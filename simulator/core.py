@@ -247,6 +247,10 @@ STAGE0_TERMINAL_SLAG_COMPONENTS = {
     'unreported_loi_residual', 'unreported_residual', 'loi_residual',
 }
 FO2_BUFFER_ACCOUNT = 'reservoir.fo2_buffer'
+FE_REDOX_OXYGEN_SOURCE_OVERHEAD = 'overhead_gas'
+FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS = (
+    'evaporative_metal_loss_internal'
+)
 WALL_DEPOSIT_ACCOUNT = 'process.wall_deposit'
 KRESS_CARMICHAEL_1991_REFERENCE = (
     'Kress and Carmichael 1991 Contrib Mineral Petrol 108:82-92 '
@@ -1065,6 +1069,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'pre-storm native-metal exsolution.',
         ),
         (
+            'engines.builtin.fe_redox_respeciation',
+            'BuiltinFeRedoxRespeciationProvider',
+            (ChemistryIntent.FE_REDOX_RESPECIATION,),
+            False,
+            'FE_REDOX_RESPECIATION -- AUTHORITATIVE: 2FeO + 0.5O2 '
+            '<-> Fe2O3 cleaned-melt repartition from scalar Kress91 fO2.',
+        ),
+        (
             'engines.builtin.stage0_pretreatment',
             'BuiltinStage0PretreatmentProvider',
             (ChemistryIntent.STAGE0_PRETREATMENT,),
@@ -1680,6 +1692,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         terms = self._evaporative_redox_source_terms_from_transition(transition)
         if not terms:
             return None
+        internal_o2_mol = max(
+            0.0,
+            float(terms.get('redox_source:evaporative_metal_loss', 0.0) or 0.0),
+        )
+        if internal_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+            self._fe_redox_internal_o2_capacity_mol_this_hr = (
+                float(
+                    getattr(
+                        self,
+                        '_fe_redox_internal_o2_capacity_mol_this_hr',
+                        0.0,
+                    )
+                )
+                + internal_o2_mol
+            )
         return self._apply_oxygen_reservoir_redox_source_terms(
             terms,
             exchange_direction=exchange_direction,
@@ -2765,6 +2792,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._redox_source_skip_reasons_this_hr = {}
         self._redox_source_context_this_hr = {}
         self._redox_source_delta_ln_this_hr = 0.0
+        self._last_fe_redox_respeciation_diagnostic = {}
+        self._fe_redox_respeciation_diagnostics_this_hr = []
+        self._fe_redox_internal_o2_capacity_mol_this_hr = 0.0
+        self._fe_redox_internal_o2_consumed_mol_this_hr = 0.0
 
     def _ledger_ferric_fraction_diagnostic(self) -> Dict[str, Any]:
         melt_mol = self.atom_ledger.mol_by_account('process.cleaned_melt')
@@ -2788,7 +2819,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ledger = (2.0 * fe2o3_mol) / oxidized_fe_mol
         delta = implied - ledger
         warning = abs(delta) > threshold
-        return {
+        diagnostic = {
             'status': 'warning' if warning else 'ok',
             'implied_ferric_fraction': implied,
             'ledger_ferric_fraction': ledger,
@@ -2799,6 +2830,175 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'sampling_context': 'current_ledger_vs_current_reservoir',
             'warning': warning,
         }
+        if warning:
+            last_respeciation = dict(
+                getattr(self, '_last_fe_redox_respeciation_diagnostic', {}) or {}
+            )
+            attribution = str(
+                last_respeciation.get('residual_attribution')
+                or 'respeciation_pending'
+            )
+            diagnostic['attribution'] = attribution
+            diagnostic['reason'] = attribution
+        return diagnostic
+
+    def _fe_redox_respeciation_divergence_attribution(
+        self,
+        diagnostic: Mapping[str, Any],
+    ) -> str:
+        exchange_direction = str(
+            getattr(self.melt.oxygen_reservoir, 'exchange_direction', '') or ''
+        )
+        reason = str(diagnostic.get('reason', '') or '')
+        oxygen_source = str(diagnostic.get('oxygen_source', '') or '')
+        unfunded_o2_mol = max(
+            0.0,
+            float(diagnostic.get('unfunded_o2_mol', 0.0) or 0.0),
+        )
+        if 'managed_headspace_to_melt' in exchange_direction and reason in {
+            'fe_redox_respeciation_o2_unavailable',
+            'fe_redox_respeciation_internal_o_unavailable',
+            '',
+        }:
+            return 'managed_floor_unbacked'
+        if (
+            oxygen_source == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
+            and unfunded_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL
+        ):
+            return 'evaporative_internal_o_unbacked'
+        if reason == 'fe_redox_respeciation_internal_o_unavailable':
+            return 'evaporative_internal_o_unbacked'
+        if reason == 'fe_redox_respeciation_o2_unavailable':
+            return 'headspace_o2_unavailable'
+        if reason == 'fe_redox_respeciation_feo_unavailable':
+            return 'feo_unavailable'
+        if reason == 'fe_redox_respeciation_fe2o3_unavailable':
+            return 'fe2o3_unavailable'
+        return 'respeciation_pending'
+
+    def _apply_fe_redox_respeciation(
+        self,
+        *,
+        oxygen_source: str = FE_REDOX_OXYGEN_SOURCE_OVERHEAD,
+    ) -> Dict[str, Any]:
+        T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
+        self._re_reference_melt_fO2_to_temperature(T_K)
+        fO2_log = self._current_melt_redox_fO2_log()
+        oxygen_source = str(oxygen_source or FE_REDOX_OXYGEN_SOURCE_OVERHEAD)
+        internal_o2_capacity_mol = 0.0
+        if oxygen_source == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS:
+            internal_o2_capacity_mol = max(
+                0.0,
+                float(
+                    getattr(
+                        self,
+                        '_fe_redox_internal_o2_capacity_mol_this_hr',
+                        0.0,
+                    )
+                    or 0.0
+                )
+                - float(
+                    getattr(
+                        self,
+                        '_fe_redox_internal_o2_consumed_mol_this_hr',
+                        0.0,
+                    )
+                    or 0.0
+                ),
+            )
+        if not self._melt_redox_temperature_shift_is_liquid(T_K):
+            diagnostic = {
+                'respeciation_status': 'skipped_solid',
+                'status': 'ok',
+                'direction': 'none',
+                'reason': 'fe_redox_respeciation_not_liquid',
+                'oxygen_source': oxygen_source,
+                'internal_o2_capacity_mol': internal_o2_capacity_mol,
+            }
+            self._sync_oxygen_reservoir_mirror()
+            divergence = self._ledger_ferric_fraction_diagnostic()
+            if divergence.get('warning'):
+                divergence['attribution'] = 'sub_liquid_respeciation_deferred'
+                divergence['reason'] = 'sub_liquid_respeciation_deferred'
+                diagnostic['residual_attribution'] = (
+                    'sub_liquid_respeciation_deferred'
+                )
+            diagnostic['ferric_divergence_after'] = divergence
+            self._last_fe_redox_respeciation_diagnostic = diagnostic
+            self._fe_redox_respeciation_diagnostics_this_hr = list(
+                getattr(self, '_fe_redox_respeciation_diagnostics_this_hr', []) or []
+            )
+            self._fe_redox_respeciation_diagnostics_this_hr.append(dict(diagnostic))
+            self.melt.oxygen_reservoir.ferric_divergence = dict(divergence)
+            return diagnostic
+        control_inputs = {
+            'source': 'scalar Kress91 fO2 ledger re-speciation',
+            'o2_account': (
+                FO2_BUFFER_ACCOUNT
+                if oxygen_source == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
+                else 'process.overhead_gas'
+            ),
+            'oxygen_source': oxygen_source,
+            'internal_o2_capacity_mol': internal_o2_capacity_mol,
+        }
+        result = self._dispatch_only(
+            ChemistryIntent.FE_REDOX_RESPECIATION,
+            control_inputs=control_inputs,
+            fO2_log=fO2_log,
+        )
+        diagnostic = dict(result.diagnostic or {})
+        diagnostic['status'] = str(result.status)
+        proposal = result.transition
+        if proposal is None:
+            self._chem_no_op_dispatch_count += 1
+        else:
+            transition = self._commit_proposal(
+                ChemistryIntent.FE_REDOX_RESPECIATION,
+                proposal,
+                diagnostic=diagnostic,
+                control_inputs=control_inputs,
+            )
+            diagnostic['transition_name'] = transition.name
+            self._project_cleaned_melt_from_atom_ledger()
+            if oxygen_source == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS:
+                self._fe_redox_internal_o2_consumed_mol_this_hr = (
+                    float(
+                        getattr(
+                            self,
+                            '_fe_redox_internal_o2_consumed_mol_this_hr',
+                            0.0,
+                        )
+                        or 0.0
+                    )
+                    + max(
+                        0.0,
+                        float(diagnostic.get('o2_debit_mol', 0.0) or 0.0),
+                    )
+                )
+        self._sync_oxygen_reservoir_mirror()
+        divergence = self._ledger_ferric_fraction_diagnostic()
+        if (
+            divergence.get('warning')
+            or str(diagnostic.get('status', '') or '') == 'refused'
+            or max(0.0, float(diagnostic.get('unfunded_o2_mol', 0.0) or 0.0))
+            > OXYGEN_RESERVOIR_NOOP_MOL
+        ):
+            attribution = self._fe_redox_respeciation_divergence_attribution(
+                diagnostic
+            )
+            divergence['attribution'] = attribution
+            divergence['reason'] = attribution
+            diagnostic['residual_attribution'] = attribution
+        diagnostic['ferric_divergence_after'] = divergence
+        self._last_fe_redox_respeciation_diagnostic = diagnostic
+        self._fe_redox_respeciation_diagnostics_this_hr = list(
+            getattr(self, '_fe_redox_respeciation_diagnostics_this_hr', []) or []
+        )
+        self._fe_redox_respeciation_diagnostics_this_hr.append(dict(diagnostic))
+        self.melt.oxygen_reservoir.ferric_divergence = dict(
+            diagnostic['ferric_divergence_after']
+        )
+        return diagnostic
 
     def _redox_source_breakdown_diagnostic(self) -> Dict[str, Any]:
         def _filtered_terms(attr_name: str) -> Dict[str, float]:
@@ -2837,6 +3037,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if not source_context:
             source_context = self._redox_source_context_for_current_state()
+        respeciation_attempts = [
+            dict(attempt)
+            for attempt in (
+                getattr(self, '_fe_redox_respeciation_diagnostics_this_hr', []) or []
+            )
+        ]
         return {
             'terms_mol_o2_equiv_by_label': terms,
             'applied_terms_mol_o2_equiv_by_label': applied_terms,
@@ -2848,6 +3054,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'delta_ln_fO2': delta_ln,
             'delta_log10_fO2': delta_ln / math.log(10.0),
             'ferric_divergence': self._ledger_ferric_fraction_diagnostic(),
+            'fe_redox_respeciation': dict(
+                getattr(self, '_last_fe_redox_respeciation_diagnostic', {}) or {}
+            ),
+            'fe_redox_respeciation_attempts': respeciation_attempts,
             'source_context': source_context,
             'source_campaign': str(source_context.get('campaign', '')),
             'source_hour': int(source_context.get('hour', 0)),
@@ -7414,13 +7624,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         2. Update temperature (ramp toward campaign target)
         3. Apply passive oxygen-reservoir exchange from carried-in headspace
         4. Commit C3/MRE/C6/C7 source-producing reactions
-        5. Apply native-Fe split from the post-source redox state
-        6. Refresh thermodynamic equilibrium (via melt backend)
-        7. Calculate evaporation flux and route it through condensation
-        8. Update overhead gas & turbine pressure
-        9. Calculate energy consumption this hour
-        10. Check campaign endpoint criteria
-        11. Record snapshot
+        5. Repartition FeO/Fe2O3 from the post-source redox state
+        6. Apply native-Fe split from the re-speciated melt state
+        7. Refresh thermodynamic equilibrium (via melt backend)
+        8. Calculate evaporation flux and route it through condensation
+        9. Repartition any evaporation-induced FeO/Fe2O3 redox shift
+        10. Update overhead gas & turbine pressure
+        11. Calculate energy consumption this hour
+        12. Check campaign endpoint criteria
+        13. Record snapshot
 
         Returns:
             HourSnapshot with full system state at this hour
@@ -7496,6 +7708,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.melt.campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             self._step_c7_ca_aluminothermic()
 
+        self._apply_fe_redox_respeciation()
         self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
 
         # --- 4. Thermodynamic equilibrium ---
@@ -7528,6 +7741,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 6. Update melt composition ---
         # Subtract evaporated mass from the melt.
         self._update_melt_composition(evap_flux)
+        remaining_internal_o2_mol = max(
+            0.0,
+            float(
+                getattr(
+                    self,
+                    '_fe_redox_internal_o2_capacity_mol_this_hr',
+                    0.0,
+                )
+                or 0.0
+            )
+            - float(
+                getattr(
+                    self,
+                    '_fe_redox_internal_o2_consumed_mol_this_hr',
+                    0.0,
+                )
+                or 0.0
+            ),
+        )
+        if remaining_internal_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+            self._apply_fe_redox_respeciation(
+                oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+            )
+        else:
+            self._apply_fe_redox_respeciation()
 
         # --- 7. Overhead gas (with turbine capacity feedback) ---   [LOOP-2]
         # Pass the turbine spec so overhead model can enforce capacity limits,
@@ -7536,9 +7774,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # The AtomLedger is the canonical quantity authority (see AGENTS.md),
         # so the turbine/vent decision is fed strictly the actual finite O2
         # holdup in process.overhead_gas. This is NOT max()'d with a per-tick
-        # production counter: the holdup already includes this tick's
-        # evaporation O2 coproduct (credited in evaporation.py) plus any O2
-        # carried over from prior ticks not yet drained. max()-ing the two
+        # production counter: the holdup already includes this tick's real
+        # overhead O2 plus any O2 carried over from prior ticks not yet drained.
+        # max()-ing the two
         # overlapping quantities would let the turbine see carried-over O2 as
         # fresh throughput, or mask the case where holdup < this-hour output.
         finite_headspace_enabled = self._overhead_headspace_enabled()

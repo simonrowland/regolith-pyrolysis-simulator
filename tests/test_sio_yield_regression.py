@@ -109,9 +109,14 @@ GOLDENS = (
 # C2A_continuous is FP-IDENTICAL (the cooler continuous dwell never enters
 # the coupling regime — consistent with the staged-vs-continuous dwell
 # physics). Correction-class; not a retune.
+# 2026-07-02 SSO-R re-speciation (#82): ledger Fe2O3 now forms from
+# retained metal-evaporation O, changing the melt composition/fO2 path;
+# mars SiO partially recovers (5.6767e-06 -> 6.2597e-06, +10%) because
+# some retained O now oxidizes Fe instead of staying as free couple
+# drive. Lunar continuous remains FP-identical (below coupling regime).
 BASELINE_SIO_EVOLVED_KG = {
     "lunar_mare_low_ti": 9.11967185718e-06,
-    "mars_basalt": 5.67671326661e-06,
+    "mars_basalt": 6.2597137711e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +

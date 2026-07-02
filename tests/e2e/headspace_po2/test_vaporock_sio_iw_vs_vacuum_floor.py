@@ -47,7 +47,9 @@ SIO_ANCHOR_HOUR = 6
 # changes; strong internal control). Separation 0.5010 -> 0.1031 decade;
 # the old wide separation partly encoded the missing self-oxidation.
 # Correction-class.
-EXPECTED_SIO_DECADE_DRIFT = 0.10313466268217683
+# 2026-07-02 re-speciation (#82): retained-O ledger bookkeeping narrows
+# the managed-vs-IW separation further (0.1031 -> 0.0342 decade).
+EXPECTED_SIO_DECADE_DRIFT = 0.03422618580509003
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

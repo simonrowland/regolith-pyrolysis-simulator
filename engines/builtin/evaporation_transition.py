@@ -7,10 +7,10 @@ exactly -- this is a refactor of where the LedgerTransition is built, not
 a re-derivation of the stoich math (which still routes through
 ``_evaporation_stoich`` at the caller). The provider:
 
-- reads ``process.cleaned_melt``, ``process.overhead_gas``, and
-  ``process.condensation_train`` from the account view -- the three
-  accounts the legacy transition touches (see "Account declaration"
-  below for the rationale on all three),
+- reads ``process.cleaned_melt``, ``process.overhead_gas``,
+  ``process.condensation_train``, and ``reservoir.fo2_buffer`` from the
+  account view -- the accounts the evaporation transition touches (see
+  "Account declaration" below for the rationale),
 - reads T from ``request.temperature_C``,
 - reads the per-species flux + condensation outcome from
   ``request.control_inputs``:
@@ -49,16 +49,18 @@ validation runs both at dispatch time (in ``validate_atom_balance``) and
 again at commit time (re-validated by ``commit_batch``).
 
 Account declaration: ``process.cleaned_melt``, ``process.overhead_gas``,
-``process.condensation_train``. The legacy
+``process.condensation_train``, ``reservoir.fo2_buffer``. The legacy
 :meth:`_credit_evaporation_transition` builds a single
-:class:`LedgerTransition` with these three accounts on its debit/credit
+:class:`LedgerTransition` with these accounts on its debit/credit
 sides; the provider must declare every account the proposal touches
 (``validate_proposal_accounts`` enforces this with
 :class:`AccountFilterViolation`). The cleaned-melt is the debit; the
 condensation_train is credited with the condensed fraction (in mol if
 the species disproportionates, in kg otherwise -- the kernel's
 proposal layer is mol-native, so the provider converts); the overhead_gas
-is credited with the uncondensed vapor + the O2 coproduct.
+is credited with uncondensed vapor and oxide-vapor O2; elemental metal
+evaporation parks parent-oxide oxygen in ``reservoir.fo2_buffer`` for the
+same-tick Fe redox re-speciation chain.
 """
 
 from __future__ import annotations
@@ -99,6 +101,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         "process.cleaned_melt",
         "process.overhead_gas",
         "process.condensation_train",
+        "reservoir.fo2_buffer",
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -226,6 +229,8 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         # the provider speaks mol natively here to match the kernel API).
         registry = request.account_view.species_formula_registry
 
+        vapor_formula = resolve_species_formula(species, registry)
+        vapor_oxygen_atoms = float(vapor_formula.elements.get("O", 0.0) or 0.0)
         condensed_product_mol = self._condensed_product_mol(
             species, condensed_kg, sp_data, registry,
             resolve_species_formula,
@@ -236,6 +241,7 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         #   debits:  process.cleaned_melt -> {parent_oxide: mol}
         #   credits: process.condensation_train -> {product: mol, ...}
         #            process.overhead_gas        -> {species: mol, O2: mol}
+        #            reservoir.fo2_buffer        -> {O2: mol}
         # ------------------------------------------------------------------
         debits: dict[str, dict[str, float]] = {}
         credits: dict[str, dict[str, float]] = {}
@@ -250,15 +256,16 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
 
         overhead_credit: dict[str, float] = {}
         if remaining_kg > 1e-12:
-            vapor_formula = resolve_species_formula(species, registry)
             overhead_credit[species] = (
                 remaining_kg / vapor_formula.molar_mass_kg_per_mol()
             )
         if O2_kg > 1e-12:
             o2_formula = resolve_species_formula("O2", registry)
-            overhead_credit["O2"] = (
-                O2_kg / o2_formula.molar_mass_kg_per_mol()
-            )
+            o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
+            if vapor_oxygen_atoms <= 0.0:
+                credits["reservoir.fo2_buffer"] = {"O2": o2_mol}
+            else:
+                overhead_credit["O2"] = o2_mol
         if overhead_credit:
             credits["process.overhead_gas"] = overhead_credit
         if O2_kg < -1e-12:

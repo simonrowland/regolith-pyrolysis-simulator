@@ -42,6 +42,7 @@ _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
     'SiO2',
     'Al2O3',
     'FeO',
+    'Fe2O3',
     'MgO',
     'CaO',
     'Na2O',
@@ -1043,8 +1044,9 @@ class EvaporationMixin:
         committed through the kernel. The flow per species is:
 
         1. EVAPORATION_TRANSITION dispatched with ``remaining=rate`` --
-           ALL vapor routed to ``process.overhead_gas`` (plus O2
-           coproduct). No condensation_train credit from that intent.
+           ALL vapor routed to ``process.overhead_gas``; elemental-metal
+           parent-oxide oxygen stays in ``reservoir.fo2_buffer``. No
+           condensation_train credit from that intent.
         2. CONDENSATION_ROUTE dispatched with the analytically smoothed
            per-species condensed_kg derived from
            ``route_result.remaining_by_species`` -- debits

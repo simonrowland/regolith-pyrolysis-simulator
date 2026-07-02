@@ -2,6 +2,7 @@ import shlex
 
 import pytest
 
+from simulator.core import FERRIC_DIVERGENCE_WARNING_THRESHOLD
 from simulator.session_cli import SessionScriptRunner
 from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS, STOICH_RATIOS
 
@@ -18,7 +19,8 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # raising fO2 into the staged run and suppressing SiO release; wall SiO
 # 2.7316e-4 -> 2.0656e-4 (-24%). Correction-class (the lever interaction
 # the model was missing).
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.0002065561796897695
+# 2026-07-02 re-speciation (#82): micro-drift through the coupled route.
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00020655554960142685
 
 
 def _run_script(lines: list[str]):
@@ -184,6 +186,7 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # the shuttle-reduction window than staged's scheduled ramp, so it reduces more
     # FeO -> more Fe product at this dwell. This is a shuttle-dwell effect, not the
     # alpha-series evaporation change.
+    assert continuous_products.get("Fe", 0.0) > 0.0
     assert continuous_products.get("Fe", 0.0) > staged_products.get("Fe", 0.0)
     # Na product is now mode-independent: the alpha-series transport limit suppresses
     # main-extraction Na evaporation ~285x in BOTH modes, collapsing the staged>continuous
@@ -215,6 +218,22 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     assert staged_silica > 1e-4
     assert staged_stage3_total > staged_silica
     assert staged_silica / staged_stage3_total > 0.02
+
+
+def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():
+    sim = _run_staged()
+
+    melt_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    divergence = sim.melt.oxygen_reservoir.ferric_divergence
+
+    assert melt_kg.get("Fe2O3", 0.0) > 0.0
+    assert (
+        divergence["delta_abs"] <= FERRIC_DIVERGENCE_WARNING_THRESHOLD
+        or divergence.get("attribution") in {
+            "managed_floor_unbacked",
+            "sub_liquid_respeciation_deferred",
+        }
+    )
 
 
 def test_c2a_staged_pipework_has_no_upstream_cold_spot():

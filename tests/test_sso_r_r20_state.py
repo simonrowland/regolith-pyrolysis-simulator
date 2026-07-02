@@ -18,6 +18,7 @@ from simulator.account_ids import (
 from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.core import (
+    FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
     FERRIC_DIVERGENCE_WARNING_THRESHOLD,
     OXYGEN_RESERVOIR_NOOP_MOL,
     PyrolysisSimulator,
@@ -119,6 +120,10 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
         order.append("native_split")
         return {}
 
+    def fake_respeciation(**_kwargs):
+        order.append("fe_redox_respeciation")
+        return {}
+
     def fake_equilibrium():
         order.append("equilibrium")
         return SimpleNamespace()
@@ -142,6 +147,7 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
 
     monkeypatch.setattr(sim, "_apply_oxygen_reservoir_exchange", fake_exchange)
     monkeypatch.setattr(sim, "_step_shuttle", lambda: order.append("c3_source"))
+    monkeypatch.setattr(sim, "_apply_fe_redox_respeciation", fake_respeciation)
     monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", fake_native_split)
     monkeypatch.setattr(sim, "_get_equilibrium", fake_equilibrium)
     monkeypatch.setattr(sim, "_calculate_evaporation", fake_evaporation)
@@ -158,12 +164,16 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
     sim.step()
 
     assert order.count("passive_exchange") == 1
+    assert order.count("fe_redox_respeciation") == 2
     assert order.index("passive_exchange") < order.index("evaporation")
-    assert order.index("c3_source") < order.index("native_split")
+    assert order.index("c3_source") < order.index("fe_redox_respeciation")
+    assert order.index("fe_redox_respeciation") < order.index("native_split")
     assert order.index("native_split") < order.index("evaporation")
     assert order.index("passive_exchange") < order.index(
         "evaporative_redox_source_terms"
     )
+    assert order.index("evaporative_redox_source_terms") < len(order) - 1
+    assert order[-1] == "fe_redox_respeciation"
 
 
 @pytest.mark.parametrize(
@@ -198,6 +208,10 @@ def test_step_orders_source_producers_before_native_split(
         order.append("native_split")
         return {}
 
+    def fake_respeciation(**_kwargs):
+        order.append("fe_redox_respeciation")
+        return {}
+
     def fake_producer():
         order.append(producer_marker)
         return producer_result
@@ -208,6 +222,7 @@ def test_step_orders_source_producers_before_native_split(
         lambda: order.append("passive_exchange") or sim.melt.oxygen_reservoir,
     )
     monkeypatch.setattr(sim, producer_attr, fake_producer)
+    monkeypatch.setattr(sim, "_apply_fe_redox_respeciation", fake_respeciation)
     monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", fake_native_split)
     monkeypatch.setattr(
         sim,
@@ -218,7 +233,8 @@ def test_step_orders_source_producers_before_native_split(
     sim.step()
 
     assert order.index("passive_exchange") < order.index(producer_marker)
-    assert order.index(producer_marker) < order.index("native_split")
+    assert order.index(producer_marker) < order.index("fe_redox_respeciation")
+    assert order.index("fe_redox_respeciation") < order.index("native_split")
     assert order.index("native_split") < order.index("equilibrium")
 
 
@@ -1080,11 +1096,18 @@ def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
         account="process.cleaned_melt",
         species=parent_oxide,
     )
-    o2_mol = _transition_account_species_mol(
+    overhead_o2_mol = _transition_account_species_mol(
         sim,
         transition,
         side="credits",
         account="process.overhead_gas",
+        species="O2",
+    )
+    buffer_o2_mol = _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account="reservoir.fo2_buffer",
         species="O2",
     )
     breakdown = sim._redox_source_breakdown_diagnostic()
@@ -1092,7 +1115,8 @@ def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
     assert rate_kg_hr > 0.0
     assert transition.name == f"evaporate_{species}"
     assert parent_oxide_o2_equiv_mol > 0.0
-    assert o2_mol == pytest.approx(parent_oxide_o2_equiv_mol)
+    assert overhead_o2_mol == pytest.approx(0.0)
+    assert buffer_o2_mol == pytest.approx(parent_oxide_o2_equiv_mol)
     assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
         parent_oxide_o2_equiv_mol
     )
@@ -1269,6 +1293,176 @@ def test_managed_o2_floor_relaxes_reducing_melt_without_real_o2_inventory() -> N
         0.0,
     )
     assert after_o2 == pytest.approx(before_o2)
+
+
+def test_fe_redox_respeciation_closes_scalar_ledger_divergence_with_real_o2() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 10_000.0},
+        source="test explicit headspace oxygen for Fe redox re-speciation",
+    )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    before = sim._ledger_ferric_fraction_diagnostic()
+    before_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+
+    diagnostic = sim._apply_fe_redox_respeciation()
+
+    after = sim._ledger_ferric_fraction_diagnostic()
+    after_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+    melt_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    assert before["status"] == "warning"
+    assert diagnostic["status"] == "ok"
+    assert diagnostic["direction"] == "oxidizing"
+    assert after["status"] == "ok"
+    assert after["delta_abs"] <= FERRIC_DIVERGENCE_WARNING_THRESHOLD
+    assert melt_mol.get("Fe2O3", 0.0) > 0.0
+    assert after_o2 < before_o2
+
+
+def test_fe_redox_respeciation_refuses_managed_floor_without_phantom_o2() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim._apply_oxygen_reservoir_exchange()
+    diagnostic = sim._apply_fe_redox_respeciation()
+
+    assert diagnostic["status"] == "refused"
+    assert diagnostic["reason"] == "fe_redox_respeciation_o2_unavailable"
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
+        "Fe2O3",
+        0.0,
+    ) == pytest.approx(0.0)
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    ) == pytest.approx(0.0)
+    assert diagnostic["ferric_divergence_after"]["delta_abs"] >= 0.0
+    assert diagnostic["ferric_divergence_after"]["attribution"] == (
+        "managed_floor_unbacked"
+    )
+
+
+def test_fe_redox_respeciation_uses_evaporative_internal_o_without_overhead_draw() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim._sync_oxygen_reservoir_mirror()
+    sim._fe_redox_internal_o2_capacity_mol_this_hr = 10_000.0
+    sim.atom_ledger.load_external_mol(
+        "reservoir.fo2_buffer",
+        {"O2": 10_000.0},
+        source="test evaporative internal O carrier",
+    )
+    sim._redox_source_terms_this_hr = {
+        "redox_source:evaporative_metal_loss": 10_000.0,
+    }
+    sim._redox_source_applied_terms_this_hr = {
+        "redox_source:evaporative_metal_loss": 10_000.0,
+    }
+    before_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    )
+    before_buffer_o2 = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get(
+        "O2",
+        0.0,
+    )
+
+    diagnostic = sim._apply_fe_redox_respeciation(
+        oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+    )
+
+    melt_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    buffer_mol = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer")
+    after_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    )
+    assert diagnostic["status"] == "ok"
+    assert diagnostic["direction"] == "oxidizing"
+    assert diagnostic["oxygen_source"] == "evaporative_metal_loss_internal"
+    assert melt_mol.get("Fe2O3", 0.0) > 0.0
+    assert buffer_mol.get("O2", 0.0) < before_buffer_o2
+    assert buffer_mol.get("O2", 0.0) >= 0.0
+    assert after_o2 == pytest.approx(before_o2)
+    breakdown = sim._redox_source_breakdown_diagnostic()
+    attempts = breakdown["fe_redox_respeciation_attempts"]
+    assert attempts[-1]["oxygen_source"] == (
+        "evaporative_metal_loss_internal"
+    )
+    assert attempts[-1]["status"] == "ok"
+
+
+def test_fe_redox_respeciation_skips_below_liquid_calibration_band() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 265.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim._sync_oxygen_reservoir_mirror()
+    sim._fe_redox_internal_o2_capacity_mol_this_hr = 1_000.0
+    sim.atom_ledger.load_external_mol(
+        "reservoir.fo2_buffer",
+        {"O2": 1_000.0},
+        source="test sub-liquid internal O carrier",
+    )
+    before_melt = dict(sim.atom_ledger.mol_by_account("process.cleaned_melt"))
+    before_buffer_o2 = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer")[
+        "O2"
+    ]
+
+    diagnostic = sim._apply_fe_redox_respeciation(
+        oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+    )
+
+    after_melt = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    after_buffer_o2 = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer")[
+        "O2"
+    ]
+    assert diagnostic["respeciation_status"] == "skipped_solid"
+    assert diagnostic["reason"] == "fe_redox_respeciation_not_liquid"
+    assert after_melt.get("Fe2O3", 0.0) == pytest.approx(
+        before_melt.get("Fe2O3", 0.0),
+    )
+    assert after_buffer_o2 == pytest.approx(before_buffer_o2)
+
+
+def test_full_c2a_step_reports_closed_ferric_divergence_after_respeciation() -> None:
+    sim = _make_sim()
+    sim.start_campaign(CampaignPhase.C2A)
+    sim.melt.temperature_C = 1600.0
+    sim.melt.target_temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 10_000.0},
+        source="test explicit headspace oxygen for full-step Fe redox re-speciation",
+    )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    snapshot = sim.step()
+    summary = build_per_hour_summary(sim, snapshot)
+
+    divergence = snapshot.oxygen_reservoir["ferric_divergence"]
+    assert divergence["status"] == "ok"
+    assert divergence["delta_abs"] <= FERRIC_DIVERGENCE_WARNING_THRESHOLD
+    assert snapshot.composition_wt_pct["Fe2O3"] > 0.0
+    assert summary["fe_redox_split"]["ferric_frac"] == pytest.approx(
+        divergence["ledger_ferric_fraction"],
+        abs=FERRIC_DIVERGENCE_WARNING_THRESHOLD,
+    )
 
 
 def test_pn2_sweep_without_o2_does_not_phantom_oxidize_melt() -> None:

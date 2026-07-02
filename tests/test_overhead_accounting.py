@@ -64,6 +64,10 @@ def _sio_train_sim():
     return sim
 
 
+def _sio_o2_kg(sio_kg):
+    return sio_kg * 0.5 * MOLAR_MASS["O2"] / MOLAR_MASS["SiO"]
+
+
 def _cro2_train_sim():
     backend = StubBackend()
     backend.initialize({})
@@ -155,17 +159,18 @@ def test_mre_anode_o2_is_not_turbine_throughput():
 
 
 def test_gas_train_o2_routes_through_terminal_ledger_not_stage6():
-    sim = _gas_train_sim()
-    fe_kg = MOLAR_MASS["Fe"]
-    o2_from_fe_kg = 0.5 * MOLAR_MASS["O2"]
-    flux = EvaporationFlux(species_kg_hr={"Fe": fe_kg}, total_kg_hr=fe_kg)
+    # Re-speciation contract: SiO still credits overhead O2; metal O stays internal.
+    sim = _sio_train_sim()
+    sio_kg = 100.0
+    o2_from_sio_kg = _sio_o2_kg(sio_kg)
+    flux = EvaporationFlux(species_kg_hr={"SiO": sio_kg}, total_kg_hr=sio_kg)
 
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
 
-    assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
-        "O2"
-    ] == pytest.approx(o2_from_fe_kg)
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas").get(
+        "O2", 0.0
+    ) == pytest.approx(o2_from_sio_kg)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_stored").get("O2", 0.0) == pytest.approx(0.0)
     assert sim._oxygen_total_kg() == pytest.approx(0.0)
@@ -174,12 +179,13 @@ def test_gas_train_o2_routes_through_terminal_ledger_not_stage6():
 
 
 def test_o2_venting_moves_between_terminal_ledger_accounts():
-    sim = _gas_train_sim()
-    fe_kg = MOLAR_MASS["Fe"]
-    o2_from_fe_kg = 0.5 * MOLAR_MASS["O2"]
+    # Re-speciation contract: use SiO to exercise overhead O2 vent routing.
+    sim = _sio_train_sim()
+    sio_kg = 100.0
+    o2_from_sio_kg = _sio_o2_kg(sio_kg)
     stored_o2_kg = 10.0
-    vented_o2_kg = o2_from_fe_kg - stored_o2_kg
-    flux = EvaporationFlux(species_kg_hr={"Fe": fe_kg}, total_kg_hr=fe_kg)
+    vented_o2_kg = o2_from_sio_kg - stored_o2_kg
+    flux = EvaporationFlux(species_kg_hr={"SiO": sio_kg}, total_kg_hr=sio_kg)
     turbine = types.SimpleNamespace(max_O2_flow_kg_hr=10.0)
 
     sim._route_to_condensation(flux)
@@ -189,7 +195,7 @@ def test_o2_venting_moves_between_terminal_ledger_accounts():
         sim.train,
         turbine_spec=turbine,
         actual_O2_kg_hr=sim.atom_ledger.kg_by_account(
-            "process.overhead_gas")["O2"],
+            "process.overhead_gas").get("O2", 0.0),
     )
     sim._dispatch_overhead_bleed(
         turbine_spec=turbine,
@@ -204,16 +210,17 @@ def test_o2_venting_moves_between_terminal_ledger_accounts():
     assert sim.atom_ledger.kg_by_account("terminal.oxygen_melt_offgas_vented_to_vacuum")[
         "O2"
     ] == pytest.approx(vented_o2_kg)
-    assert sim._oxygen_total_kg() == pytest.approx(o2_from_fe_kg)
+    assert sim._oxygen_total_kg() == pytest.approx(o2_from_sio_kg)
     assert sim.O2_stored_cumulative_kg == pytest.approx(stored_o2_kg)
     assert sim.O2_vented_cumulative_kg == pytest.approx(vented_o2_kg)
 
 
 def test_step_does_not_double_credit_gas_train_ledger_o2():
-    sim = _gas_train_sim()
-    fe_kg = MOLAR_MASS["Fe"]
-    o2_from_fe_kg = 0.5 * MOLAR_MASS["O2"]
-    flux = EvaporationFlux(species_kg_hr={"Fe": fe_kg}, total_kg_hr=fe_kg)
+    # Re-speciation contract: SiO preserves the overhead O2 source for this invariant.
+    sim = _sio_train_sim()
+    sio_kg = 100.0
+    o2_from_sio_kg = _sio_o2_kg(sio_kg)
+    flux = EvaporationFlux(species_kg_hr={"SiO": sio_kg}, total_kg_hr=sio_kg)
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
@@ -222,16 +229,17 @@ def test_step_does_not_double_credit_gas_train_ledger_o2():
 
     sim.step()
 
-    assert sim._oxygen_total_kg() == pytest.approx(o2_from_fe_kg)
+    assert sim._oxygen_total_kg() == pytest.approx(o2_from_sio_kg)
 
 
 def test_step_vents_terminal_stored_evaporation_o2_when_turbine_limited():
-    sim = _gas_train_sim()
-    fe_kg = MOLAR_MASS["Fe"]
-    o2_from_fe_kg = 0.5 * MOLAR_MASS["O2"]
+    # Re-speciation contract: SiO O2 still enters overhead and can be vented.
+    sim = _sio_train_sim()
+    sio_kg = 100.0
+    o2_from_sio_kg = _sio_o2_kg(sio_kg)
     stored_o2_kg = 10.0
-    vented_o2_kg = o2_from_fe_kg - stored_o2_kg
-    flux = EvaporationFlux(species_kg_hr={"Fe": fe_kg}, total_kg_hr=fe_kg)
+    vented_o2_kg = o2_from_sio_kg - stored_o2_kg
+    flux = EvaporationFlux(species_kg_hr={"SiO": sio_kg}, total_kg_hr=sio_kg)
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
@@ -248,7 +256,7 @@ def test_step_vents_terminal_stored_evaporation_o2_when_turbine_limited():
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_vented_to_vacuum"
     )["O2"] == pytest.approx(vented_o2_kg)
-    assert sim._oxygen_total_kg() == pytest.approx(o2_from_fe_kg)
+    assert sim._oxygen_total_kg() == pytest.approx(o2_from_sio_kg)
 
 
 def test_overhead_o2_not_double_counted_across_ticks():
@@ -259,9 +267,11 @@ def test_overhead_o2_not_double_counted_across_ticks():
     # production counter, which would let carried-over O2 read as fresh
     # throughput. The invariant: over tick 2, turbine throughput + vent
     # equals the ledger O2 delta into the terminal accounts.
-    sim = _gas_train_sim(mass_kg=200.0)
-    fe_kg = MOLAR_MASS["Fe"]
-    flux = EvaporationFlux(species_kg_hr={"Fe": fe_kg}, total_kg_hr=fe_kg)
+    # Re-speciation contract: SiO still supplies overhead O2 across ticks.
+    sim = _sio_train_sim()
+    sio_kg = 100.0
+    o2_from_sio_kg = _sio_o2_kg(sio_kg)
+    flux = EvaporationFlux(species_kg_hr={"SiO": sio_kg}, total_kg_hr=sio_kg)
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
@@ -289,7 +299,7 @@ def test_overhead_o2_not_double_counted_across_ticks():
 
     carried_over_kg = sim.atom_ledger.kg_by_account(
         "process.overhead_gas")["O2"]
-    assert carried_over_kg == pytest.approx(0.5 * MOLAR_MASS["O2"])
+    assert carried_over_kg == pytest.approx(o2_from_sio_kg)
 
     # Capture the O2 quantity the turbine model is actually fed on tick 2,
     # and the ledger holdup that exists at that instant.

@@ -128,6 +128,7 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     wall01_mol = sim.atom_ledger.mol_by_account(
         "process.wall_deposit_segment_stage_0_to_stage_1"
     )
+    fo2_buffer_mol = sim.atom_ledger.mol_by_account("reservoir.fo2_buffer")
     tap = sim.atom_ledger.kg_by_account("terminal.drain_tap_material")
     overhead = sim.atom_ledger.kg_by_account("process.overhead_gas")
     fe_mm = resolve_species_formula(
@@ -160,11 +161,16 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     assert before_feo_kg - after_melt["FeO"] == pytest.approx(
         split_fe_mol * feo_mm,
     )
-    assert overhead["O2"] == pytest.approx(0.5 * split_fe_mol * o2_mm)
+    retained_o2_mol = fo2_buffer_mol.get("O2", 0.0)
+    # 2026-07-02 re-speciation #82: vapor Fe keeps its oxide O in fO2 buffer.
+    assert overhead["O2"] + retained_o2_mol * o2_mm == pytest.approx(
+        0.5 * split_fe_mol * o2_mm
+    )
     partition = sim._compute_fe_redox_split_diagnostic()["native_fe_partition"]
     assert partition["native_fe_pool_mol"] == pytest.approx(split_fe_mol)
     assert partition["native_fe_tap_mol"] == pytest.approx(tap_mol["Fe"])
     assert partition["native_fe_vapor_mol"] == pytest.approx(routed_vapor_mol)
+    assert retained_o2_mol == pytest.approx(0.5 * routed_vapor_mol)
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(
         0.0,
         abs=5e-12,

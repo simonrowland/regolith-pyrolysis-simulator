@@ -5,11 +5,12 @@ ledger-mutating intent in the migration.
 Covers:
 
 * Capability profile: provider is authoritative for
-  ``EVAPORATION_TRANSITION`` and declares the three accounts the
+  ``EVAPORATION_TRANSITION`` and declares the accounts the
   legacy transition touches (``process.cleaned_melt``,
-  ``process.overhead_gas``, ``process.condensation_train``).
+  ``process.overhead_gas``, ``process.condensation_train``,
+  ``reservoir.fo2_buffer``).
 * Account filter: the kernel filter scopes the provider's view to those
-  three accounts only -- a metal-phase seed must NOT cross the boundary.
+  declared accounts only -- a metal-phase seed must NOT cross the boundary.
 * Atom-balance gate: a malformed proposal that does NOT conserve atoms
   is rejected at ``ChemistryKernel.commit_batch`` with
   :class:`AtomBalanceError`. This proves the authoritative ledger-write
@@ -65,13 +66,14 @@ def test_provider_declares_only_evaporation_transition_intent():
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_three_evaporation_accounts():
+def test_provider_declares_four_evaporation_accounts():
     provider = BuiltinEvaporationTransitionProvider()
     profile = provider.capability_profile()
     assert profile.declared_accounts == frozenset({
         "process.cleaned_melt",
         "process.overhead_gas",
         "process.condensation_train",
+        "reservoir.fo2_buffer",
     })
 
 
@@ -132,6 +134,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         "process.cleaned_melt",
         "process.overhead_gas",
         "process.condensation_train",
+        "reservoir.fo2_buffer",
     })
     for accounts in seen_accounts:
         assert accounts == expected, (
@@ -228,7 +231,7 @@ def test_provider_emits_expected_proposal_for_known_inputs(
 
     * the proposal debits ``process.cleaned_melt`` for parent oxide,
     * the proposal credits ``process.condensation_train`` for vapor,
-    * the proposal credits ``process.overhead_gas`` for the O2 coproduct,
+    * the proposal credits ``reservoir.fo2_buffer`` for the internal O2 carrier,
     * the atom-balance proof is element-by-element zero (within
       tolerance).
     """
@@ -308,15 +311,15 @@ def test_provider_emits_expected_proposal_for_known_inputs(
         expected_oxide_kg / mw_na2o, rel=1e-12
     )
 
-    # Credit side: condensation_train with vapor + overhead_gas with O2.
+    # Credit side: condensation_train with vapor + internal fO2 buffer with O2.
     assert set(proposal.credits) == {
         "process.condensation_train",
-        "process.overhead_gas",
+        "reservoir.fo2_buffer",
     }
     cond_train_credit = dict(proposal.credits["process.condensation_train"])
-    overhead_credit = dict(proposal.credits["process.overhead_gas"])
+    buffer_credit = dict(proposal.credits["reservoir.fo2_buffer"])
     assert cond_train_credit["Na"] == pytest.approx(rate_kg_hr / mw_na, rel=1e-12)
-    assert overhead_credit["O2"] == pytest.approx(expected_o2_kg / mw_o2, rel=1e-12)
+    assert buffer_credit["O2"] == pytest.approx(expected_o2_kg / mw_o2, rel=1e-12)
 
     # Atom-balance proof: every element should net to ~0
     for element, net in dict(proposal.atom_balance_proof).items():
@@ -444,8 +447,8 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
     * debit: ``process.cleaned_melt`` with the parent oxide,
     * credit: ``process.condensation_train`` with the condensed vapor
       (or vapor disproportionation products),
-    * credit: ``process.overhead_gas`` with the uncondensed vapor +
-      O2 coproduct.
+    * credit: ``process.overhead_gas`` with uncondensed vapor / oxide-vapor O2,
+    * credit: ``reservoir.fo2_buffer`` with elemental-metal parent-oxide O.
 
     Note: this test runs the simulator -- which uses the kernel path --
     so the assertion is that the committed transitions take the same
@@ -503,6 +506,7 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
         "process.cleaned_melt",
         "process.overhead_gas",
         "process.condensation_train",
+        "reservoir.fo2_buffer",
     }
     for trans in evap_transitions:
         for lot in trans.debits:
@@ -610,10 +614,12 @@ def test_evaporation_transition_does_not_apply_per_species_scale(
     expected_o2_kg = rate_kg_hr * O2_per_product_kg
 
     overhead_credit = dict(proposal.credits["process.overhead_gas"])
+    buffer_credit = dict(proposal.credits["reservoir.fo2_buffer"])
     assert overhead_credit["Na"] == pytest.approx(
         expected_vapor_kg / mw_na, rel=1e-12
     )
-    assert overhead_credit["O2"] == pytest.approx(
+    assert "O2" not in overhead_credit
+    assert buffer_credit["O2"] == pytest.approx(
         expected_o2_kg / mw_o2, rel=1e-12
     )
 

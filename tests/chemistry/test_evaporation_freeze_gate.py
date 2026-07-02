@@ -657,7 +657,10 @@ def test_freeze_gate_pre_curve_window_builds_curve_on_first_staged_tick(
         ticks_to_curve += 1
 
     assert ticks_to_curve == 1
-    assert gate_calls == 1
+    # Round-3 Fe re-speciation can materialize ferric ledger state on the
+    # same hot staged tick that builds the first curve. That is a real
+    # composition/fO2 key change, so one immediate bounded rekey is expected.
+    assert 1 <= gate_calls <= 2
 
 
 def test_temperature_rereference_noop_skips_liquid_guard(
@@ -845,3 +848,28 @@ def test_freeze_gate_cache_key_includes_pressure_and_fo2(
     assert same == baseline
     assert different_pressure != baseline
     assert different_fO2 != baseline
+
+
+def test_freeze_gate_cache_key_includes_respeciated_fe2o3(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+
+    baseline = sim._freeze_gate_cache_key(pressure_bar=1.00, fO2_log=-9.0)
+    sim.atom_ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        {'Fe2O3': 1_000.0},
+        source='test ferric oxide cache-key perturbation',
+    )
+    ferric_key = sim._freeze_gate_cache_key(pressure_bar=1.00, fO2_log=-9.0)
+
+    assert ferric_key != baseline
+    composition_key = dict(ferric_key[3])
+    assert 'Fe2O3' in composition_key

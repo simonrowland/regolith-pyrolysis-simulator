@@ -207,6 +207,7 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         account: dict(sim.atom_ledger.mol_by_account(account))
         for account in DECLARED_ACCOUNTS
     }
+    before_fo2_buffer = dict(sim.atom_ledger.mol_by_account("reservoir.fo2_buffer"))
     golden = PINNED_NATIVE_FE_MIGRATION_GOLDENS[feedstock_id]
     expected_native_fe_mol = golden["native_fe_mol"]
 
@@ -216,6 +217,7 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         account: dict(sim.atom_ledger.mol_by_account(account))
         for account in DECLARED_ACCOUNTS
     }
+    after_fo2_buffer = dict(sim.atom_ledger.mol_by_account("reservoir.fo2_buffer"))
     feo_debit_mol = (
         before["process.cleaned_melt"].get("FeO", 0.0)
         - after["process.cleaned_melt"].get("FeO", 0.0)
@@ -228,6 +230,10 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         after["process.overhead_gas"].get("O2", 0.0)
         - before["process.overhead_gas"].get("O2", 0.0)
     )
+    retained_o2_mol = (
+        after_fo2_buffer.get("O2", 0.0)
+        - before_fo2_buffer.get("O2", 0.0)
+    )
     partition = sim._compute_fe_redox_split_diagnostic()["native_fe_partition"]
     assert feo_debit_mol == pytest.approx(expected_native_fe_mol, abs=2e-2)
     assert partition["native_fe_pool_mol"] == pytest.approx(
@@ -238,9 +244,12 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         partition["native_fe_pool_mol"],
         abs=1e-9,
     )
-    assert overhead_o2_credit_mol == pytest.approx(
-        0.5 * partition["native_fe_pool_mol"],
-        abs=1e-9,
+    # 2026-07-02 re-speciation #82: vapor Fe retains its oxide O in fO2 buffer.
+    assert overhead_o2_credit_mol + retained_o2_mol == pytest.approx(
+        0.5 * partition["native_fe_pool_mol"], abs=1e-9
+    )
+    assert retained_o2_mol == pytest.approx(
+        0.5 * partition["native_fe_vapor_mol"], abs=1e-9
     )
     if feedstock_id == "lunar_mare_low_ti":
         accounts = {

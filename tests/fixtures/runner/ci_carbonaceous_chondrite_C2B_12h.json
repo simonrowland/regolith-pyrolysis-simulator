@@ -17,6 +17,7 @@
         "electrolysis_step": "builtin-electrolysis-step",
         "evaporation_flux": "builtin-evaporation-flux",
         "evaporation_transition": "builtin-evaporation-transition",
+        "fe_redox_respeciation": "builtin-fe-redox-respeciation",
         "metallothermic_step": "builtin-metallothermic-step",
         "native_fe_saturation": "builtin-native-fe-saturation",
         "overhead_bleed": "builtin-overhead-bleed",
@@ -44,6 +45,11 @@
         },
         "evaporation_transition": {
           "authoritative": "builtin-evaporation-transition",
+          "fallback": null,
+          "shadows": []
+        },
+        "fe_redox_respeciation": {
+          "authoritative": "builtin-fe-redox-respeciation",
           "fallback": null,
           "shadows": []
         },
@@ -404,18 +410,15 @@
     },
     "process.overhead_gas": {},
     "process.stage0_volatile_feed": {},
+    "reservoir.fo2_buffer": {
+      "O2": 196.31585181896227
+    },
     "reservoir.stage0_oxidant": {},
     "terminal.offgas": {
       "CO2": 2713.4241399043226,
       "Ca": 43.538310966847064,
       "H2O": 10086.89172750294,
       "N2": 71.21483789633506
-    },
-    "terminal.oxygen_melt_offgas_stored": {
-      "O2": 187.51171948246767
-    },
-    "terminal.oxygen_melt_offgas_vented_to_vacuum": {
-      "O2": 8.804132336494602
     },
     "terminal.stage0_salt_phase": {
       "CaCO3": 2.470028782002507,
@@ -1109,15 +1112,14 @@
       "P_total_bar": 0.001,
       "pO2_bar": 0.001,
       "mass_balance_pct": 2.0625897818801802e-14,
-      "O2_yield_kg_cumulative": 6.281714626503154,
-      "O2_source_side_potential_kg_cumulative": 6.281714626503154,
+      "O2_yield_kg_cumulative": 0.0,
+      "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
       "metal_yields_kg": {
         "Ca": 15.735893418400737
       },
       "condensation_train_kg": {
-        "Ca": 13.99096499147144,
-        "O2": 6.0
+        "Ca": 13.99096499147144
       },
       "vapor_species_kg_hr": {
         "Ca": 15.735893418400737
@@ -1150,8 +1152,78 @@
           "warning_threshold_abs": 0.05,
           "warning_threshold_ferric_fraction_abs": 0.05,
           "sampling_context": "current_ledger_vs_current_reservoir",
-          "warning": true
+          "warning": true,
+          "attribution": "sub_liquid_respeciation_deferred",
+          "reason": "sub_liquid_respeciation_deferred"
         },
+        "fe_redox_respeciation": {
+          "respeciation_status": "skipped_solid",
+          "status": "ok",
+          "direction": "none",
+          "reason": "fe_redox_respeciation_not_liquid",
+          "oxygen_source": "evaporative_metal_loss_internal",
+          "internal_o2_capacity_mol": 196.31585181896227,
+          "residual_attribution": "sub_liquid_respeciation_deferred",
+          "ferric_divergence_after": {
+            "status": "warning",
+            "implied_ferric_fraction": 1.0,
+            "ledger_ferric_fraction": 0.0,
+            "delta_abs": 1.0,
+            "delta_signed": 1.0,
+            "warning_threshold_abs": 0.05,
+            "warning_threshold_ferric_fraction_abs": 0.05,
+            "sampling_context": "current_ledger_vs_current_reservoir",
+            "warning": true,
+            "attribution": "sub_liquid_respeciation_deferred",
+            "reason": "sub_liquid_respeciation_deferred"
+          }
+        },
+        "fe_redox_respeciation_attempts": [
+          {
+            "respeciation_status": "skipped_solid",
+            "status": "ok",
+            "direction": "none",
+            "reason": "fe_redox_respeciation_not_liquid",
+            "oxygen_source": "overhead_gas",
+            "internal_o2_capacity_mol": 0.0,
+            "residual_attribution": "sub_liquid_respeciation_deferred",
+            "ferric_divergence_after": {
+              "status": "warning",
+              "implied_ferric_fraction": 0.9999998404269276,
+              "ledger_ferric_fraction": 0.0,
+              "delta_abs": 0.9999998404269276,
+              "delta_signed": 0.9999998404269276,
+              "warning_threshold_abs": 0.05,
+              "warning_threshold_ferric_fraction_abs": 0.05,
+              "sampling_context": "current_ledger_vs_current_reservoir",
+              "warning": true,
+              "attribution": "sub_liquid_respeciation_deferred",
+              "reason": "sub_liquid_respeciation_deferred"
+            }
+          },
+          {
+            "respeciation_status": "skipped_solid",
+            "status": "ok",
+            "direction": "none",
+            "reason": "fe_redox_respeciation_not_liquid",
+            "oxygen_source": "evaporative_metal_loss_internal",
+            "internal_o2_capacity_mol": 196.31585181896227,
+            "residual_attribution": "sub_liquid_respeciation_deferred",
+            "ferric_divergence_after": {
+              "status": "warning",
+              "implied_ferric_fraction": 1.0,
+              "ledger_ferric_fraction": 0.0,
+              "delta_abs": 1.0,
+              "delta_signed": 1.0,
+              "warning_threshold_abs": 0.05,
+              "warning_threshold_ferric_fraction_abs": 0.05,
+              "sampling_context": "current_ledger_vs_current_reservoir",
+              "warning": true,
+              "attribution": "sub_liquid_respeciation_deferred",
+              "reason": "sub_liquid_respeciation_deferred"
+            }
+          }
+        ],
         "source_context": {
           "campaign": "C3_K",
           "hour": 12,
