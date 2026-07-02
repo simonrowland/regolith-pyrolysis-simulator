@@ -652,13 +652,7 @@ class ExtractionMixin:
             'dt_hr': 1.0,
             'pO2_bar': float(self._commanded_pO2_bar()),
         }
-        melt_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
-        try:
-            melt_fO2_log = float(melt_fO2_log)
-        except (TypeError, ValueError):
-            melt_fO2_log = self._compute_intrinsic_melt_fO2()
-        if not math.isfinite(melt_fO2_log):
-            melt_fO2_log = self._compute_intrinsic_melt_fO2()
+        melt_fO2_log = self._current_melt_redox_fO2_log()
         electrolysis_controls['melt_fO2_log'] = float(melt_fO2_log)
         if c5_allowed_oxides is not None:
             electrolysis_controls['allowed_oxides'] = c5_allowed_oxides

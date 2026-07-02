@@ -19,6 +19,67 @@ KRESS91_MOL_FRACTION_OXIDES = (
     'K2O',
     'P2O5',
 )
+KRESS91_LN_FO2_COEFFICIENT = 0.196
+KRESS91_INV_T_COEFFICIENT_K = 11492.0
+# Fallback liquid-only guard when freeze-gate liquid fraction is disabled.
+# Kress91 coefficients above remain the thermodynamic source.
+KRESS91_LIQUID_CALIBRATION_MIN_T_C = 1400.0
+# 1400 C cache-label convention for isochemical redox keys, not new physics.
+KRESS91_FO2_KEY_REFERENCE_T_K = 1673.15
+
+
+def kress91_ln_fO2_temperature_delta(
+    reference_T_K: float,
+    target_T_K: float,
+) -> float:
+    """Return the Kress91 ln(fO2) shift for fixed redox composition."""
+
+    controls = {
+        'reference_T_K': reference_T_K,
+        'target_T_K': target_T_K,
+    }
+    for name, value in controls.items():
+        try:
+            number = float(value)
+        except (TypeError, ValueError) as exc:
+            raise Kress91InvalidControls(
+                f'Kress91 invalid control {name}: expected finite positive '
+                f'value, got {value!r}'
+            ) from exc
+        if not math.isfinite(number) or number <= 0.0:
+            raise Kress91InvalidControls(
+                f'Kress91 invalid control {name}: expected finite positive '
+                f'value, got {value!r}'
+            )
+    return -(
+        KRESS91_INV_T_COEFFICIENT_K / KRESS91_LN_FO2_COEFFICIENT
+    ) * ((1.0 / float(target_T_K)) - (1.0 / float(reference_T_K)))
+
+
+def kress91_referenced_log_fO2(
+    fO2_log: float,
+    *,
+    reference_T_K: float | None,
+    target_T_K: float,
+) -> float:
+    redox_fO2_log = float(fO2_log)
+    if reference_T_K is None:
+        return redox_fO2_log
+    redox_reference_T_K = float(reference_T_K)
+    redox_target_T_K = float(target_T_K)
+    if math.isclose(
+        redox_reference_T_K,
+        redox_target_T_K,
+        rel_tol=0.0,
+        abs_tol=1.0e-9,
+    ):
+        return redox_fO2_log
+    delta_ln_fO2 = kress91_ln_fO2_temperature_delta(
+        redox_reference_T_K,
+        redox_target_T_K,
+    )
+    return (redox_fO2_log * math.log(10.0) + delta_ln_fO2) / math.log(10.0)
+
 
 # Holzheid, Palme & Chakraborty 1997, DOI 10.1016/S0009-2541(97)00030-2:
 # gamma_FeO(wustite(l)) = 1.70 +/- 0.22; stoich-FeO(l) multipliers below.
@@ -401,8 +462,8 @@ def _kress91_fe2o3_over_feo_molar(
         # then math.log(0.0) raises a domain error, aborting the provider (BUG-159).
         # This form is algebraically exact and is the canonical Kress91 a*ln(fO2)
         # term (the sibling exp() at the return is already domain-clamped).
-        0.196 * float(fO2_log) * math.log(10.0)
-        + 11492.0 / float(T_K)
+        KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
+        + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
         - 6.675
         - 2.243 * x.get('Al2O3', 0.0)
         - 1.828 * x.get('FeOt', 0.0)

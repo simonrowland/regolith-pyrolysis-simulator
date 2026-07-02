@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from types import SimpleNamespace
 
 import pytest
@@ -13,6 +14,7 @@ from simulator.chemistry.kernel import (
     IntentResult,
     ProviderUnavailableError,
 )
+from simulator.fe_redox import kress91_ln_fO2_temperature_delta
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.state import CampaignPhase
 from tests.chemistry.conftest import _build_sim
@@ -452,6 +454,295 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
     )
 
 
+def test_freeze_gate_cache_key_constant_across_isochemical_ramp(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1425.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    gate_calls = 0
+
+    def fake_dispatch(intent, *args, **kwargs):
+        nonlocal gate_calls
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        gate_calls += 1
+        return SimpleNamespace(
+            status='ok',
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+
+    cache_keys = []
+    for temperature_C in (1425.0, 1500.0, 1600.0, 1750.0):
+        sim.melt.temperature_C = temperature_C
+        sim._re_reference_melt_fO2_to_temperature(temperature_C + 273.15)
+        sim._freeze_gate_curve()
+        cache_keys.append(sim._freeze_gate_liquid_fraction_cache['key'])
+
+    assert len(set(cache_keys)) == 1
+    assert sim._freeze_gate_cache_rebuild_count == 1
+    assert gate_calls == 1
+
+
+def test_freeze_gate_cache_rekeys_after_real_redox_source_term(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    temperature_K = 1500.0 + 273.15
+    sim.melt.temperature_C = 1500.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
+    sim._sync_oxygen_reservoir_mirror()
+    gate_calls = 0
+
+    def fake_dispatch(intent, *args, **kwargs):
+        nonlocal gate_calls
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        gate_calls += 1
+        return SimpleNamespace(
+            status='ok',
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+
+    sim._freeze_gate_curve()
+    baseline_key = sim._freeze_gate_liquid_fraction_cache['key']
+    capacity = sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=sim._current_melt_redox_fO2_log(),
+        T_K=temperature_K,
+    )
+    sim._apply_oxygen_reservoir_redox_source_terms(
+        {'test_redox_step': capacity * math.log(10.0) * 0.25},
+        temperature_K=temperature_K,
+    )
+    sim._freeze_gate_curve()
+
+    assert sim._freeze_gate_liquid_fraction_cache['key'] != baseline_key
+    assert sim._freeze_gate_cache_rebuild_count == 2
+    assert gate_calls == 2
+
+
+def test_redox_liquid_guard_uses_cached_bounds_without_dispatch(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': ('test',),
+        'curve': {
+            'source': 'test',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1300.0,
+        },
+    }
+
+    def fail_dispatch(*_args, **_kwargs):
+        raise AssertionError('redox liquid guard must not dispatch')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fail_dispatch)
+
+    assert sim._melt_redox_temperature_shift_is_liquid(999.0 + 273.15) is False
+    assert sim._melt_redox_temperature_shift_is_liquid(1001.0 + 273.15) is True
+
+
+def test_freeze_gate_enabled_without_cached_curve_defers_first_reference_seed(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1450.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim.melt.oxygen_reservoir.reference_T_K = None
+    sim._sync_oxygen_reservoir_mirror()
+
+    def fail_dispatch(*_args, **_kwargs):
+        raise AssertionError('first redox seed deferral must not dispatch')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fail_dispatch)
+
+    sim._re_reference_melt_fO2_to_temperature(1450.0 + 273.15)
+
+    assert sim.melt.oxygen_reservoir.reference_T_K is None
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(-9.0)
+
+
+def test_freeze_gate_pre_curve_window_builds_curve_on_first_staged_tick(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.start_campaign(CampaignPhase.C2A)
+    sim.melt.temperature_C = sim.campaign_mgr.furnace_max_T_C
+    original_dispatch = sim._dispatch_only
+    gate_calls = 0
+
+    def fake_dispatch(intent, *args, **kwargs):
+        nonlocal gate_calls
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 0.01}},
+            )
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            gate_calls += 1
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={
+                    'backend_status': 'ok',
+                    'solidus_T_C': 1000.0,
+                    'liquidus_T_C': 1300.0,
+                },
+            )
+        return original_dispatch(intent, *args, **kwargs)
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+
+    ticks_to_curve = 0
+    while getattr(sim, '_freeze_gate_liquid_fraction_cache', None) is None:
+        assert ticks_to_curve < 3
+        sim.step()
+        ticks_to_curve += 1
+
+    assert ticks_to_curve == 1
+    assert gate_calls == 1
+
+
+def test_temperature_rereference_noop_skips_liquid_guard(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    temperature_K = 1500.0 + 273.15
+    sim.melt.temperature_C = 1500.0
+    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
+
+    def fail_guard(_temperature_K):
+        raise AssertionError('constant-T re-reference should be a no-op')
+
+    monkeypatch.setattr(sim, '_melt_redox_temperature_shift_is_liquid', fail_guard)
+
+    sim._re_reference_melt_fO2_to_temperature(temperature_K)
+
+
+def test_freeze_gate_enabled_quench_hysteresis_uses_last_liquid_reference(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': ('test',),
+        'curve': {
+            'source': 'test',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1300.0,
+        },
+    }
+
+    def fail_dispatch(*_args, **_kwargs):
+        raise AssertionError('quenched redox guard must not dispatch')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fail_dispatch)
+
+    original_T_K = 1500.0 + 273.15
+    remelt_T_K = 1650.0 + 273.15
+    original_fO2 = -9.0
+    sim.melt.temperature_C = 1500.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = original_fO2
+    sim.melt.oxygen_reservoir.reference_T_K = original_T_K
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim.melt.temperature_C = 900.0
+    sim._re_reference_melt_fO2_to_temperature(900.0 + 273.15)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        original_fO2,
+    )
+    assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(original_T_K)
+
+    sim.melt.temperature_C = 1650.0
+    sim._re_reference_melt_fO2_to_temperature(remelt_T_K)
+    expected_hot = (
+        original_fO2
+        + kress91_ln_fO2_temperature_delta(original_T_K, remelt_T_K)
+        / math.log(10.0)
+    )
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        expected_hot,
+        abs=1.0e-9,
+    )
+    assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(remelt_T_K)
+
+    sim.melt.temperature_C = 1500.0
+    sim._re_reference_melt_fO2_to_temperature(original_T_K)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        original_fO2,
+        abs=1.0e-9,
+    )
+    assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(original_T_K)
+
+
 def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
     monkeypatch,
     vapor_pressure_data,
@@ -511,6 +802,8 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
         cache_ids.append(id(sim._freeze_gate_liquid_fraction_cache))
 
     cache_rebuild_count = sim._freeze_gate_cache_rebuild_count
+    # 2026-07-02 SSO-R ch1d: freeze-gate fO2 key is T-invariant along
+    # isochemical ramps, so quantization returns to the original <=2 bound.
     assert cache_rebuild_count <= 2
     assert gate_calls == cache_rebuild_count
     assert len(set(cache_ids)) <= 2

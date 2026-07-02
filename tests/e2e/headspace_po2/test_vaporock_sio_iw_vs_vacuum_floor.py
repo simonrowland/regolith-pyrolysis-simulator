@@ -36,7 +36,11 @@ from .helpers import run_campaign_headspace
 SIO_ANCHOR_CAMPAIGN = CampaignPhase.C2A
 SIO_ANCHOR_START_TEMPERATURE_C = 1550.0
 SIO_ANCHOR_HOUR = 6
-EXPECTED_SIO_DECADE_DRIFT = 0.49088696478866867
+# 2026-07-02 SSO-R ch1(+1c): the conserved fO2 integrator (heuristic demoted
+# to seed-only) shifts the finite-pO2 branch's melt fO2 at the hot C2A
+# anchor hour; the IW-vs-finite SiO suppression ratio moves 0.4909 -> 0.5010
+# decade. Correction-class (old pin encoded the hourly heuristic re-seed).
+EXPECTED_SIO_DECADE_DRIFT = 0.5010448078158256
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

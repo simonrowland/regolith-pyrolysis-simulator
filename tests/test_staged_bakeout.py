@@ -10,7 +10,10 @@ FEEDSTOCK = "lunar_mare_low_ti"
 NA_DOSE_KG = 12.0
 HOT_HOLD_C = 1750.0
 MASS_BALANCE_MAX_PCT = 5e-12
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00029403068124880024
+# 2026-07-02 SSO-R ch1(+1c): conserved fO2 integrator + Kress91 isochemical
+# T re-referencing replace the per-tick intrinsic-fO2 heuristic re-seed.
+# Staged wall SiO shifts -7.1% (2.9403e-4 -> 2.7316e-4); correction-class.
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.0002731599527839413
 
 
 def _run_script(lines: list[str]):

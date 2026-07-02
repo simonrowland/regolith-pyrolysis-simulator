@@ -7,6 +7,7 @@ Fe rows are redox-inert in this model: a_FeO is static until SSO-R.
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 import sys
 from pathlib import Path
@@ -83,32 +84,39 @@ def _rows(args: argparse.Namespace) -> list[dict[str, Any]]:
     sim = _build_sim(args)
     species_order = tuple(dict.fromkeys(args.species or DEFAULT_SPECIES))
     rows: list[dict[str, Any]] = []
-    for temperature_c in _temperature_grid(args.start_C, args.stop_C, args.step_C):
-        sim.melt.temperature_C = temperature_c
-        sim.melt.fO2_log = sim._compute_intrinsic_melt_fO2()
-        equilibrium = sim._get_equilibrium()
-        flux = sim._calculate_evaporation(equilibrium)
-        total_flux = sum(
-            max(0.0, float(value))
-            for value in (flux.species_kg_hr or {}).values()
-        )
-        emitted_species = set(species_order) | set(flux.species_kg_hr or {})
-        for species in sorted(emitted_species):
-            flux_kg_hr = max(
-                0.0,
-                float((flux.species_kg_hr or {}).get(species, 0.0)),
+    original_temperature_C = sim.melt.temperature_C
+    original_reservoir = copy.deepcopy(sim.melt.oxygen_reservoir)
+    try:
+        for temperature_c in _temperature_grid(args.start_C, args.stop_C, args.step_C):
+            sim.melt.temperature_C = temperature_c
+            sim._re_reference_melt_fO2_to_temperature(temperature_c + 273.15)
+            equilibrium = sim._get_equilibrium()
+            flux = sim._calculate_evaporation(equilibrium)
+            total_flux = sum(
+                max(0.0, float(value))
+                for value in (flux.species_kg_hr or {}).values()
             )
-            rows.append({
-                "temperature_C": temperature_c,
-                "pO2_mbar": float(args.p_o2_mbar),
-                "p_total_mbar": float(args.p_total_mbar),
-                "species": species,
-                "flux_kg_hr": flux_kg_hr,
-                "fraction": flux_kg_hr / total_flux if total_flux > 0.0 else 0.0,
-                "vp_confidence_note": (
-                    FE_LOW_CONFIDENCE_NOTE if species == "Fe" else ""
-                ),
-            })
+            emitted_species = set(species_order) | set(flux.species_kg_hr or {})
+            for species in sorted(emitted_species):
+                flux_kg_hr = max(
+                    0.0,
+                    float((flux.species_kg_hr or {}).get(species, 0.0)),
+                )
+                rows.append({
+                    "temperature_C": temperature_c,
+                    "pO2_mbar": float(args.p_o2_mbar),
+                    "p_total_mbar": float(args.p_total_mbar),
+                    "species": species,
+                    "flux_kg_hr": flux_kg_hr,
+                    "fraction": flux_kg_hr / total_flux if total_flux > 0.0 else 0.0,
+                    "vp_confidence_note": (
+                        FE_LOW_CONFIDENCE_NOTE if species == "Fe" else ""
+                    ),
+                })
+    finally:
+        sim.melt.temperature_C = original_temperature_C
+        sim.melt.oxygen_reservoir = original_reservoir
+        sim._sync_oxygen_reservoir_mirror()
     return rows
 
 

@@ -33,6 +33,10 @@ from simulator.corpus_version import (
 from simulator.grind_preflight import (
     assert_strict_vapor_pt1_row,
 )
+from simulator.fe_redox import (
+    KRESS91_FO2_KEY_REFERENCE_T_K,
+    kress91_referenced_log_fO2,
+)
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.sulfsat import SulfurSaturationResult
 
@@ -78,6 +82,7 @@ _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
 _COMPOSITION_SIG_FIGS = 5
 _TRACE_CUTOFF = 1.0e-12
+_GATE_CURVE_KEY_T_K_SENTINEL = 298.15
 _CACHEABLE_EQUILIBRIUM_STATUSES = frozenset({"ok"})
 _CACHEABLE_GATE_STATUSES = frozenset({"ok"})
 _CACHEABLE_GATE_CALIBRATION_STATUSES = frozenset({"in_range"})
@@ -224,6 +229,39 @@ class PT0NonFinitePayload(ValueError):
     """PT-0 payload canonicalization received a non-finite value."""
 
 
+def _authoritative_melt_fO2_log(sim: Any) -> float:
+    reader = getattr(sim, "_current_melt_redox_fO2_log", None)
+    if callable(reader):
+        value = reader()
+    else:
+        reservoir = getattr(getattr(sim, "melt", None), "oxygen_reservoir", None)
+        value = getattr(reservoir, "melt_intrinsic_fO2_log", None)
+        if value is None:
+            value = getattr(getattr(sim, "melt", None), "melt_fO2_log", None)
+    try:
+        fO2_log = float(value)
+    except (TypeError, ValueError) as exc:
+        raise PT0InvalidControls(
+            "missing authoritative melt fO2_log for PT-0 cache key"
+        ) from exc
+    if not math.isfinite(fO2_log):
+        raise PT0InvalidControls(
+            "non-finite authoritative melt fO2_log for PT-0 cache key: "
+            f"{value!r}"
+        )
+    return fO2_log
+
+
+def _melt_fO2_log_at_gate_key_reference_T(sim: Any, fO2_log: float) -> float:
+    reference_reader = getattr(sim, "_current_melt_redox_reference_T_K", None)
+    reference_T_K = reference_reader() if callable(reference_reader) else None
+    return kress91_referenced_log_fO2(
+        fO2_log,
+        reference_T_K=reference_T_K,
+        target_T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
+    )
+
+
 class PT0DeterminismStore:
     """PT-0 capture/replay store, optionally backed by the PT-1 SQLite DB."""
 
@@ -333,7 +371,7 @@ class PT0DeterminismStore:
                 f"{melt_pressure_mbar!r} mbar"
             )
         if fO2_log is None:
-            fO2_log = sim._compute_intrinsic_melt_fO2(T_K)
+            fO2_log = _authoritative_melt_fO2_log(sim)
         quantized_fO2_log = _quantize(
             fO2_log,
             self._control_quantization.log_fo2_quantum,
@@ -436,7 +474,8 @@ class PT0DeterminismStore:
             sim,
             artifact="equilibrium_post_record",
             intent=intent,
-            fO2_log=sim._compute_intrinsic_melt_fO2(),
+            # Equilibrium is solved at actual conditions; keep live-T fO2.
+            fO2_log=_authoritative_melt_fO2_log(sim),
             fe_redox_policy="intrinsic",
             control_quantization=self._control_quantization,
         )
@@ -462,7 +501,14 @@ class PT0DeterminismStore:
         sulfur = getattr(result, "sulfur_saturation", None)
         sim._last_sulfur_saturation_result = sulfur
         if getattr(result, "fO2_log", None) is not None:
-            sim.melt.fO2_log = float(result.fO2_log)
+            sync = getattr(sim, "_sync_oxygen_reservoir_mirror", None)
+            if callable(sync):
+                sync()
+            else:
+                fO2_log = float(result.fO2_log)
+                sim.melt.fO2_log = fO2_log
+                if hasattr(sim.melt, "melt_fO2_log"):
+                    sim.melt.melt_fO2_log = fO2_log
         return result
 
     def _apply_equilibrium_cache_authority(
@@ -1785,11 +1831,21 @@ def canonical_replay_key(
             provider_role = _gate_provider_role_for_key(sim)
         else:
             _register_gate_providers_for_key(sim)
-    T_K = _quantize(
+    live_T_K = _quantize(
         float(sim.melt.temperature_C) + 273.15,
         quantization.t_k_quantum,
         quantization.t_k_decimals,
     )
+    if intent == ChemistryIntent.GATE_LIQUID_FRACTION:
+        # Gate curves are composition artifacts. Keep the legacy T_K field as
+        # a schema sentinel; the redox control below carries the T_STD key.
+        T_K = _quantize(
+            _GATE_CURVE_KEY_T_K_SENTINEL,
+            quantization.t_k_quantum,
+            quantization.t_k_decimals,
+        )
+    else:
+        T_K = live_T_K
     pressure_bar = _quantize(
         float(sim.melt.p_total_mbar) / 1000.0,
         quantization.pressure_bar_quantum,
@@ -1801,7 +1857,7 @@ def canonical_replay_key(
     # flow into _compute_intrinsic_melt_fO2). Refuse here — finite controls
     # quantize to floats, so valid keys stay byte-identical (SC-49: guard every
     # sibling of a class-cutting invalid-control gate, not just the first).
-    if T_K is None:
+    if live_T_K is None:
         raise PT0InvalidControls(
             "non-finite melt temperature passed to PT-0 cache key "
             f"quantization: {sim.melt.temperature_C!r}"
@@ -1812,7 +1868,12 @@ def canonical_replay_key(
             f"quantization: {sim.melt.p_total_mbar!r}"
         )
     if fO2_log is None:
-        fO2_log = sim._compute_intrinsic_melt_fO2(T_K)
+        fO2_log = _authoritative_melt_fO2_log(sim)
+    if intent == ChemistryIntent.GATE_LIQUID_FRACTION:
+        # Gate curve replay follows the freeze-gate cache identity. Equilibrium
+        # keys intentionally keep live-T fO2 because equilibrium solves actual
+        # conditions, not a composition-only curve artifact.
+        fO2_log = _melt_fO2_log_at_gate_key_reference_T(sim, fO2_log)
     quantized_fO2_log = _quantize(
         fO2_log,
         quantization.log_fo2_quantum,

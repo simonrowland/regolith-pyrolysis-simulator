@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import math
 import os
 import sqlite3
 import subprocess
@@ -596,6 +597,74 @@ def test_pt0_canonical_key_contains_required_identity_fields() -> None:
         "vapor_pressures",
         "species_formula_registry",
     }
+
+
+def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "pt1-gate-tstd.db"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim._freeze_gate_liquid_fraction_cache = {
+        "key": ("test",),
+        "curve": {"source": "test", "solidus_T_C": 1000.0, "liquidus_T_C": 1300.0},
+    }
+    sim.melt.temperature_C = 1450.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1450.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    curve = {
+        "source": "unit-test",
+        "solidus_T_C": 1210.0,
+        "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
+    }
+
+    capture.capture_gate_curve(
+        sim,
+        fO2_log=sim._current_melt_redox_fO2_log(),
+        curve=curve,
+    )
+    capture_key = capture.capture_sequence[-1]["key"]
+    assert capture_key["controls"]["T_K"] == pytest.approx(298.15)
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    replay_sim._freeze_gate_liquid_fraction_cache = sim._freeze_gate_liquid_fraction_cache
+    replay_sim.melt.temperature_C = 1450.0
+    replay_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    replay_sim.melt.oxygen_reservoir.reference_T_K = 1450.0 + 273.15
+    replay_sim._sync_oxygen_reservoir_mirror()
+    replay_sim.melt.temperature_C = 1600.0
+    replay_sim._re_reference_melt_fO2_to_temperature(1600.0 + 273.15)
+
+    assert replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._current_melt_redox_fO2_log(),
+    ) == curve
+    replay_key = replay.replay_sequence[-1]["key"]
+    assert replay_key == capture_key
+
+    capacity = replay_sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=replay_sim._current_melt_redox_fO2_log(),
+        T_K=1600.0 + 273.15,
+    )
+    replay_sim._apply_oxygen_reservoir_redox_source_terms(
+        {"pt0_real_redox_step": capacity * math.log(10.0) * 0.25},
+        temperature_K=1600.0 + 273.15,
+    )
+    redox_key = canonical_replay_key(
+        replay_sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=replay_sim._current_melt_redox_fO2_log(),
+        fe_redox_policy="intrinsic",
+    )
+
+    assert redox_key != capture_key
+    assert redox_key["controls"]["log_fO2"] != capture_key["controls"]["log_fO2"]
 
 
 def test_pt2_silicate_provider_identity_changes_equilibrium_key() -> None:

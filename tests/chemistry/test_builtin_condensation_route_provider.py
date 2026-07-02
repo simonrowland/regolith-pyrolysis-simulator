@@ -93,43 +93,54 @@ from tests.chemistry.conftest import _build_sim
 # 2026-06-30 SiO cold-wall condensation replaces subfloor Wetzel/Gail
 # evaporation-Arrhenius extrapolation with the Pound 1972 unity
 # high-supersaturation gate. Only SiO segment-wall traces move.
+# 2026-07-01 SSO-R chunk-1 fO2 integrator authority: melt fO2 is no longer
+# re-seeded hourly from the intrinsic heuristic (`_compute_intrinsic_melt_fO2`
+# is seed-only at load_batch); the conserved O2 integrator holds live state.
+# Na/Si/SiO2 wall traces shift (lunar_mare Na +20%, Si/SiO2 -27%); mars/
+# s_type move only at coupled-routing roundoff. Correction-class rebaseline
+# (old pins encoded the per-tick heuristic override); the structural parity
+# assertions (overhead debit<=credit, train>0, closure<5e-12%) are unchanged.
+# 2026-07-02 SSO-R chunk-1c isochemical T re-referencing (Kress91
+# dln fO2 = -(b/a) d(1/T); fO2 state now rides the redox-couple curve
+# across temperature ramps instead of freezing numeric log fO2). Si/SiO2
+# traces move at the 3rd-4th digit; Na/Mg/FeSi unchanged from chunk-1.
 EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "FeSi": 9.702832833968842e-11,
-            "MgO": 2.9584114812195352e-12,
-            "Na": 0.0018552014816105894,
-            "Si": 1.993651411013487e-07,
-            "SiO2": 4.26572287237794e-07,
+            "FeSi": 3.19901746636553e-11,
+            "MgO": 4.016353117341632e-12,
+            "Na": 0.002231099567131609,
+            "Si": 1.4492383557186092e-07,
+            "SiO2": 3.1005639405890596e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "MgO": 2.9584114812195352e-12,
-            "Na": 0.0018552014816105894,
-            "Si": 1.9939760911756958e-07,
-            "SiO2": 4.26572287237794e-07,
+            "MgO": 4.016353117341632e-12,
+            "Na": 0.002231099567131609,
+            "Si": 1.4493454025499481e-07,
+            "SiO2": 3.1005639405890596e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "Mg": 1.7840460264748115e-12,
-            "Na": 0.0018552014816105894,
+            "Mg": 2.422029141449691e-12,
+            "Na": 0.002231099567131609,
         },
         "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 1.7840460264748127e-12,
-            "Na": 0.001855201481610589,
+            "Mg": 2.4220291414496907e-12,
+            "Na": 0.0022310995671316093,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "FeSi": 4.1166796290497356e-11,
+            "FeSi": 4.116387349490728e-11,
             "MgO": 1.0736171850979366e-12,
             "Na": 0.007795747254667318,
-            "Si": 1.5361229568248467e-07,
-            "SiO2": 3.2865640836594653e-07,
+            "Si": 1.5361229651902015e-07,
+            "SiO2": 3.2865640806322675e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
             "MgO": 1.0736171850979366e-12,
             "Na": 0.007795747254667318,
-            "Si": 1.5362607108429356e-07,
-            "SiO2": 3.2865640836594653e-07,
+            "Si": 1.536260709427912e-07,
+            "SiO2": 3.2865640806322675e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Na": 0.007795747254667318,
@@ -140,25 +151,25 @@ EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "FeSi": 5.246553031130163e-11,
-            "MgO": 9.303749426760607e-12,
-            "Na": 0.0035765454423857413,
-            "Si": 1.930002911031523e-07,
-            "SiO2": 4.129144310430405e-07,
+            "FeSi": 1.1144196651650963e-11,
+            "MgO": 7.33541245349951e-12,
+            "Na": 0.003511336838479897,
+            "Si": 1.1820456112005656e-07,
+            "SiO2": 2.5287525676717015e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "MgO": 9.303749426760607e-12,
-            "Na": 0.0035765454423857413,
-            "Si": 1.9301784733356802e-07,
-            "SiO2": 4.129144310430405e-07,
+            "MgO": 7.33541245349951e-12,
+            "Na": 0.003511336838479897,
+            "Si": 1.1820829023673666e-07,
+            "SiO2": 2.5287525676717015e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "Mg": 5.6105505611705185e-12,
-            "Na": 0.0035765454423857413,
+            "Mg": 4.423560928997261e-12,
+            "Na": 0.003511336838479897,
         },
         "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "Mg": 5.610550561170517e-12,
-            "Na": 0.0035765454423857413,
+            "Mg": 4.423560928997261e-12,
+            "Na": 0.003511336838479897,
         },
     },
 }

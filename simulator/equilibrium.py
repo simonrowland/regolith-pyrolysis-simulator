@@ -268,8 +268,13 @@ class EquilibriumMixin:
         if intrinsic_fO2_value is None:
             intrinsic_fO2_value = getattr(self.melt, 'melt_fO2_log', None)
         if intrinsic_fO2_value is None:
-            intrinsic_fO2_value = self._compute_intrinsic_melt_fO2()
-        intrinsic_fO2_log = float(intrinsic_fO2_value)
+            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
+            if callable(current_fO2):
+                intrinsic_fO2_log = float(current_fO2())
+            else:
+                intrinsic_fO2_log = float(getattr(self.melt, 'fO2_log', -9.0))
+        else:
+            intrinsic_fO2_log = float(intrinsic_fO2_value)
         # Vacuum-floor via the shared -inf-safe helper, NOT max(p, 1e-9): max
         # silently masks a -inf pressure as 1e-9, hiding it from the Kress91
         # chokepoint validator reached through kress91_ferrous_feo_activity below.

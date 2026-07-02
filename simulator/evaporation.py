@@ -13,6 +13,10 @@ from simulator.chemistry.kernel import (
     ChemistryIntent,
     ProviderUnavailableError,
 )
+from simulator.fe_redox import (
+    KRESS91_FO2_KEY_REFERENCE_T_K,
+    kress91_referenced_log_fO2,
+)
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -298,20 +302,27 @@ class EvaporationMixin:
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
-        fO2_log = float(self._compute_intrinsic_melt_fO2())
+        fO2_log = float(self._current_melt_redox_fO2_log())
+        redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
+            fO2_log=fO2_log,
+        )
         key = self._freeze_gate_cache_key(
             pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
+            fO2_log=redox_key_fO2_log,
         )
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
         if store is not None and getattr(store, 'replay_enabled', False):
-            return store.replay_gate_curve(self, fO2_log=fO2_log)
+            return store.replay_gate_curve(self, fO2_log=redox_key_fO2_log)
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         if cache and cache.get('key') == key:
             curve = dict(cache['curve'])
             if store is not None and getattr(store, 'capture_enabled', False):
-                store.capture_gate_curve(self, fO2_log=fO2_log, curve=curve)
+                store.capture_gate_curve(
+                    self,
+                    fO2_log=redox_key_fO2_log,
+                    curve=curve,
+                )
             return curve
 
         reasons: list[str] = []
@@ -346,8 +357,37 @@ class EvaporationMixin:
             int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
         )
         if store is not None and getattr(store, 'capture_enabled', False):
-            store.capture_gate_curve(self, fO2_log=fO2_log, curve=curve)
+            store.capture_gate_curve(
+                self,
+                fO2_log=redox_key_fO2_log,
+                curve=curve,
+            )
         return curve
+
+    def _freeze_gate_redox_key_fO2_log(
+        self,
+        *,
+        fO2_log: float | None = None,
+        reference_T_K: float | None = None,
+    ) -> float:
+        redox_fO2_log = (
+            float(fO2_log)
+            if fO2_log is not None
+            else float(self._current_melt_redox_fO2_log())
+        )
+        redox_reference_T_K = (
+            float(reference_T_K)
+            if reference_T_K is not None
+            else self._current_melt_redox_reference_T_K()
+        )
+        # Boundary by design: before the first liquid seed, reference_T_K is None
+        # and the key uses live fO2; after seeding, the key is T_STD-referenced.
+        # Capture/replay cross this one re-key boundary at the same tick.
+        return kress91_referenced_log_fO2(
+            redox_fO2_log,
+            reference_T_K=redox_reference_T_K,
+            target_T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
+        )
 
     def _freeze_gate_cache_key(
         self,

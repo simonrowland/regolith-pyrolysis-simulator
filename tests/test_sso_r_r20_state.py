@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import math
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -8,8 +10,13 @@ import yaml
 
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.core import PyrolysisSimulator
+from simulator.fe_redox import (
+    KRESS91_INV_T_COEFFICIENT_K,
+    KRESS91_LN_FO2_COEFFICIENT,
+)
 from simulator.melt_backend.base import StubBackend
-from simulator.state import CampaignPhase, MeltState
+from simulator.state import Atmosphere, CampaignPhase, MeltState
+from scripts import evaporation_selectivity_map as selectivity_map
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,19 +59,41 @@ def test_load_batch_seeds_melt_fO2_log_from_intrinsic_value() -> None:
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
         intrinsic
     )
+    assert sim.melt.oxygen_reservoir.reference_T_K is None
 
 
-def test_start_campaign_mirrors_intrinsic_value_to_melt_fO2_log() -> None:
+def test_load_batch_resets_hot_reference_temperature_on_reload() -> None:
     sim = _make_sim()
-    sim.melt.melt_fO2_log = 123.0
+    sim._overhead_headspace_config["enabled"] = False
+    sim.melt.temperature_C = 1600.0
+
+    first = sim._apply_oxygen_reservoir_exchange()
+    assert first.reference_T_K == pytest.approx(1600.0 + 273.15)
+
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    base_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+
+    assert sim.melt.oxygen_reservoir.reference_T_K is None
+
+    sim._overhead_headspace_config["enabled"] = False
+    sim.melt.temperature_C = 1450.0
+    seeded = sim._apply_oxygen_reservoir_exchange()
+
+    assert seeded.reference_T_K == pytest.approx(1450.0 + 273.15)
+    assert seeded.melt_intrinsic_fO2_log == pytest.approx(base_fO2)
+
+
+def test_start_campaign_preserves_authoritative_melt_fO2_log() -> None:
+    sim = _make_sim()
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -7.25
+    sim._sync_oxygen_reservoir_mirror()
 
     sim.start_campaign(CampaignPhase.C0)
-    intrinsic = sim._compute_intrinsic_melt_fO2()
 
-    assert sim.melt.fO2_log == pytest.approx(intrinsic)
-    assert sim.melt.melt_fO2_log == pytest.approx(intrinsic)
+    assert sim.melt.fO2_log == pytest.approx(-7.25)
+    assert sim.melt.melt_fO2_log == pytest.approx(-7.25)
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
-        intrinsic
+        -7.25
     )
 
 
@@ -123,3 +152,283 @@ def test_melt_fO2_log_is_live_in_vapor_pressure_producer(monkeypatch) -> None:
 
     assert seen_control_inputs
     assert seen_control_inputs[-1]["intrinsic_fO2_log"] == pytest.approx(-6.25)
+
+
+def test_reductant_source_term_lowers_fO2_and_raises_native_drive() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
+
+    sim._apply_oxygen_reservoir_redox_source_terms(
+        {"test_reductant_sink": -1.0},
+        exchange_direction="redox_source:test_reductant_sink",
+    )
+
+    after_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    after_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
+    assert after_fO2 < before_fO2
+    assert after_native > before_native
+
+
+def test_isochemical_temperature_ramp_references_fO2_on_kress91_curve() -> None:
+    sim = _make_sim()
+    sim._overhead_headspace_config["enabled"] = False
+    reference_T_K = 1425.0 + 273.15
+    hot_T_K = 1750.0 + 273.15
+    sim.melt.temperature_C = 1750.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim.melt.oxygen_reservoir.reference_T_K = reference_T_K
+    sim._sync_oxygen_reservoir_mirror()
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    expected_shift_log10 = -(
+        KRESS91_INV_T_COEFFICIENT_K / KRESS91_LN_FO2_COEFFICIENT
+    ) * ((1.0 / hot_T_K) - (1.0 / reference_T_K)) / math.log(10.0)
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        -9.0 + expected_shift_log10,
+        abs=1.0e-6,
+    )
+    assert reservoir.reference_T_K == pytest.approx(hot_T_K)
+
+
+def test_isochemical_temperature_cooling_reverses_fO2_reference_shift() -> None:
+    sim = _make_sim()
+    sim._overhead_headspace_config["enabled"] = False
+    reference_T_K = 1425.0 + 273.15
+    hot_T_K = 1750.0 + 273.15
+    sim.melt.temperature_C = 1750.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim.melt.oxygen_reservoir.reference_T_K = reference_T_K
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim._apply_oxygen_reservoir_exchange()
+    sim.melt.temperature_C = 1425.0
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-9.0, abs=1.0e-6)
+    assert reservoir.reference_T_K == pytest.approx(reference_T_K)
+
+
+def test_load_seed_references_on_first_liquid_tick_not_low_temperature() -> None:
+    sim = _make_sim()
+    sim._overhead_headspace_config["enabled"] = False
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim.melt.temperature_C = 1250.0
+    low = sim._apply_oxygen_reservoir_exchange()
+    assert low.melt_intrinsic_fO2_log == pytest.approx(-9.0)
+    assert low.reference_T_K is None
+
+    sim.melt.temperature_C = 1425.0
+    liquid = sim._apply_oxygen_reservoir_exchange()
+    assert liquid.melt_intrinsic_fO2_log == pytest.approx(-9.0)
+    assert liquid.reference_T_K == pytest.approx(1425.0 + 273.15)
+
+
+def test_selectivity_map_temperature_sweep_rides_kress91_curve(monkeypatch) -> None:
+    sim = _make_sim()
+    sim._overhead_headspace_config["enabled"] = False
+    original_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    captured_fO2: list[float] = []
+
+    def fake_get_equilibrium():
+        captured_fO2.append(sim._current_melt_redox_fO2_log())
+        return SimpleNamespace(vapor_pressures_Pa={"Na": 1.0})
+
+    def fake_calculate_evaporation(_equilibrium):
+        return SimpleNamespace(species_kg_hr={"Na": 1.0})
+
+    args = SimpleNamespace(
+        additive=None,
+        feedstock="lunar_mare_low_ti",
+        mass_kg=1000.0,
+        p_o2_mbar=0.0,
+        p_total_mbar=10.0,
+        species=["Na"],
+        start_C=1425.0,
+        stop_C=1725.0,
+        step_C=150.0,
+    )
+    monkeypatch.setattr(selectivity_map, "_build_sim", lambda _args: sim)
+    monkeypatch.setattr(sim, "_get_equilibrium", fake_get_equilibrium)
+    monkeypatch.setattr(sim, "_calculate_evaporation", fake_calculate_evaporation)
+
+    rows = selectivity_map._rows(args)
+
+    assert rows
+    assert captured_fO2 == sorted(captured_fO2)
+    assert len(set(captured_fO2)) == len(captured_fO2)
+    assert sim.melt.oxygen_reservoir.reference_T_K is None
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        original_fO2,
+    )
+
+
+def test_native_fe_split_sees_temperature_honest_unreduced_melt() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1750.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1425.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+
+    split = sim._apply_native_fe_saturation_split()
+    native_fe_kg = sim.atom_ledger.kg_by_account(
+        "terminal.drain_tap_material"
+    ).get("Fe", 0.0)
+
+    assert split["native_fe_frac"] <= 1.0e-12
+    assert native_fe_kg == pytest.approx(0.0, abs=1.0e-12)
+
+
+def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+
+    sim._apply_oxygen_reservoir_redox_source_terms(
+        {"test_reductant_sink": -1.0},
+        exchange_direction="redox_source:test_reductant_sink",
+    )
+    reduced_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 0.05},
+        source="test finite headspace O2 holdup",
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.exchange_direction == "headspace_to_melt"
+    assert reservoir.exchange_clamped is True
+    assert reservoir.melt_intrinsic_fO2_log > reduced_fO2
+    assert reservoir.melt_intrinsic_fO2_log < before_fO2
+
+
+def test_managed_o2_floor_relaxes_reducing_melt_without_real_o2_inventory() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert before_o2 == pytest.approx(0.0)
+    assert reservoir.exchange_direction == "managed_headspace_to_melt"
+    assert reservoir.melt_intrinsic_fO2_log > before_fO2
+    assert reservoir.melt_intrinsic_fO2_log < math.log10(
+        sim.melt.pO2_mbar / 1000.0
+    )
+    after_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    )
+    assert after_o2 == pytest.approx(before_o2)
+
+
+def test_pn2_sweep_without_o2_does_not_phantom_oxidize_melt() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 10.0
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.exchange_direction == "none:headspace_o2_clamped"
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
+
+
+def test_live_paths_do_not_call_intrinsic_heuristic(monkeypatch) -> None:
+    sim = _make_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 1150.0
+    sim.melt.p_total_mbar = 1.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -6.5
+    sim._sync_oxygen_reservoir_mirror()
+    pressure_bar = sim.melt.p_total_mbar / 1000.0
+    sim._freeze_gate_liquid_fraction_cache = {
+        "key": sim._freeze_gate_cache_key(
+            pressure_bar=pressure_bar,
+            fO2_log=-6.5,
+        ),
+        "curve": {
+            "source": "test_cached_curve",
+            "solidus_T_C": 1000.0,
+            "liquidus_T_C": 1300.0,
+        },
+    }
+    seen_sulfsat_fO2: list[float] = []
+
+    def fail_heuristic(*_args, **_kwargs):
+        raise AssertionError("live path called intrinsic fO2 heuristic")
+
+    def fake_sulfsat(**kwargs):
+        seen_sulfsat_fO2.append(float(kwargs["fO2_log"]))
+        return SimpleNamespace(calibration_status="in_range", warnings=())
+
+    monkeypatch.setattr(sim, "_compute_intrinsic_melt_fO2", fail_heuristic)
+    monkeypatch.setattr(sim, "_stage0_sulfur_input_ppm", lambda: 100.0)
+    monkeypatch.setattr(sim._sulfsat_gate, "compute_sulfur_saturation", fake_sulfsat)
+
+    assert sim._freeze_gate_curve()["source"] == "test_cached_curve"
+    assert sim._stub_equilibrium().fO2_log == pytest.approx(-6.5)
+    sim._attach_post_equilibrium_sulfsat(SimpleNamespace(warnings=[]))
+
+    assert seen_sulfsat_fO2 == pytest.approx([-6.5])
+    assert sim.melt.fO2_log == pytest.approx(-6.5)
+    assert sim.melt.melt_fO2_log == pytest.approx(-6.5)
+
+
+def test_step_does_not_reseed_live_fO2_from_heuristic() -> None:
+    sim = _make_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.5
+    sim._sync_oxygen_reservoir_mirror()
+    heuristic = sim._compute_intrinsic_melt_fO2()
+
+    sim.step()
+
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < heuristic - 1.0
+
+
+def test_native_fe_split_updates_fO2_to_saturation_boundary() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
+
+    sim._apply_native_fe_saturation_split()
+
+    after = sim._compute_fe_redox_split_diagnostic()
+    assert before_native > 0.0
+    assert sim.melt.oxygen_reservoir.exchange_direction == (
+        "redox_source:native_fe_saturation_split"
+    )
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log > before_fO2
+    assert after["native_fe_frac"] <= 2.0e-12
