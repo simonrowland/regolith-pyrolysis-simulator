@@ -8,13 +8,19 @@ from typing import Any
 import pytest
 import yaml
 
+from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
-from simulator.core import PyrolysisSimulator
+from simulator.core import (
+    FERRIC_DIVERGENCE_WARNING_THRESHOLD,
+    OXYGEN_RESERVOIR_NOOP_MOL,
+    PyrolysisSimulator,
+)
 from simulator.fe_redox import (
     KRESS91_INV_T_COEFFICIENT_K,
     KRESS91_LN_FO2_COEFFICIENT,
 )
 from simulator.melt_backend.base import StubBackend
+from simulator.runner import build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase, MeltState
 from scripts import evaporation_selectivity_map as selectivity_map
 
@@ -26,7 +32,11 @@ def _load_yaml(name: str) -> dict[str, Any]:
     return yaml.safe_load((ROOT / "data" / name).read_text())
 
 
-def _make_sim(feedstock_id: str = "lunar_mare_low_ti") -> PyrolysisSimulator:
+def _make_sim(
+    feedstock_id: str = "lunar_mare_low_ti",
+    *,
+    additives_kg: dict[str, float] | None = None,
+) -> PyrolysisSimulator:
     setpoints = _load_yaml("setpoints.yaml")
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
     sim = PyrolysisSimulator(
@@ -35,8 +45,18 @@ def _make_sim(feedstock_id: str = "lunar_mare_low_ti") -> PyrolysisSimulator:
         _load_yaml("feedstocks.yaml"),
         _load_yaml("vapor_pressures.yaml"),
     )
-    sim.load_batch(feedstock_id, mass_kg=1000.0)
+    sim.load_batch(feedstock_id, mass_kg=1000.0, additives_kg=additives_kg or {})
     return sim
+
+
+def _cleaned_melt_debit_mol(sim: PyrolysisSimulator, transition, species: str) -> float:
+    formula = resolve_species_formula(species, sim.species_formula_registry)
+    return sum(
+        float(lot.species_kg.get(species, 0.0))
+        / formula.molar_mass_kg_per_mol()
+        for lot in transition.debits
+        if lot.account == "process.cleaned_melt"
+    )
 
 
 def test_melt_fO2_log_exists_and_defaults_to_intrinsic_seed() -> None:
@@ -171,6 +191,248 @@ def test_reductant_source_term_lowers_fO2_and_raises_native_drive() -> None:
     after_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
     assert after_fO2 < before_fO2
     assert after_native > before_native
+
+
+@pytest.mark.parametrize(
+    ("terms", "capacity", "expected_reason"),
+    [
+        ({"test_reductant_sink": -1.0}, 0.0, "no_melt_redox_capacity"),
+        (
+            {
+                "test_reductant_sink": -1.0,
+                "test_oxidant_source": 1.0,
+            },
+            10.0,
+            "below_threshold",
+        ),
+    ],
+)
+def test_redox_source_breakdown_marks_skipped_terms(
+    monkeypatch,
+    terms: dict[str, float],
+    capacity: float,
+    expected_reason: str,
+) -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim._sync_oxygen_reservoir_mirror()
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_capacity_mol_per_ln_fO2",
+        lambda **_: capacity,
+    )
+
+    sim._apply_oxygen_reservoir_redox_source_terms(
+        terms,
+        exchange_direction="redox_source:test_reductant_sink",
+    )
+
+    reservoir = sim.melt.oxygen_reservoir
+    breakdown = sim._redox_source_breakdown_diagnostic()
+    assert breakdown["terms_mol_o2_equiv_by_label"] == pytest.approx(terms)
+    assert breakdown["applied_terms_mol_o2_equiv_by_label"] == {}
+    assert breakdown["skipped_terms_mol_o2_equiv_by_label"] == pytest.approx(
+        terms
+    )
+    assert set(breakdown["skipped_reasons_by_label"].values()) == {
+        expected_reason
+    }
+    assert breakdown["redox_source_terms_applied"] is False
+    assert breakdown["redox_source_skip_reason"] == expected_reason
+    assert breakdown["delta_ln_fO2"] == pytest.approx(0.0)
+    assert reservoir.redox_source_terms_applied is False
+    assert reservoir.redox_source_skip_reason == expected_reason
+    assert reservoir.redox_source_skipped_terms_mol_o2_equiv == pytest.approx(
+        terms
+    )
+    assert reservoir.exchange_direction.endswith(f":skipped:{expected_reason}")
+
+
+def test_c3_na_source_term_comes_from_committed_transition() -> None:
+    sim = _make_sim(additives_kg={"Na": 12.0})
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.melt.temperature_C = 1150.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -11.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
+    transitions_before = len(sim.atom_ledger.transitions)
+
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+
+    transition = sim.atom_ledger.transitions[-1]
+    assert len(sim.atom_ledger.transitions) == transitions_before + 1
+    assert transition.name == "c3_na_shuttle_reduction"
+    feo_mol = _cleaned_melt_debit_mol(sim, transition, "FeO")
+    expected_source = -0.5 * feo_mol
+    label = "redox_source:c3_na_shuttle_reduction"
+    reservoir = sim.melt.oxygen_reservoir
+    breakdown = sim._redox_source_breakdown_diagnostic()
+
+    assert feo_mol > 0.0
+    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
+        expected_source
+    )
+    assert reservoir.redox_source_terms_mol_o2_equiv[label] == pytest.approx(
+        expected_source
+    )
+    assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(
+        expected_source / reservoir.melt_redox_capacity_mol_per_ln_fO2
+    )
+    assert reservoir.melt_intrinsic_fO2_log < before_fO2
+    assert sim._compute_fe_redox_split_diagnostic()["native_fe_frac"] > before_native
+    assert breakdown["ferric_divergence"]["status"] == "ok"
+    assert breakdown["ferric_divergence"]["sampling_context"] == (
+        "current_ledger_vs_current_reservoir"
+    )
+
+
+def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
+    sim = _make_sim(additives_kg={"Na": 12.0})
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.melt.temperature_C = 1150.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+    sim._sync_oxygen_reservoir_mirror()
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 0.05},
+        source="test finite headspace O2 holdup",
+    )
+
+    exchange = sim._apply_oxygen_reservoir_exchange()
+    exchange_direction = exchange.exchange_direction
+    exchange_o2_mol = exchange.exchange_o2_mol
+    exchange_transition_name = exchange.exchange_transition_name
+    k_O_m_s = exchange.k_O_m_s
+    tau_hr = exchange.tau_hr
+    ledger_pO2 = exchange.headspace_ledger_pO2_bar
+    transport_pO2 = exchange.headspace_transport_pO2_bar
+
+    assert abs(exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
+    assert exchange_direction
+    assert k_O_m_s > 0.0
+    assert tau_hr > 0.0
+
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+    snapshot = sim._make_snapshot()
+    reservoir = snapshot.oxygen_reservoir
+    label = "redox_source:c3_na_shuttle_reduction"
+
+    assert reservoir["k_O_m_s"] == pytest.approx(k_O_m_s)
+    assert reservoir["tau_hr"] == pytest.approx(tau_hr)
+    assert reservoir["exchange_o2_mol"] == pytest.approx(exchange_o2_mol)
+    assert reservoir["exchange_transition_name"] == exchange_transition_name
+    assert reservoir["headspace_ledger_pO2_bar"] == pytest.approx(ledger_pO2)
+    assert reservoir["headspace_transport_pO2_bar"] == pytest.approx(
+        transport_pO2
+    )
+    assert reservoir["exchange_direction"].split("|")[0] == exchange_direction
+    assert label in reservoir["exchange_direction"].split("|")
+    assert label in reservoir["redox_source_terms_mol_o2_equiv"]
+    assert label in reservoir["redox_source_applied_terms_mol_o2_equiv"]
+    assert reservoir["redox_source_skipped_terms_mol_o2_equiv"] == {}
+    assert reservoir["redox_source_terms_applied"] is True
+
+
+def test_c3_k_source_term_comes_from_committed_transition() -> None:
+    sim = _make_sim(additives_kg={"K": 12.0})
+    sim._init_shuttle_inventory(CampaignPhase.C3_K)
+    sim.melt.campaign = CampaignPhase.C3_K
+    sim.melt.temperature_C = 800.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -7.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim._shuttle_inject_K(liquid_fraction=1.0)
+
+    transition = sim.atom_ledger.transitions[-1]
+    feo_mol = _cleaned_melt_debit_mol(sim, transition, "FeO")
+    label = "redox_source:c3_k_shuttle_reduction"
+    assert feo_mol > 0.0
+    assert sim._redox_source_breakdown_diagnostic()[
+        "terms_mol_o2_equiv_by_label"
+    ][label] == pytest.approx(-0.5 * feo_mol)
+
+
+def test_c3_na_cr_ti_source_term_scales_each_target_oxide() -> None:
+    sim = _make_sim(additives_kg={"Na": 50.0})
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.melt.temperature_C = 200.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -11.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim._shuttle_inject_Na(target_stage="cr_ti", liquid_fraction=1.0)
+
+    transition = next(
+        transition
+        for transition in reversed(sim.atom_ledger.transitions)
+        if transition.name == "c3_na_shuttle_reduction"
+    )
+    label = "redox_source:c3_na_shuttle_reduction"
+    feo_mol = _cleaned_melt_debit_mol(sim, transition, "FeO")
+    cr2o3_mol = _cleaned_melt_debit_mol(sim, transition, "Cr2O3")
+    tio2_mol = _cleaned_melt_debit_mol(sim, transition, "TiO2")
+    expected_cr2o3_source = -1.5 * cr2o3_mol
+    expected_tio2_source = -1.0 * tio2_mol
+    expected_total_source = (
+        (-0.5 * feo_mol)
+        + expected_cr2o3_source
+        + expected_tio2_source
+    )
+    cr2o3_terms = sim._cleaned_melt_reduction_source_terms_from_transition(
+        transition,
+        label="cr2o3_component",
+        target_oxides=("Cr2O3",),
+    )
+    tio2_terms = sim._cleaned_melt_reduction_source_terms_from_transition(
+        transition,
+        label="tio2_component",
+        target_oxides=("TiO2",),
+    )
+
+    assert transition.name == "c3_na_shuttle_reduction"
+    assert cr2o3_mol > 0.0
+    assert tio2_mol > 0.0
+    assert cr2o3_terms["cr2o3_component"] == pytest.approx(
+        expected_cr2o3_source
+    )
+    assert tio2_terms["tio2_component"] == pytest.approx(expected_tio2_source)
+    assert sim._redox_source_breakdown_diagnostic()[
+        "terms_mol_o2_equiv_by_label"
+    ][label] == pytest.approx(expected_total_source)
+
+
+def test_runner_reads_redox_source_breakdown() -> None:
+    sim = _make_sim(additives_kg={"Na": 12.0})
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.melt.temperature_C = 1150.0
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+    snapshot = sim._make_snapshot()
+    snapshot.fe_redox_split = sim._compute_fe_redox_split_diagnostic()
+
+    summary = build_per_hour_summary(sim, snapshot, include_fe_redox_split=True)
+
+    label = "redox_source:c3_na_shuttle_reduction"
+    breakdown = summary["redox_source_breakdown"]
+    assert label in breakdown["terms_mol_o2_equiv_by_label"]
+    assert breakdown["terms_mol_o2_equiv_by_label"][label] < 0.0
+    assert breakdown["ferric_divergence"]["warning_threshold_abs"] == pytest.approx(
+        FERRIC_DIVERGENCE_WARNING_THRESHOLD
+    )
+    assert breakdown["ferric_divergence"][
+        "warning_threshold_ferric_fraction_abs"
+    ] == pytest.approx(
+        FERRIC_DIVERGENCE_WARNING_THRESHOLD
+    )
+    assert "fe_redox_split" in summary
 
 
 def test_isochemical_temperature_ramp_references_fO2_on_kress91_curve() -> None:
@@ -427,8 +689,9 @@ def test_native_fe_split_updates_fO2_to_saturation_boundary() -> None:
 
     after = sim._compute_fe_redox_split_diagnostic()
     assert before_native > 0.0
-    assert sim.melt.oxygen_reservoir.exchange_direction == (
+    assert (
         "redox_source:native_fe_saturation_split"
+        in sim.melt.oxygen_reservoir.exchange_direction.split("|")
     )
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log > before_fO2
     assert after["native_fe_frac"] <= 2.0e-12

@@ -129,6 +129,7 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "evap_plane_selectivity",
     "mre_uncertified_yield",
     "fe_redox_split",
+    "redox_source_breakdown",
     "mass_balance_error_category",
     "reduced_real_cache_state",
 })

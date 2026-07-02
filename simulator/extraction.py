@@ -1004,7 +1004,7 @@ class ExtractionMixin:
             self._chem_no_op_dispatch_count += 1
             return
 
-        self._commit_proposal(
+        transition = self._commit_proposal(
             ChemistryIntent.METALLOTHERMIC_STEP,
             proposal,
             diagnostic=diagnostic,
@@ -1012,6 +1012,12 @@ class ExtractionMixin:
                 'reaction_family': REACTION_FAMILY_C3_K,
                 'dt_hr': 1.0,
             },
+        )
+        self._apply_transition_redox_source_terms(
+            transition,
+            label='redox_source:c3_k_shuttle_reduction',
+            target_oxides=('FeO',),
+            exchange_direction='redox_source:c3_k_shuttle_reduction',
         )
 
         # Fe produced goes to its canonical product destination.
@@ -1106,7 +1112,7 @@ class ExtractionMixin:
             self._chem_no_op_dispatch_count += 1
             return
 
-        self._commit_proposal(
+        transition = self._commit_proposal(
             ChemistryIntent.METALLOTHERMIC_STEP,
             proposal,
             diagnostic=diagnostic,
@@ -1114,6 +1120,12 @@ class ExtractionMixin:
                 'reaction_family': REACTION_FAMILY_C3_NA,
                 'dt_hr': 1.0,
             },
+        )
+        self._apply_transition_redox_source_terms(
+            transition,
+            label='redox_source:c3_na_shuttle_reduction',
+            target_oxides=('FeO', 'Cr2O3', 'TiO2'),
+            exchange_direction='redox_source:c3_na_shuttle_reduction',
         )
 
         # Reduced metals use the canonical recipe product registry.  Cr routes

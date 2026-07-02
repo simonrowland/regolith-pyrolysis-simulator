@@ -315,6 +315,10 @@ OXYGEN_MOLAR_MASS_KG_PER_MOL = MOLAR_MASS[OXYGEN_SPECIES] / 1000.0
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
 OXYGEN_RESERVOIR_FLOOR_BAR = 1e-9
 OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
+# Coarse absolute ferric-fraction tripwire until SSO-R ch2 re-speciation
+# samples implied and ledger speciation at the same boundary.
+# TODO(SSO-R ch2 re-speciation): replace with the final respeciation gate.
+FERRIC_DIVERGENCE_WARNING_THRESHOLD = 0.05
 TERMINAL_RUMP_ACCOUNTS = (
     'process.cleaned_melt',
     'terminal.slag',
@@ -551,6 +555,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
+        self._redox_source_terms_this_hr: Dict[str, float] = {}
+        self._redox_source_delta_ln_this_hr = 0.0
         self._pt0_determinism_store: Any | None = None
         self._last_reduced_real_cache_state: str | None = None
         self._rump_expectation_warnings: list[str] = []
@@ -1494,6 +1500,103 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         return transition
 
+    def _cleaned_melt_reduction_source_terms_from_transition(
+        self,
+        transition: LedgerTransition,
+        *,
+        label: str,
+        target_oxides: Tuple[str, ...],
+    ) -> Dict[str, float]:
+        target_set = {str(species) for species in target_oxides}
+        o2_equiv_mol = 0.0
+        for lot in transition.debits:
+            if lot.account != 'process.cleaned_melt':
+                continue
+            for species, kg in lot.species_kg.items():
+                if species not in target_set:
+                    continue
+                formula = resolve_species_formula(
+                    species,
+                    self.species_formula_registry,
+                )
+                oxygen_atoms = float(formula.elements.get('O', 0.0) or 0.0)
+                if oxygen_atoms <= 0.0:
+                    continue
+                species_mol = float(kg) / formula.molar_mass_kg_per_mol()
+                o2_equiv_mol -= 0.5 * oxygen_atoms * species_mol
+        if abs(o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+            return {}
+        return {str(label): o2_equiv_mol}
+
+    def _apply_transition_redox_source_terms(
+        self,
+        transition: LedgerTransition,
+        *,
+        label: str,
+        target_oxides: Tuple[str, ...],
+        exchange_direction: str,
+    ) -> OxygenReservoirState | None:
+        terms = self._cleaned_melt_reduction_source_terms_from_transition(
+            transition,
+            label=label,
+            target_oxides=target_oxides,
+        )
+        if not terms:
+            return None
+        return self._apply_oxygen_reservoir_redox_source_terms(
+            terms,
+            exchange_direction=exchange_direction,
+        )
+
+    @staticmethod
+    def _composed_oxygen_reservoir_direction(
+        existing_direction: str,
+        redox_direction: str,
+        *,
+        skip_reason: str = '',
+    ) -> str:
+        # Pipe-delimited components preserve the same-hour headspace exchange
+        # label while appending the redox source-term outcome.
+        redox_component = str(redox_direction or 'redox_source_terms')
+        if skip_reason:
+            redox_component = f'{redox_component}:skipped:{skip_reason}'
+        components = [
+            part for part in str(existing_direction or '').split('|') if part
+        ]
+        if redox_component not in components:
+            components.append(redox_component)
+        return '|'.join(components)
+
+    def _accumulate_redox_source_terms_for_hour(
+        self,
+        attr_name: str,
+        terms: Mapping[str, float],
+    ) -> None:
+        aggregate = getattr(self, attr_name, None)
+        if aggregate is None:
+            aggregate = {}
+            setattr(self, attr_name, aggregate)
+        for label, mol in terms.items():
+            key = str(label)
+            aggregate[key] = float(aggregate.get(key, 0.0)) + float(mol)
+
+    def _record_redox_source_skip_reasons_for_hour(
+        self,
+        terms: Mapping[str, float],
+        reason: str,
+    ) -> None:
+        reasons = getattr(self, '_redox_source_skip_reasons_this_hr', None)
+        if reasons is None:
+            reasons = {}
+            self._redox_source_skip_reasons_this_hr = reasons
+        for label in terms:
+            key = str(label)
+            existing = str(reasons.get(key, ''))
+            parts = [part for part in existing.split('|') if part]
+            if reason not in parts:
+                parts.append(reason)
+            reasons[key] = '|'.join(parts)
+
     def _record_cost_diagnostic_error(
         self,
         context: str,
@@ -2244,6 +2347,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f'redox source term {label!r} must be finite, got {raw_mol!r}'
                 )
             terms[str(label)] = mol
+        if terms:
+            self._accumulate_redox_source_terms_for_hour(
+                '_redox_source_terms_this_hr',
+                terms,
+            )
         net_o2_equiv_mol = sum(terms.values())
         T_K = (
             max(1.0, float(temperature_K))
@@ -2264,33 +2372,182 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fO2_log=base_fO2_log,
             T_K=T_K,
         )
-        reservoir = OxygenReservoirState(
-            melt_intrinsic_fO2_log=base_fO2_log,
-            reference_T_K=reference_T_K,
-            headspace_ledger_pO2_bar=ledger_pO2,
-            headspace_transport_pO2_bar=(
-                self._headspace_transport_pO2_bar_from_ledger(ledger_pO2)
-            ),
-            headspace_control_floor_pO2_bar=self._headspace_control_floor_pO2_bar(),
-            melt_redox_capacity_mol_per_ln_fO2=C_m,
-            headspace_capacity_mol_per_ln_pO2=max(
-                head_o2_mol,
-                self._effective_headspace_floor_o2_mol(),
-            ),
+        reservoir = self.melt.oxygen_reservoir
+        existing_direction = str(getattr(reservoir, 'exchange_direction', '') or '')
+        reservoir.melt_intrinsic_fO2_log = base_fO2_log
+        reservoir.reference_T_K = reference_T_K
+        reservoir.headspace_ledger_pO2_bar = ledger_pO2
+        reservoir.headspace_transport_pO2_bar = (
+            self._headspace_transport_pO2_bar_from_ledger(ledger_pO2)
         )
+        reservoir.headspace_control_floor_pO2_bar = (
+            self._headspace_control_floor_pO2_bar()
+        )
+        reservoir.melt_redox_capacity_mol_per_ln_fO2 = C_m
+        reservoir.headspace_capacity_mol_per_ln_pO2 = max(
+            head_o2_mol,
+            self._effective_headspace_floor_o2_mol(),
+        )
+        applied_delta_ln = 0.0
+        skip_reason = ''
         if C_m <= 0.0:
-            reservoir.exchange_direction = 'none:no_melt_redox_capacity'
+            skip_reason = 'no_melt_redox_capacity'
         elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:
-            reservoir.exchange_direction = 'none:below_threshold'
+            skip_reason = 'below_threshold'
         else:
             x_m = base_fO2_log * math.log(10.0)
+            applied_delta_ln = net_o2_equiv_mol / C_m
             reservoir.melt_intrinsic_fO2_log = (
-                x_m + net_o2_equiv_mol / C_m
+                x_m + applied_delta_ln
             ) / math.log(10.0)
-            reservoir.exchange_direction = exchange_direction
+        if terms:
+            if skip_reason:
+                self._accumulate_redox_source_terms_for_hour(
+                    '_redox_source_skipped_terms_this_hr',
+                    terms,
+                )
+                self._record_redox_source_skip_reasons_for_hour(
+                    terms,
+                    skip_reason,
+                )
+            else:
+                self._accumulate_redox_source_terms_for_hour(
+                    '_redox_source_applied_terms_this_hr',
+                    terms,
+                )
+            reservoir.exchange_direction = (
+                self._composed_oxygen_reservoir_direction(
+                    existing_direction,
+                    exchange_direction,
+                    skip_reason=skip_reason,
+                )
+            )
+        self._redox_source_delta_ln_this_hr = (
+            float(getattr(self, '_redox_source_delta_ln_this_hr', 0.0))
+            + applied_delta_ln
+        )
+        self.melt.oxygen_reservoir = reservoir
+        self._sync_oxygen_reservoir_mirror()
+        breakdown = self._redox_source_breakdown_diagnostic()
+        reservoir.redox_source_terms_mol_o2_equiv = dict(
+            breakdown.get('terms_mol_o2_equiv_by_label', {})
+        )
+        reservoir.redox_source_net_mol_o2_equiv = float(
+            breakdown.get('net_mol_o2_equiv', 0.0)
+        )
+        reservoir.redox_source_delta_ln_fO2 = float(
+            breakdown.get('delta_ln_fO2', 0.0)
+        )
+        reservoir.redox_source_delta_log10_fO2 = float(
+            breakdown.get('delta_log10_fO2', 0.0)
+        )
+        reservoir.redox_source_applied_terms_mol_o2_equiv = dict(
+            breakdown.get('applied_terms_mol_o2_equiv_by_label', {})
+        )
+        reservoir.redox_source_skipped_terms_mol_o2_equiv = dict(
+            breakdown.get('skipped_terms_mol_o2_equiv_by_label', {})
+        )
+        reservoir.redox_source_skipped_reasons_by_label = dict(
+            breakdown.get('skipped_reasons_by_label', {})
+        )
+        reservoir.redox_source_terms_applied = bool(
+            breakdown.get('redox_source_terms_applied', False)
+        )
+        reservoir.redox_source_skip_reason = str(
+            breakdown.get('redox_source_skip_reason', '')
+        )
+        reservoir.ferric_divergence = dict(
+            breakdown.get('ferric_divergence', {})
+        )
         self.melt.oxygen_reservoir = reservoir
         self._sync_oxygen_reservoir_mirror()
         return reservoir
+
+    def _reset_redox_source_diagnostics_for_hour(self) -> None:
+        self._redox_source_terms_this_hr = {}
+        self._redox_source_applied_terms_this_hr = {}
+        self._redox_source_skipped_terms_this_hr = {}
+        self._redox_source_skip_reasons_this_hr = {}
+        self._redox_source_delta_ln_this_hr = 0.0
+
+    def _ledger_ferric_fraction_diagnostic(self) -> Dict[str, Any]:
+        melt_mol = self.atom_ledger.mol_by_account('process.cleaned_melt')
+        feo_mol = max(0.0, float(melt_mol.get('FeO', 0.0) or 0.0))
+        fe2o3_mol = max(0.0, float(melt_mol.get('Fe2O3', 0.0) or 0.0))
+        oxidized_fe_mol = feo_mol + 2.0 * fe2o3_mol
+        threshold = float(FERRIC_DIVERGENCE_WARNING_THRESHOLD)
+        if oxidized_fe_mol <= 0.0:
+            return {
+                'status': 'no_oxidized_iron',
+                'implied_ferric_fraction': 0.0,
+                'ledger_ferric_fraction': 0.0,
+                'delta_abs': 0.0,
+                'warning_threshold_abs': threshold,
+                'warning_threshold_ferric_fraction_abs': threshold,
+                'sampling_context': 'current_ledger_vs_current_reservoir',
+                'warning': False,
+            }
+        split = self._compute_fe_redox_split_diagnostic()
+        implied = max(0.0, min(1.0, float(split.get('ferric_frac', 0.0) or 0.0)))
+        ledger = (2.0 * fe2o3_mol) / oxidized_fe_mol
+        delta = implied - ledger
+        warning = abs(delta) > threshold
+        return {
+            'status': 'warning' if warning else 'ok',
+            'implied_ferric_fraction': implied,
+            'ledger_ferric_fraction': ledger,
+            'delta_abs': abs(delta),
+            'delta_signed': delta,
+            'warning_threshold_abs': threshold,
+            'warning_threshold_ferric_fraction_abs': threshold,
+            'sampling_context': 'current_ledger_vs_current_reservoir',
+            'warning': warning,
+        }
+
+    def _redox_source_breakdown_diagnostic(self) -> Dict[str, Any]:
+        def _filtered_terms(attr_name: str) -> Dict[str, float]:
+            return {
+                str(label): float(mol)
+                for label, mol in sorted(
+                    dict(getattr(self, attr_name, {}) or {}).items()
+                )
+                if abs(float(mol)) > OXYGEN_RESERVOIR_NOOP_MOL
+            }
+
+        terms = _filtered_terms('_redox_source_terms_this_hr')
+        if not terms:
+            return {}
+        applied_terms = _filtered_terms('_redox_source_applied_terms_this_hr')
+        skipped_terms = _filtered_terms('_redox_source_skipped_terms_this_hr')
+        all_skip_reasons = dict(
+            getattr(self, '_redox_source_skip_reasons_this_hr', {}) or {}
+        )
+        skipped_reasons = {
+            label: str(all_skip_reasons.get(label, ''))
+            for label in skipped_terms
+            if all_skip_reasons.get(label)
+        }
+        skip_reason = '|'.join(
+            sorted({
+                reason
+                for value in skipped_reasons.values()
+                for reason in str(value).split('|')
+                if reason
+            })
+        )
+        delta_ln = float(getattr(self, '_redox_source_delta_ln_this_hr', 0.0))
+        return {
+            'terms_mol_o2_equiv_by_label': terms,
+            'applied_terms_mol_o2_equiv_by_label': applied_terms,
+            'skipped_terms_mol_o2_equiv_by_label': skipped_terms,
+            'skipped_reasons_by_label': skipped_reasons,
+            'redox_source_terms_applied': bool(applied_terms),
+            'redox_source_skip_reason': skip_reason,
+            'net_mol_o2_equiv': sum(terms.values()),
+            'delta_ln_fO2': delta_ln,
+            'delta_log10_fO2': delta_ln / math.log(10.0),
+            'ferric_divergence': self._ledger_ferric_fraction_diagnostic(),
+        }
 
     def _apply_oxygen_reservoir_exchange(self) -> OxygenReservoirState:
         T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
@@ -6569,6 +6826,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_impurity_delta = {}
         self._last_extraction_completeness_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
+        self._reset_redox_source_diagnostics_for_hour()
 
         # --- 1. Decision check ---
         if self.paused_for_decision:
@@ -6755,6 +7013,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot.evap_flux = evap_flux
         snapshot.evap_plane_selectivity = evap_plane_selectivity
         snapshot.fe_redox_split = fe_redox_split
+        snapshot.redox_source_breakdown = self._redox_source_breakdown_diagnostic()
         snapshot.energy = energy
         snapshot.energy_cumulative_kWh = self.energy_cumulative_kWh
         snapshot.oxygen_produced_kg = self._oxygen_total_kg()
@@ -7000,6 +7259,50 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Build an HourSnapshot from current state."""
         oxygen_partition = self._oxygen_terminal_partition_kg()
         condensation_totals = self._condensation_totals_with_terminal_oxygen()
+        redox_source_breakdown = self._redox_source_breakdown_diagnostic()
+        oxygen_reservoir_snapshot = dict(vars(self.melt.oxygen_reservoir))
+        if redox_source_breakdown:
+            oxygen_reservoir_snapshot.update({
+                'redox_source_terms_mol_o2_equiv': dict(
+                    redox_source_breakdown.get('terms_mol_o2_equiv_by_label', {})
+                ),
+                'redox_source_net_mol_o2_equiv': float(
+                    redox_source_breakdown.get('net_mol_o2_equiv', 0.0)
+                ),
+                'redox_source_delta_ln_fO2': float(
+                    redox_source_breakdown.get('delta_ln_fO2', 0.0)
+                ),
+                'redox_source_delta_log10_fO2': float(
+                    redox_source_breakdown.get('delta_log10_fO2', 0.0)
+                ),
+                'redox_source_applied_terms_mol_o2_equiv': dict(
+                    redox_source_breakdown.get(
+                        'applied_terms_mol_o2_equiv_by_label',
+                        {},
+                    )
+                ),
+                'redox_source_skipped_terms_mol_o2_equiv': dict(
+                    redox_source_breakdown.get(
+                        'skipped_terms_mol_o2_equiv_by_label',
+                        {},
+                    )
+                ),
+                'redox_source_skipped_reasons_by_label': dict(
+                    redox_source_breakdown.get('skipped_reasons_by_label', {})
+                ),
+                'redox_source_terms_applied': bool(
+                    redox_source_breakdown.get(
+                        'redox_source_terms_applied',
+                        False,
+                    )
+                ),
+                'redox_source_skip_reason': str(
+                    redox_source_breakdown.get('redox_source_skip_reason', '')
+                ),
+                'ferric_divergence': dict(
+                    redox_source_breakdown.get('ferric_divergence', {})
+                ),
+            })
         # Mass balance check
         mass_in = self.record.batch_mass_kg + sum(
             self.record.additives_kg.values()) + sum(
@@ -7064,13 +7367,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mre_current_A=self._mre_current_A,
             mre_metals_kg_hr=dict(self._mre_metals_this_hr),
             mre_uncertified_yield=dict(self._mre_uncertified_yield),
+            redox_source_breakdown=redox_source_breakdown,
             # 0.5.4 W8 (M2 historical-audit closure): per-species drift
             # between ``process.metal_phase`` ledger and the
             # ``train.stages[*].collected_kg`` UI projection. Empty dict
             # means all metals in sync. Diagnostic only — the global
             # ``mass_balance_error_pct`` ≤5e-12 % gate remains hard.
             metal_projection_drift_kg=self._audit_metal_projection_drift(),
-            oxygen_reservoir=dict(vars(self.melt.oxygen_reservoir)),
+            oxygen_reservoir=oxygen_reservoir_snapshot,
             # 0.5.4.1 E3: Knudsen-regime warning sticker from the
             # latest condensation pass. Empty dict on ticks that
             # didn't trigger a condensation route.

@@ -314,7 +314,33 @@ schema-shape assertion.
     },
     "Kn": 0.00035,                           // Knudsen number, or null
     "regime": "viscous",                    // named Knudsen regime, or ""
-    "transport_formula_id": "not_applicable_until_p0"
+    "transport_formula_id": "not_applicable_until_p0",
+    "redox_source_breakdown": {             // optional; present when melt redox source terms fired
+      "terms_mol_o2_equiv_by_label": {
+        "redox_source:c3_na_shuttle_reduction": -0.5
+      },
+      "applied_terms_mol_o2_equiv_by_label": {
+        "redox_source:c3_na_shuttle_reduction": -0.5
+      },
+      "skipped_terms_mol_o2_equiv_by_label": {},
+      "skipped_reasons_by_label": {},
+      "redox_source_terms_applied": true,
+      "redox_source_skip_reason": "",
+      "net_mol_o2_equiv": -0.5,
+      "delta_ln_fO2": -0.001,
+      "delta_log10_fO2": -0.000434,
+      "ferric_divergence": {
+        "status": "warning",
+        "implied_ferric_fraction": 0.2,
+        "ledger_ferric_fraction": 0.1,
+        "delta_abs": 0.1,
+        "delta_signed": 0.1,
+        "warning_threshold_abs": 0.05,
+        "warning_threshold_ferric_fraction_abs": 0.05,
+        "sampling_context": "current_ledger_vs_current_reservoir",
+        "warning": true
+      }
+    }
   },
   ...
 ]
@@ -361,6 +387,13 @@ schema-shape assertion.
     `HourSnapshot.fe_redox_split` is non-empty; per-field ferric / ferrous /
     native-Fe redox split (numeric fields finite-export-checked; flags
     serialized as bool / str / null).
+  * `redox_source_breakdown` -- emitted by
+    `_redox_source_breakdown_observables` when
+    `HourSnapshot.redox_source_breakdown` is non-empty; per-label
+    mol-O2-equivalent redox source terms, applied scalar fO2 delta, and the
+    implied-vs-ledger ferric divergence. The divergence warning threshold
+    mirrors the ledger relative tolerance; it is a loud diagnostic tripwire,
+    not a fitted chemistry coefficient.
   * `mass_balance_error_category` -- added inline by `build_per_hour_summary`
     when `HourSnapshot.mass_balance_error_category` is a non-empty string; the
     categorical mass-balance-error label for that hour.

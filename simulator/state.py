@@ -455,6 +455,22 @@ class OxygenReservoirState:
     exchange_direction: str = ""
     exchange_clamped: bool = False
     exchange_transition_name: str = ""
+    redox_source_terms_mol_o2_equiv: Dict[str, float] = field(default_factory=dict)
+    redox_source_applied_terms_mol_o2_equiv: Dict[str, float] = field(
+        default_factory=dict
+    )
+    redox_source_skipped_terms_mol_o2_equiv: Dict[str, float] = field(
+        default_factory=dict
+    )
+    redox_source_skipped_reasons_by_label: Dict[str, str] = field(
+        default_factory=dict
+    )
+    redox_source_terms_applied: bool = False
+    redox_source_skip_reason: str = ""
+    redox_source_net_mol_o2_equiv: float = 0.0
+    redox_source_delta_ln_fO2: float = 0.0
+    redox_source_delta_log10_fO2: float = 0.0
+    ferric_divergence: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -1030,6 +1046,10 @@ class HourSnapshot:
     oxygen_reservoir: Dict[str, Any] = field(default_factory=dict)
     # Snapshot copy of MeltState.oxygen_reservoir after this tick's
     # pre-equilibrium O2 exchange.
+
+    redox_source_breakdown: Dict[str, Any] = field(default_factory=dict)
+    # Per-tick mol-O2-equivalent source terms applied to the melt redox scalar.
+    # Diagnostic only; mass movement remains in AtomLedger transitions.
 
     # --- Knudsen regime warning sticker (0.5.4.1 E3) ---
     knudsen_regime_summary: Dict[str, Any] = field(default_factory=dict)

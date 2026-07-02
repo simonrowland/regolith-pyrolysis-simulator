@@ -1368,6 +1368,13 @@ def _fe_redox_split_observables(snapshot: HourSnapshot) -> dict[str, Any]:
     return {"fe_redox_split": exported}
 
 
+def _redox_source_breakdown_observables(snapshot: HourSnapshot) -> dict[str, Any]:
+    summary = dict(getattr(snapshot, "redox_source_breakdown", {}) or {})
+    if not summary:
+        return {}
+    return {"redox_source_breakdown": _json_safe(summary)}
+
+
 def _mre_uncertified_yield_observables(snapshot: HourSnapshot) -> dict[str, Any]:
     summary = dict(getattr(snapshot, "mre_uncertified_yield", {}) or {})
     if not summary:
@@ -1484,6 +1491,7 @@ def build_per_hour_summary(
         ),
         **_knudsen_regime_observables(snapshot),
         **_evap_plane_selectivity_observables(snapshot),
+        **_redox_source_breakdown_observables(snapshot),
         **_mre_uncertified_yield_observables(snapshot),
         **(
             _fe_redox_split_observables(snapshot)
