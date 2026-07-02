@@ -62,6 +62,9 @@ MELTS_OXIDE_BASIS = (
     'Na2O', 'K2O', 'Cr2O3', 'MnO', 'P2O5', 'NiO', 'CoO',
 )
 MELTS_MAJOR_OXIDES = set(MELTS_OXIDE_BASIS)
+# MELTS binding spec: admit only compositions with major oxide sum >95.0 wt%.
+# Exact 95.0 wt% is rejected so adapter and provider gates share one boundary.
+MELTS_MAJOR_OXIDE_MIN_TOTAL_WT_PCT = 95.0
 MELTS_OXIDE_ALIASES = {
     oxide.lower(): oxide
     for oxide in MELTS_OXIDE_BASIS
@@ -1100,9 +1103,12 @@ class AlphaMELTSBackend(MeltBackend):
         if not 30.0 <= sio2_pct <= 80.0:
             reason = OutOfDomainReason.SILICATE_WINDOW
             reasons.append(f'SiO2 {sio2_pct:.3f} wt% outside [30, 80]')
-        if major_pct <= 95.0:
+        if major_pct <= MELTS_MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
             reason = reason or OutOfDomainReason.MAJOR_SUM
-            reasons.append(f'major oxide sum {major_pct:.3f} wt% <= 95')
+            reasons.append(
+                f'major oxide sum {major_pct:.3f} wt% <= '
+                f'{MELTS_MAJOR_OXIDE_MIN_TOTAL_WT_PCT:g}'
+            )
         if non_oxides:
             reason = OutOfDomainReason.FORBIDDEN_SPECIES
             reasons.append(

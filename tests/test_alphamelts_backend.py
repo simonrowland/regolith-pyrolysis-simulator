@@ -989,6 +989,26 @@ def test_alphamelts_domain_gate_rejects_unrecognized_oxide_like_species():
     assert 'unrecognised species outside MELTS basis: XeO' in result.warnings[0]
 
 
+def test_alphamelts_domain_gate_rejects_exact_major_oxide_boundary():
+    backend = AlphaMELTSBackend()
+
+    result = backend._domain_gate(
+        {'SiO2': 50.0, 'MgO': 45.0},
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    assert result is not None
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == (
+        OutOfDomainReason.MAJOR_SUM.value
+    )
+    assert result.warnings == [
+        'DomainGate rejected: major oxide sum 95.000 wt% <= 95'
+    ]
+
+
 def test_domain_gate_rejects_non_silicate_or_non_oxide_inputs():
     backend = AlphaMELTSBackend()
 

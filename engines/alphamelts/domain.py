@@ -47,8 +47,9 @@ _OXIDE_ALIASES.update({
     'feo_tot': 'FeO_total',
 })
 
-# Tolerance constants. Match the AlphaMELTS adapter DomainGate values
-# (alphamelts._domain_gate: SiO2 ∈ [30, 80] wt%, major oxide sum > 95 wt%).
+# Tolerance constants. Match the AlphaMELTS adapter DomainGate values. The
+# MELTS binding spec uses a strict silicate-network admission criterion:
+# major oxide sum must be >95.0 wt%, so an exact 95.0 wt% boundary is rejected.
 _SIO2_MIN_WT_PCT = 30.0
 _SIO2_MAX_WT_PCT = 80.0
 _MAJOR_OXIDE_MIN_TOTAL_WT_PCT = 95.0
