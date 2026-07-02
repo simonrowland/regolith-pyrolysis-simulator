@@ -1528,6 +1528,175 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return {}
         return {str(label): o2_equiv_mol}
 
+    def _transition_species_mol(
+        self,
+        transition: LedgerTransition,
+        *,
+        side: str,
+        account: str,
+        species: str,
+    ) -> float:
+        if side not in {'debits', 'credits'}:
+            raise ValueError(f"transition side must be 'debits' or 'credits', got {side!r}")
+        lots = transition.debits if side == 'debits' else transition.credits
+        formula = resolve_species_formula(species, self.species_formula_registry)
+        mol = 0.0
+        for lot in lots:
+            if lot.account != account:
+                continue
+            kg = float(lot.species_kg.get(species, 0.0) or 0.0)
+            if kg <= 0.0:
+                continue
+            mol += kg / formula.molar_mass_kg_per_mol()
+        return mol
+
+    def _mre_anode_o2_redox_source_terms_from_transition(
+        self,
+        transition: LedgerTransition,
+        *,
+        label: str,
+    ) -> Dict[str, float]:
+        o2_mol = self._transition_species_mol(
+            transition,
+            side='credits',
+            account=OXYGEN_MRE_ANODE_ACCOUNT,
+            species=OXYGEN_SPECIES,
+        )
+        if abs(o2_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+            return {}
+        return {str(label): -o2_mol}
+
+    def _apply_mre_anode_o2_redox_source_terms(
+        self,
+        transition: LedgerTransition,
+        *,
+        label: str,
+        exchange_direction: str,
+    ) -> OxygenReservoirState | None:
+        terms = self._mre_anode_o2_redox_source_terms_from_transition(
+            transition,
+            label=label,
+        )
+        if not terms:
+            return None
+        return self._apply_oxygen_reservoir_redox_source_terms(
+            terms,
+            exchange_direction=exchange_direction,
+        )
+
+    def _c6_back_reduction_redox_source_terms_from_transition(
+        self,
+        transition: LedgerTransition,
+        *,
+        label: str,
+    ) -> Dict[str, float]:
+        si_mol = self._transition_species_mol(
+            transition,
+            side='credits',
+            account='process.metal_phase',
+            species='Si',
+        )
+        al_mol = self._transition_species_mol(
+            transition,
+            side='debits',
+            account='process.metal_phase',
+            species='Al',
+        )
+        sio2 = resolve_species_formula('SiO2', self.species_formula_registry)
+        al2o3 = resolve_species_formula('Al2O3', self.species_formula_registry)
+        si_reduction_o2 = 0.5 * float(sio2.elements.get('O', 0.0) or 0.0) * si_mol
+        al_oxidation_o2 = (
+            0.5
+            * float(al2o3.elements.get('O', 0.0) or 0.0)
+            / float(al2o3.elements.get('Al', 1.0) or 1.0)
+            * al_mol
+        )
+        o2_equiv_mol = al_oxidation_o2 - si_reduction_o2
+        # The 4 Al : 3 Si back-reduction is stoichiometrically net-zero in
+        # O2-equivalent; the kg<->mol round trip leaves a float residual
+        # that GROWS with dose and can exceed the absolute NOOP floor at
+        # production-scale thermite (grok ch2b review: ~1.4e-14 mol at
+        # 50-100 kg Mg), leaking a spurious back-reduction label + fO2
+        # nudge. Snap to zero when the net is float noise RELATIVE to the
+        # gross O2 traffic of the transition — this preserves the
+        # nets-to-zero contract at any dose without masking a real
+        # stoichiometric imbalance (which scales with gross, not eps).
+        gross_o2_mol = abs(al_oxidation_o2) + abs(si_reduction_o2)
+        if abs(o2_equiv_mol) <= max(
+            OXYGEN_RESERVOIR_NOOP_MOL,
+            1e-12 * gross_o2_mol,
+        ):
+            return {}
+        return {str(label): o2_equiv_mol}
+
+    def _apply_c6_back_reduction_redox_source_terms(
+        self,
+        transition: LedgerTransition,
+        *,
+        label: str,
+        exchange_direction: str,
+    ) -> OxygenReservoirState | None:
+        terms = self._c6_back_reduction_redox_source_terms_from_transition(
+            transition,
+            label=label,
+        )
+        if not terms:
+            return None
+        return self._apply_oxygen_reservoir_redox_source_terms(
+            terms,
+            exchange_direction=exchange_direction,
+        )
+
+    def _c7_aluminothermic_redox_source_terms_from_transition(
+        self,
+        transition: LedgerTransition,
+        *,
+        label: str,
+    ) -> Dict[str, float]:
+        ca_mol = self._transition_species_mol(
+            transition,
+            side='credits',
+            account='process.overhead_gas',
+            species='Ca',
+        )
+        if ca_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+            return {}
+        in_situ_al_mol = self._transition_species_mol(
+            transition,
+            side='debits',
+            account='process.metal_phase',
+            species='Al',
+        )
+        al2o3 = resolve_species_formula('Al2O3', self.species_formula_registry)
+        al_oxidation_o2 = (
+            0.5
+            * float(al2o3.elements.get('O', 0.0) or 0.0)
+            / float(al2o3.elements.get('Al', 1.0) or 1.0)
+            * in_situ_al_mol
+        )
+        o2_equiv_mol = al_oxidation_o2 - (0.5 * ca_mol)
+        if abs(o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+            return {}
+        return {str(label): o2_equiv_mol}
+
+    def _apply_c7_aluminothermic_redox_source_terms(
+        self,
+        transition: LedgerTransition,
+        *,
+        label: str,
+        exchange_direction: str,
+    ) -> OxygenReservoirState | None:
+        terms = self._c7_aluminothermic_redox_source_terms_from_transition(
+            transition,
+            label=label,
+        )
+        if not terms:
+            return None
+        return self._apply_oxygen_reservoir_redox_source_terms(
+            terms,
+            exchange_direction=exchange_direction,
+        )
+
     def _apply_transition_redox_source_terms(
         self,
         transition: LedgerTransition,

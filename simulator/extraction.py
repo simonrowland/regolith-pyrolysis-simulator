@@ -704,11 +704,16 @@ class ExtractionMixin:
             reason = diagnostic.get('reason_refused', 'electrolysis_step_refused')
             raise RuntimeError(f'MRE electrolysis refused: {reason}')
         if proposal is not None:
-            self._commit_proposal(
+            transition = self._commit_proposal(
                 ChemistryIntent.ELECTROLYSIS_STEP,
                 proposal,
                 diagnostic=diagnostic,
                 control_inputs=electrolysis_controls,
+            )
+            self._apply_mre_anode_o2_redox_source_terms(
+                transition,
+                label='redox_source:mre_electrolysis_reduction',
+                exchange_direction='redox_source:mre_electrolysis_reduction',
             )
         else:
             # F-A4: no-op dispatch counter mirrors the
@@ -1287,7 +1292,7 @@ class ExtractionMixin:
             self._chem_no_op_dispatch_count += 1
             return
 
-        self._commit_proposal(
+        primary_transition = self._commit_proposal(
             ChemistryIntent.METALLOTHERMIC_STEP,
             primary_proposal,
             diagnostic=primary_diag,
@@ -1295,6 +1300,12 @@ class ExtractionMixin:
                 'reaction_family': REACTION_FAMILY_C6_MG,
                 'dt_hr': 1.0,
             },
+        )
+        self._apply_transition_redox_source_terms(
+            primary_transition,
+            label='redox_source:c6_mg_thermite_primary',
+            target_oxides=('Al2O3',),
+            exchange_direction='redox_source:c6_mg_thermite_primary',
         )
 
         Mg_consumed_kg = float(primary_diag.get('reagent_consumed_kg', 0.0))
@@ -1328,7 +1339,7 @@ class ExtractionMixin:
         back_si_before_kg = self._ledger_account_species_kg(
             'process.metal_phase', 'Si')
         if back_proposal is not None:
-            self._commit_proposal(
+            back_transition = self._commit_proposal(
                 ChemistryIntent.METALLOTHERMIC_STEP,
                 back_proposal,
                 diagnostic=back_diag,
@@ -1337,6 +1348,11 @@ class ExtractionMixin:
                     'back_reduction': True,
                     'dt_hr': 1.0,
                 },
+            )
+            self._apply_c6_back_reduction_redox_source_terms(
+                back_transition,
+                label='redox_source:c6_mg_thermite_back_reduction',
+                exchange_direction='redox_source:c6_mg_thermite_back_reduction',
             )
             metal_phase_delta = (
                 self._ledger_account_species_kg(
@@ -1800,7 +1816,7 @@ class ExtractionMixin:
             if al_budget <= 0.0 or objective_extent <= 0.0:
                 continue
             source_extent = min(objective_extent, al_budget / stoich['Al'])
-            result = self._dispatch_and_commit(
+            result = self._dispatch_only(
                 ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
                 control_inputs={
                     **common_controls,
@@ -1809,9 +1825,26 @@ class ExtractionMixin:
                 },
             )
             diag = dict(result.diagnostic or {})
-            if result.transition is None:
+            proposal = result.transition
+            if proposal is None:
+                self._chem_no_op_dispatch_count += 1
                 self._last_c7_refusal_diagnostic = diag
                 break
+            transition = self._commit_proposal(
+                ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+                proposal,
+                diagnostic=diag,
+                control_inputs={
+                    **common_controls,
+                    'al_source_account': source_account,
+                    'objective_extent_mol': source_extent,
+                },
+            )
+            self._apply_c7_aluminothermic_redox_source_terms(
+                transition,
+                label='redox_source:c7_ca_aluminothermic_reduction',
+                exchange_direction='redox_source:c7_ca_aluminothermic_reduction',
+            )
             diagnostics.append(diag)
             objective_extent = max(0.0, objective_extent - float(diag.get('r_c7', 0.0)))
 

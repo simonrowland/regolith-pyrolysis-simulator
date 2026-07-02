@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import math
 from pathlib import Path
 from types import SimpleNamespace
@@ -8,6 +9,8 @@ from typing import Any
 import pytest
 import yaml
 
+from engines.builtin.ca_aluminothermic_step import BuiltinCaAluminothermicStepProvider
+from simulator.account_ids import C7_AL_CREDIT_ACCOUNT, OXYGEN_MRE_ANODE_ACCOUNT
 from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.core import (
@@ -57,6 +60,42 @@ def _cleaned_melt_debit_mol(sim: PyrolysisSimulator, transition, species: str) -
         for lot in transition.debits
         if lot.account == "process.cleaned_melt"
     )
+
+
+def _transition_account_species_mol(
+    sim: PyrolysisSimulator,
+    transition,
+    *,
+    side: str,
+    account: str,
+    species: str,
+) -> float:
+    formula = resolve_species_formula(species, sim.species_formula_registry)
+    lots = transition.debits if side == "debits" else transition.credits
+    return sum(
+        float(lot.species_kg.get(species, 0.0))
+        / formula.molar_mass_kg_per_mol()
+        for lot in lots
+        if lot.account == account
+    )
+
+
+def _make_custom_feedstock_sim(
+    feedstocks: dict[str, Any],
+    feedstock_id: str,
+    *,
+    additives_kg: dict[str, float] | None = None,
+) -> PyrolysisSimulator:
+    setpoints = _load_yaml("setpoints.yaml")
+    setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
+    sim = PyrolysisSimulator(
+        StubBackend(),
+        setpoints,
+        feedstocks,
+        _load_yaml("vapor_pressures.yaml"),
+    )
+    sim.load_batch(feedstock_id, mass_kg=1000.0, additives_kg=additives_kg or {})
+    return sim
 
 
 def test_melt_fO2_log_exists_and_defaults_to_intrinsic_seed() -> None:
@@ -433,6 +472,275 @@ def test_runner_reads_redox_source_breakdown() -> None:
         FERRIC_DIVERGENCE_WARNING_THRESHOLD
     )
     assert "fe_redox_split" in summary
+
+
+def test_mre_source_term_comes_from_committed_anode_o2_transition() -> None:
+    sim = _make_sim()
+    sim.start_campaign(CampaignPhase.C5)
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = "SiO2"
+    sim.melt.mre_max_voltage_V = 1.45
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+
+    sim._step_mre()
+
+    transition = sim.atom_ledger.transitions[-1]
+    label = "redox_source:mre_electrolysis_reduction"
+    anode_o2_mol = _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account=OXYGEN_MRE_ANODE_ACCOUNT,
+        species="O2",
+    )
+    breakdown = sim._redox_source_breakdown_diagnostic()
+
+    assert transition.name == "mre_electrolysis_reduction"
+    assert anode_o2_mol > 0.0
+    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
+        -anode_o2_mol
+    )
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2", 0.0
+    ) == pytest.approx(0.0)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
+
+
+# Mg=12 is the original scale; 50/100 kg are production-scale doses where
+# the kg<->mol round-trip float residual on the 4 Al : 3 Si back-reduction
+# exceeded the absolute NOOP floor and leaked a spurious back label (grok
+# ch2b review) — the relative-epsilon snap must hold at ANY dose.
+@pytest.mark.parametrize("mg_dose_kg", [12.0, 50.0, 100.0])
+def test_c6_primary_source_term_from_transition_and_back_reduction_nets_zero(
+    mg_dose_kg,
+) -> None:
+    sim = _make_custom_feedstock_sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"Al2O3": 75.0, "SiO2": 20.0, "FeO": 5.0},
+            }
+        },
+        "oxide",
+        additives_kg={"Mg": mg_dose_kg},
+    )
+    sim._init_thermite_inventory()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+
+    sim._step_thermite()
+
+    primary = next(
+        transition
+        for transition in reversed(sim.atom_ledger.transitions)
+        if transition.name == "c6_mg_thermite_primary"
+    )
+    back = next(
+        transition
+        for transition in reversed(sim.atom_ledger.transitions)
+        if transition.name == "c6_al_si_back_reduction"
+    )
+    primary_label = "redox_source:c6_mg_thermite_primary"
+    back_label = "redox_source:c6_mg_thermite_back_reduction"
+    al2o3_mol = _cleaned_melt_debit_mol(sim, primary, "Al2O3")
+    breakdown = sim._redox_source_breakdown_diagnostic()
+
+    assert al2o3_mol > 0.0
+    assert breakdown["terms_mol_o2_equiv_by_label"][primary_label] == pytest.approx(
+        -1.5 * al2o3_mol
+    )
+    assert sim._c6_back_reduction_redox_source_terms_from_transition(
+        back,
+        label=back_label,
+    ) == {}
+    assert back_label not in breakdown["terms_mol_o2_equiv_by_label"]
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
+
+
+def test_c7_external_al_credit_lowers_fO2_from_committed_transition(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        BuiltinCaAluminothermicStepProvider,
+        "_computed_thermo_margin_kj_per_mol_o2",
+        lambda self, hold_temp_C: 2.0,
+    )
+    setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
+    setpoints["campaigns"]["C7"].update(
+        {"enabled": True, "al_credit_limit_kg": 20.0, "extent_fraction": 0.1}
+    )
+    sim = PyrolysisSimulator(
+        StubBackend(),
+        setpoints,
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("vapor_pressures.yaml"),
+    )
+    sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
+    sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+    sim.melt.temperature_C = 1200.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+
+    sim._step_c7_ca_aluminothermic()
+
+    transition = next(
+        transition
+        for transition in reversed(sim.atom_ledger.transitions)
+        if transition.name == "ca_aluminothermic_c3a_credit_al"
+    )
+    label = "redox_source:c7_ca_aluminothermic_reduction"
+    ca_mol = _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account="process.overhead_gas",
+        species="Ca",
+    )
+    breakdown = sim._redox_source_breakdown_diagnostic()
+
+    assert ca_mol > 0.0
+    assert _transition_account_species_mol(
+        sim,
+        transition,
+        side="debits",
+        account=C7_AL_CREDIT_ACCOUNT,
+        species="Al",
+    ) > 0.0
+    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
+        -0.5 * ca_mol
+    )
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
+
+
+def test_c7_in_situ_al_route_does_not_double_count_prior_reducing_power(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        BuiltinCaAluminothermicStepProvider,
+        "_computed_thermo_margin_kj_per_mol_o2",
+        lambda self, hold_temp_C: 2.0,
+    )
+    setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
+    setpoints["campaigns"]["C7"].update(
+        {"enabled": True, "al_credit_limit_kg": 0.0, "extent_fraction": 0.1}
+    )
+    sim = PyrolysisSimulator(
+        StubBackend(),
+        setpoints,
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("vapor_pressures.yaml"),
+    )
+    sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
+    sim.atom_ledger.load_external_mol(
+        "process.metal_phase",
+        {"Al": 1000.0},
+        source="test in-situ Al inventory",
+    )
+    sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+    sim.melt.temperature_C = 1200.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+
+    sim._step_c7_ca_aluminothermic()
+
+    transition = next(
+        transition
+        for transition in reversed(sim.atom_ledger.transitions)
+        if transition.name == "ca_aluminothermic_c3a_in_situ_al"
+    )
+    label = "redox_source:c7_ca_aluminothermic_reduction"
+    breakdown = sim._redox_source_breakdown_diagnostic()
+
+    assert _transition_account_species_mol(
+        sim,
+        transition,
+        side="debits",
+        account="process.metal_phase",
+        species="Al",
+    ) > 0.0
+    assert label not in breakdown.get("terms_mol_o2_equiv_by_label", {})
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        before_fO2
+    )
+
+
+def test_c7_mixed_in_situ_and_external_al_counts_only_external_credit_sink(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        BuiltinCaAluminothermicStepProvider,
+        "_computed_thermo_margin_kj_per_mol_o2",
+        lambda self, hold_temp_C: 2.0,
+    )
+    setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
+    setpoints["campaigns"]["C7"].update(
+        {"enabled": True, "al_credit_limit_kg": 20.0, "extent_fraction": 0.1}
+    )
+    sim = PyrolysisSimulator(
+        StubBackend(),
+        setpoints,
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("vapor_pressures.yaml"),
+    )
+    sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
+    sim.atom_ledger.load_external_mol(
+        "process.metal_phase",
+        {"Al": 2.0},
+        source="test limited in-situ Al inventory",
+    )
+    sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+    sim.melt.temperature_C = 1200.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim._step_c7_ca_aluminothermic()
+
+    in_situ = next(
+        transition
+        for transition in sim.atom_ledger.transitions
+        if transition.name == "ca_aluminothermic_c3a_in_situ_al"
+    )
+    credit = next(
+        transition
+        for transition in sim.atom_ledger.transitions
+        if transition.name == "ca_aluminothermic_c3a_credit_al"
+    )
+    label = "redox_source:c7_ca_aluminothermic_reduction"
+    credit_ca_mol = _transition_account_species_mol(
+        sim,
+        credit,
+        side="credits",
+        account="process.overhead_gas",
+        species="Ca",
+    )
+    total_ca_mol = credit_ca_mol + _transition_account_species_mol(
+        sim,
+        in_situ,
+        side="credits",
+        account="process.overhead_gas",
+        species="Ca",
+    )
+    breakdown = sim._redox_source_breakdown_diagnostic()
+
+    assert sim._c7_aluminothermic_redox_source_terms_from_transition(
+        in_situ,
+        label=label,
+    ) == {}
+    assert credit_ca_mol > 0.0
+    assert total_ca_mol > credit_ca_mol
+    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
+        -0.5 * credit_ca_mol
+    )
+    assert breakdown["terms_mol_o2_equiv_by_label"][label] != pytest.approx(
+        -0.5 * total_ca_mol
+    )
 
 
 def test_isochemical_temperature_ramp_references_fO2_on_kress91_curve() -> None:
