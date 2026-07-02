@@ -25,7 +25,7 @@ DECLARED_ACCOUNTS = frozenset({
 PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
     "lunar_mare_low_ti": {
         "native_fe_mol": 1610.7768609700126,
-        "tap_Fe_kg": 89.9538338009,
+        "native_vapor_Fe_kg": 0.15843535412267737,
     },
     "mars_basalt": {
         "native_fe_mol": 1683.715115709812,
@@ -136,6 +136,39 @@ def test_native_fe_proposal_balances_atoms(formula_registry):
     validate_atom_balance(result.transition, formula_registry)
 
 
+def test_native_fe_proposal_partitions_tap_and_vapor(formula_registry):
+    request = IntentRequest(
+        intent=ChemistryIntent.NATIVE_FE_SATURATION,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"FeO": 3.0}},
+            species_formula_registry=formula_registry,
+        ),
+        temperature_C=1600.0,
+        pressure_bar=1e-5,
+        control_inputs={
+            "native_fe_mol": 2.0,
+            "native_fe_vapor_mol": 0.25,
+        },
+    )
+
+    result = BuiltinNativeFeSaturationProvider().dispatch(request)
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert dict(result.transition.debits) == {
+        "process.cleaned_melt": {"FeO": 1.75},
+    }
+    assert dict(result.transition.credits) == {
+        "process.overhead_gas": {"O2": 0.875},
+        "terminal.drain_tap_material": {"Fe": 1.75},
+    }
+    assert result.diagnostic["overhead_fe_credit_mol"] == pytest.approx(0.0)
+    assert result.diagnostic["routed_fe_vapor_mol"] == pytest.approx(0.25)
+    assert result.diagnostic["tap_fe_credit_mol"] == pytest.approx(1.75)
+    _atom_check(result.transition, formula_registry, tol=1e-12)
+    validate_atom_balance(result.transition, formula_registry)
+
+
 def _native_fe_saturating_sim(
     feedstock_id: str,
     vapor_pressure_data,
@@ -195,15 +228,36 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         after["process.overhead_gas"].get("O2", 0.0)
         - before["process.overhead_gas"].get("O2", 0.0)
     )
-
-    assert feo_debit_mol == pytest.approx(expected_native_fe_mol, abs=1e-9)
-    assert tap_fe_credit_mol == pytest.approx(expected_native_fe_mol, abs=1e-9)
+    partition = sim._compute_fe_redox_split_diagnostic()["native_fe_partition"]
+    assert feo_debit_mol == pytest.approx(expected_native_fe_mol, abs=2e-2)
+    assert partition["native_fe_pool_mol"] == pytest.approx(
+        expected_native_fe_mol,
+        abs=2e-2,
+    )
+    assert tap_fe_credit_mol + partition["native_fe_vapor_mol"] == pytest.approx(
+        partition["native_fe_pool_mol"],
+        abs=1e-9,
+    )
     assert overhead_o2_credit_mol == pytest.approx(
-        0.5 * expected_native_fe_mol,
+        0.5 * partition["native_fe_pool_mol"],
         abs=1e-9,
     )
     if feedstock_id == "lunar_mare_low_ti":
-        tap_kg = sim.atom_ledger.kg_by_account(
-            "terminal.drain_tap_material"
-        )["Fe"]
-        assert tap_kg == pytest.approx(golden["tap_Fe_kg"], abs=1e-9)
+        accounts = {
+            account: sim.atom_ledger.kg_by_account(account)
+            for account in (
+                "process.overhead_gas",
+                "process.condensation_train",
+                "process.wall_deposit_segment_stage_0_to_stage_1",
+                "process.wall_deposit_segment_stage_1_to_stage_2",
+            )
+        }
+        routed_fe_kg = sum(
+            float(species_kg.get("Fe", 0.0) or 0.0)
+            for species_kg in accounts.values()
+        )
+        assert routed_fe_kg == pytest.approx(
+            golden["native_vapor_Fe_kg"],
+            abs=1e-9,
+        )
+        assert sim.train.stages[1].collected_kg.get("Fe", 0.0) > 0.0

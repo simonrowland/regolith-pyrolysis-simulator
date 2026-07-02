@@ -1361,6 +1361,8 @@ def _fe_redox_split_observables(snapshot: HourSnapshot) -> dict[str, Any]:
             )
         elif isinstance(value, bool):
             exported[key] = bool(value)
+        elif key == "native_fe_partition" and isinstance(value, Mapping):
+            exported[key] = _json_safe(value)
         elif value is None:
             exported[key] = None
         else:
@@ -1499,6 +1501,22 @@ def build_per_hour_summary(
             else {}
         ),
     }
+    if include_fe_redox_split:
+        stage3 = sim._stage3_fe_wt_pct_diagnostic()
+        summary["stage_3_capture"] = {
+            "Fe_kg": _finite_export_float(
+                stage3.get("stage_3_fe_kg", 0.0),
+                field="stage_3_capture Fe_kg",
+            ),
+            "total_kg": _finite_export_float(
+                stage3.get("stage_3_total_kg", 0.0),
+                field="stage_3_capture total_kg",
+            ),
+            "Fe_wt_pct": _finite_export_float(
+                stage3.get("stage_3_fe_wt_pct", 0.0),
+                field="stage_3_capture Fe_wt_pct",
+            ),
+        }
     if mass_balance_category:
         summary["mass_balance_error_category"] = mass_balance_category
     enforcement = getattr(sim.campaign_mgr, "last_pO2_enforcement", None)

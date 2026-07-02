@@ -588,6 +588,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_wall_deposit_by_segment_species_delta: Dict[
             Tuple[str, str], float] = {}
         self._last_impurity_delta: Dict[Tuple[int, str], float] = {}
+        self._last_native_fe_partition_diagnostic: Dict[str, Any] = {}
+        self._native_fe_vapor_residual_capacity_mol_this_hr: float | None = None
 
         # --- Gas train feedback state ---
         self.O2_vented_cumulative_kg = 0.0      # Total O₂ vented to vacuum
@@ -813,6 +815,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.overhead = OverheadGas()
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
+        self._last_native_fe_partition_diagnostic = {}
+        self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._rump_expectation_warnings = []
         self._last_shuttle_refusal_diagnostic = {}
         self._shuttle_refusal_history = []
@@ -3277,6 +3281,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             'feo_equiv_wt_pct': float(split.get('feo_equiv_wt_pct', 0.0)),
             'source': str(split.get('source', 'unknown')),
+            **(
+                {'native_fe_partition': dict(
+                    getattr(self, '_last_native_fe_partition_diagnostic', {})
+                    or {}
+                )}
+                if getattr(self, '_last_native_fe_partition_diagnostic', {})
+                else {}
+            ),
         }
 
     def _native_fe_saturation_state(
@@ -3382,7 +3394,216 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 high = mid
         return high
 
-    def _apply_native_fe_saturation_split(self) -> Dict[str, Any]:
+    def _stage3_fe_wt_pct_diagnostic(self) -> Dict[str, float]:
+        if len(self.train.stages) <= 3:
+            return {
+                'stage_3_fe_kg': 0.0,
+                'stage_3_total_kg': 0.0,
+                'stage_3_fe_wt_pct': 0.0,
+            }
+        collected = dict(getattr(self.train.stages[3], 'collected_kg', {}) or {})
+        fe_kg = max(0.0, float(collected.get('Fe', 0.0) or 0.0))
+        total_kg = sum(
+            max(0.0, float(kg or 0.0))
+            for kg in collected.values()
+        )
+        return {
+            'stage_3_fe_kg': fe_kg,
+            'stage_3_total_kg': total_kg,
+            'stage_3_fe_wt_pct': (
+                100.0 * fe_kg / total_kg
+                if total_kg > 0.0
+                else 0.0
+            ),
+        }
+
+    def _native_fe_partition_diagnostic(
+        self,
+        native_fe_available_mol: float,
+    ) -> Dict[str, Any]:
+        native_fe_available_mol = max(0.0, float(native_fe_available_mol))
+        T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
+        fe_row = dict((self.vapor_pressures.get('metals', {}) or {}).get('Fe') or {})
+        if not fe_row:
+            raise AccountingError(
+                'native Fe vapor partition requires data/vapor_pressures.yaml '
+                'metals.Fe'
+            )
+
+        from engines.builtin.evaporation_flux import (
+            DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
+            DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+            _evaluate_alpha_control,
+            _series_resistance_evaporation_flux_kg_m2_s,
+        )
+        from engines.builtin.vapor_pressure import (
+            COEFF_BLOCK_PURE_COMPONENT,
+            _pow10_pressure_or_raise,
+            vapor_pressure_antoine_coefficients,
+            vapor_pressure_source_label,
+        )
+
+        antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+            fe_row,
+            temperature_K=T_K,
+        )
+        if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
+            raise AccountingError(
+                'native Fe vapor partition requires metals.Fe.'
+                'pure_component_antoine; refusing legacy Fe vapor fit'
+            )
+        A = float(antoine.get('A', 0.0) or 0.0)
+        B = float(antoine.get('B', 0.0) or 0.0)
+        C = float(antoine.get('C', 0.0) or 0.0)
+        if A <= 0.0 or T_K + C <= 0.0:
+            raise AccountingError(
+                'native Fe vapor partition received invalid Fe '
+                'pure_component_antoine coefficients'
+            )
+        P_reference_Pa = _pow10_pressure_or_raise(
+            A - B / (T_K + C),
+            species='Fe',
+            field='P_reference_Pa',
+        )
+
+        molar_mass_g_mol = float(fe_row.get('molar_mass_g_mol', 0.0) or 0.0)
+        if molar_mass_g_mol <= 0.0:
+            raise AccountingError(
+                'native Fe vapor partition requires metals.Fe.molar_mass_g_mol'
+            )
+        molar_mass_kg_mol = molar_mass_g_mol / 1000.0
+
+        alpha_data = fe_row.get('evaporation_alpha') or {}
+        if not isinstance(alpha_data, Mapping) or 'value' not in alpha_data:
+            raise AccountingError(
+                'native Fe vapor partition requires grounded Fe '
+                'evaporation_alpha'
+            )
+        alpha_spec = alpha_data['value']
+        alpha, alpha_evaluation = _evaluate_alpha_control('Fe', T_K, alpha_spec)
+
+        kernel_config = dict(
+            getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
+        )
+        series_config = dict(
+            kernel_config.get('evaporation_series_resistance', {}) or {}
+        )
+        carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
+        carrier_gas = (
+            carrier_resolver()
+            if callable(carrier_resolver)
+            else 'N2'
+        )
+        overhead_pressure_mbar = float(
+            getattr(self.melt, 'p_total_mbar', 0.0) or 0.0
+        )
+        pressure_source = 'melt.p_total_mbar'
+        if overhead_pressure_mbar <= 0.0:
+            overhead_pressure_mbar = float(
+                getattr(self.overhead, 'pressure_mbar', 0.0) or 0.0
+            )
+            pressure_source = 'overhead.pressure_mbar'
+        overhead_pressure_pa = max(0.0, overhead_pressure_mbar) * 100.0
+        P_bulk_Pa = max(
+            0.0,
+            float(getattr(self.overhead, 'composition', {}).get('Fe', 0.0) or 0.0)
+            * 100.0,
+        )
+        gas_temperature_K = float(
+            getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
+        )
+        melt_resistance_enabled = bool(
+            series_config.get('melt_resistance_enabled', True)
+        )
+        gas_resistance_enabled = bool(
+            series_config.get('gas_resistance_enabled', True)
+        )
+        melt_surface_renewal_base = float(
+            series_config.get(
+                'melt_surface_renewal_base_kg_s_m2_pa',
+                DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
+            )
+            or DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA
+        )
+        melt_surface_renewal_source = str(
+            series_config.get(
+                'melt_surface_renewal_source',
+                DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+            )
+        )
+        series_flux = _series_resistance_evaporation_flux_kg_m2_s(
+            species='Fe',
+            P_eq_pa=P_reference_Pa,
+            P_bulk_pa=P_bulk_Pa,
+            T_surface_K=T_K,
+            molar_mass_kg_mol=molar_mass_kg_mol,
+            alpha_i=alpha,
+            pipe_diameter_m=float(
+                getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+            ),
+            overhead_pressure_pa=overhead_pressure_pa,
+            axial_stir_factor=clamp_stir_factor(self.melt.stir_state.axial),
+            radial_stir_factor=clamp_stir_factor(self.melt.stir_state.radial),
+            carrier_gas=carrier_gas,
+            T_gas_K=gas_temperature_K,
+            melt_resistance_enabled=melt_resistance_enabled,
+            gas_resistance_enabled=gas_resistance_enabled,
+            melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
+            melt_surface_renewal_source=melt_surface_renewal_source,
+        )
+        capacity_kg_hr = max(
+            0.0,
+            float(series_flux.flux_kg_s_m2)
+            * max(0.0, float(self.melt.melt_surface_area_m2))
+            * 3600.0,
+        )
+        capacity_mol_hr = capacity_kg_hr / molar_mass_kg_mol
+        vapor_mol = min(native_fe_available_mol, capacity_mol_hr)
+        tap_mol = native_fe_available_mol - vapor_mol
+        pool = native_fe_available_mol
+        diagnostic = {
+            'native_fe_pool_mol': pool,
+            'native_fe_vapor_mol': vapor_mol,
+            'native_fe_tap_mol': tap_mol,
+            'native_fe_vapor_capacity_mol_hr': capacity_mol_hr,
+            'native_fe_vapor_capacity_kg_hr': capacity_kg_hr,
+            'ordinary_melt_fe_residual_capacity_mol_hr': max(
+                0.0,
+                capacity_mol_hr - vapor_mol,
+            ),
+            'capacity_allocation_rule': 'pool_first_residual',
+            'native_pool_activity_argument': (
+                'a_Fe(pool) ~= 1 outcompetes dilute melt FeO activity'
+            ),
+            'native_fe_vapor_escape_fraction_of_pool': (
+                vapor_mol / pool if pool > 0.0 else 0.0
+            ),
+            'P_reference_Antoine_Pa': P_reference_Pa,
+            'P_eq_Pa': P_reference_Pa,
+            'P_bulk_Pa': P_bulk_Pa,
+            'activity_factor': 1.0,
+            'temperature_K': T_K,
+            'overhead_pressure_pa': overhead_pressure_pa,
+            'overhead_pressure_source': pressure_source,
+            'carrier_gas': str(carrier_gas),
+            'alpha_Fe': float(alpha),
+            'alpha_source': str(alpha_data.get('source', '')),
+            'alpha_s_evaluation': dict(alpha_evaluation),
+            'source_label': vapor_pressure_source_label(
+                'native_fe_partition',
+                fe_row,
+                coefficient_block=coefficient_block,
+                temperature_K=T_K,
+            ),
+            'series_resistance': series_flux.as_diagnostic(),
+        }
+        return diagnostic
+
+    def _apply_native_fe_saturation_split(
+        self,
+        *,
+        sample_time_h: float | None = None,
+    ) -> Dict[str, Any]:
         self._re_reference_melt_fO2_to_temperature(
             max(1.0, float(self.melt.temperature_C) + 273.15)
         )
@@ -3397,17 +3618,84 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         native_fe_mol = min(feo_mol, total_fe_mol * native_frac)
         if native_fe_mol <= 1.0e-12:
             return split
+        partition = self._native_fe_partition_diagnostic(native_fe_mol)
 
-        self._dispatch_and_commit(
+        control_inputs = {
+            'native_fe_mol': native_fe_mol,
+            'native_fe_vapor_mol': float(
+                partition.get('native_fe_vapor_mol', 0.0)
+            ),
+            'native_fe_frac': native_frac,
+            'source': 'native Fe saturation FeO split',
+        }
+        kernel_result = self._dispatch_only(
             ChemistryIntent.NATIVE_FE_SATURATION,
-            control_inputs={
-                'native_fe_mol': native_fe_mol,
-                'native_fe_frac': native_frac,
-                'source': 'native Fe saturation FeO split',
-            },
+            control_inputs=control_inputs,
         )
+        proposal = kernel_result.transition
+        diagnostic = dict(kernel_result.diagnostic or {})
+        transition = None
+        if proposal is None:
+            self._chem_no_op_dispatch_count += 1
+        else:
+            transition = self._commit_proposal(
+                ChemistryIntent.NATIVE_FE_SATURATION,
+                proposal,
+                diagnostic=diagnostic,
+                control_inputs=control_inputs,
+            )
         self._project_cleaned_melt_from_atom_ledger()
         self._project_drain_tap_from_atom_ledger()
+        committed_tap_mol = (
+            self._transition_species_mol(
+                transition,
+                side='credits',
+                account='terminal.drain_tap_material',
+                species='Fe',
+            )
+            if transition is not None
+            else 0.0
+        )
+        requested_vapor_mol = float(partition.get('native_fe_vapor_mol', 0.0) or 0.0)
+        vapor_route = self._route_native_fe_vapor_to_condensation(
+            requested_vapor_mol,
+            sample_time_h=sample_time_h,
+        )
+        self._project_cleaned_melt_from_atom_ledger()
+        committed_vapor_mol = float(
+            vapor_route.get('native_fe_vapor_mol', 0.0) or 0.0
+        )
+        committed_pool_mol = committed_vapor_mol + committed_tap_mol
+        residual_capacity_mol = max(
+            0.0,
+            float(partition.get('native_fe_vapor_capacity_mol_hr', 0.0) or 0.0)
+            - committed_vapor_mol,
+        )
+        self._native_fe_vapor_residual_capacity_mol_this_hr = residual_capacity_mol
+        partition.update({
+            'native_fe_pool_mol': committed_pool_mol,
+            'native_fe_vapor_mol': committed_vapor_mol,
+            'native_fe_tap_mol': committed_tap_mol,
+            'ordinary_melt_fe_residual_capacity_mol_hr': residual_capacity_mol,
+            'native_fe_uncondensed_mol': float(
+                vapor_route.get('native_fe_uncondensed_mol', 0.0) or 0.0
+            ),
+            'native_fe_uncondensed_fraction_of_pool': (
+                float(vapor_route.get('native_fe_uncondensed_mol', 0.0) or 0.0)
+                / committed_pool_mol
+                if committed_pool_mol > 0.0
+                else 0.0
+            ),
+            'native_fe_condensed_kg': float(
+                vapor_route.get('native_fe_condensed_kg', 0.0) or 0.0
+            ),
+            'native_fe_vapor_escape_fraction_of_pool': (
+                committed_vapor_mol / committed_pool_mol
+                if committed_pool_mol > 0.0
+                else 0.0
+            ),
+        })
+        self._last_native_fe_partition_diagnostic = dict(partition)
         base_fO2_log = self._current_melt_redox_fO2_log()
         target_fO2_log = self._native_fe_saturation_target_fO2_log(base_fO2_log)
         C_m = self._melt_redox_capacity_mol_per_ln_fO2(
@@ -3418,15 +3706,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             0.0,
             C_m * (target_fO2_log - base_fO2_log) * math.log(10.0),
         )
-        emitted_o2_mol = 0.5 * native_fe_mol
+        emitted_o2_mol = (
+            self._transition_species_mol(
+                transition,
+                side='credits',
+                account='process.overhead_gas',
+                species=OXYGEN_SPECIES,
+            )
+            if transition is not None
+            else 0.0
+        ) + float(
+            vapor_route.get('native_fe_overhead_o2_mol', 0.0) or 0.0
+        )
         self._apply_oxygen_reservoir_redox_source_terms(
-            {'native_fe_saturation_o2_emission': min(
+            {'redox_source:native_fe_saturation_split': min(
                 emitted_o2_mol,
                 needed_o2_equiv_mol,
             )},
             exchange_direction='redox_source:native_fe_saturation_split',
         )
-        return split
+        return {**split, 'native_fe_partition': dict(partition)}
 
     def _seed_atom_ledger(
         self,
@@ -4125,6 +4424,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if (mol := float(raw_mol)) > 0.0
             }
             if account == 'process.overhead_gas':
+                # Overhead metal vapor is already-evaporated product, not a
+                # melt-equilibrium input to feed back into the backend solve.
+                for species in METAL_SPECIES:
+                    species_mol.pop(species, None)
                 species_mol.pop(OXYGEN_SPECIES, None)
             if species_mol:
                 composition[account] = species_mol
@@ -7125,6 +7428,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_condensed_by_stage_species_delta = {}
         self._last_wall_deposit_by_segment_species_delta = {}
         self._last_impurity_delta = {}
+        self._last_native_fe_partition_diagnostic = {}
+        self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._last_extraction_completeness_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
         self._reset_redox_source_diagnostics_for_hour()
@@ -7147,7 +7452,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 2. Temperature ramp ---
         self._update_temperature()
         self._apply_oxygen_reservoir_exchange()
-        self._apply_native_fe_saturation_split()
+        self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
 
         # --- 3. Thermodynamic equilibrium ---
         # Query the melt backend for phase assemblage, activities,

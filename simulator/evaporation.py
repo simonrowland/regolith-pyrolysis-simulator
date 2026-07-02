@@ -279,6 +279,35 @@ class EvaporationMixin:
                 return flux
         for species, rate_kg_hr in flux_kg_hr.items():
             gated_rate_kg_hr = float(rate_kg_hr) * liquid_fraction_factor
+            if species == 'Fe':
+                residual_capacity_mol = getattr(
+                    self,
+                    '_native_fe_vapor_residual_capacity_mol_this_hr',
+                    None,
+                )
+                if residual_capacity_mol is not None:
+                    fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
+                    residual_capacity_kg_hr = max(
+                        0.0,
+                        float(residual_capacity_mol),
+                    ) * fe_molar_mass
+                    # Native-pool Fe has activity ~1; dilute melt FeO-derived
+                    # Fe has lower activity, so the shared surface/gas transport
+                    # budget is allocated to the pool first and melt Fe gets the
+                    # residual capacity.
+                    original_gated_rate = gated_rate_kg_hr
+                    gated_rate_kg_hr = min(gated_rate_kg_hr, residual_capacity_kg_hr)
+                    diagnostic['native_fe_capacity_allocation'] = {
+                        'rule': 'pool_first_residual',
+                        'native_pool_activity_argument': (
+                            'a_Fe(pool) ~= 1 outcompetes dilute melt FeO activity'
+                        ),
+                        'melt_fe_raw_kg_hr': float(original_gated_rate),
+                        'melt_fe_residual_capacity_kg_hr': float(
+                            residual_capacity_kg_hr
+                        ),
+                        'melt_fe_applied_kg_hr': float(gated_rate_kg_hr),
+                    }
             if gated_rate_kg_hr > 1e-12:
                 flux.species_kg_hr[species] = gated_rate_kg_hr
 
@@ -1037,9 +1066,6 @@ class EvaporationMixin:
         route_result = self.condensation_model.route(
             evap_flux, self.melt)
 
-        metals_data = self.vapor_pressures.get('metals', {})
-        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
-
         species_order = tuple(
             getattr(route_result, 'wall_route_species_order', ()) or (
                 evap_flux.species_kg_hr.keys()
@@ -1049,58 +1075,143 @@ class EvaporationMixin:
             if species not in evap_flux.species_kg_hr:
                 continue
             rate_kg_hr = evap_flux.species_kg_hr[species]
-            sp_data = metals_data.get(species, {})
-            if not sp_data:
-                sp_data = oxide_vapors_data.get(species, {})
-
-            stoich = self._evaporation_stoich(species, sp_data)
-            if stoich is None:
-                continue
-            available_kg = self.atom_ledger.kg_by_account(
-                'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
-            if available_kg <= 1e-12:
-                continue
-            remaining_kg_hr = route_result.remaining_by_species.get(
-                species, 0.0)
-            if (
-                remaining_kg_hr < -1e-12
-                or remaining_kg_hr > rate_kg_hr + 1e-12
-            ):
-                raise AccountingError(
-                    f"condensation route for {species!r} returned "
-                    "unphysical remaining vapor mass"
-                )
-
-            # Step 1: EVAPORATION_TRANSITION (melt -> overhead_gas + O2).
-            # Pass remaining=rate so the prior intent's wire-in routes
-            # ALL vapor to overhead, leaving the deposit leg to
-            # CONDENSATION_ROUTE.  The EVAPORATION_TRANSITION provider's
-            # internal validation already rejects remaining > rate; equal
-            # rates pass.
-            self._credit_evaporation_transition(
-                species, rate_kg_hr, rate_kg_hr, sp_data,
+            self._route_evaporated_species_to_condensation(
+                route_result,
+                species,
+                rate_kg_hr,
             )
-
-            # Step 2: CONDENSATION_ROUTE (overhead_gas -> condensation_train).
-            # condensed_kg mirrors the legacy
-            # ``credited_condensed_kg = max(0.0, product_kg - remaining_kg)``
-            # branch in _credit_evaporation_transition pre-flip: clamp
-            # negative, take the vapor mass the route said would deposit.
-            condensed_kg = max(
-                0.0, rate_kg_hr - remaining_kg_hr,
-            )
-            credited_condensed_kg = self._dispatch_condensation_route(
-                species, condensed_kg, sp_data, route_result,
-            )
-
-            # Step 3: stage UI projection (unchanged behaviour).
-            product_projection = self._condensed_products_kg(
-                species, credited_condensed_kg, sp_data)
-            self._project_condensed_stage_collection(
-                route_result, species, credited_condensed_kg,
-                product_projection)
 
         self._sync_oxygen_kg_counters()
+
+    def _route_evaporated_species_to_condensation(
+        self,
+        route_result,
+        species: str,
+        rate_kg_hr: float,
+        *,
+        apply_evaporative_redox_source_terms: bool = True,
+    ) -> dict[str, Any]:
+        metals_data = self.vapor_pressures.get('metals', {})
+        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
+        sp_data = metals_data.get(species, {})
+        if not sp_data:
+            sp_data = oxide_vapors_data.get(species, {})
+
+        stoich = self._evaporation_stoich(species, sp_data)
+        if stoich is None:
+            return {}
+        available_kg = self.atom_ledger.kg_by_account(
+            'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
+        if available_kg <= 1e-12:
+            return {}
+        remaining_kg_hr = route_result.remaining_by_species.get(
+            species, 0.0)
+        if (
+            remaining_kg_hr < -1e-12
+            or remaining_kg_hr > rate_kg_hr + 1e-12
+        ):
+            raise AccountingError(
+                f"condensation route for {species!r} returned "
+                "unphysical remaining vapor mass"
+            )
+
+        _credited_from_evaporation, evaporation_transition = (
+            self._credit_evaporation_transition(
+                species,
+                rate_kg_hr,
+                rate_kg_hr,
+                sp_data,
+                apply_evaporative_redox_source_terms=(
+                    apply_evaporative_redox_source_terms
+                ),
+                return_transition=True,
+            )
+        )
+        if evaporation_transition is None:
+            return {}
+
+        condensed_kg = max(
+            0.0, rate_kg_hr - remaining_kg_hr,
+        )
+        credited_condensed_kg = self._dispatch_condensation_route(
+            species, condensed_kg, sp_data, route_result,
+        )
+
+        product_projection = self._condensed_products_kg(
+            species, credited_condensed_kg, sp_data)
+        self._project_condensed_stage_collection(
+            route_result, species, credited_condensed_kg,
+            product_projection)
+
+        return {
+            'credited_condensed_kg': float(credited_condensed_kg),
+            'remaining_kg': float(max(0.0, remaining_kg_hr)),
+            'evaporation_transition': evaporation_transition,
+        }
+
+    def _route_native_fe_vapor_to_condensation(
+        self,
+        native_fe_vapor_mol: float,
+        *,
+        sample_time_h: float | None = None,
+    ) -> dict[str, float]:
+        native_fe_vapor_mol = max(0.0, float(native_fe_vapor_mol or 0.0))
+        if native_fe_vapor_mol <= 1.0e-12:
+            return {}
+        fe_formula = resolve_species_formula('Fe', self.species_formula_registry)
+        fe_molar_mass = fe_formula.molar_mass_kg_per_mol()
+        rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
+        evap_flux = EvaporationFlux(species_kg_hr={'Fe': rate_kg_hr})
+        evap_flux.update_totals()
+        self._configure_condensation_operating_conditions(evap_flux)
+        if sample_time_h is not None:
+            self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
+        route_result = self.condensation_model.route(evap_flux, self.melt)
+        route_diag = self._route_evaporated_species_to_condensation(
+            route_result,
+            'Fe',
+            rate_kg_hr,
+            apply_evaporative_redox_source_terms=False,
+        )
+        self._sync_oxygen_kg_counters()
+        transition = route_diag.get('evaporation_transition')
+        routed_fe_mol = 0.0
+        overhead_o2_mol = 0.0
+        overhead_fe_mol = 0.0
+        feo_debit_mol = 0.0
+        if transition is not None:
+            feo_debit_mol = self._transition_species_mol(
+                transition,
+                side='debits',
+                account='process.cleaned_melt',
+                species='FeO',
+            )
+            overhead_o2_mol = self._transition_species_mol(
+                transition,
+                side='credits',
+                account='process.overhead_gas',
+                species='O2',
+            )
+            overhead_fe_mol = self._transition_species_mol(
+                transition,
+                side='credits',
+                account='process.overhead_gas',
+                species='Fe',
+            )
+            routed_fe_mol = overhead_fe_mol
+        remaining_kg = float(route_diag.get('remaining_kg', 0.0) or 0.0)
+        return {
+            'native_fe_vapor_mol': float(routed_fe_mol),
+            'native_fe_vapor_kg': float(routed_fe_mol * fe_molar_mass),
+            'native_fe_overhead_o2_mol': float(overhead_o2_mol),
+            'native_fe_vapor_feo_debit_mol': float(feo_debit_mol),
+            'native_fe_overhead_fe_mol_before_condensation': float(overhead_fe_mol),
+            'native_fe_condensed_kg': float(
+                route_diag.get('credited_condensed_kg', 0.0) or 0.0
+            ),
+            'native_fe_uncondensed_kg': remaining_kg,
+            'native_fe_uncondensed_mol': float(remaining_kg / fe_molar_mass),
+        }
 
     def _dispatch_condensation_route(
         self,
@@ -1229,7 +1340,10 @@ class EvaporationMixin:
         rate_kg_hr: float,
         remaining_kg_hr: float,
         sp_data: dict,
-    ) -> float:
+        *,
+        apply_evaporative_redox_source_terms: bool = True,
+        return_transition: bool = False,
+    ):
         """Apply the per-species melt -> vapor transition via the kernel.
 
         EVAPORATION_TRANSITION intent -- kernel-authoritative.
@@ -1262,7 +1376,7 @@ class EvaporationMixin:
 
         stoich = self._evaporation_stoich(species, sp_data)
         if stoich is None:
-            return 0.0
+            return (0.0, None) if return_transition else 0.0
 
         parent_oxide = stoich['parent_oxide']
         rate_kg_per_tick = rate_kg_hr * 1.0  # 1-hour tick (see core.py)
@@ -1270,12 +1384,12 @@ class EvaporationMixin:
         product_kg = rate_kg_per_tick
 
         if oxide_removed <= 1e-12:
-            return 0.0
+            return (0.0, None) if return_transition else 0.0
 
         available_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt').get(parent_oxide, 0.0)
         if available_kg <= 1e-12:
-            return 0.0
+            return (0.0, None) if return_transition else 0.0
 
         # Mirror the legacy validation: the AccountingError surface is
         # owned by the caller, not the provider. The provider receives
@@ -1309,7 +1423,7 @@ class EvaporationMixin:
         proposal = kernel_result.transition
         if proposal is None:
             self._chem_no_op_dispatch_count += 1
-            return 0.0
+            return (0.0, None) if return_transition else 0.0
 
         diagnostic = dict(kernel_result.diagnostic or {})
         control_inputs = {
@@ -1327,11 +1441,15 @@ class EvaporationMixin:
             diagnostic=diagnostic,
             control_inputs=control_inputs,
         )
-        self._apply_evaporative_redox_source_terms(
-            transition,
-            exchange_direction='redox_source:evaporative_loss',
-        )
-        return float(diagnostic.get('credited_condensed_kg', 0.0))
+        if apply_evaporative_redox_source_terms:
+            self._apply_evaporative_redox_source_terms(
+                transition,
+                exchange_direction='redox_source:evaporative_loss',
+            )
+        credited_condensed_kg = float(diagnostic.get('credited_condensed_kg', 0.0))
+        if return_transition:
+            return credited_condensed_kg, transition
+        return credited_condensed_kg
 
     def _condensed_products_for_vapor(
         self, species: str, condensed_kg: float, sp_data: dict

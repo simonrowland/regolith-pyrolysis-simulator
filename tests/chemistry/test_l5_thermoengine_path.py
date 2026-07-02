@@ -19,6 +19,7 @@ class _MatchingThermoEngineBackend:
 
     def __init__(self) -> None:
         self.sim: PyrolysisSimulator | None = None
+        self.last_composition_mol: dict[str, float] = {}
 
     def initialize(self, config: dict[str, Any]) -> bool:
         return True
@@ -29,11 +30,13 @@ class _MatchingThermoEngineBackend:
     def equilibrate(
         self,
         temperature_C: float,
+        composition_mol: dict[str, float] | None = None,
         composition_kg: dict[str, float] | None = None,
         fO2_log: float = -9.0,
         pressure_bar: float = 1e-6,
         **_: Any,
     ) -> EquilibriumResult:
+        self.last_composition_mol = dict(composition_mol or {})
         if self.sim is None:
             raise RuntimeError("test backend not attached to simulator")
         dispatch = self.sim._chem_kernel.dispatch(
@@ -125,6 +128,38 @@ def test_l5_thermoengine_vapor_sources_survive_c2a_tick(
         sources["Na"],
         sources["K"],
     }
+
+
+def test_l5_thermoengine_excludes_overhead_metal_products_from_backend_inputs(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    backend = _MatchingThermoEngineBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        _setpoints_with_builtin_vapor_fallback(setpoints_data),
+        feedstocks_data,
+        vapor_pressure_data,
+    )
+    backend.sim = sim
+    _force_vaporock_unavailable_for_sim(sim)
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    _force_vaporock_unavailable_for_sim(sim)
+
+    sim.start_campaign(CampaignPhase.C2A)
+    sim.melt.temperature_C = 1700.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Fe": 1.0},
+        source="test post-native-vapor overhead product",
+    )
+
+    overhead = sim.atom_ledger.mol_by_account("process.overhead_gas")
+    assert overhead.get("Fe", 0.0) > 0.0
+    sim._get_equilibrium()
+    assert "Fe" not in backend.last_composition_mol
 
 
 def test_l5_thermoengine_mismatch_keeps_kernel_value(

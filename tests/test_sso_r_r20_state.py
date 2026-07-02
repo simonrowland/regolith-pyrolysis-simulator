@@ -1240,3 +1240,57 @@ def test_native_fe_split_updates_fO2_to_saturation_boundary() -> None:
     )
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log > before_fO2
     assert after["native_fe_frac"] <= 2.0e-12
+
+
+def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1700.0
+    sim.melt.p_total_mbar = 0.0
+    sim.overhead.pressure_mbar = 0.0
+    sim.overhead.composition = {"Fe": 0.0}
+
+    vacuum_small = sim._native_fe_partition_diagnostic(0.5)
+    vacuum_pool = sim._native_fe_partition_diagnostic(100.0)
+
+    sim.melt.p_total_mbar = 10.0
+    sim.overhead.pressure_mbar = 10.0
+    sim.overhead.composition = {"N2": 10.0, "Fe": 0.0}
+    sim.melt.background_gas_species = "N2"
+    pn2_pool = sim._native_fe_partition_diagnostic(100.0)
+
+    assert vacuum_small["native_fe_vapor_mol"] == pytest.approx(0.5)
+    assert vacuum_small["native_fe_tap_mol"] == pytest.approx(0.0)
+    assert vacuum_pool["native_fe_vapor_escape_fraction_of_pool"] > pn2_pool[
+        "native_fe_vapor_escape_fraction_of_pool"
+    ]
+
+
+def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> None:
+    sim = _make_sim()
+    sim.campaign_mgr.overrides["C2A_staged"] = {"hold_temp_C": 1700.0}
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim.melt.temperature_C = 1650.0
+    sim.melt.campaign_hour = 7
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.oxygen_reservoir.reference_T_K = sim.melt.temperature_C + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+
+    snapshot = sim.step()
+    summary = build_per_hour_summary(sim, snapshot, include_fe_redox_split=True)
+    partition = snapshot.fe_redox_split["native_fe_partition"]
+    tap_mol = sim.atom_ledger.mol_by_account("terminal.drain_tap_material")
+
+    assert snapshot.campaign == CampaignPhase.C2A_STAGED
+    assert 1650.0 <= snapshot.temperature_C <= 1700.0
+    assert summary["P_total_bar"] == pytest.approx(0.01)
+    assert snapshot.overhead.composition["N2"] == pytest.approx(10.0)
+    assert partition["native_fe_pool_mol"] > 0.0
+    assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
+    assert partition["native_fe_vapor_escape_fraction_of_pool"] < 0.001
+    assert partition["overhead_pressure_pa"] == pytest.approx(1000.0)
+    assert partition["carrier_gas"] == "N2"
+    assert tap_mol["Fe"] == pytest.approx(partition["native_fe_tap_mol"])
+    assert sim.train.stages[1].collected_kg.get("Fe", 0.0) > 0.0
+    assert "stage_3_fe_wt_pct" not in partition
+    assert summary["stage_3_capture"]["Fe_wt_pct"] >= 0.0
+    assert abs(snapshot.mass_balance_error_pct) <= 5e-12

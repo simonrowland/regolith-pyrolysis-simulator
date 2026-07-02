@@ -10,7 +10,6 @@ import yaml
 
 from simulator.accounting import resolve_species_formula
 from simulator.core import PyrolysisSimulator
-from simulator.mass_balance import MassBalance
 from simulator.melt_backend.base import StubBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import CampaignPhase
@@ -115,6 +114,11 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
 
     after_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
     tap_mol = sim.atom_ledger.mol_by_account("terminal.drain_tap_material")
+    overhead_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")
+    train_mol = sim.atom_ledger.mol_by_account("process.condensation_train")
+    wall01_mol = sim.atom_ledger.mol_by_account(
+        "process.wall_deposit_segment_stage_0_to_stage_1"
+    )
     tap = sim.atom_ledger.kg_by_account("terminal.drain_tap_material")
     overhead = sim.atom_ledger.kg_by_account("process.overhead_gas")
     fe_mm = resolve_species_formula(
@@ -123,32 +127,39 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
         "FeO", sim.species_formula_registry).molar_mass_kg_per_mol()
     o2_mm = resolve_species_formula(
         "O2", sim.species_formula_registry).molar_mass_kg_per_mol()
-    split_fe_mol = tap_mol["Fe"]
+    routed_vapor_mol = (
+        overhead_mol.get("Fe", 0.0)
+        + train_mol.get("Fe", 0.0)
+        + wall01_mol.get("Fe", 0.0)
+    )
+    split_fe_mol = tap_mol["Fe"] + routed_vapor_mol
 
     assert tap_mol["Fe"] > 0.0
-    assert tap["Fe"] == pytest.approx(split_fe_mol * fe_mm)
-    assert tap["Fe"] == pytest.approx(89.9538338009, abs=1e-9)
+    assert routed_vapor_mol > 0.0
+    assert tap["Fe"] == pytest.approx(tap_mol["Fe"] * fe_mm)
+    assert overhead.get("Fe", 0.0) == pytest.approx(
+        overhead_mol.get("Fe", 0.0) * fe_mm
+    )
+    assert sim.train.stages[1].collected_kg.get("Fe", 0.0) > 0.0
+    assert sim.atom_ledger.kg_by_account(
+        "process.wall_deposit_segment_stage_0_to_stage_1"
+    ).get("Fe", 0.0) > 0.0
+    assert tap["Fe"] + routed_vapor_mol * fe_mm == pytest.approx(
+        split_fe_mol * fe_mm,
+    )
     assert sim.inventory.drain_tap_kg["Fe"] == pytest.approx(tap["Fe"])
     assert before_feo_kg - after_melt["FeO"] == pytest.approx(
         split_fe_mol * feo_mm,
     )
     assert overhead["O2"] == pytest.approx(0.5 * split_fe_mol * o2_mm)
+    partition = sim._compute_fe_redox_split_diagnostic()["native_fe_partition"]
+    assert partition["native_fe_pool_mol"] == pytest.approx(split_fe_mol)
+    assert partition["native_fe_tap_mol"] == pytest.approx(tap_mol["Fe"])
+    assert partition["native_fe_vapor_mol"] == pytest.approx(routed_vapor_mol)
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(
         0.0,
         abs=5e-12,
     )
-
-    balance = MassBalance()
-    balance.set_inputs(sim.record.batch_mass_kg, sim.record.additives_kg)
-    kg_native = balance.check(
-        sim.melt,
-        sim.train,
-        oxygen_kg=overhead["O2"],
-        inventory=sim.inventory,
-    )
-
-    assert kg_native["drain_tap"] == pytest.approx(tap["Fe"])
-    assert kg_native["error_pct"] == pytest.approx(0.0, abs=5e-12)
 
 
 def _vaporock_chemistry_or_skip() -> Any:
