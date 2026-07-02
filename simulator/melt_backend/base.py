@@ -13,7 +13,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 import math
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 
 BACKEND_CAPABILITY_KEYS = (
@@ -254,6 +254,118 @@ def project_melt_to_oxide_projection(
         dropped_mass_kg_by_species=dict(sorted(dropped.items())),
         warnings=warnings_out,
     )
+
+
+def positive_melt_mass_by_species(
+    *,
+    composition_kg: Optional[Mapping[str, float]],
+    composition_mol: Optional[Mapping[str, float]],
+    species_formula_registry: Optional[Mapping[str, Any]],
+) -> Dict[str, float]:
+    """Return positive melt input mass by species for projection diagnostics."""
+    if composition_mol is None:
+        return {
+            str(species): float(value)
+            for species, value in (composition_kg or {}).items()
+            if float(value) > 0.0
+        }
+
+    from simulator.accounting.formulas import resolve_species_formula
+
+    masses: Dict[str, float] = {}
+    for species, mol in composition_mol.items():
+        value = float(mol)
+        if value <= 0.0:
+            continue
+        mass_kg = value * resolve_species_formula(
+            species, species_formula_registry
+        ).molar_mass_kg_per_mol()
+        masses[str(species)] = masses.get(str(species), 0.0) + mass_kg
+    return masses
+
+
+def projection_diagnostics_for_melt_input(
+    *,
+    backend: str,
+    projection: MeltOxideProjection,
+    composition_kg: Optional[Mapping[str, float]],
+    composition_mol: Optional[Mapping[str, float]],
+    oxide_basis: Sequence[str],
+    species_formula_registry: Optional[Mapping[str, Any]],
+    dropped_accounts: Sequence[str] = (),
+    dropped_account_species: Optional[Mapping[str, Sequence[str]]] = None,
+    extra_projection_details: Optional[Mapping[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Build the canonical diagnostic payload for projected melt inputs.
+
+    Silicate adapters share the same projection semantics: report dropped
+    species/accounts and the exact renormalization from the original melt mass
+    to the backend oxide basis. Backend-specific projection metadata can be
+    appended through ``extra_projection_details`` without reimplementing the
+    common mass accounting.
+    """
+    diagnostics = dict(projection.diagnostics)
+    masses = positive_melt_mass_by_species(
+        composition_kg=composition_kg,
+        composition_mol=composition_mol,
+        species_formula_registry=species_formula_registry,
+    )
+    basis = set(oxide_basis)
+    dropped_species_mass = {
+        species: mass
+        for species, mass in masses.items()
+        if species not in basis and mass > 0.0
+    }
+    retained_mass = sum(
+        mass
+        for species, mass in masses.items()
+        if species in basis and mass > 0.0
+    )
+    dropped_mass = sum(dropped_species_mass.values())
+    input_mass = retained_mass + dropped_mass
+    dropped_account_species = dropped_account_species or {}
+    extra_projection_details = extra_projection_details or {}
+    if not (
+        dropped_species_mass
+        or dropped_accounts
+        or dropped_account_species
+        or extra_projection_details
+    ):
+        return diagnostics
+
+    details: Dict[str, Any] = {
+        'status': 'projected',
+        'reason': 'input_composition_projected',
+        'backend': backend,
+        'projected_species': sorted(str(k) for k in projection.oxide_wt_pct),
+    }
+    if input_mass > 0.0:
+        details['input_melt_mass_kg'] = input_mass
+        details['retained_basis_melt_mass_kg'] = retained_mass
+    if dropped_species_mass:
+        details['dropped_species'] = sorted(dropped_species_mass)
+        details['dropped_species_mass_kg'] = dict(
+            sorted(dropped_species_mass.items())
+        )
+        details['dropped_non_basis_melt_mass_kg'] = dropped_mass
+    if retained_mass > 0.0 and dropped_mass > 0.0:
+        factor = input_mass / retained_mass
+        details['renormalization_factor'] = factor
+        details['renormalization_delta'] = factor - 1.0
+        details['dropped_mass_fraction'] = dropped_mass / input_mass
+    if dropped_accounts:
+        details['dropped_accounts'] = sorted(
+            str(account) for account in dropped_accounts
+        )
+    if dropped_account_species:
+        details['dropped_account_species'] = {
+            str(account): list(species)
+            for account, species in sorted(dropped_account_species.items())
+        }
+    details.update(extra_projection_details)
+    diagnostics['input_composition_projection'] = details
+    return diagnostics
 
 
 @dataclass

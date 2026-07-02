@@ -102,6 +102,7 @@ from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
     MeltBackend,
+    projection_diagnostics_for_melt_input,
     project_melt_to_oxide_projection,
     split_cleaned_melt_account,
 )
@@ -168,98 +169,6 @@ def _dropped_account_species(
         if species:
             result[account_name] = tuple(species)
     return result
-
-
-def _positive_mass_by_species(
-    *,
-    composition_kg: Optional[Dict[str, float]],
-    composition_mol: Optional[Mapping[str, float]],
-    species_formula_registry: Optional[Mapping[str, Any]],
-) -> Dict[str, float]:
-    if composition_mol is None:
-        return {
-            str(species): float(value)
-            for species, value in (composition_kg or {}).items()
-            if float(value) > 0.0
-        }
-
-    from simulator.accounting.formulas import resolve_species_formula
-
-    masses: Dict[str, float] = {}
-    for species, mol in composition_mol.items():
-        value = float(mol)
-        if value <= 0.0:
-            continue
-        mass_kg = value * resolve_species_formula(
-            species, species_formula_registry
-        ).molar_mass_kg_per_mol()
-        masses[str(species)] = masses.get(str(species), 0.0) + mass_kg
-    return masses
-
-
-def _projection_diagnostics(
-    *,
-    backend: str,
-    projection: Any,
-    composition_kg: Optional[Dict[str, float]],
-    composition_mol: Optional[Mapping[str, float]],
-    oxide_basis: tuple[str, ...],
-    species_formula_registry: Optional[Mapping[str, Any]],
-    dropped_accounts: List[str],
-    dropped_account_species: Mapping[str, tuple[str, ...]],
-) -> Dict[str, Any]:
-    diagnostics = dict(projection.diagnostics)
-    masses = _positive_mass_by_species(
-        composition_kg=composition_kg,
-        composition_mol=composition_mol,
-        species_formula_registry=species_formula_registry,
-    )
-    basis = set(oxide_basis)
-    dropped_species_mass = {
-        species: mass
-        for species, mass in masses.items()
-        if species not in basis and mass > 0.0
-    }
-    retained_mass = sum(
-        mass for species, mass in masses.items()
-        if species in basis and mass > 0.0
-    )
-    dropped_mass = sum(dropped_species_mass.values())
-    input_mass = retained_mass + dropped_mass
-    if not (dropped_species_mass or dropped_accounts or dropped_account_species):
-        return diagnostics
-
-    details: Dict[str, Any] = {
-        'status': 'projected',
-        'reason': 'input_composition_projected',
-        'backend': backend,
-        'projected_species': sorted(str(k) for k in projection.oxide_wt_pct),
-    }
-    if input_mass > 0.0:
-        details['input_melt_mass_kg'] = input_mass
-        details['retained_basis_melt_mass_kg'] = retained_mass
-    if dropped_species_mass:
-        details['dropped_species'] = sorted(dropped_species_mass)
-        details['dropped_species_mass_kg'] = dict(
-            sorted(dropped_species_mass.items())
-        )
-        details['dropped_non_basis_melt_mass_kg'] = dropped_mass
-    if retained_mass > 0.0 and dropped_mass > 0.0:
-        factor = input_mass / retained_mass
-        details['renormalization_factor'] = factor
-        details['renormalization_delta'] = factor - 1.0
-        details['dropped_mass_fraction'] = dropped_mass / input_mass
-    if dropped_accounts:
-        details['dropped_accounts'] = sorted(
-            str(account) for account in dropped_accounts
-        )
-    if dropped_account_species:
-        details['dropped_account_species'] = {
-            str(account): list(species)
-            for account, species in sorted(dropped_account_species.items())
-        }
-    diagnostics['input_composition_projection'] = details
-    return diagnostics
 
 
 _VAPOROCK_RUNTIME_AVAILABLE_CACHE: bool | None = None
@@ -535,7 +444,7 @@ class VapoRockBackend(MeltBackend):
         )
         comp_wt = projection.oxide_wt_pct
         prior_warnings.extend(projection.warnings)
-        projection_diagnostics = _projection_diagnostics(
+        projection_diagnostics = projection_diagnostics_for_melt_input(
             backend='VapoRock',
             projection=projection,
             composition_kg=composition_kg,
