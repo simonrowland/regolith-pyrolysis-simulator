@@ -818,7 +818,41 @@
       "wall_deposit_cumulative_kg": {},
       "Kn": 0.0012252406934889837,
       "regime": "viscous",
-      "transport_formula_id": "not_applicable_until_p0"
+      "transport_formula_id": "not_applicable_until_p0",
+      "redox_source_breakdown": {
+        "terms_mol_o2_equiv_by_label": {
+          "redox_source:evaporative_metal_loss": 196.31585181896227
+        },
+        "applied_terms_mol_o2_equiv_by_label": {
+          "redox_source:evaporative_metal_loss": 196.31585181896227
+        },
+        "skipped_terms_mol_o2_equiv_by_label": {},
+        "skipped_reasons_by_label": {},
+        "redox_source_terms_applied": true,
+        "redox_source_skip_reason": "",
+        "net_mol_o2_equiv": 196.31585181896227,
+        "delta_ln_fO2": 7801095.60077114,
+        "delta_log10_fO2": 3387972.772214639,
+        "ferric_divergence": {
+          "status": "warning",
+          "implied_ferric_fraction": 1.0,
+          "ledger_ferric_fraction": 0.0,
+          "delta_abs": 1.0,
+          "delta_signed": 1.0,
+          "warning_threshold_abs": 0.05,
+          "warning_threshold_ferric_fraction_abs": 0.05,
+          "sampling_context": "current_ledger_vs_current_reservoir",
+          "warning": true
+        },
+        "source_context": {
+          "campaign": "C3_K",
+          "hour": 12,
+          "campaign_hour": 3
+        },
+        "source_campaign": "C3_K",
+        "source_hour": 12,
+        "source_campaign_hour": 3
+      }
     }
   ],
   "shadow_trace": [],

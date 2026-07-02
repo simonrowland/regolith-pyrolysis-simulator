@@ -103,9 +103,15 @@ GOLDENS = (
 # to <1e-12); mars 7.06398603045e-06 -> 7.06523011228e-06 (+0.018%). Direction
 # is physics-honest (SiO no longer wrongly zeroed), not a retune; mass closure
 # remains covered by tests/test_mass_balance.py.
+# 2026-07-02 SSO-R ch2c evaporative metal/O-loss coupling: the melt
+# self-oxidizes as volatiles bake out. Mars (higher alkali/volatile load)
+# suppresses SiO -20% (7.06523011228e-06 -> 5.67671326661e-06); lunar
+# C2A_continuous is FP-IDENTICAL (the cooler continuous dwell never enters
+# the coupling regime — consistent with the staged-vs-continuous dwell
+# physics). Correction-class; not a retune.
 BASELINE_SIO_EVOLVED_KG = {
     "lunar_mare_low_ti": 9.11967185718e-06,
-    "mars_basalt": 7.06523011228e-06,
+    "mars_basalt": 5.67671326661e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +

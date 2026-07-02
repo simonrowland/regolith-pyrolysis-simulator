@@ -40,7 +40,14 @@ SIO_ANCHOR_HOUR = 6
 # to seed-only) shifts the finite-pO2 branch's melt fO2 at the hot C2A
 # anchor hour; the IW-vs-finite SiO suppression ratio moves 0.4909 -> 0.5010
 # decade. Correction-class (old pin encoded the hourly heuristic re-seed).
-EXPECTED_SIO_DECADE_DRIFT = 0.5010448078158256
+# 2026-07-02 SSO-R ch2c: evaporative metal/O-loss coupling — the managed
+# finite-pO2 branch now SELF-OXIDIZES over the 6-hour anchor (alkali metal
+# vapor leaves, O stays), dropping its p_SiO 0.8619 -> 0.3448 Pa while the
+# IW-BUFFERED branch is byte-identical (0.2719 — the buffer absorbs couple
+# changes; strong internal control). Separation 0.5010 -> 0.1031 decade;
+# the old wide separation partly encoded the missing self-oxidation.
+# Correction-class.
+EXPECTED_SIO_DECADE_DRIFT = 0.10313466268217683
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

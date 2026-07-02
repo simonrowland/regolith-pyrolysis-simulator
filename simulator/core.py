@@ -556,6 +556,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
         self._redox_source_terms_this_hr: Dict[str, float] = {}
+        self._redox_source_context_this_hr: Dict[str, Any] = {}
         self._redox_source_delta_ln_this_hr = 0.0
         self._pt0_determinism_store: Any | None = None
         self._last_reduced_real_cache_state: str | None = None
@@ -1508,25 +1509,52 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         target_oxides: Tuple[str, ...],
     ) -> Dict[str, float]:
         target_set = {str(species) for species in target_oxides}
+        debit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+            transition,
+            side='debits',
+            account='process.cleaned_melt',
+            species_filter=target_set,
+        )
+        credit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+            transition,
+            side='credits',
+            account='process.cleaned_melt',
+            species_filter=target_set,
+        )
+        o2_equiv_mol = -(debit_o2_equiv_mol - credit_o2_equiv_mol)
+        if abs(o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+            return {}
+        return {str(label): o2_equiv_mol}
+
+    def _transition_account_o2_equiv_mol(
+        self,
+        transition: LedgerTransition,
+        *,
+        side: str,
+        account: str,
+        species_filter: set[str] | None = None,
+    ) -> float:
+        if side not in {'debits', 'credits'}:
+            raise ValueError(f"transition side must be 'debits' or 'credits', got {side!r}")
+        lots = transition.debits if side == 'debits' else transition.credits
         o2_equiv_mol = 0.0
-        for lot in transition.debits:
-            if lot.account != 'process.cleaned_melt':
+        for lot in lots:
+            if lot.account != account:
                 continue
             for species, kg in lot.species_kg.items():
-                if species not in target_set:
+                species_name = str(species)
+                if species_filter is not None and species_name not in species_filter:
                     continue
                 formula = resolve_species_formula(
-                    species,
+                    species_name,
                     self.species_formula_registry,
                 )
                 oxygen_atoms = float(formula.elements.get('O', 0.0) or 0.0)
                 if oxygen_atoms <= 0.0:
                     continue
                 species_mol = float(kg) / formula.molar_mass_kg_per_mol()
-                o2_equiv_mol -= 0.5 * oxygen_atoms * species_mol
-        if abs(o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
-            return {}
-        return {str(label): o2_equiv_mol}
+                o2_equiv_mol += 0.5 * oxygen_atoms * species_mol
+        return o2_equiv_mol
 
     def _transition_species_mol(
         self,
@@ -1577,6 +1605,75 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             transition,
             label=label,
         )
+        if not terms:
+            return None
+        return self._apply_oxygen_reservoir_redox_source_terms(
+            terms,
+            exchange_direction=exchange_direction,
+        )
+
+    def _evaporative_redox_source_terms_from_transition(
+        self,
+        transition: LedgerTransition,
+    ) -> Dict[str, float]:
+        prefix = 'evaporate_'
+        if not transition.name.startswith(prefix):
+            return {}
+        vapor_species = transition.name[len(prefix):]
+        vapor_formula = resolve_species_formula(
+            vapor_species,
+            self.species_formula_registry,
+        )
+        vapor_oxygen_atoms = float(vapor_formula.elements.get('O', 0.0) or 0.0)
+        overhead_o2_credit_mol = self._transition_species_mol(
+            transition,
+            side='credits',
+            account='process.overhead_gas',
+            species=OXYGEN_SPECIES,
+        )
+        overhead_o2_debit_mol = self._transition_species_mol(
+            transition,
+            side='debits',
+            account='process.overhead_gas',
+            species=OXYGEN_SPECIES,
+        )
+        net_overhead_o2_mol = overhead_o2_credit_mol - overhead_o2_debit_mol
+        if vapor_oxygen_atoms > 0.0:
+            if abs(net_overhead_o2_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+                return {}
+            return {'redox_source:evaporative_oxygen_loss': -net_overhead_o2_mol}
+
+        # Elemental vapor classes (Na/K/Fe/Mg/Ca in current data) are
+        # ledger-balanced as parent oxide -> metal vapor + O2.  The metal
+        # loss leaves the debited oxide oxygen behind in the melt redox
+        # couple, so the fO2 source is positive and derives from the actual
+        # cleaned-melt debit.  If a future provider debits a reduced metal
+        # species directly, this term naturally falls to zero.
+        cleaned_melt_debit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+            transition,
+            side='debits',
+            account='process.cleaned_melt',
+        )
+        cleaned_melt_credit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+            transition,
+            side='credits',
+            account='process.cleaned_melt',
+        )
+        metal_loss_o2_equiv_mol = (
+            cleaned_melt_debit_o2_equiv_mol
+            - cleaned_melt_credit_o2_equiv_mol
+        )
+        if abs(metal_loss_o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+            return {}
+        return {'redox_source:evaporative_metal_loss': metal_loss_o2_equiv_mol}
+
+    def _apply_evaporative_redox_source_terms(
+        self,
+        transition: LedgerTransition,
+        *,
+        exchange_direction: str,
+    ) -> OxygenReservoirState | None:
+        terms = self._evaporative_redox_source_terms_from_transition(transition)
         if not terms:
             return None
         return self._apply_oxygen_reservoir_redox_source_terms(
@@ -1741,6 +1838,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         attr_name: str,
         terms: Mapping[str, float],
     ) -> None:
+        if terms and not getattr(self, '_redox_source_context_this_hr', {}):
+            self._redox_source_context_this_hr = (
+                self._redox_source_context_for_current_state()
+            )
         aggregate = getattr(self, attr_name, None)
         if aggregate is None:
             aggregate = {}
@@ -1748,6 +1849,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         for label, mol in terms.items():
             key = str(label)
             aggregate[key] = float(aggregate.get(key, 0.0)) + float(mol)
+
+    def _redox_source_context_for_current_state(self) -> Dict[str, Any]:
+        campaign = getattr(self.melt, 'campaign', CampaignPhase.IDLE)
+        return {
+            'campaign': getattr(campaign, 'name', str(campaign)),
+            'hour': int(getattr(self.melt, 'hour', 0)),
+            'campaign_hour': int(getattr(self.melt, 'campaign_hour', 0)),
+        }
+
+    def _stamp_redox_source_context_for_current_state(
+        self,
+        *,
+        force: bool = False,
+    ) -> None:
+        terms = dict(getattr(self, '_redox_source_terms_this_hr', {}) or {})
+        if terms and (
+            force or not getattr(self, '_redox_source_context_this_hr', {})
+        ):
+            self._redox_source_context_this_hr = (
+                self._redox_source_context_for_current_state()
+            )
 
     def _record_redox_source_skip_reasons_for_hour(
         self,
@@ -2637,6 +2759,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._redox_source_applied_terms_this_hr = {}
         self._redox_source_skipped_terms_this_hr = {}
         self._redox_source_skip_reasons_this_hr = {}
+        self._redox_source_context_this_hr = {}
         self._redox_source_delta_ln_this_hr = 0.0
 
     def _ledger_ferric_fraction_diagnostic(self) -> Dict[str, Any]:
@@ -2705,6 +2828,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             })
         )
         delta_ln = float(getattr(self, '_redox_source_delta_ln_this_hr', 0.0))
+        source_context = dict(
+            getattr(self, '_redox_source_context_this_hr', {}) or {}
+        )
+        if not source_context:
+            source_context = self._redox_source_context_for_current_state()
         return {
             'terms_mol_o2_equiv_by_label': terms,
             'applied_terms_mol_o2_equiv_by_label': applied_terms,
@@ -2716,6 +2844,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'delta_ln_fO2': delta_ln,
             'delta_log10_fO2': delta_ln / math.log(10.0),
             'ferric_divergence': self._ledger_ferric_fraction_diagnostic(),
+            'source_context': source_context,
+            'source_campaign': str(source_context.get('campaign', '')),
+            'source_hour': int(source_context.get('hour', 0)),
+            'source_campaign_hour': int(source_context.get('campaign_hour', 0)),
         }
 
     def _apply_oxygen_reservoir_exchange(self) -> OxygenReservoirState:
@@ -7179,6 +7311,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 10. Record snapshot ---
         self.melt.hour += 1
         self.melt.campaign_hour += 1
+        self._stamp_redox_source_context_for_current_state(force=True)
         snapshot = self._make_snapshot()
         snapshot.evap_flux = evap_flux
         snapshot.evap_plane_selectivity = evap_plane_selectivity
@@ -7438,9 +7571,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Build an HourSnapshot from current state."""
         oxygen_partition = self._oxygen_terminal_partition_kg()
         condensation_totals = self._condensation_totals_with_terminal_oxygen()
+        self._stamp_redox_source_context_for_current_state()
         redox_source_breakdown = self._redox_source_breakdown_diagnostic()
         oxygen_reservoir_snapshot = dict(vars(self.melt.oxygen_reservoir))
         if redox_source_breakdown:
+            source_context = dict(
+                redox_source_breakdown.get('source_context', {}) or {}
+            )
             oxygen_reservoir_snapshot.update({
                 'redox_source_terms_mol_o2_equiv': dict(
                     redox_source_breakdown.get('terms_mol_o2_equiv_by_label', {})
@@ -7480,6 +7617,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 'ferric_divergence': dict(
                     redox_source_breakdown.get('ferric_divergence', {})
+                ),
+                'redox_source_context': source_context,
+                'redox_source_campaign': str(source_context.get('campaign', '')),
+                'redox_source_hour': int(source_context.get('hour', 0)),
+                'redox_source_campaign_hour': int(
+                    source_context.get('campaign_hour', 0)
                 ),
             })
         # Mass balance check

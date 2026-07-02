@@ -167,8 +167,10 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # 2026-07-01 C4b stores wall SiO as physical products instead of a SiO
     # proxy. The 1050 C case drops because same-run Mg consumes some SiO2 into
     # MgO; the hot-wall cases retain the same Si+SiO2 mass to rounding.
+    # 2026-07-02 SSO-R ch2c evaporative-coupling ripple: +0.14% at 1050 C
+    # (fO2 trajectory shift through the coupled route). Correction-class.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        5.988620840997e-08, rel=1e-9
+        5.996796493384001e-08, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         6.61294555268e-08, rel=1e-9

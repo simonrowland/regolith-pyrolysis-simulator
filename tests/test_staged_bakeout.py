@@ -13,7 +13,12 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # 2026-07-02 SSO-R ch1(+1c): conserved fO2 integrator + Kress91 isochemical
 # T re-referencing replace the per-tick intrinsic-fO2 heuristic re-seed.
 # Staged wall SiO shifts -7.1% (2.9403e-4 -> 2.7316e-4); correction-class.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.0002731599527839413
+# 2026-07-02 SSO-R ch2c(+fix): evaporative O-loss/metal-loss source terms —
+# alkali bakeout now self-oxidizes the melt (metal vapor leaves, O stays),
+# raising fO2 into the staged run and suppressing SiO release; wall SiO
+# 2.7316e-4 -> 2.0656e-4 (-24%). Correction-class (the lever interaction
+# the model was missing).
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.0002065561796897695
 
 
 def _run_script(lines: list[str]):

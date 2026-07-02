@@ -10,7 +10,11 @@ import pytest
 import yaml
 
 from engines.builtin.ca_aluminothermic_step import BuiltinCaAluminothermicStepProvider
-from simulator.account_ids import C7_AL_CREDIT_ACCOUNT, OXYGEN_MRE_ANODE_ACCOUNT
+from simulator.account_ids import (
+    C7_AL_CREDIT_ACCOUNT,
+    OXYGEN_MRE_ANODE_ACCOUNT,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+)
 from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.core import (
@@ -77,6 +81,25 @@ def _transition_account_species_mol(
         / formula.molar_mass_kg_per_mol()
         for lot in lots
         if lot.account == account
+    )
+
+
+def _transition_account_o2_equiv_mol(
+    sim: PyrolysisSimulator,
+    transition,
+    *,
+    side: str,
+    account: str,
+    species: str,
+) -> float:
+    formula = resolve_species_formula(species, sim.species_formula_registry)
+    oxygen_atoms = float(formula.elements.get("O", 0.0) or 0.0)
+    return 0.5 * oxygen_atoms * _transition_account_species_mol(
+        sim,
+        transition,
+        side=side,
+        account=account,
+        species=species,
     )
 
 
@@ -474,6 +497,40 @@ def test_runner_reads_redox_source_breakdown() -> None:
     assert "fe_redox_split" in summary
 
 
+def test_redox_source_breakdown_stamp_survives_campaign_transition_seam() -> None:
+    sim = _make_sim(additives_kg={"Na": 12.0})
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.melt.hour = 17
+    sim.melt.campaign_hour = 3
+    sim.melt.temperature_C = 1150.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim._reset_redox_source_diagnostics_for_hour()
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+    sim.melt.hour += 1
+    sim.melt.campaign_hour += 1
+    sim._stamp_redox_source_context_for_current_state(force=True)
+    sim.start_campaign(CampaignPhase.C4)
+
+    snapshot = sim._make_snapshot()
+    breakdown = snapshot.redox_source_breakdown
+
+    assert snapshot.campaign == CampaignPhase.C4
+    assert breakdown["source_context"] == {
+        "campaign": "C3_NA",
+        "hour": 18,
+        "campaign_hour": 4,
+    }
+    assert breakdown["source_campaign"] == "C3_NA"
+    assert breakdown["source_hour"] == 18
+    assert breakdown["source_campaign_hour"] == 4
+    assert snapshot.oxygen_reservoir["redox_source_context"] == (
+        breakdown["source_context"]
+    )
+
+
 def test_mre_source_term_comes_from_committed_anode_o2_transition() -> None:
     sim = _make_sim()
     sim.start_campaign(CampaignPhase.C5)
@@ -512,7 +569,8 @@ def test_mre_source_term_comes_from_committed_anode_o2_transition() -> None:
 # Mg=12 is the original scale; 50/100 kg are production-scale doses where
 # the kg<->mol round-trip float residual on the 4 Al : 3 Si back-reduction
 # exceeded the absolute NOOP floor and leaked a spurious back label (grok
-# ch2b review) — the relative-epsilon snap must hold at ANY dose.
+# ch2b review). The primary pass is also net-zero in O2-equivalent because
+# its Al2O3 oxygen remains in cleaned_melt as MgO.
 @pytest.mark.parametrize("mg_dose_kg", [12.0, 50.0, 100.0])
 def test_c6_primary_source_term_from_transition_and_back_reduction_nets_zero(
     mg_dose_kg,
@@ -548,18 +606,73 @@ def test_c6_primary_source_term_from_transition_and_back_reduction_nets_zero(
     primary_label = "redox_source:c6_mg_thermite_primary"
     back_label = "redox_source:c6_mg_thermite_back_reduction"
     al2o3_mol = _cleaned_melt_debit_mol(sim, primary, "Al2O3")
+    mgo_o2_equiv_mol = _transition_account_o2_equiv_mol(
+        sim,
+        primary,
+        side="credits",
+        account="process.cleaned_melt",
+        species="MgO",
+    )
     breakdown = sim._redox_source_breakdown_diagnostic()
 
     assert al2o3_mol > 0.0
-    assert breakdown["terms_mol_o2_equiv_by_label"][primary_label] == pytest.approx(
-        -1.5 * al2o3_mol
+    assert mgo_o2_equiv_mol == pytest.approx(1.5 * al2o3_mol)
+    assert sim._cleaned_melt_reduction_source_terms_from_transition(
+        primary,
+        label=primary_label,
+        target_oxides=("Al2O3", "MgO"),
+    ) == {}
+    assert primary_label not in breakdown.get(
+        "terms_mol_o2_equiv_by_label", {}
     )
     assert sim._c6_back_reduction_redox_source_terms_from_transition(
         back,
         label=back_label,
     ) == {}
-    assert back_label not in breakdown["terms_mol_o2_equiv_by_label"]
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
+    assert back_label not in breakdown.get("terms_mol_o2_equiv_by_label", {})
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        before_fO2
+    )
+
+
+def test_c3_na_spent_residue_credit_does_not_cancel_reduction_source() -> None:
+    sim = _make_sim(additives_kg={"Na": 12.0})
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.melt.temperature_C = 1150.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+
+    transition = next(
+        transition
+        for transition in reversed(sim.atom_ledger.transitions)
+        if transition.name == "c3_na_shuttle_reduction"
+    )
+    label = "redox_source:c3_na_shuttle_reduction"
+    feo_mol = _cleaned_melt_debit_mol(sim, transition, "FeO")
+    residue_na2o_mol = _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account=SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+        species="Na2O",
+    )
+    cleaned_na2o_mol = _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account="process.cleaned_melt",
+        species="Na2O",
+    )
+
+    assert feo_mol > 0.0
+    assert residue_na2o_mol == pytest.approx(feo_mol)
+    assert cleaned_na2o_mol == pytest.approx(0.0)
+    assert sim._redox_source_breakdown_diagnostic()[
+        "terms_mol_o2_equiv_by_label"
+    ][label] == pytest.approx(-0.5 * feo_mol)
 
 
 def test_c7_external_al_credit_lowers_fO2_from_committed_transition(
@@ -741,6 +854,130 @@ def test_c7_mixed_in_situ_and_external_al_counts_only_external_credit_sink(
     assert breakdown["terms_mol_o2_equiv_by_label"][label] != pytest.approx(
         -0.5 * total_ca_mol
     )
+
+
+def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.5
+    sim.melt.p_total_mbar = 1.5
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+    sim._sync_oxygen_reservoir_mirror()
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 0.05},
+        source="test finite headspace O2 holdup",
+    )
+
+    exchange = sim._apply_oxygen_reservoir_exchange()
+    exchange_direction = exchange.exchange_direction
+    exchange_o2_mol = exchange.exchange_o2_mol
+    exchange_transition_name = exchange.exchange_transition_name
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_overhead_o2_mol = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    sp_data = sim.vapor_pressures["oxide_vapors"]["SiO"]
+    rate_kg_hr = 0.01
+
+    credited_condensed_kg = sim._credit_evaporation_transition(
+        "SiO",
+        rate_kg_hr,
+        rate_kg_hr,
+        sp_data,
+    )
+
+    transition = sim.atom_ledger.transitions[-1]
+    label = "redox_source:evaporative_oxygen_loss"
+    o2_mol = _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account="process.overhead_gas",
+        species="O2",
+    )
+    breakdown = sim._redox_source_breakdown_diagnostic()
+    snapshot = sim._make_snapshot()
+    summary = build_per_hour_summary(sim, snapshot)
+
+    assert credited_condensed_kg == pytest.approx(0.0)
+    assert transition.name == "evaporate_SiO"
+    assert o2_mol > 0.0
+    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
+        -o2_mol
+    )
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2", 0.0
+    ) == pytest.approx(before_overhead_o2_mol + o2_mol)
+    assert sim.melt.oxygen_reservoir.exchange_o2_mol == pytest.approx(
+        exchange_o2_mol
+    )
+    assert sim.melt.oxygen_reservoir.exchange_transition_name == (
+        exchange_transition_name
+    )
+    assert sim.melt.oxygen_reservoir.exchange_direction.split("|")[0] == (
+        exchange_direction
+    )
+    assert label in summary["redox_source_breakdown"][
+        "terms_mol_o2_equiv_by_label"
+    ]
+    assert summary["redox_source_breakdown"]["ferric_divergence"][
+        "warning_threshold_abs"
+    ] == pytest.approx(FERRIC_DIVERGENCE_WARNING_THRESHOLD)
+
+
+@pytest.mark.parametrize("species", ["Na", "K", "Fe", "Mg"])
+def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
+    species,
+) -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    sp_data = sim.vapor_pressures["metals"][species]
+    stoich = sim._evaporation_stoich(species, sp_data)
+    parent_oxide = stoich["parent_oxide"]
+    available_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        parent_oxide,
+        0.0,
+    )
+    rate_kg_hr = min(
+        0.001,
+        0.1 * available_kg / float(stoich["oxide_per_product_kg"]),
+    )
+
+    sim._credit_evaporation_transition(species, rate_kg_hr, rate_kg_hr, sp_data)
+
+    transition = sim.atom_ledger.transitions[-1]
+    label = "redox_source:evaporative_metal_loss"
+    parent_oxide_o2_equiv_mol = _transition_account_o2_equiv_mol(
+        sim,
+        transition,
+        side="debits",
+        account="process.cleaned_melt",
+        species=parent_oxide,
+    )
+    o2_mol = _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account="process.overhead_gas",
+        species="O2",
+    )
+    breakdown = sim._redox_source_breakdown_diagnostic()
+
+    assert rate_kg_hr > 0.0
+    assert transition.name == f"evaporate_{species}"
+    assert parent_oxide_o2_equiv_mol > 0.0
+    assert o2_mol == pytest.approx(parent_oxide_o2_equiv_mol)
+    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
+        parent_oxide_o2_equiv_mol
+    )
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log > before_fO2
 
 
 def test_isochemical_temperature_ramp_references_fO2_on_kress91_curve() -> None:

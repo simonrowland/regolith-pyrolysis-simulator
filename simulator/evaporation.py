@@ -1292,12 +1292,9 @@ class EvaporationMixin:
                 f"condensation route for {species!r} exceeds credited vapor"
             )
 
-        # F-B1: dispatch + commit through the shared helper.  The
-        # kernel's commit_batch path is still the ONLY writable entry
-        # into the AtomLedger for EVAPORATION_TRANSITION; the helper
-        # re-runs the full pre-commit validator stack inside
-        # commit_batch (defence in depth).
-        kernel_result = self._dispatch_and_commit(
+        # F-B1: split dispatch / commit so post-commit redox scalar
+        # bookkeeping can derive strictly from the applied LedgerTransition.
+        kernel_result = self._dispatch_only(
             ChemistryIntent.EVAPORATION_TRANSITION,
             control_inputs={
                 'species': species,
@@ -1309,10 +1306,31 @@ class EvaporationMixin:
                 'available_kg': float(available_kg),
             },
         )
-        if kernel_result.transition is None:
+        proposal = kernel_result.transition
+        if proposal is None:
+            self._chem_no_op_dispatch_count += 1
             return 0.0
 
         diagnostic = dict(kernel_result.diagnostic or {})
+        control_inputs = {
+            'species': species,
+            'stoich': dict(stoich),
+            'sp_data': dict(sp_data or {}),
+            'rate_kg_hr': float(rate_kg_hr),
+            'remaining_kg_hr': float(remaining_kg_hr),
+            'dt_hr': 1.0,
+            'available_kg': float(available_kg),
+        }
+        transition = self._commit_proposal(
+            ChemistryIntent.EVAPORATION_TRANSITION,
+            proposal,
+            diagnostic=diagnostic,
+            control_inputs=control_inputs,
+        )
+        self._apply_evaporative_redox_source_terms(
+            transition,
+            exchange_direction='redox_source:evaporative_loss',
+        )
         return float(diagnostic.get('credited_condensed_kg', 0.0))
 
     def _condensed_products_for_vapor(

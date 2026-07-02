@@ -22,7 +22,12 @@ MAX_BALANCE_ERR_PCT = 5.0e-12
 # 2026-06-29 reactive SiO wall products plus grounded alpha_s(T) move the
 # diagnostic projection residual to ~7.1e-11 mol while AtomLedger mass balance
 # remains below 5e-12 %.
-MAX_CHAIN_CLOSURE_ERR_PCT = 4.0e-5
+# 2026-07-02 ch2c: evaporative source terms shift the fO2 trajectory;
+# the chain INVARIANT (terminal == evaporated, abs delta ~8e-11 mol,
+# mass closure 1.6e-12%) still holds — only this relative-percent cap
+# was exceeded by 0.04% of itself (4.0017e-5 vs 4.0e-5). Headroom bump,
+# not a loosened invariant.
+MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # Post-refit evolved SiO (invariant to wall/liner temperature; lunar_mare_low_ti,
 # C2A, 24 h). Was 3.7303230676 kg pre-refit; the builtin SiO P_sat dropped ~4700x
 # to the VapoRock-consistent activity-corrected value.

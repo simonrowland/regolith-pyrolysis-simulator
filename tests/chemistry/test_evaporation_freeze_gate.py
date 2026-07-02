@@ -629,7 +629,11 @@ def test_freeze_gate_pre_curve_window_builds_curve_on_first_staged_tick(
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
                 status='ok',
-                diagnostic={'evaporation_flux_kg_hr': {'Na': 0.01}},
+                # 2026-07-02 ch2c: a nonzero stubbed flux now drives REAL committed
+                # evaporation transitions -> evaporative redox source terms -> fO2
+                # movement -> honest cache re-keys. These tests probe cache/gate
+                # behavior on a QUIESCENT plateau, so the stub flux must be zero.
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 0.0}},
             )
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
             gate_calls += 1
@@ -770,7 +774,11 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
         if intent is ChemistryIntent.EVAPORATION_FLUX:
             return SimpleNamespace(
                 status='ok',
-                diagnostic={'evaporation_flux_kg_hr': {'Na': 0.01}},
+                # 2026-07-02 ch2c: a nonzero stubbed flux now drives REAL committed
+                # evaporation transitions -> evaporative redox source terms -> fO2
+                # movement -> honest cache re-keys. These tests probe cache/gate
+                # behavior on a QUIESCENT plateau, so the stub flux must be zero.
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 0.0}},
             )
         if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
             gate_calls += 1

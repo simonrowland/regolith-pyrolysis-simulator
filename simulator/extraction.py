@@ -1304,7 +1304,7 @@ class ExtractionMixin:
         self._apply_transition_redox_source_terms(
             primary_transition,
             label='redox_source:c6_mg_thermite_primary',
-            target_oxides=('Al2O3',),
+            target_oxides=('Al2O3', 'MgO'),
             exchange_direction='redox_source:c6_mg_thermite_primary',
         )
 
