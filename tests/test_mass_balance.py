@@ -311,8 +311,9 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 
     # C5 is default-off: the staged path now stops after the branch
     # decision instead of appending a default C5 cleanup segment. The
-    # conservation assertions below remain the invariant being guarded.
-    assert steps == 40
+    # transition tick is credited to the finishing campaign, so the staged
+    # campaign receives its full commanded hour window.
+    assert steps == 41
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions

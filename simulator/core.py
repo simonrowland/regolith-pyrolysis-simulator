@@ -6986,6 +6986,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         fe_redox_split = self._compute_fe_redox_split_diagnostic()
 
         # --- 9. Endpoint check ---
+        next_campaign: CampaignPhase | None = None
+        pending_decision: Any | None = None
+        complete_after_snapshot = False
         campaign_done = self.campaign_mgr.check_endpoint(
             self.melt, evap_flux, self.train, self.record)
         if campaign_done:
@@ -6997,14 +7000,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             next_campaign = self.campaign_mgr.get_next_campaign(
                 self.melt.campaign, self.record)
             if next_campaign == CampaignPhase.COMPLETE:
-                self.melt.campaign = CampaignPhase.COMPLETE
+                complete_after_snapshot = True
+                next_campaign = None
             elif next_campaign is None:
                 # Decision needed before proceeding
-                self.pending_decision = self.campaign_mgr.get_decision(
+                pending_decision = self.campaign_mgr.get_decision(
                     self.melt.campaign, self.record)
-                self.paused_for_decision = True
-            else:
-                self.start_campaign(next_campaign)
 
         # --- 10. Record snapshot ---
         self.melt.hour += 1
@@ -7018,6 +7019,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot.energy_cumulative_kWh = self.energy_cumulative_kWh
         snapshot.oxygen_produced_kg = self._oxygen_total_kg()
         self.record.snapshots.append(snapshot)
+
+        if complete_after_snapshot:
+            self.melt.campaign = CampaignPhase.COMPLETE
+        elif pending_decision is not None:
+            self.pending_decision = pending_decision
+            self.paused_for_decision = True
+        elif next_campaign is not None:
+            self.start_campaign(next_campaign)
+
         if self.is_complete():
             self._finalize_record()
 
