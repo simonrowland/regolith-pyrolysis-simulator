@@ -104,20 +104,24 @@ from tests.chemistry.conftest import _build_sim
 # dln fO2 = -(b/a) d(1/T); fO2 state now rides the redox-couple curve
 # across temperature ramps instead of freezing numeric log fO2). Si/SiO2
 # traces move at the 3rd-4th digit; Na/Mg/FeSi unchanged from chunk-1.
+# 2026-07-02 BUG-006/-6b: the campaign-transition hour is now credited to
+# the finishing campaign (transition deferred until after the snapshot).
+# Full-run C0->C6 wall traces shift through the corrected per-campaign
+# hour windows. Correction-class.
 EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
             "FeSi": 3.19901746636553e-11,
             "MgO": 4.016353117341632e-12,
             "Na": 0.002231099567131609,
-            "Si": 1.4492383557186092e-07,
-            "SiO2": 3.1005639405890596e-07,
+            "Si": 1.3869143433939313e-07,
+            "SiO2": 2.9672324956005025e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
             "MgO": 4.016353117341632e-12,
             "Na": 0.002231099567131609,
-            "Si": 1.4493454025499481e-07,
-            "SiO2": 3.1005639405890596e-07,
+            "Si": 1.3870213902252702e-07,
+            "SiO2": 2.9672324956005025e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Mg": 2.422029141449691e-12,
@@ -154,14 +158,14 @@ EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
             "FeSi": 1.1144196651650963e-11,
             "MgO": 7.33541245349951e-12,
             "Na": 0.003511336838479897,
-            "Si": 1.1820456112005656e-07,
-            "SiO2": 2.5287525676717015e-07,
+            "Si": 1.1298413817216334e-07,
+            "SiO2": 2.417070647793379e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
             "MgO": 7.33541245349951e-12,
             "Na": 0.003511336838479897,
-            "Si": 1.1820829023673666e-07,
-            "SiO2": 2.5287525676717015e-07,
+            "Si": 1.1298786728884344e-07,
+            "SiO2": 2.417070647793379e-07,
         },
         "process.wall_deposit_segment_stage_2_to_stage_3": {
             "Mg": 4.423560928997261e-12,
