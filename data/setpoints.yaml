@@ -202,7 +202,7 @@ campaigns:
         bounds_C: [1650, 1800]
         role: "cycle-time lever; not a thermal-yield ceiling breaker"
       Na_additive_kg:
-        via: "recipe knob campaigns.C3.alkali_dosing.Na_kg projected to additives_kg"
+        via: "recipe knob campaigns.C3.alkali_dosing.Na_kg requested as C3 alkali credit-line dose"
         default_kg: 12
         role: "V1c cool residual-FeO cleanup dose; thin +9.6 kJ/mol O2 margin at 1150 C"
     max_hold_hr: 9

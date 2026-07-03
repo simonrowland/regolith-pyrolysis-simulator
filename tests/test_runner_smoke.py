@@ -205,7 +205,10 @@ def test_pyrolysis_run_folds_internal_analytical_alias_to_stable_stub_token(alia
     assert run.backend_name == "stub"
 
 
-def test_c3_alkali_recipe_dose_projects_to_additives_and_shuttle_inventory():
+def test_c3_alkali_recipe_dose_routes_to_credit_line_not_additives():
+    # S2b: the C3 alkali dose is a recycled credit-line draw request, NOT a
+    # physical additives_kg seed. additives_kg stays empty; the dose surfaces
+    # as c3_alkali_credit_* metadata and shuttle inventory.
     schema = RecipeSchema()
     na_dose = ("campaigns", "C3", "alkali_dosing", "Na_kg")
     k_dose = ("campaigns", "C3", "alkali_dosing", "K_kg")
@@ -222,15 +225,27 @@ def test_c3_alkali_recipe_dose_projects_to_additives_and_shuttle_inventory():
     sim = session.simulator
     payload = run.run()
 
-    assert config.additives_kg["Na"] == pytest.approx(12.0)
-    assert config.additives_kg["K"] == pytest.approx(4.0)
-    assert sim.record.additives_kg["Na"] == pytest.approx(12.0)
-    assert sim.record.additives_kg["K"] == pytest.approx(4.0)
+    assert dict(config.additives_kg) == {}
+    assert sim.record.additives_kg == {}
     assert sim.shuttle_Na_inventory_kg >= 12.0
+    assert sim._c3_alkali_credit_drawn_kg_by_species["Na"] == pytest.approx(12.0)
     assert sim.atom_ledger.kg_by_account("reservoir.reagent.Na").get("Na", 0.0) == (
-        pytest.approx(0.0)
+        pytest.approx(-12.0)
     )
-    assert payload["run_metadata"]["additives_kg"] == {"K": 4.0, "Na": 12.0}
+    assert payload["run_metadata"]["additives_kg"] == {}
+    assert payload["run_metadata"]["c3_alkali_credit_dose_kg_by_species"] == {
+        "K": 4.0,
+        "Na": 12.0,
+    }
+    assert payload["run_metadata"]["c3_alkali_credit_drawn_kg_by_species"][
+        "Na"
+    ] >= 12.0
+    assert payload["run_metadata"]["c3_alkali_credit_drawn_kg_by_species"][
+        "K"
+    ] == pytest.approx(0.0)
+    assert payload["run_metadata"]["c3_alkali_credit_outstanding_kg_by_species"][
+        "Na"
+    ] >= 12.0
     _assert_mass_balance_bound(payload)
 
     undosed = PyrolysisRun(
@@ -291,8 +306,11 @@ def test_c3_alkali_dosing_conflict_fail_loud():
         allow_fallback_vapor=True,
     )
     dosing_config = dosing_only._session_config()
-    assert dosing_config.additives_kg["Na"] == pytest.approx(12.0)
-    assert dosing_config.additives_kg["K"] == pytest.approx(4.0)
+    assert dict(dosing_config.additives_kg) == {}
+    assert dosing_config.setpoints["campaigns"]["C3"]["alkali_dosing"] == {
+        "K_kg": pytest.approx(4.0),
+        "Na_kg": pytest.approx(12.0),
+    }
 
     additive_only = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",

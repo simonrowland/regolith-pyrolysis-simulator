@@ -308,8 +308,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # explicit certification/status stamping; source-fingerprint only.
     # 2026-07-01: moved when C4b added FeSi to species_catalog and the
     # grounded wall_reactivity_matrix source surface.
-    # This is a source-fingerprint invalidation, not a recipe/schema move.
-    assert cache_key(spec) == "c071375593cbce4b3880b133e50e459bc799b1af39e76a30f2f22b8fdad1618b"
+    # 2026-07-03: moved when S2b routed the C3 Na/K dose through the credit
+    # line (core/extraction/runner/state source edits). recipe_id + the 70-path
+    # search allowlist above are UNCHANGED, so this is source-fingerprint
+    # invalidation only, not a recipe/schema/allowlist or authoritative
+    # vapor/yield/ledger move.
+    assert cache_key(spec) == "064325bb49b375f2236eec859e552bcf163b3ace6e394249305a2109e709bfeb"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

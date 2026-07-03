@@ -594,15 +594,22 @@ def test_k_shuttle_draws_from_process_reagent_inventory():
             }
         }
     )
-    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"K": 9.0})
+    sim.setpoints.setdefault("campaigns", {}).setdefault("C3", {}).setdefault(
+        "alkali_dosing", {}
+    )["K_kg"] = 9.0
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={})
     sim._init_shuttle_inventory(CampaignPhase.C3_K)
 
     assert sim.atom_ledger.kg_by_account("reservoir.reagent.K").get(
         "K", 0.0
-    ) == pytest.approx(0.0)
+    ) == pytest.approx(-9.0)
     assert sim.atom_ledger.kg_by_account("process.reagent_inventory")[
         "K"
     ] == pytest.approx(9.0)
+    assert sim._c3_alkali_credit_drawn_kg_by_species["K"] == pytest.approx(9.0)
+    assert sim._c3_alkali_credit_outstanding_kg_by_species()["K"] == (
+        pytest.approx(9.0)
+    )
 
     sim._shuttle_inject_K()
 
@@ -632,8 +639,15 @@ def test_na_shuttle_metals_are_reported_from_process_metal_phase():
             }
         }
     )
-    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Na": 60.0})
+    sim.setpoints.setdefault("campaigns", {}).setdefault("C3", {}).setdefault(
+        "alkali_dosing", {}
+    )["Na_kg"] = 60.0
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={})
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    assert sim.atom_ledger.kg_by_account("reservoir.reagent.Na").get(
+        "Na", 0.0
+    ) == pytest.approx(-60.0)
+    assert sim._c3_alkali_credit_drawn_kg_by_species["Na"] == pytest.approx(60.0)
 
     sim._shuttle_inject_Na()
 

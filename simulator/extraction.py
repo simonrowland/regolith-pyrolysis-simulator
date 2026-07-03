@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import Dict
+from typing import Dict, Mapping
 
 import simulator.mre_ladder as mre_ladder
 from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
@@ -205,6 +205,7 @@ class ExtractionMixin:
         requested_kg: float,
         *,
         fail_if_insufficient: bool = False,
+        allow_credit: bool = False,
         ) -> float:
         requested_kg = max(0.0, float(requested_kg))
         if requested_kg <= self._LEDGER_KG_TOL:
@@ -214,13 +215,14 @@ class ExtractionMixin:
         available_kg = self._ledger_account_species_kg(reservoir, species)
         if (
             fail_if_insufficient
+            and not allow_credit
             and requested_kg > available_kg + self._LEDGER_KG_TOL
         ):
             raise ValueError(
                 f"requested {requested_kg:.12g} kg {species} reagent exceeds "
                 f"available inventory {available_kg:.12g} kg"
             )
-        draw_kg = min(requested_kg, available_kg)
+        draw_kg = requested_kg if allow_credit else min(requested_kg, available_kg)
         if draw_kg <= self._LEDGER_KG_TOL:
             return 0.0
         moved_kg = self._move_ledger_species(
@@ -229,15 +231,20 @@ class ExtractionMixin:
             'process.reagent_inventory',
             species,
             draw_kg,
-            reason=f'{species} reagent draw from reservoir',
+            reason=(
+                f'C3 {species} alkali credit-line draw'
+                if allow_credit
+                else f'{species} reagent draw from reservoir'
+            ),
         )
-        self._move_cost_inventory_lots_best_effort(
-            source_account=reservoir,
-            destination_account='process.reagent_inventory',
-            species=species,
-            quantity_kg=moved_kg,
-            reason=f'{species} reagent draw from reservoir',
-        )
+        if not allow_credit:
+            self._move_cost_inventory_lots_best_effort(
+                source_account=reservoir,
+                destination_account='process.reagent_inventory',
+                species=species,
+                quantity_kg=moved_kg,
+                reason=f'{species} reagent draw from reservoir',
+            )
         return moved_kg
 
     def _sync_reagent_counter_from_ledger(self, species: str) -> float:
@@ -252,6 +259,80 @@ class ExtractionMixin:
             requested_kg,
             fail_if_insufficient=True,
         )
+
+    def _c3_alkali_requested_dose_kg(self, species: str) -> float:
+        campaigns = getattr(self, 'setpoints', {}).get('campaigns', {})
+        if not isinstance(campaigns, Mapping):
+            return 0.0
+        c3 = campaigns.get('C3', {})
+        if not isinstance(c3, Mapping):
+            return 0.0
+        dosing = c3.get('alkali_dosing', {})
+        if dosing in (None, {}):
+            return 0.0
+        if not isinstance(dosing, Mapping):
+            raise ValueError('campaigns.C3.alkali_dosing must be a mapping')
+        key = f'{species}_kg'
+        if key not in dosing or dosing[key] is None:
+            return 0.0
+        try:
+            requested_kg = float(dosing[key])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f'campaigns.C3.alkali_dosing.{key} must be numeric'
+            ) from exc
+        if not math.isfinite(requested_kg) or requested_kg < 0.0:
+            raise ValueError(
+                f'campaigns.C3.alkali_dosing.{key} must be finite and non-negative'
+            )
+        return requested_kg
+
+    def _record_c3_alkali_credit_draw(self, species: str, kg: float) -> None:
+        if kg <= self._LEDGER_KG_TOL:
+            return
+        drawn = getattr(self, '_c3_alkali_credit_drawn_kg_by_species', None)
+        if not isinstance(drawn, dict):
+            drawn = {}
+            self._c3_alkali_credit_drawn_kg_by_species = drawn
+        drawn[species] = float(drawn.get(species, 0.0)) + float(kg)
+
+    def _c3_alkali_credit_outstanding_kg_by_species(self) -> dict[str, float]:
+        outstanding: dict[str, float] = {}
+        for species in ('Na', 'K'):
+            account = f'reservoir.reagent.{species}'
+            balance_kg = float(
+                self.atom_ledger.kg_by_account(account).get(species, 0.0)
+            )
+            if balance_kg < -self._LEDGER_KG_TOL:
+                outstanding[species] = -balance_kg
+        return outstanding
+
+    def _top_up_c3_alkali_credit(self, species: str) -> float:
+        # The C3 alkali dose is a steady-state reagent-inventory FLOOR, not a
+        # one-time per-run cap: this runs each C3 tick and tops the shortfall
+        # back up to the requested dose from the recycled credit line. So
+        # ``c3_alkali_credit_drawn_kg_by_species`` accumulates GROSS draws
+        # across replenishment cycles, while
+        # ``c3_alkali_credit_outstanding_kg_by_species`` is the NET makeup
+        # required per run — use OUTSTANDING (not drawn) for makeup accounting.
+        requested_kg = self._c3_alkali_requested_dose_kg(species)
+        if requested_kg <= self._LEDGER_KG_TOL:
+            return 0.0
+        current_kg = self._process_reagent_inventory_kg(species)
+        shortfall_kg = max(0.0, requested_kg - current_kg)
+        if shortfall_kg <= self._LEDGER_KG_TOL:
+            return 0.0
+        drawn_kg = self._draw_reagent_to_process(
+            species,
+            shortfall_kg,
+            allow_credit=True,
+        )
+        self._record_c3_alkali_credit_draw(species, drawn_kg)
+        if species == 'K':
+            self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
+        elif species == 'Na':
+            self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
+        return drawn_kg
 
     def _activate_stage0_carbon_reagent(self, required_kg: float) -> None:
         if 'C' in self._activated_additive_reagents:
@@ -783,11 +864,16 @@ class ExtractionMixin:
         """
         Initialize shuttle inventory when entering a C3 phase.
 
-        K and Na are sourced primarily from user-supplied inventory
-        (additives), not self-bootstrapped from the batch.  In a
-        running refinery, the shuttle reagents circulate: K/Na injected
-        into the melt are recovered during bakeout and recycled.  The
-        initial charge comes from inventory.
+        K and Na reagent is supplied by the C3 alkali credit line
+        (S2b): recovered Stage-4 condensate is transferred first, then
+        the ``campaigns.C3.alkali_dosing`` request is topped up for the
+        remaining shortfall by drawing against the negative-authorized
+        ``reservoir.reagent.{Na,K}`` credit reservoirs.  The line models
+        a steady-state recycled inventory, so the phase is NOT limited by
+        the alkali harvested in the previous run.  Native melt Na₂O/K₂O
+        is never mined into elemental reagent (BUG-069 stays off).  An
+        explicit physical ``additives_kg`` charge, if present, is real
+        pre-funded inventory that reduces the credit top-up need.
 
         Any K/Na that happened to condense in earlier campaigns
         (evaporated from the melt's own Na₂O/K₂O during C0/C2) is
@@ -804,16 +890,16 @@ class ExtractionMixin:
             )
             self._transfer_condensed_species('K')
             self._transfer_condensed_species('Na')
-            self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
             na_additive_kg = self.record.additives_kg.get('Na', 0.0)
             if na_additive_kg > self._LEDGER_KG_TOL:
                 self._activate_additive_reagent(
                     'Na',
                     na_additive_kg,
                 )
-                self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
-            else:
-                self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
+            self._top_up_c3_alkali_credit('K')
+            self._top_up_c3_alkali_credit('Na')
+            self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
+            self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
             self.shuttle_cycle_K = 0
 
         elif campaign == CampaignPhase.C3_NA:
@@ -823,6 +909,7 @@ class ExtractionMixin:
             )
             self._transfer_condensed_species('Na')
             self._transfer_condensed_species('K')
+            self._top_up_c3_alkali_credit('Na')
             self.shuttle_Na_inventory_kg = self._sync_reagent_counter_from_ledger('Na')
             self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
             self.shuttle_cycle_Na = 0
@@ -892,8 +979,11 @@ class ExtractionMixin:
         if campaign == CampaignPhase.C3_K:
             self._transfer_condensed_species('K')
             self._transfer_condensed_species('Na')
+            self._top_up_c3_alkali_credit('K')
+            self._top_up_c3_alkali_credit('Na')
         elif campaign == CampaignPhase.C3_NA:
             self._transfer_condensed_species('Na')
+            self._top_up_c3_alkali_credit('Na')
 
         cycle_period = 6  # hours per inject-bakeout cycle
         # Staged C2A enters the cool Na cleanup at the end of the cooldown

@@ -81,7 +81,13 @@ def test_runner_recipe_cli_honors_setpoints_patch(tmp_path: Path) -> None:
 
     assert completed.returncode == 0, completed.stderr
     payload = json.loads(output_path.read_text(encoding="utf-8"))
-    assert payload["run_metadata"]["additives_kg"] == {"Na": 12.0}
+    assert payload["run_metadata"]["additives_kg"] == {}
+    assert payload["run_metadata"]["c3_alkali_credit_dose_kg_by_species"] == {
+        "Na": 12.0
+    }
+    assert payload["run_metadata"]["c3_alkali_credit_drawn_kg_by_species"][
+        "Na"
+    ] >= 12.0
 
 
 def test_malformed_recipe_fails_loud(tmp_path: Path) -> None:
@@ -250,7 +256,13 @@ def test_save_recipe_helper_round_trips_saved_recipe_through_runner(
     assert completed.returncode == 0, completed.stderr
     payload = json.loads(output_path.read_text(encoding="utf-8"))
     assert payload["status"] == "ok"
-    assert payload["run_metadata"]["additives_kg"] == {"Na": 7.0}
+    assert payload["run_metadata"]["additives_kg"] == {}
+    assert payload["run_metadata"]["c3_alkali_credit_dose_kg_by_species"] == {
+        "Na": 7.0
+    }
+    assert payload["run_metadata"]["c3_alkali_credit_drawn_kg_by_species"][
+        "Na"
+    ] >= 7.0
 
 
 def test_runner_recipe_runtime_campaign_overrides_win_same_key(

@@ -187,6 +187,61 @@ def test_c3_k_entry_transfers_condensed_na_without_native_melt_banking():
     ).get("O2", 0.0) == pytest.approx(o2_before)
 
 
+def test_c3_entry_without_dose_does_not_bank_native_na2o_as_reagent():
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        _load("setpoints.yaml"),
+        _load("feedstocks.yaml"),
+        _load("vapor_pressures.yaml"),
+    )
+    sim.load_batch(FEEDSTOCK, mass_kg=1000.0)
+    melt_na2o_before = sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        "Na2O", 0.0
+    )
+
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+
+    assert melt_na2o_before > 0.0
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        "Na2O", 0.0
+    ) == pytest.approx(melt_na2o_before)
+    assert sim.atom_ledger.kg_by_account("process.reagent_inventory").get(
+        "Na", 0.0
+    ) == pytest.approx(0.0)
+    assert getattr(sim, "_c3_alkali_credit_drawn_kg_by_species", {}) == {}
+
+
+def test_c3_credit_draw_does_not_debit_native_cleaned_melt_na2o():
+    backend = StubBackend()
+    backend.initialize({})
+    setpoints = _load("setpoints.yaml")
+    setpoints["campaigns"]["C3"]["alkali_dosing"]["Na_kg"] = 12.0
+    sim = PyrolysisSimulator(
+        backend,
+        setpoints,
+        _load("feedstocks.yaml"),
+        _load("vapor_pressures.yaml"),
+    )
+    sim.load_batch(FEEDSTOCK, mass_kg=1000.0)
+    melt_na2o_before = sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        "Na2O", 0.0
+    )
+
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        "Na2O", 0.0
+    ) == pytest.approx(melt_na2o_before)
+    assert sim.atom_ledger.kg_by_account("process.reagent_inventory").get(
+        "Na", 0.0
+    ) == pytest.approx(12.0)
+    assert sim.atom_ledger.kg_by_account("reservoir.reagent.Na").get(
+        "Na", 0.0
+    ) == pytest.approx(-12.0)
+
+
 def test_c3_shuttle_injects_na_from_condensed_alkali_alone():
     backend = StubBackend()
     backend.initialize({})

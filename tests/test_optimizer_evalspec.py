@@ -1682,9 +1682,15 @@ def test_build_eval_inputs_projects_c3_alkali_dose_into_evalspec_additives() -> 
     assert dict(undosed_spec.additives_kg) == {}
     assert dict(undosed_config.additives_kg) == {}
     assert cache_key(undosed_spec) == cache_key(replace(undosed_spec, additives_kg={}))
-    assert dict(dosed_spec.additives_kg) == {"K": 4.0, "Na": 12.0}
-    assert dict(dosed_config.additives_kg) == {"K": 4.0, "Na": 12.0}
-    assert cache_key(dosed_spec) != cache_key(replace(dosed_spec, additives_kg={}))
+    assert dict(dosed_spec.additives_kg) == {}
+    assert dict(dosed_config.additives_kg) == {}
+    assert dosed_config.setpoints["campaigns"]["C3"]["alkali_dosing"] == {
+        "K_kg": pytest.approx(4.0),
+        "Na_kg": pytest.approx(12.0),
+    }
+    assert dosed_spec.recipe_id != undosed_spec.recipe_id
+    assert cache_key(dosed_spec) != cache_key(undosed_spec)
+    assert cache_key(dosed_spec) == cache_key(replace(dosed_spec, additives_kg={}))
 
 
 def test_build_eval_inputs_keys_disabled_stage0_redox_doses_without_runtime_effect() -> None:

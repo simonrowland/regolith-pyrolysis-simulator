@@ -623,18 +623,36 @@ def _additives_with_c3_alkali_dosing(
     setpoints: Mapping[str, Any],
 ) -> dict[str, float]:
     additives = {str(k): float(v) for k, v in dict(additives_kg).items()}
+    dosing_by_species = _c3_alkali_dosing_kg_by_species(setpoints)
+    for species, dose_kg in dosing_by_species.items():
+        raw_additive_kg = additives.get(species, 0.0)
+        if raw_additive_kg > 0.0 and not math.isclose(
+            raw_additive_kg, dose_kg, rel_tol=0.0, abs_tol=1.0e-12
+        ):
+            key = f"{species}_kg"
+            raise RunnerError(
+                f"campaigns.C3.alkali_dosing.{key} conflicts with "
+                f"additives_kg[{species!r}]"
+            )
+    return additives
+
+
+def _c3_alkali_dosing_kg_by_species(
+    setpoints: Mapping[str, Any],
+) -> dict[str, float]:
     campaigns = setpoints.get("campaigns", {})
     if not isinstance(campaigns, Mapping):
-        return additives
+        return {}
     c3 = campaigns.get("C3", {})
     if not isinstance(c3, Mapping):
-        return additives
+        return {}
     dosing = c3.get("alkali_dosing", {})
     if dosing in (None, {}):
-        return additives
+        return {}
     if not isinstance(dosing, Mapping):
         raise RunnerError("campaigns.C3.alkali_dosing must be a mapping")
 
+    doses: dict[str, float] = {}
     for key, species in (("Na_kg", "Na"), ("K_kg", "K")):
         if key not in dosing or dosing[key] is None:
             continue
@@ -650,16 +668,8 @@ def _additives_with_c3_alkali_dosing(
             )
         if dose_kg <= 0.0:
             continue
-        raw_additive_kg = additives.get(species, 0.0)
-        if raw_additive_kg > 0.0 and not math.isclose(
-            raw_additive_kg, dose_kg, rel_tol=0.0, abs_tol=1.0e-12
-        ):
-            raise RunnerError(
-                f"campaigns.C3.alkali_dosing.{key} conflicts with "
-                f"additives_kg[{species!r}]"
-            )
-        additives[species] = dose_kg
-    return additives
+        doses[species] = dose_kg
+    return doses
 
 
 def _canonical_runtime_campaign_overrides(
@@ -994,6 +1004,34 @@ class PyrolysisRun:
             "engines_used": engines_used,
             "kernel_commit_sha": kernel_commit_sha,
         }
+        c3_credit_dose_kg = _c3_alkali_dosing_kg_by_species(
+            session_config.setpoints
+        )
+        c3_credit_drawn_kg = dict(
+            getattr(sim, "_c3_alkali_credit_drawn_kg_by_species", {}) or {}
+        )
+        c3_credit_outstanding_kg = (
+            sim._c3_alkali_credit_outstanding_kg_by_species()
+        )
+        c3_credit_species = (
+            set(c3_credit_dose_kg)
+            | set(c3_credit_drawn_kg)
+            | set(c3_credit_outstanding_kg)
+        )
+        if c3_credit_species:
+            ordered_species = sorted(c3_credit_species)
+            run_metadata["c3_alkali_credit_dose_kg_by_species"] = {
+                species: float(c3_credit_dose_kg.get(species, 0.0))
+                for species in ordered_species
+            }
+            run_metadata["c3_alkali_credit_drawn_kg_by_species"] = {
+                species: float(c3_credit_drawn_kg.get(species, 0.0))
+                for species in ordered_species
+            }
+            run_metadata["c3_alkali_credit_outstanding_kg_by_species"] = {
+                species: float(c3_credit_outstanding_kg.get(species, 0.0))
+                for species in ordered_species
+            }
         if execution.reduced_real_cache:
             run_metadata["reduced_real_cache"] = _json_safe(
                 execution.reduced_real_cache

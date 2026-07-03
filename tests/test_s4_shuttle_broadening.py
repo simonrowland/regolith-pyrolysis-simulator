@@ -354,6 +354,8 @@ def test_c2a_staged_k_plus_na_shuttle_beats_k_only_and_stays_cool():
     ]
 
     assert broadened.record.additives_kg["Na"] == pytest.approx(NA_DOSE_KG)
+    assert broadened._c3_alkali_credit_drawn_kg_by_species == {}
+    assert broadened._c3_alkali_credit_outstanding_kg_by_species() == {}
     assert broadened_fe > k_only_fe
     assert increment > 0.005
     assert na_fe > 1.0

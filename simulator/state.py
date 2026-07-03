@@ -1025,6 +1025,12 @@ class HourSnapshot:
     shuttle_Na_inventory_kg: float = 0.0
     # Na available for shuttle injection (from condenser + additives)
 
+    c3_alkali_credit_drawn_kg_by_species: Dict[str, float] = field(default_factory=dict)
+    # Gross Na/K reagent drawn from the recycled C3 credit line this run
+
+    c3_alkali_credit_outstanding_kg_by_species: Dict[str, float] = field(default_factory=dict)
+    # Net Na/K makeup still owed to the recycled C3 credit line
+
     shuttle_cycle: int = 0
     # Current inject-bakeout cycle number within the C3 phase
 

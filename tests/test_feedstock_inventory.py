@@ -4,7 +4,12 @@ import pytest
 import yaml
 
 from simulator.core import PyrolysisSimulator
-from simulator.accounting import AccountingError, resolve_species_formula
+from simulator.accounting import (
+    AccountPolicy,
+    AccountingError,
+    OverdraftError,
+    resolve_species_formula,
+)
 from simulator.feedstock_guard import BlockedFeedstockError, is_blocked_feedstock
 from simulator.melt_backend.base import StubBackend
 from simulator.state import CampaignPhase
@@ -1241,8 +1246,16 @@ def test_c3_na_dose_draws_reagent_inventory_and_commits_balanced_transition():
         }
     )
 
-    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Na": 12.0})
-    reservoir_before = sim.atom_ledger.kg_by_account("reservoir.reagent.Na")["Na"]
+    sim.setpoints.setdefault("campaigns", {}).setdefault("C3", {}).setdefault(
+        "alkali_dosing", {}
+    )["Na_kg"] = 12.0
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={})
+    cleaned_na2o_before = sim.atom_ledger.kg_by_account(
+        "process.cleaned_melt"
+    ).get("Na2O", 0.0)
+    reservoir_before = sim.atom_ledger.kg_by_account(
+        "reservoir.reagent.Na"
+    ).get("Na", 0.0)
 
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
     process_before = sim.atom_ledger.kg_by_account(
@@ -1261,13 +1274,82 @@ def test_c3_na_dose_draws_reagent_inventory_and_commits_balanced_transition():
         for t in sim.atom_ledger.transitions
     )
 
-    assert reservoir_before == pytest.approx(12.0)
+    assert reservoir_before == pytest.approx(0.0)
     assert process_before == pytest.approx(12.0)
+    assert sim.atom_ledger.kg_by_account("reservoir.reagent.Na")["Na"] == (
+        pytest.approx(-12.0)
+    )
+    assert sim._c3_alkali_credit_drawn_kg_by_species["Na"] == pytest.approx(12.0)
+    assert sim._c3_alkali_credit_outstanding_kg_by_species()["Na"] == (
+        pytest.approx(12.0)
+    )
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        "Na2O", 0.0
+    ) == pytest.approx(cleaned_na2o_before)
     assert process_after < process_before
     assert sim.shuttle_Na_inventory_kg == pytest.approx(process_after)
     assert sim.atom_ledger.kg_by_account("process.metal_phase")["Fe"] > 0.0
     assert abs(snapshot.mass_balance_error_pct) < 5e-12
     assert transition_imbalance_kg < 1e-6
+    sim.atom_ledger.assert_balanced()
+
+
+def test_c3_recovered_condensate_reduces_credit_top_up_need():
+    # S2b scope acceptance: recovered Stage-4 condensate is transferred once
+    # and REDUCES the credit top-up need without becoming a second supply.
+    # 8 kg recovered + a 12 kg dose request => only the 4 kg shortfall is drawn
+    # from the credit line (grok S2B-REV P2: logic was verified only manually).
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {
+                    "SiO2": 50.0,
+                    "FeO": 50.0,
+                },
+            }
+        }
+    )
+    sim.setpoints.setdefault("campaigns", {}).setdefault("C3", {}).setdefault(
+        "alkali_dosing", {}
+    )["Na_kg"] = 12.0
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={})
+    cleaned_na2o_before = sim.atom_ledger.kg_by_account(
+        "process.cleaned_melt"
+    ).get("Na2O", 0.0)
+    # Recovered Stage-4 condensate lands in BOTH the display counter and the
+    # authoritative ledger account (the ledger account is the real mass source
+    # _transfer_condensed_species reads; the counter alone is a stale mirror).
+    sim.train.stages[4].collected_kg["Na"] = 8.0
+    sim.atom_ledger.load_external(
+        "process.condensation_train",
+        {"Na": 8.0},
+        source="test recovered Na condensate",
+    )
+
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+
+    # Full 12 kg dose is available, but only the 4 kg shortfall was borrowed.
+    assert sim.atom_ledger.kg_by_account("process.reagent_inventory")[
+        "Na"
+    ] == pytest.approx(12.0)
+    assert sim._c3_alkali_credit_drawn_kg_by_species["Na"] == pytest.approx(4.0)
+    assert sim._c3_alkali_credit_outstanding_kg_by_species()["Na"] == (
+        pytest.approx(4.0)
+    )
+    assert sim.atom_ledger.kg_by_account("reservoir.reagent.Na")[
+        "Na"
+    ] == pytest.approx(-4.0)
+    # Condensate consumed exactly once; native cleaned-melt Na2O untouched
+    # (BUG-069 stays off — recovered metal is not a second native-banking path).
+    assert sim.train.stages[4].collected_kg.get("Na", 0.0) == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account("process.condensation_train").get(
+        "Na", 0.0
+    ) == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        "Na2O", 0.0
+    ) == pytest.approx(cleaned_na2o_before)
+    sim.atom_ledger.assert_balanced()
 
 
 def test_c3_na_ti_prose_uses_balanced_reaction():
@@ -1292,10 +1374,19 @@ def test_c3_alkali_dose_overdraw_fails_loud():
         }
     )
 
-    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Na": 1.0})
-    sim.record.additives_kg["Na"] = 2.0
+    sim.setpoints.setdefault("campaigns", {}).setdefault("C3", {}).setdefault(
+        "alkali_dosing", {}
+    )["Na_kg"] = 2.0
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={})
+    sim.atom_ledger.set_account_policy(
+        "reservoir.reagent.Na",
+        AccountPolicy.reservoir(
+            "reservoir.reagent.Na",
+            credit_limit_kg_by_species={"Na": 1.0},
+        ),
+    )
 
-    with pytest.raises(ValueError, match="exceeds available inventory"):
+    with pytest.raises(OverdraftError, match="exceeded 'Na' credit"):
         sim._init_shuttle_inventory(CampaignPhase.C3_NA)
 
 
@@ -1312,7 +1403,10 @@ def test_c3_na_dose_activation_is_idempotent_across_k_then_na_phases():
         }
     )
 
-    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Na": 12.0})
+    sim.setpoints.setdefault("campaigns", {}).setdefault("C3", {}).setdefault(
+        "alkali_dosing", {}
+    )["Na_kg"] = 12.0
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={})
 
     sim._init_shuttle_inventory(CampaignPhase.C3_K)
     after_k_phase = sim.shuttle_Na_inventory_kg
@@ -1320,9 +1414,10 @@ def test_c3_na_dose_activation_is_idempotent_across_k_then_na_phases():
 
     assert after_k_phase == pytest.approx(12.0)
     assert sim.shuttle_Na_inventory_kg == pytest.approx(12.0)
+    assert sim._c3_alkali_credit_drawn_kg_by_species["Na"] == pytest.approx(12.0)
     assert sim.atom_ledger.kg_by_account("reservoir.reagent.Na").get(
         "Na", 0.0
-    ) == pytest.approx(0.0)
+    ) == pytest.approx(-12.0)
 
 
 def test_oxygen_is_not_duplicated_in_product_ledger():

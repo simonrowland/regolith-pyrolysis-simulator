@@ -39,6 +39,62 @@ def test_unspent_additive_is_reservoir_balance_not_product():
     ) == pytest.approx(0.0)
 
 
+def test_na_k_reagent_reservoir_credit_requires_policy():
+    ledger = _ledger()
+    AccountPolicy = _required_attr("simulator.accounting", "AccountPolicy")
+    OverdraftError = _required_attr("simulator.accounting", "OverdraftError")
+
+    ledger.set_account_policy(
+        "reservoir.reagent.Na",
+        AccountPolicy.reservoir(
+            "reservoir.reagent.Na",
+            credit_limit_kg_by_species={"Na": 3.0},
+        ),
+    )
+    ledger.move(
+        "draw_na_credit",
+        "reservoir.reagent.Na",
+        "process.reagent_inventory",
+        {"Na": 2.0},
+        reason="C3 Na credit line draw",
+    )
+
+    ledger.assert_balanced()
+    assert ledger.kg_by_account("reservoir.reagent.Na")["Na"] == pytest.approx(
+        -2.0
+    )
+    assert ledger.kg_by_account("process.reagent_inventory")["Na"] == (
+        pytest.approx(2.0)
+    )
+    ledger.set_account_policy(
+        "reservoir.reagent.K",
+        AccountPolicy.reservoir(
+            "reservoir.reagent.K",
+            credit_limit_kg_by_species={"K": 2.0},
+        ),
+    )
+    ledger.move(
+        "draw_k_credit",
+        "reservoir.reagent.K",
+        "process.reagent_inventory",
+        {"K": 1.0},
+        reason="C3 K credit line draw",
+    )
+    assert ledger.kg_by_account("reservoir.reagent.K")["K"] == pytest.approx(
+        -1.0
+    )
+
+    no_policy_ledger = _ledger()
+    with pytest.raises(OverdraftError, match="insufficient available 'K'"):
+        no_policy_ledger.move(
+            "draw_k_without_policy",
+            "reservoir.reagent.K",
+            "process.reagent_inventory",
+            {"K": 1.0},
+            reason="K credit without policy must fail",
+        )
+
+
 def test_recovered_reagent_transfer_is_zero_sum_debit_credit():
     ledger = _ledger()
     MaterialLot = _material_lot()

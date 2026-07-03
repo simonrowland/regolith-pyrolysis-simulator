@@ -143,6 +143,8 @@ def test_c2a_staged_recipe_separates_products_and_k_shuttle_breaks_fe_ceiling():
 
     assert sim.is_complete()
     assert sim.record.additives_kg["Na"] == pytest.approx(NA_DOSE_KG)
+    assert sim._c3_alkali_credit_drawn_kg_by_species == {}
+    assert sim._c3_alkali_credit_outstanding_kg_by_species() == {}
     assert sim.campaign_mgr.overrides["C2A_staged"]["hold_temp_C"] == pytest.approx(
         HOT_HOLD_C
     )

@@ -825,6 +825,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._rump_expectation_warnings = []
         self._last_shuttle_refusal_diagnostic = {}
         self._shuttle_refusal_history = []
+        self._c3_alkali_credit_drawn_kg_by_species = {}
         self._equipment = None
         self._configure_overhead_headspace()
         self._configure_freeze_gate()
@@ -972,6 +973,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             AccountPolicy.reservoir(
                 'reservoir.reagent.C',
                 credit_limit_kg_by_species={'C': 1e15},
+            ),
+            AccountPolicy.reservoir(
+                'reservoir.reagent.Na',
+                credit_limit_kg_by_species={'Na': 1e15},
+            ),
+            AccountPolicy.reservoir(
+                'reservoir.reagent.K',
+                credit_limit_kg_by_species={'K': 1e15},
             ),
         )
 
@@ -8259,6 +8268,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             shuttle_metal_produced_kg_hr=self._shuttle_metal_this_hr,
             shuttle_K_inventory_kg=self.shuttle_K_inventory_kg,
             shuttle_Na_inventory_kg=self.shuttle_Na_inventory_kg,
+            c3_alkali_credit_drawn_kg_by_species=dict(
+                getattr(self, '_c3_alkali_credit_drawn_kg_by_species', {}) or {}
+            ),
+            c3_alkali_credit_outstanding_kg_by_species=(
+                self._c3_alkali_credit_outstanding_kg_by_species()
+            ),
             shuttle_cycle=(self.shuttle_cycle_K
                            if self.melt.campaign == CampaignPhase.C3_K
                            else self.shuttle_cycle_Na),
