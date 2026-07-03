@@ -1,0 +1,224 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from scripts import sso_r_validation_map as validation_map
+
+
+GOLDEN_PATH = Path("tests/goldens/sso_r_validation_map_lunar_mare_low_ti.json")
+
+
+@pytest.fixture(scope="module")
+def smoke_payload():
+    return validation_map.run_validation_map(smoke=True)
+
+
+def test_full_grid_count_is_1512_rows():
+    assert len(validation_map.full_grid()) == 1512
+    assert validation_map.expected_grid_count(smoke=False) == 1512
+    assert validation_map.expected_grid_count(smoke=True) == 36
+
+
+def _assertion(payload, name):
+    return {a["name"]: a for a in payload["assertions"]}[name]
+
+
+def test_manual_fO2_anchors_match_native_fe_design_window():
+    anchors = {
+        anchor["fO2_log"]: anchor
+        for anchor in validation_map.manual_fO2_anchors()
+    }
+
+    assert anchors[-9.0]["reference_source"].startswith("docs-private/research/")
+    assert anchors[-9.5]["reference_source"].startswith("docs-private/research/")
+    assert anchors[-9.0]["native_fe_frac"] == pytest.approx(
+        anchors[-9.0]["reference_native_fe_frac"],
+        rel=0.0,
+        abs=anchors[-9.0]["reference_abs_tolerance"],
+    )
+    assert anchors[-9.5]["native_fe_frac"] == pytest.approx(
+        anchors[-9.5]["reference_native_fe_frac"],
+        rel=0.0,
+        abs=anchors[-9.5]["reference_abs_tolerance"],
+    )
+    assert anchors[-9.0]["diagnostic_only"] is True
+    assert anchors[-9.5]["diagnostic_only"] is True
+
+
+def test_grid_count_assertion_uses_requested_grid_size(smoke_payload):
+    assert _assertion(smoke_payload, "grid_count")["passed"] is True
+    assert _assertion(smoke_payload, "grid_count")["detail"] == (
+        "rows=36 expected=36 scope=36-smoke"
+    )
+
+    truncated = smoke_payload["rows"][:-1]
+    smoke_assertions = validation_map.evaluate_assertions(
+        truncated,
+        smoke_payload["manual_fO2_anchors"],
+        expected_rows=validation_map.expected_grid_count(smoke=True),
+        grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
+    )
+    full_assertions = validation_map.evaluate_assertions(
+        smoke_payload["rows"],
+        smoke_payload["manual_fO2_anchors"],
+        expected_rows=validation_map.expected_grid_count(smoke=False),
+        grid_scope_label=validation_map.GRID_SCOPE_FULL,
+    )
+
+    assert {a["name"]: a for a in smoke_assertions}["grid_count"]["passed"] is False
+    full_grid_count = {a["name"]: a for a in full_assertions}["grid_count"]
+    assert full_grid_count["passed"] is False
+    assert full_grid_count["detail"] == "rows=36 expected=1512 scope=1512-full"
+
+
+def test_corrected_monotonic_metrics_report_native_response(smoke_payload):
+    pO2 = _assertion(smoke_payload, "pO2_SiO_suppression_monotonicity")
+    dose = _assertion(smoke_payload, "dose_reduction_monotonicity")
+
+    assert pO2["passed"] is True
+    assert "sio_nonincreasing_failures=0" in pO2["detail"]
+    assert "native_response_nonmonotone_reported=" in pO2["detail"]
+    assert dose["passed"] is True
+    assert "feo_reduced_failures=0" in dose["detail"]
+    assert "native_response_nonmonotone_reported=" in dose["detail"]
+
+
+def test_monotonicity_assertions_are_not_vacuous(smoke_payload):
+    # The smoke grid exercises the pO2 and dose axes but has a single pN2
+    # point: the pN2 assertion must say so instead of passing silently.
+    pO2 = _assertion(smoke_payload, "pO2_SiO_suppression_monotonicity")
+    dose = _assertion(smoke_payload, "dose_reduction_monotonicity")
+    pn2 = _assertion(smoke_payload, "pN2_escape_monotonicity")
+
+    assert "qualifying_slices=9" in pO2["detail"]
+    assert "qualifying_slices=12" in dose["detail"]
+    assert pn2["passed"] is True
+    assert "qualifying_slices=0" in pn2["detail"]
+    assert "not_exercised_on_smoke_grid" in pn2["detail"]
+
+    # Under the full-grid scope label, zero qualifying slices is a harness
+    # defect and must FAIL loud, not pass vacuously.
+    full_assertions = validation_map.evaluate_assertions(
+        smoke_payload["rows"],
+        smoke_payload["manual_fO2_anchors"],
+        expected_rows=validation_map.expected_grid_count(smoke=False),
+        grid_scope_label=validation_map.GRID_SCOPE_FULL,
+    )
+    full_pn2 = {a["name"]: a for a in full_assertions}["pN2_escape_monotonicity"]
+    assert full_pn2["passed"] is False
+    assert "qualifying_slices=0" in full_pn2["detail"]
+
+
+def test_smoke_rows_have_owner_readable_schema_and_source_label_reader(
+    smoke_payload,
+):
+    assert smoke_payload["grid"]["row_count"] == 36
+    assert smoke_payload["grid"]["expected_row_count"] == 36
+    assert smoke_payload["grid_scope"] == validation_map.GRID_SCOPE_SMOKE
+    row = smoke_payload["rows"][0]
+
+    required = {
+        "grid_scope",
+        "sample_time_h",
+        "temperature_C",
+        "requested_pO2_mbar",
+        "requested_pN2_mbar",
+        "total_pressure_mbar",
+        "gas_regime",
+        "transport_property_basis",
+        "map_scope_note",
+        "dose_species",
+        "dose_kg",
+        "post_exchange_fO2_log_diagnostic",
+        "post_exchange_delta_IW_diagnostic",
+        "fO2_diagnostic_status",
+        "redox_source_terms_mol_o2_equiv_by_label",
+        "redox_source_reader",
+        "native_fe_event_type",
+        "native_fe_pool_mol",
+        "native_fe_tap_mol",
+        "native_fe_vapor_mol",
+        "native_fe_vapor_escape_fraction_denominator",
+        "retained_FeO_mol",
+        "retained_Fe2O3_mol",
+        "retained_native_Fe_mol",
+        "Fe_vapor_kg_hr",
+        "SiO_flux_kg_hr",
+        "stage_3_Fe_wt_pct",
+        "stage_3_SiO2_capture_kg",
+        "oxygen_reservoir_exchange_direction",
+        "oxygen_reservoir_exchange_o2_mol",
+        "mass_balance_error_pct",
+    }
+    assert required <= set(row)
+    assert "fO2_log" not in row
+    assert row["fO2_diagnostic_status"].startswith("diagnostic_only")
+    assert row["native_fe_vapor_escape_fraction_denominator"] == (
+        "native_fe_pool_mol"
+    )
+    assert row["redox_source_reader"] == (
+        "runner.build_per_hour_summary.redox_source_breakdown"
+    )
+
+    labeled = [
+        r for r in smoke_payload["rows"]
+        if r["redox_source_terms_mol_o2_equiv_by_label"]
+    ]
+    assert labeled
+    for labeled_row in labeled:
+        assert labeled_row["redox_source_reader"]
+
+
+def test_owner_pn2_anchor_reports_current_certification_blocker(smoke_payload):
+    owner = [
+        row for row in smoke_payload["rows"]
+        if row["temperature_C"] == 1650.0
+        and row["requested_pO2_mbar"] == pytest.approx(1.0e-6)
+        and row["requested_pN2_mbar"] == pytest.approx(10.0)
+        and row["dose_fraction_of_full_FeO_equiv"] == pytest.approx(1.0)
+    ][0]
+    assertions = {a["name"]: a for a in smoke_payload["assertions"]}
+
+    assert owner["native_fe_pool_mol"] > 0.0
+    assert owner["native_fe_tap_mol"] > owner["native_fe_vapor_mol"]
+    assert owner["native_fe_vapor_escape_fraction_of_pool"] < 0.001
+    assert owner["stage_3_Fe_wt_pct"] > 0.0
+    assert owner["ferric_divergence_material"] is False
+    assert abs(owner["mass_balance_error_pct"]) <= 5e-12
+    assert owner["SiO_flux_kg_hr"] < validation_map.OWNER_RECIPE_MIN_SIO_KG_HR
+    assert assertions["owner_pN2_recipe_point"]["passed"] is False
+
+
+def test_distilled_golden_fixture_matches_current_anchors(smoke_payload):
+    golden = json.loads(GOLDEN_PATH.read_text(encoding="utf-8"))
+    current = validation_map.golden_payload(smoke_payload)
+
+    assert golden["schema_version"] == validation_map.GOLDEN_SCHEMA_VERSION
+    assert golden["grid_scope"] == validation_map.GRID_SCOPE_SMOKE
+    assert current["grid_scope"] == golden["grid_scope"]
+    assert current["grid_expected_row_count"] == golden["grid_expected_row_count"]
+    assert current["manual_fO2_anchors"] == golden["manual_fO2_anchors"]
+    assert current["owner_pn2_row"]["classification"] == (
+        golden["owner_pn2_row"]["classification"]
+    )
+    assert current["owner_pn2_row"]["native_fe_pool_mol"] == pytest.approx(
+        golden["owner_pn2_row"]["native_fe_pool_mol"],
+        rel=0.0,
+        abs=1e-9,
+    )
+    assert current["owner_pn2_row"]["SiO_flux_kg_hr"] == pytest.approx(
+        golden["owner_pn2_row"]["SiO_flux_kg_hr"],
+        rel=0.0,
+        abs=1e-15,
+    )
+    # The distilled monotonic slices are regression pins, not write-only
+    # payload: compare them against the golden (SC-50 consumption).
+    for slice_name in (
+        "pO2_sio_suppression_slice",
+        "dose_reduction_slice",
+        "pN2_monotonic_slice",
+    ):
+        assert current[slice_name] == golden[slice_name], slice_name
