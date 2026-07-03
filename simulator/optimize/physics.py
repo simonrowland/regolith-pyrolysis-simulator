@@ -533,13 +533,9 @@ class PhysicsConstraintSet:
 
     def extraction_completeness(self, trace: Any) -> GateMargin:
         try:
-            products = _required_mapping(trace, "product_ledger_kg")
-            rump = _required_mapping(trace, "terminal_rump_by_species_kg")
-            by_target = extraction_completeness_by_target(
-                self.target_species,
-                self.residual_species_by_target,
-                products,
-                rump,
+            by_target = _extraction_completeness_by_target_for_trace(
+                trace,
+                self,
             )
             worst_margin = math.inf
             worst_fraction = 1.0
@@ -684,13 +680,9 @@ def extraction_completeness_report(
     active_constraints = constraints or PhysicsConstraintSet()
     targets = tuple(str(target) for target in active_constraints.target_species)
     try:
-        products = _required_mapping(trace, "product_ledger_kg")
-        rump = _required_mapping(trace, "terminal_rump_by_species_kg")
-        by_target = extraction_completeness_by_target(
-            targets,
-            active_constraints.residual_species_by_target,
-            products,
-            rump,
+        by_target = _extraction_completeness_by_target_for_trace(
+            trace,
+            active_constraints,
             require_residual_species=True,
         )
     except (AccountingError, KeyError, TypeError, ValueError) as exc:
@@ -742,6 +734,101 @@ def extraction_completeness_report(
     )
 
 
+def _extraction_completeness_by_target_for_trace(
+    trace: Any,
+    constraints: PhysicsConstraintSet,
+    *,
+    require_residual_species: bool = False,
+) -> Mapping[str, TargetExtractionCompleteness]:
+    provenance_results = _provenance_extraction_results_from_trace(
+        trace,
+        constraints,
+    )
+    if provenance_results is not None:
+        return provenance_results
+    products = _required_mapping(trace, "product_ledger_kg")
+    rump = _required_mapping(trace, "terminal_rump_by_species_kg")
+    return extraction_completeness_by_target(
+        tuple(str(target) for target in constraints.target_species),
+        constraints.residual_species_by_target,
+        products,
+        rump,
+        require_residual_species=require_residual_species,
+    )
+
+
+def _provenance_extraction_results_from_trace(
+    trace: Any,
+    constraints: PhysicsConstraintSet,
+) -> Mapping[str, TargetExtractionCompleteness] | None:
+    values = getattr(trace, "extraction_completeness_by_target", None)
+    if not isinstance(values, Mapping) or not values:
+        return None
+    results: dict[str, TargetExtractionCompleteness] = {}
+    for target in tuple(str(target) for target in constraints.target_species):
+        payload = values.get(target)
+        if not isinstance(payload, Mapping):
+            return None
+        results[target] = _target_extraction_result_from_payload(target, payload)
+    return MappingProxyType(results)
+
+
+def _target_extraction_result_from_payload(
+    target: str,
+    payload: Mapping[str, Any],
+) -> TargetExtractionCompleteness:
+    fraction_raw = payload.get("completeness_fraction")
+    fraction = None if fraction_raw is None else _finite_number(
+        fraction_raw,
+        f"{target}.completeness_fraction",
+    )
+    return TargetExtractionCompleteness(
+        target,
+        fraction,
+        _optional_finite_number(
+            payload.get("product_target_equiv_mol"),
+            f"{target}.product_target_equiv_mol",
+        ),
+        _optional_finite_number(
+            payload.get("residual_target_equiv_mol"),
+            f"{target}.residual_target_equiv_mol",
+        ),
+        _optional_finite_number(
+            payload.get("denominator_target_equiv_mol"),
+            f"{target}.denominator_target_equiv_mol",
+        ),
+        str(payload.get("reason") or "unknown: no result"),
+        wall_deposit_target_equiv_mol=_optional_finite_number(
+            payload.get("wall_deposit_target_equiv_mol"),
+            f"{target}.wall_deposit_target_equiv_mol",
+        ),
+        reagent_target_equiv_mol=_optional_finite_number(
+            payload.get("reagent_target_equiv_mol"),
+            f"{target}.reagent_target_equiv_mol",
+        ),
+        gross_product_target_equiv_mol=_optional_finite_number(
+            payload.get("gross_product_target_equiv_mol"),
+            f"{target}.gross_product_target_equiv_mol",
+        ),
+        contract_id=str(payload.get("contract_id") or ""),
+        feedstock_recovered_reagent_target_equiv_mol=_optional_finite_number(
+            payload.get("feedstock_recovered_reagent_target_equiv_mol"),
+            f"{target}.feedstock_recovered_reagent_target_equiv_mol",
+        ),
+        credit_line_reagent_target_equiv_mol=_optional_finite_number(
+            payload.get("credit_line_reagent_target_equiv_mol"),
+            f"{target}.credit_line_reagent_target_equiv_mol",
+        ),
+        external_additive_reagent_target_equiv_mol=_optional_finite_number(
+            payload.get("external_additive_reagent_target_equiv_mol"),
+            f"{target}.external_additive_reagent_target_equiv_mol",
+        ),
+        denominator_basis_source=str(
+            payload.get("denominator_basis_source") or "product_plus_residual"
+        ),
+    )
+
+
 def _extraction_completeness_target_report(
     result: TargetExtractionCompleteness,
     constraints: PhysicsConstraintSet,
@@ -767,12 +854,33 @@ def _extraction_completeness_target_report(
         "product_target_equiv_mol": (
             result.product_target_equiv_mol if has_denominator else None
         ),
+        "gross_product_target_equiv_mol": (
+            result.gross_product_target_equiv_mol
+            if result.gross_product_target_equiv_mol
+            else None
+        ),
         "residual_target_equiv_mol": (
             result.residual_target_equiv_mol if has_denominator else None
         ),
         "denominator_target_equiv_mol": (
             result.denominator_target_equiv_mol if has_denominator else None
         ),
+        "feedstock_recovered_reagent_target_equiv_mol": (
+            result.feedstock_recovered_reagent_target_equiv_mol
+            if has_denominator
+            else None
+        ),
+        "credit_line_reagent_target_equiv_mol": (
+            result.credit_line_reagent_target_equiv_mol
+            if has_denominator
+            else None
+        ),
+        "external_additive_reagent_target_equiv_mol": (
+            result.external_additive_reagent_target_equiv_mol
+            if has_denominator
+            else None
+        ),
+        "denominator_basis_source": result.denominator_basis_source,
         "completeness_fraction": result.completeness_fraction,
         "reason": "",
         "detail": result.detail,
@@ -808,8 +916,13 @@ def _extraction_completeness_insufficient_report(
         "product_bin": target,
         "product_account": "product_ledger_kg",
         "product_target_equiv_mol": None,
+        "gross_product_target_equiv_mol": None,
         "residual_target_equiv_mol": None,
         "denominator_target_equiv_mol": None,
+        "feedstock_recovered_reagent_target_equiv_mol": None,
+        "credit_line_reagent_target_equiv_mol": None,
+        "external_additive_reagent_target_equiv_mol": None,
+        "denominator_basis_source": "product_plus_residual",
         "completeness_fraction": None,
         "reason": reason,
         "detail": f"{target}: {reason}",
@@ -1086,3 +1199,9 @@ def _finite_number(value: Any, name: str) -> float:
     if not math.isfinite(amount):
         raise ValueError(f"{name} must be finite")
     return amount
+
+
+def _optional_finite_number(value: Any, name: str) -> float:
+    if value is None:
+        return 0.0
+    return _finite_number(value, name)

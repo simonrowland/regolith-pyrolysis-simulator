@@ -55,6 +55,10 @@ class TargetExtractionCompleteness:
     reagent_target_equiv_mol: float = 0.0
     gross_product_target_equiv_mol: float = 0.0
     contract_id: str = ""
+    feedstock_recovered_reagent_target_equiv_mol: float = 0.0
+    credit_line_reagent_target_equiv_mol: float = 0.0
+    external_additive_reagent_target_equiv_mol: float = 0.0
+    denominator_basis_source: str = "product_plus_residual"
 
     @property
     def detail(self) -> str:
@@ -123,6 +127,13 @@ class CompletionContract:
     def allowed_species(self) -> tuple[str, ...]:
         values = self.element_map.get(self.element, ())
         return tuple(str(species) for species in values)
+
+
+@dataclass(frozen=True)
+class ReagentProvenanceTargetEquivalent:
+    feedstock_recovered_mol: float = 0.0
+    credit_line_mol: float = 0.0
+    external_additive_mol: float = 0.0
 
 
 def extraction_completeness_by_target(
@@ -397,21 +408,43 @@ def vapor_contract_completeness(
     if contract.wall_account:
         wall_kg = _species_kg_by_account_pattern(queries, contract.wall_account)
 
-    # OWNER 2026-06-03 fix2: dosed additives are staged to their own
-    # campaigns (Na/K -> C3, Mg -> C4, C -> Stage-0), not the earlier
-    # vapor-extraction stages, so these narrow product accounts are
-    # feedstock-derived and need no reagent subtraction.
-    product_mol = _contract_target_equivalent_mol(
+    gross_product_account_mol = _contract_target_equivalent_mol(
         contract, product_kg, "product"
     )
-    recovered_reagent_mol = _contract_recovered_reagent_target_equivalent_mol(
+    product_account_mol = gross_product_account_mol
+    reagent_provenance = _contract_reagent_provenance_target_equivalent_mol(
         contract, queries
     )
-    product_mol += recovered_reagent_mol
+    product_non_feedstock_mol = _non_feedstock_reagent_element_mol(
+        contract.element,
+        queries,
+        accounts=contract.product_accounts,
+    )
+    product_account_mol = max(
+        0.0,
+        product_account_mol - min(product_account_mol, product_non_feedstock_mol),
+    )
+    product_mol = product_account_mol + reagent_provenance.feedstock_recovered_mol
     residual_mol = _contract_residual_target_equivalent_mol(
         contract, residual_kg
     )
+    residual_non_feedstock_mol = _non_feedstock_reagent_element_mol(
+        contract.element,
+        queries,
+        accounts=contract.residual_accounts,
+    )
+    residual_mol = max(
+        0.0,
+        residual_mol - min(residual_mol, residual_non_feedstock_mol),
+    )
     wall_mol = _contract_target_equivalent_mol(contract, wall_kg, "wall")
+    if contract.wall_account:
+        wall_non_feedstock_mol = _non_feedstock_reagent_element_mol(
+            contract.element,
+            queries,
+            account_pattern=contract.wall_account,
+        )
+        wall_mol = max(0.0, wall_mol - min(wall_mol, wall_non_feedstock_mol))
     if wall_mol > _WALL_EPS and not contract.wall_account:
         raise CompletionContractBlocked(
             f"{contract.contract_id}: wall deposit present without wall term"
@@ -426,9 +459,20 @@ def vapor_contract_completeness(
             denom,
             "no target-equivalent mol evidence",
             wall_deposit_target_equiv_mol=wall_mol,
-            reagent_target_equiv_mol=recovered_reagent_mol,
-            gross_product_target_equiv_mol=product_mol,
+            reagent_target_equiv_mol=reagent_provenance.feedstock_recovered_mol,
+            gross_product_target_equiv_mol=gross_product_account_mol,
             contract_id=contract.contract_id,
+            feedstock_recovered_reagent_target_equiv_mol=(
+                reagent_provenance.feedstock_recovered_mol
+            ),
+            credit_line_reagent_target_equiv_mol=reagent_provenance.credit_line_mol,
+            external_additive_reagent_target_equiv_mol=(
+                reagent_provenance.external_additive_mol
+            ),
+            denominator_basis_source=(
+                "feedstock_derived_product_residual_wall_excluding_credit_line_"
+                "and_external_additives"
+            ),
         )
     return TargetExtractionCompleteness(
         target,
@@ -437,9 +481,20 @@ def vapor_contract_completeness(
         residual_mol,
         denom,
         wall_deposit_target_equiv_mol=wall_mol,
-        reagent_target_equiv_mol=recovered_reagent_mol,
-        gross_product_target_equiv_mol=product_mol,
+        reagent_target_equiv_mol=reagent_provenance.feedstock_recovered_mol,
+        gross_product_target_equiv_mol=gross_product_account_mol,
         contract_id=contract.contract_id,
+        feedstock_recovered_reagent_target_equiv_mol=(
+            reagent_provenance.feedstock_recovered_mol
+        ),
+        credit_line_reagent_target_equiv_mol=reagent_provenance.credit_line_mol,
+        external_additive_reagent_target_equiv_mol=(
+            reagent_provenance.external_additive_mol
+        ),
+        denominator_basis_source=(
+            "feedstock_derived_product_residual_wall_excluding_credit_line_"
+            "and_external_additives"
+        ),
     )
 
 
@@ -725,22 +780,97 @@ def _contract_residual_target_equivalent_mol(
     return _contract_target_equivalent_mol(contract, filtered, "residual")
 
 
-def _contract_recovered_reagent_target_equivalent_mol(
+def _contract_reagent_provenance_target_equivalent_mol(
     contract: CompletionContract,
     queries: Any,
-) -> float:
-    reagent_kg = _species_kg_by_accounts(queries, ("process.reagent_inventory",))
+) -> ReagentProvenanceTargetEquivalent:
     element = contract.element
-    reagent_target_mol = _contract_target_equivalent_mol(
-        contract, reagent_kg, "reagent"
+    feedstock_recovered_kg = _feedstock_recovered_reagent_kg(element, queries)
+    credit_line_kg = _credit_line_reagent_kg(element, queries)
+    external_additive_kg = _process_unspent_additive_reagent_kg(element, queries)
+    return ReagentProvenanceTargetEquivalent(
+        feedstock_recovered_mol=_species_mol(element, feedstock_recovered_kg),
+        credit_line_mol=_species_mol(element, credit_line_kg),
+        external_additive_mol=_species_mol(element, external_additive_kg),
     )
-    if reagent_target_mol <= _EPS:
+
+
+def _feedstock_recovered_reagent_kg(element: str, queries: Any) -> float:
+    helper = getattr(queries, "feedstock_recovered_reagents_kg", None)
+    if not callable(helper):
         return 0.0
-    process_additive_kg = _process_unspent_additive_reagent_kg(
-        element, queries
+    return _reagent_mapping_species_kg(
+        helper(),
+        element,
+        "feedstock_recovered",
     )
-    additive_mol = _species_mol(element, process_additive_kg)
-    return max(0.0, reagent_target_mol - additive_mol)
+
+
+def _credit_line_reagent_kg(element: str, queries: Any) -> float:
+    helper = getattr(queries, "c3_alkali_credit_outstanding_kg_by_species", None)
+    if not callable(helper):
+        return 0.0
+    credit_kg = _reagent_mapping_species_kg(helper(), element, "credit_line")
+    if credit_kg <= _EPS:
+        return 0.0
+    reagent_kg = _species_kg_by_accounts(queries, ("process.reagent_inventory",))
+    process_reagent_kg = _non_negative_number(
+        reagent_kg.get(element, 0.0),
+        f"process.reagent_inventory.{element}",
+    )
+    feedstock_kg = _feedstock_recovered_reagent_kg(element, queries)
+    return min(credit_kg, max(0.0, process_reagent_kg - feedstock_kg))
+
+
+def _non_feedstock_reagent_element_mol(
+    element: str,
+    queries: Any,
+    *,
+    accounts: tuple[str, ...] = (),
+    account_pattern: str | None = None,
+) -> float:
+    helper = getattr(queries, "non_feedstock_reagent_element_kg_by_account", None)
+    if not callable(helper):
+        return 0.0
+    values = helper()
+    if not isinstance(values, Mapping):
+        return 0.0
+    element_kg = 0.0
+    for account, element_values in values.items():
+        account_name = str(account)
+        if accounts and account_name not in accounts:
+            continue
+        if account_pattern is not None and not _account_matches_pattern(
+            account_name,
+            account_pattern,
+        ):
+            continue
+        if not isinstance(element_values, Mapping):
+            continue
+        element_kg += _non_negative_number(
+            element_values.get(element, 0.0),
+            f"non_feedstock_reagent.{account_name}.{element}",
+        )
+    return _species_mol(element, element_kg)
+
+
+def _account_matches_pattern(account: str, pattern: str) -> bool:
+    if pattern.endswith("*"):
+        return account.startswith(pattern[:-1])
+    return account == pattern
+
+
+def _reagent_mapping_species_kg(
+    values: Any,
+    element: str,
+    source_name: str,
+) -> float:
+    if not isinstance(values, Mapping):
+        return 0.0
+    direct = values.get(element, None)
+    if direct is None:
+        direct = values.get(f"recovered_{element}_reagent", 0.0)
+    return _non_negative_number(direct, f"{source_name}.{element}")
 
 
 def _process_unspent_additive_reagent_kg(element: str, queries: Any) -> float:
@@ -756,12 +886,13 @@ def _process_unspent_additive_reagent_kg(element: str, queries: Any) -> float:
     ledger = getattr(queries, "ledger", None)
     reservoir_kg = 0.0
     if ledger is not None:
-        reservoir_kg = _non_negative_number(
+        reservoir_balance_kg = _finite_number(
             ledger.kg_by_account(f"reservoir.reagent.{element}").get(
                 element, 0.0
             ),
             f"reservoir.reagent.{element}",
         )
+        reservoir_kg = max(0.0, reservoir_balance_kg)
     return max(0.0, total_unspent_kg - reservoir_kg)
 
 

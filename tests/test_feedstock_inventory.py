@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -6,13 +7,18 @@ import yaml
 from simulator.core import PyrolysisSimulator
 from simulator.accounting import (
     AccountPolicy,
+    AccountingQueries,
     AccountingError,
     OverdraftError,
     resolve_species_formula,
 )
+from simulator.accounting.completeness import (
+    completion_contracts_from_setpoints,
+    vapor_contract_completeness,
+)
 from simulator.feedstock_guard import BlockedFeedstockError, is_blocked_feedstock
 from simulator.melt_backend.base import StubBackend
-from simulator.state import CampaignPhase
+from simulator.state import CampaignPhase, MOLAR_MASS
 
 
 def _sim(feedstocks):
@@ -24,6 +30,30 @@ def _sim(feedstocks):
         feedstocks,
         {"metals": {}, "oxide_vapors": {}},
     )
+
+
+def _sim_with_data(feedstocks):
+    data_dir = Path(__file__).parent.parent / "data"
+    backend = StubBackend()
+    backend.initialize({})
+    return PyrolysisSimulator(
+        backend,
+        yaml.safe_load((data_dir / "setpoints.yaml").read_text()),
+        feedstocks,
+        yaml.safe_load((data_dir / "vapor_pressures.yaml").read_text()),
+    )
+
+
+def _completion_contract(contract_id: str):
+    data_dir = Path(__file__).parent.parent / "data"
+    contracts = completion_contracts_from_setpoints(
+        yaml.safe_load((data_dir / "setpoints.yaml").read_text())
+    )
+    return {contract.contract_id: contract for contract in contracts}[contract_id]
+
+
+def _mol(species: str, kg: float) -> float:
+    return kg * 1000.0 / MOLAR_MASS[species]
 
 
 def test_builtin_feedstocks_initially_conserve_batch_mass():
@@ -1337,6 +1367,9 @@ def test_c3_recovered_condensate_reduces_credit_top_up_need():
     assert sim._c3_alkali_credit_outstanding_kg_by_species()["Na"] == (
         pytest.approx(4.0)
     )
+    assert sim._feedstock_recovered_reagent_kg_by_species["Na"] == pytest.approx(
+        8.0
+    )
     assert sim.atom_ledger.kg_by_account("reservoir.reagent.Na")[
         "Na"
     ] == pytest.approx(-4.0)
@@ -1349,6 +1382,112 @@ def test_c3_recovered_condensate_reduces_credit_top_up_need():
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
         "Na2O", 0.0
     ) == pytest.approx(cleaned_na2o_before)
+    sim.atom_ledger.assert_balanced()
+
+
+def test_feedstock_recovered_reagent_balance_decrements_on_k_consumption():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"FeO": 50.0, "SiO2": 50.0},
+            }
+        }
+    )
+    sim.setpoints.setdefault("campaigns", {}).setdefault("C3", {}).setdefault(
+        "alkali_dosing", {}
+    )["K_kg"] = 12.0
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={})
+    sim.atom_ledger.load_external(
+        "process.condensation_train",
+        {"K": 8.0},
+        source="test recovered K condensate",
+    )
+    sim._init_shuttle_inventory(CampaignPhase.C3_K)
+
+    sim.melt.campaign = CampaignPhase.C3_K
+    sim.melt.temperature_C = 800.0
+    sim._shuttle_inject_K(liquid_fraction=1.0)
+
+    consumed_kg = sim._shuttle_injected_this_hr
+    assert consumed_kg > 0.0
+    expected_feedstock_balance_kg = 8.0 - consumed_kg * (8.0 / 12.0)
+    assert sim._feedstock_recovered_reagent_kg_by_species["K"] == pytest.approx(
+        expected_feedstock_balance_kg
+    )
+    result = vapor_contract_completeness(
+        _completion_contract("C2A_continuous.K.vapor"),
+        AccountingQueries(sim),
+    )
+    assert result.denominator_target_equiv_mol == pytest.approx(_mol("K", 8.0))
+    assert result.denominator_target_equiv_mol < _mol(
+        "K",
+        8.0 + consumed_kg,
+    )
+    sim.atom_ledger.assert_balanced()
+
+
+def test_credit_line_k_product_route_is_removed_from_vapor_denominator():
+    sim = _sim_with_data(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"FeO": 50.0, "SiO2": 50.0},
+            }
+        }
+    )
+    sim.setpoints.setdefault("campaigns", {}).setdefault("C3", {}).setdefault(
+        "alkali_dosing", {}
+    )["K_kg"] = 9.0
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={})
+    sim._init_shuttle_inventory(CampaignPhase.C3_K)
+    sim.melt.campaign = CampaignPhase.C3_K
+    sim.melt.temperature_C = 800.0
+    sim._shuttle_inject_K(liquid_fraction=1.0)
+    assert sim.atom_ledger.kg_by_account("process.cleaned_melt").get(
+        "K2O",
+        0.0,
+    ) > 0.0
+
+    route_result = SimpleNamespace(
+        remaining_by_species={"K": 0.0},
+        wall_route_species_order=("K",),
+        wall_deposit_fraction_by_species={"K": 0.0},
+        wall_deposit_account_fractions_by_species={"K": {}},
+        condensed_for_species=lambda species: 0.01 if species == "K" else 0.0,
+        condensed_by_stage_species={4: {"K": 0.01}},
+        impurity_by_stage_species={4: {}},
+    )
+    sim._route_evaporated_species_to_condensation(route_result, "K", 0.01)
+
+    assert sim.atom_ledger.kg_by_account("process.condensation_train").get(
+        "K",
+        0.0,
+    ) > 0.0
+    result = vapor_contract_completeness(
+        _completion_contract("C2A_continuous.K.vapor"),
+        AccountingQueries(sim),
+    )
+    assert result.gross_product_target_equiv_mol > 0.0
+    assert result.product_target_equiv_mol == pytest.approx(0.0)
+    assert result.denominator_target_equiv_mol == pytest.approx(0.0)
+    assert result.completeness_fraction is None
+
+    assert sim._transfer_condensed_species("K") == pytest.approx(0.01)
+    assert sim.atom_ledger.kg_by_account("process.reagent_inventory").get(
+        "K",
+        0.0,
+    ) > 0.0
+    assert sim._feedstock_recovered_reagent_kg_by_species.get(
+        "K",
+        0.0,
+    ) == pytest.approx(0.0)
+    recycled = vapor_contract_completeness(
+        _completion_contract("C2A_continuous.K.vapor"),
+        AccountingQueries(sim),
+    )
+    assert recycled.denominator_target_equiv_mol == pytest.approx(0.0)
+    assert recycled.completeness_fraction is None
     sim.atom_ledger.assert_balanced()
 
 

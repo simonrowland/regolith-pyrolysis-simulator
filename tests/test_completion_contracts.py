@@ -51,9 +51,19 @@ class _FakeQueries:
         self,
         accounts: dict[str, dict[str, float]],
         reagents: dict[str, float] | None = None,
+        feedstock_recovered_reagents: dict[str, float] | None = None,
+        c3_credit_outstanding: dict[str, float] | None = None,
+        non_feedstock_reagent_element_by_account: (
+            dict[str, dict[str, float]] | None
+        ) = None,
     ) -> None:
         self.ledger = _FakeLedger(accounts)
         self._reagents = reagents or {}
+        self._feedstock_recovered_reagents = feedstock_recovered_reagents or {}
+        self._c3_credit_outstanding = c3_credit_outstanding or {}
+        self._non_feedstock_reagent_element_by_account = (
+            non_feedstock_reagent_element_by_account or {}
+        )
 
     def species_kg_by_accounts(self, accounts):
         values: dict[str, float] = {}
@@ -76,6 +86,22 @@ class _FakeQueries:
 
     def unspent_additive_reagents_kg(self) -> dict[str, float]:
         return dict(self._reagents)
+
+    def feedstock_recovered_reagents_kg(self) -> dict[str, float]:
+        return dict(self._feedstock_recovered_reagents)
+
+    def c3_alkali_credit_outstanding_kg_by_species(self) -> dict[str, float]:
+        return dict(self._c3_credit_outstanding)
+
+    def non_feedstock_reagent_element_kg_by_account(
+        self,
+    ) -> dict[str, dict[str, float]]:
+        return {
+            account: dict(element_kg)
+            for account, element_kg in (
+                self._non_feedstock_reagent_element_by_account
+            ).items()
+        }
 
 
 class _NoReagentSurfaceQueries:
@@ -244,14 +270,171 @@ def test_vapor_contract_counts_recovered_feedstock_reagent_not_additive() -> Non
                 "process.cleaned_melt": {},
             },
             {"unspent_Na_reagent": 10.0},
+            feedstock_recovered_reagents={"Na": 2.0},
         ),
     )
 
     recovered_mol = _mol("Na", 2.0)
     assert result.product_target_equiv_mol == pytest.approx(recovered_mol)
     assert result.reagent_target_equiv_mol == pytest.approx(recovered_mol)
+    assert result.feedstock_recovered_reagent_target_equiv_mol == pytest.approx(
+        recovered_mol
+    )
+    assert result.external_additive_reagent_target_equiv_mol == pytest.approx(
+        _mol("Na", 3.0)
+    )
     assert result.denominator_target_equiv_mol == pytest.approx(recovered_mol)
     assert result.completeness_fraction == pytest.approx(1.0)
+
+
+def test_vapor_contract_does_not_infer_recovered_reagent_from_inventory() -> None:
+    contract = _contracts_by_id()["C2A_continuous.Na.vapor"]
+
+    result = vapor_contract_completeness(
+        contract,
+        _FakeQueries(
+            {
+                "process.reagent_inventory": {"Na": 2.0},
+                "process.condensation_train": {},
+                "process.cleaned_melt": {},
+            },
+        ),
+    )
+
+    assert result.product_target_equiv_mol == pytest.approx(0.0)
+    assert result.reagent_target_equiv_mol == pytest.approx(0.0)
+    assert result.feedstock_recovered_reagent_target_equiv_mol == pytest.approx(0.0)
+    assert result.denominator_target_equiv_mol == pytest.approx(0.0)
+    assert result.completeness_fraction is None
+
+
+def test_vapor_contract_excludes_c3_credit_line_reagent() -> None:
+    contract = _contracts_by_id()["C2A_continuous.Na.vapor"]
+
+    result = vapor_contract_completeness(
+        contract,
+        _FakeQueries(
+            {
+                "process.reagent_inventory": {"Na": 5.0},
+                "reservoir.reagent.Na": {"Na": -5.0},
+                "process.condensation_train": {},
+                "process.cleaned_melt": {},
+            },
+            c3_credit_outstanding={"Na": 5.0},
+        ),
+    )
+
+    assert result.product_target_equiv_mol == pytest.approx(0.0)
+    assert result.reagent_target_equiv_mol == pytest.approx(0.0)
+    assert result.feedstock_recovered_reagent_target_equiv_mol == pytest.approx(0.0)
+    assert result.credit_line_reagent_target_equiv_mol == pytest.approx(
+        _mol("Na", 5.0)
+    )
+    assert result.denominator_target_equiv_mol == pytest.approx(0.0)
+    assert result.completeness_fraction is None
+
+
+def test_credit_line_diagnostic_subtracts_recovered_feedstock_balance() -> None:
+    contract = _contracts_by_id()["C2A_continuous.Na.vapor"]
+
+    result = vapor_contract_completeness(
+        contract,
+        _FakeQueries(
+            {
+                "process.reagent_inventory": {"Na": 8.0},
+                "reservoir.reagent.Na": {"Na": -20.0},
+                "process.condensation_train": {},
+                "process.cleaned_melt": {},
+            },
+            feedstock_recovered_reagents={"Na": 6.0},
+            c3_credit_outstanding={"Na": 20.0},
+        ),
+    )
+
+    assert result.credit_line_reagent_target_equiv_mol == pytest.approx(
+        _mol("Na", 2.0)
+    )
+
+
+def test_vapor_contract_preserves_harvested_then_recycled_denominator() -> None:
+    contract = _contracts_by_id()["C2A_continuous.Na.vapor"]
+
+    condensed = vapor_contract_completeness(
+        contract,
+        _FakeQueries({
+            "process.condensation_train": {"Na": 2.0},
+            "process.cleaned_melt": {},
+        }),
+    )
+    recycled = vapor_contract_completeness(
+        contract,
+        _FakeQueries(
+            {
+                "process.reagent_inventory": {"Na": 2.0},
+                "process.condensation_train": {},
+                "process.cleaned_melt": {},
+            },
+            feedstock_recovered_reagents={"Na": 2.0},
+        ),
+    )
+
+    assert recycled.product_target_equiv_mol == pytest.approx(
+        condensed.product_target_equiv_mol
+    )
+    assert recycled.denominator_target_equiv_mol == pytest.approx(
+        condensed.denominator_target_equiv_mol
+    )
+    assert recycled.completeness_fraction == pytest.approx(
+        condensed.completeness_fraction
+    )
+
+
+def test_vapor_contract_excludes_external_additive_reagent() -> None:
+    contract = _contracts_by_id()["C2A_continuous.Na.vapor"]
+
+    result = vapor_contract_completeness(
+        contract,
+        _FakeQueries(
+            {
+                "process.reagent_inventory": {"Na": 5.0},
+                "reservoir.reagent.Na": {"Na": 0.0},
+                "process.condensation_train": {},
+                "process.cleaned_melt": {},
+            },
+            {"unspent_Na_reagent": 5.0},
+        ),
+    )
+
+    assert result.product_target_equiv_mol == pytest.approx(0.0)
+    assert result.reagent_target_equiv_mol == pytest.approx(0.0)
+    assert result.external_additive_reagent_target_equiv_mol == pytest.approx(
+        _mol("Na", 5.0)
+    )
+    assert result.denominator_target_equiv_mol == pytest.approx(0.0)
+    assert result.completeness_fraction is None
+
+
+def test_vapor_contract_excludes_non_feedstock_reagent_product_atoms() -> None:
+    contract = _contracts_by_id()["C2A_continuous.Na.vapor"]
+
+    result = vapor_contract_completeness(
+        contract,
+        _FakeQueries(
+            {
+                "process.condensation_train": {"Na": 5.0},
+                "process.cleaned_melt": {},
+            },
+            c3_credit_outstanding={"Na": 5.0},
+            non_feedstock_reagent_element_by_account={
+                "process.condensation_train": {"Na": 5.0},
+            },
+        ),
+    )
+
+    assert result.gross_product_target_equiv_mol == pytest.approx(_mol("Na", 5.0))
+    assert result.product_target_equiv_mol == pytest.approx(0.0)
+    assert result.denominator_target_equiv_mol == pytest.approx(0.0)
+    assert result.completeness_fraction is None
 
 
 def test_vapor_contract_excludes_reagent_inventory_na2o_residue() -> None:

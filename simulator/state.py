@@ -1031,6 +1031,12 @@ class HourSnapshot:
     c3_alkali_credit_outstanding_kg_by_species: Dict[str, float] = field(default_factory=dict)
     # Net Na/K makeup still owed to the recycled C3 credit line
 
+    feedstock_recovered_reagent_kg_by_species: Dict[str, float] = field(default_factory=dict)
+    # Live feedstock-derived elemental reagent balance in process.reagent_inventory
+
+    non_feedstock_reagent_element_kg_by_account: Dict[str, Dict[str, float]] = field(default_factory=dict)
+    # Live additive/credit-derived target-element kg by ledger account
+
     shuttle_cycle: int = 0
     # Current inject-bakeout cycle number within the C3 phase
 

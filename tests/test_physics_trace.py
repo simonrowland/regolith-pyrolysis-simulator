@@ -251,3 +251,53 @@ def test_physics_trace_exposes_per_tick_delta_maps():
         trace.product_ledger_kg["SiO"] = 0.0
     with pytest.raises(TypeError):
         trace.condensed_by_stage_species_delta[0][(0, "SiO")] = 0.0
+
+
+def test_from_simulator_provenance_gate_matches_legacy_verdict():
+    """grok S2C-FOLDCHECK regression: from_simulator populated the provenance
+    surface WITHOUT completeness_fraction (it lives in the sibling
+    completeness_by_target_species dict), so the routed optimizer gate
+    fail-closed (feasible=False, "no result") on healthy runs the legacy
+    path scored feasible. The merged payload must make both paths agree.
+
+    The completeness diagnostic only populates when the campaign config
+    declares target_species, so this builds its own C2A sim with Na/K
+    targets instead of using _representative_sim()."""
+    from simulator.optimize.physics import PhysicsConstraintSet
+
+    feedstocks = _load_data_yaml("feedstocks.yaml")
+    setpoints = dict(_load_data_yaml("setpoints.yaml"))
+    vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
+    kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
+    kernel_config["allow_fallback_vapor"] = True
+    kernel_config["allow_unmeasured_alpha_fallback"] = True
+    setpoints["chemistry_kernel"] = kernel_config
+    campaigns = dict(setpoints.get("campaigns", {}) or {})
+    c2a = dict(campaigns.get("C2A", {}) or {})
+    c2a["target_species"] = ["Na", "K"]
+    campaigns["C2A"] = c2a
+    setpoints["campaigns"] = campaigns
+
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
+    sim.load_batch("mars_basalt", mass_kg=1000.0, additives_kg={"C": 30.0})
+    sim.start_campaign(CampaignPhase.C2A)
+    for _ in range(8):
+        sim.step()
+    trace = PhysicsTrace.from_simulator(sim)
+
+    provenance = dict(trace.extraction_completeness_by_target)
+    assert provenance, "representative run must emit per-target provenance"
+    # The bug signature: entries lacked the fraction key entirely.
+    for target, entry in provenance.items():
+        assert "completeness_fraction" in entry, target
+
+    targets = tuple(sorted(provenance))
+    constraints = PhysicsConstraintSet(target_species=targets)
+    provenance_margin = constraints.extraction_completeness(trace)
+    legacy_trace = replace(trace, extraction_completeness_by_target={})
+    legacy_margin = constraints.extraction_completeness(legacy_trace)
+
+    assert "fail-closed: no result" not in provenance_margin.detail
+    assert provenance_margin.feasible == legacy_margin.feasible

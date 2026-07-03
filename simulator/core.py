@@ -559,6 +559,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
+        self._feedstock_recovered_reagent_kg_by_species: Dict[str, float] = {}
+        self._non_feedstock_reagent_element_kg_by_account: Dict[
+            str, Dict[str, float]
+        ] = {}
         self._redox_source_terms_this_hr: Dict[str, float] = {}
         self._redox_source_context_this_hr: Dict[str, Any] = {}
         self._redox_source_delta_ln_this_hr = 0.0
@@ -826,6 +830,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_shuttle_refusal_diagnostic = {}
         self._shuttle_refusal_history = []
         self._c3_alkali_credit_drawn_kg_by_species = {}
+        self._feedstock_recovered_reagent_kg_by_species = {}
+        self._non_feedstock_reagent_element_kg_by_account = {}
         self._equipment = None
         self._configure_overhead_headspace()
         self._configure_freeze_gate()
@@ -1516,7 +1522,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         thin pass-through.
         """
         kernel = self._require_chem_kernel()
+        balances_before = self.atom_ledger.kg_by_account()
         transition = kernel.commit_batch(intent, proposal)
+        self._observe_reagent_provenance_transition(
+            transition,
+            balances_before,
+        )
         self._observe_cost_transition_best_effort(
             intent=intent,
             transition=transition,
@@ -1526,6 +1537,212 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             strict=False,
         )
         return transition
+
+    def _observe_reagent_provenance_transition(
+        self,
+        transition: LedgerTransition,
+        balances_before: Mapping[str, Mapping[str, float]],
+    ) -> None:
+        non_feedstock_source_kg: Dict[str, float] = {}
+        for lot in transition.debits:
+            account = str(lot.account)
+            account_before = balances_before.get(account, {}) or {}
+            if account == 'process.reagent_inventory':
+                for species, kg in lot.species_kg.items():
+                    reagent = str(species)
+                    debited_kg = max(0.0, float(kg))
+                    if debited_kg <= 1.0e-12:
+                        continue
+                    total_before_kg = max(
+                        0.0,
+                        float(account_before.get(reagent, 0.0) or 0.0),
+                    )
+                    feedstock_kg = self._consume_feedstock_recovered_reagent(
+                        reagent,
+                        debited_kg,
+                        total_before_kg,
+                    )
+                    non_feedstock_kg = max(0.0, debited_kg - feedstock_kg)
+                    if non_feedstock_kg > 1.0e-12:
+                        non_feedstock_source_kg[reagent] = (
+                            non_feedstock_source_kg.get(reagent, 0.0)
+                            + non_feedstock_kg
+                        )
+                continue
+            tracked = getattr(
+                self,
+                '_non_feedstock_reagent_element_kg_by_account',
+                {},
+            )
+            account_tracked = tracked.get(account, {}) if isinstance(tracked, dict) else {}
+            for element in tuple(account_tracked):
+                debited_element_kg = self._transition_lot_element_kg(
+                    lot,
+                    element,
+                )
+                if debited_element_kg <= 1.0e-12:
+                    continue
+                total_element_kg = self._account_element_kg(
+                    account_before,
+                    element,
+                )
+                moved_kg = self._consume_non_feedstock_reagent_element(
+                    account,
+                    element,
+                    debited_element_kg,
+                    total_element_kg,
+                )
+                if moved_kg > 1.0e-12:
+                    non_feedstock_source_kg[element] = (
+                        non_feedstock_source_kg.get(element, 0.0) + moved_kg
+                    )
+        for element, source_kg in non_feedstock_source_kg.items():
+            self._credit_non_feedstock_reagent_element(
+                transition,
+                element,
+                source_kg,
+            )
+
+    def _consume_feedstock_recovered_reagent(
+        self,
+        species: str,
+        debited_kg: float,
+        total_before_kg: float,
+    ) -> float:
+        balances = getattr(self, '_feedstock_recovered_reagent_kg_by_species', None)
+        if not isinstance(balances, dict):
+            balances = {}
+            self._feedstock_recovered_reagent_kg_by_species = balances
+        live_kg = max(0.0, float(balances.get(species, 0.0) or 0.0))
+        if live_kg <= 1.0e-12 or debited_kg <= 1.0e-12 or total_before_kg <= 1.0e-12:
+            return 0.0
+        live_kg = min(live_kg, total_before_kg)
+        consumed_kg = min(live_kg, debited_kg * live_kg / total_before_kg)
+        remaining_kg = max(0.0, float(balances.get(species, 0.0) or 0.0) - consumed_kg)
+        if remaining_kg <= 1.0e-12:
+            balances.pop(species, None)
+        else:
+            balances[species] = remaining_kg
+        return consumed_kg
+
+    def _consume_non_feedstock_reagent_element(
+        self,
+        account: str,
+        element: str,
+        debited_element_kg: float,
+        total_element_kg: float,
+    ) -> float:
+        balances = getattr(
+            self,
+            '_non_feedstock_reagent_element_kg_by_account',
+            None,
+        )
+        if not isinstance(balances, dict):
+            balances = {}
+            self._non_feedstock_reagent_element_kg_by_account = balances
+        account_balances = balances.get(account, {})
+        if not isinstance(account_balances, dict):
+            return 0.0
+        live_kg = max(0.0, float(account_balances.get(element, 0.0) or 0.0))
+        if live_kg <= 1.0e-12 or debited_element_kg <= 1.0e-12 or total_element_kg <= 1.0e-12:
+            return 0.0
+        live_kg = min(live_kg, total_element_kg)
+        consumed_kg = min(live_kg, debited_element_kg * live_kg / total_element_kg)
+        remaining_kg = max(
+            0.0,
+            float(account_balances.get(element, 0.0) or 0.0) - consumed_kg,
+        )
+        if remaining_kg <= 1.0e-12:
+            account_balances.pop(element, None)
+        else:
+            account_balances[element] = remaining_kg
+        if not account_balances:
+            balances.pop(account, None)
+        return consumed_kg
+
+    def _credit_non_feedstock_reagent_element(
+        self,
+        transition: LedgerTransition,
+        element: str,
+        source_kg: float,
+    ) -> None:
+        credit_element_kg: list[tuple[str, float]] = []
+        for lot in transition.credits:
+            kg = self._transition_lot_element_kg(lot, element)
+            if kg > 1.0e-12:
+                credit_element_kg.append((str(lot.account), kg))
+        total_credit_kg = sum(kg for _account, kg in credit_element_kg)
+        if source_kg <= 1.0e-12 or total_credit_kg <= 1.0e-12:
+            return
+        for account, kg in credit_element_kg:
+            self._add_non_feedstock_reagent_element(
+                account,
+                element,
+                source_kg * kg / total_credit_kg,
+            )
+
+    def _add_non_feedstock_reagent_element(
+        self,
+        account: str,
+        element: str,
+        kg: float,
+    ) -> None:
+        if kg <= 1.0e-12:
+            return
+        balances = getattr(
+            self,
+            '_non_feedstock_reagent_element_kg_by_account',
+            None,
+        )
+        if not isinstance(balances, dict):
+            balances = {}
+            self._non_feedstock_reagent_element_kg_by_account = balances
+        account_balances = balances.setdefault(str(account), {})
+        account_balances[str(element)] = (
+            float(account_balances.get(str(element), 0.0) or 0.0)
+            + float(kg)
+        )
+
+    def _transition_lot_element_kg(self, lot: Any, element: str) -> float:
+        return self._species_mapping_element_kg(lot.species_kg, element)
+
+    def _account_element_kg(
+        self,
+        species_kg: Mapping[str, float],
+        element: str,
+    ) -> float:
+        return self._species_mapping_element_kg(species_kg, element)
+
+    def _species_mapping_element_kg(
+        self,
+        species_kg: Mapping[str, float],
+        element: str,
+    ) -> float:
+        total_kg = 0.0
+        for species, kg in species_kg.items():
+            amount_kg = max(0.0, float(kg or 0.0))
+            if amount_kg <= 1.0e-12:
+                continue
+            total_kg += self._species_element_kg(str(species), element, amount_kg)
+        return total_kg
+
+    def _species_element_kg(
+        self,
+        species: str,
+        element: str,
+        species_kg: float,
+    ) -> float:
+        formula = resolve_species_formula(species, self.species_formula_registry)
+        count = float(formula.elements.get(element, 0.0) or 0.0)
+        if count <= 0.0:
+            return 0.0
+        element_formula = resolve_species_formula(element, self.species_formula_registry)
+        return (
+            float(species_kg)
+            * count
+            * element_formula.molar_mass_kg_per_mol()
+            / formula.molar_mass_kg_per_mol()
+        )
 
     def _cleaned_melt_reduction_source_terms_from_transition(
         self,
@@ -7387,6 +7604,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 product_mol = residual_mol = denom_mol = None
                 wall_mol = reagent_mol = gross_product_mol = None
                 contract_id = ""
+                feedstock_recovered_reagent_mol = None
+                credit_line_reagent_mol = None
+                external_additive_reagent_mol = None
+                denominator_basis_source = None
             else:
                 fraction = result.completeness_fraction
                 reason = result.reason
@@ -7397,6 +7618,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 reagent_mol = result.reagent_target_equiv_mol
                 gross_product_mol = result.gross_product_target_equiv_mol
                 contract_id = result.contract_id
+                feedstock_recovered_reagent_mol = (
+                    result.feedstock_recovered_reagent_target_equiv_mol
+                )
+                credit_line_reagent_mol = result.credit_line_reagent_target_equiv_mol
+                external_additive_reagent_mol = (
+                    result.external_additive_reagent_target_equiv_mol
+                )
+                denominator_basis_source = result.denominator_basis_source
             completeness[target] = fraction
             detail[target] = {
                 "product_target_equiv_mol": product_mol,
@@ -7406,6 +7635,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 "reagent_target_equiv_mol": reagent_mol,
                 "gross_product_target_equiv_mol": gross_product_mol,
                 "contract_id": contract_id,
+                "feedstock_recovered_reagent_target_equiv_mol": (
+                    feedstock_recovered_reagent_mol
+                ),
+                "credit_line_reagent_target_equiv_mol": credit_line_reagent_mol,
+                "external_additive_reagent_target_equiv_mol": (
+                    external_additive_reagent_mol
+                ),
+                "denominator_basis_source": denominator_basis_source,
                 "reason": reason,
             }
             if fraction is None:
@@ -8274,6 +8511,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             c3_alkali_credit_outstanding_kg_by_species=(
                 self._c3_alkali_credit_outstanding_kg_by_species()
             ),
+            feedstock_recovered_reagent_kg_by_species=dict(
+                getattr(
+                    self,
+                    '_feedstock_recovered_reagent_kg_by_species',
+                    {},
+                ) or {}
+            ),
+            non_feedstock_reagent_element_kg_by_account={
+                str(account): dict(element_kg)
+                for account, element_kg in (
+                    getattr(
+                        self,
+                        '_non_feedstock_reagent_element_kg_by_account',
+                        {},
+                    ) or {}
+                ).items()
+            },
             shuttle_cycle=(self.shuttle_cycle_K
                            if self.melt.campaign == CampaignPhase.C3_K
                            else self.shuttle_cycle_Na),

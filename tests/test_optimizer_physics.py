@@ -87,6 +87,9 @@ def _trace(
     wall: tuple[dict[tuple[str, str], float], ...] | None = None,
     wall_zone_by_segment: dict[str, str] | None = None,
     wall_deposit_sticking_authority: dict[str, object] | None = None,
+    extraction_completeness_by_target: (
+        dict[str, dict[str, object]] | None
+    ) = None,
     temperature_C: float = 1600.0,
     knudsen_number: float = 0.001,
     ) -> PhysicsTrace:
@@ -109,6 +112,9 @@ def _trace(
         wall_deposit_by_segment_species_delta=wall_delta,
         wall_zone_by_segment=inferred_zones,
         wall_deposit_sticking_authority=wall_deposit_sticking_authority or {},
+        extraction_completeness_by_target=(
+            extraction_completeness_by_target or {}
+        ),
     )
 
 
@@ -747,6 +753,44 @@ def test_extraction_completeness_uses_per_species_minimum() -> None:
     assert tight_margin.threshold.value == pytest.approx(0.95)
 
 
+def test_extraction_completeness_gate_uses_provenance_trace_surface() -> None:
+    constraints = PhysicsConstraintSet(
+        target_species=("K",),
+        residual_species_by_target={"K": ("K2O", "K")},
+    )
+    trace = _trace(
+        condensed=({(4, "K"): 1.0},),
+        products={"K": MOLAR_MASS["K"] / 1000.0},
+        rump={"K2O": MOLAR_MASS["K2O"] / 1000.0},
+        extraction_completeness_by_target={
+            "K": {
+                "completeness_fraction": None,
+                "product_target_equiv_mol": 0.0,
+                "residual_target_equiv_mol": 0.0,
+                "denominator_target_equiv_mol": 0.0,
+                "reason": "no target-equivalent mol evidence",
+                "gross_product_target_equiv_mol": 1.0,
+                "credit_line_reagent_target_equiv_mol": 1.0,
+                "denominator_basis_source": (
+                    "feedstock_derived_product_residual_wall_excluding_"
+                    "credit_line_and_external_additives"
+                ),
+            },
+        },
+    )
+
+    margin = constraints.extraction_completeness(trace)
+    report = extraction_completeness_report(trace, constraints)
+
+    assert not margin.feasible
+    assert "no target-equivalent mol evidence" in margin.detail
+    target = report["targets"]["K"]
+    assert target["gross_product_target_equiv_mol"] == pytest.approx(1.0)
+    assert target["product_target_equiv_mol"] is None
+    assert target["credit_line_reagent_target_equiv_mol"] is None
+    assert report["status"] == "insufficient-evidence"
+
+
 def test_per_species_extraction_thresholds_must_cover_targets() -> None:
     threshold = ThresholdSpec(
         id="extraction_completeness_min[Fe]",
@@ -797,6 +841,12 @@ def test_extraction_completeness_reports_target_denominator_residual_and_product
     assert target["product_target_equiv_mol"] == pytest.approx(1.0)
     assert target["residual_target_equiv_mol"] == pytest.approx(2.0)
     assert target["denominator_target_equiv_mol"] == pytest.approx(3.0)
+    assert target["feedstock_recovered_reagent_target_equiv_mol"] == pytest.approx(
+        0.0
+    )
+    assert target["credit_line_reagent_target_equiv_mol"] == pytest.approx(0.0)
+    assert target["external_additive_reagent_target_equiv_mol"] == pytest.approx(0.0)
+    assert target["denominator_basis_source"] == "product_plus_residual"
 
     missing = extraction_completeness_report(
         _trace(condensed=({(1, "Cr"): 1.0},), products={}, rump={}),

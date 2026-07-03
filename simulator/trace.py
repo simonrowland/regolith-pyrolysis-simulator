@@ -74,6 +74,9 @@ class PhysicsTrace:
     wall_deposit_by_segment_species_delta: tuple[
         Mapping[tuple[str, str], float], ...] = ()
     impurity_delta: tuple[Mapping[tuple[int, str], float], ...] = ()
+    extraction_completeness_by_target: Mapping[str, Mapping[str, Any]] = field(
+        default_factory=dict
+    )
 
     @classmethod
     def from_simulator(cls, sim: Any) -> "PhysicsTrace":
@@ -94,6 +97,31 @@ class PhysicsTrace:
             "last_sticking_alpha_provenance_notice",
             {},
         ) or {}
+        extraction_diag = (
+            getattr(sim, "_last_extraction_completeness_diagnostic", {}) or {}
+        )
+        extraction_by_target = extraction_diag.get("detail_by_target_species", {})
+        if not isinstance(extraction_by_target, Mapping):
+            extraction_by_target = {}
+        # The diagnostic stores the per-target fraction in the SIBLING
+        # completeness_by_target_species dict; the provenance-aware optimizer
+        # gate reads completeness_fraction from each per-target entry, so the
+        # two must be merged here or every real-trace eval fail-closes
+        # (grok S2C-FOLDCHECK: legacy feasible=True 0.99 vs provenance-path
+        # feasible=False on the same healthy run).
+        completeness_by_target = extraction_diag.get(
+            "completeness_by_target_species", {}
+        )
+        if not isinstance(completeness_by_target, Mapping):
+            completeness_by_target = {}
+        extraction_by_target = {
+            str(target): {
+                **dict(entry),
+                "completeness_fraction": completeness_by_target.get(target),
+            }
+            for target, entry in extraction_by_target.items()
+            if isinstance(entry, Mapping)
+        }
         return cls(
             snapshots=snapshots,
             product_ledger_kg=_freeze_mapping(queries.product_ledger()),
@@ -125,6 +153,9 @@ class PhysicsTrace:
                 _freeze_mapping(snapshot.impurity_delta)
                 for snapshot in snapshots
             ),
+            extraction_completeness_by_target=_freeze_nested_mapping(
+                extraction_by_target
+            ),
         )
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
@@ -144,6 +175,7 @@ class PhysicsTrace:
                 _thaw_value(self.condensed_by_stage_species_delta),
                 _thaw_value(self.wall_deposit_by_segment_species_delta),
                 _thaw_value(self.impurity_delta),
+                _thaw_value(self.extraction_completeness_by_target),
             ),
         )
 

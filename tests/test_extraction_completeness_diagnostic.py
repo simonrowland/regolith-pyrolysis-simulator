@@ -110,6 +110,19 @@ def test_c2a_completion_contracts_and_aggregate_are_monotonic() -> None:
             assert (
                 diag["detail_by_target_species"][target]["contract_id"]
             )
+            assert (
+                diag["detail_by_target_species"][target][
+                    "denominator_basis_source"
+                ]
+                == "feedstock_derived_product_residual_wall_excluding_credit_line_"
+                "and_external_additives"
+            )
+            assert (
+                diag["detail_by_target_species"][target][
+                    "credit_line_reagent_target_equiv_mol"
+                ]
+                == pytest.approx(0.0)
+            )
             if target in previous_by_target:
                 assert fraction + EPS >= previous_by_target[target]
             previous_by_target[target] = fraction

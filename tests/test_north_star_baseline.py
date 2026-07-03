@@ -27,7 +27,7 @@ import yaml
 
 from simulator.backends import BackendSelectionPolicy
 from simulator.session import SimSession, SimSessionConfig
-from simulator.state import CampaignPhase
+from simulator.state import CampaignPhase, MOLAR_MASS
 
 # Heavy real-backend c2a baseline runs: spuriously SIGALRM/timeout when xdist
 # co-schedules them under resource contention. Run them serially (pyproject
@@ -83,6 +83,21 @@ def _run_for_hours(session: SimSession, hours: int) -> list:
         sim.step()
         snapshots.append(session.snapshot())
     return snapshots
+
+
+def _cleaned_melt_target_equiv_mol(sim, target: str) -> float:
+    cleaned = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    if target == "Na":
+        return (
+            cleaned.get("Na", 0.0) * 1000.0 / MOLAR_MASS["Na"]
+            + cleaned.get("Na2O", 0.0) * 1000.0 / MOLAR_MASS["Na2O"] * 2.0
+        )
+    if target == "K":
+        return (
+            cleaned.get("K", 0.0) * 1000.0 / MOLAR_MASS["K"]
+            + cleaned.get("K2O", 0.0) * 1000.0 / MOLAR_MASS["K2O"] * 2.0
+        )
+    raise AssertionError(f"unsupported target {target}")
 
 
 # ---------------------------------------------------------------------------
@@ -169,6 +184,66 @@ def test_product_ledger_surface_callable_during_c2a_run():
         assert kg >= 0.0, (
             f"product_ledger returned negative mass for "
             f"{species}: {kg}"
+        )
+
+
+def test_e1b_na_k_denominator_matches_cleaned_melt_basis_and_ignores_c3_credit():
+    def diagnostic_with_optional_credit(draw_credit: bool):
+        setpoints = _load_yaml("setpoints.yaml")
+        if draw_credit:
+            dosing = setpoints.setdefault("campaigns", {}).setdefault(
+                "C3", {}
+            ).setdefault("alkali_dosing", {})
+            dosing["Na_kg"] = 12.0
+            dosing["K_kg"] = 4.0
+        session = SimSession().start(_config(campaign="C2A", setpoints=setpoints))
+        sim = session.simulator
+        expected_basis = {
+            target: _cleaned_melt_target_equiv_mol(sim, target)
+            for target in ("Na", "K")
+        }
+        atoms_flowed = False
+        if draw_credit:
+            sim._top_up_c3_alkali_credit("Na")
+            sim._top_up_c3_alkali_credit("K")
+            sim.melt.campaign = CampaignPhase.C3_K
+            sim.melt.temperature_C = 800.0
+            sim._shuttle_inject_K(liquid_fraction=1.0)
+            sim.melt.campaign = CampaignPhase.C3_NA
+            sim.melt.temperature_C = 1150.0
+            sim._shuttle_inject_Na(
+                target_stage="feo_cleanup",
+                liquid_fraction=1.0,
+            )
+            atoms_flowed = sim._shuttle_injected_this_hr > 0.0
+            sim.atom_ledger.assert_balanced()
+        sim.melt.campaign = CampaignPhase.C2A
+        sim._update_extraction_completeness_diagnostic()
+        return expected_basis, sim._last_extraction_completeness_diagnostic, atoms_flowed
+
+    base_basis, base_diag, _base_flowed = diagnostic_with_optional_credit(False)
+    credit_basis, credit_diag, credit_flowed = diagnostic_with_optional_credit(True)
+
+    assert credit_flowed
+
+    for target in ("Na", "K"):
+        base_detail = base_diag["detail_by_target_species"][target]
+        credit_detail = credit_diag["detail_by_target_species"][target]
+        assert base_detail["denominator_target_equiv_mol"] == pytest.approx(
+            base_basis[target]
+        )
+        assert credit_detail["denominator_target_equiv_mol"] == pytest.approx(
+            credit_basis[target]
+        )
+        assert credit_detail["denominator_target_equiv_mol"] == pytest.approx(
+            base_detail["denominator_target_equiv_mol"]
+        )
+        assert credit_detail["reagent_target_equiv_mol"] == pytest.approx(0.0)
+        assert credit_detail["credit_line_reagent_target_equiv_mol"] > 0.0
+        assert (
+            credit_detail["denominator_basis_source"]
+            == "feedstock_derived_product_residual_wall_excluding_credit_line_"
+            "and_external_additives"
         )
 
 

@@ -203,6 +203,58 @@ class AccountingQueries:
             if float(kg) > 0.0
         }
 
+    def feedstock_recovered_reagents_kg(self) -> dict[str, float]:
+        values = getattr(self.sim, "_feedstock_recovered_reagent_kg_by_species", {})
+        if not isinstance(values, Mapping):
+            raise AccountingError(
+                "feedstock recovered reagent surface is not a mapping"
+            )
+        return {
+            str(species): float(kg)
+            for species, kg in values.items()
+            if float(kg) > 0.0
+        }
+
+    def non_feedstock_reagent_element_kg_by_account(
+        self,
+    ) -> dict[str, dict[str, float]]:
+        values = getattr(
+            self.sim,
+            "_non_feedstock_reagent_element_kg_by_account",
+            {},
+        )
+        if not isinstance(values, Mapping):
+            raise AccountingError(
+                "non-feedstock reagent provenance surface is not a mapping"
+            )
+        result: dict[str, dict[str, float]] = {}
+        for account, element_kg in values.items():
+            if not isinstance(element_kg, Mapping):
+                raise AccountingError(
+                    "non-feedstock reagent provenance account is not a mapping"
+                )
+            cleaned = {
+                str(element): float(kg)
+                for element, kg in element_kg.items()
+                if float(kg) > 0.0
+            }
+            if cleaned:
+                result[str(account)] = cleaned
+        return result
+
+    def c3_alkali_credit_outstanding_kg_by_species(self) -> dict[str, float]:
+        getter = getattr(self.sim, "_c3_alkali_credit_outstanding_kg_by_species", None)
+        if not callable(getter):
+            return {}
+        values = getter()
+        if not isinstance(values, Mapping):
+            raise AccountingError("C3 alkali credit surface is not a mapping")
+        return {
+            str(species): float(kg)
+            for species, kg in values.items()
+            if float(kg) > 0.0
+        }
+
     def terminal_rump_by_species(self) -> dict[str, float]:
         species_kg: dict[str, float] = {}
         for account in TERMINAL_RUMP_ACCOUNTS:

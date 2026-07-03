@@ -296,6 +296,19 @@ class ExtractionMixin:
             self._c3_alkali_credit_drawn_kg_by_species = drawn
         drawn[species] = float(drawn.get(species, 0.0)) + float(kg)
 
+    def _record_feedstock_recovered_reagent(self, species: str, kg: float) -> None:
+        if kg <= self._LEDGER_KG_TOL:
+            return
+        recovered = getattr(
+            self,
+            '_feedstock_recovered_reagent_kg_by_species',
+            None,
+        )
+        if not isinstance(recovered, dict):
+            recovered = {}
+            self._feedstock_recovered_reagent_kg_by_species = recovered
+        recovered[species] = float(recovered.get(species, 0.0)) + float(kg)
+
     def _c3_alkali_credit_outstanding_kg_by_species(self) -> dict[str, float]:
         outstanding: dict[str, float] = {}
         for species in ('Na', 'K'):
@@ -1287,6 +1300,16 @@ class ExtractionMixin:
             species=species,
             quantity_kg=moved_kg,
             reason=f'recovered {species} condensate transfer',
+        )
+        non_feedstock_moved_kg = self._consume_non_feedstock_reagent_element(
+            source_account,
+            species,
+            moved_kg,
+            recovered_kg,
+        )
+        self._record_feedstock_recovered_reagent(
+            species,
+            max(0.0, moved_kg - non_feedstock_moved_kg),
         )
         if species == 'K':
             self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
