@@ -470,6 +470,7 @@ class OxygenReservoirState:
     redox_source_net_mol_o2_equiv: float = 0.0
     redox_source_delta_ln_fO2: float = 0.0
     redox_source_delta_log10_fO2: float = 0.0
+    redox_source_refusal_context: Dict[str, Any] = field(default_factory=dict)
     ferric_divergence: Dict[str, Any] = field(default_factory=dict)
 
 

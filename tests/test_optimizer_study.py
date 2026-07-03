@@ -1453,7 +1453,10 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
     )
     new_digest, new_recipe_id, new_cache_key = build_for_version(current_version)
 
-    assert current_version == "physics-feasibility-v2-coating-gate"
+    # v3 2026-07-03: bumped when the extraction_completeness gate flipped to
+    # the S2c provenance-aware trace surface (milestone-3 L2-P2 — pre-S2c
+    # cached feasibility verdicts must not be served under the same digest).
+    assert current_version == "physics-feasibility-v3-provenance-completeness"
     assert old_digest != new_digest
     assert old_cache_key != new_cache_key
     assert old_recipe_id == new_recipe_id

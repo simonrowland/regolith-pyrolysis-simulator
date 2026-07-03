@@ -2719,7 +2719,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return (total_fe_mol / 4.0) * derivative
 
     def _sync_oxygen_reservoir_mirror(self) -> None:
-        fO2_log = float(self.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
+        fO2_log = self._finite_oxygen_reservoir_fO2_log(
+            self.melt.oxygen_reservoir.melt_intrinsic_fO2_log,
+            context='sync_oxygen_reservoir_mirror',
+            source_terms_mol_o2_equiv=getattr(
+                self,
+                '_redox_source_terms_this_hr',
+                {},
+            ),
+        )
         self.melt.fO2_log = fO2_log
         self.melt.melt_fO2_log = fO2_log
 
@@ -2732,15 +2740,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             raw = -9.0
         try:
             fO2_log = float(raw)
-        except (TypeError, ValueError) as exc:
-            raise AccountingError(
-                'authoritative melt_intrinsic_fO2_log must be finite; '
-                f'got {raw!r}'
-            ) from exc
+        except (TypeError, ValueError):
+            self._raise_nonfinite_oxygen_reservoir_fO2(
+                raw,
+                context='current_melt_redox_fO2_log',
+            )
         if not math.isfinite(fO2_log):
-            raise AccountingError(
-                'authoritative melt_intrinsic_fO2_log must be finite; '
-                f'got {raw!r}'
+            self._raise_nonfinite_oxygen_reservoir_fO2(
+                raw,
+                context='current_melt_redox_fO2_log',
             )
         return fO2_log
 
@@ -2762,6 +2770,136 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'got {raw!r}'
             )
         return reference_T_K
+
+    def _oxygen_reservoir_guard_context(
+        self,
+        *,
+        context: str,
+        source_terms_mol_o2_equiv: Mapping[str, float] | None = None,
+        net_o2_equiv_mol: float | None = None,
+        melt_redox_capacity_mol_per_ln_fO2: float | None = None,
+        delta_ln_fO2: float | None = None,
+        candidate_fO2_log: float | None = None,
+    ) -> Dict[str, Any]:
+        def _json_safe_number(value: object) -> object:
+            try:
+                number = float(value)
+            except (TypeError, ValueError):
+                return repr(value)
+            if math.isfinite(number):
+                return number
+            return repr(value)
+
+        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+        head_o2_mol = float(
+            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+            or 0.0
+        )
+        payload: Dict[str, Any] = {
+            'context': str(context),
+            'temperature_C': float(getattr(self.melt, 'temperature_C', 0.0) or 0.0),
+            'temperature_K': float(getattr(self.melt, 'temperature_C', 0.0) or 0.0)
+            + 273.15,
+            'headspace_o2_mol': head_o2_mol,
+            'reservoir_fO2_log': _json_safe_number(
+                getattr(reservoir, 'melt_intrinsic_fO2_log', None)
+            ),
+            'reference_T_K': _json_safe_number(
+                getattr(reservoir, 'reference_T_K', None)
+            ),
+            'headspace_ledger_pO2_bar': _json_safe_number(
+                getattr(reservoir, 'headspace_ledger_pO2_bar', None)
+            ),
+            'headspace_transport_pO2_bar': _json_safe_number(
+                getattr(reservoir, 'headspace_transport_pO2_bar', None)
+            ),
+            'headspace_control_floor_pO2_bar': _json_safe_number(
+                getattr(reservoir, 'headspace_control_floor_pO2_bar', None)
+            ),
+            'exchange_direction': getattr(reservoir, 'exchange_direction', ''),
+        }
+        if source_terms_mol_o2_equiv is not None:
+            payload['source_terms_mol_o2_equiv'] = {
+                str(label): _json_safe_number(mol)
+                for label, mol in source_terms_mol_o2_equiv.items()
+            }
+        if net_o2_equiv_mol is not None:
+            payload['net_o2_equiv_mol'] = _json_safe_number(net_o2_equiv_mol)
+        if melt_redox_capacity_mol_per_ln_fO2 is not None:
+            payload['melt_redox_capacity_mol_per_ln_fO2'] = _json_safe_number(
+                melt_redox_capacity_mol_per_ln_fO2
+            )
+        if delta_ln_fO2 is not None:
+            payload['delta_ln_fO2'] = _json_safe_number(delta_ln_fO2)
+        if candidate_fO2_log is not None:
+            payload['candidate_fO2_log'] = _json_safe_number(candidate_fO2_log)
+        return payload
+
+    def _raise_nonfinite_oxygen_reservoir_fO2(
+        self,
+        raw: object,
+        *,
+        context: str,
+        source_terms_mol_o2_equiv: Mapping[str, float] | None = None,
+        net_o2_equiv_mol: float | None = None,
+        melt_redox_capacity_mol_per_ln_fO2: float | None = None,
+        delta_ln_fO2: float | None = None,
+        candidate_fO2_log: float | None = None,
+    ) -> None:
+        attribution = self._oxygen_reservoir_guard_context(
+            context=context,
+            source_terms_mol_o2_equiv=source_terms_mol_o2_equiv,
+            net_o2_equiv_mol=net_o2_equiv_mol,
+            melt_redox_capacity_mol_per_ln_fO2=melt_redox_capacity_mol_per_ln_fO2,
+            delta_ln_fO2=delta_ln_fO2,
+            candidate_fO2_log=candidate_fO2_log,
+        )
+        raise AccountingError(
+            'authoritative melt_intrinsic_fO2_log must be finite; '
+            f'got {raw!r}; attribution={attribution!r}'
+        )
+
+    def _finite_oxygen_reservoir_fO2_log(
+        self,
+        raw: object,
+        *,
+        context: str,
+        source_terms_mol_o2_equiv: Mapping[str, float] | None = None,
+        net_o2_equiv_mol: float | None = None,
+        melt_redox_capacity_mol_per_ln_fO2: float | None = None,
+        delta_ln_fO2: float | None = None,
+        candidate_fO2_log: float | None = None,
+    ) -> float:
+        try:
+            fO2_log = float(raw)
+        except (TypeError, ValueError):
+            self._raise_nonfinite_oxygen_reservoir_fO2(
+                raw,
+                context=context,
+                source_terms_mol_o2_equiv=source_terms_mol_o2_equiv,
+                net_o2_equiv_mol=net_o2_equiv_mol,
+                melt_redox_capacity_mol_per_ln_fO2=(
+                    melt_redox_capacity_mol_per_ln_fO2
+                ),
+                delta_ln_fO2=delta_ln_fO2,
+                candidate_fO2_log=candidate_fO2_log,
+            )
+        if not math.isfinite(fO2_log):
+            self._raise_nonfinite_oxygen_reservoir_fO2(
+                raw,
+                context=context,
+                source_terms_mol_o2_equiv=source_terms_mol_o2_equiv,
+                net_o2_equiv_mol=net_o2_equiv_mol,
+                melt_redox_capacity_mol_per_ln_fO2=(
+                    melt_redox_capacity_mol_per_ln_fO2
+                ),
+                delta_ln_fO2=delta_ln_fO2,
+                candidate_fO2_log=candidate_fO2_log,
+            )
+        return fO2_log
 
     def _melt_redox_temperature_shift_is_liquid(self, T_K: float) -> bool:
         if self._freeze_gate_enabled():
@@ -2825,9 +2963,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             reference_T_K,
             T_now,
         )
-        reservoir.melt_intrinsic_fO2_log = (
+        candidate_fO2_log = (
             base_ln_fO2 + delta_ln_fO2
         ) / math.log(10.0)
+        reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
+            candidate_fO2_log,
+            context='temperature_re_reference',
+            delta_ln_fO2=delta_ln_fO2,
+            candidate_fO2_log=candidate_fO2_log,
+        )
         reservoir.reference_T_K = T_now
         self._sync_oxygen_reservoir_mirror()
 
@@ -2838,10 +2982,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         reference_T_K: object = _PRESERVE_REFERENCE_T_K,
         exchange_direction: str = 'none:initialized',
     ) -> OxygenReservoirState:
-        fO2_log = (
-            float(melt_intrinsic_fO2_log)
+        fO2_raw = (
+            melt_intrinsic_fO2_log
             if melt_intrinsic_fO2_log is not None
-            else float(self.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
+            else self.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+        )
+        fO2_log = self._finite_oxygen_reservoir_fO2_log(
+            fO2_raw,
+            context='refresh_oxygen_reservoir_without_exchange',
         )
         if reference_T_K is _PRESERVE_REFERENCE_T_K:
             reference_T = self._current_melt_redox_reference_T_K()
@@ -2903,10 +3051,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         net_o2_equiv_mol = sum(terms.values())
         T_K = (
-            max(1.0, float(temperature_K))
+            float(temperature_K)
             if temperature_K is not None
-            else max(1.0, float(self.melt.temperature_C) + 273.15)
+            else float(self.melt.temperature_C) + 273.15
         )
+        if not math.isfinite(T_K) or T_K <= 0.0:
+            raise AccountingError(
+                'oxygen reservoir redox source terms require finite positive T_K; '
+                f'got {temperature_K!r}'
+            )
         self._re_reference_melt_fO2_to_temperature(T_K)
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
@@ -2939,6 +3092,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         applied_delta_ln = 0.0
         skip_reason = ''
+        refusal_context: Dict[str, Any] = {}
         if C_m <= 0.0:
             skip_reason = 'no_melt_redox_capacity'
         elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:
@@ -2946,9 +3100,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             x_m = base_fO2_log * math.log(10.0)
             applied_delta_ln = net_o2_equiv_mol / C_m
-            reservoir.melt_intrinsic_fO2_log = (
+            candidate_fO2_log = (
                 x_m + applied_delta_ln
             ) / math.log(10.0)
+            if (
+                not math.isfinite(applied_delta_ln)
+                or not math.isfinite(candidate_fO2_log)
+            ):
+                skip_reason = 'redox_capacity_saturation_refusal'
+                refusal_context = self._oxygen_reservoir_guard_context(
+                    context='redox_source_terms_saturation_refusal',
+                    source_terms_mol_o2_equiv=terms,
+                    net_o2_equiv_mol=net_o2_equiv_mol,
+                    melt_redox_capacity_mol_per_ln_fO2=C_m,
+                    delta_ln_fO2=applied_delta_ln,
+                    candidate_fO2_log=candidate_fO2_log,
+                )
+                applied_delta_ln = 0.0
+            else:
+                reservoir.melt_intrinsic_fO2_log = (
+                    self._finite_oxygen_reservoir_fO2_log(
+                        candidate_fO2_log,
+                        context='redox_source_terms',
+                        source_terms_mol_o2_equiv=terms,
+                        net_o2_equiv_mol=net_o2_equiv_mol,
+                        melt_redox_capacity_mol_per_ln_fO2=C_m,
+                        delta_ln_fO2=applied_delta_ln,
+                        candidate_fO2_log=candidate_fO2_log,
+                    )
+                )
         if terms:
             if skip_reason:
                 self._accumulate_redox_source_terms_for_hour(
@@ -2959,6 +3139,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     terms,
                     skip_reason,
                 )
+                if refusal_context:
+                    self._redox_source_refusal_context_this_hr = refusal_context
             else:
                 self._accumulate_redox_source_terms_for_hour(
                     '_redox_source_applied_terms_this_hr',
@@ -3005,6 +3187,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         reservoir.redox_source_skip_reason = str(
             breakdown.get('redox_source_skip_reason', '')
         )
+        reservoir.redox_source_refusal_context = dict(
+            breakdown.get('redox_source_refusal_context', {}) or {}
+        )
         reservoir.ferric_divergence = dict(
             breakdown.get('ferric_divergence', {})
         )
@@ -3018,6 +3203,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._redox_source_skipped_terms_this_hr = {}
         self._redox_source_skip_reasons_this_hr = {}
         self._redox_source_context_this_hr = {}
+        self._redox_source_refusal_context_this_hr = {}
         self._redox_source_delta_ln_this_hr = 0.0
         self._last_fe_redox_respeciation_diagnostic = {}
         self._fe_redox_respeciation_diagnostics_this_hr = []
@@ -3281,6 +3467,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if not source_context:
             source_context = self._redox_source_context_for_current_state()
+        refusal_context = dict(
+            getattr(self, '_redox_source_refusal_context_this_hr', {}) or {}
+        )
         return {
             'terms_mol_o2_equiv_by_label': terms,
             'applied_terms_mol_o2_equiv_by_label': applied_terms,
@@ -3297,13 +3486,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             'fe_redox_respeciation_attempts': respeciation_attempts,
             'source_context': source_context,
+            'redox_source_refusal_context': refusal_context,
             'source_campaign': str(source_context.get('campaign', '')),
             'source_hour': int(source_context.get('hour', 0)),
             'source_campaign_hour': int(source_context.get('campaign_hour', 0)),
         }
 
     def _apply_oxygen_reservoir_exchange(self) -> OxygenReservoirState:
-        T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
+        T_K = float(self.melt.temperature_C) + 273.15
+        if not math.isfinite(T_K) or T_K <= 0.0:
+            raise AccountingError(
+                'oxygen reservoir exchange requires finite positive T_K; '
+                f'temperature_C={self.melt.temperature_C!r}'
+            )
         self._re_reference_melt_fO2_to_temperature(T_K)
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
@@ -3354,8 +3549,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return reservoir
 
         x_m = base_fO2_log * math.log(10.0)
-        x_h = math.log(max(transport_pO2, OXYGEN_RESERVOIR_FLOOR_BAR))
-        dn_to_headspace = alpha * ((x_m - x_h) / (1.0 / C_m + 1.0 / C_h))
+        effective_transport_pO2 = max(transport_pO2, OXYGEN_RESERVOIR_FLOOR_BAR)
+        if not math.isfinite(effective_transport_pO2) or effective_transport_pO2 <= 0.0:
+            raise AccountingError(
+                'oxygen reservoir exchange requires finite positive transport pO2; '
+                f"attribution={self._oxygen_reservoir_guard_context(context='exchange_transport_pO2')!r}"
+            )
+        x_h = math.log(effective_transport_pO2)
+        denominator = (1.0 / C_m + 1.0 / C_h)
+        dn_to_headspace = alpha * ((x_m - x_h) / denominator)
+        if not math.isfinite(dn_to_headspace):
+            self._raise_nonfinite_oxygen_reservoir_fO2(
+                dn_to_headspace,
+                context='oxygen_reservoir_exchange_delta',
+                melt_redox_capacity_mol_per_ln_fO2=C_m,
+            )
         dn_ledger_to_headspace = dn_to_headspace
         exchange_clamped = False
         if dn_to_headspace < 0.0:
@@ -3398,7 +3606,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
 
         x_m_after = x_m - dn_to_headspace / C_m
-        reservoir.melt_intrinsic_fO2_log = x_m_after / math.log(10.0)
+        candidate_fO2_log = x_m_after / math.log(10.0)
+        reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
+            candidate_fO2_log,
+            context='oxygen_reservoir_exchange',
+            melt_redox_capacity_mol_per_ln_fO2=C_m,
+            delta_ln_fO2=(-dn_to_headspace / C_m),
+            candidate_fO2_log=candidate_fO2_log,
+        )
         post_head_o2_mol = max(0.0, float(
             self.atom_ledger.mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,

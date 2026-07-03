@@ -31,7 +31,12 @@ SourceKind = Literal[
 # D1: coating gate armed -- fail-closed on grounded
 # campaigns-to-resinter<N when authoritative; bump invalidates pre-D1 cached
 # feasibility verdicts.
-PHYSICS_GATE_VERSION = "physics-feasibility-v2-coating-gate"
+# v3 (2026-07-03, milestone-3 L2-P2): the extraction_completeness gate now
+# routes through the S2c provenance-aware trace surface (credit-line /
+# additive exclusion, honest denominator) when present -- a semantic flip,
+# so pre-S2c cached feasibility verdicts must not be served under the same
+# physics_constraints_digest.
+PHYSICS_GATE_VERSION = "physics-feasibility-v3-provenance-completeness"
 GATE_ORDER: tuple[str, ...] = (
     "delivered_stream_purity",
     "coating",

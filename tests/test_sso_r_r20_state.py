@@ -15,7 +15,7 @@ from simulator.account_ids import (
     OXYGEN_MRE_ANODE_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
-from simulator.accounting import resolve_species_formula
+from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.core import (
     FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
@@ -444,6 +444,61 @@ def test_redox_source_breakdown_marks_skipped_terms(
         terms
     )
     assert reservoir.exchange_direction.endswith(f":skipped:{expected_reason}")
+
+
+def test_redox_source_refuses_denormal_capacity_before_nonfinite_fo2(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -1614.1695751928787
+    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
+    sim._sync_oxygen_reservoir_mirror()
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_capacity_mol_per_ln_fO2",
+        lambda **_: 2.0864e-320,
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:evaporative_metal_loss": 0.0001505988658952519},
+        exchange_direction="redox_source:evaporative_loss",
+    )
+
+    assert math.isfinite(reservoir.melt_intrinsic_fO2_log)
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        -1614.1695751928787
+    )
+    assert reservoir.redox_source_terms_applied is False
+    assert reservoir.redox_source_skip_reason == "redox_capacity_saturation_refusal"
+    assert reservoir.redox_source_skipped_terms_mol_o2_equiv == pytest.approx(
+        {"redox_source:evaporative_metal_loss": 0.0001505988658952519}
+    )
+    context = reservoir.redox_source_refusal_context
+    assert context["context"] == "redox_source_terms_saturation_refusal"
+    assert context["temperature_C"] == pytest.approx(1600.0)
+    assert context["melt_redox_capacity_mol_per_ln_fO2"] == pytest.approx(
+        2.0864e-320
+    )
+    assert context["delta_ln_fO2"] == "inf"
+    assert context["candidate_fO2_log"] == "inf"
+
+
+def test_nonfinite_reservoir_fo2_raises_accounting_error_with_attribution() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim._redox_source_terms_this_hr = {"redox_source:test": 1.25}
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = math.inf
+
+    with pytest.raises(AccountingError) as excinfo:
+        sim._sync_oxygen_reservoir_mirror()
+
+    message = str(excinfo.value)
+    assert "sync_oxygen_reservoir_mirror" in message
+    assert "temperature_C" in message
+    assert "headspace_o2_mol" in message
+    assert "source_terms_mol_o2_equiv" in message
+    assert "redox_source:test" in message
 
 
 def test_c3_na_source_term_comes_from_committed_transition() -> None:

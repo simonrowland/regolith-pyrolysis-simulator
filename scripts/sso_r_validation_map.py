@@ -22,6 +22,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from simulator.core import (
     FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+    OXYGEN_RESERVOIR_FLOOR_BAR,
     PyrolysisSimulator,
 )
 from simulator.runner import build_per_hour_summary
@@ -70,12 +71,27 @@ ROW_UNITS = {
     "dose_feo_reduced_mol": "mol FeO reduced by Na dose",
     "post_exchange_fO2_log_diagnostic": "log10 fO2, post-exchange diagnostic only",
     "post_exchange_delta_IW_diagnostic": "log10 fO2 minus IW, post-exchange diagnostic only",
+    "redox_source_delta_ln_fO2": "natural-log fO2 increment applied this row",
     "native_fe_pool_mol": "mol Fe in native-Fe pool",
     "native_fe_tap_mol": "mol Fe routed to tap",
     "native_fe_vapor_mol": "mol Fe routed to vapor",
     "native_fe_vapor_escape_fraction_of_pool": "native_fe_vapor_mol/native_fe_pool_mol",
     "Fe_vapor_kg_hr": "kg/hr",
     "SiO_flux_kg_hr": "kg/hr",
+    "SiO_vapor_pressure_Pa": "Pa",
+    "SiO_P_reference_Antoine_Pa": "Pa",
+    "SiO_activity_factor": "dimensionless",
+    "SiO_provider_pO2_bar": "bar",
+    "SiO_alpha_s": "dimensionless",
+    "SiO_alpha_effective": "dimensionless",
+    "SiO_r_interface": "s*m2*Pa/kg",
+    "SiO_r_gas": "s*m2*Pa/kg",
+    "SiO_r_melt": "s*m2*Pa/kg",
+    "melt_surface_area_m2": "m2",
+    "freeze_gate_liquid_fraction_factor": "dimensionless",
+    "SiO_provider_flux_pre_depletion_kg_hr": "kg/hr",
+    "SiO_flux_pre_analytic_depletion_kg_hr": "kg/hr",
+    "SiO_flux_post_analytic_depletion_kg_hr": "kg/hr",
     "stage_3_Fe_kg": "kg",
     "stage_3_total_kg": "kg",
     "stage_3_Fe_wt_pct": "wt pct",
@@ -286,6 +302,7 @@ def _configure_gas_state(sim: PyrolysisSimulator, gas: GasPoint) -> None:
         sim.melt.p_total_mbar = 0.0
         sim.overhead.composition = {}
         sim.overhead.pressure_mbar = 0.0
+        _apply_requested_transport_pO2(sim, gas)
         return
     if gas.pN2_mbar > 0.0:
         sim.melt.atmosphere = Atmosphere.PN2_SWEEP
@@ -297,6 +314,20 @@ def _configure_gas_state(sim: PyrolysisSimulator, gas: GasPoint) -> None:
         sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
         sim.overhead.composition = {"O2": float(gas.pO2_mbar)}
     sim.overhead.pressure_mbar = float(gas.total_pressure_mbar)
+    _apply_requested_transport_pO2(sim, gas)
+
+
+def _requested_transport_pO2_bar(gas: GasPoint) -> float:
+    return max(
+        float(gas.pO2_mbar) / 1000.0,
+        OXYGEN_RESERVOIR_FLOOR_BAR,
+    )
+
+
+def _apply_requested_transport_pO2(sim: PyrolysisSimulator, gas: GasPoint) -> None:
+    reservoir = sim.melt.oxygen_reservoir
+    reservoir.headspace_transport_pO2_bar = _requested_transport_pO2_bar(gas)
+    reservoir.headspace_control_floor_pO2_bar = sim._headspace_control_floor_pO2_bar()
 
 
 def _transport_property_basis(gas: GasPoint) -> str:
@@ -402,9 +433,19 @@ def run_row(
     exchange = sim._apply_oxygen_reservoir_exchange()
     first_respeciation = sim._apply_fe_redox_respeciation()
     split = sim._apply_native_fe_saturation_split(sample_time_h=SAMPLE_TIME_H)
+    _apply_requested_transport_pO2(sim, gas)
     equilibrium = sim._get_equilibrium()
-    evap_flux = sim._calculate_evaporation(equilibrium)
-    evap_flux = sim._apply_analytic_evaporation_depletion(evap_flux)
+    raw_evap_flux = sim._calculate_evaporation(equilibrium)
+    vapor_pressure_diagnostic = dict(
+        getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
+    )
+    evaporation_diagnostic = dict(
+        getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+    )
+    freeze_gate_diagnostic = dict(
+        getattr(sim, "_last_freeze_gate_diagnostic", {}) or {}
+    )
+    evap_flux = sim._apply_analytic_evaporation_depletion(raw_evap_flux)
     if evap_flux.total_kg_hr > 0.0:
         sim._configure_condensation_operating_conditions(evap_flux)
         sim._apply_lab_surface_temperatures(sample_time_h=SAMPLE_TIME_H)
@@ -433,9 +474,40 @@ def run_row(
     melt_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
     drain_mol = sim.atom_ledger.mol_by_account("terminal.drain_tap_material")
     vapor_species = dict(summary.get("vapor_species_kg_hr", {}) or {})
+    vapor_pressures_Pa = dict(
+        vapor_pressure_diagnostic.get("vapor_pressures_Pa") or {}
+    )
+    evaporation_flux_kg_hr = dict(
+        evaporation_diagnostic.get("evaporation_flux_kg_hr") or {}
+    )
+    sio_series = dict(
+        (evaporation_diagnostic.get("evaporation_series_resistance") or {}).get("SiO")
+        or {}
+    )
+    freeze_gate_factor = 1.0
+    if freeze_gate_diagnostic:
+        freeze_gate_factor = float(
+            freeze_gate_diagnostic.get("liquid_fraction", 1.0) or 0.0
+        )
     source_terms = {
         str(k): float(v)
         for k, v in dict(redox.get("terms_mol_o2_equiv_by_label", {}) or {}).items()
+    }
+    applied_source_terms = {
+        str(k): float(v)
+        for k, v in dict(
+            redox.get("applied_terms_mol_o2_equiv_by_label", {}) or {}
+        ).items()
+    }
+    skipped_source_terms = {
+        str(k): float(v)
+        for k, v in dict(
+            redox.get("skipped_terms_mol_o2_equiv_by_label", {}) or {}
+        ).items()
+    }
+    skipped_source_reasons = {
+        str(k): str(v)
+        for k, v in dict(redox.get("skipped_reasons_by_label", {}) or {}).items()
     }
     material_divergence = (
         bool(ferric_divergence.get("warning"))
@@ -475,7 +547,15 @@ def run_row(
         "redox_source_net_mol_o2_equiv": float(
             redox.get("net_mol_o2_equiv", 0.0) or 0.0
         ),
+        "redox_source_delta_ln_fO2": float(redox.get("delta_ln_fO2", 0.0) or 0.0),
+        "redox_source_skip_reason": str(redox.get("redox_source_skip_reason", "")),
         "redox_source_terms_mol_o2_equiv_by_label": source_terms,
+        "redox_source_applied_terms_mol_o2_equiv_by_label": applied_source_terms,
+        "redox_source_skipped_terms_mol_o2_equiv_by_label": skipped_source_terms,
+        "redox_source_skipped_reasons_by_label": skipped_source_reasons,
+        "redox_source_refusal_context": dict(
+            redox.get("redox_source_refusal_context", {}) or {}
+        ),
         "redox_source_reader": "runner.build_per_hour_summary.redox_source_breakdown",
         "native_fe_event_type": "native_fe_partitioned_saturation",
         "native_fe_event_source_label": (
@@ -506,6 +586,28 @@ def run_row(
         "ferric_divergence_material": material_divergence,
         "Fe_vapor_kg_hr": _positive(vapor_species.get("Fe")),
         "SiO_flux_kg_hr": _positive(vapor_species.get("SiO")),
+        "SiO_vapor_pressure_Pa": _positive(vapor_pressures_Pa.get("SiO")),
+        "SiO_P_reference_Antoine_Pa": _positive(
+            sio_series.get("P_reference_Antoine_Pa")
+        ),
+        "SiO_activity_factor": _positive(sio_series.get("activity_factor")),
+        "SiO_provider_pO2_bar": _positive(sio_series.get("pO2_bar")),
+        "SiO_alpha_s": _positive(sio_series.get("alpha_intrinsic")),
+        "SiO_alpha_effective": _positive(sio_series.get("alpha_effective")),
+        "SiO_r_interface": _positive(sio_series.get("r_interface")),
+        "SiO_r_gas": _positive(sio_series.get("r_gas")),
+        "SiO_r_melt": _positive(sio_series.get("r_melt")),
+        "melt_surface_area_m2": _positive(sim.melt.melt_surface_area_m2),
+        "freeze_gate_liquid_fraction_factor": freeze_gate_factor,
+        "SiO_provider_flux_pre_depletion_kg_hr": _positive(
+            evaporation_flux_kg_hr.get("SiO")
+        ),
+        "SiO_flux_pre_analytic_depletion_kg_hr": _positive(
+            raw_evap_flux.species_kg_hr.get("SiO", 0.0)
+        ),
+        "SiO_flux_post_analytic_depletion_kg_hr": _positive(
+            evap_flux.species_kg_hr.get("SiO", 0.0)
+        ),
         "stage_3_Fe_kg": _positive(stage3.get("Fe_kg")),
         "stage_3_total_kg": _positive(stage3.get("total_kg")),
         "stage_3_Fe_wt_pct": _positive(stage3.get("Fe_wt_pct")),
@@ -750,16 +852,34 @@ def evaluate_assertions(
             and row["row_passes_base_integrity"]
         )
         add(
-            "owner_pN2_recipe_point",
+            "owner_pN2_recipe_point_requested_pO2_semantics",
             owner_pass,
             (
                 "native_pool={native_fe_pool_mol:.6g} tap={native_fe_tap_mol:.6g} "
                 "vapor={native_fe_vapor_mol:.6g} escape={native_fe_vapor_escape_fraction_of_pool:.6g} "
-                "stage3_Fe_wt={stage_3_Fe_wt_pct:.6g} SiO={SiO_flux_kg_hr:.6g}"
+                "stage3_Fe_wt={stage_3_Fe_wt_pct:.6g} SiO={SiO_flux_kg_hr:.6g}; "
+                "map uses requested-pO2 (design semantics); live parity pending -- "
+                "see map_live_semantics_parity"
             ).format(**row),
         )
     else:
-        add("owner_pN2_recipe_point", False, "owner row missing")
+        add(
+            "owner_pN2_recipe_point_requested_pO2_semantics",
+            False,
+            "owner row missing",
+        )
+
+    map_live_semantics_parity_pass = False
+    add(
+        "map_live_semantics_parity",
+        map_live_semantics_parity_pass,
+        (
+            "BLOCKER: live step() transport pO2 diverges from requested-pO2 "
+            "design semantics under PN2_SWEEP (holdup O2 not drained; observed "
+            "up to ~1481 bar at owner conditions; map 9.06e-3 vs live ~3.2e-7 "
+            "kg/hr SiO). Certification gated on LIVE-PO2-SWEEP."
+        ),
+    )
 
     passing_target_rows = [
         r for r in rows
@@ -772,8 +892,11 @@ def evaluate_assertions(
     first_T = min((float(r["temperature_C"]) for r in passing_target_rows), default=None)
     add(
         "grind_ready_target_window",
-        first_T is not None and first_T >= 1600.0,
-        f"first_passing_T_C={first_T}",
+        first_T is not None and map_live_semantics_parity_pass,
+        (
+            f"first_passing_T_C={first_T}; window under requested-pO2 semantics; "
+            "certification gated on live parity"
+        ),
     )
     return assertions
 
@@ -884,8 +1007,12 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
     assertions = list(payload["assertions"])
     assertions_by_name = {a["name"]: a for a in assertions}
     owner_assertion = assertions_by_name.get(
-        "owner_pN2_recipe_point",
+        "owner_pN2_recipe_point_requested_pO2_semantics",
         {"passed": False, "detail": "owner assertion missing"},
+    )
+    map_live_parity = assertions_by_name.get(
+        "map_live_semantics_parity",
+        {"passed": False, "detail": "live parity assertion missing"},
     )
     grid = dict(payload["grid"])
     grid_scope_label = str(payload["grid_scope"])
@@ -951,7 +1078,7 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
         [
             "new distilled fixture",
             "tests/goldens/sso_r_validation_map_lunar_mare_low_ti.json",
-            f"{grid_scope_label} validation anchor; owner row classified current blocker if SiO target fails",
+            f"{grid_scope_label} validation anchor; owner row classified current blocker until live parity passes",
         ],
     ]
     unit_rows = [
@@ -969,10 +1096,12 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
         f"- Map scope: `{payload['map_scope']}` (`sample_time_h={payload['sample_time_h']}`)",
         f"- Feedstock/batch: `{FEEDSTOCK}`, `{BATCH_KG:g} kg`",
         f"- Dose calibration: `{payload['dose_calibration']['transition_name']}` at `{DOSE_CALIBRATION_T_C:g} C`; full FeO equivalent `{payload['dose_calibration']['full_feo_equiv_dose_kg']:.9g} kg Na`.",
-        "## Recipe certification",
+        "## Requested-pO2 recipe check",
         (
-            f"Overall owner recipe certification: **{_assertion_mark(bool(owner_assertion['passed']))}**. "
-            f"Detail: `{owner_assertion['detail']}`. Fe purity/base-integrity PASS values are component checks, not recipe certification."
+            f"Owner requested-pO2 recipe check: **{_assertion_mark(bool(owner_assertion['passed']))}**. "
+            f"Live parity: **{_assertion_mark(bool(map_live_parity['passed']))}**. "
+            f"Detail: `{owner_assertion['detail']}` `{map_live_parity['detail']}`. "
+            "Fe purity/base-integrity PASS values are component checks, not recipe certification."
         ),
         "## pN2 recipe table",
         _table(
@@ -994,14 +1123,25 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
         ),
         "## pO2 SiO suppression slice",
         _table(
-            ["T_C", "pO2_mbar", "native_pool_mol", "tap_mol", "SiO_kg_hr", "fO2_diag_status"],
+            [
+                "T_C",
+                "pO2_mbar",
+                "provider_pO2_bar",
+                "SiO_Peq_Pa",
+                "SiO_kg_hr",
+                "alpha_eff",
+                "R_gas",
+                "fO2_diag_status",
+            ],
             [
                 [
                     f"{r['temperature_C']:.0f}",
                     f"{r['requested_pO2_mbar']:.6g}",
-                    f"{r['native_fe_pool_mol']:.6g}",
-                    f"{r['native_fe_tap_mol']:.6g}",
+                    f"{r['SiO_provider_pO2_bar']:.6g}",
+                    f"{r['SiO_vapor_pressure_Pa']:.6g}",
                     f"{r['SiO_flux_kg_hr']:.6g}",
+                    f"{r['SiO_alpha_effective']:.6g}",
+                    f"{r['SiO_r_gas']:.6g}",
                     r["fO2_diagnostic_status"],
                 ]
                 for r in sorted(pO2_slice, key=lambda row: (row["temperature_C"], row["requested_pO2_mbar"]))
@@ -1036,6 +1176,7 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
                 ["redox_source_terms_mol_o2_equiv_by_label", "runner.build_per_hour_summary redox_source_breakdown"],
                 ["native_fe_event_source_label", "validation-map row native_fe_event_type/source_label"],
                 ["post_exchange_fO2_log_diagnostic", "diagnostic-only row field; not a certification anchor"],
+                ["SiO vapor/series diagnostic scalars", "validation-map pO2 SiO suppression slice + CSV/JSON row"],
                 ["stage_3_capture", "runner.build_per_hour_summary stage_3_capture"],
             ],
         ),
@@ -1089,7 +1230,12 @@ def golden_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         key=lambda row: row["requested_pN2_mbar"],
     )
     owner_pass = next(
-        a for a in payload["assertions"] if a["name"] == "owner_pN2_recipe_point"
+        a
+        for a in payload["assertions"]
+        if a["name"] == "owner_pN2_recipe_point_requested_pO2_semantics"
+    )["passed"]
+    live_parity_pass = next(
+        a for a in payload["assertions"] if a["name"] == "map_live_semantics_parity"
     )["passed"]
     return {
         "schema_version": GOLDEN_SCHEMA_VERSION,
@@ -1111,9 +1257,11 @@ def golden_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             ],
             "stage_3_Fe_wt_pct": owner["stage_3_Fe_wt_pct"],
             "SiO_flux_kg_hr": owner["SiO_flux_kg_hr"],
-            "owner_recipe_pass": owner_pass,
+            "owner_recipe_pass": owner_pass and live_parity_pass,
             "classification": (
-                "certification_pass" if owner_pass else "current_physics_blocker"
+                "certification_pass"
+                if owner_pass and live_parity_pass
+                else "current_physics_blocker"
             ),
         },
         "pO2_sio_suppression_slice": [

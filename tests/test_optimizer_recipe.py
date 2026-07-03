@@ -313,7 +313,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # search allowlist above are UNCHANGED, so this is source-fingerprint
     # invalidation only, not a recipe/schema/allowlist or authoritative
     # vapor/yield/ledger move.
-    assert cache_key(spec) == "064325bb49b375f2236eec859e552bcf163b3ace6e394249305a2109e709bfeb"
+    # 2026-07-03 (later): moved again for SIO-PATH0 (map/core diagnostics +
+    # fO2 non-finite fail-loud guard, source-fingerprint) AND the
+    # PHYSICS_GATE_VERSION v3 bump — the latter is the INTENDED semantic
+    # invalidation: pre-S2c cached feasibility verdicts must not be served
+    # under the new provenance-completeness gate (milestone-3 L2-P2).
+    assert cache_key(spec) == "4e726c3815abefc74e38570e1cf183627cad13a50f49a22f0e4753c7f34d2415"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

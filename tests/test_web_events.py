@@ -670,7 +670,12 @@ def test_recipe_ui_renders_per_hour_redox_summary_payload_keys() -> None:
         "total_kg",
         "Fe_wt_pct",
         "redox_source_breakdown",
-        "terms_mol_o2_equiv_by_label",
+        # M3-L3 P2: the source-label readout must distinguish applied from
+        # skipped terms — rendering the TOTAL terms dict shows skipped terms
+        # as if they happened. Pin the applied/skipped split + skipped tag.
+        "applied_terms_mol_o2_equiv_by_label",
+        "skipped_terms_mol_o2_equiv_by_label",
+        " (skipped)",
     ):
         assert payload_key in controls
 

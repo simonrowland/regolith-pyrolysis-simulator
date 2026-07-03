@@ -547,6 +547,67 @@ def test_interval_required_foulant_vapor_row_is_not_certifying(
         provider.dispatch(request)
 
 
+def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    account_view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": sim.atom_ledger.mol_by_account(
+                "process.cleaned_melt"
+            )
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    temperature_C = 1650.0
+    temperature_K = temperature_C + 273.15
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=account_view,
+        temperature_C=temperature_C,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    result = provider.dispatch(request)
+
+    sio_row = vapor_pressure_data["oxide_vapors"]["SiO"]
+    antoine = sio_row["antoine"]
+    # Hand arithmetic from the row:
+    # P_ref = 10 ** (A - B / (T_K + C)); floor pO2 is the row reference,
+    # so pO2^-0.5 suppression is unity and P_eq = P_ref * a_SiO2.
+    p_reference = 10 ** (
+        float(antoine["A"])
+        - float(antoine["B"]) / (temperature_K + float(antoine["C"]))
+    )
+    comp_wt = composition_wt_pct_from_account_view(
+        account_view,
+        "process.cleaned_melt",
+    )
+    activity = (comp_wt["SiO2"] / 100.0) ** float(
+        sio_row.get("oxide_activity_exponent", 1.0)
+    )
+    expected_p_eq = p_reference * activity
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
+
+    assert p_reference == pytest.approx(6.2391038335, rel=1e-10)
+    assert 1.0 < expected_p_eq < 10.0
+    assert provenance["P_reference_Antoine_Pa"] == pytest.approx(p_reference)
+    assert provenance["activity_factor"] == pytest.approx(activity)
+    assert provenance["pO2_bar"] == pytest.approx(1.0e-9)
+    assert result.diagnostic["vapor_pressures_Pa"]["SiO"] == pytest.approx(
+        expected_p_eq
+    )
+
+
 @pytest.mark.parametrize("pO2_bar", [-1.0, 0.0, 1e-12])
 def test_explicit_transport_po2_rejects_invalid_or_subfloor_values(
     vapor_pressure_data,

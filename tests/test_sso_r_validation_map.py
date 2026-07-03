@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 import pytest
@@ -25,6 +26,16 @@ def test_full_grid_count_is_1512_rows():
 
 def _assertion(payload, name):
     return {a["name"]: a for a in payload["assertions"]}[name]
+
+
+def _calibrated_inputs():
+    setpoints, feedstocks, vapor_pressures = validation_map._load_data()
+    calibration = validation_map.calibrate_dose(
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+    )
+    return setpoints, feedstocks, vapor_pressures, calibration
 
 
 def test_manual_fO2_anchors_match_native_fe_design_window():
@@ -146,8 +157,28 @@ def test_smoke_rows_have_owner_readable_schema_and_source_label_reader(
         "retained_FeO_mol",
         "retained_Fe2O3_mol",
         "retained_native_Fe_mol",
+        "redox_source_delta_ln_fO2",
+        "redox_source_skip_reason",
         "Fe_vapor_kg_hr",
         "SiO_flux_kg_hr",
+        "SiO_vapor_pressure_Pa",
+        "SiO_P_reference_Antoine_Pa",
+        "SiO_activity_factor",
+        "SiO_provider_pO2_bar",
+        "SiO_alpha_s",
+        "SiO_alpha_effective",
+        "SiO_r_interface",
+        "SiO_r_gas",
+        "SiO_r_melt",
+        "melt_surface_area_m2",
+        "freeze_gate_liquid_fraction_factor",
+        "SiO_provider_flux_pre_depletion_kg_hr",
+        "SiO_flux_pre_analytic_depletion_kg_hr",
+        "SiO_flux_post_analytic_depletion_kg_hr",
+        "redox_source_applied_terms_mol_o2_equiv_by_label",
+        "redox_source_skipped_terms_mol_o2_equiv_by_label",
+        "redox_source_skipped_reasons_by_label",
+        "redox_source_refusal_context",
         "stage_3_Fe_wt_pct",
         "stage_3_SiO2_capture_kg",
         "oxygen_reservoir_exchange_direction",
@@ -171,6 +202,102 @@ def test_smoke_rows_have_owner_readable_schema_and_source_label_reader(
     assert labeled
     for labeled_row in labeled:
         assert labeled_row["redox_source_reader"]
+
+
+def test_sio_vapor_pressure_responds_to_requested_po2(smoke_payload):
+    rows = [
+        row for row in smoke_payload["rows"]
+        if row["temperature_C"] == pytest.approx(1650.0)
+        and row["requested_pN2_mbar"] == pytest.approx(10.0)
+        and row["dose_fraction_of_full_FeO_equiv"] == pytest.approx(1.0)
+    ]
+    by_pO2 = {float(row["requested_pO2_mbar"]): row for row in rows}
+    low = by_pO2[1.0e-6]
+    high = by_pO2[1.0]
+
+    assert low["SiO_provider_pO2_bar"] == pytest.approx(1.0e-9)
+    assert high["SiO_provider_pO2_bar"] == pytest.approx(1.0e-3)
+    assert low["SiO_P_reference_Antoine_Pa"] == pytest.approx(
+        high["SiO_P_reference_Antoine_Pa"]
+    )
+    assert low["SiO_activity_factor"] == pytest.approx(
+        high["SiO_activity_factor"]
+    )
+    assert low["SiO_vapor_pressure_Pa"] / high["SiO_vapor_pressure_Pa"] == (
+        pytest.approx(math.sqrt(1.0e-3 / 1.0e-9), rel=1.0e-6)
+    )
+    assert low["SiO_flux_kg_hr"] > high["SiO_flux_kg_hr"] * 100.0
+
+
+def test_exact_full_dose_oxidizing_pn2_row_refuses_denormal_fo2_capacity():
+    setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
+
+    row = validation_map.run_row(
+        1600.0,
+        validation_map.GasPoint(0.1, 5.0, "n2_carrier"),
+        1.0,
+        calibration,
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+        grid_scope_label=validation_map.GRID_SCOPE_FULL,
+    )
+
+    assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
+    assert math.isfinite(row["redox_source_delta_ln_fO2"])
+    assert row["redox_source_skip_reason"] == "redox_capacity_saturation_refusal"
+    assert row["redox_source_skipped_terms_mol_o2_equiv_by_label"][
+        "redox_source:evaporative_metal_loss"
+    ] > 0.0
+    assert row["redox_source_skipped_reasons_by_label"][
+        "redox_source:evaporative_metal_loss"
+    ] == "redox_capacity_saturation_refusal"
+    context = row["redox_source_refusal_context"]
+    assert context["temperature_C"] == pytest.approx(1600.0)
+    assert context["headspace_o2_mol"] > 0.0
+    assert context["source_terms_mol_o2_equiv"][
+        "redox_source:evaporative_metal_loss"
+    ] > 0.0
+    assert context["candidate_fO2_log"] == "inf"
+
+
+def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():
+    setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
+    exact_gas = validation_map.GasPoint(0.1, 5.0, "n2_carrier")
+    cases = {
+        (temperature_C, exact_gas, 1.0)
+        for temperature_C in validation_map.MAP_TEMPERATURES_C
+    }
+    cases.update(
+        (1600.0, gas, 1.0)
+        for gas in validation_map.gas_grid()
+    )
+    cases.update(
+        (1600.0, exact_gas, dose_fraction)
+        for dose_fraction in validation_map.DOSE_FRACTIONS
+    )
+
+    for temperature_C, gas, dose_fraction in sorted(
+        cases,
+        key=lambda item: (
+            item[0],
+            item[1].pO2_mbar,
+            item[1].pN2_mbar,
+            item[2],
+        ),
+    ):
+        row = validation_map.run_row(
+            temperature_C,
+            gas,
+            dose_fraction,
+            calibration,
+            setpoints,
+            feedstocks,
+            vapor_pressures,
+            grid_scope_label=validation_map.GRID_SCOPE_FULL,
+        )
+        assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
+        assert math.isfinite(row["redox_source_delta_ln_fO2"])
 
 
 def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
@@ -212,7 +339,7 @@ def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
     assert calls[-1] == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 
 
-def test_owner_pn2_anchor_reports_current_certification_blocker(smoke_payload):
+def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
     owner = [
         row for row in smoke_payload["rows"]
         if row["temperature_C"] == 1650.0
@@ -228,8 +355,30 @@ def test_owner_pn2_anchor_reports_current_certification_blocker(smoke_payload):
     assert owner["stage_3_Fe_wt_pct"] > 0.0
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12
-    assert owner["SiO_flux_kg_hr"] < validation_map.OWNER_RECIPE_MIN_SIO_KG_HR
-    assert assertions["owner_pN2_recipe_point"]["passed"] is False
+    assert owner["SiO_provider_pO2_bar"] == pytest.approx(1.0e-9)
+    assert owner["SiO_flux_kg_hr"] >= validation_map.OWNER_RECIPE_MIN_SIO_KG_HR
+    requested_pO2_assertion = assertions[
+        "owner_pN2_recipe_point_requested_pO2_semantics"
+    ]
+    assert requested_pO2_assertion["passed"] is True
+    assert "map uses requested-pO2" in requested_pO2_assertion["detail"]
+    assert "map_live_semantics_parity" in requested_pO2_assertion["detail"]
+
+
+def test_map_live_semantics_parity_blocks_certification(smoke_payload):
+    parity = _assertion(smoke_payload, "map_live_semantics_parity")
+
+    assert parity["passed"] is False
+    assert "LIVE-PO2-SWEEP" in parity["detail"]
+
+
+def test_grind_ready_target_window_fails_until_live_parity(smoke_payload):
+    window = _assertion(smoke_payload, "grind_ready_target_window")
+
+    assert window["passed"] is False
+    assert "first_passing_T_C=" in window["detail"]
+    assert "window under requested-pO2 semantics" in window["detail"]
+    assert "certification gated on live parity" in window["detail"]
 
 
 def test_distilled_golden_fixture_matches_current_anchors(smoke_payload):

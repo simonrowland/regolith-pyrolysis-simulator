@@ -236,16 +236,26 @@ function nativeFePartitionText(partition) {
 }
 
 function redoxSourceLabels(summary) {
+    // Render APPLIED source terms plainly and SKIPPED ones with an explicit
+    // tag — the total terms dict includes skipped terms, and showing them
+    // unlabelled reads as if they happened (M3-L3 P2).
     const breakdown = objectOrNull(summary?.redox_source_breakdown);
-    const terms = objectOrNull(breakdown?.terms_mol_o2_equiv_by_label);
-    if (!terms) return REDOX_EMPTY;
-    const entries = Object.entries(terms)
-        .filter(([, value]) => finiteNumber(value) !== null)
-        .sort(([left], [right]) => left.localeCompare(right));
-    if (!entries.length) return REDOX_EMPTY;
-    return entries
-        .map(([label, value]) => `${label}: ${formatRedoxNumber(value)} mol O2e`)
-        .join(', ');
+    if (!breakdown) return REDOX_EMPTY;
+    const applied = objectOrNull(breakdown.applied_terms_mol_o2_equiv_by_label) || {};
+    const skipped = objectOrNull(breakdown.skipped_terms_mol_o2_equiv_by_label) || {};
+    const parts = [];
+    const pushEntries = (terms, suffix) => {
+        Object.entries(terms)
+            .filter(([, value]) => finiteNumber(value) !== null)
+            .sort(([left], [right]) => left.localeCompare(right))
+            .forEach(([label, value]) => {
+                parts.push(`${label}: ${formatRedoxNumber(value)} mol O2e${suffix}`);
+            });
+    };
+    pushEntries(applied, '');
+    pushEntries(skipped, ' (skipped)');
+    if (!parts.length) return REDOX_EMPTY;
+    return parts.join(', ');
 }
 
 function renderRedoxSummary(summary) {
