@@ -663,6 +663,100 @@ def test_freeze_gate_pre_curve_window_builds_curve_on_first_staged_tick(
     assert 1 <= gate_calls <= 2
 
 
+def test_freeze_gate_pre_curve_tick_defers_native_split_with_respeciation(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.start_campaign(CampaignPhase.C2A)
+    sim.melt.temperature_C = sim.campaign_mgr.furnace_max_T_C
+    sim.melt.target_temperature_C = sim.campaign_mgr.furnace_max_T_C
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.oxygen_reservoir.reference_T_K = None
+    sim._sync_oxygen_reservoir_mirror()
+    original_dispatch = sim._dispatch_only
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 0.0}},
+            )
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={
+                    'backend_status': 'ok',
+                    'solidus_T_C': 1000.0,
+                    'liquidus_T_C': 1300.0,
+                },
+            )
+        return original_dispatch(intent, *args, **kwargs)
+
+    respeciation_results: list[dict] = []
+    native_results: list[dict] = []
+    original_respeciation = sim._apply_fe_redox_respeciation
+    original_native_split = sim._apply_native_fe_saturation_split
+
+    def record_respeciation(**kwargs):
+        result = original_respeciation(**kwargs)
+        respeciation_results.append(dict(result))
+        return result
+
+    def record_native_split(*, sample_time_h=None):
+        result = original_native_split(sample_time_h=sample_time_h)
+        native_results.append(dict(result))
+        return result
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+    monkeypatch.setattr(sim, '_apply_fe_redox_respeciation', record_respeciation)
+    monkeypatch.setattr(sim, '_apply_native_fe_saturation_split', record_native_split)
+
+    deferred_snapshot = sim.step()
+
+    assert any(
+        result.get('respeciation_status') == 'skipped_solid'
+        for result in respeciation_results
+    )
+    assert native_results[0]['native_fe_event'] == 'deferred_not_liquid_for_redox'
+    assert native_results[0]['native_fe_event_reason'] == (
+        'deferred_not_liquid_for_redox'
+    )
+    assert 'native_fe_partition' not in native_results[0]
+    # The deferred label must be LIVE-VISIBLE in the snapshot, not just in
+    # the (discarded) wrapped return (codex M2-FIX-REV Cluster B).
+    deferred_event = deferred_snapshot.fe_redox_split['native_fe_saturation_event']
+    assert deferred_event['native_fe_event'] == 'deferred_not_liquid_for_redox'
+    assert deferred_event['native_fe_event_status'] == 'deferred'
+    assert 'native_fe_partition' not in deferred_snapshot.fe_redox_split
+
+    respeciation_results.clear()
+    native_results.clear()
+    live_snapshot = sim.step()
+
+    assert respeciation_results
+    assert all(
+        result.get('respeciation_status') != 'skipped_solid'
+        for result in respeciation_results
+    )
+    assert native_results[0]['native_fe_event'] == 'native_fe_partitioned_saturation'
+    assert native_results[0]['native_fe_partition']['native_fe_pool_mol'] > 0.0
+    # On the live tick the snapshot carries the partitioned event + partition.
+    live_event = live_snapshot.fe_redox_split['native_fe_saturation_event']
+    assert live_event['native_fe_event'] == 'native_fe_partitioned_saturation'
+    assert live_snapshot.fe_redox_split['native_fe_partition'][
+        'native_fe_pool_mol'
+    ] > 0.0
+
+
 def test_temperature_rereference_noop_skips_liquid_guard(
     monkeypatch,
     vapor_pressure_data,
@@ -813,9 +907,14 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
         cache_ids.append(id(sim._freeze_gate_liquid_fraction_cache))
 
     cache_rebuild_count = sim._freeze_gate_cache_rebuild_count
-    # 2026-07-02 SSO-R ch1d: freeze-gate fO2 key is T-invariant along
-    # isochemical ramps, so quantization returns to the original <=2 bound.
-    assert cache_rebuild_count <= 2
+    # 2026-07-03 M2 fold: the pre-curve redox group now defers native-Fe
+    # splitting until the second hot tick, so the quiescent plateau rekeys
+    # exactly three times: (1) first curve build, (2) first-hot-tick
+    # ferric/fO2 composition rekey, (3) tick-2 native-split first-go-live
+    # rekey. Pinned to ==3 (not <=3) so an accidental elision of the
+    # native-split rekey — which would drop the count to 2 while
+    # gate_calls==rebuild_count still held — fails loud (grok M2-FIX-REV D1).
+    assert cache_rebuild_count == 3
     assert gate_calls == cache_rebuild_count
     assert len(set(cache_ids)) <= 2
     assert factors == [1.0] * 10

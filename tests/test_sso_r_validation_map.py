@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from simulator.core import FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 from scripts import sso_r_validation_map as validation_map
 
 
@@ -170,6 +171,45 @@ def test_smoke_rows_have_owner_readable_schema_and_source_label_reader(
     assert labeled
     for labeled_row in labeled:
         assert labeled_row["redox_source_reader"]
+
+
+def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
+    monkeypatch,
+):
+    setpoints, feedstocks, vapor_pressures = validation_map._load_data()
+    calibration = validation_map.calibrate_dose(
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+    )
+    calls: list[str] = []
+    original = validation_map.PyrolysisSimulator._apply_fe_redox_respeciation
+
+    def wrapped(self, **kwargs):
+        calls.append(str(kwargs.get("oxygen_source", "overhead_gas")))
+        return original(self, **kwargs)
+
+    monkeypatch.setattr(
+        validation_map.PyrolysisSimulator,
+        "_apply_fe_redox_respeciation",
+        wrapped,
+    )
+
+    row = validation_map.run_row(
+        1650.0,
+        validation_map.GasPoint(1.0e-6, 10.0, "n2_carrier"),
+        1.0,
+        calibration,
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+        grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
+    )
+
+    assert row["redox_source_terms_mol_o2_equiv_by_label"][
+        "redox_source:evaporative_metal_loss"
+    ] > 0.0
+    assert calls[-1] == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 
 
 def test_owner_pn2_anchor_reports_current_certification_blocker(smoke_payload):

@@ -1361,7 +1361,10 @@ def _fe_redox_split_observables(snapshot: HourSnapshot) -> dict[str, Any]:
             )
         elif isinstance(value, bool):
             exported[key] = bool(value)
-        elif key == "native_fe_partition" and isinstance(value, Mapping):
+        elif (
+            key in ("native_fe_partition", "native_fe_saturation_event")
+            and isinstance(value, Mapping)
+        ):
             exported[key] = _json_safe(value)
         elif value is None:
             exported[key] = None

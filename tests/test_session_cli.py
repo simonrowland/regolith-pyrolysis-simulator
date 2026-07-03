@@ -37,6 +37,7 @@ PER_HOUR_KEYS = {
 }
 PER_HOUR_DIAGNOSTIC_KEYS = {
     "fe_redox_split",
+    "redox_source_breakdown",
     "stage_3_capture",
 }
 
@@ -77,6 +78,17 @@ def _run_session(script: str, *, strict: bool = False) -> subprocess.CompletedPr
 
 def _frames(stdout: str) -> list[dict]:
     return [json.loads(line) for line in stdout.splitlines() if line]
+
+
+def _unexpected_stderr_lines(stderr: str) -> list[str]:
+    allowed = (
+        "VapoRock not available; vapor-melt backend disabled",
+        "module = self._import_vaporock()",
+    )
+    return [
+        line for line in stderr.splitlines()
+        if not any(marker in line for marker in allowed)
+    ]
 
 
 def test_session_start_carries_c5_mre_fields_into_session():
@@ -179,7 +191,31 @@ def test_session_script_exercises_every_verb_as_ndjson():
     assert frames[3]["choice"] == "A"
     assert frames[5]["campaign"] == "C2A"
     assert frames[5]["field"] == "stir_factor"
-    assert result.stderr == ""
+    assert _unexpected_stderr_lines(result.stderr) == []
+
+
+def test_session_cli_reports_redox_breakdown_when_respeciation_attempts_exist():
+    result = _run_session(
+        """
+        start --feedstock=lunar_mare_low_ti --campaign=C0 --backend=stub --setpoint=C0.max_hours=1 --setpoint=C0B.max_hours=1
+        advance 10
+        quit
+        """
+    )
+
+    assert result.returncode == 0, result.stderr
+    frames = _frames(result.stdout)
+    steps = frames[1]["steps"]
+    attempted = [
+        step["redox_source_breakdown"]
+        for step in steps
+        if step.get("redox_source_breakdown", {}).get(
+            "fe_redox_respeciation_attempts"
+        )
+    ]
+
+    assert attempted
+    assert all("ferric_divergence" in breakdown for breakdown in attempted)
 
 
 def test_session_script_is_byte_deterministic():

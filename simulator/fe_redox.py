@@ -19,7 +19,9 @@ KRESS91_MOL_FRACTION_OXIDES = (
     'K2O',
     'P2O5',
 )
+# Kress & Carmichael 1991 CMP 108:82-92 doi:10.1007/BF00307328: ln(fO2) term.
 KRESS91_LN_FO2_COEFFICIENT = 0.196
+# Kress & Carmichael 1991 CMP 108:82-92 doi:10.1007/BF00307328: inverse-T term.
 KRESS91_INV_T_COEFFICIENT_K = 11492.0
 # Fallback liquid-only guard when freeze-gate liquid fraction is disabled.
 # Kress91 coefficients above remain the thermodynamic source.

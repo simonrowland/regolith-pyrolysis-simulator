@@ -20,7 +20,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from simulator.core import PyrolysisSimulator
+from simulator.core import (
+    FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+    PyrolysisSimulator,
+)
 from simulator.runner import build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase
 
@@ -407,7 +410,12 @@ def run_row(
         sim._apply_lab_surface_temperatures(sample_time_h=SAMPLE_TIME_H)
         sim._route_to_condensation(evap_flux)
     sim._update_melt_composition(evap_flux)
-    second_respeciation = sim._apply_fe_redox_respeciation()
+    if sim._has_remaining_fe_redox_internal_o2_capacity():
+        second_respeciation = sim._apply_fe_redox_respeciation(
+            oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
+        )
+    else:
+        second_respeciation = sim._apply_fe_redox_respeciation()
 
     snapshot = sim._make_snapshot()
     snapshot.evap_flux = evap_flux

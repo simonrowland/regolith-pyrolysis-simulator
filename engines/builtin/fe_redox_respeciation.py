@@ -61,6 +61,12 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
+        """Dispatch FeO/Fe2O3 re-speciation.
+
+        Partial funding returns ``status='ok'`` with ``unfunded_o2_mol``;
+        consumers must key on ``unfunded_o2_mol``, not ``status`` alone.
+        """
+
         from simulator.accounting.formulas import resolve_species_formula
 
         wrong_intent = reject_wrong_intent(

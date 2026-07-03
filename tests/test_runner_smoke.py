@@ -1082,8 +1082,25 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
             "target_selectivity": 0.9,
         },
         mre_uncertified_yield={"Al": 1.23},
-        fe_redox_split={"fO2_log": -8.0, "ferric_frac": 0.2, "valid": True},
+        fe_redox_split={
+            "fO2_log": -8.0,
+            "ferric_frac": 0.2,
+            "valid": True,
+            "native_fe_saturation_event": {
+                "native_fe_event": "deferred_not_liquid_for_redox",
+                "native_fe_event_status": "deferred",
+            },
+        },
     )
+
+    # The native-Fe saturation event is a Mapping and must serialize as a
+    # nested JSON object, not a Python repr string (codex M2-FOLD-CLOSE:
+    # the observables helper stringified every non-partition key).
+    fe_split_export = _fe_redox_split_observables(snapshot)["fe_redox_split"]
+    assert fe_split_export["native_fe_saturation_event"] == {
+        "native_fe_event": "deferred_not_liquid_for_redox",
+        "native_fe_event_status": "deferred",
+    }
 
     emitted: set[str] = set()
     emitted |= set(_evap_plane_selectivity_observables(snapshot))

@@ -593,6 +593,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             Tuple[str, str], float] = {}
         self._last_impurity_delta: Dict[Tuple[int, str], float] = {}
         self._last_native_fe_partition_diagnostic: Dict[str, Any] = {}
+        self._last_native_fe_saturation_event: Dict[str, Any] = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr: float | None = None
 
         # --- Gas train feedback state ---
@@ -2876,6 +2877,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 'fe2o3_unavailable'
         return 'respeciation_pending'
 
+    def _remaining_fe_redox_internal_o2_capacity_mol(self) -> float:
+        return max(
+            0.0,
+            float(
+                getattr(
+                    self,
+                    '_fe_redox_internal_o2_capacity_mol_this_hr',
+                    0.0,
+                )
+                or 0.0
+            )
+            - float(
+                getattr(
+                    self,
+                    '_fe_redox_internal_o2_consumed_mol_this_hr',
+                    0.0,
+                )
+                or 0.0
+            ),
+        )
+
+    def _has_remaining_fe_redox_internal_o2_capacity(self) -> bool:
+        return (
+            self._remaining_fe_redox_internal_o2_capacity_mol()
+            > OXYGEN_RESERVOIR_NOOP_MOL
+        )
+
     def _apply_fe_redox_respeciation(
         self,
         *,
@@ -2887,24 +2915,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         oxygen_source = str(oxygen_source or FE_REDOX_OXYGEN_SOURCE_OVERHEAD)
         internal_o2_capacity_mol = 0.0
         if oxygen_source == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS:
-            internal_o2_capacity_mol = max(
-                0.0,
-                float(
-                    getattr(
-                        self,
-                        '_fe_redox_internal_o2_capacity_mol_this_hr',
-                        0.0,
-                    )
-                    or 0.0
-                )
-                - float(
-                    getattr(
-                        self,
-                        '_fe_redox_internal_o2_consumed_mol_this_hr',
-                        0.0,
-                    )
-                    or 0.0
-                ),
+            internal_o2_capacity_mol = (
+                self._remaining_fe_redox_internal_o2_capacity_mol()
             )
         if not self._melt_redox_temperature_shift_is_liquid(T_K):
             diagnostic = {
@@ -3011,7 +3023,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
 
         terms = _filtered_terms('_redox_source_terms_this_hr')
-        if not terms:
+        respeciation_attempts = [
+            dict(attempt)
+            for attempt in (
+                getattr(self, '_fe_redox_respeciation_diagnostics_this_hr', []) or []
+            )
+        ]
+        if not terms and not respeciation_attempts:
             return {}
         applied_terms = _filtered_terms('_redox_source_applied_terms_this_hr')
         skipped_terms = _filtered_terms('_redox_source_skipped_terms_this_hr')
@@ -3037,12 +3055,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if not source_context:
             source_context = self._redox_source_context_for_current_state()
-        respeciation_attempts = [
-            dict(attempt)
-            for attempt in (
-                getattr(self, '_fe_redox_respeciation_diagnostics_this_hr', []) or []
-            )
-        ]
         return {
             'terms_mol_o2_equiv_by_label': terms,
             'applied_terms_mol_o2_equiv_by_label': applied_terms,
@@ -3499,6 +3511,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if getattr(self, '_last_native_fe_partition_diagnostic', {})
                 else {}
             ),
+            # Surface the native-Fe saturation event (deferred /
+            # below-threshold / partitioned) so the live HourSnapshot and
+            # runner output show WHY there is (or is not) a partition this
+            # tick — otherwise the deferred-not-liquid label is write-only.
+            **(
+                {'native_fe_saturation_event': dict(
+                    getattr(self, '_last_native_fe_saturation_event', {})
+                    or {}
+                )}
+                if getattr(self, '_last_native_fe_saturation_event', {})
+                else {}
+            ),
         }
 
     def _native_fe_saturation_state(
@@ -3814,20 +3838,43 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         sample_time_h: float | None = None,
     ) -> Dict[str, Any]:
-        self._re_reference_melt_fO2_to_temperature(
-            max(1.0, float(self.melt.temperature_C) + 273.15)
-        )
+        T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
+        if not self._melt_redox_temperature_shift_is_liquid(T_K):
+            split = self._compute_fe_redox_split_diagnostic()
+            event = {
+                'native_fe_event': 'deferred_not_liquid_for_redox',
+                'native_fe_event_reason': 'deferred_not_liquid_for_redox',
+                'native_fe_event_status': 'deferred',
+                'temperature_C': float(self.melt.temperature_C),
+            }
+            self._last_native_fe_partition_diagnostic = {}
+            self._last_native_fe_saturation_event = dict(event)
+            return {**split, **event}
+
+        self._re_reference_melt_fO2_to_temperature(T_K)
         split = self._compute_fe_redox_split_diagnostic()
         native_frac = max(0.0, float(split.get('native_fe_frac', 0.0) or 0.0))
         if native_frac <= 1.0e-12:
-            return split
+            event = {
+                'native_fe_event': 'no_native_fe_below_threshold',
+                'native_fe_event_reason': 'native_fe_frac_below_threshold',
+                'native_fe_event_status': 'ok',
+            }
+            self._last_native_fe_saturation_event = dict(event)
+            return {**split, **event}
         cleaned_melt_mol = self.atom_ledger.mol_by_account(
             'process.cleaned_melt')
         feo_mol = max(0.0, float(cleaned_melt_mol.get('FeO', 0.0) or 0.0))
         total_fe_mol = self._cleaned_melt_fe_atom_mol()
         native_fe_mol = min(feo_mol, total_fe_mol * native_frac)
         if native_fe_mol <= 1.0e-12:
-            return split
+            event = {
+                'native_fe_event': 'no_native_fe_below_threshold',
+                'native_fe_event_reason': 'native_fe_mol_below_threshold',
+                'native_fe_event_status': 'ok',
+            }
+            self._last_native_fe_saturation_event = dict(event)
+            return {**split, **event}
         partition = self._native_fe_partition_diagnostic(native_fe_mol)
 
         control_inputs = {
@@ -3935,7 +3982,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )},
             exchange_direction='redox_source:native_fe_saturation_split',
         )
-        return {**split, 'native_fe_partition': dict(partition)}
+        event = {
+            'native_fe_event': 'native_fe_partitioned_saturation',
+            'native_fe_event_reason': 'native_fe_saturation_split_applied',
+            'native_fe_event_status': 'ok',
+        }
+        self._last_native_fe_saturation_event = dict(event)
+        return {**split, 'native_fe_partition': dict(partition), **event}
 
     def _seed_atom_ledger(
         self,
@@ -7641,6 +7694,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_wall_deposit_by_segment_species_delta = {}
         self._last_impurity_delta = {}
         self._last_native_fe_partition_diagnostic = {}
+        self._last_native_fe_saturation_event = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._last_extraction_completeness_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
@@ -7741,26 +7795,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 6. Update melt composition ---
         # Subtract evaporated mass from the melt.
         self._update_melt_composition(evap_flux)
-        remaining_internal_o2_mol = max(
-            0.0,
-            float(
-                getattr(
-                    self,
-                    '_fe_redox_internal_o2_capacity_mol_this_hr',
-                    0.0,
-                )
-                or 0.0
-            )
-            - float(
-                getattr(
-                    self,
-                    '_fe_redox_internal_o2_consumed_mol_this_hr',
-                    0.0,
-                )
-                or 0.0
-            ),
-        )
-        if remaining_internal_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+        if self._has_remaining_fe_redox_internal_o2_capacity():
             self._apply_fe_redox_respeciation(
                 oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
             )
