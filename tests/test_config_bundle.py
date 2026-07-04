@@ -112,6 +112,33 @@ def test_functional_data_yaml_digests_track_values_and_added_keys(
     assert load_config_bundle(tmp_path).digests[name] != baseline
 
 
+@pytest.mark.parametrize("name", sorted(FUNCTIONAL_DATA_CONFIGS))
+def test_functional_data_yaml_digests_distinguish_degenerate_roots(
+    tmp_path: Path,
+    name: str,
+) -> None:
+    # #89 review-fold: distinct degenerate roots must NOT collide — the old
+    # `yaml.safe_load(...) or {}` fallback collapsed {}, [], null, and empty-file
+    # to one digest, masking a real root-structure change.
+    _write_minimal_config_bundle(tmp_path)
+    path = tmp_path / REQUIRED_CONFIGS[name]
+
+    def _digest_for(text: str) -> str:
+        path.write_text(text)
+        return load_config_bundle(tmp_path).digests[name]
+
+    # all four are falsey YAML roots that the old `... or {}` fallback collapsed to
+    # a single hash({}); the fix digests the parsed root so they are now distinct.
+    # (null and empty-file both parse to None, so they are intentionally omitted.)
+    variants = {
+        _digest_for("{}\n"),
+        _digest_for("[]\n"),
+        _digest_for("false\n"),
+        _digest_for("0\n"),
+    }
+    assert len(variants) == 4
+
+
 def test_load_config_bundle_missing_required_file_raises(tmp_path: Path) -> None:
     for filename in REQUIRED_CONFIGS.values():
         shutil.copy2(DEFAULT_DATA_DIR / filename, tmp_path / filename)

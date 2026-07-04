@@ -355,7 +355,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # vapor_pressure/equilibrium/fe_redox/core. Behaviorally neutral (unknown
     # body defaults to the old 1e-9; all reduced-real output goldens byte-
     # identical); only the source-module digest moves. Provenance rebaseline.
-    assert cache_key(spec) == "daab79ca24a8b73c6ef6e47d8f39b22731b35faf6bf1ef01c058cdd791237aeb"
+    # 2026-07-04 (#89): functional-YAML production digest (setpoints/vapor_pressures
+    # parsed-content, not raw bytes) shifts the evalspec cache_key; golden-neutral.
+    assert cache_key(spec) == "cc0a0b827d59e6a4573c9af073acee12b51f00a70a3ae6419aeeb623d33cc66d"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

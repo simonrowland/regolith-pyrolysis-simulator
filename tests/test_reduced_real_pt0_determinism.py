@@ -152,13 +152,13 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     key_hash = _key_hash(key)
     fine_key = _freeze_gate_key(control_quantization=ControlQuantization.PRODUCTION)
 
-    # 2026-07-03: rebaselined for S2b — the replay key serializes the full
-    # setpoints dict, so updating the (now-accurate) C3 Na_additive_kg `via:`
-    # annotation to "requested as C3 alkali credit-line dose" moved the hash.
-    # Deterministic (byte-identical across runs) and PRODUCTION==default still
-    # holds; this is a setpoints-content change, not a freeze-gate physics move.
-    # The over-broad digest (hashing doc annotations) is tracked separately.
-    assert key_hash == "0ea8780005c41ee538202675ce68fe39ff75460448adf6f86fddbea922f86e3a"
+    # 2026-07-04: rebaselined for #89 — the reduced-real production key now hashes
+    # the FUNCTIONAL parsed content of setpoints/vapor_pressures (canonical JSON),
+    # not raw file bytes, so doc-annotation/formatting edits no longer move it (the
+    # over-broad digest flagged on 2026-07-03 is now fixed). Deterministic (byte-
+    # identical across runs) and PRODUCTION==default still hold; golden-neutral
+    # (runner outputs unchanged) — only this cache-identity hash moved.
+    assert key_hash == "4515ccbca9c2ec443d631257736047bd74e46a87f876138a4b461a4ca051b8c3"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 

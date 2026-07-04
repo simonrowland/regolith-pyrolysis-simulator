@@ -69,9 +69,13 @@ def _load_required_yaml(
     if not path.exists():
         raise FileNotFoundError(f"required config file missing: {path}")
     raw = path.read_bytes()
-    loaded = yaml.safe_load(raw.decode("utf-8")) or {}
+    parsed = yaml.safe_load(raw.decode("utf-8"))
+    loaded = parsed if isinstance(parsed, dict) else {}
     digest = (
-        functional_data_yaml_digest(loaded)
+        # #89 review-fold: digest the ACTUAL parsed root, not the `or {}` fallback,
+        # so a degenerate root ({}, [], null, empty file, scalar) hashes distinctly
+        # and a real root-structure change cannot collide. Neutral for real mappings.
+        functional_data_yaml_digest(parsed)
         if functional_digest
         else sha256(raw).hexdigest()
     )
