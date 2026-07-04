@@ -20,6 +20,11 @@ from simulator.optimize.objective import (
     product_summary,
     target_spec_digest,
 )
+from simulator.optimize.sso2_evidence import (
+    SSO2_CHUNK3B_READER_HANDOFF,
+    sso2_owner_recipe_evidence,
+    sso2_owner_recipe_setpoints_patch,
+)
 
 
 DEFINITIONS = (
@@ -175,6 +180,219 @@ class _FakeUnclassifiedProductSim(_FakeProductSim):
         ledger = dict(super().product_ledger())
         ledger["MysteryOxide"] = 7.0
         return ledger
+
+
+class _FakeSso2Transition:
+    name = "native_fe_saturation_split"
+
+
+class _FakeSso2Ledger:
+    def __init__(
+        self,
+        accounts: dict[str, dict[str, float]],
+        *,
+        split_present: bool = True,
+    ) -> None:
+        self._accounts = accounts
+        self.transitions = (_FakeSso2Transition(),) if split_present else ()
+
+    def kg_by_account(self, account: str) -> dict[str, float]:
+        return dict(self._accounts.get(account, {}))
+
+
+def _sso2_execution(
+    *,
+    condensed_delta: dict[tuple[int, str], float] | None = None,
+    ledger: _FakeSso2Ledger | None = None,
+):
+    snapshot = SimpleNamespace(hour=1, mass_balance_error_pct=1.2e-13)
+    trace = SimpleNamespace(
+        snapshots=(snapshot,),
+        condensed_by_stage_species_delta=(
+            dict(condensed_delta or {}),
+        ),
+        wall_deposit_by_segment_species_delta=({},),
+        wall_deposit_by_segment_species_kg={},
+        wall_zone_by_segment={},
+        wall_deposit_sticking_authority={},
+    )
+    sim = SimpleNamespace(
+        atom_ledger=ledger,
+        species_formula_registry={},
+        product_ledger=lambda: {"Fe": 8.0},
+    )
+    return SimpleNamespace(
+        simulator=sim,
+        snapshots=(snapshot,),
+        trace=trace,
+    )
+
+
+def test_sso2_owner_recipe_patch_is_named_allowlisted_fe_then_sio() -> None:
+    patch = sso2_owner_recipe_setpoints_patch()
+    staged = patch["campaigns"]["C2A_staged"]
+    stages = {stage["name"]: stage for stage in staged["stages"]}
+
+    assert staged["order"] == "fe_then_sio"
+    assert stages["sio_window"]["target_C"] == pytest.approx(1650.0)
+    assert stages["sio_window"]["gas_cover_mode"] == "pn2_sweep"
+    assert stages["sio_window"]["pO2_mbar"] == pytest.approx(0.0)
+    assert 5.0 <= stages["sio_window"]["p_total_mbar"] <= 15.0
+
+
+def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:
+    execution = _sso2_execution(
+        condensed_delta={
+            (1, "Fe"): 5.0,
+            (1, "SiO"): 0.25,
+            (3, "SiO2"): 9.0,
+            (3, "Si"): 1.0,
+            (3, "Fe"): 1.0,
+        },
+        ledger=_FakeSso2Ledger({
+            "terminal.drain_tap_material": {"Fe": 7.0, "Si": 0.2},
+            "process.metal_phase": {"Fe": 3.0},
+        }),
+    )
+
+    evidence = sso2_owner_recipe_evidence(execution)
+
+    assert evidence["status"] == "stage_stream_purity_failed"
+    assert evidence["stage_3"]["accepted_species"] == ["Si", "SiO", "SiO2"]
+    assert evidence["stage_3"]["silica_species_kg"]["SiO2"] == pytest.approx(9.0)
+    assert evidence["stage_3"]["silica_species_mol"]["SiO2"] > 0.0
+    assert evidence["stage_3"]["Fe_kg"] == pytest.approx(1.0)
+    assert evidence["stage_3"]["Fe_wt_pct"] == pytest.approx(100.0 / 11.0)
+    assert evidence["delivered_stream_purity"]["feasible"] is False
+    assert evidence["delivered_stream_purity"]["observed"] == pytest.approx(10.0 / 11.0)
+    assert evidence["fe_tap"]["Fe_kg"] == pytest.approx(7.0)
+    assert evidence["fe_tap"]["SiO_Si_impurity_wt_pct"] == pytest.approx(0.2 / 7.2 * 100.0)
+    assert "chunk 3b" in evidence["reader_handoff_chunk3b"]
+    assert "Stage 3 Fe contamination" in SSO2_CHUNK3B_READER_HANDOFF
+
+
+def test_sso2_evidence_empty_fe_tap_account_fails_closed_without_zero_alias() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 1.0},
+        ledger=_FakeSso2Ledger({"process.metal_phase": {"Fe": 1.0}}),
+    )
+
+    evidence = sso2_owner_recipe_evidence(execution)
+
+    assert evidence["status"] == "missing_fe_tap_evidence"
+    assert evidence["fe_tap"]["status"] == "missing_fe_tap_evidence"
+    assert evidence["fe_tap"]["Fe_kg"] is None
+    assert evidence["fe_tap"]["total_kg"] is None
+    assert evidence["fe_tap"]["species_kg"] == {}
+
+
+def test_sso2_evidence_missing_partition_preempts_empty_fe_tap_status() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 1.0},
+        ledger=_FakeSso2Ledger({"process.metal_phase": {"Fe": 1.0}}, split_present=False),
+    )
+
+    evidence = sso2_owner_recipe_evidence(execution)
+
+    assert evidence["status"] == "missing_fe_drain_vapor_partition"
+    assert evidence["fe_tap"]["status"] == "missing_fe_tap_evidence"
+    assert evidence["fe_tap"]["Fe_kg"] is None
+
+
+def test_sso2_evidence_negative_condensed_kg_fails_closed_without_raise() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): -1.0},
+        ledger=_FakeSso2Ledger({"terminal.drain_tap_material": {"Fe": 1.0}}),
+    )
+
+    evidence = sso2_owner_recipe_evidence(execution)
+
+    assert evidence["status"] == "invalid_stage_purity_trace"
+    assert evidence["stage_3"]["status"] == "invalid_stage_purity_trace"
+    assert evidence["stage_3"]["Fe_kg"] is None
+
+
+def test_sso2_evidence_negative_fe_tap_kg_fails_closed_without_raise() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 1.0},
+        ledger=_FakeSso2Ledger({"terminal.drain_tap_material": {"Fe": -1.0}}),
+    )
+
+    evidence = sso2_owner_recipe_evidence(execution)
+
+    assert evidence["status"] == "missing_fe_tap_evidence"
+    assert evidence["fe_tap"]["status"] == "missing_fe_tap_evidence"
+    assert evidence["fe_tap"]["Fe_kg"] is None
+    assert evidence["fe_tap"]["species_kg"] == {}
+
+
+def test_sso2_evidence_negative_product_fe_kg_fails_closed_without_raise() -> None:
+    # SC-49 sibling: the optional product-ledger field must not escape a bare
+    # ValueError from the evidence surface on a corrupt (negative) product kg.
+    snapshot = SimpleNamespace(hour=1, mass_balance_error_pct=1.2e-13)
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            atom_ledger=_FakeSso2Ledger({"terminal.drain_tap_material": {"Fe": 1.0}}),
+            species_formula_registry={},
+            product_ledger=lambda: {"Fe": -1.0},
+        ),
+        snapshots=(snapshot,),
+        trace=SimpleNamespace(
+            snapshots=(snapshot,),
+            condensed_by_stage_species_delta=({(3, "SiO2"): 1.0},),
+        ),
+    )
+
+    evidence = sso2_owner_recipe_evidence(execution)
+
+    assert evidence["metal_product_path"]["product_ledger_Fe_kg"] is None
+
+
+def test_sso2_evidence_nonfinite_mass_balance_fails_closed_without_raise() -> None:
+    # SC-49 sibling: a non-finite mass-balance value is invalid evidence, not a
+    # pass, and must fail closed rather than raise out of the evidence surface.
+    snapshot = SimpleNamespace(hour=1, mass_balance_error_pct=float("nan"))
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            atom_ledger=_FakeSso2Ledger({"terminal.drain_tap_material": {"Fe": 1.0}}),
+            species_formula_registry={},
+            product_ledger=lambda: {"Fe": 1.0},
+        ),
+        snapshots=(snapshot,),
+        trace=SimpleNamespace(
+            snapshots=(snapshot,),
+            condensed_by_stage_species_delta=({(3, "SiO2"): 1.0},),
+        ),
+    )
+
+    evidence = sso2_owner_recipe_evidence(execution)
+
+    assert evidence["mass_balance"]["status"] == "invalid_mass_balance_trace"
+    assert evidence["mass_balance"]["max_abs_error_pct"] is None
+
+
+def test_sso2_evidence_missing_stage_trace_fails_closed_without_zero_alias() -> None:
+    snapshot = SimpleNamespace(hour=1, mass_balance_error_pct=0.0)
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            atom_ledger=_FakeSso2Ledger({"terminal.drain_tap_material": {"Fe": 1.0}}),
+            species_formula_registry={},
+            product_ledger=lambda: {"Fe": 1.0},
+        ),
+        snapshots=(snapshot,),
+        trace=SimpleNamespace(snapshots=(snapshot,)),
+    )
+
+    evidence = sso2_owner_recipe_evidence(execution)
+
+    assert evidence["status"] == "missing_stage_purity_trace"
+    assert evidence["stage_3"]["Fe_kg"] is None
+    assert evidence["stage_3"]["silica_species_kg"] == {
+        "SiO": None,
+        "SiO2": None,
+        "Si": None,
+    }
+    assert evidence["delivered_stream_purity"]["detail"].startswith("fail-closed:")
 
 
 def test_product_summary_includes_input_output_yield_table_and_mass_closure() -> None:

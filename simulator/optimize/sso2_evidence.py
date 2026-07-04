@@ -1,0 +1,454 @@
+"""SSO-2 owner-recipe evidence report surface."""
+
+from __future__ import annotations
+
+import math
+from collections.abc import Mapping, Sequence
+from typing import Any
+
+from simulator.accounting.formulas import resolve_species_formula
+from simulator.condensation_routing import accepted_species_for_stage_number
+from simulator.optimize.physics import GateMargin, PhysicsConstraintSet
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.runner import PyrolysisRun
+from simulator.run_executor import RunExecution, RunExecutor
+
+
+SSO2_OWNER_RECIPE_ID = "sso2_pn2_fe_drain_silica"
+SSO2_FEEDSTOCK_ID = "lunar_mare_low_ti"
+SSO2_STAGE_NUMBER = 3
+SSO2_SILICA_SPECIES = ("SiO", "SiO2", "Si")
+SSO2_FE_TAP_ACCOUNT = "terminal.drain_tap_material"
+SSO2_METAL_PHASE_ACCOUNT = "process.metal_phase"
+SSO2_CHUNK3B_READER_HANDOFF = (
+    "PhysicsConstraintSet.delivered_stream_purity plus the SSO-2 profile/objective "
+    "reader added in chunk 3b; it must consume Stage 3 Fe contamination and Fe tap "
+    "evidence, not just captured_stage_3_silica."
+)
+_EPS = 1.0e-12
+
+
+def sso2_owner_recipe_patch() -> RecipePatch:
+    """Named SSO-2 owner recipe preset; no purity threshold is invented here."""
+
+    return RecipePatch.from_nested({
+        "furnace_max_T_C": 1700.0,
+        "campaigns": {
+            "C2A_staged": {
+                "order": "fe_then_sio",
+                "default_hold_T_C": 1670.0,
+                "max_hold_hr": 9,
+                "stages": {
+                    "fe_hot_hold": {
+                        "duration_h": 1,
+                        "ramp_rate_C_per_hr": 150.0,
+                        "gas_cover_mode": "pn2_sweep",
+                        "pO2_mbar": 0.0,
+                        "p_total_mbar": 10.0,
+                    },
+                    "sio_window": {
+                        "target_C": 1650.0,
+                        "duration_h": 3,
+                        "ramp_rate_C_per_hr": 175.0,
+                        "gas_cover_mode": "pn2_sweep",
+                        "pO2_mbar": 0.0,
+                        "p_total_mbar": 10.0,
+                    },
+                },
+            }
+        },
+    })
+
+
+def sso2_owner_recipe_setpoints_patch(
+    schema: RecipeSchema | None = None,
+) -> Mapping[str, Any]:
+    active_schema = schema or RecipeSchema()
+    return active_schema.to_setpoints_patch(sso2_owner_recipe_patch())
+
+
+def build_sso2_owner_recipe_execution(
+    *,
+    hours: int = 9,
+    mass_kg: float = 1000.0,
+    backend_name: str = "stub",
+) -> RunExecution:
+    run = PyrolysisRun(
+        feedstock_id=SSO2_FEEDSTOCK_ID,
+        campaign="C2A_staged",
+        hours=int(hours),
+        mass_kg=float(mass_kg),
+        backend_name=backend_name,
+        setpoints_patch=sso2_owner_recipe_setpoints_patch(),
+    )
+    return RunExecutor().execute(run._session_config())
+
+
+def sso2_owner_recipe_evidence(
+    run_execution: Any,
+    *,
+    constraints: PhysicsConstraintSet | None = None,
+) -> dict[str, Any]:
+    active_constraints = constraints or PhysicsConstraintSet()
+    trace = getattr(run_execution, "trace", None)
+    purity_margin = active_constraints.delivered_stream_purity(trace)
+    coating_margin = active_constraints.coating(trace)
+    stage_species_kg, trace_status, trace_reason = _stage_species_kg_from_trace(trace)
+    stage3_kg = {
+        species: kg
+        for (stage, species), kg in stage_species_kg.items()
+        if stage == SSO2_STAGE_NUMBER
+    }
+    accepted = accepted_species_for_stage_number(SSO2_STAGE_NUMBER)
+    stage3_total_kg = sum(stage3_kg.values())
+    stage3_stream_available = trace_status == "available" and stage3_total_kg > _EPS
+    if trace_status != "available":
+        stage_status = trace_status
+        stage_reason = trace_reason
+    elif not stage3_stream_available:
+        stage_status = "missing_stage_3_stream"
+        stage_reason = "Stage 3 condensed stream is absent or zero"
+    else:
+        stage_status = "available"
+        stage_reason = ""
+    accepted_kg = sum(kg for species, kg in stage3_kg.items() if species in accepted)
+    stage3_purity = accepted_kg / stage3_total_kg if stage3_stream_available else None
+    stage3_fe_kg = stage3_kg.get("Fe", 0.0) if stage3_stream_available else None
+    stage3_fe_wt_pct = (
+        stage3_fe_kg / stage3_total_kg * 100.0
+        if stage3_stream_available and stage3_fe_kg is not None
+        else None
+    )
+
+    sim = getattr(run_execution, "simulator", run_execution)
+    ledger = getattr(sim, "atom_ledger", None)
+    tap_kg_by_species, tap_status, tap_reason = _ledger_account_kg(
+        ledger, SSO2_FE_TAP_ACCOUNT
+    )
+    metal_phase_kg_by_species, metal_status, metal_reason = _ledger_account_kg(
+        ledger, SSO2_METAL_PHASE_ACCOUNT
+    )
+    product_fe_kg = _product_species_kg(sim, "Fe")
+    native_split_count = _transition_count(ledger, "native_fe_saturation_split")
+    fe_tap_total_kg = sum(tap_kg_by_species.values())
+    fe_tap_si_impurity_kg = sum(
+        tap_kg_by_species.get(species, 0.0) for species in SSO2_SILICA_SPECIES
+    )
+    fe_tap_si_impurity_wt_pct = _wt_pct(fe_tap_si_impurity_kg, fe_tap_total_kg)
+    stage1_kg = {
+        species: kg
+        for (stage, species), kg in stage_species_kg.items()
+        if stage == 1
+    }
+    stage1_total_kg = sum(stage1_kg.values())
+    stage1_si_impurity_kg = sum(stage1_kg.get(species, 0.0) for species in SSO2_SILICA_SPECIES)
+    stage1_si_impurity_wt_pct = _wt_pct(stage1_si_impurity_kg, stage1_total_kg)
+    dependency_status = (
+        "available"
+        if native_split_count > 0
+        else "missing_fe_drain_vapor_partition"
+    )
+    dependency_reason = (
+        ""
+        if native_split_count > 0
+        else "no native_fe_saturation_split transition observed for this run"
+    )
+    mass_balance = _mass_balance_closure(run_execution, trace)
+
+    if trace_status != "available":
+        status = trace_status
+        status_reason = trace_reason
+    elif not stage3_stream_available:
+        status = "missing_stage_3_stream"
+        status_reason = stage_reason
+    elif dependency_status != "available":
+        status = dependency_status
+        status_reason = dependency_reason
+    elif tap_status != "available":
+        status = "missing_fe_tap_evidence"
+        status_reason = tap_reason
+    elif not purity_margin.feasible:
+        status = "stage_stream_purity_failed"
+        status_reason = purity_margin.detail
+    else:
+        status = "available"
+        status_reason = ""
+
+    return {
+        "recipe_id": SSO2_OWNER_RECIPE_ID,
+        "status": status,
+        "status_reason": status_reason,
+        "feedstock": SSO2_FEEDSTOCK_ID,
+        "recipe_patch": sso2_owner_recipe_patch().to_nested(),
+        "reader_handoff_chunk3b": SSO2_CHUNK3B_READER_HANDOFF,
+        "stage_3": {
+            "status": stage_status,
+            "status_reason": stage_reason,
+            "accepted_species": sorted(accepted),
+            "accepted_species_reader": "accepted_species_for_stage_number(3)",
+            "silica_species_kg": _species_values(stage3_kg, SSO2_SILICA_SPECIES, stage3_stream_available),
+            "silica_species_mol": _species_mol_values(
+                run_execution, stage3_kg, SSO2_SILICA_SPECIES, stage3_stream_available
+            ),
+            "Fe_kg": stage3_fe_kg,
+            "Fe_wt_pct": stage3_fe_wt_pct,
+            "total_kg": stage3_total_kg if stage3_stream_available else None,
+            "purity_fraction": stage3_purity,
+            "purity_margin": (
+                stage3_purity - active_constraints.stream_purity_min.value
+                if stage3_purity is not None
+                else None
+            ),
+            "purity_threshold": _threshold_payload(active_constraints.stream_purity_min),
+        },
+        "delivered_stream_purity": _gate_margin_payload(purity_margin),
+        "fe_tap": {
+            "status": tap_status,
+            "status_reason": tap_reason,
+            "account": SSO2_FE_TAP_ACCOUNT,
+            "Fe_kg": tap_kg_by_species.get("Fe", 0.0) if tap_status == "available" else None,
+            "total_kg": fe_tap_total_kg if tap_status == "available" else None,
+            "SiO_Si_impurity_kg": (
+                fe_tap_si_impurity_kg if tap_status == "available" else None
+            ),
+            "SiO_Si_impurity_wt_pct": (
+                fe_tap_si_impurity_wt_pct if tap_status == "available" else None
+            ),
+            "species_kg": dict(sorted(tap_kg_by_species.items())) if tap_status == "available" else {},
+        },
+        "metal_product_path": {
+            "status": metal_status,
+            "status_reason": metal_reason,
+            "account": SSO2_METAL_PHASE_ACCOUNT,
+            "Fe_kg": (
+                metal_phase_kg_by_species.get("Fe", 0.0)
+                if metal_status == "available"
+                else None
+            ),
+            "product_ledger_Fe_kg": product_fe_kg,
+            "species_kg": (
+                dict(sorted(metal_phase_kg_by_species.items()))
+                if metal_status == "available"
+                else {}
+            ),
+        },
+        "stage_1_or_metal_tap_si_impurity": {
+            "stage_1_total_kg": stage1_total_kg if trace_status == "available" else None,
+            "stage_1_SiO_Si_impurity_kg": (
+                stage1_si_impurity_kg if trace_status == "available" else None
+            ),
+            "stage_1_SiO_Si_impurity_wt_pct": (
+                stage1_si_impurity_wt_pct if trace_status == "available" else None
+            ),
+            "metal_tap_SiO_Si_impurity_kg": (
+                fe_tap_si_impurity_kg if tap_status == "available" else None
+            ),
+            "metal_tap_SiO_Si_impurity_wt_pct": (
+                fe_tap_si_impurity_wt_pct if tap_status == "available" else None
+            ),
+        },
+        "wall_coating": _gate_margin_payload(coating_margin),
+        "mass_balance": mass_balance,
+        "fe_drain_vapor_partition_dependency": {
+            "status": dependency_status,
+            "status_reason": dependency_reason,
+            "native_fe_saturation_split_count": native_split_count,
+            "required_transition": "native_fe_saturation_split",
+        },
+    }
+
+
+def _stage_species_kg_from_trace(trace: Any) -> tuple[dict[tuple[int, str], float], str, str]:
+    if trace is None:
+        return {}, "missing_stage_purity_trace", "trace is missing"
+    snapshots = getattr(trace, "snapshots", None)
+    deltas = getattr(trace, "condensed_by_stage_species_delta", None)
+    if not _is_sequence(snapshots) or not _is_sequence(deltas):
+        return (
+            {},
+            "missing_stage_purity_trace",
+            "trace snapshots or condensed_by_stage_species_delta missing",
+        )
+    if len(deltas) != len(snapshots):
+        return (
+            {},
+            "missing_stage_purity_trace",
+            "condensed delta count does not match snapshots",
+        )
+    totals: dict[tuple[int, str], float] = {}
+    for tick in deltas:
+        if not isinstance(tick, Mapping):
+            return {}, "invalid_stage_purity_trace", "condensed tick is not a mapping"
+        for key, kg in tick.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                return {}, "invalid_stage_purity_trace", "stage/species key is not a 2-tuple"
+            stage, species = int(key[0]), str(key[1])
+            try:
+                amount = _finite_non_negative(kg, "condensed kg")
+            except ValueError as exc:
+                return {}, "invalid_stage_purity_trace", str(exc)
+            if amount > _EPS:
+                totals[(stage, species)] = totals.get((stage, species), 0.0) + amount
+    return totals, "available", ""
+
+
+def _ledger_account_kg(ledger: Any, account: str) -> tuple[dict[str, float], str, str]:
+    if ledger is None:
+        return {}, "missing_fe_tap_evidence", "atom ledger is missing"
+    kg_by_account = getattr(ledger, "kg_by_account", None)
+    if not callable(kg_by_account):
+        return {}, "missing_fe_tap_evidence", "atom ledger has no kg_by_account reader"
+    try:
+        raw = kg_by_account(account)
+    except TypeError:
+        all_accounts = kg_by_account()
+        raw = all_accounts.get(account, {}) if isinstance(all_accounts, Mapping) else {}
+    except Exception as exc:  # noqa: BLE001 - report surface must fail closed
+        return {}, "missing_fe_tap_evidence", str(exc)
+    if raw is None:
+        return {}, "missing_fe_tap_evidence", f"{account} kg reader returned no evidence"
+    if not isinstance(raw, Mapping):
+        return {}, "missing_fe_tap_evidence", f"{account} kg reader is not a mapping"
+    if not raw:
+        return {}, "missing_fe_tap_evidence", f"{account} kg evidence is absent"
+    species_kg: dict[str, float] = {}
+    for species, kg in raw.items():
+        try:
+            species_kg[str(species)] = _finite_non_negative(kg, f"{account}[{species}]")
+        except ValueError as exc:
+            return {}, "missing_fe_tap_evidence", str(exc)
+    return species_kg, "available", ""
+
+
+def _transition_count(ledger: Any, name: str) -> int:
+    transitions = getattr(ledger, "transitions", ())
+    if not _is_sequence(transitions):
+        return 0
+    return sum(1 for transition in transitions if getattr(transition, "name", "") == name)
+
+
+def _product_species_kg(sim: Any, species: str) -> float | None:
+    product_ledger = getattr(sim, "product_ledger", None)
+    if not callable(product_ledger):
+        return None
+    try:
+        products = product_ledger()
+    except Exception:  # noqa: BLE001 - optional report field
+        return None
+    if not isinstance(products, Mapping):
+        return None
+    try:
+        return _finite_non_negative(products.get(species, 0.0), f"product[{species}]")
+    except ValueError:
+        # Optional report field: a corrupt/negative/non-finite product kg must not
+        # crash the evidence surface — fail closed to None like the other errors above.
+        return None
+
+
+def _mass_balance_closure(run_execution: Any, trace: Any) -> dict[str, Any]:
+    snapshots = getattr(run_execution, "snapshots", None)
+    if not _is_sequence(snapshots) and trace is not None:
+        snapshots = getattr(trace, "snapshots", None)
+    if not _is_sequence(snapshots) or not snapshots:
+        return {"status": "missing_mass_balance_trace", "max_abs_error_pct": None}
+    try:
+        errors = [
+            abs(_finite_number(getattr(snapshot, "mass_balance_error_pct", 0.0), "mass balance"))
+            for snapshot in snapshots
+        ]
+    except ValueError:
+        # A non-finite mass-balance value is missing/invalid evidence, not a pass:
+        # fail closed with an explicit status rather than raising out of the surface.
+        return {"status": "invalid_mass_balance_trace", "max_abs_error_pct": None}
+    return {"status": "available", "max_abs_error_pct": max(errors)}
+
+
+def _species_values(
+    species_kg: Mapping[str, float],
+    species_names: Sequence[str],
+    available: bool,
+) -> dict[str, float | None]:
+    return {
+        species: species_kg.get(species, 0.0) if available else None
+        for species in species_names
+    }
+
+
+def _species_mol_values(
+    run_execution: Any,
+    species_kg: Mapping[str, float],
+    species_names: Sequence[str],
+    available: bool,
+) -> dict[str, float | None]:
+    if not available:
+        return {species: None for species in species_names}
+    return {
+        species: _kg_to_mol(run_execution, species, species_kg.get(species, 0.0))
+        for species in species_names
+    }
+
+
+def _kg_to_mol(run_execution: Any, species: str, kg: float) -> float:
+    sim = getattr(run_execution, "simulator", run_execution)
+    registry = getattr(sim, "species_formula_registry", None)
+    formula = resolve_species_formula(species, registry)
+    return _finite_non_negative(kg, species) / formula.molar_mass_kg_per_mol()
+
+
+def _gate_margin_payload(margin: GateMargin) -> dict[str, Any]:
+    return {
+        "gate": margin.gate,
+        "feasible": margin.feasible,
+        "margin": _json_number(margin.margin),
+        "observed": _json_number(margin.observed),
+        "detail": margin.detail,
+        "status": margin.status,
+        "status_reason": margin.status_reason,
+        "threshold": _threshold_payload(margin.threshold),
+    }
+
+
+def _threshold_payload(threshold: Any) -> dict[str, Any]:
+    return {
+        "id": threshold.id,
+        "value": threshold.value,
+        "units": threshold.units,
+        "source": threshold.source,
+        "source_ref": threshold.source_ref,
+        "tolerance": threshold.tolerance,
+    }
+
+
+def _wt_pct(part: float, total: float) -> float | None:
+    if total <= _EPS:
+        return None
+    return part / total * 100.0
+
+
+def _is_sequence(value: Any) -> bool:
+    return isinstance(value, (tuple, list)) and not isinstance(value, (str, bytes))
+
+
+def _finite_non_negative(value: Any, label: str) -> float:
+    number = _finite_number(value, label)
+    if number < -_EPS:
+        raise ValueError(f"{label} must be non-negative")
+    return max(0.0, number)
+
+
+def _finite_number(value: Any, label: str) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} must be numeric") from exc
+    if not math.isfinite(number):
+        raise ValueError(f"{label} must be finite")
+    return number
+
+
+def _json_number(value: float) -> float | str:
+    if math.isnan(value):
+        return "nan"
+    if math.isinf(value):
+        return "inf" if value > 0 else "-inf"
+    return float(value)
