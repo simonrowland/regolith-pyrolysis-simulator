@@ -24,6 +24,44 @@ def _stage(setpoints: dict, name: str) -> dict:
     raise AssertionError(f"missing C2A_staged stage {name}")
 
 
+def _n2_lab_schedule() -> dict:
+    return {
+        "id": "unit-test-n2-lab-schedule",
+        "duration_h": 1.0,
+        "interpolation": "piecewise_linear",
+        "interpolation_source_class": "test_fixture",
+        "furnace_ceiling_C": 1700.0,
+        "melt_temperature_C": [
+            {"t_h": 0.0, "value": 1200.0, "unit": "C"},
+            {"t_h": 1.0, "value": 1300.0, "unit": "C"},
+        ],
+        "chamber_pressure_mbar": [
+            {"t_h": 0.0, "value": 10.0, "unit": "mbar"},
+            {"t_h": 1.0, "value": 10.0, "unit": "mbar"},
+        ],
+        "gas_boundary": {
+            "background_gas": {
+                "species": "N2",
+                "mole_fraction": 0.8,
+                "source_class": "test_fixture",
+                "citation_id": "unit_test",
+            },
+            "imposed_flow": {
+                "reported_status": "not_reported",
+                "source_class": "test_fixture",
+                "citation_id": "unit_test",
+                "digest": "not_applicable",
+                "reason": "unit test",
+            },
+            "pressure_control": {
+                "mode": "controlled",
+                "source_class": "test_fixture",
+                "citation_id": "unit_test",
+            },
+        },
+    }
+
+
 @pytest.mark.parametrize(
     ("campaign", "pO2_mbar", "p_total_mbar", "atmosphere"),
     [
@@ -164,7 +202,7 @@ def test_c2a_staged_gas_cover_switch_is_stage_atomic():
     _stage(setpoints, "alkali_early_fe").update({
         "gas_cover_mode": "po2_hold",
         "pO2_mbar": 1.0,
-        "p_total_mbar": 7.0,
+        "p_total_mbar": 1.0,
     })
     _stage(setpoints, "sio_window").update({
         "gas_cover_mode": "pn2_sweep",
@@ -180,7 +218,9 @@ def test_c2a_staged_gas_cover_switch_is_stage_atomic():
     assert first["stage_name"] == "alkali_early_fe"
     assert first["gas_cover_mode"] == "po2_hold"
     assert first["pO2_mbar"] == pytest.approx(1.0)
-    assert first["p_total_mbar"] == pytest.approx(7.0)
+    assert first["p_total_mbar"] == pytest.approx(1.0)
+    assert melt.background_gas_species == ""
+    assert melt.background_gas_mole_fraction == pytest.approx(0.0)
 
     melt.campaign_hour = 4
     manager.apply_c2a_staged_gas_controls(melt)
@@ -191,6 +231,8 @@ def test_c2a_staged_gas_cover_switch_is_stage_atomic():
     assert second["pO2_mbar"] == pytest.approx(1.0e-6)
     assert second["p_total_mbar"] == pytest.approx(10.000001)
     assert second["pN2_mbar"] == pytest.approx(10.0)
+    assert melt.background_gas_species == "N2"
+    assert melt.background_gas_mole_fraction == pytest.approx(1.0)
 
 
 def test_c2a_staged_pn2_sweep_trace_po2_is_not_silent_or_phantom_o2():
@@ -282,3 +324,23 @@ def test_c2a_staged_without_stage_schedule_noops_gas_controls(stages_value):
     # Idempotent re-application also no-ops rather than raising.
     mgr.apply_c2a_staged_gas_controls(melt, CampaignPhase.C2A_STAGED)
     assert mgr.last_c2a_staged_gas_control is None
+
+
+def test_configure_campaign_reset_does_not_clobber_lab_schedule_background():
+    setpoints = _setpoints()
+    manager = CampaignManager(setpoints)
+    manager.overrides["C3_NA"] = {
+        "lab_schedule": _n2_lab_schedule(),
+        "lab_schedule_pO2_setpoint_mbar": 1.0,
+    }
+    melt = MeltState(campaign=CampaignPhase.C3_NA)
+    melt.background_gas_species = "Ar"
+    melt.background_gas_mole_fraction = 0.25
+
+    manager.configure_campaign(melt, CampaignPhase.C3_NA)
+
+    assert melt.atmosphere is Atmosphere.CONTROLLED_O2
+    assert melt.pO2_mbar == pytest.approx(1.0)
+    assert melt.p_total_mbar == pytest.approx(10.0)
+    assert melt.background_gas_species == "N2"
+    assert melt.background_gas_mole_fraction == pytest.approx(0.8)

@@ -144,6 +144,17 @@ def test_debug_batches_auto_apply_branching_decisions():
     assert (DecisionType.C6_PROCEED, "yes") in record.decisions
 
 
+def _setpoints() -> dict:
+    return yaml.safe_load((DATA_DIR / "setpoints.yaml").read_text()) or {}
+
+
+def _simulator_shell(melt: MeltState, setpoints: dict) -> PyrolysisSimulator:
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = melt
+    sim.setpoints = setpoints
+    return sim
+
+
 def test_c2a_staged_c3_na_cool_cleanup_does_not_poison_reused_manager():
     manager = CampaignManager({"campaigns": {}})
     record = BatchRecord(path="A_staged")
@@ -172,6 +183,51 @@ def test_c2a_staged_c3_na_cool_cleanup_does_not_poison_reused_manager():
     assert manager.get_temp_target(
         CampaignPhase.C3_NA, 3, default_melt
     ) == (1600.0, 50.0)
+
+
+@pytest.mark.parametrize(
+    "controlled_phase",
+    [CampaignPhase.C3_K, CampaignPhase.C3_NA],
+)
+def test_c2a_staged_background_gas_does_not_leak_to_controlled_o2_stage(
+    controlled_phase,
+):
+    setpoints = _setpoints()
+    setpoints["campaigns"].setdefault(controlled_phase.name, {})[
+        "carrier_gas"
+    ] = "Ar"
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+
+    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    assert melt.background_gas_species == "N2"
+    assert melt.background_gas_mole_fraction == pytest.approx(1.0)
+
+    melt.campaign = controlled_phase
+    manager.configure_campaign(melt, controlled_phase)
+
+    assert melt.background_gas_species == ""
+    assert melt.background_gas_mole_fraction == pytest.approx(0.0)
+    assert _simulator_shell(
+        melt,
+        setpoints,
+    )._resolve_condensation_carrier_gas() == "Ar"
+
+
+def test_clean_stage_to_c2a_staged_reapplies_stage_n2_background():
+    setpoints = _setpoints()
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C3_NA)
+
+    manager.configure_campaign(melt, CampaignPhase.C3_NA)
+    assert melt.background_gas_species == ""
+    assert melt.background_gas_mole_fraction == pytest.approx(0.0)
+
+    melt.campaign = CampaignPhase.C2A_STAGED
+    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+
+    assert melt.background_gas_species == "N2"
+    assert melt.background_gas_mole_fraction == pytest.approx(1.0)
 
 
 def test_debug_batches_skip_c5_by_default_after_c4():

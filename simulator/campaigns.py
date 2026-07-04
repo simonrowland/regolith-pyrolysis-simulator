@@ -772,6 +772,13 @@ class CampaignManager:
     # Campaign configuration
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _reset_stage_background_gas(melt: MeltState) -> None:
+        if hasattr(melt, 'background_gas_species'):
+            melt.background_gas_species = ''
+        if hasattr(melt, 'background_gas_mole_fraction'):
+            melt.background_gas_mole_fraction = 0.0
+
     def configure_campaign(self, melt: MeltState, campaign: CampaignPhase):
         """
         Set gas-side atmosphere and process parameters for a campaign.
@@ -779,6 +786,8 @@ class CampaignManager:
 
         Called when starting a new campaign phase.
         """
+        self._reset_stage_background_gas(melt)
+
         if campaign == CampaignPhase.C3_NA:
             self._active_c3_na_scoped_overrides = (
                 self._pending_c3_na_scoped_overrides
