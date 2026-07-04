@@ -1561,6 +1561,9 @@ def build_per_hour_summary(
         }
     if mass_balance_category:
         summary["mass_balance_error_category"] = mass_balance_category
+    c2a_staged_gas = dict(getattr(snapshot, "c2a_staged_gas", {}) or {})
+    if c2a_staged_gas:
+        summary["c2a_staged_gas"] = _json_safe(c2a_staged_gas)
     enforcement = getattr(sim.campaign_mgr, "last_pO2_enforcement", None)
     if isinstance(enforcement, Mapping) and int(enforcement.get("hour", -1)) == int(snapshot.hour):
         summary["pO2_enforcement"] = _json_safe(dict(enforcement))

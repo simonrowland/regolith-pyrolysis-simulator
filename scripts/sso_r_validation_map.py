@@ -24,7 +24,8 @@ from simulator.core import (
     FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
     PyrolysisSimulator,
 )
-from simulator.runner import build_per_hour_summary
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.runner import _deep_merge_setpoints, build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase
 
 
@@ -47,6 +48,7 @@ OWNER_RECIPE_MAX_ESCAPE_FRACTION = 1.0e-3
 OWNER_RECIPE_T_C = 1650.0
 OWNER_RECIPE_PO2_MBAR = 1.0e-6
 OWNER_RECIPE_PN2_MBAR = 10.0
+OWNER_RECIPE_STAGE_NAME = "alkali_early_fe"
 OWNER_CERTIFICATION_ASSERTION = "owner_pN2_recipe_point_requested_pO2_semantics"
 MAP_LIVE_PARITY_ASSERTION = "map_live_semantics_parity"
 MAP_LIVE_PARITY_PO2_ABS_TOL_BAR = 1.0e-15
@@ -156,6 +158,47 @@ def _build_sim(
     additives = {DOSE_SPECIES: dose_kg} if dose_kg > 0.0 else {}
     sim.load_batch(FEEDSTOCK, mass_kg=BATCH_KG, additives_kg=additives)
     return sim
+
+
+def _owner_pn2_recipe_patch() -> RecipePatch:
+    return RecipePatch.from_nested({
+        "campaigns": {
+            "C2A_staged": {
+                "stages": {
+                    OWNER_RECIPE_STAGE_NAME: {
+                        "gas_cover_mode": "pn2_sweep",
+                        "pO2_mbar": OWNER_RECIPE_PO2_MBAR,
+                        "p_total_mbar": OWNER_RECIPE_PN2_MBAR + OWNER_RECIPE_PO2_MBAR,
+                    }
+                }
+            }
+        }
+    })
+
+
+def _setpoints_with_recipe_patch(
+    setpoints: Mapping[str, Any],
+    patch: RecipePatch,
+) -> dict[str, Any]:
+    return _deep_merge_setpoints(
+        setpoints,
+        RecipeSchema().to_setpoints_patch(patch),
+    )
+
+
+def _c2a_stage_start_hour(setpoints: Mapping[str, Any], stage_name: str) -> int:
+    c2a = dict((setpoints.get("campaigns", {}) or {}).get("C2A_staged", {}) or {})
+    stages = c2a.get("stages", [])
+    elapsed = 0
+    if not isinstance(stages, list):
+        raise RuntimeError("C2A_staged.stages must be a list")
+    for stage in stages:
+        if not isinstance(stage, Mapping):
+            continue
+        if stage.get("name") == stage_name:
+            return elapsed
+        elapsed += max(1, int(float(stage.get("duration_h", 1.0))))
+    raise RuntimeError(f"C2A_staged stage not found: {stage_name}")
 
 
 def _molar_mass_kg_per_mol(sim: PyrolysisSimulator, species: str) -> float:
@@ -627,21 +670,25 @@ def run_owner_live_step_probe(
     feedstocks: Mapping[str, Any],
     vapor_pressures: Mapping[str, Any],
 ) -> dict[str, Any]:
-    gas = GasPoint(OWNER_RECIPE_PO2_MBAR, OWNER_RECIPE_PN2_MBAR, "n2_carrier")
     dose_kg = calibration.full_feo_equiv_dose_kg
+    owner_patch = _owner_pn2_recipe_patch()
+    patched_setpoints = _setpoints_with_recipe_patch(setpoints, owner_patch)
+    owner_stage_hour = _c2a_stage_start_hour(
+        patched_setpoints,
+        OWNER_RECIPE_STAGE_NAME,
+    )
     sim = _build_sim(
-        setpoints,
+        patched_setpoints,
         feedstocks,
         vapor_pressures,
         dose_kg=dose_kg,
     )
     _apply_dose(sim, dose_kg=dose_kg)
-    sim.melt.campaign = CampaignPhase.C2A_STAGED
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
     sim.melt.temperature_C = OWNER_RECIPE_T_C
     sim.melt.target_temperature_C = OWNER_RECIPE_T_C
-    sim.melt.hour = 0
-    sim.melt.campaign_hour = 0
-    _configure_gas_state(sim, gas)
+    sim.melt.hour = owner_stage_hour
+    sim.melt.campaign_hour = owner_stage_hour
     sim._update_temperature = lambda: None
 
     terminal_stored_before = float(
@@ -715,6 +762,17 @@ def run_owner_live_step_probe(
         "temperature_C": OWNER_RECIPE_T_C,
         "requested_pO2_mbar": OWNER_RECIPE_PO2_MBAR,
         "requested_pN2_mbar": OWNER_RECIPE_PN2_MBAR,
+        "recipe_reachable": True,
+        "recipe_stage_name": str(snapshot.c2a_staged_gas.get("stage_name", "")),
+        "recipe_gas_cover_mode": str(
+            snapshot.c2a_staged_gas.get("gas_cover_mode", "")
+        ),
+        "recipe_atmosphere": str(snapshot.c2a_staged_gas.get("atmosphere", "")),
+        "recipe_pO2_mbar": float(snapshot.c2a_staged_gas.get("pO2_mbar", 0.0)),
+        "recipe_p_total_mbar": float(
+            snapshot.c2a_staged_gas.get("p_total_mbar", 0.0)
+        ),
+        "recipe_pN2_mbar": float(snapshot.c2a_staged_gas.get("pN2_mbar", 0.0)),
         "SiO_provider_pO2_bar": _positive(sio_series.get("pO2_bar")),
         "SiO_flux_kg_hr": _positive(snapshot.evap_flux.species_kg_hr.get("SiO", 0.0)),
         "SiO_vapor_pressure_Pa": _positive(

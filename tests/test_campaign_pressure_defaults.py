@@ -17,6 +17,13 @@ def _setpoints() -> dict:
     return yaml.safe_load((DATA_DIR / "setpoints.yaml").read_text()) or {}
 
 
+def _stage(setpoints: dict, name: str) -> dict:
+    for stage in setpoints["campaigns"]["C2A_staged"]["stages"]:
+        if stage.get("name") == name:
+            return stage
+    raise AssertionError(f"missing C2A_staged stage {name}")
+
+
 @pytest.mark.parametrize(
     ("campaign", "pO2_mbar", "p_total_mbar", "atmosphere"),
     [
@@ -150,3 +157,128 @@ def test_mre_baseline_pressure_defaults_are_yaml_sourced_and_decoupled():
 
     assert melt.pO2_mbar == pytest.approx(40.0)
     assert melt.p_total_mbar == pytest.approx(41.0)
+
+
+def test_c2a_staged_gas_cover_switch_is_stage_atomic():
+    setpoints = deepcopy(_setpoints())
+    _stage(setpoints, "alkali_early_fe").update({
+        "gas_cover_mode": "po2_hold",
+        "pO2_mbar": 1.0,
+        "p_total_mbar": 7.0,
+    })
+    _stage(setpoints, "sio_window").update({
+        "gas_cover_mode": "pn2_sweep",
+        "pO2_mbar": 1.0e-6,
+        "p_total_mbar": 10.000001,
+    })
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+
+    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    first = dict(manager.last_c2a_staged_gas_control or {})
+    assert melt.atmosphere is Atmosphere.CONTROLLED_O2
+    assert first["stage_name"] == "alkali_early_fe"
+    assert first["gas_cover_mode"] == "po2_hold"
+    assert first["pO2_mbar"] == pytest.approx(1.0)
+    assert first["p_total_mbar"] == pytest.approx(7.0)
+
+    melt.campaign_hour = 4
+    manager.apply_c2a_staged_gas_controls(melt)
+    second = dict(manager.last_c2a_staged_gas_control or {})
+    assert melt.atmosphere is Atmosphere.PN2_SWEEP
+    assert second["stage_name"] == "sio_window"
+    assert second["gas_cover_mode"] == "pn2_sweep"
+    assert second["pO2_mbar"] == pytest.approx(1.0e-6)
+    assert second["p_total_mbar"] == pytest.approx(10.000001)
+    assert second["pN2_mbar"] == pytest.approx(10.0)
+
+
+def test_c2a_staged_pn2_sweep_trace_po2_is_not_silent_or_phantom_o2():
+    setpoints = deepcopy(_setpoints())
+    _stage(setpoints, "alkali_early_fe").update({
+        "gas_cover_mode": "pn2_sweep",
+        "pO2_mbar": 1.0e-6,
+        "p_total_mbar": 10.000001,
+    })
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+
+    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    gas = dict(manager.last_c2a_staged_gas_control or {})
+
+    assert melt.atmosphere is Atmosphere.PN2_SWEEP
+    assert melt.pO2_mbar == pytest.approx(1.0e-6)
+    assert melt.p_total_mbar == pytest.approx(10.000001)
+    assert gas["pN2_mbar"] == pytest.approx(10.0)
+    assert gas["pn2_band_action"] == ""
+
+
+def test_c2a_staged_pn2_sweep_clamps_to_operating_band():
+    setpoints = deepcopy(_setpoints())
+    _stage(setpoints, "alkali_early_fe").update({
+        "gas_cover_mode": "pn2_sweep",
+        "pO2_mbar": 0.25,
+        "p_total_mbar": 1.25,
+    })
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+
+    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    gas = dict(manager.last_c2a_staged_gas_control or {})
+
+    assert melt.atmosphere is Atmosphere.PN2_SWEEP
+    assert gas["pN2_mbar"] == pytest.approx(5.0)
+    assert gas["p_total_mbar"] == pytest.approx(5.25)
+    assert gas["requested_p_total_mbar"] == pytest.approx(1.25)
+    assert gas["pn2_band_action"] == "clamped_low"
+
+
+@pytest.mark.parametrize(
+    ("stage_patch", "message"),
+    [
+        ({"gas_cover_mode": "bad"}, "C2A_staged.stages.alkali_early_fe.gas_cover_mode"),
+        (
+            {"gas_cover_mode": "po2_hold", "pO2_mbar": 0.0, "p_total_mbar": 1.0},
+            "C2A_staged.stages.alkali_early_fe.pO2_mbar",
+        ),
+        (
+            {"gas_cover_mode": "po2_hold", "pO2_mbar": 2.0, "p_total_mbar": 1.0},
+            "C2A_staged.stages.alkali_early_fe.p_total_mbar",
+        ),
+        (
+            {"gas_cover_mode": "pn2_sweep", "pO2_mbar": 2.0, "p_total_mbar": 1.0},
+            "C2A_staged.stages.alkali_early_fe.p_total_mbar",
+        ),
+    ],
+)
+def test_c2a_staged_invalid_gas_schedule_fails_loud(stage_patch, message):
+    setpoints = deepcopy(_setpoints())
+    _stage(setpoints, "alkali_early_fe").update(stage_patch)
+
+    with pytest.raises(ValueError, match=message):
+        CampaignManager(setpoints).configure_campaign(
+            MeltState(),
+            CampaignPhase.C2A_STAGED,
+        )
+
+
+@pytest.mark.parametrize("stages_value", [None, [], "drop_key"])
+def test_c2a_staged_without_stage_schedule_noops_gas_controls(stages_value):
+    # A minimal/legacy C2A_staged config (no per-stage schedule) must configure
+    # without raising and leave gas cover untouched — per-stage gas control is a
+    # no-op when there is no schedule, preserving pre-schedule behavior.
+    setpoints = deepcopy(_setpoints())
+    c2a = setpoints["campaigns"]["C2A_staged"]
+    if stages_value == "drop_key":
+        c2a.pop("stages", None)
+    else:
+        c2a["stages"] = stages_value
+
+    mgr = CampaignManager(setpoints)
+    melt = MeltState()
+    mgr.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+
+    assert mgr.last_c2a_staged_gas_control is None
+    # Idempotent re-application also no-ops rather than raising.
+    mgr.apply_c2a_staged_gas_controls(melt, CampaignPhase.C2A_STAGED)
+    assert mgr.last_c2a_staged_gas_control is None

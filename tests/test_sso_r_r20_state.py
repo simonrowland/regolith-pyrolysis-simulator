@@ -1537,6 +1537,46 @@ def test_pn2_sweep_without_o2_does_not_phantom_oxidize_melt() -> None:
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
 
 
+def test_c2a_staged_po2_hold_uses_managed_exchange_not_direct_refresh(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    stage = sim.campaign_mgr.campaigns["C2A_staged"]["stages"][0]
+    stage.update({
+        "gas_cover_mode": "po2_hold",
+        "pO2_mbar": 1.5,
+        "p_total_mbar": 1.5,
+    })
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim.melt.temperature_C = 1600.0
+    sim.melt.target_temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    def fail_direct_refresh(*_args, **_kwargs):
+        raise AssertionError("stage gas must not directly refresh oxygen reservoir")
+
+    monkeypatch.setattr(
+        sim,
+        "_refresh_oxygen_reservoir_without_exchange",
+        fail_direct_refresh,
+    )
+
+    snapshot = sim.step()
+
+    assert snapshot.c2a_staged_gas["gas_cover_mode"] == "po2_hold"
+    assert snapshot.c2a_staged_gas["atmosphere"] == "CONTROLLED_O2"
+    assert snapshot.oxygen_reservoir["headspace_control_floor_pO2_bar"] == (
+        pytest.approx(0.0015)
+    )
+    assert snapshot.oxygen_reservoir["exchange_direction"].split("|")[0] in {
+        "managed_headspace_to_melt",
+        "headspace_to_melt",
+        "melt_to_headspace",
+        "none:below_threshold",
+    }
+
+
 def test_live_paths_do_not_call_intrinsic_heuristic(monkeypatch) -> None:
     sim = _make_sim()
     sim.start_campaign(CampaignPhase.C0)

@@ -390,6 +390,34 @@ def test_map_live_semantics_parity_is_computed_from_live_owner_tick(smoke_payloa
     assert "live_SiO_kg_hr=" in parity["detail"]
 
 
+def test_owner_live_probe_is_recipe_reachable(smoke_payload):
+    probe = smoke_payload["live_owner_probe"]
+    owner = _owner_recipe_row(smoke_payload)
+
+    assert probe["recipe_reachable"] is True
+    assert probe["recipe_stage_name"] == validation_map.OWNER_RECIPE_STAGE_NAME
+    assert probe["recipe_gas_cover_mode"] == "pn2_sweep"
+    assert probe["recipe_atmosphere"] == "PN2_SWEEP"
+    assert probe["recipe_pO2_mbar"] == pytest.approx(
+        validation_map.OWNER_RECIPE_PO2_MBAR
+    )
+    assert probe["recipe_pN2_mbar"] == pytest.approx(
+        validation_map.OWNER_RECIPE_PN2_MBAR
+    )
+    assert probe["recipe_p_total_mbar"] == pytest.approx(
+        validation_map.OWNER_RECIPE_PO2_MBAR
+        + validation_map.OWNER_RECIPE_PN2_MBAR
+    )
+    assert probe["SiO_provider_pO2_bar"] == pytest.approx(
+        owner["SiO_provider_pO2_bar"]
+    )
+    assert probe["SiO_flux_kg_hr"] == pytest.approx(
+        owner["SiO_flux_kg_hr"],
+        rel=validation_map.MAP_LIVE_PARITY_SIO_REL_TOL,
+        abs=validation_map.MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR,
+    )
+
+
 def test_owner_live_pn2_tick_uses_sweep_floor_and_drains_o2(smoke_payload):
     probe = smoke_payload["live_owner_probe"]
 

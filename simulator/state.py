@@ -1049,6 +1049,11 @@ class HourSnapshot:
     # target_species intersected with the evolved-flux species), target/total
     # selectivity. Empty dict means no selectivity diagnostic was computed.
 
+    # --- C2A staged gas-control diagnostic (SSO-2) ---
+    c2a_staged_gas: Dict[str, Any] = field(default_factory=dict)
+    # Per-tick stage-owned gas cover selected before process execution.
+    # Diagnostic only; atmosphere/pO2/p_total remain MeltState controls.
+
     # --- Fe redox split diagnostic (SSO-R Phase 1) ---
     fe_redox_split: Dict[str, Any] = field(default_factory=dict)
     # Per-tick Kress-Carmichael 1991 fO2 -> Fe3+/Fe2+ split. Diagnostic

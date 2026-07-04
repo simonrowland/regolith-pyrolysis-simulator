@@ -41,6 +41,14 @@ from simulator.core import (
 )
 
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
+C2A_STAGED_GAS_COVER_PN2_SWEEP = 'pn2_sweep'
+C2A_STAGED_GAS_COVER_PO2_HOLD = 'po2_hold'
+C2A_STAGED_GAS_COVER_MODES = frozenset({
+    C2A_STAGED_GAS_COVER_PN2_SWEEP,
+    C2A_STAGED_GAS_COVER_PO2_HOLD,
+})
+C2A_STAGED_PN2_SWEEP_MIN_MBAR = 5.0
+C2A_STAGED_PN2_SWEEP_MAX_MBAR = 15.0
 
 
 class _CampaignOverrideFields(dict):
@@ -153,6 +161,7 @@ class CampaignManager:
         self.overrides: Dict[str, dict] = _CampaignOverrideStore(
             type(self)._refuse_unknown_override_fields)
         self.last_pO2_enforcement: dict[str, object] | None = None
+        self.last_c2a_staged_gas_control: dict[str, object] | None = None
         self.c5_enabled = False
         self._c2a_staged_stage_idx: int = 0
         self._c2a_staged_stage_start_hour: int = 0
@@ -580,6 +589,147 @@ class CampaignManager:
         idx = min(max(0, int(self._c2a_staged_stage_idx)), len(stages) - 1)
         return stages[idx]
 
+    @staticmethod
+    def _c2a_staged_stage_label(stage: Mapping) -> str:
+        name = stage.get('name')
+        return str(name) if isinstance(name, str) and name else '<unnamed>'
+
+    def _c2a_staged_stage_float(
+            self,
+            stage: Mapping,
+            key: str,
+            default: float) -> tuple[float, bool]:
+        present = key in stage and stage.get(key) is not None
+        value = self._float(stage.get(key), default) if present else float(default)
+        if not math.isfinite(value):
+            label = self._c2a_staged_stage_label(stage)
+            raise ValueError(f'C2A_staged.stages.{label}.{key} must be finite')
+        return value, present
+
+    def _c2a_staged_stage_gas_control(
+            self,
+            stage: Mapping) -> tuple[Atmosphere, dict[str, object]]:
+        cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
+        stage_name = self._c2a_staged_stage_label(stage)
+        raw_mode = stage.get('gas_cover_mode', cfg.get(
+            'gas_cover_mode',
+            C2A_STAGED_GAS_COVER_PN2_SWEEP,
+        ))
+        mode = str(raw_mode or C2A_STAGED_GAS_COVER_PN2_SWEEP).strip()
+        if mode not in C2A_STAGED_GAS_COVER_MODES:
+            raise ValueError(
+                f'C2A_staged.stages.{stage_name}.gas_cover_mode '
+                f'unknown gas cover mode: {raw_mode!r}'
+            )
+
+        default_pO2 = self._pressure_config_float(
+            cfg, 'pO2_mbar', 'pO2_mbar_default', 0.0)
+        default_total = self._pressure_config_float(
+            cfg, 'p_total_mbar', 'p_total_mbar_default', 10.0)
+        pO2_mbar, pO2_present = self._c2a_staged_stage_float(
+            stage, 'pO2_mbar', default_pO2)
+        p_total_mbar, p_total_present = self._c2a_staged_stage_float(
+            stage, 'p_total_mbar', default_total)
+        if pO2_mbar < 0.0:
+            raise ValueError(
+                f'C2A_staged.stages.{stage_name}.pO2_mbar '
+                'must be finite and non-negative'
+            )
+        if p_total_mbar < 0.0:
+            raise ValueError(
+                f'C2A_staged.stages.{stage_name}.p_total_mbar '
+                'must be finite and non-negative'
+            )
+        if p_total_present and p_total_mbar + 1.0e-12 < pO2_mbar:
+            raise ValueError(
+                f'C2A_staged.stages.{stage_name}.p_total_mbar '
+                'must be >= pO2_mbar'
+            )
+
+        band_action = ''
+        requested_p_total_mbar = p_total_mbar
+        if mode == C2A_STAGED_GAS_COVER_PO2_HOLD:
+            if (not pO2_present) or pO2_mbar <= 0.0:
+                raise ValueError(
+                    f'C2A_staged.stages.{stage_name}.pO2_mbar '
+                    'must be positive for gas_cover_mode=po2_hold'
+                )
+            if not p_total_present and p_total_mbar < pO2_mbar:
+                p_total_mbar = pO2_mbar
+            if p_total_mbar + 1.0e-12 < pO2_mbar:
+                raise ValueError(
+                    f'C2A_staged.stages.{stage_name}.p_total_mbar '
+                    'must be >= pO2_mbar'
+                )
+            atmosphere = Atmosphere.CONTROLLED_O2
+            pN2_mbar = max(0.0, p_total_mbar - pO2_mbar)
+        else:
+            pN2_mbar = p_total_mbar - pO2_mbar
+            if pN2_mbar <= 0.0:
+                raise ValueError(
+                    f'C2A_staged.stages.{stage_name}.pN2_mbar '
+                    'must be positive for gas_cover_mode=pn2_sweep'
+                )
+            clamped_pN2 = min(
+                C2A_STAGED_PN2_SWEEP_MAX_MBAR,
+                max(C2A_STAGED_PN2_SWEEP_MIN_MBAR, pN2_mbar),
+            )
+            if clamped_pN2 != pN2_mbar:
+                band_action = (
+                    'clamped_low'
+                    if pN2_mbar < C2A_STAGED_PN2_SWEEP_MIN_MBAR
+                    else 'clamped_high'
+                )
+                pN2_mbar = clamped_pN2
+                p_total_mbar = pO2_mbar + pN2_mbar
+            atmosphere = Atmosphere.PN2_SWEEP
+
+        diagnostic = {
+            'stage_name': stage_name,
+            'gas_cover_mode': mode,
+            'atmosphere': atmosphere.name,
+            'pO2_mbar': float(pO2_mbar),
+            'p_total_mbar': float(p_total_mbar),
+            'pN2_mbar': float(pN2_mbar),
+            'requested_p_total_mbar': float(requested_p_total_mbar),
+            'pn2_band_action': band_action,
+        }
+        return atmosphere, diagnostic
+
+    def apply_c2a_staged_gas_controls(
+            self,
+            melt: MeltState,
+            campaign: CampaignPhase | None = None) -> None:
+        active_campaign = campaign if campaign is not None else melt.campaign
+        if active_campaign != CampaignPhase.C2A_STAGED:
+            self.last_c2a_staged_gas_control = None
+            return
+        # A minimal/legacy C2A_staged config may carry no per-stage schedule
+        # (e.g. composition-only runs). There is no per-stage gas cover to
+        # apply, so no-op and preserve the pre-schedule default gas cover
+        # rather than raising during configure_campaign.
+        cfg = self._campaign_config(CampaignPhase.C2A_STAGED)
+        stages = cfg.get('stages') if isinstance(cfg, Mapping) else None
+        if not isinstance(stages, list) or not stages:
+            self.last_c2a_staged_gas_control = None
+            return
+        stage = self._c2a_staged_active_stage(melt.campaign_hour)
+        if not isinstance(stage, Mapping):
+            raise ValueError('C2A_staged.stages did not select a stage')
+        atmosphere, diagnostic = self._c2a_staged_stage_gas_control(stage)
+        melt.atmosphere = atmosphere
+        melt.pO2_mbar = float(diagnostic['pO2_mbar'])
+        melt.p_total_mbar = float(diagnostic['p_total_mbar'])
+        pN2_mbar = float(diagnostic['pN2_mbar'])
+        if pN2_mbar > 0.0:
+            melt.background_gas_species = 'N2'
+            melt.background_gas_mole_fraction = 1.0
+        else:
+            melt.background_gas_species = ''
+            melt.background_gas_mole_fraction = 0.0
+        melt.validate_melt_pressures()
+        self.last_c2a_staged_gas_control = diagnostic
+
     def _c2a_staged_flux_decay_species(self, stage: Mapping) -> tuple[str, ...]:
         endpoint = stage.get('endpoint', {})
         if not isinstance(endpoint, Mapping):
@@ -731,6 +881,7 @@ class CampaignManager:
             if override_pO2 > 0.0:
                 melt.atmosphere = Atmosphere.CONTROLLED_O2
         self.apply_lab_schedule_controls(melt, campaign, sample_time_h=0.0)
+        self.apply_c2a_staged_gas_controls(melt, campaign)
         # 0.5.3 Phase B chunk-review P2 (codex 2026-05-28): per-axis
         # merge precedence. Before this fix, when an operator passed
         # BOTH ``{stir_factor: 6, stir_state: {radial: 8}}``, the whole-

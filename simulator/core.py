@@ -2532,6 +2532,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return max(0.0, float(self.melt.pO2_mbar) / 1000.0)
         return 0.0
 
+    def _sync_c2a_staged_overhead_gas_control(self) -> None:
+        control = getattr(
+            self.campaign_mgr, 'last_c2a_staged_gas_control', None)
+        if self.melt.campaign != CampaignPhase.C2A_STAGED:
+            return
+        if not isinstance(control, Mapping):
+            return
+
+        pO2_mbar = max(0.0, float(control.get('pO2_mbar', 0.0) or 0.0))
+        p_total_mbar = max(
+            0.0, float(control.get('p_total_mbar', 0.0) or 0.0))
+        pN2_mbar = max(
+            0.0,
+            float(control.get('pN2_mbar', p_total_mbar - pO2_mbar) or 0.0),
+        )
+
+        composition: Dict[str, float] = {}
+        if pN2_mbar > 0.0:
+            composition['N2'] = pN2_mbar
+        if pO2_mbar > 0.0:
+            composition['O2'] = pO2_mbar
+        self.overhead.composition = composition
+        self.overhead.pressure_mbar = p_total_mbar
+
     def _headspace_bleed_conductance_kg_s_per_bar(self) -> float:
         configured = self._overhead_headspace_config.get(
             'conductance_kg_s_per_bar')
@@ -8275,7 +8299,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # Return current state without advancing
             return self._make_snapshot()
         self._mre_anode_O2_kg_this_hr = 0.0
-        self.melt.validate_melt_pressures()
 
         sample_time_h = float(self.melt.campaign_hour) + 1.0
         self.campaign_mgr.apply_lab_schedule_controls(
@@ -8283,6 +8306,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt.campaign,
             sample_time_h=sample_time_h,
         )
+        self.campaign_mgr.apply_c2a_staged_gas_controls(self.melt)
+        self._sync_c2a_staged_overhead_gas_control()
+        self.melt.validate_melt_pressures()
         self.validate_lab_surface_temperature_resolver()
 
         # --- 2. Temperature ramp and carried-in passive exchange ---
@@ -8863,6 +8889,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mre_current_A=self._mre_current_A,
             mre_metals_kg_hr=dict(self._mre_metals_this_hr),
             mre_uncertified_yield=dict(self._mre_uncertified_yield),
+            c2a_staged_gas=dict(
+                getattr(
+                    self.campaign_mgr,
+                    'last_c2a_staged_gas_control',
+                    {},
+                ) or {}
+            ),
             redox_source_breakdown=redox_source_breakdown,
             # 0.5.4 W8 (M2 historical-audit closure): per-species drift
             # between ``process.metal_phase`` ledger and the
