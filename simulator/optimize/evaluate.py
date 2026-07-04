@@ -87,6 +87,7 @@ from simulator.optimize.recipe import (
     RecipePatch,
     RecipeSchema,
     RecipeValidationError,
+    _effective_o2_bubbler_allowlist_version,
 )
 from simulator.optimize.worker_runtime import get_worker_runtime
 from simulator.reduced_real_determinism import PT0NonFinitePayload
@@ -1513,6 +1514,11 @@ def _build_eval_inputs(
         stage0_redox_oxidant_kg,
         stage0_carbon_reductant_kg,
     ) = schema.redox_cleanup_doses_kg(patch)
+    o2_bubbler_settings = schema.o2_bubbler_settings(patch)
+    effective_allowlist_version = _effective_o2_bubbler_allowlist_version(
+        patch.values,
+        schema.allowlist_version,
+    )
     for digest_key in (
         "setpoints",
         "feedstocks",
@@ -1578,7 +1584,7 @@ def _build_eval_inputs(
             schema=schema,
             c4_default_hold_temp_C=c4_default_hold_temp_C,
         ),
-        allowlist_version=schema.allowlist_version,
+        allowlist_version=effective_allowlist_version,
         feedstock_recipe_digest=feedstock_recipe_digest(feedstock),
         feedstock_id=feedstock_id,
         profile_id=profile_id,
@@ -1597,6 +1603,7 @@ def _build_eval_inputs(
         mre_target_species=str(run_options["mre_target_species"]),
         stage0_redox_oxidant_kg=stage0_redox_oxidant_kg,
         stage0_carbon_reductant_kg=stage0_carbon_reductant_kg,
+        o2_bubbler_settings=o2_bubbler_settings,
         runtime_campaign_overrides=run_options["runtime_campaign_overrides"],
         lab_schedule=lab_schedule if isinstance(lab_schedule, MappingABC) else {},
         chemistry_kernel=diagnostic_chemistry_kernel,

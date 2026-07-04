@@ -1069,6 +1069,13 @@ class HourSnapshot:
     # Per-tick mol-O2-equivalent source terms applied to the melt redox scalar.
     # Diagnostic only; mass movement remains in AtomLedger transitions.
 
+    # --- O2 bubbler actuator telemetry (SSO-O2 chunk A) ---
+    o2_bubbler_injected_kg: float = 0.0
+    o2_bubbler_absorbed_kg: float = 0.0
+    o2_bubbler_passthrough_kg: float = 0.0
+    o2_bubbler_vented_kg: float = 0.0
+    # Chunk B runtime `_apply_o2_bubbler` is the named writer/reader.
+
     # --- Knudsen regime warning sticker (0.5.4.1 E3) ---
     knudsen_regime_summary: Dict[str, Any] = field(default_factory=dict)
     # Per-tick Knudsen-regime visibility surface. Carries the

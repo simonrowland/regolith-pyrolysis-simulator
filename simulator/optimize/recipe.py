@@ -26,6 +26,8 @@ KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
 allowlist_version = "allowlist-v10"
+O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v10"
+O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
 
 FURNACE_MAX_T_C_PATH: KeyPath = ("furnace_max_T_C",)
 C5_ALLOW_MRE_VOLTAGE_CAP_PATH: KeyPath = tuple(
@@ -74,6 +76,9 @@ STAGE0_CARBON_REDUCTANT_KG_PATH: KeyPath = tuple(
 )
 C4_HOLD_TEMP_C_PATH: KeyPath = tuple("campaigns.C4.hold_temp_C".split("."))
 
+O2_BUBBLER_RATE_KEY = "o2_bubbler_kg_per_hr"
+O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH: KeyPath = ("o2_bubbler_eta_absorb_default",)
+O2_BUBBLER_TARGET_FO2_LOG_PATH: KeyPath = ("o2_bubbler_target_fO2_log",)
 C2A_STAGED_STAGES_PATH: KeyPath = tuple("campaigns.C2A_staged.stages".split("."))
 C2A_STAGED_ORDER_PATH: KeyPath = tuple("campaigns.C2A_staged.order".split("."))
 C2A_STAGED_PO2_MBAR_DEFAULT_PATH: KeyPath = tuple(
@@ -143,6 +148,11 @@ C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyTyp
         ) + C2A_STAGED_STAGE_GAS_FIELDS,
     }
 )
+O2_BUBBLER_CAMPAIGN_RATE_PATHS: tuple[KeyPath, ...] = tuple(
+    tuple(f"campaigns.{campaign}.{O2_BUBBLER_RATE_KEY}".split("."))
+    for campaign in ("C2B", "C3", "C4", "C6")
+)
+O2_BUBBLER_RATE_PATHS: tuple[KeyPath, ...] = O2_BUBBLER_CAMPAIGN_RATE_PATHS
 
 
 class RecipeValidationError(ValueError):
@@ -222,6 +232,18 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
                 "Atmosphere.CONTROLLED_O2"
             ),
         ),
+    )
+
+
+def _o2_bubbler_rate_knob(path: str, *, bounds_source: str) -> KnobSpec:
+    return _knob(
+        path,
+        low=0.0,
+        high=5.0,
+        units="kg/hr O2",
+        bounds_source=bounds_source,
+        search_enabled=False,
+        runtime_enabled=False,
     )
 
 
@@ -335,6 +357,30 @@ class RecipeSchema:
             bounds_source=(
                 "engineering_envelope inert RDX-OPT0 schema placeholder; "
                 "RDX-OPT1 defines live bounds"
+            ),
+            search_enabled=False,
+            runtime_enabled=False,
+        ),
+        _knob(
+            "o2_bubbler_eta_absorb_default",
+            low=0.0,
+            high=1.0,
+            units="fraction",
+            bounds_source=(
+                "engineering_envelope inert SSO-O2 chunk-A transfer-efficiency "
+                "placeholder; runtime reader lands in chunk B"
+            ),
+            search_enabled=False,
+            runtime_enabled=False,
+        ),
+        _knob(
+            "o2_bubbler_target_fO2_log",
+            low=-20.0,
+            high=0.0,
+            units="log10 fO2",
+            bounds_source=(
+                "engineering_envelope inert SSO-O2 chunk-A target placeholder; "
+                "runtime reader lands in chunk B"
             ),
             search_enabled=False,
             runtime_enabled=False,
@@ -626,6 +672,13 @@ class RecipeSchema:
             units="mbar",
             bounds_source="setpoints:campaigns.C2B.pO2_mbar",
         ),
+        _o2_bubbler_rate_knob(
+            "campaigns.C2B.o2_bubbler_kg_per_hr",
+            bounds_source=(
+                "engineering_envelope inert SSO-O2 chunk-A C2B actuator "
+                "placeholder; runtime reader lands in chunk B"
+            ),
+        ),
         _knob(
             "campaigns.C3.pO2_mbar_default",
             low=0.5,
@@ -700,6 +753,13 @@ class RecipeSchema:
             units="h",
             bounds_source="setpoints:campaigns.C3.duration_after_pathB_h_per_phase",
         ),
+        _o2_bubbler_rate_knob(
+            "campaigns.C3.o2_bubbler_kg_per_hr",
+            bounds_source=(
+                "engineering_envelope inert SSO-O2 chunk-A C3 actuator "
+                "placeholder; runtime reader lands in chunk B"
+            ),
+        ),
         _knob(
             "campaigns.C4.temp_range_C",
             low=1580,
@@ -743,6 +803,13 @@ class RecipeSchema:
             units="mbar",
             bounds_source="setpoints:campaigns.C4.optional_Ca_harvest.pO2_mbar",
             search_enabled=False,
+        ),
+        _o2_bubbler_rate_knob(
+            "campaigns.C4.o2_bubbler_kg_per_hr",
+            bounds_source=(
+                "engineering_envelope inert SSO-O2 chunk-A C4 actuator "
+                "placeholder; runtime reader lands in chunk B"
+            ),
         ),
         _knob(
             "campaigns.C5.temp_range_C",
@@ -851,6 +918,13 @@ class RecipeSchema:
             high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C6.pO2_mbar",
+        ),
+        _o2_bubbler_rate_knob(
+            "campaigns.C6.o2_bubbler_kg_per_hr",
+            bounds_source=(
+                "engineering_envelope inert SSO-O2 chunk-A C6 actuator "
+                "placeholder; runtime reader lands in chunk B"
+            ),
         ),
         _knob(
             f"chemistry_kernel.{OXYGEN_SINK_CHANNEL_MODE_KEY}",
@@ -1095,6 +1169,10 @@ class RecipeSchema:
                 or 0.0
             ),
         )
+
+    def o2_bubbler_settings(self, patch: "RecipePatch") -> Mapping[str, Any]:
+        validated = patch.validated(self)
+        return _o2_bubbler_identity_settings(validated.values)
 
 
 MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
@@ -1549,10 +1627,13 @@ class RecipePatch:
         *,
         recipe_schema_version: str | None = None,
         allowlist_version: str | None = None,
-    ) -> str:
+        ) -> str:
         active_schema = schema or RecipeSchema()
         schema_version = recipe_schema_version or active_schema.recipe_schema_version
-        active_allowlist_version = allowlist_version or active_schema.allowlist_version
+        active_allowlist_version = _effective_o2_bubbler_allowlist_version(
+            self.values,
+            allowlist_version or active_schema.allowlist_version,
+        )
         canonical = self.canonical_json().encode("utf-8")
         payload = (
             canonical
@@ -1564,11 +1645,89 @@ class RecipePatch:
         return hashlib.sha256(payload).hexdigest()
 
     def canonical_json(self) -> str:
+        values = _canonical_o2_bubbler_recipe_values(self.values)
         entries = [
             {"path": list(path), "value": _normalize_value(value)}
-            for path, value in sorted(self.values.items())
+            for path, value in sorted(values.items())
         ]
         return canonical_json_dumps(entries)
+
+
+def _identity_float(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(result):
+        return None
+    return result
+
+
+def _canonical_o2_bubbler_recipe_values(
+    values: Mapping[KeyPath, Any],
+) -> dict[KeyPath, Any]:
+    canonical = dict(values)
+    for path in O2_BUBBLER_RATE_PATHS:
+        if path not in canonical:
+            continue
+        rate = _identity_float(canonical[path])
+        if rate is None:
+            continue
+        if rate <= 0.0:
+            canonical.pop(path, None)
+        else:
+            canonical[path] = rate
+    if O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH in canonical:
+        eta = _identity_float(canonical[O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH])
+        if eta is None or math.isclose(
+            eta,
+            O2_BUBBLER_DEFAULT_ETA_ABSORB,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        ):
+            canonical.pop(O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH, None)
+        elif eta is not None:
+            canonical[O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH] = eta
+    if O2_BUBBLER_TARGET_FO2_LOG_PATH in canonical:
+        target = _identity_float(canonical[O2_BUBBLER_TARGET_FO2_LOG_PATH])
+        if target is None:
+            canonical.pop(O2_BUBBLER_TARGET_FO2_LOG_PATH, None)
+        else:
+            canonical[O2_BUBBLER_TARGET_FO2_LOG_PATH] = target
+    return canonical
+
+
+def _o2_bubbler_identity_settings(values: Mapping[KeyPath, Any]) -> Mapping[str, Any]:
+    canonical = _canonical_o2_bubbler_recipe_values(values)
+    settings: dict[str, Any] = {}
+    rates = {
+        ".".join(path[1:-1]): float(canonical[path])
+        for path in O2_BUBBLER_RATE_PATHS
+        if path in canonical
+    }
+    if rates:
+        settings["kg_per_hr"] = rates
+    if O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH in canonical:
+        settings["eta_absorb_default"] = float(
+            canonical[O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH]
+        )
+    if O2_BUBBLER_TARGET_FO2_LOG_PATH in canonical:
+        settings["target_fO2_log"] = float(canonical[O2_BUBBLER_TARGET_FO2_LOG_PATH])
+    return MappingProxyType(settings)
+
+
+def _effective_o2_bubbler_allowlist_version(
+    values: Mapping[KeyPath, Any],
+    requested_version: str,
+) -> str:
+    if (
+        requested_version == allowlist_version
+        and not _o2_bubbler_identity_settings(values)
+    ):
+        return O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION
+    return requested_version
 
 
 def _normalize_key_path(path: Any) -> KeyPath:
@@ -1802,6 +1961,8 @@ def _validate_value(spec: KnobSpec, value: Any, schema: RecipeSchema) -> None:
         _validate_numeric_bounds(spec, float(value))
         return
     if spec.kind == "float":
+        if spec.path == O2_BUBBLER_TARGET_FO2_LOG_PATH and value is None:
+            return
         if isinstance(value, list):
             if spec.path not in schema.NUMERIC_PAIR_VALUE_PATHS:
                 raise RecipeValidationError(

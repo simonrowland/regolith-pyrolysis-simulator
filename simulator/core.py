@@ -8897,6 +8897,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ) or {}
             ),
             redox_source_breakdown=redox_source_breakdown,
+            o2_bubbler_injected_kg=float(
+                getattr(self, '_o2_bubbler_injected_kg', 0.0) or 0.0
+            ),
+            o2_bubbler_absorbed_kg=float(
+                getattr(self, '_o2_bubbler_absorbed_kg', 0.0) or 0.0
+            ),
+            o2_bubbler_passthrough_kg=float(
+                getattr(self, '_o2_bubbler_passthrough_kg', 0.0) or 0.0
+            ),
+            o2_bubbler_vented_kg=float(
+                getattr(self, '_o2_bubbler_vented_kg', 0.0) or 0.0
+            ),
             # 0.5.4 W8 (M2 historical-audit closure): per-species drift
             # between ``process.metal_phase`` ledger and the
             # ``train.stages[*].collected_kg`` UI projection. Empty dict

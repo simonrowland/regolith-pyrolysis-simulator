@@ -28,7 +28,9 @@ from simulator.optimize.canonical import (
     normalize_canonical_value,
 )
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
-from simulator.optimize.recipe import allowlist_version as DEFAULT_ALLOWLIST_VERSION
+from simulator.optimize.recipe import (
+    O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION as DEFAULT_ALLOWLIST_VERSION,
+)
 
 
 _VERSION_PATH = Path(__file__).resolve().parents[2] / "VERSION"
@@ -78,6 +80,7 @@ class EvalSpec:
     mre_target_species: str = ""
     stage0_redox_oxidant_kg: float = 0.0
     stage0_carbon_reductant_kg: float = 0.0
+    o2_bubbler_settings: Mapping[str, Any] = field(default_factory=dict)
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
     lab_schedule: Mapping[str, Any] = field(default_factory=dict)
     chemistry_kernel: Mapping[str, Any] = field(default_factory=dict)
@@ -172,6 +175,11 @@ class EvalSpec:
         object.__setattr__(self, "additives_kg", _freeze_value(self.additives_kg, "additives_kg"))
         object.__setattr__(
             self,
+            "o2_bubbler_settings",
+            _freeze_value(self.o2_bubbler_settings, "o2_bubbler_settings"),
+        )
+        object.__setattr__(
+            self,
             "runtime_campaign_overrides",
             _freeze_value(self.runtime_campaign_overrides, "runtime_campaign_overrides"),
         )
@@ -229,6 +237,7 @@ class EvalSpec:
                 self.mre_target_species,
                 self.stage0_redox_oxidant_kg,
                 self.stage0_carbon_reductant_kg,
+                _thaw_value(self.o2_bubbler_settings),
                 _thaw_value(self.runtime_campaign_overrides),
                 _thaw_value(self.lab_schedule),
                 _thaw_value(self.chemistry_kernel),
@@ -293,6 +302,7 @@ class PrefixEvalSpec(EvalSpec):
                 self.mre_target_species,
                 self.stage0_redox_oxidant_kg,
                 self.stage0_carbon_reductant_kg,
+                _thaw_value(self.o2_bubbler_settings),
                 _thaw_value(self.runtime_campaign_overrides),
                 _thaw_value(self.lab_schedule),
                 _thaw_value(self.chemistry_kernel),
@@ -322,15 +332,18 @@ class PrefixEvalSpec(EvalSpec):
 
 
 _OLD_EVALSPEC_REDUCE_ARG_COUNT = 34
+_PRE_BUBBLER_EVALSPEC_REDUCE_ARG_COUNT = 36
 _OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT = 38
-_EVALSPEC_REDUCE_ARG_COUNT = 36
-_PREFIX_EVALSPEC_REDUCE_ARG_COUNT = 40
+_PRE_BUBBLER_PREFIX_EVALSPEC_REDUCE_ARG_COUNT = 40
+_EVALSPEC_REDUCE_ARG_COUNT = 37
+_PREFIX_EVALSPEC_REDUCE_ARG_COUNT = 41
 # Position of (stage0_redox_oxidant_kg, stage0_carbon_reductant_kg) in the
 # __reduce__ tuple: immediately after mre_target_species (index 15) and before
 # runtime_campaign_overrides (index 18). Must track that field order — if the
 # reduce tuple is reordered, update this index or old-arity pickles rebuild
 # with the redox defaults in the wrong slots (silent cache corruption).
 _REDOX_REDUCE_INSERT_INDEX = 16
+_BUBBLER_REDUCE_INSERT_INDEX = 18
 _DATA_DIGESTS_REDUCE_INDEX = 6
 
 
@@ -340,6 +353,16 @@ def _with_default_redox_reduce_args(args: tuple[Any, ...]) -> tuple[Any, ...]:
         + (0.0, 0.0)
         + args[_REDOX_REDUCE_INSERT_INDEX:]
     )
+
+
+def _with_default_bubbler_reduce_args(args: tuple[Any, ...]) -> tuple[Any, ...]:
+    return args[:_BUBBLER_REDUCE_INSERT_INDEX] + ({},) + args[_BUBBLER_REDUCE_INSERT_INDEX:]
+
+
+def _with_default_redox_and_bubbler_reduce_args(
+    args: tuple[Any, ...],
+) -> tuple[Any, ...]:
+    return _with_default_bubbler_reduce_args(_with_default_redox_reduce_args(args))
 
 
 def _with_legacy_data_digest_scope(value: Any) -> Any:
@@ -370,10 +393,31 @@ def _with_legacy_data_digest_args(args: tuple[Any, ...]) -> tuple[Any, ...]:
 def _rebuild_eval_spec(*args: Any) -> EvalSpec:
     if len(args) == _OLD_EVALSPEC_REDUCE_ARG_COUNT:
         return EvalSpec(
-            *_with_legacy_data_digest_args(_with_default_redox_reduce_args(args))
+            *_with_legacy_data_digest_args(
+                _with_default_redox_and_bubbler_reduce_args(args)
+            )
+        )
+    if len(args) == _PRE_BUBBLER_EVALSPEC_REDUCE_ARG_COUNT:
+        return EvalSpec(
+            *_with_legacy_data_digest_args(_with_default_bubbler_reduce_args(args))
+        )
+    if len(args) == _PRE_BUBBLER_EVALSPEC_REDUCE_ARG_COUNT + 1 and isinstance(args[-1], bool):
+        return EvalSpec(
+            *_with_legacy_data_digest_args(
+                _with_default_bubbler_reduce_args(args[:-1])
+            ),
+            stop_at_stage0_exit=args[-1],
         )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT:
         return EvalSpec(*_with_legacy_data_digest_args(args))
+    if len(args) == _PRE_BUBBLER_EVALSPEC_REDUCE_ARG_COUNT + 2:
+        return EvalSpec(
+            *_with_legacy_data_digest_args(
+                _with_default_bubbler_reduce_args(args[:-2])
+            ),
+            allowlist_version=args[-2],
+            stop_at_stage0_exit=args[-1],
+        )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 2:
         return EvalSpec(
             *_with_legacy_data_digest_args(args[:-2]),
@@ -382,7 +426,9 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
         )
     if len(args) == _OLD_EVALSPEC_REDUCE_ARG_COUNT + 1:
         return EvalSpec(
-            *_with_legacy_data_digest_args(_with_default_redox_reduce_args(args[:-1])),
+            *_with_legacy_data_digest_args(
+                _with_default_redox_and_bubbler_reduce_args(args[:-1])
+            ),
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 1:
@@ -396,10 +442,34 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
 def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
     if len(args) == _OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(_with_default_redox_reduce_args(args))
+            *_with_legacy_data_digest_args(
+                _with_default_redox_and_bubbler_reduce_args(args)
+            )
+        )
+    if len(args) == _PRE_BUBBLER_PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
+        return PrefixEvalSpec(
+            *_with_legacy_data_digest_args(_with_default_bubbler_reduce_args(args))
+        )
+    if (
+        len(args) == _PRE_BUBBLER_PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1
+        and isinstance(args[-1], bool)
+    ):
+        return PrefixEvalSpec(
+            *_with_legacy_data_digest_args(
+                _with_default_bubbler_reduce_args(args[:-1])
+            ),
+            stop_at_stage0_exit=args[-1],
         )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT:
         return PrefixEvalSpec(*_with_legacy_data_digest_args(args))
+    if len(args) == _PRE_BUBBLER_PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 2:
+        return PrefixEvalSpec(
+            *_with_legacy_data_digest_args(
+                _with_default_bubbler_reduce_args(args[:-2])
+            ),
+            allowlist_version=args[-2],
+            stop_at_stage0_exit=args[-1],
+        )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 2:
         return PrefixEvalSpec(
             *_with_legacy_data_digest_args(args[:-2]),
@@ -408,7 +478,9 @@ def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
         )
     if len(args) == _OLD_PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1:
         return PrefixEvalSpec(
-            *_with_legacy_data_digest_args(_with_default_redox_reduce_args(args[:-1])),
+            *_with_legacy_data_digest_args(
+                _with_default_redox_and_bubbler_reduce_args(args[:-1])
+            ),
             stop_at_stage0_exit=args[-1],
         )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 1:
@@ -454,6 +526,8 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         payload["stage0_redox_oxidant_kg"] = spec.stage0_redox_oxidant_kg
     if spec.stage0_carbon_reductant_kg:
         payload["stage0_carbon_reductant_kg"] = spec.stage0_carbon_reductant_kg
+    if spec.o2_bubbler_settings:
+        payload["o2_bubbler_settings"] = spec.o2_bubbler_settings
     if spec.allow_fallback_vapor:
         payload["vapor_pressure_fallback_provider_id"] = (
             spec.vapor_pressure_fallback_provider_id

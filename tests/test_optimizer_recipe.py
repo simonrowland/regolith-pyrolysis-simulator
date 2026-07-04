@@ -23,12 +23,17 @@ from simulator.optimize.recipe import (
     C4_HOLD_TEMP_C_PATH,
     FURNACE_MAX_T_C_PATH,
     KnobSpec,
+    O2_BUBBLER_CAMPAIGN_RATE_PATHS,
+    O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH,
+    O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION,
+    O2_BUBBLER_TARGET_FO2_LOG_PATH,
     RecipePatch,
     RecipePinWarning,
     RecipeSchema,
     RecipeValidationError,
     STAGE0_CARBON_REDUCTANT_KG_PATH,
     STAGE0_REDOX_OXIDANT_KG_PATH,
+    allowlist_version,
 )
 import simulator.optimize.recipe as recipe_module
 from simulator.optimize.canonical import canonical_json_dumps
@@ -1061,6 +1066,111 @@ def test_redox_cleanup_dose_fields_validate_but_do_not_materialize() -> None:
     }
     assert schema.to_setpoints_patch(patch) == {}
     assert schema.redox_cleanup_doses_kg(patch) == pytest.approx((12.5, 7.25))
+
+
+def test_o2_bubbler_knobs_validate_but_do_not_materialize_in_chunk_a() -> None:
+    schema = RecipeSchema()
+    c3_rate = ("campaigns", "C3", "o2_bubbler_kg_per_hr")
+    patch = RecipePatch(
+        {
+            c3_rate: 0.25,
+            O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH: 0.8,
+            O2_BUBBLER_TARGET_FO2_LOG_PATH: -8.0,
+        }
+    ).validated(schema)
+    search_paths = {spec.path for spec in schema.search_allowlist}
+
+    assert schema.allowlist_version == allowlist_version
+    assert schema.to_setpoints_patch(patch) == {}
+    assert c3_rate in O2_BUBBLER_CAMPAIGN_RATE_PATHS
+    spec = schema.spec_for(c3_rate)
+    assert spec.search_enabled is False
+    assert spec.runtime_enabled is False
+    assert c3_rate not in search_paths
+    assert schema.o2_bubbler_settings(patch) == {
+        "kg_per_hr": {"C3": 0.25},
+        "eta_absorb_default": 0.8,
+        "target_fO2_log": -8.0,
+    }
+
+
+def test_o2_bubbler_zero_rate_preserves_legacy_recipe_identity() -> None:
+    schema = RecipeSchema()
+    legacy_schema = RecipeSchema(allowlist_version=O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION)
+    c3_rate = ("campaigns", "C3", "o2_bubbler_kg_per_hr")
+
+    assert RecipePatch({}).recipe_id(schema) == RecipePatch({}).recipe_id(legacy_schema)
+    assert RecipePatch({c3_rate: 0.0}).recipe_id(schema) == RecipePatch({}).recipe_id(
+        legacy_schema
+    )
+    assert RecipePatch({c3_rate: 0.25}).recipe_id(schema) != RecipePatch({}).recipe_id(
+        legacy_schema
+    )
+    assert RecipePatch(
+        {O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH: 0.75}
+    ).recipe_id(schema) == RecipePatch({}).recipe_id(schema)
+    assert RecipePatch(
+        {O2_BUBBLER_TARGET_FO2_LOG_PATH: None}
+    ).recipe_id(schema) == RecipePatch({}).recipe_id(schema)
+
+
+@pytest.mark.parametrize("bad_value", [-1.0, float("nan"), float("inf")])
+def test_o2_bubbler_invalid_rate_fails_loud(bad_value: float) -> None:
+    schema = RecipeSchema()
+    c3_rate = ("campaigns", "C3", "o2_bubbler_kg_per_hr")
+
+    with pytest.raises(RecipeValidationError):
+        RecipePatch({c3_rate: bad_value}).validated(schema)
+
+
+def test_o2_bubbler_c2a_staged_stage_key_is_deferred() -> None:
+    with pytest.raises(
+        RecipeValidationError,
+        match=r"unknown C2A_staged stage field: campaigns\.C2A_staged\.stages\.sio_window\.o2_bubbler_kg_per_hr",
+    ):
+        RecipePatch.from_nested(
+            {
+                "campaigns": {
+                    "C2A_staged": {
+                        "stages": [
+                            {"name": "sio_window", "o2_bubbler_kg_per_hr": 0.5},
+                        ],
+                    },
+                },
+            }
+        )
+
+
+def test_o2_bubbler_target_none_validates_as_unset() -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch({O2_BUBBLER_TARGET_FO2_LOG_PATH: None}).validated(schema)
+
+    assert patch.recipe_id(schema) == RecipePatch({}).recipe_id(schema)
+    assert schema.o2_bubbler_settings(patch) == {}
+
+
+def test_o2_bubbler_c2a_staged_list_entry_flattens_existing_named_stage_keys() -> None:
+    patch = RecipePatch.from_nested(
+        {
+            "campaigns": {
+                "C2A_staged": {
+                    "stages": [
+                        {"name": "sio_window", "target_C": 1585.0},
+                    ],
+                },
+            },
+        }
+    ).validated()
+
+    assert patch.values[
+        (
+            "campaigns",
+            "C2A_staged",
+            "stages",
+            "sio_window",
+            "target_C",
+        )
+    ] == pytest.approx(1585.0)
 
 
 def test_c5_allow_mre_voltage_cap_is_primary_search_knob() -> None:

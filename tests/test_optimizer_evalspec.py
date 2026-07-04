@@ -45,15 +45,17 @@ from simulator.optimize.recipe import (
     C2A_STAGED_ORDER_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
+    O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION,
     RecipePatch,
     RecipeSchema,
     STAGE0_CARBON_REDUCTANT_KG_PATH,
     STAGE0_REDOX_OXIDANT_KG_PATH,
+    allowlist_version,
 )
 from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
 from simulator.runner import PyrolysisRun, RunnerError
-from simulator.state import MeltState
+from simulator.state import HourSnapshot, MeltState
 
 
 STAGE_SIO_PO2 = (
@@ -109,6 +111,7 @@ STAGE_SIO_TARGET = (
     "sio_window",
     "target_C",
 )
+O2_C3_RATE = ("campaigns", "C3", "o2_bubbler_kg_per_hr")
 
 
 def _base_spec(**overrides: object) -> EvalSpec:
@@ -302,6 +305,79 @@ def test_build_eval_inputs_keys_schema_allowlist_version_in_production_path() ->
     assert cache_key(old_spec) != cache_key(new_spec)
 
 
+def test_o2_bubbler_default_and_zero_settings_preserve_evalspec_identity() -> None:
+    profile = _mre_cap_profile(campaign="C3")
+    schema = RecipeSchema()
+    legacy_schema = RecipeSchema(allowlist_version=O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION)
+
+    baseline, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        legacy_schema,
+    )
+    default_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    zero_spec, _ = _build_eval_inputs(
+        RecipePatch({O2_C3_RATE: 0.0}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert schema.allowlist_version == allowlist_version
+    assert default_spec.allowlist_version == O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION
+    assert zero_spec.allowlist_version == O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION
+    assert default_spec.recipe_id == baseline.recipe_id
+    assert zero_spec.recipe_id == baseline.recipe_id
+    assert canonical_evalspec_json(default_spec) == canonical_evalspec_json(baseline)
+    assert canonical_evalspec_json(zero_spec) == canonical_evalspec_json(baseline)
+    assert cache_key(default_spec) == cache_key(baseline)
+    assert cache_key(zero_spec) == cache_key(baseline)
+    assert b"o2_bubbler_settings" not in canonical_evalspec_json(default_spec)
+
+
+def test_o2_bubbler_nonzero_setting_splits_recipe_id_and_cache_key() -> None:
+    profile = _mre_cap_profile(campaign="C3")
+    schema = RecipeSchema()
+    neutral_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    bubbler_spec, _ = _build_eval_inputs(
+        RecipePatch({O2_C3_RATE: 0.25}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert bubbler_spec.allowlist_version == allowlist_version
+    assert bubbler_spec.o2_bubbler_settings == {"kg_per_hr": {"C3": 0.25}}
+    assert bubbler_spec.recipe_id != neutral_spec.recipe_id
+    assert cache_key(bubbler_spec) != cache_key(neutral_spec)
+    assert b"o2_bubbler_settings" in canonical_evalspec_json(bubbler_spec)
+
+
+def test_o2_bubbler_snapshot_telemetry_defaults_zero() -> None:
+    snapshot = HourSnapshot()
+
+    assert snapshot.o2_bubbler_injected_kg == pytest.approx(0.0)
+    assert snapshot.o2_bubbler_absorbed_kg == pytest.approx(0.0)
+    assert snapshot.o2_bubbler_passthrough_kg == pytest.approx(0.0)
+    assert snapshot.o2_bubbler_vented_kg == pytest.approx(0.0)
+
+
 def test_code_version_is_sourced_from_version_file() -> None:
     spec = _base_spec()
 
@@ -440,6 +516,7 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
         ("mre_target_species", "SiO2"),
         ("stage0_redox_oxidant_kg", 12.5),
         ("stage0_carbon_reductant_kg", 7.25),
+        ("o2_bubbler_settings", {"kg_per_hr": {"C3": 0.25}}),
         ("runtime_campaign_overrides", {"C2A": {"hold_time_h": 2.0}}),
         ("lab_alpha_digest", "robinot-lab-alpha-v1"),
         ("geometry_digest", "robinot-geometry-v1"),
@@ -502,9 +579,10 @@ def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
     _, args = _base_spec(
         stage0_redox_oxidant_kg=1.0,
         stage0_carbon_reductant_kg=2.0,
+        o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[18:-2]
+    old_args = args[:16] + args[19:-2]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -512,18 +590,39 @@ def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
 
     assert restored.stage0_redox_oxidant_kg == 0.0
     assert restored.stage0_carbon_reductant_kg == 0.0
+    assert restored.o2_bubbler_settings == {}
     assert restored_with_stop.stop_at_stage0_exit is True
     assert restored_with_stop.stage0_redox_oxidant_kg == 0.0
     assert restored_with_stop.stage0_carbon_reductant_kg == 0.0
+    assert restored_with_stop.o2_bubbler_settings == {}
+
+
+def test_pre_bubbler_evalspec_reduce_payloads_get_empty_settings_default() -> None:
+    _, args = _base_spec(
+        o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
+        stop_at_stage0_exit=True,
+    ).__reduce__()
+    old_args = args[:18] + args[19:-2]
+    old_args_with_stop = old_args + (True,)
+
+    restored = evalspec_module._rebuild_eval_spec(*old_args)
+    restored_with_stop = evalspec_module._rebuild_eval_spec(*old_args_with_stop)
+
+    assert restored.stage0_redox_oxidant_kg == 0.0
+    assert restored.stage0_carbon_reductant_kg == 0.0
+    assert restored.o2_bubbler_settings == {}
+    assert restored_with_stop.stop_at_stage0_exit is True
+    assert restored_with_stop.o2_bubbler_settings == {}
 
 
 def test_pre_redox_prefix_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
     _, args = _prefix_spec(
         stage0_redox_oxidant_kg=1.0,
         stage0_carbon_reductant_kg=2.0,
+        o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[18:-2]
+    old_args = args[:16] + args[19:-2]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -533,10 +632,29 @@ def test_pre_redox_prefix_evalspec_reduce_payloads_get_zero_dose_defaults() -> N
 
     assert restored.stage0_redox_oxidant_kg == 0.0
     assert restored.stage0_carbon_reductant_kg == 0.0
+    assert restored.o2_bubbler_settings == {}
     assert restored.prefix_stage_ids == ("C0", "C0B")
     assert restored_with_stop.stop_at_stage0_exit is True
     assert restored_with_stop.stage0_redox_oxidant_kg == 0.0
     assert restored_with_stop.stage0_carbon_reductant_kg == 0.0
+    assert restored_with_stop.o2_bubbler_settings == {}
+
+
+def test_pre_bubbler_prefix_evalspec_reduce_payloads_get_empty_settings_default() -> None:
+    _, args = _prefix_spec(
+        o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
+        stop_at_stage0_exit=True,
+    ).__reduce__()
+    old_args = args[:18] + args[19:-2]
+    old_args_with_stop = old_args + (True,)
+
+    restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
+    restored_with_stop = evalspec_module._rebuild_prefix_eval_spec(*old_args_with_stop)
+
+    assert restored.o2_bubbler_settings == {}
+    assert restored.prefix_stage_ids == ("C0", "C0B")
+    assert restored_with_stop.stop_at_stage0_exit is True
+    assert restored_with_stop.o2_bubbler_settings == {}
 
 
 def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
