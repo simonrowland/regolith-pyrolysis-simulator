@@ -23,6 +23,12 @@ from simulator.optimize.objective import (
     pareto_front,
 )
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    C2A_STAGED_DEFAULT_ORDER,
+    C2A_STAGED_ORDER_CHOICES,
+    C2A_STAGED_ORDER_PATH,
+    c2a_staged_stage_order,
+)
 from simulator.optimize.strategy.protocol import Candidate
 
 
@@ -69,15 +75,27 @@ class TopologyChoice:
     branch: str = "two"
     c5: bool = False
     c6: bool = True
+    c2a_staged_order: str = C2A_STAGED_DEFAULT_ORDER
+
+    def __post_init__(self) -> None:
+        c2a_staged_stage_order(self.c2a_staged_order)
+        if self.path_ab != "A_staged" and self.c2a_staged_order != C2A_STAGED_DEFAULT_ORDER:
+            raise ValueError("c2a_staged_order requires PATH_A_STAGED")
 
     @property
     def id(self) -> str:
         c5_value = "YES" if self.c5 else "NO"
         c6_value = "YES" if self.c6 else "NO"
-        return (
+        base = (
             f"PATH_{self.path_ab.upper()}__BRANCH_{self.branch.upper()}"
             f"__C5_{c5_value}__C6_{c6_value}"
         )
+        if (
+            self.path_ab == "A_staged"
+            and self.c2a_staged_order != C2A_STAGED_DEFAULT_ORDER
+        ):
+            return f"{base}__C2A_ORDER_{self.c2a_staged_order.upper()}"
+        return base
 
     def metadata(self) -> Mapping[str, Any]:
         return MappingProxyType(
@@ -87,6 +105,7 @@ class TopologyChoice:
                 "branch": self.branch,
                 "c5": "yes" if self.c5 else "no",
                 "c6": "yes" if self.c6 else "no",
+                "c2a_staged_order": self.c2a_staged_order,
             }
         )
 
@@ -96,7 +115,9 @@ _BRANCH_CHOICES = ("two", "one")
 _C5_CHOICES = (False, True)
 _C6_CHOICES = (True, False)
 _DEFAULT_TOPOLOGY = TopologyChoice()
-_TOPOLOGY_MAPPING_KEYS = frozenset({"id", "path", "path_ab", "branch", "c5", "c6"})
+_TOPOLOGY_MAPPING_KEYS = frozenset(
+    {"id", "path", "path_ab", "branch", "c5", "c6", "c2a_staged_order", "order"}
+)
 _ACTIVE_STAGE_ALIASES: Mapping[str, tuple[str, ...]] = MappingProxyType(
     {
         "C0": ("stage0", "feed", "raw", "drying", "volatile"),
@@ -135,8 +156,19 @@ def enumerate_topologies(
 ) -> tuple[TopologyChoice, ...]:
     if topologies is None:
         return tuple(
-            TopologyChoice(path_ab=path_ab, branch=branch, c5=c5, c6=c6)
+            TopologyChoice(
+                path_ab=path_ab,
+                branch=branch,
+                c5=c5,
+                c6=c6,
+                c2a_staged_order=order,
+            )
             for path_ab in _PATH_AB_CHOICES
+            for order in (
+                C2A_STAGED_ORDER_CHOICES
+                if path_ab == "A_staged"
+                else (C2A_STAGED_DEFAULT_ORDER,)
+            )
             for branch in _BRANCH_CHOICES
             for c5 in _C5_CHOICES
             for c6 in _C6_CHOICES
@@ -257,9 +289,10 @@ class StagedStrategy:
             raise StagedBeamStateError("staged strategy requires at least one stage")
         self._definitions = objective_definitions(self.objective_profile)
         self._stage_index = 0
+        self._topology_patch = _patch_for_topology(self.topology).validated(self.schema)
         self._frontier = (
             _BeamNode(
-                patch=RecipePatch({}),
+                patch=self._topology_patch,
                 stage_ids=(),
                 recipe_ids=(),
                 parent_id=None,
@@ -943,6 +976,7 @@ def _coerce_topology(value: Any) -> TopologyChoice:
         branch = None
         c5 = None
         c6 = None
+        c2a_staged_order = C2A_STAGED_DEFAULT_ORDER
         for part in normalized.split("__"):
             if part in {"PATH_A", "A"}:
                 path_ab = "A"
@@ -962,12 +996,17 @@ def _coerce_topology(value: Any) -> TopologyChoice:
                 c6 = True
             elif part in {"C6_NO", "NO"}:
                 c6 = False
+            elif part.startswith("C2A_ORDER_"):
+                c2a_staged_order = _normalize_c2a_staged_order(
+                    part.removeprefix("C2A_ORDER_")
+                )
         if path_ab is not None and branch is not None and c6 is not None:
             return TopologyChoice(
                 path_ab=path_ab,
                 branch=branch,
                 c5=True if c5 is None else c5,
                 c6=c6,
+                c2a_staged_order=c2a_staged_order,
             )
         raise ValueError(f"unknown topology {value!r}")
     if isinstance(value, Mapping):
@@ -995,6 +1034,9 @@ def _coerce_topology(value: Any) -> TopologyChoice:
             branch=_normalize_branch(value["branch"]),
             c5=_normalize_c5(value.get("c5", False)),
             c6=_normalize_c6(value["c6"]),
+            c2a_staged_order=_normalize_c2a_staged_order(
+                value.get("c2a_staged_order", value.get("order", C2A_STAGED_DEFAULT_ORDER))
+            ),
         )
     raise TypeError("topology must be a TopologyChoice, mapping, or id string")
 
@@ -1059,6 +1101,14 @@ def _normalize_c5(value: Any) -> bool:
     raise ValueError("topology c5 must be yes/no")
 
 
+def _normalize_c2a_staged_order(value: Any) -> str:
+    if not isinstance(value, str):
+        raise ValueError("topology c2a_staged_order must be a string")
+    normalized = value.strip().lower().replace("-", "_")
+    c2a_staged_stage_order(normalized)
+    return normalized
+
+
 def _stage_path_for_topology(topology: TopologyChoice) -> tuple[str, ...]:
     path_stage = {
         "A": "C2A_continuous",
@@ -1073,6 +1123,15 @@ def _stage_path_for_topology(topology: TopologyChoice) -> tuple[str, ...]:
     if topology.c6:
         stages.append("C6")
     return tuple(stages)
+
+
+def _patch_for_topology(topology: TopologyChoice) -> RecipePatch:
+    if (
+        topology.path_ab != "A_staged"
+        or topology.c2a_staged_order == C2A_STAGED_DEFAULT_ORDER
+    ):
+        return RecipePatch({})
+    return RecipePatch({C2A_STAGED_ORDER_PATH: topology.c2a_staged_order})
 
 
 def _joint_refine_target_indices(

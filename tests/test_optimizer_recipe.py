@@ -18,6 +18,7 @@ from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
+    C2A_STAGED_ORDER_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
     FURNACE_MAX_T_C_PATH,
@@ -90,6 +91,7 @@ STAGE_SIO_GAS_MODE = (
     "sio_window",
     "gas_cover_mode",
 )
+C2A_ORDER = C2A_STAGED_ORDER_PATH
 DATA_DIGESTS = {
     "feedstocks": "feedstocks-digest",
     "foulant_thermo": "foulant-thermo-digest",
@@ -713,9 +715,127 @@ def test_c2a_staged_stage_gas_defaults_are_empty_patch_neutral() -> None:
     cfg = config.setpoints["campaigns"]["C2A_staged"]
 
     assert cfg["stages"] == source_c2a["stages"]
+    assert "order" not in cfg
     assert cfg["pO2_mbar_default"] == pytest.approx(0.0)
     assert cfg["p_total_mbar_default"] == pytest.approx(10.0)
     assert all("gas_cover_mode" not in stage for stage in cfg["stages"])
+
+
+def test_c2a_staged_order_choice_renders_and_executes_requested_order() -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch({C2A_ORDER: "fe_then_sio"}).validated(schema)
+    nested = schema.to_setpoints_patch(patch)
+    stages = nested["campaigns"]["C2A_staged"]["stages"]
+
+    assert nested["campaigns"]["C2A_staged"]["order"] == "fe_then_sio"
+    assert [stage["name"] for stage in stages] == [
+        "alkali_early_fe",
+        "fe_hot_hold",
+        "sio_window",
+        "cool_for_na_shuttle",
+    ]
+    assert nested["campaigns"]["C2A_staged"]["max_hold_hr"] == 9
+
+    loaded_patch = RecipePatch.from_nested(nested).validated(schema)
+    assert loaded_patch.values[C2A_ORDER] == "fe_then_sio"
+
+    config = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        campaign="C2A_staged",
+        hours=9,
+        setpoints_patch=nested,
+    )._session_config()
+    cfg = config.setpoints["campaigns"]["C2A_staged"]
+    assert [stage["name"] for stage in cfg["stages"]] == [
+        "alkali_early_fe",
+        "fe_hot_hold",
+        "sio_window",
+        "cool_for_na_shuttle",
+    ]
+    manager = CampaignManager(config.setpoints)
+
+    target, ramp = manager.get_temp_target(
+        CampaignPhase.C2A_STAGED,
+        4,
+        MeltState(campaign=CampaignPhase.C2A_STAGED),
+    )
+    assert target == pytest.approx(1750.0)
+    assert ramp == pytest.approx(150.0)
+
+    target, ramp = manager.get_temp_target(
+        CampaignPhase.C2A_STAGED,
+        5,
+        MeltState(campaign=CampaignPhase.C2A_STAGED),
+    )
+    assert target == pytest.approx(1600.0)
+    assert ramp == pytest.approx(175.0)
+
+
+@pytest.mark.parametrize(
+    ("stages", "message"),
+    (
+        (
+            [
+                {"name": "alkali_early_fe"},
+                {"name": "sio_window"},
+                {"name": "cool_for_na_shuttle"},
+            ],
+            "missing C2A_staged.stages stage: fe_hot_hold",
+        ),
+        (
+            [
+                {"name": "alkali_early_fe"},
+                {"name": "sio_window"},
+                {"name": "mg_surprise"},
+                {"name": "cool_for_na_shuttle"},
+            ],
+            "unknown C2A_staged stage: mg_surprise",
+        ),
+        (
+            [
+                {"name": "alkali_early_fe"},
+                {"name": "sio_window"},
+                {"name": "sio_window"},
+                {"name": "cool_for_na_shuttle"},
+            ],
+            "duplicate C2A_staged stage: sio_window",
+        ),
+        (
+            [
+                {"name": "sio_window"},
+                {"name": "alkali_early_fe"},
+                {"name": "fe_hot_hold"},
+                {"name": "cool_for_na_shuttle"},
+            ],
+            "C2A_staged.stages must keep alkali_early_fe first",
+        ),
+        (
+            [
+                {"name": "alkali_early_fe"},
+                {"name": "sio_window"},
+                {"name": "cool_for_na_shuttle"},
+                {"name": "fe_hot_hold"},
+            ],
+            "C2A_staged.stages must keep cool_for_na_shuttle last",
+        ),
+    ),
+)
+def test_c2a_staged_stage_order_refuses_dropped_or_moved_required_stages(
+    stages,
+    message,
+) -> None:
+    with pytest.raises(RecipeValidationError, match=message):
+        RecipePatch.from_nested(
+            {"campaigns": {"C2A_staged": {"stages": stages}}}
+        ).validated(RecipeSchema())
+
+
+def test_c2a_staged_order_rejects_unknown_choice() -> None:
+    with pytest.raises(
+        RecipeValidationError,
+        match=r"campaigns\.C2A_staged\.order",
+    ):
+        RecipePatch({C2A_ORDER: "iron_firstish"}).validated(RecipeSchema())
 
 
 def test_c2a_staged_depletion_flux_decay_knob_bounds_and_neutral_validation() -> None:

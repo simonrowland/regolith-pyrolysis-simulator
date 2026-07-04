@@ -91,6 +91,19 @@ def test_evap_plane_selectivity_uses_hour_based_stage_on_default_staged_path() -
     assert fe_hot_hold["target_flux_kg_hr"] == pytest.approx(1.0)
 
 
+def test_partial_c2a_staged_config_preserves_declared_runtime_order() -> None:
+    setpoints = _staged_setpoints()
+    assert "order" not in setpoints["campaigns"]["C2A_staged"]
+    manager = CampaignManager(setpoints)
+
+    stage_names = [
+        manager._c2a_staged_active_stage(hour)["name"]
+        for hour in (0, 2, 4)
+    ]
+
+    assert stage_names == ["alkali_early_fe", "sio_window", "fe_hot_hold"]
+
+
 def test_evap_plane_selectivity_targets_staged_flux_fraction() -> None:
     stage = {
         "name": "sio_window",

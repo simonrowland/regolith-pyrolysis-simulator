@@ -21,12 +21,13 @@ from simulator.optimize.objective import (
     pareto_front,
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
-from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.recipe import C2A_STAGED_ORDER_PATH, RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.strategy.staged import (
     StagedAllowlistError,
     TopologyChoice,
     enumerate_topologies,
+    _patch_for_topology,
 )
 from simulator.optimize.strategy import (
     Candidate,
@@ -483,13 +484,56 @@ def test_c5_and_c6_topology_changes_stage_path() -> None:
         topology=TopologyChoice(path_ab="A", branch="two", c5=True, c6=True),
     )
 
-    assert len(enumerate_topologies()) == 24
+    assert len(enumerate_topologies()) == 32
     assert c5_no.stage_ids != c5_yes.stage_ids
     assert "C5" not in c5_no.stage_ids
     assert "C5" in c5_yes.stage_ids
     assert c6_no.stage_ids != c6_yes.stage_ids
     assert "C6" not in c6_no.stage_ids
     assert c6_yes.stage_ids[-1] == "C6"
+
+
+def test_c2a_staged_topology_order_is_candidate_visible() -> None:
+    topology = TopologyChoice(
+        path_ab="A_staged",
+        branch="two",
+        c5=False,
+        c6=True,
+        c2a_staged_order="fe_then_sio",
+    )
+    profile = {**PROFILE, "staged": {"beam_width": 1, "children_per_parent": 1}}
+    strategy = StagedStrategy(
+        SCHEMA,
+        seed=7,
+        objective_profile=profile,
+        topology=topology,
+    )
+
+    candidate = strategy.ask(1)[0]
+
+    assert "__C2A_ORDER_FE_THEN_SIO" in topology.id
+    assert topology.metadata()["c2a_staged_order"] == "fe_then_sio"
+    assert candidate.patch.values[C2A_STAGED_ORDER_PATH] == "fe_then_sio"
+    assert candidate.metadata["topology"]["c2a_staged_order"] == "fe_then_sio"
+    assert "__C2A_ORDER_FE_THEN_SIO" in candidate.id
+    with pytest.raises(ValueError, match="requires PATH_A_STAGED"):
+        TopologyChoice(path_ab="A", c2a_staged_order="fe_then_sio")
+
+
+def test_default_c2a_staged_topology_is_cache_neutral() -> None:
+    topology = TopologyChoice(path_ab="A_staged", branch="two", c5=False, c6=True)
+    topology_patch = _patch_for_topology(topology)
+    default_patch = RecipePatch({})
+
+    topology_spec = _spec(topology_patch)
+    default_spec = _spec(default_patch)
+
+    assert topology.id == "PATH_A_STAGED__BRANCH_TWO__C5_NO__C6_YES"
+    assert "__C2A_ORDER" not in topology.id
+    assert C2A_STAGED_ORDER_PATH not in topology_patch.values
+    assert topology_patch.recipe_id(SCHEMA) == default_patch.recipe_id(SCHEMA)
+    assert topology_spec.recipe_id == default_spec.recipe_id
+    assert cache_key(topology_spec) == cache_key(default_spec)
 
 
 def test_empty_topologies_raise(tmp_path) -> None:

@@ -33,6 +33,7 @@ from simulator.lab_schedule import (
     schedule_sample_time_h,
 )
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+from simulator.optimize.recipe import c2a_staged_stage_order, validate_c2a_staged_stage_order
 from simulator.state import StirState, clamp_stir_factor, clamp_stir_state
 from simulator.core import (
     Atmosphere, BatchRecord, CampaignPhase, CondensationTrain,
@@ -512,12 +513,24 @@ class CampaignManager:
         stages = cfg.get('stages')
         if not isinstance(stages, list) or not stages:
             raise ValueError('C2A_staged.stages must be a non-empty list')
-        enabled: list[dict] = []
+        declared_stages: list[dict] = []
+        stages_by_name: dict[str, dict] = {}
+        names: list[str] = []
         for idx, stage in enumerate(stages):
             if not isinstance(stage, dict):
                 raise ValueError(f'C2A_staged.stages[{idx}] must be a mapping')
-            enabled.append(stage)
-        return enabled
+            name = stage.get('name')
+            if not isinstance(name, str):
+                raise ValueError(f'C2A_staged.stages[{idx}].name must be a string')
+            declared_stages.append(stage)
+            names.append(name)
+            stages_by_name[name] = stage
+        order_value = cfg.get('order')
+        if order_value is None:
+            return declared_stages
+        validate_c2a_staged_stage_order(names)
+        order = c2a_staged_stage_order(order_value)
+        return [stages_by_name[name] for name in order]
 
     def _c2a_staged_current_stage(self) -> dict | None:
         stages = self._c2a_staged_enabled_stages()

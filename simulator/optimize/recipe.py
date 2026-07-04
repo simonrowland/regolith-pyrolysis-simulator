@@ -75,6 +75,7 @@ STAGE0_CARBON_REDUCTANT_KG_PATH: KeyPath = tuple(
 C4_HOLD_TEMP_C_PATH: KeyPath = tuple("campaigns.C4.hold_temp_C".split("."))
 
 C2A_STAGED_STAGES_PATH: KeyPath = tuple("campaigns.C2A_staged.stages".split("."))
+C2A_STAGED_ORDER_PATH: KeyPath = tuple("campaigns.C2A_staged.order".split("."))
 C2A_STAGED_PO2_MBAR_DEFAULT_PATH: KeyPath = tuple(
     "campaigns.C2A_staged.pO2_mbar_default".split(".")
 )
@@ -93,6 +94,22 @@ C2A_STAGED_STAGE_NAMES: tuple[str, ...] = (
     "sio_window",
     "fe_hot_hold",
     "cool_for_na_shuttle",
+)
+C2A_STAGED_DEFAULT_ORDER = "sio_then_fe"
+C2A_STAGED_ORDER_CHOICES: tuple[str, ...] = (
+    C2A_STAGED_DEFAULT_ORDER,
+    "fe_then_sio",
+)
+C2A_STAGED_STAGE_NAMES_BY_ORDER: Mapping[str, tuple[str, ...]] = MappingProxyType(
+    {
+        "sio_then_fe": C2A_STAGED_STAGE_NAMES,
+        "fe_then_sio": (
+            "alkali_early_fe",
+            "fe_hot_hold",
+            "sio_window",
+            "cool_for_na_shuttle",
+        ),
+    }
 )
 C2A_STAGED_STAGE_GAS_FIELDS: tuple[str, ...] = (
     "pO2_mbar",
@@ -429,6 +446,17 @@ class RecipeSchema:
                 "engineering_envelope: disabled at 0.0; enabled optimizer "
                 "range floors positive values to 0.01"
             ),
+        ),
+        _knob(
+            "campaigns.C2A_staged.order",
+            "categorical",
+            choices=C2A_STAGED_ORDER_CHOICES,
+            bounds_source=(
+                "engineering_envelope: C2A_staged internal order branch; "
+                "sio_then_fe preserves the origin/main schedule, fe_then_sio "
+                "swaps only sio_window and fe_hot_hold"
+            ),
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_staged.stages.alkali_early_fe.duration_h",
@@ -1185,7 +1213,8 @@ def _setpoints_patch_from_runtime_values(
         if _is_c2a_staged_stage_field_path(path)
     }
     nested = RecipePatch(direct_values).to_nested()
-    if not stage_values:
+    order = direct_values.get(C2A_STAGED_ORDER_PATH)
+    if not stage_values and order is None:
         return nested
 
     stages = _default_c2a_staged_stages()
@@ -1204,6 +1233,9 @@ def _setpoints_patch_from_runtime_values(
                 f"missing default C2A_staged stage: {stage_name}"
             ) from exc
         stage[field_name] = _normalize_value(value)
+
+    if order is not None:
+        stages = _ordered_c2a_staged_stages(stages, order)
 
     total_hours = 0
     for stage in stages:
@@ -1234,17 +1266,86 @@ def _default_c2a_staged_stages() -> list[dict[str, Any]]:
             f"{_format_path(C2A_STAGED_STAGES_PATH)} must be a YAML list"
         )
     stages = copy.deepcopy(node)
-    seen: set[str] = set()
+    names: list[str] = []
     for stage in stages:
         if not isinstance(stage, dict) or not isinstance(stage.get("name"), str):
             raise RecipeValidationError("C2A_staged stages must be named mappings")
-        seen.add(stage["name"])
-    missing = set(C2A_STAGED_STAGE_NAMES) - seen
+        names.append(stage["name"])
+    validate_c2a_staged_stage_order(names, source="default C2A_staged stages")
+    return stages
+
+
+def c2a_staged_stage_order(order: Any = C2A_STAGED_DEFAULT_ORDER) -> tuple[str, ...]:
+    if order is None:
+        order = C2A_STAGED_DEFAULT_ORDER
+    if not isinstance(order, str):
+        raise RecipeValidationError("campaigns.C2A_staged.order must be a string")
+    normalized = order.strip()
+    try:
+        return C2A_STAGED_STAGE_NAMES_BY_ORDER[normalized]
+    except KeyError as exc:
+        raise RecipeValidationError(f"unknown C2A_staged order: {order!r}") from exc
+
+
+def c2a_staged_order_from_stage_names(stage_names: Sequence[str]) -> str:
+    names = validate_c2a_staged_stage_order(stage_names)
+    for order, expected in C2A_STAGED_STAGE_NAMES_BY_ORDER.items():
+        if names == expected:
+            return order
+    raise RecipeValidationError(
+        "unsupported C2A_staged stage order: " + " -> ".join(names)
+    )
+
+
+def validate_c2a_staged_stage_order(
+    stage_names: Sequence[str],
+    *,
+    source: str = "C2A_staged.stages",
+) -> tuple[str, ...]:
+    names = tuple(str(name) for name in stage_names)
+    required = set(C2A_STAGED_STAGE_NAMES)
+    seen: set[str] = set()
+    duplicates: set[str] = set()
+    unknown: set[str] = set()
+    for name in names:
+        if name in seen:
+            duplicates.add(name)
+        seen.add(name)
+        if name not in required:
+            unknown.add(name)
+    if unknown:
+        raise RecipeValidationError(
+            f"unknown {source} stage: " + ", ".join(sorted(unknown))
+        )
+    if duplicates:
+        raise RecipeValidationError(
+            f"duplicate {source} stage: " + ", ".join(sorted(duplicates))
+        )
+    missing = required - seen
     if missing:
         raise RecipeValidationError(
-            "missing default C2A_staged stage: " + ", ".join(sorted(missing))
+            f"missing {source} stage: " + ", ".join(sorted(missing))
         )
-    return stages
+    if not names or names[0] != C2A_STAGED_STAGE_NAMES[0]:
+        raise RecipeValidationError(
+            f"{source} must keep {C2A_STAGED_STAGE_NAMES[0]} first"
+        )
+    if names[-1] != C2A_STAGED_STAGE_NAMES[-1]:
+        raise RecipeValidationError(
+            f"{source} must keep {C2A_STAGED_STAGE_NAMES[-1]} last"
+        )
+    return names
+
+
+def _ordered_c2a_staged_stages(stages: list[dict[str, Any]], order: Any) -> list[dict[str, Any]]:
+    stage_order = c2a_staged_stage_order(order)
+    stages_by_name = {
+        str(stage.get("name")): stage
+        for stage in stages
+        if isinstance(stage, dict) and stage.get("name") is not None
+    }
+    validate_c2a_staged_stage_order(tuple(stages_by_name), source="C2A_staged.stages")
+    return [stages_by_name[name] for name in stage_order]
 
 
 def _setpoints_source_fingerprint() -> tuple[str, int | None, int | None, str]:
@@ -1491,6 +1592,7 @@ def _flatten_c2a_staged_stage_list(
     stages: list[Any],
 ) -> None:
     seen: set[str] = set()
+    stage_names: list[str] = []
     for stage in stages:
         if not isinstance(stage, Mapping) or not isinstance(stage.get("name"), str):
             raise RecipeValidationError("C2A_staged stages must be named mappings")
@@ -1500,6 +1602,7 @@ def _flatten_c2a_staged_stage_list(
         if stage_name in seen:
             raise RecipeValidationError(f"duplicate C2A_staged stage: {stage_name}")
         seen.add(stage_name)
+        stage_names.append(stage_name)
         allowed_fields = set(C2A_STAGED_STAGE_FIELDS_BY_NAME[stage_name])
         allowed_fields.update(C2A_STAGED_STAGE_METADATA_FIELDS)
         unknown_fields = sorted(
@@ -1520,6 +1623,19 @@ def _flatten_c2a_staged_stage_list(
                 flat[C2A_STAGED_STAGES_PATH + (stage_name, field_name)] = (
                     _normalize_value(stage[field_name])
                 )
+    has_complete_stage_set = len(stage_names) == len(C2A_STAGED_STAGE_NAMES) and set(
+        stage_names
+    ) == set(C2A_STAGED_STAGE_NAMES)
+    if has_complete_stage_set:
+        order = c2a_staged_order_from_stage_names(stage_names)
+        if order != C2A_STAGED_DEFAULT_ORDER:
+            flat[C2A_STAGED_ORDER_PATH] = order
+    elif (
+        len(stage_names) > 1
+        and stage_names[0] == C2A_STAGED_STAGE_NAMES[0]
+        and stage_names[-1] == C2A_STAGED_STAGE_NAMES[-1]
+    ):
+        validate_c2a_staged_stage_order(stage_names)
 
 
 def _normalize_value(value: Any) -> Any:

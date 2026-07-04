@@ -42,6 +42,7 @@ from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
+    C2A_STAGED_ORDER_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
     RecipePatch,
@@ -990,6 +991,39 @@ def test_build_eval_inputs_c2a_staged_stage_gas_knobs_partition_cache() -> None:
 
     assert len(recipe_ids) == 4
     assert len(cache_keys) == 4
+
+
+def test_build_eval_inputs_c2a_staged_order_partitions_cache_and_schedule() -> None:
+    profile = _mre_cap_profile(campaign="C2A_staged", hours=9)
+    schema = RecipeSchema()
+    default_spec, default_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    order_spec, order_config = _build_eval_inputs(
+        RecipePatch({C2A_STAGED_ORDER_PATH: "fe_then_sio"}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert order_spec.recipe_id != default_spec.recipe_id
+    assert cache_key(order_spec) != cache_key(default_spec)
+    assert "order" not in default_config.setpoints["campaigns"]["C2A_staged"]
+    assert order_config.setpoints["campaigns"]["C2A_staged"]["order"] == "fe_then_sio"
+    assert [
+        stage["name"]
+        for stage in order_config.setpoints["campaigns"]["C2A_staged"]["stages"]
+    ] == [
+        "alkali_early_fe",
+        "fe_hot_hold",
+        "sio_window",
+        "cool_for_na_shuttle",
+    ]
 
 
 def test_build_eval_inputs_c2a_staged_depletion_zero_is_cache_neutral() -> None:
