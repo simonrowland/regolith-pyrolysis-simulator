@@ -30,6 +30,7 @@ from simulator.corpus_version import (
     current_corpus_version,
     interoperable_corpus_versions,
 )
+from simulator.config import functional_data_yaml_digest
 from simulator.grind_preflight import (
     assert_strict_vapor_pt1_row,
 )
@@ -2753,9 +2754,11 @@ def _cached_real_authorized_backend_name(sim: Any) -> str | None:
 
 def _data_digests(sim: Any) -> dict[str, str]:
     return {
-        "setpoints": _digest(getattr(sim, "setpoints", {})),
+        "setpoints": functional_data_yaml_digest(getattr(sim, "setpoints", {})),
         "feedstocks": _digest(getattr(sim, "feedstocks", {})),
-        "vapor_pressures": _digest(getattr(sim, "vapor_pressures", {})),
+        "vapor_pressures": functional_data_yaml_digest(
+            getattr(sim, "vapor_pressures", {})
+        ),
         "species_formula_registry": _digest(
             getattr(sim, "species_formula_registry", {})
         ),

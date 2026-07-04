@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from hashlib import sha256
+import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +14,8 @@ import yaml
 
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+_FUNCTIONAL_DATA_DIGEST_CONFIGS = frozenset({"setpoints", "vapor_pressures"})
+_FUNCTIONAL_DATA_DIGEST_PREFIX = b"functional-data-yaml-v1\0"
 
 
 @dataclass(frozen=True)
@@ -25,12 +30,52 @@ class ConfigBundle:
     digests: dict[str, str]
 
 
-def _load_required_yaml(path: Path) -> tuple[dict[str, Any], str]:
+def _functional_data_ready(value: Any) -> Any:
+    if isinstance(value, bool) or value is None or isinstance(value, str):
+        return value
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError("functional data YAML digest rejects NaN and infinity")
+        return value
+    if isinstance(value, (list, tuple)):
+        return [_functional_data_ready(item) for item in value]
+    if isinstance(value, Mapping):
+        keys = list(value)
+        if not all(isinstance(key, str) for key in keys):
+            raise TypeError("functional data YAML digest mapping keys must be strings")
+        return {key: _functional_data_ready(value[key]) for key in sorted(keys)}
+    raise TypeError(
+        f"functional data YAML digest unsupported type: {type(value).__name__}"
+    )
+
+
+def functional_data_yaml_digest(value: Any) -> str:
+    canonical = json.dumps(
+        _functional_data_ready(value),
+        allow_nan=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return sha256(_FUNCTIONAL_DATA_DIGEST_PREFIX + canonical).hexdigest()
+
+
+def _load_required_yaml(
+    path: Path,
+    *,
+    functional_digest: bool = False,
+) -> tuple[dict[str, Any], str]:
     if not path.exists():
         raise FileNotFoundError(f"required config file missing: {path}")
     raw = path.read_bytes()
     loaded = yaml.safe_load(raw.decode("utf-8")) or {}
-    return loaded, sha256(raw).hexdigest()
+    digest = (
+        functional_data_yaml_digest(loaded)
+        if functional_digest
+        else sha256(raw).hexdigest()
+    )
+    return loaded, digest
 
 
 def load_config_bundle(
@@ -67,7 +112,10 @@ def load_config_bundle(
     loaded: dict[str, dict[str, Any]] = {}
     digests: dict[str, str] = {}
     for name, path in source_paths.items():
-        loaded[name], digests[name] = _load_required_yaml(path)
+        loaded[name], digests[name] = _load_required_yaml(
+            path,
+            functional_digest=name in _FUNCTIONAL_DATA_DIGEST_CONFIGS,
+        )
     return ConfigBundle(
         setpoints=loaded["setpoints"],
         feedstocks=loaded["feedstocks"],
