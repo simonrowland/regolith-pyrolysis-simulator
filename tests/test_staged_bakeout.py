@@ -20,7 +20,11 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # 2.7316e-4 -> 2.0656e-4 (-24%). Correction-class (the lever interaction
 # the model was missing).
 # 2026-07-02 re-speciation (#82): micro-drift through the coupled route.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00020655554960142685
+# 2026-07-03 LIVE-PO2-SWEEP (#94): sweep-transport pO2 no longer sees
+# pre-bleed holdup O2 during vapor dispatch, so the staged C2A run's SiO
+# release (and hence wall deposit) roughly doubles (2.0656e-4 -> 4.7792e-4).
+# Correction-class: the old pin encoded the holdup-O2 suppression.
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.000477924801086693
 
 
 def _run_script(lines: list[str]):

@@ -49,7 +49,14 @@ SIO_ANCHOR_HOUR = 6
 # Correction-class.
 # 2026-07-02 re-speciation (#82): retained-O ledger bookkeeping narrows
 # the managed-vs-IW separation further (0.1031 -> 0.0342 decade).
-EXPECTED_SIO_DECADE_DRIFT = 0.03422618580509003
+# 2026-07-03 LIVE-PO2-SWEEP (#94): PN2 sweep transport pO2 is now computed
+# BEFORE vapor dispatch from sweep-balance semantics instead of the
+# pre-bleed closed-headspace ledger (native-split O2 no longer crushes the
+# managed branch for its own emission tick). The finite-pO2 branch's p_SiO
+# rises 0.3724 -> 0.8608 Pa and the managed-vs-IW separation widens
+# 0.0342 -> 0.3639 decade. Correction-class: the old pin encoded the
+# holdup-O2 ordering bug this docstring's own design statement forbids.
+EXPECTED_SIO_DECADE_DRIFT = 0.3639312952042445
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

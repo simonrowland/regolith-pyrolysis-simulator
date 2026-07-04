@@ -34,17 +34,23 @@ class _MatchingThermoEngineBackend:
         composition_kg: dict[str, float] | None = None,
         fO2_log: float = -9.0,
         pressure_bar: float = 1e-6,
+        vapor_transport_pO2_bar: float | None = None,
         **_: Any,
     ) -> EquilibriumResult:
         self.last_composition_mol = dict(composition_mol or {})
         if self.sim is None:
             raise RuntimeError("test backend not attached to simulator")
+        if vapor_transport_pO2_bar is None:
+            vapor_transport_pO2_bar = self.sim._vapor_pressure_dispatch_pO2_bar()
         dispatch = self.sim._chem_kernel.dispatch(
             ChemistryIntent.VAPOR_PRESSURE,
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
-            control_inputs={"pO2_bar": self.sim._commanded_pO2_bar()},
+            control_inputs={
+                "pO2_bar": float(vapor_transport_pO2_bar),
+                "intrinsic_fO2_log": fO2_log,
+            },
         )
         kernel_vp = dict((dispatch.diagnostic or {}).get("vapor_pressures_Pa") or {})
         thermoengine_vp = {
@@ -186,7 +192,7 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
-        control_inputs={"pO2_bar": sim._commanded_pO2_bar()},
+        control_inputs={"pO2_bar": sim._vapor_pressure_dispatch_pO2_bar()},
         fO2_log=sim._compute_intrinsic_melt_fO2(),
     )
     kernel_vp = dict((kernel.diagnostic or {}).get("vapor_pressures_Pa") or {})

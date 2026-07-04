@@ -114,9 +114,15 @@ GOLDENS = (
 # mars SiO partially recovers (5.6767e-06 -> 6.2597e-06, +10%) because
 # some retained O now oxidizes Fe instead of staying as free couple
 # drive. Lunar continuous remains FP-identical (below coupling regime).
+# 2026-07-03 LIVE-PO2-SWEEP (#94): PN2 sweep transport pO2 computed before
+# vapor dispatch (sweep-balance semantics) instead of pre-bleed holdup
+# ledger O2; mars rises 6.2597e-06 -> 7.8135e-06 (+25%, the suppression
+# the ordering bug imposed). Lunar continuous again FP-identical (its
+# dwell never builds the holdup O2 that triggered the bug) — internal
+# control. Correction-class.
 BASELINE_SIO_EVOLVED_KG = {
     "lunar_mare_low_ti": 9.11967185718e-06,
-    "mars_basalt": 6.2597137711e-06,
+    "mars_basalt": 7.81354274586e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +

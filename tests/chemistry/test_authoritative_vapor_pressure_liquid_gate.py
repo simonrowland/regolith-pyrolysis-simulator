@@ -31,6 +31,9 @@ def _sim_with_vapor_dispatch(vapor_pressures: dict[str, float]):
         melt=types.SimpleNamespace(temperature_C=1600.0),
         _allow_fallback_vapor=False,
         _commanded_pO2_bar=lambda: 1e-9,
+        # #94 LIVE-PO2-SWEEP: kernel refresh now reads the shared vapor
+        # transport-pO2 snapshot helper instead of commanded pO2 directly.
+        _vapor_pressure_dispatch_pO2_bar=lambda: 1e-9,
         _compute_intrinsic_melt_fO2=lambda: -9.0,
         _dispatch_only=_dispatch_only,
         _kernel_vapor_pressure_source=(

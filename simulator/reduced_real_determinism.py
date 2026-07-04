@@ -388,13 +388,20 @@ class PT0DeterminismStore:
             "fO2_log": quantized_fO2_log,
         }
 
-    def quantized_pO2_bar(self, sim: Any) -> float:
+    def quantized_pO2_bar(
+        self,
+        sim: Any,
+        *,
+        pO2_bar: float | None = None,
+    ) -> float:
         # _sigfig returns None on non-finite input, so a non-finite commanded
         # pO2 would otherwise leak a None into the control surface (the same
         # invalid-control class as T_K / pressure / fO2 above). Commanded 0.0
         # (controlled-O2 off) is finite and preserved by _sigfig; only NaN/inf
         # is refused.
-        commanded_pO2_bar = float(sim._commanded_pO2_bar())
+        commanded_pO2_bar = float(
+            sim._commanded_pO2_bar() if pO2_bar is None else pO2_bar
+        )
         quantized = _sigfig(
             commanded_pO2_bar,
             self._control_quantization.composition_sig_figs,

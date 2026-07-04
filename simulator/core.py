@@ -2649,15 +2649,115 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         )
 
+    def _pn2_sweep_transport_pO2_bar(self, head_o2_mol: float) -> float:
+        """PN2 sweep transport pO2 for vapor dispatch.
+
+        Formula follows docs-private/research/2026-07-03-live-po2-probe/
+        findings.md "Design answer": PN2_SWEEP requested pO2 is incoming
+        sweep-gas composition, while O2 made this tick is a ledger product
+        drained by the sweep. Transport therefore uses
+        max(vacuum_floor, incoming_sweep_pO2, post_sweep_residual_pO2),
+        not the pre-sweep closed-headspace ledger pO2.
+        """
+        incoming_sweep_pO2 = max(0.0, float(self.melt.pO2_mbar) / 1000.0)
+        residual_o2_mol = max(0.0, float(head_o2_mol))
+        if self._overhead_headspace_enabled() and residual_o2_mol > 0.0:
+            holdup_mol = {
+                species: max(0.0, float(mol))
+                for species, mol in self.atom_ledger.mol_by_account(
+                    'process.overhead_gas'
+                ).items()
+                if max(0.0, float(mol)) > 0.0
+            }
+            total_mol = sum(holdup_mol.values())
+            total_kg = 0.0
+            for species, mol in holdup_mol.items():
+                formula = resolve_species_formula(
+                    species,
+                    self.atom_ledger.registry,
+                )
+                total_kg += mol * formula.molar_mass_kg_per_mol()
+            if total_mol > 0.0 and total_kg > 0.0:
+                p_total_bar = max(
+                    self._headspace_ledger_pO2_bar_from_o2_mol(total_mol),
+                    max(0.0, float(self.melt.p_total_mbar) / 1000.0),
+                )
+                bleed_kg = (
+                    self._headspace_bleed_conductance_kg_s_per_bar()
+                    * max(0.0, p_total_bar - self._headspace_downstream_pressure_bar())
+                    * 3600.0
+                )
+                if bleed_kg > 0.0:
+                    avg_molar_mass = total_kg / total_mol
+                    bleed_total_mol = min(total_mol, bleed_kg / avg_molar_mass)
+                    bled_o2_mol = min(
+                        residual_o2_mol,
+                        residual_o2_mol * bleed_total_mol / total_mol,
+                    )
+                    residual_o2_mol = max(0.0, residual_o2_mol - bled_o2_mol)
+        residual_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(
+            residual_o2_mol
+        )
+        return max(
+            incoming_sweep_pO2,
+            residual_pO2,
+            OXYGEN_RESERVOIR_FLOOR_BAR,
+        )
+
     def _headspace_transport_pO2_bar_from_ledger(
         self,
         ledger_pO2_bar: float,
+        *,
+        head_o2_mol: Optional[float] = None,
     ) -> float:
+        if str(getattr(self.melt.atmosphere, 'name', '') or '') == 'PN2_SWEEP':
+            if head_o2_mol is None:
+                head_o2_mol = self._headspace_o2_mol_for_pO2_bar(
+                    ledger_pO2_bar
+                )
+            return self._pn2_sweep_transport_pO2_bar(head_o2_mol)
         return max(
             float(ledger_pO2_bar),
             self._headspace_control_floor_pO2_bar(),
             OXYGEN_RESERVOIR_FLOOR_BAR,
         )
+
+    def _refresh_oxygen_reservoir_transport_pO2_for_vapor(
+        self,
+    ) -> OxygenReservoirState:
+        head_o2_mol = max(0.0, float(
+            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+        ))
+        ledger_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(head_o2_mol)
+        reservoir = self.melt.oxygen_reservoir
+        reservoir.headspace_ledger_pO2_bar = ledger_pO2
+        reservoir.headspace_transport_pO2_bar = (
+            self._headspace_transport_pO2_bar_from_ledger(
+                ledger_pO2,
+                head_o2_mol=head_o2_mol,
+            )
+        )
+        reservoir.headspace_control_floor_pO2_bar = (
+            self._headspace_control_floor_pO2_bar()
+        )
+        self._sync_oxygen_reservoir_mirror()
+        return reservoir
+
+    def _vapor_pressure_transport_pO2_bar(self) -> float:
+        transport_pO2 = getattr(self, '_headspace_transport_pO2_bar', None)
+        if callable(transport_pO2):
+            return float(transport_pO2())
+        return float(self._commanded_pO2_bar())
+
+    def _vapor_pressure_dispatch_pO2_bar(self) -> float:
+        pO2_bar = self._vapor_pressure_transport_pO2_bar()
+        store = _pt0_determinism_store_for(self)
+        if store is not None and getattr(store, 'quantize_live_controls', False):
+            return float(store.quantized_pO2_bar(self, pO2_bar=pO2_bar))
+        return pO2_bar
 
     def _cleaned_melt_fe_atom_mol(self) -> float:
         total_fe_mol = 0.0
@@ -3020,7 +3120,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             reference_T_K=reference_T,
             headspace_ledger_pO2_bar=ledger_pO2,
             headspace_transport_pO2_bar=(
-                self._headspace_transport_pO2_bar_from_ledger(ledger_pO2)
+                self._headspace_transport_pO2_bar_from_ledger(
+                    ledger_pO2,
+                    head_o2_mol=head_o2_mol,
+                )
             ),
             headspace_control_floor_pO2_bar=self._headspace_control_floor_pO2_bar(),
             exchange_direction=exchange_direction,
@@ -3080,7 +3183,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         reservoir.reference_T_K = reference_T_K
         reservoir.headspace_ledger_pO2_bar = ledger_pO2
         reservoir.headspace_transport_pO2_bar = (
-            self._headspace_transport_pO2_bar_from_ledger(ledger_pO2)
+            self._headspace_transport_pO2_bar_from_ledger(
+                ledger_pO2,
+                head_o2_mol=head_o2_mol,
+            )
         )
         reservoir.headspace_control_floor_pO2_bar = (
             self._headspace_control_floor_pO2_bar()
@@ -3509,7 +3615,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         ))
         ledger_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(head_o2_mol)
-        transport_pO2 = self._headspace_transport_pO2_bar_from_ledger(ledger_pO2)
+        transport_pO2 = self._headspace_transport_pO2_bar_from_ledger(
+            ledger_pO2,
+            head_o2_mol=head_o2_mol,
+        )
         control_floor = self._headspace_control_floor_pO2_bar()
         k_O, k_source = self._oxygen_exchange_k_m_s(T_K)
         h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
@@ -3625,7 +3734,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         reservoir.headspace_ledger_pO2_bar = post_ledger_pO2
         reservoir.headspace_transport_pO2_bar = (
-            self._headspace_transport_pO2_bar_from_ledger(post_ledger_pO2)
+            self._headspace_transport_pO2_bar_from_ledger(
+                post_ledger_pO2,
+                head_o2_mol=post_head_o2_mol,
+            )
         )
         reservoir.exchange_o2_mol = dn_to_headspace
         reservoir.exchange_o2_kg = (
@@ -5308,6 +5420,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'fO2_log': intrinsic_fO2_log,
                     'pressure_bar': pressure_bar,
                 }
+                if self._backend_accepts_kwarg('vapor_transport_pO2_bar'):
+                    backend_kwargs['vapor_transport_pO2_bar'] = (
+                        self._vapor_pressure_dispatch_pO2_bar()
+                    )
                 if self._backend_accepts_kwarg('composition_mol_by_account'):
                     backend_kwargs['composition_mol_by_account'] = (
                         backend_composition_by_account)
@@ -5483,14 +5599,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
         # the same single path the rest of the simulator uses.
-        transport_pO2 = getattr(self, '_headspace_transport_pO2_bar', None)
-        if callable(transport_pO2):
-            pO2_bar = transport_pO2()
-        else:
-            pO2_bar = self._commanded_pO2_bar()
-        store = _pt0_determinism_store_for(self)
-        if store is not None and getattr(store, 'quantize_live_controls', False):
-            pO2_bar = store.quantized_pO2_bar(self)
+        pO2_bar = self._vapor_pressure_dispatch_pO2_bar()
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         intrinsic_fO2_log = getattr(
             reservoir,
@@ -8225,6 +8334,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         self._apply_fe_redox_respeciation()
         self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
+        self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
 
         # --- 4. Thermodynamic equilibrium ---
         # Query the melt backend for phase assemblage, activities,
@@ -8280,6 +8390,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if finite_headspace_enabled:
             bleed_result = self._dispatch_overhead_bleed(
                 turbine_spec=turbine_spec)
+            self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
             bleed_diag = dict(bleed_result.diagnostic or {})
             melt_offgas_O2_kg_hr = float(
                 bleed_diag.get('bled_o2_kg', 0.0) or 0.0)
@@ -8309,6 +8420,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 force_drain_all=True,
                 o2_vented_kg=self.overhead.O2_vented_kg_hr,
             )
+            self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
         self._sync_oxygen_kg_counters()
 
         # --- 8. Energy ---

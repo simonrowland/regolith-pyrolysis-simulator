@@ -22,7 +22,6 @@ if str(REPO_ROOT) not in sys.path:
 
 from simulator.core import (
     FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
-    OXYGEN_RESERVOIR_FLOOR_BAR,
     PyrolysisSimulator,
 )
 from simulator.runner import build_per_hour_summary
@@ -45,6 +44,12 @@ DOSE_FRACTIONS = (0.0, 0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 1.0)
 MASS_BALANCE_LIMIT_PCT = 5.0e-12
 OWNER_RECIPE_MIN_SIO_KG_HR = 1.0e-3
 OWNER_RECIPE_MAX_ESCAPE_FRACTION = 1.0e-3
+OWNER_RECIPE_T_C = 1650.0
+OWNER_RECIPE_PO2_MBAR = 1.0e-6
+OWNER_RECIPE_PN2_MBAR = 10.0
+MAP_LIVE_PARITY_PO2_ABS_TOL_BAR = 1.0e-15
+MAP_LIVE_PARITY_SIO_REL_TOL = 1.0e-9
+MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR = 1.0e-12
 ANCHOR_REFERENCE_SOURCE = (
     "docs-private/research/2026-07-01-sso-r-scope/findings.md lines 107 and 259; "
     "CH1-CLOSEOUT.md lines 23-26 and 107-118 record the ch1/ch1c redox-state provenance"
@@ -302,7 +307,6 @@ def _configure_gas_state(sim: PyrolysisSimulator, gas: GasPoint) -> None:
         sim.melt.p_total_mbar = 0.0
         sim.overhead.composition = {}
         sim.overhead.pressure_mbar = 0.0
-        _apply_requested_transport_pO2(sim, gas)
         return
     if gas.pN2_mbar > 0.0:
         sim.melt.atmosphere = Atmosphere.PN2_SWEEP
@@ -314,20 +318,6 @@ def _configure_gas_state(sim: PyrolysisSimulator, gas: GasPoint) -> None:
         sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
         sim.overhead.composition = {"O2": float(gas.pO2_mbar)}
     sim.overhead.pressure_mbar = float(gas.total_pressure_mbar)
-    _apply_requested_transport_pO2(sim, gas)
-
-
-def _requested_transport_pO2_bar(gas: GasPoint) -> float:
-    return max(
-        float(gas.pO2_mbar) / 1000.0,
-        OXYGEN_RESERVOIR_FLOOR_BAR,
-    )
-
-
-def _apply_requested_transport_pO2(sim: PyrolysisSimulator, gas: GasPoint) -> None:
-    reservoir = sim.melt.oxygen_reservoir
-    reservoir.headspace_transport_pO2_bar = _requested_transport_pO2_bar(gas)
-    reservoir.headspace_control_floor_pO2_bar = sim._headspace_control_floor_pO2_bar()
 
 
 def _transport_property_basis(gas: GasPoint) -> str:
@@ -433,7 +423,7 @@ def run_row(
     exchange = sim._apply_oxygen_reservoir_exchange()
     first_respeciation = sim._apply_fe_redox_respeciation()
     split = sim._apply_native_fe_saturation_split(sample_time_h=SAMPLE_TIME_H)
-    _apply_requested_transport_pO2(sim, gas)
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
     equilibrium = sim._get_equilibrium()
     raw_evap_flux = sim._calculate_evaporation(equilibrium)
     vapor_pressure_diagnostic = dict(
@@ -629,6 +619,115 @@ def run_row(
     return row
 
 
+def run_owner_live_step_probe(
+    calibration: DoseCalibration,
+    setpoints: Mapping[str, Any],
+    feedstocks: Mapping[str, Any],
+    vapor_pressures: Mapping[str, Any],
+) -> dict[str, Any]:
+    gas = GasPoint(OWNER_RECIPE_PO2_MBAR, OWNER_RECIPE_PN2_MBAR, "n2_carrier")
+    dose_kg = calibration.full_feo_equiv_dose_kg
+    sim = _build_sim(
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+        dose_kg=dose_kg,
+    )
+    _apply_dose(sim, dose_kg=dose_kg)
+    sim.melt.campaign = CampaignPhase.C2A_STAGED
+    sim.melt.temperature_C = OWNER_RECIPE_T_C
+    sim.melt.target_temperature_C = OWNER_RECIPE_T_C
+    sim.melt.hour = 0
+    sim.melt.campaign_hour = 0
+    _configure_gas_state(sim, gas)
+    sim._update_temperature = lambda: None
+
+    terminal_stored_before = float(
+        sim.atom_ledger.mol_by_account("terminal.oxygen_melt_offgas_stored").get(
+            "O2",
+            0.0,
+        )
+        or 0.0
+    )
+    terminal_vented_before = float(
+        sim.atom_ledger.mol_by_account(
+            "terminal.oxygen_melt_offgas_vented_to_vacuum"
+        ).get("O2", 0.0)
+        or 0.0
+    )
+    snapshot = sim.step()
+    vapor_pressure_diagnostic = dict(
+        getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
+    )
+    evaporation_diagnostic = dict(
+        getattr(sim, "_last_evaporation_flux_diagnostic", {}) or {}
+    )
+    sio_series = dict(
+        (evaporation_diagnostic.get("evaporation_series_resistance") or {}).get("SiO")
+        or {}
+    )
+    overhead_o2_mol = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0)
+        or 0.0
+    )
+    native_splits = [
+        transition
+        for transition in sim.atom_ledger.transitions
+        if transition.name == "native_fe_saturation_split"
+    ]
+    bleed_transitions = [
+        transition
+        for transition in sim.atom_ledger.transitions
+        if transition.name == "overhead_bleed"
+    ]
+    native_o2_mol = 0.0
+    if native_splits:
+        native_o2_mol = sim._transition_species_mol(
+            native_splits[-1],
+            side="credits",
+            account="process.overhead_gas",
+            species="O2",
+        )
+    bled_o2_mol = 0.0
+    if bleed_transitions:
+        bled_o2_mol = sim._transition_species_mol(
+            bleed_transitions[-1],
+            side="debits",
+            account="process.overhead_gas",
+            species="O2",
+        )
+    terminal_stored_o2_mol = float(
+        sim.atom_ledger.mol_by_account("terminal.oxygen_melt_offgas_stored").get(
+            "O2",
+            0.0,
+        )
+        or 0.0
+    )
+    terminal_vented_o2_mol = float(
+        sim.atom_ledger.mol_by_account(
+            "terminal.oxygen_melt_offgas_vented_to_vacuum"
+        ).get("O2", 0.0)
+        or 0.0
+    )
+    return {
+        "temperature_C": OWNER_RECIPE_T_C,
+        "requested_pO2_mbar": OWNER_RECIPE_PO2_MBAR,
+        "requested_pN2_mbar": OWNER_RECIPE_PN2_MBAR,
+        "SiO_provider_pO2_bar": _positive(sio_series.get("pO2_bar")),
+        "SiO_flux_kg_hr": _positive(snapshot.evap_flux.species_kg_hr.get("SiO", 0.0)),
+        "SiO_vapor_pressure_Pa": _positive(
+            dict(vapor_pressure_diagnostic.get("vapor_pressures_Pa") or {}).get("SiO")
+        ),
+        "post_tick_overhead_o2_mol": overhead_o2_mol,
+        "native_split_o2_mol": native_o2_mol,
+        "bled_o2_mol": bled_o2_mol,
+        "terminal_stored_o2_mol": terminal_stored_o2_mol,
+        "terminal_vented_o2_mol": terminal_vented_o2_mol,
+        "terminal_stored_o2_delta_mol": terminal_stored_o2_mol - terminal_stored_before,
+        "terminal_vented_o2_delta_mol": terminal_vented_o2_mol - terminal_vented_before,
+    }
+
+
 def manual_fO2_anchors(
     setpoints: Mapping[str, Any] | None = None,
     feedstocks: Mapping[str, Any] | None = None,
@@ -685,6 +784,7 @@ def evaluate_assertions(
     *,
     expected_rows: int,
     grid_scope_label: str,
+    live_owner_probe: Mapping[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     assertions: list[dict[str, Any]] = []
 
@@ -836,11 +936,13 @@ def evaluate_assertions(
 
     owner = [
         r for r in rows
-        if float(r["temperature_C"]) == 1650.0
-        and math.isclose(float(r["requested_pO2_mbar"]), 1.0e-6)
-        and math.isclose(float(r["requested_pN2_mbar"]), 10.0)
+        if float(r["temperature_C"]) == OWNER_RECIPE_T_C
+        and math.isclose(float(r["requested_pO2_mbar"]), OWNER_RECIPE_PO2_MBAR)
+        and math.isclose(float(r["requested_pN2_mbar"]), OWNER_RECIPE_PN2_MBAR)
         and math.isclose(float(r["dose_fraction_of_full_FeO_equiv"]), 1.0)
     ]
+    map_live_semantics_parity_pass = False
+    map_live_detail = "owner row missing"
     if owner:
         row = owner[0]
         owner_pass = (
@@ -858,10 +960,38 @@ def evaluate_assertions(
                 "native_pool={native_fe_pool_mol:.6g} tap={native_fe_tap_mol:.6g} "
                 "vapor={native_fe_vapor_mol:.6g} escape={native_fe_vapor_escape_fraction_of_pool:.6g} "
                 "stage3_Fe_wt={stage_3_Fe_wt_pct:.6g} SiO={SiO_flux_kg_hr:.6g}; "
-                "map uses requested-pO2 (design semantics); live parity pending -- "
+                "map/live share PN2 sweep transport-pO2 semantics; "
                 "see map_live_semantics_parity"
             ).format(**row),
         )
+        if live_owner_probe is not None:
+            live_pO2 = float(live_owner_probe.get("SiO_provider_pO2_bar", math.nan))
+            live_sio = float(live_owner_probe.get("SiO_flux_kg_hr", math.nan))
+            map_pO2 = float(row["SiO_provider_pO2_bar"])
+            map_sio = float(row["SiO_flux_kg_hr"])
+            pO2_ok = (
+                math.isfinite(live_pO2)
+                and abs(live_pO2 - map_pO2) <= MAP_LIVE_PARITY_PO2_ABS_TOL_BAR
+            )
+            sio_ok = (
+                math.isfinite(live_sio)
+                and math.isclose(
+                    live_sio,
+                    map_sio,
+                    rel_tol=MAP_LIVE_PARITY_SIO_REL_TOL,
+                    abs_tol=MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR,
+                )
+            )
+            map_live_semantics_parity_pass = pO2_ok and sio_ok
+            map_live_detail = (
+                f"map_pO2_bar={map_pO2:.12g} live_pO2_bar={live_pO2:.12g} "
+                f"map_SiO_kg_hr={map_sio:.12g} live_SiO_kg_hr={live_sio:.12g} "
+                f"pO2_abs_tol={MAP_LIVE_PARITY_PO2_ABS_TOL_BAR:.1e} "
+                f"SiO_rel_tol={MAP_LIVE_PARITY_SIO_REL_TOL:.1e} "
+                f"SiO_abs_tol={MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR:.1e}"
+            )
+        else:
+            map_live_detail = "live owner probe missing"
     else:
         add(
             "owner_pN2_recipe_point_requested_pO2_semantics",
@@ -869,16 +999,10 @@ def evaluate_assertions(
             "owner row missing",
         )
 
-    map_live_semantics_parity_pass = False
     add(
         "map_live_semantics_parity",
         map_live_semantics_parity_pass,
-        (
-            "BLOCKER: live step() transport pO2 diverges from requested-pO2 "
-            "design semantics under PN2_SWEEP (holdup O2 not drained; observed "
-            "up to ~1481 bar at owner conditions; map 9.06e-3 vs live ~3.2e-7 "
-            "kg/hr SiO). Certification gated on LIVE-PO2-SWEEP."
-        ),
+        map_live_detail,
     )
 
     passing_target_rows = [
@@ -894,8 +1018,8 @@ def evaluate_assertions(
         "grind_ready_target_window",
         first_T is not None and map_live_semantics_parity_pass,
         (
-            f"first_passing_T_C={first_T}; window under requested-pO2 semantics; "
-            "certification gated on live parity"
+            f"first_passing_T_C={first_T}; window under PN2 sweep transport "
+            f"semantics; live parity={'confirmed' if map_live_semantics_parity_pass else 'missing'}"
         ),
     )
     return assertions
@@ -921,11 +1045,18 @@ def run_validation_map(*, smoke: bool = False) -> dict[str, Any]:
         for T, gas, dose in grid
     ]
     anchors = manual_fO2_anchors(setpoints, feedstocks, vapor_pressures)
+    live_owner_probe = run_owner_live_step_probe(
+        calibration,
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+    )
     assertions = evaluate_assertions(
         rows,
         anchors,
         expected_rows=expected_grid_count(smoke=smoke),
         grid_scope_label=scope,
+        live_owner_probe=live_owner_probe,
     )
     grid_payload = grid_spec(smoke=smoke)
     grid_payload["row_count"] = len(rows)
@@ -942,6 +1073,7 @@ def run_validation_map(*, smoke: bool = False) -> dict[str, Any]:
         "units": ROW_UNITS,
         "dose_calibration": calibration.__dict__,
         "manual_fO2_anchors": anchors,
+        "live_owner_probe": live_owner_probe,
         "assertions": assertions,
         "rows": rows,
     }
@@ -1073,12 +1205,37 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
             f"{peak['dose_fraction_of_full_FeO_equiv']:.6g}",
             f"{peak['native_fe_pool_mol']:.6g}",
         ])
+    # Derive the pin-report text from the ACTUAL parity/classification state
+    # so this surface cannot lie about certification (codex LPO2-REV P2: the
+    # old hardcoded strings claimed "no pins changed" and "blocker until
+    # parity" even after the live sweep fix flipped both).
+    parity_assertion = assertions_by_name.get(
+        "map_live_semantics_parity", {"passed": False, "detail": "missing"}
+    )
+    owner_classification = str(
+        (payload.get("owner_pn2_row") or {}).get("classification")
+        or ("certification_pass" if parity_assertion["passed"] else
+            "current_physics_blocker")
+    )
     moved_pin_rows = [
-        ["existing runner/golden pins", "none changed by this harness", "no rebaseline"],
+        [
+            "existing runner/golden pins",
+            (
+                "live sweep-transport semantics move SiO-coupled pins "
+                "(see LIVE-PO2-SWEEP drift report)"
+                if parity_assertion["passed"]
+                else "none changed by this harness"
+            ),
+            "controller adjudicates rebaselines",
+        ],
         [
             "new distilled fixture",
             "tests/goldens/sso_r_validation_map_lunar_mare_low_ti.json",
-            f"{grid_scope_label} validation anchor; owner row classified current blocker until live parity passes",
+            (
+                f"{grid_scope_label} validation anchor; owner row "
+                f"classification={owner_classification}; live parity="
+                + ("confirmed" if parity_assertion["passed"] else "PENDING")
+            ),
         ],
     ]
     unit_rows = [

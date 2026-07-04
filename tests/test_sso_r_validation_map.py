@@ -361,24 +361,45 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
         "owner_pN2_recipe_point_requested_pO2_semantics"
     ]
     assert requested_pO2_assertion["passed"] is True
-    assert "map uses requested-pO2" in requested_pO2_assertion["detail"]
+    assert "map/live share PN2 sweep transport-pO2 semantics" in (
+        requested_pO2_assertion["detail"]
+    )
     assert "map_live_semantics_parity" in requested_pO2_assertion["detail"]
 
 
-def test_map_live_semantics_parity_blocks_certification(smoke_payload):
+def test_map_live_semantics_parity_is_computed_from_live_owner_tick(smoke_payload):
     parity = _assertion(smoke_payload, "map_live_semantics_parity")
 
-    assert parity["passed"] is False
-    assert "LIVE-PO2-SWEEP" in parity["detail"]
+    assert parity["passed"] is True
+    assert "map_pO2_bar=" in parity["detail"]
+    assert "live_pO2_bar=" in parity["detail"]
+    assert "map_SiO_kg_hr=" in parity["detail"]
+    assert "live_SiO_kg_hr=" in parity["detail"]
 
 
-def test_grind_ready_target_window_fails_until_live_parity(smoke_payload):
+def test_owner_live_pn2_tick_uses_sweep_floor_and_drains_o2(smoke_payload):
+    probe = smoke_payload["live_owner_probe"]
+
+    assert probe["SiO_provider_pO2_bar"] == pytest.approx(1.0e-9)
+    assert probe["SiO_provider_pO2_bar"] < 1.0e-6
+    assert probe["post_tick_overhead_o2_mol"] == pytest.approx(0.0, abs=1.0e-9)
+    terminal_delta = (
+        probe["terminal_stored_o2_delta_mol"] + probe["terminal_vented_o2_delta_mol"]
+    )
+    assert probe["native_split_o2_mol"] > 700.0
+    assert probe["bled_o2_mol"] >= probe["native_split_o2_mol"]
+    assert (
+        terminal_delta
+    ) == pytest.approx(probe["bled_o2_mol"], rel=0.0, abs=1.0e-6)
+
+
+def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     window = _assertion(smoke_payload, "grind_ready_target_window")
 
-    assert window["passed"] is False
+    assert window["passed"] is True
     assert "first_passing_T_C=" in window["detail"]
-    assert "window under requested-pO2 semantics" in window["detail"]
-    assert "certification gated on live parity" in window["detail"]
+    assert "window under PN2 sweep transport semantics" in window["detail"]
+    assert "live parity=confirmed" in window["detail"]
 
 
 def test_distilled_golden_fixture_matches_current_anchors(smoke_payload):
