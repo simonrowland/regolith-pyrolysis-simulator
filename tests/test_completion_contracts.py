@@ -3,16 +3,19 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
 
+from simulator.accounting.formulas import parse_formula
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
     TargetExtractionCompleteness,
     aggregate_extraction_completeness,
     completion_contracts_from_setpoints,
     extraction_completeness_by_target,
+    target_species_yield_by_initial_cleaned_melt,
     validate_completion_contract_coverage,
     vapor_contract_completeness,
 )
@@ -53,11 +56,15 @@ class _FakeQueries:
         reagents: dict[str, float] | None = None,
         feedstock_recovered_reagents: dict[str, float] | None = None,
         c3_credit_outstanding: dict[str, float] | None = None,
+        additives_kg: dict[str, float] | None = None,
         non_feedstock_reagent_element_by_account: (
             dict[str, dict[str, float]] | None
         ) = None,
     ) -> None:
         self.ledger = _FakeLedger(accounts)
+        self.sim = SimpleNamespace(
+            record=SimpleNamespace(additives_kg=additives_kg or {})
+        )
         self._reagents = reagents or {}
         self._feedstock_recovered_reagents = feedstock_recovered_reagents or {}
         self._c3_credit_outstanding = c3_credit_outstanding or {}
@@ -105,8 +112,15 @@ class _FakeQueries:
 
 
 class _NoReagentSurfaceQueries:
-    def __init__(self, accounts: dict[str, dict[str, float]]) -> None:
+    def __init__(
+        self,
+        accounts: dict[str, dict[str, float]],
+        additives_kg: dict[str, float] | None = None,
+    ) -> None:
         self.ledger = _FakeLedger(accounts)
+        self.sim = SimpleNamespace(
+            record=SimpleNamespace(additives_kg=additives_kg or {})
+        )
 
 
 def _mol(species: str, kg: float) -> float:
@@ -488,6 +502,191 @@ def test_extraction_completeness_counts_spent_residue_as_residual_basis() -> Non
     assert result.residual_target_equiv_mol == pytest.approx(2.0)
     assert result.denominator_target_equiv_mol == pytest.approx(3.0)
     assert result.completeness_fraction == pytest.approx(1.0 / 3.0)
+
+
+def test_e1b_target_yield_excludes_additive_overcredit() -> None:
+    initial = {"Na2O": 0.5 * MOLAR_MASS["Na2O"] / 1000.0}
+    gross_product_kg = 3.0 * MOLAR_MASS["Na"] / 1000.0
+    additive_product_kg = 2.5 * MOLAR_MASS["Na"] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        initial,
+        _FakeQueries(
+            {"process.condensation_train": {"Na": gross_product_kg}},
+            non_feedstock_reagent_element_by_account={
+                "process.condensation_train": {"Na": additive_product_kg},
+            },
+        ),
+    )["Na"]
+
+    assert result.initial_cleaned_target_equiv_mol == pytest.approx(1.0)
+    assert result.gross_product_target_equiv_mol == pytest.approx(3.0)
+    assert result.excluded_non_feedstock_reagent_target_equiv_mol == pytest.approx(
+        2.5
+    )
+    assert result.product_target_equiv_mol == pytest.approx(0.5)
+    assert result.yield_fraction == pytest.approx(0.5)
+
+
+def test_e1b_target_yield_blocks_helper_present_empty_unclean_additive_map() -> None:
+    initial = {"Na2O": 0.5 * MOLAR_MASS["Na2O"] / 1000.0}
+    gross_product_kg = 3.0 * MOLAR_MASS["Na"] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        initial,
+        _FakeQueries(
+            {"process.condensation_train": {"Na": gross_product_kg}},
+            additives_kg={"Na": 12.0},
+            non_feedstock_reagent_element_by_account={},
+        ),
+    )["Na"]
+
+    assert result.yield_fraction is None
+    assert "unclean additive/reagent provenance for Na" in result.reason
+    assert "provenance map does not account" in result.reason
+
+
+def test_e1b_target_yield_blocks_helper_present_undercovered_additive_map() -> None:
+    initial = {"Na2O": 0.5 * MOLAR_MASS["Na2O"] / 1000.0}
+    gross_product_kg = 3.0 * MOLAR_MASS["Na"] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        initial,
+        _FakeQueries(
+            {"process.condensation_train": {"Na": gross_product_kg}},
+            additives_kg={"Na": 2.0 * MOLAR_MASS["Na"] / 1000.0},
+            non_feedstock_reagent_element_by_account={
+                "process.condensation_train": {
+                    "Na": MOLAR_MASS["Na"] / 1000.0,
+                },
+            },
+        ),
+    )["Na"]
+
+    assert result.yield_fraction is None
+    assert "unclean additive/reagent provenance for Na" in result.reason
+    assert "provenance map does not account" in result.reason
+
+
+def test_e1b_target_yield_accepts_helper_present_fully_covered_additive_map() -> None:
+    initial = {"Na2O": 0.5 * MOLAR_MASS["Na2O"] / 1000.0}
+    gross_product_kg = 3.0 * MOLAR_MASS["Na"] / 1000.0
+    additive_kg = 2.0 * MOLAR_MASS["Na"] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        initial,
+        _FakeQueries(
+            {"process.condensation_train": {"Na": gross_product_kg}},
+            additives_kg={"Na": additive_kg},
+            non_feedstock_reagent_element_by_account={
+                "process.condensation_train": {"Na": additive_kg},
+            },
+        ),
+    )["Na"]
+
+    assert result.yield_fraction == pytest.approx(1.0)
+    assert result.product_target_equiv_mol == pytest.approx(1.0)
+    assert result.excluded_non_feedstock_reagent_target_equiv_mol == pytest.approx(
+        2.0
+    )
+    assert result.reason == ""
+
+
+def test_e1b_target_yield_allows_clean_run_with_empty_helper_map() -> None:
+    initial = {"Na2O": 0.5 * MOLAR_MASS["Na2O"] / 1000.0}
+    gross_product_kg = 3.0 * MOLAR_MASS["Na"] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        initial,
+        _FakeQueries(
+            {"process.condensation_train": {"Na": gross_product_kg}},
+            non_feedstock_reagent_element_by_account={},
+        ),
+    )["Na"]
+
+    assert result.yield_fraction == pytest.approx(3.0)
+    assert result.excluded_non_feedstock_reagent_target_equiv_mol == pytest.approx(
+        0.0
+    )
+    assert result.reason == ""
+
+
+def test_e1b_target_yield_ci_k_zero_denominator_is_not_applicable() -> None:
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("K",),
+        {"Na2O": MOLAR_MASS["Na2O"] / 1000.0},
+        _FakeQueries({}),
+    )["K"]
+
+    assert result.yield_fraction is None
+    assert result.reason == "not-applicable: zero initial process.cleaned_melt basis for K"
+    assert result.initial_cleaned_target_equiv_mol == pytest.approx(0.0)
+
+
+def test_e1b_target_yield_uses_formula_mass_for_valid_species_not_in_static_table() -> None:
+    na2co3_molar_mass = parse_formula("Na2CO3", species="Na2CO3").molar_mass_g_mol
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        {"Na2CO3": na2co3_molar_mass / 1000.0},
+        _FakeQueries({
+            "process.condensation_train": {
+                "Na": MOLAR_MASS["Na"] / 1000.0,
+            },
+        }),
+    )["Na"]
+
+    assert result.initial_cleaned_target_equiv_mol == pytest.approx(2.0)
+    assert result.product_target_equiv_mol == pytest.approx(1.0)
+    assert result.yield_fraction == pytest.approx(0.5)
+
+
+def test_e1b_target_yield_reports_sio_exact_species_and_si_equiv_mol() -> None:
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("SiO",),
+        {"SiO2": 10.0 * MOLAR_MASS["SiO2"] / 1000.0},
+        _FakeQueries({
+            "process.condensation_train": {
+                "Si": MOLAR_MASS["Si"] / 1000.0,
+                "SiO": 2.0 * MOLAR_MASS["SiO"] / 1000.0,
+                "SiO2": 3.0 * MOLAR_MASS["SiO2"] / 1000.0,
+            },
+        }),
+    )["SiO"]
+
+    assert result.product_species_kg == {
+        "Si": pytest.approx(MOLAR_MASS["Si"] / 1000.0),
+        "SiO": pytest.approx(2.0 * MOLAR_MASS["SiO"] / 1000.0),
+        "SiO2": pytest.approx(3.0 * MOLAR_MASS["SiO2"] / 1000.0),
+    }
+    assert result.exact_product_kg == pytest.approx(
+        2.0 * MOLAR_MASS["SiO"] / 1000.0
+    )
+    assert result.product_target_equiv_mol == pytest.approx(6.0)
+    assert result.initial_cleaned_target_equiv_mol == pytest.approx(10.0)
+
+
+def test_e1b_target_yield_fails_closed_on_unclean_additive_provenance() -> None:
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        {"Na2O": 0.5 * MOLAR_MASS["Na2O"] / 1000.0},
+        _NoReagentSurfaceQueries(
+            {
+                "process.condensation_train": {
+                    "Na": 3.0 * MOLAR_MASS["Na"] / 1000.0,
+                },
+            },
+            additives_kg={"Na": 12.0},
+        ),
+    )["Na"]
+
+    assert result.yield_fraction is None
+    assert "unclean additive/reagent provenance for Na" in result.reason
 
 
 def test_vapor_contract_blocks_unsupported_provenance_rule() -> None:

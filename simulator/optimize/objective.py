@@ -21,6 +21,7 @@ from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
     extraction_completeness_report,
+    target_species_yield_report,
 )
 from simulator.optimize.product_pools import COMPOSITION_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.three_product_report import classify_products
@@ -3183,6 +3184,7 @@ def product_summary(run_execution: Any, profile: Mapping[str, Any]) -> Mapping[s
             getattr(run_execution, "trace", None),
             _extraction_constraints_from_profile(profile),
         ),
+        "target_species_yield_report": target_species_yield_report(sim),
     }
     summary.update(_coating_product_summary(run_execution))
     return MappingProxyType(summary)

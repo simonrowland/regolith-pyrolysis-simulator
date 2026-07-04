@@ -134,6 +134,8 @@ class _FakeLedger:
     def kg_by_account(self, account: str) -> dict[str, float]:
         if account == "terminal.offgas":
             return {"H2O": 5.0}
+        if account == "process.metal_phase":
+            return {"Fe": 50.0}
         return {}
 
 
@@ -141,6 +143,8 @@ class _FakeProductSim:
     atom_ledger = _FakeLedger()
 
     def __init__(self) -> None:
+        self._feedstock_recovered_reagent_kg_by_species = {}
+        self._non_feedstock_reagent_element_kg_by_account = {}
         self.train = SimpleNamespace(
             stages=(
                 SimpleNamespace(collected_kg={}),
@@ -153,6 +157,9 @@ class _FakeProductSim:
             feedstock_key="lunar_mare_low_ti",
             batch_mass_kg=1000.0,
             additives_kg={"CaO": 1.5},
+            initial_inventory=SimpleNamespace(
+                melt_oxide_kg={"FeO": 80.0, "SiO2": 100.0},
+            ),
             snapshots=(
                 SimpleNamespace(
                     mass_in_kg=1001.5,
@@ -175,6 +182,12 @@ class _FakeProductSim:
             "total": 20.0,
             "mre_anode_stored": 20.0,
         }
+
+    def _unspent_additive_reagents_kg(self) -> dict[str, float]:
+        return {}
+
+    def _c3_alkali_credit_outstanding_kg_by_species(self) -> dict[str, float]:
+        return {}
 
 
 class _FakeUnclassifiedProductSim(_FakeProductSim):
@@ -506,6 +519,11 @@ def test_product_summary_includes_input_output_yield_table_and_mass_closure() ->
     assert outputs["captured_volatiles"]["kg_by_species"] == {"H2O": 5.0}
     assert table["mass_closure"]["status"] == "closed"
     assert table["mass_closure"]["tolerance_pct"] == pytest.approx(5e-12)
+    target_yield = summary["target_species_yield_report"]
+    assert target_yield["gate_status"] == "skipped_pending_physics"
+    assert "product_summary.target_species_yield_report" in target_yield["consumer"]
+    assert target_yield["targets"]["K"]["status"] == "not-applicable"
+    assert target_yield["targets"]["Fe"]["yield_fraction"] is not None
 
 
 def test_unclassified_product_mass_makes_yield_table_inconclusive() -> None:

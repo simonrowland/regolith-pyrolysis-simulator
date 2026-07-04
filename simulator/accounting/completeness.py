@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import math
 from types import MappingProxyType
 from typing import Any, Mapping
@@ -32,6 +32,22 @@ _VAPOR_RESIDUAL_ACCOUNTS = (
 )
 _VAPOR_WALL_ACCOUNT = "process.wall_deposit_segment_*"
 _VAPOR_PROVENANCE_RULE = "narrow_account_feedstock_clean"
+TARGET_YIELD_PRODUCT_ACCOUNTS = (
+    "terminal.offgas",
+    "terminal.stage0_salt_phase",
+    "terminal.stage0_chloride_salt_phase",
+    "terminal.stage0_sulfide_matte",
+    "terminal.drain_tap_material",
+    "terminal.chromium_condensed_oxide_stored",
+    "process.metal_phase",
+    "process.condensation_train",
+    "process.overhead_gas",
+)
+TARGET_YIELD_DENOMINATOR_SOURCE = "initial_process.cleaned_melt"
+TARGET_YIELD_NUMERATOR_SOURCE = "narrow_product_accounts"
+TARGET_YIELD_PROVENANCE_RULE = (
+    "feedstock_clean_excluding_unspent_reagents_credit_lines_and_external_additives"
+)
 
 DEFAULT_RESIDUAL_SPECIES_BY_TARGET: Mapping[str, tuple[str, ...]] = MappingProxyType({
     "SiO": ("SiO2", "SiO"),
@@ -136,6 +152,22 @@ class ReagentProvenanceTargetEquivalent:
     external_additive_mol: float = 0.0
 
 
+@dataclass(frozen=True)
+class TargetSpeciesYield:
+    target_species: str
+    yield_fraction: float | None
+    product_target_equiv_mol: float
+    initial_cleaned_target_equiv_mol: float
+    reason: str = ""
+    product_species_kg: Mapping[str, float] = field(default_factory=dict)
+    exact_product_kg: float = 0.0
+    gross_product_target_equiv_mol: float = 0.0
+    excluded_non_feedstock_reagent_target_equiv_mol: float = 0.0
+    denominator_source: str = TARGET_YIELD_DENOMINATOR_SOURCE
+    numerator_source: str = TARGET_YIELD_NUMERATOR_SOURCE
+    provenance_rule: str = TARGET_YIELD_PROVENANCE_RULE
+
+
 def extraction_completeness_by_target(
     target_species: tuple[str, ...],
     residual_species_by_target: Mapping[str, tuple[str, ...]],
@@ -203,6 +235,71 @@ def extraction_completeness_by_target(
                 0.0,
                 0.0,
                 f"unknown: {exc}",
+            )
+    return results
+
+
+def target_species_yield_by_initial_cleaned_melt(
+    target_species: tuple[str, ...],
+    initial_cleaned_melt_kg: Mapping[str, Any],
+    queries: Any,
+) -> dict[str, TargetSpeciesYield]:
+    initial = {
+        str(species): kg
+        for species, kg in initial_cleaned_melt_kg.items()
+    }
+    product_kg = _species_kg_by_accounts(queries, TARGET_YIELD_PRODUCT_ACCOUNTS)
+    results: dict[str, TargetSpeciesYield] = {}
+    for raw_target in target_species:
+        target = str(raw_target)
+        try:
+            element = _target_element(target)
+            denominator_mol = _target_relevant_element_mol(element, initial)
+            product_species_kg = _target_relevant_species_kg(element, product_kg)
+            gross_product_mol = _target_relevant_element_mol(
+                element,
+                product_species_kg,
+            )
+            excluded_mol = _strict_non_feedstock_reagent_element_mol(
+                element,
+                queries,
+                accounts=TARGET_YIELD_PRODUCT_ACCOUNTS,
+                gross_product_target_equiv_mol=gross_product_mol,
+            )
+            product_mol = max(0.0, gross_product_mol - min(
+                gross_product_mol,
+                excluded_mol,
+            ))
+            if denominator_mol <= _EPS:
+                results[target] = TargetSpeciesYield(
+                    target,
+                    None,
+                    product_mol,
+                    denominator_mol,
+                    f"not-applicable: zero initial process.cleaned_melt basis for {target}",
+                    product_species_kg=MappingProxyType(product_species_kg),
+                    exact_product_kg=float(product_species_kg.get(target, 0.0)),
+                    gross_product_target_equiv_mol=gross_product_mol,
+                    excluded_non_feedstock_reagent_target_equiv_mol=excluded_mol,
+                )
+                continue
+            results[target] = TargetSpeciesYield(
+                target,
+                product_mol / denominator_mol,
+                product_mol,
+                denominator_mol,
+                product_species_kg=MappingProxyType(product_species_kg),
+                exact_product_kg=float(product_species_kg.get(target, 0.0)),
+                gross_product_target_equiv_mol=gross_product_mol,
+                excluded_non_feedstock_reagent_target_equiv_mol=excluded_mol,
+            )
+        except (AccountingError, KeyError, TypeError, ValueError) as exc:
+            results[target] = TargetSpeciesYield(
+                target,
+                None,
+                0.0,
+                0.0,
+                f"blocked: {exc}",
             )
     return results
 
@@ -525,6 +622,12 @@ def _species_mol(species: str, kg: Any) -> float:
     if amount <= _EPS:
         return 0.0
     molar_mass = MOLAR_MASS.get(species)
+    if molar_mass is None:
+        try:
+            formula = parse_formula(species, species=species)
+        except (AccountingError, ValueError) as exc:
+            raise KeyError(f"missing molar mass for {species}") from exc
+        molar_mass = formula.molar_mass_g_mol
     if molar_mass is None:
         raise KeyError(f"missing molar mass for {species}")
     return amount * 1000.0 / float(molar_mass)
@@ -927,6 +1030,204 @@ def _contract_target_equivalent_mol(
             species_name,
             kg,
         )
+    return total
+
+
+def _target_relevant_species_kg(
+    element: str,
+    species_kg: Mapping[str, Any],
+) -> dict[str, float]:
+    values: dict[str, float] = {}
+    for species, kg in species_kg.items():
+        species_name = str(species)
+        if _unspent_reagent_element(species_name) is not None:
+            continue
+        amount = _non_negative_number(kg, f"{species_name} kg")
+        if amount <= _EPS:
+            continue
+        formula = parse_formula(species_name, species=species_name)
+        if formula.elements.get(element, 0.0) <= 0.0:
+            continue
+        values[species_name] = values.get(species_name, 0.0) + amount
+    return values
+
+
+def _target_relevant_element_mol(
+    element: str,
+    species_kg: Mapping[str, Any],
+) -> float:
+    total = 0.0
+    for species, kg in _target_relevant_species_kg(element, species_kg).items():
+        total += _element_equivalent_mol(element, species, kg)
+    return total
+
+
+def _strict_non_feedstock_reagent_element_mol(
+    element: str,
+    queries: Any,
+    *,
+    accounts: tuple[str, ...],
+    gross_product_target_equiv_mol: float,
+) -> float:
+    # Backend-equilibrium transitions can lag this provenance map because
+    # commit_validated_transition (core.py ~5734-5754) bypasses
+    # _observe_reagent_provenance_transition. The normal _commit_proposal path
+    # is exact; backend runs may under-exclude reagent-tagged element moved into
+    # a product account. This E1b metric is reporting-only while observer
+    # coverage of that commit path is backlogged.
+    helper = getattr(queries, "non_feedstock_reagent_element_kg_by_account", None)
+    if not callable(helper):
+        if _target_element_has_reagent_signal(element, queries):
+            raise CompletionContractBlocked(
+                f"unclean additive/reagent provenance for {element}: "
+                "non_feedstock_reagent_element_kg_by_account surface unavailable"
+            )
+        return 0.0
+    values = helper()
+    if not isinstance(values, Mapping):
+        raise CompletionContractBlocked(
+            f"unclean additive/reagent provenance for {element}: "
+            "non_feedstock_reagent_element_kg_by_account is not a mapping"
+        )
+    element_kg = 0.0
+    provenance_element_kg = 0.0
+    for account, element_values in values.items():
+        account_name = str(account)
+        if not isinstance(element_values, Mapping):
+            raise CompletionContractBlocked(
+                f"unclean additive/reagent provenance for {element}: "
+                f"{account_name} provenance entry is not a mapping"
+            )
+        account_element_kg = _non_negative_number(
+            element_values.get(element, 0.0),
+            f"non_feedstock_reagent.{account_name}.{element}",
+        )
+        provenance_element_kg += account_element_kg
+        if account_name not in accounts:
+            continue
+        element_kg += account_element_kg
+    excluded_mol = _species_mol(element, element_kg)
+    required_provenance_mol = _target_element_required_provenance_mol(
+        element,
+        queries,
+    )
+    provenance_mol = _species_mol(element, provenance_element_kg)
+    if (
+        required_provenance_mol > _EPS
+        and provenance_mol + _EPS < required_provenance_mol
+    ):
+        raise CompletionContractBlocked(
+            f"unclean additive/reagent provenance for {element}: "
+            "provenance map does not account for declared additive/credit signal"
+        )
+    return min(gross_product_target_equiv_mol, excluded_mol)
+
+
+def _target_element_has_reagent_signal(element: str, queries: Any) -> bool:
+    return _target_element_reagent_signal_mol(element, queries) > _EPS
+
+
+def _target_element_reagent_signal_mol(element: str, queries: Any) -> float:
+    return max(
+        _declared_additive_element_mol(element, queries),
+        _external_unspent_additive_reagent_element_mol(element, queries),
+        _credit_line_reagent_element_mol(element, queries),
+        _external_reagent_inventory_element_mol(element, queries),
+    )
+
+
+def _target_element_required_provenance_mol(element: str, queries: Any) -> float:
+    declared_mol = _declared_additive_element_mol(element, queries)
+    unspent_mol = _external_unspent_additive_reagent_element_mol(element, queries)
+    credit_mol = _credit_line_reagent_element_mol(element, queries)
+    inventory_mol = _external_reagent_inventory_element_mol(element, queries)
+    if any(math.isinf(value) for value in (declared_mol, unspent_mol, credit_mol, inventory_mol)):
+        return math.inf
+    declared_required = max(0.0, declared_mol - max(unspent_mol, inventory_mol))
+    credit_required = max(0.0, credit_mol - inventory_mol)
+    inventory_required = (
+        inventory_mol
+        if declared_mol <= _EPS and credit_mol <= _EPS
+        else 0.0
+    )
+    return max(declared_required, credit_required, inventory_required)
+
+
+def _external_unspent_additive_reagent_element_mol(element: str, queries: Any) -> float:
+    unspent_mol = _unspent_additive_reagent_element_mol(element, queries)
+    recovered_mol = _feedstock_recovered_reagent_element_mol(element, queries)
+    if math.isinf(unspent_mol):
+        return math.inf
+    return max(0.0, unspent_mol - recovered_mol)
+
+
+def _unspent_additive_reagent_element_mol(element: str, queries: Any) -> float:
+    helper = getattr(queries, "unspent_additive_reagents_kg", None)
+    if not callable(helper):
+        return 0.0
+    values = helper()
+    if not isinstance(values, Mapping):
+        return math.inf
+    unspent_key = f"unspent_{element}_reagent"
+    return _species_mol(
+        element,
+        _non_negative_number(values.get(unspent_key, 0.0), unspent_key),
+    ) + _target_relevant_element_mol(element, values)
+
+
+def _credit_line_reagent_element_mol(element: str, queries: Any) -> float:
+    credit_helper = getattr(queries, "c3_alkali_credit_outstanding_kg_by_species", None)
+    if not callable(credit_helper):
+        return 0.0
+    values = credit_helper()
+    if not isinstance(values, Mapping):
+        return math.inf
+    return _target_relevant_element_mol(element, values)
+
+
+def _external_reagent_inventory_element_mol(element: str, queries: Any) -> float:
+    inventory_mol = _reagent_inventory_element_mol(element, queries)
+    recovered_mol = _feedstock_recovered_reagent_element_mol(element, queries)
+    return max(0.0, inventory_mol - recovered_mol)
+
+
+def _reagent_inventory_element_mol(element: str, queries: Any) -> float:
+    try:
+        reagent_inventory = _species_kg_by_accounts(
+            queries,
+            ("process.reagent_inventory",),
+        )
+    except (AccountingError, KeyError, TypeError, ValueError):
+        reagent_inventory = {}
+    return _target_relevant_element_mol(element, reagent_inventory)
+
+
+def _feedstock_recovered_reagent_element_mol(element: str, queries: Any) -> float:
+    helper = getattr(queries, "feedstock_recovered_reagents_kg", None)
+    if not callable(helper):
+        return 0.0
+    values = helper()
+    if not isinstance(values, Mapping):
+        return 0.0
+    return _target_relevant_element_mol(element, values)
+
+
+def _declared_additive_has_element(element: str, queries: Any) -> bool:
+    return _declared_additive_element_mol(element, queries) > _EPS
+
+
+def _declared_additive_element_mol(element: str, queries: Any) -> float:
+    sim = getattr(queries, "sim", None)
+    record = getattr(sim, "record", None)
+    additives = getattr(record, "additives_kg", {})
+    if not isinstance(additives, Mapping):
+        return 0.0
+    total = 0.0
+    for species, kg in additives.items():
+        amount = _non_negative_number(kg, f"additives_kg.{species}")
+        if amount <= _EPS:
+            continue
+        total += _target_relevant_element_mol(element, {str(species): amount})
     return total
 
 

@@ -255,6 +255,20 @@ class AccountingQueries:
             if float(kg) > 0.0
         }
 
+    def initial_cleaned_melt_kg(self) -> dict[str, float]:
+        record = getattr(self.sim, "record", None)
+        inventory = getattr(record, "initial_inventory", None)
+        melt = getattr(inventory, "melt_oxide_kg", None)
+        if not isinstance(melt, Mapping):
+            raise AccountingError(
+                "initial process.cleaned_melt inventory surface is unavailable"
+            )
+        return {
+            str(species): float(kg)
+            for species, kg in melt.items()
+            if float(kg) > 0.0
+        }
+
     def terminal_rump_by_species(self) -> dict[str, float]:
         species_kg: dict[str, float] = {}
         for account in TERMINAL_RUMP_ACCOUNTS:

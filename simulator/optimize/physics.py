@@ -13,8 +13,14 @@ from simulator.accounting import AccountingError
 from simulator.accounting.completeness import (
     DEFAULT_RESIDUAL_SPECIES_BY_TARGET,
     TargetExtractionCompleteness,
+    TargetSpeciesYield,
+    TARGET_YIELD_DENOMINATOR_SOURCE,
+    TARGET_YIELD_NUMERATOR_SOURCE,
+    TARGET_YIELD_PROVENANCE_RULE,
     extraction_completeness_by_target,
+    target_species_yield_by_initial_cleaned_melt,
 )
+from simulator.accounting.queries import AccountingQueries
 from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
@@ -43,6 +49,12 @@ GATE_ORDER: tuple[str, ...] = (
     "extraction_completeness",
     "knudsen_viscous",
     "furnace_temperature",
+)
+E1B_TARGET_SPECIES: tuple[str, ...] = ("Na", "K", "Fe", "Mg", "SiO")
+E1B_TARGET_YIELD_GATE_FRACTION = 0.95
+TARGET_SPECIES_YIELD_CONSUMERS: tuple[str, ...] = (
+    "tests/test_north_star_baseline.py::test_e1b_future_target_species_yield_threshold",
+    "product_summary.target_species_yield_report",
 )
 _EPS = 1.0e-12
 
@@ -690,7 +702,7 @@ def extraction_completeness_report(
             active_constraints,
             require_residual_species=True,
         )
-    except (AccountingError, KeyError, TypeError, ValueError) as exc:
+    except (AccountingError, AttributeError, KeyError, TypeError, ValueError) as exc:
         target_payloads = {
             target: _extraction_completeness_insufficient_report(
                 target,
@@ -949,6 +961,198 @@ def _extraction_completeness_report_payload(
         "aggregation": "min_all_targets",
         "worst_target_species": worst_target,
         "completeness_fraction": completeness_fraction,
+        "reason": reason,
+        "targets": MappingProxyType(dict(target_payloads)),
+    })
+
+
+def target_species_yield_report(
+    sim: Any,
+    *,
+    target_species: tuple[str, ...] = E1B_TARGET_SPECIES,
+    gate_fraction: float = E1B_TARGET_YIELD_GATE_FRACTION,
+) -> Mapping[str, Any]:
+    targets = tuple(str(target) for target in target_species)
+    try:
+        threshold = _finite_number(gate_fraction, "target_species_yield gate_fraction")
+        queries = AccountingQueries(sim)
+        initial_cleaned_melt = queries.initial_cleaned_melt_kg()
+        by_target = target_species_yield_by_initial_cleaned_melt(
+            targets,
+            initial_cleaned_melt,
+            queries,
+        )
+    except (AccountingError, AttributeError, KeyError, TypeError, ValueError) as exc:
+        payloads = {
+            target: _target_species_yield_insufficient_payload(target, str(exc))
+            for target in targets
+        }
+        return _target_species_yield_report_payload(
+            "insufficient-evidence",
+            "inconclusive",
+            payloads,
+            str(exc),
+            threshold=gate_fraction,
+        )
+
+    payloads = {
+        target: _target_species_yield_payload(by_target[target], threshold)
+        for target in targets
+    }
+    blocked = tuple(
+        payload for payload in payloads.values()
+        if payload["status"] == "insufficient-evidence"
+    )
+    if blocked:
+        return _target_species_yield_report_payload(
+            "insufficient-evidence",
+            "inconclusive",
+            payloads,
+            str(blocked[0]["reason"]),
+            threshold=threshold,
+        )
+
+    applicable = tuple(
+        target for target, payload in payloads.items()
+        if payload["applicable"]
+    )
+    not_applicable = tuple(
+        target for target, payload in payloads.items()
+        if not payload["applicable"]
+    )
+    if not applicable:
+        return _target_species_yield_report_payload(
+            "not-applicable",
+            "not-applicable",
+            payloads,
+            "no applicable target species",
+            threshold=threshold,
+            applicable=applicable,
+            not_applicable=not_applicable,
+        )
+    worst_target = min(
+        applicable,
+        key=lambda target: payloads[target]["yield_fraction"],
+    )
+    return _target_species_yield_report_payload(
+        "reported",
+        "reported",
+        payloads,
+        "",
+        threshold=threshold,
+        applicable=applicable,
+        not_applicable=not_applicable,
+        worst_target=worst_target,
+        worst_yield_fraction=payloads[worst_target]["yield_fraction"],
+    )
+
+
+def _target_species_yield_payload(
+    result: TargetSpeciesYield,
+    gate_fraction: float,
+) -> Mapping[str, Any]:
+    has_denominator = result.yield_fraction is not None
+    status = "reported"
+    if result.reason.startswith("not-applicable:"):
+        status = "not-applicable"
+    elif result.yield_fraction is None:
+        status = "insufficient-evidence"
+    return MappingProxyType({
+        "status": status,
+        "conclusion": "reported" if has_denominator else status,
+        "applicable": has_denominator,
+        "target_species": result.target_species,
+        "denominator_source": result.denominator_source,
+        "denominator_basis": "target_equivalent_mol",
+        "initial_cleaned_target_equiv_mol": (
+            result.initial_cleaned_target_equiv_mol if has_denominator else None
+        ),
+        "numerator_source": result.numerator_source,
+        "provenance_rule": result.provenance_rule,
+        "product_account": TARGET_YIELD_NUMERATOR_SOURCE,
+        "product_species_kg": MappingProxyType(dict(result.product_species_kg)),
+        "exact_product_kg": result.exact_product_kg if has_denominator else None,
+        "product_target_equiv_mol": (
+            result.product_target_equiv_mol if has_denominator else None
+        ),
+        "gross_product_target_equiv_mol": (
+            result.gross_product_target_equiv_mol if has_denominator else None
+        ),
+        "excluded_non_feedstock_reagent_target_equiv_mol": (
+            result.excluded_non_feedstock_reagent_target_equiv_mol
+            if has_denominator
+            else None
+        ),
+        "yield_fraction": result.yield_fraction,
+        "yield_pct": (
+            result.yield_fraction * 100.0
+            if result.yield_fraction is not None
+            else None
+        ),
+        "gate_fraction": gate_fraction,
+        "gap_to_gate_fraction": (
+            gate_fraction - result.yield_fraction
+            if result.yield_fraction is not None
+            else None
+        ),
+        "reason": result.reason,
+    })
+
+
+def _target_species_yield_insufficient_payload(
+    target: str,
+    reason: str,
+) -> Mapping[str, Any]:
+    return MappingProxyType({
+        "status": "insufficient-evidence",
+        "conclusion": "inconclusive",
+        "applicable": False,
+        "target_species": target,
+        "denominator_source": TARGET_YIELD_DENOMINATOR_SOURCE,
+        "denominator_basis": "target_equivalent_mol",
+        "initial_cleaned_target_equiv_mol": None,
+        "numerator_source": TARGET_YIELD_NUMERATOR_SOURCE,
+        "provenance_rule": TARGET_YIELD_PROVENANCE_RULE,
+        "product_account": TARGET_YIELD_NUMERATOR_SOURCE,
+        "product_species_kg": MappingProxyType({}),
+        "exact_product_kg": None,
+        "product_target_equiv_mol": None,
+        "gross_product_target_equiv_mol": None,
+        "excluded_non_feedstock_reagent_target_equiv_mol": None,
+        "yield_fraction": None,
+        "yield_pct": None,
+        "gate_fraction": E1B_TARGET_YIELD_GATE_FRACTION,
+        "gap_to_gate_fraction": None,
+        "reason": reason,
+    })
+
+
+def _target_species_yield_report_payload(
+    status: str,
+    conclusion: str,
+    target_payloads: Mapping[str, Mapping[str, Any]],
+    reason: str,
+    *,
+    threshold: float,
+    applicable: tuple[str, ...] = (),
+    not_applicable: tuple[str, ...] = (),
+    worst_target: str | None = None,
+    worst_yield_fraction: float | None = None,
+) -> Mapping[str, Any]:
+    return MappingProxyType({
+        "status": status,
+        "conclusion": conclusion,
+        "consumer": TARGET_SPECIES_YIELD_CONSUMERS,
+        "gate_status": "skipped_pending_physics",
+        "gate_fraction": threshold,
+        "denominator_source": TARGET_YIELD_DENOMINATOR_SOURCE,
+        "numerator_source": TARGET_YIELD_NUMERATOR_SOURCE,
+        "provenance_rule": TARGET_YIELD_PROVENANCE_RULE,
+        "aggregation": "min_applicable_targets",
+        "applicable_target_species": applicable,
+        "not_applicable_target_species": not_applicable,
+        "worst_target_species": worst_target,
+        "worst_yield_fraction": worst_yield_fraction,
         "reason": reason,
         "targets": MappingProxyType(dict(target_payloads)),
     })
