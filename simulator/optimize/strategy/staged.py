@@ -11,6 +11,7 @@ from simulator.optimize.doe import (
     SAMPLER_NAMES,
     STREAMING_SAMPLER_NAMES,
     active_sampler_name,
+    _condition_pressure_pair_values,
     sample_recipe_patch_at_index,
 )
 from simulator.optimize.evalspec import EvalSpec, PrefixEvalSpec
@@ -626,6 +627,7 @@ class StagedStrategy:
                 refine_patch = _refine_patch_near_parent(
                     parent.patch,
                     target_specs,
+                    schema=self.schema,
                     seed=self.seed,
                     round_index=self.joint_refines_completed,
                     parent_index=parent_index,
@@ -1127,6 +1129,7 @@ def _refine_patch_near_parent(
     parent: RecipePatch,
     specs: Sequence[KnobSpec],
     *,
+    schema: RecipeSchema,
     seed: int,
     round_index: int,
     parent_index: int,
@@ -1161,6 +1164,17 @@ def _refine_patch_near_parent(
                 values[spec.path] = choices[(base_index + direction) % len(choices)]
             else:
                 values[spec.path] = choices[0]
+    anchor_values = dict(parent.values)
+    for spec in specs:
+        if spec.path in values and spec.path not in anchor_values:
+            anchor_values[spec.path] = values[spec.path]
+    _condition_pressure_pair_values(
+        schema,
+        tuple(specs),
+        values,
+        anchor=RecipePatch(anchor_values),
+        fallback_values=parent.values,
+    )
     return RecipePatch(values)
 
 

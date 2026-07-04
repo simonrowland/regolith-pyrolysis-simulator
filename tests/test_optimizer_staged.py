@@ -607,6 +607,69 @@ def test_joint_refine_improves_or_refines() -> None:
     assert "joint-refine" in strategy._archive[0].candidate.metadata["stage_id"]
 
 
+def test_joint_refine_conditions_c2a_staged_pressure_pair_at_boundary() -> None:
+    profile = {
+        **PROFILE,
+        "staged": {
+            "beam_width": 1,
+            "children_per_parent": 4,
+            "allowlist": ("C2A_staged",),
+            "joint_refine": True,
+            "max_backward_passes": 0,
+        },
+    }
+    strategy = StagedStrategy(
+        SCHEMA,
+        seed=0,
+        objective_profile=profile,
+        topology=TopologyChoice(path_ab="A_staged", branch="two", c6=False),
+    )
+    while True:
+        candidates = strategy.ask(20)
+        if not candidates:
+            break
+        strategy.tell(
+            [
+                (
+                    candidate,
+                    _scored(
+                        candidate.patch,
+                        profile=profile,
+                        candidate_id=candidate.id,
+                        margin=replace(
+                            _margin(),
+                            gate="C2A_staged_pressure",
+                            margin=0.01,
+                            detail="near C2A staged pressure boundary",
+                        ),
+                    ),
+                )
+                for candidate in candidates
+            ]
+        )
+
+    po2_path = tuple("campaigns.C2A_staged.stages.sio_window.pO2_mbar".split("."))
+    total_path = tuple(
+        "campaigns.C2A_staged.stages.sio_window.p_total_mbar".split(".")
+    )
+    boundary_patch = RecipePatch({po2_path: 15.0, total_path: 15.0}).validated(SCHEMA)
+    member = strategy._archive[0]
+    boundary_node = replace(
+        member.node,
+        patch=boundary_patch,
+        recipe_ids=(boundary_patch.recipe_id(SCHEMA),),
+    )
+    strategy._archive = (replace(member, node=boundary_node),)
+
+    assert strategy.joint_refine() is True
+    joint_candidates = strategy.ask(20)
+
+    assert joint_candidates
+    for candidate in joint_candidates:
+        assert candidate.patch.values[po2_path] <= candidate.patch.values[total_path]
+        candidate.patch.validated(SCHEMA)
+
+
 def test_backward_pass_reorders_pareto_with_improving_backward_candidate(tmp_path) -> None:
     def evaluator(
         patch: RecipePatch,

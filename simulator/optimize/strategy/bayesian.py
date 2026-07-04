@@ -7,6 +7,7 @@ import math
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
+from simulator.optimize.doe import _condition_pressure_pair_values
 from simulator.optimize.objective import ObjectiveDefinition, objective_definitions
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.strategy.protocol import Candidate
@@ -275,22 +276,7 @@ def _couple_suggested_pressure_defaults(
     schema: RecipeSchema,
     values: dict[KeyPath, Any],
 ) -> None:
-    for po2_path, total_path in schema.PRESSURE_COUPLED_DEFAULT_PAIRS:
-        if po2_path not in values or total_path not in values:
-            continue
-        po2_spec = schema.spec_for(po2_path)
-        po2_low, po2_high = _numeric_bounds(po2_spec)
-        total = float(values[total_path])
-        feasible_high = min(po2_high, total)
-        tolerance = max(1e-12, 1e-12 * max(1.0, abs(po2_low), abs(total)))
-        if feasible_high + tolerance < po2_low:
-            raise ValueError(
-                "pressure_default_pair_infeasible_bounds: "
-                f"{'.'.join(po2_path)} low {po2_low:.12g} exceeds "
-                f"{'.'.join(total_path)} {total:.12g}"
-            )
-        unit = (float(values[po2_path]) - po2_low) / (po2_high - po2_low)
-        values[po2_path] = float(po2_low + unit * (feasible_high - po2_low))
+    _condition_pressure_pair_values(schema, tuple(schema.search_allowlist), values)
 
 
 def _numeric_bounds(spec: KnobSpec) -> tuple[float, float]:

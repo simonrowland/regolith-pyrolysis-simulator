@@ -28,6 +28,13 @@ from simulator.optimize.physics import physics_constraints_digest
 from simulator.optimize.profiles import physics_constraints_from_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
+from simulator.optimize.strategy import (
+    MorrisScreenStrategy,
+    OptunaNSGA2Strategy,
+    OptunaTPEStrategy,
+    RandomStrategy,
+    StagedStrategy,
+)
 
 
 PROFILE = {
@@ -121,6 +128,113 @@ def _scope_spec() -> EvalSpec:
         PROFILE,
         physics_constraints_from_profile(PROFILE),
     )
+
+
+def _assert_candidate_pressure_pairs_valid(candidates: list[Any]) -> None:
+    schema = RecipeSchema()
+    pressure_pairs = tuple(schema.PRESSURE_COUPLED_DEFAULT_PAIRS) + tuple(
+        schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items()
+    )
+    for candidate in candidates:
+        for po2_path, total_path in pressure_pairs:
+            if po2_path not in candidate.patch.values or total_path not in candidate.patch.values:
+                continue
+            assert candidate.patch.values[po2_path] <= candidate.patch.values[total_path], (
+                candidate.id,
+                ".".join(po2_path),
+                candidate.patch.values[po2_path],
+                ".".join(total_path),
+                candidate.patch.values[total_path],
+            )
+
+
+def _pressure_feasible_scored(candidate: Any) -> ScoredResult:
+    spec = _spec(candidate.patch, FEEDSTOCK, "stub", PROFILE)
+    objectives = ObjectiveVector(
+        (
+            ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),
+            ObjectiveValue("energy_kWh", "minimize", 2.0, "kWh", ordinal=1),
+        )
+    )
+    return ScoredResult(
+        candidate_id=candidate.id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=objectives,
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(status="ok", trace={"backend_status": "ok"}),
+    )
+
+
+def _joint_refine_pressure_strategy(schema: RecipeSchema) -> StagedStrategy:
+    profile = {
+        **PROFILE,
+        "staged": {
+            "beam_width": 1,
+            "children_per_parent": 4,
+            "allowlist": ("C2A_staged",),
+            "joint_refine": True,
+            "max_backward_passes": 0,
+            "topology": {"path_ab": "A_staged", "branch": "two", "c6": False},
+        },
+    }
+    strategy = StagedStrategy(schema, seed=0, objective_profile=profile)
+    while True:
+        candidates = strategy.ask(64)
+        if not candidates:
+            break
+        strategy.tell([(candidate, _pressure_feasible_scored(candidate)) for candidate in candidates])
+    assert strategy.joint_refine() is True
+    return strategy
+
+
+@pytest.mark.parametrize(
+    ("name", "factory", "draws"),
+    (
+        ("random", lambda schema: RandomStrategy(schema, seed=23), 128),
+        (
+            "morris",
+            lambda schema: MorrisScreenStrategy(schema, seed=23, num_trajectories=16),
+            10_000,
+        ),
+        (
+            "tpe",
+            lambda schema: OptunaTPEStrategy(
+                schema,
+                seed=23,
+                objective_profile=PROFILE,
+            ),
+            64,
+        ),
+        (
+            "nsga2",
+            lambda schema: OptunaNSGA2Strategy(
+                schema,
+                seed=23,
+                objective_profile=PROFILE,
+            ),
+            64,
+        ),
+        ("staged_joint_refine", _joint_refine_pressure_strategy, 64),
+    ),
+)
+def test_strategy_ask_paths_emit_pressure_feasible_candidates(
+    name: str,
+    factory: Any,
+    draws: int,
+) -> None:
+    schema = RecipeSchema()
+    try:
+        strategy = factory(schema)
+    except ImportError as exc:
+        pytest.skip(str(exc))
+    count = min(draws, getattr(strategy, "plan_length", draws))
+
+    candidates = strategy.ask(count)
+
+    assert candidates, name
+    _assert_candidate_pressure_pairs_valid(candidates)
 
 
 def _stale_melt_target_profile() -> dict[str, Any]:

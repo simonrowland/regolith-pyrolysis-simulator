@@ -55,9 +55,32 @@ from simulator.runner import PyrolysisRun, RunnerError
 from simulator.state import MeltState
 
 
+STAGE_SIO_PO2 = (
+    "campaigns",
+    "C2A_staged",
+    "stages",
+    "sio_window",
+    "pO2_mbar",
+)
+STAGE_SIO_PTOTAL = (
+    "campaigns",
+    "C2A_staged",
+    "stages",
+    "sio_window",
+    "p_total_mbar",
+)
+STAGE_SIO_GAS_MODE = (
+    "campaigns",
+    "C2A_staged",
+    "stages",
+    "sio_window",
+    "gas_cover_mode",
+)
+
+
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,'
-    b'"allowlist_version":"allowlist-v9","backend_name":"stub",'
+    b'"allowlist_version":"allowlist-v10","backend_name":"stub",'
     b'"c5_enabled":false,"campaign":"C0","chemistry_kernel":{'
     b'"allow_builtin_fallback":false,"engine":"builtin",'
     b'"pressure_Pa":"0.001000000"},"code_version":"0.5.7",'
@@ -925,6 +948,48 @@ def test_build_eval_inputs_c2a_staged_stage_knob_partitions_cache_and_schedule()
     )
     assert target == pytest.approx(1585.0)
     assert ramp == pytest.approx(175.0)
+
+
+def test_build_eval_inputs_c2a_staged_stage_gas_knobs_partition_cache() -> None:
+    profile = _mre_cap_profile(campaign="C2A_staged", hours=9)
+    schema = RecipeSchema()
+    default_spec, default_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    default_stages = default_config.setpoints["campaigns"]["C2A_staged"]["stages"]
+    assert "pO2_mbar" not in default_stages[1]
+    assert "p_total_mbar" not in default_stages[1]
+    assert "gas_cover_mode" not in default_stages[1]
+
+    cases = (
+        (STAGE_SIO_PO2, 2.0, "pO2_mbar", 2.0),
+        (STAGE_SIO_PTOTAL, 12.0, "p_total_mbar", 12.0),
+        (STAGE_SIO_GAS_MODE, "po2_hold", "gas_cover_mode", "po2_hold"),
+    )
+    recipe_ids = {default_spec.recipe_id}
+    cache_keys = {cache_key(default_spec)}
+    for path, value, field_name, expected in cases:
+        spec, config = _build_eval_inputs(
+            RecipePatch({path: value}),
+            "lunar_mare_low_ti",
+            "stub",
+            profile,
+            schema,
+        )
+        stage = config.setpoints["campaigns"]["C2A_staged"]["stages"][1]
+        assert stage["name"] == "sio_window"
+        assert stage[field_name] == expected
+        assert spec.recipe_id != default_spec.recipe_id
+        assert cache_key(spec) != cache_key(default_spec)
+        recipe_ids.add(spec.recipe_id)
+        cache_keys.add(cache_key(spec))
+
+    assert len(recipe_ids) == 4
+    assert len(cache_keys) == 4
 
 
 def test_build_eval_inputs_c2a_staged_depletion_zero_is_cache_neutral() -> None:

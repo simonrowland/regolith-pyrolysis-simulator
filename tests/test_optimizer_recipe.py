@@ -69,6 +69,27 @@ STAGE_COOL_RAMP = (
     "cool_for_na_shuttle",
     "ramp_rate_C_per_hr",
 )
+STAGE_SIO_PO2 = (
+    "campaigns",
+    "C2A_staged",
+    "stages",
+    "sio_window",
+    "pO2_mbar",
+)
+STAGE_SIO_PTOTAL = (
+    "campaigns",
+    "C2A_staged",
+    "stages",
+    "sio_window",
+    "p_total_mbar",
+)
+STAGE_SIO_GAS_MODE = (
+    "campaigns",
+    "C2A_staged",
+    "stages",
+    "sio_window",
+    "gas_cover_mode",
+)
 DATA_DIGESTS = {
     "feedstocks": "feedstocks-digest",
     "foulant_thermo": "foulant-thermo-digest",
@@ -282,10 +303,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
 
     assert unpinned is schema
-    assert len(paths) == 70
+    assert len(paths) == 82
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "58600e0c9946d451f232b5537d9ea528aefb4de9fa25edb51ff53ddf18ef6d0b"
+        == "7d86446f2c513af1bd79636abd4ec7842d98b9a977c27cc15b1d93f8e2baf173"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -294,7 +315,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
         profile,
         unpinned,
     )
-    assert spec.recipe_id == "4d29164b77b3b714092e083a9605cb3e704cbf1668145bdcdcf74091dec46ab1"
+    assert spec.recipe_id == "6b7dc801973b564bca8393aa91e3989bb58de245239f471bc4e7260dbfe5ddbf"
     # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
     # moves when the live searchable allowlist identity changes.
     # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed,
@@ -313,12 +334,16 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # search allowlist above are UNCHANGED, so this is source-fingerprint
     # invalidation only, not a recipe/schema/allowlist or authoritative
     # vapor/yield/ledger move.
+    # 2026-07-03 (SSO-2 c1): allowlist-v10 — 12 new C2A_staged per-stage gas
+    # knobs (pO2/p_total/gas_cover_mode x 4 stages) enter the SEARCHABLE
+    # allowlist, so recipe_id + allowlist hash + cache_key move BY DESIGN
+    # (allowlist-identity move, not source-fingerprint).
     # 2026-07-03 (later): moved again for SIO-PATH0 (map/core diagnostics +
     # fO2 non-finite fail-loud guard, source-fingerprint) AND the
     # PHYSICS_GATE_VERSION v3 bump — the latter is the INTENDED semantic
     # invalidation: pre-S2c cached feasibility verdicts must not be served
     # under the new provenance-completeness gate (milestone-3 L2-P2).
-    assert cache_key(spec) == "4e726c3815abefc74e38570e1cf183627cad13a50f49a22f0e4753c7f34d2415"
+    assert cache_key(spec) == "8daa588cfef249fc6c095b1fa761ca6b489fc626493812decb9bfd9539057950"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -572,6 +597,96 @@ def test_c2a_staged_named_stage_knobs_render_to_real_stage_list() -> None:
     assert ramp == pytest.approx(175.0)
 
 
+def test_c2a_staged_stage_gas_knobs_validate_and_render() -> None:
+    schema = RecipeSchema()
+    search_paths = {spec.path for spec in schema.search_allowlist}
+
+    assert {
+        STAGE_SIO_PO2,
+        STAGE_SIO_PTOTAL,
+        STAGE_SIO_GAS_MODE,
+    } <= search_paths
+    po2_spec = schema.spec_for(STAGE_SIO_PO2)
+    total_spec = schema.spec_for(STAGE_SIO_PTOTAL)
+    mode_spec = schema.spec_for(STAGE_SIO_GAS_MODE)
+    assert po2_spec.low == pytest.approx(0.0)
+    assert po2_spec.high == pytest.approx(15.0)
+    assert total_spec.low == pytest.approx(5.0)
+    assert total_spec.high == pytest.approx(15.0)
+    assert mode_spec.choices == ("pn2_sweep", "po2_hold")
+
+    patch = RecipePatch(
+        {
+            STAGE_SIO_PO2: 2.5,
+            STAGE_SIO_PTOTAL: 12.0,
+            STAGE_SIO_GAS_MODE: "po2_hold",
+        }
+    ).validated(schema)
+    nested = schema.to_setpoints_patch(patch)
+    loaded_patch = RecipePatch.from_nested(nested).validated(schema)
+    sio_stage = _stage_by_name(nested["campaigns"]["C2A_staged"]["stages"], "sio_window")
+
+    assert loaded_patch.values[STAGE_SIO_PO2] == pytest.approx(2.5)
+    assert loaded_patch.values[STAGE_SIO_PTOTAL] == pytest.approx(12.0)
+    assert loaded_patch.values[STAGE_SIO_GAS_MODE] == "po2_hold"
+    assert sio_stage["pO2_mbar"] == pytest.approx(2.5)
+    assert sio_stage["p_total_mbar"] == pytest.approx(12.0)
+    assert sio_stage["gas_cover_mode"] == "po2_hold"
+
+
+def test_c2a_staged_stage_gas_knobs_fail_loudly() -> None:
+    schema = RecipeSchema()
+
+    with pytest.raises(
+        RecipeValidationError,
+        match=r"campaigns\.C2A_staged\.stages\.sio_window\.gas_cover_mode",
+    ):
+        RecipePatch({STAGE_SIO_GAS_MODE: "argon_blanket"}).validated(schema)
+    with pytest.raises(
+        RecipeValidationError,
+        match=r"campaigns\.C2A_staged\.stages\.sio_window\.p_total_mbar",
+    ):
+        RecipePatch({STAGE_SIO_PTOTAL: 4.9}).validated(schema)
+    with pytest.raises(
+        RecipeValidationError,
+        match=r"campaigns\.C2A_staged\.stages\.sio_window\.pN2_mbar",
+    ):
+        RecipePatch.from_nested(
+            {
+                "campaigns": {
+                    "C2A_staged": {
+                        "stages": [{"name": "sio_window", "pN2_mbar": 10.0}]
+                    }
+                }
+            }
+        ).validated(schema)
+    with pytest.raises(
+        RecipeValidationError,
+        match="recipe_pressure_partial_exceeds_total",
+    ):
+        RecipePatch({STAGE_SIO_PO2: 12.0}).validated(schema)
+
+
+def test_c2a_staged_stage_gas_defaults_are_empty_patch_neutral() -> None:
+    schema = RecipeSchema()
+    source_setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    source_c2a = source_setpoints["campaigns"]["C2A_staged"]
+
+    assert schema.to_setpoints_patch(RecipePatch({})) == {}
+    config = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        campaign="C2A_staged",
+        hours=9,
+        setpoints_patch=schema.to_setpoints_patch(RecipePatch({})),
+    )._session_config()
+    cfg = config.setpoints["campaigns"]["C2A_staged"]
+
+    assert cfg["stages"] == source_c2a["stages"]
+    assert cfg["pO2_mbar_default"] == pytest.approx(0.0)
+    assert cfg["p_total_mbar_default"] == pytest.approx(10.0)
+    assert all("gas_cover_mode" not in stage for stage in cfg["stages"])
+
+
 def test_c2a_staged_depletion_flux_decay_knob_bounds_and_neutral_validation() -> None:
     schema = RecipeSchema()
     spec = schema.spec_for(C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH)
@@ -756,7 +871,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     assert first.recipe_id() == second.recipe_id()
     assert (
         first.recipe_id()
-            == "63e50b641639c236c847ac2c9e46f92332839475b5578adfcd7bcdf6cfc14df1"
+            == "40e6638db09ce4f9d85e944c26c6239783cd55baff69c8fcb65b96177140a2d9"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

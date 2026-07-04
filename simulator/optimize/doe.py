@@ -15,7 +15,14 @@ from types import MappingProxyType
 from typing import Any, Mapping
 import warnings
 
-from simulator.optimize.recipe import KeyPath, RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    C2A_STAGED_PO2_MBAR_DEFAULT_PATH,
+    C2A_STAGED_P_TOTAL_MBAR_DEFAULT_PATH,
+    KeyPath,
+    RecipePatch,
+    RecipeSchema,
+    _default_setpoint_value,
+)
 
 DEFAULT_ANCHOR_DELTA_FRACTION = 0.15
 
@@ -549,6 +556,18 @@ def _map_unit_value(spec: Any, unit_value: float) -> Any:
     raise ValueError(f"{'.'.join(spec.path)} has unsupported knob kind {spec.kind!r}")
 
 
+def _map_numeric_unit_value(spec: Any, unit_value: float, low: float, high: float) -> Any:
+    value = low + unit_value * (high - low)
+    if spec.kind == "int":
+        low_int = int(low)
+        high_int = int(high)
+        bucket = min(int(unit_value * (high_int - low_int + 1)), high_int - low_int)
+        return low_int + bucket
+    if spec.kind == "float":
+        return float(value)
+    raise ValueError(f"{'.'.join(spec.path)} has unsupported knob kind {spec.kind!r}")
+
+
 def _map_unit_row(
     schema: RecipeSchema,
     specs: tuple[Any, ...],
@@ -563,7 +582,7 @@ def _map_unit_row(
     for spec, unit_value in zip(specs, row, strict=True):
         unit_by_path[spec.path] = float(unit_value)
         values[spec.path] = mapper(spec, unit_value)
-    _couple_pressure_default_pairs(
+    _condition_pressure_pair_values(
         schema,
         specs,
         values,
@@ -583,39 +602,161 @@ def _couple_pressure_default_pairs(
     anchor: RecipePatch | None,
     delta_fraction: float,
 ) -> None:
+    _condition_pressure_pair_values(
+        schema,
+        specs,
+        values,
+        unit_by_path,
+        anchor=anchor,
+        delta_fraction=delta_fraction,
+    )
+
+
+def _condition_pressure_pair_values(
+    schema: RecipeSchema,
+    specs: tuple[Any, ...],
+    values: dict[KeyPath, Any],
+    unit_by_path: Mapping[KeyPath, float] | None = None,
+    *,
+    anchor: RecipePatch | None = None,
+    delta_fraction: float = DEFAULT_ANCHOR_DELTA_FRACTION,
+    fallback_values: Mapping[KeyPath, Any] | None = None,
+) -> None:
     spec_by_path = {spec.path: spec for spec in specs}
-    for po2_path, total_path in schema.PRESSURE_COUPLED_DEFAULT_PAIRS:
-        if po2_path not in values or total_path not in values:
+    units = unit_by_path or {}
+    fallbacks = fallback_values or {}
+    for po2_path, total_path in _pressure_coupled_pairs(schema):
+        po2_sampled = po2_path in values
+        total_sampled = total_path in values
+        if not po2_sampled and not total_sampled:
             continue
-        po2_spec = spec_by_path[po2_path]
-        po2_low, po2_high = _numeric_bounds(po2_spec)
-        total = float(values[total_path])
-        if anchor is not None:
-            po2_low, po2_high = _anchored_numeric_interval(
-                po2_spec, anchor.values[po2_path], delta_fraction
+
+        if total_sampled:
+            total_spec = spec_by_path[total_path]
+            total_low, total_high = _sample_interval(
+                total_spec,
+                anchor=anchor,
+                delta_fraction=delta_fraction,
             )
-            feasible_high = min(po2_high, total)
-            tolerance = max(1e-12, 1e-12 * max(1.0, abs(po2_low), abs(total)))
-            if feasible_high + tolerance < po2_low:
-                raise ValueError(
-                    "pressure_default_pair_infeasible_bounds: "
-                    f"{'.'.join(po2_path)} anchored low {po2_low:.12g} exceeds "
-                    f"{'.'.join(total_path)} {total:.12g}"
-                )
-            values[po2_path] = float(
-                min(max(float(values[po2_path]), po2_low), feasible_high)
+            total_unit = _unit_for_path(
+                total_path, total_spec, values, units, total_low, total_high
+            )
+        else:
+            total = _pressure_fallback_value(schema, total_path, fallbacks)
+
+        if po2_sampled:
+            po2_spec = spec_by_path[po2_path]
+            po2_low, po2_high = _sample_interval(
+                po2_spec,
+                anchor=anchor,
+                delta_fraction=delta_fraction,
+            )
+            po2_unit = _unit_for_path(
+                po2_path, po2_spec, values, units, po2_low, po2_high
+            )
+        else:
+            po2 = _pressure_fallback_value(schema, po2_path, fallbacks)
+
+        if total_sampled and not po2_sampled:
+            feasible_low = max(total_low, po2)
+            _raise_if_infeasible(
+                total_path,
+                feasible_low,
+                total_high,
+                total_path,
+                "pressure_total_pair_infeasible_bounds",
+            )
+            values[total_path] = _map_numeric_unit_value(
+                total_spec,
+                total_unit,
+                feasible_low,
+                total_high,
             )
             continue
+
+        if total_sampled:
+            total = float(values[total_path])
         feasible_high = min(po2_high, total)
-        tolerance = max(1e-12, 1e-12 * max(1.0, abs(po2_low), abs(total)))
-        if feasible_high + tolerance < po2_low:
-            raise ValueError(
-                "pressure_default_pair_infeasible_bounds: "
-                f"{'.'.join(po2_path)} low {po2_low:.12g} exceeds "
-                f"{'.'.join(total_path)} {total:.12g}"
-            )
-        values[po2_path] = float(
-            po2_low + unit_by_path[po2_path] * (feasible_high - po2_low)
+        _raise_if_infeasible(
+            po2_path,
+            po2_low,
+            feasible_high,
+            total_path,
+            "pressure_default_pair_infeasible_bounds",
+        )
+        values[po2_path] = _map_numeric_unit_value(
+            po2_spec,
+            po2_unit,
+            po2_low,
+            feasible_high,
+        )
+
+
+def _pressure_coupled_pairs(schema: RecipeSchema) -> tuple[tuple[KeyPath, KeyPath], ...]:
+    return tuple(schema.PRESSURE_COUPLED_DEFAULT_PAIRS) + tuple(
+        schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items()
+    )
+
+
+def _sample_interval(
+    spec: Any,
+    *,
+    anchor: RecipePatch | None,
+    delta_fraction: float,
+) -> tuple[float, float]:
+    if anchor is not None:
+        return _anchored_numeric_interval(spec, anchor.values[spec.path], delta_fraction)
+    return _numeric_bounds(spec)
+
+
+def _unit_for_path(
+    path: KeyPath,
+    spec: Any,
+    values: Mapping[KeyPath, Any],
+    unit_by_path: Mapping[KeyPath, float],
+    low: float,
+    high: float,
+) -> float:
+    if path in unit_by_path:
+        return float(unit_by_path[path])
+    if high == low:
+        return 0.0
+    unit = (float(values[path]) - low) / (high - low)
+    return min(max(unit, 0.0), 1.0)
+
+
+def _pressure_default_value(schema: RecipeSchema, path: KeyPath) -> float:
+    if path in schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2:
+        default_path = C2A_STAGED_PO2_MBAR_DEFAULT_PATH
+    elif path in set(schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.values()):
+        default_path = C2A_STAGED_P_TOTAL_MBAR_DEFAULT_PATH
+    else:
+        default_path = path
+    return float(_default_setpoint_value(default_path))
+
+
+def _pressure_fallback_value(
+    schema: RecipeSchema,
+    path: KeyPath,
+    fallback_values: Mapping[KeyPath, Any],
+) -> float:
+    if path in fallback_values:
+        return float(fallback_values[path])
+    return _pressure_default_value(schema, path)
+
+
+def _raise_if_infeasible(
+    sampled_path: KeyPath,
+    low: float,
+    high: float,
+    limit_path: KeyPath,
+    code: str,
+) -> None:
+    tolerance = max(1e-12, 1e-12 * max(1.0, abs(low), abs(high)))
+    if high + tolerance < low:
+        raise ValueError(
+            f"{code}: {'.'.join(sampled_path)} low {low:.12g} exceeds "
+            f"{'.'.join(limit_path)} constrained high {high:.12g}"
         )
 
 

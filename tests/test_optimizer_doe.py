@@ -19,7 +19,15 @@ from simulator.optimize.doe import (
     sample_recipe_patch_at_index,
     sample_recipe_patches,
 )
-from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    KnobSpec,
+    RecipePatch,
+    RecipeSchema,
+    _default_setpoint_value,
+)
+
+C5_PO2_DEFAULT = tuple("campaigns.C5.pO2_mbar_default".split("."))
+C5_PTOTAL_DEFAULT = tuple("campaigns.C5.p_total_mbar_default".split("."))
 
 
 def _canonical_patch_set(
@@ -82,8 +90,11 @@ def _assert_pressure_defaults_are_jointly_feasible(
     schema: RecipeSchema,
     patches: tuple[RecipePatch, ...],
 ) -> None:
+    pressure_pairs = tuple(schema.PRESSURE_COUPLED_DEFAULT_PAIRS) + tuple(
+        schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items()
+    )
     for patch in patches:
-        for po2_path, total_path in schema.PRESSURE_COUPLED_DEFAULT_PAIRS:
+        for po2_path, total_path in pressure_pairs:
             if po2_path not in patch.values or total_path not in patch.values:
                 continue
             assert patch.values[po2_path] <= patch.values[total_path], (
@@ -94,6 +105,11 @@ def _assert_pressure_defaults_are_jointly_feasible(
             )
 
 
+def _single_knob_schema(path: tuple[str, ...]) -> RecipeSchema:
+    base = RecipeSchema()
+    return RecipeSchema(allowlist=(base.spec_for(path),))
+
+
 def test_sobol_sampler_is_deterministic_for_schema_n_and_seed() -> None:
     first = _canonical_patch_set(n_samples=16, seed=123)
     second = _canonical_patch_set(n_samples=16, seed=123)
@@ -101,6 +117,59 @@ def test_sobol_sampler_is_deterministic_for_schema_n_and_seed() -> None:
 
     assert first == second
     assert first != different_seed
+
+
+def test_pressure_conditioned_index_sampling_is_seed_stable() -> None:
+    if not doe_module._scipy_sobol_available():
+        pytest.skip("scipy-sobol unavailable for streaming index sampling")
+    schema = RecipeSchema()
+
+    first = tuple(
+        sample_recipe_patch_at_index(
+            schema,
+            index=index,
+            seed=17,
+            sampler_name=SCIPY_SOBOL_SAMPLER,
+        )
+        for index in range(64)
+    )
+    second = tuple(
+        sample_recipe_patch_at_index(
+            schema,
+            index=index,
+            seed=17,
+            sampler_name=SCIPY_SOBOL_SAMPLER,
+        )
+        for index in range(64)
+    )
+
+    assert tuple(patch.canonical_json() for patch in first) == tuple(
+        patch.canonical_json() for patch in second
+    )
+    _assert_pressure_defaults_are_jointly_feasible(schema, first)
+
+
+def test_pressure_conditioning_uses_default_when_only_one_side_is_sampled() -> None:
+    po2_schema = _single_knob_schema(C5_PO2_DEFAULT)
+    total_schema = _single_knob_schema(C5_PTOTAL_DEFAULT)
+    fixed_total = float(_default_setpoint_value(C5_PTOTAL_DEFAULT))
+    fixed_po2 = float(_default_setpoint_value(C5_PO2_DEFAULT))
+
+    po2_patches = sample_recipe_patches(
+        po2_schema,
+        n_samples=64,
+        seed=11,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+    )
+    total_patches = sample_recipe_patches(
+        total_schema,
+        n_samples=64,
+        seed=11,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+    )
+
+    assert all(patch.values[C5_PO2_DEFAULT] <= fixed_total for patch in po2_patches)
+    assert all(patch.values[C5_PTOTAL_DEFAULT] >= fixed_po2 for patch in total_patches)
 
 
 def test_requested_scipy_sobol_sampler_is_deterministic_when_available() -> None:

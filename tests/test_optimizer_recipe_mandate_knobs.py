@@ -27,6 +27,16 @@ def _path(dotted: str) -> tuple[str, ...]:
 
 
 C4_RUNTIME_ONLY_PATHS = {_path("campaigns.C4.hold_temp_C")}
+C2A_STAGED_STAGE_GAS_PATHS = {
+    _path(f"campaigns.C2A_staged.stages.{stage}.{field}")
+    for stage in (
+        "alkali_early_fe",
+        "sio_window",
+        "fe_hot_hold",
+        "cool_for_na_shuttle",
+    )
+    for field in ("pO2_mbar", "p_total_mbar", "gas_cover_mode")
+}
 
 
 def _lookup(root: dict, path: tuple[str, ...]):
@@ -62,7 +72,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v9" == schema.allowlist_version
+    assert "allowlist-v10" == schema.allowlist_version
 
     # P1 #1: campaigns.C2A_staged.stages.fe_hot_hold.target_C is a silent no-op
     # (the runtime holds fe_hot_hold at default_hold_T_C / the C4-style override,
@@ -94,6 +104,9 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
         _path("campaigns.C2A_staged.na_shuttle_stage.duration_h"),
         _path("campaigns.C2A_staged.depletion_flux_decay_fraction"),
         _path("campaigns.C2A_staged.stages.sio_window.target_C"),
+        _path("campaigns.C2A_staged.stages.sio_window.pO2_mbar"),
+        _path("campaigns.C2A_staged.stages.sio_window.p_total_mbar"),
+        _path("campaigns.C2A_staged.stages.sio_window.gas_cover_mode"),
         _path("campaigns.C2A_staged.stages.fe_hot_hold.duration_h"),
         _path("campaigns.C3.endpoint.hold_time_min"),
         _path("campaigns.C3.alkali_dosing.Na_kg"),
@@ -115,7 +128,7 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
     pair_map = dict(RecipeSchema.PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT)
     spec_by_path = {spec.path: spec for spec in schema.allowlist}
     for spec in MANDATE_LEVER_ALLOWLIST:
-        if spec.path not in C4_RUNTIME_ONLY_PATHS:
+        if spec.path not in C4_RUNTIME_ONLY_PATHS | C2A_STAGED_STAGE_GAS_PATHS:
             _lookup(setpoints, spec.path)
         values = {spec.path: _sample_value(spec)}
         total_path = pair_map.get(spec.path)
@@ -126,6 +139,9 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
             )
         patch = RecipePatch(values)
         assert patch.validated(schema).values[spec.path] == _sample_value(spec)
+        if spec.path in C2A_STAGED_STAGE_GAS_PATHS:
+            rendered = schema.to_setpoints_patch(patch.validated(schema))
+            assert _lookup(rendered, spec.path) == _sample_value(spec)
 
 
 def test_c2a_staged_depletion_flux_decay_mandate_knob_is_runtime_live() -> None:

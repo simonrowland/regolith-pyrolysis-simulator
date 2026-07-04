@@ -25,7 +25,7 @@ from simulator.optimize.canonical import canonical_json_dumps
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v9"
+allowlist_version = "allowlist-v10"
 
 FURNACE_MAX_T_C_PATH: KeyPath = ("furnace_max_T_C",)
 C5_ALLOW_MRE_VOLTAGE_CAP_PATH: KeyPath = tuple(
@@ -75,6 +75,12 @@ STAGE0_CARBON_REDUCTANT_KG_PATH: KeyPath = tuple(
 C4_HOLD_TEMP_C_PATH: KeyPath = tuple("campaigns.C4.hold_temp_C".split("."))
 
 C2A_STAGED_STAGES_PATH: KeyPath = tuple("campaigns.C2A_staged.stages".split("."))
+C2A_STAGED_PO2_MBAR_DEFAULT_PATH: KeyPath = tuple(
+    "campaigns.C2A_staged.pO2_mbar_default".split(".")
+)
+C2A_STAGED_P_TOTAL_MBAR_DEFAULT_PATH: KeyPath = tuple(
+    "campaigns.C2A_staged.p_total_mbar_default".split(".")
+)
 C2A_STAGED_MAX_HOLD_HR_PATH: KeyPath = tuple(
     "campaigns.C2A_staged.max_hold_hr".split(".")
 )
@@ -88,12 +94,36 @@ C2A_STAGED_STAGE_NAMES: tuple[str, ...] = (
     "fe_hot_hold",
     "cool_for_na_shuttle",
 )
+C2A_STAGED_STAGE_GAS_FIELDS: tuple[str, ...] = (
+    "pO2_mbar",
+    "p_total_mbar",
+    "gas_cover_mode",
+)
+C2A_STAGED_STAGE_METADATA_FIELDS: frozenset[str] = frozenset(
+    ("target_species", "endpoint", "verification")
+)
+C2A_STAGED_GAS_COVER_MODES: tuple[str, ...] = ("pn2_sweep", "po2_hold")
 C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyType(
     {
-        "alkali_early_fe": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
-        "sio_window": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
-        "fe_hot_hold": ("duration_h", "ramp_rate_C_per_hr"),
-        "cool_for_na_shuttle": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
+        "alkali_early_fe": (
+            "duration_h",
+            "target_C",
+            "ramp_rate_C_per_hr",
+        ) + C2A_STAGED_STAGE_GAS_FIELDS,
+        "sio_window": (
+            "duration_h",
+            "target_C",
+            "ramp_rate_C_per_hr",
+        ) + C2A_STAGED_STAGE_GAS_FIELDS,
+        "fe_hot_hold": (
+            "duration_h",
+            "ramp_rate_C_per_hr",
+        ) + C2A_STAGED_STAGE_GAS_FIELDS,
+        "cool_for_na_shuttle": (
+            "duration_h",
+            "target_C",
+            "ramp_rate_C_per_hr",
+        ) + C2A_STAGED_STAGE_GAS_FIELDS,
     }
 )
 
@@ -141,6 +171,40 @@ def _knob(
         bounds_source=bounds_source,
         search_enabled=search_enabled,
         runtime_enabled=runtime_enabled,
+    )
+
+
+def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
+    prefix = f"campaigns.C2A_staged.stages.{stage_name}"
+    return (
+        _knob(
+            f"{prefix}.pO2_mbar",
+            low=0.0,
+            high=15.0,
+            units="mbar",
+            bounds_source=(
+                "engineering_envelope: per-stage pO2 lever for future "
+                "Atmosphere.CONTROLLED_O2 C2A_staged execution; bounded to "
+                "the 5-15 mbar gas-cover band for this optimizer slice"
+            ),
+        ),
+        _knob(
+            f"{prefix}.p_total_mbar",
+            low=5.0,
+            high=15.0,
+            units="mbar",
+            bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
+        ),
+        _knob(
+            f"{prefix}.gas_cover_mode",
+            "categorical",
+            choices=C2A_STAGED_GAS_COVER_MODES,
+            bounds_source=(
+                "engineering_envelope: pn2_sweep maps to "
+                "Atmosphere.PN2_SWEEP; po2_hold maps to "
+                "Atmosphere.CONTROLLED_O2"
+            ),
+        ),
     )
 
 
@@ -195,6 +259,13 @@ class RecipeSchema:
     })
     PRESSURE_COUPLED_DEFAULT_PAIRS: tuple[tuple[KeyPath, KeyPath], ...] = tuple(
         PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT.items()
+    )
+    C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2: Mapping[KeyPath, KeyPath] = MappingProxyType(
+        {
+            C2A_STAGED_STAGES_PATH + (stage_name, "pO2_mbar"):
+            C2A_STAGED_STAGES_PATH + (stage_name, "p_total_mbar")
+            for stage_name in C2A_STAGED_STAGE_NAMES
+        }
     )
 
     ALLOWLIST: tuple[KnobSpec, ...] = (
@@ -390,6 +461,7 @@ class RecipeSchema:
                 "campaigns.C2A_staged.stages.alkali_early_fe.ramp_rate_C_per_hr=600"
             ),
         ),
+        *_c2a_stage_gas_knobs("alkali_early_fe"),
         _knob(
             "campaigns.C2A_staged.stages.sio_window.duration_h",
             "int",
@@ -421,6 +493,7 @@ class RecipeSchema:
                 "campaigns.C2A_staged.stages.sio_window.ramp_rate_C_per_hr=175"
             ),
         ),
+        *_c2a_stage_gas_knobs("sio_window"),
         _knob(
             "campaigns.C2A_staged.stages.fe_hot_hold.duration_h",
             "int",
@@ -442,6 +515,7 @@ class RecipeSchema:
                 "campaigns.C2A_staged.stages.fe_hot_hold.ramp_rate_C_per_hr=150"
             ),
         ),
+        *_c2a_stage_gas_knobs("fe_hot_hold"),
         _knob(
             "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h",
             "int",
@@ -473,6 +547,7 @@ class RecipeSchema:
                 "campaigns.C2A_staged.stages.cool_for_na_shuttle.ramp_rate_C_per_hr=600"
             ),
         ),
+        *_c2a_stage_gas_knobs("cool_for_na_shuttle"),
         _knob(
             "campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr",
             low=300,
@@ -1018,14 +1093,26 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C2A_staged.stages.alkali_early_fe.duration_h",
         "campaigns.C2A_staged.stages.alkali_early_fe.target_C",
         "campaigns.C2A_staged.stages.alkali_early_fe.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.stages.alkali_early_fe.pO2_mbar",
+        "campaigns.C2A_staged.stages.alkali_early_fe.p_total_mbar",
+        "campaigns.C2A_staged.stages.alkali_early_fe.gas_cover_mode",
         "campaigns.C2A_staged.stages.sio_window.duration_h",
         "campaigns.C2A_staged.stages.sio_window.target_C",
         "campaigns.C2A_staged.stages.sio_window.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.stages.sio_window.pO2_mbar",
+        "campaigns.C2A_staged.stages.sio_window.p_total_mbar",
+        "campaigns.C2A_staged.stages.sio_window.gas_cover_mode",
         "campaigns.C2A_staged.stages.fe_hot_hold.duration_h",
         "campaigns.C2A_staged.stages.fe_hot_hold.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.stages.fe_hot_hold.pO2_mbar",
+        "campaigns.C2A_staged.stages.fe_hot_hold.p_total_mbar",
+        "campaigns.C2A_staged.stages.fe_hot_hold.gas_cover_mode",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.target_C",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.pO2_mbar",
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.p_total_mbar",
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.gas_cover_mode",
         "campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr",
         "campaigns.C2A_staged.na_shuttle_stage.duration_h",
         "campaigns.C2B.temp_range_C",
@@ -1413,6 +1500,21 @@ def _flatten_c2a_staged_stage_list(
         if stage_name in seen:
             raise RecipeValidationError(f"duplicate C2A_staged stage: {stage_name}")
         seen.add(stage_name)
+        allowed_fields = set(C2A_STAGED_STAGE_FIELDS_BY_NAME[stage_name])
+        allowed_fields.update(C2A_STAGED_STAGE_METADATA_FIELDS)
+        unknown_fields = sorted(
+            field_name
+            for field_name in stage
+            if isinstance(field_name, str)
+            and field_name != "name"
+            and field_name not in allowed_fields
+        )
+        if unknown_fields:
+            first = unknown_fields[0]
+            raise RecipeValidationError(
+                "unknown C2A_staged stage field: "
+                f"{_format_path(C2A_STAGED_STAGES_PATH + (stage_name, first))}"
+            )
         for field_name in C2A_STAGED_STAGE_FIELDS_BY_NAME[stage_name]:
             if field_name in stage:
                 flat[C2A_STAGED_STAGES_PATH + (stage_name, field_name)] = (
@@ -1457,15 +1559,66 @@ def _validate_pressure_default_pairs(
         else:
             total = float(_default_setpoint_value(total_path))
             total_source = "YAML default"
-        tolerance = max(1e-12, 1e-12 * max(1.0, abs(po2), abs(total)))
-        if po2 - total > tolerance:
-            raise RecipeValidationError(
-                "recipe_pressure_partial_exceeds_total: "
-                f"{_format_path(po2_path)}={po2:.12g} ({po2_source}) > "
-                f"{_format_path(total_path)}={total:.12g} ({total_source}); "
-                "oxygen partial pressure cannot exceed total pressure; "
-                "set both pO2 and p_total knobs for this campaign"
-            )
+        _validate_pressure_pair(
+            po2_path,
+            po2,
+            po2_source,
+            total_path,
+            total,
+            total_source,
+            "set both pO2 and p_total knobs for this campaign",
+        )
+    for (
+        po2_path,
+        total_path,
+    ) in schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items():
+        if (
+            po2_path not in schema._spec_by_path
+            or total_path not in schema._spec_by_path
+            or (po2_path not in values and total_path not in values)
+        ):
+            continue
+        if po2_path in values:
+            po2 = float(values[po2_path])
+            po2_source = "patched"
+        else:
+            po2 = float(_default_setpoint_value(C2A_STAGED_PO2_MBAR_DEFAULT_PATH))
+            po2_source = "C2A_staged YAML default"
+        if total_path in values:
+            total = float(values[total_path])
+            total_source = "patched"
+        else:
+            total = float(_default_setpoint_value(C2A_STAGED_P_TOTAL_MBAR_DEFAULT_PATH))
+            total_source = "C2A_staged YAML default"
+        _validate_pressure_pair(
+            po2_path,
+            po2,
+            po2_source,
+            total_path,
+            total,
+            total_source,
+            "set both pO2_mbar and p_total_mbar knobs for this C2A_staged stage",
+        )
+
+
+def _validate_pressure_pair(
+    po2_path: KeyPath,
+    po2: float,
+    po2_source: str,
+    total_path: KeyPath,
+    total: float,
+    total_source: str,
+    guidance: str,
+) -> None:
+    tolerance = max(1e-12, 1e-12 * max(1.0, abs(po2), abs(total)))
+    if po2 - total > tolerance:
+        raise RecipeValidationError(
+            "recipe_pressure_partial_exceeds_total: "
+            f"{_format_path(po2_path)}={po2:.12g} ({po2_source}) > "
+            f"{_format_path(total_path)}={total:.12g} ({total_source}); "
+            "oxygen partial pressure cannot exceed total pressure; "
+            f"{guidance}"
+        )
 
 
 @lru_cache(maxsize=1)
