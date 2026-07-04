@@ -20,6 +20,7 @@ SSO2_STAGE_NUMBER = 3
 SSO2_SILICA_SPECIES = ("SiO", "SiO2", "Si")
 SSO2_FE_TAP_ACCOUNT = "terminal.drain_tap_material"
 SSO2_METAL_PHASE_ACCOUNT = "process.metal_phase"
+SSO2_MASS_BALANCE_TOLERANCE_PCT = 5.0e-12
 SSO2_CHUNK3B_READER_HANDOFF = (
     "PhysicsConstraintSet.delivered_stream_purity plus the SSO-2 profile/objective "
     "reader added in chunk 3b; it must consume Stage 3 Fe contamination and Fe tap "
@@ -258,6 +259,153 @@ def sso2_owner_recipe_evidence(
     }
 
 
+def sso2_owner_recipe_objective_reader(
+    run_execution: Any,
+    *,
+    constraints: PhysicsConstraintSet | None = None,
+) -> tuple[float, dict[str, Any]]:
+    evidence = sso2_owner_recipe_evidence(run_execution, constraints=constraints)
+    reader: dict[str, Any] = {
+        "reader": SSO2_OWNER_RECIPE_ID,
+        "status": "available",
+        "status_reason": "",
+        "score_components": {},
+        "consumed_fields": (
+            "delivered_stream_purity.margin",
+            "stage_3.Fe_kg",
+            "stage_3.Fe_wt_pct",
+            "fe_tap.Fe_kg",
+            "wall_coating.margin",
+            "wall_coating.status",
+            "mass_balance.max_abs_error_pct",
+        ),
+        "evidence": evidence,
+    }
+
+    delivered = evidence.get("delivered_stream_purity", {})
+    stage3 = evidence.get("stage_3", {})
+    fe_tap = evidence.get("fe_tap", {})
+    coating = evidence.get("wall_coating", {})
+    mass_balance = evidence.get("mass_balance", {})
+
+    fail_reason = _sso2_reader_fail_reason(
+        evidence=evidence,
+        delivered=delivered,
+        stage3=stage3,
+        fe_tap=fe_tap,
+        coating=coating,
+        mass_balance=mass_balance,
+    )
+    if fail_reason is not None:
+        reader["status"] = fail_reason[0]
+        reader["status_reason"] = fail_reason[1]
+        reader["score"] = 0.0
+        return 0.0, reader
+
+    purity_fraction = _finite_number(stage3["purity_fraction"], "stage_3.purity_fraction")
+    stage3_fe_kg = _finite_non_negative(stage3["Fe_kg"], "stage_3.Fe_kg")
+    fe_tap_kg = _finite_non_negative(fe_tap["Fe_kg"], "fe_tap.Fe_kg")
+    denominator = fe_tap_kg + stage3_fe_kg
+    if denominator <= _EPS:
+        reader["status"] = "missing_fe_tap_evidence"
+        reader["status_reason"] = "Fe tap plus Stage 3 Fe evidence is zero"
+        reader["score"] = 0.0
+        return 0.0, reader
+
+    fe_partition_score = fe_tap_kg / denominator
+    score = _clamp01(purity_fraction) * _clamp01(fe_partition_score)
+    reader["score_components"] = {
+        "stage_3_purity_fraction": purity_fraction,
+        "stage_3_fe_kg": stage3_fe_kg,
+        "stage_3_fe_wt_pct": _finite_number(stage3["Fe_wt_pct"], "stage_3.Fe_wt_pct"),
+        "fe_tap_Fe_kg": fe_tap_kg,
+        "fe_partition_score": fe_partition_score,
+        "delivered_stream_purity_margin": _finite_number(
+            delivered["margin"],
+            "delivered_stream_purity.margin",
+        ),
+        "wall_coating_margin": coating["margin"],
+        "wall_coating_status": str(coating.get("status", "")),
+        "mass_balance_max_abs_error_pct": _finite_number(
+            mass_balance["max_abs_error_pct"],
+            "mass_balance.max_abs_error_pct",
+        ),
+    }
+    if stage3_fe_kg > _EPS:
+        reader["status"] = "stage_3_fe_contamination_penalized"
+        reader["status_reason"] = "Stage 3 Fe contamination reduces purity and Fe tap partition score"
+    reader["score"] = score
+    return score, reader
+
+
+def _sso2_reader_fail_reason(
+    *,
+    evidence: Mapping[str, Any],
+    delivered: Mapping[str, Any],
+    stage3: Mapping[str, Any],
+    fe_tap: Mapping[str, Any],
+    coating: Mapping[str, Any],
+    mass_balance: Mapping[str, Any],
+) -> tuple[str, str] | None:
+    status = str(evidence.get("status", "missing_sso2_evidence"))
+    if status not in {"available", "stage_stream_purity_failed"}:
+        return status, str(evidence.get("status_reason", "") or "SSO-2 evidence unavailable")
+    if stage3.get("Fe_kg") is None or stage3.get("Fe_wt_pct") is None:
+        return "missing_stage_3_fe_evidence", "Stage 3 Fe kg/wt% evidence is missing"
+    try:
+        _finite_non_negative(stage3["Fe_kg"], "stage_3.Fe_kg")
+        _finite_non_negative(stage3["Fe_wt_pct"], "stage_3.Fe_wt_pct")
+        _finite_non_negative(stage3["purity_fraction"], "stage_3.purity_fraction")
+    except (KeyError, ValueError) as exc:
+        return "invalid_stage_3_fe_evidence", str(exc)
+    if delivered.get("margin") is None:
+        return "missing_stage_3_purity_evidence", "delivered_stream_purity margin is missing"
+    try:
+        _finite_number(delivered["margin"], "delivered_stream_purity.margin")
+    except (KeyError, ValueError) as exc:
+        return "invalid_stage_3_purity_evidence", str(exc)
+    if not bool(delivered.get("feasible", False)):
+        return "stage_stream_purity_failed", str(
+            delivered.get("detail", "") or "delivered_stream_purity failed"
+        )
+    if fe_tap.get("Fe_kg") is None:
+        return "missing_fe_tap_evidence", str(
+            fe_tap.get("status_reason", "") or "Fe tap evidence is missing"
+        )
+    try:
+        _finite_non_negative(fe_tap["Fe_kg"], "fe_tap.Fe_kg")
+    except (KeyError, ValueError) as exc:
+        return "invalid_fe_tap_evidence", str(exc)
+    if not bool(coating.get("feasible", False)):
+        return "wall_coating_failed", str(
+            coating.get("status_reason", "") or coating.get("detail", "")
+        )
+    if coating.get("margin") is None:
+        return "missing_wall_coating_evidence", "wall/coating margin is missing"
+    if mass_balance.get("status") != "available":
+        return str(mass_balance.get("status", "missing_mass_balance_trace")), (
+            "mass-balance closure evidence is missing"
+        )
+    if mass_balance.get("max_abs_error_pct") is None:
+        return "missing_mass_balance_trace", "mass-balance closure value is missing"
+    try:
+        max_error = _finite_number(
+            mass_balance["max_abs_error_pct"],
+            "mass_balance.max_abs_error_pct",
+        )
+    except ValueError as exc:
+        return "invalid_mass_balance_trace", str(exc)
+    if max_error > SSO2_MASS_BALANCE_TOLERANCE_PCT:
+        return (
+            "mass_balance_open",
+            (
+                f"mass balance error {max_error:g}% exceeds "
+                f"{SSO2_MASS_BALANCE_TOLERANCE_PCT:g}%"
+            ),
+        )
+    return None
+
+
 def _stage_species_kg_from_trace(trace: Any) -> tuple[dict[tuple[int, str], float], str, str]:
     if trace is None:
         return {}, "missing_stage_purity_trace", "trace is missing"
@@ -452,3 +600,7 @@ def _json_number(value: float) -> float | str:
     if math.isinf(value):
         return "inf" if value > 0 else "-inf"
     return float(value)
+
+
+def _clamp01(value: float) -> float:
+    return min(1.0, max(0.0, value))

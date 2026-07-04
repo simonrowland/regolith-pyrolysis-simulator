@@ -31,6 +31,7 @@ from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpo
 
 
 PROFILE_SCHEMA_VERSION = "profile-schema-v1"
+SSO2_OWNER_RECIPE_ID = "sso2_pn2_fe_drain_silica"
 PROFILE_DIRNAME = "optimize_profiles"
 VALID_FIDELITIES = ("stub", "fast", "high", "auto")
 KNOWN_STUDY_CONSTRAINTS = frozenset({"physics", "stub_smoke"})
@@ -56,6 +57,7 @@ KNOWN_OBJECTIVE_METRICS = frozenset(
         "energy_total_kWh",
         "duration_h",
         "total_hours",
+        SSO2_OWNER_RECIPE_ID,
     }
 )
 

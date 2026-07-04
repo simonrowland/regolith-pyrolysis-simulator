@@ -12,6 +12,7 @@ from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.optimize.objective import composition_target_eval_metadata
 from simulator.optimize import study
 from simulator.optimize.physics import GATE_ORDER
+from simulator.optimize.sso2_evidence import SSO2_OWNER_RECIPE_ID
 from simulator.backends import CACHE_TIER_CEILINGS
 from simulator.optimize.profiles import (
     KNOWN_OBJECTIVE_METRICS,
@@ -256,6 +257,42 @@ def test_constraint_target_species_must_be_non_empty_list() -> None:
 
     with pytest.raises(ProfileValidationError, match="constraints.target_species must be a non-empty list"):
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_sso2_objective_metric_is_explicit_and_does_not_infect_generic_profiles() -> None:
+    generic = _profile_copy("lunar_mare_low_ti")
+    assert all(
+        objective["metric"] != SSO2_OWNER_RECIPE_ID
+        for objective in generic["objectives"]
+    )
+    generic_constraints = physics_constraints_from_profile(
+        generic,
+        source="generic-profile.yaml",
+    )
+    assert generic_constraints.stream_purity_min.source != "profile"
+
+    sso2 = _profile_copy("lunar_mare_low_ti")
+    sso2["profile_id"] = "sso2-pn2-fe-drain-silica-objectives-test"
+    sso2["objectives"] = [
+        {
+            "metric": SSO2_OWNER_RECIPE_ID,
+            "sense": "maximize",
+            "units": "score_0_1",
+            "weight": 1.0,
+            "rationale": "profile-owned SSO-2 Fe-free Stage 3 silica reader",
+        }
+    ]
+    sso2["constraints"]["stream_purity_min"] = 0.95
+
+    validated = validate_profile(sso2, expected_feedstock="lunar_mare_low_ti")
+    constraints = physics_constraints_from_profile(
+        validated,
+        source="sso2-profile.yaml",
+    )
+
+    assert validated["objectives"][0]["metric"] == SSO2_OWNER_RECIPE_ID
+    assert constraints.stream_purity_min.value == pytest.approx(0.95)
+    assert constraints.stream_purity_min.source == "profile"
 
 
 def test_runtime_loader_refuses_stale_melt_pool_stream_purity_gate() -> None:

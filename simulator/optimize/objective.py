@@ -35,6 +35,7 @@ _MISSING = object()
 VALID_OBJECTIVE_SENSES = {"minimize", "maximize"}
 COMPOSITION_TARGET_TYPE = "composition_target"
 COMPOSITION_TARGET_METRIC_PREFIX = "composition_target:"
+SSO2_OWNER_RECIPE_ID = "sso2_pn2_fe_drain_silica"
 SUPPORTED_COMPOSITION_POOLS = COMPOSITION_PRODUCT_POOLS
 COMPOSITION_VECTOR_SPECIES = frozenset({"Na", "K", "Fe", "Mg", "Si", "Al", "Ca", "O2"})
 COMPOSITION_VECTOR_ROLES = frozenset({"extract", "retain", "free", "to_window"})
@@ -1305,6 +1306,16 @@ def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> Object
             )
             if objective_evidence:
                 evidence[definition.metric] = dict(objective_evidence)
+        elif definition.metric == SSO2_OWNER_RECIPE_ID:
+            from simulator.optimize.sso2_evidence import (
+                sso2_owner_recipe_objective_reader,
+            )
+
+            value, reader_evidence = sso2_owner_recipe_objective_reader(
+                run_execution,
+                constraints=_extraction_constraints_from_profile(profile),
+            )
+            evidence[definition.metric] = reader_evidence
         else:
             value = _metric_value(
                 definition.metric,
@@ -3193,6 +3204,19 @@ def _extraction_constraints_from_profile(profile: Mapping[str, Any]) -> PhysicsC
                 "profile.constraints.target_species must be a non-empty sequence"
             )
         updates["target_species"] = tuple(str(target) for target in raw_targets)
+    if "stream_purity_min" in raw_constraints:
+        threshold = base.stream_purity_min
+        updates["stream_purity_min"] = ThresholdSpec(
+            id=threshold.id,
+            value=_finite_float(
+                raw_constraints["stream_purity_min"],
+                "profile.constraints.stream_purity_min",
+            ),
+            units=threshold.units,
+            source="profile",
+            source_ref="profile.constraints.stream_purity_min",
+            tolerance=threshold.tolerance,
+        )
     if "extraction_min_fraction" in raw_constraints:
         threshold = base.extraction_min_fraction
         updates["extraction_min_fraction"] = ThresholdSpec(

@@ -22,7 +22,9 @@ from simulator.optimize.objective import (
 )
 from simulator.optimize.sso2_evidence import (
     SSO2_CHUNK3B_READER_HANDOFF,
+    SSO2_OWNER_RECIPE_ID,
     sso2_owner_recipe_evidence,
+    sso2_owner_recipe_objective_reader,
     sso2_owner_recipe_setpoints_patch,
 )
 
@@ -205,7 +207,11 @@ def _sso2_execution(
     condensed_delta: dict[tuple[int, str], float] | None = None,
     ledger: _FakeSso2Ledger | None = None,
 ):
-    snapshot = SimpleNamespace(hour=1, mass_balance_error_pct=1.2e-13)
+    snapshot = SimpleNamespace(
+        hour=1,
+        campaign="C2A_staged",
+        mass_balance_error_pct=1.2e-13,
+    )
     trace = SimpleNamespace(
         snapshots=(snapshot,),
         condensed_by_stage_species_delta=(
@@ -393,6 +399,88 @@ def test_sso2_evidence_missing_stage_trace_fails_closed_without_zero_alias() -> 
         "Si": None,
     }
     assert evidence["delivered_stream_purity"]["detail"].startswith("fail-closed:")
+
+
+def _sso2_objective_profile(*, stream_purity_min: float = 0.95) -> dict:
+    return {
+        "objectives": [
+            {
+                "metric": SSO2_OWNER_RECIPE_ID,
+                "sense": "maximize",
+                "units": "score_0_1",
+                "weight": 1.0,
+                "rationale": "SSO-2 Fe-free Stage 3 silica and Fe tap purity reader",
+            }
+        ],
+        "constraints": {
+            "gates": ["delivered_stream_purity"],
+            "stream_purity_min": stream_purity_min,
+        },
+    }
+
+
+def test_sso2_objective_reader_score_changes_with_stage3_fe_contamination() -> None:
+    clean = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 10.0},
+        ledger=_FakeSso2Ledger({
+            "terminal.drain_tap_material": {"Fe": 7.0},
+            "process.metal_phase": {"Fe": 3.0},
+        }),
+    )
+    contaminated = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 10.0, (3, "Fe"): 0.1},
+        ledger=_FakeSso2Ledger({
+            "terminal.drain_tap_material": {"Fe": 7.0},
+            "process.metal_phase": {"Fe": 3.0},
+        }),
+    )
+
+    clean_objectives = compute_objectives(_sso2_objective_profile(), clean)
+    dirty_objectives = compute_objectives(_sso2_objective_profile(), contaminated)
+
+    clean_score = clean_objectives.as_mapping()[SSO2_OWNER_RECIPE_ID]
+    dirty_score = dirty_objectives.as_mapping()[SSO2_OWNER_RECIPE_ID]
+    assert clean_score == pytest.approx(1.0)
+    assert 0.0 < dirty_score < clean_score
+    reader = dirty_objectives.evidence[SSO2_OWNER_RECIPE_ID]
+    assert reader["reader"] == SSO2_OWNER_RECIPE_ID
+    assert reader["status"] == "stage_3_fe_contamination_penalized"
+    assert reader["score_components"]["stage_3_fe_kg"] == pytest.approx(0.1)
+    assert reader["score_components"]["fe_tap_Fe_kg"] == pytest.approx(7.0)
+    assert "delivered_stream_purity.margin" in reader["consumed_fields"]
+
+
+def test_sso2_objective_reader_fails_closed_on_missing_fe_tap_evidence() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 10.0},
+        ledger=_FakeSso2Ledger({"process.metal_phase": {"Fe": 3.0}}),
+    )
+
+    objectives = compute_objectives(_sso2_objective_profile(), execution)
+
+    assert objectives.as_mapping()[SSO2_OWNER_RECIPE_ID] == pytest.approx(0.0)
+    reader = objectives.evidence[SSO2_OWNER_RECIPE_ID]
+    assert reader["status"] == "missing_fe_tap_evidence"
+    assert reader["evidence"]["fe_tap"]["Fe_kg"] is None
+
+
+def test_sso2_objective_reader_fails_closed_on_missing_stage_purity() -> None:
+    snapshot = SimpleNamespace(hour=1, mass_balance_error_pct=0.0)
+    execution = SimpleNamespace(
+        simulator=SimpleNamespace(
+            atom_ledger=_FakeSso2Ledger({"terminal.drain_tap_material": {"Fe": 1.0}}),
+            species_formula_registry={},
+            product_ledger=lambda: {"Fe": 1.0},
+        ),
+        snapshots=(snapshot,),
+        trace=SimpleNamespace(snapshots=(snapshot,)),
+    )
+
+    score, reader = sso2_owner_recipe_objective_reader(execution)
+
+    assert score == pytest.approx(0.0)
+    assert reader["status"] == "missing_stage_purity_trace"
+    assert reader["evidence"]["stage_3"]["Fe_kg"] is None
 
 
 def test_product_summary_includes_input_output_yield_table_and_mass_closure() -> None:
