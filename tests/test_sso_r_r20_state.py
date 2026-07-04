@@ -20,6 +20,7 @@ from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.core import (
     FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
     FERRIC_DIVERGENCE_WARNING_THRESHOLD,
+    OXYGEN_MOLAR_MASS_KG_PER_MOL,
     OXYGEN_RESERVOIR_NOOP_MOL,
     PyrolysisSimulator,
 )
@@ -116,6 +117,10 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
         order.append("passive_exchange")
         return sim.melt.oxygen_reservoir
 
+    def fake_bubbler():
+        order.append("o2_bubbler")
+        return {}
+
     def fake_native_split(*, sample_time_h=None):
         order.append("native_split")
         return {}
@@ -146,6 +151,7 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
         )
 
     monkeypatch.setattr(sim, "_apply_oxygen_reservoir_exchange", fake_exchange)
+    monkeypatch.setattr(sim, "_apply_o2_bubbler", fake_bubbler)
     monkeypatch.setattr(sim, "_step_shuttle", lambda: order.append("c3_source"))
     monkeypatch.setattr(sim, "_apply_fe_redox_respeciation", fake_respeciation)
     monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", fake_native_split)
@@ -164,7 +170,10 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
     sim.step()
 
     assert order.count("passive_exchange") == 1
+    assert order.count("o2_bubbler") == 1
     assert order.count("fe_redox_respeciation") == 2
+    assert order.index("passive_exchange") < order.index("o2_bubbler")
+    assert order.index("o2_bubbler") < order.index("c3_source")
     assert order.index("passive_exchange") < order.index("evaporation")
     assert order.index("c3_source") < order.index("fe_redox_respeciation")
     assert order.index("fe_redox_respeciation") < order.index("native_split")
@@ -221,6 +230,11 @@ def test_step_orders_source_producers_before_native_split(
         "_apply_oxygen_reservoir_exchange",
         lambda: order.append("passive_exchange") or sim.melt.oxygen_reservoir,
     )
+    monkeypatch.setattr(
+        sim,
+        "_apply_o2_bubbler",
+        lambda: order.append("o2_bubbler") or {},
+    )
     monkeypatch.setattr(sim, producer_attr, fake_producer)
     monkeypatch.setattr(sim, "_apply_fe_redox_respeciation", fake_respeciation)
     monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", fake_native_split)
@@ -233,6 +247,8 @@ def test_step_orders_source_producers_before_native_split(
     sim.step()
 
     assert order.index("passive_exchange") < order.index(producer_marker)
+    assert order.index("passive_exchange") < order.index("o2_bubbler")
+    assert order.index("o2_bubbler") < order.index(producer_marker)
     assert order.index(producer_marker) < order.index("fe_redox_respeciation")
     assert order.index("fe_redox_respeciation") < order.index("native_split")
     assert order.index("native_split") < order.index("equilibrium")
@@ -388,6 +404,215 @@ def test_reductant_source_term_lowers_fO2_and_raises_native_drive() -> None:
     after_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
     assert after_fO2 < before_fO2
     assert after_native > before_native
+
+
+def _configure_o2_bubbler(
+    sim: PyrolysisSimulator,
+    *,
+    campaign: CampaignPhase = CampaignPhase.C4,
+    rate_kg_per_hr: float,
+    eta_absorb: float,
+    target_fO2_log: float,
+) -> None:
+    sim.melt.campaign = campaign
+    sim.campaign_mgr.overrides.setdefault(campaign.name, {}).update({
+        "o2_bubbler_kg_per_hr": rate_kg_per_hr,
+        "o2_bubbler_eta_absorb_default": eta_absorb,
+        "o2_bubbler_target_fO2_log": target_fO2_log,
+    })
+
+
+def _seed_o2_bubbler_redox_state(
+    sim: PyrolysisSimulator,
+    *,
+    fO2_log: float,
+    temperature_C: float = 1600.0,
+) -> None:
+    sim.melt.temperature_C = temperature_C
+    sim._refresh_oxygen_reservoir_without_exchange(
+        melt_intrinsic_fO2_log=fO2_log,
+        reference_T_K=temperature_C + 273.15,
+    )
+
+
+def test_o2_bubbler_reoxidizes_by_kress91_capacity_math() -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+    before = sim._current_melt_redox_fO2_log()
+    T_K = sim.melt.temperature_C + 273.15
+    capacity = sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=before,
+        T_K=T_K,
+    )
+    delta_log10 = 0.5
+    expected_absorbed_mol = capacity * math.log(10.0) * delta_log10
+    _configure_o2_bubbler(
+        sim,
+        rate_kg_per_hr=2.0 * expected_absorbed_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL,
+        eta_absorb=1.0,
+        target_fO2_log=before + delta_log10,
+    )
+
+    diagnostic = sim._apply_o2_bubbler()
+
+    assert diagnostic["reason"] == "applied"
+    assert diagnostic["absorbed_mol"] == pytest.approx(expected_absorbed_mol)
+    assert diagnostic["passthrough_mol"] == pytest.approx(0.0)
+    assert sim._current_melt_redox_fO2_log() - before == pytest.approx(
+        delta_log10
+    )
+    assert sim._o2_bubbler_absorbed_kg == pytest.approx(
+        expected_absorbed_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+    )
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    ) == pytest.approx(0.0)
+
+
+def test_o2_bubbler_cap_prevents_overoxidation_and_overhead_transition() -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-8.0)
+    before_transitions = len(sim.atom_ledger.transitions)
+    _configure_o2_bubbler(
+        sim,
+        rate_kg_per_hr=10.0,
+        eta_absorb=1.0,
+        target_fO2_log=-8.0,
+    )
+
+    diagnostic = sim._apply_o2_bubbler()
+
+    assert diagnostic["reason"] == "at_or_above_target"
+    assert diagnostic["injected_mol"] == pytest.approx(0.0)
+    assert sim._current_melt_redox_fO2_log() == pytest.approx(-8.0)
+    assert len(sim.atom_ledger.transitions) == before_transitions
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    ) == pytest.approx(0.0)
+
+
+def test_o2_bubbler_absent_config_is_inert_no_raise() -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+
+    diagnostic = sim._apply_o2_bubbler()
+
+    assert diagnostic["reason"] == "rate_absent"
+    assert diagnostic["injected_mol"] == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "reason"),
+    [
+        ("o2_bubbler_kg_per_hr", "bad-rate", "invalid_rate_kg_per_hr"),
+        ("o2_bubbler_eta_absorb_default", "bad-eta", "invalid_eta_absorb"),
+        ("o2_bubbler_target_fO2_log", "bad-target", "invalid_target_fO2_log"),
+    ],
+)
+def test_o2_bubbler_invalid_config_fails_closed_no_raise(
+    field: str,
+    value: object,
+    reason: str,
+) -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+    sim.melt.campaign = CampaignPhase.C4
+    overrides = sim.campaign_mgr.overrides.setdefault(CampaignPhase.C4.name, {})
+    overrides.update({
+        "o2_bubbler_kg_per_hr": 1.0,
+        "o2_bubbler_eta_absorb_default": 1.0,
+        "o2_bubbler_target_fO2_log": -9.5,
+        field: value,
+    })
+
+    diagnostic = sim._apply_o2_bubbler()
+
+    assert diagnostic["reason"] == reason
+    assert diagnostic["injected_mol"] == pytest.approx(0.0)
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    ) == pytest.approx(0.0)
+
+
+def test_o2_bubbler_passthrough_credits_overhead_without_absorbed_double_count() -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+    before = sim._current_melt_redox_fO2_log()
+    T_K = sim.melt.temperature_C + 273.15
+    capacity = sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=before,
+        T_K=T_K,
+    )
+    delta_log10 = 0.05
+    target_need_mol = capacity * math.log(10.0) * delta_log10
+    _configure_o2_bubbler(
+        sim,
+        rate_kg_per_hr=10.0 * target_need_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL,
+        eta_absorb=0.5,
+        target_fO2_log=before + delta_log10,
+    )
+    mre_o2_before = sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_mre_anode_stored"
+    ).get("O2", 0.0)
+
+    diagnostic = sim._apply_o2_bubbler()
+
+    overhead_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    )
+    assert diagnostic["absorbed_mol"] == pytest.approx(target_need_mol)
+    assert diagnostic["passthrough_mol"] == pytest.approx(target_need_mol)
+    assert overhead_o2 == pytest.approx(diagnostic["passthrough_mol"])
+    assert overhead_o2 != pytest.approx(diagnostic["injected_mol"])
+    assert sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_mre_anode_stored"
+    ).get("O2", 0.0) == pytest.approx(mre_o2_before)
+
+
+def test_o2_bubbler_raised_fo2_is_visible_to_equilibrium_path(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    sim.melt.campaign = CampaignPhase.C4
+    sim.melt.campaign_hour = 1
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+    target = -9.75
+    _configure_o2_bubbler(
+        sim,
+        rate_kg_per_hr=1.0,
+        eta_absorb=1.0,
+        target_fO2_log=target,
+    )
+    seen_fO2: list[float] = []
+
+    monkeypatch.setattr(sim, "_update_temperature", lambda: None)
+    monkeypatch.setattr(
+        sim,
+        "_apply_oxygen_reservoir_exchange",
+        lambda: sim.melt.oxygen_reservoir,
+    )
+    monkeypatch.setattr(sim, "_apply_fe_redox_respeciation", lambda **_kwargs: {})
+    monkeypatch.setattr(
+        sim,
+        "_apply_native_fe_saturation_split",
+        lambda **_kwargs: {},
+    )
+    monkeypatch.setattr(
+        sim,
+        "_get_equilibrium",
+        lambda: seen_fO2.append(sim._current_melt_redox_fO2_log())
+        or SimpleNamespace(),
+    )
+    monkeypatch.setattr(sim, "_calculate_evaporation", lambda _eq: EvaporationFlux())
+
+    sim.step()
+
+    assert seen_fO2
+    assert seen_fO2[-1] == pytest.approx(target)
 
 
 @pytest.mark.parametrize(

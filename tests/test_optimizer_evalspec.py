@@ -354,7 +354,7 @@ def test_o2_bubbler_nonzero_setting_splits_recipe_id_and_cache_key() -> None:
         profile,
         schema,
     )
-    bubbler_spec, _ = _build_eval_inputs(
+    bubbler_spec, bubbler_config = _build_eval_inputs(
         RecipePatch({O2_C3_RATE: 0.25}),
         "lunar_mare_low_ti",
         "stub",
@@ -364,6 +364,9 @@ def test_o2_bubbler_nonzero_setting_splits_recipe_id_and_cache_key() -> None:
 
     assert bubbler_spec.allowlist_version == allowlist_version
     assert bubbler_spec.o2_bubbler_settings == {"kg_per_hr": {"C3": 0.25}}
+    assert bubbler_config.runtime_campaign_overrides["C3"][
+        "o2_bubbler_kg_per_hr"
+    ] == pytest.approx(0.25)
     assert bubbler_spec.recipe_id != neutral_spec.recipe_id
     assert cache_key(bubbler_spec) != cache_key(neutral_spec)
     assert b"o2_bubbler_settings" in canonical_evalspec_json(bubbler_spec)

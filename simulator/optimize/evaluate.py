@@ -1466,6 +1466,65 @@ def _accepts_keyword(callable_obj: Any, keyword: str) -> bool:
     )
 
 
+def _merge_o2_bubbler_runtime_field(
+    campaign_overrides: dict[str, Any],
+    field: str,
+    value: float,
+    *,
+    campaign: str,
+) -> None:
+    existing = campaign_overrides.get(field)
+    if existing is not None and float(existing) != float(value):
+        raise EvaluationInputError(
+            "o2_bubbler_settings conflict with runtime_campaign_overrides "
+            f"{campaign}.{field}"
+        )
+    campaign_overrides[field] = float(value)
+
+
+def _run_options_with_o2_bubbler_settings(
+    run_options: Mapping[str, Any],
+    o2_bubbler_settings: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    rates = o2_bubbler_settings.get("kg_per_hr")
+    if not isinstance(rates, MappingABC) or not rates:
+        return run_options
+    merged = dict(run_options)
+    runtime_overrides = {
+        str(campaign): dict(fields)
+        for campaign, fields in dict(
+            run_options.get("runtime_campaign_overrides", {}) or {}
+        ).items()
+    }
+    eta = o2_bubbler_settings.get("eta_absorb_default")
+    target = o2_bubbler_settings.get("target_fO2_log")
+    for campaign, rate in rates.items():
+        campaign_name = str(campaign)
+        fields = runtime_overrides.setdefault(campaign_name, {})
+        _merge_o2_bubbler_runtime_field(
+            fields,
+            "o2_bubbler_kg_per_hr",
+            float(rate),
+            campaign=campaign_name,
+        )
+        if eta is not None:
+            _merge_o2_bubbler_runtime_field(
+                fields,
+                "o2_bubbler_eta_absorb_default",
+                float(eta),
+                campaign=campaign_name,
+            )
+        if target is not None:
+            _merge_o2_bubbler_runtime_field(
+                fields,
+                "o2_bubbler_target_fO2_log",
+                float(target),
+                campaign=campaign_name,
+            )
+    merged["runtime_campaign_overrides"] = MappingProxyType(runtime_overrides)
+    return MappingProxyType(merged)
+
+
 def _build_eval_inputs(
     patch: RecipePatch,
     feedstock_id: str,
@@ -1515,6 +1574,10 @@ def _build_eval_inputs(
         stage0_carbon_reductant_kg,
     ) = schema.redox_cleanup_doses_kg(patch)
     o2_bubbler_settings = schema.o2_bubbler_settings(patch)
+    run_options = _run_options_with_o2_bubbler_settings(
+        run_options,
+        o2_bubbler_settings,
+    )
     effective_allowlist_version = _effective_o2_bubbler_allowlist_version(
         patch.values,
         schema.allowlist_version,

@@ -429,6 +429,30 @@ class CampaignManager:
             return None
         return self._float(value, 0.0)
 
+    def o2_bubbler_controls(self, campaign: CampaignPhase) -> dict[str, object]:
+        cfg = self._campaign_config(campaign)
+        ovr = self._campaign_overrides(campaign)
+        return {
+            'o2_bubbler_kg_per_hr': ovr.get(
+                'o2_bubbler_kg_per_hr',
+                cfg.get('o2_bubbler_kg_per_hr'),
+            ),
+            'o2_bubbler_eta_absorb_default': ovr.get(
+                'o2_bubbler_eta_absorb_default',
+                self.setpoints.get(
+                    'o2_bubbler_eta_absorb_default',
+                    cfg.get('o2_bubbler_eta_absorb_default'),
+                ),
+            ),
+            'o2_bubbler_target_fO2_log': ovr.get(
+                'o2_bubbler_target_fO2_log',
+                self.setpoints.get(
+                    'o2_bubbler_target_fO2_log',
+                    cfg.get('o2_bubbler_target_fO2_log'),
+                ),
+            ),
+        }
+
     def _pressure_config_float(self,
                                config: Mapping[str, object],
                                scalar_key: str,

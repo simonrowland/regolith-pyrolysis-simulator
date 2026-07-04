@@ -1152,6 +1152,8 @@ class PyrolysisRun:
         internal_intents = {"backend_equilibrium"}
         if not getattr(sim, "_c7_product_report", None):
             internal_intents.add("ca_aluminothermic_step")
+        if not self._requests_o2_bubbler_runtime():
+            internal_intents.add("oxygen_bubbler")
         capability = {
             intent: slots
             for intent, slots in capability.items()
@@ -1167,6 +1169,19 @@ class PyrolysisRun:
             "requested": echoed,
             "registry": _json_safe(capability),
         }
+
+    def _requests_o2_bubbler_runtime(self) -> bool:
+        for fields in dict(self.runtime_campaign_overrides).values():
+            if not isinstance(fields, Mapping):
+                continue
+            raw_rate = fields.get("o2_bubbler_kg_per_hr")
+            try:
+                rate = float(raw_rate)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(rate) and rate > 0.0:
+                return True
+        return False
 
 
 # ----------------------------------------------------------------------

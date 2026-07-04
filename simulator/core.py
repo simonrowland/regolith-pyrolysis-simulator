@@ -604,6 +604,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.O2_vented_cumulative_kg = 0.0      # Total O₂ vented to vacuum
         self.O2_stored_cumulative_kg = 0.0      # Total O₂ in accumulator
         self._mre_anode_O2_kg_this_hr = 0.0
+        self._o2_bubbler_injected_kg = 0.0
+        self._o2_bubbler_absorbed_kg = 0.0
+        self._o2_bubbler_passthrough_kg = 0.0
+        self._o2_bubbler_vented_kg = 0.0
+        self._o2_bubbler_overhead_passthrough_pending_kg = 0.0
+        self._o2_bubbler_injected_cumulative_kg = 0.0
+        self._o2_bubbler_absorbed_cumulative_kg = 0.0
+        self._o2_bubbler_passthrough_cumulative_kg = 0.0
+        self._o2_bubbler_vented_cumulative_kg = 0.0
+        self._last_o2_bubbler_diagnostic: Dict[str, Any] = {
+            'status': 'ok',
+            'reason': 'not_run',
+        }
         self._last_nominal_ramp = 0.0           # Campaign ramp before throttle
         self._last_actual_ramp = 0.0            # Ramp after throttle applied
         self._last_throttle_reason = ''         # Why ramp was throttled
@@ -853,6 +866,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.O2_vented_cumulative_kg = 0.0
         self.O2_stored_cumulative_kg = 0.0
         self._mre_anode_O2_kg_this_hr = 0.0
+        self._o2_bubbler_injected_kg = 0.0
+        self._o2_bubbler_absorbed_kg = 0.0
+        self._o2_bubbler_passthrough_kg = 0.0
+        self._o2_bubbler_vented_kg = 0.0
+        self._o2_bubbler_overhead_passthrough_pending_kg = 0.0
+        self._o2_bubbler_injected_cumulative_kg = 0.0
+        self._o2_bubbler_absorbed_cumulative_kg = 0.0
+        self._o2_bubbler_passthrough_cumulative_kg = 0.0
+        self._o2_bubbler_vented_cumulative_kg = 0.0
+        self._last_o2_bubbler_diagnostic = {
+            'status': 'ok',
+            'reason': 'not_run',
+        }
         self._last_nominal_ramp = 0.0
         self._last_actual_ramp = 0.0
         self._last_throttle_reason = ''
@@ -1116,6 +1142,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             False,
             'OVERHEAD_BLEED -- AUTHORITATIVE: pure-move routing from '
             'overhead_gas to terminal offgas / melt-offgas O2 bins.',
+        ),
+        (
+            'engines.builtin.oxygen_bubbler',
+            'BuiltinOxygenBubblerProvider',
+            (ChemistryIntent.OXYGEN_BUBBLER,),
+            False,
+            'OXYGEN_BUBBLER -- AUTHORITATIVE: unabsorbed bubbler O2 '
+            'moves from reservoir.fo2_buffer to process.overhead_gas.',
         ),
         (
             'engines.builtin.oxygen_reservoir_exchange',
@@ -3326,6 +3360,232 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.oxygen_reservoir = reservoir
         self._sync_oxygen_reservoir_mirror()
         return reservoir
+
+    @staticmethod
+    def _finite_float_or_none(value: object) -> float | None:
+        if value is None:
+            return None
+        try:
+            result = float(value)
+        except (TypeError, ValueError):
+            return None
+        return result if math.isfinite(result) else None
+
+    def _o2_bubbler_target_fO2_log(
+        self,
+        raw_target_fO2_log: object,
+    ) -> tuple[float | None, str]:
+        explicit = self._finite_float_or_none(raw_target_fO2_log)
+        if explicit is not None:
+            return explicit, 'explicit_fO2_log'
+        if raw_target_fO2_log is not None:
+            return None, 'invalid_target_fO2_log'
+        atmosphere_name = str(getattr(self.melt.atmosphere, 'name', '') or '')
+        if atmosphere_name not in {
+            'CONTROLLED_O2',
+            'CONTROLLED_O2_FLOW',
+            'O2_BACKPRESSURE',
+        }:
+            return None, 'no_target_for_uncontrolled_atmosphere'
+        pO2_mbar = self._finite_float_or_none(getattr(self.melt, 'pO2_mbar', None))
+        if pO2_mbar is None or pO2_mbar <= 0.0:
+            return None, 'no_positive_controlled_pO2'
+        return math.log10(pO2_mbar / 1000.0), 'controlled_o2_pO2_mbar'
+
+    def _reset_o2_bubbler_telemetry_for_hour(self) -> None:
+        self._o2_bubbler_injected_kg = 0.0
+        self._o2_bubbler_absorbed_kg = 0.0
+        self._o2_bubbler_passthrough_kg = 0.0
+        self._o2_bubbler_vented_kg = 0.0
+        self._o2_bubbler_overhead_passthrough_pending_kg = 0.0
+        self._last_o2_bubbler_diagnostic = {
+            'status': 'ok',
+            'reason': 'not_run',
+        }
+
+    def _apply_o2_bubbler(self) -> Dict[str, Any]:
+        controls = self.campaign_mgr.o2_bubbler_controls(self.melt.campaign)
+        raw_rate = controls.get('o2_bubbler_kg_per_hr')
+        raw_eta = controls.get('o2_bubbler_eta_absorb_default')
+        raw_target = controls.get('o2_bubbler_target_fO2_log')
+        rate_kg_hr = self._finite_float_or_none(raw_rate)
+        if rate_kg_hr is None:
+            if raw_rate is None:
+                reason = 'rate_absent'
+            else:
+                reason = 'invalid_rate_kg_per_hr'
+            diagnostic = {'status': 'ok', 'reason': reason, 'injected_mol': 0.0}
+            self._last_o2_bubbler_diagnostic = diagnostic
+            return diagnostic
+        rate_kg_hr = max(0.0, rate_kg_hr)
+
+        if raw_eta is None:
+            eta_absorb = 0.75
+        else:
+            eta_absorb = self._finite_float_or_none(raw_eta)
+            if eta_absorb is None:
+                diagnostic = {
+                    'status': 'ok',
+                    'reason': 'invalid_eta_absorb',
+                    'rate_kg_per_hr': rate_kg_hr,
+                    'raw_eta_absorb': raw_eta,
+                    'injected_mol': 0.0,
+                }
+                self._last_o2_bubbler_diagnostic = diagnostic
+                return diagnostic
+        if eta_absorb < 0.0 or eta_absorb > 1.0:
+            diagnostic = {
+                'status': 'ok',
+                'reason': 'invalid_eta_absorb',
+                'rate_kg_per_hr': rate_kg_hr,
+                'eta_absorb': eta_absorb,
+                'injected_mol': 0.0,
+            }
+            self._last_o2_bubbler_diagnostic = diagnostic
+            return diagnostic
+
+        target_fO2_log, target_source = self._o2_bubbler_target_fO2_log(raw_target)
+        if target_fO2_log is None:
+            diagnostic = {
+                'status': 'ok',
+                'reason': target_source,
+                'rate_kg_per_hr': rate_kg_hr,
+                'eta_absorb': eta_absorb,
+                'injected_mol': 0.0,
+            }
+            self._last_o2_bubbler_diagnostic = diagnostic
+            return diagnostic
+
+        T_K = float(self.melt.temperature_C) + 273.15
+        commanded_mol = rate_kg_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL
+        self._re_reference_melt_fO2_to_temperature(T_K)
+        current_fO2_log = self._current_melt_redox_fO2_log()
+        C_m = self._melt_redox_capacity_mol_per_ln_fO2(
+            fO2_log=current_fO2_log,
+            T_K=T_K,
+        )
+        target_need_mol = max(
+            0.0,
+            C_m * math.log(10.0) * (target_fO2_log - current_fO2_log),
+        )
+        reason = 'applied'
+        actual_injected_mol = 0.0
+        absorbed_mol = 0.0
+        passthrough_mol = 0.0
+        if rate_kg_hr <= 0.0:
+            reason = 'rate_zero'
+        elif commanded_mol <= 0.0:
+            reason = 'commanded_zero'
+        elif C_m <= 0.0:
+            reason = 'no_melt_redox_capacity'
+        elif target_need_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+            reason = 'at_or_above_target'
+        else:
+            eta_for_cap = max(eta_absorb, 1.0e-12)
+            actual_injected_mol = min(commanded_mol, target_need_mol / eta_for_cap)
+            absorbed_mol = min(actual_injected_mol * eta_absorb, target_need_mol)
+            passthrough_mol = max(0.0, actual_injected_mol - absorbed_mol)
+            if actual_injected_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+                reason = 'below_threshold'
+
+        if absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+            self._apply_oxygen_reservoir_redox_source_terms(
+                {'redox_source:o2_bubbler': absorbed_mol},
+                exchange_direction='redox_source:o2_bubbler',
+                temperature_K=T_K,
+            )
+        if passthrough_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+            result = self._dispatch_and_commit(
+                ChemistryIntent.OXYGEN_BUBBLER,
+                control_inputs={
+                    'injected_mol': actual_injected_mol,
+                    'absorbed_mol': absorbed_mol,
+                    'passthrough_mol': passthrough_mol,
+                    'source': 'redox_source:o2_bubbler',
+                },
+            )
+            if result.transition is None:
+                self._chem_no_op_dispatch_count += 1
+            self._refresh_oxygen_reservoir_without_exchange(
+                exchange_direction='redox_source:o2_bubbler:passthrough',
+            )
+
+        injected_kg = actual_injected_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        absorbed_kg = absorbed_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        passthrough_kg = passthrough_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        self._o2_bubbler_injected_kg = injected_kg
+        self._o2_bubbler_absorbed_kg = absorbed_kg
+        self._o2_bubbler_passthrough_kg = passthrough_kg
+        self._o2_bubbler_overhead_passthrough_pending_kg = passthrough_kg
+        self._o2_bubbler_injected_cumulative_kg = (
+            float(getattr(self, '_o2_bubbler_injected_cumulative_kg', 0.0) or 0.0)
+            + injected_kg
+        )
+        self._o2_bubbler_absorbed_cumulative_kg = (
+            float(getattr(self, '_o2_bubbler_absorbed_cumulative_kg', 0.0) or 0.0)
+            + absorbed_kg
+        )
+        self._o2_bubbler_passthrough_cumulative_kg = (
+            float(
+                getattr(
+                    self,
+                    '_o2_bubbler_passthrough_cumulative_kg',
+                    0.0,
+                )
+                or 0.0
+            )
+            + passthrough_kg
+        )
+        diagnostic = {
+            'status': 'ok',
+            'reason': reason,
+            'rate_kg_per_hr': rate_kg_hr,
+            'eta_absorb': eta_absorb,
+            'target_fO2_log': target_fO2_log,
+            'target_source': target_source,
+            'current_fO2_log_before': current_fO2_log,
+            'melt_redox_capacity_mol_per_ln_fO2': C_m,
+            'commanded_mol': commanded_mol,
+            'target_need_mol': target_need_mol,
+            'injected_mol': actual_injected_mol,
+            'absorbed_mol': absorbed_mol,
+            'passthrough_mol': passthrough_mol,
+            'injected_kg': injected_kg,
+            'absorbed_kg': absorbed_kg,
+            'passthrough_kg': passthrough_kg,
+        }
+        self._last_o2_bubbler_diagnostic = diagnostic
+        return diagnostic
+
+    def _attribute_o2_bubbler_vented_from_bleed(
+        self,
+        bleed_result: IntentResult | None,
+    ) -> None:
+        pending_kg = max(
+            0.0,
+            float(
+                getattr(
+                    self,
+                    '_o2_bubbler_overhead_passthrough_pending_kg',
+                    0.0,
+                )
+                or 0.0
+            ),
+        )
+        if pending_kg <= 0.0 or bleed_result is None:
+            return
+        diagnostic = dict(bleed_result.diagnostic or {})
+        vented_kg = max(0.0, float(diagnostic.get('o2_vented_kg', 0.0) or 0.0))
+        attributed = min(pending_kg, vented_kg)
+        self._o2_bubbler_vented_kg = attributed
+        self._o2_bubbler_vented_cumulative_kg = (
+            float(getattr(self, '_o2_bubbler_vented_cumulative_kg', 0.0) or 0.0)
+            + attributed
+        )
+        self._o2_bubbler_overhead_passthrough_pending_kg = max(
+            0.0,
+            pending_kg - float(diagnostic.get('bled_o2_kg', 0.0) or 0.0),
+        )
 
     def _reset_redox_source_diagnostics_for_hour(self) -> None:
         self._redox_source_terms_this_hr = {}
@@ -8270,16 +8530,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         1. Check if paused for a decision
         2. Update temperature (ramp toward campaign target)
         3. Apply passive oxygen-reservoir exchange from carried-in headspace
-        4. Commit C3/MRE/C6/C7 source-producing reactions
-        5. Repartition FeO/Fe2O3 from the post-source redox state
-        6. Apply native-Fe split from the re-speciated melt state
-        7. Refresh thermodynamic equilibrium (via melt backend)
-        8. Calculate evaporation flux and route it through condensation
-        9. Repartition any evaporation-induced FeO/Fe2O3 redox shift
-        10. Update overhead gas & turbine pressure
-        11. Calculate energy consumption this hour
-        12. Check campaign endpoint criteria
-        13. Record snapshot
+        4. Apply configured O2 bubbler redox source/pass-through
+        5. Commit C3/MRE/C6/C7 source-producing reactions
+        6. Repartition FeO/Fe2O3 from the post-source redox state
+        7. Apply native-Fe split from the re-speciated melt state
+        8. Refresh thermodynamic equilibrium (via melt backend)
+        9. Calculate evaporation flux and route it through condensation
+        10. Repartition any evaporation-induced FeO/Fe2O3 redox shift
+        11. Update overhead gas & turbine pressure
+        12. Calculate energy consumption this hour
+        13. Check campaign endpoint criteria
+        14. Record snapshot
 
         Returns:
             HourSnapshot with full system state at this hour
@@ -8293,6 +8554,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_extraction_completeness_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
         self._reset_redox_source_diagnostics_for_hour()
+        self._reset_o2_bubbler_telemetry_for_hour()
 
         # --- 1. Decision check ---
         if self.paused_for_decision:
@@ -8314,6 +8576,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 2. Temperature ramp and carried-in passive exchange ---
         self._update_temperature()
         self._apply_oxygen_reservoir_exchange()
+        self._apply_o2_bubbler()
 
         c3_shuttle_campaign = self.melt.campaign in (
             CampaignPhase.C3_K, CampaignPhase.C3_NA,
@@ -8416,6 +8679,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if finite_headspace_enabled:
             bleed_result = self._dispatch_overhead_bleed(
                 turbine_spec=turbine_spec)
+            self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
             self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
             bleed_diag = dict(bleed_result.diagnostic or {})
             melt_offgas_O2_kg_hr = float(
@@ -8441,11 +8705,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Track cumulative O₂ vented and stored
         if not finite_headspace_enabled:
-            self._dispatch_overhead_bleed(
+            bleed_result = self._dispatch_overhead_bleed(
                 turbine_spec=turbine_spec,
                 force_drain_all=True,
                 o2_vented_kg=self.overhead.O2_vented_kg_hr,
             )
+            self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
             self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
         self._sync_oxygen_kg_counters()
 
