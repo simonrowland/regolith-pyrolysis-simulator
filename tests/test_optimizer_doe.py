@@ -90,18 +90,34 @@ def _assert_pressure_defaults_are_jointly_feasible(
     schema: RecipeSchema,
     patches: tuple[RecipePatch, ...],
 ) -> None:
+    c2a_pairs = schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2
     pressure_pairs = tuple(schema.PRESSURE_COUPLED_DEFAULT_PAIRS) + tuple(
-        schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items()
+        c2a_pairs.items()
     )
     for patch in patches:
         for po2_path, total_path in pressure_pairs:
             if po2_path not in patch.values or total_path not in patch.values:
                 continue
-            assert patch.values[po2_path] <= patch.values[total_path], (
+            po2 = patch.values[po2_path]
+            total = patch.values[total_path]
+            if po2_path in c2a_pairs:
+                mode_path = po2_path[:-1] + ("gas_cover_mode",)
+                mode = patch.values.get(mode_path, "pn2_sweep")
+                if mode == "pn2_sweep":
+                    assert po2 < total, (
+                        ".".join(po2_path),
+                        po2,
+                        ".".join(total_path),
+                        total,
+                        ".".join(mode_path),
+                        mode,
+                    )
+                    continue
+            assert po2 <= total, (
                 ".".join(po2_path),
-                patch.values[po2_path],
+                po2,
                 ".".join(total_path),
-                patch.values[total_path],
+                total,
             )
 
 

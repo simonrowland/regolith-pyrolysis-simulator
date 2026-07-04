@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -99,8 +100,14 @@ def _changed_paths(previous: Candidate, current: Candidate) -> set[tuple[str, ..
     return {
         path
         for path in previous.patch.values
-        if previous.patch.values[path] != current.patch.values[path]
+        if _meaningfully_changed(previous.patch.values[path], current.patch.values[path])
     }
+
+
+def _meaningfully_changed(previous: object, current: object) -> bool:
+    if isinstance(previous, float) and isinstance(current, float):
+        return not math.isclose(previous, current, rel_tol=1e-12, abs_tol=1e-12)
+    return previous != current
 
 
 class _BadObjectives:

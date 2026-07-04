@@ -657,9 +657,22 @@ def _condition_pressure_pair_values(
         else:
             po2 = _pressure_fallback_value(schema, po2_path, fallbacks)
 
+        requires_positive_carrier = _requires_positive_carrier(
+            schema, po2_path, values, fallbacks
+        )
         if total_sampled and not po2_sampled:
-            feasible_low = max(total_low, po2)
+            minimum_total = (
+                math.nextafter(po2, math.inf) if requires_positive_carrier else po2
+            )
+            feasible_low = max(total_low, minimum_total)
             _raise_if_infeasible(
+                total_path,
+                feasible_low,
+                total_high,
+                total_path,
+                "pressure_total_pair_infeasible_bounds",
+            )
+            _raise_if_strictly_infeasible(
                 total_path,
                 feasible_low,
                 total_high,
@@ -677,7 +690,18 @@ def _condition_pressure_pair_values(
         if total_sampled:
             total = float(values[total_path])
         feasible_high = min(po2_high, total)
+        if requires_positive_carrier:
+            # `pn2_sweep` needs p_total > pO2. Remap the same unit draw into
+            # the nearest representable open interval; no rejection or redraw.
+            feasible_high = math.nextafter(feasible_high, -math.inf)
         _raise_if_infeasible(
+            po2_path,
+            po2_low,
+            feasible_high,
+            total_path,
+            "pressure_default_pair_infeasible_bounds",
+        )
+        _raise_if_strictly_infeasible(
             po2_path,
             po2_low,
             feasible_high,
@@ -696,6 +720,22 @@ def _pressure_coupled_pairs(schema: RecipeSchema) -> tuple[tuple[KeyPath, KeyPat
     return tuple(schema.PRESSURE_COUPLED_DEFAULT_PAIRS) + tuple(
         schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items()
     )
+
+
+def _requires_positive_carrier(
+    schema: RecipeSchema,
+    po2_path: KeyPath,
+    values: Mapping[KeyPath, Any],
+    fallback_values: Mapping[KeyPath, Any],
+) -> bool:
+    if po2_path not in schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2:
+        return False
+    mode_path = po2_path[:-1] + ("gas_cover_mode",)
+    if mode_path in values:
+        return str(values[mode_path]) == "pn2_sweep"
+    if mode_path in fallback_values:
+        return str(fallback_values[mode_path]) == "pn2_sweep"
+    return True
 
 
 def _sample_interval(
@@ -754,6 +794,20 @@ def _raise_if_infeasible(
 ) -> None:
     tolerance = max(1e-12, 1e-12 * max(1.0, abs(low), abs(high)))
     if high + tolerance < low:
+        raise ValueError(
+            f"{code}: {'.'.join(sampled_path)} low {low:.12g} exceeds "
+            f"{'.'.join(limit_path)} constrained high {high:.12g}"
+        )
+
+
+def _raise_if_strictly_infeasible(
+    sampled_path: KeyPath,
+    low: float,
+    high: float,
+    limit_path: KeyPath,
+    code: str,
+) -> None:
+    if high < low:
         raise ValueError(
             f"{code}: {'.'.join(sampled_path)} low {low:.12g} exceeds "
             f"{'.'.join(limit_path)} constrained high {high:.12g}"

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 import json
+import math
 from pathlib import Path
 import sqlite3
 import subprocess
@@ -652,7 +653,9 @@ def test_joint_refine_conditions_c2a_staged_pressure_pair_at_boundary() -> None:
     total_path = tuple(
         "campaigns.C2A_staged.stages.sio_window.p_total_mbar".split(".")
     )
-    boundary_patch = RecipePatch({po2_path: 15.0, total_path: 15.0}).validated(SCHEMA)
+    boundary_patch = RecipePatch(
+        {po2_path: math.nextafter(15.0, -math.inf), total_path: 15.0}
+    ).validated(SCHEMA)
     member = strategy._archive[0]
     boundary_node = replace(
         member.node,
@@ -666,7 +669,7 @@ def test_joint_refine_conditions_c2a_staged_pressure_pair_at_boundary() -> None:
 
     assert joint_candidates
     for candidate in joint_candidates:
-        assert candidate.patch.values[po2_path] <= candidate.patch.values[total_path]
+        assert candidate.patch.values[po2_path] < candidate.patch.values[total_path]
         candidate.patch.validated(SCHEMA)
 
 

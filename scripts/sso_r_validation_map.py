@@ -47,6 +47,8 @@ OWNER_RECIPE_MAX_ESCAPE_FRACTION = 1.0e-3
 OWNER_RECIPE_T_C = 1650.0
 OWNER_RECIPE_PO2_MBAR = 1.0e-6
 OWNER_RECIPE_PN2_MBAR = 10.0
+OWNER_CERTIFICATION_ASSERTION = "owner_pN2_recipe_point_requested_pO2_semantics"
+MAP_LIVE_PARITY_ASSERTION = "map_live_semantics_parity"
 MAP_LIVE_PARITY_PO2_ABS_TOL_BAR = 1.0e-15
 MAP_LIVE_PARITY_SIO_REL_TOL = 1.0e-9
 MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR = 1.0e-12
@@ -778,6 +780,12 @@ def _nondecreasing(values: list[float], *, tolerance: float = 1.0e-12) -> bool:
     return all(values[i + 1] + tolerance >= values[i] for i in range(len(values) - 1))
 
 
+def _certification_pass(assertions_by_name: Mapping[str, Mapping[str, Any]]) -> bool:
+    owner = assertions_by_name.get(OWNER_CERTIFICATION_ASSERTION, {})
+    parity = assertions_by_name.get(MAP_LIVE_PARITY_ASSERTION, {})
+    return bool(owner.get("passed")) and bool(parity.get("passed"))
+
+
 def evaluate_assertions(
     rows: list[dict[str, Any]],
     anchors: list[dict[str, Any]],
@@ -1004,6 +1012,7 @@ def evaluate_assertions(
         map_live_semantics_parity_pass,
         map_live_detail,
     )
+    assertions_by_name = {a["name"]: a for a in assertions}
 
     passing_target_rows = [
         r for r in rows
@@ -1016,7 +1025,7 @@ def evaluate_assertions(
     first_T = min((float(r["temperature_C"]) for r in passing_target_rows), default=None)
     add(
         "grind_ready_target_window",
-        first_T is not None and map_live_semantics_parity_pass,
+        first_T is not None and _certification_pass(assertions_by_name),
         (
             f"first_passing_T_C={first_T}; window under PN2 sweep transport "
             f"semantics; live parity={'confirmed' if map_live_semantics_parity_pass else 'missing'}"
@@ -1139,11 +1148,11 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
     assertions = list(payload["assertions"])
     assertions_by_name = {a["name"]: a for a in assertions}
     owner_assertion = assertions_by_name.get(
-        "owner_pN2_recipe_point_requested_pO2_semantics",
+        OWNER_CERTIFICATION_ASSERTION,
         {"passed": False, "detail": "owner assertion missing"},
     )
     map_live_parity = assertions_by_name.get(
-        "map_live_semantics_parity",
+        MAP_LIVE_PARITY_ASSERTION,
         {"passed": False, "detail": "live parity assertion missing"},
     )
     grid = dict(payload["grid"])
@@ -1213,9 +1222,9 @@ def write_markdown(payload: Mapping[str, Any], path: Path, *, command: str) -> N
         "map_live_semantics_parity", {"passed": False, "detail": "missing"}
     )
     owner_classification = str(
-        (payload.get("owner_pn2_row") or {}).get("classification")
-        or ("certification_pass" if parity_assertion["passed"] else
-            "current_physics_blocker")
+        "certification_pass"
+        if _certification_pass(assertions_by_name)
+        else "current_physics_blocker"
     )
     moved_pin_rows = [
         [
@@ -1386,14 +1395,8 @@ def golden_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         ],
         key=lambda row: row["requested_pN2_mbar"],
     )
-    owner_pass = next(
-        a
-        for a in payload["assertions"]
-        if a["name"] == "owner_pN2_recipe_point_requested_pO2_semantics"
-    )["passed"]
-    live_parity_pass = next(
-        a for a in payload["assertions"] if a["name"] == "map_live_semantics_parity"
-    )["passed"]
+    assertions_by_name = {a["name"]: a for a in payload["assertions"]}
+    certification_pass = _certification_pass(assertions_by_name)
     return {
         "schema_version": GOLDEN_SCHEMA_VERSION,
         "source_commit": payload["commit"],
@@ -1414,10 +1417,10 @@ def golden_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             ],
             "stage_3_Fe_wt_pct": owner["stage_3_Fe_wt_pct"],
             "SiO_flux_kg_hr": owner["SiO_flux_kg_hr"],
-            "owner_recipe_pass": owner_pass and live_parity_pass,
+            "owner_recipe_pass": certification_pass,
             "classification": (
                 "certification_pass"
-                if owner_pass and live_parity_pass
+                if certification_pass
                 else "current_physics_blocker"
             ),
         },

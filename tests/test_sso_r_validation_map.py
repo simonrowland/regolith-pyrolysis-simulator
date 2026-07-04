@@ -38,6 +38,19 @@ def _calibrated_inputs():
     return setpoints, feedstocks, vapor_pressures, calibration
 
 
+def _is_owner_recipe_row(row):
+    return (
+        row["temperature_C"] == pytest.approx(validation_map.OWNER_RECIPE_T_C)
+        and row["requested_pO2_mbar"] == pytest.approx(validation_map.OWNER_RECIPE_PO2_MBAR)
+        and row["requested_pN2_mbar"] == pytest.approx(validation_map.OWNER_RECIPE_PN2_MBAR)
+        and row["dose_fraction_of_full_FeO_equiv"] == pytest.approx(1.0)
+    )
+
+
+def _owner_recipe_row(payload):
+    return next(row for row in payload["rows"] if _is_owner_recipe_row(row))
+
+
 def test_manual_fO2_anchors_match_native_fe_design_window():
     anchors = {
         anchor["fO2_log"]: anchor
@@ -400,6 +413,91 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     assert "first_passing_T_C=" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
     assert "live parity=confirmed" in window["detail"]
+
+
+def test_certification_surfaces_require_owner_pass_and_live_parity(
+    smoke_payload,
+    tmp_path,
+):
+    rows = []
+    for row in smoke_payload["rows"]:
+        updated = dict(row)
+        if _is_owner_recipe_row(updated):
+            updated["native_fe_vapor_escape_fraction_of_pool"] = (
+                validation_map.OWNER_RECIPE_MAX_ESCAPE_FRACTION * 10.0
+            )
+        rows.append(updated)
+    assertions = validation_map.evaluate_assertions(
+        rows,
+        smoke_payload["manual_fO2_anchors"],
+        expected_rows=validation_map.expected_grid_count(smoke=True),
+        grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
+        live_owner_probe=smoke_payload["live_owner_probe"],
+    )
+    payload = dict(smoke_payload)
+    payload["rows"] = rows
+    payload["assertions"] = assertions
+    report_path = tmp_path / "sso-r-report.md"
+
+    by_name = {a["name"]: a for a in assertions}
+    assert by_name["owner_pN2_recipe_point_requested_pO2_semantics"]["passed"] is False
+    assert by_name["map_live_semantics_parity"]["passed"] is True
+    assert by_name["grind_ready_target_window"]["passed"] is False
+    validation_map.write_markdown(payload, report_path, command="pytest synthetic")
+    report = report_path.read_text(encoding="utf-8")
+    assert "classification=current_physics_blocker; live parity=confirmed" in report
+    golden = validation_map.golden_payload(payload)
+    assert golden["owner_pn2_row"]["owner_recipe_pass"] is False
+    assert golden["owner_pn2_row"]["classification"] == "current_physics_blocker"
+
+
+def test_map_live_semantics_parity_tolerances_bind(smoke_payload, monkeypatch):
+    owner = _owner_recipe_row(smoke_payload)
+    canonical_pO2_abs_tol_bar = 1.0e-15
+    canonical_sio_rel_tol = 1.0e-9
+    canonical_sio_abs_tol_kg_hr = 1.0e-12
+    assert validation_map.MAP_LIVE_PARITY_PO2_ABS_TOL_BAR <= canonical_pO2_abs_tol_bar
+    assert validation_map.MAP_LIVE_PARITY_SIO_REL_TOL <= canonical_sio_rel_tol
+    assert (
+        validation_map.MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR
+        <= canonical_sio_abs_tol_kg_hr
+    )
+    live_probe = dict(smoke_payload["live_owner_probe"])
+    live_probe["SiO_provider_pO2_bar"] = (
+        owner["SiO_provider_pO2_bar"] + canonical_pO2_abs_tol_bar * 10.0
+    )
+    live_probe["SiO_flux_kg_hr"] = (
+        owner["SiO_flux_kg_hr"]
+        + max(
+            canonical_sio_abs_tol_kg_hr * 10.0,
+            abs(owner["SiO_flux_kg_hr"]) * canonical_sio_rel_tol * 10.0,
+        )
+    )
+
+    assertions = validation_map.evaluate_assertions(
+        smoke_payload["rows"],
+        smoke_payload["manual_fO2_anchors"],
+        expected_rows=validation_map.expected_grid_count(smoke=True),
+        grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
+        live_owner_probe=live_probe,
+    )
+    assert _assertion({"assertions": assertions}, "map_live_semantics_parity")[
+        "passed"
+    ] is False
+
+    monkeypatch.setattr(validation_map, "MAP_LIVE_PARITY_PO2_ABS_TOL_BAR", 1.0)
+    monkeypatch.setattr(validation_map, "MAP_LIVE_PARITY_SIO_REL_TOL", 1.0)
+    monkeypatch.setattr(validation_map, "MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR", 1.0)
+    widened_assertions = validation_map.evaluate_assertions(
+        smoke_payload["rows"],
+        smoke_payload["manual_fO2_anchors"],
+        expected_rows=validation_map.expected_grid_count(smoke=True),
+        grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
+        live_owner_probe=live_probe,
+    )
+    assert _assertion({"assertions": widened_assertions}, "map_live_semantics_parity")[
+        "passed"
+    ] is True
 
 
 def test_distilled_golden_fixture_matches_current_anchors(smoke_payload):

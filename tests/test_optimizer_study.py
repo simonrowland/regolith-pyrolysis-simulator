@@ -132,19 +132,36 @@ def _scope_spec() -> EvalSpec:
 
 def _assert_candidate_pressure_pairs_valid(candidates: list[Any]) -> None:
     schema = RecipeSchema()
+    c2a_pairs = schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2
     pressure_pairs = tuple(schema.PRESSURE_COUPLED_DEFAULT_PAIRS) + tuple(
-        schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items()
+        c2a_pairs.items()
     )
     for candidate in candidates:
         for po2_path, total_path in pressure_pairs:
             if po2_path not in candidate.patch.values or total_path not in candidate.patch.values:
                 continue
-            assert candidate.patch.values[po2_path] <= candidate.patch.values[total_path], (
+            po2 = candidate.patch.values[po2_path]
+            total = candidate.patch.values[total_path]
+            if po2_path in c2a_pairs:
+                mode_path = po2_path[:-1] + ("gas_cover_mode",)
+                mode = candidate.patch.values.get(mode_path, "pn2_sweep")
+                if mode == "pn2_sweep":
+                    assert po2 < total, (
+                        candidate.id,
+                        ".".join(po2_path),
+                        po2,
+                        ".".join(total_path),
+                        total,
+                        ".".join(mode_path),
+                        mode,
+                    )
+                    continue
+            assert po2 <= total, (
                 candidate.id,
                 ".".join(po2_path),
-                candidate.patch.values[po2_path],
+                po2,
                 ".".join(total_path),
-                candidate.patch.values[total_path],
+                total,
             )
 
 

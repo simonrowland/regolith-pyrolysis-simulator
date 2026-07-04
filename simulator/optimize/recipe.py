@@ -1590,6 +1590,13 @@ def _validate_pressure_default_pairs(
         else:
             total = float(_default_setpoint_value(C2A_STAGED_P_TOTAL_MBAR_DEFAULT_PATH))
             total_source = "C2A_staged YAML default"
+        mode_path = po2_path[:-1] + ("gas_cover_mode",)
+        if mode_path in values:
+            gas_cover_mode = str(values[mode_path])
+            gas_cover_mode_source = "patched"
+        else:
+            gas_cover_mode = "pn2_sweep"
+            gas_cover_mode_source = "C2A_staged default"
         _validate_pressure_pair(
             po2_path,
             po2,
@@ -1598,6 +1605,9 @@ def _validate_pressure_default_pairs(
             total,
             total_source,
             "set both pO2_mbar and p_total_mbar knobs for this C2A_staged stage",
+            gas_cover_mode_path=mode_path,
+            gas_cover_mode=gas_cover_mode,
+            gas_cover_mode_source=gas_cover_mode_source,
         )
 
 
@@ -1609,6 +1619,10 @@ def _validate_pressure_pair(
     total: float,
     total_source: str,
     guidance: str,
+    *,
+    gas_cover_mode_path: KeyPath | None = None,
+    gas_cover_mode: str | None = None,
+    gas_cover_mode_source: str = "",
 ) -> None:
     tolerance = max(1e-12, 1e-12 * max(1.0, abs(po2), abs(total)))
     if po2 - total > tolerance:
@@ -1617,6 +1631,16 @@ def _validate_pressure_pair(
             f"{_format_path(po2_path)}={po2:.12g} ({po2_source}) > "
             f"{_format_path(total_path)}={total:.12g} ({total_source}); "
             "oxygen partial pressure cannot exceed total pressure; "
+            f"{guidance}"
+        )
+    if gas_cover_mode == "pn2_sweep" and total <= po2:
+        mode_path = gas_cover_mode_path or total_path[:-1] + ("gas_cover_mode",)
+        raise RecipeValidationError(
+            "recipe_pressure_pn2_sweep_requires_positive_carrier: "
+            f"{_format_path(total_path)}={total:.12g} ({total_source}) must be "
+            f"strictly greater than {_format_path(po2_path)}={po2:.12g} "
+            f"({po2_source}) when {_format_path(mode_path)}=pn2_sweep "
+            f"({gas_cover_mode_source or 'unspecified'}); implied pN2_mbar must be > 0; "
             f"{guidance}"
         )
 

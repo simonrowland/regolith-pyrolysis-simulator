@@ -667,6 +667,37 @@ def test_c2a_staged_stage_gas_knobs_fail_loudly() -> None:
         RecipePatch({STAGE_SIO_PO2: 12.0}).validated(schema)
 
 
+def test_c2a_staged_pn2_sweep_requires_positive_carrier_floor() -> None:
+    schema = RecipeSchema()
+
+    with pytest.raises(
+        RecipeValidationError,
+        match="recipe_pressure_pn2_sweep_requires_positive_carrier",
+    ):
+        RecipePatch(
+            {
+                STAGE_SIO_PO2: 10.0,
+                STAGE_SIO_PTOTAL: 10.0,
+                STAGE_SIO_GAS_MODE: "pn2_sweep",
+            }
+        ).validated(schema)
+
+    RecipePatch(
+        {
+            STAGE_SIO_PO2: 9.999,
+            STAGE_SIO_PTOTAL: 10.0,
+            STAGE_SIO_GAS_MODE: "pn2_sweep",
+        }
+    ).validated(schema)
+    RecipePatch(
+        {
+            STAGE_SIO_PO2: 10.0,
+            STAGE_SIO_PTOTAL: 10.0,
+            STAGE_SIO_GAS_MODE: "po2_hold",
+        }
+    ).validated(schema)
+
+
 def test_c2a_staged_stage_gas_defaults_are_empty_patch_neutral() -> None:
     schema = RecipeSchema()
     source_setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
