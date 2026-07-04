@@ -3,6 +3,8 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping
 
+from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+
 
 class Kress91InvalidControls(ValueError):
     """Invalid finite-control input for the Kress91 Fe-redox relation."""
@@ -201,17 +203,27 @@ def _validate_kress91_controls(
             )
 
 
-def floor_vacuum_pressure_bar(pressure_bar: float) -> float:
+def floor_vacuum_pressure_bar(
+    pressure_bar: float,
+    *,
+    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+) -> float:
     """Floor a FINITE non-positive (vacuum) pressure to the Kress91 numerical
-    floor 1e-9, but pass NON-finite pressure through unchanged so the Kress91
+    floor, but pass NON-finite pressure through unchanged so the Kress91
     chokepoint validator (_validate_kress91_controls) refuses it.
 
-    `max(p, 1e-9)` silently masks -inf (returns 1e-9), hiding an invalid
+    `max(p, floor)` silently masks -inf (returns floor), hiding an invalid
     control.
     """
     p = float(pressure_bar)
     if math.isfinite(p) and p <= 0.0:
-        return 1.0e-9
+        floor = float(floor_bar)
+        if not math.isfinite(floor) or floor <= 0.0:
+            raise Kress91InvalidControls(
+                'Kress91 invalid control pressure_floor_bar: expected finite'
+                f' positive value, got {floor_bar!r}'
+            )
+        return floor
     return p
 
 
@@ -502,6 +514,7 @@ def _kress91_ferrous_feo_activity_raw(
     fO2_log: float,
     T_K: float,
     pressure_bar: float,
+    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
     feot = feot_equivalent_wt_pct(comp_wt)
     if feot <= 0.0:
@@ -514,8 +527,8 @@ def _kress91_ferrous_feo_activity_raw(
     # (engines/builtin/vapor_pressure.py passes request.pressure_bar UNFLOORED),
     # which legitimately runs at pressure_bar == 0.0 at furnace vacuum. Kress91's
     # pressure terms are a high-pressure (GPa) petrologic correction, negligible
-    # at furnace mbar pressures, so a non-positive overhead pressure is floored to
-    # 1e-9 here (FeO activity is pressure-insensitive in this regime) rather than
+    # at furnace mbar pressures, so a non-positive overhead pressure is floored here
+    # (FeO activity is pressure-insensitive in this regime) rather than
     # refused. NON-FINITE pressure is deliberately left unfloored (isfinite gate)
     # so NaN/inf still raises through the _validate_kress91_controls chokepoint.
     # kress91_split, by contrast, serves the redox-split path where pressure is a
@@ -524,7 +537,10 @@ def _kress91_ferrous_feo_activity_raw(
     # a class-incompleteness. (A prior fold removed this clamp on that mistaken
     # premise and broke every vacuum evaporation golden — see test
     # test_kress91_ferrous_feo_activity_vacuum_pressure_is_floored_not_refused.)
-    pressure_control = floor_vacuum_pressure_bar(pressure_bar)
+    pressure_control = floor_vacuum_pressure_bar(
+        pressure_bar,
+        floor_bar=floor_bar,
+    )
     split = kress91_split(
         fO2_log=fO2_log,
         mol_fractions=mol_fractions,
@@ -550,12 +566,14 @@ def kress91_ferrous_feo_activity(
     fO2_log: float,
     T_K: float,
     pressure_bar: float,
+    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
     components = _calphad_feo_activity_components(
         comp_wt=comp_wt,
         fO2_log=fO2_log,
         T_K=T_K,
         pressure_bar=pressure_bar,
+        floor_bar=floor_bar,
     )
     return max(0.0, float(components.get('a_FeO_authoritative', 0.0) or 0.0))
 
@@ -566,12 +584,14 @@ def _calphad_feo_activity_components(
     fO2_log: float,
     T_K: float,
     pressure_bar: float,
+    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> dict[str, object]:
     kress91_activity = _kress91_ferrous_feo_activity_raw(
         comp_wt=comp_wt,
         fO2_log=fO2_log,
         T_K=T_K,
         pressure_bar=pressure_bar,
+        floor_bar=floor_bar,
     )
     mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
     if not mol_fractions or mol_fractions.get('FeOt', 0.0) <= 0.0:
@@ -587,7 +607,10 @@ def _calphad_feo_activity_components(
             'sources': FEO_ACTIVITY_DIAGNOSTIC_SOURCES,
         }
 
-    pressure_control = floor_vacuum_pressure_bar(pressure_bar)
+    pressure_control = floor_vacuum_pressure_bar(
+        pressure_bar,
+        floor_bar=floor_bar,
+    )
     split = kress91_split(
         fO2_log=fO2_log,
         mol_fractions=mol_fractions,
@@ -759,12 +782,14 @@ def calphad_ferrous_feo_activity_diagnostic(
     fO2_log: float,
     T_K: float,
     pressure_bar: float,
+    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> dict[str, object]:
     return _calphad_feo_activity_components(
         comp_wt=comp_wt,
         fO2_log=fO2_log,
         T_K=T_K,
         pressure_bar=pressure_bar,
+        floor_bar=floor_bar,
     )
 
 

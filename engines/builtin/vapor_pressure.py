@@ -52,6 +52,7 @@ from engines.builtin._common import (
     composition_wt_pct_from_account_view,
     diagnostic_control_audit,
     reject_wrong_intent,
+    resolve_request_vacuum_floor_bar,
     resolve_transport_pO2_bar,
 )
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
@@ -619,6 +620,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 diagnostic={"vapor_pressures_Pa": {}, "activities": {}},
             )
 
+        vacuum_floor_bar = resolve_request_vacuum_floor_bar(request)
         transport_pO2_bar = self._resolve_transport_pO2_bar(request)
         controls = request.control_inputs or {}
         intrinsic_fO2_log_supplied = (
@@ -644,6 +646,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 fO2_log=intrinsic_fO2_log,
                 T_K=T_K,
                 pressure_bar=request.pressure_bar,
+                floor_bar=vacuum_floor_bar,
             )
 
         vapor_pressures: dict[str, float] = {}
@@ -729,6 +732,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     fO2_log=intrinsic_fO2_log,
                     T_K=T_K,
                     pressure_bar=request.pressure_bar,
+                    floor_bar=vacuum_floor_bar,
                 )
             else:
                 a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
@@ -916,13 +920,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 pO2_scaled = True
 
             # SiO suppression by pO2: p(SiO) ~ 1/sqrt(pO2). Reference is
-            # 1e-9 bar (lunar hard vacuum).
+            # the body/environment vacuum floor.
             if (
                 name == 'SiO'
                 and not pO2_exponent
-                and transport_pO2_bar > 1e-9
+                and transport_pO2_bar > vacuum_floor_bar
             ):
-                suppression = math.sqrt(1e-9 / transport_pO2_bar)
+                suppression = math.sqrt(vacuum_floor_bar / transport_pO2_bar)
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa * suppression,
                     species=name,
@@ -971,6 +975,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
             "activities": activities,
             "pO2_bar": transport_pO2_bar,
+            "vacuum_floor_bar": vacuum_floor_bar,
             "extrapolated_beyond_valid_range_K": {
                 **metal_extrapolations,
                 **oxide_vapor_extrapolations,
@@ -1007,7 +1012,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         numerical vacuum floor.
         """
 
-        return resolve_transport_pO2_bar(request, floor_bar=1e-9)
+        return resolve_transport_pO2_bar(request)
 
     def _resolve_intrinsic_melt_fO2_log(
         self,

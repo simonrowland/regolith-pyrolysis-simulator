@@ -30,6 +30,7 @@ from typing import Any, Mapping, Optional
 
 from engines.builtin._common import (
     reject_wrong_intent,
+    resolve_request_vacuum_floor_bar,
     resolve_transport_pO2_bar,
 )
 from engines.vaporock.result import VapoRockDiagnostics
@@ -216,7 +217,7 @@ class VapoRockProvider(ChemistryProvider):
         so a parity comparison against the builtin path sees the same
         pO2 input.
         """
-        return resolve_transport_pO2_bar(request, floor_bar=1e-9)
+        return resolve_transport_pO2_bar(request)
 
     @staticmethod
     def _resolve_fO2_log(request: IntentRequest) -> float:
@@ -224,13 +225,13 @@ class VapoRockProvider(ChemistryProvider):
         controls = request.control_inputs or {}
         if controls.get('pO2_bar') is not None:
             return float(
-                math.log10(resolve_transport_pO2_bar(request, floor_bar=1e-9))
+                math.log10(resolve_transport_pO2_bar(request))
             )
         if request.fO2_log is not None:
             return float(
-                math.log10(resolve_transport_pO2_bar(request, floor_bar=1e-9))
+                math.log10(resolve_transport_pO2_bar(request))
             )
-        return -9.0
+        return math.log10(resolve_request_vacuum_floor_bar(request))
 
     @staticmethod
     def _control_audit(

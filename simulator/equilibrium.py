@@ -13,6 +13,7 @@ from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     kress91_ferrous_feo_activity,
 )
+from simulator.environment import vacuum_floor_bar_for_environment
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.state import GAS_CONSTANT, Atmosphere
 
@@ -26,17 +27,23 @@ _O2_CONTROLLED_ATMOSPHERES = frozenset({
     Atmosphere.O2_BACKPRESSURE,
 })
 
-# Numerical floor on pO₂ (bar). This is a divide-by-zero guard for the
-# 1/√pO₂ SiO suppression and the K/pO₂ Ellingham term -- NOT a synthetic
-# setpoint. ~10⁻⁹ bar is also the physical lunar hard-vacuum reference.
-_PO2_VACUUM_FLOOR_BAR = 1e-9
-
-
 class EquilibriumMixin:
     def _get_equilibrium(self):
         raise NotImplementedError(
             "backend equilibrium must be supplied by the simulator class "
             "using AtomLedger mol inputs"
+        )
+
+    def _vacuum_floor_bar(self) -> float:
+        ambient_pressure_bar = (
+            float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0)
+            / 1000.0
+        )
+        return vacuum_floor_bar_for_environment(
+            body=getattr(self.melt, 'body', ''),
+            ambient_pressure_bar=(
+                ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
+            ),
         )
 
     def _commanded_pO2_bar(self) -> float:
@@ -60,8 +67,8 @@ class EquilibriumMixin:
             actively O₂-controlled mode (turbine + bleed holding the
             setpoint).  An uncontrolled HARD_VACUUM / PN2_SWEEP run gets no
             synthetic floor -- its effective pO₂ collapses to the
-            numerical vacuum floor below for the whole campaign.
-          - A hard numerical floor (``_PO2_VACUUM_FLOOR_BAR``) guards the
+              numerical vacuum floor below for the whole campaign.
+          - A hard numerical floor (``self._vacuum_floor_bar()``) guards the
             1/√pO₂ and K/pO₂ divisions; it is not a setpoint.
 
         With finite headspace enabled, melt-offgas O₂ remains in
@@ -84,15 +91,15 @@ class EquilibriumMixin:
             # Re-apply melt.pO2_mbar as a floor in actively-controlled
             # atmospheres so a recipe pO2 setpoint still gates SiO suppression
             # via 1/sqrt(pO2). Uncontrolled HARD_VACUUM / PN2_SWEEP runs get
-            # NO synthetic floor — they collapse to _PO2_VACUUM_FLOOR_BAR.
+            # NO synthetic floor — they collapse to the environment floor.
             if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
                 pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-            return max(pO2_bar, _PO2_VACUUM_FLOOR_BAR)
+            return max(pO2_bar, self._vacuum_floor_bar())
 
         pO2_bar = self.overhead.composition.get('O2', 0.0) / 1000.0
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
             pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
-        return max(pO2_bar, _PO2_VACUUM_FLOOR_BAR)
+        return max(pO2_bar, self._vacuum_floor_bar())
 
     def _headspace_transport_pO2_bar(self) -> float:
         """O2 transport reservoir pO2 consumed by SiO/vapor transport."""
@@ -104,7 +111,7 @@ class EquilibriumMixin:
                 or 0.0
             )
             if pO2_bar > 0.0:
-                return max(pO2_bar, _PO2_VACUUM_FLOOR_BAR)
+                return max(pO2_bar, self._vacuum_floor_bar())
         return self._commanded_pO2_bar()
 
     # --- Ellingham thermodynamic data for oxide equilibrium ---        [ELLI]
@@ -275,12 +282,13 @@ class EquilibriumMixin:
                 intrinsic_fO2_log = float(getattr(self.melt, 'fO2_log', -9.0))
         else:
             intrinsic_fO2_log = float(intrinsic_fO2_value)
-        # Vacuum-floor via the shared -inf-safe helper, NOT max(p, 1e-9): max
-        # silently masks a -inf pressure as 1e-9, hiding it from the Kress91
+        # Vacuum-floor via the shared -inf-safe helper, NOT max(p, floor): max
+        # silently masks a -inf pressure as finite, hiding it from the Kress91
         # chokepoint validator reached through kress91_ferrous_feo_activity below.
-        # Finite vacuum (<=0) still floors to 1e-9; finite-positive passes through.
+        # Finite vacuum (<=0) still floors; finite-positive passes through.
         pressure_bar = floor_vacuum_pressure_bar(
-            float(self.melt.p_total_mbar) / 1000.0
+            float(self.melt.p_total_mbar) / 1000.0,
+            floor_bar=self._vacuum_floor_bar(),
         )
 
         # --- Melt composition for oxide activities ---
@@ -290,6 +298,7 @@ class EquilibriumMixin:
             fO2_log=intrinsic_fO2_log,
             T_K=T_K,
             pressure_bar=pressure_bar,
+            floor_bar=self._vacuum_floor_bar(),
         )
 
         # ================================================================
@@ -536,14 +545,18 @@ class EquilibriumMixin:
 
             # SiO suppression by pO₂: p(SiO) ∝ 1/√pO₂         [THERMO-8]
             #
-            # The Antoine equation gives P_SiO at hard vacuum
-            # (pO₂ ≈ 10⁻⁹ bar).  At higher pO₂, the equilibrium
+            # The Antoine equation gives P_SiO at the environment vacuum
+            # floor.  At higher pO₂, the equilibrium
             # shifts toward SiO₂, suppressing SiO vapor:
-            #   At 10⁻⁹ bar:  suppression = 1.0  (reference)
-            #   At 10⁻⁶ bar:  suppression ≈ 0.032 (31× suppression)
-            #   At 10⁻³ bar:  suppression ≈ 0.001 (1000× suppression)
-            if name == 'SiO' and not pO2_exponent and pO2_bar > 1e-9:
-                suppression = math.sqrt(1e-9 / pO2_bar)
+            #   At floor:     suppression = 1.0  (reference)
+            #   At 10^-6 bar: suppression follows sqrt(floor / pO2)
+            vacuum_floor_bar = self._vacuum_floor_bar()
+            if (
+                name == 'SiO'
+                and not pO2_exponent
+                and pO2_bar > vacuum_floor_bar
+            ):
+                suppression = math.sqrt(vacuum_floor_bar / pO2_bar)
                 P_sat = _require_finite_vapor_value(
                     P_sat * suppression,
                     species=name,

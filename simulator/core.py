@@ -78,6 +78,7 @@ from simulator.condensation_routing import (
 )
 from simulator.cost_ledger import CostImportContext, CostLedger
 from simulator.feedstock_guard import assert_feedstock_loadable
+from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
 from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
@@ -317,7 +318,6 @@ BACKEND_ACCOUNT_SCOPED_ONLY = (
 )
 OXYGEN_MOLAR_MASS_KG_PER_MOL = MOLAR_MASS[OXYGEN_SPECIES] / 1000.0
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
-OXYGEN_RESERVOIR_FLOOR_BAR = 1e-9
 OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
 # Coarse absolute ferric-fraction tripwire until SSO-R ch2 re-speciation
 # samples implied and ledger speciation at the same boundary.
@@ -822,6 +822,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fs.get('atmosphere')
             or environment.get('atmosphere')
             or '')
+        self.melt.body = feedstock_body(fs)
         self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
         self.melt.pO2_mbar = 0.0
         base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
@@ -2697,13 +2698,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
     def _headspace_floor_o2_mol(self) -> float:
-        return self._headspace_o2_mol_for_pO2_bar(OXYGEN_RESERVOIR_FLOOR_BAR)
+        return self._headspace_o2_mol_for_pO2_bar(self._vacuum_floor_bar())
 
     def _effective_headspace_floor_o2_mol(self) -> float:
         return self._headspace_o2_mol_for_pO2_bar(
             max(
                 self._headspace_control_floor_pO2_bar(),
-                OXYGEN_RESERVOIR_FLOOR_BAR,
+                self._vacuum_floor_bar(),
             )
         )
 
@@ -2759,7 +2760,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return max(
             incoming_sweep_pO2,
             residual_pO2,
-            OXYGEN_RESERVOIR_FLOOR_BAR,
+            self._vacuum_floor_bar(),
         )
 
     def _headspace_transport_pO2_bar_from_ledger(
@@ -2777,7 +2778,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return max(
             float(ledger_pO2_bar),
             self._headspace_control_floor_pO2_bar(),
-            OXYGEN_RESERVOIR_FLOOR_BAR,
+            self._vacuum_floor_bar(),
         )
 
     def _refresh_oxygen_reservoir_transport_pO2_for_vapor(
@@ -2857,7 +2858,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 0.0
         comp = self._melt_oxide_wt_pct()
         pressure_bar = floor_vacuum_pressure_bar(
-            float(self.melt.p_total_mbar) / 1000.0
+            float(self.melt.p_total_mbar) / 1000.0,
+            floor_bar=self._vacuum_floor_bar(),
         )
         eps_log10 = 0.001
         eps_ln = math.log(10.0) * eps_log10
@@ -3942,7 +3944,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return reservoir
 
         x_m = base_fO2_log * math.log(10.0)
-        effective_transport_pO2 = max(transport_pO2, OXYGEN_RESERVOIR_FLOOR_BAR)
+        effective_transport_pO2 = max(transport_pO2, self._vacuum_floor_bar())
         if not math.isfinite(effective_transport_pO2) or effective_transport_pO2 <= 0.0:
             raise AccountingError(
                 'oxygen reservoir exchange requires finite positive transport pO2; '
@@ -4075,7 +4077,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else float(self.melt.temperature_C) + 273.15
         )
         if T_K <= 0.0:
-            return -9.0
+            return math.log10(self._vacuum_floor_bar())
         comp = self._melt_oxide_wt_pct()
         feo = max(0.0, float(comp.get('FeO', 0.0)))
         fe2o3 = max(0.0, float(comp.get('Fe2O3', 0.0)))
@@ -4102,7 +4104,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if feo > 0.0 and fe2o3 > 0.0:
             redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
         redox_offset += min(0.15, alkali * 0.01)
-        return max(-9.0, min(0.0, log_iw + redox_offset))
+        return max(
+            math.log10(self._vacuum_floor_bar()),
+            min(0.0, log_iw + redox_offset),
+        )
 
     def _compute_fe_redox_split_diagnostic(
         self,
@@ -4122,9 +4127,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         )
         pressure_bar = floor_vacuum_pressure_bar(
-            float(self.overhead.pressure_mbar) * 1.0e-3
+            float(self.overhead.pressure_mbar) * 1.0e-3,
+            floor_bar=self._vacuum_floor_bar(),
         )
-        log_iw = -27215.0 / T_K + 6.57 if T_K > 0.0 else -9.0
+        log_iw = (
+            -27215.0 / T_K + 6.57
+            if T_K > 0.0
+            else math.log10(self._vacuum_floor_bar())
+        )
         base = {
             'fO2_log': float(fO2_log),
             'temperature_K': float(T_K),
@@ -5903,11 +5913,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     getattr(self.melt, 'fO2_log', -9.0),
                 )
         intrinsic_fO2_log = float(intrinsic_fO2_log)
+        vacuum_floor = (
+            float(self._vacuum_floor_bar())
+            if callable(getattr(self, '_vacuum_floor_bar', None))
+            else DEFAULT_VACUUM_FLOOR_BAR
+        )
+        ambient_pressure_bar = (
+            float(getattr(self.melt, 'ambient_pressure_mbar', 0.0) or 0.0)
+            / 1000.0
+        )
         kernel_result = self._dispatch_only(
             ChemistryIntent.VAPOR_PRESSURE,
             control_inputs={
                 'pO2_bar': pO2_bar,
                 'intrinsic_fO2_log': intrinsic_fO2_log,
+                'vacuum_floor_bar': vacuum_floor,
+                'body': getattr(self.melt, 'body', ''),
+                'ambient_pressure_bar': (
+                    ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
+                ),
             },
             fO2_log=intrinsic_fO2_log,
         )

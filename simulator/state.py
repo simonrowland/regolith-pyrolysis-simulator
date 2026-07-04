@@ -17,6 +17,7 @@ from typing import Any, Dict, Iterable, List, Tuple
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.condensation_routing import target_species_for_stage_number
+from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 
 # ============================================================================
 # SECTION 1: CONSTANTS
@@ -364,7 +365,7 @@ class DecisionType(Enum):
 
 class Atmosphere(Enum):
     """Atmosphere above the melt."""
-    HARD_VACUUM = auto()      # pO₂ ~1e-9 bar (C0)
+    HARD_VACUUM = auto()      # Body/environment vacuum floor (C0)
     CONTROLLED_O2 = auto()    # pO₂ managed by turbine + bleed (C2B, C3, C4)
     PN2_SWEEP = auto()        # Recirculating N₂ at 5-15 mbar (C2A)
     O2_BACKPRESSURE = auto()  # O₂ at 0.01-0.1 bar (C5 MRE)
@@ -441,8 +442,8 @@ class ProcessInventory:
 class OxygenReservoirState:
     melt_intrinsic_fO2_log: float = -9.0
     reference_T_K: float | None = None
-    headspace_ledger_pO2_bar: float = 1e-9
-    headspace_transport_pO2_bar: float = 1e-9
+    headspace_ledger_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
+    headspace_transport_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
     headspace_control_floor_pO2_bar: float = 0.0
     k_O_m_s: float = 0.0
     k_O_source: str = ""
@@ -503,6 +504,7 @@ class MeltState:
     ambient_pressure_mbar: float = 0.0
     # Site pressure floor for bodies without hard vacuum, e.g. Mars ~6 mbar.
     ambient_atmosphere: str = ''
+    body: str = ''
     background_gas_species: str = ''
     # Lab/preset carrier gas species used to populate overhead gas state.
     background_gas_mole_fraction: float = 0.0

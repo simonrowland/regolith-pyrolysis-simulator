@@ -13,8 +13,8 @@ suppression — the √pO₂ dependence in the equilibrium:
 
     SiO₂(melt) → SiO(g) + ½O₂(g)
 
-gives >300× suppression of SiO vapor pressure when
-pO₂ is raised from hard vacuum (~1e-9 bar) to ~1 mbar.
+gives strong suppression of SiO vapor pressure when
+pO₂ is raised from the body/environment vacuum floor to ~1 mbar.
 
 Pipe conductance (Poiseuille viscous flow at mbar pressures):
     C = π × d⁴ × p̄ / (128 × η × L)                       [PIPE-1]

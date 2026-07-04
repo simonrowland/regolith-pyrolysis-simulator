@@ -350,7 +350,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # PHYSICS_GATE_VERSION v3 bump — the latter is the INTENDED semantic
     # invalidation: pre-S2c cached feasibility verdicts must not be served
     # under the new provenance-completeness gate (milestone-3 L2-P2).
-    assert cache_key(spec) == "8daa588cfef249fc6c095b1fa761ca6b489fc626493812decb9bfd9539057950"
+    # 2026-07-04 (CF-1 env-vacuum-floor): source-fingerprint move — new
+    # simulator/environment.py (body->vacuum-floor) + env-set floor in
+    # vapor_pressure/equilibrium/fe_redox/core. Behaviorally neutral (unknown
+    # body defaults to the old 1e-9; all reduced-real output goldens byte-
+    # identical); only the source-module digest moves. Provenance rebaseline.
+    assert cache_key(spec) == "daab79ca24a8b73c6ef6e47d8f39b22731b35faf6bf1ef01c058cdd791237aeb"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

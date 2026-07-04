@@ -25,6 +25,10 @@ from simulator.chemistry.kernel.dto import (
     IntentResult,
     ProviderAccountView,
 )
+from simulator.environment import (
+    DEFAULT_VACUUM_FLOOR_BAR,
+    vacuum_floor_bar_for_environment,
+)
 
 
 def reject_wrong_intent(
@@ -316,11 +320,12 @@ def diagnostic_control_audit(
 def resolve_transport_pO2_bar(
     request: IntentRequest,
     *,
-    floor_bar: float = 1e-9,
+    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
     """Resolve vapor-transport pO2 without hiding invalid explicit controls."""
 
     controls = request.control_inputs or {}
+    floor_bar = resolve_request_vacuum_floor_bar(request, floor_bar=floor_bar)
     if "pO2_bar" in controls and controls.get("pO2_bar") is not None:
         raw_pO2 = controls.get("pO2_bar")
         try:
@@ -362,3 +367,43 @@ def resolve_transport_pO2_bar(
         return pO2_bar
 
     return floor_bar
+
+
+def resolve_request_vacuum_floor_bar(
+    request: IntentRequest,
+    *,
+    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+) -> float:
+    """Resolve the applicable vacuum floor from controls or caller default."""
+
+    controls = request.control_inputs or {}
+    explicit_floor = controls.get("vacuum_floor_bar")
+    if explicit_floor is not None:
+        try:
+            resolved_floor = float(explicit_floor)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"vacuum_floor_bar must be numeric, got {explicit_floor!r}"
+            ) from exc
+        if not math.isfinite(resolved_floor) or resolved_floor <= 0.0:
+            raise ValueError(
+                "vacuum_floor_bar must be finite and > 0, "
+                f"got {explicit_floor!r}"
+            )
+        return resolved_floor
+
+    body = controls.get("body")
+    ambient_pressure_bar = controls.get("ambient_pressure_bar")
+    if body is not None or ambient_pressure_bar is not None:
+        return vacuum_floor_bar_for_environment(
+            body=body,
+            ambient_pressure_bar=ambient_pressure_bar,
+        )
+
+    try:
+        resolved_floor = float(floor_bar)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"floor_bar must be numeric, got {floor_bar!r}") from exc
+    if not math.isfinite(resolved_floor) or resolved_floor <= 0.0:
+        raise ValueError(f"floor_bar must be finite and > 0, got {floor_bar!r}")
+    return resolved_floor
