@@ -7,7 +7,7 @@
 # Population notes, audit tallies, and the encode-next backlog live in the sidecar, NOT here:
 #   docs/chemistry-provenance.notes.md
 #
-# Audit (human or agent), one command: scripts/audit_chemistry_provenance.py  [TO BUILD]
+# Audit (human or agent), one command: python3 scripts/audit_chemistry_provenance.py --strict
 #   (a) every `value` matches the number at each of its `code_sites`;
 #   (b) every grounded chemistry coefficient in the code has an entry here;
 #   (c) reports counts per `tier` and every open `gap`.
@@ -50,31 +50,33 @@ values:
     uncertainty: "NaO0.5 +/-2.2e-4, KO0.5 +/-5.5e-5 (Sossi 2019); table envelope NaO0.5 8.4e-4-2.2e-3, KO0.5 6.3e-5-7.1e-4"
     chosen:
       ref: REF-013   # Sossi et al. 2019, Geochim. Cosmochim. Acta 260:204-231
-      locus: "§4.5.1, Tables 3-4 (gamma_NaO0.5=1.0e-3, gamma_KO0.5=2.2e-4 at 1673 K); reaction MO0.5(l)=M(g)+1/4 O2"   # exact table page: verify in corpus (t-106)
+      locus: "GCA 260:204-231, §4.5.1 and Tables 3-4 (Table 4 gamma_NaO0.5=1.0e-3, gamma_KO0.5=2.2e-4 at 1673 K); reaction MO0.5(l)=M(g)+1/4 O2"
       url: "https://doi.org/10.1016/j.gca.2019.06.021"
-      corpus: "docs-private/deep-research/literature/sossi-2019-gca-hkl-evaporation/source.md"
+      corpus: "docs-private/deep-research/literature/sossi-2019-gca-hkl-evaporation/mineru/source/vlm/source.md"
       why: >-
-        Primary KEMS on a ferrobasalt (lunar analog); reports gamma on the correct single-cation NaO0.5
-        basis, Raoultian, with the explicit reaction and logK*; VALUE corroborated by DeMaria 1971 lunar
-        KEMS and the Sossi & Fegley 2018 compilation.
+        Primary 1-atm gas-mixing furnace evaporation experiments on a ferrobasalt (lunar analog),
+        with LA-ICP-MS residual-glass analyses and HKL/logK* fitting; reports gamma on the correct
+        single-cation NaO0.5 basis, Raoultian, with the explicit reaction and logK*; VALUE
+        corroborated by DeMaria 1971 lunar KEMS and the Sossi & Fegley 2018 compilation.
     alternatives:
       - ref: REF-019   # Sossi & Fegley 2018, Rev. Mineral. Geochem. 84:393-459
         locus: "Table 2, NaO0.5 & KO0.5 rows (pp. 409-410); Raoultian def Eqn 24 (p. 413); reaction Eqn 25 (p. 413); gamma(T) Fig 5 (p. 414)"
         value: "NaO0.5 8.4e-4-2.2e-3 @1673 K (Mathieu et al. 2011); KO0.5 6.3e-5-7.1e-4 @1573 K (Hastie et al. 1981)"
         url: "https://doi.org/10.2138/rmg.2018.84.11"
-        corpus: "docs-private/deep-research/literature/sossi-fegley-2018-volatility/source.md — Table 2 :1244, Eqn 24 :1533, Eqn 25 :1547, Fig 5 :1577"
+        corpus: "docs-private/deep-research/literature/sossi-fegley-2018-volatility/mineru/source/vlm/source.md — Table 2 :1244, Eqn 24 :1533, Eqn 25 :1547, Fig 5 :1577"
         lacks: "review compilation, not the primary; the NaO0.5 datum is from a CMS melt (Mathieu 2011), not a lunar-analog ferrobasalt"
-      - ref: "DeMaria et al. 1971, Apollo 12022 KEMS — add to references.yaml as REF-041"
+      - ref: REF-049
+        note: "DeMaria et al. 1971 Apollo 12022 KEMS; bibliography record is REF-049, DOI blank, ADS bibcode tracked in references.yaml."
         locus: "Fig 1 (p_Na vs 1/T), Fig 2 (p_K vs 1/T); Proc. 2nd Lunar Sci. Conf., vol. 2, pp. 1367-1380"   # exact page/URL: verify (t-106)
         value: "direct p_Na=3.2e-2 Pa @1538 K (melt 0.36 wt% Na2O); gamma_NaO0.5~1e-3 via S&F derivation"
-        url: "NASA ADS bibcode to verify (t-106); DOI-less proceedings"
-        corpus: "docs-private/deep-research/literature/demaria-1971-apollo-12022-kems/source.md"
+        url: "NASA ADS bibcode 1971LPSC....2.1367D; DOI-less proceedings"
+        corpus: "docs-private/deep-research/literature/demaria-1971-apollo-12022-kems/mineru/source/vlm/source.md"
         lacks: "does not tabulate gamma directly (reports p_Na, p_K). IS the LUNAR primary + the ideal VALIDATION case (our exact feedstock) — used to CHECK the model, not as the gamma source."
       - ref: "Bencze & Yazhenskikh 2016, gasifier-slag KEMS"
-        locus: "Table S-I (ln p(Pa)=A-B/T fits); corpus source.md"
+        locus: "Table S-I (ln p(Pa)=A-B/T fits); MinerU OCR corpus path below."
         value: "p_Na(1773 K calc)=2.77e-2 Pa on a Na2O 2-cation activity basis"
         url: ""
-        corpus: "docs-private/deep-research/literature/bencze-yazhenskikh-2016-gasifier-slag-kems-si/source.md"
+        corpus: "docs-private/deep-research/literature/bencze-yazhenskikh-2016-gasifier-slag-kems-si/mineru/source/vlm/source.md"
         lacks: "wrong feedstock (gasifier slag, not silicate/lunar); Na2O di-cation basis (not single-cation NaO0.5); degenerate aNa2O extrapolation"
     code_sites:
       - "pending: CF-3 rework (t-003) — engines/builtin/vapor_pressure.py MELT_OXIDE_ACTIVITY_COEFFICIENTS, rebuilt on the single-cation-linear basis"
@@ -104,7 +106,7 @@ values:
     uncertainty: "JANAF evaluated, species-specific; typical assessed uncertainty is order 0.1-2 kJ/mol, with per-table details in the source."
     chosen:
       ref: REF-020
-      locus: "NIST-JANAF species tables for the listed metals and oxides, Monograph 9."
+      locus: "NIST-JANAF Monograph 9 species tables: metal latent rows Na(l)->Na(g), K(l)->K(g), Mg(l)->Mg(g), Fe(l)->Fe(g), Ca(l)->Ca(g), Al(l)->Al(g), Si(l)->Si(g), Ti(l)->Ti(g), Cr(l)->Cr(g), Mn(l)->Mn(g); oxide Delta_fH rows Na2O(s), K2O(s), MgO(s), FeO(s), CaO(s), Al2O3(s), SiO2(quartz), TiO2(rutile), Cr2O3(s), MnO(s). Table IDs/pages not fully recovered; Monograph 9 pages unverified."
       url: "https://janaf.nist.gov/"
       why: >-
         Canonical evaluated thermochemical compilation with consistent species and phase coverage across
@@ -140,7 +142,7 @@ values:
     uncertainty: "JANAF assessed; current code cross-checks produce expected DeltaG examples such as Fe near -304 kJ/mol_O2 at 1600 C."
     chosen:
       ref: REF-020
-      locus: "Fe, Si/SiO2, and Cr condensed JANAF tables plus high-temperature H/S/G functions used for the linear refit."
+      locus: "NIST-JANAF Monograph 9 table IDs mirrored in runtime comments: Na-012, K-012, Fe-018, Mn-008, Cr-014, and Si/SiO2 condensed tables; high-temperature H/S/G functions used for the linear refit. Monograph 9 pages unverified."
       url: "https://janaf.nist.gov/"
       why: >-
         Same evaluated thermochemical basis as the rest of the built-in Ellingham and vapor-pressure
@@ -169,7 +171,7 @@ values:
     uncertainty: "Si is reported near 50.2 +/- 0.4 kJ/mol in JANAF notes; Fe and Cr are small-scatter handbook/JANAF values."
     chosen:
       ref: REF-020
-      locus: "JANAF elemental condensed-phase tables and fusion notes for Fe, Si, and Cr."
+      locus: "NIST-JANAF Monograph 9 elemental condensed-phase tables and fusion notes for Fe, Si, and Cr; runtime anchors Fe fusion at 1811 K, Si fusion at 1687 K, and Cr fusion at 2180 K. Monograph 9 pages unverified."
       url: "https://janaf.nist.gov/"
       why: "Keeps the phase-change corrections on the same evaluated thermochemical basis as the Ellingham fits."
     alternatives:
@@ -193,7 +195,7 @@ values:
     uncertainty: "Fit-domain declaration; thermochemical uncertainty inherits from the JANAF tables and fusion corrections."
     chosen:
       ref: REF-020
-      locus: "JANAF table coverage and elemental phase-transition temperatures used by the runtime range constants."
+      locus: "NIST-JANAF Monograph 9 table coverage and runtime phase-split constants for Na-012, K-012, Fe-018, Mn-008, Cr-014, and Si/SiO2 condensed tables; pages unverified."
       url: "https://janaf.nist.gov/"
       why: "The fit ranges are not independent measurements; they are the declared domain for the JANAF-derived fits."
     alternatives:
@@ -224,6 +226,7 @@ values:
         lacks: "do not reproduce the exact NIST Antoine row embedded in the simulator"
     code_sites:
       - "data/vapor_pressures.yaml:60 (metals.Na.pure_component_antoine)"
+    note: "Known follow-up: data/vapor_pressures.yaml:60 inline source still says REF-002; registry REF-041 is intentional Rodebush & Walters/NIST sodium row provenance."
     status: active
 
   - id: K_pure_antoine
@@ -310,7 +313,7 @@ values:
     uncertainty: "Literature scatter in high-temperature Fe DeltaH_vap and boiling point; no single primary Antoine row recovered."
     chosen:
       ref: REF-012
-      locus: "NIST/CRC-style elemental boiling point and vaporization enthalpy values; local Clausius-Clapeyron derivation."
+      locus: "NIST/CRC-style elemental boiling point and vaporization-enthalpy rows; local Clausius-Clapeyron derivation; no primary Antoine table/page recovered."
       url: "https://webbook.nist.gov/chemistry/"
       why: "Best documented basis for the current simple iron pure-component approximation, but not certification-grade."
     alternatives:
@@ -336,7 +339,7 @@ values:
     uncertainty: "Maximum dense-grid residual 0.379 dex against the VapoRock backsolve target."
     chosen:
       ref: REF-044
-      locus: "VapoRock ApJ 947:64 plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve."
+      locus: "VapoRock ApJ 947:64 article plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve; coefficient table/row is local data/vapor_pressures.yaml metals.Na.antoine, not a published primary table."
       url: "https://doi.org/10.3847/1538-4357/acbcc7"
       why: "Documents the model target for the effective pseudo term; not a primary measurement."
     alternatives:
@@ -359,7 +362,7 @@ values:
     uncertainty: "Maximum dense-grid residual 0.691 dex against the VapoRock backsolve target."
     chosen:
       ref: REF-044
-      locus: "VapoRock ApJ 947:64 plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve."
+      locus: "VapoRock ApJ 947:64 article plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve; coefficient table/row is local data/vapor_pressures.yaml metals.K.antoine, not a published primary table."
       url: "https://doi.org/10.3847/1538-4357/acbcc7"
       why: "Documents the model target for the effective pseudo term; not a primary measurement."
     alternatives:
@@ -383,7 +386,7 @@ values:
     uncertainty: "Maximum dense-grid residual 0.418 dex; prior lower residual did not re-confirm in the sweep."
     chosen:
       ref: REF-044
-      locus: "VapoRock ApJ 947:64 plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve."
+      locus: "VapoRock ApJ 947:64 article plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve; coefficient table/row is local data/vapor_pressures.yaml metals.Fe.antoine, not a published primary table."
       url: "https://doi.org/10.3847/1538-4357/acbcc7"
       why: "Documents the model target for the effective pseudo term; not a primary measurement."
     alternatives:
@@ -408,7 +411,7 @@ values:
     uncertainty: "Maximum dense-grid residual 0.270 dex against the VapoRock backsolve target."
     chosen:
       ref: REF-044
-      locus: "VapoRock ApJ 947:64 plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve."
+      locus: "VapoRock ApJ 947:64 article plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve; coefficient table/row is local data/vapor_pressures.yaml oxide_vapors.SiO.antoine, not a published primary table."
       url: "https://doi.org/10.3847/1538-4357/acbcc7"
       why: "Documents the model target for the effective pseudo term; not a primary measurement."
     alternatives:
@@ -433,7 +436,7 @@ values:
     uncertainty: "Sossi open-furnace behavior is near ideal; Fedkin sealed-chamber KEMS alternative is about 0.13 and remains a regime-mismatch warning."
     chosen:
       ref: REF-013
-      locus: "Sossi et al. 2019, open 1 atm furnace ferrobasalt FCMAS mass-loss experiments and evaporation model."
+      locus: "Sossi et al. 2019 GCA 260:204-231, open 1 atm gas-mixing furnace ferrobasalt FCMAS mass-loss experiments, LA-ICP-MS residual analyses, and HKL evaporation model; alpha about 1 is a regime inference, not a KEMS table row."
       url: "https://doi.org/10.1016/j.gca.2019.06.021"
       why: "Closest regime match for continuous sweep/open mass loss, while still uncertified for mbar process use."
     alternatives:
@@ -460,7 +463,7 @@ values:
     uncertainty: "Rounded to 0.05 V; high-temperature DeltaGf scatter is typically a few tens of kJ/mol for the major oxides."
     chosen:
       ref: REF-020
-      locus: "JANAF species tables near 1800-1900 K, plus NiO Hemingway/Robie/NEA and FeO O'Neill emf anchors where code comments identify them."
+      locus: "JANAF Monograph 9 oxide species tables near 1800-1900 K for Cr2O3/MnO/SiO2/TiO2/Al2O3, plus NiO Hemingway 1990 American Mineralogist 75:p.781 and FeO O'Neill emf anchors where code comments identify them."
       url: "https://janaf.nist.gov/"
       why: "Provides the common raw-thermo basis for the cited MRE voltage rungs."
     alternatives:
@@ -492,7 +495,7 @@ values:
     uncertainty: "Rounded legacy values; Na/K volatility and Mg/Ca missing source anchors are explicit open gaps."
     chosen:
       ref: REF-020
-      locus: "JANAF-style raw-thermo convention used by the ladder; exact legacy Na2O/K2O/MgO/CaO anchors not recovered."
+      locus: "JANAF-style raw-thermo table convention used by the ladder; exact legacy Na2O/K2O/MgO/CaO anchor tables/pages not recovered, so this remains UNCERTIFIED."
       url: "https://janaf.nist.gov/"
       why: "Records the intended thermochemical basis while preserving the sweep's UNCERTIFIED status."
     alternatives:
@@ -505,7 +508,8 @@ values:
 
   - id: condensation_reference_at_1mbar_routing_temps
     quantity: "Nominal condenser routing temperatures labeled as 1 mbar condensation references."
-    value: {Fe: 1250, SiO: 1050, Mg: 580, Na: 480, K: 420, Ca: 780, Mn: 1000, Cr: 1280, CrO2: 1250, NaCl: 900, KCl: 880}
+    value: {Fe: 1250, SiO: 1050, Mg: 580, Na: 480, K: 420, Ca: 780, Mn: 1000, Cr: 1280, CrO2: 1250, Al: 1180, Ti: 1500}
+    dead_metadata_only: {NaCl: 900, KCl: 880}
     units: degC
     tier: ASSUMED
     basis: >-
@@ -518,7 +522,7 @@ values:
     uncertainty: "No reported measurement or primary row for the exact routing values; tolerances are operator/setpoint choices."
     chosen:
       ref: "ASSUMED: no primary source"
-      locus: "data/setpoints.yaml condensation_temperatures_C notes and simulator/condensation.py CONDENSATION_TEMPS_C comments."
+      locus: "simulator/condensation.py CONDENSATION_TEMPS_C runtime table/constant plus data/setpoints.yaml condensation_temperatures_C notes; data/vapor_pressures.yaml condensation_reference_at_1mbar is a dead metadata table for NaCl/KCl only."
       url: ""
       why: "The sweep found no primary source for these exact routing values; preserving them as explicit engineering assumptions is more honest."
     alternatives:
@@ -529,7 +533,7 @@ values:
       - ref: "pure Antoine 1 mbar crossings"
         lacks: "only approximate for Na/Mg; Fe, Ca, Cr, chlorides, and SiO do not match the routing table"
     code_sites:
-      - "data/vapor_pressures.yaml:704 (DEAD condensation_reference_at_1mbar block; runtime ignores it)"
+      - "data/vapor_pressures.yaml:704 (DEAD condensation_reference_at_1mbar block; runtime ignores it; NaCl/KCl only)"
       - "simulator/condensation.py:1550 (runtime CONDENSATION_TEMPS_C)"
       - "data/setpoints.yaml:885 (operator condensation_temperatures_C override)"
     status: "active; cleanup: data/vapor_pressures.yaml:704 is dead metadata and should be removed or relabeled"
@@ -579,7 +583,7 @@ values:
     uncertainty: "Reviewed thermochemical value, but Barin/Ebbinghaus cross-checks were not recovered; scatter remains open."
     chosen:
       ref: REF-020
-      locus: "NIST-JANAF / WebBook gas thermochemistry for CrO2(g), CAS 12018-01-8, Delta_f H gas row."
+      locus: "NIST-JANAF / WebBook gas thermochemistry table for CrO2(g), CAS 12018-01-8, Delta_f H gas row."
       url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C12018018&Mask=1"
       why: "Only recovered source family for the current CrO2 enthalpy, but uncertainty closure is incomplete."
     alternatives:
@@ -596,9 +600,12 @@ values:
     value: {A: 12.9245114, B: 23732.9593, C: 0, H: -75.312}
     units: "log10(P_Pa) coefficients and kJ/mol Shomate H"
     tier: UNCERTIFIED
-    basis: >-
-      Fit to VapoRock/JANAF0 for 0.5 Cr2O3 + 0.25 O2 -> CrO2(g), with oxide activity 0.5 and
-      pO2 exponent handling recorded in data/vapor_pressures.yaml.
+    basis:
+      reaction: >-
+        Fit to VapoRock/JANAF0 for 0.5 Cr2O3 + 0.25 O2 -> CrO2(g), with oxide activity and
+        pO2 exponent handling recorded in data/vapor_pressures.yaml.
+      oxide_activity_exponent: 0.5
+      pO2_exponent: 0.25
     range:
       T_K: [1500, 2200]
       recipe_1773_2173K: inside fit range
@@ -606,7 +613,7 @@ values:
     uncertainty: "Backsolve/fit-derived; underlying CrO2(g) thermochemistry scatter remains open."
     chosen:
       ref: REF-020
-      locus: "Chase 1998 / NIST-JANAF via VapoRock JANAF0; WebBook CrO2(g) CAS 12018-01-8."
+      locus: "Chase 1998 / NIST-JANAF via VapoRock JANAF0 table; WebBook CrO2(g) CAS 12018-01-8 gas thermochemistry row."
       url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C12018018&Mask=1"
       why: "Matches the current JANAF0/VapoRock fit basis while retaining UNCERTIFIED status."
     alternatives:

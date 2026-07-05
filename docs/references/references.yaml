@@ -280,7 +280,7 @@ references:
     pages: "393-459"
     doi: "10.2138/rmg.2018.84.11"
     url: "https://doi.org/10.2138/rmg.2018.84.11"
-    coefficient_note: "Compilation of oxide melt-activity coefficients (Table 2, pp. 409-410). For the alkali melt activity the model relies instead on the primary KEMS measurement REF-013 (Sossi 2019), which controls for a lunar-analog ferrobasalt melt composition; the Table 2 NaO0.5 datum here is from a CMS melt. Included for the T-dependence (Fig 5) and the standard-state definition (Eqns 24-25)."
+    coefficient_note: "Compilation of oxide melt-activity coefficients (Table 2, pp. 409-410). For the alkali melt activity the model relies instead on REF-013 (Sossi 2019), a 1-atm gas-mixing furnace evaporation study with LA-ICP-MS residual analyses and HKL/logK* fitting that controls for a lunar-analog ferrobasalt melt composition; the Table 2 NaO0.5 datum here is from a CMS melt. Included for the T-dependence (Fig 5) and the standard-state definition (Eqns 24-25)."
     role: REVIEW
     topic: volatility
     status: current
@@ -749,12 +749,13 @@ references:
     volume: "2"
     pages: "1367-1380"
     doi: ""
-    url: ""
-    provenance_unavailable_reason: "The 2026-07-05 sweep identified a DOI-less proceedings locus and requested ADS-bibcode verification; the bibcode was not independently verified in this chunk, so no ADS URL is claimed."
+    url: "https://ui.adsabs.harvard.edu/abs/1971LPSC....2.1367D/abstract"
+    ads_bibcode: "1971LPSC....2.1367D"
+    provenance_unavailable_reason: "DOI-less proceedings locus; ADS bibcode 1971LPSC....2.1367D supplies the stable bibliographic identifier."
     role: MEASUREMENT
     topic: vapor-pressure
     status: current
-    coefficient_note: "Apollo 12022 KEMS lunar validation source for Na/K vapor pressures and alkali activity sanity checks; page span comes from the verified harvest, ADS bibcode remains unverified."
+    coefficient_note: "Apollo 12022 KEMS lunar validation source for Na/K vapor pressures and alkali activity sanity checks; page span comes from the verified harvest, stable ADS bibcode recorded."
     found: "2026-07-05 citation-sweep population"
     needs_quote: true
     pull_quotes: []
@@ -767,7 +768,7 @@ references:
     pages: "608-628"
     doi: ""
     url: ""
-    provenance_unavailable_reason: "The 2026-07-05 DOI sweep did not verify a DOI from a primary/publisher/Crossref source; leave blank rather than guessing."
+    provenance_unavailable_reason: "The 2026-07-05 fold rechecked for a publisher DOI but did not verify one from available primary/publisher search results in this worktree; leave blank rather than guessing."
     role: MEASUREMENT
     topic: volatility
     status: current
