@@ -278,6 +278,28 @@ separate from the radial Sherwood driver above. The full three-resistance series
 are documented in
 [`docs/model-limitations.md`](model-limitations.md).
 
+### Directional (two-axis) induction stirring
+
+The stirring in the paragraphs above is not a single knob. An industrial multi-coil electromagnetic stirrer
+exposes two independent, physically orthogonal control axes, and the model carries both because they act on
+two different — and otherwise independent — transport resistances:
+
+- **Axial** stir is vertical electromagnetic circulation, bottom-to-surface. It renews the evaporating
+  surface with fresh, un-depleted melt, and enters as the melt-side surface-renewal term (`r_melt ∝ √axial`)
+  on the evaporation side. Its default is 6.0 — the mid-band of the documented 4–8× stirring window.
+- **Radial** stir is horizontal/azimuthal circulation — an in-plane vortex in the gas just above the melt. It
+  thins the gas-side diffusion boundary layer and enters as the Sherwood enhancement (`Sh_eff = 3.66 ×
+  √radial`) on the condensation/gas side. Its default is 1.0 — the no-stir laminar baseline `Sh = 3.66`.
+
+Because the two axes feed different resistances, they are an independent design lever, each dialable from the
+laminar baseline up to a per-axis ten-fold ceiling: axial stir relieves the melt-side *supply* limit (keeping
+the surface concentration up), radial stir relieves the gas-side *boundary-layer* limit (thinning the
+diffusion film). When one axis sits at its default, that transport path reverts to its un-stirred form — which
+is why a scalar "stir factor" set by an operator writes only the axial axis and leaves the gas side laminar
+unless the radial axis is set explicitly. This is the other half of the connection to the KEMS baseline: a
+Knudsen cell is the both-axes-zero, unstirred limit, and the furnace layers these two orthogonal stirring
+enhancements — together with the overhead sweep pressure — on top of it.
+
 ### The evaporation coefficient
 
 The coefficient `α` (the fraction of impinging-rate flux actually realized) is the physically uncertain
@@ -332,6 +354,56 @@ fresh equilibrium solve at each instant: it smooths the time integration but ass
 is constant over the tick, which accumulates error when the melt composition swings hard within a
 single hour. It is stated as a current approximation in
 [`docs/model-limitations.md`](model-limitations.md).
+
+### The Knudsen and Langmuir limits, the sweep, and self-poisoning
+
+The three-resistance flux has two informative limits, and they are also how the model connects to the
+laboratory measurements it is grounded on.
+
+**The Langmuir (free-evaporation) limit.** When the bulk gas carries no back-pressure of the evaporating
+species, the driving force is the full equilibrium pressure and the flux is set only by the interface
+term, `J = α × P_eff × √(M / 2πRT)`. This is free evaporation from an open surface — the regime in which
+the evaporation coefficient α is measured (the open-furnace mass-loss experiments the sodium coefficient
+comes from).
+
+**The Knudsen (equilibrium-effusion) limit.** A Knudsen-effusion mass-spectrometry (KEMS) cell holds the
+vapor near its saturation pressure and lets it effuse through a small orifice in free-molecular flow. In
+the model's terms this is the ballistic limit — high Knudsen number, so the Fuchs–Sutugin weight sends the
+gas-side resistance to zero — combined with a static, unstirred melt. KEMS is therefore the model's
+**zero-transport-enhancement baseline**: it measures the thermodynamic driving force (the equilibrium
+vapor pressure, and through it the melt-oxide activity) with neither of the furnace's two transport levers
+— the overhead sweep pressure and the induction stirring — engaged. This is why KEMS partial pressures are
+the primary anchor for the vapor-pressure and activity coefficients, and why stirring and sweep enter the
+furnace model only as enhancements layered on top of that baseline. Equilibrium-mode KEMS pins the
+activity (it is transport-independent); free-evaporation (Langmuir) measurements pin α at that same
+un-enhanced surface.
+
+**The metal-vapor back-pressure.** Between the two limits the net flux is driven by `P_eff − P_bulk`: the
+partial pressure of the species already in the bulk gas subtracts from the equilibrium pressure, so as a
+species accumulates in the headspace its own back-pressure throttles its further evaporation. This is the
+same physics that makes a sweep useful — carrying evolved vapor away keeps `P_bulk` low and preserves the
+driving force.
+
+**Co-evolved oxygen and self-poisoning.** Every dissociation-driven species releases oxygen as it evolves
+(`SiO₂ → SiO + ½O₂`, `MOₓ → M + (x/2)O₂`). That oxygen raises the effective oxygen pressure, which —
+through the same `pO₂^(−x/2)` dissociation lever (§2) — suppresses further evolution. The model captures
+this as a **headspace oxygen balance**: oxygen released by evaporation is credited to the overhead gas,
+converted to a transport oxygen pressure, and applied to the *next* step's vapor-pressure solve, so
+accumulated oxygen self-limits the extraction. Under an inert sweep cover, that headspace oxygen is bled
+off through the pressure-and-conductance path, lowering the transport oxygen pressure and relieving the
+suppression.
+
+**How the sweep is represented, and its current limits.** The inert sweep (the 5–15 mbar pN₂ cover) enters
+the model as an *overhead pressure*, not as a commanded *flow rate*. Raising it lowers the Knudsen number
+and shifts the gas-side transport from the ballistic toward the viscous (continuum) limit, raising `r_gas`;
+because it enters no dissociation equilibrium, it changes the rate and the coating pattern but not the
+equilibrium pressure itself. The oxygen dilution above is likewise driven by a pressure-and-conductance
+bleed rather than a sweep flow rate. Two consequences are stated as current limitations in
+[`docs/model-limitations.md`](model-limitations.md): the model has no sweep *rate* or residence-time input,
+so the advective removal of vapor and oxygen that a faster flowing sweep would provide is not resolved
+separately from the static-pressure diffusion resistance; and the co-evolved-oxygen self-poisoning acts
+with a one-step lag (through the headspace ledger) rather than as an instantaneous local-surface balance in
+which the oxygen from the current solve poisons that same solve.
 
 ---
 
