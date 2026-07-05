@@ -52,9 +52,9 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:302</code> - metals.Si.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133), converted to Pa by A+5&quot;</li>
 <li><code>data/vapor_pressures.yaml:384</code> - metals.Cr.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); runtime pure-component source is pure_component_antoine&quot;</li>
 <li><code>data/vapor_pressures.yaml:386</code> - metals.Cr.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 chromium (C7440473); log10(P/bar)=6.02371-16064.989/(T-83.86), converted to Pa by A+5&quot;</li>
-<li><code>data/vapor_pressures.yaml:638</code> - foulant_vapor.NaCl.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C&quot;</li>
-<li><code>data/vapor_pressures.yaml:662</code> - foulant_vapor.KCl.pure_component_antoine.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)&quot;</li>
-<li><code>data/vapor_pressures.yaml:668</code> - foulant_vapor.KCl.antoine.source: source: &quot;REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine&quot;</li>
+<li><code>data/vapor_pressures.yaml:640</code> - foulant_vapor.NaCl.pure_component_antoine.source: source: &quot;REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 NaCl (C7647145); CRC normal bp 1465 C&quot;</li>
+<li><code>data/vapor_pressures.yaml:664</code> - foulant_vapor.KCl.pure_component_antoine.source: source: &quot;REF-002 NIST WebBook SRD 69 Stull 1947 KCl (C7447407); CRC bp 1420 C; Clausius-Clapeyron anchored at 1 atm (Stull raw overshoots bp)&quot;</li>
+<li><code>data/vapor_pressures.yaml:670</code> - foulant_vapor.KCl.antoine.source: source: &quot;REF-002 NIST Stull 1947 mid-range faithful runtime row; bp overshoots - tests use pure_component_antoine&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-003">
@@ -168,14 +168,14 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/species_catalog.yaml:122</code> - species.id.source: source: Stoichiometric iron sulfate formula for cation-bearing sulfate Stage 0 routing; NIST WebBook REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
 <li><code>data/species_catalog.yaml:164</code> - species.id.source: source: Sodium carbonate formula for the carbonate_salts surrogate component and Na2CO3 silicate-displacement gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
 <li><code>data/vapor_pressures.yaml:208</code> - metals.Fe.pure_component_antoine.source: source: &quot;REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
-<li><code>simulator/core.py:6636</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
+<li><code>simulator/core.py:7130</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
 </ul>
 </section>
 <section class="entry" id="REF-013">
 <h2>REF-013</h2>
 <p class="citation">Sossi, P.A., Klemme, S., O&#x27;Neill, H.St.C., Berndt, J. &amp; Moynier, F. (2019). Evaporation of moderately volatile elements from silicate melts: experiments and theory. <em>Geochimica et Cosmochimica Acta</em> <strong>260</strong>: 204-231.</p>
 <p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/evaporation.html">evaporation</a></p>
-<p><a href="https://doi.org/10.1016/j.gca.2019.06.021">doi:10.1016/j.gca.2019.06.021</a></p>
+<p><a href="https://doi.org/10.1016/j.gca.2019.06.021">doi:10.1016/j.gca.2019.06.021</a> | <a href="https://doi.org/10.1016/j.gca.2019.06.021">source URL</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
@@ -184,8 +184,8 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:140</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
 <li><code>data/vapor_pressures.yaml:68</code> - metals.Na.evaporation_alpha.source: source: &quot;OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic: REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal open-furnace evaporation from ferrobasalt FCMAS melt; retained pending owner ratification against competing Fedkin intrinsic 0.13&quot;</li>
 <li><code>data/vapor_pressures.yaml:497</code> - metals.Mn.evaporation_alpha_policy.source: source: &quot;REF-013 REF-014 Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted&quot;</li>
-<li><code>data/vapor_pressures.yaml:652</code> - foulant_vapor.NaCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement&quot;</li>
-<li><code>data/vapor_pressures.yaml:677</code> - foulant_vapor.KCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement&quot;</li>
+<li><code>data/vapor_pressures.yaml:654</code> - foulant_vapor.NaCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement&quot;</li>
+<li><code>data/vapor_pressures.yaml:679</code> - foulant_vapor.KCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-014">
@@ -203,7 +203,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:131</code> - metals.K.evaporation_alpha.source: source: &quot;REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber intrinsic K alpha_e~0.13; replaces prior Na open-furnace analogy for series-resistance intrinsic-alpha model&quot;</li>
 <li><code>data/vapor_pressures.yaml:395</code> - metals.Cr.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 GCA 70:206-223; no isolated HK alpha found&quot;</li>
 <li><code>data/vapor_pressures.yaml:497</code> - metals.Mn.evaporation_alpha_policy.source: source: &quot;REF-013 REF-014 Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted&quot;</li>
-<li><code>data/vapor_pressures.yaml:591</code> - oxide_vapors.CrO2.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted&quot;</li>
+<li><code>data/vapor_pressures.yaml:593</code> - oxide_vapors.CrO2.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-015">
@@ -229,7 +229,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:51</code> - species.Fe.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:69</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
 <li><code>data/vapor_pressures.yaml:215</code> - metals.Fe.evaporation_alpha.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy&quot;</li>
-<li><code>data/vapor_pressures.yaml:544</code> - oxide_vapors.SiO.evaporation_alpha.value.prior_scalar.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
+<li><code>data/vapor_pressures.yaml:545</code> - oxide_vapors.SiO.evaporation_alpha.value.prior_scalar.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-017">
@@ -255,14 +255,14 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:100</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
 <li><code>data/vapor_pressures.yaml:176</code> - metals.Mg.evaporation_alpha.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21&quot;</li>
 <li><code>data/vapor_pressures.yaml:279</code> - metals.Al.evaporation_alpha.source: source: &quot;OWNER-RATIFY proxy_not_intrinsic: REF-018 Schaefer &amp; Fegley 2004 Icarus 169:216-241 Table 10 plus Shahar &amp; Young 2007 CAI modeling; conflicting Al proxy coverage&quot;</li>
-<li><code>data/vapor_pressures.yaml:544</code> - oxide_vapors.SiO.evaporation_alpha.value.prior_scalar.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
+<li><code>data/vapor_pressures.yaml:545</code> - oxide_vapors.SiO.evaporation_alpha.value.prior_scalar.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-019">
 <h2>REF-019</h2>
 <p class="citation">Sossi, P.A. &amp; Fegley, B. (2018). Thermodynamics of Element Volatility and its Application to Planetary Processes. <em>Reviews in Mineralogy &amp; Geochemistry</em> <strong>84</strong>: 393-459.</p>
 <p class="meta"><span class="badge">REVIEW</span><span class="badge status-current">current</span><a class="badge" href="topics/volatility.html">volatility</a></p>
-<p><a href="https://doi.org/10.2138/rmg.2018.84.11">doi:10.2138/rmg.2018.84.11</a></p>
+<p><a href="https://doi.org/10.2138/rmg.2018.84.11">doi:10.2138/rmg.2018.84.11</a> | <a href="https://doi.org/10.2138/rmg.2018.84.11">source URL</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
@@ -288,7 +288,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:422</code> - metals.Mn.pure_component_antoine.default_segment: # T_K=[1560,1710,1780,1890,1980,2080,2240,2390]; REF-020 NIST/JANAF</li>
 <li><code>data/vapor_pressures.yaml:432</code> - metals.Mn.pure_component_antoine.segments.name.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_sub, standard pressure 1 bar, constrained to the stored liquid fit at 1519 K for C0 runtime continuity&quot;</li>
 <li><code>data/vapor_pressures.yaml:469</code> - metals.Mn.pure_component_antoine.segments.name.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_vap, standard pressure 1 bar, with exact 101325 Pa anchor at 2334.526 K&quot;</li>
-<li><code>data/vapor_pressures.yaml:615</code> - oxide_vapors.CrO2.source: source: &quot;REF-020 JANAF coefficients shipped by VapoRock.&quot;</li>
+<li><code>data/vapor_pressures.yaml:617</code> - oxide_vapors.CrO2.source: source: &quot;REF-020 JANAF coefficients shipped by VapoRock.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-021">
@@ -446,6 +446,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:332</code> - metals.Ti.pure_component_antoine.source: source: &quot;REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted form; dense 10 K minimax refit from 1941-2400 K plus exact 3560.15 K normal-boiling anchor to log10(P/Pa)=A-B/(T+C)&quot;</li>
 <li><code>data/vapor_pressures.yaml:411</code> - metals.Mn.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine&quot;</li>
 <li><code>data/vapor_pressures.yaml:413</code> - metals.Mn.pure_component_antoine.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators&quot;</li>
+<li><code>simulator/chemistry/ellingham_thermo.py:105</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # from CRC/Lange tabulations carried in REF-032-style elemental fusion data.</li>
 </ul>
 </section>
 <section class="entry" id="REF-033">

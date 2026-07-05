@@ -1,0 +1,85 @@
+# Chemistry Provenance Registry — the comparative decision layer
+#
+# Policy: docs/citation-policy.md. Bibliography (source details + DOI): docs/references/references.yaml
+# (REF-xxx ids). This file is the layer ON TOP of the bibliography: keyed by VALUE (not by source), it
+# records for each grounded number WHICH source we rely on, WHY that one, and what the ALTERNATIVES lack.
+# It is the single machine-readable answer to "here is what we use and why, vs these other references".
+# Population notes, audit tallies, and the encode-next backlog live in the sidecar, NOT here:
+#   docs/chemistry-provenance.notes.md
+#
+# Audit (human or agent), one command: scripts/audit_chemistry_provenance.py  [TO BUILD]
+#   (a) every `value` matches the number at each of its `code_sites`;
+#   (b) every grounded chemistry coefficient in the code has an entry here;
+#   (c) reports counts per `tier` and every open `gap`.
+#
+# Entry schema (all keys required unless marked optional):
+#   id:            stable slug (referenced by the inline comment at each code_site)
+#   quantity:      what the number physically is
+#   value:         the number (or range) actually used
+#   units:         explicit units
+#   tier:          CITED | ASSUMED | UNCERTIFIED   (see citation-policy.md §3)
+#   basis:         standard-state / component-basis / concentration-measure   (policy §4; where it matters)
+#   range:         {T_K: [lo, hi], composition: ..., measured_vs_extrapolated: measured|extrapolated}
+#   uncertainty:   reported error bar or literature scatter
+#   chosen:        {ref: REF-xxx, why: <one line: why this over the alternatives>}
+#   alternatives:  [ {ref: REF-xxx|<name>, value: ..., lacks: <the specific X/Y/Z that down-ranked it>}, ... ]
+#   code_sites:    [ <file:symbol> ]   (or "pending: <task>" if not yet in code)
+#   validation:    (optional) how it is ground-truth checked
+#   status:        active | pending-rework | deprecated
+
+schema_version: 1
+
+values:
+
+  - id: gamma_alkali_melt_activity
+    quantity: >-
+      Melt activity coefficient of the alkali oxide component (single-cation NaO0.5 / KO0.5) in a
+      silicate melt, used to correct the alkali vapor pressure for melt non-ideality
+      (p_M proportional to gamma_MO0.5 * X_MO0.5, i.e. LINEAR in gamma on this basis).
+    value: {NaO0.5: 1.0e-3, KO0.5: 2.2e-4}
+    units: dimensionless
+    tier: UNCERTIFIED   # single-temperature datum, extrapolated to the 1773-2173 K recipe band; T-dependence not yet fit
+    basis: >-
+      single-cation NaO0.5 / KO0.5 component; RAOULTIAN reference (activity -> 1 for the pure liquid
+      oxide, consistent with the JANAF pure-oxide K_p); MOLE fraction (single-cation-normalized). The
+      reaction is NaO0.5(l) = Na(g) + 1/4 O2 (Sossi & Fegley Eqn 25), so gamma enters p_Na LINEARLY.
+    range:
+      T_K: [1673, 1673]
+      composition: FCMAS ferrobasalt (Na 3252 ppm, K 944 ppm), lunar-analog
+      measured_vs_extrapolated: extrapolated   # recipe band 1773-2173 K is HOTTER; gamma rises toward 1 with T
+    uncertainty: "NaO0.5 +/-2.2e-4, KO0.5 +/-5.5e-5 (Sossi 2019); table envelope NaO0.5 8.4e-4-2.2e-3, KO0.5 6.3e-5-7.1e-4"
+    chosen:
+      ref: REF-013   # Sossi et al. 2019, Geochim. Cosmochim. Acta 260:204-231
+      locus: "§4.5.1, Tables 3-4 (gamma_NaO0.5=1.0e-3, gamma_KO0.5=2.2e-4 at 1673 K); reaction MO0.5(l)=M(g)+1/4 O2"   # exact table page: verify in corpus (t-106)
+      url: "https://doi.org/10.1016/j.gca.2019.06.021"
+      corpus: "docs-private/deep-research/literature/sossi-2019-gca-hkl-evaporation/source.md"
+      why: >-
+        Primary KEMS on a ferrobasalt (lunar analog); reports gamma on the correct single-cation NaO0.5
+        basis, Raoultian, with the explicit reaction and logK*; VALUE corroborated by DeMaria 1971 lunar
+        KEMS and the Sossi & Fegley 2018 compilation.
+    alternatives:
+      - ref: REF-019   # Sossi & Fegley 2018, Rev. Mineral. Geochem. 84:393-459
+        locus: "Table 2, NaO0.5 & KO0.5 rows (pp. 409-410); Raoultian def Eqn 24 (p. 413); reaction Eqn 25 (p. 413); gamma(T) Fig 5 (p. 414)"
+        value: "NaO0.5 8.4e-4-2.2e-3 @1673 K (Mathieu et al. 2011); KO0.5 6.3e-5-7.1e-4 @1573 K (Hastie et al. 1981)"
+        url: "https://doi.org/10.2138/rmg.2018.84.11"
+        corpus: "docs-private/deep-research/literature/sossi-fegley-2018-volatility/source.md — Table 2 :1244, Eqn 24 :1533, Eqn 25 :1547, Fig 5 :1577"
+        lacks: "review compilation, not the primary; the NaO0.5 datum is from a CMS melt (Mathieu 2011), not a lunar-analog ferrobasalt"
+      - ref: "DeMaria et al. 1971, Apollo 12022 KEMS — add to references.yaml as REF-041"
+        locus: "Fig 1 (p_Na vs 1/T), Fig 2 (p_K vs 1/T); Proc. 2nd Lunar Sci. Conf., vol. 2, pp. 1367-1380"   # exact page/URL: verify (t-106)
+        value: "direct p_Na=3.2e-2 Pa @1538 K (melt 0.36 wt% Na2O); gamma_NaO0.5~1e-3 via S&F derivation"
+        url: "NASA ADS bibcode to verify (t-106); DOI-less proceedings"
+        corpus: "docs-private/deep-research/literature/demaria-1971-apollo-12022-kems/source.md"
+        lacks: "does not tabulate gamma directly (reports p_Na, p_K). IS the LUNAR primary + the ideal VALIDATION case (our exact feedstock) — used to CHECK the model, not as the gamma source."
+      - ref: "Bencze & Yazhenskikh 2016, gasifier-slag KEMS"
+        locus: "Table S-I (ln p(Pa)=A-B/T fits); corpus source.md"
+        value: "p_Na(1773 K calc)=2.77e-2 Pa on a Na2O 2-cation activity basis"
+        url: ""
+        corpus: "docs-private/deep-research/literature/bencze-yazhenskikh-2016-gasifier-slag-kems-si/source.md"
+        lacks: "wrong feedstock (gasifier slag, not silicate/lunar); Na2O di-cation basis (not single-cation NaO0.5); degenerate aNa2O extrapolation"
+    code_sites:
+      - "pending: CF-3 rework (t-003) — engines/builtin/vapor_pressure.py MELT_OXIDE_ACTIVITY_COEFFICIENTS, rebuilt on the single-cation-linear basis"
+    validation: >-
+      Reproduce DeMaria 1971 (test-harness feedstock = lunar basalt 0.36 wt% Na2O / 0.068 wt% K2O at the
+      stated pO2): the corrected model p_Na must match the measured ~3.2e-2 Pa @1538 K and the p_Na(T) slope.
+    status: pending-rework
+    trace: docs-private/deep-research/cf3-alkali-activity-synthesis.md
