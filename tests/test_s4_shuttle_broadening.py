@@ -137,7 +137,7 @@ def test_c3_step_refreshes_equilibrium_after_shuttle_before_evaporation(
     monkeypatch.setattr(
         sim.energy_tracker,
         "calculate_hour",
-        lambda *args, **kwargs: SimpleNamespace(total_kWh=0.0),
+        lambda *args, **kwargs: SimpleNamespace(electrical_plus_evaporation_kWh=0.0),
     )
     monkeypatch.setattr(sim, "_update_overlap_evaporation_diagnostic", lambda flux: None)
     monkeypatch.setattr(sim, "_update_extraction_completeness_diagnostic", lambda: None)

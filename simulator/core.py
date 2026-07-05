@@ -683,7 +683,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._campaign_start_mass = 0.0
         self._campaign_start_composition: Dict[str, float] = {}
         self._campaign_start_condensation: Dict[str, float] = {}
-        self._campaign_start_energy = 0.0
+        self._campaign_start_electrical_plus_evaporation_energy = 0.0
         self._campaign_start_O2 = 0.0
         self._last_campaign_summary: Optional[dict] = None
 
