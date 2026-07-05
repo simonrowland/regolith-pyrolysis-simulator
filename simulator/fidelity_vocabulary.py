@@ -7,6 +7,8 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Any, Mapping, Sequence
 
+from simulator.backend_names import canonical_backend_name
+
 
 class CanonicalDimension(str, Enum):
     EVIDENCE_CLASS = "evidence_class"
@@ -350,6 +352,32 @@ def may_certify(
     if evidence_class is None:
         return False
     return _evidence_class_value(evidence_class) not in CERTIFICATION_DENYLIST
+
+
+def backend_name_denies_authority(backend_name: str | None) -> bool:
+    """Return True when backend identity independently forbids authoritative admission."""
+
+    if backend_name is None:
+        return False
+    normalized = canonical_backend_name(str(backend_name).strip())
+    if not normalized:
+        return False
+    if normalized.startswith("mixed:"):
+        suffix = normalized[len("mixed:") :]
+        for delimiter in ("+", "|"):
+            suffix = suffix.replace(delimiter, ",")
+        return any(
+            backend_name_denies_authority(token.strip())
+            for token in suffix.split(",")
+            if token.strip()
+        )
+    try:
+        mapping = translate_legacy_token("backend/status alias", normalized)
+    except (UnknownFidelityVocabularyTokenError, FidelityVocabularyTranslationError):
+        return False
+    if mapping.evidence_class is None:
+        return False
+    return _evidence_class_value(mapping.evidence_class) in CERTIFICATION_DENYLIST
 
 
 def canonicalize_fidelity_emission(

@@ -42,6 +42,8 @@ from simulator.optimize.objective import (
     normalize_objective_sense,
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
+from simulator.backend_names import canonical_backend_name
+from simulator.fidelity_vocabulary import backend_name_denies_authority
 from simulator.optimize.result_scope import result_scope_json, selector_where
 
 SCHEMA_VERSION = 4
@@ -661,6 +663,10 @@ def _assert_cache_write_admissible(scored_result: ScoredResult) -> None:
     )
     if contradiction is not None:
         reasons.append(contradiction)
+    backend_name = _artifact_backend_name(scored_result)
+    name_rejection = _backend_name_admission_rejection(backend_name)
+    if name_rejection is not None:
+        reasons.append(name_rejection)
     approximate_cache = _approximate_reduced_real_cache_state(scored_result)
     if approximate_cache is not None:
         reasons.append(f"approximate_reduced_real_cache_state:{approximate_cache}")
@@ -678,6 +684,30 @@ def _artifact_backend_status(scored_result: ScoredResult) -> str | None:
         status = _extract_backend_status(carrier)
         if status is not None:
             return status
+    return None
+
+
+def _artifact_backend_name(scored_result: ScoredResult) -> str | None:
+    for carrier in _admission_carriers(scored_result):
+        name = _extract_backend_name(carrier)
+        if name is not None:
+            return canonical_backend_name(name)
+    return None
+
+
+def _extract_backend_name(carrier: Any) -> str | None:
+    raw = _carrier_value(carrier, "backend_name")
+    if raw is None:
+        return None
+    text = str(raw).strip()
+    return text or None
+
+
+def _backend_name_admission_rejection(backend_name: str | None) -> str | None:
+    if backend_name is None:
+        return None
+    if backend_name_denies_authority(backend_name):
+        return f"backend_name_non_authoritative:{backend_name}"
     return None
 
 

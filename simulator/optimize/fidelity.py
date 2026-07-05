@@ -31,6 +31,7 @@ from simulator.optimize.objective import ObjectiveValue
 from simulator.fidelity_vocabulary import (
     CANONICAL_EVIDENCE_CLASSES,
     FidelityVocabularyTranslationError,
+    backend_name_denies_authority,
     canonicalize_fidelity_emission,
     translate_legacy_token,
 )
@@ -622,6 +623,8 @@ def _arm_backend_authority(
         else None
     )
     if backend_name == "cached-real" and authoritative and inherited_evidence_class is None:
+        authoritative = False
+    if authoritative and backend_name_denies_authority(backend_name):
         authoritative = False
     canonical = canonicalize_fidelity_emission(
         backend_name=backend_name,

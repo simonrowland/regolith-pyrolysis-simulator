@@ -775,6 +775,46 @@ def test_store_accepts_closure_clean_authoritative_in_domain_cache_write(
         assert conn.execute("SELECT count(*) FROM results").fetchone()[0] == 1
 
 
+def test_store_rejects_stub_backend_name_with_spoofed_authority_markers(
+    tmp_path,
+) -> None:
+    spec = _base_spec()
+    trace = _admissible_trace(
+        {
+            "backend_name": "stub",
+            "backend_status": "ok",
+            "backend_authoritative": True,
+        }
+    )
+    scored = _scored(
+        spec,
+        result_blob=trace,
+        product_summary={"oxygen_kg": 10.0},
+    )
+    scored = replace(
+        scored,
+        run_reference=RunReference(
+            status="ok",
+            trace=trace,
+            backend_name="stub",
+            backend_status="ok",
+            backend_authoritative=True,
+            product_summary={"oxygen_kg": 10.0},
+        ),
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    assert "backend_name_non_authoritative:stub" in exc_info.value.reasons
+    assert store.lookup(spec) is None
+
+
 def test_store_rejects_nan_margin_numbers(tmp_path) -> None:
     spec = _base_spec()
     store = ResultStore(tmp_path / "results.sqlite")
