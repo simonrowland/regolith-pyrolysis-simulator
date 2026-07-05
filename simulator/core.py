@@ -609,6 +609,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._o2_bubbler_passthrough_kg = 0.0
         self._o2_bubbler_vented_kg = 0.0
         self._o2_bubbler_overhead_passthrough_pending_kg = 0.0
+        self._o2_bubbler_external_o2_in_overhead_mol = 0.0
         self._o2_bubbler_injected_cumulative_kg = 0.0
         self._o2_bubbler_absorbed_cumulative_kg = 0.0
         self._o2_bubbler_passthrough_cumulative_kg = 0.0
@@ -872,6 +873,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._o2_bubbler_passthrough_kg = 0.0
         self._o2_bubbler_vented_kg = 0.0
         self._o2_bubbler_overhead_passthrough_pending_kg = 0.0
+        self._o2_bubbler_external_o2_in_overhead_mol = 0.0
         self._o2_bubbler_injected_cumulative_kg = 0.0
         self._o2_bubbler_absorbed_cumulative_kg = 0.0
         self._o2_bubbler_passthrough_cumulative_kg = 0.0
@@ -1559,6 +1561,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         kernel = self._require_chem_kernel()
         balances_before = self.atom_ledger.kg_by_account()
         transition = kernel.commit_batch(intent, proposal)
+        self._observe_o2_bubbler_external_o2_transition(
+            intent,
+            transition,
+            balances_before,
+        )
         self._observe_reagent_provenance_transition(
             transition,
             balances_before,
@@ -2248,6 +2255,77 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             control_inputs=control_inputs,
         )
         return result
+
+    def _o2_bubbler_external_o2_overhead_mol(self) -> float:
+        return max(
+            0.0,
+            float(getattr(
+                self,
+                '_o2_bubbler_external_o2_in_overhead_mol',
+                0.0,
+            ) or 0.0),
+        )
+
+    def _observe_o2_bubbler_external_o2_transition(
+        self,
+        intent: ChemistryIntent,
+        transition: LedgerTransition,
+        balances_before: Mapping[str, Mapping[str, float]],
+    ) -> None:
+        external_o2_mol = self._o2_bubbler_external_o2_overhead_mol()
+        o2_molar_mass = OXYGEN_MOLAR_MASS_KG_PER_MOL
+        overhead_before_kg = float(
+            (balances_before.get('process.overhead_gas', {}) or {}).get(
+                OXYGEN_SPECIES,
+                0.0,
+            )
+            or 0.0
+        )
+        overhead_before_mol = (
+            max(0.0, overhead_before_kg / o2_molar_mass)
+            if o2_molar_mass > 0.0
+            else 0.0
+        )
+        overhead_debit_mol = self._transition_species_mol(
+            transition,
+            side='debits',
+            account='process.overhead_gas',
+            species=OXYGEN_SPECIES,
+        )
+        if overhead_debit_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+            external_before_mol = min(external_o2_mol, overhead_before_mol)
+            if (
+                external_before_mol > OXYGEN_RESERVOIR_NOOP_MOL
+                and overhead_before_mol > OXYGEN_RESERVOIR_NOOP_MOL
+            ):
+                consumed_external_mol = min(
+                    external_before_mol,
+                    overhead_debit_mol * external_before_mol / overhead_before_mol,
+                )
+                external_o2_mol = max(0.0, external_o2_mol - consumed_external_mol)
+
+        if intent == ChemistryIntent.OXYGEN_BUBBLER:
+            external_o2_mol += self._transition_species_mol(
+                transition,
+                side='credits',
+                account='process.overhead_gas',
+                species=OXYGEN_SPECIES,
+            )
+
+        live_overhead_o2_mol = max(
+            0.0,
+            float(
+                self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                    OXYGEN_SPECIES,
+                    0.0,
+                )
+                or 0.0
+            ),
+        )
+        self._o2_bubbler_external_o2_in_overhead_mol = min(
+            max(0.0, external_o2_mol),
+            live_overhead_o2_mol,
+        )
 
     def _resolve_overhead_headspace_config(
         self, campaign: Optional[CampaignPhase] = None
@@ -3491,6 +3569,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 reason = 'below_threshold'
 
         if absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+            if not self._melt_redox_temperature_shift_is_liquid(T_K):
+                passthrough_mol = actual_injected_mol
+                absorbed_mol = 0.0
+                reason = 'deferred_not_liquid'
+        if absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
             self._apply_oxygen_reservoir_redox_source_terms(
                 {'redox_source:o2_bubbler': absorbed_mol},
                 exchange_direction='redox_source:o2_bubbler',
@@ -3578,6 +3661,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return
         diagnostic = dict(bleed_result.diagnostic or {})
         vented_kg = max(0.0, float(diagnostic.get('o2_vented_kg', 0.0) or 0.0))
+        external_vented_kg = max(
+            0.0,
+            float(diagnostic.get('external_o2_vented_kg', 0.0) or 0.0),
+        )
+        if external_vented_kg > 0.0:
+            vented_kg = external_vented_kg
         attributed = min(pending_kg, vented_kg)
         self._o2_bubbler_vented_kg = attributed
         self._o2_bubbler_vented_cumulative_kg = (
@@ -4054,6 +4143,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'force_drain_all': bool(force_drain_all),
             'max_o2_flow_kg_hr': float(
                 getattr(turbine_spec, 'max_O2_flow_kg_hr', 0.0) or 0.0
+            ),
+            'external_o2_in_overhead_mol': (
+                self._o2_bubbler_external_o2_overhead_mol()
             ),
         }
         if o2_vented_kg is not None:

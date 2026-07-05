@@ -573,6 +573,100 @@ def test_o2_bubbler_passthrough_credits_overhead_without_absorbed_double_count()
     ).get("O2", 0.0) == pytest.approx(mre_o2_before)
 
 
+def test_o2_bubbler_sub_liquid_routes_all_injected_o2_to_overhead(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+    before = sim._current_melt_redox_fO2_log()
+    T_K = sim.melt.temperature_C + 273.15
+    capacity = sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=before,
+        T_K=T_K,
+    )
+    delta_log10 = 0.05
+    target_need_mol = capacity * math.log(10.0) * delta_log10
+    _configure_o2_bubbler(
+        sim,
+        rate_kg_per_hr=10.0 * target_need_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL,
+        eta_absorb=0.5,
+        target_fO2_log=before + delta_log10,
+    )
+
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_temperature_shift_is_liquid",
+        lambda _T_K: False,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_apply_oxygen_reservoir_redox_source_terms",
+        lambda *_args, **_kwargs: pytest.fail("sub-liquid bubbler applied redox"),
+    )
+
+    diagnostic = sim._apply_o2_bubbler()
+
+    assert diagnostic["reason"] == "deferred_not_liquid"
+    assert diagnostic["injected_mol"] > 0.0
+    assert diagnostic["absorbed_mol"] == pytest.approx(0.0)
+    assert diagnostic["passthrough_mol"] == pytest.approx(
+        diagnostic["injected_mol"]
+    )
+    assert sim._current_melt_redox_fO2_log() == pytest.approx(before)
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    ) == pytest.approx(diagnostic["passthrough_mol"])
+
+
+def test_o2_bubbler_external_passthrough_not_terminal_product_o2() -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+    before = sim._current_melt_redox_fO2_log()
+    _configure_o2_bubbler(
+        sim,
+        rate_kg_per_hr=0.1,
+        eta_absorb=0.0,
+        target_fO2_log=before + 0.5,
+    )
+
+    diagnostic = sim._apply_o2_bubbler()
+    passthrough_mol = diagnostic["passthrough_mol"]
+    passthrough_kg = passthrough_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+    assert passthrough_mol > 0.0
+    assert sim._o2_bubbler_external_o2_overhead_mol() == pytest.approx(
+        passthrough_mol
+    )
+    pO2_with_external_provenance = sim._headspace_ledger_pO2_bar_from_o2_mol(
+        sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+    )
+    sim._o2_bubbler_external_o2_in_overhead_mol = 0.0
+    pO2_without_external_provenance = sim._headspace_ledger_pO2_bar_from_o2_mol(
+        sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+    )
+    sim._o2_bubbler_external_o2_in_overhead_mol = passthrough_mol
+    assert pO2_with_external_provenance == pytest.approx(
+        pO2_without_external_provenance
+    )
+
+    bleed_result = sim._dispatch_overhead_bleed(
+        force_drain_all=True,
+        o2_vented_kg=0.0,
+    )
+
+    assert bleed_result.diagnostic["external_o2_bled_mol"] == pytest.approx(
+        passthrough_mol
+    )
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_bubbler_external_vented_to_vacuum"
+    )["O2"] == pytest.approx(passthrough_kg)
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_melt_offgas_stored"
+    ).get("O2", 0.0) == pytest.approx(0.0)
+    assert sim.product_ledger().get("O2", 0.0) == pytest.approx(0.0)
+    assert sim._o2_bubbler_external_o2_overhead_mol() == pytest.approx(0.0)
+
+
 def test_o2_bubbler_raised_fo2_is_visible_to_equilibrium_path(
     monkeypatch,
 ) -> None:

@@ -26,6 +26,9 @@ OXYGEN_MELT_OFFGAS_ACCOUNT = "terminal.oxygen_melt_offgas_stored"
 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT = (
     "terminal.oxygen_melt_offgas_vented_to_vacuum"
 )
+OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT = (
+    "terminal.oxygen_bubbler_external_vented_to_vacuum"
+)
 OXYGEN_SPECIES = "O2"
 
 
@@ -38,6 +41,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         TERMINAL_OFFGAS_ACCOUNT,
         OXYGEN_MELT_OFFGAS_ACCOUNT,
         OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
+        OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -119,23 +123,43 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
 
         bled_o2_mol = bled_mol.get(OXYGEN_SPECIES, 0.0)
         bled_o2_kg = bled_o2_mol * molar_mass.get(OXYGEN_SPECIES, 0.0)
-        o2_vented_kg = self._o2_vented_kg(
-            bled_o2_kg, controls
+        overhead_o2_mol = holdup_mol.get(OXYGEN_SPECIES, 0.0)
+        external_o2_holdup_mol = self._external_o2_holdup_mol(
+            controls,
+            overhead_o2_mol,
         )
-        o2_vented_mol = (
-            o2_vented_kg / molar_mass[OXYGEN_SPECIES]
-            if bled_o2_mol > 0.0 and molar_mass.get(OXYGEN_SPECIES, 0.0) > 0.0
+        external_o2_bled_mol = (
+            min(
+                bled_o2_mol,
+                bled_o2_mol * external_o2_holdup_mol / overhead_o2_mol,
+            )
+            if bled_o2_mol > 0.0 and overhead_o2_mol > 0.0
             else 0.0
         )
-        o2_vented_mol = min(bled_o2_mol, max(0.0, o2_vented_mol))
-        o2_stored_mol = max(0.0, bled_o2_mol - o2_vented_mol)
+        melt_o2_bled_mol = max(0.0, bled_o2_mol - external_o2_bled_mol)
+        melt_o2_bled_kg = melt_o2_bled_mol * molar_mass.get(OXYGEN_SPECIES, 0.0)
+        melt_o2_vented_kg = self._o2_vented_kg(
+            melt_o2_bled_kg, controls
+        )
+        melt_o2_vented_mol = (
+            melt_o2_vented_kg / molar_mass[OXYGEN_SPECIES]
+            if melt_o2_bled_mol > 0.0 and molar_mass.get(OXYGEN_SPECIES, 0.0) > 0.0
+            else 0.0
+        )
+        melt_o2_vented_mol = min(melt_o2_bled_mol, max(0.0, melt_o2_vented_mol))
+        o2_stored_mol = max(0.0, melt_o2_bled_mol - melt_o2_vented_mol)
+        o2_vented_mol = melt_o2_vented_mol + external_o2_bled_mol
         if o2_stored_mol > 0.0:
             credits[OXYGEN_MELT_OFFGAS_ACCOUNT] = {
                 OXYGEN_SPECIES: o2_stored_mol
             }
-        if o2_vented_mol > 0.0:
+        if melt_o2_vented_mol > 0.0:
             credits[OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT] = {
-                OXYGEN_SPECIES: o2_vented_mol
+                OXYGEN_SPECIES: melt_o2_vented_mol
+            }
+        if external_o2_bled_mol > 0.0:
+            credits[OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT] = {
+                OXYGEN_SPECIES: external_o2_bled_mol
             }
 
         for species, mol in bled_mol.items():
@@ -174,8 +198,25 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 "o2_vented_kg": o2_vented_mol * molar_mass.get(
                     OXYGEN_SPECIES, 0.0
                 ),
+                "melt_o2_bled_mol": melt_o2_bled_mol,
+                "melt_o2_vented_mol": melt_o2_vented_mol,
+                "external_o2_holdup_mol": external_o2_holdup_mol,
+                "external_o2_bled_mol": external_o2_bled_mol,
+                "external_o2_vented_mol": external_o2_bled_mol,
+                "external_o2_vented_kg": (
+                    external_o2_bled_mol * molar_mass.get(OXYGEN_SPECIES, 0.0)
+                ),
             },
         )
+
+    @staticmethod
+    def _external_o2_holdup_mol(controls: dict, overhead_o2_mol: float) -> float:
+        raw = controls.get("external_o2_in_overhead_mol", 0.0)
+        try:
+            external_o2_mol = float(raw)
+        except (TypeError, ValueError):
+            external_o2_mol = 0.0
+        return min(max(0.0, external_o2_mol), max(0.0, overhead_o2_mol))
 
     @staticmethod
     def _bled_species_mol(
