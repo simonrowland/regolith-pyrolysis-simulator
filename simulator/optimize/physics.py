@@ -751,6 +751,53 @@ def extraction_completeness_report(
     )
 
 
+_EXTRACTION_COMPLETENESS_LEDGER_TOLERANCE = 1.0e-6
+
+
+def _ledger_mappings_from_trace(
+    trace: Any,
+) -> tuple[Mapping[Any, Any], Mapping[Any, Any]] | None:
+    products = getattr(trace, "product_ledger_kg", None)
+    rump = getattr(trace, "terminal_rump_by_species_kg", None)
+    if products is None or rump is None:
+        return None
+    if not isinstance(products, Mapping) or not isinstance(rump, Mapping):
+        return None
+    return products, rump
+
+
+def _assert_extraction_completeness_provenance_matches_ledger(
+    provenance_results: Mapping[str, TargetExtractionCompleteness],
+    ledger_results: Mapping[str, TargetExtractionCompleteness],
+    targets: tuple[str, ...],
+) -> None:
+    for target in targets:
+        carried = provenance_results[target]
+        ledger = ledger_results[target]
+        carried_fraction = carried.completeness_fraction
+        if carried_fraction is None:
+            continue
+        ledger_fraction = ledger.completeness_fraction
+        if ledger_fraction is None:
+            raise ValueError(
+                "extraction completeness provenance contradicts ledger for "
+                f"{target}: carried completeness_fraction={carried_fraction!r}, "
+                f"ledger completeness_fraction=None "
+                f"(ledger reason={ledger.reason!r})"
+            )
+        if not math.isclose(
+            carried_fraction,
+            ledger_fraction,
+            abs_tol=_EXTRACTION_COMPLETENESS_LEDGER_TOLERANCE,
+            rel_tol=0.0,
+        ):
+            raise ValueError(
+                "extraction completeness provenance contradicts ledger for "
+                f"{target}: carried completeness_fraction={carried_fraction!r}, "
+                f"ledger completeness_fraction={ledger_fraction!r}"
+            )
+
+
 def _extraction_completeness_by_target_for_trace(
     trace: Any,
     constraints: PhysicsConstraintSet,
@@ -762,6 +809,21 @@ def _extraction_completeness_by_target_for_trace(
         constraints,
     )
     if provenance_results is not None:
+        ledger_mappings = _ledger_mappings_from_trace(trace)
+        if ledger_mappings is not None:
+            products, rump = ledger_mappings
+            ledger_results = extraction_completeness_by_target(
+                tuple(str(target) for target in constraints.target_species),
+                constraints.residual_species_by_target,
+                products,
+                rump,
+                require_residual_species=require_residual_species,
+            )
+            _assert_extraction_completeness_provenance_matches_ledger(
+                provenance_results,
+                ledger_results,
+                tuple(str(target) for target in constraints.target_species),
+            )
         return provenance_results
     products = _required_mapping(trace, "product_ledger_kg")
     rump = _required_mapping(trace, "terminal_rump_by_species_kg")

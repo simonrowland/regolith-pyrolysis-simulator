@@ -791,6 +791,34 @@ def test_extraction_completeness_gate_uses_provenance_trace_surface() -> None:
     assert report["status"] == "insufficient-evidence"
 
 
+def test_extraction_completeness_gate_rejects_provenance_contradicting_ledger() -> None:
+    """SC-22: finite carried completeness must agree with product/rump ledger."""
+    constraints = PhysicsConstraintSet(
+        target_species=("Fe",),
+        residual_species_by_target={"Fe": ("FeO", "Fe")},
+    )
+    trace = _trace(
+        condensed=({(3, "Fe"): 1.0},),
+        products={},
+        rump={"FeO": 100.0},
+        extraction_completeness_by_target={
+            "Fe": {
+                "completeness_fraction": 1.0,
+                "product_target_equiv_mol": 1.0,
+                "residual_target_equiv_mol": 0.0,
+                "denominator_target_equiv_mol": 1.0,
+                "reason": "self-certified",
+            },
+        },
+    )
+
+    margin = constraints.extraction_completeness(trace)
+
+    assert not margin.feasible
+    assert "contradicts ledger" in margin.detail
+    assert margin.observed != pytest.approx(1.0)
+
+
 def test_per_species_extraction_thresholds_must_cover_targets() -> None:
     threshold = ThresholdSpec(
         id="extraction_completeness_min[Fe]",
