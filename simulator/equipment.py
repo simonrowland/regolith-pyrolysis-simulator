@@ -158,6 +158,7 @@ class EquipmentDesigner:
     # Melt physical properties
     MELT_DENSITY_KG_M3 = 2700.0     # Basaltic melt ~2500-2900
     MELT_CP_J_KG_K = 1200.0          # Heat capacity of silicate melt
+    # provenance: melt emissivity — REF-047 coefficient_note; engineering default for hot silicates.
     MELT_EMISSIVITY = 0.85            # Radiative emissivity
 
     def design_for_batch(self, mass_kg: float,

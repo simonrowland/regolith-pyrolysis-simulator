@@ -67,6 +67,7 @@ DECOMP_VOLTAGES = {
     # estimated; Na/K are volatile above their boiling points, so activity
     # and vapor partitioning can lower the effective threshold. Hold legacy
     # 0.5 V pending activity/vapor-aware grounding.
+    # provenance: Na2O/K2O legacy rungs — REF-019 Table 2 plus REF-050/REF-051 activity primaries; value intentionally unchanged.
     'Na2O':  0.5,
     'K2O':   0.5,
     # O'Neill 1988 + Chase 1998 Fe-O emf/raw-thermo anchor.
