@@ -83,3 +83,535 @@ values:
       stated pO2): the corrected model p_Na must match the measured ~3.2e-2 Pa @1538 K and the p_Na(T) slope.
     status: pending-rework
     trace: docs-private/deep-research/cf3-alkali-activity-synthesis.md
+
+  - id: janaf_chase1998_thermal_latent_dissoc
+    quantity: >-
+      Metal latent heats of vaporization and parent-oxide dissociation enthalpies used by the thermal
+      budget when estimating the energy cost of evaporated products.
+    value:
+      latent_vaporization_kJ_per_mol: {Na: 97.42, K: 76.90, Mg: 127.40, Fe: 340.00, Ca: 153.60, Al: 284.10, Si: 359.00, Ti: 425.00, Cr: 339.50, Mn: 220.50}
+      oxide_dissociation_kJ_per_mol: {Na2O: 414.22, K2O: 363.17, MgO: 601.60, FeO: 272.04, CaO: 635.09, Al2O3: 1675.69, SiO2: 910.94, TiO2: 944.75, Cr2O3: 1139.70, MnO: 385.20}
+    units: kJ/mol
+    tier: CITED
+    basis: >-
+      Delta_f H deg at 298.15 K, 1 bar standard state; dissociation values are -Delta_f H of the parent
+      oxide, and latent values are M(l) -> M(g) vaporization enthalpies. The runtime uses these as
+      298 K proxies and omits fusion plus sensible heat, as noted at the code site.
+    range:
+      T_K: [298, 6000]
+      recipe_1773_2173K: interpolated within the JANAF tabulation but used as a proxy in the model
+      measured_vs_extrapolated: interpolated
+    uncertainty: "JANAF evaluated, species-specific; typical assessed uncertainty is order 0.1-2 kJ/mol, with per-table details in the source."
+    chosen:
+      ref: REF-020
+      locus: "NIST-JANAF species tables for the listed metals and oxides, Monograph 9."
+      url: "https://janaf.nist.gov/"
+      why: >-
+        Canonical evaluated thermochemical compilation with consistent species and phase coverage across
+        the required metals and oxides.
+    alternatives:
+      - ref: "Barin, Thermochemical Data of Pure Substances"
+        lacks: "different evaluation round and not the uniform JANAF-consistent compilation used elsewhere in the simulator"
+      - ref: "CODATA Key Values"
+        lacks: "selected subset only; not full coverage for all metals, oxides, and vapors in this table"
+    code_sites:
+      - "simulator/thermal_budget.py:71 (_LATENT_VAPORIZATION_KJ_PER_MOL)"
+      - "simulator/thermal_budget.py:100 (_OXIDE_DISSOCIATION_KJ_PER_MOL)"
+    status: active
+
+  - id: ellingham_janaf_linear_fits_v1c
+    quantity: >-
+      Linear JANAF-derived Ellingham fit coefficients and phase-segment deltas for Fe, Si, and Cr
+      oxidation reactions.
+    value:
+      Fe: {low_dH_kJ_per_mol_O2: -538.946, low_dS_kJ_per_mol_O2_K: -0.125272, high_dH_kJ_per_mol_O2: -566.566, high_dS_kJ_per_mol_O2_K: -0.140512}
+      Si: {low_dH_kJ_per_mol_O2: -910.94, low_dS_kJ_per_mol_O2_K: -0.1824, high_dH_kJ_per_mol_O2: -961.15, high_dS_kJ_per_mol_O2_K: -0.21216}
+      Cr: {low_dH_kJ_per_mol_O2: -748.076, low_dS_kJ_per_mol_O2_K: -0.168676, high_dH_kJ_per_mol_O2: -776.076, high_dS_kJ_per_mol_O2_K: -0.18152}
+    units: kJ/mol_O2 and kJ/mol_O2/K
+    tier: CITED
+    basis: >-
+      Per mol O2, pure 1 bar standard states, Raoultian condensed phases; n_M M(phase standard) + O2
+      -> n_oxide oxide(condensed JANAF phase). High-temperature segments include elemental fusion
+      corrections where the runtime switches metal phase.
+    range:
+      T_K: [1100, 2200]
+      phase_splits_K: {Fe: 1811, Si: 1687, Cr: 2180}
+      measured_vs_extrapolated: interpolated
+    uncertainty: "JANAF assessed; current code cross-checks produce expected DeltaG examples such as Fe near -304 kJ/mol_O2 at 1600 C."
+    chosen:
+      ref: REF-020
+      locus: "Fe, Si/SiO2, and Cr condensed JANAF tables plus high-temperature H/S/G functions used for the linear refit."
+      url: "https://janaf.nist.gov/"
+      why: >-
+        Same evaluated thermochemical basis as the rest of the built-in Ellingham and vapor-pressure
+        logic, with explicit phase-split handling.
+    alternatives:
+      - ref: "older JANAF editions or Barin"
+        lacks: "4th-edition update alignment and exact phase-split handling used in the V1c refit"
+    code_sites:
+      - "simulator/chemistry/ellingham_thermo.py:48 (ELLINGHAM_THERMO)"
+      - "simulator/chemistry/ellingham_thermo.py:100 (phase segments)"
+    status: active
+
+  - id: dH_fus_elemental_Fe_1811K_Si_1687K_Cr_2180K
+    quantity: >-
+      Elemental fusion enthalpy corrections applied to Ellingham reaction enthalpies when the metal
+      reactant changes from solid to liquid.
+    value: {Fe_kJ_per_mol: 13.81, Si_kJ_per_mol: 50.21, Cr_kJ_per_mol: 21.0}
+    units: kJ/mol element
+    tier: CITED
+    basis: >-
+      Pure elemental standard-state solid-to-liquid fusion enthalpy at the normal melting point; the
+      reaction enthalpy correction is -n_M * DeltaH_fus for a liquid-metal reactant segment.
+    range:
+      T_K: {Fe: 1811, Si: 1687, Cr: 2180}
+      measured_vs_extrapolated: measured at melting point
+    uncertainty: "Si is reported near 50.2 +/- 0.4 kJ/mol in JANAF notes; Fe and Cr are small-scatter handbook/JANAF values."
+    chosen:
+      ref: REF-020
+      locus: "JANAF elemental condensed-phase tables and fusion notes for Fe, Si, and Cr."
+      url: "https://janaf.nist.gov/"
+      why: "Keeps the phase-change corrections on the same evaluated thermochemical basis as the Ellingham fits."
+    alternatives:
+      - ref: "CRC elemental property tables"
+        lacks: "useful corroboration, but not the same source family as the fitted JANAF reaction functions"
+    code_sites:
+      - "simulator/chemistry/ellingham_thermo.py:104 (Cr fusion note)"
+      - "simulator/chemistry/ellingham_thermo.py:159 (Fe fusion correction)"
+      - "simulator/chemistry/ellingham_thermo.py:228 (Si fusion correction)"
+    status: active
+
+  - id: ellingham_fit_ranges
+    quantity: "Temperature ranges over which the built-in Ellingham linear fits and mbar extensions are declared valid."
+    value: {legacy_T_K: [1100, 1700], extended_T_K: [1100, 2200], Fe_split_K: 1811, Si_split_K: 1687, Cr_split_K: 2180}
+    units: K
+    tier: CITED
+    basis: "Runtime fit-domain declarations tied to the JANAF fit and phase-transition anchors above."
+    range:
+      T_K: [1100, 2200]
+      measured_vs_extrapolated: interpolated
+    uncertainty: "Fit-domain declaration; thermochemical uncertainty inherits from the JANAF tables and fusion corrections."
+    chosen:
+      ref: REF-020
+      locus: "JANAF table coverage and elemental phase-transition temperatures used by the runtime range constants."
+      url: "https://janaf.nist.gov/"
+      why: "The fit ranges are not independent measurements; they are the declared domain for the JANAF-derived fits."
+    alternatives:
+      - ref: "narrow legacy 1100-1700 K runtime range"
+        lacks: "does not cover the current mbar recipes and phase-split extension"
+    code_sites:
+      - "simulator/chemistry/ellingham_thermo.py:23 (fit ranges and phase split constants)"
+    status: active
+
+  - id: Na_pure_antoine
+    quantity: "Pure liquid sodium vapor-pressure Antoine coefficients."
+    value: {A: 7.46077, B: 1873.728, C: -416.372}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: CITED
+    basis: "Pure liquid Na metal, Raoultian standard state; source log10(P/bar) Antoine row converted to Pa by adding 5 to A."
+    range:
+      T_K: [924, 1118]
+      recipe_1773_2173K: strong extrapolation
+      measured_vs_extrapolated: extrapolated
+    uncertainty: "NIST fit to Rodebush & Walters data; no explicit uncertainty bar in the row; historical vapor-pressure uncertainty order few percent."
+    chosen:
+      ref: REF-041
+      locus: "JACS 52(7):2654-2665; NIST WebBook Antoine table, 924-1118 K sodium row."
+      url: "https://doi.org/10.1021/ja01370a011"
+      why: "Primary source row used by NIST for the exact Antoine coefficients currently in the data file."
+    alternatives:
+      - ref: "later sodium vapor-pressure evaluations"
+        lacks: "do not reproduce the exact NIST Antoine row embedded in the simulator"
+    code_sites:
+      - "data/vapor_pressures.yaml:60 (metals.Na.pure_component_antoine)"
+    status: active
+
+  - id: K_pure_antoine
+    quantity: "Pure liquid potassium vapor-pressure Antoine coefficients."
+    value: {A: 9.45718, B: 4691.58, C: 24.195}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: CITED
+    basis: "Pure liquid K metal, Raoultian standard state; source log10(P/bar) Antoine row converted to Pa by adding 5 to A."
+    range:
+      T_K: [679.4, 1033]
+      recipe_1773_2173K: strong extrapolation
+      measured_vs_extrapolated: extrapolated
+    uncertainty: "NIST fit to Fiock & Rodebush data; no explicit uncertainty bar in the row; historical vapor-pressure uncertainty order few percent."
+    chosen:
+      ref: REF-042
+      locus: "JACS 48(10):2522-2528; NIST WebBook Antoine table, 679.4-1033 K potassium row."
+      url: "https://doi.org/10.1021/ja01421a006"
+      why: "Primary source row used by NIST for the exact Antoine coefficients currently in the data file."
+    alternatives:
+      - ref: "later potassium vapor-pressure evaluations"
+        lacks: "do not reproduce the exact NIST Antoine row embedded in the simulator"
+    code_sites:
+      - "data/vapor_pressures.yaml:123 (metals.K.pure_component_antoine)"
+    status: active
+
+  - id: Ca_pure_antoine
+    quantity: "Pure liquid calcium vapor-pressure Antoine coefficients."
+    value: {A: 7.78473, B: 3121.368, C: -594.591}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: CITED
+    basis: "Pure liquid Ca metal, Raoultian standard state; source log10(P/bar) Antoine row converted to Pa by adding 5 to A."
+    range:
+      T_K: [1254, 1712]
+      recipe_1773_2173K: slight extrapolation
+      measured_vs_extrapolated: extrapolated
+    uncertainty: "NIST fit to Hartmann & Schneider data; no explicit uncertainty bar in the row."
+    chosen:
+      ref: REF-043
+      locus: "ZAAC 180(1):275-283; NIST WebBook Antoine table, 1254-1712 K calcium row."
+      url: "https://doi.org/10.1002/zaac.19291800129"
+      why: "Primary source row used by NIST for the exact Antoine coefficients currently in the data file."
+    alternatives:
+      - ref: "calcium boiling-point or handbook data"
+        lacks: "full Antoine row matching the simulator coefficients"
+    code_sites:
+      - "data/vapor_pressures.yaml:241 (metals.Ca.pure_component_antoine)"
+    status: active
+
+  - id: Al_pure_antoine
+    quantity: "Pure liquid aluminum vapor-pressure Antoine coefficients."
+    value: {A: 10.73623, B: 13204.109, C: -24.306}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: CITED
+    basis: "Pure liquid Al metal, Raoultian standard state; source log10(P/bar) Antoine row converted to Pa by adding 5 to A."
+    range:
+      T_K: [1557, 2329]
+      recipe_1773_2173K: within or near source range
+      measured_vs_extrapolated: interpolated
+    uncertainty: "NIST fit to Stull compilation data."
+    chosen:
+      ref: REF-002
+      locus: "Industrial & Engineering Chemistry 39(4):517-540; NIST WebBook Antoine table, 1557-2329 K aluminum row."
+      url: "https://doi.org/10.1021/ie50448a022"
+      why: "Existing project bibliography entry for the Stull compilation row used by NIST."
+    alternatives:
+      - ref: "earlier aluminum vapor-pressure primaries"
+        lacks: "not the exact NIST/Stull compilation row embedded in the data file"
+    code_sites:
+      - "data/vapor_pressures.yaml:271 (metals.Al.pure_component_antoine)"
+    status: active
+
+  - id: Fe_pure_antoine
+    quantity: "Pure liquid iron vapor-pressure Clausius-Clapeyron approximation encoded as Antoine coefficients."
+    value: {A: 10.670336, B: 17759.430841, C: 0}
+    units: "log10(P_Pa) = A - B/T_K"
+    tier: UNCERTIFIED
+    basis: >-
+      Pure liquid Fe metal, Raoultian standard state; derived constant-DeltaH Clausius-Clapeyron form
+      anchored to the normal boiling point and DeltaH_vap near 340 kJ/mol, not a primary Antoine fit.
+    range:
+      anchor_T_K: 3135.15
+      recipe_1773_2173K: engineering extrapolation of constant-DeltaH form
+      measured_vs_extrapolated: extrapolated
+    uncertainty: "Literature scatter in high-temperature Fe DeltaH_vap and boiling point; no single primary Antoine row recovered."
+    chosen:
+      ref: REF-012
+      locus: "NIST/CRC-style elemental boiling point and vaporization enthalpy values; local Clausius-Clapeyron derivation."
+      url: "https://webbook.nist.gov/chemistry/"
+      why: "Best documented basis for the current simple iron pure-component approximation, but not certification-grade."
+    alternatives:
+      - ref: "Hultgren or Desai high-temperature evaluations"
+        lacks: "more complex equations and variant anchors; not the simple runtime CC Antoine form"
+    code_sites:
+      - "data/vapor_pressures.yaml:208 (metals.Fe.pure_component_antoine)"
+    status: active
+
+  - id: pseudo_antoine_Na_backsolve
+    quantity: "Effective pseudo-Antoine sodium standard term backsolved from VapoRock gas abundances."
+    value: {A: 5.18586, B: 11127.434869, C: 1000}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: UNCERTIFIED
+    basis: >-
+      Effective pseudo-saturation pressure term; activity_term * P_pseudo reproduces VapoRock p_Na at
+      Kress91 IW with the activity formula recorded in data/vapor_pressures.yaml.
+    range:
+      T_K: [1350, 1950]
+      samples: 217
+      recipe_1773_2173K: extrapolated above 1950 K
+      measured_vs_extrapolated: extrapolated
+    uncertainty: "Maximum dense-grid residual 0.379 dex against the VapoRock backsolve target."
+    chosen:
+      ref: REF-044
+      locus: "VapoRock ApJ 947:64 plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve."
+      url: "https://doi.org/10.3847/1538-4357/acbcc7"
+      why: "Documents the model target for the effective pseudo term; not a primary measurement."
+    alternatives:
+      - ref: REF-041
+        lacks: "pure metal vapor pressure only; lacks silicate-melt nonideality and VapoRock gas speciation"
+    code_sites:
+      - "data/vapor_pressures.yaml:metals.Na.antoine"
+    status: active
+
+  - id: pseudo_antoine_K_backsolve
+    quantity: "Effective pseudo-Antoine potassium standard term backsolved from VapoRock gas abundances."
+    value: {A: 8.59344, B: 24937.098488, C: 1000}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: UNCERTIFIED
+    basis: "Effective pseudo-saturation pressure term on the same VapoRock/Kress91 IW basis as the sodium backsolve."
+    range:
+      T_K: [1350, 1950]
+      recipe_1773_2173K: extrapolated above 1950 K
+      measured_vs_extrapolated: extrapolated
+    uncertainty: "Maximum dense-grid residual 0.691 dex against the VapoRock backsolve target."
+    chosen:
+      ref: REF-044
+      locus: "VapoRock ApJ 947:64 plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve."
+      url: "https://doi.org/10.3847/1538-4357/acbcc7"
+      why: "Documents the model target for the effective pseudo term; not a primary measurement."
+    alternatives:
+      - ref: REF-042
+        lacks: "pure metal vapor pressure only; lacks silicate-melt nonideality and VapoRock gas speciation"
+    code_sites:
+      - "data/vapor_pressures.yaml:metals.K.antoine"
+    status: active
+
+  - id: pseudo_antoine_Fe_backsolve
+    quantity: "Effective pseudo-Antoine iron standard term backsolved from VapoRock gas abundances."
+    value: {A: 9.408547, B: 23312.312336, C: 1000}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: UNCERTIFIED
+    basis: "Effective pseudo-saturation pressure term on the same VapoRock/Kress91 IW basis as the sodium backsolve."
+    range:
+      T_K: [1350, 1950]
+      valid_range_K: [1400, 1900]
+      recipe_1773_2173K: extrapolated above 1950 K
+      measured_vs_extrapolated: extrapolated
+    uncertainty: "Maximum dense-grid residual 0.418 dex; prior lower residual did not re-confirm in the sweep."
+    chosen:
+      ref: REF-044
+      locus: "VapoRock ApJ 947:64 plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve."
+      url: "https://doi.org/10.3847/1538-4357/acbcc7"
+      why: "Documents the model target for the effective pseudo term; not a primary measurement."
+    alternatives:
+      - ref: REF-012
+        lacks: "pure Fe boiling-point/DeltaH anchor only; lacks VapoRock melt and oxygen-fugacity behavior"
+    code_sites:
+      - "data/vapor_pressures.yaml:metals.Fe.antoine"
+    status: active
+
+  - id: pseudo_antoine_SiO_backsolve
+    quantity: "Effective pseudo-Antoine SiO standard term backsolved from VapoRock gas abundances."
+    value: {A: 28.062027, B: 79705.252727, C: 1000}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: UNCERTIFIED
+    basis: >-
+      Effective pseudo-saturation pressure for SiO2 -> SiO + 1/2 O2 with the runtime activity and
+      pO2 suppression term.
+    range:
+      T_K: [1350, 1950]
+      extrapolated_valid_range_K: [1400, 2273.15]
+      measured_vs_extrapolated: extrapolated
+    uncertainty: "Maximum dense-grid residual 0.270 dex against the VapoRock backsolve target."
+    chosen:
+      ref: REF-044
+      locus: "VapoRock ApJ 947:64 plus local scripts/vaporock_pseudo_antoine_refit.py minimax-log10 backsolve."
+      url: "https://doi.org/10.3847/1538-4357/acbcc7"
+      why: "Documents the model target for the effective pseudo term; not a primary measurement."
+    alternatives:
+      - ref: REF-002
+        lacks: "pure vapor-pressure compilation only; lacks pO2-sensitive SiO speciation in silicate vapor"
+    code_sites:
+      - "data/vapor_pressures.yaml:oxide_vapors.SiO.antoine"
+    status: active
+
+  - id: Na_evaporation_alpha
+    quantity: "Effective sodium evaporation coefficient used in the Hertz-Knudsen-Langmuir flux path."
+    value: 1.0
+    units: dimensionless
+    tier: UNCERTIFIED
+    basis: >-
+      Apparent open-furnace mass-loss coefficient for the mbar-sweep process regime; not the sealed KEMS
+      intrinsic evaporation coefficient.
+    range:
+      T_K: [1700, 2273]
+      alpha_envelope: [0.9, 1.0]
+      measured_vs_extrapolated: measured-regime-adapted
+    uncertainty: "Sossi open-furnace behavior is near ideal; Fedkin sealed-chamber KEMS alternative is about 0.13 and remains a regime-mismatch warning."
+    chosen:
+      ref: REF-013
+      locus: "Sossi et al. 2019, open 1 atm furnace ferrobasalt FCMAS mass-loss experiments and evaporation model."
+      url: "https://doi.org/10.1016/j.gca.2019.06.021"
+      why: "Closest regime match for continuous sweep/open mass loss, while still uncertified for mbar process use."
+    alternatives:
+      - ref: REF-014
+        value: "alpha_e about 0.13"
+        lacks: "sealed KEMS chamber intrinsic coefficient, not continuous open-sweep routing"
+    code_sites:
+      - "data/vapor_pressures.yaml:metals.Na.evaporation_alpha"
+    status: active
+
+  - id: mre_decomp_voltages_cited_raw_thermo
+    quantity: "Standard oxide decomposition voltages with cited high-temperature raw-thermo grounding."
+    value: {NiO: 0.39, FeO: 0.75, Cr2O3: 0.95, MnO: 1.05, SiO2: 1.45, TiO2: 1.70, Al2O3: 1.95}
+    units: V
+    tier: CITED
+    basis: >-
+      E0 = -DeltaGf(T about 1873 K)/(n F), per oxide formula unit; n follows the reduction
+      stoichiometry. Runtime Nernst terms apply melt activity and pO2 from the standard pO2=1 bar
+      reference.
+    range:
+      T_K: [1773, 2173]
+      anchor_T_K: 1873
+      measured_vs_extrapolated: interpolated
+    uncertainty: "Rounded to 0.05 V; high-temperature DeltaGf scatter is typically a few tens of kJ/mol for the major oxides."
+    chosen:
+      ref: REF-020
+      locus: "JANAF species tables near 1800-1900 K, plus NiO Hemingway/Robie/NEA and FeO O'Neill emf anchors where code comments identify them."
+      url: "https://janaf.nist.gov/"
+      why: "Provides the common raw-thermo basis for the cited MRE voltage rungs."
+    alternatives:
+      - ref: "NASA molten oxide electrolysis table at 1300 K"
+        lacks: "lower-temperature potentials and different normalization/activities; not the 1873 K runtime anchor"
+      - ref: REF-045
+        value: "NiO 0.39 V support"
+        lacks: "single-species NiO support only, not a full oxide ladder"
+      - ref: REF-046
+        value: "FeO 0.75 V support"
+        lacks: "single Fe-O emf support only, not a full oxide ladder"
+    code_sites:
+      - "simulator/electrolysis.py:58 (DECOMP_VOLTAGES)"
+      - "engines/builtin/electrolysis_step.py:104 (MRE_DECOMP_VOLTAGE_PROVENANCE)"
+    status: active
+
+  - id: mre_decomp_voltages_uncertified_legacy
+    quantity: "Legacy oxide decomposition voltages whose high-temperature primary grounding remains incomplete."
+    value: {Na2O: 0.5, K2O: 0.5, Fe2O3: 0.90, MgO: 2.2, CaO: 2.5}
+    units: V
+    tier: UNCERTIFIED
+    basis: >-
+      Same E0 = -DeltaGf/(nF) runtime convention as the cited rungs, but the current code marks these
+      values as legacy, reference-only, or pending source/activity/vapor-aware grounding.
+    range:
+      anchor_T_K: 1873
+      recipe_1773_2173K: within runtime use but source grounding incomplete
+      measured_vs_extrapolated: uncertified
+    uncertainty: "Rounded legacy values; Na/K volatility and Mg/Ca missing source anchors are explicit open gaps."
+    chosen:
+      ref: REF-020
+      locus: "JANAF-style raw-thermo convention used by the ladder; exact legacy Na2O/K2O/MgO/CaO anchors not recovered."
+      url: "https://janaf.nist.gov/"
+      why: "Records the intended thermochemical basis while preserving the sweep's UNCERTIFIED status."
+    alternatives:
+      - ref: "NASA molten oxide electrolysis table at 1300 K"
+        lacks: "lower-temperature and different normalization/activities; confirms these should not be promoted blindly"
+    code_sites:
+      - "simulator/electrolysis.py:58 (DECOMP_VOLTAGES)"
+      - "engines/builtin/electrolysis_step.py:104 (legacy_uncited provenance statuses)"
+    status: active
+
+  - id: condensation_reference_at_1mbar_routing_temps
+    quantity: "Nominal condenser routing temperatures labeled as 1 mbar condensation references."
+    value: {Fe: 1250, SiO: 1050, Mg: 580, Na: 480, K: 420, Ca: 780, Mn: 1000, Cr: 1280, CrO2: 1250, NaCl: 900, KCl: 880}
+    units: degC
+    tier: ASSUMED
+    basis: >-
+      Engineering process-routing thresholds at roughly 1 mbar partial pressure, aligned to condenser
+      stage bands and effective vapor behavior. These are not pure-component p_sat=1 mbar crossings
+      except approximately for Na and Mg.
+    range:
+      process_basis: condenser stage routing
+      measured_vs_extrapolated: assumed
+    uncertainty: "No reported measurement or primary row for the exact routing values; tolerances are operator/setpoint choices."
+    chosen:
+      ref: "ASSUMED: no primary source"
+      locus: "data/setpoints.yaml condensation_temperatures_C notes and simulator/condensation.py CONDENSATION_TEMPS_C comments."
+      url: ""
+      why: "The sweep found no primary source for these exact routing values; preserving them as explicit engineering assumptions is more honest."
+    alternatives:
+      - ref: "Lodders 2003 nebular 50 percent condensation temperatures"
+        lacks: "wrong composition and meaning; not process-stream 1 mbar partial-pressure routing"
+      - ref: "Schick 1960 SiO vapor-pressure data"
+        lacks: "old qualitative support only; does not pin 1050 C and is reported as overpredicting in later work"
+      - ref: "pure Antoine 1 mbar crossings"
+        lacks: "only approximate for Na/Mg; Fe, Ca, Cr, chlorides, and SiO do not match the routing table"
+    code_sites:
+      - "data/vapor_pressures.yaml:704 (DEAD condensation_reference_at_1mbar block; runtime ignores it)"
+      - "simulator/condensation.py:1550 (runtime CONDENSATION_TEMPS_C)"
+      - "data/setpoints.yaml:885 (operator condensation_temperatures_C override)"
+    status: "active; cleanup: data/vapor_pressures.yaml:704 is dead metadata and should be removed or relabeled"
+
+  - id: melt_total_hemispherical_emissivity
+    quantity: "Total hemispherical emissivity used for radiative heat loss from the melt/equipment surface."
+    value: 0.85
+    units: dimensionless
+    tier: ASSUMED
+    basis: >-
+      Engineering default for sigma * epsilon * A * T^4 net radiative loss to sky/vacuum from a
+      non-metallic high-temperature silicate surface.
+    range:
+      T_K: "literature mostly below or near 1500-1700 K; recipe 1773-2173 K is at or above direct support"
+      composition: basaltic, ferrobasaltic, lunar-simulant, refractory/slag analogs
+      measured_vs_extrapolated: extrapolated
+    uncertainty: "Literature scatter roughly 0.6-0.95; typical uncertainty +/-0.05 to +/-0.15, strongly surface-state dependent."
+    chosen:
+      ref: REF-047
+      locus: "Journal of the Energy Institute 92:523-534, high-temperature glass/refractory/slag emissivity compilation."
+      url: "https://doi.org/10.1016/j.joei.2018.04.006"
+      why: "Best compilation-scale support for a mid/high silicate emissivity default, but not a direct lunar melt measurement."
+    alternatives:
+      - ref: REF-048
+        value: "basalt lava emissivity about 0.973 smooth and 0.984 rough"
+        locus: "JGR Solid Earth 111:B11203"
+        lacks: "thermal-infrared band and lava surface/crust context, not total hemispherical clean melt"
+      - ref: "light oxide refractory emissivities"
+        lacks: "wrong composition and lower-emissivity surface class"
+    code_sites:
+      - "simulator/equipment.py:161 (EquipmentDesigner.MELT_EMISSIVITY)"
+      - "simulator/thermal_budget.py:43 (MELT_EMISSIVITY)"
+    status: active
+
+  - id: cro2_oxide_vapor_rxn_enthalpy
+    quantity: "Reference enthalpy for CrO2 gas formation from chromia and oxygen in the thermal-budget oxide-vapor path."
+    value: 494.54
+    units: kJ/mol
+    tier: UNCERTIFIED
+    basis: >-
+      DeltaH_298 for 1/2 Cr2O3(s) + 1/4 O2(g) -> CrO2(g), using Delta_f H deg of CrO2(g)
+      about -75.31 kJ/mol on a 1 bar standard-state basis.
+    range:
+      T_K: [298, 298]
+      recipe_1773_2173K: high-temperature use inherits unclosed scatter
+      measured_vs_extrapolated: extrapolated
+    uncertainty: "Reviewed thermochemical value, but Barin/Ebbinghaus cross-checks were not recovered; scatter remains open."
+    chosen:
+      ref: REF-020
+      locus: "NIST-JANAF / WebBook gas thermochemistry for CrO2(g), CAS 12018-01-8, Delta_f H gas row."
+      url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C12018018&Mask=1"
+      why: "Only recovered source family for the current CrO2 enthalpy, but uncertainty closure is incomplete."
+    alternatives:
+      - ref: "Barin, Thermochemical Data of Pure Substances"
+        lacks: "CrO2(g) table value not recovered in the sweep"
+      - ref: "Ebbinghaus 1993 Combustion and Flame 93:119"
+        lacks: "DeltaHf298 CrO2(g) value not recovered in the sweep"
+    code_sites:
+      - "simulator/thermal_budget.py:156 (CrO2 enthalpy)"
+    status: active
+
+  - id: crO2_vapor_row
+    quantity: "CrO2 oxide-vapor Antoine/Shomate row used for vapor-pressure estimates."
+    value: {A: 12.9245114, B: 23732.9593, C: 0, H: -75.312}
+    units: "log10(P_Pa) coefficients and kJ/mol Shomate H"
+    tier: UNCERTIFIED
+    basis: >-
+      Fit to VapoRock/JANAF0 for 0.5 Cr2O3 + 0.25 O2 -> CrO2(g), with oxide activity 0.5 and
+      pO2 exponent handling recorded in data/vapor_pressures.yaml.
+    range:
+      T_K: [1500, 2200]
+      recipe_1773_2173K: inside fit range
+      measured_vs_extrapolated: fit-derived
+    uncertainty: "Backsolve/fit-derived; underlying CrO2(g) thermochemistry scatter remains open."
+    chosen:
+      ref: REF-020
+      locus: "Chase 1998 / NIST-JANAF via VapoRock JANAF0; WebBook CrO2(g) CAS 12018-01-8."
+      url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C12018018&Mask=1"
+      why: "Matches the current JANAF0/VapoRock fit basis while retaining UNCERTIFIED status."
+    alternatives:
+      - ref: "Barin or Ebbinghaus chromium-gas thermochemistry"
+        lacks: "specific CrO2(g) fit basis and values were not recovered in the sweep"
+    code_sites:
+      - "data/vapor_pressures.yaml:578 (oxide_vapors.CrO2)"
+    status: active

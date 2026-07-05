@@ -24,6 +24,7 @@ references:
     pages: "517-540"
     doi: "10.1021/ie50448a022"
     url: "https://webbook.nist.gov/chemistry/"
+    coefficient_note: "Compilation source for the NIST WebBook pure-component Antoine fit used for Al. The Na/K/Ca pure-component Antoine fits trace instead to their primary vapor-pressure papers REF-041 (Rodebush & Walters 1930), REF-042 (Fiock & Rodebush 1926), REF-043 (Hartmann & Schneider 1929), cited at those rows."
     role: DATA
     topic: vapor-pressure
     status: current
@@ -279,6 +280,7 @@ references:
     pages: "393-459"
     doi: "10.2138/rmg.2018.84.11"
     url: "https://doi.org/10.2138/rmg.2018.84.11"
+    coefficient_note: "Compilation of oxide melt-activity coefficients (Table 2, pp. 409-410). For the alkali melt activity the model relies instead on the primary KEMS measurement REF-013 (Sossi 2019), which controls for a lunar-analog ferrobasalt melt composition; the Table 2 NaO0.5 datum here is from a CMS melt. Included for the T-dependence (Fig 5) and the standard-state definition (Eqns 24-25)."
     role: REVIEW
     topic: volatility
     status: current
@@ -607,5 +609,152 @@ references:
     topic: evaporation
     status: current
     found: "2026-06-30 sio-coldwall-sticking-grounding"
+    needs_quote: true
+    pull_quotes: []
+  REF-041:
+    authors: "Rodebush, W.H. & Walters, E.H."
+    title: "Sodium vapor-pressure measurements used by the NIST WebBook Antoine row"
+    journal: "Journal of the American Chemical Society"
+    year: 1930
+    volume: "52"
+    pages: "2654-2665"
+    doi: "10.1021/ja01370a011"
+    url: "https://webbook.nist.gov/cgi/inchi?ID=C7440235&Mask=4&Type=ANTOINE"
+    role: MEASUREMENT
+    topic: vapor-pressure
+    status: current
+    coefficient_note: "Na pure-component Antoine source row; NIST WebBook gives 924-1118 K coefficients from Rodebush & Walters data. Publication title not independently verified in this chunk."
+    found: "2026-07-05 citation-sweep population"
+    needs_quote: true
+    pull_quotes: []
+  REF-042:
+    authors: "Fiock, E.F. & Rodebush, W.H."
+    title: "Potassium vapor-pressure measurements used by the NIST WebBook Antoine row"
+    journal: "Journal of the American Chemical Society"
+    year: 1926
+    volume: "48"
+    pages: "2522-2528"
+    doi: "10.1021/ja01421a006"
+    url: "https://webbook.nist.gov/cgi/inchi?ID=C7440097&Mask=4&Type=ANTOINE"
+    role: MEASUREMENT
+    topic: vapor-pressure
+    status: current
+    coefficient_note: "K pure-component Antoine source row; NIST WebBook gives 679.4-1033 K coefficients from Fiock & Rodebush data. Publication title not independently verified in this chunk."
+    found: "2026-07-05 citation-sweep population"
+    needs_quote: true
+    pull_quotes: []
+  REF-043:
+    authors: "Hartmann, H. & Schneider, A."
+    title: "Calcium vapor-pressure measurements used by the NIST WebBook Antoine row"
+    journal: "Zeitschrift fuer anorganische und allgemeine Chemie"
+    year: 1929
+    volume: "180"
+    pages: "275-283"
+    doi: "10.1002/zaac.19291800129"
+    url: "https://webbook.nist.gov/cgi/inchi?ID=C7440702&Mask=4&Type=ANTOINE"
+    role: MEASUREMENT
+    topic: vapor-pressure
+    status: current
+    coefficient_note: "Ca pure-component Antoine source row; NIST WebBook gives 1254-1712 K coefficients from Hartmann & Schneider data. Publication title not independently verified in this chunk."
+    found: "2026-07-05 citation-sweep population"
+    needs_quote: true
+    pull_quotes: []
+  REF-044:
+    authors: "Wolf, A.S., Jaeggi, N., Sossi, P.A. & Bower, D.J."
+    title: "VapoRock: Thermodynamics of vaporized silicate melts for modeling volcanic outgassing and magma ocean atmospheres"
+    journal: "The Astrophysical Journal"
+    year: 2023
+    volume: "947"
+    pages: "64"
+    doi: "10.3847/1538-4357/acbcc7"
+    url: "https://arxiv.org/abs/2208.09582"
+    role: MODEL
+    topic: vapor-pressure
+    status: current
+    coefficient_note: "VapoRock target model for local pseudo-Antoine backsolves; model provenance, not primary vapor-pressure measurement."
+    found: "2026-07-05 citation-sweep population"
+    needs_quote: true
+    pull_quotes: []
+  REF-045:
+    authors: "Hemingway, B.S."
+    title: "NiO thermodynamic data used for high-temperature decomposition voltage grounding"
+    journal: "American Mineralogist"
+    year: 1990
+    volume: "75"
+    pages: "781"
+    doi: ""
+    url: ""
+    provenance_unavailable_reason: "The 2026-07-05 verified harvest supplied only Hemingway 1990, American Mineralogist 75:781 for NiO; DOI, exact title, and full page span were not verified, so they are left unclaimed."
+    role: DATA
+    topic: thermochemistry
+    status: current
+    coefficient_note: "NiO high-temperature DeltaGf support used with Robie & Hemingway and NEA nickel thermodynamics for the 0.39 V rung."
+    found: "2026-07-05 citation-sweep population"
+    needs_quote: true
+    pull_quotes: []
+  REF-046:
+    authors: "O'Neill, H.St.C."
+    title: "FeO electromotive-force thermodynamic data used for decomposition voltage grounding"
+    journal: ""
+    year: 1988
+    volume: ""
+    pages: ""
+    doi: ""
+    url: ""
+    provenance_unavailable_reason: "The 2026-07-05 verified harvest supplied only an O'Neill 1988 Fe-O emf locus; DOI, journal, title, and pages were not verified, so they are left unclaimed."
+    role: MEASUREMENT
+    topic: thermochemistry
+    status: current
+    coefficient_note: "FeO emf/raw-thermo anchor paired with Chase 1998 NIST-JANAF for the 0.75 V rung."
+    found: "2026-07-05 citation-sweep population"
+    needs_quote: true
+    pull_quotes: []
+  REF-047:
+    authors: "Jones, A.D., Lior, N. & Frysinger, S.P."
+    title: "Emissivity of high-temperature industrial and natural silicate materials"
+    journal: "Journal of the Energy Institute"
+    year: 2019
+    volume: "92"
+    pages: "523-534"
+    doi: "10.1016/j.joei.2018.04.006"
+    url: "https://doi.org/10.1016/j.joei.2018.04.006"
+    role: REVIEW
+    topic: thermal-properties
+    status: current
+    coefficient_note: "Support for MELT_EMISSIVITY=0.85 as an engineering default; not a direct measurement of the exact lunar melt state."
+    found: "2026-07-05 citation-sweep population"
+    needs_quote: true
+    pull_quotes: []
+  REF-048:
+    authors: "Ball, M. & Pinkerton, H."
+    title: "Factors affecting the accuracy of thermal imaging cameras in volcanology"
+    journal: "Journal of Geophysical Research: Solid Earth"
+    year: 2006
+    volume: "111"
+    pages: "B11203"
+    doi: "10.1029/2005JB003829"
+    url: "https://doi.org/10.1029/2005JB003829"
+    role: MEASUREMENT
+    topic: thermal-properties
+    status: current
+    coefficient_note: "Basalt lava emissivity alternative for the melt-emissivity registry entry; high lava-surface values are not adopted as the simulator default."
+    found: "2026-07-05 citation-sweep population"
+    needs_quote: true
+    pull_quotes: []
+  REF-049:
+    authors: "DeMaria, G., Balducci, G., Guido, M. & Piacente, V."
+    title: "Apollo 12022 Knudsen-effusion mass-spectrometry vaporization study"
+    journal: "Proceedings of the Second Lunar Science Conference"
+    year: 1971
+    volume: "2"
+    pages: "1367-1380"
+    doi: ""
+    url: ""
+    provenance_unavailable_reason: "The 2026-07-05 sweep identified a DOI-less proceedings locus and requested ADS-bibcode verification; the bibcode was not independently verified in this chunk, so no ADS URL is claimed."
+    role: MEASUREMENT
+    topic: vapor-pressure
+    status: current
+    coefficient_note: "Apollo 12022 KEMS lunar validation source for Na/K vapor pressures and alkali activity sanity checks; page span comes from the verified harvest, ADS bibcode remains unverified."
+    found: "2026-07-05 citation-sweep population"
     needs_quote: true
     pull_quotes: []
