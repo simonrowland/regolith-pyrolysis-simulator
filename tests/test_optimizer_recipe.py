@@ -357,7 +357,11 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # identical); only the source-module digest moves. Provenance rebaseline.
     # 2026-07-04 (#89): functional-YAML production digest (setpoints/vapor_pressures
     # parsed-content, not raw bytes) shifts the evalspec cache_key; golden-neutral.
-    assert cache_key(spec) == "cc0a0b827d59e6a4573c9af073acee12b51f00a70a3ae6419aeeb623d33cc66d"
+    # 2026-07-04 (CF-2-lite): Ellingham source-fingerprint move from code-only
+    # mbar-species fit segmentation and authority flags; production YAML digest
+    # remains stable because data/setpoints.yaml and data/vapor_pressures.yaml
+    # are untouched.
+    assert cache_key(spec) == "149ceb110248267186640b8b88afcc59fa2781c7c8cf26306cb48a4f2e3f853d"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

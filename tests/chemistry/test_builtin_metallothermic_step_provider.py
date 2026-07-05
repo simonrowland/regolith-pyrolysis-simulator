@@ -47,6 +47,7 @@ from engines.builtin.metallothermic_step import (
     REACTION_FAMILY_C6_MG,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
+from simulator.chemistry.ellingham_thermo import ELLINGHAM_AUTHORITY_LIMIT_FLAG
 from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
@@ -106,6 +107,27 @@ def test_provider_declares_metallothermic_accounts():
     assert "terminal.oxygen_mre_anode_stored" not in profile.declared_accounts
     assert "terminal.oxygen_melt_offgas_stored" not in profile.declared_accounts
     assert "terminal.oxygen_stage0_stored" not in profile.declared_accounts
+
+
+def test_ellingham_authority_flag_is_consumed_by_metallothermic_diagnostic():
+    provider = BuiltinMetallothermicStepProvider()
+
+    extrapolations = provider._ellingham_pair_fit_extrapolations(
+        "Na",
+        ("TiO2",),
+        1800.0,
+    )
+    diagnostic = provider._ellingham_fit_diagnostic(extrapolations)
+
+    authority = diagnostic["ellingham_authority"]
+    assert authority["consumer"] == "builtin-metallothermic-step"
+    assert authority["status"] == "extrapolation_limited"
+    assert authority[ELLINGHAM_AUTHORITY_LIMIT_FLAG] is True
+    assert "Na/TiO2" in authority["extrapolated_beyond_fit_range_K"]
+    limited = authority["extrapolated_beyond_fit_range_K"]["Na/TiO2"][
+        "limited_species"
+    ]
+    assert set(limited) == {"Ti"}
 
 
 # ---------------------------------------------------------------------------
@@ -394,19 +416,15 @@ def test_crossover_temperature_C_reports_physical_roots_only():
     # K/Fe crossover under V1c-constants JANAF refit dropped from 1216 C
     # to 832 C (V1c-NEEDS-RECIPE-RETUNE finding: K shuttle no longer
     # viable in default 1150-1600 C melt window).
-    # Na/Ti gains a physical (but very low-T) crossover under JANAF at
-    # 269.5 C; in practice still refused because no melt operates that
-    # cold, but the helper now reports it as a real root.
+    # Na/Ti has only a low-T algebraic root outside the shared JANAF segment,
+    # so the diagnostic refuses to report it as an authoritative crossover.
     provider = BuiltinMetallothermicStepProvider()
 
     assert provider._crossover_temperature_C("K", "Fe") == pytest.approx(
         832.0,
         abs=0.5,
     )
-    assert provider._crossover_temperature_C("Na", "Ti") == pytest.approx(
-        269.5,
-        abs=0.5,
-    )
+    assert provider._crossover_temperature_C("Na", "Ti") is None
 
 
 def test_crossover_temperature_C_has_single_runtime_helper():
@@ -526,7 +544,14 @@ def test_c3_na_shuttle_flags_ellingham_pair_fit_band_extrapolation(
         "ellingham_extrapolated_beyond_fit_range_K"
     ]
     assert flagged["Na/FeO"]["temperature_K"] == pytest.approx(1073.15)
-    assert tuple(flagged["Na/FeO"]["fit_range_K"]) == (1100.0, 1700.0)
+    assert tuple(flagged["Na/FeO"]["fit_range_K"]) == (1100.0, 2200.0)
+    assert result.diagnostic["ellingham_authority"]["consumer"] == (
+        "builtin-metallothermic-step"
+    )
+    assert (
+        result.diagnostic["ellingham_authority"][ELLINGHAM_AUTHORITY_LIMIT_FLAG]
+        is True
+    )
     assert any(
         "Na/FeO Ellingham JANAF high-T fit extrapolated beyond fit_range_K"
         in warning

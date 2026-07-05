@@ -9,11 +9,14 @@ import yaml
 
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
-    _ELLINGHAM_THERMO,
     vapor_pressure_antoine_coefficients,
     vapor_pressure_source_label,
 )
 from engines.builtin.metallothermic_step import BuiltinMetallothermicStepProvider
+from simulator.chemistry.ellingham_thermo import (
+    ellingham_delta_g_kj_per_mol_o2,
+    ellingham_stoichiometry,
+)
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
@@ -253,8 +256,8 @@ def _runtime_recovered_reference_pressure_pa(
 
     assert result.status == "ok"
     emitted_pa = result.diagnostic["vapor_pressures_Pa"][species]
-    dH_f, dS_f, n_M, _n_ox = _ELLINGHAM_THERMO[species]
-    dG_f_kJ = dH_f - temperature_K * dS_f
+    n_M, _n_ox = ellingham_stoichiometry(species)
+    dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, temperature_K)
     k_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * temperature_K))
     activity = min((k_decomp / 1e-9) ** (1.0 / n_M), 1.0)
     return emitted_pa / activity
@@ -539,8 +542,8 @@ def test_builtin_runtime_provider_uses_pure_component_sidecar_for_reference_pres
 
     assert result.status == "ok"
     emitted_pa = result.diagnostic["vapor_pressures_Pa"][species]
-    dH_f, dS_f, n_M, n_ox = _ELLINGHAM_THERMO[species]
-    dG_f_kJ = dH_f - temperature_K * dS_f
+    n_M, _n_ox = ellingham_stoichiometry(species)
+    dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, temperature_K)
     k_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * temperature_K))
     activity = min((k_decomp / 1e-9) ** (1.0 / n_M), 1.0)
     recovered_reference_pa = emitted_pa / activity

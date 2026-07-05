@@ -5,8 +5,12 @@ from __future__ import annotations
 import math
 
 from simulator.chemistry.ellingham_thermo import (
-    ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
+    ellingham_authority_diagnostic,
+    ellingham_delta_g_kj_per_mol_o2,
+    ellingham_fit_extrapolation,
+    ellingham_fit_range_K,
+    ellingham_stoichiometry,
 )
 from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
@@ -312,7 +316,8 @@ class EquilibriumMixin:
 
         metals_data = self.vapor_pressures.get('metals', {})
 
-        for species, (dH_f, dS_f, n_M, n_ox) in self._ELLINGHAM_THERMO.items():
+        for species in self._ELLINGHAM_THERMO:
+            n_M, n_ox = ellingham_stoichiometry(species)
             sp_data = metals_data.get(species, {})
             if not sp_data:
                 continue
@@ -417,13 +422,14 @@ class EquilibriumMixin:
             if a_oxide <= 1e-10:
                 continue
 
-            valid_low, valid_high = ELLINGHAM_FIT_RANGE_K
-            if T_K < valid_low or T_K > valid_high:
-                ellingham_extrapolations[species] = {
-                    'temperature_K': T_K,
-                    'fit_range_K': (valid_low, valid_high),
-                    'species': species,
-                }
+            ellingham_extrapolation = ellingham_fit_extrapolation(
+                T_K,
+                species=species,
+                consumer='legacy-equilibrium-fallback',
+            )
+            if ellingham_extrapolation is not None:
+                ellingham_extrapolations[species] = ellingham_extrapolation
+                valid_low, valid_high = ellingham_fit_range_K(species)
                 warnings.append(
                     f"{species} Ellingham JANAF high-T fit extrapolated beyond "
                     f"fit_range_K [{valid_low:g}, {valid_high:g}] at "
@@ -435,7 +441,10 @@ class EquilibriumMixin:
             # --- Ellingham decomposition equilibrium ---          [ELLI-1..3]
             #
             # ΔG_f(T) = ΔH_f - T × ΔS_f   (kJ/mol O₂)
-            dG_f_kJ = dH_f - T_K * dS_f   # negative (formation favorable)
+            dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(
+                species,
+                T_K,
+            )   # negative (formation favorable)
 
             # K_decomp = exp(ΔG_f / (R × T))
             # ΔG_f in kJ, R in J/(mol·K) → multiply by 1000
@@ -469,6 +478,9 @@ class EquilibriumMixin:
                     sp_data,
                     coefficient_block=coefficient_block,
                     temperature_K=T_K,
+                    authority_limited_by_ellingham_fit_range=(
+                        species in ellingham_extrapolations
+                    ),
                 )
                 if species in metal_extrapolations:
                     source_label = (
@@ -570,6 +582,9 @@ class EquilibriumMixin:
                     data,
                     coefficient_block=COEFF_BLOCK_ANTOINE,
                     temperature_K=T_K,
+                    authority_limited_by_ellingham_fit_range=(
+                        name in ellingham_extrapolations
+                    ),
                 )
                 warn_pseudo_vapor_pressure_fallback(
                     name,
@@ -597,5 +612,9 @@ class EquilibriumMixin:
             status='ok',
             diagnostics={
                 'a_FeO_calphad': feo_activity_diagnostic,
+                'ellingham_authority': ellingham_authority_diagnostic(
+                    ellingham_extrapolations,
+                    consumer='legacy-equilibrium-fallback',
+                ),
             },
         )

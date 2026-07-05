@@ -193,12 +193,8 @@ def test_v1c_janaf_alkali_shuttle_crossovers_are_documented():
     assert provider._crossover_temperature_C("Na", "Fe") == pytest.approx(
         1173.4, abs=_CROSSOVER_TOL_C
     )
-    assert provider._crossover_temperature_C("Na", "Cr") == pytest.approx(
-        776.5, abs=_CROSSOVER_TOL_C
-    )
-    assert provider._crossover_temperature_C("Na", "Ti") == pytest.approx(
-        269.5, abs=_CROSSOVER_TOL_C
-    )
+    assert provider._crossover_temperature_C("Na", "Cr") is None
+    assert provider._crossover_temperature_C("Na", "Ti") is None
 
 
 @pytest.mark.parametrize("liquid_fraction", [None, 0.25])

@@ -129,8 +129,14 @@ from engines.builtin._common import (
     unpack_controls,
 )
 from engines.builtin.vapor_pressure import (
-    ELLINGHAM_FIT_RANGE_K,
     _ELLINGHAM_THERMO,
+)
+from simulator.chemistry.ellingham_thermo import (
+    ellingham_authority_diagnostic,
+    ellingham_delta_g_kj_per_mol_o2,
+    ellingham_fit_extrapolation,
+    ellingham_fit_range_K,
+    ellingham_fit_segments,
 )
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
@@ -1286,7 +1292,14 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             "ellingham_extrapolated_beyond_fit_range_K": {
                 str(pair): dict(data)
                 for pair, data in extrapolations.items()
-            }
+            },
+            "ellingham_authority": ellingham_authority_diagnostic(
+                {
+                    str(pair): dict(data)
+                    for pair, data in extrapolations.items()
+                },
+                consumer="builtin-metallothermic-step",
+            ),
         }
 
     @staticmethod
@@ -1311,42 +1324,86 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         temperature_C: float,
     ) -> dict[str, dict[str, Any]]:
         temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
-        valid_low, valid_high = ELLINGHAM_FIT_RANGE_K
-        if valid_low <= temperature_K <= valid_high:
-            return {}
         flagged: dict[str, dict[str, Any]] = {}
         for target_oxide in target_oxides:
             target_metal = TARGET_OXIDE_TO_METAL[target_oxide]
             pair = f"{reductant}/{target_oxide}"
+            limited_species: dict[str, dict[str, Any]] = {}
+            for species in (reductant, target_metal):
+                extrapolation = ellingham_fit_extrapolation(
+                    temperature_K,
+                    species=species,
+                    consumer="builtin-metallothermic-step",
+                )
+                if extrapolation is not None:
+                    limited_species[species] = extrapolation
+            if not limited_species:
+                continue
+            fit_lows_highs = [
+                ellingham_fit_range_K(species)
+                for species in (reductant, target_metal)
+            ]
             flagged[pair] = {
                 "temperature_K": temperature_K,
-                "fit_range_K": (valid_low, valid_high),
+                "fit_range_K": (
+                    max(bounds[0] for bounds in fit_lows_highs),
+                    min(bounds[1] for bounds in fit_lows_highs),
+                ),
                 "reductant": reductant,
                 "target_oxide": target_oxide,
                 "target_metal": target_metal,
+                "limited_species": limited_species,
+                "consumer": "builtin-metallothermic-step",
+                "authority_status": "extrapolation_limited",
             }
         return flagged
 
     @staticmethod
     def _delta_g_kj_per_mol_o2(metal: str, temperature_C: float) -> float:
-        dH_f, dS_f, _n_M, _n_ox = _ELLINGHAM_THERMO[metal]
-        return dH_f - (float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET) * dS_f
+        return ellingham_delta_g_kj_per_mol_o2(
+            metal,
+            float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+        )
 
     @staticmethod
-    def _crossover_temperature_C(reagent_metal: str, target_metal: str) -> float:
+    def _crossover_temperature_C(
+        reagent_metal: str,
+        target_metal: str,
+    ) -> float | None:
         """Return the oxide-stability crossover temperature in Celsius.
 
         V1c JANAF refit crossovers used by the alkali-shuttle diagnostic:
-        K/Fe = 832.0 C, Na/Fe = 1173.4 C, Na/Cr = 776.5 C,
-        Na/Ti = 269.5 C. Above a pair's crossover, the reagent oxide is
-        less stable than the target oxide, so reduction is thermodynamically
-        disfavored; current recipe gates remain handled outside this helper.
+        K/Fe = 832.0 C, Na/Fe = 1173.4 C. Above a pair's crossover, the
+        reagent oxide is less stable than the target oxide, so reduction is
+        thermodynamically disfavored; current recipe gates remain handled
+        outside this helper. Returns None when the algebraic root falls
+        outside the shared phase-valid JANAF fit segment.
         """
-        dH_reagent, dS_reagent, _n_M, _n_ox = _ELLINGHAM_THERMO[reagent_metal]
-        dH_target, dS_target, _n_M, _n_ox = _ELLINGHAM_THERMO[target_metal]
-        return (
-            (dH_reagent - dH_target) / (dS_reagent - dS_target)
-        ) - CELSIUS_TO_KELVIN_OFFSET
+        for reagent_segment in ellingham_fit_segments(reagent_metal):
+            for target_segment in ellingham_fit_segments(target_metal):
+                low_K = max(
+                    reagent_segment.range_K[0],
+                    target_segment.range_K[0],
+                )
+                high_K = min(
+                    reagent_segment.range_K[1],
+                    target_segment.range_K[1],
+                )
+                if low_K > high_K:
+                    continue
+                dS_delta = (
+                    reagent_segment.dS_f_kJ_per_mol_K_per_mol_O2
+                    - target_segment.dS_f_kJ_per_mol_K_per_mol_O2
+                )
+                if abs(dS_delta) < 1e-15:
+                    continue
+                root_K = (
+                    reagent_segment.dH_f_kJ_per_mol_O2
+                    - target_segment.dH_f_kJ_per_mol_O2
+                ) / dS_delta
+                if low_K <= root_K <= high_K:
+                    return root_K - CELSIUS_TO_KELVIN_OFFSET
+        return None
 
     @classmethod
     def _na_thermo_priority(

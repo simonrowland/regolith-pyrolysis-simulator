@@ -28,13 +28,20 @@ from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin._common import composition_wt_pct_from_account_view
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
-    ELLINGHAM_FIT_RANGE_K,
     VaporPressureComputationError,
     _ELLINGHAM_THERMO,
 )
 from simulator.equilibrium import EquilibriumMixin
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.ledger import AtomLedger
+from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_AUTHORITY_LIMIT_FLAG,
+    ellingham_delta_g_kj_per_mol_o2,
+    ellingham_fit_extrapolation,
+    ellingham_fit_range_K,
+    ellingham_fit_segments,
+    ellingham_segment_for_temperature,
+)
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryKernel,
@@ -73,6 +80,68 @@ _V1C_JANAF_ELLINGHAM = {
 def test_ellingham_table_matches_v1c_janaf_refit():
     assert _ELLINGHAM_THERMO == _V1C_JANAF_ELLINGHAM
     assert EquilibriumMixin._ELLINGHAM_THERMO == _V1C_JANAF_ELLINGHAM
+
+
+@pytest.mark.parametrize(
+    ("species", "expected_1600C", "expected_1800C", "expected_1900C"),
+    [
+        ("Na", -128.47, -20.98, 32.76),
+        ("K", -0.71, 103.40, 155.46),
+        ("Fe", -303.37, -275.26, -261.21),
+        ("Mn", -484.25, -451.12, -434.56),
+        ("Cr", -432.12, -398.39, -381.52),
+        ("Si", -563.74, -521.31, -500.09),
+    ],
+)
+def test_cf2lite_janaf_mbar_species_match_extended_anchor_window(
+    species: str,
+    expected_1600C: float,
+    expected_1800C: float,
+    expected_1900C: float,
+) -> None:
+    # CF-2-lite anchors: NIST-JANAF/Chase 1998 table IDs cited in
+    # simulator.chemistry.ellingham_thermo. Values are copied here so this is
+    # an external-anchor check, not helper self-parity.
+    assert ellingham_fit_range_K(species)[1] == pytest.approx(2200.0)
+    assert ellingham_delta_g_kj_per_mol_o2(
+        species,
+        1600.0 + 273.15,
+    ) == pytest.approx(expected_1600C, abs=0.02)
+    assert ellingham_delta_g_kj_per_mol_o2(
+        species,
+        1800.0 + 273.15,
+    ) == pytest.approx(expected_1800C, abs=0.02)
+    assert ellingham_delta_g_kj_per_mol_o2(
+        species,
+        1900.0 + 273.15,
+    ) == pytest.approx(expected_1900C, abs=0.02)
+
+
+def test_cf2lite_ellingham_segments_use_phase_correct_high_t_basis() -> None:
+    assert "Fe(s)" in ellingham_segment_for_temperature("Fe", 1800.0).phase_basis
+    assert "Fe(l)" in ellingham_segment_for_temperature("Fe", 1873.15).phase_basis
+    assert "Si(s)" in ellingham_segment_for_temperature("Si", 1600.0).phase_basis
+    assert "Si(l)" in ellingham_segment_for_temperature("Si", 1873.15).phase_basis
+    assert "Mn(l)" in ellingham_segment_for_temperature("Mn", 1873.15).phase_basis
+    assert "Cr(s)" in ellingham_segment_for_temperature("Cr", 2179.0).phase_basis
+    assert "Cr(l)" in ellingham_segment_for_temperature("Cr", 2181.0).phase_basis
+    cr_solid, cr_liquid = ellingham_fit_segments("Cr")
+    assert cr_solid.delta_g_kJ_per_mol_O2(2180.0) == pytest.approx(
+        cr_liquid.delta_g_kJ_per_mol_O2(2180.0),
+        abs=1e-9,
+    )
+    assert ellingham_delta_g_kj_per_mol_o2("Cr", 2190.0) == pytest.approx(
+        -378.547120,
+        abs=1e-6,
+    )
+
+    extrapolation = ellingham_fit_extrapolation(
+        1400.0,
+        species="Mn",
+        consumer="test",
+    )
+    assert extrapolation is not None
+    assert extrapolation["authority_flag"] == ELLINGHAM_AUTHORITY_LIMIT_FLAG
 
 
 # ---------------------------------------------------------------------------
@@ -141,6 +210,15 @@ class _MnAboveNbpMelt:
 
 class _FeOnlyHighTMelt:
     temperature_C = 1600.0
+    p_total_mbar = 1e-3
+    melt_fO2_log = -9.0
+
+    def composition_wt_pct(self):
+        return {"FeO": 100.0}
+
+
+class _FeBeyondEllinghamMelt:
+    temperature_C = 2250.0 - 273.15
     p_total_mbar = 1e-3
     melt_fO2_log = -9.0
 
@@ -416,7 +494,7 @@ def test_ellingham_fit_band_extrapolation_is_diagnostic(
         "ellingham_extrapolated_beyond_fit_range_K"
     ]["Fe"]
     assert extrapolation["temperature_K"] == pytest.approx(1073.15)
-    assert tuple(extrapolation["fit_range_K"]) == ELLINGHAM_FIT_RANGE_K
+    assert tuple(extrapolation["fit_range_K"]) == ellingham_fit_range_K("Fe")
     assert any(
         "Fe Ellingham JANAF high-T fit extrapolated beyond fit_range_K"
         in warning
@@ -637,7 +715,7 @@ def test_builtin_provider_marks_pure_component_range_extrapolation(
 
     assert result.vapor_pressures_Pa["Ca"] > 0.0
     assert result.vapor_pressures_source["Ca"] == (
-        "builtin_authoritative:pure_component_source_equation_fit:"
+        "builtin_extrapolation_limited:pure_component_source_equation_fit:"
         "extrapolated_beyond_valid_range_K:"
         "extrapolated_beyond_ellingham_fit_range_K"
     )
@@ -647,15 +725,38 @@ def test_builtin_provider_marks_pure_component_range_extrapolation(
     )
 
 
+def test_builtin_provider_exposes_consumable_ellingham_authority_flag(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    result = provider.dispatch(_ca_range_extrapolation_request())
+
+    authority = result.diagnostic["ellingham_authority"]
+    assert authority["consumer"] == "builtin-vapor-pressure"
+    assert authority["status"] == "extrapolation_limited"
+    assert authority[ELLINGHAM_AUTHORITY_LIMIT_FLAG] is True
+    assert "Ca" in authority["extrapolated_beyond_fit_range_K"]
+    source_label = result.diagnostic["vapor_pressures_source"]["Ca"]
+    assert "builtin_authoritative" not in source_label
+    assert source_label.startswith("builtin_extrapolation_limited:")
+    assert source_label.endswith(
+        "extrapolated_beyond_ellingham_fit_range_K"
+    )
+
+
 def test_legacy_fallback_marks_ellingham_fit_range_extrapolation(
     vapor_pressure_data,
 ):
     result = _LegacyFallbackStub(
         vapor_pressure_data,
-        melt=_FeOnlyHighTMelt(),
+        melt=_FeBeyondEllinghamMelt(),
     )._stub_equilibrium()
 
     assert result.vapor_pressures_Pa["Fe"] > 0.0
+    assert "builtin_authoritative" not in result.vapor_pressures_source["Fe"]
+    assert result.vapor_pressures_source["Fe"].startswith(
+        "builtin_extrapolation_limited:"
+    )
     assert result.vapor_pressures_source["Fe"].endswith(
         "extrapolated_beyond_ellingham_fit_range_K"
     )
@@ -675,9 +776,9 @@ def test_legacy_fallback_grounds_mn_liquid_source_band(
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
     assert result.vapor_pressures_source["Mn"] == (
-        "builtin_authoritative:pure_component_derived_from_evaluation:"
-        "extrapolated_beyond_ellingham_fit_range_K"
+        "builtin_authoritative:pure_component_derived_from_evaluation"
     )
+    assert result.diagnostics["ellingham_authority"]["status"] == "authoritative"
 
 
 def test_builtin_provider_marks_mn_above_nbp_source_extrapolation(
@@ -689,7 +790,7 @@ def test_builtin_provider_marks_mn_above_nbp_source_extrapolation(
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
     assert result.vapor_pressures_source["Mn"] == (
-        "builtin_authoritative:pure_component_extrapolated:"
+        "builtin_extrapolation_limited:pure_component_extrapolated:"
         "extrapolated_beyond_source_certified_range_K:"
         "extrapolated_beyond_valid_range_K:"
         "extrapolated_beyond_ellingham_fit_range_K"

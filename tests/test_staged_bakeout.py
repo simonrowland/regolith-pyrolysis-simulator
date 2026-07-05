@@ -24,7 +24,10 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # pre-bleed holdup O2 during vapor dispatch, so the staged C2A run's SiO
 # release (and hence wall deposit) roughly doubles (2.0656e-4 -> 4.7792e-4).
 # Correction-class: the old pin encoded the holdup-O2 suppression.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.000477924801086693
+# 2026-07-05 CF-2-lite (t-001): Si(l) Ellingham fit extended to ~2200 K (covers the
+# 1750-1800 C staged recipe) shifts the SiO wall deposit +2.11e-10 kg (+4.4e-5%);
+# JANAF-grounded physics change, verified controller-side, not a behaviour regression.
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00047792501195157886
 
 
 def _run_script(lines: list[str]):

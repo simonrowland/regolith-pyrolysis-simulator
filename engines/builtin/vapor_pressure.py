@@ -81,6 +81,11 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.chemistry.ellingham_thermo import (  # noqa: E402
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_THERMO as _ELLINGHAM_THERMO,
+    ellingham_authority_diagnostic,
+    ellingham_delta_g_kj_per_mol_o2,
+    ellingham_fit_extrapolation,
+    ellingham_fit_range_K,
+    ellingham_stoichiometry,
 )
 
 
@@ -333,8 +338,15 @@ def vapor_pressure_source_label(
     *,
     coefficient_block: str | None = None,
     temperature_K: float | None = None,
+    authority_limited_by_ellingham_fit_range: bool = False,
 ) -> str:
     """Return honest provenance for an Antoine vapor-pressure row."""
+
+    if (
+        authority_limited_by_ellingham_fit_range
+        and base_source == "builtin_authoritative"
+    ):
+        base_source = "builtin_extrapolation_limited"
 
     # Provenance tiers:
     # - source_equation_fit: source-published empirical Antoine/vapor equation,
@@ -532,14 +544,11 @@ def _ellingham_fit_extrapolation(
     *,
     species: str,
 ) -> dict[str, object] | None:
-    valid_low, valid_high = ELLINGHAM_FIT_RANGE_K
-    if valid_low <= temperature_K <= valid_high:
-        return None
-    return {
-        "temperature_K": float(temperature_K),
-        "fit_range_K": (valid_low, valid_high),
-        "species": species,
-    }
+    return ellingham_fit_extrapolation(
+        temperature_K,
+        species=species,
+        consumer="builtin-vapor-pressure",
+    )
 
 
 def _pow10_pressure_or_raise(
@@ -659,7 +668,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         warnings: list[str] = []
 
         metals_data = self._vapor_pressure_data.get('metals', {}) or {}
-        for species, (dH_f, dS_f, n_M, n_ox) in _ELLINGHAM_THERMO.items():
+        for species in _ELLINGHAM_THERMO:
+            n_M, n_ox = ellingham_stoichiometry(species)
             sp_data = metals_data.get(species, {}) or {}
             if not sp_data:
                 continue
@@ -745,7 +755,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
             if ellingham_extrapolation is not None:
                 ellingham_extrapolations[species] = ellingham_extrapolation
-                valid_low, valid_high = ELLINGHAM_FIT_RANGE_K
+                valid_low, valid_high = ellingham_fit_range_K(species)
                 warnings.append(
                     f"{species} Ellingham JANAF high-T fit extrapolated beyond "
                     f"fit_range_K [{valid_low:g}, {valid_high:g}] at "
@@ -755,7 +765,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             activities[species] = a_oxide
 
             # Ellingham: dG_f(T) = dH_f - T * dS_f (kJ/mol O2)
-            dG_f_kJ = dH_f - T_K * dS_f
+            dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, T_K)
             # K_decomp = exp(dG_f * 1000 / (R * T))
             try:
                 K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
@@ -796,11 +806,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     sp_data,
                     coefficient_block=coefficient_block,
                     temperature_K=T_K,
+                    authority_limited_by_ellingham_fit_range=(
+                        species in ellingham_extrapolations
+                    ),
                 )
                 if species in metal_extrapolations:
                     source_label = (
                         f"{source_label}:"
                         "extrapolated_beyond_valid_range_K"
+                    )
+                if species in ellingham_extrapolations:
+                    source_label = (
+                        f"{source_label}:"
+                        "extrapolated_beyond_ellingham_fit_range_K"
                     )
                 vapor_pressure_sources[species] = source_label
                 vapor_pressure_provenance[species] = {
@@ -941,6 +959,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     data,
                     coefficient_block=COEFF_BLOCK_ANTOINE,
                     temperature_K=T_K,
+                    authority_limited_by_ellingham_fit_range=(
+                        name in ellingham_extrapolations
+                    ),
                 )
                 if name in oxide_vapor_extrapolations:
                     source_label = (
@@ -982,6 +1003,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             },
             "ellingham_extrapolated_beyond_fit_range_K": (
                 ellingham_extrapolations
+            ),
+            "ellingham_authority": ellingham_authority_diagnostic(
+                ellingham_extrapolations,
+                consumer="builtin-vapor-pressure",
             ),
         }
         if feo_activity_diagnostic is not None:
