@@ -19,6 +19,7 @@ from simulator.optimize.objective import (
     pareto_front,
     product_summary,
     target_spec_digest,
+    _metric_value,
 )
 from simulator.optimize.sso2_evidence import (
     SSO2_CHUNK3B_READER_HANDOFF,
@@ -92,6 +93,47 @@ def test_missing_or_nonfinite_objectives_raise() -> None:
             {"oxygen_kg": 1.0, "energy_kWh": 5.0},
             DEFINITIONS,
         )
+
+
+def test_energy_component_and_per_product_metrics_read_decomposed_total() -> None:
+    sim = SimpleNamespace(
+        energy_cumulative_kWh=18.0,
+        energy_cumulative_breakdown_kWh={
+            "electrical": 6.0,
+            "solar_thermal": 12.0,
+            "latent": 5.0,
+            "dissociation": 7.0,
+            "thermal_total": 12.0,
+            "total": 18.0,
+        },
+        record=SimpleNamespace(
+            energy_total_kWh=18.0,
+            energy_electrical_kWh=6.0,
+            energy_solar_thermal_kWh=12.0,
+            energy_latent_kWh=5.0,
+            energy_dissociation_kWh=7.0,
+        ),
+    )
+    product_classes = {"metals_plus_O2": {"class_total_kg": 3.0}}
+
+    assert _metric_value(
+        "energy_kWh", sim, {}, product_classes
+    ) == pytest.approx(18.0)
+    assert _metric_value(
+        "electrical_energy_kWh", sim, {}, product_classes
+    ) == pytest.approx(6.0)
+    assert _metric_value(
+        "solar_thermal_energy_kWh", sim, {}, product_classes
+    ) == pytest.approx(12.0)
+    assert _metric_value(
+        "energy_total_per_product_kWh_per_kg", sim, {}, product_classes
+    ) == pytest.approx(6.0)
+    assert _metric_value(
+        "dissociation_energy_per_product_kWh_per_kg",
+        sim,
+        {},
+        product_classes,
+    ) == pytest.approx(7.0 / 3.0)
 
 
 def test_incomplete_objective_importance_evidence_raises_insufficient_evidence() -> None:

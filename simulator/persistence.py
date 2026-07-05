@@ -73,6 +73,14 @@ class RunHistory:
             'branch': record.branch,
             'total_hours': record.total_hours,
             'energy_total_kWh': round(record.energy_total_kWh, 1),
+            'energy_electrical_kWh': round(record.energy_electrical_kWh, 1),
+            'energy_solar_thermal_kWh': round(
+                record.energy_solar_thermal_kWh, 1),
+            'energy_latent_kWh': round(record.energy_latent_kWh, 1),
+            'energy_dissociation_kWh': round(record.energy_dissociation_kWh, 1),
+            'energy_breakdown_kWh': {
+                k: round(v, 1) for k, v in record.energy_breakdown_kWh.items()
+            },
             'oxygen_total_kg': round(record.oxygen_total_kg, 1),
             'products_kg': {k: round(v, 2)
                            for k, v in record.products_kg.items()},

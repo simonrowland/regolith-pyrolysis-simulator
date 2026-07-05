@@ -8,7 +8,16 @@ import uuid
 from pathlib import Path
 
 import yaml
-from flask import request
+try:
+    from flask import request
+except ModuleNotFoundError:
+    class _MissingFlaskRequest:
+        sid = None
+
+        def __getattr__(self, name):
+            raise RuntimeError("Flask is required for SocketIO request context")
+
+    request = _MissingFlaskRequest()
 
 from simulator.backends import (
     BackendSelectionPolicy,
@@ -687,7 +696,20 @@ def _tick_payload(
         },
         'stage_purity_report': stage_purity_report(sim.train),
         'energy_kWh': round(snapshot.energy.total_kWh, 4),
+        'energy_electrical_kWh': round(snapshot.energy.electrical_total_kWh, 4),
+        'energy_solar_thermal_kWh': round(
+            snapshot.energy.solar_thermal_kWh, 4),
+        'energy_latent_kWh': round(snapshot.energy.latent_kWh, 4),
+        'energy_dissociation_kWh': round(snapshot.energy.dissociation_kWh, 4),
+        'energy_breakdown_kWh': {
+            key: round(value, 4)
+            for key, value in snapshot.energy.thermal_breakdown_kWh.items()
+        },
         'energy_cumulative_kWh': round(snapshot.energy_cumulative_kWh, 2),
+        'energy_cumulative_breakdown_kWh': {
+            key: round(value, 4)
+            for key, value in snapshot.energy_cumulative_breakdown_kWh.items()
+        },
         'oxygen_kg': round(snapshot.oxygen_produced_kg, 2),
         **_mass_balance_error_fields(snapshot),
         'ramp_throttled': snapshot.ramp_throttled,
@@ -740,6 +762,8 @@ def _completion_payload(sim):
     return {
         'total_hours': sim.melt.hour,
         'energy_kWh': sim.energy_cumulative_kWh,
+        'energy_breakdown_kWh': dict(
+            getattr(sim, 'energy_cumulative_breakdown_kWh', {}) or {}),
         'oxygen_kg': sim._oxygen_total_kg(),
         'oxygen_stored_kg': sim._oxygen_stored_kg(),
         'oxygen_vented_kg': sim._oxygen_vented_kg(),

@@ -4,6 +4,7 @@ from simulator.thermal_budget import (
     ASSUMED,
     CITED,
     UNCERTIFIED,
+    evaporation_enthalpy_budget,
     furnace_material_context,
     thermal_budget_decomposition,
 )
@@ -18,6 +19,128 @@ BASE_THERMAL_BUDGET_ARGS = {
     "T_sky_K": 3.0,
     "view_factor": 1.0,
 }
+
+
+def test_evaporation_enthalpy_budget_adds_latent_and_dissociation_sinks():
+    result = evaporation_enthalpy_budget(
+        {"Na": 1.0},
+        vapor_pressures={
+            "metals": {
+                "Na": {
+                    "parent_oxide": "Na2O",
+                    "molar_mass_g_mol": 22.98976928,
+                }
+            }
+        },
+    )
+
+    assert result["latent_kWh"] > 0.0
+    assert result["dissociation_kWh"] > 0.0
+    assert result["solar_thermal_kWh"] == pytest.approx(
+        result["latent_kWh"] + result["dissociation_kWh"]
+    )
+    assert result["heat_flows_kWh"]["product_vapor_enthalpy_sink"] == pytest.approx(
+        result["latent_kWh"]
+    )
+    assert "NIST-JANAF" in result["sources"]["latent:Na"]
+    assert "Na2O" in result["sources"]["dissociation:Na"]
+
+
+def test_evaporation_enthalpy_budget_fails_loud_for_uncited_species():
+    with pytest.raises(ValueError, match="missing cited latent"):
+        evaporation_enthalpy_budget(
+            {"Unobtainium": 1.0},
+            vapor_pressures={
+                "metals": {
+                    "Unobtainium": {
+                        "parent_oxide": "UnobtainiumO",
+                        "molar_mass_g_mol": 1.0,
+                    }
+                }
+            },
+        )
+
+
+def test_evaporation_enthalpy_budget_oxide_vapor_uses_single_reaction_not_double_charge():
+    # SiO forms via the single reaction SiO2(melt) -> SiO(g) + 1/2 O2.  It must
+    # NOT be charged metal latent (337.60) PLUS full SiO2->Si+O2 dissociation
+    # (910.94): that double-counts (~54% high) and routes through elemental Si.
+    molar_mass = 44.0849
+    result = evaporation_enthalpy_budget(
+        {"SiO": 1.0},
+        vapor_pressures={
+            "oxide_vapors": {
+                "SiO": {
+                    "parent_oxide": "SiO2",
+                    "molar_mass_g_mol": molar_mass,
+                    "stoich_oxide_per_vapor": 1.362920787587333,
+                }
+            }
+        },
+    )
+
+    product_mol = 1.0 * 1000.0 / molar_mass
+    expected_reaction_kWh = product_mol * 810.52 / 3600.0
+    # No metal latent leg for an oxide vapor.
+    assert result["latent_by_species_kWh"]["SiO"] == 0.0
+    # Single melt-oxide -> oxide-vapor reaction, booked as the reaction sink.
+    assert result["dissociation_by_species_kWh"]["SiO"] == pytest.approx(
+        expected_reaction_kWh
+    )
+    assert result["solar_thermal_kWh"] == pytest.approx(expected_reaction_kWh)
+    assert "SiO2->SiO(g)" in result["sources"]["oxide_vapor_reaction:SiO"]
+    # Regression guard: the old double-charge exceeded 7.8 kWh here.
+    assert result["solar_thermal_kWh"] < 6.0
+
+
+def test_evaporation_enthalpy_budget_cro2_uses_single_reaction_not_fail_loud():
+    # CrO2 evaporates as a trace flux from Cr-bearing basalts, so it MUST compute
+    # (fail-loud crashes real runs).  It uses the single oxidation reaction
+    # 1/2 Cr2O3 + 1/4 O2 -> CrO2(g), not metal latent + full Cr2O3 dissociation.
+    molar_mass = 83.9948
+    result = evaporation_enthalpy_budget(
+        {"CrO2": 1.0},
+        vapor_pressures={
+            "oxide_vapors": {
+                "CrO2": {
+                    "parent_oxide": "Cr2O3",
+                    "molar_mass_g_mol": molar_mass,
+                    "stoich_oxide_per_vapor": 0.904761167748687,
+                }
+            }
+        },
+    )
+
+    product_mol = 1.0 * 1000.0 / molar_mass
+    expected_reaction_kWh = product_mol * 494.95 / 3600.0
+    assert result["latent_by_species_kWh"]["CrO2"] == 0.0
+    assert result["dissociation_by_species_kWh"]["CrO2"] == pytest.approx(
+        expected_reaction_kWh
+    )
+    assert result["solar_thermal_kWh"] == pytest.approx(expected_reaction_kWh)
+    assert "CrO2(g)" in result["sources"]["oxide_vapor_reaction:CrO2"]
+
+
+def test_evaporation_enthalpy_budget_fails_loud_for_uncited_oxide_vapor(monkeypatch):
+    # An oxide-vapor species with no cited reaction enthalpy must fail loud rather
+    # than fall back to a metal double-charge or a fabricated value.
+    import simulator.thermal_budget as tb
+
+    monkeypatch.setattr(
+        tb, "_OXIDE_VAPOR_SPECIES", frozenset(tb._OXIDE_VAPOR_SPECIES | {"FakeO"})
+    )
+    with pytest.raises(ValueError, match="missing cited oxide-vapor formation"):
+        evaporation_enthalpy_budget(
+            {"FakeO": 1.0},
+            vapor_pressures={
+                "oxide_vapors": {
+                    "FakeO": {
+                        "parent_oxide": "Fe2O3",
+                        "molar_mass_g_mol": 71.8,
+                    }
+                }
+            },
+        )
 
 
 def test_cold_skull_reference_case_matches_bootstrap_report_band():

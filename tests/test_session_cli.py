@@ -34,6 +34,16 @@ PER_HOUR_KEYS = {
     "Kn",
     "regime",
     "transport_formula_id",
+    # Hourly energy split (electrical tracker + solar-thermal evaporation budget),
+    # emitted by build_per_hour_summary since CF-8 (energy-budget-close).
+    "energy_kWh",
+    "energy_electrical_kWh",
+    "energy_solar_thermal_kWh",
+    "energy_latent_kWh",
+    "energy_dissociation_kWh",
+    "energy_cumulative_kWh",
+    "energy_cumulative_breakdown_kWh",
+    "energy_thermal_breakdown_kWh",
 }
 PER_HOUR_DIAGNOSTIC_KEYS = {
     "fe_redox_split",

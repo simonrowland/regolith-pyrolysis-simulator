@@ -26,11 +26,13 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
+from dataclasses import dataclass
 from typing import Any
 
 from simulator.equipment import EquipmentDesigner, STEFAN_BOLTZMANN
 from simulator.furnace_materials import load_furnace_materials
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.state import MOLAR_MASS, OXIDE_TO_METAL, STOICH_RATIOS
 
 
 CITED = "CITED"
@@ -42,6 +44,7 @@ MELT_EMISSIVITY = EquipmentDesigner.MELT_EMISSIVITY
 THERMAL_BUDGET_VIEW_FACTOR = 1.0
 THERMAL_BUDGET_WALL_CONDUCTIVITY_W_M_K = 1.5
 THERMAL_BUDGET_WALL_INNER_SOLIDUS_T_C = 1050.0
+KJ_PER_KWH = 3600.0
 UNCERTIFIED_GAP_SPECS = (
     (
         "creep",
@@ -56,6 +59,202 @@ UNCERTIFIED_GAP_SPECS = (
         "mbar forced-convection coefficient is not certified; gas remains a chemistry trim lever, not primary cooling.",
     ),
 )
+
+
+@dataclass(frozen=True)
+class EnthalpyCoefficient:
+    kJ_per_mol: float
+    source: str
+
+
+# Product-vapor latent heats.  Values are kJ/mol product vapor.
+_LATENT_VAPORIZATION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
+    # NIST-JANAF phase-change table, Chase 1998: Na(l)->Na(g), ΔvapH=97.42 kJ/mol.
+    "Na": EnthalpyCoefficient(97.42, "NIST-JANAF Chase 1998 Na(l)->Na(g) ΔvapH=97.42 kJ/mol"),
+    # NIST-JANAF phase-change table, Chase 1998: K(l)->K(g), ΔvapH=76.90 kJ/mol.
+    "K": EnthalpyCoefficient(76.90, "NIST-JANAF Chase 1998 K(l)->K(g) ΔvapH=76.90 kJ/mol"),
+    # NIST-JANAF phase-change table, Chase 1998: Mg(l)->Mg(g), ΔvapH=127.40 kJ/mol.
+    "Mg": EnthalpyCoefficient(127.40, "NIST-JANAF Chase 1998 Mg(l)->Mg(g) ΔvapH=127.40 kJ/mol"),
+    # NIST-JANAF phase-change table, Chase 1998: Fe(l)->Fe(g), ΔvapH=340.00 kJ/mol.
+    "Fe": EnthalpyCoefficient(340.00, "NIST-JANAF Chase 1998 Fe(l)->Fe(g) ΔvapH=340.00 kJ/mol"),
+    # NIST-JANAF phase-change table, Chase 1998: Ca(l)->Ca(g), ΔvapH=153.60 kJ/mol.
+    "Ca": EnthalpyCoefficient(153.60, "NIST-JANAF Chase 1998 Ca(l)->Ca(g) ΔvapH=153.60 kJ/mol"),
+    # NIST-JANAF phase-change table, Chase 1998: Al(l)->Al(g), ΔvapH=284.10 kJ/mol.
+    "Al": EnthalpyCoefficient(284.10, "NIST-JANAF Chase 1998 Al(l)->Al(g) ΔvapH=284.10 kJ/mol"),
+    # NIST-JANAF phase-change table, Chase 1998: Si(l)->Si(g), ΔvapH=359.00 kJ/mol.
+    "Si": EnthalpyCoefficient(359.00, "NIST-JANAF Chase 1998 Si(l)->Si(g) ΔvapH=359.00 kJ/mol"),
+    # NIST-JANAF phase-change table, Chase 1998: Ti(l)->Ti(g), ΔvapH=425.00 kJ/mol.
+    "Ti": EnthalpyCoefficient(425.00, "NIST-JANAF Chase 1998 Ti(l)->Ti(g) ΔvapH=425.00 kJ/mol"),
+    # NIST-JANAF phase-change table, Chase 1998: Cr(l)->Cr(g), ΔvapH=339.50 kJ/mol.
+    "Cr": EnthalpyCoefficient(339.50, "NIST-JANAF Chase 1998 Cr(l)->Cr(g) ΔvapH=339.50 kJ/mol"),
+    # NIST-JANAF phase-change table, Chase 1998: Mn(l)->Mn(g), ΔvapH=220.50 kJ/mol.
+    "Mn": EnthalpyCoefficient(220.50, "NIST-JANAF Chase 1998 Mn(l)->Mn(g) ΔvapH=220.50 kJ/mol"),
+    # Oxide vapors (SiO, CrO2) are NOT reduced metals: they do not go through a
+    # metal latent + full oxide->element dissociation. They form directly from
+    # the melt oxide in a single reaction (parent_oxide -> oxide_vapor(g) +
+    # partial O2) and are handled via _OXIDE_VAPOR_REACTION_KJ_PER_MOL below.
+}
+
+
+# Parent-oxide dissociation enthalpies.  Values are kJ/mol parent oxide.
+_OXIDE_DISSOCIATION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
+    # NIST-JANAF Chase 1998 ΔfH° Na2O(s)=-414.22 kJ/mol; Na2O -> 2Na + 1/2O2 = +414.22.
+    "Na2O": EnthalpyCoefficient(414.22, "NIST-JANAF Chase 1998 Na2O(s) ΔfH=-414.22 kJ/mol"),
+    # NIST-JANAF Chase 1998 ΔfH° K2O(s)=-363.17 kJ/mol; K2O -> 2K + 1/2O2 = +363.17.
+    "K2O": EnthalpyCoefficient(363.17, "NIST-JANAF Chase 1998 K2O(s) ΔfH=-363.17 kJ/mol"),
+    # NIST-JANAF Chase 1998 ΔfH° MgO(s)=-601.60 kJ/mol; MgO -> Mg + 1/2O2 = +601.60.
+    "MgO": EnthalpyCoefficient(601.60, "NIST-JANAF Chase 1998 MgO(s) ΔfH=-601.60 kJ/mol"),
+    # NIST-JANAF Chase 1998 ΔfH° FeO(s)=-272.04 kJ/mol; FeO -> Fe + 1/2O2 = +272.04.
+    "FeO": EnthalpyCoefficient(272.04, "NIST-JANAF Chase 1998 FeO(s) ΔfH=-272.04 kJ/mol"),
+    # NIST-JANAF Chase 1998 ΔfH° CaO(s)=-635.09 kJ/mol; CaO -> Ca + 1/2O2 = +635.09.
+    "CaO": EnthalpyCoefficient(635.09, "NIST-JANAF Chase 1998 CaO(s) ΔfH=-635.09 kJ/mol"),
+    # NIST-JANAF Chase 1998 ΔfH° Al2O3(s)=-1675.69 kJ/mol; Al2O3 -> 2Al + 3/2O2 = +1675.69.
+    "Al2O3": EnthalpyCoefficient(1675.69, "NIST-JANAF Chase 1998 Al2O3(s) ΔfH=-1675.69 kJ/mol"),
+    # NIST-JANAF Chase 1998 ΔfH° SiO2(quartz)=-910.94 kJ/mol; SiO2 -> Si + O2 = +910.94.
+    "SiO2": EnthalpyCoefficient(910.94, "NIST-JANAF Chase 1998 SiO2(quartz) ΔfH=-910.94 kJ/mol"),
+    # NIST-JANAF Chase 1998 ΔfH° TiO2(rutile)=-944.75 kJ/mol; TiO2 -> Ti + O2 = +944.75.
+    "TiO2": EnthalpyCoefficient(944.75, "NIST-JANAF Chase 1998 TiO2(rutile) ΔfH=-944.75 kJ/mol"),
+    # NIST-JANAF Chase 1998 ΔfH° Cr2O3(s)=-1139.70 kJ/mol; Cr2O3 -> 2Cr + 3/2O2 = +1139.70.
+    "Cr2O3": EnthalpyCoefficient(1139.70, "NIST-JANAF Chase 1998 Cr2O3(s) ΔfH=-1139.70 kJ/mol"),
+    # NIST-JANAF Chase 1998 ΔfH° MnO(s)=-385.20 kJ/mol; MnO -> Mn + 1/2O2 = +385.20.
+    "MnO": EnthalpyCoefficient(385.20, "NIST-JANAF Chase 1998 MnO(s) ΔfH=-385.20 kJ/mol"),
+}
+
+
+# Oxide-vapor single-reaction enthalpies.  Values are kJ/mol oxide vapor.
+#
+# A species that evaporates AS AN OXIDE (SiO, CrO2), not as a reduced metal,
+# must not be charged metal latent PLUS full oxide->element dissociation: that
+# double-counts.  For SiO the buggy path routed SiO2 all the way to elemental
+# Si + O2 (910.94 kJ/mol) and then also added an SiO(condensed)->SiO(g) latent
+# (337.60), ~54% high and physically wrong.  The real path is a single reaction
+#   parent_oxide(melt) -> oxide_vapor(g) + partial O2,
+# ΔH = ΔfH[oxide_vapor(g)] - ΔfH[parent_oxide] (1 mol oxide vapor : 1 mol parent).
+_OXIDE_VAPOR_REACTION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
+    # NIST-JANAF Chase 1998: ΔfH°[SiO2, α-quartz]=-910.94, ΔfH°[SiO(g)]=-100.42;
+    # SiO2 -> SiO(g) + 1/2 O2 = -100.42 - (-910.94) = +810.52 kJ/mol SiO.
+    "SiO": EnthalpyCoefficient(
+        810.52,
+        "NIST-JANAF Chase 1998: SiO2(quartz) ΔfH=-910.94 + SiO(g) ΔfH=-100.42 "
+        "=> SiO2->SiO(g)+1/2 O2 = +810.52 kJ/mol SiO",
+    ),
+    # CrO2(g) forms from Cr2O3 by OXIDATION (Cr3+ -> Cr4+), not dissociation:
+    #   1/2 Cr2O3 + 1/4 O2 -> CrO2(g), ΔH = ΔfH[CrO2(g)] - 1/2 ΔfH[Cr2O3].
+    # ΔfH[Cr2O3(s)]=-1139.70 (NIST-JANAF). ΔfH[CrO2(g)]≈-74.9 kJ/mol is only
+    # MODERATE confidence (gas-phase Cr-oxide formation enthalpies carry real
+    # literature scatter, unlike SiO). => ΔH ≈ -74.9 + 569.85 = +494.95 kJ/mol.
+    # Cr-bearing basalts DO evaporate a trace CrO2 flux, so this MUST be present
+    # (fail-loud here crashes real runs). Value is grounded-but-soft, flagged for
+    # a firm-up follow-on; the single-reaction form is still far more correct than
+    # metal latent + full Cr2O3->2Cr dissociation (which double-counts).
+    "CrO2": EnthalpyCoefficient(
+        494.95,
+        "1/2 Cr2O3 + 1/4 O2 -> CrO2(g); ΔfH[Cr2O3]=-1139.70 (NIST-JANAF) + "
+        "ΔfH[CrO2(g)]≈-74.9 (MODERATE confidence, gas Cr-oxide scatter; firm-up "
+        "follow-on) => +494.95 kJ/mol CrO2",
+    ),
+}
+
+# Species that evaporate as an oxide vapor (single-reaction path), not a metal.
+_OXIDE_VAPOR_SPECIES: frozenset[str] = frozenset({"SiO", "CrO2"})
+
+
+def evaporation_enthalpy_budget(
+    species_kg_hr: Mapping[str, float],
+    *,
+    vapor_pressures: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Return one-hour solar-thermal enthalpy sinks for evaporated species.
+
+    This is diagnostic-only: it reads vapor species metadata and cited
+    coefficients, but does not touch AtomLedger or any kg-keyed state.
+
+    APPROXIMATION: the metal path charges (M(l)->M(g) latent) + (MOx->M+1/2 O2
+    dissociation from 298 K ΔfH). It omits the M(s)->M(l) fusion step (~1-4% of
+    the per-metal total, Si worst) and all 298 K->process-T sensible heat, so it
+    is a consistent low-order ESTIMATE of the evaporation enthalpy, not the full
+    MOx(melt, T)->M(g)+1/2 O2 path enthalpy. Oxide vapors (SiO, CrO2) use a
+    single cited melt-oxide->oxide-vapor(g) reaction instead of that two-leg form.
+    """
+
+    latent_by_species: dict[str, float] = {}
+    dissociation_by_species: dict[str, float] = {}
+    sources: dict[str, str] = {}
+
+    for species, raw_kg_hr in sorted(species_kg_hr.items()):
+        kg_hr = _non_negative(float(raw_kg_hr), f"species_kg_hr[{species!r}]")
+        if kg_hr <= 0.0:
+            continue
+
+        metadata = _vapor_metadata(species, vapor_pressures)
+        product_mol = kg_hr * 1000.0 / _molar_mass_g_mol(species, metadata)
+
+        if species in _OXIDE_VAPOR_SPECIES:
+            # Oxide vapor: a single reaction parent_oxide(melt) -> oxide_vapor(g)
+            # + partial O2 (1:1 in the oxide-forming cation), NOT metal latent +
+            # full oxide->element dissociation.  Booked as the reaction sink with
+            # zero metal-latent, per mol of oxide vapor produced.
+            reaction_coeff = _required_enthalpy(
+                _OXIDE_VAPOR_REACTION_KJ_PER_MOL,
+                species,
+                "oxide-vapor formation",
+            )
+            reaction_kWh = product_mol * reaction_coeff.kJ_per_mol / KJ_PER_KWH
+            latent_by_species[species] = 0.0
+            dissociation_by_species[species] = reaction_kWh
+            sources[f"oxide_vapor_reaction:{species}"] = reaction_coeff.source
+            continue
+
+        latent_coeff = _required_enthalpy(
+            _LATENT_VAPORIZATION_KJ_PER_MOL,
+            species,
+            "latent vaporization",
+        )
+        latent_kWh = product_mol * latent_coeff.kJ_per_mol / KJ_PER_KWH
+        latent_by_species[species] = latent_kWh
+        sources[f"latent:{species}"] = latent_coeff.source
+
+        parent_oxide = str(metadata.get("parent_oxide") or _parent_oxide_for(species))
+        if not parent_oxide:
+            raise ValueError(
+                f"vapor species {species!r} requires parent_oxide metadata "
+                "for oxide-dissociation enthalpy"
+            )
+        oxide_coeff = _required_enthalpy(
+            _OXIDE_DISSOCIATION_KJ_PER_MOL,
+            parent_oxide,
+            "oxide dissociation",
+        )
+        oxide_kg = kg_hr * _oxide_per_product_kg(
+            species,
+            parent_oxide,
+            metadata,
+        )
+        oxide_mol = oxide_kg * 1000.0 / _molar_mass_g_mol(parent_oxide, {})
+        dissociation_kWh = oxide_mol * oxide_coeff.kJ_per_mol / KJ_PER_KWH
+        dissociation_by_species[species] = dissociation_kWh
+        sources[f"dissociation:{species}"] = oxide_coeff.source
+
+    latent_kWh = sum(latent_by_species.values())
+    dissociation_kWh = sum(dissociation_by_species.values())
+    solar_thermal_kWh = latent_kWh + dissociation_kWh
+    return {
+        "schema": "evaporation_enthalpy_budget.v0",
+        "status": "diagnostic_ledger_neutral",
+        "solar_thermal_kWh": solar_thermal_kWh,
+        "thermal_total_kWh": solar_thermal_kWh,
+        "latent_kWh": latent_kWh,
+        "dissociation_kWh": dissociation_kWh,
+        "heat_flows_kWh": {
+            "heat_in": solar_thermal_kWh,
+            "reaction_disproportionation_enthalpy_sink": dissociation_kWh,
+            "product_vapor_enthalpy_sink": latent_kWh,
+            "net_unallocated": 0.0,
+        },
+        "latent_by_species_kWh": latent_by_species,
+        "dissociation_by_species_kWh": dissociation_by_species,
+        "sources": sources,
+    }
 
 
 def thermal_budget_decomposition(
@@ -345,6 +544,82 @@ def _tagged_heat_term(
     status = UNCERTIFIED if value is None else ASSUMED
     source = "not supplied" if value is None else "caller supplied"
     return _figure(value, "kW", _tag(tags, key, status, source))
+
+
+def _vapor_metadata(
+    species: str,
+    vapor_pressures: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    if not vapor_pressures:
+        return {}
+    for section in ("metals", "oxide_vapors"):
+        section_data = vapor_pressures.get(section, {})
+        if isinstance(section_data, Mapping) and species in section_data:
+            raw = section_data.get(species, {})
+            if not isinstance(raw, Mapping):
+                raise ValueError(f"vapor metadata for {species!r} must be a mapping")
+            return dict(raw)
+    raw = vapor_pressures.get(species)
+    if isinstance(raw, Mapping):
+        return dict(raw)
+    return {}
+
+
+def _molar_mass_g_mol(species: str, metadata: Mapping[str, Any]) -> float:
+    raw_value = metadata.get("molar_mass_g_mol")
+    if raw_value is None:
+        raw_value = MOLAR_MASS.get(species)
+    if raw_value is None:
+        raise ValueError(f"missing molar mass for {species!r}")
+    value = float(raw_value)
+    if not math.isfinite(value) or value <= 0.0:
+        raise ValueError(f"invalid molar mass for {species!r}: {raw_value!r}")
+    return value
+
+
+def _parent_oxide_for(species: str) -> str:
+    for oxide, (metal, _n_metal, _n_oxygen) in OXIDE_TO_METAL.items():
+        if species == metal:
+            return oxide
+    return ""
+
+
+def _oxide_per_product_kg(
+    species: str,
+    parent_oxide: str,
+    metadata: Mapping[str, Any],
+) -> float:
+    explicit = metadata.get("stoich_oxide_per_vapor")
+    if explicit is not None:
+        value = float(explicit)
+        if math.isfinite(value) and value > 0.0:
+            return value
+        raise ValueError(
+            f"invalid stoich_oxide_per_vapor for {species!r}: {explicit!r}"
+        )
+
+    fallback = STOICH_RATIOS.get(parent_oxide)
+    implied_species = OXIDE_TO_METAL.get(parent_oxide, ("", 0, 0))[0]
+    if fallback and implied_species == species and fallback[0] > 0.0:
+        return 1.0 / fallback[0]
+
+    raise ValueError(
+        f"vapor species {species!r} from {parent_oxide!r} requires "
+        "stoich_oxide_per_vapor metadata for oxide-dissociation enthalpy"
+    )
+
+
+def _required_enthalpy(
+    table: Mapping[str, EnthalpyCoefficient],
+    key: str,
+    label: str,
+) -> EnthalpyCoefficient:
+    coefficient = table.get(key)
+    if coefficient is None:
+        raise ValueError(f"missing cited {label} enthalpy coefficient for {key!r}")
+    if not math.isfinite(coefficient.kJ_per_mol):
+        raise ValueError(f"non-finite {label} enthalpy coefficient for {key!r}")
+    return coefficient
 
 
 def _tag(

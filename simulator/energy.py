@@ -24,6 +24,7 @@ from __future__ import annotations
 from simulator.core import (
     EnergyRecord, EvaporationFlux, MeltState, OverheadGas,
 )
+from simulator.thermal_budget import evaporation_enthalpy_budget
 
 
 class EnergyTracker:
@@ -37,12 +38,22 @@ class EnergyTracker:
 
     def __init__(self):
         self.cumulative_kWh = 0.0
+        self.electrical_cumulative_kWh = 0.0
+        self.solar_thermal_cumulative_kWh = 0.0
+        self.latent_cumulative_kWh = 0.0
+        self.dissociation_cumulative_kWh = 0.0
+        self.thermal_cumulative_kWh = 0.0
         self.by_campaign: dict = {}
+        self.by_campaign_breakdown: dict = {}
+
+    def reset(self) -> None:
+        self.__init__()
 
     def calculate_hour(self, melt: MeltState,
                        overhead: OverheadGas,
                        evap_flux: EvaporationFlux,
-                       mre_kWh: float = 0.0) -> EnergyRecord:
+                       mre_kWh: float = 0.0,
+                       vapor_pressures: dict | None = None) -> EnergyRecord:
         """
         Calculate electrical energy consumed this hour.
 
@@ -79,12 +90,58 @@ class EnergyTracker:
         # --- MRE ---
         record.mre_kWh = mre_kWh
 
+        # --- Solar-thermal diagnostic sinks ---
+        # Ledger-neutral: reads the evaporation flux and cited enthalpy
+        # coefficients, but does not debit/credit AtomLedger or mass state.
+        thermal_budget = evaporation_enthalpy_budget(
+            evap_flux.species_kg_hr,
+            vapor_pressures=vapor_pressures,
+        )
+        record.solar_thermal_kWh = thermal_budget["solar_thermal_kWh"]
+        record.latent_kWh = thermal_budget["latent_kWh"]
+        record.dissociation_kWh = thermal_budget["dissociation_kWh"]
+        record.thermal_total_kWh = thermal_budget["thermal_total_kWh"]
+        record.thermal_breakdown_kWh = dict(thermal_budget["heat_flows_kWh"])
+        record.thermal_sources = dict(thermal_budget["sources"])
+
         record.sum_total()
 
         # Track cumulative
         self.cumulative_kWh += record.total_kWh
+        self.electrical_cumulative_kWh += record.electrical_total_kWh
+        self.solar_thermal_cumulative_kWh += record.solar_thermal_kWh
+        self.latent_cumulative_kWh += record.latent_kWh
+        self.dissociation_cumulative_kWh += record.dissociation_kWh
+        self.thermal_cumulative_kWh += record.thermal_total_kWh
         campaign_key = melt.campaign.name
         self.by_campaign[campaign_key] = (
             self.by_campaign.get(campaign_key, 0.0) + record.total_kWh)
+        campaign_breakdown = self.by_campaign_breakdown.setdefault(
+            campaign_key,
+            {
+                "electrical": 0.0,
+                "solar_thermal": 0.0,
+                "latent": 0.0,
+                "dissociation": 0.0,
+                "thermal_total": 0.0,
+                "total": 0.0,
+            },
+        )
+        campaign_breakdown["electrical"] += record.electrical_total_kWh
+        campaign_breakdown["solar_thermal"] += record.solar_thermal_kWh
+        campaign_breakdown["latent"] += record.latent_kWh
+        campaign_breakdown["dissociation"] += record.dissociation_kWh
+        campaign_breakdown["thermal_total"] += record.thermal_total_kWh
+        campaign_breakdown["total"] += record.total_kWh
 
         return record
+
+    def cumulative_breakdown(self) -> dict:
+        return {
+            "electrical": self.electrical_cumulative_kWh,
+            "solar_thermal": self.solar_thermal_cumulative_kWh,
+            "latent": self.latent_cumulative_kWh,
+            "dissociation": self.dissociation_cumulative_kWh,
+            "thermal_total": self.thermal_cumulative_kWh,
+            "total": self.cumulative_kWh,
+        }

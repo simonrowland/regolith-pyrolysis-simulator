@@ -900,14 +900,33 @@ class OverheadGas:
 
 @dataclass
 class EnergyRecord:
-    """Electrical energy consumption for one timestep."""
+    """Energy consumption for one timestep.
+
+    Electrical terms stay separate from solar-thermal diagnostics.  The
+    solar-thermal input is counted once in ``total_kWh``; latent and
+    dissociation fields expose the sink decomposition that sets that input.
+    """
     turbine_kWh: float = 0.0       # O₂ compression
     condenser_kWh: float = 0.0     # Active cooling (if needed)
     mre_kWh: float = 0.0          # Electrolysis
+    electrical_total_kWh: float = 0.0
+    solar_thermal_kWh: float = 0.0
+    latent_kWh: float = 0.0
+    dissociation_kWh: float = 0.0
+    thermal_total_kWh: float = 0.0
     total_kWh: float = 0.0
+    thermal_breakdown_kWh: Dict[str, float] = field(default_factory=dict)
+    thermal_sources: Dict[str, str] = field(default_factory=dict)
 
     def sum_total(self):
-        self.total_kWh = self.turbine_kWh + self.condenser_kWh + self.mre_kWh
+        self.electrical_total_kWh = (
+            self.turbine_kWh + self.condenser_kWh + self.mre_kWh
+        )
+        if self.thermal_total_kWh <= 0.0:
+            self.thermal_total_kWh = self.latent_kWh + self.dissociation_kWh
+        if self.solar_thermal_kWh <= 0.0:
+            self.solar_thermal_kWh = self.thermal_total_kWh
+        self.total_kWh = self.electrical_total_kWh + self.solar_thermal_kWh
 
 
 @dataclass
@@ -944,6 +963,7 @@ class HourSnapshot:
     # Energy
     energy: EnergyRecord = field(default_factory=EnergyRecord)
     energy_cumulative_kWh: float = 0.0
+    energy_cumulative_breakdown_kWh: Dict[str, float] = field(default_factory=dict)
 
     # O₂ produced (cumulative, kg)
     oxygen_produced_kg: float = 0.0
@@ -1165,7 +1185,15 @@ class BatchRecord:
 
     # Energy
     energy_total_kWh: float = 0.0
+    energy_electrical_kWh: float = 0.0
+    energy_solar_thermal_kWh: float = 0.0
+    energy_latent_kWh: float = 0.0
+    energy_dissociation_kWh: float = 0.0
+    energy_breakdown_kWh: Dict[str, float] = field(default_factory=dict)
     energy_by_campaign: Dict[str, float] = field(default_factory=dict)
+    energy_by_campaign_breakdown: Dict[str, Dict[str, float]] = field(
+        default_factory=dict
+    )
     cost_rollup: Dict[str, Any] = field(default_factory=dict)
 
     # Status
