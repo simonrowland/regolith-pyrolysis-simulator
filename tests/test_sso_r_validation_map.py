@@ -10,6 +10,9 @@ from simulator.core import FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 from scripts import sso_r_validation_map as validation_map
 
 
+# stateful validation-map smoke fixture errors under xdist coscheduling.
+pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
+
 GOLDEN_PATH = Path("tests/goldens/sso_r_validation_map_lunar_mare_low_ti.json")
 
 

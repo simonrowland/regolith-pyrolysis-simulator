@@ -50,6 +50,9 @@ from simulator.state import (
 from tests.chemistry.conftest import _build_sim
 
 
+# shadow-parity simulation runs clip/fail under xdist coscheduling.
+pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
+
 _FLUX_TOLERANCE_REL = 1e-9
 _FLUX_TOLERANCE_ABS_KG_HR = 1e-9
 

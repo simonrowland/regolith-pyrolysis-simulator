@@ -44,6 +44,9 @@ from simulator.state import CampaignPhase, DecisionType
 from tests.chemistry.conftest import _build_sim
 
 
+# mass-balance smoke parity runs clip/fail under xdist coscheduling.
+pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
+
 # ---------------------------------------------------------------------------
 # 1. Capability profile
 # ---------------------------------------------------------------------------

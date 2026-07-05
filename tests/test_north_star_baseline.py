@@ -32,7 +32,7 @@ from simulator.state import CampaignPhase, MOLAR_MASS
 # Heavy real-backend c2a baseline runs: spuriously SIGALRM/timeout when xdist
 # co-schedules them under resource contention. Run them serially (pyproject
 # `markers`); -n0 is also AGENTS.md guidance for the c2a freeze-gate class.
-pytestmark = pytest.mark.serial
+pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 

@@ -34,6 +34,9 @@ from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltStat
 from scripts import evaporation_selectivity_map as selectivity_map
 
 
+# stateful redox simulation matrix flakes under xdist coscheduling.
+pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
+
 ROOT = Path(__file__).resolve().parents[1]
 
 

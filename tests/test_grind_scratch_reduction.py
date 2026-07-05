@@ -27,7 +27,7 @@ from simulator.reduced_real_determinism import (
 # sqlite busy-lock contention: these shard tests spuriously hit
 # "database is locked" when xdist co-schedules them with other db-touching
 # tests. Run them serially (see pyproject `markers`).
-pytestmark = pytest.mark.serial
+pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
 
 
 def _put_cache_row(

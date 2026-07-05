@@ -102,20 +102,24 @@ norecursedirs = ["_attic", ".git", ".venv", "engines", "*.egg-info"]
 # pytest-timeout. Without these, the full gate took ~10 min serial and
 # routinely exceeded the 1500s sandbox tool window of in-flight codex-acp
 # workers (which silently invoke `pytest` on top of their chunk subset).
-# `-n auto` uses all available cores; `--timeout=300` kills any test that
-# silently hangs past 5 min. Workers can still override with `-n0` for
-# debugging serial behavior.
-addopts = "-n auto --timeout=300"
-# Two-pass gate: the fast pass runs everything EXCEPT @pytest.mark.serial under
-# xdist (`pytest -m "not serial"`); the serial pass runs the marked tests under
-# `-n0` (`pytest -n0 -m serial`). A test is marked serial only when xdist
-# co-scheduling makes it flake — sqlite busy-lock contention (grind scratch
-# shards) and heavy real-backend / subprocess baselines (north-star c2a, the
-# MAGEMin freeze gate, the vpr p6a CLI) that spuriously SIGALRM under parallel
-# load. The two passes collect the IDENTICAL test set (parity-checked), so
-# coverage is unchanged — only the scheduling differs.
+# `-n auto` uses all available cores; `--dist loadgroup` keeps
+# @pytest.mark.xdist_group families on one worker; `--timeout=300` kills any
+# test that silently hangs past 5 min. Workers can still override with `-n0`
+# for debugging serial behavior.
+addopts = "-n auto --dist loadgroup --timeout=300"
+# Deterministic gate: `python -m pytest tests/` is the canonical default. Tests
+# marked both serial and xdist_group("serial") still run exactly once in that
+# default xdist pass, but loadgroup keeps them on one worker. The optional
+# two-pass helper runs non-serial tests under xdist and serial tests under -n0.
+# A test is marked serial only when xdist co-scheduling makes it flake —
+# sqlite busy-lock contention (grind scratch shards), stateful smoke fixtures
+# (SSO-R validation/state), SocketIO pause/resume loops, and heavy
+# real-backend / subprocess baselines (north-star c2a, evaporation shadow
+# parity, MAGEMin freeze gate, vpr p6a CLI) that spuriously SIGALRM under
+# parallel load. Coverage is unchanged, only scheduling differs.
 markers = [
-    "serial: run under -n0 only; flakes under xdist co-scheduling (sqlite lock / heavy real-backend)",
+    "serial: run under -n0 only; flakes under xdist co-scheduling (sqlite lock / stateful fixture / heavy real-backend)",
+    "xdist_group(name): run marked tests on the same xdist worker under --dist loadgroup",
 ]
 
 # Explicit package layout. Auto-discovery works for this repo today, but

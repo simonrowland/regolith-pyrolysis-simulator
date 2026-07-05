@@ -54,6 +54,9 @@ from web.events import (
 )
 
 
+# SocketIO pause/resume loop has timing flakes under xdist coscheduling.
+pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
+
 # StubBackend = deterministic baseline: no AlphaMELTS dependence (opt-in + slow
 # here) and no float drift between runs. The decision-gate state machine is
 # backend-independent, so the stub is both correct and fast for this test.
