@@ -409,7 +409,7 @@ campaigns:
     pO2_mbar_default: 0.2
     p_total_mbar_default: 0.2
     target_species: ["Mg"]
-    Mg_vapour_pressure_bar_1600C: 0.5
+    Mg_vapour_pressure_bar_1600C: 0.5  # Legacy inert note; MgO congruent vaporization follows overhead pO2, not this fossil scalar.
     prerequisite: "SiO2 activity reduced 30-50% by C3 conditioning"
     SiO_gunk_vs_vacuum: "10-40x lower"
     products:

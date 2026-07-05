@@ -515,6 +515,7 @@ oxide_vapors:
     backsolve:
       feedstock_grid: "dense seven-feedstock lunar/mars grid"
       fO2_convention: "Kress91 IW"
+      # Descriptive fit note only; runtime uses the fitted SiO pseudo-psat with provider pO2.
       activity_formula: "a_SiO2 * sqrt(1e-9 / pO2_bar) for pO2_bar > 1e-9; hard-vacuum reference otherwise"
       target: "VapoRock SiO(g) partial pressure on the dense grid"
       residual_dex: 0.270
@@ -561,6 +562,7 @@ oxide_vapors:
     condensation_products_mol_per_mol_vapor:
       Si: 0.5
       SiO2: 0.5
+    # Descriptive equation note only; not a runtime suppression coefficient.
     suppression_equation: "p(SiO) = K(T) * a(SiO2) / sqrt pO2"
     suppression_factor_at_1mbar_O2: ">300*"
     notes: |
