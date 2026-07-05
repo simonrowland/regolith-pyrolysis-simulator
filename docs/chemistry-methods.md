@@ -78,13 +78,16 @@ one atmosphere at its normal boiling point (3135 K). It is labelled UNCERTIFIED 
 but a derivation rather than a fitted primary.
 
 Several species that the pure-component approach cannot reach directly — sodium and potassium at recipe
-temperature, iron, silicon monoxide — instead carry a **pseudo-Antoine** fit whose coefficients are
+temperature, iron, magnesium, and silicon monoxide — instead carry a **pseudo-Antoine** fit whose coefficients are
 back-solved so that the activity-scaled Antoine product reproduces a VapoRock gas-speciation target on a
 fixed reference grid (seven lunar and Mars feedstocks, 31 temperature points from 1350 to 1950 K, at an
 iron–wüstite oxygen fugacity per Kress & Carmichael 1991). These are the
 `pseudo_psat_backsolved_from_vaporock` rows. They are honestly a model-to-model fit, not a measurement:
-the residual against VapoRock grows with distance from the calibration grid (about 0.38 log-decades for
-Na, 0.69 for K, 0.27 for SiO), and every such row is UNCERTIFIED. The VapoRock target itself comes from
+the residual against VapoRock grows with distance from the calibration grid (about 0.379 dex for Na,
+0.691 for K, 0.282 for Mg, 0.270 for SiO, and 0.418 for Fe), and every such row is UNCERTIFIED.
+High-uncertainty Fe pseudo rows have an additional runtime guard: above their stated `valid_range_K`, the
+provider omits the fallback and records `non_certifying_vapor_pressure_fallback_omitted` rather than
+emitting an extrapolated Fe pressure. The VapoRock target itself comes from
 Wolf et al. 2023 (*ApJ* 947:64,
 [doi:10.3847/1538-4357/acbcc7](https://doi.org/10.3847/1538-4357/acbcc7)).
 
@@ -117,12 +120,12 @@ SiO2(melt) → SiO(g) + ½ O2(g)
 p(SiO) ∝ a(SiO2) / √pO2
 ```
 
-The effective SiO pressure carries an explicit inverse-root oxygen-pressure term,
-`a(SiO₂) × √(pO₂_ref / pO₂)`, so that lowering the overhead oxygen pressure raises the SiO pressure and
-raising it suppresses SiO. This is the physical basis of the "hold pO₂ to lock silicon in the melt,
-drop toward vacuum to release it" control described in `docs/concepts.md`. To keep the equilibrium from
-diverging as oxygen pressure approaches zero, the term is clamped at a hard-vacuum reference of
-1×10⁻⁹ bar; below that the model reads the clamped reference rather than extrapolating the divergence.
+The effective SiO pressure carries an explicit inverse-root oxygen-pressure term above the vacuum floor,
+`a(SiO₂) × √(pO₂_ref / pO₂)` with `pO₂_ref = 1×10⁻⁹ bar`, so that lowering the overhead oxygen pressure
+raises the SiO pressure and raising it suppresses SiO. This is the physical basis of the "hold pO₂ to
+lock silicon in the melt, drop toward vacuum to release it" control described in `docs/concepts.md`.
+When `pO₂` is at or below that floor, the suppression term is not applied again; the model reads the
+hard-vacuum reference rather than extrapolating the divergence.
 The species-specific oxygen-pressure slopes for the other oxides (the `−1/n_M` family in
 `docs/concepts.md`) follow from the same formation-reaction stoichiometry.
 
@@ -147,10 +150,12 @@ far from ideal.
 **The activity that feeds the authoritative vapor-pressure path is the builtin analytic treatment, not
 a melt-equilibrium engine.** For every oxide except iron oxide, the builtin provider takes the activity
 as the oxide's weight-fraction proportion of the melt — an **ideal solution with activity coefficient
-γ = 1**. Iron oxide is the exception: when an intrinsic oxygen fugacity is supplied, the FeO activity is
-the redox-resolved ferrous activity from the Kress & Carmichael / CALPHAD treatment of §7; when it is
-not supplied, iron oxide falls back to the same ideal weight-fraction proportion as the other oxides.
-This ideal-for-non-iron, Kress-for-iron activity surface is what the vapor pressures of §2 are built on.
+γ = 1**. Iron oxide is the exception in interactive and batch simulator runs: those runs always pass the
+intrinsic oxygen fugacity into the vapor-pressure provider, so FeO uses the redox-resolved ferrous
+activity from the Kress & Carmichael / CALPHAD treatment of §7. The ideal weight-fraction fallback for
+FeO exists only for external callers that invoke the vapor-pressure provider without the intrinsic-fO₂
+channel. This ideal-for-non-iron, Kress-for-iron activity surface is what the vapor pressures of §2 are
+built on.
 
 The silicate-equilibrium engines compute activities too, on the MELTS convention
 
@@ -214,10 +219,11 @@ tightly as it gets hotter) and the temperature dependence is not yet fit.
 
 The chosen source is Sossi et al. 2019 (*Geochim. Cosmochim. Acta* 260:204–231, §4.5.1, Tables 3–4;
 [doi:10.1016/j.gca.2019.06.021](https://doi.org/10.1016/j.gca.2019.06.021)). It is chosen because it is
-a primary Knudsen-effusion mass-spectrometry measurement on a **ferrobasalt** — the mafic, iron-bearing
-melt composition of interest — reported on exactly the single-cation Raoultian basis the physics
-requires, with the vaporization reaction written explicitly. The review compilation of Sossi & Fegley
-2018 (*Rev. Mineral. Geochem.* 84:393–459, Table 2 pp. 409–410; Raoultian definition Eqn 24 and the
+a 1-atm gas-mixing furnace evaporation study on a **ferrobasalt** — the mafic, iron-bearing melt
+composition of interest — with LA-ICP-MS residual-glass analyses and HKL/logK* fitting. It reports the
+alkali activities on exactly the single-cation Raoultian basis the physics requires, with the vaporization
+reaction written explicitly. The review compilation of Sossi & Fegley 2018 (*Rev. Mineral. Geochem.*
+84:393–459, Table 2 pp. 409–410; Raoultian definition Eqn 24 and the
 single-cation reaction Eqn 25, p. 413; the γ(T) trend Fig. 5, p. 414;
 [doi:10.2138/rmg.2018.84.11](https://doi.org/10.2138/rmg.2018.84.11)) is where the framework and the
 exponent come from, and it is included in the provenance — but its tabulated NaO₀.₅ datum is from a
@@ -245,28 +251,31 @@ interface resistance, and the continuum boundary-layer gas-diffusion resistance:
 J = (P_eff − P_bulk) / ( r_melt + r_interface + r_gas )
 
   r_interface = 1 / (α × k_HKL)             free-molecular impingement
-  r_gas       = (1 − f) / k_MT              gas-side boundary layer
+  r_gas       = β_FS / k_MT                 gas-side boundary layer
   r_melt      = melt-side surface renewal   (see below)
 
   k_HKL = √( M / (2π R T) )                 free-molecular impingement rate
   k_MT  = D_AB(T, P) × Sh                   boundary-layer (continuum) mass transfer
-  f     = Kn / (Kn + 0.01)                  Knudsen-regime weight
+  β_FS  = (1 + Kn) / (1 + (4/(3α_g)+0.377)Kn + (4/(3α_g))Kn²)
+                                                Fuchs-Sutugin gas-resistance weight; α_g = 1.0
 ```
 
-In the free-molecular limit (high Knudsen number) the regime weight sends the gas-side boundary-layer
-resistance to zero and the Hertz–Knudsen interface term rate-limits; in the viscous limit (the millibar
-sweep-gas regime the recipes actually run in) the boundary-layer diffusion rate-limits. The diffusion
-coefficient `D_AB` is a per-species Chapman–Enskog value rather than a fixed constant, and the Sherwood
-number carries an induction-stirring enhancement (`Sh_eff = 3.66 × √stir_factor`, with the stirring
-factor from the recipe, default giving `Sh_eff ≈ 9`) so that stirring the melt increases the flux in the
-diffusion-limited regime.
+In the free-molecular limit (high Knudsen number) the Fuchs–Sutugin gas-resistance weight sends the
+gas-side boundary-layer resistance to zero and the Hertz–Knudsen interface term rate-limits; in the
+viscous limit (the millibar sweep-gas regime the recipes actually run in) the boundary-layer diffusion
+rate-limits. The diffusion coefficient `D_AB` is a per-species Chapman–Enskog value rather than a fixed
+constant, and the Sherwood number carries the **radial** induction-stirring enhancement,
+`Sh_eff = 3.66 × √max(1, radial_stir_factor)`. The radial default is 1.0, so the default Sherwood number
+is the laminar `Sh = 3.66`; `Sh_eff ≈ 9` occurs only when the radial factor is about 6.
 
 The **melt-side surface-renewal resistance** `r_melt` accounts for the finite rate at which stirring
 brings fresh, un-depleted melt to the evaporating surface — a resistance in series with the gas-side
 terms, so a species cannot evaporate faster than the melt can resupply its surface concentration. It is
 an owner-ratified engineering term, enabled by default in the recipe data (`melt_resistance_enabled`),
-with a base surface-renewal conductance that scales with the same induction-stirring factor. The full
-three-resistance series form and its derivation are documented in
+with a base surface-renewal conductance that scales with the **axial** induction-stirring axis via
+`√axial_stir_factor`. The axial default is 6.0 and controls melt-side renewal; it is intentionally
+separate from the radial Sherwood driver above. The full three-resistance series form and its derivation
+are documented in
 [`docs/model-limitations.md`](model-limitations.md).
 
 ### The evaporation coefficient
@@ -287,7 +296,9 @@ the CITED / ASSUMED / UNCERTIFIED trust tiers of the citation policy, and a spec
   re-condensing reservoir, whereas the recipes run at millibar overhead with a continuous sweep gas,
   which is the open-furnace regime with little back-flux. Because the two credible measurements are not
   reconciled, the sodium coefficient is tagged UNCERTIFIED in the provenance registry, and an operator
-  can select the conservative Fedkin value through the setpoints. These grounded rows carry a
+  can select the conservative Fedkin value through the setpoints. Potassium does not inherit sodium's
+  Sossi open-furnace coefficient: the potassium row uses Fedkin et al.'s KEMS intrinsic coefficient
+  `α = 0.13` (envelope 0.10–0.16), distinct from sodium's `α ≈ 1`. These grounded rows carry a
   confidence-tier-2 label in the coefficient data — a proxy-or-conditional confidence, not a direct
   regolith-melt measurement — so "grounded" here means sourced and cited, not high-confidence.
 - **Proxy coefficient.** Calcium and titanium use a perovskite (CaTiO₃) proxy; aluminium uses a broad
@@ -407,6 +418,12 @@ fluorescence measure total iron by X-ray intensity and cannot separate the oxida
 collection time, so all iron is booked as FeO and the redox state must be inferred afterward. Every
 feedstock in the catalog follows this convention, and its annotations say so.
 
+That convention is also a validation caveat for mass-spectrometry comparisons. A KEMS sample sees vapor
+over the ferric/ferrous state actually present in the experimental melt, while the simulator starts from
+total iron booked as FeO and infers the ferric/ferrous split from the assumed oxygen fugacity,
+temperature, and composition. Validation residuals against KEMS data therefore include this redox-state
+inference, not only the vapor-pressure equation itself.
+
 The model therefore **infers** the redox state rather than reading it. From the total-iron content, the
 melt composition, temperature, and oxygen fugacity, it computes the ferric/ferrous split using the
 Kress & Carmichael 1991 relation (*Contrib. Mineral. Petrol.* 108:82–92,
@@ -514,7 +531,7 @@ recorded warning.
   subprocess (it can hang on spinel-saturated compositions, and a subprocess kill is logged as a
   diagnostic failure rather than a ledger error), and it does not itself write the mol-native ledger.
 
-- **MAGEMin** is a fast Gibbs-minimization engine over an igneous phase set, used as a narrow-gate
+- **MAGEMin** is a fast Gibbs-minimization engine over an igneous phase set, used as a narrow-scope
   shadow for liquid fraction and phase context. It is quick and broad but returns stoichiometric phases
   only (no activity coefficients) and does not cover manganese, so it is a diagnostic companion rather
   than an authority. It is an optional install.
@@ -523,7 +540,10 @@ recorded warning.
   **diagnostic-only shadow** for vapor pressure. Its full gas speciation is reported for comparison and
   is the calibration target behind the pseudo-Antoine fits of §2, but it does not own the pressure
   surface that evaporation consumes and it never writes the ledger. The builtin analytic provider
-  remains authoritative for vapor pressure whether or not VapoRock is available.
+  remains authoritative for vapor pressure whether or not VapoRock is available. If a ThermoEngine /
+  PetThermoTools backend reports a species vapor pressure that agrees with the builtin value, the
+  per-species provenance string may read `thermoengine`; that is a diagnostic confirmation label, not an
+  authority swap.
 
 - **FactSAGE / ChemApp** is not part of this checkout: the adapter has been archived and removed, and
   an explicit request for it raises rather than falling through. It is noted here only so that a reader
@@ -533,9 +553,10 @@ recorded warning.
 analytic kernels consume — the pure-component Antoine coefficients, the JANAF-derived Ellingham and
 latent/dissociation tables, and the redox-buffer fits. In trust vocabulary this is the
 `internal-datatables` evidence class. It is a trust category, not a separate runtime backend: the data
-is embedded in the builtin engines and the reference data files, it carries no ledger authority, and it
-is preferred over MELTS only within the diagnostic silicate-context intent and only in the refractory
-(high-alumina, low-iron) regime where MELTS extrapolates outside its igneous training set.
+is embedded in the builtin engines and the reference data files, and it carries no ledger authority. A
+preference for internal data tables over MELTS in refractory silicate contexts is a trust-policy
+statement about evidence quality; this checkout does not expose a runtime selector that switches MELTS
+versus data tables by refractory regime.
 
 ---
 
@@ -563,6 +584,13 @@ size and the oxygen ramp, and some coarse graphite could survive an oxidizing pr
 with the reactive organic matter tends to overestimate carbon loss and underestimate any surviving
 reductant carbon. The assumption is stated so it can be revisited; it is not presented as a measured
 fate.
+
+Alongside that ledger-active simplification, the checkout also contains an instrument-first refractory
+carbon partition diagnostic in `data/stage0_carbon_partition.yaml`. It can partition declared organic
+carbon into labile, refractory, carbonate, and process-reductant buckets, and can report residual
+refractory carbon after Stage 0. That diagnostic is not ledger-active in the extraction path described
+above; it documents the split that would need to become authoritative before the simplification is
+removed.
 
 ### CNOPS handling
 
@@ -635,7 +663,7 @@ upgraded.
 
 The reproduction error bar is treated as a deliverable, not a disclaimer: where the model is validated
 against a laboratory experiment, the residual is decomposed and reported rather than tuned away. The
-governing discipline, stated in `CLAUDE.md` and the citation policy, is that when the model disagrees
-with reference data the response is investigation, never retuning a coefficient to force agreement. The
-appropriate and inappropriate uses of the simulator's numbers are enumerated in
+governing discipline, stated in [`docs/citation-policy.md`](citation-policy.md), is that when the model
+disagrees with reference data the response is investigation, never retuning a coefficient to force
+agreement. The appropriate and inappropriate uses of the simulator's numbers are enumerated in
 [`docs/model-limitations.md`](model-limitations.md).
