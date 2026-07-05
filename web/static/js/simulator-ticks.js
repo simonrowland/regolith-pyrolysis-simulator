@@ -145,8 +145,17 @@ socket.on('simulation_tick', (data) => {
     }
 
     // Energy
-    setEl('energy-cumulative', data.energy_cumulative_kWh.toFixed(1) + ' kWh');
-    setEl('energy-hour', data.energy_kWh.toFixed(3) + ' kWh');
+    setEl('energy-cumulative',
+        data.energy_electrical_plus_evaporation_cumulative_kWh.toFixed(1) + ' kWh');
+    setEl('energy-hour',
+        data.energy_electrical_plus_evaporation_kWh.toFixed(3) + ' kWh');
+    setEl('energy-electrical', data.energy_electrical_kWh.toFixed(3) + ' kWh');
+    setEl('energy-evaporation',
+        data.energy_evaporation_thermal_kWh.toFixed(3) + ' kWh');
+    setEl('energy-scope', data.energy_scope);
+    setEl('furnace-heat-status',
+        data.furnace_heat_status
+            + '; feed sensible, fusion, radiation, full furnace heat omitted');
 
     // O2
     setEl('oxygen-total', data.oxygen_kg.toFixed(2) + ' kg');

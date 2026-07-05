@@ -317,7 +317,9 @@ function recipePreviewText() {
         `furnace_max_T_C: ${selectedC4MaxTempC() ?? 'not captured'}`,
         `mre_enabled: ${mre.c5_enabled ? 'true' : 'false'}`,
         `oxygen_kg: ${tick.oxygen_kg ?? 'not captured'}`,
-        `energy_kWh: ${tick.energy_cumulative_kWh ?? tick.energy_kWh ?? 'not captured'}`,
+        `energy_electrical_plus_evaporation_kWh: ${tick.energy_electrical_plus_evaporation_cumulative_kWh ?? tick.energy_electrical_plus_evaporation_kWh ?? 'not captured'}`,
+        `energy_scope: ${tick.energy_scope ?? 'not captured'}`,
+        `furnace_heat_status: ${tick.furnace_heat_status ?? 'not captured'}`,
         `mass_balance_error_pct: ${tick.mass_balance_error_pct ?? 'not captured'}`,
         `wall_deposit_kg: ${summary.wall_deposit_cumulative_kg ? '[captured]' : 'not captured'}`,
         `melt_fO2_log: ${formatRedoxNumber(redox.fO2_log)}`,
@@ -814,7 +816,16 @@ socket.on('campaign_complete_summary', (summary) => {
         ['Start Mass', summary.start_mass_kg.toFixed(1) + ' kg'],
         ['End Mass', summary.end_mass_kg.toFixed(1) + ' kg'],
         ['Mass Lost', summary.mass_lost_kg.toFixed(1) + ' kg'],
-        ['Energy This Campaign', summary.energy_kWh.toFixed(1) + ' kWh'],
+        [
+            'Electrical + known evaporation enthalpy (partial)',
+            summary.energy_electrical_plus_evaporation_kWh.toFixed(1) + ' kWh',
+        ],
+        ['Energy scope', summary.energy_scope],
+        [
+            'Furnace heat status',
+            summary.furnace_heat_status
+                + '; feed sensible, fusion, radiation, full furnace heat omitted',
+        ],
         ['O\u2082 Produced', summary.O2_kg.toFixed(2) + ' kg'],
     ];
 

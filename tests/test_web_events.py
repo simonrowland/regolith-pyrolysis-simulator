@@ -124,7 +124,9 @@ def _install_recipe_endpoint_state(sid: str) -> None:
                 "pO2_mbar": 0.2,
                 "p_total_mbar": 10.0,
                 "oxygen_kg": 4.5,
-                "energy_cumulative_kWh": 12.25,
+                "energy_electrical_plus_evaporation_cumulative_kWh": 12.25,
+                "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+                "furnace_heat_status": "partial",
                 "mass_balance_error_pct": 0.0,
                 "process_buckets_kg": {
                     "metal_alloy": {"Fe": 2.0, "Mg": 0.5},
@@ -139,7 +141,9 @@ def _install_recipe_endpoint_state(sid: str) -> None:
         },
         "last_completion_payload": {
             "oxygen_kg": 4.5,
-            "energy_kWh": 12.25,
+            "energy_electrical_plus_evaporation_kWh": 12.25,
+            "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+            "furnace_heat_status": "partial",
             "mass_balance_error_pct": 0.0,
             "terminal_rump_kg": 10.0,
             "products": {"glass": 3.0},
@@ -292,7 +296,7 @@ def test_recipe_save_list_load_endpoints_round_trip_without_run(
             "title": "<img src=x onerror=alert(1)>",
             "summary": (
                 "lunar_mare_low_ti | C4 | O2 4.5 kg | "
-                "energy 12.25 kWh | wall deposit 0.01 kg"
+                "electrical+evap partial 12.25 kWh | wall deposit 0.01 kg"
             ),
         }]
         monkeypatch.setattr(web_routes, "load_recipe_patch", load_recipe_patch)

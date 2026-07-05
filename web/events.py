@@ -695,17 +695,21 @@ def _tick_payload(
             k: round(v, 3) for k, v in snapshot.condensation_totals.items()
         },
         'stage_purity_report': stage_purity_report(sim.train),
-        'energy_kWh': round(snapshot.energy.total_kWh, 4),
+        'energy_electrical_plus_evaporation_kWh': round(
+            snapshot.energy.electrical_plus_evaporation_kWh, 4),
         'energy_electrical_kWh': round(snapshot.energy.electrical_total_kWh, 4),
-        'energy_solar_thermal_kWh': round(
-            snapshot.energy.solar_thermal_kWh, 4),
+        'energy_evaporation_thermal_kWh': round(
+            snapshot.energy.evaporation_thermal_kWh, 4),
+        'energy_scope': snapshot.energy.energy_scope,
+        'furnace_heat_status': snapshot.energy.furnace_heat_status,
         'energy_latent_kWh': round(snapshot.energy.latent_kWh, 4),
         'energy_dissociation_kWh': round(snapshot.energy.dissociation_kWh, 4),
-        'energy_breakdown_kWh': {
+        'energy_evaporation_breakdown_kWh': {
             key: round(value, 4)
-            for key, value in snapshot.energy.thermal_breakdown_kWh.items()
+            for key, value in snapshot.energy.evaporation_breakdown_kWh.items()
         },
-        'energy_cumulative_kWh': round(snapshot.energy_cumulative_kWh, 2),
+        'energy_electrical_plus_evaporation_cumulative_kWh': round(
+            snapshot.energy_electrical_plus_evaporation_cumulative_kWh, 2),
         'energy_cumulative_breakdown_kWh': {
             key: round(value, 4)
             for key, value in snapshot.energy_cumulative_breakdown_kWh.items()
@@ -761,7 +765,11 @@ def _completion_payload(sim):
     )
     return {
         'total_hours': sim.melt.hour,
-        'energy_kWh': sim.energy_cumulative_kWh,
+        'energy_electrical_plus_evaporation_kWh': (
+            sim.energy_electrical_plus_evaporation_cumulative_kWh
+        ),
+        'energy_scope': 'electrical_plus_known_evaporation_enthalpy',
+        'furnace_heat_status': 'partial',
         'energy_breakdown_kWh': dict(
             getattr(sim, 'energy_cumulative_breakdown_kWh', {}) or {}),
         'oxygen_kg': sim._oxygen_total_kg(),

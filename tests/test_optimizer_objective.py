@@ -95,21 +95,20 @@ def test_missing_or_nonfinite_objectives_raise() -> None:
         )
 
 
-def test_energy_component_and_per_product_metrics_read_decomposed_total() -> None:
+def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
     sim = SimpleNamespace(
-        energy_cumulative_kWh=18.0,
+        energy_electrical_plus_evaporation_cumulative_kWh=18.0,
         energy_cumulative_breakdown_kWh={
             "electrical": 6.0,
-            "solar_thermal": 12.0,
+            "evaporation_thermal": 12.0,
             "latent": 5.0,
             "dissociation": 7.0,
-            "thermal_total": 12.0,
-            "total": 18.0,
+            "electrical_plus_evaporation": 18.0,
         },
         record=SimpleNamespace(
-            energy_total_kWh=18.0,
+            energy_electrical_plus_evaporation_kWh=18.0,
             energy_electrical_kWh=6.0,
-            energy_solar_thermal_kWh=12.0,
+            energy_evaporation_thermal_kWh=12.0,
             energy_latent_kWh=5.0,
             energy_dissociation_kWh=7.0,
         ),
@@ -123,10 +122,13 @@ def test_energy_component_and_per_product_metrics_read_decomposed_total() -> Non
         "electrical_energy_kWh", sim, {}, product_classes
     ) == pytest.approx(6.0)
     assert _metric_value(
-        "solar_thermal_energy_kWh", sim, {}, product_classes
+        "evaporation_thermal_energy_kWh", sim, {}, product_classes
     ) == pytest.approx(12.0)
     assert _metric_value(
-        "energy_total_per_product_kWh_per_kg", sim, {}, product_classes
+        "energy_electrical_plus_evaporation_per_product_kWh_per_kg",
+        sim,
+        {},
+        product_classes,
     ) == pytest.approx(6.0)
     assert _metric_value(
         "dissociation_energy_per_product_kWh_per_kg",
@@ -631,11 +633,11 @@ class _CompositionSim:
             products_kg={},
             oxygen_stored_kg=0.0,
             oxygen_vented_kg=0.0,
-            energy_total_kWh=1.0,
+            energy_electrical_plus_evaporation_kWh=1.0,
             total_hours=1,
         )
         self.melt = SimpleNamespace(hour=1)
-        self.energy_cumulative_kWh = 1.0
+        self.energy_electrical_plus_evaporation_cumulative_kWh = 1.0
 
     def product_ledger(self) -> dict[str, float]:
         return dict(self._product_kg)

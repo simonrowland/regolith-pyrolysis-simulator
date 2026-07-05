@@ -1539,17 +1539,25 @@ def build_per_hour_summary(
         "O2_yield_kg_cumulative": o2_source_side_potential_kg,
         "O2_source_side_potential_kg_cumulative": o2_source_side_potential_kg,
         "O2_metric_label": O2_SOURCE_SIDE_POTENTIAL_LABEL,
-        "energy_kWh": float(snapshot.energy.total_kWh),
+        "energy_electrical_plus_evaporation_kWh": float(
+            snapshot.energy.electrical_plus_evaporation_kWh
+        ),
         "energy_electrical_kWh": float(snapshot.energy.electrical_total_kWh),
-        "energy_solar_thermal_kWh": float(snapshot.energy.solar_thermal_kWh),
+        "energy_evaporation_thermal_kWh": float(
+            snapshot.energy.evaporation_thermal_kWh
+        ),
+        "energy_scope": snapshot.energy.energy_scope,
+        "furnace_heat_status": snapshot.energy.furnace_heat_status,
         "energy_latent_kWh": float(snapshot.energy.latent_kWh),
         "energy_dissociation_kWh": float(snapshot.energy.dissociation_kWh),
-        "energy_cumulative_kWh": float(snapshot.energy_cumulative_kWh),
+        "energy_electrical_plus_evaporation_cumulative_kWh": float(
+            snapshot.energy_electrical_plus_evaporation_cumulative_kWh
+        ),
         "energy_cumulative_breakdown_kWh": _json_safe(
             dict(snapshot.energy_cumulative_breakdown_kWh)
         ),
-        "energy_thermal_breakdown_kWh": _json_safe(
-            dict(snapshot.energy.thermal_breakdown_kWh)
+        "energy_evaporation_breakdown_kWh": _json_safe(
+            dict(snapshot.energy.evaporation_breakdown_kWh)
         ),
         "metal_yields_kg": metal_yields,
         "condensation_train_kg": {

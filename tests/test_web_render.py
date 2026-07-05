@@ -27,6 +27,10 @@ _RENDER_IDS = [
     "status-atmosphere",
     "energy-cumulative",
     "energy-hour",
+    "energy-electrical",
+    "energy-evaporation",
+    "energy-scope",
+    "furnace-heat-status",
     "oxygen-total",
     "mass-error",
     "gt-ramp-actual",
@@ -142,9 +146,25 @@ def test_simulation_tick_payload_renders_operator_dom_readouts(
     )
     assert rendered["text"]["status-atmosphere"] == "Atmosphere: Hard vacuum"
     assert rendered["text"]["energy-cumulative"] == (
-        f"{payload['energy_cumulative_kWh']:.1f} kWh"
+        f"{payload['energy_electrical_plus_evaporation_cumulative_kWh']:.1f} kWh"
     )
-    assert rendered["text"]["energy-hour"] == f"{payload['energy_kWh']:.3f} kWh"
+    assert rendered["text"]["energy-hour"] == (
+        f"{payload['energy_electrical_plus_evaporation_kWh']:.3f} kWh"
+    )
+    assert rendered["text"]["energy-electrical"] == (
+        f"{payload['energy_electrical_kWh']:.3f} kWh"
+    )
+    assert rendered["text"]["energy-evaporation"] == (
+        f"{payload['energy_evaporation_thermal_kWh']:.3f} kWh"
+    )
+    assert rendered["text"]["energy-scope"] == (
+        "electrical_plus_known_evaporation_enthalpy"
+    )
+    assert rendered["text"]["furnace-heat-status"] == (
+        "partial; feed sensible, fusion, radiation, full furnace heat omitted"
+    )
+    assert "energy_kWh" not in payload
+    assert "energy_solar_thermal_kWh" not in payload
     assert rendered["text"]["oxygen-total"] == f"{payload['oxygen_kg']:.2f} kg"
     assert rendered["text"]["mass-error"] == (
         f"{_js_number_text(payload['mass_balance_error_pct'])}%"

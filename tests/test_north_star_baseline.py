@@ -297,7 +297,7 @@ def test_snapshots_carry_all_expected_north_star_fields():
     assert snap.mass_out_kg > 0.0
 
     # Energy accumulator.
-    assert snap.energy_cumulative_kWh >= 0.0
+    assert snap.energy_electrical_plus_evaporation_cumulative_kWh >= 0.0
 
     # Metal-projection drift audit (W8) on the snapshot.
     assert hasattr(snap, 'metal_projection_drift_kg')

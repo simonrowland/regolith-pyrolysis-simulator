@@ -2,9 +2,11 @@
 Energy Tracker
 ===============
 
-Tracks electrical energy consumption per campaign stage and
-cumulative per batch.  Solar-thermal energy (concentrator) is
-assumed provided but not tracked in the electrical budget.
+Tracks electrical energy consumption per campaign stage and cumulative per
+batch.  It also carries a diagnostic evaporation-enthalpy sink estimate
+(latent + oxide-dissociation enthalpy of evaporated species).  That diagnostic
+is partial furnace heat accounting: feed sensible heat, fusion, radiation, and
+the full furnace heat path remain outside this tracker.
 
 Electrical consumers:
     - Turbine/compressor:  O₂ compression from mbar → ~3 bar
@@ -31,18 +33,17 @@ class EnergyTracker:
     """
     Calculates hourly electrical energy consumption.
 
-    Solar-thermal energy for the concentrator is not tracked
-    here — the concentrator is assumed to maintain whatever
-    temperature the campaign requires.
+    Full solar/furnace heat input is not tracked here.  The non-electrical
+    term is only the known evaporation-enthalpy sink estimate.
     """
 
     def __init__(self):
         self.cumulative_kWh = 0.0
         self.electrical_cumulative_kWh = 0.0
-        self.solar_thermal_cumulative_kWh = 0.0
+        self.evaporation_thermal_cumulative_kWh = 0.0
         self.latent_cumulative_kWh = 0.0
         self.dissociation_cumulative_kWh = 0.0
-        self.thermal_cumulative_kWh = 0.0
+        self.electrical_plus_evaporation_cumulative_kWh = 0.0
         self.by_campaign: dict = {}
         self.by_campaign_breakdown: dict = {}
 
@@ -90,58 +91,61 @@ class EnergyTracker:
         # --- MRE ---
         record.mre_kWh = mre_kWh
 
-        # --- Solar-thermal diagnostic sinks ---
+        # --- Evaporation-enthalpy diagnostic sinks ---
         # Ledger-neutral: reads the evaporation flux and cited enthalpy
         # coefficients, but does not debit/credit AtomLedger or mass state.
         thermal_budget = evaporation_enthalpy_budget(
             evap_flux.species_kg_hr,
             vapor_pressures=vapor_pressures,
         )
-        record.solar_thermal_kWh = thermal_budget["solar_thermal_kWh"]
+        record.evaporation_thermal_kWh = thermal_budget["evaporation_thermal_kWh"]
+        record.energy_scope = thermal_budget["energy_scope"]
+        record.furnace_heat_status = thermal_budget["furnace_heat_status"]
         record.latent_kWh = thermal_budget["latent_kWh"]
         record.dissociation_kWh = thermal_budget["dissociation_kWh"]
-        record.thermal_total_kWh = thermal_budget["thermal_total_kWh"]
-        record.thermal_breakdown_kWh = dict(thermal_budget["heat_flows_kWh"])
-        record.thermal_sources = dict(thermal_budget["sources"])
+        record.evaporation_breakdown_kWh = dict(thermal_budget["heat_flows_kWh"])
+        record.evaporation_sources = dict(thermal_budget["sources"])
 
-        record.sum_total()
+        record.sum_scoped_energy()
 
         # Track cumulative
-        self.cumulative_kWh += record.total_kWh
+        self.cumulative_kWh += record.electrical_plus_evaporation_kWh
         self.electrical_cumulative_kWh += record.electrical_total_kWh
-        self.solar_thermal_cumulative_kWh += record.solar_thermal_kWh
+        self.evaporation_thermal_cumulative_kWh += record.evaporation_thermal_kWh
         self.latent_cumulative_kWh += record.latent_kWh
         self.dissociation_cumulative_kWh += record.dissociation_kWh
-        self.thermal_cumulative_kWh += record.thermal_total_kWh
+        self.electrical_plus_evaporation_cumulative_kWh += (
+            record.electrical_plus_evaporation_kWh
+        )
         campaign_key = melt.campaign.name
         self.by_campaign[campaign_key] = (
-            self.by_campaign.get(campaign_key, 0.0) + record.total_kWh)
+            self.by_campaign.get(campaign_key, 0.0)
+            + record.electrical_plus_evaporation_kWh)
         campaign_breakdown = self.by_campaign_breakdown.setdefault(
             campaign_key,
             {
                 "electrical": 0.0,
-                "solar_thermal": 0.0,
+                "evaporation_thermal": 0.0,
                 "latent": 0.0,
                 "dissociation": 0.0,
-                "thermal_total": 0.0,
-                "total": 0.0,
+                "electrical_plus_evaporation": 0.0,
             },
         )
         campaign_breakdown["electrical"] += record.electrical_total_kWh
-        campaign_breakdown["solar_thermal"] += record.solar_thermal_kWh
+        campaign_breakdown["evaporation_thermal"] += record.evaporation_thermal_kWh
         campaign_breakdown["latent"] += record.latent_kWh
         campaign_breakdown["dissociation"] += record.dissociation_kWh
-        campaign_breakdown["thermal_total"] += record.thermal_total_kWh
-        campaign_breakdown["total"] += record.total_kWh
+        campaign_breakdown["electrical_plus_evaporation"] += (
+            record.electrical_plus_evaporation_kWh
+        )
 
         return record
 
     def cumulative_breakdown(self) -> dict:
         return {
             "electrical": self.electrical_cumulative_kWh,
-            "solar_thermal": self.solar_thermal_cumulative_kWh,
+            "evaporation_thermal": self.evaporation_thermal_cumulative_kWh,
             "latent": self.latent_cumulative_kWh,
             "dissociation": self.dissociation_cumulative_kWh,
-            "thermal_total": self.thermal_cumulative_kWh,
-            "total": self.cumulative_kWh,
+            "electrical_plus_evaporation": self.cumulative_kWh,
         }

@@ -51,11 +51,11 @@ class _ObjectiveSim:
             products_kg={},
             oxygen_stored_kg=0.0,
             oxygen_vented_kg=0.0,
-            energy_total_kWh=1.0,
+            energy_electrical_plus_evaporation_kWh=1.0,
             total_hours=1,
         )
         self.melt = SimpleNamespace(hour=1)
-        self.energy_cumulative_kWh = 1.0
+        self.energy_electrical_plus_evaporation_cumulative_kWh = 1.0
 
     def product_ledger(self) -> dict[str, float]:
         return dict(self._product_kg)

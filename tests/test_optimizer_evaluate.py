@@ -193,10 +193,10 @@ class _Sim:
             products_kg={"O2": 3.0, "Fe": 1.0},
             oxygen_stored_kg=2.5,
             oxygen_vented_kg=0.5,
-            energy_total_kWh=44.0,
+            energy_electrical_plus_evaporation_kWh=44.0,
             total_hours=1,
         )
-        self.energy_cumulative_kWh = 44.0
+        self.energy_electrical_plus_evaporation_cumulative_kWh = 44.0
         self.melt = SimpleNamespace(hour=1)
         self._last_backend_diagnostics = backend_diagnostics or {}
         self._freeze_curve = freeze_curve
@@ -1766,10 +1766,16 @@ def test_objective_definitions_keep_profile_order_as_ordinal() -> None:
 
 def test_missing_objective_output_on_feasible_run_aborts_as_engine_bug() -> None:
     execution = _execution()
-    delattr(execution.simulator, "energy_cumulative_kWh")
-    delattr(execution.simulator.record, "energy_total_kWh")
+    delattr(
+        execution.simulator,
+        "energy_electrical_plus_evaporation_cumulative_kWh",
+    )
+    delattr(execution.simulator.record, "energy_electrical_plus_evaporation_kWh")
 
-    with pytest.raises(EngineBugAbort, match="energy_total_kWh is missing") as raised:
+    with pytest.raises(
+        EngineBugAbort,
+        match="energy_electrical_plus_evaporation_kWh is missing",
+    ) as raised:
         evaluate(
             _valid_patch(),
             "lunar_mare_low_ti",

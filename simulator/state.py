@@ -898,35 +898,42 @@ class OverheadGas:
     # >100% triggers ΔT/dt throttling
 
 
+ENERGY_SCOPE_ELECTRICAL_PLUS_KNOWN_EVAPORATION = (
+    "electrical_plus_known_evaporation_enthalpy"
+)
+FURNACE_HEAT_STATUS_PARTIAL = "partial"
+
+
 @dataclass
 class EnergyRecord:
     """Energy consumption for one timestep.
 
-    Electrical terms stay separate from solar-thermal diagnostics.  The
-    solar-thermal input is counted once in ``total_kWh``; latent and
-    dissociation fields expose the sink decomposition that sets that input.
+    Electrical terms stay separate from the known evaporation-enthalpy
+    diagnostic.  The combined scoped value includes electrical load plus the
+    latent and dissociation sink estimate only; it is not total furnace heat.
     """
     turbine_kWh: float = 0.0       # O₂ compression
     condenser_kWh: float = 0.0     # Active cooling (if needed)
     mre_kWh: float = 0.0          # Electrolysis
     electrical_total_kWh: float = 0.0
-    solar_thermal_kWh: float = 0.0
+    evaporation_thermal_kWh: float = 0.0
     latent_kWh: float = 0.0
     dissociation_kWh: float = 0.0
-    thermal_total_kWh: float = 0.0
-    total_kWh: float = 0.0
-    thermal_breakdown_kWh: Dict[str, float] = field(default_factory=dict)
-    thermal_sources: Dict[str, str] = field(default_factory=dict)
+    electrical_plus_evaporation_kWh: float = 0.0
+    energy_scope: str = ENERGY_SCOPE_ELECTRICAL_PLUS_KNOWN_EVAPORATION
+    furnace_heat_status: str = FURNACE_HEAT_STATUS_PARTIAL
+    evaporation_breakdown_kWh: Dict[str, float] = field(default_factory=dict)
+    evaporation_sources: Dict[str, str] = field(default_factory=dict)
 
-    def sum_total(self):
+    def sum_scoped_energy(self):
         self.electrical_total_kWh = (
             self.turbine_kWh + self.condenser_kWh + self.mre_kWh
         )
-        if self.thermal_total_kWh <= 0.0:
-            self.thermal_total_kWh = self.latent_kWh + self.dissociation_kWh
-        if self.solar_thermal_kWh <= 0.0:
-            self.solar_thermal_kWh = self.thermal_total_kWh
-        self.total_kWh = self.electrical_total_kWh + self.solar_thermal_kWh
+        if self.evaporation_thermal_kWh <= 0.0:
+            self.evaporation_thermal_kWh = self.latent_kWh + self.dissociation_kWh
+        self.electrical_plus_evaporation_kWh = (
+            self.electrical_total_kWh + self.evaporation_thermal_kWh
+        )
 
 
 @dataclass
@@ -962,7 +969,7 @@ class HourSnapshot:
 
     # Energy
     energy: EnergyRecord = field(default_factory=EnergyRecord)
-    energy_cumulative_kWh: float = 0.0
+    energy_electrical_plus_evaporation_cumulative_kWh: float = 0.0
     energy_cumulative_breakdown_kWh: Dict[str, float] = field(default_factory=dict)
 
     # O₂ produced (cumulative, kg)
@@ -1184,11 +1191,13 @@ class BatchRecord:
     terminal_slag_kg: float = 0.0
 
     # Energy
-    energy_total_kWh: float = 0.0
+    energy_electrical_plus_evaporation_kWh: float = 0.0
     energy_electrical_kWh: float = 0.0
-    energy_solar_thermal_kWh: float = 0.0
+    energy_evaporation_thermal_kWh: float = 0.0
     energy_latent_kWh: float = 0.0
     energy_dissociation_kWh: float = 0.0
+    energy_scope: str = ENERGY_SCOPE_ELECTRICAL_PLUS_KNOWN_EVAPORATION
+    furnace_heat_status: str = FURNACE_HEAT_STATUS_PARTIAL
     energy_breakdown_kWh: Dict[str, float] = field(default_factory=dict)
     energy_by_campaign: Dict[str, float] = field(default_factory=dict)
     energy_by_campaign_breakdown: Dict[str, Dict[str, float]] = field(

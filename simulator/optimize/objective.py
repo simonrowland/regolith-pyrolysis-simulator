@@ -3661,8 +3661,12 @@ def _metric_value(
         return _oxygen_partition_value(sim, "stored")
     if metric == "oxygen_vented_kg":
         return _oxygen_partition_value(sim, "vented")
-    if metric in {"energy_kWh", "energy_total_kWh"}:
-        return _sim_float(sim, "energy_cumulative_kWh", "energy_total_kWh")
+    if metric in {"energy_kWh", "energy_electrical_plus_evaporation_kWh"}:
+        return _sim_float(
+            sim,
+            "energy_electrical_plus_evaporation_cumulative_kWh",
+            "energy_electrical_plus_evaporation_kWh",
+        )
     energy_component = _energy_component_metric(metric)
     if energy_component is not None:
         return _energy_component_value(sim, energy_component)
@@ -3760,10 +3764,8 @@ def _energy_component_metric(metric: str) -> str | None:
     aliases = {
         "electrical_energy_kWh": "electrical",
         "energy_electrical_kWh": "electrical",
-        "solar_thermal_energy_kWh": "solar_thermal",
-        "energy_solar_thermal_kWh": "solar_thermal",
-        "thermal_energy_kWh": "thermal_total",
-        "energy_thermal_kWh": "thermal_total",
+        "evaporation_thermal_energy_kWh": "evaporation_thermal",
+        "energy_evaporation_thermal_kWh": "evaporation_thermal",
         "latent_energy_kWh": "latent",
         "energy_latent_kWh": "latent",
         "dissociation_energy_kWh": "dissociation",
@@ -3774,11 +3776,13 @@ def _energy_component_metric(metric: str) -> str | None:
 
 def _energy_per_product_metric(metric: str) -> str | None:
     aliases = {
-        "energy_total_per_product_kWh_per_kg": "total",
-        "total_energy_per_product_kWh_per_kg": "total",
+        "energy_electrical_plus_evaporation_per_product_kWh_per_kg": (
+            "electrical_plus_evaporation"
+        ),
         "electrical_energy_per_product_kWh_per_kg": "electrical",
-        "solar_thermal_energy_per_product_kWh_per_kg": "solar_thermal",
-        "thermal_energy_per_product_kWh_per_kg": "thermal_total",
+        "evaporation_thermal_energy_per_product_kWh_per_kg": (
+            "evaporation_thermal"
+        ),
         "latent_energy_per_product_kWh_per_kg": "latent",
         "dissociation_energy_per_product_kWh_per_kg": "dissociation",
     }
@@ -3786,8 +3790,12 @@ def _energy_per_product_metric(metric: str) -> str | None:
 
 
 def _energy_component_value(sim: Any, component: str) -> float:
-    if component == "total":
-        return _sim_float(sim, "energy_cumulative_kWh", "energy_total_kWh")
+    if component == "electrical_plus_evaporation":
+        return _sim_float(
+            sim,
+            "energy_electrical_plus_evaporation_cumulative_kWh",
+            "energy_electrical_plus_evaporation_kWh",
+        )
 
     breakdown = getattr(sim, "energy_cumulative_breakdown_kWh", _MISSING)
     if isinstance(breakdown, Mapping) and component in breakdown:
@@ -3804,8 +3812,7 @@ def _energy_component_value(sim: Any, component: str) -> float:
     record = getattr(sim, "record", None)
     record_attr = {
         "electrical": "energy_electrical_kWh",
-        "solar_thermal": "energy_solar_thermal_kWh",
-        "thermal_total": "energy_solar_thermal_kWh",
+        "evaporation_thermal": "energy_evaporation_thermal_kWh",
         "latent": "energy_latent_kWh",
         "dissociation": "energy_dissociation_kWh",
     }.get(component)

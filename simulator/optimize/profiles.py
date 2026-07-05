@@ -54,7 +54,7 @@ KNOWN_OBJECTIVE_METRICS = frozenset(
         "oxygen_stored_kg",
         "oxygen_vented_kg",
         "energy_kWh",
-        "energy_total_kWh",
+        "energy_electrical_plus_evaporation_kWh",
         "duration_h",
         "total_hours",
         SSO2_OWNER_RECIPE_ID,

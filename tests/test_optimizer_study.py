@@ -588,7 +588,7 @@ class _ClosedLoopSim:
             total_hours=configured_hours,
         )
         self.melt = SimpleNamespace(hour=configured_hours)
-        self.energy_cumulative_kWh = 1.0
+        self.energy_electrical_plus_evaporation_cumulative_kWh = 1.0
 
     def product_ledger(self) -> dict[str, float]:
         return {}

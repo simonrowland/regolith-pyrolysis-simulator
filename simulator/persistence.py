@@ -72,10 +72,13 @@ class RunHistory:
             'path': record.path,
             'branch': record.branch,
             'total_hours': record.total_hours,
-            'energy_total_kWh': round(record.energy_total_kWh, 1),
+            'energy_electrical_plus_evaporation_kWh': round(
+                record.energy_electrical_plus_evaporation_kWh, 1),
             'energy_electrical_kWh': round(record.energy_electrical_kWh, 1),
-            'energy_solar_thermal_kWh': round(
-                record.energy_solar_thermal_kWh, 1),
+            'energy_evaporation_thermal_kWh': round(
+                record.energy_evaporation_thermal_kWh, 1),
+            'energy_scope': record.energy_scope,
+            'furnace_heat_status': record.furnace_heat_status,
             'energy_latent_kWh': round(record.energy_latent_kWh, 1),
             'energy_dissociation_kWh': round(record.energy_dissociation_kWh, 1),
             'energy_breakdown_kWh': {

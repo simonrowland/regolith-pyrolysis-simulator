@@ -2507,10 +2507,21 @@ def _headline_results_from_context(context: Mapping[str, Any]) -> dict[str, Any]
             if completion.get('mass_balance_error_pct') is not None
             else _finite_or_none(tick.get('mass_balance_error_pct'))
         ),
-        'energy_kWh': (
-            _finite_or_none(completion.get('energy_kWh'))
-            or _finite_or_none(tick.get('energy_cumulative_kWh'))
-            or _finite_or_none(tick.get('energy_kWh'))
+        'energy_electrical_plus_evaporation_kWh': (
+            _finite_or_none(
+                completion.get('energy_electrical_plus_evaporation_kWh'))
+            or _finite_or_none(
+                tick.get('energy_electrical_plus_evaporation_cumulative_kWh'))
+            or _finite_or_none(
+                tick.get('energy_electrical_plus_evaporation_kWh'))
+        ),
+        'energy_scope': (
+            completion.get('energy_scope')
+            or tick.get('energy_scope')
+        ),
+        'furnace_heat_status': (
+            completion.get('furnace_heat_status')
+            or tick.get('furnace_heat_status')
         ),
         'wall_deposit_kg': _sum_nested_numbers(wall_deposit),
     }
@@ -2586,12 +2597,13 @@ def _recipe_metadata_summary(metadata: Mapping[str, Any]) -> str:
     if campaign:
         parts.append(str(campaign))
     oxygen = _finite_or_none(results.get('oxygen_kg'))
-    energy = _finite_or_none(results.get('energy_kWh'))
+    energy = _finite_or_none(
+        results.get('energy_electrical_plus_evaporation_kWh'))
     wall = _finite_or_none(results.get('wall_deposit_kg'))
     if oxygen is not None:
         parts.append(f'O2 {oxygen:g} kg')
     if energy is not None:
-        parts.append(f'energy {energy:g} kWh')
+        parts.append(f'electrical+evap partial {energy:g} kWh')
     if wall is not None:
         parts.append(f'wall deposit {wall:g} kg')
     return ' | '.join(parts) if parts else 'metadata captured'

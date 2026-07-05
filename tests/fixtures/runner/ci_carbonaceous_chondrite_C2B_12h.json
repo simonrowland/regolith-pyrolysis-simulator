@@ -598,25 +598,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -760,7 +750,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 2,
@@ -772,25 +773,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -934,7 +925,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 3,
@@ -946,25 +948,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -1108,7 +1100,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 4,
@@ -1120,25 +1123,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -1282,7 +1275,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 5,
@@ -1294,25 +1298,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -1456,7 +1450,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 6,
@@ -1468,25 +1473,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -1630,7 +1625,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 7,
@@ -1642,25 +1648,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -1804,7 +1800,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 8,
@@ -1816,25 +1823,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -1978,7 +1975,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 9,
@@ -1990,25 +1998,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -2152,7 +2150,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 10,
@@ -2164,25 +2173,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -2326,7 +2325,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 11,
@@ -2338,25 +2348,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
-      "energy_solar_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_dissociation_kWh": 0.0,
-      "energy_cumulative_kWh": 0.0,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.0,
-        "solar_thermal": 0.0,
         "latent": 0.0,
         "dissociation": 0.0,
-        "thermal_total": 0.0,
-        "total": 0.0
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 0,
-        "reaction_disproportionation_enthalpy_sink": 0,
-        "product_vapor_enthalpy_sink": 0,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 0.0,
+        "electrical_plus_evaporation": 0.0
       },
       "metal_yields_kg": {},
       "condensation_train_kg": {},
@@ -2500,7 +2500,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 0.0,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
+      "energy_evaporation_thermal_kWh": 0.0,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 0,
+        "product_vapor_enthalpy_sink": 0,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 0
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     },
     {
       "hour": 12,
@@ -2512,25 +2523,15 @@
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_kWh": 86.80393049022452,
       "energy_electrical_kWh": 0.7867946709200369,
-      "energy_solar_thermal_kWh": 86.01713581930449,
       "energy_latent_kWh": 16.751450079468515,
       "energy_dissociation_kWh": 69.26568573983597,
-      "energy_cumulative_kWh": 86.80393049022452,
       "energy_cumulative_breakdown_kWh": {
         "electrical": 0.7867946709200369,
-        "solar_thermal": 86.01713581930449,
         "latent": 16.751450079468515,
         "dissociation": 69.26568573983597,
-        "thermal_total": 86.01713581930449,
-        "total": 86.80393049022452
-      },
-      "energy_thermal_breakdown_kWh": {
-        "heat_in": 86.01713581930449,
-        "reaction_disproportionation_enthalpy_sink": 69.26568573983597,
-        "product_vapor_enthalpy_sink": 16.751450079468515,
-        "net_unallocated": 0.0
+        "evaporation_thermal": 86.01713581930449,
+        "electrical_plus_evaporation": 86.80393049022452
       },
       "metal_yields_kg": {
         "Ca": 15.735893418400737
@@ -2680,7 +2681,18 @@
         "Fe_kg": 0.0,
         "total_kg": 0.0,
         "Fe_wt_pct": 0.0
-      }
+      },
+      "energy_electrical_plus_evaporation_kWh": 86.80393049022452,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 86.80393049022452,
+      "energy_evaporation_thermal_kWh": 86.01713581930449,
+      "energy_evaporation_breakdown_kWh": {
+        "reaction_disproportionation_enthalpy_sink": 69.26568573983597,
+        "product_vapor_enthalpy_sink": 16.751450079468515,
+        "net_unallocated": 0.0,
+        "evaporation_enthalpy_sink": 86.01713581930449
+      },
+      "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+      "furnace_heat_status": "partial"
     }
   ],
   "shadow_trace": [],

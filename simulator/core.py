@@ -589,7 +589,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # --- Batch record ---
         self.record = BatchRecord()
-        self.energy_cumulative_kWh = 0.0
+        self.energy_electrical_plus_evaporation_cumulative_kWh = 0.0
         self.energy_cumulative_breakdown_kWh: Dict[str, float] = {}
         self.oxygen_cumulative_kg = 0.0
         self._last_condensed_by_stage_species_delta: Dict[
@@ -864,7 +864,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             additives_kg=additives,
             initial_inventory=self.inventory.copy(),
         )
-        self.energy_cumulative_kWh = 0.0
+        self.energy_electrical_plus_evaporation_cumulative_kWh = 0.0
         self.energy_cumulative_breakdown_kWh = {}
         self._energy_tracker = None
         self.oxygen_cumulative_kg = 0.0
@@ -8130,7 +8130,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._campaign_start_mass = self.melt.total_mass_kg
         self._campaign_start_composition = dict(self.melt.composition_kg)
         self._campaign_start_condensation = dict(self.train.total_by_species())
-        self._campaign_start_energy = self.energy_cumulative_kWh
+        self._campaign_start_electrical_plus_evaporation_energy = (
+            self.energy_electrical_plus_evaporation_cumulative_kWh
+        )
         self._campaign_start_O2 = self._oxygen_total_kg()
 
         # Configure atmosphere and targets from setpoints
@@ -8587,15 +8589,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.record.oxygen_stored_kg = oxygen_partition['stored']
         self.record.oxygen_vented_kg = oxygen_partition['vented']
         self.record.terminal_slag_kg = self._terminal_slag_kg()
-        self.record.energy_total_kWh = self.energy_cumulative_kWh
+        self.record.energy_electrical_plus_evaporation_kWh = (
+            self.energy_electrical_plus_evaporation_cumulative_kWh
+        )
         energy_breakdown = dict(self.energy_cumulative_breakdown_kWh)
         self.record.energy_breakdown_kWh = energy_breakdown
         self.record.energy_electrical_kWh = energy_breakdown.get('electrical', 0.0)
-        self.record.energy_solar_thermal_kWh = energy_breakdown.get(
-            'solar_thermal', 0.0)
+        self.record.energy_evaporation_thermal_kWh = energy_breakdown.get(
+            'evaporation_thermal', 0.0)
         self.record.energy_latent_kWh = energy_breakdown.get('latent', 0.0)
         self.record.energy_dissociation_kWh = energy_breakdown.get(
             'dissociation', 0.0)
+        self.record.energy_scope = 'electrical_plus_known_evaporation_enthalpy'
+        self.record.furnace_heat_status = 'partial'
         tracker = self._energy_tracker
         self.record.energy_by_campaign = (
             dict(tracker.by_campaign) if tracker is not None else {})
@@ -8734,8 +8740,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'start_mass_kg': round(self._campaign_start_mass, 1),
             'end_mass_kg': round(end_mass, 1),
             'mass_lost_kg': round(mass_lost, 1),
-            'energy_kWh': round(
-                self.energy_cumulative_kWh - self._campaign_start_energy, 1),
+            'energy_electrical_plus_evaporation_kWh': round(
+                self.energy_electrical_plus_evaporation_cumulative_kWh
+                - self._campaign_start_electrical_plus_evaporation_energy,
+                1,
+            ),
+            'energy_scope': 'electrical_plus_known_evaporation_enthalpy',
+            'furnace_heat_status': 'partial',
             'O2_kg': round(
                 self._oxygen_total_kg() - self._campaign_start_O2, 2),
             'species_extracted': species_extracted,
@@ -8949,7 +8960,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mre_kWh=mre_energy_kWh,  # Actual MRE energy this hour
             vapor_pressures=self.vapor_pressures,
         )
-        self.energy_cumulative_kWh += energy.total_kWh
+        self.energy_electrical_plus_evaporation_cumulative_kWh += (
+            energy.electrical_plus_evaporation_kWh
+        )
         self.energy_cumulative_breakdown_kWh = (
             self.energy_tracker.cumulative_breakdown())
 
@@ -8992,7 +9005,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot.fe_redox_split = fe_redox_split
         snapshot.redox_source_breakdown = self._redox_source_breakdown_diagnostic()
         snapshot.energy = energy
-        snapshot.energy_cumulative_kWh = self.energy_cumulative_kWh
+        snapshot.energy_electrical_plus_evaporation_cumulative_kWh = (
+            self.energy_electrical_plus_evaporation_cumulative_kWh
+        )
         snapshot.energy_cumulative_breakdown_kWh = dict(
             self.energy_cumulative_breakdown_kWh)
         snapshot.oxygen_produced_kg = self._oxygen_total_kg()
@@ -9329,7 +9344,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             wall_deposit_by_segment_species_delta=dict(
                 self._last_wall_deposit_by_segment_species_delta),
             impurity_delta=dict(self._last_impurity_delta),
-            energy_cumulative_kWh=self.energy_cumulative_kWh,
+            energy_electrical_plus_evaporation_cumulative_kWh=(
+                self.energy_electrical_plus_evaporation_cumulative_kWh
+            ),
             energy_cumulative_breakdown_kWh=dict(
                 self.energy_cumulative_breakdown_kWh),
             oxygen_produced_kg=oxygen_partition['total'],

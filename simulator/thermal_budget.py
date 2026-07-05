@@ -170,7 +170,7 @@ def evaporation_enthalpy_budget(
     *,
     vapor_pressures: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Return one-hour solar-thermal enthalpy sinks for evaporated species.
+    """Return one-hour evaporation-enthalpy sinks for evaporated species.
 
     This is diagnostic-only: it reads vapor species metadata and cited
     coefficients, but does not touch AtomLedger or any kg-keyed state.
@@ -243,16 +243,17 @@ def evaporation_enthalpy_budget(
 
     latent_kWh = sum(latent_by_species.values())
     dissociation_kWh = sum(dissociation_by_species.values())
-    solar_thermal_kWh = latent_kWh + dissociation_kWh
+    evaporation_thermal_kWh = latent_kWh + dissociation_kWh
     return {
         "schema": "evaporation_enthalpy_budget.v0",
         "status": "diagnostic_ledger_neutral",
-        "solar_thermal_kWh": solar_thermal_kWh,
-        "thermal_total_kWh": solar_thermal_kWh,
+        "evaporation_thermal_kWh": evaporation_thermal_kWh,
+        "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+        "furnace_heat_status": "partial",
         "latent_kWh": latent_kWh,
         "dissociation_kWh": dissociation_kWh,
         "heat_flows_kWh": {
-            "heat_in": solar_thermal_kWh,
+            "evaporation_enthalpy_sink": evaporation_thermal_kWh,
             "reaction_disproportionation_enthalpy_sink": dissociation_kWh,
             "product_vapor_enthalpy_sink": latent_kWh,
             "net_unallocated": 0.0,

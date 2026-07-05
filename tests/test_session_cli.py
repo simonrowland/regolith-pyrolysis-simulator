@@ -34,16 +34,17 @@ PER_HOUR_KEYS = {
     "Kn",
     "regime",
     "transport_formula_id",
-    # Hourly energy split (electrical tracker + solar-thermal evaporation budget),
-    # emitted by build_per_hour_summary since CF-8 (energy-budget-close).
-    "energy_kWh",
+    # Hourly energy split (electrical tracker + known evaporation enthalpy).
+    "energy_electrical_plus_evaporation_kWh",
     "energy_electrical_kWh",
-    "energy_solar_thermal_kWh",
+    "energy_evaporation_thermal_kWh",
+    "energy_scope",
+    "furnace_heat_status",
     "energy_latent_kWh",
     "energy_dissociation_kWh",
-    "energy_cumulative_kWh",
+    "energy_electrical_plus_evaporation_cumulative_kWh",
     "energy_cumulative_breakdown_kWh",
-    "energy_thermal_breakdown_kWh",
+    "energy_evaporation_breakdown_kWh",
 }
 PER_HOUR_DIAGNOSTIC_KEYS = {
     "fe_redox_split",
@@ -189,9 +190,17 @@ def test_session_script_exercises_every_verb_as_ndjson():
     assert frames[0]["backend"] == "stub"
     assert frames[0]["backend_active"] == "StubBackend"
     assert set(frames[1]["snapshot"]) == PER_HOUR_KEYS
+    assert frames[1]["snapshot"]["energy_scope"] == (
+        "electrical_plus_known_evaporation_enthalpy"
+    )
+    assert frames[1]["snapshot"]["furnace_heat_status"] == "partial"
+    assert "energy_kWh" not in frames[1]["snapshot"]
+    assert "energy_solar_thermal_kWh" not in frames[1]["snapshot"]
+    assert "energy_thermal_breakdown_kWh" not in frames[1]["snapshot"]
     assert frames[2]["decision"]["recommendation"] == "A_staged"
     assert frames[2]["steps"]
     assert set(frames[2]["steps"][0]) == PER_HOUR_KEYS | PER_HOUR_DIAGNOSTIC_KEYS
+    assert frames[2]["steps"][0]["furnace_heat_status"] == "partial"
     assert frames[2]["steps"][0]["fe_redox_split"]
     assert set(frames[2]["steps"][0]["stage_3_capture"]) == {
         "Fe_kg",

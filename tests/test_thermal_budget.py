@@ -36,12 +36,16 @@ def test_evaporation_enthalpy_budget_adds_latent_and_dissociation_sinks():
 
     assert result["latent_kWh"] > 0.0
     assert result["dissociation_kWh"] > 0.0
-    assert result["solar_thermal_kWh"] == pytest.approx(
+    assert result["evaporation_thermal_kWh"] == pytest.approx(
         result["latent_kWh"] + result["dissociation_kWh"]
     )
+    assert result["energy_scope"] == "electrical_plus_known_evaporation_enthalpy"
+    assert result["furnace_heat_status"] == "partial"
     assert result["heat_flows_kWh"]["product_vapor_enthalpy_sink"] == pytest.approx(
         result["latent_kWh"]
     )
+    assert "solar_thermal_kWh" not in result
+    assert "thermal_total_kWh" not in result
     assert "NIST-JANAF" in result["sources"]["latent:Na"]
     assert "Na2O" in result["sources"]["dissociation:Na"]
 
@@ -87,10 +91,10 @@ def test_evaporation_enthalpy_budget_oxide_vapor_uses_single_reaction_not_double
     assert result["dissociation_by_species_kWh"]["SiO"] == pytest.approx(
         expected_reaction_kWh
     )
-    assert result["solar_thermal_kWh"] == pytest.approx(expected_reaction_kWh)
+    assert result["evaporation_thermal_kWh"] == pytest.approx(expected_reaction_kWh)
     assert "SiO2->SiO(g)" in result["sources"]["oxide_vapor_reaction:SiO"]
     # Regression guard: the old double-charge exceeded 7.8 kWh here.
-    assert result["solar_thermal_kWh"] < 6.0
+    assert result["evaporation_thermal_kWh"] < 6.0
 
 
 def test_evaporation_enthalpy_budget_cro2_uses_single_reaction_not_fail_loud():
@@ -118,7 +122,7 @@ def test_evaporation_enthalpy_budget_cro2_uses_single_reaction_not_fail_loud():
     assert result["dissociation_by_species_kWh"]["CrO2"] == pytest.approx(
         expected_reaction_kWh
     )
-    assert result["solar_thermal_kWh"] == pytest.approx(expected_reaction_kWh)
+    assert result["evaporation_thermal_kWh"] == pytest.approx(expected_reaction_kWh)
     assert "CrO2(g)" in result["sources"]["oxide_vapor_reaction:CrO2"]
 
 
