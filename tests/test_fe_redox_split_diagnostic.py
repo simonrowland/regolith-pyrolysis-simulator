@@ -177,6 +177,57 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     )
 
 
+def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.fO2_log = -10.0
+    sim.melt.melt_fO2_log = -10.0
+    pre_poison_split = sim._compute_fe_redox_split_diagnostic()
+    native_frac = max(
+        0.0,
+        float(pre_poison_split.get("native_fe_frac", 0.0) or 0.0),
+    )
+    cleaned_melt_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    feo_mol = max(0.0, float(cleaned_melt_mol.get("FeO", 0.0) or 0.0))
+    expected_native_fe_mol = min(
+        feo_mol,
+        sim._cleaned_melt_fe_atom_mol() * native_frac,
+    )
+    assert expected_native_fe_mol > 0.0
+
+    def poisoned_diagnostic(*_args: Any, **_kwargs: Any) -> dict[str, Any]:
+        return {
+            "diagnostic_only": True,
+            "status": "ok",
+            "native_fe_saturation": False,
+            "native_fe_frac": 0.0,
+            "source": "poisoned:test_diagnostic_payload",
+        }
+
+    monkeypatch.setattr(
+        sim,
+        "_compute_fe_redox_split_diagnostic",
+        poisoned_diagnostic,
+    )
+    before_feo_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")["FeO"]
+
+    sim._apply_native_fe_saturation_split()
+
+    after_feo_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")["FeO"]
+    partition = sim._last_native_fe_partition_diagnostic
+    assert before_feo_mol - after_feo_mol == pytest.approx(
+        expected_native_fe_mol,
+        abs=1e-9,
+    )
+    assert partition["native_fe_pool_mol"] == pytest.approx(
+        expected_native_fe_mol,
+        abs=1e-9,
+    )
+    assert callable(getattr(sim, "_compute_native_fe_saturation_extent"))
+
+
 def _vaporock_chemistry_or_skip() -> Any:
     try:
         chemistry = importlib.import_module("vaporock.chemistry")

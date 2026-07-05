@@ -4323,15 +4323,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         fO2_log: float,
     ) -> Dict[str, Any]:
         fe3 = min(1.0, max(0.0, float(split.get('fe3_over_sigma_fe', 0.0))))
-        native_state = self._native_fe_saturation_state(
+        native_extent = self._compute_native_fe_saturation_extent(
             comp,
             fe3_over_sigma_fe=fe3,
             T_K=T_K,
             pressure_bar=pressure_bar,
             fO2_log=fO2_log,
         )
+        native_state = dict(native_extent['native_fe_state'])
         native = min(1.0, max(0.0, float(
-            native_state.get('native_fe_frac', 0.0) or 0.0,
+            native_extent.get('native_fe_frac', 0.0) or 0.0,
         )))
         ferrous = max(0.0, 1.0 - fe3 - native)
         return {
@@ -4438,14 +4439,101 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
         }
 
+    def _compute_native_fe_saturation_extent(
+        self,
+        comp: Optional[Mapping[str, float]] = None,
+        *,
+        fe3_over_sigma_fe: Optional[float] = None,
+        T_K: Optional[float] = None,
+        pressure_bar: Optional[float] = None,
+        fO2_log: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        """Authoritative native-Fe saturation extent for provider controls.
+
+        The redox diagnostic may copy these fields into its snapshot, but the
+        ledger move must be sized here, not from a diagnostic-only payload.
+        """
+        temperature_K = (
+            float(T_K)
+            if T_K is not None
+            else float(self.melt.temperature_C) + 273.15
+        )
+        comp_wt = dict(comp) if comp is not None else self._melt_oxide_wt_pct()
+        melt_fO2_log = (
+            float(fO2_log)
+            if fO2_log is not None
+            else float(
+                getattr(
+                    self.melt.oxygen_reservoir,
+                    'melt_intrinsic_fO2_log',
+                    getattr(self.melt, 'melt_fO2_log', -9.0),
+                )
+            )
+        )
+        pressure = (
+            float(pressure_bar)
+            if pressure_bar is not None
+            else floor_vacuum_pressure_bar(
+                float(self.overhead.pressure_mbar) * 1.0e-3,
+                floor_bar=self._vacuum_floor_bar(),
+            )
+        )
+        feot_wt = self._feot_equivalent_wt_pct(comp_wt)
+        if temperature_K <= 0.0 or feot_wt <= 0.0:
+            native_state = {
+                'native_fe_saturation': False,
+                'native_fe_threshold': 'FeO_activity_saturation',
+                'native_fe_frac': 0.0,
+            }
+        else:
+            if fe3_over_sigma_fe is None:
+                split = self._fe_redox_split_from_pysulfsat(
+                    comp_wt,
+                    T_K=temperature_K,
+                    pressure_bar=pressure,
+                    fO2_log=melt_fO2_log,
+                )
+                if split is None:
+                    split = self._fe_redox_split_inline_kress91(
+                        comp_wt,
+                        T_K=temperature_K,
+                        pressure_bar=pressure,
+                        fO2_log=melt_fO2_log,
+                    )
+                fe3 = float(split.get('fe3_over_sigma_fe', 0.0) or 0.0)
+            else:
+                fe3 = float(fe3_over_sigma_fe)
+            native_state = self._native_fe_saturation_state(
+                comp_wt,
+                fe3_over_sigma_fe=fe3,
+                T_K=temperature_K,
+                pressure_bar=pressure,
+                fO2_log=melt_fO2_log,
+            )
+        native_frac = min(1.0, max(0.0, float(
+            native_state.get('native_fe_frac', 0.0) or 0.0,
+        )))
+        cleaned_melt_mol = self.atom_ledger.mol_by_account(
+            'process.cleaned_melt')
+        feo_mol = max(0.0, float(cleaned_melt_mol.get('FeO', 0.0) or 0.0))
+        total_fe_mol = self._cleaned_melt_fe_atom_mol()
+        native_fe_mol = min(feo_mol, total_fe_mol * native_frac)
+        return {
+            'native_fe_state': {**native_state, 'native_fe_frac': native_frac},
+            'native_fe_frac': native_frac,
+            'native_fe_mol': native_fe_mol,
+            'feo_available_mol': feo_mol,
+            'total_fe_mol': total_fe_mol,
+        }
+
     def _native_fe_frac_for_trial_fO2(self, fO2_log: float) -> float:
         previous = self._current_melt_redox_fO2_log()
         previous_reference_T_K = self._current_melt_redox_reference_T_K()
         try:
             self.melt.oxygen_reservoir.melt_intrinsic_fO2_log = float(fO2_log)
             self._sync_oxygen_reservoir_mirror()
-            split = self._compute_fe_redox_split_diagnostic()
-            return max(0.0, float(split.get('native_fe_frac', 0.0) or 0.0))
+            extent = self._compute_native_fe_saturation_extent()
+            return max(0.0, float(extent.get('native_fe_frac', 0.0) or 0.0))
         finally:
             self.melt.oxygen_reservoir.melt_intrinsic_fO2_log = previous
             self.melt.oxygen_reservoir.reference_T_K = previous_reference_T_K
@@ -4699,8 +4787,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return {**split, **event}
 
         self._re_reference_melt_fO2_to_temperature(T_K)
+        native_extent = self._compute_native_fe_saturation_extent()
         split = self._compute_fe_redox_split_diagnostic()
-        native_frac = max(0.0, float(split.get('native_fe_frac', 0.0) or 0.0))
+        native_frac = max(
+            0.0,
+            float(native_extent.get('native_fe_frac', 0.0) or 0.0),
+        )
         if native_frac <= 1.0e-12:
             event = {
                 'native_fe_event': 'no_native_fe_below_threshold',
@@ -4709,11 +4801,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
             self._last_native_fe_saturation_event = dict(event)
             return {**split, **event}
-        cleaned_melt_mol = self.atom_ledger.mol_by_account(
-            'process.cleaned_melt')
-        feo_mol = max(0.0, float(cleaned_melt_mol.get('FeO', 0.0) or 0.0))
-        total_fe_mol = self._cleaned_melt_fe_atom_mol()
-        native_fe_mol = min(feo_mol, total_fe_mol * native_frac)
+        native_fe_mol = max(
+            0.0,
+            float(native_extent.get('native_fe_mol', 0.0) or 0.0),
+        )
         if native_fe_mol <= 1.0e-12:
             event = {
                 'native_fe_event': 'no_native_fe_below_threshold',
