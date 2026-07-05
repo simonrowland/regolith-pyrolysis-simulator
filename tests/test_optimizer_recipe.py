@@ -361,7 +361,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # mbar-species fit segmentation and authority flags; production YAML digest
     # remains stable because data/setpoints.yaml and data/vapor_pressures.yaml
     # are untouched.
-    assert cache_key(spec) == "149ceb110248267186640b8b88afcc59fa2781c7c8cf26306cb48a4f2e3f853d"
+    # 2026-07-05 (structural-activity reference): source-fingerprint move from the new
+    # simulator/chemistry/structural_activity.py plus its diagnostic-only exposure in
+    # engines/builtin/vapor_pressure.py (diagnostic['structural_activity_reference']).
+    # recipe_id + the searchable allowlist above are UNCHANGED and golden surfaces are
+    # byte-identical; diagnostic-only, not an authoritative vapor/yield/ledger move.
+    assert cache_key(spec) == "79bcebc9b75584f0872ea90c189f9267124b48130342982f90ca4f00f964676b"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

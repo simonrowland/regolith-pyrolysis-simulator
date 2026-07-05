@@ -646,6 +646,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
         )
+        from simulator.chemistry.structural_activity import (
+            structural_activity_diagnostic,
+        )
+
+        structural_activity_reference = structural_activity_diagnostic(
+            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}),
+            temperature_K=T_K,
+        )
         feo_activity_diagnostic = None
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
@@ -1008,6 +1016,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 ellingham_extrapolations,
                 consumer="builtin-vapor-pressure",
             ),
+            "structural_activity_reference": structural_activity_reference,
         }
         if feo_activity_diagnostic is not None:
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic
