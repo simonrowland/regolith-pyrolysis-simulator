@@ -26,6 +26,8 @@ feed or own ledger transitions as applicable (some kernels, such as vapor pressu
 that later kernels turn into a transition; others write the transition directly), and a set of
 **diagnostic engines** (external thermodynamic codes) that shadow those kernels for comparison but do
 not write results.
+<!-- impl: §1 -> engines/builtin/__init__.py __all__:69 — builtin provider surface -->
+<!-- impl: §1 -> simulator/chemistry/kernel/planner.py Planner.dispatch:118 — authority plus shadows -->
 
 The reason for the split is that no single external thermodynamic engine covers the whole process.
 Silicate phase-equilibrium codes (MELTS, MAGEMin) solve for which crystalline and liquid phases are
@@ -43,6 +45,7 @@ electrolysis. The silicate-equilibrium engines are authoritative for nothing in 
 ledger; they inform liquid fraction and phase context as diagnostics. This assignment, and the rule
 that a diagnostic engine may never be silently promoted into an authoritative slot, is the subject of
 §9.
+<!-- impl: §1 -> simulator/chemistry/kernel/planner.py Planner.dispatch:171 — shadows never apply -->
 
 ---
 
@@ -52,8 +55,9 @@ Vapor pressure is the driving quantity for the whole extraction sequence: it set
 leave the melt at a given temperature and pressure. The authoritative provider is analytic — an
 Antoine reference for the pure component, coupled to an Ellingham/activity correction that converts the
 pure-component pressure into the effective pressure over the actual melt.
+<!-- impl: §2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:613 — Antoine Ellingham path -->
 
-### Pure-component reference
+### §2.1 Pure-component reference
 
 Each volatile species carries an Antoine fit for its pure-component saturation pressure:
 
@@ -71,11 +75,14 @@ via the WebBook Antoine table; potassium traces to Fiock & Rodebush 1926
 1947 compilation ([doi:10.1021/ie50448a022](https://doi.org/10.1021/ie50448a022)). These are the
 `pure_component_psat` species (Ca, Al, Ti, Cr, Mn, and the alkalis' pure references) and their fits are
 CITED — traceable to a primary measurement on the basis the reference used.
+<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py vapor_pressure_antoine_coefficients:233 — Antoine row selection -->
+<!-- impl: §2.1 -> data/vapor_pressures.yaml metals.Na.pure_component_antoine:59 — pure Antoine data -->
 
 Iron is a documented exception. The WebBook carries no simple high-temperature elemental Antoine row
 for iron, so the iron pure-component pressure is a constant-enthalpy Clausius–Clapeyron form anchored at
 one atmosphere at its normal boiling point (3135 K). It is labelled UNCERTIFIED accordingly: defensible,
 but a derivation rather than a fitted primary.
+<!-- impl: §2.1 -> docs/chemistry-provenance.yaml Fe_pure_antoine:301 — Fe surrogate provenance -->
 
 Several species that the pure-component approach cannot reach directly — sodium and potassium at recipe
 temperature, iron, magnesium, and silicon monoxide — instead carry a **pseudo-Antoine** fit whose coefficients are
@@ -90,8 +97,10 @@ provider omits the fallback and records `non_certifying_vapor_pressure_fallback_
 emitting an extrapolated Fe pressure. The VapoRock target itself comes from
 Wolf et al. 2023 (*ApJ* 947:64,
 [doi:10.3847/1538-4357/acbcc7](https://doi.org/10.3847/1538-4357/acbcc7)).
+<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:485 — pseudo guard -->
+<!-- impl: §2.1 -> data/vapor_pressures.yaml oxide_vapors.SiO.backsolve:515 — pseudo grid metadata -->
 
-### From pure component to effective pressure over the melt
+### §2.2 From pure component to effective pressure over the melt
 
 The pure-component pressure is not the pressure over the melt. The effective equilibrium pressure is
 the pure-component pressure scaled by the species' activity in the melt:
@@ -109,8 +118,10 @@ free energies are a linear refit of NIST-JANAF condensed-phase data (Chase 1998,
 Thermochemical Tables 4th ed., Monograph 9), on a per-mole-O₂ basis with the elemental fusion
 corrections (iron 13.81 kJ/mol at 1811 K, silicon 50.21 kJ/mol at 1687 K, chromium 21.0 kJ/mol at
 2180 K) built into the segment deltas.
+<!-- impl: §2.2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:790 — activity times Psat -->
+<!-- impl: §2.2 -> simulator/chemistry/ellingham_thermo.py ELLINGHAM_THERMO:48 — JANAF Ellingham table -->
 
-### The oxygen-pressure dissociation lever
+### §2.3 The oxygen-pressure dissociation lever
 
 Silicon monoxide is the species where oxygen pressure is the direct lever, because oxygen sits inside
 its evolution equilibrium:
@@ -128,8 +139,10 @@ When `pO₂` is at or below that floor, the suppression term is not applied agai
 hard-vacuum reference rather than extrapolating the divergence.
 The species-specific oxygen-pressure slopes for the other oxides (the `−1/n_M` family in
 `docs/concepts.md`) follow from the same formation-reaction stoichiometry.
+<!-- impl: §2.3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:948 — SiO pO2 suppression -->
+<!-- impl: §2.3 -> data/vapor_pressures.yaml oxide_vapors.SiO.suppression_equation:566 — SiO equation metadata -->
 
-### Metal vapor versus oxide vapor
+### §2.4 Metal vapor versus oxide vapor
 
 The two branches are kept distinct so the energy books do not double-count. A metal leaves as its
 element (`a_M × P_sat`, with `a_M` from the Ellingham activity). An oxide-vapor species — SiO, and the
@@ -138,6 +151,7 @@ its own oxygen-pressure exponent, and is charged the reaction enthalpy once rath
 heat plus a separate dissociation. When the melt temperature exceeds a row's measured Antoine range,
 the provider switches to a bounded fallback fit and guards against numerical blow-up rather than
 extrapolating the pure-component curve unphysically.
+<!-- impl: §2.4 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:927 — oxide vapor scaling -->
 
 ---
 
@@ -156,6 +170,8 @@ activity from the Kress & Carmichael / CALPHAD treatment of §7. The ideal weigh
 FeO exists only for external callers that invoke the vapor-pressure provider without the intrinsic-fO₂
 channel. This ideal-for-non-iron, Kress-for-iron activity surface is what the vapor pressures of §2 are
 built on.
+<!-- impl: §3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:745 — FeO Kress activity -->
+<!-- impl: §3 -> simulator/fe_redox.py kress91_ferrous_feo_activity:562 — FeO activity path -->
 
 The silicate-equilibrium engines compute activities too, on the MELTS convention
 
@@ -168,6 +184,7 @@ at the same temperature and pressure — the same convention VapoRock uses to bu
 But that surface is used for **silicate phase equilibrium and as diagnostic / fallback-context data**,
 not as the authoritative activity source for the vapor-pressure path. The authoritative vapor-pressure
 activity is the builtin treatment described above.
+<!-- impl: §3 -> engines/alphamelts/provider.py AlphaMELTSProvider.dispatch:136 — MELTS diagnostic surface -->
 
 The physical cost of the ideal treatment is largest, and points in a known direction, for the alkalis.
 In a silicate melt the alkali oxides are held in the aluminosilicate network far more strongly than an
@@ -177,8 +194,9 @@ overstates the alkali activity, and therefore the alkali vapor pressure and evap
 roughly that same factor of a thousand. An ideal treatment predicts sodium and potassium boiling off
 far too readily. This is why the grounded alkali coefficients matter, and why they are recorded even
 though the builtin activity path does not yet consume them.
+<!-- impl: §3 -> docs/chemistry-provenance.yaml gamma_alkali_melt_activity:34 — alkali gamma provenance -->
 
-### The grounded alkali coefficients and why the basis is load-bearing
+### §3.1 The grounded alkali coefficients and why the basis is load-bearing
 
 The correct formulation for the alkali activity, and the one the grounded values are measured on, is:
 
@@ -237,6 +255,7 @@ is the wrong feedstock and is tabulated on the di-cation basis.
 
 Full comparative provenance — chosen source, alternatives, and what each alternative lacks — is the
 `gamma_alkali_melt_activity` entry in [`docs/chemistry-provenance.yaml`](chemistry-provenance.yaml).
+<!-- impl: §3.1 -> docs/chemistry-provenance.yaml gamma_alkali_melt_activity:34 — single cation basis -->
 
 ---
 
@@ -259,6 +278,7 @@ J = (P_eff − P_bulk) / ( r_melt + r_interface + r_gas )
   β_FS  = (1 + Kn) / (1 + (4/(3α_g)+0.377)Kn + (4/(3α_g))Kn²)
                                                 Fuchs-Sutugin gas-resistance weight; α_g = 1.0
 ```
+<!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:363 — three resistance flux -->
 
 In the free-molecular limit (high Knudsen number) the Fuchs–Sutugin gas-resistance weight sends the
 gas-side boundary-layer resistance to zero and the Hertz–Knudsen interface term rate-limits; in the
@@ -267,6 +287,8 @@ rate-limits. The diffusion coefficient `D_AB` is a per-species Chapman–Enskog 
 constant, and the Sherwood number carries the **radial** induction-stirring enhancement,
 `Sh_eff = 3.66 × √max(1, radial_stir_factor)`. The radial default is 1.0, so the default Sherwood number
 is the laminar `Sh = 3.66`; `Sh_eff ≈ 9` occurs only when the radial factor is about 6.
+<!-- impl: §4 -> engines/builtin/evaporation_flux.py _fuchs_sutugin_gas_resistance_weight:225 — Fuchs gas weight -->
+<!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1215 — radial Sherwood -->
 
 The **melt-side surface-renewal resistance** `r_melt` accounts for the finite rate at which stirring
 brings fresh, un-depleted melt to the evaporating surface — a resistance in series with the gas-side
@@ -277,8 +299,9 @@ with a base surface-renewal conductance that scales with the **axial** induction
 separate from the radial Sherwood driver above. The full three-resistance series form and its derivation
 are documented in
 [`docs/model-limitations.md`](model-limitations.md).
+<!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:541 — axial melt renewal -->
 
-### Directional (two-axis) induction stirring
+### §4.1 Directional (two-axis) induction stirring
 
 The stirring in the paragraphs above is not a single knob. An industrial multi-coil electromagnetic stirrer
 exposes two independent, physically orthogonal control axes, and the model carries both because they act on
@@ -299,8 +322,9 @@ is why a scalar "stir factor" set by an operator writes only the axial axis and 
 unless the radial axis is set explicitly. This is the other half of the connection to the KEMS baseline: a
 Knudsen cell is the both-axes-zero, unstirred limit, and the furnace layers these two orthogonal stirring
 enhancements — together with the overhead sweep pressure — on top of it.
+<!-- impl: §4.1 -> simulator/state.py StirState:202 — axial radial state -->
 
-### The evaporation coefficient
+### §4.2 The evaporation coefficient
 
 The coefficient `α` (the fraction of impinging-rate flux actually realized) is the physically uncertain
 term. Its **coverage** — whether a species has any grounded coefficient at all — falls into three
@@ -333,6 +357,7 @@ the CITED / ASSUMED / UNCERTIFIED trust tiers of the citation policy, and a spec
   under a recorded α = 1 fallback. The distinction matters for auditing: the provider will not invent a
   coefficient on its own, but the shipped recipe configuration opts into the fallback, and the output
   records which species used it.
+<!-- impl: §4.2 -> engines/builtin/evaporation_flux.py BuiltinEvaporationFluxProvider.dispatch:715 — alpha fallback policy -->
 
 SiO is treated specially because its coefficient is strongly temperature-dependent, and the
 hot-source and cold-wall interfaces are physically different. Hot-source evaporation uses the Wetzel &
@@ -344,8 +369,9 @@ uses the Pound 1972 high-supersaturation unity condensation coefficient (α_c = 
 Ref. Data* 1:135, [doi:10.1063/1.3253096](https://doi.org/10.1063/1.3253096)). The model does not
 extrapolate the hot-source Arrhenius onto cold walls: the evaporation and condensation coefficients are
 deliberately different off-equilibrium at high supersaturation.
+<!-- impl: §4.2 -> data/vapor_pressures.yaml oxide_vapors.SiO.evaporation_alpha:533 — SiO alpha split -->
 
-### The one-hour reservoir model
+### §4.3 The one-hour reservoir model
 
 Within each one-hour simulation step, the driving force is evaluated **once** at the start of the step
 — vapor pressures, bulk pressure, and temperature are fixed — and the parent-oxide and shared-oxygen
@@ -354,8 +380,9 @@ fresh equilibrium solve at each instant: it smooths the time integration but ass
 is constant over the tick, which accumulates error when the melt composition swings hard within a
 single hour. It is stated as a current approximation in
 [`docs/model-limitations.md`](model-limitations.md).
+<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:905 — hourly depletion reservoir -->
 
-### The Knudsen and Langmuir limits, the sweep, and self-poisoning
+### §4.4 The Knudsen and Langmuir limits, the sweep, and self-poisoning
 
 The three-resistance flux has two informative limits, and they are also how the model connects to the
 laboratory measurements it is grounded on.
@@ -377,12 +404,14 @@ the primary anchor for the vapor-pressure and activity coefficients, and why sti
 furnace model only as enhancements layered on top of that baseline. Equilibrium-mode KEMS pins the
 activity (it is transport-independent); free-evaporation (Langmuir) measurements pin α at that same
 un-enhanced surface.
+<!-- impl: §4.4 -> engines/builtin/evaporation_flux.py _fuchs_sutugin_gas_resistance_weight:225 — ballistic gas limit -->
 
 **The metal-vapor back-pressure.** Between the two limits the net flux is driven by `P_eff − P_bulk`: the
 partial pressure of the species already in the bulk gas subtracts from the equilibrium pressure, so as a
 species accumulates in the headspace its own back-pressure throttles its further evaporation. This is the
 same physics that makes a sweep useful — carrying evolved vapor away keeps `P_bulk` low and preserves the
 driving force.
+<!-- impl: §4.4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:446 — Pbulk driving force -->
 
 **Co-evolved oxygen and self-poisoning.** Every dissociation-driven species releases oxygen as it evolves
 (`SiO₂ → SiO + ½O₂`, `MOₓ → M + (x/2)O₂`). That oxygen raises the effective oxygen pressure, which —
@@ -392,6 +421,8 @@ converted to a transport oxygen pressure, and applied to the *next* step's vapor
 accumulated oxygen self-limits the extraction. Under an inert sweep cover, that headspace oxygen is bled
 off through the pressure-and-conductance path, lowering the transport oxygen pressure and relieving the
 suppression.
+<!-- impl: §4.4 -> engines/builtin/evaporation_transition.py BuiltinEvaporationTransitionProvider.dispatch:262 — O2 overhead credit -->
+<!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:222 — conductance bleed -->
 
 **How the sweep is represented, and its current limits.** The inert sweep (the 5–15 mbar pN₂ cover) enters
 the model as an *overhead pressure*, not as a commanded *flow rate*. Raising it lowers the Knudsen number
@@ -404,6 +435,7 @@ so the advective removal of vapor and oxygen that a faster flowing sweep would p
 separately from the static-pressure diffusion resistance; and the co-evolved-oxygen self-poisoning acts
 with a one-step lag (through the headspace ledger) rather than as an instantaneous local-surface balance in
 which the oxygen from the current solve poisons that same solve.
+<!-- impl: §4.4 -> simulator/campaigns.py CampaignManager._c2a_staged_stage_gas_control:633 — pN2 band cover -->
 
 ---
 
@@ -416,6 +448,8 @@ species' condensation time constant. Iron is designated to the hottest condenser
 magnesium, sodium, and potassium condensing in progressively cooler stages. SiO that reaches a cold
 surface disproportionates on condensation (`SiO → ½ SiO₂ + ½ Si`), which is why its captured product
 is silica rather than a recoverable monoxide.
+<!-- impl: §5 -> simulator/condensation.py CondensationModel.route:2146 — stage routing efficiency -->
+<!-- impl: §5 -> engines/builtin/condensation_route.py BuiltinCondensationRouteProvider.dispatch:203 — SiO product credits -->
 
 The condensation reference temperatures used for this routing (for example, iron at 1250 °C, SiO at
 1050 °C, magnesium at 580 °C, sodium at 480 °C, potassium at 420 °C, at a 1 mbar partial pressure) are
@@ -425,6 +459,7 @@ threshold approximately tracks a pure-component saturation crossing it does so b
 condenser stage-band alignment, not the pure-substance vapor-pressure crossing. They are documented as
 such in the recipe data and are an engineering approximation pending physical validation of the real
 condenser geometry.
+<!-- impl: §5 -> data/vapor_pressures.yaml condensation_reference_at_1mbar:705 — routing thresholds -->
 
 The simulator reports the outcome of routing as a per-stage purity account (designated mass versus
 impurity mass per stage) and pins the routing against per-pipe-segment wall temperatures with a
@@ -447,6 +482,7 @@ through the condensation route inside the mass-balance closure. At each wall the
 sink competes against the onward condensed sink, and the split is set by a per-species, per-segment,
 temperature-dependent wall sticking coefficient. The remainder — the capture budget minus the wall
 deposit — is what reaches the designated condenser.
+<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:3607 — wall HKL MT split -->
 
 Wall re-evaporation is handled by a per-species reactivity class:
 
@@ -461,6 +497,7 @@ Wall re-evaporation is handled by a per-species reactivity class:
 - **Sodium and potassium** credit their elemental deposit but carry a diagnostic activity-depression
   state anchored to a disilicate saturation (0.5 mol alkali oxide per mol SiO₂, from the Kracek-family
   phase data).
+<!-- impl: §6 -> engines/builtin/condensation_route.py BuiltinCondensationRouteProvider._wall_reaction_plan:351 — wall reaction plan -->
 
 The accumulated wall load maps to furnace lifespan by a thickness proxy: per segment, the deposited
 mass of each species divided by its density and the segment area gives a cumulative wall thickness, and
@@ -475,12 +512,13 @@ transient wall state) are enumerated in [`docs/model-limitations.md`](model-limi
 The Knudsen number is reported per segment as a transport diagnostic and drives cold-spot warnings, but
 it does not gate deposition routing — the transport regimes are treated as continuous, consistent with
 modelling coating as a rate rather than a threshold.
+<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:3841 — wall Kn weighting -->
 
 ---
 
 ## 7. Melt and redox chemistry
 
-### Iron redox and the total-iron convention
+### §7.1 Iron redox and the total-iron convention
 
 Iron is the one melt cation whose activity is redox-sensitive, and its treatment begins with an
 **input convention that must be stated plainly.** Feedstock analyses report all iron as a single "FeO"
@@ -489,6 +527,7 @@ number — total iron expressed as ferrous oxide — and do **not** resolve the 
 fluorescence measure total iron by X-ray intensity and cannot separate the oxidation states at
 collection time, so all iron is booked as FeO and the redox state must be inferred afterward. Every
 feedstock in the catalog follows this convention, and its annotations say so.
+<!-- impl: §7.1 -> simulator/fe_redox.py feot_equivalent_wt_pct:229 — total iron conversion -->
 
 That convention is also a validation caveat for mass-spectrometry comparisons. A KEMS sample sees vapor
 over the ferric/ferrous state actually present in the experimental melt, while the simulator starts from
@@ -506,6 +545,8 @@ vapor pressure. The activity authority switches by regime: below the iron–wüs
 metal-saturated and uses a CALPHAD/Holzheid stoichiometric-wüstite activity coefficient (γ_FeO ≈ 1.70,
 Holzheid 1997); above iron–wüstite plus one log unit it uses the Kress & Carmichael ferric limb; between
 them it blends smoothly, with the activity clamped at the pure-FeO ceiling.
+<!-- impl: §7.1 -> simulator/fe_redox.py _kress91_fe2o3_over_feo_molar:457 — Kress redox split -->
+<!-- impl: §7.1 -> simulator/fe_redox.py _calphad_feo_activity_components:580 — FeO activity blend -->
 
 Because the split is an **inference from an assumed oxygen fugacity, temperature, and composition — not
 a measurement — it carries a systematic bias, and the bias is oxidizing.** The redox reference is
@@ -522,7 +563,7 @@ fugacity to the split is itself grounded. This is stated as a current limitation
 QFM, CCO) are the O'Neill 1987, Frost 1991, and Jakobsson & Oskarsson 1994 entries in the reference
 registry.
 
-### The metallothermic shuttle
+### §7.2 The metallothermic shuttle
 
 The alkali shuttle reduces iron oxide chemically rather than thermally: dosed elemental sodium strips
 oxygen from ferrous oxide (`2 Na + FeO → Na₂O + Fe`), freeing metallic iron that can be tapped or
@@ -535,8 +576,10 @@ practical melt window, sodium is refused above its crossover, and each refusal i
 output. Inside the gate the reaction is treated as temperature-independent; it does not interpolate
 yields across the crossover band. The physics and the crossover values are developed in
 `docs/concepts.md`.
+<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._reduction_margin_kj_per_mol_o2:1155 — Ellingham margin gate -->
+<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._crossover_temperature_C:1369 — crossover temperatures -->
 
-### Molten regolith electrolysis
+### §7.3 Molten regolith electrolysis
 
 Electrolysis is modelled as a reduced Nernst/Faraday cell, not a full electrochemical simulation. Each
 reducible oxide carries a standard-state decomposition voltage `E° = −ΔG_f°/(nF)` evaluated near
@@ -551,6 +594,8 @@ temperature, and are labelled UNCERTIFIED. The ferric full-reduction rung is ref
 path can reduce ferric to ferrous through an explicitly uncertified diagnostic route rather than a
 validated ferric-current-partition model. Metal-phase settling and drain-tap are not modelled —
 reduced metal accumulates in a single account and is reported directly as product.
+<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider._nernst_voltage:693 — Nernst correction -->
+<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider.dispatch:234 — Faraday ledger step -->
 
 ---
 
@@ -564,6 +609,7 @@ Monograph 9) on a standard-state basis (for example, SiO₂ dissociation at 910.
 601.60 kJ/mol, the sodium latent heat at 97.42 kJ/mol), and are CITED. The metal-vapor and oxide-vapor
 branches are charged separately and once each, so an oxide leaving as SiO is not also charged a metal
 latent heat — the single-counting discipline of §2 carried into the energy ledger.
+<!-- impl: §8 -> engines/builtin/evaporation_transition.py BuiltinEvaporationTransitionProvider.dispatch:146 — stoich transition bookkeeping -->
 
 Heat *transfer* is simplified: solar concentration is assumed to maintain the target temperature rather
 than fully modelling radiative, conductive, and convective losses, and the melt radiative loss uses an
@@ -584,6 +630,7 @@ that each engine is used only where it is competent. The rule the whole architec
 dispatch has no usable result, the simulator raises rather than quietly falling back to a diagnostic
 engine's number, unless the operator explicitly sets the `allow_fallback_vapor` flag and accepts the
 recorded warning.
+<!-- impl: §9 -> simulator/chemistry/kernel/planner.py Planner.dispatch:118 — authority shadow planner -->
 
 - **The builtin analytic model** is the authoritative provider for vapor pressure, evaporation flux,
   condensation routing, metallothermy, native-iron saturation, and electrolysis — the analytic kernels
@@ -594,6 +641,7 @@ recorded warning.
   trust-architecture vocabulary this is the `internal-analytical` model (serialized under the legacy
   name `stub`), and it is denylisted from certification claims: it can supply exploratory diagnostic
   evidence but cannot certify a yield or phase claim.
+<!-- impl: §9 -> engines/builtin/__init__.py __all__:69 — builtin providers exported -->
 
 - **AlphaMELTS / MELTS** (via ThermoEngine / PetThermoTools) is the live path for silicate equilibrium:
   Gibbs-energy minimization over the silicate liquid and crystalline phases, supplying liquid fraction
@@ -602,11 +650,13 @@ recorded warning.
   source for the vapor-pressure path, which uses the builtin treatment. It runs in an isolated
   subprocess (it can hang on spinel-saturated compositions, and a subprocess kill is logged as a
   diagnostic failure rather than a ledger error), and it does not itself write the mol-native ledger.
+<!-- impl: §9 -> engines/alphamelts/provider.py AlphaMELTSProvider.capability_profile:122 — MELTS intent profile -->
 
 - **MAGEMin** is a fast Gibbs-minimization engine over an igneous phase set, used as a narrow-scope
   shadow for liquid fraction and phase context. It is quick and broad but returns stoichiometric phases
   only (no activity coefficients) and does not cover manganese, so it is a diagnostic companion rather
   than an authority. It is an optional install.
+<!-- impl: §9 -> engines/magemin/provider.py MAGEMinShadowProvider.capability_profile:126 — MAGEMin fallback scope -->
 
 - **VapoRock** computes silicate-vapor speciation over a melt composition and is run as a
   **diagnostic-only shadow** for vapor pressure. Its full gas speciation is reported for comparison and
@@ -616,6 +666,7 @@ recorded warning.
   PetThermoTools backend reports a species vapor pressure that agrees with the builtin value, the
   per-species provenance string may read `thermoengine`; that is a diagnostic confirmation label, not an
   authority swap.
+<!-- impl: §9 -> engines/vaporock/provider.py VapoRockProvider.capability_profile:109 — VapoRock shadow profile -->
 
 - **FactSAGE / ChemApp** is not part of this checkout: the adapter has been archived and removed, and
   an explicit request for it raises rather than falling through. It is noted here only so that a reader
@@ -629,6 +680,7 @@ is embedded in the builtin engines and the reference data files, and it carries 
 preference for internal data tables over MELTS in refractory silicate contexts is a trust-policy
 statement about evidence quality; this checkout does not expose a runtime selector that switches MELTS
 versus data tables by refractory regime.
+<!-- impl: §9 -> simulator/chemistry/kernel/planner.py Planner.dispatch:140 — authoritative provider lookup -->
 
 ---
 
@@ -639,7 +691,7 @@ model a cleaned silicate oxide composition plus an explicit residual ledger. Wha
 non-rock species is stated here as assumptions, because those assumptions bound what the downstream
 chemistry is allowed to conclude.
 
-### Carbonaceous chondrite: refractory carbon
+### §10.1 Carbonaceous chondrite: refractory carbon
 
 A carbonaceous chondrite carries several weight percent carbon, in two broad forms: insoluble organic
 matter (the dominant fraction, of order 90% of total carbon) and mineral carbonate. The published
@@ -656,6 +708,7 @@ size and the oxygen ramp, and some coarse graphite could survive an oxidizing pr
 with the reactive organic matter tends to overestimate carbon loss and underestimate any surviving
 reductant carbon. The assumption is stated so it can be revisited; it is not presented as a measured
 fate.
+<!-- impl: §10.1 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_complete_oxidation:350 — reactive carbon bake -->
 
 Alongside that ledger-active simplification, the checkout also contains an instrument-first refractory
 carbon partition diagnostic in `data/stage0_carbon_partition.yaml`. It can partition declared organic
@@ -663,8 +716,10 @@ carbon into labile, refractory, carbonate, and process-reductant buckets, and ca
 refractory carbon after Stage 0. That diagnostic is not ledger-active in the extraction path described
 above; it documents the split that would need to become authoritative before the simplification is
 removed.
+<!-- impl: §10.1 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_partition_carbon_diagnostic:1213 — carbon split diagnostic -->
+<!-- impl: §10.1 -> engines/builtin/foulant_disposition.py partition_carbon:372 — carbon bucket partition -->
 
-### CNOPS handling
+### §10.2 CNOPS handling
 
 The cleanup stage's treatment of carbon, nitrogen, oxygen, phosphorus, and sulfur is:
 
@@ -685,6 +740,8 @@ The cleanup stage's treatment of carbon, nitrogen, oxygen, phosphorus, and sulfu
   falls inside its calibration windows, the gate reports the sulfide-capacity (SCSS) and
   sulfate-capacity (SCAS) limits and the sulfide/sulfate partition; otherwise it falls back to the
   builtin bucketing with a recorded warning. The gate never mutates the atom ledger.
+<!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_carbonate_decomposition:565 — carbonate oxide credit -->
+<!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_volatilization_diagnostic:920 — volatile salt diagnostic -->
 
 The mechanism behind this cleanup is, for most species, **name-routing rather than reductant-driven
 thermodynamics**: raw feedstock components are matched by name and dropped into terminal buckets
@@ -700,6 +757,7 @@ is not wholesale lost), refractory fluorides are carried to the rump, chlorides 
 re-condense on cold walls, and nitrates have no explicit coverage. The per-species detail and the honest
 coverage holes are in [`docs/model-limitations.md`](model-limitations.md) and the Stage 0 contract in
 [`docs/process-model.md`](process-model.md).
+<!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider.dispatch:260 — CNOPS family routing -->
 
 Feedstock compositions themselves include literature-derived ranges and estimates; the lunar-simulant
 composition is grounded on Engelschion et al. 2020 (EAC-1A) and the carbonaceous and Mars-volatile
