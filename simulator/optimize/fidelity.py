@@ -506,10 +506,16 @@ def _initialize_fidelity_worker(
     if isinstance(warm_runtime, str):
         warm_worker_runtime(warm_runtime)
         return
+    feedstocks = _default_feedstocks()
+    subprocess_required = warm_runtime.stage0_subprocess_required or requires_stage0_subprocess(
+        warm_runtime.feedstock_id,
+        feedstocks,
+    )
     warm_worker_runtime(
         warm_runtime.backend_name,
         feedstock_id=warm_runtime.feedstock_id,
-        stage0_subprocess_required=warm_runtime.stage0_subprocess_required,
+        feedstocks=feedstocks,
+        stage0_subprocess_required=subprocess_required,
     )
 
 

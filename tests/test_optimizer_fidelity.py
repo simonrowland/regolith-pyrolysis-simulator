@@ -145,6 +145,70 @@ def test_fidelity_warm_runtime_spec_carries_feedstock_subprocess_route() -> None
     )
 
 
+def test_fidelity_warm_worker_initialization_rechecks_feedstock_subprocess_route(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    feedstock_id = "ci_carbonaceous_chondrite"
+    calls: list[dict[str, object]] = []
+    backend = object()
+
+    def fake_resolve_backend(
+        backend_name: str,
+        *_args: object,
+        **kwargs: object,
+    ) -> object:
+        feedstocks = kwargs.get("feedstocks")
+        calls.append(
+            {
+                "backend_name": backend_name,
+                "feedstock_id": kwargs.get("feedstock_id"),
+                "feedstock_present": feedstocks is not None
+                and feedstock_id in feedstocks,
+                "stage0_subprocess_required": kwargs.get(
+                    "stage0_subprocess_required"
+                ),
+            }
+        )
+        return backend
+
+    monkeypatch.delenv(WARM_WORKERS_ENV, raising=False)
+    monkeypatch.setattr(worker_runtime_module, "resolve_backend", fake_resolve_backend)
+    worker_runtime_module.clear_worker_runtime()
+    try:
+        fidelity_module._initialize_fidelity_worker(
+            fidelity_module._FidelityWarmRuntimeSpec(
+                backend_name="alphamelts",
+                feedstock_id=feedstock_id,
+                stage0_subprocess_required=False,
+            )
+        )
+
+        assert calls == [
+            {
+                "backend_name": "alphamelts",
+                "feedstock_id": feedstock_id,
+                "feedstock_present": True,
+                "stage0_subprocess_required": True,
+            }
+        ]
+        assert (
+            worker_runtime_module.get_worker_runtime(
+                feedstock_id=feedstock_id,
+                stage0_subprocess_required=True,
+            )
+            is not None
+        )
+        assert (
+            worker_runtime_module.get_worker_runtime(
+                feedstock_id=feedstock_id,
+                stage0_subprocess_required=False,
+            )
+            is None
+        )
+    finally:
+        worker_runtime_module.clear_worker_runtime()
+
+
 def test_fidelity_task_requests_matching_feedstock_worker_runtime(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
