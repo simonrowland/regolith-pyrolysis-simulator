@@ -140,18 +140,24 @@ _OXIDE_VAPOR_REACTION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
     ),
     # CrO2(g) forms from Cr2O3 by OXIDATION (Cr3+ -> Cr4+), not dissociation:
     #   1/2 Cr2O3 + 1/4 O2 -> CrO2(g), ΔH = ΔfH[CrO2(g)] - 1/2 ΔfH[Cr2O3].
-    # ΔfH[Cr2O3(s)]=-1139.70 (NIST-JANAF). ΔfH[CrO2(g)]≈-74.9 kJ/mol is only
-    # MODERATE confidence (gas-phase Cr-oxide formation enthalpies carry real
-    # literature scatter, unlike SiO). => ΔH ≈ -74.9 + 569.85 = +494.95 kJ/mol.
-    # Cr-bearing basalts DO evaporate a trace CrO2 flux, so this MUST be present
-    # (fail-loud here crashes real runs). Value is grounded-but-soft, flagged for
-    # a firm-up follow-on; the single-reaction form is still far more correct than
-    # metal latent + full Cr2O3->2Cr dissociation (which double-counts).
+    # ΔfH[Cr2O3(s)]=-1139.70 (NIST-JANAF). ΔfH[CrO2(g)]=-75.31 kJ/mol from NIST
+    # Chemistry WebBook SRD 69, chromium dioxide (CAS 12018-01-8), gas-phase
+    # thermochemistry, method Review, ref Chase 1998 / NIST-JANAF 4th ed
+    # (J. Phys. Chem. Ref. Data Monograph 9). => ΔH = -75.31 + 569.85 = +494.54.
+    # Confidence stays MODERATE / UNCERTIFIED: the WebBook/JANAF value is clean,
+    # but the independent Barin and Ebbinghaus table values were NOT recovered,
+    # so the known gas Cr-oxide scatter is not closed -- no certification gate may
+    # treat this as ground truth (grounding: docs-private/research/
+    # 2026-07-05-cro2-grounding/findings.md). Cr-bearing basalts DO evaporate a
+    # trace CrO2 flux, so this MUST be present (fail-loud here crashes real runs);
+    # the single-reaction form is far more correct than metal latent + full
+    # Cr2O3->2Cr dissociation (which double-counts).
     "CrO2": EnthalpyCoefficient(
-        494.95,
-        "1/2 Cr2O3 + 1/4 O2 -> CrO2(g); ΔfH[Cr2O3]=-1139.70 (NIST-JANAF) + "
-        "ΔfH[CrO2(g)]≈-74.9 (MODERATE confidence, gas Cr-oxide scatter; firm-up "
-        "follow-on) => +494.95 kJ/mol CrO2",
+        494.54,
+        "1/2 Cr2O3 + 1/4 O2 -> CrO2(g); ΔfH[Cr2O3(s)]=-1139.70 (NIST-JANAF) + "
+        "ΔfH[CrO2(g)]=-75.31 (NIST WebBook SRD 69, CAS 12018-01-8, Chase 1998/"
+        "NIST-JANAF; MODERATE/UNCERTIFIED -- Barin & Ebbinghaus not verified, gas "
+        "Cr-oxide scatter not closed) => +494.54 kJ/mol CrO2",
     ),
 }
 

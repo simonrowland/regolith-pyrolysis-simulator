@@ -112,7 +112,8 @@ def test_evaporation_enthalpy_budget_cro2_uses_single_reaction_not_fail_loud():
     )
 
     product_mol = 1.0 * 1000.0 / molar_mass
-    expected_reaction_kWh = product_mol * 494.95 / 3600.0
+    # NIST WebBook SRD 69 / Chase 1998 ΔfH[CrO2(g)]=-75.31 -> reaction +494.54.
+    expected_reaction_kWh = product_mol * 494.54 / 3600.0
     assert result["latent_by_species_kWh"]["CrO2"] == 0.0
     assert result["dissociation_by_species_kWh"]["CrO2"] == pytest.approx(
         expected_reaction_kWh
