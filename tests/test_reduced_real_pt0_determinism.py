@@ -705,35 +705,52 @@ def test_pt2_silicate_provider_identity_changes_equilibrium_key() -> None:
     assert _key_hash(different_version) == _key_hash(first)
 
 
-def test_pt2_physics_bucket_ignores_recipe_setpoints_islands() -> None:
+def test_pt2_physics_bucket_partitions_setpoints_and_feedstock_digests() -> None:
     provider = _CountingSilicateEquilibriumProvider(
         provider_id="alphamelts-diagnostic-cache-c1",
         engine_version="alpha-v1",
     )
     store = PT0DeterminismStore("capture")
-    first = _build_pt0_sim(store)
-    first.backend.is_available = lambda: True
-    first._chem_registry.register(
-        provider,
-        [ChemistryIntent.SILICATE_EQUILIBRIUM],
-    )
-    second = _build_pt0_sim(store)
-    second.backend.is_available = lambda: True
-    second._chem_registry.register(
-        provider,
-        [ChemistryIntent.SILICATE_EQUILIBRIUM],
-    )
-    second.setpoints["optimizer_candidate_patch"] = {
+
+    def build_sim():
+        sim = _build_pt0_sim(store)
+        sim.backend.is_available = lambda: True
+        sim._chem_registry.register(
+            provider,
+            [ChemistryIntent.SILICATE_EQUILIBRIUM],
+        )
+        return sim
+
+    baseline_key = store._equilibrium_key(build_sim())
+    unchanged_key = store._equilibrium_key(build_sim())
+
+    setpoints_changed = build_sim()
+    setpoints_changed.setpoints["optimizer_candidate_patch"] = {
         "mre_target_species": ["FeO"],
         "temperature_C": 1275.0,
     }
+    setpoints_key = store._equilibrium_key(setpoints_changed)
 
-    first_key = store._equilibrium_key(first)
-    second_key = store._equilibrium_key(second)
+    feedstocks_changed = build_sim()
+    feedstocks_changed.feedstocks = copy.deepcopy(feedstocks_changed.feedstocks)
+    feedstocks_changed.feedstocks["lunar_mare_high_ti"]["sc37_digest_probe"] = (
+        "feedstock-drift"
+    )
+    feedstocks_key = store._equilibrium_key(feedstocks_changed)
 
-    assert _key_hash(first_key) != _key_hash(second_key)
-    assert first_key["data_digests"]["setpoints"] != second_key["data_digests"]["setpoints"]
-    assert _physics_bucket_hash(first_key) == _physics_bucket_hash(second_key)
+    baseline_hash = _physics_bucket_hash(baseline_key)
+    assert _physics_bucket_hash(unchanged_key) == baseline_hash
+    assert _key_hash(setpoints_key) != _key_hash(baseline_key)
+    assert (
+        setpoints_key["data_digests"]["setpoints"]
+        != baseline_key["data_digests"]["setpoints"]
+    )
+    assert _physics_bucket_hash(setpoints_key) != baseline_hash
+    assert (
+        feedstocks_key["data_digests"]["feedstocks"]
+        != baseline_key["data_digests"]["feedstocks"]
+    )
+    assert _physics_bucket_hash(feedstocks_key) != baseline_hash
 
 
 def test_pt2_physics_bucket_partitions_real_determinants() -> None:
@@ -775,7 +792,7 @@ def test_pt2_physics_bucket_partitions_real_determinants() -> None:
     assert _physics_bucket_hash(solver_version_changed) != baseline
 
 
-def test_pt2_physics_bucket_keeps_sulfur_input_without_stage0_digest() -> None:
+def test_pt2_physics_bucket_partitions_stage0_inventory_digest() -> None:
     key = _silicate_equilibrium_key(
         _CountingSilicateEquilibriumProvider(
             provider_id="alphamelts-diagnostic-cache-c1",
@@ -788,11 +805,13 @@ def test_pt2_physics_bucket_keeps_sulfur_input_without_stage0_digest() -> None:
     bucket = canonical_physics_bucket_key_from_replay_key(sulfur_key)
 
     assert bucket["physics_bucket"]["sulfur"]["S_input_ppm"] == 1000.0
-    assert "stage0_inventory_digest" not in canonical_json_bytes(bucket).decode("utf-8")
+    assert (
+        bucket["physics_bucket"]["sulfur"]["stage0_inventory_digest"] == "history-a"
+    )
 
     history_changed = copy.deepcopy(sulfur_key)
     history_changed["sulfur_side"]["stage0_inventory_digest"] = "history-b"
-    assert _physics_bucket_hash(history_changed) == _physics_bucket_hash(sulfur_key)
+    assert _physics_bucket_hash(history_changed) != _physics_bucket_hash(sulfur_key)
 
 
 def test_pt2_physics_ladder_snaps_composition_and_temperature_only() -> None:
@@ -1069,6 +1088,16 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
         def get_engine_version(self) -> str:
             return "non-stub-test"
 
+    class ReplayOnlySulfsatGate:
+        def is_available(self) -> bool:
+            return False
+
+        def package_version(self) -> str:
+            return "exact-only-replay"
+
+        def calibration_version(self) -> str:
+            return "exact-only-replay"
+
     db_path = tmp_path / "pt1.sqlite"
     provider = _CountingSilicateEquilibriumProvider(
         provider_id="alphamelts-diagnostic-cache-c1",
@@ -1103,7 +1132,12 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
     )
-    replay_sim.setpoints["optimizer_candidate_patch"] = {"temperature_C": 1275.0}
+    replay_sim._sulfsat_gate = ReplayOnlySulfsatGate()
+
+    capture_key = capture_store.capture_sequence[-1]["key"]
+    replay_key = replay_store._equilibrium_key(replay_sim)
+    assert _key_hash(replay_key) != _key_hash(capture_key)
+    assert _physics_bucket_hash(replay_key) == _physics_bucket_hash(capture_key)
 
     payload = replay_store.cached_equilibrium(replay_sim)
 

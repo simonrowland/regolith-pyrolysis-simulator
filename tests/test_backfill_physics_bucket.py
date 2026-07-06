@@ -25,10 +25,17 @@ SPEC.loader.exec_module(backfill)
 def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
     db_path = tmp_path / "legacy.db"
     _create_legacy_db(db_path)
+    # a/b share ALL physics inputs and differ only on the non-physics axes
+    # (code_version / source_module_digest) -> they collapse into one bucket.
+    # c differs by pressure, d differs only by setpoints digest -> since the
+    # b-029 SC-37 fix, setpoints/feedstock digest drift PARTITIONS the physics
+    # bucket (the old expectation that setpoints-a vs setpoints-b collapse was
+    # the collision bug itself).
     keys = [
-        _replay_key("candidate-a", setpoints_digest="setpoints-a"),
-        _replay_key("candidate-b", setpoints_digest="setpoints-b"),
+        _replay_key("candidate-a", setpoints_digest="setpoints-shared"),
+        _replay_key("candidate-b", setpoints_digest="setpoints-shared"),
         _replay_key("candidate-c", setpoints_digest="setpoints-c", pressure=0.002),
+        _replay_key("candidate-d", setpoints_digest="setpoints-d"),
     ]
     for key in keys:
         _insert_legacy_row(db_path, key)
@@ -36,41 +43,59 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
     exact_before = _exact_columns(db_path)
     dry = backfill.run_backfill(db_path, dry_run=True)
 
-    assert dry.total_rows == 3
-    assert dry.distinct_physics_bucket_sha256 == 2
-    assert dry.distinct_physics_bucket_h40_sha256 == 2
-    assert dry.distinct_physics_bucket_h30_sha256 == 2
-    assert dry.distinct_physics_bucket_h40c_sha256 == 2
-    assert dry.distinct_physics_bucket_h30c_sha256 == 2
-    assert dry.rows_needing_backfill == 3
+    assert dry.total_rows == 4
+    assert dry.distinct_physics_bucket_sha256 == 3
+    assert dry.distinct_physics_bucket_h40_sha256 == 3
+    assert dry.distinct_physics_bucket_h30_sha256 == 3
+    assert dry.distinct_physics_bucket_h40c_sha256 == 3
+    assert dry.distinct_physics_bucket_h30c_sha256 == 3
+    assert dry.rows_needing_backfill == 4
     assert dry.rows_updated == 0
     assert _physics_columns(db_path) == set()
 
     real = backfill.run_backfill(db_path, dry_run=False)
 
-    assert real.total_rows == 3
-    assert real.distinct_physics_bucket_sha256 == 2
-    assert real.distinct_physics_bucket_h40_sha256 == 2
-    assert real.distinct_physics_bucket_h30_sha256 == 2
-    assert real.distinct_physics_bucket_h40c_sha256 == 2
-    assert real.distinct_physics_bucket_h30c_sha256 == 2
-    assert real.rows_updated == 3
+    assert real.total_rows == 4
+    assert real.distinct_physics_bucket_sha256 == 3
+    assert real.distinct_physics_bucket_h40_sha256 == 3
+    assert real.distinct_physics_bucket_h30_sha256 == 3
+    assert real.distinct_physics_bucket_h40c_sha256 == 3
+    assert real.distinct_physics_bucket_h30c_sha256 == 3
+    assert real.rows_updated == 4
     assert real.rows_already_backfilled == 0
     assert _exact_columns(db_path) == exact_before
     assert _physics_columns(db_path) == set(backfill.PHYSICS_COLUMNS)
     assert _null_physics_column_count(db_path) == 0
 
+    # Lock the axis contract directly: a/b (non-physics axes only) share a
+    # bucket; c (pressure) and d (setpoints digest) each get their own.
+    bucket_by_label = _bucket_sha_by_code_version(db_path)
+    assert bucket_by_label["test-candidate-a"] == bucket_by_label["test-candidate-b"]
+    assert bucket_by_label["test-candidate-c"] != bucket_by_label["test-candidate-a"]
+    assert bucket_by_label["test-candidate-d"] != bucket_by_label["test-candidate-a"]
+    assert bucket_by_label["test-candidate-d"] != bucket_by_label["test-candidate-c"]
+
     second = backfill.run_backfill(db_path, dry_run=False)
 
-    assert second.total_rows == 3
-    assert second.distinct_physics_bucket_sha256 == 2
-    assert second.distinct_physics_bucket_h40_sha256 == 2
-    assert second.distinct_physics_bucket_h30_sha256 == 2
-    assert second.distinct_physics_bucket_h40c_sha256 == 2
-    assert second.distinct_physics_bucket_h30c_sha256 == 2
+    assert second.total_rows == 4
+    assert second.distinct_physics_bucket_sha256 == 3
+    assert second.distinct_physics_bucket_h40_sha256 == 3
+    assert second.distinct_physics_bucket_h30_sha256 == 3
+    assert second.distinct_physics_bucket_h40c_sha256 == 3
+    assert second.distinct_physics_bucket_h30c_sha256 == 3
     assert second.rows_updated == 0
-    assert second.rows_already_backfilled == 3
+    assert second.rows_already_backfilled == 4
     assert _exact_columns(db_path) == exact_before
+
+
+def _bucket_sha_by_code_version(db_path: Path) -> dict:
+    with sqlite3.connect(db_path) as conn:
+        rows = conn.execute(
+            f"SELECT key_bytes, physics_bucket_sha256 FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchall()
+    return {
+        json.loads(key_bytes)["code_version"]: sha for key_bytes, sha in rows
+    }
 
 
 def _create_legacy_db(db_path: Path) -> None:

@@ -2041,6 +2041,10 @@ def canonical_physics_bucket_key_from_replay_key(
         bucket_controls["pO2_bar"] = controls.get("pO2_bar")
 
     sulfur_input_ppm = _sulfur_input_ppm_from_replay_key(key)
+    bucket_sulfur: dict[str, Any] = {"S_input_ppm": sulfur_input_ppm}
+    stage0_inventory_digest = _stage0_inventory_digest_from_replay_key(key)
+    if stage0_inventory_digest is not None:
+        bucket_sulfur["stage0_inventory_digest"] = stage0_inventory_digest
     replay_scope: dict[str, Any] = {
         "exact_replay_schema_version": key.get("schema_version"),
         "backend": _json_ready(key.get("backend", {})),
@@ -2063,7 +2067,7 @@ def canonical_physics_bucket_key_from_replay_key(
                 key.get("composition_mol_fraction", [])
             ),
             "controls": bucket_controls,
-            "sulfur": {"S_input_ppm": sulfur_input_ppm},
+            "sulfur": bucket_sulfur,
         },
         "replay_scope": replay_scope,
     }
@@ -2771,9 +2775,21 @@ def _solver_data_digests_from_key(key: Mapping[str, Any]) -> dict[str, Any]:
         data_digests = {}
     return {
         name: data_digests.get(name)
-        for name in ("species_formula_registry", "vapor_pressures")
+        for name in (
+            "setpoints",
+            "feedstocks",
+            "vapor_pressures",
+            "species_formula_registry",
+        )
         if data_digests.get(name) is not None
     }
+
+
+def _stage0_inventory_digest_from_replay_key(key: Mapping[str, Any]) -> Any | None:
+    sulfur_side = key.get("sulfur_side", {})
+    if not isinstance(sulfur_side, Mapping):
+        return None
+    return sulfur_side.get("stage0_inventory_digest")
 
 
 def _sulfur_input_ppm_from_replay_key(key: Mapping[str, Any]) -> float:
