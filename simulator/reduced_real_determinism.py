@@ -2287,7 +2287,7 @@ def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
         "last_vapor_pressures_source": dict(
             getattr(sim, "_last_vapor_pressures_source", {}) or {}
         ),
-        "last_vapor_pressure_diagnostic": _json_ready(
+        "last_vapor_pressure_diagnostic": _cache_payload_diagnostic(
             getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
         ),
     }
@@ -2298,6 +2298,30 @@ def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
             getattr(result, "alphamelts_diagnostics")
         )
     return payload
+
+
+def _cache_payload_diagnostic(value: Mapping[str, Any]) -> dict[str, Any]:
+    return _json_ready(_strip_cache_inert_diagnostic_keys(value))
+
+
+def _strip_cache_inert_diagnostic_keys(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            str(key): _strip_cache_inert_diagnostic_keys(item)
+            for key, item in value.items()
+            if not _is_cache_inert_diagnostic_key(key)
+        }
+    if isinstance(value, (list, tuple)):
+        return [_strip_cache_inert_diagnostic_keys(item) for item in value]
+    return value
+
+
+def _is_cache_inert_diagnostic_key(key: Any) -> bool:
+    text = str(key)
+    return (
+        text == "melt_regime_predicate_divergences"
+        or text.endswith("_divergences")
+    )
 
 
 def equilibrium_from_payload(payload: Mapping[str, Any]) -> EquilibriumResult:

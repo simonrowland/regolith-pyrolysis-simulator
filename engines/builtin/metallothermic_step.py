@@ -117,6 +117,7 @@ account; the declared set is the first-line gate.
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import replace
 import math
 from typing import Any
 
@@ -154,6 +155,7 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
@@ -285,7 +287,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         true_available_mol = self._true_available_mol_by_species(controls)
 
         if reaction_family == REACTION_FAMILY_C3_K:
-            return self._dispatch_c3_k(
+            result = self._dispatch_c3_k(
                 composition_kg,
                 composition_wt_pct,
                 total_kg,
@@ -297,8 +299,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 resolve_species_formula,
                 control_audit,
             )
-        if reaction_family == REACTION_FAMILY_C3_NA:
-            return self._dispatch_c3_na(
+        elif reaction_family == REACTION_FAMILY_C3_NA:
+            result = self._dispatch_c3_na(
                 composition_kg,
                 composition_wt_pct,
                 total_kg,
@@ -310,29 +312,32 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 resolve_species_formula,
                 control_audit,
             )
-        # reaction_family == REACTION_FAMILY_C6_MG
-        back_reduction = bool(controls.get("back_reduction") or False)
-        if back_reduction:
-            return self._dispatch_c6_back_reduction(
-                composition_kg,
-                true_available_mol,
-                metal_mol,
-                controls,
-                MOLAR_MASS,
-                registry,
-                resolve_species_formula,
-                control_audit,
-            )
-        return self._dispatch_c6_mg_primary(
-            composition_kg,
-            composition_wt_pct,
-            true_available_mol,
-            controls,
-            MOLAR_MASS,
-            registry,
-            resolve_species_formula,
-            control_audit,
-        )
+        else:
+            # reaction_family == REACTION_FAMILY_C6_MG
+            back_reduction = bool(controls.get("back_reduction") or False)
+            if back_reduction:
+                result = self._dispatch_c6_back_reduction(
+                    composition_kg,
+                    true_available_mol,
+                    metal_mol,
+                    controls,
+                    MOLAR_MASS,
+                    registry,
+                    resolve_species_formula,
+                    control_audit,
+                )
+            else:
+                result = self._dispatch_c6_mg_primary(
+                    composition_kg,
+                    composition_wt_pct,
+                    true_available_mol,
+                    controls,
+                    MOLAR_MASS,
+                    registry,
+                    resolve_species_formula,
+                    control_audit,
+                )
+        return self._with_melt_regime_diagnostic(result, controls)
 
     # ------------------------------------------------------------------
     # C3 K-shuttle dispatch.  Mirrors _shuttle_inject_K line-for-line
@@ -855,11 +860,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     ) -> IntentResult:
         import math
 
-        liquid_fraction = controls.get("liquid_fraction")
-        if (
-            liquid_fraction is not None
-            and float(liquid_fraction) == 0.0
-        ):
+        if self._liquid_fraction_blocks_metallothermic(controls):
             return IntentResult(
                 intent=ChemistryIntent.METALLOTHERMIC_STEP,
                 status="refused",
@@ -1119,8 +1120,42 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         liquid_fraction = controls.get("liquid_fraction")
         return (
             liquid_fraction is not None
-            and float(liquid_fraction) == 0.0
+            and melt_regime(
+                liquid_fraction=liquid_fraction,
+                epsilon=0.0,
+                invalid_liquid_fraction_regime=MeltRegime.PARTIAL,
+            )
+            == MeltRegime.FROZEN
         )
+
+    @staticmethod
+    def _with_melt_regime_diagnostic(
+        result: IntentResult,
+        controls: Mapping[str, Any],
+    ) -> IntentResult:
+        liquid_fraction = controls.get("liquid_fraction")
+        if liquid_fraction is None:
+            return result
+        diagnostic: dict[str, Any] = {}
+        melt_regime(
+            liquid_fraction=liquid_fraction,
+            epsilon=0.0,
+            invalid_liquid_fraction_regime=MeltRegime.PARTIAL,
+            diagnostic=diagnostic,
+            diagnostic_site='engines.builtin.metallothermic_step.liquid_fraction',
+            legacy_predicate='liquid_fraction == 0.0',
+        )
+        if not diagnostic:
+            return result
+        payload = dict(result.diagnostic or {})
+        existing = payload.get("melt_regime_predicate_divergences")
+        if existing:
+            diagnostic["melt_regime_predicate_divergences"] = [
+                *tuple(existing),
+                *diagnostic["melt_regime_predicate_divergences"],
+            ]
+        payload.update(diagnostic)
+        return replace(result, diagnostic=payload)
 
     @staticmethod
     def _no_liquid_phase_refusal(

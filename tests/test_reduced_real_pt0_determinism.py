@@ -533,6 +533,57 @@ def _strict_vapor_key() -> dict:
     }
 
 
+def test_equilibrium_payload_hash_ignores_melt_regime_divergence_diagnostics():
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1.0e-6,
+        liquid_fraction=0.5,
+    )
+    base_diagnostic = {
+        "status": "ok",
+        "vapor_pressures_Pa": {"Na": 1.0},
+    }
+    base_sim = SimpleNamespace(
+        _last_vapor_pressures_source={"Na": "builtin_authoritative"},
+        _last_vapor_pressure_diagnostic=dict(base_diagnostic),
+    )
+    live_diagnostic = {
+        **base_diagnostic,
+        "melt_regime_predicate_divergences": [
+            {
+                "site": "core.vapor_pressure.no_liquid_phase",
+                "effective_regime": "partial",
+                "canonical_error": "liquid_fraction must be finite",
+                "liquid_fraction_repr": "nan",
+            }
+        ],
+        "future_melt_regime_divergences": [
+            {"liquid_fraction": float("nan")},
+        ],
+    }
+    diverged_sim = SimpleNamespace(
+        _last_vapor_pressures_source={"Na": "builtin_authoritative"},
+        _last_vapor_pressure_diagnostic=live_diagnostic,
+    )
+
+    base_payload = rrd.equilibrium_payload(base_sim, result)
+    diverged_payload = rrd.equilibrium_payload(diverged_sim, result)
+
+    assert canonical_json_bytes(diverged_payload) == canonical_json_bytes(
+        base_payload
+    )
+    assert (
+        "melt_regime_predicate_divergences"
+        not in diverged_payload["last_vapor_pressure_diagnostic"]
+    )
+    assert (
+        "future_melt_regime_divergences"
+        not in diverged_payload["last_vapor_pressure_diagnostic"]
+    )
+    assert "melt_regime_predicate_divergences" in live_diagnostic
+    assert "future_melt_regime_divergences" in live_diagnostic
+
+
 def test_strict_pt1_put_rejects_builtin_fallback_vapor_source(
     tmp_path: Path,
 ) -> None:

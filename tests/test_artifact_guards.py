@@ -54,6 +54,214 @@ def test_species_catalog_loads_case_sensitive_species_ids():
     assert dict(formulas["CO"].elements) == {"C": 1.0, "O": 1.0}
 
 
+def test_no_direct_melt_regime_membership_comparisons_outside_helper():
+    repo = Path(__file__).parent.parent
+    violations = []
+    for root in (repo / "simulator", repo / "engines" / "builtin"):
+        for path in root.rglob("*.py"):
+            if path.relative_to(repo).as_posix() == "simulator/melt_regime.py":
+                continue
+            violations.extend(_melt_regime_membership_ast_violations(path, repo))
+
+    assert not violations, "\n".join(violations)
+
+
+def _melt_regime_membership_ast_violations(
+    path: Path,
+    repo: Path,
+) -> list[str]:
+    return _melt_regime_membership_ast_violations_from_source(
+        path.read_text(),
+        path.relative_to(repo).as_posix(),
+    )
+
+
+def _melt_regime_membership_ast_violations_from_source(
+    source: str,
+    label: str,
+) -> list[str]:
+    tree = ast.parse(source, filename=label)
+    violations = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Compare):
+            continue
+        left_chain = [node.left, *node.comparators[:-1]]
+        for left, op, right in zip(left_chain, node.ops, node.comparators):
+            if _forbidden_liquid_fraction_compare(left, op, right):
+                violations.append(
+                    f"{label}:{node.lineno}: {ast.unparse(node)}"
+                )
+                break
+            if _forbidden_solidus_compare(left, op, right):
+                violations.append(
+                    f"{label}:{node.lineno}: {ast.unparse(node)}"
+                )
+                break
+    return violations
+
+
+def _forbidden_liquid_fraction_compare(
+    left: ast.expr,
+    op: ast.cmpop,
+    right: ast.expr,
+) -> bool:
+    if not isinstance(op, (ast.Eq, ast.LtE, ast.GtE)):
+        return False
+    return (
+        _expr_mentions_liquid_fraction(left)
+        and _expr_is_zero_or_epsilon_boundary(right)
+    ) or (
+        _expr_is_zero_or_epsilon_boundary(left)
+        and _expr_mentions_liquid_fraction(right)
+    )
+
+
+def _forbidden_solidus_compare(
+    left: ast.expr,
+    op: ast.cmpop,
+    right: ast.expr,
+) -> bool:
+    if not isinstance(op, (ast.Eq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)):
+        return False
+    return (
+        _expr_mentions_temperature_boundary(left)
+        and _expr_mentions_solidus_boundary(right)
+    ) or (
+        _expr_mentions_solidus_boundary(left)
+        and _expr_mentions_temperature_boundary(right)
+    )
+
+
+def _expr_mentions_liquid_fraction(expr: ast.expr) -> bool:
+    expr = _unwrap_float_call(expr)
+    if isinstance(expr, ast.Name):
+        return expr.id == "liquid_fraction"
+    if isinstance(expr, ast.Attribute):
+        return expr.attr == "liquid_fraction"
+    if isinstance(expr, ast.Subscript):
+        return _subscript_key(expr.slice) == "liquid_fraction"
+    if isinstance(expr, ast.Call):
+        return _call_reads_liquid_fraction(expr) or any(
+            _expr_mentions_liquid_fraction(child)
+            for child in ast.iter_child_nodes(expr)
+            if isinstance(child, ast.expr)
+        )
+    return any(
+        _expr_mentions_liquid_fraction(child)
+        for child in ast.iter_child_nodes(expr)
+        if isinstance(child, ast.expr)
+    )
+
+
+def _expr_mentions_temperature_boundary(expr: ast.expr) -> bool:
+    expr = _unwrap_float_call(expr)
+    if isinstance(expr, ast.Name):
+        return expr.id in {"temperature_C", "temperature_K", "T_K"}
+    if isinstance(expr, ast.Attribute):
+        return expr.attr in {"temperature_C", "temperature_K", "T_K"}
+    return any(
+        _expr_mentions_temperature_boundary(child)
+        for child in ast.iter_child_nodes(expr)
+        if isinstance(child, ast.expr)
+    )
+
+
+def _expr_mentions_solidus_boundary(expr: ast.expr) -> bool:
+    expr = _unwrap_float_call(expr)
+    if isinstance(expr, ast.Name):
+        return expr.id in {"solidus_T_C", "solidus_K"}
+    if isinstance(expr, ast.Attribute):
+        return expr.attr in {"solidus_T_C", "solidus_K"}
+    return any(
+        _expr_mentions_solidus_boundary(child)
+        for child in ast.iter_child_nodes(expr)
+        if isinstance(child, ast.expr)
+    )
+
+
+def _expr_is_zero_or_epsilon_boundary(expr: ast.expr) -> bool:
+    expr = _unwrap_float_call(expr)
+    if isinstance(expr, ast.Constant):
+        return (
+            isinstance(expr.value, (int, float))
+            and not isinstance(expr.value, bool)
+            and float(expr.value) == 0.0
+        )
+    if isinstance(expr, ast.Name):
+        return expr.id in {"_FREEZE_GATE_EPSILON", "MELT_REGIME_EPSILON"}
+    return False
+
+
+def _unwrap_float_call(expr: ast.expr) -> ast.expr:
+    if (
+        isinstance(expr, ast.Call)
+        and isinstance(expr.func, ast.Name)
+        and expr.func.id == "float"
+        and len(expr.args) == 1
+        and not expr.keywords
+    ):
+        return expr.args[0]
+    return expr
+
+
+def _call_reads_liquid_fraction(expr: ast.Call) -> bool:
+    if (
+        isinstance(expr.func, ast.Name)
+        and expr.func.id == "getattr"
+        and len(expr.args) >= 2
+    ):
+        return _string_constant(expr.args[1]) == "liquid_fraction"
+    if (
+        isinstance(expr.func, ast.Attribute)
+        and expr.func.attr == "get"
+        and expr.args
+    ):
+        return _string_constant(expr.args[0]) == "liquid_fraction"
+    return False
+
+
+def _subscript_key(expr: ast.expr) -> str | None:
+    return _string_constant(expr)
+
+
+def _string_constant(expr: ast.expr) -> str | None:
+    if isinstance(expr, ast.Constant) and isinstance(expr.value, str):
+        return expr.value
+    return None
+
+
+def test_melt_regime_ast_guard_detects_executable_comparisons_not_strings():
+    source = '''
+legacy_predicate = "liquid_fraction == 0.0"
+comment = """
+if liquid_fraction == 0.0:
+    pass
+"""
+if liquid_fraction == 0.0:
+    pass
+if result.liquid_fraction <= 0:
+    pass
+if controls["liquid_fraction"] == 0.0:
+    pass
+if getattr(result, "liquid_fraction") == 0.0:
+    pass
+if controls.get("liquid_fraction") == 0.0:
+    pass
+if temperature_C <= solidus_T_C:
+    pass
+if (float(T_K) - 273.15) > solidus_T_C:
+    pass
+'''
+
+    violations = _melt_regime_membership_ast_violations_from_source(
+        source,
+        "sample.py",
+    )
+
+    assert len(violations) == 7
+    assert all("legacy_predicate" not in violation for violation in violations)
+
+
 def test_ok_equilibrium_result_constructors_do_not_hardcode_liquid_fraction():
     repo = Path(__file__).parent.parent
     violations = []

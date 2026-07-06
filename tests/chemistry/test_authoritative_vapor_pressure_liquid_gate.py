@@ -172,6 +172,55 @@ def test_authoritative_vapor_pressure_liquid_present_dispatch_unchanged():
     assert result.vapor_pressures_source == {'Na': 'builtin_authoritative'}
 
 
+def test_authoritative_vapor_pressure_invalid_liquid_fraction_still_fails_loud():
+    sim, calls = _sim_with_vapor_dispatch({'Na': 12.5})
+    result = types.SimpleNamespace(
+        liquid_fraction=float('nan'),
+        vapor_pressures_Pa={'Na': 3.0},
+        vapor_pressures_source={'Na': 'backend_pre_kernel'},
+    )
+
+    with pytest.raises(RuntimeError, match='liquid_fraction_invalid'):
+        PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, result)
+
+    assert calls == []
+
+
+def test_empty_vapor_pressure_invalid_liquid_fraction_preserves_false_gate():
+    sim = types.SimpleNamespace(melt=types.SimpleNamespace(temperature_C=1600.0))
+    result = types.SimpleNamespace(
+        liquid_fraction=float('nan'),
+        vapor_pressures_Pa={},
+        diagnostics={},
+    )
+
+    with pytest.raises(RuntimeError, match='empty vapor_pressures_Pa'):
+        PyrolysisSimulator._calculate_evaporation(sim, result)
+
+    divergence = sim._last_evaporation_flux_diagnostic[
+        'melt_regime_predicate_divergences'
+    ][0]
+    assert divergence['site'] == (
+        'evaporation.empty_vapor_pressure.liquid_fraction'
+    )
+    assert divergence['effective_regime'] == 'partial'
+    assert divergence['liquid_fraction_invalid'] == 'non_finite'
+
+
+def test_empty_vapor_pressure_string_zero_preserves_legacy_false_gate():
+    sim = types.SimpleNamespace(melt=types.SimpleNamespace(temperature_C=1600.0))
+    result = types.SimpleNamespace(
+        liquid_fraction="0",
+        vapor_pressures_Pa={},
+        diagnostics={},
+    )
+
+    with pytest.raises(RuntimeError, match='empty vapor_pressures_Pa'):
+        PyrolysisSimulator._calculate_evaporation(sim, result)
+
+    assert not hasattr(sim, '_last_evaporation_flux_diagnostic')
+
+
 def test_kernel_refresh_preserves_per_species_source_labels():
     source = (
         'vaporock_backsolved_curve_fit:'

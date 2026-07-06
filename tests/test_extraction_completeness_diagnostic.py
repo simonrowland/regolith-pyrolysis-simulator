@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from copy import deepcopy
 from pathlib import Path
 
@@ -59,6 +60,22 @@ def test_step_emits_extraction_completeness_side_channel() -> None:
     assert diag["would_be_hard_floor_advance"] is None
     assert diag["would_be_cap_advance"] is False
     assert "extraction_completeness" not in sim.record.snapshots[-1].__dict__
+
+
+def test_extraction_hard_floor_invalid_liquid_fraction_preserves_false_gate() -> None:
+    sim = _diagnostic_sim()
+    sim._freeze_gate_enabled = lambda: True
+    sim._freeze_gate_liquid_fraction_factor = lambda: float("nan")
+
+    sim._update_extraction_completeness_diagnostic()
+
+    diag = sim._last_extraction_completeness_diagnostic
+    assert math.isnan(diag["liquid_fraction"])
+    assert diag["would_be_hard_floor_advance"] is False
+    divergence = diag["melt_regime_predicate_divergences"][0]
+    assert divergence["site"] == "core.extraction_hard_floor"
+    assert divergence["effective_regime"] == "partial"
+    assert divergence["liquid_fraction_invalid"] == "non_finite"
 
 
 def test_completeness_diagnostic_does_not_change_campaign_advancement() -> None:

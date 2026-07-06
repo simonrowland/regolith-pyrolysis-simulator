@@ -787,6 +787,30 @@ def _c3_na_feo_cleanup_request(sim, *, liquid_fraction, na_kg=12.0):
     )
 
 
+def _c3_k_feo_request(sim, *, liquid_fraction, k_kg=30.0):
+    return IntentRequest(
+        intent=ChemistryIntent.METALLOTHERMIC_STEP,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {
+                    "FeO": 10.0 / (MOLAR_MASS["FeO"] / 1000.0),
+                },
+                "process.metal_phase": {},
+                "process.reagent_inventory": {},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1150.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "reaction_family": REACTION_FAMILY_C3_K,
+            "reagent_available_kg": k_kg,
+            "liquid_fraction": liquid_fraction,
+            "dt_hr": 1.0,
+        },
+    )
+
+
 def test_c3_na_draw_uses_true_ledger_availability_not_quantized_view(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -1025,6 +1049,48 @@ def test_c3_k_shuttle_primary_refuses_no_liquid_before_ellingham(
     assert result.diagnostic["reaction_family"] == REACTION_FAMILY_C3_K
 
 
+def test_c3_k_shuttle_not_numeric_liquid_fraction_preserves_legacy_raise(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+
+    with pytest.raises(ValueError):
+        provider.dispatch(
+            _c3_k_feo_request(sim, liquid_fraction="not_numeric")
+        )
+
+
+def test_c3_k_shuttle_invalid_liquid_fraction_preserves_legacy_fallthrough(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+
+    result = provider.dispatch(
+        _c3_k_feo_request(sim, liquid_fraction=1.1)
+    )
+
+    assert result.status == "refused"
+    assert result.diagnostic["reason_refused"] != "no_liquid_phase"
+    divergence = result.diagnostic["melt_regime_predicate_divergences"][0]
+    assert divergence["site"] == (
+        "engines.builtin.metallothermic_step.liquid_fraction"
+    )
+    assert divergence["effective_regime"] == "partial"
+    assert divergence["liquid_fraction_invalid"] == "out_of_range"
+
+
 def test_c3_na_shuttle_primary_refuses_no_liquid(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -1070,6 +1136,47 @@ def test_c3_na_shuttle_primary_reduces_feo_with_liquid_or_unknown(
     assert result.status == "ok"
     assert result.transition is not None
     assert result.diagnostic["per_oxide_reduced_kg"]["FeO"] > 0.0
+
+
+@pytest.mark.parametrize(
+    "liquid_fraction",
+    [
+        pytest.param(float("nan"), id="nan"),
+        pytest.param(-0.1, id="negative"),
+        pytest.param(float("inf"), id="inf"),
+    ],
+)
+def test_c3_na_shuttle_invalid_liquid_fraction_preserves_legacy_fallthrough(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    liquid_fraction,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+
+    result = provider.dispatch(
+        _c3_na_feo_cleanup_request(sim, liquid_fraction=liquid_fraction)
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.diagnostic["per_oxide_reduced_kg"]["FeO"] > 0.0
+    divergence = result.diagnostic["melt_regime_predicate_divergences"][0]
+    assert divergence["site"] == (
+        "engines.builtin.metallothermic_step.liquid_fraction"
+    )
+    assert divergence["effective_regime"] == "partial"
+    assert divergence["canonical_error"]
+    assert divergence["liquid_fraction_invalid"] in {
+        "non_finite",
+        "out_of_range",
+    }
 
 
 def test_c3_na_shuttle_inject_no_liquid_no_reagent_leak(
@@ -1205,6 +1312,60 @@ def test_c6_mg_thermite_primary_matches_legacy_stoich(
     )
 
     _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
+
+
+def _c6_mg_primary_request(sim, *, liquid_fraction):
+    Al2O3_kg = 100.0
+    Al2O3_mol = Al2O3_kg / (MOLAR_MASS["Al2O3"] / 1000.0)
+    MgO_kg = 20.0
+    MgO_mol = MgO_kg / (MOLAR_MASS["MgO"] / 1000.0)
+    return IntentRequest(
+        intent=ChemistryIntent.METALLOTHERMIC_STEP,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {
+                    "Al2O3": Al2O3_mol,
+                    "MgO": MgO_mol,
+                },
+                "process.metal_phase": {},
+                "process.reagent_inventory": {},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1700.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "reaction_family": REACTION_FAMILY_C6_MG,
+            "reagent_available_kg": 50.0,
+            "liquid_fraction": liquid_fraction,
+            "dt_hr": 1.0,
+        },
+    )
+
+
+def test_c6_mg_thermite_invalid_liquid_fraction_preserves_legacy_fallthrough(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+
+    result = provider.dispatch(
+        _c6_mg_primary_request(sim, liquid_fraction=float("inf"))
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    divergence = result.diagnostic["melt_regime_predicate_divergences"][0]
+    assert divergence["site"] == (
+        "engines.builtin.metallothermic_step.liquid_fraction"
+    )
+    assert divergence["effective_regime"] == "partial"
+    assert divergence["liquid_fraction_invalid"] == "non_finite"
 
 
 def test_c6_mg_thermite_primary_refuses_no_liquid(

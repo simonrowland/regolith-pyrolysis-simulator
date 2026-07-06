@@ -17,6 +17,11 @@ from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
     kress91_referenced_log_fO2,
 )
+from simulator.melt_regime import (
+    MeltRegime,
+    legacy_raw_liquid_fraction_is_zero,
+    melt_regime,
+)
 from simulator.state import (
     GAS_CONSTANT,
     MOLAR_MASS,
@@ -162,10 +167,32 @@ class EvaporationMixin:
                 or equilibrium_diagnostic.get('vapor_pressure_zero_reason')
             )
             liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
+            no_liquid_fraction = False
+            regime_diagnostic: dict[str, Any] = {}
+            if liquid_fraction is not None:
+                no_liquid_fraction = legacy_raw_liquid_fraction_is_zero(
+                    liquid_fraction
+                )
+                try:
+                    melt_regime(
+                        liquid_fraction=liquid_fraction,
+                        epsilon=0.0,
+                        invalid_liquid_fraction_regime=MeltRegime.PARTIAL,
+                        diagnostic=regime_diagnostic,
+                        diagnostic_site=(
+                            'evaporation.empty_vapor_pressure.'
+                            'liquid_fraction'
+                        ),
+                        legacy_predicate='liquid_fraction == 0.0',
+                    )
+                except (TypeError, ValueError):
+                    pass
+            if regime_diagnostic:
+                self._last_evaporation_flux_diagnostic = regime_diagnostic
             if (
                 zero_reason
                 in {'no_liquid_phase', 'kernel_ok_empty', 'no_volatile_species'}
-                or liquid_fraction == 0.0
+                or no_liquid_fraction
             ):
                 return flux
             raise RuntimeError(
@@ -275,7 +302,10 @@ class EvaporationMixin:
         liquid_fraction_factor = 1.0
         if flux_kg_hr and self._freeze_gate_enabled():
             liquid_fraction_factor = self._freeze_gate_liquid_fraction_factor()
-            if liquid_fraction_factor <= _FREEZE_GATE_EPSILON:
+            if (
+                melt_regime(liquid_fraction=liquid_fraction_factor)
+                == MeltRegime.FROZEN
+            ):
                 flux.update_totals()
                 return flux
         for species, rate_kg_hr in flux_kg_hr.items():
@@ -321,6 +351,15 @@ class EvaporationMixin:
             curve,
             float(self.melt.temperature_C),
         )
+        regime_diagnostic: dict[str, Any] = {}
+        melt_regime(
+            temperature_K=float(self.melt.temperature_C) + 273.15,
+            solidus_K=float(curve['solidus_T_C']) + 273.15,
+            epsilon=0.0,
+            diagnostic=regime_diagnostic,
+            diagnostic_site='evaporation.freeze_gate_curve.solidus_boundary',
+            legacy_predicate='temperature_C <= solidus_T_C',
+        )
         self._last_freeze_gate_diagnostic = {
             'enabled': True,
             'source': curve['source'],
@@ -328,6 +367,7 @@ class EvaporationMixin:
             'liquidus_T_C': curve['liquidus_T_C'],
             'liquid_fraction': factor,
         }
+        self._last_freeze_gate_diagnostic.update(regime_diagnostic)
         return factor
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
@@ -785,7 +825,14 @@ class EvaporationMixin:
     ) -> float:
         solidus_T_C = float(curve['solidus_T_C'])
         liquidus_T_C = float(curve['liquidus_T_C'])
-        if temperature_C <= solidus_T_C:
+        if (
+            melt_regime(
+                temperature_K=float(temperature_C) + 273.15,
+                solidus_K=solidus_T_C + 273.15,
+                epsilon=0.0,
+            )
+            == MeltRegime.FROZEN
+        ):
             return 0.0
         if temperature_C >= liquidus_T_C:
             return 1.0

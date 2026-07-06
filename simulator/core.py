@@ -89,6 +89,7 @@ from simulator.fe_redox import (
     kress91_split,
     melt_mol_fractions_for_kress91,
 )
+from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import LabScheduleValidationError, interpolate_schedule_points
 from simulator.accounting.completeness import (
@@ -3159,14 +3160,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         # Mush-zone redox shifts the residual liquid couple; at
                         # this 0-D fidelity, the bulk cleaned-melt composition is
                         # the residual-liquid approximation fed to Kress91.
-                        return (float(T_K) - 273.15) > solidus_T_C
+                        regime_diagnostic: dict[str, Any] = {}
+                        regime = melt_regime(
+                            temperature_K=float(T_K),
+                            solidus_K=solidus_T_C + 273.15,
+                            epsilon=0.0,
+                            diagnostic=regime_diagnostic,
+                            diagnostic_site=(
+                                'core.redox_temperature_shift.'
+                                'freeze_gate_solidus'
+                            ),
+                            legacy_predicate='temperature_C > solidus_T_C',
+                        )
+                        # Intentional telemetry for the t-125 uncertainty stack;
+                        # its consumer lands after the predicate-unification work.
+                        self._last_melt_regime_diagnostic = regime_diagnostic
+                        return regime != MeltRegime.FROZEN
             # Enabled freeze-gate is the liquid authority. Before its first curve
             # exists, defer reference seeding instead of using the disabled-mode
             # Kress91 calibration threshold as a false solidus. In the staged
             # path, evaporation builds the curve on the first hot tick; this
             # pre-curve window is regression-pinned to <=1 tick.
             return False
-        return (float(T_K) - 273.15) >= KRESS91_LIQUID_CALIBRATION_MIN_T_C
+        regime_diagnostic = {}
+        regime = melt_regime(
+            temperature_K=float(T_K),
+            solidus_K=KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15,
+            epsilon=0.0,
+            solidus_boundary='liquid',
+            diagnostic=regime_diagnostic,
+            diagnostic_site='core.redox_temperature_shift.kress91_threshold',
+            legacy_predicate=(
+                'temperature_C >= KRESS91_LIQUID_CALIBRATION_MIN_T_C'
+            ),
+        )
+        # Intentional telemetry for the t-125 uncertainty stack; its consumer
+        # lands after the predicate-unification work.
+        self._last_melt_regime_diagnostic = regime_diagnostic
+        return regime != MeltRegime.FROZEN
 
     def _re_reference_melt_fO2_to_temperature(
         self,
@@ -6024,7 +6055,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             reached the evaporation surface without changing flux values.
             The activities dict is replaced too (the legacy stub set both
             atomically and downstream code keys off the same source).
-          - If the equilibrium result proves ``liquid_fraction == 0``,
+          - If the equilibrium result proves zero liquid fraction,
             no liquid surface exists.  Clear any backend vapor pressures
             and skip the kernel dispatch so the refractory rump is a
             physical zero, not a bulk-composition vapor source.
@@ -6048,6 +6079,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(result, 'vapor_pressures_source', {}) or {}
         )
         raw_liquid_fraction = getattr(result, 'liquid_fraction', None)
+        regime_diagnostic: dict[str, Any] = {}
         # H1 permits None only for vapor-only results with no phase
         # assemblage.  That is not proof of a no-liquid rump, so the
         # physical-zero branch is exact-zero only.
@@ -6068,7 +6100,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'Authoritative VAPOR_PRESSURE liquid_fraction_invalid: '
                     f'{raw_liquid_fraction!r}'
                 )
-            if liquid_fraction == 0.0:
+            if (
+                melt_regime(
+                    liquid_fraction=liquid_fraction,
+                    epsilon=0.0,
+                    diagnostic=regime_diagnostic,
+                    diagnostic_site='core.vapor_pressure.no_liquid_phase',
+                    legacy_predicate='liquid_fraction == 0.0',
+                )
+                == MeltRegime.FROZEN
+            ):
                 result.vapor_pressures_Pa = {}
                 result.vapor_pressures_source = {}
                 diagnostic = {
@@ -6131,6 +6172,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         diagnostic = dict(kernel_result.diagnostic or {})
         diagnostic['backend_vapor_pressures_source'] = dict(backend_sources)
         diagnostic['backend_vapor_pressures_Pa'] = dict(backend_vp)
+        diagnostic.update(regime_diagnostic)
         kernel_vp = diagnostic.get('vapor_pressures_Pa') or {}
         if kernel_vp:
             kernel_source = self._kernel_vapor_pressure_source(diagnostic)
@@ -8534,11 +8576,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         hard_reason = "freeze gate disabled"
         if self._freeze_gate_enabled():
             try:
-                liquid_fraction = float(self._freeze_gate_liquid_fraction_factor())
+                raw_liquid_fraction = self._freeze_gate_liquid_fraction_factor()
             except Exception as exc:
                 hard_reason = f"unknown: {exc}"
             else:
-                hard_would_advance = liquid_fraction == 0.0
+                liquid_fraction = float(raw_liquid_fraction)
+                hard_regime_diagnostic: dict[str, Any] = {}
+                hard_would_advance = (
+                    melt_regime(
+                        liquid_fraction=liquid_fraction,
+                        epsilon=0.0,
+                        invalid_liquid_fraction_regime=MeltRegime.PARTIAL,
+                        diagnostic=hard_regime_diagnostic,
+                        diagnostic_site='core.extraction_hard_floor',
+                        legacy_predicate='liquid_fraction == 0.0',
+                    )
+                    == MeltRegime.FROZEN
+                )
                 hard_reason = "freeze gate enabled"
 
         cap_would_advance = None
@@ -8565,6 +8619,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "would_be_cap_advance": cap_would_advance,
             "cap_status": cap_reason,
         }
+        if self._freeze_gate_enabled() and 'hard_regime_diagnostic' in locals():
+            self._last_extraction_completeness_diagnostic.update(
+                hard_regime_diagnostic
+            )
 
     def product_ledger(self) -> Dict[str, float]:
         """
