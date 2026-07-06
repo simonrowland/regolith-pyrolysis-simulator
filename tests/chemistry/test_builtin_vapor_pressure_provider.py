@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import copy
 import math
+from dataclasses import replace
 
 import pytest
 
@@ -41,6 +42,12 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_fit_range_K,
     ellingham_fit_segments,
     ellingham_segment_for_temperature,
+)
+from simulator.chemistry import melt_activity
+from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+    melt_oxide_activity,
+    single_cation_mole_fractions,
 )
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -309,6 +316,30 @@ _COMPOSITION_SENSITIVITY_BASE_MOL = {
     "FeO": 0.3,
 }
 
+_DEMARIA_12022_WT_PCT = {
+    "SiO2": 44.5,
+    "TiO2": 1.5,
+    "Al2O3": 13.5,
+    "FeO": 16.5,
+    "MgO": 9.0,
+    "CaO": 11.0,
+    "Na2O": 0.36,
+    "K2O": 0.068,
+    "MnO": 0.20,
+    "P2O5": 0.10,
+    "Cr2O3": 0.35,
+}
+
+
+def _wt_pct_to_mol_account(wt_pct: dict[str, float]) -> dict[str, float]:
+    from simulator.state import MOLAR_MASS
+
+    return {
+        oxide: float(wt) / MOLAR_MASS[oxide] * 1000.0
+        for oxide, wt in wt_pct.items()
+        if wt > 0.0
+    }
+
 
 def _composition_sensitivity_request(
     account_mol: dict[str, float],
@@ -364,6 +395,171 @@ def test_runtime_p_eq_numerator_moves_with_parent_oxide_composition(
     assert high_provenance["P_eq_Pa"] == pytest.approx(high_p_eq)
     assert high_provenance["activity_factor"] > low_provenance["activity_factor"]
     assert high_provenance["pressure_kind"] == "effective_equilibrium"
+
+
+def test_grounded_melt_activity_coefficients_match_single_cation_sources():
+    expected = {
+        "Na2O": ("NaO0.5", 1.0e-3),
+        "K2O": ("KO0.5", 2.2e-4),
+        "CaO": ("CaO", 1.2e-2),
+        "Al2O3": ("AlO1.5", 0.322),
+        "SiO2": ("SiO2", 1.0),
+        "TiO2": ("TiO2", 1.60),
+        "Cr2O3": ("CrO1.5", 31.1),
+        "MgO": ("MgO", 1.0),
+        "MnO": ("MnO", 1.90),
+    }
+
+    for parent_oxide, (component, gamma) in expected.items():
+        coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS[parent_oxide]
+        assert coeff.single_cation_component == component
+        assert coeff.gamma == pytest.approx(gamma)
+        assert "DOI" in coeff.citation
+
+
+def test_single_cation_mole_fraction_uses_mol_ledger_not_wt_proxy():
+    account = {"Na2O": 0.25, "SiO2": 1.0, "Al2O3": 0.25}
+
+    fractions = single_cation_mole_fractions(account)
+    activity = melt_oxide_activity("Na2O", account)
+
+    assert fractions["Na2O"] == pytest.approx(0.25)
+    assert fractions["Al2O3"] == pytest.approx(0.25)
+    assert fractions["SiO2"] == pytest.approx(0.5)
+    assert activity is not None
+    assert activity.activity == pytest.approx(1.0e-3 * 0.25)
+
+
+def test_metal_vapor_activity_gamma_is_linear_for_alkalis_and_refractory_species(
+    vapor_pressure_data,
+    monkeypatch,
+):
+    account = {
+        "SiO2": 1.0,
+        "Na2O": 0.08,
+        "K2O": 0.08,
+        "TiO2": 0.08,
+        "Cr2O3": 0.04,
+        "MgO": 0.4,
+    }
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": dict(account)},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=-9.0,
+        control_inputs={"pO2_bar": 1.0, "intrinsic_fO2_log": -9.0},
+    )
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+
+    grounded = provider.dispatch(request).diagnostic
+    grounded_pressures = grounded["vapor_pressures_Pa"]
+    grounded_provenance = grounded["vapor_pressure_numerator_provenance"]
+
+    idealized = dict(MELT_OXIDE_ACTIVITY_COEFFICIENTS)
+    for oxide in ("Na2O", "K2O", "TiO2", "Cr2O3"):
+        idealized[oxide] = replace(idealized[oxide], gamma=1.0)
+    monkeypatch.setattr(
+        melt_activity,
+        "MELT_OXIDE_ACTIVITY_COEFFICIENTS",
+        idealized,
+    )
+    ideal_pressures = provider.dispatch(request).diagnostic["vapor_pressures_Pa"]
+
+    assert ideal_pressures["Na"] / grounded_pressures["Na"] == pytest.approx(
+        1.0 / 1.0e-3,
+        rel=1e-9,
+    )
+    assert ideal_pressures["K"] / grounded_pressures["K"] == pytest.approx(
+        1.0 / 2.2e-4,
+        rel=1e-9,
+    )
+    assert grounded_pressures["Cr"] / ideal_pressures["Cr"] == pytest.approx(
+        31.1,
+        rel=1e-9,
+    )
+    assert grounded_provenance["Na"]["melt_oxide_activity"] == pytest.approx(
+        1.0e-3 * grounded_provenance["Na"]["melt_oxide_X_single_cation"]
+    )
+    assert grounded_provenance["Na"]["alphamelts_cross_check_status"] == (
+        "inconclusive_no_activities"
+    )
+
+    ti_request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": dict(account)},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=-9.0,
+        control_inputs={"pO2_bar": 1e-9, "intrinsic_fO2_log": -9.0},
+    )
+    monkeypatch.setattr(
+        melt_activity,
+        "MELT_OXIDE_ACTIVITY_COEFFICIENTS",
+        MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+    )
+    ti_grounded = provider.dispatch(ti_request).diagnostic["vapor_pressures_Pa"]
+    monkeypatch.setattr(
+        melt_activity,
+        "MELT_OXIDE_ACTIVITY_COEFFICIENTS",
+        idealized,
+    )
+    ti_ideal = provider.dispatch(ti_request).diagnostic["vapor_pressures_Pa"]
+    assert ti_grounded["Ti"] / ti_ideal["Ti"] == pytest.approx(
+        1.60,
+        rel=1e-9,
+    )
+
+
+def test_sio_pure_limit_uses_single_cation_activity_reference_pressure(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = _si_only_vapor_request_at_T_K(1923.15)
+
+    result = provider.dispatch(request)
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
+
+    assert result.diagnostic["activities"]["SiO"] == pytest.approx(1.0)
+    assert provenance["activity_factor"] == pytest.approx(1.0)
+    assert result.diagnostic["vapor_pressures_Pa"]["SiO"] == pytest.approx(
+        provenance["P_reference_Antoine_Pa"]
+    )
+
+
+def test_demaria_1971_na_validation_case_reports_measured_pressure_gap(
+    vapor_pressure_data,
+):
+    account = _wt_pct_to_mol_account(_DEMARIA_12022_WT_PCT)
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    p_na_by_T: dict[float, float] = {}
+    for temperature_K in (1396.0, 1538.0):
+        request = IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": account},
+                species_formula_registry={},
+            ),
+            temperature_C=temperature_K - 273.15,
+            pressure_bar=1e-6,
+            control_inputs={"pO2_bar": 5.54e-9 * 1.01325},
+        )
+        result = provider.dispatch(request)
+        p_na_by_T[temperature_K] = result.diagnostic["vapor_pressures_Pa"]["Na"]
+
+    modeled_p_na = p_na_by_T[1538.0]
+    measured_p_na = 3.2e-2
+    gap_factor = modeled_p_na / measured_p_na
+
+    assert modeled_p_na > 0.0
+    assert p_na_by_T[1538.0] > p_na_by_T[1396.0]
+    assert gap_factor == pytest.approx(36.61015344, rel=1e-6)
 
 
 class _LegacyFallbackStub(EquilibriumMixin):
@@ -680,11 +876,12 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
         float(antoine["A"])
         - float(antoine["B"]) / (temperature_K + float(antoine["C"]))
     )
-    comp_wt = composition_wt_pct_from_account_view(
-        account_view,
-        "process.cleaned_melt",
+    oxide_activity = melt_oxide_activity(
+        "SiO2",
+        account_view.accounts["process.cleaned_melt"],
     )
-    activity = (comp_wt["SiO2"] / 100.0) ** float(
+    assert oxide_activity is not None
+    activity = oxide_activity.activity ** float(
         sio_row.get("oxide_activity_exponent", 1.0)
     )
     expected_p_eq = p_reference * activity

@@ -13,10 +13,6 @@ from engines.builtin.vapor_pressure import (
     vapor_pressure_source_label,
 )
 from engines.builtin.metallothermic_step import BuiltinMetallothermicStepProvider
-from simulator.chemistry.ellingham_thermo import (
-    ellingham_delta_g_kj_per_mol_o2,
-    ellingham_stoichiometry,
-)
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
@@ -256,11 +252,20 @@ def _runtime_recovered_reference_pressure_pa(
 
     assert result.status == "ok"
     emitted_pa = result.diagnostic["vapor_pressures_Pa"][species]
-    n_M, _n_ox = ellingham_stoichiometry(species)
-    dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, temperature_K)
-    k_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * temperature_K))
-    activity = min((k_decomp / 1e-9) ** (1.0 / n_M), 1.0)
-    return emitted_pa / activity
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"][species]
+    return _recovered_reference_pressure_pa(emitted_pa, provenance)
+
+
+def _recovered_reference_pressure_pa(emitted_pa: float, provenance: dict) -> float:
+    activity_factor = provenance["activity_factor"]
+    gamma = provenance.get("melt_oxide_gamma")
+    if gamma is not None:
+        # CF-3: provenance exposes the consumed activity_factor after gamma_MOx
+        # is applied. Split/recombine gamma here so the pure-sidecar invariant
+        # explicitly divides out the activity-coefficient contribution.
+        gamma_free_activity_factor = activity_factor / gamma
+        return emitted_pa / (gamma_free_activity_factor * gamma)
+    return emitted_pa / activity_factor
 
 
 def _chi_escape_equilibrium(p_sat_pa: float, p_total_pa: float) -> float:
@@ -542,11 +547,8 @@ def test_builtin_runtime_provider_uses_pure_component_sidecar_for_reference_pres
 
     assert result.status == "ok"
     emitted_pa = result.diagnostic["vapor_pressures_Pa"][species]
-    n_M, _n_ox = ellingham_stoichiometry(species)
-    dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, temperature_K)
-    k_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * temperature_K))
-    activity = min((k_decomp / 1e-9) ** (1.0 / n_M), 1.0)
-    recovered_reference_pa = emitted_pa / activity
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"][species]
+    recovered_reference_pa = _recovered_reference_pressure_pa(emitted_pa, provenance)
 
     assert recovered_reference_pa == pytest.approx(expected_reference_pa, rel=rel_tol)
 

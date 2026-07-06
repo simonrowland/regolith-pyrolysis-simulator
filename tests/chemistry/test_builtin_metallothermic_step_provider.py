@@ -47,6 +47,9 @@ from engines.builtin.metallothermic_step import (
     REACTION_FAMILY_C6_MG,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
+from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+)
 from simulator.chemistry.ellingham_thermo import ELLINGHAM_AUTHORITY_LIMIT_FLAG
 from simulator.chemistry.kernel import (
     AtomBalanceError,
@@ -696,11 +699,10 @@ def test_extraction_records_shuttle_refusal_diagnostic(
     assert sim._last_shuttle_refusal_diagnostic == refusal
 
 
-def test_c3_na_shuttle_refuses_cr_ti_with_negative_margins(
+def test_c3_na_shuttle_accepts_cr_after_nao05_activity_shift(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Cr/Ti remain ordered for diagnostics, but both are refused at C3 T.
-    """
+    """Cr becomes favorable once NaO0.5 activity is applied; Ti remains near-margin."""
 
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -742,16 +744,22 @@ def test_c3_na_shuttle_refuses_cr_ti_with_negative_margins(
     )
     result = provider.dispatch(request)
     proposal = result.transition
-    assert result.status == "refused"
-    assert proposal is None
+    assert result.status == "ok"
+    assert proposal is not None
     assert result.diagnostic["reaction_family"] == REACTION_FAMILY_C3_NA
     assert result.diagnostic["target_stage"] == "cr_ti"
     assert result.diagnostic["target_priority"] == ["Cr2O3", "TiO2"]
-    assert result.diagnostic["accepted_targets"] == []
-    refused = result.diagnostic["refused_targets"]
-    assert set(refused) == {"Cr2O3", "TiO2"}
-    assert refused["Cr2O3"]["margin_kJ_per_mol_O2"] < 0.0
-    assert refused["TiO2"]["margin_kJ_per_mol_O2"] < 0.0
+    assert result.diagnostic["accepted_targets"] == ["Cr2O3"]
+    assert set(result.diagnostic["refused_targets"]) == {"TiO2"}
+    assert result.diagnostic["Na2O_activity_gamma"] == pytest.approx(
+        MELT_OXIDE_ACTIVITY_COEFFICIENTS["Na2O"].gamma
+    )
+    assert result.diagnostic["Na2O_activity_component"] == "NaO0.5"
+    assert result.diagnostic["Na2O_activity_shift_kJ_per_mol_O2"] < 0.0
+    assert result.diagnostic["na_reduction_margin_kJ_per_mol_O2"]["Cr2O3"] > 0.0
+    assert result.diagnostic["na_reduction_margin_kJ_per_mol_O2"]["TiO2"] < 0.0
+    assert "Cr2O3" in proposal.debits["process.cleaned_melt"]
+    assert "TiO2" not in proposal.debits["process.cleaned_melt"]
 
 
 def _c3_na_feo_cleanup_request(sim, *, liquid_fraction, na_kg=12.0):
@@ -1463,6 +1471,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
         "process.cleaned_melt",
         "process.metal_phase",
         "process.reagent_inventory",
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     }
     cumulative_imbalance_kg = 0.0
     for trans in metallothermic_transitions:

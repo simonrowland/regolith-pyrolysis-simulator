@@ -286,7 +286,7 @@ def test_na_shuttle_spent_residue_fills_solubility_cap_across_ticks():
     assert "Na2O above 10 wt% solubility limit" in second.diagnostic["reason_skipped"]
 
 
-def test_na_cr_stage_refuses_cr_ti_with_negative_margins():
+def test_na_cr_stage_accepts_cr_after_nao05_activity_shift():
     sim = _build_provider_sim()
     provider = BuiltinMetallothermicStepProvider()
     view = ProviderAccountView(
@@ -316,15 +316,17 @@ def test_na_cr_stage_refuses_cr_ti_with_negative_margins():
     result = provider.dispatch(request)
     proposal = result.transition
 
-    assert result.status == "refused"
-    assert proposal is None
+    assert result.status == "ok"
+    assert proposal is not None
     assert result.diagnostic["target_stage"] == "cr_ti"
     assert result.diagnostic["target_priority"] == ["Cr2O3", "TiO2"]
-    assert result.diagnostic["accepted_targets"] == []
+    assert result.diagnostic["accepted_targets"] == ["Cr2O3"]
     refused = result.diagnostic["refused_targets"]
-    assert set(refused) == {"Cr2O3", "TiO2"}
-    assert refused["Cr2O3"]["margin_kJ_per_mol_O2"] < 0.0
+    assert set(refused) == {"TiO2"}
+    assert result.diagnostic["na_reduction_margin_kJ_per_mol_O2"]["Cr2O3"] > 0.0
     assert refused["TiO2"]["margin_kJ_per_mol_O2"] < 0.0
+    assert "Cr2O3" in proposal.debits["process.cleaned_melt"]
+    assert "TiO2" not in proposal.debits["process.cleaned_melt"]
 
 
 def test_c2a_staged_k_plus_na_shuttle_beats_k_only_and_stays_cool():

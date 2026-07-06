@@ -120,9 +120,15 @@ GOLDENS = (
 # the ordering bug imposed). Lunar continuous again FP-identical (its
 # dwell never builds the holdup O2 that triggered the bug) — internal
 # control. Correction-class.
+# 2026-07-06 CF-3 landing: corrected single-cation alkali activity (linear in
+# gamma) lowers alkali vapor backpressure, shifting the coupled finite-
+# headspace pO2 path and hence SiO evolution. Values recomputed controller-
+# side from the fresh CLI runs in the CF-3 regen batch; magnitudes match the
+# completion-pass enumeration (lunar -4.4%, mars +248% -- Mars has the
+# stronger coupled response per the CF-3 findings).
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 9.11967185718e-06,
-    "mars_basalt": 7.81354274586e-06,
+    "lunar_mare_low_ti": 8.71403947628e-06,
+    "mars_basalt": 2.72208152768e-05,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +

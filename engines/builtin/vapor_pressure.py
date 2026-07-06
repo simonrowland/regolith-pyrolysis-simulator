@@ -87,6 +87,12 @@ from simulator.chemistry.ellingham_thermo import (  # noqa: E402
     ellingham_fit_range_K,
     ellingham_stoichiometry,
 )
+from simulator.chemistry.melt_activity import (  # noqa: E402
+    ALPHAMELTS_CROSS_CHECK_STATUS,
+    MELT_OXIDE_ACTIVITY_LIMITATION,
+    MELT_OXIDE_ACTIVITY_TIER,
+    melt_oxide_activity,
+)
 
 
 class VaporPressureComputationError(RuntimeError):
@@ -673,6 +679,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}),
             temperature_K=T_K,
         )
+        melt_account_mol = dict(
+            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
+        )
         feo_activity_diagnostic = None
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
@@ -761,19 +770,40 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 field="P_reference_Pa",
             )
 
-            if parent_oxide == 'FeO' and intrinsic_fO2_log is not None:
-                from simulator.fe_redox import kress91_ferrous_feo_activity
+            if parent_oxide == 'FeO':
+                oxide_activity = None
+                if intrinsic_fO2_log is not None:
+                    from simulator.fe_redox import kress91_ferrous_feo_activity
 
-                a_oxide = kress91_ferrous_feo_activity(
-                    comp_wt=comp_wt,
-                    fO2_log=intrinsic_fO2_log,
-                    T_K=T_K,
-                    pressure_bar=request.pressure_bar,
-                    floor_bar=vacuum_floor_bar,
-                )
+                    a_oxide = kress91_ferrous_feo_activity(
+                        comp_wt=comp_wt,
+                        fO2_log=intrinsic_fO2_log,
+                        T_K=T_K,
+                        pressure_bar=request.pressure_bar,
+                        floor_bar=vacuum_floor_bar,
+                    )
+                else:
+                    a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
             else:
-                a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
-            if a_oxide <= 1e-10:
+                oxide_activity = melt_oxide_activity(parent_oxide, melt_account_mol)
+                if oxide_activity is None:
+                    continue
+                # provenance: gamma_alkali_melt_activity
+                # Sossi & Fegley 2018 Eq.25 is linear in single-cation
+                # a_MOx = gamma_MOx * X_MOx. The JANAF Ellingham row here is
+                # still written on the parent oxide (Na2O, Al2O3, Cr2O3), so
+                # feed an equivalent parent activity whose legacy exponent
+                # produces the single-cation activity.
+                a_oxide = oxide_activity.equivalent_parent_activity(n_ox / n_M)
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
+            if (
+                oxide_activity is None
+                and a_oxide <= 1e-10
+            ) or (
+                oxide_activity is not None
+                and oxide_activity.activity <= 1e-10
+            ):
                 continue
 
             ellingham_extrapolation = _ellingham_fit_extrapolation(
@@ -789,7 +819,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     f"{T_K:.2f} K"
                 )
 
-            activities[species] = a_oxide
+            activities[species] = (
+                a_oxide if oxide_activity is None else oxide_activity.activity
+            )
 
             # Ellingham: dG_f(T) = dH_f - T * dS_f (kJ/mol O2)
             dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, T_K)
@@ -860,6 +892,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": a_M_liquid,
                     "source_label": source_label,
                 }
+                if oxide_activity is not None:
+                    vapor_pressure_provenance[species].update(
+                        oxide_activity.provenance()
+                    )
+                    vapor_pressure_provenance[species][
+                        "equivalent_parent_oxide_activity"
+                    ] = a_oxide
                 if coefficient_block == COEFF_BLOCK_ANTOINE:
                     warn_pseudo_vapor_pressure_fallback(
                         species,
@@ -886,14 +925,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
             parent_oxide = data.get('parent_oxide', '')
             activity_factor = 1.0
+            oxide_activity = None
             if parent_oxide:
-                a_ox = comp_wt.get(parent_oxide, 0.0) / 100.0
-                if a_ox <= 1e-10:
-                    continue
-                activities[name] = a_ox
                 activity_exponent = float(
                     data.get('oxide_activity_exponent', 1.0)
                 )
+                oxide_activity = melt_oxide_activity(parent_oxide, melt_account_mol)
+                if oxide_activity is None:
+                    continue
+                # provenance: gamma_alkali_melt_activity
+                a_ox = oxide_activity.equivalent_parent_activity(
+                    activity_exponent
+                )
+                if oxide_activity.activity <= 1e-10:
+                    continue
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
+                activities[name] = oxide_activity.activity
                 activity_factor = max(a_ox, 0.0) ** activity_exponent
 
             valid_range = _range_tuple(valid)
@@ -1010,6 +1058,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "activity_factor": activity_factor,
                     "source_label": source_label,
                 }
+                if oxide_activity is not None:
+                    vapor_pressure_provenance[name].update(
+                        oxide_activity.provenance()
+                    )
+                    vapor_pressure_provenance[name][
+                        "equivalent_parent_oxide_activity"
+                    ] = a_ox
                 warn_pseudo_vapor_pressure_fallback(
                     name,
                     data,
@@ -1036,6 +1091,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 consumer="builtin-vapor-pressure",
             ),
             "structural_activity_reference": structural_activity_reference,
+            "melt_oxide_activity_model": {
+                "basis": "single-cation mole fraction",
+                "tier": MELT_OXIDE_ACTIVITY_TIER,
+                "limitation": MELT_OXIDE_ACTIVITY_LIMITATION,
+                "alphamelts_cross_check_status": ALPHAMELTS_CROSS_CHECK_STATUS,
+            },
         }
         if feo_activity_diagnostic is not None:
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic

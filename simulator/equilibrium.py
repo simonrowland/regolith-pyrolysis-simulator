@@ -12,6 +12,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_fit_range_K,
     ellingham_stoichiometry,
 )
+from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
     floor_vacuum_pressure_bar,
@@ -19,7 +20,7 @@ from simulator.fe_redox import (
 )
 from simulator.environment import vacuum_floor_bar_for_environment
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
-from simulator.state import GAS_CONSTANT, Atmosphere
+from simulator.state import GAS_CONSTANT, MOLAR_MASS, Atmosphere
 
 # Atmosphere modes where a turbine/bleed loop actively holds a commanded pO₂
 # setpoint. Only in these modes may the setpoint act as a floor on the
@@ -297,6 +298,16 @@ class EquilibriumMixin:
 
         # --- Melt composition for oxide activities ---
         comp_wt = self.melt.composition_wt_pct()
+        atom_ledger = getattr(self, "atom_ledger", None)
+        mol_by_account = getattr(atom_ledger, "mol_by_account", None)
+        if callable(mol_by_account):
+            melt_account_mol = dict(mol_by_account("process.cleaned_melt") or {})
+        else:
+            melt_account_mol = {
+                oxide: float(wt_pct) / MOLAR_MASS[oxide] * 1000.0
+                for oxide, wt_pct in comp_wt.items()
+                if oxide in MOLAR_MASS and float(wt_pct) > 0.0
+            }
         feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
             comp_wt=comp_wt,
             fO2_log=intrinsic_fO2_log,
@@ -402,14 +413,7 @@ class EquilibriumMixin:
             else:
                 continue
 
-            # --- Oxide activity (wt fraction proxy) ---           [ELLI-5]
-            #
-            # Without AlphaMELTS, we approximate the oxide activity
-            # as the weight fraction.  This is crude but captures the
-            # key behaviour: as an oxide depletes, its activity drops
-            # and evaporation slows.  Real activities differ significantly
-            # (e.g., γ(Na₂O) ≈ 10⁻² in CMAS melts [THERMO-10]), which
-            # is why AlphaMELTS is preferred for quantitative work.
+            # --- Oxide activity ---                              [ELLI-5]
             if parent_oxide == 'FeO':
                 a_oxide = kress91_ferrous_feo_activity(
                     comp_wt=comp_wt,
@@ -417,9 +421,24 @@ class EquilibriumMixin:
                     T_K=T_K,
                     pressure_bar=pressure_bar,
                 )
+                oxide_activity = None
             else:
-                a_oxide = comp_wt.get(parent_oxide, 0.0) / 100.0
-            if a_oxide <= 1e-10:
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide,
+                    melt_account_mol,
+                )
+                if oxide_activity is None:
+                    continue
+                a_oxide = oxide_activity.equivalent_parent_activity(
+                    n_ox / n_M
+                )
+            if (
+                oxide_activity is None
+                and a_oxide <= 1e-10
+            ) or (
+                oxide_activity is not None
+                and oxide_activity.activity <= 1e-10
+            ):
                 continue
 
             ellingham_extrapolation = ellingham_fit_extrapolation(
@@ -436,7 +455,9 @@ class EquilibriumMixin:
                     f"{T_K:.2f} K"
                 )
 
-            activities[species] = a_oxide
+            activities[species] = (
+                a_oxide if oxide_activity is None else oxide_activity.activity
+            )
 
             # --- Ellingham decomposition equilibrium ---          [ELLI-1..3]
             #
@@ -530,14 +551,21 @@ class EquilibriumMixin:
             else:
                 continue
 
-            # Oxide activity proxy (weight fraction)
             parent_oxide = data.get('parent_oxide', '')
             if parent_oxide:
-                a_ox = comp_wt.get(parent_oxide, 0.0) / 100.0
-                activities[name] = a_ox
                 activity_exponent = float(
                     data.get('oxide_activity_exponent', 1.0)
                 )
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide,
+                    melt_account_mol,
+                )
+                if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    continue
+                a_ox = oxide_activity.equivalent_parent_activity(
+                    activity_exponent
+                )
+                activities[name] = oxide_activity.activity
                 P_sat = _require_finite_vapor_value(
                     P_sat * max(a_ox, 0.0) ** activity_exponent,
                     species=name,

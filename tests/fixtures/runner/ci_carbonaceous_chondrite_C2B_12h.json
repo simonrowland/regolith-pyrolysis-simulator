@@ -112,63 +112,63 @@
       "status": "ok",
       "reason": "",
       "regime": "viscous",
-      "knudsen_number": 0.0012252406934889837,
-      "mean_free_path_m": 0.00014702888321867805,
-      "overhead_pressure_mbar": 2.5980727585651713,
+      "knudsen_number": 0.0012252414349430045,
+      "mean_free_path_m": 0.00014702897219316053,
+      "overhead_pressure_mbar": 2.5980711863432093,
       "gas_temperature_C": 1500.0,
       "carrier_gas": "N2",
       "carrier_collision_diameter_m": 3.798e-10,
       "pipe_diameter_m": 0.12,
-      "regime_factor": 0.10915050527154081,
+      "regime_factor": 0.10915056411427872,
       "segments": [
         {
           "name": "stage_0_to_stage_1",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.0012252414349430045,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.10915056411427872
         },
         {
           "name": "stage_1_to_stage_2",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.0012252414349430045,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.10915056411427872
         },
         {
           "name": "stage_2_to_stage_3",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.0012252414349430045,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.10915056411427872
         },
         {
           "name": "stage_3_to_stage_4",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.0012252414349430045,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.10915056411427872
         },
         {
           "name": "stage_4_to_stage_5",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.0012252414349430045,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.10915056411427872
         },
         {
           "name": "stage_5_to_stage_6",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.0012252414349430045,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.10915056411427872
         },
         {
           "name": "stage_6_to_stage_7",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.0012252414349430045,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.10915056411427872
         }
       ],
       "warnings": [],
@@ -194,13 +194,13 @@
         "characteristic_length_source": "knudsen_regime_diagnostic.segments[*].characteristic_length_m"
       },
       "current": {
-        "overhead_pressure_pa": 259.80727585651715,
-        "overhead_pressure_mbar": 2.5980727585651717,
+        "overhead_pressure_pa": 259.80711863432094,
+        "overhead_pressure_mbar": 2.5980711863432093,
         "gas_temperature_K": 1773.15,
         "carrier_gas": "N2",
-        "knudsen_number": 0.0012252406934889837,
+        "knudsen_number": 0.0012252414349430045,
         "regime": "viscous",
-        "distance_from_no_warning_gate_pressure_factor": 8.161661666267461,
+        "distance_from_no_warning_gate_pressure_factor": 8.161656727243457,
         "setpoint_band_distance_from_gate_pressure_factor": {
           "at_5mbar": 15.707146074644335,
           "at_15mbar": 47.121438223933005
@@ -252,89 +252,89 @@
           "quantity_kg": 119.41508297304934,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 1529.3403136524632,
-            "furnace_h": 3.991492401546296,
+            "thermal_flux_h": 1529.3403542176034,
+            "furnace_h": 3.991492507419035,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 1569.2552376679262
+          "owner_ratify_money_projection": 1569.2552792917936
         },
         "terminal.product:Ca": {
-          "quantity_kg": 15.735893418400737,
+          "quantity_kg": 15.73588389583554,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 201.5284466329102,
-            "furnace_h": 0.5259779371862461,
+            "thermal_flux_h": 201.52833002356599,
+            "furnace_h": 0.5259776328424011,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 206.78822600477267
+          "owner_ratify_money_projection": 206.78810635199
         },
         "terminal.product:CaCO3": {
           "quantity_kg": 0.24721530067550287,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 3.166068440115636,
-            "furnace_h": 0.008263260968590985,
+            "thermal_flux_h": 3.166068524094335,
+            "furnace_h": 0.008263261187770678,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 3.248701049801546
+          "owner_ratify_money_projection": 3.248701135972042
         },
         "terminal.product:H2O": {
           "quantity_kg": 181.71535447096545,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 2327.2153758400423,
-            "furnace_h": 6.073901542059355,
+            "thermal_flux_h": 2327.2154375684995,
+            "furnace_h": 6.073901703167165,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 2387.954391260636
+          "owner_ratify_money_projection": 2387.954454600171
         },
         "terminal.product:MgCO3": {
           "quantity_kg": 1.7767742832575095e-10,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 2.275501948325852e-09,
-            "furnace_h": 5.938932398083915e-12,
+            "thermal_flux_h": 2.275502008682631e-09,
+            "furnace_h": 5.93893255561172e-12,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 2.334891272306691e-09
+          "owner_ratify_money_projection": 2.334891334238748e-09
         },
         "terminal.product:N2": {
           "quantity_kg": 1.9950124688279303,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 25.54998011018818,
-            "furnace_h": 0.06668401438128195,
+            "thermal_flux_h": 25.549980787891183,
+            "furnace_h": 0.06668401615004876,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 26.216820254001
+          "owner_ratify_money_projection": 26.21682094939167
         },
         "terminal.product:Na2CO3": {
           "quantity_kg": 1.664085635333379e-05,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 0.00021311824135814366,
-            "furnace_h": 5.562266510717569e-07,
+            "thermal_flux_h": 0.00021311824701101978,
+            "furnace_h": 5.562266658254463e-07,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 0.00021868050786886124
+          "owner_ratify_money_projection": 0.00021868051366927423
         },
         "terminal.product:S": {
           "quantity_kg": 39.900249376558605,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 510.99960220376363,
-            "furnace_h": 1.333680287625639,
+            "thermal_flux_h": 510.9996157578237,
+            "furnace_h": 1.333680323000975,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 524.33640508002
+          "owner_ratify_money_projection": 524.3364189878334
         }
       },
       "active_inventory_costs": {},
@@ -399,6 +399,7 @@
   "final_state": {
     "process.cleaned_melt": {
       "Al2O3": 188.9668814547603,
+      "CaO": 0.00023760080841839226,
       "FeO": 3218.152293899655,
       "MgO": 4675.0980429879255,
       "Na2O": 85.8772944197033,
@@ -406,17 +407,17 @@
       "SiO2": 4617.710834737149
     },
     "process.condensation_train": {
-      "Ca": 349.09339267107737
+      "Ca": 349.09318141744836
     },
     "process.overhead_gas": {},
     "process.stage0_volatile_feed": {},
     "reservoir.fo2_buffer": {
-      "O2": 196.31585181896227
+      "O2": 196.31573301855812
     },
     "reservoir.stage0_oxidant": {},
     "terminal.offgas": {
       "CO2": 2713.4241399043226,
-      "Ca": 43.538310966847064,
+      "Ca": 43.53828461966776,
       "H2O": 10086.89172750294,
       "N2": 71.21483789633506
     },
@@ -519,11 +520,11 @@
       "designated_species_kg": {},
       "coproduct_species_kg": {},
       "impurity_species_kg": {
-        "Ca": 11.871374535262065
+        "Ca": 11.87136737526257
       },
       "designated_kg": 0,
-      "impurity_kg": 11.871374535262065,
-      "total_kg": 11.871374535262065,
+      "impurity_kg": 11.87136737526257,
+      "total_kg": 11.87136737526257,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -535,11 +536,11 @@
       "designated_species_kg": {},
       "coproduct_species_kg": {},
       "impurity_species_kg": {
-        "Ca": 2.119590456209374
+        "Ca": 2.1195891495859263
       },
       "designated_kg": 0,
-      "impurity_kg": 2.119590456209374,
-      "total_kg": 2.119590456209374,
+      "impurity_kg": 2.1195891495859263,
+      "total_kg": 2.1195891495859263,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -2519,59 +2520,59 @@
       "T_C": 265.0,
       "P_total_bar": 0.001,
       "pO2_bar": 0.001,
-      "mass_balance_pct": 2.0625897818801802e-14,
+      "mass_balance_pct": 0.0,
       "O2_yield_kg_cumulative": 0.0,
       "O2_source_side_potential_kg_cumulative": 0.0,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
-      "energy_electrical_plus_evaporation_kWh": 86.80393049022452,
-      "energy_electrical_kWh": 0.7867946709200369,
-      "energy_evaporation_thermal_kWh": 86.01713581930449,
+      "energy_electrical_plus_evaporation_kWh": 86.80387796088505,
+      "energy_electrical_kWh": 0.786794194791777,
+      "energy_evaporation_thermal_kWh": 86.01708376609326,
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
       "furnace_heat_status": "partial",
-      "energy_latent_kWh": 16.751450079468515,
-      "energy_dissociation_kWh": 69.26568573983597,
-      "energy_electrical_plus_evaporation_cumulative_kWh": 86.80393049022452,
+      "energy_latent_kWh": 16.7514399423399,
+      "energy_dissociation_kWh": 69.26564382375336,
+      "energy_electrical_plus_evaporation_cumulative_kWh": 86.80387796088505,
       "energy_cumulative_breakdown_kWh": {
-        "electrical": 0.7867946709200369,
-        "evaporation_thermal": 86.01713581930449,
-        "latent": 16.751450079468515,
-        "dissociation": 69.26568573983597,
-        "electrical_plus_evaporation": 86.80393049022452
+        "electrical": 0.786794194791777,
+        "evaporation_thermal": 86.01708376609326,
+        "latent": 16.7514399423399,
+        "dissociation": 69.26564382375336,
+        "electrical_plus_evaporation": 86.80387796088505
       },
       "energy_evaporation_breakdown_kWh": {
-        "evaporation_enthalpy_sink": 86.01713581930449,
-        "reaction_disproportionation_enthalpy_sink": 69.26568573983597,
-        "product_vapor_enthalpy_sink": 16.751450079468515,
+        "evaporation_enthalpy_sink": 86.01708376609326,
+        "reaction_disproportionation_enthalpy_sink": 69.26564382375336,
+        "product_vapor_enthalpy_sink": 16.7514399423399,
         "net_unallocated": 0.0
       },
       "metal_yields_kg": {
-        "Ca": 15.735893418400737
+        "Ca": 15.73588389583554
       },
       "condensation_train_kg": {
-        "Ca": 13.99096499147144
+        "Ca": 13.990956524848496
       },
       "vapor_species_kg_hr": {
-        "Ca": 15.735893418400737
+        "Ca": 15.735883895835542
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.0012252406934889837,
+      "Kn": 0.0012252414349430045,
       "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0",
       "redox_source_breakdown": {
         "terms_mol_o2_equiv_by_label": {
-          "redox_source:evaporative_metal_loss": 196.31585181896227
+          "redox_source:evaporative_metal_loss": 196.3157330185581
         },
         "applied_terms_mol_o2_equiv_by_label": {
-          "redox_source:evaporative_metal_loss": 196.31585181896227
+          "redox_source:evaporative_metal_loss": 196.3157330185581
         },
         "skipped_terms_mol_o2_equiv_by_label": {},
         "skipped_reasons_by_label": {},
         "redox_source_terms_applied": true,
         "redox_source_skip_reason": "",
-        "net_mol_o2_equiv": 196.31585181896227,
-        "delta_ln_fO2": 7801095.60077114,
-        "delta_log10_fO2": 3387972.772214639,
+        "net_mol_o2_equiv": 196.3157330185581,
+        "delta_ln_fO2": 7801090.879943444,
+        "delta_log10_fO2": 3387970.721985221,
         "ferric_divergence": {
           "status": "warning",
           "implied_ferric_fraction": 1.0,
@@ -2591,7 +2592,7 @@
           "direction": "none",
           "reason": "fe_redox_respeciation_not_liquid",
           "oxygen_source": "evaporative_metal_loss_internal",
-          "internal_o2_capacity_mol": 196.31585181896227,
+          "internal_o2_capacity_mol": 196.3157330185581,
           "residual_attribution": "sub_liquid_respeciation_deferred",
           "ferric_divergence_after": {
             "status": "warning",
@@ -2636,7 +2637,7 @@
             "direction": "none",
             "reason": "fe_redox_respeciation_not_liquid",
             "oxygen_source": "evaporative_metal_loss_internal",
-            "internal_o2_capacity_mol": 196.31585181896227,
+            "internal_o2_capacity_mol": 196.3157330185581,
             "residual_attribution": "sub_liquid_respeciation_deferred",
             "ferric_divergence_after": {
               "status": "warning",
@@ -2665,8 +2666,8 @@
       },
       "fe_redox_split": {
         "diagnostic_only": true,
-        "fO2_log": 3387966.8968319134,
-        "fe2o3_equiv_wt_pct": 34.378189516576036,
+        "fO2_log": 3387964.846602495,
+        "fe2o3_equiv_wt_pct": 34.37818890372401,
         "fe2o3_over_feo_molar": 8.218407461554972e+307,
         "fe3_over_sigma_fe": 1.0,
         "feo_equiv_wt_pct": 0.0,

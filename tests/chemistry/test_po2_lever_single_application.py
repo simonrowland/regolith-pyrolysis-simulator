@@ -18,6 +18,16 @@ from simulator.state import MOLAR_MASS
 _PO2_LEVELS = (1.0e-4, 1.0e-6, 1.0e-9)
 
 
+def _po2_levels_for_species(species: str) -> tuple[float, float, float]:
+    if species == "Ca":
+        # CF-3 constant gamma_CaO suppresses the old equal-mol Ca point below
+        # the provider's 1e-15 Pa emission floor at pO2=1e-4. Use the same
+        # legal transport-pO2 range where all Ca points are emitted; the tested
+        # invariant is the pO2 slope, not the absolute pressure magnitude.
+        return (1.0e-6, 1.0e-7, 1.0e-9)
+    return _PO2_LEVELS
+
+
 def _account_view() -> ProviderAccountView:
     return ProviderAccountView(
         accounts={
@@ -89,7 +99,8 @@ def test_builtin_vapor_pressure_po2_slope_once(
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     pressures = []
-    for pO2_bar in _PO2_LEVELS:
+    po2_levels = _po2_levels_for_species(species)
+    for pO2_bar in po2_levels:
         result = provider.dispatch(
             _request(
                 ChemistryIntent.VAPOR_PRESSURE,
@@ -99,7 +110,7 @@ def test_builtin_vapor_pressure_po2_slope_once(
         )
         pressures.append(result.diagnostic["vapor_pressures_Pa"][species])
 
-    for observed in _slope(_PO2_LEVELS, tuple(pressures)):
+    for observed in _slope(po2_levels, tuple(pressures)):
         assert observed == pytest.approx(expected_slope, abs=1.0e-9)
 
 

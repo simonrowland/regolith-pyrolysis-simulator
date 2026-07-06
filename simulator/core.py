@@ -658,6 +658,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._mre_uncertified_yield: Dict[str, Any] = {}
         self._mre_voltage_step_idx = 0
         self._mre_hold_hours = 0
+        self._mre_rung_ever_effective = False
         self._mre_voltage_sequence: list = []
 
         # --- User-configurable parameters ---
@@ -8178,7 +8179,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._mre_voltage_step_idx = 0
             self._mre_hold_hours = 0
             self._mre_effective_current_A = 0.0
+            self._mre_rung_ever_effective = False
             self.melt.mre_low_current_hours = 0
+            # Ladder bookkeeping must not leak across campaign (re)starts:
+            # a sticky complete flag/key would trip the C5 endpoint (or
+            # short-circuit the ladder) on the first hour of a fresh C5.
+            self.melt.mre_c5_ladder_complete = False
+            self.melt.mre_c5_on_final_rung = None
+            self.melt.mre_declared_rung_V = 0.0
+            if hasattr(self, '_mre_c5_sequence_complete_key'):
+                del self._mre_c5_sequence_complete_key
 
         # Pass C4 max temp to campaign manager
         self.campaign_mgr.c4_max_temp_C = self.c4_max_temp_C
@@ -9420,6 +9430,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # MRE electrolysis
             mre_voltage_V=self._mre_voltage_V,
             mre_current_A=self._mre_current_A,
+            mre_declared_rung_V=float(
+                getattr(self.melt, 'mre_declared_rung_V', 0.0)
+            ),
             mre_metals_kg_hr=dict(self._mre_metals_this_hr),
             mre_uncertified_yield=dict(self._mre_uncertified_yield),
             c2a_staged_gas=dict(

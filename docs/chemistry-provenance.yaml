@@ -80,10 +80,11 @@ values:
         lacks: "wrong feedstock (gasifier slag, not silicate/lunar); Na2O di-cation basis (not single-cation NaO0.5); degenerate aNa2O extrapolation"
     code_sites:
       - "pending: CF-3 rework (t-003) — engines/builtin/vapor_pressure.py MELT_OXIDE_ACTIVITY_COEFFICIENTS, rebuilt on the single-cation-linear basis"
+    alphamelts_cross_check_status: "inconclusive_no_activities"
     validation: >-
       Reproduce DeMaria 1971 (test-harness feedstock = lunar basalt 0.36 wt% Na2O / 0.068 wt% K2O at the
       stated pO2): the corrected model p_Na must match the measured ~3.2e-2 Pa @1538 K and the p_Na(T) slope.
-    status: pending-rework
+    status: implemented-cf3-rework-t003-pending-golden-rebaseline
     trace: docs-private/deep-research/cf3-alkali-activity-synthesis.md
 
   - id: janaf_chase1998_thermal_latent_dissoc

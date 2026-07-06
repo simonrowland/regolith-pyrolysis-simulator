@@ -11,6 +11,7 @@ from simulator.chemistry.structural_activity import (
     structural_activity_diagnostic,
     structural_activity_features,
 )
+from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.state import MOLAR_MASS
 
 
@@ -129,6 +130,16 @@ def test_builtin_vapor_pressure_exposes_structural_reference_diagnostic_only(
     assert structural["diagnostic_only"] is True
     assert structural["tier"] == "UNCERTIFIED"
     assert structural["reference_gamma_MOx"]["NaO0.5"] != pytest.approx(1.0)
+    consumed_na_activity = melt_oxide_activity("Na2O", account_mol)
+    assert consumed_na_activity is not None
+    # CF-3: the authoritative vapor path consumes single-cation gamma*X, not
+    # the old ideal wt%-fraction proxy. The structural reference remains
+    # diagnostic-only; this assertion pins the actual consumer.
     assert diagnostic["activities"]["Na"] == pytest.approx(
-        comp_wt["Na2O"] / 100.0
+        consumed_na_activity.activity
+    )
+    assert diagnostic["vapor_pressure_numerator_provenance"]["Na"][
+        "melt_oxide_activity"
+    ] == pytest.approx(
+        consumed_na_activity.activity
     )

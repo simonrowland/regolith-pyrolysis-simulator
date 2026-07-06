@@ -245,7 +245,7 @@ def test_sio_vapor_pressure_responds_to_requested_po2(smoke_payload):
     assert low["SiO_flux_kg_hr"] > high["SiO_flux_kg_hr"] * 100.0
 
 
-def test_exact_full_dose_oxidizing_pn2_row_refuses_denormal_fo2_capacity():
+def test_exact_full_dose_oxidizing_pn2_row_refuses_absent_melt_redox_capacity():
     setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
 
     row = validation_map.run_row(
@@ -261,20 +261,14 @@ def test_exact_full_dose_oxidizing_pn2_row_refuses_denormal_fo2_capacity():
 
     assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
     assert math.isfinite(row["redox_source_delta_ln_fO2"])
-    assert row["redox_source_skip_reason"] == "redox_capacity_saturation_refusal"
+    assert row["redox_source_skip_reason"] == "no_melt_redox_capacity"
     assert row["redox_source_skipped_terms_mol_o2_equiv_by_label"][
         "redox_source:evaporative_metal_loss"
     ] > 0.0
     assert row["redox_source_skipped_reasons_by_label"][
         "redox_source:evaporative_metal_loss"
-    ] == "redox_capacity_saturation_refusal"
-    context = row["redox_source_refusal_context"]
-    assert context["temperature_C"] == pytest.approx(1600.0)
-    assert context["headspace_o2_mol"] > 0.0
-    assert context["source_terms_mol_o2_equiv"][
-        "redox_source:evaporative_metal_loss"
-    ] > 0.0
-    assert context["candidate_fO2_log"] == "inf"
+    ] == "no_melt_redox_capacity"
+    assert row["redox_source_refusal_context"] == {}
 
 
 def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():

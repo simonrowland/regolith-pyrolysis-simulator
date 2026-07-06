@@ -27,7 +27,10 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # 2026-07-05 CF-2-lite (t-001): Si(l) Ellingham fit extended to ~2200 K (covers the
 # 1750-1800 C staged recipe) shifts the SiO wall deposit +2.11e-10 kg (+4.4e-5%);
 # JANAF-grounded physics change, verified controller-side, not a behaviour regression.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00047792501195157886
+# 2026-07-06 CF-3: constant single-cation gamma*X alkali activity lowers
+# Na/K vapor, shifting the coupled SiO wall trace while mass balance remains
+# closed.
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.0004540737297072478
 
 
 def _run_script(lines: list[str]):
@@ -197,13 +200,9 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # alpha-series evaporation change.
     assert continuous_products.get("Fe", 0.0) > 0.0
     assert continuous_products.get("Fe", 0.0) > staged_products.get("Fe", 0.0)
-    # Na product is now mode-independent: the alpha-series transport limit suppresses
-    # main-extraction Na evaporation ~285x in BOTH modes, collapsing the staged>continuous
-    # Na gap that existed under bare-alpha to machine equality (probe delta ~2e-16).
-    # Assert equality, not the prior float-dust inequality.
-    assert staged_products.get("Na", 0.0) == pytest.approx(
-        continuous_products.get("Na", 0.0), rel=1e-9
-    )
+    # CF-3 constant gamma*X activity removes the old mode-equality pin: lower
+    # alkali vapor makes the staged/continuous thermal histories visible again.
+    assert continuous_products.get("Na", 0.0) > staged_products.get("Na", 0.0) > 0.0
     assert staged_silica > continuous_silica
     # Builtin-authoritative vapor pressure makes Stage 3 a mixed SiO/Fe
     # hot-trap instead of the old VapoRock-dominant silica-purity surface.

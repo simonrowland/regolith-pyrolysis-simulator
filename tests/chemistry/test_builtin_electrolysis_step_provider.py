@@ -1746,13 +1746,14 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
 
     registry = sim.atom_ledger.registry
     allowed_credit_accounts = {
+        "process.cleaned_melt",
         "process.metal_phase",
         "terminal.oxygen_mre_anode_stored",
     }
     cumulative_imbalance_kg = 0.0
     for trans in mre_transitions:
-        # Strict account scoping: debit cleaned_melt only, credit
-        # metal_phase + anode O2 only.
+        # Strict account scoping: debit cleaned_melt only; credit products,
+        # anode O2, and any Faraday-cap residual oxide returned to cleaned_melt.
         for lot in trans.debits:
             assert lot.account == "process.cleaned_melt", (
                 f"MRE transition {trans.name} debits unexpected "

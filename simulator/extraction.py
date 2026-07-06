@@ -622,6 +622,7 @@ class ExtractionMixin:
             self._mre_effective_current_A = 0.0
             self._mre_energy_this_hr = 0.0
             self.melt.mre_voltage_V = 0.0
+            self.melt.mre_declared_rung_V = 0.0
             self.melt.mre_current_A = 0.0
             return 0.0
 
@@ -649,8 +650,10 @@ class ExtractionMixin:
 
             current_A = 3000.0  # Full-scale MRE: ~60 kA/m² at 0.05 m²
             c5_allowed_oxides = None
+            c5_rung_advanced = False
         else:
             # C5 limited MRE: EvalSpec/session fields are behavior determinants.
+            c5_rung_advanced = False
             target = str(getattr(self.melt, 'mre_target_species', '') or '')
             configured_max = (
                 mre_ladder.coerce_mre_decomposition_voltage(
@@ -685,6 +688,7 @@ class ExtractionMixin:
                 self._mre_effective_current_A = 0.0
                 self._mre_energy_this_hr = 0.0
                 self.melt.mre_voltage_V = 0.0
+                self.melt.mre_declared_rung_V = 0.0
                 self.melt.mre_current_A = 0.0
                 return 0.0
 
@@ -703,34 +707,57 @@ class ExtractionMixin:
                 self._mre_effective_current_A = 0.0
                 self._mre_energy_this_hr = 0.0
                 self.melt.mre_voltage_V = 0.0
+                self.melt.mre_declared_rung_V = 0.0
                 self.melt.mre_current_A = 0.0
+                self.melt.mre_c5_ladder_complete = True
                 return 0.0
 
             else:
                 idx = min(self._mre_voltage_step_idx, len(seq) - 1)
                 step_info = seq[idx]
-                voltage_V = step_info['voltage']
+                # Cell sits at the stage voltage cap; the ladder rung is the
+                # accounting schedule, not a second applied voltage. Reported
+                # voltage MUST be the dispatched one (solved==reported); the
+                # declared rung is carried separately for endpoint/diagnostics.
+                voltage_V = float(ladder_cap_V)
+                self.melt.mre_declared_rung_V = float(step_info['voltage'])
+                self.melt.mre_c5_on_final_rung = bool(idx >= len(seq) - 1)
+                rung_allowed_oxides = set(step_info['species'])
+                if allowed_oxides is not None:
+                    rung_allowed_oxides &= set(allowed_oxides)
 
                 self._mre_hold_hours += 1
                 if self._mre_hold_hours >= step_info.get('min_hold_hours', 3):
                     c5_current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
                     target_current_low = (
                         self._mre_effective_current_A < c5_current_A * 0.05)
+                    rung_ever_effective = bool(
+                        getattr(self, '_mre_rung_ever_effective', False)
+                    )
+                    rung_species_absent = all(
+                        self.melt.composition_kg.get(oxide, 0.0) < 1e-6
+                        for oxide in step_info['species']
+                    )
                     safety_max_hold = (
                         self._mre_hold_hours
                         >= mre_ladder.C5_DEPLETION_SAFETY_MAX_HOLD_HR
                     )
-                    if target_current_low or safety_max_hold:
+                    depleted_after_effective = (
+                        target_current_low
+                        and (rung_ever_effective or rung_species_absent)
+                    )
+                    if depleted_after_effective or safety_max_hold:
                         self._mre_voltage_step_idx += 1
                         if idx >= len(seq) - 1:
                             self._mre_c5_sequence_complete_key = sequence_completion_key
                         self._mre_hold_hours = 0
+                        self._mre_rung_ever_effective = False
+                        c5_rung_advanced = True
 
             current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
-            # Operator target-rung selectivity; not a second Nernst gate.
-            c5_allowed_oxides = (
-                sorted(allowed_oxides) if allowed_oxides is not None else None
-            )
+            # Declared C5 ladder holds are rung-scoped selectivity filters;
+            # Nernst remains the physical reducibility gate inside the engine.
+            c5_allowed_oxides = sorted(rung_allowed_oxides)
 
         # F-B1: dispatch + commit split via the _dispatch_only /
         # _commit_proposal helper pair so the per-account balance
@@ -750,6 +777,24 @@ class ExtractionMixin:
         electrolysis_controls['melt_fO2_log'] = float(melt_fO2_log)
         if c5_allowed_oxides is not None:
             electrolysis_controls['allowed_oxides'] = c5_allowed_oxides
+            from engines.builtin.metallothermic_step import (
+                SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+            )
+            residue_kg = self.atom_ledger.kg_by_account(
+                SPENT_REDUCTANT_RESIDUE_ACCOUNT
+            )
+            for oxide in c5_allowed_oxides:
+                self._move_ledger_species(
+                    'c5_mre_spent_residue_to_cleaned_melt',
+                    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+                    'process.cleaned_melt',
+                    oxide,
+                    residue_kg.get(oxide, 0.0),
+                    reason=(
+                        'C5 MRE treats melt-resident spent reductant residue '
+                        'as electrolyzable cleaned melt for the active rung'
+                    ),
+                )
         kernel_result = self._dispatch_only(
             ChemistryIntent.ELECTROLYSIS_STEP,
             control_inputs=electrolysis_controls,
@@ -794,6 +839,7 @@ class ExtractionMixin:
             self._mre_effective_current_A = 0.0
             self._mre_energy_this_hr = 0.0
             self.melt.mre_voltage_V = 0.0
+            self.melt.mre_declared_rung_V = 0.0
             self.melt.mre_current_A = 0.0
             reason = diagnostic.get('reason_refused', 'electrolysis_step_refused')
             raise RuntimeError(f'MRE electrolysis refused: {reason}')
@@ -862,6 +908,13 @@ class ExtractionMixin:
             moles_ox = kg_removed * 1000.0 / M_ox
             total_charge_C += moles_ox * n_e * FARADAY
         self._mre_effective_current_A = total_charge_C / 3600.0
+        if (
+            self.melt.campaign == CampaignPhase.C5
+            and not c5_rung_advanced
+            and self._mre_effective_current_A
+            >= mre_ladder.C5_LIMITED_MRE_CURRENT_A * 0.05
+        ):
+            self._mre_rung_ever_effective = True
 
         # Store effective current on melt state for endpoint detection
         self.melt.mre_voltage_V = voltage_V

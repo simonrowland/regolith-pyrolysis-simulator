@@ -154,6 +154,42 @@ def test_configured_campaign_endpoints_match_legacy_trip_points(
     assert manager.check_endpoint(melt, flux, CondensationTrain(), record) is expected
 
 
+def test_c5_low_current_endpoint_is_gated_on_final_rung():
+    # The C5 cell dispatches at the stage voltage cap for EVERY ladder hold
+    # (2026-07-06 rung fix), so at-cap + low-current no longer means "ladder
+    # done" by itself. The endpoint's low-current signal must only count on
+    # the FINAL declared rung; earlier rungs' depletion belongs to the
+    # ladder-advance logic. Tri-state contract: None (no ladder bookkeeping,
+    # legacy states) keeps the legacy trip; explicit False blocks it.
+    manager = CampaignManager(_setpoints())
+    record = BatchRecord(branch="two")
+
+    def melt_at_cap(low_hours: int) -> MeltState:
+        return _melt(
+            CampaignPhase.C5,
+            10,
+            voltage_V=1.6,
+            current_A=4.0,
+            low_current_hours=low_hours,
+        )
+
+    early_rung = melt_at_cap(3)
+    early_rung.mre_c5_on_final_rung = False
+    assert manager.check_endpoint(early_rung, _flux(), CondensationTrain(), record) is False
+
+    final_rung = melt_at_cap(3)
+    final_rung.mre_c5_on_final_rung = True
+    assert manager.check_endpoint(final_rung, _flux(), CondensationTrain(), record) is True
+
+    legacy = melt_at_cap(3)
+    assert legacy.mre_c5_on_final_rung is None
+    assert manager.check_endpoint(legacy, _flux(), CondensationTrain(), record) is True
+
+    complete = _melt(CampaignPhase.C5, 10, voltage_V=0.0, current_A=0.0)
+    complete.mre_c5_ladder_complete = True
+    assert manager.check_endpoint(complete, _flux(), CondensationTrain(), record) is True
+
+
 def test_campaign_endpoint_caps_and_classes_are_materialized():
     campaigns = _setpoints()["campaigns"]
 

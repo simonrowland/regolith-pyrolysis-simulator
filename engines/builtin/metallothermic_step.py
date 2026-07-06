@@ -138,6 +138,11 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_fit_range_K,
     ellingham_fit_segments,
 )
+from simulator.chemistry.melt_activity import (
+    MELT_OXIDE_ACTIVITY_COEFFICIENTS,
+    MELT_OXIDE_ACTIVITY_LIMITATION,
+    na_reductant_activity_shift_kj_per_mol_o2,
+)
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -602,14 +607,24 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         total_Ti_produced_mol = 0.0
         accepted_targets: list[str] = []
         refused_targets: dict[str, dict[str, Any]] = {}
+        activity_audit = {
+            key: value
+            for key, value in thermo_audit.items()
+            if key
+            in {
+                "standard_deltaG",
+                "Na2O_activity_gamma",
+                "Na2O_activity_component",
+                "Na2O_activity_shift_kJ_per_mol_O2",
+                "Na2O_activity_limitation",
+            }
+        }
 
         for target in target_priority:
             if target == "FeO":
                 if FeO_available_kg <= 0.01 or mol_Na <= 0.1:
                     continue
-                margin = self._reduction_margin_kj_per_mol_o2(
-                    "Na", target, temperature_C
-                )
+                margin = float(thermo_audit["margin"].get(target, 0.0))
                 if margin <= 0.0:
                     refused_targets[target] = {
                         "margin_kJ_per_mol_O2": margin,
@@ -634,9 +649,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             elif target == "Cr2O3":
                 if Cr2O3_available_kg <= 0.01 or mol_Na <= 0.1:
                     continue
-                margin = self._reduction_margin_kj_per_mol_o2(
-                    "Na", target, temperature_C
-                )
+                margin = float(thermo_audit["margin"].get(target, 0.0))
                 if margin <= 0.0:
                     refused_targets[target] = {
                         "margin_kJ_per_mol_O2": margin,
@@ -661,9 +674,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             elif target == "TiO2":
                 if TiO2_available_kg <= 0.01 or mol_Na <= 0.1:
                     continue
-                margin = self._reduction_margin_kj_per_mol_o2(
-                    "Na", target, temperature_C
-                )
+                margin = float(thermo_audit["margin"].get(target, 0.0))
                 if margin <= 0.0:
                     refused_targets[target] = {
                         "margin_kJ_per_mol_O2": margin,
@@ -702,6 +713,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     "accepted_targets": accepted_targets,
                     "refused_targets": refused_targets,
                 }
+                diagnostic.update(activity_audit)
                 diagnostic.update(
                     self._ellingham_fit_diagnostic(fit_extrapolations)
                 )
@@ -811,6 +823,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             "na2o_melt_kg_for_solubility_cap": composition_kg.get("Na2O", 0.0),
             "na2o_solubility_headroom_kg": Na2O_max_kg,
         }
+        diagnostic.update(activity_audit)
         diagnostic.update(self._ellingham_fit_diagnostic(fit_extrapolations))
         return IntentResult(
             intent=ChemistryIntent.METALLOTHERMIC_STEP,
@@ -1411,8 +1424,16 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         targets: tuple[str, ...],
         temperature_C: float,
     ) -> tuple[tuple[str, ...], dict[str, Any]]:
+        temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        na_standard_delta_g = cls._delta_g_kj_per_mol_o2(
+            "Na",
+            temperature_C,
+        )
+        na_activity_shift = na_reductant_activity_shift_kj_per_mol_o2(
+            temperature_K
+        )
         delta_g: dict[str, float] = {
-            "Na2O": cls._delta_g_kj_per_mol_o2("Na", temperature_C)
+            "Na2O": na_standard_delta_g + na_activity_shift
         }
         margin: dict[str, float] = {}
         for oxide in targets:
@@ -1434,6 +1455,17 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         return priority, {
             "priority": priority,
             "deltaG": delta_g,
+            "standard_deltaG": {"Na2O": na_standard_delta_g},
+            "Na2O_activity_gamma": (
+                MELT_OXIDE_ACTIVITY_COEFFICIENTS["Na2O"].gamma
+            ),
+            "Na2O_activity_component": (
+                MELT_OXIDE_ACTIVITY_COEFFICIENTS[
+                    "Na2O"
+                ].single_cation_component
+            ),
+            "Na2O_activity_shift_kJ_per_mol_O2": na_activity_shift,
+            "Na2O_activity_limitation": MELT_OXIDE_ACTIVITY_LIMITATION,
             "margin": margin,
             "ellingham_extrapolated_beyond_fit_range_K": (
                 cls._ellingham_pair_fit_extrapolations(

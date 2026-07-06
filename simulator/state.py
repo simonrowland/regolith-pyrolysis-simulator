@@ -553,6 +553,15 @@ class MeltState:
     mre_voltage_V: float = 0.0
     mre_current_A: float = 0.0            # Effective (Faradaic) current
     mre_low_current_hours: int = 0        # Consecutive hours below threshold
+    # C5 ladder bookkeeping: the cell dispatches at the stage voltage cap;
+    # the declared rung is the accounting schedule (kept separate so the
+    # reported voltage is always the dispatched one).
+    mre_declared_rung_V: float = 0.0
+    # Tri-state: None = no ladder bookkeeping this run (legacy states, tests
+    # that never step extraction) -> endpoint is not gated; True/False are
+    # set every C5 hold hour by ExtractionMixin.
+    mre_c5_on_final_rung: bool | None = None
+    mre_c5_ladder_complete: bool = False
 
     # --- Derived quantities (set by step()) ---
     total_mass_kg: float = 0.0
@@ -982,6 +991,9 @@ class HourSnapshot:
 
     # MRE state (for C5 / MRE baseline)
     mre_voltage_V: float = 0.0
+    # Declared C5 ladder rung (audit: the cell dispatches at the stage cap;
+    # this is the accounting rung, 0.0 outside C5 holds).
+    mre_declared_rung_V: float = 0.0
     mre_current_A: float = 0.0
     mre_metals_kg_hr: Dict[str, float] = field(default_factory=dict)
     mre_uncertified_yield: Dict[str, Any] = field(default_factory=dict)

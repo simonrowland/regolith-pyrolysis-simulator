@@ -169,14 +169,17 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # MgO; the hot-wall cases retain the same Si+SiO2 mass to rounding.
     # 2026-07-02 SSO-R ch2c evaporative-coupling ripple: +0.14% at 1050 C
     # (fO2 trajectory shift through the coupled route). Correction-class.
+    # 2026-07-06 CF-3 constant gamma*X alkali activity lowers Na/K vapor
+    # backpressure, moving the coupled SiO wall pins without changing the
+    # fouling-threshold structure.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        5.996796493384001e-08, rel=1e-9
+        5.661634510284001e-08, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
-        6.61294555268e-08, rel=1e-9
+        6.304807560719999e-08, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
-        6.6558616333e-08, rel=1e-9
+        6.34548794328e-08, rel=1e-9
     )
 
 

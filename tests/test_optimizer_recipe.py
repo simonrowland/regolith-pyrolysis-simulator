@@ -376,7 +376,13 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # source labels (vapor_pressure/core), and the authority re-derive paths. Physics
     # values unchanged; two runner fixtures moved on label strings only (verified
     # zero numeric diffs before regen).
-    assert cache_key(spec) == "e483f84e446fb0a3f4a0cd850b3c53af280164f08558caf05ecfc632b29b2cca"
+    # 2026-07-06 (CF-3 landing): source-fingerprint move from the corrected
+    # single-cation alkali activity (simulator/chemistry/melt_activity.py new,
+    # engines/builtin/vapor_pressure.py gamma*X wiring). A REAL physics move
+    # (linear-in-gamma alkali suppression); runner/sio_yield/sso_r goldens
+    # regenerated in the same batch. Value recomputed controller-side and
+    # cross-checked against the independent completion-worker observation.
+    assert cache_key(spec) == "7829f8bff98daf116761ccb293e568888353bf39bcdb13c5b192c04cc926fa9f"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

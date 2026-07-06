@@ -1497,7 +1497,16 @@ class CampaignManager:
                     mre_ladder.C5_DEPLETION_CONSECUTIVE_HOURS,
                 )
             )
-            at_cap = melt.mre_voltage_V >= (voltage_cap_V - at_cap_margin_V)
+            if getattr(melt, 'mre_c5_ladder_complete', False):
+                return True
+            # The cell dispatches at the stage cap for every ladder hold, so
+            # at-cap alone no longer discriminates; low-current only counts
+            # as an endpoint signal on the FINAL declared rung (earlier
+            # rungs' depletion is the ladder-advance logic's job).
+            at_cap = (
+                melt.mre_voltage_V >= (voltage_cap_V - at_cap_margin_V)
+                and getattr(melt, 'mre_c5_on_final_rung', None) is not False
+            )
             if at_cap and melt.mre_current_A < threshold_A:
                 melt.mre_low_current_hours += 1
             else:
