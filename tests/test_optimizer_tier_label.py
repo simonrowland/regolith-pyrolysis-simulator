@@ -56,13 +56,32 @@ def test_optimizer_tier_label_mapping_matrix(
 
 
 def test_optimizer_tier_label_prefers_run_reference_cache_state() -> None:
-    run_reference = {"cache_state": "cached_exact", "evidence_class": EvidenceClass.MELTS.value}
+    # backend_authoritative is REQUIRED for CERTIFIED since the 5786d1f R2
+    # fold (tier-label authority): certification fails toward caution when
+    # authority is absent. This fixture supplies it so the test exercises its
+    # actual target — run_reference cache_state winning over result_blob.
+    run_reference = {
+        "cache_state": "cached_exact",
+        "evidence_class": EvidenceClass.MELTS.value,
+        "backend_authoritative": True,
+    }
     result_blob = {"cache_state": "cached_interpolated"}
 
     label = _optimizer_tier_label(run_reference, result_blob)
 
     assert label["tier"] == "cached_exact"
     assert label["ux_label"] == "CERTIFIED"
+
+
+def test_optimizer_tier_label_without_backend_authority_is_not_certified() -> None:
+    # The pre-fold fixture shape (no backend_authoritative) must NOT certify.
+    run_reference = {"cache_state": "cached_exact", "evidence_class": EvidenceClass.MELTS.value}
+    result_blob = {"cache_state": "cached_interpolated"}
+
+    label = _optimizer_tier_label(run_reference, result_blob)
+
+    assert label["tier"] == "cached_exact"
+    assert label["ux_label"] == "UNVERIFIED"
 
 
 def test_optimizer_tier_label_reads_per_hour_summary_fallback() -> None:
