@@ -314,11 +314,13 @@ def test_snapshots_carry_all_expected_north_star_fields():
 
 @pytest.mark.skip(
     reason=(
-        "E1b future-work: hard-assertion gate on >= 95% Na/K/Fe/Mg/SiO "
-        "yield is deferred to post-Phase-D per "
-        "docs-private/goal-deferred-and-roadmap-2026-05-28.md rev 2. "
-        "Reactivate this test once the recipe defaults land that "
-        "actually clear the 95% threshold without fudging."
+        "E1b still skipped after t-025 grounding run "
+        "(2026-07-06, lunar_mare_low_ti, StubBackend, C0 -> C0B -> "
+        "C2A_STAGED -> C3_NA -> C4 -> C6, C5/MRE disabled). "
+        "Corrected-denominator yields: Na=0.211855, K=0.435267, "
+        "Fe=0.008236, Mg=0.000975, SiO=0.000205; all below the "
+        ">=0.95 gate. Do not unskip until a fresh grounded run clears "
+        "the threshold without tuning it."
     )
 )
 def test_e1b_future_target_species_yield_threshold():
