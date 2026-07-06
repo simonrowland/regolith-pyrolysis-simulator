@@ -529,6 +529,146 @@ def test_e1b_target_yield_excludes_additive_overcredit() -> None:
     assert result.yield_fraction == pytest.approx(0.5)
 
 
+@pytest.mark.parametrize(("target", "native_oxide"), (("Na", "Na2O"), ("K", "K2O")))
+def test_e1b_target_yield_denominator_excludes_unspent_alkali_credit_line(
+    target: str,
+    native_oxide: str,
+) -> None:
+    native_oxide_kg = 0.5 * MOLAR_MASS[native_oxide] / 1000.0
+    credit_line_kg = 2.0 * MOLAR_MASS[target] / 1000.0
+    product_kg = MOLAR_MASS[target] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        (target,),
+        {
+            native_oxide: native_oxide_kg,
+            target: credit_line_kg,
+        },
+        _FakeQueries(
+            {
+                "process.condensation_train": {target: product_kg},
+                "process.reagent_inventory": {target: credit_line_kg},
+            },
+            c3_credit_outstanding={target: credit_line_kg},
+        ),
+    )[target]
+
+    assert result.initial_cleaned_target_equiv_mol == pytest.approx(1.0)
+    assert result.product_target_equiv_mol == pytest.approx(1.0)
+    assert result.yield_fraction == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize(("target", "native_oxide"), (("Na", "Na2O"), ("K", "K2O")))
+def test_e1b_target_yield_denominator_keeps_native_oxide_when_credit_unspent(
+    target: str,
+    native_oxide: str,
+) -> None:
+    native_oxide_kg = 0.5 * MOLAR_MASS[native_oxide] / 1000.0
+    credit_line_kg = 2.0 * MOLAR_MASS[target] / 1000.0
+    product_kg = MOLAR_MASS[target] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        (target,),
+        {native_oxide: native_oxide_kg},
+        _FakeQueries(
+            {
+                "process.condensation_train": {target: product_kg},
+                "process.reagent_inventory": {target: credit_line_kg},
+            },
+            c3_credit_outstanding={target: credit_line_kg},
+        ),
+    )[target]
+
+    assert result.initial_cleaned_target_equiv_mol == pytest.approx(1.0)
+    assert result.product_target_equiv_mol == pytest.approx(1.0)
+    assert result.yield_fraction == pytest.approx(1.0)
+
+
+def test_e1b_target_yield_denominator_caps_partially_spent_credit_line() -> None:
+    native_oxide_kg = 0.5 * MOLAR_MASS["Na2O"] / 1000.0
+    credit_line_kg = 2.0 * MOLAR_MASS["Na"] / 1000.0
+    live_credit_kg = 0.75 * MOLAR_MASS["Na"] / 1000.0
+    spent_credit_product_kg = 1.25 * MOLAR_MASS["Na"] / 1000.0
+    gross_product_kg = 3.0 * MOLAR_MASS["Na"] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        {
+            "Na2O": native_oxide_kg,
+            "Na": credit_line_kg,
+        },
+        _FakeQueries(
+            {
+                "process.condensation_train": {"Na": gross_product_kg},
+                "process.reagent_inventory": {"Na": live_credit_kg},
+            },
+            c3_credit_outstanding={"Na": credit_line_kg},
+            non_feedstock_reagent_element_by_account={
+                "process.condensation_train": {"Na": spent_credit_product_kg},
+            },
+        ),
+    )["Na"]
+
+    assert result.initial_cleaned_target_equiv_mol == pytest.approx(2.25)
+    assert result.excluded_non_feedstock_reagent_target_equiv_mol == pytest.approx(
+        1.25
+    )
+    assert result.product_target_equiv_mol == pytest.approx(1.75)
+    assert result.yield_fraction == pytest.approx(1.75 / 2.25)
+
+
+def test_e1b_target_yield_denominator_keeps_fully_spent_credit_line() -> None:
+    native_oxide_kg = 0.5 * MOLAR_MASS["Na2O"] / 1000.0
+    credit_line_kg = 2.0 * MOLAR_MASS["Na"] / 1000.0
+    gross_product_kg = 3.0 * MOLAR_MASS["Na"] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        {
+            "Na2O": native_oxide_kg,
+            "Na": credit_line_kg,
+        },
+        _FakeQueries(
+            {"process.condensation_train": {"Na": gross_product_kg}},
+            c3_credit_outstanding={"Na": credit_line_kg},
+            non_feedstock_reagent_element_by_account={
+                "process.condensation_train": {"Na": credit_line_kg},
+            },
+        ),
+    )["Na"]
+
+    assert result.initial_cleaned_target_equiv_mol == pytest.approx(3.0)
+    assert result.excluded_non_feedstock_reagent_target_equiv_mol == pytest.approx(
+        2.0
+    )
+    assert result.product_target_equiv_mol == pytest.approx(1.0)
+    assert result.yield_fraction == pytest.approx(1.0 / 3.0)
+
+
+def test_e1b_target_yield_denominator_excludes_tagged_cleaned_melt_reagent() -> None:
+    native_oxide_kg = 0.5 * MOLAR_MASS["Na2O"] / 1000.0
+    tagged_reagent_kg = 2.0 * MOLAR_MASS["Na"] / 1000.0
+    product_kg = MOLAR_MASS["Na"] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Na",),
+        {
+            "Na2O": native_oxide_kg,
+            "Na": tagged_reagent_kg,
+        },
+        _FakeQueries(
+            {"process.condensation_train": {"Na": product_kg}},
+            non_feedstock_reagent_element_by_account={
+                "process.cleaned_melt": {"Na": tagged_reagent_kg},
+            },
+        ),
+    )["Na"]
+
+    assert result.initial_cleaned_target_equiv_mol == pytest.approx(1.0)
+    assert result.product_target_equiv_mol == pytest.approx(1.0)
+    assert result.yield_fraction == pytest.approx(1.0)
+
+
 def test_e1b_target_yield_blocks_helper_present_empty_unclean_additive_map() -> None:
     initial = {"Na2O": 0.5 * MOLAR_MASS["Na2O"] / 1000.0}
     gross_product_kg = 3.0 * MOLAR_MASS["Na"] / 1000.0

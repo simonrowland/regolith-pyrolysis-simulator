@@ -48,6 +48,7 @@ TARGET_YIELD_NUMERATOR_SOURCE = "narrow_product_accounts"
 TARGET_YIELD_PROVENANCE_RULE = (
     "feedstock_clean_excluding_unspent_reagents_credit_lines_and_external_additives"
 )
+_TARGET_YIELD_DENOMINATOR_ACCOUNT = "process.cleaned_melt"
 
 DEFAULT_RESIDUAL_SPECIES_BY_TARGET: Mapping[str, tuple[str, ...]] = MappingProxyType({
     "SiO": ("SiO2", "SiO"),
@@ -254,7 +255,11 @@ def target_species_yield_by_initial_cleaned_melt(
         target = str(raw_target)
         try:
             element = _target_element(target)
-            denominator_mol = _target_relevant_element_mol(element, initial)
+            denominator_mol = _target_yield_denominator_element_mol(
+                element,
+                initial,
+                queries,
+            )
             product_species_kg = _target_relevant_species_kg(element, product_kg)
             gross_product_mol = _target_relevant_element_mol(
                 element,
@@ -1060,6 +1065,58 @@ def _target_relevant_element_mol(
     for species, kg in _target_relevant_species_kg(element, species_kg).items():
         total += _element_equivalent_mol(element, species, kg)
     return total
+
+
+def _target_yield_denominator_element_mol(
+    element: str,
+    initial_cleaned_melt_kg: Mapping[str, Any],
+    queries: Any,
+) -> float:
+    gross_mol = _target_relevant_element_mol(element, initial_cleaned_melt_kg)
+    if gross_mol <= _EPS:
+        return 0.0
+    excluded_mol = _initial_denominator_non_feedstock_reagent_element_mol(
+        element,
+        initial_cleaned_melt_kg,
+        queries,
+        gross_mol,
+    )
+    if math.isinf(excluded_mol):
+        raise CompletionContractBlocked(
+            f"unclean additive/reagent provenance for {element}: "
+            "denominator reagent surface is not finite"
+        )
+    return max(0.0, gross_mol - min(gross_mol, excluded_mol))
+
+
+def _initial_denominator_non_feedstock_reagent_element_mol(
+    element: str,
+    initial_cleaned_melt_kg: Mapping[str, Any],
+    queries: Any,
+    gross_denominator_mol: float,
+) -> float:
+    tagged_mol = _strict_non_feedstock_reagent_element_mol(
+        element,
+        queries,
+        accounts=(_TARGET_YIELD_DENOMINATOR_ACCOUNT,),
+        gross_product_target_equiv_mol=gross_denominator_mol,
+    )
+    if tagged_mol > _EPS:
+        return tagged_mol
+    direct_initial_mol = _species_mol(
+        element,
+        initial_cleaned_melt_kg.get(element, 0.0),
+    )
+    if direct_initial_mol <= _EPS:
+        return 0.0
+    credit_mol = _species_mol(
+        element,
+        _credit_line_reagent_kg(element, queries),
+    )
+    additive_mol = _external_unspent_additive_reagent_element_mol(element, queries)
+    if math.isinf(credit_mol) or math.isinf(additive_mol):
+        return math.inf
+    return min(direct_initial_mol, credit_mol + additive_mol)
 
 
 def _strict_non_feedstock_reagent_element_mol(
