@@ -94,6 +94,33 @@ C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: KeyPath = tuple(
     "campaigns.C2A_staged.depletion_flux_decay_fraction".split(".")
 )
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
+C3_ALKALI_DOSING_NA_KG_PATH: KeyPath = tuple(
+    "campaigns.C3.alkali_dosing.Na_kg".split(".")
+)
+C3_ALKALI_DOSING_K_KG_PATH: KeyPath = tuple(
+    "campaigns.C3.alkali_dosing.K_kg".split(".")
+)
+C3_ALKALI_DOSING_NA_HIGH_KG = 140.0
+C3_ALKALI_DOSING_K_HIGH_KG = 56.0
+# Deadband exists only so continuous samplers can reach OFF; keep it well
+# below physically meaningful C3 shuttle doses.
+C3_ALKALI_DOSING_ZERO_LEVEL_FRACTION = 0.01
+C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH: Mapping[KeyPath, float] = MappingProxyType(
+    {
+        C3_ALKALI_DOSING_NA_KG_PATH: (
+            C3_ALKALI_DOSING_NA_HIGH_KG * C3_ALKALI_DOSING_ZERO_LEVEL_FRACTION
+        ),
+        C3_ALKALI_DOSING_K_KG_PATH: (
+            C3_ALKALI_DOSING_K_HIGH_KG * C3_ALKALI_DOSING_ZERO_LEVEL_FRACTION
+        ),
+    }
+)
+C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES: Mapping[str, float] = MappingProxyType(
+    {
+        "Na": C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[C3_ALKALI_DOSING_NA_KG_PATH],
+        "K": C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[C3_ALKALI_DOSING_K_KG_PATH],
+    }
+)
 C2A_STAGED_STAGE_NAMES: tuple[str, ...] = (
     "alkali_early_fe",
     "sio_window",
@@ -485,12 +512,12 @@ class RecipeSchema:
         ),
         _knob(
             "campaigns.C2A_staged.depletion_flux_decay_fraction",
-            low=C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
+            low=0.0,
             high=0.50,
             units="fraction",
             bounds_source=(
-                "engineering_envelope: disabled at 0.0; enabled optimizer "
-                "range floors positive values to 0.01"
+                "engineering_envelope: disabled band [0.0, 0.01) "
+                "canonicalizes to fixed schedule; enabled values floor to 0.01"
             ),
         ),
         _knob(
@@ -722,21 +749,22 @@ class RecipeSchema:
         _knob(
             "campaigns.C3.alkali_dosing.Na_kg",
             low=0.0,
-            high=140.0,
+            high=C3_ALKALI_DOSING_NA_HIGH_KG,
             units="kg",
             bounds_source=(
-                "engineering_envelope from disabled=0 plus "
+                "engineering_envelope from disabled band <=7 kg plus "
                 "setpoints:campaigns.C3.Na_phase.Na_total_kg high bound"
             ),
         ),
         _knob(
             "campaigns.C3.alkali_dosing.K_kg",
             low=0.0,
-            high=56.0,
+            high=C3_ALKALI_DOSING_K_HIGH_KG,
             units="kg",
             bounds_source=(
-                "engineering_envelope from setpoints:campaigns.C3."
-                "K_phase.K_per_cycle_kg high bound over two cycles"
+                "engineering_envelope from disabled band <=2.8 kg plus "
+                "setpoints:campaigns.C3.K_phase.K_per_cycle_kg high bound "
+                "over two cycles"
             ),
         ),
         _knob(
@@ -1153,9 +1181,10 @@ class RecipeSchema:
     def to_setpoints_patch(self, patch: "RecipePatch") -> dict[str, Any]:
         """Validate then render the optimizer-facing setpoints patch."""
         validated = patch.validated(self)
+        canonical_values = _canonical_recipe_values(validated.values)
         runtime_values = {
             path: value
-            for path, value in validated.values.items()
+            for path, value in canonical_values.items()
             if self.spec_for(path).runtime_enabled
         }
         return _setpoints_patch_from_runtime_values(runtime_values)
@@ -1645,7 +1674,7 @@ class RecipePatch:
         return hashlib.sha256(payload).hexdigest()
 
     def canonical_json(self) -> str:
-        values = _canonical_o2_bubbler_recipe_values(self.values)
+        values = _canonical_recipe_values(self.values)
         entries = [
             {"path": list(path), "value": _normalize_value(value)}
             for path, value in sorted(values.items())
@@ -1663,6 +1692,49 @@ def _identity_float(value: Any) -> float | None:
     if not math.isfinite(result):
         return None
     return result
+
+
+def _canonical_c3_alkali_dosing_recipe_values(
+    values: Mapping[KeyPath, Any],
+) -> dict[KeyPath, Any]:
+    canonical = dict(values)
+    for path, zero_level_kg in C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH.items():
+        if path not in canonical:
+            continue
+        dose_kg = _identity_float(canonical[path])
+        if dose_kg is None:
+            continue
+        if dose_kg <= zero_level_kg:
+            canonical.pop(path, None)
+        else:
+            canonical[path] = dose_kg
+    return canonical
+
+
+def _canonical_recipe_values(values: Mapping[KeyPath, Any]) -> dict[KeyPath, Any]:
+    return _canonical_o2_bubbler_recipe_values(
+        _canonical_c3_alkali_dosing_recipe_values(
+            _canonical_c2a_staged_depletion_flux_decay_recipe_values(values)
+        )
+    )
+
+
+def _canonical_c2a_staged_depletion_flux_decay_recipe_values(
+    values: Mapping[KeyPath, Any],
+) -> dict[KeyPath, Any]:
+    canonical = dict(values)
+    if C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH not in canonical:
+        return canonical
+    fraction = _identity_float(
+        canonical[C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH]
+    )
+    if fraction is None:
+        return canonical
+    if 0.0 <= fraction < C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR:
+        canonical[C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH] = 0.0
+    else:
+        canonical[C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH] = fraction
+    return canonical
 
 
 def _canonical_o2_bubbler_recipe_values(

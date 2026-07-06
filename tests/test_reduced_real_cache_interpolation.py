@@ -168,6 +168,49 @@ def test_linear_interpolation_brackets_temperature() -> None:
     assert payload["equilibrium_result"]["vapor_pressures_Pa"]["SiO"] == pytest.approx(8.0)
 
 
+def test_interpolation_reports_weighted_neighbor_operating_point() -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    query["controls"]["pressure_bar"] = 0.01
+    query["controls"]["log_fO2"] = -12.0
+    low_payload = _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0)
+    high_payload = _interpolation_payload(liquid_fraction=0.9, sio_pa=9.0)
+    low_payload["equilibrium_result"]["temperature_C"] = 900.0
+    low_payload["equilibrium_result"]["pressure_bar"] = 0.5
+    low_payload["equilibrium_result"]["fO2_log"] = -8.0
+    high_payload["equilibrium_result"]["temperature_C"] = 1100.0
+    high_payload["equilibrium_result"]["pressure_bar"] = 1.5
+    high_payload["equilibrium_result"]["fO2_log"] = -6.0
+    neighbors = [
+        _candidate(
+            _interpolation_key("low", feo_fraction=0.20, temperature_K=1400.0),
+            low_payload,
+        ),
+        _candidate(
+            _interpolation_key("high", feo_fraction=0.20, temperature_K=1600.0),
+            high_payload,
+        ),
+    ]
+
+    payload = rci.interpolate_equilibrium_payload(
+        query,
+        neighbors,
+        weights=[0.5, 0.5],
+    )
+    result = payload["equilibrium_result"]
+
+    assert result["temperature_C"] == pytest.approx(1000.0)
+    assert result["pressure_bar"] == pytest.approx(1.0)
+    assert result["fO2_log"] == pytest.approx(-7.0)
+    assert result["status"] == "out_of_domain"
+    assert result["diagnostics"]["operating_point_clamped"] is True
+    assert result["diagnostics"]["requested_fO2_log"] == -12.0
+    assert result["diagnostics"]["solved_fO2_log"] == pytest.approx(-7.0)
+    assert (
+        result["diagnostics"]["authoritative_for_requested_conditions"]
+        is False
+    )
+
+
 def test_validity_gate_refuses_phase_assemblage_mismatch() -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
     neighbors = [

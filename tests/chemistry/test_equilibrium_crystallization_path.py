@@ -146,7 +146,7 @@ def test_table_builder_clamps_small_engine_noise_but_rejects_gross_nonmonotone()
     assert any('non-monotone frac_M' in warning for warning in failed.warnings)
 
 
-def test_table_builder_smooths_magemin_scale_nonmonotone_dip():
+def test_table_builder_refuses_magemin_scale_nonmonotone_dip():
     # 0.09 / 0.33 / 0.05 MAGEMin frac_M dips were observed in the
     # 2026-05-26 freeze-gate flip blast-radius on lunar/mars C2A cases.
     fractions = {
@@ -172,15 +172,9 @@ def test_table_builder_smooths_magemin_scale_nonmonotone_dip():
         monotonicity_tolerance=0.02,
     )
 
-    assert result.status == 'ok'
-    path = {p.temperature_C: p.liquid_fraction for p in result.liquid_fraction_path}
-    assert path[1300.0] == pytest.approx(0.98075)
-    assert path[1500.0] == pytest.approx(1.0)
-    assert path[1550.0] == pytest.approx(1.0)
-    assert any('smoothed non-monotone frac_M' in w for w in result.warnings)
-    assert any('1300.000 C raw 0.890898' in w for w in result.warnings)
-    assert any('1500.000 C raw 0.670427' in w for w in result.warnings)
-    assert any('1550.000 C raw 0.945697' in w for w in result.warnings)
+    assert result.status == 'not_converged'
+    assert any('non-monotone frac_M' in w for w in result.warnings)
+    assert any('would require smoothing' in w for w in result.warnings)
 
 
 class _FakeECAlphaMELTSBackend:

@@ -614,17 +614,26 @@ class ResultStore:
 
 def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
     failure_category = row["failure_category"]
+    failure = FailureCategory(failure_category) if failure_category is not None else None
+    margins = _deserialize_grounding_margins(row["feasibility_margins"])
+    feasible = grounded_result_feasible(
+        bool(row["feasible"]),
+        failure_category=failure,
+        margins=margins,
+    )
+    objectives = _deserialize_objectives(_json_load(row["objectives"]))
     return ScoredResult(
         candidate_id=row["candidate_id"],
         eval_spec=_deserialize_eval_spec(_json_load(row["eval_spec"])),
         cache_key=row["cache_key"],
-        feasible=bool(row["feasible"]),
-        failure_category=(
-            FailureCategory(failure_category) if failure_category is not None else None
+        feasible=feasible,
+        failure_category=failure,
+        objectives=objectives if feasible else None,
+        feasibility_margins=margins,
+        failing_gates=grounded_failing_gates(
+            tuple(_json_load(row["failing_gates"])),
+            margins=margins,
         ),
-        objectives=_deserialize_objectives(_json_load(row["objectives"])),
-        feasibility_margins=_deserialize_margins(_json_load(row["feasibility_margins"])),
-        failing_gates=tuple(_json_load(row["failing_gates"])),
         run_reference=_deserialize_run_reference(
             _json_load(row["run_reference"]),
             _json_load(row["result_blob"]),
@@ -647,6 +656,66 @@ def _validate_result_artifact(eval_spec: EvalSpec, scored_result: ScoredResult) 
         raise ValueError("result artifact missing feasibility_margins")
     if _artifact_backend_status(scored_result) is None:
         raise ValueError("result artifact missing backend_status")
+
+
+def grounded_result_feasible(
+    stored_feasible: bool,
+    *,
+    failure_category: FailureCategory | str | None,
+    margins: Mapping[str, GateMargin],
+) -> bool:
+    """Re-derive feasible from grounded margins, failing closed for legacy gaps.
+
+    SC-42 intentionally drops legacy/corrupt rows with stored feasible=1 but
+    missing, empty, or malformed feasibility_margins from feasible surfaces.
+    Stored-infeasible rows without re-derivable margins remain infeasible.
+    """
+
+    if failure_category not in (None, ""):
+        return False
+    if margins:
+        return all(bool(margin.feasible) for margin in margins.values())
+    return False
+
+
+def grounded_failing_gates(
+    stored_failing_gates: Sequence[str],
+    *,
+    margins: Mapping[str, GateMargin],
+) -> tuple[str, ...]:
+    if margins:
+        return tuple(
+            str(gate)
+            for gate, margin in margins.items()
+            if not bool(margin.feasible)
+        )
+    return tuple(str(gate) for gate in stored_failing_gates)
+
+
+def reground_scored_result(scored_result: ScoredResult) -> ScoredResult:
+    feasible = grounded_result_feasible(
+        scored_result.feasible,
+        failure_category=scored_result.failure_category,
+        margins=scored_result.feasibility_margins,
+    )
+    failing_gates = grounded_failing_gates(
+        scored_result.failing_gates,
+        margins=scored_result.feasibility_margins,
+    )
+    if feasible == scored_result.feasible and failing_gates == scored_result.failing_gates:
+        return scored_result
+    return ScoredResult(
+        candidate_id=scored_result.candidate_id,
+        eval_spec=scored_result.eval_spec,
+        cache_key=scored_result.cache_key,
+        feasible=feasible,
+        failure_category=None if feasible else scored_result.failure_category,
+        objectives=scored_result.objectives if feasible else None,
+        feasibility_margins=scored_result.feasibility_margins,
+        failing_gates=failing_gates,
+        run_reference=scored_result.run_reference,
+        notes=scored_result.notes,
+    )
 
 
 def _assert_cache_write_admissible(scored_result: ScoredResult) -> None:
@@ -1165,11 +1234,20 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
             if isinstance(item.get("status_payload", {}), Mapping)
             else {}
         )
+        observed_value = _decode_json_number(item["observed"], f"{gate}.observed")
+        threshold_value = float(threshold["value"])
+        threshold_tolerance = float(threshold.get("tolerance", 0.0))
+        feasible_value = bool(item["feasible"])
         if gate_name == "coating":
             grounded_authority = _coating_margin_grounded_authority(status_payload)
             if grounded_authority is not None:
                 authoritative_value = bool(
                     grounded_authority.get("authoritative_for_coating", False)
+                )
+                feasible_value = (
+                    observed_value >= threshold_value - threshold_tolerance
+                    if authoritative_value
+                    else True
                 )
                 status_value = "available" if authoritative_value else "warning"
                 output_status = str(
@@ -1184,17 +1262,17 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
                 status_payload = _jsonable(grounded_authority)
         margins[str(gate)] = GateMargin(
             gate=gate_name,
-            feasible=bool(item["feasible"]),
+            feasible=feasible_value,
             margin=_decode_json_number(item["margin"], f"{gate}.margin"),
             threshold=ThresholdSpec(
                 id=str(threshold["id"]),
-                value=float(threshold["value"]),
+                value=threshold_value,
                 units=str(threshold["units"]),
                 source=threshold["source"],
                 source_ref=str(threshold["source_ref"]),
-                tolerance=float(threshold.get("tolerance", 0.0)),
+                tolerance=threshold_tolerance,
             ),
-            observed=_decode_json_number(item["observed"], f"{gate}.observed"),
+            observed=observed_value,
             detail=str(item["detail"]),
             status=status_value,
             authoritative=authoritative_value,
@@ -1203,6 +1281,19 @@ def _deserialize_margins(payload: Mapping[str, Mapping[str, Any]]) -> dict[str, 
             status_payload=status_payload,
         )
     return margins
+
+
+def _deserialize_grounding_margins(payload: Any) -> dict[str, GateMargin]:
+    try:
+        decoded = _json_load(payload) if isinstance(payload, str) else payload
+    except (TypeError, ValueError):
+        return {}
+    if not isinstance(decoded, Mapping):
+        return {}
+    try:
+        return _deserialize_margins(decoded)
+    except (KeyError, TypeError, ValueError):
+        return {}
 
 
 def _coating_margin_grounded_authority(

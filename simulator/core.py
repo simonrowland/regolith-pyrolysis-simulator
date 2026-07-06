@@ -5943,9 +5943,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return self._record_equilibrium_status(self._stub_equilibrium())
         if transition is not None:
             self._validate_backend_ledger_transition(transition)
+            balances_before = self.atom_ledger.kg_by_account()
             self._require_chem_kernel().commit_validated_transition(
                 ChemistryIntent.BACKEND_EQUILIBRIUM,
                 transition,
+            )
+            self._observe_reagent_provenance_transition(
+                transition,
+                balances_before,
             )
             self._project_cleaned_melt_from_atom_ledger()
         return self._record_equilibrium_status(result)
@@ -6127,9 +6132,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         kernel_vp = diagnostic.get('vapor_pressures_Pa') or {}
         if kernel_vp:
             kernel_source = self._kernel_vapor_pressure_source(diagnostic)
+            kernel_sources = diagnostic.get('vapor_pressures_source')
+            if not isinstance(kernel_sources, Mapping):
+                kernel_sources = {}
             merged_vp = dict(kernel_vp)
             merged_sources = {
-                str(species): kernel_source
+                str(species): str(
+                    kernel_sources.get(species)
+                    or kernel_sources.get(str(species))
+                    or kernel_source
+                )
                 for species in merged_vp
             }
             thermoengine_confirmed = []
@@ -6259,8 +6271,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         provider = diagnostic.get('kernel_fallback_used')
         if provider == 'builtin-vapor-pressure':
             return 'builtin_fallback'
-        if 'vapor_pressures_source' in diagnostic:
-            return 'builtin_authoritative'
+        sources = diagnostic.get('vapor_pressures_source')
+        if isinstance(sources, Mapping):
+            labels = {str(source) for source in sources.values() if source}
+            if len(labels) == 1:
+                return next(iter(labels))
         if 'vaporock_full_speciation_Pa' in diagnostic:
             return 'vaporock'
         return 'kernel_diagnostic'

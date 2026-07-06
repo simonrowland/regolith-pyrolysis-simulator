@@ -13,6 +13,8 @@ from typing import Any
 APPROVED_LIVE_VAPOR_SOURCES = frozenset({"builtin_authoritative"})
 VAPOR_ACTIVE_CAMPAIGN_PREFIXES = ("C2A", "C2B", "C4")
 _PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
+_PSEUDO_VAPOROCK_CURVE_FIT_SOURCE = "vaporock_backsolved_curve_fit"
+_PSEUDO_VAPOROCK_CURVE_FIT_SUFFIX = "backsolved_vaporock_curve_fit"
 STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS = frozenset(
     {
         "lunar_highland",
@@ -603,7 +605,10 @@ def _truthy(value: Any) -> bool:
 
 
 def _source_authority(source: Any) -> str:
-    head = str(source or "").split(":", 1)[0]
+    parts = str(source or "").split(":")
+    if _PSEUDO_VAPOROCK_CURVE_FIT_SUFFIX in parts[1:]:
+        return _PSEUDO_VAPOROCK_CURVE_FIT_SOURCE
+    head = parts[0]
     if head == "builtin-vapor-pressure":
         return "builtin_authoritative"
     return head

@@ -206,12 +206,19 @@ def test_builtin_authority_dispatches_even_when_vaporock_available(
     assert "kernel_fallback_used" not in diagnostic
     sources = dict(diagnostic.get("vapor_pressures_source") or {})
     assert sources
-    authoritative_species = {"Cr", "Fe", "K", "Mn", "Na", "SiO"}
+    authoritative_species = {"Cr", "Fe", "K", "Mn", "Na"}
+    pseudo_vaporock_species = {"SiO"}
     limited_species = {"Al", "Ca", "Mg", "Ti"}
     assert authoritative_species.issubset(sources)
+    assert pseudo_vaporock_species.issubset(sources)
     assert limited_species.issubset(sources)
     for species in authoritative_species:
         assert sources[species].startswith("builtin_authoritative:")
+    for species in pseudo_vaporock_species:
+        assert sources[species] == (
+            "vaporock_backsolved_curve_fit:"
+            "backsolved_vaporock_curve_fit"
+        )
     for species in limited_species:
         assert sources[species].startswith("builtin_extrapolation_limited:")
         assert "builtin_authoritative" not in sources[species]
@@ -324,7 +331,13 @@ def test_non_authoritative_vaporock_empty_output_does_not_trip_core_guard(
     result = sim._get_equilibrium()
 
     assert result.vapor_pressures_Pa
-    assert set(result.vapor_pressures_source.values()) == {"builtin_authoritative"}
+    sources = set(result.vapor_pressures_source.values())
+    assert "vaporock" not in sources
+    assert (
+        "vaporock_backsolved_curve_fit:"
+        "backsolved_vaporock_curve_fit"
+    ) in sources
+    assert any(source.startswith("builtin_authoritative") for source in sources)
     diagnostic = dict(sim._last_vapor_pressure_diagnostic or {})
     assert diagnostic.get("vapor_pressures_Pa")
     assert diagnostic.get("vapor_pressures_source")

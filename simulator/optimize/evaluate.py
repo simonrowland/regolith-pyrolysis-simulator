@@ -1719,7 +1719,7 @@ def _canonical_mre_voltage_cap(cap: float) -> float:
     Threshold is derived (min_decomposition_voltage) so it tracks ladder changes.
     """
     cap = float(cap or 0.0)
-    if cap <= 0.0:
+    if not math.isfinite(cap) or cap <= 0.0:
         return 0.0
     if cap < min_decomposition_voltage():
         return 0.0

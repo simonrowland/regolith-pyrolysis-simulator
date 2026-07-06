@@ -153,7 +153,6 @@ def find_liquidus_solidus_by_fraction(
             samples,
             tolerance=monotonicity_tolerance,
             smoothing_max=monotone_smoothing_max,
-            warnings=smoothing_warnings,
         )
         samples.append(point)
         samples.sort(key=lambda p: p.temperature_C)
@@ -292,7 +291,6 @@ def build_equilibrium_crystallization_path(
                 samples,
                 tolerance=monotonicity_tolerance,
                 smoothing_max=monotone_smoothing_max,
-                warnings=smoothing_warnings,
             )
             samples.append(fraction_point)
             samples.sort(key=lambda p: p.temperature_C)
@@ -380,7 +378,6 @@ def _monotone_point(
     *,
     tolerance: float,
     smoothing_max: float,
-    warnings: list[str],
 ) -> MeltFractionSample:
     lower = [p for p in samples if p.temperature_C < point.temperature_C]
     upper = [p for p in samples if p.temperature_C > point.temperature_C]
@@ -395,19 +392,13 @@ def _monotone_point(
                 f'{low.temperature_C:.3f} C value {low.frac_M:.6g}'
             )
         if drop > tolerance:
-            warnings.append(
-                _smoothing_warning(
-                    point.temperature_C,
-                    raw=frac,
-                    clamped=low.frac_M,
-                    magnitude=drop,
-                    direction='below',
-                    reference=low,
-                )
+            raise RuntimeError(
+                'non-monotone frac_M(T) would require smoothing: '
+                f'{point.temperature_C:.3f} C gives raw {frac:.6g} below '
+                f'{low.temperature_C:.3f} C value {low.frac_M:.6g}'
             )
-        # Three bands: tiny engine jitter stays silent, moderate MAGEMin
-        # dips smooth to the physical cummax envelope, gross drops still trip
-        # the engine-broken canary.
+        # Tiny engine jitter stays silent; material non-monotone dips fail
+        # closed instead of being consumed as bracket points.
         frac = max(frac, low.frac_M)
     if upper:
         high = min(upper, key=lambda p: p.temperature_C)
@@ -419,35 +410,13 @@ def _monotone_point(
                 f'{high.temperature_C:.3f} C value {high.frac_M:.6g}'
             )
         if rise > tolerance:
-            warnings.append(
-                _smoothing_warning(
-                    point.temperature_C,
-                    raw=frac,
-                    clamped=high.frac_M,
-                    magnitude=rise,
-                    direction='above',
-                    reference=high,
-                )
+            raise RuntimeError(
+                'non-monotone frac_M(T) would require smoothing: '
+                f'{point.temperature_C:.3f} C gives raw {frac:.6g} above '
+                f'{high.temperature_C:.3f} C value {high.frac_M:.6g}'
             )
         frac = min(frac, high.frac_M)
     return MeltFractionSample(point.temperature_C, frac)
-
-
-def _smoothing_warning(
-    temperature_C: float,
-    *,
-    raw: float,
-    clamped: float,
-    magnitude: float,
-    direction: str,
-    reference: MeltFractionSample,
-) -> str:
-    return (
-        'smoothed non-monotone frac_M(T): '
-        f'{temperature_C:.3f} C raw {raw:.6g} clamped to {clamped:.6g}; '
-        f'delta={magnitude:.6g} {direction} '
-        f'{reference.temperature_C:.3f} C value {reference.frac_M:.6g}'
-    )
 
 
 def _clamp_fraction(value: float) -> float:

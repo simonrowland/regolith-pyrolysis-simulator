@@ -71,7 +71,7 @@ def test_liquidus_finder_is_deterministic():
     assert first == second
 
 
-def test_liquidus_finder_smooths_magemin_scale_nonmonotone_dip():
+def test_liquidus_finder_refuses_magemin_scale_nonmonotone_dip():
     # 0.09 / 0.33 / 0.05 MAGEMin frac_M dips were observed in the
     # 2026-05-26 freeze-gate flip blast-radius on lunar/mars C2A cases.
     result = find_liquidus_solidus_by_fraction(
@@ -94,14 +94,11 @@ def test_liquidus_finder_smooths_magemin_scale_nonmonotone_dip():
         tolerance_C=1.0,
     )
 
-    assert result.status == 'ok'
-    assert result.solidus_T_C is not None
-    assert result.liquidus_T_C is not None
-    assert result.liquidus_T_C >= result.solidus_T_C
-    assert any('smoothed non-monotone frac_M' in w for w in result.warnings)
-    assert any('1300.000 C raw 0.890898' in w for w in result.warnings)
-    assert any('1500.000 C raw 0.670427' in w for w in result.warnings)
-    assert any('1550.000 C raw 0.945697' in w for w in result.warnings)
+    assert result.status == 'not_converged'
+    assert result.solidus_T_C is None
+    assert result.liquidus_T_C is None
+    assert any('non-monotone frac_M' in w for w in result.warnings)
+    assert any('would require smoothing' in w for w in result.warnings)
 
 
 def test_liquidus_finder_guards_non_monotone_fraction_curve():

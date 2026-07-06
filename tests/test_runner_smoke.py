@@ -29,13 +29,20 @@ from pathlib import Path
 
 import pytest
 
-from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    C3_ALKALI_DOSING_K_KG_PATH,
+    C3_ALKALI_DOSING_NA_KG_PATH,
+    C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH,
+    RecipePatch,
+    RecipeSchema,
+)
 from simulator.run_executor import RunExecutor
 from simulator.runner import (
     NOT_APPLICABLE_UNTIL_P0,
     PyrolysisRun,
     RUNNER_SCHEMA_VERSION,
     RunnerError,
+    _c3_alkali_dosing_kg_by_species,
 )
 
 
@@ -266,6 +273,45 @@ def test_c3_alkali_recipe_dose_routes_to_credit_line_not_additives():
     assert undosed["run_metadata"]["additives_kg"] == {}
 
 
+def test_c3_alkali_dose_deadband_does_not_route_tiny_continuous_draws():
+    setpoints = {
+        "campaigns": {
+            "C3": {
+                "alkali_dosing": {
+                    "Na_kg": 1e-12,
+                    "K_kg": C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[
+                        C3_ALKALI_DOSING_K_KG_PATH
+                    ],
+                }
+            }
+        }
+    }
+    active_setpoints = {
+        "campaigns": {
+            "C3": {
+                "alkali_dosing": {
+                    "Na_kg": (
+                        C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[
+                            C3_ALKALI_DOSING_NA_KG_PATH
+                        ]
+                        + 0.01
+                    )
+                }
+            }
+        }
+    }
+
+    assert _c3_alkali_dosing_kg_by_species(setpoints) == {}
+    assert _c3_alkali_dosing_kg_by_species(active_setpoints) == {
+        "Na": pytest.approx(
+            C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[
+                C3_ALKALI_DOSING_NA_KG_PATH
+            ]
+            + 0.01
+        )
+    }
+
+
 def test_c3_alkali_dosing_conflict_fail_loud():
     """CONFLICT: explicit additives_kg and C3 alkali_dosing must not disagree."""
     schema = RecipeSchema()
@@ -448,13 +494,20 @@ def _assert_schema_shape(payload: dict) -> None:
     assert source_report["total_species"] == len(source_report["species"])
     for species, source in source_report["species"].items():
         assert isinstance(species, str)
-        assert source in {
+        # Per-species sources carry a colon-suffixed evidence detail after the
+        # SC-05 label-honesty fix (e.g. "builtin_authoritative:standard_reaction_term",
+        # "vaporock_backsolved_curve_fit:backsolved_vaporock_curve_fit",
+        # "builtin_extrapolation_limited:..."). The contract pins the CLASS
+        # prefix, not the exact suffixed string.
+        assert source.split(":", 1)[0] in {
             "thermoengine",
             "alphamelts_python_api",
             "alphamelts_text",
             "vaporock",
+            "vaporock_backsolved_curve_fit",
             "builtin_fallback",
             "builtin_authoritative",
+            "builtin_extrapolation_limited",
             "kernel_diagnostic",
         }
     for source, item in source_report["summary"].items():

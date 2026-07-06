@@ -196,9 +196,9 @@ def _applied_trace_value(path: KeyPath, value: Any) -> Any:
         return value
     if not math.isfinite(fraction) or fraction < 0.0:
         return value
-    if fraction <= 0.0:
+    if fraction < C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR:
         return 0.0
-    return max(fraction, C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR)
+    return fraction
 
 
 def _same_trace_value(left: Any, right: Any) -> bool:

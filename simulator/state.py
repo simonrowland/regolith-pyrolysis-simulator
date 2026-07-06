@@ -1117,7 +1117,7 @@ class HourSnapshot:
     #   - ``knudsen_regime`` (str): ``viscous`` / ``transition`` /
     #     ``free_molecular``
     #   - ``regime_factor`` (float): the F3 viscous-flow attenuation
-    #     factor (1 → pure viscous; 0 → pure ballistic)
+    #     factor (0 → pure viscous; 1 → pure ballistic/free-molecular)
     #   - ``warnings`` (tuple[str, ...]): operator-facing strings
     #     when Kn approaches the boundary (e.g., ``Kn=5e-3 near the
     #     0.01 viscous-flow cutoff``); empty when state is clean

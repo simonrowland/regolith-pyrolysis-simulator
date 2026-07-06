@@ -1485,6 +1485,59 @@ def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):
     )
 
 
+def test_magemin_configured_named_buffer_marks_requested_fo2_out_of_domain(
+    monkeypatch,
+):
+    captured: dict = {}
+
+    class FakeCompleted:
+        returncode = 0
+        stderr = ""
+        stdout = "Phase : liq mw\nMode  : 1.000 0.000\n"
+
+    def fake_subprocess_run(args, **kwargs):
+        captured["args"] = list(args)
+        return FakeCompleted()
+
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda explicit: Path("/fake/MAGEMin")),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("subprocess", None),
+    )
+    import simulator.melt_backend.magemin as magemin_module
+    monkeypatch.setattr(
+        magemin_module.subprocess, "run", fake_subprocess_run
+    )
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        backend.initialize({"fO2_buffer": "mw"})
+
+    result = backend.equilibrate(
+        1450.0,
+        composition_mol={"SiO2": 5.0, "MgO": 3.0},
+        fO2_log=-12.0,
+        pressure_bar=1e-6,
+    )
+
+    assert any(arg == "--buffer=mw" for arg in captured["args"])
+    assert any(arg == "--buffer_n=0.000000" for arg in captured["args"])
+    assert result.status == "out_of_domain"
+    assert result.fO2_log == -12.0
+    assert result.diagnostics["operating_point_clamped"] is True
+    assert result.diagnostics["fO2_clamped"] is True
+    assert result.diagnostics["requested_fO2_log"] == -12.0
+    assert result.diagnostics["solved_fO2_log"] is None
+    assert result.diagnostics["applied_fO2_buffer"] == "mw"
+    assert result.diagnostics["authoritative_for_requested_conditions"] is False
+
+
 def test_magemin_resolve_buffer_qfm_calibration_at_1450C():
     # Pin the O'Neill 1987 calibration math: at T = 1450 C (T_K = 1723.15),
     # logfo2_QFM should be ~-5.96. The conversion is load-bearing for the

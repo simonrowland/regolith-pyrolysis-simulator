@@ -10,8 +10,15 @@ from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import EquilibriumResult
 
 
-def _sim_with_vapor_dispatch(vapor_pressures: dict[str, float]):
+def _sim_with_vapor_dispatch(
+    vapor_pressures: dict[str, float],
+    vapor_sources: dict[str, str] | None = None,
+):
     calls = []
+    source_by_species = vapor_sources or {
+        species: 'builtin_authoritative'
+        for species in vapor_pressures
+    }
 
     def _dispatch_only(intent, **kwargs):
         calls.append((intent, kwargs))
@@ -20,10 +27,7 @@ def _sim_with_vapor_dispatch(vapor_pressures: dict[str, float]):
             status='ok',
             diagnostic={
                 'vapor_pressures_Pa': dict(vapor_pressures),
-                'vapor_pressures_source': {
-                    species: 'builtin_authoritative'
-                    for species in vapor_pressures
-                },
+                'vapor_pressures_source': dict(source_by_species),
             },
         )
 
@@ -166,6 +170,32 @@ def test_authoritative_vapor_pressure_liquid_present_dispatch_unchanged():
     assert [call[0] for call in calls] == [ChemistryIntent.VAPOR_PRESSURE]
     assert result.vapor_pressures_Pa == {'Na': pytest.approx(12.5)}
     assert result.vapor_pressures_source == {'Na': 'builtin_authoritative'}
+
+
+def test_kernel_refresh_preserves_per_species_source_labels():
+    source = (
+        'vaporock_backsolved_curve_fit:'
+        'backsolved_vaporock_curve_fit'
+    )
+    sim, calls = _sim_with_vapor_dispatch({'Na': 12.5}, {'Na': source})
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        phases_present=['liq', 'olivine'],
+        phase_masses_kg={'liq': 0.25, 'olivine': 0.75},
+        liquid_fraction=0.25,
+        vapor_pressures_Pa={'Na': 3.0},
+        vapor_pressures_source={'Na': 'backend_pre_kernel'},
+    )
+
+    PyrolysisSimulator._refresh_vapor_pressures_from_kernel(sim, result)
+
+    assert [call[0] for call in calls] == [ChemistryIntent.VAPOR_PRESSURE]
+    assert result.vapor_pressures_Pa == {'Na': pytest.approx(12.5)}
+    assert result.vapor_pressures_source == {'Na': source}
+    assert sim._last_vapor_pressure_diagnostic['vapor_pressures_source'] == {
+        'Na': source,
+    }
 
 
 def test_authoritative_vapor_pressure_vapor_only_none_does_not_zero_gate():

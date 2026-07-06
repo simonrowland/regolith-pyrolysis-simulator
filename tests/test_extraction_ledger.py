@@ -3,6 +3,8 @@ import shlex
 import pytest
 
 from engines.builtin.metallothermic_step import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
+from simulator.accounting import MaterialLot
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -47,6 +49,42 @@ def _run_session_script(lines: list[str]):
     for line in lines:
         runner.execute(shlex.split(line), line)
     return runner.session._sim
+
+
+def _sim_with_c7_al_credit():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Al oxide",
+                "composition_wt_pct": {"Al2O3": 100.0},
+            }
+        }
+    )
+    sim.load_batch("oxide", mass_kg=MOLAR_MASS["Al2O3"])
+    sim.atom_ledger.transfer(
+        "test_c7_al_credit",
+        debits=(
+            MaterialLot(
+                "process.cleaned_melt",
+                {"Al2O3": MOLAR_MASS["Al2O3"]},
+                source="test C7 credit source",
+            ),
+        ),
+        credits=(
+            MaterialLot(
+                C7_AL_CREDIT_ACCOUNT,
+                {"Al": 2.0 * MOLAR_MASS["Al"]},
+                source="test C7 Al credit",
+            ),
+            MaterialLot(
+                "process.overhead_gas",
+                {"O2": 1.5 * MOLAR_MASS["O2"]},
+                source="test C7 oxygen byproduct",
+            ),
+        ),
+        reason="seed elemental Al credit for read-side consumer tests",
+    )
+    return sim
 
 
 def _run_c2a_staged():
@@ -182,6 +220,24 @@ def _assert_product_matches_account(sim, account, species):
     account_kg = sim.atom_ledger.kg_by_account(account).get(species, 0.0)
     assert account_kg > 0.0
     assert sim.product_ledger()[species] == pytest.approx(account_kg)
+
+
+def test_product_ledger_includes_c7_al_credit():
+    sim = _sim_with_c7_al_credit()
+    al_credit_kg = sim.atom_ledger.kg_by_account(C7_AL_CREDIT_ACCOUNT)["Al"]
+
+    assert sim.product_ledger()["Al"] == pytest.approx(al_credit_kg)
+
+
+def test_rump_element_kg_includes_c7_al_credit():
+    sim = _sim_with_c7_al_credit()
+    al_credit_kg = sim.atom_ledger.kg_by_account(C7_AL_CREDIT_ACCOUNT)["Al"]
+
+    assert sim._rump_element_kg("Al") == pytest.approx(al_credit_kg)
+    assert sim._actual_rump_elements_kg()["Al"] == pytest.approx(al_credit_kg)
+    assert sum(sim._terminal_rump_by_class().values()) == pytest.approx(
+        al_credit_kg
+    )
 
 
 def test_c2a_staged_rump_expectation_keeps_ca_and_al():

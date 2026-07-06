@@ -158,7 +158,13 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # over-broad digest flagged on 2026-07-03 is now fixed). Deterministic (byte-
     # identical across runs) and PRODUCTION==default still hold; golden-neutral
     # (runner outputs unchanged) — only this cache-identity hash moved.
-    assert key_hash == "4515ccbca9c2ec443d631257736047bd74e46a87f876138a4b461a4ca051b8c3"
+    # 2026-07-06: rebaselined for the bug-hunt fix wave — the Na/K pure-Antoine
+    # `source:` provenance strings in data/vapor_pressures.yaml were corrected from
+    # the REF-002 compilation id to their primary ids (REF-041 Rodebush & Walters,
+    # REF-042 Fiock & Rodebush). Parsed-content digest moves on those metadata
+    # strings; verified the embedded formulas and every coefficient are unchanged.
+    # Provenance-only cache-identity move, not a physics move.
+    assert key_hash == "6417caf9722eb3b2e1039d2f02263374db20a6250bd23df78300bd0a6affaba8"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 

@@ -210,7 +210,8 @@ def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
             "HIGH-UNCERTAINTY WARNING: K vapor pressure uses a backsolved "
             "VapoRock fallback \\(curve-fit\\), NOT first-principles; "
             "residual_dex=1.4; confidence_tier=low; "
-            "builtin remains authoritative; VapoRock is diagnostic-only"
+            "builtin provider emits a VapoRock-derived curve-fit; "
+            "VapoRock runtime is diagnostic-only"
         ),
     ):
         first = provider.dispatch(request)
@@ -230,7 +231,10 @@ def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
         separators=(",", ":"),
     )
     assert first.diagnostic["vapor_pressures_source"] == {
-        "K": "builtin_authoritative:backsolved_vaporock_curve_fit"
+        "K": (
+            "vaporock_backsolved_curve_fit:"
+            "backsolved_vaporock_curve_fit"
+        )
     }
 
 

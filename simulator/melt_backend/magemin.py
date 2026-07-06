@@ -93,6 +93,7 @@ library is called.
 
 from __future__ import annotations
 
+import math
 import os
 import shutil
 import subprocess
@@ -474,11 +475,33 @@ class MAGEMinBackend(MeltBackend):
         # "Authority posture" note) — it is only valid for a shadow
         # comparator.
         all_warnings = [*prior_warnings, *bulk_projection.warnings]
+        result_status = 'ok'
+        result_fO2_log = fO2_log
+        result_diagnostics = dict(result_diagnostics)
         if isinstance(raw, dict):
             buffer_warnings = raw.get('buffer_warnings') or []
             for line in buffer_warnings:
                 if line not in all_warnings:
                     all_warnings.append(line)
+            operating_point = raw.get('operating_point_diagnostics') or {}
+            if isinstance(operating_point, Mapping):
+                result_diagnostics.update(dict(operating_point))
+                solved_fO2_log = operating_point.get('solved_fO2_log')
+                if solved_fO2_log is not None:
+                    result_fO2_log = float(solved_fO2_log)
+                requested_point_non_authoritative = (
+                    bool(operating_point.get('operating_point_clamped'))
+                    or operating_point.get(
+                        'authoritative_for_requested_conditions'
+                    ) is False
+                )
+                if requested_point_non_authoritative:
+                    result_status = 'out_of_domain'
+                    result_diagnostics['backend_status'] = 'out_of_domain'
+                    result_diagnostics.setdefault(
+                        'backend_status_reason',
+                        'clamped_operating_point',
+                    )
         (
             phases_present,
             phase_masses_kg,
@@ -489,13 +512,13 @@ class MAGEMinBackend(MeltBackend):
         result = EquilibriumResult(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
+            fO2_log=result_fO2_log,
             phases_present=phases_present,
             phase_masses_kg=phase_masses_kg,
             phase_compositions=phase_compositions,
             liquid_fraction=liquid_fraction,
             liquid_composition_wt_pct=liquid_composition_wt_pct,
-            status='ok',
+            status=result_status,
             warnings=all_warnings,
             diagnostics=result_diagnostics,
         )
@@ -1005,6 +1028,35 @@ class MAGEMinBackend(MeltBackend):
         buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
             temperature_C=temperature_C, fO2_log=fO2_log,
         )
+        solved_fO2_log: Optional[float]
+        if buffer_name == 'qfm':
+            solved_fO2_log = self._qfm_logfo2_oneill(temperature_C) + buffer_n
+        else:
+            solved_fO2_log = None
+        if solved_fO2_log is None:
+            fO2_clamped = True
+        else:
+            fO2_clamped = not math.isclose(
+                float(solved_fO2_log),
+                float(fO2_log),
+                rel_tol=0.0,
+                abs_tol=1.0e-9,
+            )
+        operating_point_diagnostics: Dict[str, Any] = {
+            'requested_fO2_log': float(fO2_log),
+            'applied_fO2_buffer': buffer_name,
+            'applied_fO2_buffer_n': float(buffer_n),
+            'solved_fO2_log': solved_fO2_log,
+            'fO2_clamped': fO2_clamped,
+            'authoritative_for_requested_conditions': not fO2_clamped,
+            'authoritative_for_solved_conditions': solved_fO2_log is not None,
+        }
+        if fO2_clamped:
+            operating_point_diagnostics.update({
+                'operating_point_clamped': True,
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': 'clamped_operating_point',
+            })
 
         args = [
             str(binary_path),
@@ -1050,7 +1102,11 @@ class MAGEMinBackend(MeltBackend):
             raise RuntimeError(
                 'MAGEMin binary produced no parseable Phase/Mode block'
             )
-        return {'phases': phases, 'buffer_warnings': buffer_warnings}
+        return {
+            'phases': phases,
+            'buffer_warnings': buffer_warnings,
+            'operating_point_diagnostics': operating_point_diagnostics,
+        }
 
     def _build_ig_bulk_vector(
         self, composition_wt_pct: Mapping[str, float]

@@ -73,6 +73,11 @@ def test_mre_off_switch_floor_tracks_runtime_ladder(monkeypatch) -> None:
     assert EVALUATE_MODULE._canonical_mre_voltage_cap(0.80) == pytest.approx(0.80)
 
 
+@pytest.mark.parametrize("cap", [float("nan"), float("inf"), float("-inf")])
+def test_mre_off_switch_rejects_nonfinite_caps(cap: float) -> None:
+    assert EVALUATE_MODULE._canonical_mre_voltage_cap(cap) == pytest.approx(0.0)
+
+
 def test_fixed_mre_ladder_excludes_ferric_full_reduction_rung() -> None:
     expected = [
         ("NiO", 0.39),

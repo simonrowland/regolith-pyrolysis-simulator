@@ -25,6 +25,8 @@ from simulator.optimize.results_store import (
     ResultStoreWriteRejected,
     SCHEMA_VERSION,
     _deserialize_margins,
+    _serialize_margins,
+    grounded_result_feasible,
 )
 from web.routes import _coating_readout
 
@@ -83,6 +85,30 @@ def _margin(
         ),
         observed=observed if observed is not None else (0.98 if feasible else 0.90),
         detail="test margin",
+    )
+
+
+def _coating_margin(
+    *,
+    feasible: bool,
+    observed: float = 1.0,
+    threshold: float = 10.0,
+    status_payload: Mapping[str, object] | None = None,
+) -> GateMargin:
+    return GateMargin(
+        gate="coating",
+        feasible=feasible,
+        margin=observed - threshold,
+        threshold=ThresholdSpec(
+            id="coating_min_campaigns_to_resinter",
+            value=threshold,
+            units="campaigns",
+            source="profile",
+            source_ref="test profile",
+        ),
+        observed=observed,
+        detail="coating test margin",
+        status_payload=status_payload or {},
     )
 
 
@@ -352,6 +378,51 @@ def test_lookup_deserializes_legacy_evalspec_digest_scope(tmp_path) -> None:
     )
 
 
+def test_deserialize_coating_margin_rederives_feasible_from_grounded_authority() -> None:
+    payload = _serialize_margins(
+        {
+            "coating": _coating_margin(
+                feasible=False,
+                status_payload={
+                    "deposited_species": ["SiO"],
+                    "authoritative_for_coating": True,
+                },
+            )
+        }
+    )
+
+    margins = _deserialize_margins(payload)
+
+    assert margins["coating"].authoritative is False
+    assert margins["coating"].feasible is True
+
+
+def test_lookup_rederives_stale_false_feasible_from_margins(tmp_path) -> None:
+    spec = _base_spec()
+    db_path = tmp_path / "results.sqlite"
+    store = ResultStore(
+        db_path,
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+    store.store(spec, _scored(spec), created_at="2026-06-18T00:00:00Z")
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            """
+            UPDATE results
+            SET feasible = 0, failing_gates = ?
+            WHERE cache_key = ?
+            """,
+            (json.dumps(["delivered_stream_purity"]), cache_key(spec)),
+        )
+
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.feasible is True
+    assert loaded.failing_gates == ()
+
+
 def test_strict_eval_spec_storage_omits_inactive_vapor_fallback_provider(tmp_path) -> None:
     spec = _base_spec(
         vapor_pressure_provider_id="vaporock",
@@ -565,6 +636,65 @@ def test_store_result_artifact_missing_required_fields_raise_named(
         store.store(spec, bad_result(spec), created_at="2026-01-01T00:00:00Z")
 
     assert store.lookup(spec) is None
+
+
+def test_grounded_result_feasible_fails_closed_without_rederivable_margins() -> None:
+    assert grounded_result_feasible(
+        True,
+        failure_category=None,
+        margins={},
+    ) is False
+    assert grounded_result_feasible(
+        False,
+        failure_category=None,
+        margins={},
+    ) is False
+    assert grounded_result_feasible(
+        False,
+        failure_category="",
+        margins={"delivered_stream_purity": _margin()},
+    ) is True
+    assert grounded_result_feasible(
+        True,
+        failure_category=None,
+        margins={"delivered_stream_purity": _margin(feasible=False)},
+    ) is False
+
+
+@pytest.mark.parametrize(
+    ("stored_feasible", "margins_payload"),
+    (
+        (1, "{malformed-json"),
+        (1, "{}"),
+        (1, '{"mass_balance":{"status":"legacy"}}'),
+        (0, "{}"),
+    ),
+)
+def test_lookup_fails_closed_for_ungroundable_feasibility_margins(
+    tmp_path,
+    stored_feasible: int,
+    margins_payload: str,
+) -> None:
+    spec = _base_spec(recipe_id=f"ungroundable-{stored_feasible}-{len(margins_payload)}")
+    store = ResultStore(tmp_path / "results.sqlite")
+    store.store(spec, _scored(spec), created_at="2026-01-01T00:00:00Z")
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        conn.execute(
+            """
+            UPDATE results
+            SET feasible = ?, failure_category = NULL, feasibility_margins = ?
+            WHERE cache_key = ?
+            """,
+            (stored_feasible, margins_payload, cache_key(spec)),
+        )
+
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.feasible is False
+    assert loaded.objectives is None
+    assert loaded.feasibility_margins == {}
 
 
 @pytest.mark.parametrize(

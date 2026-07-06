@@ -15,6 +15,7 @@ from simulator.coating_lifespan import (
     merge_run_snapshot,
     project_lifecycle,
 )
+from simulator.diagnostics import wall_deposit_sticking_authority_status
 
 
 MASS_BALANCE_CLOSURE_LIMIT_PCT = 5.0e-12
@@ -218,17 +219,13 @@ def _campaigns_total_from_artifact(
     if isinstance(explicit, Mapping):
         return CampaignsToResinterTotal(
             value=explicit.get("value", explicit.get("campaigns_to_resinter", "infinite")),
-            authoritative_for_resinter=bool(
-                explicit.get("authoritative_for_resinter", False)
-            ),
+            authoritative_for_resinter=_authoritative_for_resinter(snapshot),
         )
     report = _find_fouling_report(artifact.result_document)
     if report is not None:
         return CampaignsToResinterTotal(
             value=report.get("campaigns_to_resinter", "infinite"),
-            authoritative_for_resinter=bool(
-                report.get("authoritative_for_resinter", False)
-            ),
+            authoritative_for_resinter=_authoritative_for_resinter(snapshot),
         )
     return campaigns_to_resinter_total(
         snapshot.wall_deposit_by_segment_species_kg,
@@ -257,13 +254,16 @@ def _find_fouling_report(document: Mapping[str, Any] | None) -> Mapping[str, Any
 
 
 def _authoritative_for_resinter(snapshot: FoulingTerminalSnapshot) -> bool:
-    authority = snapshot.wall_deposit_sticking_authority
-    if not isinstance(authority, Mapping):
-        return False
-    for key in ("authoritative_for_resinter", "authoritative", "authoritative_for_coating"):
-        if key in authority:
-            return bool(authority[key])
-    return False
+    authority = (
+        snapshot.wall_deposit_sticking_authority
+        if isinstance(snapshot.wall_deposit_sticking_authority, Mapping)
+        else {}
+    )
+    grounded = wall_deposit_sticking_authority_status(
+        snapshot.wall_deposit_by_segment_species_kg,
+        authority,
+    )
+    return bool(grounded.get("authoritative_for_resinter", False))
 
 
 def _mass_balance_error_pct(artifact: FoulingRunArtifact) -> float | None:

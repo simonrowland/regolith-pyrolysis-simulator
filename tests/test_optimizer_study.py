@@ -6,6 +6,7 @@ from dataclasses import is_dataclass, fields, replace
 import json
 import math
 from pathlib import Path
+import sqlite3
 import subprocess
 import sys
 import time
@@ -1877,6 +1878,36 @@ def test_rerun_hits_cache_without_duplicating_rows(tmp_path) -> None:
     assert len(provenance) == 3
     assert all(row["cache_hit"] is True for row in provenance)
     assert len(_stored_rows(tmp_path)) == 3
+
+
+def test_rerun_cache_hit_rederives_stale_false_feasible_from_margins(tmp_path) -> None:
+    study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, tmp_path, seed=7, evaluator=_evaluator())
+    with sqlite3.connect(tmp_path / "cache.sqlite") as conn:
+        conn.execute(
+            """
+            UPDATE results
+            SET feasible = 0, failing_gates = ?
+            WHERE candidate_id = ?
+            """,
+            (json.dumps(["delivered_stream_purity"]), "random-7-000002"),
+        )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        3,
+        tmp_path,
+        seed=7,
+        evaluator=_evaluator(),
+    )
+
+    assert result.winner.candidate_id == "random-7-000002"
+    by_id = {record.candidate_id: record for record in result.records}
+    assert by_id["random-7-000002"].feasible is True
+    assert all(row["cache_hit"] is True for row in _read_provenance(tmp_path))
 
 
 def test_engine_bug_result_aborts_without_pareto(tmp_path) -> None:

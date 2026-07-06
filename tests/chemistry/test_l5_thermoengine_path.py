@@ -209,7 +209,9 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
     sim._refresh_vapor_pressures_from_kernel(result)
 
     assert result.vapor_pressures_Pa["Na"] == pytest.approx(kernel_vp["Na"])
-    assert result.vapor_pressures_source["Na"] == "builtin_authoritative"
+    assert result.vapor_pressures_source["Na"].startswith(
+        "builtin_authoritative:pure_component_source_equation_fit"
+    )
 
 
 def test_kernel_ok_empty_vapor_pressures_zero_backend_surface(

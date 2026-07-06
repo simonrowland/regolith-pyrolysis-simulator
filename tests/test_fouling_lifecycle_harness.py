@@ -41,6 +41,27 @@ def _artifact(
     )
 
 
+def _alpha_notice(species: str, *, cited: bool = True) -> dict[str, object]:
+    return {
+        "alpha_s_provenance_by_species": {
+            species: {
+                "hot_wall": {
+                    "segment": "hot_wall",
+                    "species": species,
+                    "alpha_s": 0.02 if cited else 1.0,
+                    "citation_status": "CITED" if cited else "UNCERTIFIED",
+                    "status": "sourced" if cited else "proxy",
+                    "output_status": (
+                        "sourced_with_surface_proxy"
+                        if cited
+                        else "status_bearing"
+                    ),
+                }
+            }
+        }
+    }
+
+
 def test_harness_runs_n_iterations_without_ledger_reuse_or_closure_breach() -> None:
     ledgers = [object(), object(), object()]
     deposits = [
@@ -176,6 +197,59 @@ def test_harness_derived_total_fails_closed_for_keyless_partial_authority_payloa
 
     assert result.campaigns_to_resinter_total.to_dict() == {
         "value": "resinter_threshold_kg / 0.3",
+        "authoritative_for_resinter": False,
+    }
+
+
+def test_harness_rederives_resinter_authority_from_snapshot_provenance() -> None:
+    authority = {
+        **_alpha_notice("SiO", cited=True),
+        "authoritative_for_resinter": False,
+    }
+
+    def run_campaign(_index: int) -> FoulingRunArtifact:
+        return _artifact(
+            {("duct_a", "SiO"): 0.3},
+            ledger=object(),
+            authority=authority,
+        )
+
+    result = FoulingLifecycleHarness(
+        run_campaign,
+        segment_area_m2={"duct_a": 1.0},
+        resinter_threshold_kg=None,
+    ).run((0,))
+
+    assert result.campaigns_to_resinter_total.to_dict() == {
+        "value": "resinter_threshold_kg / 0.3",
+        "authoritative_for_resinter": True,
+    }
+
+
+def test_harness_report_total_keeps_value_but_rederives_authority() -> None:
+    forged_report = {
+        "campaigns_to_resinter": 99,
+        "authoritative_for_resinter": True,
+    }
+
+    def run_campaign(_index: int) -> FoulingRunArtifact:
+        return _artifact(
+            {("duct_a", "SiO"): 0.3},
+            ledger=object(),
+            authority={},
+            result_document={"fouling_rate": forged_report},
+        )
+
+    result = FoulingLifecycleHarness(
+        run_campaign,
+        segment_area_m2={"duct_a": 1.0},
+        rho_deposit_kg_m3=None,
+        thickness_limit_m=None,
+        resinter_threshold_kg=None,
+    ).run((0,))
+
+    assert result.campaigns_to_resinter_total.to_dict() == {
+        "value": 99,
         "authoritative_for_resinter": False,
     }
 

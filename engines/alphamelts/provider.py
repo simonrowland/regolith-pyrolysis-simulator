@@ -251,6 +251,10 @@ class AlphaMELTSProvider(ChemistryProvider):
                 request,
                 composition_mol_by_account=composition_mol_by_account,
             )
+        control_audit = self._build_control_audit(
+            request,
+            equilibrium=equilibrium,
+        )
         diagnostics = project_equilibrium_to_diagnostics(
             equilibrium,
             mode=mode,
@@ -283,13 +287,19 @@ class AlphaMELTSProvider(ChemistryProvider):
     # Helpers
     # ------------------------------------------------------------------
 
-    def _build_control_audit(self, request: IntentRequest) -> ControlAudit:
-        """ControlAudit with applied=requested and 'diagnostic' note.
+    def _build_control_audit(
+        self,
+        request: IntentRequest,
+        *,
+        equilibrium: Any | None = None,
+    ) -> ControlAudit:
+        """ControlAudit with requested controls and applied engine controls.
 
         Checklist item 6: AlphaMELTS does not enforce fO2 / P (it
         consumes the requested values as inputs to the MELTS run; the
         engine's actual applied fO2/P depends on the redox buffer
-        choice). The audit records the values verbatim with the
+        choice). The audit records the values, with solved/clamped
+        controls from backend diagnostics when available, and the
         diagnostic note so a trace consumer sees the engine ran but
         didn't enforce.
         """
@@ -301,10 +311,31 @@ class AlphaMELTSProvider(ChemistryProvider):
             ),
             'fe_redox_policy': request.fe_redox_policy,
         }
+        applied = dict(requested)
+        notes = [_DIAGNOSTIC_AUDIT_NOTE]
+        diagnostics = (
+            getattr(equilibrium, 'diagnostics', {}) if equilibrium is not None
+            else {}
+        )
+        if isinstance(diagnostics, Mapping) and (
+            diagnostics.get('operating_point_clamped')
+            or diagnostics.get('authoritative_for_requested_conditions') is False
+        ):
+            solved_temperature_C = diagnostics.get('solved_temperature_C')
+            solved_pressure_bar = diagnostics.get('solved_pressure_bar')
+            solved_fO2_log = diagnostics.get('solved_fO2_log')
+            if solved_temperature_C is not None:
+                applied['temperature_C'] = float(solved_temperature_C)
+            if solved_pressure_bar is not None:
+                applied['pressure_bar'] = float(solved_pressure_bar)
+            if solved_fO2_log is not None:
+                applied['fO2_log'] = float(solved_fO2_log)
+            notes.append('clamped operating point')
+
         return ControlAudit(
             requested=requested,
-            applied=dict(requested),
-            notes=(_DIAGNOSTIC_AUDIT_NOTE,),
+            applied=applied,
+            notes=tuple(notes),
         )
 
     def _redox_diagnostic(

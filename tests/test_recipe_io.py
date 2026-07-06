@@ -417,4 +417,5 @@ def test_no_recipe_run_matches_committed_golden_text() -> None:
     expected = (
         ROOT / "tests" / "fixtures" / "runner" / "lunar_mare_low_ti_C0_24h.json"
     ).read_text(encoding="utf-8")
-    assert actual == expected
+    assert expected.endswith("\n")
+    assert actual == expected.removesuffix("\n")

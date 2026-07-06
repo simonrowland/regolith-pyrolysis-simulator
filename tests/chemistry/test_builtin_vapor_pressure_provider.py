@@ -448,6 +448,20 @@ def test_sio_oxide_vapor_extrapolates_instead_of_disappearing_above_valid_range(
         )
 
 
+def test_builtin_provider_marks_sio_pseudo_vaporock_source_non_authoritative(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    result = provider.dispatch(_si_only_vapor_request_at_T_K(2199.15))
+
+    source = result.diagnostic["vapor_pressures_source"]["SiO"]
+    assert source == (
+        "vaporock_backsolved_curve_fit:"
+        "backsolved_vaporock_curve_fit"
+    )
+    assert "builtin_authoritative" not in source
+
+
 def test_sio_oxide_vapor_extrapolation_fails_loud_beyond_process_bound(
     vapor_pressure_data,
 ):
@@ -779,6 +793,47 @@ def test_legacy_fallback_grounds_mn_liquid_source_band(
         "builtin_authoritative:pure_component_derived_from_evaluation"
     )
     assert result.diagnostics["ellingham_authority"]["status"] == "authoritative"
+
+
+def test_legacy_fallback_marks_pseudo_vaporock_sources_non_authoritative(
+    vapor_pressure_data,
+):
+    class _KOnlyMelt:
+        temperature_C = 1600.0
+        p_total_mbar = 1e-3
+        melt_fO2_log = -9.0
+
+        def composition_wt_pct(self):
+            return {"K2O": 100.0}
+
+    metal_data = {
+        "metals": {
+            "K": {
+                "parent_oxide": "K2O",
+                "fit_target": "pseudo_psat_backsolved_from_vaporock",
+                "residual_dex": 1.4,
+                "confidence_tier": "low",
+                "antoine": {"A": 5.0, "B": 0.0, "C": 0.0},
+            }
+        },
+        "oxide_vapors": {},
+    }
+    metal_result = _LegacyFallbackStub(
+        metal_data,
+        melt=_KOnlyMelt(),
+    )._stub_equilibrium()
+    oxide_result = _LegacyFallbackStub(
+        vapor_pressure_data,
+        melt=_SiOnlyMelt(),
+    )._stub_equilibrium()
+
+    for result, species in ((metal_result, "K"), (oxide_result, "SiO")):
+        source = result.vapor_pressures_source[species]
+        assert source == (
+            "vaporock_backsolved_curve_fit:"
+            "backsolved_vaporock_curve_fit"
+        )
+        assert "builtin_authoritative" not in source
 
 
 def test_builtin_provider_marks_mn_above_nbp_source_extrapolation(

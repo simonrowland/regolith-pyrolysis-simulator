@@ -40,7 +40,7 @@ from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
-from simulator.optimize.results_store import ResultStore
+from simulator.optimize.results_store import ResultStore, _serialize_margins
 from web import routes as web_routes
 
 
@@ -219,17 +219,28 @@ def _seed_leaderboard_fixture(
         )
     with sqlite3.connect(run_dir / "cache.sqlite") as conn:
         for row in rows:
+            margin_feasible = bool(row.get("margin_feasible", row.get("feasible", True)))
+            stored_feasible = bool(row.get("stored_feasible", row.get("feasible", True)))
             conn.execute(
                 """
                 UPDATE results
-                SET feasible = ?, objectives = ?
+                SET feasible = ?, objectives = ?, feasibility_margins = ?
                 WHERE candidate_id = ?
                 """,
                 (
-                    1 if row.get("feasible", True) else 0,
+                    1 if stored_feasible else 0,
                     _leaderboard_objectives_payload(
                         float(row.get("oxygen", 10.0)),
                         energy=float(row.get("energy", 2.0)),
+                    ),
+                    json.dumps(
+                        _serialize_margins(
+                            {
+                                "delivered_stream_purity": _margin(
+                                    feasible=margin_feasible
+                                )
+                            }
+                        )
                     ),
                     str(row["candidate_id"]),
                 ),
@@ -815,6 +826,112 @@ def test_optimizer_backend_payload_diagnostic_stub_does_not_masquerade_as_real()
     assert payload["certification_allowed"] is False
 
 
+def test_optimizer_backend_payload_ok_status_without_authority_evidence_fails_closed() -> None:
+    payload = web_routes._optimizer_backend_payload(
+        {"backend_name": "alphamelts"},
+        {"backend_status": "ok"},
+        {},
+    )
+
+    assert payload["backend_requested"] == "alphamelts"
+    assert payload["backend_status"] == "ok"
+    assert payload["runtime_status"] == "ok"
+    assert payload["evidence_class"] == "melts"
+    assert payload["certification_allowed"] is True
+    assert payload["backend_authoritative"] is False
+    assert "backend_real_active" not in payload
+
+
+def test_optimizer_tier_label_requires_backend_authority_for_certified_cache() -> None:
+    label = web_routes._optimizer_tier_label(
+        {"cache_state": "cached_exact"},
+        {},
+        backend_payload={
+            "backend_name": "alphamelts",
+            "backend_status": "ok",
+            "backend_authoritative": False,
+            "evidence_class": "melts",
+        },
+    )
+
+    assert label["tier"] == "cached_exact"
+    assert label["certification_allowed"] is True
+    assert label["ux_label"] == "UNVERIFIED"
+
+
+@pytest.mark.parametrize(
+    "margins_payload",
+    (
+        "{malformed-json",
+        None,
+        "{}",
+        '{"mass_balance":{"status":"legacy"}}',
+    ),
+)
+def test_result_row_feasible_fails_closed_for_ungroundable_margins(
+    margins_payload: str | None,
+) -> None:
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    row = conn.execute(
+        """
+        SELECT 1 AS feasible, NULL AS failure_category, ? AS feasibility_margins
+        """,
+        (margins_payload,),
+    ).fetchone()
+
+    assert web_routes._result_row_feasible(row) is False
+
+
+def test_optimizer_metadata_and_detail_use_grounded_feasible_for_legacy_row(
+    client,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-legacy-feasible-grounding"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec(recipe_id="recipe-legacy-feasible-grounding")
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(spec, candidate_id="candidate-legacy-feasible", oxygen=99.0),
+        created_at="2026-06-02T00:00:00Z",
+    )
+    key = cache_key(spec)
+    with sqlite3.connect(run_dir / "cache.sqlite") as conn:
+        conn.execute(
+            """
+            UPDATE results
+            SET feasible = 1, failure_category = NULL, feasibility_margins = '{}'
+            WHERE cache_key = ?
+            """,
+            (key,),
+        )
+
+    runs = client.get("/api/optimizer/runs")
+    leaderboard = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+    detail = client.get(
+        f"/optimizer/runs/run-legacy-feasible-grounding/results/{key}"
+    )
+    download = client.get(
+        f"/optimizer/runs/run-legacy-feasible-grounding/results/{key}/recipe.yaml"
+    )
+
+    assert runs.status_code == 200
+    assert runs.get_json()["runs"][0]["latest_result"]["feasible"] is False
+    assert leaderboard.status_code == 200
+    board_payload = leaderboard.get_json()
+    assert board_payload["entries"] == []
+    assert board_payload["excluded_infeasible"] == 1
+    assert detail.status_code == 200
+    assert "<tr><td>Feasible</td><td>no</td></tr>" in detail.get_data(as_text=True)
+    assert download.status_code == 200
+    assert yaml.safe_load(download.get_data(as_text=True))["result"]["feasible"] is False
+
+
 def test_optimizer_leaderboard_ranks_feasible_finite_objectives(client) -> None:
     runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
     run_dir = runs_dir / "run-leaderboard-green"
@@ -877,6 +994,37 @@ def test_optimizer_leaderboard_excludes_infeasible_rows_with_objectives(client) 
     ]
     assert payload["excluded_infeasible"] == 1
     assert payload["excluded_nonfinite"] == 0
+
+
+def test_optimizer_leaderboard_rederives_stale_false_feasible_from_margins(client) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-leaderboard-stale-feasible"
+    _seed_leaderboard_fixture(
+        run_dir,
+        [
+            {"candidate_id": "candidate-low", "oxygen": 6.0},
+            {
+                "candidate_id": "candidate-stale-feasible",
+                "oxygen": 99.0,
+                "stored_feasible": False,
+                "margin_feasible": True,
+            },
+        ],
+    )
+
+    response = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert [entry["candidate_id"] for entry in payload["entries"]] == [
+        "candidate-stale-feasible",
+        "candidate-low",
+    ]
+    assert payload["excluded_infeasible"] == 0
 
 
 def test_optimizer_leaderboard_all_infeasible_returns_empty_with_counts(client) -> None:
@@ -1240,11 +1388,18 @@ def test_optimizer_leaderboard_excludes_infeasible_rows_on_multi_digest_path(
         conn.execute(
             """
             UPDATE results
-            SET feasible = 0, objectives = ?
+            SET feasible = 0, objectives = ?, feasibility_margins = ?
             WHERE candidate_id = ?
             """,
             (
                 _leaderboard_objectives_payload(99.0),
+                json.dumps(
+                    _serialize_margins(
+                        {
+                            "delivered_stream_purity": _margin(feasible=False)
+                        }
+                    )
+                ),
                 "candidate-infeasible-poison",
             ),
         )

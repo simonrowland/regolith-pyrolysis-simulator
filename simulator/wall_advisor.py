@@ -46,9 +46,11 @@ PRESSURE_REGIMES = ("vacuum", "millibar_sweep")
 #   (data/setpoints.yaml C2B pO2_mbar [0.8, 2.3]; pO2_bakeout_mbar [0.5, 1.5]):
 #   the deposit/locally-O-buffered branch.
 # - Below that the overhead is the project-default low-pO2 reducing branch.
-# - Buffer gas at or above ~5 mbar is the viscous-flow sweep band
-#   (CLAUDE.md SS4: ~5-15 mbar pN2 keeps Kn << 0.01); below it transport is
-#   ballistic/vacuum-like.
+# - Buffer gas at or above ~5 mbar selects the recipe's millibar-sweep wall
+#   branch (CLAUDE.md SS4: ~5-15 mbar pN2 keeps Kn << 0.01). Below that the
+#   advisor uses its conservative "vacuum" bucket; this threshold is not a
+#   Knudsen boundary because the default 0.12 m pipe at ~1 mbar is still
+#   viscous by Kn.
 DOSED_O2_PO2_MIN_MBAR = 3.0
 BUFFERED_PO2_MIN_MBAR = 0.5
 VISCOUS_SWEEP_MIN_MBAR = 5.0

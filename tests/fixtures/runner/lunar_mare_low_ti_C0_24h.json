@@ -775,15 +775,23 @@
   },
   "vapor_pressure_source_report": {
     "species": {
-      "K": "builtin_authoritative",
-      "Mg": "builtin_authoritative",
-      "Mn": "builtin_authoritative",
-      "Na": "builtin_authoritative"
+      "K": "builtin_authoritative:pure_component_source_equation_fit:extrapolated_beyond_valid_range_K",
+      "Mg": "builtin_authoritative:pure_component_source_tabulated_fit",
+      "Mn": "builtin_extrapolation_limited:pure_component_derived_from_evaluation:extrapolated_beyond_ellingham_fit_range_K",
+      "Na": "builtin_authoritative:pure_component_source_equation_fit:extrapolated_beyond_valid_range_K"
     },
     "summary": {
-      "builtin_authoritative": {
-        "count": 4,
-        "percentage": 100.0
+      "builtin_authoritative:pure_component_source_equation_fit:extrapolated_beyond_valid_range_K": {
+        "count": 2,
+        "percentage": 50.0
+      },
+      "builtin_authoritative:pure_component_source_tabulated_fit": {
+        "count": 1,
+        "percentage": 25.0
+      },
+      "builtin_extrapolation_limited:pure_component_derived_from_evaluation:extrapolated_beyond_ellingham_fit_range_K": {
+        "count": 1,
+        "percentage": 25.0
       }
     },
     "total_species": 4

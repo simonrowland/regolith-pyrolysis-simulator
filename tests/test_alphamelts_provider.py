@@ -856,6 +856,48 @@ def test_provider_control_audit_records_diagnostic_note():
     assert 'diagnostic, not enforced' in audit.notes
 
 
+def test_provider_control_audit_records_clamped_applied_controls():
+    equilibrium = _build_equilibrium_for_basalt()
+    equilibrium.diagnostics = {
+        'operating_point_clamped': True,
+        'operating_point_transport': 'subprocess',
+        'temperature_clamped': True,
+        'pressure_clamped': True,
+        'requested_temperature_C': 650.0,
+        'requested_pressure_bar': 1.0e-6,
+        'requested_fO2_log': -10.5,
+        'solved_temperature_C': 800.0,
+        'solved_pressure_bar': 1.0,
+        'solved_fO2_log': -8.25,
+        'authoritative_for_requested_conditions': False,
+        'authoritative_for_solved_conditions': True,
+    }
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=equilibrium,
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    request = _make_request(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        composition_mol=_basalt_species_mol(),
+        temperature_C=650.0,
+        pressure_bar=1e-6,
+        fO2_log=-10.5,
+    )
+
+    result = provider.dispatch(request)
+
+    audit = result.control_audit
+    assert audit is not None
+    assert audit.requested['temperature_C'] == 650.0
+    assert audit.requested['pressure_bar'] == 1e-6
+    assert audit.requested['fO2_log'] == -10.5
+    assert audit.applied['temperature_C'] == 800.0
+    assert audit.applied['pressure_bar'] == 1.0
+    assert audit.applied['fO2_log'] == -8.25
+    assert 'clamped operating point' in audit.notes
+
+
 def test_provider_control_audit_present_for_unavailable_backend():
     """Even when the adapter is None, ControlAudit must still be populated.
 

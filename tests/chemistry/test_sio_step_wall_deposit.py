@@ -212,6 +212,26 @@ def test_hot_wall_sio_reactive_deposit_uses_product_psat_floor():
     assert hkl_flux > 0.0
 
 
+@pytest.mark.parametrize(
+    ("pressure_pa", "temperature_K"),
+    [
+        (float("nan"), 1700.0),
+        (float("inf"), 1700.0),
+        (1.0, float("nan")),
+        (1.0, float("inf")),
+    ],
+)
+def test_hkl_impingement_flux_nonfinite_inputs_fail_closed(
+    pressure_pa: float,
+    temperature_K: float,
+) -> None:
+    assert _hkl_impingement_flux_mol_m2_s(
+        "Na",
+        pressure_pa,
+        temperature_K,
+    ) == pytest.approx(0.0)
+
+
 def test_hot_wall_na_physisorber_reevaporates_against_own_psat():
     wall_T_K = 1700.0 + 273.15
     p_local_pa = 1.0

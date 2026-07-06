@@ -56,7 +56,11 @@ from simulator.optimize.profiles import (
     validate_profile,
 )
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
-from simulator.optimize.results_store import ResultStore, ResultStoreWriteRejected
+from simulator.optimize.results_store import (
+    ResultStore,
+    ResultStoreWriteRejected,
+    reground_scored_result,
+)
 from simulator.optimize.strategy import (
     Candidate,
     MorrisScreenStrategy,
@@ -1274,6 +1278,7 @@ def _evaluate_candidates(
                 staged_prefixes[candidate.id] = prefix
             misses.append((index, candidate))
         else:
+            cached = reground_scored_result(cached)
             results[index] = (candidate, cached, True)
 
     if misses:
@@ -1481,7 +1486,9 @@ def _evaluate_prefix_one(
     scored = _with_candidate_id(scored, prefix_id)
     if scored.eval_spec is None:
         return scored
-    return replace(scored, eval_spec=prefix_spec, cache_key=prefix_key)
+    return reground_scored_result(
+        replace(scored, eval_spec=prefix_spec, cache_key=prefix_key)
+    )
 
 
 def _prefix_patch_from_metadata(candidate: Candidate, schema: RecipeSchema) -> RecipePatch:

@@ -49,10 +49,6 @@ def test_c2a_depletion_trace_labels_requested_and_applied_values() -> None:
     row = _row(report, "campaigns.C2A_staged.depletion_flux_decay_fraction")
     assert row["source"] == "patched"
     assert row["requested_value"] == pytest.approx(requested)
-    assert row["applied_value"] == pytest.approx(
-        C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR
-    )
-    assert row["value"] == pytest.approx(
-        C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR
-    )
+    assert row["applied_value"] == pytest.approx(0.0)
+    assert row["value"] == pytest.approx(0.0)
     assert row["pinned"] == "low"

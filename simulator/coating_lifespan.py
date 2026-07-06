@@ -23,6 +23,8 @@ import math
 from types import MappingProxyType
 from typing import Any, Callable, Mapping, Sequence
 
+from simulator.diagnostics import wall_deposit_sticking_authority_status
+
 
 GROUNDING_UNGROUNDED = "ungrounded_threshold"
 GROUNDING_PROVISIONAL = "PROVISIONAL"
@@ -196,16 +198,65 @@ def merge_run_snapshot(
         else _plain_nested_deposit(exported)
     )
     cumulative = _add_deposits(carried, per_run_net)
+    authority = wall_deposit_sticking_authority_status(
+        cumulative,
+        _merged_wall_deposit_sticking_authority(
+            carried_projection.wall_deposit_sticking_authority
+            if carried_projection is not None
+            else None,
+            run_export.wall_deposit_sticking_authority,
+        ),
+    )
     return (
         FoulingTerminalSnapshot(
             wall_deposit_by_segment_species_kg=cumulative,
-            wall_deposit_sticking_authority=run_export.wall_deposit_sticking_authority,
+            wall_deposit_sticking_authority=authority,
             grounding_status=run_export.grounding_status,
             threshold_params=run_export.threshold_params,
             c4b_binding_substrate_state=run_export.c4b_binding_substrate_state,
         ),
         _freeze_nested_deposit(per_run_net),
     )
+
+
+def _merged_wall_deposit_sticking_authority(
+    carried_authority: Mapping[str, Any] | None,
+    run_authority: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    merged: dict[str, Any] = {}
+    for authority in (carried_authority, run_authority):
+        if not isinstance(authority, Mapping):
+            continue
+        raw = authority.get("alpha_s_provenance_by_species")
+        if not isinstance(raw, Mapping):
+            continue
+        provenance = merged.setdefault("alpha_s_provenance_by_species", {})
+        if not isinstance(provenance, dict):
+            continue
+        for species, by_segment in raw.items():
+            if not isinstance(by_segment, Mapping):
+                continue
+            current = provenance.setdefault(str(species), {})
+            if isinstance(current, dict):
+                current.update(_plain_authority_mapping(by_segment))
+    return merged
+
+
+def _plain_authority_mapping(value: Mapping[Any, Any]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, item in value.items():
+        if isinstance(item, Mapping):
+            result[str(key)] = _plain_authority_mapping(item)
+        elif isinstance(item, (list, tuple)):
+            result[str(key)] = [
+                _plain_authority_mapping(element)
+                if isinstance(element, Mapping)
+                else element
+                for element in item
+            ]
+        else:
+            result[str(key)] = item
+    return result
 
 
 def merge_snapshot_sequence(

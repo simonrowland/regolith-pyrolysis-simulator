@@ -135,21 +135,19 @@ COLD_SPOT_MARGIN_C = 25.0
 DEFAULT_UPSTREAM_HOT_WALL_MIN_C = 1400.0
 LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 
-# Viscous-regime mass-transfer model (post-F3 follow-on, 2026-05-27).
-# F3 added regime_factor = Kn/(Kn + 0.01) to the band-integrated HKL
-# flux: in viscous regime (Kn << 0.01) the HKL contribution -> 0 because
-# HKL is the FREE-MOLECULAR-LIMIT flux equation and is not the right
-# physics there. Without a compensating term the simulator simply
-# under-predicts viscous-regime stage capture (which is what F3's commit
-# noted). This block adds the Bird/Stewart/Lightfoot Sherwood-number
-# boundary-layer mass-transfer flux that goes to ~1 in viscous regime
-# where HKL goes to 0. Total deposition is:
+# Viscous-regime wall mass-transfer model (post-F3 follow-on, 2026-05-27).
+# F3 added wall-side regime_factor = Kn/(Kn + 0.01): f -> 0 in viscous flow
+# and f -> 1 in free-molecular flow. This is the cold-wall deposition gate;
+# do not conflate it with the source-side Fuchs-Sutugin evaporation
+# correction. The current wall flux composes HKL surface uptake and
+# Bird/Stewart/Lightfoot gas-side mass transfer as series resistances:
 #
-#    J_total = J_HKL * regime_factor + J_mass_transfer * (1 - regime_factor)
+#    1/k_total = 1/(alpha_s*k_HKL) + (1 - f)/k_MT
 #
-# So at Kn -> 0 (deep viscous) the mass-transfer term dominates; at
-# Kn -> inf (free molecular) the HKL term dominates; the transition
-# regime is a smooth blend.
+# So at Kn -> 0 (deep viscous) the boundary-layer mass-transfer resistance
+# dominates; at Kn -> inf (free molecular) the mass-transfer resistance
+# drops out and HKL surface uptake applies. The transition regime is a
+# smooth resistance handoff.
 #
 # Sherwood number for laminar pipe flow with constant wall concentration
 # (Bird/Stewart/Lightfoot 2007 "Transport Phenomena" 2nd ed., Eq 14.4-9):
@@ -2693,10 +2691,10 @@ class CondensationModel:
         """
         Condensation efficiency for one species in one stage.
 
-        Hertz-Knudsen-Langmuir surface deposition:
-
-            J = alpha_s * max(0, P_local - P_sat(T_surface))
-                / sqrt(2*pi*m*k*T_surface) * regime_factor(Kn)
+        Wall deposition uses ``_series_resistance_deposition_flux_mol_m2_s``:
+        HKL surface uptake in series with gas-side mass transfer, with
+        ``f = Kn/(Kn+0.01)`` removing boundary-layer resistance as flow
+        becomes free molecular.
 
         Reactive wall products use the product-P_sat floor in the shared
         driving-pressure helper instead of the vapor species' Antoine P_sat.
@@ -3490,7 +3488,12 @@ def _hkl_impingement_flux_mol_m2_s(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> float:
-    if pressure_pa <= 0.0 or T_K <= 0.0:
+    if (
+        not math.isfinite(pressure_pa)
+        or not math.isfinite(T_K)
+        or pressure_pa <= 0.0
+        or T_K <= 0.0
+    ):
         return 0.0
     molecule_kg = _molecular_mass_kg_per_molecule(
         species,
@@ -3656,12 +3659,14 @@ def _series_resistance_deposition_flux_mol_m2_s(
         deep in this band; the smoothness is a safety property, not a
         recipe regime.
 
-    Stir factor enhances the Sherwood number (and hence k_MT) per the
-    operator's induction-stirring power. At ``stir_factor=1`` (no stirring)
-    Sh = 3.66 (laminar pipe asymptote, BSL Eq 14.4-9). At ``stir_factor=6``
-    (default C2A setpoint, see ``setpoints.yaml § induction_stirring``)
-    Sh ≈ 9.0. At ``stir_factor=10`` (industrial upper bound — "melt about
-    to fly out of the pot") Sh ≈ 11.6. See
+    The canonical 0.5.3 path enhances the Sherwood number through the
+    ``radial_stir_factor`` axis, which drives gas-side bulk-to-wall
+    transport. At radial factor 1 (no radial stirring), Sh = 3.66 (laminar
+    pipe asymptote, BSL Eq 14.4-9). The C2A default
+    ``StirState(axial=6.0, radial=1.0)`` leaves Sh = 3.66; operators must
+    raise the radial axis to enhance k_MT. Legacy direct callers that pass
+    only ``stir_factor=6`` are still treated as radial-equivalent and give
+    Sh ≈ 9.0 for backward compatibility. See
     ``_stirring_enhanced_sherwood`` for the Frössling rationale.
 
     Returns 0 when there is no driving force (physisorber

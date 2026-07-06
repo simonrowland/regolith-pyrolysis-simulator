@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from simulator.account_ids import (
+    C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     OXYGEN_CAPTURED_ACCOUNTS,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
@@ -56,8 +57,21 @@ MAJOR_METAL_OXIDE_SOURCE_VAPOR_CEILINGS_MOL = {
     "TiO2": 0.0,
     "CrO2": 0.0,
 }
+PRODUCT_LEDGER_ACCOUNTS = (
+    "terminal.offgas",
+    "terminal.stage0_salt_phase",
+    "terminal.stage0_chloride_salt_phase",
+    "terminal.stage0_sulfide_matte",
+    "terminal.drain_tap_material",
+    CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    "process.metal_phase",
+    C7_AL_CREDIT_ACCOUNT,
+    CONDENSATION_TRAIN_ACCOUNT,
+    "process.overhead_gas",
+)
 TERMINAL_RUMP_ACCOUNTS = (
     "process.cleaned_melt",
+    C7_AL_CREDIT_ACCOUNT,
     "terminal.slag",
 )
 PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS = (
@@ -132,17 +146,7 @@ class AccountingQueries:
 
     def product_ledger(self) -> dict[str, float]:
         products: dict[str, float] = {}
-        for account in (
-            "terminal.offgas",
-            "terminal.stage0_salt_phase",
-            "terminal.stage0_chloride_salt_phase",
-            "terminal.stage0_sulfide_matte",
-            "terminal.drain_tap_material",
-            CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
-            "process.metal_phase",
-            "process.condensation_train",
-            "process.overhead_gas",
-        ):
+        for account in PRODUCT_LEDGER_ACCOUNTS:
             _merge_masses(
                 products,
                 {
@@ -311,9 +315,9 @@ class AccountingQueries:
                 category = "other"
             by_class[category] += kg
 
-        total_kg = (
-            self.ledger.total_kg_by_account("process.cleaned_melt")
-            + self.ledger.total_kg_by_account("terminal.slag")
+        total_kg = sum(
+            self.ledger.total_kg_by_account(account)
+            for account in TERMINAL_RUMP_ACCOUNTS
         )
         class_total_kg = sum(by_class.values())
         if total_kg > 0.0:
@@ -789,10 +793,12 @@ class AccountingQueries:
     def rump_element_kg(self, element: str) -> float:
         species_names = self.sim._RUMP_ELEMENT_SPECIES.get(element, ())
         total = 0.0
-        for account in ("process.cleaned_melt", "terminal.slag"):
+        for account in TERMINAL_RUMP_ACCOUNTS:
             species_kg = self.ledger.kg_by_account(account)
             for species in species_names:
                 total += max(0.0, float(species_kg.get(species, 0.0)))
+            if account == C7_AL_CREDIT_ACCOUNT:
+                total += max(0.0, float(species_kg.get(element, 0.0)))
         return total
 
     def actual_rump_elements_kg(self) -> dict[str, float]:

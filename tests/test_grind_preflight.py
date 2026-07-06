@@ -21,6 +21,7 @@ from simulator.grind_preflight import (
     assert_strict_vapor_config,
     assert_strict_vapor_result_payload,
     assert_strict_vapor_result_store,
+    assert_strict_vapor_source_report,
 )
 
 
@@ -325,6 +326,18 @@ def test_strict_vapor_result_store_accepts_all_builtin_authoritative_with_sio_wa
     summary = assert_strict_vapor_result_store(db_path)
 
     assert summary == {"rows": 1, "vapor_active_rows": 1, "source_reports": 1}
+
+
+def test_strict_vapor_source_report_rejects_backsolved_vaporock_colon_label() -> None:
+    source = "builtin_authoritative:backsolved_vaporock_curve_fit"
+    report = {
+        "species": {"K": source},
+        "summary": {source: {"count": 1, "percentage": 100.0}},
+        "total_species": 1,
+    }
+
+    with pytest.raises(GrindSourceGateError, match="backsolved_vaporock_curve_fit"):
+        assert_strict_vapor_source_report(report, context="stored-result")
 
 
 def test_strict_vapor_result_store_rejects_builtin_fallback_report(

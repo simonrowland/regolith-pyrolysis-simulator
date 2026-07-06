@@ -287,12 +287,45 @@ def interpolate_equilibrium_payload(
     controls = query_key.get("controls", {})
     if not isinstance(controls, Mapping):
         controls = {}
-    interpolated_result["temperature_C"] = (
-        float(controls.get("T_K", 0.0) or 0.0) - CELSIUS_TO_KELVIN_OFFSET
-    )
-    interpolated_result["pressure_bar"] = float(controls.get("pressure_bar", 0.0) or 0.0)
+    requested_temperature_C = None
+    if controls.get("T_K") is not None:
+        requested_temperature_C = (
+            float(controls.get("T_K")) - CELSIUS_TO_KELVIN_OFFSET
+        )
+    requested_pressure_bar = None
+    if controls.get("pressure_bar") is not None:
+        requested_pressure_bar = float(controls.get("pressure_bar"))
+    requested_fO2_log = None
     if controls.get("log_fO2") is not None:
-        interpolated_result["fO2_log"] = float(controls.get("log_fO2"))
+        requested_fO2_log = float(controls.get("log_fO2"))
+
+    solved_temperature_C = _weighted_average_scalar(
+        neighbors,
+        weights,
+        "temperature_C",
+    )
+    solved_pressure_bar = _weighted_average_scalar(
+        neighbors,
+        weights,
+        "pressure_bar",
+    )
+    solved_fO2_log = _weighted_average_scalar(
+        neighbors,
+        weights,
+        "fO2_log",
+    )
+    if solved_temperature_C is not None:
+        interpolated_result["temperature_C"] = solved_temperature_C
+    elif requested_temperature_C is not None:
+        interpolated_result["temperature_C"] = requested_temperature_C
+    if solved_pressure_bar is not None:
+        interpolated_result["pressure_bar"] = solved_pressure_bar
+    elif requested_pressure_bar is not None:
+        interpolated_result["pressure_bar"] = requested_pressure_bar
+    if solved_fO2_log is not None:
+        interpolated_result["fO2_log"] = solved_fO2_log
+    elif requested_fO2_log is not None:
+        interpolated_result["fO2_log"] = requested_fO2_log
 
     interpolated_result["liquid_fraction"] = _weighted_average_scalar(
         neighbors,
@@ -325,6 +358,41 @@ def interpolate_equilibrium_payload(
     }
     interpolated_result["warnings"] = list(reference_result.get("warnings") or [])
     interpolated_result["warnings"].append("cached_interpolated_linear_estimate")
+    operating_point_clamped = (
+        _operating_point_differs(requested_temperature_C, solved_temperature_C)
+        or _operating_point_differs(requested_pressure_bar, solved_pressure_bar)
+        or _operating_point_differs(requested_fO2_log, solved_fO2_log)
+    )
+    if operating_point_clamped:
+        diagnostics = dict(interpolated_result.get("diagnostics") or {})
+        diagnostics.update({
+            "operating_point_clamped": True,
+            "operating_point_transport": "reduced_real_cache_interpolation",
+            "temperature_clamped": _operating_point_differs(
+                requested_temperature_C,
+                solved_temperature_C,
+            ),
+            "pressure_clamped": _operating_point_differs(
+                requested_pressure_bar,
+                solved_pressure_bar,
+            ),
+            "fO2_clamped": _operating_point_differs(
+                requested_fO2_log,
+                solved_fO2_log,
+            ),
+            "requested_temperature_C": requested_temperature_C,
+            "requested_pressure_bar": requested_pressure_bar,
+            "requested_fO2_log": requested_fO2_log,
+            "solved_temperature_C": solved_temperature_C,
+            "solved_pressure_bar": solved_pressure_bar,
+            "solved_fO2_log": solved_fO2_log,
+            "authoritative_for_requested_conditions": False,
+            "authoritative_for_solved_conditions": False,
+            "backend_status": "out_of_domain",
+            "backend_status_reason": "clamped_operating_point",
+        })
+        interpolated_result["diagnostics"] = diagnostics
+        interpolated_result["status"] = "out_of_domain"
 
     payload = {
         "equilibrium_result": interpolated_result,
@@ -601,6 +669,20 @@ def _weighted_average_mapping(
         if total_weight > 0.0:
             averaged[key] = weighted / total_weight
     return averaged
+
+
+def _operating_point_differs(
+    requested: float | None,
+    solved: float | None,
+) -> bool:
+    if requested is None or solved is None:
+        return False
+    return not math.isclose(
+        float(requested),
+        float(solved),
+        rel_tol=0.0,
+        abs_tol=1.0e-9,
+    )
 
 
 def _euclidean_distance(left: Sequence[float], right: Sequence[float]) -> float:

@@ -348,10 +348,16 @@ def resolve_transport_pO2_bar(
 
     if request.fO2_log is not None:
         try:
-            pO2_bar = 10.0 ** float(request.fO2_log)
+            fO2_log = float(request.fO2_log)
         except (TypeError, ValueError) as exc:
             raise ValueError(
                 f"fO2_log must be numeric, got {request.fO2_log!r}"
+            ) from exc
+        try:
+            pO2_bar = 10.0 ** fO2_log
+        except OverflowError as exc:
+            raise ValueError(
+                f"fO2_log={fO2_log:g} resolves outside finite pO2_bar range"
             ) from exc
         if not math.isfinite(pO2_bar) or pO2_bar <= 0.0:
             raise ValueError(
@@ -359,7 +365,7 @@ def resolve_transport_pO2_bar(
             )
         if pO2_bar < floor_bar:
             raise ValueError(
-                f"fO2_log={float(request.fO2_log):g} resolves to "
+                f"fO2_log={fO2_log:g} resolves to "
                 f"pO2_bar={pO2_bar:g} below transport model floor "
                 f"{floor_bar:g}; request the floor explicitly by using "
                 f"pO2_bar={floor_bar:g}"

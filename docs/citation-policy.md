@@ -79,8 +79,9 @@ normalization the source fit must be the one the code computes.
 alkali-oxide activity coefficients on the **single-cation `NaO0.5`/`KO0.5` basis**, **Raoultian**
 (their Eqn 24: activity → 1 for the pure oxide), for the reaction `NaO0.5(l) = Na(g) + 1/4 O2` (their
 Eqn 25) — which makes the sodium partial pressure **linear** in the activity coefficient,
-`p_Na ∝ gamma_NaO0.5 * X_NaO0.5`. The *value* `gamma_NaO0.5 ≈ 1.0e-3` is independently confirmed by
-Sossi 2019 KEMS on ferrobasalt and by DeMaria 1971 KEMS on Apollo 12022 lunar basalt. A first pass that
+`p_Na ∝ gamma_NaO0.5 * X_NaO0.5`. The *value* `gamma_NaO0.5 ≈ 1.0e-3` is independently grounded by
+Sossi et al. 2019 gas-mixing furnace evaporation experiments on ferrobasalt, with LA-ICP-MS
+residual-glass analyses and HKL/logK* fitting, and corroborated by DeMaria 1971 KEMS on Apollo 12022 lunar basalt. A first pass that
 used that value on the di-cation `Na2O` basis with a square-root exponent and a weight-fraction proxy
 was *wrong by construction* — it recovered only `sqrt(gamma)` of the suppression — even though the
 number and the DOI were correct. The citation is not complete until the basis is stated and the code

@@ -16,6 +16,9 @@ from simulator.chemistry.kernel import (
 )
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.optimize.recipe import (
+    C3_ALKALI_DOSING_K_KG_PATH,
+    C3_ALKALI_DOSING_NA_KG_PATH,
+    C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
     C2A_STAGED_ORDER_PATH,
@@ -366,7 +369,14 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # engines/builtin/vapor_pressure.py (diagnostic['structural_activity_reference']).
     # recipe_id + the searchable allowlist above are UNCHANGED and golden surfaces are
     # byte-identical; diagnostic-only, not an authoritative vapor/yield/ledger move.
-    assert cache_key(spec) == "79bcebc9b75584f0872ea90c189f9267124b48130342982f90ca4f00f964676b"
+    # 2026-07-06 (bug-hunt fix wave): source-fingerprint + allowlist-semantics move
+    # from the validated-catch fixes: NaN/Overflow guards (evaluate/_common/condensation),
+    # SC-35 zero-level canonicalization (C3 dosing deadband at 1% of high; C2A depletion
+    # disabled band [0, 0.01) snapping to the fixed-schedule 0.0), per-species vapor
+    # source labels (vapor_pressure/core), and the authority re-derive paths. Physics
+    # values unchanged; two runner fixtures moved on label strings only (verified
+    # zero numeric diffs before regen).
+    assert cache_key(spec) == "e483f84e446fb0a3f4a0cd850b3c53af280164f08558caf05ecfc632b29b2cca"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -863,7 +873,7 @@ def test_c2a_staged_depletion_flux_decay_knob_bounds_and_neutral_validation() ->
     schema = RecipeSchema()
     spec = schema.spec_for(C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH)
 
-    assert spec.low == pytest.approx(C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR)
+    assert spec.low == pytest.approx(0.0)
     assert spec.high == pytest.approx(0.50)
     assert spec.path in {item.path for item in schema.search_allowlist}
     assert RecipePatch(
@@ -880,10 +890,59 @@ def test_c2a_staged_depletion_flux_decay_knob_bounds_and_neutral_validation() ->
     ] == pytest.approx(
         0.005
     )
+    sub_floor = RecipePatch(
+        {C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.005}
+    ).validated(schema)
+    exact_zero = RecipePatch(
+        {C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.0}
+    ).validated(schema)
+    assert schema.to_setpoints_patch(sub_floor)["campaigns"]["C2A_staged"][
+        "depletion_flux_decay_fraction"
+    ] == pytest.approx(0.0)
+    assert sub_floor.recipe_id(schema) == exact_zero.recipe_id(schema)
     with pytest.raises(RecipeValidationError, match="below lower bound"):
         RecipePatch(
             {C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: -0.01}
         ).validated(schema)
+
+
+def test_c3_alkali_dosing_deadband_canonicalizes_to_disabled_state() -> None:
+    schema = RecipeSchema()
+    assert C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[
+        C3_ALKALI_DOSING_NA_KG_PATH
+    ] == pytest.approx(1.4)
+    assert C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[
+        C3_ALKALI_DOSING_K_KG_PATH
+    ] == pytest.approx(0.56)
+    near_zero = RecipePatch(
+        {
+            C3_ALKALI_DOSING_NA_KG_PATH: 1e-12,
+            C3_ALKALI_DOSING_K_KG_PATH: (
+                C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[
+                    C3_ALKALI_DOSING_K_KG_PATH
+                ]
+            ),
+        }
+    ).validated(schema)
+    active = RecipePatch(
+        {
+            C3_ALKALI_DOSING_NA_KG_PATH: (
+                C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[
+                    C3_ALKALI_DOSING_NA_KG_PATH
+                ]
+                + 0.01
+            )
+        }
+    ).validated(schema)
+
+    assert schema.to_setpoints_patch(near_zero) == {}
+    assert near_zero.recipe_id(schema) == RecipePatch({}).recipe_id(schema)
+    assert schema.to_setpoints_patch(active)["campaigns"]["C3"]["alkali_dosing"][
+        "Na_kg"
+    ] == pytest.approx(
+        C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH[C3_ALKALI_DOSING_NA_KG_PATH]
+        + 0.01
+    )
 
 
 def test_c2a_staged_depletion_flux_decay_golden_neutral_fixed_schedule() -> None:

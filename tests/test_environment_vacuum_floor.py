@@ -44,6 +44,20 @@ def _request(control_inputs: dict[str, float | str]) -> IntentRequest:
     )
 
 
+def _fo2_request(fO2_log: float) -> IntentRequest:
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={},
+            species_formula_registry={},
+        ),
+        temperature_C=1600.0,
+        pressure_bar=0.0,
+        fO2_log=fO2_log,
+        control_inputs={},
+    )
+
+
 def _sim(feedstocks: dict | None = None) -> PyrolysisSimulator:
     return PyrolysisSimulator(
         StubBackend(),
@@ -104,6 +118,11 @@ def test_default_unknown_body_preserves_existing_1e_9_transport_floor() -> None:
     assert sim._commanded_pO2_bar() == pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
 
 
+def test_resolve_transport_po2_wraps_fo2_overflow_as_value_error() -> None:
+    with pytest.raises(ValueError, match="fO2_log=309.*finite pO2_bar range"):
+        resolve_transport_pO2_bar(_fo2_request(309.0))
+
+
 def test_explicit_feedstock_body_sets_run_vacuum_floor() -> None:
     feedstocks = copy.deepcopy(_load_yaml("feedstocks.yaml"))
     feedstocks["lunar_mare_low_ti"]["body"] = "moon"
@@ -126,4 +145,3 @@ def test_intrinsic_melt_fo2_clamp_lowers_to_vacuum_body_floor() -> None:
     assert default_clamped == pytest.approx(math.log10(DEFAULT_VACUUM_FLOOR_BAR))
     assert lunar_clamped == pytest.approx(math.log10(MOON_VACUUM_FLOOR_BAR))
     assert lunar_clamped < default_clamped
-

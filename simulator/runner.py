@@ -76,6 +76,7 @@ from simulator.lab_schedule import (
     LabScheduleValidationError,
     normalize_lab_schedule,
 )
+from simulator.optimize.recipe import C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, load_recipe_patch
 from simulator.session import (
@@ -666,7 +667,7 @@ def _c3_alkali_dosing_kg_by_species(
             raise RunnerError(
                 f"campaigns.C3.alkali_dosing.{key} must be finite and non-negative"
             )
-        if dose_kg <= 0.0:
+        if dose_kg <= C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES[species]:
             continue
         doses[species] = dose_kg
     return doses

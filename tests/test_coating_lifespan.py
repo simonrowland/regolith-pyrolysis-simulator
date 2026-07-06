@@ -27,6 +27,27 @@ def _trace(deposit, authority=None):
     )
 
 
+def _alpha_notice(species: str, *, cited: bool = True) -> dict[str, object]:
+    return {
+        "alpha_s_provenance_by_species": {
+            species: {
+                "hot_wall": {
+                    "segment": "hot_wall",
+                    "species": species,
+                    "alpha_s": 0.02 if cited else 1.0,
+                    "citation_status": "CITED" if cited else "UNCERTIFIED",
+                    "status": "sourced" if cited else "proxy",
+                    "output_status": (
+                        "sourced_with_surface_proxy"
+                        if cited
+                        else "status_bearing"
+                    ),
+                }
+            }
+        }
+    }
+
+
 def test_snapshot_is_frozen_and_deep_copied_after_export() -> None:
     deposit = {("duct_a", "SiO"): 0.25}
     authority = {"deposited_species": ["SiO"], "authoritative_for_resinter": True}
@@ -95,6 +116,29 @@ def test_seeded_export_mode_diffs_terminal_export_from_carried_projection() -> N
 
     assert per_run_net["duct_a"]["SiO"] == pytest.approx(0.25)
     assert post_merge.wall_deposit_by_segment_species_kg["duct_a"]["SiO"] == pytest.approx(1.25)
+
+
+def test_merge_run_snapshot_rederives_authority_for_cumulative_species() -> None:
+    carried = FoulingTerminalSnapshot.from_trace(
+        _trace({("hot_wall", "SiO"): 1.0}, _alpha_notice("SiO", cited=True))
+    )
+    run_export = FoulingTerminalSnapshot.from_trace(
+        _trace(
+            {("hot_wall", "Na"): 0.25},
+            {
+                "deposited_species": ["Na"],
+                "authoritative_for_resinter": True,
+                "authoritative_for_coating": True,
+            },
+        )
+    )
+
+    post_merge, _per_run_net = merge_run_snapshot(carried, run_export)
+
+    authority = post_merge.wall_deposit_sticking_authority
+    assert authority is not None
+    assert authority["authoritative_for_resinter"] is False
+    assert authority["deposited_species"] == ("Na", "SiO")
 
 
 def test_limiter_stack_provisional_verdict_and_threshold_parametric_motion() -> None:

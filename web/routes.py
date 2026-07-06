@@ -44,6 +44,10 @@ from simulator.mre_ladder import (
 from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
+from simulator.optimize.results_store import (
+    _deserialize_grounding_margins,
+    grounded_result_feasible,
+)
 from simulator.recipe_io import (
     RECIPE_LIBRARY_DIR,
     RecipeIOError,
@@ -559,7 +563,11 @@ def _optimizer_tier_label(
         )
     certification_allowed = bool(canonical.get('certification_allowed', False))
     tier = stored_state or 'unknown'
-    if tier in _CERTIFIED_CACHE_TIERS and certification_allowed:
+    if (
+        tier in _CERTIFIED_CACHE_TIERS
+        and certification_allowed
+        and bool(backend_authoritative)
+    ):
         ux_label = 'CERTIFIED'
     elif tier in _ESTIMATED_CACHE_TIERS:
         ux_label = 'ESTIMATED'
@@ -598,8 +606,6 @@ def _optimizer_backend_payload(
         if run_reference.get('backend_real_active') is not None
         else run_reference.get('backend_authoritative')
     )
-    if backend_authoritative is None:
-        backend_authoritative = backend_status == 'ok' and not stubish
     canonical = canonicalize_fidelity_emission(
         backend_name=canonical_backend_name,
         backend_status=backend_status,
@@ -662,7 +668,7 @@ def _result_metadata(
         'recipe_id': row['recipe_id'],
         'profile_id': row['profile_id'],
         'fidelity': row['fidelity'],
-        'feasible': bool(row['feasible']),
+        'feasible': _result_row_feasible(row),
         'created_at': row['created_at'],
         'corpus_version': corpus_version,
         'corpus_version_label': corpus_badge['label'],
@@ -969,9 +975,17 @@ def _numeric_objective_value(objective: dict[str, Any]) -> float | None:
 
 def _result_row_feasible(row: sqlite3.Row) -> bool:
     try:
-        return int(row['feasible']) == 1
+        stored_feasible = int(row['feasible']) == 1
     except (IndexError, KeyError, TypeError, ValueError):
         return False
+    margins = _deserialize_grounding_margins(
+        _json_value(row['feasibility_margins'], {})
+    )
+    return grounded_result_feasible(
+        stored_feasible,
+        failure_category=_row_value(row, 'failure_category'),
+        margins=margins,
+    )
 
 
 def _leaderboard_entries(

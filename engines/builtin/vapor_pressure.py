@@ -110,6 +110,14 @@ FIT_TARGET_PSEUDO_VAPOROCK = "pseudo_psat_backsolved_from_vaporock"
 FIT_TARGET_STANDARD_REACTION = "standard_reaction_term"
 COEFF_BLOCK_ANTOINE = "antoine"
 COEFF_BLOCK_PURE_COMPONENT = "pure_component_antoine"
+PSEUDO_VAPOROCK_CURVE_FIT_SOURCE = "vaporock_backsolved_curve_fit"
+_BUILTIN_VAPOR_SOURCE_CLASSES = frozenset(
+    {
+        "builtin_authoritative",
+        "builtin_extrapolation_limited",
+        "builtin_fallback",
+    }
+)
 
 
 def _fit_target(row: Mapping[str, Any] | None) -> str:
@@ -332,6 +340,15 @@ def _is_temperature_in_range(
     return low <= float(temperature_K) <= high
 
 
+def _source_base_for_fit_target(base_source: str, fit_target: str) -> str:
+    if (
+        fit_target == FIT_TARGET_PSEUDO_VAPOROCK
+        and base_source in _BUILTIN_VAPOR_SOURCE_CLASSES
+    ):
+        return PSEUDO_VAPOROCK_CURVE_FIT_SOURCE
+    return base_source
+
+
 def vapor_pressure_source_label(
     base_source: str,
     row: Mapping[str, Any] | None,
@@ -402,6 +419,7 @@ def vapor_pressure_source_label(
     if target == FIT_TARGET_PURE_COMPONENT:
         return f"{base_source}:legacy_pure_component_estimate"
     if target == FIT_TARGET_PSEUDO_VAPOROCK:
+        base_source = _source_base_for_fit_target(base_source, target)
         return f"{base_source}:backsolved_vaporock_curve_fit"
     if target == FIT_TARGET_STANDARD_REACTION:
         return f"{base_source}:standard_reaction_term"
@@ -475,7 +493,8 @@ def warn_pseudo_vapor_pressure_fallback(
         f"{prefix}: {key} vapor pressure uses a backsolved VapoRock "
         "fallback (curve-fit), NOT first-principles; "
         f"residual_dex={residual}; confidence_tier={tier}; "
-        "builtin remains authoritative; VapoRock is diagnostic-only.",
+        "builtin provider emits a VapoRock-derived curve-fit; "
+        "VapoRock runtime is diagnostic-only.",
         category,
         stacklevel=stacklevel,
     )

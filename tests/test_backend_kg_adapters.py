@@ -216,6 +216,31 @@ def test_backend_result_applies_as_atom_delta():
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
 
 
+def test_backend_validated_transition_observes_reagent_provenance():
+    MaterialLot = _required_attr("simulator.accounting", "MaterialLot")
+    LedgerTransition = _required_attr("simulator.accounting", "LedgerTransition")
+    backend = AtomDeltaBackend(MaterialLot, LedgerTransition)
+    sim = _sim(backend)
+    sim.load_batch("oxide", mass_kg=1000.0)
+    cleaned_melt_fe_kg = sim._account_element_kg(
+        sim.atom_ledger.kg_by_account("process.cleaned_melt"),
+        "Fe",
+    )
+    sim._non_feedstock_reagent_element_kg_by_account = {
+        "process.cleaned_melt": {"Fe": cleaned_melt_fe_kg},
+    }
+
+    sim.step()
+
+    provenance = sim._non_feedstock_reagent_element_kg_by_account
+    assert provenance["process.metal_phase"]["Fe"] == pytest.approx(
+        MOLAR_MASS["Fe"]
+    )
+    assert provenance["process.cleaned_melt"]["Fe"] == pytest.approx(
+        cleaned_melt_fe_kg - MOLAR_MASS["Fe"]
+    )
+
+
 def test_backend_result_cannot_credit_terminal_accounts():
     MaterialLot = _required_attr("simulator.accounting", "MaterialLot")
     LedgerTransition = _required_attr("simulator.accounting", "LedgerTransition")
