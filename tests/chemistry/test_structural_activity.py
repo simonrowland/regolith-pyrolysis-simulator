@@ -72,6 +72,12 @@ def test_reference_gamma_na_reproduces_demaria_seed_anchors() -> None:
 
     assert gamma_1300["NaO0.5"] == pytest.approx(1.8e-4, rel=1e-12)
     assert gamma_1500["NaO0.5"] == pytest.approx(4.5e-3, rel=1e-12)
+    # K anchors from the same primary (Sossi & Fegley 2018 OCR ~line 350,
+    # Fig. 5): gamma_KO0.5 = 3.5e-5 @1500 K, 7.2e-5 @1300 K — gamma RISES on
+    # cooling (opposite sign to Na). Guards the 2026-07-05 correction of the
+    # provisional 6.0e-3 K anchor (~170x high vs the primary).
+    assert gamma_1500["KO0.5"] == pytest.approx(3.5e-5, rel=1e-12)
+    assert gamma_1300["KO0.5"] == pytest.approx(7.2e-5, rel=1e-12)
 
 
 def test_liquidus_flag_trips_for_demaria_12022_sub_liquidus_case() -> None:

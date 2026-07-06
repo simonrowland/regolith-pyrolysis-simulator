@@ -136,28 +136,40 @@ _GAMMA_MODEL = {
         # DeMaria-inverted 1300->1500 K slope:
         # log10(4.5e-3 / 1.8e-4) / 200 K.
         "temperature_slope_dex_per_K": math.log10(4.5e-3 / 1.8e-4) / 200.0,
-        # Provisional structural response: positive so gamma rises as the melt
-        # becomes more basic/depolymerized; seeded until binary fits land.
-        "lambda_slope_dex": 8.0,
-        # Provisional NBO/T response; lower weight than Lambda to avoid double
-        # counting before Toop-Samis/MQM calibration.
-        "nbo_t_slope_dex": 0.35,
+        # Optical-basicity response calibrated against the CMS/Abdelouhab series
+        # (COMPILED-ACTIVITY-KEMS.md Axis 3): log10(gamma) ~ 4.5 +/- 1.0 per
+        # Lambda unit, scatter +/-0.8 dex. E-glass/Al-rich outliers break a
+        # universal single-Lambda fit; UNCERTIFIED.
+        "lambda_slope_dex": 4.5,
+        # NBO/T response calibrated against the Zaitsev/Charles/Neudorf binary
+        # alkali-silicate ladder (COMPILED-ACTIVITY-KEMS.md Axis 1):
+        # log10(gamma_NaO0.5) ~ (-8.5 +/- 1.5) + (2.8 +/- 0.6) * NBO/T at
+        # ~1473 K; scatter +/-1.5 dex across EMF/KEMS/transpiration families.
+        # NOTE: Lambda and NBO/T are correlated axes; both slopes are fitted
+        # marginals, not independent — consumers should use ONE axis at a time
+        # until a joint Toop-Samis/MQM calibration lands. UNCERTIFIED.
+        "nbo_t_slope_dex": 2.8,
     },
     "KO0.5": {
-        # Provisional K anchor tied to the same DeMaria/Wolf trend family;
-        # K lacks a clean inverted gamma table in the current grounding note.
-        "anchor_gamma_at_1500K": 6.0e-3,
-        # Same thermal slope as Na until K-specific KEMS inversion lands.
-        "temperature_slope_dex_per_K": math.log10(4.5e-3 / 1.8e-4) / 200.0,
-        # Provisional structural response; K is at least as modifier-like as Na.
-        "lambda_slope_dex": 8.0,
-        # Provisional NBO/T response shared with Na.
-        "nbo_t_slope_dex": 0.35,
+        # DeMaria-inverted lunar-basalt K anchor, Sossi & Fegley 2018 (OCR
+        # source.md line ~350, Fig. 5): gamma_KO0.5 = 3.5e-5 at 1500 K.
+        # Replaces the provisional 6.0e-3 (was ~170x high vs the primary).
+        "anchor_gamma_at_1500K": 3.5e-5,
+        # K thermal slope from the same primary: 3.5e-5 @1500 K vs 7.2e-5
+        # @1300 K — gamma RISES on cooling (opposite sign to Na, weak).
+        # log10(3.5e-5 / 7.2e-5) / 200 ~= -1.57e-3 dex/K. Sign-ambiguous in
+        # the literature (K3/K4 lanes disagree); UNCERTIFIED.
+        "temperature_slope_dex_per_K": math.log10(3.5e-5 / 7.2e-5) / 200.0,
+        # Same calibrated structural axes as Na (K binary ladder parallels Na
+        # with slightly lower gamma at fixed NBO/T; Axis 1 slope 3.0 +/- 0.6).
+        "lambda_slope_dex": 4.5,
+        "nbo_t_slope_dex": 3.0,
     },
     "CaO": {
-        # Major-oxide nonideality is milder than alkalis in the grounding note;
-        # 0.45 is a reference-only basalt-scale starting point.
-        "anchor_gamma_at_1500K": 0.45,
+        # Aligned to the chemistry-provenance registry choice for CaO
+        # (gamma ~ 1.2e-2, envelope 1e-3..0.15; Sossi & Fegley 2018 Table 2 /
+        # Beckett 2002 CMAS basicity band). Was 0.45 (above the envelope).
+        "anchor_gamma_at_1500K": 1.2e-2,
         # Small positive T slope: major-oxide gamma tends toward unity as T rises.
         "temperature_slope_dex_per_K": 5.0e-4,
         # Weak provisional basicity response for CaO.
@@ -166,9 +178,9 @@ _GAMMA_MODEL = {
         "nbo_t_slope_dex": 0.10,
     },
     "MgO": {
-        # Major-oxide nonideality is milder than alkalis; MgO starts closer to
-        # unity than alkalis but remains diagnostic-only.
-        "anchor_gamma_at_1500K": 0.60,
+        # Aligned to the registry choice for MgO (gamma = 1.0 ideal; Sossi &
+        # Fegley 2018 Table 2 / Beckett 2002 MgO ~0.25-4 straddles unity).
+        "anchor_gamma_at_1500K": 1.0,
         # Small positive T slope: major-oxide gamma tends toward unity as T rises.
         "temperature_slope_dex_per_K": 5.0e-4,
         # Weak provisional basicity response for MgO.
