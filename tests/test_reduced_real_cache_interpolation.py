@@ -348,9 +348,71 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     assert payload is not None
     assert store.last_cache_state == "cached_interpolated"
     assert store.replay_sequence[-1]["cache_state"] == "cached_interpolated"
+    uncertainty = store.replay_sequence[-1]["interpolation_uncertainty"]
+    assert uncertainty["dtype"] == "float64"
+    assert uncertainty["vector"]["cache_distance"] > 0.0
+    payload_bytes = canonical_json_bytes(payload)
+    assert b"interpolation_uncertainty" in canonical_json_bytes(store.replay_sequence[-1])
+    assert b"interpolation_uncertainty" not in payload_bytes
+    without_diagnostics = rci.interpolate_equilibrium_payload(
+        query,
+        [
+            _candidate(low, _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0)),
+            _candidate(high, _interpolation_payload(liquid_fraction=0.71, sio_pa=7.05)),
+        ],
+        weights=[0.5, 0.5],
+    )
+    assert hashlib.sha256(payload_bytes).hexdigest() == hashlib.sha256(
+        canonical_json_bytes(without_diagnostics)
+    ).hexdigest()
+    summary = store.summary()
+    assert summary["interpolation_uncertainty_points"] == 1
+    assert summary["interpolation_uncertainty_ranked_table_drain"]["selected"]
     assert payload["equilibrium_result"]["liquid_fraction"] == pytest.approx(0.705)
     assert payload["equilibrium_result"]["vapor_pressures_Pa"]["SiO"] == pytest.approx(7.025)
     assert "cached_interpolated_linear_estimate" in payload["equilibrium_result"]["warnings"]
+
+
+def test_cached_interpolated_eval_trace_emits_feasibility_verdict(tmp_path: Path) -> None:
+    from simulator.optimize.evaluate import _trace_payload_with_interpolation_feasibility
+    from simulator.optimize.physics import GateMargin, ThresholdSpec
+
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1490.0)
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1510.0)
+    db_path = tmp_path / "trace-verdict.sqlite"
+    _put_interpolation_row(db_path, low, liquid_fraction=0.7, sio_pa=7.0)
+    _put_interpolation_row(db_path, high, liquid_fraction=0.71, sio_pa=7.05)
+
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    assert store._lookup_optional(
+        str(query["artifact"]),
+        query,
+        physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
+    )
+    trace = _trace_payload_with_interpolation_feasibility(
+        {},
+        SimpleNamespace(reduced_real_cache=store.summary()),
+        {
+            "yield": GateMargin(
+                gate="yield",
+                feasible=True,
+                margin=0.01,
+                threshold=ThresholdSpec(
+                    id="yield_min",
+                    value=0.0,
+                    units="fraction",
+                    source="synthetic",
+                    source_ref="exact synthetic trace verdict",
+                ),
+                observed=0.01,
+                detail="synthetic exact margin",
+            )
+        },
+    )
+
+    assert trace["interpolation_feasibility_verdict"]["verdict"] == "indeterminate"
+    assert trace["interpolation_feasibility_verdict"]["diagnostic_only"] is True
 
 
 def test_lookup_optional_accepts_fully_liquid_single_phase_rows(tmp_path: Path) -> None:

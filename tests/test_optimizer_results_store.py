@@ -296,6 +296,40 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
 
 
+def test_interpolation_diagnostics_do_not_change_result_store_row_key(tmp_path) -> None:
+    spec = _base_spec()
+    expected_key = cache_key(spec)
+    scored = _scored(
+        spec,
+        result_blob={
+            "hours": [{"hour": 1, "oxygen_kg": 10.0}],
+            "interpolation_feasibility_verdict": {
+                "schema_version": "interpolation_feasibility_verdict.v1",
+                "verdict": "indeterminate",
+                "diagnostic_only": True,
+            },
+            "reduced_real_cache": {
+                "interpolation_uncertainty_ranked_table_drain": {
+                    "schema_version": "interpolation_uncertainty_ranked_tables.v1",
+                    "selected": [{"point_id": "a", "uncertainty": {"large": "blob"}}],
+                }
+            },
+        },
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, scored, created_at="2026-07-06T00:00:00Z")
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        rows = conn.execute("SELECT cache_key FROM results").fetchall()
+    assert [row[0] for row in rows] == [expected_key]
+    assert store.fetch(expected_key).cache_key == expected_key
+
+
 def test_store_rejects_feasible_out_of_domain_backend_status_reason_from_cache_write(
     tmp_path,
 ) -> None:

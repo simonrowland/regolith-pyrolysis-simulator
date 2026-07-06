@@ -16,6 +16,7 @@ from simulator.reduced_real_determinism import (
     canonical_physics_bucket_key_from_replay_key,
     physics_control_rung_error_budget,
 )
+from simulator.interpolation_uncertainty import build_interpolation_uncertainty_vector
 
 
 INTERPOLATION_NEIGHBOR_K = 4
@@ -454,12 +455,19 @@ def attempt_cached_interpolation(
         weights=weight_info["weights"],
     )
     error_estimate = estimate_interpolation_error(neighbors, payload)
+    uncertainty = build_interpolation_uncertainty_vector(
+        query_key,
+        neighbors,
+        weight_info=weight_info,
+        error_estimate=error_estimate,
+    )
     return {
         "payload": payload,
         "neighbors": neighbors,
         "gate": gate,
         "weight_info": weight_info,
         "error_estimate": error_estimate,
+        "uncertainty": uncertainty,
     }
 
 

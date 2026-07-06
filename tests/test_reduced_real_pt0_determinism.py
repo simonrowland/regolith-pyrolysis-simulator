@@ -462,6 +462,44 @@ def _physics_ladder_hash(key: dict, rung_tag: str) -> str:
     return _key_hash(rrd.canonical_physics_ladder_bucket_key_from_replay_key(key, rung_tag))
 
 
+def test_interpolation_diagnostics_do_not_enter_replay_key() -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    fO2_log = sim._compute_intrinsic_melt_fO2()
+    before = canonical_replay_key(
+        sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=fO2_log,
+        fe_redox_policy="intrinsic",
+    )
+
+    sim.reduced_real_cache = {
+        "interpolation_uncertainty_ranked_table_drain": {
+            "schema_version": "interpolation_uncertainty_ranked_tables.v1",
+            "selected": [{"point_id": "a", "uncertainty": {"large": "blob"}}],
+        }
+    }
+    sim._last_backend_diagnostics = {
+        "interpolation_feasibility_verdict": {
+            "schema_version": "interpolation_feasibility_verdict.v1",
+            "verdict": "indeterminate",
+        }
+    }
+    after = canonical_replay_key(
+        sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=fO2_log,
+        fe_redox_policy="intrinsic",
+    )
+
+    assert after == before
+    assert b"interpolation_uncertainty" not in canonical_json_bytes(after)
+    assert b"interpolation_feasibility" not in canonical_json_bytes(after)
+
+
 def _c3a_ladder_key(
     label: str,
     *,
@@ -1550,6 +1588,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
         "data_digests_json",
         "git_dirty",
     } <= columns
+    assert not any("interpolation" in column for column in columns)
     assert row[0] == "freeze_gate_curve"
     assert row[1]
     assert row[2]

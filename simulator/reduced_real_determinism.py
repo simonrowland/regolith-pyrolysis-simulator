@@ -591,6 +591,11 @@ class PT0DeterminismStore:
         return _curve_from_payload(payload["curve"])
 
     def summary(self) -> dict[str, Any]:
+        from simulator.interpolation_uncertainty import (
+            interpolation_uncertainty_points_from_replay_sequence,
+            ranked_table_drain,
+        )
+
         by_artifact = Counter(
             record["artifact"] for record in self.capture_sequence
         )
@@ -602,7 +607,7 @@ class PT0DeterminismStore:
             artifact = event["artifact"]
             state_counts_by_artifact.setdefault(artifact, Counter())
             state_counts_by_artifact[artifact][event["cache_state"]] += 1
-        return {
+        summary = {
             "mode": self.mode,
             "entries": len(self.entries),
             "capture_calls": len(self.capture_sequence),
@@ -638,6 +643,15 @@ class PT0DeterminismStore:
                 }
             ),
         }
+        uncertainty_points = interpolation_uncertainty_points_from_replay_sequence(
+            self.replay_sequence
+        )
+        if uncertainty_points:
+            summary["interpolation_uncertainty_points"] = len(uncertainty_points)
+            summary["interpolation_uncertainty_ranked_table_drain"] = (
+                ranked_table_drain(uncertainty_points)
+            )
+        return summary
 
     def key_drift_histogram(self) -> dict[str, int]:
         """Replay-only drift counts for 1:1 capture/replay sequence comparisons."""
@@ -987,6 +1001,7 @@ class PT0DeterminismStore:
             ],
             "interpolation_mode": attempt["weight_info"]["mode"],
             "interpolation_error_estimate": attempt["error_estimate"],
+            "interpolation_uncertainty": attempt["uncertainty"],
             "interpolation_gate": attempt["gate"],
         }
         self.replay_sequence.append(replay_event)

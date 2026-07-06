@@ -1882,9 +1882,11 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "force_builtin_vapor_pressure",
             "kernel_fallback_used",
             "knob_saturation",
+            "interpolation_feasibility_verdict",
         ):
             if key in trace:
                 payload[key] = _jsonable_value(trace[key])
+        _project_interpolation_ranked_drain_summary(trace, payload)
     return MappingProxyType(payload) if payload else None
 
 
@@ -2068,10 +2070,35 @@ def _light_backend_status_trace_for_reference(
             "force_builtin_vapor_pressure",
             "kernel_fallback_used",
             "knob_saturation",
+            "interpolation_feasibility_verdict",
         ):
             if key in reference.trace:
                 payload[key] = _jsonable_value(reference.trace[key])
+        _project_interpolation_ranked_drain_summary(reference.trace, payload)
     return MappingProxyType(payload)
+
+
+def _project_interpolation_ranked_drain_summary(
+    trace: Mapping[str, Any],
+    payload: dict[str, Any],
+) -> None:
+    reduced_real_cache = trace.get("reduced_real_cache")
+    if not isinstance(reduced_real_cache, Mapping):
+        return
+    drain = reduced_real_cache.get("interpolation_uncertainty_ranked_table_drain")
+    if not isinstance(drain, Mapping):
+        return
+    selected = drain.get("selected")
+    selected_count = (
+        len(selected)
+        if isinstance(selected, Sequence) and not isinstance(selected, (str, bytes))
+        else 0
+    )
+    payload["interpolation_uncertainty_ranked_drain"] = {
+        "schema_version": drain.get("schema_version"),
+        "present": True,
+        "selected_count": selected_count,
+    }
 
 
 def _failure_counts(records: Sequence[StudyRecord]) -> Mapping[str, int]:

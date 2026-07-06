@@ -49,6 +49,9 @@ from simulator.optimize.evalspec import (
     current_code_version,
     feedstock_recipe_digest,
 )
+from simulator.interpolation_uncertainty import (
+    feasibility_verdict_from_reduced_real_cache,
+)
 from simulator.optimize.knob_saturation import compute_knob_saturation
 from simulator.fidelity_vocabulary import (
     FidelityVocabularyTranslationError,
@@ -912,6 +915,11 @@ def evaluate(
             eval_spec=spec,
             cache_key_value=key,
         ) from exc
+    trace_payload = _trace_payload_with_interpolation_feasibility(
+        trace_payload,
+        run_execution,
+        feasibility.margins,
+    )
 
     return ScoredResult(
         candidate_id=candidate_id,
@@ -935,6 +943,22 @@ def _trace_payload_with_knob_saturation(
 ) -> Mapping[str, Any]:
     payload = dict(trace_payload) if isinstance(trace_payload, Mapping) else {}
     payload["knob_saturation"] = knob_saturation
+    return MappingProxyType(payload)
+
+
+def _trace_payload_with_interpolation_feasibility(
+    trace_payload: Mapping[str, Any] | None,
+    run_execution: Any,
+    margins: Mapping[str, GateMargin],
+) -> Mapping[str, Any] | None:
+    verdict = feasibility_verdict_from_reduced_real_cache(
+        margins,
+        getattr(run_execution, "reduced_real_cache", None),
+    )
+    if verdict is None:
+        return trace_payload
+    payload = dict(trace_payload) if isinstance(trace_payload, Mapping) else {}
+    payload["interpolation_feasibility_verdict"] = verdict
     return MappingProxyType(payload)
 
 
@@ -2613,6 +2637,11 @@ def _infeasible_result(
     notes: tuple[str, ...] = (),
     trace_payload: Mapping[str, Any] | None = None,
 ) -> ScoredResult:
+    trace_payload = _trace_payload_with_interpolation_feasibility(
+        trace_payload,
+        run_execution,
+        feasibility.margins,
+    )
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,

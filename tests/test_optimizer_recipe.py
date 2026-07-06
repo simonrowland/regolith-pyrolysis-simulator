@@ -10,6 +10,7 @@ from pathlib import Path
 import yaml
 import pytest
 
+import simulator.optimize.study as study_module
 from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     OXYGEN_SINK_CHANNEL_MODE_VALUES,
@@ -40,8 +41,9 @@ from simulator.optimize.recipe import (
 )
 import simulator.optimize.recipe as recipe_module
 from simulator.optimize.canonical import canonical_json_dumps
-from simulator.optimize.evaluate import _build_eval_inputs
+from simulator.optimize.evaluate import RunReference, _build_eval_inputs
 from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
+from simulator.interpolation_uncertainty import build_interpolation_uncertainty_vector
 from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
 from simulator.runner import PyrolysisRun
@@ -1112,6 +1114,89 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
+
+
+def test_interpolation_uncertainty_diagnostics_do_not_enter_evalspec_cache_key() -> None:
+    spec = EvalSpec(
+        recipe_id="recipe-id",
+        feedstock_recipe_digest="feedstock-recipe-digest",
+        feedstock_id=FEEDSTOCK,
+        profile_id="profile-id",
+        fidelity="fast",
+        code_version="test-code-version",
+        data_digests=DATA_DIGESTS,
+    )
+    before_key = cache_key(spec)
+    before_json = canonical_evalspec_json(spec)
+
+    diagnostic = build_interpolation_uncertainty_vector(
+        {
+            "composition_mol_fraction": [("FeO", 0.2), ("SiO2", 0.8)],
+            "controls": {"T_K": 1500.0, "pressure_bar": 0.01},
+        },
+        [
+            {
+                "key": {
+                    "composition_mol_fraction": [("FeO", 0.2), ("SiO2", 0.8)],
+                    "controls": {"T_K": 1490.0, "pressure_bar": 0.01},
+                },
+                "payload": {"equilibrium_result": {"liquid_fraction": 0.7}},
+                "interpolation_distance": 0.01,
+            },
+            {
+                "key": {
+                    "composition_mol_fraction": [("FeO", 0.2), ("SiO2", 0.8)],
+                    "controls": {"T_K": 1510.0, "pressure_bar": 0.01},
+                },
+                "payload": {"equilibrium_result": {"liquid_fraction": 0.8}},
+                "interpolation_distance": 0.02,
+            },
+        ],
+    )
+
+    assert diagnostic["schema_version"] == "interpolation_uncertainty_vector.v1"
+    assert cache_key(spec) == before_key
+    assert canonical_evalspec_json(spec) == before_json
+    assert b"interpolation_uncertainty" not in before_json
+    assert b"cache_distance" not in before_json
+
+
+def test_interpolation_diagnostics_project_to_study_trace_summary() -> None:
+    reference = RunReference(
+        status="ok",
+        trace={
+            "backend_status": "ok",
+            "interpolation_feasibility_verdict": {
+                "schema_version": "interpolation_feasibility_verdict.v1",
+                "verdict": "indeterminate",
+                "diagnostic_only": True,
+            },
+            "reduced_real_cache": {
+                "interpolation_uncertainty_ranked_table_drain": {
+                    "schema_version": "interpolation_uncertainty_ranked_tables.v1",
+                    "selected": [
+                        {"point_id": "a", "uncertainty": {"large": "blob"}},
+                        {"point_id": "b", "uncertainty": {"large": "blob"}},
+                    ],
+                }
+            },
+        },
+        backend_status="ok",
+        backend_authoritative=False,
+    )
+
+    direct = study_module._trace_summary_mapping(reference)
+    stripped = study_module._light_backend_status_trace_for_reference(reference)
+
+    for summary in (direct, stripped):
+        assert summary["interpolation_feasibility_verdict"]["verdict"] == "indeterminate"
+        assert summary["interpolation_uncertainty_ranked_drain"] == {
+            "schema_version": "interpolation_uncertainty_ranked_tables.v1",
+            "present": True,
+            "selected_count": 2,
+        }
+        assert "reduced_real_cache" not in summary
+        assert "interpolation_uncertainty_ranked_table_drain" not in summary
 
 
 def test_recipe_id_changes_when_allowlist_version_changes() -> None:
