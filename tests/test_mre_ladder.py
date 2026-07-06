@@ -9,13 +9,15 @@ import yaml
 
 from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
 from simulator import mre_ladder
+from simulator import extraction as extraction_module
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.core import PyrolysisSimulator
+from simulator.evaporation import EvaporationFlux
 from simulator.melt_backend.base import StubBackend
 from simulator.runner import PyrolysisRun, build_per_hour_summary
 from simulator.session import SimSession
-from simulator.state import CampaignPhase, MeltState, MOLAR_MASS
+from simulator.state import CampaignPhase, EnergyRecord, MeltState, MOLAR_MASS
 
 
 def _repo_setpoints() -> dict:
@@ -32,6 +34,22 @@ def _sim(setpoints: dict) -> PyrolysisSimulator:
         {"x": {"label": "X", "composition_wt_pct": {"SiO2": 100}}},
         {"metals": {}, "oxide_vapors": {}},
     )
+
+
+def _seed_cleaned_melt_kg(
+    sim: PyrolysisSimulator,
+    species_kg: dict[str, float],
+) -> None:
+    sim.atom_ledger = sim._new_atom_ledger()
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {
+            species: float(kg) / (MOLAR_MASS[species] / 1000.0)
+            for species, kg in species_kg.items()
+        },
+        source="test cleaned melt seed",
+    )
+    sim._chem_kernel = sim._build_chemistry_kernel()
 
 
 def _species_names(sequence: list[dict]) -> list[str]:
@@ -263,6 +281,281 @@ def test_step_mre_restricts_reducible_oxides_to_target_rung():
     assert captured
     assert captured[0]["allowed_oxides"] == ["SiO2"]
     assert captured[0]["voltage_V"] == pytest.approx(1.45)
+
+
+def test_c5_ellingham_ladder_diagnostic_emits_and_flags_synthetic_reordering(
+    monkeypatch,
+):
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 0.75, "min_hold_hours": 3},
+                {"species": "SiO2", "decomposition_V": 1.45, "min_hold_hours": 3},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = "FeO"
+    sim.melt.mre_max_voltage_V = 0.75
+    sim.melt.temperature_C = 1600.0
+    sim.melt.composition_kg = {"FeO": 10.0, "SiO2": 10.0}
+    _seed_cleaned_melt_kg(sim, {"FeO": 10.0, "SiO2": 10.0})
+    sim._mre_voltage_step_idx = 0
+    captured: list[dict] = []
+
+    def fake_delta_g(species: str, temperature_K: float) -> float:
+        assert temperature_K == pytest.approx(1873.15)
+        if species == "Si":
+            return -200.0
+        if species == "Fe":
+            return -500.0
+        raise KeyError(species)
+
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
+        captured.append(dict(control_inputs))
+        return SimpleNamespace(
+            diagnostic={
+                "energy_kWh": 0.0,
+                "metals_produced_kg": {},
+                "metals_produced_mol": {},
+                "oxides_reduced_kg": {},
+            },
+            transition=None,
+        )
+
+    monkeypatch.setattr(
+        extraction_module.ellingham_graph,
+        "dissociation_delta_g",
+        fake_delta_g,
+    )
+    sim._commanded_pO2_bar = lambda: 1.0
+    sim._dispatch_only = fake_dispatch
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+
+    sim._step_mre()
+
+    assert captured[0]["allowed_oxides"] == ["FeO"]
+    assert captured[0]["voltage_V"] == pytest.approx(0.75)
+    diagnostic = sim._mre_ellingham_ladder_diagnostic
+    assert diagnostic["certification"] == "diagnostic_uncertified"
+    assert diagnostic["authority"] == "read_only_ellingham_graph"
+    assert diagnostic["activity_basis"] == "cleaned_melt_account"
+    assert diagnostic["declared_rung_V"] == pytest.approx(0.75)
+    assert diagnostic["rung_species"] == ["FeO"]
+    assert diagnostic["species"]["FeO"]["oxide_activity"] == pytest.approx(0.5)
+    assert diagnostic["derived_Ed_V"]["FeO"] > 0.75
+    assert diagnostic["species"]["SiO2"]["derived_Ed_V"] < 0.75
+    assert diagnostic["species"]["SiO2"]["declared_after_held_rung"] is True
+    assert diagnostic["reordering"]["ordering_divergence_detected"] is True
+    assert diagnostic["reordering"]["other_species_below_declared_rung"] == ["SiO2"]
+
+    snapshot = sim._make_snapshot()
+    assert snapshot.mre_ellingham_ladder_diagnostic == diagnostic
+    summary = build_per_hour_summary(sim, snapshot)
+    assert summary["mre_ellingham_ladder_diagnostic"]["schema"] == (
+        "c5_ellingham_ladder_diagnostic_v1"
+    )
+
+
+def test_c5_disabled_keeps_ellingham_ladder_diagnostic_empty_in_snapshot():
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 0.75, "min_hold_hours": 3},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = False
+    sim._mre_ellingham_ladder_diagnostic = {"schema": "stale"}
+
+    sim._step_mre()
+
+    assert sim._mre_ellingham_ladder_diagnostic == {}
+    assert sim._make_snapshot().mre_ellingham_ladder_diagnostic == {}
+
+
+def test_c5_ellingham_ladder_diagnostic_failure_does_not_change_dispatch(
+    monkeypatch,
+):
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 0.75, "min_hold_hours": 3},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = "FeO"
+    sim.melt.mre_max_voltage_V = 0.75
+    sim.melt.temperature_C = 1600.0
+    sim.melt.composition_kg = {"FeO": 10.0}
+    _seed_cleaned_melt_kg(sim, {"FeO": 10.0})
+    captured: list[dict] = []
+
+    def fail_diagnostic(**_kwargs):
+        raise RuntimeError("synthetic diagnostic failure")
+
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
+        captured.append(dict(control_inputs))
+        return SimpleNamespace(
+            diagnostic={
+                "energy_kWh": 0.0,
+                "metals_produced_kg": {},
+                "metals_produced_mol": {},
+                "oxides_reduced_kg": {},
+            },
+            transition=None,
+        )
+
+    monkeypatch.setattr(sim, "_build_c5_ellingham_ladder_diagnostic", fail_diagnostic)
+    sim._dispatch_only = fake_dispatch
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+
+    sim._step_mre()
+
+    assert captured[0]["voltage_V"] == pytest.approx(0.75)
+    assert captured[0]["allowed_oxides"] == ["FeO"]
+    diagnostic = sim._mre_ellingham_ladder_diagnostic
+    assert diagnostic["activity_basis"] == "cleaned_melt_account"
+    assert diagnostic["status"] == "diagnostic_failed:RuntimeError"
+    assert diagnostic["declared_rung_V"] == pytest.approx(0.75)
+    assert diagnostic["rung_species"] == ["FeO"]
+
+
+def test_non_mre_step_clears_prior_c5_ellingham_ladder_diagnostic(monkeypatch):
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 0.75, "min_hold_hours": 3},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = "FeO"
+    sim.melt.mre_max_voltage_V = 0.75
+    sim.melt.temperature_C = 1600.0
+    sim.melt.composition_kg = {"FeO": 10.0}
+    _seed_cleaned_melt_kg(sim, {"FeO": 10.0})
+
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
+        return SimpleNamespace(
+            diagnostic={
+                "energy_kWh": 0.0,
+                "metals_produced_kg": {},
+                "metals_produced_mol": {},
+                "oxides_reduced_kg": {},
+            },
+            transition=None,
+        )
+
+    sim._dispatch_only = fake_dispatch
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+    sim._step_mre()
+    assert sim._mre_ellingham_ladder_diagnostic
+
+    sim.melt.campaign = CampaignPhase.C0
+    monkeypatch.setattr(
+        sim.campaign_mgr,
+        "apply_lab_schedule_controls",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(
+        sim.campaign_mgr,
+        "apply_c2a_staged_gas_controls",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(
+        sim.campaign_mgr,
+        "check_endpoint",
+        lambda *_args, **_kwargs: False,
+    )
+    for name in (
+        "_sync_c2a_staged_overhead_gas_control",
+        "validate_lab_surface_temperature_resolver",
+        "_update_temperature",
+        "_apply_oxygen_reservoir_exchange",
+        "_apply_o2_bubbler",
+        "_apply_fe_redox_respeciation",
+        "_refresh_oxygen_reservoir_transport_pO2_for_vapor",
+        "_sync_oxygen_kg_counters",
+        "_update_overlap_evaporation_diagnostic",
+        "_update_extraction_completeness_diagnostic",
+    ):
+        monkeypatch.setattr(sim, name, lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(sim.melt, "validate_melt_pressures", lambda: None)
+    monkeypatch.setattr(
+        sim,
+        "_apply_native_fe_saturation_split",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(sim, "_get_equilibrium", lambda: SimpleNamespace())
+    monkeypatch.setattr(sim, "_calculate_evaporation", lambda _eq: EvaporationFlux())
+    monkeypatch.setattr(sim, "_apply_analytic_evaporation_depletion", lambda flux: flux)
+    monkeypatch.setattr(sim, "_update_melt_composition", lambda _flux: None)
+    monkeypatch.setattr(
+        sim,
+        "_has_remaining_fe_redox_internal_o2_capacity",
+        lambda: False,
+    )
+    monkeypatch.setattr(sim, "_get_turbine_spec", lambda: None)
+    monkeypatch.setattr(sim, "_overhead_headspace_enabled", lambda: False)
+    monkeypatch.setattr(sim, "_ledger_o2_kg", lambda _account: 0.0)
+    monkeypatch.setattr(
+        sim.overhead_model,
+        "update",
+        lambda *_args, **_kwargs: sim.overhead,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_dispatch_overhead_bleed",
+        lambda **_kwargs: SimpleNamespace(diagnostic={}),
+    )
+    monkeypatch.setattr(
+        sim,
+        "_attribute_o2_bubbler_vented_from_bleed",
+        lambda _result: None,
+    )
+    monkeypatch.setattr(
+        sim.energy_tracker,
+        "calculate_hour",
+        lambda *_args, **_kwargs: EnergyRecord(),
+    )
+    monkeypatch.setattr(sim.energy_tracker, "cumulative_breakdown", lambda: {})
+    monkeypatch.setattr(
+        sim,
+        "_evap_plane_selectivity_diagnostic",
+        lambda _flux: {},
+    )
+    monkeypatch.setattr(sim, "_compute_fe_redox_split_diagnostic", lambda: {})
+    monkeypatch.setattr(sim, "_redox_source_breakdown_diagnostic", lambda: {})
+    monkeypatch.setattr(sim, "_oxygen_total_kg", lambda: 0.0)
+
+    snapshot = sim.step()
+
+    assert sim._mre_ellingham_ladder_diagnostic == {}
+    assert snapshot.mre_ellingham_ladder_diagnostic == {}
 
 
 def test_c5_safety_max_hold_advances_without_low_current():

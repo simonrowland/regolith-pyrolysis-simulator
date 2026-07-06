@@ -1441,6 +1441,15 @@ def _mre_uncertified_yield_observables(snapshot: HourSnapshot) -> dict[str, Any]
     return {"mre_uncertified_yield": _json_safe(summary)}
 
 
+def _mre_ellingham_ladder_diagnostic_observables(
+    snapshot: HourSnapshot,
+) -> dict[str, Any]:
+    summary = dict(getattr(snapshot, "mre_ellingham_ladder_diagnostic", {}) or {})
+    if not summary:
+        return {}
+    return {"mre_ellingham_ladder_diagnostic": _json_safe(summary)}
+
+
 def build_per_hour_summary(
     sim: PyrolysisSimulator,
     snapshot: HourSnapshot,
@@ -1577,6 +1586,7 @@ def build_per_hour_summary(
         **_evap_plane_selectivity_observables(snapshot),
         **_redox_source_breakdown_observables(snapshot),
         **_mre_uncertified_yield_observables(snapshot),
+        **_mre_ellingham_ladder_diagnostic_observables(snapshot),
         **fe_redox_split_observables,
     }
     if fe_redox_split_observables and hasattr(sim, "_stage3_fe_wt_pct_diagnostic"):

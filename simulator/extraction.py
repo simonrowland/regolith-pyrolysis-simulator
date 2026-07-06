@@ -3,15 +3,18 @@
 from __future__ import annotations
 
 import math
-from typing import Dict, Mapping
+from typing import Any, Dict, Mapping
 
 import simulator.mre_ladder as mre_ladder
 from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
 from simulator.accounting.queries import AccountingQueries
+from simulator.chemistry import ellingham_graph
 from simulator.condensation_routing import product_stage_number
 from simulator.state import (
     FARADAY,
+    GAS_CONSTANT,
     MOLAR_MASS,
+    OXIDE_TO_METAL,
     CampaignPhase,
 )
 
@@ -570,6 +573,183 @@ class ExtractionMixin:
         """
         return mre_ladder.build_mre_voltage_sequence(self.setpoints)
 
+    @staticmethod
+    def _finite_or_none(value: float | None) -> float | None:
+        if value is None:
+            return None
+        try:
+            result = float(value)
+        except (TypeError, ValueError):
+            return None
+        return result if math.isfinite(result) else None
+
+    def _c5_ellingham_derived_decomposition_voltage(
+        self,
+        oxide: str,
+        *,
+        temperature_K: float,
+        pO2_bar: float,
+        oxide_activity: float,
+    ) -> tuple[float | None, str | None, str | None]:
+        metal_info = OXIDE_TO_METAL.get(str(oxide))
+        if metal_info is None:
+            return None, None, 'oxide_not_in_reduction_stoichiometry'
+
+        metal_species, _n_met, n_oxy = metal_info
+        n_electrons = 2.0 * float(n_oxy)
+        if n_electrons <= 0.0:
+            return None, str(metal_species), 'invalid_electron_count'
+
+        try:
+            dG_form_kJ_per_mol_O2 = ellingham_graph.dissociation_delta_g(
+                str(metal_species),
+                float(temperature_K),
+            )
+        except Exception as exc:  # diagnostic-only: never gate C5 behavior
+            return None, str(metal_species), f'ellingham_query_failed:{type(exc).__name__}'
+
+        standard_Ed_V = -float(dG_form_kJ_per_mol_O2) * 1000.0 / (4.0 * FARADAY)
+        activity = max(float(oxide_activity), 1e-30)
+        pO2 = max(float(pO2_bar), 1e-30)
+        o2_mol_per_oxide = float(n_oxy) / 2.0
+        nernst_V = (
+            -((GAS_CONSTANT * float(temperature_K)) / (n_electrons * FARADAY))
+            * math.log(activity)
+            + ((GAS_CONSTANT * float(temperature_K)) / (n_electrons * FARADAY))
+            * o2_mol_per_oxide
+            * math.log(pO2)
+        )
+        return standard_Ed_V + nernst_V, str(metal_species), None
+
+    def _build_c5_ellingham_ladder_diagnostic(
+        self,
+        *,
+        step_info: Mapping[str, Any],
+        declared_rung_V: float,
+        pO2_bar: float,
+    ) -> dict[str, Any]:
+        temperature_C = float(getattr(self.melt, 'temperature_C', 0.0))
+        temperature_K = temperature_C + 273.15
+        cleaned_melt_kg = AccountingQueries(self).species_kg_by_accounts(
+            ('process.cleaned_melt',)
+        )
+        cleaned_melt_total_kg = sum(
+            max(0.0, float(kg)) for kg in cleaned_melt_kg.values()
+        )
+        rung_species = tuple(str(oxide) for oxide in step_info.get('species', ()) or ())
+
+        ladder_steps = []
+        for raw_entry in self._mre_voltage_sequence or ():
+            if not isinstance(raw_entry, Mapping):
+                continue
+            voltage = mre_ladder.coerce_mre_decomposition_voltage(
+                raw_entry.get('voltage')
+            )
+            if voltage is None:
+                continue
+            raw_species = raw_entry.get('species') or ()
+            if isinstance(raw_species, str):
+                species = (raw_species,)
+            else:
+                species = tuple(str(item) for item in raw_species if item)
+            if not species:
+                continue
+            ladder_steps.append((float(voltage), species))
+
+        species_rows: dict[str, Any] = {}
+        for static_declared_V, species in ladder_steps:
+            for oxide in species:
+                activity = 0.0
+                if cleaned_melt_total_kg > 0.0:
+                    activity = max(
+                        0.0,
+                        float(cleaned_melt_kg.get(oxide, 0.0))
+                        / cleaned_melt_total_kg,
+                    )
+                derived_Ed_V, metal_species, status = (
+                    self._c5_ellingham_derived_decomposition_voltage(
+                        oxide,
+                        temperature_K=temperature_K,
+                        pO2_bar=pO2_bar,
+                        oxide_activity=activity,
+                    )
+                )
+                species_rows[oxide] = {
+                    'ellingham_species': metal_species,
+                    'static_declared_V': static_declared_V,
+                    'oxide_activity': activity,
+                    'inventory_present': bool(
+                        cleaned_melt_kg.get(oxide, 0.0) >= 1e-6
+                    ),
+                    'derived_Ed_V': self._finite_or_none(derived_Ed_V),
+                    'delta_vs_declared_rung_V': self._finite_or_none(
+                        None if derived_Ed_V is None else derived_Ed_V - declared_rung_V
+                    ),
+                    'delta_vs_static_declared_V': self._finite_or_none(
+                        None if derived_Ed_V is None else derived_Ed_V - static_declared_V
+                    ),
+                    'declared_after_held_rung': bool(static_declared_V > declared_rung_V),
+                    'status': status or 'ok',
+                }
+
+        held_derived = {
+            oxide: row['derived_Ed_V']
+            for oxide, row in species_rows.items()
+            if oxide in rung_species
+        }
+        ordering_divergences = [
+            oxide
+            for oxide, row in species_rows.items()
+            if (
+                oxide not in rung_species
+                and row.get('declared_after_held_rung')
+                and row.get('derived_Ed_V') is not None
+                and float(row['derived_Ed_V']) <= declared_rung_V
+            )
+        ]
+        derived_order = [
+            oxide
+            for oxide, row in sorted(
+                species_rows.items(),
+                key=lambda item: (
+                    float('inf')
+                    if item[1].get('derived_Ed_V') is None
+                    else float(item[1]['derived_Ed_V']),
+                    item[0],
+                ),
+            )
+        ]
+        declared_order = [
+            oxide
+            for _voltage, species in sorted(ladder_steps, key=lambda item: item[0])
+            for oxide in species
+        ]
+
+        return {
+            'schema': 'c5_ellingham_ladder_diagnostic_v1',
+            'certification': 'diagnostic_uncertified',
+            'authority': 'read_only_ellingham_graph',
+            'activity_basis': 'cleaned_melt_account',
+            'temperature_C': temperature_C,
+            'temperature_K': temperature_K,
+            'pO2_bar': float(pO2_bar),
+            'declared_rung_V': float(declared_rung_V),
+            'rung_species': list(rung_species),
+            'derived_Ed_V': held_derived,
+            'delta_vs_declared_rung_V': {
+                oxide: species_rows[oxide]['delta_vs_declared_rung_V']
+                for oxide in rung_species
+                if oxide in species_rows
+            },
+            'reordering': {
+                'ordering_divergence_detected': bool(ordering_divergences),
+                'other_species_below_declared_rung': ordering_divergences,
+                'derived_order_by_Ed': derived_order,
+                'declared_order_by_static_voltage': declared_order,
+            },
+            'species': species_rows,
+        }
+
     def _step_mre(self) -> float:
         """
         Perform one hour of molten regolith electrolysis (C5 or MRE baseline).
@@ -612,6 +792,7 @@ class ExtractionMixin:
         from simulator.electrolysis import ELECTRONS_PER_OXIDE
 
         self._mre_uncertified_yield = {}
+        self._mre_ellingham_ladder_diagnostic = {}
         if (
             self.melt.campaign == CampaignPhase.C5
             and not getattr(self.melt, 'c5_enabled', False)
@@ -627,6 +808,7 @@ class ExtractionMixin:
             return 0.0
 
         # --- Voltage and current selection (stepped holds) ---         [Step 9]
+        c5_step_info: Mapping[str, Any] | None = None
         if self.melt.campaign == CampaignPhase.MRE_BASELINE:
             seq = self._mre_voltage_sequence
             if not seq:
@@ -715,6 +897,7 @@ class ExtractionMixin:
             else:
                 idx = min(self._mre_voltage_step_idx, len(seq) - 1)
                 step_info = seq[idx]
+                c5_step_info = step_info
                 # Cell sits at the stage voltage cap; the ladder rung is the
                 # accounting schedule, not a second applied voltage. Reported
                 # voltage MUST be the dispatched one (solved==reported); the
@@ -759,6 +942,7 @@ class ExtractionMixin:
             # Nernst remains the physical reducibility gate inside the engine.
             c5_allowed_oxides = sorted(rung_allowed_oxides)
 
+        pO2_bar = float(self._commanded_pO2_bar())
         # F-B1: dispatch + commit split via the _dispatch_only /
         # _commit_proposal helper pair so the per-account balance
         # snapshot can sit between them.  We need the pre-commit metal
@@ -771,7 +955,7 @@ class ExtractionMixin:
             'voltage_V': float(voltage_V),
             'current_A': float(current_A),
             'dt_hr': 1.0,
-            'pO2_bar': float(self._commanded_pO2_bar()),
+            'pO2_bar': pO2_bar,
         }
         melt_fO2_log = self._current_melt_redox_fO2_log()
         electrolysis_controls['melt_fO2_log'] = float(melt_fO2_log)
@@ -795,6 +979,29 @@ class ExtractionMixin:
                         'as electrolyzable cleaned melt for the active rung'
                     ),
                 )
+        c5_ellingham_ladder_diagnostic = {}
+        if self.melt.campaign == CampaignPhase.C5 and c5_step_info is not None:
+            try:
+                c5_ellingham_ladder_diagnostic = (
+                    self._build_c5_ellingham_ladder_diagnostic(
+                        step_info=c5_step_info,
+                        declared_rung_V=float(c5_step_info['voltage']),
+                        pO2_bar=pO2_bar,
+                    )
+                )
+            except Exception as exc:  # diagnostic-only: never gate C5 behavior
+                c5_ellingham_ladder_diagnostic = {
+                    'schema': 'c5_ellingham_ladder_diagnostic_v1',
+                    'certification': 'diagnostic_uncertified',
+                    'authority': 'read_only_ellingham_graph',
+                    'activity_basis': 'cleaned_melt_account',
+                    'status': f'diagnostic_failed:{type(exc).__name__}',
+                    'declared_rung_V': float(c5_step_info['voltage']),
+                    'rung_species': [
+                        str(oxide)
+                        for oxide in c5_step_info.get('species', ()) or ()
+                    ],
+                }
         kernel_result = self._dispatch_only(
             ChemistryIntent.ELECTROLYSIS_STEP,
             control_inputs=electrolysis_controls,
@@ -802,6 +1009,13 @@ class ExtractionMixin:
             fe_redox_policy='kress91_live',
         )
         diagnostic = dict(kernel_result.diagnostic or {})
+        if c5_ellingham_ladder_diagnostic:
+            diagnostic['mre_ellingham_ladder_diagnostic'] = (
+                c5_ellingham_ladder_diagnostic
+            )
+            self._mre_ellingham_ladder_diagnostic = dict(
+                c5_ellingham_ladder_diagnostic
+            )
         result = diagnostic  # legacy variable name -- same shape as step_hour's dict.
         self._mre_uncertified_yield = dict(
             result.get('uncertified_yield') or {})

@@ -383,8 +383,65 @@ schema-shape assertion.
     `_mre_uncertified_yield_observables` when
     `HourSnapshot.mre_uncertified_yield` is non-empty; a JSON-safe copy of
     that uncertified-MRE yield bookkeeping summary.
+  * `mre_ellingham_ladder_diagnostic` -- emitted by
+     `_mre_ellingham_ladder_diagnostic_observables` when C5 ladder execution
+     has a read-only, uncertified Ellingham/Nernst ladder cross-check payload.
+     The helper emits only when `HourSnapshot.mre_ellingham_ladder_diagnostic`
+     is non-empty; C5-disabled and non-MRE hours carry `{}` and therefore omit
+     the per-hour key.  Successful payload shape:
+     ```jsonc
+     {
+       "schema": "c5_ellingham_ladder_diagnostic_v1",
+       "certification": "diagnostic_uncertified",
+       "authority": "read_only_ellingham_graph",
+       "activity_basis": "cleaned_melt_account",
+       "temperature_C": 1600.0,
+       "temperature_K": 1873.15,
+       "pO2_bar": 1.0,
+       "declared_rung_V": 0.75,
+       "rung_species": ["FeO"],
+       "derived_Ed_V": {"FeO": 0.8},
+       "delta_vs_declared_rung_V": {"FeO": 0.05},
+       "reordering": {
+         "ordering_divergence_detected": false,
+         "other_species_below_declared_rung": [],
+         "derived_order_by_Ed": ["FeO", "SiO2"],
+         "declared_order_by_static_voltage": ["FeO", "SiO2"]
+       },
+       "species": {
+         "FeO": {
+           "ellingham_species": "Fe",
+           "static_declared_V": 0.75,
+           "oxide_activity": 0.5,
+           "inventory_present": true,
+           "derived_Ed_V": 0.8,
+           "delta_vs_declared_rung_V": 0.05,
+           "delta_vs_static_declared_V": 0.05,
+           "declared_after_held_rung": false,
+           "status": "ok"
+         }
+       }
+     }
+     ```
+     `activity_basis: cleaned_melt_account` means oxide activities and
+     `inventory_present` are read from `process.cleaned_melt` after the existing
+     C5 active-residue move and before electrolysis dispatch.  If the
+     cross-check itself raises, the simulator still preserves C5 dispatch
+     voltage and `allowed_oxides` behavior and emits only the minimal diagnostic
+     form:
+     ```jsonc
+     {
+       "schema": "c5_ellingham_ladder_diagnostic_v1",
+       "certification": "diagnostic_uncertified",
+       "authority": "read_only_ellingham_graph",
+       "activity_basis": "cleaned_melt_account",
+       "status": "diagnostic_failed:<ExceptionType>",
+       "declared_rung_V": 0.75,
+       "rung_species": ["FeO"]
+     }
+     ```
   * `fe_redox_split` -- emitted by `_fe_redox_split_observables` when
-    `HourSnapshot.fe_redox_split` is non-empty; per-field ferric / ferrous /
+     `HourSnapshot.fe_redox_split` is non-empty; per-field ferric / ferrous /
     native-Fe redox split (numeric fields finite-export-checked; flags
     serialized as bool / str / null).
   * `stage_3_capture` -- emitted with `fe_redox_split`; stage-3 Fe kg,

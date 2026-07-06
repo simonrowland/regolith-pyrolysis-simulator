@@ -656,6 +656,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._mre_effective_current_A = 0.0
         self._mre_energy_this_hr = 0.0
         self._mre_uncertified_yield: Dict[str, Any] = {}
+        self._mre_ellingham_ladder_diagnostic: Dict[str, Any] = {}
         self._mre_voltage_step_idx = 0
         self._mre_hold_hours = 0
         self._mre_rung_ever_effective = False
@@ -8873,6 +8874,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._mre_current_A = 0.0
             self._mre_effective_current_A = 0.0
             self._mre_metals_this_hr = {}
+            self._mre_ellingham_ladder_diagnostic = {}
             self._mre_energy_this_hr = 0.0
             self._mre_anode_O2_kg_this_hr = 0.0
 
@@ -9435,6 +9437,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             mre_metals_kg_hr=dict(self._mre_metals_this_hr),
             mre_uncertified_yield=dict(self._mre_uncertified_yield),
+            mre_ellingham_ladder_diagnostic=dict(
+                self._mre_ellingham_ladder_diagnostic
+            ),
             c2a_staged_gas=dict(
                 getattr(
                     self.campaign_mgr,

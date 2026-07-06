@@ -997,6 +997,7 @@ class HourSnapshot:
     mre_current_A: float = 0.0
     mre_metals_kg_hr: Dict[str, float] = field(default_factory=dict)
     mre_uncertified_yield: Dict[str, Any] = field(default_factory=dict)
+    mre_ellingham_ladder_diagnostic: Dict[str, Any] = field(default_factory=dict)
     # Per-tick MRE yield entries that came from heuristic / unanchored
     # chemistry branches. Empty dict means the tick produced no uncertified
     # yield.

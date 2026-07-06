@@ -145,6 +145,7 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     # _last_reduced_real_cache_state when it is not None.
     "evap_plane_selectivity",
     "mre_uncertified_yield",
+    "mre_ellingham_ladder_diagnostic",
     "fe_redox_split",
     "stage_3_capture",
     "redox_source_breakdown",
@@ -1152,6 +1153,7 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
     from simulator.runner import (
         _evap_plane_selectivity_observables,
         _fe_redox_split_observables,
+        _mre_ellingham_ladder_diagnostic_observables,
         _mre_uncertified_yield_observables,
     )
 
@@ -1164,6 +1166,7 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
             "target_selectivity": 0.9,
         },
         mre_uncertified_yield={"Al": 1.23},
+        mre_ellingham_ladder_diagnostic={"schema": "c5_ellingham_ladder_diagnostic_v1"},
         fe_redox_split={
             "fO2_log": -8.0,
             "ferric_frac": 0.2,
@@ -1187,13 +1190,16 @@ def test_conditional_per_hour_observables_are_whitelisted() -> None:
     emitted: set[str] = set()
     emitted |= set(_evap_plane_selectivity_observables(snapshot))
     emitted |= set(_mre_uncertified_yield_observables(snapshot))
+    emitted |= set(_mre_ellingham_ladder_diagnostic_observables(snapshot))
     emitted |= set(_fe_redox_split_observables(snapshot))
 
-    # All three must actually emit given non-empty inputs (guards against the
-    # helpers silently short-circuiting and making this test a no-op).
+    # All four helper-backed observables must emit given non-empty inputs
+    # (guards against the helpers silently short-circuiting and making this test
+    # a no-op).
     assert emitted == {
         "evap_plane_selectivity",
         "mre_uncertified_yield",
+        "mre_ellingham_ladder_diagnostic",
         "fe_redox_split",
     }
     # The contract under test: every emitted conditional key is whitelisted as
