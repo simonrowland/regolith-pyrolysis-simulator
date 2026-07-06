@@ -105,7 +105,7 @@ from the chart/condensation-train internals — low priority given the usage.
 
 ## Known debt (prioritized for future design passes)
 
-1. `game.css` (Lunar Operator, hidden stub) hardcodes ~10 hex chip colors —
+1. `_attic/game/static/css/game.css` (Lunar Operator, archived) hardcodes ~10 hex chip colors —
    tokenize and dedupe against the shared vars.
 2. Optional explicit light/dark toggle (theme is OS-driven only today).
 3. Delightful motion + performance polish (self-host the CDN deps for offline +

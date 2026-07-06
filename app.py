@@ -6,8 +6,6 @@ Creates the Flask + SocketIO web application.
 
 Interfaces:
   /                 — Simulator (full parameter control, engine selection)
-  /lunar-operator   — Operator game (stub; mounted only when its frontend
-                      assets are present — gitignored while shelved)
 
 Usage:
     python regolith-pyrolysis-run.py
@@ -46,12 +44,6 @@ def _load_secret_key() -> str:
     return generated
 
 
-def _game_frontend_present() -> bool:
-    """Lunar Operator is a shelved stub; the whole game/ dir is gitignored.
-    The template's presence is the single signal for whether to mount the game."""
-    return (Path(__file__).parent / 'game' / 'templates' / 'operator.html').exists()
-
-
 def create_app():
     app = Flask(
         __name__,
@@ -65,21 +57,12 @@ def create_app():
     from web.routes import bp as web_bp
     app.register_blueprint(web_bp)
 
-    # Mount the Lunar Operator game only when its frontend is present (see helper).
-    game_enabled = _game_frontend_present()
-    if game_enabled:
-        from game.routes import bp as game_bp
-        app.register_blueprint(game_bp)
-
     # Initialize SocketIO
     socketio.init_app(app, async_mode='threading')
 
     # Register SocketIO event handlers
     from web.events import register_events as register_web_events
     register_web_events(socketio)
-    if game_enabled:
-        from game.events import register_events as register_game_events
-        register_game_events(socketio)
 
     return app
 
@@ -144,8 +127,6 @@ def main():
     base_url = f"http://{host}:{port}"
     print(f"Starting Regolith Pyrolysis Simulator on {base_url}")
     print(f"  Simulator:       {base_url}/")
-    if _game_frontend_present():
-        print(f"  Lunar Operator:  {base_url}/lunar-operator")
     socketio.run(app, **run_config)
 
 

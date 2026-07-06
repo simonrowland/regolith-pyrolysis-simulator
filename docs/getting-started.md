@@ -68,7 +68,6 @@ Things to look for during the run:
 - **Stage purity** (in the runner JSON output's `stage_purity_report`): each stage carries a `verdict` (`PURE` / `MIXED` / `CONTAMINATED`) and a per-species kg breakdown of designated vs impurity material. Stage 3 should be `PURE` SiO under default Path A.
 - **Shuttle refusals** (in `shuttle_refusal_history`): empty list means every C3 step the engine accepted; entries name the campaign, hour, melt T, and thermodynamic margin. Under V1c-JANAF a stray `--additive=K=…` will be quietly ignored by the gate (this is the surviving design, not a bug); see [`docs/recipe-playbook.md`](recipe-playbook.md) for the policy.
 
-The web UI also exposes the `lunar-operator` mode at `http://127.0.0.1:3000/lunar-operator` for multi-line refinery management, but that interface is out of scope for this tutorial.
 
 ## First run via the CLI
 

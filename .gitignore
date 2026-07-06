@@ -113,10 +113,9 @@ config/*.dat
 config/*.lic
 config/*license*
 
-# Lunar Operator game — shelved stub, fully untracked for now.
-# app.py mounts /lunar-operator only when game/templates/operator.html is present,
-# so a clone without game/ boots cleanly; restore the dir to re-enable.
-game/
+# Lunar Operator game — shelved stub, archived under _attic/game/.
+# Keep only the root restoration path ignored.
+/game/
 
 # Private working notes
 docs-private/
