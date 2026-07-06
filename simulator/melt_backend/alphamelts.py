@@ -1338,7 +1338,7 @@ class AlphaMELTSBackend(MeltBackend):
                 ),
                 warnings=list(payload.warnings),
                 status=status,
-                diagnostics=self._vapor_pressure_zero_diagnostics(
+                diagnostics=self._vapor_pressure_diagnostics(
                     clamp_diagnostics,
                     vapor_pressures,
                     vapor_pressure_source,
@@ -1439,7 +1439,7 @@ class AlphaMELTSBackend(MeltBackend):
                 eq.vapor_pressures_Pa,
                 source,
             )
-            eq.diagnostics = self._vapor_pressure_zero_diagnostics(
+            eq.diagnostics = self._vapor_pressure_diagnostics(
                 eq.diagnostics,
                 eq.vapor_pressures_Pa,
                 source,
@@ -2469,6 +2469,43 @@ class AlphaMELTSBackend(MeltBackend):
         payload = dict(diagnostics or {})
         if not pressures and source == 'no_volatile_species':
             payload.setdefault('vapor_pressure_zero_reason', 'no_volatile_species')
+        return payload
+
+    @staticmethod
+    def _vapor_pressure_degraded_to_antoine(
+        source: str | Mapping[str, str],
+    ) -> bool:
+        labels = source.values() if isinstance(source, Mapping) else (source,)
+        return any(
+            str(label).startswith('antoine_fallback_from_vaporock')
+            for label in labels
+        )
+
+    def _vapor_pressure_diagnostics(
+        self,
+        diagnostics: Optional[Mapping[str, object]],
+        pressures: Mapping[str, float],
+        source: str | Mapping[str, str],
+    ) -> dict[str, object]:
+        payload = self._vapor_pressure_zero_diagnostics(
+            diagnostics,
+            pressures,
+            source,
+        )
+        if self._vapor_pressure_degraded_to_antoine(source):
+            # Facet-scoped honesty: the equilibrium solve answered the
+            # requested conditions, so parent status/backend_status stay
+            # intact; only the vapor-pressure facet lost VapoRock authority.
+            # (magemin's out_of_domain precedent is for clamped operating
+            # points, where the solve itself missed the request.)
+            payload['vapor_pressure_backend_status'] = 'fallback'
+            payload['vapor_pressure_backend_status_reason'] = (
+                'vaporock_to_antoine_fallback'
+            )
+            payload['vapor_pressure_fallback_source'] = (
+                'antoine_fallback_from_vaporock'
+            )
+            payload['authoritative_for_requested_vapor_pressure'] = False
         return payload
 
     def _activities_times_antoine(self, T_C: float,

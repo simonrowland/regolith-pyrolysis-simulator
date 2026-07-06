@@ -2165,6 +2165,79 @@ def test_thermoengine_callsite_wires_vaporock_source_and_solved_liquid(monkeypat
     assert helper.calls[0]['composition_kg'] == solved_liquid
 
 
+def test_thermoengine_vaporock_empty_fallback_marks_vapor_facet_degraded():
+    from engines.alphamelts.thermoengine import ThermoEnginePayload
+
+    solved_liquid = {'SiO2': 44.0, 'FeO': 17.0, 'Na2O': 0.5}
+
+    class FakeTransport:
+        def equilibrate(self, *, temperature_C, pressure_bar, comp_wt, warnings):
+            return ThermoEnginePayload(
+                phases_present=('liquid',),
+                phase_masses_kg={'liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct=dict(solved_liquid),
+                activity_coefficients={'Na2O': 0.2},
+                fe_redox_split={},
+            )
+
+    backend = AlphaMELTSBackend()
+    backend._mode = 'thermoengine'
+    backend._thermoengine_transport = FakeTransport()
+    backend._vaporock_available = True
+    backend._vaporock_helper = _vaporock_helper_returning(
+        {},
+        status='non_authoritative',
+    )
+    backend._vapor_pressure_table = {
+        'Na': {
+            'fit_target': 'pure_component_psat',
+            'residual_dex': 0.01,
+            'confidence_tier': 'high',
+            'antoine': {'A': 4.0, 'B': 0.0, 'C': 0.0},
+        },
+    }
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        eq = backend.equilibrate(
+            temperature_C=1600.0,
+            composition_kg={
+                'SiO2': 45.0,
+                'FeO': 18.0,
+                'MgO': 9.0,
+                'CaO': 11.0,
+                'Al2O3': 12.0,
+                'Na2O': 4.0,
+                'K2O': 1.0,
+            },
+            fO2_log=-7.96,
+            pressure_bar=1e-6,
+        )
+
+    assert any(
+        'VapoRock returned no usable vapor pressures' in str(item.message)
+        for item in caught
+    )
+    assert eq.vapor_pressures_Pa == {'Na': pytest.approx(2000.0)}
+    # Parent status stays 'ok': the equilibrium solve answered the requested
+    # conditions; only the vapor-pressure facet lost VapoRock authority
+    # (SC-39 honesty is facet-scoped — parent out_of_domain is reserved for
+    # clamped operating points per the magemin 5786d1f precedent).
+    assert eq.status == 'ok'
+    assert eq.diagnostics.get('backend_status') != 'out_of_domain'
+    assert eq.diagnostics['vapor_pressure_backend_status'] == 'fallback'
+    assert (
+        eq.diagnostics['vapor_pressure_backend_status_reason']
+        == 'vaporock_to_antoine_fallback'
+    )
+    assert eq.diagnostics['authoritative_for_requested_vapor_pressure'] is False
+    assert eq.vapor_pressures_source['Na'].startswith(
+        'antoine_fallback_from_vaporock:'
+    )
+    assert set(eq.vapor_pressures_source.values()) != {'vaporock'}
+
+
 def test_dead_uppercase_vaporock_stub_is_gone_from_source():
     import simulator.melt_backend.alphamelts as mod
 
