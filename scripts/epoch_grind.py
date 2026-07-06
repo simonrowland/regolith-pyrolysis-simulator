@@ -36,6 +36,7 @@ from collections.abc import Iterable as RuntimeIterable
 import hashlib
 import json
 import logging
+import math
 import os
 import re
 import shutil
@@ -58,7 +59,7 @@ try:
 except ImportError:  # pragma: no cover - project runtime normally has PyYAML.
     yaml = None  # type: ignore[assignment]
 
-from scripts.seed_reduced_real_cache import seed_cache
+from scripts.seed_reduced_real_cache import payload_count, seed_cache
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evalspec import current_code_version
 from simulator.grind_preflight import (
@@ -71,6 +72,11 @@ from simulator.reduced_real_determinism import (
     ControlQuantization,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentEquilibriumStore,
+)
+from simulator.interpolation_uncertainty import (
+    DEFAULT_RANK_LIMIT as DEFAULT_INTERPOLATION_RANK_LIMIT,
+    RANKED_TABLE_SCHEMA_VERSION,
+    ranked_table_drain,
 )
 
 
@@ -88,6 +94,7 @@ DEFAULT_FINAL_LONG_TIMEOUT_SECONDS = 6 * 60 * 60
 DEFAULT_OPTIMIZER_EVAL_TIMEOUT_SECONDS = 45 * 60
 DEFAULT_DUP_THRESHOLD = 0.02
 DEFAULT_LOW_DUP_EPOCHS = 2
+DEFAULT_CALIBRATION_FRACTION = 0.10
 STALE_CLEANUP_RETRY_SECONDS = 0.05
 JOURNAL_SCHEMA_VERSION = 2
 LEGACY_JOURNAL_SCHEMA_VERSION = 1
@@ -106,6 +113,14 @@ NO_FEASIBLE_STDERR_RE = re.compile(
     r"^error: (?:no feasible candidates; winner\.recipe\.yaml not written|"
     r"all candidates failed with non_finite_payload); failure_counts=\{.*\}$"
 )
+SEED_SOURCE_SUMMARY_SCHEMA_VERSION = "grind_seed_source_summary.v1"
+SEED_SOURCE_MUTATION = "mutation"
+SEED_SOURCE_LADDER_POLISH = "ladder_polish"
+SEED_SOURCE_CALIBRATION_UNIFORM = "calibration_uniform"
+SEED_SOURCE_TABLE = "grind_seed_sources"
+SEED_SOURCE_TABLE_SCHEMA_VERSION = "grind_seed_sources.v1"
+_SEED_BASE_ALIAS = "grind_seed_base"
+_SEED_SOURCE_MERGE_ALIAS = "grind_seed_source_merge"
 JOB_IDENTITY_FIELDS = (
     "feedstock",
     "profile",
@@ -115,6 +130,7 @@ JOB_IDENTITY_FIELDS = (
     "out",
     "fidelity",
     "parallel",
+    "acquisition",
 )
 
 
@@ -130,6 +146,7 @@ class JobSpec:
     fidelity: str
     parallel: int
     reduced_real_cache: Mapping[str, Any] | None = None
+    acquisition: Mapping[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -321,6 +338,8 @@ def load_manifest(path: Path, *, base_cache: Path | None = None, work_dir: Path 
         if job_id in seen_ids:
             raise ValueError(f"{path}: duplicate job id {job_id!r}")
         seen_ids.add(job_id)
+        if "acquisition" in item and not isinstance(item.get("acquisition"), Mapping):
+            raise ValueError(f"{path}: jobs[{index}].acquisition must be a mapping")
         jobs.append(
             JobSpec(
                 id=job_id,
@@ -335,6 +354,11 @@ def load_manifest(path: Path, *, base_cache: Path | None = None, work_dir: Path 
                 reduced_real_cache=(
                     dict(item["reduced_real_cache"])
                     if isinstance(item.get("reduced_real_cache"), Mapping)
+                    else None
+                ),
+                acquisition=(
+                    dict(item["acquisition"])
+                    if isinstance(item.get("acquisition"), Mapping)
                     else None
                 ),
             )
@@ -470,6 +494,7 @@ def _job_identity(job: JobSpec, manifest_dir: Path) -> dict[str, object]:
         "out": str(job.out),
         "fidelity": job.fidelity,
         "parallel": job.parallel,
+        "acquisition": _jsonable(job.acquisition) if job.acquisition is not None else None,
     }
 
 
@@ -784,11 +809,13 @@ def dry_run_plan(manifest: Manifest, config: DriverConfig, journal: Mapping[str,
             epoch_dir,
             base_cache=manifest.base_cache,
         )
+        seed_source_summary = build_seed_source_summary(job, manifest.path.parent)
         job_plan = {
             "id": job.id,
             "shard_db": str(shard_db),
             "out": str(out_dir),
             "profile": profile,
+            "seed_source_summary": seed_source_summary,
             "command": build_optimizer_command(
                 job,
                 profile=profile,
@@ -956,6 +983,10 @@ def merge_epoch_shards(
             "sources": [],
         }
     summary = dict(seed_fn(base_cache, sources))
+    merged_seed_source_rows = _merge_seed_source_tables(base_cache, sources)
+    if merged_seed_source_rows:
+        summary["seed_source_rows"] = merged_seed_source_rows
+        summary["seed_source_table"] = SEED_SOURCE_TABLE
     if seed_rows_by_source:
         for source in summary.get("sources", []):
             if not isinstance(source, dict) or source.get("skipped") == "target":
@@ -969,6 +1000,8 @@ def seed_job_cache(
     shard_db: Path,
     base_cache: Path,
     *,
+    point_sources: Sequence[Mapping[str, Any]] = (),
+    job_id: str = "",
     seed_fn: Callable[[Path, Iterable[Path]], Mapping[str, Any]] = seed_cache,
 ) -> Mapping[str, Any]:
     del seed_fn
@@ -978,15 +1011,600 @@ def seed_job_cache(
         shard_db,
         read_only_base_db_path=base_cache if base_cache.exists() else None,
     )
+    seeded = _seed_cache_rows_from_base(
+        shard_db,
+        base_cache,
+        point_sources=point_sources,
+        job_id=job_id,
+    )
+    seed_rows = len(seeded)
     return {
         "target": str(shard_db),
         "rows_before": 0,
-        "rows_after": 0,
-        "inserted_rows": 0,
-        "seed_rows": 0,
+        "rows_after": payload_count(shard_db),
+        "inserted_rows": seed_rows,
+        "seed_rows": seed_rows,
         "read_only_base": str(base_cache) if base_cache.exists() else None,
+        "seed_source_table": SEED_SOURCE_TABLE if seeded else None,
+        "seeded_point_sources": seeded,
         "sources": [],
     }
+
+
+def _seed_cache_rows_from_base(
+    shard_db: Path,
+    base_cache: Path,
+    *,
+    point_sources: Sequence[Mapping[str, Any]],
+    job_id: str,
+) -> list[dict[str, Any]]:
+    if not point_sources:
+        return []
+    clean_sources = [_clean_point_source(point) for point in point_sources]
+    if not base_cache.exists():
+        raise FileNotFoundError(
+            f"acquisition seed requested but base cache does not exist: {base_cache}"
+        )
+
+    point_ids = [str(point["point_id"]) for point in clean_sources]
+    conn = sqlite3.connect(shard_db)
+    conn.row_factory = sqlite3.Row
+    try:
+        conn.execute(
+            f"ATTACH DATABASE ? AS {_SEED_BASE_ALIAS}",
+            (f"{base_cache.resolve().as_uri()}?mode=ro",),
+        )
+        _ensure_seed_source_table(conn)
+        columns = _pt1_payload_columns(conn, PT1_EQUILIBRIUM_TABLE)
+        source_columns = _pt1_payload_columns(
+            conn,
+            f"{_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}",
+        )
+        if columns != source_columns:
+            raise ValueError(
+                "acquisition seed source schema mismatch: "
+                f"{base_cache} does not match {shard_db}"
+            )
+        placeholders = ",".join("?" for _ in point_ids)
+        rows = conn.execute(
+            f"""
+            SELECT key_hash
+            FROM {_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}
+            WHERE key_hash IN ({placeholders})
+            """,
+            tuple(point_ids),
+        ).fetchall()
+        found_ids = {str(row["key_hash"]) for row in rows}
+        missing = [point_id for point_id in point_ids if point_id not in found_ids]
+        if missing:
+            raise ValueError(
+                "acquisition seed point ids not found in base cache "
+                f"{base_cache}: {missing[:10]}"
+            )
+        quoted_columns = ", ".join(columns)
+        conn.execute(
+            f"""
+            INSERT OR IGNORE INTO {PT1_EQUILIBRIUM_TABLE} ({quoted_columns})
+            SELECT {quoted_columns}
+            FROM {_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}
+            WHERE key_hash IN ({placeholders})
+            """,
+            tuple(point_ids),
+        )
+        created_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        for index, point in enumerate(clean_sources):
+            conn.execute(
+                f"""
+                INSERT OR REPLACE INTO {SEED_SOURCE_TABLE} (
+                    key_hash, point_id, source, job_id, source_index,
+                    metadata_json, schema_version, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    point["point_id"],
+                    point["point_id"],
+                    point["source"],
+                    str(job_id),
+                    index,
+                    json.dumps(_jsonable(point), sort_keys=True, allow_nan=False),
+                    SEED_SOURCE_TABLE_SCHEMA_VERSION,
+                    created_at,
+                ),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+    return clean_sources
+
+
+def _pt1_payload_columns(conn: sqlite3.Connection, table: str) -> list[str]:
+    columns = _sqlite_column_names(conn, table)
+    if not columns:
+        raise ValueError(f"PT-1 payload table missing: {table}")
+    return columns
+
+
+def _sqlite_column_names(conn: sqlite3.Connection, table: str) -> list[str]:
+    if "." in table:
+        schema, table_name = table.split(".", 1)
+        rows = conn.execute(f"PRAGMA {schema}.table_info({table_name})")
+    else:
+        rows = conn.execute(f"PRAGMA table_info({table})")
+    return [str(row["name"]) for row in rows]
+
+
+def _ensure_seed_source_table(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        f"""
+        CREATE TABLE IF NOT EXISTS {SEED_SOURCE_TABLE} (
+            key_hash TEXT NOT NULL,
+            point_id TEXT NOT NULL,
+            source TEXT NOT NULL,
+            job_id TEXT NOT NULL,
+            source_index INTEGER NOT NULL,
+            metadata_json TEXT NOT NULL,
+            schema_version TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            PRIMARY KEY (key_hash, job_id)
+        )
+        """
+    )
+
+
+def _merge_seed_source_tables(base_cache: Path, sources: Sequence[Path]) -> int:
+    source_paths = [Path(source) for source in sources if Path(source).exists()]
+    if not source_paths:
+        return 0
+    merged = 0
+    conn = sqlite3.connect(base_cache)
+    conn.row_factory = sqlite3.Row
+    try:
+        for source in source_paths:
+            conn.execute(
+                f"ATTACH DATABASE ? AS {_SEED_SOURCE_MERGE_ALIAS}",
+                (f"{source.resolve().as_uri()}?mode=ro",),
+            )
+            try:
+                try:
+                    exists = conn.execute(
+                        f"""
+                        SELECT 1
+                        FROM {_SEED_SOURCE_MERGE_ALIAS}.sqlite_master
+                        WHERE type = 'table' AND name = ?
+                        """,
+                        (SEED_SOURCE_TABLE,),
+                    ).fetchone()
+                    if exists is None:
+                        conn.commit()
+                        continue
+                    _ensure_seed_source_table(conn)
+                    columns = _sqlite_column_names(conn, SEED_SOURCE_TABLE)
+                    source_columns = _sqlite_column_names(
+                        conn,
+                        f"{_SEED_SOURCE_MERGE_ALIAS}.{SEED_SOURCE_TABLE}",
+                    )
+                    if columns != source_columns:
+                        raise ValueError(
+                            "seed source table schema mismatch: "
+                            f"{source} does not match {base_cache}"
+                        )
+                    column_sql = ", ".join(columns)
+                    before = conn.total_changes
+                    conn.execute(
+                        f"""
+                        INSERT OR REPLACE INTO {SEED_SOURCE_TABLE} ({column_sql})
+                        SELECT {column_sql}
+                        FROM {_SEED_SOURCE_MERGE_ALIAS}.{SEED_SOURCE_TABLE}
+                        """
+                    )
+                    merged += conn.total_changes - before
+                    conn.commit()
+                except Exception:
+                    conn.rollback()
+                    raise
+            finally:
+                conn.execute(f"DETACH DATABASE {_SEED_SOURCE_MERGE_ALIAS}")
+    finally:
+        conn.close()
+    return merged
+
+
+def _clean_point_source(point: Mapping[str, Any]) -> dict[str, Any]:
+    if not isinstance(point, Mapping):
+        raise ValueError("acquisition seed point source must be a mapping")
+    point_id = _point_id(point)
+    source = str(point.get("source") or "")
+    if source not in {SEED_SOURCE_LADDER_POLISH, SEED_SOURCE_CALIBRATION_UNIFORM}:
+        raise ValueError(f"unknown acquisition seed source {source!r}")
+    clean = _plain_mapping(point)
+    clean["point_id"] = point_id
+    clean["source"] = source
+    return clean
+
+
+def build_seed_source_summary(job: JobSpec, manifest_dir: Path) -> dict[str, Any]:
+    mutation = _mutation_source_summary(job)
+    if job.acquisition is None:
+        return {
+            "schema_version": SEED_SOURCE_SUMMARY_SCHEMA_VERSION,
+            "job_id": job.id,
+            "acquisition_enabled": False,
+            "source_counts": {
+                SEED_SOURCE_MUTATION: job.budget,
+                SEED_SOURCE_LADDER_POLISH: 0,
+                SEED_SOURCE_CALIBRATION_UNIFORM: 0,
+            },
+            "sources": [mutation],
+            "point_sources": [],
+        }
+
+    acquisition = dict(job.acquisition)
+    recompute_limit = _non_negative_int(
+        acquisition.get("recompute_limit", DEFAULT_INTERPOLATION_RANK_LIMIT),
+        "acquisition.recompute_limit",
+    )
+    calibration_fraction = _calibration_fraction(
+        acquisition.get("calibration_fraction", DEFAULT_CALIBRATION_FRACTION),
+        "acquisition.calibration_fraction",
+    )
+    drains = _acquisition_ranked_drains(
+        acquisition,
+        manifest_dir,
+        recompute_limit=recompute_limit,
+    )
+    calibration_quota = _calibration_quota(recompute_limit, calibration_fraction)
+    calibration_candidates = _calibration_point_candidates(
+        acquisition,
+        drains,
+        quota=calibration_quota,
+        salt=f"{job.id}:{job.seed}",
+    )
+    calibration_ids = {str(point["point_id"]) for point in calibration_candidates}
+    ladder_candidates = [
+        point
+        for point in _ladder_polish_candidates(drains)
+        if str(point["point_id"]) not in calibration_ids
+    ]
+    ladder_limit = max(0, recompute_limit - len(calibration_candidates))
+    ladder_points = ladder_candidates[:ladder_limit]
+    point_sources = [*ladder_points, *calibration_candidates]
+    return {
+        "schema_version": SEED_SOURCE_SUMMARY_SCHEMA_VERSION,
+        "job_id": job.id,
+        "acquisition_enabled": True,
+        "recompute_limit": recompute_limit,
+        "calibration_fraction": calibration_fraction,
+        "calibration_quota": calibration_quota,
+        "calibration_shortfall": max(0, calibration_quota - len(calibration_candidates)),
+        "drain_count": len(drains),
+        "source_counts": {
+            SEED_SOURCE_MUTATION: job.budget,
+            SEED_SOURCE_LADDER_POLISH: len(ladder_points),
+            SEED_SOURCE_CALIBRATION_UNIFORM: len(calibration_candidates),
+        },
+        "sources": [
+            mutation,
+            {
+                "source": SEED_SOURCE_LADDER_POLISH,
+                "count": len(ladder_points),
+                "requested_after_calibration": ladder_limit,
+                "input": "interpolation_uncertainty_ranked_table_drain",
+            },
+            {
+                "source": SEED_SOURCE_CALIBRATION_UNIFORM,
+                "count": len(calibration_candidates),
+                "quota": calibration_quota,
+                "selection": "uniform_random_holdout_deterministic_hash",
+            },
+        ],
+        "point_sources": point_sources,
+    }
+
+
+def write_seed_source_summary(path: Path, summary: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(_jsonable(summary), indent=2, sort_keys=True, allow_nan=False) + "\n",
+        encoding="utf-8",
+    )
+
+
+def actualize_seed_source_summary(
+    summary: Mapping[str, Any],
+    seed_summary: Mapping[str, Any],
+) -> dict[str, Any]:
+    actual = _plain_mapping(summary)
+    point_sources = [
+        _clean_point_source(point)
+        for point in seed_summary.get("seeded_point_sources", [])
+        if isinstance(point, Mapping)
+    ]
+    counts = {
+        SEED_SOURCE_MUTATION: int(
+            (actual.get("source_counts") or {}).get(SEED_SOURCE_MUTATION, 0)
+            if isinstance(actual.get("source_counts"), Mapping)
+            else 0
+        ),
+        SEED_SOURCE_LADDER_POLISH: 0,
+        SEED_SOURCE_CALIBRATION_UNIFORM: 0,
+    }
+    for point in point_sources:
+        counts[str(point["source"])] += 1
+    actual["source_counts"] = counts
+    actual["point_sources"] = point_sources
+    actual["seed_rows"] = int(seed_summary.get("seed_rows", len(point_sources)))
+    if seed_summary.get("seed_source_table"):
+        actual["seed_source_table"] = str(seed_summary["seed_source_table"])
+    for source in actual.get("sources", []):
+        if not isinstance(source, dict):
+            continue
+        label = str(source.get("source") or "")
+        if label in counts:
+            source["count"] = counts[label]
+    return actual
+
+
+def _mutation_source_summary(job: JobSpec) -> dict[str, Any]:
+    summary: dict[str, Any] = {
+        "source": SEED_SOURCE_MUTATION,
+        "count": job.budget,
+        "strategy": job.strategy,
+        "seed": job.seed,
+        "consumer": "simulator.optimize.strategy",
+    }
+    if job.budget > 0 and job.strategy == "random":
+        summary["candidate_id_start"] = f"random-{job.seed}-000000"
+        summary["candidate_id_stop"] = f"random-{job.seed}-{job.budget - 1:06d}"
+    return summary
+
+
+def _acquisition_ranked_drains(
+    acquisition: Mapping[str, Any],
+    manifest_dir: Path,
+    *,
+    recompute_limit: int,
+) -> list[dict[str, Any]]:
+    drains: list[dict[str, Any]] = []
+    for key in ("ranked_table_drain", "interpolation_uncertainty_ranked_table_drain"):
+        value = acquisition.get(key)
+        if isinstance(value, Mapping):
+            drains.append(_plain_mapping(value))
+    inline_drains = acquisition.get("ranked_table_drains")
+    if isinstance(inline_drains, Sequence) and not isinstance(inline_drains, (str, bytes)):
+        for drain in inline_drains:
+            if isinstance(drain, Mapping):
+                drains.append(_plain_mapping(drain))
+    inline_points = acquisition.get("interpolation_uncertainty_points", acquisition.get("points"))
+    if isinstance(inline_points, Sequence) and not isinstance(inline_points, (str, bytes)):
+        drains.append(ranked_table_drain(inline_points, limit=recompute_limit))
+    for raw_path in _path_list(acquisition.get("ranked_table_drain_paths")):
+        drains.extend(
+            _load_ranked_drains_from_path(
+                _resolve_acquisition_path(raw_path, acquisition, manifest_dir)
+            )
+        )
+    return _unique_drains(drains)
+
+
+def _load_ranked_drains_from_path(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        raise FileNotFoundError(f"acquisition ranked-table drain source does not exist: {path}")
+    records: list[Any] = []
+    text = path.read_text(encoding="utf-8")
+    if path.suffix.lower() == ".jsonl":
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped:
+                records.append(json.loads(stripped))
+    else:
+        records.append(json.loads(text))
+    drains: list[dict[str, Any]] = []
+    for record in records:
+        drains.extend(_extract_ranked_drains(record))
+    return drains
+
+
+def _extract_ranked_drains(value: Any) -> list[dict[str, Any]]:
+    drains: list[dict[str, Any]] = []
+    if isinstance(value, Mapping):
+        if (
+            value.get("schema_version") == RANKED_TABLE_SCHEMA_VERSION
+            and isinstance(value.get("selected"), Sequence)
+        ):
+            drains.append(_plain_mapping(value))
+        nested = value.get("interpolation_uncertainty_ranked_table_drain")
+        if isinstance(nested, Mapping):
+            drains.append(_plain_mapping(nested))
+        for child in value.values():
+            if child is nested:
+                continue
+            drains.extend(_extract_ranked_drains(child))
+    elif isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        for child in value:
+            drains.extend(_extract_ranked_drains(child))
+    return drains
+
+
+def _unique_drains(drains: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    unique: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for drain in drains:
+        payload = _plain_mapping(drain)
+        marker = json.dumps(_jsonable(payload), sort_keys=True, separators=(",", ":"))
+        if marker in seen:
+            continue
+        seen.add(marker)
+        unique.append(payload)
+    return unique
+
+
+def _ladder_polish_candidates(drains: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    points: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for drain_index, drain in enumerate(drains):
+        selected = drain.get("selected")
+        if not isinstance(selected, Sequence) or isinstance(selected, (str, bytes)):
+            continue
+        for selected_index, raw_point in enumerate(selected):
+            if not isinstance(raw_point, Mapping):
+                continue
+            point_id = _point_id(raw_point)
+            if point_id in seen:
+                continue
+            seen.add(point_id)
+            points.append(
+                _point_source_record(
+                    raw_point,
+                    source=SEED_SOURCE_LADDER_POLISH,
+                    point_id=point_id,
+                    drain_index=drain_index,
+                    selected_index=selected_index,
+                )
+            )
+    return points
+
+
+def _calibration_point_candidates(
+    acquisition: Mapping[str, Any],
+    drains: Sequence[Mapping[str, Any]],
+    *,
+    quota: int,
+    salt: str,
+) -> list[dict[str, Any]]:
+    if quota <= 0:
+        return []
+    universe = _calibration_universe(acquisition, drains)
+    ranked = sorted(
+        universe,
+        key=lambda point_id: (
+            hashlib.sha256(f"{salt}:{point_id}".encode("utf-8")).hexdigest(),
+            point_id,
+        ),
+    )
+    return [
+        {
+            "source": SEED_SOURCE_CALIBRATION_UNIFORM,
+            "point_id": point_id,
+            "selection_rank": index,
+        }
+        for index, point_id in enumerate(ranked[:quota])
+    ]
+
+
+def _calibration_universe(
+    acquisition: Mapping[str, Any],
+    drains: Sequence[Mapping[str, Any]],
+) -> list[str]:
+    point_ids: list[str] = []
+    for key in ("uniform_point_ids", "calibration_point_ids"):
+        raw_ids = acquisition.get(key)
+        if isinstance(raw_ids, Sequence) and not isinstance(raw_ids, (str, bytes)):
+            point_ids.extend(_point_id_from_value(point_id) for point_id in raw_ids)
+    for drain in drains:
+        tables = drain.get("tables")
+        if isinstance(tables, Sequence) and not isinstance(tables, (str, bytes)):
+            for table in tables:
+                if not isinstance(table, Mapping):
+                    continue
+                ids = table.get("point_ids")
+                if isinstance(ids, Sequence) and not isinstance(ids, (str, bytes)):
+                    point_ids.extend(_point_id_from_value(point_id) for point_id in ids)
+        selected = drain.get("selected")
+        if isinstance(selected, Sequence) and not isinstance(selected, (str, bytes)):
+            for point in selected:
+                if isinstance(point, Mapping):
+                    point_ids.append(_point_id(point))
+    unique: list[str] = []
+    seen: set[str] = set()
+    for point_id in point_ids:
+        if point_id in seen:
+            continue
+        seen.add(point_id)
+        unique.append(point_id)
+    return unique
+
+
+def _point_source_record(
+    point: Mapping[str, Any],
+    *,
+    source: str,
+    point_id: str,
+    drain_index: int,
+    selected_index: int,
+) -> dict[str, Any]:
+    record = {
+        "source": source,
+        "point_id": point_id,
+        "drain_index": drain_index,
+        "selected_index": selected_index,
+    }
+    for key in ("ranked_table", "rank_value", "sequence_index", "artifact", "cache_state"):
+        if key in point:
+            record[key] = _jsonable(point[key])
+    return record
+
+
+def _calibration_quota(limit: int, fraction: float) -> int:
+    if limit <= 0 or fraction <= 0.0:
+        return 0
+    return min(limit, max(1, math.ceil(limit * fraction)))
+
+
+def _calibration_fraction(value: Any, label: str) -> float:
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} must be a finite fraction in [0, 1]") from exc
+    if not math.isfinite(parsed) or parsed < 0.0 or parsed > 1.0:
+        raise ValueError(f"{label} must be a finite fraction in [0, 1]")
+    return parsed
+
+
+def _path_list(value: Any) -> list[str | os.PathLike[str]]:
+    if value is None:
+        return []
+    if isinstance(value, (str, os.PathLike)):
+        return [value]
+    if not isinstance(value, Sequence) or isinstance(value, bytes):
+        raise ValueError("acquisition.ranked_table_drain_paths must be a path or list of paths")
+    return list(value)
+
+
+def _resolve_acquisition_path(
+    raw_path: str | os.PathLike[str],
+    acquisition: Mapping[str, Any],
+    manifest_dir: Path,
+) -> Path:
+    root = _resolve_path(acquisition.get("artifact_root", manifest_dir), manifest_dir)
+    candidate = Path(raw_path).expanduser()
+    resolved = candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    try:
+        resolved.relative_to(root.resolve())
+    except ValueError as exc:
+        raise ValueError(
+            "acquisition.ranked_table_drain_paths entry escapes acquisition root "
+            f"{root}: {raw_path}"
+        ) from exc
+    return resolved
+
+
+def _point_id_from_value(value: Any) -> str:
+    if isinstance(value, Mapping):
+        return _point_id(value)
+    if value is None or str(value) == "":
+        raise ValueError("acquisition point id must not be empty")
+    return str(value)
+
+
+def _point_id(point: Mapping[str, Any]) -> str:
+    for key in ("point_id", "cache_key", "key_hash", "hash"):
+        if key not in point:
+            continue
+        value = point.get(key)
+        if value is None or str(value) == "":
+            raise ValueError("acquisition point id must not be empty")
+        return str(value)
+    return json.dumps(_jsonable(point), sort_keys=True, separators=(",", ":"))
 
 
 def _remove_sqlite_file_set(path: Path) -> None:
@@ -1161,8 +1779,20 @@ def _prepare_job_run(
     log_dir: Path,
 ) -> _PreparedJobRun:
     shard_db = epoch_dir / "shards" / f"{job.id}.sqlite"
-    seed_summary = seed_job_cache(shard_db, manifest.base_cache)
+    seed_source_summary = build_seed_source_summary(job, manifest.path.parent)
+    seed_summary = seed_job_cache(
+        shard_db,
+        manifest.base_cache,
+        point_sources=seed_source_summary.get("point_sources", ()),
+        job_id=job.id,
+    )
     seed_rows = int(seed_summary.get("seed_rows", 0))
+    seed_source_summary = actualize_seed_source_summary(
+        seed_source_summary,
+        seed_summary,
+    )
+    seed_source_path = epoch_dir / "seed-source-summaries" / f"{job.id}.json"
+    write_seed_source_summary(seed_source_path, seed_source_summary)
     profile_arg = write_epoch_profile(
         job,
         manifest.path.parent,
@@ -1190,6 +1820,8 @@ def _prepare_job_run(
         "out": str(out_dir),
         "stdout": str(stdout_path),
         "stderr": str(stderr_path),
+        "seed_source_manifest": str(seed_source_path),
+        "seed_source_summary": seed_source_summary,
     }
     return _PreparedJobRun(
         job=job,
@@ -1902,6 +2534,25 @@ def _load_mapping(path: Path) -> dict[str, Any]:
     if not isinstance(data, Mapping):
         raise ValueError(f"{path}: expected mapping")
     return dict(data)
+
+
+def _plain_mapping(value: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        str(key): _jsonable(item)
+        for key, item in value.items()
+    }
+
+
+def _jsonable(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {str(key): _jsonable(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [_jsonable(item) for item in value]
+    if isinstance(value, list):
+        return [_jsonable(item) for item in value]
+    if isinstance(value, Path):
+        return str(value)
+    return value
 
 
 def _resolve_path(value: str | os.PathLike[str], base: Path) -> Path:

@@ -14,6 +14,7 @@ import pytest
 
 from scripts import epoch_grind
 from scripts.seed_reduced_real_cache import payload_count
+from simulator.corpus_version import current_corpus_version
 from simulator.reduced_real_determinism import (
     PT1PersistentEquilibriumStore,
     canonical_json_bytes,
@@ -81,6 +82,71 @@ def _manifest_file(tmp_path: Path, jobs: list[dict[str, object]] | None = None) 
     manifest.write_text(json.dumps(payload), encoding="utf-8")
     PT1PersistentEquilibriumStore(tmp_path / "base.sqlite")
     return manifest
+
+
+def _ranked_drain(
+    selected_ids: list[str],
+    *,
+    table_ids: list[str] | None = None,
+) -> dict[str, object]:
+    ids = table_ids or selected_ids
+    return {
+        "schema_version": "interpolation_uncertainty_ranked_tables.v1",
+        "limit": len(selected_ids),
+        "tables": [
+            {
+                "name": "threshold_straddle",
+                "count": len(ids),
+                "point_ids": ids,
+            },
+            {
+                "name": "nonlinearity_general",
+                "count": 0,
+                "point_ids": [],
+            },
+        ],
+        "selected": [
+            {
+                "point_id": point_id,
+                "sequence_index": index,
+                "ranked_table": "threshold_straddle",
+                "rank_value": 1.0,
+            }
+            for index, point_id in enumerate(selected_ids)
+        ],
+    }
+
+
+def _pt1_cache_key(tag: str) -> dict[str, object]:
+    return {
+        "artifact": "freeze_gate_curve",
+        "corpus_version": current_corpus_version(),
+        "data_digests": {"fixture": "v1"},
+        "schema_version": "test",
+        "tag": tag,
+    }
+
+
+def _pt1_cache_point_id(tag: str) -> str:
+    return hashlib.sha256(canonical_json_bytes(_pt1_cache_key(tag))).hexdigest()
+
+
+def _put_pt1_cache_row(db_path: Path, tag: str) -> str:
+    key = _pt1_cache_key(tag)
+    payload = {"curve": {"status": "in_range", "tag": tag}}
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    PT1PersistentEquilibriumStore(db_path).put(
+        artifact=str(key["artifact"]),
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+    return key_hash
 
 
 def test_control_quantization_cli_parse_and_epoch_profile_overlay(
@@ -440,6 +506,322 @@ def test_manifest_parsing_resolves_paths_and_defaults(tmp_path: Path) -> None:
     assert job.fidelity == "fast"
     assert job.parallel == 2
     assert job.out == tmp_path / "runs/job-a"
+
+
+def test_seed_source_summary_adds_ladder_polish_without_reducing_mutation_budget(
+    tmp_path: Path,
+) -> None:
+    drain = _ranked_drain(
+        [f"ranked-{index}" for index in range(6)],
+        table_ids=[f"ranked-{index}" for index in range(10)],
+    )
+    manifest = epoch_grind.load_manifest(
+        _manifest_file(
+            tmp_path,
+            jobs=[
+                {
+                    "id": "job-a",
+                    "feedstock": "lunar_mare_low_ti",
+                    "profile": "profile.json",
+                    "budget": 8,
+                    "strategy": "random",
+                    "seed": 3,
+                    "out": "runs/job-a",
+                    "acquisition": {
+                        "ranked_table_drain": drain,
+                        "recompute_limit": 5,
+                        "calibration_fraction": 0.2,
+                    },
+                }
+            ],
+        )
+    )
+
+    summary = epoch_grind.build_seed_source_summary(manifest.jobs[0], manifest.path.parent)
+
+    assert summary["source_counts"] == {
+        "mutation": 8,
+        "ladder_polish": 4,
+        "calibration_uniform": 1,
+    }
+    assert summary["calibration_quota"] == 1
+    point_sources = summary["point_sources"]
+    assert [point["source"] for point in point_sources[:4]] == ["ladder_polish"] * 4
+    assert point_sources[-1]["source"] == "calibration_uniform"
+    assert point_sources[-1]["point_id"] not in {f"ranked-{index}" for index in range(6)}
+    assert summary["sources"][0]["source"] == "mutation"
+    assert summary["sources"][0]["candidate_id_start"] == "random-3-000000"
+    assert summary["sources"][0]["candidate_id_stop"] == "random-3-000007"
+
+
+def test_seed_source_summary_reserves_uniform_quota_with_rounding_and_exhaustion(
+    tmp_path: Path,
+) -> None:
+    manifest = epoch_grind.load_manifest(
+        _manifest_file(
+            tmp_path,
+            jobs=[
+                {
+                    "id": "job-a",
+                    "feedstock": "lunar_mare_low_ti",
+                    "profile": "profile.json",
+                    "budget": 8,
+                    "strategy": "random",
+                    "seed": 3,
+                    "out": "runs/job-a",
+                    "acquisition": {
+                        "ranked_table_drain": _ranked_drain(["a", "b"]),
+                        "recompute_limit": 3,
+                        "calibration_fraction": 0.34,
+                    },
+                }
+            ],
+        )
+    )
+
+    summary = epoch_grind.build_seed_source_summary(manifest.jobs[0], manifest.path.parent)
+
+    assert summary["calibration_quota"] == 2
+    assert summary["calibration_shortfall"] == 0
+    assert summary["source_counts"]["ladder_polish"] == 0
+    assert summary["source_counts"]["calibration_uniform"] == 2
+    assert {point["source"] for point in summary["point_sources"]} == {"calibration_uniform"}
+
+
+def test_seed_source_summary_calibration_replay_is_job_seed_pinned(
+    tmp_path: Path,
+) -> None:
+    manifest = epoch_grind.load_manifest(
+        _manifest_file(
+            tmp_path,
+            jobs=[
+                {
+                    "id": "job-a",
+                    "feedstock": "lunar_mare_low_ti",
+                    "profile": "profile.json",
+                    "budget": 8,
+                    "strategy": "random",
+                    "seed": 3,
+                    "out": "runs/job-a",
+                    "acquisition": {
+                        "ranked_table_drain": _ranked_drain(
+                            ["calib-0", "calib-1"],
+                            table_ids=[f"calib-{index}" for index in range(8)],
+                        ),
+                        "recompute_limit": 4,
+                        "calibration_fraction": 0.5,
+                    },
+                }
+            ],
+        )
+    )
+
+    first = epoch_grind.build_seed_source_summary(manifest.jobs[0], manifest.path.parent)
+    second = epoch_grind.build_seed_source_summary(manifest.jobs[0], manifest.path.parent)
+
+    calibration_ids = [
+        point["point_id"]
+        for point in first["point_sources"]
+        if point["source"] == "calibration_uniform"
+    ]
+    assert calibration_ids == ["calib-3", "calib-4"]
+    assert second["point_sources"] == first["point_sources"]
+
+
+def test_seed_source_summary_dedups_cross_drain_duplicate_ids(
+    tmp_path: Path,
+) -> None:
+    manifest = epoch_grind.load_manifest(
+        _manifest_file(
+            tmp_path,
+            jobs=[
+                {
+                    "id": "job-a",
+                    "feedstock": "lunar_mare_low_ti",
+                    "profile": "profile.json",
+                    "budget": 8,
+                    "strategy": "random",
+                    "seed": 3,
+                    "out": "runs/job-a",
+                    "acquisition": {
+                        "ranked_table_drains": [
+                            _ranked_drain(["dup", "a"]),
+                            _ranked_drain(["dup", "b"]),
+                        ],
+                        "recompute_limit": 4,
+                        "calibration_fraction": 0,
+                    },
+                }
+            ],
+        )
+    )
+
+    summary = epoch_grind.build_seed_source_summary(manifest.jobs[0], manifest.path.parent)
+
+    assert summary["source_counts"]["ladder_polish"] == 3
+    assert [point["point_id"] for point in summary["point_sources"]] == ["dup", "a", "b"]
+
+
+def test_seed_source_summary_rejects_empty_point_ids(tmp_path: Path) -> None:
+    manifest = epoch_grind.load_manifest(
+        _manifest_file(
+            tmp_path,
+            jobs=[
+                {
+                    "id": "job-a",
+                    "feedstock": "lunar_mare_low_ti",
+                    "profile": "profile.json",
+                    "budget": 8,
+                    "strategy": "random",
+                    "seed": 3,
+                    "out": "runs/job-a",
+                    "acquisition": {
+                        "ranked_table_drain": _ranked_drain([""]),
+                        "recompute_limit": 1,
+                        "calibration_fraction": 0,
+                    },
+                }
+            ],
+        )
+    )
+
+    with pytest.raises(ValueError, match="acquisition point id must not be empty"):
+        epoch_grind.build_seed_source_summary(manifest.jobs[0], manifest.path.parent)
+
+
+def test_seed_source_summary_reads_ranked_drain_jsonl_and_dry_run_consumes_it(
+    tmp_path: Path,
+) -> None:
+    drain = _ranked_drain(
+        ["a", "b", "c"],
+        table_ids=["a", "b", "c", "d", "e", "f"],
+    )
+    drain_path = tmp_path / "drains.jsonl"
+    drain_path.write_text(
+        json.dumps(
+            {
+                "trace_summary": {
+                    "reduced_real_cache": {
+                        "interpolation_uncertainty_ranked_table_drain": drain
+                    }
+                }
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    manifest = epoch_grind.load_manifest(
+        _manifest_file(
+            tmp_path,
+            jobs=[
+                {
+                    "id": "job-a",
+                    "feedstock": "lunar_mare_low_ti",
+                    "profile": "profile.json",
+                    "budget": 8,
+                    "strategy": "random",
+                    "seed": 3,
+                    "out": "runs/job-a",
+                    "acquisition": {
+                        "ranked_table_drain_paths": ["drains.jsonl"],
+                        "recompute_limit": 4,
+                        "calibration_fraction": 0.25,
+                    },
+                }
+            ],
+        )
+    )
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+
+    payload = epoch_grind.dry_run_plan(
+        manifest,
+        config,
+        epoch_grind.initialize_journal(manifest),
+    )
+
+    summary = payload["jobs"][0]["seed_source_summary"]
+    assert summary["drain_count"] == 1
+    assert summary["source_counts"] == {
+        "mutation": 8,
+        "ladder_polish": 3,
+        "calibration_uniform": 1,
+    }
+    assert {point["source"] for point in summary["point_sources"]} == {
+        "ladder_polish",
+        "calibration_uniform",
+    }
+    cache_config = payload["jobs"][0]["would_write_profile"]["content"]["run"][
+        "reduced_real_cache"
+    ]
+    assert "acquisition" not in cache_config
+    assert "ranked_table_drain" not in json.dumps(cache_config, sort_keys=True)
+
+
+def test_ranked_table_drain_paths_must_stay_under_manifest_or_artifact_root(
+    tmp_path: Path,
+) -> None:
+    outside = tmp_path.parent / f"{tmp_path.name}-outside.jsonl"
+    outside.write_text(json.dumps(_ranked_drain(["a"])) + "\n", encoding="utf-8")
+    manifest = epoch_grind.load_manifest(
+        _manifest_file(
+            tmp_path,
+            jobs=[
+                {
+                    "id": "job-a",
+                    "feedstock": "lunar_mare_low_ti",
+                    "profile": "profile.json",
+                    "budget": 8,
+                    "strategy": "random",
+                    "seed": 3,
+                    "out": "runs/job-a",
+                    "acquisition": {
+                        "ranked_table_drain_paths": ["../" + outside.name],
+                        "recompute_limit": 1,
+                    },
+                }
+            ],
+        )
+    )
+
+    with pytest.raises(ValueError, match="ranked_table_drain_paths entry escapes"):
+        epoch_grind.build_seed_source_summary(manifest.jobs[0], manifest.path.parent)
+
+    artifact_root = tmp_path / "artifact-root"
+    artifact_root.mkdir()
+    inside = artifact_root / "drains.jsonl"
+    inside.write_text(json.dumps(_ranked_drain(["a"])) + "\n", encoding="utf-8")
+    allowed = epoch_grind.load_manifest(
+        _manifest_file(
+            tmp_path,
+            jobs=[
+                {
+                    "id": "job-a",
+                    "feedstock": "lunar_mare_low_ti",
+                    "profile": "profile.json",
+                    "budget": 8,
+                    "strategy": "random",
+                    "seed": 3,
+                    "out": "runs/job-a",
+                    "acquisition": {
+                        "artifact_root": str(artifact_root),
+                        "ranked_table_drain_paths": [str(inside)],
+                        "recompute_limit": 1,
+                        "calibration_fraction": 0,
+                    },
+                }
+            ],
+        )
+    )
+
+    summary = epoch_grind.build_seed_source_summary(allowed.jobs[0], allowed.path.parent)
+    assert summary["source_counts"]["ladder_polish"] == 1
 
 
 def test_resume_from_journal_keeps_done_jobs_done(tmp_path: Path) -> None:
@@ -813,6 +1195,190 @@ def test_dry_run_plan_prints_optimizer_commands(
     assert profile["run"]["reduced_real_cache"]["db_path"].endswith(
         "epoch-0001/shards/job-a.sqlite"
     )
+
+
+def test_optimizer_command_is_identical_with_acquisition_manifest(tmp_path: Path) -> None:
+    point_ids = [_pt1_cache_point_id(f"seed-{index}") for index in range(3)]
+    baseline = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    acquisition = epoch_grind.load_manifest(
+        _manifest_file(
+            tmp_path,
+            jobs=[
+                {
+                    "id": "job-a",
+                    "feedstock": "lunar_mare_low_ti",
+                    "profile": "profile.json",
+                    "budget": 8,
+                    "strategy": "random",
+                    "seed": 3,
+                    "out": "runs/job-a",
+                    "acquisition": {
+                        "ranked_table_drain": _ranked_drain(point_ids),
+                        "recompute_limit": 2,
+                        "calibration_fraction": 0.5,
+                    },
+                }
+            ],
+        )
+    )
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+
+    baseline_command = epoch_grind.dry_run_plan(
+        baseline,
+        config,
+        epoch_grind.initialize_journal(baseline),
+    )["jobs"][0]["command"]
+    acquisition_command = epoch_grind.dry_run_plan(
+        acquisition,
+        config,
+        epoch_grind.initialize_journal(acquisition),
+    )["jobs"][0]["command"]
+
+    assert acquisition_command == baseline_command
+    assert acquisition_command[acquisition_command.index("--budget") + 1] == "8"
+
+
+def test_no_acquisition_prepare_job_run_keeps_empty_seed_baseline(tmp_path: Path) -> None:
+    manifest = epoch_grind.load_manifest(_manifest_file(tmp_path))
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+
+    prepared = epoch_grind._prepare_job_run(
+        manifest.jobs[0],
+        manifest,
+        config,
+        epoch_dir=manifest.work_dir / "epoch-0001",
+        epoch_index=1,
+        log_dir=manifest.work_dir / "epoch-0001" / "logs",
+    )
+
+    assert prepared.seed_rows == 0
+    assert payload_count(prepared.shard_db) == 0
+    assert prepared.job_record["seed_source_summary"]["acquisition_enabled"] is False
+    assert prepared.job_record["seed_source_summary"]["source_counts"] == {
+        "mutation": 8,
+        "ladder_polish": 0,
+        "calibration_uniform": 0,
+    }
+
+
+def test_prepare_job_run_writes_seed_summary_and_actual_seed_rows(tmp_path: Path) -> None:
+    point_ids = [_pt1_cache_point_id(f"seed-{index}") for index in range(4)]
+    manifest = epoch_grind.load_manifest(
+        _manifest_file(
+            tmp_path,
+            jobs=[
+                {
+                    "id": "job-a",
+                    "feedstock": "lunar_mare_low_ti",
+                    "profile": "profile.json",
+                    "budget": 8,
+                    "strategy": "random",
+                    "seed": 3,
+                    "out": "runs/job-a",
+                    "acquisition": {
+                        "ranked_table_drain": _ranked_drain(
+                            point_ids,
+                            table_ids=point_ids,
+                        ),
+                        "recompute_limit": 3,
+                        "calibration_fraction": 1 / 3,
+                    },
+                }
+            ],
+        )
+    )
+    for index in range(4):
+        assert _put_pt1_cache_row(manifest.base_cache, f"seed-{index}") == point_ids[index]
+    config = epoch_grind.DriverConfig(
+        python="/venv/bin/python",
+        time_box_seconds=7200,
+        dup_threshold=0.02,
+        low_dup_epochs=2,
+        duplication_expected=True,
+        nice=15,
+    )
+
+    prepared = epoch_grind._prepare_job_run(
+        manifest.jobs[0],
+        manifest,
+        config,
+        epoch_dir=manifest.work_dir / "epoch-0001",
+        epoch_index=1,
+        log_dir=manifest.work_dir / "epoch-0001" / "logs",
+    )
+
+    summary_path = Path(prepared.job_record["seed_source_manifest"])
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    assert prepared.seed_rows == 3
+    assert payload_count(prepared.shard_db) == 3
+    assert summary["source_counts"] == {
+        "mutation": 8,
+        "ladder_polish": 2,
+        "calibration_uniform": 1,
+    }
+    assert summary["seed_rows"] == 3
+    assert summary["seed_source_table"] == epoch_grind.SEED_SOURCE_TABLE
+    con = sqlite3.connect(prepared.shard_db)
+    try:
+        rows = con.execute(
+            f"""
+            SELECT point_id, source
+            FROM {epoch_grind.SEED_SOURCE_TABLE}
+            ORDER BY source_index
+            """
+        ).fetchall()
+    finally:
+        con.close()
+    assert rows == [
+        (summary["point_sources"][0]["point_id"], summary["point_sources"][0]["source"]),
+        (summary["point_sources"][1]["point_id"], summary["point_sources"][1]["source"]),
+        (summary["point_sources"][2]["point_id"], summary["point_sources"][2]["source"]),
+    ]
+
+
+def test_merge_epoch_shards_preserves_seed_source_labels_in_base_cache(tmp_path: Path) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "epoch" / "shards" / "job-a.sqlite"
+    point_id = _put_pt1_cache_row(base, "seeded")
+    seed_summary = epoch_grind.seed_job_cache(
+        shard,
+        base,
+        point_sources=[{"point_id": point_id, "source": "ladder_polish"}],
+        job_id="job-a",
+    )
+
+    merge_summary = epoch_grind.merge_epoch_shards(
+        base,
+        [shard],
+        seed_rows_by_source={str(shard): int(seed_summary["seed_rows"])},
+    )
+
+    con = sqlite3.connect(base)
+    try:
+        rows = con.execute(
+            f"""
+            SELECT point_id, source, job_id
+            FROM {epoch_grind.SEED_SOURCE_TABLE}
+            """
+        ).fetchall()
+    finally:
+        con.close()
+    assert merge_summary["seed_source_rows"] == 1
+    assert rows == [(point_id, "ladder_polish", "job-a")]
 
 
 def test_schema_gate_passthrough_from_merge(tmp_path: Path) -> None:
