@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import json
 import os
 import time
@@ -7,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+import simulator.backends as backend_module
 import simulator.optimize.fidelity as fidelity_module
 import simulator.optimize.worker_runtime as worker_runtime_module
 from simulator.optimize.doe import (
@@ -143,6 +145,36 @@ def test_fidelity_warm_runtime_spec_carries_feedstock_subprocess_route() -> None
         feedstock_id=FEEDSTOCK_ID,
         stage0_subprocess_required=True,
     )
+
+
+def test_fidelity_warm_runtime_spec_keeps_benign_feedstock_inprocess() -> None:
+    feedstock_id = "m_type_metallic_phase"
+    spec = fidelity_module._warm_runtime_spec(
+        (_warm_task(feedstock_id=feedstock_id),)
+    )
+
+    assert spec == fidelity_module._FidelityWarmRuntimeSpec(
+        backend_name="alphamelts",
+        feedstock_id=feedstock_id,
+        stage0_subprocess_required=False,
+    )
+
+
+def test_fidelity_subprocess_routing_uses_shared_backend_predicate() -> None:
+    fidelity_source = Path(fidelity_module.__file__).read_text()
+    task_route_source = inspect.getsource(
+        fidelity_module._task_stage0_subprocess_required
+    )
+    init_route_source = inspect.getsource(fidelity_module._initialize_fidelity_worker)
+
+    assert (
+        fidelity_module.requires_stage0_subprocess
+        is backend_module.requires_stage0_subprocess
+    )
+    assert "requires_stage0_subprocess" in task_route_source
+    assert "requires_stage0_subprocess" in init_route_source
+    assert "STAGE0_SUBPROCESS_FEEDSTOCK_IDS" not in fidelity_source
+    assert "is_spinel_rich_stage0_subprocess_feedstock" not in fidelity_source
 
 
 def test_fidelity_warm_worker_initialization_rechecks_feedstock_subprocess_route(
