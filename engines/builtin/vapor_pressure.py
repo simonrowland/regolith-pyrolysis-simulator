@@ -259,20 +259,7 @@ def vapor_pressure_antoine_coefficients(
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
             selected = _selected_temperature_segment(pure, temperature_K)
-            use_row_level = False
-            if temperature_K is not None:
-                try:
-                    denominator = float(temperature_K) + float(selected.get("C", 0.0))
-                    projected_log_pressure = float(selected.get("A", 0.0)) - (
-                        float(selected.get("B", 0.0)) / denominator
-                    )
-                    use_row_level = (
-                        not math.isfinite(projected_log_pressure)
-                        or projected_log_pressure > 308.0
-                    )
-                except (TypeError, ValueError, ZeroDivisionError):
-                    use_row_level = True
-            if use_row_level:
+            if not _pure_segment_usable(selected, temperature_K):
                 antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
                 if _is_mapping(antoine):
                     return antoine, COEFF_BLOCK_ANTOINE
@@ -286,6 +273,30 @@ def vapor_pressure_antoine_coefficients(
     return {}, COEFF_BLOCK_ANTOINE
 
 
+def _pure_segment_usable(
+    selected: Mapping[str, Any],
+    temperature_K: float | None,
+) -> bool:
+    """Shared pole/overflow guard for pure-component segment selection.
+
+    A segment is unusable when its Antoine form diverges at ``temperature_K``
+    (pole in the denominator) or projects a nonphysical pressure; callers
+    then fall back rather than evaluate a divergent fit (e.g. the Ca
+    Hartmann-Schneider fit has a pole at 594.6 K).
+    """
+
+    if temperature_K is None:
+        return True
+    try:
+        denominator = float(temperature_K) + float(selected.get("C", 0.0))
+        projected_log_pressure = float(selected.get("A", 0.0)) - (
+            float(selected.get("B", 0.0)) / denominator
+        )
+    except (TypeError, ValueError, ZeroDivisionError):
+        return False
+    return math.isfinite(projected_log_pressure) and projected_log_pressure <= 308.0
+
+
 def wall_condensation_antoine_coefficients(
     row: Mapping[str, Any] | None,
     temperature_K: float | None = None,
@@ -293,18 +304,23 @@ def wall_condensation_antoine_coefficients(
     """Return coefficients for local wall ``P_sat`` consumers.
 
     Melt-source standard-reaction terms are not pure-species saturation
-    pressures. When a row carries a grounded pure-component sidecar, wall
-    re-evaporation uses that sidecar instead of the melt activity/pO2 term.
+    pressures. When a standard-reaction row carries a grounded pure-component
+    sidecar usable at this temperature, wall re-evaporation uses that sidecar;
+    otherwise it fails closed (empty block -> the caller's documented ~1 mbar
+    reference fallback) rather than serve the melt activity/pO2 term as a
+    local P_sat. Non-standard-reaction rows keep the runtime selector's
+    behavior byte-for-byte.
     """
 
+    if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
+        return vapor_pressure_antoine_coefficients(row, temperature_K)
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
-            return (
-                _selected_temperature_segment(pure, temperature_K),
-                COEFF_BLOCK_PURE_COMPONENT,
-            )
-    return vapor_pressure_antoine_coefficients(row, temperature_K)
+            selected = _selected_temperature_segment(pure, temperature_K)
+            if _pure_segment_usable(selected, temperature_K):
+                return selected, COEFF_BLOCK_PURE_COMPONENT
+    return {}, COEFF_BLOCK_PURE_COMPONENT
 
 
 def vapor_pressure_valid_range_K(

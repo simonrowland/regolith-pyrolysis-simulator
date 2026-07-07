@@ -56,7 +56,9 @@ SIO_ANCHOR_HOUR = 6
 # rises 0.3724 -> 0.8608 Pa and the managed-vs-IW separation widens
 # 0.0342 -> 0.3639 decade. Correction-class: the old pin encoded the
 # holdup-O2 ordering bug this docstring's own design statement forbids.
-EXPECTED_SIO_DECADE_DRIFT = 0.3639312952042445
+# 2026-07-07 t-141 L&H K standard-term regen: decade drift -0.0076276 via the
+# K-coupled headspace path (matches golden-deltas.json enumeration).
+EXPECTED_SIO_DECADE_DRIFT = 0.35630359273564843
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

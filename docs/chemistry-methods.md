@@ -55,7 +55,7 @@ Vapor pressure is the driving quantity for the whole extraction sequence: it set
 leave the melt at a given temperature and pressure. The authoritative provider is analytic — an
 Antoine reference for the pure component, coupled to an Ellingham/activity correction that converts the
 pure-component pressure into the effective pressure over the actual melt.
-<!-- impl: §2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:613 — Antoine Ellingham path -->
+<!-- impl: §2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:670 — Antoine Ellingham path -->
 
 ### §2.1 Pure-component reference
 
@@ -82,7 +82,7 @@ Iron is a documented exception. The WebBook carries no simple high-temperature e
 for iron, so the iron pure-component pressure is a constant-enthalpy Clausius–Clapeyron form anchored at
 one atmosphere at its normal boiling point (3135 K). It is labelled UNCERTIFIED accordingly: defensible,
 but a derivation rather than a fitted primary.
-<!-- impl: §2.1 -> docs/chemistry-provenance.yaml Fe_pure_antoine:301 — Fe surrogate provenance -->
+<!-- impl: §2.1 -> docs/chemistry-provenance.yaml Fe_pure_antoine:358 — Fe surrogate provenance -->
 
 Several species that the pure-component approach cannot reach directly — sodium and potassium at recipe
 temperature, iron, magnesium, and silicon monoxide — instead carry a **pseudo-Antoine** fit whose coefficients are
@@ -97,8 +97,8 @@ provider omits the fallback and records `non_certifying_vapor_pressure_fallback_
 emitting an extrapolated Fe pressure. The VapoRock target itself comes from
 Wolf et al. 2023 (*ApJ* 947:64,
 [doi:10.3847/1538-4357/acbcc7](https://doi.org/10.3847/1538-4357/acbcc7)).
-<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:515 — pseudo guard -->
-<!-- impl: §2.1 -> data/vapor_pressures.yaml oxide_vapors.SiO.backsolve:515 — pseudo grid metadata -->
+<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:552 — pseudo guard -->
+<!-- impl: §2.1 -> data/vapor_pressures.yaml oxide_vapors.SiO.backsolve:543 — pseudo grid metadata -->
 
 ### §2.2 From pure component to effective pressure over the melt
 
@@ -140,7 +140,7 @@ hard-vacuum reference rather than extrapolating the divergence.
 The species-specific oxygen-pressure slopes for the other oxides (the `−1/n_M` family in
 `docs/concepts.md`) follow from the same formation-reaction stoichiometry.
 <!-- impl: §2.3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:948 — SiO pO2 suppression -->
-<!-- impl: §2.3 -> data/vapor_pressures.yaml oxide_vapors.SiO.suppression_equation:566 — SiO equation metadata -->
+<!-- impl: §2.3 -> data/vapor_pressures.yaml oxide_vapors.SiO.suppression_equation:594 — SiO equation metadata -->
 
 ### §2.4 Metal vapor versus oxide vapor
 
@@ -369,7 +369,7 @@ uses the Pound 1972 high-supersaturation unity condensation coefficient (α_c = 
 Ref. Data* 1:135, [doi:10.1063/1.3253096](https://doi.org/10.1063/1.3253096)). The model does not
 extrapolate the hot-source Arrhenius onto cold walls: the evaporation and condensation coefficients are
 deliberately different off-equilibrium at high supersaturation.
-<!-- impl: §4.2 -> data/vapor_pressures.yaml oxide_vapors.SiO.evaporation_alpha:533 — SiO alpha split -->
+<!-- impl: §4.2 -> data/vapor_pressures.yaml oxide_vapors.SiO.evaporation_alpha:561 — SiO alpha split -->
 
 ### §4.3 The one-hour reservoir model
 
@@ -459,7 +459,7 @@ threshold approximately tracks a pure-component saturation crossing it does so b
 condenser stage-band alignment, not the pure-substance vapor-pressure crossing. They are documented as
 such in the recipe data and are an engineering approximation pending physical validation of the real
 condenser geometry.
-<!-- impl: §5 -> data/vapor_pressures.yaml condensation_reference_at_1mbar:705 — routing thresholds -->
+<!-- impl: §5 -> data/vapor_pressures.yaml condensation_reference_at_1mbar:733 — routing thresholds -->
 
 The simulator reports the outcome of routing as a per-stage purity account (designated mass versus
 impurity mass per stage) and pins the routing against per-pipe-segment wall temperatures with a

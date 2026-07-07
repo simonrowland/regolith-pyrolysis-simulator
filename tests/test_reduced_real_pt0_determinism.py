@@ -164,7 +164,10 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # REF-042 Fiock & Rodebush). Parsed-content digest moves on those metadata
     # strings; verified the embedded formulas and every coefficient are unchanged.
     # Provenance-only cache-identity move, not a physics move.
-    assert key_hash == "6417caf9722eb3b2e1039d2f02263374db20a6250bd23df78300bd0a6affaba8"
+    # 2026-07-07 (t-141 epoch): reduced-real key moves with the K standard-term
+    # data digest; value matches the worker enumeration in golden-deltas.json
+    # (the interim 62a416... reading in the refutation pass was the stale one).
+    assert key_hash == "f594594f971d2e0dc3d0e5b4ceb24fbb14a51648252fc21d4ad2e20abe49c0ba"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 

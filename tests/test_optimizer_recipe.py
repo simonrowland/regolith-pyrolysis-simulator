@@ -430,7 +430,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # depletion_flux_decay_fraction from search. Search-list hash moves by
     # design; recipe_id/cache_key remain pinned here because this no-O2 patch
     # resolves through the O2-neutral allowlist epoch.
-    assert cache_key(spec) == "6f74942b5f62c4dc22772c27dd716db4fb8d71e49049b675b20fb74144e4ca4f"
+    # 2026-07-07 (t-141 epoch): K standard term moves to the Lamoreaux-
+    # Hildenbrand 1984 liquid-KO0.5 basis (data/vapor_pressures.yaml K row +
+    # engines/builtin/vapor_pressure.py fit_target plumbing). cache_key moves
+    # through the data-digest facet; recipe_id stays pinned (no allowlist or
+    # bounds change). Recomputed controller-side on the production venv.
+    assert cache_key(spec) == "39de4f7e90199fc761211b056231c86256ad679901861303471a7c287b15dba3"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

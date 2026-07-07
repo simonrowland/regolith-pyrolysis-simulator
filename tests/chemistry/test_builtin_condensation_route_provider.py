@@ -118,43 +118,44 @@ from tests.chemistry.conftest import _build_sim
 # 2026-07-06 CF-3: single-cation gamma*X alkali activity suppresses Na vapor
 # linearly and exposes trace K wall deposition. Route parity still proves the
 # split path closes; only the physics-pinned wall trace table moves.
-# 2026-07-07 t-141 L&H K standard-term regen: K wall deposition drops ~60x
-# (below the trace floor on lunar/s_type segments -> K entries vanish;
-# mars K 7.794e-6 -> 1.254e-7 per segment) with ppm-scale Na/Si/SiO2/Mg
-# co-shifts through the shared headspace path. Recomputed controller-side;
-# matches docs-private/research/2026-07-07-t141-kmox/golden-deltas.json.
-EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {'lunar_mare_low_ti': {'process.wall_deposit_segment_stage_0_to_stage_1': {'Na': 8.13100421728669e-07,
-                                                                           'Si': 1.957778440361475e-07,
-                                                                           'SiO2': 4.1883283614825884e-07},
-                       'process.wall_deposit_segment_stage_1_to_stage_2': {'Na': 8.13100421728669e-07,
-                                                                           'Si': 1.957778440361475e-07,
-                                                                           'SiO2': 4.1883283614825884e-07},
-                       'process.wall_deposit_segment_stage_2_to_stage_3': {'Na': 8.13100421728669e-07},
-                       'process.wall_deposit_segment_stage_3_to_stage_4': {'Na': 8.131004217286689e-07}},
- 'mars_basalt': {'process.wall_deposit_segment_stage_0_to_stage_1': {'K': 1.25356775106986e-07,
-                                                                     'MgO': 8.918011685744506e-11,
-                                                                     'Na': 2.841947430165311e-05,
-                                                                     'Si': 1.564056640055922e-06,
-                                                                     'SiO2': 3.3458957218642735e-06},
-                 'process.wall_deposit_segment_stage_1_to_stage_2': {'K': 1.25356775106986e-07,
-                                                                     'MgO': 8.918011685744506e-11,
-                                                                     'Na': 2.841947430165311e-05,
-                                                                     'Si': 1.564056640055922e-06,
-                                                                     'SiO2': 3.3458957218642735e-06},
-                 'process.wall_deposit_segment_stage_2_to_stage_3': {'K': 1.25356775106986e-07,
-                                                                     'Mg': 5.377934547985813e-11,
-                                                                     'Na': 2.841947430165311e-05},
-                 'process.wall_deposit_segment_stage_3_to_stage_4': {'K': 1.25356775106986e-07,
-                                                                     'Mg': 5.37793454798581e-11,
-                                                                     'Na': 2.84194743016531e-05}},
- 's_type_asteroid_silicate': {'process.wall_deposit_segment_stage_0_to_stage_1': {'Na': 1.5356703164972603e-06,
-                                                                                  'Si': 1.7156264502192973e-07,
-                                                                                  'SiO2': 3.67028606047805e-07},
-                              'process.wall_deposit_segment_stage_1_to_stage_2': {'Na': 1.5356703164972603e-06,
-                                                                                  'Si': 1.7156264502192973e-07,
-                                                                                  'SiO2': 3.67028606047805e-07},
-                              'process.wall_deposit_segment_stage_2_to_stage_3': {'Na': 1.5356703164972603e-06},
-                              'process.wall_deposit_segment_stage_3_to_stage_4': {'Na': 1.5356703164972599e-06}}}
+# 2026-07-07 t-141 L&H K standard-term regen (+ wall-selector pole guard):
+# K wall deposition drops ~60x (below trace floor on lunar/s_type; mars K
+# 7.794e-6 -> 1.254e-7 per segment). The wall sidecar helper delegates
+# non-standard-reaction rows to the runtime selector (shared pole/overflow
+# guard), so Na/Ca-class wall values stay at their pre-t-141 behavior
+# (Na back within an LSB of the prior pin) — t-141's wall effect is K-only.
+EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {'lunar_mare_low_ti': {'process.wall_deposit_segment_stage_0_to_stage_1': {'Na': 8.098416550477048e-07,
+                                                                           'Si': 1.9577784403627287e-07,
+                                                                           'SiO2': 4.1883283614852703e-07},
+                       'process.wall_deposit_segment_stage_1_to_stage_2': {'Na': 8.098416550477048e-07,
+                                                                           'Si': 1.9577784403627287e-07,
+                                                                           'SiO2': 4.1883283614852703e-07},
+                       'process.wall_deposit_segment_stage_2_to_stage_3': {'Na': 8.098416550477048e-07},
+                       'process.wall_deposit_segment_stage_3_to_stage_4': {'Na': 8.098416550477047e-07}},
+ 'mars_basalt': {'process.wall_deposit_segment_stage_0_to_stage_1': {'K': 1.2535677513155645e-07,
+                                                                     'MgO': 8.918011687581417e-11,
+                                                                     'Na': 2.830763435362209e-05,
+                                                                     'Si': 1.564056640058321e-06,
+                                                                     'SiO2': 3.3458957218693773e-06},
+                 'process.wall_deposit_segment_stage_1_to_stage_2': {'K': 1.2535677513155645e-07,
+                                                                     'MgO': 8.918011687581417e-11,
+                                                                     'Na': 2.830763435362209e-05,
+                                                                     'Si': 1.564056640058321e-06,
+                                                                     'SiO2': 3.3458957218693773e-06},
+                 'process.wall_deposit_segment_stage_2_to_stage_3': {'K': 1.2535677513155645e-07,
+                                                                     'Mg': 5.377934549093548e-11,
+                                                                     'Na': 2.830763435362209e-05},
+                 'process.wall_deposit_segment_stage_3_to_stage_4': {'K': 1.253567751315564e-07,
+                                                                     'Mg': 5.37793454909355e-11,
+                                                                     'Na': 2.830763435362208e-05}},
+ 's_type_asteroid_silicate': {'process.wall_deposit_segment_stage_0_to_stage_1': {'Na': 1.5295156139210297e-06,
+                                                                                  'Si': 1.7156264502213654e-07,
+                                                                                  'SiO2': 3.6702860604824736e-07},
+                              'process.wall_deposit_segment_stage_1_to_stage_2': {'Na': 1.5295156139210297e-06,
+                                                                                  'Si': 1.7156264502213654e-07,
+                                                                                  'SiO2': 3.6702860604824736e-07},
+                              'process.wall_deposit_segment_stage_2_to_stage_3': {'Na': 1.5295156139210297e-06},
+                              'process.wall_deposit_segment_stage_3_to_stage_4': {'Na': 1.5295156139210297e-06}}}
 
 
 def _assert_atom_proof_closed(proposal) -> None:
