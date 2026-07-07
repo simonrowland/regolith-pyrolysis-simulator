@@ -555,6 +555,8 @@ _HOLD = ("campaigns", "C3", "endpoint", "hold_time_min")
 _MODE = ("campaigns", "C0", "mode")
 _C3_PO2_DEFAULT = ("campaigns", "C3", "pO2_mbar_default")
 _C3_PTOTAL_DEFAULT = ("campaigns", "C3", "p_total_mbar_default")
+_RAIL_FLOAT = ("rail", "float")
+_RAIL_INT = ("rail", "int")
 
 
 def _anchored_schema() -> RecipeSchema:
@@ -569,6 +571,10 @@ def _anchored_schema() -> RecipeSchema:
             ),
         )
     )
+
+
+def _rail_schema(path: tuple[str, ...], kind: str) -> RecipeSchema:
+    return RecipeSchema(allowlist=(KnobSpec(path=path, kind=kind, low=0, high=100),))
 
 
 def _anchor(temp: float = 500.0, hold: int = 30, mode: str = "nominal") -> RecipePatch:
@@ -694,6 +700,153 @@ def test_anchored_sampling_clamps_when_center_near_bound() -> None:
     _assert_within_neighborhood(schema, patches, anchor, delta)
     assert max(p.values[_TEMP] for p in patches) <= 950.0
     assert max(p.values[_HOLD] for p in patches) <= 60
+
+
+def test_anchored_float_near_upper_bound_remaps_without_rail_pileup() -> None:
+    schema = _rail_schema(_RAIL_FLOAT, "float")
+    patches = sample_recipe_patches(
+        schema,
+        n_samples=10_000,
+        seed=144,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=RecipePatch({_RAIL_FLOAT: 95.0}),
+        delta_fraction=0.15,
+    )
+
+    values = [patch.values[_RAIL_FLOAT] for patch in patches]
+    assert min(values) >= 80.0
+    assert max(values) <= 100.0
+    assert values.count(100.0) == 0
+    counts: dict[float, int] = {}
+    for value in values:
+        counts[value] = counts.get(value, 0) + 1
+    assert max(counts.values()) / len(values) <= 0.001
+
+
+def test_anchored_int_near_upper_bound_uses_fair_clipped_buckets() -> None:
+    schema = _rail_schema(_RAIL_INT, "int")
+    patches = sample_recipe_patches(
+        schema,
+        n_samples=10_000,
+        seed=144,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        anchor=RecipePatch({_RAIL_INT: 95}),
+        delta_fraction=0.15,
+    )
+
+    values = [patch.values[_RAIL_INT] for patch in patches]
+    assert min(values) == 80
+    assert max(values) == 100
+    counts: dict[int, int] = {}
+    for value in values:
+        counts[value] = counts.get(value, 0) + 1
+    assert set(counts) == set(range(80, 101))
+    assert max(counts.values()) / len(values) <= 0.06
+
+
+def test_anchored_interior_unit_mapping_matches_legacy_formula() -> None:
+    float_spec = KnobSpec(path=_RAIL_FLOAT, kind="float", low=0, high=100)
+    int_spec = KnobSpec(path=_RAIL_INT, kind="int", low=0, high=100)
+    center = 50
+    delta = 0.15
+
+    for unit in (0.0, 0.125, 0.5, 0.875, math.nextafter(1.0, 0.0)):
+        legacy_value = center + (2.0 * unit - 1.0) * 15.0
+        assert doe_module._map_unit_value_anchored(
+            float_spec, unit, float(center), delta
+        ) == pytest.approx(legacy_value)
+        assert doe_module._map_unit_value_anchored(
+            int_spec, unit, center, delta
+        ) == int(round(legacy_value))
+
+
+def test_anchored_interior_dependency_free_lhc_canonical_json_matches_legacy() -> None:
+    schema = _anchored_schema()
+
+    # Recorded from the legacy interior-anchor expression:
+    # center + (2 * unit - 1) * half_width.
+    assert tuple(
+        patch.canonical_json()
+        for patch in sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=144,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=_anchor(),
+            delta_fraction=0.15,
+        )
+    ) == (
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":453.40763271253763},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":36}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":517.3343123700043},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":29}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":543.0543134472375},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":34}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":419.2745649641729},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":24}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":577.4789490504673},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":27}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":466.4803891941184},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":32}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":364.7420667677326},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":26}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":613.0671952710939},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":31}]',
+    )
+
+
+def test_anchored_interior_scipy_sobol_canonical_json_matches_legacy() -> None:
+    if not doe_module._scipy_sobol_available():
+        pytest.skip("scipy-sobol unavailable")
+
+    schema = _anchored_schema()
+
+    # Recorded from the legacy interior-anchor expression:
+    # center + (2 * unit - 1) * half_width.
+    assert tuple(
+        patch.canonical_json()
+        for patch in sample_recipe_patches(
+            schema,
+            n_samples=8,
+            seed=144,
+            sampler_name=SCIPY_SOBOL_SAMPLER,
+            anchor=_anchor(),
+            delta_fraction=0.15,
+        )
+    ) == (
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":589.6556176226586},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":26}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":477.6095311231911},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":31}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":415.90245443955064},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":27}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":512.9525380562991},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":35}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":554.9749413356185},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":30}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":372.78716417588294},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":35}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":450.8525401148945},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":24}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":617.4994091466069},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":33}]',
+    )
+
+
+def test_anchored_near_rail_sampling_respects_bounds() -> None:
+    for path, kind, center in (
+        (_RAIL_FLOAT, "float", 5.0),
+        (_RAIL_FLOAT, "float", 95.0),
+        (_RAIL_INT, "int", 5),
+        (_RAIL_INT, "int", 95),
+    ):
+        schema = _rail_schema(path, kind)
+        patches = sample_recipe_patches(
+            schema,
+            n_samples=256,
+            seed=144,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+            anchor=RecipePatch({path: center}),
+            delta_fraction=0.15,
+        )
+        values = [patch.values[path] for patch in patches]
+        assert all(0 <= value <= 100 for value in values)
+
+
+def test_anchored_int_clipped_endpoint_buckets_are_reachable() -> None:
+    spec = KnobSpec(path=_RAIL_INT, kind="int", low=0, high=100)
+
+    assert doe_module._map_unit_value_anchored(spec, 0.0, 95, 0.15) == 80
+    assert (
+        doe_module._map_unit_value_anchored(
+            spec, math.nextafter(1.0, 0.0), 95, 0.15
+        )
+        == 100
+    )
 
 
 def test_anchored_pressure_coupling_stays_in_neighborhood_and_under_total() -> None:

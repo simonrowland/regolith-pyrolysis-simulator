@@ -381,9 +381,12 @@ def sample_recipe_patches(
     With ``anchor=None`` (default) this sweeps each knob's full schema range and
     behaviour is unchanged. With an ``anchor`` RecipePatch, each numeric knob is
     instead perturbed within ``+/- delta_fraction * (high - low)`` of the anchor
-    center, clamped to ``[low, high]`` -- a small neighborhood around a known
-    recipe. The same unit-hypercube generator / ``sampler_name`` is reused, so
-    results stay deterministic for a given seed.
+    center, clipped to ``[low, high]`` and remapped over that clipped interval
+    -- a small neighborhood around a known recipe. The same unit-hypercube
+    generator / ``sampler_name`` is reused, so results stay deterministic for a
+    given seed. Interior anchors retain their historical unit mapping; near-rail
+    anchors intentionally change from map-then-clamp to remap-into-clipped-range
+    semantics to avoid rail pile-up.
     """
 
     active_schema = schema or RecipeSchema()
@@ -842,19 +845,60 @@ def _map_unit_value_anchored(
     if spec.kind == "categorical":
         return center
 
-    low, high = _numeric_bounds(spec)
     anchored_low, anchored_high = _anchored_numeric_interval(
         spec, center, delta_fraction
     )
-    # value = clamp(c + (2u-1) * delta_fraction * (hi-lo), lo, hi)
-    half_width = delta_fraction * (high - low)
-    value = float(center) + (2.0 * unit_value - 1.0) * half_width
-    value = min(max(value, anchored_low), anchored_high)
     if spec.kind == "int":
-        return int(round(value))
+        return _map_anchored_int_unit_value(
+            spec,
+            unit_value,
+            center,
+            delta_fraction,
+            anchored_low,
+            anchored_high,
+        )
     if spec.kind == "float":
-        return float(value)
+        low, high = _numeric_bounds(spec)
+        half_width = delta_fraction * (high - low)
+        center_value = float(center)
+        symmetric_low = center_value - half_width
+        symmetric_high = center_value + half_width
+        if low <= symmetric_low and symmetric_high <= high:
+            value = center_value + (2.0 * unit_value - 1.0) * half_width
+            return float(value)
+        return float(anchored_low + unit_value * (anchored_high - anchored_low))
     raise ValueError(f"{'.'.join(spec.path)} has unsupported knob kind {spec.kind!r}")
+
+
+def _map_anchored_int_unit_value(
+    spec: Any,
+    unit_value: float,
+    center: Any,
+    delta_fraction: float,
+    anchored_low: float,
+    anchored_high: float,
+) -> int:
+    low, high = _numeric_bounds(spec)
+    half_width = delta_fraction * (high - low)
+    center_value = float(center)
+    symmetric_low = center_value - half_width
+    symmetric_high = center_value + half_width
+    if low <= symmetric_low and symmetric_high <= high:
+        # Preserve established interior-anchor mapping exactly. The pile-up bug
+        # only occurs when the symmetric window crosses a schema rail.
+        value = center_value + (2.0 * unit_value - 1.0) * half_width
+        return int(round(value))
+
+    low_int = math.ceil(anchored_low)
+    high_int = math.floor(anchored_high)
+    if low_int > high_int:
+        raise ValueError(
+            f"{'.'.join(spec.path)} anchored interval "
+            f"[{anchored_low:.12g}, {anchored_high:.12g}] contains no integer"
+        )
+    bucket_count = high_int - low_int + 1
+    bucket = min(int(unit_value * bucket_count), bucket_count - 1)
+    return low_int + bucket
 
 
 def _anchored_numeric_interval(
