@@ -15,6 +15,7 @@ from simulator.optimize.profiles import (
     load_profile,
 )
 from simulator.optimize.study import (
+    COMPLETED_NO_FEASIBLE_WINNER_STATUS,
     DEFAULT_EVAL_TIMEOUT_SECONDS,
     DEFAULT_PROFILE_NAME,
     DEFAULT_PROFILES,
@@ -89,14 +90,19 @@ def main(argv: Sequence[str] | None = None) -> int:
             message=str(exc),
         )
         parser.exit(2, f"error: {exc}\n")
+    winner_candidate_id = result.winner.candidate_id if result.winner else None
     print(f"out_dir: {result.out_dir}")
-    print(f"winner: {result.winner.candidate_id}")
+    print(f"winner: {winner_candidate_id or '<none>'}")
     print(f"strategy: {args.strategy}->{STRATEGY_CLASS_NAMES[args.strategy]}")
+    study_status = getattr(result, "status", "completed")
+    # A completed all-infeasible study is a successful CLI run; the distinct
+    # marker status lets web/job reload paths avoid advertising a green winner.
     _write_job_status(
         result.out_dir,
-        status="SUCCEEDED",
-        reason="completed",
-        winner_candidate_id=result.winner.candidate_id,
+        status=_job_status_for_study(study_status),
+        reason=getattr(result, "reason", "completed"),
+        winner_candidate_id=winner_candidate_id,
+        study_status=study_status,
     )
     return 0
 
@@ -237,6 +243,12 @@ def _validate_constrained_max_args(
         parser.error(f"{', '.join(cap_names)} require --constrained-max")
 
 
+def _job_status_for_study(study_status: str) -> str:
+    if study_status == COMPLETED_NO_FEASIBLE_WINNER_STATUS:
+        return COMPLETED_NO_FEASIBLE_WINNER_STATUS
+    return "SUCCEEDED"
+
+
 def _write_job_status(
     out_dir: Path | None,
     *,
@@ -244,6 +256,7 @@ def _write_job_status(
     reason: str,
     message: str = "",
     winner_candidate_id: str | None = None,
+    study_status: str | None = None,
 ) -> None:
     if out_dir is None:
         return
@@ -252,10 +265,12 @@ def _write_job_status(
         "message": message,
         "reason": reason,
         "status": status,
-        "success": status == "SUCCEEDED",
+        "success": status != "FAILED",
     }
     if winner_candidate_id is not None:
         payload["winner_candidate_id"] = winner_candidate_id
+    if study_status is not None:
+        payload["study_status"] = study_status
     try:
         out_dir.mkdir(parents=True, exist_ok=True)
         tmp = out_dir / f"{JOB_STATUS_NAME}.tmp"

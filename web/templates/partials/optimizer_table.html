@@ -70,6 +70,15 @@
                     Run {{ entry.run_id }}<br>
                     Candidate {{ entry.candidate_id }}<br>
                     <span class="range">cache {{ entry.cache_key[:12] }}</span>
+                    {% if entry.previously_ungated %}
+                    <br><span class="version-badge version-badge-legacy" title="{{ entry.constraint_label.title }}">previously_ungated</span>
+                    {% endif %}
+                    {% if entry.constraint_margin_summary %}
+                    <br>
+                    {% for margin in entry.constraint_margin_summary %}
+                    <span class="version-badge version-badge-legacy" title="{{ margin.detail }}">{{ margin.gate }} {{ margin.verdict }}</span>
+                    {% endfor %}
+                    {% endif %}
                 </td>
                 <td>
                     {% if entry.completeness.status == "available" and entry.completeness.percent is not none %}

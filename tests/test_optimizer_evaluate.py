@@ -44,12 +44,12 @@ from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
-from simulator.optimize.study import StubSmokeConstraintSet
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
 from simulator.runner import RunnerError, _force_builtin_vapor_pressure
 from simulator.session import SimSession, SimSessionConfig
 from simulator.state import CampaignPhase, HourSnapshot
+from optimizer_fixtures import StubSmokeConstraintSet
 
 
 PO2_DEFAULT = ("campaigns", "C0b_p_cleanup", "pO2_mbar_default")
@@ -736,6 +736,39 @@ def _hand_knudsen_number_5_mbar_1600c() -> float:
     return _hand_knudsen_number(5.0, 1600.0)
 
 
+def _flow_present_missing_knudsen_snapshot() -> HourSnapshot:
+    snapshot = _snapshot(knudsen_regime_summary={})
+    snapshot.evap_flux.species_kg_hr = {"Na": 1.0}
+    snapshot.evap_flux.total_kg_hr = 1.0
+    snapshot.condensed_by_stage_species_delta = {(4, "Na"): 1.0}
+    return snapshot
+
+
+def _zero_overhead_flow_snapshot(*, marked: bool = True) -> HourSnapshot:
+    summary = (
+        {
+            "status": "not_applicable",
+            "reason": "not-applicable-zero-overhead-flow",
+            "provenance": "not-applicable-zero-overhead-flow",
+        }
+        if marked
+        else {}
+    )
+    snapshot = _snapshot(knudsen_regime_summary=summary)
+    snapshot.evap_flux.species_kg_hr = {}
+    snapshot.evap_flux.total_kg_hr = 0.0
+    snapshot.condensed_by_stage_species_delta = {}
+    snapshot.wall_deposit_by_segment_species_delta = {}
+    for name in (
+        "O2_vented_kg_hr",
+        "O2_vented_mol_hr",
+        "melt_offgas_O2_mol_hr",
+        "mre_anode_O2_mol_hr",
+    ):
+        setattr(snapshot, name, 0.0)
+    return snapshot
+
+
 def test_batch_global_knudsen_summary_feeds_finite_physics_gate() -> None:
     expected_kn = _hand_knudsen_number_10_mbar_1600c()
     assert expected_kn == pytest.approx(3.3627904232901555e-4)
@@ -797,14 +830,12 @@ def test_measured_segment_knudsen_margin_keeps_measured_detail() -> None:
     assert "hot_wall" in margin.detail
 
 
-def test_repro_profile_missing_trace_knudsen_uses_pressure_band() -> None:
-    expected_kn = _hand_knudsen_number_5_mbar_1600c()
-    assert expected_kn == pytest.approx(6.725580846580311e-4)
+def test_repro_profile_flow_present_empty_snapshot_knudsen_fails_closed() -> None:
     profile = _knudsen_gate_profile()
     del profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
         "p_total_mbar_default"
     ]
-    trace = _trace(snapshots=(_snapshot(knudsen_regime_summary={}),))
+    trace = _trace(snapshots=(_flow_present_missing_knudsen_snapshot(),))
 
     result = evaluate(
         RecipePatch({}),
@@ -821,15 +852,214 @@ def test_repro_profile_missing_trace_knudsen_uses_pressure_band() -> None:
     )
 
     margin = result.feasibility_margins["knudsen_viscous"]
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert not margin.feasible
+    assert margin.margin == -math.inf
+    assert margin.observed == math.inf
+    assert margin.detail.startswith("population-bug-missing-overhead-flow-state:")
+    assert "flow present but knudsen_regime_summary absent" in margin.detail
+    assert "fallback:eval-inputs" not in margin.detail
+
+
+def test_zero_overhead_flow_knudsen_snapshot_is_not_applicable_pass(
+    tmp_path,
+) -> None:
+    trace = _trace(snapshots=(_zero_overhead_flow_snapshot(marked=True),))
+
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_knudsen_no_flow_profile(),
+        executor=FakeExecutor(
+            _execution(
+                trace=trace,
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    assert result.feasible
+    assert result.failure_category is None
+    margin = result.feasibility_margins["knudsen_viscous"]
     assert margin.feasible
-    assert margin.observed == pytest.approx(expected_kn)
-    assert 6.0e-4 < margin.observed < 8.0e-4
-    assert margin.detail.startswith("fallback:eval-inputs")
-    assert "default_pipe" in margin.detail
+    assert margin.margin == pytest.approx(0.01)
+    assert margin.observed == pytest.approx(0.0)
+    assert margin.detail.startswith("not-applicable-zero-overhead-flow:")
+    assert "zero_overhead_flow" in margin.detail
+
+    assert result.eval_spec is not None
+    store = ResultStore(
+        tmp_path / "knudsen-results.sqlite",
+        current_code_version=result.eval_spec.code_version,
+        current_data_digests=result.eval_spec.data_digests,
+    )
+    assert result.run_reference is not None
+    closure = {"status": "closed", "mass_balance_error_pct": 0.0}
+    closed_product_summary = dict(result.run_reference.product_summary)
+    product_yield_table = dict(closed_product_summary.get("product_yield_table") or {})
+    product_yield_table["mass_closure"] = closure
+    closed_product_summary["mass_closure"] = closure
+    closed_product_summary["product_yield_table"] = product_yield_table
+    storable = replace(
+        result,
+        run_reference=replace(
+            result.run_reference,
+            product_summary=closed_product_summary,
+        ),
+    )
+    store.store(result.eval_spec, storable, created_at="2026-06-11T00:00:00Z")
+    loaded = store.fetch(result.cache_key)
+    assert loaded is not None
+    loaded_margin = loaded.feasibility_margins["knudsen_viscous"]
+    assert loaded_margin.detail == margin.detail
+    assert loaded_margin.observed == pytest.approx(0.0)
 
 
-def test_missing_knudsen_flow_state_is_named_and_serializable(tmp_path) -> None:
-    trace = _trace(snapshots=(_snapshot(knudsen_regime_summary={}),))
+def test_zero_overhead_flow_requires_marker_not_dataclass_defaults() -> None:
+    trace = _trace(snapshots=(_zero_overhead_flow_snapshot(marked=False),))
+
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_knudsen_no_flow_profile(),
+        executor=FakeExecutor(
+            _execution(
+                trace=trace,
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    margin = result.feasibility_margins["knudsen_viscous"]
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert not margin.feasible
+    assert margin.detail.startswith("population-bug-missing-overhead-flow-state:")
+    assert "not-applicable-zero-overhead-flow" not in margin.detail
+
+
+def test_extraction_not_attempted_round_trips_through_result_store(tmp_path) -> None:
+    snapshot = replace(_snapshot(), temperature_C=600.0)
+    setattr(snapshot, "solidus_T_C", 950.0)
+    trace = _trace(snapshots=(snapshot,))
+    trace.product_ledger_kg = {}
+    trace.terminal_rump_by_species_kg = {"SiO2": 1000.0}
+    trace.condensed_by_stage_species_delta = ({},)
+    profile = {
+        **PROFILE,
+        "constraints": {
+            "gates": [
+                "delivered_stream_purity",
+                "extraction_completeness",
+            ],
+        },
+    }
+
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(
+            _execution(
+                trace=trace,
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    margins = result.feasibility_margins
+    for gate in ("delivered_stream_purity", "extraction_completeness"):
+        margin = margins[gate]
+        assert margin.status == "not-attempted"
+        assert margin.output_status == "not_attempted"
+        assert margin.status_reason == "not-attempted-no-volatilization"
+        assert margin.status_payload["predicate"] == "melt_never_reached_solidus"
+
+    assert result.eval_spec is not None
+    assert result.run_reference is not None
+    closure = {"status": "closed", "mass_balance_error_pct": 0.0}
+    closed_product_summary = dict(result.run_reference.product_summary)
+    closed_product_summary["mass_closure"] = closure
+    storable = replace(
+        result,
+        run_reference=replace(
+            result.run_reference,
+            product_summary=closed_product_summary,
+        ),
+    )
+    store = ResultStore(
+        tmp_path / "not-attempted-results.sqlite",
+        current_code_version=result.eval_spec.code_version,
+        current_data_digests=result.eval_spec.data_digests,
+    )
+    store.store(result.eval_spec, storable, created_at="2026-06-11T00:00:00Z")
+    loaded = store.fetch(result.cache_key)
+
+    assert loaded is not None
+    for gate in ("delivered_stream_purity", "extraction_completeness"):
+        margin = loaded.feasibility_margins[gate]
+        assert margin.status == "not-attempted"
+        assert margin.output_status == "not_attempted"
+        assert margin.status_reason == "not-attempted-no-volatilization"
+        assert margin.status_payload["predicate"] == "melt_never_reached_solidus"
+
+
+def test_below_solidus_with_routed_flow_is_honest_infeasible() -> None:
+    snapshot = replace(_snapshot(), temperature_C=100.0)
+    setattr(snapshot, "solidus_T_C", 950.0)
+    snapshot.evap_flux.species_kg_hr = {"SiO": 0.9, "Fe": 0.1}
+    snapshot.evap_flux.total_kg_hr = 1.0
+    snapshot.condensed_by_stage_species_delta = {(3, "SiO"): 0.9, (3, "Fe"): 0.1}
+    trace = _trace(mixed_stream=True, snapshots=(snapshot,))
+    trace.product_ledger_kg = {}
+    trace.terminal_rump_by_species_kg = {"SiO2": 1000.0}
+    trace.condensed_by_stage_species_delta = ({(3, "SiO"): 0.9, (3, "Fe"): 0.1},)
+    profile = {
+        **PROFILE,
+        "constraints": {
+            "gates": [
+                "delivered_stream_purity",
+                "extraction_completeness",
+            ],
+        },
+    }
+
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(
+            _execution(
+                trace=trace,
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    for gate in ("delivered_stream_purity", "extraction_completeness"):
+        margin = result.feasibility_margins[gate]
+        assert not margin.feasible
+        assert margin.status != "not-attempted"
+        assert margin.output_status != "not_attempted"
+        assert margin.status_reason != "not-attempted-no-volatilization"
+        assert "not-attempted-no-volatilization" not in margin.detail
+
+
+def test_flow_present_missing_knudsen_summary_fails_closed() -> None:
+    trace = _trace(snapshots=(_flow_present_missing_knudsen_snapshot(),))
 
     result = evaluate(
         RecipePatch({}),
@@ -849,17 +1079,42 @@ def test_missing_knudsen_flow_state_is_named_and_serializable(tmp_path) -> None:
     assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
     margin = result.feasibility_margins["knudsen_viscous"]
     assert not margin.feasible
-    assert not math.isnan(margin.observed)
-    assert margin.detail.startswith("not-applicable:")
+    assert margin.margin == -math.inf
+    assert margin.observed == math.inf
+    assert margin.detail.startswith("population-bug-missing-overhead-flow-state:")
     assert "missing overhead flow state" in margin.detail
+    assert "not-applicable-zero-overhead-flow" not in margin.detail
 
-    assert result.eval_spec is not None
-    store = ResultStore(
-        tmp_path / "knudsen-results.sqlite",
-        current_code_version=result.eval_spec.code_version,
-        current_data_digests=result.eval_spec.data_digests,
+
+@pytest.mark.parametrize("flow_value", [math.nan, math.inf])
+def test_nonfinite_flow_scalar_missing_knudsen_summary_fails_closed(
+    flow_value: float,
+) -> None:
+    snapshot = _snapshot(knudsen_regime_summary={})
+    setattr(snapshot, "O2_vented_mol_hr", flow_value)
+    trace = _trace(snapshots=(snapshot,))
+
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=_knudsen_no_flow_profile(),
+        executor=FakeExecutor(
+            _execution(
+                trace=trace,
+                backend_status="ok",
+                backend_authoritative=True,
+            )
+        ),
     )
-    store.store(result.eval_spec, result, created_at="2026-06-11T00:00:00Z")
+
+    margin = result.feasibility_margins["knudsen_viscous"]
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
+    assert not margin.feasible
+    assert margin.detail.startswith("population-bug-missing-overhead-flow-state:")
+    assert "fallback:eval-inputs" not in margin.detail
+    assert "not-applicable-zero-overhead-flow" not in margin.detail
 
 
 def test_zero_input_extraction_completeness_is_named_and_serializable(tmp_path) -> None:

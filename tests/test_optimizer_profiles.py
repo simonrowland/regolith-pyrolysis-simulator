@@ -11,7 +11,7 @@ from simulator.config import DEFAULT_DATA_DIR
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.optimize.objective import composition_target_eval_metadata
 from simulator.optimize import study
-from simulator.optimize.physics import GATE_ORDER
+from simulator.optimize.physics import GATE_ORDER, PhysicsConstraintSet
 from simulator.optimize.sso2_evidence import SSO2_OWNER_RECIPE_ID
 from simulator.backends import CACHE_TIER_CEILINGS
 from simulator.optimize.profiles import (
@@ -208,21 +208,10 @@ def test_profile_catalog_blocked_exemption_is_status_marker_driven(tmp_path: Pat
         validate_profile_catalog(data_dir=tmp_path)
 
 
-def test_each_profile_drives_stub_study(tmp_path: Path) -> None:
+def test_each_profile_defaults_to_physics_constraints() -> None:
     for feedstock, profile in validate_profile_catalog().items():
-        result = study.run(
-            profile,
-            feedstock,
-            "random",
-            "stub",
-            1,
-            1,
-            tmp_path / feedstock,
-            seed=11,
-        )
-
-        assert result.winner is not None
-        assert result.pareto
+        assert profile.get("study_constraints") is None, feedstock
+        assert isinstance(study._constraints_for_profile(profile), PhysicsConstraintSet)
 
 
 def test_unknown_objective_metric_raises_named_error() -> None:
@@ -283,6 +272,17 @@ def test_constraint_threshold_overrides_validate_types() -> None:
 
     with pytest.raises(ProfileValidationError, match="constraints.furnace_T_max_C must be numeric"):
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_shipped_profiles_do_not_select_stub_smoke() -> None:
+    profile_dir = DEFAULT_DATA_DIR / "optimize_profiles"
+    offenders: list[str] = []
+    for path in sorted(profile_dir.glob("*.yaml")):
+        profile = yaml.safe_load(path.read_text()) or {}
+        if profile.get("study_constraints") == "stub_smoke":
+            offenders.append(str(path.relative_to(DEFAULT_DATA_DIR.parent)))
+
+    assert offenders == []
 
 
 @pytest.mark.parametrize("cap_C", [1199.0, 2001.0])

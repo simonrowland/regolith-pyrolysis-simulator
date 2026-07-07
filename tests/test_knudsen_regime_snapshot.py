@@ -26,7 +26,7 @@ import yaml
 
 from simulator.backends import BackendSelectionPolicy
 from simulator.session import SimSession, SimSessionConfig
-from simulator.state import HourSnapshot
+from simulator.state import EvaporationFlux, HourSnapshot, OverheadGas
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
@@ -150,3 +150,17 @@ def test_latest_knudsen_summary_returns_empty_dict_pre_condensation():
     sim._condensation_model = None
     summary = sim._latest_knudsen_summary()
     assert summary == {}
+
+
+def test_zero_overhead_marker_rejects_mre_only_o2_flow():
+    session = SimSession().start(_config(campaign="C5"))
+    sim = session.simulator
+    sim._last_condensed_by_stage_species_delta = {}
+    sim._last_wall_deposit_by_segment_species_delta = {}
+    sim.overhead = OverheadGas(mre_anode_O2_mol_hr=1.0)
+
+    sim._refresh_knudsen_zero_overhead_flow_marker(
+        EvaporationFlux(species_kg_hr={}, total_kg_hr=0.0)
+    )
+
+    assert sim._latest_knudsen_summary() == {}

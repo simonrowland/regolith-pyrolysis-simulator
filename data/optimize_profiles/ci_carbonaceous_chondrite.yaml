@@ -12,7 +12,6 @@ objectives:
   - {metric: duration_h, sense: minimize, units: h, weight: 0.12, rationale: long cleanup penalty}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
-study_constraints: stub_smoke
 run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
 fidelities:
   stub: {backend_name: stub, hours: 1}

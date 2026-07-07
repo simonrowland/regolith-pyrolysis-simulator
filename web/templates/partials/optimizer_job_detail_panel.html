@@ -4,7 +4,14 @@
      hx-swap="outerHTML">
     <h2>Optimizer Job {{ job.job_id }}</h2>
     <table class="param-table">
-        <tr><td>Status</td><td>{{ job.status }}</td></tr>
+        <tr>
+            <td>Status</td>
+            <td>
+                <span class="backend-badge optimizer-status-{{ job.status|lower }}">
+                    {{ job.status }}
+                </span>
+            </td>
+        </tr>
         <tr><td>Feedstock</td><td>{{ job.feedstock_id }}</td></tr>
         <tr><td>Profile</td><td>{{ job.profile_id }}</td></tr>
         <tr><td>Mode</td><td>{{ "certify (live-fill)" if job.certify else job.strategy }}</td></tr>

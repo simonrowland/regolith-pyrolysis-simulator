@@ -373,13 +373,16 @@ def _write_job_status_marker(
     status: str,
     reason: str = "completed",
     message: str = "",
+    study_status: str | None = None,
 ) -> None:
     payload = {
         "status": status,
-        "success": status == "SUCCEEDED",
+        "success": status != "FAILED",
         "reason": reason,
         "message": message,
     }
+    if study_status is not None:
+        payload["study_status"] = study_status
     (job_dir / "job_status.json").write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -930,6 +933,131 @@ def test_optimizer_metadata_and_detail_use_grounded_feasible_for_legacy_row(
     assert "<tr><td>Feasible</td><td>no</td></tr>" in detail.get_data(as_text=True)
     assert download.status_code == 200
     assert yaml.safe_load(download.get_data(as_text=True))["result"]["feasible"] is False
+
+
+def test_optimizer_marks_stub_smoke_rows_previously_ungated(client) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-previously-ungated"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec(recipe_id="recipe-previously-ungated")
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(spec, candidate_id="candidate-previously-ungated", oxygen=42.0),
+        created_at="2026-06-02T00:00:00Z",
+    )
+    key = cache_key(spec)
+    with sqlite3.connect(run_dir / "cache.sqlite") as conn:
+        conn.execute(
+            """
+            UPDATE results
+            SET feasibility_margins = ?
+            WHERE cache_key = ?
+            """,
+            (
+                json.dumps(
+                    _serialize_margins(
+                        {"stub_smoke": _margin("stub_smoke", feasible=True)}
+                    )
+                ),
+                key,
+            ),
+        )
+
+    leaderboard = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+    table = client.get(
+        "/partials/optimizer-table"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=oxygen_kg&limit=5"
+    )
+    detail = client.get(f"/optimizer/runs/run-previously-ungated/results/{key}")
+
+    assert leaderboard.status_code == 200
+    entry = leaderboard.get_json()["entries"][0]
+    assert entry["previously_ungated"] is True
+    assert entry["constraint_label"]["key"] == "previously_ungated"
+    assert table.status_code == 200
+    assert "previously_ungated" in table.get_data(as_text=True)
+    assert detail.status_code == 200
+    assert "previously_ungated" in detail.get_data(as_text=True)
+
+
+def test_optimizer_result_surfaces_knudsen_and_not_attempted_margins(client) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-constraint-margins"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec(recipe_id="recipe-constraint-margins")
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(spec, candidate_id="candidate-constraint-margins", oxygen=42.0),
+        created_at="2026-06-02T00:00:00Z",
+    )
+    key = cache_key(spec)
+    margins = {
+        "knudsen_viscous": replace(
+            _margin("knudsen_viscous", feasible=False, margin=-1.0, observed=1.0),
+            detail=(
+                "population-bug-missing-overhead-flow-state: "
+                "snapshot 0 flow present but knudsen_regime_summary absent"
+            ),
+        ),
+        "delivered_stream_purity": replace(
+            _margin("delivered_stream_purity", feasible=False),
+            detail="not-attempted-no-volatilization: zero delivered stream",
+            status="not-attempted",
+            output_status="not_attempted",
+            status_reason="not-attempted-no-volatilization",
+            status_payload={
+                "reason": "not-attempted-no-volatilization",
+                "predicate": "melt_never_reached_solidus",
+            },
+        ),
+    }
+    with sqlite3.connect(run_dir / "cache.sqlite") as conn:
+        conn.execute(
+            """
+            UPDATE results
+            SET feasible = 0,
+                failure_category = ?,
+                objectives = ?,
+                feasibility_margins = ?,
+                failing_gates = ?
+            WHERE cache_key = ?
+            """,
+            (
+                FailureCategory.INFEASIBLE_RECIPE.value,
+                "[]",
+                json.dumps(_serialize_margins(margins)),
+                json.dumps(list(margins)),
+                key,
+            ),
+        )
+
+    runs = client.get("/api/optimizer/runs")
+    detail = client.get(f"/optimizer/runs/run-constraint-margins/results/{key}")
+
+    assert runs.status_code == 200
+    latest = runs.get_json()["runs"][0]["latest_result"]
+    margin_by_gate = {row["gate"]: row for row in latest["constraint_margins"]}
+    assert margin_by_gate["knudsen_viscous"]["verdict"] == "fail"
+    assert "population-bug-missing-overhead-flow-state" in margin_by_gate[
+        "knudsen_viscous"
+    ]["detail"]
+    assert margin_by_gate["delivered_stream_purity"]["verdict"] == "not-attempted"
+    assert margin_by_gate["delivered_stream_purity"]["predicate"] == (
+        "melt_never_reached_solidus"
+    )
+    assert detail.status_code == 200
+    html = detail.get_data(as_text=True)
+    assert "Constraint Margins" in html
+    assert "population-bug-missing-overhead-flow-state" in html
+    assert "not-attempted-no-volatilization" in html
+    assert "melt_never_reached_solidus" in html
 
 
 def test_optimizer_leaderboard_ranks_feasible_finite_objectives(client) -> None:
@@ -1710,6 +1838,33 @@ def test_optimizer_job_runner_fifo_queue_and_single_running(tmp_path) -> None:
     assert jobs[third["job_id"]]["queue_depth"] == 1
 
 
+def test_optimizer_job_runner_preserves_no_feasible_status_on_live_completion(
+    tmp_path,
+) -> None:
+    popen = _FakePopenFactory()
+    runner = optimizer_job_runner.OptimizerJobRunner(
+        tmp_path / "runs",
+        popen_factory=popen,
+    )
+    job = runner.submit(_job_request(seed=1))
+    job_dir = Path(job["out_dir"])
+    _write_minimal_result_table(job_dir)
+    _write_job_status_marker(
+        job_dir,
+        status="completed-no-feasible-winner",
+        reason="completed-no-feasible-winner",
+        study_status="completed-no-feasible-winner",
+    )
+    popen.processes[0].returncode = 0
+
+    completed = runner.get_job(job["job_id"])
+
+    assert completed is not None
+    assert completed["status"] == "completed-no-feasible-winner"
+    meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
+    assert meta["status"] == "completed-no-feasible-winner"
+
+
 def test_optimizer_job_register_rebuilds_from_disk_on_fresh_app(tmp_path) -> None:
     runs_dir = tmp_path / "runs"
     job_dir = runs_dir / "jobs" / "job-from-disk"
@@ -1771,6 +1926,39 @@ def test_optimizer_job_register_marks_orphan_with_success_marker_succeeded_on_re
     meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
     assert meta["status"] == "SUCCEEDED"
     assert meta["completed_at"] is not None
+
+
+def test_optimizer_job_reload_and_web_render_no_feasible_status(tmp_path) -> None:
+    runs_dir = tmp_path / "runs"
+    job_id = "orphan-no-feasible"
+    job_dir = runs_dir / "jobs" / job_id
+    job_dir.mkdir(parents=True)
+    _write_running_job_meta(job_dir, job_id)
+    _write_minimal_result_table(job_dir)
+    _write_job_status_marker(
+        job_dir,
+        status="completed-no-feasible-winner",
+        reason="completed-no-feasible-winner",
+        study_status="completed-no-feasible-winner",
+    )
+    optimizer_job_runner.reset_runner_cache()
+    app = Flask(__name__)
+    app.config["TESTING"] = True
+    app.config["OPTIMIZER_RUNS_DIR"] = str(runs_dir)
+    app.register_blueprint(web_routes.bp)
+    client = app.test_client()
+
+    api_job = client.get("/api/optimizer/jobs").get_json()["jobs"][0]
+    list_html = client.get("/partials/optimizer-jobs").get_data(as_text=True)
+    detail_html = client.get(f"/partials/optimizer-jobs/{job_id}").get_data(as_text=True)
+
+    assert api_job["status"] == "completed-no-feasible-winner"
+    assert "completed-no-feasible-winner" in list_html
+    assert "optimizer-status-completed-no-feasible-winner" in list_html
+    assert "completed-no-feasible-winner" in detail_html
+    assert "optimizer-status-succeeded" not in list_html
+    meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
+    assert meta["status"] == "completed-no-feasible-winner"
 
 
 def test_optimizer_job_register_marks_orphan_success_marker_without_results_failed(

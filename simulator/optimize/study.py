@@ -48,7 +48,6 @@ from simulator.optimize.pool import (
     evaluate_request_supervised,
     resolve_eval_timeout_seconds,
 )
-from simulator.optimize.physics import FeasibilityResult, GateMargin, ThresholdSpec
 from simulator.optimize.profiles import (
     ProfileValidationError,
     physics_constraints_from_profile,
@@ -91,6 +90,8 @@ WINNER_SELECTION_RULE = (
     "objectives in order using their declared directions, then cache_key, "
     "then candidate_id"
 )
+COMPLETED_STATUS = "completed"
+COMPLETED_NO_FEASIBLE_WINNER_STATUS = "completed-no-feasible-winner"
 CERTIFIED_CACHE_STATES = frozenset({"cached_exact", "live_fill"})
 EXPLORE_CACHE_TIER_CEILING = "cached_interpolated"
 CERTIFY_CACHE_TIER_CEILING = "cached_exact"
@@ -171,7 +172,6 @@ DEFAULT_PROFILES: Mapping[str, Mapping[str, Any]] = MappingProxyType(
                     "mass_kg": 1000.0,
                     "backend_name": "stub",
                 },
-                "study_constraints": "stub_smoke",
                 "fidelities": {
                     "stub": {"backend_name": "stub", "hours": 1},
                     "fast": {"backend_name": "stub", "hours": 1},
@@ -209,37 +209,22 @@ class StudyNoFeasibleError(StudyError):
     """Raised when no feasible Pareto winner exists."""
 
 
+_NO_FEASIBLE_CONFIG_FAILURE_CATEGORIES = frozenset(
+    {
+        FailureCategory.INVALID_PATCH.value,
+        FailureCategory.INVALID_RECIPE.value,
+        FailureCategory.NON_FINITE_PAYLOAD.value,
+        FailureCategory.STALE_PROFILE.value,
+        FailureCategory.ZERO_INPUT_BASIS_BREACH.value,
+    }
+)
+
+
 @dataclass(frozen=True)
 class StagedReplay:
     prefix_result: ScoredResult
     stage_id: str | None
     stage_patch: RecipePatch
-
-
-class StubSmokeConstraintSet:
-    """Explicit built-in smoke gate for offline CLI wiring tests."""
-
-    def evaluate(self, trace: Any) -> FeasibilityResult:
-        threshold = ThresholdSpec(
-            id="stub_smoke_feasible",
-            value=1.0,
-            units="boolean",
-            source="engineering_envelope",
-            source_ref="Phase-O default profile smoke constraint",
-        )
-        return FeasibilityResult(
-            feasible=True,
-            margins={
-                "stub_smoke": GateMargin(
-                    gate="stub_smoke",
-                    feasible=True,
-                    margin=1.0,
-                    threshold=threshold,
-                    observed=1.0,
-                    detail="built-in default profile smoke gate",
-                )
-            },
-        )
 
 
 @dataclass(frozen=True)
@@ -312,7 +297,9 @@ class StudyResult:
     records: tuple[StudyRecord, ...]
     leaderboard: tuple[StudyRecord, ...]
     pareto: tuple[StudyRecord, ...]
-    winner: StudyRecord
+    winner: StudyRecord | None = None
+    status: str = COMPLETED_STATUS
+    reason: str = COMPLETED_STATUS
     winner_selection_rule: str = WINNER_SELECTION_RULE
 
     def __post_init__(self) -> None:
@@ -518,6 +505,16 @@ def run(
         sorted(explore_pareto, key=lambda row: _rank_key(row, definitions))
     )
     non_finite_count = failure_counts.get(FailureCategory.NON_FINITE_PAYLOAD.value, 0)
+    if not records:
+        _write_empty_artifacts(
+            out,
+            profile=resolved_profile,
+            feedstock=feedstock,
+            fidelity=fidelity,
+            definitions=definitions,
+            failure_counts=failure_counts,
+        )
+        raise StudyNoFeasibleError("no candidates were evaluated")
     if records and non_finite_count == len(records):
         _write_empty_artifacts(
             out,
@@ -532,19 +529,49 @@ def run(
             f"failure_counts={dict(failure_counts)}"
         )
     if not explore_pareto_ranked:
-        _write_empty_artifacts(
+        if _no_feasible_config_failure(failure_counts, len(records)):
+            _write_empty_artifacts(
+                out,
+                profile=resolved_profile,
+                feedstock=feedstock,
+                fidelity=fidelity,
+                definitions=definitions,
+                failure_counts=failure_counts,
+            )
+            raise StudyNoFeasibleError(
+                "no feasible candidates due to config/runtime failure; "
+                f"failure_counts={dict(failure_counts)}"
+            )
+        leaderboard = tuple(records)
+        artifacts = _write_artifacts(
             out,
             profile=resolved_profile,
             feedstock=feedstock,
             fidelity=fidelity,
             definitions=definitions,
+            pareto=(),
+            leaderboard=leaderboard,
+            winner=None,
+            schema=active_schema,
             failure_counts=failure_counts,
+            search_space_identity=search_space_identity,
         )
-        raise StudyNoFeasibleError(
-            "no feasible candidates; winner.recipe.yaml not written; "
-            f"failure_counts={dict(failure_counts)}"
+        artifacts["provenance"] = provenance_path
+        artifacts["store"] = store.path
+        return StudyResult(
+            out_dir=out,
+            store_path=store.path,
+            artifacts=artifacts,
+            records=tuple(records),
+            leaderboard=leaderboard,
+            pareto=(),
+            winner=None,
+            status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
+            reason=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
         )
 
+    result_status = COMPLETED_STATUS
+    result_reason = COMPLETED_STATUS
     certification_artifact: dict[str, Any] | None = None
     if two_phase.enabled:
         certify_profile = _profile_for_cache_phase(
@@ -574,6 +601,8 @@ def run(
         pareto_ranked = certification.pareto
         winner = certification.winner
         certification_artifact = certification.artifact
+        result_status = certification.status
+        result_reason = certification.reason
     else:
         leaderboard = explore_leaderboard
         pareto_ranked = explore_pareto_ranked
@@ -610,6 +639,8 @@ def run(
         leaderboard=leaderboard,
         pareto=pareto_ranked,
         winner=winner,
+        status=result_status,
+        reason=result_reason,
     )
 
 
@@ -782,8 +813,10 @@ def run_certify(
 class _CertificationPassResult:
     leaderboard: tuple[StudyRecord, ...]
     pareto: tuple[StudyRecord, ...]
-    winner: StudyRecord
+    winner: StudyRecord | None
     artifact: dict[str, Any]
+    status: str = COMPLETED_STATUS
+    reason: str = COMPLETED_STATUS
 
 
 def _resolve_two_phase_config(
@@ -1010,19 +1043,6 @@ def _run_exact_certification(
                     ",".join(exc.reasons),
                 )
 
-    certified_feasible = tuple(record for record in certified_records if record.feasible)
-    if not certified_feasible:
-        raise StudyNoFeasibleError(
-            "two-phase certification produced no feasible certified candidates"
-        )
-    leaderboard = tuple(sorted(certified_feasible, key=lambda row: _rank_key(row, definitions)))
-    pareto = pareto_front(
-        certified_feasible,
-        definitions,
-        objective_getter=lambda row: row.objectives,
-    )
-    pareto_ranked = tuple(sorted(pareto, key=lambda row: _rank_key(row, definitions)))
-    winner = pareto_ranked[0]
     disagreements = [
         float(row["disagreement"])
         for row in certification_rows
@@ -1049,6 +1069,24 @@ def _run_exact_certification(
         "top_k": len(top_k_records),
         "disagreement_threshold": None,
     }
+    certified_feasible = tuple(record for record in certified_records if record.feasible)
+    if not certified_feasible:
+        return _CertificationPassResult(
+            leaderboard=tuple(certified_records),
+            pareto=(),
+            winner=None,
+            artifact=artifact,
+            status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
+            reason=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
+        )
+    leaderboard = tuple(sorted(certified_feasible, key=lambda row: _rank_key(row, definitions)))
+    pareto = pareto_front(
+        certified_feasible,
+        definitions,
+        objective_getter=lambda row: row.objectives,
+    )
+    pareto_ranked = tuple(sorted(pareto, key=lambda row: _rank_key(row, definitions)))
+    winner = pareto_ranked[0]
     return _CertificationPassResult(
         leaderboard=leaderboard,
         pareto=pareto_ranked,
@@ -1232,7 +1270,10 @@ def _constraints_for_profile(profile: Mapping[str, Any]) -> Any:
     if selector == "physics":
         return physics_constraints_from_profile(profile)
     if selector == "stub_smoke":
-        return StubSmokeConstraintSet()
+        raise ValueError(
+            "study_constraints 'stub_smoke' is retired; use physics constraints; "
+            "regenerate with FORCE_PROFILES=1"
+        )
     raise ValueError(f"unknown study_constraints {selector!r}")
 
 
@@ -2228,6 +2269,20 @@ def _failure_counts(records: Sequence[StudyRecord]) -> Mapping[str, int]:
     return MappingProxyType(dict(sorted(counts.items())))
 
 
+def _no_feasible_config_failure(
+    failure_counts: Mapping[str, int],
+    record_count: int,
+) -> bool:
+    if record_count <= 0 or not failure_counts:
+        return False
+    config_failures = sum(
+        count
+        for category, count in failure_counts.items()
+        if category in _NO_FEASIBLE_CONFIG_FAILURE_CATEGORIES
+    )
+    return config_failures == record_count
+
+
 def _coating_leaderboard_fields(records: Sequence[StudyRecord]) -> tuple[str, ...]:
     fields: list[str] = []
     for summary_key, csv_key in _COATING_LEADERBOARD_FIELDS.items():
@@ -2429,7 +2484,7 @@ def _write_artifacts(
     definitions: Sequence[ObjectiveDefinition],
     pareto: Sequence[StudyRecord],
     leaderboard: Sequence[StudyRecord],
-    winner: StudyRecord,
+    winner: StudyRecord | None,
     schema: RecipeSchema,
     failure_counts: Mapping[str, int],
     search_space_identity: Mapping[str, Any] | None = None,
@@ -2470,27 +2525,28 @@ def _write_artifacts(
         schema,
         profile=profile,
     )
-    winner_patch = _materialized_winner_patch(winner, schema, profile)
-    winner_path.write_text(
-        yaml.safe_dump(winner_patch, sort_keys=True),
-        encoding="utf-8",
-    )
     artifacts = {
         "pareto": pareto_path,
         "leaderboard": leaderboard_path,
-        "winner": winner_path,
     }
-    tap_sidecar = _tap_truncated_sidecar(
-        winner,
-        winner_patch,
-        schema.to_setpoints_patch(winner.patch),
-    )
-    if tap_sidecar is not None:
-        tap_sidecar_path.write_text(
-            json.dumps(tap_sidecar, indent=2, sort_keys=True, allow_nan=False) + "\n",
+    if winner is not None:
+        winner_patch = _materialized_winner_patch(winner, schema, profile)
+        winner_path.write_text(
+            yaml.safe_dump(winner_patch, sort_keys=True),
             encoding="utf-8",
         )
-        artifacts["winner_tap_truncated"] = tap_sidecar_path
+        artifacts["winner"] = winner_path
+        tap_sidecar = _tap_truncated_sidecar(
+            winner,
+            winner_patch,
+            schema.to_setpoints_patch(winner.patch),
+        )
+        if tap_sidecar is not None:
+            tap_sidecar_path.write_text(
+                json.dumps(tap_sidecar, indent=2, sort_keys=True, allow_nan=False) + "\n",
+                encoding="utf-8",
+            )
+            artifacts["winner_tap_truncated"] = tap_sidecar_path
     return artifacts
 
 
@@ -2663,7 +2719,7 @@ def _pareto_payload(
     fidelity: str,
     definitions: Sequence[ObjectiveDefinition],
     pareto: Sequence[StudyRecord],
-    winner: StudyRecord,
+    winner: StudyRecord | None,
     schema: RecipeSchema,
     search_space_identity: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
@@ -2674,8 +2730,15 @@ def _pareto_payload(
         "pareto": [_record_payload(record, schema, profile) for record in pareto],
         "profile": profile_id(profile),
         "selection_rule": WINNER_SELECTION_RULE,
-        "winner_candidate_id": winner.candidate_id,
-        "winner_knob_saturation": _winner_knob_saturation_payload(winner),
+        "status": (
+            COMPLETED_STATUS
+            if winner is not None
+            else COMPLETED_NO_FEASIBLE_WINNER_STATUS
+        ),
+        "winner_candidate_id": winner.candidate_id if winner is not None else None,
+        "winner_knob_saturation": (
+            _winner_knob_saturation_payload(winner) if winner is not None else None
+        ),
     }
     if search_space_identity is not None:
         payload["search_space_identity"] = _jsonable_value(search_space_identity)

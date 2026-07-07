@@ -1,7 +1,7 @@
 # Analog source: data/optimize_profiles/lunar_mare_low_ti.yaml.
 # Simulant-specific adjustment: LMS-1 keeps the low-Ti mare balance, with
 # text/id/feedstock changed for the source-captured simulant composition.
-# H1 scope note: stub/fast/high/auto share the existing stub_smoke fidelity posture;
+# H1 scope note: stub/fast/high/auto share the existing physics constraint posture;
 # the H1/G3 backend-honesty gate is deferred and not closed by this profile.
 profile_id: lunar-mare-lms1-objectives-v1
 profile_schema_version: profile-schema-v1
@@ -17,7 +17,6 @@ objectives:
   - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: furnace occupancy}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
-study_constraints: stub_smoke
 run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
 fidelities:
   stub: {backend_name: stub, hours: 1}

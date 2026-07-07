@@ -20,8 +20,10 @@ from simulator.optimize.evalspec import current_code_version
 STATUS_QUEUED = "QUEUED"
 STATUS_RUNNING = "RUNNING"
 STATUS_SUCCEEDED = "SUCCEEDED"
+STATUS_COMPLETED_NO_FEASIBLE_WINNER = "completed-no-feasible-winner"
 STATUS_FAILED = "FAILED"
-TERMINAL_STATUSES = {STATUS_SUCCEEDED, STATUS_FAILED}
+SUCCESS_STATUSES = {STATUS_SUCCEEDED, STATUS_COMPLETED_NO_FEASIBLE_WINNER}
+TERMINAL_STATUSES = SUCCESS_STATUSES | {STATUS_FAILED}
 META_NAME = ".job_meta.json"
 LOG_NAME = "job.log"
 CACHE_NAME = "cache.sqlite"
@@ -280,7 +282,10 @@ class OptimizerJobRunner:
                 or "optimizer terminal status marker recorded failure"
             )
         elif return_code == 0 and self._has_stored_results(job_id):
-            meta["status"] = STATUS_SUCCEEDED
+            if terminal_status and terminal_status[0] in SUCCESS_STATUSES:
+                meta["status"] = terminal_status[0]
+            else:
+                meta["status"] = STATUS_SUCCEEDED
         elif return_code == 0:
             meta["status"] = STATUS_FAILED
             meta["stderr_tail"] = (
@@ -291,11 +296,17 @@ class OptimizerJobRunner:
         self._write_meta(meta)
 
     def _normalize_meta(self, meta: dict[str, Any]) -> dict[str, Any]:
-        status = str(meta.get("status") or STATUS_FAILED).upper()
+        raw_status = str(meta.get("status") or STATUS_FAILED).strip()
+        status = (
+            raw_status
+            if raw_status == STATUS_COMPLETED_NO_FEASIBLE_WINNER
+            else raw_status.upper()
+        )
         if status not in {
             STATUS_QUEUED,
             STATUS_RUNNING,
             STATUS_SUCCEEDED,
+            STATUS_COMPLETED_NO_FEASIBLE_WINNER,
             STATUS_FAILED,
         }:
             status = STATUS_FAILED
@@ -439,6 +450,12 @@ class OptimizerJobRunner:
         marker_status = str(payload.get("status") or "").upper()
         success = payload.get("success")
         detail = self._terminal_marker_detail(payload)
+        study_status = str(payload.get("study_status") or "").strip()
+        if marker_status == STATUS_COMPLETED_NO_FEASIBLE_WINNER.upper() or (
+            study_status == STATUS_COMPLETED_NO_FEASIBLE_WINNER
+            and (marker_status in {STATUS_SUCCEEDED, "SUCCESS"} or success is True)
+        ):
+            return STATUS_COMPLETED_NO_FEASIBLE_WINNER, detail
         if marker_status in {STATUS_SUCCEEDED, "SUCCESS"} or success is True:
             return STATUS_SUCCEEDED, detail
         if marker_status in {STATUS_FAILED, "FAILURE", "ERROR"} or success is False:

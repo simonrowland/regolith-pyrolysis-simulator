@@ -124,8 +124,8 @@ def main() -> int:
     doe = DoeSpec(schema=schema, n_samples=N, seed=0)  # sampler defaults to scipy-sobol
 
     # Honor the profile's study_constraints selector (same resolver as study.py).
-    # The stock pilot profile uses stub_smoke so Sobol patches stay feasible.
-    # Set FIDELITY_SKIP_PROFILE_CONSTRAINTS=1 only to exercise full default gates.
+    # Stock profiles omit the selector and default to physics constraints.
+    # Set FIDELITY_SKIP_PROFILE_CONSTRAINTS=1 only to exercise evaluate() defaults.
     eval_kwargs: dict = {}
     if os.environ.get("FIDELITY_SKIP_PROFILE_CONSTRAINTS") != "1":
         from simulator.optimize.study import _constraints_for_profile

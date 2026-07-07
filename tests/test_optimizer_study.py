@@ -73,6 +73,18 @@ PROFILE = {
 FEEDSTOCK = "lunar_mare_low_ti"
 
 
+def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
+    profile = copy.deepcopy(PROFILE)
+    profile["profile_id"] = "cli-physics-smoke"
+    profile["constraints"] = {
+        "gates": ["furnace_temperature"],
+        "furnace_T_max_C": 1800.0,
+    }
+    path = tmp_path / "cli-physics-smoke.yaml"
+    path.write_text(yaml.safe_dump(profile), encoding="utf-8")
+    return path
+
+
 def _threshold() -> ThresholdSpec:
     return ThresholdSpec(
         id="test_gate_min",
@@ -1289,7 +1301,7 @@ def test_parallel_composition_target_stub_study_completes(
                 "--hours",
                 "24",
                 "--gate",
-                "stub_smoke",
+                "physics",
                 "--db",
                 str(tmp_path / "profile.db"),
                 "--out",
@@ -2104,7 +2116,7 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
     assert old_recipe_id == new_recipe_id
 
 
-def test_stub_smoke_selector_ignores_profile_threshold_overrides() -> None:
+def test_stub_smoke_selector_is_retired_from_live_profiles() -> None:
     profile = dict(PROFILE)
     profile["study_constraints"] = "stub_smoke"
     profile["constraints"] = {
@@ -2112,19 +2124,22 @@ def test_stub_smoke_selector_ignores_profile_threshold_overrides() -> None:
         "furnace_T_max_C": 1300.0,
     }
 
-    constraints = study._constraints_for_profile(profile)
+    with pytest.raises(ValueError) as excinfo:
+        study._constraints_for_profile(profile)
+    message = str(excinfo.value)
+    assert "stub_smoke" in message
+    assert "retired" in message
+    assert "FORCE_PROFILES=1" in message
 
-    assert isinstance(constraints, study.StubSmokeConstraintSet)
 
-
-def test_fidelity_pilot_profile_resolves_stub_smoke_constraints() -> None:
+def test_fidelity_pilot_profile_defaults_to_physics_constraints() -> None:
     profile_path = Path("data/optimize_profiles/lunar_mare_low_ti.yaml")
     profile = yaml.safe_load(profile_path.read_text())
 
     constraints = study._constraints_for_profile(profile)
 
-    assert profile["study_constraints"] == "stub_smoke"
-    assert isinstance(constraints, study.StubSmokeConstraintSet)
+    assert "study_constraints" not in profile
+    assert isinstance(constraints, PhysicsConstraintSet)
 
 
 def test_feasibility_filter_excludes_infeasible_from_pareto_but_logs_provenance(tmp_path) -> None:
@@ -2246,26 +2261,38 @@ def test_parallel_one_timeout_records_failure_and_continues(tmp_path) -> None:
     assert provenance[1]["status"] == "ok"
 
 
-def test_all_infeasible_writes_empty_pareto_and_no_winner(tmp_path) -> None:
-    with pytest.raises(study.StudyNoFeasibleError):
-        study.run(
-            PROFILE,
-            FEEDSTOCK,
-            "random",
-            "stub",
-            1,
-            3,
-            tmp_path,
-            seed=7,
-            evaluator=_evaluator(infeasible={0, 1, 2}),
-        )
+def test_all_infeasible_completes_with_no_feasible_winner(tmp_path) -> None:
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        3,
+        tmp_path,
+        seed=7,
+        evaluator=_evaluator(infeasible={0, 1, 2}),
+    )
 
     pareto_payload = json.loads((tmp_path / "pareto.json").read_text())
+    leaderboard_rows = list(csv.DictReader((tmp_path / "leaderboard.csv").open()))
+
+    assert result.status == "completed-no-feasible-winner"
+    assert result.reason == "completed-no-feasible-winner"
+    assert result.winner is None
+    assert result.pareto == ()
+    assert len(result.records) == 3
+    assert len(result.leaderboard) == 3
     assert pareto_payload["pareto"] == []
+    assert pareto_payload["status"] == "completed-no-feasible-winner"
     assert pareto_payload["winner_candidate_id"] is None
-    assert (tmp_path / "leaderboard.csv").read_text().splitlines() == [
-        "rank,candidate_id,cache_key,is_pareto,is_winner,oxygen_kg,energy_kWh,patch_json"
+    assert [row["candidate_id"] for row in leaderboard_rows] == [
+        "random-7-000000",
+        "random-7-000001",
+        "random-7-000002",
     ]
+    assert {row["is_winner"] for row in leaderboard_rows} == {"False"}
+    assert all(row["margin_delivered_stream_purity"] for row in leaderboard_rows)
     assert len(_read_provenance(tmp_path)) == 3
     assert len(_stored_rows(tmp_path)) == 3
     assert not (tmp_path / "winner.recipe.yaml").exists()
@@ -2296,25 +2323,28 @@ def test_stale_profile_refusal_flows_through_study_as_named_failure(tmp_path) ->
     assert not (tmp_path / "winner.recipe.yaml").exists()
 
 
-def test_all_out_of_domain_raises_no_feasible_and_logs_count(tmp_path) -> None:
-    with pytest.raises(study.StudyNoFeasibleError):
-        study.run(
-            PROFILE,
-            FEEDSTOCK,
-            "random",
-            "stub",
-            1,
-            3,
-            tmp_path,
-            seed=7,
-            evaluator=_evaluator(out_of_domain={0, 1, 2}),
-        )
+def test_all_out_of_domain_completes_no_feasible_and_logs_count(tmp_path) -> None:
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        3,
+        tmp_path,
+        seed=7,
+        evaluator=_evaluator(out_of_domain={0, 1, 2}),
+    )
 
     pareto_payload = json.loads((tmp_path / "pareto.json").read_text())
+    assert result.status == "completed-no-feasible-winner"
+    assert result.winner is None
     assert pareto_payload["pareto"] == []
     assert pareto_payload["winner_candidate_id"] is None
+    assert pareto_payload["status"] == "completed-no-feasible-winner"
     assert pareto_payload["failure_counts"] == {"out_of_domain": 3}
     assert len(_read_provenance(tmp_path)) == 3
+    assert len(list(csv.DictReader((tmp_path / "leaderboard.csv").open()))) == 3
     stored = _stored_rows(tmp_path)
     assert len(stored) == 3
     assert {row.failure_category for row in stored} == {FailureCategory.OUT_OF_DOMAIN}
@@ -2893,6 +2923,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
     assert "error: output path exists and is not a directory" in bad_out.stderr
     assert "Traceback" not in bad_out.stderr
 
+    cli_profile = _write_cli_physics_smoke_profile(tmp_path)
     staged = subprocess.run(
         [
             sys.executable,
@@ -2901,7 +2932,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             "--feedstock",
             FEEDSTOCK,
             "--profile",
-            "default",
+            str(cli_profile),
             "--strategy",
             "staged",
             "--fidelity",
@@ -2927,7 +2958,7 @@ def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:
             "--feedstock",
             FEEDSTOCK,
             "--profile",
-            "default",
+            str(cli_profile),
             "--strategy",
             "random",
             "--fidelity",
@@ -3079,13 +3110,14 @@ def test_cli_rejects_incoherent_constrained_max_args(
 
 def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> None:
     out_dir = tmp_path / "constrained-max"
+    cli_profile = _write_cli_physics_smoke_profile(tmp_path)
 
     result = optimizer_cli.main(
         [
             "--feedstock",
             FEEDSTOCK,
             "--profile",
-            "default",
+            str(cli_profile),
             "--strategy",
             "random",
             "--fidelity",
@@ -3232,7 +3264,58 @@ def test_constrained_max_nullable_lifespan_persists_and_round_trips(
     assert loaded.objectives.evidence[metric]["lifespan_cost_status"] == "threshold_unavailable"
 
 
-def test_cli_writes_failure_job_status_marker_for_no_feasible(
+def test_cli_writes_success_job_status_marker_for_completed_no_feasible_winner(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    out_dir = tmp_path / "cli-no-winner"
+
+    def complete_without_winner(**kwargs):
+        out = Path(kwargs["out_dir"])
+        out.mkdir(parents=True, exist_ok=True)
+        store_path = out / "cache.sqlite"
+        store_path.write_text("partial", encoding="utf-8")
+        return study.StudyResult(
+            out_dir=out,
+            store_path=store_path,
+            artifacts={"store": store_path},
+            records=(),
+            leaderboard=(),
+            pareto=(),
+            winner=None,
+            status="completed-no-feasible-winner",
+            reason="completed-no-feasible-winner",
+        )
+
+    monkeypatch.setattr(optimizer_cli, "run", complete_without_winner)
+
+    exit_code = optimizer_cli.main(
+        [
+            "--feedstock",
+            FEEDSTOCK,
+            "--profile",
+            "default",
+            "--strategy",
+            "random",
+            "--fidelity",
+            "stub",
+            "--budget",
+            "1",
+            "--out",
+            str(out_dir),
+        ]
+    )
+
+    assert exit_code == 0
+    status = json.loads((out_dir / "job_status.json").read_text(encoding="utf-8"))
+    assert status["status"] == "completed-no-feasible-winner"
+    assert status["success"] is True
+    assert status["reason"] == "completed-no-feasible-winner"
+    assert status["study_status"] == "completed-no-feasible-winner"
+    assert "winner_candidate_id" not in status
+
+
+def test_cli_writes_failure_job_status_marker_for_no_feasible_config_error(
     tmp_path,
     monkeypatch,
 ) -> None:
@@ -3375,6 +3458,55 @@ def _two_phase_exact_flip_evaluate_patch(
     )
 
 
+def _two_phase_exact_all_infeasible_evaluate_patch(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    fid_opts = profile.get("fidelities", {}).get(fidelity, {})
+    tier_ceiling = fid_opts.get("cache_tier_ceiling", "cached_interpolated")
+    if tier_ceiling != "cached_interpolated":
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=False,
+            failure_category=FailureCategory.INFEASIBLE_RECIPE,
+            feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
+            failing_gates=("delivered_stream_purity",),
+            run_reference=RunReference(
+                status="ok",
+                trace={
+                    "backend_status": "ok",
+                    "backend_authoritative": True,
+                    "per_hour_summary": [{"reduced_real_cache_state": "cached_exact"}],
+                    "snapshots": [{"mass_balance_error_pct": 0.0}],
+                },
+                product_summary={
+                    "mass_closure": {
+                        "status": "closed",
+                        "mass_balance_error_pct": 0.0,
+                    }
+                },
+                backend_status="ok",
+                backend_authoritative=True,
+            ),
+        )
+    return _two_phase_evaluate_patch(
+        patch,
+        feedstock,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        **kwargs,
+    )
+
+
 def test_two_phase_loop_certifies_top_k_and_reports_certified_winner(tmp_path) -> None:
     out = tmp_path / "two-phase"
     result = study.run(
@@ -3455,6 +3587,40 @@ def test_two_phase_certification_filters_exact_infeasible_before_objective(tmp_p
     assert flipped["certified_objective"] is None
     assert flipped["disagreement"] is None
     assert certification["aggregate_disagreement"]["max"] > 0.0
+
+
+def test_two_phase_certification_all_infeasible_completes_no_winner(tmp_path) -> None:
+    out = tmp_path / "two-phase-exact-all-infeasible"
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        5,
+        out,
+        seed=7,
+        evaluator=_two_phase_exact_all_infeasible_evaluate_patch,
+        two_phase_certify={"enabled": True, "top_k": 3},
+    )
+
+    pareto_payload = json.loads((out / "pareto.json").read_text())
+    certification = json.loads((out / "two_phase_certification.json").read_text())
+    leaderboard_rows = list(csv.DictReader((out / "leaderboard.csv").open()))
+
+    assert result.status == "completed-no-feasible-winner"
+    assert result.reason == "completed-no-feasible-winner"
+    assert result.winner is None
+    assert result.pareto == ()
+    assert len(result.leaderboard) == 3
+    assert {record.feasible for record in result.leaderboard} == {False}
+    assert pareto_payload["status"] == "completed-no-feasible-winner"
+    assert pareto_payload["pareto"] == []
+    assert pareto_payload["winner_candidate_id"] is None
+    assert len(certification["candidates"]) == 3
+    assert all(row["certified_objective"] is None for row in certification["candidates"])
+    assert [row["is_winner"] for row in leaderboard_rows] == ["False", "False", "False"]
+    assert not (out / "winner.recipe.yaml").exists()
 
 
 def test_two_phase_disabled_matches_single_pass_output(tmp_path) -> None:

@@ -659,6 +659,7 @@ def _result_metadata(
     if not isinstance(product_summary, dict):
         product_summary = {}
     product_summary = coating_summary_with_grounded_authority(product_summary)
+    constraint_margins = _result_row_constraint_margins(row)
 
     metadata = {
         'run_id': run_id,
@@ -685,8 +686,20 @@ def _result_metadata(
         'eval_spec': _eval_spec_summary(eval_spec),
         'backend': _optimizer_backend_payload(eval_spec, result_blob, run_reference),
         'tier_label': None,
+        'previously_ungated': _result_row_previously_ungated(row),
+        'constraint_margins': constraint_margins,
+        'constraint_margin_summary': _constraint_margin_summary(constraint_margins),
         'notes': _json_value(row['notes'], []),
     }
+    metadata['constraint_label'] = (
+        {
+            'key': 'previously_ungated',
+            'label': 'previously_ungated',
+            'title': 'stored result used legacy stub_smoke constraints',
+        }
+        if metadata['previously_ungated']
+        else None
+    )
     metadata['tier_label'] = metadata['backend'].get('tier_label')
     for key in (
         'product_ledger_kg',
@@ -986,6 +999,70 @@ def _result_row_feasible(row: sqlite3.Row) -> bool:
         failure_category=_row_value(row, 'failure_category'),
         margins=margins,
     )
+
+
+def _result_row_previously_ungated(row: sqlite3.Row) -> bool:
+    try:
+        payload = _json_value(row['feasibility_margins'], {})
+    except (IndexError, KeyError, TypeError):
+        return False
+    return isinstance(payload, Mapping) and 'stub_smoke' in payload
+
+
+def _result_row_constraint_margins(row: sqlite3.Row) -> list[dict[str, Any]]:
+    try:
+        payload = _json_value(row['feasibility_margins'], {})
+    except (IndexError, KeyError, TypeError):
+        return []
+    margins = _deserialize_grounding_margins(payload)
+    return [_constraint_margin_readout(margin) for margin in margins.values()]
+
+
+def _constraint_margin_readout(margin: Any) -> dict[str, Any]:
+    status = str(getattr(margin, 'status', '') or '')
+    output_status = str(getattr(margin, 'output_status', '') or '')
+    feasible = bool(getattr(margin, 'feasible', False))
+    status_payload = _mapping_value(getattr(margin, 'status_payload', {}))
+    status_reason = str(
+        getattr(margin, 'status_reason', '')
+        or status_payload.get('reason')
+        or ''
+    )
+    if feasible:
+        verdict = 'pass'
+    elif status == 'not-attempted' or output_status == 'not_attempted':
+        verdict = 'not-attempted'
+    else:
+        verdict = 'fail'
+    threshold = getattr(margin, 'threshold', None)
+    return {
+        'gate': str(getattr(margin, 'gate', '')),
+        'feasible': feasible,
+        'verdict': verdict,
+        'status': status,
+        'output_status': output_status,
+        'status_reason': status_reason,
+        'status_payload': dict(status_payload),
+        'predicate': str(status_payload.get('predicate') or ''),
+        'detail': str(getattr(margin, 'detail', '') or ''),
+        'observed': getattr(margin, 'observed', None),
+        'observed_label': _display_value(getattr(margin, 'observed', None)),
+        'margin': getattr(margin, 'margin', None),
+        'margin_label': _display_value(getattr(margin, 'margin', None)),
+        'threshold': {
+            'id': str(getattr(threshold, 'id', '') or ''),
+            'value': getattr(threshold, 'value', None),
+            'units': str(getattr(threshold, 'units', '') or ''),
+            'source': str(getattr(threshold, 'source', '') or ''),
+            'source_ref': str(getattr(threshold, 'source_ref', '') or ''),
+        },
+    }
+
+
+def _constraint_margin_summary(
+    margins: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    return [margin for margin in margins if margin.get('verdict') != 'pass'][:3]
 
 
 def _leaderboard_entries(

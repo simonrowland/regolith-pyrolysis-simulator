@@ -353,6 +353,7 @@ DEFAULT_OVERHEAD_HEADSPACE_CONFIG = {
 DEFAULT_FREEZE_GATE_CONFIG = {
     'enabled': False,
 }
+KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW = 'not-applicable-zero-overhead-flow'
 BACKEND_FALLBACK_EXCEPTIONS = (RuntimeError, ImportError)
 STAGE0_DEFAULT_TEMP_RANGE_C = (20.0, 950.0)
 STAGE0_CARBON_CLEANUP_TEMP_RANGE_C = (20.0, 1050.0)
@@ -8976,6 +8977,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._configure_condensation_operating_conditions(evap_flux)
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
             self._route_to_condensation(evap_flux)
+        self._pending_knudsen_zero_overhead_flow_marker = None
 
         # --- 6. Update melt composition ---
         # Subtract evaporated mass from the melt.
@@ -9038,6 +9040,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
             self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
         self._sync_oxygen_kg_counters()
+        self._refresh_knudsen_zero_overhead_flow_marker(evap_flux)
 
         # --- 8. Energy ---
         energy = self.energy_tracker.calculate_hour(
@@ -9294,6 +9297,62 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     # Snapshot construction
     # ------------------------------------------------------------------
 
+    def _refresh_knudsen_zero_overhead_flow_marker(
+        self,
+        evap_flux: EvaporationFlux,
+    ) -> None:
+        if not self._total_overhead_flow_is_finite_zero(evap_flux):
+            self._pending_knudsen_zero_overhead_flow_marker = None
+            return
+        self._pending_knudsen_zero_overhead_flow_marker = {
+            'status': 'not_applicable',
+            'reason': KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW,
+            'provenance': KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW,
+            'evap_flux_total_kg_hr': 0.0,
+            'O2_vented_kg_hr': 0.0,
+            'O2_vented_mol_hr': 0.0,
+            'melt_offgas_O2_mol_hr': 0.0,
+            'mre_anode_O2_mol_hr': 0.0,
+            'turbine_flow_kg_hr': 0.0,
+            'turbine_flow_mol_hr': 0.0,
+        }
+
+    def _total_overhead_flow_is_finite_zero(
+        self,
+        evap_flux: EvaporationFlux,
+    ) -> bool:
+        overhead = self.overhead
+        return (
+            self._evap_flux_is_finite_zero(evap_flux)
+            and self._mapping_is_finite_zero(self._last_condensed_by_stage_species_delta)
+            and self._mapping_is_finite_zero(
+                self._last_wall_deposit_by_segment_species_delta
+            )
+            and self._mapping_is_finite_zero(getattr(overhead, 'composition', {}))
+            and self._value_is_finite_zero(getattr(overhead, 'O2_vented_kg_hr', None))
+            and self._value_is_finite_zero(getattr(overhead, 'O2_vented_mol_hr', None))
+            and self._value_is_finite_zero(
+                getattr(overhead, 'melt_offgas_O2_mol_hr', None)
+            )
+            and self._value_is_finite_zero(
+                getattr(overhead, 'mre_anode_O2_mol_hr', None)
+            )
+            and self._value_is_finite_zero(getattr(overhead, 'turbine_flow_kg_hr', None))
+            and self._value_is_finite_zero(
+                getattr(overhead, 'turbine_flow_mol_hr', None)
+            )
+        )
+
+    @classmethod
+    def _mapping_is_finite_zero(cls, value: object) -> bool:
+        if not isinstance(value, Mapping):
+            return False
+        return all(cls._value_is_finite_zero(item) for item in value.values())
+
+    @classmethod
+    def _value_is_finite_zero(cls, value: object) -> bool:
+        return cls._finite_float_or_none(value) == 0.0
+
     def _latest_knudsen_summary(self) -> Dict[str, Any]:
         """0.5.4.1 E3: project the latest Knudsen-regime diagnostic
         from the condensation model into the snapshot-facing summary
@@ -9307,6 +9366,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         normalises into a JSON-serialisable shape so the snapshot
         round-trips cleanly through ``runner.py`` output.
         """
+        marker = getattr(self, '_pending_knudsen_zero_overhead_flow_marker', None)
+        if isinstance(marker, Mapping):
+            return dict(marker)
         model = self._condensation_model
         if model is None:
             return {}
@@ -9342,6 +9404,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         warnings = diag.get('warnings', ())
         summary['warnings'] = tuple(str(w) for w in warnings)
         return summary
+
+    @staticmethod
+    def _evap_flux_is_finite_zero(evap_flux: EvaporationFlux) -> bool:
+        try:
+            total = float(getattr(evap_flux, 'total_kg_hr', None))
+        except (TypeError, ValueError):
+            return False
+        if not math.isfinite(total) or total != 0.0:
+            return False
+        species = getattr(evap_flux, 'species_kg_hr', {}) or {}
+        if not isinstance(species, Mapping):
+            return False
+        for value in species.values():
+            try:
+                numeric = float(value)
+            except (TypeError, ValueError):
+                return False
+            if not math.isfinite(numeric) or numeric != 0.0:
+                return False
+        return True
 
     def _make_snapshot(self) -> HourSnapshot:
         """Build an HourSnapshot from current state."""

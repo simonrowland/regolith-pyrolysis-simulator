@@ -7,7 +7,7 @@ printed for provenance; cache authority comes from the committed corpus version.
 
 Usage:
   make_recipe_db_profile.py <feedstock_id> [--campaign C2A_continuous]
-      [--hours 30] [--gate stub_smoke|physics] [--db <cache.db>] [--out <path>]
+      [--hours 30] [--gate physics] [--db <cache.db>] [--out <path>]
       [--target <menu-id>|all]
 Writes the real-fidelity profile to --out (default docs-private/recipe-db/profiles/<id>.real.yaml).
 """
@@ -357,7 +357,9 @@ def _apply_cached_real(
     gate: str,
     cache: Mapping[str, str],
 ) -> None:
-    profile["study_constraints"] = gate
+    if gate != "physics":
+        raise SystemExit(f"unsupported study constraint gate: {gate}")
+    profile.pop("study_constraints", None)
     run = dict(profile.get("run") or {})
     run.update({
         "campaign": campaign,
@@ -1036,7 +1038,7 @@ def main(argv: list[str]) -> int:
     ap.add_argument("feedstock")
     ap.add_argument("--campaign", default=None)
     ap.add_argument("--hours", type=int, default=None)
-    ap.add_argument("--gate", default="stub_smoke", choices=["stub_smoke", "physics"])
+    ap.add_argument("--gate", default="physics", choices=["physics"])
     ap.add_argument("--db", default="docs-private/recipe-db/reduced-real.db")
     ap.add_argument("--out", default=None)
     ap.add_argument(

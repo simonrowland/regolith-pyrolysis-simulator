@@ -13,7 +13,7 @@ import json
 import math
 import re
 from types import MappingProxyType, SimpleNamespace
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 from collections.abc import Iterable, Mapping as MappingABC, Set as AbstractSet
 
 from engines.builtin.vapor_pressure import VaporPressureNumericalOverflowError
@@ -106,6 +106,15 @@ NUMERICAL_OVERFLOW = "numerical_overflow"
 RUMP_TERMINAL_LIQUID_FRACTION_MAX = 1e-9
 KNUDSEN_FALLBACK_EVAL_INPUTS = "fallback:eval-inputs"
 KNUDSEN_FALLBACK_GLOBAL_SUMMARY = "fallback:global-summary"
+KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW = "not-applicable-zero-overhead-flow"
+KNUDSEN_POPULATION_BUG_MISSING_OVERHEAD_FLOW = (
+    "population-bug-missing-overhead-flow-state"
+)
+EXTRACTION_NOT_ATTEMPTED_NO_VOLATILIZATION = "not-attempted-no-volatilization"
+EXTRACTION_CLASS_GATES = frozenset((
+    "delivered_stream_purity",
+    "extraction_completeness",
+))
 DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
 DEFAULT_COLD_START_TEMPERATURE_C = 25.0
 SYNTHETIC_BACKEND_NOT_RUN = "not_run"
@@ -990,22 +999,26 @@ def _evaluate_physics_constraints(
         missing_knudsen_state is not None
         and "knudsen_viscous" in feasibility.margins
     ):
-        fallback_summary = _knudsen_summary_from_eval_inputs(
-            spec=spec,
-            profile=profile,
-            run_config=run_config,
-        )
-        if fallback_summary is not None:
-            prepared_trace, missing_knudsen_state = _trace_with_knudsen_observables(
-                _trace_with_fallback_knudsen_summary(trace, fallback_summary)
+        if not _knudsen_missing_flow_state_blocks_eval_input_fallback(
+            trace,
+            missing_knudsen_state,
+        ):
+            fallback_summary = _knudsen_summary_from_eval_inputs(
+                spec=spec,
+                profile=profile,
+                run_config=run_config,
             )
-            feasibility = active_constraints.evaluate(prepared_trace)
+            if fallback_summary is not None:
+                prepared_trace, missing_knudsen_state = _trace_with_knudsen_observables(
+                    _trace_with_fallback_knudsen_summary(trace, fallback_summary)
+                )
+                feasibility = active_constraints.evaluate(prepared_trace)
     if (
         missing_knudsen_state is not None
         and "knudsen_viscous" in feasibility.margins
     ):
         margins = dict(feasibility.margins)
-        margins["knudsen_viscous"] = _knudsen_not_applicable_margin(
+        margins["knudsen_viscous"] = _knudsen_missing_flow_state_margin(
             active_constraints,
             missing_knudsen_state,
         )
@@ -1017,7 +1030,8 @@ def _evaluate_physics_constraints(
                 if gate in margins
             },
         )
-    return _with_knudsen_fallback_margin_detail(feasibility, prepared_trace)
+    feasibility = _with_knudsen_fallback_margin_detail(feasibility, prepared_trace)
+    return _with_extraction_not_attempted_verdicts(feasibility, prepared_trace)
 
 
 def _knudsen_summary_from_eval_inputs(
@@ -1260,6 +1274,7 @@ def _trace_with_knudsen_observables(trace: Any) -> tuple[Any, str | None]:
         prepared_summary, missing_reason = _knudsen_summary_with_segment(
             summary,
             index,
+            snapshot=snapshot,
         )
         if missing_reason is not None:
             return trace, missing_reason
@@ -1279,8 +1294,22 @@ def _trace_with_knudsen_observables(trace: Any) -> tuple[Any, str | None]:
 def _knudsen_summary_with_segment(
     summary: Any,
     index: int,
+    *,
+    snapshot: Any | None = None,
 ) -> tuple[Mapping[str, Any] | None, str | None]:
     if not isinstance(summary, MappingABC) or not summary:
+        if (
+            isinstance(summary, MappingABC)
+            and not summary
+            and _knudsen_snapshot_has_zero_overhead_flow(snapshot)
+        ):
+            return _knudsen_zero_overhead_flow_summary(index), None
+        if _knudsen_snapshot_has_flow_observation(snapshot):
+            return (
+                None,
+                f"snapshot {index} missing overhead flow state: "
+                "flow present but knudsen_regime_summary absent",
+            )
         return (
             None,
             f"snapshot {index} missing overhead flow state: "
@@ -1288,6 +1317,11 @@ def _knudsen_summary_with_segment(
         )
     if summary.get("segments"):
         return summary, None
+    if (
+        _knudsen_summary_has_zero_overhead_flow_marker(summary)
+        and _knudsen_snapshot_has_zero_overhead_flow(snapshot)
+    ):
+        return _knudsen_zero_overhead_flow_summary(index), None
 
     knudsen_number = _finite_float_or_none(summary.get("knudsen_number"))
     if knudsen_number is None:
@@ -1318,6 +1352,156 @@ def _knudsen_summary_with_segment(
         },
     )
     return prepared, None
+
+
+def _knudsen_zero_overhead_flow_summary(index: int) -> Mapping[str, Any]:
+    return MappingProxyType({
+        "status": "not_applicable",
+        "reason": KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW,
+        "provenance": KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW,
+        "segments": (
+            MappingProxyType({
+                "name": "zero_overhead_flow",
+                "regime": "viscous",
+                "knudsen_number": 0.0,
+                "provenance": KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW,
+                "reason": KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW,
+                "snapshot": index,
+            }),
+        ),
+    })
+
+
+def _knudsen_snapshot_has_zero_overhead_flow(snapshot: Any | None) -> bool:
+    if snapshot is None:
+        return False
+    if not _knudsen_snapshot_has_zero_overhead_flow_marker(snapshot):
+        return False
+    return (
+        _snapshot_has_zero_evaporation_flux(snapshot)
+        and _snapshot_has_zero_flow_map(snapshot, "condensed_by_stage_species_delta")
+        and _snapshot_has_zero_flow_map(
+            snapshot,
+            "wall_deposit_by_segment_species_delta",
+        )
+        and _snapshot_has_zero_scalar(snapshot, "O2_vented_kg_hr")
+        and _snapshot_has_zero_scalar(snapshot, "O2_vented_mol_hr")
+        and _snapshot_has_zero_scalar(snapshot, "melt_offgas_O2_mol_hr")
+        and _snapshot_has_zero_scalar(snapshot, "mre_anode_O2_mol_hr")
+    )
+
+
+def _knudsen_snapshot_has_zero_overhead_flow_marker(snapshot: Any) -> bool:
+    summary = getattr(snapshot, "knudsen_regime_summary", None)
+    return (
+        isinstance(summary, MappingABC)
+        and _knudsen_summary_has_zero_overhead_flow_marker(summary)
+    )
+
+
+def _knudsen_summary_has_zero_overhead_flow_marker(summary: Mapping[str, Any]) -> bool:
+    return (
+        str(summary.get("reason") or "") == KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW
+        or str(summary.get("provenance") or "") == KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW
+    )
+
+
+def _knudsen_snapshot_has_flow_observation(snapshot: Any | None) -> bool:
+    if snapshot is None:
+        return False
+    if _snapshot_has_nonzero_or_nonfinite_evaporation_flux(snapshot):
+        return True
+    for name in (
+        "condensed_by_stage_species_delta",
+        "wall_deposit_by_segment_species_delta",
+    ):
+        if _mapping_has_nonzero_or_nonfinite_value(getattr(snapshot, name, None)):
+            return True
+    return any(
+        _scalar_is_nonzero_or_nonfinite(getattr(snapshot, name, None))
+        for name in (
+            "O2_vented_kg_hr",
+            "O2_vented_mol_hr",
+            "melt_offgas_O2_mol_hr",
+            "mre_anode_O2_mol_hr",
+        )
+    )
+
+
+def _snapshot_has_nonzero_or_nonfinite_evaporation_flux(snapshot: Any) -> bool:
+    flux = getattr(snapshot, "evap_flux", None)
+    if flux is None:
+        return False
+    if _scalar_is_nonzero_or_nonfinite(getattr(flux, "total_kg_hr", None)):
+        return True
+    if _mapping_has_nonzero_or_nonfinite_value(getattr(flux, "species_kg_hr", None)):
+        return True
+    selectivity = getattr(snapshot, "evap_plane_selectivity", None)
+    return (
+        isinstance(selectivity, MappingABC)
+        and "total_flux_kg_hr" in selectivity
+        and _scalar_is_nonzero_or_nonfinite(selectivity.get("total_flux_kg_hr"))
+    )
+
+
+def _mapping_has_nonzero_or_nonfinite_value(value: Any) -> bool:
+    if not isinstance(value, MappingABC):
+        return False
+    return any(_scalar_is_nonzero_or_nonfinite(item) for item in value.values())
+
+
+def _scalar_is_nonzero_or_nonfinite(value: Any) -> bool:
+    numeric = _finite_float_or_none(value)
+    if numeric is None:
+        return value is not None
+    return numeric != 0.0
+
+
+def _knudsen_missing_flow_state_blocks_eval_input_fallback(
+    trace: Any,
+    reason: str,
+) -> bool:
+    if "flow present but knudsen_regime_summary absent" in reason:
+        return True
+    snapshots = getattr(trace, "snapshots", None)
+    if not isinstance(snapshots, (tuple, list)):
+        return False
+    return any(_knudsen_snapshot_has_flow_observation(snapshot) for snapshot in snapshots)
+
+
+def _snapshot_has_zero_evaporation_flux(snapshot: Any) -> bool:
+    flux = getattr(snapshot, "evap_flux", None)
+    if flux is None:
+        return False
+    if not _value_is_finite_zero(getattr(flux, "total_kg_hr", None)):
+        return False
+    species = getattr(flux, "species_kg_hr", None)
+    if species is not None and not _mapping_values_are_finite_zero(species):
+        return False
+    selectivity = getattr(snapshot, "evap_plane_selectivity", None)
+    if isinstance(selectivity, MappingABC) and "total_flux_kg_hr" in selectivity:
+        return _value_is_finite_zero(selectivity.get("total_flux_kg_hr"))
+    return selectivity in (None, {}) or not isinstance(selectivity, MappingABC)
+
+
+def _snapshot_has_zero_flow_map(snapshot: Any, name: str) -> bool:
+    value = getattr(snapshot, name, None)
+    return _mapping_values_are_finite_zero(value)
+
+
+def _snapshot_has_zero_scalar(snapshot: Any, name: str) -> bool:
+    return _value_is_finite_zero(getattr(snapshot, name, None))
+
+
+def _mapping_values_are_finite_zero(value: Any) -> bool:
+    if not isinstance(value, MappingABC):
+        return False
+    return all(_value_is_finite_zero(item) for item in value.values())
+
+
+def _value_is_finite_zero(value: Any) -> bool:
+    numeric = _finite_float_or_none(value)
+    return numeric == 0.0
 
 
 def _knudsen_summary_with_fallback_provenance(
@@ -1400,7 +1584,9 @@ def _knudsen_snapshot_segment_provenance(
 
 def _fallback_provenance(value: Any) -> str | None:
     provenance = str(value or "").strip()
-    if provenance.startswith("fallback:"):
+    if provenance.startswith("fallback:") or (
+        provenance == KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW
+    ):
         return provenance
     return None
 
@@ -1466,7 +1652,7 @@ def _replace_snapshot_knudsen_summary(
         return snapshot
 
 
-def _knudsen_not_applicable_margin(
+def _knudsen_missing_flow_state_margin(
     constraints: PhysicsConstraintSet,
     reason: str,
 ) -> GateMargin:
@@ -1476,8 +1662,107 @@ def _knudsen_not_applicable_margin(
         margin=-math.inf,
         threshold=constraints.knudsen_max,
         observed=math.inf,
-        detail=f"not-applicable: {reason}",
+        detail=f"{KNUDSEN_POPULATION_BUG_MISSING_OVERHEAD_FLOW}: {reason}",
     )
+
+
+def _with_extraction_not_attempted_verdicts(
+    feasibility: FeasibilityResult,
+    trace: Any,
+) -> FeasibilityResult:
+    gates = tuple(
+        gate
+        for gate in EXTRACTION_CLASS_GATES
+        if gate in feasibility.margins and not feasibility.margins[gate].feasible
+    )
+    if not gates:
+        return feasibility
+    evidence = _no_volatilization_evidence(trace)
+    if evidence is None:
+        return feasibility
+    margins = dict(feasibility.margins)
+    for gate in gates:
+        margins[gate] = _not_attempted_extraction_margin(margins[gate], evidence)
+    return FeasibilityResult(
+        feasible=all(margin.feasible for margin in margins.values()),
+        margins={gate: margins[gate] for gate in GATE_ORDER if gate in margins},
+        version=feasibility.version,
+    )
+
+
+def _not_attempted_extraction_margin(
+    margin: GateMargin,
+    evidence: Mapping[str, Any],
+) -> GateMargin:
+    detail = f"{EXTRACTION_NOT_ATTEMPTED_NO_VOLATILIZATION}: {margin.detail}"
+    return replace(
+        margin,
+        detail=detail,
+        status="not-attempted",
+        output_status="not_attempted",
+        status_reason=EXTRACTION_NOT_ATTEMPTED_NO_VOLATILIZATION,
+        status_payload=evidence,
+    )
+
+
+def _no_volatilization_evidence(trace: Any) -> Mapping[str, Any] | None:
+    snapshots = getattr(trace, "snapshots", None)
+    if not isinstance(snapshots, (tuple, list)) or not snapshots:
+        return None
+    if any(_knudsen_snapshot_has_flow_observation(snapshot) for snapshot in snapshots):
+        return None
+    below_solidus = _all_snapshots_below_solidus(snapshots)
+    if below_solidus is not None:
+        return MappingProxyType({
+            "reason": EXTRACTION_NOT_ATTEMPTED_NO_VOLATILIZATION,
+            "predicate": "melt_never_reached_solidus",
+            **below_solidus,
+        })
+    if all(_knudsen_snapshot_has_zero_overhead_flow(snapshot) for snapshot in snapshots):
+        return MappingProxyType({
+            "reason": EXTRACTION_NOT_ATTEMPTED_NO_VOLATILIZATION,
+            "predicate": "evaporation_route_never_ran",
+            "snapshot_count": len(snapshots),
+            "marker": KNUDSEN_NOT_APPLICABLE_ZERO_OVERHEAD_FLOW,
+        })
+    return None
+
+
+def _all_snapshots_below_solidus(
+    snapshots: Sequence[Any],
+) -> Mapping[str, Any] | None:
+    max_temperature = -math.inf
+    min_solidus = math.inf
+    for snapshot in snapshots:
+        temperature = _finite_float_or_none(getattr(snapshot, "temperature_C", None))
+        solidus = _snapshot_solidus_T_C(snapshot)
+        if temperature is None or solidus is None:
+            return None
+        max_temperature = max(max_temperature, temperature)
+        min_solidus = min(min_solidus, solidus)
+        if temperature >= solidus:
+            return None
+    return MappingProxyType({
+        "snapshot_count": len(snapshots),
+        "max_temperature_C": max_temperature,
+        "min_solidus_T_C": min_solidus,
+    })
+
+
+def _snapshot_solidus_T_C(snapshot: Any) -> float | None:
+    for attr in ("solidus_T_C", "melt_solidus_T_C"):
+        value = _finite_float_or_none(getattr(snapshot, attr, None))
+        if value is not None:
+            return value
+    for attr in ("melt_regime", "phase_state", "liquidus_solidus"):
+        payload = getattr(snapshot, attr, None)
+        if isinstance(payload, MappingABC):
+            value = _finite_float_or_none(
+                payload.get("solidus_T_C") or payload.get("solidus_C")
+            )
+            if value is not None:
+                return value
+    return None
 
 
 def _accepts_keyword(callable_obj: Any, keyword: str) -> bool:

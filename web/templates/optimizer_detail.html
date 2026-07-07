@@ -11,6 +11,14 @@
             <tr><td>Cache key</td><td>{{ result.cache_key }}</td></tr>
             <tr><td>Created</td><td>{{ result.created_at }}</td></tr>
             <tr><td>Feasible</td><td>{{ "yes" if result.feasible else "no" }}</td></tr>
+            {% if result.previously_ungated %}
+            <tr>
+                <td>Constraint label</td>
+                <td>
+                    <span class="version-badge version-badge-legacy" title="{{ result.constraint_label.title }}">previously_ungated</span>
+                </td>
+            </tr>
+            {% endif %}
             <tr>
                 <td>Version</td>
                 <td>
@@ -62,6 +70,46 @@
         </div>
         <div id="optimizer-certify-job"></div>
     </div>
+
+    {% if result.constraint_margins %}
+    <div class="section-card">
+        <h3>Constraint Margins</h3>
+        <table class="param-table">
+            <thead>
+                <tr>
+                    <th>Gate</th>
+                    <th>Verdict</th>
+                    <th>Observed</th>
+                    <th>Margin</th>
+                    <th>Reason</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for margin in result.constraint_margins %}
+                <tr>
+                    <td>{{ margin.gate }}</td>
+                    <td>
+                        <strong>{{ margin.verdict }}</strong><br>
+                        <span class="range">{{ margin.output_status or margin.status }}</span>
+                    </td>
+                    <td>{{ margin.observed_label }}</td>
+                    <td>{{ margin.margin_label }}</td>
+                    <td>
+                        {{ margin.status_reason or margin.detail }}
+                        {% if margin.predicate %}
+                        <br><span class="range">{{ margin.predicate }}</span>
+                        {% endif %}
+                        {% if margin.detail and margin.status_reason and margin.detail != margin.status_reason %}
+                        <br><span class="range">{{ margin.detail }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% endif %}
 
     <div class="section-card">
         <h3>Recipe Patch</h3>

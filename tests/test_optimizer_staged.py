@@ -1149,21 +1149,26 @@ def test_all_infeasible_beam_bounded(tmp_path) -> None:
         )
 
     out = tmp_path / "all-infeasible"
-    with pytest.raises(study.StudyNoFeasibleError):
-        study.run(
-            {**PROFILE, "staged": {**PROFILE["staged"], "max_backward_passes": 1}},
-            FEEDSTOCK,
-            "staged",
-            "stub",
-            parallel=4,
-            budget=8,
-            out_dir=out,
-            seed=47,
-            evaluator=infeasible_evaluator,
-        )
+    result = study.run(
+        {**PROFILE, "staged": {**PROFILE["staged"], "max_backward_passes": 1}},
+        FEEDSTOCK,
+        "staged",
+        "stub",
+        parallel=4,
+        budget=8,
+        out_dir=out,
+        seed=47,
+        evaluator=infeasible_evaluator,
+    )
 
-    assert json.loads((out / "pareto.json").read_text())["pareto"] == []
-    assert (out / "leaderboard.csv").read_text().strip() == "rank,candidate_id,cache_key,is_pareto,is_winner,oxygen_kg,energy_kWh,patch_json"
+    payload = json.loads((out / "pareto.json").read_text())
+    leaderboard_lines = (out / "leaderboard.csv").read_text().strip().splitlines()
+    assert result.status == "completed-no-feasible-winner"
+    assert result.winner is None
+    assert result.pareto == ()
+    assert payload["pareto"] == []
+    assert payload["status"] == "completed-no-feasible-winner"
+    assert len(leaderboard_lines) == len(result.records) + 1
     assert not (out / "winner.recipe.yaml").exists()
 
 
