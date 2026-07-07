@@ -684,13 +684,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         )
         feo_activity_diagnostic = None
         if intrinsic_fO2_log is not None:
-            from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
+            from simulator.fe_redox import (
+                calphad_ferrous_feo_activity_diagnostic,
+                kress91_furnace_activity_pressure_bar,
+            )
+
+            feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
+                floor_bar=vacuum_floor_bar,
+            )
 
             feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
                 comp_wt=comp_wt,
                 fO2_log=intrinsic_fO2_log,
                 T_K=T_K,
-                pressure_bar=request.pressure_bar,
+                pressure_bar=feo_activity_pressure_bar,
                 floor_bar=vacuum_floor_bar,
             )
 
@@ -779,7 +786,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         comp_wt=comp_wt,
                         fO2_log=intrinsic_fO2_log,
                         T_K=T_K,
-                        pressure_bar=request.pressure_bar,
+                        pressure_bar=feo_activity_pressure_bar,
                         floor_bar=vacuum_floor_bar,
                     )
                 else:

@@ -226,6 +226,18 @@ def floor_vacuum_pressure_bar(
     return p
 
 
+def kress91_furnace_activity_pressure_bar(
+    *,
+    floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+) -> float:
+    """Fixed pressure control for furnace FeO activity in vapor equilibrium."""
+
+    # Kress91 pressure terms are high-pressure redox-split corrections. Neutral
+    # furnace overhead is transport only, so vapor-equilibrium activity must not
+    # read p_total. Coefficient provenance is recorded at the module constants.
+    return floor_vacuum_pressure_bar(0.0, floor_bar=floor_bar)
+
+
 def feot_equivalent_wt_pct(comp_wt: Mapping[str, float]) -> float:
     feo = max(0.0, float(comp_wt.get('FeO', 0.0) or 0.0))
     fe2o3 = max(0.0, float(comp_wt.get('Fe2O3', 0.0) or 0.0))
@@ -521,15 +533,15 @@ def _kress91_ferrous_feo_activity_raw(
     mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
     if not mol_fractions:
         return 0.0
-    # Vacuum tolerance — intentional, NOT a missing guard. This entry point is
-    # reached from the evaporation / vapor-pressure path
-    # (engines/builtin/vapor_pressure.py passes request.pressure_bar UNFLOORED),
-    # which legitimately runs at pressure_bar == 0.0 at furnace vacuum. Kress91's
-    # pressure terms are a high-pressure (GPa) petrologic correction, negligible
-    # at furnace mbar pressures, so a non-positive overhead pressure is floored here
-    # (FeO activity is pressure-insensitive in this regime) rather than
-    # refused. NON-FINITE pressure is deliberately left unfloored (isfinite gate)
-    # so NaN/inf still raises through the _validate_kress91_controls chokepoint.
+    # Vacuum tolerance — intentional, NOT a missing guard. Direct activity
+    # callers may pass pressure_bar == 0.0 at furnace vacuum. Kress91's pressure
+    # terms are a high-pressure (GPa) petrologic correction, negligible at
+    # furnace mbar pressures, so a non-positive pressure is floored here rather
+    # than refused. Vapor-equilibrium providers use
+    # kress91_furnace_activity_pressure_bar so neutral overhead p_total never
+    # enters this path. NON-FINITE pressure is deliberately left unfloored
+    # (isfinite gate) so NaN/inf still raises through the
+    # _validate_kress91_controls chokepoint.
     # kress91_split, by contrast, serves the redox-split path where pressure is a
     # real melt pressure > 0 and a non-positive value IS invalid — the two entry
     # points have DIFFERENT valid-input domains, so this asymmetry is correct, not

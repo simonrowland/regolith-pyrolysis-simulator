@@ -397,6 +397,41 @@ def test_runtime_p_eq_numerator_moves_with_parent_oxide_composition(
     assert high_provenance["pressure_kind"] == "effective_equilibrium"
 
 
+def test_neutral_total_pressure_does_not_change_vapor_equilibrium_peq(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    account = _wt_pct_to_mol_account(_DEMARIA_12022_WT_PCT)
+    pressure_sweep_bar = (1e-12, 1e-6, 0.005, 0.01, 0.015, 1.0)
+    p_eq_by_pressure: dict[float, dict[str, float]] = {}
+
+    for pressure_bar in pressure_sweep_bar:
+        request = IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": account},
+                species_formula_registry={},
+            ),
+            temperature_C=1300.0,
+            pressure_bar=pressure_bar,
+            fO2_log=-9.0,
+            control_inputs={"pO2_bar": 1e-9, "intrinsic_fO2_log": -9.0},
+        )
+        result = provider.dispatch(request)
+        vapor_pressures = result.diagnostic["vapor_pressures_Pa"]
+        p_eq_by_pressure[pressure_bar] = {
+            species: vapor_pressures[species]
+            for species in ("Fe", "SiO", "Na")
+        }
+
+    # Kress91 pressure terms stay inside pressure-sensitive redox splits;
+    # neutral pN2 overhead is transport only and must not perturb
+    # equilibrium/activity P_eq.
+    reference = p_eq_by_pressure[pressure_sweep_bar[0]]
+    for pressure_bar in pressure_sweep_bar[1:]:
+        assert p_eq_by_pressure[pressure_bar] == reference
+
+
 def test_grounded_melt_activity_coefficients_match_single_cation_sources():
     expected = {
         "Na2O": ("NaO0.5", 1.0e-3),

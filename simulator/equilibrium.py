@@ -15,7 +15,7 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
-    floor_vacuum_pressure_bar,
+    kress91_furnace_activity_pressure_bar,
     kress91_ferrous_feo_activity,
 )
 from simulator.environment import vacuum_floor_bar_for_environment
@@ -287,12 +287,7 @@ class EquilibriumMixin:
                 intrinsic_fO2_log = float(getattr(self.melt, 'fO2_log', -9.0))
         else:
             intrinsic_fO2_log = float(intrinsic_fO2_value)
-        # Vacuum-floor via the shared -inf-safe helper, NOT max(p, floor): max
-        # silently masks a -inf pressure as finite, hiding it from the Kress91
-        # chokepoint validator reached through kress91_ferrous_feo_activity below.
-        # Finite vacuum (<=0) still floors; finite-positive passes through.
-        pressure_bar = floor_vacuum_pressure_bar(
-            float(self.melt.p_total_mbar) / 1000.0,
+        feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
             floor_bar=self._vacuum_floor_bar(),
         )
 
@@ -312,7 +307,7 @@ class EquilibriumMixin:
             comp_wt=comp_wt,
             fO2_log=intrinsic_fO2_log,
             T_K=T_K,
-            pressure_bar=pressure_bar,
+            pressure_bar=feo_activity_pressure_bar,
             floor_bar=self._vacuum_floor_bar(),
         )
 
@@ -419,7 +414,7 @@ class EquilibriumMixin:
                     comp_wt=comp_wt,
                     fO2_log=intrinsic_fO2_log,
                     T_K=T_K,
-                    pressure_bar=pressure_bar,
+                    pressure_bar=feo_activity_pressure_bar,
                 )
                 oxide_activity = None
             else:
