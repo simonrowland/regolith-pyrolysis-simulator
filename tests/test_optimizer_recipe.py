@@ -434,8 +434,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # Hildenbrand 1984 liquid-KO0.5 basis (data/vapor_pressures.yaml K row +
     # engines/builtin/vapor_pressure.py fit_target plumbing). cache_key moves
     # through the data-digest facet; recipe_id stays pinned (no allowlist or
-    # bounds change). Recomputed controller-side on the production venv.
-    assert cache_key(spec) == "39de4f7e90199fc761211b056231c86256ad679901861303471a7c287b15dba3"
+    # bounds change). Recomputed controller-side on the production venv after
+    # the wall-selector pole-guard follow-up (914a2a3 + scope fix) finalized
+    # the resolution fingerprint.
+    assert cache_key(spec) == "f448556f48fca480fe9949f056772ece3582bdbf01fc9675d269ee0832da6029"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

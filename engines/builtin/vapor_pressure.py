@@ -320,7 +320,15 @@ def wall_condensation_antoine_coefficients(
             selected = _selected_temperature_segment(pure, temperature_K)
             if _pure_segment_usable(selected, temperature_K):
                 return selected, COEFF_BLOCK_PURE_COMPONENT
-    return {}, COEFF_BLOCK_PURE_COMPONENT
+            # A grounded pure-species wall answer exists but not at this
+            # temperature: fail closed (caller's reference fallback) rather
+            # than extrapolate through a pole or substitute the melt term.
+            return {}, COEFF_BLOCK_PURE_COMPONENT
+    # No pure sidecar at all: keep the pre-t-141 legacy behavior (the
+    # standard term serves as the wall reference). Whether that basis is
+    # defensible for CrO2-class rows is the t-162 chemistry ruling; do not
+    # change routing behavior here as a side effect.
+    return vapor_pressure_antoine_coefficients(row, temperature_K)
 
 
 def vapor_pressure_valid_range_K(
