@@ -1091,6 +1091,13 @@ class HourSnapshot:
     # target_species intersected with the evolved-flux species), target/total
     # selectivity. Empty dict means no selectivity diagnostic was computed.
 
+    # --- Partial-melt offgassing diagnostic (t-109) ---
+    partial_melt_offgassing_diagnostic: Dict[str, Any] = field(default_factory=dict)
+    # Diagnostic-only pressure comparison for Na/K in the mush interval:
+    # current bulk-basis vapor pressure versus an enriched-liquid estimate.
+    # Empty dict means the tick lacked enough melt-fraction or alkali pressure
+    # context to compute the diagnostic. No gate, rate, or ledger path reads it.
+
     # --- C2A staged gas-control diagnostic (SSO-2) ---
     c2a_staged_gas: Dict[str, Any] = field(default_factory=dict)
     # Per-tick stage-owned gas cover selected before process execution.

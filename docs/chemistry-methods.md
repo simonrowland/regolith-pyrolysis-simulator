@@ -380,7 +380,7 @@ fresh equilibrium solve at each instant: it smooths the time integration but ass
 is constant over the tick, which accumulates error when the melt composition swings hard within a
 single hour. It is stated as a current approximation in
 [`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:947 — hourly depletion reservoir -->
+<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1304 — hourly depletion reservoir -->
 
 ### §4.4 The Knudsen and Langmuir limits, the sweep, and self-poisoning
 

@@ -559,6 +559,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
+        self._last_partial_melt_offgassing_diagnostic: Dict[str, Any] = {}
         self._last_extraction_completeness_diagnostic: Dict[str, Any] = {}
         self._last_overlap_evaporation_diagnostic: Dict[str, Any] = {}
         self._feedstock_recovered_reagent_kg_by_species: Dict[str, float] = {}
@@ -8876,6 +8877,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_native_fe_partition_diagnostic = {}
         self._last_native_fe_saturation_event = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
+        self._last_partial_melt_offgassing_diagnostic = {}
         self._last_extraction_completeness_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
         self._reset_redox_source_diagnostics_for_hour()
@@ -9090,6 +9092,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot = self._make_snapshot()
         snapshot.evap_flux = evap_flux
         snapshot.evap_plane_selectivity = evap_plane_selectivity
+        snapshot.partial_melt_offgassing_diagnostic = dict(
+            self._last_partial_melt_offgassing_diagnostic
+        )
         snapshot.fe_redox_split = fe_redox_split
         snapshot.redox_source_breakdown = self._redox_source_breakdown_diagnostic()
         snapshot.energy = energy

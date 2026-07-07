@@ -9,6 +9,7 @@ from typing import Any
 
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ProviderUnavailableError,
@@ -43,6 +44,20 @@ _FREEZE_GATE_FRACTION_QUANTUM = 0.001
 _FREEZE_GATE_PRESSURE_BAR_QUANTUM = 0.01
 _FREEZE_GATE_FO2_LOG_QUANTUM = 0.1
 _FREEZE_GATE_TRACE_FRACTION_CUTOFF = 0.001
+_PARTIAL_MELT_OFFGASSING_COMPONENTS = {
+    'Na': {
+        'parent_oxide': 'Na2O',
+        'component': 'NaO0.5',
+        'partition_coefficient': 0.10,
+        'partition_coefficient_range': (0.05, 0.20),
+    },
+    'K': {
+        'parent_oxide': 'K2O',
+        'component': 'KO0.5',
+        'partition_coefficient': 0.05,
+        'partition_coefficient_range': (0.0, 0.10),
+    },
+}
 _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
     'SiO2',
     'Al2O3',
@@ -148,6 +163,7 @@ class EvaporationMixin:
         """
         T_K = self.melt.temperature_C + 273.15
         flux = EvaporationFlux()
+        self._last_partial_melt_offgassing_diagnostic = {}
 
         if T_K < 400:  # Below any significant evaporation
             return flux
@@ -202,6 +218,13 @@ class EvaporationMixin:
             )
         vapor_pressure_diagnostic = dict(
             getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
+        )
+        self._last_partial_melt_offgassing_diagnostic = (
+            self._build_partial_melt_offgassing_diagnostic(
+                equilibrium,
+                vapor_pressures=vapor_pressures,
+                vapor_pressure_diagnostic=vapor_pressure_diagnostic,
+            )
         )
 
         # Precompute the auxiliary maps the provider consumes via
@@ -344,6 +367,335 @@ class EvaporationMixin:
 
         flux.update_totals()
         return flux
+
+    def _build_partial_melt_offgassing_diagnostic(
+        self,
+        equilibrium: Any,
+        *,
+        vapor_pressures: Mapping[str, float],
+        vapor_pressure_diagnostic: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        """Estimate partial-melt alkali vapor undercount without changing flux.
+
+        Diagnostic-only grounding:
+        DeMaria et al. 1971 measured Na/K vapor below the Apollo 12022
+        liquidus, and the phase-engine result classes document
+        ``liquid_fraction`` plus ``liquid_composition_wt_pct`` as the preferred
+        source when available.  If a backend supplies only F(T), use the
+        documented batch-partition fallback
+        ``C_liquid/C_bulk = 1 / (D + F * (1 - D))`` at WARN tier.
+        """
+        fraction = self._partial_melt_fraction_diagnostic(equilibrium)
+        liquid_comp, liquid_comp_source = (
+            self._phase_engine_liquid_composition_wt_pct(equilibrium)
+        )
+        bulk_single_cation = self._bulk_single_cation_mole_fractions(
+            vapor_pressure_diagnostic
+        )
+        liquid_single_cation = (
+            self._single_cation_mole_fractions_from_wt_pct(liquid_comp)
+            if liquid_comp
+            else {}
+        )
+
+        component_details: dict[str, dict[str, Any]] = {}
+        p_bulk_current: dict[str, float] = {}
+        p_partial_liquid: dict[str, float] = {}
+        ratios: dict[str, float] = {}
+        bulk_x: dict[str, float] = {}
+        liquid_x: dict[str, float] = {}
+        enrichment: dict[str, float] = {}
+        sources: set[str] = set()
+        warnings: list[str] = []
+
+        for vapor_species, spec in _PARTIAL_MELT_OFFGASSING_COMPONENTS.items():
+            current_pressure = self._optional_float(
+                vapor_pressures.get(vapor_species)
+            )
+            if current_pressure is None or current_pressure <= 0.0:
+                continue
+
+            parent_oxide = str(spec['parent_oxide'])
+            component = str(spec['component'])
+            bulk_fraction = self._optional_float(
+                bulk_single_cation.get(parent_oxide)
+            )
+            if bulk_fraction is None or bulk_fraction <= 0.0:
+                continue
+
+            source = ''
+            liquid_fraction = self._optional_float(
+                liquid_single_cation.get(parent_oxide)
+            )
+            if liquid_fraction is not None:
+                source = liquid_comp_source
+            else:
+                F = self._optional_float(fraction.get('melt_fraction_F'))
+                if F is None:
+                    continue
+                try:
+                    regime = melt_regime(liquid_fraction=F)
+                except (TypeError, ValueError):
+                    continue
+                if regime == MeltRegime.FROZEN:
+                    continue
+                partition_coefficient = float(spec['partition_coefficient'])
+                factor = 1.0 / (
+                    partition_coefficient + F * (1.0 - partition_coefficient)
+                )
+                liquid_fraction = min(1.0, bulk_fraction * factor)
+                source = 'analytical_batch_partition_fallback'
+                warnings.append(
+                    'WARN-tier analytical partition fallback used for '
+                    f'{component}; phase-engine liquid composition absent'
+                )
+
+            ratio = liquid_fraction / bulk_fraction
+            enriched_pressure = current_pressure * ratio
+            sources.add(source)
+            p_bulk_current[vapor_species] = current_pressure
+            p_partial_liquid[vapor_species] = enriched_pressure
+            ratios[vapor_species] = ratio
+            bulk_x[component] = bulk_fraction
+            liquid_x[component] = liquid_fraction
+            enrichment[component] = ratio
+            component_details[component] = {
+                'vapor_species': vapor_species,
+                'parent_oxide': parent_oxide,
+                'bulk_single_cation_mole_fraction': bulk_fraction,
+                'estimated_liquid_single_cation_mole_fraction': liquid_fraction,
+                'enrichment_factor': ratio,
+                'p_bulk_current': current_pressure,
+                'p_partial_liquid_diagnostic': enriched_pressure,
+                'p_ratio_partial_over_bulk': ratio,
+                'liquid_composition_source': source,
+            }
+            if source == 'analytical_batch_partition_fallback':
+                component_details[component].update({
+                    'partition_model': 'batch_equilibrium',
+                    'partition_coefficient': float(
+                        spec['partition_coefficient']
+                    ),
+                    'partition_coefficient_range': tuple(
+                        spec['partition_coefficient_range']
+                    ),
+                })
+
+        if component_details:
+            status = (
+                'ENGINE_DERIVED'
+                if sources == {liquid_comp_source} and liquid_comp
+                else 'UNCERTIFIED_PARAMETERIZED_ESTIMATE'
+            )
+        else:
+            status = 'UNAVAILABLE'
+
+        payload = {
+            'status': status,
+            'T_K': float(self.melt.temperature_C) + 273.15,
+            'solidus_K': fraction.get('solidus_K'),
+            'liquidus_K': fraction.get('liquidus_K'),
+            'melt_fraction_F': fraction.get('melt_fraction_F'),
+            'melt_regime': fraction.get('melt_regime'),
+            'F_source': fraction.get('F_source'),
+            'liquid_composition_source': (
+                'mixed' if len(sources) > 1 else next(iter(sources), '')
+            ),
+            'bulk_oxide_mole_fraction': bulk_x,
+            'estimated_liquid_oxide_mole_fraction': liquid_x,
+            'enrichment_factor_by_component': enrichment,
+            'p_bulk_current': p_bulk_current,
+            'p_partial_liquid_diagnostic': p_partial_liquid,
+            'p_ratio_partial_over_bulk': ratios,
+            'surface_fraction_model': 'pressure_only_no_surface_fraction_applied',
+            'golden_authoritative': False,
+            'component_details': component_details,
+            'diagnostic_basis': (
+                'alkali vapor pressure scales linearly with single-cation '
+                'alkali oxide activity in the current vapor-pressure provider'
+            ),
+        }
+        reasons = tuple(fraction.get('unavailable_reasons') or ())
+        if reasons:
+            payload['unavailable_reasons'] = reasons
+        payload['warnings'] = tuple(dict.fromkeys(warnings))
+        return payload
+
+    def _partial_melt_fraction_diagnostic(
+        self,
+        equilibrium: Any,
+    ) -> dict[str, Any]:
+        diagnostics = self._equilibrium_diagnostic_mapping(equilibrium)
+        reasons: list[str] = []
+        solidus_T_C = self._optional_float(
+            getattr(equilibrium, 'solidus_T_C', None)
+        )
+        if solidus_T_C is None:
+            solidus_T_C = self._optional_float(diagnostics.get('solidus_T_C'))
+        liquidus_T_C = self._optional_float(
+            getattr(equilibrium, 'liquidus_T_C', None)
+        )
+        if liquidus_T_C is None:
+            liquidus_T_C = self._optional_float(diagnostics.get('liquidus_T_C'))
+        if liquidus_T_C is None:
+            liquidus_T_K = self._optional_float(diagnostics.get('liquidus_T_K'))
+            if liquidus_T_K is not None:
+                liquidus_T_C = liquidus_T_K - 273.15
+
+        F = self._optional_float(getattr(equilibrium, 'liquid_fraction', None))
+        source = ''
+        if F is not None and 0.0 <= F <= 1.0:
+            source = 'phase_engine:equilibrium.liquid_fraction'
+        else:
+            F = self._optional_float(diagnostics.get('liquid_fraction'))
+            if F is not None and 0.0 <= F <= 1.0:
+                source = 'phase_engine:diagnostic.liquid_fraction'
+
+        if F is None and solidus_T_C is not None and liquidus_T_C is not None:
+            curve = self._freeze_gate_curve_from_bounds(
+                solidus_T_C=solidus_T_C,
+                liquidus_T_C=liquidus_T_C,
+                source='liquidus_solidus:equilibrium_diagnostic_bounds',
+                reasons=reasons,
+            )
+            if curve is not None:
+                F = self._interpolate_freeze_gate_curve(
+                    curve,
+                    float(self.melt.temperature_C),
+                )
+                source = str(curve['source'])
+
+        regime = None
+        if F is not None:
+            try:
+                regime = melt_regime(liquid_fraction=F).value
+            except (TypeError, ValueError) as exc:
+                reasons.append(f'melt_regime_invalid_liquid_fraction: {exc}')
+                F = None
+
+        if F is None:
+            reasons.append('melt_fraction_unavailable')
+        return {
+            'melt_fraction_F': F,
+            'F_source': source,
+            'melt_regime': regime,
+            'solidus_K': (
+                solidus_T_C + 273.15 if solidus_T_C is not None else None
+            ),
+            'liquidus_K': (
+                liquidus_T_C + 273.15 if liquidus_T_C is not None else None
+            ),
+            'unavailable_reasons': tuple(dict.fromkeys(reasons)),
+        }
+
+    def _phase_engine_liquid_composition_wt_pct(
+        self,
+        equilibrium: Any,
+    ) -> tuple[dict[str, float], str]:
+        direct = self._finite_mapping(
+            getattr(equilibrium, 'liquid_composition_wt_pct', {}) or {}
+        )
+        if direct:
+            return direct, 'phase_engine:equilibrium.liquid_composition_wt_pct'
+
+        diagnostics = self._equilibrium_diagnostic_mapping(equilibrium)
+        diagnostic_direct = self._finite_mapping(
+            diagnostics.get('liquid_composition_wt_pct') or {}
+        )
+        if diagnostic_direct:
+            return diagnostic_direct, 'phase_engine:diagnostic.liquid_composition_wt_pct'
+
+        path_value = diagnostics.get('liquid_fraction_path') or ()
+        path = path_value if isinstance(path_value, tuple | list) else ()
+        current_T_C = float(self.melt.temperature_C)
+        best: tuple[float, dict[str, float]] | None = None
+        for point in path:
+            if not isinstance(point, Mapping):
+                continue
+            temperature_C = self._optional_float(
+                point.get('temperature_C', point.get('T_C'))
+            )
+            composition = self._finite_mapping(
+                point.get('liquid_composition_wt_pct') or {}
+            )
+            if temperature_C is None or not composition:
+                continue
+            distance = abs(temperature_C - current_T_C)
+            if best is None or distance < best[0]:
+                best = (distance, composition)
+        if best is not None:
+            return best[1], 'phase_engine:diagnostic.liquid_fraction_path'
+        return {}, ''
+
+    @staticmethod
+    def _finite_mapping(values: Mapping[str, Any]) -> dict[str, float]:
+        if not isinstance(values, Mapping):
+            return {}
+        out: dict[str, float] = {}
+        for key, value in dict(values).items():
+            try:
+                number = float(value)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(number) and number > 0.0:
+                out[str(key)] = number
+        return out
+
+    def _single_cation_mole_fractions_from_wt_pct(
+        self,
+        wt_pct: Mapping[str, float],
+    ) -> dict[str, float]:
+        account_mol: dict[str, float] = {}
+        for species, wt in wt_pct.items():
+            molar_mass = MOLAR_MASS.get(str(species))
+            if molar_mass is None or molar_mass <= 0.0:
+                continue
+            value = self._optional_float(wt)
+            if value is None or value <= 0.0:
+                continue
+            account_mol[str(species)] = value / molar_mass
+        return single_cation_mole_fractions(account_mol)
+
+    def _bulk_single_cation_mole_fractions(
+        self,
+        vapor_pressure_diagnostic: Mapping[str, Any],
+    ) -> dict[str, float]:
+        try:
+            account_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+        except AttributeError:
+            account_mol = {}
+        fractions = dict(single_cation_mole_fractions(account_mol))
+        provenance = dict(
+            vapor_pressure_diagnostic.get('vapor_pressure_numerator_provenance')
+            or {}
+        )
+        for vapor_species, spec in _PARTIAL_MELT_OFFGASSING_COMPONENTS.items():
+            parent_oxide = str(spec['parent_oxide'])
+            species_provenance = provenance.get(vapor_species)
+            if not isinstance(species_provenance, Mapping):
+                continue
+            value = self._optional_float(
+                species_provenance.get('melt_oxide_X_single_cation')
+            )
+            if value is not None and value > 0.0:
+                fractions[parent_oxide] = value
+        return fractions
+
+    @staticmethod
+    def _equilibrium_diagnostic_mapping(equilibrium: Any) -> dict[str, Any]:
+        diagnostics: dict[str, Any] = {}
+        for attr in (
+            'diagnostics',
+            'alphamelts_diagnostics',
+            'magemin_diagnostics',
+        ):
+            value = getattr(equilibrium, attr, None)
+            if isinstance(value, Mapping):
+                diagnostics.update(dict(value))
+        backend_diagnostics = diagnostics.get('backend_diagnostics')
+        if isinstance(backend_diagnostics, Mapping):
+            diagnostics.update(dict(backend_diagnostics))
+        return diagnostics
 
     def _freeze_gate_liquid_fraction_factor(self) -> float:
         curve = self._freeze_gate_curve()
