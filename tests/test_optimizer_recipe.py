@@ -419,7 +419,7 @@ def test_furnace_max_t_c_knob_bounds_and_top_level_patch() -> None:
     assert RecipePatch({FURNACE_MAX_T_C_PATH: FURNACE_MAX_T_BOUNDS_C[0]}).validated(schema)
     assert RecipePatch({FURNACE_MAX_T_C_PATH: FURNACE_MAX_T_BOUNDS_C[1]}).validated(schema)
     with pytest.raises(RecipeValidationError, match="below lower bound"):
-        RecipePatch({FURNACE_MAX_T_C_PATH: 1299.0}).validated(schema)
+        RecipePatch({FURNACE_MAX_T_C_PATH: FURNACE_MAX_T_BOUNDS_C[0] - 1.0}).validated(schema)
     with pytest.raises(RecipeValidationError, match="above upper bound"):
         RecipePatch({FURNACE_MAX_T_C_PATH: 2001.0}).validated(schema)
 
@@ -427,6 +427,23 @@ def test_furnace_max_t_c_knob_bounds_and_top_level_patch() -> None:
     assert nested == {"furnace_max_T_C": 1450.0}
     config = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)._session_config()
     assert config.setpoints["furnace_max_T_C"] == pytest.approx(1450.0)
+
+
+def test_furnace_max_t_c_bounds_are_allowlist_epoch_pinned() -> None:
+    schema = RecipeSchema()
+    spec = schema.spec_for(FURNACE_MAX_T_C_PATH)
+
+    assert (
+        schema.allowlist_version,
+        O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION,
+        (spec.low, spec.high),
+        FURNACE_MAX_T_BOUNDS_C,
+    ) == (
+        "allowlist-v10",
+        "allowlist-v10",
+        (1200.0, 2000.0),
+        (1200.0, 2000.0),
+    )
 
 
 def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
@@ -514,7 +531,7 @@ def test_furnace_max_t_c_default_and_clamp_chokepoint() -> None:
     )[0] is None
 
 
-@pytest.mark.parametrize("value", [1299.0, 2000.1, float("inf"), "nan", "hot"])
+@pytest.mark.parametrize("value", [1199.0, 2000.1, float("inf"), "nan", "hot"])
 def test_furnace_max_t_c_setpoints_validation_fails_loud(value) -> None:
     setpoints = copy.deepcopy(yaml.safe_load(SETPOINTS_PATH.read_text()))
     setpoints["furnace_max_T_C"] = value

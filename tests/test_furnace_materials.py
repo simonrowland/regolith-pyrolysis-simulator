@@ -7,6 +7,7 @@ from simulator.core import CampaignPhase
 from simulator.furnace_materials import (
     load_furnace_materials,
     resolve_furnace_max_T_C,
+    resolve_furnace_temperature_caps,
 )
 from simulator.runner import PyrolysisRun
 
@@ -54,6 +55,8 @@ def test_catalog_loads_grounded_enabled_materials():
     assert catalog["zirconia_ysz"]["enabled"] is True
     assert catalog["plasma_sprayed_alumina"]["max_service_T_C"] == 1650
     assert catalog["plasma_sprayed_alumina"]["enabled"] is True
+    assert catalog["fused_silica"]["max_service_T_C"] == 1200
+    assert catalog["fused_silica"]["enabled"] is True
 
 
 def test_furnace_material_caps_track_wall_material_temperature_anchors():
@@ -83,7 +86,6 @@ def test_furnace_material_caps_track_wall_material_temperature_anchors():
 def test_catalog_disabled_materials_are_not_selectable():
     catalog = load_furnace_materials()
 
-    assert catalog["fused_silica"]["enabled"] is False
     assert catalog["sintered_regolith"]["enabled"] is False
     assert catalog["graphite_inert"]["enabled"] is False
 
@@ -94,8 +96,6 @@ def test_resolver_clamps_requested_cap_to_material_max():
 
 
 def test_resolver_distinguishes_service_rating_from_applied_ceiling():
-    from simulator.furnace_materials import resolve_furnace_temperature_caps
-
     caps = resolve_furnace_temperature_caps("zirconia_ysz", 1800)
 
     assert caps["service_rating_T_C"] == pytest.approx(2200)
@@ -103,8 +103,23 @@ def test_resolver_distinguishes_service_rating_from_applied_ceiling():
     assert caps["requested_ceiling_T_C"] == pytest.approx(1800)
 
 
+def test_resolver_allows_grounded_sub_1300_material_floor():
+    from simulator.campaigns import CampaignManager
+    from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
+
+    caps = resolve_furnace_temperature_caps("fused_silica", 1300)
+
+    assert FURNACE_MAX_T_BOUNDS_C[0] == pytest.approx(1200)
+    assert caps["service_rating_T_C"] == pytest.approx(1200)
+    assert caps["requested_ceiling_T_C"] == pytest.approx(1300)
+    assert caps["effective_applied_ceiling_T_C"] == pytest.approx(1200)
+    assert resolve_furnace_max_T_C("fused_silica", 1300) == pytest.approx(1200)
+    CampaignManager({"furnace_max_T_C": caps["effective_applied_ceiling_T_C"], "campaigns": {}})
+
+
 def test_resolver_defaults_to_material_max_when_no_request():
     assert resolve_furnace_max_T_C("dense_alumina_continuous") == 1700
+    assert resolve_furnace_max_T_C("fused_silica") == 1200
 
 
 def test_resolver_clamps_applied_ceiling_to_runtime_envelope_when_uncapped():
@@ -190,7 +205,7 @@ def test_resolver_fails_loud_for_unknown_material():
 
 def test_resolver_fails_loud_for_disabled_material():
     with pytest.raises(ValueError, match="not selectable yet"):
-        resolve_furnace_max_T_C("fused_silica", 1200)
+        resolve_furnace_max_T_C("sintered_regolith", 1200)
 
 
 def test_resolver_fails_loud_for_enabled_material_with_non_numeric_cap():

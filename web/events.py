@@ -1139,18 +1139,6 @@ def register_events(socketio):
         vapor_pressures = _load_yaml('vapor_pressures.yaml')
         materials = _load_yaml('materials.yaml')
         furnace_material_id = str(data.get('furnace_material_id') or '').strip()
-        if furnace_material_id:
-            try:
-                setpoints['furnace_max_T_C'] = resolve_furnace_max_T_C(
-                    furnace_material_id,
-                    requested_cap=setpoints.get('furnace_max_T_C'),
-                )
-            except ValueError as exc:
-                socketio.emit('simulation_status', {
-                    'status': 'error',
-                    'message': str(exc),
-                }, room=sid)
-                return
         if setpoints_patch:
             try:
                 setpoints = _deep_merge_setpoints(setpoints, setpoints_patch)
@@ -1162,6 +1150,18 @@ def register_events(socketio):
                 }, room=sid)
                 return
             except InputValidationError as exc:
+                socketio.emit('simulation_status', {
+                    'status': 'error',
+                    'message': str(exc),
+                }, room=sid)
+                return
+        if furnace_material_id:
+            try:
+                setpoints['furnace_max_T_C'] = resolve_furnace_max_T_C(
+                    furnace_material_id,
+                    requested_cap=setpoints.get('furnace_max_T_C'),
+                )
+            except ValueError as exc:
                 socketio.emit('simulation_status', {
                     'status': 'error',
                     'message': str(exc),

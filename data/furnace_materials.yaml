@@ -31,15 +31,15 @@ furnace_materials:
     enabled: true
     source_note: "plasma_sprayed_alumina continuous_C and max_operating_C are 1650 C for the cited high-purity alumina coating."
 
-  # Source: data/wall_materials.yaml:454-468, fused_silica service_temp.max_operating_C.
-  # Disabled until Chunk 3 changes the furnace_max_T_C validation floor; 1200 C is below the current [1300, 2000] floor.
+  # Source: data/wall_materials.yaml:454-468, fused_silica service_temp.max_operating_C;
+  # W:S1 = AdValue Technology "Fused Quartz Technical Information"
+  # (https://www.advaluetech.com/technical-clear-quartz-products), audited in wall-AUDIT.md.
   fused_silica:
     id: fused_silica
     display_name: "Fused silica / fused quartz"
     max_service_T_C: 1200
-    enabled: false
-    not_selectable_reason: "max service 1200 C is below the current furnace_max_T_C validation floor [1300, 2000]; enable with the Chunk 3 floor change"
-    source_note: "fused_silica max_operating_C is 1200 C; normal continuous_C is 1050 C and peak_C is 1250 C."
+    enabled: true
+    source_note: "AdValue W:S1 reports fused quartz normal continuous use at 1050 C, recommended max operating temperature at 1200 C, and non-continuous use at 1250 C; wall_materials.yaml stores 1200 C as fused_silica max_operating_C."
 
   # Provisional only; not grounded in data/wall_materials.yaml.
   sintered_regolith:

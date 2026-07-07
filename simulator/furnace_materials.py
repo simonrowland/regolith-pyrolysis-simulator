@@ -13,7 +13,7 @@ import yaml
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DEFAULT_FURNACE_MATERIALS_PATH = DATA_DIR / "furnace_materials.yaml"
-FURNACE_MAX_T_BOUNDS_C = (1300.0, 2000.0)
+FURNACE_MAX_T_BOUNDS_C = (1200.0, 2000.0)
 
 
 @lru_cache(maxsize=4)

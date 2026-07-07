@@ -973,7 +973,7 @@ def test_furnace_material_catalog_endpoint_returns_enabled_only():
     materials = response.get_json()["materials"]
     material_ids = {material["id"] for material in materials}
     assert "dense_alumina_continuous" in material_ids
-    assert "fused_silica" not in material_ids
+    assert "fused_silica" in material_ids
     for material in materials:
         assert set(material) == {
             "id",
@@ -992,6 +992,14 @@ def test_furnace_material_catalog_endpoint_returns_enabled_only():
     assert zirconia["service_rating_T_C"] == pytest.approx(2200)
     assert zirconia["requested_ceiling_T_C"] == pytest.approx(1800)
     assert zirconia["effective_applied_ceiling_T_C"] == pytest.approx(1800)
+    fused_silica = next(
+        material
+        for material in materials
+        if material["id"] == "fused_silica"
+    )
+    assert fused_silica["service_rating_T_C"] == pytest.approx(1200)
+    assert fused_silica["requested_ceiling_T_C"] == pytest.approx(1800)
+    assert fused_silica["effective_applied_ceiling_T_C"] == pytest.approx(1200)
 
 
 def test_c4_operator_presets_render_from_server_setpoints(monkeypatch):
@@ -1260,7 +1268,7 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
 @pytest.mark.parametrize(
     ("material_id", "message"),
     [
-        ("fused_silica", "not selectable"),
+        ("sintered_regolith", "not selectable"),
         ("unknown_material", "unknown furnace material"),
     ],
 )
@@ -1307,6 +1315,50 @@ def test_web_start_event_rejects_unselectable_furnace_material_before_session(
         assert message in statuses[-1]["message"]
         assert set(_simulations) == before
         assert backend_called is False
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch):
+    monkeypatch.setattr("web.events._get_backend", lambda _backend_name: StubBackend())
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+                "furnace_material_id": "fused_silica",
+                "setpoints_patch": {"furnace_max_T_C": 1300},
+            },
+        )
+        received = client.get_received()
+        statuses = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses
+        assert statuses[-1]["status"] == "started"
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        state, _ = _current_simulation_state(new_sids.pop())
+        assert state is not None
+        sim = state["session"].simulator
+        assert sim.campaign_mgr.furnace_max_T_C == pytest.approx(1200)
+        assert state["recipe_inputs"]["furnace_material_id"] == "fused_silica"
+        assert state["recipe_inputs"]["furnace_max_T_C"] == pytest.approx(1200)
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
