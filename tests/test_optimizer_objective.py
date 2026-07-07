@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+import simulator.optimize.objective as objective_module
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ObjectiveComputationError,
@@ -136,6 +137,93 @@ def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
         {},
         product_classes,
     ) == pytest.approx(7.0 / 3.0)
+
+
+def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 2.0)
+    sim = SimpleNamespace(
+        record=SimpleNamespace(
+            cost_rollup={
+                "run_input_cost": {
+                    "physical_cost": {
+                        "thermal_flux_h": 1234.0,
+                        "furnace_h": 6.0,
+                    },
+                    "owner_ratify_money_projection": 1294.0,
+                }
+            }
+        )
+    )
+    run_execution = SimpleNamespace(
+        simulator=sim,
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={
+                ("stage_0_to_stage_1", "SiO"): 0.20,
+                ("stage_0_to_stage_1", "Na"): 0.05,
+            }
+        ),
+    )
+    product_classes = {"metals_plus_O2": {"class_total_kg": 1.0}}
+
+    assert _metric_value(
+        "solar_thermal_flux_h",
+        sim,
+        {},
+        product_classes,
+        run_execution=run_execution,
+    ) == pytest.approx(1234.0)
+    assert _metric_value(
+        "furnace_time_h",
+        sim,
+        {},
+        product_classes,
+        run_execution=run_execution,
+    ) == pytest.approx(6.0)
+    assert _metric_value(
+        "throughput_cost_owner_ratify_usd",
+        sim,
+        {},
+        product_classes,
+        run_execution=run_execution,
+    ) == pytest.approx(1294.0)
+    assert _metric_value(
+        "furnace_lifespan_consumed_fraction",
+        sim,
+        {},
+        product_classes,
+        run_execution=run_execution,
+    ) == pytest.approx(0.125)
+
+
+def test_lifespan_cost_metric_is_not_costed_when_threshold_is_unavailable(monkeypatch) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: None)
+    sim = SimpleNamespace()
+    run_execution = SimpleNamespace(
+        simulator=sim,
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={
+                ("stage_0_to_stage_1", "SiO"): 0.20,
+                ("stage_0_to_stage_1", "Na"): 0.05,
+            }
+        ),
+    )
+    product_classes = {"metals_plus_O2": {"class_total_kg": 1.0}}
+
+    assert _metric_value(
+        "furnace_lifespan_consumed_fraction",
+        sim,
+        {},
+        product_classes,
+        run_execution=run_execution,
+    ) is None
+    summary = objective_module._furnace_lifespan_cost_summary(run_execution, sim)
+    assert summary["lifespan_cost_status"] == "threshold_unavailable"
+    assert summary["furnace_lifespan_consumed_fraction"] is None
+    assert summary["wall_deposit_total_kg"] == pytest.approx(0.25)
+    assert summary["wall_deposit_kg_by_species"] == {
+        "Na": pytest.approx(0.05),
+        "SiO": pytest.approx(0.20),
+    }
 
 
 def test_incomplete_objective_importance_evidence_raises_insufficient_evidence() -> None:

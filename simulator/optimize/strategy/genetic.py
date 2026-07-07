@@ -246,7 +246,11 @@ class OptunaNSGA2Strategy:
         for definition in self._objective_definitions:
             if definition.metric not in mapping:
                 raise ValueError(f"objective {definition.metric!r} is missing")
-            values.append(mapping[definition.metric])
+            value = mapping[definition.metric]
+            values.append(
+                _bad_objective_value(definition)
+                if value is None else value
+            )
         return tuple(values)
 
 

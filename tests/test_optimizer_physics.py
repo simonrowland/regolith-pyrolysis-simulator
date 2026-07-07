@@ -178,12 +178,13 @@ def test_delivered_stream_purity_zero_delivery_is_infeasible_not_nan() -> None:
 
 
 def test_clean_selective_recipe_trace_is_feasible_with_signed_margins() -> None:
+    constraints = PhysicsConstraintSet()
     trace = _trace(condensed=({(1, "Fe"): 5.0, (3, "SiO"): 20.0},))
 
-    result = PhysicsConstraintSet().evaluate(trace)
+    result = constraints.evaluate(trace)
 
     assert result.feasible
-    assert tuple(result.margins) == GATE_ORDER
+    assert tuple(result.margins) == constraints.active_gates
     assert not result.failing_gates
     for margin in result.margins.values():
         assert margin.feasible
@@ -191,7 +192,7 @@ def test_clean_selective_recipe_trace_is_feasible_with_signed_margins() -> None:
         assert margin.margin >= -margin.threshold.tolerance
 
 
-def test_all_five_gates_are_computed_from_physics_trace() -> None:
+def test_all_default_gates_are_computed_from_physics_trace() -> None:
     constraints = PhysicsConstraintSet(allowable_wall_deposit_kg={
         ("hot_wall", "SiO"): ThresholdSpec(
             id="allowable_wall_deposit_kg.hot_wall.SiO",
@@ -209,7 +210,7 @@ def test_all_five_gates_are_computed_from_physics_trace() -> None:
     result = constraints.evaluate(trace)
 
     assert result.feasible
-    assert set(result.margins) == set(GATE_ORDER)
+    assert set(result.margins) == set(constraints.active_gates)
     assert result.margins["coating"].observed == pytest.approx(20.0)
 
 
@@ -231,6 +232,26 @@ def test_profile_furnace_temperature_threshold_drives_gate() -> None:
     assert cool.feasible
     assert constraints.furnace_T_max_C.source == "profile"
     assert constraints.furnace_T_max_C.source_ref == "profiles/test.yaml:constraints.furnace_T_max_C"
+
+
+def test_profile_cycle_time_threshold_drives_optional_gate() -> None:
+    constraints = physics_constraints_from_profile(
+        {
+            "constraints": {
+                "gates": ["cycle_time"],
+                "cycle_time_max_h": 2.0,
+            }
+        },
+        source="profiles/test.yaml",
+    )
+
+    slow = constraints.evaluate(SimpleNamespace(snapshots=(SimpleNamespace(hour=2.1),)))
+    fast = constraints.evaluate(SimpleNamespace(snapshots=(SimpleNamespace(hour=1.9),)))
+
+    assert slow.failing_gates == ("cycle_time",)
+    assert fast.feasible
+    assert constraints.cycle_time_max_h.source == "profile"
+    assert constraints.cycle_time_max_h.source_ref == "profiles/test.yaml:constraints.cycle_time_max_h"
 
 
 def test_profile_gates_limit_active_physics_evaluation() -> None:
@@ -279,7 +300,7 @@ def test_thresholds_are_non_null_and_have_declared_provenance() -> None:
         assert threshold.source_ref
 
     rows = constraints.threshold_provenance_table()
-    assert {row[0] for row in rows} == set(GATE_ORDER)
+    assert {row[0] for row in rows} == set(constraints.active_gates)
     assert all(row[2] in allowed_sources for row in rows)
     hardcoded_defaults = (
         constraints.extraction_min_fraction,

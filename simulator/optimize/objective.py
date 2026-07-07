@@ -37,6 +37,13 @@ VALID_OBJECTIVE_SENSES = {"minimize", "maximize"}
 COMPOSITION_TARGET_TYPE = "composition_target"
 COMPOSITION_TARGET_METRIC_PREFIX = "composition_target:"
 SSO2_OWNER_RECIPE_ID = "sso2_pn2_fe_drain_silica"
+SOLAR_THERMAL_FLUX_METRICS = frozenset({"solar_thermal_flux_h", "thermal_flux_h"})
+FURNACE_TIME_METRICS = frozenset({"furnace_time_h", "furnace_h"})
+THROUGHPUT_OWNER_COST_METRICS = frozenset({"throughput_cost_owner_ratify_usd"})
+FURNACE_LIFESPAN_COST_METRICS = frozenset({
+    "furnace_lifespan_consumed_fraction",
+    "furnace_lifespan_cost_fraction",
+})
 SUPPORTED_COMPOSITION_POOLS = COMPOSITION_PRODUCT_POOLS
 COMPOSITION_VECTOR_SPECIES = frozenset({"Na", "K", "Fe", "Mg", "Si", "Al", "Ca", "O2"})
 COMPOSITION_VECTOR_ROLES = frozenset({"extract", "retain", "free", "to_window"})
@@ -205,7 +212,7 @@ class ObjectiveImportanceEvidence:
 class ObjectiveValue:
     metric: str
     sense: str
-    value: float
+    value: float | None
     units: str = ""
     ordinal: int = 0
 
@@ -213,11 +220,15 @@ class ObjectiveValue:
         if not self.metric:
             raise ObjectiveProfileError("objective metric is required")
         object.__setattr__(self, "sense", normalize_objective_sense(self.sense))
-        if not math.isfinite(float(self.value)):
+        if self.value is None:
+            numeric: float | None = None
+        else:
+            numeric = float(self.value)
+        if numeric is not None and not math.isfinite(numeric):
             raise ObjectiveComputationError(
                 f"objective {self.metric!r} produced non-finite value"
             )
-        object.__setattr__(self, "value", float(self.value))
+        object.__setattr__(self, "value", numeric)
         ordinal = int(self.ordinal)
         if ordinal < 0:
             raise ObjectiveProfileError("objective ordinal must be non-negative")
@@ -235,14 +246,14 @@ class ObjectiveVector:
             raise ObjectiveProfileError("objective metrics must be unique")
         object.__setattr__(self, "evidence", dict(self.evidence))
 
-    def as_mapping(self) -> Mapping[str, float]:
+    def as_mapping(self) -> Mapping[str, float | None]:
         return MappingProxyType({value.metric: value.value for value in self.values})
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
         return (type(self), (self.values, _thaw_value(self.evidence)))
 
 
-ObjectiveLike = ObjectiveVector | Mapping[str, float]
+ObjectiveLike = ObjectiveVector | Mapping[str, float | None]
 T = TypeVar("T")
 
 
@@ -1323,7 +1334,12 @@ def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> Object
                 sim,
                 product_ledger,
                 product_classes,
+                run_execution=run_execution,
             )
+            if definition.metric in FURNACE_LIFESPAN_COST_METRICS:
+                evidence[definition.metric] = _plain_payload(
+                    _furnace_lifespan_cost_summary(run_execution, sim)
+                )
         values.append(
             ObjectiveValue(
                 metric=definition.metric,
@@ -1698,6 +1714,7 @@ def _tap_coating_product_summary(
                 "wall_deposit_kg_by_zone_species": MappingProxyType({}),
                 "wall_deposit_remobilization_by_segment_species": MappingProxyType({}),
                 "campaigns_to_resinter": "infinite",
+                **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
                 **_coating_authority_summary(authority),
             }
         )
@@ -1736,6 +1753,7 @@ def _tap_coating_product_summary(
                 for segment, species_map in remobilization.items()
             }),
             "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
+            **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
             **_coating_authority_summary(authority),
         }
     )
@@ -3115,7 +3133,7 @@ def objective_scores(
     objectives: ObjectiveLike,
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[float, ...]:
-    """Render objective values as maximize-native scores in profile order."""
+    """Render available objective values as maximize-native scores in profile order."""
 
     mapping = _objective_mapping(objectives)
     scores: list[float] = []
@@ -3126,6 +3144,8 @@ def objective_scores(
             raise ObjectiveComputationError(
                 f"objective {definition.metric!r} is missing"
             ) from exc
+        if value is None:
+            continue
         numeric = _finite_float(value, definition.metric)
         scores.append(numeric if definition.sense == "maximize" else -numeric)
     return tuple(scores)
@@ -3278,6 +3298,7 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
             for segment, species_map in remobilization.items()
         }),
         "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
+        **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
         **_coating_authority_summary(authority),
     })
 
@@ -3594,6 +3615,19 @@ def _wall_deposit_by_segment_species_summary(
 def _campaigns_to_resinter(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
 ) -> float | str:
+    by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
+    if not by_species:
+        return "infinite"
+    total_wall_load_kg = sum(by_species.values())
+    threshold = _wall_resinter_threshold_kg()
+    if threshold is None:
+        return f"resinter_threshold_kg / {total_wall_load_kg:.12g}"
+    return threshold / total_wall_load_kg
+
+
+def _wall_deposit_by_species_summary(
+    wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+) -> Mapping[str, float]:
     by_species: dict[str, float] = {}
     for key, kg in wall_deposit_by_segment_species.items():
         if not isinstance(key, tuple) or len(key) != 2:
@@ -3604,13 +3638,7 @@ def _campaigns_to_resinter(
         amount = _finite_float(kg, f"wall_deposit[{key!r}]")
         if amount > 1e-12:
             by_species[species] = by_species.get(species, 0.0) + amount
-    if not by_species:
-        return "infinite"
-    total_wall_load_kg = sum(by_species.values())
-    threshold = _wall_resinter_threshold_kg()
-    if threshold is None:
-        return f"resinter_threshold_kg / {total_wall_load_kg:.12g}"
-    return threshold / total_wall_load_kg
+    return MappingProxyType(dict(sorted(by_species.items())))
 
 
 def _wall_resinter_threshold_kg() -> float | None:
@@ -3634,6 +3662,59 @@ def _wall_resinter_threshold_kg() -> float | None:
     return _finite_float(threshold, "resinter_threshold_kg")
 
 
+def _furnace_lifespan_cost_summary(
+    run_execution: Any | None,
+    sim: Any,
+) -> Mapping[str, Any]:
+    raw = _wall_deposit_metric_raw(run_execution, sim)
+    return _furnace_lifespan_cost_summary_from_raw(raw)
+
+
+def _furnace_lifespan_cost_summary_from_raw(
+    wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+) -> Mapping[str, Any]:
+    by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
+    total_wall_load_kg = sum(by_species.values())
+    threshold = _wall_resinter_threshold_kg()
+    summary: dict[str, Any] = {
+        "furnace_lifespan_consumed_fraction": None,
+        "lifespan_cost_status": "threshold_unavailable",
+        "lifespan_cost_status_reason": (
+            "resinter_threshold_kg is null; furnace lifespan cost is not priced"
+        ),
+        "resinter_threshold_kg": threshold,
+        "wall_deposit_total_kg": total_wall_load_kg,
+        "wall_deposit_kg_by_species": by_species,
+    }
+    if threshold is None:
+        return MappingProxyType(summary)
+    if threshold <= 0.0:
+        raise ObjectiveComputationError("resinter_threshold_kg must be positive")
+    summary["furnace_lifespan_consumed_fraction"] = total_wall_load_kg / threshold
+    summary["lifespan_cost_status"] = "available"
+    summary["lifespan_cost_status_reason"] = ""
+    return MappingProxyType(summary)
+
+
+def _wall_deposit_metric_raw(
+    run_execution: Any | None,
+    sim: Any,
+) -> Mapping[tuple[str, str], float]:
+    trace = getattr(run_execution, "trace", None) if run_execution is not None else None
+    raw = getattr(trace, "wall_deposit_by_segment_species_kg", None)
+    if raw is None:
+        raw = getattr(sim, "wall_deposit_by_segment_species_kg", None)
+    if raw is None:
+        raise ObjectiveComputationError(
+            "wall_deposit_by_segment_species_kg trace is missing"
+        )
+    if not isinstance(raw, Mapping):
+        raise ObjectiveComputationError(
+            "wall_deposit_by_segment_species_kg trace is not a mapping"
+        )
+    return raw
+
+
 def product_classes_summary(sim: Any, profile: Mapping[str, Any]) -> Mapping[str, Any]:
     return MappingProxyType(
         classify_products(
@@ -3648,7 +3729,9 @@ def _metric_value(
     sim: Any,
     product_ledger: Mapping[str, float],
     product_classes: Mapping[str, Any],
-) -> float:
+    *,
+    run_execution: Any | None = None,
+) -> float | None:
     if metric == "pure_silica_glass_kg":
         return _nested_float(product_classes, ("pure_silica_glass", "class_total_kg"))
     if metric == "metals_plus_o2_kg":
@@ -3683,6 +3766,14 @@ def _metric_value(
         return _energy_component_value(sim, energy_per_product_component) / product_kg
     if metric in {"duration_h", "total_hours"}:
         return _duration_hours(sim)
+    if metric in SOLAR_THERMAL_FLUX_METRICS:
+        return _cost_rollup_physical_metric(sim, "thermal_flux_h", metric)
+    if metric in FURNACE_TIME_METRICS:
+        return _cost_rollup_physical_metric(sim, "furnace_h", metric)
+    if metric in THROUGHPUT_OWNER_COST_METRICS:
+        return _cost_rollup_run_input_money(sim, metric)
+    if metric in FURNACE_LIFESPAN_COST_METRICS:
+        return _furnace_lifespan_consumed_fraction(run_execution, sim)
     if metric.endswith("_kg"):
         species = metric[:-3]
         if species in product_ledger:
@@ -3692,7 +3783,7 @@ def _metric_value(
     )
 
 
-def _objective_mapping(objectives: ObjectiveLike) -> Mapping[str, float]:
+def _objective_mapping(objectives: ObjectiveLike) -> Mapping[str, float | None]:
     if isinstance(objectives, ObjectiveVector):
         return objectives.as_mapping()
     if isinstance(objectives, Mapping):
@@ -3717,6 +3808,53 @@ def _product_ledger(sim: Any) -> Mapping[str, float]:
         str(species): _finite_float(kg, f"product_ledger[{species!r}]")
         for species, kg in raw.items()
     })
+
+
+def _cost_rollup_physical_metric(sim: Any, field: str, metric: str) -> float:
+    physical_cost = _cost_rollup_run_input_physical_cost(sim)
+    if field not in physical_cost:
+        raise ObjectiveComputationError(f"cost_rollup physical_cost missing {field!r}")
+    return _finite_float(physical_cost[field], metric)
+
+
+def _cost_rollup_run_input_money(sim: Any, metric: str) -> float:
+    run_input = _cost_rollup_run_input(sim)
+    if "owner_ratify_money_projection" not in run_input:
+        raise ObjectiveComputationError(
+            "cost_rollup run_input_cost missing owner_ratify_money_projection"
+        )
+    return _finite_float(run_input["owner_ratify_money_projection"], metric)
+
+
+def _cost_rollup_run_input_physical_cost(sim: Any) -> Mapping[str, Any]:
+    run_input = _cost_rollup_run_input(sim)
+    physical_cost = run_input.get("physical_cost")
+    if not isinstance(physical_cost, Mapping):
+        raise ObjectiveComputationError(
+            "cost_rollup run_input_cost.physical_cost is missing"
+        )
+    return physical_cost
+
+
+def _cost_rollup_run_input(sim: Any) -> Mapping[str, Any]:
+    cost_rollup = getattr(sim, "cost_rollup", _MISSING)
+    if cost_rollup is _MISSING:
+        cost_rollup = getattr(getattr(sim, "record", None), "cost_rollup", _MISSING)
+    if not isinstance(cost_rollup, Mapping):
+        raise ObjectiveComputationError("cost_rollup is missing")
+    run_input = cost_rollup.get("run_input_cost")
+    if not isinstance(run_input, Mapping):
+        raise ObjectiveComputationError("cost_rollup run_input_cost is missing")
+    return run_input
+
+
+def _furnace_lifespan_consumed_fraction(
+    run_execution: Any | None,
+    sim: Any,
+) -> float | None:
+    summary = _furnace_lifespan_cost_summary(run_execution, sim)
+    value = summary["furnace_lifespan_consumed_fraction"]
+    return None if value is None else _finite_float(value, "furnace_lifespan_consumed_fraction")
 
 
 def _nested_float(root: Mapping[str, Any], path: tuple[str, ...]) -> float:

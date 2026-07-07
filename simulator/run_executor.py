@@ -9,6 +9,7 @@ from typing import Any, Mapping
 
 from simulator.backends import requires_stage0_subprocess
 from simulator.condensation import KnudsenRegimeRefusal
+from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.core import BACKEND_FALLBACK_EXCEPTIONS, PyrolysisSimulator
 from simulator.session import (
     DecisionPolicy,
@@ -117,6 +118,11 @@ class RunExecutor:
             error_message = f"{type(exc).__name__}: {exc}"
 
         shadow_trace = _collect_shadow_trace(sim, operator_decisions)
+        sim.record.cost_rollup = build_cost_rollup_diagnostic(
+            cost_ledger=sim.cost_ledger,
+            per_hour=tuple(per_hour),
+            products_kg=sim.product_ledger(),
+        )
         trace = PhysicsTrace.from_simulator(sim)
         snapshots = tuple(getattr(sim.record, "snapshots", ()))
         reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)

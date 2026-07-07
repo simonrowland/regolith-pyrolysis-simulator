@@ -15,6 +15,7 @@ from simulator.optimize.physics import GATE_ORDER
 from simulator.optimize.sso2_evidence import SSO2_OWNER_RECIPE_ID
 from simulator.backends import CACHE_TIER_CEILINGS
 from simulator.optimize.profiles import (
+    constrained_max_profile,
     KNOWN_OBJECTIVE_METRICS,
     ProfileValidationError,
     physics_constraints_from_profile,
@@ -105,6 +106,29 @@ def test_profile_pinned_paths_rejects_invalid_entries() -> None:
 
     with pytest.raises(ProfileValidationError, match="pinned_paths\\[1\\]"):
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_constrained_max_profile_costs_coating_and_applies_hardware_caps() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+
+    overlaid = constrained_max_profile(
+        profile,
+        furnace_T_max_C=1300.0,
+        cycle_time_max_h=12.0,
+    )
+    validated = validate_profile(overlaid, expected_feedstock="lunar_mare_low_ti")
+    constraints = physics_constraints_from_profile(validated)
+    metrics = [objective["metric"] for objective in validated["objectives"]]
+
+    assert "coating" not in validated["constraints"]["gates"]
+    assert "furnace_temperature" in validated["constraints"]["gates"]
+    assert "cycle_time" in validated["constraints"]["gates"]
+    assert validated["constraints"]["furnace_T_max_C"] == pytest.approx(1300.0)
+    assert validated["constraints"]["cycle_time_max_h"] == pytest.approx(12.0)
+    assert "solar_thermal_flux_h" in metrics
+    assert "furnace_lifespan_consumed_fraction" in metrics
+    assert constraints.furnace_T_max_C.value == pytest.approx(1300.0)
+    assert constraints.cycle_time_max_h.value == pytest.approx(12.0)
 
 
 def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
@@ -248,6 +272,15 @@ def test_constraint_threshold_overrides_validate_types() -> None:
     profile["constraints"]["furnace_T_max_C"] = "1300"
 
     with pytest.raises(ProfileValidationError, match="constraints.furnace_T_max_C must be numeric"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+@pytest.mark.parametrize("cap_C", [1299.0, 2001.0])
+def test_furnace_temperature_cap_must_be_inside_hardware_envelope(cap_C: float) -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["constraints"]["furnace_T_max_C"] = cap_C
+
+    with pytest.raises(ProfileValidationError, match="hardware envelope"):
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 

@@ -2483,6 +2483,123 @@ def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> 
     ]
 
 
+def test_cli_constrained_max_overlay_forwards_hardware_caps(tmp_path, monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_run(**kwargs: Any) -> SimpleNamespace:
+        captured.update(kwargs)
+        return SimpleNamespace(
+            out_dir=kwargs["out_dir"],
+            winner=SimpleNamespace(candidate_id="winner"),
+        )
+
+    monkeypatch.setattr(optimizer_cli, "run", fake_run)
+
+    result = optimizer_cli.main(
+        [
+            "--feedstock",
+            FEEDSTOCK,
+            "--profile",
+            "default",
+            "--strategy",
+            "random",
+            "--fidelity",
+            "stub",
+            "--budget",
+            "1",
+            "--out",
+            str(tmp_path),
+            "--constrained-max",
+            "--furnace-temp-cap-C",
+            "1300",
+            "--cycle-time-cap-h",
+            "12",
+        ]
+    )
+
+    assert result == 0
+    profile = captured["profile"]
+    metrics = {objective["metric"] for objective in profile["objectives"]}
+    assert profile["profile_id"].endswith("-constrained-max")
+    assert "coating" not in profile["constraints"]["gates"]
+    assert "furnace_temperature" in profile["constraints"]["gates"]
+    assert "cycle_time" in profile["constraints"]["gates"]
+    assert profile["constraints"]["furnace_T_max_C"] == pytest.approx(1300.0)
+    assert profile["constraints"]["cycle_time_max_h"] == pytest.approx(12.0)
+    assert "solar_thermal_flux_h" in metrics
+    assert "furnace_lifespan_consumed_fraction" in metrics
+
+
+@pytest.mark.parametrize(
+    ("extra_args", "message"),
+    [
+        (["--constrained-max"], "--constrained-max requires at least one hardware cap"),
+        (["--furnace-temp-cap-C", "1300"], "require --constrained-max"),
+        (["--cycle-time-cap-h", "12"], "require --constrained-max"),
+    ],
+)
+def test_cli_rejects_incoherent_constrained_max_args(
+    tmp_path,
+    capsys,
+    extra_args: list[str],
+    message: str,
+) -> None:
+    with pytest.raises(SystemExit) as exc:
+        optimizer_cli.main(
+            [
+                "--feedstock",
+                FEEDSTOCK,
+                "--profile",
+                "default",
+                "--strategy",
+                "random",
+                "--fidelity",
+                "stub",
+                "--budget",
+                "1",
+                "--out",
+                str(tmp_path),
+                *extra_args,
+            ]
+        )
+
+    assert exc.value.code == 2
+    assert message in capsys.readouterr().err
+
+
+def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> None:
+    out_dir = tmp_path / "constrained-max"
+
+    result = optimizer_cli.main(
+        [
+            "--feedstock",
+            FEEDSTOCK,
+            "--profile",
+            "default",
+            "--strategy",
+            "random",
+            "--fidelity",
+            "stub",
+            "--budget",
+            "1",
+            "--out",
+            str(out_dir),
+            "--constrained-max",
+            "--furnace-temp-cap-C",
+            "1300",
+        ]
+    )
+
+    assert result == 0
+    leaderboard_path = out_dir / "leaderboard.csv"
+    assert leaderboard_path.exists()
+    rows = list(csv.DictReader(leaderboard_path.open()))
+    assert rows
+    assert "furnace_lifespan_consumed_fraction" in rows[0]
+    assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
+    assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
+
+
 def test_cli_writes_failure_job_status_marker_for_no_feasible(
     tmp_path,
     monkeypatch,

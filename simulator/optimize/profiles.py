@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import replace
@@ -14,6 +15,7 @@ import yaml
 from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.feedstock_guard import is_blocked_feedstock
+from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.optimize.objective import (
     COMPOSITION_TARGET_METRIC_PREFIX,
     COMPOSITION_TARGET_TYPE,
@@ -57,8 +59,36 @@ KNOWN_OBJECTIVE_METRICS = frozenset(
         "energy_electrical_plus_evaporation_kWh",
         "duration_h",
         "total_hours",
+        "solar_thermal_flux_h",
+        "thermal_flux_h",
+        "furnace_time_h",
+        "furnace_h",
+        "throughput_cost_owner_ratify_usd",
+        "furnace_lifespan_consumed_fraction",
+        "furnace_lifespan_cost_fraction",
         SSO2_OWNER_RECIPE_ID,
     }
+)
+CONSTRAINED_MAX_THROUGHPUT_OBJECTIVES: tuple[Mapping[str, Any], ...] = (
+    MappingProxyType({
+        "metric": "solar_thermal_flux_h",
+        "sense": "minimize",
+        "units": "K*h",
+        "weight": 0.2,
+        "rationale": (
+            "SSO-3 throughput cost: solar concentrator temperature-time burden"
+        ),
+    }),
+    MappingProxyType({
+        "metric": "furnace_lifespan_consumed_fraction",
+        "sense": "minimize",
+        "units": "fraction/run",
+        "weight": 0.2,
+        "rationale": (
+            "SSO-3 throughput cost: continuous wall-deposition rate consumes "
+            "furnace service life without hard-blocking the run"
+        ),
+    }),
 )
 
 _TOP_LEVEL_KEYS = frozenset(
@@ -90,6 +120,7 @@ _THRESHOLD_CONSTRAINT_KEYS = MappingProxyType({
     "extraction_min_fraction": "extraction_min_fraction",
     "knudsen_max": "knudsen_max",
     "furnace_T_max_C": "furnace_T_max_C",
+    "cycle_time_max_h": "cycle_time_max_h",
 })
 _CONSTRAINT_KEYS = frozenset({
     "gates",
@@ -283,6 +314,66 @@ def validate_profile(
     return ValidatedProfile(profile, source=source)
 
 
+def constrained_max_profile(
+    profile: Mapping[str, Any],
+    *,
+    furnace_T_max_C: float | None = None,
+    cycle_time_max_h: float | None = None,
+    include_throughput_cost: bool = True,
+) -> Mapping[str, Any]:
+    """Return a profile overlay for yield under explicit hardware ceilings."""
+
+    overlaid = copy.deepcopy(dict(profile))
+    profile_id = str(overlaid.get("profile_id") or overlaid.get("id") or "profile")
+    if not profile_id.endswith("-constrained-max"):
+        overlaid["profile_id"] = f"{profile_id}-constrained-max"
+
+    constraints = dict(overlaid.get("constraints", {}) or {})
+    gates = [str(gate) for gate in constraints.get("gates", [])]
+    gates = [gate for gate in gates if gate != "coating"]
+    if furnace_T_max_C is not None:
+        constraints["furnace_T_max_C"] = float(furnace_T_max_C)
+        if "furnace_temperature" not in gates:
+            gates.append("furnace_temperature")
+    if cycle_time_max_h is not None:
+        constraints["cycle_time_max_h"] = float(cycle_time_max_h)
+        if "cycle_time" not in gates:
+            gates.append("cycle_time")
+    constraints["gates"] = gates
+    overlaid["constraints"] = constraints
+
+    objectives = [
+        _coating_target_as_cost_objective(objective)
+        for objective in overlaid.get("objectives", [])
+    ]
+    if include_throughput_cost:
+        seen = {
+            str(objective.get("metric"))
+            for objective in objectives
+            if isinstance(objective, Mapping)
+        }
+        for objective in CONSTRAINED_MAX_THROUGHPUT_OBJECTIVES:
+            if str(objective["metric"]) not in seen:
+                objectives.append(dict(objective))
+                seen.add(str(objective["metric"]))
+    overlaid["objectives"] = objectives
+    return MappingProxyType(overlaid)
+
+
+def _coating_target_as_cost_objective(objective: Any) -> Any:
+    if not isinstance(objective, Mapping):
+        return objective
+    normalized = copy.deepcopy(dict(objective))
+    if objective_type(normalized) != COMPOSITION_TARGET_TYPE:
+        return normalized
+    target = normalized.get("target")
+    if isinstance(target, Mapping):
+        target_copy = copy.deepcopy(dict(target))
+        target_copy["require_coating_gate"] = False
+        normalized["target"] = target_copy
+    return normalized
+
+
 def physics_constraints_from_profile(
     profile: Mapping[str, Any],
     *,
@@ -420,6 +511,12 @@ def _validate_constraints(raw: Any, *, source: str | Path) -> None:
         if key not in raw:
             continue
         _validate_constraint_threshold(raw[key], source=source, where=f"constraints.{key}")
+    if "furnace_T_max_C" in raw:
+        _validate_furnace_temperature_cap(
+            raw["furnace_T_max_C"],
+            source=source,
+            where="constraints.furnace_T_max_C",
+        )
     for key in ("stream_purity_min", "extraction_min_fraction"):
         if key in raw:
             value = float(raw[key])
@@ -493,6 +590,21 @@ def _validate_constraint_threshold(raw: Any, *, source: str | Path, where: str) 
     value = float(raw)
     if not math.isfinite(value) or value <= 0.0:
         raise ProfileValidationError(f"{source}: {where} must be positive finite")
+
+
+def _validate_furnace_temperature_cap(
+    raw: Any,
+    *,
+    source: str | Path,
+    where: str,
+) -> None:
+    value = float(raw)
+    low, high = FURNACE_MAX_T_BOUNDS_C
+    if value < low or value > high:
+        raise ProfileValidationError(
+            f"{source}: {where} must be within hardware envelope "
+            f"[{low:.0f}, {high:.0f}] degC"
+        )
 
 
 def _validate_target_species(raw: Any, *, source: str | Path) -> None:

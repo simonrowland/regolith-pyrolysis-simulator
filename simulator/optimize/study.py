@@ -108,6 +108,11 @@ _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
         "coating_authoritative",
         "coating_output_status",
         "coating_status_reason",
+        "lifespan_cost_status",
+        "lifespan_cost_status_reason",
+        "furnace_lifespan_consumed_fraction",
+        "wall_deposit_total_kg",
+        "wall_deposit_kg_by_species",
         "wall_deposit_sticking_authority",
     }
 )
@@ -120,6 +125,11 @@ _COATING_LEADERBOARD_FIELDS: Mapping[str, str] = MappingProxyType(
         "coating_authoritative": "coating_authoritative",
         "coating_output_status": "coating_output_status",
         "coating_status_reason": "coating_status_reason",
+        "lifespan_cost_status": "lifespan_cost_status",
+        "lifespan_cost_status_reason": "lifespan_cost_status_reason",
+        "furnace_lifespan_consumed_fraction": "furnace_lifespan_consumed_fraction",
+        "wall_deposit_total_kg": "wall_deposit_total_kg",
+        "wall_deposit_kg_by_species": "wall_deposit_kg_by_species_json",
     }
 )
 DEFAULT_PROFILE_NAME = "default"
@@ -250,7 +260,7 @@ class StudyRecord:
     patch: RecipePatch
     feasible: bool
     status: str
-    objectives: Mapping[str, float]
+    objectives: Mapping[str, float | None]
     feasibility_margins: Mapping[str, Mapping[str, Any]]
     cache_key: str | None = None
     failure_category: str | None = None
@@ -845,6 +855,10 @@ def _primary_objective_metric(definitions: Sequence[ObjectiveDefinition]) -> str
 def _objective_value(record: StudyRecord, metric: str) -> float:
     if metric not in record.objectives:
         raise StudyError(f"record {record.candidate_id!r} missing objective {metric!r}")
+    if record.objectives[metric] is None:
+        raise StudyError(
+            f"record {record.candidate_id!r} objective {metric!r} is not costed"
+        )
     return float(record.objectives[metric])
 
 
@@ -1936,11 +1950,14 @@ def _to_record(candidate: Candidate, scored: ScoredResult, *, cache_hit: bool) -
     )
 
 
-def _objective_mapping(objectives: ObjectiveVector | None) -> Mapping[str, float]:
+def _objective_mapping(objectives: ObjectiveVector | None) -> Mapping[str, float | None]:
     if objectives is None:
         return MappingProxyType({})
     mapping = objectives.as_mapping()
-    return MappingProxyType({str(key): _finite(value, str(key)) for key, value in mapping.items()})
+    return MappingProxyType({
+        str(key): None if value is None else _finite(value, str(key))
+        for key, value in mapping.items()
+    })
 
 
 def _margin_mapping(margins: Mapping[str, Any]) -> Mapping[str, Mapping[str, Any]]:
@@ -2134,11 +2151,19 @@ def _coating_leaderboard_row(
         row["wall_deposit_kg_by_zone_species_json"] = _json_dump_value(
             summary.get("wall_deposit_kg_by_zone_species", {})
         )
+    if "wall_deposit_kg_by_species_json" in fields:
+        row["wall_deposit_kg_by_species_json"] = _json_dump_value(
+            summary.get("wall_deposit_kg_by_species", {})
+        )
     for key in (
         "coating_status",
         "coating_authoritative",
         "coating_output_status",
         "coating_status_reason",
+        "lifespan_cost_status",
+        "lifespan_cost_status_reason",
+        "furnace_lifespan_consumed_fraction",
+        "wall_deposit_total_kg",
     ):
         if key in fields:
             row[key] = summary.get(key, "")
@@ -2589,7 +2614,14 @@ def _write_leaderboard(
                     _materialized_record_patch(record, schema, profile)
                 ),
             }
-            row.update({definition.metric: record.objectives[definition.metric] for definition in definitions})
+            row.update({
+                definition.metric: (
+                    ""
+                    if record.objectives.get(definition.metric) is None
+                    else record.objectives[definition.metric]
+                )
+                for definition in definitions
+            })
             row.update(
                 {
                     f"margin_{name}": record.feasibility_margins[name]["margin"]

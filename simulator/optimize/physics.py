@@ -43,13 +43,14 @@ SourceKind = Literal[
 # so pre-S2c cached feasibility verdicts must not be served under the same
 # physics_constraints_digest.
 PHYSICS_GATE_VERSION = "physics-feasibility-v3-provenance-completeness"
-GATE_ORDER: tuple[str, ...] = (
+DEFAULT_ACTIVE_GATES: tuple[str, ...] = (
     "delivered_stream_purity",
     "coating",
     "extraction_completeness",
     "knudsen_viscous",
     "furnace_temperature",
 )
+GATE_ORDER: tuple[str, ...] = (*DEFAULT_ACTIVE_GATES, "cycle_time")
 E1B_TARGET_SPECIES: tuple[str, ...] = ("Na", "K", "Fe", "Mg", "SiO")
 E1B_TARGET_YIELD_GATE_FRACTION = 0.95
 TARGET_SPECIES_YIELD_CONSUMERS: tuple[str, ...] = (
@@ -166,8 +167,15 @@ class PhysicsConstraintSet:
         source="code_default",
         source_ref="simulator.optimize.physics.PhysicsConstraintSet.furnace_T_max_C",
     ))
+    cycle_time_max_h: ThresholdSpec = field(default_factory=lambda: ThresholdSpec(
+        id="cycle_time_max_h",
+        value=1.0e12,
+        units="h",
+        source="code_default",
+        source_ref="simulator.optimize.physics.PhysicsConstraintSet.cycle_time_max_h",
+    ))
     target_species: tuple[str, ...] = ("SiO",)
-    active_gates: tuple[str, ...] = GATE_ORDER
+    active_gates: tuple[str, ...] = DEFAULT_ACTIVE_GATES
     residual_species_by_target: Mapping[str, tuple[str, ...]] = field(
         default_factory=lambda: DEFAULT_RESIDUAL_SPECIES_BY_TARGET
     )
@@ -185,6 +193,7 @@ class PhysicsConstraintSet:
             ),
             "knudsen_max": self.knudsen_max,
             "furnace_T_max_C": self.furnace_T_max_C,
+            "cycle_time_max_h": self.cycle_time_max_h,
             "target_species": self.target_species,
             "active_gates": self.active_gates,
             "residual_species_by_target": dict(self.residual_species_by_target),
@@ -255,7 +264,7 @@ class PhysicsConstraintSet:
 
     @property
     def thresholds(self) -> tuple[ThresholdSpec, ...]:
-        return (
+        thresholds = [
             self.stream_purity_min,
             self.coating_min_campaigns_to_resinter,
             self.extraction_min_fraction,
@@ -263,7 +272,10 @@ class PhysicsConstraintSet:
             self.knudsen_max,
             self.furnace_T_max_C,
             *tuple(self.allowable_wall_deposit_kg.values()),
-        )
+        ]
+        if "cycle_time" in self.active_gates:
+            thresholds.append(self.cycle_time_max_h)
+        return tuple(thresholds)
 
     def threshold_provenance_table(self) -> tuple[tuple[str, str, str], ...]:
         rows = [
@@ -296,6 +308,12 @@ class PhysicsConstraintSet:
                 self.furnace_T_max_C.source,
             ),
         ]
+        if "cycle_time" in self.active_gates:
+            rows.append((
+                "cycle_time",
+                f"{self.cycle_time_max_h.id}={self.cycle_time_max_h.value:g}",
+                self.cycle_time_max_h.source,
+            ))
         for species, threshold in sorted(self.extraction_min_fraction_by_species.items()):
             rows.append((
                 "extraction_completeness",
@@ -320,6 +338,7 @@ class PhysicsConstraintSet:
             "extraction_completeness": self.extraction_completeness,
             "knudsen_viscous": self.knudsen_viscous,
             "furnace_temperature": self.furnace_temperature,
+            "cycle_time": self.cycle_time,
         }
         margins = {
             gate: evaluators[gate](trace)
@@ -676,6 +695,32 @@ class PhysicsConstraintSet:
             )
         except (KeyError, TypeError, ValueError) as exc:
             return _fail_closed("furnace_temperature", self.furnace_T_max_C, str(exc))
+
+    def cycle_time(self, trace: Any) -> GateMargin:
+        try:
+            snapshots = _required_sequence(trace, "snapshots")
+            if not snapshots:
+                return _fail_closed(
+                    "cycle_time",
+                    self.cycle_time_max_h,
+                    "trace has no snapshots",
+                )
+            max_hour = -math.inf
+            max_index = -1
+            for index, snapshot in enumerate(snapshots):
+                hour = _finite_number(getattr(snapshot, "hour", None), "hour")
+                if hour > max_hour:
+                    max_hour = hour
+                    max_index = index
+            return _margin(
+                "cycle_time",
+                self.cycle_time_max_h.value - max_hour,
+                self.cycle_time_max_h,
+                max_hour,
+                f"snapshot {max_index} hour={max_hour:.6g}",
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            return _fail_closed("cycle_time", self.cycle_time_max_h, str(exc))
 
 
 def _extraction_completeness_fail_closed_detail(

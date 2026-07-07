@@ -1125,7 +1125,11 @@ def _deserialize_objectives(payload: Sequence[Mapping[str, Any]]) -> ObjectiveVe
             ObjectiveValue(
                 metric=str(item["metric"]),
                 sense=_objective_payload_sense(item),
-                value=float(item["value"]),
+                value=(
+                    None
+                    if item.get("value") is None
+                    else float(item["value"])
+                ),
                 units=str(item.get("units", "")),
                 ordinal=int(item.get("ordinal", ordinal)),
             )

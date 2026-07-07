@@ -243,7 +243,11 @@ class OptunaTPEStrategy:
         for definition in self._objective_definitions:
             if definition.metric not in mapping:
                 raise ValueError(f"objective {definition.metric!r} is missing")
-            values.append(mapping[definition.metric])
+            value = mapping[definition.metric]
+            values.append(
+                _bad_objective_value(definition)
+                if value is None else value
+            )
         return tuple(values)
 
 
@@ -294,7 +298,7 @@ def _log_scale(spec: KnobSpec) -> bool:
     return bool(getattr(spec, "log", False) or getattr(spec, "log_scale", False))
 
 
-def _objective_mapping(scored: "ScoredResult") -> Mapping[str, float]:
+def _objective_mapping(scored: "ScoredResult") -> Mapping[str, float | None]:
     objectives = getattr(scored, "objectives", None)
     if objectives is None:
         raise ValueError("feasible result requires objectives")
@@ -305,9 +309,12 @@ def _objective_mapping(scored: "ScoredResult") -> Mapping[str, float]:
         raw = as_mapping()
     except Exception as exc:
         raise ValueError("objective mapping accessor failed") from exc
-    mapping: dict[str, float] = {}
+    mapping: dict[str, float | None] = {}
     for metric, value in raw.items():
         metric_name = str(metric)
+        if value is None:
+            mapping[metric_name] = None
+            continue
         try:
             numeric_value = float(value)
         except (TypeError, ValueError) as exc:

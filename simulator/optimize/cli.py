@@ -9,7 +9,11 @@ from pathlib import Path
 import sys
 from typing import Sequence
 
-from simulator.optimize.profiles import ProfileValidationError, load_profile
+from simulator.optimize.profiles import (
+    ProfileValidationError,
+    constrained_max_profile,
+    load_profile,
+)
 from simulator.optimize.study import (
     DEFAULT_EVAL_TIMEOUT_SECONDS,
     DEFAULT_PROFILE_NAME,
@@ -17,6 +21,7 @@ from simulator.optimize.study import (
     STRATEGY_CLASS_NAMES,
     VALID_FIDELITIES,
     StudyError,
+    resolve_profile,
     run,
     run_certify,
 )
@@ -28,8 +33,20 @@ JOB_STATUS_NAME = "job_status.json"
 def main(argv: Sequence[str] | None = None) -> int:
     parser = _parser()
     args = parser.parse_args(argv)
+    _validate_constrained_max_args(args, parser)
     try:
         profile = _resolve_profile_arg(args.profile, parser)
+        if _has_constrained_max_overlay(args):
+            profile = constrained_max_profile(
+                (
+                    resolve_profile(profile, expected_feedstock=args.feedstock)
+                    if isinstance(profile, str)
+                    else profile
+                ),
+                furnace_T_max_C=args.furnace_temp_cap_C,
+                cycle_time_max_h=args.cycle_time_cap_h,
+                include_throughput_cost=True,
+            )
         if not args.certify and args.strategy is None:
             parser.error("--strategy is required unless --certify is set")
         if args.certify:
@@ -128,6 +145,26 @@ def _parser() -> argparse.ArgumentParser:
         help="freeze an optimizer knob at its loaded default; repeatable",
     )
     parser.add_argument(
+        "--constrained-max",
+        action="store_true",
+        help=(
+            "optimize yield under hardware ceilings; wall coating becomes "
+            "furnace-lifespan cost, not a hard gate"
+        ),
+    )
+    parser.add_argument(
+        "--furnace-temp-cap-C",
+        type=_positive_float,
+        default=None,
+        help="activate furnace_temperature gate with this maximum degC",
+    )
+    parser.add_argument(
+        "--cycle-time-cap-h",
+        type=_positive_float,
+        default=None,
+        help="activate cycle_time gate with this maximum run hour",
+    )
+    parser.add_argument(
         "--two-phase-certify",
         action="store_true",
         help="run coarse explore then exact-certify top-K (opt-in)",
@@ -170,6 +207,34 @@ def _resolve_profile_arg(profile: str, parser: argparse.ArgumentParser):
                 f"error: argument --profile: invalid choice: {profile!r}\n",
             )
         raise exc
+
+
+def _has_constrained_max_overlay(args: argparse.Namespace) -> bool:
+    return (
+        bool(args.constrained_max)
+        or args.furnace_temp_cap_C is not None
+        or args.cycle_time_cap_h is not None
+    )
+
+
+def _validate_constrained_max_args(
+    args: argparse.Namespace,
+    parser: argparse.ArgumentParser,
+) -> None:
+    cap_names = []
+    if args.furnace_temp_cap_C is not None:
+        cap_names.append("--furnace-temp-cap-C")
+    if args.cycle_time_cap_h is not None:
+        cap_names.append("--cycle-time-cap-h")
+    if args.constrained_max:
+        if not cap_names:
+            parser.error(
+                "--constrained-max requires at least one hardware cap "
+                "(--furnace-temp-cap-C or --cycle-time-cap-h)"
+            )
+        return
+    if cap_names:
+        parser.error(f"{', '.join(cap_names)} require --constrained-max")
 
 
 def _write_job_status(
