@@ -30,7 +30,10 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # 2026-07-06 CF-3: constant single-cation gamma*X alkali activity lowers
 # Na/K vapor, shifting the coupled SiO wall trace while mass balance remains
 # closed.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00045375238289485886
+# 2026-07-07 t-141 L&H K standard-term regen: reactive SiO wall deposit
+# shifts -1.3605e-7 kg via the K-coupled headspace path (delta matches
+# docs-private/research/2026-07-07-t141-kmox/golden-deltas.json).
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00045361633105156225
 
 
 def _run_script(lines: list[str]):

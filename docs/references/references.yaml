@@ -795,17 +795,23 @@ references:
     pull_quotes: []
   REF-052:
     authors: "Lamoreaux, R.H. & Hildenbrand, D.L."
-    title: "High temperature vaporization behavior of oxides II. Alkali metal binary oxides"
+    title: "High Temperature Vaporization Behavior of Oxides. I. Alkali Metal Binary Oxides"
     journal: "Journal of Physical and Chemical Reference Data"
     year: 1984
     volume: "13"
     pages: "151-173"
     doi: "10.1063/1.555706"
     url: "https://doi.org/10.1063/1.555706"
-    role: THERMOCHEMISTRY
+    role: DATA
     topic: volatility
     status: current
     coefficient_note: "Tables 2 and 4 K2O(l), K(g), and O2(g) Gibbs-energy-function/enthalpy source for the t-141 liquid KO0.5 standard-reaction term."
     found: "2026-07-07 t-141 Lamoreaux-Hildenbrand verification"
     needs_quote: false
-    pull_quotes: []
+    pull_quotes:
+      - quote: "The Gibbs energy functions of condensed phases calculated by this procedure are consistent with the enthalpies of formation of the condensed phase stable at 298.15 K and 1.013 25 bar."
+        page: "p. 153, Sec. 2.1a"
+        grounds: "Licenses combining the K2O(l) Gibbs-energy-function row directly with the Table 4 dfH298 of K2O(s) in the t-141 KO0.5 standard-term assembly."
+      - quote: "Data on the potassium oxides is limited and of uncertain quality."
+        page: "p. 159, Sec. 2.3c"
+        grounds: "Source-quality caveat carried into the t-141 uncertainty budget for the honest +1.15..+1.28 dex held-out DeMaria residual."

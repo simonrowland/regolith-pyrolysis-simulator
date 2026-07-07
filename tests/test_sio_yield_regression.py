@@ -131,9 +131,16 @@ GOLDENS = (
 # headspace pO2 path documented above (lunar -0.006%, mars -74% -- Mars
 # again the stronger coupled response). Recomputed controller-side from
 # fresh CLI runs in the t-135/t-140/b-026 epoch regen.
+# 2026-07-07 t-141 K standard-term regen: K vapor reference moves from the
+# VapoRock pseudo-refit to the Lamoreaux-Hildenbrand 1984 liquid-KO0.5
+# standard-reaction term (doi 10.1063/1.555706); K evolution drops ~5x, and
+# SiO shifts ppm-scale through the same coupled finite-headspace pO2 path
+# (lunar -0.0012%, mars -0.0048%). Recomputed controller-side from fresh
+# CLI runs in the t-141 epoch regen; deltas match the worker enumeration
+# (docs-private/research/2026-07-07-t141-kmox/golden-deltas.json).
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 8.7134903466e-06,
-    "mars_basalt": 7.03559831958e-06,
+    "lunar_mare_low_ti": 8.71338858761e-06,
+    "mars_basalt": 7.03525888239e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
