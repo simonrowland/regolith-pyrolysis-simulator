@@ -11,6 +11,7 @@ from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.builtin.melt_effect_adjustment import (
     CertifiedPointRefusedError,
     EFFECT_TABLE_VERSION,
+    NON_OXIDE_ANALYTICAL_MODEL_VERSION,
     PROPERTY_THRESHOLD_TABLE,
     PropertyPerturbation,
     aggregate_backend_status,
@@ -21,6 +22,7 @@ from engines.builtin.melt_effect_adjustment import (
     melt_effect_adjustment,
     request_certified_point,
     strip_non_oxide_residuals,
+    warn_tier_analytical_diagnostic,
 )
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
@@ -433,6 +435,179 @@ def test_stripped_s_phase_event_stays_ungrounded_interval_warning():
     assert phase_flags[0].level == "WARNING"
     assert phase_flags[0].grounded is False
     assert phase_flags[0].noise_floor_status == "noise_floor_ungrounded"
+
+
+def test_t139_halide_model_exposes_stull_vapor_and_engine_coverage_warning():
+    model = warn_tier_analytical_diagnostic("NaCl", T_K=1465.0 + 273.15)
+    assert model is not None
+    assert model["analytical_model_version"] == NON_OXIDE_ANALYTICAL_MODEL_VERSION
+    assert model["evidence_class"] == "internal-analytical"
+    assert model["certification"]["eligible"] is False
+    assert model["ledger_authority"] is False
+    assert model["engine_coverage"]["alphamelts"] == "none_for_halide_salts"
+
+    nacl = model["forms"]["vapor_pressure"]["NaCl"]
+    assert nacl["A"] == pytest.approx(10.07184)
+    assert nacl["B"] == pytest.approx(8388.497)
+    assert nacl["C"] == pytest.approx(-82.638)
+    assert nacl["valid_range_K"] == pytest.approx((1138.0, 1738.0))
+    assert "10.1021/ie50448a022" in nacl["citation"]
+    assert model["evaluated_at_T_K"]["vapor_pressure"]["NaCl"]["P_Pa"] == pytest.approx(
+        101118.1955,
+        rel=1e-6,
+    )
+
+    kcl = warn_tier_analytical_diagnostic("KCl", T_K=1420.0 + 273.15)
+    assert kcl is not None
+    kcl_form = kcl["forms"]["vapor_pressure"]["KCl"]
+    assert kcl_form["A"] == pytest.approx(10.1859)
+    assert kcl_form["B"] == pytest.approx(8774.5)
+    assert kcl["evaluated_at_T_K"]["vapor_pressure"]["KCl"]["P_Pa"] == pytest.approx(
+        100820.2059,
+        rel=1e-6,
+    )
+
+    adj = melt_effect_adjustment(
+        {"NaCl": 0.3},
+        {"liquidus_T_C": 1400.0},
+        "alphamelts",
+        T_in_C=1400.0,
+    )
+    assert any("nonoxide_engine_coverage_absent: NaCl" in w for w in adj.warnings)
+    metadata = adj.perturbations[0].metadata
+    assert metadata["analytical_model_class"] == "halide_salt_volatility"
+    assert metadata["forms"]["liquidus_delta"]["coefficient_C_per_wt_pct"] == -100.0
+
+
+def test_t139_sulfide_model_exposes_fes_matte_fits_and_mass_balance():
+    model = warn_tier_analytical_diagnostic("FeS", T_K=2000.0)
+    assert model is not None
+    assert model["analytical_model_class"] == "sulfide_matte_speciation"
+    speciation = model["speciation"]
+    assert speciation["routing"] == (
+        "terminal.stage0_sulfide_matte; FeS2 excess sulfur as "
+        "Sx_vapor_unspeciated diagnostic"
+    )
+    assert speciation["matte_mass_balance"]["FeS_molar_mass_g_mol"] == pytest.approx(87.910)
+    assert speciation["matte_mass_balance"]["S_mass_fraction_in_FeS"] == pytest.approx(0.36475)
+    assert speciation["matte_mass_balance"]["kg_FeS_per_kg_excess_S"] == pytest.approx(2.7416)
+
+    liquid = model["forms"]["FeS_liquid_vapor"]
+    assert liquid["A"] == pytest.approx(5.89363)
+    assert liquid["B"] == pytest.approx(20615.4)
+    assert liquid["valid_range_K"] == pytest.approx((1500.0, 2600.0))
+    assert "10.18434/T42S31" in liquid["citation"]
+    assert model["evaluated_at_T_K"]["FeS_liquid_vapor"]["log10_P_FeS_bar"] == pytest.approx(
+        -4.41407,
+        abs=1e-5,
+    )
+    assert model["evaluated_at_T_K"]["FeS_decomposition"]["log10_K_bar_1p5"] == pytest.approx(
+        -4.74022,
+        abs=1e-5,
+    )
+    assert model["forms"]["FeS_roast"]["deltaG_kJ_per_mol"][1500] == pytest.approx(-358.7)
+
+    adj = melt_effect_adjustment(
+        {"FeS_troilite": 0.2},
+        {"liquidus_T_C": 1400.0},
+        "alphamelts",
+        T_in_C=1400.0,
+    )
+    assert any(
+        "nonoxide_engine_coverage_absent: FeS_troilite" in warning
+        for warning in adj.warnings
+    )
+    assert adj.perturbations[0].effect_row == "sulfide"
+    assert adj.perturbations[0].metadata["analytical_model_class"] == (
+        "sulfide_matte_speciation"
+    )
+
+
+def test_t139_p2o5_model_keeps_oxide_contract_and_process_loss_bands():
+    model = warn_tier_analytical_diagnostic("P2O5", T_K=1800.0)
+    assert model is not None
+    assert model["stage0_contract"] == (
+        "P2O5 remains cleaned_melt oxide; do not route as non-oxide"
+    )
+    assert model["engine_coverage"]["alphamelts"] == (
+        "partial_for_phosphate_phase_topology"
+    )
+    sweep = model["forms"]["sweep_band"]
+    assert sweep["P2O5_wt_pct"] == pytest.approx((0.0, 2.0))
+    assert sweep["Mars_nominal_P2O5_wt_pct"] == pytest.approx(0.85)
+    assert sweep["apatite_concern_band_wt_pct"] == pytest.approx((0.5, 1.5))
+    assert sweep["phase_presence_floor_wt_pct"] == pytest.approx(0.1)
+    assert "10.1029/GL006i012p00937" in sweep["citation"]
+    cao = model["forms"]["CaO_stoichiometry"]
+    assert cao["beta_TCP_CaO_per_P2O5"] == pytest.approx(1.1852)
+    assert cao["apatite_CaO_per_P2O5"] == pytest.approx(1.3169)
+    assert cao["merrillite_CaO_per_P2O5"] == pytest.approx(1.0159)
+    loss = model["forms"]["vacuum_process_loss"]
+    assert loss["P2O5_retention_vs_Al2O3"] == pytest.approx((0.57, 0.69))
+    assert loss["mean_retention"] == pytest.approx(0.65)
+    assert loss["sigma_retention"] == pytest.approx(0.07)
+
+    alphamelts = melt_effect_adjustment(
+        {"P2O5": 0.85},
+        {
+            "liquidus_T_C": 1400.0,
+            "phase_modes_wt_pct": {"liquid": 99.8, "apatite": 0.2},
+        },
+        "alphamelts",
+        T_in_C=1400.0,
+    )
+    assert not any("nonoxide_engine_coverage_absent: P2O5" in w for w in alphamelts.warnings)
+    assert alphamelts.perturbations[0].metadata["analytical_model_class"] == (
+        "phosphate_topology_process_loss"
+    )
+
+    magemin = melt_effect_adjustment(
+        {"P2O5": 0.85},
+        {"liquidus_T_C": 1400.0, "magemin_database": "ig"},
+        "magemin",
+        T_in_C=1400.0,
+        cleaned_oxide_wt_pct={**_basalt_oxide_kg(99.15), "P2O5": 0.85},
+    )
+    assert any("nonoxide_engine_coverage_absent: P2O5" in w for w in magemin.warnings)
+
+
+def test_t139_carbon_model_exposes_cco_negative_vapor_and_burnout_interval():
+    model = warn_tier_analytical_diagnostic("carbonaceous_organic", T_K=1500.0)
+    assert model is not None
+    assert model["analytical_model_class"] == "elemental_carbon_redox_partition"
+    assert model["speciation"]["routing"] == (
+        "partition_carbon; graphite/organic carbon stays out of cleaned_melt"
+    )
+    redox = model["forms"]["redox_interval"]
+    assert redox["interval_per_wt_pct"] == pytest.approx((0.10, 0.50))
+    assert "10.1016/j.gca.2003.08.019" in redox["citation"]
+    cco = model["forms"]["cco_buffer"]
+    assert cco["valid_range_K"] == pytest.approx((1273.15, 1873.15))
+    assert "10.1016/0016-7037(94)90442-1" in cco["citation"]
+    assert model["evaluated_at_T_K"]["cco_buffer"]["log10_fO2_bar"] == pytest.approx(
+        -10.2103333333,
+        abs=1e-10,
+    )
+    graphite_vapor = model["forms"]["graphite_vapor"]
+    assert "negligible below ~2500 C" in graphite_vapor["equation"]
+    burnout = model["forms"]["burnout_kinetics"]
+    assert burnout["Ea_kJ_per_mol_range"] == pytest.approx((59.6, 110.66))
+    assert burnout["temperature_validity_C"] == pytest.approx((400.0, 700.0))
+
+    adj = melt_effect_adjustment(
+        {"carbonaceous_organic": 2.0},
+        {"liquidus_T_C": 1400.0},
+        "alphamelts",
+        T_in_C=1400.0,
+    )
+    assert any(
+        "nonoxide_engine_coverage_absent: carbonaceous_organic" in warning
+        for warning in adj.warnings
+    )
+    assert adj.perturbations[0].interval == pytest.approx((0.20, 1.00))
+    assert adj.perturbations[0].metadata["forms"]["redox_interval"][
+        "interval_per_wt_pct"
+    ] == pytest.approx((0.10, 0.50))
 
 
 def test_magemin_ig_bulk_sum_closure_warning_grounded_and_engine_gated():

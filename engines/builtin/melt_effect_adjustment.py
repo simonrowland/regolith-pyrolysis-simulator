@@ -6,8 +6,10 @@ provenance; it never silently retunes certified values.
 
 from __future__ import annotations
 
+from copy import deepcopy
+import math
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any, Mapping
 
 from engines.domain_reason import OutOfDomainReason, reason_value
@@ -98,7 +100,20 @@ EFFECT_ROWS: dict[str, dict[str, Any]] = {
     },
     "sulfide": {
         "contaminant_group": "S/FeS/CaS",
-        "species_aliases": ("S", "S2", "FeS", "FeS2", "CaS", "MgS", "NiS"),
+        "species_aliases": (
+            "S",
+            "S2",
+            "FeS",
+            "FeS_troilite",
+            "troilite",
+            "pyrrhotite",
+            "FeS2",
+            "CaS",
+            "oldhamite",
+            "MgS",
+            "MnS",
+            "NiS",
+        ),
         "properties": {
             "phase": {
                 "mode": "delta_fraction_interval_per_wt_pct",
@@ -122,7 +137,7 @@ EFFECT_ROWS: dict[str, dict[str, Any]] = {
     },
     "residual_carbon": {
         "contaminant_group": "residual C",
-        "species_aliases": ("C", "graphite"),
+        "species_aliases": ("C", "graphite", "carbonaceous_organic"),
         "properties": {
             "redox": {
                 "mode": "delta_log10_fO2_interval_per_wt_pct",
@@ -154,6 +169,301 @@ EFFECT_ROWS: dict[str, dict[str, Any]] = {
                 "interval_C_per_wt_pct": (-15.0, -5.0),
                 "grounded": False,
                 "source": "Watson 1979; Harrison 1981",
+            },
+        },
+    },
+}
+
+NON_OXIDE_ANALYTICAL_MODEL_VERSION = "2026-07-06-t139-nonoxide-warn-v1"
+_ANALYTICAL_EVIDENCE_CLASS = "internal-analytical"
+
+# WARN-tier model registry. It is diagnostic-only: no ledger authority, no
+# certification authority, and no Stage-0 bucket changes.
+WARN_TIER_ANALYTICAL_MODELS: dict[str, dict[str, Any]] = {
+    "cl_halide": {
+        "model_class": "halide_salt_volatility",
+        "tier": "WARN",
+        "evidence_class": _ANALYTICAL_EVIDENCE_CLASS,
+        "engine_coverage": {
+            "alphamelts": "none_for_halide_salts",
+            "magemin_ig_igad": "none_for_halide_salts",
+            "vaporock": "none_for_halide_salts",
+        },
+        "certification": {
+            "eligible": False,
+            "reason": "internal-analytical halide/salt model; denylisted from certification",
+        },
+        "ledger_authority": False,
+        "stage0_contract": "inventory_bucket_unchanged; stripped before melt engine",
+        "speciation": {
+            "default_forms": ("NaCl", "KCl", "CaCl2", "MgCl2"),
+            "routing": "terminal.stage0_chloride_salt_phase or evaporation",
+        },
+        "forms": {
+            "liquidus_delta": {
+                "equation": "delta_T_C = -100.0 * Cl_wt_pct",
+                "coefficient_C_per_wt_pct": -100.0,
+                "validity": "Mars/basaltic dissolved Cl warning anchor; not a universal liquidus law",
+                "error": "WARN-tier point; keep as diagnostic until per-composition engine sweep",
+                "citation": "Filiberto & Treiman 2009 Chemical Geology; LPSC 2011 abstract 2064",
+            },
+            "vapor_pressure": {
+                "NaCl": {
+                    "equation": "log10(P_Pa) = A - B / (T_K + C)",
+                    "A": 10.07184,
+                    "B": 8388.497,
+                    "C": -82.638,
+                    "valid_range_K": (1138.0, 1738.0),
+                    "boiling_point_C": 1465.0,
+                    "error": "source-equation fit; normal boiling point check ~1 atm",
+                    "citation": "Stull 1947 DOI 10.1021/ie50448a022; NIST Chemistry WebBook SRD 69 C7647145",
+                },
+                "KCl": {
+                    "equation": "log10(P_Pa) = A - B / (T_K + C)",
+                    "A": 10.185900,
+                    "B": 8774.500,
+                    "C": 0.0,
+                    "valid_range_K": (1094.0, 1680.0),
+                    "boiling_point_C": 1420.0,
+                    "error": "source-equation fit; runtime row remains separate",
+                    "citation": "Stull 1947 DOI 10.1021/ie50448a022; NIST Chemistry WebBook SRD 69 C7447407",
+                },
+            },
+        },
+    },
+    "fluoride": {
+        "model_class": "fluoride_salt_interval",
+        "tier": "WARN",
+        "evidence_class": _ANALYTICAL_EVIDENCE_CLASS,
+        "engine_coverage": {
+            "alphamelts": "none_for_fluoride_salts",
+            "magemin_ig_igad": "none_for_fluoride_salts",
+            "vaporock": "none_for_fluoride_salts",
+        },
+        "certification": {
+            "eligible": False,
+            "reason": "interval-only fluoride row; no certified vapor-pressure coefficient",
+        },
+        "ledger_authority": False,
+        "stage0_contract": "inventory_bucket_unchanged; stripped before melt engine",
+        "speciation": {
+            "default_forms": ("NaF", "KF", "CaF2", "MgF2"),
+            "routing": "terminal.stage0_chloride_salt_phase or refractory rump by carrier",
+        },
+        "forms": {
+            "liquidus_interval": {
+                "equation": "delta_T_C in [-200, -50] * F_wt_pct",
+                "interval_C_per_wt_pct": (-200.0, -50.0),
+                "validity": "basaltic halogen liquidus warning interval",
+                "error": "interval half-width drives WARN-tier flag",
+                "citation": "Filiberto et al. 2010 EOS; LPSC 2011 abstract 2064",
+            },
+            "vapor_pressure": {
+                "NaF": {
+                    "equation": "no certified point",
+                    "valid_range_K": (1200.0, 2000.0),
+                    "boiling_point_C": 1704.0,
+                    "error": "interval_required; runtime Antoine absent by design",
+                    "citation": "CRC boiling point carried in data/vapor_pressures.yaml",
+                },
+            },
+        },
+    },
+    "sulfide": {
+        "model_class": "sulfide_matte_speciation",
+        "tier": "WARN",
+        "evidence_class": _ANALYTICAL_EVIDENCE_CLASS,
+        "engine_coverage": {
+            "alphamelts": "none_for_raw_sulfide_matte",
+            "magemin_ig_igad": "none_for_raw_sulfide_matte",
+            "vaporock": "none_for_sulfide_matte",
+        },
+        "certification": {
+            "eligible": False,
+            "reason": "pure-FeS/JANAF and SCSS fallbacks are diagnostics, not melt-engine authority",
+        },
+        "ledger_authority": False,
+        "stage0_contract": "sulfide_matte bucket unchanged; no implicit oxide conversion",
+        "speciation": {
+            "default_forms": ("FeS_like", "NiS_like", "CaS_like", "MgMnS_like", "FeS2_like"),
+            "routing": "terminal.stage0_sulfide_matte; FeS2 excess sulfur as Sx_vapor_unspeciated diagnostic",
+            "matte_mass_balance": {
+                "FeS_molar_mass_g_mol": 87.910,
+                "S_mass_fraction_in_FeS": 0.36475,
+                "Fe_mass_fraction_in_FeS": 0.63525,
+                "kg_FeS_per_kg_excess_S": 2.7416,
+            },
+        },
+        "forms": {
+            "phase_interval": {
+                "equation": "delta_phase_fraction in [0.05, 0.20] * sulfide_wt_pct",
+                "interval_per_wt_pct": (0.05, 0.20),
+                "validity": "SCSS fallback only; prefer PySulfSat when installed and in range",
+                "error": "composition/redox/T/P dependent; no certification",
+                "citation": "Wieser & Gleeson 2023 DOI 10.30909/vol.06.01.107127; O'Neill & Mavrogenes 2002 DOI 10.1093/petrology/43.6.1049",
+            },
+            "FeS_solid_vapor": {
+                "equation": "log10(P_FeS_bar) = A - B / T_K",
+                "A": 7.79795,
+                "B": 23413.3,
+                "valid_range_K": (900.0, 1400.0),
+                "error": "fit residual <=0.018 dex; use +/-0.3 dex for mixed matte activity",
+                "citation": "NIST-JANAF SRD 13 DOI 10.18434/T42S31 FeS(cr) Fe-023 + FeS(g) Fe-026",
+            },
+            "FeS_liquid_vapor": {
+                "equation": "log10(P_FeS_bar) = A - B / T_K",
+                "A": 5.89363,
+                "B": 20615.4,
+                "valid_range_K": (1500.0, 2600.0),
+                "error": "fit residual <=0.030 dex; use +/-0.3 dex for mixed matte activity",
+                "citation": "NIST-JANAF SRD 13 DOI 10.18434/T42S31 FeS(l) Fe-024 + FeS(g) Fe-026",
+            },
+            "FeS_decomposition": {
+                "equation": "log10(K_bar_1p5) = A - B / T_K for FeS(l) -> Fe(g) + 0.5 S2(g)",
+                "A": 8.61298,
+                "B": 26706.4,
+                "valid_range_K": (1500.0, 2600.0),
+                "error": "fit residual <=0.024 dex; gas speciation/activity dependent",
+                "citation": "NIST-JANAF SRD 13 DOI 10.18434/T42S31 FeS(l), Fe(g), S2(g)",
+            },
+            "FeS_roast": {
+                "reaction": "FeS + 1.5 O2 -> FeO + SO2",
+                "deltaG_kJ_per_mol": {
+                    900: -405.7,
+                    1000: -398.0,
+                    1100: -390.3,
+                    1200: -382.6,
+                    1300: -375.0,
+                    1400: -367.2,
+                    1500: -358.7,
+                    1600: -348.8,
+                },
+                "valid_range_K": (900.0, 1600.0),
+                "error": "thermodynamics grounded; kinetics/onset unmodeled",
+                "citation": "NIST-JANAF SRD 13 DOI 10.18434/T42S31 FeS, FeO, SO2, O2 tables",
+            },
+        },
+    },
+    "sulfate_proxy": {
+        "model_class": "sulfate_process_loss_proxy",
+        "tier": "WARN",
+        "evidence_class": _ANALYTICAL_EVIDENCE_CLASS,
+        "engine_coverage": {
+            "alphamelts": "none_for_raw_sulfate_foulants",
+            "magemin_ig_igad": "none_for_raw_sulfate_foulants",
+            "vaporock": "none_for_sulfate_foulants",
+        },
+        "certification": {
+            "eligible": False,
+            "reason": "sulfate decomposition proxy; not a melt-engine phase claim",
+        },
+        "ledger_authority": False,
+        "stage0_contract": "sulfate decomposition routing unchanged",
+        "speciation": {
+            "default_forms": ("SO3", "SO2", "CaSO4", "MgSO4", "FeSO4"),
+            "routing": "terminal.offgas plus oxide/rump product per Stage 0 registry",
+        },
+        "forms": {
+            "phase_interval": {
+                "equation": "delta_phase_fraction in [0.02, 0.10] * sulfate_wt_pct",
+                "interval_per_wt_pct": (0.02, 0.10),
+                "validity": "process-clearance warning proxy",
+                "error": "interval half-width drives WARN-tier flag",
+                "citation": "Jugo sulfur capacity framing; sulfate clearance routing",
+            },
+        },
+    },
+    "residual_carbon": {
+        "model_class": "elemental_carbon_redox_partition",
+        "tier": "WARN",
+        "evidence_class": _ANALYTICAL_EVIDENCE_CLASS,
+        "engine_coverage": {
+            "alphamelts": "none_for_elemental_or_organic_carbon",
+            "magemin_ig_igad": "none_for_elemental_or_organic_carbon",
+            "vaporock": "none_for_graphite_carbon",
+        },
+        "certification": {
+            "eligible": False,
+            "reason": "carbon redox/partition diagnostics are internal-analytical and interval-bounded",
+        },
+        "ledger_authority": False,
+        "stage0_contract": "refractory_carbon/trapped_gasses buckets unchanged",
+        "speciation": {
+            "default_forms": ("C", "graphite", "carbonaceous_organic", "CO", "CO2"),
+            "routing": "partition_carbon; graphite/organic carbon stays out of cleaned_melt",
+        },
+        "forms": {
+            "redox_interval": {
+                "equation": "delta_log10_fO2 in [0.10, 0.50] * C_wt_pct",
+                "interval_per_wt_pct": (0.10, 0.50),
+                "validity": "residual graphite/organic-C redox warning interval",
+                "error": "interval half-width drives WARN-tier flag",
+                "citation": "Brooker et al. 2014; Sephton et al. 2004 DOI 10.1016/j.gca.2003.08.019",
+            },
+            "cco_buffer": {
+                "equation": "log10(fO2/bar) = -21803/T_K + 4.325 + 0.171*(P_bar - 1)/T_K",
+                "valid_range_K": (1273.15, 1873.15),
+                "error": "CCO reference only; EMOG/EMOD graphite-saturation bounds stay interval-only",
+                "citation": "Jakobsson & Oskarsson 1994 DOI 10.1016/0016-7037(94)90442-1; Stagno & Frost 2010 EPSL 300:72-84",
+            },
+            "graphite_vapor": {
+                "equation": "negative result; graphite vapor pressure negligible below ~2500 C for Stage-0 use",
+                "validity": "do not use vaporization as default carbon-removal route",
+                "error": "qualitative pressure-level bound",
+                "citation": "NIST-JANAF carbon graphite thermochemistry; S-E5-4 negative vapor result",
+            },
+            "burnout_kinetics": {
+                "equation": "Avrami-Erofeev n=1.5 scenario-only char burnout",
+                "Ea_kJ_per_mol_range": (59.6, 110.66),
+                "temperature_validity_C": (400.0, 700.0),
+                "error": "air/char scenario only, not default certification",
+                "citation": "Guo et al. 2018 RSC Advances low-rank char combustion kinetics",
+            },
+        },
+    },
+    "p2o5": {
+        "model_class": "phosphate_topology_process_loss",
+        "tier": "WARN",
+        "evidence_class": _ANALYTICAL_EVIDENCE_CLASS,
+        "engine_coverage": {
+            "alphamelts": "partial_for_phosphate_phase_topology",
+            "magemin_ig_igad": "drops_P2O5_from_bulk_basis",
+            "vaporock": "none_for_P_species",
+        },
+        "certification": {
+            "eligible": False,
+            "reason": "phase/process-loss diagnostics only; no certified liquidus coefficient",
+        },
+        "ledger_authority": False,
+        "stage0_contract": "P2O5 remains cleaned_melt oxide; do not route as non-oxide",
+        "speciation": {
+            "default_forms": ("P2O5", "apatite_surrogate", "merrillite_surrogate"),
+            "routing": "cleaned_melt phosphate/apatite topology warning",
+        },
+        "forms": {
+            "sweep_band": {
+                "P2O5_wt_pct": (0.0, 2.0),
+                "Mars_nominal_P2O5_wt_pct": 0.85,
+                "apatite_concern_band_wt_pct": (0.5, 1.5),
+                "phase_presence_floor_wt_pct": 0.1,
+                "validity": "Mars basalt family, CaO 5-9 wt%",
+                "error": "topology warning only; liquidus coefficient refused",
+                "citation": "Watson 1979 DOI 10.1029/GL006i012p00937; Harrison 1981 EPSL 51:322",
+            },
+            "CaO_stoichiometry": {
+                "beta_TCP_CaO_per_P2O5": 1.1852,
+                "apatite_CaO_per_P2O5": 1.3169,
+                "merrillite_CaO_per_P2O5": 1.0159,
+                "error": "stoichiometry exact; phase surrogate only",
+                "citation": "S-E5-2 stoichiometric derivation from CaO/P2O5 molar masses",
+            },
+            "vacuum_process_loss": {
+                "P2O5_retention_vs_Al2O3": (0.57, 0.69),
+                "mean_retention": 0.65,
+                "sigma_retention": 0.07,
+                "validity": "JSC-1 high vacuum, 1425-1580 C, short solar-furnace exposures",
+                "error": "process-loss envelope only; not a vapor-pressure coefficient",
+                "citation": "Sauerborn 2004 DLR solar-furnace thesis Table 5.3 / Fig. 5.31-5.32",
             },
         },
     },
@@ -389,15 +699,211 @@ def _match_effect_row(species: str) -> tuple[str, dict[str, Any]] | None:
             return row_key, row
     if species in {"Cl", "NaCl", "KCl"}:
         return "cl_halide", EFFECT_ROWS["cl_halide"]
-    if species in {"C", "graphite"}:
+    if species in {"C", "graphite", "carbonaceous_organic"}:
         return "residual_carbon", EFFECT_ROWS["residual_carbon"]
     if "F" in re.findall(r"[A-Z][a-z]?", species) and species not in _OXIDE_SET:
         return "fluoride", EFFECT_ROWS["fluoride"]
-    if species in {"S", "S2", "FeS", "FeS2", "CaS"}:
+    if species in {
+        "S",
+        "S2",
+        "FeS",
+        "FeS_troilite",
+        "troilite",
+        "pyrrhotite",
+        "FeS2",
+        "CaS",
+        "oldhamite",
+        "MgS",
+        "MnS",
+        "NiS",
+    }:
         return "sulfide", EFFECT_ROWS["sulfide"]
     if species in {"SO3", "SO2"}:
         return "sulfate_proxy", EFFECT_ROWS["sulfate_proxy"]
     return None
+
+
+def _selected_model_forms(
+    row_key: str,
+    species: str,
+    model: Mapping[str, Any],
+) -> dict[str, Any]:
+    forms = model.get("forms", {}) or {}
+    if row_key == "cl_halide":
+        vapor_forms = forms.get("vapor_pressure", {})
+        if species in vapor_forms:
+            return {
+                "liquidus_delta": deepcopy(forms.get("liquidus_delta", {})),
+                "vapor_pressure": {species: deepcopy(vapor_forms[species])},
+            }
+    if row_key == "fluoride":
+        vapor_forms = forms.get("vapor_pressure", {})
+        if species in vapor_forms:
+            return {
+                "liquidus_interval": deepcopy(forms.get("liquidus_interval", {})),
+                "vapor_pressure": {species: deepcopy(vapor_forms[species])},
+            }
+    return deepcopy(dict(forms))
+
+
+def _evaluate_analytical_forms(
+    forms: Mapping[str, Any],
+    *,
+    T_K: float | None,
+) -> dict[str, Any]:
+    if T_K is None:
+        return {}
+    try:
+        temperature = float(T_K)
+    except (TypeError, ValueError):
+        return {}
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        return {}
+
+    evaluations: dict[str, Any] = {}
+    vapor_forms = forms.get("vapor_pressure")
+    if isinstance(vapor_forms, Mapping):
+        vapor_eval: dict[str, Any] = {}
+        for species, form in vapor_forms.items():
+            if not isinstance(form, Mapping):
+                continue
+            if form.get("equation") != "log10(P_Pa) = A - B / (T_K + C)":
+                continue
+            A = float(form["A"])
+            B = float(form["B"])
+            C = float(form["C"])
+            log10_P = A - B / (temperature + C)
+            vapor_eval[str(species)] = {
+                "T_K": temperature,
+                "log10_P_Pa": log10_P,
+                "P_Pa": 10.0**log10_P,
+                "inside_valid_range": _inside_range(
+                    temperature,
+                    form.get("valid_range_K"),
+                ),
+            }
+        if vapor_eval:
+            evaluations["vapor_pressure"] = vapor_eval
+
+    for key in ("FeS_solid_vapor", "FeS_liquid_vapor", "FeS_decomposition"):
+        form = forms.get(key)
+        if not isinstance(form, Mapping):
+            continue
+        if "A" not in form or "B" not in form:
+            continue
+        value = float(form["A"]) - float(form["B"]) / temperature
+        output_key = (
+            "log10_K_bar_1p5"
+            if key == "FeS_decomposition"
+            else "log10_P_FeS_bar"
+        )
+        evaluations[key] = {
+            "T_K": temperature,
+            output_key: value,
+            "inside_valid_range": _inside_range(
+                temperature,
+                form.get("valid_range_K"),
+            ),
+        }
+
+    cco = forms.get("cco_buffer")
+    if isinstance(cco, Mapping):
+        # Keep this as an explicit diagnostic evaluation of the stored formula;
+        # callers that need the canonical redox helper still use
+        # engines.builtin.cco_redox_buffer.
+        log10_fO2 = -21803.0 / temperature + 4.325
+        evaluations["cco_buffer"] = {
+            "T_K": temperature,
+            "pressure_bar": 1.0,
+            "log10_fO2_bar": log10_fO2,
+            "inside_valid_range": _inside_range(
+                temperature,
+                cco.get("valid_range_K"),
+            ),
+        }
+
+    return evaluations
+
+
+def _inside_range(value: float, bounds: Any) -> bool | None:
+    if not isinstance(bounds, (tuple, list)) or len(bounds) != 2:
+        return None
+    low = float(bounds[0])
+    high = float(bounds[1])
+    return low <= value <= high
+
+
+def _analytical_model_metadata(
+    row_key: str,
+    species: str,
+    *,
+    T_K: float | None = None,
+) -> dict[str, Any]:
+    model = WARN_TIER_ANALYTICAL_MODELS.get(row_key)
+    if model is None:
+        return {}
+    selected_forms = _selected_model_forms(row_key, species, model)
+    metadata = {
+        "analytical_model_version": NON_OXIDE_ANALYTICAL_MODEL_VERSION,
+        "analytical_model_class": model["model_class"],
+        "analytical_tier": model["tier"],
+        "evidence_class": model["evidence_class"],
+        "engine_coverage": deepcopy(model["engine_coverage"]),
+        "certification": deepcopy(model["certification"]),
+        "ledger_authority": bool(model["ledger_authority"]),
+        "stage0_contract": model["stage0_contract"],
+        "speciation": deepcopy(model["speciation"]),
+        "forms": selected_forms,
+    }
+    evaluations = _evaluate_analytical_forms(selected_forms, T_K=T_K)
+    if evaluations:
+        metadata["evaluated_at_T_K"] = evaluations
+    return metadata
+
+
+def warn_tier_analytical_diagnostic(
+    species: str,
+    *,
+    T_K: float | None = None,
+) -> dict[str, Any] | None:
+    """Return the internal-analytical WARN-tier model for a residual species."""
+    matched = _match_effect_row(species)
+    if matched is None:
+        return None
+    row_key, _row = matched
+    return _analytical_model_metadata(row_key, species, T_K=T_K)
+
+
+def _engine_coverage_absent_warning(
+    row_key: str,
+    species: str,
+    engine: str,
+) -> str | None:
+    model = WARN_TIER_ANALYTICAL_MODELS.get(row_key)
+    if model is None:
+        return None
+    coverage = model.get("engine_coverage", {}) or {}
+    if row_key == "p2o5" and "alphamelts" in str(engine).lower():
+        return None
+    if not coverage:
+        return None
+    return (
+        "nonoxide_engine_coverage_absent: "
+        f"{species} handled by {model['model_class']} "
+        f"({NON_OXIDE_ANALYTICAL_MODEL_VERSION}); "
+        "WARN-tier internal-analytical, no ledger authority, no certification"
+    )
+
+
+def _with_analytical_model_metadata(
+    pert: PropertyPerturbation | None,
+    metadata: Mapping[str, Any],
+) -> PropertyPerturbation | None:
+    if pert is None or not metadata:
+        return pert
+    merged = dict(metadata)
+    merged.update(dict(pert.metadata))
+    return replace(pert, metadata=merged)
 
 
 def _liquidus_perturbation_pct(delta_T_C: float, T_in_C: float) -> float:
@@ -612,16 +1118,24 @@ def _compute_property_perturbation(
     mode = str(prop_cfg.get("mode", ""))
     grounded = bool(prop_cfg.get("grounded", False))
     source = str(prop_cfg.get("source", ""))
+    analytical_metadata = _analytical_model_metadata(
+        row_key,
+        species,
+        T_K=float(T_in_C) + 273.15,
+    )
 
     if mode == "phase_topology_presence":
-        return _phase_topology_perturbation(
-            species=species,
-            wt_pct=wt_pct,
-            prop_cfg=prop_cfg,
-            row_key=row_key,
-            contaminant_group=contaminant_group,
-            melts_result=melts_result,
-            engine=engine,
+        return _with_analytical_model_metadata(
+            _phase_topology_perturbation(
+                species=species,
+                wt_pct=wt_pct,
+                prop_cfg=prop_cfg,
+                row_key=row_key,
+                contaminant_group=contaminant_group,
+                melts_result=melts_result,
+                engine=engine,
+            ),
+            analytical_metadata,
         )
 
     if mode == "delta_T_per_wt_pct":
@@ -629,20 +1143,23 @@ def _compute_property_perturbation(
         delta_T = coeff * wt_pct
         before = _liquidus_perturbation_pct(delta_T, T_in_C)
         after = 0.0
-        return PropertyPerturbation(
-            property=property_name,
-            contaminant=species,
-            effect_row=row_key,
-            source=source,
-            residual_wt_pct=wt_pct,
-            perturbation_before=before,
-            perturbation_after=after,
-            metric="delta_T_frac_of_T_in_C",
-            grounded=grounded,
-            correctable=grounded,
-            raw_value=delta_T,
-            adjusted_value=0.0,
-            metric_basis=float(T_in_C),
+        return _with_analytical_model_metadata(
+            PropertyPerturbation(
+                property=property_name,
+                contaminant=species,
+                effect_row=row_key,
+                source=source,
+                residual_wt_pct=wt_pct,
+                perturbation_before=before,
+                perturbation_after=after,
+                metric="delta_T_frac_of_T_in_C",
+                grounded=grounded,
+                correctable=grounded,
+                raw_value=delta_T,
+                adjusted_value=0.0,
+                metric_basis=float(T_in_C),
+            ),
+            analytical_metadata,
         )
 
     if mode == "delta_T_interval_per_wt_pct":
@@ -658,57 +1175,66 @@ def _compute_property_perturbation(
             - _liquidus_perturbation_pct(delta_low, T_in_C)
         )
         after = width / 2.0
-        return PropertyPerturbation(
-            property=property_name,
-            contaminant=species,
-            effect_row=row_key,
-            source=source,
-            residual_wt_pct=wt_pct,
-            perturbation_before=before,
-            perturbation_after=after,
-            metric="delta_T_frac_of_T_in_C",
-            grounded=False,
-            correctable=False,
-            raw_value=None,
-            adjusted_value=None,
-            interval=(delta_low, delta_high),
-            metric_basis=float(T_in_C),
+        return _with_analytical_model_metadata(
+            PropertyPerturbation(
+                property=property_name,
+                contaminant=species,
+                effect_row=row_key,
+                source=source,
+                residual_wt_pct=wt_pct,
+                perturbation_before=before,
+                perturbation_after=after,
+                metric="delta_T_frac_of_T_in_C",
+                grounded=False,
+                correctable=False,
+                raw_value=None,
+                adjusted_value=None,
+                interval=(delta_low, delta_high),
+                metric_basis=float(T_in_C),
+            ),
+            analytical_metadata,
         )
 
     if mode == "delta_fraction_interval_per_wt_pct":
         low_f, high_f = prop_cfg["interval_per_wt_pct"]
         before = max(abs(float(low_f) * wt_pct), abs(float(high_f) * wt_pct))
         after = _interval_half_width(float(low_f) * wt_pct, float(high_f) * wt_pct)
-        return PropertyPerturbation(
-            property=property_name,
-            contaminant=species,
-            effect_row=row_key,
-            source=source,
-            residual_wt_pct=wt_pct,
-            perturbation_before=before,
-            perturbation_after=after,
-            metric="delta_absolute_fraction",
-            grounded=False,
-            correctable=False,
-            interval=(float(low_f) * wt_pct, float(high_f) * wt_pct),
+        return _with_analytical_model_metadata(
+            PropertyPerturbation(
+                property=property_name,
+                contaminant=species,
+                effect_row=row_key,
+                source=source,
+                residual_wt_pct=wt_pct,
+                perturbation_before=before,
+                perturbation_after=after,
+                metric="delta_absolute_fraction",
+                grounded=False,
+                correctable=False,
+                interval=(float(low_f) * wt_pct, float(high_f) * wt_pct),
+            ),
+            analytical_metadata,
         )
 
     if mode == "delta_log10_fO2_interval_per_wt_pct":
         low_l, high_l = prop_cfg["interval_per_wt_pct"]
         before = max(abs(float(low_l) * wt_pct), abs(float(high_l) * wt_pct))
         after = _interval_half_width(float(low_l) * wt_pct, float(high_l) * wt_pct)
-        return PropertyPerturbation(
-            property=property_name,
-            contaminant=species,
-            effect_row=row_key,
-            source=source,
-            residual_wt_pct=wt_pct,
-            perturbation_before=before,
-            perturbation_after=after,
-            metric="delta_log10_fO2",
-            grounded=False,
-            correctable=False,
-            interval=(float(low_l) * wt_pct, float(high_l) * wt_pct),
+        return _with_analytical_model_metadata(
+            PropertyPerturbation(
+                property=property_name,
+                contaminant=species,
+                effect_row=row_key,
+                source=source,
+                residual_wt_pct=wt_pct,
+                perturbation_before=before,
+                perturbation_after=after,
+                metric="delta_log10_fO2",
+                grounded=False,
+                correctable=False,
+                interval=(float(low_l) * wt_pct, float(high_l) * wt_pct),
+            ),
+            analytical_metadata,
         )
 
     raise ValueError(f"unsupported effect mode {mode!r} for {property_name}")
@@ -803,6 +1329,9 @@ def melt_effect_adjustment(
             )
             continue
         row_key, row = matched
+        coverage_warning = _engine_coverage_absent_warning(row_key, species, engine)
+        if coverage_warning is not None and coverage_warning not in warnings:
+            warnings.append(coverage_warning)
         for prop_name, prop_cfg in row.get("properties", {}).items():
             pert = _compute_property_perturbation(
                 property_name=prop_name,
