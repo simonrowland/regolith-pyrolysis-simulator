@@ -1468,6 +1468,7 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
     range_sourced = 0
     engineering_envelopes = 0
+    grounded_sources = 0
 
     for spec in RecipeSchema().allowlist:
         if spec.bounds_source.startswith("setpoints:"):
@@ -1482,15 +1483,26 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
             assert spec.high is not None
             assert yaml_value[0] <= spec.low <= spec.high <= yaml_value[1]
             range_sourced += 1
+        elif spec.bounds_source.startswith(
+            ("hot_wall_invariant:", "condensation_train ")
+        ):
+            assert spec.low is not None
+            assert spec.high is not None
+            assert spec.low <= spec.high
+            grounded_sources += 1
         else:
             assert spec.bounds_source.startswith("engineering_envelope"), (
                 f"{'.'.join(spec.path)} bounds_source must be setpoints: range "
-                "or engineering_envelope"
+                "or named grounded source"
             )
             engineering_envelopes += 1
 
-    assert range_sourced + engineering_envelopes == len(RecipeSchema().allowlist)
+    assert (
+        range_sourced + engineering_envelopes + grounded_sources
+        == len(RecipeSchema().allowlist)
+    )
     assert engineering_envelopes > 0
+    assert grounded_sources > 0
 
 
 def test_pressure_default_pair_map_covers_allowlisted_siblings() -> None:

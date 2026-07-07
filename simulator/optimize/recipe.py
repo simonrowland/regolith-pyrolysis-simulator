@@ -21,13 +21,73 @@ from simulator.chemistry.kernel.config import (
 )
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.optimize.canonical import canonical_json_dumps
+from simulator.state import CondensationTrain
 
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v10"
-O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v10"
+allowlist_version = "allowlist-v11"
+O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v11"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
+
+# Hot-wall bounds: mandate invariant keeps ducts upstream of the designated
+# condenser above ~1400 C; Stage 0 setpoints cap the Doloma-REE hot duct at
+# 1750 C. Source sidecar: data/setpoints.yaml condensation_train.metals_train
+# stage_0_hot_duct temp_range_C [1400,1600], max_service_T_C 1750; material
+# support: data/wall_materials.yaml doloma service_temp direct 1700 C
+# (W:S7/W:S8) plus magnesia 1600-1800 C (W:S6).
+OVERHEAD_HOT_WALL_MIN_C = 1400.0
+OVERHEAD_HOT_WALL_MAX_C = 1750.0
+OVERHEAD_HEADSPACE_OFFSET_MIN_K = -200.0
+OVERHEAD_HEADSPACE_OFFSET_MAX_K = 0.0
+OVERHEAD_HOT_WALL_BOUNDS_SOURCE = (
+    "hot_wall_invariant: docs/concepts.md Hot walls section; "
+    "data/setpoints.yaml condensation_train.metals_train.stage_0_hot_duct "
+    "temp_range_C=[1400,1600], max_service_T_C=1750; "
+    "data/wall_materials.yaml doloma W:S7/W:S8 direct service 1700 C"
+)
+OVERHEAD_HEADSPACE_OFFSET_BOUNDS_SOURCE = (
+    "hot_wall_invariant: C2A_continuous peak SiO window 1600 C minus "
+    "Stage 0 hot-wall floor 1400 C => offset >= -200 K; gas not hotter "
+    "than melt without an explicit wall-heat model"
+)
+DOWNSTREAM_CONDENSATION_STAGE_PAIRS: tuple[tuple[str, int, int], ...] = (
+    ("stage_4_to_stage_5", 4, 5),
+    ("stage_5_to_stage_6", 5, 6),
+    ("stage_6_to_stage_7", 6, 7),
+)
+
+
+def _condensation_train_downstream_segment_bounds() -> Mapping[str, tuple[float, float]]:
+    default_train = CondensationTrain.create_default()
+    stage_ranges = {
+        stage.stage_number: (
+            float(stage.temp_range_C[0]),
+            float(stage.temp_range_C[1]),
+        )
+        for stage in default_train.stages
+    }
+    bounds: dict[str, tuple[float, float]] = {}
+    for segment_name, upstream_stage, downstream_stage in DOWNSTREAM_CONDENSATION_STAGE_PAIRS:
+        if upstream_stage not in stage_ranges or downstream_stage not in stage_ranges:
+            raise RuntimeError(
+                "CondensationTrain.create_default() missing stages needed for "
+                f"{segment_name}"
+            )
+        low = stage_ranges[downstream_stage][0]
+        high = stage_ranges[upstream_stage][1]
+        if not (math.isfinite(low) and math.isfinite(high) and low <= high):
+            raise RuntimeError(
+                "CondensationTrain.create_default() produced invalid interface "
+                f"bounds for {segment_name}: {(low, high)!r}"
+            )
+        bounds[segment_name] = (low, high)
+    return MappingProxyType(bounds)
+
+
+OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C: Mapping[str, tuple[float, float]] = (
+    _condensation_train_downstream_segment_bounds()
+)
 
 FURNACE_MAX_T_C_PATH: KeyPath = ("furnace_max_T_C",)
 C5_ALLOW_MRE_VOLTAGE_CAP_PATH: KeyPath = tuple(
@@ -966,109 +1026,81 @@ class RecipeSchema:
         ),
         _knob(
             "overhead_headspace.temperature_offset_K",
-            low=-500,
-            high=500,
+            low=OVERHEAD_HEADSPACE_OFFSET_MIN_K,
+            high=OVERHEAD_HEADSPACE_OFFSET_MAX_K,
             units="K",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml "
-                "overhead_headspace.temperature_offset_K"
-            ),
+            bounds_source=OVERHEAD_HEADSPACE_OFFSET_BOUNDS_SOURCE,
         ),
         _knob(
             "overhead_headspace.liner_temperature_C.default_C",
-            low=20,
-            high=2000,
+            low=OVERHEAD_HOT_WALL_MIN_C,
+            high=OVERHEAD_HOT_WALL_MAX_C,
             units="C",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml "
-                "overhead_headspace.liner_temperature_C.default_C"
-            ),
+            bounds_source=OVERHEAD_HOT_WALL_BOUNDS_SOURCE,
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.default_C",
-            low=20,
-            high=2000,
+            low=OVERHEAD_HOT_WALL_MIN_C,
+            high=OVERHEAD_HOT_WALL_MAX_C,
             units="C",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml "
-                "overhead_headspace.pipe_segment_temperatures_C.default_C"
-            ),
+            bounds_source=OVERHEAD_HOT_WALL_BOUNDS_SOURCE,
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_0_to_stage_1.default_C",
-            low=20,
-            high=2000,
+            low=OVERHEAD_HOT_WALL_MIN_C,
+            high=OVERHEAD_HOT_WALL_MAX_C,
             units="C",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml "
-                "overhead_headspace.pipe_segment_temperatures_C.segments."
-                "stage_0_to_stage_1.default_C"
-            ),
+            bounds_source=OVERHEAD_HOT_WALL_BOUNDS_SOURCE,
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_1_to_stage_2.default_C",
-            low=20,
-            high=2000,
+            low=OVERHEAD_HOT_WALL_MIN_C,
+            high=OVERHEAD_HOT_WALL_MAX_C,
             units="C",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml "
-                "overhead_headspace.pipe_segment_temperatures_C.segments."
-                "stage_1_to_stage_2.default_C"
-            ),
+            bounds_source=OVERHEAD_HOT_WALL_BOUNDS_SOURCE,
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_2_to_stage_3.default_C",
-            low=20,
-            high=2000,
+            low=OVERHEAD_HOT_WALL_MIN_C,
+            high=OVERHEAD_HOT_WALL_MAX_C,
             units="C",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml "
-                "overhead_headspace.pipe_segment_temperatures_C.segments."
-                "stage_2_to_stage_3.default_C"
-            ),
+            bounds_source=OVERHEAD_HOT_WALL_BOUNDS_SOURCE,
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_3_to_stage_4.default_C",
-            low=20,
-            high=2000,
+            low=OVERHEAD_HOT_WALL_MIN_C,
+            high=OVERHEAD_HOT_WALL_MAX_C,
             units="C",
-            bounds_source=(
-                "engineering_envelope around setpoints.yaml "
-                "overhead_headspace.pipe_segment_temperatures_C.segments."
-                "stage_3_to_stage_4.default_C"
-            ),
+            bounds_source=OVERHEAD_HOT_WALL_BOUNDS_SOURCE,
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_4_to_stage_5.default_C",
-            low=20,
-            high=2000,
+            low=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_4_to_stage_5"][0],
+            high=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_4_to_stage_5"][1],
             units="C",
             bounds_source=(
-                "engineering_envelope around setpoints.yaml "
-                "overhead_headspace.pipe_segment_temperatures_C.segments."
-                "stage_4_to_stage_5.default_C"
+                "condensation_train stage 4/5 interface envelope: "
+                "state.py CondensationTrain.create_default"
             ),
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_5_to_stage_6.default_C",
-            low=20,
-            high=2000,
+            low=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_5_to_stage_6"][0],
+            high=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_5_to_stage_6"][1],
             units="C",
             bounds_source=(
-                "engineering_envelope around setpoints.yaml "
-                "overhead_headspace.pipe_segment_temperatures_C.segments."
-                "stage_5_to_stage_6.default_C"
+                "condensation_train stage 5/6 interface envelope: "
+                "state.py CondensationTrain.create_default"
             ),
         ),
         _knob(
             "overhead_headspace.pipe_segment_temperatures_C.segments.stage_6_to_stage_7.default_C",
-            low=20,
-            high=2000,
+            low=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_6_to_stage_7"][0],
+            high=OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C["stage_6_to_stage_7"][1],
             units="C",
             bounds_source=(
-                "engineering_envelope around setpoints.yaml "
-                "overhead_headspace.pipe_segment_temperatures_C.segments."
-                "stage_6_to_stage_7.default_C"
+                "condensation_train stage 6/7 interface envelope: "
+                "state.py CondensationTrain.create_default"
             ),
         ),
     )

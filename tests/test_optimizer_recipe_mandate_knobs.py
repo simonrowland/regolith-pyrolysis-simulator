@@ -12,6 +12,11 @@ from simulator.optimize.recipe import (
     FURNACE_MAX_T_C_PATH,
     MANDATE_LEVER_ALLOWLIST,
     MANDATE_LEVER_PATHS,
+    OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C,
+    OVERHEAD_HEADSPACE_OFFSET_MAX_K,
+    OVERHEAD_HEADSPACE_OFFSET_MIN_K,
+    OVERHEAD_HOT_WALL_MAX_C,
+    OVERHEAD_HOT_WALL_MIN_C,
     RecipePatch,
     RecipeSchema,
     RecipeValidationError,
@@ -72,7 +77,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v10" == schema.allowlist_version
+    assert "allowlist-v11" == schema.allowlist_version
 
     # P1 #1: campaigns.C2A_staged.stages.fe_hot_hold.target_C is a silent no-op
     # (the runtime holds fe_hot_hold at default_hold_T_C / the C4-style override,
@@ -90,6 +95,68 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
     searchable_paths = {spec.path for spec in schema.search_allowlist}
     assert optional_ca_harvest_spec.search_enabled is False
     assert optional_ca_harvest_po2 not in searchable_paths
+
+
+def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    schema = RecipeSchema()
+    metals_train = setpoints["condensation_train"]["metals_train"]
+    hot_duct = metals_train["stage_0_hot_duct"]
+    c2a_continuous = setpoints["campaigns"]["C2A_continuous"]
+
+    assert hot_duct["temp_range_C"][0] == OVERHEAD_HOT_WALL_MIN_C
+    assert hot_duct["max_service_T_C"] == OVERHEAD_HOT_WALL_MAX_C
+    assert (
+        OVERHEAD_HEADSPACE_OFFSET_MIN_K
+        == OVERHEAD_HOT_WALL_MIN_C - c2a_continuous["temp_range_C"][1]
+    )
+    assert OVERHEAD_HEADSPACE_OFFSET_MAX_K == 0.0
+
+    hot_wall_paths = [
+        "overhead_headspace.liner_temperature_C.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_0_to_stage_1.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_1_to_stage_2.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_2_to_stage_3.default_C",
+        "overhead_headspace.pipe_segment_temperatures_C.segments.stage_3_to_stage_4.default_C",
+    ]
+    for dotted in hot_wall_paths:
+        spec = schema.spec_for(_path(dotted))
+        assert spec.low == OVERHEAD_HOT_WALL_MIN_C
+        assert spec.high == OVERHEAD_HOT_WALL_MAX_C
+        assert "hot_wall_invariant" in spec.bounds_source
+
+    offset_spec = schema.spec_for(
+        _path("overhead_headspace.temperature_offset_K")
+    )
+    assert offset_spec.low == OVERHEAD_HEADSPACE_OFFSET_MIN_K
+    assert offset_spec.high == OVERHEAD_HEADSPACE_OFFSET_MAX_K
+    assert "C2A_continuous peak SiO window" in offset_spec.bounds_source
+
+    default_train = CondensationTrain.create_default()
+    stage_ranges = {
+        stage.stage_number: (
+            float(stage.temp_range_C[0]),
+            float(stage.temp_range_C[1]),
+        )
+        for stage in default_train.stages
+    }
+    downstream_bounds = {
+        "stage_4_to_stage_5": (stage_ranges[5][0], stage_ranges[4][1]),
+        "stage_5_to_stage_6": (stage_ranges[6][0], stage_ranges[5][1]),
+        "stage_6_to_stage_7": (stage_ranges[7][0], stage_ranges[6][1]),
+    }
+    assert dict(OVERHEAD_DOWNSTREAM_SEGMENT_BOUNDS_C) == downstream_bounds
+    for segment_name, (low, high) in downstream_bounds.items():
+        spec = schema.spec_for(
+            _path(
+                "overhead_headspace.pipe_segment_temperatures_C.segments."
+                f"{segment_name}.default_C"
+            )
+        )
+        assert spec.low == low
+        assert spec.high == high
+        assert "CondensationTrain.create_default" in spec.bounds_source
 
 
 def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
