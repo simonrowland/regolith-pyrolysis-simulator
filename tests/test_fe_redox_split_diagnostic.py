@@ -56,10 +56,7 @@ def test_fe_redox_split_snapshot_field_is_diagnostic_only() -> None:
     split = snapshot.fe_redox_split
 
     assert split["status"] == "ok"
-    assert split["source"] in {
-        "PySulfSat.convert_fo2_to_fe_partition:Kress1991",
-        "inline:Kress-Carmichael1991",
-    }
+    assert split["source"] == "simulator.fe_redox:kress91_split"
     assert 0.0 <= split["fe3_over_sigma_fe"] <= 1.0
     assert split["ferric_frac"] == pytest.approx(split["fe3_over_sigma_fe"])
     assert (

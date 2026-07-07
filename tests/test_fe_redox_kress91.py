@@ -292,7 +292,6 @@ def test_core_fe_redox_diagnostic_nonfinite_pressure_reaches_validator(
     )
     sim.overhead = SimpleNamespace(pressure_mbar=pressure_mbar)
     sim._melt_oxide_wt_pct = lambda: _FERROUS_ACTIVITY_COMP_WT
-    sim._fe_redox_split_from_pysulfsat = lambda *args, **kwargs: None
 
     with pytest.raises(Kress91InvalidControls, match='pressure_bar'):
         sim._compute_fe_redox_split_diagnostic(temperature_K=1873.15)
@@ -375,7 +374,7 @@ def test_core_inline_kress91_full_split_regression_pins() -> None:
         comp_wt, fO2_log=-7.75, T_K=1873.15, pressure_bar=0.01,
     )
     assert split['status'] == 'ok'
-    assert split['source'] == 'inline:Kress-Carmichael1991'
+    assert split['source'] == 'simulator.fe_redox:kress91_split'
     assert split['fe3_over_sigma_fe'] == pytest.approx(
         0.03875582404010491, rel=0, abs=1.0e-15
     )

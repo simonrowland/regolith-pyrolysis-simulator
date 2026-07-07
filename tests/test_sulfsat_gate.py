@@ -43,7 +43,9 @@ from typing import Any, Dict
 
 import pytest
 
+import simulator.melt_backend.sulfsat as sulfsat_module
 from simulator.core import PyrolysisSimulator
+from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91
 from simulator.melt_backend.base import StubBackend
 from simulator.melt_backend.sulfsat import (
     SulfSatGate,
@@ -65,6 +67,63 @@ _MORB_COMP_WT: Dict[str, float] = {
     'Na2O': 3.0,
     'K2O': 0.3,
 }
+
+
+def _published_kress91_morb_anchor() -> tuple[Dict[str, float], Dict[str, float]]:
+    """Independent REF-001 coefficient arithmetic for one MORB-like point."""
+
+    molar_mass = {
+        'SiO2': 60.0843,
+        'TiO2': 79.8788,
+        'Al2O3': 101.961,
+        'MnO': 70.9375,
+        'MgO': 40.3044,
+        'CaO': 56.0774,
+        'Na2O': 61.9789,
+        'K2O': 94.196,
+        'P2O5': 141.937,
+    }
+    feo_molar_mass = 71.844
+    fe2o3_molar_mass = 159.687
+    feot_wt = max(0.0, _MORB_COMP_WT.get('FeO', 0.0)) + max(
+        0.0, _MORB_COMP_WT.get('Fe2O3', 0.0)
+    ) * (2.0 * feo_molar_mass / fe2o3_molar_mass)
+    mol_counts = {
+        oxide: max(0.0, _MORB_COMP_WT.get(oxide, 0.0)) / oxide_molar_mass
+        for oxide, oxide_molar_mass in molar_mass.items()
+    }
+    mol_counts['FeOt'] = feot_wt / feo_molar_mass
+    total_mol = sum(mol_counts.values())
+    x = {oxide: mol / total_mol for oxide, mol in mol_counts.items()}
+
+    fO2_log = -9.0
+    T_K = 1400.0
+    p_pa = 100000.0
+    to_K = 1673.0
+    ln_ratio = (
+        0.196 * fO2_log * math.log(10.0)
+        + 11492.0 / T_K
+        - 6.675
+        - 2.243 * x['Al2O3']
+        - 1.828 * x['FeOt']
+        + 3.201 * x['CaO']
+        + 5.854 * x['Na2O']
+        + 6.215 * x['K2O']
+        - 3.36 * (1.0 - (to_K / T_K) - math.log(T_K / to_K))
+        - 0.000000701 * (p_pa / T_K)
+        - 0.000000000154 * (((T_K - 1673.0) * p_pa) / T_K)
+        + 0.0000000000000000385 * ((p_pa ** 2.0) / T_K)
+    )
+    ratio = math.exp(ln_ratio)
+    fe3 = 2.0 * ratio / (2.0 * ratio + 1.0)
+    x_fe2o3 = ratio * x['FeOt'] / (2.0 * ratio + 1.0)
+    x_feo = max(0.0, x['FeOt'] - 2.0 * x_fe2o3)
+    return x, {
+        'fe3': fe3,
+        'ratio': ratio,
+        'x_fe2o3': x_fe2o3,
+        'x_feo': x_feo,
+    }
 
 
 def _probe_live_pysulfsat() -> bool:
@@ -105,19 +164,17 @@ def _make_fake_pysulfsat(
     scss_ppm: float = 1200.0,
     scas_ppm: float = 2500.0,
     s6_fraction: float = 0.40,
-    fe3fet_liq: float = 0.15,
 ) -> types.ModuleType:
     """
-    Return a stand-in ``PySulfSat`` module exposing the four symbols the
+    Return a stand-in ``PySulfSat`` module exposing the three symbols the
     gate consumes (``calculate_S2017_SCSS``, ``calculate_CD2019_SCAS``,
-    ``calculate_S6St_Jugo2010_eq10``, ``convert_fo2_to_fe_partition``).
+    ``calculate_S6St_Jugo2010_eq10``) plus a failing
+    ``convert_fo2_to_fe_partition`` sentinel.
     Values are deterministic; the test asserts they propagate untouched
     into every ``SulfurSaturationResult`` field.
 
-    ``convert_fo2_to_fe_partition`` is the Kress-Carmichael 1991 fit the
-    gate falls back to when the caller does not pin ``Fe3Fet_Liq``
-    explicitly. The fake returns a fixed ratio so the redox-policy path
-    is exercised without depending on the upstream library's numerics.
+    ``convert_fo2_to_fe_partition`` is intentionally present but failing:
+    the gate must derive ``Fe3Fet_Liq`` through ``simulator.fe_redox``.
     """
     import pandas as pd
 
@@ -132,11 +189,8 @@ def _make_fake_pysulfsat(
     def _calc_s6(deltaQFM=None):
         return s6_fraction
 
-    def _convert_fo2(*, liq_comps, T_K, P_kbar, model='Kress1991',
-                     fo2, renorm=False, fo2_offset=0):
-        out = liq_comps.copy()
-        out['Fe3Fet_Liq'] = fe3fet_liq
-        return out
+    def _convert_fo2(**kwargs):
+        raise AssertionError('PySulfSat Kress evaluator must not run')
 
     fake.calculate_S2017_SCSS = _calc_scss
     fake.calculate_CD2019_SCAS = _calc_scas
@@ -381,8 +435,8 @@ def test_stage0_fallback_records_warning_when_gate_unavailable(monkeypatch):
 def test_operator_fe3fet_override_takes_precedence(monkeypatch):
     """
     Explicit ``Fe3Fet_Liq`` on the call path bypasses the Kress-Carmichael
-    fallback and is forwarded to the SCSS call after being clamped to
-    [0, 1] (mirrors the AlphaMELTS redox-policy pattern).
+    fallback and is forwarded to the SCSS call after [0, 1] validation
+    (mirrors the AlphaMELTS redox-policy pattern).
     """
     captured: Dict[str, Any] = {}
     fake = _make_fake_pysulfsat()
@@ -392,13 +446,13 @@ def test_operator_fe3fet_override_takes_precedence(monkeypatch):
         captured['Fe3Fet_Liq'] = float(df['Fe3Fet_Liq'].iloc[0])
         return pd.DataFrame({'SCSS2_ppm_ideal_Smythe2017': [1200.0]})
 
-    def _convert_fo2(**kwargs):
+    def _kress_split(**kwargs):
         captured['kress_called'] = True
         raise AssertionError('Kress-Carmichael must not run when operator pins ratio')
 
     fake.calculate_S2017_SCSS = _calc_scss
-    fake.convert_fo2_to_fe_partition = _convert_fo2
     monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+    monkeypatch.setattr(sulfsat_module, 'kress91_split', _kress_split)
 
     gate = SulfSatGate()
     assert gate.initialize({}) is True
@@ -414,14 +468,36 @@ def test_operator_fe3fet_override_takes_precedence(monkeypatch):
     assert result.calibration_status == 'in_range'
 
 
-def test_kress_carmichael_fallback_when_no_operator_ratio(monkeypatch):
+def test_kress_carmichael_shared_split_matches_published_anchor():
     """
-    Without an operator ratio the gate derives Fe3Fet_Liq from
-    ``convert_fo2_to_fe_partition`` (Kress-Carmichael 1991) and forwards
-    the derived value to SCSS.
+    REF-001 Kress & Carmichael 1991 coefficient arithmetic is pinned here
+    independently from ``simulator.fe_redox.kress91_split``.
+    """
+
+    mol_fractions, expected = _published_kress91_morb_anchor()
+
+    split = kress91_split(
+        fO2_log=-9.0,
+        mol_fractions=mol_fractions,
+        T_K=1400.0,
+        pressure_bar=1.0,
+    )
+
+    assert split['fe3'] == pytest.approx(expected['fe3'], rel=0, abs=1.0e-15)
+    assert split['ratio'] == pytest.approx(expected['ratio'], rel=0, abs=1.0e-15)
+    assert split['x_fe2o3'] == pytest.approx(
+        expected['x_fe2o3'], rel=0, abs=1.0e-15
+    )
+    assert split['x_feo'] == pytest.approx(expected['x_feo'], rel=0, abs=1.0e-15)
+
+
+def test_kress_carmichael_fe3fet_uses_shared_split(monkeypatch):
+    """
+    Without an operator ratio the gate derives Fe3Fet_Liq from the shared
+    simulator.fe_redox Kress-Carmichael 1991 split and forwards it to SCSS.
     """
     captured: Dict[str, Any] = {}
-    fake = _make_fake_pysulfsat(fe3fet_liq=0.18)
+    fake = _make_fake_pysulfsat()
 
     def _calc_scss(df=None, T_K=None, P_kbar=None, Fe_FeNiCu_Sulf=None):
         import pandas as pd
@@ -439,7 +515,13 @@ def test_kress_carmichael_fallback_when_no_operator_ratio(monkeypatch):
         T_K=1400.0, P_bar=1.0, fO2_log=-9.0, S_input_ppm=1000.0,
     )
 
-    assert captured['Fe3Fet_Liq'] == pytest.approx(0.18)
+    expected = kress91_split(
+        fO2_log=-9.0,
+        mol_fractions=melt_mol_fractions_for_kress91(_MORB_COMP_WT),
+        T_K=1400.0,
+        pressure_bar=1.0,
+    )['fe3']
+    assert captured['Fe3Fet_Liq'] == pytest.approx(expected)
     assert result.calibration_status == 'in_range'
 
 
@@ -451,11 +533,11 @@ def test_kress_carmichael_failure_tags_out_of_range(monkeypatch):
     """
     fake = _make_fake_pysulfsat()
 
-    def _convert_fo2(**kwargs):
-        raise RuntimeError('upstream fit blew up')
+    def _kress_split(**kwargs):
+        raise RuntimeError('shared fit blew up')
 
-    fake.convert_fo2_to_fe_partition = _convert_fo2
     monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+    monkeypatch.setattr(sulfsat_module, 'kress91_split', _kress_split)
 
     gate = SulfSatGate()
     assert gate.initialize({}) is True

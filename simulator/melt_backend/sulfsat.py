@@ -25,14 +25,11 @@ The underlying PySulfSat (`Wieser & Gleeson 2023`) calls are:
 * :func:`PySulfSat.calculate_fo2_QFM_buffers` — computes the absolute
   logfO2 of QFM at given T, P; subtract the simulator's absolute
   ``fO2_log`` from QFM (O'Neill 1987 formulation) to obtain ΔQFM.
-* :func:`PySulfSat.convert_fo2_to_fe_partition` — Kress & Carmichael
-  (1991) ``ln(XFe2O3/XFeO)`` fit used to derive ``Fe3Fet_Liq`` from the
-  absolute fO2, T, P, and bulk composition. Smythe 2017 SCSS requires
-  this column; the adapter mirrors the AlphaMELTS redox-policy pattern
-  (``simulator/melt_backend/alphamelts.py``) by accepting an explicit
-  operator-set ``Fe3Fet_Liq`` and falling back to Kress-Carmichael when
-  the operator did not pin a value. There is no silent default — if
-  both paths fail the result is tagged ``out_of_range``.
+
+Smythe 2017 SCSS requires ``Fe3Fet_Liq``. The adapter accepts an
+operator-set value, otherwise it derives the ratio through
+``simulator.fe_redox.kress91_split``. PySulfSat is not used as a second
+Kress-Carmichael evaluator.
 
 The simulator passes the cleaned-melt oxide composition in wt%; the
 adapter renames the oxide keys onto PySulfSat's ``*_Liq`` vocabulary
@@ -75,6 +72,8 @@ import warnings
 from dataclasses import dataclass, field
 from importlib import metadata as importlib_metadata
 from typing import Any, Dict, List, Mapping, Optional
+
+from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91
 
 
 # Cleaned-melt oxide -> PySulfSat ``*_Liq`` column name mapping. Every
@@ -263,10 +262,10 @@ class SulfSatGate:
         ``simulator/melt_backend/alphamelts.py``:
 
         * If the caller passes an explicit ``Fe3Fet_Liq`` (operator
-          override), it is used verbatim after clamping to ``[0, 1]``.
+          override), it is used verbatim after validating it is in
+          ``[0, 1]``.
         * Otherwise the ratio is derived from ``fO2_log`` + ``T_K`` +
-          ``P_bar`` + composition via PySulfSat's
-          ``convert_fo2_to_fe_partition`` (Kress & Carmichael 1991).
+          ``P_bar`` + composition via ``simulator.fe_redox.kress91_split``.
         * If the derivation raises or produces a non-finite ratio (e.g.
           zero-iron melt or out-of-calibration extrapolation), the
           result is tagged ``calibration_status='out_of_range'`` with an
@@ -438,11 +437,9 @@ class SulfSatGate:
         Smythe 2017 SCSS requires the ``Fe3Fet_Liq`` column. We resolve
         it before the SCSS call so the upstream library does not raise:
 
-        * ``operator_fe3fet`` non-None -> used verbatim (clamped above).
-        * otherwise -> PySulfSat's ``convert_fo2_to_fe_partition`` with
-          ``model='Kress1991'`` (Kress & Carmichael 1991,
-          doi:10.1007/BF00307281) on the absolute ``fO2 = 10**fO2_log``
-          (bar).
+        * ``operator_fe3fet`` non-None -> used verbatim (validated above).
+        * otherwise -> simulator.fe_redox's shared Kress-Carmichael 1991
+          split on ``fO2_log``.
 
         If the derivation raises or returns a non-finite value the
         result is tagged ``out_of_range`` with an explicit warning and
@@ -458,6 +455,7 @@ class SulfSatGate:
 
         fe3fet_value, redox_warnings, redox_in_range = self._resolve_fe3fet(
             df=df,
+            liquid_comp_wt=liquid_comp_wt,
             T_K=T_K,
             P_kbar=P_kbar,
             fO2_log=fO2_log,
@@ -518,6 +516,7 @@ class SulfSatGate:
         self,
         *,
         df: Any,
+        liquid_comp_wt: Mapping[str, float],
         T_K: float,
         P_kbar: float,
         fO2_log: float,
@@ -532,14 +531,10 @@ class SulfSatGate:
         degenerate case so the SCSS call can complete, but the caller
         honours ``calibration_status='out_of_range'``.
 
-        The Kress-Carmichael path uses PySulfSat's
-        ``convert_fo2_to_fe_partition`` which expects:
-
-        * a one-row DataFrame in the ``*_Liq`` schema (FeOt_Liq +
-          oxide_Liq columns) with a ``Sample_ID_Liq`` column the
-          function drops internally during renormalization,
-        * ``fo2`` as an absolute value (bar), i.e. ``10**fO2_log``,
-        * ``T_K`` in Kelvin and ``P_kbar`` in kbar.
+        The Kress-Carmichael path deliberately uses
+        ``simulator.fe_redox.kress91_split`` rather than PySulfSat's
+        ``convert_fo2_to_fe_partition`` so the simulator has one Kress91
+        evaluator. PySulfSat remains the independent sulfur-capacity engine.
 
         Zero-FeOt melts are a degenerate boundary case: there is no
         iron to partition, the fit returns NaN, and we report
@@ -557,20 +552,15 @@ class SulfSatGate:
             # there is genuinely nothing to derive a ratio FROM.
             return 0.0, [], True
 
-        ss = self._module
         try:
-            df_for_fit = df.copy()
-            df_for_fit['Sample_ID_Liq'] = 'SulfSatGate'
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore')
-                fit_result = ss.convert_fo2_to_fe_partition(
-                    liq_comps=df_for_fit,
-                    T_K=T_K,
-                    P_kbar=P_kbar,
-                    model='Kress1991',
-                    fo2=10.0 ** float(fO2_log),
-                )
-            ratio = float(fit_result['Fe3Fet_Liq'].iloc[0])
+            mol_fractions = melt_mol_fractions_for_kress91(liquid_comp_wt)
+            split = kress91_split(
+                fO2_log=float(fO2_log),
+                mol_fractions=mol_fractions,
+                T_K=float(T_K),
+                pressure_bar=max(float(P_kbar) * 1000.0, 1.0e-9),
+            )
+            ratio = float(split['fe3'])
         except Exception as exc:  # noqa: BLE001 — upstream library boundary
             return (
                 0.0,

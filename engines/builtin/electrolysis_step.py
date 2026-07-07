@@ -829,7 +829,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 "fe2o3_over_feo_molar": 0.0,
                 "fe2o3_equiv_wt_pct": 0.0,
                 "feo_equiv_wt_pct": 0.0,
-                "source": "inline:Kress-Carmichael1991:no_iron",
+                "source": "simulator.fe_redox:kress91_split:no_iron",
             }
 
         split = kress91_split(
@@ -871,7 +871,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "fe2o3_over_feo_molar": ratio,
             "fe2o3_equiv_wt_pct": fe2o3_wt,
             "feo_equiv_wt_pct": feo_wt,
-            "source": "inline:Kress-Carmichael1991",
+            "source": "simulator.fe_redox:kress91_split",
         }
 
     @staticmethod
