@@ -828,8 +828,19 @@ def _score_key(
 ) -> tuple[Any, ...]:
     if scored.feasible and scored.objectives is not None:
         scores = objective_scores(scored.objectives, definitions)
-        return (0, *(-score for score in scores), scored.cache_key or "", candidate.id)
+        return (
+            0,
+            *_score_key_components(scores),
+            scored.cache_key or "",
+            candidate.id,
+        )
     return (1, scored.cache_key or "", candidate.id)
+
+
+def _score_key_components(
+    scores: Sequence[float | None],
+) -> tuple[tuple[int, float], ...]:
+    return tuple((1, 0.0) if score is None else (0, -score) for score in scores)
 
 
 def _stage_specs(

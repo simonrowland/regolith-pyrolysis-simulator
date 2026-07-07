@@ -3132,11 +3132,11 @@ def normalize_objective_sense(sense: str) -> str:
 def objective_scores(
     objectives: ObjectiveLike,
     definitions: Sequence[ObjectiveDefinition],
-) -> tuple[float, ...]:
-    """Render available objective values as maximize-native scores in profile order."""
+) -> tuple[float | None, ...]:
+    """Render objective values as maximize-native scores in profile order."""
 
     mapping = _objective_mapping(objectives)
-    scores: list[float] = []
+    scores: list[float | None] = []
     for definition in definitions:
         try:
             value = mapping[definition.metric]
@@ -3145,9 +3145,10 @@ def objective_scores(
                 f"objective {definition.metric!r} is missing"
             ) from exc
         if value is None:
-            continue
-        numeric = _finite_float(value, definition.metric)
-        scores.append(numeric if definition.sense == "maximize" else -numeric)
+            scores.append(None)
+        else:
+            numeric = _finite_float(value, definition.metric)
+            scores.append(numeric if definition.sense == "maximize" else -numeric)
     return tuple(scores)
 
 
@@ -3160,8 +3161,13 @@ def dominates(
 
     left_scores = objective_scores(left, definitions)
     right_scores = objective_scores(right, definitions)
-    return all(a >= b for a, b in zip(left_scores, right_scores)) and any(
-        a > b for a, b in zip(left_scores, right_scores)
+    comparable = tuple(
+        (a, b)
+        for a, b in zip(left_scores, right_scores)
+        if a is not None and b is not None
+    )
+    return bool(comparable) and all(a >= b for a, b in comparable) and any(
+        a > b for a, b in comparable
     )
 
 

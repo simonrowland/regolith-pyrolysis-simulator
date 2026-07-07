@@ -67,6 +67,51 @@ def test_dominates_honors_mixed_minimize_maximize_directions() -> None:
     assert not dominates(higher_energy, lower_energy, DEFINITIONS)
 
 
+def test_nullable_objective_scores_preserve_metric_positions() -> None:
+    definitions = (
+        ObjectiveDefinition("primary", "maximize", "kg", ordinal=0),
+        ObjectiveDefinition("middle", "minimize", "kWh", ordinal=1),
+        ObjectiveDefinition("last", "maximize", "kg", ordinal=2),
+    )
+
+    assert objective_scores(
+        {"primary": None, "middle": 4.0, "last": 9.0},
+        definitions,
+    ) == (None, -4.0, 9.0)
+    assert objective_scores(
+        {"primary": 2.0, "middle": None, "last": 9.0},
+        definitions,
+    ) == (2.0, None, 9.0)
+    assert objective_scores(
+        {"primary": 2.0, "middle": 4.0, "last": None},
+        definitions,
+    ) == (2.0, -4.0, None)
+
+
+def test_dominates_skips_unavailable_objectives_by_metric_not_position() -> None:
+    definitions = (
+        ObjectiveDefinition("primary", "maximize", "kg", ordinal=0),
+        ObjectiveDefinition("middle", "minimize", "kWh", ordinal=1),
+        ObjectiveDefinition("last", "maximize", "kg", ordinal=2),
+    )
+
+    assert dominates(
+        {"primary": None, "middle": 4.0, "last": 10.0},
+        {"primary": 100.0, "middle": 5.0, "last": 10.0},
+        definitions,
+    )
+    assert dominates(
+        {"primary": 10.0, "middle": None, "last": 10.0},
+        {"primary": 9.0, "middle": 1.0, "last": 10.0},
+        definitions,
+    )
+    assert dominates(
+        {"primary": 10.0, "middle": 4.0, "last": None},
+        {"primary": 10.0, "middle": 5.0, "last": 100.0},
+        definitions,
+    )
+
+
 def test_target_spec_digest_excludes_derived_thermal_window_disposition() -> None:
     target = {
         "pool": "residual_rump_at_stop",
@@ -333,6 +378,32 @@ def test_pareto_front_preserves_stable_non_dominated_order() -> None:
     )
 
     assert [item["id"] for item in front] == ["d", "c"]
+
+
+def test_pareto_front_keeps_nullable_objective_identity() -> None:
+    definitions = (
+        ObjectiveDefinition("primary", "maximize", "kg", ordinal=0),
+        ObjectiveDefinition("middle", "minimize", "kWh", ordinal=1),
+        ObjectiveDefinition("last", "maximize", "kg", ordinal=2),
+    )
+    items = (
+        {"id": "primary-null", "objectives": {"primary": None, "middle": 4.0, "last": 1.0}},
+        {"id": "middle-null", "objectives": {"primary": 10.0, "middle": None, "last": 1.0}},
+        {"id": "last-null", "objectives": {"primary": 10.0, "middle": 4.0, "last": None}},
+        {"id": "dominated", "objectives": {"primary": 9.0, "middle": 5.0, "last": 1.0}},
+    )
+
+    front = pareto_front(
+        items,
+        definitions,
+        objective_getter=lambda item: item["objectives"],
+    )
+
+    assert [item["id"] for item in front] == [
+        "primary-null",
+        "middle-null",
+        "last-null",
+    ]
 
 
 class _FakeLedger:

@@ -445,6 +445,100 @@ def test_objective_evidence_json_stringifies_none_and_nonfinite_values(tmp_path)
     assert loaded.objectives.evidence[metric]["score_components"] == score_components
 
 
+def test_nullable_objective_value_round_trips_with_status_and_does_not_win_ranking(
+    tmp_path,
+) -> None:
+    metric = "furnace_lifespan_consumed_fraction"
+    profile_id = "lifespan-nullability"
+    null_spec = _base_spec(profile_id=profile_id, recipe_id="null-lifespan")
+    numeric_spec = _base_spec(profile_id=profile_id, recipe_id="numeric-lifespan")
+    null_key = cache_key(null_spec)
+    numeric_key = cache_key(numeric_spec)
+    null_objectives = ObjectiveVector(
+        (
+            ObjectiveValue(
+                metric,
+                "minimize",
+                None,
+                "fraction/run",
+                ordinal=0,
+            ),
+        ),
+        evidence={
+            metric: {
+                "reader": metric,
+                "lifespan_cost_status": "threshold_unavailable",
+                "lifespan_cost_status_reason": "resinter_threshold_kg is null",
+            }
+        },
+    )
+    numeric_objectives = ObjectiveVector(
+        (
+            ObjectiveValue(
+                metric,
+                "minimize",
+                0.4,
+                "fraction/run",
+                ordinal=0,
+            ),
+        ),
+        evidence={
+            metric: {
+                "reader": metric,
+                "lifespan_cost_status": "available",
+                "lifespan_cost_status_reason": "",
+            }
+        },
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=null_spec.code_version,
+        current_data_digests=null_spec.data_digests,
+    )
+
+    store.store(
+        null_spec,
+        _scored(null_spec, objectives=null_objectives, candidate_id="null"),
+        created_at="2026-07-06T00:00:00Z",
+    )
+    store.store(
+        numeric_spec,
+        _scored(numeric_spec, objectives=numeric_objectives, candidate_id="numeric"),
+        created_at="2026-07-06T00:00:01Z",
+    )
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        scalar_row = conn.execute(
+            """
+            SELECT value, value_status
+            FROM objective_values
+            WHERE cache_key = ? AND metric = ?
+            """,
+            (null_key, metric),
+        ).fetchone()
+        payload_row = conn.execute(
+            "SELECT objectives FROM results WHERE cache_key = ?",
+            (null_key,),
+        ).fetchone()
+    payload = json.loads(payload_row[0])
+    loaded = store.fetch(null_key)
+    best = store.best(
+        null_spec.feedstock_id,
+        objective_metric=metric,
+        profile_id=profile_id,
+        fidelity=null_spec.fidelity,
+    )
+
+    assert scalar_row == (None, "threshold_unavailable")
+    assert payload[0]["value"] is None
+    assert payload[0]["value_status"] == "threshold_unavailable"
+    assert loaded is not None and loaded.objectives is not None
+    assert loaded.objectives.as_mapping()[metric] is None
+    assert loaded.objectives.evidence[metric]["lifespan_cost_status"] == "threshold_unavailable"
+    assert best is not None
+    assert best.cache_key == numeric_key
+
+
 def test_objective_evidence_unknown_schema_version_warns_and_reads_absent(tmp_path) -> None:
     metric = "sso2_pn2_fe_drain_silica"
     spec = _base_spec(profile_id="sso2-unknown-version")
@@ -2079,12 +2173,22 @@ def test_v3_store_migrates_corpus_version_once_without_rewriting_payloads(
                 "2026-06-01T00:00:00Z",
             ),
         )
+        conn.execute(
+            """
+            INSERT INTO objective_values(cache_key, metric, sense, value, units, ordinal)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            ("legacy-cache-key", "oxygen_kg", "maximize", 1.0, "kg", 0),
+        )
 
     assert ResultStore(path).schema_version == SCHEMA_VERSION
     assert ResultStore(path).schema_version == SCHEMA_VERSION
 
     with sqlite3.connect(path) as conn:
         columns = [row[1] for row in conn.execute("PRAGMA table_info(results)")]
+        objective_columns = {
+            row[1]: row for row in conn.execute("PRAGMA table_info(objective_values)")
+        }
         row = conn.execute(
             """
             SELECT corpus_version, data_digests, result_scope, objectives,
@@ -2094,8 +2198,18 @@ def test_v3_store_migrates_corpus_version_once_without_rewriting_payloads(
             WHERE cache_key = 'legacy-cache-key'
             """
         ).fetchone()
+        objective_row = conn.execute(
+            """
+            SELECT value, value_status
+            FROM objective_values
+            WHERE cache_key = 'legacy-cache-key' AND metric = 'oxygen_kg'
+            """
+        ).fetchone()
 
     assert columns.count("corpus_version") == 1
+    assert objective_columns["value"][3] == 0
+    assert "value_status" in objective_columns
+    assert objective_row == (1.0, "available")
     assert row[0] is None
     assert {
         "data_digests": row[1],
@@ -2108,3 +2222,119 @@ def test_v3_store_migrates_corpus_version_once_without_rewriting_payloads(
         "eval_spec": row[8],
         "notes": row[9],
     } == legacy_payloads
+
+
+def test_v4_store_migrates_objective_values_to_nullable_value_status(
+    tmp_path,
+) -> None:
+    path = tmp_path / "old-v4.sqlite"
+    with sqlite3.connect(path) as conn:
+        conn.executescript(
+            """
+            CREATE TABLE store_meta (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            );
+            INSERT INTO store_meta(key, value) VALUES ('schema_version', '4');
+            CREATE TABLE results (
+                cache_key TEXT PRIMARY KEY,
+                feedstock_id TEXT NOT NULL,
+                recipe_id TEXT NOT NULL,
+                profile_id TEXT NOT NULL,
+                fidelity TEXT NOT NULL,
+                code_version TEXT NOT NULL,
+                corpus_version TEXT,
+                data_digests TEXT NOT NULL,
+                result_scope TEXT NOT NULL DEFAULT '{}',
+                feasible INTEGER NOT NULL CHECK (feasible IN (0, 1)),
+                failure_category TEXT,
+                objectives TEXT NOT NULL,
+                feasibility_margins TEXT NOT NULL,
+                failing_gates TEXT NOT NULL,
+                candidate_id TEXT,
+                result_blob TEXT NOT NULL,
+                run_reference TEXT NOT NULL,
+                eval_spec TEXT NOT NULL,
+                notes TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE TABLE objective_values (
+                cache_key TEXT NOT NULL,
+                metric TEXT NOT NULL,
+                sense TEXT NOT NULL CHECK (sense IN ('minimize', 'maximize')),
+                value REAL NOT NULL,
+                units TEXT NOT NULL,
+                ordinal INTEGER NOT NULL,
+                PRIMARY KEY (cache_key, metric),
+                FOREIGN KEY (cache_key) REFERENCES results(cache_key)
+                    ON DELETE CASCADE
+            );
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO results (
+                cache_key, feedstock_id, recipe_id, profile_id, fidelity,
+                code_version, corpus_version, data_digests, result_scope, feasible,
+                failure_category, objectives, feasibility_margins, failing_gates,
+                candidate_id, result_blob, run_reference, eval_spec, notes,
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "legacy-v4-cache-key",
+                "lunar_mare_low_ti",
+                "legacy-recipe",
+                "oxygen-yield-v1",
+                "fast",
+                "legacy-code",
+                "legacy-corpus",
+                '{"feedstocks":"legacy-feedstock","profile":"legacy-profile"}',
+                "{}",
+                1,
+                None,
+                '[{"metric":"oxygen_kg","sense":"maximize","value":1.0,"units":"kg","ordinal":0}]',
+                '{"mass_balance":{"status":"legacy"}}',
+                "[]",
+                "legacy-v4-candidate",
+                '{"trace":["byte","unchanged"]}',
+                '{"status":"ok","backend_status":"ok"}',
+                '{"recipe_id":"legacy-recipe"}',
+                "[]",
+                "2026-07-01T00:00:00Z",
+            ),
+        )
+        conn.execute(
+            """
+            INSERT INTO objective_values(cache_key, metric, sense, value, units, ordinal)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            ("legacy-v4-cache-key", "oxygen_kg", "maximize", 1.0, "kg", 0),
+        )
+
+    migrated = ResultStore(path)
+
+    assert migrated.schema_version == SCHEMA_VERSION
+    with sqlite3.connect(path) as conn:
+        objective_columns = {
+            row[1]: row for row in conn.execute("PRAGMA table_info(objective_values)")
+        }
+        objective_row = conn.execute(
+            """
+            SELECT value, value_status
+            FROM objective_values
+            WHERE cache_key = 'legacy-v4-cache-key' AND metric = 'oxygen_kg'
+            """
+        ).fetchone()
+        result_row = conn.execute(
+            """
+            SELECT corpus_version, result_blob
+            FROM results
+            WHERE cache_key = 'legacy-v4-cache-key'
+            """
+        ).fetchone()
+
+    assert objective_columns["value"][3] == 0
+    assert "value_status" in objective_columns
+    assert objective_row == (1.0, "available")
+    assert result_row == ("legacy-corpus", '{"trace":["byte","unchanged"]}')

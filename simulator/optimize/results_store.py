@@ -47,7 +47,7 @@ from simulator.backend_names import canonical_backend_name
 from simulator.fidelity_vocabulary import backend_name_denies_authority
 from simulator.optimize.result_scope import result_scope_json, selector_where
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 OBJECTIVE_EVIDENCE_SCHEMA_VERSION = 1
 DEFAULT_BUSY_TIMEOUT_MS = 30000
 WRITE_RETRY_ATTEMPTS = 8
@@ -253,8 +253,8 @@ class ResultStore:
                 conn.executemany(
                     """
                     INSERT INTO objective_values (
-                        cache_key, metric, sense, value, units, ordinal
-                    ) VALUES (?, ?, ?, ?, ?, ?)
+                        cache_key, metric, sense, value, value_status, units, ordinal
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
                     """,
                     [
                         (
@@ -262,6 +262,7 @@ class ResultStore:
                             objective["metric"],
                             objective["sense"],
                             objective["value"],
+                            objective["value_status"],
                             objective["units"],
                             objective["ordinal"],
                         )
@@ -352,7 +353,7 @@ class ResultStore:
                 FROM results r
                 JOIN objective_values ov ON ov.cache_key = r.cache_key
                 WHERE {where} AND r.feasible = 1 AND r.corpus_version = ?
-                    AND ov.metric = ?
+                    AND ov.metric = ? AND ov.value IS NOT NULL
                 GROUP BY ov.sense
                 ORDER BY ov.sense ASC
                 LIMIT 2
@@ -371,7 +372,7 @@ class ResultStore:
                 FROM results r
                 JOIN objective_values ov ON ov.cache_key = r.cache_key
                 WHERE {where} AND r.feasible = 1 AND r.corpus_version = ?
-                    AND ov.metric = ?
+                    AND ov.metric = ? AND ov.value IS NOT NULL
                 ORDER BY ov.value {value_order}, r.cache_key ASC
                 LIMIT 1
                 """,
@@ -404,6 +405,7 @@ class ResultStore:
                 FROM results r
                 JOIN objective_values ov ON ov.cache_key = r.cache_key
                 WHERE {where} AND r.feasible = 1 AND r.corpus_version = ?
+                    AND ov.value IS NOT NULL
                 ORDER BY ov.ordinal ASC, ov.metric ASC, r.cache_key ASC
                 LIMIT 1
                 """,
@@ -502,7 +504,8 @@ class ResultStore:
                 cache_key TEXT NOT NULL,
                 metric TEXT NOT NULL,
                 sense TEXT NOT NULL CHECK (sense IN ('minimize', 'maximize')),
-                value REAL NOT NULL,
+                value REAL,
+                value_status TEXT NOT NULL DEFAULT 'available',
                 units TEXT NOT NULL,
                 ordinal INTEGER NOT NULL,
                 PRIMARY KEY (cache_key, metric),
@@ -574,6 +577,17 @@ class ResultStore:
                 (str(SCHEMA_VERSION),),
             )
             version = 4
+        if version < 5:
+            _migrate_objective_values_v5(conn)
+            conn.execute(
+                """
+                INSERT INTO store_meta(key, value)
+                VALUES ('schema_version', ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                (str(SCHEMA_VERSION),),
+            )
+            version = 5
         if version != SCHEMA_VERSION:
             raise ResultStoreSchemaError(f"unsupported result store schema {version}")
         self._refresh_current_selector_index(conn)
@@ -1110,10 +1124,16 @@ def _serialize_objectives(objectives: ObjectiveVector | None) -> list[dict[str, 
     evidence_by_metric = objectives.evidence if isinstance(objectives.evidence, Mapping) else {}
     rows: list[dict[str, Any]] = []
     for value in objectives.values:
+        evidence_item = (
+            evidence_by_metric.get(value.metric)
+            if isinstance(evidence_by_metric, Mapping)
+            else None
+        )
         payload = {
             "metric": value.metric,
             "sense": value.sense,
             "value": value.value,
+            "value_status": _objective_value_status(value.value, evidence_item),
             "units": value.units,
             "ordinal": value.ordinal,
         }
@@ -1171,6 +1191,13 @@ def _column_exists(conn: sqlite3.Connection, table: str, column: str) -> bool:
     return any(row["name"] == column for row in conn.execute(f"PRAGMA table_info({table})"))
 
 
+def _column_notnull(conn: sqlite3.Connection, table: str, column: str) -> bool:
+    for row in conn.execute(f"PRAGMA table_info({table})"):
+        if row["name"] == column:
+            return bool(row["notnull"])
+    return False
+
+
 def _migrate_objective_values_v2(conn: sqlite3.Connection) -> None:
     rows = conn.execute("SELECT cache_key, objectives FROM results").fetchall()
     for row in rows:
@@ -1200,6 +1227,80 @@ def _migrate_objective_values_v2(conn: sqlite3.Connection) -> None:
             "UPDATE results SET objectives = ? WHERE cache_key = ?",
             (_json_dump(updated_payload), row["cache_key"]),
         )
+
+
+def _migrate_objective_values_v5(conn: sqlite3.Connection) -> None:
+    has_value_status = _column_exists(conn, "objective_values", "value_status")
+    value_is_not_null = _column_notnull(conn, "objective_values", "value")
+    if has_value_status and not value_is_not_null:
+        conn.execute(
+            """
+            UPDATE objective_values
+            SET value_status = CASE
+                WHEN value_status IS NULL OR value_status = '' THEN
+                    CASE WHEN value IS NULL THEN 'unavailable' ELSE 'available' END
+                ELSE value_status
+            END
+            """
+        )
+        return
+
+    conn.execute("DROP INDEX IF EXISTS idx_objective_values_metric")
+    conn.execute("ALTER TABLE objective_values RENAME TO objective_values_legacy_v5")
+    conn.execute(
+        """
+        CREATE TABLE objective_values (
+            cache_key TEXT NOT NULL,
+            metric TEXT NOT NULL,
+            sense TEXT NOT NULL CHECK (sense IN ('minimize', 'maximize')),
+            value REAL,
+            value_status TEXT NOT NULL DEFAULT 'available',
+            units TEXT NOT NULL,
+            ordinal INTEGER NOT NULL,
+            PRIMARY KEY (cache_key, metric),
+            FOREIGN KEY (cache_key) REFERENCES results(cache_key)
+                ON DELETE CASCADE
+        )
+        """
+    )
+    status_expr = (
+        """
+        CASE
+            WHEN value_status IS NULL OR value_status = '' THEN
+                CASE WHEN value IS NULL THEN 'unavailable' ELSE 'available' END
+            ELSE value_status
+        END
+        """
+        if has_value_status
+        else "CASE WHEN value IS NULL THEN 'unavailable' ELSE 'available' END"
+    )
+    conn.execute(
+        f"""
+        INSERT INTO objective_values (
+            cache_key, metric, sense, value, value_status, units, ordinal
+        )
+        SELECT cache_key, metric, sense, value, {status_expr}, units, ordinal
+        FROM objective_values_legacy_v5
+        """
+    )
+    conn.execute("DROP TABLE objective_values_legacy_v5")
+    conn.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_objective_values_metric
+            ON objective_values(metric, sense, ordinal, value, cache_key)
+        """
+    )
+
+
+def _objective_value_status(value: Any, evidence: Any) -> str:
+    if value is not None:
+        return "available"
+    if isinstance(evidence, Mapping):
+        for key in ("value_status", "lifespan_cost_status", "status"):
+            raw = evidence.get(key)
+            if raw is not None and str(raw):
+                return str(raw)
+    return "unavailable"
 
 
 def _is_locked_error(exc: sqlite3.OperationalError) -> bool:

@@ -26,7 +26,7 @@ from simulator.optimize.evaluate import evaluate
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector, compute_objectives
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.physics import physics_constraints_digest
-from simulator.optimize.profiles import physics_constraints_from_profile
+from simulator.optimize.profiles import constrained_max_profile, physics_constraints_from_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.strategy import (
@@ -839,6 +839,22 @@ class _SingleCandidateStrategy:
         return None
 
 
+class _FixedCandidateStrategy:
+    name = "fixed"
+    seed = 0
+
+    def __init__(self, candidates: tuple[Candidate, ...]) -> None:
+        self._pending = list(candidates)
+
+    def ask(self, n: int) -> list[Candidate]:
+        batch = self._pending[:n]
+        self._pending = self._pending[n:]
+        return batch
+
+    def tell(self, results) -> None:
+        return None
+
+
 class _ClosedLoopLedger:
     registry = {}
 
@@ -1319,6 +1335,205 @@ def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path
     assert row["certification_tier"] == "certified"
     assert json.loads(row["certified_envelope_json"]) == [
         {"id": "FeO_total", "pass": True, "strict": True}
+    ]
+
+
+def _nullable_position_profile() -> dict[str, Any]:
+    return {
+        **PROFILE,
+        "profile_id": "nullable-position-ranking",
+        "objectives": [
+            {
+                "metric": "energy_kWh",
+                "sense": "minimize",
+                "units": "kWh",
+                "weight": 0.4,
+                "rationale": "primary nullable-position regression metric",
+            },
+            {
+                "metric": "oxygen_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 0.3,
+                "rationale": "middle nullable-position regression metric",
+            },
+            {
+                "metric": "metals_total_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 0.3,
+                "rationale": "last nullable-position regression metric",
+            },
+        ],
+    }
+
+
+def _nullable_position_values(candidate_id: str) -> tuple[float | None, float | None, float | None]:
+    return {
+        "nullable-baseline": (1.0, 1.0, 1.0),
+        "nullable-primary": (None, 100.0, 0.0),
+        "nullable-middle": (1.0, None, 100.0),
+        "nullable-last": (1.0, 1.0, None),
+    }[candidate_id]
+
+
+def _nullable_position_candidates() -> tuple[Candidate, ...]:
+    candidates: list[Candidate] = []
+    for idx, candidate_id in enumerate(
+        (
+            "nullable-baseline",
+            "nullable-primary",
+            "nullable-middle",
+            "nullable-last",
+        )
+    ):
+        candidates.append(
+            Candidate(
+                id=candidate_id,
+                patch=RecipePatch.from_nested(
+                    {"campaigns": {"C0": {"temp_range_C": [900.0 + idx, 920.0 + idx]}}}
+                ),
+            )
+        )
+    return tuple(candidates)
+
+
+def _nullable_position_objectives(
+    candidate_id: str,
+    definitions: tuple[study.ObjectiveDefinition, ...],
+) -> ObjectiveVector:
+    values = _nullable_position_values(candidate_id)
+    return ObjectiveVector(
+        tuple(
+            ObjectiveValue(
+                definition.metric,
+                definition.sense,
+                values[idx],
+                definition.units,
+                ordinal=definition.ordinal,
+            )
+            for idx, definition in enumerate(definitions)
+        )
+    )
+
+
+def _nullable_position_record(candidate_id: str) -> study.StudyRecord:
+    profile = _nullable_position_profile()
+    definitions = study.objective_definitions(profile)
+    values = _nullable_position_values(candidate_id)
+    return study.StudyRecord(
+        candidate_id=candidate_id,
+        patch=RecipePatch({}),
+        feasible=True,
+        status="ok",
+        objectives={
+            definition.metric: values[idx]
+            for idx, definition in enumerate(definitions)
+        },
+        feasibility_margins={},
+        cache_key=f"cache-{candidate_id}",
+    )
+
+
+def _nullable_position_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    assert candidate_id is not None
+    definitions = study.objective_definitions(profile)
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=_nullable_position_objectives(candidate_id, definitions),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+            },
+            product_summary={
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                }
+            },
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+    )
+
+
+def test_leaderboard_ranking_preserves_nullable_objective_positions(tmp_path) -> None:
+    profile = _nullable_position_profile()
+    definitions = study.objective_definitions(profile)
+    records = tuple(
+        _nullable_position_record(candidate.id)
+        for candidate in _nullable_position_candidates()
+    )
+    leaderboard = tuple(sorted(records, key=lambda row: study._rank_key(row, definitions)))
+
+    study._write_leaderboard(
+        tmp_path / "leaderboard.csv",
+        leaderboard,
+        leaderboard,
+        leaderboard[0],
+        definitions,
+        RecipeSchema(),
+    )
+    rows = list(csv.DictReader((tmp_path / "leaderboard.csv").open()))
+
+    assert [record.candidate_id for record in leaderboard] == [
+        "nullable-baseline",
+        "nullable-last",
+        "nullable-middle",
+        "nullable-primary",
+    ]
+    assert [row["candidate_id"] for row in rows] == [
+        "nullable-baseline",
+        "nullable-last",
+        "nullable-middle",
+        "nullable-primary",
+    ]
+
+
+def test_two_phase_ranking_preserves_nullable_objective_positions(tmp_path) -> None:
+    profile = _nullable_position_profile()
+    result = study.run(
+        profile,
+        FEEDSTOCK,
+        _FixedCandidateStrategy(_nullable_position_candidates()),
+        "stub",
+        1,
+        4,
+        tmp_path / "two-phase-nullable-position",
+        evaluator=_nullable_position_evaluator,
+        two_phase_certify={"enabled": True, "top_k": 4},
+    )
+    certification = json.loads(
+        (tmp_path / "two-phase-nullable-position" / "two_phase_certification.json").read_text()
+    )
+
+    assert [record.candidate_id for record in result.leaderboard] == [
+        "nullable-baseline",
+        "nullable-last",
+        "nullable-middle",
+        "nullable-primary",
+    ]
+    assert [row["candidate_id"] for row in certification["candidates"]] == [
+        "nullable-baseline",
+        "nullable-last",
+        "nullable-middle",
+        "nullable-primary",
     ]
 
 
@@ -2879,9 +3094,131 @@ def test_cli_constrained_max_furnace_cap_e2e_writes_leaderboard(tmp_path) -> Non
     assert leaderboard_path.exists()
     rows = list(csv.DictReader(leaderboard_path.open()))
     assert rows
+    assert rows[0]["rank"] == "1"
     assert "furnace_lifespan_consumed_fraction" in rows[0]
     assert rows[0]["furnace_lifespan_consumed_fraction"] == ""
     assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
+
+
+def test_constrained_max_nullable_lifespan_persists_and_round_trips(
+    tmp_path,
+) -> None:
+    metric = "furnace_lifespan_consumed_fraction"
+    base_profile = copy.deepcopy(
+        dict(study.resolve_profile("default", expected_feedstock=FEEDSTOCK))
+    )
+    profile = constrained_max_profile(
+        base_profile,
+        furnace_T_max_C=1300.0,
+        include_throughput_cost=True,
+    )
+
+    def evaluate_lifespan_null(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+        values: list[ObjectiveValue] = []
+        evidence: dict[str, Mapping[str, Any]] = {}
+        for definition in study.objective_definitions(profile):
+            if definition.metric == metric:
+                value = None
+                evidence[metric] = {
+                    "reader": metric,
+                    "lifespan_cost_status": "threshold_unavailable",
+                    "lifespan_cost_status_reason": "resinter_threshold_kg is null",
+                    "resinter_threshold_kg": None,
+                    "wall_deposit_total_kg": 0.0,
+                }
+            elif definition.metric == "solar_thermal_flux_h":
+                value = 12.0
+            elif definition.sense == "maximize":
+                value = 1.0
+            else:
+                value = 1.0
+            values.append(
+                ObjectiveValue(
+                    definition.metric,
+                    definition.sense,
+                    value,
+                    definition.units,
+                    ordinal=definition.ordinal,
+                )
+            )
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=True,
+            objectives=ObjectiveVector(tuple(values), evidence=evidence),
+            feasibility_margins={"delivered_stream_purity": _margin()},
+            failing_gates=(),
+            run_reference=RunReference(
+                status="ok",
+                trace={
+                    "backend_status": "ok",
+                    "backend_authoritative": True,
+                    "snapshots": [{"mass_balance_error_pct": 0.0}],
+                },
+                product_summary={
+                    "mass_closure": {
+                        "status": "closed",
+                        "mass_balance_error_pct": 0.0,
+                    },
+                    "lifespan_cost_status": "threshold_unavailable",
+                    "lifespan_cost_status_reason": "resinter_threshold_kg is null",
+                    "furnace_lifespan_consumed_fraction": None,
+                    "wall_deposit_total_kg": 0.0,
+                },
+                backend_status="ok",
+                backend_authoritative=True,
+            ),
+        )
+
+    out_dir = tmp_path / "constrained-max-store"
+    result = study.run(
+        profile,
+        FEEDSTOCK,
+        _SingleCandidateStrategy(),
+        "fast",
+        parallel=1,
+        budget=1,
+        out_dir=out_dir,
+        evaluator=evaluate_lifespan_null,
+    )
+
+    rows = list(csv.DictReader((out_dir / "leaderboard.csv").open()))
+    with sqlite3.connect(result.store_path) as conn:
+        stored = conn.execute(
+            """
+            SELECT r.cache_key, r.objectives, ov.value, ov.value_status
+            FROM results r
+            JOIN objective_values ov ON ov.cache_key = r.cache_key
+            WHERE ov.metric = ?
+            """,
+            (metric,),
+        ).fetchone()
+    assert stored is not None
+    payload = json.loads(stored[1])
+    lifespan_payload = next(item for item in payload if item["metric"] == metric)
+    loaded = ResultStore(result.store_path).fetch(stored[0])
+
+    assert result.leaderboard[0].objectives[metric] is None
+    assert rows[0]["rank"] == "1"
+    assert rows[0][metric] == ""
+    assert rows[0]["lifespan_cost_status"] == "threshold_unavailable"
+    assert stored[2] is None
+    assert stored[3] == "threshold_unavailable"
+    assert lifespan_payload["value"] is None
+    assert lifespan_payload["value_status"] == "threshold_unavailable"
+    assert loaded is not None and loaded.objectives is not None
+    assert loaded.objectives.as_mapping()[metric] is None
+    assert loaded.objectives.evidence[metric]["lifespan_cost_status"] == "threshold_unavailable"
 
 
 def test_cli_writes_failure_job_status_marker_for_no_feasible(

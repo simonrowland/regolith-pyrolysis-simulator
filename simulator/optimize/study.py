@@ -854,13 +854,11 @@ def _primary_objective_metric(definitions: Sequence[ObjectiveDefinition]) -> str
     return definitions[0].metric
 
 
-def _objective_value(record: StudyRecord, metric: str) -> float:
+def _objective_value(record: StudyRecord, metric: str) -> float | None:
     if metric not in record.objectives:
         raise StudyError(f"record {record.candidate_id!r} missing objective {metric!r}")
     if record.objectives[metric] is None:
-        raise StudyError(
-            f"record {record.candidate_id!r} objective {metric!r} is not costed"
-        )
+        return None
     return float(record.objectives[metric])
 
 
@@ -957,7 +955,7 @@ def _run_exact_certification(
         )
         disagreement = (
             abs(explore_objective - certified_objective)
-            if certified_objective is not None
+            if explore_objective is not None and certified_objective is not None
             else None
         )
         certification_rows.append(
@@ -2372,7 +2370,13 @@ def _rank_key(
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[Any, ...]:
     scores = objective_scores(record.objectives, definitions)
-    return (*(-score for score in scores), record.cache_key or "", record.candidate_id)
+    return (*_rank_score_components(scores), record.cache_key or "", record.candidate_id)
+
+
+def _rank_score_components(
+    scores: Sequence[float | None],
+) -> tuple[tuple[int, float], ...]:
+    return tuple((1, 0.0) if score is None else (0, -score) for score in scores)
 
 
 def _write_artifacts(
