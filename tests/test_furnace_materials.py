@@ -5,9 +5,12 @@ import yaml
 
 from simulator.core import CampaignPhase
 from simulator.furnace_materials import (
+    ALLOWED_FURNACE_GROUNDING_TIERS,
+    CERTIFIED_WALL_ANCHORED_FURNACE_MATERIALS,
     load_furnace_materials,
     resolve_furnace_max_T_C,
     resolve_furnace_temperature_caps,
+    validate_furnace_material_grounding,
 )
 from simulator.runner import PyrolysisRun
 
@@ -23,9 +26,12 @@ FURNACE_WALL_SERVICE_TEMP_ANCHORS = {
     "fused_silica": ("fused_silica", "max_operating_C"),
 }
 
+LITERATURE_GROUNDED_FURNACE_MATERIALS = {
+    "sintered_regolith",
+}
+
 # Provisional furnace options with no certified wall_materials.yaml service-temp anchor.
 UNANCHORED_FURNACE_MATERIALS = {
-    "sintered_regolith",
     "graphite_inert",
 }
 
@@ -57,6 +63,12 @@ def test_catalog_loads_grounded_enabled_materials():
     assert catalog["plasma_sprayed_alumina"]["enabled"] is True
     assert catalog["fused_silica"]["max_service_T_C"] == 1200
     assert catalog["fused_silica"]["enabled"] is True
+    assert catalog["sintered_regolith"]["max_service_T_C"] == 1200
+    assert catalog["sintered_regolith"]["enabled"] is True
+    grounding = catalog["sintered_regolith"]["grounding"]
+    assert grounding["tier"] == "proxy-sintering"
+    assert grounding["source"] == "Warren et al. 2022 (arXiv:2205.06855)"
+    assert "not a certified refractory hot-face" in grounding["caveat"]
 
 
 def test_furnace_material_caps_track_wall_material_temperature_anchors():
@@ -65,8 +77,13 @@ def test_furnace_material_caps_track_wall_material_temperature_anchors():
     ]
     wall_materials = _load_yaml(DATA_DIR / "wall_materials.yaml")["materials"]
 
+    assert set(FURNACE_WALL_SERVICE_TEMP_ANCHORS) == (
+        CERTIFIED_WALL_ANCHORED_FURNACE_MATERIALS
+    )
     assert set(furnace_materials) == (
-        set(FURNACE_WALL_SERVICE_TEMP_ANCHORS) | UNANCHORED_FURNACE_MATERIALS
+        set(FURNACE_WALL_SERVICE_TEMP_ANCHORS)
+        | LITERATURE_GROUNDED_FURNACE_MATERIALS
+        | UNANCHORED_FURNACE_MATERIALS
     )
 
     for furnace_id, (
@@ -82,11 +99,25 @@ def test_furnace_material_caps_track_wall_material_temperature_anchors():
     for furnace_id in UNANCHORED_FURNACE_MATERIALS:
         assert furnace_materials[furnace_id]["max_service_T_C"] is None
 
+    for furnace_id in LITERATURE_GROUNDED_FURNACE_MATERIALS:
+        row = furnace_materials[furnace_id]
+        grounding = row.get("grounding")
+
+        validate_furnace_material_grounding(furnace_id, row)
+        assert isinstance(grounding, dict), f"{furnace_id} needs structured grounding"
+        assert grounding.get("tier") in ALLOWED_FURNACE_GROUNDING_TIERS
+        assert grounding.get("source"), f"{furnace_id} needs grounding.source"
+        if grounding.get("tier") == "proxy-sintering":
+            assert grounding.get("caveat"), f"{furnace_id} proxy tier needs caveat"
+
+    sintered_grounding = furnace_materials["sintered_regolith"]["grounding"]
+    assert furnace_materials["sintered_regolith"]["max_service_T_C"] == 1200
+    assert sintered_grounding["source"] == "Warren et al. 2022 (arXiv:2205.06855)"
+
 
 def test_catalog_disabled_materials_are_not_selectable():
     catalog = load_furnace_materials()
 
-    assert catalog["sintered_regolith"]["enabled"] is False
     assert catalog["graphite_inert"]["enabled"] is False
 
 
@@ -120,6 +151,15 @@ def test_resolver_allows_grounded_sub_1300_material_floor():
 def test_resolver_defaults_to_material_max_when_no_request():
     assert resolve_furnace_max_T_C("dense_alumina_continuous") == 1700
     assert resolve_furnace_max_T_C("fused_silica") == 1200
+
+
+def test_resolver_allows_sintered_regolith_bootstrap_floor():
+    caps = resolve_furnace_temperature_caps("sintered_regolith", 1300)
+
+    assert caps["service_rating_T_C"] == pytest.approx(1200)
+    assert caps["requested_ceiling_T_C"] == pytest.approx(1300)
+    assert caps["effective_applied_ceiling_T_C"] == pytest.approx(1200)
+    assert resolve_furnace_max_T_C("sintered_regolith") == pytest.approx(1200)
 
 
 def test_resolver_clamps_applied_ceiling_to_runtime_envelope_when_uncapped():
@@ -205,17 +245,80 @@ def test_resolver_fails_loud_for_unknown_material():
 
 def test_resolver_fails_loud_for_disabled_material():
     with pytest.raises(ValueError, match="not selectable yet"):
-        resolve_furnace_max_T_C("sintered_regolith", 1200)
+        resolve_furnace_max_T_C("graphite_inert", 1200)
 
 
 def test_resolver_fails_loud_for_enabled_material_with_non_numeric_cap():
     # An enabled material whose max_service_T_C is null/non-numeric must fail
     # loud rather than silently resolving to a bad ceiling.
     bad_catalog = {
-        "bogus": {"id": "bogus", "enabled": True, "max_service_T_C": None},
+        "bogus": {
+            "id": "bogus",
+            "enabled": True,
+            "max_service_T_C": None,
+            "grounding": {
+                "tier": "proxy-sintering",
+                "source": "bench note",
+                "caveat": "not certified",
+            },
+        },
     }
     with pytest.raises(ValueError, match="must be numeric"):
         resolve_furnace_max_T_C("bogus", 1800, catalog=bad_catalog)
+
+
+@pytest.mark.parametrize(
+    ("grounding", "message"),
+    [
+        (None, "grounding must be a mapping"),
+        (
+            {
+                "tier": "unsupported",
+                "source": "bench note",
+                "caveat": "not certified",
+            },
+            "grounding.tier must be one of",
+        ),
+        (
+            {
+                "tier": "proxy-sintering",
+                "source": "",
+                "caveat": "not certified",
+            },
+            "grounding.source must be a non-empty string",
+        ),
+        (
+            {
+                "tier": "proxy-sintering",
+                "source": "bench note",
+            },
+            "proxy tier needs grounding.caveat",
+        ),
+    ],
+)
+def test_load_furnace_materials_rejects_enabled_material_with_bad_grounding(
+    tmp_path,
+    grounding,
+    message,
+):
+    row = {
+        "id": "bad_proxy",
+        "display_name": "Bad proxy material",
+        "max_service_T_C": 1200,
+        "enabled": True,
+    }
+    if grounding is not None:
+        row["grounding"] = grounding
+    catalog_path = tmp_path / "furnace_materials.yaml"
+    catalog_path.write_text(
+        yaml.safe_dump({"furnace_materials": {"bad_proxy": row}}),
+        encoding="utf-8",
+    )
+
+    load_furnace_materials.cache_clear()
+    with pytest.raises(ValueError, match=message):
+        load_furnace_materials(catalog_path)
+    load_furnace_materials.cache_clear()
 
 
 def test_setpoints_patch_cap_flows_through_existing_campaign_manager():

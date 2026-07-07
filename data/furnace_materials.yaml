@@ -41,15 +41,20 @@ furnace_materials:
     enabled: true
     source_note: "AdValue W:S1 reports fused quartz normal continuous use at 1050 C, recommended max operating temperature at 1200 C, and non-continuous use at 1250 C; wall_materials.yaml stores 1200 C as fused_silica max_operating_C."
 
-  # Provisional only; not grounded in data/wall_materials.yaml.
+  # Source: Warren et al. 2022, arXiv:2205.06855, LMS-1/MGS-1 regolith
+  # simulants sintered at 1000/1100/1200 C; 1200 C samples were sturdy enough
+  # for compression data while 1000/1100 C samples remained too brittle.
   sintered_regolith:
     id: sintered_regolith
     display_name: "Sintered regolith bootstrap furnace"
-    max_service_T_C: null
-    provisional_range_C: "1100-1200 ungrounded"
-    enabled: false
-    not_selectable_reason: "bootstrap furnace range is ungrounded and needs literature before selection"
-    source_note: "Provisional owner prompt only; no precise cap is certified in wall_materials.yaml."
+    max_service_T_C: 1200
+    provisional_range_C: "1100-1200 literature-grounded bootstrap proxy"
+    enabled: true
+    grounding:
+      tier: "proxy-sintering"
+      source: "Warren et al. 2022 (arXiv:2205.06855)"
+      caveat: "1200 C is grounded in sintering/fabrication and post-sinter compression samples; it is not a certified refractory hot-face or furnace service rating."
+    source_note: "WARN-tier grounded proxy: Warren et al. 2022 (arXiv:2205.06855) tested molded lunar/martian regolith simulants at 1000/1100/1200 C and reports 1200 C samples were sturdy enough for compression data while lower-temperature samples were brittle; use 1200 C as conservative bootstrap service cap, not a certified refractory hot-face rating."
 
   # Provisional only; not grounded in data/wall_materials.yaml.
   graphite_inert:

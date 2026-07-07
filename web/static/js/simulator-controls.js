@@ -71,20 +71,32 @@ function formatFurnaceTemperature(value) {
 
 function furnaceMaterialOptionText(material) {
     const name = material.display_name || material.id || 'material';
-    const service = formatFurnaceTemperature(
-        material.service_rating_T_C ?? material.max_service_T_C
-    );
+    const rating = material.service_rating_T_C ?? material.max_service_T_C;
+    const service = formatFurnaceTemperature(rating);
     const applied = formatFurnaceTemperature(
         material.effective_applied_ceiling_T_C
     );
-    return `${name} (service ${service} C; applied ${applied} C)`;
+    const groundingTier = material.grounding?.tier || '';
+    const capLabel = groundingTier === 'proxy-sintering'
+        ? `${service} C proxy cap (sintering-based, uncertified)`
+        : `service ${service} C`;
+    return `${name} (${capLabel}; applied ${applied} C)`;
 }
 
 function optionForFurnaceMaterial(material) {
     const option = document.createElement('option');
+    const rating = material.service_rating_T_C ?? material.max_service_T_C;
+    const ratingText = formatFurnaceTemperature(rating);
+    const appliedText = formatFurnaceTemperature(
+        material.effective_applied_ceiling_T_C
+    );
+    const groundingTier = material.grounding?.tier || '';
+    const ratingTitle = groundingTier === 'proxy-sintering'
+        ? `Proxy cap: ${ratingText} C (sintering-based, uncertified)`
+        : `Service rating: ${ratingText} C`;
     option.value = material.id;
     option.textContent = furnaceMaterialOptionText(material);
-    option.title = `Service rating: ${formatFurnaceTemperature(material.service_rating_T_C)} C; effective applied ceiling: ${formatFurnaceTemperature(material.effective_applied_ceiling_T_C)} C`;
+    option.title = `${ratingTitle}; effective applied ceiling: ${appliedText} C`;
     option.dataset.serviceRatingTC = String(material.service_rating_T_C ?? '');
     option.dataset.effectiveAppliedCeilingTC = String(
         material.effective_applied_ceiling_T_C ?? ''

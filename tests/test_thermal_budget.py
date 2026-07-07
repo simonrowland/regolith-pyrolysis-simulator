@@ -321,4 +321,9 @@ def test_furnace_material_context_marks_missing_conductivity_uncertified():
 
     assert context["conductivity_W_m_K"]["value"] is None
     assert context["conductivity_W_m_K"]["status"] == UNCERTIFIED
+    assert context["max_service_T_C"]["value"] == pytest.approx(1200)
     assert context["max_service_T_C"]["status"] == UNCERTIFIED
+    assert context["max_service_T_C"]["tier"] == "proxy-sintering"
+    assert "not a certified refractory hot-face" in context["max_service_T_C"]["caveat"]
+    assert context["grounding"]["tier"] == "proxy-sintering"
+    assert "WARN-tier" in context["source_note"]

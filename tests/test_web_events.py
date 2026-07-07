@@ -974,15 +974,22 @@ def test_furnace_material_catalog_endpoint_returns_enabled_only():
     material_ids = {material["id"] for material in materials}
     assert "dense_alumina_continuous" in material_ids
     assert "fused_silica" in material_ids
+    assert "sintered_regolith" in material_ids
+    assert "graphite_inert" not in material_ids
+    base_material_keys = {
+        "id",
+        "display_name",
+        "max_service_T_C",
+        "grounding",
+        "service_rating_T_C",
+        "requested_ceiling_T_C",
+        "effective_applied_ceiling_T_C",
+    }
     for material in materials:
-        assert set(material) == {
-            "id",
-            "display_name",
-            "max_service_T_C",
-            "service_rating_T_C",
-            "requested_ceiling_T_C",
-            "effective_applied_ceiling_T_C",
-        }
+        if material["grounding"].get("tier") == "proxy-sintering":
+            assert set(material) == base_material_keys | {"service_rating_qualifier"}
+        else:
+            assert set(material) == base_material_keys
 
     zirconia = next(
         material
@@ -1000,6 +1007,25 @@ def test_furnace_material_catalog_endpoint_returns_enabled_only():
     assert fused_silica["service_rating_T_C"] == pytest.approx(1200)
     assert fused_silica["requested_ceiling_T_C"] == pytest.approx(1800)
     assert fused_silica["effective_applied_ceiling_T_C"] == pytest.approx(1200)
+    sintered_regolith = next(
+        material
+        for material in materials
+        if material["id"] == "sintered_regolith"
+    )
+    assert sintered_regolith["max_service_T_C"] == pytest.approx(1200)
+    assert sintered_regolith["service_rating_T_C"] == pytest.approx(1200)
+    assert sintered_regolith["requested_ceiling_T_C"] == pytest.approx(1800)
+    assert sintered_regolith["effective_applied_ceiling_T_C"] == pytest.approx(1200)
+    assert sintered_regolith["grounding"]["tier"] == "proxy-sintering"
+    assert sintered_regolith["grounding"]["source"] == "Warren et al. 2022 (arXiv:2205.06855)"
+    assert sintered_regolith["service_rating_qualifier"] == {
+        "tier": "proxy-sintering",
+        "source": "Warren et al. 2022 (arXiv:2205.06855)",
+        "caveat": sintered_regolith["grounding"]["caveat"],
+    }
+    assert "not a certified refractory hot-face" in (
+        sintered_regolith["service_rating_qualifier"]["caveat"]
+    )
 
 
 def test_c4_operator_presets_render_from_server_setpoints(monkeypatch):
@@ -1112,7 +1138,8 @@ def test_furnace_material_dropdown_hydrates_honest_labels_at_source():
     ticks = (_REPO_ROOT / "web/static/js/simulator-ticks.js").read_text()
 
     assert "furnaceMaterialOptionText(material)" in controls
-    assert "service ${service} C; applied ${applied} C" in controls
+    assert "proxy cap (sintering-based, uncertified)" in controls
+    assert "`service ${service} C`" in controls
     assert "effective_applied_ceiling_T_C" in controls
     assert "`${material.display_name} (${material.max_service_T_C} C)`" not in controls
     assert "hydrateHonestFurnaceMaterialLabels" not in ticks
@@ -1268,7 +1295,7 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
 @pytest.mark.parametrize(
     ("material_id", "message"),
     [
-        ("sintered_regolith", "not selectable"),
+        ("graphite_inert", "not selectable"),
         ("unknown_material", "unknown furnace material"),
     ],
 )

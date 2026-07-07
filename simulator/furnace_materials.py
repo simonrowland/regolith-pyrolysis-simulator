@@ -14,6 +14,17 @@ import yaml
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DEFAULT_FURNACE_MATERIALS_PATH = DATA_DIR / "furnace_materials.yaml"
 FURNACE_MAX_T_BOUNDS_C = (1200.0, 2000.0)
+CERTIFIED_WALL_ANCHORED_FURNACE_MATERIALS = frozenset(
+    {
+        "dense_alumina_continuous",
+        "dense_alumina_max",
+        "zirconia_ysz",
+        "plasma_sprayed_alumina",
+        "fused_silica",
+    }
+)
+ALLOWED_FURNACE_GROUNDING_TIERS = frozenset({"proxy-sintering"})
+PROXY_FURNACE_GROUNDING_TIERS = frozenset({"proxy-sintering"})
 
 
 @lru_cache(maxsize=4)
@@ -28,7 +39,47 @@ def load_furnace_materials(
     catalog = data.get("furnace_materials")
     if not isinstance(catalog, dict):
         raise ValueError(f"furnace material catalog is malformed: {source_path}")
+    for material_id, row in catalog.items():
+        try:
+            validate_furnace_material_grounding(str(material_id), row)
+        except ValueError as exc:
+            raise ValueError(
+                f"furnace material catalog is malformed: {source_path}: {exc}"
+            ) from exc
     return catalog
+
+
+def validate_furnace_material_grounding(material_id: str, row: Any) -> None:
+    """Validate grounding metadata required for enabled non-certified rows."""
+
+    if not isinstance(row, Mapping) or row.get("enabled") is not True:
+        return
+    grounding = row.get("grounding")
+    if grounding is None and material_id in CERTIFIED_WALL_ANCHORED_FURNACE_MATERIALS:
+        return
+    if not isinstance(grounding, Mapping):
+        raise ValueError(
+            f"{material_id}.grounding must be a mapping for enabled material"
+        )
+
+    tier = grounding.get("tier")
+    if not isinstance(tier, str) or not tier.strip():
+        raise ValueError(f"{material_id}.grounding.tier must be a non-empty string")
+    tier = tier.strip()
+    if tier not in ALLOWED_FURNACE_GROUNDING_TIERS:
+        allowed = ", ".join(sorted(ALLOWED_FURNACE_GROUNDING_TIERS))
+        raise ValueError(
+            f"{material_id}.grounding.tier must be one of: {allowed}"
+        )
+
+    source = grounding.get("source")
+    if not isinstance(source, str) or not source.strip():
+        raise ValueError(f"{material_id}.grounding.source must be a non-empty string")
+
+    if tier in PROXY_FURNACE_GROUNDING_TIERS:
+        caveat = grounding.get("caveat")
+        if not isinstance(caveat, str) or not caveat.strip():
+            raise ValueError(f"{material_id} proxy tier needs grounding.caveat")
 
 
 def resolve_furnace_max_T_C(
@@ -57,6 +108,7 @@ def resolve_furnace_temperature_caps(
     if material.get("enabled") is not True:
         reason = str(material.get("not_selectable_reason") or "disabled")
         raise ValueError(f"{material_id} not selectable yet: {reason}")
+    validate_furnace_material_grounding(str(material_id), material)
 
     material_max = _finite_float(
         material.get("max_service_T_C"),

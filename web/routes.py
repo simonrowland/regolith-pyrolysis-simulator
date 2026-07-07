@@ -33,6 +33,7 @@ from simulator.diagnostics import coating_summary_with_grounded_authority
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.furnace_materials import (
+    PROXY_FURNACE_GROUNDING_TIERS,
     load_furnace_materials,
     resolve_furnace_temperature_caps,
 )
@@ -1615,17 +1616,31 @@ def _furnace_material_catalog_payload() -> list[dict[str, Any]]:
         if not isinstance(row, Mapping) or row.get('enabled') is not True:
             continue
         row_id = str(row.get('id') or material_id)
+        grounding = row.get('grounding')
+        grounding_payload = (
+            {str(key): value for key, value in grounding.items()}
+            if isinstance(grounding, Mapping)
+            else {}
+        )
         caps = resolve_furnace_temperature_caps(
             row_id,
             requested_cap=requested_cap,
             catalog=catalog,
         )
-        materials.append({
+        material_payload = {
             'id': row_id,
             'display_name': str(row.get('display_name') or row_id),
             'max_service_T_C': row.get('max_service_T_C'),
+            'grounding': grounding_payload,
             **caps,
-        })
+        }
+        if grounding_payload.get('tier') in PROXY_FURNACE_GROUNDING_TIERS:
+            material_payload['service_rating_qualifier'] = {
+                'tier': grounding_payload['tier'],
+                'source': grounding_payload['source'],
+                'caveat': grounding_payload['caveat'],
+            }
+        materials.append(material_payload)
     return materials
 
 

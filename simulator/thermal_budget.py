@@ -487,6 +487,11 @@ def furnace_material_context(
     if not isinstance(material, Mapping):
         raise ValueError(f"unknown furnace material: {material_id}")
 
+    grounding = material.get("grounding")
+    if not isinstance(grounding, Mapping):
+        grounding = {}
+    grounding_tier = str(grounding.get("tier") or "")
+
     conductivity = material.get("conductivity_W_m_K")
     conductivity_status = CITED if conductivity is not None else UNCERTIFIED
     conductivity_source = (
@@ -494,22 +499,37 @@ def furnace_material_context(
         if conductivity is not None
         else "data/furnace_materials.yaml has no conductivity_W_m_K field"
     )
+    max_service_status = (
+        CITED if material.get("max_service_T_C") is not None else UNCERTIFIED
+    )
+    max_service_source = f"data/furnace_materials.yaml:{material_id}.max_service_T_C"
+    max_service_provenance = {
+        "status": max_service_status,
+        "source": max_service_source,
+    }
+    if grounding_tier == "proxy-sintering":
+        max_service_provenance.update(
+            {
+                "status": UNCERTIFIED,
+                "source": str(grounding.get("source") or max_service_source),
+                "tier": grounding_tier,
+                "caveat": str(grounding.get("caveat") or ""),
+            }
+        )
     return {
         "material_id": material_id,
         "display_name": material.get("display_name"),
         "max_service_T_C": _figure(
             material.get("max_service_T_C"),
             "degC",
-            {
-                "status": CITED if material.get("max_service_T_C") is not None else UNCERTIFIED,
-                "source": f"data/furnace_materials.yaml:{material_id}.max_service_T_C",
-            },
+            max_service_provenance,
         ),
         "conductivity_W_m_K": _figure(
             conductivity,
             "W/(m K)",
             {"status": conductivity_status, "source": conductivity_source},
         ),
+        "grounding": dict(grounding),
         "source_note": material.get("source_note"),
     }
 
@@ -660,13 +680,17 @@ def _uncertified_gaps() -> list[dict[str, str]]:
     ]
 
 
-def _figure(value: Any, unit: str, tag: Mapping[str, str]) -> dict[str, Any]:
-    return {
+def _figure(value: Any, unit: str, tag: Mapping[str, Any]) -> dict[str, Any]:
+    figure = {
         "value": value,
         "unit": unit,
         "status": tag["status"],
         "source": tag["source"],
     }
+    for key, extra_value in tag.items():
+        if key not in figure:
+            figure[str(key)] = extra_value
+    return figure
 
 
 def _positive(value: float, name: str) -> float:
