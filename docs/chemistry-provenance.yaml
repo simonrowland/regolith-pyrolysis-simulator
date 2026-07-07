@@ -36,7 +36,7 @@ values:
       Melt activity coefficient of the alkali oxide component (single-cation NaO0.5 / KO0.5) in a
       silicate melt, used to correct the alkali vapor pressure for melt non-ideality
       (p_M proportional to gamma_MO0.5 * X_MO0.5, i.e. LINEAR in gamma on this basis).
-    value: {NaO0.5: 1.0e-3, KO0.5: 2.2e-4}
+    value: {NaO0.5: 1.0e-3, KO0.5: 3.5e-5}
     units: dimensionless
     tier: UNCERTIFIED   # single-temperature datum, extrapolated to the 1773-2173 K recipe band; T-dependence not yet fit
     basis: >-
@@ -44,20 +44,22 @@ values:
       oxide, consistent with the JANAF pure-oxide K_p); MOLE fraction (single-cation-normalized). The
       reaction is NaO0.5(l) = Na(g) + 1/4 O2 (Sossi & Fegley Eqn 25), so gamma enters p_Na LINEARLY.
     range:
-      T_K: [1673, 1673]
-      composition: FCMAS ferrobasalt (Na 3252 ppm, K 944 ppm), lunar-analog
-      measured_vs_extrapolated: extrapolated   # recipe band 1773-2173 K is HOTTER; gamma rises toward 1 with T
-    uncertainty: "NaO0.5 +/-2.2e-4, KO0.5 +/-5.5e-5 (Sossi 2019); table envelope NaO0.5 8.4e-4-2.2e-3, KO0.5 6.3e-5-7.1e-4"
+      T_K: [1500, 1673]
+      anchors:
+        NaO0.5: {anchor_T_K: 1673, composition: "FCMAS ferrobasalt (Na 3252 ppm, K 944 ppm), lunar-analog"}
+        KO0.5: {anchor_T_K: 1500, composition: "Apollo 12022 / DeMaria lunar basalt KEMS inversion"}
+      measured_vs_extrapolated: point_anchor_extrapolated_to_recipe_band   # recipe band 1773-2173 K is HOTTER; gamma rises toward 1 with T
+    uncertainty: "NaO0.5 +/-2.2e-4 (Sossi 2019); KO0.5 is DeMaria/Sossi-Fegley point-anchor value 3.5e-5 at 1500 K; table envelope KO0.5 6.3e-5-7.1e-4 remains a comparison band"
     chosen:
-      ref: REF-013   # Sossi et al. 2019, Geochim. Cosmochim. Acta 260:204-231
-      locus: "GCA 260:204-231, §4.5.1 and Tables 3-4 (Table 4 gamma_NaO0.5=1.0e-3, gamma_KO0.5=2.2e-4 at 1673 K); reaction MO0.5(l)=M(g)+1/4 O2"
-      url: "https://doi.org/10.1016/j.gca.2019.06.021"
+      ref: "REF-013 REF-019 REF-049"   # Sossi 2019 for Na; Sossi & Fegley 2018 + DeMaria 1971 for K
+      locus: "GCA 260:204-231, §4.5.1 and Tables 3-4 (Table 4 gamma_NaO0.5=1.0e-3 at 1673 K); DeMaria et al. 1971 Apollo 12022 KEMS inversion carried by Sossi & Fegley 2018 Fig. 5/source OCR line ~350 gives gamma_KO0.5=3.5e-5 at 1500 K; reaction MO0.5(l)=M(g)+1/4 O2"
+      url: "https://doi.org/10.1016/j.gca.2019.06.021; https://doi.org/10.2138/rmg.2018.84.11; NASA ADS bibcode 1971LPSC....2.1367D"
       corpus: "docs-private/deep-research/literature/sossi-2019-gca-hkl-evaporation/mineru/source/vlm/source.md"
       why: >-
         Primary 1-atm gas-mixing furnace evaporation experiments on a ferrobasalt (lunar analog),
         with LA-ICP-MS residual-glass analyses and HKL/logK* fitting; reports gamma on the correct
-        single-cation NaO0.5 basis, Raoultian, with the explicit reaction and logK*; VALUE
-        corroborated by DeMaria 1971 lunar KEMS and the Sossi & Fegley 2018 compilation.
+        single-cation NaO0.5 basis, Raoultian, with the explicit reaction and logK*. The runtime K value
+        is the DeMaria 1971 lunar KEMS inversion carried by Sossi & Fegley 2018 at the Apollo 12022 anchor.
     alternatives:
       - ref: REF-019   # Sossi & Fegley 2018, Rev. Mineral. Geochem. 84:393-459
         locus: "Table 2, NaO0.5 & KO0.5 rows (pp. 409-410); Raoultian def Eqn 24 (p. 413); reaction Eqn 25 (p. 413); gamma(T) Fig 5 (p. 414)"

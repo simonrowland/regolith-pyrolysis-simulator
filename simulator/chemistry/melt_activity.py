@@ -29,12 +29,14 @@ class MeltOxideActivityCoefficient:
     cations_per_parent_formula: float
     gamma: float
     citation: str
+    valid_range_K: tuple[float, float] | None = None
+    anchor_T_K: float | None = None
 
 
 # provenance: gamma_alkali_melt_activity
 # Values are Raoultian, single-cation MO_x components. Sossi & Fegley 2018
 # RMG 84 Table 2 pp. 409-410, Eq. 24-25 pp. 413, DOI 10.2138/rmg.2018.84.11
-# gives the basis and component rows. Na/K chosen values come from Sossi et al.
+# gives the basis and component rows. Na chosen value comes from Sossi et al.
 # 2019 GCA 260:204-231 Tables 3-4, DOI 10.1016/j.gca.2019.06.021, as recorded
 # in docs/chemistry-provenance.yaml::gamma_alkali_melt_activity.
 MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
@@ -51,10 +53,14 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "K2O",
         "KO0.5",
         2.0,
-        2.2e-4,
-        "Sossi et al. 2019 Tables 3-4, DOI 10.1016/j.gca.2019.06.021; "
+        3.5e-5,
+        "DeMaria et al. 1971 lunar basalt inversion carried by Sossi & "
+        "Fegley 2018 Fig.5/source OCR line ~350: gamma_KO0.5=3.5e-5 "
+        "at 1500 K for the Apollo 12022/DeMaria composition; "
         "basis cross-check Sossi & Fegley 2018 Table 2 pp.409-410, "
         "Eq.25 p.413, DOI 10.2138/rmg.2018.84.11",
+        valid_range_K=(1500.0, 1500.0),
+        anchor_T_K=1500.0,
     ),
     "CaO": MeltOxideActivityCoefficient(
         "CaO",

@@ -97,7 +97,7 @@ provider omits the fallback and records `non_certifying_vapor_pressure_fallback_
 emitting an extrapolated Fe pressure. The VapoRock target itself comes from
 Wolf et al. 2023 (*ApJ* 947:64,
 [doi:10.3847/1538-4357/acbcc7](https://doi.org/10.3847/1538-4357/acbcc7)).
-<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:485 — pseudo guard -->
+<!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:515 — pseudo guard -->
 <!-- impl: §2.1 -> data/vapor_pressures.yaml oxide_vapors.SiO.backsolve:515 — pseudo grid metadata -->
 
 ### §2.2 From pure component to effective pressure over the melt

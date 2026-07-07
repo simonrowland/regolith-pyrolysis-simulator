@@ -435,7 +435,7 @@ def test_neutral_total_pressure_does_not_change_vapor_equilibrium_peq(
 def test_grounded_melt_activity_coefficients_match_single_cation_sources():
     expected = {
         "Na2O": ("NaO0.5", 1.0e-3),
-        "K2O": ("KO0.5", 2.2e-4),
+        "K2O": ("KO0.5", 3.5e-5),
         "CaO": ("CaO", 1.2e-2),
         "Al2O3": ("AlO1.5", 0.322),
         "SiO2": ("SiO2", 1.0),
@@ -450,6 +450,10 @@ def test_grounded_melt_activity_coefficients_match_single_cation_sources():
         assert coeff.single_cation_component == component
         assert coeff.gamma == pytest.approx(gamma)
         assert "DOI" in coeff.citation
+    k_coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS["K2O"]
+    assert k_coeff.valid_range_K == (1500.0, 1500.0)
+    assert k_coeff.anchor_T_K == pytest.approx(1500.0)
+    assert "DeMaria" in k_coeff.citation
 
 
 def test_single_cation_mole_fraction_uses_mol_ledger_not_wt_proxy():
@@ -509,7 +513,7 @@ def test_metal_vapor_activity_gamma_is_linear_for_alkalis_and_refractory_species
         rel=1e-9,
     )
     assert ideal_pressures["K"] / grounded_pressures["K"] == pytest.approx(
-        1.0 / 2.2e-4,
+        1.0 / 3.5e-5,
         rel=1e-9,
     )
     assert grounded_pressures["Cr"] / ideal_pressures["Cr"] == pytest.approx(
