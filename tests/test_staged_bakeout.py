@@ -30,7 +30,7 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # 2026-07-06 CF-3: constant single-cation gamma*X alkali activity lowers
 # Na/K vapor, shifting the coupled SiO wall trace while mass balance remains
 # closed.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.0004540737297072478
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00045375238289485886
 
 
 def _run_script(lines: list[str]):

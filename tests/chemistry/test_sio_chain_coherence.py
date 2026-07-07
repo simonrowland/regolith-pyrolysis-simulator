@@ -71,7 +71,7 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # 2026-07-06 CF-3 constant gamma*X alkali activity lowers Na/K vapor
 # backpressure, shifting the coupled finite-headspace pO2 path while preserving
 # the wall-temperature invariance contract.
-PHASE3BIS_SIO_EVOLVED_KG = 8.71403947628e-06
+PHASE3BIS_SIO_EVOLVED_KG = 8.7134903466e-06
 
 
 @lru_cache(maxsize=None)

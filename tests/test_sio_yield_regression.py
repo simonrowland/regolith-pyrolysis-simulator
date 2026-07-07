@@ -126,9 +126,14 @@ GOLDENS = (
 # side from the fresh CLI runs in the CF-3 regen batch; magnitudes match the
 # completion-pass enumeration (lunar -4.4%, mars +248% -- Mars has the
 # stronger coupled response per the CF-3 findings).
+# 2026-07-07 t-140 K-gamma regen: gamma_KO0.5 2.2e-4 -> 3.5e-5 (DeMaria/Sossi).
+# K-only coefficient change; SiO moves through the same coupled finite-
+# headspace pO2 path documented above (lunar -0.006%, mars -74% -- Mars
+# again the stronger coupled response). Recomputed controller-side from
+# fresh CLI runs in the t-135/t-140/b-026 epoch regen.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 8.71403947628e-06,
-    "mars_basalt": 2.72208152768e-05,
+    "lunar_mare_low_ti": 8.7134903466e-06,
+    "mars_basalt": 7.03559831958e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +

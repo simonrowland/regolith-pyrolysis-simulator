@@ -118,78 +118,46 @@ from tests.chemistry.conftest import _build_sim
 # 2026-07-06 CF-3: single-cation gamma*X alkali activity suppresses Na vapor
 # linearly and exposes trace K wall deposition. Route parity still proves the
 # split path closes; only the physics-pinned wall trace table moves.
-EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
-    "lunar_mare_low_ti": {
-        "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "K": 3.0194046764652297e-06,
-            "Na": 8.098416563935017e-07,
-            "Si": 1.9604430167382062e-07,
-            "SiO2": 4.194028761783216e-07,
-        },
-        "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "K": 3.0194046764652297e-06,
-            "Na": 8.098416563935017e-07,
-            "Si": 1.9604430167382062e-07,
-            "SiO2": 4.194028761783216e-07,
-        },
-        "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "K": 3.0194046764652297e-06,
-            "Na": 8.098416563935017e-07,
-        },
-        "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "K": 3.0194046764652297e-06,
-            "Na": 8.098416563935015e-07,
-        },
-    },
-    "mars_basalt": {
-        "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "K": 1.7534260496434172e-05,
-            "MgO": 8.973301183517314e-11,
-            "Na": 2.8419890141284795e-05,
-            "Si": 1.5715219429405952e-06,
-            "SiO2": 3.3618656219833257e-06,
-        },
-        "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "K": 1.7534260496434172e-05,
-            "MgO": 8.973301183517314e-11,
-            "Na": 2.8419890141284795e-05,
-            "Si": 1.5715219429405954e-06,
-            "SiO2": 3.361865621983326e-06,
-        },
-        "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "K": 1.7534260496434172e-05,
-            "Mg": 5.411276430760925e-11,
-            "Na": 2.8419890141284795e-05,
-        },
-        "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "K": 1.753426049643417e-05,
-            "Mg": 5.4112764307609245e-11,
-            "Na": 2.8419890141284795e-05,
-        },
-    },
-    "s_type_asteroid_silicate": {
-        "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "K": 2.281119364233768e-06,
-            "Na": 1.5295156158154474e-06,
-            "Si": 1.7166535636506232e-07,
-            "SiO2": 3.672483392017817e-07,
-        },
-        "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "K": 2.281119364233768e-06,
-            "Na": 1.5295156158154474e-06,
-            "Si": 1.7166535636506232e-07,
-            "SiO2": 3.672483392017817e-07,
-        },
-        "process.wall_deposit_segment_stage_2_to_stage_3": {
-            "K": 2.281119364233768e-06,
-            "Na": 1.5295156158154474e-06,
-        },
-        "process.wall_deposit_segment_stage_3_to_stage_4": {
-            "K": 2.2811193642337684e-06,
-            "Na": 1.5295156158154474e-06,
-        },
-    },
-}
+EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {'lunar_mare_low_ti': {'process.wall_deposit_segment_stage_0_to_stage_1': {'K': 4.81109266384828e-07,
+                                                                           'Na': 8.098416552232346e-07,
+                                                                           'Si': 1.9588756582270735e-07,
+                                                                           'SiO2': 4.190675669334422e-07},
+                       'process.wall_deposit_segment_stage_1_to_stage_2': {'K': 4.81109266384828e-07,
+                                                                           'Na': 8.098416552232346e-07,
+                                                                           'Si': 1.9588756582270735e-07,
+                                                                           'SiO2': 4.190675669334422e-07},
+                       'process.wall_deposit_segment_stage_2_to_stage_3': {'K': 4.81109266384828e-07,
+                                                                           'Na': 8.098416552232346e-07},
+                       'process.wall_deposit_segment_stage_3_to_stage_4': {'K': 4.811092663848279e-07,
+                                                                           'Na': 8.098416552232348e-07}},
+ 'mars_basalt': {'process.wall_deposit_segment_stage_0_to_stage_1': {'K': 7.794418876395167e-06,
+                                                                     'MgO': 8.937803126783267e-11,
+                                                                     'Na': 2.835023758058475e-05,
+                                                                     'Si': 1.5657937795513396e-06,
+                                                                     'SiO2': 3.3496117363241357e-06},
+                 'process.wall_deposit_segment_stage_1_to_stage_2': {'K': 7.794418876395167e-06,
+                                                                     'MgO': 8.937803126783267e-11,
+                                                                     'Na': 2.835023758058475e-05,
+                                                                     'Si': 1.5657937795513396e-06,
+                                                                     'SiO2': 3.3496117363241357e-06},
+                 'process.wall_deposit_segment_stage_2_to_stage_3': {'K': 7.794418876395167e-06,
+                                                                     'Mg': 5.3898696158313645e-11,
+                                                                     'Na': 2.835023758058475e-05},
+                 'process.wall_deposit_segment_stage_3_to_stage_4': {'K': 7.794418876395165e-06,
+                                                                     'Mg': 5.3898696158313645e-11,
+                                                                     'Na': 2.835023758058474e-05}},
+ 's_type_asteroid_silicate': {'process.wall_deposit_segment_stage_0_to_stage_1': {'K': 3.6346142362106115e-07,
+                                                                                  'Na': 1.529515614167985e-06,
+                                                                                  'Si': 1.7159452296317388e-07,
+                                                                                  'SiO2': 3.670968033895807e-07},
+                              'process.wall_deposit_segment_stage_1_to_stage_2': {'K': 3.6346142362106115e-07,
+                                                                                  'Na': 1.529515614167985e-06,
+                                                                                  'Si': 1.7159452296317388e-07,
+                                                                                  'SiO2': 3.670968033895807e-07},
+                              'process.wall_deposit_segment_stage_2_to_stage_3': {'K': 3.6346142362106115e-07,
+                                                                                  'Na': 1.529515614167985e-06},
+                              'process.wall_deposit_segment_stage_3_to_stage_4': {'K': 3.634614236210612e-07,
+                                                                                  'Na': 1.5295156141679847e-06}}}
 
 
 def _assert_atom_proof_closed(proposal) -> None:
