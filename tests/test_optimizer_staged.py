@@ -13,6 +13,7 @@ from typing import Any, Mapping
 
 import pytest
 
+from simulator.optimize import doe as doe_module
 from simulator.optimize import study
 from simulator.optimize import evalspec as evalspec_module
 from simulator.optimize.evalspec import EvalSpec, PrefixEvalSpec, cache_key
@@ -24,7 +25,12 @@ from simulator.optimize.objective import (
     pareto_front,
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
-from simulator.optimize.recipe import C2A_STAGED_ORDER_PATH, RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    C2A_STAGED_ORDER_PATH,
+    KnobSpec,
+    RecipePatch,
+    RecipeSchema,
+)
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.strategy import staged as staged_module
 from simulator.optimize.strategy.staged import (
@@ -861,6 +867,165 @@ def test_joint_refine_conditions_c2a_staged_pressure_pair_at_boundary() -> None:
     for candidate in joint_candidates:
         assert candidate.patch.values[po2_path] < candidate.patch.values[total_path]
         candidate.patch.validated(SCHEMA)
+
+
+def test_joint_refine_conditions_pinned_c2a_pressure_pair_after_parent_fallback() -> None:
+    if not doe_module._scipy_sobol_available():
+        pytest.skip("scipy-sobol unavailable")
+
+    schema = RecipeSchema(
+        pinned_paths=["C2A_staged.stages.sio_window.p_total_mbar"]
+    )
+    po2_path = tuple("campaigns.C2A_staged.stages.sio_window.pO2_mbar".split("."))
+    total_path = tuple(
+        "campaigns.C2A_staged.stages.sio_window.p_total_mbar".split(".")
+    )
+    mode_path = tuple(
+        "campaigns.C2A_staged.stages.sio_window.gas_cover_mode".split(".")
+    )
+    specs = (schema.spec_for(po2_path),)
+    search_paths = {spec.path for spec in schema.search_allowlist}
+    parent = RecipePatch(
+        {po2_path: 5.0, total_path: 5.0, mode_path: "po2_hold"}
+    ).validated(schema)
+
+    assert po2_path in search_paths
+    assert total_path not in search_paths
+    raw_numeric_patch = staged_module._anchored_numeric_refine_patch(
+        parent,
+        specs,
+        schema=schema,
+        seed=41,
+        sampler_name=doe_module.SCIPY_SOBOL_SAMPLER,
+        round_index=0,
+        parent_index=0,
+        child_index=0,
+        children_per_parent=6,
+    )
+    assert raw_numeric_patch.values[po2_path] == pytest.approx(6.700232018716632)
+
+    refined_patch = staged_module._refine_patch_near_parent(
+        parent,
+        specs,
+        schema=schema,
+        seed=41,
+        sampler_name=doe_module.SCIPY_SOBOL_SAMPLER,
+        round_index=0,
+        parent_index=0,
+        child_index=0,
+        children_per_parent=6,
+    )
+    child_patch = RecipePatch({**parent.values, **refined_patch.values})
+
+    assert refined_patch.values[po2_path] <= parent.values[total_path]
+    child_patch.validated(schema)
+
+
+def test_joint_refine_numeric_trust_region_shrinks_and_remaps_near_rail() -> None:
+    if not doe_module._scipy_sobol_available():
+        pytest.skip("scipy-sobol unavailable")
+
+    path = ("test_float",)
+    spec = KnobSpec(path=path, kind="float", low=0.0, high=100.0)
+    schema = RecipeSchema(allowlist=(spec,))
+    parent = RecipePatch({path: 2.0}).validated(schema)
+
+    def values_for_round(round_index: int) -> tuple[float, ...]:
+        return tuple(
+            staged_module._anchored_numeric_refine_patch(
+                parent,
+                (spec,),
+                schema=schema,
+                seed=31,
+                sampler_name=doe_module.SCIPY_SOBOL_SAMPLER,
+                round_index=round_index,
+                parent_index=0,
+                child_index=child_index,
+                children_per_parent=8,
+            ).values[path]
+            for child_index in range(8)
+        )
+
+    round0 = values_for_round(0)
+    round1 = values_for_round(1)
+    round2 = values_for_round(2)
+    round3 = values_for_round(3)
+
+    assert staged_module._joint_refine_delta_fraction(0) == 0.15
+    assert staged_module._joint_refine_delta_fraction(1) == 0.05
+    assert staged_module._joint_refine_delta_fraction(2) == 0.02
+    assert staged_module._joint_refine_delta_fraction(3) == 0.02
+    assert all(0.0 < value <= 17.0 for value in round0)
+    assert all(0.0 <= value <= 7.0 for value in round1)
+    assert all(0.0 <= value <= 4.0 for value in round2)
+    assert all(0.0 <= value <= 4.0 for value in round3)
+    assert len({round(value, 12) for value in round0}) > 1
+
+
+def test_joint_refine_keeps_categorical_adjacent_neighbor_regression() -> None:
+    path = ("mode",)
+    spec = KnobSpec(
+        path=path,
+        kind="categorical",
+        choices=("low", "nominal", "high"),
+    )
+    parent = RecipePatch({path: "nominal"})
+
+    for child_index in range(4):
+        patch = staged_module._refine_patch_near_parent(
+            parent,
+            (spec,),
+            schema=RecipeSchema(allowlist=(spec,)),
+            seed=19,
+            sampler_name=doe_module.SCIPY_SOBOL_SAMPLER,
+            round_index=1,
+            parent_index=0,
+            child_index=child_index,
+            children_per_parent=4,
+        )
+        direction = -1 if (19 + 1 + child_index) % 2 else 1
+        expected = spec.choices[(spec.choices.index("nominal") + direction) % 3]
+        assert patch.values[path] == expected
+
+
+def test_joint_refine_composite_operator_is_deterministic_for_same_seed() -> None:
+    if not doe_module._scipy_sobol_available():
+        pytest.skip("scipy-sobol unavailable")
+
+    float_path = ("test_float",)
+    int_path = ("test_int",)
+    mode_path = ("mode",)
+    specs = (
+        KnobSpec(path=float_path, kind="float", low=0.0, high=100.0),
+        KnobSpec(path=int_path, kind="int", low=0, high=10),
+        KnobSpec(
+            path=mode_path,
+            kind="categorical",
+            choices=("low", "nominal", "high"),
+        ),
+    )
+    schema = RecipeSchema(allowlist=specs)
+    parent = RecipePatch(
+        {float_path: 50.0, int_path: 5, mode_path: "nominal"}
+    ).validated(schema)
+
+    def composite_values() -> tuple[Mapping[tuple[str, ...], Any], ...]:
+        return tuple(
+            staged_module._refine_patch_near_parent(
+                parent,
+                specs,
+                schema=schema,
+                seed=41,
+                sampler_name=doe_module.SCIPY_SOBOL_SAMPLER,
+                round_index=0,
+                parent_index=2,
+                child_index=child_index,
+                children_per_parent=6,
+            ).values
+            for child_index in range(6)
+        )
+
+    assert composite_values() == composite_values()
 
 
 def test_backward_pass_reorders_pareto_with_improving_backward_candidate(tmp_path) -> None:

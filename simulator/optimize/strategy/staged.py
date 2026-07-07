@@ -12,6 +12,8 @@ from simulator.optimize.doe import (
     STREAMING_SAMPLER_NAMES,
     active_sampler_name,
     _condition_pressure_pair_values,
+    _resolve_value_mapper,
+    _unit_hypercube_points,
     sample_recipe_patch_at_index,
 )
 from simulator.optimize.evalspec import EvalSpec, PrefixEvalSpec
@@ -55,6 +57,10 @@ class StagedAllowlistError(StagedBeamStateError):
 _FORWARD_SAMPLE_INDEX_BAND = 1_000_000
 _BACKWARD_TARGET_INDEX_BAND = 100_000
 _BACKWARD_PASS_INDEX_BAND = 1_000_000
+_JOINT_REFINE_TRUST_REGION_DELTA_FRACTIONS = (0.15, 0.05, 0.02)
+_JOINT_REFINE_SEED_OFFSET = 20_000_000
+_JOINT_REFINE_ROUND_SEED_BAND = 1_000_000
+_JOINT_REFINE_PARENT_SEED_BAND = 10_000
 
 
 @dataclass(frozen=True)
@@ -674,6 +680,7 @@ class StagedStrategy:
                     target_specs,
                     schema=self.schema,
                     seed=self.seed,
+                    sampler_name=self.sampler_name,
                     round_index=self.joint_refines_completed,
                     parent_index=parent_index,
                     child_index=child_index,
@@ -1246,51 +1253,144 @@ def _refine_patch_near_parent(
     *,
     schema: RecipeSchema,
     seed: int,
+    sampler_name: str,
     round_index: int,
     parent_index: int,
     child_index: int,
     children_per_parent: int,
 ) -> RecipePatch:
-    values: dict[KeyPath, Any] = {}
+    values: dict[KeyPath, Any] = dict(
+        _anchored_numeric_refine_patch(
+            parent,
+            specs,
+            schema=schema,
+            seed=seed,
+            sampler_name=sampler_name,
+            round_index=round_index,
+            parent_index=parent_index,
+            child_index=child_index,
+            children_per_parent=children_per_parent,
+        ).values
+    )
     for spec_index, spec in enumerate(specs):
+        if spec.kind != "categorical":
+            continue
         base = parent.values.get(spec.path)
-        direction = -1 if (seed + round_index + parent_index + child_index + spec_index) % 2 else 1
-        if spec.kind == "float":
-            low = 0.0 if spec.low is None else float(spec.low)
-            high = low if spec.high is None else float(spec.high)
-            if high <= low:
-                values[spec.path] = low
-                continue
-            base_value = (low + high) / 2.0 if base is None else float(base)
-            step = (high - low) * 0.05 * ((child_index + 1) / (children_per_parent + 1))
-            values[spec.path] = min(high, max(low, base_value + direction * step))
-        elif spec.kind == "int":
-            low = 0 if spec.low is None else int(spec.low)
-            high = low if spec.high is None else int(spec.high)
-            base_value = low if base is None else int(base)
-            step = max(1, int(round((high - low) * 0.05))) if high > low else 0
-            values[spec.path] = min(high, max(low, base_value + direction * step))
-        elif spec.kind == "categorical":
-            choices = spec.choices or ()
-            if not choices:
-                continue
-            if base in choices and len(choices) > 1:
-                base_index = choices.index(base)
-                values[spec.path] = choices[(base_index + direction) % len(choices)]
-            else:
-                values[spec.path] = choices[0]
-    anchor_values = dict(parent.values)
-    for spec in specs:
-        if spec.path in values and spec.path not in anchor_values:
-            anchor_values[spec.path] = values[spec.path]
+        direction = (
+            -1
+            if (seed + round_index + parent_index + child_index + spec_index) % 2
+            else 1
+        )
+        choices = spec.choices or ()
+        if not choices:
+            continue
+        if base in choices and len(choices) > 1:
+            base_index = choices.index(base)
+            values[spec.path] = choices[(base_index + direction) % len(choices)]
+        else:
+            values[spec.path] = choices[0]
+    _condition_refined_pressure_pairs(
+        parent,
+        specs,
+        values,
+        schema=schema,
+        delta_fraction=_joint_refine_delta_fraction(round_index),
+    )
+    return RecipePatch(values)
+
+
+def _anchored_numeric_refine_patch(
+    parent: RecipePatch,
+    specs: Sequence[KnobSpec],
+    *,
+    schema: RecipeSchema,
+    seed: int,
+    sampler_name: str,
+    round_index: int,
+    parent_index: int,
+    child_index: int,
+    children_per_parent: int,
+) -> RecipePatch:
+    numeric_specs = tuple(spec for spec in specs if spec.kind in {"float", "int"})
+    if not numeric_specs:
+        return RecipePatch({})
+    numeric_schema = RecipeSchema(
+        allowlist=numeric_specs,
+        recipe_schema_version=schema.recipe_schema_version,
+        allowlist_version=schema.allowlist_version,
+    )
+    anchor = RecipePatch(
+        {spec.path: _joint_refine_anchor_value(parent, spec) for spec in numeric_specs}
+    )
+    delta_fraction = _joint_refine_delta_fraction(round_index)
+    mapper = _resolve_value_mapper(numeric_schema, numeric_specs, anchor, delta_fraction)
+    points = _unit_hypercube_points(
+        len(numeric_specs),
+        children_per_parent,
+        _joint_refine_sample_seed(seed, round_index, parent_index),
+        sampler_name,
+    )
+    values = {
+        spec.path: mapper(spec, unit_value)
+        for spec, unit_value in zip(numeric_specs, points[child_index], strict=True)
+    }
+    return RecipePatch(values)
+
+
+def _condition_refined_pressure_pairs(
+    parent: RecipePatch,
+    specs: Sequence[KnobSpec],
+    values: dict[KeyPath, Any],
+    *,
+    schema: RecipeSchema,
+    delta_fraction: float,
+) -> None:
+    if not values:
+        return
+    effective_values = dict(parent.values)
+    effective_values.update(values)
+    anchor_values = {
+        spec.path: _joint_refine_anchor_value(parent, spec)
+        for spec in specs
+        if spec.kind in {"float", "int"}
+    }
     _condition_pressure_pair_values(
         schema,
         tuple(specs),
         values,
-        anchor=RecipePatch(anchor_values),
-        fallback_values=parent.values,
+        anchor=RecipePatch(anchor_values) if anchor_values else None,
+        delta_fraction=delta_fraction,
+        fallback_values=effective_values,
     )
-    return RecipePatch(values)
+
+
+def _joint_refine_delta_fraction(round_index: int) -> float:
+    if round_index < len(_JOINT_REFINE_TRUST_REGION_DELTA_FRACTIONS):
+        return _JOINT_REFINE_TRUST_REGION_DELTA_FRACTIONS[round_index]
+    return _JOINT_REFINE_TRUST_REGION_DELTA_FRACTIONS[-1]
+
+
+def _joint_refine_anchor_value(parent: RecipePatch, spec: KnobSpec) -> Any:
+    if spec.path in parent.values:
+        return parent.values[spec.path]
+    if spec.kind == "float":
+        low = 0.0 if spec.low is None else float(spec.low)
+        high = low if spec.high is None else float(spec.high)
+        return (low + high) / 2.0 if high > low else low
+    if spec.kind == "int":
+        return 0 if spec.low is None else int(spec.low)
+    raise ValueError(
+        f"{'.'.join(spec.path)} has unsupported numeric refine kind {spec.kind!r}"
+    )
+
+
+def _joint_refine_sample_seed(seed: int, round_index: int, parent_index: int) -> int:
+    return (
+        seed
+        + _JOINT_REFINE_SEED_OFFSET
+        + round_index * _JOINT_REFINE_ROUND_SEED_BAND
+        + parent_index * _JOINT_REFINE_PARENT_SEED_BAND
+    )
 
 
 def _merge_patches(prefix: RecipePatch, stage_patch: RecipePatch) -> RecipePatch:
