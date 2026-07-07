@@ -66,9 +66,9 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 # - Metals with `fit_target: pseudo_psat_backsolved_from_vaporock` have raw
 #   legacy Antoine evaluated as a pseudo-standard term only when no
 #   pure-component sidecar is available.
-# - Oxide vapors with `fit_target: standard_reaction_term` use raw Antoine as
-#   a ΔG-equivalent term, consumed with explicit oxide-activity + pO2
-#   exponents -- single-counted via explicit reaction stoichiometry.
+# - Metal or oxide vapor rows with `fit_target: standard_reaction_term` use raw
+#   Antoine as a ΔG-equivalent term, consumed with explicit oxide-activity +
+#   pO2 exponents -- single-counted via explicit reaction stoichiometry.
 # Dispatch keeps the existing math, but uses `fit_target` for honest source
 # labels and runtime warnings when pseudo VapoRock curve-fit fallback rows are
 # actually used.
@@ -250,6 +250,11 @@ def vapor_pressure_antoine_coefficients(
 ) -> tuple[Mapping[str, Any], str]:
     """Return the runtime Antoine block and its provenance key."""
 
+    if _fit_target(row) == FIT_TARGET_STANDARD_REACTION:
+        antoine = (row or {}).get(COEFF_BLOCK_ANTOINE)
+        if _is_mapping(antoine):
+            return antoine, COEFF_BLOCK_ANTOINE
+
     if not bool((row or {}).get("interval_required")):
         pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
         if _is_mapping(pure):
@@ -279,6 +284,27 @@ def vapor_pressure_antoine_coefficients(
     if _is_mapping(antoine):
         return antoine, COEFF_BLOCK_ANTOINE
     return {}, COEFF_BLOCK_ANTOINE
+
+
+def wall_condensation_antoine_coefficients(
+    row: Mapping[str, Any] | None,
+    temperature_K: float | None = None,
+) -> tuple[Mapping[str, Any], str]:
+    """Return coefficients for local wall ``P_sat`` consumers.
+
+    Melt-source standard-reaction terms are not pure-species saturation
+    pressures. When a row carries a grounded pure-component sidecar, wall
+    re-evaporation uses that sidecar instead of the melt activity/pO2 term.
+    """
+
+    if not bool((row or {}).get("interval_required")):
+        pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
+        if _is_mapping(pure):
+            return (
+                _selected_temperature_segment(pure, temperature_K),
+                COEFF_BLOCK_PURE_COMPONENT,
+            )
+    return vapor_pressure_antoine_coefficients(row, temperature_K)
 
 
 def vapor_pressure_valid_range_K(
@@ -776,6 +802,80 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="P_reference_Pa",
             )
+
+            if _fit_target(sp_data) == FIT_TARGET_STANDARD_REACTION:
+                oxide_activity = melt_oxide_activity(parent_oxide, melt_account_mol)
+                if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    continue
+                if oxide_activity.warning:
+                    warnings.append(oxide_activity.warning)
+                activities[species] = oxide_activity.activity
+
+                # provenance: k_mox_liquid_standard_reaction
+                # Lamoreaux & Hildenbrand 1984 Tables 2/4
+                # (DOI 10.1063/1.555706) supplies the liquid KO0.5 standard
+                # term; DeMaria 1971 Table 1 is held-out pO2 validation only.
+                activity_exponent = float(
+                    sp_data.get("oxide_activity_exponent", 1.0) or 1.0
+                )
+                activity_factor = max(
+                    oxide_activity.activity,
+                    0.0,
+                ) ** activity_exponent
+                P_eq_Pa = _require_finite_vapor_value(
+                    P_reference_Pa * activity_factor,
+                    species=species,
+                    field="P_eq_activity",
+                )
+                pO2_scaled = False
+                pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
+                if pO2_exponent:
+                    pO2_reference_bar = max(
+                        1e-30,
+                        float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
+                    )
+                    P_eq_Pa = _require_finite_vapor_value(
+                        P_eq_Pa
+                        * (transport_pO2_bar / pO2_reference_bar)
+                        ** pO2_exponent,
+                        species=species,
+                        field="P_eq_pO2",
+                    )
+                    pO2_scaled = True
+                if P_eq_Pa > 1e-15:
+                    vapor_pressures[species] = P_eq_Pa
+                    source_label = vapor_pressure_source_label(
+                        "builtin_authoritative",
+                        sp_data,
+                        coefficient_block=coefficient_block,
+                        temperature_K=T_K,
+                    )
+                    if species in metal_extrapolations:
+                        source_label = (
+                            f"{source_label}:"
+                            "extrapolated_beyond_valid_range_K"
+                        )
+                    vapor_pressure_sources[species] = source_label
+                    vapor_pressure_provenance[species] = {
+                        "pressure_kind": _runtime_pressure_kind(
+                            sp_data,
+                            coefficient_block,
+                            effective_scaled=(
+                                activity_factor != 1.0 or pO2_scaled
+                            ),
+                        ),
+                        "P_reference_Antoine_Pa": P_reference_Pa,
+                        "P_eq_Pa": P_eq_Pa,
+                        "pO2_bar": transport_pO2_bar,
+                        "activity_factor": activity_factor,
+                        "oxide_activity_exponent": activity_exponent,
+                        "pO2_exponent": pO2_exponent,
+                        "source_label": source_label,
+                    }
+                    vapor_pressure_provenance[species].update(
+                        oxide_activity.provenance()
+                    )
+                continue
 
             if parent_oxide == 'FeO':
                 oxide_activity = None

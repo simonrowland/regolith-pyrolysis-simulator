@@ -72,7 +72,7 @@ Class counts: 11 first-principles / 14 literature / 35 assumed / 8 fitted.
 | # | Subsystem | Parameter / value | Where set | Robinot-path sensitivity |
 |---:|---|---|---|---|
 | 17 | P_sat runtime | Na runtime Antoine `(8.477035,11265.231371,0)`, `pseudo_psat_backsolved_from_vaporock` | `data/vapor_pressures.yaml::metals.Na.antoine`; convention in `engines/builtin/vapor_pressure.py:59-71` | Medium for builtin authoritative runtime. |
-| 18 | P_sat runtime | K runtime Antoine `(3.869571,4961,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.K.antoine` | Medium/low for builtin authoritative runtime. |
+| 18 | P_sat runtime | K liquid KO0.5 standard-reaction fit `(10.641294,9965.408779,-123.001)`, Lamoreaux & Hildenbrand 1984 Tables 2/4, DOI 10.1063/1.555706 | `data/vapor_pressures.yaml::metals.K.antoine/reaction` | Medium/low for builtin authoritative runtime; held-out DeMaria residual is about +1.24 dex at 1429 K. |
 | 19 | P_sat runtime | Mg runtime Antoine `(10.628931,6788.644019,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.Mg.antoine` | Medium/high for builtin authoritative runtime. |
 | 20 | P_sat runtime | Fe runtime Antoine `(12.404333,19156.973681,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.Fe.antoine` | High for builtin authoritative runtime. |
 | 21 | P_sat runtime | SiO runtime Antoine `(22.117682,40638.351545,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::oxide_vapors.SiO.antoine` | Very high for builtin authoritative runtime. |
@@ -350,7 +350,7 @@ Full 68-row derivation-chain audit. FITTED rows remain flagged as FITTED because
 | 15 | Alpha | Ti `alpha=0.8`, proxy tag | ASSUMED | `data/vapor_pressures.yaml::metals.Ti.evaporation_alpha` | Low; Ti vapor tiny. |
 | 16 | Alpha | Cr/Mn `fail_loud_missing_alpha` policy | ASSUMED | `data/vapor_pressures.yaml::metals.Cr/Mn.evaporation_alpha_policy` | Low unless fallback enabled; honest no-value state. |
 | 17 | P_sat runtime | Na runtime Antoine `(8.477035,11265.231371,0)`, `pseudo_psat_backsolved_from_vaporock` | FITTED | `data/vapor_pressures.yaml::metals.Na.antoine`; convention in `engines/builtin/vapor_pressure.py:59-71` | Medium for builtin authoritative runtime. |
-| 18 | P_sat runtime | K runtime Antoine `(3.869571,4961,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.K.antoine` | Medium/low for builtin authoritative runtime. |
+| 18 | P_sat runtime | K liquid KO0.5 standard-reaction fit `(10.641294,9965.408779,-123.001)`, Lamoreaux & Hildenbrand 1984 Tables 2/4, DOI 10.1063/1.555706 | FITTED | `data/vapor_pressures.yaml::metals.K.antoine/reaction` | Medium/low for builtin authoritative runtime; held-out DeMaria residual is about +1.24 dex at 1429 K. |
 | 19 | P_sat runtime | Mg runtime Antoine `(10.628931,6788.644019,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.Mg.antoine` | Medium/high for builtin authoritative runtime. |
 | 20 | P_sat runtime | Fe runtime Antoine `(12.404333,19156.973681,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.Fe.antoine` | High for builtin authoritative runtime. |
 | 21 | P_sat runtime | SiO runtime Antoine `(22.117682,40638.351545,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::oxide_vapors.SiO.antoine` | Very high for builtin authoritative runtime. |

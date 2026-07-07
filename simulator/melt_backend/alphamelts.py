@@ -2600,6 +2600,7 @@ class AlphaMELTSBackend(MeltBackend):
                 T_C,
                 dict(activities),
                 dict(melt_wt),
+                pO2_bar=max(10.0 ** float(fO2_log), 1e-30),
                 context='VapoRock helper unavailable',
             )
             return (
@@ -2639,6 +2640,7 @@ class AlphaMELTSBackend(MeltBackend):
                 T_C,
                 dict(activities),
                 dict(melt_wt),
+                pO2_bar=max(10.0 ** float(fO2_log), 1e-30),
                 context=f'VapoRock status {result.status!r}',
             )
             return (
@@ -2660,6 +2662,7 @@ class AlphaMELTSBackend(MeltBackend):
         activities: dict,
         comp_wt: dict,
         *,
+        pO2_bar: float | None = None,
         context: str,
     ) -> Dict[str, float]:
         table = self._load_vapor_pressure_table()
@@ -2670,7 +2673,12 @@ class AlphaMELTSBackend(MeltBackend):
                 'because it would silently zero evaporation flux'
             )
 
-        pressures = self._activities_times_antoine(T_C, activities, comp_wt)
+        pressures = self._activities_times_antoine(
+            T_C,
+            activities,
+            comp_wt,
+            pO2_bar=pO2_bar,
+        )
         if pressures:
             return pressures
 
@@ -2773,7 +2781,9 @@ class AlphaMELTSBackend(MeltBackend):
 
     def _activities_times_antoine(self, T_C: float,
                                     activities: dict,
-                                    _comp_wt: dict) -> Dict[str, float]:
+                                    _comp_wt: dict,
+                                    *,
+                                    pO2_bar: float | None = None) -> Dict[str, float]:
         """
         Compute vapor pressures as thermodynamic activity x Antoine-row P(T).
 
@@ -2799,6 +2809,7 @@ class AlphaMELTSBackend(MeltBackend):
         pressures: Dict[str, float] = {}
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_ANTOINE,
+            FIT_TARGET_STANDARD_REACTION,
             vapor_pressure_antoine_coefficients,
             warn_pseudo_vapor_pressure_fallback,
         )
@@ -2820,6 +2831,25 @@ class AlphaMELTSBackend(MeltBackend):
                 float(coeffs['A']) - float(coeffs['B']) / (T_K + float(coeffs['C']))
             )
             p_i = activity_i * p_reference_i
+            if str(spec.get('fit_target', '') or '') == FIT_TARGET_STANDARD_REACTION:
+                activity_exponent = float(
+                    spec.get('oxide_activity_exponent', 1.0) or 1.0
+                )
+                p_i = (max(activity_i, 0.0) ** activity_exponent) * p_reference_i
+                pO2_exponent = float(spec.get('pO2_exponent', 0.0) or 0.0)
+                if pO2_exponent:
+                    if pO2_bar is None:
+                        raise RuntimeError(
+                            'AlphaMELTS Antoine fallback cannot evaluate '
+                            f'{species} standard_reaction_term without pO2_bar; '
+                            'refusing activity-only vapor pressure'
+                        )
+                    pO2_reference_bar = max(
+                        1e-30,
+                        float(spec.get('pO2_reference_bar', 1.0) or 1.0),
+                    )
+                    pO2_value = max(float(pO2_bar), 1e-30)
+                    p_i *= (pO2_value / pO2_reference_bar) ** pO2_exponent
             if p_i > 0.0 and math.isfinite(p_i):
                 pressures[str(species)] = p_i
                 if coefficient_block == COEFF_BLOCK_ANTOINE:

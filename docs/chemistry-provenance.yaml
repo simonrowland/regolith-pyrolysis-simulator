@@ -72,7 +72,7 @@ values:
         locus: "Fig 1 (p_Na vs 1/T), Fig 2 (p_K vs 1/T); Proc. 2nd Lunar Sci. Conf., vol. 2, pp. 1367-1380"   # exact page/URL: verify (t-106)
         value: "direct p_Na=3.2e-2 Pa @1538 K (melt 0.36 wt% Na2O); gamma_NaO0.5~1e-3 via S&F derivation"
         url: "NASA ADS bibcode 1971LPSC....2.1367D; DOI-less proceedings"
-        corpus: "docs-private/deep-research/literature/demaria-1971-apollo-12022-kems/mineru/source/vlm/source.md"
+        corpus: "docs/model-limitations.md#demaria-1971-k-validation-rows"
         lacks: "does not tabulate gamma directly (reports p_Na, p_K). IS the LUNAR primary + the ideal VALIDATION case (our exact feedstock) — used to CHECK the model, not as the gamma source."
       - ref: "Bencze & Yazhenskikh 2016, gasifier-slag KEMS"
         locus: "Table S-I (ln p(Pa)=A-B/T fits); MinerU OCR corpus path below."
@@ -88,6 +88,60 @@ values:
       stated pO2): the corrected model p_Na must match the measured ~3.2e-2 Pa @1538 K and the p_Na(T) slope.
     status: implemented-cf3-rework-t003-pending-golden-rebaseline
     trace: docs-private/deep-research/cf3-alkali-activity-synthesis.md
+
+  - id: k_mox_liquid_standard_reaction
+    quantity: >-
+      Potassium vapor-pressure standard-reaction term for the liquid single-cation KO0.5 reaction
+      KO0.5(l) = K(g) + 1/4 O2(g), consumed directly by the builtin K vapor path.
+    value:
+      antoine: {A: 10.641294, B: 9965.408779, C: -123.001}
+      oxide_activity_exponent: 1.0
+      pO2_exponent: -0.25
+      pO2_reference_bar: 1.0
+      fit_residual_dex: {max_abs: 0.000223, rms: 0.000083}
+      heldout_demaria_residual_dex: {min: 1.152912, max: 1.282637, at_1428_571K: 1.241499}
+    units: "log10(Pa) Antoine-like standard term; P_K = 10^(A-B/T) * a_KO0.5 * (pO2_bar/1bar)^-0.25"
+    tier: UNCERTIFIED
+    basis: >-
+      single-cation KO0.5 liquid Raoultian activity basis; oxide_activity_exponent = 1.0 and
+      pO2_exponent = -0.25 from KO0.5(l) = K(g) + 1/4 O2(g). The term is a standard-reaction
+      pressure at a_KO0.5=1 and pO2_reference_bar=1.0, not a JANAF K2O(cr) condensed-phase surrogate,
+      not a VapoRock backsolve, and not fitted to DeMaria.
+    range:
+      T_K: [1190, 1600]
+      composition: "source thermodynamic standard term; runtime validation uses Apollo 12022 lunar basalt K2O 0.068 wt%"
+      measured_vs_extrapolated: "Lamoreaux & Hildenbrand 1984 Tables 2/4 fef fits and Table 4 enthalpies; DeMaria Fig.2/Table 1 rows held out"
+    uncertainty: >-
+      Lamoreaux & Hildenbrand 1984 Table 4 enthalpy propagation gives about +/-0.09 dex near
+      1450 K before fef-fit tolerance; fef fits add about +/-0.03 to 0.3 dex reaction-summed.
+      The paper flags potassium-oxide data as limited and uncertain. DeMaria KEMS calibration,
+      Apollo 12022 sub-liquidus state, and runtime constant gamma_KO0.5 remain separate validation
+      uncertainty carriers.
+    chosen:
+      ref: REF-052
+      locus: >-
+        Tables 2 and 4: K2O(l), K(g), and O2(g) Gibbs-energy-function fits plus DeltafH298/R;
+        assembly verified in docs-private/research/2026-07-07-t141-kmox/lamoreaux-hildenbrand-1984-verified-data.md.
+      url: "https://doi.org/10.1063/1.555706"
+      why: >-
+        This is the independent local source chain that keeps the standard term on liquid K2O/KO0.5
+        without fitting to DeMaria. The held JANAF K2O(cr) term is rejected because it mixes a crystal
+        standard state with the liquid Raoultian activity convention; the DeMaria/Sossi backsolve is
+        rejected as validation data leakage into the standard term.
+    alternatives:
+      - ref: REF-020
+        value: "JANAF K2O(cr)-derived held fit A=11.882258, B=12892.095382; 1429 K standard term about 2.86 log10 Pa"
+        lacks: "wrong condensed-phase convention for liquid KO0.5 activity; review found 5.574 dex contamination when paired with Sossi gamma"
+      - ref: "DeMaria et al. 1971 / Sossi & Fegley 2018 reconstruction"
+        value: "prior fit A=15.171577, B=19293.857399, C=0.0; matched DeMaria 1429 K within about -0.10 dex"
+        lacks: "not independent; standard term was back-solved from held-out DeMaria KEMS data"
+    code_sites:
+      - "data/vapor_pressures.yaml:metals.K"
+    validation: >-
+      Provider test reconstructs the Lamoreaux-Hildenbrand source rows to <=0.001 dex and reports
+      the held-out DeMaria comparison using measured/interpolated Table 1 pO2 (log10 pO2_bar about
+      -7.858 at 1428.57 K): model-minus-DeMaria residual is about +1.24 dex with runtime gamma.
+    status: implemented-t141-pending-golden-rebaseline
 
   - id: janaf_chase1998_thermal_latent_dissoc
     quantity: >-
@@ -353,7 +407,7 @@ values:
     status: active
 
   - id: pseudo_antoine_K_backsolve
-    quantity: "Effective pseudo-Antoine potassium standard term backsolved from VapoRock gas abundances."
+    quantity: "Deprecated effective pseudo-Antoine potassium standard term backsolved from VapoRock gas abundances."
     value: {A: 8.59344, B: 24937.098488, C: 1000}
     units: "log10(P_Pa) = A - B/(T_K + C)"
     tier: UNCERTIFIED
@@ -372,8 +426,8 @@ values:
       - ref: REF-042
         lacks: "pure metal vapor pressure only; lacks silicate-melt nonideality and VapoRock gas speciation"
     code_sites:
-      - "data/vapor_pressures.yaml:metals.K.antoine"
-    status: active
+      - "pending: deprecated by t-141 k_mox_liquid_standard_reaction; old coefficients intentionally no longer active in data/vapor_pressures.yaml"
+    status: deprecated
 
   - id: pseudo_antoine_Fe_backsolve
     quantity: "Effective pseudo-Antoine iron standard term backsolved from VapoRock gas abundances."

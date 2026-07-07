@@ -132,8 +132,11 @@ def _vapor_pressure_data() -> dict:
 
 
 def _pure_component_antoine_pa(entry: dict, temperature_K: float) -> float:
-    coeff, block = vapor_pressure_antoine_coefficients(entry, temperature_K)
-    assert block == "pure_component_antoine"
+    if entry.get("fit_target") == "standard_reaction_term":
+        coeff = entry["pure_component_antoine"]
+    else:
+        coeff, block = vapor_pressure_antoine_coefficients(entry, temperature_K)
+        assert block == "pure_component_antoine"
     return 10.0 ** (
         float(coeff["A"])
         - float(coeff["B"]) / (float(temperature_K) + float(coeff.get("C", 0.0)))
@@ -507,7 +510,6 @@ def test_mn_source_spread_and_join_resolution_are_documented_in_place() -> None:
     ("species", "temperature_K", "expected_reference_pa", "rel_tol"),
     [
         ("Na", 1118.0, 61_691.685390, 1e-6),
-        ("K", 1033.0, 104_572.576518, 1e-6),
         ("Mg", 1364.15, PA_PER_ATM, 0.03),
         ("Fe", 3135.15, PA_PER_ATM, 0.02),
         ("Ca", 1500.0, 21_740.153809, 1e-6),
@@ -576,7 +578,6 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
 
     label_cases = [
         ("Na", 1118.0, "pure_component_source_equation_fit"),
-        ("K", 1033.0, "pure_component_source_equation_fit"),
         ("Fe", 3135.15, "pure_component_derived_from_evaluation"),
         ("Ca", 1700.0, "pure_component_source_equation_fit"),
         ("Al", 2300.0, "pure_component_source_equation_fit"),
@@ -603,6 +604,19 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         if expected_fragment == "pure_component_extrapolated":
             assert "pure_component_first_principles" not in label
             assert "extrapolated_beyond_source" in label
+
+    k_metal = data["metals"]["K"]
+    _, k_block = vapor_pressure_antoine_coefficients(k_metal, 1429.0)
+    assert k_block == "antoine"
+    assert (
+        vapor_pressure_source_label(
+            "builtin_fallback",
+            k_metal,
+            coefficient_block=k_block,
+            temperature_K=1429.0,
+        )
+        == "builtin_fallback:standard_reaction_term"
+    )
 
     foulant_label_cases = [
         ("NaCl", "pure_component_source_equation_fit"),

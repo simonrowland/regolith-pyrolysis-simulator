@@ -33,9 +33,13 @@ explicit reaction term.
 
 `standard_reaction_term`
 
-: `antoine` evaluates a standard-reaction ΔG-equivalent term. The consumer
-  applies explicit oxide-activity and pO2 exponents from the YAML reaction
-  metadata. Rows with this target must include a `reaction` block containing:
+: `antoine` evaluates a standard-reaction ΔG-equivalent term for either a
+  metal or oxide-vapor row. The consumer applies explicit oxide-activity and
+  pO2 exponents from the YAML reaction metadata. The row must state its
+  pressure basis explicitly (`pressure_standard_Pa`, `pO2_reference_bar`) when
+  the source thermodynamics use a different standard state, such as 1 atm
+  Lamoreaux-Hildenbrand data converted to the runtime Pa/bar convention. Rows
+  with this target must include a `reaction` block containing:
 
   - `formula`: reaction represented by the standard term.
   - `exponent_oxide`: oxide activity exponent used by the consumer.

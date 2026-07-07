@@ -84,6 +84,27 @@ def test_evolves_uses_builtin_pressure_floor(vapor_pressure_data) -> None:
     )
 
 
+def test_k_standard_reaction_graph_uses_activity_and_po2_scaling(
+    vapor_pressure_data,
+) -> None:
+    row = vapor_pressure_data["metals"]["K"]
+    coeff = row["antoine"]
+    T_K = 1429.0
+    pO2_bar = 10.0**-7.853
+    a_KO0_5 = 3.5e-5
+    reference = 10.0 ** (coeff["A"] - coeff["B"] / (T_K + coeff["C"]))
+    expected = reference * a_KO0_5 * (pO2_bar ** -0.25)
+
+    assert row["fit_target"] == "standard_reaction_term"
+    assert ellingham_graph.effective_equilibrium_pressure_Pa(
+        "K",
+        T_K,
+        pO2_bar,
+        vapor_pressure_data=vapor_pressure_data,
+        a_oxide=a_KO0_5,
+    ) == pytest.approx(expected)
+
+
 def test_evolution_order_qualitative_pyrolysis_sequence(vapor_pressure_data) -> None:
     # Representative mbar-sweep operating point in the Fe/SiO band.
     T_K = 1650.0

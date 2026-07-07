@@ -330,6 +330,22 @@ _DEMARIA_12022_WT_PCT = {
     "Cr2O3": 0.35,
 }
 
+_DEMARIA_12022_PO2_TABLE_ATM = {
+    1396.0: 5.54e-9,
+    1475.0: 4.96e-8,
+}
+
+
+def _demaria_12022_log10_po2_bar(temperature_K: float) -> float:
+    """Log-linear interpolation of DeMaria 1971 Table 1 O2 pressures."""
+
+    lo_T, hi_T = sorted(_DEMARIA_12022_PO2_TABLE_ATM)
+    lo_log = math.log10(_DEMARIA_12022_PO2_TABLE_ATM[lo_T] * 1.01325)
+    hi_log = math.log10(_DEMARIA_12022_PO2_TABLE_ATM[hi_T] * 1.01325)
+    return lo_log + (float(temperature_K) - lo_T) * (hi_log - lo_log) / (
+        hi_T - lo_T
+    )
+
 
 def _wt_pct_to_mol_account(wt_pct: dict[str, float]) -> dict[str, float]:
     from simulator.state import MOLAR_MASS
@@ -454,6 +470,100 @@ def test_grounded_melt_activity_coefficients_match_single_cation_sources():
     assert k_coeff.valid_range_K == (1500.0, 1500.0)
     assert k_coeff.anchor_T_K == pytest.approx(1500.0)
     assert "DeMaria" in k_coeff.citation
+
+
+def test_k_standard_reaction_term_reconstructs_liquid_ko05_source_rows(
+    vapor_pressure_data,
+):
+    row = vapor_pressure_data["metals"]["K"]
+    coeff = row["antoine"]
+    reaction = row["reaction"]
+
+    assert row["fit_target"] == "standard_reaction_term"
+    assert reaction["formula"] == "KO0.5(l) -> K(g) + 0.25 O2(g)"
+    assert "Lamoreaux & Hildenbrand 1984 Tables 2/4" in reaction["basis"]
+    assert "10.1063/1.555706" in reaction["basis"]
+    assert row["oxide_activity_exponent"] == pytest.approx(1.0)
+    assert row["pO2_exponent"] == pytest.approx(-0.25)
+
+    for source_row in reaction["source_table_values"]:
+        temperature_K = source_row["T_K"]
+        fit_log10_p_pa = coeff["A"] - coeff["B"] / (
+            temperature_K + coeff["C"]
+        )
+        assert fit_log10_p_pa == pytest.approx(
+            source_row["fit_log10_P_K_ref_Pa"],
+            abs=1e-6,
+        )
+        assert fit_log10_p_pa == pytest.approx(
+            source_row["log10_P_K_ref_Pa"],
+            abs=0.001,
+        )
+
+    assert reaction["fit_residual_dex"]["max_abs"] == pytest.approx(
+        0.000223,
+        abs=1e-6,
+    )
+    heldout = reaction["heldout_demaria_comparison"]
+    assert heldout[2]["T_K"] == pytest.approx(1428.571429)
+    assert heldout[2]["residual_dex_model_minus_demaria"] == pytest.approx(
+        1.241499,
+        abs=1e-6,
+    )
+
+
+def test_k_wall_condensation_uses_pure_component_sidecar(vapor_pressure_data):
+    row = vapor_pressure_data["metals"]["K"]
+
+    runtime_coeff, runtime_block = vapor_pressure_module.vapor_pressure_antoine_coefficients(
+        row,
+        temperature_K=1429.0,
+    )
+    wall_coeff, wall_block = vapor_pressure_module.wall_condensation_antoine_coefficients(
+        row,
+        temperature_K=1429.0,
+    )
+
+    assert runtime_block == "antoine"
+    assert wall_block == "pure_component_antoine"
+    assert runtime_coeff is row["antoine"]
+    assert wall_coeff is row["pure_component_antoine"]
+
+
+def test_demaria_1971_k_validation_case_uses_measured_table1_po2(
+    vapor_pressure_data,
+):
+    account = _wt_pct_to_mol_account(_DEMARIA_12022_WT_PCT)
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    temperature_K = 1429.0
+    measured_po2_bar = 10.0 ** _demaria_12022_log10_po2_bar(temperature_K)
+    measured_p_k_pa = (10.0 ** -8.8) * 101_325.0
+
+    def modeled_p_k(pO2_bar: float) -> float:
+        request = IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": account},
+                species_formula_registry={},
+            ),
+            temperature_C=temperature_K - 273.15,
+            pressure_bar=1e-6,
+            control_inputs={
+                "pO2_bar": pO2_bar,
+                "intrinsic_fO2_log": math.log10(pO2_bar),
+            },
+        )
+        return provider.dispatch(request).diagnostic["vapor_pressures_Pa"]["K"]
+
+    modeled_measured_po2 = modeled_p_k(measured_po2_bar)
+    modeled_floor_po2 = modeled_p_k(1e-9)
+    residual_dex = math.log10(modeled_measured_po2 / measured_p_k_pa)
+    floor_delta_dex = math.log10(modeled_floor_po2 / modeled_measured_po2)
+
+    assert math.log10(measured_po2_bar) == pytest.approx(-7.853, abs=0.002)
+    assert residual_dex == pytest.approx(1.241, abs=0.005)
+    assert abs(residual_dex) > 1.0
+    assert floor_delta_dex == pytest.approx(0.288, abs=0.005)
 
 
 def test_single_cation_mole_fraction_uses_mol_ledger_not_wt_proxy():

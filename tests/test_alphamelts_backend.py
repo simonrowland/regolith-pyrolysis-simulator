@@ -1564,6 +1564,7 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
         1600.0,
         {'Na': 2.0, 'K': 1.0, 'unknown': 10.0},
         {'SiO2': 100.0},
+        pO2_bar=1e-9,
     )
     table = _load_data('vapor_pressures.yaml')['metals']
     T_K = 1600.0 + 273.15
@@ -1592,6 +1593,7 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
             'Al2O3': 0.6,
         },
         {'SiO2': 45.0, 'Na2O': 4.0, 'K2O': 1.0},
+        pO2_bar=1e-9,
     )
 
     assert {'Na', 'K', 'Si', 'SiO', 'Ca', 'Mg', 'Al'} <= set(pressures)
@@ -1608,6 +1610,27 @@ def test_activities_times_antoine_returns_empty_without_species_activity():
         {},
         {'Na2O': 100.0},
     ) == {}
+
+
+def test_activities_times_antoine_refuses_standard_reaction_without_po2():
+    backend = AlphaMELTSBackend()
+    backend._vapor_pressure_table = {
+        'K': {
+            'parent_oxide': 'K2O',
+            'fit_target': 'standard_reaction_term',
+            'oxide_activity_exponent': 1.0,
+            'pO2_exponent': -0.25,
+            'pO2_reference_bar': 1.0,
+            'antoine': {'A': 5.0, 'B': 0.0, 'C': 0.0},
+        },
+    }
+
+    with pytest.raises(RuntimeError, match='without pO2_bar'):
+        backend._activities_times_antoine(
+            1600.0,
+            {'K2O': 0.5},
+            {'K2O': 1.0},
+        )
 
 
 def test_activities_times_antoine_warns_once_for_pseudo_curvefit():

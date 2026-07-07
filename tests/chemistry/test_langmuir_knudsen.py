@@ -132,10 +132,8 @@ def test_grounded_alpha_and_p_eq_match_provider_wiring():
     assert alpha_k == pytest.approx(0.13)
     assert alpha_sio == pytest.approx(0.52 * math.exp(-3685.0 / T_K))
     p_na = pseudo_antoine_p_eq_pa("Na", T_K)
-    p_k = pseudo_antoine_p_eq_pa("K", T_K)
     p_sio = pseudo_antoine_p_eq_pa("SiO", T_K)
     assert p_na > 0.0
-    assert p_k > 0.0
     assert p_sio > 0.0
     provider = _series_resistance_evaporation_flux_kg_m2_s(
         species="Na",
@@ -160,6 +158,11 @@ def test_grounded_alpha_and_p_eq_match_provider_wiring():
         ),
         rel=1e-12,
     )
+
+
+def test_pseudo_antoine_rejects_k_standard_reaction_without_context():
+    with pytest.raises(ValueError, match="standard_reaction_term"):
+        pseudo_antoine_p_eq_pa("K", 1429.0)
 
 
 def test_validate_against_baseline_reports_ratios_without_tuning():

@@ -165,11 +165,10 @@ class EquilibriumMixin:
     #   `a_M * 10^(A-B/T) ~= VapoRock_partial_pressure` on the calibration
     #   grid. The convention is single-counted by construction but assumes
     #   proximity to that grid.
-    # - Oxide vapors with `fit_target: standard_reaction_term` use raw Antoine
-    #   as a ΔG-equivalent term, consumed with explicit oxide-activity + pO2
-    #   exponents -- single-counted via explicit reaction stoichiometry.
-    # This metadata documents the existing math only; `_stub_equilibrium` does
-    # not branch on `fit_target`.
+    # - Metal or oxide vapor rows with `fit_target: standard_reaction_term`
+    #   use raw Antoine as a ΔG-equivalent term, consumed with explicit
+    #   oxide-activity + pO2 exponents -- single-counted via explicit reaction
+    #   stoichiometry.
     #
     # Tuple: (ΔH_f kJ/mol_O₂, ΔS_f kJ/(mol·K), n_M, n_ox)
     #   n_M  = moles of metal per mol O₂ in the decomposition reaction
@@ -226,6 +225,7 @@ class EquilibriumMixin:
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_ANTOINE,
             FIT_TARGET_PSEUDO_VAPOROCK,
+            FIT_TARGET_STANDARD_REACTION,
             _is_noncertifying_pseudo_vapor_pressure_runtime,
             _metadata_value,
             _pow10_pressure_or_raise,
@@ -406,6 +406,56 @@ class EquilibriumMixin:
                     field="P_reference_Pa",
                 )
             else:
+                continue
+
+            if str(sp_data.get("fit_target", "") or "") == FIT_TARGET_STANDARD_REACTION:
+                oxide_activity = melt_oxide_activity(
+                    parent_oxide,
+                    melt_account_mol,
+                )
+                if oxide_activity is None or oxide_activity.activity <= 1e-10:
+                    continue
+                activities[species] = oxide_activity.activity
+
+                # provenance: k_mox_liquid_standard_reaction
+                # Lamoreaux & Hildenbrand 1984 Tables 2/4
+                # (DOI 10.1063/1.555706) supplies the liquid KO0.5 standard
+                # term; DeMaria 1971 Table 1 is held-out pO2 validation only.
+                activity_exponent = float(
+                    sp_data.get("oxide_activity_exponent", 1.0) or 1.0
+                )
+                P_effective_Pa = _require_finite_vapor_value(
+                    P_reference_Pa
+                    * max(oxide_activity.activity, 0.0) ** activity_exponent,
+                    species=species,
+                    field="P_effective_activity",
+                )
+                pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
+                if pO2_exponent:
+                    pO2_reference_bar = max(
+                        1e-30,
+                        float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
+                    )
+                    P_effective_Pa = _require_finite_vapor_value(
+                        P_effective_Pa
+                        * (pO2_bar / pO2_reference_bar) ** pO2_exponent,
+                        species=species,
+                        field="P_effective_pO2",
+                    )
+                if P_effective_Pa > 1e-15:
+                    vapor_pressures[species] = P_effective_Pa
+                    source_label = vapor_pressure_source_label(
+                        'builtin_authoritative',
+                        sp_data,
+                        coefficient_block=coefficient_block,
+                        temperature_K=T_K,
+                    )
+                    if species in metal_extrapolations:
+                        source_label = (
+                            f'{source_label}:'
+                            'extrapolated_beyond_valid_range_K'
+                        )
+                    vapor_pressure_sources[species] = source_label
                 continue
 
             # --- Oxide activity ---                              [ELLI-5]

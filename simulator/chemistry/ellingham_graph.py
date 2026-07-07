@@ -143,9 +143,10 @@ def effective_equilibrium_pressure_Pa(
 ) -> float:
     """Effective equilibrium pressure ``P_eff = a_M · P_sat`` (Pa).
 
-    Metals use the builtin Ellingham + Antoine path. Oxide vapors (for example
-    ``SiO``) use the declared Antoine row with activity and pO₂ scaling from
-    :mod:`engines.builtin.vapor_pressure`.
+    Metals use the builtin Ellingham + Antoine path unless their row declares
+    ``fit_target: standard_reaction_term``. Standard-reaction metals and oxide
+    vapors (for example ``K`` and ``SiO``) use the declared Antoine row with
+    activity and pO2 scaling from :mod:`engines.builtin.vapor_pressure`.
     """
 
     from engines.builtin.vapor_pressure import vapor_pressure_antoine_coefficients
@@ -166,6 +167,19 @@ def effective_equilibrium_pressure_Pa(
         P_reference_Pa = _antoine_reference_pressure_Pa(antoine, T_K)
         if P_reference_Pa is None:
             return 0.0
+        if str(sp_data.get("fit_target", "") or "") == "standard_reaction_term":
+            activity_exponent = float(
+                sp_data.get("oxide_activity_exponent", 1.0) or 1.0
+            )
+            P_eq_Pa = P_reference_Pa * (a_ox ** activity_exponent)
+            pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
+            if pO2_exponent:
+                pO2_reference_bar = max(
+                    1e-30,
+                    float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
+                )
+                P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
+            return max(P_eq_Pa, 0.0)
         a_M = metal_activity_factor(species, T_K, pO2, a_oxide=a_ox)
         return a_M * P_reference_Pa
 

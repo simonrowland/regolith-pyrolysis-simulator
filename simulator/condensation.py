@@ -3361,9 +3361,9 @@ def _antoine_psat_pa(
         species,
         vapor_pressure_data=vapor_pressure_data,
     )
-    from engines.builtin.vapor_pressure import vapor_pressure_antoine_coefficients
+    from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
 
-    antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+    antoine, coefficient_block = wall_condensation_antoine_coefficients(
         data,
         temperature_K=T_K,
     )

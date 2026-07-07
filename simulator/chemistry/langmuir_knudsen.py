@@ -32,6 +32,7 @@ from engines.builtin.evaporation_flux import (
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from engines.builtin.vapor_pressure import (
+    FIT_TARGET_STANDARD_REACTION,
     vapor_pressure_antoine_coefficients,
 )
 from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
@@ -275,6 +276,12 @@ def species_molar_mass_kg_mol(species: str) -> float:
 def pseudo_antoine_p_eq_pa(species: str, T_K: float) -> float:
     """Evaluate the builtin pseudo-Antoine ``p_eq`` row used by the provider."""
     row = _species_row(species)
+    if str(row.get("fit_target", "") or "") == FIT_TARGET_STANDARD_REACTION:
+        raise ValueError(
+            f"{species} uses a standard_reaction_term; raw pseudo-Antoine "
+            "evaluation would omit melt activity and pO2 context. Use the "
+            "builtin vapor-pressure provider for an effective P_eq."
+        )
     antoine, _ = vapor_pressure_antoine_coefficients(row, temperature_K=T_K)
     A = float(antoine.get("A", 0.0))
     B = float(antoine.get("B", 0.0))

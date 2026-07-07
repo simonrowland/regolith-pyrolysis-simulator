@@ -21,6 +21,7 @@ from engines.alphamelts.domain import (
 )
 from engines.builtin.vapor_pressure import (
     COEFF_BLOCK_ANTOINE,
+    FIT_TARGET_STANDARD_REACTION,
     VaporPressureComputationError,
     _ELLINGHAM_THERMO,
     _is_noncertifying_pseudo_vapor_pressure_runtime,
@@ -304,8 +305,53 @@ def _analytical_vapor_pressures_from_activities(
                 extrapolations[species] = {
                     "temperature_K": T_K,
                     "valid_range_K": (valid_low, valid_high),
-                    "authority_status": "extrapolation_limited",
+                        "authority_status": "extrapolation_limited",
                 }
+        P_reference_Pa = _pow10(A - B / (T_K + C), species=species)
+        if str(sp_data.get("fit_target", "") or "") == FIT_TARGET_STANDARD_REACTION:
+            activity_exponent = float(
+                sp_data.get("oxide_activity_exponent", 1.0) or 1.0
+            )
+            pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
+            pO2_reference_bar = max(
+                1e-30,
+                float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
+            )
+
+            def standard_pressure(oxide_value: float) -> tuple[float, float]:
+                if oxide_value <= 0.0:
+                    return 0.0, 0.0
+                activity_factor = max(oxide_value, 0.0) ** activity_exponent
+                pressure = P_reference_Pa * activity_factor
+                if pO2_exponent:
+                    pressure *= (pO2 / pO2_reference_bar) ** pO2_exponent
+                return _finite_number(
+                    pressure,
+                    species=species,
+                    field="P_eq_standard_reaction",
+                ), activity_factor
+
+            P_eq_Pa, activity_factor = standard_pressure(activity)
+            P_eq_wt_Pa, wt_activity_factor = standard_pressure(wt_activity)
+            by_species[species] = _species_payload(
+                parent_oxide=parent_oxide,
+                P_eq_Pa=P_eq_Pa,
+                P_eq_wt_fraction_Pa=P_eq_wt_Pa,
+                melt_oxide_activity=activity,
+                wt_fraction_activity=wt_activity,
+                activity_factor=activity_factor,
+                wt_fraction_activity_factor=wt_activity_factor,
+                P_reference_Antoine_Pa=P_reference_Pa,
+                pO2_bar=pO2,
+                source=vapor_pressure_source_label(
+                    "alphamelts_activity_diagnostic",
+                    sp_data,
+                    coefficient_block=coefficient_block,
+                    temperature_K=T_K,
+                    extrapolated=str(species) in extrapolations,
+                ),
+            )
+            continue
         ellingham_extrapolation = ellingham_fit_extrapolation(
             T_K,
             species=species,
@@ -313,7 +359,6 @@ def _analytical_vapor_pressures_from_activities(
         )
         if ellingham_extrapolation is not None:
             extrapolations[species] = ellingham_extrapolation
-        P_reference_Pa = _pow10(A - B / (T_K + C), species=species)
         P_eq_Pa, metal_activity = _metal_vapor_pressure_Pa(
             species=species,
             T_K=T_K,

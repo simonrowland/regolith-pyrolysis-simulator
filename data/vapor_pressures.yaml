@@ -5,14 +5,18 @@
 # provider into the effective P_eq consumed by evaporation. Only
 # pure_component_antoine sidecars are pure-component references.
 # Sources: legacy constants plus diagnostic refits against VapoRock over Kress91
-# IW operating conditions. The builtin provider is authoritative; VapoRock is
-# diagnostic-only when available.
+# IW operating conditions. K is not a VapoRock pseudo-refit: it is a
+# Lamoreaux & Hildenbrand 1984 liquid-KO0.5 standard-reaction term whose
+# activity and pO2 scaling are applied by the builtin provider. The builtin
+# provider is authoritative; VapoRock is diagnostic-only when available.
 #
 # Dense fallback refit (2026-06-14, scripts/vaporock_pseudo_antoine_refit.py):
 #   current VapoRock import; 7 feedstocks; 31 T points from 1350-1950 K;
 #   Kress91/IW via vaporock.redox_buffer(T, "IW"); 217 samples/species.
-#   Na max 0.379 dex (low); K max 0.691 dex (low);
-#   Mg max 0.282 dex (moderate); SiO max 0.270 dex (moderate).
+#   Na max 0.379 dex (low); Mg max 0.282 dex (moderate);
+#   SiO max 0.270 dex (moderate). K is intentionally excluded from this
+#   VapoRock-refit note; its L&H standard term remains +1.15..+1.28 dex high
+#   against held-out DeMaria 1971 Apollo 12022 rows with runtime gamma_KO0.5.
 #   Fe 0.023 dex did not re-confirm against current VapoRock; dense-grid
 #   refit lowers current residual to 0.418 dex but remains low confidence.
 #
@@ -101,24 +105,40 @@ metals:
     molar_mass_g_mol: 39.0983
     electrons_per_atom: 1
     parent_oxide: "K2O"
-    fit_target: "pseudo_psat_backsolved_from_vaporock"
-    residual_dex: 0.691
-    confidence_tier: "low"
-    backsolve:
-      feedstock_grid: "dense seven-feedstock lunar/mars grid"
-      fO2_convention: "Kress91 IW"
-      activity_formula: "(K_decomp * a_oxide**n_ox / pO2_bar)**(1/n_M), clamped at 1"
-      target: "VapoRock K(g) partial pressure on the dense grid"
-      residual_dex: 0.691
-      old_metadata_residual_dex: 1.469
-      old_dense_residual_dex: 2.302
-      provenance:
-        generated_by: "scripts/vaporock_pseudo_antoine_refit.py"
-        temperature_K: {min: 1350, max: 1950, step: 20, count: 31}
-        feedstocks: ["lunar_mare_low_ti", "lunar_mare_high_ti", "lunar_highland", "lunar_pkt_kreep_average", "lunar_spa_kreep_influenced", "mars_basalt", "mars_sulfate_rich"]
-        n_samples: 217
-        composition_basis: "VapoRock-supported silicate oxides; unsupported Stage 0 foulants removed, remaining oxides renormalized to 100 wt%"
-        fit_objective: "bounded minimax absolute log10 residual; |C| <= 1000 K"
+    fit_target: "standard_reaction_term"
+    residual_dex: 0.000223
+    confidence_tier: "uncertified_liquid_ko0_5_lamoreaux_hildenbrand"
+    reaction:
+      formula: "KO0.5(l) -> K(g) + 0.25 O2(g)"
+      exponent_oxide: 1.0
+      exponent_pO2: -0.25
+      basis: "Lamoreaux & Hildenbrand 1984 Tables 2/4 liquid K2O Gibbs-energy-function/enthalpy assembly, DOI 10.1063/1.555706; halved to liquid KO0.5 Raoultian standard reaction; DeMaria 1971 retained only as held-out validation"
+      activity_basis: "single-cation KO0.5 Raoultian activity"
+      fit_form: "log10(P_K_Pa)=A-B/T_K+log10(a_KO0.5)-0.25*log10(pO2_bar/1bar)"
+      pressure_standard_Pa: 100000
+      source: "Lamoreaux & Hildenbrand 1984 J. Phys. Chem. Ref. Data 13:151-173 Tables 2/4, DOI 10.1063/1.555706; verified extraction docs-private/research/2026-07-07-t141-kmox/lamoreaux-hildenbrand-1984-verified-data.md"
+      source_urls:
+        - "https://doi.org/10.1063/1.555706"
+      source_table_values:
+        - {T_K: 1190.000000, log10_K_r_KO0_5_atm: -3.705290, log10_P_K_ref_Pa: 1.301855, fit_log10_P_K_ref_Pa: 1.301633, residual_dex: -0.000223}
+        - {T_K: 1300.000000, log10_K_r_KO0_5_atm: -2.832657, log10_P_K_ref_Pa: 2.174488, fit_log10_P_K_ref_Pa: 2.174499, residual_dex: 0.000011}
+        - {T_K: 1400.000000, log10_K_r_KO0_5_atm: -2.169771, log10_P_K_ref_Pa: 2.837375, fit_log10_P_K_ref_Pa: 2.837522, residual_dex: 0.000147}
+        - {T_K: 1428.571429, log10_K_r_KO0_5_atm: -1.998894, log10_P_K_ref_Pa: 3.008252, fit_log10_P_K_ref_Pa: 3.008301, residual_dex: 0.000049}
+        - {T_K: 1450.000000, log10_K_r_KO0_5_atm: -1.875574, log10_P_K_ref_Pa: 3.131572, fit_log10_P_K_ref_Pa: 3.131560, residual_dex: -0.000012}
+        - {T_K: 1475.000000, log10_K_r_KO0_5_atm: -1.736660, log10_P_K_ref_Pa: 3.270486, fit_log10_P_K_ref_Pa: 3.270424, residual_dex: -0.000062}
+        - {T_K: 1600.000000, log10_K_r_KO0_5_atm: -1.113140, log10_P_K_ref_Pa: 3.894006, fit_log10_P_K_ref_Pa: 3.894228, residual_dex: 0.000223}
+      fit_residual_dex: {max_abs: 0.000223, rms: 0.000083}
+      comparison_anchor:
+        T_K: 1428.571429
+        measured_log10_pO2_bar: -7.858279
+        measured_log10_pK_Pa: -3.794
+        predicted_log10_pK_Pa_with_runtime_gamma: -2.553
+        residual_dex_model_minus_demaria: 1.241
+      heldout_demaria_comparison:
+        - {T_K: 1470.588235, log10_pK_atm: -8.600000, log10_pO2_bar: -7.351965, X_KO0_5: 8.516800e-4, gamma_runtime: 3.5e-5, measured_log10_pK_Pa: -3.594283, predicted_log10_pK_Pa: -2.441372, residual_dex_model_minus_demaria: 1.152912}
+        - {T_K: 1449.275362, log10_pK_atm: -8.700000, log10_pO2_bar: -7.608791, X_KO0_5: 8.516800e-4, gamma_runtime: 3.5e-5, measured_log10_pK_Pa: -3.694283, predicted_log10_pK_Pa: -2.496001, residual_dex_model_minus_demaria: 1.198283}
+        - {T_K: 1428.571429, log10_pK_atm: -8.800000, log10_pO2_bar: -7.858279, X_KO0_5: 8.516800e-4, gamma_runtime: 3.5e-5, measured_log10_pK_Pa: -3.794283, predicted_log10_pK_Pa: -2.552784, residual_dex_model_minus_demaria: 1.241499}
+        - {T_K: 1408.450704, log10_pK_atm: -8.900000, log10_pO2_bar: -8.100739, X_KO0_5: 8.516800e-4, gamma_runtime: 3.5e-5, measured_log10_pK_Pa: -3.894283, predicted_log10_pK_Pa: -2.611646, residual_dex_model_minus_demaria: 1.282637}
     pure_component_antoine:
       source: "REF-042 NIST Chemistry WebBook SRD 69 Fiock and Rodebush 1926 potassium (C7440097); log10(P/bar)=4.45718-4691.58/(T+24.195), converted to Pa by A+5"
       source_certification: "source_equation_fit"
@@ -132,21 +152,29 @@ metals:
       T_band_K: [1700, 2273]
       envelope: [0.10, 0.16]
       tier: 2
+    oxide_activity_exponent: 1.0
+    pO2_exponent: -0.25
+    pO2_reference_bar: 1.0
     antoine:
-      # Bounded-minimax fallback fit to current VapoRock dense IW grid.
-      A: 8.593440
-      B: 24937.098488
-      C: 1000.0
-    valid_range_K: [1400, 1900]
+      # provenance: k_mox_liquid_standard_reaction
+      # Lamoreaux & Hildenbrand 1984 Tables 2/4 (DOI 10.1063/1.555706):
+      # K2O(l)=2K(g)+0.5O2(g), DeltaH298/R=65.04 kK, fef(T) table fits,
+      # halved to KO0.5(l)=K(g)+0.25O2(g), 1 atm -> Pa/bar pO2 basis.
+      # A=10.641293604542, B=9965.408778631245, C=-123.001.
+      A: 10.641294
+      B: 9965.408779
+      C: -123.001
+    valid_range_K: [1190, 1600]
     boiling_point_C: 759
     condensation_T_C_at_1mbar: 420
     notes: |
-      Structurally limited species in the builtin authoritative surface;
-      Antoine coefficients are diagnostic approximations to dense-grid
-      VapoRock K(g), not a first-principles replacement. The old
-      single-reference residual (1.469 dex) improves to 0.691 dex on the
-      dense Kress91 IW grid, but K remains structurally limited by VapoRock's
-      richer JANAF gas speciation.
+      Direct liquid-KO0.5 standard-reaction term for KO0.5(l) = K(g) + 0.25 O2.
+      The coefficient is not a VapoRock fit, not a DeMaria back-solve, and not a
+      JANAF K2O(cr) surrogate: it is fitted only to the Lamoreaux & Hildenbrand
+      1984 Tables 2/4 liquid-K2O thermodynamic assembly (DOI 10.1063/1.555706),
+      halved to the single-cation KO0.5 Raoultian basis consumed by melt
+      activity. DeMaria 1971 Apollo 12022 KEMS rows are held-out validation and
+      remain +1.15 to +1.28 dex high with the runtime constant gamma.
 
   Mg:
     formula: "Mg"
