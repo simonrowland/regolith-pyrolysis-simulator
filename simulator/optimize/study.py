@@ -1222,6 +1222,7 @@ def _search_space_identity(
         {
             "recipe_schema_version": schema.recipe_schema_version,
             "allowlist_version": schema.allowlist_version,
+            "bounds_digest": schema.bounds_digest,
             "profile_pinned_paths": list(profile_pinned_paths),
             "cli_pinned_paths": list(cli_pinned_paths),
             "resolved_pinned_paths": [

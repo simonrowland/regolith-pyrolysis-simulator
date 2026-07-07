@@ -1147,6 +1147,7 @@ def test_study_applies_profile_and_cli_pins_to_strategy_search(tmp_path) -> None
     assert searched_ramp in observed_paths[0]
     pareto = json.loads((tmp_path / "pareto.json").read_text(encoding="utf-8"))
     identity = pareto["search_space_identity"]
+    assert identity["bounds_digest"] == RecipeSchema().bounds_digest
     assert identity["profile_pinned_paths"] == [
         "C2A_staged.stages.alkali_early_fe.target_C"
     ]
@@ -1156,6 +1157,49 @@ def test_study_applies_profile_and_cli_pins_to_strategy_search(tmp_path) -> None
     ]
     provenance = _read_provenance(tmp_path)
     assert provenance[0]["search_space_identity"] == identity
+
+
+def test_study_search_space_identity_tracks_schema_bounds_digest(tmp_path) -> None:
+    base_schema = RecipeSchema()
+    same_bounds_schema = RecipeSchema(allowlist=base_schema.allowlist)
+    target = next(spec for spec in base_schema.allowlist if spec.high is not None)
+    shifted_bounds_schema = RecipeSchema(
+        allowlist=tuple(
+            replace(spec, high=float(spec.high) + 1.0)
+            if spec.path == target.path
+            else spec
+            for spec in base_schema.allowlist
+        )
+    )
+
+    def persisted_identity(schema: RecipeSchema, out_dir: Path) -> Mapping[str, Any]:
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            _SingleCandidateStrategy(),
+            "stub",
+            1,
+            1,
+            out_dir,
+            seed=7,
+            evaluator=_evaluator(),
+            schema=schema,
+        )
+        pareto = json.loads((out_dir / "pareto.json").read_text(encoding="utf-8"))
+        identity = pareto["search_space_identity"]
+        assert _read_provenance(out_dir)[0]["search_space_identity"] == identity
+        return identity
+
+    base_identity = persisted_identity(base_schema, tmp_path / "base")
+    same_identity = persisted_identity(same_bounds_schema, tmp_path / "same")
+    shifted_identity = persisted_identity(shifted_bounds_schema, tmp_path / "shifted")
+
+    assert base_identity["bounds_digest"] == base_schema.bounds_digest
+    assert same_identity["bounds_digest"] == same_bounds_schema.bounds_digest
+    assert shifted_identity["bounds_digest"] == shifted_bounds_schema.bounds_digest
+    assert same_identity == base_identity
+    assert shifted_identity["bounds_digest"] != base_identity["bounds_digest"]
+    assert shifted_identity != base_identity
 
 
 def test_study_surfaces_knob_saturation_in_pareto_and_provenance(tmp_path) -> None:
