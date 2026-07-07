@@ -7,6 +7,7 @@ import pytest
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 import simulator.optimize.objective as objective_module
+from scripts import sso_r_validation_map as validation_map
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ObjectiveComputationError,
@@ -23,8 +24,12 @@ from simulator.optimize.objective import (
     _metric_value,
 )
 from simulator.optimize.sso2_evidence import (
+    SSO2_CERTIFIED_PN2_MBAR,
+    SSO2_CERTIFIED_PO2_MBAR,
+    SSO2_CERTIFIED_TOTAL_PRESSURE_MBAR,
     SSO2_CHUNK3B_READER_HANDOFF,
     SSO2_OWNER_RECIPE_ID,
+    build_sso2_owner_recipe_execution,
     sso2_owner_recipe_evidence,
     sso2_owner_recipe_objective_reader,
     sso2_owner_recipe_setpoints_patch,
@@ -347,15 +352,49 @@ class _FakeSso2Ledger:
         return dict(self._accounts.get(account, {}))
 
 
+def _fake_sso2_stage_gas() -> dict[str, float | str]:
+    return {
+        "stage_name": "sio_window",
+        "gas_cover_mode": "pn2_sweep",
+        "atmosphere": "PN2_SWEEP",
+        "pO2_mbar": SSO2_CERTIFIED_PO2_MBAR,
+        "pN2_mbar": SSO2_CERTIFIED_PN2_MBAR,
+        "p_total_mbar": SSO2_CERTIFIED_TOTAL_PRESSURE_MBAR,
+        "requested_p_total_mbar": SSO2_CERTIFIED_TOTAL_PRESSURE_MBAR,
+    }
+
+
+def _fake_sso2_partition_basis() -> dict[str, float | str]:
+    return {
+        "native_fe_pool_mol": 12.0,
+        "native_fe_tap_mol": 11.5,
+        "native_fe_vapor_mol": 0.5,
+        "native_fe_vapor_escape_fraction_of_pool": 0.5 / 12.0,
+        "native_fe_vapor_capacity_mol_hr": 0.5,
+        "temperature_K": 1923.15,
+        "overhead_pressure_pa": SSO2_CERTIFIED_TOTAL_PRESSURE_MBAR * 100.0,
+        "overhead_pressure_source": "melt.p_total_mbar",
+        "carrier_gas": "N2",
+        "source_label": "fake native Fe partition basis",
+    }
+
+
 def _sso2_execution(
     *,
     condensed_delta: dict[tuple[int, str], float] | None = None,
     ledger: _FakeSso2Ledger | None = None,
 ):
+    split_present = bool(getattr(ledger, "transitions", ())) if ledger is not None else False
     snapshot = SimpleNamespace(
         hour=1,
         campaign="C2A_staged",
         mass_balance_error_pct=1.2e-13,
+        c2a_staged_gas=_fake_sso2_stage_gas(),
+        fe_redox_split=(
+            {"native_fe_partition": _fake_sso2_partition_basis()}
+            if split_present
+            else {}
+        ),
     )
     trace = SimpleNamespace(
         snapshots=(snapshot,),
@@ -385,10 +424,52 @@ def test_sso2_owner_recipe_patch_is_named_allowlisted_fe_then_sio() -> None:
     stages = {stage["name"]: stage for stage in staged["stages"]}
 
     assert staged["order"] == "fe_then_sio"
+    assert stages["fe_hot_hold"]["gas_cover_mode"] == "pn2_sweep"
+    assert stages["fe_hot_hold"]["pO2_mbar"] == pytest.approx(SSO2_CERTIFIED_PO2_MBAR)
+    assert stages["fe_hot_hold"]["p_total_mbar"] == pytest.approx(
+        SSO2_CERTIFIED_TOTAL_PRESSURE_MBAR
+    )
     assert stages["sio_window"]["target_C"] == pytest.approx(1650.0)
     assert stages["sio_window"]["gas_cover_mode"] == "pn2_sweep"
-    assert stages["sio_window"]["pO2_mbar"] == pytest.approx(0.0)
-    assert 5.0 <= stages["sio_window"]["p_total_mbar"] <= 15.0
+    assert stages["sio_window"]["pO2_mbar"] == pytest.approx(SSO2_CERTIFIED_PO2_MBAR)
+    assert stages["sio_window"]["p_total_mbar"] == pytest.approx(
+        SSO2_CERTIFIED_TOTAL_PRESSURE_MBAR
+    )
+    assert (
+        stages["sio_window"]["p_total_mbar"] - stages["sio_window"]["pO2_mbar"]
+    ) == pytest.approx(SSO2_CERTIFIED_PN2_MBAR)
+
+
+def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> None:
+    execution = build_sso2_owner_recipe_execution(hours=9)
+    evidence = sso2_owner_recipe_evidence(execution)
+    calibration = validation_map.calibrate_dose()
+
+    surface = evidence["certified_sso_r_surface"]
+    partition = evidence["fe_drain_vapor_partition_dependency"]
+    stage_gas = surface["stage_gas_snapshot"]
+    partition_basis = partition["native_fe_partition_basis"]
+
+    assert execution.status in {"ok", "partial"}
+    assert surface["dose_species"] == "Na"
+    assert surface["dose_kg"] == pytest.approx(calibration.full_feo_equiv_dose_kg)
+    assert surface["dose_transition_count"] >= 1
+    assert surface["declared_pO2_mbar"] == pytest.approx(SSO2_CERTIFIED_PO2_MBAR)
+    assert surface["declared_pN2_mbar"] == pytest.approx(SSO2_CERTIFIED_PN2_MBAR)
+    assert surface["pO2_mbar"] == pytest.approx(SSO2_CERTIFIED_PO2_MBAR)
+    assert surface["pN2_mbar"] == pytest.approx(SSO2_CERTIFIED_PN2_MBAR)
+    assert surface["pO2_mbar"] == pytest.approx(stage_gas["pO2_mbar"])
+    assert surface["pN2_mbar"] == pytest.approx(stage_gas["pN2_mbar"])
+    assert partition["status"] == "available"
+    assert partition["stage_gas_snapshot"]["pO2_mbar"] == pytest.approx(
+        surface["pO2_mbar"]
+    )
+    assert partition_basis["status"] == "available"
+    assert partition_basis["native_fe_tap_mol"] > partition_basis["native_fe_vapor_mol"]
+    assert partition["native_fe_saturation_split_count"] > 0
+    assert partition["tap_basis"]["Fe_kg"] == pytest.approx(evidence["fe_tap"]["Fe_kg"])
+    assert evidence["fe_tap"]["status"] == "available"
+    assert evidence["fe_tap"]["Fe_kg"] > 0.0
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:

@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from simulator.core import FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
+from simulator.optimize import sso_r_owner_surface
 from scripts import sso_r_validation_map as validation_map
 
 
@@ -25,6 +26,18 @@ def test_full_grid_count_is_1512_rows():
     assert len(validation_map.full_grid()) == 1512
     assert validation_map.expected_grid_count(smoke=False) == 1512
     assert validation_map.expected_grid_count(smoke=True) == 36
+
+
+def test_owner_recipe_surface_constants_are_shared():
+    assert validation_map.OWNER_RECIPE_PO2_MBAR == pytest.approx(
+        sso_r_owner_surface.OWNER_RECIPE_PO2_MBAR
+    )
+    assert validation_map.OWNER_RECIPE_PN2_MBAR == pytest.approx(
+        sso_r_owner_surface.OWNER_RECIPE_PN2_MBAR
+    )
+    assert validation_map.OWNER_RECIPE_TOTAL_PRESSURE_MBAR == pytest.approx(
+        sso_r_owner_surface.OWNER_RECIPE_TOTAL_PRESSURE_MBAR
+    )
 
 
 def _assertion(payload, name):

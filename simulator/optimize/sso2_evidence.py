@@ -8,15 +8,32 @@ from typing import Any
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation_routing import accepted_species_for_stage_number
+from simulator.core import PyrolysisSimulator
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.sso_r_owner_surface import (
+    OWNER_CERTIFICATION_ASSERTION,
+    OWNER_CERTIFIED_SURFACE_SOURCE,
+    OWNER_RECIPE_GAS_COVER_MODE,
+    OWNER_RECIPE_PN2_MBAR,
+    OWNER_RECIPE_PO2_MBAR,
+    OWNER_RECIPE_TOTAL_PRESSURE_MBAR,
+)
 from simulator.runner import PyrolysisRun
 from simulator.run_executor import RunExecution, RunExecutor
+from simulator.session import SimSession
+from simulator.state import CampaignPhase
 
 
 SSO2_OWNER_RECIPE_ID = "sso2_pn2_fe_drain_silica"
 SSO2_FEEDSTOCK_ID = "lunar_mare_low_ti"
 SSO2_STAGE_NUMBER = 3
+SSO2_CERTIFIED_DOSE_SPECIES = "Na"
+SSO2_CERTIFIED_DOSE_CALIBRATION_T_C = 1150.0
+SSO2_CERTIFIED_PN2_MBAR = OWNER_RECIPE_PN2_MBAR
+SSO2_CERTIFIED_PO2_MBAR = OWNER_RECIPE_PO2_MBAR
+SSO2_CERTIFIED_TOTAL_PRESSURE_MBAR = OWNER_RECIPE_TOTAL_PRESSURE_MBAR
+SSO2_CERTIFIED_SURFACE_SOURCE = OWNER_CERTIFIED_SURFACE_SOURCE
 SSO2_SILICA_SPECIES = ("SiO", "SiO2", "Si")
 SSO2_FE_TAP_ACCOUNT = "terminal.drain_tap_material"
 SSO2_METAL_PHASE_ACCOUNT = "process.metal_phase"
@@ -43,17 +60,17 @@ def sso2_owner_recipe_patch() -> RecipePatch:
                     "fe_hot_hold": {
                         "duration_h": 1,
                         "ramp_rate_C_per_hr": 150.0,
-                        "gas_cover_mode": "pn2_sweep",
-                        "pO2_mbar": 0.0,
-                        "p_total_mbar": 10.0,
+                        "gas_cover_mode": OWNER_RECIPE_GAS_COVER_MODE,
+                        "pO2_mbar": SSO2_CERTIFIED_PO2_MBAR,
+                        "p_total_mbar": SSO2_CERTIFIED_TOTAL_PRESSURE_MBAR,
                     },
                     "sio_window": {
                         "target_C": 1650.0,
                         "duration_h": 3,
                         "ramp_rate_C_per_hr": 175.0,
-                        "gas_cover_mode": "pn2_sweep",
-                        "pO2_mbar": 0.0,
-                        "p_total_mbar": 10.0,
+                        "gas_cover_mode": OWNER_RECIPE_GAS_COVER_MODE,
+                        "pO2_mbar": SSO2_CERTIFIED_PO2_MBAR,
+                        "p_total_mbar": SSO2_CERTIFIED_TOTAL_PRESSURE_MBAR,
                     },
                 },
             }
@@ -74,15 +91,113 @@ def build_sso2_owner_recipe_execution(
     mass_kg: float = 1000.0,
     backend_name: str = "stub",
 ) -> RunExecution:
+    setpoints_patch = sso2_owner_recipe_setpoints_patch()
+    dose_kg = _certified_full_feo_equiv_na_dose_kg(
+        mass_kg=float(mass_kg),
+        backend_name=backend_name,
+        setpoints_patch=setpoints_patch,
+    )
     run = PyrolysisRun(
         feedstock_id=SSO2_FEEDSTOCK_ID,
         campaign="C2A_staged",
         hours=int(hours),
         mass_kg=float(mass_kg),
         backend_name=backend_name,
-        setpoints_patch=sso2_owner_recipe_setpoints_patch(),
+        additives_kg={SSO2_CERTIFIED_DOSE_SPECIES: dose_kg},
+        setpoints_patch=setpoints_patch,
     )
-    return RunExecutor().execute(run._session_config())
+    session = SimSession().start(run._session_config())
+    _apply_certified_na_dose(session.simulator)
+    return RunExecutor().execute_session(session, hours=int(hours))
+
+
+def _certified_full_feo_equiv_na_dose_kg(
+    *,
+    mass_kg: float,
+    backend_name: str,
+    setpoints_patch: Mapping[str, Any],
+) -> float:
+    calibration_run = PyrolysisRun(
+        feedstock_id=SSO2_FEEDSTOCK_ID,
+        campaign="C2A_staged",
+        hours=0,
+        mass_kg=float(mass_kg),
+        backend_name=backend_name,
+        additives_kg={SSO2_CERTIFIED_DOSE_SPECIES: float(mass_kg)},
+        setpoints_patch=setpoints_patch,
+    )
+    config = calibration_run._session_config()
+    sim = PyrolysisSimulator(
+        None,
+        config.setpoints,
+        config.feedstocks,
+        config.vapor_pressures,
+    )
+    sim.load_batch(
+        config.feedstock_id,
+        config.mass_kg,
+        additives_kg={SSO2_CERTIFIED_DOSE_SPECIES: float(mass_kg)},
+    )
+    base_feo_mol = float(
+        sim.atom_ledger.mol_by_account("process.cleaned_melt").get("FeO", 0.0)
+        or 0.0
+    )
+    before = len(sim.atom_ledger.transitions)
+    _commit_certified_na_reduction(sim)
+    transitions = sim.atom_ledger.transitions[before:]
+    committed = [
+        transition
+        for transition in transitions
+        if transition.name == "c3_na_shuttle_reduction"
+    ]
+    if not committed:
+        raise RuntimeError("SSO-2 Na dose calibration did not reduce FeO")
+    transition = committed[-1]
+    reagent_mol = sim._transition_species_mol(
+        transition,
+        side="debits",
+        account="process.reagent_inventory",
+        species=SSO2_CERTIFIED_DOSE_SPECIES,
+    )
+    feo_mol = sim._transition_species_mol(
+        transition,
+        side="debits",
+        account="process.cleaned_melt",
+        species="FeO",
+    )
+    if reagent_mol <= 0.0 or feo_mol <= 0.0 or base_feo_mol <= 0.0:
+        raise RuntimeError(
+            "SSO-2 Na dose calibration transition had no FeO/reagent debit"
+        )
+    formula = resolve_species_formula(
+        SSO2_CERTIFIED_DOSE_SPECIES,
+        sim.species_formula_registry,
+    )
+    return base_feo_mol * (reagent_mol / feo_mol) * formula.molar_mass_kg_per_mol()
+
+
+def _apply_certified_na_dose(sim: PyrolysisSimulator) -> None:
+    before = len(sim.atom_ledger.transitions)
+    _commit_certified_na_reduction(sim)
+    committed = [
+        transition
+        for transition in sim.atom_ledger.transitions[before:]
+        if transition.name == "c3_na_shuttle_reduction"
+    ]
+    if not committed:
+        raise RuntimeError(
+            "SSO-2 certified Na dose did not produce c3_na_shuttle_reduction"
+        )
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+
+
+def _commit_certified_na_reduction(sim: PyrolysisSimulator) -> None:
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.melt.temperature_C = SSO2_CERTIFIED_DOSE_CALIBRATION_T_C
+    sim.melt.target_temperature_C = SSO2_CERTIFIED_DOSE_CALIBRATION_T_C
+    sim.melt.campaign_hour = 1
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
 
 
 def sso2_owner_recipe_evidence(
@@ -131,6 +246,9 @@ def sso2_owner_recipe_evidence(
     )
     product_fe_kg = _product_species_kg(sim, "Fe")
     native_split_count = _transition_count(ledger, "native_fe_saturation_split")
+    dose_transition_count = _transition_count(ledger, "c3_na_shuttle_reduction")
+    stage_gas_snapshot = _stage_gas_snapshot_payload(run_execution)
+    native_partition_basis = _native_fe_partition_basis(run_execution, sim)
     fe_tap_total_kg = sum(tap_kg_by_species.values())
     fe_tap_si_impurity_kg = sum(
         tap_kg_by_species.get(species, 0.0) for species in SSO2_SILICA_SPECIES
@@ -144,15 +262,25 @@ def sso2_owner_recipe_evidence(
     stage1_total_kg = sum(stage1_kg.values())
     stage1_si_impurity_kg = sum(stage1_kg.get(species, 0.0) for species in SSO2_SILICA_SPECIES)
     stage1_si_impurity_wt_pct = _wt_pct(stage1_si_impurity_kg, stage1_total_kg)
+    partition_basis_available = native_partition_basis.get("status") == "available"
     dependency_status = (
         "available"
-        if native_split_count > 0
+        if native_split_count > 0 and partition_basis_available
         else "missing_fe_drain_vapor_partition"
     )
     dependency_reason = (
         ""
-        if native_split_count > 0
-        else "no native_fe_saturation_split transition observed for this run"
+        if dependency_status == "available"
+        else (
+            "no native_fe_saturation_split transition observed for this run"
+            if native_split_count <= 0
+            else str(
+                native_partition_basis.get(
+                    "status_reason",
+                    "native Fe partition basis missing",
+                )
+            )
+        )
     )
     mass_balance = _mass_balance_closure(run_execution, trace)
 
@@ -181,6 +309,11 @@ def sso2_owner_recipe_evidence(
         "status_reason": status_reason,
         "feedstock": SSO2_FEEDSTOCK_ID,
         "recipe_patch": sso2_owner_recipe_patch().to_nested(),
+        "certified_sso_r_surface": _certified_surface_payload(
+            sim,
+            dose_transition_count=dose_transition_count,
+            stage_gas_snapshot=stage_gas_snapshot,
+        ),
         "reader_handoff_chunk3b": SSO2_CHUNK3B_READER_HANDOFF,
         "stage_3": {
             "status": stage_status,
@@ -255,7 +388,59 @@ def sso2_owner_recipe_evidence(
             "status_reason": dependency_reason,
             "native_fe_saturation_split_count": native_split_count,
             "required_transition": "native_fe_saturation_split",
+            "stage_gas_snapshot": stage_gas_snapshot,
+            "native_fe_partition_basis": native_partition_basis,
+            "tap_basis": {
+                "status": tap_status,
+                "status_reason": tap_reason,
+                "account": SSO2_FE_TAP_ACCOUNT,
+                "species_kg": (
+                    dict(sorted(tap_kg_by_species.items()))
+                    if tap_status == "available"
+                    else {}
+                ),
+                "Fe_kg": (
+                    tap_kg_by_species.get("Fe", 0.0)
+                    if tap_status == "available"
+                    else None
+                ),
+            },
         },
+    }
+
+
+def _certified_surface_payload(
+    sim: Any,
+    *,
+    dose_transition_count: int,
+    stage_gas_snapshot: Mapping[str, Any],
+) -> dict[str, Any]:
+    record = getattr(sim, "record", None)
+    additives_kg = getattr(record, "additives_kg", {}) if record is not None else {}
+    dose_kg = None
+    if isinstance(additives_kg, Mapping):
+        try:
+            dose_kg = _finite_non_negative(
+                additives_kg.get(SSO2_CERTIFIED_DOSE_SPECIES, 0.0),
+                "certified Na dose",
+            )
+        except ValueError:
+            dose_kg = None
+    return {
+        "source": SSO2_CERTIFIED_SURFACE_SOURCE,
+        "certification_assertion": OWNER_CERTIFICATION_ASSERTION,
+        "dose_species": SSO2_CERTIFIED_DOSE_SPECIES,
+        "dose_kg": dose_kg,
+        "dose_transition": "c3_na_shuttle_reduction",
+        "dose_transition_count": dose_transition_count,
+        "dose_calibration_temperature_C": SSO2_CERTIFIED_DOSE_CALIBRATION_T_C,
+        "declared_pO2_mbar": SSO2_CERTIFIED_PO2_MBAR,
+        "declared_pN2_mbar": SSO2_CERTIFIED_PN2_MBAR,
+        "declared_p_total_mbar": SSO2_CERTIFIED_TOTAL_PRESSURE_MBAR,
+        "pO2_mbar": stage_gas_snapshot.get("pO2_mbar"),
+        "pN2_mbar": stage_gas_snapshot.get("pN2_mbar"),
+        "p_total_mbar": stage_gas_snapshot.get("p_total_mbar"),
+        "stage_gas_snapshot": dict(stage_gas_snapshot),
     }
 
 
@@ -473,6 +658,185 @@ def _transition_count(ledger: Any, name: str) -> int:
     if not _is_sequence(transitions):
         return 0
     return sum(1 for transition in transitions if getattr(transition, "name", "") == name)
+
+
+def _execution_snapshots(run_execution: Any) -> tuple[Any, ...]:
+    snapshots = getattr(run_execution, "snapshots", None)
+    if _is_sequence(snapshots):
+        return tuple(snapshots)
+    trace = getattr(run_execution, "trace", None)
+    trace_snapshots = getattr(trace, "snapshots", None) if trace is not None else None
+    if _is_sequence(trace_snapshots):
+        return tuple(trace_snapshots)
+    return ()
+
+
+def _stage_gas_snapshot_payload(run_execution: Any) -> dict[str, Any]:
+    candidates = [
+        snapshot
+        for snapshot in _execution_snapshots(run_execution)
+        if isinstance(getattr(snapshot, "c2a_staged_gas", None), Mapping)
+        and getattr(snapshot, "c2a_staged_gas")
+    ]
+    selectors = (
+        lambda snapshot: (
+            _snapshot_has_native_partition(snapshot)
+            and _stage_gas_matches_owner(getattr(snapshot, "c2a_staged_gas", {}))
+        ),
+        lambda snapshot: _stage_gas_matches_owner(
+            getattr(snapshot, "c2a_staged_gas", {})
+        ),
+        lambda snapshot: True,
+    )
+    for selector in selectors:
+        for snapshot in reversed(candidates):
+            if selector(snapshot):
+                raw = getattr(snapshot, "c2a_staged_gas", {})
+                return _stage_gas_payload_from_raw(raw, snapshot=snapshot)
+    return {
+        "status": "missing_stage_gas_snapshot",
+        "status_reason": "no c2a_staged_gas snapshot observed",
+        "source": "run_execution.snapshot.c2a_staged_gas",
+    }
+
+
+def _snapshot_has_native_partition(snapshot: Any) -> bool:
+    split = getattr(snapshot, "fe_redox_split", None)
+    if not isinstance(split, Mapping):
+        return False
+    partition = split.get("native_fe_partition")
+    return isinstance(partition, Mapping) and bool(partition)
+
+
+def _stage_gas_matches_owner(raw: Any) -> bool:
+    if not isinstance(raw, Mapping):
+        return False
+    try:
+        return (
+            math.isclose(
+                _finite_non_negative(raw.get("pO2_mbar"), "stage_gas.pO2_mbar"),
+                SSO2_CERTIFIED_PO2_MBAR,
+                rel_tol=0.0,
+                abs_tol=1.0e-12,
+            )
+            and math.isclose(
+                _finite_non_negative(raw.get("pN2_mbar"), "stage_gas.pN2_mbar"),
+                SSO2_CERTIFIED_PN2_MBAR,
+                rel_tol=0.0,
+                abs_tol=1.0e-9,
+            )
+        )
+    except ValueError:
+        return False
+
+
+def _stage_gas_payload_from_raw(
+    raw: Mapping[str, Any],
+    *,
+    snapshot: Any,
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "status": "available",
+        "status_reason": "",
+        "source": "run_execution.snapshot.c2a_staged_gas",
+    }
+    if getattr(snapshot, "hour", None) is not None:
+        payload["hour"] = getattr(snapshot, "hour")
+    for key in ("stage_name", "gas_cover_mode", "atmosphere", "pn2_band_action"):
+        if raw.get(key) is not None:
+            payload[key] = str(raw.get(key))
+    for key in (
+        "pO2_mbar",
+        "pN2_mbar",
+        "p_total_mbar",
+        "requested_p_total_mbar",
+    ):
+        try:
+            payload[key] = _finite_non_negative(raw.get(key), f"stage_gas.{key}")
+        except ValueError as exc:
+            return {
+                "status": "invalid_stage_gas_snapshot",
+                "status_reason": str(exc),
+                "source": "run_execution.snapshot.c2a_staged_gas",
+            }
+    return payload
+
+
+def _native_fe_partition_basis(run_execution: Any, sim: Any) -> dict[str, Any]:
+    raw: Mapping[str, Any] | None = None
+    source = "run_execution.snapshot.fe_redox_split.native_fe_partition"
+    for snapshot in reversed(_execution_snapshots(run_execution)):
+        split = getattr(snapshot, "fe_redox_split", None)
+        if not isinstance(split, Mapping):
+            continue
+        candidate = split.get("native_fe_partition")
+        if isinstance(candidate, Mapping) and candidate:
+            raw = candidate
+            break
+    if raw is None:
+        candidate = getattr(sim, "_last_native_fe_partition_diagnostic", None)
+        if isinstance(candidate, Mapping) and candidate:
+            raw = candidate
+            source = "sim._last_native_fe_partition_diagnostic"
+    if raw is None:
+        return {
+            "status": "missing_fe_drain_vapor_partition",
+            "status_reason": "native_fe_partition basis missing from snapshots",
+            "source": source,
+        }
+
+    payload: dict[str, Any] = {
+        "status": "available",
+        "status_reason": "",
+        "source": source,
+    }
+    numeric_keys = (
+        "native_fe_pool_mol",
+        "native_fe_tap_mol",
+        "native_fe_vapor_mol",
+        "native_fe_vapor_escape_fraction_of_pool",
+        "native_fe_uncondensed_mol",
+        "native_fe_uncondensed_fraction_of_pool",
+        "native_fe_vapor_capacity_mol_hr",
+        "native_fe_vapor_capacity_kg_hr",
+        "ordinary_melt_fe_residual_capacity_mol_hr",
+        "P_reference_Antoine_Pa",
+        "P_eq_Pa",
+        "P_bulk_Pa",
+        "activity_factor",
+        "temperature_K",
+        "overhead_pressure_pa",
+        "alpha_Fe",
+    )
+    required = ("native_fe_pool_mol", "native_fe_tap_mol", "native_fe_vapor_mol")
+    for key in numeric_keys:
+        if key not in raw:
+            if key in required:
+                return {
+                    "status": "missing_fe_drain_vapor_partition",
+                    "status_reason": f"native_fe_partition.{key} missing",
+                    "source": source,
+                }
+            continue
+        try:
+            payload[key] = _finite_non_negative(raw.get(key), f"native_fe_partition.{key}")
+        except ValueError as exc:
+            return {
+                "status": "invalid_fe_drain_vapor_partition",
+                "status_reason": str(exc),
+                "source": source,
+            }
+    for key in (
+        "capacity_allocation_rule",
+        "native_pool_activity_argument",
+        "overhead_pressure_source",
+        "carrier_gas",
+        "alpha_source",
+        "source_label",
+    ):
+        if raw.get(key) is not None:
+            payload[key] = str(raw.get(key))
+    return payload
 
 
 def _product_species_kg(sim: Any, species: str) -> float | None:

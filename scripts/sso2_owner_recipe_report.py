@@ -63,6 +63,7 @@ def _markdown_report(evidence: Mapping[str, Any], execution: Any) -> str:
     metal = evidence["metal_product_path"]
     impurity = evidence["stage_1_or_metal_tap_si_impurity"]
     partition = evidence["fe_drain_vapor_partition_dependency"]
+    surface = evidence["certified_sso_r_surface"]
     purity = evidence["delivered_stream_purity"]
     coating = evidence["wall_coating"]
     mass_balance = evidence["mass_balance"]
@@ -81,7 +82,25 @@ def _markdown_report(evidence: Mapping[str, Any], execution: Any) -> str:
         "- feedstock: `lunar_mare_low_ti`",
         "- high_temperature_legs_C: `1650-1670`",
         "- stage_order: `fe_then_sio`",
-        "- SiO_leg_gas_cover: `pn2_sweep`, `pO2_mbar=0`, `p_total_mbar=10`",
+        (
+            "- SSO_R_observed_stage_gas_surface: "
+            f"`{surface['stage_gas_snapshot'].get('gas_cover_mode')}`, "
+            f"`stage={surface['stage_gas_snapshot'].get('stage_name')}`, "
+            f"`pO2_mbar={_fmt(surface['pO2_mbar'])}`, "
+            f"`pN2_mbar={_fmt(surface['pN2_mbar'])}`, "
+            f"`p_total_mbar={_fmt(surface['p_total_mbar'])}`"
+        ),
+        (
+            "- SSO_R_declared_gas_surface: `pn2_sweep`, "
+            f"`pO2_mbar={surface['declared_pO2_mbar']}`, "
+            f"`pN2_mbar={surface['declared_pN2_mbar']}`, "
+            f"`p_total_mbar={surface['declared_p_total_mbar']}`"
+        ),
+        (
+            "- SSO_R_certified_Na_dose: "
+            f"`{surface['dose_species']}` {_fmt(surface['dose_kg'])} kg; "
+            f"transition_count `{surface['dose_transition_count']}`"
+        ),
         "- pN2_heuristic_band_mbar: `5-15`; this preset uses `10`",
         "- Fe_threshold: none invented in chunk 3a",
         "",

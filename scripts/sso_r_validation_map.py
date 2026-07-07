@@ -25,6 +25,15 @@ from simulator.core import (
     PyrolysisSimulator,
 )
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.sso_r_owner_surface import (
+    OWNER_CERTIFICATION_ASSERTION,
+    OWNER_RECIPE_GAS_COVER_MODE,
+    OWNER_RECIPE_PN2_MBAR,
+    OWNER_RECIPE_PO2_MBAR,
+    OWNER_RECIPE_STAGE_NAME,
+    OWNER_RECIPE_T_C,
+    OWNER_RECIPE_TOTAL_PRESSURE_MBAR,
+)
 from simulator.runner import _deep_merge_setpoints, build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase
 
@@ -45,11 +54,6 @@ DOSE_FRACTIONS = (0.0, 0.025, 0.05, 0.10, 0.25, 0.50, 0.75, 1.0)
 MASS_BALANCE_LIMIT_PCT = 5.0e-12
 OWNER_RECIPE_MIN_SIO_KG_HR = 1.0e-3
 OWNER_RECIPE_MAX_ESCAPE_FRACTION = 1.0e-3
-OWNER_RECIPE_T_C = 1650.0
-OWNER_RECIPE_PO2_MBAR = 1.0e-6
-OWNER_RECIPE_PN2_MBAR = 10.0
-OWNER_RECIPE_STAGE_NAME = "alkali_early_fe"
-OWNER_CERTIFICATION_ASSERTION = "owner_pN2_recipe_point_requested_pO2_semantics"
 MAP_LIVE_PARITY_ASSERTION = "map_live_semantics_parity"
 MAP_LIVE_PARITY_PO2_ABS_TOL_BAR = 1.0e-15
 MAP_LIVE_PARITY_SIO_REL_TOL = 1.0e-9
@@ -166,9 +170,9 @@ def _owner_pn2_recipe_patch() -> RecipePatch:
             "C2A_staged": {
                 "stages": {
                     OWNER_RECIPE_STAGE_NAME: {
-                        "gas_cover_mode": "pn2_sweep",
+                        "gas_cover_mode": OWNER_RECIPE_GAS_COVER_MODE,
                         "pO2_mbar": OWNER_RECIPE_PO2_MBAR,
-                        "p_total_mbar": OWNER_RECIPE_PN2_MBAR + OWNER_RECIPE_PO2_MBAR,
+                        "p_total_mbar": OWNER_RECIPE_TOTAL_PRESSURE_MBAR,
                     }
                 }
             }
