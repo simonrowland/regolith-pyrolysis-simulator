@@ -353,7 +353,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
         profile,
         unpinned,
     )
-    assert spec.recipe_id == "6b7dc801973b564bca8393aa91e3989bb58de245239f471bc4e7260dbfe5ddbf"
+    assert spec.recipe_id == "c90b279ed091015613f48eefd3b5da1e6e4f65a18f99357f3d8dce6f3668ae41"
     # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
     # moves when the live searchable allowlist identity changes.
     # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed,
@@ -415,7 +415,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # depletion_flux_decay_fraction from search. Search-list hash moves by
     # design; recipe_id/cache_key remain pinned here because this no-O2 patch
     # resolves through the O2-neutral allowlist epoch.
-    assert cache_key(spec) == "7829f8bff98daf116761ccb293e568888353bf39bcdb13c5b192c04cc926fa9f"
+    assert cache_key(spec) == "fc626beb46aece4979bfdacfec5646396dc7ad576215b0a327e16c7c14d5d447"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -470,8 +470,8 @@ def test_furnace_max_t_c_bounds_are_allowlist_epoch_pinned() -> None:
         (spec.low, spec.high),
         FURNACE_MAX_T_BOUNDS_C,
     ) == (
-        "allowlist-v10",
-        "allowlist-v10",
+        "allowlist-v11",
+        "allowlist-v11",
         (1200.0, 2000.0),
         (1200.0, 2000.0),
     )
@@ -1255,7 +1255,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     assert first.recipe_id() == second.recipe_id()
     assert (
         first.recipe_id()
-            == "40e6638db09ce4f9d85e944c26c6239783cd55baff69c8fcb65b96177140a2d9"
+            == "6fca19c6da8ec4a87b94fb81eed726e5c7a132fdfa2d874df140fd5552dc6b41"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

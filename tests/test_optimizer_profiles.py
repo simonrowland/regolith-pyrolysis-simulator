@@ -275,7 +275,7 @@ def test_constraint_threshold_overrides_validate_types() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
-@pytest.mark.parametrize("cap_C", [1299.0, 2001.0])
+@pytest.mark.parametrize("cap_C", [1199.0, 2001.0])
 def test_furnace_temperature_cap_must_be_inside_hardware_envelope(cap_C: float) -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["constraints"]["furnace_T_max_C"] = cap_C
