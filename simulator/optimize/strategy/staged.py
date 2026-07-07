@@ -61,6 +61,12 @@ _JOINT_REFINE_TRUST_REGION_DELTA_FRACTIONS = (0.15, 0.05, 0.02)
 _JOINT_REFINE_SEED_OFFSET = 20_000_000
 _JOINT_REFINE_ROUND_SEED_BAND = 1_000_000
 _JOINT_REFINE_PARENT_SEED_BAND = 10_000
+_JOINT_REFINE_MARGIN_THRESHOLD = 0.05
+_JOINT_REFINE_THRESHOLD_STRADDLE = "threshold_straddle"
+_JOINT_REFINE_INDETERMINATE = "indeterminate"
+_JOINT_REFINE_GATE_TARGET_STATUSES = frozenset(
+    {"indeterminate", "not-attempted", "not_attempted"}
+)
 
 
 @dataclass(frozen=True)
@@ -78,6 +84,7 @@ class _ArchiveMember:
     candidate: Candidate
     scored: ScoredResult
     node: _BeamNode
+    joint_refine_trace_signals: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -139,6 +146,8 @@ _ACTIVE_STAGE_ALIASES: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "sio",
             "silica",
             "alkali",
+            "liquidus",
+            "solidus",
             "thermal",
             "ramp",
             "ptotal",
@@ -149,6 +158,8 @@ _ACTIVE_STAGE_ALIASES: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "sio",
             "silica",
             "alkali",
+            "liquidus",
+            "solidus",
             "thermal",
             "ramp",
             "ptotal",
@@ -319,6 +330,7 @@ class StagedStrategy:
         self._pending: list[Candidate] = []
         self._expected_stage_ids: set[str] = set()
         self._stage_results: dict[str, tuple[Candidate, ScoredResult]] = {}
+        self._stage_joint_refine_trace_signals: dict[str, tuple[str, ...]] = {}
         self._asked_by_id: dict[str, Candidate] = {}
         self._results: list[tuple[Candidate, ScoredResult]] = []
         self._archive: tuple[_ArchiveMember, ...] = ()
@@ -354,7 +366,7 @@ class StagedStrategy:
         return batch
 
     def tell(self, results: Sequence[tuple[Candidate, ScoredResult]]) -> None:
-        batch: list[tuple[Candidate, ScoredResult]] = []
+        batch: list[tuple[Candidate, ScoredResult, tuple[str, ...]]] = []
         seen: set[str] = set()
         recorded = {candidate.id for candidate, _ in self._results}
         for pair in results:
@@ -376,12 +388,14 @@ class StagedStrategy:
             if candidate.id in recorded:
                 raise ValueError(f"candidate_id already recorded: {candidate.id!r}")
             seen.add(candidate.id)
+            joint_refine_trace_signals = _joint_refine_trace_labels(_scored_trace(scored))
             light_scored = _strip_trace(scored)
             _assert_not_parent_duplicate(candidate, light_scored)
-            batch.append((candidate, light_scored))
+            batch.append((candidate, light_scored, joint_refine_trace_signals))
 
-        for candidate, scored in batch:
+        for candidate, scored, joint_refine_trace_signals in batch:
             self._stage_results[candidate.id] = (candidate, scored)
+            self._stage_joint_refine_trace_signals[candidate.id] = joint_refine_trace_signals
             self._results.append((candidate, scored))
         self._tell_count += len(batch)
         self._advance_completed_stage()
@@ -448,6 +462,7 @@ class StagedStrategy:
             self._pending = []
             self._expected_stage_ids = set()
             self._stage_results = {}
+            self._stage_joint_refine_trace_signals = {}
             return
         stage_id, specs = self._stages[self._stage_index]
         if not specs:
@@ -501,6 +516,7 @@ class StagedStrategy:
         self._pending = candidates
         self._expected_stage_ids = expected
         self._stage_results = {}
+        self._stage_joint_refine_trace_signals = {}
 
     def _advance_completed_stage(self) -> None:
         if self._pending:
@@ -529,6 +545,7 @@ class StagedStrategy:
                     self._stage_results.values(),
                     self._definitions,
                     self.schema,
+                    joint_refine_trace_signals=self._stage_joint_refine_trace_signals,
                 ),
                 self._definitions,
             )
@@ -548,6 +565,10 @@ class StagedStrategy:
                 candidate=candidate,
                 scored=scored,
                 node=_node_from_candidate(candidate, scored, score_key, self.schema),
+                joint_refine_trace_signals=self._stage_joint_refine_trace_signals.get(
+                    candidate.id,
+                    (),
+                ),
             )
             for score_key, candidate, scored in ranked
             if scored.feasible and scored.objectives is not None
@@ -556,6 +577,7 @@ class StagedStrategy:
         self._frontier = tuple(member.node for member in self._archive)
         self._expected_stage_ids = set()
         self._stage_results = {}
+        self._stage_joint_refine_trace_signals = {}
         self._mode = "forward"
         if (
             self._backward_reference_signature is not None
@@ -760,17 +782,25 @@ def _archive_members_from_results(
     results: Sequence[tuple[Candidate, ScoredResult]],
     definitions: Sequence[ObjectiveDefinition],
     schema: RecipeSchema,
+    *,
+    joint_refine_trace_signals: Mapping[str, tuple[str, ...]] | None = None,
 ) -> tuple[_ArchiveMember, ...]:
     members: list[_ArchiveMember] = []
     for candidate, scored in results:
         if not scored.feasible or scored.objectives is None:
             continue
         score_key = _score_key(candidate, scored, definitions)
+        trace_signals = (
+            ()
+            if joint_refine_trace_signals is None
+            else joint_refine_trace_signals.get(candidate.id, ())
+        )
         members.append(
             _ArchiveMember(
                 candidate=candidate,
                 scored=scored,
                 node=_node_from_candidate(candidate, scored, score_key, schema),
+                joint_refine_trace_signals=trace_signals,
             )
         )
     return tuple(members)
@@ -1206,19 +1236,173 @@ def _joint_refine_target_indices(
     stage_ids = tuple(stage_id for stage_id, _ in stages)
     uncertain: set[int] = set()
     for member in archive:
-        for name, margin in member.scored.feasibility_margins.items():
-            if getattr(margin, "authoritative", True) is False:
-                continue
-            margin_value = getattr(margin, "margin", None)
-            if not isinstance(margin_value, int | float) or abs(float(margin_value)) > 0.05:
-                continue
-            label = str(getattr(margin, "gate", name)).lower()
-            for index in _active_stage_indices(label, stage_ids):
-                uncertain.update({max(0, index - 1), index})
+        uncertain.update(_joint_refine_signal_stage_indices(member, stage_ids))
     if uncertain:
         return tuple(sorted(uncertain))
     start = max(0, len(stages) - 2)
     return tuple(range(start, len(stages)))
+
+
+def _joint_refine_signal_stage_indices(
+    member: _ArchiveMember,
+    stage_ids: Sequence[str],
+) -> tuple[int, ...]:
+    target_indices: set[int] = set()
+    for name, margin in member.scored.feasibility_margins.items():
+        for label in _joint_refine_margin_labels(name, margin):
+            _add_joint_refine_label_indices(target_indices, label, stage_ids)
+    for label in member.joint_refine_trace_signals:
+        _add_joint_refine_label_indices(target_indices, label, stage_ids)
+    return tuple(sorted(target_indices))
+
+
+def _add_joint_refine_label_indices(
+    target_indices: set[int],
+    label: object,
+    stage_ids: Sequence[str],
+) -> None:
+    label_text = str(label).lower()
+    for index in _active_stage_indices(label_text, stage_ids):
+        target_indices.update({max(0, index - 1), index})
+
+
+def _joint_refine_margin_labels(name: str, margin: Any) -> tuple[str, ...]:
+    labels: list[str] = []
+    gate_label = str(getattr(margin, "gate", name))
+    if _near_authoritative_margin(margin):
+        labels.append(gate_label)
+    if _gate_status_targets_joint_refine(margin):
+        labels.append(gate_label)
+        labels.extend(
+            str(value)
+            for value in (
+                getattr(margin, "detail", None),
+                getattr(margin, "status_reason", None),
+            )
+            if value
+        )
+    return tuple(labels)
+
+
+def _near_authoritative_margin(margin: Any) -> bool:
+    if getattr(margin, "authoritative", True) is False:
+        return False
+    margin_value = getattr(margin, "margin", None)
+    if not isinstance(margin_value, int | float):
+        return False
+    return abs(float(margin_value)) <= _JOINT_REFINE_MARGIN_THRESHOLD
+
+
+def _gate_status_targets_joint_refine(margin: Any) -> bool:
+    return any(
+        str(getattr(margin, attr, "")).lower() in _JOINT_REFINE_GATE_TARGET_STATUSES
+        for attr in ("status", "output_status")
+    )
+
+
+def _scored_trace(scored: ScoredResult) -> Any:
+    reference = scored.run_reference
+    return getattr(reference, "trace", None) if reference is not None else None
+
+
+def _joint_refine_trace_labels(trace: Any) -> tuple[str, ...]:
+    labels: list[str] = []
+    labels.extend(
+        _interpolation_feasibility_verdict_labels(
+            _mapping_get(trace, "interpolation_feasibility_verdict")
+        )
+    )
+    labels.extend(_knob_saturation_labels(_mapping_get(trace, "knob_saturation")))
+    labels.extend(
+        _threshold_straddle_drain_labels(_mapping_get(trace, "reduced_real_cache"))
+    )
+    return tuple(labels)
+
+
+def _interpolation_feasibility_verdict_labels(verdict: Any) -> tuple[str, ...]:
+    if not isinstance(verdict, Mapping):
+        return ()
+    if str(verdict.get("verdict", "")).lower() != _JOINT_REFINE_INDETERMINATE:
+        return ()
+    return tuple(
+        str(value)
+        for key in ("closest_gate", "point_id", "reason", "margin_error_source")
+        if (value := verdict.get(key)) is not None
+    )
+
+
+def _knob_saturation_labels(report: Any) -> tuple[str, ...]:
+    if not isinstance(report, Mapping) or report.get("red_flag") is not True:
+        return ()
+    knobs = report.get("knobs")
+    if not _is_non_string_sequence(knobs):
+        return ()
+    labels: list[str] = []
+    for row in knobs:
+        if not isinstance(row, Mapping):
+            continue
+        if str(row.get("pinned", "none")).lower() == "none":
+            continue
+        if bool(row.get("has_opposing_cost")):
+            continue
+        for key in ("key", "path"):
+            value = row.get(key)
+            if value is not None:
+                labels.append(str(value))
+    return tuple(labels)
+
+
+def _threshold_straddle_drain_labels(reduced_real_cache: Any) -> tuple[str, ...]:
+    drain = _mapping_get(
+        reduced_real_cache,
+        "interpolation_uncertainty_ranked_table_drain",
+    )
+    selected = _mapping_get(drain, "selected")
+    if not _is_non_string_sequence(selected):
+        return ()
+    labels: list[str] = []
+    for point in selected:
+        if not isinstance(point, Mapping):
+            continue
+        uncertainty = point.get("uncertainty")
+        threshold = _mapping_get(
+            _mapping_get(uncertainty, "components"),
+            _JOINT_REFINE_THRESHOLD_STRADDLE,
+        )
+        ranked_table = str(point.get("ranked_table", "")).lower()
+        threshold_status = str(_mapping_get(threshold, "status", "")).lower()
+        if (
+            ranked_table != _JOINT_REFINE_THRESHOLD_STRADDLE
+            and threshold_status != "non_interpolable"
+        ):
+            continue
+        point_id = point.get("point_id")
+        if point_id is not None:
+            labels.append(str(point_id))
+        surfaces = _mapping_get(threshold, "surfaces")
+        if _is_non_string_sequence(surfaces):
+            labels.extend(
+                str(surface.get("surface"))
+                for surface in surfaces
+                if isinstance(surface, Mapping) and surface.get("surface") is not None
+            )
+    return tuple(labels)
+
+
+def _mapping_get(value: Any, key: str, default: Any = None) -> Any:
+    if isinstance(value, Mapping):
+        return value.get(key, default)
+    getter = getattr(value, "get", None)
+    if callable(getter):
+        try:
+            return getter(key, default)
+        except Exception:
+            return default
+    return getattr(value, key, default)
+
+
+def _is_non_string_sequence(value: Any) -> bool:
+    return isinstance(value, Sequence) and not isinstance(value, str | bytes)
 
 
 def _active_stage_indices(label: str, stage_ids: Sequence[str]) -> tuple[int, ...]:

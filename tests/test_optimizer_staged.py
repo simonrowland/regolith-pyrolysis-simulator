@@ -707,6 +707,171 @@ def test_staged_rejects_sobol_sample_index_band_collisions() -> None:
         )
 
 
+def _joint_refine_strategy_after_real_tell(
+    *,
+    trace: Mapping[str, Any] | None = None,
+    margin: GateMargin | None = None,
+) -> StagedStrategy:
+    profile = {
+        **PROFILE,
+        "staged": {
+            "beam_width": 1,
+            "children_per_parent": 1,
+            "allowlist": ("C0", "C2A_continuous", "C5", "C6"),
+            "joint_refine": True,
+            "max_backward_passes": 0,
+        },
+    }
+    strategy = StagedStrategy(
+        SCHEMA,
+        seed=11,
+        objective_profile=profile,
+        topology=TopologyChoice(path_ab="A", branch="two", c5=True, c6=True),
+    )
+    while True:
+        candidates = strategy.ask(20)
+        if not candidates:
+            break
+        strategy.tell(
+            [
+                (
+                    candidate,
+                    _scored(
+                        candidate.patch,
+                        profile=profile,
+                        candidate_id=candidate.id,
+                        trace=trace,
+                        margin=margin or replace(_margin(), margin=1.0),
+                    ),
+                )
+                for candidate in candidates
+            ]
+        )
+    assert strategy._archive
+    return strategy
+
+
+def _joint_refine_targets_after_real_tell(
+    *,
+    trace: Mapping[str, Any] | None = None,
+    margin: GateMargin | None = None,
+) -> tuple[int, ...]:
+    strategy = _joint_refine_strategy_after_real_tell(trace=trace, margin=margin)
+    return staged_module._joint_refine_target_indices(
+        strategy._archive,
+        strategy._stages,
+    )
+
+
+def test_joint_refine_targets_threshold_straddle_trace_from_real_tell_sc15() -> None:
+    trace = {
+        "reduced_real_cache": {
+            "interpolation_uncertainty_ranked_table_drain": {
+                "selected": [
+                    {
+                        "point_id": "C2A_continuous_solidus_probe",
+                        "ranked_table": "threshold_straddle",
+                        "uncertainty": {
+                            "components": {
+                                "threshold_straddle": {
+                                    "status": "non_interpolable",
+                                    "surfaces": [
+                                        {"surface": "solidus_liquid_fraction_proxy"}
+                                    ],
+                                }
+                            }
+                        },
+                    }
+                ]
+            }
+        }
+    }
+
+    strategy = _joint_refine_strategy_after_real_tell(trace=trace)
+    targets = staged_module._joint_refine_target_indices(
+        strategy._archive,
+        strategy._stages,
+    )
+
+    member = strategy._archive[0]
+    assert member.scored.run_reference.trace == {"backend_status": "ok"}
+    assert "C2A_continuous_solidus_probe" in member.joint_refine_trace_signals
+    assert targets == (0, 1)
+    assert strategy.joint_refine() is True
+    joint_candidates = strategy.ask(10)
+    assert joint_candidates
+    assert {
+        candidate.metadata["joint_refine_target_stage_ids"]
+        for candidate in joint_candidates
+    } == {("C0", "C2A_continuous")}
+
+
+def test_joint_refine_targets_knob_saturation_trace_from_real_tell_sc50() -> None:
+    trace = {
+        "knob_saturation": {
+            "red_flag": True,
+            "knobs": [
+                {
+                    "key": "campaigns.C2A_continuous.temperature_C",
+                    "pinned": "high",
+                    "has_opposing_cost": False,
+                }
+            ],
+        }
+    }
+
+    strategy = _joint_refine_strategy_after_real_tell(trace=trace)
+    targets = staged_module._joint_refine_target_indices(
+        strategy._archive,
+        strategy._stages,
+    )
+
+    assert "campaigns.C2A_continuous.temperature_C" in (
+        strategy._archive[0].joint_refine_trace_signals
+    )
+    assert targets == (0, 1)
+
+
+def test_joint_refine_targets_indeterminate_gate_verdict_trace_from_real_tell() -> None:
+    trace = {
+        "interpolation_feasibility_verdict": {
+            "verdict": "indeterminate",
+            "reason": "gate_margin_inside_interpolation_error",
+            "closest_gate": "C2A_continuous_pressure",
+        }
+    }
+
+    targets = _joint_refine_targets_after_real_tell(trace=trace)
+
+    assert targets == (0, 1)
+
+
+def test_joint_refine_targets_not_attempted_gate_verdict_margin_from_real_tell() -> None:
+    targets = _joint_refine_targets_after_real_tell(
+        margin=replace(
+            _margin(),
+            gate="C2A_continuous_extraction",
+            margin=1.0,
+            status="not-attempted",
+            output_status="not_attempted",
+            status_reason="no_volatilization",
+        )
+    )
+
+    assert targets == (0, 1)
+
+
+def test_joint_refine_without_w3_signals_from_real_tell_preserves_legacy_behavior() -> None:
+    near_margin = replace(
+        _margin(),
+        gate="C2A_continuous_pressure",
+        margin=0.01,
+    )
+
+    assert _joint_refine_targets_after_real_tell(margin=near_margin) == (0, 1)
+    assert _joint_refine_targets_after_real_tell() == (2, 3)
+
+
 def test_joint_refine_improves_or_refines() -> None:
     profile = {
         **PROFILE,
