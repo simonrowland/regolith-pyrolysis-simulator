@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import math
 import re
 import subprocess
 import sys
@@ -112,12 +113,78 @@ def _gate_margin(*, margin: float, tolerance: float, feasible: bool) -> GateMarg
     )
 
 
+def _gate_margin_result(candidate: Candidate, gate_margin: GateMargin) -> ScoredResult:
+    if gate_margin.feasible:
+        return ScoredResult(
+            candidate_id=candidate.id,
+            eval_spec=None,
+            cache_key=None,
+            feasible=True,
+            objectives=ObjectiveVector(
+                (
+                    ObjectiveValue(metric="yield", sense="maximize", value=1.0),
+                    ObjectiveValue(metric="energy", sense="minimize", value=1.0),
+                )
+            ),
+            feasibility_margins={"gate": gate_margin},
+        )
+    return ScoredResult(
+        candidate_id=candidate.id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        feasibility_margins={"gate": gate_margin},
+    )
+
+
+def _null_objective_result(candidate: Candidate) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate.id,
+        eval_spec=None,
+        cache_key=None,
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue(metric="yield", sense="maximize", value=None),
+                ObjectiveValue(metric="energy", sense="minimize", value=1.0),
+            )
+        ),
+        feasibility_margins={"gate": 0.25},
+    )
+
+
 def _trials_by_candidate(strategy: OptunaNSGA2Strategy) -> dict[str, object]:
     return {
         trial.user_attrs[_CANDIDATE_ID_ATTR]: trial
         for trial in strategy.study.trials
         if _CANDIDATE_ID_ATTR in trial.user_attrs
     }
+
+
+def _assert_pressure_trial_params_match_patches(
+    strategy: OptunaNSGA2Strategy,
+    candidates: list[Candidate],
+) -> None:
+    schema = strategy.schema
+    pressure_pairs = tuple(schema.PRESSURE_COUPLED_DEFAULT_PAIRS) + tuple(
+        schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items()
+    )
+    trials_by_number = {trial.number: trial for trial in strategy.study.trials}
+    checked = 0
+    for candidate in candidates:
+        trial = trials_by_number[candidate.metadata["trial_number"]]
+        for po2_path, total_path in pressure_pairs:
+            for path in (po2_path, total_path):
+                if path not in candidate.patch.values:
+                    continue
+                name = ".".join(path)
+                assert name in trial.params
+                assert float(trial.params[name]) == pytest.approx(
+                    float(candidate.patch.values[path])
+                )
+                checked += 1
+    assert checked > 0
 
 
 def _feasible_result(candidate: Candidate, yield_value: float, energy: float) -> ScoredResult:
@@ -225,6 +292,13 @@ def test_nsga2_ask_returns_schema_valid_unique_deterministic_candidates() -> Non
                 assert float(value) >= float(spec.low)
             if spec.high is not None:
                 assert float(value) <= float(spec.high)
+
+
+def test_nsga2_pressure_conditioning_updates_recorded_trial_params() -> None:
+    strategy = OptunaNSGA2Strategy(RecipeSchema(), seed=17, objective_profile=PROFILE)
+    candidates = strategy.ask(4)
+
+    _assert_pressure_trial_params_match_patches(strategy, candidates)
 
 
 def test_nsga2_multi_objective_directions_and_pareto_front_are_derived_from_profile() -> None:
@@ -403,6 +477,41 @@ def test_nsga2_constraint_feasible_margin_not_violated_and_reuses_tpe_contract()
     assert trials_by_candidate[candidates[1].id].user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.05,)
 
 
+def test_nsga2_nonfinite_gate_margins_map_to_finite_constraint_values() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=421, objective_profile=PROFILE)
+    candidates = strategy.ask(3)
+    feasible_inf = _gate_margin(margin=math.inf, tolerance=0.0, feasible=True)
+    infeasible_neg_inf = _gate_margin(margin=-math.inf, tolerance=0.0, feasible=False)
+    na_pass = _gate_margin(margin=-math.inf, tolerance=0.0, feasible=True)
+
+    strategy.tell(
+        [
+            (candidates[0], _gate_margin_result(candidates[0], feasible_inf)),
+            (candidates[1], _gate_margin_result(candidates[1], infeasible_neg_inf)),
+            (candidates[2], _gate_margin_result(candidates[2], na_pass)),
+        ]
+    )
+
+    trials_by_candidate = _trials_by_candidate(strategy)
+    assert trials_by_candidate[candidates[0].id].user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.0,)
+    assert trials_by_candidate[candidates[1].id].user_attrs[_CONSTRAINT_VALUES_ATTR] == (
+        bayesian._NONFINITE_INFEASIBLE_CONSTRAINT_VIOLATION,
+    )
+    assert trials_by_candidate[candidates[2].id].user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.0,)
+
+
+def test_nsga2_nan_gate_margin_fails_loud() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=422, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+    nan_margin = _gate_margin(margin=math.nan, tolerance=0.0, feasible=True)
+
+    with pytest.raises(ValueError, match="constraint margin"):
+        strategy.tell([(candidate, _gate_margin_result(candidate, nan_margin))])
+
+    assert strategy.tell_count == 0
+    assert strategy.study.trials[0].state.name == "RUNNING"
+
+
 def test_nsga2_constraints_for_trial_rejects_malformed_or_nonfinite_attrs() -> None:
     assert _constraints_for_trial(SimpleNamespace(user_attrs={})) == (0.0,)
 
@@ -429,6 +538,20 @@ def test_nsga2_infeasible_result_uses_directional_worst_values_not_zero() -> Non
     trial = _trials_by_candidate(strategy)[candidate.id]
     assert trial.values == [bayesian._BAD_MAXIMIZE_VALUE, bayesian._BAD_MINIMIZE_VALUE]
     assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR] == (1.0,)
+
+
+def test_nsga2_feasible_unscoreable_result_fails_trial_without_bad_objective_values() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=45, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+
+    strategy.tell([(candidate, _null_objective_result(candidate))])
+
+    trial = _trials_by_candidate(strategy)[candidate.id]
+    assert trial.state.name == "FAIL"
+    assert trial.values is None
+    assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.0,)
+    assert trial.user_attrs[bayesian._UNSCOREABLE_OBJECTIVES_ATTR] is True
+    assert strategy.tell_count == 1
 
 
 def test_nsga2_import_boundary_is_lazy_without_optuna() -> None:

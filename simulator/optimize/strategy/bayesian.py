@@ -19,7 +19,7 @@ TellBatchRow = tuple[
     Candidate,
     "ScoredResult",
     Any,
-    tuple[float, ...],
+    tuple[float, ...] | None,
     tuple[float, ...],
     tuple[str, ...],
 ]
@@ -31,8 +31,10 @@ _CONSTRAINT_VALUES_ATTR = "regolith_constraint_values"
 _CONSTRAINT_NAMES_ATTR = "regolith_constraint_names"
 _CANDIDATE_ID_ATTR = "regolith_candidate_id"
 _INFEASIBLE_ATTR = "regolith_infeasible"
+_UNSCOREABLE_OBJECTIVES_ATTR = "regolith_unscoreable_objectives"
 _BAD_MAXIMIZE_VALUE = -1.0e30
 _BAD_MINIMIZE_VALUE = 1.0e30
+_NONFINITE_INFEASIBLE_CONSTRAINT_VIOLATION = 1.0e30
 
 
 class OptunaUnavailableError(ImportError):
@@ -143,7 +145,9 @@ class OptunaTPEStrategy:
                 for spec in self._specs
                 if not self.schema.is_forbidden(spec.path)
             }
+            raw_values = dict(values)
             _couple_suggested_pressure_defaults(self.schema, values)
+            _sync_conditioned_trial_params(trial, values, raw_values)
             patch = RecipePatch(values).validated(self.schema)
             candidate = Candidate(
                 id=f"tpe-{self.seed}-{trial.number:06d}",
@@ -223,32 +227,17 @@ class OptunaTPEStrategy:
                 _INFEASIBLE_ATTR,
                 not bool(getattr(scored, "feasible", False)),
             )
-            self._study.tell(trial, values=values)
+            if values is None:
+                trial.set_user_attr(_UNSCOREABLE_OBJECTIVES_ATTR, True)
+                self._study.tell(trial, state=_failed_trial_state())
+            else:
+                self._study.tell(trial, values=values)
             self._result_by_id[candidate.id] = scored
             self._results.append((candidate, scored))
             self._tell_count += 1
 
-    def _objective_values(self, scored: "ScoredResult") -> tuple[float, ...]:
-        if (
-            not bool(getattr(scored, "feasible", False))
-            or getattr(scored, "objectives", None) is None
-        ):
-            return tuple(
-                _bad_objective_value(definition)
-                for definition in self._objective_definitions
-            )
-
-        mapping = _objective_mapping(scored)
-        values: list[float] = []
-        for definition in self._objective_definitions:
-            if definition.metric not in mapping:
-                raise ValueError(f"objective {definition.metric!r} is missing")
-            value = mapping[definition.metric]
-            values.append(
-                _bad_objective_value(definition)
-                if value is None else value
-            )
-        return tuple(values)
+    def _objective_values(self, scored: "ScoredResult") -> tuple[float, ...] | None:
+        return _objective_values_for_definitions(scored, self._objective_definitions)
 
 
 def _require_optuna() -> Any:
@@ -281,6 +270,30 @@ def _couple_suggested_pressure_defaults(
     values: dict[KeyPath, Any],
 ) -> None:
     _condition_pressure_pair_values(schema, tuple(schema.search_allowlist), values)
+
+
+def _sync_conditioned_trial_params(
+    trial: Any,
+    values: Mapping[KeyPath, Any],
+    raw_values: Mapping[KeyPath, Any],
+) -> None:
+    distributions = getattr(trial, "distributions", {})
+    for path, value in values.items():
+        if raw_values.get(path) == value:
+            continue
+        name = ".".join(path)
+        if name not in distributions:
+            continue
+        distribution = distributions[name]
+        try:
+            internal_value = distribution.to_internal_repr(value)
+        except Exception as exc:
+            raise ValueError(f"conditioned trial param {name!r} is invalid") from exc
+        # Optuna's public Trial.params is read-only after suggest(); update the
+        # running trial storage so future sampler observations use evaluated coords.
+        trial.storage.set_trial_param(trial._trial_id, name, internal_value, distribution)
+    if hasattr(trial, "_cached_frozen_trial"):
+        trial._cached_frozen_trial = trial.storage.get_trial(trial._trial_id)
 
 
 def _numeric_bounds(spec: KnobSpec) -> tuple[float, float]:
@@ -325,6 +338,27 @@ def _objective_mapping(scored: "ScoredResult") -> Mapping[str, float | None]:
     return mapping
 
 
+def _objective_values_for_definitions(
+    scored: "ScoredResult",
+    definitions: Sequence[ObjectiveDefinition],
+) -> tuple[float, ...] | None:
+    if not bool(getattr(scored, "feasible", False)):
+        return tuple(_bad_objective_value(definition) for definition in definitions)
+    if getattr(scored, "objectives", None) is None:
+        return None
+
+    mapping = _objective_mapping(scored)
+    values: list[float] = []
+    for definition in definitions:
+        if definition.metric not in mapping:
+            return None
+        value = mapping[definition.metric]
+        if value is None:
+            return None
+        values.append(value)
+    return tuple(values)
+
+
 def _constraint_values(scored: "ScoredResult") -> tuple[tuple[str, ...], tuple[float, ...]]:
     margins = getattr(scored, "feasibility_margins", {}) or {}
     names: list[str] = []
@@ -338,20 +372,26 @@ def _constraint_values(scored: "ScoredResult") -> tuple[tuple[str, ...], tuple[f
             except (TypeError, ValueError) as exc:
                 raise ValueError(f"constraint margin {name!r} is not numeric") from exc
             has_feasible_flag = hasattr(raw_margin, "feasible")
-            if not has_feasible_flag and not math.isfinite(numeric_margin):
+            if math.isnan(numeric_margin):
                 raise ValueError(f"constraint margin {name!r} is not finite")
             names.append(str(name))
             if has_feasible_flag:
                 if bool(getattr(raw_margin, "feasible")):
-                    if not math.isfinite(numeric_margin):
-                        raise ValueError(f"constraint margin {name!r} is not finite")
                     values.append(0.0)
-                elif math.isfinite(numeric_margin):
-                    values.append(-numeric_margin if numeric_margin < 0.0 else 1.0)
                 else:
-                    values.append(1.0)
+                    values.append(
+                        _constraint_violation_from_margin(
+                            numeric_margin,
+                            infeasible_flag=True,
+                        )
+                    )
             else:
-                values.append(max(0.0, -numeric_margin))
+                values.append(
+                    _constraint_violation_from_margin(
+                        numeric_margin,
+                        infeasible_flag=False,
+                    )
+                )
 
     feasible = bool(getattr(scored, "feasible", False))
     if not values:
@@ -360,6 +400,20 @@ def _constraint_values(scored: "ScoredResult") -> tuple[tuple[str, ...], tuple[f
         names.append("infeasible")
         values.append(1.0)
     return tuple(names), tuple(values)
+
+
+def _constraint_violation_from_margin(
+    margin: float,
+    *,
+    infeasible_flag: bool,
+) -> float:
+    if math.isinf(margin):
+        if margin > 0.0 and not infeasible_flag:
+            return 0.0
+        return _NONFINITE_INFEASIBLE_CONSTRAINT_VIOLATION
+    if margin < 0.0:
+        return -margin
+    return 1.0 if infeasible_flag else 0.0
 
 
 def _constraints_for_trial(trial: Any) -> tuple[float, ...]:
@@ -383,6 +437,10 @@ def _bad_objective_value(definition: ObjectiveDefinition) -> float:
     if definition.sense == "minimize":
         return _BAD_MINIMIZE_VALUE
     raise ValueError(f"unsupported objective direction {definition.sense!r}")
+
+
+def _failed_trial_state() -> Any:
+    return _require_optuna().trial.TrialState.FAIL
 
 
 def _validate_non_negative_int(name: str, value: int) -> None:

@@ -13,12 +13,14 @@ from simulator.optimize.strategy.bayesian import (
     _CONSTRAINT_NAMES_ATTR,
     _CONSTRAINT_VALUES_ATTR,
     _INFEASIBLE_ATTR,
-    _bad_objective_value,
+    _UNSCOREABLE_OBJECTIVES_ATTR,
     _constraint_values,
     _constraints_for_trial,
     _couple_suggested_pressure_defaults,
-    _objective_mapping,
+    _failed_trial_state,
+    _objective_values_for_definitions,
     _suggest_value,
+    _sync_conditioned_trial_params,
 )
 from simulator.optimize.strategy.protocol import Candidate
 
@@ -29,7 +31,7 @@ TellBatchRow = tuple[
     Candidate,
     "ScoredResult",
     Any,
-    tuple[float, ...],
+    tuple[float, ...] | None,
     tuple[float, ...],
     tuple[str, ...],
 ]
@@ -140,7 +142,9 @@ class OptunaNSGA2Strategy:
                 for spec in self._specs
                 if not self.schema.is_forbidden(spec.path)
             }
+            raw_values = dict(values)
             _couple_suggested_pressure_defaults(self.schema, values)
+            _sync_conditioned_trial_params(trial, values, raw_values)
             patch = RecipePatch(values).validated(self.schema)
             candidate = Candidate(
                 id=f"nsga2-{self.seed}-{trial.number:06d}",
@@ -226,32 +230,17 @@ class OptunaNSGA2Strategy:
                 _INFEASIBLE_ATTR,
                 not bool(getattr(scored, "feasible", False)),
             )
-            self._study.tell(trial, values=values)
+            if values is None:
+                trial.set_user_attr(_UNSCOREABLE_OBJECTIVES_ATTR, True)
+                self._study.tell(trial, state=_failed_trial_state())
+            else:
+                self._study.tell(trial, values=values)
             self._result_by_id[candidate.id] = scored
             self._results.append((candidate, scored))
             self._tell_count += 1
 
-    def _objective_values(self, scored: "ScoredResult") -> tuple[float, ...]:
-        if (
-            not bool(getattr(scored, "feasible", False))
-            or getattr(scored, "objectives", None) is None
-        ):
-            return tuple(
-                _bad_objective_value(definition)
-                for definition in self._objective_definitions
-            )
-
-        mapping = _objective_mapping(scored)
-        values: list[float] = []
-        for definition in self._objective_definitions:
-            if definition.metric not in mapping:
-                raise ValueError(f"objective {definition.metric!r} is missing")
-            value = mapping[definition.metric]
-            values.append(
-                _bad_objective_value(definition)
-                if value is None else value
-            )
-        return tuple(values)
+    def _objective_values(self, scored: "ScoredResult") -> tuple[float, ...] | None:
+        return _objective_values_for_definitions(scored, self._objective_definitions)
 
 
 def _require_optuna() -> Any:
