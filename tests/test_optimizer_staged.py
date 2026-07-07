@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import replace
+import ast
+from dataclasses import fields, replace
+import inspect
 import json
 import math
 from pathlib import Path
@@ -12,6 +14,7 @@ from typing import Any, Mapping
 import pytest
 
 from simulator.optimize import study
+from simulator.optimize import evalspec as evalspec_module
 from simulator.optimize.evalspec import EvalSpec, PrefixEvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
 from simulator.optimize.objective import (
@@ -23,6 +26,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import C2A_STAGED_ORDER_PATH, RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
+from simulator.optimize.strategy import staged as staged_module
 from simulator.optimize.strategy.staged import (
     StagedAllowlistError,
     TopologyChoice,
@@ -336,6 +340,28 @@ def test_staged_default_evaluator_fails_loud_without_replay(tmp_path) -> None:
         )
 
 
+def test_make_prefix_eval_spec_handles_all_canonical_identity_fields() -> None:
+    def spec_attribute_names(function: Any) -> set[str]:
+        tree = ast.parse(inspect.getsource(function))
+        return {
+            node.attr
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Attribute)
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "spec"
+        }
+
+    canonical_identity_fields = spec_attribute_names(
+        evalspec_module.canonical_evalspec_json
+    ) | spec_attribute_names(evalspec_module.lab_overlay_scope_payload)
+    handled_fields = staged_module._PREFIX_EVAL_SPEC_HANDLED_FIELD_NAMES
+
+    assert set(staged_module._PREFIX_EVAL_SPEC_BASE_FIELD_NAMES) == {
+        field.name for field in fields(EvalSpec)
+    }
+    assert canonical_identity_fields <= handled_fields
+
+
 def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None:
     profile = {
         **PROFILE,
@@ -391,6 +417,50 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
     assert loaded_prefix.eval_spec.vapor_pressure_provider_code_fingerprint == (
         "provider-source-sha256:test"
     )
+
+
+def test_prefix_evalspec_copies_schema_identity_and_splits_bounds_digest() -> None:
+    base = _spec(RecipePatch({}))
+
+    def prefix_for(spec: EvalSpec) -> PrefixEvalSpec:
+        return make_prefix_eval_spec(
+            spec,
+            prefix_stage_ids=("C0",),
+            prefix_recipe_ids=(spec.recipe_id,),
+            topology_id="PATH_AB",
+        )
+
+    old_base = replace(
+        base,
+        allowlist_version="allowlist-custom",
+        bounds_digest="bounds-digest-old",
+    )
+    new_base = replace(old_base, bounds_digest="bounds-digest-new")
+    bubbler_base = replace(
+        old_base,
+        o2_bubbler_settings={"C3": {"o2_bubbler_kg_per_hr": 0.125}},
+    )
+    stage0_exit_base = replace(old_base, stop_at_stage0_exit=True)
+
+    old_prefix = prefix_for(old_base)
+    new_prefix = prefix_for(new_base)
+    bubbler_prefix = prefix_for(bubbler_base)
+    stage0_exit_prefix = prefix_for(stage0_exit_base)
+
+    assert old_base.recipe_id == new_base.recipe_id
+    assert old_prefix.allowlist_version == "allowlist-custom"
+    assert old_prefix.bounds_digest == "bounds-digest-old"
+    assert new_prefix.allowlist_version == old_prefix.allowlist_version
+    assert new_prefix.bounds_digest == "bounds-digest-new"
+    assert bubbler_prefix.o2_bubbler_settings == {
+        "C3": {"o2_bubbler_kg_per_hr": 0.125}
+    }
+    assert stage0_exit_prefix.stop_at_stage0_exit is True
+    assert old_prefix.recipe_id == new_prefix.recipe_id
+    assert old_prefix.prefix_recipe_ids == new_prefix.prefix_recipe_ids
+    assert cache_key(old_prefix) != cache_key(new_prefix)
+    assert cache_key(old_prefix) != cache_key(bubbler_prefix)
+    assert cache_key(old_prefix) != cache_key(stage0_exit_prefix)
 
 
 def test_staged_clean_import_boundary_then_touch_loads_evaluate_only() -> None:

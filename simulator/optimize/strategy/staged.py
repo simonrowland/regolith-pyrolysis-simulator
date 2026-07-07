@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, fields, replace
 import math
 from types import MappingProxyType
 from typing import Any, Mapping, Sequence
@@ -149,6 +149,19 @@ _ACTIVE_STAGE_ALIASES: Mapping[str, tuple[str, ...]] = MappingProxyType(
         "C6": ("c6", "aluminum", "al", "thermite", "mg"),
     }
 )
+_PREFIX_EVAL_SPEC_BASE_FIELD_NAMES: tuple[str, ...] = tuple(
+    field.name for field in fields(EvalSpec)
+)
+# Prefix specs inherit base EvalSpec identity verbatim. These are the only
+# fields redefined by prefix replay semantics: prefix span content, topology,
+# and the explicit prefix type discriminator used in cache keys.
+_PREFIX_EVAL_SPEC_OVERRIDE_FIELD_NAMES = frozenset(
+    {"prefix_stage_ids", "prefix_recipe_ids", "topology_id", "eval_spec_type"}
+)
+_PREFIX_EVAL_SPEC_HANDLED_FIELD_NAMES = (
+    frozenset(_PREFIX_EVAL_SPEC_BASE_FIELD_NAMES)
+    | _PREFIX_EVAL_SPEC_OVERRIDE_FIELD_NAMES
+)
 
 
 def enumerate_topologies(
@@ -190,37 +203,16 @@ def make_prefix_eval_spec(
     stage_ids = tuple(prefix_stage_ids)
     if not recipe_ids:
         recipe_ids = (base_spec.recipe_id,) * len(stage_ids)
-    return PrefixEvalSpec(
-        recipe_id=base_spec.recipe_id,
-        feedstock_recipe_digest=base_spec.feedstock_recipe_digest,
-        feedstock_id=base_spec.feedstock_id,
-        profile_id=base_spec.profile_id,
-        fidelity=base_spec.fidelity,
-        code_version=base_spec.code_version,
-        data_digests=base_spec.data_digests,
-        campaign=base_spec.campaign,
-        hours=base_spec.hours,
-        mass_kg=base_spec.mass_kg,
-        additives_kg=base_spec.additives_kg,
-        track=base_spec.track,
-        backend_name=base_spec.backend_name,
-        runtime_campaign_overrides=base_spec.runtime_campaign_overrides,
-        chemistry_kernel=base_spec.chemistry_kernel,
-        c5_enabled=base_spec.c5_enabled,
-        mre_max_voltage_V=base_spec.mre_max_voltage_V,
-        mre_target_species=base_spec.mre_target_species,
-        vapor_pressure_provider_id=base_spec.vapor_pressure_provider_id,
-        vapor_pressure_fallback_provider_id=base_spec.vapor_pressure_fallback_provider_id,
-        allow_fallback_vapor=base_spec.allow_fallback_vapor,
-        force_builtin_vapor_pressure=base_spec.force_builtin_vapor_pressure,
-        vapor_pressure_provider_code_fingerprint=(
-            base_spec.vapor_pressure_provider_code_fingerprint
-        ),
-        prefix_stage_ids=stage_ids,
-        prefix_recipe_ids=recipe_ids,
-        topology_id=topology_id,
-        lab_schedule=base_spec.lab_schedule,
-    )
+    inherited_fields = {
+        name: getattr(base_spec, name) for name in _PREFIX_EVAL_SPEC_BASE_FIELD_NAMES
+    }
+    prefix_overrides = {
+        "prefix_stage_ids": stage_ids,
+        "prefix_recipe_ids": recipe_ids,
+        "topology_id": topology_id,
+        "eval_spec_type": "prefix",
+    }
+    return PrefixEvalSpec(**inherited_fields, **prefix_overrides)
 
 
 def assert_prefix_replay_equal(replayed: ScoredResult, fresh: ScoredResult) -> None:

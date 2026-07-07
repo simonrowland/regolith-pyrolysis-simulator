@@ -97,6 +97,7 @@ C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_PATH: KeyPath = tuple(
     "campaigns.C5.allow_mre_voltage_cap_upper_bound_V".split(".")
 )
 DEFAULT_C5_ALLOW_MRE_VOLTAGE_CAP_UPPER_BOUND_V = 2.5
+BOUNDS_DIGEST_SCHEMA_VERSION = "optimizer-bounds-digest-v1"
 
 
 def _c5_allow_mre_voltage_cap_upper_bound() -> float:
@@ -1211,10 +1212,18 @@ class RecipeSchema:
             self.pinned_paths = resolved_pins
         else:
             self.pinned_paths = ()
+        self._bounds_identity_json = _bounds_identity_json(self)
+        self.bounds_digest = hashlib.sha256(
+            self._bounds_identity_json.encode("utf-8")
+        ).hexdigest()
 
     @property
     def search_allowlist(self) -> tuple[KnobSpec, ...]:
         return tuple(spec for spec in self.allowlist if spec.search_enabled)
+
+    @property
+    def bounds_identity_json(self) -> str:
+        return self._bounds_identity_json
 
     def with_pinned_paths(
         self,
@@ -1566,6 +1575,75 @@ def _cached_default_allowlist(
     )
 
 
+def default_bounds_digest() -> str:
+    return RecipeSchema().bounds_digest
+
+
+def _bounds_identity_json(schema: RecipeSchema) -> str:
+    return canonical_json_dumps(_bounds_identity_payload(schema))
+
+
+def _bounds_identity_payload(schema: RecipeSchema) -> dict[str, Any]:
+    return {
+        "schema_version": BOUNDS_DIGEST_SCHEMA_VERSION,
+        "knobs": [
+            _bounds_identity_entry(spec)
+            for spec in sorted(
+                schema.allowlist,
+                key=lambda item: _format_path(item.path),
+            )
+        ],
+        "sampling_constraints": _sampling_bounds_constraints(schema),
+    }
+
+
+def _bounds_identity_entry(spec: KnobSpec) -> dict[str, Any]:
+    entry: dict[str, Any] = {
+        "kind": spec.kind,
+        "path": _format_path(spec.path),
+    }
+    if spec.low is not None:
+        entry["low"] = _bounds_identity_float(spec.low)
+    if spec.high is not None:
+        entry["high"] = _bounds_identity_float(spec.high)
+    if spec.choices is not None:
+        entry["choices"] = [str(choice) for choice in spec.choices]
+    step = getattr(spec, "step", None)
+    if step is not None:
+        entry["step"] = _bounds_identity_float(step)
+    return entry
+
+
+def _bounds_identity_float(value: Any) -> str:
+    numeric = float(value)
+    if not math.isfinite(numeric):
+        raise RecipeValidationError("optimizer bounds digest rejects NaN and infinity")
+    return repr(numeric)
+
+
+def _sampling_bounds_constraints(schema: RecipeSchema) -> dict[str, Any]:
+    pressure_pairs = tuple(schema.PRESSURE_COUPLED_DEFAULT_PAIRS) + tuple(
+        schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items()
+    )
+    return {
+        "pressure_coupled_pairs": [
+            {
+                "pO2_path": _format_path(po2_path),
+                "p_total_path": _format_path(total_path),
+                "pO2_effective_high": "min(pO2_high,p_total)",
+                "p_total_effective_low": "max(p_total_low,pO2)",
+                "positive_carrier_open_interval": (
+                    po2_path in schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2
+                ),
+            }
+            for po2_path, total_path in sorted(
+                pressure_pairs,
+                key=lambda pair: (_format_path(pair[0]), _format_path(pair[1])),
+            )
+        ]
+    }
+
+
 def _apply_pinned_paths(
     schema: RecipeSchema,
     pinned_paths: Sequence[str | KeyPath],
@@ -1748,6 +1826,8 @@ class RecipePatch:
             + schema_version.encode("utf-8")
             + b"\n"
             + active_allowlist_version.encode("utf-8")
+            + b"\n"
+            + active_schema.bounds_digest.encode("utf-8")
         )
         return hashlib.sha256(payload).hexdigest()
 

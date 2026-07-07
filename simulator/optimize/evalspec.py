@@ -28,7 +28,10 @@ from simulator.optimize.canonical import (
     normalize_canonical_value,
 )
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
-from simulator.optimize.recipe import allowlist_version as DEFAULT_ALLOWLIST_VERSION
+from simulator.optimize.recipe import (
+    allowlist_version as DEFAULT_ALLOWLIST_VERSION,
+    default_bounds_digest,
+)
 
 
 _VERSION_PATH = Path(__file__).resolve().parents[2] / "VERSION"
@@ -98,6 +101,7 @@ class EvalSpec:
     force_builtin_vapor_pressure: bool = False
     vapor_pressure_provider_code_fingerprint: str = ""
     allowlist_version: str = field(default=DEFAULT_ALLOWLIST_VERSION, kw_only=True)
+    bounds_digest: str = field(default_factory=default_bounds_digest, kw_only=True)
     stop_at_stage0_exit: bool = field(default=False, kw_only=True)
 
     def __post_init__(self) -> None:
@@ -119,6 +123,7 @@ class EvalSpec:
             "vapor_pressure_fallback_provider_id",
             "vapor_pressure_provider_code_fingerprint",
             "allowlist_version",
+            "bounds_digest",
         ):
             if not isinstance(getattr(self, field_name), str):
                 raise TypeError(f"{field_name} must be a string")
@@ -255,6 +260,7 @@ class EvalSpec:
                 self.force_builtin_vapor_pressure,
                 self.vapor_pressure_provider_code_fingerprint,
                 self.allowlist_version,
+                self.bounds_digest,
                 self.stop_at_stage0_exit,
             ),
         )
@@ -324,6 +330,7 @@ class PrefixEvalSpec(EvalSpec):
                 self.topology_id,
                 self.eval_spec_type,
                 self.allowlist_version,
+                self.bounds_digest,
                 self.stop_at_stage0_exit,
             ),
         )
@@ -416,6 +423,13 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
             allowlist_version=args[-2],
             stop_at_stage0_exit=args[-1],
         )
+    if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 3:
+        return EvalSpec(
+            *_with_legacy_data_digest_args(args[:-3]),
+            allowlist_version=args[-3],
+            bounds_digest=args[-2],
+            stop_at_stage0_exit=args[-1],
+        )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 2:
         return EvalSpec(
             *_with_legacy_data_digest_args(args[:-2]),
@@ -468,6 +482,13 @@ def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
             allowlist_version=args[-2],
             stop_at_stage0_exit=args[-1],
         )
+    if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 3:
+        return PrefixEvalSpec(
+            *_with_legacy_data_digest_args(args[:-3]),
+            allowlist_version=args[-3],
+            bounds_digest=args[-2],
+            stop_at_stage0_exit=args[-1],
+        )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 2:
         return PrefixEvalSpec(
             *_with_legacy_data_digest_args(args[:-2]),
@@ -498,6 +519,7 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "additives_kg": spec.additives_kg,
         "allowlist_version": spec.allowlist_version,
         "backend_name": spec.backend_name,
+        "bounds_digest": spec.bounds_digest,
         "c5_enabled": spec.c5_enabled,
         "campaign": spec.campaign,
         "chemistry_kernel": _chemistry_kernel_key_payload(spec.chemistry_kernel),

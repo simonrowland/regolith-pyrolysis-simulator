@@ -1673,6 +1673,7 @@ def _build_eval_inputs(
             c4_default_hold_temp_C=c4_default_hold_temp_C,
         ),
         allowlist_version=effective_allowlist_version,
+        bounds_digest=schema.bounds_digest,
         feedstock_recipe_digest=feedstock_recipe_digest(feedstock),
         feedstock_id=feedstock_id,
         profile_id=profile_id,

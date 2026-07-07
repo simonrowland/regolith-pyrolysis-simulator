@@ -153,6 +153,10 @@ class DoeSpec:
         return self.schema.allowlist_version
 
     @property
+    def bounds_digest(self) -> str:
+        return self.schema.bounds_digest
+
+    @property
     def knob_paths(self) -> tuple[KeyPath, ...]:
         return tuple(spec.path for spec in self.schema.search_allowlist)
 
@@ -163,6 +167,7 @@ class DoeSpec:
             "sampler_name": self.sampler_name,
             "recipe_schema_version": self.recipe_schema_version,
             "allowlist_version": self.allowlist_version,
+            "bounds_digest": self.bounds_digest,
             "knob_paths": [list(path) for path in self.knob_paths],
             "anchor": _anchor_to_entries(self.anchor),
             "delta_fraction": float(self.delta_fraction),
@@ -185,6 +190,19 @@ class DoeSpec:
             and expected_allowlist_version != active_schema.allowlist_version
         ):
             raise ValueError("DOE spec allowlist_version does not match the active schema")
+        if "bounds_digest" not in payload:
+            warnings.warn(
+                "DOE spec payload missing bounds_digest; replay invalidation caveat: "
+                "schema bounds changes cannot be checked",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+        else:
+            expected_bounds_digest = payload.get("bounds_digest")
+            if expected_bounds_digest != active_schema.bounds_digest:
+                raise ValueError(
+                    "DOE spec bounds_digest does not match the active schema"
+                )
         active_knob_paths = tuple(
             spec.path for spec in active_schema.search_allowlist
         )

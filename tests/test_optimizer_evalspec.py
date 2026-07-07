@@ -47,6 +47,7 @@ from simulator.optimize.recipe import (
     C2A_STAGED_ORDER_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
+    FURNACE_MAX_T_C_PATH,
     O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION,
     RecipePatch,
     RecipeSchema,
@@ -307,6 +308,44 @@ def test_build_eval_inputs_keys_schema_allowlist_version_in_production_path() ->
     assert cache_key(old_spec) != cache_key(new_spec)
 
 
+def test_build_eval_inputs_keys_schema_bounds_digest_in_production_path() -> None:
+    profile = _mre_cap_profile(campaign="C0")
+    old_schema = RecipeSchema()
+    new_schema = RecipeSchema(
+        allowlist=tuple(
+            replace(spec, low=1300.0)
+            if spec.path == FURNACE_MAX_T_C_PATH
+            else spec
+            for spec in old_schema.allowlist
+        ),
+        recipe_schema_version=old_schema.recipe_schema_version,
+        allowlist_version=old_schema.allowlist_version,
+    )
+    assert old_schema.recipe_schema_version == new_schema.recipe_schema_version
+    assert old_schema.allowlist_version == new_schema.allowlist_version
+    assert old_schema.bounds_digest != new_schema.bounds_digest
+
+    old_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        old_schema,
+    )
+    new_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        new_schema,
+    )
+
+    assert old_spec.bounds_digest == old_schema.bounds_digest
+    assert new_spec.bounds_digest == new_schema.bounds_digest
+    assert old_spec.recipe_id != new_spec.recipe_id
+    assert cache_key(old_spec) != cache_key(new_spec)
+
+
 def test_o2_bubbler_default_and_zero_settings_preserve_evalspec_identity() -> None:
     profile = _mre_cap_profile(campaign="C3")
     schema = RecipeSchema()
@@ -509,6 +548,7 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
         ("fidelity", "accurate"),
         ("code_version", "0.0.0-determinant-mutant"),
         ("allowlist_version", "allowlist-mutant"),
+        ("bounds_digest", "bounds-mutant"),
         ("campaign", "C2A"),
         ("hours", 48),
         ("mass_kg", 500.0),
@@ -587,7 +627,7 @@ def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-2]
+    old_args = args[:16] + args[19:-3]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -607,7 +647,7 @@ def test_pre_bubbler_evalspec_reduce_payloads_get_empty_settings_default() -> No
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-2]
+    old_args = args[:18] + args[19:-3]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -627,7 +667,7 @@ def test_pre_redox_prefix_evalspec_reduce_payloads_get_zero_dose_defaults() -> N
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-2]
+    old_args = args[:16] + args[19:-3]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -650,7 +690,7 @@ def test_pre_bubbler_prefix_evalspec_reduce_payloads_get_empty_settings_default(
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-2]
+    old_args = args[:18] + args[19:-3]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -668,13 +708,17 @@ def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
         _prefix_spec(stop_at_stage0_exit=False),
     ):
         _, new_args = spec.__reduce__()
-        old_args = new_args[:-2]
+        old_args = new_args[:-3]
         restored = type(spec)(*old_args)
 
         assert restored.stop_at_stage0_exit is False
         assert restored.allowlist_version == spec.allowlist_version
         for field in fields(type(spec)):
-            if field.name in {"allowlist_version", "stop_at_stage0_exit"}:
+            if field.name in {
+                "allowlist_version",
+                "bounds_digest",
+                "stop_at_stage0_exit",
+            }:
                 continue
             assert getattr(restored, field.name) == getattr(spec, field.name)
 

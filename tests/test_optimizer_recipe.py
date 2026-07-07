@@ -115,6 +115,21 @@ DATA_DIGESTS = {
 }
 
 
+def _schema_with_replaced_spec(
+    schema: RecipeSchema,
+    path: tuple[str, ...],
+    **changes: object,
+) -> RecipeSchema:
+    return RecipeSchema(
+        allowlist=tuple(
+            replace(spec, **changes) if spec.path == path else spec
+            for spec in schema.allowlist
+        ),
+        recipe_schema_version=schema.recipe_schema_version,
+        allowlist_version=schema.allowlist_version,
+    )
+
+
 def _lookup_setpoint(root: dict, dotted_path: str):
     node = root
     for segment in dotted_path.split("."):
@@ -475,6 +490,79 @@ def test_furnace_max_t_c_bounds_are_allowlist_epoch_pinned() -> None:
         (1200.0, 2000.0),
         (1200.0, 2000.0),
     )
+
+
+@pytest.mark.parametrize(("field", "value"), (("low", 1300.0), ("high", 1900.0)))
+def test_bounds_digest_changes_recipe_identity_for_single_bound_edit(
+    field: str, value: float
+) -> None:
+    schema = RecipeSchema()
+    changed = _schema_with_replaced_spec(schema, FURNACE_MAX_T_C_PATH, **{field: value})
+    patch = RecipePatch({}).validated(schema)
+
+    assert changed.bounds_digest != schema.bounds_digest
+    assert patch.recipe_id(changed) != patch.recipe_id(schema)
+
+
+def test_bounds_digest_changes_evalspec_cache_key_for_bound_edit() -> None:
+    schema = RecipeSchema()
+    changed = _schema_with_replaced_spec(schema, FURNACE_MAX_T_C_PATH, low=1300.0)
+    patch = RecipePatch({})
+    before = EvalSpec(
+        recipe_id=patch.recipe_id(schema),
+        allowlist_version=schema.allowlist_version,
+        bounds_digest=schema.bounds_digest,
+        feedstock_recipe_digest="feedstock-recipe-digest",
+        feedstock_id=FEEDSTOCK,
+        profile_id="profile-id",
+        fidelity="fast",
+        code_version="test-code-version",
+        data_digests=DATA_DIGESTS,
+    )
+    after = replace(
+        before,
+        recipe_id=patch.recipe_id(changed),
+        bounds_digest=changed.bounds_digest,
+    )
+
+    assert cache_key(after) != cache_key(before)
+
+
+def test_bounds_digest_is_stable_for_reordered_allowlist() -> None:
+    schema = RecipeSchema()
+    reordered = RecipeSchema(
+        allowlist=tuple(reversed(schema.allowlist)),
+        recipe_schema_version=schema.recipe_schema_version,
+        allowlist_version=schema.allowlist_version,
+    )
+
+    assert reordered.bounds_digest == schema.bounds_digest
+
+
+def test_bounds_digest_ignores_identity_inert_metadata() -> None:
+    schema = RecipeSchema()
+    spec = schema.spec_for(FURNACE_MAX_T_C_PATH)
+    changed = _schema_with_replaced_spec(
+        schema,
+        FURNACE_MAX_T_C_PATH,
+        units=f"{spec.units} display",
+        bounds_source=f"{spec.bounds_source}; display-only note",
+    )
+
+    assert changed.bounds_digest == schema.bounds_digest
+
+
+def test_bounds_digest_changes_for_categorical_choice_edit() -> None:
+    schema = RecipeSchema()
+    spec = schema.spec_for(STAGE_SIO_GAS_MODE)
+    assert spec.choices is not None
+    changed = _schema_with_replaced_spec(
+        schema,
+        STAGE_SIO_GAS_MODE,
+        choices=tuple(reversed(spec.choices)),
+    )
+
+    assert changed.bounds_digest != schema.bounds_digest
 
 
 def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:

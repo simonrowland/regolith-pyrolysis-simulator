@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import json
 import math
 
@@ -20,6 +21,7 @@ from simulator.optimize.doe import (
     sample_recipe_patches,
 )
 from simulator.optimize.recipe import (
+    FURNACE_MAX_T_C_PATH,
     KnobSpec,
     RecipePatch,
     RecipeSchema,
@@ -124,6 +126,21 @@ def _assert_pressure_defaults_are_jointly_feasible(
 def _single_knob_schema(path: tuple[str, ...]) -> RecipeSchema:
     base = RecipeSchema()
     return RecipeSchema(allowlist=(base.spec_for(path),))
+
+
+def _schema_with_replaced_spec(
+    schema: RecipeSchema,
+    path: tuple[str, ...],
+    **changes: object,
+) -> RecipeSchema:
+    return RecipeSchema(
+        allowlist=tuple(
+            replace(spec, **changes) if spec.path == path else spec
+            for spec in schema.allowlist
+        ),
+        recipe_schema_version=schema.recipe_schema_version,
+        allowlist_version=schema.allowlist_version,
+    )
 
 
 def test_sobol_sampler_is_deterministic_for_schema_n_and_seed() -> None:
@@ -240,6 +257,61 @@ def test_doe_spec_from_dict_rejects_allowlist_version_mismatch() -> None:
 
     with pytest.raises(ValueError, match="allowlist_version"):
         DoeSpec.from_dict(payload, schema=new_schema)
+
+
+def test_doe_spec_to_dict_always_writes_bounds_digest() -> None:
+    schema = RecipeSchema()
+    payload = DoeSpec(schema=schema, n_samples=8, seed=321).to_dict()
+
+    assert "bounds_digest" in payload
+    assert payload["bounds_digest"] == schema.bounds_digest
+
+
+def test_doe_spec_from_dict_rejects_bounds_digest_mismatch() -> None:
+    schema = RecipeSchema()
+    changed = _schema_with_replaced_spec(schema, FURNACE_MAX_T_C_PATH, low=1300.0)
+    payload = DoeSpec(schema=schema, n_samples=8, seed=321).to_dict()
+
+    with pytest.raises(ValueError, match="bounds_digest"):
+        DoeSpec.from_dict(payload, schema=changed)
+    with pytest.raises(ValueError, match="bounds_digest"):
+        DoeSpec.from_dict({**payload, "bounds_digest": None}, schema=schema)
+
+
+def test_doe_spec_from_dict_warns_when_legacy_payload_lacks_bounds_digest() -> None:
+    schema = RecipeSchema()
+    payload = DoeSpec(schema=schema, n_samples=8, seed=321).to_dict()
+    del payload["bounds_digest"]
+
+    with pytest.warns(
+        RuntimeWarning,
+        match="bounds_digest.*replay invalidation caveat",
+    ):
+        restored = DoeSpec.from_dict(payload, schema=schema)
+
+    assert restored.bounds_digest == schema.bounds_digest
+
+
+def test_furnace_floor_bound_edit_moves_same_seed_samples() -> None:
+    schema = RecipeSchema()
+    changed = _schema_with_replaced_spec(schema, FURNACE_MAX_T_C_PATH, low=1300.0)
+    before = sample_recipe_patches(
+        schema,
+        n_samples=8,
+        seed=20260707,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+    )
+    after = sample_recipe_patches(
+        changed,
+        n_samples=8,
+        seed=20260707,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+    )
+
+    assert changed.bounds_digest != schema.bounds_digest
+    assert tuple(patch.values[FURNACE_MAX_T_C_PATH] for patch in after) != tuple(
+        patch.values[FURNACE_MAX_T_C_PATH] for patch in before
+    )
 
 
 def test_unknown_sampler_name_raises_without_fallback() -> None:
