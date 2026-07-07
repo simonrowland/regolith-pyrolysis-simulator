@@ -593,25 +593,6 @@ def _map_unit_row(
     return values
 
 
-def _couple_pressure_default_pairs(
-    schema: RecipeSchema,
-    specs: tuple[Any, ...],
-    values: dict[KeyPath, Any],
-    unit_by_path: Mapping[KeyPath, float],
-    *,
-    anchor: RecipePatch | None,
-    delta_fraction: float,
-) -> None:
-    _condition_pressure_pair_values(
-        schema,
-        specs,
-        values,
-        unit_by_path,
-        anchor=anchor,
-        delta_fraction=delta_fraction,
-    )
-
-
 def _condition_pressure_pair_values(
     schema: RecipeSchema,
     specs: tuple[Any, ...],

@@ -13,6 +13,7 @@ from simulator.interpolation_uncertainty import (
     NONLINEARITY_GENERAL,
     THRESHOLD_STRADDLE,
     build_interpolation_uncertainty_vector,
+    feasibility_verdict_from_reduced_real_cache,
     feasibility_verdict_with_interpolation_uncertainty,
     ranked_table_drain,
 )
@@ -270,6 +271,32 @@ def test_margin_inside_uncalibrated_interpolation_error_is_indeterminate() -> No
 
     assert near["verdict"] == INDETERMINATE
     assert far["verdict"] == FEASIBLE
+
+
+def test_reduced_real_cache_verdict_preserves_margin_error_audit_fields() -> None:
+    vector = build_interpolation_uncertainty_vector(
+        _key("query", temperature_K=1500.0),
+        [
+            _neighbor("low", temperature_K=1490.0, liquid_fraction=0.7, distance=0.04),
+            _neighbor("high", temperature_K=1510.0, liquid_fraction=0.8, distance=0.04),
+        ],
+    )
+
+    verdict = feasibility_verdict_from_reduced_real_cache(
+        {"yield": _margin(0.05)},
+        {
+            "interpolation_uncertainty_ranked_table_drain": {
+                "selected": [{"point_id": "seed-a", "uncertainty": vector}]
+            }
+        },
+    )
+
+    assert verdict["verdict"] == INDETERMINATE
+    assert verdict["point_id"] == "seed-a"
+    assert verdict["closest_gate"] == "yield"
+    assert verdict["closest_abs_margin"] == pytest.approx(0.05)
+    assert verdict["uncalibrated_margin_error_bound"] is not None
+    assert verdict["margin_error_source"] == "consumer_side_uncalibrated_wide_band"
 
 
 def test_margin_outside_uncalibrated_error_preserves_infeasible_branch() -> None:

@@ -248,6 +248,12 @@ def feasibility_verdict_from_reduced_real_cache(
         "verdict": chosen["verdict"],
         "reason": chosen["reason"],
         "point_id": chosen.get("point_id"),
+        "closest_gate": chosen.get("closest_gate"),
+        "closest_abs_margin": chosen.get("closest_abs_margin"),
+        "uncalibrated_margin_error_bound": chosen.get(
+            "uncalibrated_margin_error_bound"
+        ),
+        "margin_error_source": chosen.get("margin_error_source"),
         "points_considered": len(verdicts),
         "diagnostic_only": True,
     }

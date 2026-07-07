@@ -153,6 +153,16 @@ def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
             RecipePatch.from_nested(seed["patch"]).validated(RecipeSchema())
 
 
+def test_seed_source_campaigns_rejects_non_list_and_bad_entries() -> None:
+    for bad in ("C2A_continuous", 7, {}, [], ["C2A_continuous", ""], [3]):
+        profile = _profile_copy("lunar_mare_low_ti")
+        seed = profile["seed_recipes"][0]
+        seed.pop("source_campaign", None)
+        seed["source_campaigns"] = bad
+        with pytest.raises(ProfileValidationError, match="source_campaigns"):
+            validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
 def test_mgs1_profile_is_base_simulant_without_carbon_cleanup_seed() -> None:
     profile = _profile_copy("mars_global_mgs1")
 

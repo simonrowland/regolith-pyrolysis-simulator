@@ -1176,19 +1176,6 @@ def _signal_pids(pids: Sequence[int], sig: signal.Signals) -> None:
             continue
 
 
-def _living_pids(pids: Sequence[int]) -> tuple[int, ...]:
-    living: list[int] = []
-    for pid in pids:
-        try:
-            os.kill(int(pid), 0)
-        except ProcessLookupError:
-            continue
-        except OSError:
-            continue
-        living.append(int(pid))
-    return tuple(living)
-
-
 def _child_pid_log_path(task: _PoolTask) -> Path:
     return Path(task.output_dir) / ".child-pids"
 

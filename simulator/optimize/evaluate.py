@@ -80,6 +80,7 @@ from simulator.optimize.physics import (
 from simulator.optimize.profiles import (
     ProfileValidationError,
     physics_constraints_from_profile,
+    seed_source_campaigns,
     validate_profile,
 )
 from simulator.optimize.recipe import (
@@ -1164,7 +1165,7 @@ def _profile_campaign_setting(
     for seed in profile.get("seed_recipes", ()) or ():
         if not isinstance(seed, MappingABC):
             continue
-        if str(seed.get("source_campaign", "") or campaign) != campaign:
+        if campaign not in seed_source_campaigns(seed):
             continue
         value = _campaign_setting(seed.get("patch"), campaign, key)
         if value is not None:
@@ -3254,29 +3255,6 @@ def _crash_point_from_diagnostics(
     if not isinstance(raw, MappingABC):
         return None
     return _compact_jsonable(raw)
-
-
-def _crash_point_has_composition(crash_point: Mapping[str, Any]) -> bool:
-    for key in (
-        "composition_mol",
-        "composition_wt_pct",
-        "composition_melts_wt_pct",
-    ):
-        raw = crash_point.get(key)
-        if isinstance(raw, MappingABC) and any(
-            _finite_optional_float(value) is not None
-            for value in raw.values()
-        ):
-            return True
-    raw_by_account = crash_point.get("composition_mol_by_account")
-    if isinstance(raw_by_account, MappingABC):
-        for species_mol in raw_by_account.values():
-            if isinstance(species_mol, MappingABC) and any(
-                _finite_optional_float(value) is not None
-                for value in species_mol.values()
-            ):
-                return True
-    return False
 
 
 def _crash_point_composition_mol_by_account(

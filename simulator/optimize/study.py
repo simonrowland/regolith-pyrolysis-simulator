@@ -12,7 +12,6 @@ import json
 import logging
 import math
 from pathlib import Path
-import tempfile
 from types import MappingProxyType
 from typing import Any
 
@@ -368,6 +367,11 @@ def run(
         resolved_profile,
         cli_pinned_paths=pinned_paths,
     )
+    search_space_identity = _search_space_identity(
+        active_schema,
+        profile_pinned_paths=_profile_pinned_paths(resolved_profile),
+        cli_pinned_paths=_cli_pinned_paths(pinned_paths),
+    )
     definitions = objective_definitions(resolved_profile)
     two_phase = _resolve_two_phase_config(resolved_profile, two_phase_certify)
     _validate_inputs(config, resolved_profile)
@@ -479,7 +483,12 @@ def run(
                 records.append(record)
                 provenance.write(
                     json.dumps(
-                        _record_payload(record, active_schema, resolved_profile),
+                        _record_payload(
+                            record,
+                            active_schema,
+                            resolved_profile,
+                            search_space_identity=search_space_identity,
+                        ),
                         sort_keys=True,
                         separators=(",", ":"),
                         allow_nan=False,
@@ -581,6 +590,7 @@ def run(
         winner=winner,
         schema=active_schema,
         failure_counts=failure_counts,
+        search_space_identity=search_space_identity,
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
@@ -644,6 +654,11 @@ def run_certify(
         base_schema,
         resolved_profile,
         cli_pinned_paths=pinned_paths,
+    )
+    search_space_identity = _search_space_identity(
+        active_schema,
+        profile_pinned_paths=_profile_pinned_paths(resolved_profile),
+        cli_pinned_paths=_cli_pinned_paths(pinned_paths),
     )
     definitions = objective_definitions(resolved_profile)
     _validate_inputs(config, resolved_profile)
@@ -723,7 +738,12 @@ def run_certify(
     with provenance_path.open("w", encoding="utf-8") as provenance:
         provenance.write(
             json.dumps(
-                _record_payload(record, active_schema, resolved_profile),
+                _record_payload(
+                    record,
+                    active_schema,
+                    resolved_profile,
+                    search_space_identity=search_space_identity,
+                ),
                 sort_keys=True,
                 separators=(",", ":"),
                 allow_nan=False,
@@ -741,6 +761,7 @@ def run_certify(
         winner=record,
         schema=active_schema,
         failure_counts=MappingProxyType({}),
+        search_space_identity=search_space_identity,
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
@@ -1075,6 +1096,26 @@ def _cli_pinned_paths(raw: Sequence[str] | None) -> tuple[str, ...]:
             raise ValueError(f"--pin entry {index} must be a dotted path string")
         pins.append(path)
     return tuple(pins)
+
+
+def _search_space_identity(
+    schema: RecipeSchema,
+    *,
+    profile_pinned_paths: Sequence[str],
+    cli_pinned_paths: Sequence[str],
+) -> Mapping[str, Any]:
+    return MappingProxyType(
+        {
+            "recipe_schema_version": schema.recipe_schema_version,
+            "allowlist_version": schema.allowlist_version,
+            "profile_pinned_paths": list(profile_pinned_paths),
+            "cli_pinned_paths": list(cli_pinned_paths),
+            "resolved_pinned_paths": [
+                ".".join(path) for path in getattr(schema, "pinned_paths", ())
+            ],
+            "search_knob_paths": [".".join(spec.path) for spec in schema.search_allowlist],
+        }
+    )
 
 
 def resolve_profile(
@@ -2391,13 +2432,23 @@ def _write_artifacts(
     winner: StudyRecord,
     schema: RecipeSchema,
     failure_counts: Mapping[str, int],
+    search_space_identity: Mapping[str, Any] | None = None,
 ) -> dict[str, Path]:
     pareto_path = out / "pareto.json"
     leaderboard_path = out / "leaderboard.csv"
     winner_path = out / "winner.recipe.yaml"
     tap_sidecar_path = out / "winner.tap-truncated.json"
     pareto_payload = dict(
-        _pareto_payload(profile, feedstock, fidelity, definitions, pareto, winner, schema)
+        _pareto_payload(
+            profile,
+            feedstock,
+            fidelity,
+            definitions,
+            pareto,
+            winner,
+            schema,
+            search_space_identity=search_space_identity,
+        )
     )
     pareto_payload["failure_counts"] = dict(failure_counts)
     pareto_path.write_text(
@@ -2614,8 +2665,9 @@ def _pareto_payload(
     pareto: Sequence[StudyRecord],
     winner: StudyRecord,
     schema: RecipeSchema,
+    search_space_identity: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
-    return {
+    payload = {
         "feedstock": feedstock,
         "fidelity": fidelity,
         "objectives": [_definition_payload(definition) for definition in definitions],
@@ -2625,6 +2677,9 @@ def _pareto_payload(
         "winner_candidate_id": winner.candidate_id,
         "winner_knob_saturation": _winner_knob_saturation_payload(winner),
     }
+    if search_space_identity is not None:
+        payload["search_space_identity"] = _jsonable_value(search_space_identity)
+    return payload
 
 
 def _winner_knob_saturation_payload(winner: StudyRecord) -> Any:
@@ -2747,6 +2802,8 @@ def _record_payload(
     record: StudyRecord,
     schema: RecipeSchema,
     profile: Mapping[str, Any],
+    *,
+    search_space_identity: Mapping[str, Any] | None = None,
 ) -> Mapping[str, Any]:
     patch = _materialized_record_patch(record, schema, profile)
     payload = {
@@ -2766,6 +2823,8 @@ def _record_payload(
         "trace_summary": _jsonable_value(record.trace_summary),
         "status": record.status,
     }
+    if search_space_identity is not None:
+        payload["search_space_identity"] = _jsonable_value(search_space_identity)
     if _is_tap_truncated(_composition_target_payload(record)):
         # Tap rows serialize materialized patch as primary; parent_trajectory_patch preserves metadata.
         payload["materialized_patch"] = patch
@@ -2775,7 +2834,3 @@ def _record_payload(
 
 def profile_id(profile: Mapping[str, Any]) -> str:
     return str(profile.get("profile_id") or profile.get("id") or "inline-profile")
-
-
-def _default_out_dir_for_tests() -> Path:
-    return Path(tempfile.mkdtemp(prefix="regolith-optimizer-study-"))

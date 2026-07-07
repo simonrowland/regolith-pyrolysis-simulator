@@ -62,6 +62,7 @@ except ImportError:  # pragma: no cover - project runtime normally has PyYAML.
 from scripts.seed_reduced_real_cache import payload_count, seed_cache
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evalspec import current_code_version
+from simulator.optimize.recipe import RecipeSchema
 from simulator.grind_preflight import (
     GrindSourceGateError,
     assert_grind_feedstock_stage0_route_coverage,
@@ -1002,6 +1003,7 @@ def seed_job_cache(
     *,
     point_sources: Sequence[Mapping[str, Any]] = (),
     job_id: str = "",
+    expected_seed_epoch: Mapping[str, Any] | None = None,
     seed_fn: Callable[[Path, Iterable[Path]], Mapping[str, Any]] = seed_cache,
 ) -> Mapping[str, Any]:
     del seed_fn
@@ -1011,11 +1013,12 @@ def seed_job_cache(
         shard_db,
         read_only_base_db_path=base_cache if base_cache.exists() else None,
     )
-    seeded = _seed_cache_rows_from_base(
+    seeded, rejected = _seed_cache_rows_from_base(
         shard_db,
         base_cache,
         point_sources=point_sources,
         job_id=job_id,
+        expected_seed_epoch=expected_seed_epoch,
     )
     seed_rows = len(seeded)
     return {
@@ -1027,6 +1030,11 @@ def seed_job_cache(
         "read_only_base": str(base_cache) if base_cache.exists() else None,
         "seed_source_table": SEED_SOURCE_TABLE if seeded else None,
         "seeded_point_sources": seeded,
+        "rejected_seed_rows": len(rejected),
+        "rejected_seed_point_sources": rejected,
+        "expected_seed_epoch": (
+            _plain_mapping(expected_seed_epoch) if expected_seed_epoch else None
+        ),
         "sources": [],
     }
 
@@ -1037,9 +1045,10 @@ def _seed_cache_rows_from_base(
     *,
     point_sources: Sequence[Mapping[str, Any]],
     job_id: str,
-) -> list[dict[str, Any]]:
+    expected_seed_epoch: Mapping[str, Any] | None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     if not point_sources:
-        return []
+        return [], []
     clean_sources = [_clean_point_source(point) for point in point_sources]
     if not base_cache.exists():
         raise FileNotFoundError(
@@ -1068,31 +1077,51 @@ def _seed_cache_rows_from_base(
         placeholders = ",".join("?" for _ in point_ids)
         rows = conn.execute(
             f"""
-            SELECT key_hash
+            SELECT key_hash, key_bytes
             FROM {_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}
             WHERE key_hash IN ({placeholders})
             """,
             tuple(point_ids),
         ).fetchall()
-        found_ids = {str(row["key_hash"]) for row in rows}
+        rows_by_hash = {str(row["key_hash"]): row for row in rows}
+        found_ids = set(rows_by_hash)
         missing = [point_id for point_id in point_ids if point_id not in found_ids]
         if missing:
             raise ValueError(
                 "acquisition seed point ids not found in base cache "
                 f"{base_cache}: {missing[:10]}"
             )
+        seeded_sources: list[dict[str, Any]] = []
+        rejected_sources: list[dict[str, Any]] = []
+        for point in clean_sources:
+            point_id = str(point["point_id"])
+            row = rows_by_hash[point_id]
+            key_payload = _seed_row_key_payload(row)
+            rejection = _seed_epoch_rejection(
+                key_payload,
+                expected_seed_epoch=expected_seed_epoch,
+            )
+            if rejection is not None:
+                rejected = dict(point)
+                rejected.update(rejection)
+                rejected_sources.append(rejected)
+                continue
+            seeded_sources.append(point)
+        seed_ids = [str(point["point_id"]) for point in seeded_sources]
         quoted_columns = ", ".join(columns)
-        conn.execute(
-            f"""
-            INSERT OR IGNORE INTO {PT1_EQUILIBRIUM_TABLE} ({quoted_columns})
-            SELECT {quoted_columns}
-            FROM {_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}
-            WHERE key_hash IN ({placeholders})
-            """,
-            tuple(point_ids),
-        )
+        if seed_ids:
+            seed_placeholders = ",".join("?" for _ in seed_ids)
+            conn.execute(
+                f"""
+                INSERT OR IGNORE INTO {PT1_EQUILIBRIUM_TABLE} ({quoted_columns})
+                SELECT {quoted_columns}
+                FROM {_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}
+                WHERE key_hash IN ({seed_placeholders})
+                """,
+                tuple(seed_ids),
+            )
         created_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-        for index, point in enumerate(clean_sources):
+        for index, point in enumerate(seeded_sources):
             conn.execute(
                 f"""
                 INSERT OR REPLACE INTO {SEED_SOURCE_TABLE} (
@@ -1114,7 +1143,70 @@ def _seed_cache_rows_from_base(
         conn.commit()
     finally:
         conn.close()
-    return clean_sources
+    return seeded_sources, rejected_sources
+
+
+def _current_seed_epoch_identity() -> dict[str, Any]:
+    schema = RecipeSchema()
+    return {
+        "allowlist_version": schema.allowlist_version,
+        "recipe_schema_version": schema.recipe_schema_version,
+        "recipe_id_required": True,
+    }
+
+
+def _seed_row_key_payload(row: sqlite3.Row) -> dict[str, Any]:
+    try:
+        raw = row["key_bytes"]
+        if isinstance(raw, str):
+            key_bytes = raw.encode("utf-8")
+        else:
+            key_bytes = bytes(raw)
+        decoded = json.loads(key_bytes.decode("utf-8"))
+    except (TypeError, ValueError, UnicodeDecodeError) as exc:
+        raise ValueError(
+            f"acquisition seed row has invalid key_bytes for {row['key_hash']!r}"
+        ) from exc
+    if not isinstance(decoded, Mapping):
+        raise ValueError(
+            f"acquisition seed row key_bytes is not a mapping for {row['key_hash']!r}"
+        )
+    return dict(decoded)
+
+
+def _seed_epoch_rejection(
+    key_payload: Mapping[str, Any],
+    *,
+    expected_seed_epoch: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not expected_seed_epoch:
+        return None
+    actual_allowlist = key_payload.get("allowlist_version")
+    expected_allowlist = expected_seed_epoch.get("allowlist_version")
+    if actual_allowlist != expected_allowlist:
+        return {
+            "rejected": "stale_seed_epoch",
+            "reason": "allowlist_version_mismatch",
+            "actual_allowlist_version": actual_allowlist,
+            "expected_allowlist_version": expected_allowlist,
+        }
+    if expected_seed_epoch.get("recipe_id_required") and not key_payload.get("recipe_id"):
+        return {
+            "rejected": "stale_seed_epoch",
+            "reason": "missing_recipe_id",
+            "actual_allowlist_version": actual_allowlist,
+            "expected_allowlist_version": expected_allowlist,
+        }
+    actual_recipe_schema = key_payload.get("recipe_schema_version")
+    expected_recipe_schema = expected_seed_epoch.get("recipe_schema_version")
+    if actual_recipe_schema is not None and actual_recipe_schema != expected_recipe_schema:
+        return {
+            "rejected": "stale_seed_epoch",
+            "reason": "recipe_schema_version_mismatch",
+            "actual_recipe_schema_version": actual_recipe_schema,
+            "expected_recipe_schema_version": expected_recipe_schema,
+        }
+    return None
 
 
 def _pt1_payload_columns(conn: sqlite3.Connection, table: str) -> list[str]:
@@ -1333,6 +1425,17 @@ def actualize_seed_source_summary(
     actual["source_counts"] = counts
     actual["point_sources"] = point_sources
     actual["seed_rows"] = int(seed_summary.get("seed_rows", len(point_sources)))
+    rejected = [
+        _plain_mapping(point)
+        for point in seed_summary.get("rejected_seed_point_sources", [])
+        if isinstance(point, Mapping)
+    ]
+    actual["rejected_seed_rows"] = int(
+        seed_summary.get("rejected_seed_rows", len(rejected))
+    )
+    actual["rejected_seed_point_sources"] = rejected
+    if seed_summary.get("expected_seed_epoch"):
+        actual["expected_seed_epoch"] = _plain_mapping(seed_summary["expected_seed_epoch"])
     if seed_summary.get("seed_source_table"):
         actual["seed_source_table"] = str(seed_summary["seed_source_table"])
     for source in actual.get("sources", []):
@@ -1785,6 +1888,7 @@ def _prepare_job_run(
         manifest.base_cache,
         point_sources=seed_source_summary.get("point_sources", ()),
         job_id=job.id,
+        expected_seed_epoch=_current_seed_epoch_identity(),
     )
     seed_rows = int(seed_summary.get("seed_rows", 0))
     seed_source_summary = actualize_seed_source_summary(

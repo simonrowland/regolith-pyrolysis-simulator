@@ -117,22 +117,32 @@ def _ranked_drain(
     }
 
 
-def _pt1_cache_key(tag: str) -> dict[str, object]:
+def _pt1_cache_key(
+    tag: str,
+    *,
+    allowlist_version: str | None = None,
+    recipe_schema_version: str | None = None,
+    recipe_id: str | None = None,
+) -> dict[str, object]:
+    schema = epoch_grind.RecipeSchema()
     return {
+        "allowlist_version": allowlist_version or schema.allowlist_version,
         "artifact": "freeze_gate_curve",
         "corpus_version": current_corpus_version(),
         "data_digests": {"fixture": "v1"},
+        "recipe_id": recipe_id or hashlib.sha256(f"recipe:{tag}".encode()).hexdigest(),
+        "recipe_schema_version": recipe_schema_version or schema.recipe_schema_version,
         "schema_version": "test",
         "tag": tag,
     }
 
 
-def _pt1_cache_point_id(tag: str) -> str:
-    return hashlib.sha256(canonical_json_bytes(_pt1_cache_key(tag))).hexdigest()
+def _pt1_cache_point_id(tag: str, **kwargs: object) -> str:
+    return hashlib.sha256(canonical_json_bytes(_pt1_cache_key(tag, **kwargs))).hexdigest()
 
 
-def _put_pt1_cache_row(db_path: Path, tag: str) -> str:
-    key = _pt1_cache_key(tag)
+def _put_pt1_cache_row(db_path: Path, tag: str, **kwargs: object) -> str:
+    key = _pt1_cache_key(tag, **kwargs)
     payload = {"curve": {"status": "in_range", "tag": tag}}
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
@@ -1379,6 +1389,49 @@ def test_merge_epoch_shards_preserves_seed_source_labels_in_base_cache(tmp_path:
         con.close()
     assert merge_summary["seed_source_rows"] == 1
     assert rows == [(point_id, "ladder_polish", "job-a")]
+
+
+def test_seed_job_cache_rejects_stale_epoch_seed_without_counting_coverage(
+    tmp_path: Path,
+) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "epoch" / "shards" / "job-a.sqlite"
+    current_id = _put_pt1_cache_row(base, "current")
+    stale_id = _put_pt1_cache_row(
+        base,
+        "stale",
+        allowlist_version="allowlist-old",
+    )
+
+    summary = epoch_grind.seed_job_cache(
+        shard,
+        base,
+        point_sources=[
+            {"point_id": current_id, "source": "ladder_polish"},
+            {"point_id": stale_id, "source": "calibration_uniform"},
+        ],
+        job_id="job-a",
+        expected_seed_epoch=epoch_grind._current_seed_epoch_identity(),
+    )
+
+    assert summary["seed_rows"] == 1
+    assert summary["rejected_seed_rows"] == 1
+    assert payload_count(shard) == 1
+    rejected = summary["rejected_seed_point_sources"][0]
+    assert rejected["point_id"] == stale_id
+    assert rejected["reason"] == "allowlist_version_mismatch"
+
+    con = sqlite3.connect(shard)
+    try:
+        rows = con.execute(
+            f"""
+            SELECT point_id, source
+            FROM {epoch_grind.SEED_SOURCE_TABLE}
+            """
+        ).fetchall()
+    finally:
+        con.close()
+    assert rows == [(current_id, "ladder_polish")]
 
 
 def test_schema_gate_passthrough_from_merge(tmp_path: Path) -> None:

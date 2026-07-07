@@ -959,7 +959,7 @@ def _profile_campaign_setting(
     for seed in profile.get("seed_recipes", ()) or ():
         if not isinstance(seed, Mapping):
             continue
-        if campaign not in _seed_source_campaigns(seed):
+        if campaign not in seed_source_campaigns(seed):
             continue
         value = _campaign_setting(seed.get("patch"), campaign, key)
         if value is not None:
@@ -981,7 +981,7 @@ def _campaign_setting(source: Any, campaign: str, key: str) -> Any:
     return source.get(key)
 
 
-def _seed_source_campaigns(seed: Mapping[str, Any]) -> frozenset[str]:
+def seed_source_campaigns(seed: Mapping[str, Any]) -> frozenset[str]:
     campaigns: set[str] = set()
     source_campaign = seed.get("source_campaign")
     if source_campaign is not None:
@@ -1133,6 +1133,19 @@ def _validate_seed_recipes(
             raise ProfileValidationError(
                 f"{source}: {where} requires source_campaign or source_campaigns"
             )
+        if "source_campaigns" in seed:
+            source_campaigns = seed["source_campaigns"]
+            if not isinstance(source_campaigns, list) or not source_campaigns:
+                raise ProfileValidationError(
+                    f"{source}: {where}.source_campaigns must be a non-empty "
+                    f"list of campaign names; got {source_campaigns!r}"
+                )
+            for entry in source_campaigns:
+                if not isinstance(entry, str) or not entry.strip():
+                    raise ProfileValidationError(
+                        f"{source}: {where}.source_campaigns entries must be "
+                        f"non-empty strings; got {entry!r}"
+                    )
         patch = seed["patch"]
         if not isinstance(patch, Mapping):
             raise ProfileValidationError(f"{source}: {where}.patch must be a mapping")

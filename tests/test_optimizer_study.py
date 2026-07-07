@@ -1133,6 +1133,17 @@ def test_study_applies_profile_and_cli_pins_to_strategy_search(tmp_path) -> None
     assert cli_pin not in observed_paths[0]
     assert searched_pressure in observed_paths[0]
     assert searched_ramp in observed_paths[0]
+    pareto = json.loads((tmp_path / "pareto.json").read_text(encoding="utf-8"))
+    identity = pareto["search_space_identity"]
+    assert identity["profile_pinned_paths"] == [
+        "C2A_staged.stages.alkali_early_fe.target_C"
+    ]
+    assert identity["cli_pinned_paths"] == ["C2A_staged.stages.sio_window.target_C"]
+    assert "campaigns.C2A_staged.stages.sio_window.target_C" in identity[
+        "resolved_pinned_paths"
+    ]
+    provenance = _read_provenance(tmp_path)
+    assert provenance[0]["search_space_identity"] == identity
 
 
 def test_study_surfaces_knob_saturation_in_pareto_and_provenance(tmp_path) -> None:

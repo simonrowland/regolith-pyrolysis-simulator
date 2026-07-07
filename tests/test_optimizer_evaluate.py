@@ -681,6 +681,31 @@ def _knudsen_no_flow_profile() -> dict:
     }
 
 
+def test_profile_campaign_setting_respects_plural_source_campaigns() -> None:
+    profile = _knudsen_gate_profile()
+    seed = dict(profile["seed_recipes"][0])
+    seed.pop("source_campaign")
+    seed["source_campaigns"] = ["C2A_continuous"]
+    profile["seed_recipes"] = [seed]
+
+    assert (
+        evaluate_module._profile_campaign_setting(
+            profile,
+            "C2A_continuous",
+            "p_total_mbar_default",
+        )
+        == 10
+    )
+    assert (
+        evaluate_module._profile_campaign_setting(
+            profile,
+            "C4",
+            "p_total_mbar_default",
+        )
+        is None
+    )
+
+
 def _hand_knudsen_number(
     pressure_mbar: float,
     gas_temperature_C: float,
