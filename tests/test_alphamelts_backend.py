@@ -1296,6 +1296,7 @@ def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys()
             {species: {} for species in vapor},
             {},
         ),
+        _build_partial_melt_offgassing_diagnostic=lambda *a, **k: {},
         _dispatch_only=_dispatch_only,
     )
 
