@@ -97,6 +97,8 @@ EXPLORE_CACHE_TIER_CEILING = "cached_interpolated"
 CERTIFY_CACHE_TIER_CEILING = "cached_exact"
 DEFAULT_TWO_PHASE_TOP_K = 10
 _TWO_PHASE_CERTIFICATION_NAME = "two_phase_certification.json"
+_SSO2_OBJECTIVE_METRIC = "sso2_pn2_fe_drain_silica"
+_SSO2_OBJECTIVE_TRACE_KEY = "sso2_objective_evidence"
 _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
     {
         "campaigns_to_resinter",
@@ -1946,7 +1948,7 @@ def _to_record(candidate: Candidate, scored: ScoredResult, *, cache_hit: bool) -
         notes=scored.notes,
         cache_hit=cache_hit,
         product_summary=_product_summary_mapping(scored.run_reference),
-        trace_summary=_trace_summary_mapping(scored.run_reference),
+        trace_summary=_trace_summary_mapping(scored),
     )
 
 
@@ -2048,7 +2050,15 @@ def _apply_tap_coating_product_summary(
             summary[key] = tap_summary[key]
 
 
-def _trace_summary_mapping(reference: RunReference | None) -> Mapping[str, Any]:
+def _trace_summary_mapping(scored: ScoredResult | RunReference | None) -> Mapping[str, Any]:
+    if not isinstance(scored, ScoredResult):
+        return _run_reference_trace_summary(scored)
+    payload: dict[str, Any] = dict(_run_reference_trace_summary(scored.run_reference))
+    payload.update(_objective_evidence_trace_summary(scored.objectives))
+    return MappingProxyType(payload)
+
+
+def _run_reference_trace_summary(reference: RunReference | None) -> Mapping[str, Any]:
     if reference is None or not isinstance(reference.trace, Mapping):
         return MappingProxyType({})
     return _light_backend_status_trace_for_reference(reference)
@@ -2092,6 +2102,58 @@ def _light_backend_status_trace_for_reference(
             if key in reference.trace:
                 payload[key] = _jsonable_value(reference.trace[key])
         _project_interpolation_ranked_drain_summary(reference.trace, payload)
+    return MappingProxyType(payload)
+
+
+def _objective_evidence_trace_summary(objectives: ObjectiveVector | None) -> Mapping[str, Any]:
+    if objectives is None:
+        return MappingProxyType({})
+    objective_values = objectives.as_mapping()
+    if _SSO2_OBJECTIVE_METRIC not in objective_values:
+        return MappingProxyType({})
+    evidence = objectives.evidence.get(_SSO2_OBJECTIVE_METRIC)
+    if not isinstance(evidence, Mapping):
+        return MappingProxyType({
+            _SSO2_OBJECTIVE_TRACE_KEY: {
+                "reader": _SSO2_OBJECTIVE_METRIC,
+                "status": "evidence_absent",
+                "status_reason": "stored objective row has no SSO-2 evidence payload",
+                "consumed_fields": [],
+            }
+        })
+    return MappingProxyType({_SSO2_OBJECTIVE_TRACE_KEY: _sso2_evidence_projection(evidence)})
+
+
+def _sso2_evidence_projection(reader: Mapping[str, Any]) -> Mapping[str, Any]:
+    payload: dict[str, Any] = {
+        "reader": str(reader.get("reader", _SSO2_OBJECTIVE_METRIC)),
+        "status": str(reader.get("status", "")),
+        "status_reason": str(reader.get("status_reason", "")),
+        "consumed_fields": _jsonable_value(reader.get("consumed_fields", [])),
+    }
+    if "score" in reader:
+        payload["score"] = _jsonable_value(reader["score"])
+    score_components = reader.get("score_components")
+    if isinstance(score_components, Mapping):
+        payload["score_components"] = _jsonable_value(score_components)
+    evidence = reader.get("evidence")
+    if isinstance(evidence, Mapping):
+        if "status" in evidence:
+            payload["evidence_status"] = _jsonable_value(evidence["status"])
+        if "status_reason" in evidence:
+            payload["evidence_status_reason"] = _jsonable_value(
+                evidence["status_reason"]
+            )
+        for key in (
+            "certified_sso_r_surface",
+            "delivered_stream_purity",
+            "stage_3",
+            "fe_tap",
+            "wall_coating",
+            "mass_balance",
+        ):
+            if key in evidence:
+                payload[key] = _jsonable_value(evidence[key])
     return MappingProxyType(payload)
 
 
@@ -2216,6 +2278,36 @@ def _composition_target_leaderboard_row(
     }
 
 
+def _sso2_objective_leaderboard_fields(records: Sequence[StudyRecord]) -> tuple[str, ...]:
+    if not any(isinstance(record.trace_summary.get(_SSO2_OBJECTIVE_TRACE_KEY), Mapping) for record in records):
+        return ()
+    return (
+        "sso2_reader_status",
+        "sso2_reader_status_reason",
+        "sso2_consumed_fields_json",
+        "sso2_certified_surface_json",
+    )
+
+
+def _sso2_objective_leaderboard_row(
+    record: StudyRecord,
+    fields: Sequence[str],
+) -> dict[str, Any]:
+    if not fields:
+        return {}
+    payload = record.trace_summary.get(_SSO2_OBJECTIVE_TRACE_KEY)
+    if not isinstance(payload, Mapping):
+        return {field: "" for field in fields}
+    return {
+        "sso2_reader_status": str(payload.get("status", "")),
+        "sso2_reader_status_reason": str(payload.get("status_reason", "")),
+        "sso2_consumed_fields_json": _json_dump_value(payload.get("consumed_fields", [])),
+        "sso2_certified_surface_json": _json_dump_value(
+            payload.get("certified_sso_r_surface", {})
+        ),
+    }
+
+
 def _status(scored: ScoredResult) -> str:
     if scored.failure_category is not None:
         return scored.failure_category.value
@@ -2259,6 +2351,8 @@ def _jsonable_value(value: Any) -> Any:
     if isinstance(value, list):
         return [_jsonable_value(item) for item in value]
     if isinstance(value, float):
+        if math.isnan(value):
+            return "nan"
         return _json_number(value, "json value")
     json.dumps(value)
     return value
@@ -2585,6 +2679,7 @@ def _write_leaderboard(
     margin_names = sorted({name for record in leaderboard for name in record.feasibility_margins})
     coating_fields = _coating_leaderboard_fields(leaderboard)
     composition_target_fields = _composition_target_leaderboard_fields(leaderboard)
+    sso2_objective_fields = _sso2_objective_leaderboard_fields(leaderboard)
     materialized_patch_fields = _materialized_patch_leaderboard_fields(leaderboard)
     fieldnames = [
         "rank",
@@ -2596,6 +2691,7 @@ def _write_leaderboard(
         *(f"margin_{name}" for name in margin_names),
         *coating_fields,
         *composition_target_fields,
+        *sso2_objective_fields,
         *materialized_patch_fields,
         "patch_json",
     ]
@@ -2631,6 +2727,7 @@ def _write_leaderboard(
             )
             row.update(_coating_leaderboard_row(record, coating_fields))
             row.update(_composition_target_leaderboard_row(record, composition_target_fields))
+            row.update(_sso2_objective_leaderboard_row(record, sso2_objective_fields))
             row.update(
                 _materialized_patch_leaderboard_row(
                     record,

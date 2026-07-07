@@ -16,6 +16,7 @@ from pathlib import Path
 import sqlite3
 import threading
 import time
+import warnings
 from typing import Any, Mapping, Sequence
 
 from simulator.corpus_version import current_corpus_version
@@ -47,6 +48,7 @@ from simulator.fidelity_vocabulary import backend_name_denies_authority
 from simulator.optimize.result_scope import result_scope_json, selector_where
 
 SCHEMA_VERSION = 4
+OBJECTIVE_EVIDENCE_SCHEMA_VERSION = 1
 DEFAULT_BUSY_TIMEOUT_MS = 30000
 WRITE_RETRY_ATTEMPTS = 8
 WRITE_RETRY_BASE_DELAY_S = 0.05
@@ -1105,25 +1107,33 @@ def _eval_spec_kwargs(eval_spec_cls: type[EvalSpec], payload: Mapping[str, Any])
 def _serialize_objectives(objectives: ObjectiveVector | None) -> list[dict[str, Any]]:
     if objectives is None:
         return []
-    return [
-        {
+    evidence_by_metric = objectives.evidence if isinstance(objectives.evidence, Mapping) else {}
+    rows: list[dict[str, Any]] = []
+    for value in objectives.values:
+        payload = {
             "metric": value.metric,
             "sense": value.sense,
             "value": value.value,
             "units": value.units,
             "ordinal": value.ordinal,
         }
-        for value in objectives.values
-    ]
+        if value.metric in evidence_by_metric:
+            payload["evidence_schema_version"] = OBJECTIVE_EVIDENCE_SCHEMA_VERSION
+            payload["evidence"] = _jsonable(evidence_by_metric[value.metric])
+        rows.append(payload)
+    return rows
 
 
 def _deserialize_objectives(payload: Sequence[Mapping[str, Any]]) -> ObjectiveVector | None:
     if not payload:
         return None
-    return ObjectiveVector(
-        tuple(
+    values: list[ObjectiveValue] = []
+    evidence: dict[str, Any] = {}
+    for ordinal, item in enumerate(payload):
+        metric = str(item["metric"])
+        values.append(
             ObjectiveValue(
-                metric=str(item["metric"]),
+                metric=metric,
                 sense=_objective_payload_sense(item),
                 value=(
                     None
@@ -1133,9 +1143,28 @@ def _deserialize_objectives(payload: Sequence[Mapping[str, Any]]) -> ObjectiveVe
                 units=str(item.get("units", "")),
                 ordinal=int(item.get("ordinal", ordinal)),
             )
-            for ordinal, item in enumerate(payload)
         )
+        evidence_payload = _objective_evidence_payload(metric, item)
+        if evidence_payload is not None:
+            evidence[metric] = evidence_payload
+    return ObjectiveVector(tuple(values), evidence=evidence)
+
+
+def _objective_evidence_payload(metric: str, item: Mapping[str, Any]) -> Any | None:
+    if "evidence" not in item:
+        return None
+    version = item.get("evidence_schema_version")
+    if version == OBJECTIVE_EVIDENCE_SCHEMA_VERSION and not isinstance(version, bool):
+        return _jsonable(item["evidence"])
+    warnings.warn(
+        (
+            f"objective evidence for {metric!r} has unsupported "
+            f"evidence_schema_version {version!r}; treating evidence as absent"
+        ),
+        RuntimeWarning,
+        stacklevel=2,
     )
+    return None
 
 
 def _column_exists(conn: sqlite3.Connection, table: str, column: str) -> bool:

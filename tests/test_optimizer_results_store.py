@@ -330,6 +330,167 @@ def test_interpolation_diagnostics_do_not_change_result_store_row_key(tmp_path) 
     assert store.fetch(expected_key).cache_key == expected_key
 
 
+def test_objective_evidence_round_trips_without_changing_result_store_key(tmp_path) -> None:
+    metric = "sso2_pn2_fe_drain_silica"
+    spec = _base_spec(profile_id="sso2-owner")
+    expected_key = cache_key(spec)
+    evidence = {
+        "reader": metric,
+        "status": "missing_fe_tap_evidence",
+        "status_reason": "Fe tap evidence is missing",
+        "consumed_fields": (
+            "delivered_stream_purity.margin",
+            "fe_tap.Fe_kg",
+        ),
+        "evidence": {
+            "certified_sso_r_surface": {
+                "dose_species": "Na",
+                "pN2_mbar": 99.99,
+            }
+        },
+    }
+    objectives = ObjectiveVector(
+        (ObjectiveValue(metric, "maximize", 0.0, "score_0_1", ordinal=0),),
+        evidence={metric: evidence},
+    )
+    scored = _scored(
+        spec,
+        objectives=objectives,
+        result_blob={"backend_status": "ok", "hours": [{"hour": 1}], "status": "ok"},
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, scored, created_at="2026-07-06T00:00:00Z")
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        row = conn.execute(
+            "SELECT cache_key, objectives FROM results WHERE cache_key = ?",
+            (expected_key,),
+        ).fetchone()
+        scalar_row = conn.execute(
+            "SELECT metric, value FROM objective_values WHERE cache_key = ?",
+            (expected_key,),
+        ).fetchone()
+    payload = json.loads(row[1])
+    loaded = store.fetch(expected_key)
+
+    assert row[0] == expected_key
+    assert scalar_row == (metric, 0.0)
+    assert payload[0]["evidence_schema_version"] == 1
+    assert payload[0]["evidence"]["status"] == "missing_fe_tap_evidence"
+    assert payload[0]["evidence"]["consumed_fields"] == [
+        "delivered_stream_purity.margin",
+        "fe_tap.Fe_kg",
+    ]
+    assert loaded is not None
+    assert loaded.cache_key == expected_key
+    assert loaded.objectives is not None
+    loaded_evidence = loaded.objectives.evidence[metric]
+    assert loaded_evidence["status_reason"] == "Fe tap evidence is missing"
+    assert loaded_evidence["evidence"]["certified_sso_r_surface"]["dose_species"] == "Na"
+
+
+def test_objective_evidence_json_stringifies_none_and_nonfinite_values(tmp_path) -> None:
+    metric = "sso2_pn2_fe_drain_silica"
+    spec = _base_spec(profile_id="sso2-nonfinite")
+    expected_key = cache_key(spec)
+    objectives = ObjectiveVector(
+        (ObjectiveValue(metric, "maximize", 0.0, "score_0_1", ordinal=0),),
+        evidence={
+            metric: {
+                "reader": metric,
+                "status": "available",
+                "score_components": {
+                    "none_value": None,
+                    "nan_value": math.nan,
+                    "positive_inf": math.inf,
+                    "negative_inf": -math.inf,
+                },
+            }
+        },
+    )
+    scored = _scored(
+        spec,
+        objectives=objectives,
+        result_blob={"backend_status": "ok", "hours": [{"hour": 1}], "status": "ok"},
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, scored, created_at="2026-07-06T00:00:00Z")
+
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        row = conn.execute(
+            "SELECT objectives FROM results WHERE cache_key = ?",
+            (expected_key,),
+        ).fetchone()
+    payload = json.loads(row[0])
+    score_components = payload[0]["evidence"]["score_components"]
+    loaded = store.fetch(expected_key)
+
+    assert score_components == {
+        "negative_inf": "-inf",
+        "nan_value": "nan",
+        "none_value": None,
+        "positive_inf": "inf",
+    }
+    assert loaded is not None and loaded.objectives is not None
+    assert loaded.objectives.evidence[metric]["score_components"] == score_components
+
+
+def test_objective_evidence_unknown_schema_version_warns_and_reads_absent(tmp_path) -> None:
+    metric = "sso2_pn2_fe_drain_silica"
+    spec = _base_spec(profile_id="sso2-unknown-version")
+    expected_key = cache_key(spec)
+    objectives = ObjectiveVector(
+        (ObjectiveValue(metric, "maximize", 0.5, "score_0_1", ordinal=0),),
+        evidence={
+            metric: {
+                "reader": metric,
+                "status": "available",
+                "evidence": {"status": "available"},
+            }
+        },
+    )
+    scored = _scored(
+        spec,
+        objectives=objectives,
+        result_blob={"backend_status": "ok", "hours": [{"hour": 1}], "status": "ok"},
+    )
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+
+    store.store(spec, scored, created_at="2026-07-06T00:00:00Z")
+    with sqlite3.connect(tmp_path / "results.sqlite") as conn:
+        row = conn.execute(
+            "SELECT objectives FROM results WHERE cache_key = ?",
+            (expected_key,),
+        ).fetchone()
+        payload = json.loads(row[0])
+        payload[0]["evidence_schema_version"] = 999
+        conn.execute(
+            "UPDATE results SET objectives = ? WHERE cache_key = ?",
+            (json.dumps(payload), expected_key),
+        )
+
+    with pytest.warns(RuntimeWarning, match="unsupported evidence_schema_version"):
+        loaded = store.fetch(expected_key)
+
+    assert loaded is not None and loaded.objectives is not None
+    assert loaded.objectives.as_mapping()[metric] == pytest.approx(0.5)
+    assert metric not in loaded.objectives.evidence
+
+
 def test_store_rejects_feasible_out_of_domain_backend_status_reason_from_cache_write(
     tmp_path,
 ) -> None:

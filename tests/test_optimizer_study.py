@@ -23,13 +23,14 @@ from simulator.optimize import study
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
 from simulator.optimize.evaluate import evaluate
-from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
+from simulator.optimize.objective import ObjectiveValue, ObjectiveVector, compute_objectives
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.physics import physics_constraints_digest
 from simulator.optimize.profiles import physics_constraints_from_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.strategy import (
+    Candidate,
     MorrisScreenStrategy,
     OptunaNSGA2Strategy,
     OptunaTPEStrategy,
@@ -299,6 +300,289 @@ def _stored_rows(out_dir: Path) -> list[ScoredResult]:
 
 def _read_provenance(out_dir: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in (out_dir / "provenance.jsonl").read_text().splitlines()]
+
+
+def _sso2_objective_profile(profile_id: str) -> dict[str, Any]:
+    return {
+        **PROFILE,
+        "profile_id": profile_id,
+        "objectives": [
+            {
+                "metric": "sso2_pn2_fe_drain_silica",
+                "sense": "maximize",
+                "units": "score_0_1",
+                "weight": 1.0,
+                "rationale": "test SSO-2 evidence projection",
+            }
+        ],
+    }
+
+
+def test_sso2_objective_evidence_projects_reader_failure_without_field_collision(tmp_path) -> None:
+    metric = "sso2_pn2_fe_drain_silica"
+    profile = _sso2_objective_profile("sso2-study-test")
+    spec = _spec(RecipePatch({}), FEEDSTOCK, "stub", profile)
+    evidence = {
+        "reader": metric,
+        "status": "wall_coating_failed",
+        "status_reason": "wall coating failed",
+        "consumed_fields": (
+            "delivered_stream_purity.margin",
+            "fe_tap.Fe_kg",
+        ),
+        "score": 0.0,
+        "evidence": {
+            "status": "available",
+            "status_reason": "",
+            "certified_sso_r_surface": {
+                "dose_species": "Na",
+                "declared_pN2_mbar": 99.99,
+                "source": "quoted \"surface\", line\nnext",
+            },
+            "fe_tap": {
+                "status": "available",
+                "status_reason": "",
+            },
+            "wall_coating": {
+                "status": "wall_coating_failed",
+                "status_reason": "liner failed",
+            },
+        },
+    }
+    scored = ScoredResult(
+        candidate_id="sso2-candidate",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (ObjectiveValue(metric, "maximize", 0.0, "score_0_1", ordinal=0),),
+            evidence={metric: evidence},
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        failing_gates=(),
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+            },
+        ),
+    )
+
+    record = study._to_record(
+        Candidate("sso2-candidate", RecipePatch({})),
+        scored,
+        cache_hit=True,
+    )
+    summary = record.trace_summary["sso2_objective_evidence"]
+    assert summary["status"] == "wall_coating_failed"
+    assert summary["status_reason"] == "wall coating failed"
+    assert summary["evidence_status"] == "available"
+    assert summary["consumed_fields"] == [
+        "delivered_stream_purity.margin",
+        "fe_tap.Fe_kg",
+    ]
+    assert summary["certified_sso_r_surface"]["dose_species"] == "Na"
+
+    leaderboard_path = tmp_path / "leaderboard.csv"
+    study._write_leaderboard(
+        leaderboard_path,
+        (record,),
+        (record,),
+        record,
+        study.objective_definitions(profile),
+        RecipeSchema(),
+        profile=profile,
+    )
+    row = next(csv.DictReader(leaderboard_path.open(encoding="utf-8")))
+
+    assert row["sso2_reader_status"] == "wall_coating_failed"
+    assert row["sso2_reader_status_reason"] == "wall coating failed"
+    assert json.loads(row["sso2_consumed_fields_json"]) == [
+        "delivered_stream_purity.margin",
+        "fe_tap.Fe_kg",
+    ]
+    certified_surface = json.loads(row["sso2_certified_surface_json"])
+    assert certified_surface["dose_species"] == "Na"
+    assert certified_surface["source"] == "quoted \"surface\", line\nnext"
+
+
+class _Sso2AbsenceLedger:
+    registry = {}
+    transitions = (SimpleNamespace(name="native_fe_saturation_split"),)
+
+    def kg_by_account(self, account: str | None = None) -> dict[str, dict[str, float]] | dict[str, float]:
+        balances = {
+            "terminal.drain_tap_material": {},
+            "process.metal_phase": {"Fe": 1.0},
+        }
+        if account is None:
+            return {key: dict(value) for key, value in balances.items()}
+        return dict(balances.get(account, {}))
+
+
+class _Sso2AbsenceSim:
+    def __init__(self, snapshots: tuple[Any, ...]) -> None:
+        self.atom_ledger = _Sso2AbsenceLedger()
+        self.species_formula_registry = {}
+        self.train = SimpleNamespace(
+            stages=(
+                SimpleNamespace(collected_kg={}),
+                SimpleNamespace(collected_kg={}),
+                SimpleNamespace(collected_kg={}),
+                SimpleNamespace(collected_kg={"SiO": 1.0}),
+            )
+        )
+        self.record = SimpleNamespace(
+            feedstock_key=FEEDSTOCK,
+            batch_mass_kg=1000.0,
+            additives_kg={},
+            snapshots=snapshots,
+            total_hours=1,
+        )
+        self.melt = SimpleNamespace(hour=1)
+        self.energy_electrical_plus_evaporation_cumulative_kWh = 1.0
+
+    def product_ledger(self) -> dict[str, float]:
+        return {}
+
+    def _terminal_rump_by_species(self) -> dict[str, float]:
+        return {}
+
+    def _oxygen_terminal_partition_kg(self) -> dict[str, float]:
+        return {"stored": 0.0, "vented": 0.0, "total": 0.0}
+
+
+def _sso2_absent_tap_run_execution() -> SimpleNamespace:
+    native_partition = {
+        "native_fe_pool_mol": 1.0,
+        "native_fe_tap_mol": 1.0,
+        "native_fe_vapor_mol": 0.0,
+    }
+    snapshot = SimpleNamespace(
+        hour=1,
+        mass_balance_error_pct=0.0,
+        fe_redox_split={"native_fe_partition": native_partition},
+    )
+    snapshots = (snapshot,)
+    trace = SimpleNamespace(
+        snapshots=snapshots,
+        condensed_by_stage_species_delta=({(3, "SiO"): 1.0},),
+        wall_deposit_by_segment_species_delta=({},),
+        wall_zone_by_segment={},
+    )
+    return SimpleNamespace(
+        simulator=_Sso2AbsenceSim(snapshots),
+        snapshots=snapshots,
+        trace=trace,
+    )
+
+
+def _stored_sso2_record(
+    tmp_path: Path,
+    *,
+    profile_id: str,
+    objectives: ObjectiveVector,
+) -> study.StudyRecord:
+    profile = _sso2_objective_profile(profile_id)
+    spec = _spec(RecipePatch({}), FEEDSTOCK, "stub", profile)
+    scored = ScoredResult(
+        candidate_id=f"{profile_id}-candidate",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=objectives,
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        failing_gates=(),
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+            },
+        ),
+    )
+    store = ResultStore(
+        tmp_path / f"{profile_id}.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+    store.store(spec, scored, created_at="2026-07-06T00:00:00Z")
+    loaded = store.fetch(cache_key(spec))
+    assert loaded is not None
+    return study._to_record(
+        Candidate(f"{profile_id}-candidate", RecipePatch({})),
+        loaded,
+        cache_hit=True,
+    )
+
+
+def test_sso2_missing_tap_evidence_chains_through_store_to_leaderboard(tmp_path) -> None:
+    metric = "sso2_pn2_fe_drain_silica"
+    profile = _sso2_objective_profile("sso2-missing-tap")
+    objectives = compute_objectives(profile, _sso2_absent_tap_run_execution())
+    assert objectives.evidence[metric]["status"] == "missing_fe_tap_evidence"
+
+    record = _stored_sso2_record(
+        tmp_path,
+        profile_id="sso2-missing-tap",
+        objectives=objectives,
+    )
+    summary = record.trace_summary["sso2_objective_evidence"]
+    assert summary["status"] == "missing_fe_tap_evidence"
+    assert "terminal.drain_tap_material kg evidence is absent" in summary["status_reason"]
+    assert summary["fe_tap"]["Fe_kg"] is None
+
+    leaderboard_path = tmp_path / "missing-tap-leaderboard.csv"
+    study._write_leaderboard(
+        leaderboard_path,
+        (record,),
+        (record,),
+        record,
+        study.objective_definitions(profile),
+        RecipeSchema(),
+        profile=profile,
+    )
+    row = next(csv.DictReader(leaderboard_path.open(encoding="utf-8")))
+    assert row["sso2_reader_status"] == "missing_fe_tap_evidence"
+    assert "terminal.drain_tap_material kg evidence is absent" in row[
+        "sso2_reader_status_reason"
+    ]
+
+
+def test_sso2_legacy_row_without_evidence_reads_as_evidence_absent(tmp_path) -> None:
+    metric = "sso2_pn2_fe_drain_silica"
+    profile = _sso2_objective_profile("sso2-legacy-no-evidence")
+    record = _stored_sso2_record(
+        tmp_path,
+        profile_id="sso2-legacy-no-evidence",
+        objectives=ObjectiveVector(
+            (ObjectiveValue(metric, "maximize", 0.25, "score_0_1", ordinal=0),)
+        ),
+    )
+    summary = record.trace_summary["sso2_objective_evidence"]
+    assert summary == {
+        "reader": metric,
+        "status": "evidence_absent",
+        "status_reason": "stored objective row has no SSO-2 evidence payload",
+        "consumed_fields": [],
+    }
+
+    leaderboard_path = tmp_path / "legacy-leaderboard.csv"
+    study._write_leaderboard(
+        leaderboard_path,
+        (record,),
+        (record,),
+        record,
+        study.objective_definitions(profile),
+        RecipeSchema(),
+        profile=profile,
+    )
+    row = next(csv.DictReader(leaderboard_path.open(encoding="utf-8")))
+    assert row["sso2_reader_status"] == "evidence_absent"
+    assert row["sso2_certified_surface_json"] == "{}"
 
 
 def _evaluator(
