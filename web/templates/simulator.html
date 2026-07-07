@@ -256,20 +256,33 @@
             </div>
         </div>
 
-        <!-- Melt Fe redox status -->
+        <!-- Melt Fe redox diagnostics -->
         <div id="redox-card" class="section-card shuttle-card" data-redox-panel>
-            <h3>Melt Fe Redox</h3>
+            <h3>Melt Fe Redox Diagnostics</h3>
+            <div class="config-hint">Diagnostic ferric/ferrous speciation; not a certified assay.</div>
             <div class="shuttle-grid">
                 <div class="shuttle-metric">
                     <div class="metric-label">fO2 log</div>
                     <div class="metric-value" id="redox-fo2-log">—</div>
                 </div>
                 <div class="shuttle-metric">
-                    <div class="metric-label">Ferric fraction</div>
+                    <div class="metric-label">Ferric fraction diagnostic</div>
                     <div class="metric-value" id="redox-ferric-frac">—</div>
                 </div>
                 <div class="shuttle-metric">
-                    <div class="metric-label">Native Fe fraction</div>
+                    <div class="metric-label">Ferrous fraction diagnostic</div>
+                    <div class="metric-value" id="redox-ferrous-frac">—</div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Fe3+/sigma Fe diagnostic</div>
+                    <div class="metric-value" id="redox-fe3-sigma-fe">—</div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Fe2O3/FeO molar diagnostic</div>
+                    <div class="metric-value" id="redox-fe2o3-feo-molar">—</div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Native Fe fraction diagnostic</div>
                     <div class="metric-value" id="redox-native-fe-frac">—</div>
                 </div>
                 <div class="shuttle-metric">
@@ -281,19 +294,33 @@
                     <div class="metric-value" id="redox-native-fe-partition">—</div>
                 </div>
                 <div class="shuttle-metric">
-                    <div class="metric-label">Stage 3 Fe</div>
+                    <div class="metric-label">Stage 3 Fe diagnostic</div>
                     <div class="metric-value" id="redox-stage3-fe">—</div>
                 </div>
                 <div class="shuttle-metric">
-                    <div class="metric-label">Stage 3 total</div>
+                    <div class="metric-label">Stage 3 total diagnostic</div>
                     <div class="metric-value" id="redox-stage3-total">—</div>
                 </div>
                 <div class="shuttle-metric">
-                    <div class="metric-label">Stage 3 Fe wt%</div>
+                    <div class="metric-label">Stage 3 Fe wt% diagnostic</div>
                     <div class="metric-value" id="redox-stage3-fe-wt">—</div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Redox source net</div>
+                    <div class="metric-value" id="redox-source-net">—</div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Redox source fO2 delta</div>
+                    <div class="metric-value" id="redox-source-delta-log10">—</div>
+                </div>
+                <div class="shuttle-metric">
+                    <div class="metric-label">Ferric divergence status</div>
+                    <div class="metric-value" id="redox-divergence-status">—</div>
                 </div>
             </div>
             <div class="config-hint">Source terms: <span id="redox-source-labels">—</span></div>
+            <div class="config-hint">Split source: <span id="redox-split-source">—</span></div>
+            <div class="config-hint">Source context: <span id="redox-source-context">—</span></div>
         </div>
 
         <!-- Gas Train Status -->

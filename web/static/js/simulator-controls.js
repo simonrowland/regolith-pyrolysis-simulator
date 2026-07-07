@@ -270,12 +270,46 @@ function redoxSourceLabels(summary) {
     return parts.join(', ');
 }
 
+function redoxDivergenceStatus(summary) {
+    const breakdown = objectOrNull(summary?.redox_source_breakdown);
+    const divergence = objectOrNull(breakdown?.ferric_divergence);
+    if (!divergence) return REDOX_EMPTY;
+    const status = textOrDash(divergence.status);
+    if (divergence.warning === true) return `${status} / warning`;
+    return status;
+}
+
+function redoxSourceContext(summary) {
+    const breakdown = objectOrNull(summary?.redox_source_breakdown);
+    if (!breakdown) return REDOX_EMPTY;
+    const campaign = textOrDash(breakdown.source_campaign);
+    const hour = finiteNumber(breakdown.source_hour);
+    const campaignHour = finiteNumber(breakdown.source_campaign_hour);
+    const parts = [];
+    if (campaign !== REDOX_EMPTY) parts.push(campaign);
+    if (hour !== null) parts.push(`hour ${formatRedoxNumber(hour, 0)}`);
+    if (campaignHour !== null) {
+        parts.push(`campaign hour ${formatRedoxNumber(campaignHour, 0)}`);
+    }
+    return parts.length ? parts.join(' / ') : REDOX_EMPTY;
+}
+
 function renderRedoxSummary(summary) {
     const redox = objectOrNull(summary?.fe_redox_split) || {};
     const stage3 = objectOrNull(summary?.stage_3_capture) || {};
+    const breakdown = objectOrNull(summary?.redox_source_breakdown) || {};
 
     setRedoxText('redox-fo2-log', formatRedoxNumber(redox.fO2_log));
     setRedoxText('redox-ferric-frac', formatRedoxNumber(redox.ferric_frac, 4));
+    setRedoxText('redox-ferrous-frac', formatRedoxNumber(redox.ferrous_frac, 4));
+    setRedoxText(
+        'redox-fe3-sigma-fe',
+        formatRedoxNumber(redox.fe3_over_sigma_fe, 4),
+    );
+    setRedoxText(
+        'redox-fe2o3-feo-molar',
+        formatRedoxNumber(redox.fe2o3_over_feo_molar, 4),
+    );
     setRedoxText('redox-native-fe-frac', formatRedoxNumber(redox.native_fe_frac, 4));
     setRedoxText(
         'redox-native-fe-status',
@@ -288,7 +322,18 @@ function renderRedoxSummary(summary) {
     setRedoxText('redox-stage3-fe', formatRedoxUnit(stage3.Fe_kg, 'kg'));
     setRedoxText('redox-stage3-total', formatRedoxUnit(stage3.total_kg, 'kg'));
     setRedoxText('redox-stage3-fe-wt', formatRedoxUnit(stage3.Fe_wt_pct, 'wt%'));
+    setRedoxText(
+        'redox-source-net',
+        formatRedoxUnit(breakdown.net_mol_o2_equiv, 'mol O2e'),
+    );
+    setRedoxText(
+        'redox-source-delta-log10',
+        formatRedoxUnit(breakdown.delta_log10_fO2, 'log10'),
+    );
+    setRedoxText('redox-divergence-status', redoxDivergenceStatus(summary));
     setRedoxText('redox-source-labels', redoxSourceLabels(summary));
+    setRedoxText('redox-split-source', textOrDash(redox.source));
+    setRedoxText('redox-source-context', redoxSourceContext(summary));
 }
 
 function setRecipeError(id, message) {
@@ -320,6 +365,7 @@ function recipePreviewText() {
     const summary = lastRecipeSummary || {};
     const redox = objectOrNull(summary.fe_redox_split) || {};
     const stage3 = objectOrNull(summary.stage_3_capture) || {};
+    const breakdown = objectOrNull(summary.redox_source_breakdown) || {};
     return [
         `feedstock: ${document.getElementById('feedstock-select')?.value || 'not selected'}`,
         `campaign: ${campaign}`,
@@ -336,11 +382,21 @@ function recipePreviewText() {
         `wall_deposit_kg: ${summary.wall_deposit_cumulative_kg ? '[captured]' : 'not captured'}`,
         `melt_fO2_log: ${formatRedoxNumber(redox.fO2_log)}`,
         `ferric_frac: ${formatRedoxNumber(redox.ferric_frac, 4)}`,
+        `ferrous_frac: ${formatRedoxNumber(redox.ferrous_frac, 4)}`,
+        `fe3_over_sigma_fe: ${formatRedoxNumber(redox.fe3_over_sigma_fe, 4)}`,
+        `fe2o3_over_feo_molar: ${formatRedoxNumber(redox.fe2o3_over_feo_molar, 4)}`,
         `native_fe_frac: ${formatRedoxNumber(redox.native_fe_frac, 4)}`,
         `native_fe_status: ${nativeFeEventStatus(redox.native_fe_saturation_event)}`,
+        `native_fe_partition: ${nativeFePartitionText(redox.native_fe_partition)}`,
         `stage_3_Fe_kg: ${formatRedoxNumber(stage3.Fe_kg)}`,
         `stage_3_total_kg: ${formatRedoxNumber(stage3.total_kg)}`,
+        `stage_3_Fe_wt_pct: ${formatRedoxNumber(stage3.Fe_wt_pct)}`,
+        `redox_source_net_mol_o2_equiv: ${formatRedoxUnit(breakdown.net_mol_o2_equiv, 'mol O2e')}`,
+        `redox_source_delta_log10_fO2: ${formatRedoxUnit(breakdown.delta_log10_fO2, 'log10')}`,
+        `redox_ferric_divergence_status: ${redoxDivergenceStatus(summary)}`,
         `redox_source_labels: ${redoxSourceLabels(summary)}`,
+        `redox_split_source: ${textOrDash(redox.source)}`,
+        `redox_source_context: ${redoxSourceContext(summary)}`,
     ].join('\n');
 }
 

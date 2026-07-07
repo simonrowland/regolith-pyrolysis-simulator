@@ -8,6 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 import app as app_module
 from web import events as web_events
@@ -16,8 +17,9 @@ from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
 from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
+from simulator.runner import build_per_hour_summary
 from simulator.session import drive_auto_apply
-from simulator.state import DecisionPoint, DecisionType, EvaporationFlux
+from simulator.state import CampaignPhase, DecisionPoint, DecisionType, EvaporationFlux
 from web.events import (
     BackendUnavailableError,
     _clear_simulation_state,
@@ -79,6 +81,24 @@ def _sim_with_mass_balance_snapshot(error_pct, category=None):
     if category is not None:
         setattr(snapshot, "mass_balance_error_category", category)
     return sim, snapshot
+
+
+def _producer_backed_redox_per_hour_summary() -> dict[str, object]:
+    root = Path(__file__).resolve().parents[1]
+    setpoints = yaml.safe_load((root / "data/setpoints.yaml").read_text())
+    setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        setpoints,
+        yaml.safe_load((root / "data/feedstocks.yaml").read_text()),
+        yaml.safe_load((root / "data/vapor_pressures.yaml").read_text()),
+    )
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.start_campaign(CampaignPhase.C0)
+    snapshot = sim.step()
+    return build_per_hour_summary(sim, snapshot, include_fe_redox_split=True)
 
 
 def _set_nested(mapping, path, value):
@@ -189,40 +209,6 @@ def _force_socketio_stub(monkeypatch) -> list[tuple[object, tuple, dict]]:
         capture_background_task,
     )
     return captured_tasks
-
-
-def _sample_redox_per_hour_summary() -> dict[str, object]:
-    return {
-        "hour": 1,
-        "fe_redox_split": {
-            "fO2_log": -9.25,
-            "ferric_frac": 0.1234,
-            "native_fe_frac": 0.0056,
-            "native_fe_saturation_event": {
-                "native_fe_event_status": "partitioned",
-                "native_fe_event": "partitioned_to_tap",
-                "native_fe_event_reason": "native_fe_pool_above_threshold",
-            },
-            "native_fe_partition": {
-                "native_fe_pool_mol": 3.0,
-                "native_fe_tap_mol": 2.5,
-                "native_fe_vapor_mol": 0.5,
-            },
-        },
-        "stage_3_capture": {
-            "Fe_kg": 2.75,
-            "total_kg": 10.0,
-            "Fe_wt_pct": 27.5,
-        },
-        "redox_source_breakdown": {
-            "terms_mol_o2_equiv_by_label": {
-                "redox_source:native_fe_saturation_split": -0.25,
-                "redox_source:test_respeciation": 0.1,
-            },
-            "fe_redox_respeciation": {"status": "ok"},
-            "ferric_divergence": {"status": "ok"},
-        },
-    }
 
 
 def test_recipe_save_list_load_endpoints_round_trip_without_run(
@@ -661,19 +647,36 @@ def test_recipe_ui_renders_per_hour_redox_summary_payload_keys() -> None:
     ).read_text(encoding="utf-8")
 
     assert "renderRedoxSummary(lastRecipeSummary)" in controls
+    redox_markup = simulator_template.split('<div id="redox-card"', 1)[1].split(
+        "<!-- Gas Train Status -->",
+        1,
+    )[0]
+    assert "Melt Fe Redox Diagnostics" in redox_markup
+    assert "Diagnostic ferric/ferrous speciation" in redox_markup
+    assert "CERTIFIED" not in redox_markup
     for payload_key in (
         "fe_redox_split",
         "fO2_log",
+        "fe3_over_sigma_fe",
         "ferric_frac",
+        "ferrous_frac",
+        "fe2o3_over_feo_molar",
         "native_fe_frac",
         "native_fe_saturation_event",
         "native_fe_event_status",
         "native_fe_partition",
+        "source",
         "stage_3_capture",
         "Fe_kg",
         "total_kg",
         "Fe_wt_pct",
         "redox_source_breakdown",
+        "net_mol_o2_equiv",
+        "delta_log10_fO2",
+        "ferric_divergence",
+        "source_campaign",
+        "source_hour",
+        "source_campaign_hour",
         # M3-L3 P2: the source-label readout must distinguish applied from
         # skipped terms — rendering the TOTAL terms dict shows skipped terms
         # as if they happened. Pin the applied/skipped split + skipped tag.
@@ -683,19 +686,38 @@ def test_recipe_ui_renders_per_hour_redox_summary_payload_keys() -> None:
     ):
         assert payload_key in controls
 
-    for element_id in (
+    assert "nativeFeEventStatus(redox.native_fe_saturation_event)" in controls
+    assert "nativeFePartitionText(redox.native_fe_partition)" in controls
+
+    expected_redox_ids = (
         "redox-fo2-log",
         "redox-ferric-frac",
+        "redox-ferrous-frac",
+        "redox-fe3-sigma-fe",
+        "redox-fe2o3-feo-molar",
         "redox-native-fe-frac",
         "redox-native-fe-status",
         "redox-native-fe-partition",
         "redox-stage3-fe",
         "redox-stage3-total",
         "redox-stage3-fe-wt",
+        "redox-source-net",
+        "redox-source-delta-log10",
+        "redox-divergence-status",
         "redox-source-labels",
-    ):
-        assert f'id="{element_id}"' in simulator_template
-        assert f"'{element_id}'" in controls
+        "redox-split-source",
+        "redox-source-context",
+    )
+    redox_template_ids = tuple(
+        element_id
+        for element_id in re.findall(r'id="(redox-[^"]+)"', redox_markup)
+        if element_id != "redox-card"
+    )
+    set_redox_ids = tuple(
+        re.findall(r"setRedoxText\(\s*'([^']+)'", controls)
+    )
+    assert redox_template_ids == expected_redox_ids
+    assert set_redox_ids == expected_redox_ids
 
 
 def test_recipe_defining_controls_share_loaded_recipe_clear_marker() -> None:
@@ -1978,12 +2000,133 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
             _clear_simulation_state(sid)
 
 
-def test_per_hour_summary_redox_fields_reach_socket_and_recipe_capture(
+def test_per_hour_summary_redox_fields_reach_socket_and_recipe_capture_live_path(
+    monkeypatch,
+):
+    captured_tasks = []
+
+    def force_stub_backend(_backend_name):
+        backend = StubBackend()
+        backend.initialize({})
+        return backend
+
+    original_emit = web_events._emit_if_current
+
+    def emit_and_stop_after_summary(socketio, sid, run_id, event, payload):
+        emitted = original_emit(socketio, sid, run_id, event, payload)
+        if event == "per_hour_summary":
+            state, _ = _current_simulation_state(sid, run_id)
+            if state is not None:
+                state["running"] = False
+        return emitted
+
+    def run_background_task(target, *args, **kwargs):
+        captured_tasks.append(target)
+        target()
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr(web_events, "_get_backend", force_stub_backend)
+    monkeypatch.setattr(web_events, "_emit_if_current", emit_and_stop_after_summary)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        run_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        received = client.get_received()
+        summaries = [
+            event["args"][0]
+            for event in received
+            if event["name"] == "per_hour_summary"
+        ]
+        assert len(summaries) == 1
+        summary = summaries[0]
+        redox = summary["fe_redox_split"]
+        for key in (
+            "fO2_log",
+            "ferric_frac",
+            "ferrous_frac",
+            "fe3_over_sigma_fe",
+            "fe2o3_over_feo_molar",
+            "native_fe_frac",
+            "native_fe_saturation_event",
+            "diagnostic_only",
+            "source",
+        ):
+            assert key in redox
+        assert redox["diagnostic_only"] is True
+        event = redox["native_fe_saturation_event"]
+        assert event["native_fe_event"]
+        assert event["native_fe_event_status"]
+
+        stage_3 = summary["stage_3_capture"]
+        for key in ("Fe_kg", "total_kg", "Fe_wt_pct"):
+            assert key in stage_3
+
+        breakdown = summary["redox_source_breakdown"]
+        for key in (
+            "net_mol_o2_equiv",
+            "delta_log10_fO2",
+            "ferric_divergence",
+            "source_campaign",
+            "source_hour",
+            "source_campaign_hour",
+        ):
+            assert key in breakdown
+
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        state, _ = _current_simulation_state(new_sids.pop())
+        capture = state["last_recipe_capture"]["per_hour_summary"]
+        assert capture["fe_redox_split"]["fO2_log"] == pytest.approx(
+            redox["fO2_log"]
+        )
+        assert capture["fe_redox_split"]["native_fe_saturation_event"] == event
+        assert capture["stage_3_capture"]["Fe_wt_pct"] == pytest.approx(
+            stage_3["Fe_wt_pct"]
+        )
+        assert capture["redox_source_breakdown"]["ferric_divergence"]["status"] == (
+            breakdown["ferric_divergence"]["status"]
+        )
+    finally:
+        client.disconnect()
+        for sid in list(_simulations):
+            _clear_simulation_state(sid)
+
+
+def test_optional_native_fe_nested_redox_payloads_reach_socket_and_recipe_capture(
     monkeypatch,
 ):
     captured_tasks = []
     drive_calls = {"count": 0}
-    redox_summary = _sample_redox_per_hour_summary()
+    redox_summary = copy.deepcopy(_producer_backed_redox_per_hour_summary())
+    redox_summary["fe_redox_split"]["native_fe_saturation_event"] = {
+        "native_fe_event": "native_fe_partitioned_saturation",
+        "native_fe_event_reason": "native_fe_saturation_split_applied",
+        "native_fe_event_status": "ok",
+    }
+    redox_summary["fe_redox_split"]["native_fe_partition"] = {
+        "native_fe_pool_mol": 12.5,
+        "native_fe_tap_mol": 12.0,
+        "native_fe_vapor_mol": 0.5,
+        "native_fe_vapor_escape_fraction_of_pool": 0.04,
+    }
 
     def force_stub_backend(_backend_name):
         backend = StubBackend()
@@ -2042,33 +2185,33 @@ def test_per_hour_summary_redox_fields_reach_socket_and_recipe_capture(
             if event["name"] == "per_hour_summary"
         ]
         assert len(summaries) == 1
-        summary = summaries[0]
-        assert summary["fe_redox_split"]["fO2_log"] == pytest.approx(-9.25)
-        assert summary["fe_redox_split"]["ferric_frac"] == pytest.approx(0.1234)
-        assert summary["fe_redox_split"]["native_fe_frac"] == pytest.approx(0.0056)
-        assert (
-            summary["fe_redox_split"]["native_fe_saturation_event"][
-                "native_fe_event_status"
-            ]
-            == "partitioned"
+        redox = summaries[0]["fe_redox_split"]
+        assert redox["native_fe_saturation_event"]["native_fe_event"] == (
+            "native_fe_partitioned_saturation"
         )
-        assert summary["stage_3_capture"]["Fe_kg"] == pytest.approx(2.75)
-        assert summary["stage_3_capture"]["Fe_wt_pct"] == pytest.approx(27.5)
-        assert (
-            "redox_source:native_fe_saturation_split"
-            in summary["redox_source_breakdown"]["terms_mol_o2_equiv_by_label"]
+        assert redox["native_fe_saturation_event"]["native_fe_event_status"] == "ok"
+        assert redox["native_fe_partition"]["native_fe_pool_mol"] == pytest.approx(
+            12.5
+        )
+        assert redox["native_fe_partition"]["native_fe_tap_mol"] == pytest.approx(
+            12.0
+        )
+        assert redox["native_fe_partition"]["native_fe_vapor_mol"] == pytest.approx(
+            0.5
         )
 
         new_sids = set(_simulations) - before
         assert len(new_sids) == 1
         state, _ = _current_simulation_state(new_sids.pop())
-        capture = state["last_recipe_capture"]["per_hour_summary"]
-        assert capture["fe_redox_split"]["native_fe_partition"][
-            "native_fe_tap_mol"
-        ] == pytest.approx(2.5)
-        assert capture["redox_source_breakdown"]["ferric_divergence"][
-            "status"
-        ] == "ok"
+        capture_redox = state["last_recipe_capture"]["per_hour_summary"][
+            "fe_redox_split"
+        ]
+        assert capture_redox["native_fe_saturation_event"] == (
+            redox["native_fe_saturation_event"]
+        )
+        assert capture_redox["native_fe_partition"]["native_fe_vapor_mol"] == (
+            pytest.approx(redox["native_fe_partition"]["native_fe_vapor_mol"])
+        )
     finally:
         client.disconnect()
         for sid in list(_simulations):
