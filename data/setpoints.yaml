@@ -373,7 +373,7 @@ campaigns:
         Ti:
           mass_g: [12000, 15000]
           note: "65-85% of available; Na accessibility is key uncertainty"
-    Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # strongly stabilised in melt
+    Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11
     delta_G_shift_kJ_per_mol: [50, 80]       # due to low activity coefficient
     slag_solubility_limit_wt_pct: [8, 12]    # Na2O/K2O oxide equivalent
     endpoint:

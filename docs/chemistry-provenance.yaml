@@ -63,10 +63,24 @@ values:
     alternatives:
       - ref: REF-019   # Sossi & Fegley 2018, Rev. Mineral. Geochem. 84:393-459
         locus: "Table 2, NaO0.5 & KO0.5 rows (pp. 409-410); Raoultian def Eqn 24 (p. 413); reaction Eqn 25 (p. 413); gamma(T) Fig 5 (p. 414)"
-        value: "NaO0.5 8.4e-4-2.2e-3 @1673 K (Mathieu et al. 2011); KO0.5 6.3e-5-7.1e-4 @1573 K (Hastie et al. 1981)"
+        value: "Review compilation of NaO0.5 8.4e-4-2.2e-3 @1673 K from REF-050 and KO0.5 6.3e-5-7.1e-4 @1573 K from REF-051"
         url: "https://doi.org/10.2138/rmg.2018.84.11"
         corpus: "docs-private/deep-research/literature/sossi-fegley-2018-volatility/mineru/source/vlm/source.md — Table 2 :1244, Eqn 24 :1533, Eqn 25 :1547, Fig 5 :1577"
         lacks: "review compilation, not the primary; the NaO0.5 datum is from a CMS melt (Mathieu 2011), not a lunar-analog ferrobasalt"
+      - ref: REF-050
+        note: "Mathieu et al. 2011 primary behind the Sossi & Fegley 2018 Table 2 NaO0.5 activity-coefficient range."
+        locus: "GCA 75:608-628; Sossi & Fegley 2018 Table 2 carries the NaO0.5 row as 8.4e-4-2.2e-3 at 1673 K"
+        value: "NaO0.5 8.4e-4-2.2e-3 @1673 K"
+        url: ""
+        corpus: "bibliography record only; no local primary corpus harvested"
+        lacks: "CMS melt primary, not the chosen lunar-analog ferrobasalt anchor; DOI not verified in references.yaml"
+      - ref: REF-051
+        note: "Plante/Hastie 1981 primary behind the Sossi & Fegley 2018 Table 2 KO0.5 activity-coefficient range."
+        locus: "NBS Special Publication 561:265-281; Sossi & Fegley 2018 Table 2 carries the KO0.5 row as 6.3e-5-7.1e-4 at 1573 K"
+        value: "KO0.5 6.3e-5-7.1e-4 @1573 K"
+        url: ""
+        corpus: "bibliography record only; no local primary corpus harvested"
+        lacks: "comparison K-bearing silicate system, not the chosen Apollo 12022 lunar-basalt KEMS anchor; DOI not verified in references.yaml"
       - ref: REF-049
         note: "DeMaria et al. 1971 Apollo 12022 KEMS; bibliography record is REF-049, DOI blank, ADS bibcode tracked in references.yaml."
         locus: "Fig 1 (p_Na vs 1/T), Fig 2 (p_K vs 1/T); Proc. 2nd Lunar Sci. Conf., vol. 2, pp. 1367-1380"   # exact page/URL: verify (t-106)
