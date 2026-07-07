@@ -37,6 +37,21 @@ VALID_OBJECTIVE_SENSES = {"minimize", "maximize"}
 COMPOSITION_TARGET_TYPE = "composition_target"
 COMPOSITION_TARGET_METRIC_PREFIX = "composition_target:"
 SSO2_OWNER_RECIPE_ID = "sso2_pn2_fe_drain_silica"
+ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC = "energy_electrical_plus_evaporation_kWh"
+LEGACY_ENERGY_KWH_METRIC = "energy_kWh"
+_OBJECTIVE_METRIC_ALIASES = MappingProxyType({
+    LEGACY_ENERGY_KWH_METRIC: ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+})
+ENERGY_ELECTRICAL_PLUS_EVAPORATION_ALIASES = frozenset(
+    {
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+        *(
+            alias
+            for alias, canonical in _OBJECTIVE_METRIC_ALIASES.items()
+            if canonical == ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+        ),
+    }
+)
 SOLAR_THERMAL_FLUX_METRICS = frozenset({"solar_thermal_flux_h", "thermal_flux_h"})
 FURNACE_TIME_METRICS = frozenset({"furnace_time_h", "furnace_h"})
 THROUGHPUT_OWNER_COST_METRICS = frozenset({"throughput_cost_owner_ratify_usd"})
@@ -255,6 +270,36 @@ class ObjectiveVector:
 
 ObjectiveLike = ObjectiveVector | Mapping[str, float | None]
 T = TypeVar("T")
+
+
+def canonical_objective_metric(metric: str) -> str:
+    return _OBJECTIVE_METRIC_ALIASES.get(str(metric), str(metric))
+
+
+def canonical_objective_mapping(raw: Mapping[str, T]) -> Mapping[str, T]:
+    mapping: dict[str, T] = {}
+    for metric, value in raw.items():
+        canonical = canonical_objective_metric(str(metric))
+        if canonical in mapping and mapping[canonical] != value:
+            raise ObjectiveComputationError(
+                f"objective aliases for {canonical!r} disagree"
+            )
+        mapping[canonical] = value
+    return MappingProxyType(mapping)
+
+
+def objective_metric_aliases(metric: str) -> tuple[str, ...]:
+    canonical = canonical_objective_metric(metric)
+    if canonical == ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC:
+        return (
+            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+            *(
+                alias
+                for alias, target in _OBJECTIVE_METRIC_ALIASES.items()
+                if target == ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+            ),
+        )
+    return (canonical,)
 
 
 def _thaw_value(value: Any) -> Any:
@@ -1233,7 +1278,7 @@ def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefiniti
             raise ObjectiveProfileError("each objective must be a mapping")
         definitions.append(
             ObjectiveDefinition(
-                metric=str(raw.get("metric", "")),
+                metric=canonical_objective_metric(str(raw.get("metric", ""))),
                 sense=str(raw.get("sense", "")),
                 units=str(raw.get("units", "")),
                 ordinal=ordinal,
@@ -1254,7 +1299,7 @@ def objective_importance_evidence(
         where = f"objectives[{ordinal}]"
         if not isinstance(raw, Mapping):
             raise ObjectiveProfileError("each objective must be a mapping")
-        metric = str(raw.get("metric", "") or f"#{ordinal}")
+        metric = canonical_objective_metric(str(raw.get("metric", "") or f"#{ordinal}"))
         if "weight" not in raw:
             raise ObjectiveProfileError(
                 f"insufficient-evidence: {where} {metric!r} missing weight"
@@ -3138,18 +3183,26 @@ def objective_scores(
     mapping = _objective_mapping(objectives)
     scores: list[float | None] = []
     for definition in definitions:
+        metric = canonical_objective_metric(definition.metric)
         try:
-            value = mapping[definition.metric]
+            value = mapping[metric]
         except KeyError as exc:
             raise ObjectiveComputationError(
-                f"objective {definition.metric!r} is missing"
+                f"objective {metric!r} is missing"
             ) from exc
         if value is None:
             scores.append(None)
         else:
-            numeric = _finite_float(value, definition.metric)
+            numeric = _finite_float(value, metric)
             scores.append(numeric if definition.sense == "maximize" else -numeric)
     return tuple(scores)
+
+
+def objective_value_for_metric(
+    objectives: ObjectiveLike,
+    metric: str,
+) -> float | None:
+    return _objective_mapping(objectives).get(canonical_objective_metric(metric))
 
 
 def dominates(
@@ -3750,7 +3803,7 @@ def _metric_value(
         return _oxygen_partition_value(sim, "stored")
     if metric == "oxygen_vented_kg":
         return _oxygen_partition_value(sim, "vented")
-    if metric in {"energy_kWh", "energy_electrical_plus_evaporation_kWh"}:
+    if metric in ENERGY_ELECTRICAL_PLUS_EVAPORATION_ALIASES:
         return _sim_float(
             sim,
             "energy_electrical_plus_evaporation_cumulative_kWh",
@@ -3791,15 +3844,17 @@ def _metric_value(
 
 def _objective_mapping(objectives: ObjectiveLike) -> Mapping[str, float | None]:
     if isinstance(objectives, ObjectiveVector):
-        return objectives.as_mapping()
-    if isinstance(objectives, Mapping):
-        return objectives
-    accessor = getattr(objectives, "as_mapping", None)
-    if callable(accessor):
+        raw = objectives.as_mapping()
+    elif isinstance(objectives, Mapping):
+        raw = objectives
+    else:
+        accessor = getattr(objectives, "as_mapping", None)
+        if not callable(accessor):
+            raise ObjectiveComputationError("objective values must be a mapping")
         raw = accessor()
-        if isinstance(raw, Mapping):
-            return raw
-    raise ObjectiveComputationError("objective values must be a mapping")
+        if not isinstance(raw, Mapping):
+            raise ObjectiveComputationError("objective values must be a mapping")
+    return canonical_objective_mapping(raw)
 
 
 def _product_ledger(sim: Any) -> Mapping[str, float]:

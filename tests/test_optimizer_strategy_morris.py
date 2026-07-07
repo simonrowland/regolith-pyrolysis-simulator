@@ -9,7 +9,12 @@ import pytest
 
 from simulator.optimize import Candidate, MorrisScreenStrategy, Strategy
 from simulator.optimize.evaluate import FailureCategory, ScoredResult
-from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    LEGACY_ENERGY_KWH_METRIC,
+    ObjectiveValue,
+    ObjectiveVector,
+)
 from simulator.optimize.recipe import KnobSpec, RecipeSchema
 
 
@@ -292,6 +297,35 @@ def test_morris_multi_objective_recommendation_is_per_objective_aware() -> None:
     assert groups["chemistry"].objectives["small_scale"].mu_star == pytest.approx(1.5)
     assert groups["chemistry"].objectives["zero"].mu_star == pytest.approx(0.0)
     assert groups["chemistry"].recommendation == "keep"
+
+
+def test_morris_folds_legacy_energy_cache_metrics_across_trajectory_steps() -> None:
+    strategy = MorrisScreenStrategy(RecipeSchema(), seed=26, num_trajectories=1)
+    candidates = _all_candidates(strategy)
+
+    strategy.tell(
+        [
+            (
+                candidate,
+                _feasible_result(
+                    candidate,
+                    float(index),
+                    metric=(
+                        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+                        if index % 2 == 0
+                        else LEGACY_ENERGY_KWH_METRIC
+                    ),
+                ),
+            )
+            for index, candidate in enumerate(candidates)
+        ]
+    )
+
+    result = strategy.screen_result()
+    assert result.completed_trajectories == 1
+    assert {
+        metric for group in result.groups for metric in group.objectives
+    } == {ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC}
 
 
 def test_morris_deterministic_screen_result_and_seed_changes_plan() -> None:

@@ -6,6 +6,10 @@ import math
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    LEGACY_ENERGY_KWH_METRIC,
+)
 from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
@@ -21,7 +25,10 @@ from simulator.optimize.recipe import (
 
 SCHEMA_VERSION = "knob-saturation-v1"
 _DURATION_COST_METRICS = ("duration_h", "total_hours")
-_ENERGY_COST_METRICS = ("energy_kWh",)
+_ENERGY_COST_METRICS = (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    LEGACY_ENERGY_KWH_METRIC,
+)
 
 
 def compute_knob_saturation(

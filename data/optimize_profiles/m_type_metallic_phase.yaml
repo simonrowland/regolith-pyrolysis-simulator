@@ -6,7 +6,7 @@ north_star_rationale: M-type metal is already ingot feed; objective is maximum m
 objective_emphasis: Direct metal production.
 objectives:
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.70, rationale: direct Fe-Ni-Co metal phase}
-  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.20, rationale: tapping energy}
+  - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.20, rationale: tapping energy}
   - {metric: duration_h, sense: minimize, units: h, weight: 0.10, rationale: short melt/tap campaign}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]

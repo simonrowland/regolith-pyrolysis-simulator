@@ -5,6 +5,10 @@ import pytest
 from simulator.optimize.evalspec import cache_key
 from simulator.optimize.evaluate import _build_eval_inputs
 from simulator.optimize.knob_saturation import compute_knob_saturation
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    LEGACY_ENERGY_KWH_METRIC,
+)
 from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
 
 
@@ -212,12 +216,25 @@ def test_no_cost_pinned_red_flags_but_costed_duration_and_voltage_do_not() -> No
     voltage_costed = compute_knob_saturation(
         RecipePatch({VOLTAGE: schema.spec_for(VOLTAGE).high}),
         schema,
-        active_objective_metrics=("energy_kWh",),
+        active_objective_metrics=(ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,),
     )
     voltage_row = _row(voltage_costed, "campaigns.C5.allow_mre_voltage_cap_V")
     assert voltage_row["has_opposing_cost"] is True
-    assert voltage_row["opposing_cost_metrics"] == ["energy_kWh"]
+    assert voltage_row["opposing_cost_metrics"] == [ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC]
     assert voltage_costed["red_flag"] is False
+
+    legacy_voltage_costed = compute_knob_saturation(
+        RecipePatch({VOLTAGE: schema.spec_for(VOLTAGE).high}),
+        schema,
+        active_objective_metrics=(LEGACY_ENERGY_KWH_METRIC,),
+    )
+    legacy_voltage_row = _row(
+        legacy_voltage_costed,
+        "campaigns.C5.allow_mre_voltage_cap_V",
+    )
+    assert legacy_voltage_row["has_opposing_cost"] is True
+    assert legacy_voltage_row["opposing_cost_metrics"] == [LEGACY_ENERGY_KWH_METRIC]
+    assert legacy_voltage_costed["red_flag"] is False
 
 
 def test_knob_saturation_does_not_change_evalspec_cache_key() -> None:

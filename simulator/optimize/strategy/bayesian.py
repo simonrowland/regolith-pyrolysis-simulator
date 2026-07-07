@@ -8,7 +8,11 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
 from simulator.optimize.doe import _condition_pressure_pair_values
-from simulator.optimize.objective import ObjectiveDefinition, objective_definitions
+from simulator.optimize.objective import (
+    ObjectiveDefinition,
+    canonical_objective_mapping,
+    objective_definitions,
+)
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.strategy.protocol import Candidate
 
@@ -335,7 +339,7 @@ def _objective_mapping(scored: "ScoredResult") -> Mapping[str, float | None]:
         if not math.isfinite(numeric_value):
             raise ValueError(f"objective {metric_name!r} is not finite")
         mapping[metric_name] = numeric_value
-    return mapping
+    return canonical_objective_mapping(mapping)
 
 
 def _objective_values_for_definitions(

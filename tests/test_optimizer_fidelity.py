@@ -19,7 +19,11 @@ from simulator.optimize.doe import (
 from simulator.optimize.evaluate import EvaluationAbort, FailureCategory, RunReference, ScoredResult
 from simulator.optimize.evalspec import EvalSpec
 from simulator.optimize.fidelity import DEFAULT_THRESHOLD_PROFILE, run_fidelity_correlation
-from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    ObjectiveValue,
+    ObjectiveVector,
+)
 from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.worker_runtime import WARM_WORKERS_ENV
 
@@ -517,7 +521,9 @@ def test_stub_high_self_parity_withholds_trust_verdict(tmp_path: Path) -> None:
     assert result.feasible_infeasible_agreement == 1.0
     assert result.top_k_recall[3] == 1.0
     assert result.spearman_by_objective["oxygen_kg"] == pytest.approx(1.0)
-    assert result.spearman_by_objective["energy_kWh"] == pytest.approx(1.0)
+    assert result.spearman_by_objective[
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+    ] == pytest.approx(1.0)
     assert result.fast_screen_trustworthy is False
     assert result.confidence == "inconclusive"
     assert result.notes == ("stub-vs-stub diagnostic, not authoritative",)
@@ -590,7 +596,9 @@ def test_authoritative_high_correlation_is_trustworthy_and_writes_artifacts(
     assert result.feasible_infeasible_agreement == 1.0
     assert result.top_k_recall[3] == 1.0
     assert result.spearman_by_objective["oxygen_kg"] == pytest.approx(1.0)
-    assert result.spearman_by_objective["energy_kWh"] == pytest.approx(1.0)
+    assert result.spearman_by_objective[
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+    ] == pytest.approx(1.0)
 
     payload = json.loads(Path(result.artifact_paths["json"]).read_text())
     assert payload["fast_screen_trustworthy"] is True
@@ -714,16 +722,19 @@ def test_missing_declared_objective_in_arm_withholds_inconclusive_and_names_metr
 
     assert result.fast_screen_trustworthy is False
     assert result.confidence == "inconclusive"
-    assert result.spearman_by_objective["energy_kWh"] is None
+    assert result.spearman_by_objective[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC] is None
     assert any(
-        "declared objective 'energy_kWh' missing in high arm" in note
+        (
+            f"declared objective '{ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC}' "
+            "missing in high arm"
+        ) in note
         for note in result.notes
     )
 
     payload = json.loads(Path(result.artifact_paths["json"]).read_text())
     assert payload["fast_screen_trustworthy"] is False
-    assert "energy_kWh" in payload["reason"] or any(
-        "energy_kWh" in note for note in payload["notes"]
+    assert ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC in payload["reason"] or any(
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC in note for note in payload["notes"]
     )
 
 
@@ -741,7 +752,9 @@ def test_anti_correlated_scores_fail_verdict() -> None:
 
     assert result.fast_screen_trustworthy is False
     assert result.spearman_by_objective["oxygen_kg"] == pytest.approx(-1.0)
-    assert result.spearman_by_objective["energy_kWh"] == pytest.approx(-1.0)
+    assert result.spearman_by_objective[
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+    ] == pytest.approx(-1.0)
     assert result.top_k_recall[3] < 1.0
 
 

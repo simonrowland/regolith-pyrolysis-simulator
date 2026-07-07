@@ -45,6 +45,10 @@ from simulator.mre_ladder import (
 from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
+from simulator.optimize.objective import (
+    canonical_objective_metric,
+    objective_metric_aliases,
+)
 from simulator.optimize.results_store import (
     _deserialize_grounding_margins,
     grounded_result_feasible,
@@ -332,7 +336,7 @@ def _objectives_mapping(items: list[dict[str, Any]]) -> dict[str, Any]:
     for item in items:
         metric = item.get('metric')
         if isinstance(metric, str):
-            values[metric] = item.get('value')
+            values[canonical_objective_metric(metric)] = item.get('value')
     return values
 
 
@@ -340,9 +344,10 @@ def _objective_for(
     items: list[dict[str, Any]],
     metric: str | None = None,
 ) -> dict[str, Any] | None:
+    metric_aliases = set(objective_metric_aliases(metric)) if metric is not None else None
     candidates = [
         item for item in items
-        if metric is None or item.get('metric') == metric
+        if metric_aliases is None or item.get('metric') in metric_aliases
     ]
     if not candidates:
         return None
@@ -1081,7 +1086,11 @@ def _leaderboard_entries(
         'excluded_infeasible': 0,
         'excluded_nonfinite': 0,
     }
-    selected_metric = objective_metric
+    selected_metric = (
+        canonical_objective_metric(objective_metric)
+        if objective_metric is not None
+        else None
+    )
     selected_sense = 'maximize'
     root = _optimizer_runs_root()
 
@@ -1106,7 +1115,7 @@ def _leaderboard_entries(
             if selected_metric is None:
                 primary = _objective_for(objectives)
                 if primary is not None:
-                    selected_metric = str(primary.get('metric'))
+                    selected_metric = canonical_objective_metric(str(primary.get('metric')))
             objective = _objective_for(objectives, selected_metric)
             if objective is None:
                 continue
@@ -1209,11 +1218,11 @@ def _optimizer_feedstock_profiles_payload() -> dict[str, Any]:
             profile_id = payload.get('profile_id') or path.stem
             feedstock = payload.get('feedstock') or payload.get('feedstock_id')
             objectives = payload.get('objectives') or ()
-            objective_metrics = [
-                objective.get('metric')
+            objective_metrics = list(dict.fromkeys(
+                canonical_objective_metric(str(objective.get('metric')))
                 for objective in objectives
                 if isinstance(objective, dict) and objective.get('metric')
-            ]
+            ))
             constraints = payload.get('constraints') or {}
             gates = constraints.get('gates') if isinstance(constraints, dict) else ()
             constraints_gates = [

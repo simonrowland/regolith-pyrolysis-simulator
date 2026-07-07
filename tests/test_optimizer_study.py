@@ -23,7 +23,13 @@ from simulator.optimize import study
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
 from simulator.optimize.evaluate import evaluate
-from simulator.optimize.objective import ObjectiveValue, ObjectiveVector, compute_objectives
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    LEGACY_ENERGY_KWH_METRIC,
+    ObjectiveValue,
+    ObjectiveVector,
+    compute_objectives,
+)
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.physics import physics_constraints_digest
 from simulator.optimize.profiles import constrained_max_profile, physics_constraints_from_profile
@@ -52,7 +58,7 @@ PROFILE = {
             "rationale": "test oxygen objective evidence",
         },
         {
-            "metric": "energy_kWh",
+            "metric": ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
             "sense": "minimize",
             "units": "kWh",
             "weight": 0.4,
@@ -1082,12 +1088,186 @@ def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path)
     assert pareto_payload["winner_candidate_id"] in {row["candidate_id"] for row in leaderboard}
     assert result.winner.candidate_id in {row["candidate_id"] for row in pareto_payload["pareto"]}
     assert [float(row["oxygen_kg"]) for row in leaderboard] == [12.0, 11.0, 10.0]
-    assert [float(row["energy_kWh"]) for row in leaderboard] == [7.0, 6.0, 5.0]
+    assert [float(row[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC]) for row in leaderboard] == [
+        7.0,
+        6.0,
+        5.0,
+    ]
     assert [float(row["margin_delivered_stream_purity"]) for row in leaderboard] == [1.0, 1.0, 1.0]
     assert len(_stored_rows(tmp_path)) == 3
 
     loaded = yaml.safe_load((tmp_path / "winner.recipe.yaml").read_text())
     assert RecipePatch.from_nested(loaded).validated(RecipeSchema())
+
+
+def test_default_profile_leaderboard_uses_scoped_energy_metric_and_legacy_alias(
+    tmp_path,
+) -> None:
+    profile = study.resolve_profile(
+        study.DEFAULT_PROFILE_NAME,
+        expected_feedstock=FEEDSTOCK,
+    )
+    definitions = study.objective_definitions(profile)
+    assert [definition.metric for definition in definitions] == [
+        "oxygen_kg",
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+        "duration_h",
+    ]
+    record = study.StudyRecord(
+        candidate_id="legacy-cache-row",
+        patch=RecipePatch({}),
+        feasible=True,
+        status="ok",
+        objectives={
+            "oxygen_kg": 1.0,
+            LEGACY_ENERGY_KWH_METRIC: 2.0,
+            "duration_h": 3.0,
+        },
+        feasibility_margins={},
+        cache_key="legacy-cache-key",
+    )
+
+    leaderboard_path = tmp_path / "leaderboard.csv"
+    study._write_leaderboard(
+        leaderboard_path,
+        [record],
+        [record],
+        record,
+        definitions,
+        RecipeSchema(),
+        profile=profile,
+    )
+
+    with leaderboard_path.open(encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        row = next(reader)
+        assert reader.fieldnames is not None
+        assert ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC in reader.fieldnames
+        assert LEGACY_ENERGY_KWH_METRIC not in reader.fieldnames
+    assert float(row[ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC]) == pytest.approx(2.0)
+
+
+def _strategy_for_legacy_cache_hit(
+    name: str,
+    schema: RecipeSchema,
+    profile: Mapping[str, Any],
+) -> Any:
+    if name == "bayes":
+        return OptunaTPEStrategy(schema, seed=916, objective_profile=profile)
+    if name == "nsga2":
+        return OptunaNSGA2Strategy(schema, seed=916, objective_profile=profile)
+    if name == "screen":
+        return MorrisScreenStrategy(schema, seed=916, num_trajectories=1)
+    raise AssertionError(f"unknown strategy {name!r}")
+
+
+def _legacy_energy_cached_scored(
+    candidate: Candidate,
+    profile: Mapping[str, Any],
+    constraints: Any,
+    *,
+    index: int,
+    energy_metric: str,
+) -> ScoredResult:
+    spec = _spec(candidate.patch, FEEDSTOCK, "stub", profile, constraints)
+    return ScoredResult(
+        candidate_id=candidate.id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", 10.0 + index, "kg", ordinal=0),
+                ObjectiveValue(
+                    energy_metric,
+                    "minimize",
+                    2.0 + index,
+                    "kWh",
+                    ordinal=1,
+                ),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+            },
+            backend_status="ok",
+            backend_authoritative=True,
+            product_summary={
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                }
+            },
+        ),
+    )
+
+
+@pytest.mark.parametrize("strategy_name", ["bayes", "nsga2", "screen"])
+def test_strategy_cache_hit_legacy_energy_scores_against_canonical_profile(
+    tmp_path,
+    strategy_name: str,
+) -> None:
+    profile = copy.deepcopy(PROFILE)
+    schema = RecipeSchema()
+    constraints = physics_constraints_from_profile(profile)
+    preview_strategy = _strategy_for_legacy_cache_hit(strategy_name, schema, profile)
+    budget = (
+        preview_strategy.plan_length
+        if isinstance(preview_strategy, MorrisScreenStrategy)
+        else 1
+    )
+    candidates = preview_strategy.ask(budget)
+    store = ResultStore(tmp_path / f"{strategy_name}-cache.sqlite")
+    for index, candidate in enumerate(candidates):
+        energy_metric = (
+            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+            if strategy_name == "screen" and index % 2 == 0
+            else LEGACY_ENERGY_KWH_METRIC
+        )
+        scored = _legacy_energy_cached_scored(
+            candidate,
+            profile,
+            constraints,
+            index=index,
+            energy_metric=energy_metric,
+        )
+        store.store(
+            scored.eval_spec,
+            scored,
+            created_at="2026-07-07T00:00:00+00:00",
+        )
+
+    def cache_miss_evaluator(*args: Any, **kwargs: Any) -> ScoredResult:
+        raise AssertionError("expected cached optimizer result")
+
+    active_strategy = _strategy_for_legacy_cache_hit(strategy_name, schema, profile)
+    result = study.run(
+        profile,
+        FEEDSTOCK,
+        active_strategy,
+        "stub",
+        parallel=budget,
+        budget=budget,
+        out_dir=tmp_path / f"{strategy_name}-out",
+        evaluator=cache_miss_evaluator,
+        schema=schema,
+        result_store=store,
+        constraints=constraints,
+    )
+
+    assert len(result.records) == budget
+    assert all(record.cache_hit for record in result.records)
+    if strategy_name == "screen":
+        assert active_strategy.screen_result().completed_trajectories == 1
+    else:
+        trial = active_strategy.study.trials[0]
+        assert trial.state.name == "COMPLETE"
+        assert trial.values == [10.0, 2.0]
 
 
 def test_study_applies_profile_and_cli_pins_to_strategy_search(tmp_path) -> None:
@@ -3789,6 +3969,34 @@ def test_two_phase_loop_certifies_top_k_and_reports_certified_winner(tmp_path) -
         certification["aggregate_disagreement"]["max"]
         == pytest.approx(abs(explore_winner.objectives["oxygen_kg"] - result.winner.objectives["oxygen_kg"]))
     )
+
+
+def test_two_phase_certification_scores_legacy_energy_alias_as_primary_metric(
+    tmp_path,
+) -> None:
+    profile = copy.deepcopy(PROFILE)
+    profile["objectives"] = [copy.deepcopy(PROFILE["objectives"][1])]
+    out = tmp_path / "two-phase-legacy-energy-primary"
+
+    result = study.run(
+        profile,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        5,
+        out,
+        seed=7,
+        evaluator=_two_phase_evaluate_patch,
+        two_phase_certify={"enabled": True, "top_k": 3},
+    )
+
+    assert result.winner is not None
+    assert ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC in result.winner.objectives
+    assert LEGACY_ENERGY_KWH_METRIC not in result.winner.objectives
+    certification = json.loads((out / "two_phase_certification.json").read_text())
+    assert certification["candidates"]
+    assert all(row["certified_objective"] is not None for row in certification["candidates"])
 
 
 def test_two_phase_certification_filters_exact_infeasible_before_objective(tmp_path) -> None:

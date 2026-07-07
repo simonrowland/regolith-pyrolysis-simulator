@@ -8,7 +8,7 @@ objectives:
   - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.30, rationale: ceramic/glass precursor}
   - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.28, rationale: stored O2 product}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.22, rationale: Al/metal proxy}
-  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.12, rationale: dehydroxylation energy}
+  - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.12, rationale: dehydroxylation energy}
   - {metric: duration_h, sense: minimize, units: h, weight: 0.08, rationale: throughput}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]

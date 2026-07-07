@@ -8,7 +8,7 @@ objectives:
   - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.30, rationale: stored O2 after volatile cleanup}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.26, rationale: Fe-Ni alloy proxy}
   - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.16, rationale: silicate glass product}
-  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.16, rationale: degassing thermal cost}
+  - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.16, rationale: degassing thermal cost}
   - {metric: duration_h, sense: minimize, units: h, weight: 0.12, rationale: long cleanup penalty}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]

@@ -37,7 +37,11 @@ from simulator.optimize.evaluate import (
     _build_eval_inputs,
 )
 from simulator.optimize import job_runner as optimizer_job_runner
-from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    ObjectiveValue,
+    ObjectiveVector,
+)
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore, _serialize_margins
@@ -1066,8 +1070,8 @@ def test_optimizer_leaderboard_ranks_feasible_finite_objectives(client) -> None:
     _seed_leaderboard_fixture(
         run_dir,
         [
-            {"candidate_id": "candidate-low", "oxygen": 6.0},
-            {"candidate_id": "candidate-high", "oxygen": 12.0},
+            {"candidate_id": "candidate-low", "oxygen": 6.0, "energy": 1.0},
+            {"candidate_id": "candidate-high", "oxygen": 12.0, "energy": 3.0},
         ],
     )
 
@@ -1090,6 +1094,27 @@ def test_optimizer_leaderboard_ranks_feasible_finite_objectives(client) -> None:
     assert [entry["rank"] for entry in payload["entries"]] == [1, 2]
     assert payload["excluded_infeasible"] == 0
     assert payload["excluded_nonfinite"] == 0
+
+    legacy_energy_response = client.get(
+        "/api/optimizer/leaderboard"
+        "?feedstock_id=lunar_mare_low_ti&profile_id=oxygen-yield-v1"
+        "&objective=energy_kWh&limit=5"
+    )
+
+    assert legacy_energy_response.status_code == 200
+    legacy_energy_payload = legacy_energy_response.get_json()
+    assert (
+        legacy_energy_payload["objective_metric"]
+        == ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+    )
+    assert [entry["candidate_id"] for entry in legacy_energy_payload["entries"]] == [
+        "candidate-low",
+        "candidate-high",
+    ]
+    assert [entry["objective_value"] for entry in legacy_energy_payload["entries"]] == [
+        1.0,
+        3.0,
+    ]
 
 
 def test_optimizer_leaderboard_excludes_infeasible_rows_with_objectives(client) -> None:

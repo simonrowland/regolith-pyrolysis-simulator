@@ -26,12 +26,16 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    canonical_objective_metric,
+)
 from simulator.optimize.product_pools import forbidden_gates_for_pool, product_pool_class
 
 DESIGN_TARGET_PROVENANCE = (
     "design-composition-target-objective-2026-06-10 rev 3.2 PC target menu seed"
 )
-STANDARD_COST_METRICS = ("energy_kWh", "duration_h")
+STANDARD_COST_METRICS = (ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC, "duration_h")
 _SETPOINT_CAMPAIGN_ALIASES = {
     "C2A": "C2A_continuous",
     "C2A_staged": "C2A_staged",
@@ -507,11 +511,14 @@ def _standard_cost_objectives(profile: Mapping[str, Any]) -> list[dict[str, Any]
     objectives = profile.get("objectives") or []
     if not isinstance(objectives, list):
         raise SystemExit("base profile objectives must be a list")
-    by_metric = {
-        objective.get("metric"): dict(objective)
-        for objective in objectives
-        if isinstance(objective, Mapping)
-    }
+    by_metric = {}
+    for objective in objectives:
+        if not isinstance(objective, Mapping):
+            continue
+        normalized = dict(objective)
+        metric = canonical_objective_metric(str(normalized.get("metric", "")))
+        normalized["metric"] = metric
+        by_metric[metric] = normalized
     missing = [metric for metric in STANDARD_COST_METRICS if metric not in by_metric]
     if missing:
         raise SystemExit(f"base profile missing standard cost objectives: {', '.join(missing)}")

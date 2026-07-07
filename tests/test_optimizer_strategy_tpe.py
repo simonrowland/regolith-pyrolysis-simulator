@@ -18,7 +18,12 @@ from simulator.optimize import (
     ThresholdSpec,
 )
 from simulator.optimize.evaluate import FailureCategory, ScoredResult
-from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    LEGACY_ENERGY_KWH_METRIC,
+    ObjectiveValue,
+    ObjectiveVector,
+)
 from simulator.optimize.recipe import KnobSpec, RecipePatch, RecipeSchema
 from simulator.optimize.strategy.bayesian import (
     _BAD_MAXIMIZE_VALUE,
@@ -182,6 +187,32 @@ def _single_objective_result(candidate: Candidate, metric: str, value: float) ->
         objectives=ObjectiveVector(
             (
                 ObjectiveValue(metric=metric, sense="minimize", value=value),
+            )
+        ),
+        feasibility_margins={"gate": 0.25},
+    )
+
+
+def _legacy_energy_cache_result(
+    candidate: Candidate,
+    *,
+    yield_value: float,
+    energy: float,
+) -> ScoredResult:
+    return ScoredResult(
+        candidate_id=candidate.id,
+        eval_spec=None,
+        cache_key="legacy-cache-key",
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue(metric="yield", sense="maximize", value=yield_value),
+                ObjectiveValue(
+                    metric=LEGACY_ENERGY_KWH_METRIC,
+                    sense="minimize",
+                    value=energy,
+                    units="kWh",
+                ),
             )
         ),
         feasibility_margins={"gate": 0.25},
@@ -544,6 +575,39 @@ def test_tpe_feasible_unscoreable_result_fails_trial_without_bad_objective_value
     assert trial.values is None
     assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.0,)
     assert trial.user_attrs[_UNSCOREABLE_OBJECTIVES_ATTR] is True
+    assert strategy.tell_count == 1
+
+
+def test_tpe_scores_legacy_energy_cache_objective_against_canonical_profile() -> None:
+    profile = {
+        "objectives": [
+            {"metric": "yield", "sense": "maximize", "units": "kg"},
+            {
+                "metric": ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+                "sense": "minimize",
+                "units": "kWh",
+            },
+        ]
+    }
+    strategy = OptunaTPEStrategy(_simple_schema(), seed=46, objective_profile=profile)
+    candidate = strategy.ask(1)[0]
+
+    strategy.tell(
+        [
+            (
+                candidate,
+                _legacy_energy_cache_result(
+                    candidate,
+                    yield_value=1.25,
+                    energy=2.5,
+                ),
+            )
+        ]
+    )
+
+    trial = _trials_by_candidate(strategy)[candidate.id]
+    assert trial.state.name == "COMPLETE"
+    assert trial.values == [1.25, 2.5]
     assert strategy.tell_count == 1
 
 

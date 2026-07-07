@@ -14,7 +14,7 @@ objectives:
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.34, rationale: main oxidizer product}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Fe/Mg ingot proxy}
   - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.22, rationale: Stage 3 glass product}
-  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.10, rationale: throughput cost}
+  - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.10, rationale: throughput cost}
   - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: furnace occupancy}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]

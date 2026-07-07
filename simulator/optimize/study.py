@@ -34,12 +34,15 @@ from simulator.optimize.evaluate import (
 )
 from simulator.optimize.evalspec import PrefixEvalSpec, cache_key
 from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     ObjectiveComputationError,
     ObjectiveDefinition,
     ObjectiveProfileError,
     ObjectiveVector,
+    canonical_objective_mapping,
     objective_definitions,
     objective_scores,
+    objective_value_for_metric,
     pareto_front,
 )
 from simulator.optimize.pool import (
@@ -153,7 +156,7 @@ DEFAULT_PROFILES: Mapping[str, Mapping[str, Any]] = MappingProxyType(
                         "rationale": "default oxygen objective evidence",
                     },
                     {
-                        "metric": "energy_kWh",
+                        "metric": ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
                         "sense": "minimize",
                         "units": "kWh",
                         "weight": 0.25,
@@ -917,11 +920,12 @@ def _primary_objective_metric(definitions: Sequence[ObjectiveDefinition]) -> str
 
 
 def _objective_value(record: StudyRecord, metric: str) -> float | None:
-    if metric not in record.objectives:
+    objectives = canonical_objective_mapping(record.objectives)
+    if metric not in objectives:
         raise StudyError(f"record {record.candidate_id!r} missing objective {metric!r}")
-    if record.objectives[metric] is None:
+    if objectives[metric] is None:
         return None
-    return float(record.objectives[metric])
+    return float(objectives[metric])
 
 
 def _cache_state_from_record(record: StudyRecord) -> str | None:
@@ -2117,10 +2121,11 @@ def _objective_mapping(objectives: ObjectiveVector | None) -> Mapping[str, float
     if objectives is None:
         return MappingProxyType({})
     mapping = objectives.as_mapping()
-    return MappingProxyType({
+    finite_mapping = {
         str(key): None if value is None else _finite(value, str(key))
         for key, value in mapping.items()
-    })
+    }
+    return canonical_objective_mapping(finite_mapping)
 
 
 def _margin_mapping(margins: Mapping[str, Any]) -> Mapping[str, Mapping[str, Any]]:
@@ -2913,14 +2918,9 @@ def _write_leaderboard(
                     _materialized_record_patch(record, schema, profile)
                 ),
             }
-            row.update({
-                definition.metric: (
-                    ""
-                    if record.objectives.get(definition.metric) is None
-                    else record.objectives[definition.metric]
-                )
-                for definition in definitions
-            })
+            for definition in definitions:
+                value = objective_value_for_metric(record.objectives, definition.metric)
+                row[definition.metric] = "" if value is None else value
             row.update(
                 {
                     f"margin_{name}": record.feasibility_margins[name]["margin"]

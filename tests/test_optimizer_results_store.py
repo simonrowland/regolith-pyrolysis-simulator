@@ -17,7 +17,11 @@ from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.fidelity_vocabulary import FidelityVocabularyTranslationError
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
-from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    ObjectiveValue,
+    ObjectiveVector,
+)
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.result_scope import result_scope_payload, selector_where
 from simulator.optimize.results_store import (
@@ -1860,11 +1864,17 @@ def test_best_defaults_to_profile_primary_and_honors_direction(tmp_path) -> None
 
     default_best = store.best(spec_a.feedstock_id)
     explicit_energy_best = store.best(spec_a.feedstock_id, objective_metric="energy_kWh")
+    explicit_scoped_energy_best = store.best(
+        spec_a.feedstock_id,
+        objective_metric=ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    )
 
     assert default_best is not None
     assert default_best.candidate_id == "high-oxygen-high-energy"
     assert explicit_energy_best is not None
     assert explicit_energy_best.candidate_id == "low-oxygen-low-energy"
+    assert explicit_scoped_energy_best is not None
+    assert explicit_scoped_energy_best.candidate_id == "low-oxygen-low-energy"
 
 
 def test_unknown_objective_sense_raises_at_construction_and_deserialization(tmp_path) -> None:

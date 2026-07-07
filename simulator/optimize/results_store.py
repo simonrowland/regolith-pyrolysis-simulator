@@ -40,7 +40,9 @@ from simulator.optimize.evaluate import (
 from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
+    canonical_objective_metric,
     normalize_objective_sense,
+    objective_metric_aliases,
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.backend_names import canonical_backend_name
@@ -338,6 +340,9 @@ class ResultStore:
         )
         if metric is None:
             return None
+        metric = canonical_objective_metric(metric)
+        metric_aliases = objective_metric_aliases(metric)
+        metric_placeholders = ", ".join("?" for _ in metric_aliases)
         where, params = self._selector_where(
             feedstock_id,
             profile_id=profile_id,
@@ -353,12 +358,12 @@ class ResultStore:
                 FROM results r
                 JOIN objective_values ov ON ov.cache_key = r.cache_key
                 WHERE {where} AND r.feasible = 1 AND r.corpus_version = ?
-                    AND ov.metric = ? AND ov.value IS NOT NULL
+                    AND ov.metric IN ({metric_placeholders}) AND ov.value IS NOT NULL
                 GROUP BY ov.sense
                 ORDER BY ov.sense ASC
                 LIMIT 2
                 """,
-                (*params, current_corpus_version(), metric),
+                (*params, current_corpus_version(), *metric_aliases),
             ).fetchall()
             if not objective:
                 return None
@@ -372,11 +377,11 @@ class ResultStore:
                 FROM results r
                 JOIN objective_values ov ON ov.cache_key = r.cache_key
                 WHERE {where} AND r.feasible = 1 AND r.corpus_version = ?
-                    AND ov.metric = ? AND ov.value IS NOT NULL
+                    AND ov.metric IN ({metric_placeholders}) AND ov.value IS NOT NULL
                 ORDER BY ov.value {value_order}, r.cache_key ASC
                 LIMIT 1
                 """,
-                (*params, current_corpus_version(), metric),
+                (*params, current_corpus_version(), *metric_aliases),
             ).fetchone()
         return _row_to_scored_result(row) if row is not None else None
 
@@ -411,7 +416,7 @@ class ResultStore:
                 """,
                 (*params, current_corpus_version()),
             ).fetchone()
-        return str(row["metric"]) if row is not None else None
+        return canonical_objective_metric(str(row["metric"])) if row is not None else None
 
     def _selector_where(
         self,

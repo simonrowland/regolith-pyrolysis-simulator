@@ -38,7 +38,10 @@ from simulator.optimize.evaluate import (
     evaluate,
 )
 from simulator.optimize.evalspec import DEFAULT_VAPOR_PRESSURE_PROVIDER_ID, cache_key
-from simulator.optimize.objective import objective_definitions
+from simulator.optimize.objective import (
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    objective_definitions,
+)
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError
@@ -75,7 +78,7 @@ PROFILE = {
             "rationale": "test oxygen objective evidence",
         },
         {
-            "metric": "energy_kWh",
+            "metric": ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
             "sense": "min",
             "units": "kWh",
             "weight": 0.15,
@@ -2039,7 +2042,7 @@ def test_objective_definitions_keep_profile_order_as_ordinal() -> None:
     assert [(definition.metric, definition.sense, definition.ordinal) for definition in definitions] == [
         ("pure_silica_glass_kg", "maximize", 0),
         ("oxygen_kg", "maximize", 1),
-        ("energy_kWh", "minimize", 2),
+        (ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC, "minimize", 2),
         ("duration_h", "minimize", 3),
     ]
 

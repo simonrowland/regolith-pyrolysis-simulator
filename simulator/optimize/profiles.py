@@ -19,7 +19,10 @@ from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.optimize.objective import (
     COMPOSITION_TARGET_METRIC_PREFIX,
     COMPOSITION_TARGET_TYPE,
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    LEGACY_ENERGY_KWH_METRIC,
     ObjectiveProfileError,
+    canonical_objective_metric,
     normalize_composition_target_objective,
     objective_definitions,
     objective_importance_evidence,
@@ -55,8 +58,8 @@ KNOWN_OBJECTIVE_METRICS = frozenset(
         "oxygen_kg",
         "oxygen_stored_kg",
         "oxygen_vented_kg",
-        "energy_kWh",
-        "energy_electrical_plus_evaporation_kWh",
+        LEGACY_ENERGY_KWH_METRIC,
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
         "duration_h",
         "total_hours",
         "solar_thermal_flux_h",
@@ -475,10 +478,13 @@ def _validate_objectives(profile: Mapping[str, Any], *, source: str | Path) -> N
             if "type" in objective and objective["type"] != "legacy_metric":
                 raise ProfileValidationError(f"{source}: unknown objective type {kind!r}")
             _require_keys(objective, {"metric", "sense", "units"}, source=source, where=where)
-            metric = objective["metric"]
+            metric = str(objective["metric"])
             if metric not in KNOWN_OBJECTIVE_METRICS:
                 raise ProfileValidationError(f"{source}: unknown objective metric {metric!r}")
-            normalized_objectives.append(dict(objective))
+            metric = canonical_objective_metric(metric)
+            normalized = dict(objective)
+            normalized["metric"] = metric
+            normalized_objectives.append(normalized)
         else:
             raise ProfileValidationError(f"{source}: unknown objective type {kind!r}")
         _require_keys(objective, {"metric", "sense", "units"}, source=source, where=where)

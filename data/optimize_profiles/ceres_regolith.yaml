@@ -8,7 +8,7 @@ objectives:
   - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.30, rationale: stored O2 product}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.26, rationale: Mg shuttle metal proxy}
   - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.14, rationale: silicate glass product}
-  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.16, rationale: extended degassing energy}
+  - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.16, rationale: extended degassing energy}
   - {metric: duration_h, sense: minimize, units: h, weight: 0.14, rationale: long staged cleanup}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]

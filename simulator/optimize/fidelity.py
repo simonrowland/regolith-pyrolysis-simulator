@@ -27,7 +27,11 @@ from simulator.backend_names import canonical_backend_name
 from simulator.backends import requires_stage0_subprocess
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evaluate import EvaluationAbort, ScoredResult
-from simulator.optimize.objective import ObjectiveValue
+from simulator.optimize.objective import (
+    ObjectiveValue,
+    canonical_objective_metric,
+    objective_metric_aliases,
+)
 from simulator.fidelity_vocabulary import (
     CANONICAL_EVIDENCE_CLASSES,
     FidelityVocabularyTranslationError,
@@ -814,7 +818,8 @@ def _ranked(pairs: Sequence[Pair], objective: str, *, use_high: bool) -> list[in
 def _value(result: ScoredResult, objective: str) -> ObjectiveValue | None:
     if result.objectives is None:
         return None
-    return next((value for value in result.objectives.values if value.metric == objective), None)
+    aliases = set(objective_metric_aliases(objective))
+    return next((value for value in result.objectives.values if value.metric in aliases), None)
 
 
 def _score(value: ObjectiveValue) -> float:
@@ -823,13 +828,13 @@ def _score(value: ObjectiveValue) -> float:
 
 def _objective_names(requested: Sequence[str] | None, pairs: Sequence[Pair]) -> tuple[str, ...]:
     if requested:
-        return tuple(str(name) for name in requested)
+        return tuple(dict.fromkeys(canonical_objective_metric(str(name)) for name in requested))
     seen: dict[str, int] = {}
     for _, fast, high in pairs:
         for result in (high, fast):
             if result.objectives:
                 for value in result.objectives.values:
-                    seen.setdefault(value.metric, value.ordinal)
+                    seen.setdefault(canonical_objective_metric(value.metric), value.ordinal)
         if seen:
             break
     return tuple(name for name, _ in sorted(seen.items(), key=lambda item: item[1]))
@@ -841,8 +846,9 @@ def _primary(pairs: Sequence[Pair], names: Sequence[str]) -> str | None:
         for result in (high, fast):
             if result.objectives:
                 for value in result.objectives.values:
-                    if value.metric in names:
-                        ordinals[value.metric] = value.ordinal
+                    metric = canonical_objective_metric(value.metric)
+                    if metric in names:
+                        ordinals[metric] = value.ordinal
     return min(ordinals.items(), key=lambda item: item[1])[0] if ordinals else None
 
 
@@ -857,7 +863,7 @@ def _missing_declared_objective_notes(
             if not result.feasible:
                 continue
             present = (
-                {value.metric for value in result.objectives.values}
+                {canonical_objective_metric(value.metric) for value in result.objectives.values}
                 if result.objectives is not None
                 else set()
             )

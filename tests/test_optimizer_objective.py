@@ -10,6 +10,8 @@ import simulator.optimize.objective as objective_module
 from scripts import sso_r_validation_map as validation_map
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
+    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+    LEGACY_ENERGY_KWH_METRIC,
     ObjectiveComputationError,
     ObjectiveDefinition,
     ObjectiveProfileError,
@@ -17,6 +19,7 @@ from simulator.optimize.objective import (
     composition_target_eval_metadata,
     compute_objectives,
     dominates,
+    objective_definitions,
     objective_scores,
     objective_importance_evidence,
     pareto_front,
@@ -39,7 +42,7 @@ from simulator.optimize.sso2_evidence import (
 
 DEFINITIONS = (
     ObjectiveDefinition("oxygen_kg", "maximize", "kg", ordinal=0),
-    ObjectiveDefinition("energy_kWh", "minimize", "kWh", ordinal=1),
+    ObjectiveDefinition(ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC, "minimize", "kWh", ordinal=1),
 )
 
 
@@ -136,7 +139,10 @@ def test_target_spec_digest_excludes_derived_thermal_window_disposition() -> Non
 
 
 def test_missing_or_nonfinite_objectives_raise() -> None:
-    with pytest.raises(ObjectiveComputationError, match="energy_kWh.*missing"):
+    with pytest.raises(
+        ObjectiveComputationError,
+        match=f"{ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC}.*missing",
+    ):
         dominates({"oxygen_kg": 1.0}, {"oxygen_kg": 1.0, "energy_kWh": 5.0}, DEFINITIONS)
 
     with pytest.raises(ObjectiveComputationError, match="oxygen_kg is non-finite"):
@@ -145,6 +151,42 @@ def test_missing_or_nonfinite_objectives_raise() -> None:
             {"oxygen_kg": 1.0, "energy_kWh": 5.0},
             DEFINITIONS,
         )
+
+
+def test_legacy_energy_objective_alias_scores_under_canonical_definition() -> None:
+    profile = {
+        "objectives": [
+            {
+                "metric": LEGACY_ENERGY_KWH_METRIC,
+                "sense": "minimize",
+                "units": "kWh",
+            }
+        ]
+    }
+
+    definitions = objective_definitions(profile)
+
+    assert definitions[0].metric == ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+    assert objective_scores({LEGACY_ENERGY_KWH_METRIC: 4.0}, definitions) == (-4.0,)
+    assert objective_scores(
+        {ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: 4.0},
+        (ObjectiveDefinition(LEGACY_ENERGY_KWH_METRIC, "minimize", "kWh"),),
+    ) == (-4.0,)
+
+
+def test_energy_alias_set_is_derived_from_canonical_alias_mapping() -> None:
+    expected = frozenset(
+        {
+            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+            *(
+                alias
+                for alias, canonical in objective_module._OBJECTIVE_METRIC_ALIASES.items()
+                if canonical == ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+            ),
+        }
+    )
+    assert objective_module.ENERGY_ELECTRICAL_PLUS_EVAPORATION_ALIASES == expected
+    assert set(objective_module.objective_metric_aliases(LEGACY_ENERGY_KWH_METRIC)) == expected
 
 
 def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
@@ -168,8 +210,9 @@ def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
     product_classes = {"metals_plus_O2": {"class_total_kg": 3.0}}
 
     assert _metric_value(
-        "energy_kWh", sim, {}, product_classes
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC, sim, {}, product_classes
     ) == pytest.approx(18.0)
+    assert _metric_value(LEGACY_ENERGY_KWH_METRIC, sim, {}, product_classes) == pytest.approx(18.0)
     assert _metric_value(
         "electrical_energy_kWh", sim, {}, product_classes
     ) == pytest.approx(6.0)

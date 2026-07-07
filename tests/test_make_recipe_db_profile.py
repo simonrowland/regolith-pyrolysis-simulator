@@ -14,6 +14,7 @@ from simulator.optimize.evaluate import (
     _composition_target_constraints,
     evaluate,
 )
+from simulator.optimize.objective import ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
 from simulator.optimize.product_pools import MELT_PRODUCT_POOLS, STREAM_PRODUCT_POOLS
 from simulator.optimize.profiles import ProfileValidationError, validate_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
@@ -227,7 +228,7 @@ def test_target_menu_rows_emit_validating_profiles(
     assert objective["metric"] == f"composition_target:{target_id}"
     assert objective["target"]["require_coating_gate"] is True
     assert {row["metric"] for row in validated["objectives"][1:]} == {
-        "energy_kWh",
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
         "duration_h",
     }
 

@@ -9,7 +9,7 @@ objectives:
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.28, rationale: O2 product}
   - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.18, rationale: glass product}
   - {metric: oxygen_stored_kg, sense: maximize, units: kg, weight: 0.10, rationale: storage preference}
-  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.08, rationale: cleanup energy}
+  - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.08, rationale: cleanup energy}
   - {metric: duration_h, sense: minimize, units: h, weight: 0.04, rationale: extra hold penalty}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]

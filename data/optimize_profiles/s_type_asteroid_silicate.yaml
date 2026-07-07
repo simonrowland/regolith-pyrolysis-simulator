@@ -8,7 +8,7 @@ objectives:
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.38, rationale: Mg-dominant metal proxy}
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.24, rationale: oxidizer product}
   - {metric: pure_silica_glass_kg, sense: maximize, units: kg, weight: 0.14, rationale: glass co-product}
-  - {metric: energy_kWh, sense: minimize, units: kWh, weight: 0.14, rationale: high liquidus penalty}
+  - {metric: energy_electrical_plus_evaporation_kWh, sense: minimize, units: kWh, weight: 0.14, rationale: high liquidus penalty}
   - {metric: duration_h, sense: minimize, units: h, weight: 0.10, rationale: throughput}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
