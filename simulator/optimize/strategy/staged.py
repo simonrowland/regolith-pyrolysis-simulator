@@ -52,6 +52,11 @@ class StagedAllowlistError(StagedBeamStateError):
     """Raised when staged allowlist names an unsupported stage."""
 
 
+_FORWARD_SAMPLE_INDEX_BAND = 1_000_000
+_BACKWARD_TARGET_INDEX_BAND = 100_000
+_BACKWARD_PASS_INDEX_BAND = 1_000_000
+
+
 @dataclass(frozen=True)
 class _BeamNode:
     patch: RecipePatch
@@ -189,6 +194,15 @@ def enumerate_topologies(
     resolved = tuple(_coerce_topology(topology) for topology in topologies)
     if not resolved:
         raise ValueError("at least one topology")
+    seen: set[str] = set()
+    duplicates: list[str] = []
+    for topology in resolved:
+        if topology.id in seen:
+            duplicates.append(topology.id)
+        seen.add(topology.id)
+    if duplicates:
+        duplicate_list = ", ".join(sorted(set(duplicates)))
+        raise ValueError(f"duplicate staged topology id: {duplicate_list}")
     return resolved
 
 
@@ -279,6 +293,12 @@ class StagedStrategy:
         self._stages = _stage_specs(self.schema, configured_allowlist, self.topology)
         if not self._stages:
             raise StagedBeamStateError("staged strategy requires at least one stage")
+        _validate_sobol_index_bands(
+            beam_width=self.beam_width,
+            children_per_parent=self.children_per_parent,
+            stage_count=len(self._stages),
+            max_backward_passes=self.max_backward_passes,
+        )
         self._definitions = objective_definitions(self.objective_profile)
         self._stage_index = 0
         self._topology_patch = _patch_for_topology(self.topology).validated(self.schema)
@@ -904,6 +924,39 @@ def _positive_int(value: Any, field_name: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
         raise ValueError(f"{field_name} must be a positive int")
     return value
+
+
+def _validate_sobol_index_bands(
+    *,
+    beam_width: int,
+    children_per_parent: int,
+    stage_count: int,
+    max_backward_passes: int,
+) -> None:
+    forward_width = max(1, beam_width) * children_per_parent
+    if forward_width > _FORWARD_SAMPLE_INDEX_BAND:
+        raise ValueError(
+            "staged Sobol forward band exceeded: "
+            "beam_width * children_per_parent must be <= "
+            f"{_FORWARD_SAMPLE_INDEX_BAND}"
+        )
+    if max_backward_passes <= 0:
+        return
+    if stage_count * _BACKWARD_TARGET_INDEX_BAND > _BACKWARD_PASS_INDEX_BAND:
+        raise ValueError(
+            "staged Sobol backward stage band exceeded: "
+            f"stage_count must be <= {_BACKWARD_PASS_INDEX_BAND // _BACKWARD_TARGET_INDEX_BAND}"
+        )
+    archive_bound = forward_width
+    for pass_index in range(max_backward_passes):
+        backward_width = archive_bound * children_per_parent
+        if backward_width > _BACKWARD_TARGET_INDEX_BAND:
+            raise ValueError(
+                "staged Sobol backward target band exceeded: "
+                "possible archive_size * children_per_parent must be <= "
+                f"{_BACKWARD_TARGET_INDEX_BAND} at backward pass {pass_index}"
+            )
+        archive_bound += backward_width
 
 
 def _non_negative_int(value: Any, field_name: str) -> int:

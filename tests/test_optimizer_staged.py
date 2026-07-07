@@ -625,6 +625,82 @@ def test_empty_topologies_raise(tmp_path) -> None:
         )
 
 
+def test_duplicate_topologies_raise_at_profile_and_strategy_construction(tmp_path) -> None:
+    topology = TopologyChoice(path_ab="A", branch="two", c5=False, c6=True)
+    duplicate_topologies = (topology.id, topology.id)
+    with pytest.raises(ValueError, match="duplicate staged topology id"):
+        enumerate_topologies(duplicate_topologies)
+
+    profile = {**PROFILE, "staged": {"topologies": duplicate_topologies}}
+    with pytest.raises(ValueError, match="duplicate staged topology id"):
+        study.resolve_profile(profile, expected_feedstock=FEEDSTOCK, schema=SCHEMA)
+    with pytest.raises(ValueError, match="duplicate staged topology id"):
+        StagedStrategy(SCHEMA, seed=13, objective_profile=profile)
+    with pytest.raises(ValueError, match="duplicate staged topology id"):
+        study.run(
+            profile,
+            FEEDSTOCK,
+            "staged",
+            "stub",
+            parallel=2,
+            budget=2,
+            out_dir=tmp_path,
+            seed=13,
+            evaluator=SpyEvaluator(),
+        )
+
+
+def test_multi_topology_staged_run_uses_topology_specific_sample_streams(tmp_path) -> None:
+    topologies = (
+        TopologyChoice(path_ab="A", branch="two", c5=False, c6=False),
+        TopologyChoice(path_ab="A", branch="two", c5=False, c6=True),
+    )
+    result = study.run(
+        {**PROFILE, "staged": {"beam_width": 1, "children_per_parent": 1}},
+        FEEDSTOCK,
+        "staged",
+        "stub",
+        parallel=2,
+        budget=2,
+        out_dir=tmp_path,
+        seed=17,
+        evaluator=SpyEvaluator(),
+        topologies=topologies,
+    )
+
+    assert {record.candidate_id.split("-")[2] for record in result.records} == {
+        topology.id for topology in topologies
+    }
+    assert len({record.cache_key for record in result.records}) == len(result.records)
+    assert result.records[0].patch.recipe_id(SCHEMA) != result.records[1].patch.recipe_id(SCHEMA)
+
+
+def test_staged_rejects_sobol_sample_index_band_collisions() -> None:
+    with pytest.raises(ValueError, match="forward band exceeded"):
+        StagedStrategy(
+            SCHEMA,
+            seed=1,
+            objective_profile={
+                **PROFILE,
+                "staged": {"beam_width": 1_000_001, "children_per_parent": 1},
+            },
+        )
+
+    with pytest.raises(ValueError, match="backward target band exceeded"):
+        StagedStrategy(
+            SCHEMA,
+            seed=1,
+            objective_profile={
+                **PROFILE,
+                "staged": {
+                    "beam_width": 100_000,
+                    "children_per_parent": 2,
+                    "max_backward_passes": 1,
+                },
+            },
+        )
+
+
 def test_joint_refine_improves_or_refines() -> None:
     profile = {
         **PROFILE,

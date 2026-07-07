@@ -7,6 +7,7 @@ from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 import copy
 import csv
+import hashlib
 import inspect
 import json
 import logging
@@ -96,6 +97,7 @@ CERTIFIED_CACHE_STATES = frozenset({"cached_exact", "live_fill"})
 EXPLORE_CACHE_TIER_CEILING = "cached_interpolated"
 CERTIFY_CACHE_TIER_CEILING = "cached_exact"
 DEFAULT_TWO_PHASE_TOP_K = 10
+_TWO_PHASE_CERTIFICATION_POOL_MAX_MULTIPLIER = 4
 _TWO_PHASE_CERTIFICATION_NAME = "two_phase_certification.json"
 _SSO2_OBJECTIVE_METRIC = "sso2_pn2_fe_drain_silica"
 _SSO2_OBJECTIVE_TRACE_KEY = "sso2_objective_evidence"
@@ -394,7 +396,7 @@ def run(
         staged_strategies = tuple(
             StagedStrategy(
                 active_schema,
-                seed=config.seed,
+                seed=_staged_topology_seed(config.seed, topology, requested_topologies),
                 objective_profile=single_topology_profile,
                 topology=topology,
             )
@@ -581,7 +583,12 @@ def run(
             miss_policy="live-fill",
         )
         certification = _run_exact_certification(
-            explore_leaderboard[: two_phase.top_k],
+            _two_phase_certification_pool(
+                leaderboard=explore_leaderboard,
+                pareto=explore_pareto_ranked,
+                top_k=two_phase.top_k,
+                include_pareto_extras=len(definitions) > 1,
+            ),
             records=records,
             profile=certify_profile,
             feedstock=config.feedstock,
@@ -596,6 +603,7 @@ def run(
             config=config,
             active_strategy=active_strategy,
             staged_strategies=staged_strategies,
+            requested_top_k=two_phase.top_k,
         )
         leaderboard = certification.leaderboard
         pareto_ranked = certification.pareto
@@ -945,6 +953,68 @@ def _is_certified_cache_state(cache_state: str | None) -> bool:
     return cache_state in CERTIFIED_CACHE_STATES
 
 
+def _staged_topology_seed(
+    base_seed: int,
+    topology: TopologyChoice,
+    topologies: Sequence[TopologyChoice],
+) -> int:
+    """Derive a deterministic Sobol stream seed for multi-topology staged runs."""
+    if len(topologies) <= 1:
+        return base_seed
+    digest = hashlib.blake2s(topology.id.encode("utf-8"), digest_size=4).digest()
+    topology_offset = int.from_bytes(digest, "big") + 1
+    return (base_seed + topology_offset) % (2**32)
+
+
+def _two_phase_certification_pool(
+    *,
+    leaderboard: Sequence[StudyRecord],
+    pareto: Sequence[StudyRecord],
+    top_k: int,
+    include_pareto_extras: bool,
+) -> tuple[StudyRecord, ...]:
+    """Return scalar top-K, plus Pareto-front extras for multi-objective profiles."""
+    selected: list[StudyRecord] = []
+    seen: set[str] = set()
+    pareto_extras = pareto if include_pareto_extras else ()
+    for record in (*leaderboard[:top_k], *pareto_extras):
+        if record.candidate_id in seen:
+            continue
+        selected.append(record)
+        seen.add(record.candidate_id)
+    if not selected:
+        return ()
+    limit = min(
+        len(leaderboard),
+        max(top_k, top_k * _TWO_PHASE_CERTIFICATION_POOL_MAX_MULTIPLIER),
+    )
+    if limit <= 0:
+        limit = len(selected)
+    if len(selected) > limit:
+        truncated = selected[limit:]
+        _LOGGER.warning(
+            "two_phase_certification_pool_truncated top_k=%s limit=%s pareto=%s "
+            "union=%s truncated_candidate_ids=%s",
+            top_k,
+            limit,
+            len(pareto_extras),
+            len(selected),
+            ",".join(record.candidate_id for record in truncated),
+        )
+        return tuple(selected[:limit])
+    return tuple(selected)
+
+
+def _certification_pool_limit(
+    top_k: int,
+    *,
+    definitions: Sequence[ObjectiveDefinition],
+) -> int:
+    if len(definitions) <= 1:
+        return top_k
+    return max(top_k, top_k * _TWO_PHASE_CERTIFICATION_POOL_MAX_MULTIPLIER)
+
+
 def _disagreement_aggregate(values: Sequence[float]) -> dict[str, float]:
     if not values:
         return {"max": 0.0, "p95": 0.0}
@@ -954,7 +1024,7 @@ def _disagreement_aggregate(values: Sequence[float]) -> dict[str, float]:
 
 
 def _run_exact_certification(
-    top_k_records: Sequence[StudyRecord],
+    certification_pool: Sequence[StudyRecord],
     *,
     records: list[StudyRecord],
     profile: Mapping[str, Any],
@@ -970,8 +1040,9 @@ def _run_exact_certification(
     config: "StudyConfig",
     active_strategy: Strategy,
     staged_strategies: tuple[StagedStrategy, ...],
+    requested_top_k: int,
 ) -> _CertificationPassResult:
-    if not top_k_records:
+    if not certification_pool:
         raise StudyNoFeasibleError("two-phase certification received no explore candidates")
     primary_metric = _primary_objective_metric(definitions)
     explore_by_id = {record.candidate_id: record for record in records}
@@ -980,7 +1051,7 @@ def _run_exact_certification(
     replay_code_version: str | None = None
     replay_data_digests: Mapping[str, str] | None = None
 
-    for explore_record in top_k_records:
+    for explore_record in certification_pool:
         candidate = Candidate(id=explore_record.candidate_id, patch=explore_record.patch)
         results = _evaluate_candidates(
             [candidate],
@@ -1066,7 +1137,12 @@ def _run_exact_certification(
             "code_version": replay_code_version,
             "data_digests": dict(replay_data_digests or {}),
         },
-        "top_k": len(top_k_records),
+        "top_k": requested_top_k,
+        "certification_pool_size": len(certification_pool),
+        "certification_pool_limit": _certification_pool_limit(
+            requested_top_k,
+            definitions=definitions,
+        ),
         "disagreement_threshold": None,
     }
     certified_feasible = tuple(record for record in certified_records if record.feasible)
@@ -1169,20 +1245,24 @@ def resolve_profile(
             raise ValueError(f"unknown profile {profile!r}") from exc
         if expected_feedstock is not None:
             resolved["feedstock"] = expected_feedstock
-        return validate_profile(
+        validated = validate_profile(
             resolved,
             expected_feedstock=expected_feedstock,
             source=f"<profile:{profile}>",
             schema=schema,
         )
+        _requested_staged_topologies(validated, None)
+        return validated
     if not isinstance(profile, Mapping):
         raise TypeError("profile must be a profile name or mapping")
-    return validate_profile(
+    validated = validate_profile(
         profile,
         expected_feedstock=expected_feedstock,
         source=getattr(profile, "source", "<profile>"),
         schema=schema,
     )
+    _requested_staged_topologies(validated, None)
+    return validated
 
 
 def resolve_strategy(

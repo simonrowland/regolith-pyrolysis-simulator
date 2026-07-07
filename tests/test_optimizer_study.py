@@ -1496,6 +1496,192 @@ def _nullable_position_evaluator(
     )
 
 
+def _pareto_certification_candidates() -> tuple[Candidate, ...]:
+    candidates: list[Candidate] = []
+    for idx, candidate_id in enumerate(("pareto-a", "pareto-b", "scalar-c")):
+        candidates.append(
+            Candidate(
+                id=candidate_id,
+                patch=RecipePatch.from_nested(
+                    {"campaigns": {"C0": {"temp_range_C": [910.0 + idx, 930.0 + idx]}}}
+                ),
+            )
+        )
+    return tuple(candidates)
+
+
+def _pareto_certification_values(candidate_id: str) -> tuple[float, float]:
+    return {
+        "pareto-a": (10.0, 10.0),
+        "pareto-b": (8.0, 0.0),
+        "scalar-c": (9.0, 9.0),
+    }[candidate_id]
+
+
+def _pareto_certification_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    assert candidate_id is not None
+    oxygen, energy = _pareto_certification_values(candidate_id)
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", oxygen, "kg", ordinal=0),
+                ObjectiveValue("energy_kWh", "minimize", energy, "kWh", ordinal=1),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+            },
+            product_summary={
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                }
+            },
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+    )
+
+
+def _single_objective_tie_profile() -> dict[str, Any]:
+    profile = copy.deepcopy(PROFILE)
+    profile["objectives"] = [copy.deepcopy(PROFILE["objectives"][0])]
+    return profile
+
+
+def _single_objective_tie_candidates() -> tuple[Candidate, ...]:
+    candidates: list[Candidate] = []
+    for idx, candidate_id in enumerate(("tie-a", "tie-b", "lower-c")):
+        candidates.append(
+            Candidate(
+                id=candidate_id,
+                patch=RecipePatch.from_nested(
+                    {"campaigns": {"C0": {"temp_range_C": [920.0 + idx, 940.0 + idx]}}}
+                ),
+            )
+        )
+    return tuple(candidates)
+
+
+def _single_objective_tie_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    assert candidate_id is not None
+    oxygen = {"tie-a": 10.0, "tie-b": 10.0, "lower-c": 9.0}[candidate_id]
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (ObjectiveValue("oxygen_kg", "maximize", oxygen, "kg", ordinal=0),)
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+            },
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+    )
+
+
+def test_two_phase_certification_pool_includes_pareto_beyond_scalar_top_k(
+    tmp_path,
+) -> None:
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        _FixedCandidateStrategy(_pareto_certification_candidates()),
+        "stub",
+        1,
+        3,
+        tmp_path / "two-phase-pareto-pool",
+        evaluator=_pareto_certification_evaluator,
+        two_phase_certify={"enabled": True, "top_k": 2},
+    )
+    certification = json.loads(
+        (tmp_path / "two-phase-pareto-pool" / "two_phase_certification.json").read_text()
+    )
+
+    certified_ids = [row["candidate_id"] for row in certification["candidates"]]
+    assert certified_ids == ["pareto-a", "scalar-c", "pareto-b"]
+    assert "pareto-b" in {record.candidate_id for record in result.pareto}
+    assert certification["top_k"] == 2
+    assert certification["certification_pool_size"] == 3
+
+
+def test_two_phase_certification_pool_preserves_single_objective_scalar_top_k_ties(
+    tmp_path,
+) -> None:
+    profile = _single_objective_tie_profile()
+    result = study.run(
+        profile,
+        FEEDSTOCK,
+        _FixedCandidateStrategy(_single_objective_tie_candidates()),
+        "stub",
+        1,
+        3,
+        tmp_path / "two-phase-single-objective-tie",
+        evaluator=_single_objective_tie_evaluator,
+        two_phase_certify={"enabled": True, "top_k": 1},
+    )
+    certification = json.loads(
+        (
+            tmp_path
+            / "two-phase-single-objective-tie"
+            / "two_phase_certification.json"
+        ).read_text()
+    )
+    definitions = study.objective_definitions(profile)
+    scalar_top_id = sorted(result.records, key=lambda row: study._rank_key(row, definitions))[
+        0
+    ].candidate_id
+    explore_pareto_ids = {
+        row.candidate_id
+        for row in study.pareto_front(
+            result.records,
+            definitions,
+            objective_getter=lambda row: row.objectives,
+        )
+    }
+
+    assert {"tie-a", "tie-b"} <= explore_pareto_ids
+    assert [row["candidate_id"] for row in certification["candidates"]] == [scalar_top_id]
+    assert certification["top_k"] == 1
+    assert certification["certification_pool_size"] == 1
+    assert certification["certification_pool_limit"] == 1
+
+
 def test_leaderboard_ranking_preserves_nullable_objective_positions(tmp_path) -> None:
     profile = _nullable_position_profile()
     definitions = study.objective_definitions(profile)
@@ -3612,14 +3798,16 @@ def test_two_phase_certification_all_infeasible_completes_no_winner(tmp_path) ->
     assert result.reason == "completed-no-feasible-winner"
     assert result.winner is None
     assert result.pareto == ()
-    assert len(result.leaderboard) == 3
+    assert len(result.leaderboard) == certification["certification_pool_size"]
     assert {record.feasible for record in result.leaderboard} == {False}
     assert pareto_payload["status"] == "completed-no-feasible-winner"
     assert pareto_payload["pareto"] == []
     assert pareto_payload["winner_candidate_id"] is None
-    assert len(certification["candidates"]) == 3
+    assert len(certification["candidates"]) == certification["certification_pool_size"]
     assert all(row["certified_objective"] is None for row in certification["candidates"])
-    assert [row["is_winner"] for row in leaderboard_rows] == ["False", "False", "False"]
+    assert [row["is_winner"] for row in leaderboard_rows] == [
+        "False" for _ in range(certification["certification_pool_size"])
+    ]
     assert not (out / "winner.recipe.yaml").exists()
 
 
