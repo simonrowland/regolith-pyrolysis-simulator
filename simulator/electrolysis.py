@@ -52,43 +52,9 @@ from typing import Dict, List, Tuple
 from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
 )
+from simulator.mre_ladder import DECOMP_VOLTAGES
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
-
-# Standard decomposition voltages at ~1873 K / ~1600 C (V).
-# Raw-thermo rungs use E = -DeltaGf(1873 K)/(nF), rounded to 0.05 V.
-DECOMP_VOLTAGES = {
-    # NiO source: DeltaGf(NiO, ~1873 K) ~= -76 kJ/mol
-    # [Hemingway 1990 Am. Mineral. 75:781 + Robie & Hemingway + NEA
-    # Chemical Thermodynamics of Nickel]; E = -DeltaGf/(2F) ~= 0.39 V
-    # standard-state. Runtime Nernst applies melt activity + pO2.
-    'NiO':   0.39,
-    # Na2O/K2O volatility caveat: condensed-phase DeltaGf at 1873 K is
-    # estimated; Na/K are volatile above their boiling points, so activity
-    # and vapor partitioning can lower the effective threshold. Hold legacy
-    # 0.5 V pending activity/vapor-aware grounding.
-    # provenance: Na2O/K2O legacy rungs — REF-019 Table 2 plus REF-050/REF-051 activity primaries; value intentionally unchanged.
-    'Na2O':  0.5,
-    'K2O':   0.5,
-    # O'Neill 1988 + Chase 1998 Fe-O emf/raw-thermo anchor.
-    'FeO':   0.75,
-    # Reference-only legacy full-reduction threshold. Live MRE fixed
-    # reduction excludes Fe2O3 because ferric Fe is represented by the
-    # fO2-coupled Kress91 split, not by a terminal-O2 full-reduction rung.
-    'Fe2O3': 0.90,
-    # NIST-JANAF/Chase 1998 + Barin; modest-confidence upper-range anchor.
-    'Cr2O3': 0.95,
-    # NIST-JANAF/Chase 1998 + Barin; modest-confidence anchor.
-    'MnO':   1.05,
-    # Chase 1998 raw-thermo anchor.
-    'SiO2':  1.45,
-    # Chase 1998 + Barin raw-thermo anchor.
-    'TiO2':  1.70,
-    # NIST-JANAF/Chase 1998 + Barin raw-thermo anchor.
-    'Al2O3': 1.95,
-    'MgO':   2.2,
-    'CaO':   2.5,
-}
 
 FERRIC_TO_FERROUS_REFERENCE_V = 0.65
 FERRIC_TO_FERROUS_REFERENCE_STATUS = (

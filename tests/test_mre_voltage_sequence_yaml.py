@@ -8,7 +8,7 @@ graceful fallback so the YAML is now source-of-truth.
 These tests pin:
 1. ``_coerce_mre_decomposition_voltage`` numeric parsing (scalar,
    range mean, string with operator prefix, defensive None/bool/
-   non-finite skip).
+   non-finite skip) plus the repo YAML canonical-token path.
 2. ``_parse_mre_voltage_sequence_yaml`` end-to-end YAML parse with
    the canonical published shape.
 3. Fallback behaviour when YAML missing / empty / malformed.

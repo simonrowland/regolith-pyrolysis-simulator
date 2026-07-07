@@ -5,7 +5,43 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from simulator.electrolysis import DECOMP_VOLTAGES
+# Standard decomposition voltages at ~1873 K / ~1600 C (V).
+# Raw-thermo rungs use E = -DeltaGf(1873 K)/(nF), rounded to 0.05 V.
+DECOMP_VOLTAGES = {
+    # NiO source: DeltaGf(NiO, ~1873 K) ~= -76 kJ/mol
+    # [Hemingway 1990 Am. Mineral. 75:781 + Robie & Hemingway + NEA
+    # Chemical Thermodynamics of Nickel]; E = -DeltaGf/(2F) ~= 0.39 V
+    # standard-state. Runtime Nernst applies melt activity + pO2.
+    'NiO': 0.39,
+    # Na2O/K2O volatility caveat: condensed-phase DeltaGf at 1873 K is
+    # estimated; Na/K are volatile above their boiling points, so activity
+    # and vapor partitioning can lower the effective threshold. Hold legacy
+    # 0.5 V pending activity/vapor-aware grounding.
+    # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051
+    # activity primaries; value intentionally unchanged.
+    'Na2O': 0.5,
+    'K2O': 0.5,
+    # O'Neill 1988 + Chase 1998 Fe-O emf/raw-thermo anchor.
+    'FeO': 0.75,
+    # Reference-only legacy full-reduction threshold. Live MRE fixed
+    # reduction excludes Fe2O3 because ferric Fe is represented by the
+    # fO2-coupled Kress91 split, not by a terminal-O2 full-reduction rung.
+    'Fe2O3': 0.90,
+    # NIST-JANAF/Chase 1998 + Barin; modest-confidence upper-range anchor.
+    'Cr2O3': 0.95,
+    # NIST-JANAF/Chase 1998 + Barin; modest-confidence anchor.
+    'MnO': 1.05,
+    # Chase 1998 raw-thermo anchor.
+    'SiO2': 1.45,
+    # Chase 1998 + Barin raw-thermo anchor.
+    'TiO2': 1.70,
+    # NIST-JANAF/Chase 1998 + Barin raw-thermo anchor.
+    'Al2O3': 1.95,
+    'MgO': 2.2,
+    'CaO': 2.5,
+}
+
+CANONICAL_DECOMPOSITION_VOLTAGE_TOKEN = "canonical"
 
 # Fallback ladder used when the YAML MRE sequence is missing/unusable. Rung
 # voltages are DERIVED from the single-source electrolysis.DECOMP_VOLTAGES
@@ -47,6 +83,13 @@ DISABLED_PRESET_TARGETS = {
 }
 
 
+def canonical_mre_decomposition_voltage(species: Any) -> float | None:
+    """Return the canonical MRE decomposition voltage for ``species``."""
+    if not species or isinstance(species, bool):
+        return None
+    return DECOMP_VOLTAGES.get(str(species))
+
+
 def coerce_mre_decomposition_voltage(value: Any) -> float | None:
     """Coerce a YAML decomposition voltage to a finite float."""
     if value is None or isinstance(value, bool):
@@ -79,11 +122,22 @@ def coerce_mre_decomposition_voltage(value: Any) -> float | None:
     return None
 
 
+def resolve_mre_decomposition_voltage(species: Any, value: Any) -> float | None:
+    """Resolve an explicit YAML voltage or the canonical-voltage token."""
+    if isinstance(value, str) and (
+        value.strip().lower() == CANONICAL_DECOMPOSITION_VOLTAGE_TOKEN
+    ):
+        return canonical_mre_decomposition_voltage(species)
+    return coerce_mre_decomposition_voltage(value)
+
+
 def parse_mre_voltage_sequence_yaml(setpoints: dict[str, Any] | None) -> list[dict[str, Any]]:
     """Parse ``setpoints['mre_voltage_sequence']['sequence']``.
 
     Returns the Python ladder shape used by the simulator:
-    ``{voltage, species, min_hold_hours}``. Malformed entries are skipped.
+    ``{voltage, species, min_hold_hours}``. ``decomposition_V: "canonical"``
+    resolves through ``DECOMP_VOLTAGES`` for that species. Malformed entries
+    are skipped.
     """
     block = ((setpoints or {}).get('mre_voltage_sequence', {}) or {})
     entries = block.get('sequence', []) or []
@@ -97,7 +151,10 @@ def parse_mre_voltage_sequence_yaml(setpoints: dict[str, Any] | None) -> list[di
         species = entry.get('species')
         if not species or not isinstance(species, str):
             continue
-        voltage = coerce_mre_decomposition_voltage(entry.get('decomposition_V'))
+        voltage = resolve_mre_decomposition_voltage(
+            species,
+            entry.get('decomposition_V'),
+        )
         if voltage is None:
             continue
         raw_hold = entry.get('min_hold_hours', MRE_DEFAULT_MIN_HOLD_HOURS)

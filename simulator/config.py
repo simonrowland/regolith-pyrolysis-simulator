@@ -18,6 +18,58 @@ _FUNCTIONAL_DATA_DIGEST_CONFIGS = frozenset({"setpoints", "vapor_pressures"})
 _FUNCTIONAL_DATA_DIGEST_PREFIX = b"functional-data-yaml-v1\0"
 
 
+def _resolve_mre_canonical_voltage_token(species: Any, value: Any) -> Any:
+    from simulator.mre_ladder import (
+        CANONICAL_DECOMPOSITION_VOLTAGE_TOKEN,
+        DECOMP_VOLTAGES,
+    )
+
+    if not (
+        isinstance(value, str)
+        and value.strip().lower() == CANONICAL_DECOMPOSITION_VOLTAGE_TOKEN
+    ):
+        return value
+    if not species or isinstance(species, bool):
+        return value
+    if isinstance(species, str):
+        return DECOMP_VOLTAGES.get(species, value)
+    if isinstance(species, (list, tuple)) and len(species) == 1:
+        item = species[0]
+        if isinstance(item, str):
+            return DECOMP_VOLTAGES.get(item, value)
+    return value
+
+
+def _resolve_mre_ladder_tokens(value: Any) -> Any:
+    if isinstance(value, (list, tuple)):
+        return [_resolve_mre_ladder_tokens(item) for item in value]
+    if not isinstance(value, Mapping):
+        return value
+
+    resolved = {key: _resolve_mre_ladder_tokens(value[key]) for key in value}
+    sequence_block = resolved.get("mre_voltage_sequence")
+    if isinstance(sequence_block, Mapping):
+        entries = sequence_block.get("sequence")
+        if isinstance(entries, list):
+            for entry in entries:
+                if isinstance(entry, dict):
+                    entry["decomposition_V"] = _resolve_mre_canonical_voltage_token(
+                        entry.get("species"),
+                        entry.get("decomposition_V"),
+                    )
+    holds_block = resolved.get("mre_stepped_voltage_holds")
+    if isinstance(holds_block, Mapping):
+        entries = holds_block.get("sequence")
+        if isinstance(entries, list):
+            for entry in entries:
+                if isinstance(entry, dict):
+                    entry["voltage"] = _resolve_mre_canonical_voltage_token(
+                        entry.get("species"),
+                        entry.get("voltage"),
+                    )
+    return resolved
+
+
 @dataclass(frozen=True)
 class ConfigBundle:
     setpoints: dict[str, Any]
@@ -52,6 +104,7 @@ def _functional_data_ready(value: Any) -> Any:
 
 
 def functional_data_yaml_digest(value: Any) -> str:
+    value = _resolve_mre_ladder_tokens(value)
     canonical = json.dumps(
         _functional_data_ready(value),
         allow_nan=False,

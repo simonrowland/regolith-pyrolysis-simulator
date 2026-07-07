@@ -56,6 +56,10 @@ def _species_names(sequence: list[dict]) -> list[str]:
     return [entry["species"][0] for entry in sequence]
 
 
+def _voltage_pairs(sequence: list[dict] | tuple[dict, ...]) -> tuple[tuple[str, float], ...]:
+    return tuple((entry["species"][0], entry["voltage"]) for entry in sequence)
+
+
 def test_c5_fields_default_off_and_pass_through_session_config():
     melt = MeltState()
 
@@ -124,6 +128,52 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         5,
         10,
     ]
+
+
+def test_published_ladder_former_copy_sites_resolve_from_single_source():
+    from engines.builtin.electrolysis_step import MRE_DECOMP_VOLTAGE_PROVENANCE
+    from simulator.electrolysis import DECOMP_VOLTAGES as electrolysis_voltages
+
+    setpoints = _repo_setpoints()
+    sequence_entries = setpoints["mre_voltage_sequence"]["sequence"]
+    hold_entries = setpoints["mre_stepped_voltage_holds"]["sequence"]
+    token = mre_ladder.CANONICAL_DECOMPOSITION_VOLTAGE_TOKEN
+
+    assert all(entry.get("decomposition_V") == token for entry in sequence_entries)
+    assert all(entry.get("voltage") == token for entry in hold_entries)
+    assert electrolysis_voltages is mre_ladder.DECOMP_VOLTAGES
+
+    expected_sequence_pairs = tuple(
+        (entry["species"], mre_ladder.DECOMP_VOLTAGES[entry["species"]])
+        for entry in sequence_entries
+    )
+    parsed_pairs = _voltage_pairs(mre_ladder.parse_ladder_from_setpoints(setpoints))
+    provenance_pairs = tuple(
+        (species, MRE_DECOMP_VOLTAGE_PROVENANCE[species]["standard_voltage_V"])
+        for species, _voltage in expected_sequence_pairs
+    )
+    hold_pairs = tuple(
+        (
+            entry["species"][0],
+            mre_ladder.resolve_mre_decomposition_voltage(
+                entry["species"][0],
+                entry["voltage"],
+            ),
+        )
+        for entry in hold_entries
+    )
+    fallback_pairs = _voltage_pairs(mre_ladder.MRE_VOLTAGE_LADDER_FALLBACK)
+
+    assert parsed_pairs == expected_sequence_pairs
+    assert provenance_pairs == expected_sequence_pairs
+    assert hold_pairs == tuple(
+        pair for pair in expected_sequence_pairs
+        if pair[0] not in {"NiO", "Na2O", "K2O"}
+    )
+    assert fallback_pairs == tuple(
+        pair for pair in expected_sequence_pairs
+        if pair[0] not in {"Na2O", "K2O"}
+    )
 
 
 def test_parse_ladder_from_setpoints_matches_repo_yaml_shape():

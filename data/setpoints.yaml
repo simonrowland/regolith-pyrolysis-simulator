@@ -1316,9 +1316,11 @@ mre_voltage_sequence:
   # OXIDE_TO_METAL / MOLAR_MASS + electrolysis.py DECOMP_VOLTAGES /
   # ELECTRONS_PER_OXIDE). Re-add via the same place once full V
   # support lands.
+  # decomposition_V: "canonical" resolves through
+  # simulator/mre_ladder.py DECOMP_VOLTAGES.
   sequence:
     - species: "NiO"
-      decomposition_V: 0.39
+      decomposition_V: "canonical"
       campaign: "C5 carbonaceous trace recovery"
       min_hold_hours: 2
       note: >-
@@ -1335,25 +1337,25 @@ mre_voltage_sequence:
         grounding because Na/K are volatile at 1873 K.
 
     - species: "Na2O"
-      decomposition_V: 0.5
+      decomposition_V: "canonical"
       campaign: "C5 opening"
       min_hold_hours: 2
       note: "alkali recovery; held legacy pending volatility-aware grounding"
 
     - species: "K2O"
-      decomposition_V: 0.5
+      decomposition_V: "canonical"
       campaign: "C5 opening"
       min_hold_hours: 2
       note: "alkali recovery; held legacy pending volatility-aware grounding"
 
     - species: "FeO"
-      decomposition_V: 0.75
+      decomposition_V: "canonical"
       campaign: "C5"
       min_hold_hours: 3
       note: "O'Neill 1988 + Chase 1998 raw-thermo anchor; should be pre-depleted by C2/C3"
 
     - species: "Cr2O3"
-      decomposition_V: 0.95
+      decomposition_V: "canonical"
       campaign: "C5 trace cleanup"
       min_hold_hours: 2
 
@@ -1367,35 +1369,35 @@ mre_voltage_sequence:
     # MOLAR_MASS + OXIDE_TO_METAL + ELECTRONS_PER_OXIDE etc.).
 
     - species: "MnO"
-      decomposition_V: 1.05
+      decomposition_V: "canonical"
       campaign: "C5 trace cleanup"
       min_hold_hours: 2
 
     - species: "SiO2"
-      decomposition_V: 1.45
+      decomposition_V: "canonical"
       campaign: "C5 primary target"
       min_hold_hours: 5
       note: "Chase 1998 raw-thermo anchor; Si as liquid metal; permanently removes SiO source"
 
     - species: "TiO2"
-      decomposition_V: 1.70
+      decomposition_V: "canonical"
       campaign: "C5 sweep"
       min_hold_hours: 3
       note: "Chase 1998 + Barin raw-thermo anchor; optional -- retain for C6 Al-Ti alloy by stopping before this voltage"
 
     - species: "Al2O3"
-      decomposition_V: 1.95
+      decomposition_V: "canonical"
       campaign: "C5 Branch One only"
       min_hold_hours: 8
       note: "NIST-JANAF/Chase 1998 + Barin raw-thermo anchor"
 
     - species: "MgO"
-      decomposition_V: 2.2
+      decomposition_V: "canonical"
       campaign: "C5 Branch One only"
       min_hold_hours: 5
 
     - species: "CaO"
-      decomposition_V: 2.5
+      decomposition_V: "canonical"
       campaign: "C5 Branch One only (or dedicated batch)"
       min_hold_hours: 10
 
@@ -1545,29 +1547,31 @@ mre_stepped_voltage_holds:
     mre_voltage_sequence, MRE-COVERAGE #32B). This block appears UNCONSUMED
     (no code reader; the live schedule is mre_voltage_sequence) and is a
     single-source-of-truth consolidation candidate (SC-09 ladder-drift).
+  # voltage: "canonical" resolves through simulator/mre_ladder.py
+  # DECOMP_VOLTAGES.
   sequence:
-    - voltage: 0.75
+    - voltage: "canonical"
       species: [FeO]
       min_hold_hours: 3
-    - voltage: 0.95
+    - voltage: "canonical"
       species: [Cr2O3]
       min_hold_hours: 2
-    - voltage: 1.05
+    - voltage: "canonical"
       species: [MnO]
       min_hold_hours: 2
-    - voltage: 1.45
+    - voltage: "canonical"
       species: [SiO2]
       min_hold_hours: 5
-    - voltage: 1.70
+    - voltage: "canonical"
       species: [TiO2]
       min_hold_hours: 3
-    - voltage: 1.95
+    - voltage: "canonical"
       species: [Al2O3]
       min_hold_hours: 8
-    - voltage: 2.2
+    - voltage: "canonical"
       species: [MgO]
       min_hold_hours: 5
-    - voltage: 2.5
+    - voltage: "canonical"
       species: [CaO]
       min_hold_hours: 10
 

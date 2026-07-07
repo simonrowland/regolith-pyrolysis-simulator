@@ -552,8 +552,9 @@ class ExtractionMixin:
         YAML schema (per ``data/setpoints.yaml § mre_voltage_sequence
         .sequence``): each entry has ``species`` (single string),
         ``decomposition_V`` (scalar OR ``[low, high]`` range OR string
-        like ``"<0.5"``), optional ``campaign`` (informational),
-        optional ``note`` (informational), and optional
+        like ``"<0.5"`` OR ``"canonical"`` to resolve from
+        ``simulator.mre_ladder.DECOMP_VOLTAGES``), optional ``campaign``
+        (informational), optional ``note`` (informational), and optional
         ``min_hold_hours`` (else falls back to
         ``_MRE_DEFAULT_MIN_HOLD_HOURS``).
 

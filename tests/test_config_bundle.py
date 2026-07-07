@@ -67,6 +67,39 @@ def test_load_config_bundle_digests_are_stable_and_scoped() -> None:
             assert first.digests[name] == sha256(path.read_bytes()).hexdigest()
 
 
+def test_functional_data_digest_resolves_mre_canonical_voltage_tokens() -> None:
+    numeric = {
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": 0.75},
+                {"species": "SiO2", "decomposition_V": 1.45},
+            ],
+        },
+        "mre_stepped_voltage_holds": {
+            "sequence": [
+                {"species": ["FeO"], "voltage": 0.75},
+                {"species": ["SiO2"], "voltage": 1.45},
+            ],
+        },
+    }
+    canonical = {
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": "canonical"},
+                {"species": "SiO2", "decomposition_V": "canonical"},
+            ],
+        },
+        "mre_stepped_voltage_holds": {
+            "sequence": [
+                {"species": ["FeO"], "voltage": "canonical"},
+                {"species": ["SiO2"], "voltage": "canonical"},
+            ],
+        },
+    }
+
+    assert functional_data_yaml_digest(canonical) == functional_data_yaml_digest(numeric)
+
+
 @pytest.mark.parametrize("name", sorted(FUNCTIONAL_DATA_CONFIGS))
 def test_functional_data_yaml_digests_ignore_comments_and_mapping_order(
     tmp_path: Path,

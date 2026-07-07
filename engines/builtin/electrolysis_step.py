@@ -94,6 +94,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.mre_ladder import DECOMP_VOLTAGES
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 MRE_CURRENT_PARTITION_SOURCE = (
@@ -103,7 +104,7 @@ MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 
 MRE_DECOMP_VOLTAGE_PROVENANCE = {
     "NiO": {
-        "standard_voltage_V": 0.39,
+        "standard_voltage_V": DECOMP_VOLTAGES["NiO"],
         "electrons_per_formula": 2,
         "delta_gf_kJ_per_mol_formula": -75.258559038,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -114,7 +115,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "cited_raw_thermo",
     },
     "Na2O": {
-        "standard_voltage_V": 0.5,
+        "standard_voltage_V": DECOMP_VOLTAGES["Na2O"],
         "electrons_per_formula": 2,
         "delta_gf_kJ_per_mol_formula": -96.485332100,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -122,7 +123,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "legacy_uncited_voltage_pending_activity_vapor_grounding",
     },
     "K2O": {
-        "standard_voltage_V": 0.5,
+        "standard_voltage_V": DECOMP_VOLTAGES["K2O"],
         "electrons_per_formula": 2,
         "delta_gf_kJ_per_mol_formula": -96.485332100,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -130,7 +131,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "legacy_uncited_voltage_pending_activity_vapor_grounding",
     },
     "FeO": {
-        "standard_voltage_V": 0.75,
+        "standard_voltage_V": DECOMP_VOLTAGES["FeO"],
         "electrons_per_formula": 2,
         "delta_gf_kJ_per_mol_formula": -144.727998150,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -138,7 +139,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "cited_raw_thermo",
     },
     "Fe2O3": {
-        "standard_voltage_V": 0.90,
+        "standard_voltage_V": DECOMP_VOLTAGES["Fe2O3"],
         "electrons_per_formula": 6,
         "delta_gf_kJ_per_mol_formula": -521.020793340,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -146,7 +147,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "reference_only_uncited_legacy_not_live_full_reduction_rung",
     },
     "Cr2O3": {
-        "standard_voltage_V": 0.95,
+        "standard_voltage_V": DECOMP_VOLTAGES["Cr2O3"],
         "electrons_per_formula": 6,
         "delta_gf_kJ_per_mol_formula": -549.966392970,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -154,7 +155,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "cited_raw_thermo_modest_confidence",
     },
     "MnO": {
-        "standard_voltage_V": 1.05,
+        "standard_voltage_V": DECOMP_VOLTAGES["MnO"],
         "electrons_per_formula": 2,
         "delta_gf_kJ_per_mol_formula": -202.619197410,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -162,7 +163,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "cited_raw_thermo_modest_confidence",
     },
     "SiO2": {
-        "standard_voltage_V": 1.45,
+        "standard_voltage_V": DECOMP_VOLTAGES["SiO2"],
         "electrons_per_formula": 4,
         "delta_gf_kJ_per_mol_formula": -559.614926180,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -170,7 +171,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "cited_raw_thermo",
     },
     "TiO2": {
-        "standard_voltage_V": 1.70,
+        "standard_voltage_V": DECOMP_VOLTAGES["TiO2"],
         "electrons_per_formula": 4,
         "delta_gf_kJ_per_mol_formula": -656.100258280,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -178,7 +179,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "cited_raw_thermo",
     },
     "Al2O3": {
-        "standard_voltage_V": 1.95,
+        "standard_voltage_V": DECOMP_VOLTAGES["Al2O3"],
         "electrons_per_formula": 6,
         "delta_gf_kJ_per_mol_formula": -1128.878385570,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -186,7 +187,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "cited_raw_thermo",
     },
     "MgO": {
-        "standard_voltage_V": 2.2,
+        "standard_voltage_V": DECOMP_VOLTAGES["MgO"],
         "electrons_per_formula": 2,
         "delta_gf_kJ_per_mol_formula": -424.535461240,
         "delta_gf_relation": "DeltaGf = -E*n*F",
@@ -194,7 +195,7 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "status": "legacy_uncited_voltage_pending_thermo_source",
     },
     "CaO": {
-        "standard_voltage_V": 2.5,
+        "standard_voltage_V": DECOMP_VOLTAGES["CaO"],
         "electrons_per_formula": 2,
         "delta_gf_kJ_per_mol_formula": -482.426660500,
         "delta_gf_relation": "DeltaGf = -E*n*F",
