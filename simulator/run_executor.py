@@ -11,6 +11,7 @@ from simulator.backends import requires_stage0_subprocess
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.core import BACKEND_FALLBACK_EXCEPTIONS, PyrolysisSimulator
+from simulator.pumping_cost import pumping_context_from_sim
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -118,13 +119,14 @@ class RunExecutor:
             error_message = f"{type(exc).__name__}: {exc}"
 
         shadow_trace = _collect_shadow_trace(sim, operator_decisions)
+        snapshots = tuple(getattr(sim.record, "snapshots", ()))
         sim.record.cost_rollup = build_cost_rollup_diagnostic(
             cost_ledger=sim.cost_ledger,
             per_hour=tuple(per_hour),
             products_kg=sim.product_ledger(),
+            pumping_context=pumping_context_from_sim(sim, snapshots),
         )
         trace = PhysicsTrace.from_simulator(sim)
-        snapshots = tuple(getattr(sim.record, "snapshots", ()))
         reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)
         latest_backend_status = str(
             getattr(

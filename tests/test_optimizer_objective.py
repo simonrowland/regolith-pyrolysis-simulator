@@ -17,6 +17,7 @@ from simulator.optimize.objective import (
     composition_target_eval_metadata,
     compute_objectives,
     dominates,
+    objective_scores,
     objective_importance_evidence,
     pareto_front,
     product_summary,
@@ -229,6 +230,73 @@ def test_lifespan_cost_metric_is_not_costed_when_threshold_is_unavailable(monkey
         "Na": pytest.approx(0.05),
         "SiO": pytest.approx(0.20),
     }
+
+
+def test_cost_objective_ranking_ignores_pumping_sidecar() -> None:
+    definitions = (
+        ObjectiveDefinition(
+            "throughput_cost_owner_ratify_usd",
+            "minimize",
+            "usd",
+            ordinal=0,
+        ),
+    )
+
+    def sim_with(cost_usd: float, *, pumping_electrical_kWh: float | None = None):
+        cost_rollup = {
+            "run_input_cost": {
+                "physical_cost": {
+                    "thermal_flux_h": 1234.0,
+                    "furnace_h": 6.0,
+                },
+                "owner_ratify_money_projection": cost_usd,
+            }
+        }
+        if pumping_electrical_kWh is not None:
+            cost_rollup["pumping_diagnostic"] = {
+                "status": "ok",
+                "pumping_electrical_kWh": pumping_electrical_kWh,
+            }
+        return SimpleNamespace(record=SimpleNamespace(cost_rollup=cost_rollup))
+
+    def score(sim: SimpleNamespace) -> tuple[float, ...]:
+        value = _metric_value(
+            "throughput_cost_owner_ratify_usd",
+            sim,
+            {},
+            {},
+            run_execution=SimpleNamespace(simulator=sim),
+        )
+        return objective_scores(
+            {"throughput_cost_owner_ratify_usd": value},
+            definitions,
+        )
+
+    without_pumping = (
+        ("lower_cost", sim_with(100.0)),
+        ("higher_cost", sim_with(200.0)),
+    )
+    with_pumping = (
+        ("lower_cost", sim_with(100.0, pumping_electrical_kWh=1_000_000.0)),
+        ("higher_cost", sim_with(200.0)),
+    )
+
+    rank_without = [
+        name for name, sim in sorted(
+            without_pumping,
+            key=lambda item: score(item[1]),
+            reverse=True,
+        )
+    ]
+    rank_with = [
+        name for name, sim in sorted(
+            with_pumping,
+            key=lambda item: score(item[1]),
+            reverse=True,
+        )
+    ]
+
+    assert rank_with == rank_without == ["lower_cost", "higher_cost"]
 
 
 def test_incomplete_objective_importance_evidence_raises_insufficient_evidence() -> None:

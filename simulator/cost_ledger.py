@@ -16,6 +16,7 @@ from simulator.cost_energy import (
     owner_ratify_cost_placeholders,
     project_owner_ratify_money,
 )
+from simulator.pumping_cost import estimate_subambient_pump_cost, pumping_cost_parameters
 
 VECTOR_TOLERANCE = 1e-12
 COST_LEDGER_SCHEMA_VERSION = "cost-ledger-v1"
@@ -792,12 +793,14 @@ def build_cost_rollup_diagnostic(
     cost_ledger: CostLedger,
     per_hour: tuple[dict[str, Any], ...],
     products_kg: Mapping[str, float],
+    pumping_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     try:
         return _build_cost_rollup_diagnostic(
             cost_ledger=cost_ledger,
             per_hour=per_hour,
             products_kg=products_kg,
+            pumping_context=pumping_context,
         )
     except Exception as exc:  # noqa: BLE001 -- cost diagnostics must not abort runner output
         cost_ledger._record_best_effort_error(
@@ -820,9 +823,15 @@ def _build_cost_rollup_diagnostic(
     cost_ledger: CostLedger,
     per_hour: tuple[dict[str, Any], ...],
     products_kg: Mapping[str, float],
+    pumping_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     summary = cost_ledger.summary()
     furnace_input = _run_furnace_input_cost(per_hour)
+    pumping_enabled = isinstance(pumping_context, Mapping)
+    pumping_input, pumping_diagnostic = (
+        _run_pumping_input_cost(pumping_context)
+        if pumping_enabled else (ZERO_COST, {})
+    )
     product_inputs = _clean_outputs({
         ("terminal.product", species): kg
         for species, kg in dict(products_kg or {}).items()
@@ -863,7 +872,7 @@ def _build_cost_rollup_diagnostic(
                 "accumulated_cost": total.to_json(),
                 "owner_ratify_money_projection": project_owner_ratify_money(total),
             }
-    summary["run_input_cost"] = {
+    run_input_cost = {
         "thermal_proxy": "thermal_flux_h = absolute_temperature_K * duration_h",
         "physical_cost": furnace_input.to_json(),
         "allocation_status": (
@@ -872,6 +881,13 @@ def _build_cost_rollup_diagnostic(
         ),
         "owner_ratify_money_projection": project_owner_ratify_money(furnace_input),
     }
+    if pumping_enabled:
+        summary["pumping_diagnostic"] = {
+            **pumping_diagnostic,
+            "pumping_electrical_kWh": pumping_input.electrical_kWh,
+            "status": pumping_diagnostic.get("status", "unknown"),
+        }
+    summary["run_input_cost"] = run_input_cost
     if not product_inputs and not furnace_input.is_zero():
         summary["warnings"] = [
             *summary.get("warnings", []),
@@ -893,6 +909,63 @@ def _run_furnace_input_cost(per_hour: tuple[dict[str, Any], ...]) -> CostVector:
         thermal_flux_h += furnace_thermal_flux_hours(temperature_C, 1.0)
         furnace_h += 1.0
     return CostVector(thermal_flux_h=thermal_flux_h, furnace_h=furnace_h)
+
+
+def _run_pumping_input_cost(
+    pumping_context: Mapping[str, Any] | None,
+) -> tuple[CostVector, dict[str, Any]]:
+    parameter_metadata = [p.to_json() for p in pumping_cost_parameters()]
+    if not isinstance(pumping_context, Mapping):
+        return ZERO_COST, {
+            "schema_version": "pumping-cost-rollup-v1",
+            "status": "not_evaluated_no_pumping_context",
+            "pumping_electrical_kWh": 0.0,
+            "parameter_metadata": parameter_metadata,
+            "rows": [],
+        }
+    ambient_pressure_pa = _finite(
+        pumping_context.get("ambient_pressure_pa"),
+        default=math.nan,
+    )
+    rows: list[dict[str, Any]] = []
+    total_energy_kWh = 0.0
+    all_feasible = True
+    for raw_row in pumping_context.get("rows", ()) or ():
+        if not isinstance(raw_row, Mapping):
+            continue
+        result = estimate_subambient_pump_cost(
+            target_pressure_pa=_finite(raw_row.get("target_pressure_pa"), math.nan),
+            offgas_mol_per_s=_finite(raw_row.get("offgas_mol_per_s"), math.nan),
+            duration_s=_finite(raw_row.get("duration_s"), math.nan),
+            ambient_pressure_pa=ambient_pressure_pa,
+            gas_temperature_K=_finite(raw_row.get("gas_temperature_K"), math.nan),
+        )
+        total_energy_kWh += max(0.0, _finite(result.energy_kWh))
+        all_feasible = all_feasible and bool(result.feasible)
+        rows.append({
+            "hour": int(_finite(raw_row.get("hour"), len(rows))),
+            **result.to_json(),
+        })
+    cost = CostVector(electrical_kWh=total_energy_kWh)
+    status = "ok"
+    if not rows:
+        status = "no_rows"
+    elif not all_feasible:
+        status = "infeasible_pumping_point"
+    diagnostic = {
+        "schema_version": "pumping-cost-rollup-v1",
+        "status": status,
+        "body": str(pumping_context.get("body", "")),
+        "ambient_pressure_pa": ambient_pressure_pa,
+        "ambient_pressure_source": str(
+            pumping_context.get("ambient_pressure_source", "")
+        ),
+        "pumping_electrical_kWh": cost.electrical_kWh,
+        "feasible": bool(all_feasible),
+        "parameter_metadata": parameter_metadata,
+        "rows": rows,
+    }
+    return cost, diagnostic
 
 
 def _sum_cost(costs: Any) -> CostVector:

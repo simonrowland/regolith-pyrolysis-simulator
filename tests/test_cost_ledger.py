@@ -7,6 +7,7 @@ import pytest
 from simulator.chemistry.kernel import ChemistryIntent, LedgerTransitionProposal
 from simulator.cost_energy import (
     ELECTRICAL_USD_PER_KWH,
+    FURNACE_USD_PER_H,
     THERMAL_USD_PER_FLUX_H,
     furnace_thermal_flux_hours,
     owner_ratify_cost_placeholders,
@@ -193,6 +194,46 @@ def test_run_input_allocation_uses_existing_species_product_row():
     co = CostVector(**diagnostic["product_costs"]["terminal.offgas:CO"]["accumulated_cost"])
     assert co.external_reagent_kg == pytest.approx(1.0)
     assert co.thermal_flux_h == pytest.approx(1273.15)
+
+
+def test_cost_rollup_adds_pumping_sidecar_without_costing_run_input():
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=({"T_C": 1000.0},),
+        products_kg={"O2": 1.0},
+        pumping_context={
+            "body": "mars",
+            "ambient_pressure_pa": 610.0,
+            "ambient_pressure_source": "test.mars_datum",
+            "rows": (
+                {
+                    "hour": 1,
+                    "target_pressure_pa": 100.0,
+                    "offgas_mol_per_s": 0.01,
+                    "duration_s": 3600.0,
+                    "gas_temperature_K": 300.0,
+                },
+            ),
+        },
+    )
+
+    run_input = diagnostic["run_input_cost"]
+    physical = run_input["physical_cost"]
+    assert physical["thermal_flux_h"] == pytest.approx(1273.15)
+    assert physical["furnace_h"] == pytest.approx(1.0)
+    assert physical["electrical_kWh"] == pytest.approx(0.0)
+    assert run_input["owner_ratify_money_projection"] == pytest.approx(
+        1273.15 * THERMAL_USD_PER_FLUX_H.value
+        + 1.0 * FURNACE_USD_PER_H.value
+    )
+    pumping = diagnostic["pumping_diagnostic"]
+    assert pumping["status"] == "ok"
+    assert pumping["pumping_electrical_kWh"] == pytest.approx(0.3006989878103832)
+    assert pumping["rows"][0]["regime"] == "pump"
+    o2 = CostVector(
+        **diagnostic["product_costs"]["terminal.product:O2"]["accumulated_cost"]
+    )
+    assert o2.electrical_kWh == pytest.approx(0.0)
 
 
 def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture():

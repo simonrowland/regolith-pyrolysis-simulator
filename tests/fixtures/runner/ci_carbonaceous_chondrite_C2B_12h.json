@@ -382,6 +382,34 @@
         }
       ],
       "owner_ratify_placeholder_count": 5,
+      "pumping_diagnostic": {
+        "schema_version": "pumping-cost-rollup-v1",
+        "status": "no_rows",
+        "body": "",
+        "ambient_pressure_pa": 0.0001,
+        "ambient_pressure_source": "environment.vacuum_floor_bar_for_body",
+        "pumping_electrical_kWh": 0.0,
+        "feasible": true,
+        "parameter_metadata": [
+          {
+            "name": "pump_isothermal_efficiency",
+            "value": 0.15,
+            "units": "fraction",
+            "source_tag": "owner-ratify-placeholder:2026-07-02-knob-grounding:eta_wire_to_gas_range_0.05_to_0.25",
+            "ticket": "COST-PARAM-PUMP-ISOTHERMAL-EFFICIENCY",
+            "status": "owner-ratify-placeholder"
+          },
+          {
+            "name": "max_pump_speed_m3_s",
+            "value": 50.0,
+            "units": "m^3/s",
+            "source_tag": "owner-ratify-placeholder:single-parallelized-pump-train-speed-ceiling:real-pump-curve-datasheet-pinning-still-open",
+            "ticket": "COST-PARAM-PUMP-SPEED-CEILING",
+            "status": "owner-ratify-placeholder"
+          }
+        ],
+        "rows": []
+      },
       "run_input_cost": {
         "thermal_proxy": "thermal_flux_h = absolute_temperature_K * duration_h",
         "physical_cost": {

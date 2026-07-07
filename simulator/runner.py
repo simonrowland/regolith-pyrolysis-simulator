@@ -69,6 +69,7 @@ from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
 )
+from simulator.pumping_cost import pumping_context_from_sim
 from simulator.run_executor import RunExecution, RunExecutor, _json_safe
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import (
@@ -1075,6 +1076,7 @@ class PyrolysisRun:
                 cost_ledger=sim.cost_ledger,
                 per_hour=execution.per_hour,
                 products_kg=sim.product_ledger(),
+                pumping_context=pumping_context_from_sim(sim, execution.snapshots),
             )
         )
         sim.record.cost_rollup = dict(run_metadata["cost_rollup_diagnostic"])
