@@ -11,6 +11,7 @@ from engines.domain_reason import OutOfDomainReason
 from simulator.diagnostic_helpers.alphamelts_volatility import (
     alphamelts_activity_volatility_diagnostic,
 )
+from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 
 
 _SIO_VAPOR_DATA = {
@@ -41,9 +42,19 @@ class StubActivitySource:
     ) -> dict[str, object]:
         del temperature_C, composition_wt_pct, fO2_log
         self.calls.append(float(pressure_bar))
+        sample = self.by_pressure[float(pressure_bar)]
+        if any(
+            key in sample
+            for key in (
+                "activity_coefficients",
+                "diagnostic_oxide_activities",
+                "diagnostics",
+            )
+        ):
+            return {"status": "ok", **sample}
         return {
             "status": "ok",
-            "activity_coefficients": self.by_pressure[float(pressure_bar)],
+            "activity_coefficients": sample,
         }
 
 
@@ -92,6 +103,60 @@ def test_maps_alphamelt_activity_into_analytical_sio_vapor_pressure_grid():
     # the 1e-9 bar floor: 100 Pa * a(SiO2)=0.25 * sqrt(1e-9 / 1e-7).
     assert oxidized["P_eq_Pa"] == pytest.approx(2.5)
     assert oxidized["P_eq_wt_fraction_Pa"] == pytest.approx(5.0)
+
+
+def test_uses_diagnostic_oxide_activities_payload():
+    source = StubActivitySource(
+        {
+            1.0: {
+                "activity_coefficients": {"Na2SiO3": 0.8},
+                "diagnostic_oxide_activities": {"SiO2": 0.25, "Na2O": 0.08},
+            },
+            0.1: {
+                "activity_coefficients": {"Na2SiO3": 0.8},
+                "diagnostic_oxide_activities": {"SiO2": 0.25, "Na2O": 0.08},
+            },
+        }
+    )
+
+    diagnostic = alphamelts_activity_volatility_diagnostic(
+        composition_wt_pct=_domain_composition(),
+        pO2_grid_bar=[1e-9],
+        temperature_C=1500.0,
+        activity_source=source,
+        vapor_pressure_data=_SIO_VAPOR_DATA,
+        primary_pressure_bar=1.0,
+        comparison_pressure_bar=1.0,
+    )
+
+    assert diagnostic["status"] == "ok"
+    assert diagnostic["melt_oxide_activities"] == {
+        "SiO2": pytest.approx(0.25),
+        "Na2O": pytest.approx(0.08),
+    }
+
+
+def test_diagnostic_helper_does_not_convert_endmember_labels_to_oxides():
+    source = StubActivitySource(
+        {
+            1.0: {"SiO2_Liq": 0.25, "Na2SiO3": 0.08, "Na": 0.03},
+            0.1: {"SiO2_Liq": 0.25, "Na2SiO3": 0.08, "Na": 0.03},
+        }
+    )
+
+    diagnostic = alphamelts_activity_volatility_diagnostic(
+        composition_wt_pct=_domain_composition(),
+        pO2_grid_bar=[1e-9],
+        temperature_C=1500.0,
+        activity_source=source,
+        vapor_pressure_data=_SIO_VAPOR_DATA,
+        primary_pressure_bar=1.0,
+        comparison_pressure_bar=1.0,
+    )
+
+    assert diagnostic["status"] == "ok"
+    assert diagnostic["melt_oxide_activities"] == {"SiO2": pytest.approx(0.25)}
+    assert "Na2O" not in diagnostic["melt_oxide_activities"]
 
 
 def test_composition_domain_violation_reuses_alphamelt_reason_flag():
@@ -237,3 +302,45 @@ def test_real_alphamelt_volatility_diagnostic_opt_in():
     assert diagnostic["diagnostic_only"] is True
     assert diagnostic["activity_pressure_gate"]["status"] in {"ok", "falsified"}
 
+
+@pytest.mark.serial
+def test_live_alphamelt_benign_feedstock_returns_oxide_activities_when_available():
+    backend = AlphaMELTSBackend()
+    try:
+        available = backend.initialize({"mode": "subprocess", "timeout_s": 25.0})
+    except ImportError as exc:
+        pytest.skip(f"AlphaMELTS subprocess transport unavailable: {exc}")
+    if not available:
+        pytest.skip("AlphaMELTS subprocess transport unavailable")
+
+    backend_results = []
+
+    def source(**kwargs):
+        result = backend.equilibrate(
+            temperature_C=float(kwargs["temperature_C"]),
+            composition_kg=dict(kwargs["composition_wt_pct"]),
+            fO2_log=float(kwargs["fO2_log"]),
+            pressure_bar=float(kwargs["pressure_bar"]),
+        )
+        backend_results.append(result)
+        return result
+
+    diagnostic = alphamelts_activity_volatility_diagnostic(
+        composition_wt_pct=_domain_composition(),
+        pO2_grid_bar=[1e-9],
+        temperature_C=1500.0,
+        activity_source=source,
+        vapor_pressure_data=_SIO_VAPOR_DATA,
+    )
+
+    assert diagnostic["diagnostic_only"] is True
+    assert diagnostic["status"] == "no_activities"
+    assert diagnostic["activity_samples"]["primary"]["activity_coefficients"] == {}
+    assert diagnostic["activity_samples"]["comparison"]["activity_coefficients"] == {}
+    assert backend_results
+    for result in backend_results:
+        assert set(result.activity_coefficients) == {"H2O"}
+        assert result.activity_coefficients["H2O"] == pytest.approx(0.0)
+        diagnostics = result.diagnostics or {}
+        assert diagnostics.get("diagnostic_oxide_activities") in (None, {})
+        assert diagnostics.get("diagnostic_activity_label_map") in (None, {})

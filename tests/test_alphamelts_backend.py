@@ -17,6 +17,7 @@ from engines.alphamelts.domain import AlphaMELTSDomainGate
 import engines.alphamelts.provider as alphamelts_provider_module
 from engines.alphamelts.parser import diagnostics_to_equilibrium
 from engines.alphamelts.result import LiquidusDiagnostics
+from simulator.chemistry.kernel import ChemistryIntent
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_MISSING_BINARY,
@@ -1092,11 +1093,9 @@ def test_petthermotools_result_parser_uses_verified_schema():
     }
     assert result.liquid_fraction == pytest.approx(0.8)
     assert result.liquid_composition_wt_pct['SiO2'] == pytest.approx(50.0)
-    assert result.activity_coefficients == {}
-    assert result.warnings == [
-        'PetThermoTools chemical potentials absent; '
-        'activity-scaled Antoine fallback skipped'
-    ]
+    assert result.activity_coefficients == {'Na': pytest.approx(2.0)}
+    assert result.diagnostics['diagnostic_oxide_activities'] == {}
+    assert result.warnings == []
     assert result.ledger_transition is None
 
 
@@ -1150,6 +1149,218 @@ def test_petthermotools_result_parser_converts_mu_to_activity():
         'Na': activity_from_chem_potential(-900.0, -1000.0, 1800.0),
         'K': activity_from_chem_potential(-1050.0, -1000.0, 1800.0),
     })
+    assert result.diagnostics['diagnostic_oxide_activities'] == {}
+
+
+def test_petthermotools_result_parser_prefers_reported_oxide_activities():
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+        'liquid1_prop': {'mass': 100.0},
+        'Activities': {
+            'liquid1': {'SiO2_Liq': 0.42, 'Na': 0.08, 'K': 0.03},
+        },
+        'chemical_potentials': {'Na': -900.0},
+        'pure_chemical_potentials': {'Na': -1000.0},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'SiO2_Liq': 0.42,
+        'Na': 0.08,
+        'K': 0.03,
+    })
+    assert result.diagnostics['diagnostic_oxide_activities'] == pytest.approx({
+        'SiO2': 0.42,
+    })
+
+
+def test_subprocess_stdout_parser_reports_activity_labels_and_exact_oxide_diagnostic():
+    backend = AlphaMELTSBackend()
+    output = """
+<> Stable phase assemblage achieved.
+liquid: SiO2 Al2O3 FeO Na2O
+100.0 g 50.0 15.0 10.0 5.0
+Melt fraction = 1.0
+Liquid activities:
+SiO2_Liq Na K Fe
+0.42 0.08 0.03 0.25
+"""
+
+    result = backend._parse_single_point_stdout(
+        output,
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        total_input_kg=100.0,
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'SiO2_Liq': 0.42,
+        'Na': 0.08,
+        'K': 0.03,
+        'Fe': 0.25,
+    })
+    assert result.diagnostics['diagnostic_oxide_activities'] == pytest.approx({
+        'SiO2': 0.42,
+    })
+
+
+def test_equilibrium_emission_keeps_endmember_activities_diagnostic_only():
+    backend = AlphaMELTSBackend()
+
+    result = backend._emit_equilibrium_result(
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={'SiO2': 50.0},
+        activity_coefficients={
+            'Na2SiO3': 0.08,
+            'Mg2SiO4': 0.2,
+            'Ca3(PO4)2': 0.03,
+            'H2O': 1.0,
+        },
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'Na2SiO3': 0.08,
+        'Mg2SiO4': 0.2,
+        'Ca3(PO4)2': 0.03,
+        'H2O': 1.0,
+    })
+    assert result.diagnostics['diagnostic_oxide_activities'] == {}
+    label_map = result.diagnostics['diagnostic_activity_label_map']
+    assert label_map['Na2SiO3']['oxide_activity'] is None
+    assert label_map['Mg2SiO4']['oxide_activity'] is None
+    assert label_map['Ca3(PO4)2']['oxide_activity'] is None
+
+
+def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys():
+    backend = AlphaMELTSBackend()
+    result = backend._emit_equilibrium_result(
+        temperature_C=1600.0,
+        pressure_bar=1e-6,
+        fO2_log=-8.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={'SiO2': 50.0, 'Na2O': 5.0},
+        activity_coefficients={'Na2SiO3': 0.08},
+        vapor_pressures_Pa={'Na': 1.0},
+        vapor_pressures_source={'Na': 'alphamelts_python_api'},
+    )
+    assert 'Na2O' not in result.activity_coefficients
+    assert backend._activities_times_antoine(
+        1600.0,
+        result.activity_coefficients,
+        {'Na2O': 5.0},
+    ) == {}
+
+    captured: dict[str, object] = {}
+
+    def _dispatch_only(intent, **kwargs):
+        assert intent is ChemistryIntent.EVAPORATION_FLUX
+        captured.update(kwargs['control_inputs'])
+        return types.SimpleNamespace(
+            status='ok',
+            diagnostic={'evaporation_flux_kg_hr': {}},
+        )
+
+    sim = types.SimpleNamespace(
+        melt=types.SimpleNamespace(
+            temperature_C=1600.0,
+            melt_surface_area_m2=1.0,
+            stir_state=types.SimpleNamespace(axial=0.0, radial=0.0),
+        ),
+        overhead=types.SimpleNamespace(
+            composition={},
+            headspace_temperature_K=0.0,
+            pressure_mbar=0.0,
+        ),
+        overhead_model=types.SimpleNamespace(pipe_diameter_m=0.12),
+        setpoints={'chemistry_kernel': {'allow_fallback_vapor': True}},
+        vapor_pressures={'metals': {}, 'oxide_vapors': {}},
+        _build_evaporation_aux_maps=lambda vapor: (
+            {species: 1.0 for species in vapor},
+            {species: {} for species in vapor},
+            {},
+        ),
+        _dispatch_only=_dispatch_only,
+    )
+
+    PyrolysisSimulator._calculate_evaporation(sim, result)
+
+    assert captured['vapor_pressure_activities'] == {'Na2SiO3': 0.08}
+    assert 'Na2O' not in captured['vapor_pressure_activities']
+
+
+def test_petthermotools_activity_extractor_selects_liquid_row_not_spinel_first():
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+        'liquid1_prop': {'mass': 80.0},
+        'spinel1': {'SiO2': 0.0, 'FeO': 25.0},
+        'spinel1_prop': {'mass': 20.0},
+        'Activities': [
+            {'phase': 'spinel1', 'Na2O': 0.99, 'SiO2_Liq': 0.01},
+            {'phase': 'liquid1', 'Na2O': 0.08, 'SiO2_Liq': 0.42},
+        ],
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+    )
+
+    assert result.activity_coefficients == pytest.approx({
+        'Na2O': 0.08,
+        'SiO2_Liq': 0.42,
+    })
+    assert result.diagnostics['diagnostic_oxide_activities'] == pytest.approx({
+        'Na2O': 0.08,
+        'SiO2': 0.42,
+    })
+
+
+def test_petthermotools_activity_extractor_falls_back_without_liquid_row():
+    backend = AlphaMELTSBackend()
+    expected = activity_from_chem_potential(-900.0, -1000.0, 1800.0)
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+        'liquid1_prop': {'mass': 100.0},
+        'Activities': [
+            {'phase': 'spinel1', 'Na2O': 0.99},
+        ],
+        'chemical_potentials': {'Na2O': -900.0},
+        'pure_chemical_potentials': {'Na2O': -1000.0},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1526.85,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt={'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+    )
+
+    assert result.activity_coefficients == pytest.approx({'Na2O': expected})
+    assert result.activity_coefficients['Na2O'] != pytest.approx(0.99)
 
 
 def test_thermoengine_activity_extractor_uses_mu_minus_mu0():

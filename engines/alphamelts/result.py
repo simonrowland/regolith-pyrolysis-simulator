@@ -27,8 +27,8 @@ caller wants for trace + UI:
   (None when backend_status is not ``'ok'``).
 * ``liquid_composition_wt_pct`` -- liquid-phase oxide composition (wt%).
 * ``liquid_fraction_path`` -- EC path points over solidus -> liquidus.
-* ``activity_coefficients`` -- legacy field name for per-species
-  thermodynamic activities (None when chemical potentials are absent).
+* ``activity_coefficients`` -- legacy field name for reported per-label
+  thermodynamic activities (empty when activities are absent).
 * ``fO2_log``              -- oxygen fugacity reported by the adapter
   when available.
 * ``fe_redox_policy``      -- request policy used for the Fe split.

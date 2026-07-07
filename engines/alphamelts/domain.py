@@ -46,7 +46,6 @@ _OXIDE_ALIASES.update({
     'feototal': 'FeO_total',
     'feo_tot': 'FeO_total',
 })
-
 # Tolerance constants. Match the AlphaMELTS adapter DomainGate values. The
 # MELTS binding spec uses a strict silicate-network admission criterion:
 # major oxide sum must be >95.0 wt%, so an exact 95.0 wt% boundary is rejected.
@@ -256,6 +255,31 @@ def _canonical_oxide_name(name: object) -> str | None:
     return _OXIDE_ALIASES.get(key.lower())
 
 
+def canonical_melt_oxide_activity_name(name: object) -> str | None:
+    """Map an exact oxide-basis activity label to a canonical key.
+
+    This helper deliberately does not convert endmember, cation, vapor, or
+    component labels such as ``Na``, ``Na2SiO3``, or ``Mg2SiO4`` into oxide
+    activities. Those labels can be reported diagnostically, but without a
+    thermodynamic basis conversion they are not ``Na2O``/``MgO`` activities.
+    """
+
+    key = str(name).strip().strip('"\'')
+    if not key:
+        return None
+    match = re.match(r'^(?:a|activity)\(([^)]+)\)$', key, flags=re.IGNORECASE)
+    if match:
+        key = match.group(1).strip()
+    if key.endswith('_Liq'):
+        key = key[:-4]
+    oxide = _canonical_oxide_name(key)
+    if oxide == 'FeO_total':
+        return 'FeO'
+    if oxide in _MELTS_OXIDE_SET:
+        return oxide
+    return None
+
+
 def _is_non_oxide_species_name(name: object) -> bool:
     """Detect non-oxide species names (metals, halides, sulfides).
 
@@ -290,4 +314,5 @@ def _safe_float(value: object) -> float:
 __all__: Iterable[str] = (
     'AlphaMELTSDomainGate',
     'MELTS_OXIDE_BASIS',
+    'canonical_melt_oxide_activity_name',
 )

@@ -36,6 +36,7 @@ import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
+from engines.alphamelts.domain import canonical_melt_oxide_activity_name
 from engines.domain_reason import OutOfDomainReason, reason_value
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.melt_backend.base import (
@@ -182,6 +183,7 @@ def _alphamelts_backend_failure_error(reason_code: str,
 PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'All', 'Mass', 'Volume', 'rho', 'Conditions', 'Input', 'Affinity',
     'Activities', 'activities', 'activity_coefficients',
+    'melt_oxide_activities',
     'chemical_potentials', 'chem_potentials', 'mu', 'mu_oxides',
     'oxide_mu', 'standard_chemical_potentials', 'pure_chemical_potentials',
     'reference_chemical_potentials', 'mu0', 'mu0_oxides', 'oxide_mu0',
@@ -910,6 +912,10 @@ class AlphaMELTSBackend(MeltBackend):
         phase_masses = dict(phase_masses_kg or {})
         result_status = str(status)
         result_diagnostics = dict(diagnostics or {})
+        reported_activities = dict(activity_coefficients or {})
+        result_diagnostics.update(
+            self._activity_diagnostic_payload(reported_activities)
+        )
         resolved_liquid_fraction = liquid_fraction
         if result_status == 'ok':
             resolved_liquid_fraction = self._resolve_ok_liquid_fraction(
@@ -931,7 +937,7 @@ class AlphaMELTSBackend(MeltBackend):
             phase_masses_kg=phase_masses,
             liquid_fraction=resolved_liquid_fraction,
             liquid_composition_wt_pct=dict(liquid_composition_wt_pct or {}),
-            activity_coefficients=dict(activity_coefficients or {}),
+            activity_coefficients=reported_activities,
             vapor_pressures_Pa=dict(vapor_pressures_Pa or {}),
             vapor_pressures_source=dict(vapor_pressures_source or {}),
             warnings=list(warnings or []),
@@ -1223,6 +1229,58 @@ class AlphaMELTSBackend(MeltBackend):
         if key.endswith('_Liq'):
             key = key[:-4]
         return MELTS_OXIDE_ALIASES.get(key.lower())
+
+    def _canonical_activity_mapping(self, values: Mapping[str, object]) -> dict:
+        activities: Dict[str, float] = {}
+        for raw_name, raw_value in dict(values or {}).items():
+            oxide = canonical_melt_oxide_activity_name(raw_name)
+            if oxide is None:
+                continue
+            try:
+                value = float(raw_value)
+            except (TypeError, ValueError):
+                continue
+            if value > 0.0 and math.isfinite(value):
+                activities.setdefault(oxide, value)
+        return activities
+
+    def _activity_diagnostic_payload(
+        self,
+        values: Mapping[str, object],
+    ) -> dict[str, object]:
+        reported: Dict[str, float] = {}
+        label_map: Dict[str, dict[str, object]] = {}
+        for raw_name, raw_value in dict(values or {}).items():
+            label = str(raw_name)
+            try:
+                value = float(raw_value)
+            except (TypeError, ValueError):
+                continue
+            if not (value > 0.0 and math.isfinite(value)):
+                continue
+            oxide = canonical_melt_oxide_activity_name(label)
+            reported[label] = value
+            label_map[label] = {
+                'oxide_activity': oxide,
+                'basis': (
+                    'oxide_activity'
+                    if oxide is not None
+                    else 'reported_endmember_or_component_not_oxide_activity'
+                ),
+            }
+        if not reported:
+            return {}
+        return {
+            'diagnostic_activity_basis': (
+                'reported_label; endmember/component labels are NOT '
+                'oxide activities without an explicit basis conversion'
+            ),
+            'diagnostic_reported_activities': reported,
+            'diagnostic_oxide_activities': self._canonical_activity_mapping(
+                reported
+            ),
+            'diagnostic_activity_label_map': label_map,
+        }
 
     def _normalize_composition_to_melts_basis(self, comp_wt: dict) -> dict:
         self._last_normalization_warnings = []
@@ -1810,6 +1868,86 @@ class AlphaMELTSBackend(MeltBackend):
             return None
         return float(match.group(1))
 
+    def _extract_subprocess_activity_mapping(self, output: str) -> dict:
+        lines = output.splitlines()
+        activities: Dict[str, float] = {}
+        for line in lines:
+            activities.update(self._activity_assignments_from_line(line))
+        for idx, line in enumerate(lines):
+            if 'activit' not in line.lower():
+                continue
+            activities.update(self._activity_pairs_from_line(line))
+            table = self._activity_table_after(lines, idx)
+            if table:
+                activities.update(table)
+        return activities
+
+    def _activity_assignments_from_line(self, line: str) -> dict:
+        if 'activit' not in line.lower():
+            return {}
+        number = r'([0-9.+\-Ee]+)'
+        name = r'([A-Za-z][A-Za-z0-9_]*(?:_Liq)?)'
+        patterns = (
+            rf'\bactivity(?:\s+of)?\s+{name}\s*[=:]\s*{number}',
+            rf'\b{name}\s+activity\s*[=:]\s*{number}',
+        )
+        activities: Dict[str, float] = {}
+        for pattern in patterns:
+            for match in re.finditer(pattern, line, flags=re.IGNORECASE):
+                activities[match.group(1)] = float(match.group(2))
+        return activities
+
+    def _activity_pairs_from_line(self, line: str) -> dict:
+        if ':' not in line:
+            return {}
+        tokens = line.split(':', 1)[1].split()
+        return self._activity_pairs_from_tokens(tokens)
+
+    def _activity_table_after(self, lines: list[str], idx: int) -> dict:
+        for header_idx in range(idx + 1, min(idx + 6, len(lines))):
+            header = lines[header_idx].strip()
+            if not header:
+                continue
+            names = header.split()
+            if not any(self._looks_like_activity_label(name) for name in names):
+                continue
+            for values_idx in range(header_idx + 1, min(header_idx + 5, len(lines))):
+                value_tokens = lines[values_idx].strip().split()
+                if not value_tokens:
+                    continue
+                values = []
+                for token in value_tokens:
+                    if self._is_number(token):
+                        values.append(float(token))
+                if len(values) >= len(names):
+                    return {
+                        name: value
+                        for name, value in zip(names, values)
+                    }
+        return {}
+
+    def _activity_pairs_from_tokens(self, tokens: list[str]) -> dict:
+        activities: Dict[str, float] = {}
+        idx = 0
+        while idx + 1 < len(tokens):
+            name = tokens[idx].strip(',')
+            raw_value = tokens[idx + 1].strip(',')
+            if (
+                self._looks_like_activity_label(name)
+                and self._is_number(raw_value)
+            ):
+                activities[name] = float(raw_value)
+                idx += 2
+                continue
+            idx += 1
+        return activities
+
+    def _looks_like_activity_label(self, name: object) -> bool:
+        label = str(name).strip().strip(',')
+        if not label or self._is_number(label):
+            return False
+        return bool(re.search(r'[A-Za-z]', label))
+
     def _parse_single_point_stdout(self, output: str, *, temperature_C: float,
                                    pressure_bar: float, fO2_log: float,
                                    total_input_kg: float,
@@ -1828,6 +1966,7 @@ class AlphaMELTSBackend(MeltBackend):
         liquid_composition_wt_pct: Dict[str, float] = {}
         liquid_fraction: Optional[float] = None
         result_warnings = list(warnings or [])
+        activity_coefficients = self._extract_subprocess_activity_mapping(output)
         liquidus_C = self._parse_liquidus_C(output)
         if liquidus_C is not None:
             result_warnings.append(f'AlphaMELTS liquidus_C={liquidus_C:.3f}')
@@ -1906,6 +2045,7 @@ class AlphaMELTSBackend(MeltBackend):
             phase_masses_kg=phase_masses_kg,
             liquid_fraction=liquid_fraction,
             liquid_composition_wt_pct=liquid_composition_wt_pct,
+            activity_coefficients=activity_coefficients,
             warnings=result_warnings,
             status='ok',
             diagnostics=success_diagnostics,
@@ -1974,10 +2114,14 @@ class AlphaMELTSBackend(MeltBackend):
                 liquid_fraction = max(0.0, min(1.0, liquid_mass / total_mass))
 
         result_warnings = list(warnings or [])
-        activity_coefficients = self._extract_activities_from_chemical_potentials(
-            run_result,
-            temperature_C=temperature_C,
-        )
+        activity_coefficients = self._extract_activity_mapping(run_result)
+        if not activity_coefficients:
+            activity_coefficients = (
+                self._extract_activities_from_chemical_potentials(
+                    run_result,
+                    temperature_C=temperature_C,
+                )
+            )
         if not activity_coefficients:
             result_warnings.append(
                 'PetThermoTools chemical potentials absent; '
@@ -2082,6 +2226,125 @@ class AlphaMELTSBackend(MeltBackend):
                 composition[oxide] = float(value)
         return composition
 
+    def _extract_activity_mapping(self, results: Mapping[str, object]) -> dict:
+        for key in ('melt_oxide_activities',):
+            if key not in results:
+                continue
+            row = self._first_row_mapping(results[key])
+            mapped = self._finite_activity_mapping(row)
+            if mapped:
+                return mapped
+
+        for key in ('activity_coefficients', 'activities', 'Activities'):
+            if key not in results:
+                continue
+            row = self._liquid_activity_row_mapping(results[key])
+            mapped = self._finite_activity_mapping(row)
+            if mapped:
+                return mapped
+
+        activities: Dict[str, float] = {}
+        for key, value in results.items():
+            name = str(key)
+            if not name.endswith('_prop'):
+                continue
+            phase_name = name[: -len('_prop')]
+            if not self._is_liquid_activity_phase(phase_name):
+                continue
+            row = self._first_row_mapping(value)
+            for prop_name, prop_value in row.items():
+                if not self._is_number(prop_value):
+                    continue
+                prop = str(prop_name)
+                prop_lower = prop.lower()
+                if prop_lower.endswith('_activity'):
+                    species = prop[: -len('_activity')]
+                elif prop_lower.startswith('activity_'):
+                    species = prop[len('activity_'):]
+                else:
+                    continue
+                if self._looks_like_activity_label(species):
+                    activities[species] = float(prop_value)
+        return self._finite_activity_mapping(activities)
+
+    def _finite_activity_mapping(self, values: Mapping[str, object]) -> dict:
+        activities: Dict[str, float] = {}
+        for raw_name, raw_value in dict(values or {}).items():
+            if not self._looks_like_activity_label(raw_name):
+                continue
+            try:
+                value = float(raw_value)
+            except (TypeError, ValueError):
+                continue
+            if value > 0.0 and math.isfinite(value):
+                activities[str(raw_name)] = value
+        return activities
+
+    def _liquid_activity_row_mapping(self, table) -> dict:
+        for row in self._activity_row_mappings(table):
+            phase = self._activity_row_phase(row)
+            if phase is None or not self._is_liquid_activity_phase(phase):
+                continue
+            return {
+                key: value
+                for key, value in row.items()
+                if str(key).lower() not in {
+                    'phase', 'phase_name', 'phasename', 'name',
+                }
+            }
+        return {}
+
+    def _activity_row_mappings(self, table) -> list[dict]:
+        if table is None:
+            return []
+        if isinstance(table, Mapping):
+            nested = [
+                (key, value)
+                for key, value in table.items()
+                if isinstance(value, Mapping)
+            ]
+            if nested:
+                rows = []
+                for phase, row in nested:
+                    mapped = dict(row)
+                    mapped.setdefault('phase', phase)
+                    rows.append(mapped)
+                return rows
+            return [dict(table)]
+        if isinstance(table, (list, tuple)):
+            return [dict(row) for row in table if isinstance(row, Mapping)]
+        try:
+            if hasattr(table, 'empty') and bool(table.empty):
+                return []
+            if hasattr(table, 'to_dict'):
+                try:
+                    records = table.to_dict('records')
+                except TypeError:
+                    records = None
+                if isinstance(records, list):
+                    return [
+                        dict(row) for row in records
+                        if isinstance(row, Mapping)
+                    ]
+            if hasattr(table, 'iterrows'):
+                return [
+                    dict(row.to_dict() if hasattr(row, 'to_dict') else row)
+                    for _, row in table.iterrows()
+                ]
+        except (TypeError, ValueError):
+            return []
+        return []
+
+    def _activity_row_phase(self, row: Mapping[str, object]) -> Optional[str]:
+        for key in ('phase', 'Phase', 'phase_name', 'Phase Name', 'name', 'Name'):
+            if key in row and row[key] is not None:
+                return str(row[key])
+        return None
+
+    def _is_liquid_activity_phase(self, phase: object) -> bool:
+        name = str(phase).strip().lower()
+        return name == 'liq' or name.startswith('liquid')
+
     def _extract_activities_from_chemical_potentials(
         self,
         results: Mapping[str, object],
@@ -2114,7 +2377,7 @@ class AlphaMELTSBackend(MeltBackend):
         if not mu or not mu0:
             return {}
         T_K = float(temperature_C) + 273.15
-        activities: Dict[str, float] = {}
+        raw_activities: Dict[str, float] = {}
         for species, mu_i in mu.items():
             if species not in mu0:
                 continue
@@ -2123,8 +2386,8 @@ class AlphaMELTSBackend(MeltBackend):
             except (OverflowError, ValueError):
                 continue
             if activity > 0.0 and math.isfinite(activity):
-                activities[str(species)] = activity
-        return activities
+                raw_activities[str(species)] = activity
+        return raw_activities
 
     def _extract_potential_mapping(
         self,

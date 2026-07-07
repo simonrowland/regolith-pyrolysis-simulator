@@ -15,7 +15,10 @@ from typing import Any
 
 import yaml
 
-from engines.alphamelts.domain import AlphaMELTSDomainGate, _canonical_oxide_name
+from engines.alphamelts.domain import (
+    AlphaMELTSDomainGate,
+    canonical_melt_oxide_activity_name,
+)
 from engines.builtin.vapor_pressure import (
     COEFF_BLOCK_ANTOINE,
     VaporPressureComputationError,
@@ -70,7 +73,9 @@ def alphamelts_activity_volatility_diagnostic(
     real AlphaMELTS. It must accept keyword arguments ``temperature_C``,
     ``pressure_bar``, ``composition_wt_pct`` and ``fO2_log`` and return either
     an ``EquilibriumResult``-like object or a mapping with
-    ``activity_coefficients``/``activities``.
+    ``diagnostic_oxide_activities`` or exact oxide-labeled
+    ``activity_coefficients``/``activities``. Endmember/component labels are
+    not converted into oxide activities.
     """
 
     comp_wt = _finite_positive_mapping(composition_wt_pct)
@@ -648,13 +653,15 @@ def _source_extrapolation_limits(*samples: Mapping[str, Any]) -> dict[str, Any]:
 
 def _coerce_activity_sample(value: Any) -> dict[str, Any]:
     if isinstance(value, Mapping):
+        diagnostics = dict(value.get("diagnostics", {}) or {})
         raw_activities = (
-            value.get("activity_coefficients")
-            or value.get("activities")
+            value.get("diagnostic_oxide_activities")
+            or diagnostics.get("diagnostic_oxide_activities")
             or value.get("melt_oxide_activities")
+            or value.get("activity_coefficients")
+            or value.get("activities")
             or {}
         )
-        diagnostics = dict(value.get("diagnostics", {}) or {})
         return {
             "status": str(value.get("status", "ok")),
             "backend_status_reason": reason_value(
@@ -665,12 +672,13 @@ def _coerce_activity_sample(value: Any) -> dict[str, Any]:
             "warnings": tuple(str(w) for w in value.get("warnings", ()) or ()),
             "diagnostics": diagnostics,
         }
+    diagnostics = dict(getattr(value, "diagnostics", {}) or {})
     raw_activities = (
-        getattr(value, "activity_coefficients", None)
-        or getattr(value, "activities", None)
+        diagnostics.get("diagnostic_oxide_activities")
+        or getattr(value, "diagnostic_oxide_activities", None)
+        or getattr(value, "melt_oxide_activities", None)
         or {}
     )
-    diagnostics = dict(getattr(value, "diagnostics", {}) or {})
     return {
         "status": str(getattr(value, "status", "ok")),
         "backend_status_reason": reason_value(
@@ -686,7 +694,7 @@ def _coerce_activity_sample(value: Any) -> dict[str, Any]:
 def _canonical_activity_mapping(values: Mapping[str, float]) -> dict[str, float]:
     result: dict[str, float] = {}
     for raw_name, raw_value in dict(values or {}).items():
-        oxide = _canonical_oxide_name(raw_name)
+        oxide = canonical_melt_oxide_activity_name(raw_name)
         if oxide is None:
             continue
         try:
