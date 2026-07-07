@@ -154,6 +154,11 @@ C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: KeyPath = tuple(
     "campaigns.C2A_staged.depletion_flux_decay_fraction".split(".")
 )
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
+# SC-50 audit consumers: RecipeSchema identity/canonicalization,
+# CampaignManager staged endpoint logic, _build_eval_inputs runtime overrides,
+# and knob-saturation requested/applied diagnostics.
+C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD = "depletion_log_slope_epsilon_per_hr"
+C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR = 0.01
 C3_ALKALI_DOSING_NA_KG_PATH: KeyPath = tuple(
     "campaigns.C3.alkali_dosing.Na_kg".split(".")
 )
@@ -203,6 +208,23 @@ C2A_STAGED_STAGE_NAMES_BY_ORDER: Mapping[str, tuple[str, ...]] = MappingProxyTyp
         ),
     }
 )
+C2A_STAGED_DEPLETION_LOG_SLOPE_STAGE_NAMES: tuple[str, ...] = (
+    "alkali_early_fe",
+    "sio_window",
+    "fe_hot_hold",
+)
+C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE: Mapping[
+    str, KeyPath
+] = MappingProxyType(
+    {
+        stage_name: C2A_STAGED_STAGES_PATH
+        + (stage_name, C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD)
+        for stage_name in C2A_STAGED_DEPLETION_LOG_SLOPE_STAGE_NAMES
+    }
+)
+C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS: tuple[KeyPath, ...] = tuple(
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE.values()
+)
 C2A_STAGED_STAGE_GAS_FIELDS: tuple[str, ...] = (
     "pO2_mbar",
     "p_total_mbar",
@@ -218,15 +240,18 @@ C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyTyp
             "duration_h",
             "target_C",
             "ramp_rate_C_per_hr",
+            C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
         ) + C2A_STAGED_STAGE_GAS_FIELDS,
         "sio_window": (
             "duration_h",
             "target_C",
             "ramp_rate_C_per_hr",
+            C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
         ) + C2A_STAGED_STAGE_GAS_FIELDS,
         "fe_hot_hold": (
             "duration_h",
             "ramp_rate_C_per_hr",
+            C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
         ) + C2A_STAGED_STAGE_GAS_FIELDS,
         "cool_for_na_shuttle": (
             "duration_h",
@@ -318,6 +343,20 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
                 "Atmosphere.PN2_SWEEP; po2_hold maps to "
                 "Atmosphere.CONTROLLED_O2"
             ),
+        ),
+    )
+
+
+def _c2a_stage_depletion_log_slope_knob(stage_name: str) -> KnobSpec:
+    prefix = f"campaigns.C2A_staged.stages.{stage_name}"
+    return _knob(
+        f"{prefix}.{C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD}",
+        low=0.0,
+        high=0.50,
+        units="1/hr",
+        bounds_source=(
+            "engineering_envelope: per-stage cumulative-yield log-slope epsilon; "
+            "0.0 keeps fixed-duration mode, positive values floor to 0.01 1/hr"
         ),
     )
 
@@ -576,9 +615,10 @@ class RecipeSchema:
             high=0.50,
             units="fraction",
             bounds_source=(
-                "engineering_envelope: disabled band [0.0, 0.01) "
-                "canonicalizes to fixed schedule; enabled values floor to 0.01"
+                "engineering_envelope legacy replay only: replaced for search by per-stage "
+                "depletion_log_slope_epsilon_per_hr"
             ),
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_staged.order",
@@ -622,6 +662,7 @@ class RecipeSchema:
                 "campaigns.C2A_staged.stages.alkali_early_fe.ramp_rate_C_per_hr=600"
             ),
         ),
+        _c2a_stage_depletion_log_slope_knob("alkali_early_fe"),
         *_c2a_stage_gas_knobs("alkali_early_fe"),
         _knob(
             "campaigns.C2A_staged.stages.sio_window.duration_h",
@@ -654,6 +695,7 @@ class RecipeSchema:
                 "campaigns.C2A_staged.stages.sio_window.ramp_rate_C_per_hr=175"
             ),
         ),
+        _c2a_stage_depletion_log_slope_knob("sio_window"),
         *_c2a_stage_gas_knobs("sio_window"),
         _knob(
             "campaigns.C2A_staged.stages.fe_hot_hold.duration_h",
@@ -676,6 +718,7 @@ class RecipeSchema:
                 "campaigns.C2A_staged.stages.fe_hot_hold.ramp_rate_C_per_hr=150"
             ),
         ),
+        _c2a_stage_depletion_log_slope_knob("fe_hot_hold"),
         *_c2a_stage_gas_knobs("fe_hot_hold"),
         _knob(
             "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h",
@@ -1256,21 +1299,23 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C2A_staged.default_hold_T_C",
         "campaigns.C2A_staged.p_total_mbar",
         "campaigns.C2A_staged.p_total_mbar_default",
-        "campaigns.C2A_staged.depletion_flux_decay_fraction",
         "campaigns.C2A_staged.stages.alkali_early_fe.duration_h",
         "campaigns.C2A_staged.stages.alkali_early_fe.target_C",
         "campaigns.C2A_staged.stages.alkali_early_fe.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.stages.alkali_early_fe.depletion_log_slope_epsilon_per_hr",
         "campaigns.C2A_staged.stages.alkali_early_fe.pO2_mbar",
         "campaigns.C2A_staged.stages.alkali_early_fe.p_total_mbar",
         "campaigns.C2A_staged.stages.alkali_early_fe.gas_cover_mode",
         "campaigns.C2A_staged.stages.sio_window.duration_h",
         "campaigns.C2A_staged.stages.sio_window.target_C",
         "campaigns.C2A_staged.stages.sio_window.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.stages.sio_window.depletion_log_slope_epsilon_per_hr",
         "campaigns.C2A_staged.stages.sio_window.pO2_mbar",
         "campaigns.C2A_staged.stages.sio_window.p_total_mbar",
         "campaigns.C2A_staged.stages.sio_window.gas_cover_mode",
         "campaigns.C2A_staged.stages.fe_hot_hold.duration_h",
         "campaigns.C2A_staged.stages.fe_hot_hold.ramp_rate_C_per_hr",
+        "campaigns.C2A_staged.stages.fe_hot_hold.depletion_log_slope_epsilon_per_hr",
         "campaigns.C2A_staged.stages.fe_hot_hold.pO2_mbar",
         "campaigns.C2A_staged.stages.fe_hot_hold.p_total_mbar",
         "campaigns.C2A_staged.stages.fe_hot_hold.gas_cover_mode",
@@ -1680,6 +1725,7 @@ class RecipePatch:
             spec = active_schema.spec_for(path)
             _validate_value(spec, value, active_schema)
         _validate_pressure_default_pairs(active_schema, self.values)
+        _validate_c2a_staged_depletion_knob_conflict(self.values)
         return RecipePatch(dict(self.values))
 
     def recipe_id(
@@ -1746,9 +1792,44 @@ def _canonical_c3_alkali_dosing_recipe_values(
 def _canonical_recipe_values(values: Mapping[KeyPath, Any]) -> dict[KeyPath, Any]:
     return _canonical_o2_bubbler_recipe_values(
         _canonical_c3_alkali_dosing_recipe_values(
-            _canonical_c2a_staged_depletion_flux_decay_recipe_values(values)
+            _canonical_c2a_staged_depletion_log_slope_recipe_values(
+                _canonical_c2a_staged_depletion_flux_decay_recipe_values(values)
+            )
         )
     )
+
+
+def _validate_c2a_staged_depletion_knob_conflict(
+    values: Mapping[KeyPath, Any],
+) -> None:
+    if C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH not in values:
+        return
+    if not any(path in values for path in C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS):
+        return
+    raise RecipeValidationError(
+        "campaigns.C2A_staged.depletion_flux_decay_fraction is legacy-only "
+        "and conflicts with per-stage depletion_log_slope_epsilon_per_hr"
+    )
+
+
+def _canonical_c2a_staged_depletion_log_slope_recipe_values(
+    values: Mapping[KeyPath, Any],
+) -> dict[KeyPath, Any]:
+    _validate_c2a_staged_depletion_knob_conflict(values)
+    canonical = dict(values)
+    for path in C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS:
+        if path not in canonical:
+            continue
+        epsilon = _identity_float(canonical[path])
+        if epsilon is None:
+            continue
+        if epsilon <= 0.0:
+            canonical.pop(path, None)
+        elif epsilon < C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR:
+            canonical[path] = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR
+        else:
+            canonical[path] = epsilon
+    return canonical
 
 
 def _canonical_c2a_staged_depletion_flux_decay_recipe_values(

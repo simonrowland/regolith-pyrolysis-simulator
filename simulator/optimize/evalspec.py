@@ -28,9 +28,7 @@ from simulator.optimize.canonical import (
     normalize_canonical_value,
 )
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
-from simulator.optimize.recipe import (
-    O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION as DEFAULT_ALLOWLIST_VERSION,
-)
+from simulator.optimize.recipe import allowlist_version as DEFAULT_ALLOWLIST_VERSION
 
 
 _VERSION_PATH = Path(__file__).resolve().parents[2] / "VERSION"

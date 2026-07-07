@@ -22,6 +22,8 @@ from simulator.optimize.recipe import (
     C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_PATH,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE,
     C2A_STAGED_ORDER_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
@@ -124,7 +126,12 @@ def _stage_by_name(stages: list[dict], name: str) -> dict:
     return next(stage for stage in stages if stage["name"] == name)
 
 
-def _c2a_staged_setpoints(fraction: float | None = None) -> dict:
+def _c2a_staged_setpoints(
+    fraction: float | None = None,
+    *,
+    log_slope_by_stage: dict[str, float] | None = None,
+    duration_by_stage: dict[str, int] | None = None,
+) -> dict:
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
     setpoints = copy.deepcopy(setpoints)
     c2a = setpoints["campaigns"]["C2A_staged"]
@@ -132,6 +139,14 @@ def _c2a_staged_setpoints(fraction: float | None = None) -> dict:
         c2a.pop("depletion_flux_decay_fraction", None)
     else:
         c2a["depletion_flux_decay_fraction"] = fraction
+    stages = c2a["stages"]
+    for stage_name, epsilon in (log_slope_by_stage or {}).items():
+        _stage_by_name(stages, stage_name)[
+            "depletion_log_slope_epsilon_per_hr"
+        ] = epsilon
+    for stage_name, duration_h in (duration_by_stage or {}).items():
+        _stage_by_name(stages, stage_name)["duration_h"] = duration_h
+    c2a["max_hold_hr"] = sum(int(stage["duration_h"]) for stage in stages)
     return setpoints
 
 
@@ -153,8 +168,19 @@ def _write_c5_mre_cap_bound_yaml(data_dir: Path, high: float, mtime_ns: int) -> 
     os.utime(path, ns=(mtime_ns, mtime_ns))
 
 
-def _configured_c2a_staged_manager(fraction: float | None = None) -> CampaignManager:
-    manager = CampaignManager(_c2a_staged_setpoints(fraction))
+def _configured_c2a_staged_manager(
+    fraction: float | None = None,
+    *,
+    log_slope_by_stage: dict[str, float] | None = None,
+    duration_by_stage: dict[str, int] | None = None,
+) -> CampaignManager:
+    manager = CampaignManager(
+        _c2a_staged_setpoints(
+            fraction,
+            log_slope_by_stage=log_slope_by_stage,
+            duration_by_stage=duration_by_stage,
+        )
+    )
     manager.configure_campaign(
         MeltState(campaign=CampaignPhase.C2A_STAGED),
         CampaignPhase.C2A_STAGED,
@@ -315,10 +341,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
 
     assert unpinned is schema
-    assert len(paths) == 82
+    assert len(paths) == 84
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "7d86446f2c513af1bd79636abd4ec7842d98b9a977c27cc15b1d93f8e2baf173"
+        == "6b1388b7909a135b18153bdda8503dc36911ed23520914cdbd2246e1c6827249"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -384,6 +410,11 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # (linear-in-gamma alkali suppression); runner/sio_yield/sso_r goldens
     # regenerated in the same batch. Value recomputed controller-side and
     # cross-checked against the independent completion-worker observation.
+    # 2026-07-06 (SSO-4): allowlist-v11 adds three searched per-stage
+    # depletion_log_slope_epsilon_per_hr knobs and removes the legacy global
+    # depletion_flux_decay_fraction from search. Search-list hash moves by
+    # design; recipe_id/cache_key remain pinned here because this no-O2 patch
+    # resolves through the O2-neutral allowlist epoch.
     assert cache_key(spec) == "7829f8bff98daf116761ccb293e568888353bf39bcdb13c5b192c04cc926fa9f"
 
 
@@ -894,13 +925,13 @@ def test_c2a_staged_order_rejects_unknown_choice() -> None:
         RecipePatch({C2A_ORDER: "iron_firstish"}).validated(RecipeSchema())
 
 
-def test_c2a_staged_depletion_flux_decay_knob_bounds_and_neutral_validation() -> None:
+def test_c2a_staged_depletion_flux_decay_legacy_knob_is_runtime_only() -> None:
     schema = RecipeSchema()
     spec = schema.spec_for(C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH)
 
     assert spec.low == pytest.approx(0.0)
     assert spec.high == pytest.approx(0.50)
-    assert spec.path in {item.path for item in schema.search_allowlist}
+    assert spec.path not in {item.path for item in schema.search_allowlist}
     assert RecipePatch(
         {C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.0}
     ).validated(schema).values[
@@ -928,6 +959,49 @@ def test_c2a_staged_depletion_flux_decay_knob_bounds_and_neutral_validation() ->
     with pytest.raises(RecipeValidationError, match="below lower bound"):
         RecipePatch(
             {C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: -0.01}
+        ).validated(schema)
+
+
+def test_c2a_staged_depletion_log_slope_knobs_canonicalize_per_stage() -> None:
+    schema = RecipeSchema()
+    alkali_path = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE[
+        "alkali_early_fe"
+    ]
+    sio_path = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE["sio_window"]
+    spec = schema.spec_for(alkali_path)
+
+    assert spec.low == pytest.approx(0.0)
+    assert spec.high == pytest.approx(0.50)
+    assert spec.units == "1/hr"
+    assert spec.path in {item.path for item in schema.search_allowlist}
+
+    zero = RecipePatch({alkali_path: 0.0}).validated(schema)
+    sub_floor = RecipePatch({alkali_path: 0.005}).validated(schema)
+    floor = RecipePatch(
+        {alkali_path: C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR}
+    ).validated(schema)
+    same_value_other_stage = RecipePatch(
+        {sio_path: C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR}
+    ).validated(schema)
+
+    assert schema.to_setpoints_patch(zero) == {}
+    assert zero.recipe_id(schema) == RecipePatch({}).recipe_id(schema)
+    rendered = schema.to_setpoints_patch(sub_floor)
+    stages = rendered["campaigns"]["C2A_staged"]["stages"]
+    assert _stage_by_name(stages, "alkali_early_fe")[
+        "depletion_log_slope_epsilon_per_hr"
+    ] == pytest.approx(C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR)
+    assert sub_floor.recipe_id(schema) == floor.recipe_id(schema)
+    assert same_value_other_stage.recipe_id(schema) != floor.recipe_id(schema)
+
+    with pytest.raises(RecipeValidationError, match="below lower bound"):
+        RecipePatch({alkali_path: -0.01}).validated(schema)
+    with pytest.raises(RecipeValidationError, match="legacy-only"):
+        RecipePatch(
+            {
+                C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.25,
+                alkali_path: 0.25,
+            }
         ).validated(schema)
 
 
@@ -970,7 +1044,7 @@ def test_c3_alkali_dosing_deadband_canonicalizes_to_disabled_state() -> None:
     )
 
 
-def test_c2a_staged_depletion_flux_decay_golden_neutral_fixed_schedule() -> None:
+def test_c2a_staged_depletion_log_slope_neutral_fixed_schedule() -> None:
     expected_targets = [
         (1250.0, 600.0),
         (1250.0, 600.0),
@@ -1008,8 +1082,10 @@ def test_c2a_staged_depletion_flux_decay_golden_neutral_fixed_schedule() -> None
         assert manager._c2a_staged_stage_idx == 0
 
 
-def test_c2a_staged_depletion_flux_decay_advances_stage_early() -> None:
-    manager = _configured_c2a_staged_manager(0.25)
+def test_c2a_staged_depletion_log_slope_advances_stage_early() -> None:
+    manager = _configured_c2a_staged_manager(
+        log_slope_by_stage={"alkali_early_fe": 0.25}
+    )
 
     assert not _check_c2a_staged_endpoint(manager, 0, _flux(Na=10.0, K=8.0))
     assert manager._c2a_staged_stage_idx == 0
@@ -1019,7 +1095,13 @@ def test_c2a_staged_depletion_flux_decay_advances_stage_early() -> None:
 
     assert manager._c2a_staged_stage_idx == 1
     assert manager._c2a_staged_stage_start_hour == 3
-    assert manager._c2a_staged_peak_flux_by_species == {}
+    assert manager._c2a_staged_cumulative_yield_mol_by_species == {}
+    assert manager.last_c2a_staged_termination is not None
+    assert manager.last_c2a_staged_termination["reason"] == "depletion_log_slope"
+    assert manager.last_c2a_staged_termination["stage"] == "alkali_early_fe"
+    slopes = manager.last_c2a_staged_termination["log_slope_per_hr_by_species"]
+    assert slopes["Na"] <= 0.25
+    assert slopes["K"] <= 0.25
     target, ramp = manager.get_temp_target(
         CampaignPhase.C2A_STAGED,
         3,
@@ -1029,8 +1111,14 @@ def test_c2a_staged_depletion_flux_decay_advances_stage_early() -> None:
     assert ramp == pytest.approx(175.0)
 
 
-def test_c2a_staged_depletion_flux_decay_times_out_when_flux_never_decays() -> None:
-    manager = _configured_c2a_staged_manager(0.25)
+def test_c2a_staged_depletion_log_slope_times_out_when_flux_never_decays() -> None:
+    manager = _configured_c2a_staged_manager(
+        log_slope_by_stage={
+            "alkali_early_fe": 0.01,
+            "sio_window": 0.01,
+            "fe_hot_hold": 0.01,
+        }
+    )
     ended_hour = None
     stage_idx_by_hour: dict[int, int] = {}
 
@@ -1050,6 +1138,46 @@ def test_c2a_staged_depletion_flux_decay_times_out_when_flux_never_decays() -> N
     assert stage_idx_by_hour[6] == 2
     assert stage_idx_by_hour[7] == 3
     assert ended_hour == 8
+    assert manager.last_c2a_staged_termination is not None
+    assert manager.last_c2a_staged_termination["reason"] == "duration_cap_timeout"
+
+
+def test_c2a_staged_duration_cap_separate_from_log_slope_exit() -> None:
+    long_cap = _configured_c2a_staged_manager(
+        log_slope_by_stage={"alkali_early_fe": 0.25},
+        duration_by_stage={"alkali_early_fe": 6},
+    )
+    for hour, flux in enumerate(
+        (_flux(Na=10.0, K=8.0), _flux(Na=5.0, K=4.0), _flux(Na=2.4, K=1.9))
+    ):
+        assert not _check_c2a_staged_endpoint(long_cap, hour, flux)
+
+    assert long_cap._c2a_staged_stage_idx == 1
+    assert long_cap.last_c2a_staged_termination is not None
+    assert long_cap.last_c2a_staged_termination["reason"] == "depletion_log_slope"
+
+    short_cap = _configured_c2a_staged_manager(
+        log_slope_by_stage={"alkali_early_fe": 0.25},
+        duration_by_stage={"alkali_early_fe": 2},
+    )
+    assert not _check_c2a_staged_endpoint(short_cap, 0, _flux(Na=10.0, K=8.0))
+    assert not _check_c2a_staged_endpoint(short_cap, 1, _flux(Na=5.0, K=4.0))
+
+    assert short_cap._c2a_staged_stage_idx == 1
+    assert short_cap.last_c2a_staged_termination is not None
+    assert short_cap.last_c2a_staged_termination["reason"] == "duration_cap_timeout"
+
+
+def test_c2a_staged_legacy_flux_decay_replay_still_advances() -> None:
+    manager = _configured_c2a_staged_manager(0.25)
+
+    assert not _check_c2a_staged_endpoint(manager, 0, _flux(Na=10.0, K=8.0))
+    assert not _check_c2a_staged_endpoint(manager, 1, _flux(Na=5.0, K=4.0))
+    assert not _check_c2a_staged_endpoint(manager, 2, _flux(Na=2.4, K=1.9))
+
+    assert manager._c2a_staged_stage_idx == 1
+    assert manager.last_c2a_staged_termination is not None
+    assert manager.last_c2a_staged_termination["reason"] == "legacy_flux_decay"
 
 
 @pytest.mark.parametrize("mode", OXYGEN_SINK_CHANNEL_MODE_VALUES)

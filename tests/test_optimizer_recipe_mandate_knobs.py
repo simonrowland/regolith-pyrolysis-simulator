@@ -9,6 +9,7 @@ from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
 from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE,
     FURNACE_MAX_T_C_PATH,
     MANDATE_LEVER_ALLOWLIST,
     MANDATE_LEVER_PATHS,
@@ -42,6 +43,9 @@ C2A_STAGED_STAGE_GAS_PATHS = {
     )
     for field in ("pO2_mbar", "p_total_mbar", "gas_cover_mode")
 }
+C2A_STAGED_DEPLETION_LOG_SLOPE_PATHS = set(
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE.values()
+)
 
 
 def _lookup(root: dict, path: tuple[str, ...]):
@@ -169,7 +173,10 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
         _path("campaigns.C2A_continuous.p_total_mbar_default"),
         _path("campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr"),
         _path("campaigns.C2A_staged.na_shuttle_stage.duration_h"),
-        _path("campaigns.C2A_staged.depletion_flux_decay_fraction"),
+        _path(
+            "campaigns.C2A_staged.stages.alkali_early_fe."
+            "depletion_log_slope_epsilon_per_hr"
+        ),
         _path("campaigns.C2A_staged.stages.sio_window.target_C"),
         _path("campaigns.C2A_staged.stages.sio_window.pO2_mbar"),
         _path("campaigns.C2A_staged.stages.sio_window.p_total_mbar"),
@@ -195,7 +202,11 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
     pair_map = dict(RecipeSchema.PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT)
     spec_by_path = {spec.path: spec for spec in schema.allowlist}
     for spec in MANDATE_LEVER_ALLOWLIST:
-        if spec.path not in C4_RUNTIME_ONLY_PATHS | C2A_STAGED_STAGE_GAS_PATHS:
+        if spec.path not in (
+            C4_RUNTIME_ONLY_PATHS
+            | C2A_STAGED_STAGE_GAS_PATHS
+            | C2A_STAGED_DEPLETION_LOG_SLOPE_PATHS
+        ):
             _lookup(setpoints, spec.path)
         values = {spec.path: _sample_value(spec)}
         total_path = pair_map.get(spec.path)
@@ -206,14 +217,17 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
             )
         patch = RecipePatch(values)
         assert patch.validated(schema).values[spec.path] == _sample_value(spec)
-        if spec.path in C2A_STAGED_STAGE_GAS_PATHS:
+        if spec.path in (
+            C2A_STAGED_STAGE_GAS_PATHS | C2A_STAGED_DEPLETION_LOG_SLOPE_PATHS
+        ):
             rendered = schema.to_setpoints_patch(patch.validated(schema))
             assert _lookup(rendered, spec.path) == _sample_value(spec)
 
 
-def test_c2a_staged_depletion_flux_decay_mandate_knob_is_runtime_live() -> None:
+def test_c2a_staged_depletion_log_slope_mandate_knob_is_runtime_live() -> None:
     schema = RecipeSchema()
-    patch = RecipePatch({C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.25})
+    path = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE["alkali_early_fe"]
+    patch = RecipePatch({path: 0.25})
     nested = schema.to_setpoints_patch(patch)
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
     setpoints["campaigns"]["C2A_staged"].update(nested["campaigns"]["C2A_staged"])
@@ -240,6 +254,70 @@ def test_c2a_staged_depletion_flux_decay_mandate_knob_is_runtime_live() -> None:
         BatchRecord(),
     )
     assert manager._c2a_staged_stage_idx == 1
+    assert manager.last_c2a_staged_termination is not None
+    assert manager.last_c2a_staged_termination["reason"] == "depletion_log_slope"
+
+
+def test_c2a_staged_log_slope_depletes_stage_a_while_stage_b_evolves() -> None:
+    schema = RecipeSchema()
+    alkali_path = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE[
+        "alkali_early_fe"
+    ]
+    sio_path = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE["sio_window"]
+    sio_epsilon_per_hr = 0.25
+    patch = RecipePatch({alkali_path: 0.25, sio_path: sio_epsilon_per_hr})
+    nested = schema.to_setpoints_patch(patch)
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    setpoints["campaigns"]["C2A_staged"].update(nested["campaigns"]["C2A_staged"])
+    manager = CampaignManager(setpoints)
+    manager.configure_campaign(
+        MeltState(campaign=CampaignPhase.C2A_STAGED),
+        CampaignPhase.C2A_STAGED,
+    )
+
+    def flux(species_kg_hr: dict[str, float]) -> EvaporationFlux:
+        evap_flux = EvaporationFlux(species_kg_hr=species_kg_hr)
+        evap_flux.update_totals()
+        return evap_flux
+
+    train = CondensationTrain.create_default()
+    record = BatchRecord()
+    assert not manager.check_endpoint(
+        MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=0),
+        flux({"Na": 10.0, "K": 8.0}),
+        train,
+        record,
+    )
+    assert manager._c2a_staged_stage_idx == 0
+    assert not manager.check_endpoint(
+        MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=1),
+        flux({"Na": 2.4, "K": 1.9}),
+        train,
+        record,
+    )
+    assert manager._c2a_staged_stage_idx == 1
+    assert manager._c2a_staged_stage_start_hour == 2
+    assert manager.last_c2a_staged_termination is not None
+    assert manager.last_c2a_staged_termination["reason"] == "depletion_log_slope"
+    assert manager.last_c2a_staged_termination["stage"] == "alkali_early_fe"
+
+    assert not manager.check_endpoint(
+        MeltState(campaign=CampaignPhase.C2A_STAGED, campaign_hour=2),
+        flux({"SiO": 10.0}),
+        train,
+        record,
+    )
+    assert manager._c2a_staged_stage_idx == 1
+    assert set(manager._c2a_staged_cumulative_yield_mol_by_species) == {"SiO"}
+    assert manager._c2a_staged_last_log_slope_by_species["SiO"] > sio_epsilon_per_hr
+
+
+def test_c2a_staged_legacy_flux_decay_is_not_mandate_searched() -> None:
+    schema = RecipeSchema()
+    assert C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH not in MANDATE_LEVER_PATHS
+    assert C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH not in {
+        spec.path for spec in schema.search_allowlist
+    }
 
 
 def test_furnace_max_t_c_mandate_knob_is_runtime_live() -> None:

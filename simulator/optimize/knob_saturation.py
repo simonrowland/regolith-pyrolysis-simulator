@@ -9,6 +9,8 @@ from typing import Any
 from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     KeyPath,
     RecipePatch,
@@ -113,6 +115,8 @@ _MISSING_DEFAULT = object()
 def _effective_default_value(path: KeyPath) -> Any:
     if path == C5_ALLOW_MRE_VOLTAGE_CAP_PATH:
         return 0.0
+    if path in C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS:
+        return 0.0
     try:
         return _default_setpoint_value(path)
     except Exception:
@@ -188,6 +192,16 @@ def _knob_row(
 
 
 def _applied_trace_value(path: KeyPath, value: Any) -> Any:
+    if path in C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS:
+        try:
+            epsilon = float(value or 0.0)
+        except (TypeError, ValueError):
+            return value
+        if not math.isfinite(epsilon) or epsilon < 0.0:
+            return value
+        if epsilon <= 0.0:
+            return 0.0
+        return max(epsilon, C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR)
     if path != C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH:
         return value
     try:

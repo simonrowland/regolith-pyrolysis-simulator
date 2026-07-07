@@ -42,6 +42,8 @@ from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE,
     C2A_STAGED_ORDER_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
@@ -83,7 +85,7 @@ STAGE_SIO_GAS_MODE = (
 
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,'
-    b'"allowlist_version":"allowlist-v10","backend_name":"stub",'
+    b'"allowlist_version":"allowlist-v11","backend_name":"stub",'
     b'"c5_enabled":false,"campaign":"C0","chemistry_kernel":{'
     b'"allow_builtin_fallback":false,"engine":"builtin",'
     b'"pressure_Pa":"0.001000000"},"code_version":"0.5.7",'
@@ -1223,6 +1225,105 @@ def test_build_eval_inputs_c2a_staged_depletion_floor_partitions_cache_and_runti
     ] == pytest.approx(0.25)
     assert subfloor_spec.recipe_id != default_spec.recipe_id
     assert quarter_spec.recipe_id != subfloor_spec.recipe_id
+
+
+def test_build_eval_inputs_c2a_staged_depletion_log_slope_zero_is_cache_neutral() -> None:
+    profile = _mre_cap_profile(campaign="C2A_staged", hours=9)
+    schema = RecipeSchema()
+    alkali_path = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE[
+        "alkali_early_fe"
+    ]
+    default_spec, default_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    zero_spec, zero_config = _build_eval_inputs(
+        RecipePatch({alkali_path: 0.0}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    assert zero_spec.recipe_id == default_spec.recipe_id
+    assert canonical_evalspec_json(zero_spec) == canonical_evalspec_json(default_spec)
+    assert cache_key(zero_spec) == cache_key(default_spec)
+    assert "C2A_staged" not in default_config.runtime_campaign_overrides
+    assert "C2A_staged" not in zero_config.runtime_campaign_overrides
+    alkali_stage = next(
+        stage
+        for stage in zero_config.setpoints["campaigns"]["C2A_staged"]["stages"]
+        if stage["name"] == "alkali_early_fe"
+    )
+    assert "depletion_log_slope_epsilon_per_hr" not in alkali_stage
+
+
+def test_build_eval_inputs_c2a_staged_depletion_log_slope_partitions_cache_by_stage() -> None:
+    profile = _mre_cap_profile(campaign="C2A_staged", hours=9)
+    schema = RecipeSchema()
+    alkali_path = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE[
+        "alkali_early_fe"
+    ]
+    sio_path = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE["sio_window"]
+    default_spec, _ = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    subfloor_spec, subfloor_config = _build_eval_inputs(
+        RecipePatch({alkali_path: 0.005}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    floor_spec, floor_config = _build_eval_inputs(
+        RecipePatch({alkali_path: C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    quarter_spec, quarter_config = _build_eval_inputs(
+        RecipePatch({alkali_path: 0.25}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+    same_value_sio_spec, _ = _build_eval_inputs(
+        RecipePatch({sio_path: C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile,
+        schema,
+    )
+
+    def stage_value(config, stage_name: str) -> float:
+        stage = next(
+            stage
+            for stage in config.setpoints["campaigns"]["C2A_staged"]["stages"]
+            if stage["name"] == stage_name
+        )
+        return stage["depletion_log_slope_epsilon_per_hr"]
+
+    assert subfloor_spec.recipe_id == floor_spec.recipe_id
+    assert cache_key(subfloor_spec) == cache_key(floor_spec)
+    assert stage_value(subfloor_config, "alkali_early_fe") == pytest.approx(
+        C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR
+    )
+    assert stage_value(floor_config, "alkali_early_fe") == pytest.approx(
+        C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR
+    )
+    assert stage_value(quarter_config, "alkali_early_fe") == pytest.approx(0.25)
+    assert subfloor_spec.recipe_id != default_spec.recipe_id
+    assert quarter_spec.recipe_id != subfloor_spec.recipe_id
+    assert same_value_sio_spec.recipe_id != floor_spec.recipe_id
 
 
 def test_build_eval_inputs_c4_hold_temp_knob_partitions_cache_and_runtime() -> None:

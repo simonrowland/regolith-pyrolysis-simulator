@@ -4,8 +4,8 @@ import pytest
 
 from simulator.optimize.knob_saturation import compute_knob_saturation
 from simulator.optimize.recipe import (
-    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
-    C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
+    C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     RecipePatch,
     RecipeSchema,
@@ -34,11 +34,10 @@ def test_empty_patch_reports_default_at_bound_search_knobs() -> None:
     assert report["pinned_count"] >= 1
 
 
-def test_c2a_depletion_trace_labels_requested_and_applied_values() -> None:
-    requested = C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR / 2.0
-    patch = RecipePatch(
-        {C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: requested}
-    ).validated()
+def test_c2a_depletion_log_slope_trace_labels_requested_and_applied_values() -> None:
+    requested = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR / 2.0
+    path = C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE["alkali_early_fe"]
+    patch = RecipePatch({path: requested}).validated()
 
     report = compute_knob_saturation(
         patch,
@@ -46,9 +45,17 @@ def test_c2a_depletion_trace_labels_requested_and_applied_values() -> None:
         active_objective_metrics=("oxygen_kg",),
     )
 
-    row = _row(report, "campaigns.C2A_staged.depletion_flux_decay_fraction")
+    row = _row(
+        report,
+        "campaigns.C2A_staged.stages.alkali_early_fe."
+        "depletion_log_slope_epsilon_per_hr",
+    )
     assert row["source"] == "patched"
     assert row["requested_value"] == pytest.approx(requested)
-    assert row["applied_value"] == pytest.approx(0.0)
-    assert row["value"] == pytest.approx(0.0)
-    assert row["pinned"] == "low"
+    assert row["applied_value"] == pytest.approx(
+        C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR
+    )
+    assert row["value"] == pytest.approx(
+        C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR
+    )
+    assert row["pinned"] == "none"
