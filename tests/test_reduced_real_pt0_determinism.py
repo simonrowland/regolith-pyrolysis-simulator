@@ -453,6 +453,20 @@ def _silicate_equilibrium_key(
     return store._equilibrium_key(sim)
 
 
+def _alphamelts_silicate_equilibrium_key(
+    *,
+    model: str = "MELTSv1.0.2",
+    mode: str = "subprocess",
+    engine_version: str = "alphamelts-authentic-test",
+) -> dict:
+    provider = _CountingSilicateEquilibriumProvider(
+        provider_id="alphamelts-diagnostic",
+        engine_version=engine_version,
+    )
+    provider._backend = SimpleNamespace(_model=model, _mode=mode)
+    return _silicate_equilibrium_key(provider)
+
+
 def _key_hash(key: dict) -> str:
     return hashlib.sha256(canonical_json_bytes(key)).hexdigest()
 
@@ -501,6 +515,93 @@ def test_interpolation_diagnostics_do_not_enter_replay_key() -> None:
     assert after == before
     assert b"interpolation_uncertainty" not in canonical_json_bytes(after)
     assert b"interpolation_feasibility" not in canonical_json_bytes(after)
+
+
+def test_alphamelts_provider_key_partitions_model_mode_and_engine_version() -> None:
+    base = _alphamelts_silicate_equilibrium_key()
+    pmelts = _alphamelts_silicate_equilibrium_key(model="pMELTS")
+    thermoengine = _alphamelts_silicate_equilibrium_key(mode="thermoengine")
+    next_engine = _alphamelts_silicate_equilibrium_key(
+        engine_version="alphamelts-authentic-test-2"
+    )
+
+    assert base["model"] == {
+        "model": "MELTSv1.0.2",
+        "mode": "subprocess",
+        "engine_version": "alphamelts-authentic-test",
+    }
+    assert pmelts["model"]["model"] == "pMELTS"
+    assert thermoengine["model"]["mode"] == "thermoengine"
+    assert next_engine["model"]["engine_version"] == "alphamelts-authentic-test-2"
+    assert _key_hash(base) != _key_hash(pmelts)
+    assert _key_hash(base) != _key_hash(thermoengine)
+    assert _key_hash(base) != _key_hash(next_engine)
+
+
+def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> None:
+    key = _freeze_gate_key()
+
+    assert key["backend"] == {
+        "backend_name": "StubBackend",
+        "backend_class": "simulator.melt_backend.base.StubBackend",
+        "corpus_version": current_corpus_version(),
+    }
+    assert key["provider"] == {
+        "resolved_provider_id": "magemin-shadow",
+        "resolved_role": "fallback",
+        "authoritative_provider_id": None,
+        "fallback_provider_id": "magemin-shadow",
+        "fallback_allowed": True,
+        "model": "magemin-shadow",
+        "mode": "subprocess",
+    }
+    assert key["model"] == {
+        "model": "magemin-shadow",
+        "mode": "subprocess",
+    }
+    # No engine_version key is folded into the non-alphamelts model identity (the exact dicts
+    # above assert that — the BH-055/056 folding is alphamelts-only). The FULL-key byte-identity
+    # of this same _freeze_gate_key() is anchored by the sibling
+    # test_control_quantization_default_production_key_is_byte_identical hash pin; we do NOT
+    # duplicate that hardcoded hash here (it rebaselines on legitimate data/corpus moves, and a
+    # stale second copy would spuriously re-break this test).
+    assert "engine_version" not in key["model"]
+    assert "engine_version" not in key["provider"]
+
+
+def test_magemin_shadow_fallback_under_alphamelts_config_excludes_engine_version(
+    monkeypatch,
+) -> None:
+    # A magemin-shadow gate fallback can resolve UNDER an alphamelts-authorized cached-real
+    # config (the real alphamelts backend is unavailable, so the gate falls back to the
+    # magemin shadow). engine_version must NOT be folded into the shadow provider's cache key:
+    # the shadow identity must not depend on the alphamelts binary version, else an alphamelts
+    # version bump spuriously invalidates the magemin-shadow cache. Regression for the
+    # BH-055/056 config-misclassification path — a RESOLVED non-alphamelts provider is not an
+    # alphamelts key identity even when the authorized backend is alphamelts.
+    sim = SimpleNamespace(backend=SimpleNamespace())
+    monkeypatch.setattr(
+        rrd,
+        "_cached_real_config",
+        lambda _sim: SimpleNamespace(authorized_backend_name="alphamelts"),
+    )
+    magemin_identity = {
+        "resolved_provider_id": "magemin-shadow",
+        "authoritative_provider_id": None,
+    }
+    # Even though the cached-real config authorizes alphamelts, the resolved shadow provider
+    # is NOT an alphamelts key identity.
+    assert rrd._is_alphamelts_key_identity(sim, magemin_identity) is False
+    # ...so no engine_version is folded into its cache key.
+    assert (
+        rrd._cache_key_engine_version(
+            sim,
+            ChemistryIntent.GATE_LIQUID_FRACTION,
+            provider_identity=magemin_identity,
+            provider_role="fallback",
+        )
+        is None
+    )
 
 
 def _c3a_ladder_key(

@@ -119,6 +119,9 @@ _ALPHAMELTS_BACKEND_NAME = "AlphaMELTSBackend"
 _ALPHAMELTS_BACKEND_CLASS = (
     "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
 )
+_ALPHAMELTS_PROVIDER_ID = "alphamelts-diagnostic"
+_ALPHAMELTS_DEFAULT_MODEL = "MELTSv1.0.2"
+_ALPHAMELTS_DEFAULT_MODE = "subprocess"
 _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID = "builtin-backend-equilibrium"
 _STUB_BACKEND_NAME = "StubBackend"
 
@@ -1935,6 +1938,19 @@ def canonical_replay_key(
         provider_role=provider_role,
     )
     vapor_provider = _provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
+    model_identity = {
+        "model": provider.get("model"),
+        "mode": provider.get("mode"),
+    }
+    engine_version = _cache_key_engine_version(
+        sim,
+        intent,
+        provider_identity=provider,
+        provider_role=provider_role,
+    )
+    if engine_version is not None:
+        model_identity["engine_version"] = engine_version
+
     # NOTE (cache identity is VERSION-based, NOT source-content-based — deliberate,
     # see commit 8d09d4f "corpus_version = sole cache lever"): the cache key uses
     # SCHEMA_VERSION + corpus_version + provider/backend identity, and intentionally
@@ -1975,10 +1991,7 @@ def canonical_replay_key(
             "stage0_inventory_digest": _digest(sulfur_inventory),
             **_sulfsat_identity(getattr(sim, "_sulfsat_gate", None)),
         },
-        "model": {
-            "model": provider.get("model"),
-            "mode": provider.get("mode"),
-        },
+        "model": model_identity,
         "data_digests": _data_digests(sim),
         "corpus_version": current_corpus_version(),
     }
@@ -2615,6 +2628,17 @@ def _engine_version_provenance(
     provider_role: str | None = None,
 ) -> str | None:
     backend = getattr(sim, "backend", None)
+    config = _cached_real_config(sim)
+    if config is not None:
+        authorized_name = str(
+            getattr(config, "authorized_backend_name", "")
+        ).strip()
+        if _is_alphamelts_authorized_name(authorized_name):
+            version = str(
+                getattr(config, "authorized_backend_version", "")
+            ).strip()
+            return version or "unavailable"
+
     live_backend = getattr(backend, "_live_backend", None)
     if live_backend is not None:
         return _backend_version_for_key(live_backend)
@@ -2641,8 +2665,8 @@ def _cached_real_provider_identity(
         return None
     authorized_name = str(
         getattr(config, "authorized_backend_name", "")
-    ).strip().lower()
-    if authorized_name != "alphamelts":
+    ).strip()
+    if not _is_alphamelts_authorized_name(authorized_name):
         return None
     alphamelts_intents = {
         ChemistryIntent.SILICATE_LIQUIDUS,
@@ -2668,13 +2692,19 @@ def _cached_real_provider_identity(
         else None
     )
     return {
-        "resolved_provider_id": "alphamelts-diagnostic",
+        "resolved_provider_id": _ALPHAMELTS_PROVIDER_ID,
         "resolved_role": "authoritative",
-        "authoritative_provider_id": "alphamelts-diagnostic",
+        "authoritative_provider_id": _ALPHAMELTS_PROVIDER_ID,
         "fallback_provider_id": fallback_provider_id,
         "fallback_allowed": bool(fallback_allowed),
-        "model": "alphamelts-diagnostic",
-        "mode": "AlphaMELTSProvider",
+        "model": (
+            str(getattr(config, "authorized_model", "")).strip()
+            or _ALPHAMELTS_DEFAULT_MODEL
+        ),
+        "mode": (
+            str(getattr(config, "authorized_mode", "")).strip()
+            or _ALPHAMELTS_DEFAULT_MODE
+        ),
     }
 
 
@@ -2688,6 +2718,12 @@ def _provider_id(provider: Any) -> str | None:
 def _provider_model(provider: Any) -> str | None:
     if provider is None:
         return None
+    backend = getattr(provider, "_backend", None)
+    model = getattr(backend, "_model", None)
+    if model is not None:
+        model_text = str(model).strip()
+        if model_text:
+            return model_text
     return str(getattr(provider, "name", type(provider).__name__))
 
 
@@ -2695,12 +2731,60 @@ def _provider_mode(provider: Any) -> str | None:
     if provider is None:
         return None
     backend = getattr(provider, "_backend", None)
-    mode = getattr(backend, "_bridge", None)
+    mode = getattr(backend, "_mode", None)
     if mode is not None:
-        return str(mode)
+        mode_text = str(mode).strip()
+        if mode_text:
+            return mode_text
     if _provider_id(provider) == "magemin-shadow":
         return "subprocess"
     return str(type(provider).__name__)
+
+
+def _cache_key_engine_version(
+    sim: Any,
+    intent: ChemistryIntent,
+    *,
+    provider_identity: Mapping[str, Any],
+    provider_role: str | None = None,
+) -> str | None:
+    if not _is_alphamelts_key_identity(sim, provider_identity):
+        return None
+    return _engine_version_provenance(sim, intent, provider_role=provider_role)
+
+
+def _is_alphamelts_key_identity(
+    sim: Any,
+    provider_identity: Mapping[str, Any],
+) -> bool:
+    provider_ids = {
+        str(provider_identity.get("resolved_provider_id") or ""),
+        str(provider_identity.get("authoritative_provider_id") or ""),
+    }
+    if _ALPHAMELTS_PROVIDER_ID in provider_ids:
+        return True
+    # A RESOLVED non-alphamelts provider (e.g. the magemin-shadow gate fallback) is NOT an
+    # alphamelts key identity even when the cached-real config's authorized backend is
+    # alphamelts. Do not fold engine_version into its key — that would change a non-alphamelts
+    # cache identity (magemin-shadow / stub), which must stay byte-identical.
+    resolved = str(provider_identity.get("resolved_provider_id") or "").strip()
+    if resolved and resolved != _ALPHAMELTS_PROVIDER_ID:
+        return False
+    backend = getattr(sim, "backend", None)
+    live_backend = getattr(backend, "_live_backend", None)
+    if _is_alphamelts_backend(live_backend) or _is_alphamelts_backend(backend):
+        return True
+    config = _cached_real_config(sim)
+    if config is None:
+        return False
+    authorized_name = str(getattr(config, "authorized_backend_name", "")).strip()
+    return _is_alphamelts_authorized_name(authorized_name)
+
+
+def _is_alphamelts_authorized_name(value: Any) -> bool:
+    text = str(value or "").strip().lower()
+    leaf = text.rsplit(".", 1)[-1]
+    return text == _ALPHAMELTS_AUTHORIZED_NAME or leaf == "alphameltsbackend"
 
 
 def _provider_engine_version(provider: Any) -> str | None:
@@ -3095,7 +3179,7 @@ def _authorized_backend_identity_for_key(
     authorized_name: str,
 ) -> dict[str, str]:
     name = str(authorized_name).strip()
-    if name.lower() == _ALPHAMELTS_AUTHORIZED_NAME:
+    if _is_alphamelts_authorized_name(name):
         return {
             "backend_name": _ALPHAMELTS_BACKEND_NAME,
             "backend_class": _ALPHAMELTS_BACKEND_CLASS,

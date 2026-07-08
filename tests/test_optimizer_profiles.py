@@ -54,6 +54,8 @@ def test_reduced_real_cache_accepts_authorized_backend_version() -> None:
         "miss_policy": "fail-loud",
         "authorized_backend_name": "AlphaMELTSBackend",
         "authorized_backend_version": "alphaMELTS subprocess 2.3.1",
+        "authorized_model": "MELTSv1.0.2",
+        "authorized_mode": "subprocess",
         "cache_tier_ceiling": "cached_exact",
     }
     validated = validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
@@ -61,6 +63,11 @@ def test_reduced_real_cache_accepts_authorized_backend_version() -> None:
         validated["run"]["reduced_real_cache"]["authorized_backend_version"]
         == "alphaMELTS subprocess 2.3.1"
     )
+    assert (
+        validated["run"]["reduced_real_cache"]["authorized_model"]
+        == "MELTSv1.0.2"
+    )
+    assert validated["run"]["reduced_real_cache"]["authorized_mode"] == "subprocess"
 
 
 def test_reduced_real_cache_rejects_unknown_cache_tier_ceiling() -> None:

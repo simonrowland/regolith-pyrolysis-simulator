@@ -40,6 +40,8 @@ from simulator.state import CampaignPhase
 class _FakeLiveRealBackend:
     name = "fake-live-real"
     engine_version = "fake-live-real 1.0.0"
+    model = "MELTSv1.0.2"
+    mode = "subprocess"
     last_instance: "_FakeLiveRealBackend | None" = None
 
     def __init__(self) -> None:
@@ -87,6 +89,11 @@ class AlphaMELTSBackend(_FakeLiveRealBackend):
     name = "alphamelts"
     engine_version = "alphamelts-test 1.0.0"
 
+    def initialize(self, _config: Mapping[str, Any] | None = None) -> bool:
+        self._model = self.model
+        self._mode = self.mode
+        return super().initialize(_config)
+
 
 class _AlphaMELTSClusterIdentityBackend(_FakeLiveRealBackend):
     name = "alphamelts"
@@ -103,13 +110,24 @@ def _cache_config(
     *,
     name: str = _FakeLiveRealBackend.name,
     version: str = _FakeLiveRealBackend.engine_version,
+    model: str | None = None,
+    mode: str | None = None,
 ) -> dict[str, str]:
-    return {
+    config = {
         "db_path": str(db_path),
         "miss_policy": miss_policy,
         "authorized_backend_name": name,
         "authorized_backend_version": version,
     }
+    if model is not None:
+        config["authorized_model"] = model
+    if mode is not None:
+        config["authorized_mode"] = mode
+    return config
+
+
+def _key_hash(key: Mapping[str, Any]) -> str:
+    return hashlib.sha256(canonical_json_bytes(key)).hexdigest()
 
 
 def _restamp_first_pt1_row_corpus(db_path: Path, corpus_version: str) -> None:
@@ -166,6 +184,27 @@ def test_cached_real_config_threads_strict_vapor_gate_to_store(
     assert store.strict_vapor_gate is True
     assert store.persistent_store is not None
     assert store.persistent_store.strict_vapor_gate is True
+
+
+def test_cached_real_config_defaults_model_mode_for_alphamelts_alias(
+    tmp_path: Path,
+) -> None:
+    normalized = normalize_cached_real_config(
+        _cache_config(
+            tmp_path / "cached-real.db",
+            "live-fill",
+            name="AlphaMELTSBackend",
+        )
+    )
+
+    assert normalized.authorized_model == "MELTSv1.0.2"
+    assert normalized.authorized_mode == "subprocess"
+    assert resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=normalized,
+        cached_real_live_backend_cls=AlphaMELTSBackend,
+    ).config == normalized
 
 
 def test_cached_real_config_threads_control_quantization_to_store(
@@ -272,6 +311,52 @@ def _build_direct_real_sim(backend, *, db_path: Path | None = None):
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     return sim
+
+
+def test_cached_real_replay_key_matches_live_alphamelts_identity(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "cached-real.db"
+    live_backend = AlphaMELTSBackend()
+    live_backend._model = live_backend.model
+    live_backend._mode = live_backend.mode
+    live_sim = _build_direct_real_sim(live_backend, db_path=db_path)
+    live_key = canonical_replay_key(
+        live_sim,
+        artifact="equilibrium_post_record",
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=None,
+        fe_redox_policy="intrinsic",
+    )
+
+    replay_config = _cache_config(
+        db_path,
+        "fail-loud",
+        name="alphamelts",
+        version=live_backend.engine_version,
+        model=live_backend._model,
+        mode=live_backend._mode,
+    )
+    replay_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+    replay_key = canonical_replay_key(
+        replay_sim,
+        artifact="equilibrium_post_record",
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=None,
+        fe_redox_policy="intrinsic",
+    )
+
+    assert live_key["provider"] == replay_key["provider"]
+    assert live_key["model"] == replay_key["model"]
+    assert _key_hash(live_key) == _key_hash(replay_key)
 
 
 def test_cached_real_resolver_requires_cache_config() -> None:
@@ -1030,12 +1115,15 @@ def test_cached_real_skips_direct_alphamelts_unavailable_equilibrium_cache(
     assert "equilibrium_post_record" not in direct_summary[
         "capture_calls_by_artifact"
     ]
+    direct_gate_key = direct_sim._pt0_store().capture_sequence[-1]["key"]
 
     replay_config = _cache_config(
         db_path,
         "fail-loud",
         name="alphamelts",
         version=AlphaMELTSBackend.engine_version,
+        model=direct_gate_key["model"]["model"],
+        mode=direct_gate_key["model"]["mode"],
     )
     replay_backend = resolve_backend(
         "cached-real",
@@ -1108,7 +1196,7 @@ def test_direct_alphamelts_fallback_gate_curve_replay_exact_hits(
     ] == 1
 
 
-def test_cached_real_direct_alphamelts_gate_curve_engine_change_hits_same_corpus(
+def test_cached_real_direct_alphamelts_gate_curve_engine_change_misses_same_corpus(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / "cached-real.db"
@@ -1122,12 +1210,15 @@ def test_cached_real_direct_alphamelts_gate_curve_engine_change_hits_same_corpus
         fO2_log=direct_sim._compute_intrinsic_melt_fO2(),
         curve=_authoritative_gate_curve(),
     )
+    direct_gate_key = direct_sim._pt0_store().capture_sequence[-1]["key"]
 
     replay_config = _cache_config(
         db_path,
         "fail-loud",
         name="alphamelts",
         version="alphamelts-test 2.0.0",
+        model=direct_gate_key["model"]["model"],
+        mode=direct_gate_key["model"]["mode"],
     )
     replay_backend = resolve_backend(
         "cached-real",
@@ -1139,13 +1230,12 @@ def test_cached_real_direct_alphamelts_gate_curve_engine_change_hits_same_corpus
         cache_config=replay_config,
     )
 
-    replay_curve = replay_sim._pt0_store().replay_gate_curve(
-        replay_sim,
-        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
-    )
-
-    assert replay_curve == _authoritative_gate_curve()
-    assert replay_sim._pt0_store().summary()["misses"] == 0
+    with pytest.raises(PT0CacheMiss):
+        replay_sim._pt0_store().replay_gate_curve(
+            replay_sim,
+            fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+        )
+    assert replay_sim._pt0_store().summary()["misses"] == 1
 
 
 def test_cached_real_refuses_authoritative_gate_cache_for_fallback_curve(

@@ -72,6 +72,8 @@ CACHE_TIER_CEILINGS = (
     "cached_exact",
 )
 DEFAULT_CACHE_TIER_CEILING = "cached_interpolated"
+DEFAULT_ALPHAMELTS_MODEL = "MELTSv1.0.2"
+DEFAULT_ALPHAMELTS_MODE = "subprocess"
 BACKEND_STATUS_OK = "ok"
 BACKEND_STATUS_UNAVAILABLE = "unavailable"
 REAL_DATA_REQUIRED_INTENTS = frozenset(
@@ -134,6 +136,8 @@ class CachedRealConfig:
     corpus_version: str
     interoperable_corpus_versions: tuple[str, ...]
     authorized_backend_version: str = ""
+    authorized_model: str = ""
+    authorized_mode: str = ""
     miss_policy: str = "fail-loud"
     cache_tier_ceiling: str = DEFAULT_CACHE_TIER_CEILING
     read_only_base_db_path: Path | None = None
@@ -282,6 +286,11 @@ def normalize_cached_real_config(
     authorized_backend_version = str(
         value.get("authorized_backend_version", "")
     ).strip()
+    authorized_model = str(value.get("authorized_model", "")).strip()
+    authorized_mode = str(value.get("authorized_mode", "")).strip()
+    if _is_alphamelts_authorized_name(authorized_backend_name):
+        authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
+        authorized_mode = authorized_mode or DEFAULT_ALPHAMELTS_MODE
     miss_policy = str(value.get("miss_policy", "fail-loud")).strip().lower()
     miss_policy = miss_policy.replace("_", "-")
     if miss_policy not in CACHED_REAL_MISS_POLICIES:
@@ -318,6 +327,8 @@ def normalize_cached_real_config(
         corpus_version=corpus_version,
         interoperable_corpus_versions=interoperable_versions,
         authorized_backend_version=authorized_backend_version,
+        authorized_model=authorized_model,
+        authorized_mode=authorized_mode,
         miss_policy=miss_policy,
         cache_tier_ceiling=cache_tier_ceiling,
         read_only_base_db_path=read_only_base_db_path,
@@ -1116,7 +1127,17 @@ def _backend_identity_matches(
 ) -> bool:
     live_name, _live_version = live_identity
     expected_name, _expected_corpus_version = expected_identity
+    if _is_alphamelts_authorized_name(live_name) and _is_alphamelts_authorized_name(
+        expected_name
+    ):
+        return True
     return live_name.strip().lower() == expected_name.strip().lower()
+
+
+def _is_alphamelts_authorized_name(value: Any) -> bool:
+    text = str(value or "").strip().lower()
+    leaf = text.rsplit(".", 1)[-1]
+    return text == "alphamelts" or leaf == "alphameltsbackend"
 
 
 def _log_selection(

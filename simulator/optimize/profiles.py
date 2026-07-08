@@ -187,6 +187,8 @@ _REDUCED_REAL_CACHE_KEYS = frozenset({
     "db_path",
     "miss_policy",
     "authorized_backend_name",
+    "authorized_model",
+    "authorized_mode",
     # Provenance/version-authority key consumed by the cached-real runtime
     # (backends.py cached-real config). Added to the generated real profiles +
     # runtime by 7c490d4/8d09d4f but omitted from this validator allowlist —
@@ -850,6 +852,12 @@ def _validate_reduced_real_cache_config(
         raise ProfileValidationError(
             f"{source}: {where}.authorized_backend_name must be a non-empty string"
         )
+    for key in ("authorized_model", "authorized_mode"):
+        value = raw.get(key)
+        if value is not None and (not isinstance(value, str) or not value.strip()):
+            raise ProfileValidationError(
+                f"{source}: {where}.{key} must be a non-empty string"
+            )
     miss_policy = str(raw.get("miss_policy", "fail-loud")).strip().lower()
     miss_policy = miss_policy.replace("_", "-")
     if miss_policy not in _REDUCED_REAL_MISS_POLICIES:
