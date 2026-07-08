@@ -20,6 +20,7 @@ import yaml
 
 from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.corpus_version import current_corpus_version
 from simulator.diagnostics import coating_summary_with_grounded_authority
 from simulator.optimize.doe import active_sampler_name
 from simulator.optimize.evaluate import (
@@ -32,7 +33,12 @@ from simulator.optimize.evaluate import (
     _stale_profile_result,
     evaluate,
 )
-from simulator.optimize.evalspec import PrefixEvalSpec, cache_key
+from simulator.optimize.evalspec import (
+    PrefixEvalSpec,
+    cache_key,
+    canonical_evalspec_json,
+    current_code_version,
+)
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     ObjectiveComputationError,
@@ -58,6 +64,7 @@ from simulator.optimize.profiles import (
     validate_profile,
 )
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
+from simulator.optimize.result_scope import result_scope_json
 from simulator.optimize.results_store import (
     ResultStore,
     ResultStoreWriteRejected,
@@ -68,6 +75,7 @@ from simulator.optimize.strategy import (
     MorrisScreenStrategy,
     RandomStrategy,
     Strategy,
+    WarmStartSeed,
 )
 from simulator.optimize.strategy.staged import (
     StagedBeamStateError,
@@ -242,7 +250,14 @@ class StudyConfig:
     budget: int = 1
     out_dir: str | Path | None = None
     seed: int = 0
+    warm_start_from: str | Path | Mapping[str, Any] | None = None
     per_eval_timeout_seconds: float | None = None
+
+
+@dataclass(frozen=True)
+class _WarmStartSource:
+    store: ResultStore
+    pareto_path: Path
 
 
 @dataclass(frozen=True)
@@ -260,6 +275,9 @@ class StudyRecord:
     cache_hit: bool = False
     product_summary: Mapping[str, Any] = field(default_factory=dict)
     trace_summary: Mapping[str, Any] = field(default_factory=dict)
+    proposal_source: str = "unknown"
+    seed_lineage: bool = False
+    search_provenance: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "objectives", MappingProxyType(dict(self.objectives)))
@@ -284,6 +302,13 @@ class StudyRecord:
             self,
             "trace_summary",
             MappingProxyType(dict(self.trace_summary)),
+        )
+        object.__setattr__(self, "proposal_source", str(self.proposal_source))
+        object.__setattr__(self, "seed_lineage", bool(self.seed_lineage))
+        object.__setattr__(
+            self,
+            "search_provenance",
+            MappingProxyType(dict(self.search_provenance)),
         )
 
 
@@ -327,6 +352,7 @@ def run(
     constraints: Any = None,
     topologies: Sequence[Any] | None = None,
     two_phase_certify: bool | Mapping[str, Any] | None = None,
+    warm_start_from: str | Path | Mapping[str, Any] | None = None,
     pinned_paths: Sequence[str] | None = None,
     per_eval_timeout_seconds: float | None = None,
 ) -> StudyResult:
@@ -342,6 +368,7 @@ def run(
         budget=budget,
         out_dir=out_dir,
         seed=seed,
+        warm_start_from=warm_start_from,
         per_eval_timeout_seconds=resolve_eval_timeout_seconds(per_eval_timeout_seconds),
     )
     try:
@@ -380,13 +407,30 @@ def run(
     out = _resolve_out_dir(config.out_dir)
     _prepare_out_dir(out)
     store = result_store or ResultStore(out / "cache.sqlite")
+    warm_start_source = _resolve_warm_start_source(
+        resolved_profile,
+        config.warm_start_from,
+        current_store_path=store.path,
+    )
     requested_topologies = _requested_staged_topologies(resolved_profile, topologies)
+    _validate_multi_topology_seed_recipes(resolved_profile, requested_topologies)
+    warm_start_seeds = _resolve_warm_start_seeds(
+        resolved_profile,
+        feedstock=config.feedstock,
+        fidelity=config.fidelity,
+        schema=active_schema,
+        warm_start_source=warm_start_source,
+        constraints=active_constraints,
+        search_space_identity=search_space_identity,
+        requested_topologies=requested_topologies,
+    )
     if requested_topologies is None:
         active_strategy = resolve_strategy(
             config.strategy,
             profile=resolved_profile,
             seed=config.seed,
             schema=active_schema,
+            warm_start_seeds=warm_start_seeds,
         )
         staged_strategies: tuple[StagedStrategy, ...] = ()
     else:
@@ -402,6 +446,7 @@ def run(
                 seed=_staged_topology_seed(config.seed, topology, requested_topologies),
                 objective_profile=single_topology_profile,
                 topology=topology,
+                stage0_seed_candidates=warm_start_seeds,
             )
             for topology in requested_topologies
         )
@@ -560,6 +605,10 @@ def run(
             schema=active_schema,
             failure_counts=failure_counts,
             search_space_identity=search_space_identity,
+            strategy_provenance=_strategy_provenance_payload(
+                active_strategy,
+                *staged_strategies,
+            ),
         )
         artifacts["provenance"] = provenance_path
         artifacts["store"] = store.path
@@ -631,6 +680,10 @@ def run(
         schema=active_schema,
         failure_counts=failure_counts,
         search_space_identity=search_space_identity,
+        strategy_provenance=_strategy_provenance_payload(
+            active_strategy,
+            *staged_strategies,
+        ),
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
@@ -1056,7 +1109,7 @@ def _run_exact_certification(
     replay_data_digests: Mapping[str, str] | None = None
 
     for explore_record in certification_pool:
-        candidate = Candidate(id=explore_record.candidate_id, patch=explore_record.patch)
+        candidate = _certification_candidate_from_record(explore_record)
         results = _evaluate_candidates(
             [candidate],
             profile=profile,
@@ -1175,6 +1228,15 @@ def _run_exact_certification(
     )
 
 
+def _certification_candidate_from_record(record: StudyRecord) -> Candidate:
+    metadata = dict(record.search_provenance)
+    metadata["proposal_source"] = record.proposal_source
+    metadata["seed_lineage"] = record.seed_lineage
+    if "topology_id" in metadata and "topology" not in metadata:
+        metadata["topology"] = {"id": metadata["topology_id"]}
+    return Candidate(id=record.candidate_id, patch=record.patch, metadata=metadata)
+
+
 def _schema_with_pinned_paths(
     schema: RecipeSchema,
     profile: Mapping[str, Any],
@@ -1276,6 +1338,7 @@ def resolve_strategy(
     profile: Mapping[str, Any],
     seed: int,
     schema: RecipeSchema,
+    warm_start_seeds: Sequence[WarmStartSeed] = (),
 ) -> Strategy:
     if not isinstance(strategy, str):
         return strategy
@@ -1284,15 +1347,30 @@ def resolve_strategy(
     if strategy == "screen":
         return MorrisScreenStrategy(schema, seed=seed)
     if strategy == "staged":
-        return StagedStrategy(schema, seed=seed, objective_profile=profile)
+        return StagedStrategy(
+            schema,
+            seed=seed,
+            objective_profile=profile,
+            stage0_seed_candidates=warm_start_seeds,
+        )
     if strategy == "bayes":
         from simulator.optimize.strategy import OptunaTPEStrategy
 
-        return OptunaTPEStrategy(schema, seed=seed, objective_profile=profile)
+        return OptunaTPEStrategy(
+            schema,
+            seed=seed,
+            objective_profile=profile,
+            warm_start_seeds=warm_start_seeds,
+        )
     if strategy == "nsga2":
         from simulator.optimize.strategy import OptunaNSGA2Strategy
 
-        return OptunaNSGA2Strategy(schema, seed=seed, objective_profile=profile)
+        return OptunaNSGA2Strategy(
+            schema,
+            seed=seed,
+            objective_profile=profile,
+            warm_start_seeds=warm_start_seeds,
+        )
     raise ValueError(f"unknown strategy {strategy!r}")
 
 
@@ -1346,6 +1424,382 @@ def _ask_staged_topology_candidates(
         owners[candidate.id] = strategy
         misses = 0
     return tuple(candidates), next_cursor, owners
+
+
+def _validate_multi_topology_seed_recipes(
+    profile: Mapping[str, Any],
+    requested_topologies: Sequence[TopologyChoice] | None,
+) -> None:
+    if requested_topologies is None or len(requested_topologies) <= 1:
+        return
+    requested_ids = {topology.id for topology in requested_topologies}
+    for index, seed in enumerate(profile.get("seed_recipes", ()) or ()):
+        if not isinstance(seed, Mapping):
+            continue
+        topology_id = _seed_topology_id(seed)
+        if topology_id is None:
+            raise ProfileValidationError(
+                f"profile {profile_id(profile)!r}: seed_recipes[{index}] requires "
+                "topology in multi-topology staged profiles"
+            )
+        if topology_id not in requested_ids:
+            raise ProfileValidationError(
+                f"profile {profile_id(profile)!r}: seed_recipes[{index}] topology "
+                f"{topology_id!r} is not requested"
+            )
+
+
+def _resolve_warm_start_source(
+    profile: Mapping[str, Any],
+    override: str | Path | Mapping[str, Any] | None,
+    *,
+    current_store_path: Path,
+) -> _WarmStartSource | None:
+    raw = override if override is not None else profile.get("warm_start_from")
+    if raw is None:
+        return None
+    base_dir = _warm_start_base_dir(profile, from_profile=override is None)
+    store_path, pareto_path = _warm_start_paths(raw, base_dir=base_dir)
+    current_resolved = current_store_path.expanduser().resolve()
+    if store_path.expanduser().resolve() == current_resolved:
+        raise StudyError(
+            "warm_start_from must point at an explicit prior run, not the current output store"
+        )
+    if not store_path.is_file():
+        raise StudyError(f"warm_start_from store missing: {store_path}")
+    if not pareto_path.is_file():
+        raise StudyError(f"warm_start_from pareto artifact missing: {pareto_path}")
+    return _WarmStartSource(ResultStore(store_path), pareto_path)
+
+
+def _warm_start_base_dir(
+    profile: Mapping[str, Any],
+    *,
+    from_profile: bool,
+) -> Path:
+    if from_profile:
+        source = getattr(profile, "source", None)
+        if isinstance(source, str) and source and not source.startswith("<"):
+            return Path(source).expanduser().resolve().parent
+    return Path.cwd()
+
+
+def _warm_start_paths(
+    raw: str | Path | Mapping[str, Any],
+    *,
+    base_dir: Path,
+) -> tuple[Path, Path]:
+    if isinstance(raw, Path):
+        return _infer_warm_start_paths(_resolve_warm_start_path(raw, base_dir))
+    if isinstance(raw, str):
+        return _infer_warm_start_paths(_resolve_warm_start_path(Path(raw), base_dir))
+    if not isinstance(raw, Mapping):
+        raise StudyError("warm_start_from must be a path string or mapping")
+
+    store_raw = raw.get("store_path", raw.get("store"))
+    pareto_raw = raw.get("pareto_path", raw.get("pareto", raw.get("artifact_path", raw.get("artifact"))))
+    path_raw = raw.get("path", raw.get("run_dir"))
+    if store_raw is None and pareto_raw is None and path_raw is None:
+        raise StudyError(
+            "warm_start_from must name a prior run dir, cache.sqlite, or pareto.json"
+        )
+    if path_raw is not None:
+        inferred_store, inferred_pareto = _infer_warm_start_paths(
+            _resolve_warm_start_path(Path(str(path_raw)), base_dir)
+        )
+    else:
+        inferred_store = inferred_pareto = None
+    store_path = (
+        _resolve_warm_start_path(Path(str(store_raw)), base_dir)
+        if store_raw is not None
+        else inferred_store
+    )
+    pareto_path = (
+        _resolve_warm_start_path(Path(str(pareto_raw)), base_dir)
+        if pareto_raw is not None
+        else inferred_pareto
+    )
+    if store_path is None or pareto_path is None:
+        raise StudyError(
+            "warm_start_from mapping must resolve both cache.sqlite and pareto.json"
+        )
+    return store_path, pareto_path
+
+
+def _resolve_warm_start_path(path: Path, base_dir: Path) -> Path:
+    path = path.expanduser()
+    if not path.is_absolute():
+        path = base_dir / path
+    return path
+
+
+def _infer_warm_start_paths(path: Path) -> tuple[Path, Path]:
+    if path.name == "cache.sqlite":
+        return path, path.parent / "pareto.json"
+    if path.name == "pareto.json":
+        return path.parent / "cache.sqlite", path
+    return path / "cache.sqlite", path / "pareto.json"
+
+
+def _resolve_warm_start_seeds(
+    profile: Mapping[str, Any],
+    *,
+    feedstock: str,
+    fidelity: str,
+    schema: RecipeSchema,
+    warm_start_source: _WarmStartSource | None,
+    constraints: Any,
+    search_space_identity: Mapping[str, Any],
+    requested_topologies: Sequence[TopologyChoice] | None,
+) -> tuple[WarmStartSeed, ...]:
+    seeds = [
+        *_store_warm_start_seeds(
+            profile,
+            feedstock=feedstock,
+            fidelity=fidelity,
+            schema=schema,
+            warm_start_source=warm_start_source,
+            constraints=constraints,
+            search_space_identity=search_space_identity,
+            requested_topologies=requested_topologies,
+        ),
+        *_profile_warm_start_seeds(profile, schema=schema),
+    ]
+    unique: list[WarmStartSeed] = []
+    seen: set[tuple[str | None, str]] = set()
+    for seed in seeds:
+        key = (seed.topology_id, seed.patch.canonical_json())
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(seed)
+    return tuple(unique)
+
+
+def _profile_warm_start_seeds(
+    profile: Mapping[str, Any],
+    *,
+    schema: RecipeSchema,
+) -> tuple[WarmStartSeed, ...]:
+    seed_rows = tuple(profile.get("seed_recipes", ()) or ())
+    if seed_rows:
+        _warn_profile_seed_epoch_mismatch(profile)
+    seeds: list[WarmStartSeed] = []
+    for index, seed in enumerate(seed_rows):
+        if not isinstance(seed, Mapping):
+            continue
+        # Profile seeds are advisory recipe candidates. They never inject a cached
+        # score; each seed is re-evaluated through the normal pipeline.
+        patch = RecipePatch.from_nested(seed["patch"]).validated(schema)
+        seed_id = str(seed["id"])
+        source_campaigns = seed.get("source_campaigns")
+        if source_campaigns is None and seed.get("source_campaign") is not None:
+            source_campaigns = [seed.get("source_campaign")]
+        seeds.append(
+            WarmStartSeed(
+                id=seed_id,
+                patch=patch,
+                proposal_source="seed_recipe",
+                topology_id=_seed_topology_id(seed),
+                origin={
+                    "kind": "profile_seed",
+                    "profile": profile_id(profile),
+                    "seed_index": index,
+                    "seed_id": seed_id,
+                    "source_campaigns": list(source_campaigns or ()),
+                },
+            )
+        )
+    return tuple(seeds)
+
+
+def _warn_profile_seed_epoch_mismatch(profile: Mapping[str, Any]) -> None:
+    mismatches: list[str] = []
+    stamped_code = profile.get("code_version")
+    if isinstance(stamped_code, str) and stamped_code != current_code_version():
+        mismatches.append(
+            f"code_version profile={stamped_code!r} current={current_code_version()!r}"
+        )
+    stamped_corpus = profile.get("corpus_version")
+    if isinstance(stamped_corpus, str) and stamped_corpus != current_corpus_version():
+        mismatches.append(
+            f"corpus_version profile={stamped_corpus!r} current={current_corpus_version()!r}"
+        )
+    if mismatches:
+        _LOGGER.warning(
+            "profile_seed_epoch_warning profile=%s stale advisory seed_recipes: %s",
+            profile_id(profile),
+            "; ".join(mismatches),
+        )
+
+
+def _store_warm_start_seeds(
+    profile: Mapping[str, Any],
+    *,
+    feedstock: str,
+    fidelity: str,
+    schema: RecipeSchema,
+    warm_start_source: _WarmStartSource | None,
+    constraints: Any,
+    search_space_identity: Mapping[str, Any],
+    requested_topologies: Sequence[TopologyChoice] | None,
+) -> tuple[WarmStartSeed, ...]:
+    if warm_start_source is None:
+        return ()
+    store = warm_start_source.store
+    pareto_path = warm_start_source.pareto_path
+    try:
+        payload = json.loads(pareto_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise StudyError(f"could not read warm-start artifact {pareto_path}: {exc}") from exc
+    if not isinstance(payload, Mapping):
+        raise StudyError(f"warm-start artifact {pareto_path} must be a JSON object")
+    pareto_rows = payload.get("pareto")
+    if not isinstance(pareto_rows, list) or not pareto_rows:
+        return ()
+    persisted_identity = payload.get("search_space_identity")
+    if persisted_identity is None:
+        raise StudyError(
+            f"warm-start artifact {pareto_path} missing search_space_identity"
+        )
+    if _jsonable_value(persisted_identity) != _jsonable_value(search_space_identity):
+        raise StudyError(
+            "warm-start search_space_identity mismatch; stale seeds rejected"
+        )
+
+    requested_ids = (
+        {topology.id for topology in requested_topologies}
+        if requested_topologies is not None and len(requested_topologies) > 1
+        else None
+    )
+    seeds: list[WarmStartSeed] = []
+    for index, record in enumerate(pareto_rows):
+        if not isinstance(record, Mapping):
+            continue
+        provenance = record.get("search_provenance")
+        provenance = provenance if isinstance(provenance, Mapping) else {}
+        topology_id = _record_topology_id(provenance)
+        if requested_ids is not None:
+            if topology_id is None:
+                continue
+            if topology_id not in requested_ids:
+                continue
+        patch_payload = record.get("optimizer_patch", record.get("patch"))
+        cache_key_value = record.get("cache_key")
+        if not isinstance(patch_payload, Mapping) or not isinstance(cache_key_value, str):
+            continue
+        cached = store.fetch(cache_key_value)
+        if cached is None:
+            raise StudyError(
+                f"warm-start seed {record.get('candidate_id')!r} missing store row "
+                "or stale-corpus store row; stale-corpus seeds rejected"
+            )
+        if cached.eval_spec is None:
+            raise StudyError(
+                f"warm-start seed {record.get('candidate_id')!r} missing eval_spec"
+            )
+        stored_cache_key = cache_key(cached.eval_spec)
+        if stored_cache_key != cache_key_value:
+            raise StudyError(
+                f"warm-start seed {record.get('candidate_id')!r} corrupt cache_key: "
+                f"artifact has {cache_key_value!r}, eval_spec derives {stored_cache_key!r}"
+            )
+        if not _is_certified_cache_state(_cache_state_from_scored(cached)):
+            continue
+        patch = RecipePatch.from_nested(patch_payload).validated(schema)
+        try:
+            current_spec, _ = _build_eval_inputs(
+                patch,
+                feedstock,
+                fidelity,
+                profile,
+                schema,
+                constraints=constraints,
+            )
+        except ProfileValidationError as exc:
+            if _is_stale_profile_refusal(exc):
+                raise StudyError(
+                    f"warm-start seed {record.get('candidate_id')!r} is stale: {exc}"
+                ) from exc
+            raise
+        current_identity = _evalspec_seed_identity(current_spec)
+        stored_identity = _evalspec_seed_identity(cached.eval_spec)
+        if current_spec.recipe_id != cached.eval_spec.recipe_id:
+            raise StudyError(
+                f"warm-start recipe_id mismatch for {record.get('candidate_id')!r}: "
+                f"patch derives {current_spec.recipe_id!r}, "
+                f"store has {cached.eval_spec.recipe_id!r}"
+            )
+        current_cache_key = cache_key(current_spec)
+        if current_cache_key != cache_key_value:
+            raise StudyError(
+                f"warm-start cache_key mismatch for {record.get('candidate_id')!r}: "
+                f"patch derives {current_cache_key!r}, artifact has {cache_key_value!r}"
+            )
+        if current_identity != stored_identity:
+            diff_keys = ", ".join(_identity_diff_keys(current_identity, stored_identity))
+            raise StudyError(
+                f"warm-start EvalSpec identity mismatch for "
+                f"{record.get('candidate_id')!r}: {diff_keys or 'unknown'}"
+            )
+        if result_scope_json(current_spec) != result_scope_json(cached.eval_spec):
+            raise StudyError(
+                f"warm-start result_scope mismatch for {record.get('candidate_id')!r}"
+            )
+        source_id = str(record.get("candidate_id") or cache_key_value[:12])
+        seeds.append(
+            WarmStartSeed(
+                id=f"store-{source_id}",
+                patch=patch,
+                proposal_source="store_warm_start",
+                topology_id=topology_id,
+                origin={
+                    "kind": "store_warm_start",
+                    "source_candidate_id": record.get("candidate_id"),
+                    "source_cache_key": cache_key_value,
+                    "source_pareto_index": index,
+                    "source_artifact": str(pareto_path),
+                },
+            )
+        )
+    return tuple(seeds)
+
+
+def _seed_topology_id(seed: Mapping[str, Any]) -> str | None:
+    raw = seed.get("topology", seed.get("topology_id"))
+    if raw is None:
+        return None
+    try:
+        return enumerate_topologies([raw])[0].id
+    except (TypeError, ValueError) as exc:
+        raise ProfileValidationError(f"invalid seed topology {raw!r}: {exc}") from exc
+
+
+def _record_topology_id(provenance: Mapping[str, Any]) -> str | None:
+    topology_id = provenance.get("topology_id")
+    if isinstance(topology_id, str) and topology_id:
+        return topology_id
+    topology = provenance.get("topology")
+    if isinstance(topology, Mapping):
+        value = topology.get("id")
+        if isinstance(value, str) and value:
+            return value
+    return None
+
+
+def _evalspec_seed_identity(spec: Any) -> Mapping[str, Any]:
+    payload = json.loads(canonical_evalspec_json(spec).decode("utf-8"))
+    if not isinstance(payload, dict):
+        raise StudyError("canonical EvalSpec payload must be a JSON object")
+    return payload
+
+
+def _identity_diff_keys(
+    current: Mapping[str, Any],
+    stored: Mapping[str, Any],
+) -> tuple[str, ...]:
+    keys = sorted(set(current) | set(stored))
+    return tuple(key for key in keys if current.get(key) != stored.get(key))
 
 
 def _constraints_for_profile(profile: Mapping[str, Any]) -> Any:
@@ -2100,6 +2554,7 @@ def _latest_backend_status(value: Any) -> str | None:
 def _to_record(candidate: Candidate, scored: ScoredResult, *, cache_hit: bool) -> StudyRecord:
     failure = scored.failure_category
     objectives = _objective_mapping(scored.objectives)
+    search_provenance = _search_provenance_from_candidate(candidate)
     return StudyRecord(
         candidate_id=candidate.id,
         patch=candidate.patch,
@@ -2114,7 +2569,45 @@ def _to_record(candidate: Candidate, scored: ScoredResult, *, cache_hit: bool) -
         cache_hit=cache_hit,
         product_summary=_product_summary_mapping(scored.run_reference),
         trace_summary=_trace_summary_mapping(scored),
+        proposal_source=str(search_provenance["proposal_source"]),
+        seed_lineage=bool(search_provenance["seed_lineage"]),
+        search_provenance=search_provenance,
     )
+
+
+def _search_provenance_from_candidate(candidate: Candidate) -> Mapping[str, Any]:
+    metadata = candidate.metadata
+    proposal_source = metadata.get("proposal_source", "unknown")
+    proposal_source = str(proposal_source) if proposal_source is not None else "unknown"
+    topology = metadata.get("topology")
+    topology_id = None
+    if isinstance(topology, Mapping):
+        raw_topology_id = topology.get("id")
+        if isinstance(raw_topology_id, str) and raw_topology_id:
+            topology_id = raw_topology_id
+    seed_origin = metadata.get("seed_origin")
+    payload: dict[str, Any] = {
+        "proposal_source": proposal_source,
+        "seed_lineage": bool(metadata.get("seed_lineage")),
+        "strategy": str(metadata.get("strategy", "")),
+    }
+    if topology_id is not None:
+        payload["topology_id"] = topology_id
+        payload["topology"] = _jsonable_value(topology)
+    for key in (
+        "stage_index",
+        "stage_id",
+        "parent_candidate_id",
+        "parent_cache_key",
+        "trial_number",
+        "seed_id",
+    ):
+        value = metadata.get(key)
+        if value is not None:
+            payload[key] = _jsonable_value(value)
+    if isinstance(seed_origin, Mapping):
+        payload["seed_origin"] = _jsonable_value(seed_origin)
+    return MappingProxyType(payload)
 
 
 def _objective_mapping(objectives: ObjectiveVector | None) -> Mapping[str, float | None]:
@@ -2574,8 +3067,10 @@ def _write_artifacts(
     schema: RecipeSchema,
     failure_counts: Mapping[str, int],
     search_space_identity: Mapping[str, Any] | None = None,
+    strategy_provenance: Mapping[str, Any] | None = None,
 ) -> dict[str, Path]:
     pareto_path = out / "pareto.json"
+    search_provenance_path = out / "search_provenance.json"
     leaderboard_path = out / "leaderboard.csv"
     winner_path = out / "winner.recipe.yaml"
     tap_sidecar_path = out / "winner.tap-truncated.json"
@@ -2592,9 +3087,31 @@ def _write_artifacts(
         )
     )
     pareto_payload["failure_counts"] = dict(failure_counts)
+    best_non_seeded = _best_non_seeded_lineage(leaderboard)
+    pareto_payload["best_overall_candidate_id"] = (
+        winner.candidate_id if winner is not None else None
+    )
+    pareto_payload["best_non_seeded_lineage_candidate_id"] = (
+        best_non_seeded.candidate_id if best_non_seeded is not None else None
+    )
     pareto_path.write_text(
         json.dumps(
             pareto_payload,
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    search_provenance_path.write_text(
+        json.dumps(
+            _search_provenance_payload(
+                leaderboard,
+                winner=winner,
+                best_non_seeded=best_non_seeded,
+                strategy_provenance=strategy_provenance,
+            ),
             indent=2,
             sort_keys=True,
             allow_nan=False,
@@ -2614,6 +3131,7 @@ def _write_artifacts(
     artifacts = {
         "pareto": pareto_path,
         "leaderboard": leaderboard_path,
+        "search_provenance": search_provenance_path,
     }
     if winner is not None:
         winner_patch = _materialized_winner_patch(winner, schema, profile)
@@ -2831,6 +3349,59 @@ def _pareto_payload(
     return payload
 
 
+def _best_non_seeded_lineage(records: Sequence[StudyRecord]) -> StudyRecord | None:
+    for record in records:
+        if not record.seed_lineage:
+            return record
+    return None
+
+
+def _search_provenance_payload(
+    records: Sequence[StudyRecord],
+    *,
+    winner: StudyRecord | None,
+    best_non_seeded: StudyRecord | None,
+    strategy_provenance: Mapping[str, Any] | None = None,
+) -> Mapping[str, Any]:
+    counts: dict[str, int] = {}
+    seeded_ids: list[str] = []
+    for record in records:
+        counts[record.proposal_source] = counts.get(record.proposal_source, 0) + 1
+        if record.seed_lineage:
+            seeded_ids.append(record.candidate_id)
+    payload: dict[str, Any] = {
+        "best_overall_candidate_id": winner.candidate_id if winner is not None else None,
+        "best_non_seeded_lineage_candidate_id": (
+            best_non_seeded.candidate_id if best_non_seeded is not None else None
+        ),
+        "proposal_source_counts": dict(sorted(counts.items())),
+        "seeded_candidate_ids": seeded_ids,
+    }
+    if strategy_provenance:
+        payload["strategy_provenance"] = _jsonable_value(strategy_provenance)
+    return payload
+
+
+def _strategy_provenance_payload(*strategies: Strategy) -> Mapping[str, Any]:
+    dropped = 0
+    dropped_ids: list[str] = []
+    for strategy in strategies:
+        count = getattr(strategy, "warm_start_rejected_seed_count", 0)
+        try:
+            dropped += int(count)
+        except (TypeError, ValueError):
+            pass
+        raw_ids = getattr(strategy, "warm_start_rejected_seed_ids", ())
+        if isinstance(raw_ids, Sequence) and not isinstance(raw_ids, (str, bytes)):
+            dropped_ids.extend(str(value) for value in raw_ids)
+    if not dropped:
+        return {}
+    return {
+        "optuna_incomplete_seed_dropped_count": dropped,
+        "optuna_incomplete_seed_dropped_ids": dropped_ids,
+    }
+
+
 def _winner_knob_saturation_payload(winner: StudyRecord) -> Any:
     payload = winner.trace_summary.get("knob_saturation")
     return _jsonable_value(payload) if isinstance(payload, Mapping) else None
@@ -2895,6 +3466,8 @@ def _write_leaderboard(
         "cache_key",
         "is_pareto",
         "is_winner",
+        "proposal_source",
+        "seed_lineage",
         *(definition.metric for definition in definitions),
         *(f"margin_{name}" for name in margin_names),
         *coating_fields,
@@ -2913,6 +3486,8 @@ def _write_leaderboard(
                 "cache_key": record.cache_key or "",
                 "is_pareto": record.candidate_id in pareto_ids,
                 "is_winner": bool(winner and record.candidate_id == winner.candidate_id),
+                "proposal_source": record.proposal_source,
+                "seed_lineage": record.seed_lineage,
                 # For tap rows, patch_json is the materialized tap-hour patch, not the parent trajectory.
                 "patch_json": _json_dump_value(
                     _materialized_record_patch(record, schema, profile)
@@ -2962,8 +3537,12 @@ def _record_payload(
         "feasible": record.feasible,
         "notes": list(record.notes),
         "objectives": dict(record.objectives),
+        "optimizer_patch": record.patch.to_nested(),
         "patch": patch,
         "product_summary": _jsonable_value(record.product_summary),
+        "proposal_source": record.proposal_source,
+        "search_provenance": _jsonable_value(record.search_provenance),
+        "seed_lineage": record.seed_lineage,
         "trace_summary": _jsonable_value(record.trace_summary),
         "status": record.status,
     }

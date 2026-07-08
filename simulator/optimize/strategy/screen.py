@@ -337,6 +337,7 @@ class MorrisScreenStrategy:
                 "moved_group": moved_group,
                 "group_delta": group_delta,
                 "group_units": dict(sorted(group_units.items())),
+                "proposal_source": "morris",
             },
         )
 

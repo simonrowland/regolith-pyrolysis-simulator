@@ -46,6 +46,7 @@ from simulator.optimize.strategy import (
     StagedReplayViolation,
     StagedStrategy,
     StagedStrategyError,
+    WarmStartSeed,
     assert_prefix_replay_equal,
     make_prefix_eval_spec,
 )
@@ -239,6 +240,178 @@ def _record_signature(record: study.StudyRecord) -> tuple[Any, ...]:
         tuple(sorted(record.objectives.items())),
         tuple(sorted((key, tuple(sorted(value.items()))) for key, value in record.feasibility_margins.items())),
     )
+
+
+def _stage0_seed(
+    seed_id: str,
+    low: float,
+    high: float,
+    *,
+    include_later_stage: bool = False,
+) -> WarmStartSeed:
+    patch: dict[str, Any] = {"campaigns": {"C0": {"temp_range_C": [low, high]}}}
+    if include_later_stage:
+        patch["campaigns"]["C0b_p_cleanup"] = {"duration_h": 1.0}
+    return WarmStartSeed(
+        id=seed_id,
+        patch=RecipePatch.from_nested(patch).validated(SCHEMA),
+        proposal_source="seed_recipe",
+        origin={"kind": "test", "seed_id": seed_id},
+    )
+
+
+def _staged_profile(*, beam_width: int = 2, children_per_parent: int = 4) -> dict[str, Any]:
+    profile = dict(PROFILE)
+    profile["staged"] = {
+        "beam_width": beam_width,
+        "children_per_parent": children_per_parent,
+        "allowlist": ("C0", "C0b_p_cleanup"),
+    }
+    return profile
+
+
+def test_stage0_warm_start_seeds_replace_sobol_slots_and_cap() -> None:
+    strategy = StagedStrategy(
+        SCHEMA,
+        seed=7,
+        objective_profile=_staged_profile(children_per_parent=4),
+        stage0_seed_candidates=(
+            _stage0_seed("one", 901, 945),
+            _stage0_seed("two", 902, 946),
+            _stage0_seed("three", 903, 947),
+        ),
+    )
+
+    batch = strategy.ask(10)
+
+    assert len(batch) == 4
+    assert [candidate.metadata["proposal_source"] for candidate in batch[:2]] == [
+        "seed_recipe",
+        "seed_recipe",
+    ]
+    assert [candidate.metadata["proposal_source"] for candidate in batch[2:]] == [
+        "sobol",
+        "sobol",
+    ]
+    assert [candidate.metadata["child_index"] for candidate in batch[2:]] == [2, 3]
+
+
+def test_stage0_warm_start_population_is_deterministic() -> None:
+    seeds = (_stage0_seed("one", 901, 945), _stage0_seed("two", 902, 946))
+
+    def signature() -> tuple[tuple[str, str, str], ...]:
+        strategy = StagedStrategy(
+            SCHEMA,
+            seed=11,
+            objective_profile=_staged_profile(children_per_parent=4),
+            stage0_seed_candidates=seeds,
+        )
+        return tuple(
+            (
+                candidate.id,
+                candidate.patch.canonical_json(),
+                str(candidate.metadata["proposal_source"]),
+            )
+            for candidate in strategy.ask(10)
+        )
+
+    assert signature() == signature()
+
+
+def test_stage0_warm_start_avoids_seed_fresh_double_count() -> None:
+    profile = _staged_profile(children_per_parent=2)
+    baseline = StagedStrategy(SCHEMA, seed=3, objective_profile=profile).ask(1)[0]
+    seed = WarmStartSeed(
+        id="same-as-sobol-zero",
+        patch=baseline.patch,
+        proposal_source="seed_recipe",
+        origin={"kind": "test"},
+    )
+
+    batch = StagedStrategy(
+        SCHEMA,
+        seed=3,
+        objective_profile=profile,
+        stage0_seed_candidates=(seed,),
+    ).ask(10)
+
+    assert len(batch) == 2
+    assert len({candidate.patch.canonical_json() for candidate in batch}) == 2
+    assert batch[0].metadata["proposal_source"] == "seed_recipe"
+    assert all(
+        not (
+            candidate.metadata["proposal_source"] == "sobol"
+            and candidate.metadata["child_index"] == 0
+        )
+        for candidate in batch
+    )
+
+
+def test_stage0_seed_beam_entry_is_prefix_projected_with_exploration_floor() -> None:
+    strategy = StagedStrategy(
+        SCHEMA,
+        seed=13,
+        objective_profile=_staged_profile(beam_width=2, children_per_parent=4),
+        stage0_seed_candidates=(
+            _stage0_seed("seed-one", 901, 945, include_later_stage=True),
+            _stage0_seed("seed-two", 902, 946, include_later_stage=True),
+        ),
+    )
+    stage0 = strategy.ask(10)
+
+    strategy.tell(
+        tuple(
+            (
+                candidate,
+                _scored(
+                    candidate.patch,
+                    candidate_id=candidate.id,
+                    oxygen=100.0
+                    if candidate.metadata["proposal_source"] == "seed_recipe"
+                    else 1.0,
+                ),
+            )
+            for candidate in stage0
+        )
+    )
+    stage1 = strategy.ask(10)
+    parent_ids = {candidate.metadata["parent_candidate_id"] for candidate in stage1}
+    seed_parent_ids = {
+        candidate.id
+        for candidate in stage0
+        if candidate.metadata["proposal_source"] == "seed_recipe"
+    }
+    fresh_parent_ids = {
+        candidate.id
+        for candidate in stage0
+        if candidate.metadata["proposal_source"] == "sobol"
+    }
+
+    assert parent_ids & seed_parent_ids
+    assert parent_ids & fresh_parent_ids
+    seed_child = next(
+        candidate
+        for candidate in stage1
+        if candidate.metadata["parent_candidate_id"] in seed_parent_ids
+    )
+    prefix_values = seed_child.metadata["prefix_patch_values"]
+    assert "campaigns.C0.temp_range_C" in prefix_values
+    assert not any(key.startswith("campaigns.C0b_p_cleanup.") for key in prefix_values)
+    assert seed_child.metadata["seed_lineage"] is True
+
+
+def test_stage0_without_warm_start_keeps_legacy_sobol_population() -> None:
+    batch = StagedStrategy(
+        SCHEMA,
+        seed=5,
+        objective_profile=_staged_profile(children_per_parent=2),
+    ).ask(10)
+
+    assert [candidate.metadata["proposal_source"] for candidate in batch] == [
+        "sobol",
+        "sobol",
+    ]
+    assert [candidate.metadata["child_index"] for candidate in batch] == [0, 1]
 
 
 def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> None:
@@ -661,8 +834,13 @@ def test_multi_topology_staged_run_uses_topology_specific_sample_streams(tmp_pat
         TopologyChoice(path_ab="A", branch="two", c5=False, c6=False),
         TopologyChoice(path_ab="A", branch="two", c5=False, c6=True),
     )
+    profile = {
+        **PROFILE,
+        "seed_recipes": [{**PROFILE["seed_recipes"][0], "topology": topologies[0].id}],
+        "staged": {"beam_width": 1, "children_per_parent": 1},
+    }
     result = study.run(
-        {**PROFILE, "staged": {"beam_width": 1, "children_per_parent": 1}},
+        profile,
         FEEDSTOCK,
         "staged",
         "stub",
@@ -1650,8 +1828,12 @@ def test_beam_width_1_vs_k(tmp_path) -> None:
 def test_one_topology_vs_all_topologies_study(tmp_path) -> None:
     topologies = enumerate_topologies()
     store = SpyStore(tmp_path / "topologies.sqlite")
+    profile = {
+        **PROFILE,
+        "seed_recipes": [{**PROFILE["seed_recipes"][0], "topology": topologies[0].id}],
+    }
     one = study.run(
-        PROFILE,
+        profile,
         FEEDSTOCK,
         "staged",
         "stub",
@@ -1664,7 +1846,7 @@ def test_one_topology_vs_all_topologies_study(tmp_path) -> None:
         topologies=topologies[:1],
     )
     all_result = study.run(
-        PROFILE,
+        profile,
         FEEDSTOCK,
         "staged",
         "stub",

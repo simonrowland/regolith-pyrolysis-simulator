@@ -1,6 +1,11 @@
 """Optimizer strategy interfaces and baselines."""
 
-from simulator.optimize.strategy.protocol import Candidate, Strategy
+from simulator.optimize.strategy.protocol import (
+    PROPOSAL_SOURCES,
+    Candidate,
+    Strategy,
+    WarmStartSeed,
+)
 from simulator.optimize.strategy.random_strategy import RandomStrategy
 from simulator.optimize.strategy.screen import MorrisScreenStrategy
 
@@ -36,6 +41,7 @@ __all__ = [
     "MorrisScreenStrategy",
     "OptunaNSGA2Strategy",
     "OptunaTPEStrategy",
+    "PROPOSAL_SOURCES",
     "RandomStrategy",
     "StagedBeamStateError",
     "StagedDuplicateCacheKey",
@@ -43,6 +49,7 @@ __all__ = [
     "StagedStrategy",
     "StagedStrategyError",
     "Strategy",
+    "WarmStartSeed",
     "assert_prefix_replay_equal",
     "make_prefix_eval_spec",
 ]

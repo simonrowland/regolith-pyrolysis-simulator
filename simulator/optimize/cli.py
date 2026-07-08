@@ -79,6 +79,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 out_dir=args.out,
                 seed=args.seed,
                 two_phase_certify=two_phase_certify,
+                warm_start_from=args.warm_start_from,
                 pinned_paths=args.pin,
                 per_eval_timeout_seconds=args.per_eval_timeout_seconds,
             )
@@ -133,6 +134,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--budget", type=_positive_int, required=True, help="evaluation budget")
     parser.add_argument("--out", type=Path, default=None, help="artifact output directory")
     parser.add_argument("--seed", type=_non_negative_int, default=0, help="strategy seed")
+    parser.add_argument(
+        "--warm-start-from",
+        help="prior optimizer run directory, cache.sqlite, or pareto.json for W1 warm-start seeds",
+    )
     parser.add_argument(
         "--per-eval-timeout-seconds",
         type=_positive_float,

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import logging
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
@@ -19,10 +20,11 @@ from simulator.optimize.strategy.bayesian import (
     _couple_suggested_pressure_defaults,
     _failed_trial_state,
     _objective_values_for_definitions,
+    _optuna_params_from_seed,
     _suggest_value,
     _sync_conditioned_trial_params,
 )
-from simulator.optimize.strategy.protocol import Candidate
+from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
 
 if TYPE_CHECKING:
     from simulator.optimize.evaluate import ScoredResult
@@ -39,6 +41,7 @@ TellBatchRow = tuple[
 OPTUNA_NSGA2_REQUIRED_MESSAGE = (
     "optuna is required for OptunaNSGA2Strategy; install the [optimize] extra"
 )
+_LOGGER = logging.getLogger(__name__)
 
 
 class OptunaNSGA2UnavailableError(ImportError):
@@ -57,6 +60,7 @@ class OptunaNSGA2Strategy:
         seed: int,
         objective_profile: Mapping[str, Any] | None = None,
         profile: Mapping[str, Any] | None = None,
+        warm_start_seeds: Sequence[WarmStartSeed] | None = None,
     ) -> None:
         if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
             raise ValueError("seed must be a non-negative int")
@@ -86,6 +90,23 @@ class OptunaNSGA2Strategy:
             directions=self._directions,
             sampler=sampler,
         )
+        enqueued_seeds: list[WarmStartSeed] = []
+        rejected_seed_ids: list[str] = []
+        for seed_candidate in tuple(warm_start_seeds or ()):
+            try:
+                params = _optuna_params_from_seed(seed_candidate, self._specs, self.schema)
+            except ValueError as exc:
+                _LOGGER.warning(
+                    "optuna_warm_start_seed_dropped seed_id=%s reason=%s",
+                    seed_candidate.id,
+                    exc,
+                )
+                rejected_seed_ids.append(seed_candidate.id)
+                continue
+            self._study.enqueue_trial(params)
+            enqueued_seeds.append(seed_candidate)
+        self._warm_start_seeds = tuple(enqueued_seeds)
+        self._warm_start_rejected_seed_ids = tuple(rejected_seed_ids)
         self._tell_count = 0
         self._planned_by_id: dict[str, Candidate] = {}
         self._trial_by_candidate_id: dict[str, Any] = {}
@@ -117,6 +138,14 @@ class OptunaNSGA2Strategy:
         return tuple(self._study.best_trials)
 
     @property
+    def warm_start_rejected_seed_count(self) -> int:
+        return len(self._warm_start_rejected_seed_ids)
+
+    @property
+    def warm_start_rejected_seed_ids(self) -> tuple[str, ...]:
+        return self._warm_start_rejected_seed_ids
+
+    @property
     def pareto_front(self) -> tuple[Any, ...]:
         return self.best_trials
 
@@ -137,6 +166,11 @@ class OptunaNSGA2Strategy:
         candidates: list[Candidate] = []
         for _ in range(n):
             trial = self._study.ask()
+            enqueued_seed = (
+                self._warm_start_seeds[trial.number]
+                if trial.number < len(self._warm_start_seeds)
+                else None
+            )
             values = {
                 spec.path: _suggest_value(trial, spec)
                 for spec in self._specs
@@ -155,6 +189,18 @@ class OptunaNSGA2Strategy:
                     "trial_number": trial.number,
                     "objective_metrics": self.objective_metrics,
                     "directions": self.directions,
+                    "proposal_source": (
+                        "optuna_enqueued" if enqueued_seed is not None else "optuna_model"
+                    ),
+                    "seed_lineage": enqueued_seed is not None,
+                    **(
+                        {
+                            "seed_id": enqueued_seed.id,
+                            "seed_origin": enqueued_seed.origin,
+                        }
+                        if enqueued_seed is not None
+                        else {}
+                    ),
                 },
             )
             self._planned_by_id[candidate.id] = candidate

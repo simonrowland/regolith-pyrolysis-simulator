@@ -31,7 +31,7 @@ from simulator.optimize.recipe import (
     C2A_STAGED_ORDER_PATH,
     c2a_staged_stage_order,
 )
-from simulator.optimize.strategy.protocol import Candidate
+from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
 
 
 class StagedStrategyError(RuntimeError):
@@ -77,6 +77,7 @@ class _BeamNode:
     parent_id: str | None
     score_key: tuple[Any, ...] = ()
     cache_key: str | None = None
+    seed_lineage: bool = False
 
 
 @dataclass(frozen=True)
@@ -271,6 +272,7 @@ class StagedStrategy:
         stage_allowlist: Sequence[str] | None = None,
         sampler_name: str | None = None,
         topology: Any | None = None,
+        stage0_seed_candidates: Sequence[WarmStartSeed] | None = None,
     ) -> None:
         if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
             raise ValueError("seed must be a non-negative int")
@@ -304,6 +306,10 @@ class StagedStrategy:
         self.joint_refines_completed = 0
         self._joint_refine_done = self.max_joint_refines <= 0
         self.topology = _topology_from_options(options, topology)
+        self._stage0_seed_candidates = _stage0_seeds_for_topology(
+            stage0_seed_candidates or (),
+            self.topology.id,
+        )
         configured_allowlist = (
             stage_allowlist if stage_allowlist is not None else options.get("allowlist")
         )
@@ -474,45 +480,116 @@ class StagedStrategy:
         )
         candidates: list[Candidate] = []
         expected: set[str] = set()
-        for parent_index, parent in enumerate(self._frontier):
-            for child_index in range(self.children_per_parent):
-                sample_index = (
-                    self._stage_index * 1_000_000
-                    + parent_index * self.children_per_parent
-                    + child_index
+        seen_patch_json: set[str] = set()
+
+        def append_unique(candidate: Candidate) -> bool:
+            patch_json = candidate.patch.canonical_json()
+            if patch_json in seen_patch_json:
+                return False
+            seen_patch_json.add(patch_json)
+            candidates.append(candidate)
+            expected.add(candidate.id)
+            self._asked_by_id[candidate.id] = candidate
+            return True
+
+        def sobol_candidate(parent_index: int, parent: _BeamNode, child_index: int) -> Candidate:
+            sample_index = (
+                self._stage_index * 1_000_000
+                + parent_index * self.children_per_parent
+                + child_index
+            )
+            stage_patch = sample_recipe_patch_at_index(
+                stage_schema,
+                index=sample_index,
+                seed=self.seed,
+                sampler_name=self.sampler_name,
+            )
+            patch = _merge_patches(parent.patch, stage_patch).validated(self.schema)
+            candidate_id = (
+                f"{self.name}-{self.seed}-{self.topology.id}-{self._stage_index:02d}-"
+                f"{stage_id}-p{parent_index:03d}-c{child_index:06d}"
+            )
+            metadata = {
+                "strategy": self.name,
+                "seed": self.seed,
+                "stage_index": self._stage_index,
+                "stage_id": stage_id,
+                "stage_ids": (*parent.stage_ids, stage_id),
+                "prefix_depth": len(parent.stage_ids),
+                "prefix_stage_ids": parent.stage_ids,
+                "prefix_recipe_ids": parent.recipe_ids,
+                "prefix_patch_values": _metadata_patch_values(parent.patch),
+                "stage_patch_values": _metadata_patch_values(stage_patch),
+                "topology": self.topology.metadata(),
+                "parent_candidate_id": parent.parent_id,
+                "parent_cache_key": parent.cache_key,
+                "parent_rank": parent_index,
+                "child_index": child_index,
+                "proposal_source": "sobol" if self._stage_index == 0 else "staged_child",
+                "seed_lineage": parent.seed_lineage,
+            }
+            return Candidate(id=candidate_id, patch=patch, metadata=metadata)
+
+        stage0_count = len(self._frontier) * self.children_per_parent
+        seed_cap = (
+            min(len(self._stage0_seed_candidates), stage0_count // 2)
+            if self._stage_index == 0
+            else 0
+        )
+        if seed_cap:
+            parent = self._frontier[0]
+            for seed_index, seed in enumerate(self._stage0_seed_candidates[:seed_cap]):
+                seed_patch = _merge_patches(self._topology_patch, seed.patch).validated(
+                    self.schema
                 )
-                stage_patch = sample_recipe_patch_at_index(
-                    stage_schema,
-                    index=sample_index,
-                    seed=self.seed,
-                    sampler_name=self.sampler_name,
-                )
-                patch = _merge_patches(parent.patch, stage_patch).validated(self.schema)
+                frontier_patch = _merge_patches(
+                    self._topology_patch,
+                    _patch_for_stage_range(seed_patch, self._stages, stop=1),
+                ).validated(self.schema)
+                seed_token = _candidate_id_token(seed.id)
                 candidate_id = (
-                    f"{self.name}-{self.seed}-{self.topology.id}-{self._stage_index:02d}-"
-                    f"{stage_id}-p{parent_index:03d}-c{child_index:06d}"
+                    f"{self.name}-{self.seed}-{self.topology.id}-00-{stage_id}-"
+                    f"seed-s{seed_index:03d}-{seed_token}"
                 )
                 metadata = {
                     "strategy": self.name,
                     "seed": self.seed,
                     "stage_index": self._stage_index,
                     "stage_id": stage_id,
-                    "stage_ids": (*parent.stage_ids, stage_id),
-                    "prefix_depth": len(parent.stage_ids),
-                    "prefix_stage_ids": parent.stage_ids,
-                    "prefix_recipe_ids": parent.recipe_ids,
+                    "stage_ids": (stage_id,),
+                    "recipe_ids": (frontier_patch.recipe_id(self.schema),),
+                    "prefix_depth": 0,
+                    "prefix_stage_ids": (),
+                    "prefix_recipe_ids": (),
                     "prefix_patch_values": _metadata_patch_values(parent.patch),
-                    "stage_patch_values": _metadata_patch_values(stage_patch),
+                    "stage_patch_values": _metadata_patch_values(seed.patch),
+                    "frontier_patch_values": _metadata_patch_values(frontier_patch),
                     "topology": self.topology.metadata(),
-                    "parent_candidate_id": parent.parent_id,
-                    "parent_cache_key": parent.cache_key,
-                    "parent_rank": parent_index,
-                    "child_index": child_index,
+                    "parent_candidate_id": None,
+                    "parent_cache_key": None,
+                    "parent_rank": 0,
+                    "child_index": seed_index,
+                    "replaced_sobol_child_index": seed_index,
+                    "proposal_source": seed.proposal_source,
+                    "seed_lineage": True,
+                    "seed_id": seed.id,
+                    "seed_origin": seed.origin,
                 }
-                candidate = Candidate(id=candidate_id, patch=patch, metadata=metadata)
-                candidates.append(candidate)
-                expected.add(candidate_id)
-                self._asked_by_id[candidate_id] = candidate
+                append_unique(Candidate(id=candidate_id, patch=seed_patch, metadata=metadata))
+
+            child_index = seed_cap
+            attempts = 0
+            while len(candidates) < stage0_count:
+                attempts += 1
+                if attempts > stage0_count + len(self._stage0_seed_candidates) + 100:
+                    raise StagedBeamStateError("could not fill unique seeded stage-0 batch")
+                append_unique(sobol_candidate(0, parent, child_index))
+                child_index += 1
+        else:
+            for parent_index, parent in enumerate(self._frontier):
+                for child_index in range(self.children_per_parent):
+                    candidate = sobol_candidate(parent_index, parent, child_index)
+                    append_unique(candidate)
         self._pending = candidates
         self._expected_stage_ids = expected
         self._stage_results = {}
@@ -531,8 +608,14 @@ class StagedStrategy:
         ranked = _rank_stage_results(
             self._stage_results.values(),
             self._definitions,
-            beam_width=self.beam_width,
+            beam_width=(
+                len(self._stage_results)
+                if self._stage_index == 0
+                else self.beam_width
+            ),
         )
+        if self._stage_index == 0:
+            ranked = _apply_stage0_seed_exploration_floor(ranked, self.beam_width)
         if not ranked:
             raise StagedBeamStateError("staged beam produced no ranked candidates")
         next_frontier: list[_BeamNode] = []
@@ -660,6 +743,8 @@ class StagedStrategy:
                     "child_index": child_index,
                     "backward_pass": self.backward_passes_completed,
                     "backward_target_stage_id": target_stage_id,
+                    "proposal_source": "backward_resample",
+                    "seed_lineage": parent.seed_lineage,
                 }
                 candidate = Candidate(id=candidate_id, patch=patch, metadata=metadata)
                 candidates.append(candidate)
@@ -738,6 +823,8 @@ class StagedStrategy:
                     "child_index": child_index,
                     "joint_refine": self.joint_refines_completed,
                     "joint_refine_target_stage_ids": target_stage_ids,
+                    "proposal_source": "joint_refine",
+                    "seed_lineage": parent.seed_lineage,
                 }
                 candidate = Candidate(id=candidate_id, patch=patch, metadata=metadata)
                 candidates.append(candidate)
@@ -776,6 +863,25 @@ def _rank_stage_results(
         ranked.append((score_key, candidate, scored))
     ranked.sort(key=lambda item: item[0])
     return tuple(ranked[:beam_width])
+
+
+def _apply_stage0_seed_exploration_floor(
+    ranked: Sequence[tuple[tuple[Any, ...], Candidate, ScoredResult]],
+    beam_width: int,
+) -> tuple[tuple[tuple[Any, ...], Candidate, ScoredResult], ...]:
+    seed_slots = beam_width // 2
+    selected: list[tuple[tuple[Any, ...], Candidate, ScoredResult]] = []
+    seed_count = 0
+    for item in ranked:
+        _, candidate, _ = item
+        if _candidate_seed_lineage(candidate):
+            if seed_count >= seed_slots:
+                continue
+            seed_count += 1
+        selected.append(item)
+        if len(selected) >= beam_width:
+            break
+    return tuple(selected)
 
 
 def _archive_members_from_results(
@@ -845,13 +951,18 @@ def _node_from_candidate(
     score_key: tuple[Any, ...],
     schema: RecipeSchema,
 ) -> _BeamNode:
+    patch = candidate.patch
+    frontier_values = candidate.metadata.get("frontier_patch_values")
+    if isinstance(frontier_values, Mapping):
+        patch = _patch_from_metadata_values(frontier_values).validated(schema)
     return _BeamNode(
-        patch=candidate.patch,
+        patch=patch,
         stage_ids=_string_tuple_metadata(candidate, "stage_ids"),
         recipe_ids=_recipe_ids_from_metadata(candidate, schema),
         parent_id=candidate.id,
         score_key=score_key,
         cache_key=scored.cache_key,
+        seed_lineage=_candidate_seed_lineage(candidate),
     )
 
 
@@ -890,6 +1001,35 @@ def _score_key_components(
     scores: Sequence[float | None],
 ) -> tuple[tuple[int, float], ...]:
     return tuple((1, 0.0) if score is None else (0, -score) for score in scores)
+
+
+def _stage0_seeds_for_topology(
+    seeds: Sequence[WarmStartSeed],
+    topology_id: str,
+) -> tuple[WarmStartSeed, ...]:
+    return tuple(
+        seed
+        for seed in seeds
+        if seed.topology_id is None or seed.topology_id == topology_id
+    )
+
+
+def _candidate_seed_lineage(candidate: Candidate) -> bool:
+    if bool(candidate.metadata.get("seed_lineage")):
+        return True
+    return candidate.metadata.get("proposal_source") in {
+        "seed_recipe",
+        "store_warm_start",
+        "optuna_enqueued",
+    }
+
+
+def _candidate_id_token(value: str) -> str:
+    token = "".join(
+        char.lower() if char.isalnum() else "-"
+        for char in value.strip()
+    ).strip("-")
+    return token or "seed"
 
 
 def _stage_specs(
@@ -1644,6 +1784,10 @@ def _assert_not_parent_duplicate(candidate: Candidate, scored: ScoredResult) -> 
 
 def _metadata_patch_values(patch: RecipePatch) -> Mapping[str, Any]:
     return MappingProxyType({".".join(path): value for path, value in sorted(patch.values.items())})
+
+
+def _patch_from_metadata_values(values: Mapping[str, Any]) -> RecipePatch:
+    return RecipePatch({tuple(str(path).split(".")): value for path, value in values.items()})
 
 
 def _strip_trace(scored: ScoredResult) -> ScoredResult:

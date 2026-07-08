@@ -4,6 +4,7 @@ import copy
 import csv
 from dataclasses import is_dataclass, fields, replace
 import json
+import logging
 import math
 from pathlib import Path
 import sqlite3
@@ -827,6 +828,106 @@ def _evaluator(
     return evaluate_patch
 
 
+def _seed_safe_certified_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    seed_bonus = 100.0 if candidate_id and "seed" in candidate_id else 0.0
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", 10.0 + seed_bonus, "kg", ordinal=0),
+                ObjectiveValue("energy_kWh", "minimize", 5.0, "kWh", ordinal=1),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "backend_authoritative": True,
+                "per_hour_summary": [{"reduced_real_cache_state": "cached_exact"}],
+                "snapshots": [{"mass_balance_error_pct": 0.0}],
+            },
+            product_summary={
+                "oxygen_kg": 10.0 + seed_bonus,
+                "mass_closure": {
+                    "status": "closed",
+                    "mass_balance_error_pct": 0.0,
+                },
+            },
+            backend_status="ok",
+            backend_authoritative=True,
+        ),
+    )
+
+
+def _write_prior_warm_start_run(
+    out_dir: Path,
+    patch: RecipePatch,
+    *,
+    profile_payload: Mapping[str, Any] = PROFILE,
+    candidate_id: str = "prior-winner",
+) -> ScoredResult:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    schema = RecipeSchema()
+    profile = study.resolve_profile(
+        profile_payload,
+        expected_feedstock=FEEDSTOCK,
+        schema=schema,
+    )
+    scored = _seed_safe_certified_evaluator(
+        patch.validated(schema),
+        FEEDSTOCK,
+        "stub",
+        profile=profile,
+        candidate_id=candidate_id,
+        constraints=study._constraints_for_profile(profile),
+    )
+    ResultStore(out_dir / "cache.sqlite").store(
+        scored.eval_spec,
+        scored,
+        created_at="2026-07-07T00:00:00Z",
+    )
+    record = study._to_record(
+        Candidate(
+            id=candidate_id,
+            patch=patch,
+            metadata={"proposal_source": "sobol", "strategy": "test"},
+        ),
+        scored,
+        cache_hit=False,
+    )
+    study._write_artifacts(
+        out_dir,
+        profile=profile,
+        feedstock=FEEDSTOCK,
+        fidelity="stub",
+        definitions=study.objective_definitions(PROFILE),
+        pareto=(record,),
+        leaderboard=(record,),
+        winner=record,
+        schema=schema,
+        failure_counts={},
+        search_space_identity=study._search_space_identity(
+            schema,
+            profile_pinned_paths=(),
+            cli_pinned_paths=(),
+        ),
+    )
+    return scored
+
+
 def _slow_first_then_ok_evaluator(
     patch: RecipePatch,
     feedstock: str,
@@ -1382,6 +1483,254 @@ def test_study_search_space_identity_tracks_schema_bounds_digest(tmp_path) -> No
     assert shifted_identity != base_identity
 
 
+def test_warm_start_rejects_stale_search_space_identity(tmp_path) -> None:
+    prior = tmp_path / "prior"
+    current = tmp_path / "current"
+    prior.mkdir()
+    ResultStore(prior / "cache.sqlite")
+    (prior / "pareto.json").write_text(
+        json.dumps(
+            {
+                "search_space_identity": {"bounds_digest": "stale"},
+                "pareto": [
+                    {
+                        "candidate_id": "old-winner",
+                        "cache_key": "missing",
+                        "patch": {"campaigns": {"C0": {"temp_range_C": [900, 950]}}},
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(study.StudyError, match="search_space_identity mismatch"):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "staged",
+            "stub",
+            parallel=1,
+            budget=1,
+            out_dir=current,
+            evaluator=_evaluator(),
+            warm_start_from=prior,
+        )
+
+
+def test_warm_start_from_prior_run_store_admits_real_seed(tmp_path) -> None:
+    prior = tmp_path / "prior"
+    current = tmp_path / "current"
+    _write_prior_warm_start_run(
+        prior,
+        RecipePatch.from_nested(
+            {"campaigns": {"C0": {"temp_range_C": [900.0, 940.0]}}}
+        ),
+    )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "staged",
+        "stub",
+        parallel=1,
+        budget=2,
+        out_dir=current,
+        seed=7,
+        evaluator=_seed_safe_certified_evaluator,
+        warm_start_from=prior,
+    )
+    search_provenance = json.loads(result.artifacts["search_provenance"].read_text())
+
+    store_records = [
+        record for record in result.records if record.proposal_source == "store_warm_start"
+    ]
+    assert store_records
+    assert all(record.seed_lineage for record in store_records)
+    assert search_provenance["proposal_source_counts"]["store_warm_start"] >= 1
+
+
+def test_warm_start_rejects_corrupt_patch_recipe_identity(tmp_path) -> None:
+    prior = tmp_path / "prior"
+    current = tmp_path / "current"
+    _write_prior_warm_start_run(
+        prior,
+        RecipePatch.from_nested(
+            {"campaigns": {"C0": {"temp_range_C": [900.0, 940.0]}}}
+        ),
+    )
+    pareto_path = prior / "pareto.json"
+    payload = json.loads(pareto_path.read_text(encoding="utf-8"))
+    payload["pareto"][0]["optimizer_patch"] = {
+        "campaigns": {"C0": {"temp_range_C": [900.0, 950.0]}}
+    }
+    pareto_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(study.StudyError, match="recipe_id mismatch|cache_key mismatch"):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "staged",
+            "stub",
+            parallel=1,
+            budget=1,
+            out_dir=current,
+            seed=7,
+            evaluator=_seed_safe_certified_evaluator,
+            warm_start_from=prior,
+        )
+
+
+def test_profile_seed_epoch_stamp_mismatch_warns_but_reevaluates(
+    tmp_path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    profile = copy.deepcopy(PROFILE)
+    profile["code_version"] = "stale-code"
+    profile["corpus_version"] = "stale-corpus"
+
+    with caplog.at_level(logging.WARNING, logger=study.__name__):
+        result = study.run(
+            profile,
+            FEEDSTOCK,
+            "staged",
+            "stub",
+            parallel=1,
+            budget=1,
+            out_dir=tmp_path,
+            seed=7,
+            evaluator=_seed_safe_certified_evaluator,
+        )
+
+    assert any(record.proposal_source == "seed_recipe" for record in result.records)
+    messages = [record.getMessage() for record in caplog.records]
+    assert any("profile_seed_epoch_warning" in message for message in messages)
+    assert any("stale advisory seed_recipes" in message for message in messages)
+
+
+def test_optuna_incomplete_warm_start_drop_counted_in_search_provenance(
+    tmp_path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    pytest.importorskip("optuna")
+
+    with caplog.at_level(logging.WARNING):
+        result = study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "bayes",
+            "stub",
+            parallel=1,
+            budget=1,
+            out_dir=tmp_path,
+            seed=7,
+            evaluator=_evaluator(),
+        )
+    payload = json.loads(result.artifacts["search_provenance"].read_text())
+    strategy_provenance = payload["strategy_provenance"]
+
+    assert strategy_provenance["optuna_incomplete_seed_dropped_count"] == 1
+    assert strategy_provenance["optuna_incomplete_seed_dropped_ids"] == [
+        "study-c0-seed"
+    ]
+    assert any(
+        "optuna_warm_start_seed_dropped" in record.getMessage()
+        for record in caplog.records
+    )
+
+
+def test_evalspec_seed_identity_tracks_canonical_evalspec_fields() -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch.from_nested(
+        {"campaigns": {"C0": {"temp_range_C": [900.0, 950.0]}}}
+    ).validated(schema)
+    spec, _ = _build_eval_inputs(
+        patch,
+        FEEDSTOCK,
+        "stub",
+        PROFILE,
+        schema,
+        constraints=physics_constraints_from_profile(PROFILE),
+    )
+    rich_spec = replace(
+        spec,
+        stop_at_stage0_exit=True,
+        stage0_redox_oxidant_kg=1.0,
+        stage0_carbon_reductant_kg=1.0,
+        o2_bubbler_settings={"O2": {"flow": 1.0}},
+        allow_fallback_vapor=True,
+        vapor_pressure_provider_code_fingerprint="fingerprint",
+        lab_schedule={"campaigns": {"C0": {"operator": "test"}}},
+        target_spec_id="target",
+        target_spec_digest="target-digest",
+        target_maturity={"level": "test"},
+    )
+    canonical_payload = json.loads(
+        study.canonical_evalspec_json(rich_spec).decode("utf-8")
+    )
+    seed_identity = study._evalspec_seed_identity(rich_spec)
+    intentionally_excluded: set[str] = set()
+
+    assert set(seed_identity) == set(canonical_payload) - intentionally_excluded
+    assert "recipe_id" in seed_identity
+
+
+def test_study_records_seed_provenance_and_dual_winner_artifacts(tmp_path) -> None:
+    def staged_id_evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+        oxygen = 50.0 if candidate_id and "seed" in candidate_id else 10.0
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=True,
+            objectives=ObjectiveVector(
+                (
+                    ObjectiveValue("oxygen_kg", "maximize", oxygen, "kg", ordinal=0),
+                    ObjectiveValue("energy_kWh", "minimize", 2.0, "kWh", ordinal=1),
+                )
+            ),
+            feasibility_margins={"delivered_stream_purity": _margin()},
+            run_reference=RunReference(
+                status="ok",
+                trace={"backend_status": "ok"},
+                backend_status="ok",
+                backend_authoritative=True,
+            ),
+        )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "staged",
+        "stub",
+        parallel=2,
+        budget=2,
+        out_dir=tmp_path / "run",
+        evaluator=staged_id_evaluator,
+    )
+
+    assert any(record.proposal_source == "seed_recipe" for record in result.records)
+    pareto = json.loads(result.artifacts["pareto"].read_text())
+    search_provenance = json.loads(result.artifacts["search_provenance"].read_text())
+    with result.artifacts["leaderboard"].open(newline="", encoding="utf-8") as handle:
+        row = next(csv.DictReader(handle))
+
+    assert "best_overall_candidate_id" in pareto
+    assert "best_non_seeded_lineage_candidate_id" in pareto
+    assert search_provenance["proposal_source_counts"]["seed_recipe"] >= 1
+    assert row["proposal_source"]
+    assert row["seed_lineage"] in {"True", "False"}
+
+
 def test_study_surfaces_knob_saturation_in_pareto_and_provenance(tmp_path) -> None:
     diagnostic = {
         "schema_version": "knob-saturation-v1",
@@ -1904,6 +2253,64 @@ def test_two_phase_certification_pool_preserves_single_objective_scalar_top_k_ti
     assert certification["top_k"] == 1
     assert certification["certification_pool_size"] == 1
     assert certification["certification_pool_limit"] == 1
+
+
+def test_two_phase_certification_preserves_seed_lineage_for_dual_winner(
+    tmp_path,
+) -> None:
+    def seed_winner_evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+        oxygen = 100.0 if candidate_id and "seed" in candidate_id else 10.0
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=True,
+            objectives=ObjectiveVector(
+                (
+                    ObjectiveValue("oxygen_kg", "maximize", oxygen, "kg", ordinal=0),
+                    ObjectiveValue("energy_kWh", "minimize", 1.0, "kWh", ordinal=1),
+                )
+            ),
+            feasibility_margins={"delivered_stream_purity": _margin()},
+            run_reference=RunReference(
+                status="ok",
+                trace={"backend_status": "ok"},
+                backend_status="ok",
+                backend_authoritative=True,
+            ),
+        )
+
+    out = tmp_path / "two-phase-seed-lineage"
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "staged",
+        "stub",
+        1,
+        2,
+        out,
+        seed=7,
+        evaluator=seed_winner_evaluator,
+        two_phase_certify={"enabled": True, "top_k": 2},
+    )
+    pareto = json.loads((out / "pareto.json").read_text())
+    search_provenance = json.loads((out / "search_provenance.json").read_text())
+
+    assert result.winner is not None
+    assert result.winner.proposal_source == "seed_recipe"
+    assert result.winner.seed_lineage is True
+    assert pareto["best_overall_candidate_id"] == result.winner.candidate_id
+    assert pareto["best_non_seeded_lineage_candidate_id"] != result.winner.candidate_id
+    assert result.winner.candidate_id in search_provenance["seeded_candidate_ids"]
 
 
 def test_leaderboard_ranking_preserves_nullable_objective_positions(tmp_path) -> None:
@@ -3420,6 +3827,8 @@ def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> 
             "1",
             "--out",
             str(tmp_path),
+            "--warm-start-from",
+            str(tmp_path / "prior-run"),
             "--pin",
             "C2A_staged.stages.alkali_early_fe.target_C",
             "--pin",
@@ -3432,6 +3841,7 @@ def test_cli_forwards_repeatable_pin_to_optimizer_run(tmp_path, monkeypatch) -> 
         "C2A_staged.stages.alkali_early_fe.target_C",
         "C2A_staged.stages.sio_window.target_C",
     ]
+    assert captured["warm_start_from"] == str(tmp_path / "prior-run")
 
 
 def test_cli_constrained_max_overlay_forwards_hardware_caps(tmp_path, monkeypatch) -> None:

@@ -113,6 +113,9 @@ _TOP_LEVEL_KEYS = frozenset(
         "staged",
         "staged_strategy",
         "two_phase_certify",
+        "warm_start_from",
+        "code_version",
+        "corpus_version",
     }
 )
 _OBJECTIVE_KEYS = frozenset({"metric", "sense", "units", "weight", "rationale"})
@@ -131,7 +134,15 @@ _CONSTRAINT_KEYS = frozenset({
     *_THRESHOLD_CONSTRAINT_KEYS,
 })
 _SEED_KEYS = frozenset(
-    {"id", "source_campaign", "source_campaigns", "rationale", "patch"}
+    {
+        "id",
+        "source_campaign",
+        "source_campaigns",
+        "rationale",
+        "patch",
+        "topology",
+        "topology_id",
+    }
 )
 _RUN_KEYS = frozenset(
     {
@@ -307,6 +318,8 @@ def validate_profile(
     _validate_thermal_window_caps(profile, source=source)
     _validate_two_phase_certify(profile.get("two_phase_certify"), source=source)
     _validate_pinned_paths(profile.get("pinned_paths"), source=source)
+    _validate_warm_start_from(profile.get("warm_start_from"), source=source)
+    _validate_profile_epoch_stamps(profile, source=source)
     _validate_seed_recipes(
         profile["seed_recipes"],
         source=source,
@@ -555,6 +568,45 @@ def _validate_pinned_paths(raw: Any, *, source: str | Path) -> None:
         if path in seen:
             raise ProfileValidationError(f"{source}: duplicate pinned path {path!r}")
         seen.add(path)
+
+
+def _validate_warm_start_from(raw: Any, *, source: str | Path) -> None:
+    if raw is None:
+        return
+    if isinstance(raw, str):
+        if not raw.strip():
+            raise ProfileValidationError(f"{source}: warm_start_from must not be empty")
+        return
+    if not isinstance(raw, Mapping):
+        raise ProfileValidationError(
+            f"{source}: warm_start_from must be a path string or mapping"
+        )
+    allowed = {
+        "path",
+        "run_dir",
+        "store",
+        "store_path",
+        "pareto",
+        "pareto_path",
+        "artifact",
+        "artifact_path",
+    }
+    _reject_unknown_keys(raw, allowed, source=source, where="warm_start_from")
+    if not any(key in raw for key in allowed):
+        raise ProfileValidationError(
+            f"{source}: warm_start_from must name a prior run dir, store, or pareto artifact"
+        )
+    for key, value in raw.items():
+        if not isinstance(value, str) or not value.strip():
+            raise ProfileValidationError(
+                f"{source}: warm_start_from.{key} must be a non-empty path string"
+            )
+
+
+def _validate_profile_epoch_stamps(profile: Mapping[str, Any], *, source: str | Path) -> None:
+    for key in ("code_version", "corpus_version"):
+        if key in profile and not isinstance(profile[key], str):
+            raise ProfileValidationError(f"{source}: {key} must be a string")
 
 
 def _validate_pool_scoped_constraints(profile: Mapping[str, Any], *, source: str | Path) -> None:
@@ -1152,6 +1204,18 @@ def _validate_seed_recipes(
                         f"{source}: {where}.source_campaigns entries must be "
                         f"non-empty strings; got {entry!r}"
                     )
+        if "topology" in seed and "topology_id" in seed:
+            raise ProfileValidationError(
+                f"{source}: {where} must use topology or topology_id, not both"
+            )
+        for topology_key in ("topology", "topology_id"):
+            if topology_key not in seed:
+                continue
+            topology_value = seed[topology_key]
+            if not isinstance(topology_value, (str, Mapping)):
+                raise ProfileValidationError(
+                    f"{source}: {where}.{topology_key} must be a topology id or mapping"
+                )
         patch = seed["patch"]
         if not isinstance(patch, Mapping):
             raise ProfileValidationError(f"{source}: {where}.patch must be a mapping")

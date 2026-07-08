@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import logging
 import math
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
@@ -14,7 +15,7 @@ from simulator.optimize.objective import (
     objective_definitions,
 )
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
-from simulator.optimize.strategy.protocol import Candidate
+from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
 
 if TYPE_CHECKING:
     from simulator.optimize.evaluate import ScoredResult
@@ -39,6 +40,7 @@ _UNSCOREABLE_OBJECTIVES_ATTR = "regolith_unscoreable_objectives"
 _BAD_MAXIMIZE_VALUE = -1.0e30
 _BAD_MINIMIZE_VALUE = 1.0e30
 _NONFINITE_INFEASIBLE_CONSTRAINT_VIOLATION = 1.0e30
+_LOGGER = logging.getLogger(__name__)
 
 
 class OptunaUnavailableError(ImportError):
@@ -59,6 +61,7 @@ class OptunaTPEStrategy:
         profile: Mapping[str, Any] | None = None,
         n_startup_trials: int = 10,
         n_ei_candidates: int = 24,
+        warm_start_seeds: Sequence[WarmStartSeed] | None = None,
     ) -> None:
         if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
             raise ValueError("seed must be a non-negative int")
@@ -93,6 +96,23 @@ class OptunaTPEStrategy:
             directions=self._directions,
             sampler=sampler,
         )
+        enqueued_seeds: list[WarmStartSeed] = []
+        rejected_seed_ids: list[str] = []
+        for seed_candidate in tuple(warm_start_seeds or ()):
+            try:
+                params = _optuna_params_from_seed(seed_candidate, self._specs, self.schema)
+            except ValueError as exc:
+                _LOGGER.warning(
+                    "optuna_warm_start_seed_dropped seed_id=%s reason=%s",
+                    seed_candidate.id,
+                    exc,
+                )
+                rejected_seed_ids.append(seed_candidate.id)
+                continue
+            self._study.enqueue_trial(params)
+            enqueued_seeds.append(seed_candidate)
+        self._warm_start_seeds = tuple(enqueued_seeds)
+        self._warm_start_rejected_seed_ids = tuple(rejected_seed_ids)
         self._tell_count = 0
         self._planned_by_id: dict[str, Candidate] = {}
         self._trial_by_candidate_id: dict[str, Any] = {}
@@ -124,6 +144,14 @@ class OptunaTPEStrategy:
         return tuple(self._study.best_trials)
 
     @property
+    def warm_start_rejected_seed_count(self) -> int:
+        return len(self._warm_start_rejected_seed_ids)
+
+    @property
+    def warm_start_rejected_seed_ids(self) -> tuple[str, ...]:
+        return self._warm_start_rejected_seed_ids
+
+    @property
     def pareto_front(self) -> tuple[Any, ...]:
         return self.best_trials
 
@@ -144,6 +172,11 @@ class OptunaTPEStrategy:
         candidates: list[Candidate] = []
         for _ in range(n):
             trial = self._study.ask()
+            enqueued_seed = (
+                self._warm_start_seeds[trial.number]
+                if trial.number < len(self._warm_start_seeds)
+                else None
+            )
             values = {
                 spec.path: _suggest_value(trial, spec)
                 for spec in self._specs
@@ -162,6 +195,18 @@ class OptunaTPEStrategy:
                     "trial_number": trial.number,
                     "objective_metrics": self.objective_metrics,
                     "directions": self.directions,
+                    "proposal_source": (
+                        "optuna_enqueued" if enqueued_seed is not None else "optuna_model"
+                    ),
+                    "seed_lineage": enqueued_seed is not None,
+                    **(
+                        {
+                            "seed_id": enqueued_seed.id,
+                            "seed_origin": enqueued_seed.origin,
+                        }
+                        if enqueued_seed is not None
+                        else {}
+                    ),
                 },
             )
             self._planned_by_id[candidate.id] = candidate
@@ -242,6 +287,28 @@ class OptunaTPEStrategy:
 
     def _objective_values(self, scored: "ScoredResult") -> tuple[float, ...] | None:
         return _objective_values_for_definitions(scored, self._objective_definitions)
+
+
+def _optuna_params_from_seed(
+    seed: WarmStartSeed,
+    specs: Sequence[KnobSpec],
+    schema: RecipeSchema,
+) -> dict[str, Any]:
+    patch = seed.patch.validated(schema)
+    missing = [spec.path for spec in specs if spec.path not in patch.values]
+    if missing:
+        missing_names = ", ".join(".".join(path) for path in missing[:5])
+        if len(missing) > 5:
+            missing_names += ", ..."
+        raise ValueError(
+            f"warm-start seed {seed.id!r} is incomplete for Optuna enqueue: "
+            f"{missing_names}"
+        )
+    return {
+        ".".join(spec.path): patch.values[spec.path]
+        for spec in specs
+        if not schema.is_forbidden(spec.path)
+    }
 
 
 def _require_optuna() -> Any:

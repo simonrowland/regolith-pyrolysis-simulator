@@ -78,6 +78,7 @@ class RandomStrategy:
                     "seed": self.seed,
                     "sequence": sequence,
                     "sampler_name": self.sampler_name,
+                    "proposal_source": "sobol",
                 },
             )
             for sequence in range(start, end)

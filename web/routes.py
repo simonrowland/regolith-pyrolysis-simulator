@@ -81,6 +81,7 @@ OPTIMIZER_ARTIFACT_NAMES = (
     OPTIMIZER_CACHE_NAME,
     'leaderboard.csv',
     'pareto.json',
+    'search_provenance.json',
     'provenance.jsonl',
 )
 OPTIMIZER_JOBS_DIR_NAME = 'jobs'

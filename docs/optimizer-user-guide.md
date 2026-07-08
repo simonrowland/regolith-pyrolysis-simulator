@@ -12,7 +12,7 @@ Use the optimizer when you need to:
 
 - Compare recipes for a known feedstock profile.
 - Search for better objective tradeoffs, such as more stored oxygen, more metal product, lower energy, or shorter duration.
-- Produce auditable artifacts: `leaderboard.csv`, `pareto.json`, `winner.recipe.yaml`, `provenance.jsonl`, and the optimizer cache database.
+- Produce auditable artifacts: `leaderboard.csv`, `pareto.json`, `search_provenance.json`, `winner.recipe.yaml`, `provenance.jsonl`, and the optimizer cache database.
 
 Do not treat an `internal-analytical`-backed (legacy `stub`) result as a real process prediction. Internal-analytical-backed studies are useful for UI, cache, profile, and workflow checks.
 
@@ -64,9 +64,10 @@ Actual flags:
 --budget BUDGET
 --out OUT
 --seed SEED
+--warm-start-from PRIOR_RUN_OR_ARTIFACT
 ```
 
-`--feedstock`, `--strategy`, `--fidelity`, and `--budget` are required. `--profile` accepts the built-in profile name, a feedstock profile id, or a YAML profile path. If `--out` is omitted, the study writes under `runs/<timestamp>`.
+`--feedstock`, `--strategy`, `--fidelity`, and `--budget` are required. `--profile` accepts the built-in profile name, a feedstock profile id, or a YAML profile path. `--warm-start-from` accepts a prior run directory, `cache.sqlite`, or `pareto.json`; omitted means no store warm-start. If `--out` is omitted, the study writes under `runs/<timestamp>`.
 
 On success, the CLI prints:
 
@@ -152,7 +153,7 @@ The web leaderboard is the **Feedstock/Profile Winners** table. It shows:
 - products
 - detail link
 
-The CLI writes `leaderboard.csv` and `pareto.json` in the output directory. If there is a feasible Pareto winner, it also writes `winner.recipe.yaml`.
+The CLI writes `leaderboard.csv`, `pareto.json`, and optional `search_provenance.json` in the output directory. If there is a feasible Pareto winner, it also writes `winner.recipe.yaml`.
 
 Winner selection is deterministic: choose the feasible Pareto point with the best primary profile objective, then compare remaining objectives in declared order, then `cache_key`, then `candidate_id`.
 

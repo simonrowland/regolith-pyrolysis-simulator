@@ -16,6 +16,58 @@ from simulator.optimize.recipe import RecipePatch
 if TYPE_CHECKING:
     from simulator.optimize.evaluate import ScoredResult
 
+PROPOSAL_SOURCES = frozenset(
+    {
+        "sobol",
+        "morris",
+        "staged_child",
+        "backward_resample",
+        "joint_refine",
+        "seed_recipe",
+        "store_warm_start",
+        "optuna_enqueued",
+        "optuna_model",
+    }
+)
+
+
+@dataclass(frozen=True)
+class WarmStartSeed:
+    """Prior or profile recipe proposed as a fresh optimizer candidate."""
+
+    id: str
+    patch: RecipePatch = field(compare=False)
+    proposal_source: str
+    origin: Mapping[str, Any] = field(default_factory=dict, compare=False, hash=False)
+    topology_id: str | None = None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.id, str) or not self.id:
+            raise ValueError("seed id must be a non-empty string")
+        if not isinstance(self.patch, RecipePatch):
+            raise TypeError("seed patch must be a RecipePatch")
+        if self.proposal_source not in PROPOSAL_SOURCES:
+            raise ValueError(f"unknown proposal_source {self.proposal_source!r}")
+        if not isinstance(self.origin, MappingABC):
+            raise TypeError("seed origin must be a mapping")
+        if self.topology_id is not None and not isinstance(self.topology_id, str):
+            raise TypeError("seed topology_id must be a string or None")
+        object.__setattr__(self, "origin", _deep_freeze(self.origin))
+
+    def __reduce__(
+        self,
+    ) -> tuple[Any, tuple[str, RecipePatch, str, dict[str, Any], str | None]]:
+        return (
+            type(self),
+            (
+                self.id,
+                self.patch,
+                self.proposal_source,
+                _deep_thaw(self.origin),
+                self.topology_id,
+            ),
+        )
+
 
 @dataclass(frozen=True)
 class Candidate:

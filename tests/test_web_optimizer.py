@@ -658,6 +658,10 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
         "rank,candidate_id\n1,candidate-b\n",
         encoding="utf-8",
     )
+    (run_dir / "search_provenance.json").write_text(
+        json.dumps({"proposal_source_counts": {"sobol": 1}}),
+        encoding="utf-8",
+    )
 
     spec_a = _base_spec(recipe_id="recipe-a")
     spec_b = replace(
@@ -697,6 +701,7 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     assert {artifact["name"] for artifact in run["artifacts"]} >= {
         "cache.sqlite",
         "leaderboard.csv",
+        "search_provenance.json",
     }
     assert run["latest_result"]["candidate_id"] == "candidate-b"
     assert run["latest_result"]["objectives"]["oxygen_kg"] == 12.0
