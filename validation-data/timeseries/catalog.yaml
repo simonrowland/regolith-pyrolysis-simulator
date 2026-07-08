@@ -1,0 +1,157 @@
+schema_version: 1
+canonical_columns:
+- dataset_id
+- run_id
+- time_s
+- T_K
+- pressure_context
+- species
+- model_species
+- signal_type
+- value
+- uncertainty
+- source_table
+- source_row
+- sample
+- analysis_label
+- notes
+root: validation-data/timeseries
+normalization_source: docs-private/validation-data/timeseries from 2026-07-05 ingest
+  plus t-110 DS-010 fetch attempt
+model_mapping_note: model_species maps residue oxides to the runtime vapor species
+  parent where possible; missing activity/pO2 context is reported as a validation
+  gap, not fitted. Si-bearing residue and forsterite-rate rows map to SiO,
+  the runtime volatile proxy for silica volatilization, not inactive elemental
+  Si.
+datasets:
+- id: DS-001
+  status: validated-scale-free
+  rows: 1288
+  time_rows: 1288
+  temperature_rows: 1288
+  species_count: 23
+  signals:
+  - residue_wt_pct
+  file: DS-001.csv
+  source: Sossi et al. 2019, GCA. DOI 10.1016/j.gca.2019.06.021
+  melt_system: Synthetic ferrobasalt + 20 MVE traces
+  condition_gap: time-series residue depletion; geometry/inventory absent
+- id: DS-002
+  status: unavailable-automation
+  rows: 0
+  time_rows: 0
+  temperature_rows: 0
+  species_count: 0
+  signals: []
+  file: ''
+  source: ACS supporting information
+  melt_system: ''
+  condition_gap: HTTP 403 / paywalled SI artifact; documented gap, skipped
+- id: DS-003
+  status: validated-scale-free
+  rows: 335
+  time_rows: 335
+  temperature_rows: 335
+  species_count: 7
+  signals:
+  - isotope_delta
+  - mass_loss_pct
+  - residue_wt_pct
+  file: DS-003.csv
+  source: Richter et al. 2007, GCA. DOI 10.1016/j.gca.2007.09.005
+  melt_system: Type B CAI-like CMAS
+  condition_gap: time-series residue and mass-loss depletion; geometry/inventory absent
+- id: DS-004
+  status: not-time-series
+  rows: 205
+  time_rows: 0
+  temperature_rows: 205
+  species_count: 8
+  signals:
+  - isotope_delta
+  - mass_loss_pct
+  - residue_wt_pct
+  file: DS-004.csv
+  source: Knight et al. 2009, GCA. DOI 10.1016/j.gca.2009.07.008
+  melt_system: CAI-like residues paired with DS-003
+  condition_gap: numeric residues but no time column
+- id: DS-005
+  status: validated-scale-free
+  rows: 114
+  time_rows: 114
+  temperature_rows: 114
+  species_count: 3
+  signals:
+  - isotope_delta
+  - mass_loss_pct
+  file: DS-005.csv
+  source: Yu et al. 2003, GCA. DOI 10.1016/S0016-7037(02)01176-6
+  melt_system: Chondrule-analog peralkaline melt
+  condition_gap: time-series Na/K mass-loss; K effective p_eq uses builtin provider
+    with synthetic single-parent-oxide activity and fixed validation pO2 context
+- id: DS-006
+  status: validated-scale-free
+  rows: 150
+  time_rows: 150
+  temperature_rows: 150
+  species_count: 6
+  signals:
+  - mass_loss_pct
+  - residue_wt_pct
+  file: DS-006.csv
+  source: Hashimoto 1983, Geochem. J. DOI 10.2343/geochemj.17.111
+  melt_system: Solar-abundance chondritic melt
+  condition_gap: time-series bulk/Fe residue depletion; geometry/inventory absent
+- id: DS-007
+  status: validated-alpha
+  rows: 16
+  time_rows: 0
+  temperature_rows: 16
+  species_count: 3
+  signals:
+  - evaporation_coefficient
+  file: DS-007.csv
+  source: Fedkin et al. 2006, GCA. DOI 10.1016/j.gca.2006.10.018
+  melt_system: Chondrule/CMAS analogs
+  condition_gap: direct evaporation-coefficient alpha rows
+- id: DS-010
+  status: validated-direct-flux
+  rows: 8
+  time_rows: 0
+  temperature_rows: 8
+  species_count: 1
+  signals:
+  - evaporation_flux_molecules_cm2_s
+  file: DS-010.csv
+  source: Inada & Tachibana figshare DOI 10.6084/m9.figshare.30550964; expected GCA_Inada_data.xlsx
+    from https://ndownloader.figshare.com/files/65733075
+  melt_system: Forsterite Mg2SiO4
+  condition_gap: direct forsterite formula-unit evaporation flux from workbook
+    high/low H2O sheets; compared dimensionally to runtime SiO volatile proxy
+    with no H2O/H2-to-pO2 conversion or coefficient fitting
+- id: DS-012
+  status: unavailable-automation
+  rows: 0
+  time_rows: 0
+  temperature_rows: 0
+  species_count: 0
+  signals: []
+  file: ''
+  source: Mendeley DOI 10.17632/7sdhsb9jwx.1
+  melt_system: Basalt + loess melts
+  condition_gap: Mendeley download is session-gated / landing-page HTML; documented
+    gap, skipped
+- id: DS-014
+  status: not-time-series
+  rows: 2815
+  time_rows: 0
+  temperature_rows: 0
+  species_count: 5
+  signals:
+  - residue_wt_pct
+  file: DS-014.csv
+  source: Supplement of Eur. J. Mineral., 36, 173-181, 2024; The effect of oxygen
+    fugacity on the evaporation of boron from aluminoborosilicate melt; Stamatis Flemetakis
+    et al.
+  melt_system: Aluminoborosilicate + B
+  condition_gap: numeric residues but no time/T/fO2 condition map
