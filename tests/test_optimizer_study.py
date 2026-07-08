@@ -216,7 +216,12 @@ def _save_format_record() -> study.StudyRecord:
     )
 
 
-def _write_save_format_artifacts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+def _write_save_format_artifacts(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    warm_start_from: Path | None = None,
+) -> Path:
     out = tmp_path / "run"
     out.mkdir()
     calls: list[tuple[Mapping[str, Any], Mapping[str, Any]]] = []
@@ -248,6 +253,7 @@ def _write_save_format_artifacts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
         parallel=1,
         out_dir=out,
         seed=7,
+        warm_start_from=warm_start_from,
     )
     (out / "study.events.jsonl").write_text(
         json.dumps({"event_kind": "candidate_asked", "event_version": 1}) + "\n",
@@ -384,6 +390,86 @@ def test_export_study_bundle_round_trip_hash_index(
             if name.endswith(".json"):
                 member = json.loads(data)
                 assert member["member_schema_version"] == entry["member_schema_version"]
+
+
+def test_export_study_bundle_sanitizes_manifest_host_paths(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    warm_start = tmp_path / "prior-run" / "pareto.json"
+    out = _write_save_format_artifacts(
+        tmp_path,
+        monkeypatch,
+        warm_start_from=warm_start,
+    )
+    (out / "cache.sqlite").write_bytes(b"SQLite format 3\x00")
+    (out / "job_status.json").write_text(
+        json.dumps({"status": "SUCCEEDED", "success": True}, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    manifest_path = out / "study.manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["strategy"]["config"]["diagnostic_path"] = str(tmp_path / "host-secret")
+    manifest_path.write_text(
+        json.dumps(manifest, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    bundle = export_study_bundle(out)
+
+    with zipfile.ZipFile(bundle) as archive:
+        manifest_text = archive.read("study.manifest.json").decode("utf-8")
+        exported = json.loads(manifest_text)
+    config = exported["strategy"]["config"]
+    # warm_start_from is REDACTED-not-dropped: the key must survive so study.py's journal
+    # -replay guard (which demands bundled seed state iff the imported manifest carries a
+    # non-None warm_start_from) still fires. Only the host path itself is elided.
+    assert config["warm_start_from"] == "<redacted-host-path>"
+    assert config["warm_start_from"] is not None
+    assert config["diagnostic_path"] == "<redacted-host-path>"
+    assert str(tmp_path) not in manifest_text
+
+
+def test_export_host_path_redaction_resists_encoding_and_case_bypass() -> None:
+    # WHOLE-VALUE host paths (the realistic export vector: warm_start_from / diagnostic_path)
+    # are redacted across case / single+double percent-encoding / unicode-slash / Windows /
+    # UNC / home-shorthand forms. Legitimate machine-generated values — INCLUDING relative
+    # repo paths used as data_digests KEYS (e.g. `pkg/data/feedstocks.yaml`) — must NOT be
+    # over-redacted. Embedded/nested paths inside a larger string are out of scope (theoretical;
+    # the exporter emits whole-value paths, not attacker-crafted concatenations).
+    from simulator.optimize.save_bundle import _sanitize_manifest_for_export
+
+    redacted = {
+        "upper_uri": "FILE:///Users/simon/secret",
+        "mixed_uri": "File:/Users/simon/secret",
+        "encoded_uri": "file:%2FUsers%2Fsimon%2Fsecret",
+        "encoded_abs": "%2FUsers%2Fsimon%2Fsecret",
+        "double_encoded_abs": "%252FUsers%252Fsimon%252Fsecret%252Fseed.json",
+        "unicode_solidus": "／Users／simon／secret",
+        "plain_abs": "/Users/simon/secret",
+        "win_drive": "C:\\Users\\simon\\secret\\seed.json",
+        "win_drive_encoded": "C:%5CUsers%5Csimon%5Csecret",
+        "backslash_root": "\\work\\prior\\pareto.json",
+        "unc": "\\\\host\\share\\secret",
+        "home_shorthand": "~/runs/prior/pareto.json",
+        "home_named_user": "~simonrowland/prior-run/pareto.json",
+        "home_named_bare": "~simonrowland",
+    }
+    preserved = {
+        "keep_relative": "runs/prior",
+        "data_digest_key": "pkg/data/feedstocks.yaml",
+        "dot_relative": "./data/vapor_pressures.yaml",
+        "innocent_file_substr": "profile: oxygen-yield-v1",
+        "tilde_approx": "~5 minutes to converge",
+        "public_url": "https://example.com/a/b",
+        "scheme_url_multi_letter": "ftp://example.com/pub",
+        "version": "2026-07-08T00:00:00+00:00",
+    }
+    out = _sanitize_manifest_for_export({**redacted, **preserved})
+    for key in redacted:
+        assert out[key] == "<redacted-host-path>", f"leaked: {key}"
+    for key, value in preserved.items():
+        assert out[key] == value, f"over-redacted: {key}"
 
 
 def test_export_study_bundle_refuses_non_terminal_run(

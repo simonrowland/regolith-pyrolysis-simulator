@@ -30,6 +30,7 @@ from simulator.optimize.save_bundle import (
     ARTIFACT_INDEX_NAME,
     MEMBER_SCHEMA_VERSION,
     REQUIRED_MEMBERS,
+    SAVE_SCHEMA_VERSION,
 )
 
 BUNDLE_CAP_BYTES = 512 * 1024 * 1024
@@ -75,6 +76,8 @@ IMPORTED_BADGE = {
 _SAFE_STUDY_ID_CHARS = frozenset(
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-"
 )
+SUPPORTED_SAVE_SCHEMA_VERSIONS = frozenset({SAVE_SCHEMA_VERSION})
+SUPPORTED_MEMBER_SCHEMA_VERSIONS = frozenset({MEMBER_SCHEMA_VERSION})
 _IDENTITY_FIELDS = (
     "corpus_version",
     "code_version",
@@ -140,12 +143,18 @@ def import_study_bundle(
     imported_root.mkdir(parents=True, exist_ok=True)
     tmp = Path(mkdtemp(prefix=".import.", dir=imported_root))
     try:
-        parsed, member_names = _extract_bundle_members(source, tmp)
+        member_names = _extract_bundle_members(source, tmp)
+        index_payload = _parse_json_object(
+            ARTIFACT_INDEX_NAME,
+            (tmp / ARTIFACT_INDEX_NAME).read_bytes(),
+        )
         _verify_artifact_index_files(
             tmp,
             member_names,
-            parsed[ARTIFACT_INDEX_NAME],
+            index_payload,
         )
+        _validate_artifact_index_schema_versions(index_payload)
+        parsed = _parse_bundle_json_members(tmp, member_names, index_payload)
 
         manifest = parsed["study.manifest.json"]
         summary = parsed["study.summary.json"]
@@ -406,8 +415,7 @@ def is_imported_path(path: Path | str, runs_root: Path | str) -> bool:
 def _extract_bundle_members(
     source: Path,
     target_root: Path,
-) -> tuple[dict[str, dict[str, Any]], set[str]]:
-    parsed_json: dict[str, dict[str, Any]] = {}
+) -> set[str]:
     _preflight_zip_entry_count(source)
     try:
         archive = zipfile.ZipFile(source)
@@ -448,17 +456,25 @@ def _extract_bundle_members(
                 bundle_cap=remaining_bundle_cap,
             )
             total_uncompressed += actual_size
-            if info.filename.endswith(".json"):
-                parsed_json[info.filename] = _parse_json_object(
-                    info.filename,
-                    (target_root / info.filename).read_bytes(),
-                )
-            elif info.filename.endswith(".jsonl"):
-                _validate_jsonl_member(
-                    info.filename,
-                    (target_root / info.filename).read_bytes(),
-                )
-    return parsed_json, member_names
+    return member_names
+
+
+def _parse_bundle_json_members(
+    root: Path,
+    member_names: set[str],
+    index_payload: Mapping[str, Any],
+) -> dict[str, dict[str, Any]]:
+    parsed_json: dict[str, dict[str, Any]] = {ARTIFACT_INDEX_NAME: dict(index_payload)}
+    for name in sorted(member_names - {ARTIFACT_INDEX_NAME}):
+        if name.endswith(".json"):
+            data = (root / name).read_bytes()
+            payload = _parse_json_object(name, data)
+            _validate_json_member_schema_versions(name, payload)
+            parsed_json[name] = payload
+        elif name.endswith(".jsonl"):
+            data = (root / name).read_bytes()
+            _validate_jsonl_member(name, data)
+    return parsed_json
 
 
 def _preflight_zip_entry_count(source: Path) -> None:
@@ -781,6 +797,70 @@ def _verify_artifact_index_files(
             raise ImportBundleError(f"artifact size mismatch: {name}")
         if str(entry.get("sha256") or "") != _sha256_file(path):
             raise ImportBundleError(f"artifact hash mismatch: {name}")
+
+
+def _validate_artifact_index_schema_versions(index_payload: Mapping[str, Any]) -> None:
+    # Spec §Integrity: the index carries member_schema_version, NOT save_schema_version
+    # (that is a manifest/summary field, validated when those bodies are parsed). Gating
+    # the index on save_schema_version would make this importer stricter than the locked
+    # spec and wrongly reject a spec-valid bundle. member_schema_version stays the
+    # pre-member-parse gate here (index is parsed first, before untrusted member bodies).
+    _require_supported_schema_version(
+        owner=ARTIFACT_INDEX_NAME,
+        field="member_schema_version",
+        raw=index_payload.get("member_schema_version"),
+        supported=SUPPORTED_MEMBER_SCHEMA_VERSIONS,
+    )
+    index_members = index_payload.get("members")
+    if not isinstance(index_members, Mapping):
+        raise ImportBundleError("artifact.index.json members must be an object")
+    for name, entry in index_members.items():
+        if not isinstance(entry, Mapping):
+            raise ImportBundleError(f"artifact.index.json entry must be object: {name}")
+        _require_supported_schema_version(
+            owner=f"artifact.index.json entry {name}",
+            field="member_schema_version",
+            raw=entry.get("member_schema_version"),
+            supported=SUPPORTED_MEMBER_SCHEMA_VERSIONS,
+        )
+
+
+def _validate_json_member_schema_versions(
+    name: str,
+    payload: Mapping[str, Any],
+) -> None:
+    _require_supported_schema_version(
+        owner=name,
+        field="member_schema_version",
+        raw=payload.get("member_schema_version"),
+        supported=SUPPORTED_MEMBER_SCHEMA_VERSIONS,
+    )
+    if name in {"study.manifest.json", "study.summary.json"}:
+        _require_supported_schema_version(
+            owner=name,
+            field="save_schema_version",
+            raw=payload.get("save_schema_version"),
+            supported=SUPPORTED_SAVE_SCHEMA_VERSIONS,
+        )
+
+
+def _require_supported_schema_version(
+    *,
+    owner: str,
+    field: str,
+    raw: Any,
+    supported: frozenset[int],
+) -> int:
+    if raw is None:
+        raise ImportBundleError(f"{owner} missing {field}")
+    if isinstance(raw, bool) or not isinstance(raw, int):
+        raise ImportBundleError(f"{owner} malformed {field}")
+    if raw not in supported:
+        supported_text = ", ".join(str(version) for version in sorted(supported))
+        raise ImportBundleError(
+            f"{owner} unsupported {field}: {raw}; supported: {supported_text}"
+        )
+    return raw
 
 
 def _sha256_file(path: Path) -> str:

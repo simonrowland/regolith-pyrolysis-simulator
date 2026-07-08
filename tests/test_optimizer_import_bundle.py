@@ -26,7 +26,12 @@ from simulator.optimize.import_bundle import (
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.recipe import RecipeSchema
-from simulator.optimize.save_bundle import ARTIFACT_INDEX_NAME, export_study_bundle
+from simulator.optimize.save_bundle import (
+    ARTIFACT_INDEX_NAME,
+    MEMBER_SCHEMA_VERSION,
+    SAVE_SCHEMA_VERSION,
+    export_study_bundle,
+)
 from web import routes as web_routes
 
 
@@ -308,8 +313,8 @@ def _members(
 ) -> dict[str, bytes]:
     schema = _schema()
     summary = {
-        "member_schema_version": 1,
-        "save_schema_version": 1,
+        "member_schema_version": MEMBER_SCHEMA_VERSION,
+        "save_schema_version": SAVE_SCHEMA_VERSION,
         "study_id": study_id,
         "feedstock_id": "lunar_mare_low_ti",
         "profile_id": "oxygen-yield-v1",
@@ -318,8 +323,8 @@ def _members(
     }
     summary.update(summary_extra or {})
     manifest = {
-        "member_schema_version": 1,
-        "save_schema_version": 1,
+        "member_schema_version": MEMBER_SCHEMA_VERSION,
+        "save_schema_version": SAVE_SCHEMA_VERSION,
         "study_id": study_id,
         "study_status": study_status,
         "created_at": "2026-07-08T00:00:00+00:00",
@@ -358,14 +363,22 @@ def _members(
             code_version=code_version,
             rows=sqlite_rows,
         ),
-        "pareto.json": _json_bytes({"member_schema_version": 1, "pareto": []}),
+        "pareto.json": _json_bytes(
+            {"member_schema_version": MEMBER_SCHEMA_VERSION, "pareto": []}
+        ),
         "leaderboard.csv": _leaderboard_bytes(
             oxygen=oxygen,
             patch=leaderboard_patch,
             patch_json=leaderboard_patch_json,
             rows=leaderboard_rows,
         ),
-        "job_status.json": _json_bytes({"status": "SUCCEEDED", "success": True}),
+        "job_status.json": _json_bytes(
+            {
+                "member_schema_version": MEMBER_SCHEMA_VERSION,
+                "status": "SUCCEEDED",
+                "success": True,
+            }
+        ),
     }
 
 
@@ -373,7 +386,13 @@ def _json_bytes(payload: dict[str, object]) -> bytes:
     return (json.dumps(payload, sort_keys=True, allow_nan=False) + "\n").encode("utf-8")
 
 
-def _write_zip(path: Path, members: dict[str, bytes], extra: dict[str, bytes] | None = None) -> Path:
+def _write_zip(
+    path: Path,
+    members: dict[str, bytes],
+    extra: dict[str, bytes] | None = None,
+    *,
+    member_schema_version: int = MEMBER_SCHEMA_VERSION,
+) -> Path:
     payload = dict(members)
     if extra:
         payload.update(extra)
@@ -381,14 +400,17 @@ def _write_zip(path: Path, members: dict[str, bytes], extra: dict[str, bytes] | 
         name: {
             "sha256": hashlib.sha256(data).hexdigest(),
             "size_bytes": len(data),
-            "member_schema_version": 1,
+            "member_schema_version": member_schema_version,
             "producer_code_version": current_code_version(),
         }
         for name, data in payload.items()
         if name != ARTIFACT_INDEX_NAME
     }
     payload[ARTIFACT_INDEX_NAME] = _json_bytes(
-        {"member_schema_version": 1, "members": index_members}
+        {
+            "member_schema_version": member_schema_version,
+            "members": index_members,
+        }
     )
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for name, data in payload.items():
@@ -402,6 +424,68 @@ def _export_bundle(tmp_path: Path, members: dict[str, bytes]) -> Path:
     for name, data in members.items():
         (run_dir / name).write_bytes(data)
     return export_study_bundle(run_dir, output_path=tmp_path / f"{run_dir.name}.rpstudy.zip")
+
+
+def test_import_accepts_current_schema_version_bundle(tmp_path: Path) -> None:
+    bundle = _write_zip(tmp_path / "current-version.rpstudy.zip", _members(tmp_path))
+
+    imported = import_study_bundle(
+        bundle,
+        tmp_path / "runs",
+        verification_tier=0,
+        evaluator=_evaluator(oxygen=10.0),
+    )
+
+    assert imported.study_id == "study123"
+
+
+def test_import_rejects_unsupported_member_schema_version_before_member_parse(
+    tmp_path: Path,
+) -> None:
+    # The artifact.index member_schema_version gate runs BEFORE any untrusted member body
+    # is JSON-parsed: a corrupt manifest body must NOT be reached when the index already
+    # declares an unsupported member schema. (save_schema_version is a manifest/summary
+    # field, not an index field — Spec §Integrity — so the surviving pre-parse gate is
+    # member_schema_version, validated from the index that is parsed first.)
+    members = _members(tmp_path)
+    members["study.manifest.json"] = b"{not valid json"
+    bundle = _write_zip(
+        tmp_path / "bad-member-schema-pre-parse.rpstudy.zip",
+        members,
+        member_schema_version=999,
+    )
+
+    with pytest.raises(
+        ImportBundleError,
+        match="unsupported member_schema_version",
+    ):
+        import_study_bundle(bundle, tmp_path / "runs", evaluator=_evaluator(oxygen=10.0))
+
+
+def test_import_rejects_unsupported_manifest_save_schema_version(
+    tmp_path: Path,
+) -> None:
+    bundle = _write_zip(
+        tmp_path / "bad-manifest-save-schema.rpstudy.zip",
+        _members(tmp_path, manifest_extra={"save_schema_version": 999}),
+    )
+
+    with pytest.raises(
+        ImportBundleError,
+        match="study.manifest.json unsupported save_schema_version",
+    ):
+        import_study_bundle(bundle, tmp_path / "runs", evaluator=_evaluator(oxygen=10.0))
+
+
+def test_import_rejects_unsupported_member_schema_version(tmp_path: Path) -> None:
+    bundle = _write_zip(
+        tmp_path / "bad-member-schema.rpstudy.zip",
+        _members(tmp_path),
+        member_schema_version=999,
+    )
+
+    with pytest.raises(ImportBundleError, match="unsupported member_schema_version"):
+        import_study_bundle(bundle, tmp_path / "runs", evaluator=_evaluator(oxygen=10.0))
 
 
 def test_import_rejects_unknown_member(tmp_path: Path) -> None:
