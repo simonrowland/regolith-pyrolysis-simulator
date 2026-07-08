@@ -4,19 +4,19 @@
       "dose_consumed_kg": 0.0,
       "dose_feo_reduced_mol": 0.0,
       "dose_fraction": 0.0,
-      "native_fe_pool_mol": 760.2642461342376
+      "native_fe_pool_mol": 760.2572487720322
     },
     {
       "dose_consumed_kg": 18.116070127696766,
       "dose_feo_reduced_mol": 394.00286942977016,
       "dose_fraction": 0.5,
-      "native_fe_pool_mol": 1968.8418360567205
+      "native_fe_pool_mol": 1968.840979344341
     },
     {
       "dose_consumed_kg": 36.23214025539353,
       "dose_feo_reduced_mol": 788.0057388595403,
       "dose_fraction": 1.0,
-      "native_fe_pool_mol": 1576.0073981701114
+      "native_fe_pool_mol": 1576.0073936609833
     }
   ],
   "grid_expected_row_count": 36,
@@ -28,7 +28,7 @@
       "fO2_log": -9.0,
       "feedstock": "lunar_mare_low_ti",
       "mode": "manual_fO2_diagnostic_anchor",
-      "native_fe_frac": 0.012467999513236896,
+      "native_fe_frac": 0.012467868381143766,
       "reference_abs_tolerance": 5e-06,
       "reference_native_fe_frac": 0.012467999513236896,
       "reference_note": "recorded forced-reduction native_frac_before at 1600 C",
@@ -40,7 +40,7 @@
       "fO2_log": -9.5,
       "feedstock": "lunar_mare_low_ti",
       "mode": "manual_fO2_diagnostic_anchor",
-      "native_fe_frac": 0.4400115588436534,
+      "native_fe_frac": 0.4400078512483836,
       "reference_abs_tolerance": 0.0005,
       "reference_native_fe_frac": 0.44,
       "reference_note": "recorded manual fO2 curve native fraction, 44.0 percent at 1600 C",
@@ -49,39 +49,39 @@
     }
   ],
   "owner_pn2_row": {
-    "SiO_flux_kg_hr": 0.008290381147252182,
+    "SiO_flux_kg_hr": 0.008290381144777561,
     "classification": "certification_pass",
     "dose_fraction": 1.0,
-    "native_fe_pool_mol": 1576.0073981701114,
-    "native_fe_tap_mol": 1574.987439370071,
-    "native_fe_vapor_escape_fraction_of_pool": 0.0006471789416882211,
+    "native_fe_pool_mol": 1576.0073936609833,
+    "native_fe_tap_mol": 1574.9874348609428,
+    "native_fe_vapor_escape_fraction_of_pool": 0.0006471789435398702,
     "native_fe_vapor_mol": 1.0199588000405395,
     "owner_recipe_pass": true,
     "pN2_mbar": 10.0,
     "pO2_mbar": 1e-06,
-    "stage_3_Fe_wt_pct": 48.6636600989565,
+    "stage_3_Fe_wt_pct": 48.663660106413495,
     "temperature_C": 1650.0
   },
   "pN2_monotonic_slice": [
     {
-      "native_fe_vapor_escape_fraction_of_pool": 0.0006471789416882211,
+      "native_fe_vapor_escape_fraction_of_pool": 0.0006471789435398702,
       "pN2_mbar": 10.0
     }
   ],
   "pO2_sio_suppression_slice": [
     {
-      "SiO_flux_kg_hr": 0.008290381147252182,
-      "native_fe_pool_mol": 1576.0073981701114,
-      "native_fe_tap_mol": 1574.987439370071,
+      "SiO_flux_kg_hr": 0.008290381144777561,
+      "native_fe_pool_mol": 1576.0073936609833,
+      "native_fe_tap_mol": 1574.9874348609428,
       "pO2_mbar": 1e-06
     },
     {
-      "SiO_flux_kg_hr": 7.596776963408335e-06,
-      "native_fe_pool_mol": 1576.0073981702685,
-      "native_fe_tap_mol": 1575.0624531406845,
+      "SiO_flux_kg_hr": 7.596776961140721e-06,
+      "native_fe_pool_mol": 1576.0073936611404,
+      "native_fe_tap_mol": 1575.0624486315564,
       "pO2_mbar": 1.0
     }
   ],
   "schema_version": "sso-r-validation-map-golden-v2",
-  "source_commit": "cf5d1494f10d"
+  "source_commit": "8b230033b83d"
 }
