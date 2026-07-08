@@ -68,11 +68,11 @@ This guide is for contributors and coding agents that need to find the right fil
   | `engines/builtin/metallothermic_step.py` | `BuiltinMetallothermicStepProvider` | `METALLOTHERMIC_STEP` | authoritative, ledger-mutating | `process.cleaned_melt`, `process.metal_phase`, `process.reagent_inventory` |
   | `engines/builtin/stage0_pretreatment.py` | `BuiltinStage0PretreatmentProvider` | `STAGE0_PRETREATMENT` | authoritative, ledger-mutating | nine Stage 0 feed/sink accounts (`process.stage0_*`, `reservoir.stage0_*`, `terminal.offgas`, `terminal.stage0_salt_phase`, `terminal.oxygen_stage0_stored`) |
 
-- `engines/magemin/__init__.py` re-exports the MAGEMin shadow scaffold (`MAGEMinShadowProvider`, `MAGEMinDomainGate`, `MAGEMinParityComparator`, `ParityReport`).
-- `engines/magemin/provider.py` is the forward-declared `MAGEMinShadowProvider` scaffold; not yet wired and `dispatch()` raises `NotImplementedError` pending the kernel carve-out.
+- `engines/magemin/__init__.py` re-exports the MAGEMin shadow provider surface (`MAGEMinShadowProvider`, `MAGEMinDomainGate`, `MAGEMinParityComparator`, `ParityReport`).
+- `engines/magemin/provider.py` is the registered `MAGEMinShadowProvider` kernel shadow provider. Its capability profile declares `SILICATE_LIQUIDUS`, `SILICATE_EQUILIBRIUM`, and `GATE_LIQUID_FRACTION`; only `GATE_LIQUID_FRACTION` is fallback-authoritative, and `dispatch()` returns `IntentResult` diagnostics, including `unsupported` for wrong intents.
 - `engines/magemin/domain.py` is the `MAGEMinDomainGate` composition-range gate (14-oxide MELTS basis).
 - `engines/magemin/parity.py` is the `MAGEMinParityComparator` shadow-vs-authoritative comparator (±50 K liquidus, ±2 wt% modal).
-- `engines/magemin/README.md` documents the deliberate two-path split: the `simulator/melt_backend/magemin.py` today-hook adapter is the live call site, while `engines/magemin/` is the kernel-shadow provider scaffold that delegates to it.
+- `engines/magemin/README.md` documents the deliberate two-path split: `simulator/melt_backend/magemin.py` remains the backend adapter, while `engines/magemin/` is the registered kernel-shadow provider package that delegates to it.
 
 ## Chemistry Kernel
 
@@ -104,7 +104,7 @@ This guide is for contributors and coding agents that need to find the right fil
 - `tests/test_feedstock_inventory.py` validates feedstock inventory loading and balance enforcement.
 - `tests/test_alphamelts_backend.py` exercises the alphaMELTS backend wiring and subprocess paths.
 - `tests/test_magemin_backend.py` defends the MAGEMin today-hook adapter (`MeltBackend`) contract.
-- `tests/test_magemin_shadow_provider.py` covers the `engines/magemin/` kernel-shadow scaffold (domain gate, parity comparator, `dispatch()` raising).
+- `tests/test_magemin_shadow_provider.py` covers the `engines/magemin/` kernel-shadow provider surface (domain gate, parity comparator, capability profile, diagnostic shape, and dispatch-level writer purity).
 - `tests/test_vaporock_backend.py` exercises the VapoRock vapor-speciation backend adapter.
 - `tests/test_backend_kg_adapters.py` checks backend kg adapters against the mol-native contract.
 - `tests/test_debug_feedstocks.py` checks debug feedstocks stay hidden by default behind the debug env flags.

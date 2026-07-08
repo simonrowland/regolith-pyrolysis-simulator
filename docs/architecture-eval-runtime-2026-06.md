@@ -1,7 +1,7 @@
 # Eval runtime architecture (post G9.7)
 
-**Status:** target design — documents the optimizer / batch eval plane **after** G9.6 profiler and G9.7 persistent workers land.  
-**As of:** 2026-06-05 (planned; not yet implemented).  
+**Status:** implemented runtime — documents the optimizer / batch eval plane with G9.7 warm workers live in `simulator/optimize/worker_runtime.py` and injected by `simulator/optimize/pool.py`.  
+**As of:** 2026-06-05 design; updated to implemented code reality in 2026-07 live modules.  
 **Companion:** live web + interactive sim remain in [`architecture.md`](architecture.md). This doc covers **CLI optimizer, fidelity DOE, Mac Studio precompute, and Book full job** economics.
 
 ---
@@ -19,7 +19,7 @@ G9.7 addresses (1–3) with **warm worker processes**. PT-1 / `results_store` / 
 
 ---
 
-## Runtime shape (target)
+## Runtime shape (implemented)
 
 ```text
 Operator / batch script (cli, run_fidelity_doe, populate_reduced_real_cache)
@@ -34,7 +34,7 @@ evaluate_batch (pool.py)  -- ProcessPoolExecutor, W workers
   |
   |  per worker (once, after fork/spawn):
   |    pin_worker_env()
-  |    WorkerEvalContext.warm(backend_name)  --> AlphaMELTSBackend + ThermoEngine transport
+  |    warm_worker_runtime(backend_name, ...) --> WorkerEvalContext + warmed backend/transport
   |
   |  per task:
   v
@@ -99,23 +99,29 @@ def clear_worker_runtime() -> None: ...  # tests + rollback
 
 ---
 
-## API injection (target signatures)
+## API injection (landed signatures)
 
 ```python
-# session.py
+# simulator/session.py
 def start(self, config: SimSessionConfig, *, backend: Any | None = None) -> SimSession:
     # backend is None -> resolve_backend(...) as today
     # backend set -> skip resolve; still validate policy once at worker warm
 
-# evaluate.py
+# simulator/optimize/evaluate.py
 def evaluate(..., worker_runtime: WorkerEvalContext | None = None) -> ScoredResult:
     # worker_runtime from get_worker_runtime() when called inside pool task
 
-# run_executor.py
-def execute(self, config: SimSessionConfig, *, backend: Any | None = None) -> RunExecution:
+# simulator/run_executor.py
+def execute(
+    self,
+    config: SimSessionConfig,
+    *,
+    worker_runtime: WorkerEvalContext | None = None,
+) -> RunExecution:
+    # passes _backend_from_worker_runtime(config, worker_runtime) into SimSession.start(...)
 ```
 
-Pool tasks call `evaluate(...)`; `evaluate` pulls `worker_runtime` from argument or `get_worker_runtime()`.
+Pool tasks call `evaluate(...)`; `pool._evaluate_pool_task` passes `worker_runtime=get_worker_runtime(...)`, and `evaluate` falls back to `get_worker_runtime()` when no explicit runtime is supplied.
 
 ---
 
