@@ -1,0 +1,21 @@
+<div class="advisory-panel" data-vapor-pressure-authority-panel>
+    <div class="advisory-panel-header">
+        <h3>Vapor Pressure Authority</h3>
+        <span class="advisory-state advisory-state-{{ vapor_pressure_authority.status }}">{{ vapor_pressure_authority.status }}</span>
+    </div>
+    {% if vapor_pressure_authority.status == 'n/a' %}
+    <div class="advisory-empty">n/a</div>
+    {% else %}
+    <div class="advisory-result">
+        <div class="advisory-result-title">{{ vapor_pressure_authority.status }}</div>
+        <div>{{ vapor_pressure_authority.message }}</div>
+        {% if vapor_pressure_authority.reason %}
+        <div>Reason: {{ vapor_pressure_authority.reason }}</div>
+        {% endif %}
+        {% if vapor_pressure_authority.fallback_source %}
+        <div>Fallback source: {{ vapor_pressure_authority.fallback_source }}</div>
+        {% endif %}
+        <div>Diagnostic only: {{ vapor_pressure_authority.diagnostic_only }}</div>
+    </div>
+    {% endif %}
+</div>

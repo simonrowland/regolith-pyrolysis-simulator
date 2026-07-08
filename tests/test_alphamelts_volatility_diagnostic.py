@@ -211,6 +211,48 @@ def test_source_clamped_operating_point_marks_extrapolation_limited():
     )
 
 
+def test_source_vapor_pressure_facet_fallback_surfaces_diagnostic_only_limit():
+    def fallback_source(**kwargs):
+        del kwargs
+        return {
+            "status": "ok",
+            "activity_coefficients": {"SiO2": 0.25},
+            "diagnostics": {
+                "vapor_pressure_backend_status": "fallback",
+                "vapor_pressure_backend_status_reason": (
+                    "vaporock_to_antoine_fallback"
+                ),
+                "vapor_pressure_fallback_source": (
+                    "antoine_fallback_from_vaporock"
+                ),
+                "authoritative_for_requested_vapor_pressure": False,
+            },
+        }
+
+    diagnostic = alphamelts_activity_volatility_diagnostic(
+        composition_wt_pct=_domain_composition(),
+        pO2_grid_bar=[1e-9],
+        temperature_C=1500.0,
+        activity_source=fallback_source,
+        vapor_pressure_data=_SIO_VAPOR_DATA,
+    )
+
+    limits = diagnostic["activity_source_extrapolation_limits"]
+    assert diagnostic["diagnostic_only"] is True
+    assert diagnostic["extrapolation_limited"] is True
+    assert "activity_sample_0" not in limits
+    assert limits["vapor_pressure_sample_0"] == {
+        "vapor_pressure_backend_status": "fallback",
+        "vapor_pressure_backend_status_reason": (
+            "vaporock_to_antoine_fallback"
+        ),
+        "vapor_pressure_fallback_source": "antoine_fallback_from_vaporock",
+        "authority_status": "vapor_pressure_facet_degraded",
+        "diagnostic_only": True,
+        "diagnostics": diagnostic["activity_samples"]["primary"]["diagnostics"],
+    }
+
+
 def test_pressure_insensitivity_gate_passes_matched_and_flags_mismatch():
     matched = StubActivitySource(
         {

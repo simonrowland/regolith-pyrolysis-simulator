@@ -26,6 +26,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -43,6 +44,7 @@ from simulator.runner import (
     RUNNER_SCHEMA_VERSION,
     RunnerError,
     _c3_alkali_dosing_kg_by_species,
+    _vapor_pressure_source_report,
 )
 
 
@@ -553,6 +555,79 @@ def _assert_schema_shape(payload: dict) -> None:
     assert payload["status"] in ("ok", "partial", "failed", "refused")
     assert isinstance(payload["reason"], str)
     assert isinstance(payload["error_message"], str)
+
+
+def test_vapor_pressure_source_report_adds_separate_facet_status_summary():
+    sim = SimpleNamespace(
+        _last_vapor_pressures_source={
+            "Na": "builtin_authoritative:legacy_pure_component_estimate",
+            "SiO": "builtin_authoritative:standard_reaction_term",
+        },
+        _last_backend_diagnostics={
+            "vapor_pressure_backend_status": "fallback",
+            "vapor_pressure_backend_status_reason": (
+                "vaporock_to_antoine_fallback"
+            ),
+            "vapor_pressure_fallback_source": (
+                "antoine_fallback_from_vaporock"
+            ),
+            "authoritative_for_requested_vapor_pressure": False,
+        },
+    )
+
+    report = _vapor_pressure_source_report(sim)
+
+    assert report["summary"] == {
+        "builtin_authoritative:legacy_pure_component_estimate": {
+            "count": 1,
+            "percentage": 50.0,
+        },
+        "builtin_authoritative:standard_reaction_term": {
+            "count": 1,
+            "percentage": 50.0,
+        },
+    }
+    assert report["vapor_pressure_backend_status"] == "fallback"
+    assert report["vapor_pressure_backend_status_summary"] == {
+        "fallback": {"count": 2, "percentage": 100.0}
+    }
+    assert (
+        report["vapor_pressure_backend_status_reason"]
+        == "vaporock_to_antoine_fallback"
+    )
+    assert (
+        report["vapor_pressure_fallback_source"]
+        == "antoine_fallback_from_vaporock"
+    )
+    assert report["authoritative_for_requested_vapor_pressure"] is False
+
+
+def test_vapor_pressure_source_report_surfaces_not_attempted():
+    # SC-03 (t-121): a production CONSUMER — the runner vapor-provenance report — must READ +
+    # surface the 'not_attempted' facet status, not merely have the backend emit it. Without a
+    # consumer-level assertion the marker could be produced-but-never-surfaced dead metadata.
+    sim = SimpleNamespace(
+        _last_vapor_pressures_source={
+            "Na": "builtin_authoritative:legacy_pure_component_estimate",
+        },
+        _last_backend_diagnostics={
+            "vapor_pressure_backend_status": "not_attempted",
+            "vapor_pressure_backend_status_reason": (
+                "vaporock_unavailable_not_attempted"
+            ),
+        },
+    )
+
+    report = _vapor_pressure_source_report(sim)
+
+    assert report["vapor_pressure_backend_status"] == "not_attempted"
+    assert report["vapor_pressure_backend_status_summary"] == {
+        "not_attempted": {"count": 1, "percentage": 100.0}
+    }
+    assert (
+        report["vapor_pressure_backend_status_reason"]
+        == "vaporock_unavailable_not_attempted"
+    )
 
 
 def _assert_mass_balance_bound(payload: dict) -> None:

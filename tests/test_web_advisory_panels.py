@@ -23,8 +23,54 @@ def test_dashboard_renders_advisory_panels(client) -> None:
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert 'id="wall-risk-panel"' in html
+    assert 'id="vapor-pressure-authority-panel"' in html
     assert 'id="ceramic-rump-panel"' in html
     assert "simulator-advisory.js" in html
+
+
+def test_vapor_pressure_authority_payload_surfaces_fallback() -> None:
+    payload = advisory.vapor_pressure_authority_payload(
+        {
+            "vapor_pressure_backend_status": "fallback",
+            "vapor_pressure_backend_status_reason": (
+                "vaporock_to_antoine_fallback"
+            ),
+            "vapor_pressure_fallback_source": (
+                "antoine_fallback_from_vaporock"
+            ),
+            "authoritative_for_requested_vapor_pressure": False,
+        }
+    )
+
+    assert payload["status"] == "fallback"
+    assert payload["reason"] == "vaporock_to_antoine_fallback"
+    assert payload["fallback_source"] == "antoine_fallback_from_vaporock"
+    assert payload["authoritative_for_requested_vapor_pressure"] is False
+    assert payload["diagnostic_only"] is True
+
+
+def test_vapor_pressure_authority_api_and_panel_render_fallback(client) -> None:
+    query = (
+        "vapor_pressure_backend_status=fallback"
+        "&vapor_pressure_backend_status_reason=vaporock_to_antoine_fallback"
+        "&vapor_pressure_fallback_source=antoine_fallback_from_vaporock"
+        "&authoritative_for_requested_vapor_pressure=false"
+    )
+
+    response = client.get(f"/api/vapor-pressure-authority?{query}")
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["status"] == "fallback"
+    assert payload["authoritative_for_requested_vapor_pressure"] is False
+
+    html = client.get(
+        f"/partials/vapor-pressure-authority-panel?{query}"
+    ).get_data(as_text=True)
+    assert "data-vapor-pressure-authority-panel" in html
+    assert "fallback" in html
+    assert "VapoRock returned no usable vapor pressures" in html
+    assert "Diagnostic only: True" in html
 
 
 def test_wall_risk_api_and_panel_render_uncharacterized_without_rating(

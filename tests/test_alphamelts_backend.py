@@ -2466,11 +2466,97 @@ def test_thermoengine_vaporock_empty_fallback_marks_vapor_facet_degraded():
         eq.diagnostics['vapor_pressure_backend_status_reason']
         == 'vaporock_to_antoine_fallback'
     )
+    assert (
+        eq.diagnostics['vapor_pressure_fallback_source']
+        == 'antoine_fallback_from_vaporock'
+    )
     assert eq.diagnostics['authoritative_for_requested_vapor_pressure'] is False
+    assert eq.vapor_pressures_source == {
+        'Na': 'antoine_fallback_from_vaporock:legacy_pure_component_estimate',
+    }
     assert eq.vapor_pressures_source['Na'].startswith(
         'antoine_fallback_from_vaporock:'
     )
     assert set(eq.vapor_pressures_source.values()) != {'vaporock'}
+
+
+def test_thermoengine_vaporock_unavailable_marks_not_attempted_without_churn():
+    from engines.alphamelts.thermoengine import ThermoEnginePayload
+
+    solved_liquid = {'SiO2': 44.0, 'FeO': 17.0, 'Na2O': 0.5}
+
+    class FakeTransport:
+        def equilibrate(self, *, temperature_C, pressure_bar, comp_wt, warnings):
+            return ThermoEnginePayload(
+                phases_present=('liquid',),
+                phase_masses_kg={'liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct=dict(solved_liquid),
+                activity_coefficients={'Na2O': 0.2},
+                fe_redox_split={},
+            )
+
+    backend = AlphaMELTSBackend()
+    backend._mode = 'thermoengine'
+    backend._thermoengine_transport = FakeTransport()
+    backend._vaporock_available = False
+    backend._vapor_pressure_table = {
+        'Na': {
+            'fit_target': 'pure_component_psat',
+            'residual_dex': 0.01,
+            'confidence_tier': 'high',
+            'antoine': {'A': 4.0, 'B': 0.0, 'C': 0.0},
+        },
+    }
+
+    eq = backend.equilibrate(
+        temperature_C=1600.0,
+        composition_kg={
+            'SiO2': 45.0,
+            'FeO': 18.0,
+            'MgO': 9.0,
+            'CaO': 11.0,
+            'Al2O3': 12.0,
+            'Na2O': 4.0,
+            'K2O': 1.0,
+        },
+        fO2_log=-7.96,
+        pressure_bar=1e-6,
+    )
+
+    assert eq.status == 'ok'
+    assert eq.diagnostics.get('backend_status') != 'out_of_domain'
+    assert eq.diagnostics['vapor_pressure_backend_status'] == 'not_attempted'
+    assert (
+        eq.diagnostics['vapor_pressure_backend_status_reason']
+        == 'vaporock_unavailable_not_attempted'
+    )
+    assert 'vapor_pressure_fallback_source' not in eq.diagnostics
+    assert 'authoritative_for_requested_vapor_pressure' not in eq.diagnostics
+    assert eq.vapor_pressures_Pa == {'Na': pytest.approx(2000.0)}
+    assert eq.vapor_pressures_source == {
+        'Na': 'thermoengine:legacy_pure_component_estimate',
+    }
+
+
+def test_vapor_pressure_diagnostics_marks_not_attempted_on_empty_pressures():
+    # t-121 empty-pressures gap: when VapoRock is unavailable AND pressures come out empty,
+    # the facet backend_status must STILL be 'not_attempted' so the operator panel is not
+    # stuck at 'n/a' (indistinguishable from an authoritative VapoRock-succeeded result).
+    backend = AlphaMELTSBackend()
+    backend._vaporock_available = False
+
+    payload = backend._vapor_pressure_diagnostics(
+        diagnostics={},
+        pressures={},                    # empty — e.g. no volatile species in the melt
+        source='antoine_internal',       # NOT an antoine_fallback_from_vaporock source
+    )
+
+    assert payload['vapor_pressure_backend_status'] == 'not_attempted'
+    assert (
+        payload['vapor_pressure_backend_status_reason']
+        == 'vaporock_unavailable_not_attempted'
+    )
 
 
 def test_dead_uppercase_vaporock_stub_is_gone_from_source():

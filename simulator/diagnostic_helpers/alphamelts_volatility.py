@@ -683,6 +683,13 @@ def _source_extrapolation_limits(*samples: Mapping[str, Any]) -> dict[str, Any]:
             sample.get("backend_status_reason")
             or diagnostics.get("backend_status_reason")
         )
+        vapor_pressure_status = reason_value(
+            diagnostics.get("vapor_pressure_backend_status")
+        )
+        vapor_pressure_degraded = (
+            vapor_pressure_status in {"fallback", "not_attempted"}
+            or diagnostics.get("authoritative_for_requested_vapor_pressure") is False
+        )
         if (
             sample.get("status") == "out_of_domain"
             or diagnostics.get("authoritative_for_requested_conditions") is False
@@ -691,6 +698,20 @@ def _source_extrapolation_limits(*samples: Mapping[str, Any]) -> dict[str, Any]:
             limits[f"activity_sample_{idx}"] = {
                 "backend_status_reason": reason or "clamped_operating_point",
                 "authority_status": "extrapolation_limited",
+                "diagnostics": diagnostics,
+            }
+        if vapor_pressure_degraded:
+            status = vapor_pressure_status or "fallback"
+            limits[f"vapor_pressure_sample_{idx}"] = {
+                "vapor_pressure_backend_status": status,
+                "vapor_pressure_backend_status_reason": reason_value(
+                    diagnostics.get("vapor_pressure_backend_status_reason")
+                ),
+                "vapor_pressure_fallback_source": reason_value(
+                    diagnostics.get("vapor_pressure_fallback_source")
+                ),
+                "authority_status": "vapor_pressure_facet_degraded",
+                "diagnostic_only": True,
                 "diagnostics": diagnostics,
             }
     return limits

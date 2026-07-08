@@ -49,6 +49,7 @@ from web.advisory import (
     active_wall_species_from_flue,
     ceramic_rump_payload,
     oxide_wt_pct_from_kg,
+    vapor_pressure_authority_payload,
     wall_advisory_payload,
 )
 
@@ -681,6 +682,9 @@ def _tick_payload(
             # pressure is what sets the transport (Knudsen) regime.
             p_buffer_mbar=max(sim.melt.p_total_mbar - sim.melt.pO2_mbar, 0.0),
         ),
+        'vapor_pressure_authority_panel': vapor_pressure_authority_payload(
+            getattr(sim, '_last_backend_diagnostics', {}) or {}
+        ),
         'overlap_evaporation': (
             getattr(sim, '_last_overlap_evaporation_diagnostic', {}) or {}
         ),
@@ -801,6 +805,9 @@ def _completion_payload(sim):
         'terminal_rump_by_class': sim._terminal_rump_by_class(),
         'ceramic_rump_panel': ceramic_rump_payload(
             terminal_rump_composition_wt_pct
+        ),
+        'vapor_pressure_authority_panel': vapor_pressure_authority_payload(
+            getattr(sim, '_last_backend_diagnostics', {}) or {}
         ),
         'stage_purity_report': stage_purity_report(sim.train),
         'knudsen_regime_diagnostic': _knudsen_regime_diagnostic_from_sim(sim),

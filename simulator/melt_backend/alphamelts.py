@@ -2777,6 +2777,16 @@ class AlphaMELTSBackend(MeltBackend):
                 'antoine_fallback_from_vaporock'
             )
             payload['authoritative_for_requested_vapor_pressure'] = False
+        elif not self._vaporock_available:
+            # Mark 'not_attempted' whenever VapoRock was never available — INCLUDING the
+            # empty-pressures case. The complementary zero_reason (from
+            # _vapor_pressure_zero_diagnostics above) explains WHY pressures are empty; this
+            # facet backend_status separately reports the VapoRock backend was never tried, so
+            # an operator can distinguish "unavailable (never attempted)" from authoritative.
+            payload['vapor_pressure_backend_status'] = 'not_attempted'
+            payload['vapor_pressure_backend_status_reason'] = (
+                'vaporock_unavailable_not_attempted'
+            )
         return payload
 
     def _activities_times_antoine(self, T_C: float,

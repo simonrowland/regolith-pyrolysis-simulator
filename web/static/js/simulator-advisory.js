@@ -1,5 +1,5 @@
 /**
- * Wall-risk and ceramic-rump advisory panel renderers.
+ * Diagnostic advisory panel renderers.
  */
 
 function advisorySetText(id, text) {
@@ -217,13 +217,51 @@ function appendCeramicLine(parent, label, value) {
     parent.appendChild(line);
 }
 
+function renderVaporPressureAuthorityPanel(payload) {
+    const content = document.getElementById('vapor-pressure-authority-content');
+    if (!content) return;
+    const status = payload && payload.status ? payload.status : 'n/a';
+    updateAdvisoryState('vapor-pressure-authority-state', status);
+    advisoryClear(content);
+    if (!payload || status === 'n/a') {
+        content.className = 'advisory-empty';
+        content.textContent = 'n/a';
+        return;
+    }
+
+    content.className = 'advisory-result';
+    const title = document.createElement('div');
+    title.className = 'advisory-result-title';
+    title.textContent = status;
+    content.appendChild(title);
+    appendCeramicLine(content, 'Message', payload.message || 'n/a');
+    if (payload.reason) appendCeramicLine(content, 'Reason', payload.reason);
+    if (payload.fallback_source) {
+        appendCeramicLine(content, 'Fallback source', payload.fallback_source);
+    }
+    if (
+        payload.authoritative_for_requested_vapor_pressure !== null
+        && payload.authoritative_for_requested_vapor_pressure !== undefined
+    ) {
+        appendCeramicLine(
+            content,
+            'Requested vapor authority',
+            String(payload.authoritative_for_requested_vapor_pressure)
+        );
+    }
+    appendCeramicLine(content, 'Diagnostic only', String(!!payload.diagnostic_only));
+}
+
 socket.on('simulation_tick', (data) => {
     renderWallRiskPanel(data.wall_risk_panel);
+    renderVaporPressureAuthorityPanel(data.vapor_pressure_authority_panel);
 });
 
 socket.on('simulation_complete', (data) => {
     renderCeramicRumpPanel(data.ceramic_rump_panel);
+    renderVaporPressureAuthorityPanel(data.vapor_pressure_authority_panel);
 });
 
 window.renderWallRiskPanel = renderWallRiskPanel;
 window.renderCeramicRumpPanel = renderCeramicRumpPanel;
+window.renderVaporPressureAuthorityPanel = renderVaporPressureAuthorityPanel;

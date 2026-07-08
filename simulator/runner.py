@@ -1201,7 +1201,7 @@ def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
     }
     total = len(source_by_species)
     counts = Counter(source_by_species.values())
-    return {
+    report: dict[str, object] = {
         "species": source_by_species,
         "summary": {
             source: {
@@ -1212,6 +1212,26 @@ def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
         },
         "total_species": total,
     }
+    diagnostics = dict(getattr(sim, "_last_backend_diagnostics", {}) or {})
+    facet_status = str(
+        diagnostics.get("vapor_pressure_backend_status") or ""
+    ).strip()
+    if facet_status:
+        report["vapor_pressure_backend_status"] = facet_status
+        report["vapor_pressure_backend_status_summary"] = {
+            facet_status: {
+                "count": total,
+                "percentage": 100.0 if total else 0.0,
+            }
+        }
+        for key in (
+            "vapor_pressure_backend_status_reason",
+            "vapor_pressure_fallback_source",
+            "authoritative_for_requested_vapor_pressure",
+        ):
+            if key in diagnostics:
+                report[key] = diagnostics[key]
+    return report
 
 
 def _finite_export_float(value: Any, *, field: str) -> float:

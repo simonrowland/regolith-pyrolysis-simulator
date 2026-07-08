@@ -1,4 +1,4 @@
-"""Web payload adapters for wall and ceramic advisory panels."""
+"""Web payload adapters for diagnostic advisory panels."""
 
 from __future__ import annotations
 
@@ -31,6 +31,7 @@ WALL_ZONE_LABELS = {
 }
 _NON_DEPOSIT_FLUE_SPECIES = {"O2", "N2", "CO2"}
 _OXIDE_FORMULA_RE = re.compile(r"^(?:[A-Z][a-z]?\d*)*O\d*$")
+_VAPOR_PRESSURE_FACET_PANEL_STATUSES = {"fallback", "not_attempted"}
 
 
 def active_wall_species_from_flue(
@@ -133,6 +134,46 @@ def ceramic_rump_payload(
         kwargs["tolerance_wt_pct"] = float(tolerance_wt_pct)
     classification = classify_ceramic_rump(composition, **kwargs)
     return _ceramic_classification_payload(classification, composition)
+
+
+def vapor_pressure_authority_payload(
+    diagnostics: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    diagnostic = dict(diagnostics or {}) if isinstance(diagnostics, Mapping) else {}
+    status = _string_or_none(diagnostic.get("vapor_pressure_backend_status"))
+    if status not in _VAPOR_PRESSURE_FACET_PANEL_STATUSES:
+        return {
+            "status": "n/a",
+            "message": "n/a",
+            "diagnostic_only": True,
+        }
+
+    if status == "fallback":
+        message = (
+            "VapoRock returned no usable vapor pressures; AlphaMELTS activity "
+            "x Antoine fallback is carrying the vapor-pressure facet."
+        )
+    else:
+        message = (
+            "VapoRock was unavailable, so the vapor-pressure facet was never "
+            "attempted; AlphaMELTS activity x Antoine fallback provenance is "
+            "displayed without changing source labels."
+        )
+
+    return {
+        "status": status,
+        "message": message,
+        "reason": _string_or_none(
+            diagnostic.get("vapor_pressure_backend_status_reason")
+        ),
+        "fallback_source": _string_or_none(
+            diagnostic.get("vapor_pressure_fallback_source")
+        ),
+        "authoritative_for_requested_vapor_pressure": diagnostic.get(
+            "authoritative_for_requested_vapor_pressure"
+        ),
+        "diagnostic_only": True,
+    }
 
 
 def oxide_wt_pct_from_kg(species_kg: Mapping[str, Any] | None) -> dict[str, float]:
@@ -323,6 +364,13 @@ def _float_or_none(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _string_or_none(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
 
 
 def _round_or_none(value: float | None) -> float | None:

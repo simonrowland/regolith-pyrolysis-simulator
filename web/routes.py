@@ -80,7 +80,11 @@ from web.feedstock_data import (
     load_feedstock_groups,
     load_visible_feedstocks,
 )
-from web.advisory import ceramic_rump_payload, wall_advisory_payload
+from web.advisory import (
+    ceramic_rump_payload,
+    vapor_pressure_authority_payload,
+    wall_advisory_payload,
+)
 
 bp = Blueprint('web', __name__,
                template_folder='templates',
@@ -2800,6 +2804,25 @@ def ceramic_rump_panel_partial():
     )
 
 
+@bp.route('/api/vapor-pressure-authority')
+def vapor_pressure_authority_api():
+    payload = vapor_pressure_authority_payload(
+        _query_vapor_pressure_diagnostics()
+    )
+    return jsonify(payload)
+
+
+@bp.route('/partials/vapor-pressure-authority-panel')
+def vapor_pressure_authority_panel_partial():
+    payload = vapor_pressure_authority_payload(
+        _query_vapor_pressure_diagnostics()
+    )
+    return render_template(
+        'partials/vapor_pressure_authority_panel.html',
+        vapor_pressure_authority=payload,
+    )
+
+
 @bp.route('/optimizer')
 def optimizer_page():
     """Optimizer results page plus async CLI launch form."""
@@ -2826,6 +2849,25 @@ def _query_composition_wt_pct() -> dict[str, float]:
         if amount is not None:
             composition[key] = amount
     return composition
+
+
+def _query_vapor_pressure_diagnostics() -> dict[str, object]:
+    allowed = {
+        'vapor_pressure_backend_status',
+        'vapor_pressure_backend_status_reason',
+        'vapor_pressure_fallback_source',
+        'authoritative_for_requested_vapor_pressure',
+    }
+    diagnostics: dict[str, object] = {}
+    for key in allowed:
+        if key not in request.args:
+            continue
+        value = request.args.get(key)
+        if key == 'authoritative_for_requested_vapor_pressure':
+            diagnostics[key] = str(value).lower() == 'true'
+        else:
+            diagnostics[key] = value
+    return diagnostics
 
 
 def _query_float(name: str, *, default: float) -> float:
