@@ -855,20 +855,24 @@ def _extraction_completeness_by_target_for_trace(
     )
     if provenance_results is not None:
         ledger_mappings = _ledger_mappings_from_trace(trace)
-        if ledger_mappings is not None:
-            products, rump = ledger_mappings
-            ledger_results = extraction_completeness_by_target(
-                tuple(str(target) for target in constraints.target_species),
-                constraints.residual_species_by_target,
-                products,
-                rump,
-                require_residual_species=require_residual_species,
+        if ledger_mappings is None:
+            raise ValueError(
+                "extraction completeness provenance cannot be verified without "
+                "product_ledger_kg and terminal_rump_by_species_kg ledgers"
             )
-            _assert_extraction_completeness_provenance_matches_ledger(
-                provenance_results,
-                ledger_results,
-                tuple(str(target) for target in constraints.target_species),
-            )
+        products, rump = ledger_mappings
+        ledger_results = extraction_completeness_by_target(
+            tuple(str(target) for target in constraints.target_species),
+            constraints.residual_species_by_target,
+            products,
+            rump,
+            require_residual_species=require_residual_species,
+        )
+        _assert_extraction_completeness_provenance_matches_ledger(
+            provenance_results,
+            ledger_results,
+            tuple(str(target) for target in constraints.target_species),
+        )
         return provenance_results
     products = _required_mapping(trace, "product_ledger_kg")
     rump = _required_mapping(trace, "terminal_rump_by_species_kg")

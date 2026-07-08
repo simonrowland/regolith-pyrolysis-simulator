@@ -840,6 +840,41 @@ def test_extraction_completeness_gate_rejects_provenance_contradicting_ledger() 
     assert margin.observed != pytest.approx(1.0)
 
 
+def test_extraction_completeness_gate_rejects_provenance_without_ledgers() -> None:
+    """SC-22/SC-44: carried completeness is not trusted without ledger checks."""
+    constraints = PhysicsConstraintSet(
+        target_species=("Fe",),
+        residual_species_by_target={"Fe": ("FeO", "Fe")},
+    )
+    trace = SimpleNamespace(
+        extraction_completeness_by_target={
+            "Fe": {
+                "completeness_fraction": 1.0,
+                "product_target_equiv_mol": 1.0,
+                "residual_target_equiv_mol": 0.0,
+                "denominator_target_equiv_mol": 1.0,
+                "reason": "self-certified",
+            },
+        },
+    )
+
+    margin = constraints.extraction_completeness(trace)
+    report = extraction_completeness_report(trace, constraints)
+
+    assert not hasattr(trace, "product_ledger_kg")
+    assert not hasattr(trace, "terminal_rump_by_species_kg")
+    assert not margin.feasible
+    assert margin.margin == -math.inf
+    assert math.isnan(margin.observed)
+    assert (
+        "cannot be verified without product_ledger_kg and "
+        "terminal_rump_by_species_kg ledgers"
+    ) in margin.detail
+    assert "product_target_equiv_mol=1" not in margin.detail
+    assert report["status"] == "insufficient-evidence"
+    assert report["reason"] in margin.detail
+
+
 def test_per_species_extraction_thresholds_must_cover_targets() -> None:
     threshold = ThresholdSpec(
         id="extraction_completeness_min[Fe]",
