@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 import copy
 import csv
 import hashlib
+import importlib.metadata
 import inspect
 import json
 import logging
@@ -29,6 +30,7 @@ from simulator.corpus_version import current_corpus_version
 from simulator.diagnostics import coating_summary_with_grounded_authority
 from simulator.optimize.canonical import canonical_json_dumps
 from simulator.optimize.doe import active_sampler_name
+from simulator.optimize.determinism import pin_seeds
 from simulator.optimize.evaluate import (
     EvaluationAbort,
     FailureCategory,
@@ -82,7 +84,15 @@ from simulator.optimize.save_bundle import MEMBER_SCHEMA_VERSION, SAVE_SCHEMA_VE
 from simulator.optimize.results_store import (
     ResultStore,
     ResultStoreWriteRejected,
+    _deserialize_eval_spec,
+    _deserialize_margins,
+    _deserialize_objectives,
+    _deserialize_run_reference,
     _result_blob,
+    _serialize_eval_spec,
+    _serialize_margins,
+    _serialize_objectives,
+    _serialize_run_reference,
     reground_scored_result,
 )
 from simulator.optimize.strategy import (
@@ -363,6 +373,62 @@ class StudyResult:
         object.__setattr__(self, "artifacts", MappingProxyType(dict(self.artifacts)))
 
 
+STUDY_EVENTS_NAME = "study.events.jsonl"
+STRATEGY_STATE_NAME = "strategy_state.jsonl"
+JOURNAL_EVENT_VERSION = 1
+REPLAY_RELEVANT_EVENT_KINDS = frozenset({"candidate_asked", "candidate_evaluated"})
+EPOCH_IDENTITY_KEYS = (
+    "code_version",
+    "corpus_version",
+    "allowlist_version",
+    "bounds_digest",
+)
+
+
+class StudyReplayError(StudyError):
+    """Raised when a study journal cannot be replayed exactly."""
+
+
+class StudyManifestMismatchError(StudyReplayError):
+    """Raised when a journal replay crosses the locked identity epoch."""
+
+
+@dataclass(frozen=True)
+class StudyReplayResult:
+    run_dir: Path
+    manifest: Mapping[str, Any]
+    strategy: Strategy
+    records: tuple[StudyRecord, ...]
+    leaderboard: tuple[StudyRecord, ...]
+    pareto: tuple[StudyRecord, ...]
+    pending_candidates: tuple[Candidate, ...] = ()
+    warnings: tuple[str, ...] = ()
+    consumed_rows: int = 0
+    strategy_state: Mapping[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "manifest", MappingProxyType(dict(self.manifest)))
+        object.__setattr__(self, "records", tuple(self.records))
+        object.__setattr__(self, "leaderboard", tuple(self.leaderboard))
+        object.__setattr__(self, "pareto", tuple(self.pareto))
+        object.__setattr__(self, "pending_candidates", tuple(self.pending_candidates))
+        object.__setattr__(self, "warnings", tuple(self.warnings))
+        object.__setattr__(self, "strategy_state", MappingProxyType(dict(self.strategy_state)))
+
+
+@dataclass(frozen=True)
+class _JournalResumePosition:
+    event_seq: int = 0
+    ask_seq: int = 0
+    tell_seq: int = 0
+    batch_seq: int = 0
+    pending_batch_seq: int | None = None
+    ask_seq_by_id: Mapping[str, int] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "ask_seq_by_id", MappingProxyType(dict(self.ask_seq_by_id)))
+
+
 def run(
     profile: str | Mapping[str, Any],
     feedstock: str,
@@ -398,6 +464,7 @@ def run(
         warm_start_from=warm_start_from,
         per_eval_timeout_seconds=resolve_eval_timeout_seconds(per_eval_timeout_seconds),
     )
+    pin_seeds(config.seed)
     try:
         resolved_profile = resolve_profile(
             config.profile,
@@ -481,8 +548,20 @@ def run(
 
     records: list[StudyRecord] = []
     provenance_path = out / "provenance.jsonl"
+    events_path = out / STUDY_EVENTS_NAME
+    strategy_state_path = out / STRATEGY_STATE_NAME
     evaluated = 0
     topology_cursor = 0
+    batch_seq = 0
+    ask_seq_by_id: dict[str, int] = {}
+    pending_resume_candidates: list[Candidate] = []
+    pending_resume_batch_seq: int | None = None
+    journal_event_seq = 0
+    journal_ask_seq = 0
+    journal_tell_seq = 0
+    journal_mode = "w"
+    provenance_mode = "w"
+    refresh_resume_provenance = False
     prefix_replay_cache: dict[str, ScoredResult] = {}
     loop_profile = (
         _profile_for_cache_phase(
@@ -493,24 +572,123 @@ def run(
         if two_phase.enabled
         else resolved_profile
     )
+    if events_path.is_file():
+        if requested_topologies is not None:
+            raise StudyReplayError(
+                "staged study resume is not yet supported; refusing to overwrite existing journal"
+            )
+        resumed = load_study_resume_state(out, schema=active_schema)
+        _assert_resume_manifest_matches_invocation(
+            resumed.manifest,
+            config=config,
+            profile=resolved_profile,
+            feedstock=config.feedstock,
+            fidelity=config.fidelity,
+            search_space_identity=search_space_identity,
+            strategy=active_strategy,
+        )
+        resume_events = _load_replay_events(events_path)
+        resume_position = _journal_resume_position(
+            resume_events,
+            pending_candidates=resumed.pending_candidates,
+        )
+        records = list(resumed.records)
+        evaluated = len(records)
+        if evaluated > config.budget:
+            raise StudyReplayError(
+                "study resume journal already exceeds requested budget: "
+                f"evaluated={evaluated} budget={config.budget}"
+            )
+        if evaluated + len(resumed.pending_candidates) > config.budget:
+            raise StudyReplayError(
+                "study resume pending asks exceed requested budget: "
+                f"evaluated={evaluated} pending={len(resumed.pending_candidates)} "
+                f"budget={config.budget}"
+            )
+        active_strategy = resumed.strategy
+        staged_strategies = ()
+        batch_seq = resume_position.batch_seq
+        ask_seq_by_id = dict(resume_position.ask_seq_by_id)
+        pending_resume_candidates = list(resumed.pending_candidates)
+        pending_resume_batch_seq = resume_position.pending_batch_seq
+        journal_event_seq = resume_position.event_seq
+        journal_ask_seq = resume_position.ask_seq
+        journal_tell_seq = resume_position.tell_seq
+        journal_mode = "a"
+        provenance_mode = "a"
+        if not pending_resume_candidates and evaluated == config.budget:
+            records = [replace(record, cache_hit=True) for record in records]
+            refresh_resume_provenance = True
+            provenance_mode = "w"
     try:
-        with provenance_path.open("w", encoding="utf-8") as provenance:
-            while evaluated < config.budget:
-                batch_size = min(config.parallel, config.budget - evaluated)
-                owners: dict[str, StagedStrategy] = {}
-                if staged_strategies:
-                    candidates, topology_cursor, owners = _ask_staged_topology_candidates(
-                        staged_strategies,
-                        cursor=topology_cursor,
-                        batch_size=batch_size,
+        with (
+            provenance_path.open(provenance_mode, encoding="utf-8") as provenance,
+            events_path.open(journal_mode, encoding="utf-8") as events,
+            strategy_state_path.open(journal_mode, encoding="utf-8") as strategy_state,
+        ):
+            journal = _StudyJournalWriter(
+                events,
+                strategy_state,
+                schema=active_schema,
+                strategy_name=_strategy_label(active_strategy),
+                event_seq=journal_event_seq,
+                ask_seq=journal_ask_seq,
+                tell_seq=journal_tell_seq,
+            )
+            if refresh_resume_provenance:
+                for record in records:
+                    provenance.write(
+                        json.dumps(
+                            _record_payload(
+                                record,
+                                active_schema,
+                                resolved_profile,
+                                search_space_identity=search_space_identity,
+                            ),
+                            sort_keys=True,
+                            separators=(",", ":"),
+                            allow_nan=False,
+                        )
+                        + "\n"
                     )
+            while evaluated < config.budget:
+                owners: dict[str, StagedStrategy] = {}
+                if pending_resume_candidates:
+                    candidates = pending_resume_candidates
+                    pending_resume_candidates = []
+                    if pending_resume_batch_seq is None:
+                        raise StudyReplayError("study resume pending asks are missing batch_seq")
+                    current_batch_seq = pending_resume_batch_seq
+                    pending_resume_batch_seq = None
                 else:
-                    candidates = active_strategy.ask(batch_size)
-                    if not candidates and isinstance(active_strategy, StagedStrategy):
-                        if active_strategy.run_backward_pass() or active_strategy.joint_refine():
-                            candidates = active_strategy.ask(batch_size)
-                if not candidates:
-                    break
+                    batch_size = min(config.parallel, config.budget - evaluated)
+                    if staged_strategies:
+                        candidates, topology_cursor, owners = _ask_staged_topology_candidates(
+                            staged_strategies,
+                            cursor=topology_cursor,
+                            batch_size=batch_size,
+                        )
+                    else:
+                        candidates = active_strategy.ask(batch_size)
+                        if not candidates and isinstance(active_strategy, StagedStrategy):
+                            if active_strategy.run_backward_pass() or active_strategy.joint_refine():
+                                candidates = active_strategy.ask(batch_size)
+                    if not candidates:
+                        break
+                    batch_seq += 1
+                    current_batch_seq = batch_seq
+                    ask_seq_by_id.update(
+                        journal.write_ask_batch(
+                            batch_seq=batch_seq,
+                            candidates=candidates,
+                            owners=owners,
+                        )
+                    )
+                    journal.write_strategy_state(
+                        batch_seq=batch_seq,
+                        strategy=active_strategy,
+                        staged_strategies=staged_strategies,
+                    )
                 results = _evaluate_candidates(
                     candidates,
                     profile=loop_profile,
@@ -561,6 +739,14 @@ def run(
                         + "\n"
                     )
                     tell_batch.append((candidate, light_scored))
+                    journal.write_tell(
+                        batch_seq=current_batch_seq,
+                        ask_seq=ask_seq_by_id[candidate.id],
+                        candidate=candidate,
+                        scored=light_scored,
+                        source_scored=scored,
+                        cache_hit=cache_hit,
+                    )
                 if staged_strategies:
                     grouped: dict[StagedStrategy, list[tuple[Candidate, ScoredResult]]] = {}
                     for candidate, scored in tell_batch:
@@ -569,6 +755,11 @@ def run(
                         owner.tell(owner_batch)
                 else:
                     active_strategy.tell(tell_batch)
+                journal.write_strategy_state(
+                    batch_seq=current_batch_seq,
+                    strategy=active_strategy,
+                    staged_strategies=staged_strategies,
+                )
                 evaluated += len(candidates)
     except (KeyboardInterrupt, StudyAbort):
         _write_aborted_artifacts_from_cache(
@@ -1031,6 +1222,13 @@ def _resolved_strategy_sampler(strategy: Strategy | str) -> str:
     return str(sampler_name) if sampler_name is not None else active_sampler_name()
 
 
+def _package_version(package_name: str) -> str | None:
+    try:
+        return importlib.metadata.version(package_name)
+    except importlib.metadata.PackageNotFoundError:
+        return None
+
+
 def _strategy_label(strategy: Strategy | str) -> str:
     if isinstance(strategy, str):
         return STRATEGY_CLASS_NAMES.get(strategy, strategy)
@@ -1066,19 +1264,974 @@ def _cache_state_from_scored(scored: ScoredResult) -> str | None:
     if reference is not None and reference.cache_state is not None:
         return str(reference.cache_state)
     trace = reference.trace if reference is not None else None
+    for carrier in _cache_trace_carriers(trace):
+        for key in ("reduced_real_cache_state", "cache_state"):
+            state = carrier.get(key)
+            if state is not None:
+                return str(state)
+    return None
+
+
+def _cache_rung_from_scored(scored: ScoredResult) -> str | None:
+    reference = scored.run_reference
+    trace = reference.trace if reference is not None else None
+    for carrier in _cache_trace_carriers(trace):
+        for key in (
+            "physics_bucket_rung",
+            "reduced_real_cache_rung",
+            "cache_rung",
+            "rung",
+        ):
+            value = carrier.get(key)
+            if value is not None:
+                return str(value)
+    return None
+
+
+def _cache_trace_carriers(trace: Any) -> tuple[Mapping[str, Any], ...]:
+    carriers: list[Mapping[str, Any]] = []
     if isinstance(trace, Mapping):
-        per_hour = trace.get("per_hour_summary")
+        carriers.append(trace)
+        per_hour = trace.get("per_hour_summary", trace.get("per_hour"))
         if isinstance(per_hour, Sequence) and per_hour:
             last = per_hour[-1]
             if isinstance(last, Mapping):
-                state = last.get("reduced_real_cache_state")
-                if state is not None:
-                    return str(state)
-    return None
+                carriers.append(last)
+    return tuple(carriers)
 
 
 def _is_certified_cache_state(cache_state: str | None) -> bool:
     return cache_state in CERTIFIED_CACHE_STATES
+
+
+class _StudyJournalWriter:
+    def __init__(
+        self,
+        events: Any,
+        strategy_state: Any,
+        *,
+        schema: RecipeSchema,
+        strategy_name: str,
+        event_seq: int = 0,
+        ask_seq: int = 0,
+        tell_seq: int = 0,
+    ) -> None:
+        self._events = events
+        self._strategy_state = strategy_state
+        self._schema = schema
+        self._strategy_name = strategy_name
+        self._event_seq = event_seq
+        self._ask_seq = ask_seq
+        self._tell_seq = tell_seq
+
+    def write_ask_batch(
+        self,
+        *,
+        batch_seq: int,
+        candidates: Sequence[Candidate],
+        owners: Mapping[str, StagedStrategy],
+    ) -> dict[str, int]:
+        ask_seq_by_id: dict[str, int] = {}
+        for candidate_index, candidate in enumerate(candidates):
+            self._ask_seq += 1
+            ask_seq_by_id[candidate.id] = self._ask_seq
+            owner = owners.get(candidate.id)
+            self._write_event(
+                {
+                    "event_kind": "candidate_asked",
+                    "replay_relevant": True,
+                    "batch_seq": batch_seq,
+                    "ask_seq": self._ask_seq,
+                    "candidate_index": candidate_index,
+                    "candidate_id": candidate.id,
+                    "strategy": self._strategy_name,
+                    "owner_strategy": _owner_strategy_payload(owner),
+                    "candidate": _candidate_journal_payload(candidate, self._schema),
+                    "cache_state": None,
+                    "rung": None,
+                    "cache_tier": None,
+                }
+            )
+        return ask_seq_by_id
+
+    def write_tell(
+        self,
+        *,
+        batch_seq: int,
+        ask_seq: int,
+        candidate: Candidate,
+        scored: ScoredResult,
+        source_scored: ScoredResult,
+        cache_hit: bool,
+    ) -> None:
+        self._tell_seq += 1
+        cache_state = _cache_state_from_scored(source_scored)
+        rung = _cache_rung_from_scored(source_scored)
+        self._write_event(
+            {
+                "event_kind": "candidate_evaluated",
+                "replay_relevant": True,
+                "batch_seq": batch_seq,
+                "ask_seq": ask_seq,
+                "tell_seq": self._tell_seq,
+                "candidate_id": candidate.id,
+                "cache_hit": bool(cache_hit),
+                "cache_state": cache_state,
+                "rung": rung,
+                "cache_tier": rung if rung is not None else cache_state,
+                "status": _result_status(scored),
+                "failure_category": (
+                    scored.failure_category.value
+                    if scored.failure_category is not None
+                    else None
+                ),
+                "objectives": _serialize_objectives(scored.objectives),
+                "feasibility_margins": _serialize_margins(scored.feasibility_margins),
+                "failing_gates": list(scored.failing_gates),
+                "scored_result": _scored_result_journal_payload(scored),
+            }
+        )
+
+    def write_strategy_state(
+        self,
+        *,
+        batch_seq: int,
+        strategy: Strategy,
+        staged_strategies: Sequence[StagedStrategy],
+    ) -> None:
+        payload = {
+            "member_schema_version": MEMBER_SCHEMA_VERSION,
+            "event_version": JOURNAL_EVENT_VERSION,
+            "event_kind": "strategy_state",
+            "batch_seq": batch_seq,
+            "journal_metadata": {"created_at": datetime.now(UTC).isoformat()},
+            "strategy_state": _strategy_replay_state(strategy, *staged_strategies),
+        }
+        self._strategy_state.write(_json_dump_value(payload) + "\n")
+        self._strategy_state.flush()
+
+    def _write_event(self, payload: Mapping[str, Any]) -> None:
+        self._event_seq += 1
+        row = {
+            "member_schema_version": MEMBER_SCHEMA_VERSION,
+            "event_version": JOURNAL_EVENT_VERSION,
+            "event_seq": self._event_seq,
+            "journal_metadata": {"created_at": datetime.now(UTC).isoformat()},
+            **payload,
+        }
+        self._events.write(_json_dump_value(row) + "\n")
+        self._events.flush()
+
+
+def replay_study(run_dir: str | Path, *, schema: RecipeSchema | None = None) -> StudyReplayResult:
+    """Replay a saved study by re-asking and re-telling recorded journal results."""
+
+    return _load_study_journal(run_dir, schema=schema, allow_pending=False)
+
+
+def load_study_resume_state(
+    run_dir: str | Path,
+    *,
+    schema: RecipeSchema | None = None,
+) -> StudyReplayResult:
+    """Load an interrupted study journal, replay completed tells, and expose pending asks."""
+
+    return _load_study_journal(run_dir, schema=schema, allow_pending=True)
+
+
+def _load_study_journal(
+    run_dir: str | Path,
+    *,
+    schema: RecipeSchema | None,
+    allow_pending: bool,
+) -> StudyReplayResult:
+    root = Path(run_dir)
+    manifest_path = root / "study.manifest.json"
+    events_path = root / STUDY_EVENTS_NAME
+    profile_path = root / "study.profile.yaml"
+    if not events_path.is_file():
+        raise StudyReplayError(f"study journal not found: {events_path}")
+    manifest = _load_json_object_file(manifest_path)
+    profile_payload = _load_yaml_mapping(profile_path)
+    base_schema = schema or RecipeSchema()
+    feedstock = str(manifest.get("feedstock_id") or profile_payload.get("feedstock") or "")
+    if not feedstock:
+        raise StudyReplayError("study manifest missing feedstock_id")
+    resolved_profile = resolve_profile(
+        profile_payload,
+        expected_feedstock=feedstock,
+        schema=base_schema,
+    )
+    manifest_identity = _mapping_or_empty(manifest.get("search_space_identity"))
+    active_schema = _schema_with_pinned_paths(
+        base_schema,
+        resolved_profile,
+        cli_pinned_paths=tuple(
+            str(path) for path in manifest_identity.get("cli_pinned_paths", ())
+        ),
+    )
+    search_space_identity = _search_space_identity(
+        active_schema,
+        profile_pinned_paths=_profile_pinned_paths(resolved_profile),
+        cli_pinned_paths=_cli_pinned_paths(manifest_identity.get("cli_pinned_paths", ())),
+    )
+    warnings_seen = list(
+        _assert_replay_manifest_current(
+            manifest,
+            schema=active_schema,
+            search_space_identity=search_space_identity,
+        )
+    )
+    strategy_key = _strategy_key_from_manifest(manifest)
+    config_payload = _mapping_or_empty(_mapping_or_empty(manifest.get("strategy")).get("config"))
+    if config_payload.get("warm_start_from") is not None:
+        raise StudyReplayError(
+            "journal replay for warm_start_from requires bundled warm-start seed state"
+        )
+    config = StudyConfig(
+        profile=resolved_profile,
+        feedstock=feedstock,
+        strategy=strategy_key,
+        fidelity=str(manifest.get("fidelity")),
+        parallel=int(manifest.get("parallel", 1)),
+        budget=int(manifest.get("budget", 0)),
+        out_dir=root,
+        seed=int(manifest.get("seed", 0)),
+    )
+    pin_seeds(config.seed)
+    requested_topologies = _requested_staged_topologies(resolved_profile, None)
+    try:
+        active_constraints = _constraints_for_profile(resolved_profile)
+    except ProfileValidationError as exc:
+        if not _is_stale_profile_refusal(exc):
+            raise
+        active_constraints = None
+    warm_start_seeds = _resolve_warm_start_seeds(
+        resolved_profile,
+        feedstock=config.feedstock,
+        fidelity=config.fidelity,
+        schema=active_schema,
+        warm_start_source=None,
+        constraints=active_constraints,
+        search_space_identity=search_space_identity,
+        requested_topologies=requested_topologies,
+    )
+    if requested_topologies is None:
+        active_strategy = resolve_strategy(
+            strategy_key,
+            profile=resolved_profile,
+            seed=config.seed,
+            schema=active_schema,
+            warm_start_seeds=warm_start_seeds,
+        )
+        staged_strategies: tuple[StagedStrategy, ...] = ()
+    else:
+        single_topology_profile = _profile_without_staged_topologies(resolved_profile)
+        staged_strategies = tuple(
+            StagedStrategy(
+                active_schema,
+                seed=_staged_topology_seed(config.seed, topology, requested_topologies),
+                objective_profile=single_topology_profile,
+                topology=topology,
+                stage0_seed_candidates=warm_start_seeds,
+            )
+            for topology in requested_topologies
+        )
+        active_strategy = staged_strategies[0]
+
+    warnings_seen.extend(_strategy_manifest_warnings(manifest, active_strategy))
+    events = _load_replay_events(events_path)
+    definitions = objective_definitions(resolved_profile)
+    records: list[StudyRecord] = []
+    pending_candidates: list[Candidate] = []
+    topology_cursor = 0
+    for batch in _journal_batches(events):
+        ask_rows = batch["asked"]
+        tell_rows = batch["told"]
+        if not ask_rows:
+            raise StudyReplayError(f"journal batch {batch['batch_seq']} has tells without asks")
+        if pending_candidates:
+            raise StudyReplayError("journal asks a new batch while prior asks remain pending")
+        candidates, topology_cursor, owners = _replay_ask_batch(
+            active_strategy,
+            staged_strategies=staged_strategies,
+            topology_cursor=topology_cursor,
+            batch_size=len(ask_rows),
+        )
+        _assert_replayed_candidates_match(ask_rows, candidates)
+        candidate_by_id = {candidate.id: candidate for candidate in candidates}
+        told_ids: set[str] = set()
+        tell_batch: list[tuple[Candidate, ScoredResult]] = []
+        for row in tell_rows:
+            candidate_id = str(row.get("candidate_id"))
+            candidate = candidate_by_id.get(candidate_id)
+            if candidate is None:
+                raise StudyReplayError(
+                    f"tell row references candidate outside batch: {candidate_id!r}"
+                )
+            scored = _scored_result_from_journal_payload(
+                _mapping_or_empty(row.get("scored_result"))
+            )
+            tell_batch.append((candidate, scored))
+            told_ids.add(candidate_id)
+            records.append(_to_record(candidate, scored, cache_hit=bool(row.get("cache_hit"))))
+        if tell_batch:
+            _replay_tell_batch(
+                active_strategy,
+                staged_strategies=staged_strategies,
+                owners=owners,
+                tell_batch=tell_batch,
+            )
+        for row, candidate in zip(ask_rows, candidates, strict=True):
+            if candidate.id not in told_ids:
+                pending_candidates.append(candidate)
+        if pending_candidates and not allow_pending:
+            raise StudyReplayError(
+                "study journal has asked candidates without recorded tell rows"
+            )
+
+    feasible = tuple(record for record in records if record.feasible)
+    leaderboard = (
+        tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
+        if feasible
+        else tuple(records)
+    )
+    pareto = tuple(
+        sorted(
+            pareto_front(
+                feasible,
+                definitions,
+                objective_getter=lambda row: row.objectives,
+            ),
+            key=lambda row: _rank_key(row, definitions),
+        )
+    )
+    replay_state = _strategy_replay_state(active_strategy, *staged_strategies)
+    stored_state = _load_latest_strategy_state(root / STRATEGY_STATE_NAME)
+    if stored_state is not None and stored_state != replay_state:
+        raise StudyReplayError(
+            "strategy_state snapshot differs from journal replay; refusing replay"
+        )
+    return StudyReplayResult(
+        run_dir=root,
+        manifest=manifest,
+        strategy=active_strategy,
+        records=tuple(records),
+        leaderboard=leaderboard,
+        pareto=pareto,
+        pending_candidates=tuple(pending_candidates),
+        warnings=tuple(warnings_seen),
+        consumed_rows=len(events),
+        strategy_state=replay_state,
+    )
+
+
+def _replay_ask_batch(
+    active_strategy: Strategy,
+    *,
+    staged_strategies: Sequence[StagedStrategy],
+    topology_cursor: int,
+    batch_size: int,
+) -> tuple[list[Candidate], int, dict[str, StagedStrategy]]:
+    owners: dict[str, StagedStrategy] = {}
+    if staged_strategies:
+        candidates, topology_cursor, owners = _ask_staged_topology_candidates(
+            staged_strategies,
+            cursor=topology_cursor,
+            batch_size=batch_size,
+        )
+        return candidates, topology_cursor, owners
+    candidates = active_strategy.ask(batch_size)
+    if not candidates and isinstance(active_strategy, StagedStrategy):
+        if active_strategy.run_backward_pass() or active_strategy.joint_refine():
+            candidates = active_strategy.ask(batch_size)
+    return candidates, topology_cursor, owners
+
+
+def _replay_tell_batch(
+    active_strategy: Strategy,
+    *,
+    staged_strategies: Sequence[StagedStrategy],
+    owners: Mapping[str, StagedStrategy],
+    tell_batch: Sequence[tuple[Candidate, ScoredResult]],
+) -> None:
+    if staged_strategies:
+        grouped: dict[StagedStrategy, list[tuple[Candidate, ScoredResult]]] = {}
+        for candidate, scored in tell_batch:
+            grouped.setdefault(owners[candidate.id], []).append((candidate, scored))
+        for owner, owner_batch in grouped.items():
+            owner.tell(owner_batch)
+        return
+    active_strategy.tell(tell_batch)
+
+
+def _load_replay_events(path: Path) -> tuple[Mapping[str, Any], ...]:
+    events: list[Mapping[str, Any]] = []
+    previous_event_seq: int | None = None
+    with path.open("r", encoding="utf-8") as handle:
+        for line_no, line in enumerate(handle, start=1):
+            text = line.strip()
+            if not text:
+                continue
+            try:
+                payload = json.loads(text)
+            except json.JSONDecodeError as exc:
+                raise StudyReplayError(f"{path.name}:{line_no} is not valid JSON") from exc
+            if not isinstance(payload, Mapping):
+                raise StudyReplayError(f"{path.name}:{line_no} is not a JSON object")
+            event_kind = str(payload.get("event_kind", ""))
+            replay_relevant = bool(payload.get("replay_relevant", False))
+            if event_kind not in REPLAY_RELEVANT_EVENT_KINDS:
+                if replay_relevant:
+                    raise StudyReplayError(
+                        f"unknown replay-relevant event kind {event_kind!r}"
+                    )
+                continue
+            version = payload.get("event_version")
+            if version != JOURNAL_EVENT_VERSION:
+                raise StudyReplayError(
+                    f"unsupported journal event_version {version!r} at {path.name}:{line_no}"
+                )
+            try:
+                event_seq = int(payload["event_seq"])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise StudyReplayError(
+                    f"{path.name}:{line_no} missing integer event_seq"
+                ) from exc
+            if previous_event_seq is not None and event_seq <= previous_event_seq:
+                raise StudyReplayError(
+                    "journal event_seq must be strictly increasing: "
+                    f"{event_seq} after {previous_event_seq} at {path.name}:{line_no}"
+                )
+            previous_event_seq = event_seq
+            events.append(dict(payload))
+    return tuple(events)
+
+
+def _load_latest_strategy_state(path: Path) -> Mapping[str, Any] | None:
+    if not path.is_file():
+        return None
+    latest: Mapping[str, Any] | None = None
+    with path.open("r", encoding="utf-8") as handle:
+        for line_no, line in enumerate(handle, start=1):
+            text = line.strip()
+            if not text:
+                continue
+            try:
+                payload = json.loads(text)
+            except json.JSONDecodeError as exc:
+                raise StudyReplayError(f"{path.name}:{line_no} is not valid JSON") from exc
+            if not isinstance(payload, Mapping):
+                raise StudyReplayError(f"{path.name}:{line_no} is not a JSON object")
+            latest = _mapping_or_empty(payload.get("strategy_state"))
+    return latest
+
+
+def _journal_batches(events: Sequence[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
+    batches: list[dict[str, Any]] = []
+    by_seq: dict[int, dict[str, Any]] = {}
+    asked_keys: set[tuple[int, int]] = set()
+    asked_ids: set[tuple[int, str]] = set()
+    told_ids: set[tuple[int, str]] = set()
+    for row in events:
+        try:
+            batch_seq = int(row["batch_seq"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise StudyReplayError("journal event missing integer batch_seq") from exc
+        batch = by_seq.get(batch_seq)
+        if batch is None:
+            batch = {"batch_seq": batch_seq, "asked": [], "told": []}
+            by_seq[batch_seq] = batch
+            batches.append(batch)
+        event_kind = row.get("event_kind")
+        if event_kind == "candidate_asked":
+            try:
+                ask_seq = int(row["ask_seq"])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise StudyReplayError("journal ask event missing integer ask_seq") from exc
+            candidate_id = str(row.get("candidate_id"))
+            key = (batch_seq, ask_seq)
+            id_key = (batch_seq, candidate_id)
+            if key in asked_keys or id_key in asked_ids:
+                raise StudyReplayError(
+                    f"journal batch {batch_seq} has duplicate ask for {candidate_id!r}"
+                )
+            asked_keys.add(key)
+            asked_ids.add(id_key)
+            batch["asked"].append(row)
+        elif event_kind == "candidate_evaluated":
+            try:
+                ask_seq = int(row["ask_seq"])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise StudyReplayError("journal tell event missing integer ask_seq") from exc
+            candidate_id = str(row.get("candidate_id"))
+            key = (batch_seq, ask_seq)
+            id_key = (batch_seq, candidate_id)
+            if key not in asked_keys or id_key not in asked_ids:
+                raise StudyReplayError(
+                    f"journal tell for {candidate_id!r} appears before its ask"
+                )
+            if id_key in told_ids:
+                raise StudyReplayError(
+                    f"journal batch {batch_seq} has duplicate tell for {candidate_id!r}"
+                )
+            told_ids.add(id_key)
+            batch["told"].append(row)
+        else:
+            raise StudyReplayError(f"unsupported journal event kind {event_kind!r}")
+    return tuple(sorted(batches, key=lambda batch: batch["batch_seq"]))
+
+
+def _journal_resume_position(
+    events: Sequence[Mapping[str, Any]],
+    *,
+    pending_candidates: Sequence[Candidate],
+) -> _JournalResumePosition:
+    event_seq = 0
+    ask_seq = 0
+    tell_seq = 0
+    batch_seq = 0
+    ask_seq_by_id: dict[str, int] = {}
+    pending_ids = {candidate.id for candidate in pending_candidates}
+    pending_batches: set[int] = set()
+    for row in events:
+        event_seq = max(event_seq, int(row["event_seq"]))
+        batch_seq = max(batch_seq, int(row["batch_seq"]))
+        event_kind = row.get("event_kind")
+        if event_kind == "candidate_asked":
+            row_ask_seq = int(row["ask_seq"])
+            ask_seq = max(ask_seq, row_ask_seq)
+            candidate_id = str(row.get("candidate_id"))
+            ask_seq_by_id[candidate_id] = row_ask_seq
+            if candidate_id in pending_ids:
+                pending_batches.add(int(row["batch_seq"]))
+        elif event_kind == "candidate_evaluated":
+            tell_seq = max(tell_seq, int(row.get("tell_seq", 0)))
+    if pending_ids:
+        missing_ids = sorted(pending_ids - set(ask_seq_by_id))
+        if missing_ids:
+            raise StudyReplayError(f"study resume pending asks missing rows: {missing_ids}")
+        if len(pending_batches) != 1:
+            raise StudyReplayError(
+                "study resume pending asks must belong to exactly one batch"
+            )
+    return _JournalResumePosition(
+        event_seq=event_seq,
+        ask_seq=ask_seq,
+        tell_seq=tell_seq,
+        batch_seq=batch_seq,
+        pending_batch_seq=next(iter(pending_batches)) if pending_batches else None,
+        ask_seq_by_id=ask_seq_by_id,
+    )
+
+
+def _assert_replayed_candidates_match(
+    ask_rows: Sequence[Mapping[str, Any]],
+    candidates: Sequence[Candidate],
+) -> None:
+    if len(ask_rows) != len(candidates):
+        raise StudyReplayError(
+            f"strategy ask count mismatch: journal={len(ask_rows)} replay={len(candidates)}"
+        )
+    for row, candidate in zip(ask_rows, candidates, strict=True):
+        expected = _mapping_or_empty(row.get("candidate"))
+        expected_id = str(row.get("candidate_id"))
+        if candidate.id != expected_id:
+            raise StudyReplayError(
+                f"candidate_id replay mismatch: {candidate.id!r} != {expected_id!r}"
+            )
+        expected_patch = expected.get("patch_canonical_json")
+        if candidate.patch.canonical_json() != expected_patch:
+            raise StudyReplayError(f"candidate patch replay mismatch: {candidate.id!r}")
+        expected_metadata = _jsonable_value(expected.get("metadata", {}))
+        if _jsonable_value(candidate.metadata) != expected_metadata:
+            raise StudyReplayError(f"candidate metadata replay mismatch: {candidate.id!r}")
+
+
+def _candidate_journal_payload(candidate: Candidate, schema: RecipeSchema) -> Mapping[str, Any]:
+    return {
+        "id": candidate.id,
+        "patch": _jsonable_value(candidate.patch.to_nested()),
+        "patch_canonical_json": candidate.patch.canonical_json(),
+        "recipe_id": candidate.patch.recipe_id(schema),
+        "metadata": _jsonable_value(candidate.metadata),
+    }
+
+
+def _owner_strategy_payload(owner: StagedStrategy | None) -> Mapping[str, Any] | None:
+    if owner is None:
+        return None
+    return {
+        "class": type(owner).__name__,
+        "name": owner.name,
+        "seed": owner.seed,
+        "topology_id": owner.topology.id,
+    }
+
+
+def _scored_result_journal_payload(scored: ScoredResult) -> Mapping[str, Any]:
+    return {
+        "candidate_id": scored.candidate_id,
+        "eval_spec": (
+            _serialize_eval_spec(scored.eval_spec)
+            if scored.eval_spec is not None
+            else None
+        ),
+        "cache_key": scored.cache_key,
+        "feasible": bool(scored.feasible),
+        "failure_category": (
+            scored.failure_category.value if scored.failure_category is not None else None
+        ),
+        "objectives": _serialize_objectives(scored.objectives),
+        "feasibility_margins": _serialize_margins(scored.feasibility_margins),
+        "failing_gates": list(scored.failing_gates),
+        "run_reference": _serialize_run_reference(scored.run_reference),
+        "result_blob": _result_blob(scored),
+        "notes": list(scored.notes),
+    }
+
+
+def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredResult:
+    failure_category = payload.get("failure_category")
+    failure = FailureCategory(failure_category) if failure_category is not None else None
+    objectives = _deserialize_objectives(
+        _sequence_of_mappings(payload.get("objectives", ()))
+    )
+    return ScoredResult(
+        candidate_id=(
+            str(payload["candidate_id"]) if payload.get("candidate_id") is not None else None
+        ),
+        eval_spec=(
+            _deserialize_eval_spec(_mapping_or_empty(payload.get("eval_spec")))
+            if payload.get("eval_spec") is not None
+            else None
+        ),
+        cache_key=str(payload["cache_key"]) if payload.get("cache_key") is not None else None,
+        feasible=bool(payload.get("feasible", False)),
+        failure_category=failure,
+        objectives=objectives if bool(payload.get("feasible", False)) else None,
+        feasibility_margins=_deserialize_margins(
+            _mapping_of_mappings(payload.get("feasibility_margins", {}))
+        ),
+        failing_gates=tuple(str(item) for item in payload.get("failing_gates", ())),
+        run_reference=_deserialize_run_reference(
+            _mapping_or_none(payload.get("run_reference")),
+            payload.get("result_blob"),
+        ),
+        notes=tuple(str(item) for item in payload.get("notes", ())),
+    )
+
+
+def _strategy_replay_state(strategy: Strategy, *staged_strategies: Strategy) -> Mapping[str, Any]:
+    strategies = (strategy, *staged_strategies) if staged_strategies else (strategy,)
+    return {
+        "strategies": [
+            _single_strategy_replay_state(item, index=index)
+            for index, item in enumerate(strategies)
+        ]
+    }
+
+
+def _single_strategy_replay_state(strategy: Strategy, *, index: int) -> Mapping[str, Any]:
+    results = tuple(getattr(strategy, "results", ()))
+    payload: dict[str, Any] = {
+        "index": index,
+        "class": type(strategy).__name__,
+        "name": getattr(strategy, "name", type(strategy).__name__),
+        "seed": getattr(strategy, "seed", None),
+        "ask_cursor": _strategy_ask_cursor(strategy),
+        "tell_count": getattr(strategy, "tell_count", len(results)),
+        "results": [
+            {
+                "candidate_id": candidate.id,
+                "cache_key": scored.cache_key,
+                "feasible": bool(scored.feasible),
+                "failure_category": (
+                    scored.failure_category.value
+                    if scored.failure_category is not None
+                    else None
+                ),
+                "objectives": _serialize_objectives(scored.objectives),
+            }
+            for candidate, scored in results
+        ],
+    }
+    if isinstance(strategy, StagedStrategy):
+        payload.update(
+            {
+                "stage_index": getattr(strategy, "_stage_index", None),
+                "mode": getattr(strategy, "_mode", None),
+                "pending_ids": [candidate.id for candidate in getattr(strategy, "_pending", ())],
+                "expected_stage_ids": sorted(getattr(strategy, "_expected_stage_ids", ())),
+                "archive_ids": [
+                    member.candidate.id for member in getattr(strategy, "_archive", ())
+                ],
+                "archive_cache_keys": [
+                    member.scored.cache_key for member in getattr(strategy, "_archive", ())
+                ],
+                "frontier_cache_keys": [
+                    getattr(node, "cache_key", None)
+                    for node in getattr(strategy, "_frontier", ())
+                ],
+                "backward_passes_completed": getattr(
+                    strategy, "backward_passes_completed", None
+                ),
+                "joint_refines_completed": getattr(
+                    strategy, "joint_refines_completed", None
+                ),
+                "topology_id": strategy.topology.id,
+            }
+        )
+    return _jsonable_value(payload)
+
+
+def _strategy_ask_cursor(strategy: Strategy) -> int | None:
+    if hasattr(strategy, "_asked"):
+        return int(getattr(strategy, "_asked"))
+    planned_by_id = getattr(strategy, "_planned_by_id", None)
+    if isinstance(planned_by_id, Mapping):
+        return len(planned_by_id)
+    asked_by_id = getattr(strategy, "_asked_by_id", None)
+    if isinstance(asked_by_id, Mapping):
+        return len(asked_by_id)
+    return None
+
+
+def _result_status(scored: ScoredResult) -> str:
+    if scored.run_reference is not None:
+        return str(scored.run_reference.status)
+    if scored.feasible:
+        return "ok"
+    if scored.failure_category is not None:
+        return scored.failure_category.value
+    return "unknown"
+
+
+def _assert_replay_manifest_current(
+    manifest: Mapping[str, Any],
+    *,
+    schema: RecipeSchema,
+    search_space_identity: Mapping[str, Any],
+) -> tuple[str, ...]:
+    stored = _manifest_epoch_identity(manifest)
+    current = {
+        "code_version": current_code_version(),
+        "corpus_version": current_corpus_version(),
+        "allowlist_version": schema.allowlist_version,
+        "bounds_digest": search_space_identity.get("bounds_digest"),
+    }
+    mismatches = [
+        key for key in EPOCH_IDENTITY_KEYS if stored.get(key) != current.get(key)
+    ]
+    if mismatches:
+        details = ", ".join(
+            f"{key}: stored={stored.get(key)!r} current={current.get(key)!r}"
+            for key in mismatches
+        )
+        raise StudyManifestMismatchError(f"study replay identity mismatch: {details}")
+    strategy_name = _manifest_strategy_class(manifest)
+    warnings_seen: list[str] = []
+    if strategy_name in {"StagedStrategy", "RandomStrategy"}:
+        stored_sampler = manifest.get("sampler_name")
+        current_sampler = active_sampler_name()
+        if stored_sampler != current_sampler:
+            raise StudyManifestMismatchError(
+                "study replay sampler mismatch: "
+                f"stored={stored_sampler!r} current={current_sampler!r}"
+            )
+        if str(stored_sampler).startswith("scipy"):
+            stored_scipy = manifest.get("scipy_version")
+            current_scipy = _package_version("scipy")
+            if stored_scipy != current_scipy:
+                raise StudyManifestMismatchError(
+                    "study replay SciPy mismatch: "
+                    f"stored={stored_scipy!r} current={current_scipy!r}"
+                )
+    elif strategy_name in {"OptunaTPEStrategy", "OptunaNSGA2Strategy"}:
+        stored_optuna = manifest.get("optuna_version")
+        current_optuna = _package_version("optuna")
+        if stored_optuna != current_optuna:
+            raise StudyManifestMismatchError(
+                "study replay Optuna mismatch: "
+                f"stored={stored_optuna!r} current={current_optuna!r}"
+            )
+    return tuple(warnings_seen)
+
+
+def _assert_resume_manifest_matches_invocation(
+    manifest: Mapping[str, Any],
+    *,
+    config: StudyConfig,
+    profile: Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    search_space_identity: Mapping[str, Any],
+    strategy: Strategy,
+) -> None:
+    mismatches: list[str] = []
+
+    def note(key: str, stored: Any, current: Any) -> None:
+        if stored != current:
+            mismatches.append(f"{key}: stored={stored!r} current={current!r}")
+
+    note("feedstock_id", manifest.get("feedstock_id"), feedstock)
+    note("fidelity", manifest.get("fidelity"), fidelity)
+    note("seed", int(manifest.get("seed", 0)), int(config.seed))
+    note("budget", int(manifest.get("budget", 0)), int(config.budget))
+    note("parallel", int(manifest.get("parallel", 1)), int(config.parallel))
+    stored_profile = _mapping_or_empty(manifest.get("profile"))
+    note("profile.content_hash", stored_profile.get("content_hash"), _profile_content_hash(profile))
+    note(
+        "search_space_identity",
+        _jsonable_value(_mapping_or_empty(manifest.get("search_space_identity"))),
+        _jsonable_value(search_space_identity),
+    )
+    note(
+        "strategy.class",
+        _manifest_strategy_class(manifest),
+        _canonical_strategy_class_name(_strategy_label(strategy)),
+    )
+    if mismatches:
+        raise StudyReplayError("study resume config mismatch: " + "; ".join(mismatches))
+
+
+def _strategy_manifest_warnings(
+    manifest: Mapping[str, Any],
+    strategy: Strategy,
+) -> tuple[str, ...]:
+    expected_class = _manifest_strategy_class(manifest)
+    actual_class = type(strategy).__name__
+    if expected_class and expected_class != actual_class:
+        raise StudyManifestMismatchError(
+            f"strategy class mismatch: stored={expected_class!r} current={actual_class!r}"
+        )
+    if expected_class in {"OptunaTPEStrategy", "OptunaNSGA2Strategy"}:
+        stored_config = _mapping_or_empty(_mapping_or_empty(manifest.get("strategy")).get("config"))
+        current_config = _strategy_config_payload(
+            strategy,
+            config=None,
+            sampler_name=_resolved_strategy_sampler(strategy),
+        )
+        config_mismatches = [
+            key
+            for key in ("strategy", "seed", "sampler_name")
+            if stored_config.get(key) != current_config.get(key)
+        ]
+        if config_mismatches:
+            details = ", ".join(
+                f"{key}: stored={stored_config.get(key)!r} current={current_config.get(key)!r}"
+                for key in config_mismatches
+            )
+            raise StudyManifestMismatchError(f"optuna strategy config mismatch: {details}")
+    return ()
+
+
+def _manifest_epoch_identity(manifest: Mapping[str, Any]) -> Mapping[str, Any]:
+    search_identity = _mapping_or_empty(manifest.get("search_space_identity"))
+    return {
+        "code_version": manifest.get("code_version"),
+        "corpus_version": manifest.get("corpus_version"),
+        "allowlist_version": manifest.get("allowlist_version"),
+        "bounds_digest": search_identity.get("bounds_digest"),
+    }
+
+
+def _strategy_key_from_manifest(manifest: Mapping[str, Any]) -> str:
+    strategy_payload = _mapping_or_empty(manifest.get("strategy"))
+    config = _mapping_or_empty(strategy_payload.get("config"))
+    raw = config.get("strategy") or strategy_payload.get("name") or strategy_payload.get("class")
+    aliases = {
+        "RandomStrategy": "random",
+        "random": "random",
+        "MorrisScreenStrategy": "screen",
+        "morris-screen": "screen",
+        "screen": "screen",
+        "StagedStrategy": "staged",
+        "staged": "staged",
+        "OptunaTPEStrategy": "bayes",
+        "optuna-tpe": "bayes",
+        "bayes": "bayes",
+        "OptunaNSGA2Strategy": "nsga2",
+        "optuna-nsga2": "nsga2",
+        "nsga2": "nsga2",
+    }
+    try:
+        return aliases[str(raw)]
+    except KeyError as exc:
+        raise StudyReplayError(f"unsupported replay strategy {raw!r}") from exc
+
+
+def _manifest_strategy_class(manifest: Mapping[str, Any]) -> str | None:
+    strategy_payload = _mapping_or_empty(manifest.get("strategy"))
+    raw = strategy_payload.get("class") or strategy_payload.get("name")
+    if raw is None:
+        return None
+    return _canonical_strategy_class_name(raw)
+
+
+def _canonical_strategy_class_name(value: Any) -> str:
+    aliases = {
+        "random": "RandomStrategy",
+        "screen": "MorrisScreenStrategy",
+        "morris-screen": "MorrisScreenStrategy",
+        "staged": "StagedStrategy",
+        "bayes": "OptunaTPEStrategy",
+        "optuna-tpe": "OptunaTPEStrategy",
+        "nsga2": "OptunaNSGA2Strategy",
+        "optuna-nsga2": "OptunaNSGA2Strategy",
+    }
+    text = str(value)
+    return aliases.get(text, text)
+
+
+def _load_json_object_file(path: Path) -> Mapping[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise StudyReplayError(f"could not read {path.name}: {exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise StudyReplayError(f"{path.name} is not valid JSON") from exc
+    if not isinstance(payload, Mapping):
+        raise StudyReplayError(f"{path.name} must be a JSON object")
+    return dict(payload)
+
+
+def _load_yaml_mapping(path: Path) -> Mapping[str, Any]:
+    try:
+        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise StudyReplayError(f"could not read {path.name}: {exc}") from exc
+    if not isinstance(payload, Mapping):
+        raise StudyReplayError(f"{path.name} must be a mapping")
+    return dict(payload)
+
+
+def _mapping_or_none(value: Any) -> Mapping[str, Any] | None:
+    if value is None:
+        return None
+    return _mapping_or_empty(value)
+
+
+def _sequence_of_mappings(value: Any) -> tuple[Mapping[str, Any], ...]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        return ()
+    result: list[Mapping[str, Any]] = []
+    for item in value:
+        if not isinstance(item, Mapping):
+            raise StudyReplayError("journal payload expected a sequence of mappings")
+        result.append(dict(item))
+    return tuple(result)
+
+
+def _mapping_of_mappings(value: Any) -> Mapping[str, Mapping[str, Any]]:
+    if not isinstance(value, Mapping):
+        return {}
+    result: dict[str, Mapping[str, Any]] = {}
+    for key, item in value.items():
+        if not isinstance(item, Mapping):
+            raise StudyReplayError("journal payload expected a mapping of mappings")
+        result[str(key)] = dict(item)
+    return result
 
 
 def _staged_topology_seed(
@@ -3316,7 +4469,14 @@ def _write_artifacts(
                 sampler_name=resolved_sampler,
                 search_space_identity=search_space_identity,
                 strategy_config=strategy_config,
-                replayable=(out / "study.events.jsonl").is_file(),
+                # journal replay reconstructs strategy state from the ask/tell
+                # journal alone; a warm_start_from study needs bundled seed
+                # state replay cannot rebuild, so it is not journal-replayable
+                # even though the events journal exists.
+                replayable=(
+                    (out / "study.events.jsonl").is_file()
+                    and getattr(config, "warm_start_from", None) is None
+                ),
             ),
             indent=2,
             sort_keys=True,
@@ -3333,6 +4493,12 @@ def _write_artifacts(
         "leaderboard": leaderboard_path,
         "search_provenance": search_provenance_path,
     }
+    events_path = out / STUDY_EVENTS_NAME
+    if events_path.is_file():
+        artifacts["events_journal"] = events_path
+    strategy_state_path = out / STRATEGY_STATE_NAME
+    if strategy_state_path.is_file():
+        artifacts["strategy_state"] = strategy_state_path
     if winner is not None:
         winner_patch = _materialized_winner_patch(winner, schema, profile)
         winner_path.write_text(
@@ -3476,8 +4642,8 @@ def _study_manifest_payload(
         "corpus_version": current_corpus_version(),
         "result_scope": None,
         "sampler_name": sampler_name,
-        "scipy_version": None,
-        "optuna_version": None,
+        "scipy_version": _package_version("scipy"),
+        "optuna_version": _package_version("optuna"),
         "cache_tier_policy": _jsonable_value(
             _mapping_or_empty(profile.get("cache_tier_policy"))
         ),
@@ -4316,7 +5482,10 @@ def _write_empty_artifacts(
                 sampler_name=sampler_name,
                 search_space_identity=None,
                 strategy_config=strategy_config,
-                replayable=(out / "study.events.jsonl").is_file(),
+                replayable=(
+                    (out / "study.events.jsonl").is_file()
+                    and getattr(config, "warm_start_from", None) is None
+                ),
             ),
             indent=2,
             sort_keys=True,

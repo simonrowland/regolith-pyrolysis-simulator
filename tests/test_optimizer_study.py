@@ -253,6 +253,20 @@ def _write_save_format_artifacts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
         json.dumps({"event_kind": "candidate_asked", "event_version": 1}) + "\n",
         encoding="utf-8",
     )
+    (out / "strategy_state.jsonl").write_text(
+        json.dumps(
+            {
+                "member_schema_version": 1,
+                "event_version": 1,
+                "event_kind": "strategy_state",
+                "batch_seq": 0,
+                "strategy_state": {"strategies": []},
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     study._write_artifacts(
         out,
         profile=PROFILE,
@@ -356,6 +370,8 @@ def test_export_study_bundle_round_trip_hash_index(
             "pareto.json",
             "leaderboard.csv",
             "job_status.json",
+            "study.events.jsonl",
+            "strategy_state.jsonl",
         ):
             assert required in names
         index = json.loads(archive.read("artifact.index.json"))
@@ -388,6 +404,438 @@ def test_export_study_bundle_refuses_non_terminal_run(
 
     with pytest.raises(ValueError, match="not terminal"):
         export_study_bundle(out)
+
+
+def _journal_cache_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    index = _sequence(candidate_id)
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    objectives = ObjectiveVector(
+        (
+            ObjectiveValue("oxygen_kg", "maximize", 10.0 + index, "kg", ordinal=0),
+            ObjectiveValue("energy_kWh", "minimize", 5.0 + index, "kWh", ordinal=1),
+        )
+    )
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=objectives,
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "reduced_real_cache_state": "cached_exact",
+                "physics_bucket_rung": "h40",
+            },
+            product_summary={"oxygen_kg": 10.0 + index},
+        ),
+    )
+
+
+def _journal_any_id_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    token = hashlib.sha256(str(candidate_id).encode("utf-8")).hexdigest()
+    index = int(token[:6], 16) % 1000
+    spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+    objectives = ObjectiveVector(
+        (
+            ObjectiveValue("oxygen_kg", "maximize", 10.0 + index, "kg", ordinal=0),
+            ObjectiveValue("energy_kWh", "minimize", 5.0 + index, "kWh", ordinal=1),
+        )
+    )
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=objectives,
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=RunReference(
+            status="ok",
+            trace={
+                "backend_status": "ok",
+                "reduced_real_cache_state": "cached_exact",
+                "physics_bucket_rung": "h40",
+            },
+            product_summary={"oxygen_kg": 10.0 + index},
+        ),
+    )
+
+
+def test_study_events_journal_replay_round_trip(tmp_path: Path) -> None:
+    out = tmp_path / "journal-round-trip"
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=2,
+        budget=4,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_cache_evaluator,
+    )
+
+    rows = [
+        json.loads(line)
+        for line in (out / "study.events.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert [row["event_kind"] for row in rows].count("candidate_asked") == 4
+    assert [row["event_kind"] for row in rows].count("candidate_evaluated") == 4
+    assert all("cache_state" in row and "rung" in row for row in rows)
+    assert all("created_at" not in row for row in rows)
+    assert all("journal_metadata" in row for row in rows)
+    told = [row for row in rows if row["event_kind"] == "candidate_evaluated"]
+    assert {row["cache_state"] for row in told} == {"cached_exact"}
+    assert {row["rung"] for row in told} == {"h40"}
+    manifest = json.loads((out / "study.manifest.json").read_text(encoding="utf-8"))
+    assert manifest["replayable"] is True
+    assert "scipy_version" in manifest
+    assert "optuna_version" in manifest
+
+    replay = study.replay_study(out)
+
+    assert replay.consumed_rows == 8
+    assert replay.pending_candidates == ()
+    assert [record.candidate_id for record in replay.records] == [
+        record.candidate_id for record in result.records
+    ]
+    assert [record.candidate_id for record in replay.pareto] == [
+        record.candidate_id for record in result.pareto
+    ]
+    state_rows = [
+        json.loads(line)
+        for line in (out / "strategy_state.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    assert state_rows[-1]["strategy_state"] == dict(replay.strategy_state)
+    assert state_rows[-1]["strategy_state"]["strategies"][0]["ask_cursor"] == 4
+
+
+def test_study_journal_replay_fails_closed_on_strategy_state_mismatch(
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "journal-state-mismatch"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=1,
+        budget=2,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_cache_evaluator,
+    )
+    state_path = out / "strategy_state.jsonl"
+    state_rows = [
+        json.loads(line)
+        for line in state_path.read_text(encoding="utf-8").splitlines()
+    ]
+    state_rows[-1]["strategy_state"]["strategies"][0]["ask_cursor"] = 999
+    state_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in state_rows),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(study.StudyReplayError, match="strategy_state snapshot differs"):
+        study.replay_study(out)
+
+
+def test_study_journal_replay_fails_closed_on_corrupt_strategy_state(
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "journal-state-corrupt"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=1,
+        budget=2,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_cache_evaluator,
+    )
+    (out / "strategy_state.jsonl").write_text("{not-json}\n", encoding="utf-8")
+
+    with pytest.raises(study.StudyReplayError, match="not valid JSON"):
+        study.replay_study(out)
+
+
+def test_study_journal_replay_relevant_projection_is_seed_deterministic(
+    tmp_path: Path,
+) -> None:
+    def replay_relevant_jsonl(path: Path) -> list[str]:
+        rows = []
+        for line in path.read_text(encoding="utf-8").splitlines():
+            row = json.loads(line)
+            row.pop("journal_metadata", None)
+            row.pop("created_at", None)
+            rows.append(json.dumps(row, sort_keys=True, separators=(",", ":")))
+        return rows
+
+    for name in ("a", "b"):
+        study.run(
+            PROFILE,
+            FEEDSTOCK,
+            "random",
+            "stub",
+            parallel=2,
+            budget=4,
+            out_dir=tmp_path / name,
+            seed=7,
+            evaluator=_journal_cache_evaluator,
+        )
+
+    assert replay_relevant_jsonl(tmp_path / "a" / "study.events.jsonl") == (
+        replay_relevant_jsonl(tmp_path / "b" / "study.events.jsonl")
+    )
+    assert replay_relevant_jsonl(tmp_path / "a" / "strategy_state.jsonl") == (
+        replay_relevant_jsonl(tmp_path / "b" / "strategy_state.jsonl")
+    )
+
+
+def test_staged_journal_replay_reconstructs_beam_archive(tmp_path: Path) -> None:
+    out = tmp_path / "journal-staged"
+    profile = copy.deepcopy(PROFILE)
+    profile["profile_id"] = "journal-staged"
+    profile["staged"] = {
+        "beam_width": 1,
+        "children_per_parent": 2,
+        "allowlist": ("C0",),
+        "max_backward_passes": 0,
+        "joint_refine": False,
+    }
+
+    result = study.run(
+        profile,
+        FEEDSTOCK,
+        "staged",
+        "stub",
+        parallel=2,
+        budget=2,
+        out_dir=out,
+        seed=4,
+        evaluator=_journal_any_id_evaluator,
+    )
+
+    replay = study.replay_study(out)
+
+    assert [record.candidate_id for record in replay.pareto] == [
+        record.candidate_id for record in result.pareto
+    ]
+    state_rows = [
+        json.loads(line)
+        for line in (out / "strategy_state.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    replay_state = dict(replay.strategy_state)
+    assert state_rows[-1]["strategy_state"] == replay_state
+    staged_state = replay_state["strategies"][0]
+    assert staged_state["archive_ids"]
+    assert staged_state["archive_cache_keys"]
+
+
+def test_study_journal_replay_fails_closed_on_manifest_mismatch(tmp_path: Path) -> None:
+    out = tmp_path / "journal-mismatch"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=1,
+        budget=2,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_cache_evaluator,
+    )
+    manifest_path = out / "study.manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["search_space_identity"]["bounds_digest"] = "stale-bounds"
+    manifest_path.write_text(json.dumps(manifest, sort_keys=True) + "\n", encoding="utf-8")
+
+    with pytest.raises(study.StudyManifestMismatchError, match="bounds_digest"):
+        study.replay_study(out)
+
+
+def test_run_resume_continues_pending_asks_without_overwriting_journal(
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "journal-resume"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=2,
+        budget=4,
+        out_dir=out,
+        seed=9,
+        evaluator=_journal_cache_evaluator,
+    )
+    events_path = out / "study.events.jsonl"
+    rows = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines()]
+    rows = [
+        row
+        for row in rows
+        if not (row["batch_seq"] == 2 and row["event_kind"] == "candidate_evaluated")
+    ]
+    events_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+    state_path = out / "strategy_state.jsonl"
+    state_rows = [
+        json.loads(line)
+        for line in state_path.read_text(encoding="utf-8").splitlines()
+    ]
+    state_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in state_rows[:-1]),
+        encoding="utf-8",
+    )
+    provenance_path = out / "provenance.jsonl"
+    provenance_path.write_text(
+        "".join(provenance_path.read_text(encoding="utf-8").splitlines(True)[:2]),
+        encoding="utf-8",
+    )
+
+    resumed = study.load_study_resume_state(out)
+
+    assert len(resumed.records) == 2
+    assert [candidate.id for candidate in resumed.pending_candidates] == [
+        "random-9-000002",
+        "random-9-000003",
+    ]
+    with pytest.raises(study.StudyReplayError, match="without recorded tell"):
+        study.replay_study(out)
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=2,
+        budget=4,
+        out_dir=out,
+        seed=9,
+        evaluator=_journal_cache_evaluator,
+    )
+    final_rows = [
+        json.loads(line)
+        for line in events_path.read_text(encoding="utf-8").splitlines()
+    ]
+
+    assert len(result.records) == 4
+    assert [row["event_seq"] for row in final_rows] == list(range(1, 9))
+    assert [row["event_kind"] for row in final_rows].count("candidate_asked") == 4
+    assert [row["event_kind"] for row in final_rows].count("candidate_evaluated") == 4
+    assert [row["event_kind"] for row in final_rows if row["batch_seq"] == 2] == [
+        "candidate_asked",
+        "candidate_asked",
+        "candidate_evaluated",
+        "candidate_evaluated",
+    ]
+
+
+def test_study_journal_replay_fails_closed_on_out_of_order_events(
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "journal-order"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=1,
+        budget=2,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_cache_evaluator,
+    )
+    events_path = out / "study.events.jsonl"
+    rows = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines()]
+    rows[0], rows[1] = rows[1], rows[0]
+    events_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(study.StudyReplayError, match="event_seq must be strictly increasing"):
+        study.replay_study(out)
+
+
+def test_study_journal_replay_fails_closed_on_tell_before_ask(
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "journal-tell-before-ask"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=1,
+        budget=1,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_cache_evaluator,
+    )
+    events_path = out / "study.events.jsonl"
+    rows = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines()]
+    ask = rows[0]
+    tell = rows[1]
+    tell["event_seq"] = 1
+    ask["event_seq"] = 2
+    events_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in (tell, ask)),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(study.StudyReplayError, match="appears before its ask"):
+        study.replay_study(out)
+
+
+def test_strategy_manifest_matching_hard_fail_vs_warn_split(tmp_path: Path) -> None:
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        out = _write_save_format_artifacts(tmp_path, monkeypatch)
+    manifest = json.loads((out / "study.manifest.json").read_text(encoding="utf-8"))
+
+    staged_manifest = copy.deepcopy(manifest)
+    staged_manifest["strategy"]["class"] = "StagedStrategy"
+    staged_manifest["strategy"]["name"] = "StagedStrategy"
+    staged_manifest["sampler_name"] = "not-the-active-sampler"
+    with pytest.raises(study.StudyManifestMismatchError, match="sampler mismatch"):
+        study._assert_replay_manifest_current(
+            staged_manifest,
+            schema=RecipeSchema(),
+            search_space_identity=staged_manifest["search_space_identity"],
+        )
+
+    optuna_manifest = copy.deepcopy(manifest)
+    optuna_manifest["strategy"]["class"] = "OptunaTPEStrategy"
+    optuna_manifest["strategy"]["name"] = "OptunaTPEStrategy"
+    optuna_manifest["optuna_version"] = "old-optuna"
+    with pytest.raises(study.StudyManifestMismatchError, match="Optuna mismatch"):
+        study._assert_replay_manifest_current(
+            optuna_manifest,
+            schema=RecipeSchema(),
+            search_space_identity=optuna_manifest["search_space_identity"],
+        )
 
 
 def test_write_empty_artifacts_synthesizes_aborted_ledgers_from_cache(

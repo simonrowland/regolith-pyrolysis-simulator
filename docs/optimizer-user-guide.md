@@ -153,7 +153,14 @@ The web leaderboard is the **Feedstock/Profile Winners** table. It shows:
 - products
 - detail link
 
-The CLI writes `leaderboard.csv`, `pareto.json`, and optional `search_provenance.json` in the output directory. If there is a feasible Pareto winner, it also writes `winner.recipe.yaml`.
+The CLI writes `leaderboard.csv`, `pareto.json`, `study.events.jsonl`, and optional
+`search_provenance.json` in the output directory. If there is a feasible Pareto
+winner, it also writes `winner.recipe.yaml`.
+
+`study.events.jsonl` is the primary replay record: replay re-runs strategy
+`ask()` calls and feeds the recorded `tell()` results back into the strategy.
+Seed reruns are only a determinism check or a way to extend a study, not the
+save/replay mechanism.
 
 Winner selection is deterministic: choose the feasible Pareto point with the best primary profile objective, then compare remaining objectives in declared order, then `cache_key`, then `candidate_id`.
 
