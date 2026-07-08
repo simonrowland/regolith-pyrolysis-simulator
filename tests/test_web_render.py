@@ -17,7 +17,17 @@ _DOM_HARNESS = (
     / "web_render"
     / "render_simulator_tick_dom.mjs"
 )
+_ADVISORY_HARNESS = (
+    _REPO_ROOT
+    / "tests"
+    / "fixtures"
+    / "web_render"
+    / "render_simulator_advisory_dom.mjs"
+)
 _SIMULATOR_TICKS_JS = _REPO_ROOT / "web" / "static" / "js" / "simulator-ticks.js"
+_SIMULATOR_ADVISORY_JS = (
+    _REPO_ROOT / "web" / "static" / "js" / "simulator-advisory.js"
+)
 
 _RENDER_IDS = [
     "status-hour",
@@ -41,6 +51,15 @@ _RENDER_IDS = [
     "gt-o2-vented",
     "gt-vent-rate",
     "debug-inventory-json",
+]
+
+_ADVISORY_IDS = [
+    "product-ledger-state",
+    "product-ledger-content",
+    "overlap-evaporation-state",
+    "overlap-evaporation-content",
+    "knudsen-regime-state",
+    "knudsen-regime-content",
 ]
 
 
@@ -214,6 +233,191 @@ def test_simulation_tick_payload_renders_operator_dom_readouts(
     }
 
 
+def test_completion_payload_renders_product_ledger_and_knudsen_diagnostic():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    payload = {
+        "products": {"Fe": 12.345, "glass": 4.0},
+        "oxygen_kg": 2.5,
+        "oxygen_stored_kg": 2.0,
+        "oxygen_vented_kg": 0.5,
+        "mass_in_kg": 1000.0,
+        "mass_out_kg": 999.999,
+        "terminal_rump_kg": 80.0,
+        "terminal_rump_by_class": {"refractory_ceramic_rump": 80.0},
+        "terminal_rump_by_species": {"CaO": 10.0},
+        "terminal_residual_buckets": {
+            "process.cleaned_melt": {
+                "kg_by_species": {"SiO2": 1.2},
+                "total_kg": 1.2,
+            },
+        },
+        "process_inventory_spent_reductant": {
+            "class_total_kg": 0.75,
+            "account": "process.spent_reductant_residue",
+            "disposition": "process_inventory_spent_reductant",
+            "kg_by_species": {"Na2O": 0.75},
+        },
+        "knudsen_regime_diagnostic": {
+            "status": "warning",
+            "reason": "transitional_knudsen_transport",
+            "regime": "transitional",
+            "knudsen_number": 0.000345,
+            "mean_free_path_m": 0.000041,
+            "overhead_pressure_mbar": 10.0,
+            "gas_temperature_C": 1500.0,
+            "carrier_gas": "N2",
+            "segments": [
+                {
+                    "name": "stage_1_to_stage_2",
+                    "knudsen_number": 0.000345,
+                    "regime": "viscous",
+                    "characteristic_length_m": 0.12,
+                    "regime_factor": 1.0,
+                }
+            ],
+            "warnings": ["surface deposition uncertainty"],
+        },
+    }
+
+    rendered = _render_advisory_dom(
+        html=html,
+        event="simulation_complete",
+        payload=payload,
+    )
+
+    product = rendered["text"]["product-ledger-content"]
+    assert rendered["text"]["product-ledger-state"] == "ok"
+    assert "ProductsFe: 12.345 kg" in product
+    assert "glass: 4 kg" in product
+    assert "Terminal rump by classrefractory ceramic rump: 80 kg" in product
+    assert "SiO2 1.2 kg" in product
+    assert "process.spent_reductant_residue" in product
+    assert "Na2O 0.75 kg" in product
+
+    knudsen = rendered["text"]["knudsen-regime-content"]
+    assert rendered["text"]["knudsen-regime-state"] == "warning"
+    assert "Completion diagnostic" in knudsen
+    assert "Regime: transitional" in knudsen
+    assert "Kn: 3.45e-4" in knudsen
+    assert "stage_1_to_stage_2: Kn 3.45e-4; regime viscous" in knudsen
+
+
+def test_simulation_tick_renders_overlap_evaporation_diagnostic():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    payload = {
+        "overlap_evaporation": {
+            "campaign": "C2A",
+            "campaign_hour": 3,
+            "temperature_C": 1550.0,
+            "completion_target_species": ["Fe"],
+            "endpoint_species_monitored": ["Fe"],
+            "off_target_total_kg_hr": 0.012,
+            "off_target_evaporation": {
+                "SiO": {
+                    "rate_kg_hr": 0.012,
+                    "designated_stage_number": 3,
+                    "future_campaign_stage_targets": ["C4"],
+                    "listed_in_endpoint_watch": False,
+                    "gates_completion": False,
+                },
+            },
+        },
+    }
+
+    rendered = _render_advisory_dom(
+        html=html,
+        event="simulation_tick",
+        payload=payload,
+    )
+
+    content = rendered["text"]["overlap-evaporation-content"]
+    assert rendered["text"]["overlap-evaporation-state"] == "warning"
+    assert "Campaign: C2A" in content
+    assert "Off-target total: 0.012 kg/hr" in content
+    assert "SiO: rate 0.012 kg/hr; stage 3" in content
+    assert "endpoint watch false" in content
+    assert "gates completion false" in content
+
+
+def test_refusal_status_renders_structured_knudsen_diagnostic():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    payload = {
+        "status": "refused",
+        "message": "knudsen regime refused",
+        "knudsen_regime_diagnostic": {
+            "status": "refused",
+            "reason": "free_molecular_transport_refused",
+            "regime": "free_molecular",
+            "knudsen_number": None,
+            "mean_free_path_m": None,
+            "overhead_pressure_mbar": 0.0,
+            "gas_temperature_C": 1500.0,
+            "carrier_gas": "N2",
+            "segments": [
+                {
+                    "name": "default_pipe",
+                    "knudsen_number": 12.0,
+                    "regime": "free_molecular",
+                    "characteristic_length_m": 0.12,
+                    "regime_factor": 0.0,
+                }
+            ],
+        },
+    }
+
+    rendered = _render_advisory_dom(
+        html=html,
+        event="simulation_status",
+        payload=payload,
+    )
+
+    content = rendered["text"]["knudsen-regime-content"]
+    assert rendered["text"]["knudsen-regime-state"] == "refused"
+    assert "Refusal diagnostic" in content
+    assert "Regime: free_molecular" in content
+    assert "Reason: free_molecular_transport_refused" in content
+    assert "default_pipe: Kn 12; regime free_molecular" in content
+
+
+def test_per_hour_summary_renders_kn_and_regime():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+    payload = {
+        "hour": 7,
+        "campaign": "C2A",
+        "Kn": 0.000345,
+        "regime": "viscous",
+        "transport_formula_id": "mean_free_path_v1",
+    }
+
+    rendered = _render_advisory_dom(
+        html=html,
+        event="per_hour_summary",
+        payload=payload,
+    )
+
+    content = rendered["text"]["knudsen-regime-content"]
+    assert rendered["text"]["knudsen-regime-state"] == "viscous"
+    assert "Per-hour transport" in content
+    assert "Hour: 7" in content
+    assert "Kn: 3.45e-4" in content
+    assert "Regime: viscous" in content
+    assert "Formula: mean_free_path_v1" in content
+
+
+def test_new_advisory_panels_render_empty_payloads_as_na():
+    html = app_module.create_app().test_client().get("/").get_data(as_text=True)
+
+    complete = _render_advisory_dom(html=html, event="simulation_complete", payload={})
+    assert complete["text"]["product-ledger-state"] == "n/a"
+    assert complete["text"]["product-ledger-content"] == "n/a"
+    assert complete["text"]["knudsen-regime-state"] == "n/a"
+    assert complete["text"]["knudsen-regime-content"] == "n/a"
+
+    tick = _render_advisory_dom(html=html, event="simulation_tick", payload={})
+    assert tick["text"]["overlap-evaporation-state"] == "n/a"
+    assert tick["text"]["overlap-evaporation-content"] == "n/a"
+
+
 def _assert_producer_tick_baseline(payload):
     assert payload["hour"] == 1
     assert payload["campaign"] == "C0"
@@ -242,6 +446,30 @@ def _render_tick_dom(*, html, payload):
                 "payload": payload,
                 "script_path": str(_SIMULATOR_TICKS_JS),
                 "ids": _RENDER_IDS,
+            }
+        ),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return json.loads(completed.stdout)
+
+
+def _render_advisory_dom(*, html, event, payload):
+    completed = subprocess.run(
+        [
+            "node",
+            str(_ADVISORY_HARNESS),
+        ],
+        input=json.dumps(
+            {
+                "html": html,
+                "event": event,
+                "payload": payload,
+                "script_path": str(_SIMULATOR_ADVISORY_JS),
+                "ids": _ADVISORY_IDS,
             }
         ),
         text=True,

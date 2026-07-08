@@ -2554,6 +2554,7 @@ def test_product_ledger_panel_surfaces_unclassified_mass_as_inconclusive(
         ),
         created_at="2026-06-02T00:00:00Z",
     )
+    key = cache_key(spec)
 
     response = client.get("/api/optimizer/runs")
 
@@ -2567,6 +2568,13 @@ def test_product_ledger_panel_surfaces_unclassified_mass_as_inconclusive(
     }
     diagnostics = {row["id"]: row for row in panel["diagnostics"]}
     assert diagnostics["unclassified_product_mass"]["kind"] == "diagnostic"
+
+    detail = client.get(f"/optimizer/runs/run-unclassified/results/{key}")
+    assert detail.status_code == 200
+    html = detail.get_data(as_text=True)
+    assert "Unclassified product mass" in html
+    assert "MysteryOxide 7.0 kg" in html
+    assert "product ledger species are outside named product bins" in html
 
 
 def test_web_routes_do_not_import_evaluate_or_worker_runtime() -> None:

@@ -203,6 +203,42 @@
             </tbody>
         </table>
         {% endif %}
+        {% if result.product_ledger_panel and result.product_ledger_panel.diagnostics %}
+        <h4 class="ctrl-heading">Diagnostics</h4>
+        <table class="param-table">
+            <thead>
+                <tr>
+                    <th>Diagnostic</th>
+                    <th>Mass</th>
+                    <th>Species detail</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in result.product_ledger_panel.diagnostics %}
+                <tr>
+                    <td>{{ row.label if row.label is defined else row.id }}</td>
+                    <td>{{ row.kg if row.kg is defined else "inconclusive" }} kg</td>
+                    <td>
+                        {% if row.kg_by_species is defined and row.kg_by_species %}
+                        {% for species, kg in row.kg_by_species.items() %}
+                        {{ species }} {{ kg }} kg{% if not loop.last %}<br>{% endif %}
+                        {% endfor %}
+                        {% else %}
+                        inconclusive
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ row.status if row.status is defined else "inconclusive" }}
+                        {% if row.reason is defined and row.reason %}
+                        <span class="range">{{ row.reason }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
     </div>
 
     <div class="section-card">

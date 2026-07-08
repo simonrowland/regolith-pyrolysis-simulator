@@ -15,6 +15,10 @@
         {% if vapor_pressure_authority.fallback_source %}
         <div>Fallback source: {{ vapor_pressure_authority.fallback_source }}</div>
         {% endif %}
+        {% if vapor_pressure_authority.authoritative_for_requested_vapor_pressure is defined
+              and vapor_pressure_authority.authoritative_for_requested_vapor_pressure is not none %}
+        <div>Requested vapor authority: {{ vapor_pressure_authority.authoritative_for_requested_vapor_pressure }}</div>
+        {% endif %}
         <div>Diagnostic only: {{ vapor_pressure_authority.diagnostic_only }}</div>
     </div>
     {% endif %}

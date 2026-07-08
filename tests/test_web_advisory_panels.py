@@ -25,6 +25,9 @@ def test_dashboard_renders_advisory_panels(client) -> None:
     assert 'id="wall-risk-panel"' in html
     assert 'id="vapor-pressure-authority-panel"' in html
     assert 'id="ceramic-rump-panel"' in html
+    assert 'id="product-ledger-panel"' in html
+    assert 'id="overlap-evaporation-panel"' in html
+    assert 'id="knudsen-regime-panel"' in html
     assert "simulator-advisory.js" in html
 
 
@@ -70,6 +73,7 @@ def test_vapor_pressure_authority_api_and_panel_render_fallback(client) -> None:
     assert "data-vapor-pressure-authority-panel" in html
     assert "fallback" in html
     assert "VapoRock returned no usable vapor pressures" in html
+    assert "Requested vapor authority: False" in html
     assert "Diagnostic only: True" in html
 
 
