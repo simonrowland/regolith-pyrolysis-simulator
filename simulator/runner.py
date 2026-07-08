@@ -1276,6 +1276,24 @@ def _latest_execution_mass_balance_pct(execution: RunExecution) -> float | None:
     return None
 
 
+def _execution_mass_balance_error_category(execution: RunExecution) -> str:
+    snapshots = tuple(getattr(execution, "snapshots", ()) or ())
+    for snapshot in snapshots:
+        category = str(
+            getattr(snapshot, "mass_balance_error_category", "") or ""
+        )
+        if category:
+            return category
+    per_hour = tuple(getattr(execution, "per_hour", ()) or ())
+    for row in per_hour:
+        if not isinstance(row, Mapping):
+            continue
+        category = str(row.get("mass_balance_error_category", "") or "")
+        if category:
+            return category
+    return ""
+
+
 def _coerce_mass_balance_pct(value: Any, *, source: str) -> float:
     try:
         pct = float(value)
@@ -1300,6 +1318,12 @@ def _status_with_mass_balance_invariant(
     error_message = str(execution.error_message)
     if status not in {"ok", "partial"}:
         return status, reason, error_message
+
+    category = _execution_mass_balance_error_category(execution)
+    if category:
+        reason = category
+        error_message = f"mass_balance_error_category: {category}"
+        return "failed", reason, error_message
 
     mass_balance_pct = _latest_execution_mass_balance_pct(execution)
     if (

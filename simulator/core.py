@@ -304,6 +304,8 @@ BACKEND_ACCOUNT_SCOPED_ONLY = (
 OXYGEN_MOLAR_MASS_KG_PER_MOL = MOLAR_MASS[OXYGEN_SPECIES] / 1000.0
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
 OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
+OXYGEN_RESERVOIR_REDOX_SOURCE_MIN_FO2_LOG10_BAR = -1.0e11
+OXYGEN_RESERVOIR_REDOX_SOURCE_MAX_FO2_LOG10_BAR = 1.0e11
 # Coarse absolute ferric-fraction tripwire until SSO-R ch2 re-speciation
 # samples implied and ledger speciation at the same boundary.
 # TODO(SSO-R ch2 re-speciation): replace with the final respeciation gate.
@@ -3381,6 +3383,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     melt_redox_capacity_mol_per_ln_fO2=C_m,
                     delta_ln_fO2=applied_delta_ln,
                     candidate_fO2_log=candidate_fO2_log,
+                )
+                applied_delta_ln = 0.0
+            elif not (
+                OXYGEN_RESERVOIR_REDOX_SOURCE_MIN_FO2_LOG10_BAR
+                <= candidate_fO2_log
+                <= OXYGEN_RESERVOIR_REDOX_SOURCE_MAX_FO2_LOG10_BAR
+            ):
+                skip_reason = 'redox_candidate_fO2_out_of_range_refusal'
+                refusal_context = self._oxygen_reservoir_guard_context(
+                    context='redox_source_terms_fO2_range_refusal',
+                    source_terms_mol_o2_equiv=terms,
+                    net_o2_equiv_mol=net_o2_equiv_mol,
+                    melt_redox_capacity_mol_per_ln_fO2=C_m,
+                    delta_ln_fO2=applied_delta_ln,
+                    candidate_fO2_log=candidate_fO2_log,
+                )
+                refusal_context['candidate_fO2_log_min'] = (
+                    OXYGEN_RESERVOIR_REDOX_SOURCE_MIN_FO2_LOG10_BAR
+                )
+                refusal_context['candidate_fO2_log_max'] = (
+                    OXYGEN_RESERVOIR_REDOX_SOURCE_MAX_FO2_LOG10_BAR
                 )
                 applied_delta_ln = 0.0
             else:

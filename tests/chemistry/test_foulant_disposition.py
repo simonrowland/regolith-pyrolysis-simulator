@@ -126,6 +126,21 @@ def test_chi_escape_salt_returns_escape_split_dataclass() -> None:
     assert result.escaped_frac == pytest.approx(0.354, abs=0.02)
     assert result.retained_frac == pytest.approx(1.0 - result.escaped_frac, abs=1e-9)
     assert 0.0 <= result.escaped_frac <= 1.0
+    assert result.status == "ok"
+    assert result.confidence == "partly_grounded"
+    assert result.warning is None
+
+
+def test_chi_escape_salt_flags_out_of_range_non_authoritative_result() -> None:
+    result = chi_escape_salt("NaCl", 1500.0, 0.01)
+    assert isinstance(result, EscapeSplit)
+    assert result.escaped_frac == pytest.approx(0.992, abs=0.002)
+    assert result.retained_frac == pytest.approx(1.0 - result.escaped_frac, abs=1e-9)
+    assert result.status == "out_of_range"
+    assert result.confidence == "extrapolated"
+    assert result.warning is not None
+    assert "outside valid_range_K [1138, 1738]" in result.warning
+    assert "non-authoritative extrapolation" in result.warning
 
 
 def test_chi_escape_salt_high_vacuum_fraction() -> None:

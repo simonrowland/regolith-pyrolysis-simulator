@@ -88,6 +88,30 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
     assert _exact_columns(db_path) == exact_before
 
 
+def test_backfill_physics_bucket_skips_stub_rows_before_bucket_derivation(tmp_path):
+    db_path = tmp_path / "legacy.db"
+    _create_legacy_db(db_path)
+    trusted = _replay_key("trusted", setpoints_digest="setpoints-trusted")
+    stub = _replay_key("stub", setpoints_digest="setpoints-stub")
+    stub["backend"] = {
+        "backend_name": "StubBackend",
+        "backend_class": "simulator.melt_backend.base.StubBackend",
+        "corpus_version": current_corpus_version(),
+    }
+    _insert_legacy_row(db_path, trusted)
+    _insert_legacy_row(db_path, stub)
+
+    stats = backfill.run_backfill(db_path, dry_run=False)
+
+    assert stats.total_rows == 2
+    assert stats.invalid_rows == 1
+    assert stats.rows_updated == 1
+    bucket_by_label = _bucket_sha_by_code_version(db_path)
+    assert bucket_by_label["test-trusted"] is not None
+    assert bucket_by_label["test-stub"] is None
+    assert _null_physics_column_count(db_path) == 1
+
+
 def _bucket_sha_by_code_version(db_path: Path) -> dict:
     with sqlite3.connect(db_path) as conn:
         rows = conn.execute(
@@ -156,7 +180,14 @@ def _replay_key(
 
 
 def _insert_legacy_row(db_path: Path, key: dict) -> None:
-    payload = {"equilibrium_result": {"status": "ok"}, "label": key["code_version"]}
+    payload = {
+        "equilibrium_result": {"status": "ok"},
+        "last_vapor_pressures_source": {
+            "Na": "builtin_authoritative",
+            "SiO": "builtin_authoritative",
+        },
+        "label": key["code_version"],
+    }
     key_bytes = rrd.canonical_json_bytes(key)
     payload_bytes = rrd.canonical_json_bytes(payload)
     key_hash = hashlib.sha256(key_bytes).hexdigest()

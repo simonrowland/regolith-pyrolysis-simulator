@@ -43,7 +43,9 @@ from simulator.runner import (
     PyrolysisRun,
     RUNNER_SCHEMA_VERSION,
     RunnerError,
+    ZERO_INPUT_BASIS_BREACH,
     _c3_alkali_dosing_kg_by_species,
+    _status_with_mass_balance_invariant,
     _vapor_pressure_source_report,
 )
 
@@ -938,6 +940,43 @@ def test_runner_cli_rejects_zero_mass_with_named_failure(tmp_path):
     assert payload["status"] == "failed"
     assert payload["run_metadata"]["mass_kg"] == pytest.approx(0.0)
     assert "zero_input_basis_breach" in payload["error_message"]
+
+
+def test_status_with_mass_balance_invariant_fails_breach_category() -> None:
+    execution = SimpleNamespace(
+        status="ok",
+        reason="",
+        error_message="",
+        snapshots=(
+            SimpleNamespace(
+                mass_balance_error_pct=4.99e-12,
+                mass_balance_error_category=ZERO_INPUT_BASIS_BREACH,
+            ),
+        ),
+        per_hour=(),
+    )
+
+    status, reason, error_message = _status_with_mass_balance_invariant(execution)
+
+    assert status == "failed"
+    assert reason == ZERO_INPUT_BASIS_BREACH
+    assert ZERO_INPUT_BASIS_BREACH in error_message
+
+
+def test_status_with_mass_balance_invariant_valid_small_pct_unchanged() -> None:
+    execution = SimpleNamespace(
+        status="ok",
+        reason="still-valid",
+        error_message="",
+        snapshots=(SimpleNamespace(mass_balance_error_pct=4.99e-12),),
+        per_hour=(),
+    )
+
+    assert _status_with_mass_balance_invariant(execution) == (
+        "ok",
+        "still-valid",
+        "",
+    )
 
 
 def test_runner_records_operator_decision_in_shadow_trace():

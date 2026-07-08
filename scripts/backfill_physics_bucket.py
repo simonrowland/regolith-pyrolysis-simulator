@@ -24,10 +24,12 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_SCHEMA_VERSION,
     PHYSICS_BUCKET_ALL_LADDER_RUNGS,
     PT1_EQUILIBRIUM_TABLE,
+    assert_strict_vapor_pt1_row,
     canonical_physics_ladder_bucket_key_from_replay_key,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
     physics_ladder_bucket_distance_from_replay_key,
+    validate_reduced_real_equilibrium_record_key,
 )
 
 
@@ -135,12 +137,13 @@ def run_backfill(
             for row in rows:
                 stats.total_rows += 1
                 try:
-                    values = _physics_values_from_key_bytes(row["key_bytes"])
+                    values = _physics_values_from_admitted_row(row)
                 except (json.JSONDecodeError, UnicodeDecodeError, TypeError, ValueError):
                     stats.invalid_rows += 1
-                    raise RuntimeError(
-                        f"invalid replay key bytes for row {row['key_hash']}"
-                    ) from None
+                    continue
+                except RuntimeError:
+                    stats.invalid_rows += 1
+                    continue
                 distinct_physics_hashes.add(values.physics_bucket_sha256)
                 distinct_ladder_hashes["h40"].add(values.physics_bucket_h40_sha256)
                 distinct_ladder_hashes["h30"].add(values.physics_bucket_h30_sha256)
@@ -282,24 +285,84 @@ def _ensure_backfill_columns(conn: sqlite3.Connection, columns: set[str]) -> Non
 
 
 def _select_rows_sql(columns: set[str]) -> str:
+    required = [
+        column if column in columns else f"NULL AS {column}"
+        for column in (
+            "artifact",
+            "key_hash",
+            "key_sha256",
+            "payload_sha256",
+            "key_bytes",
+            "payload_bytes",
+        )
+    ]
     optional = [
         column if column in columns else f"NULL AS {column}"
         for column in PHYSICS_COLUMNS
     ]
+    order_by = "key_hash" if "key_hash" in columns else "rowid"
     return f"""
         SELECT
-            key_hash,
-            key_bytes,
+            {", ".join(required)},
             {", ".join(optional)}
         FROM {PT1_EQUILIBRIUM_TABLE}
-        ORDER BY key_hash
+        ORDER BY {order_by}
     """
+
+
+def _physics_values_from_admitted_row(row: sqlite3.Row) -> PhysicsBucketValues:
+    key_hash = str(row["key_hash"] or "")
+    key_bytes = _blob_bytes(row["key_bytes"])
+    if not key_hash:
+        raise ValueError("row key_hash is required")
+    actual_key_hash = _sha256(key_bytes)
+    if actual_key_hash != key_hash:
+        raise ValueError("row key_hash does not match key_bytes")
+    if row["key_sha256"] is not None and str(row["key_sha256"]) != actual_key_hash:
+        raise ValueError("row key_sha256 does not match key_bytes")
+
+    payload_bytes = _blob_bytes(row["payload_bytes"])
+    payload_hash = _sha256(payload_bytes)
+    if (
+        row["payload_sha256"] is not None
+        and str(row["payload_sha256"]) != payload_hash
+    ):
+        raise ValueError("row payload_sha256 does not match payload_bytes")
+
+    key = json.loads(key_bytes.decode("utf-8"))
+    payload = json.loads(payload_bytes.decode("utf-8"))
+    if not isinstance(key, Mapping):
+        raise ValueError("replay key must decode to a JSON object")
+    if not isinstance(payload, Mapping):
+        raise ValueError("payload must decode to a JSON object")
+
+    artifact = str(row["artifact"] or key.get("artifact", "") or "")
+    if not artifact:
+        raise ValueError("row artifact is required")
+    key_artifact = str(key.get("artifact", "") or "")
+    if key_artifact and key_artifact != artifact:
+        raise ValueError("row artifact does not match key artifact")
+
+    _reject_stub_backend_key(key)
+    validate_reduced_real_equilibrium_record_key(artifact, key)
+    assert_strict_vapor_pt1_row(
+        artifact=artifact,
+        key=key,
+        payload=payload,
+        key_hash=key_hash,
+        context=f"physics-bucket backfill {artifact}:{key_hash}",
+    )
+    return _physics_values_from_replay_key(key)
 
 
 def _physics_values_from_key_bytes(key_bytes: Any) -> PhysicsBucketValues:
     key = json.loads(_blob_bytes(key_bytes).decode("utf-8"))
     if not isinstance(key, Mapping):
         raise ValueError("replay key must decode to a JSON object")
+    return _physics_values_from_replay_key(key)
+
+
+def _physics_values_from_replay_key(key: Mapping[str, Any]) -> PhysicsBucketValues:
     physics_key = canonical_physics_bucket_key_from_replay_key(key)
     physics_key_bytes = canonical_json_bytes(physics_key)
     replay_scope = physics_key.get("replay_scope", {})
@@ -332,6 +395,19 @@ def _physics_values_from_key_bytes(key_bytes: Any) -> PhysicsBucketValues:
         physics_bucket_h30c_sha256=str(ladder_values["h30c"]["sha256"]),
         physics_bucket_h30c_distance=float(ladder_values["h30c"]["distance"]),
     )
+
+
+def _reject_stub_backend_key(key: Mapping[str, Any]) -> None:
+    backend = key.get("backend", {})
+    if not isinstance(backend, Mapping):
+        backend = {}
+    for field in ("backend_name", "backend_class"):
+        name = str(backend.get(field, "") or "").strip().split(".")[-1]
+        if name == "StubBackend":
+            raise RuntimeError(
+                "physics-bucket backfill requires authorized real backend rows; "
+                "got StubBackend"
+            )
 
 
 def _backfill_state(row: sqlite3.Row, values: PhysicsBucketValues) -> str:

@@ -100,6 +100,39 @@ def _uncertified_foulant_warning(carrier_key: str) -> str:
     return f"{carrier_key} foulant volatilization uncertified - not modeled"
 
 
+def _valid_range_K(entry: Mapping[str, Any]) -> tuple[float, float] | None:
+    raw_range = entry.get("valid_range_K")
+    if raw_range is None:
+        coeff = entry.get("pure_component_antoine") or entry.get("antoine") or {}
+        raw_range = coeff.get("valid_range_K")
+    if not isinstance(raw_range, Sequence) or isinstance(raw_range, (str, bytes)):
+        return None
+    if len(raw_range) != 2:
+        return None
+    low = float(raw_range[0])
+    high = float(raw_range[1])
+    if not math.isfinite(low) or not math.isfinite(high) or low > high:
+        return None
+    return low, high
+
+
+def _temperature_range_warning(
+    carrier_key: str,
+    temperature_K: float,
+    valid_range: tuple[float, float] | None,
+) -> str | None:
+    if valid_range is None:
+        return None
+    low, high = valid_range
+    if low <= temperature_K <= high:
+        return None
+    return (
+        f"{carrier_key} foulant volatilization at {temperature_K:.2f} K is "
+        f"outside valid_range_K [{low:g}, {high:g}]; "
+        "salt/halide result is non-authoritative extrapolation"
+    )
+
+
 def _load_vapor_pressures(path: Path | None = None) -> Mapping[str, Any]:
     yaml_path = path or _DEFAULT_VAPOR_PRESSURES_PATH
     with yaml_path.open(encoding="utf-8") as handle:
@@ -130,6 +163,11 @@ def chi_escape_salt(
         )
 
     temperature_K = float(T_C) + 273.15
+    warning = _temperature_range_warning(
+        carrier_key,
+        temperature_K,
+        _valid_range_K(entry),
+    )
     p_sat_pa = _pure_component_antoine_pa(entry, temperature_K)
     p_total_pa = float(p_overhead_bar) * PA_PER_BAR
     if p_sat_pa < 0.0 or p_total_pa < 0.0:
@@ -144,6 +182,9 @@ def chi_escape_salt(
     return EscapeSplit(
         escaped_frac=escaped,
         retained_frac=1.0 - escaped,
+        confidence="extrapolated" if warning else "partly_grounded",
+        status="out_of_range" if warning else "ok",
+        warning=warning,
     )
 
 

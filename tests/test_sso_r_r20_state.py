@@ -806,6 +806,66 @@ def test_redox_source_refuses_denormal_capacity_before_nonfinite_fo2(
     assert context["candidate_fO2_log"] == "inf"
 
 
+def test_redox_source_refuses_finite_absurd_candidate_fo2(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    temperature_K = 1873.15
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
+    sim._sync_oxygen_reservoir_mirror()
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_capacity_mol_per_ln_fO2",
+        lambda **_: 1e-9,
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:evaporative_metal_loss": 1000.0},
+        exchange_direction="redox_source:evaporative_loss",
+        temperature_K=temperature_K,
+    )
+
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-9.0)
+    assert reservoir.redox_source_terms_applied is False
+    assert (
+        reservoir.redox_source_skip_reason
+        == "redox_candidate_fO2_out_of_range_refusal"
+    )
+    assert reservoir.redox_source_skipped_terms_mol_o2_equiv == pytest.approx(
+        {"redox_source:evaporative_metal_loss": 1000.0}
+    )
+    context = reservoir.redox_source_refusal_context
+    assert context["context"] == "redox_source_terms_fO2_range_refusal"
+    assert context["candidate_fO2_log"] > 1.0e11
+    assert context["candidate_fO2_log_min"] == pytest.approx(-1.0e11)
+    assert context["candidate_fO2_log_max"] == pytest.approx(1.0e11)
+
+
+def test_redox_source_valid_candidate_fo2_still_applies_exact_delta() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    temperature_K = 1873.15
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
+    sim._sync_oxygen_reservoir_mirror()
+    capacity = sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=sim._current_melt_redox_fO2_log(),
+        T_K=temperature_K,
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_valid": capacity * math.log(10.0) * 0.25},
+        temperature_K=temperature_K,
+    )
+
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-8.75)
+    assert reservoir.redox_source_terms_applied is True
+    assert reservoir.redox_source_skip_reason == ""
+    assert reservoir.redox_source_refusal_context == {}
+
+
 def test_nonfinite_reservoir_fo2_raises_accounting_error_with_attribution() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
