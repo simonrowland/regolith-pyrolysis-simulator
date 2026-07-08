@@ -9,6 +9,7 @@ import copy
 from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path
+import tempfile
 from typing import Any
 from urllib.parse import quote
 
@@ -46,6 +47,14 @@ from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
 from simulator.optimize.honesty import optimizer_tier_label
+from simulator.optimize.import_bundle import (
+    BUNDLE_CAP_BYTES,
+    ImportBundleError,
+    import_study_bundle,
+    imported_studies,
+    imported_study_model,
+    is_imported_path,
+)
 from simulator.optimize.objective import (
     canonical_objective_metric,
     objective_metric_aliases,
@@ -181,17 +190,25 @@ def _optimizer_run_dirs(root: Path) -> list[Path]:
         return []
 
     run_dirs: list[Path] = []
-    if (root / OPTIMIZER_CACHE_NAME).is_file():
+    if (root / OPTIMIZER_CACHE_NAME).is_file() and not is_imported_path(root, root):
         run_dirs.append(root)
 
     for child in sorted(root.iterdir()):
-        if child.is_dir() and (child / OPTIMIZER_CACHE_NAME).is_file():
+        if (
+            child.is_dir()
+            and not is_imported_path(child, root)
+            and (child / OPTIMIZER_CACHE_NAME).is_file()
+        ):
             run_dirs.append(child)
 
     jobs_root = root / OPTIMIZER_JOBS_DIR_NAME
     if jobs_root.is_dir():
         for child in sorted(jobs_root.iterdir()):
-            if child.is_dir() and (child / OPTIMIZER_CACHE_NAME).is_file():
+            if (
+                child.is_dir()
+                and not is_imported_path(child, root)
+                and (child / OPTIMIZER_CACHE_NAME).is_file()
+            ):
                 run_dirs.append(child)
 
     unique = {path.resolve(): path for path in run_dirs}
@@ -1956,6 +1973,7 @@ def _optimizer_table_context() -> dict[str, Any]:
     return {
         'runs_dir': str(root),
         'entries': entries,
+        'imported_entries': imported_studies(root),
         'filters': filters,
         'feedstock_profiles': _optimizer_feedstock_profiles_payload(),
         **_optimizer_version_context(),
@@ -2983,6 +3001,107 @@ def optimizer_run_download(run_id: str):
         download_name=bundle_path.name,
         max_age=0,
     )
+
+
+def _uploaded_bundle_tempfile() -> tuple[Path | None, str | None]:
+    upload = request.files.get('bundle')
+    if upload is None or not upload.filename:
+        return None, 'bundle file is required'
+    suffix = '.rpstudy.zip' if str(upload.filename).endswith('.rpstudy.zip') else '.zip'
+    handle = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    total = 0
+    path = Path(handle.name)
+    try:
+        with handle:
+            while True:
+                chunk = upload.stream.read(1024 * 1024)
+                if not chunk:
+                    break
+                total += len(chunk)
+                if total > BUNDLE_CAP_BYTES:
+                    return path, 'bundle exceeds 512MB cap'
+                handle.write(chunk)
+    except OSError as exc:
+        return path, f'could not store upload: {exc}'
+    return path, None
+
+
+@bp.route('/api/optimizer/import', methods=['POST'])
+@bp.route('/optimizer/import', methods=['POST'])
+def optimizer_import_upload():
+    """Import an uploaded save-format bundle into runs/imported/."""
+    tmp_path, error = _uploaded_bundle_tempfile()
+    if error is not None:
+        if tmp_path is not None:
+            try:
+                tmp_path.unlink()
+            except OSError:
+                pass
+        code = 413 if '512MB' in error else 400
+        if _wants_json_response():
+            return jsonify({'error': error}), code
+        return render_template(
+            'optimizer.html',
+            import_error=error,
+            **_optimizer_table_context(),
+            **_optimizer_launch_context(),
+        ), code
+    assert tmp_path is not None
+    try:
+        imported = import_study_bundle(
+            tmp_path,
+            _optimizer_runs_root(),
+            uploader_note=str(request.form.get('uploader_note') or ''),
+            origin={'upload_filename': request.files['bundle'].filename},
+        )
+    except ImportBundleError as exc:
+        try:
+            tmp_path.unlink()
+        except OSError:
+            pass
+        if _wants_json_response():
+            return jsonify({'error': str(exc)}), 400
+        return render_template(
+            'optimizer.html',
+            import_error=str(exc),
+            **_optimizer_table_context(),
+            **_optimizer_launch_context(),
+        ), 400
+    finally:
+        try:
+            tmp_path.unlink()
+        except OSError:
+            pass
+
+    model = imported_study_model(imported.path, _optimizer_runs_root())
+    if _wants_json_response():
+        status = 200 if imported.deduped else 201
+        return jsonify({'imported': model, 'deduped': imported.deduped}), status
+    return render_template('optimizer_imported.html', imported=model), 201
+
+
+@bp.route('/api/optimizer/imported')
+def optimizer_imported_runs():
+    """Return imported studies from the quarantine namespace only."""
+    root = _optimizer_runs_root()
+    return jsonify({
+        'runs_dir': str(root),
+        'imported': imported_studies(root),
+    })
+
+
+@bp.route('/optimizer/imported/<path:study_id>')
+def optimizer_imported_detail(study_id: str):
+    """Dedicated imported-study view composed from summary plus overlay."""
+    root = _optimizer_runs_root()
+    import_dir = root / 'imported' / study_id
+    if not is_imported_path(import_dir, root) or not import_dir.is_dir():
+        return render_template('optimizer_not_found.html'), 404
+    try:
+        model = imported_study_model(import_dir, root)
+    except (ImportBundleError, OSError, ValueError):
+        return render_template('optimizer_not_found.html'), 404
+    return render_template('optimizer_imported.html', imported=model)
 
 
 @bp.route('/api/feedstocks')

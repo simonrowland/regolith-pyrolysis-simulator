@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Imported Study {{ imported.study_id }} - Regolith Pyrolysis{% endblock %}
+
+{% block content %}
+<section class="main-area">
+    <div class="section-card">
+        <h2>Imported Study</h2>
+        <table class="param-table">
+            <tr><td>Study</td><td>{{ imported.study_id }}</td></tr>
+            <tr><td>Source study</td><td>{{ imported.source_study_id or "not declared" }}</td></tr>
+            <tr><td>Feedstock</td><td>{{ imported.feedstock_id or "not declared" }}</td></tr>
+            <tr><td>Profile</td><td>{{ imported.profile_id or "not declared" }}</td></tr>
+            <tr><td>Status</td><td>{{ imported.study_status or "unknown" }}</td></tr>
+            <tr><td>Created</td><td>{{ imported.created_at or "unknown" }}</td></tr>
+            <tr><td>Imported</td><td>{{ imported.imported_at or "unknown" }}</td></tr>
+            <tr>
+                <td>Origin</td>
+                <td>
+                    {{ imported.origin.kind or "uploaded" }}
+                    {% if imported.origin.filename %}
+                    <span class="range">{{ imported.origin.filename }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Verification</td>
+                <td>
+                    {% set badge = imported.badges or {} %}
+                    <span class="backend-badge backend-badge-unknown"
+                          title="{{ badge.title or 'imported verification state' }}">
+                        {{ badge.ux_label or "UNVERIFIED" }} / {{ badge.tier or "imported" }}
+                    </span>
+                </td>
+            </tr>
+        </table>
+        <div class="control-buttons">
+            <a class="btn" href="{{ url_for('web.optimizer_page') }}">Back to optimizer</a>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h3>Verification Report</h3>
+        {% if imported.verification %}
+        <table class="composition-table">
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Cache key</th>
+                    <th>Verdict</th>
+                    <th>Reasons</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for candidate in imported.verification.candidates or [] %}
+                <tr>
+                    <td>{{ candidate.candidate_id or "not declared" }}</td>
+                    <td>{{ candidate.cache_key or "not declared" }}</td>
+                    <td>{{ candidate.verdict or "unverified" }}</td>
+                    <td>{{ (candidate.reason_codes or [])|join(", ") }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-hint">No local verification report.</div>
+        {% endif %}
+    </div>
+
+    <div class="section-card">
+        <h3>Leaderboard Claims</h3>
+        {% if imported.leaderboard %}
+        <table class="composition-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Candidate</th>
+                    <th>Cache key</th>
+                    <th>Winner</th>
+                    <th>Pareto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in imported.leaderboard %}
+                <tr>
+                    <td>{{ row.rank or loop.index }}</td>
+                    <td>{{ row.candidate_id or "not declared" }}</td>
+                    <td>{{ row.cache_key or "not declared" }}</td>
+                    <td>{{ row.is_winner or "false" }}</td>
+                    <td>{{ row.is_pareto or "false" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-hint">No leaderboard rows in imported bundle.</div>
+        {% endif %}
+    </div>
+
+    <div class="section-card">
+        <h3>Artifacts</h3>
+        <table class="param-table">
+            {% for artifact in imported.artifacts %}
+            <tr>
+                <td>{{ artifact.name }}</td>
+                <td>{{ artifact.size_bytes }} bytes <span class="range">{{ artifact.relative_path }}</span></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endblock %}

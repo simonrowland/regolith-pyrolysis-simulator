@@ -125,6 +125,81 @@
         </form>
     </div>
 
+    <div class="section-card">
+        <h3>Import Study Bundle</h3>
+        {% if import_error %}
+        <p class="config-hint">{{ import_error }}</p>
+        {% endif %}
+        <form id="optimizer-import-form"
+              class="campaign-controls"
+              method="post"
+              action="{{ url_for('web.optimizer_import_upload') }}"
+              enctype="multipart/form-data">
+            <div class="ctrl-row">
+                <label for="optimizer-import-bundle">Bundle</label>
+                <input id="optimizer-import-bundle"
+                       name="bundle"
+                       type="file"
+                       accept=".rpstudy.zip,application/zip"
+                       required>
+            </div>
+            <div class="ctrl-row">
+                <label for="optimizer-import-note">Note</label>
+                <input id="optimizer-import-note"
+                       name="uploader_note"
+                       value=""
+                       placeholder="optional">
+            </div>
+            <div class="control-buttons">
+                <button class="btn btn-primary" type="submit">Import</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="section-card">
+        <h3>Imported Studies</h3>
+        {% if imported_entries %}
+        <table class="composition-table">
+            <thead>
+                <tr>
+                    <th>Study</th>
+                    <th>Feedstock / profile</th>
+                    <th>Status</th>
+                    <th>Verification</th>
+                    <th>Imported</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for imported in imported_entries %}
+                <tr>
+                    <td>{{ imported.study_id }}</td>
+                    <td>
+                        <strong>{{ imported.feedstock_id or "not declared" }}</strong><br>
+                        <span class="range">{{ imported.profile_id or "not declared" }}</span>
+                    </td>
+                    <td>{{ imported.study_status or "unknown" }}</td>
+                    <td>
+                        {% set badge = imported.badges or {} %}
+                        <span class="backend-badge backend-badge-unknown"
+                              title="{{ badge.title or 'imported verification state' }}">
+                            {{ badge.ux_label or "UNVERIFIED" }} / {{ badge.tier or "imported" }}
+                        </span>
+                    </td>
+                    <td>{{ imported.imported_at or "unknown" }}</td>
+                    <td>
+                        <a class="btn"
+                           href="{{ url_for('web.optimizer_imported_detail', study_id=imported.study_id) }}">Open</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-hint">No imported studies.</div>
+        {% endif %}
+    </div>
+
     {% include "partials/optimizer_jobs.html" %}
 
     <div id="optimizer-table"
