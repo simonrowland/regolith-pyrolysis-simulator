@@ -28,9 +28,10 @@ import math
 import pytest
 
 from simulator.chemistry.kernel import ChemistryIntent
-from simulator.state import CampaignPhase
+from simulator.core import OXYGEN_SPECIES
+from simulator.state import Atmosphere, CampaignPhase
 
-from .helpers import run_campaign_headspace
+from .helpers import build_headspace_sim, run_campaign_headspace
 
 
 SIO_ANCHOR_CAMPAIGN = CampaignPhase.C2A
@@ -98,3 +99,46 @@ def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
         f"|log10({p_sio_finite:.4g} / {p_sio_iw:.4g})| = "
         f"{decade:.4f} decade"
     )
+
+
+def test_pn2_sweep_sio_provider_uses_transport_floor_not_holdup_reservoir():
+    sim = build_headspace_sim(
+        enabled=True,
+        campaign=SIO_ANCHOR_CAMPAIGN,
+        start_temperature_C=SIO_ANCHOR_START_TEMPERATURE_C,
+    )
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    requested_transport_pO2_bar = sim._vacuum_floor_bar()
+    sim.melt.pO2_mbar = requested_transport_pO2_bar * 1000.0
+    sim.melt.p_total_mbar = 10.0
+
+    holdup_o2_mol = 1.0e-3
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {OXYGEN_SPECIES: holdup_o2_mol},
+        source="test PN2 holdup O2 must not drive SiO transport pO2",
+    )
+
+    sim._apply_oxygen_reservoir_exchange()
+    sim._apply_native_fe_saturation_split(sample_time_h=0.0)
+    reservoir = sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    assert reservoir.headspace_ledger_pO2_bar > requested_transport_pO2_bar * 1.0e5
+    assert requested_transport_pO2_bar * 1.0e5 == pytest.approx(1.0e-4)
+    assert reservoir.headspace_transport_pO2_bar == pytest.approx(
+        requested_transport_pO2_bar
+    )
+
+    equilibrium = sim._get_equilibrium()
+    diagnostic = dict(sim._last_vapor_pressure_diagnostic or {})
+    provenance = diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
+    p_sio = diagnostic["vapor_pressures_Pa"]["SiO"]
+
+    assert diagnostic["pO2_bar"] == pytest.approx(requested_transport_pO2_bar)
+    assert provenance["pO2_bar"] == pytest.approx(requested_transport_pO2_bar)
+    assert p_sio == pytest.approx(provenance["P_eq_Pa"])
+    assert equilibrium.vapor_pressures_Pa["SiO"] == pytest.approx(p_sio)
+
+    holdup_substituted_p_sio = p_sio * math.sqrt(
+        requested_transport_pO2_bar / reservoir.headspace_ledger_pO2_bar
+    )
+    assert p_sio > holdup_substituted_p_sio * 100.0

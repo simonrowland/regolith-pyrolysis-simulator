@@ -682,6 +682,20 @@ def test_sio_pure_limit_uses_single_cation_activity_reference_pressure(
     )
 
 
+def test_sio_pseudo_vaporock_fallback_residual_matches_dense_fit(
+    vapor_pressure_data,
+):
+    sio_row = vapor_pressure_data["oxide_vapors"]["SiO"]
+
+    assert sio_row["fit_target"] == "pseudo_psat_backsolved_from_vaporock"
+    assert sio_row["residual_dex"] == pytest.approx(0.270)
+    assert sio_row["confidence_tier"] == "moderate"
+    assert sio_row["backsolve"]["target"] == (
+        "VapoRock SiO(g) partial pressure on the dense grid"
+    )
+    assert sio_row["backsolve"]["residual_dex"] == pytest.approx(0.270)
+
+
 def test_demaria_1971_na_validation_case_reports_measured_pressure_gap(
     vapor_pressure_data,
 ):
