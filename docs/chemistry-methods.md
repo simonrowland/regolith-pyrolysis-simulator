@@ -717,7 +717,7 @@ refractory carbon after Stage 0. That diagnostic is not ledger-active in the ext
 above; it documents the split that would need to become authoritative before the simplification is
 removed.
 <!-- impl: §10.1 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_partition_carbon_diagnostic:1213 — carbon split diagnostic -->
-<!-- impl: §10.1 -> engines/builtin/foulant_disposition.py partition_carbon:372 — carbon bucket partition -->
+<!-- impl: §10.1 -> engines/builtin/foulant_disposition.py partition_carbon:413 — carbon bucket partition -->
 
 ### §10.2 CNOPS handling
 
