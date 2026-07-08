@@ -760,6 +760,38 @@ def test_study_journal_replay_fails_closed_on_manifest_mismatch(tmp_path: Path) 
         study.replay_study(out)
 
 
+def test_study_journal_replay_rejects_top_level_objectives_mismatch(
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "journal-objectives-mismatch"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=1,
+        budget=2,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_cache_evaluator,
+    )
+    events_path = out / "study.events.jsonl"
+    rows = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines()]
+    for row in rows:
+        if row.get("event_kind") == "candidate_evaluated":
+            row["objectives"] = []
+            break
+    else:
+        raise AssertionError("expected candidate_evaluated journal row")
+    events_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(study.StudyReplayError, match="journal objectives mismatch"):
+        study.replay_study(out)
+
+
 def test_run_resume_continues_pending_asks_without_overwriting_journal(
     tmp_path: Path,
 ) -> None:
@@ -837,6 +869,44 @@ def test_run_resume_continues_pending_asks_without_overwriting_journal(
         "candidate_evaluated",
         "candidate_evaluated",
     ]
+
+
+def test_run_completed_resume_preserves_existing_provenance_rows(
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "completed-resume"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=1,
+        budget=2,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_cache_evaluator,
+    )
+    provenance_path = out / "provenance.jsonl"
+    before_text = provenance_path.read_text(encoding="utf-8")
+    before_rows = _read_provenance(out)
+    assert before_rows
+    assert all(row["cache_hit"] is False for row in before_rows)
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        parallel=1,
+        budget=2,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_cache_evaluator,
+    )
+
+    assert len(result.records) == 2
+    assert provenance_path.read_text(encoding="utf-8") == before_text
+    assert _read_provenance(out) == before_rows
 
 
 def test_study_journal_replay_fails_closed_on_out_of_order_events(
@@ -4159,18 +4229,20 @@ def test_winner_tie_determinism_uses_cache_key_then_candidate_id(tmp_path) -> No
     ]
 
 
-def test_rerun_hits_cache_without_duplicating_rows(tmp_path) -> None:
+def test_completed_rerun_preserves_provenance_without_duplicating_rows(tmp_path) -> None:
     study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, tmp_path, seed=7, evaluator=_evaluator())
+    before = _read_provenance(tmp_path)
     study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, tmp_path, seed=7, evaluator=_evaluator())
 
     provenance = _read_provenance(tmp_path)
     assert len(provenance) == 3
-    assert all(row["cache_hit"] is True for row in provenance)
+    assert provenance == before
     assert len(_stored_rows(tmp_path)) == 3
 
 
-def test_rerun_cache_hit_rederives_stale_false_feasible_from_margins(tmp_path) -> None:
+def test_completed_rerun_replays_journal_without_mutating_provenance(tmp_path) -> None:
     study.run(PROFILE, FEEDSTOCK, "random", "stub", 1, 3, tmp_path, seed=7, evaluator=_evaluator())
+    before = _read_provenance(tmp_path)
     with sqlite3.connect(tmp_path / "cache.sqlite") as conn:
         conn.execute(
             """
@@ -4196,7 +4268,7 @@ def test_rerun_cache_hit_rederives_stale_false_feasible_from_margins(tmp_path) -
     assert result.winner.candidate_id == "random-7-000002"
     by_id = {record.candidate_id: record for record in result.records}
     assert by_id["random-7-000002"].feasible is True
-    assert all(row["cache_hit"] is True for row in _read_provenance(tmp_path))
+    assert _read_provenance(tmp_path) == before
 
 
 def test_engine_bug_result_aborts_without_pareto(tmp_path) -> None:

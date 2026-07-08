@@ -392,6 +392,7 @@ def _write_zip(
     extra: dict[str, bytes] | None = None,
     *,
     member_schema_version: int = MEMBER_SCHEMA_VERSION,
+    index_mutator=None,
 ) -> Path:
     payload = dict(members)
     if extra:
@@ -406,11 +407,14 @@ def _write_zip(
         for name, data in payload.items()
         if name != ARTIFACT_INDEX_NAME
     }
+    index_payload = {
+        "member_schema_version": member_schema_version,
+        "members": index_members,
+    }
+    if index_mutator is not None:
+        index_mutator(index_payload)
     payload[ARTIFACT_INDEX_NAME] = _json_bytes(
-        {
-            "member_schema_version": member_schema_version,
-            "members": index_members,
-        }
+        index_payload
     )
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for name, data in payload.items():
@@ -437,6 +441,176 @@ def test_import_accepts_current_schema_version_bundle(tmp_path: Path) -> None:
     )
 
     assert imported.study_id == "study123"
+    assert (imported.path / "study.profile.yaml").is_file()
+
+
+def test_import_rejects_failed_job_status_before_commit(tmp_path: Path) -> None:
+    members = _members(tmp_path)
+    members["job_status.json"] = _json_bytes(
+        {
+            "member_schema_version": MEMBER_SCHEMA_VERSION,
+            "status": "FAILED",
+            "success": False,
+        }
+    )
+    bundle = _write_zip(tmp_path / "failed-job.rpstudy.zip", members)
+
+    with pytest.raises(ImportBundleError, match="job_status.json reports unsuccessful"):
+        import_study_bundle(
+            bundle,
+            tmp_path / "runs",
+            verification_tier=0,
+            evaluator=_evaluator(oxygen=10.0),
+        )
+
+    assert not (tmp_path / "runs" / IMPORTED_DIR_NAME / "study123").exists()
+
+
+def test_import_rejects_manifest_summary_study_id_mismatch(tmp_path: Path) -> None:
+    bundle = _write_zip(
+        tmp_path / "study-id-mismatch.rpstudy.zip",
+        _members(
+            tmp_path,
+            manifest_extra={"study_id": "manifest-id"},
+            summary_extra={"study_id": "summary-id"},
+        ),
+    )
+
+    with pytest.raises(ImportBundleError, match="study_id mismatch"):
+        import_study_bundle(
+            bundle,
+            tmp_path / "runs",
+            verification_tier=0,
+            evaluator=_evaluator(oxygen=10.0),
+        )
+
+
+def test_import_rejects_raw_study_id_mismatch_that_sanitizes_equal(tmp_path: Path) -> None:
+    # Distinct RAW study_ids that sanitize to the same safe token ("a/b" and "a-b" both ->
+    # "a-b") must still be rejected as a mismatch, else provenance lands under the wrong id.
+    bundle = _write_zip(
+        tmp_path / "sanitized-collision.rpstudy.zip",
+        _members(
+            tmp_path,
+            manifest_extra={"study_id": "a/b"},
+            summary_extra={"study_id": "a-b"},
+        ),
+    )
+    with pytest.raises(ImportBundleError, match="study_id mismatch"):
+        import_study_bundle(
+            bundle, tmp_path / "runs", verification_tier=0, evaluator=_evaluator(oxygen=10.0)
+        )
+
+
+def test_import_rejects_running_job_status_with_success_true(tmp_path: Path) -> None:
+    # A non-terminal / failure-like job status (RUNNING/ERROR/…) must be rejected even when
+    # `success` was set true — only an affirmative success token is accepted.
+    members = _members(tmp_path)
+    members["job_status.json"] = _json_bytes(
+        {
+            "member_schema_version": MEMBER_SCHEMA_VERSION,
+            "status": "RUNNING",
+            "success": True,
+        }
+    )
+    bundle = _write_zip(tmp_path / "running-job.rpstudy.zip", members)
+    with pytest.raises(ImportBundleError, match="job_status.json reports unsuccessful"):
+        import_study_bundle(
+            bundle, tmp_path / "runs", verification_tier=0, evaluator=_evaluator(oxygen=10.0)
+        )
+
+
+def test_import_rejects_manifest_summary_study_status_mismatch(tmp_path: Path) -> None:
+    bundle = _write_zip(
+        tmp_path / "study-status-mismatch.rpstudy.zip",
+        _members(
+            tmp_path,
+            manifest_extra={"study_status": "aborted"},
+            summary_extra={"study_status": "completed"},
+        ),
+    )
+
+    with pytest.raises(ImportBundleError, match="study_status mismatch"):
+        import_study_bundle(
+            bundle,
+            tmp_path / "runs",
+            verification_tier=0,
+            evaluator=_evaluator(oxygen=10.0),
+        )
+
+
+def test_import_rejects_invalid_profile_yaml_at_tier0(tmp_path: Path) -> None:
+    members = _members(tmp_path)
+    members["study.profile.yaml"] = b": invalid: yaml: ["
+    bundle = _write_zip(tmp_path / "invalid-profile.rpstudy.zip", members)
+
+    with pytest.raises(ImportBundleError, match="study.profile.yaml is not valid YAML"):
+        import_study_bundle(
+            bundle,
+            tmp_path / "runs",
+            verification_tier=0,
+            evaluator=_evaluator(oxygen=10.0),
+        )
+
+
+def test_import_rejects_malformed_index_size_bytes_as_import_error(
+    tmp_path: Path,
+) -> None:
+    def null_size(index_payload: dict[str, object]) -> None:
+        members = index_payload["members"]
+        assert isinstance(members, dict)
+        entry = members["study.summary.json"]
+        assert isinstance(entry, dict)
+        entry["size_bytes"] = None
+
+    bundle = _write_zip(
+        tmp_path / "null-size.rpstudy.zip",
+        _members(tmp_path),
+        index_mutator=null_size,
+    )
+
+    with pytest.raises(ImportBundleError, match="malformed size_bytes"):
+        import_study_bundle(
+            bundle,
+            tmp_path / "runs",
+            verification_tier=0,
+            evaluator=_evaluator(oxygen=10.0),
+        )
+
+
+def test_import_rejects_nonterminal_study_status_before_commit(tmp_path: Path) -> None:
+    bundle = _write_zip(
+        tmp_path / "running-status.rpstudy.zip",
+        _members(tmp_path, study_status="running"),
+    )
+
+    with pytest.raises(ImportBundleError, match="study_status is not terminal"):
+        import_study_bundle(
+            bundle,
+            tmp_path / "runs",
+            verification_tier=0,
+            evaluator=_evaluator(oxygen=10.0),
+        )
+
+    assert not (tmp_path / "runs" / IMPORTED_DIR_NAME / "study123").exists()
+
+
+def test_import_rejects_json_member_schema_version_disagreement(
+    tmp_path: Path,
+) -> None:
+    members = _members(tmp_path)
+    summary = json.loads(members["study.summary.json"])
+    summary["member_schema_version"] = 0
+    members["study.summary.json"] = _json_bytes(summary)
+    bundle = _write_zip(tmp_path / "member-schema-disagreement.rpstudy.zip", members)
+
+    with pytest.raises(ImportBundleError, match="member_schema_version mismatch"):
+        import_study_bundle(
+            bundle,
+            tmp_path / "runs",
+            verification_tier=0,
+            evaluator=_evaluator(oxygen=10.0),
+        )
 
 
 def test_import_rejects_unsupported_member_schema_version_before_member_parse(

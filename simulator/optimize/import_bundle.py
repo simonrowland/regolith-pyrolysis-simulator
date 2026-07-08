@@ -31,6 +31,7 @@ from simulator.optimize.save_bundle import (
     MEMBER_SCHEMA_VERSION,
     REQUIRED_MEMBERS,
     SAVE_SCHEMA_VERSION,
+    TERMINAL_STUDY_STATUSES,
 )
 
 BUNDLE_CAP_BYTES = 512 * 1024 * 1024
@@ -78,6 +79,10 @@ _SAFE_STUDY_ID_CHARS = frozenset(
 )
 SUPPORTED_SAVE_SCHEMA_VERSIONS = frozenset({SAVE_SCHEMA_VERSION})
 SUPPORTED_MEMBER_SCHEMA_VERSIONS = frozenset({MEMBER_SCHEMA_VERSION})
+# Affirmative success tokens for job_status.json (uppercased). A bundle is accepted only
+# when success is True AND status is one of these; any other status (RUNNING/ERROR/ABORTED/
+# FAILED/…) is rejected fail-closed even if `success` was set true.
+_SUCCESSFUL_JOB_STATUSES = frozenset({"SUCCEEDED", "SUCCESS", "COMPLETED", "COMPLETE"})
 _IDENTITY_FIELDS = (
     "corpus_version",
     "code_version",
@@ -158,9 +163,10 @@ def import_study_bundle(
 
         manifest = parsed["study.manifest.json"]
         summary = parsed["study.summary.json"]
-        study_id = _safe_study_id(summary.get("study_id") or manifest.get("study_id"))
-        if not study_id:
-            raise ImportBundleError("bundle missing safe study_id")
+        job_status = parsed["job_status.json"]
+        study_id = _validated_study_id(manifest, summary)
+        _validate_bundle_status(manifest, summary, job_status)
+        _load_profile(tmp / "study.profile.yaml")
 
         # Safety caps are unconditional on any extracted untrusted bundle — they
         # MUST run before the dedupe early-return, else an over-cap bundle whose
@@ -336,7 +342,7 @@ def verify_import_hashes(import_dir: Path | str) -> dict[str, Any]:
         _assert_child_path(root, path)
         if not path.is_file():
             raise ImportBundleError(f"indexed member missing after import: {name}")
-        expected_size = int(entry.get("size_bytes", -1))
+        expected_size = _index_entry_size_bytes(name, entry)
         expected_sha = str(entry.get("sha256") or "")
         if expected_size != path.stat().st_size:
             raise ImportBundleError(f"artifact size mismatch: {name}")
@@ -469,12 +475,76 @@ def _parse_bundle_json_members(
         if name.endswith(".json"):
             data = (root / name).read_bytes()
             payload = _parse_json_object(name, data)
-            _validate_json_member_schema_versions(name, payload)
+            _validate_json_member_schema_versions(
+                name,
+                payload,
+                index_member_schema_version=_index_entry_member_schema_version(
+                    index_payload,
+                    name,
+                ),
+            )
             parsed_json[name] = payload
         elif name.endswith(".jsonl"):
             data = (root / name).read_bytes()
             _validate_jsonl_member(name, data)
     return parsed_json
+
+
+def _validated_study_id(
+    manifest: Mapping[str, Any],
+    summary: Mapping[str, Any],
+) -> str:
+    manifest_id = _safe_study_id(manifest.get("study_id"))
+    summary_id = _safe_study_id(summary.get("study_id"))
+    if not manifest_id or not summary_id:
+        raise ImportBundleError("bundle missing safe study_id")
+    # Compare the RAW ids, not just the sanitized ones: distinct raw ids can sanitize to
+    # the same safe token (e.g. "a/b" and "a-b" both -> "a-b"), which would let a genuine
+    # manifest/summary mismatch land provenance under the wrong id.
+    raw_manifest_id = str(manifest.get("study_id") or "").strip()
+    raw_summary_id = str(summary.get("study_id") or "").strip()
+    if raw_manifest_id != raw_summary_id:
+        raise ImportBundleError("manifest/summary study_id mismatch")
+    return summary_id
+
+
+def _validate_bundle_status(
+    manifest: Mapping[str, Any],
+    summary: Mapping[str, Any],
+    job_status: Mapping[str, Any],
+) -> None:
+    manifest_status = _required_terminal_study_status(
+        "study.manifest.json",
+        manifest.get("study_status"),
+    )
+    summary_status = _required_terminal_study_status(
+        "study.summary.json",
+        summary.get("study_status"),
+    )
+    if manifest_status != summary_status:
+        raise ImportBundleError("manifest/summary study_status mismatch")
+    if "study_status" in job_status:
+        job_study_status = _required_terminal_study_status(
+            "job_status.json",
+            job_status.get("study_status"),
+        )
+        if job_study_status != summary_status:
+            raise ImportBundleError("job_status.json study_status mismatch")
+
+    # Require an AFFIRMATIVELY successful terminal job: success is True AND the status is an
+    # explicit success token. Rejecting only "FAILED" let a non-terminal/failure-like status
+    # (RUNNING / ERROR / ABORTED / …) through when success was set true.
+    success = job_status.get("success")
+    status = str(job_status.get("status") or "").strip().upper()
+    if success is not True or status not in _SUCCESSFUL_JOB_STATUSES:
+        raise ImportBundleError("job_status.json reports unsuccessful job")
+
+
+def _required_terminal_study_status(owner: str, raw: Any) -> str:
+    status = str(raw or "").strip()
+    if status not in TERMINAL_STUDY_STATUSES:
+        raise ImportBundleError(f"{owner} study_status is not terminal: {status!r}")
+    return status
 
 
 def _preflight_zip_entry_count(source: Path) -> None:
@@ -793,7 +863,7 @@ def _verify_artifact_index_files(
         _assert_child_path(root, path)
         if not path.is_file():
             raise ImportBundleError(f"indexed member missing after import: {name}")
-        if int(entry.get("size_bytes", -1)) != path.stat().st_size:
+        if _index_entry_size_bytes(name, entry) != path.stat().st_size:
             raise ImportBundleError(f"artifact size mismatch: {name}")
         if str(entry.get("sha256") or "") != _sha256_file(path):
             raise ImportBundleError(f"artifact hash mismatch: {name}")
@@ -825,14 +895,46 @@ def _validate_artifact_index_schema_versions(index_payload: Mapping[str, Any]) -
         )
 
 
+def _index_entry_member_schema_version(
+    index_payload: Mapping[str, Any],
+    name: str,
+) -> int:
+    index_members = index_payload.get("members")
+    if not isinstance(index_members, Mapping):
+        raise ImportBundleError("artifact.index.json members must be an object")
+    entry = index_members.get(name)
+    if not isinstance(entry, Mapping):
+        raise ImportBundleError(f"artifact.index.json entry must be object: {name}")
+    return _require_supported_schema_version(
+        owner=f"artifact.index.json entry {name}",
+        field="member_schema_version",
+        raw=entry.get("member_schema_version"),
+        supported=SUPPORTED_MEMBER_SCHEMA_VERSIONS,
+    )
+
+
 def _validate_json_member_schema_versions(
     name: str,
     payload: Mapping[str, Any],
+    *,
+    index_member_schema_version: int | None = None,
 ) -> None:
-    _require_supported_schema_version(
+    body_version = _require_well_formed_schema_version(
         owner=name,
         field="member_schema_version",
         raw=payload.get("member_schema_version"),
+    )
+    if (
+        index_member_schema_version is not None
+        and body_version != index_member_schema_version
+    ):
+        raise ImportBundleError(
+            f"{name} member_schema_version mismatch with artifact.index.json"
+        )
+    _require_supported_schema_version(
+        owner=name,
+        field="member_schema_version",
+        raw=body_version,
         supported=SUPPORTED_MEMBER_SCHEMA_VERSIONS,
     )
     if name in {"study.manifest.json", "study.summary.json"}:
@@ -851,15 +953,34 @@ def _require_supported_schema_version(
     raw: Any,
     supported: frozenset[int],
 ) -> int:
+    parsed = _require_well_formed_schema_version(owner=owner, field=field, raw=raw)
+    if parsed not in supported:
+        supported_text = ", ".join(str(version) for version in sorted(supported))
+        raise ImportBundleError(
+            f"{owner} unsupported {field}: {parsed}; supported: {supported_text}"
+        )
+    return parsed
+
+
+def _require_well_formed_schema_version(
+    *,
+    owner: str,
+    field: str,
+    raw: Any,
+) -> int:
     if raw is None:
         raise ImportBundleError(f"{owner} missing {field}")
     if isinstance(raw, bool) or not isinstance(raw, int):
         raise ImportBundleError(f"{owner} malformed {field}")
-    if raw not in supported:
-        supported_text = ", ".join(str(version) for version in sorted(supported))
-        raise ImportBundleError(
-            f"{owner} unsupported {field}: {raw}; supported: {supported_text}"
-        )
+    return raw
+
+
+def _index_entry_size_bytes(owner: str, entry: Mapping[str, Any]) -> int:
+    raw = entry.get("size_bytes")
+    if isinstance(raw, bool) or not isinstance(raw, int):
+        raise ImportBundleError(f"artifact.index.json entry {owner} malformed size_bytes")
+    if raw < 0:
+        raise ImportBundleError(f"artifact.index.json entry {owner} malformed size_bytes")
     return raw
 
 
@@ -1406,8 +1527,11 @@ def _read_leaderboard(path: Path) -> list[dict[str, Any]]:
 def _load_profile(path: Path) -> dict[str, Any]:
     if path.stat().st_size > YAML_CAP_BYTES:
         raise ImportSafetyCapError("study.profile.yaml exceeds 1MB cap")
-    with path.open("r", encoding="utf-8") as handle:
-        payload = yaml.safe_load(handle) or {}
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            payload = yaml.safe_load(handle) or {}
+    except (UnicodeDecodeError, yaml.YAMLError) as exc:
+        raise ImportBundleError("study.profile.yaml is not valid YAML") from exc
     _validate_untrusted_structure(
         "study.profile.yaml",
         payload,

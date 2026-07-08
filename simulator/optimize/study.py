@@ -561,7 +561,6 @@ def run(
     journal_tell_seq = 0
     journal_mode = "w"
     provenance_mode = "w"
-    refresh_resume_provenance = False
     prefix_replay_cache: dict[str, ScoredResult] = {}
     loop_profile = (
         _profile_for_cache_phase(
@@ -617,9 +616,7 @@ def run(
         journal_mode = "a"
         provenance_mode = "a"
         if not pending_resume_candidates and evaluated == config.budget:
-            records = [replace(record, cache_hit=True) for record in records]
-            refresh_resume_provenance = True
-            provenance_mode = "w"
+            provenance_mode = "r"
     try:
         with (
             provenance_path.open(provenance_mode, encoding="utf-8") as provenance,
@@ -635,22 +632,6 @@ def run(
                 ask_seq=journal_ask_seq,
                 tell_seq=journal_tell_seq,
             )
-            if refresh_resume_provenance:
-                for record in records:
-                    provenance.write(
-                        json.dumps(
-                            _record_payload(
-                                record,
-                                active_schema,
-                                resolved_profile,
-                                search_space_identity=search_space_identity,
-                            ),
-                            sort_keys=True,
-                            separators=(",", ":"),
-                            allow_nan=False,
-                        )
-                        + "\n"
-                    )
             while evaluated < config.budget:
                 owners: dict[str, StagedStrategy] = {}
                 if pending_resume_candidates:
@@ -1569,8 +1550,10 @@ def _load_study_journal(
                 raise StudyReplayError(
                     f"tell row references candidate outside batch: {candidate_id!r}"
                 )
+            scored_payload = _mapping_or_empty(row.get("scored_result"))
+            _assert_journal_objectives_consistent(row, scored_payload)
             scored = _scored_result_from_journal_payload(
-                _mapping_or_empty(row.get("scored_result"))
+                scored_payload
             )
             tell_batch.append((candidate, scored))
             told_ids.add(candidate_id)
@@ -1889,6 +1872,18 @@ def _scored_result_journal_payload(scored: ScoredResult) -> Mapping[str, Any]:
         "result_blob": _result_blob(scored),
         "notes": list(scored.notes),
     }
+
+
+def _assert_journal_objectives_consistent(
+    row: Mapping[str, Any],
+    scored_payload: Mapping[str, Any],
+) -> None:
+    if "objectives" not in row:
+        return
+    if _json_dump_value(row.get("objectives")) != _json_dump_value(
+        scored_payload.get("objectives", ())
+    ):
+        raise StudyReplayError("journal objectives mismatch with scored_result")
 
 
 def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredResult:
