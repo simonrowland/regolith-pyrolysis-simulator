@@ -3361,7 +3361,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         applied_delta_ln = 0.0
         skip_reason = ''
         refusal_context: Dict[str, Any] = {}
-        if C_m <= 0.0:
+        if C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
+            # At or below the project's negligible-mol numerical floor (NOOP_MOL = 1e-15) the
+            # melt retains no MEANINGFUL authoritative differential redox capacity. A saturated/
+            # exhausted melt drives C_m into this band (observed down to denormalized ~1e-293 mol
+            # per ln fO2 after the C3 alkali shuttle). Dividing a residual source term by such a
+            # C_m yields an absurd candidate fO2 (finite ~1e9..1e287, or overflow to non-finite),
+            # so APPLYING it would corrupt the reservoir. Diagnose the honest root cause
+            # (no_melt_redox_capacity) at the floor instead. A full-grid SSO-R scan (review
+            # codex-7466, 2026-07-08) found 846/15082 real source-term calls in this band and
+            # confirmed the floor REFUSES 37 real rows the prior branch would have applied as
+            # absurd fO2 jumps (candidate log10 fO2 up to ~1.9e9) — a correctness fix, and NOT a
+            # fail-open: skipped terms are recorded as refusal, never as success. The graded
+            # range/saturation refusals below still apply ABOVE the floor (C_m > NOOP_MOL), where
+            # a real capacity meets an out-of-range or non-finite demand.
             skip_reason = 'no_melt_redox_capacity'
         elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:
             skip_reason = 'below_threshold'

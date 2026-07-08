@@ -768,9 +768,16 @@ def test_redox_source_breakdown_marks_skipped_terms(
     assert reservoir.exchange_direction.endswith(f":skipped:{expected_reason}")
 
 
-def test_redox_source_refuses_denormal_capacity_before_nonfinite_fo2(
+def test_redox_source_treats_denormal_capacity_as_no_melt_redox_capacity(
     monkeypatch,
 ) -> None:
+    # A denormal/underflow melt redox capacity (2.0864e-320 mol per ln fO2 — a subnormal
+    # double, far below a single cation) is physically NO capacity, not a tiny real one.
+    # It is diagnosed as no_melt_redox_capacity at the capacity floor, BEFORE any candidate
+    # fO2 is computed — so the honest root cause is reported rather than an out-of-range or
+    # saturation refusal derived from dividing a source term by ~0. This matches the SSO-R
+    # validation-map exact-full-dose row (see test_sso_r_validation_map). Floor lives in
+    # simulator/core.py _apply_oxygen_reservoir_redox_source_terms (C_m <= NOOP_MOL).
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -1614.1695751928787
@@ -787,23 +794,20 @@ def test_redox_source_refuses_denormal_capacity_before_nonfinite_fo2(
         exchange_direction="redox_source:evaporative_loss",
     )
 
+    # Reservoir untouched (the term cannot be absorbed) and diagnosed as the honest root
+    # cause, not a downstream candidate-fO2 artifact.
     assert math.isfinite(reservoir.melt_intrinsic_fO2_log)
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
         -1614.1695751928787
     )
     assert reservoir.redox_source_terms_applied is False
-    assert reservoir.redox_source_skip_reason == "redox_capacity_saturation_refusal"
+    assert reservoir.redox_source_skip_reason == "no_melt_redox_capacity"
     assert reservoir.redox_source_skipped_terms_mol_o2_equiv == pytest.approx(
         {"redox_source:evaporative_metal_loss": 0.0001505988658952519}
     )
-    context = reservoir.redox_source_refusal_context
-    assert context["context"] == "redox_source_terms_saturation_refusal"
-    assert context["temperature_C"] == pytest.approx(1600.0)
-    assert context["melt_redox_capacity_mol_per_ln_fO2"] == pytest.approx(
-        2.0864e-320
-    )
-    assert context["delta_ln_fO2"] == "inf"
-    assert context["candidate_fO2_log"] == "inf"
+    # no_melt_redox_capacity is diagnosed before a candidate fO2 is computed, so no
+    # out-of-range / saturation refusal context is emitted.
+    assert reservoir.redox_source_refusal_context == {}
 
 
 def test_redox_source_refuses_finite_absurd_candidate_fo2(
