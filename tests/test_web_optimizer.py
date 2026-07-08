@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import ast
+import io
 import json
 import math
 import sqlite3
+import zipfile
 from collections.abc import Mapping
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
@@ -331,6 +333,57 @@ def client(tmp_path):
     app.register_blueprint(web_routes.bp)
     yield app.test_client()
     optimizer_job_runner.reset_runner_cache()
+
+
+def test_optimizer_run_download_route_returns_rpstudy_zip(client) -> None:
+    runs_root = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_root / "manual-run"
+    run_dir.mkdir(parents=True)
+    (run_dir / "cache.sqlite").write_bytes(b"SQLite format 3\x00")
+    (run_dir / "leaderboard.csv").write_text("candidate_id\n", encoding="utf-8")
+    (run_dir / "pareto.json").write_text(
+        json.dumps({"member_schema_version": 1, "pareto": []}) + "\n",
+        encoding="utf-8",
+    )
+    (run_dir / "job_status.json").write_text(
+        json.dumps({"status": "SUCCEEDED", "success": True}) + "\n",
+        encoding="utf-8",
+    )
+    (run_dir / "study.profile.yaml").write_text("profile_id: study-test\n", encoding="utf-8")
+    (run_dir / "study.summary.json").write_text(
+        json.dumps(
+            {
+                "member_schema_version": 1,
+                "save_schema_version": 1,
+                    "study_id": "study123",
+                    "feedstock_id": "lunar_mare_low_ti",
+                    "profile_id": "study-test",
+                    "study_status": "completed",
+                }
+            )
+        + "\n",
+        encoding="utf-8",
+    )
+    (run_dir / "study.manifest.json").write_text(
+        json.dumps(
+            {
+                "member_schema_version": 1,
+                    "save_schema_version": 1,
+                    "study_id": "study123",
+                    "study_status": "completed",
+                }
+            )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    response = client.get("/optimizer/runs/manual-run/download.rpstudy.zip")
+
+    assert response.status_code == 200
+    assert ".rpstudy.zip" in response.headers["Content-Disposition"]
+    with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
+        assert "artifact.index.json" in archive.namelist()
+        assert "study.summary.json" in archive.namelist()
 
 
 class _FakeProcess:

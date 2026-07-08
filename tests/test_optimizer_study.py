@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import csv
 from dataclasses import is_dataclass, fields, replace
+import hashlib
 import json
 import logging
 import math
@@ -13,6 +14,7 @@ import sys
 import time
 from types import SimpleNamespace
 from typing import Any, Mapping
+import zipfile
 
 import pytest
 import yaml
@@ -36,6 +38,7 @@ from simulator.optimize.physics import physics_constraints_digest
 from simulator.optimize.profiles import constrained_max_profile, physics_constraints_from_profile
 from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import ResultStore
+from simulator.optimize.save_bundle import ALLOWED_MEMBERS, export_study_bundle
 from simulator.optimize.strategy import (
     Candidate,
     MorrisScreenStrategy,
@@ -151,6 +154,401 @@ def _scope_spec() -> EvalSpec:
     )
 
 
+def _save_format_record() -> study.StudyRecord:
+    return study.StudyRecord(
+        candidate_id="candidate-001",
+        patch=RecipePatch({}),
+        feasible=True,
+        status="ok",
+        objectives={"oxygen_kg": 41.2},
+        feasibility_margins={
+            "delivered_stream_purity": {
+                "feasible": True,
+                "margin": 1.0,
+                "observed": 1.0,
+                "detail": "test",
+            }
+        },
+        cache_key="cache-key-001",
+        product_summary={
+            "product_ledger_kg": {"O2": 41.2, "Fe": 12.9},
+            "product_classes": {
+                "metals_plus_O2": {
+                    "O2_kg": 41.2,
+                    "metals_kg_by_species": {"Fe": 12.9},
+                    "class_total_kg": 54.1,
+                },
+                "ingots_metals": {
+                    "kg_by_species": {"Fe": 12.9},
+                    "class_total_kg": 12.9,
+                },
+                "glass": {
+                    "kg_by_species": {"fused_silica": 3.1},
+                    "class_total_kg": 3.1,
+                },
+                "captured_volatiles": {
+                    "kg_by_species": {"Na": 0.9, "K": 0.5},
+                    "class_total_kg": 1.4,
+                },
+                "refractory_ceramic_rump": {
+                    "kg_by_species": {"CaO": 31.0, "Al2O3": 24.5},
+                    "class_total_kg": 55.0,
+                },
+            },
+            "extraction_completeness": {"status": "complete", "percent": 100.0},
+            "wall_deposit_kg_by_segment_species": {
+                "stage_1_to_stage_2": {"SiO2": 4.2e-7, "K": 4.8e-7}
+            },
+            "campaigns_to_resinter": 12.4,
+            "coating_status": "slow-fouling",
+        },
+        trace_summary={
+            "backend_name": "alphamelts",
+            "backend_status": "ok",
+            "backend_authoritative": True,
+            "evidence_class": "melts",
+            "reduced_real_cache_state": "live_fill",
+            "terminal_rump_by_species_kg": {"CaO": 31.0, "Al2O3": 24.5},
+        },
+        result_blob={"cache_state": "live_fill", "cache_rung": 3},
+        proposal_source="staged_child",
+        seed_lineage=False,
+    )
+
+
+def _write_save_format_artifacts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    out = tmp_path / "run"
+    out.mkdir()
+    calls: list[tuple[Mapping[str, Any], Mapping[str, Any]]] = []
+
+    def fake_honesty(
+        run_reference: Mapping[str, Any],
+        result_blob: Mapping[str, Any],
+        *,
+        backend_payload: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        calls.append((run_reference, result_blob))
+        return {
+            "tier": "live_fill",
+            "evidence_class": "melts",
+            "ux_label": "CERTIFIED",
+            "certification_allowed": True,
+            "title": "tier=live_fill",
+            "canonical": {"evidence_class": "melts", "runtime_status": "ok"},
+        }
+
+    monkeypatch.setattr(study, "optimizer_tier_label", fake_honesty)
+    record = _save_format_record()
+    config = study.StudyConfig(
+        profile=PROFILE,
+        feedstock=FEEDSTOCK,
+        strategy="random",
+        fidelity="stub",
+        budget=4,
+        parallel=1,
+        out_dir=out,
+        seed=7,
+    )
+    (out / "study.events.jsonl").write_text(
+        json.dumps({"event_kind": "candidate_asked", "event_version": 1}) + "\n",
+        encoding="utf-8",
+    )
+    study._write_artifacts(
+        out,
+        profile=PROFILE,
+        feedstock=FEEDSTOCK,
+        fidelity="stub",
+        definitions=study.objective_definitions(PROFILE),
+        pareto=(record,),
+        leaderboard=(record,),
+        winner=record,
+        schema=RecipeSchema(),
+        failure_counts={"physics_constraint": 1},
+        config=config,
+        strategy_name="RandomStrategy",
+        sampler_name="random",
+    )
+    assert calls == [(record.trace_summary, record.result_blob)]
+    return out
+
+
+def test_write_artifacts_emits_study_summary_schema(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    out = _write_save_format_artifacts(tmp_path, monkeypatch)
+
+    summary = json.loads((out / "study.summary.json").read_text(encoding="utf-8"))
+
+    for key in (
+        "save_schema_version",
+        "member_schema_version",
+        "study_id",
+        "created_at",
+        "study_status",
+        "feedstock_id",
+        "profile_id",
+        "profile_display_name",
+        "strategy",
+        "seed",
+        "budget",
+        "evaluated",
+        "verdict_counts",
+        "objectives_spec",
+        "winner",
+        "dual_winner_non_seeded",
+        "honesty",
+        "badges",
+        "coating",
+        "products_source",
+        "products",
+        "origin",
+        "verification",
+    ):
+        assert key in summary
+    assert summary["honesty"]["ux_label"] == "CERTIFIED"
+    assert summary["honesty"]["cache_states_seen"] == ["live_fill"]
+    assert summary["badges"]["corpus"]["raw_status"] == "accepted"
+    assert summary["products_source"] == "winner"
+    assert summary["products"]["oxygen_kg"] == pytest.approx(41.2)
+    assert summary["products"]["metals_kg"] == {"Fe": 12.9}
+    assert summary["products"]["terminal_rump_by_class_kg"] == {
+        "refractory_ceramic_rump": pytest.approx(55.0)
+    }
+    assert summary["products"]["ceramic_rump_panel"]["status"] in {
+        "match",
+        "ambiguous",
+        "no-match",
+        "n/a",
+    }
+    assert summary["coating"]["wall_deposit_kg_by_segment_species"] == {
+        "stage_1_to_stage_2": {"SiO2": 4.2e-7, "K": 4.8e-7}
+    }
+    manifest = json.loads((out / "study.manifest.json").read_text(encoding="utf-8"))
+    assert manifest["strategy"]["config"]["seed"] == 7
+    assert manifest["strategy"]["config"]["budget"] == 4
+    assert manifest["strategy"]["config"]["sampler_name"] == "random"
+    assert manifest["replayable"] is True
+
+
+def test_export_study_bundle_round_trip_hash_index(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    out = _write_save_format_artifacts(tmp_path, monkeypatch)
+    (out / "cache.sqlite").write_bytes(b"SQLite format 3\x00")
+    (out / "job_status.json").write_text(
+        json.dumps({"status": "SUCCEEDED", "success": True}, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    bundle = export_study_bundle(out)
+
+    with zipfile.ZipFile(bundle) as archive:
+        names = set(archive.namelist())
+        assert names <= ALLOWED_MEMBERS
+        for required in (
+            "study.manifest.json",
+            "study.summary.json",
+            "study.profile.yaml",
+            "artifact.index.json",
+            "cache.sqlite",
+            "pareto.json",
+            "leaderboard.csv",
+            "job_status.json",
+        ):
+            assert required in names
+        index = json.loads(archive.read("artifact.index.json"))
+        assert "artifact.index.json" not in index["members"]
+        for name, entry in index["members"].items():
+            data = archive.read(name)
+            assert entry["sha256"] == hashlib.sha256(data).hexdigest()
+            assert entry["size_bytes"] == len(data)
+            assert entry["member_schema_version"] >= 1
+            if name.endswith(".json"):
+                member = json.loads(data)
+                assert member["member_schema_version"] == entry["member_schema_version"]
+
+
+def test_export_study_bundle_refuses_non_terminal_run(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    out = _write_save_format_artifacts(tmp_path, monkeypatch)
+    (out / "cache.sqlite").write_bytes(b"SQLite format 3\x00")
+    (out / "job_status.json").write_text(
+        json.dumps({"status": "RUNNING", "success": False}, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    for name in ("study.manifest.json", "study.summary.json"):
+        path = out / name
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["study_status"] = "running"
+        path.write_text(json.dumps(payload, sort_keys=True) + "\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="not terminal"):
+        export_study_bundle(out)
+
+
+def test_write_empty_artifacts_synthesizes_aborted_ledgers_from_cache(
+    tmp_path: Path,
+) -> None:
+    out = tmp_path / "aborted-with-cache"
+    out.mkdir()
+    profile = copy.deepcopy(PROFILE)
+    profile["profile_id"] = "aborted-scope-a"
+    profile["run"] = {
+        **profile["run"],
+        "lab_overlay_scope": {"lab_alpha_digest": "scope-a"},
+    }
+    config = study.StudyConfig(
+        profile=profile,
+        feedstock=FEEDSTOCK,
+        strategy="random",
+        fidelity="stub",
+        budget=3,
+        parallel=1,
+        out_dir=out,
+        seed=2,
+    )
+    spec = _spec(
+        RecipePatch({}),
+        FEEDSTOCK,
+        "stub",
+        profile,
+        physics_constraints_from_profile(profile),
+    )
+    store = ResultStore(out / "cache.sqlite")
+
+    def store_cached_result(
+        spec: EvalSpec,
+        *,
+        candidate_id: str,
+        oxygen_kg: float,
+        created_at: str,
+    ) -> None:
+        store.store(
+            spec,
+            ScoredResult(
+                candidate_id=candidate_id,
+                eval_spec=spec,
+                cache_key=cache_key(spec),
+                feasible=True,
+                objectives=ObjectiveVector(
+                    (
+                        ObjectiveValue(
+                            "oxygen_kg", "maximize", oxygen_kg, "kg", ordinal=0
+                        ),
+                        ObjectiveValue(
+                            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+                            "minimize",
+                            2.0,
+                            "kWh",
+                            ordinal=1,
+                        ),
+                    )
+                ),
+                feasibility_margins={"delivered_stream_purity": _margin()},
+                run_reference=RunReference(
+                    status="ok",
+                    trace={
+                        "backend_name": "alphamelts",
+                        "backend_status": "ok",
+                        "backend_authoritative": True,
+                        "evidence_class": "melts",
+                        "cache_state": "live_fill",
+                        "mass_closure": {
+                            "status": "closed",
+                            "mass_balance_error_pct": 0.0,
+                        },
+                    },
+                    product_summary={
+                        "oxygen_kg": oxygen_kg,
+                        "mass_closure": {
+                            "status": "closed",
+                            "mass_balance_error_pct": 0.0,
+                        },
+                    },
+                    backend_name="alphamelts",
+                    backend_status="ok",
+                    backend_authoritative=True,
+                    evidence_class="melts",
+                ),
+            ),
+            created_at=created_at,
+        )
+
+    store_cached_result(
+        spec,
+        candidate_id="cached-candidate",
+        oxygen_kg=25.0,
+        created_at="2026-07-07T00:00:00Z",
+    )
+    other_scope = replace(
+        spec,
+        lab_alpha_digest="scope-b",
+    )
+    store_cached_result(
+        other_scope,
+        candidate_id="wrong-scope-candidate",
+        oxygen_kg=99.0,
+        created_at="2026-07-07T00:00:01Z",
+    )
+
+    study._write_empty_artifacts(
+        out,
+        profile=profile,
+        feedstock=FEEDSTOCK,
+        fidelity="stub",
+        definitions=study.objective_definitions(profile),
+        failure_counts={},
+        config=config,
+    )
+
+    summary = json.loads((out / "study.summary.json").read_text(encoding="utf-8"))
+    pareto = json.loads((out / "pareto.json").read_text(encoding="utf-8"))
+    leaderboard_rows = list(csv.DictReader((out / "leaderboard.csv").open()))
+    assert summary["study_status"] == "aborted"
+    assert summary["evaluated"] == 1
+    assert summary["winner"] is None
+    assert summary["products_source"] == "none"
+    assert summary["products"] is None
+    assert pareto["status"] == "aborted"
+    assert pareto["winner_candidate_id"] is None
+    assert [row["candidate_id"] for row in leaderboard_rows] == ["cached-candidate"]
+
+
+def test_write_empty_artifacts_synthesizes_aborted_save_sidecars(tmp_path: Path) -> None:
+    out = tmp_path / "aborted"
+    out.mkdir()
+    config = study.StudyConfig(
+        profile=PROFILE,
+        feedstock=FEEDSTOCK,
+        strategy="random",
+        fidelity="stub",
+        budget=3,
+        parallel=1,
+        out_dir=out,
+        seed=2,
+    )
+
+    study._write_empty_artifacts(
+        out,
+        profile=PROFILE,
+        feedstock=FEEDSTOCK,
+        fidelity="stub",
+        definitions=study.objective_definitions(PROFILE),
+        failure_counts={"no_candidates": 1},
+        config=config,
+    )
+
+    summary = json.loads((out / "study.summary.json").read_text(encoding="utf-8"))
+    manifest = json.loads((out / "study.manifest.json").read_text(encoding="utf-8"))
+    assert summary["study_status"] == "aborted"
+    assert summary["products_source"] == "none"
+    assert summary["products"] is None
+    assert manifest["study_status"] == "aborted"
+    assert (out / "study.profile.yaml").is_file()
 def _assert_candidate_pressure_pairs_valid(candidates: list[Any]) -> None:
     schema = RecipeSchema()
     c2a_pairs = schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2

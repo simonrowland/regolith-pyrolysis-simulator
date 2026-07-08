@@ -13,15 +13,21 @@ import json
 import logging
 import math
 from pathlib import Path
+import re
 from types import MappingProxyType
 from typing import Any
 
 import yaml
 
 from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
+from simulator.ceramic_classifier import (
+    CeramicMatch,
+    CeramicServiceTemperature,
+)
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.corpus_version import current_corpus_version
 from simulator.diagnostics import coating_summary_with_grounded_authority
+from simulator.optimize.canonical import canonical_json_dumps
 from simulator.optimize.doe import active_sampler_name
 from simulator.optimize.evaluate import (
     EvaluationAbort,
@@ -39,6 +45,7 @@ from simulator.optimize.evalspec import (
     canonical_evalspec_json,
     current_code_version,
 )
+from simulator.optimize.honesty import optimizer_tier_label
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     ObjectiveComputationError,
@@ -63,11 +70,19 @@ from simulator.optimize.profiles import (
     physics_constraints_from_profile,
     validate_profile,
 )
-from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
-from simulator.optimize.result_scope import result_scope_json
+from simulator.optimize.recipe import (
+    RecipePatch,
+    RecipeSchema,
+    RecipeValidationError,
+    allowlist_version,
+    recipe_schema_version,
+)
+from simulator.optimize.result_scope import result_scope_json, result_scope_payload
+from simulator.optimize.save_bundle import MEMBER_SCHEMA_VERSION, SAVE_SCHEMA_VERSION
 from simulator.optimize.results_store import (
     ResultStore,
     ResultStoreWriteRejected,
+    _result_blob,
     reground_scored_result,
 )
 from simulator.optimize.strategy import (
@@ -86,6 +101,7 @@ from simulator.optimize.strategy.staged import (
     enumerate_topologies,
     make_prefix_eval_spec,
 )
+from web.advisory import ceramic_rump_payload
 
 VALID_FIDELITIES = ("stub", "fast", "high", "auto")
 _LOGGER = logging.getLogger(__name__)
@@ -104,6 +120,7 @@ WINNER_SELECTION_RULE = (
 )
 COMPLETED_STATUS = "completed"
 COMPLETED_NO_FEASIBLE_WINNER_STATUS = "completed-no-feasible-winner"
+ABORTED_STATUS = "aborted"
 CERTIFIED_CACHE_STATES = frozenset({"cached_exact", "live_fill"})
 EXPLORE_CACHE_TIER_CEILING = "cached_interpolated"
 CERTIFY_CACHE_TIER_CEILING = "cached_exact"
@@ -146,6 +163,10 @@ _COATING_LEADERBOARD_FIELDS: Mapping[str, str] = MappingProxyType(
         "wall_deposit_total_kg": "wall_deposit_total_kg",
         "wall_deposit_kg_by_species": "wall_deposit_kg_by_species_json",
     }
+)
+_OXIDE_FORMULA_RE = re.compile(r"^(?:[A-Z][a-z]?\d*)*O\d*$")
+_TERMINAL_RUMP_PRODUCT_CLASS_KEYS = frozenset(
+    {"refractory_ceramic_rump", "terminal_rump"}
 )
 DEFAULT_PROFILE_NAME = "default"
 DEFAULT_PROFILES: Mapping[str, Mapping[str, Any]] = MappingProxyType(
@@ -275,6 +296,7 @@ class StudyRecord:
     cache_hit: bool = False
     product_summary: Mapping[str, Any] = field(default_factory=dict)
     trace_summary: Mapping[str, Any] = field(default_factory=dict)
+    result_blob: Mapping[str, Any] = field(default_factory=dict)
     proposal_source: str = "unknown"
     seed_lineage: bool = False
     search_provenance: Mapping[str, Any] = field(default_factory=dict)
@@ -302,6 +324,11 @@ class StudyRecord:
             self,
             "trace_summary",
             MappingProxyType(dict(self.trace_summary)),
+        )
+        object.__setattr__(
+            self,
+            "result_blob",
+            MappingProxyType(dict(self.result_blob)),
         )
         object.__setattr__(self, "proposal_source", str(self.proposal_source))
         object.__setattr__(self, "seed_lineage", bool(self.seed_lineage))
@@ -466,82 +493,105 @@ def run(
         if two_phase.enabled
         else resolved_profile
     )
-    with provenance_path.open("w", encoding="utf-8") as provenance:
-        while evaluated < config.budget:
-            batch_size = min(config.parallel, config.budget - evaluated)
-            owners: dict[str, StagedStrategy] = {}
-            if staged_strategies:
-                candidates, topology_cursor, owners = _ask_staged_topology_candidates(
-                    staged_strategies,
-                    cursor=topology_cursor,
-                    batch_size=batch_size,
-                )
-            else:
-                candidates = active_strategy.ask(batch_size)
-                if not candidates and isinstance(active_strategy, StagedStrategy):
-                    if active_strategy.run_backward_pass() or active_strategy.joint_refine():
-                        candidates = active_strategy.ask(batch_size)
-            if not candidates:
-                break
-            results = _evaluate_candidates(
-                candidates,
-                profile=loop_profile,
-                feedstock=config.feedstock,
-                fidelity=config.fidelity,
-                parallel=config.parallel,
-                out_dir=out,
-                evaluator=evaluator,
-                schema=active_schema,
-                constraints=active_constraints,
-                store=store,
-                definitions=definitions,
-                prefix_replay_cache=prefix_replay_cache,
-                per_eval_timeout_seconds=config.per_eval_timeout_seconds,
-            )
-            tell_batch: list[tuple[Candidate, ScoredResult]] = []
-            for candidate, scored, cache_hit in results:
-                _assert_honest_result(scored, definitions)
-                light_scored = _strip_heavy_result(scored)
-                if scored.eval_spec is not None:
-                    try:
-                        store.store(
-                            scored.eval_spec,
-                            light_scored,
-                            created_at=datetime.now(UTC).isoformat(),
-                        )
-                    except ResultStoreWriteRejected as exc:
-                        _LOGGER.warning(
-                            "result_store_write_rejected candidate_id=%s cache_key=%s reasons=%s",
-                            scored.candidate_id,
-                            scored.cache_key,
-                            ",".join(exc.reasons),
-                        )
-                record = _to_record(candidate, scored, cache_hit=cache_hit)
-                records.append(record)
-                provenance.write(
-                    json.dumps(
-                        _record_payload(
-                            record,
-                            active_schema,
-                            resolved_profile,
-                            search_space_identity=search_space_identity,
-                        ),
-                        sort_keys=True,
-                        separators=(",", ":"),
-                        allow_nan=False,
+    try:
+        with provenance_path.open("w", encoding="utf-8") as provenance:
+            while evaluated < config.budget:
+                batch_size = min(config.parallel, config.budget - evaluated)
+                owners: dict[str, StagedStrategy] = {}
+                if staged_strategies:
+                    candidates, topology_cursor, owners = _ask_staged_topology_candidates(
+                        staged_strategies,
+                        cursor=topology_cursor,
+                        batch_size=batch_size,
                     )
-                    + "\n"
+                else:
+                    candidates = active_strategy.ask(batch_size)
+                    if not candidates and isinstance(active_strategy, StagedStrategy):
+                        if active_strategy.run_backward_pass() or active_strategy.joint_refine():
+                            candidates = active_strategy.ask(batch_size)
+                if not candidates:
+                    break
+                results = _evaluate_candidates(
+                    candidates,
+                    profile=loop_profile,
+                    feedstock=config.feedstock,
+                    fidelity=config.fidelity,
+                    parallel=config.parallel,
+                    out_dir=out,
+                    evaluator=evaluator,
+                    schema=active_schema,
+                    constraints=active_constraints,
+                    store=store,
+                    definitions=definitions,
+                    prefix_replay_cache=prefix_replay_cache,
+                    per_eval_timeout_seconds=config.per_eval_timeout_seconds,
                 )
-                tell_batch.append((candidate, light_scored))
-            if staged_strategies:
-                grouped: dict[StagedStrategy, list[tuple[Candidate, ScoredResult]]] = {}
-                for candidate, scored in tell_batch:
-                    grouped.setdefault(owners[candidate.id], []).append((candidate, scored))
-                for owner, owner_batch in grouped.items():
-                    owner.tell(owner_batch)
-            else:
-                active_strategy.tell(tell_batch)
-            evaluated += len(candidates)
+                tell_batch: list[tuple[Candidate, ScoredResult]] = []
+                for candidate, scored, cache_hit in results:
+                    _assert_honest_result(scored, definitions)
+                    light_scored = _strip_heavy_result(scored)
+                    if scored.eval_spec is not None:
+                        try:
+                            store.store(
+                                scored.eval_spec,
+                                light_scored,
+                                created_at=datetime.now(UTC).isoformat(),
+                            )
+                        except ResultStoreWriteRejected as exc:
+                            _LOGGER.warning(
+                                "result_store_write_rejected candidate_id=%s cache_key=%s reasons=%s",
+                                scored.candidate_id,
+                                scored.cache_key,
+                                ",".join(exc.reasons),
+                            )
+                    record = _to_record(candidate, scored, cache_hit=cache_hit)
+                    records.append(record)
+                    provenance.write(
+                        json.dumps(
+                            _record_payload(
+                                record,
+                                active_schema,
+                                resolved_profile,
+                                search_space_identity=search_space_identity,
+                            ),
+                            sort_keys=True,
+                            separators=(",", ":"),
+                            allow_nan=False,
+                        )
+                        + "\n"
+                    )
+                    tell_batch.append((candidate, light_scored))
+                if staged_strategies:
+                    grouped: dict[StagedStrategy, list[tuple[Candidate, ScoredResult]]] = {}
+                    for candidate, scored in tell_batch:
+                        grouped.setdefault(owners[candidate.id], []).append((candidate, scored))
+                    for owner, owner_batch in grouped.items():
+                        owner.tell(owner_batch)
+                else:
+                    active_strategy.tell(tell_batch)
+                evaluated += len(candidates)
+    except (KeyboardInterrupt, StudyAbort):
+        _write_aborted_artifacts_from_cache(
+            out,
+            profile=resolved_profile,
+            feedstock=feedstock,
+            fidelity=fidelity,
+            definitions=definitions,
+            fallback_records=records,
+            schema=active_schema,
+            failure_counts=_failure_counts(records),
+            search_space_identity=search_space_identity,
+            strategy_provenance=_strategy_provenance_payload(
+                active_strategy,
+                *staged_strategies,
+            ),
+            config=config,
+            strategy=active_strategy,
+            strategy_name=_strategy_label(active_strategy),
+            sampler_name=_resolved_strategy_sampler(active_strategy),
+            constraints=active_constraints,
+        )
+        raise
 
     failure_counts = _failure_counts(records)
     feasible = tuple(record for record in records if record.feasible)
@@ -563,6 +613,8 @@ def run(
             fidelity=fidelity,
             definitions=definitions,
             failure_counts=failure_counts,
+            config=config,
+            constraints=active_constraints,
         )
         raise StudyNoFeasibleError("no candidates were evaluated")
     if records and non_finite_count == len(records):
@@ -573,6 +625,8 @@ def run(
             fidelity=fidelity,
             definitions=definitions,
             failure_counts=failure_counts,
+            config=config,
+            constraints=active_constraints,
         )
         raise StudyNoFeasibleError(
             "all candidates failed with non_finite_payload; "
@@ -587,6 +641,8 @@ def run(
                 fidelity=fidelity,
                 definitions=definitions,
                 failure_counts=failure_counts,
+                config=config,
+                constraints=active_constraints,
             )
             raise StudyNoFeasibleError(
                 "no feasible candidates due to config/runtime failure; "
@@ -609,6 +665,11 @@ def run(
                 active_strategy,
                 *staged_strategies,
             ),
+            config=config,
+            strategy=active_strategy,
+            strategy_name=_strategy_label(active_strategy),
+            sampler_name=_resolved_strategy_sampler(active_strategy),
+            study_status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
         )
         artifacts["provenance"] = provenance_path
         artifacts["store"] = store.path
@@ -684,11 +745,17 @@ def run(
             active_strategy,
             *staged_strategies,
         ),
+        config=config,
+        strategy=active_strategy,
+        strategy_name=_strategy_label(active_strategy),
+        sampler_name=_resolved_strategy_sampler(active_strategy),
+        study_status=result_status,
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
     if certification_artifact is not None:
         certification_path = out / _TWO_PHASE_CERTIFICATION_NAME
+        certification_artifact = _json_member_payload(certification_artifact)
         certification_path.write_text(
             json.dumps(certification_artifact, indent=2, sort_keys=True, allow_nan=False)
             + "\n",
@@ -857,6 +924,10 @@ def run_certify(
         schema=active_schema,
         failure_counts=MappingProxyType({}),
         search_space_identity=search_space_identity,
+        config=config,
+        strategy_name="certify",
+        sampler_name=_resolved_strategy_sampler(config.strategy),
+        study_status=COMPLETED_STATUS,
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
@@ -2488,8 +2559,19 @@ def _strip_heavy_result(scored: ScoredResult) -> ScoredResult:
         reason=reference.reason,
         trace=_light_backend_status_trace(scored),
         product_summary=reference.product_summary,
+        backend_name=reference.backend_name,
         backend_status=_result_backend_status(scored),
         backend_authoritative=reference.backend_authoritative,
+        evidence_class=reference.evidence_class,
+        cache_state=reference.cache_state,
+        runtime_status=reference.runtime_status,
+        label_source=reference.label_source,
+        degradation_reason=reference.degradation_reason,
+        degraded_from=reference.degraded_from,
+        backend_real_active=reference.backend_real_active,
+        certification_allowed=reference.certification_allowed,
+        contributors=reference.contributors,
+        backend_status_reason=reference.backend_status_reason,
     )
     return replace(scored, run_reference=light_reference)
 
@@ -2501,10 +2583,18 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
     payload: dict[str, Any] = {}
     if status is not None:
         payload["backend_status"] = status
+    if reference is not None and reference.backend_name is not None:
+        payload["backend_name"] = reference.backend_name
     if reference is not None and reference.backend_authoritative is not None:
         payload["backend_authoritative"] = reference.backend_authoritative
+    if reference is not None and reference.evidence_class is not None:
+        payload["evidence_class"] = reference.evidence_class
+    if reference is not None and reference.cache_state is not None:
+        payload["cache_state"] = reference.cache_state
+        payload["reduced_real_cache_state"] = reference.cache_state
     if isinstance(trace, Mapping):
         for key in (
+            "backend_name",
             "backend_diagnostics",
             "out_of_domain_crash_point",
             "rump_terminal",
@@ -2518,6 +2608,19 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "kernel_fallback_used",
             "knob_saturation",
             "interpolation_feasibility_verdict",
+            "evidence_class",
+            "cache_state",
+            "reduced_real_cache_state",
+            "cache_rung",
+            "physics_rung",
+            "sig_fig_rung",
+            "rung",
+            "evidence_rank",
+            "proof_rank",
+            "proof_grade",
+            "neighbor_disagreement",
+            "reduced_real_cache",
+            "per_hour_summary",
         ):
             if key in trace:
                 payload[key] = _jsonable_value(trace[key])
@@ -2552,23 +2655,26 @@ def _latest_backend_status(value: Any) -> str | None:
 
 
 def _to_record(candidate: Candidate, scored: ScoredResult, *, cache_hit: bool) -> StudyRecord:
-    failure = scored.failure_category
-    objectives = _objective_mapping(scored.objectives)
+    light_scored = _strip_heavy_result(scored)
+    failure = light_scored.failure_category
+    objectives = _objective_mapping(light_scored.objectives)
     search_provenance = _search_provenance_from_candidate(candidate)
+    result_blob = _result_blob(light_scored)
     return StudyRecord(
         candidate_id=candidate.id,
         patch=candidate.patch,
-        feasible=bool(scored.feasible),
-        status=_status(scored),
+        feasible=bool(light_scored.feasible),
+        status=_status(light_scored),
         objectives=objectives,
-        feasibility_margins=_margin_mapping(scored.feasibility_margins),
-        cache_key=scored.cache_key,
+        feasibility_margins=_margin_mapping(light_scored.feasibility_margins),
+        cache_key=light_scored.cache_key,
         failure_category=failure.value if failure is not None else None,
-        failing_gates=scored.failing_gates,
-        notes=scored.notes,
+        failing_gates=light_scored.failing_gates,
+        notes=light_scored.notes,
         cache_hit=cache_hit,
-        product_summary=_product_summary_mapping(scored.run_reference),
-        trace_summary=_trace_summary_mapping(scored),
+        product_summary=_product_summary_mapping(light_scored.run_reference),
+        trace_summary=_trace_summary_mapping(light_scored),
+        result_blob=result_blob if isinstance(result_blob, Mapping) else {},
         proposal_source=str(search_provenance["proposal_source"]),
         seed_lineage=bool(search_provenance["seed_lineage"]),
         search_provenance=search_provenance,
@@ -2732,10 +2838,15 @@ def _light_backend_status_trace_for_reference(
         status = _backend_status_from_trace(reference.trace)
     if status is not None:
         payload["backend_status"] = str(status)
+    if reference.backend_name is not None:
+        payload["backend_name"] = reference.backend_name
     if reference.backend_authoritative is not None:
         payload["backend_authoritative"] = reference.backend_authoritative
+    if reference.evidence_class is not None:
+        payload["evidence_class"] = reference.evidence_class
     if reference.cache_state is not None:
         payload["reduced_real_cache_state"] = str(reference.cache_state)
+        payload["cache_state"] = str(reference.cache_state)
     elif isinstance(reference.trace, Mapping):
         per_hour = reference.trace.get("per_hour_summary")
         if isinstance(per_hour, Sequence) and per_hour:
@@ -3068,7 +3179,44 @@ def _write_artifacts(
     failure_counts: Mapping[str, int],
     search_space_identity: Mapping[str, Any] | None = None,
     strategy_provenance: Mapping[str, Any] | None = None,
+    config: StudyConfig | None = None,
+    strategy: Strategy | str | None = None,
+    strategy_name: str | None = None,
+    sampler_name: str | None = None,
+    study_status: str | None = None,
 ) -> dict[str, Path]:
+    created_at = datetime.now(UTC).isoformat()
+    resolved_study_status = study_status or (
+        COMPLETED_STATUS if winner is not None else COMPLETED_NO_FEASIBLE_WINNER_STATUS
+    )
+    resolved_strategy = strategy_name or (
+        _strategy_label(config.strategy) if config is not None else "unknown"
+    )
+    resolved_sampler = sampler_name or (
+        _resolved_strategy_sampler(config.strategy) if config is not None else active_sampler_name()
+    )
+    resolved_strategy_input = strategy if strategy is not None else (
+        config.strategy if config is not None else resolved_strategy
+    )
+    strategy_config = _strategy_config_payload(
+        resolved_strategy_input,
+        config=config,
+        sampler_name=resolved_sampler,
+    )
+    strategy_config_digest = _strategy_config_digest(strategy_config)
+    study_id_value = _study_id(
+        profile=profile,
+        feedstock=feedstock,
+        fidelity=fidelity,
+        created_at=created_at,
+        config=config,
+        strategy_name=resolved_strategy,
+        strategy_config_digest=strategy_config_digest,
+        search_space_identity=search_space_identity,
+    )
+    manifest_path = out / "study.manifest.json"
+    summary_path = out / "study.summary.json"
+    profile_path = out / "study.profile.yaml"
     pareto_path = out / "pareto.json"
     search_provenance_path = out / "search_provenance.json"
     leaderboard_path = out / "leaderboard.csv"
@@ -3086,6 +3234,8 @@ def _write_artifacts(
             search_space_identity=search_space_identity,
         )
     )
+    pareto_payload["member_schema_version"] = MEMBER_SCHEMA_VERSION
+    pareto_payload["status"] = resolved_study_status
     pareto_payload["failure_counts"] = dict(failure_counts)
     best_non_seeded = _best_non_seeded_lineage(leaderboard)
     pareto_payload["best_overall_candidate_id"] = (
@@ -3106,11 +3256,13 @@ def _write_artifacts(
     )
     search_provenance_path.write_text(
         json.dumps(
-            _search_provenance_payload(
-                leaderboard,
-                winner=winner,
-                best_non_seeded=best_non_seeded,
-                strategy_provenance=strategy_provenance,
+            _json_member_payload(
+                _search_provenance_payload(
+                    leaderboard,
+                    winner=winner,
+                    best_non_seeded=best_non_seeded,
+                    strategy_provenance=strategy_provenance,
+                )
             ),
             indent=2,
             sort_keys=True,
@@ -3128,7 +3280,55 @@ def _write_artifacts(
         schema,
         profile=profile,
     )
+    profile_path.write_text(
+        yaml.safe_dump(_jsonable_value(profile), sort_keys=True),
+        encoding="utf-8",
+    )
+    summary_payload = _study_summary_payload(
+        study_id=study_id_value,
+        created_at=created_at,
+        study_status=resolved_study_status,
+        profile=profile,
+        feedstock=feedstock,
+        fidelity=fidelity,
+        definitions=definitions,
+        leaderboard=leaderboard,
+        winner=winner,
+        failure_counts=failure_counts,
+        config=config,
+        strategy_name=resolved_strategy,
+    )
+    summary_path.write_text(
+        json.dumps(summary_payload, indent=2, sort_keys=True, allow_nan=False) + "\n",
+        encoding="utf-8",
+    )
+    manifest_path.write_text(
+        json.dumps(
+            _study_manifest_payload(
+                study_id=study_id_value,
+                created_at=created_at,
+                study_status=resolved_study_status,
+                profile=profile,
+                feedstock=feedstock,
+                fidelity=fidelity,
+                config=config,
+                strategy_name=resolved_strategy,
+                sampler_name=resolved_sampler,
+                search_space_identity=search_space_identity,
+                strategy_config=strategy_config,
+                replayable=(out / "study.events.jsonl").is_file(),
+            ),
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     artifacts = {
+        "manifest": manifest_path,
+        "summary": summary_path,
+        "profile_snapshot": profile_path,
         "pareto": pareto_path,
         "leaderboard": leaderboard_path,
         "search_provenance": search_provenance_path,
@@ -3146,12 +3346,611 @@ def _write_artifacts(
             schema.to_setpoints_patch(winner.patch),
         )
         if tap_sidecar is not None:
+            tap_sidecar = _json_member_payload(tap_sidecar)
             tap_sidecar_path.write_text(
                 json.dumps(tap_sidecar, indent=2, sort_keys=True, allow_nan=False) + "\n",
                 encoding="utf-8",
             )
             artifacts["winner_tap_truncated"] = tap_sidecar_path
     return artifacts
+
+
+def _study_summary_payload(
+    *,
+    study_id: str,
+    created_at: str,
+    study_status: str,
+    profile: Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    definitions: Sequence[ObjectiveDefinition],
+    leaderboard: Sequence[StudyRecord],
+    winner: StudyRecord | None,
+    failure_counts: Mapping[str, int],
+    config: StudyConfig | None,
+    strategy_name: str,
+) -> Mapping[str, Any]:
+    feasible_count = sum(1 for record in leaderboard if record.feasible)
+    infeasible_count = sum(int(value) for value in failure_counts.values())
+    if infeasible_count == 0:
+        infeasible_count = sum(1 for record in leaderboard if not record.feasible)
+    evaluated = feasible_count + infeasible_count
+    budget = int(config.budget) if config is not None else evaluated
+    source_record, products_source = _summary_products_source(winner, leaderboard)
+    if study_status == ABORTED_STATUS:
+        source_record, products_source = None, "none"
+    best_non_seeded = _best_non_seeded_lineage(leaderboard)
+    return {
+        "save_schema_version": SAVE_SCHEMA_VERSION,
+        "member_schema_version": MEMBER_SCHEMA_VERSION,
+        "study_id": study_id,
+        "created_at": created_at,
+        "study_status": study_status,
+        "feedstock_id": feedstock,
+        "profile_id": profile_id(profile),
+        "profile_display_name": _profile_display_name(profile),
+        "strategy": strategy_name,
+        "seed": int(config.seed) if config is not None else 0,
+        "budget": budget,
+        "evaluated": evaluated,
+        "verdict_counts": {
+            "feasible": feasible_count,
+            "not_attempted": max(budget - evaluated, 0),
+            "infeasible": infeasible_count,
+        },
+        "objectives_spec": [
+            {
+                "metric": definition.metric,
+                "sense": definition.sense,
+                "units": definition.units,
+            }
+            for definition in definitions
+        ],
+        "winner": (
+            _summary_record_ref(winner, _record_rank(winner, leaderboard))
+            if winner is not None
+            else None
+        ),
+        "dual_winner_non_seeded": (
+            _summary_record_ref(best_non_seeded, _record_rank(best_non_seeded, leaderboard))
+            if best_non_seeded is not None
+            and (winner is None or best_non_seeded.candidate_id != winner.candidate_id)
+            else None
+        ),
+        "honesty": _summary_honesty_payload(
+            fidelity,
+            source_record,
+            records=leaderboard,
+        ),
+        "badges": _summary_badges_payload(),
+        "coating": _summary_coating_payload(source_record),
+        "products_source": products_source,
+        "products": _summary_products_payload(source_record),
+        "origin": "local",
+        "verification": None,
+    }
+
+
+def _study_manifest_payload(
+    *,
+    study_id: str,
+    created_at: str,
+    study_status: str,
+    profile: Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    config: StudyConfig | None,
+    strategy_name: str,
+    sampler_name: str,
+    search_space_identity: Mapping[str, Any] | None,
+    strategy_config: Mapping[str, Any],
+    replayable: bool,
+) -> Mapping[str, Any]:
+    return {
+        "save_schema_version": SAVE_SCHEMA_VERSION,
+        "member_schema_version": MEMBER_SCHEMA_VERSION,
+        "study_id": study_id,
+        "created_at": created_at,
+        "code_version": current_code_version(),
+        "git": {"sha": None, "dirty": None},
+        "strategy": {
+            "name": strategy_name,
+            "class": strategy_name,
+            "config": _jsonable_value(strategy_config),
+        },
+        "seed": int(config.seed) if config is not None else 0,
+        "budget": int(config.budget) if config is not None else 0,
+        "parallel": int(config.parallel) if config is not None else 1,
+        "fidelity": fidelity,
+        "profile": {
+            "id": profile_id(profile),
+            "display_name": _profile_display_name(profile),
+            "basename": _profile_basename(config.profile if config is not None else None),
+            "content_hash": _profile_content_hash(profile),
+        },
+        "feedstock_id": feedstock,
+        "search_space_identity": _jsonable_value(search_space_identity or {}),
+        "recipe_schema_version": recipe_schema_version,
+        "allowlist_version": allowlist_version,
+        "data_digests": {},
+        "corpus_version": current_corpus_version(),
+        "result_scope": None,
+        "sampler_name": sampler_name,
+        "scipy_version": None,
+        "optuna_version": None,
+        "cache_tier_policy": _jsonable_value(
+            _mapping_or_empty(profile.get("cache_tier_policy"))
+        ),
+        "two_phase_settings": _jsonable_value(
+            _mapping_or_empty(profile.get("two_phase_certification"))
+        ),
+        "study_status": study_status,
+        "replayable": bool(replayable),
+        "reoptimized_from": None,
+        "goals_source": None,
+    }
+
+
+def _json_member_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
+    result = dict(payload)
+    result.setdefault("member_schema_version", MEMBER_SCHEMA_VERSION)
+    return result
+
+
+def _strategy_config_payload(
+    strategy: Strategy | str,
+    *,
+    config: StudyConfig | None,
+    sampler_name: str,
+) -> Mapping[str, Any]:
+    payload: dict[str, Any] = {}
+    if isinstance(strategy, str):
+        payload["strategy"] = strategy
+    else:
+        payload["strategy"] = getattr(strategy, "name", type(strategy).__name__)
+        for attr in (
+            "seed",
+            "sampler_name",
+            "num_trajectories",
+            "num_levels",
+            "prune_threshold",
+            "beam_width",
+            "children_per_parent",
+            "max_backward_passes",
+            "max_joint_refines",
+            "stage_ids",
+        ):
+            if hasattr(strategy, attr):
+                value = getattr(strategy, attr)
+                payload[attr] = value() if callable(value) else value
+        topology = getattr(strategy, "topology", None)
+        metadata = getattr(topology, "metadata", None)
+        if callable(metadata):
+            payload["topology"] = metadata()
+    payload["sampler_name"] = sampler_name
+    if config is not None:
+        payload["seed"] = int(config.seed)
+        payload["budget"] = int(config.budget)
+        payload["parallel"] = int(config.parallel)
+        if config.warm_start_from is not None:
+            payload["warm_start_from"] = str(config.warm_start_from)
+        if config.per_eval_timeout_seconds is not None:
+            payload["per_eval_timeout_seconds"] = float(config.per_eval_timeout_seconds)
+    return _jsonable_value(payload)
+
+
+def _strategy_config_digest(strategy_config: Mapping[str, Any]) -> str:
+    encoded = canonical_json_dumps(_jsonable_value(strategy_config)).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _study_id(
+    *,
+    profile: Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    created_at: str,
+    config: StudyConfig | None,
+    strategy_name: str,
+    strategy_config_digest: str | None,
+    search_space_identity: Mapping[str, Any] | None,
+) -> str:
+    identity_block = {
+        "strategy": strategy_name,
+        "strategy_config_digest": strategy_config_digest,
+        "seed": int(config.seed) if config is not None else 0,
+        "budget": int(config.budget) if config is not None else 0,
+        "fidelity": fidelity,
+        "profile_content_hash": _profile_content_hash(profile),
+        "feedstock_id": feedstock,
+        "recipe_schema_version": recipe_schema_version,
+        "allowlist_version": allowlist_version,
+        "bounds_digest": _mapping_or_empty(search_space_identity).get("bounds_digest"),
+        "data_digests": {},
+        "corpus_version": current_corpus_version(),
+        "result_scope": None,
+        "created_at": created_at,
+    }
+    encoded = canonical_json_dumps(_jsonable_value(identity_block)).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()[:16]
+
+
+def _summary_record_ref(record: StudyRecord, rank: int | None) -> Mapping[str, Any]:
+    return {
+        "candidate_id": record.candidate_id,
+        "cache_key": record.cache_key,
+        "rank": rank,
+        "feasible": record.feasible,
+        "objectives": dict(record.objectives),
+        "proposal_source": record.proposal_source,
+        "seed_lineage": record.seed_lineage,
+    }
+
+
+def _record_rank(record: StudyRecord | None, leaderboard: Sequence[StudyRecord]) -> int | None:
+    if record is None:
+        return None
+    for rank, candidate in enumerate(leaderboard, start=1):
+        if candidate.candidate_id == record.candidate_id:
+            return rank
+    return None
+
+
+def _summary_products_source(
+    winner: StudyRecord | None,
+    leaderboard: Sequence[StudyRecord],
+) -> tuple[StudyRecord | None, str]:
+    if winner is not None:
+        return winner, "winner"
+    if leaderboard and leaderboard[0].feasible:
+        return leaderboard[0], "rank_1_leaderboard"
+    return None, "none"
+
+
+def _summary_honesty_payload(
+    fidelity: str,
+    record: StudyRecord | None,
+    *,
+    records: Sequence[StudyRecord],
+) -> Mapping[str, Any]:
+    carrier = _mapping_or_empty(record.trace_summary if record is not None else {})
+    result_blob = _mapping_or_empty(record.result_blob if record is not None else {})
+    label = optimizer_tier_label(carrier, result_blob)
+    canonical = _mapping_or_empty(label.get("canonical"))
+    extraction = _mapping_or_empty(
+        record.product_summary.get("extraction_completeness") if record is not None else {}
+    )
+    payload: dict[str, Any] = {
+        "fidelity": fidelity,
+        "tier": label.get("tier", "unknown"),
+        "backend_name": carrier.get("backend_name"),
+        "backend_status": carrier.get("backend_status") or canonical.get("runtime_status"),
+        "evidence_class": label.get("evidence_class") or canonical.get("evidence_class"),
+        "ux_label": label.get("ux_label", "UNVERIFIED"),
+        "certification_allowed": bool(label.get("certification_allowed", False)),
+        "completeness": {
+            "status": str(extraction.get("status") or "unknown"),
+            "percent": _optional_float(
+                extraction.get("percent", extraction.get("completeness_percent"))
+            ),
+        },
+        "extraction_completeness_summary": _jsonable_value(extraction),
+        "corpus_version": current_corpus_version(),
+        "code_version": current_code_version(),
+        "cache_states_seen": _cache_states_seen(records),
+        "diagnostic_warnings": _diagnostic_warnings(records),
+    }
+    evidence_rank = _summary_evidence_rank(label)
+    if evidence_rank is not None:
+        payload["evidence_rank"] = evidence_rank
+    return payload
+
+
+def _summary_evidence_rank(label: Mapping[str, Any]) -> str | None:
+    for key in ("evidence_rank", "proof_rank", "proof_grade"):
+        value = label.get(key)
+        if value is not None and str(value).strip():
+            return str(value)
+    return None
+
+
+def _summary_badges_payload() -> Mapping[str, Any]:
+    corpus_version = current_corpus_version()
+    code_version = current_code_version()
+    return {
+        "corpus": {
+            "status": "current",
+            "raw_status": "accepted",
+            "label": corpus_version,
+            "stored_version": corpus_version,
+            "current_version": corpus_version,
+        },
+        "code": {
+            "status": "current",
+            "raw_status": "current",
+            "label": "current",
+            "stored_version": code_version,
+            "current_version": code_version,
+        },
+    }
+
+
+def _summary_coating_payload(record: StudyRecord | None) -> Mapping[str, Any]:
+    summary = _mapping_or_empty(record.product_summary if record is not None else {})
+    wall = _mapping_or_empty(summary.get("wall_deposit_kg_by_segment_species"))
+    return {
+        "campaigns_to_resinter": _optional_float(summary.get("campaigns_to_resinter")),
+        "verdict": str(
+            summary.get("coating_status")
+            or summary.get("coating_output_status")
+            or "unknown"
+        ),
+        "worst_species": _worst_wall_deposit_species(wall),
+        "wall_deposit_kg_by_segment_species": _jsonable_value(wall),
+    }
+
+
+def _summary_products_payload(record: StudyRecord | None) -> Mapping[str, Any] | None:
+    if record is None:
+        return None
+    summary = _mapping_or_empty(record.product_summary)
+    classes = _mapping_or_empty(summary.get("product_classes"))
+    product_ledger = _mapping_or_empty(summary.get("product_ledger_kg"))
+    terminal_rump_species = _terminal_rump_species_kg(record)
+    rump_oxides = _oxide_wt_pct_from_kg(terminal_rump_species)
+    if not rump_oxides:
+        rump_oxides = _oxide_wt_pct_from_kg(
+            _species_kg_from_classes(classes, "refractory_ceramic_rump")
+        )
+    return {
+        "oxygen_kg": _first_float(
+            _nested_value(classes, ("metals_plus_O2", "O2_kg")),
+            _nested_value(classes, ("oxygen", "class_total_kg")),
+            product_ledger.get("O2"),
+            product_ledger.get("oxygen"),
+        ),
+        "metals_kg": _species_kg_from_classes(
+            classes,
+            "ingots_metals",
+            "metals_plus_O2",
+            species_keys=("kg_by_species", "metals_kg_by_species"),
+        ),
+        "glass_kg": _species_kg_from_classes(classes, "glass", "pure_silica_glass"),
+        "volatiles_captured_kg": _species_kg_from_classes(
+            classes,
+            "captured_volatiles",
+            "volatiles_captured",
+        ),
+        "refractory_rump_kg": _first_float(
+            _nested_value(classes, ("refractory_ceramic_rump", "class_total_kg")),
+            _nested_value(classes, ("terminal_rump", "class_total_kg")),
+        ),
+        "rump_top_oxides_wt_pct": rump_oxides,
+        "ceramic_rump_panel": _ceramic_rump_panel_from_oxides(rump_oxides),
+        "terminal_rump_by_class_kg": _terminal_rump_by_class_kg(classes, record),
+    }
+
+
+def _cache_states_seen(records: Sequence[StudyRecord]) -> list[str]:
+    seen: set[str] = set()
+    for record in records:
+        trace = _mapping_or_empty(record.trace_summary)
+        for key in ("reduced_real_cache_state", "cache_state"):
+            value = trace.get(key)
+            if value is not None and str(value).strip():
+                seen.add(str(value))
+    return sorted(seen)
+
+
+def _diagnostic_warnings(records: Sequence[StudyRecord]) -> list[str]:
+    warnings: set[str] = set()
+    for record in records:
+        trace = _mapping_or_empty(record.trace_summary)
+        backend_name = str(trace.get("backend_name") or "")
+        backend_status = str(trace.get("backend_status") or "")
+        if backend_name in {"stub", "diagnostic_stub"} or backend_status == "diagnostic_stub":
+            warnings.add("stub-backend")
+        if record.failure_category == "diagnostic_only":
+            warnings.add("diagnostic-only rows")
+        if _is_tap_truncated(_composition_target_payload(record)):
+            warnings.add("tap_truncated")
+        if trace.get("vapor_pressure_fallback_provider_id") or trace.get(
+            "kernel_fallback_used"
+        ):
+            warnings.add("vapor-pressure fallback")
+        if any("previously_ungated" in str(note) for note in record.notes):
+            warnings.add("previously_ungated")
+    return sorted(warnings)
+
+
+def _profile_display_name(profile: Mapping[str, Any]) -> str:
+    raw = profile.get("display_name") or profile.get("name") or profile_id(profile)
+    return str(raw)
+
+
+def _profile_basename(raw_profile: Any) -> str | None:
+    if isinstance(raw_profile, (str, Path)):
+        return Path(raw_profile).name
+    return None
+
+
+def _profile_content_hash(profile: Mapping[str, Any]) -> str:
+    encoded = canonical_json_dumps(_jsonable_value(profile)).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _mapping_or_empty(value: Any) -> Mapping[str, Any]:
+    return value if isinstance(value, Mapping) else MappingProxyType({})
+
+
+def _nested_value(source: Mapping[str, Any], path: Sequence[str]) -> Any:
+    current: Any = source
+    for key in path:
+        if not isinstance(current, Mapping):
+            return None
+        current = current.get(key)
+    return current
+
+
+def _species_kg_from_classes(
+    classes: Mapping[str, Any],
+    *class_keys: str,
+    species_keys: Sequence[str] = ("kg_by_species",),
+) -> Mapping[str, float]:
+    result: dict[str, float] = {}
+    for class_key in class_keys:
+        class_payload = _mapping_or_empty(classes.get(class_key))
+        for species_key in species_keys:
+            species_map = _mapping_or_empty(class_payload.get(species_key))
+            for species, kg in species_map.items():
+                value = _optional_float(kg)
+                if value is not None:
+                    result[str(species)] = value
+    return result
+
+
+def _terminal_rump_species_kg(record: StudyRecord) -> Mapping[str, float]:
+    trace = _mapping_or_empty(record.trace_summary)
+    direct = _mapping_or_empty(trace.get("terminal_rump_by_species_kg"))
+    if direct:
+        return {
+            str(species): value
+            for species, kg in direct.items()
+            for value in [_optional_float(kg)]
+            if value is not None
+        }
+    rump = _mapping_or_empty(trace.get("rump_terminal"))
+    return {
+        str(species): value
+        for species, kg in _mapping_or_empty(rump.get("kg_by_species")).items()
+        for value in [_optional_float(kg)]
+        if value is not None
+    }
+
+
+def _terminal_rump_by_class_kg(
+    classes: Mapping[str, Any],
+    record: StudyRecord,
+) -> Mapping[str, float]:
+    trace = _mapping_or_empty(record.trace_summary)
+    direct = _mapping_or_empty(trace.get("terminal_rump_by_class_kg"))
+    if direct:
+        return {
+            str(key): value
+            for key, kg in direct.items()
+            for value in [_optional_float(kg)]
+            if value is not None
+        }
+    result: dict[str, float] = {}
+    for key in sorted(_TERMINAL_RUMP_PRODUCT_CLASS_KEYS):
+        payload = classes.get(key)
+        value = _optional_float(_mapping_or_empty(payload).get("class_total_kg"))
+        if value is not None:
+            result[str(key)] = value
+    return result
+
+
+def _oxide_wt_pct_from_kg(species_kg: Mapping[str, Any]) -> Mapping[str, float]:
+    oxide_kg = {
+        str(species): amount
+        for species, kg in species_kg.items()
+        if _is_oxide_species(str(species))
+        for amount in [_optional_float(kg)]
+        if amount is not None and amount > 0.0
+    }
+    total = sum(oxide_kg.values())
+    if total <= 0.0:
+        return {}
+    return {
+        species: round(amount / total * 100.0, 3)
+        for species, amount in sorted(oxide_kg.items())
+    }
+
+
+def _is_oxide_species(species: str) -> bool:
+    if species in {"O2", "H2O", "CO2"}:
+        return False
+    if species == "REE_oxides":
+        return True
+    return bool(_OXIDE_FORMULA_RE.fullmatch(species))
+
+
+def _ceramic_rump_panel_from_oxides(composition: Mapping[str, Any]) -> Mapping[str, Any]:
+    return ceramic_rump_payload(composition)
+
+
+def _ceramic_match_payload(match: CeramicMatch) -> Mapping[str, Any]:
+    return {
+        "ceramic_id": match.ceramic_id,
+        "label": match.label,
+        "composition_kind": match.composition_kind,
+        "service_temp": _ceramic_service_temp_payload(match.service_temp),
+        "liner_suitability": dict(match.liner_suitability),
+    }
+
+
+def _ceramic_service_temp_payload(
+    service_temp: CeramicServiceTemperature,
+) -> Mapping[str, Any]:
+    usable = service_temp.usable_service_C
+    kind = service_temp.kind
+    if usable is not None:
+        display = f"Usable service: {usable:g} C"
+        usable_service = True
+    elif service_temp.value_C is not None:
+        display = f"{kind}: {service_temp.value_C:g} C; not a usable service rating"
+        usable_service = False
+    else:
+        display = f"{kind}; not a usable service rating"
+        usable_service = False
+    return {
+        "value_C": _round_or_none(service_temp.value_C),
+        "kind": kind,
+        "usable_service_C": _round_or_none(usable),
+        "usable_service": usable_service,
+        "display": display,
+        "note": service_temp.note,
+    }
+
+
+def _worst_wall_deposit_species(wall: Mapping[str, Any]) -> str | None:
+    totals: dict[str, float] = {}
+    for species_map in wall.values():
+        if not isinstance(species_map, Mapping):
+            continue
+        for species, kg in species_map.items():
+            value = _optional_float(kg)
+            if value is not None:
+                totals[str(species)] = totals.get(str(species), 0.0) + value
+    if not totals:
+        return None
+    return max(sorted(totals), key=lambda species: totals[species])
+
+
+def _first_float(*values: Any) -> float | None:
+    for value in values:
+        number = _optional_float(value)
+        if number is not None:
+            return number
+    return None
+
+
+def _optional_float(value: Any) -> float | None:
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return number
+
+
+def _round_or_none(value: float | None) -> float | None:
+    if value is None:
+        return None
+    return round(float(value), 3)
 
 
 _TAP_TRUNCATION_DURATION_PATHS: Mapping[str, tuple[str, ...]] = MappingProxyType(
@@ -3287,6 +4086,144 @@ def _positive_int(value: Any, label: str) -> int:
     return numeric
 
 
+def _write_aborted_artifacts_from_cache(
+    out: Path,
+    *,
+    profile: Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    definitions: Sequence[ObjectiveDefinition],
+    fallback_records: Sequence[StudyRecord] = (),
+    schema: RecipeSchema,
+    failure_counts: Mapping[str, int],
+    search_space_identity: Mapping[str, Any] | None = None,
+    strategy_provenance: Mapping[str, Any] | None = None,
+    config: StudyConfig | None = None,
+    strategy: Strategy | str | None = None,
+    strategy_name: str | None = None,
+    sampler_name: str | None = None,
+    constraints: Any = None,
+) -> bool:
+    records = _records_from_cache_sqlite(
+        out,
+        schema,
+        profile=profile,
+        feedstock=feedstock,
+        fidelity=fidelity,
+        constraints=constraints,
+    )
+    if not records:
+        records = tuple(fallback_records)
+    if not records:
+        return False
+
+    computed_failures = _failure_counts(records)
+    resolved_failure_counts = dict(failure_counts)
+    resolved_failure_counts.update(computed_failures)
+    feasible = tuple(record for record in records if record.feasible)
+    leaderboard = (
+        tuple(sorted(feasible, key=lambda row: _rank_key(row, definitions)))
+        if feasible
+        else tuple(records)
+    )
+    pareto_ranked = tuple(
+        sorted(
+            pareto_front(
+                feasible,
+                definitions,
+                objective_getter=lambda row: row.objectives,
+            ),
+            key=lambda row: _rank_key(row, definitions),
+        )
+    )
+    _write_artifacts(
+        out,
+        profile=profile,
+        feedstock=feedstock,
+        fidelity=fidelity,
+        definitions=definitions,
+        pareto=pareto_ranked,
+        leaderboard=leaderboard,
+        winner=None,
+        schema=schema,
+        failure_counts=resolved_failure_counts,
+        search_space_identity=search_space_identity,
+        strategy_provenance=strategy_provenance,
+        config=config,
+        strategy=strategy,
+        strategy_name=strategy_name,
+        sampler_name=sampler_name,
+        study_status=ABORTED_STATUS,
+    )
+    return True
+
+
+def _records_from_cache_sqlite(
+    out: Path,
+    schema: RecipeSchema,
+    *,
+    profile: Mapping[str, Any],
+    feedstock: str,
+    fidelity: str,
+    constraints: Any = None,
+) -> tuple[StudyRecord, ...]:
+    store_path = out / "cache.sqlite"
+    if not store_path.is_file():
+        return ()
+    store = ResultStore(store_path)
+    active_constraints = constraints
+    if active_constraints is None:
+        try:
+            active_constraints = _constraints_for_profile(profile)
+        except ProfileValidationError as exc:
+            if not _is_stale_profile_refusal(exc):
+                return ()
+    try:
+        selector_spec, _ = _build_eval_inputs(
+            RecipePatch({}).validated(schema),
+            feedstock,
+            fidelity,
+            profile,
+            schema,
+            constraints=active_constraints,
+        )
+    except (ProfileValidationError, RecipeValidationError, ValueError):
+        return ()
+    scoped = store.query(
+        selector_spec.feedstock_id,
+        profile_id=selector_spec.profile_id,
+        fidelity=selector_spec.fidelity,
+        code_version=selector_spec.code_version,
+        data_digests=selector_spec.data_digests,
+        result_scope=result_scope_payload(selector_spec),
+    )
+    records: list[StudyRecord] = []
+    for index, scored in enumerate(scoped):
+        candidate = _candidate_from_cached_scored(scored, index=index, schema=schema)
+        records.append(_to_record(candidate, scored, cache_hit=True))
+    return tuple(records)
+
+
+def _candidate_from_cached_scored(
+    scored: ScoredResult,
+    *,
+    index: int,
+    schema: RecipeSchema,
+) -> Candidate:
+    cache_key_value = scored.cache_key or f"row-{index:06d}"
+    candidate_id = scored.candidate_id or f"cache-{cache_key_value[:12]}"
+    return Candidate(
+        id=str(candidate_id),
+        patch=RecipePatch({}).validated(schema),
+        metadata={
+            "strategy": "cache.sqlite",
+            "sequence": index,
+            "proposal_source": "cache_sqlite",
+            "seed_lineage": False,
+        },
+    )
+
+
 def _write_empty_artifacts(
     out: Path,
     *,
@@ -3295,10 +4232,103 @@ def _write_empty_artifacts(
     fidelity: str,
     definitions: Sequence[ObjectiveDefinition],
     failure_counts: Mapping[str, int],
+    config: StudyConfig | None = None,
+    constraints: Any = None,
 ) -> None:
+    schema = RecipeSchema()
+    strategy_name = _strategy_label(config.strategy) if config is not None else "unknown"
+    sampler_name = (
+        _resolved_strategy_sampler(config.strategy)
+        if config is not None
+        else active_sampler_name()
+    )
+    if _write_aborted_artifacts_from_cache(
+        out,
+        profile=profile,
+        feedstock=feedstock,
+        fidelity=fidelity,
+        definitions=definitions,
+        schema=schema,
+        failure_counts=failure_counts,
+        config=config,
+        strategy=config.strategy if config is not None else None,
+        strategy_name=strategy_name,
+        sampler_name=sampler_name,
+        constraints=constraints,
+    ):
+        return
+
+    created_at = datetime.now(UTC).isoformat()
+    strategy_config = _strategy_config_payload(
+        config.strategy if config is not None else strategy_name,
+        config=config,
+        sampler_name=sampler_name,
+    )
+    strategy_config_digest = _strategy_config_digest(strategy_config)
+    study_id_value = _study_id(
+        profile=profile,
+        feedstock=feedstock,
+        fidelity=fidelity,
+        created_at=created_at,
+        config=config,
+        strategy_name=strategy_name,
+        strategy_config_digest=strategy_config_digest,
+        search_space_identity=None,
+    )
+    (out / "study.profile.yaml").write_text(
+        yaml.safe_dump(_jsonable_value(profile), sort_keys=True),
+        encoding="utf-8",
+    )
+    (out / "study.summary.json").write_text(
+        json.dumps(
+            _study_summary_payload(
+                study_id=study_id_value,
+                created_at=created_at,
+                study_status=ABORTED_STATUS,
+                profile=profile,
+                feedstock=feedstock,
+                fidelity=fidelity,
+                definitions=definitions,
+                leaderboard=(),
+                winner=None,
+                failure_counts=failure_counts,
+                config=config,
+                strategy_name=strategy_name,
+            ),
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (out / "study.manifest.json").write_text(
+        json.dumps(
+            _study_manifest_payload(
+                study_id=study_id_value,
+                created_at=created_at,
+                study_status=ABORTED_STATUS,
+                profile=profile,
+                feedstock=feedstock,
+                fidelity=fidelity,
+                config=config,
+                strategy_name=strategy_name,
+                sampler_name=sampler_name,
+                search_space_identity=None,
+                strategy_config=strategy_config,
+                replayable=(out / "study.events.jsonl").is_file(),
+            ),
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     (out / "pareto.json").write_text(
         json.dumps(
             {
+                "member_schema_version": MEMBER_SCHEMA_VERSION,
                 "feedstock": feedstock,
                 "fidelity": fidelity,
                 "failure_counts": dict(failure_counts),
@@ -3306,6 +4336,7 @@ def _write_empty_artifacts(
                 "pareto": [],
                 "profile": profile_id(profile),
                 "selection_rule": WINNER_SELECTION_RULE,
+                "status": ABORTED_STATUS,
                 "winner_candidate_id": None,
             },
             indent=2,
@@ -3314,7 +4345,7 @@ def _write_empty_artifacts(
         + "\n",
         encoding="utf-8",
     )
-    _write_leaderboard(out / "leaderboard.csv", (), (), None, definitions, RecipeSchema())
+    _write_leaderboard(out / "leaderboard.csv", (), (), None, definitions, schema)
 
 
 def _pareto_payload(

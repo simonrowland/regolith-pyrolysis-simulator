@@ -3,7 +3,57 @@ from __future__ import annotations
 import pytest
 
 from simulator.fidelity_vocabulary import EvidenceClass, may_certify
+from simulator.optimize import study
+from simulator.optimize.evaluate import RunReference, ScoredResult
+from simulator.optimize.honesty import optimizer_tier_label
+from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
+from simulator.optimize.recipe import RecipePatch
+from simulator.optimize.strategy import Candidate
 from web.routes import _optimizer_tier_label
+
+
+def _real_path_record(*, proof_grade: str | None) -> study.StudyRecord:
+    trace = {
+        "backend_name": "alphamelts",
+        "backend_status": "ok",
+        "backend_authoritative": True,
+        "evidence_class": EvidenceClass.MELTS.value,
+        "cache_state": "live_fill",
+        "reduced_real_cache_state": "live_fill",
+    }
+    if proof_grade is not None:
+        trace["proof_grade"] = proof_grade
+    reference = RunReference(
+        status="ok",
+        trace=trace,
+        backend_name="alphamelts",
+        backend_status="ok",
+        backend_authoritative=True,
+        evidence_class=EvidenceClass.MELTS.value,
+    )
+    candidate = Candidate(
+        id="candidate-proof-grade",
+        patch=RecipePatch({}),
+        metadata={"proposal_source": "sobol", "strategy": "test"},
+    )
+    scored = ScoredResult(
+        candidate_id=candidate.id,
+        eval_spec=None,
+        cache_key="cache-proof-grade",
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue(
+                    metric="oxygen_kg",
+                    sense="maximize",
+                    value=1.0,
+                    units="kg",
+                ),
+            )
+        ),
+        run_reference=reference,
+    )
+    return study._to_record(candidate, scored, cache_hit=False)
 
 
 @pytest.mark.parametrize(
@@ -125,3 +175,51 @@ def test_optimizer_tier_label_title_includes_rung_and_disagreement() -> None:
     assert "rung=4.5" in label["title"]
     assert "neighbor_disagreement_max=0.12" in label["title"]
     assert label["ux_label"] == "ESTIMATED"
+
+
+def test_web_optimizer_tier_label_delegates_to_shared_producer() -> None:
+    run_reference = {
+        "cache_state": "live_fill",
+        "backend_name": "alphamelts",
+        "backend_status": "ok",
+        "backend_authoritative": True,
+        "evidence_class": EvidenceClass.MELTS.value,
+    }
+    result_blob = {"cache_rung": 3}
+
+    assert _optimizer_tier_label(run_reference, result_blob) == optimizer_tier_label(
+        run_reference,
+        result_blob,
+    )
+
+
+def test_summary_honesty_real_path_matches_web_without_proof_grade() -> None:
+    record = _real_path_record(proof_grade=None)
+
+    summary_label = study._summary_honesty_payload("stub", record, records=(record,))
+    web_label = _optimizer_tier_label(record.trace_summary, record.result_blob)
+
+    assert record.result_blob["evidence_class"] == EvidenceClass.MELTS.value
+    assert summary_label["tier"] == web_label["tier"] == "live_fill"
+    assert summary_label["ux_label"] == web_label["ux_label"] == "CERTIFIED"
+    assert summary_label["evidence_class"] == web_label["evidence_class"]
+    assert "evidence_rank" not in summary_label
+    assert "evidence_rank" not in web_label
+    assert summary_label.get("evidence_rank") == web_label.get("evidence_rank")
+
+
+@pytest.mark.parametrize("proof_grade", ["D", "B", "C"])
+def test_summary_honesty_real_path_preserves_result_blob_proof_grade(
+    proof_grade: str,
+) -> None:
+    record = _real_path_record(proof_grade=proof_grade)
+
+    summary_label = study._summary_honesty_payload("stub", record, records=(record,))
+    web_label = _optimizer_tier_label(record.trace_summary, record.result_blob)
+
+    assert record.result_blob["evidence_class"] == EvidenceClass.MELTS.value
+    assert record.result_blob["proof_grade"] == proof_grade
+    assert web_label["evidence_rank"] == proof_grade
+    assert web_label["proof_grade"] == proof_grade
+    assert summary_label["evidence_class"] == EvidenceClass.MELTS.value
+    assert summary_label["evidence_rank"] == web_label["evidence_rank"] == proof_grade

@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import quote
 
-from flask import Blueprint, Response, current_app, render_template, jsonify, request
+from flask import Blueprint, Response, current_app, render_template, jsonify, request, send_file
 import yaml
 from werkzeug.exceptions import BadRequest
 
@@ -45,6 +45,7 @@ from simulator.mre_ladder import (
 from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
+from simulator.optimize.honesty import optimizer_tier_label
 from simulator.optimize.objective import (
     canonical_objective_metric,
     objective_metric_aliases,
@@ -53,6 +54,7 @@ from simulator.optimize.results_store import (
     _deserialize_grounding_margins,
     grounded_result_feasible,
 )
+from simulator.optimize.save_bundle import export_study_bundle
 from simulator.recipe_io import (
     RECIPE_LIBRARY_DIR,
     RecipeIOError,
@@ -79,6 +81,11 @@ DATA_DIR = Path(__file__).parent.parent / 'data'
 OPTIMIZER_CACHE_NAME = 'cache.sqlite'
 OPTIMIZER_ARTIFACT_NAMES = (
     OPTIMIZER_CACHE_NAME,
+    'study.manifest.json',
+    'study.summary.json',
+    'study.profile.yaml',
+    'artifact.index.json',
+    'job_status.json',
     'leaderboard.csv',
     'pareto.json',
     'search_provenance.json',
@@ -439,156 +446,17 @@ def _optional_bool(value: Any) -> bool | None:
     return False
 
 
-_CERTIFIED_CACHE_TIERS = frozenset({'cached_exact', 'live_fill'})
-_ESTIMATED_CACHE_TIERS = frozenset({'cached_physics_bucket', 'cached_interpolated'})
-_LEGACY_EVIDENCE_BACKEND_ALIASES = frozenset({'stub', 'diagnostic_stub'})
-
-
-def _stored_reduced_real_cache_state(
-    run_reference: Mapping[str, Any],
-    result_blob: Mapping[str, Any],
-) -> str | None:
-    for carrier in (run_reference, result_blob):
-        if not isinstance(carrier, Mapping):
-            continue
-        for key in ('cache_state', 'reduced_real_cache_state'):
-            raw = carrier.get(key)
-            if raw is not None and str(raw).strip():
-                return str(raw)
-        per_hour = carrier.get('per_hour_summary')
-        if isinstance(per_hour, list) and per_hour:
-            last = per_hour[-1]
-            if isinstance(last, Mapping):
-                for key in ('reduced_real_cache_state', 'cache_state'):
-                    raw = last.get(key)
-                    if raw is not None and str(raw).strip():
-                        return str(raw)
-    return None
-
-
-def _stored_evidence_class(
-    run_reference: Mapping[str, Any],
-    result_blob: Mapping[str, Any],
-) -> str | None:
-    for carrier in (run_reference, result_blob):
-        if not isinstance(carrier, Mapping):
-            continue
-        raw = carrier.get('evidence_class')
-        if raw is not None and str(raw).strip():
-            return str(raw)
-    return None
-
-
-def _tier_label_title(
-    run_reference: Mapping[str, Any],
-    result_blob: Mapping[str, Any],
-    *,
-    tier: str | None,
-) -> str:
-    parts: list[str] = []
-    if tier:
-        parts.append(f'tier={tier}')
-    for carrier in (run_reference, result_blob):
-        if not isinstance(carrier, Mapping):
-            continue
-        for key in ('cache_rung', 'physics_rung', 'sig_fig_rung', 'rung'):
-            raw = carrier.get(key)
-            if raw is not None:
-                parts.append(f'rung={raw}')
-                break
-        disagreement = carrier.get('neighbor_disagreement')
-        if isinstance(disagreement, Mapping):
-            if disagreement.get('max') is not None:
-                parts.append(f'neighbor_disagreement_max={disagreement["max"]}')
-            elif disagreement.get('p95') is not None:
-                parts.append(f'neighbor_disagreement_p95={disagreement["p95"]}')
-        reduced_real = carrier.get('reduced_real_cache')
-        if isinstance(reduced_real, Mapping):
-            err = reduced_real.get('interpolation_error_estimate')
-            if isinstance(err, Mapping) and err.get('max') is not None:
-                parts.append(f'interpolation_error_max={err["max"]}')
-    return '; '.join(parts) if parts else 'cache tier from stored artifact'
-
-
 def _optimizer_tier_label(
     run_reference: Mapping[str, Any],
     result_blob: Mapping[str, Any],
     *,
     backend_payload: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    stored_state = _stored_reduced_real_cache_state(run_reference, result_blob)
-    evidence_class = _stored_evidence_class(run_reference, result_blob)
-    backend_name = _mapping_value(run_reference).get('backend_name')
-    if backend_name is None:
-        backend_name = _mapping_value(result_blob).get('backend_name')
-    backend_status = _mapping_value(run_reference).get('backend_status')
-    if backend_status is None:
-        backend_status = _mapping_value(result_blob).get('backend_status')
-    backend_authoritative = _optional_bool(
-        _mapping_value(run_reference).get('backend_authoritative')
+    return optimizer_tier_label(
+        run_reference,
+        result_blob,
+        backend_payload=backend_payload,
     )
-    if backend_authoritative is None:
-        backend_authoritative = _optional_bool(
-            _mapping_value(result_blob).get('backend_authoritative')
-        )
-    if isinstance(backend_payload, Mapping):
-        backend_status = backend_payload.get('backend_status') or backend_status
-        backend_authoritative = _optional_bool(
-            backend_payload.get('backend_authoritative')
-        )
-        if backend_authoritative is None:
-            backend_authoritative = _optional_bool(
-                backend_payload.get('backend_real_active')
-            )
-        if evidence_class is None:
-            evidence_class = backend_payload.get('evidence_class')
-        if backend_name is None:
-            backend_name = backend_payload.get('backend_name')
-
-    canonical_evidence_class = evidence_class
-    canonical_backend_name = backend_name
-    if (
-        isinstance(canonical_evidence_class, str)
-        and canonical_evidence_class in _LEGACY_EVIDENCE_BACKEND_ALIASES
-    ):
-        canonical_backend_name = canonical_backend_name or canonical_evidence_class
-        canonical_evidence_class = None
-
-    if stored_state is not None:
-        canonical = canonicalize_fidelity_emission(
-            reduced_real_cache_state=stored_state,
-            evidence_class=canonical_evidence_class,
-            backend_name=canonical_backend_name if canonical_evidence_class is None else None,
-            backend_status=backend_status if canonical_evidence_class is None else None,
-        )
-    else:
-        canonical = canonicalize_fidelity_emission(
-            evidence_class=canonical_evidence_class,
-            backend_name=canonical_backend_name,
-            backend_status=backend_status,
-            backend_authoritative=backend_authoritative,
-        )
-    certification_allowed = bool(canonical.get('certification_allowed', False))
-    tier = stored_state or 'unknown'
-    if (
-        tier in _CERTIFIED_CACHE_TIERS
-        and certification_allowed
-        and bool(backend_authoritative)
-    ):
-        ux_label = 'CERTIFIED'
-    elif tier in _ESTIMATED_CACHE_TIERS:
-        ux_label = 'ESTIMATED'
-    else:
-        ux_label = 'UNVERIFIED'
-
-    return {
-        'tier': tier,
-        'evidence_class': canonical.get('evidence_class') or evidence_class,
-        'ux_label': ux_label,
-        'certification_allowed': certification_allowed,
-        'title': _tier_label_title(run_reference, result_blob, tier=tier),
-        'canonical': canonical,
-    }
 
 
 def _optimizer_backend_payload(
@@ -2125,6 +1993,14 @@ def _optimizer_result_row(
     return None
 
 
+def _optimizer_run_dir_for_id(run_id: str) -> tuple[Path, Path] | None:
+    root = _optimizer_runs_root()
+    for run_dir in _optimizer_run_dirs(root):
+        if _optimizer_run_id(run_dir, root) == run_id:
+            return root, run_dir
+    return None
+
+
 def _display_value(value: Any) -> str:
     if value in (None, ''):
         return 'not declared'
@@ -3087,6 +2963,26 @@ def optimizer_result_yaml(run_id: str, cache_key: str):
     )
     response.headers.set('Content-Disposition', 'attachment', filename=filename)
     return response
+
+
+@bp.route('/optimizer/runs/<path:run_id>/download.rpstudy.zip')
+def optimizer_run_download(run_id: str):
+    """Download one optimizer run as a save-format bundle."""
+    resolved = _optimizer_run_dir_for_id(run_id)
+    if resolved is None:
+        return jsonify({'error': 'Optimizer run not found'}), 404
+    _root, run_dir = resolved
+    try:
+        bundle_path = export_study_bundle(run_dir)
+    except (FileNotFoundError, ValueError) as exc:
+        return jsonify({'error': str(exc)}), 409
+    return send_file(
+        bundle_path,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name=bundle_path.name,
+        max_age=0,
+    )
 
 
 @bp.route('/api/feedstocks')
