@@ -86,6 +86,12 @@ The table below records, for each non-rock class, how the code handles it, wheth
 | **Alkali fluoride (NaF, generic fluoride)** | Explicit keys only → chloride/salt phase (bare `f` raises) | Yes (as separated salt) | NaF (b.p. ~1700 °C) can volatilize/re-condense; not a clean thermal clearance | No | **Weak** — routed to the same separated-salt/fouling-risk bucket as chlorides, not gasified. |
 | **Refractory trace (ZrO₂, REE, ThO₂, UO₂)** | Name/prefix-routed to slag | Yes (to slag) | Refractory; do not vaporize | No | **Mostly** — a routing choice; REE also partition into the melt, so pre-melt removal is a simplification. |
 
+The salt-volatilization diagnostic is **warn-tier, not a clearance certificate.** When it evaluates NaCl/KCl
+vapor outside the Antoine row's valid temperature range, it still returns an escape/retained split for operator
+visibility but labels the result out-of-range and extrapolated and emits a warning — the non-oxide policy is to
+*warn*, since salts have no first-principles engine coverage, rather than fail-closed. That warning must never
+be promoted into a certified Stage-0 clearance claim.
+
 ### Where the honest gaps are
 
 Ranked by whether the error corrupts the melt composition handed to the silicate-equilibrium engines:
