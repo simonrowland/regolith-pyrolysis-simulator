@@ -3375,6 +3375,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # fail-open: skipped terms are recorded as refusal, never as success. The graded
             # range/saturation refusals below still apply ABOVE the floor (C_m > NOOP_MOL), where
             # a real capacity meets an out-of-range or non-finite demand.
+            # Physical rationale (owner-confirmed 2026-07-08): in this project's default vacuum regime
+            # the O2 tied to a floored term sits below lunar-atmosphere pressure (~1e-15 bar) — the
+            # free-molecular / pure-ballistic-escape regime — so it leaves the system without
+            # re-equilibrating with the melt. Applying vs refusing the tiny redox term therefore does
+            # not change the physics: that oxygen escapes ballistically either way, so the floor is
+            # moot (hence correct) precisely where it fires.
             skip_reason = 'no_melt_redox_capacity'
         elif abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL:
             skip_reason = 'below_threshold'
