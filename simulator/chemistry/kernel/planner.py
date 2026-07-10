@@ -115,6 +115,20 @@ class Planner:
 
         self._shadow_trace.clear()
 
+    @staticmethod
+    def _safe_exception_repr(exc: BaseException) -> str:
+        try:
+            return repr(exc)
+        except BaseException:  # noqa: BLE001 -- diagnostics cannot replace failure
+            return "<exception repr unavailable>"
+
+    @staticmethod
+    def _safe_provider_id(provider: ChemistryProvider) -> str:
+        try:
+            return provider.capability_profile().provider_id
+        except Exception:  # noqa: BLE001 -- diagnostic identity cannot block authority
+            return "<provider id unavailable>"
+
     def dispatch(self, request: IntentRequest) -> IntentResult:
         """Run the authoritative + shadow providers for ``request``.
 
@@ -144,9 +158,9 @@ class Planner:
             )
 
         shadows = self._registry.shadows_for(request.intent)
-        shadow_results: list[tuple[ChemistryProvider, IntentResult]] = []
+        shadow_results: list[tuple[ChemistryProvider, str, IntentResult]] = []
         for shadow in shadows:
-            provider_id = shadow.capability_profile().provider_id
+            provider_id = self._safe_provider_id(shadow)
             try:
                 shadow_result = shadow.dispatch(request)
             except Exception as exc:  # noqa: BLE001 -- never block dispatch
@@ -155,11 +169,11 @@ class Planner:
                         "event": "shadow_error",
                         "provider_id": provider_id,
                         "intent": request.intent.value,
-                        "error": repr(exc),
+                        "error": self._safe_exception_repr(exc),
                     }
                 )
                 continue
-            shadow_results.append((shadow, shadow_result))
+            shadow_results.append((shadow, provider_id, shadow_result))
             self._append_shadow_trace(
                 {
                     "event": "shadow_dispatch",
@@ -183,35 +197,34 @@ class Planner:
         # produces a ``parity_warning`` event in the trace.  Goal #9
         # forbids silent averaging -- both numbers stay visible on the
         # warning record.
-        for shadow, shadow_result in shadow_results:
-            comparator = getattr(shadow, "parity_compare", None)
-            if not callable(comparator):
-                continue
+        for shadow, provider_id, shadow_result in shadow_results:
             try:
+                comparator = getattr(shadow, "parity_compare", None)
+                if not callable(comparator):
+                    continue
                 report = comparator(authoritative_result, shadow_result)
-            except Exception as exc:  # noqa: BLE001 -- never block dispatch
-                self._append_shadow_trace(
-                    {
-                        "event": "parity_error",
-                        "provider_id": shadow.capability_profile().provider_id,
-                        "intent": request.intent.value,
-                        "error": repr(exc),
-                    }
-                )
-                continue
-            if report is None:
-                continue
-            if getattr(report, "agreement", True):
-                continue
-            self._append_shadow_trace(
-                self._build_parity_warning_record(
-                    shadow=shadow,
+                if report is None:
+                    continue
+                if getattr(report, "agreement", True):
+                    continue
+                warning_record = self._build_parity_warning_record(
+                    provider_id=provider_id,
                     intent=request.intent,
                     report=report,
                     authoritative_result=authoritative_result,
                     shadow_result=shadow_result,
                 )
-            )
+            except Exception as exc:  # noqa: BLE001 -- never block dispatch
+                self._append_shadow_trace(
+                    {
+                        "event": "parity_error",
+                        "provider_id": provider_id,
+                        "intent": request.intent.value,
+                        "error": self._safe_exception_repr(exc),
+                    }
+                )
+                continue
+            self._append_shadow_trace(warning_record)
 
         return authoritative_result
 
@@ -226,7 +239,7 @@ class Planner:
     @staticmethod
     def _build_parity_warning_record(
         *,
-        shadow: ChemistryProvider,
+        provider_id: str,
         intent: ChemistryIntent,
         report: Any,
         authoritative_result: IntentResult,
@@ -248,7 +261,7 @@ class Planner:
 
         return {
             "event": "parity_warning",
-            "provider_id": shadow.capability_profile().provider_id,
+            "provider_id": provider_id,
             "intent": intent.value,
             "agreement": False,
             "liquidus_T_delta_K": getattr(report, "liquidus_T_delta_K", None),

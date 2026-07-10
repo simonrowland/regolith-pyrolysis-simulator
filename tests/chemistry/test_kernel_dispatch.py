@@ -107,6 +107,36 @@ class _RaisingShadowProvider(_ShadowProvider):
         raise RuntimeError("shadow backend failed")
 
 
+class _HostileReprError(RuntimeError):
+    def __repr__(self) -> str:
+        raise RuntimeError("secondary repr failure")
+
+
+class _HostileReprShadowProvider(_ShadowProvider):
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        self.call_count += 1
+        raise _HostileReprError("primary shadow failure")
+
+
+class _RaisingParityShadowProvider(_ShadowProvider):
+    def __init__(self) -> None:
+        super().__init__()
+        self.capability_call_count = 0
+
+    def capability_profile(self) -> CapabilityProfile:
+        self.capability_call_count += 1
+        if self.capability_call_count > 2:
+            raise RuntimeError("secondary capability failure")
+        return super().capability_profile()
+
+    def parity_compare(
+        self,
+        authoritative_result: IntentResult,
+        shadow_result: IntentResult,
+    ) -> None:
+        raise RuntimeError("primary parity failure")
+
+
 def test_planner_routes_to_authoritative_and_returns_its_result():
     registry = ProviderRegistry()
     auth = _AuthoritativeProvider()
@@ -143,6 +173,51 @@ def test_shadow_dispatch_error_does_not_block_authoritative_result():
             "error": "RuntimeError('shadow backend failed')",
         },
     )
+
+
+def test_shadow_error_diagnostic_survives_hostile_exception_repr():
+    registry = ProviderRegistry()
+    auth = _AuthoritativeProvider()
+    shadow = _HostileReprShadowProvider()
+    registry.register(auth, [ChemistryIntent.VAPOR_PRESSURE])
+    registry.register(shadow, [ChemistryIntent.VAPOR_PRESSURE], shadow=True)
+
+    planner = Planner(registry)
+    result = planner.dispatch(_make_request(ChemistryIntent.VAPOR_PRESSURE))
+
+    assert auth.call_count == 1
+    assert shadow.call_count == 1
+    assert result.diagnostic.get("source") == "authoritative"
+    assert planner.shadow_trace == (
+        {
+            "event": "shadow_error",
+            "provider_id": "shadow",
+            "intent": "vapor_pressure",
+            "error": "<exception repr unavailable>",
+        },
+    )
+
+
+def test_parity_error_diagnostic_does_not_recall_provider_capability():
+    registry = ProviderRegistry()
+    auth = _AuthoritativeProvider()
+    shadow = _RaisingParityShadowProvider()
+    registry.register(auth, [ChemistryIntent.VAPOR_PRESSURE])
+    registry.register(shadow, [ChemistryIntent.VAPOR_PRESSURE], shadow=True)
+
+    planner = Planner(registry)
+    result = planner.dispatch(_make_request(ChemistryIntent.VAPOR_PRESSURE))
+
+    assert auth.call_count == 1
+    assert shadow.call_count == 1
+    assert shadow.capability_call_count == 2
+    assert result.diagnostic.get("source") == "authoritative"
+    assert planner.shadow_trace[-1] == {
+        "event": "parity_error",
+        "provider_id": "shadow",
+        "intent": "vapor_pressure",
+        "error": "RuntimeError('primary parity failure')",
+    }
 
 
 def test_planner_records_shadow_trace_separately():
