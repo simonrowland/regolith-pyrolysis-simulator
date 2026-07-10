@@ -62,33 +62,45 @@ def _timed_evaluate(patch, feedstock_id, fidelity, **kwargs):
     """
     t0 = time.perf_counter()
     err_cls = None
+    primary_error = None
     try:
         result = _evaluate(patch, feedstock_id, fidelity, **kwargs)
     except BaseException as exc:  # noqa: BLE001 - record then re-raise for harness taxonomy
+        primary_error = exc
         err_cls = type(exc).__name__
         result = None
         raise
     finally:
-        dt = time.perf_counter() - t0
-        feasible = getattr(result, "feasible", None) if result is not None else None
-        objs = getattr(result, "objectives", None) if result is not None else None
-        row = {
-            "tier": fidelity,
-            "candidate_id": kwargs.get("candidate_id"),
-            "seconds": dt,
-            "feasible": feasible,
-            "objectives_populated": objs is not None,
-            "failure_category": (
-                getattr(getattr(result, "failure_category", None), "value", None)
-                if result is not None
-                else None
-            ),
-            "error_class": err_cls,
-            "wall_clock_epoch": time.time(),
-            "pid": os.getpid(),
-        }
-        with open(TIMING_LOG, "a", encoding="utf-8") as fh:
-            fh.write(json.dumps(row) + "\n")
+        try:
+            dt = time.perf_counter() - t0
+            feasible = getattr(result, "feasible", None) if result is not None else None
+            objs = getattr(result, "objectives", None) if result is not None else None
+            row = {
+                "tier": fidelity,
+                "candidate_id": kwargs.get("candidate_id"),
+                "seconds": dt,
+                "feasible": feasible,
+                "objectives_populated": objs is not None,
+                "failure_category": (
+                    getattr(getattr(result, "failure_category", None), "value", None)
+                    if result is not None
+                    else None
+                ),
+                "error_class": err_cls,
+                "wall_clock_epoch": time.time(),
+                "pid": os.getpid(),
+            }
+            with open(TIMING_LOG, "a", encoding="utf-8") as fh:
+                fh.write(json.dumps(row) + "\n")
+        except BaseException as reporting_error:  # noqa: BLE001 - preserve primary taxonomy
+            if primary_error is None:
+                raise
+            try:
+                primary_error.add_note(
+                    f"timing-log reporting failed: {type(reporting_error).__name__}"
+                )
+            except BaseException:  # noqa: BLE001 - diagnostics must remain total
+                pass
     return result
 
 

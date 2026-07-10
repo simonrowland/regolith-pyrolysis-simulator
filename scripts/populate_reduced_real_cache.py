@@ -14,6 +14,7 @@ import ast
 import copy
 import json
 import math
+import signal
 import sqlite3
 import sys
 import tempfile
@@ -68,6 +69,44 @@ MAGEMIN_PROVIDER_ID = "magemin-shadow"
 GATE_LIQUIDUS_UNAVAILABLE_PREFIX = (
     "freeze_gate.enabled requires a liquid_fraction(T) source"
 )
+
+
+class WallCapExceeded(BaseException):
+    """Raised when a cache-population case exceeds its absolute wall deadline."""
+
+
+@contextmanager
+def _wall_deadline(deadline: float) -> Iterator[None]:
+    remaining = deadline - time.perf_counter()
+    if remaining <= 0.0:
+        raise WallCapExceeded("cache-population case wall cap expired before execution")
+    if not hasattr(signal, "setitimer"):
+        raise RuntimeError("absolute wall-cap enforcement requires signal.setitimer")
+
+    previous_delay, previous_interval = signal.getitimer(signal.ITIMER_REAL)
+    if 0.0 < previous_delay <= remaining:
+        raise RuntimeError(
+            "cannot enforce wall cap while an earlier real-time timer is active"
+        )
+
+    def expire(_signum: int, _frame: Any) -> None:
+        raise WallCapExceeded("cache-population case exceeded its wall cap")
+
+    previous_handler = signal.signal(signal.SIGALRM, expire)
+    armed_at = time.perf_counter()
+    signal.setitimer(signal.ITIMER_REAL, remaining)
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0.0)
+        signal.signal(signal.SIGALRM, previous_handler)
+        if previous_delay > 0.0:
+            elapsed = time.perf_counter() - armed_at
+            signal.setitimer(
+                signal.ITIMER_REAL,
+                max(previous_delay - elapsed, 1e-6),
+                previous_interval,
+            )
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -468,14 +507,17 @@ def _run_case(
         _disable_live_providers(session)
 
     rows: list[dict[str, Any]] = []
+    if not math.isfinite(wall_cap_s) or wall_cap_s <= 0.0:
+        raise ValueError("wall_cap_s must be finite and greater than zero")
     started = time.perf_counter()
+    deadline = started + wall_cap_s
     stop_reason = "max_hours"
     mass_balance_failed = False
     max_abs_mass_balance_error_pct = 0.0
     failed_mass_balance_row: dict[str, Any] | None = None
-    with _timed_magemin_dispatch(timings):
+    with _wall_deadline(deadline), _timed_magemin_dispatch(timings):
         for hour_index in range(1, hours + 1):
-            if time.perf_counter() - started >= wall_cap_s:
+            if time.perf_counter() >= deadline:
                 stop_reason = "wall_cap"
                 break
             if session.is_complete():

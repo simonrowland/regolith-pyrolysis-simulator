@@ -1,7 +1,9 @@
+import contextlib
 import hashlib
 import importlib.util
 import json
 import sqlite3
+import time
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -1002,6 +1004,45 @@ def test_run_case_rejects_builtin_fallback_source_report(tmp_path, monkeypatch):
             disable_live=False,
             allow_stub_equilibrium=False,
         )
+
+
+def test_run_case_enforces_wall_cap_during_advance(tmp_path, monkeypatch):
+    session = _FakeSession(source="builtin_authoritative")
+    advance_started = False
+
+    def slow_advance():
+        nonlocal advance_started
+        advance_started = True
+        time.sleep(1.0)
+        return _FakeStep()
+
+    session.advance = slow_advance
+    monkeypatch.setattr(driver, "_start_session", lambda **kwargs: session)
+    monkeypatch.setattr(driver, "_apply_pending_decision", lambda session: False)
+    monkeypatch.setattr(
+        driver,
+        "_timed_magemin_dispatch",
+        lambda timings: contextlib.nullcontext(),
+    )
+
+    started = time.perf_counter()
+    with pytest.raises(driver.WallCapExceeded, match="exceeded its wall cap"):
+        driver._run_case(
+            feedstock="lunar_mare_low_ti",
+            campaign="C2A_continuous",
+            backend_name="alphamelts",
+            mass_kg=1000.0,
+            additives_kg={},
+            hours=1,
+            wall_cap_s=0.02,
+            db_path=tmp_path / "case.db",
+            mode="capture",
+            disable_live=False,
+            allow_stub_equilibrium=False,
+        )
+
+    assert advance_started is True
+    assert time.perf_counter() - started < 0.5
 
 
 class _FakeSnapshot:

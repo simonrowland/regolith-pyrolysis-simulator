@@ -6,11 +6,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import shutil
+import os
 import sqlite3
 import sys
+import tempfile
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -190,11 +190,44 @@ def _count_rows_needing_rekey(
     return count
 
 
-def _backup_db(db_path: Path) -> Path:
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    backup_path = db_path.with_name(f"{db_path.name}.backup-{stamp}")
-    shutil.copy2(db_path, backup_path)
-    return backup_path
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _backup_db(conn: sqlite3.Connection, db_path: Path) -> tuple[Path, int]:
+    source_data_version = int(conn.execute("PRAGMA data_version").fetchone()[0])
+    with tempfile.NamedTemporaryFile(
+        prefix=f".{db_path.name}.backup-",
+        dir=db_path.parent,
+        delete=False,
+    ) as temporary:
+        temporary_path = Path(temporary.name)
+    try:
+        backup_conn = sqlite3.connect(temporary_path)
+        try:
+            conn.backup(backup_conn)
+        finally:
+            backup_conn.close()
+
+        if int(conn.execute("PRAGMA data_version").fetchone()[0]) != source_data_version:
+            raise RuntimeError("cache database changed while the backup was created")
+
+        backup_digest = _file_sha256(temporary_path)
+        backup_path = db_path.with_name(
+            f"{db_path.name}.backup-{backup_digest[:16]}"
+        )
+        try:
+            os.link(temporary_path, backup_path)
+        except FileExistsError:
+            if _file_sha256(backup_path) != backup_digest:
+                raise RuntimeError("existing retry backup failed its identity check")
+        return backup_path, source_data_version
+    finally:
+        temporary_path.unlink(missing_ok=True)
 
 
 def rekey_cache(
@@ -216,71 +249,75 @@ def rekey_cache(
             engine=engine,
             target_corpus_version=target,
         )
+        if dry_run or before == 0:
+            return RekeyResult(rows_before=before, rows_updated=0, backup_path=None)
+
+        backup_path, backup_data_version = _backup_db(conn, db_path)
+        conn.execute("BEGIN IMMEDIATE")
+        if int(conn.execute("PRAGMA data_version").fetchone()[0]) != backup_data_version:
+            raise RuntimeError("cache database changed after the backup was created")
+
+        _ensure_corpus_column(conn)
+        updated = 0
+        table_columns = _table_columns(conn)
+        for row in conn.execute(
+            f"""
+            SELECT key_hash, key_bytes, engine_version
+            FROM {PT1_EQUILIBRIUM_TABLE}
+            """
+        ):
+            key = _json_loads(bytes(row["key_bytes"]))
+            if not _row_matches_engine(key, engine):
+                continue
+            if not _needs_rekey(key, target):
+                continue
+            provenance = _engine_version_provenance(key, row["engine_version"])
+            if not _replace_cache_identity(key, target):
+                continue
+            key_bytes = canonical_json_bytes(key)
+            key_hash = hashlib.sha256(key_bytes).hexdigest()
+            physics = _physics_columns(key)
+            assignments = [
+                "key_bytes = ?",
+                "key_sha256 = ?",
+                "key_hash = ?",
+                "corpus_version = ?",
+                "engine_version = ?",
+            ]
+            values: list[Any] = [
+                sqlite3.Binary(key_bytes),
+                key_hash,
+                key_hash,
+                target,
+                provenance,
+            ]
+            for column, value in physics.items():
+                if column not in table_columns:
+                    continue
+                assignments.append(f"{column} = ?")
+                values.append(value)
+            values.append(row["key_hash"])
+            conn.execute(
+                f"""
+                UPDATE {PT1_EQUILIBRIUM_TABLE}
+                SET {", ".join(assignments)}
+                WHERE key_hash = ?
+                """,
+                tuple(values),
+            )
+            updated += 1
+
+        conn.commit()
+        return RekeyResult(
+            rows_before=before,
+            rows_updated=updated,
+            backup_path=backup_path,
+        )
+    except BaseException:
+        conn.rollback()
+        raise
     finally:
         conn.close()
-    if dry_run or before == 0:
-        return RekeyResult(rows_before=before, rows_updated=0, backup_path=None)
-
-    backup_path = _backup_db(db_path)
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    _ensure_corpus_column(conn)
-    updated = 0
-    table_columns = _table_columns(conn)
-    for row in conn.execute(
-        f"""
-        SELECT key_hash, key_bytes, engine_version
-        FROM {PT1_EQUILIBRIUM_TABLE}
-        """
-    ):
-        key = _json_loads(bytes(row["key_bytes"]))
-        if not _row_matches_engine(key, engine):
-            continue
-        if not _needs_rekey(key, target):
-            continue
-        provenance = _engine_version_provenance(key, row["engine_version"])
-        if not _replace_cache_identity(key, target):
-            continue
-        key_bytes = canonical_json_bytes(key)
-        key_hash = hashlib.sha256(key_bytes).hexdigest()
-        physics = _physics_columns(key)
-        assignments = [
-            "key_bytes = ?",
-            "key_sha256 = ?",
-            "key_hash = ?",
-            "corpus_version = ?",
-            "engine_version = ?",
-        ]
-        values: list[Any] = [
-            sqlite3.Binary(key_bytes),
-            key_hash,
-            key_hash,
-            target,
-            provenance,
-        ]
-        for column, value in physics.items():
-            if column not in table_columns:
-                continue
-            assignments.append(f"{column} = ?")
-            values.append(value)
-        values.append(row["key_hash"])
-        conn.execute(
-            f"""
-            UPDATE {PT1_EQUILIBRIUM_TABLE}
-            SET {", ".join(assignments)}
-            WHERE key_hash = ?
-            """,
-            tuple(values),
-        )
-        updated += 1
-
-    conn.commit()
-    conn.close()
-    return RekeyResult(
-        rows_before=before,
-        rows_updated=updated,
-        backup_path=backup_path,
-    )
 
 
 def main(argv: list[str] | None = None) -> int:
