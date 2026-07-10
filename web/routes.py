@@ -612,16 +612,18 @@ def _result_metadata(
     ):
         if key in product_summary:
             metadata[key] = product_summary[key]
-    product_ledger_panel = _product_ledger_panel(product_summary)
-    if product_ledger_panel is not None:
-        metadata['product_ledger_panel'] = product_ledger_panel
+    metadata['product_ledger_panel'] = _product_ledger_panel(product_summary)
     return metadata
 
 
-def _product_ledger_panel(product_summary: Mapping[str, Any]) -> dict[str, Any] | None:
+def _product_ledger_panel(product_summary: Mapping[str, Any]) -> dict[str, Any]:
     product_yield_table = product_summary.get('product_yield_table')
     if isinstance(product_yield_table, Mapping):
         panel = dict(product_yield_table)
+        panel.setdefault('inputs', [])
+        panel.setdefault('outputs', [])
+        panel.setdefault('mass_closure', None)
+        panel.setdefault('diagnostics', [])
         unclassified = _unclassified_product_mass(product_summary)
         if unclassified is not None:
             panel['status'] = 'inconclusive'
@@ -643,12 +645,18 @@ def _product_ledger_panel(product_summary: Mapping[str, Any]) -> dict[str, Any] 
                 })
             panel['diagnostics'] = diagnostics
         return panel
-    if product_summary:
-        return {
-            'status': 'inconclusive',
-            'reason': 'product_yield_table missing',
-        }
-    return None
+    return {
+        'status': 'inconclusive',
+        'reason': (
+            'product_yield_table missing'
+            if product_summary
+            else 'product summary missing'
+        ),
+        'inputs': [],
+        'outputs': [],
+        'mass_closure': None,
+        'diagnostics': [],
+    }
 
 
 def _unclassified_product_mass(

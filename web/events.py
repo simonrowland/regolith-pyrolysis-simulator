@@ -526,6 +526,14 @@ def _mass_balance_error_fields(snapshot) -> dict[str, object]:
             'mass_balance_error_breached': bool(category),
         }
     error_pct = float(error_pct)
+    if not math.isfinite(error_pct):
+        return {
+            'mass_balance_error_pct': None,
+            'mass_balance_error_category': (
+                category or 'non_finite_mass_balance_error'
+            ),
+            'mass_balance_error_breached': True,
+        }
     return {
         'mass_balance_error_pct': error_pct,
         'mass_balance_error_category': category,

@@ -2392,6 +2392,53 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
     assert payload["provenance"]["cache_key"] == key
 
 
+def test_optimizer_result_detail_renders_empty_product_summary_inconclusive(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-empty-product-summary"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec()
+    scored = _scored(
+        spec,
+        candidate_id="candidate-empty-product-summary",
+        feasible=False,
+    )
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        replace(
+            scored,
+            run_reference=replace(scored.run_reference, product_summary={}),
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    summary_response = client.get("/api/optimizer/runs")
+    response = client.get(
+        f"/optimizer/runs/run-empty-product-summary/results/{cache_key(spec)}"
+    )
+
+    assert summary_response.status_code == 200
+    panel = summary_response.get_json()["runs"][0]["latest_result"][
+        "product_ledger_panel"
+    ]
+    assert panel == {
+        "status": "inconclusive",
+        "reason": "product summary missing",
+        "inputs": [],
+        "outputs": [],
+        "mass_closure": None,
+        "diagnostics": [],
+    }
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "candidate-empty-product-summary" in html
+    assert "Product inconclusive" in html
+    assert "product summary missing" in html
+
+
 def test_optimizer_result_yaml_download_sanitizes_stored_candidate_id(
     client,
     tmp_path,

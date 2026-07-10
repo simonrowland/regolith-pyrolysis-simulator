@@ -1878,6 +1878,27 @@ def test_web_mass_balance_category_breaches_with_small_numeric_error():
     assert payload["mass_balance_error_breached"] is True
 
 
+@pytest.mark.parametrize("error_pct", [float("nan"), float("inf"), float("-inf")])
+def test_web_mass_balance_non_finite_error_fails_closed(error_pct):
+    sim, snapshot = _sim_with_mass_balance_snapshot(error_pct)
+
+    payload = _tick_payload(
+        sim=sim,
+        snapshot=snapshot,
+        backend_message="",
+        backend_status="stub",
+        backend_authoritative=False,
+    )
+
+    assert payload["mass_balance_error_pct"] is None
+    assert (
+        payload["mass_balance_error_category"]
+        == "non_finite_mass_balance_error"
+    )
+    assert payload["mass_balance_error_breached"] is True
+    json.dumps(payload, allow_nan=False)
+
+
 def test_completion_payload_exposes_mass_balance_category_when_pct_none(
     monkeypatch,
 ):
