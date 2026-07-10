@@ -2,11 +2,34 @@
 
 from __future__ import annotations
 
+import inspect
 import math
+import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Optional, Tuple
 
 from simulator.melt_backend.base import LiquidFractionInvalidError
+
+
+# MAGEMin-facing default only - the generic finder stays unbounded so
+# AlphaMELTS (and pure-function unit tests) are not silently wall-capped.
+#
+# Derivation for DEFAULT_LIQUIDUS_FINDER_BUDGET_S (900 s):
+#   Premise: a legitimate real MAGEMin freeze-gate search on lunar mare
+#   is documented at ~163 s wall (37-point 400-2200 C / 50 C grid +
+#   bisection; AGENTS.md test-timeout invariant / M5 MacBook Pro).
+#   Worst-case call count under defaults: ceil((2200-400)/50)+1 = 37
+#   grid + 2 * max_bisection_iterations (32) = 37 + 64 = 101 engine
+#   calls. Per-call timeout default is 60 s, so a between-calls-only
+#   budget would admit up to ~budget + 60 s of overrun per call; under
+#   per-call limits alone the pathological case is 101 * 60 s ~ 101 min.
+#   Algebra: budget >= n_calls * p95_call * headroom with headroom >= 2.
+#   Healthy p95 is far below the 60 s ceiling (order ~1-4 s); using a
+#   conservative 4 s p95: 101 * 4 * 2.2 ~ 890 s -> round to 900 s.
+#   Sanity: 900 / 163 ~ 5.5x headroom on the documented real search, and
+#   900 << 101 min so the aggregate still bounds the spinel-hang class.
+# Unit check: all terms in seconds; product is seconds.
+DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 900.0
 
 
 @dataclass(frozen=True)
@@ -112,7 +135,7 @@ class EquilibriumCrystallizationPathResult:
 
 
 def find_liquidus_solidus_by_fraction(
-    sample_fraction: Callable[[float], float],
+    sample_fraction: Callable[..., float],
     *,
     min_T_C: float = 400.0,
     max_T_C: float = 2200.0,
@@ -123,13 +146,23 @@ def find_liquidus_solidus_by_fraction(
     monotonicity_tolerance: float = 2.0e-2,
     monotone_smoothing_max: float = 5.0e-1,
     max_bisection_iterations: int = 32,
+    budget_s: Optional[float] = None,
 ) -> LiquidusSolidusResult:
-    """Bracket and bisect solidus/liquidus on monotone melt fraction."""
+    """Bracket and bisect solidus/liquidus on monotone melt fraction.
+
+    ``budget_s`` defaults to ``None`` (unbounded). Callers that must bound
+    aggregate wall time — MAGEMin in particular — pass a finite budget
+    explicitly (see ``DEFAULT_LIQUIDUS_FINDER_BUDGET_S``). Remaining budget
+    is threaded into each sample as ``remaining_budget_s`` when the
+    callable accepts it, so engine call timeouts can be clamped to the
+    residual rather than only checking the budget between calls.
+    """
     try:
         min_T = float(min_T_C)
         max_T = float(max_T_C)
         step = float(scan_step_C)
         tolerance = float(tolerance_C)
+        budget = None if budget_s is None else float(budget_s)
     except (TypeError, ValueError) as exc:
         return _not_converged(f'invalid finder parameter: {exc}')
     if not min_T < max_T:
@@ -138,15 +171,59 @@ def find_liquidus_solidus_by_fraction(
         return _not_converged('invalid finder scan_step_C: must be positive')
     if tolerance <= 0.0:
         return _not_converged('invalid finder tolerance_C: must be positive')
+    if budget is not None and (not math.isfinite(budget) or budget <= 0.0):
+        return _not_converged('invalid finder budget_s: must be finite and positive')
 
     liquid_threshold = 1.0 - float(liquid_epsilon)
     solid_threshold = float(solid_epsilon)
     samples: list[MeltFractionSample] = []
     smoothing_warnings: list[str] = []
     iterations = 0
+    start_time = time.monotonic()
+    deadline = start_time + budget if budget is not None else None
+    last_T_C: Optional[float] = None
+
+    def _elapsed_s() -> float:
+        return max(0.0, time.monotonic() - start_time)
+
+    def _budget_diagnostics() -> dict[str, Any]:
+        assert budget is not None
+        return {
+            'reason': 'aggregate_budget_exceeded',
+            'elapsed_s': _elapsed_s(),
+            'call_count': len(samples),
+            'last_T_C': last_T_C,
+            'budget_s': float(budget),
+        }
+
+    def budget_warning() -> str:
+        assert budget is not None
+        return (
+            f'liquidus finder exceeded aggregate budget {budget:g}s '
+            f'after {len(samples)} calls'
+        )
+
+    def remaining_budget_s() -> Optional[float]:
+        if deadline is None:
+            return None
+        return max(0.0, deadline - time.monotonic())
+
+    def check_budget() -> None:
+        if deadline is not None and time.monotonic() >= deadline:
+            raise _LiquidusFinderBudgetExceeded(budget_warning())
 
     def sample(T_C: float) -> MeltFractionSample:
-        raw = sample_fraction(float(T_C))
+        nonlocal last_T_C
+        check_budget()
+        remaining = remaining_budget_s()
+        if remaining is not None and remaining <= 0.0:
+            raise _LiquidusFinderBudgetExceeded(budget_warning())
+        last_T_C = float(T_C)
+        raw = _invoke_sample_fraction(
+            sample_fraction,
+            float(T_C),
+            remaining_budget_s=remaining,
+        )
         frac = _clamp_fraction(raw)
         point = _monotone_point(
             MeltFractionSample(float(T_C), frac),
@@ -156,6 +233,7 @@ def find_liquidus_solidus_by_fraction(
         )
         samples.append(point)
         samples.sort(key=lambda p: p.temperature_C)
+        check_budget()
         return point
 
     try:
@@ -221,6 +299,14 @@ def find_liquidus_solidus_by_fraction(
             max_iterations=max_bisection_iterations,
         )
         iterations += liquidus_iterations
+    except _LiquidusFinderBudgetExceeded as exc:
+        return LiquidusSolidusResult(
+            status='not_converged',
+            warnings=tuple([*smoothing_warnings, str(exc)]),
+            samples=tuple(samples),
+            iterations=iterations,
+            diagnostics=_budget_diagnostics(),
+        )
     except Exception as exc:  # noqa: BLE001 - library-boundary finder guard
         return LiquidusSolidusResult(
             status='not_converged',
@@ -490,7 +576,54 @@ def _not_converged(message: str) -> LiquidusSolidusResult:
     return LiquidusSolidusResult(status='not_converged', warnings=(message,))
 
 
+def _invoke_sample_fraction(
+    sample_fraction: Callable[..., float],
+    temperature_C: float,
+    *,
+    remaining_budget_s: Optional[float],
+) -> float:
+    """Call sample_fraction, threading remaining budget when accepted.
+
+    Budget-aware engines (MAGEMin) declare
+    ``remaining_budget_s: Optional[float] = None`` (or a second positional)
+    and clamp their per-call timeout/cancellation to that residual. Simple
+    ``lambda T: ...`` unit-test callables keep working unchanged.
+    """
+    if remaining_budget_s is None:
+        return float(sample_fraction(float(temperature_C)))
+    try:
+        parameters = inspect.signature(sample_fraction).parameters
+    except (TypeError, ValueError):
+        return float(sample_fraction(float(temperature_C)))
+    if 'remaining_budget_s' in parameters:
+        return float(
+            sample_fraction(
+                float(temperature_C),
+                remaining_budget_s=float(remaining_budget_s),
+            )
+        )
+    positional = [
+        name
+        for name, param in parameters.items()
+        if param.kind
+        in (
+            inspect.Parameter.POSITIONAL_ONLY,
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        )
+    ]
+    if len(positional) >= 2:
+        return float(
+            sample_fraction(float(temperature_C), float(remaining_budget_s))
+        )
+    return float(sample_fraction(float(temperature_C)))
+
+
+class _LiquidusFinderBudgetExceeded(RuntimeError):
+    pass
+
+
 __all__ = (
+    'DEFAULT_LIQUIDUS_FINDER_BUDGET_S',
     'EquilibriumCrystallizationPathResult',
     'LiquidFractionPathPoint',
     'LiquidusSolidusResult',

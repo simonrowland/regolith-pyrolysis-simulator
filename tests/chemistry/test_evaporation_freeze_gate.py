@@ -510,6 +510,63 @@ def test_freeze_gate_enabled_reaches_magemin_gate_fallback(
     )
 
 
+def test_kernel_liquidus_aggregate_budget_exhaustion_production_default_no_authority(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """allow_parametric=False is the production default: budget exhaustion
+    must not earn a curve, cache entry, or ledger-authority path.
+    """
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim._freeze_gate_liquid_fraction_cache = None
+    transitions_before = len(sim.atom_ledger.transitions)
+    mol_before = sim.atom_ledger.mol_by_account()
+
+    def fake_dispatch(intent, *args, **kwargs):
+        assert intent is ChemistryIntent.SILICATE_LIQUIDUS
+        return SimpleNamespace(
+            status='not_converged',
+            diagnostic={
+                'backend_status': 'not_converged',
+                'reason': 'aggregate_budget_exceeded',
+                'elapsed_s': 0.12,
+                'call_count': 3,
+                'last_T_C': 900.0,
+                'budget_s': 0.1,
+            },
+            warnings=(
+                'liquidus finder exceeded aggregate budget 0.1s after 3 calls',
+            ),
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    reasons: list[str] = []
+
+    # Production call site omits allow_parametric (default False).
+    curve = sim._freeze_gate_curve_from_kernel_liquidus(
+        reasons,
+        fO2_log=-9.0,
+    )
+
+    assert curve is None
+    assert any(
+        'kernel liquidus unavailable: status=not_converged' in r
+        for r in reasons
+    )
+    # No freeze-gate curve authority and no cache population on this helper.
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    # No ledger mutation from a non-ok diagnostic liquidus path.
+    assert len(sim.atom_ledger.transitions) == transitions_before
+    assert sim.atom_ledger.mol_by_account() == mol_before
+
+
 def test_freeze_gate_cache_key_constant_across_isochemical_ramp(
     monkeypatch,
     vapor_pressure_data,

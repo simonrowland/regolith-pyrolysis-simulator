@@ -24,6 +24,7 @@ import pytest
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
+import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
 from simulator.melt_backend.magemin import MAGEMinBackend
@@ -340,6 +341,110 @@ def test_magemin_liquidus_finder_bisects_fake_bridge(monkeypatch):
     assert result.solidus_T_C == pytest.approx(1000.0, abs=1.0)
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
     assert result.liquidus_T_K == pytest.approx(result.liquidus_T_C + 273.15)
+
+
+def test_magemin_liquidus_finder_honors_aggregate_budget_config(monkeypatch):
+    clock = {"t": 0.0}
+
+    def minimize(**kwargs):
+        temperature_C = float(kwargs["T_C"])
+        clock["t"] += 0.1
+        frac = max(0.0, min(1.0, (temperature_C - 1000.0) / 300.0))
+        phases = {}
+        if frac > 0.0:
+            phases["liq"] = {"mass_kg": frac}
+        if frac < 1.0:
+            phases["ol"] = {"mass_kg": 1.0 - frac}
+        return {"phases": phases}
+
+    fake_module = types.SimpleNamespace(minimize=minimize)
+    _make_available_magemin(monkeypatch, fake_module)
+    monkeypatch.setattr(liquidus_module.time, "monotonic", lambda: clock["t"])
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        assert backend.initialize({"liquidus_finder_budget_s": 0.05}) is True
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == "not_converged"
+    assert len(result.samples) == 1
+    assert any(
+        "liquidus finder exceeded aggregate budget 0.05s after 1 calls"
+        in warning
+        for warning in result.warnings
+    )
+    assert result.diagnostics["reason"] == "aggregate_budget_exceeded"
+    assert result.diagnostics["call_count"] == 1
+    assert result.diagnostics["last_T_C"] == pytest.approx(800.0)
+
+
+def test_magemin_liquidus_finder_rejects_none_budget(monkeypatch):
+    def minimize(**kwargs):
+        return {"phases": {"liq": {"mass_kg": 1.0}}}
+
+    fake_module = types.SimpleNamespace(minimize=minimize)
+    _make_available_magemin(monkeypatch, fake_module)
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        assert backend.initialize({"liquidus_finder_budget_s": None}) is True
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        min_T_C=800.0,
+        max_T_C=1000.0,
+        scan_step_C=100.0,
+    )
+    assert result.status == "not_converged"
+    assert any("None is rejected" in w for w in result.warnings)
+    assert result.diagnostics.get("reason") == "invalid_liquidus_finder_budget"
+
+
+def test_magemin_subprocess_timeout_clamped_to_remaining_budget(monkeypatch):
+    """Per-call subprocess timeout must be min(configured, remaining)."""
+    seen_timeouts: list[float] = []
+
+    def fake_run(*args, **kwargs):
+        seen_timeouts.append(float(kwargs["timeout"]))
+        raise subprocess.TimeoutExpired(cmd=args[0], timeout=kwargs["timeout"])
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.magemin.subprocess.run", fake_run
+    )
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/tmp/fake-MAGEMin")
+    backend._config = {"timeout_s": 60.0, "database": "ig"}
+    backend._database = "ig"
+    backend._magemin_module = None
+
+    # Remaining aggregate budget of 1.5s must clamp the 60s default.
+    with pytest.raises(RuntimeError, match="timed out after 1.5"):
+        backend._call_magemin_subprocess(
+            bulk_projection=types.SimpleNamespace(
+                vector=[1.0] * 11,
+                composition_wt_pct={"SiO2": 50.0, "MgO": 50.0},
+                warnings=(),
+            ),
+            temperature_C=1200.0,
+            pressure_kbar=0.001,
+            fO2_log=-8.0,
+            call_timeout_s=1.5,
+        )
+    assert seen_timeouts == [pytest.approx(1.5)]
 
 
 def test_magemin_liquidus_finder_unavailable_without_backend():

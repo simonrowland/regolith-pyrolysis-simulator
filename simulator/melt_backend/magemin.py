@@ -116,6 +116,7 @@ from simulator.melt_backend.base import (
     split_cleaned_melt_account,
 )
 from simulator.melt_backend.liquidus import (
+    DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
 )
@@ -312,6 +313,7 @@ class MAGEMinBackend(MeltBackend):
             Mapping[str, Mapping[str, float]]
         ] = None,
         species_formula_registry: Optional[Mapping[str, Any]] = None,
+        call_timeout_s: Optional[float] = None,
     ) -> EquilibriumResult:
         """
         Minimize Gibbs energy via MAGEMin.
@@ -453,6 +455,7 @@ class MAGEMinBackend(MeltBackend):
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
+                call_timeout_s=call_timeout_s,
             )
         except Exception as exc:  # noqa: BLE001 - library-boundary catch
             # MAGEMin is present but the minimisation did not produce a
@@ -549,7 +552,44 @@ class MAGEMinBackend(MeltBackend):
 
         sample_warnings: list[str] = []
 
-        def sample_fraction(temperature_C: float) -> float:
+        # Mandatory aggregate budget: generic finder default is unbounded so
+        # AlphaMELTS is not silently capped; MAGEMin always applies a finite
+        # wall and rejects an explicit None config (boundedness is invariant).
+        if 'liquidus_finder_budget_s' in self._config:
+            raw_budget = self._config.get('liquidus_finder_budget_s')
+        else:
+            raw_budget = DEFAULT_LIQUIDUS_FINDER_BUDGET_S
+        if raw_budget is None:
+            return LiquidusSolidusResult(
+                status='not_converged',
+                warnings=(
+                    'liquidus_finder_budget_s=None is rejected; '
+                    'MAGEMin requires a finite aggregate liquidus budget',
+                ),
+                diagnostics={
+                    'reason': 'invalid_liquidus_finder_budget',
+                    'liquidus_finder_budget_s': None,
+                },
+            )
+        try:
+            budget_s = float(raw_budget)
+        except (TypeError, ValueError) as exc:
+            return LiquidusSolidusResult(
+                status='not_converged',
+                warnings=(f'invalid liquidus_finder_budget_s: {exc}',),
+            )
+        if not math.isfinite(budget_s) or budget_s <= 0.0:
+            return LiquidusSolidusResult(
+                status='not_converged',
+                warnings=(
+                    'invalid liquidus_finder_budget_s: must be finite and positive',
+                ),
+            )
+
+        def sample_fraction(
+            temperature_C: float,
+            remaining_budget_s: Optional[float] = None,
+        ) -> float:
             result = self.equilibrate(
                 float(temperature_C),
                 composition_kg=composition_kg,
@@ -558,6 +598,7 @@ class MAGEMinBackend(MeltBackend):
                 composition_mol=composition_mol,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_formula_registry,
+                call_timeout_s=remaining_budget_s,
             )
             if result.status != 'ok':
                 warning = '; '.join(result.warnings) or result.status
@@ -575,6 +616,7 @@ class MAGEMinBackend(MeltBackend):
             max_T_C=max_T_C,
             scan_step_C=scan_step_C,
             tolerance_C=tolerance_C,
+            budget_s=budget_s,
         )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
         return LiquidusSolidusResult(
@@ -586,6 +628,7 @@ class MAGEMinBackend(MeltBackend):
             warnings=tuple(warnings_out),
             samples=result.samples,
             iterations=result.iterations,
+            diagnostics=dict(result.diagnostics or {}),
         )
 
     # ------------------------------------------------------------------
@@ -861,6 +904,7 @@ class MAGEMinBackend(MeltBackend):
         temperature_C: float,
         pressure_bar: float,
         fO2_log: float,
+        call_timeout_s: Optional[float] = None,
     ) -> Any:
         """
         Invoke MAGEMin via whichever bridge ``initialize`` selected.
@@ -880,6 +924,15 @@ class MAGEMinBackend(MeltBackend):
         temperature_K = temperature_C + 273.15
         pressure_GPa = self._pressure_bar_to_GPa(pressure_bar)
         pressure_kbar = self._GPa_to_kbar(pressure_GPa)
+
+        # Even in-process bridges cannot be cancelled mid-call, but refuse to
+        # start a new evaluation once the residual aggregate budget is gone.
+        if call_timeout_s is not None:
+            remaining = float(call_timeout_s)
+            if not math.isfinite(remaining) or remaining <= 0.0:
+                raise RuntimeError(
+                    'MAGEMin call cancelled: aggregate liquidus budget exhausted'
+                )
 
         if self._bridge == 'pymagemin':
             for name in ('minimize', 'run', 'equilibrium'):
@@ -905,6 +958,7 @@ class MAGEMinBackend(MeltBackend):
                             fO2_log=fO2_log,
                             bridge='pymagemin',
                             exc=exc,
+                            call_timeout_s=call_timeout_s,
                         )
                     raise
             if self._binary_path is not None:
@@ -915,6 +969,7 @@ class MAGEMinBackend(MeltBackend):
                     fO2_log=fO2_log,
                     bridge='pymagemin',
                     exc=RuntimeError('pymagemin exposes no minimize/run/equilibrium entry point'),
+                    call_timeout_s=call_timeout_s,
                 )
 
         if self._bridge == 'julia':
@@ -939,6 +994,7 @@ class MAGEMinBackend(MeltBackend):
                         fO2_log=fO2_log,
                         bridge='julia',
                         exc=exc,
+                        call_timeout_s=call_timeout_s,
                     )
                 raise
 
@@ -959,6 +1015,7 @@ class MAGEMinBackend(MeltBackend):
                 temperature_C=temperature_C,
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
+                call_timeout_s=call_timeout_s,
             )
 
         raise RuntimeError(
@@ -973,6 +1030,7 @@ class MAGEMinBackend(MeltBackend):
         fO2_log: float,
         bridge: str,
         exc: Exception,
+        call_timeout_s: Optional[float] = None,
     ) -> Dict[str, Any]:
         message = f'MAGEMin {bridge} bridge failed; retried subprocess: {exc}'
         self._last_error = message
@@ -982,6 +1040,7 @@ class MAGEMinBackend(MeltBackend):
                 temperature_C=temperature_C,
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
+                call_timeout_s=call_timeout_s,
             )
         except Exception as subprocess_exc:
             raise RuntimeError(
@@ -997,6 +1056,7 @@ class MAGEMinBackend(MeltBackend):
         temperature_C: float,
         pressure_kbar: float,
         fO2_log: float,
+        call_timeout_s: Optional[float] = None,
     ) -> Dict[str, Any]:
         """
         Drive the compiled MAGEMin binary for one single-point call.
@@ -1070,7 +1130,18 @@ class MAGEMinBackend(MeltBackend):
             f'--buffer_n={buffer_n:.6f}',
         ]
 
-        timeout_s = float(self._config.get('timeout_s', 60.0))
+        configured_timeout_s = float(self._config.get('timeout_s', 60.0))
+        if call_timeout_s is None:
+            timeout_s = configured_timeout_s
+        else:
+            # Clamp per-call wall to residual aggregate budget so a call
+            # started near the deadline cannot overrun by a full timeout_s.
+            remaining = float(call_timeout_s)
+            if not math.isfinite(remaining) or remaining <= 0.0:
+                raise RuntimeError(
+                    'MAGEMin call cancelled: aggregate liquidus budget exhausted'
+                )
+            timeout_s = min(configured_timeout_s, remaining)
         try:
             with tempfile.TemporaryDirectory() as tmpdir:
                 completed = subprocess.run(  # noqa: S603 - adapter-built
