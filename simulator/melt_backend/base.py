@@ -427,8 +427,9 @@ class EquilibriumResult:
     #   'out_of_domain' - a DomainGate / account filter rejected the input.
     #   'unavailable'   - the engine/library/binary is absent for this call.
     #
-    # status is descriptive: it surfaces existing state at the consumption
-    # point and never gates a new control-flow branch.
+    # Consumers use status as a control signal: non-ok results can be rejected,
+    # trigger a fallback, or stop a liquidus/solidus sample. ``__post_init__``
+    # validates liquid-fraction payloads only for ok results.
     status: str = 'ok'
 
     # Optional sulfur-saturation gate (SULFUR_SATURATION_GATE intent) result,

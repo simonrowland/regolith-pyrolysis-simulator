@@ -64,7 +64,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **Mush** — partially molten temperature region between solidus and liquidus where melt and crystals coexist. Relevant to freeze-gate behavior and melt viscosity estimates.
 
-**Overhead** — gas headspace above the melt; carries total pressure, partial pressures, and sweep gas composition. The `overhead_headspace.enabled` toggle (default OFF) controls whether evaporation O₂ is routed through `process.overhead_gas` before bleeding to terminal accounts. Source: `data/setpoints.yaml` §14.
+**Overhead** — gas headspace above the melt; carries total pressure, partial pressures, and sweep gas composition. The `overhead_headspace.enabled` toggle defaults ON and controls whether evaporation O₂ is routed through `process.overhead_gas` before bleeding to terminal accounts. Source: `data/setpoints.yaml` §14.
 
 **pN₂** — sweep gas partial pressure (canonical symbol — N₂, Ar, or CO₂ on Mars feedstocks); controls viscous-flow transport. Target band 5–15 mbar. See [`docs/concepts.md`](concepts.md).
 

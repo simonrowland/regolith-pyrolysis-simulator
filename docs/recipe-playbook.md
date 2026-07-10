@@ -15,7 +15,7 @@ All setpoints live in `data/setpoints.yaml`. The campaigns are listed in extract
 
 Removes solar-wind-implanted volatiles and separates nanophase Fe⁰ by magnetic tapping (zero additional energy cost). Volatile release is complete by ~700 °C; alkali onset is >900 °C, thermally separated from the volatile window. C0 is mandatory for all feedstocks. For carbonaceous or Mars feedstocks the Stage 0 profile is more complex (see `data/feedstocks.yaml` per-feedstock `stage0_profile` keys and [`docs/feedstocks.md`](feedstocks.md)).
 
-Source: `data/setpoints.yaml` lines 19–43.
+Source: `data/setpoints.yaml` campaign key `campaigns.C0`.
 
 ### C0b — P-Cleanup (Mild Oxidative Hold)
 
@@ -29,7 +29,7 @@ Recommended for all lunar feedstocks as a default; required when P₂O₅ > 0.04
 
 Operator note: beneficiation (magnetic pre-separation) is preferred before C0b to avoid absorbing O₂ into metallic Fe. Cool back to hard vacuum after C0b before starting C2A.
 
-Source: `data/setpoints.yaml` lines 45–73.
+Source: `data/setpoints.yaml` campaign key `campaigns.C0b_p_cleanup`.
 
 ### C2A_continuous — Continuous Adaptive pN₂ Ramp (Path A default)
 
@@ -45,7 +45,7 @@ Downstream effects: C3 shuttle scope is halved (0–1 K cycle + 1 Na cycle); C5 
 
 Product metrics for a typical `lunar_mare_low_ti` batch: Na 2.3–4.0 kg, K 0.8–1.35 kg, Fe 85–130 kg, SiO₂ glass 100–160 kg, source-side O₂ potential 48–70 kg. The O₂ number is emitted/source-side potential, not recovered or analyzer-visible O₂; downstream sink/recovery accounting is Phase B.
 
-Source: `data/setpoints.yaml` lines 79–138.
+Source: `data/setpoints.yaml` campaign key `campaigns.C2A_continuous`.
 
 ### C2A_staged — Staged pN₂ Bakeout (Path A staged variant)
 
@@ -72,7 +72,7 @@ Note on `hold_temp_C`: this is a cycle-time lever, not a thermal-yield ceiling b
 
 **Engine policy (post-V1c)**: the shuttle T-acceptance gate (S1b) refuses any K→FeO reduction (margin negative everywhere in practical melt T per JANAF-4th multiphase) and refuses Na→FeO above the 1181.5 °C crossover (2026-07-09 multiphase re-ground). The C2A_staged cool window @ 1150 °C is the only physically defended Na-shuttle T; the engine reports `status="refused"` with structured diagnostic if the operator overrides T above the crossover. K added via `--additive=K=<kg>` will not produce Fe from the shuttle — operators wanting K product should expect it from C2A_continuous evaporation only, not C3.
 
-Source: `data/setpoints.yaml` lines 139–248.
+Source: `data/setpoints.yaml` campaign key `campaigns.C2A_staged`.
 
 ### C2B — pO₂-Managed Fe Pyrolysis (Path B)
 
@@ -83,7 +83,7 @@ Source: `data/setpoints.yaml` lines 139–248.
 
 Path B deliberately holds pO₂ high enough to suppress SiO while still extracting Fe. This preserves the CMAS (Ca–Mg–Al–Si) glass in the melt for direct tapping as an industrial glass product. The tradeoff: no SiO extraction, full C3 scope required downstream, and an overall cycle 8–20 % longer than Path A.
 
-Source: `data/setpoints.yaml` lines 251–277.
+Source: `data/setpoints.yaml` campaign key `campaigns.C2B`.
 
 ### C3_NA — Na Metallothermic Polish (post-V1c default)
 
@@ -112,7 +112,7 @@ Under the pN₂ variant (pO₂ → 0), Mg can be extracted at 1500–1580 °C at
 
 Branch One fallback: skip C4, electrolyse Mg in C5 at up to 2.5 V. This costs 5–10× electrode life and 2650–4050 kWh/t versus 1200–2000 kWh/t for Branch Two (C4 + C6).
 
-Source: `data/setpoints.yaml` lines 324–363.
+Source: `data/setpoints.yaml` campaign key `campaigns.C4`.
 
 ### C5 — Limited MRE Under O₂ Backpressure (Branch Two)
 
@@ -125,7 +125,7 @@ The MRE voltage sequence proceeds: FeO at 0.75 V (should be pre-depleted), Cr2O3
 
 Electrode materials: Ir or Pt-alloy anode, Mo or W cathode. Branch Two extends electrode life 5–10× compared to full-scope MRE.
 
-Source: `data/setpoints.yaml` lines 365–399.
+Source: `data/setpoints.yaml` campaign key `campaigns.C5`.
 
 ### C6 — Mg Thermite Reduction
 
@@ -138,7 +138,7 @@ Mg rods are injected via a SiC bottom port; buoyancy drives the reaction column.
 
 Bootstrapping: accumulate 3–6 C4 batches (150–300 kg Mg inventory) before the first thermite run. The net Mg balance for low-Ti mare is positive; for highland, neutral at ≥80 % bakeout recovery.
 
-Source: `data/setpoints.yaml` lines 401–442.
+Source: `data/setpoints.yaml` campaign key `campaigns.C6`.
 
 ### MRE_BASELINE
 
@@ -165,7 +165,8 @@ See [`docs/session-script-protocol.md`](session-script-protocol.md) for the full
 
 Objective: maximum metals + source-side O₂ potential from a lunar mare feedstock.
 
-Sequence: **C0 → C0b → C2A_continuous → C3 → C4 → C5 (Branch Two) → C6**
+Sequence: **C0 → C0b → C2A_continuous → C3 → C4 → C6**. C5 is optional and
+is inserted between C4 and C6 only when `c5_enabled` is set.
 
 - C0b is recommended for all lunar feedstocks even at low P₂O₅; it adds only 0.5–2.5 h and prevents P carryover into C2.
 - C2A_continuous at Path A extracts Na, K, Fe, and SiO in a single ramp; this halves C3 scope and reduces C5.

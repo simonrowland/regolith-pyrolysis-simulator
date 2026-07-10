@@ -152,7 +152,7 @@ is the right tool — not a second RAM-resident model.
 | Workload | Warm workers W | Why |
 |----------|----------------|-----|
 | Fidelity DOE, Book full job, high `@ hours:1` | **1** | Serial; one warm backend amortizes init across N evals in sequence |
-| Staged high eval | **1** | Study forces serial when staged (`study.py:608`) |
+| Staged high eval | **configured `parallel`** | Staged strategies ask batches up to `config.parallel`; `_evaluate_candidates` passes that value to the worker pool while staged-prefix replay preserves stage dependencies (`study.py:645-678`, `:3175-3183`) |
 | Internal-analytical (`stub`) / cached-real study `parallel>1` | **min(parallel, cpu)** | Embarrassingly parallel **different** evals; each worker holds one backend for **its** queue |
 | PT-1 precompute grind | **shard workers → merge** | Fill B-layer on miss; warm model only on cache miss path |
 

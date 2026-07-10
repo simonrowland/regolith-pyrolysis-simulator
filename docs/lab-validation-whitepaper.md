@@ -71,11 +71,11 @@ Class counts: 11 first-principles / 14 literature / 35 assumed / 8 fitted.
 
 | # | Subsystem | Parameter / value | Where set | Robinot-path sensitivity |
 |---:|---|---|---|---|
-| 17 | P_sat runtime | Na runtime Antoine `(8.477035,11265.231371,0)`, `pseudo_psat_backsolved_from_vaporock` | `data/vapor_pressures.yaml::metals.Na.antoine`; convention in `engines/builtin/vapor_pressure.py:59-71` | Medium for builtin authoritative runtime. |
+| 17 | P_sat runtime | Na selected Antoine at 1700 K `(7.460770,1873.728,-416.372)`, `pure_component_antoine` | `data/vapor_pressures.yaml::metals.Na.pure_component_antoine`; selector in `engines/builtin/vapor_pressure.py::vapor_pressure_antoine_coefficients` | Medium for builtin authoritative runtime. |
 | 18 | P_sat runtime | K liquid KO0.5 standard-reaction fit `(10.641294,9965.408779,-123.001)`, Lamoreaux & Hildenbrand 1984 Tables 2/4, DOI 10.1063/1.555706 | `data/vapor_pressures.yaml::metals.K.antoine/reaction` | Medium/low for builtin authoritative runtime; held-out DeMaria residual is about +1.24 dex at 1429 K. |
-| 19 | P_sat runtime | Mg runtime Antoine `(10.628931,6788.644019,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.Mg.antoine` | Medium/high for builtin authoritative runtime. |
-| 20 | P_sat runtime | Fe runtime Antoine `(12.404333,19156.973681,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::metals.Fe.antoine` | High for builtin authoritative runtime. |
-| 21 | P_sat runtime | SiO runtime Antoine `(22.117682,40638.351545,0)`, VapoRock-backsolved | `data/vapor_pressures.yaml::oxide_vapors.SiO.antoine` | Very high for builtin authoritative runtime. |
+| 19 | P_sat runtime | Mg selected Antoine at 1700 K `(9.4964271591,5613.103906,-110.759803)`, `pure_component_antoine` | `data/vapor_pressures.yaml::metals.Mg.pure_component_antoine` | Medium/high for builtin authoritative runtime. |
+| 20 | P_sat runtime | Fe selected Antoine at 1700 K `(10.670336,17759.430841,0)`, `pure_component_antoine` | `data/vapor_pressures.yaml::metals.Fe.pure_component_antoine` | High for builtin authoritative runtime. |
+| 21 | P_sat runtime | SiO selected Antoine at 1700 K `(28.062027,79705.252727,1000.0)`, VapoRock-backsolved fallback | `data/vapor_pressures.yaml::oxide_vapors.SiO.antoine` | Very high for builtin authoritative runtime. |
 | 22 | P_sat runtime | CrO2 runtime Antoine `(12.9245114,23732.9593,0)`, JANAF0 fallback fit | `data/vapor_pressures.yaml::oxide_vapors.CrO2.antoine/reaction` | Low/medium. |
 | 39 | Condensation routing | Condensation temps Fe/Mg/Na/K/Ca/Mn/Cr/Al/Ti, operator-tuned against P_sat curves | `simulator/condensation.py:390-432`, `data/setpoints.yaml:820-832` | Medium/high; controls stage assignment. |
 | 66 | Lab overlay | Required closure factor `alpha * area = 0.03969` | `campaign analysis 2026-06`, `:112-126` | Very high; paper-derived diagnostic, not allowed as hidden runtime scalar. |
@@ -119,13 +119,13 @@ Class counts: 11 first-principles / 14 literature / 35 assumed / 8 fitted.
 | Rigid HKL site | `simulator/state.py:506-508` | `MeltState` carries `total_mass_kg` as a derived quantity but initializes `melt_surface_area_m2: float = 0.2`. This is the live default consumed by HKL. |
 | Rigid HKL site | `data/setpoints.yaml:1117-1119` | Furnace/crucible setpoints declare `diameter_m: 0.5` and `melt_surface_area_m2: 0.2`. Repo search found no runtime assignment from this setpoint into `MeltState`; it is a duplicate/declarative assumption, not the live mass-derived source. |
 | Current mass feedback | `total_mass_kg` can fall | if a run vaporizes 37% of the melt, `total_mass_kg` can fall, but HKL area remains the same `MeltState.melt_surface_area_m2` scalar unless some external caller mutates it. |
-| Lab seam | P2 lab path | the P2 lab path already derives/configures wall capture geometry. It does not yet derive HKL exposed melt area. Robinot has explicit missing fields for exposed melt/crucible opening area. Industrial runs still use the rigid `MeltState` scalar. |
+| Lab seam | P2 lab path | a `gram_lab` patch can provide `lab_geometry.sample.exposed_melt_area_m2`; the runner validates it and assigns it to `MeltState.melt_surface_area_m2` before HKL execution. Industrial runs still use the rigid `MeltState` scalar. |
 
-Derived-area model summary: `melt_surface_area_m2` should be an hourly derived input to HKL, not a fixed scalar. Proposed data model: `area_basis` one of `legacy_fixed`, `lab_exposed_area`, `industrial_pot_geometry`; lab basis uses `lab_geometry.sample.exposed_melt_area_m2`; industrial basis requires declared pot geometry (`radius_m` or `diameter_m`, `usable_depth_m`, `freeboard_fraction`) or `shape: cylindrical` plus `initial_aspect_h_over_r`; density basis starts with `EquipmentDesigner.MELT_DENSITY_KG_M3 = 2700.0` or a future composition-weighted density model.
+Derived-area model summary: runtime currently supports the fixed scalar and the `lab_exposed_area` bridge described above. An hourly derived `industrial_pot_geometry` area remains proposed: it would require declared pot geometry (`radius_m` or `diameter_m`, `usable_depth_m`, `freeboard_fraction`) or `shape: cylindrical` plus `initial_aspect_h_over_r`; density basis starts with `EquipmentDesigner.MELT_DENSITY_KG_M3 = 2700.0` or a future composition-weighted density model.
 
 Runtime derivation: read melt inventory from the mol-native ledger and project to kg only at the boundary; compute `V_melt(t) = m_melt(t) / rho_melt(t)`; for declared radius compute `fill_depth(t) = V_melt(t) / (pi R^2)`; normal fill uses `A_exposed(t) = pi R^2`; aspect input derives `R = (V0 / (pi a))^(1/3)`, then freezes pot geometry and updates only fill level over time.
 
-Refusal shape: `missing_melt_geometry_for_derived_area`; `invalid_pot_geometry`; `pot_overfilled`; `unsupported_dynamic_area_basis`; lab missing `exposed_melt_area_m2` stays diagnostic-only/fail-closed and does not fall back to industrial `0.2 m2`.
+Current refusal shape: a present but non-positive/non-finite gram-lab `exposed_melt_area_m2` raises `invalid_lab_geometry_positive_value`. If the field is absent, no bridge is applied and the existing `MeltState` area remains in force. The proposed dynamic industrial-area refusal modes are not implemented.
 
 Shallow-pot verdict: shallow pots are a credible throughput lever, but "maximize area per kg" is not the same as "best furnace." The first implementable design change is geometry-derived HKL area with fail-closed pot specs and digesting; the next physics gap is a frozen-skull wall/bottom heat-flux model.
 
@@ -349,11 +349,11 @@ Full 68-row derivation-chain audit. FITTED rows remain flagged as FITTED because
 | 14 | Alpha | Si `alpha=1.0`, pure elemental only | ASSUMED | `data/vapor_pressures.yaml::metals.Si.evaporation_alpha` | Low in current faithful run; inactive pure-Si branch. |
 | 15 | Alpha | Ti `alpha=0.8`, proxy tag | ASSUMED | `data/vapor_pressures.yaml::metals.Ti.evaporation_alpha` | Low; Ti vapor tiny. |
 | 16 | Alpha | Cr/Mn `fail_loud_missing_alpha` policy | ASSUMED | `data/vapor_pressures.yaml::metals.Cr/Mn.evaporation_alpha_policy` | Low unless fallback enabled; honest no-value state. |
-| 17 | P_sat runtime | Na runtime Antoine `(8.477035,11265.231371,0)`, `pseudo_psat_backsolved_from_vaporock` | FITTED | `data/vapor_pressures.yaml::metals.Na.antoine`; convention in `engines/builtin/vapor_pressure.py:59-71` | Medium for builtin authoritative runtime. |
+| 17 | P_sat runtime | Na selected Antoine at 1700 K `(7.460770,1873.728,-416.372)`, `pure_component_antoine` | FITTED | `data/vapor_pressures.yaml::metals.Na.pure_component_antoine`; selector in `engines/builtin/vapor_pressure.py::vapor_pressure_antoine_coefficients` | Medium for builtin authoritative runtime. |
 | 18 | P_sat runtime | K liquid KO0.5 standard-reaction fit `(10.641294,9965.408779,-123.001)`, Lamoreaux & Hildenbrand 1984 Tables 2/4, DOI 10.1063/1.555706 | FITTED | `data/vapor_pressures.yaml::metals.K.antoine/reaction` | Medium/low for builtin authoritative runtime; held-out DeMaria residual is about +1.24 dex at 1429 K. |
-| 19 | P_sat runtime | Mg runtime Antoine `(10.628931,6788.644019,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.Mg.antoine` | Medium/high for builtin authoritative runtime. |
-| 20 | P_sat runtime | Fe runtime Antoine `(12.404333,19156.973681,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::metals.Fe.antoine` | High for builtin authoritative runtime. |
-| 21 | P_sat runtime | SiO runtime Antoine `(22.117682,40638.351545,0)`, VapoRock-backsolved | FITTED | `data/vapor_pressures.yaml::oxide_vapors.SiO.antoine` | Very high for builtin authoritative runtime. |
+| 19 | P_sat runtime | Mg selected Antoine at 1700 K `(9.4964271591,5613.103906,-110.759803)`, `pure_component_antoine` | FITTED | `data/vapor_pressures.yaml::metals.Mg.pure_component_antoine` | Medium/high for builtin authoritative runtime. |
+| 20 | P_sat runtime | Fe selected Antoine at 1700 K `(10.670336,17759.430841,0)`, `pure_component_antoine` | FITTED | `data/vapor_pressures.yaml::metals.Fe.pure_component_antoine` | High for builtin authoritative runtime. |
+| 21 | P_sat runtime | SiO selected Antoine at 1700 K `(28.062027,79705.252727,1000.0)`, VapoRock-backsolved fallback | FITTED | `data/vapor_pressures.yaml::oxide_vapors.SiO.antoine` | Very high for builtin authoritative runtime. |
 | 22 | P_sat runtime | CrO2 runtime Antoine `(12.9245114,23732.9593,0)`, JANAF0 fallback fit | FITTED | `data/vapor_pressures.yaml::oxide_vapors.CrO2.antoine/reaction` | Low/medium. |
 | 23 | P_sat runtime | Ca runtime Antoine `(11.238,9520,0)`, legacy rough dH_vap approximation | ASSUMED | `data/vapor_pressures.yaml::metals.Ca` | Medium/high; Ca vapor material and source says TODO replace. |
 | 24 | P_sat runtime | Al runtime Antoine `(11.553,17340,0)`, legacy CRC-style regression/dH | ASSUMED | `data/vapor_pressures.yaml::metals.Al` | Medium. |
@@ -400,7 +400,7 @@ Full 68-row derivation-chain audit. FITTED rows remain flagged as FITTED because
 | 65 | Gas boundary | Partial-pressure total tolerance `max(1e-12 mbar, 1e-12*scale)` | first-principles | `simulator/state.py:571-585` | Low; validation only. |
 | 66 | Lab overlay | Required closure factor `alpha * area = 0.03969` | FITTED | `campaign analysis 2026-06`, `:112-126` | Very high; paper-derived diagnostic, not allowed as hidden runtime scalar. |
 | 67 | Lab overlay | Forsterite proxy `alpha_c = 0.038 +/- 0.005` | literature-pinned | `campaign analysis 2026-06`, `:112-116`; expanded in `alpha-principles.md` | Very high if lab overlay uses it. |
-| 68 | Lab overlay | Lab exposed-area seam absent; current `lab_geometry` wall area does not reach HKL source area | ASSUMED | `campaign analysis 2026-06`, `:287-289` | Very high; current faithful path likely overuses pool-scale area. |
+| 68 | Lab overlay | `gram_lab` `lab_geometry.sample.exposed_melt_area_m2` is validated and copied into the HKL source-area field before execution; missing area leaves the existing `MeltState` scalar unchanged | ASSUMED | `simulator/condensation.py::gram_lab_exposed_melt_area_bridge`; `simulator/runner.py::_apply_lab_area_bridge` | Very high; the seam is live, while dynamic industrial area remains absent. |
 
 ### Appendix C — Faithful-run artifacts
 <!-- Run digests, preset SHAs, code version per comparison row. -->

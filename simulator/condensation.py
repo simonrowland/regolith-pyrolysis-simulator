@@ -168,10 +168,10 @@ LAB_EXPOSED_MELT_AREA_BASIS = 'gram_lab_exposed_melt'
 # and documents the regime; species-specific refinements are open
 # work (tickler §5 follow-on).
 DEFAULT_SHERWOOD_LAMINAR = 3.66
-# 0.5.2: DEFAULT_BINARY_DIFFUSION_M2_S replaced by per-species
-# Chapman-Enskog computation via _chapman_enskog_d_ab_m2_s. The constant
-# remains as a documented anchor value for the historical operating
-# point (SiO/N2 at 10 mbar, 1700 C) so reviewers can quickly orient.
+# Per-species Chapman-Enskog diffusion is preferred when pressure and collision
+# data produce a finite positive value. This constant remains the live fallback
+# when pressure is absent/invalid or that computation fails, anchored to the
+# historical SiO/N2 operating point at 10 mbar and 1700 C.
 DEFAULT_BINARY_DIFFUSION_M2_S = 1.0e-2
 GAS_CONSTANT_J_MOL_K = 8.314462618
 

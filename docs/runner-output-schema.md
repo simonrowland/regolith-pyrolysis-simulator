@@ -34,11 +34,13 @@ python -m simulator.runner \
     [--kernel-commit-sha=SHA]
 ```
 
-The runner always writes a JSON document to `--output` and exits `0`
-when the run completes (`status: ok` or `partial`) or `1` when the run
-fails (`status: failed` or `refused`).  A non-ok envelope is still a
-well-formed JSON document so downstream pipelines never need to parse
-stderr.
+For completed runs and handled runner failures, the runner writes a JSON
+document to `--output` and exits `0` for `status: ok` or `partial`, or `1` for
+`status: failed` or `refused`. This is not an every-invocation guarantee.
+Argument-parser failures happen before the guarded run path: they use argparse's
+stderr message, exit `2`, and do not write an output document. An unexpected
+exception while building an otherwise non-failed output detail can also
+propagate before the document is written.
 
 The `--sio-*` flags are deterministic C2A/SiO pre-run controls. They
 apply after session construction and before hour advancement, matching
@@ -432,7 +434,9 @@ mole, energy, pressure, or partition arithmetic.
 * `mass_balance_pct` is the simulator's own
   `HourSnapshot.mass_balance_error_pct` -- expected to stay below
   `5e-12 %` per the invariant tracked in `tests/test_mass_balance.py`.
-  The runner does not enforce this on its own; the golden fixtures do.
+  The runner enforces this limit: an otherwise `ok` or `partial` execution
+  above it is emitted as `status: failed` with reason
+  `mass_balance_closure_breach`.
 * `O2_yield_kg_cumulative` is retained for serialized compatibility but
   must be read as source-side emitted O2 potential, not recovered,
   captured, or analyzer-visible O2. `O2_source_side_potential_kg_cumulative`

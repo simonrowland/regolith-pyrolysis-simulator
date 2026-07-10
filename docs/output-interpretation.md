@@ -48,7 +48,7 @@ Hertz-Knudsen-Langmuir fluxes are scaled by per-species `evaporation_alpha` meta
 
 - **Tier 1** (Na, K, Fe, Mg, SiO) — measured α with citation.
 - **Tier 2** (Ca, Ti, Al) — proxy or conditional-proxy values. Ca and Ti use Zhang 2014 CaTiO₃ melt coefficients; Al uses a broad conflicting-proxy envelope. Elemental Si is valid only for the inactive pure-element Si branch; the SiO silicate-vapor path keeps its separate SiO alpha.
-- **Tier 3** (Cr, Mn, CrO₂) — intentionally no numeric α. The engine returns a `missing_alpha` diagnostic and fails loud rather than silently using α = 1.0. Prototype continuity runs can opt into a fallback with `setpoints.chemistry_kernel.allow_unmeasured_alpha_fallback: true`; outputs then record `unmeasured_alpha_fallback_species`.
+- **Tier 3** (Cr, Mn, CrO₂) — intentionally no numeric α. The engine returns a `missing_alpha` diagnostic when fallback is disabled. Released setpoints default `chemistry_kernel.allow_unmeasured_alpha_fallback` to `true`, so normal runs use the explicit α = 1.0 upper-bound fallback and record `unmeasured_alpha_fallback_species`; set it to `false` for fail-loud behavior.
 
 The evaporation diagnostic includes `flux_uncertainty_pct`, a per-species map derived from the alpha envelope. It is alpha-only uncertainty, not a total model uncertainty: vapor-pressure fits, melt activities, temperature dependence, and composition dependence remain separate limitations.
 

@@ -1148,10 +1148,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     # VAPOR_PRESSURE stays out of this table only because it needs the
     # simulator-owned vapor_pressures.yaml payload. It is still builtin
     # authoritative; VapoRock is wired separately as a diagnostic
-    # shadow. See ``_register_vapor_pressure_pair``. The six remaining
-    # authoritative builtins (EVAPORATION_FLUX,
-    # EVAPORATION_TRANSITION, CONDENSATION_ROUTE, ELECTROLYSIS_STEP,
-    # METALLOTHERMIC_STEP, STAGE0_PRETREATMENT) are unchanged.
+    # shadow. See ``_register_vapor_pressure_pair``. The fourteen providers in
+    # this table plus the separately wired builtin vapor-pressure provider are
+    # the released builtin registration surface.
     #
     # ``needs_vapor_pressures`` is retained for forward-compatibility
     # in case a future authoritative builtin needs the same

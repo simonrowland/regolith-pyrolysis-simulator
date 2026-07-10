@@ -774,10 +774,11 @@ class PyrolysisRun:
     def run(self) -> dict:
         """Execute the run and return the fully-specified JSON dict.
 
-        Catches any per-step exception and returns a ``status=failed``
-        envelope rather than propagating: the CLI surface promises a
-        JSON document on every invocation so calling pipelines can
-        diff failure reasons without parsing stderr.
+        ``RunExecutor`` turns per-step failures into ``status=failed``
+        executions, whose detail-construction failures receive a reduced
+        failure envelope. Unexpected detail errors for an otherwise non-failed
+        execution can still propagate. CLI argument parsing happens before this
+        method; argparse usage errors exit on stderr without producing JSON.
         """
 
         lab_area_bridge = self._lab_area_bridge()

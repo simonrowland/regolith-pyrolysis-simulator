@@ -52,7 +52,7 @@ This guide is for contributors and coding agents that need to find the right fil
 ## Engine Source Trees
 
 - `engines/__init__.py` documents the chemistry-engine refactor: kernel-shadow provider source lives here; today-hook adapters stay in `simulator/melt_backend/`.
-- `engines/builtin/` is the live authoritative chemistry plane — seven kernel-registered `ChemistryProvider` classes that own every builtin intent. Every `LedgerTransitionProposal` they emit is routed through `ChemistryKernel.commit_batch` (the sole writer to `AtomLedger`); no `simulator/*.py` module mutates the ledger directly anymore.
+- `engines/builtin/` is the live authoritative chemistry plane — fifteen kernel-registered `ChemistryProvider` classes: fourteen rows in `PyrolysisSimulator._BUILTIN_PROVIDER_REGISTRATIONS` plus the separately wired `BuiltinVaporPressureProvider`. Every `LedgerTransitionProposal` they emit is routed through `ChemistryKernel.commit_batch` (the sole writer to `AtomLedger`); no `simulator/*.py` module mutates the ledger directly anymore.
   - `engines/builtin/_common.py` provides shared helpers: `reject_wrong_intent`, `unpack_controls`, and `composition_wt_pct_from_account_view` (fail-closed via `UnknownSpeciesError`, mirroring `_load_ledger_account`).
   - `engines/builtin/README.md` documents the migration plan and per-provider conventions.
 
@@ -66,7 +66,15 @@ This guide is for contributors and coding agents that need to find the right fil
   | `engines/builtin/condensation_route.py` | `BuiltinCondensationRouteProvider` | `CONDENSATION_ROUTE` | authoritative, ledger-mutating | `process.overhead_gas`, `process.condensation_train` |
   | `engines/builtin/electrolysis_step.py` | `BuiltinElectrolysisStepProvider` | `ELECTROLYSIS_STEP` | authoritative, ledger-mutating | `process.cleaned_melt`, `process.metal_phase`, `terminal.oxygen_mre_anode_stored` |
   | `engines/builtin/metallothermic_step.py` | `BuiltinMetallothermicStepProvider` | `METALLOTHERMIC_STEP` | authoritative, ledger-mutating | `process.cleaned_melt`, `process.metal_phase`, `process.reagent_inventory` |
+  | `engines/builtin/ca_aluminothermic_step.py` | `BuiltinCaAluminothermicStepProvider` | `CA_ALUMINOTHERMIC_STEP` | authoritative, ledger-mutating | cleaned melt, metal/C7-Al product, overhead/condensation/wall deposits, terminal slag |
+  | `engines/builtin/native_fe_saturation.py` | `BuiltinNativeFeSaturationProvider` | `NATIVE_FE_SATURATION` | authoritative, ledger-mutating | `process.cleaned_melt`, `terminal.drain_tap_material`, `process.overhead_gas` |
+  | `engines/builtin/fe_redox_respeciation.py` | `BuiltinFeRedoxRespeciationProvider` | `FE_REDOX_RESPECIATION` | authoritative, ledger-mutating | `process.cleaned_melt`, `process.overhead_gas`, `reservoir.fo2_buffer` |
   | `engines/builtin/stage0_pretreatment.py` | `BuiltinStage0PretreatmentProvider` | `STAGE0_PRETREATMENT` | authoritative, ledger-mutating | nine Stage 0 feed/sink accounts (`process.stage0_*`, `reservoir.stage0_*`, `terminal.offgas`, `terminal.stage0_salt_phase`, `terminal.oxygen_stage0_stored`) |
+  | `engines/builtin/overhead_gas_equilibrium.py` | `BuiltinOverheadGasEquilibriumProvider` | `OVERHEAD_GAS_EQUILIBRIUM` | authoritative, diagnostic (no transition) | `process.overhead_gas` |
+  | `engines/builtin/overhead_bleed.py` | `BuiltinOverheadBleedProvider` | `OVERHEAD_BLEED` | authoritative, ledger-mutating | `process.overhead_gas` plus terminal offgas/O₂ accounts |
+  | `engines/builtin/oxygen_bubbler.py` | `BuiltinOxygenBubblerProvider` | `OXYGEN_BUBBLER` | authoritative, ledger-mutating | `process.overhead_gas`, `reservoir.fo2_buffer` |
+  | `engines/builtin/oxygen_reservoir_exchange.py` | `BuiltinOxygenReservoirExchangeProvider` | `OXYGEN_RESERVOIR_EXCHANGE` | authoritative, ledger-mutating | `process.overhead_gas`, `reservoir.fo2_buffer` |
+  | `engines/builtin/backend_equilibrium.py` | `BuiltinBackendEquilibriumProvider` | `BACKEND_EQUILIBRIUM` | authoritative, validates/forwards backend transitions | `process.cleaned_melt`, `process.metal_phase`, `process.overhead_gas`, `reservoir.fo2_buffer` |
 
 - `engines/magemin/__init__.py` re-exports the MAGEMin shadow provider surface (`MAGEMinShadowProvider`, `MAGEMinDomainGate`, `MAGEMinParityComparator`, `ParityReport`).
 - `engines/magemin/provider.py` is the registered `MAGEMinShadowProvider` kernel shadow provider. Its capability profile declares `SILICATE_LIQUIDUS`, `SILICATE_EQUILIBRIUM`, and `GATE_LIQUID_FRACTION`; only `GATE_LIQUID_FRACTION` is fallback-authoritative, and `dispatch()` returns `IntentResult` diagnostics, including `unsupported` for wrong intents.

@@ -84,17 +84,15 @@ one atmosphere at its normal boiling point (3135 K). It is labelled UNCERTIFIED 
 but a derivation rather than a fitted primary.
 <!-- impl: §2.1 -> docs/chemistry-provenance.yaml Fe_pure_antoine:358 — Fe surrogate provenance -->
 
-Several species that the pure-component approach cannot reach directly — sodium and potassium at recipe
-temperature, iron, magnesium, and silicon monoxide — instead carry a **pseudo-Antoine** fit whose coefficients are
-back-solved so that the activity-scaled Antoine product reproduces a VapoRock gas-speciation target on a
-fixed reference grid (seven lunar and Mars feedstocks, 31 temperature points from 1350 to 1950 K, at an
+Sodium, iron, and silicon monoxide carry a **pseudo-Antoine** fallback whose coefficients are back-solved
+so that the activity-scaled Antoine product reproduces a VapoRock gas-speciation target on a fixed
+reference grid (seven lunar and Mars feedstocks, 31 temperature points from 1350 to 1950 K, at an
 iron–wüstite oxygen fugacity per Kress & Carmichael 1991). These are the
 `pseudo_psat_backsolved_from_vaporock` rows. They are honestly a model-to-model fit, not a measurement:
-the residual against VapoRock grows with distance from the calibration grid (about 0.379 dex for Na,
-0.691 for K, 0.282 for Mg, 0.270 for SiO, and 0.418 for Fe), and every such row is UNCERTIFIED.
-High-uncertainty Fe pseudo rows have an additional runtime guard: above their stated `valid_range_K`, the
-provider omits the fallback and records `non_certifying_vapor_pressure_fallback_omitted` rather than
-emitting an extrapolated Fe pressure. The VapoRock target itself comes from
+the current maximum residuals are about 0.379 dex for Na, 0.418 dex for Fe, and 0.270 dex for SiO, and
+every such row is UNCERTIFIED. Potassium now uses a `standard_reaction_term`, while magnesium uses a
+`pure_component_psat` row. Where a usable `pure_component_antoine` sidecar exists, the runtime selector
+prefers it over the pseudo fallback. The VapoRock target itself comes from
 Wolf et al. 2023 (*ApJ* 947:64,
 [doi:10.3847/1538-4357/acbcc7](https://doi.org/10.3847/1538-4357/acbcc7)).
 <!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:552 — pseudo guard -->
@@ -113,11 +111,11 @@ For a metal, `a_M` is the elemental-metal activity computed from the oxide-decom
 It is derived from the Ellingham free energy of the metal/oxide pair, `K = exp(−ΔG_f / RT)`, together
 with the moles of metal and oxide in the formation reaction and the prevailing oxygen partial pressure.
 The chain is single-counted by construction: the metal activity already carries the oxide-stability
-information, so the pressure is `a_M × P_sat` and nothing multiplies it a second time. The Ellingham
-free energies are a linear refit of NIST-JANAF condensed-phase data (Chase 1998, NIST-JANAF
-Thermochemical Tables 4th ed., Monograph 9), on a per-mole-O₂ basis with the elemental fusion
-corrections (iron 13.81 kJ/mol at 1811 K, silicon 50.21 kJ/mol at 1687 K, chromium 21.0 kJ/mol at
-2180 K) built into the segment deltas.
+information, so the pressure is `a_M × P_sat` and nothing multiplies it a second time. The authoritative
+Ellingham free energies use piecewise multiphase segments re-grounded from NIST-JANAF 4th-edition rows
+(Chase 1998, Monograph 9), on a per-mole-O₂ basis. Segment boundaries follow in-band metal and oxide
+phase transitions; each segment carries its own linear `dH - T*dS` representation rather than one
+condensed-phase fit across the full temperature range.
 <!-- impl: §2.2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:790 — activity times Psat -->
 <!-- impl: §2.2 -> simulator/chemistry/ellingham_thermo.py ELLINGHAM_THERMO:48 — JANAF Ellingham table -->
 
@@ -162,14 +160,14 @@ consequential modelling choice on this page, because in a real silicate melt the
 far from ideal.
 
 **The activity that feeds the authoritative vapor-pressure path is the builtin analytic treatment, not
-a melt-equilibrium engine.** For every oxide except iron oxide, the builtin provider takes the activity
-as the oxide's weight-fraction proportion of the melt — an **ideal solution with activity coefficient
-γ = 1**. Iron oxide is the exception in interactive and batch simulator runs: those runs always pass the
-intrinsic oxygen fugacity into the vapor-pressure provider, so FeO uses the redox-resolved ferrous
-activity from the Kress & Carmichael / CALPHAD treatment of §7. The ideal weight-fraction fallback for
-FeO exists only for external callers that invoke the vapor-pressure provider without the intrinsic-fO₂
-channel. This ideal-for-non-iron, Kress-for-iron activity surface is what the vapor pressures of §2 are
-built on.
+a melt-equilibrium engine.** For every oxide except iron oxide, the builtin provider forms a
+single-cation mole fraction `X_MOx` and applies the species-specific constant coefficient table as
+`a_MOx = γ_MOx × X_MOx` (for example, `γ_NaO0.5 = 1e-3` and `γ_KO0.5 = 3.5e-5`). A species without a
+documented table row uses an explicit unity-γ fallback with a warning, and the pure single-cation limit
+returns activity 1. Iron oxide is the exception in interactive and batch simulator runs: those runs
+pass intrinsic oxygen fugacity into the vapor-pressure provider, so FeO uses the redox-resolved ferrous
+activity from the Kress & Carmichael / CALPHAD treatment of §7. The builtin single-cation-gamma,
+Kress-for-iron activity surface is what the vapor pressures of §2 are built on.
 <!-- impl: §3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:745 — FeO Kress activity -->
 <!-- impl: §3 -> simulator/fe_redox.py kress91_ferrous_feo_activity:652 — FeO activity path -->
 
