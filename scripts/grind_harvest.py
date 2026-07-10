@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import shlex
@@ -32,6 +33,19 @@ DEFAULT_ACCUMULATOR = (
     REPO_ROOT / "docs-private/recipe-db/grind-alphamelts-accumulator.db"
 )
 ALLOWED_TABLE = "alphamelts_outputs"
+# Identity / provenance columns rewritten on insert (not copied as-is).
+_REWRITE_OUTPUT_COLUMNS = frozenset(
+    {"id", "grid_key_id", "source_host", "source_row_id"}
+)
+# Wall-clock / host provenance excluded from scientific equivalence and
+# restore fingerprints so timing noise cannot mint false conflicts or block
+# generation-change re-reconcile by canonical key. Still copied on insert.
+_EPHEMERAL_OUTPUT_COLUMNS = frozenset(
+    {"host", "created_at", "timing_s", "timing_s_repr"}
+)
+_TERMINAL_PULLED = "pulled"
+_TERMINAL_EQUIVALENT = "equivalent"
+_TERMINAL_CONFLICT = "conflict"
 
 
 def _validate_host(host: str) -> str:
@@ -87,6 +101,37 @@ def _ensure_harvest_schema(connection: sqlite3.Connection) -> None:
             connection.execute(
                 "ALTER TABLE harvest_state RENAME TO harvest_state_legacy_v1"
             )
+
+    pulled_table = connection.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='harvest_pulled_rows'"
+    ).fetchone()
+    if pulled_table is not None:
+        pulled_columns = {
+            str(row[1])
+            for row in connection.execute("PRAGMA table_info(harvest_pulled_rows)")
+        }
+        required = {
+            "expedited_key",
+            "engine_epoch",
+            "row_fingerprint",
+            "terminal_state",
+        }
+        if not required.issubset(pulled_columns):
+            legacy_pulled = connection.execute(
+                "SELECT 1 FROM sqlite_master "
+                "WHERE type='table' AND name='harvest_pulled_rows_legacy_v1'"
+            ).fetchone()
+            if legacy_pulled is not None:
+                raise RuntimeError(
+                    "unsafe legacy harvest-pulled-rows migration is incomplete"
+                )
+            # Drop blind id-only receipts: force re-reconcile under fingerprinted
+            # receipts rather than trusting content-blind pulled state.
+            connection.execute(
+                "ALTER TABLE harvest_pulled_rows "
+                "RENAME TO harvest_pulled_rows_legacy_v1"
+            )
+
     connection.executescript(
         """
         CREATE TABLE IF NOT EXISTS harvest_state (
@@ -104,6 +149,10 @@ def _ensure_harvest_schema(connection: sqlite3.Connection) -> None:
             source_generation TEXT NOT NULL,
             source_table TEXT NOT NULL,
             source_row_id INTEGER NOT NULL,
+            expedited_key TEXT NOT NULL,
+            engine_epoch INTEGER NOT NULL,
+            row_fingerprint TEXT NOT NULL,
+            terminal_state TEXT NOT NULL,
             pulled_at TEXT NOT NULL,
             PRIMARY KEY(
                 source_host, source_database, source_generation,
@@ -134,14 +183,63 @@ def _ensure_harvest_schema(connection: sqlite3.Connection) -> None:
     )
 
 
-def _row_json(row: sqlite3.Row) -> str:
+def _row_json(row: sqlite3.Row | dict[str, Any]) -> str:
+    if isinstance(row, sqlite3.Row):
+        payload = dict(row)
+    else:
+        payload = dict(row)
     return json.dumps(
-        dict(row),
+        payload,
         sort_keys=True,
         separators=(",", ":"),
         ensure_ascii=False,
         allow_nan=False,
     )
+
+
+def _copyable_output_columns(columns: Sequence[str]) -> tuple[str, ...]:
+    """Source columns copied into the accumulator (before id/provenance rewrite)."""
+    return tuple(
+        column for column in columns if column not in _REWRITE_OUTPUT_COLUMNS
+    )
+
+
+def _scientific_payload_columns(columns: Sequence[str]) -> tuple[str, ...]:
+    """Columns that define scientific identity for equivalence / fingerprinting."""
+    return tuple(
+        column
+        for column in columns
+        if column not in _REWRITE_OUTPUT_COLUMNS
+        and column not in _EPHEMERAL_OUTPUT_COLUMNS
+    )
+
+
+def _row_fingerprint(
+    row: sqlite3.Row | dict[str, Any],
+    payload_columns: Sequence[str],
+) -> str:
+    """Stable content identity for a source output row.
+
+    Used to detect restored/recreated databases that preserve generation
+    metadata and reuse source_row_id values with different payloads.
+    """
+    if isinstance(row, sqlite3.Row):
+        values = {column: row[column] for column in payload_columns}
+        values["expedited_key"] = str(row["expedited_key"])
+        values["engine_epoch"] = int(row["engine_epoch"])
+    else:
+        values = {column: row[column] for column in payload_columns}
+        values["expedited_key"] = str(row["expedited_key"])
+        values["engine_epoch"] = int(row["engine_epoch"])
+    encoded = json.dumps(
+        values,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+        default=str,
+    )
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
 def _record_conflict(
@@ -190,6 +288,53 @@ def _record_conflict(
             _row_json(incoming),
             now,
             now,
+        ),
+    )
+
+
+def _mark_consumed(
+    connection: sqlite3.Connection,
+    *,
+    source_host: str,
+    source_database: str,
+    source_generation: str,
+    source_table: str,
+    source_row_id: int,
+    expedited_key: str,
+    engine_epoch: int,
+    row_fingerprint: str,
+    terminal_state: str,
+) -> None:
+    connection.execute(
+        """
+        INSERT INTO harvest_pulled_rows(
+            source_host, source_database, source_generation,
+            source_table, source_row_id,
+            expedited_key, engine_epoch, row_fingerprint,
+            terminal_state, pulled_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(
+            source_host, source_database, source_generation,
+            source_table, source_row_id
+        )
+        DO UPDATE SET
+            expedited_key=excluded.expedited_key,
+            engine_epoch=excluded.engine_epoch,
+            row_fingerprint=excluded.row_fingerprint,
+            terminal_state=excluded.terminal_state,
+            pulled_at=excluded.pulled_at
+        """,
+        (
+            source_host,
+            source_database,
+            source_generation,
+            source_table,
+            source_row_id,
+            expedited_key,
+            engine_epoch,
+            row_fingerprint,
+            terminal_state,
+            utc_now(),
         ),
     )
 
@@ -254,20 +399,44 @@ def harvest_snapshot(
             total_source = int(
                 source.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0]
             )
-            pulled_ids = {
-                int(row[0])
+            source_output_columns = table_columns(source, table)
+            copyable_columns = _copyable_output_columns(source_output_columns)
+            payload_columns = _scientific_payload_columns(source_output_columns)
+
+            # Receipts are bound to source generation. Content-blind id skips
+            # are refused: a receipt is only trusted when its stored fingerprint
+            # still matches the live source row (restore/id-reuse detection).
+            receipts: dict[int, sqlite3.Row] = {
+                int(row["source_row_id"]): row
                 for row in target.execute(
-                    "SELECT source_row_id FROM harvest_pulled_rows "
+                    "SELECT source_row_id, expedited_key, engine_epoch, "
+                    "row_fingerprint, terminal_state FROM harvest_pulled_rows "
                     "WHERE source_host = ? AND source_database = ? "
                     "AND source_generation = ? AND source_table = ?",
                     (source_host, source_identity, source_generation, table),
                 )
             }
-            pending_ids = [
-                int(row[0])
-                for row in source.execute(f'SELECT id FROM "{table}" ORDER BY id')
-                if int(row[0]) not in pulled_ids
-            ]
+
+            pending_ids: list[int] = []
+            for (source_id,) in source.execute(
+                f'SELECT id FROM "{table}" ORDER BY id'
+            ):
+                source_id = int(source_id)
+                receipt = receipts.get(source_id)
+                if receipt is None:
+                    pending_ids.append(source_id)
+                    continue
+                live = source.execute(
+                    f'SELECT * FROM "{table}" WHERE id = ?', (source_id,)
+                ).fetchone()
+                if live is None:
+                    continue
+                live_fp = _row_fingerprint(live, payload_columns)
+                if live_fp != str(receipt["row_fingerprint"]):
+                    # Same generation + reused id with different content: the
+                    # source was restored/rewritten. Re-reconcile by canonical
+                    # key / payload, not by source_row_id alone.
+                    pending_ids.append(source_id)
             if limit is not None:
                 pending_ids = pending_ids[: int(limit)]
             rows = [
@@ -279,7 +448,6 @@ def harvest_snapshot(
 
             source_input_columns = table_columns(source, "grid_keys")
             target_input_columns = set(table_columns(target, "grid_keys"))
-            source_output_columns = table_columns(source, table)
             target_output_columns = set(table_columns(target, table))
             missing_input = set(source_input_columns) - target_input_columns
             missing_output = set(source_output_columns) - target_output_columns
@@ -297,6 +465,7 @@ def harvest_snapshot(
                 if output_row is None:
                     raise RuntimeError("source output disappeared during harvest")
                 source_id = int(output_row["id"])
+                fingerprint = _row_fingerprint(output_row, payload_columns)
                 input_row = source.execute(
                     "SELECT * FROM grid_keys WHERE id = ?",
                     (int(output_row["grid_key_id"]),),
@@ -356,31 +525,7 @@ def harvest_snapshot(
                     raise RuntimeError(
                         f"expedited-key collision while harvesting {input_row['expedited_key']}"
                     )
-                payload_columns = tuple(
-                    column
-                    for column in source_output_columns
-                    if column
-                    not in {"id", "grid_key_id", "source_host", "source_row_id"}
-                )
-                output_values = {
-                    column: output_row[column]
-                    for column in payload_columns
-                }
-                existing_output_id = target.execute(
-                    "SELECT expedited_key, engine_epoch "
-                    "FROM alphamelts_outputs WHERE id = ?",
-                    (source_id,),
-                ).fetchone()
-                if (
-                    existing_output_id is not None
-                    and (
-                        existing_output_id["expedited_key"]
-                        != output_row["expedited_key"]
-                        or int(existing_output_id["engine_epoch"])
-                        != int(output_row["engine_epoch"])
-                    )
-                ):
-                    raise RuntimeError(f"raw output id collision at {source_id}")
+
                 existing_output = target.execute(
                     f'SELECT * FROM "{table}" '
                     "WHERE expedited_key = ? AND engine_epoch = ?",
@@ -396,38 +541,100 @@ def harvest_snapshot(
                     )
                     if same_payload:
                         equivalent += 1
-                    else:
-                        _record_conflict(
+                        _mark_consumed(
                             target,
                             source_host=source_host,
                             source_database=source_identity,
                             source_generation=source_generation,
                             source_table=table,
-                            incoming=output_row,
-                            existing=existing_output,
+                            source_row_id=source_id,
+                            expedited_key=str(output_row["expedited_key"]),
+                            engine_epoch=int(output_row["engine_epoch"]),
+                            row_fingerprint=fingerprint,
+                            terminal_state=_TERMINAL_EQUIVALENT,
                         )
-                        conflicts += 1
+                        max_seen = max(max_seen, source_id)
                         continue
+                    _record_conflict(
+                        target,
+                        source_host=source_host,
+                        source_database=source_identity,
+                        source_generation=source_generation,
+                        source_table=table,
+                        incoming=output_row,
+                        existing=existing_output,
+                    )
+                    conflicts += 1
+                    # Settled conflict: advance the --limit window so later
+                    # source rows are not permanently starved, while the
+                    # conflicts table remains the loud terminal record.
+                    _mark_consumed(
+                        target,
+                        source_host=source_host,
+                        source_database=source_identity,
+                        source_generation=source_generation,
+                        source_table=table,
+                        source_row_id=source_id,
+                        expedited_key=str(output_row["expedited_key"]),
+                        engine_epoch=int(output_row["engine_epoch"]),
+                        row_fingerprint=fingerprint,
+                        terminal_state=_TERMINAL_CONFLICT,
+                    )
+                    max_seen = max(max_seen, source_id)
+                    continue
+
+                existing_by_id = target.execute(
+                    f'SELECT * FROM "{table}" WHERE id = ?',
+                    (source_id,),
+                ).fetchone()
+                if existing_by_id is not None:
+                    # Restored source reused a raw id already held by a different
+                    # canonical key. Do not overwrite; record loudly and settle.
+                    _record_conflict(
+                        target,
+                        source_host=source_host,
+                        source_database=source_identity,
+                        source_generation=source_generation,
+                        source_table=table,
+                        incoming=output_row,
+                        existing=existing_by_id,
+                    )
+                    conflicts += 1
+                    _mark_consumed(
+                        target,
+                        source_host=source_host,
+                        source_database=source_identity,
+                        source_generation=source_generation,
+                        source_table=table,
+                        source_row_id=source_id,
+                        expedited_key=str(output_row["expedited_key"]),
+                        engine_epoch=int(output_row["engine_epoch"]),
+                        row_fingerprint=fingerprint,
+                        terminal_state=_TERMINAL_CONFLICT,
+                    )
+                    max_seen = max(max_seen, source_id)
+                    continue
+
+                output_values = {
+                    column: output_row[column] for column in copyable_columns
+                }
                 output_values["id"] = source_id
                 output_values["grid_key_id"] = int(local_input["id"])
                 output_values["source_host"] = source_host
                 output_values["source_row_id"] = source_id
-                if existing_output is None:
-                    _insert(target, table, output_values)
-                    inserted += 1
-                target.execute(
-                    "INSERT INTO harvest_pulled_rows("
-                    "source_host, source_database, source_generation, "
-                    "source_table, source_row_id, pulled_at"
-                    ") VALUES (?, ?, ?, ?, ?, ?)",
-                    (
-                        source_host,
-                        source_identity,
-                        source_generation,
-                        table,
-                        source_id,
-                        utc_now(),
-                    ),
+                _insert(target, table, output_values)
+                inserted += 1
+                _mark_consumed(
+                    target,
+                    source_host=source_host,
+                    source_database=source_identity,
+                    source_generation=source_generation,
+                    source_table=table,
+                    source_row_id=source_id,
+                    expedited_key=str(output_row["expedited_key"]),
+                    engine_epoch=int(output_row["engine_epoch"]),
+                    row_fingerprint=fingerprint,
+                    terminal_state=_TERMINAL_PULLED,
                 )
                 max_seen = max(max_seen, source_id)
 
@@ -452,10 +659,13 @@ def harvest_snapshot(
             accumulator_total = int(
                 target.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0]
             )
+            # Conflicts are a distinct terminal state: never inflate `pulled`.
+            pulled = inserted + equivalent
             return {
                 "last_seen_before": last_seen,
                 "last_seen_after": max_seen,
-                "pulled": len(rows),
+                "attempted": len(rows),
+                "pulled": pulled,
                 "inserted": inserted,
                 "equivalent": equivalent,
                 "canonical_conflicts_recorded": conflicts,
@@ -535,6 +745,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 limit=args.limit,
             )
     print(json.dumps(summary, sort_keys=True))
+    # Unresolved conflicts this run are a distinct terminal failure for cron.
+    if int(summary.get("canonical_conflicts_recorded", 0)) > 0:
+        return 2
     return 0
 
 

@@ -551,7 +551,7 @@ def test_harvest_reconciles_lower_ids_from_a_later_database(tmp_path):
         ).fetchone()[0] == 2
 
 
-def test_harvest_records_payload_conflict_without_marking_row_pulled(tmp_path):
+def test_harvest_records_payload_conflict_as_distinct_terminal_state(tmp_path):
     first = tmp_path / "first.db"
     conflicting = tmp_path / "conflicting.db"
     accumulator = tmp_path / "accumulator.db"
@@ -569,17 +569,24 @@ def test_harvest_records_payload_conflict_without_marking_row_pulled(tmp_path):
     )
 
     assert conflict_summary["canonical_conflicts_recorded"] == 1
+    # Conflicts must never inflate the successful-pull counter.
+    assert conflict_summary["pulled"] == 0
+    assert conflict_summary["inserted"] == 0
+    assert conflict_summary["attempted"] == 1
     with sqlite3.connect(accumulator) as connection:
         connection.row_factory = sqlite3.Row
         conflict = connection.execute("SELECT * FROM harvest_conflicts").fetchone()
         assert conflict is not None
         assert json.loads(conflict["incoming_row_json"])["status"] == "refused"
         assert json.loads(conflict["existing_row_json"])["status"] == "ok"
-        assert connection.execute(
-            "SELECT COUNT(*) FROM harvest_pulled_rows "
+        # Settled conflict advances the window (consumed) without counting as pull.
+        receipt = connection.execute(
+            "SELECT terminal_state FROM harvest_pulled_rows "
             "WHERE source_database=?",
             (str(conflicting.resolve()),),
-        ).fetchone()[0] == 0
+        ).fetchone()
+        assert receipt is not None
+        assert receipt["terminal_state"] == "conflict"
 
 
 def test_harvest_migrates_legacy_cursor_without_trusting_it(tmp_path):
@@ -632,6 +639,151 @@ def test_harvest_database_generation_detects_same_path_replacement(tmp_path):
         assert connection.execute(
             "SELECT COUNT(DISTINCT source_generation) FROM harvest_state"
         ).fetchone()[0] == 2
+
+
+def test_harvest_restored_id_reuse_re_reconciles_by_fingerprint(tmp_path):
+    """Same generation + reused source id with different content must not vanish.
+
+    Restoring an older DB copy preserves database_id; content-blind pulled-id
+    receipts previously treated the reused id as done and dropped the new row.
+    """
+    source = tmp_path / "source.db"
+    accumulator = tmp_path / "accumulator.db"
+    _write_harvest_source(source, shard=0, temperature_C=1100.0, output=_output())
+    with sqlite3.connect(source) as connection:
+        generation = connection.execute(
+            "SELECT value FROM metadata WHERE key='database_id'"
+        ).fetchone()[0]
+        original_id = connection.execute(
+            "SELECT id FROM alphamelts_outputs"
+        ).fetchone()[0]
+        original_fp_status = connection.execute(
+            "SELECT status FROM alphamelts_outputs WHERE id = ?",
+            (original_id,),
+        ).fetchone()[0]
+
+    first = harvest_snapshot(source, accumulator, source_host="studio-1")
+    assert first["pulled"] == 1
+    assert first["inserted"] == 1
+    assert original_fp_status == "ok"
+
+    # Simulate restore that preserves generation + raw id but rewrites payload
+    # (content-blind receipts would skip; fingerprint forces re-reconcile).
+    with sqlite3.connect(source) as connection:
+        connection.execute(
+            "UPDATE alphamelts_outputs SET status = ?, status_kind = ?, "
+            "refusal_reason = ? WHERE id = ?",
+            ("refused", "refusal", "restored_payload", original_id),
+        )
+        # Generation intentionally unchanged (restore preserves database_id).
+        still = connection.execute(
+            "SELECT value FROM metadata WHERE key='database_id'"
+        ).fetchone()[0]
+        assert still == generation
+        connection.commit()
+
+    second = harvest_snapshot(source, accumulator, source_host="studio-1")
+
+    # Must not silently report pulled=0 with no conflict.
+    assert second["attempted"] == 1
+    assert second["pulled"] == 0
+    assert second["canonical_conflicts_recorded"] == 1
+    with sqlite3.connect(accumulator) as connection:
+        connection.row_factory = sqlite3.Row
+        conflict = connection.execute("SELECT * FROM harvest_conflicts").fetchone()
+        assert conflict is not None
+        assert json.loads(conflict["incoming_row_json"])["status"] == "refused"
+        # First-wins accumulator retained; conflict is loud, not silent loss.
+        assert connection.execute(
+            "SELECT status FROM alphamelts_outputs WHERE id = ?",
+            (original_id,),
+        ).fetchone()[0] == "ok"
+        receipt = connection.execute(
+            "SELECT terminal_state FROM harvest_pulled_rows "
+            "WHERE source_row_id = ?",
+            (original_id,),
+        ).fetchone()
+        assert receipt["terminal_state"] == "conflict"
+
+
+def test_harvest_conflict_limit_does_not_starve_later_rows(tmp_path):
+    """Settled conflicts must advance --limit so later source rows are harvested."""
+    first = tmp_path / "first.db"
+    multi = tmp_path / "multi.db"
+    accumulator = tmp_path / "accumulator.db"
+
+    # Canonical key K lands first (wins).
+    _write_harvest_source(first, shard=0, temperature_C=1200.0, output=_output())
+    harvest_snapshot(first, accumulator, source_host="studio-1")
+
+    # Second source: low-id conflict on same key K, plus a later distinct ok row.
+    with GridCacheWriter(multi) as writer:
+        writer.seed_id_block(1)
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            _inputs(1200.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=1,
+            intended_fO2_log=-9.0,
+        )
+        writer.materialize_key(
+            _inputs(1300.0),
+            batch_id=batch_id,
+            shuffle_rank=1,
+            shard=1,
+            intended_fO2_log=-9.0,
+        )
+        pending = sorted(
+            writer.pending_rows(batch_id=batch_id),
+            key=lambda row: int(row["grid_key_id"]),
+        )
+        assert len(pending) == 2
+        writer.write_result(pending[0]["grid_key_id"], _output("refused"))
+        writer.write_result(pending[1]["grid_key_id"], _output())
+        writer.commit()
+        low_id = int(pending[0]["grid_key_id"])
+        high_id = int(pending[1]["grid_key_id"])
+        assert low_id < high_id
+
+    # Three limited harvests: conflict must not permanently occupy the window.
+    summaries = [
+        harvest_snapshot(multi, accumulator, source_host="studio-1", limit=1)
+        for _ in range(3)
+    ]
+
+    assert summaries[0]["canonical_conflicts_recorded"] == 1
+    assert summaries[0]["pulled"] == 0
+    assert summaries[0]["attempted"] == 1
+
+    assert summaries[1]["inserted"] == 1
+    assert summaries[1]["pulled"] == 1
+    assert summaries[1]["canonical_conflicts_recorded"] == 0
+
+    # Third pass is idle — nothing left pending.
+    assert summaries[2]["attempted"] == 0
+    assert summaries[2]["pulled"] == 0
+    assert summaries[2]["inserted"] == 0
+
+    with sqlite3.connect(accumulator) as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 2
+        assert connection.execute(
+            "SELECT COUNT(*) FROM harvest_conflicts"
+        ).fetchone()[0] == 1
+        states = {
+            row[0]
+            for row in connection.execute(
+                "SELECT terminal_state FROM harvest_pulled_rows "
+                "WHERE source_database=?",
+                (str(multi.resolve()),),
+            )
+        }
+        assert "conflict" in states
+        assert "pulled" in states
 
 
 def test_expedited_key_normalizes_negative_zero_recursively():
