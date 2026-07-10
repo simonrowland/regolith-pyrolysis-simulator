@@ -498,32 +498,73 @@ def harvest_snapshot(
                     raise RuntimeError(
                         f"batch-id collision while harvesting {batch_row['batch_id']}"
                     )
-                input_values = {
-                    column: input_row[column] for column in source_input_columns
-                }
-                existing_grid_id = target.execute(
-                    "SELECT expedited_key FROM grid_keys WHERE id = ?",
-                    (int(input_row["id"]),),
-                ).fetchone()
-                if (
-                    existing_grid_id is not None
-                    and existing_grid_id["expedited_key"] != input_row["expedited_key"]
-                ):
-                    raise RuntimeError(
-                        f"raw grid-key id collision at {input_row['id']}"
-                    )
-                _insert_or_ignore(target, "grid_keys", input_values)
+                # Canonical key is identity. Raw source ids are preferred only
+                # when free; after a restore (fingerprint mismatch) an old id
+                # may carry a different key — never abort before key reconcile.
                 local_input = target.execute(
                     "SELECT id, canonical_vector FROM grid_keys "
                     "WHERE expedited_key = ?",
                     (input_row["expedited_key"],),
                 ).fetchone()
+                if local_input is None:
+                    input_values = {
+                        column: input_row[column]
+                        for column in source_input_columns
+                    }
+                    preferred_grid_id = int(input_row["id"])
+                    grid_id_holder = target.execute(
+                        "SELECT expedited_key FROM grid_keys WHERE id = ?",
+                        (preferred_grid_id,),
+                    ).fetchone()
+                    rank_holder = target.execute(
+                        "SELECT expedited_key FROM grid_keys "
+                        "WHERE batch_id = ? AND shuffle_rank = ?",
+                        (
+                            int(input_row["batch_id"]),
+                            int(input_row["shuffle_rank"]),
+                        ),
+                    ).fetchone()
+                    # Restore can reuse raw id and/or (batch, shuffle_rank) under
+                    # a new key. Prefer source placement only when free; otherwise
+                    # remap so the new key still lands (id identity is void).
+                    id_taken = grid_id_holder is not None
+                    rank_taken = (
+                        rank_holder is not None
+                        and str(rank_holder["expedited_key"])
+                        != str(input_row["expedited_key"])
+                    )
+                    if id_taken or rank_taken:
+                        if id_taken:
+                            input_values = {
+                                key: value
+                                for key, value in input_values.items()
+                                if key != "id"
+                            }
+                        if rank_taken:
+                            free_rank = int(
+                                target.execute(
+                                    "SELECT COALESCE(MAX(shuffle_rank), -1) + 1 "
+                                    "FROM grid_keys WHERE batch_id = ?",
+                                    (int(input_row["batch_id"]),),
+                                ).fetchone()[0]
+                            )
+                            input_values["shuffle_rank"] = free_rank
+                        _insert(target, "grid_keys", input_values)
+                    else:
+                        _insert_or_ignore(target, "grid_keys", input_values)
+                    local_input = target.execute(
+                        "SELECT id, canonical_vector FROM grid_keys "
+                        "WHERE expedited_key = ?",
+                        (input_row["expedited_key"],),
+                    ).fetchone()
                 if (
                     local_input is None
-                    or local_input["canonical_vector"] != input_row["canonical_vector"]
+                    or local_input["canonical_vector"]
+                    != input_row["canonical_vector"]
                 ):
                     raise RuntimeError(
-                        f"expedited-key collision while harvesting {input_row['expedited_key']}"
+                        f"expedited-key collision while harvesting "
+                        f"{input_row['expedited_key']}"
                     )
 
                 existing_output = target.execute(
@@ -583,13 +624,23 @@ def harvest_snapshot(
                     max_seen = max(max_seen, source_id)
                     continue
 
+                # New canonical key: pull as a new row. If the preferred source
+                # id is already held by a different key, remap the local id and
+                # audit the reuse — do not abort or discard the new science.
+                output_values = {
+                    column: output_row[column] for column in copyable_columns
+                }
+                output_values["grid_key_id"] = int(local_input["id"])
+                output_values["source_host"] = source_host
+                output_values["source_row_id"] = source_id
                 existing_by_id = target.execute(
                     f'SELECT * FROM "{table}" WHERE id = ?',
                     (source_id,),
                 ).fetchone()
                 if existing_by_id is not None:
-                    # Restored source reused a raw id already held by a different
-                    # canonical key. Do not overwrite; record loudly and settle.
+                    # Audit: same raw id, different key (restore / id reuse).
+                    # Distinct from payload conflicts (same key, different body):
+                    # both rows are retained; only the local PK is remapped.
                     _record_conflict(
                         target,
                         source_host=source_host,
@@ -599,29 +650,9 @@ def harvest_snapshot(
                         incoming=output_row,
                         existing=existing_by_id,
                     )
-                    conflicts += 1
-                    _mark_consumed(
-                        target,
-                        source_host=source_host,
-                        source_database=source_identity,
-                        source_generation=source_generation,
-                        source_table=table,
-                        source_row_id=source_id,
-                        expedited_key=str(output_row["expedited_key"]),
-                        engine_epoch=int(output_row["engine_epoch"]),
-                        row_fingerprint=fingerprint,
-                        terminal_state=_TERMINAL_CONFLICT,
-                    )
-                    max_seen = max(max_seen, source_id)
-                    continue
-
-                output_values = {
-                    column: output_row[column] for column in copyable_columns
-                }
-                output_values["id"] = source_id
-                output_values["grid_key_id"] = int(local_input["id"])
-                output_values["source_host"] = source_host
-                output_values["source_row_id"] = source_id
+                    # Leave output_values["id"] unset → AUTOINCREMENT remaps.
+                else:
+                    output_values["id"] = source_id
                 _insert(target, table, output_values)
                 inserted += 1
                 _mark_consumed(

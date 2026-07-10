@@ -706,6 +706,222 @@ def test_harvest_restored_id_reuse_re_reconciles_by_fingerprint(tmp_path):
         assert receipt["terminal_state"] == "conflict"
 
 
+def _rewrite_source_key_preserving_ids(
+    path, *, temperature_C: float, output_status: str = "ok"
+) -> str:
+    """Simulate a restore: keep database_id + raw ids, change canonical key."""
+    with GridCacheWriter(path) as writer:
+        connection = writer.connection
+        generation = connection.execute(
+            "SELECT value FROM metadata WHERE key='database_id'"
+        ).fetchone()[0]
+        grid = connection.execute(
+            "SELECT id, batch_id, shuffle_rank, shard FROM grid_keys"
+        ).fetchone()
+        out_id = int(
+            connection.execute("SELECT id FROM alphamelts_outputs").fetchone()[0]
+        )
+        values = writer._grid_key_values(
+            _inputs(temperature_C),
+            batch_id=int(grid["batch_id"]),
+            shuffle_rank=int(grid["shuffle_rank"]),
+            shard=int(grid["shard"]),
+            intended_fO2_log=-9.0,
+        )
+        assignments = ", ".join(f'"{column}" = ?' for column in values)
+        connection.execute(
+            f"UPDATE grid_keys SET {assignments} WHERE id = ?",
+            (*values.values(), int(grid["id"])),
+        )
+        connection.execute(
+            "UPDATE alphamelts_outputs SET expedited_key = ?, status = ?, "
+            "status_kind = ?, refusal_reason = ? WHERE id = ?",
+            (
+                values["expedited_key"],
+                output_status,
+                "success" if output_status == "ok" else "refusal",
+                None if output_status == "ok" else "restored_payload",
+                out_id,
+            ),
+        )
+        still = connection.execute(
+            "SELECT value FROM metadata WHERE key='database_id'"
+        ).fetchone()[0]
+        assert still == generation
+        writer.commit()
+        return str(values["expedited_key"])
+
+
+def test_harvest_restore_reconciles_by_canonical_key_not_raw_id(tmp_path):
+    """After restore (fingerprint mismatch), id identity is void.
+
+    Reconcile purely by canonical key:
+      (a) same-key same-id  → already-pulled / equivalent, no wedge
+      (b) new-key reused-id → NEW row under its key, id-reuse audited
+      (c) new-key new-id    → NEW row, normal pull
+    No abort path may precede this reconciliation.
+    """
+    source = tmp_path / "source.db"
+    accumulator = tmp_path / "accumulator.db"
+    _write_harvest_source(source, shard=0, temperature_C=1100.0, output=_output())
+    with sqlite3.connect(source) as connection:
+        original_id = int(
+            connection.execute("SELECT id FROM alphamelts_outputs").fetchone()[0]
+        )
+        original_key = connection.execute(
+            "SELECT expedited_key FROM alphamelts_outputs"
+        ).fetchone()[0]
+        generation = connection.execute(
+            "SELECT value FROM metadata WHERE key='database_id'"
+        ).fetchone()[0]
+
+    first = harvest_snapshot(source, accumulator, source_host="studio-1")
+    assert first["inserted"] == 1
+    assert first["pulled"] == 1
+
+    # (a) same-key same-id: restore rewrites payload-equivalent science at same id.
+    # Fingerprint matches → nothing pending; must not abort or double-insert.
+    with sqlite3.connect(source) as connection:
+        connection.execute(
+            "UPDATE alphamelts_outputs SET host = ? WHERE id = ?",
+            ("restored-host", original_id),
+        )
+        assert (
+            connection.execute(
+                "SELECT value FROM metadata WHERE key='database_id'"
+            ).fetchone()[0]
+            == generation
+        )
+        connection.commit()
+    case_a = harvest_snapshot(source, accumulator, source_host="studio-1")
+    assert case_a["attempted"] == 0
+    assert case_a["inserted"] == 0
+    assert case_a["pulled"] == 0
+    assert case_a["canonical_conflicts_recorded"] == 0
+    with sqlite3.connect(accumulator) as connection:
+        assert (
+            connection.execute("SELECT COUNT(*) FROM alphamelts_outputs").fetchone()[0]
+            == 1
+        )
+
+    # (b) new-key reused-id: previously pulled id now carries a different key.
+    # Must pull as a NEW row (remap local id), audit id-reuse, never abort.
+    new_key_b = _rewrite_source_key_preserving_ids(source, temperature_C=1500.0)
+    assert new_key_b != original_key
+    with sqlite3.connect(source) as connection:
+        reused_id = int(
+            connection.execute("SELECT id FROM alphamelts_outputs").fetchone()[0]
+        )
+        assert reused_id == original_id
+        assert (
+            connection.execute(
+                "SELECT value FROM metadata WHERE key='database_id'"
+            ).fetchone()[0]
+            == generation
+        )
+
+    case_b = harvest_snapshot(source, accumulator, source_host="studio-1")
+    assert case_b["attempted"] == 1
+    assert case_b["inserted"] == 1
+    assert case_b["pulled"] == 1
+    # Id-reuse is audited in harvest_conflicts but is not a payload conflict:
+    # the new science is retained, so do not inflate the failure counter.
+    assert case_b["canonical_conflicts_recorded"] == 0
+    with sqlite3.connect(accumulator) as connection:
+        connection.row_factory = sqlite3.Row
+        assert (
+            connection.execute("SELECT COUNT(*) FROM alphamelts_outputs").fetchone()[0]
+            == 2
+        )
+        keys = {
+            row[0]
+            for row in connection.execute(
+                "SELECT expedited_key FROM alphamelts_outputs"
+            )
+        }
+        assert original_key in keys
+        assert new_key_b in keys
+        remapped = connection.execute(
+            "SELECT id, source_row_id, expedited_key FROM alphamelts_outputs "
+            "WHERE expedited_key = ?",
+            (new_key_b,),
+        ).fetchone()
+        assert remapped is not None
+        assert int(remapped["source_row_id"]) == original_id
+        # Local PK remapped away from the reused source id.
+        assert int(remapped["id"]) != original_id
+        audit = connection.execute(
+            "SELECT existing_output_id, expedited_key, "
+            "existing_row_json, incoming_row_json FROM harvest_conflicts "
+            "WHERE source_row_id = ?",
+            (original_id,),
+        ).fetchone()
+        assert audit is not None
+        assert audit["expedited_key"] == new_key_b
+        assert int(audit["existing_output_id"]) == original_id
+        assert json.loads(audit["existing_row_json"])["expedited_key"] == original_key
+        assert json.loads(audit["incoming_row_json"])["expedited_key"] == new_key_b
+        receipt = connection.execute(
+            "SELECT terminal_state, expedited_key FROM harvest_pulled_rows "
+            "WHERE source_row_id = ?",
+            (original_id,),
+        ).fetchone()
+        assert receipt["terminal_state"] == "pulled"
+        assert receipt["expedited_key"] == new_key_b
+
+    # (c) new-key new-id: restored source also gains a never-seen id+key.
+    with GridCacheWriter(source) as writer:
+        batch_id = int(
+            writer.connection.execute("SELECT batch_id FROM batches").fetchone()[0]
+        )
+        writer.materialize_key(
+            _inputs(1600.0),
+            batch_id=batch_id,
+            shuffle_rank=1,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        pending = [
+            row
+            for row in writer.pending_rows(batch_id=batch_id)
+            if int(row["grid_key_id"]) != original_id
+        ]
+        assert len(pending) == 1
+        writer.write_result(pending[0]["grid_key_id"], _output())
+        new_id_c = int(pending[0]["grid_key_id"])
+        new_key_c = str(pending[0]["expedited_key"])
+        assert new_id_c != original_id
+        assert new_key_c not in {original_key, new_key_b}
+        still = writer.connection.execute(
+            "SELECT value FROM metadata WHERE key='database_id'"
+        ).fetchone()[0]
+        assert still == generation
+        writer.commit()
+
+    case_c = harvest_snapshot(source, accumulator, source_host="studio-1")
+    assert case_c["attempted"] == 1
+    assert case_c["inserted"] == 1
+    assert case_c["pulled"] == 1
+    assert case_c["canonical_conflicts_recorded"] == 0
+    with sqlite3.connect(accumulator) as connection:
+        assert (
+            connection.execute("SELECT COUNT(*) FROM alphamelts_outputs").fetchone()[0]
+            == 3
+        )
+        assert (
+            connection.execute(
+                "SELECT COUNT(*) FROM alphamelts_outputs WHERE expedited_key = ?",
+                (new_key_c,),
+            ).fetchone()[0]
+            == 1
+        )
+        # No wedge: a further pass is idle.
+    idle = harvest_snapshot(source, accumulator, source_host="studio-1")
+    assert idle["attempted"] == 0
+    assert idle["inserted"] == 0
+    assert idle["pulled"] == 0
+
+
 def test_harvest_conflict_limit_does_not_starve_later_rows(tmp_path):
     """Settled conflicts must advance --limit so later source rows are harvested."""
     first = tmp_path / "first.db"
