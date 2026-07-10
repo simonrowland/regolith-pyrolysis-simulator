@@ -898,6 +898,12 @@ class ExtractionMixin:
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.electrolysis import ELECTRONS_PER_OXIDE
 
+        mre_diagnostic_state_before_step = {
+            'uncertified_yield': dict(
+                getattr(self, '_mre_uncertified_yield', {}) or {}),
+            'ellingham_ladder_diagnostic': dict(
+                getattr(self, '_mre_ellingham_ladder_diagnostic', {}) or {}),
+        }
         self._mre_uncertified_yield = {}
         self._mre_ellingham_ladder_diagnostic = {}
         if (
@@ -927,6 +933,13 @@ class ExtractionMixin:
                 self.melt, 'mre_c5_on_final_rung', False),
             'melt_c5_ladder_complete': getattr(
                 self.melt, 'mre_c5_ladder_complete', False),
+            'melt_declared_rung_V': getattr(
+                self.melt, 'mre_declared_rung_V', 0.0),
+            'uncertified_yield': dict(
+                mre_diagnostic_state_before_step['uncertified_yield']),
+            'ellingham_ladder_diagnostic': dict(
+                mre_diagnostic_state_before_step[
+                    'ellingham_ladder_diagnostic']),
         }
         if self.melt.campaign == CampaignPhase.MRE_BASELINE:
             seq = self._mre_voltage_sequence
@@ -1184,7 +1197,8 @@ class ExtractionMixin:
             self._mre_effective_current_A = 0.0
             self._mre_energy_this_hr = 0.0
             self.melt.mre_voltage_V = 0.0
-            self.melt.mre_declared_rung_V = 0.0
+            self.melt.mre_declared_rung_V = float(
+                mre_replay_state_before_dispatch['melt_declared_rung_V'])
             self.melt.mre_current_A = 0.0
             self._mre_hold_hours = int(
                 mre_replay_state_before_dispatch['hold_hours'])
@@ -1198,6 +1212,11 @@ class ExtractionMixin:
                 mre_replay_state_before_dispatch['melt_c5_on_final_rung'])
             self.melt.mre_c5_ladder_complete = bool(
                 mre_replay_state_before_dispatch['melt_c5_ladder_complete'])
+            self._mre_uncertified_yield = dict(
+                mre_replay_state_before_dispatch['uncertified_yield'])
+            self._mre_ellingham_ladder_diagnostic = dict(
+                mre_replay_state_before_dispatch[
+                    'ellingham_ladder_diagnostic'])
             reason = diagnostic.get('reason_refused', 'electrolysis_step_refused')
             raise RuntimeError(f'MRE electrolysis refused: {reason}')
         if proposal is not None:

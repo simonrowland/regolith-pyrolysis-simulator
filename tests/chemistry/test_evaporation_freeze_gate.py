@@ -1769,6 +1769,9 @@ def test_mre_zero_transition_refusal_does_not_advance_rung_state(
     sim._mre_voltage_step_idx = 0
     sim._mre_rung_ever_effective = True
     sim._mre_effective_current_A = 0.0
+    sim.melt.mre_declared_rung_V = 0.75
+    sim._mre_uncertified_yield = {'previous': {'kg': 1.0}}
+    sim._mre_ellingham_ladder_diagnostic = {'schema': 'previous'}
 
     def refused_dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.ELECTROLYSIS_STEP:
@@ -1788,6 +1791,9 @@ def test_mre_zero_transition_refusal_does_not_advance_rung_state(
     assert sim._mre_hold_hours == 2
     assert sim._mre_voltage_step_idx == 0
     assert sim._mre_rung_ever_effective is True
+    assert sim.melt.mre_declared_rung_V == pytest.approx(0.75)
+    assert sim._mre_uncertified_yield == {'previous': {'kg': 1.0}}
+    assert sim._mre_ellingham_ladder_diagnostic == {'schema': 'previous'}
     assert sim._poisoned_hour is None
 
 
@@ -1825,6 +1831,8 @@ def test_shuttle_bakeout_cycle_counter_waits_for_successful_hour(
         sim.step()
 
     assert sim.shuttle_cycle_K == 0
+    assert sim._pending_shuttle_bakeout_cycle_increment == ''
+    assert sim._make_snapshot().shuttle_cycle == 0
     assert sim._poisoned_hour is None
 
 

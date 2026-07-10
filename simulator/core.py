@@ -9623,6 +9623,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         try:
             return self._step_one_hour()
         except BaseException as exc:
+            self._pending_shuttle_bakeout_cycle_increment = ''
             committed_transition_count = max(
                 0,
                 len(self.atom_ledger.transitions) - transition_count_before,
