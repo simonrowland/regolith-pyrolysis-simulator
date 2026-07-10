@@ -312,9 +312,10 @@ def test_c2a_recipe_free_molecular_transport_is_refused(monkeypatch):
     document = run._run_session(session)
     diagnostic = document["run_metadata"]["knudsen_regime_diagnostic"]
 
-    assert document["status"] == "refused"
-    assert document["reason"] == "knudsen_outside_viscous_flow"
-    assert document["error_message"] == "knudsen_outside_viscous_flow"
+    assert document["status"] == "failed"
+    assert document["reason"] == "poisoned_hour"
+    assert "knudsen_outside_viscous_flow" in document["error_message"]
+    assert "PoisonedHourError" in document["error_message"]
     assert diagnostic["status"] == "refused"
     assert diagnostic["reason"] == "knudsen_outside_viscous_flow"
     assert any(

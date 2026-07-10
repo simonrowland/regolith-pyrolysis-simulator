@@ -47,12 +47,13 @@ evidence.
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Tuple
+from typing import Dict, List, Mapping, Tuple
 
+from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
 )
-from simulator.mre_ladder import DECOMP_VOLTAGES
+from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_reference
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
@@ -77,14 +78,57 @@ MRE_CURRENT_PARTITION_SOURCE = (
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
+MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
+# C1-01 validates the fallback/raw acceptance split for FeO.  Other fallback
+# oxides keep their existing policy until their margins are independently
+# validated; their raw requirements are still surfaced in diagnostics below.
+MRE_RAW_MARGIN_GUARDED_OXIDES = frozenset({"FeO"})
 MRE_FIXED_REDUCIBLE_OXIDES = tuple(
     oxide for oxide in DECOMP_VOLTAGES
     if oxide != 'Fe2O3'
 )
 
 
-def min_decomposition_voltage() -> float:
-    return min(DECOMP_VOLTAGES.values())
+def min_decomposition_voltage(*, temperature_K: float | None = None) -> float:
+    voltages = [
+        reference.voltage
+        for oxide in MRE_FIXED_REDUCIBLE_OXIDES
+        if (
+            reference := mre_decomposition_voltage_reference(
+                oxide,
+                temperature_K=temperature_K,
+            )
+        ) is not None
+    ]
+    return min(voltages) if voltages else min(DECOMP_VOLTAGES.values())
+
+
+def melt_account_mol_from_kg(
+    composition_kg: Mapping[str, float],
+) -> dict[str, float]:
+    account_mol: dict[str, float] = {}
+    for oxide, kg in composition_kg.items():
+        molar_mass = MOLAR_MASS.get(str(oxide))
+        if molar_mass is None:
+            continue
+        try:
+            kg_value = float(kg)
+        except (TypeError, ValueError):
+            continue
+        if kg_value <= 0.0:
+            continue
+        account_mol[str(oxide)] = kg_value * 1000.0 / molar_mass
+    return account_mol
+
+
+def mre_oxide_activity(
+    oxide: str,
+    account_mol: Mapping[str, float],
+) -> float:
+    activity = melt_oxide_activity(oxide, account_mol)
+    if activity is None:
+        return 0.0
+    return max(0.0, float(activity.activity))
 
 
 # Electrons transferred per formula unit of oxide reduced
@@ -252,9 +296,10 @@ class ElectrolysisModel:
         Returns:
             Adjusted decomposition voltage (V)
         """
-        E0 = self.decomp_voltages.get(oxide, 2.5)
         n = ELECTRONS_PER_OXIDE.get(oxide, 2)
         T_K = T_C + CELSIUS_TO_KELVIN_OFFSET
+        reference = mre_decomposition_voltage_reference(oxide, temperature_K=T_K)
+        E0 = 2.5 if reference is None else reference.voltage
 
         if activity <= 1e-10:
             return E0 + 1.0  # Very high — species essentially depleted
@@ -317,6 +362,7 @@ class ElectrolysisModel:
                 energy_kWh:         float
         """
         comp = melt_state.composition_wt_pct()
+        melt_account_mol = melt_account_mol_from_kg(melt_state.composition_kg)
         feo_fraction = max(0.0, comp.get('FeO', 0.0)) / 100.0
         result = {
             'oxides_reduced_kg': {},
@@ -340,6 +386,14 @@ class ElectrolysisModel:
             'current_efficiency_model': CURRENT_EFFICIENCY_MODEL_ID,
             'current_efficiency_feo_fraction': feo_fraction,
             'current_efficiency_by_oxide': {},
+            'mre_activity_model': 'gamma_x_single_cation',
+            'mre_oxide_activity_by_oxide': {},
+            'mre_decomposition_voltage_authority_by_oxide': {},
+            'mre_decomposition_voltage_authoritative_by_oxide': {},
+            'mre_decomposition_voltage_status_by_oxide': {},
+            'mre_raw_graph_requirement_V_by_oxide': {},
+            'mre_raw_voltage_margin_V_by_oxide': {},
+            'mre_raw_margin_refused_targets': {},
         }
 
         # Find all reducible species at this voltage
@@ -350,17 +404,68 @@ class ElectrolysisModel:
             if melt_state.composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
 
-            # Crude activity ≈ wt_fraction
-            activity = comp.get(oxide, 0.0) / 100.0
+            activity = mre_oxide_activity(oxide, melt_account_mol)
+            reference = mre_decomposition_voltage_reference(
+                oxide,
+                temperature_K=T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
+            result['mre_oxide_activity_by_oxide'][oxide] = activity
+            if reference is not None:
+                result['mre_decomposition_voltage_authority_by_oxide'][oxide] = (
+                    reference.authority
+                )
+                result['mre_decomposition_voltage_authoritative_by_oxide'][oxide] = (
+                    reference.authoritative
+                )
+                result['mre_decomposition_voltage_status_by_oxide'][oxide] = (
+                    reference.status
+                )
             E_nernst = self.nernst_voltage(
                 oxide, T_C, activity, pO2_bar=pO2_bar)
 
-            if E_nernst < voltage_V:
-                overvoltage = voltage_V - E_nernst
+            fallback_margin_V = voltage_V - E_nernst
+            raw_margin_V = None
+            if (
+                reference is not None
+                and reference.raw_graph_voltage_V is not None
+            ):
+                # The Nernst activity/pO2 shift is identical for the selected
+                # fallback and raw graph E0.  Replacing E0 therefore shifts the
+                # full requirement by exactly (E0_raw - E0_fallback).
+                raw_requirement_V = (
+                    E_nernst
+                    + reference.raw_graph_voltage_V
+                    - reference.voltage
+                )
+                raw_margin_V = voltage_V - raw_requirement_V
+                result['mre_raw_graph_requirement_V_by_oxide'][oxide] = (
+                    raw_requirement_V
+                )
+                result['mre_raw_voltage_margin_V_by_oxide'][oxide] = raw_margin_V
+
+            if (
+                fallback_margin_V > 0.0
+                and oxide in MRE_RAW_MARGIN_GUARDED_OXIDES
+                and reference is not None
+                and not reference.authoritative
+                and raw_margin_V is not None
+                and raw_margin_V <= 0.0
+            ):
+                result['mre_raw_margin_refused_targets'][oxide] = {
+                    'fallback_requirement_V': E_nernst,
+                    'fallback_margin_V': fallback_margin_V,
+                    'raw_requirement_V': raw_requirement_V,
+                    'raw_margin_V': raw_margin_V,
+                    'voltage_status': reference.status,
+                }
+                continue
+
+            if fallback_margin_V > 0.0:
+                overvoltage = fallback_margin_V
                 reducible.append((oxide, E_nernst, overvoltage, activity, "oxide_to_metal"))
 
         if melt_state.composition_kg.get('Fe2O3', 0.0) >= 1e-6:
-            activity = comp.get('Fe2O3', 0.0) / 100.0
+            activity = mre_oxide_activity('Fe2O3', melt_account_mol)
             E_ferric = self.ferric_to_ferrous_voltage(
                 T_C, activity, pO2_bar=pO2_bar)
             if E_ferric < voltage_V:
@@ -375,6 +480,8 @@ class ElectrolysisModel:
         if not reducible:
             if voltage_V > 0.0 and current_A > 0.0:
                 result['energy_kWh'] = voltage_V * current_A / 1000.0
+            if result['mre_raw_margin_refused_targets']:
+                result['reason_refused'] = MRE_RAW_MARGIN_REFUSAL
             return result
 
         refused_targets = uncertified_multi_oxide_partition_targets(reducible)
@@ -491,13 +598,13 @@ class ElectrolysisModel:
         Useful for showing the operator what will reduce first
         at the current melt composition and temperature.
         """
-        comp = melt_state.composition_wt_pct()
+        melt_account_mol = melt_account_mol_from_kg(melt_state.composition_kg)
         sequence = []
 
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if melt_state.composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
-            activity = comp.get(oxide, 0.0) / 100.0
+            activity = mre_oxide_activity(oxide, melt_account_mol)
             E = self.nernst_voltage(oxide, T_C, activity, pO2_bar=pO2_bar)
             sequence.append((oxide, E))
 
@@ -514,11 +621,14 @@ class ElectrolysisModel:
         Rough estimate by summing Faraday energy for all species
         below the target voltage, divided by estimated efficiency.
         """
-        comp = melt_state.composition_wt_pct()
+        T_K = T_C + CELSIUS_TO_KELVIN_OFFSET
         total_energy = 0.0
 
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
-            E0 = self.decomp_voltages[oxide]
+            reference = mre_decomposition_voltage_reference(oxide, temperature_K=T_K)
+            if reference is None:
+                continue
+            E0 = reference.voltage
             if E0 > max_voltage_V:
                 continue
             kg = melt_state.composition_kg.get(oxide, 0.0)

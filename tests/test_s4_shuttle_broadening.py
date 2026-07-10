@@ -188,10 +188,10 @@ def test_v1c_janaf_alkali_shuttle_crossovers_are_documented():
     provider = BuiltinMetallothermicStepProvider
 
     assert provider._crossover_temperature_C("K", "Fe") == pytest.approx(
-        832.0, abs=_CROSSOVER_TOL_C
+        836.25, abs=_CROSSOVER_TOL_C
     )
     assert provider._crossover_temperature_C("Na", "Fe") == pytest.approx(
-        1173.4, abs=_CROSSOVER_TOL_C
+        1181.5, abs=_CROSSOVER_TOL_C
     )
     assert provider._crossover_temperature_C("Na", "Cr") is None
     assert provider._crossover_temperature_C("Na", "Ti") is None

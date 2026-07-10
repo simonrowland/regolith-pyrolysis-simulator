@@ -58,6 +58,7 @@ from simulator.chemistry.kernel import (
 )
 from simulator.core import (
     CampaignPhase,
+    DEGRADED_PATH_ENGAGEMENT_KEYS,
     PyrolysisSimulator,
 )
 from simulator.condensation import (
@@ -70,7 +71,12 @@ from simulator.diagnostics import (
     wall_deposit_sticking_authority_status,
 )
 from simulator.pumping_cost import pumping_context_from_sim
-from simulator.run_executor import RunExecution, RunExecutor, _json_safe
+from simulator.run_executor import (
+    RunExecution,
+    RunExecutor,
+    _json_safe,
+    _safe_exception_text,
+)
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
@@ -92,7 +98,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.3.1"
+RUNNER_SCHEMA_VERSION = "1.3.3"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -974,6 +980,47 @@ class PyrolysisRun:
         self,
         execution: RunExecution,
     ) -> dict:
+        if execution.envelope_detail_unavailable:
+            return self._minimal_failure_output(execution)
+        try:
+            return self._build_output_detail(execution)
+        except Exception as exc:  # noqa: BLE001 -- failure reporting must survive
+            if execution.status != "failed":
+                raise
+            return self._minimal_failure_output(
+                execution,
+                detail=f"envelope detail unavailable: {_safe_exception_text(exc)}",
+            )
+
+    def _minimal_failure_output(
+        self,
+        execution: RunExecution,
+        *,
+        detail: str | None = None,
+    ) -> dict[str, Any]:
+        detail = detail or execution.envelope_detail_unavailable
+        error_message = execution.error_message
+        if detail:
+            error_message = f"{error_message}\n{detail}"
+        return _runner_failure_result(
+            error=RunnerError(execution.error_message),
+            feedstock_id=self.feedstock_id,
+            campaign=self.campaign,
+            hours=self.hours,
+            mass_kg=self.mass_kg,
+            additives_kg=self.additives_kg,
+            track=self.track,
+            backend_name=self.backend_name,
+            engines=self.engines,
+            metadata_overrides=self.run_metadata_overrides,
+            reason=execution.reason,
+            error_message_override=error_message,
+        )
+
+    def _build_output_detail(
+        self,
+        execution: RunExecution,
+    ) -> dict:
         sim = execution.simulator
         metadata_overrides = dict(self.run_metadata_overrides)
         started_at_utc = metadata_overrides.pop(
@@ -1091,15 +1138,15 @@ class PyrolysisRun:
         # cleanup quietly missing.  Empty list when no refusals.
         shuttle_refusal_history = list(
             getattr(sim, "_shuttle_refusal_history", []) or [])
+        melt_redox_gate_floor_fallback_engagement = (
+            _melt_redox_gate_floor_fallback_engagement(sim)
+        )
+        degraded_path_engagement = _degraded_path_engagement(sim)
         pO2_enforcement_by_hour = [
             dict(row["pO2_enforcement"])
             for row in execution.per_hour
             if isinstance(row, Mapping) and isinstance(row.get("pO2_enforcement"), Mapping)
         ]
-        c7_product_report = dict(
-            getattr(sim, "_c7_product_report", {}) or {})
-        c7_refusal_diagnostic = dict(
-            getattr(sim, "_last_c7_refusal_diagnostic", {}) or {})
         status, reason, error_message = _status_with_mass_balance_invariant(
             execution)
 
@@ -1111,6 +1158,12 @@ class PyrolysisRun:
             "stage_purity_report": stage_purity_report(sim.train),
             "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
             "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
+            "c7_product_report": _json_safe(_c7_product_report(sim)),
+            "c7_refusal_diagnostic": _json_safe(_c7_refusal_diagnostic(sim)),
+            "degraded_path_engagement": degraded_path_engagement,
+            "melt_redox_gate_floor_fallback_engagement": (
+                melt_redox_gate_floor_fallback_engagement
+            ),
             "pO2_enforcement_by_hour": _json_safe(pO2_enforcement_by_hour),
             "per_hour_summary": list(execution.per_hour),
             "shadow_trace": list(execution.shadow_trace),
@@ -1118,10 +1171,6 @@ class PyrolysisRun:
             "reason": reason,
             "error_message": error_message,
         }
-        if c7_product_report:
-            payload["c7_product_report"] = _json_safe(c7_product_report)
-        if c7_refusal_diagnostic:
-            payload["c7_refusal_diagnostic"] = _json_safe(c7_refusal_diagnostic)
         return payload
 
     def _engines_used(self, sim: PyrolysisSimulator) -> dict[str, object]:
@@ -1262,18 +1311,38 @@ def _positive_mass_kg(value: Any, *, field: str = "mass_kg") -> float:
     return mass_kg
 
 
-def _latest_execution_mass_balance_pct(execution: RunExecution) -> float | None:
+def _worst_execution_mass_balance_pct(execution: RunExecution) -> float | None:
+    values: list[float] = []
     snapshots = tuple(getattr(execution, "snapshots", ()) or ())
-    if snapshots:
-        raw = getattr(snapshots[-1], "mass_balance_error_pct", None)
+    for index, snapshot in enumerate(snapshots):
+        raw = getattr(snapshot, "mass_balance_error_pct", None)
         if raw is not None:
-            return _coerce_mass_balance_pct(
-                raw, source="execution.snapshots[-1]",
+            values.append(
+                _coerce_mass_balance_pct(
+                    raw, source=f"execution.snapshots[{index}]",
+                )
             )
-    per_hour = tuple(getattr(execution, "per_hour", ()) or ())
-    if per_hour:
-        return _latest_mass_balance_pct({"per_hour_summary": per_hour})
-    return None
+
+    if not values:
+        per_hour = tuple(getattr(execution, "per_hour", ()) or ())
+        for index, row in enumerate(per_hour):
+            if not isinstance(row, Mapping):
+                raise EngineBugAbort(
+                    f"mass_balance_snapshot_malformed: source=per_hour_summary[{index}]"
+                )
+            values.append(
+                _required_mass_balance_value(
+                    row,
+                    "mass_balance_pct",
+                    source=f"per_hour_summary[{index}]",
+                )
+            )
+
+    if not values:
+        return None
+    # Closure is a per-hour invariant, so later cancellation cannot erase the
+    # largest absolute excursion observed during the run.
+    return max(values, key=abs)
 
 
 def _execution_mass_balance_error_category(execution: RunExecution) -> str:
@@ -1325,7 +1394,7 @@ def _status_with_mass_balance_invariant(
         error_message = f"mass_balance_error_category: {category}"
         return "failed", reason, error_message
 
-    mass_balance_pct = _latest_execution_mass_balance_pct(execution)
+    mass_balance_pct = _worst_execution_mass_balance_pct(execution)
     if (
         mass_balance_pct is None
         or abs(mass_balance_pct) <= RUNNER_MASS_BALANCE_LIMIT_PCT
@@ -1494,6 +1563,81 @@ def _mre_ellingham_ladder_diagnostic_observables(
     if not summary:
         return {}
     return {"mre_ellingham_ladder_diagnostic": _json_safe(summary)}
+
+
+def _c7_product_report(
+    sim: PyrolysisSimulator | None = None,
+) -> dict[str, Any]:
+    if sim is None:
+        return {}
+    return dict(getattr(sim, "_c7_product_report", {}) or {})
+
+
+def _c7_refusal_diagnostic(
+    sim: PyrolysisSimulator | None = None,
+) -> dict[str, Any]:
+    if sim is None:
+        return {}
+    return dict(getattr(sim, "_last_c7_refusal_diagnostic", {}) or {})
+
+
+def _empty_melt_redox_gate_floor_fallback_engagement() -> dict[str, Any]:
+    return {
+        "engaged": False,
+        "total_count": 0,
+        "by_hour": [],
+    }
+
+
+def _empty_degraded_path_engagement_entry() -> dict[str, Any]:
+    return {
+        "engaged": False,
+        "total_count": 0,
+        "by_hour": [],
+    }
+
+
+def _empty_degraded_path_engagement() -> dict[str, dict[str, Any]]:
+    return {
+        path: _empty_degraded_path_engagement_entry()
+        for path in DEGRADED_PATH_ENGAGEMENT_KEYS
+    }
+
+
+def _degraded_path_engagement(
+    sim: PyrolysisSimulator,
+) -> dict[str, dict[str, Any]]:
+    raw_summary = dict(sim._degraded_path_engagement_summary() or {})
+    unknown_paths = set(raw_summary) - set(DEGRADED_PATH_ENGAGEMENT_KEYS)
+    if unknown_paths:
+        raise RunnerError(
+            "unknown degraded path engagement keys: "
+            + ", ".join(sorted(unknown_paths))
+        )
+    summary = _empty_degraded_path_engagement()
+    for path, raw_path_summary in raw_summary.items():
+        total_count = int(raw_path_summary.get("total_count", 0) or 0)
+        summary[path].update(
+            engaged=total_count > 0,
+            total_count=total_count,
+            by_hour=_json_safe(
+                list(raw_path_summary.get("by_hour", ()) or ())
+            ),
+        )
+    return summary
+
+
+def _melt_redox_gate_floor_fallback_engagement(
+    sim: PyrolysisSimulator,
+) -> dict[str, Any]:
+    raw_summary = sim._melt_redox_liquidus_gate_fallback_summary()
+    summary = _empty_melt_redox_gate_floor_fallback_engagement()
+    summary.update(
+        engaged=bool(raw_summary.get("engaged", False)),
+        total_count=int(raw_summary.get("total_count", 0) or 0),
+        by_hour=_json_safe(list(raw_summary.get("recent_hourly", ()) or ())),
+    )
+    return summary
 
 
 def build_per_hour_summary(
@@ -3130,6 +3274,8 @@ def _runner_failure_result(
     backend_name: str,
     engines: Mapping[str, str],
     metadata_overrides: Mapping[str, Any],
+    reason: str = "",
+    error_message_override: str | None = None,
 ) -> dict[str, Any]:
     overrides = dict(metadata_overrides)
     started_at_utc = overrides.pop(
@@ -3172,12 +3318,22 @@ def _runner_failure_result(
             "total_species": 0,
         },
         "shuttle_refusal_history": [],
+        "c7_product_report": _c7_product_report(),
+        "c7_refusal_diagnostic": _c7_refusal_diagnostic(),
+        "degraded_path_engagement": _empty_degraded_path_engagement(),
+        "melt_redox_gate_floor_fallback_engagement": (
+            _empty_melt_redox_gate_floor_fallback_engagement()
+        ),
         "pO2_enforcement_by_hour": [],
         "per_hour_summary": [],
         "shadow_trace": [],
         "status": "failed",
-        "reason": "",
-        "error_message": f"RunnerError: {error}",
+        "reason": reason,
+        "error_message": (
+            error_message_override
+            if error_message_override is not None
+            else f"RunnerError: {error}"
+        ),
     }
 
 

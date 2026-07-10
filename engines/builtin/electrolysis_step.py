@@ -8,9 +8,9 @@ exactly -- this is a refactor of where the
 :class:`LedgerTransitionProposal` is built, not a re-derivation of the
 oxide-reduction physics (the legacy module retains the canonical
 ``ElectrolysisModel`` for Nernst voltage lookups, voltage sequences, and
-operator-facing summaries; the provider re-uses the same ``DECOMP_VOLTAGES``
-+ ``ELECTRONS_PER_OXIDE`` tables and the same partition / Faraday / CE
-formulas).
+operator-facing summaries; the provider re-uses the same graph-first E0(T)
+helper, static fallback anchor, ``ELECTRONS_PER_OXIDE`` table, and partition /
+Faraday / CE formulas).
 
 The provider:
 
@@ -37,9 +37,10 @@ The provider:
     correct if the simulator's tick ever changes -- the t_s = 3600 s
     Faraday integration scales with this).
 
-The wt% composition that drives the activity proxy is computed from the
-account view directly (mol -> kg -> wt% on the registry's molar
-masses), matching :meth:`MeltState.composition_wt_pct` line-for-line.
+The MRE Nernst activity uses the shared gamma-X single-cation oxide
+activity on the live mol composition. The wt% projection is still computed
+from the account view for current-efficiency diagnostics, matching
+:meth:`MeltState.composition_wt_pct` line-for-line.
 Stateless: the same provider instance serves every MRE hour in every
 campaign.
 
@@ -94,8 +95,9 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
-from simulator.mre_ladder import DECOMP_VOLTAGES
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.chemistry.melt_activity import melt_oxide_activity
+from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_reference
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, FARADAY
 
 MRE_CURRENT_PARTITION_SOURCE = (
     "heuristic:activity_exp_overvoltage_SEL-1_not_literature_grounded"
@@ -204,6 +206,31 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
     },
 }
 
+for _oxide, _row in MRE_DECOMP_VOLTAGE_PROVENANCE.items():
+    _reference = mre_decomposition_voltage_reference(_oxide)
+    if _reference is None:
+        continue
+    _row["standard_voltage_V"] = _reference.voltage
+    _row["standard_voltage_temperature_K"] = _reference.temperature_K
+    _row["standard_voltage_authority"] = _reference.authority
+    _row["standard_voltage_authoritative"] = _reference.authoritative
+    _row["standard_voltage_status"] = _reference.status
+    _row["ellingham_species"] = _reference.ellingham_species
+    _row["delta_gf_kJ_per_mol_formula"] = (
+        -_reference.voltage
+        * float(_row["electrons_per_formula"])
+        * FARADAY
+        / 1000.0
+    )
+    if _reference.authoritative:
+        _row["status"] = "authoritative_ellingham_graph"
+        _row["delta_g_kJ_per_mol_O2"] = (
+            -_reference.voltage * 4.0 * FARADAY / 1000.0
+        )
+        _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
+    else:
+        _row["status"] = "ellingham_fallback"
+
 
 class BuiltinElectrolysisStepProvider(ChemistryProvider):
     """Authoritative ``ELECTROLYSIS_STEP`` provider.
@@ -239,7 +266,6 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # engines/builtin/__init__.py for the cycle description.
         from simulator.accounting.formulas import resolve_species_formula
         from simulator.electrolysis import (
-            DECOMP_VOLTAGES,
             ELECTRONS_PER_OXIDE,
             FERRIC_TO_FERROUS_ELECTRONS,
             FERRIC_TO_FERROUS_FEO_PER_FE2O3,
@@ -247,6 +273,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             FERRIC_TO_FERROUS_REFERENCE_V,
             FERRIC_TO_FERROUS_REFERENCE_STATUS,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            MRE_RAW_MARGIN_REFUSAL,
+            MRE_RAW_MARGIN_GUARDED_OXIDES,
             MRE_CERTIFICATION_DENYLIST_REASON,
             MRE_CERTIFICATION_EVIDENCE_CLASS,
             MRE_CURRENT_PARTITION_CERTIFICATION,
@@ -287,13 +315,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             request, applied_anode_fO2_log=math.log10(pO2_bar),
         )
 
-        # Compute the wt% composition view from the cleaned_melt mol
-        # account -- mirrors MeltState.composition_wt_pct exactly. The
-        # legacy ElectrolysisModel reads activity = wt_fraction =
-        # comp[oxide]/100; we reproduce that path through the registry-
-        # driven mol -> kg projection so the provider stays stateless
-        # and the kernel account filter is the single source of truth
-        # for what the provider may see.
+        # Compute kg for cap checks and FeO current-efficiency diagnostics.
+        # Nernst activity below stays on the shared gamma-X single-cation mol
+        # basis used by the vapor path.
         melt_mol = dict(
             request.account_view.accounts.get("process.cleaned_melt", {}) or {}
         )
@@ -351,6 +375,14 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "current_efficiency_model": CURRENT_EFFICIENCY_MODEL_ID,
             "current_efficiency_feo_fraction": feo_fraction,
             "current_efficiency_by_oxide": {},
+            "mre_activity_model": "gamma_x_single_cation",
+            "mre_oxide_activity_by_oxide": {},
+            "mre_decomposition_voltage_authority_by_oxide": {},
+            "mre_decomposition_voltage_authoritative_by_oxide": {},
+            "mre_decomposition_voltage_status_by_oxide": {},
+            "mre_raw_graph_requirement_V_by_oxide": {},
+            "mre_raw_voltage_margin_V_by_oxide": {},
+            "mre_raw_margin_refused_targets": {},
             "melt_fO2_log": melt_fO2_log,
             "fe_redox_policy": str(request.fe_redox_policy),
             "fe_redox_split": self._compute_fe_redox_split_diagnostic(
@@ -391,8 +423,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             allowed_oxides = {str(item) for item in allowed_oxides_raw if item}
 
         # Find all reducible species at this voltage. Mirrors
-        # ElectrolysisModel.step_hour line-for-line: same E0 table,
-        # same Nernst formula, same 1e-6 kg gate, same activity proxy.
+        # ElectrolysisModel.step_hour line-for-line: same graph-first E0,
+        # same Nernst formula, same 1e-6 kg gate, same gamma-X activity.
         reducible: list[tuple[str, float, float, float, str]] = []
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if allowed_oxides is not None and oxide not in allowed_oxides:
@@ -401,27 +433,87 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 continue
             if composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
-            # Crude activity ~= wt_fraction. wt_pct/100 == wt_fraction.
-            activity = (composition_kg[oxide] / total_kg)
+            activity_reference = melt_oxide_activity(oxide, melt_mol)
+            activity = (
+                0.0
+                if activity_reference is None
+                else max(0.0, float(activity_reference.activity))
+            )
+            voltage_reference = mre_decomposition_voltage_reference(
+                oxide,
+                temperature_K=T_K,
+            )
+            diagnostic["mre_oxide_activity_by_oxide"][oxide] = activity
+            if voltage_reference is not None:
+                diagnostic["mre_decomposition_voltage_authority_by_oxide"][oxide] = (
+                    voltage_reference.authority
+                )
+                diagnostic["mre_decomposition_voltage_authoritative_by_oxide"][oxide] = (
+                    voltage_reference.authoritative
+                )
+                diagnostic["mre_decomposition_voltage_status_by_oxide"][oxide] = (
+                    voltage_reference.status
+                )
             E_nernst = self._nernst_voltage(
                 oxide,
                 T_K,
                 activity,
                 gas_constant=GAS_CONSTANT,
                 faraday=FARADAY,
-                decomp_voltages=DECOMP_VOLTAGES,
                 electrons_per_oxide=ELECTRONS_PER_OXIDE,
                 oxide_to_metal=OXIDE_TO_METAL,
                 pO2_bar=pO2_bar,
             )
-            if E_nernst < voltage_V:
-                overvoltage = voltage_V - E_nernst
+            fallback_margin_V = voltage_V - E_nernst
+            raw_margin_V = None
+            if (
+                voltage_reference is not None
+                and voltage_reference.raw_graph_voltage_V is not None
+            ):
+                # The Nernst activity/pO2 shift is identical for the selected
+                # fallback and raw graph E0.  Replacing E0 therefore shifts the
+                # full requirement by exactly (E0_raw - E0_fallback).
+                raw_requirement_V = (
+                    E_nernst
+                    + voltage_reference.raw_graph_voltage_V
+                    - voltage_reference.voltage
+                )
+                raw_margin_V = voltage_V - raw_requirement_V
+                diagnostic["mre_raw_graph_requirement_V_by_oxide"][oxide] = (
+                    raw_requirement_V
+                )
+                diagnostic["mre_raw_voltage_margin_V_by_oxide"][oxide] = raw_margin_V
+
+            if (
+                fallback_margin_V > 0.0
+                and oxide in MRE_RAW_MARGIN_GUARDED_OXIDES
+                and voltage_reference is not None
+                and not voltage_reference.authoritative
+                and raw_margin_V is not None
+                and raw_margin_V <= 0.0
+            ):
+                diagnostic["mre_raw_margin_refused_targets"][oxide] = {
+                    "fallback_requirement_V": E_nernst,
+                    "fallback_margin_V": fallback_margin_V,
+                    "raw_requirement_V": raw_requirement_V,
+                    "raw_margin_V": raw_margin_V,
+                    "voltage_status": voltage_reference.status,
+                }
+                continue
+
+            if fallback_margin_V > 0.0:
+                overvoltage = fallback_margin_V
                 reducible.append((
                     oxide, E_nernst, overvoltage, activity, "oxide_to_metal"
                 ))
 
         if composition_kg.get("Fe2O3", 0.0) >= 1e-6:
-            activity = composition_kg["Fe2O3"] / total_kg
+            activity_reference = melt_oxide_activity("Fe2O3", melt_mol)
+            activity = (
+                0.0
+                if activity_reference is None
+                else max(0.0, float(activity_reference.activity))
+            )
             E_ferric = self._ferric_to_ferrous_voltage(
                 T_K,
                 activity,
@@ -444,9 +536,13 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         if not reducible:
             if voltage_V > 0.0 and current_A > 0.0:
                 diagnostic["energy_kWh"] = voltage_V * current_A * dt_hr / 1000.0
+            status = "ok"
+            if diagnostic["mre_raw_margin_refused_targets"]:
+                status = "refused"
+                diagnostic["reason_refused"] = MRE_RAW_MARGIN_REFUSAL
             return IntentResult(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
-                status="ok",
+                status=status,
                 transition=None,
                 control_audit=control_audit,
                 diagnostic=diagnostic,
@@ -698,10 +794,10 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         *,
         gas_constant: float,
         faraday: float,
-        decomp_voltages: Mapping[str, float],
         electrons_per_oxide: Mapping[str, int],
         oxide_to_metal: Mapping[str, tuple[str, int, int]],
         pO2_bar: float = 1.0,
+        decomp_voltages: Mapping[str, float] | None = None,
     ) -> float:
         """Nernst-adjusted decomposition voltage.
 
@@ -711,7 +807,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         essentially-depleted species (activity < 1e-10), same as legacy.
         """
 
-        E0 = decomp_voltages.get(oxide, 2.5)
+        if decomp_voltages is None:
+            reference = mre_decomposition_voltage_reference(oxide, temperature_K=T_K)
+            E0 = 2.5 if reference is None else reference.voltage
+        else:
+            E0 = decomp_voltages.get(oxide, 2.5)
         n = electrons_per_oxide.get(oxide, 2)
         if activity <= 1e-10:
             return E0 + 1.0
@@ -830,6 +930,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 "fe2o3_equiv_wt_pct": 0.0,
                 "feo_equiv_wt_pct": 0.0,
                 "source": "simulator.fe_redox:kress91_split:no_iron",
+                "authoritative": False,
+                "extrapolation": False,
+                "high_uncertainty": False,
             }
 
         split = kress91_split(
@@ -872,6 +975,12 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "fe2o3_equiv_wt_pct": fe2o3_wt,
             "feo_equiv_wt_pct": feo_wt,
             "source": "simulator.fe_redox:kress91_split",
+            "temperature_band_case": split.get("temperature_band_case"),
+            "temperature_band_status": split.get("temperature_band_status"),
+            "temperature_band_source": split.get("temperature_band_source"),
+            "authoritative": bool(split.get("authoritative", False)),
+            "extrapolation": bool(split.get("extrapolation", False)),
+            "high_uncertainty": bool(split.get("high_uncertainty", False)),
         }
 
     @staticmethod

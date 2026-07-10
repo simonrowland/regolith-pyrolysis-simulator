@@ -25,6 +25,7 @@ Covers:
 from __future__ import annotations
 
 import math
+from types import SimpleNamespace
 
 import pytest
 
@@ -276,6 +277,39 @@ def test_provider_emits_no_ledger_transition():
     )
     result = provider.dispatch(request)
     assert result.transition is None
+
+
+def test_evaporation_caller_counts_unmeasured_alpha_fallback_engagement(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.temperature_C = 1500.0
+    sim._dispatch_only = lambda intent, *, control_inputs: SimpleNamespace(
+        status="ok",
+        diagnostic={
+            "evaporation_flux_kg_hr": {},
+            "unmeasured_alpha_fallback_species": ["Cr", "Mn"],
+        },
+    )
+    equilibrium = SimpleNamespace(
+        vapor_pressures_Pa={"Na": 1.0},
+        vapor_pressures_source={},
+        activity_coefficients={},
+        diagnostics={},
+        liquid_fraction=1.0,
+    )
+
+    sim._calculate_evaporation(equilibrium)
+
+    summary = sim._degraded_path_engagement_summary()
+    assert summary["unmeasured_alpha_evaporation_fallback"]["total_count"] == 2
 
 
 def test_provider_attaches_numerator_provenance_and_resistance_shares():

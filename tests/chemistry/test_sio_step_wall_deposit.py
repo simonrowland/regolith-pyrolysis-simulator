@@ -173,13 +173,13 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # backpressure, moving the coupled SiO wall pins without changing the
     # fouling-threshold structure.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        5.661161308125e-08, rel=1e-9
+        5.663826474772e-08, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
-        6.30441095366e-08, rel=1e-9
+        6.30430233312e-08, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
-        6.34508879004e-08, rel=1e-9
+        6.34497943176e-08, rel=1e-9
     )
 
 

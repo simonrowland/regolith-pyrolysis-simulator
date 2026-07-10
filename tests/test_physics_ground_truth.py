@@ -703,9 +703,9 @@ def test_molar_mass_ledger_derives_from_canonical_atomic_weight_table() -> None:
     ("reductant", "target", "expected_c", "abs_tol_c"),
     [
         # NIST-JANAF high-T oxide refit: Na2O/FeO crossover cited by Mandate.
-        ("Na", "Fe", 1173.4, 1.0),
+        ("Na", "Fe", 1181.5, 1.0),
         # NIST-JANAF high-T oxide refit: K2O/FeO crossover cited by Mandate.
-        ("K", "Fe", 832.0, 1.0),
+        ("K", "Fe", 836.25, 1.0),
     ],
 )
 def test_janaf_alkali_fe_ellingham_crossovers_match_literature_window(

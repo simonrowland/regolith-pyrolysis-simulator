@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from simulator.chemistry.kernel import ProviderUnavailableError
 from simulator.core import FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 from simulator.optimize import sso_r_owner_surface
 from scripts import sso_r_validation_map as validation_map
@@ -360,6 +361,97 @@ def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
         "redox_source:evaporative_metal_loss"
     ] > 0.0
     assert calls[-1] == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
+
+
+def test_run_row_establishes_one_production_authority_pin(monkeypatch):
+    setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
+    curve_calls = 0
+    pin_window = False
+    established = []
+    resolved = []
+    cleared_hours = []
+    simulator_type = validation_map.PyrolysisSimulator
+    original_establish = (
+        simulator_type._establish_melt_redox_gate_authority_for_current_hour
+    )
+    original_resolve = simulator_type._resolved_melt_redox_gate_authority
+    original_clear = (
+        simulator_type._clear_melt_redox_gate_authority_for_completed_hour
+    )
+
+    def fail_then_recover(self):
+        nonlocal curve_calls
+        if not pin_window:
+            return {
+                'source': 'test_setup_real_curve',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1700.0,
+                'path': ((1000.0, 0.0), (1700.0, 1.0)),
+            }
+        curve_calls += 1
+        if curve_calls == 1:
+            raise ProviderUnavailableError('validation row pin failure')
+        return {
+            'source': 'test_recovered_real_curve',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1700.0,
+            'path': ((1000.0, 0.0), (1700.0, 1.0)),
+        }
+
+    def record_establish(self):
+        nonlocal pin_window
+        pin_window = True
+        authority = original_establish(self)
+        established.append(authority)
+        return authority
+
+    def record_resolve(self, *args, **kwargs):
+        authority = original_resolve(self, *args, **kwargs)
+        if pin_window:
+            resolved.append(authority)
+        return authority
+
+    def record_clear(self, completed_hour):
+        nonlocal pin_window
+        cleared_hours.append(int(completed_hour))
+        result = original_clear(self, completed_hour)
+        pin_window = False
+        return result
+
+    monkeypatch.setattr(simulator_type, '_freeze_gate_curve', fail_then_recover)
+    monkeypatch.setattr(
+        simulator_type,
+        '_establish_melt_redox_gate_authority_for_current_hour',
+        record_establish,
+    )
+    monkeypatch.setattr(
+        simulator_type,
+        '_resolved_melt_redox_gate_authority',
+        record_resolve,
+    )
+    monkeypatch.setattr(
+        simulator_type,
+        '_clear_melt_redox_gate_authority_for_completed_hour',
+        record_clear,
+    )
+
+    row = validation_map.run_row(
+        1650.0,
+        validation_map.GasPoint(1.0e-6, 10.0, 'n2_carrier'),
+        1.0,
+        calibration,
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+        grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
+    )
+
+    assert row['row_passes_base_integrity'] is True
+    assert curve_calls == 1
+    assert len(established) == 1
+    assert resolved
+    assert all(authority is established[0] for authority in resolved)
+    assert cleared_hours == [0]
 
 
 def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):

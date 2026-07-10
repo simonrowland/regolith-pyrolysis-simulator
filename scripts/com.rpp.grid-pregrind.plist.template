@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.rpp.grid-pregrind</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>__HOME__</string>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>PYTHONUNBUFFERED</key>
+        <string>1</string>
+    </dict>
+    <key>ProgramArguments</key>
+    <array>
+        <string>__REPO_ROOT__/.venv/bin/python</string>
+        <string>__REPO_ROOT__/scripts/grid_pregrind.py</string>
+        <string>--drain-only</string>
+        <string>--db</string>
+        <string>__LOCAL_DB_PATH__</string>
+        <string>--status-json</string>
+        <string>__STATUS_PATH__</string>
+        <string>--workers</string>
+        <string>22</string>
+        <string>--engine-epoch</string>
+        <string>1</string>
+        <string>--shard</string>
+        <string>0</string>
+        <string>--loop</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>__REPO_ROOT__</string>
+    <key>Nice</key>
+    <integer>10</integer>
+    <key>ProcessType</key>
+    <string>Background</string>
+    <key>KeepAlive</key>
+    <true/>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+    <key>StandardOutPath</key>
+    <string>__LOG_DIR__/grid-pregrind.log</string>
+    <key>StandardErrorPath</key>
+    <string>__LOG_DIR__/grid-pregrind-error.log</string>
+</dict>
+</plist>

@@ -170,6 +170,25 @@ def test_pipe_conductance_no_kwarg_matches_legacy_fallback():
     assert C_legacy == pytest.approx(expected, rel=1e-12)
 
 
+def test_pipe_conductance_records_m_avg_fallback_engagement():
+    engagements = []
+    model = OverheadGasModel(
+        {},
+        degraded_path_engagement_recorder=lambda path, *, count: (
+            engagements.append((path, count))
+        ),
+    )
+
+    model._pipe_conductance(1000.0, 1500.0)
+    model._pipe_conductance(
+        1000.0,
+        1500.0,
+        species_kg_for_M_avg={"Na": 1.0},
+    )
+
+    assert engagements == [("pipe_m_avg_fallback", 1)]
+
+
 def test_pipe_conductance_alkali_sweep_lower_density_than_legacy():
     """Mid-alkali-sweep gas (mostly Na ~23 g/mol) has lower mole-
     weighted M_avg than the legacy 40 g/mol placeholder → lower ρ

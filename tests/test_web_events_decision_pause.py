@@ -47,6 +47,7 @@ from collections import Counter
 import pytest
 
 import app as app_module
+from simulator.core import PyrolysisSimulator
 from web.events import (
     _clear_simulation_state,
     _current_simulation_state,
@@ -56,6 +57,22 @@ from web.events import (
 
 # SocketIO pause/resume loop has timing flakes under xdist coscheduling.
 pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
+
+
+@pytest.fixture(autouse=True)
+def _deterministic_liquidus_gate(monkeypatch):
+    """Keep web state-machine tests independent of external liquidus latency."""
+    curve = {
+        'source': 'test_decision_pause_liquidus',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1700.0,
+        'path': ((1000.0, 0.0), (1700.0, 1.0)),
+    }
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        '_freeze_gate_curve',
+        lambda self: dict(curve),
+    )
 
 # StubBackend = deterministic baseline: no AlphaMELTS dependence (opt-in + slow
 # here) and no float drift between runs. The decision-gate state machine is

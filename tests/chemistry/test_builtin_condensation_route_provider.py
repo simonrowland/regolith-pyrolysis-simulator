@@ -124,38 +124,41 @@ from tests.chemistry.conftest import _build_sim
 # non-standard-reaction rows to the runtime selector (shared pole/overflow
 # guard), so Na/Ca-class wall values stay at their pre-t-141 behavior
 # (Na back within an LSB of the prior pin) — t-141's wall effect is K-only.
-EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {'lunar_mare_low_ti': {'process.wall_deposit_segment_stage_0_to_stage_1': {'Na': 8.098416550477048e-07,
-                                                                           'Si': 1.9577784403627287e-07,
-                                                                           'SiO2': 4.1883283614852703e-07},
-                       'process.wall_deposit_segment_stage_1_to_stage_2': {'Na': 8.098416550477048e-07,
-                                                                           'Si': 1.9577784403627287e-07,
-                                                                           'SiO2': 4.1883283614852703e-07},
-                       'process.wall_deposit_segment_stage_2_to_stage_3': {'Na': 8.098416550477048e-07},
-                       'process.wall_deposit_segment_stage_3_to_stage_4': {'Na': 8.098416550477047e-07}},
- 'mars_basalt': {'process.wall_deposit_segment_stage_0_to_stage_1': {'K': 1.2535677513155645e-07,
-                                                                     'MgO': 8.918011687581417e-11,
-                                                                     'Na': 2.830763435362209e-05,
-                                                                     'Si': 1.564056640058321e-06,
-                                                                     'SiO2': 3.3458957218693773e-06},
-                 'process.wall_deposit_segment_stage_1_to_stage_2': {'K': 1.2535677513155645e-07,
-                                                                     'MgO': 8.918011687581417e-11,
-                                                                     'Na': 2.830763435362209e-05,
-                                                                     'Si': 1.564056640058321e-06,
-                                                                     'SiO2': 3.3458957218693773e-06},
-                 'process.wall_deposit_segment_stage_2_to_stage_3': {'K': 1.2535677513155645e-07,
-                                                                     'Mg': 5.377934549093548e-11,
-                                                                     'Na': 2.830763435362209e-05},
-                 'process.wall_deposit_segment_stage_3_to_stage_4': {'K': 1.253567751315564e-07,
-                                                                     'Mg': 5.37793454909355e-11,
-                                                                     'Na': 2.830763435362208e-05}},
- 's_type_asteroid_silicate': {'process.wall_deposit_segment_stage_0_to_stage_1': {'Na': 1.5295156139210297e-06,
-                                                                                  'Si': 1.7156264502213654e-07,
-                                                                                  'SiO2': 3.6702860604824736e-07},
-                              'process.wall_deposit_segment_stage_1_to_stage_2': {'Na': 1.5295156139210297e-06,
-                                                                                  'Si': 1.7156264502213654e-07,
-                                                                                  'SiO2': 3.6702860604824736e-07},
-                              'process.wall_deposit_segment_stage_2_to_stage_3': {'Na': 1.5295156139210297e-06},
-                              'process.wall_deposit_segment_stage_3_to_stage_4': {'Na': 1.5295156139210297e-06}}}
+EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
+    "lunar_mare_low_ti": {
+        "process.wall_deposit_segment_stage_0_to_stage_1": {
+            "FeSi": 9.637956153082013e-11,
+            "Si": 1.962793580758873e-07,
+            "SiO2": 4.199747339680675e-07,
+        },
+        "process.wall_deposit_segment_stage_1_to_stage_2": {
+            "Si": 1.9631160899910419e-07,
+            "SiO2": 4.199747339680675e-07,
+        },
+    },
+    "mars_basalt": {
+        "process.wall_deposit_segment_stage_0_to_stage_1": {
+            "FeSi": 7.291762038063996e-11,
+            "Si": 1.5138728550193185e-07,
+            "SiO2": 3.239191133900808e-07,
+        },
+        "process.wall_deposit_segment_stage_1_to_stage_2": {
+            "Si": 1.514116854944064e-07,
+            "SiO2": 3.239191133900808e-07,
+        },
+    },
+    "s_type_asteroid_silicate": {
+        "process.wall_deposit_segment_stage_0_to_stage_1": {
+            "FeSi": 5.0864841492674255e-11,
+            "Si": 1.7171623495060957e-07,
+            "SiO2": 3.673935977685537e-07,
+        },
+        "process.wall_deposit_segment_stage_1_to_stage_2": {
+            "Si": 1.717332555519836e-07,
+            "SiO2": 3.673935977685537e-07,
+        },
+    },
+}
 
 
 def _assert_atom_proof_closed(proposal) -> None:
@@ -494,6 +497,38 @@ def test_evaporation_caller_dispatches_condensation_floor_to_provider(
         assert sim.atom_ledger.kg_by_account("process.condensation_train")[
             "Na"
         ] == pytest.approx(condensed_kg)
+
+
+def test_evaporation_caller_counts_condensation_degraded_path_engagement(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    rate_kg_hr = 1e-6
+    sim.condensation_model.route = lambda evap_flux, melt: CondensationRouteResult(
+        remaining_by_species={"Na": rate_kg_hr},
+        antoine_extrapolations={"Na:stage-1": {}, "Na:wall": {}},
+        transport_parameter_notice={"species": ["Na", "K"]},
+        capture_budget_regularizer_notice={"code": "capture_budget_regularizer"},
+    )
+
+    sim._route_to_condensation(
+        EvaporationFlux(
+            species_kg_hr={"Na": rate_kg_hr},
+            total_kg_hr=rate_kg_hr,
+        )
+    )
+
+    summary = sim._degraded_path_engagement_summary()
+    assert summary["condensation_antoine_extrapolation"]["total_count"] == 2
+    assert summary["capture_budget_regularizer"]["total_count"] == 1
+    assert summary["transport_d_ab_proxy"]["total_count"] == 2
 
 
 # ---------------------------------------------------------------------------

@@ -9,7 +9,6 @@ import yaml
 
 from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
 from simulator import mre_ladder
-from simulator import extraction as extraction_module
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.core import PyrolysisSimulator
@@ -90,31 +89,31 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
     sequence = mre_ladder.build_mre_voltage_sequence(setpoints)
 
     assert _species_names(sequence) == [
+        "K2O",
         "NiO",
         "Na2O",
-        "K2O",
         "FeO",
-        "Cr2O3",
         "MnO",
+        "Cr2O3",
         "SiO2",
         "TiO2",
-        "Al2O3",
         "MgO",
+        "Al2O3",
         "CaO",
     ]
-    assert [entry["voltage"] for entry in sequence] == [
+    assert [entry["voltage"] for entry in sequence] == pytest.approx([
+        0.023465,
         0.39,
-        0.5,
-        0.5,
-        0.75,
-        0.95,
-        1.05,
-        1.45,
-        1.70,
-        1.95,
-        2.2,
-        2.5,
-    ]
+        0.408926,
+        0.804340,
+        1.050000,
+        1.118868,
+        1.491058,
+        1.575521,
+        1.792604,
+        1.857324,
+        2.208316,
+    ], abs=1e-6)
     assert [entry["min_hold_hours"] for entry in sequence] == [
         2,
         2,
@@ -124,10 +123,146 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         2,
         5,
         3,
-        8,
         5,
+        8,
         10,
     ]
+    assert sequence[1]["voltage_authority"] == "ellingham_fallback"
+    assert sequence[4]["voltage_authority"] == "ellingham_fallback"
+    assert all(
+        entry["voltage_authority"] == "ellingham_graph"
+        for idx, entry in enumerate(sequence)
+        if idx not in {1, 4}
+    )
+
+
+def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
+    cr = mre_ladder.mre_decomposition_voltage_reference(
+        "Cr2O3",
+        temperature_K=1873.15,
+    )
+    ti = mre_ladder.mre_decomposition_voltage_reference(
+        "TiO2",
+        temperature_K=1873.15,
+    )
+
+    assert cr is not None
+    assert ti is not None
+    assert cr.authority == "ellingham_graph"
+    assert ti.authority == "ellingham_graph"
+    assert cr.voltage == pytest.approx(1.119, abs=0.001)
+    assert ti.voltage == pytest.approx(1.576, abs=0.001)
+
+    standard_oxides = [
+        "FeO",
+        "Cr2O3",
+        "MnO",
+        "SiO2",
+        "TiO2",
+        "Al2O3",
+        "MgO",
+        "CaO",
+    ]
+    ordered = sorted(
+        standard_oxides,
+        key=lambda oxide: mre_ladder.canonical_mre_decomposition_voltage(
+            oxide,
+            temperature_K=1873.15,
+        ),
+    )
+    assert ordered == [
+        "FeO",
+        "MnO",
+        "Cr2O3",
+        "SiO2",
+        "TiO2",
+        "MgO",
+        "Al2O3",
+        "CaO",
+    ]
+
+    al_low = mre_ladder.canonical_mre_decomposition_voltage(
+        "Al2O3",
+        temperature_K=1823.15,
+    )
+    mg_low = mre_ladder.canonical_mre_decomposition_voltage(
+        "MgO",
+        temperature_K=1823.15,
+    )
+    al_high = mre_ladder.canonical_mre_decomposition_voltage(
+        "Al2O3",
+        temperature_K=1873.15,
+    )
+    mg_high = mre_ladder.canonical_mre_decomposition_voltage(
+        "MgO",
+        temperature_K=1873.15,
+    )
+    assert al_low == pytest.approx(1.885517, abs=1e-6)
+    assert mg_low == pytest.approx(1.845957, abs=1e-6)
+    assert al_high == pytest.approx(1.857324, abs=1e-6)
+    assert mg_high == pytest.approx(1.792604, abs=1e-6)
+    assert mg_high < al_high
+
+
+def test_uncovered_mre_voltage_falls_back_to_static_with_flag():
+    ref = mre_ladder.mre_decomposition_voltage_reference("NiO", temperature_K=1873.15)
+
+    assert ref is not None
+    assert ref.voltage == pytest.approx(mre_ladder.DECOMP_VOLTAGES["NiO"])
+    assert ref.authority == "ellingham_fallback"
+    assert ref.authoritative is False
+    assert ref.status == "ellingham_query_failed:species_not_graph_covered"
+
+
+@pytest.mark.parametrize(
+    ("temperature_K", "status"),
+    [
+        (500.0, "ellingham_extrapolation_refused:extrapolation_limited"),
+        (5000.0, "ellingham_nonpositive_refused:voltage"),
+    ],
+)
+def test_graph_mre_voltage_refuses_extrapolated_or_nonphysical_authority(
+    temperature_K,
+    status,
+):
+    ref = mre_ladder.mre_decomposition_voltage_reference(
+        "FeO",
+        temperature_K=temperature_K,
+    )
+
+    assert ref is not None
+    assert ref.voltage == pytest.approx(mre_ladder.DECOMP_VOLTAGES["FeO"])
+    assert ref.authority == "ellingham_fallback"
+    assert ref.authoritative is False
+    assert ref.status == status
+    if temperature_K == 500.0:
+        assert ref.raw_graph_voltage_V is not None
+        assert ref.raw_graph_voltage_V > ref.voltage
+    else:
+        assert ref.raw_graph_voltage_V is None
+
+
+def test_graph_mre_voltage_refuses_nonfinite_delta_g(monkeypatch):
+    def fake_delta_g(species: str, temperature_K: float) -> float:
+        assert species == "Fe"
+        return float("inf")
+
+    monkeypatch.setattr(
+        mre_ladder.ellingham_graph,
+        "dissociation_delta_g",
+        fake_delta_g,
+    )
+
+    ref = mre_ladder.mre_decomposition_voltage_reference(
+        "FeO",
+        temperature_K=1873.15,
+    )
+
+    assert ref is not None
+    assert ref.voltage == pytest.approx(mre_ladder.DECOMP_VOLTAGES["FeO"])
+    assert ref.authority == "ellingham_fallback"
+    assert ref.authoritative is False
+    assert ref.status == "ellingham_nonfinite_refused:delta_g"
 
 
 def test_published_ladder_former_copy_sites_resolve_from_single_source():
@@ -143,25 +278,34 @@ def test_published_ladder_former_copy_sites_resolve_from_single_source():
     assert all(entry.get("voltage") == token for entry in hold_entries)
     assert electrolysis_voltages is mre_ladder.DECOMP_VOLTAGES
 
-    expected_sequence_pairs = tuple(
-        (entry["species"], mre_ladder.DECOMP_VOLTAGES[entry["species"]])
-        for entry in sequence_entries
-    )
+    expected_sequence_pairs = tuple(sorted(
+        (
+            (
+                entry["species"],
+                mre_ladder.canonical_mre_decomposition_voltage(entry["species"]),
+            )
+            for entry in sequence_entries
+        ),
+        key=lambda pair: pair[1],
+    ))
     parsed_pairs = _voltage_pairs(mre_ladder.parse_ladder_from_setpoints(setpoints))
     provenance_pairs = tuple(
         (species, MRE_DECOMP_VOLTAGE_PROVENANCE[species]["standard_voltage_V"])
         for species, _voltage in expected_sequence_pairs
     )
-    hold_pairs = tuple(
+    hold_pairs = tuple(sorted(
         (
-            entry["species"][0],
-            mre_ladder.resolve_mre_decomposition_voltage(
+            (
                 entry["species"][0],
-                entry["voltage"],
-            ),
-        )
-        for entry in hold_entries
-    )
+                mre_ladder.resolve_mre_decomposition_voltage(
+                    entry["species"][0],
+                    entry["voltage"],
+                ),
+            )
+            for entry in hold_entries
+        ),
+        key=lambda pair: pair[1],
+    ))
     fallback_pairs = _voltage_pairs(mre_ladder.MRE_VOLTAGE_LADDER_FALLBACK)
 
     assert parsed_pairs == expected_sequence_pairs
@@ -181,18 +325,27 @@ def test_parse_ladder_from_setpoints_matches_repo_yaml_shape():
 
     sequence = mre_ladder.parse_ladder_from_setpoints(setpoints)
 
-    assert _species_names(sequence)[:3] == ["NiO", "Na2O", "K2O"]
+    assert _species_names(sequence)[:3] == ["K2O", "NiO", "Na2O"]
     assert _species_names(sequence)[6:8] == ["SiO2", "TiO2"]
-    assert sequence[6]["voltage"] == pytest.approx(1.45)
-    assert sequence[7]["voltage"] == pytest.approx(1.70)
+    assert sequence[6]["voltage"] == pytest.approx(1.491058, abs=1e-6)
+    assert sequence[7]["voltage"] == pytest.approx(1.575521, abs=1e-6)
 
 
 def test_max_voltage_for_target_uses_ladder_ground_truth():
     sequence = mre_ladder.parse_ladder_from_setpoints(_repo_setpoints())
 
-    assert mre_ladder.max_voltage_for_target("SiO2", sequence) == pytest.approx(1.45)
-    assert mre_ladder.max_voltage_for_target("TiO2", sequence) == pytest.approx(1.70)
-    assert mre_ladder.max_voltage_for_target("CaO", sequence) == pytest.approx(2.5)
+    assert mre_ladder.max_voltage_for_target("SiO2", sequence) == pytest.approx(
+        1.491058,
+        abs=1e-6,
+    )
+    assert mre_ladder.max_voltage_for_target("TiO2", sequence) == pytest.approx(
+        1.575521,
+        abs=1e-6,
+    )
+    assert mre_ladder.max_voltage_for_target("CaO", sequence) == pytest.approx(
+        2.208316,
+        abs=1e-6,
+    )
     assert mre_ladder.max_voltage_for_target("not-an-oxide", sequence) == pytest.approx(0.0)
 
 
@@ -220,7 +373,10 @@ def test_preset_catalog_includes_disabled_alkali_targets():
 
     assert by_target[""]["c5_enabled"] is False
     assert by_target["SiO2"]["enabled"] is True
-    assert by_target["SiO2"]["mre_max_voltage_V"] == pytest.approx(1.45)
+    assert by_target["SiO2"]["mre_max_voltage_V"] == pytest.approx(
+        1.491058,
+        abs=1e-6,
+    )
     assert by_target["Na2O"]["enabled"] is False
     assert by_target["K2O"]["enabled"] is False
     assert "pre-depleted" in by_target["Na2O"]["disabled_reason"]
@@ -378,7 +534,7 @@ def test_c5_ellingham_ladder_diagnostic_emits_and_flags_synthetic_reordering(
         )
 
     monkeypatch.setattr(
-        extraction_module.ellingham_graph,
+        mre_ladder.ellingham_graph,
         "dissociation_delta_g",
         fake_delta_g,
     )
@@ -394,11 +550,15 @@ def test_c5_ellingham_ladder_diagnostic_emits_and_flags_synthetic_reordering(
     assert captured[0]["voltage_V"] == pytest.approx(0.75)
     diagnostic = sim._mre_ellingham_ladder_diagnostic
     assert diagnostic["certification"] == "diagnostic_uncertified"
-    assert diagnostic["authority"] == "read_only_ellingham_graph"
-    assert diagnostic["activity_basis"] == "cleaned_melt_account"
+    assert diagnostic["authority"] == "authoritative_ellingham_graph_with_static_fallback"
+    assert diagnostic["activity_basis"] == "gamma_x_single_cation_cleaned_melt_account"
     assert diagnostic["declared_rung_V"] == pytest.approx(0.75)
     assert diagnostic["rung_species"] == ["FeO"]
-    assert diagnostic["species"]["FeO"]["oxide_activity"] == pytest.approx(0.5)
+    assert diagnostic["species"]["FeO"]["oxide_activity"] == pytest.approx(
+        0.4554261068621283
+    )
+    assert diagnostic["species"]["FeO"]["voltage_authority"] == "ellingham_graph"
+    assert diagnostic["species"]["FeO"]["voltage_authoritative"] is True
     assert diagnostic["derived_Ed_V"]["FeO"] > 0.75
     assert diagnostic["species"]["SiO2"]["derived_Ed_V"] < 0.75
     assert diagnostic["species"]["SiO2"]["declared_after_held_rung"] is True
@@ -410,6 +570,59 @@ def test_c5_ellingham_ladder_diagnostic_emits_and_flags_synthetic_reordering(
     summary = build_per_hour_summary(sim, snapshot)
     assert summary["mre_ellingham_ladder_diagnostic"]["schema"] == (
         "c5_ellingham_ladder_diagnostic_v1"
+    )
+
+
+def test_c5_ladder_summary_records_non_authoritative_voltage_fallback():
+    setpoints = {
+        "campaigns": {},
+        "mre_voltage_sequence": {
+            "sequence": [
+                {"species": "FeO", "decomposition_V": "canonical", "min_hold_hours": 0},
+            ],
+        },
+    }
+    sim = _sim(setpoints)
+    sim.melt.temperature_C = 5000.0 - 273.15
+    sim._mre_voltage_sequence = sim._build_mre_voltage_sequence()
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = "FeO"
+    sim.melt.mre_max_voltage_V = mre_ladder.DECOMP_VOLTAGES["FeO"]
+    sim.melt.composition_kg = {"FeO": 10.0}
+    _seed_cleaned_melt_kg(sim, {"FeO": 10.0})
+    sim._mre_voltage_step_idx = 0
+
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
+        return SimpleNamespace(
+            diagnostic={
+                "energy_kWh": 0.0,
+                "metals_produced_kg": {},
+                "metals_produced_mol": {},
+                "oxides_reduced_kg": {},
+            },
+            transition=None,
+        )
+
+    sim._commanded_pO2_bar = lambda: 1.0
+    sim._dispatch_only = fake_dispatch
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+
+    sim._step_mre()
+
+    snapshot = sim._make_snapshot()
+    summary = build_per_hour_summary(sim, snapshot)
+    diagnostic = summary["mre_ellingham_ladder_diagnostic"]
+    feo = diagnostic["species"]["FeO"]
+    non_authoritative = diagnostic["non_authoritative_voltage_by_oxide"]["FeO"]
+    assert feo["voltage_authority"] == "ellingham_fallback"
+    assert feo["voltage_authoritative"] is False
+    assert non_authoritative["authoritative"] is False
+    assert non_authoritative["authority"] == "ellingham_fallback"
+    assert non_authoritative["status"] == (
+        "ellingham_fallback:ellingham_nonpositive_refused:voltage"
     )
 
 
@@ -482,7 +695,7 @@ def test_c5_ellingham_ladder_diagnostic_failure_does_not_change_dispatch(
     assert captured[0]["voltage_V"] == pytest.approx(0.75)
     assert captured[0]["allowed_oxides"] == ["FeO"]
     diagnostic = sim._mre_ellingham_ladder_diagnostic
-    assert diagnostic["activity_basis"] == "cleaned_melt_account"
+    assert diagnostic["activity_basis"] == "gamma_x_single_cation_cleaned_melt_account"
     assert diagnostic["status"] == "diagnostic_failed:RuntimeError"
     assert diagnostic["declared_rung_V"] == pytest.approx(0.75)
     assert diagnostic["rung_species"] == ["FeO"]

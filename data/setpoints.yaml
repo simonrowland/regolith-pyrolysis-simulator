@@ -269,21 +269,21 @@ campaigns:
       additive: "Na"
       recommended_Na_kg: 12
       Na2O_solubility_cap_wt_pct: 10
-      V1c_JANAF_margin_kJ_per_mol_O2:
-        Na_FeO_1150C: 9.6
-        Na_FeO_crossover_C: 1173.4
-        K_FeO_1150C: -125.7
-        K_FeO_crossover_C: 832.0
+      JANAF_4th_multiphase_margin_kJ_per_mol_O2:   # 2026-07-09 re-ground; recomputed from ellingham_thermo multiphase fits
+        Na_FeO_1150C: 11.1     # was 9.6 under the earlier linear fit
+        Na_FeO_crossover_C: 1181.5     # was 1173.4
+        K_FeO_1150C: -127.4    # was -125.7
+        K_FeO_crossover_C: 836.25    # was 832.0
       reactions:
         - "2Na + FeO -> Na2O + Fe"
       endpoint:
         type: "residual_FeO_reduction_or_alkali_dose_exhausted"
         Fe_total_pct_target_min: 90
       known_model_limit: >
-        V1c JANAF removes K/FeO from practical melt temperatures (K/Fe
-        crossover 832 C). The staged cleanup is now Na-only at 1150 C, inside
-        a narrow Na/FeO window with about +9.6 kJ/mol O2 margin and a 1173.4 C
-        crossover. Do not retune upward without new thermodynamic evidence.
+        The JANAF-4th multiphase refit (2026-07-09 re-ground) removes K/FeO from
+        practical melt temperatures (K/Fe crossover 836 C). The staged cleanup is
+        now Na-only at 1150 C, inside a narrow Na/FeO window with about +11.1 kJ/mol O2
+        margin and a 1181.5 C crossover. Do not retune upward without new thermodynamic evidence.
     downstream_impact: >
       Adds an operator-selectable Path A staged route without changing
       C2A_continuous. The cool Na cleanup uses additive/recycled Na for
@@ -337,9 +337,9 @@ campaigns:
   # --------------------------------------------------------------------------
   C3:
     label: "Deprecated Na/K Metallothermic Polish"
-    V1c_JANAF_status: >
+    JANAF_4th_multiphase_status: >
       K/FeO is refused throughout practical melt temperatures (formal
-      crossover 832 C). Na/FeO survives only below 1173.4 C and is therefore
+      crossover 836 C). Na/FeO survives only below 1181.5 C and is therefore
       used only by the C2A_staged 1150 C FeO cleanup override. Default C3
       Cr/Ti reductions remain refused by the executable temperature gate.
     pO2_mbar_default: 1.0
@@ -519,14 +519,17 @@ campaigns:
     p_total_mbar_default: 0.2
     target_species: ["Al"]
     reaction: "3Mg(l) + Al2O3(melt) -> 3MgO(slag) + 2Al(l)"
-    V1c_JANAF_margin_kJ_per_mol_O2:
-      Mg_Al_1500C: 8.6
-      Mg_Al_crossover_C: 1573.0
-      Mg_Al_1600C: -3.2
+    JANAF_4th_multiphase_margin_kJ_per_mol_O2:   # 2026-07-09 re-ground; recomputed from ellingham_thermo multiphase fits
+      Mg_Al_1500C: -5.6      # was +8.6 under the earlier linear fit; now NEGATIVE (1500 C sits above the crossover)
+      Mg_Al_crossover_C: 1471.4    # was 1573.0; multiphase MgO less stable after the Mg boil dropped this ~102 C
+      Mg_Al_1600C: -25.0     # was -3.2
     kinetic_driven_above_crossover: true
     kinetic_note: >
-      Operation above 1573 C must be justified by local thermite heating or
-      kinetic exotherm, not by V1c standard-state Mg/Al equilibrium alone.
+      Operation above 1471 C must be justified by local thermite heating or
+      kinetic exotherm, not by standard-state Mg/Al equilibrium alone. NOTE the C6
+      default hold of 1500 C now sits ABOVE this multiphase crossover, so the
+      standard-state Mg->Al2O3 window is the low end of the [1450, 1550] C range;
+      C6 at default T relies on the local thermite exotherm.
     Mg_density_g_per_cm3: 1.58
     melt_density_g_per_cm3: [2.5, 2.8]
     injection: "Mg rods via SiC bottom port; buoyancy-driven reaction column"
@@ -1422,18 +1425,19 @@ ellingham_V1c_reference:
     means the oxide is more stable; reduction requires the reagent oxide to sit
     below the target oxide at the recipe temperature.
   moderate_T_ordering: "Ca > Mg > Al > Ti > Mn > Cr > Fe > Na > K"
-  key_crossovers_C:
-    K_FeO: 832.0
-    Na_FeO: 1173.4
-    Mg_Al2O3: 1573.0
+  key_crossovers_C:   # 2026-07-09 JANAF-4th multiphase re-ground (were 832.0 / 1173.4 / 1573.0 under the linear fit)
+    K_FeO: 836.25
+    Na_FeO: 1181.5
+    Mg_Al2O3: 1471.4
   recipe_implications:
     alkali_shuttle: >
       K/FeO is gone in the melt window. Na/FeO survives only as a thin cool
-      window at 1150 C and is refused above the 1173.4 C crossover.
+      window at 1150 C (a positive ~31 C margin) and is refused above the 1181.5 C crossover.
     C6_thermite: >
-      Mg/Al2O3 is favorable at 1500 C (+8.6 kJ/mol O2 margin) but flips
-      slightly negative by 1600 C (-3.2 kJ/mol O2). Keep the default below the
-      crossover unless a kinetic/local-heating basis is explicitly invoked.
+      Mg/Al2O3 is favorable only below the 1471 C multiphase crossover; the default
+      1500 C hold now sits ABOVE it (-5.6 kJ/mol O2 margin at 1500 C, -25.0 at 1600 C),
+      so C6 at default T relies on the local thermite exotherm, not standard-state
+      equilibrium. The standard-state window is the low end of the [1450, 1550] C range.
 
 
 # ============================================================================

@@ -237,9 +237,10 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
         "remediation",
     )
 
-    assert returncode == 1, payload
-    assert payload["status"] == "failed"
-    assert payload["reason"] == "mass_balance_closure_breach"
+    assert returncode == 0, payload
+    assert payload["status"] == "ok"
+    assert payload["reason"] == ""
+    assert payload["error_message"] == ""
     metadata = payload["run_metadata"]
     preset = metadata["preset"]
     assert preset == {
@@ -270,6 +271,7 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
     assert enforcement[0]["achieved_mbar"] == pytest.approx(1.0e-4)
     assert enforcement[0]["limited_by_total_pressure"] is False
     row = payload["per_hour_summary"][-1]
+    assert row["mass_balance_pct"] == pytest.approx(0.0)
     assert row["P_total_bar"] == pytest.approx(13.0e-3)
     assert row["pO2_bar"] == pytest.approx(
         enforcement[0]["achieved_mbar"] * 1.0e-3)

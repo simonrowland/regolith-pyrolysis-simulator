@@ -33,7 +33,7 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # 2026-07-07 t-141 L&H K standard-term regen: reactive SiO wall deposit
 # shifts -1.3605e-7 kg via the K-coupled headspace path (delta matches
 # docs-private/research/2026-07-07-t141-kmox/golden-deltas.json).
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00045361633105156225
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00045317584648602916
 
 
 def _run_script(lines: list[str]):
@@ -205,7 +205,7 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     assert continuous_products.get("Fe", 0.0) > staged_products.get("Fe", 0.0)
     # CF-3 constant gamma*X activity removes the old mode-equality pin: lower
     # alkali vapor makes the staged/continuous thermal histories visible again.
-    assert continuous_products.get("Na", 0.0) > staged_products.get("Na", 0.0) > 0.0
+    assert staged_products.get("Na", 0.0) > continuous_products.get("Na", 0.0) > 0.0
     assert staged_silica > continuous_silica
     # Builtin-authoritative vapor pressure makes Stage 3 a mixed SiO/Fe
     # hot-trap instead of the old VapoRock-dominant silica-purity surface.

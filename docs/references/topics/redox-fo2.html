@@ -31,6 +31,13 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>docs/chemistry-provenance.notes.md:29</code> - Highest-priority gaps to encode first (authority / golden / certification paths): - **Kress91 composition coeffs** (`simulator/fe_redox.py`) — cited (REF-001) elsewhere but not at the definition site.</li>
 <li><code>simulator/fe_redox.py:24</code> - class Kress91InvalidControls(ValueError): # provenance: Kress91 coefficients — REF-001 CMP 108:82-92; ln(fO2) and inverse-T terms.</li>
+<li><code>simulator/fe_redox.py:51</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # source REF-001 defines the Kress91 liquid relation and 1200 C floor.</li>
+<li><code>simulator/fe_redox.py:57</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 liquid relation; below 1200 C calibration floor&#x27;</li>
+<li><code>simulator/fe_redox.py:63</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # CASE 1200-1630 C: AUTHORITATIVE Kress &amp; Carmichael 1991, REF-001,</li>
+<li><code>simulator/fe_redox.py:70</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 1200-1630 C calibration band&#x27;,</li>
+<li><code>simulator/fe_redox.py:83</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 retained; REF-053 confirms high-T extrapolation&#x27;</li>
+<li><code>simulator/fe_redox.py:95</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 retained beyond REF-053 confirmation band&#x27;,</li>
+<li><code>simulator/fe_redox.py:105</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 outside authorized temperature envelope&#x27;,</li>
 </ul>
 </section>
 <section class="entry" id="REF-035">
@@ -72,6 +79,42 @@ ul { padding-left: 1.4rem; }</style>
 <p><a href="https://doi.org/10.1016/S0016-7037(02)00828-1">doi:10.1016/S0016-7037(02)00828-1</a></p>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong> none</p>
+</section>
+<section class="entry" id="REF-053">
+<h2>REF-053</h2>
+<p class="citation">Aithala, Macris &amp; Hirschmann (2026). High-temperature Fe3+/SigmaFe measurements supporting Kress91 extrapolation in silicate melts. <em>Geochemical Perspectives Letters</em>.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="redox-fo2.html">redox-fo2</a></p>
+<p><a href="https://doi.org/10.7185/geochemlet.2617">doi:10.7185/geochemlet.2617</a> | <a href="https://doi.org/10.7185/geochemlet.2617">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>simulator/fe_redox.py:76</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # Aithala, Macris &amp; Hirschmann 2026 (REF-053, doi:10.7185/geochemlet.2617);</li>
+<li><code>simulator/fe_redox.py:83</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 retained; REF-053 confirms high-T extrapolation&#x27;</li>
+<li><code>simulator/fe_redox.py:89</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # CASE 2100-2500 C: extrapolation with growing uncertainty; REF-053 is</li>
+<li><code>simulator/fe_redox.py:95</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 retained beyond REF-053 confirmation band&#x27;,</li>
+</ul>
+</section>
+<section class="entry" id="REF-054">
+<h2>REF-054</h2>
+<p class="citation">Kilinc, A., Carmichael, I.S.E., Rivers, M.L. &amp; Sack, R.O. (1983). The ferric-ferrous ratio of natural silicate liquids equilibrated in air. <em>Contributions to Mineralogy and Petrology</em>.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="redox-fo2.html">redox-fo2</a></p>
+<p><a href="https://doi.org/10.1007/BF00373086">doi:10.1007/BF00373086</a> | <a href="https://doi.org/10.1007/BF00373086">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>simulator/fe_redox.py:64</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # doi:10.1007/BF00307328. Kilinc 1983 (REF-054) and Jayasuriya 2004</li>
+</ul>
+</section>
+<section class="entry" id="REF-055">
+<h2>REF-055</h2>
+<p class="citation">Jayasuriya, K.D., O&#x27;Neill, H.St.C., Berry, A.J. &amp; Campbell, S.J. (2004). A Mossbauer study of the oxidation state of Fe in silicate melts. <em>American Mineralogist</em>.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="redox-fo2.html">redox-fo2</a></p>
+<p><a href="https://doi.org/10.2138/am-2004-11-1203">doi:10.2138/am-2004-11-1203</a> | <a href="https://doi.org/10.2138/am-2004-11-1203">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>simulator/fe_redox.py:65</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # (REF-055) are comparison/validation sources, not wider model authority.</li>
+</ul>
 </section>
 </body>
 </html>

@@ -59,7 +59,7 @@ An alternative to C2A_continuous that uses explicit stage holds for sequential p
 1. **alkali_early_fe** — ramp to 1250 °C, 600 °C/hr, 4 h: Na and K.
 2. **sio_window** — ramp to 1600 °C, 175 °C/hr, 3 h: SiO with minor Fe co-evolution.
 3. **fe_hot_hold** — ramp to 1750 °C, 150 °C/hr, 1 h: Fe thermal depletion to ~88 % (residual FeO ~20–24 kg).
-4. **cool_for_na_shuttle** — cool to 1150 °C before C3_NA (Na-only) shuttle dose. The K shuttle is no longer used at this stage under V1c-JANAF Ellingham: K/Fe crossover dropped to ~832 °C, well below any practical melt T, so engine refuses K→FeO reduction. C2A_staged now advances to C3_NA (not C3_K) and uses Na as the sole reductant in the cool window where Na/Fe margin is still positive (Na/Fe crossover @ 1173 °C).
+4. **cool_for_na_shuttle** — cool to 1150 °C before C3_NA (Na-only) shuttle dose. The K shuttle is no longer used at this stage under JANAF-4th multiphase Ellingham (2026-07-09 re-ground): K/Fe crossover is ~836 °C, well below any practical melt T, so engine refuses K→FeO reduction. C2A_staged now advances to C3_NA (not C3_K) and uses Na as the sole reductant in the cool window where Na/Fe margin is still positive (Na/Fe crossover @ 1181.5 °C).
 
 **Operator knobs** (via session script):
 
@@ -70,7 +70,7 @@ An alternative to C2A_continuous that uses explicit stage holds for sequential p
 
 Note on `hold_temp_C`: this is a cycle-time lever, not a thermal-yield ceiling breaker. Running hotter within the 1650–1800 °C bounds increases the thermal Fe extraction fraction but does not remove the physical FeO floor that requires the shuttle.
 
-**Engine policy (post-V1c)**: the shuttle T-acceptance gate (S1b) refuses any K→FeO reduction (margin negative everywhere in practical melt T per V1c-JANAF) and refuses Na→FeO above the 1173 °C crossover. The C2A_staged cool window @ 1150 °C is the only physically defended Na-shuttle T; the engine reports `status="refused"` with structured diagnostic if the operator overrides T above the crossover. K added via `--additive=K=<kg>` will not produce Fe from the shuttle — operators wanting K product should expect it from C2A_continuous evaporation only, not C3.
+**Engine policy (post-V1c)**: the shuttle T-acceptance gate (S1b) refuses any K→FeO reduction (margin negative everywhere in practical melt T per JANAF-4th multiphase) and refuses Na→FeO above the 1181.5 °C crossover (2026-07-09 multiphase re-ground). The C2A_staged cool window @ 1150 °C is the only physically defended Na-shuttle T; the engine reports `status="refused"` with structured diagnostic if the operator overrides T above the crossover. K added via `--additive=K=<kg>` will not produce Fe from the shuttle — operators wanting K product should expect it from C2A_continuous evaporation only, not C3.
 
 Source: `data/setpoints.yaml` lines 139–248.
 
@@ -90,13 +90,13 @@ Source: `data/setpoints.yaml` lines 251–277.
 **Temperature**: inject 1050–1150 °C (cool window), bakeout 1520–1680 °C.  
 **Atmosphere**: Fe-granule sorbent + precision O₂ micro-bleed (pO₂ 0.5–1.5 mbar bakeout).  
 **Reductant**: Na only.  
-**Status**: legacy C3 was a mixed Na/K shuttle; under the V1c JANAF refit the K phase is refused at any practical melt T (K/Fe crossover ~832 °C) and the engine `status="refused"` is recorded in `shuttle_refusal_history`. The surviving recipe is Na-only.
+**Status**: legacy C3 was a mixed Na/K shuttle; under the JANAF-4th multiphase re-ground (2026-07-09) the K phase is refused at any practical melt T (K/Fe crossover ~836 °C) and the engine `status="refused"` is recorded in `shuttle_refusal_history`. The surviving recipe is Na-only.
 
 The shuttle architecture is one tier per injection: inject Na → reduce FeO at 1050–1150 °C → tap Fe metal → pO₂ bakeout → recover Na. The shuttle does not chemically reduce Cr, Ti, or Mn at C3 temperatures — those targets are refused by the executable thermodynamic gate (S1b). Si conditioning is a melt-activity side effect of Na₂O accumulation, not a separate cycle.
 
 Cycles after Path A: 1 Na. Cycles after Path B: 2 Na (Path B preserved more FeO and SiO₂ in the melt, so the post-C2B shuttle has more work). Na₂O solubility cap in the melt is 8–12 wt%.
 
-Honest limit: the Na/Fe crossover is 1173.4 °C, leaving a thin positive margin at the 1150 °C inject T. Running the inject T above the crossover causes the engine to refuse the step and record the refusal verbatim. K added via `--additive=K=<kg>` is ignored by the C3 shuttle gate — operators wanting K product should expect it from C2A_continuous evaporation, not C3.
+Honest limit: the Na/Fe crossover is 1181.5 °C (2026-07-09 multiphase re-ground), leaving a positive (~31 °C) margin at the 1150 °C inject T. Running the inject T above the crossover causes the engine to refuse the step and record the refusal verbatim. K added via `--additive=K=<kg>` is ignored by the C3 shuttle gate — operators wanting K product should expect it from C2A_continuous evaporation, not C3.
 
 Source: `data/setpoints.yaml` §1 `C3:` block (the YAML key is still `C3` for backward compat with goldens; the engine resolves the surviving phases at dispatch).
 
@@ -214,4 +214,4 @@ REE-enriched feedstocks (KREEP variants, targeted super-KREEP ore) yield proport
 - **Fe yield plateau around 88–90 % in C2A_staged**: expected thermal extraction limit; residual FeO (20–24 kg) is the shuttle's feed. This is correct behavior, not a failure.
 - **Very low non-refractory yields on first run without shuttle dose**: the shuttle is reagent-limited when the Na additive is not loaded. Confirm `--additive=Na=12` is present for C2A_staged, or that Na shuttle stock has accumulated from prior C2 cycles. (`--additive=K=...` is accepted but ignored by the post-V1c shuttle gate; it will not raise Fe yield.)
 
-**`shuttle_refusal_history` non-empty in the runner output**: at least one shuttle step was refused by the S1b T-acceptance gate. Each entry names the campaign, hour, melt T, and the engine's thermodynamic margin. Common cause: inject T above the species-pair crossover (Na/Fe @ 1173.4 °C, K/Fe @ 832 °C). The whole-run `status` stays `ok` or `partial` for per-step refusals; only `KnudsenRegimeRefusal`-class halts escalate to `status="refused"`. See [`docs/runner-output-schema.md`](runner-output-schema.md) §"Shuttle refusal history".
+**`shuttle_refusal_history` non-empty in the runner output**: at least one shuttle step was refused by the S1b T-acceptance gate. Each entry names the campaign, hour, melt T, and the engine's thermodynamic margin. Common cause: inject T above the species-pair crossover (Na/Fe @ 1181.5 °C, K/Fe @ 836 °C; 2026-07-09 multiphase re-ground). The whole-run `status` stays `ok` or `partial` for per-step refusals; only `KnudsenRegimeRefusal`-class halts escalate to `status="refused"`. See [`docs/runner-output-schema.md`](runner-output-schema.md) §"Shuttle refusal history".

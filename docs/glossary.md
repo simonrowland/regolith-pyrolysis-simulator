@@ -22,13 +22,13 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **C2B** — pO₂-managed Fe pyrolysis (Path B); preserves CMAS glass in the melt. Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
-**C3 (C3_NA, C3_K)** — alkali metallothermic polish campaign family. Under the V1c JANAF refit, the surviving recipe is **C3_NA** (Na-only at the cool 1150 °C window); **C3_K** is refused by the S1b engine gate at any practical melt T (K/Fe crossover ~832 °C), and Cr/Ti targets are refused at C3 temperatures. Refused dispatches are recorded in `shuttle_refusal_history`. Source: `data/setpoints.yaml` §1 `C3:`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
+**C3 (C3_NA, C3_K)** — alkali metallothermic polish campaign family. Under the JANAF-4th multiphase re-ground (2026-07-09), the surviving recipe is **C3_NA** (Na-only at the cool 1150 °C window); **C3_K** is refused by the S1b engine gate at any practical melt T (K/Fe crossover ~836 °C), and Cr/Ti targets are refused at C3 temperatures. Refused dispatches are recorded in `shuttle_refusal_history`. Source: `data/setpoints.yaml` §1 `C3:`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
 **C4** — selective Mg pyrolysis campaign (Branch Two preferred). Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
 **C5** — limited MRE under O₂ backpressure; Branch Two max 1.6 V targeting SiO₂ → Si metal. Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
-**C6** — Mg thermite reduction (3Mg + Al₂O₃ → 3MgO + 2Al); V1c keeps the equilibrium default below the ~1573 °C Mg/Al crossover, with hotter operation requiring a kinetic/local-heating justification. Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
+**C6** — Mg thermite reduction (3Mg + Al₂O₃ → 3MgO + 2Al); the default 1500 °C hold now sits above the ~1471 °C Mg/Al crossover under the JANAF-4th multiphase re-ground (2026-07-09), so standard-state Mg→Al₂O₃ is favorable only at the low end of the [1450,1550] °C range and default-T C6 relies on the local thermite exotherm / kinetic basis. Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
 **Cleaned melt** — silicate-only melt after Stage 0 removes volatiles, salts, native metals, halides, sulfates, and perchlorates. The input to the C1–C6 extraction sequence. Corresponds to `process.cleaned_melt` in the `AtomLedger`. See [`docs/process-model.md`](process-model.md).
 

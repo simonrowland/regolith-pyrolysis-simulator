@@ -40,7 +40,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Any, Mapping, Optional
+from typing import Any, Callable, Mapping, Optional
 
 from simulator.core import (
     EvaporationFlux, MeltState, OverheadGas, CondensationTrain,
@@ -68,6 +68,8 @@ DEFAULT_PIPE_M_AVG_KG_MOL = 0.040  # kg/mol — fallback mole-weighted pipe gas 
 
 def _mean_molar_mass_kg_mol(
     species_kg: Optional[Mapping[str, float]],
+    *,
+    fallback_engagement_recorder: Optional[Callable[[], None]] = None,
 ) -> float:
     """Mole-weighted mean molar mass of a species mixture, kg/mol.
 
@@ -100,6 +102,8 @@ def _mean_molar_mass_kg_mol(
         denominator).
     """
     if not species_kg:
+        if fallback_engagement_recorder is not None:
+            fallback_engagement_recorder()
         return DEFAULT_PIPE_M_AVG_KG_MOL
     total_kg = 0.0  # kg — summed species mass
     total_mol = 0.0  # mol — summed species amount
@@ -119,6 +123,8 @@ def _mean_molar_mass_kg_mol(
         total_kg += mass
         total_mol += mass / (molar_mass_g_mol / 1000.0)  # mol — g/mol -> kg/mol
     if total_mol <= 0.0 or total_kg <= 0.0:
+        if fallback_engagement_recorder is not None:
+            fallback_engagement_recorder()
         return DEFAULT_PIPE_M_AVG_KG_MOL
     return total_kg / total_mol
 
@@ -151,14 +157,29 @@ class OverheadGasModel:
         'pipe_segment_temperatures_C': None,  # °C — per-pipe-segment wall temperature schedule
     }
 
-    def __init__(self, headspace_config: Optional[Mapping] = None):
+    def __init__(
+        self,
+        headspace_config: Optional[Mapping] = None,
+        *,
+        degraded_path_engagement_recorder: Optional[Callable[..., None]] = None,
+    ):
         # Pipe geometry (default for 1-tonne batch)
         self.pipe_diameter_m = 0.12      # m — pipe inner diameter default (12 cm)
         self.pipe_length_m = 1.0         # m — crucible-to-first-condenser pipe length
         self._pipe_temperature_C = DEFAULT_PIPE_TEMPERATURE_C  # °C — active pipe/liner wall temperature
         self._liner_temperature_config: Any = DEFAULT_PIPE_TEMPERATURE_C  # °C or schedule — liner temperature config
         self._pipe_segment_temperature_config: Any = None  # °C or mapping — per-segment wall temperature config
+        self._degraded_path_engagement_recorder = (
+            degraded_path_engagement_recorder
+        )
         self.configure_headspace(headspace_config or {})
+
+    def _record_pipe_m_avg_fallback_engagement(self) -> None:
+        if self._degraded_path_engagement_recorder is not None:
+            self._degraded_path_engagement_recorder(
+                'pipe_m_avg_fallback',
+                count=1,
+            )
 
     @property
     def pipe_temperature_C(self) -> float:
@@ -808,7 +829,12 @@ class OverheadGasModel:
 
         # Convert to mass conductance (kg/s)
         # Using ideal gas: ρ = p × M / (R × T)
-        M_avg = _mean_molar_mass_kg_mol(species_kg_for_M_avg)  # kg/mol — mole-weighted gas molar mass
+        M_avg = _mean_molar_mass_kg_mol(  # kg/mol — mole-weighted gas molar mass
+            species_kg_for_M_avg,
+            fallback_engagement_recorder=(
+                self._record_pipe_m_avg_fallback_engagement
+            ),
+        )
         rho = p_mean_Pa * M_avg / (8.314 * T_K)  # kg/m³ — ideal-gas density; 8.314 J/(mol·K)
 
         return C_vol * rho  # kg/s — pipe mass-flow capacity at p_mean

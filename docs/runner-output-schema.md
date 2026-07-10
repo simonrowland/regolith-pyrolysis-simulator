@@ -6,7 +6,7 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.3.1`
+**Schema version:** `1.3.3`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
 
 Run the CLI as:
@@ -48,13 +48,17 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.3.1",
+  "schema_version": "1.3.3",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
   "stage_purity_report": {...}, // see "Stage purity report"
   "vapor_pressure_source_report": {...}, // see "Vapor pressure source report"
   "shuttle_refusal_history": [...], // see "Shuttle refusal history"
+  "c7_product_report": {...}, // see "C7 product report and refusal diagnostic"
+  "c7_refusal_diagnostic": {...}, // see "C7 product report and refusal diagnostic"
+  "degraded_path_engagement": {...}, // see "Degraded-path engagement"
+  "melt_redox_gate_floor_fallback_engagement": {...}, // see "Melt-redox gate floor fallback engagement"
   "pO2_enforcement_by_hour": [...], // see "pO2 enforcement"
   "per_hour_summary": [...],    // see "Per-hour summary"
   "shadow_trace": [...],        // see "Shadow trace"
@@ -68,11 +72,15 @@ All top-level keys are required.  Tests assert the **exact** set --
 adding a new key requires bumping `RUNNER_SCHEMA_VERSION` and the
 schema-shape assertion.
 
+The C7 report and refusal fields were already conditionally emitted by
+schema 1.3.2. Making them unconditional completes that existing contract;
+it does not introduce a new schema version.
+
 ## Run metadata
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.3.1",
+  "schema_version": "1.3.3",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -187,7 +195,7 @@ schema-shape assertion.
 * `deposit_by_surface_species_kg` is the final wall deposit projection
   by interstage segment/species, sourced from the same snapshot/trace
   wall-deposit data exported per hour.
-* `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.3.1`
+* `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.3.3`
   reports the explicit sentinel `not_applicable_until_p0`; P6b will
   replace it with pump/outlet totals after molecular transport lands.
 
@@ -284,6 +292,79 @@ schema-shape assertion.
   are refused (the recipe can still complete; the C3 cleanup target is
   what suffers). `status='refused'` is reserved for whole-run refusals
   that cannot continue, e.g. `KnudsenRegimeRefusal`.
+
+## C7 product report and refusal diagnostic
+
+```jsonc
+"c7_product_report": {
+  "enabled": true,
+  "products": {...},
+  "diagnostic": {...}
+},
+"c7_refusal_diagnostic": {
+  "reason_refused": "c7_vacuum_shifted_thermo_margin_unfavorable",
+  "computed_thermo_margin_kj_per_mol_o2": -153.94,
+  "thermo_margin_source": "builtin_janaf_ellingham_al_ca"
+}
+```
+
+Both fields are always present and object-shaped. `c7_product_report` is
+`{}` until C7 produces its report. `c7_refusal_diagnostic` is `{}` unless
+the C7 authority refuses a step. Early failure envelopes emit `{}` for
+both fields, preserving the exact top-level key contract.
+
+## Degraded-path engagement
+
+```jsonc
+"degraded_path_engagement": {
+  "condensation_antoine_extrapolation": {
+    "engaged": true,
+    "total_count": 2,
+    "by_hour": [
+      {"campaign": "C2A", "hour": 6, "campaign_hour": 2, "count": 2}
+    ]
+  },
+  "capture_budget_regularizer": {...},
+  "transport_d_ab_proxy": {...},
+  "unmeasured_alpha_evaporation_fallback": {...},
+  "pipe_m_avg_fallback": {...}
+}
+```
+
+The umbrella field and all five path objects are always present in success and
+failure envelopes. A path that did not engage serializes as
+`{engaged: false, total_count: 0, by_hour: []}`. The field is additive in
+schema 1.3.3; it does not change any degraded-path calculation or gate.
+
+`total_count` and each `by_hour[].count` count the path's native engagement
+units: Antoine extrapolation records, capture-regularizer route calls,
+transport-proxy species, unmeasured-alpha species, or pipe-conductance
+calculations using the documented M_avg fallback. The rows also carry campaign,
+global hour, and campaign hour so repeated engagements are attributable without
+parsing warnings. These counts are diagnostics only; they never enter mass,
+mole, energy, pressure, or partition arithmetic.
+
+## Melt-redox gate floor fallback engagement
+
+```jsonc
+"melt_redox_gate_floor_fallback_engagement": {
+  "engaged": true,
+  "total_count": 2,
+  "by_hour": [
+    {"campaign": "C0", "hour": 0, "campaign_hour": 0, "count": 1},
+    {"campaign": "C0", "hour": 1, "campaign_hour": 1, "count": 1}
+  ]
+}
+```
+
+* Always present. Healthy liquidus authority serializes
+  `{engaged: false, total_count: 0, by_hour: []}` so a golden proves
+  fallback absence instead of relying on an omitted field.
+* Counts only the typed Kress91 1200 °C floor fallback used when no valid
+  liquidus curve is available. A diagnostic provider name containing
+  `fallback` is still a real curve and does not increment this field.
+* `by_hour` is the bounded per-hour aggregate retained by the simulator;
+  `total_count` remains monotonic even if the bounded history rolls over.
 
 ## Per-hour summary
 
@@ -416,13 +497,16 @@ schema-shape assertion.
            "inventory_present": true,
            "derived_Ed_V": 0.8,
            "delta_vs_declared_rung_V": 0.05,
-           "delta_vs_static_declared_V": 0.05,
-           "declared_after_held_rung": false,
-           "status": "ok"
-         }
-       }
-     }
-     ```
+            "delta_vs_static_declared_V": 0.05,
+            "declared_after_held_rung": false,
+            "voltage_authority": "ellingham_graph",
+            "voltage_authoritative": true,
+            "status": "ok"
+          }
+        },
+        "non_authoritative_voltage_by_oxide": {}
+      }
+      ```
      `activity_basis: cleaned_melt_account` means oxide activities and
      `inventory_present` are read from `process.cleaned_melt` after the existing
      C5 active-residue move and before electrolysis dispatch.  If the

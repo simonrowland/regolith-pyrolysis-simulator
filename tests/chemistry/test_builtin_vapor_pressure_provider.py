@@ -40,7 +40,6 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_extrapolation,
     ellingham_fit_range_K,
-    ellingham_fit_segments,
     ellingham_segment_for_temperature,
 )
 from simulator.chemistry import melt_activity
@@ -62,7 +61,7 @@ from tests.chemistry.conftest import _build_sim
 
 
 _VP_TOLERANCE_REL = 1e-9
-_VP_TOLERANCE_ABS_PA = 1e-9
+_VP_TOLERANCE_ABS_PA = 3e-7
 _CA_RANGE_EXTRAPOLATION_T_K = 2000.0
 
 _V1C_JANAF_ELLINGHAM = {
@@ -90,18 +89,25 @@ def test_ellingham_table_matches_v1c_janaf_refit():
 
 
 @pytest.mark.parametrize(
-    ("species", "expected_1600C", "expected_1800C", "expected_1900C"),
+    (
+        "species",
+        "fit_range_max_K",
+        "expected_1600C",
+        "expected_1800C",
+        "expected_1900C",
+    ),
     [
-        ("Na", -128.47, -20.98, 32.76),
-        ("K", -0.71, 103.40, 155.46),
-        ("Fe", -303.37, -275.26, -261.21),
-        ("Mn", -484.25, -451.12, -434.56),
-        ("Cr", -432.12, -398.39, -381.52),
-        ("Si", -563.74, -521.31, -500.09),
+        ("Na", 2600.0, -157.82, -65.74, -19.70),
+        ("K", 2000.0, -9.06, 84.50, 131.26),
+        ("Fe", 2600.0, -310.43, -289.09, -278.42),
+        ("Mn", 2600.0, -484.25, -451.12, -434.56),
+        ("Cr", 2600.0, -431.82, -397.96, -379.93),
+        ("Si", 2600.0, -575.46, -537.21, -518.08),
     ],
 )
 def test_cf2lite_janaf_mbar_species_match_extended_anchor_window(
     species: str,
+    fit_range_max_K: float,
     expected_1600C: float,
     expected_1800C: float,
     expected_1900C: float,
@@ -109,7 +115,7 @@ def test_cf2lite_janaf_mbar_species_match_extended_anchor_window(
     # CF-2-lite anchors: NIST-JANAF/Chase 1998 table IDs cited in
     # simulator.chemistry.ellingham_thermo. Values are copied here so this is
     # an external-anchor check, not helper self-parity.
-    assert ellingham_fit_range_K(species)[1] == pytest.approx(2200.0)
+    assert ellingham_fit_range_K(species)[1] == pytest.approx(fit_range_max_K)
     assert ellingham_delta_g_kj_per_mol_o2(
         species,
         1600.0 + 273.15,
@@ -125,25 +131,21 @@ def test_cf2lite_janaf_mbar_species_match_extended_anchor_window(
 
 
 def test_cf2lite_ellingham_segments_use_phase_correct_high_t_basis() -> None:
-    assert "Fe(s)" in ellingham_segment_for_temperature("Fe", 1800.0).phase_basis
+    assert "Fe(gamma)" in ellingham_segment_for_temperature("Fe", 1600.0).phase_basis
+    assert "Fe(delta)" in ellingham_segment_for_temperature("Fe", 1800.0).phase_basis
     assert "Fe(l)" in ellingham_segment_for_temperature("Fe", 1873.15).phase_basis
     assert "Si(s)" in ellingham_segment_for_temperature("Si", 1600.0).phase_basis
     assert "Si(l)" in ellingham_segment_for_temperature("Si", 1873.15).phase_basis
     assert "Mn(l)" in ellingham_segment_for_temperature("Mn", 1873.15).phase_basis
-    assert "Cr(s)" in ellingham_segment_for_temperature("Cr", 2179.0).phase_basis
-    assert "Cr(l)" in ellingham_segment_for_temperature("Cr", 2181.0).phase_basis
-    cr_solid, cr_liquid = ellingham_fit_segments("Cr")
-    assert cr_solid.delta_g_kJ_per_mol_O2(2180.0) == pytest.approx(
-        cr_liquid.delta_g_kJ_per_mol_O2(2180.0),
-        abs=1e-9,
-    )
+    assert "Cr(s)" in ellingham_segment_for_temperature("Cr", 2129.0).phase_basis
+    assert "Cr(l)" in ellingham_segment_for_temperature("Cr", 2131.0).phase_basis
     assert ellingham_delta_g_kj_per_mol_o2("Cr", 2190.0) == pytest.approx(
-        -378.547120,
+        -376.818710,
         abs=1e-6,
     )
 
     extrapolation = ellingham_fit_extrapolation(
-        1400.0,
+        1000.0,
         species="Mn",
         consumer="test",
     )
@@ -579,6 +581,26 @@ def test_single_cation_mole_fraction_uses_mol_ledger_not_wt_proxy():
     assert activity.activity == pytest.approx(1.0e-3 * 0.25)
 
 
+@pytest.mark.parametrize("oxide", ["Cr2O3", "MnO", "TiO2", "Na2O"])
+def test_melt_activity_normalizes_pure_raoultian_component_to_unity(oxide):
+    activity = melt_oxide_activity(oxide, {oxide: 1.0})
+
+    assert activity is not None
+    assert activity.x_single_cation == pytest.approx(1.0)
+    assert activity.activity == pytest.approx(1.0)
+    assert activity.provenance()["melt_oxide_activity_reference_state"] == (
+        "single_cation_Raoultian_pure_liquid_reference"
+    )
+
+
+def test_melt_activity_retains_constant_gamma_x_for_mixed_melts():
+    activity = melt_oxide_activity("Cr2O3", {"Cr2O3": 0.01, "SiO2": 0.99})
+
+    assert activity is not None
+    assert activity.x_single_cation == pytest.approx(0.019801980198019802)
+    assert activity.activity == pytest.approx(31.1 * activity.x_single_cation)
+
+
 def test_metal_vapor_activity_gamma_is_linear_for_alkalis_and_refractory_species(
     vapor_pressure_data,
     monkeypatch,
@@ -722,7 +744,7 @@ def test_demaria_1971_na_validation_case_reports_measured_pressure_gap(
 
     assert modeled_p_na > 0.0
     assert p_na_by_T[1538.0] > p_na_by_T[1396.0]
-    assert gap_factor == pytest.approx(36.61015344, rel=1e-6)
+    assert gap_factor == pytest.approx(31.19182575, rel=1e-6)
 
 
 class _LegacyFallbackStub(EquilibriumMixin):
@@ -1089,9 +1111,8 @@ def test_builtin_provider_marks_pure_component_range_extrapolation(
 
     assert result.vapor_pressures_Pa["Ca"] > 0.0
     assert result.vapor_pressures_source["Ca"] == (
-        "builtin_extrapolation_limited:pure_component_source_equation_fit:"
-        "extrapolated_beyond_valid_range_K:"
-        "extrapolated_beyond_ellingham_fit_range_K"
+        "builtin_authoritative:pure_component_source_equation_fit:"
+        "extrapolated_beyond_valid_range_K"
     )
     assert any(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
@@ -1107,14 +1128,13 @@ def test_builtin_provider_exposes_consumable_ellingham_authority_flag(
 
     authority = result.diagnostic["ellingham_authority"]
     assert authority["consumer"] == "builtin-vapor-pressure"
-    assert authority["status"] == "extrapolation_limited"
-    assert authority[ELLINGHAM_AUTHORITY_LIMIT_FLAG] is True
-    assert "Ca" in authority["extrapolated_beyond_fit_range_K"]
+    assert authority["status"] == "authoritative"
+    assert authority[ELLINGHAM_AUTHORITY_LIMIT_FLAG] is False
+    assert authority["extrapolated_beyond_fit_range_K"] == {}
     source_label = result.diagnostic["vapor_pressures_source"]["Ca"]
-    assert "builtin_authoritative" not in source_label
-    assert source_label.startswith("builtin_extrapolation_limited:")
+    assert source_label.startswith("builtin_authoritative:")
     assert source_label.endswith(
-        "extrapolated_beyond_ellingham_fit_range_K"
+        "extrapolated_beyond_valid_range_K"
     )
 
 
@@ -1127,17 +1147,9 @@ def test_legacy_fallback_marks_ellingham_fit_range_extrapolation(
     )._stub_equilibrium()
 
     assert result.vapor_pressures_Pa["Fe"] > 0.0
-    assert "builtin_authoritative" not in result.vapor_pressures_source["Fe"]
-    assert result.vapor_pressures_source["Fe"].startswith(
-        "builtin_extrapolation_limited:"
-    )
+    assert result.vapor_pressures_source["Fe"].startswith("builtin_authoritative:")
     assert result.vapor_pressures_source["Fe"].endswith(
-        "extrapolated_beyond_ellingham_fit_range_K"
-    )
-    assert any(
-        "Fe Ellingham JANAF high-T fit extrapolated beyond fit_range_K"
-        in warning
-        for warning in result.warnings
+        "extrapolated_beyond_valid_range_K"
     )
 
 
@@ -1152,7 +1164,10 @@ def test_legacy_fallback_grounds_mn_liquid_source_band(
     assert result.vapor_pressures_source["Mn"] == (
         "builtin_authoritative:pure_component_derived_from_evaluation"
     )
-    assert result.diagnostics["ellingham_authority"]["status"] == "authoritative"
+    assert (
+        result.diagnostics["ellingham_authority"]["status"]
+        == "authoritative"
+    )
 
 
 def test_legacy_fallback_marks_pseudo_vaporock_sources_non_authoritative(

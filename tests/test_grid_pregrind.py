@@ -1,0 +1,527 @@
+from __future__ import annotations
+
+import json
+import math
+import sqlite3
+import sys
+from types import SimpleNamespace
+
+import pytest
+
+import scripts.grid_pregrind as grid_pregrind
+from scripts.grid_pregrind import (
+    ALPHAMELTS_UNCONSTRAINED_FO2_ARGUMENT,
+    DEFAULT_FEEDSTOCKS,
+    build_grid_points,
+    composition_wt_pct_to_mol,
+    expand_composition_axes,
+    generate_simplex_grid,
+    kress91_partitioned_composition_mol,
+    load_feedstock_box,
+    point_inputs,
+    temperature_grid,
+)
+from scripts.grid_pregrind_writer import (
+    FINDER_INPUT_FIELDS,
+    GridCacheWriter,
+    canonical_input_vector,
+    expedited_key,
+)
+from scripts.grind_harvest import harvest_snapshot
+
+
+def test_feedstock_simplex_grid_sums_deduplicates_and_respects_bounds():
+    bounds = load_feedstock_box(DEFAULT_FEEDSTOCKS)
+    points = generate_simplex_grid(bounds)
+
+    assert points
+    keys = {
+        tuple(point.get(oxide, 0.0) for oxide in bounds)
+        for point in points
+    }
+    assert len(keys) == len(points)
+    for point in points:
+        assert math.isclose(sum(point.values()), 100.0, abs_tol=1e-12)
+        for oxide, (lower, upper) in bounds.items():
+            value = point.get(oxide, 0.0)
+            assert lower <= value <= upper
+            assert math.isclose(value / 10.0, round(value / 10.0), abs_tol=1e-12)
+
+    expanded, spec = expand_composition_axes(DEFAULT_FEEDSTOCKS, points)
+    assert expanded
+    assert len(spec["cr2o3_levels_wt_pct"]) in {2, 3}
+    for point in expanded:
+        assert len(point) == 14
+        assert math.isclose(sum(point.values()), 100.0, abs_tol=1e-12)
+
+
+def test_grid_seed_is_deterministic_and_temperature_band_is_dense():
+    compositions = [
+        {"SiO2": 50.0, "FeO": 25.0, "MgO": 25.0},
+        {"SiO2": 45.0, "FeO": 30.0, "MgO": 25.0},
+    ]
+    temperatures = temperature_grid()
+
+    assert len(temperatures) == 27
+    assert 1125.0 in temperatures
+    assert 1425.0 not in temperatures
+    total_a, first = build_grid_points(
+        compositions, temperatures, [-9.0, -8.0], seed=178, limit=20
+    )
+    total_b, second = build_grid_points(
+        compositions, temperatures, [-9.0, -8.0], seed=178, limit=20
+    )
+    _total_c, third = build_grid_points(
+        compositions, temperatures, [-9.0, -8.0], seed=179, limit=20
+    )
+    assert total_a == total_b == len(compositions) * len(temperatures) * 2
+    assert first == second
+    assert first != third
+    assert {point.pressure_bar for point in first} == {1.0}
+
+
+def test_kress_partition_preserves_iron_and_moves_target_into_composition():
+    composition = {
+        "SiO2": 50.0,
+        "TiO2": 1.5,
+        "Al2O3": 15.0,
+        "FeO": 10.0,
+        "Fe2O3": 0.0,
+        "MgO": 7.0,
+        "CaO": 11.0,
+        "Na2O": 3.0,
+        "K2O": 0.3,
+    }
+    baseline = composition_wt_pct_to_mol(composition)
+    reducing = kress91_partitioned_composition_mol(
+        composition, temperature_C=1400.0, intended_fO2_log=-12.0
+    )
+    oxidizing = kress91_partitioned_composition_mol(
+        composition, temperature_C=1400.0, intended_fO2_log=-5.0
+    )
+    total_fe = baseline["FeO"] + 2.0 * baseline["Fe2O3"]
+    for partitioned in (reducing, oxidizing):
+        assert math.isclose(
+            partitioned["FeO"] + 2.0 * partitioned["Fe2O3"],
+            total_fe,
+            rel_tol=0.0,
+            abs_tol=1.0e-12,
+        )
+    assert oxidizing["Fe2O3"] > reducing["Fe2O3"] > 0.0
+    assert oxidizing["FeO"] < reducing["FeO"]
+
+
+def test_iron_free_points_collapse_nonidentity_fo2_provenance_before_sharding():
+    composition = {"SiO2": 50.0, "MgO": 25.0, "CaO": 25.0}
+    total, points = build_grid_points(
+        [composition], [1200.0, 1300.0], [-12.0, -9.0, -5.0], seed=178
+    )
+
+    assert total == len(points) == 2
+    assert {point.intended_fO2_log for point in points} == {-12.0}
+    assert {point.ordinal % 3 for point in points} == {0, 1}
+
+
+def test_intended_fo2_is_provenance_while_partitioned_couple_keys_the_point():
+    composition = {"SiO2": 50.0, "FeO": 25.0, "MgO": 25.0}
+    _total, points = build_grid_points(
+        [composition], [1400.0], [-12.0, -5.0], seed=178
+    )
+    args = SimpleNamespace(
+        model="MELTSv1.0.2",
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+    )
+    vectors = [point_inputs(point, args) for point in points]
+
+    assert {item["pressure_bar"] for item in vectors} == {1.0}
+    assert {item["fO2_log"] for item in vectors} == {
+        ALPHAMELTS_UNCONSTRAINED_FO2_ARGUMENT
+    }
+    assert vectors[0]["composition_mol"] != vectors[1]["composition_mol"]
+    assert expedited_key(vectors[0]) != expedited_key(vectors[1])
+    assert "intended_fO2_log" not in canonical_input_vector(vectors[0])
+
+
+def _inputs(temperature_C: float) -> dict:
+    composition = {
+        "SiO2": 10.0,
+        "TiO2": 0.0,
+        "Al2O3": 0.0,
+        "Fe2O3": 0.0,
+        "Cr2O3": 0.0,
+        "FeO": 5.0,
+        "MnO": 0.0,
+        "MgO": 0.0,
+        "NiO": 0.0,
+        "CoO": 0.0,
+        "CaO": 0.0,
+        "Na2O": 0.0,
+        "K2O": 0.0,
+        "P2O5": 0.0,
+    }
+    values = {
+        "temperature_C": temperature_C,
+        "composition_kg": None,
+        "fO2_log": -9.0,
+        "pressure_bar": 1.0,
+        "composition_mol": composition,
+        "composition_mol_by_account": {"process.cleaned_melt": composition},
+        "species_formula_registry": None,
+        "mode": "subprocess",
+        "redox_buffer": None,
+        "fO2_offset": None,
+        "Fe3Fet_Liq": None,
+        "model": "MELTSv1.0.2",
+        "timeout_s": 20.0,
+        "require_petthermotools": False,
+        "thermoengine_health_timeout_s": 8.0,
+    }
+    values.update({name: None for name in FINDER_INPUT_FIELDS})
+    return values
+
+
+def _output(status: str = "ok") -> dict:
+    return {
+        "status": status,
+        "status_kind": "success" if status == "ok" else "refusal",
+        "refusal_reason": None if status == "ok" else "test_refusal",
+        "raw_payload": json.dumps({"stdout": "native output\n"}),
+        "raw_payload_format": "alphamelts-subprocess-capture-v1",
+        "timing_s": 1.2345678901234567,
+        "engine_version": "alphaMELTS test",
+        "engine_mode": "subprocess",
+        "engine_model": "MELTSv1.0.2",
+        "native_input": {"SiO2": 66.66666666666667},
+        "generic": {
+            "temperature_C": 1200.1234567890123,
+            "pressure_bar": 1.0,
+            "phases_present": ["liquid"],
+            "phase_masses_kg": {"liquid": 0.1},
+            "phase_species_mol": {},
+            "phase_species_kg": {},
+            "phase_compositions": {},
+            "liquid_fraction": 1.0,
+            "phase_assemblage_available": True,
+            "liquid_composition_wt_pct": {"SiO2": 66.66666666666667},
+            "liquid_viscosity_Pa_s": None,
+            "vapor_pressures_Pa": {},
+            "vapor_pressures_source": {},
+            "activity_coefficients": {},
+            "fO2_log": -9.0,
+            "warnings": [],
+            "ledger_transition": None,
+            "status": status,
+            "sulfur_saturation": None,
+            "liquidus_T_C": None,
+            "diagnostics": {},
+        },
+        "alphamelts": {
+            "backend_status": status,
+            "backend_warnings": [],
+            "engine_version": "alphaMELTS test",
+            "mode": "subprocess",
+        },
+        "finder": {},
+        "host": "test-host",
+    }
+
+
+def _prepared_drain_database(database):
+    with GridCacheWriter(database) as writer:
+        writer.seed_id_block(0)
+        batch_id = writer.ensure_batch(
+            label="fixed-v2",
+            kind="fixed",
+            seed=178,
+            params={
+                "full_grid_points": 1,
+                "shard_count": 3,
+                "kress91_partition": {
+                    "implementation": "fixture:kress91_split",
+                    "version": "fixture-v1",
+                },
+            },
+        )
+        assert writer.materialize_key(
+            _inputs(1200.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+
+
+class _ImmediateResult:
+    def __init__(self, value):
+        self.value = value
+
+    def ready(self):
+        return True
+
+    def get(self):
+        return self.value
+
+
+class _ImmediatePool:
+    def __init__(self, processes, initializer, initargs):
+        del initializer, initargs
+        self.processes = processes
+        self.submissions = 0
+
+    def apply_async(self, function, args):
+        self.submissions += 1
+        return _ImmediateResult(function(*args))
+
+    def close(self):
+        pass
+
+    def terminate(self):
+        pass
+
+    def join(self):
+        pass
+
+
+class _ImmediateContext:
+    def __init__(self):
+        self.pool = None
+
+    def Pool(self, *, processes, initializer, initargs):
+        self.pool = _ImmediatePool(processes, initializer, initargs)
+        return self.pool
+
+
+def test_drain_only_uses_prepared_queue_without_importing_fe_redox(
+    tmp_path, monkeypatch
+):
+    database = tmp_path / "prepared.db"
+    status = tmp_path / "status.json"
+    _prepared_drain_database(database)
+    context = _ImmediateContext()
+    sys.modules.pop("simulator.fe_redox", None)
+
+    monkeypatch.setattr(grid_pregrind.signal, "signal", lambda *_args: None)
+    monkeypatch.setattr(
+        grid_pregrind,
+        "probe_engine",
+        lambda _config: {
+            "available": True,
+            "engine_version": "fixture-engine",
+            "mode": "subprocess",
+        },
+    )
+    monkeypatch.setattr(
+        grid_pregrind.multiprocessing,
+        "get_context",
+        lambda method: context if method == "spawn" else None,
+    )
+
+    def fake_run_point(job):
+        assert "simulator.fe_redox" not in sys.modules
+        return job.grid_key_id, _output()
+
+    monkeypatch.setattr(grid_pregrind, "_run_point", fake_run_point)
+    monkeypatch.setattr(
+        grid_pregrind,
+        "kress91_partition_parameters",
+        lambda: pytest.fail("drain-only imported or recomputed Kress91 metadata"),
+    )
+    monkeypatch.setattr(
+        grid_pregrind,
+        "build_grid_points",
+        lambda *_args, **_kwargs: pytest.fail("drain-only generated a grid"),
+    )
+    monkeypatch.setattr(
+        GridCacheWriter,
+        "ensure_batch",
+        lambda *_args, **_kwargs: pytest.fail("drain-only upserted a batch"),
+    )
+    monkeypatch.setattr(
+        GridCacheWriter,
+        "materialize_key",
+        lambda *_args, **_kwargs: pytest.fail("drain-only materialized a key"),
+    )
+
+    assert (
+        grid_pregrind.main(
+            [
+                "--drain-only",
+                "--db",
+                str(database),
+                "--status-json",
+                str(status),
+                "--workers",
+                "2",
+                "--limit",
+                "6",
+                "--shard",
+                "0",
+            ]
+        )
+        == 0
+    )
+    assert "simulator.fe_redox" not in sys.modules
+    assert context.pool.processes == 2
+    assert context.pool.submissions == 1
+
+    with sqlite3.connect(database) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM batches").fetchone()[0] == 1
+        assert connection.execute("SELECT COUNT(*) FROM grid_keys").fetchone()[0] == 1
+        assert (
+            connection.execute("SELECT COUNT(*) FROM alphamelts_outputs").fetchone()[0]
+            == 1
+        )
+        metadata = json.loads(
+            connection.execute(
+                "SELECT value FROM metadata WHERE key = 'last_drain_run'"
+            ).fetchone()[0]
+        )
+    assert metadata["workers"] == 2
+    assert metadata["engine_probe"]["engine_version"] == "fixture-engine"
+    assert metadata["batch_params_refs"][0]["params_source"] == "batches.params_json"
+    assert metadata["batch_params_refs"][0]["kress91_partition"]["version"] == "fixture-v1"
+
+
+def test_drain_only_refuses_database_without_materialized_queue(tmp_path, monkeypatch):
+    database = tmp_path / "empty.db"
+    with GridCacheWriter(database):
+        pass
+    sys.modules.pop("simulator.fe_redox", None)
+    monkeypatch.setattr(grid_pregrind.signal, "signal", lambda *_args: None)
+    monkeypatch.setattr(
+        grid_pregrind,
+        "probe_engine",
+        lambda _config: pytest.fail("empty drain queue reached the engine probe"),
+    )
+
+    with pytest.raises(
+        SystemExit,
+        match="DRAIN-ONLY REFUSED: database has no materialized queue",
+    ):
+        grid_pregrind.main(["--drain-only", "--db", str(database)])
+    assert "simulator.fe_redox" not in sys.modules
+
+
+def test_existing_prepared_database_requires_explicit_drain_only(tmp_path, monkeypatch):
+    database = tmp_path / "prepared.db"
+    _prepared_drain_database(database)
+    sys.modules.pop("simulator.fe_redox", None)
+    monkeypatch.setattr(grid_pregrind.signal, "signal", lambda *_args: None)
+    monkeypatch.setattr(
+        grid_pregrind,
+        "load_feedstock_box",
+        lambda *_args, **_kwargs: pytest.fail("guard allowed grid regeneration"),
+    )
+
+    with pytest.raises(SystemExit, match="use --drain-only"):
+        grid_pregrind.main(["--db", str(database)])
+    assert "simulator.fe_redox" not in sys.modules
+
+
+def test_writer_round_trip_and_resume_skip(tmp_path):
+    database = tmp_path / "grind.db"
+    inputs = _inputs(1200.1234567890123)
+    key = expedited_key(inputs)
+
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        assert writer.materialize_key(
+            inputs,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        assert writer.write_result(grid_key_id, _output())
+        writer.commit()
+        assert writer.existing_keys([key]) == {key}
+        assert not writer.write_result(grid_key_id, _output())
+        writer.commit()
+        assert writer.pending_rows(batch_id=batch_id) == []
+
+        row = writer.connection.execute(
+            "SELECT h.temperature_C, h.temperature_C_repr, "
+            "h.intended_fO2_log, h.intended_fO2_log_repr, "
+            "o.timing_s, o.timing_s_repr, o.raw_payload, "
+            "o.generic_liquid_composition_wt_pct_json "
+            "FROM grid_keys h JOIN alphamelts_outputs o ON o.grid_key_id = h.id"
+        ).fetchone()
+        assert row["temperature_C"] == inputs["temperature_C"]
+        assert float(row["temperature_C_repr"]) == inputs["temperature_C"]
+        assert row["intended_fO2_log"] == -9.0
+        assert row["intended_fO2_log_repr"] == "-9.0"
+        assert row["timing_s"] == _output()["timing_s"]
+        assert float(row["timing_s_repr"]) == _output()["timing_s"]
+        assert json.loads(row["raw_payload"])["stdout"] == "native output\n"
+        assert json.loads(row["generic_liquid_composition_wt_pct_json"])[
+            "SiO2"
+        ] == 66.66666666666667
+        assert writer.counts() == {
+            "success": 1,
+            "refusal": 0,
+            "failure": 0,
+            "total": 1,
+        }
+
+
+def test_incremental_harvest_tracks_source_id_and_skips_replay(tmp_path):
+    source = tmp_path / "source.db"
+    accumulator = tmp_path / "accumulator.db"
+    with GridCacheWriter(source) as writer:
+        writer.seed_id_block(0)
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            _inputs(1100.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        writer.materialize_key(
+            _inputs(1150.0),
+            batch_id=batch_id,
+            shuffle_rank=3,
+            shard=0,
+            intended_fO2_log=-8.0,
+        )
+        for row in writer.pending_rows(batch_id=batch_id):
+            writer.write_result(row["grid_key_id"], _output())
+        writer.commit()
+
+    first = harvest_snapshot(source, accumulator, source_host="studio-1")
+    second = harvest_snapshot(source, accumulator, source_host="studio-1")
+
+    assert first["pulled"] == first["inserted"] == 2
+    assert first["accumulator_total"] == 2
+    assert second["pulled"] == second["inserted"] == 0
+    assert second["last_seen_after"] == first["last_seen_after"]
+
+    with sqlite3.connect(accumulator) as connection:
+        assert connection.execute(
+            "SELECT last_seen_id FROM harvest_state "
+            "WHERE source_host='studio-1' AND source_table='alphamelts_outputs'"
+        ).fetchone()[0] == 1_000_000_001
+        assert connection.execute(
+            "SELECT MIN(id) FROM alphamelts_outputs"
+        ).fetchone()[0] == 1_000_000_000
+
+
+def test_actual_pressure_and_explicit_iron_couple_are_expedited_key_axes():
+    base = _inputs(1200.0)
+    pressure = dict(base, pressure_bar=0.015)
+    ferric = dict(base)
+    ferric_composition = dict(base["composition_mol"])
+    ferric_composition.update({"Fe2O3": 1.0, "FeO": 3.0})
+    ferric["composition_mol"] = ferric_composition
+    ferric["composition_mol_by_account"] = {
+        "process.cleaned_melt": ferric_composition
+    }
+
+    assert expedited_key(base) != expedited_key(pressure)
+    assert expedited_key(base) != expedited_key(ferric)

@@ -206,12 +206,10 @@ def test_builtin_authority_dispatches_even_when_vaporock_available(
     assert "kernel_fallback_used" not in diagnostic
     sources = dict(diagnostic.get("vapor_pressures_source") or {})
     assert sources
-    authoritative_species = {"Cr", "Fe", "K", "Mn", "Na"}
+    authoritative_species = {"Al", "Ca", "Cr", "Fe", "K", "Mg", "Mn", "Na", "Ti"}
     pseudo_vaporock_species = {"SiO"}
-    limited_species = {"Al", "Ca", "Mg", "Ti"}
     assert authoritative_species.issubset(sources)
     assert pseudo_vaporock_species.issubset(sources)
-    assert limited_species.issubset(sources)
     for species in authoritative_species:
         assert sources[species].startswith("builtin_authoritative:")
     for species in pseudo_vaporock_species:
@@ -219,9 +217,6 @@ def test_builtin_authority_dispatches_even_when_vaporock_available(
             "vaporock_backsolved_curve_fit:"
             "backsolved_vaporock_curve_fit"
         )
-    for species in limited_species:
-        assert sources[species].startswith("builtin_extrapolation_limited:")
-        assert "builtin_authoritative" not in sources[species]
 
     shadow = _shadow_result(sim)
     assert shadow.status == "non_authoritative"

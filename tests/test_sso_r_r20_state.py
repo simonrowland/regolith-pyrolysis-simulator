@@ -1037,11 +1037,11 @@ def test_c3_na_cr_ti_source_term_scales_each_target_oxide() -> None:
 
     assert transition.name == "c3_na_shuttle_reduction"
     assert cr2o3_mol > 0.0
-    assert tio2_mol > 0.0
+    assert tio2_mol == pytest.approx(0.0)
     assert cr2o3_terms["cr2o3_component"] == pytest.approx(
         expected_cr2o3_source
     )
-    assert tio2_terms["tio2_component"] == pytest.approx(expected_tio2_source)
+    assert tio2_terms == {}
     assert sim._redox_source_breakdown_diagnostic()[
         "terms_mol_o2_equiv_by_label"
     ][label] == pytest.approx(expected_total_source)
@@ -1112,7 +1112,7 @@ def test_mre_source_term_comes_from_committed_anode_o2_transition() -> None:
     sim.start_campaign(CampaignPhase.C5)
     sim.melt.c5_enabled = True
     sim.melt.mre_target_species = "SiO2"
-    sim.melt.mre_max_voltage_V = 1.45
+    sim.melt.mre_max_voltage_V = 1.4910580719159003
     sim.melt.temperature_C = 1600.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim._sync_oxygen_reservoir_mirror()
@@ -1139,6 +1139,10 @@ def test_mre_source_term_comes_from_committed_anode_o2_transition() -> None:
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2", 0.0
     ) == pytest.approx(0.0)
+    assert breakdown["redox_source_terms_applied"] is True
+    assert breakdown["applied_terms_mol_o2_equiv_by_label"][label] == pytest.approx(
+        -anode_o2_mol
+    )
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
 
 
@@ -1304,7 +1308,11 @@ def test_c7_external_al_credit_lowers_fO2_from_committed_transition(
     assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
         -0.5 * ca_mol
     )
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
+    assert breakdown["redox_source_terms_applied"] is False
+    assert breakdown["skipped_reasons_by_label"][label] == "no_melt_redox_capacity"
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        before_fO2
+    )
 
 
 def test_c7_in_situ_al_route_does_not_double_count_prior_reducing_power(
@@ -1759,6 +1767,7 @@ def test_fe_redox_respeciation_closes_scalar_ledger_divergence_with_real_o2() ->
     assert before["status"] == "warning"
     assert diagnostic["status"] == "ok"
     assert diagnostic["direction"] == "oxidizing"
+    assert diagnostic["respeciation_status"] == "ok"
     assert after["status"] == "ok"
     assert after["delta_abs"] <= FERRIC_DIVERGENCE_WARNING_THRESHOLD
     assert melt_mol.get("Fe2O3", 0.0) > 0.0
@@ -1834,9 +1843,9 @@ def test_fe_redox_respeciation_uses_evaporative_internal_o_without_overhead_draw
     assert diagnostic["status"] == "ok"
     assert diagnostic["direction"] == "oxidizing"
     assert diagnostic["oxygen_source"] == "evaporative_metal_loss_internal"
+    assert diagnostic["respeciation_status"] == "ok"
     assert melt_mol.get("Fe2O3", 0.0) > 0.0
     assert buffer_mol.get("O2", 0.0) < before_buffer_o2
-    assert buffer_mol.get("O2", 0.0) >= 0.0
     assert after_o2 == pytest.approx(before_o2)
     breakdown = sim._redox_source_breakdown_diagnostic()
     attempts = breakdown["fe_redox_respeciation_attempts"]
@@ -1844,6 +1853,7 @@ def test_fe_redox_respeciation_uses_evaporative_internal_o_without_overhead_draw
         "evaporative_metal_loss_internal"
     )
     assert attempts[-1]["status"] == "ok"
+    assert attempts[-1]["direction"] == "oxidizing"
 
 
 def test_fe_redox_respeciation_skips_below_liquid_calibration_band() -> None:

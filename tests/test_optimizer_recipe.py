@@ -437,7 +437,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # bounds change). Recomputed controller-side on the production venv after
     # the wall-selector pole-guard follow-up (914a2a3 + scope fix) finalized
     # the resolution fingerprint.
-    assert cache_key(spec) == "f448556f48fca480fe9949f056772ece3582bdbf01fc9675d269ee0832da6029"
+    # 2026-07-09 (JANAF-4th multiphase re-ground + Mn in-range authority fix):
+    # cache_key moves because the canonical payload differs from 3a0e64c only
+    # in data_digests.setpoints plus vapor_pressure_provider_code_fingerprint;
+    # substituting those two old fields reproduces f448556f..., proving no
+    # schema/allowlist drift.
+    assert cache_key(spec) == "2e0a3a9fbffac0a2a5a94d9c4c4a8c05d3b2808fe5ddfce2345f9f08e2df5d8b"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

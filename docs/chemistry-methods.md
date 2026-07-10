@@ -171,7 +171,7 @@ FeO exists only for external callers that invoke the vapor-pressure provider wit
 channel. This ideal-for-non-iron, Kress-for-iron activity surface is what the vapor pressures of §2 are
 built on.
 <!-- impl: §3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:745 — FeO Kress activity -->
-<!-- impl: §3 -> simulator/fe_redox.py kress91_ferrous_feo_activity:562 — FeO activity path -->
+<!-- impl: §3 -> simulator/fe_redox.py kress91_ferrous_feo_activity:652 — FeO activity path -->
 
 The silicate-equilibrium engines compute activities too, on the MELTS convention
 
@@ -380,7 +380,7 @@ fresh equilibrium solve at each instant: it smooths the time integration but ass
 is constant over the tick, which accumulates error when the melt composition swings hard within a
 single hour. It is stated as a current approximation in
 [`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1304 — hourly depletion reservoir -->
+<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1336 — hourly depletion reservoir -->
 
 ### §4.4 The Knudsen and Langmuir limits, the sweep, and self-poisoning
 
@@ -527,7 +527,7 @@ number — total iron expressed as ferrous oxide — and do **not** resolve the 
 fluorescence measure total iron by X-ray intensity and cannot separate the oxidation states at
 collection time, so all iron is booked as FeO and the redox state must be inferred afterward. Every
 feedstock in the catalog follows this convention, and its annotations say so.
-<!-- impl: §7.1 -> simulator/fe_redox.py feot_equivalent_wt_pct:229 — total iron conversion -->
+<!-- impl: §7.1 -> simulator/fe_redox.py feot_equivalent_wt_pct:319 — total iron conversion -->
 
 That convention is also a validation caveat for mass-spectrometry comparisons. A KEMS sample sees vapor
 over the ferric/ferrous state actually present in the experimental melt, while the simulator starts from
@@ -545,8 +545,22 @@ vapor pressure. The activity authority switches by regime: below the iron–wüs
 metal-saturated and uses a CALPHAD/Holzheid stoichiometric-wüstite activity coefficient (γ_FeO ≈ 1.70,
 Holzheid 1997); above iron–wüstite plus one log unit it uses the Kress & Carmichael ferric limb; between
 them it blends smoothly, with the activity clamped at the pure-FeO ceiling.
-<!-- impl: §7.1 -> simulator/fe_redox.py _kress91_fe2o3_over_feo_molar:457 — Kress redox split -->
-<!-- impl: §7.1 -> simulator/fe_redox.py _calphad_feo_activity_components:580 — FeO activity blend -->
+<!-- impl: §7.1 -> simulator/fe_redox.py _kress91_fe2o3_over_feo_molar:547 — Kress redox split -->
+<!-- impl: §7.1 -> simulator/fe_redox.py _calphad_feo_activity_components:670 — FeO activity blend -->
+
+**Temperature band and the liquidus gate.** The Kress & Carmichael calibration spans **1200–1630 °C**
+(228 quench analyses, iron–wüstite to air; the prior 1400 °C floor was a *conservative* gate, superseded by
+`max(actual liquidus, ~1200 °C)`; the paper's own floor is 1200 °C). Redox is therefore gated at
+**`max(actual liquidus, ~1200 °C)`** rather than a flat 1400 °C, and — as the evaporation path already
+does but the redox path did not — the redox capacity is scaled by the **continuous melt fraction**
+through the sub-liquidus mush rather than switched
+on/off, so reactivity follows the amount of liquid actually present. At the high end the relation extrapolates
+well to ~2100 °C with *experimental* confirmation (Aithala, Macris & Hirschmann 2026, *Geochem. Persp. Lett.*
+40:18–23, [doi:10.7185/geochemlet.2617](https://doi.org/10.7185/geochemlet.2617) — Kress91 matches their ΔCp
+model within uncertainty over 1250–2100 °C); uncertainty grows above ~2500 K. Kilinc 1983
+([doi:10.1007/BF00373086](https://doi.org/10.1007/BF00373086)) and Jayasuriya 2004
+([doi:10.2138/am-2004-11-1203](https://doi.org/10.2138/am-2004-11-1203)) were considered but do not widen the
+T-range; the code retains Kress91 across the furnace band, tagged by temperature band in-comment.
 
 Because the split is an **inference from an assumed oxygen fugacity, temperature, and composition — not
 a measurement — it carries a systematic bias, and the bias is oxidizing.** The redox reference is
@@ -569,13 +583,20 @@ The alkali shuttle reduces iron oxide chemically rather than thermally: dosed el
 oxygen from ferrous oxide (`2 Na + FeO → Na₂O + Fe`), freeing metallic iron that can be tapped or
 evaporated at a different point in the sequence than the SiO window, which is what de-conflicts the
 overlapping iron and SiO thermal windows. The reaction is gated by a strict thermodynamic acceptance
-test built on the JANAF Ellingham refit: the crossover temperatures put sodium/iron at ≈ 1173 °C and
-potassium/iron at ≈ 832 °C, and the executable gate refuses any dispatch with non-positive
+test built on the JANAF Ellingham refit: the crossover temperatures put sodium/iron at ≈ 1181 °C and
+potassium/iron at ≈ 836 °C (JANAF-4th multiphase values, Chase 1998; the 2026-07-09 re-ground moved
+these ≈ 8 °C and ≈ 4 °C up from the earlier linear-refit 1173/832 °C when the alkali lines were re-fit
+with the post-boiling-point slope break), and the executable gate refuses any dispatch with non-positive
 thermodynamic margin at its temperature — so potassium is refused as an iron-oxide reductant across the
 practical melt window, sodium is refused above its crossover, and each refusal is recorded in the run
-output. Inside the gate the reaction is treated as temperature-independent; it does not interpolate
-yields across the crossover band. The physics and the crossover values are developed in
-`docs/concepts.md`.
+output. For TiO2, acceptance uses the stricter raw thermodynamic margin, not only the NaO0.5
+activity-shifted diagnostic margin. A TiO2 target is refused whenever the minimum of shifted Na/Ti,
+raw Na/Ti, and Cr/Ti margins is non-positive; being in-band only makes the refusal authoritative, it
+does not make Ti reducible. This Ti rule is part of the same uncommitted re-ground epoch as the
+metallothermy fix and dual review IDs `codex-36227` and `grok-36559`. Inside the gate the reaction is
+treated as temperature-independent; it does not interpolate yields across the crossover band. The
+physics and the crossover values are developed in `docs/concepts.md`.
+<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider.dispatch:231 — metallothermic refusal behavior -->
 <!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._reduction_margin_kj_per_mol_o2:1198 — Ellingham margin gate -->
 <!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._crossover_temperature_C:1412 — crossover temperatures -->
 
@@ -594,8 +615,39 @@ temperature, and are labelled UNCERTIFIED. The ferric full-reduction rung is ref
 path can reduce ferric to ferrous through an explicitly uncertified diagnostic route rather than a
 validated ferric-current-partition model. Metal-phase settling and drain-tap are not modelled —
 reduced metal accumulates in a single account and is reported directly as product.
-<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider._nernst_voltage:693 — Nernst correction -->
-<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider.dispatch:234 — Faraday ledger step -->
+<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider._nernst_voltage:744 — Nernst correction -->
+<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider.dispatch:262 — Faraday ledger step -->
+
+### §7.4 Redox capacity: the liquidus scalar and the negligible-mol floor
+
+The melt's differential redox capacity `C_m` — how much oxygen the ferric/ferrous couple can exchange
+per unit change in `ln fO₂` — is proportional to the Fe inventory *actually in the liquid*, so it is
+scaled by the active residual-liquid fraction rather than switched on and off at a single temperature:
+`C_m_effective = C_m_full · liquid_fraction`, tending to zero at the solidus. The `liquid_fraction` is
+the same freeze-gate melt fraction the evaporation path already uses (§ the freeze gate), and the
+liquidus itself is gated at `max(actual liquidus, ~1200 °C)` per the Kress calibration floor (§7.1). For
+now this is a **single bulk scalar**: it does not partition Fe between liquid and solid per species, so
+in a mid-mush window (roughly 15–30 % residual liquid) it treats the liquid as compositionally identical
+to the bulk. True fractional melting — where Fe-in-liquid need not track the bulk liquid fraction — is
+MELTS-class phase-partitioning and is deferred (backlog); the scalar is honest about being a
+first-order approximation, not a partition model.
+
+Below the project's negligible-mol numerical floor (`OXYGEN_RESERVOIR_NOOP_MOL = 1e-15`) the capacity is
+treated as no redox capacity at all (`no_melt_redox_capacity`), not divided into. A saturated or
+shuttle-exhausted melt drives `C_m` into this band (observed down to denormalized ~1e-293 mol per ln fO₂
+after the C3 alkali shuttle); dividing a residual source term by such a `C_m` yields an absurd candidate
+fO₂ (finite ~1e9…1e287, or overflow to non-finite), so *applying* it would corrupt the reservoir. A
+full-grid SSO-R scan (review codex-7466, 2026-07-08) found 846 of 15082 real source-term calls in this
+band and confirmed the floor refuses 37 real rows the prior branch would have applied as absurd fO₂
+jumps — a correctness fix, **not** a fail-open: floored terms are recorded as a refusal, never as
+success. The physical justification (owner-confirmed): in the default vacuum regime the O₂ tied to a
+floored term sits below lunar-atmosphere pressure (~1e-15 bar), i.e. the free-molecular ballistic-escape
+regime, so it leaves the system without re-equilibrating with the melt — applying versus refusing the
+tiny term does not change the physics (the oxygen escapes ballistically either way), so the floor is
+moot precisely where it fires. Graded range/saturation refusals still apply *above* the floor, where a
+real capacity meets an out-of-range or non-finite demand.
+<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._melt_redox_source_capacity_mol_per_ln_fO2:3219 — C_m liquid_fraction -->
+<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._apply_oxygen_reservoir_redox_source_terms:3441 — negligible-mol redox floor -->
 
 ---
 
@@ -797,3 +849,14 @@ governing discipline, stated in [`docs/citation-policy.md`](citation-policy.md),
 disagrees with reference data the response is investigation, never retuning a coefficient to force
 agreement. The appropriate and inappropriate uses of the simulator's numbers are enumerated in
 [`docs/model-limitations.md`](model-limitations.md).
+
+When a value comes from a **real** external phase engine (alphaMELTS, MAGEMin) rather than an internal
+analytic model, its reproducibility is protected by the cache identity, not just the source citation.
+Real-engine results are memoized under a key that includes the feedstock/state inputs **and** the
+resolved engine name, the evaluation mode, and the engine's own version string — so a cached value is
+served only for the exact engine configuration that produced it, and a result computed under a prior
+engine version or a different mode is invalidated rather than silently reused. The key matches on the
+declared version, not a cross-machine content digest, so the same engine build reproduces its cache on
+another cluster node while a genuine engine change still busts it. This is what lets a validation number
+be re-derived and audited rather than taken on trust that "the cache had it."
+<!-- impl: §11 -> simulator/reduced_real_determinism.py _engine_version_provenance:2624 — real-provider cache identity (model+mode+engine version) -->

@@ -139,8 +139,8 @@ GOLDENS = (
 # CLI runs in the t-141 epoch regen; deltas match the worker enumeration
 # (docs-private/research/2026-07-07-t141-kmox/golden-deltas.json).
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 8.71338858761e-06,
-    "mars_basalt": 7.03525888239e-06,
+    "lunar_mare_low_ti": 8.71334308073e-06,
+    "mars_basalt": 7.03489699246e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +

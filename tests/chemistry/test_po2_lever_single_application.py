@@ -115,6 +115,82 @@ def test_builtin_vapor_pressure_po2_slope_once(
 
 
 @pytest.mark.parametrize(
+    ("species", "temperature_C", "expected_slope"),
+    [
+        ("Na", 1100.0, -0.25),
+        ("K", 1100.0, -0.25),
+        ("Mg", 1100.0, -0.5),
+        ("Ca", 1100.0, -0.5),
+        ("Mn", 1100.0, -0.5),
+        ("Al", 1500.0, -0.75),
+        ("Ti", 1700.0, -1.0),
+    ],
+)
+def test_non_feo_metal_dissociation_uses_intrinsic_melt_fo2(
+    vapor_pressure_data,
+    species: str,
+    temperature_C: float,
+    expected_slope: float,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+
+    def pressure(transport_pO2_bar: float, intrinsic_fO2_log: float):
+        result = provider.dispatch(
+            _request(
+                ChemistryIntent.VAPOR_PRESSURE,
+                transport_pO2_bar,
+                temperature_C=temperature_C,
+                fO2_log=intrinsic_fO2_log,
+                control_inputs={"intrinsic_fO2_log": intrinsic_fO2_log},
+            )
+        )
+        diagnostic = result.diagnostic
+        provenance = diagnostic["vapor_pressure_numerator_provenance"][species]
+        return diagnostic["vapor_pressures_Pa"][species], provenance["pO2_bar"]
+
+    reduced_pressure, reduced_pO2_bar = pressure(1.0e-6, -12.0)
+    high_transport_pressure, high_transport_pO2_bar = pressure(1.0e-4, -12.0)
+    oxidized_pressure, oxidized_pO2_bar = pressure(1.0e-6, -10.0)
+
+    assert reduced_pO2_bar == pytest.approx(1.0e-12)
+    assert high_transport_pO2_bar == pytest.approx(1.0e-12)
+    assert oxidized_pO2_bar == pytest.approx(1.0e-10)
+    assert high_transport_pressure == pytest.approx(reduced_pressure)
+
+    observed_slope = math.log10(oxidized_pressure / reduced_pressure) / math.log10(
+        1.0e-10 / 1.0e-12
+    )
+    assert observed_slope == pytest.approx(expected_slope, abs=1.0e-9)
+
+
+def test_feo_metal_dissociation_transport_denominator_unchanged(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    pressures = []
+    provenance_pO2 = []
+    for transport_pO2_bar in (1.0e-9, 1.0e-7):
+        result = provider.dispatch(
+            _request(
+                ChemistryIntent.VAPOR_PRESSURE,
+                transport_pO2_bar,
+                temperature_C=1100.0,
+                fO2_log=-10.0,
+                control_inputs={"intrinsic_fO2_log": -10.0},
+            )
+        )
+        diagnostic = result.diagnostic
+        pressures.append(diagnostic["vapor_pressures_Pa"]["Fe"])
+        provenance_pO2.append(
+            diagnostic["vapor_pressure_numerator_provenance"]["Fe"]["pO2_bar"]
+        )
+
+    assert provenance_pO2 == pytest.approx([1.0e-9, 1.0e-7])
+    observed_slope = math.log10(pressures[1] / pressures[0]) / math.log10(100.0)
+    assert observed_slope == pytest.approx(-0.5, abs=1.0e-9)
+
+
+@pytest.mark.parametrize(
     ("species", "expected_slope"),
     [
         ("Na", -0.25),

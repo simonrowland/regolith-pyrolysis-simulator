@@ -718,6 +718,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if intrinsic_fO2_log_supplied
             else None
         )
+        melt_dissociation_pO2_bar = transport_pO2_bar
+        if intrinsic_fO2_log is not None:
+            try:
+                melt_dissociation_pO2_bar = 10.0 ** float(intrinsic_fO2_log)
+            except OverflowError:
+                melt_dissociation_pO2_bar = 1e300
+            melt_dissociation_pO2_bar = min(
+                max(melt_dissociation_pO2_bar, 1e-30),
+                1e300,
+            )
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
         )
@@ -854,13 +864,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 pO2_scaled = False
                 pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
                 if pO2_exponent:
+                    # Melt-dissolved non-FeO oxide dissociation sees the
+                    # melt's oxygen chemical potential; headspace pO2 is only
+                    # the transport/backpressure channel.
                     pO2_reference_bar = max(
                         1e-30,
                         float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
                     )
                     P_eq_Pa = _require_finite_vapor_value(
                         P_eq_Pa
-                        * (transport_pO2_bar / pO2_reference_bar)
+                        * (melt_dissociation_pO2_bar / pO2_reference_bar)
                         ** pO2_exponent,
                         species=species,
                         field="P_eq_pO2",
@@ -890,7 +903,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         ),
                         "P_reference_Antoine_Pa": P_reference_Pa,
                         "P_eq_Pa": P_eq_Pa,
-                        "pO2_bar": transport_pO2_bar,
+                        "pO2_bar": melt_dissociation_pO2_bar,
                         "activity_factor": activity_factor,
                         "oxide_activity_exponent": activity_exponent,
                         "pO2_exponent": pO2_exponent,
@@ -969,8 +982,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="K_decomp",
             )
+            dissociation_pO2_bar = (
+                transport_pO2_bar
+                if parent_oxide == 'FeO'
+                else melt_dissociation_pO2_bar
+            )
+            # Melt-dissolved non-FeO oxide dissociation sees the melt's
+            # oxygen chemical potential; headspace pO2 remains reserved for
+            # gas transport/backpressure. FeO already carries melt redox
+            # through its Kress91 activity and is intentionally unchanged.
             numerator = _require_finite_vapor_value(
-                K_decomp * (a_oxide ** n_ox) / transport_pO2_bar,
+                K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar,
                 species=species,
                 field="metal_activity_numerator",
             )
@@ -1019,7 +1041,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     ),
                     "P_reference_Antoine_Pa": P_reference_Pa,
                     "P_eq_Pa": P_eq_Pa,
-                    "pO2_bar": transport_pO2_bar,
+                    "pO2_bar": dissociation_pO2_bar,
                     "activity_factor": a_M_liquid,
                     "source_label": source_label,
                 }

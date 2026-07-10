@@ -7,6 +7,7 @@ import pytest
 
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import StubBackend
+from simulator.mre_ladder import canonical_mre_decomposition_voltage
 from simulator.optimize.evaluate import evaluate
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.recipe import RecipePatch
@@ -44,12 +45,14 @@ BASE_PROFILE = {
     "seed_recipes": [{"id": "seed", "source_campaign": "C5", "patch": {}}],
 }
 
+CANONICAL_SIO2_MRE_CAP_V = canonical_mre_decomposition_voltage("SiO2")
+
 
 def _profile(
     *,
     c5_enabled: bool,
     target_species: str = "SiO2",
-    max_voltage_V: float = 1.45,
+    max_voltage_V: float = CANONICAL_SIO2_MRE_CAP_V,
     hours: int = 15,
 ) -> dict:
     profile = deepcopy(BASE_PROFILE)
@@ -69,7 +72,7 @@ def _evaluate_policy(
     *,
     c5_enabled: bool,
     target_species: str = "SiO2",
-    max_voltage_V: float = 1.45,
+    max_voltage_V: float = CANONICAL_SIO2_MRE_CAP_V,
     hours: int = 15,
 ):
     return evaluate(
@@ -147,7 +150,9 @@ def test_tc8_si_target_mre_policy_splits_cache_key_and_stub_outcome() -> None:
     assert off.eval_spec.mre_max_voltage_V == pytest.approx(0.0)
     assert si_target.eval_spec.c5_enabled is True
     assert si_target.eval_spec.mre_target_species == "SiO2"
-    assert si_target.eval_spec.mre_max_voltage_V == pytest.approx(1.45)
+    assert si_target.eval_spec.mre_max_voltage_V == pytest.approx(
+        CANONICAL_SIO2_MRE_CAP_V
+    )
 
     assert _product_ledger(off) == {}
     assert _product_ledger(si_target) != _product_ledger(off)
@@ -159,7 +164,9 @@ def test_tc8_si_target_mre_policy_splits_cache_key_and_stub_outcome() -> None:
     si_trace = si_target.run_reference.trace
     assert max(snapshot.mre_current_A for snapshot in off_trace.snapshots) == pytest.approx(0.0)
     assert max(snapshot.mre_current_A for snapshot in si_trace.snapshots) > 0.0
-    assert max(snapshot.mre_voltage_V for snapshot in si_trace.snapshots) <= 1.45
+    assert max(snapshot.mre_voltage_V for snapshot in si_trace.snapshots) <= (
+        CANONICAL_SIO2_MRE_CAP_V
+    )
 
 
 def test_tc8_si_and_ti_targets_split_c5_behavior_not_only_cache_key() -> None:

@@ -718,7 +718,10 @@ def test_na_shuttle_metals_are_reported_from_process_metal_phase():
         sim.atom_ledger.kg_by_account("process.reagent_inventory").get("Na", 0.0)
     )
     _assert_product_matches_account(sim, "process.metal_phase", "Cr")
-    _assert_product_matches_account(sim, "process.metal_phase", "Ti")
+    assert sim.atom_ledger.kg_by_account("process.metal_phase").get(
+        "Ti", 0.0
+    ) == pytest.approx(0.0)
+    assert sim.product_ledger().get("Ti", 0.0) == pytest.approx(0.0)
 
 
 def test_recovered_condensate_transfers_once_to_reagent_inventory():

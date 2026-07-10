@@ -40,10 +40,12 @@ from __future__ import annotations
 
 import inspect
 import copy
+from collections import deque
+from dataclasses import dataclass
 import logging
 import math
 from pathlib import Path
-from typing import Any, Dict, Mapping, Optional, Tuple
+from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
@@ -166,6 +168,28 @@ from simulator.chemistry.kernel import (
 # ============================================================================
 
 _PRESERVE_REFERENCE_T_K = object()
+_RESOLVE_MELT_REDOX_GATE_AUTHORITY = object()
+_MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN = 256
+DEGRADED_PATH_ENGAGEMENT_KEYS = (
+    'condensation_antoine_extrapolation',
+    'capture_budget_regularizer',
+    'transport_d_ab_proxy',
+    'unmeasured_alpha_evaporation_fallback',
+    'pipe_m_avg_fallback',
+)
+
+
+@dataclass(frozen=True)
+class _MeltRedoxLiquidusFloorFallback:
+    source: str
+    reason: str
+    liquidus_status: Literal['unavailable', 'not_converged', 'invalid']
+
+
+_MeltRedoxGateAuthority = (
+    Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None
+)
+
 
 STAGE0_GAS_COMPONENTS = {
     'h2o', 'co2', 'co_co2', 'organics', 'ch4_nh3_hcn',
@@ -379,6 +403,28 @@ def _pt0_determinism_store_for(owner: Any) -> Any | None:
 _LOGGER = logging.getLogger(__name__)
 
 
+@dataclass(frozen=True)
+class PoisonedHourState:
+    """Failure state for an hour aborted after ledger commits."""
+
+    hour: int
+    committed_transition_count: int
+    aborting_exception_summary: str
+
+
+class PoisonedHourError(RuntimeError):
+    """Raised when retry would replay a partially committed hour."""
+
+    def __init__(self, state: PoisonedHourState):
+        self.state = state
+        super().__init__(
+            f'simulator hour {state.hour} is poisoned after '
+            f'{state.committed_transition_count} ledger transition(s) committed '
+            f'before abort ({state.aborting_exception_summary}); retry refused; '
+            'create a fresh simulator or reload the batch'
+        )
+
+
 class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     """
     Hour-by-hour simulator for the Oxygen Shuttle process.
@@ -541,7 +587,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._freeze_gate_config = self._resolve_freeze_gate_config()
         self._freeze_gate_liquid_fraction_cache: Optional[Dict[str, Any]] = None
+        self._freeze_gate_liquid_fraction_curve_memo: Dict[
+            tuple,
+            Dict[str, Any],
+        ] = {}
+        self._freeze_gate_curve_in_progress: bool = False
         self._last_freeze_gate_diagnostic: Dict[str, Any] = {}
+        self._melt_redox_liquidus_gate_fallback_diagnostics: deque[
+            Dict[str, Any]
+        ] = deque(maxlen=_MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN)
+        self._melt_redox_liquidus_gate_fallback_hourly: deque[
+            Dict[str, Any]
+        ] = deque(maxlen=_MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN)
+        self._melt_redox_liquidus_gate_fallback_count = 0
+        self._degraded_path_engagement: Dict[str, Dict[str, Any]] = {}
+        self._melt_redox_gate_authority_this_tick: object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        )
+        self._melt_redox_gate_authority_tick_hour: int | None = None
+        self._poisoned_hour: PoisonedHourState | None = None
         self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
@@ -560,7 +624,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._rump_expectation_warnings: list[str] = []
         # Shuttle-physics-gate refusals: the post-V1c JANAF Ellingham +
         # S1b shuttle T-acceptance gate refuses K→FeO at any practical
-        # melt T and Na→FeO above the 1173 °C crossover.  When the
+        # melt T and Na→FeO above the 1181.5 °C crossover.  When the
         # engine returns ``status='refused'`` the extraction caller
         # records the structured diagnostic here so the recipe's
         # silent no-op cannot mask an invalid operating regime.
@@ -725,7 +789,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self._overhead_model is None:
             from simulator.overhead import OverheadGasModel
             self._overhead_model = OverheadGasModel(
-                self._overhead_headspace_config)
+                self._overhead_headspace_config,
+                degraded_path_engagement_recorder=(
+                    self._record_degraded_path_engagement
+                ),
+            )
         return self._overhead_model
 
     @property
@@ -1544,6 +1612,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         diagnostic: Mapping[str, Any] | None = None,
         control_inputs: Mapping[str, Any] | None = None,
+        transition_source: str = '',
+        transition_meta: Mapping[str, Any] | None = None,
     ) -> LedgerTransition:
         """Commit a proposal returned by :meth:`_dispatch_only`.
 
@@ -1554,7 +1624,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
         kernel = self._require_chem_kernel()
         balances_before = self.atom_ledger.kg_by_account()
-        transition = kernel.commit_batch(intent, proposal)
+        transition = kernel.commit_batch(
+            intent,
+            proposal,
+            transition_source=transition_source,
+            transition_meta=transition_meta,
+        )
         self._observe_o2_bubbler_external_o2_transition(
             intent,
             transition,
@@ -2222,6 +2297,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         intent: ChemistryIntent,
         *,
         control_inputs: Mapping[str, Any],
+        transition_source: str = '',
+        transition_meta: Mapping[str, Any] | None = None,
     ) -> IntentResult:
         """Dispatch + (if a proposal is returned) commit, in one call.
 
@@ -2247,6 +2324,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             proposal,
             diagnostic=result.diagnostic,
             control_inputs=control_inputs,
+            transition_source=transition_source,
+            transition_meta=transition_meta,
         )
         return result
 
@@ -2369,8 +2448,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _configure_freeze_gate(
         self, campaign: Optional[CampaignPhase] = None
     ) -> None:
+        previous_config = getattr(self, '_freeze_gate_config', None)
         self._freeze_gate_config = self._resolve_freeze_gate_config(campaign)
         self._freeze_gate_liquid_fraction_cache = None
+        if previous_config != self._freeze_gate_config:
+            self._freeze_gate_liquid_fraction_curve_memo = {}
+        self._freeze_gate_curve_in_progress = False
         self._last_freeze_gate_diagnostic = {}
 
     def _freeze_gate_enabled(self) -> bool:
@@ -3133,55 +3216,523 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         return fO2_log
 
-    def _melt_redox_temperature_shift_is_liquid(self, T_K: float) -> bool:
-        if self._freeze_gate_enabled():
-            cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
-            curve = cache.get('curve') if isinstance(cache, dict) else None
-            if isinstance(curve, Mapping):
-                try:
-                    solidus_T_C = float(curve['solidus_T_C'])
-                    liquidus_T_C = float(curve['liquidus_T_C'])
-                except (KeyError, TypeError, ValueError):
-                    pass
-                else:
-                    if math.isfinite(solidus_T_C) and math.isfinite(liquidus_T_C):
-                        # Mush-zone redox shifts the residual liquid couple; at
-                        # this 0-D fidelity, the bulk cleaned-melt composition is
-                        # the residual-liquid approximation fed to Kress91.
-                        regime_diagnostic: dict[str, Any] = {}
-                        regime = melt_regime(
-                            temperature_K=float(T_K),
-                            solidus_K=solidus_T_C + 273.15,
-                            epsilon=0.0,
-                            diagnostic=regime_diagnostic,
-                            diagnostic_site=(
-                                'core.redox_temperature_shift.'
-                                'freeze_gate_solidus'
-                            ),
-                            legacy_predicate='temperature_C > solidus_T_C',
-                        )
-                        # Intentional telemetry for the t-125 uncertainty stack;
-                        # its consumer lands after the predicate-unification work.
-                        self._last_melt_regime_diagnostic = regime_diagnostic
-                        return regime != MeltRegime.FROZEN
-            # Enabled freeze-gate is the liquid authority. Before its first curve
-            # exists, defer reference seeding instead of using the disabled-mode
-            # Kress91 calibration threshold as a false solidus. In the staged
-            # path, evaporation builds the curve on the first hot tick; this
-            # pre-curve window is regression-pinned to <=1 tick.
+    def _melt_redox_liquidus_floor_fallback(
+        self,
+        *,
+        source: str,
+        reason: str,
+        liquidus_status: Literal['unavailable', 'not_converged', 'invalid'],
+    ) -> _MeltRedoxLiquidusFloorFallback:
+        fallback = _MeltRedoxLiquidusFloorFallback(
+            source=source,
+            reason=reason,
+            liquidus_status=liquidus_status,
+        )
+        diagnostic = {
+            'status': 'liquidus_unavailable_floor_fallback',
+            'source': source,
+            'reason': reason,
+            'liquidus_status': liquidus_status,
+            'floor_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+            'hour': int(self.melt.hour),
+            'campaign_hour': int(self.melt.campaign_hour),
+            'campaign': self.melt.campaign.name,
+        }
+        self._last_melt_redox_liquidus_gate_diagnostic = dict(diagnostic)
+        fallback_diagnostics = getattr(
+            self,
+            '_melt_redox_liquidus_gate_fallback_diagnostics',
+            None,
+        )
+        if not isinstance(fallback_diagnostics, deque):
+            fallback_diagnostics = deque(
+                fallback_diagnostics or (),
+                maxlen=_MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN,
+            )
+        fallback_diagnostics.append(dict(diagnostic))
+        self._melt_redox_liquidus_gate_fallback_diagnostics = fallback_diagnostics
+        self._melt_redox_liquidus_gate_fallback_count = int(
+            getattr(self, '_melt_redox_liquidus_gate_fallback_count', 0) or 0
+        ) + 1
+        fallback_hourly = getattr(
+            self,
+            '_melt_redox_liquidus_gate_fallback_hourly',
+            None,
+        )
+        if not isinstance(fallback_hourly, deque):
+            fallback_hourly = deque(
+                fallback_hourly or (),
+                maxlen=_MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN,
+            )
+        hour_key = (
+            diagnostic['campaign'],
+            diagnostic['hour'],
+            diagnostic['campaign_hour'],
+        )
+        if fallback_hourly:
+            last_hour = fallback_hourly[-1]
+            last_hour_key = (
+                last_hour.get('campaign'),
+                last_hour.get('hour'),
+                last_hour.get('campaign_hour'),
+            )
+        else:
+            last_hour_key = None
+        if last_hour_key == hour_key:
+            updated_hour = dict(fallback_hourly[-1])
+            updated_hour['count'] = int(updated_hour.get('count', 0)) + 1
+            fallback_hourly[-1] = updated_hour
+        else:
+            fallback_hourly.append({
+                'campaign': diagnostic['campaign'],
+                'hour': diagnostic['hour'],
+                'campaign_hour': diagnostic['campaign_hour'],
+                'count': 1,
+            })
+        self._melt_redox_liquidus_gate_fallback_hourly = fallback_hourly
+        return fallback
+
+    def _melt_redox_liquidus_gate_fallback_summary(self) -> Dict[str, Any]:
+        total_count = int(
+            getattr(self, '_melt_redox_liquidus_gate_fallback_count', 0) or 0
+        )
+        if total_count <= 0:
+            return {}
+        recent = getattr(
+            self,
+            '_melt_redox_liquidus_gate_fallback_diagnostics',
+            (),
+        )
+        hourly = getattr(
+            self,
+            '_melt_redox_liquidus_gate_fallback_hourly',
+            (),
+        )
+        return {
+            'engaged': True,
+            'total_count': total_count,
+            'history_maxlen': _MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN,
+            'recent': [dict(item) for item in recent],
+            'recent_hourly': [dict(item) for item in hourly],
+        }
+
+    def _record_degraded_path_engagement(
+        self,
+        path: str,
+        *,
+        count: int,
+    ) -> None:
+        if path not in DEGRADED_PATH_ENGAGEMENT_KEYS:
+            raise ValueError(f'unknown degraded path engagement key: {path!r}')
+        count = int(count)
+        if count <= 0:
+            return
+
+        summary = self._degraded_path_engagement.setdefault(
+            path,
+            {'total_count': 0, 'by_hour': []},
+        )
+        # Diagnostic count is the number of records/species/calls that exercised
+        # this path, never a mass or mole quantity used by simulation arithmetic.
+        summary['total_count'] = int(summary['total_count']) + count
+        campaign = str(getattr(self.melt.campaign, 'name', self.melt.campaign))
+        hour_row = {
+            'campaign': campaign,
+            'hour': int(self.melt.hour),
+            'campaign_hour': int(self.melt.campaign_hour),
+            'count': count,
+        }
+        by_hour = summary['by_hour']
+        hour_key = (campaign, hour_row['hour'], hour_row['campaign_hour'])
+        if by_hour:
+            previous = by_hour[-1]
+            previous_key = (
+                previous.get('campaign'),
+                previous.get('hour'),
+                previous.get('campaign_hour'),
+            )
+        else:
+            previous_key = None
+        if previous_key == hour_key:
+            by_hour[-1] = {
+                **previous,
+                'count': int(previous.get('count', 0)) + count,
+            }
+        else:
+            by_hour.append(hour_row)
+
+    def _degraded_path_engagement_summary(self) -> Dict[str, Dict[str, Any]]:
+        return {
+            path: {
+                'total_count': int(summary.get('total_count', 0) or 0),
+                'by_hour': [
+                    dict(row) for row in list(summary.get('by_hour', ()) or ())
+                ],
+            }
+            for path, summary in self._degraded_path_engagement.items()
+        }
+
+    @staticmethod
+    def _melt_redox_gate_authority_provenance(
+        gate_authority: _MeltRedoxGateAuthority,
+    ) -> Dict[str, Any]:
+        if isinstance(gate_authority, _MeltRedoxLiquidusFloorFallback):
+            return {
+                'kind': 'fallback',
+                'fallback_status': 'liquidus_unavailable_floor_fallback',
+                'source': gate_authority.source,
+                'reason': gate_authority.reason,
+                'liquidus_status': gate_authority.liquidus_status,
+                'floor_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+            }
+        if isinstance(gate_authority, Mapping):
+            return {
+                'kind': 'real',
+                'fallback_status': 'not_engaged',
+                'source': gate_authority.get('source', 'liquidus_solidus'),
+                'solidus_T_C': gate_authority.get('solidus_T_C'),
+                'liquidus_T_C': gate_authority.get('liquidus_T_C'),
+            }
+        return {
+            'kind': 'real',
+            'fallback_status': 'not_engaged',
+            'source': 'none:liquidus_gate_in_progress',
+        }
+
+    def _melt_redox_transition_provenance(
+        self,
+        gate_authority: _MeltRedoxGateAuthority,
+    ) -> tuple[str, Dict[str, Any]]:
+        provenance = self._melt_redox_gate_authority_provenance(
+            gate_authority
+        )
+        return (
+            f"melt_redox_gate_authority:{provenance['kind']}",
+            {'melt_redox_gate_authority': provenance},
+        )
+
+    def _resolved_melt_redox_gate_authority(
+        self,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
+    ) -> _MeltRedoxGateAuthority:
+        if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
+            pinned_hour = getattr(
+                self,
+                '_melt_redox_gate_authority_tick_hour',
+                None,
+            )
+            pinned_authority = getattr(
+                self,
+                '_melt_redox_gate_authority_this_tick',
+                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+            )
+            if (
+                pinned_hour == int(self.melt.hour)
+                and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+            ):
+                return pinned_authority
+            return self._melt_redox_liquidus_gate_curve()
+        if (
+            gate_authority is None
+            or isinstance(gate_authority, Mapping)
+            or isinstance(gate_authority, _MeltRedoxLiquidusFloorFallback)
+        ):
+            return gate_authority
+        raise TypeError(f'invalid melt redox gate authority: {gate_authority!r}')
+
+    def _establish_melt_redox_gate_authority_for_current_hour(
+        self,
+    ) -> _MeltRedoxGateAuthority:
+        current_hour = int(self.melt.hour)
+        pinned_hour = getattr(
+            self,
+            '_melt_redox_gate_authority_tick_hour',
+            None,
+        )
+        pinned_authority = getattr(
+            self,
+            '_melt_redox_gate_authority_this_tick',
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+        )
+        if (
+            pinned_hour == current_hour
+            and pinned_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ):
+            return pinned_authority
+        authority = self._melt_redox_liquidus_gate_curve()
+        self._melt_redox_gate_authority_this_tick = authority
+        self._melt_redox_gate_authority_tick_hour = current_hour
+        return authority
+
+    def _clear_melt_redox_gate_authority_for_completed_hour(
+        self,
+        completed_hour: int,
+    ) -> None:
+        if getattr(
+            self,
+            '_melt_redox_gate_authority_tick_hour',
+            None,
+        ) != int(completed_hour):
+            return
+        self._melt_redox_gate_authority_this_tick = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        )
+        self._melt_redox_gate_authority_tick_hour = None
+
+    def _melt_redox_liquidus_gate_curve(
+        self,
+    ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
+        pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+        fO2_log = float(self._current_melt_redox_fO2_log())
+        redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
+            fO2_log=fO2_log,
+        )
+        key = self._freeze_gate_cache_key(
+            pressure_bar=pressure_bar,
+            fO2_log=redox_key_fO2_log,
+        )
+        cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
+        curve = cache.get('curve') if isinstance(cache, dict) else None
+        if not (
+            isinstance(cache, dict)
+            and cache.get('key') == key
+            and isinstance(curve, Mapping)
+        ):
+            curve = None
+        memo = getattr(self, '_freeze_gate_liquid_fraction_curve_memo', None)
+        if curve is None and isinstance(memo, dict):
+            memoized_curve = memo.get(key)
+            if isinstance(memoized_curve, Mapping):
+                curve = dict(memoized_curve)
+
+        gate_curve_in_progress = (
+            bool(getattr(self, '_freeze_gate_curve_in_progress', False))
+            or (
+                isinstance(cache, dict)
+                and cache.get('status') == 'computing'
+            )
+        )
+        if curve is None and gate_curve_in_progress:
+            # During curve construction this redox capacity read is bootstrap
+            # context, not ledger authority; the outer stored curve serves later
+            # redox reads after the in-progress provider call finishes.
+            self._last_melt_redox_liquidus_gate_diagnostic = {
+                'status': 'unavailable',
+                'source': 'none:liquidus_gate_in_progress',
+            }
+            return None
+        if curve is None:
+            try:
+                curve = self._freeze_gate_curve()
+            except Exception as exc:  # noqa: BLE001 - optional liquidus engines
+                reason = str(exc)
+                liquidus_status: Literal['unavailable', 'not_converged'] = (
+                    'not_converged'
+                    if 'status=not_converged' in reason
+                    else 'unavailable'
+                )
+                return self._melt_redox_liquidus_floor_fallback(
+                    source=f'none:liquidus_{liquidus_status}',
+                    reason=reason,
+                    liquidus_status=liquidus_status,
+                )
+
+        try:
+            solidus_T_C = float(curve['solidus_T_C'])
+            liquidus_T_C = float(curve['liquidus_T_C'])
+        except (KeyError, TypeError, ValueError) as exc:
+            if (
+                isinstance(self._freeze_gate_liquid_fraction_cache, dict)
+                and self._freeze_gate_liquid_fraction_cache.get('key') == key
+            ):
+                self._freeze_gate_liquid_fraction_cache = None
+            if isinstance(memo, dict):
+                memo.pop(key, None)
+            return self._melt_redox_liquidus_floor_fallback(
+                source='none:invalid_liquidus_curve',
+                reason=str(exc),
+                liquidus_status='invalid',
+            )
+        if (
+            not math.isfinite(solidus_T_C)
+            or not math.isfinite(liquidus_T_C)
+            or not solidus_T_C < liquidus_T_C
+        ):
+            if (
+                isinstance(self._freeze_gate_liquid_fraction_cache, dict)
+                and self._freeze_gate_liquid_fraction_cache.get('key') == key
+            ):
+                self._freeze_gate_liquid_fraction_cache = None
+            if isinstance(memo, dict):
+                memo.pop(key, None)
+            return self._melt_redox_liquidus_floor_fallback(
+                source='none:invalid_liquidus_bounds',
+                reason=(
+                    'invalid liquidus bounds: '
+                    f'solidus_T_C={solidus_T_C!r}, '
+                    f'liquidus_T_C={liquidus_T_C!r}'
+                ),
+                liquidus_status='invalid',
+            )
+
+        normalized_curve = dict(curve)
+        normalized_curve['solidus_T_C'] = solidus_T_C
+        normalized_curve['liquidus_T_C'] = liquidus_T_C
+        validated_cache = self._freeze_gate_liquid_fraction_cache
+        if not (
+            isinstance(validated_cache, dict)
+            and validated_cache.get('key') == key
+            and isinstance(validated_cache.get('curve'), Mapping)
+            and dict(validated_cache['curve']) == normalized_curve
+        ):
+            self._freeze_gate_liquid_fraction_cache = {
+                'key': key,
+                'curve': dict(normalized_curve),
+            }
+        if isinstance(memo, dict):
+            memo[key] = dict(normalized_curve)
+        self._last_melt_redox_liquidus_gate_diagnostic = {
+            'status': 'ok',
+            'source': normalized_curve.get('source', 'liquidus_solidus'),
+            'solidus_T_C': solidus_T_C,
+            'liquidus_T_C': liquidus_T_C,
+        }
+        return normalized_curve
+
+    def _melt_redox_liquid_fraction_factor(
+        self,
+        T_K: float,
+        *,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
+    ) -> float:
+        curve = self._resolved_melt_redox_gate_authority(gate_authority)
+        if curve is None:
+            return 0.0
+        if isinstance(curve, _MeltRedoxLiquidusFloorFallback):
+            temperature_C = float(T_K) - 273.15
+            # An unavailable liquidus is a measurement failure, not evidence
+            # of solidification. The calibrated Kress91 floor is the remaining
+            # lower authority; zeroing capacity would assert solid without data.
+            liquid_fraction = (
+                1.0
+                if temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
+                else 0.0
+            )
+            self._last_melt_redox_liquid_fraction_diagnostic = {
+                'status': 'liquidus_unavailable_floor_fallback',
+                'source': curve.source,
+                'reason': curve.reason,
+                'liquidus_status': curve.liquidus_status,
+                'liquid_fraction': liquid_fraction,
+                'floor_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+            }
+            return liquid_fraction
+        try:
+            liquid_fraction = float(
+                self._interpolate_freeze_gate_curve(
+                    curve,
+                    float(T_K) - 273.15,
+                )
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            self._last_melt_redox_liquid_fraction_diagnostic = {
+                'status': 'invalid',
+                'source': 'none:invalid_liquid_fraction_curve',
+                'reason': str(exc),
+            }
+            return 0.0
+        if not math.isfinite(liquid_fraction):
+            self._last_melt_redox_liquid_fraction_diagnostic = {
+                'status': 'invalid',
+                'source': 'none:nonfinite_liquid_fraction',
+                'liquid_fraction': liquid_fraction,
+            }
+            return 0.0
+        liquid_fraction = max(0.0, min(1.0, liquid_fraction))
+        self._last_melt_redox_liquid_fraction_diagnostic = {
+            'status': 'ok',
+            'source': curve.get('source', 'liquidus_solidus'),
+            'liquid_fraction': liquid_fraction,
+            'solidus_T_C': curve.get('solidus_T_C'),
+            'liquidus_T_C': curve.get('liquidus_T_C'),
+        }
+        return liquid_fraction
+
+    def _melt_redox_source_capacity_mol_per_ln_fO2(
+        self,
+        *,
+        fO2_log: float,
+        T_K: float,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
+    ) -> float:
+        C_m_full = self._melt_redox_capacity_mol_per_ln_fO2(
+            fO2_log=fO2_log,
+            T_K=T_K,
+        )
+        liquid_fraction = self._melt_redox_liquid_fraction_factor(
+            T_K,
+            gate_authority=gate_authority,
+        )
+        # Derivation: Kress91 capacity is proportional to melt Fe inventory;
+        # freeze-gate liquid_fraction is the active residual-liquid fraction,
+        # so C_m_effective = C_m_full * liquid_fraction and tends to 0 at solidus.
+        return C_m_full * liquid_fraction
+
+    def _melt_redox_temperature_shift_is_liquid(
+        self,
+        T_K: float,
+        *,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
+    ) -> bool:
+        curve = self._resolved_melt_redox_gate_authority(gate_authority)
+        if curve is None:
             return False
+        if isinstance(curve, _MeltRedoxLiquidusFloorFallback):
+            temperature_C = float(T_K) - 273.15
+            is_liquid = temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
+            self._last_melt_regime_diagnostic = {
+                'status': 'liquidus_unavailable_floor_fallback',
+                'source': curve.source,
+                'reason': curve.reason,
+                'liquidus_status': curve.liquidus_status,
+                'redox_temperature_shift_threshold_T_C': (
+                    KRESS91_LIQUID_CALIBRATION_MIN_T_C
+                ),
+                'temperature_C': temperature_C,
+                'is_liquid': is_liquid,
+            }
+            return is_liquid
+        liquidus_T_C = float(curve['liquidus_T_C'])
+        threshold_T_C = max(
+            liquidus_T_C,
+            KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+        )
         regime_diagnostic = {}
         regime = melt_regime(
             temperature_K=float(T_K),
-            solidus_K=KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15,
+            solidus_K=threshold_T_C + 273.15,
             epsilon=0.0,
             solidus_boundary='liquid',
             diagnostic=regime_diagnostic,
-            diagnostic_site='core.redox_temperature_shift.kress91_threshold',
+            diagnostic_site='core.redox_temperature_shift.liquidus_threshold',
             legacy_predicate=(
-                'temperature_C >= KRESS91_LIQUID_CALIBRATION_MIN_T_C'
+                'temperature_C >= max(SILICATE_LIQUIDUS, '
+                'KRESS91_LIQUID_CALIBRATION_MIN_T_C)'
             ),
         )
+        regime_diagnostic.update({
+            'liquidus_T_C': liquidus_T_C,
+            'redox_temperature_shift_threshold_T_C': threshold_T_C,
+            'liquidus_source': curve.get('source', 'liquidus_solidus'),
+        })
         # Intentional telemetry for the t-125 uncertainty stack; its consumer
         # lands after the predicate-unification work.
         self._last_melt_regime_diagnostic = regime_diagnostic
@@ -3190,7 +3741,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _re_reference_melt_fO2_to_temperature(
         self,
         temperature_K: Optional[float] = None,
+        *,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
     ) -> None:
+        fO2_log, reference_T_K = self._melt_fO2_reference_state_at_temperature(
+            temperature_K,
+            gate_authority=gate_authority,
+        )
+        reservoir = self.melt.oxygen_reservoir
+        reservoir.melt_intrinsic_fO2_log = fO2_log
+        reservoir.reference_T_K = reference_T_K
+        self._sync_oxygen_reservoir_mirror()
+
+    def _melt_fO2_reference_state_at_temperature(
+        self,
+        temperature_K: Optional[float] = None,
+        *,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
+    ) -> tuple[float, float | None]:
         T_now = (
             float(temperature_K)
             if temperature_K is not None
@@ -3201,41 +3773,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'melt fO2 temperature re-reference requires finite positive T_K; '
                 f'got {temperature_K!r}'
             )
-        reservoir = self.melt.oxygen_reservoir
         reference_T_K = self._current_melt_redox_reference_T_K()
         if (
             reference_T_K is not None
             and math.isclose(T_now, reference_T_K, rel_tol=0.0, abs_tol=1.0e-9)
         ):
-            return
-        if not self._melt_redox_temperature_shift_is_liquid(T_now):
+            return self._current_melt_redox_fO2_log(), reference_T_K
+        if not self._melt_redox_temperature_shift_is_liquid(
+            T_now,
+            gate_authority=gate_authority,
+        ):
             # Sub-solidus redox is quenched: Kress91 is a liquid relation, so
             # glass has no equilibrium fO2 to re-reference. Diagnostics below
             # solidus intentionally read the last liquid couple.
-            return
+            return self._current_melt_redox_fO2_log(), reference_T_K
         if reference_T_K is None:
             # load_batch seeds at 25 C; Kress91 is a liquid relation, so the
             # seed is treated as defined at the first liquid tick instead.
-            reservoir.reference_T_K = T_now
-            self._sync_oxygen_reservoir_mirror()
-            return
+            return self._current_melt_redox_fO2_log(), T_now
 
         base_ln_fO2 = self._current_melt_redox_fO2_log() * math.log(10.0)
         delta_ln_fO2 = kress91_ln_fO2_temperature_delta(
             reference_T_K,
             T_now,
         )
+        # Premise: Kress91 returns the temperature shift in natural-log fO2.
+        # Algebra: ln(fO2_new) = ln(fO2_old) + delta_ln(fO2), then / ln(10).
+        # Units: every logarithm and the resulting log10(fO2/bar) are dimensionless.
+        # Sanity: zero temperature shift returns the original log10 fO2 exactly.
         candidate_fO2_log = (
             base_ln_fO2 + delta_ln_fO2
         ) / math.log(10.0)
-        reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
+        fO2_log = self._finite_oxygen_reservoir_fO2_log(
             candidate_fO2_log,
             context='temperature_re_reference',
             delta_ln_fO2=delta_ln_fO2,
             candidate_fO2_log=candidate_fO2_log,
         )
-        reservoir.reference_T_K = T_now
-        self._sync_oxygen_reservoir_mirror()
+        return fO2_log, T_now
 
     def _refresh_oxygen_reservoir_without_exchange(
         self,
@@ -3300,6 +3875,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         *,
         exchange_direction: str = 'redox_source_terms',
         temperature_K: Optional[float] = None,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
     ) -> OxygenReservoirState:
         terms: Dict[str, float] = {}
         for label, raw_mol in source_terms_mol_o2_equiv.items():
@@ -3325,7 +3903,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'oxygen reservoir redox source terms require finite positive T_K; '
                 f'got {temperature_K!r}'
             )
-        self._re_reference_melt_fO2_to_temperature(T_K)
+        gate_authority = self._resolved_melt_redox_gate_authority(
+            gate_authority
+        )
+        self._re_reference_melt_fO2_to_temperature(
+            T_K,
+            gate_authority=gate_authority,
+        )
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
@@ -3335,9 +3919,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         ))
         ledger_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(head_o2_mol)
-        C_m = self._melt_redox_capacity_mol_per_ln_fO2(
+        C_m = self._melt_redox_source_capacity_mol_per_ln_fO2(
             fO2_log=base_fO2_log,
             T_K=T_K,
+            gate_authority=gate_authority,
         )
         reservoir = self.melt.oxygen_reservoir
         existing_direction = str(getattr(reservoir, 'exchange_direction', '') or '')
@@ -3547,7 +4132,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'reason': 'not_run',
         }
 
-    def _apply_o2_bubbler(self) -> Dict[str, Any]:
+    def _apply_o2_bubbler(
+        self,
+        *,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
+    ) -> Dict[str, Any]:
         controls = self.campaign_mgr.o2_bubbler_controls(self.melt.campaign)
         raw_rate = controls.get('o2_bubbler_kg_per_hr')
         raw_eta = controls.get('o2_bubbler_eta_absorb_default')
@@ -3602,11 +4193,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         T_K = float(self.melt.temperature_C) + 273.15
         commanded_mol = rate_kg_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL
-        self._re_reference_melt_fO2_to_temperature(T_K)
+        gate_authority = self._resolved_melt_redox_gate_authority(
+            gate_authority
+        )
+        self._re_reference_melt_fO2_to_temperature(
+            T_K,
+            gate_authority=gate_authority,
+        )
         current_fO2_log = self._current_melt_redox_fO2_log()
-        C_m = self._melt_redox_capacity_mol_per_ln_fO2(
+        C_m = self._melt_redox_source_capacity_mol_per_ln_fO2(
             fO2_log=current_fO2_log,
             T_K=T_K,
+            gate_authority=gate_authority,
         )
         target_need_mol = max(
             0.0,
@@ -3633,7 +4231,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 reason = 'below_threshold'
 
         if absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
-            if not self._melt_redox_temperature_shift_is_liquid(T_K):
+            if not self._melt_redox_temperature_shift_is_liquid(
+                T_K,
+                gate_authority=gate_authority,
+            ):
                 passthrough_mol = actual_injected_mol
                 absorbed_mol = 0.0
                 reason = 'deferred_not_liquid'
@@ -3642,8 +4243,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 {'redox_source:o2_bubbler': absorbed_mol},
                 exchange_direction='redox_source:o2_bubbler',
                 temperature_K=T_K,
+                gate_authority=gate_authority,
             )
         if passthrough_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+            transition_source, transition_meta = (
+                self._melt_redox_transition_provenance(gate_authority)
+            )
             result = self._dispatch_and_commit(
                 ChemistryIntent.OXYGEN_BUBBLER,
                 control_inputs={
@@ -3652,6 +4257,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'passthrough_mol': passthrough_mol,
                     'source': 'redox_source:o2_bubbler',
                 },
+                transition_source=transition_source,
+                transition_meta=transition_meta,
             )
             if result.transition is None:
                 self._chem_no_op_dispatch_count += 1
@@ -3865,17 +4472,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         *,
         oxygen_source: str = FE_REDOX_OXYGEN_SOURCE_OVERHEAD,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
     ) -> Dict[str, Any]:
+        # Gate authority is a measurement input to this atomic ledger operation.
+        # Consulting two measurements could authorize the fO2 re-reference with
+        # fallback physics, then refuse its transition with recovered physics.
+        gate_authority = self._resolved_melt_redox_gate_authority(
+            gate_authority
+        )
         T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
-        self._re_reference_melt_fO2_to_temperature(T_K)
-        fO2_log = self._current_melt_redox_fO2_log()
         oxygen_source = str(oxygen_source or FE_REDOX_OXYGEN_SOURCE_OVERHEAD)
         internal_o2_capacity_mol = 0.0
         if oxygen_source == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS:
             internal_o2_capacity_mol = (
                 self._remaining_fe_redox_internal_o2_capacity_mol()
             )
-        if not self._melt_redox_temperature_shift_is_liquid(T_K):
+        if not self._melt_redox_temperature_shift_is_liquid(
+            T_K,
+            gate_authority=gate_authority,
+        ):
             diagnostic = {
                 'respeciation_status': 'skipped_solid',
                 'status': 'ok',
@@ -3900,6 +4517,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._fe_redox_respeciation_diagnostics_this_hr.append(dict(diagnostic))
             self.melt.oxygen_reservoir.ferric_divergence = dict(divergence)
             return diagnostic
+        fO2_log, reference_T_K = self._melt_fO2_reference_state_at_temperature(
+            T_K,
+            gate_authority=gate_authority,
+        )
         control_inputs = {
             'source': 'scalar Kress91 fO2 ledger re-speciation',
             'o2_account': (
@@ -3917,15 +4538,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         diagnostic = dict(result.diagnostic or {})
         diagnostic['status'] = str(result.status)
+        diagnostic['gate_authority'] = (
+            self._melt_redox_gate_authority_provenance(gate_authority)
+        )
         proposal = result.transition
         if proposal is None:
             self._chem_no_op_dispatch_count += 1
         else:
+            transition_source, transition_meta = (
+                self._melt_redox_transition_provenance(gate_authority)
+            )
             transition = self._commit_proposal(
                 ChemistryIntent.FE_REDOX_RESPECIATION,
                 proposal,
                 diagnostic=diagnostic,
                 control_inputs=control_inputs,
+                transition_source=transition_source,
+                transition_meta=transition_meta,
             )
             diagnostic['transition_name'] = transition.name
             self._project_cleaned_melt_from_atom_ledger()
@@ -3944,6 +4573,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         float(diagnostic.get('o2_debit_mol', 0.0) or 0.0),
                     )
                 )
+        reservoir = self.melt.oxygen_reservoir
+        reservoir.melt_intrinsic_fO2_log = fO2_log
+        reservoir.reference_T_K = reference_T_K
         self._sync_oxygen_reservoir_mirror()
         divergence = self._ledger_ferric_fraction_diagnostic()
         if (
@@ -4037,14 +4669,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'source_campaign_hour': int(source_context.get('campaign_hour', 0)),
         }
 
-    def _apply_oxygen_reservoir_exchange(self) -> OxygenReservoirState:
+    def _apply_oxygen_reservoir_exchange(
+        self,
+        *,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
+    ) -> OxygenReservoirState:
         T_K = float(self.melt.temperature_C) + 273.15
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise AccountingError(
                 'oxygen reservoir exchange requires finite positive T_K; '
                 f'temperature_C={self.melt.temperature_C!r}'
             )
-        self._re_reference_melt_fO2_to_temperature(T_K)
+        self._re_reference_melt_fO2_to_temperature(
+            T_K,
+            gate_authority=gate_authority,
+        )
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
@@ -4352,6 +4993,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'fe2o3_equiv_wt_pct': 0.0,
                 'feo_equiv_wt_pct': 0.0,
                 'source': 'simulator.fe_redox:kress91_split:no_iron',
+                'authoritative': False,
+                'extrapolation': False,
+                'high_uncertainty': False,
             }
         kress_split = kress91_split(
             fO2_log=fO2_log,
@@ -4389,6 +5033,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'fe2o3_equiv_wt_pct': fe2o3_wt,
             'feo_equiv_wt_pct': feo_wt,
             'source': 'simulator.fe_redox:kress91_split',
+            'temperature_band_case': kress_split.get('temperature_band_case'),
+            'temperature_band_status': kress_split.get('temperature_band_status'),
+            'temperature_band_source': kress_split.get('temperature_band_source'),
+            'authoritative': bool(kress_split.get('authoritative', False)),
+            'extrapolation': bool(kress_split.get('extrapolation', False)),
+            'high_uncertainty': bool(kress_split.get('high_uncertainty', False)),
         }
 
     def _fe_redox_split_payload(
@@ -4430,6 +5080,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             'feo_equiv_wt_pct': float(split.get('feo_equiv_wt_pct', 0.0)),
             'source': str(split.get('source', 'unknown')),
+            'temperature_band_case': split.get('temperature_band_case'),
+            'temperature_band_status': split.get('temperature_band_status'),
+            'temperature_band_source': split.get('temperature_band_source'),
+            'authoritative': bool(split.get('authoritative', False)),
+            'extrapolation': bool(split.get('extrapolation', False)),
+            'high_uncertainty': bool(split.get('high_uncertainty', False)),
             **(
                 {'native_fe_partition': dict(
                     getattr(self, '_last_native_fe_partition_diagnostic', {})
@@ -4844,9 +5500,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         *,
         sample_time_h: float | None = None,
+        gate_authority: _MeltRedoxGateAuthority | object = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ),
     ) -> Dict[str, Any]:
+        gate_authority = self._resolved_melt_redox_gate_authority(
+            gate_authority
+        )
         T_K = max(1.0, float(self.melt.temperature_C) + 273.15)
-        if not self._melt_redox_temperature_shift_is_liquid(T_K):
+        if not self._melt_redox_temperature_shift_is_liquid(
+            T_K,
+            gate_authority=gate_authority,
+        ):
             split = self._compute_fe_redox_split_diagnostic()
             event = {
                 'native_fe_event': 'deferred_not_liquid_for_redox',
@@ -4858,7 +5523,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._last_native_fe_saturation_event = dict(event)
             return {**split, **event}
 
-        self._re_reference_melt_fO2_to_temperature(T_K)
+        self._re_reference_melt_fO2_to_temperature(
+            T_K,
+            gate_authority=gate_authority,
+        )
         native_extent = self._compute_native_fe_saturation_extent()
         split = self._compute_fe_redox_split_diagnostic()
         native_frac = max(
@@ -4905,11 +5573,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if proposal is None:
             self._chem_no_op_dispatch_count += 1
         else:
+            transition_source, transition_meta = (
+                self._melt_redox_transition_provenance(gate_authority)
+            )
             transition = self._commit_proposal(
                 ChemistryIntent.NATIVE_FE_SATURATION,
                 proposal,
                 diagnostic=diagnostic,
                 control_inputs=control_inputs,
+                transition_source=transition_source,
+                transition_meta=transition_meta,
             )
         self._project_cleaned_melt_from_atom_ledger()
         self._project_drain_tap_from_atom_ledger()
@@ -4965,9 +5638,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_native_fe_partition_diagnostic = dict(partition)
         base_fO2_log = self._current_melt_redox_fO2_log()
         target_fO2_log = self._native_fe_saturation_target_fO2_log(base_fO2_log)
-        C_m = self._melt_redox_capacity_mol_per_ln_fO2(
+        C_m = self._melt_redox_source_capacity_mol_per_ln_fO2(
             fO2_log=base_fO2_log,
             T_K=max(1.0, float(self.melt.temperature_C) + 273.15),
+            gate_authority=gate_authority,
         )
         needed_o2_equiv_mol = max(
             0.0,
@@ -4991,6 +5665,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 needed_o2_equiv_mol,
             )},
             exchange_direction='redox_source:native_fe_saturation_split',
+            gate_authority=gate_authority,
         )
         event = {
             'native_fe_event': 'native_fe_partitioned_saturation',
@@ -5029,6 +5704,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # F-A4: the per-batch no-op dispatch counter mirrors the shadow
         # trace lifetime -- a fresh batch starts from zero.
         self._chem_no_op_dispatch_count = 0
+        self._melt_redox_liquidus_gate_fallback_diagnostics = deque(
+            maxlen=_MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN
+        )
+        self._melt_redox_liquidus_gate_fallback_hourly = deque(
+            maxlen=_MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN
+        )
+        self._melt_redox_liquidus_gate_fallback_count = 0
+        self._degraded_path_engagement = {}
+        self._melt_redox_gate_authority_this_tick = (
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        )
+        self._melt_redox_gate_authority_tick_hour = None
+        self._poisoned_hour = None
         label = str(feedstock.get('label', feedstock_key))
         oxidation_specs, oxidized_offgas_kg = (
             self._stage0_oxidation_transition_specs(feedstock))
@@ -8790,6 +9478,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     # ------------------------------------------------------------------
 
     def step(self) -> HourSnapshot:
+        """Advance one hour, refusing replay after a partial commit."""
+        poisoned = self._poisoned_hour
+        if poisoned is not None:
+            raise PoisonedHourError(poisoned)
+
+        # Conservative fail-closed residuals accepted for future hardening:
+        # completion-bookkeeping failures can poison an advanced hour,
+        # load_external* mutations are uncounted, and empty appended
+        # transitions can poison unchanged balances.
+        attempt_hour = int(self.melt.hour)
+        transition_count_before = len(self.atom_ledger.transitions)
+        try:
+            return self._step_one_hour()
+        except BaseException as exc:
+            committed_transition_count = max(
+                0,
+                len(self.atom_ledger.transitions) - transition_count_before,
+            )
+            if committed_transition_count:
+                # AtomLedger is append-only. Whole-hour rollback would require
+                # compensating transitions and is a separate design change.
+                self._poisoned_hour = PoisonedHourState(
+                    hour=attempt_hour,
+                    committed_transition_count=committed_transition_count,
+                    aborting_exception_summary='exception summary unavailable',
+                )
+                try:
+                    self._poisoned_hour = PoisonedHourState(
+                        hour=attempt_hour,
+                        committed_transition_count=committed_transition_count,
+                        aborting_exception_summary=(
+                            f'{type(exc).__name__}: {exc}'
+                        ),
+                    )
+                except BaseException:
+                    pass
+            raise
+
+    def _step_one_hour(self) -> HourSnapshot:
         """
         Advance the simulation by one hour.
 
@@ -8844,6 +9571,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # --- 2. Temperature ramp and carried-in passive exchange ---
         self._update_temperature()
+        self._establish_melt_redox_gate_authority_for_current_hour()
         self._apply_oxygen_reservoir_exchange()
         self._apply_o2_bubbler()
 
@@ -8891,6 +9619,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.melt.campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             self._step_c7_ca_aluminothermic()
 
+        evaporation_campaign = self.melt.campaign in (
+            CampaignPhase.C0, CampaignPhase.C0B,
+            CampaignPhase.C2A, CampaignPhase.C2A_STAGED,
+            CampaignPhase.C2B, CampaignPhase.C3_K,
+            CampaignPhase.C3_NA, CampaignPhase.C4,
+        )
         self._apply_fe_redox_respeciation()
         self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
         self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
@@ -8905,12 +9639,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
         evap_flux = EvaporationFlux()
-        if self.melt.campaign in (CampaignPhase.C0, CampaignPhase.C0B,
-                                   CampaignPhase.C2A,
-                                   CampaignPhase.C2A_STAGED,
-                                   CampaignPhase.C2B,
-                                   CampaignPhase.C3_K, CampaignPhase.C3_NA,
-                                   CampaignPhase.C4):
+        if evaporation_campaign:
             evap_flux = self._calculate_evaporation(equilibrium)
             evap_flux = self._apply_analytic_evaporation_depletion(evap_flux)
 
@@ -9028,6 +9757,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     self.melt.campaign, self.record)
 
         # --- 10. Record snapshot ---
+        completed_hour = int(self.melt.hour)
         self.melt.hour += 1
         self.melt.campaign_hour += 1
         self._stamp_redox_source_context_for_current_state(force=True)
@@ -9047,6 +9777,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.energy_cumulative_breakdown_kWh)
         snapshot.oxygen_produced_kg = self._oxygen_total_kg()
         self.record.snapshots.append(snapshot)
+        self._clear_melt_redox_gate_authority_for_completed_hour(completed_hour)
 
         if complete_after_snapshot:
             self.melt.campaign = CampaignPhase.COMPLETE
@@ -9379,6 +10110,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._stamp_redox_source_context_for_current_state()
         redox_source_breakdown = self._redox_source_breakdown_diagnostic()
         oxygen_reservoir_snapshot = dict(vars(self.melt.oxygen_reservoir))
+        melt_redox_fallback_summary = (
+            self._melt_redox_liquidus_gate_fallback_summary()
+        )
+        if melt_redox_fallback_summary:
+            oxygen_reservoir_snapshot['melt_redox_gate_fallback'] = (
+                melt_redox_fallback_summary
+            )
         if redox_source_breakdown:
             source_context = dict(
                 redox_source_breakdown.get('source_context', {}) or {}

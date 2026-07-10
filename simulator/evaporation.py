@@ -40,10 +40,12 @@ from simulator.state import (
 _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
 _FREEZE_GATE_ACCOUNT = 'process.cleaned_melt'
 _FREEZE_GATE_EPSILON = 1.0e-12
-_FREEZE_GATE_FRACTION_QUANTUM = 0.001
+_FREEZE_GATE_FRACTION_QUANTUM = 0.01
 _FREEZE_GATE_PRESSURE_BAR_QUANTUM = 0.01
-_FREEZE_GATE_FO2_LOG_QUANTUM = 0.1
+_FREEZE_GATE_FO2_LOG_QUANTUM = 1.0
+_FREEZE_GATE_FO2_LOG_BOUND = 30.0
 _FREEZE_GATE_TRACE_FRACTION_CUTOFF = 0.001
+_RESOLVE_EVAPORATION_GATE_AUTHORITY = object()
 _PARTIAL_MELT_OFFGASSING_COMPONENTS = {
     'Na': {
         'parent_oxide': 'Na2O',
@@ -118,7 +120,12 @@ def _load_evaporation_alpha_envelope_by_species(
 
 
 class EvaporationMixin:
-    def _calculate_evaporation(self, equilibrium) -> EvaporationFlux:
+    def _calculate_evaporation(
+        self,
+        equilibrium,
+        *,
+        gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
+    ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
 
@@ -314,6 +321,14 @@ class EvaporationMixin:
         )
         diagnostic = dict(kernel_result.diagnostic or {})
         self._last_evaporation_flux_diagnostic = diagnostic
+        unmeasured_alpha_species = tuple(
+            diagnostic.get('unmeasured_alpha_fallback_species', ()) or ()
+        )
+        if unmeasured_alpha_species:
+            self._record_degraded_path_engagement(
+                'unmeasured_alpha_evaporation_fallback',
+                count=len(unmeasured_alpha_species),
+            )
         if str(kernel_result.status) != 'ok' and 'missing_alpha' in diagnostic:
             missing = ', '.join(sorted(diagnostic['missing_alpha']))
             raise ProviderUnavailableError(
@@ -324,7 +339,14 @@ class EvaporationMixin:
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
         liquid_fraction_factor = 1.0
         if flux_kg_hr and self._freeze_gate_enabled():
-            liquid_fraction_factor = self._freeze_gate_liquid_fraction_factor()
+            if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
+                liquid_fraction_factor = (
+                    self._freeze_gate_liquid_fraction_factor()
+                )
+            else:
+                liquid_fraction_factor = self._freeze_gate_liquid_fraction_factor(
+                    gate_authority=gate_authority,
+                )
             if (
                 melt_regime(liquid_fraction=liquid_fraction_factor)
                 == MeltRegime.FROZEN
@@ -697,8 +719,21 @@ class EvaporationMixin:
             diagnostics.update(dict(backend_diagnostics))
         return diagnostics
 
-    def _freeze_gate_liquid_fraction_factor(self) -> float:
-        curve = self._freeze_gate_curve()
+    def _freeze_gate_liquid_fraction_factor(
+        self,
+        *,
+        gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
+    ) -> float:
+        if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
+            curve = self._resolved_melt_redox_gate_authority()
+        else:
+            curve = self._resolved_melt_redox_gate_authority(gate_authority)
+        if not isinstance(curve, Mapping):
+            reason = str(
+                getattr(curve, 'reason', '')
+                or 'no liquid-fraction authority is available'
+            )
+            raise RuntimeError(reason)
         factor = self._interpolate_freeze_gate_curve(
             curve,
             float(self.melt.temperature_C),
@@ -724,7 +759,9 @@ class EvaporationMixin:
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
-        fO2_log = float(self._current_melt_redox_fO2_log())
+        fO2_log = self._freeze_gate_liquidus_fO2_log(
+            float(self._current_melt_redox_fO2_log())
+        )
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
@@ -737,8 +774,13 @@ class EvaporationMixin:
         if store is not None and getattr(store, 'replay_enabled', False):
             return store.replay_gate_curve(self, fO2_log=redox_key_fO2_log)
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
-        if cache and cache.get('key') == key:
-            curve = dict(cache['curve'])
+        cached_curve = cache.get('curve') if isinstance(cache, dict) else None
+        if (
+            cache
+            and cache.get('key') == key
+            and isinstance(cached_curve, Mapping)
+        ):
+            curve = dict(cached_curve)
             if store is not None and getattr(store, 'capture_enabled', False):
                 store.capture_gate_curve(
                     self,
@@ -747,37 +789,59 @@ class EvaporationMixin:
                 )
             return curve
 
-        reasons: list[str] = []
-        curve = self._freeze_gate_curve_from_gate_dispatch(
-            reasons,
-            fO2_log=fO2_log,
+        previous_in_progress = bool(
+            getattr(self, '_freeze_gate_curve_in_progress', False)
         )
-        if curve is None:
-            curve = self._freeze_gate_curve_from_backend_liquidus(
-                reasons,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-            )
-        if curve is None:
-            curve = self._freeze_gate_curve_from_kernel_liquidus(
-                reasons,
-                fO2_log=fO2_log,
-            )
-        if curve is None:
-            detail = '; '.join(reasons[-6:]) or 'no liquidus engine available'
-            raise RuntimeError(
-                'freeze_gate.enabled requires a liquid_fraction(T) source; '
-                'no liquidus engine produced usable solidus/liquidus bounds. '
-                f'{detail}'
-            )
-
-        self._freeze_gate_liquid_fraction_cache = {
+        previous_cache = cache
+        computing_cache = {
             'key': key,
-            'curve': dict(curve),
+            'curve': None,
+            'status': 'computing',
         }
-        self._freeze_gate_cache_rebuild_count = (
-            int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
-        )
+        self._freeze_gate_liquid_fraction_cache = computing_cache
+        self._freeze_gate_curve_in_progress = True
+        cache_committed = False
+        try:
+            reasons: list[str] = []
+            curve = self._freeze_gate_curve_from_gate_dispatch(
+                reasons,
+                fO2_log=fO2_log,
+            )
+            if curve is None:
+                curve = self._freeze_gate_curve_from_backend_liquidus(
+                    reasons,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                )
+            if curve is None:
+                curve = self._freeze_gate_curve_from_kernel_liquidus(
+                    reasons,
+                    fO2_log=fO2_log,
+                )
+            if curve is None:
+                detail = '; '.join(reasons[-6:]) or 'no liquidus engine available'
+                raise RuntimeError(
+                    'freeze_gate.enabled requires a liquid_fraction(T) source; '
+                    'no liquidus engine produced usable solidus/liquidus bounds. '
+                    f'{detail}'
+                )
+
+            self._freeze_gate_liquid_fraction_cache = {
+                'key': key,
+                'curve': dict(curve),
+            }
+            cache_committed = True
+            self._freeze_gate_cache_rebuild_count = (
+                int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
+            )
+        finally:
+            if (
+                not cache_committed
+                and getattr(self, '_freeze_gate_liquid_fraction_cache', None)
+                is computing_cache
+            ):
+                self._freeze_gate_liquid_fraction_cache = previous_cache
+            self._freeze_gate_curve_in_progress = previous_in_progress
         if store is not None and getattr(store, 'capture_enabled', False):
             store.capture_gate_curve(
                 self,
@@ -786,29 +850,49 @@ class EvaporationMixin:
             )
         return curve
 
+    @staticmethod
+    def _freeze_gate_liquidus_fO2_log(fO2_log: float) -> float:
+        try:
+            value = float(fO2_log)
+        except (TypeError, ValueError):
+            return 0.0
+        if not math.isfinite(value):
+            return 0.0
+        return max(
+            -_FREEZE_GATE_FO2_LOG_BOUND,
+            min(_FREEZE_GATE_FO2_LOG_BOUND, value),
+        )
+
     def _freeze_gate_redox_key_fO2_log(
         self,
         *,
         fO2_log: float | None = None,
         reference_T_K: float | None = None,
     ) -> float:
-        redox_fO2_log = (
+        redox_fO2_log = self._freeze_gate_liquidus_fO2_log(
             float(fO2_log)
             if fO2_log is not None
-            else float(self._current_melt_redox_fO2_log())
+            else float(self._current_melt_redox_fO2_log()),
         )
         redox_reference_T_K = (
             float(reference_T_K)
             if reference_T_K is not None
             else self._current_melt_redox_reference_T_K()
         )
+        if (
+            redox_reference_T_K is not None
+            and float(redox_reference_T_K) <= 273.15
+        ):
+            return redox_fO2_log
         # Boundary by design: before the first liquid seed, reference_T_K is None
         # and the key uses live fO2; after seeding, the key is T_STD-referenced.
         # Capture/replay cross this one re-key boundary at the same tick.
-        return kress91_referenced_log_fO2(
-            redox_fO2_log,
-            reference_T_K=redox_reference_T_K,
-            target_T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
+        return self._freeze_gate_liquidus_fO2_log(
+            kress91_referenced_log_fO2(
+                redox_fO2_log,
+                reference_T_K=redox_reference_T_K,
+                target_T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
+            )
         )
 
     def _freeze_gate_cache_key(
@@ -827,8 +911,8 @@ class EvaporationMixin:
             if mol_value > _FREEZE_GATE_EPSILON:
                 relevant_mol[species_key] = mol_value
 
-        # Liquidus is stable to small per-tick evaporation drift; 0.1 mol-%
-        # bins (0.001 fraction quantum) sit comfortably above mole-fraction
+        # Liquidus is stable to small per-tick evaporation drift; 1 mol-%
+        # bins (0.01 fraction quantum) sit comfortably above mole-fraction
         # float-arithmetic jitter while still well inside the L1 finder ±30 K
         # tolerance, and still rebuild for campaign-scale major-oxide
         # composition shifts.
@@ -854,7 +938,7 @@ class EvaporationMixin:
             round(float(fO2_log) / _FREEZE_GATE_FO2_LOG_QUANTUM)
             * _FREEZE_GATE_FO2_LOG_QUANTUM
         )
-        # Pressure is bucketed at 0.01 bar and fO2 at 0.1 log unit: coarse
+        # Pressure is bucketed at 0.01 bar and fO2 at 1 log unit: coarse
         # enough to absorb per-tick float noise, fine enough to split
         # overhead-pressure and campaign/redox control changes.
         return (
@@ -1466,6 +1550,32 @@ class EvaporationMixin:
         """
         route_result = self.condensation_model.route(
             evap_flux, self.melt)
+
+        antoine_extrapolations = dict(
+            getattr(route_result, 'antoine_extrapolations', {}) or {}
+        )
+        if antoine_extrapolations:
+            self._record_degraded_path_engagement(
+                'condensation_antoine_extrapolation',
+                count=len(antoine_extrapolations),
+            )
+        capture_budget_notice = dict(
+            getattr(route_result, 'capture_budget_regularizer_notice', {}) or {}
+        )
+        if capture_budget_notice:
+            self._record_degraded_path_engagement(
+                'capture_budget_regularizer',
+                count=1,
+            )
+        transport_notice = dict(
+            getattr(route_result, 'transport_parameter_notice', {}) or {}
+        )
+        if transport_notice:
+            transport_species = tuple(transport_notice.get('species', ()) or ())
+            self._record_degraded_path_engagement(
+                'transport_d_ab_proxy',
+                count=len(transport_species) or 1,
+            )
 
         species_order = tuple(
             getattr(route_result, 'wall_route_species_order', ()) or (

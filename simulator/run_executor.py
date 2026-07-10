@@ -10,7 +10,11 @@ from typing import Any, Mapping
 from simulator.backends import requires_stage0_subprocess
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.cost_ledger import build_cost_rollup_diagnostic
-from simulator.core import BACKEND_FALLBACK_EXCEPTIONS, PyrolysisSimulator
+from simulator.core import (
+    BACKEND_FALLBACK_EXCEPTIONS,
+    PoisonedHourError,
+    PyrolysisSimulator,
+)
 from simulator.pumping_cost import pumping_context_from_sim
 from simulator.session import (
     DecisionPolicy,
@@ -41,6 +45,7 @@ class RunExecution:
     reduced_real_cache: Mapping[str, Any] = field(default_factory=dict)
     backend_status: str = "ok"
     backend_authoritative: bool = True
+    envelope_detail_unavailable: str = ""
 
 
 class RunExecutor:
@@ -73,6 +78,7 @@ class RunExecutor:
         error_message = ""
         reason = ""
         refusal_diagnostic: dict[str, Any] = {}
+        failure_exc: Exception | None = None
         hours = int(hours)
         if stop_at_stage0_exit is None:
             config = getattr(session, "_config", None)
@@ -107,57 +113,103 @@ class RunExecutor:
             elif sim.melt.hour < hours:
                 status = "partial"
         except KnudsenRegimeRefusal as exc:
+            failure_exc = exc
             status = "refused"
             reason = exc.reason
             error_message = exc.reason
             refusal_diagnostic = dict(exc.diagnostic)
+        except PoisonedHourError as exc:
+            failure_exc = exc
+            status = "failed"
+            reason = "poisoned_hour"
+            error_message = f"PoisonedHourError: {exc}"
         except BACKEND_FALLBACK_EXCEPTIONS as exc:
+            failure_exc = exc
             status = "failed"
             error_message = f"backend failure: {exc}"
         except Exception as exc:  # noqa: BLE001 -- envelope the error
+            failure_exc = exc
             status = "failed"
             error_message = f"{type(exc).__name__}: {exc}"
 
-        shadow_trace = _collect_shadow_trace(sim, operator_decisions)
-        snapshots = tuple(getattr(sim.record, "snapshots", ()))
-        sim.record.cost_rollup = build_cost_rollup_diagnostic(
-            cost_ledger=sim.cost_ledger,
-            per_hour=tuple(per_hour),
-            products_kg=sim.product_ledger(),
-            pumping_context=pumping_context_from_sim(sim, snapshots),
-        )
-        trace = PhysicsTrace.from_simulator(sim)
-        reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)
-        latest_backend_status = str(
-            getattr(
-                sim,
-                "_backend_selection_status",
-                getattr(sim, "_last_backend_status", "ok"),
+        try:
+            unenriched_failure = (status, reason, error_message)
+            poisoned = None
+            try:
+                poisoned = getattr(sim, "_poisoned_hour", None)
+                if poisoned is not None:
+                    status = "failed"
+                    reason = "poisoned_hour"
+                    poisoned_detail = (
+                        f"PoisonedHourError: {PoisonedHourError(poisoned)}"
+                    )
+                    if error_message != poisoned_detail:
+                        error_message = (
+                            f"{error_message}; {poisoned_detail}"
+                            if error_message
+                            else poisoned_detail
+                        )
+            except Exception:  # noqa: BLE001 -- enrichment must not mask the failure
+                status, reason, error_message = unenriched_failure
+                poisoned = None
+
+            shadow_trace = _collect_shadow_trace(sim, operator_decisions)
+            snapshots = tuple(getattr(sim.record, "snapshots", ()))
+            sim.record.cost_rollup = build_cost_rollup_diagnostic(
+                cost_ledger=sim.cost_ledger,
+                per_hour=tuple(per_hour),
+                products_kg=sim.product_ledger(),
+                pumping_context=pumping_context_from_sim(sim, snapshots),
             )
-        )
-        backend_status = _aggregate_backend_status(
-            getattr(sim, "_backend_status_history", ()),
-            latest_backend_status,
-        )
-        backend_authoritative = bool(
-            getattr(sim, "_backend_authoritative", True)
-        )
-        return RunExecution(
-            session=session,
-            simulator=sim,
-            snapshots=snapshots,
-            trace=trace,
-            per_hour=tuple(per_hour),
-            operator_decisions=tuple(operator_decisions),
-            shadow_trace=tuple(shadow_trace),
-            status=status,
-            error_message=error_message,
-            reason=reason,
-            refusal_diagnostic=refusal_diagnostic,
-            reduced_real_cache=reduced_real_cache,
-            backend_status=backend_status,
-            backend_authoritative=backend_authoritative,
-        )
+            trace = PhysicsTrace.from_simulator(sim)
+            reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)
+            latest_backend_status = str(
+                getattr(
+                    sim,
+                    "_backend_selection_status",
+                    getattr(sim, "_last_backend_status", "ok"),
+                )
+            )
+            backend_status = _aggregate_backend_status(
+                getattr(sim, "_backend_status_history", ()),
+                latest_backend_status,
+            )
+            backend_authoritative = bool(
+                getattr(sim, "_backend_authoritative", True)
+            )
+            return RunExecution(
+                session=session,
+                simulator=sim,
+                snapshots=snapshots,
+                trace=trace,
+                per_hour=tuple(per_hour),
+                operator_decisions=tuple(operator_decisions),
+                shadow_trace=tuple(shadow_trace),
+                status=status,
+                error_message=error_message,
+                reason=reason,
+                refusal_diagnostic=refusal_diagnostic,
+                reduced_real_cache=reduced_real_cache,
+                backend_status=backend_status,
+                backend_authoritative=backend_authoritative,
+            )
+        except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
+            if failure_exc is None:
+                raise
+            return RunExecution(
+                session=session,
+                simulator=sim,
+                snapshots=(),
+                trace=PhysicsTrace(),
+                status="failed",
+                error_message=_safe_exception_text(failure_exc),
+                backend_status="unavailable",
+                backend_authoritative=False,
+                envelope_detail_unavailable=(
+                    "envelope detail unavailable: "
+                    f"{_safe_exception_text(envelope_exc)}"
+                ),
+            )
 
 
 def _backend_from_worker_runtime(
@@ -186,6 +238,14 @@ def _backend_from_worker_runtime(
     if config.reduced_real_cache is not None:
         return None
     return getattr(worker_runtime, "backend", None)
+
+
+def _safe_exception_text(exc: BaseException) -> str:
+    try:
+        message = str(exc)
+    except Exception as message_exc:  # noqa: BLE001 -- reporting must survive
+        message = f"<message unavailable: {type(message_exc).__name__}>"
+    return f"{type(exc).__name__}: {message}"
 
 
 def _aggregate_backend_status(history: Any, latest: str) -> str:

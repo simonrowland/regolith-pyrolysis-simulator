@@ -85,6 +85,24 @@ def normalize_mre_policy(
     )
 
 
+class InvalidDecisionChoiceError(ValueError):
+    """Raised when a session refuses a choice outside the pending options."""
+
+    def __init__(
+        self,
+        decision_type: DecisionType,
+        choice: str,
+        valid_choices: tuple[str, ...],
+    ) -> None:
+        self.decision_type = decision_type
+        self.choice = choice
+        self.valid_choices = valid_choices
+        super().__init__(
+            f"invalid {decision_type.name} choice {choice!r}; "
+            f"expected one of {list(valid_choices)!r}"
+        )
+
+
 class DecisionPolicy(Enum):
     """Driver-loop decision routing mode.
 
@@ -334,6 +352,13 @@ class SimSession:
         decision = sim.pending_decision
         if decision is None:
             raise RuntimeError("no pending decision")
+        valid_choices = tuple(str(option) for option in decision.options)
+        if choice not in valid_choices:
+            raise InvalidDecisionChoiceError(
+                decision.decision_type,
+                choice,
+                valid_choices,
+            )
         sim.apply_decision(decision.decision_type, choice)
 
     def pending_decision(self) -> DecisionPoint | None:

@@ -14,6 +14,7 @@ from simulator.fe_redox import (
     kress91_fe3_over_sigma_fe,
     kress91_ferrous_feo_activity,
     kress91_split,
+    kress91_temperature_band_case,
     melt_mol_fractions_for_kress91,
 )
 
@@ -120,7 +121,68 @@ def test_kress91_valid_finite_controls_stay_exactly_golden_neutral() -> None:
         'ratio': 0.02275705282703544,
         'x_fe2o3': 0.004005013129454584,
         'x_feo': 0.17598997374109082,
+        'temperature_band_case': '1200C_1630C_kress91_authoritative',
+        'temperature_band_status': 'authoritative',
+        'temperature_band_source': 'REF-001 Kress91 1200-1630 C calibration band',
+        'authoritative': True,
+        'extrapolation': False,
+        'high_uncertainty': False,
     }
+
+
+@pytest.mark.parametrize(
+    ('temperature_C', 'case', 'authoritative', 'extrapolation', 'high_uncertainty'),
+    [
+        (
+            1199.0,
+            'below_1200C_extrapolation',
+            False,
+            True,
+            True,
+        ),
+        (
+            1300.0,
+            '1200C_1630C_kress91_authoritative',
+            True,
+            False,
+            False,
+        ),
+        (
+            1800.0,
+            '1630C_2100C_extrapolation_experimentally_confirmed',
+            False,
+            True,
+            False,
+        ),
+        (
+            2300.0,
+            '2100C_2500C_extrapolation_growing_uncertainty',
+            False,
+            True,
+            True,
+        ),
+        (
+            2600.0,
+            'above_2500C_deauthorized_high_uncertainty',
+            False,
+            True,
+            True,
+        ),
+    ],
+)
+def test_kress91_temperature_band_cases_gate_authority(
+    temperature_C: float,
+    case: str,
+    authoritative: bool,
+    extrapolation: bool,
+    high_uncertainty: bool,
+) -> None:
+    band = kress91_temperature_band_case(temperature_C)
+
+    assert band['case'] == case
+    assert band['authoritative'] is authoritative
+    assert band['extrapolation'] is extrapolation
+    assert band['high_uncertainty'] is high_uncertainty
 
 
 @pytest.mark.parametrize('fO2_log', [float('nan'), float('inf'), float('-inf')])

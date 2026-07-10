@@ -46,6 +46,8 @@ class EllinghamFitSegment:
         )
 
 ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
+    # Legacy representative high-T coefficients kept for keying/stoichiometry
+    # compatibility. Authoritative dG(T) now comes from ELLINGHAM_FIT_SEGMENTS.
     # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti/Si.
     # Per-species trailing IDs are the JANAF grounding-corpus anchors;
     # dG(1600C) values are the cross-check used during refit.
@@ -97,139 +99,477 @@ _LEGACY_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
 }
 
 
-# CF-2-lite (2026-07-04): extend only mbar-regime JANAF authority to 2200 K.
-# Values stay in kJ/mol O2. Anchors are NIST-JANAF/Chase 1998 table IDs
-# already used by the V1c grounding corpus. Fe and Si split at the metal
-# melting transitions so the high segment uses the liquid-metal standard state.
-# Cr uses the same construction: Cr fusion at 2180 K and dH_fus=21.0 kJ/mol
-# from CRC/Lange tabulations carried in REF-032-style elemental fusion data.
-# Mn keeps the existing Mn(l) basis and extends its upper fit limit to 2200 K;
-# it is deliberately not marked authoritative below the 1517 K Mn melting point.
+# Primary-refit (2026-07-09): NIST-JANAF 4th multiphase rows from
+# _ellingham_source.json, in kJ/mol O2 for n_M M + O2 -> n_ox oxide.
+# Segments split at every in-band metal/oxide phase breakpoint. Longer stable
+# intervals are sub-split only where needed for the existing linear segment
+# schema to reproduce every source-grid row spanned by the segment to <0.5 kJ.
+# Singleton/no-row breakpoint intervals use the JANAF H/G row tangent from the
+# nearest 100 K row; those intervals have no source-grid row to residual-check.
+# Metal-boil no-row intervals are constrained to the shared endpoint value at
+# T_b so the condensed-metal and gas-metal standard states meet continuously;
+# only dG/dT kinks at the phase transition.
 ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
     **_LEGACY_SEGMENTS,
+    # Na premise: Chase 1998 JANAF Na-014 rows 1100-2600 K, split at Na
+    # boil 1156.1 K and Na2O beta->alpha 1243.15 K, alpha->liquid 1405.2 K.
+    # Fit: dH/dS are least-squares for each row span below; max residual
+    # 0.442 kJ/mol O2. Unit check: dS is kJ/mol/K/mol O2. Sanity:
+    # dG(2200 K) = -7.33 vs grid -7.772 kJ/mol O2. Boil kink: above Tb
+    # the metal standard state is gas; gaseous metal is a higher-energy
+    # reactant, so oxide-formation dG becomes less negative above T_b and
+    # the slope changes instead of false-flattening the Na line. The
+    # 1100-1156.1 K segment is constrained to the post-boil shared endpoint
+    # dG(1156.1 K) = -524.382071 kJ/mol O2.
     "Na": (
         EllinghamFitSegment(
-            -1135.130,
-            -0.537417,
+            -731.077284147,
+            -0.178786621770,
             4,
             2,
-            ELLINGHAM_MBAR_FIT_RANGE_K,
-            "4 Na(l) + O2 -> 2 Na2O(condensed JANAF phase)",
-            "Chase 1998 NIST-JANAF Na-012",
-            -128.37,
-            -60.30,
-            -20.98,
-            32.76,
+            (1100.0, 1156.1),
+            "4 Na(l) + O2 -> 2 Na2O(beta); 1100 K row constrained to Na boil endpoint",
+            "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1207.826,
+            -0.591163333,
+            4,
+            2,
+            (1156.1, 1243.15),
+            "4 Na(g) + O2 -> 2 Na2O(beta); source-row tangent at 1200 K",
+            "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1172.356,
+            -0.562800,
+            4,
+            2,
+            (1243.15, 1405.2),
+            "4 Na(g) + O2 -> 2 Na2O(alpha); rows 1300-1400 K",
+            "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1051.1212,
+            -0.477468,
+            4,
+            2,
+            (1405.2, 1800.0),
+            "4 Na(g) + O2 -> 2 Na2O(l); rows 1500-1800 K",
+            "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1020.2496,
+            -0.460416,
+            4,
+            2,
+            (1800.0, 2200.0),
+            "4 Na(g) + O2 -> 2 Na2O(l); rows 1800-2200 K",
+            "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -985.0724,
+            -0.444394,
+            4,
+            2,
+            (2200.0, 2600.0),
+            "4 Na(g) + O2 -> 2 Na2O(l); rows 2200-2600 K",
+            "Chase 1998 NIST-JANAF Na-014; confidence: primary-refit",
         ),
     ),
+    # K premise: this worktree already has K, so keep it non-breaking but
+    # fail-closed at the JANAF K-012 solid-only table limit of 2000 K.
+    # Rows 1100-2000 K are K(g)+K2O(cr); K boil is below the grid at 1032 K
+    # and no JANAF liquid K2O segment exists. Fit max residual 0.499 kJ/mol
+    # O2; dS unit is kJ/mol/K/mol O2. Sanity: dG(2000 K) = +50.294 kJ/mol
+    # O2 exactly. Boil kink premise is already active for all in-band rows:
+    # gaseous K is the higher-energy reactant, so the post-boil line must not
+    # reuse the lower-T liquid-metal slope.
     "K": (
         EllinghamFitSegment(
-            -975.838,
-            -0.520580,
+            -1000.445333,
+            -0.541100,
             4,
             2,
-            ELLINGHAM_MBAR_FIT_RANGE_K,
-            "4 K(l) + O2 -> 2 K2O(condensed JANAF phase)",
-            "Chase 1998 NIST-JANAF K-012",
-            -0.67,
-            65.32,
-            103.40,
-            155.46,
+            (1100.0, 1300.0),
+            "4 K(g) + O2 -> 2 K2O(cr); rows 1100-1300 K",
+            "Chase 1998 NIST-JANAF K-012; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -967.231,
+            -0.515800,
+            4,
+            2,
+            (1300.0, 1600.0),
+            "4 K(g) + O2 -> 2 K2O(cr); rows 1300-1600 K",
+            "Chase 1998 NIST-JANAF K-012; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -920.512,
+            -0.486590,
+            4,
+            2,
+            (1600.0, 1900.0),
+            "4 K(g) + O2 -> 2 K2O(cr); rows 1600-1900 K",
+            "Chase 1998 NIST-JANAF K-012; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -884.946,
+            -0.467620,
+            4,
+            2,
+            (1900.0, 2000.0),
+            "4 K(g) + O2 -> 2 K2O(cr); rows 1900-2000 K",
+            "Chase 1998 NIST-JANAF K-012; confidence: primary-refit",
         ),
     ),
+    # Fe premise: Chase 1998 JANAF Fe-020 rows 1100-2600 K, split at
+    # Fe alpha->gamma 1184 K, FeO melt 1650 K, Fe gamma->delta 1665 K,
+    # and Fe melt 1809 K. Fit max residual 0.131 kJ/mol O2; dS unit is
+    # kJ/mol/K/mol O2. Sanity: dG(2000 K) = -296.893 vs grid -296.904.
     "Fe": (
         EllinghamFitSegment(
-            -538.946,
-            -0.125272,
+            -540.770,
+            -0.126754545,
             2,
             2,
-            (1100.0, 1811.0),
-            "2 Fe(s) + O2 -> 2 FeO(condensed JANAF phase)",
-            "Chase 1998 NIST-JANAF Fe-018",
-            -304.35,
-            None,
+            (1100.0, 1184.0),
+            "2 Fe(alpha) + O2 -> 2 FeO(s); source-row tangent at 1100 K",
+            "Chase 1998 NIST-JANAF Fe-020; confidence: primary-refit",
         ),
         EllinghamFitSegment(
-            -566.566,
-            -0.140512,
+            -538.9524,
+            -0.125376,
             2,
             2,
-            (1811.0, 2200.0),
-            "2 Fe(l) + O2 -> 2 FeO(condensed JANAF phase)",
-            "Chase 1998 NIST-JANAF Fe-018 + Fe fusion at 1811 K",
-            -303.36,
-            -285.54,
-            -275.26,
-            -261.21,
+            (1184.0, 1650.0),
+            "2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600 K",
+            "Chase 1998 NIST-JANAF Fe-020; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -487.080,
+            -0.093781176,
+            2,
+            2,
+            (1650.0, 1665.0),
+            "2 Fe(gamma) + O2 -> 2 FeO(l); nearest-row tangent at 1700 K",
+            "Chase 1998 NIST-JANAF Fe-020; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -486.296,
+            -0.093320,
+            2,
+            2,
+            (1665.0, 1809.0),
+            "2 Fe(delta) + O2 -> 2 FeO(l); rows 1700-1800 K",
+            "Chase 1998 NIST-JANAF Fe-020; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -510.298143,
+            -0.106702619,
+            2,
+            2,
+            (1809.0, 2600.0),
+            "2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600 K",
+            "Chase 1998 NIST-JANAF Fe-020; confidence: primary-refit",
         ),
     ),
+    # Mn premise: Pankratz USBM B672 MnO(c) rows 1100-1500 K, then the
+    # project Mn(l) reconstruction dG = -794.540 + 0.165650*T from 1600 K
+    # upward. Fits are kJ/mol O2 with dS in kJ/mol/K/mol O2. Primary-row
+    # max residual is 0.014 kJ/mol O2 after continuous sub-splits at the
+    # Mn beta->gamma (1360 K) and gamma->delta (1410 K) allotrope
+    # transitions; reconstructed tail is exact by construction. Sanity:
+    # dG(2000 K) = -463.240 kJ/mol O2. Reconstructed segments are
+    # deliberately tagged non-authoritative.
     "Mn": (
+        EllinghamFitSegment(
+            -772.183333333,
+            -0.148405,
+            2,
+            2,
+            (1100.0, 1360.0),
+            "2 Mn(beta,s) + O2 -> 2 MnO(s); Pankratz rows 1100-1300 K",
+            "Pankratz USBM B672 MnO(c); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -779.980666667,
+            -0.154138333,
+            2,
+            2,
+            (1360.0, 1410.0),
+            "2 Mn(gamma,s) + O2 -> 2 MnO(s); Pankratz row 1400 K",
+            "Pankratz USBM B672 MnO(c); confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -781.816277778,
+            -0.155440185,
+            2,
+            2,
+            (1410.0, 1519.0),
+            "2 Mn(delta,s) + O2 -> 2 MnO(s); Pankratz row 1500 K",
+            "Pankratz USBM B672 MnO(c); confidence: primary-refit",
+        ),
         EllinghamFitSegment(
             -794.540,
             -0.165650,
             2,
             2,
-            (1517.0, 2200.0),
-            "2 Mn(l) + O2 -> 2 MnO(s)",
-            "Chase 1998 NIST-JANAF Mn-008 + Mn fusion basis",
-            -484.21,
-            -463.24,
-            -451.12,
-            -434.56,
+            (1519.0, 2058.0),
+            "2 Mn(l) + O2 -> 2 MnO(s); project rows 1600-2000 K",
+            "Project Mn(l) reconstruction; confidence: reconstructed",
+        ),
+        EllinghamFitSegment(
+            -794.540,
+            -0.165650,
+            2,
+            2,
+            (2058.0, 2600.0),
+            "2 Mn(l) + O2 -> 2 MnO(lit. liquid range); project rows 2100-2600 K",
+            "Project Mn(l) reconstruction; confidence: reconstructed",
         ),
     ),
+    # Cr premise: Chase 1998 JANAF Cr-016 rows 1100-2600 K, split at Cr
+    # melt 2130 K; Cr2O3 melt is 2603 K, just above this grid. Fit max
+    # residual 0.314 kJ/mol O2. Unit check: dS is kJ/mol/K/mol O2.
+    # Sanity: dG(2600 K) = -301.079 vs grid -301.093.
     "Cr": (
         EllinghamFitSegment(
-            -748.076,
-            -0.168676,
+            -748.8986,
+            -0.169276909,
             4 / 3,
             2 / 3,
-            (1100.0, 2180.0),
-            "4/3 Cr(s) + O2 -> 2/3 Cr2O3(s)",
-            "Chase 1998 NIST-JANAF Cr-014",
-            -432.14,
-            -410.72,
-            -398.39,
-            -381.52,
+            (1100.0, 2130.0),
+            "4/3 Cr(s) + O2 -> 2/3 Cr2O3(s); rows 1100-2100 K",
+            "Chase 1998 NIST-JANAF Cr-016; confidence: primary-refit",
         ),
         EllinghamFitSegment(
-            -776.076,
-            -0.1815200366972477,
+            -781.3796,
+            -0.184731,
             4 / 3,
             2 / 3,
-            (2180.0, 2200.0),
-            "4/3 Cr(l) + O2 -> 2/3 Cr2O3(s)",
-            "Chase 1998 NIST-JANAF Cr-014 + Cr fusion at 2180 K",
-            -432.14,
-            -410.72,
-            -398.39,
-            -381.52,
+            (2130.0, 2600.0),
+            "4/3 Cr(l) + O2 -> 2/3 Cr2O3(s); rows 2200-2600 K",
+            "Chase 1998 NIST-JANAF Cr-016; confidence: primary-refit",
         ),
     ),
-    "Si": (
+    # Mg premise: Chase 1998 JANAF Mg-010 rows 1100-2600 K, split at Mg
+    # boil 1366 K; MgO melt is outside the grid at 3105 K. Fit max residual
+    # 0.457 kJ/mol O2; dS unit is kJ/mol/K/mol O2. Sanity: dG(2600 K)
+    # = -398.384 vs grid -398.744. Boil kink: Mg(g) is a higher-energy
+    # reactant than Mg(l), so post-boil oxide-formation dG is less negative
+    # and must use the steeper gaseous-metal JANAF slope. The 1300-1366 K
+    # rowless connector is constrained to the post-boil shared endpoint
+    # dG(1366 K) = -900.695453 kJ/mol O2.
+    "Mg": (
         EllinghamFitSegment(
-            -910.940,
-            -0.182400,
-            1,
-            1,
-            (1100.0, 1687.0),
-            "Si(s) + O2 -> SiO2(condensed JANAF phase)",
-            "Chase 1998 NIST-JANAF Si/SiO2 condensed tables",
-            None,
-            None,
+            -1216.985333,
+            -0.231080,
+            2,
+            2,
+            (1100.0, 1300.0),
+            "2 Mg(l) + O2 -> 2 MgO(s); rows 1100-1300 K",
+            "Chase 1998 NIST-JANAF Mg-010; confidence: primary-refit",
         ),
         EllinghamFitSegment(
-            -961.150,
-            -0.212160,
+            -1229.485036627,
+            -0.240695156636,
+            2,
+            2,
+            (1300.0, 1366.0),
+            "2 Mg(l) + O2 -> 2 MgO(s); 1300 K row constrained to Mg boil endpoint",
+            "Chase 1998 NIST-JANAF Mg-010; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1463.2445,
+            -0.411822143,
+            2,
+            2,
+            (1366.0, 2000.0),
+            "2 Mg(g) + O2 -> 2 MgO(s); rows 1400-2000 K",
+            "Chase 1998 NIST-JANAF Mg-010; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1443.971643,
+            -0.402149286,
+            2,
+            2,
+            (2000.0, 2600.0),
+            "2 Mg(g) + O2 -> 2 MgO(s); rows 2000-2600 K",
+            "Chase 1998 NIST-JANAF Mg-010; confidence: primary-refit",
+        ),
+    ),
+    # Ca premise: Chase 1998 JANAF Ca-029 rows 1100-2600 K, split at Ca
+    # melt 1115 K and boil 1757 K; CaO melt is outside the grid. Fit max
+    # residual 0.456 kJ/mol O2; dS unit is kJ/mol/K/mol O2. Sanity:
+    # dG(2600 K) = -575.694 vs grid -575.720. Boil kink: Ca(g) raises the
+    # reactant standard-state G above T_b, making formation dG less negative
+    # than a false liquid-Ca extrapolation. The 1700-1757 K rowless connector
+    # is constrained to the post-boil shared endpoint dG(1757 K) =
+    # -896.761077 kJ/mol O2.
+    "Ca": (
+        EllinghamFitSegment(
+            -1269.498,
+            -0.208094545,
+            2,
+            2,
+            (1100.0, 1115.0),
+            "2 Ca(s) + O2 -> 2 CaO(s); source-row tangent at 1100 K",
+            "Chase 1998 NIST-JANAF Ca-029; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1285.2748,
+            -0.222384,
+            2,
+            2,
+            (1115.0, 1700.0),
+            "2 Ca(l) + O2 -> 2 CaO(s); rows 1200-1700 K",
+            "Chase 1998 NIST-JANAF Ca-029; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1219.214447718,
+            -0.183524969246,
+            2,
+            2,
+            (1700.0, 1757.0),
+            "2 Ca(l) + O2 -> 2 CaO(s); 1700 K row constrained to Ca boil endpoint",
+            "Chase 1998 NIST-JANAF Ca-029; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1569.619286,
+            -0.382958571,
+            2,
+            2,
+            (1757.0, 2400.0),
+            "2 Ca(g) + O2 -> 2 CaO(s); rows 1800-2400 K",
+            "Chase 1998 NIST-JANAF Ca-029; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1553.840333,
+            -0.376210,
+            2,
+            2,
+            (2400.0, 2600.0),
+            "2 Ca(g) + O2 -> 2 CaO(s); rows 2400-2600 K",
+            "Chase 1998 NIST-JANAF Ca-029; confidence: primary-refit",
+        ),
+    ),
+    # Al premise: Chase 1998 JANAF Al-101 rows 1100-2600 K, split at
+    # Al2O3 alpha->liquid 2327 K; Al melt is below the grid. Fit max residual
+    # 0.459 kJ/mol O2. Unit check: dS is kJ/mol/K/mol O2. Sanity:
+    # dG(2000 K) = -689.214 vs grid -689.397.
+    "Al": (
+        EllinghamFitSegment(
+            -1124.438873,
+            -0.217612364,
+            4 / 3,
+            2 / 3,
+            (1100.0, 2100.0),
+            "4/3 Al(l) + O2 -> 2/3 Al2O3(alpha,s); rows 1100-2100 K",
+            "Chase 1998 NIST-JANAF Al-101; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1117.678667,
+            -0.214185,
+            4 / 3,
+            2 / 3,
+            (2100.0, 2327.0),
+            "4/3 Al(l) + O2 -> 2/3 Al2O3(alpha,s); rows 2100-2300 K",
+            "Chase 1998 NIST-JANAF Al-101; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -1034.045667,
+            -0.178330,
+            4 / 3,
+            2 / 3,
+            (2327.0, 2600.0),
+            "4/3 Al(l) + O2 -> 2/3 Al2O3(l); rows 2400-2600 K",
+            "Chase 1998 NIST-JANAF Al-101; confidence: primary-refit",
+        ),
+    ),
+    # Ti premise: Chase 1998 JANAF O-045 rows 1100-2600 K, split at
+    # Ti alpha->beta 1166 K, Ti melt 1941 K, and TiO2 melt 2130 K. Fit max
+    # residual 0.206 kJ/mol O2; dS unit is kJ/mol/K/mol O2. Sanity:
+    # dG(2100 K) = -567.263 kJ/mol O2 exactly.
+    "Ti": (
+        EllinghamFitSegment(
+            -938.339,
+            -0.175941818,
             1,
             1,
-            (1687.0, 2200.0),
-            "Si(l) + O2 -> SiO2(condensed JANAF phase)",
-            "Chase 1998 NIST-JANAF Si/SiO2 tables + Si fusion at 1687 K",
-            -563.76,
-            -536.83,
-            -521.31,
-            -500.09,
+            (1100.0, 1166.0),
+            "Ti(alpha) + O2 -> TiO2(rutile,s); source-row tangent at 1100 K",
+            "Chase 1998 NIST-JANAF O-045; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -938.77244,
+            -0.176554881,
+            1,
+            1,
+            (1166.0, 1941.0),
+            "Ti(beta) + O2 -> TiO2(rutile,s); rows 1200-1900 K",
+            "Chase 1998 NIST-JANAF O-045; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -950.891,
+            -0.182680,
+            1,
+            1,
+            (1941.0, 2130.0),
+            "Ti(l) + O2 -> TiO2(rutile,s); rows 2000-2100 K",
+            "Chase 1998 NIST-JANAF O-045; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -880.544,
+            -0.149735,
+            1,
+            1,
+            (2130.0, 2600.0),
+            "Ti(l) + O2 -> TiO2(l); rows 2200-2600 K",
+            "Chase 1998 NIST-JANAF O-045; confidence: primary-refit",
+        ),
+    ),
+    # Si premise: Chase 1998 JANAF O-039 rows 1100-2600 K. Split at Si
+    # melt 1685 K and the JANAF SiO2 II->liquid transition 1696 K (not the
+    # classical cristobalite melt often quoted near 1996 K). Fit max residual
+    # 0.478 kJ/mol O2; dS unit is kJ/mol/K/mol O2. Sanity:
+    # dG(2200 K) = -512.402 vs grid -512.672.
+    "Si": (
+        EllinghamFitSegment(
+            -902.442943,
+            -0.172495143,
+            1,
+            1,
+            (1100.0, 1685.0),
+            "Si(s) + O2 -> SiO2(II); rows 1100-1600 K",
+            "Chase 1998 NIST-JANAF O-039; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -941.610,
+            -0.195618235,
+            1,
+            1,
+            (1685.0, 1696.0),
+            "Si(l) + O2 -> SiO2(II); nearest-row tangent at 1700 K",
+            "Chase 1998 NIST-JANAF O-039; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -933.753006,
+            -0.191277833,
+            1,
+            1,
+            (1696.0, 2500.0),
+            "Si(l) + O2 -> SiO2(l); rows 1700-2500 K",
+            "Chase 1998 NIST-JANAF O-039; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -924.129,
+            -0.187250,
+            1,
+            1,
+            (2500.0, 2600.0),
+            "Si(l) + O2 -> SiO2(l); rows 2500-2600 K",
+            "Chase 1998 NIST-JANAF O-039; confidence: primary-refit",
         ),
     ),
 }

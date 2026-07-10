@@ -642,16 +642,20 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert surface["pN2_mbar"] == pytest.approx(SSO2_CERTIFIED_PN2_MBAR)
     assert surface["pO2_mbar"] == pytest.approx(stage_gas["pO2_mbar"])
     assert surface["pN2_mbar"] == pytest.approx(stage_gas["pN2_mbar"])
-    assert partition["status"] == "available"
+    # JANAF-4th multiphase re-ground keeps the certified Na reduction, but the
+    # Holzheid FeO-activity saturation criterion is not crossed at the SSO-2
+    # pO2/temperature point, so no native-Fe drain/vapor split is applicable.
+    assert partition["status"] == "missing_fe_drain_vapor_partition"
+    assert "no native_fe_saturation_split transition" in partition["status_reason"]
     assert partition["stage_gas_snapshot"]["pO2_mbar"] == pytest.approx(
         surface["pO2_mbar"]
     )
-    assert partition_basis["status"] == "available"
-    assert partition_basis["native_fe_tap_mol"] > partition_basis["native_fe_vapor_mol"]
-    assert partition["native_fe_saturation_split_count"] > 0
-    assert partition["tap_basis"]["Fe_kg"] == pytest.approx(evidence["fe_tap"]["Fe_kg"])
-    assert evidence["fe_tap"]["status"] == "available"
-    assert evidence["fe_tap"]["Fe_kg"] > 0.0
+    assert partition_basis["status"] == "missing_fe_drain_vapor_partition"
+    assert partition["native_fe_saturation_split_count"] == 0
+    assert partition["tap_basis"]["status"] == "missing_fe_tap_evidence"
+    assert evidence["fe_tap"]["status"] == "missing_fe_tap_evidence"
+    assert evidence["metal_product_path"]["status"] == "available"
+    assert evidence["metal_product_path"]["Fe_kg"] > 0.0
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:

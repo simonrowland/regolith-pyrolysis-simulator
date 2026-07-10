@@ -24,11 +24,89 @@ KRESS91_MOL_FRACTION_OXIDES = (
 # provenance: Kress91 coefficients — REF-001 CMP 108:82-92; ln(fO2) and inverse-T terms.
 KRESS91_LN_FO2_COEFFICIENT = 0.196
 KRESS91_INV_T_COEFFICIENT_K = 11492.0
-# Fallback liquid-only guard when freeze-gate liquid fraction is disabled.
-# Kress91 coefficients above remain the thermodynamic source.
-KRESS91_LIQUID_CALIBRATION_MIN_T_C = 1400.0
+# Kress91 liquid calibration floor. Kress91 coefficients above remain the
+# thermodynamic source; higher-temperature bands are flagged, not model-swapped.
+KRESS91_LIQUID_CALIBRATION_MIN_T_C = 1200.0
+KRESS91_LIQUID_CALIBRATION_MAX_T_C = 1630.0
+KRESS91_AITHALA_EXPERIMENTAL_CONFIRMATION_MAX_T_C = 2100.0
+KRESS91_HIGH_UNCERTAINTY_MAX_T_C = 2500.0
 # 1400 C cache-label convention for isochemical redox keys, not new physics.
 KRESS91_FO2_KEY_REFERENCE_T_K = 1673.15
+
+
+def kress91_temperature_band_case(temperature_C: float) -> dict[str, object]:
+    """Classify Kress91 temperature authority/extrapolation bands."""
+
+    T_C = float(temperature_C)
+    if not math.isfinite(T_C):
+        return {
+            'case': 'non_finite_temperature',
+            'status': 'refused',
+            'source': 'none:invalid_temperature',
+            'authoritative': False,
+            'extrapolation': False,
+            'high_uncertainty': True,
+        }
+    # CASE liquidus..1200 C: extrapolation flagged below calibration floor;
+    # source REF-001 defines the Kress91 liquid relation and 1200 C floor.
+    if T_C < KRESS91_LIQUID_CALIBRATION_MIN_T_C:
+        return {
+            'case': 'below_1200C_extrapolation',
+            'status': 'extrapolation_below_calibration_floor',
+            'source': (
+                'REF-001 Kress91 liquid relation; below 1200 C calibration floor'
+            ),
+            'authoritative': False,
+            'extrapolation': True,
+            'high_uncertainty': True,
+        }
+    # CASE 1200-1630 C: AUTHORITATIVE Kress & Carmichael 1991, REF-001,
+    # doi:10.1007/BF00307328. Kilinc 1983 (REF-054) and Jayasuriya 2004
+    # (REF-055) are comparison/validation sources, not wider model authority.
+    if T_C <= KRESS91_LIQUID_CALIBRATION_MAX_T_C:
+        return {
+            'case': '1200C_1630C_kress91_authoritative',
+            'status': 'authoritative',
+            'source': 'REF-001 Kress91 1200-1630 C calibration band',
+            'authoritative': True,
+            'extrapolation': False,
+            'high_uncertainty': False,
+        }
+    # CASE 1630-2100 C: Kress91 extrapolation experimentally confirmed by
+    # Aithala, Macris & Hirschmann 2026 (REF-053, doi:10.7185/geochemlet.2617);
+    # retain Kress91 rather than switching models.
+    if T_C <= KRESS91_AITHALA_EXPERIMENTAL_CONFIRMATION_MAX_T_C:
+        return {
+            'case': '1630C_2100C_extrapolation_experimentally_confirmed',
+            'status': 'extrapolation_experimentally_confirmed',
+            'source': (
+                'REF-001 Kress91 retained; REF-053 confirms high-T extrapolation'
+            ),
+            'authoritative': False,
+            'extrapolation': True,
+            'high_uncertainty': False,
+        }
+    # CASE 2100-2500 C: extrapolation with growing uncertainty; REF-053 is
+    # the nearest experimental confirmation, but uncertainty grows beyond it.
+    if T_C <= KRESS91_HIGH_UNCERTAINTY_MAX_T_C:
+        return {
+            'case': '2100C_2500C_extrapolation_growing_uncertainty',
+            'status': 'high_uncertainty_extrapolation',
+            'source': 'REF-001 Kress91 retained beyond REF-053 confirmation band',
+            'authoritative': False,
+            'extrapolation': True,
+            'high_uncertainty': True,
+        }
+    # CASE >2500 C: F0-style high-uncertainty flag. The caller may refuse a
+    # transaction; diagnostics de-authorize the temperature band either way.
+    return {
+        'case': 'above_2500C_deauthorized_high_uncertainty',
+        'status': 'deauthorized_high_uncertainty',
+        'source': 'REF-001 Kress91 outside authorized temperature envelope',
+        'authoritative': False,
+        'extrapolation': True,
+        'high_uncertainty': True,
+    }
 
 
 def kress91_ln_fO2_temperature_delta(
@@ -738,6 +816,12 @@ def _calphad_feo_activity_components(
             'fe2o3_over_feo_molar': split['ratio'],
             'x_fe2o3': split['x_fe2o3'],
             'x_feo': split['x_feo'],
+            'temperature_band_case': split['temperature_band_case'],
+            'temperature_band_status': split['temperature_band_status'],
+            'temperature_band_source': split['temperature_band_source'],
+            'authoritative': split['authoritative'],
+            'extrapolation': split['extrapolation'],
+            'high_uncertainty': split['high_uncertainty'],
         },
         'gamma_FeO': {
             'low': gamma_low,
@@ -810,7 +894,7 @@ def kress91_split(
     mol_fractions: Mapping[str, float],
     T_K: float,
     pressure_bar: float,
-) -> dict[str, float]:
+) -> dict[str, object]:
     ratio = _kress91_fe2o3_over_feo_molar(
         fO2_log=fO2_log,
         mol_fractions=mol_fractions,
@@ -820,9 +904,16 @@ def kress91_split(
     fe3 = 2.0 * ratio / (2.0 * ratio + 1.0)
     x_fe2o3 = ratio * mol_fractions['FeOt'] / (2.0 * ratio + 1.0)
     x_feo = max(0.0, mol_fractions['FeOt'] - 2.0 * x_fe2o3)
+    temperature_band = kress91_temperature_band_case(float(T_K) - 273.15)
     return {
         'fe3': fe3,
         'ratio': ratio,
         'x_fe2o3': x_fe2o3,
         'x_feo': x_feo,
+        'temperature_band_case': temperature_band['case'],
+        'temperature_band_status': temperature_band['status'],
+        'temperature_band_source': temperature_band['source'],
+        'authoritative': temperature_band['authoritative'],
+        'extrapolation': temperature_band['extrapolation'],
+        'high_uncertainty': temperature_band['high_uncertainty'],
     }

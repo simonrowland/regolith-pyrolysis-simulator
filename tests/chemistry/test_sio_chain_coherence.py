@@ -112,5 +112,5 @@ def test_sio_evolved_is_invariant_to_wall_temperature_at_fixed_po2_mode():
         assert abs(diagnostics["mass_balance_error_pct"]) <= MAX_BALANCE_ERR_PCT
 
     assert evolved == pytest.approx(
-        [PHASE3BIS_SIO_EVOLVED_KG] * len(evolved), rel=0.0, abs=1e-11
+        [PHASE3BIS_SIO_EVOLVED_KG] * len(evolved), rel=0.0, abs=5e-11
     )

@@ -467,6 +467,8 @@ def run_row(
     sim.melt.temperature_C = float(temperature_C)
     sim.melt.target_temperature_C = float(temperature_C)
     _configure_gas_state(sim, gas)
+    pinned_hour = int(sim.melt.hour)
+    sim._establish_melt_redox_gate_authority_for_current_hour()
     T_K = float(temperature_C) + 273.15
     sim._re_reference_melt_fO2_to_temperature(T_K)
     exchange = sim._apply_oxygen_reservoir_exchange()
@@ -665,6 +667,7 @@ def run_row(
         abs(row["mass_balance_error_pct"]) <= MASS_BALANCE_LIMIT_PCT
         and not row["ferric_divergence_material"]
     )
+    sim._clear_melt_redox_gate_authority_for_completed_hour(pinned_hour)
     return row
 
 

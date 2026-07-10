@@ -27,6 +27,7 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
+from simulator.core import PoisonedHourError
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import StubBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
@@ -920,13 +921,30 @@ def _start_background_loop(
                     break
                 except Exception as exc:
                     _safe_log(f'Simulation loop failed: {exc}')
+                    message = str(exc)
+                    unenriched_message = message
+                    poisoned = None
+                    try:
+                        poisoned = getattr(sim, '_poisoned_hour', None)
+                        if poisoned is not None:
+                            poisoned_error = PoisonedHourError(poisoned)
+                            poisoned_detail = f'PoisonedHourError: {poisoned_error}'
+                            if message == str(poisoned_error):
+                                message = poisoned_detail
+                            elif message != poisoned_detail:
+                                message = f'{message}; {poisoned_detail}'
+                    except Exception:  # noqa: BLE001 -- best-effort enrichment
+                        message = unenriched_message
+                        poisoned = None
                     error_payload = {
                         'status': 'error',
-                        'message': str(exc),
+                        'message': message,
                         'backend_status': backend_status,
                         'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,
                     }
+                    if poisoned is not None:
+                        error_payload['reason'] = 'poisoned_hour'
                     if not _emit_if_current(
                         socketio,
                         sid,

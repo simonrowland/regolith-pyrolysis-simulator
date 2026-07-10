@@ -17,7 +17,12 @@ MELT_OXIDE_ACTIVITY_TIER = "UNCERTIFIED"
 MELT_OXIDE_ACTIVITY_LIMITATION = (
     "constant_gamma_table_value; gamma is temperature-dependent and the "
     "1773-2173 K recipe band is hotter than the table datum, so constant "
-    "gamma likely over-suppresses alkalis at recipe temperature"
+    "gamma likely over-suppresses alkalis at recipe temperature; exact pure "
+    "single-cation endpoints are normalized to the Raoultian a=1 reference, "
+    "but no continuous near-pure gamma(X) fit is claimed"
+)
+MELT_OXIDE_ACTIVITY_REFERENCE_STATE = (
+    "single_cation_Raoultian_pure_liquid_reference"
 )
 R_KJ_PER_MOL_K = 8.31446261815324e-3
 
@@ -159,6 +164,7 @@ class MeltOxideActivity:
             "melt_oxide_X_single_cation": self.x_single_cation,
             "melt_oxide_activity": self.activity,
             "melt_oxide_gamma_tier": MELT_OXIDE_ACTIVITY_TIER,
+            "melt_oxide_activity_reference_state": MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
             "melt_oxide_gamma_citation": self.citation,
             "melt_oxide_gamma_limitation": MELT_OXIDE_ACTIVITY_LIMITATION,
             "alphamelts_cross_check_status": ALPHAMELTS_CROSS_CHECK_STATUS,
@@ -220,7 +226,14 @@ def melt_oxide_activity(
             warning,
         )
 
-    activity = coeff.gamma * x_single_cation
+    # Raoultian standard state requires the pure single-cation component to
+    # have activity 1.0. The table coefficient is retained for mixed melts;
+    # a fitted gamma(X,T) curve is outside this uncertified constant-gamma model.
+    activity = (
+        1.0
+        if math.isclose(x_single_cation, 1.0, rel_tol=0.0, abs_tol=1e-12)
+        else coeff.gamma * x_single_cation
+    )
     return MeltOxideActivity(
         parent,
         coeff.single_cation_component,

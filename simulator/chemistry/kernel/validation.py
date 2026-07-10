@@ -185,6 +185,9 @@ def validate_control_audit(audit: ControlAudit, request: IntentRequest) -> None:
 def _proposal_to_ledger_transition(
     proposal: LedgerTransitionProposal,
     registry: Mapping[str, Any],
+    *,
+    lot_source: str = "",
+    lot_meta: Mapping[str, Any] | None = None,
 ) -> LedgerTransition:
     """Translate a mol-native proposal into a kg-native :class:`LedgerTransition`.
 
@@ -193,8 +196,20 @@ def _proposal_to_ledger_transition(
     :class:`MaterialLot.without_empty`).
     """
 
-    debits = _build_lots(proposal.debits, registry, kind="debit")
-    credits = _build_lots(proposal.credits, registry, kind="credit")
+    debits = _build_lots(
+        proposal.debits,
+        registry,
+        kind="debit",
+        source=lot_source,
+        meta=lot_meta,
+    )
+    credits = _build_lots(
+        proposal.credits,
+        registry,
+        kind="credit",
+        source=lot_source,
+        meta=lot_meta,
+    )
     return LedgerTransition(
         name=proposal.reason or "chemistry_kernel_proposal",
         debits=tuple(debits),
@@ -208,6 +223,8 @@ def _build_lots(
     registry: Mapping[str, Any],
     *,
     kind: str,
+    source: str = "",
+    meta: Mapping[str, Any] | None = None,
 ) -> list:
     from simulator.accounting.lots import MaterialLot
 
@@ -230,5 +247,12 @@ def _build_lots(
             formula = resolve_species_formula(str(species), registry)
             species_kg[str(species)] = value * formula.molar_mass_kg_per_mol()
         if species_kg:
-            lots.append(MaterialLot(str(account), species_kg))
+            lots.append(
+                MaterialLot(
+                    str(account),
+                    species_kg,
+                    source=source,
+                    meta=meta or {},
+                )
+            )
     return lots

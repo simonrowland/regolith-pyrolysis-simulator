@@ -29,10 +29,10 @@ The `summary` map gives per-source counts and species-count percentages for the 
 
 Per-step refusals leave the run `status` at `ok` or `partial`. Only whole-run halts (e.g. `KnudsenRegimeRefusal` for a viscous-flow violation) escalate to `status="refused"`.
 
-Under V1c JANAF Ellingham:
+Under JANAF-4th multiphase Ellingham (2026-07-09 re-ground):
 
-- K → FeO has non-positive margin at any practical melt T (crossover ~832 °C). The legacy K-shuttle path is therefore refused at every dispatch; this is the surviving design, not a failure.
-- Na → FeO has positive margin only below 1173.4 °C. The default C3_NA recipe injects at 1150 °C for a thin positive-margin window.
+- K → FeO has non-positive margin at any practical melt T (crossover ~836 °C). The legacy K-shuttle path is therefore refused at every dispatch; this is the surviving design, not a failure.
+- Na → FeO has positive margin only below 1181.5 °C. The default C3_NA recipe injects at 1150 °C for a positive (~31 °C) margin window.
 
 ## Knudsen regime diagnostic
 

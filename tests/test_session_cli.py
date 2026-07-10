@@ -213,6 +213,27 @@ def test_session_script_exercises_every_verb_as_ndjson():
     assert _unexpected_stderr_lines(result.stderr) == []
 
 
+def test_invalid_path_ab_choice_is_typed_refusal_and_stays_pending():
+    result = _run_session(
+        """
+        start --feedstock=lunar_mare_low_ti --campaign=C0 --backend=stub --setpoint=C0.max_hours=1 --setpoint=C0B.max_hours=1
+        advance 10
+        decide bogus
+        advance 1
+        quit
+        """
+    )
+
+    frames = _frames(result.stdout)
+    assert result.returncode == 0
+    assert frames[1]["frame_type"] == "decision_required"
+    assert frames[1]["decision"]["type"] == "PATH_AB"
+    assert frames[2]["ok"] is False
+    assert frames[2]["error_type"] == "InvalidDecisionChoiceError"
+    assert frames[3]["frame_type"] == "decision_required"
+    assert frames[3]["decision"] == frames[1]["decision"]
+
+
 def test_session_cli_reports_redox_breakdown_when_respeciation_attempts_exist():
     result = _run_session(
         """

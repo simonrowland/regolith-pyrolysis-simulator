@@ -38,6 +38,21 @@ def _make_sim(feedstock_id: str, *, temperature_C: float = 1600.0) -> PyrolysisS
     return sim
 
 
+def _seed_redox_liquidus_curve(sim: PyrolysisSimulator) -> None:
+    sim._freeze_gate_liquid_fraction_cache = {
+        "key": ("test",),
+        "curve": {
+            "source": "test",
+            "solidus_T_C": 1000.0,
+            "liquidus_T_C": 1300.0,
+            "path": (
+                (1000.0, 0.0),
+                (1300.0, 1.0),
+            ),
+        },
+    }
+
+
 def test_fe_redox_split_snapshot_field_is_diagnostic_only() -> None:
     sim = _make_sim("lunar_mare_low_ti")
     before_inventory = copy.deepcopy(sim.inventory)
@@ -104,6 +119,7 @@ def test_fe_redox_split_reads_oxygen_reservoir_not_stale_mirror() -> None:
 
 def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    _seed_redox_liquidus_curve(sim)
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
     sim.melt.fO2_log = -10.0
     sim.melt.melt_fO2_log = -10.0
@@ -178,6 +194,7 @@ def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    _seed_redox_liquidus_curve(sim)
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
     sim.melt.fO2_log = -10.0
     sim.melt.melt_fO2_log = -10.0

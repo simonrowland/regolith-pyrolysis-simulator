@@ -21,7 +21,7 @@ ul { padding-left: 1.4rem; }</style>
 <body>
 <h1>Reference Registry</h1>
 <nav><strong>Topics:</strong> 
-<a href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a> (7) | <a href="topics/ceres-mineralogy.html">ceres-mineralogy</a> (4) | <a href="topics/ceres-organics.html">ceres-organics</a> (1) | <a href="topics/comet-organics.html">comet-organics</a> (2) | <a href="topics/evaporation.html">evaporation</a> (6) | <a href="topics/foulant-thermo.html">foulant-thermo</a> (1) | <a href="topics/mars-carbonates.html">mars-carbonates</a> (1) | <a href="topics/perchlorate.html">perchlorate</a> (2) | <a href="topics/redox-fo2.html">redox-fo2</a> (6) | <a href="topics/simulants.html">simulants</a> (1) | <a href="topics/thermal-properties.html">thermal-properties</a> (2) | <a href="topics/thermochemistry.html">thermochemistry</a> (4) | <a href="topics/vapor-pressure.html">vapor-pressure</a> (11) | <a href="topics/volatility.html">volatility</a> (4)
+<a href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a> (7) | <a href="topics/ceres-mineralogy.html">ceres-mineralogy</a> (4) | <a href="topics/ceres-organics.html">ceres-organics</a> (1) | <a href="topics/comet-organics.html">comet-organics</a> (2) | <a href="topics/evaporation.html">evaporation</a> (6) | <a href="topics/foulant-thermo.html">foulant-thermo</a> (1) | <a href="topics/mars-carbonates.html">mars-carbonates</a> (1) | <a href="topics/perchlorate.html">perchlorate</a> (2) | <a href="topics/redox-fo2.html">redox-fo2</a> (9) | <a href="topics/simulants.html">simulants</a> (1) | <a href="topics/thermal-properties.html">thermal-properties</a> (2) | <a href="topics/thermochemistry.html">thermochemistry</a> (4) | <a href="topics/vapor-pressure.html">vapor-pressure</a> (11) | <a href="topics/volatility.html">volatility</a> (4)
 </nav>
 <h2>Master List</h2>
 <section class="entry" id="REF-001">
@@ -34,6 +34,13 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>docs/chemistry-provenance.notes.md:29</code> - Highest-priority gaps to encode first (authority / golden / certification paths): - **Kress91 composition coeffs** (`simulator/fe_redox.py`) — cited (REF-001) elsewhere but not at the definition site.</li>
 <li><code>simulator/fe_redox.py:24</code> - class Kress91InvalidControls(ValueError): # provenance: Kress91 coefficients — REF-001 CMP 108:82-92; ln(fO2) and inverse-T terms.</li>
+<li><code>simulator/fe_redox.py:51</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # source REF-001 defines the Kress91 liquid relation and 1200 C floor.</li>
+<li><code>simulator/fe_redox.py:57</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 liquid relation; below 1200 C calibration floor&#x27;</li>
+<li><code>simulator/fe_redox.py:63</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # CASE 1200-1630 C: AUTHORITATIVE Kress &amp; Carmichael 1991, REF-001,</li>
+<li><code>simulator/fe_redox.py:70</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 1200-1630 C calibration band&#x27;,</li>
+<li><code>simulator/fe_redox.py:83</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 retained; REF-053 confirms high-T extrapolation&#x27;</li>
+<li><code>simulator/fe_redox.py:95</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 retained beyond REF-053 confirmation band&#x27;,</li>
+<li><code>simulator/fe_redox.py:105</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 outside authorized temperature envelope&#x27;,</li>
 </ul>
 </section>
 <section class="entry" id="REF-002">
@@ -170,7 +177,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/species_catalog.yaml:122</code> - species.id.source: source: Stoichiometric iron sulfate formula for cation-bearing sulfate Stage 0 routing; NIST WebBook REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
 <li><code>data/species_catalog.yaml:164</code> - species.id.source: source: Sodium carbonate formula for the carbonate_salts surrogate component and Na2CO3 silicate-displacement gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
 <li><code>data/vapor_pressures.yaml:236</code> - metals.Fe.pure_component_antoine.source: source: &quot;REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
-<li><code>simulator/core.py:7091</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
+<li><code>simulator/core.py:7239</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
 </ul>
 </section>
 <section class="entry" id="REF-013">
@@ -271,7 +278,7 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:120</code> - species.K.source: source: &quot;REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.&quot;</li>
 <li><code>data/setpoints.yaml:376</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
-<li><code>simulator/mre_ladder.py:20</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
+<li><code>simulator/mre_ladder.py:26</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
 </ul>
 </section>
 <section class="entry" id="REF-020">
@@ -451,7 +458,6 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:360</code> - metals.Ti.pure_component_antoine.source: source: &quot;REF-032 Alcock-Itkin-Horrigan 1984 titanium liquid equation, CRC/CR2 Pa-converted form; dense 10 K minimax refit from 1941-2400 K plus exact 3560.15 K normal-boiling anchor to log10(P/Pa)=A-B/(T+C)&quot;</li>
 <li><code>data/vapor_pressures.yaml:439</code> - metals.Mn.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 solid/liquid Mn-&gt;Mn(g) evaluation; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as comparators; runtime pure-component source is pure_component_antoine&quot;</li>
 <li><code>data/vapor_pressures.yaml:441</code> - metals.Mn.pure_component_antoine.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s/l)-&gt;Mn(g) thermodynamic evaluation fit; REF-032 Alcock solid, REF-033 CRC/Stull, and REF-034 Kaye-Laby/NPL retained as documented comparators&quot;</li>
-<li><code>simulator/chemistry/ellingham_thermo.py:105</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # from CRC/Lange tabulations carried in REF-032-style elemental fusion data.</li>
 </ul>
 </section>
 <section class="entry" id="REF-033">
@@ -624,7 +630,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/setpoints.yaml:376</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
-<li><code>simulator/mre_ladder.py:20</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
+<li><code>simulator/mre_ladder.py:26</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
 </ul>
 </section>
 <section class="entry" id="REF-051">
@@ -634,7 +640,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>simulator/mre_ladder.py:20</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
+<li><code>simulator/mre_ladder.py:26</code> - # provenance: Na2O/K2O legacy rungs -- REF-019 Table 2 plus REF-050/REF-051</li>
 </ul>
 </section>
 <section class="entry" id="REF-052">
@@ -645,6 +651,42 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>The Gibbs energy functions of condensed phases calculated by this procedure are consistent with the enthalpies of formation of the condensed phase stable at 298.15 K and 1.013 25 bar.</p><footer>p. 153, Sec. 2.1a; Licenses combining the K2O(l) Gibbs-energy-function row directly with the Table 4 dfH298 of K2O(s) in the t-141 KO0.5 standard-term assembly.</footer></blockquote>
 <blockquote><p>Data on the potassium oxides is limited and of uncertain quality.</p><footer>p. 159, Sec. 2.3c; Source-quality caveat carried into the t-141 uncertainty budget for the honest +1.15..+1.28 dex held-out DeMaria residual.</footer></blockquote>
 <p><strong>Cited by:</strong> none</p>
+</section>
+<section class="entry" id="REF-053">
+<h2>REF-053</h2>
+<p class="citation">Aithala, Macris &amp; Hirschmann (2026). High-temperature Fe3+/SigmaFe measurements supporting Kress91 extrapolation in silicate melts. <em>Geochemical Perspectives Letters</em>.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/redox-fo2.html">redox-fo2</a></p>
+<p><a href="https://doi.org/10.7185/geochemlet.2617">doi:10.7185/geochemlet.2617</a> | <a href="https://doi.org/10.7185/geochemlet.2617">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>simulator/fe_redox.py:76</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # Aithala, Macris &amp; Hirschmann 2026 (REF-053, doi:10.7185/geochemlet.2617);</li>
+<li><code>simulator/fe_redox.py:83</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 retained; REF-053 confirms high-T extrapolation&#x27;</li>
+<li><code>simulator/fe_redox.py:89</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # CASE 2100-2500 C: extrapolation with growing uncertainty; REF-053 is</li>
+<li><code>simulator/fe_redox.py:95</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;source&#x27;: &#x27;REF-001 Kress91 retained beyond REF-053 confirmation band&#x27;,</li>
+</ul>
+</section>
+<section class="entry" id="REF-054">
+<h2>REF-054</h2>
+<p class="citation">Kilinc, A., Carmichael, I.S.E., Rivers, M.L. &amp; Sack, R.O. (1983). The ferric-ferrous ratio of natural silicate liquids equilibrated in air. <em>Contributions to Mineralogy and Petrology</em>.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/redox-fo2.html">redox-fo2</a></p>
+<p><a href="https://doi.org/10.1007/BF00373086">doi:10.1007/BF00373086</a> | <a href="https://doi.org/10.1007/BF00373086">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>simulator/fe_redox.py:64</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # doi:10.1007/BF00307328. Kilinc 1983 (REF-054) and Jayasuriya 2004</li>
+</ul>
+</section>
+<section class="entry" id="REF-055">
+<h2>REF-055</h2>
+<p class="citation">Jayasuriya, K.D., O&#x27;Neill, H.St.C., Berry, A.J. &amp; Campbell, S.J. (2004). A Mossbauer study of the oxidation state of Fe in silicate melts. <em>American Mineralogist</em>.</p>
+<p class="meta"><span class="badge">MEASUREMENT</span><span class="badge status-current">current</span><a class="badge" href="topics/redox-fo2.html">redox-fo2</a></p>
+<p><a href="https://doi.org/10.2138/am-2004-11-1203">doi:10.2138/am-2004-11-1203</a> | <a href="https://doi.org/10.2138/am-2004-11-1203">source URL</a></p>
+<p><em>Quote needed: no verified pull quote recorded.</em></p>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>simulator/fe_redox.py:65</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # (REF-055) are comparison/validation sources, not wider model authority.</li>
+</ul>
 </section>
 </body>
 </html>

@@ -1672,6 +1672,7 @@ def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
         sid = new_sids.pop()
         state, _ = _current_simulation_state(sid)
         assert state is not None
+
         assert state["speed"] == pytest.approx(1.0)
 
         client.emit("adjust_parameter", {"param": "speed", "value": bad_speed})
@@ -1994,6 +1995,77 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
             2.0 * 31.998 / 1000.0
         )
         assert tick["flue_composition_units"] == "kg/hr"
+    finally:
+        client.disconnect()
+        for sid in list(_simulations):
+            _clear_simulation_state(sid)
+
+
+def test_web_failure_status_and_cleanup_survive_poison_enrichment_failure(
+    monkeypatch,
+):
+    captured_tasks = _force_socketio_stub(monkeypatch)
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        sid = new_sids.pop()
+        state, _ = _current_simulation_state(sid)
+        assert state is not None
+
+        class RaisingPoisonSim:
+            @property
+            def _poisoned_hour(self):
+                raise LookupError("poison metadata unavailable")
+
+        class HostileSession:
+            simulator = RaisingPoisonSim()
+
+            def is_complete(self):
+                return False
+
+        state["session"] = HostileSession()
+
+        def fail_drive_session(*_args, **_kwargs):
+            raise RuntimeError("primary abort")
+
+        monkeypatch.setattr(web_events, "drive_session", fail_drive_session)
+
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses == [
+            {
+                "status": "error",
+                "message": "primary abort",
+                "backend_status": "unavailable",
+                "backend_authoritative": False,
+                "backend_message": "Using built-in fallback",
+            }
+        ]
+        assert state["running"] is False
+        assert state["paused"] is False
     finally:
         client.disconnect()
         for sid in list(_simulations):

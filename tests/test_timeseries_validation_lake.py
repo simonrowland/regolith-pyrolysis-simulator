@@ -93,8 +93,10 @@ def test_endpoint_rank_metric_is_not_labeled_as_kinetic_ordering() -> None:
     payload = report.as_dict()
     assert "endpoint_rank_disagreement_fraction" in payload
     assert "ordering_inversion_fraction" not in payload
+    # JANAF-4th multiphase re-ground moves the model Mg/SiO endpoint ordering;
+    # the observed KEMS rows are unchanged, and this derived residual records it.
     assert report.endpoint_rank_disagreement_fraction == pytest.approx(
-        0.058823529411764705
+        0.08823529411764706
     )
 
 

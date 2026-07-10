@@ -287,6 +287,14 @@ class EquilibriumMixin:
                 intrinsic_fO2_log = float(getattr(self.melt, 'fO2_log', -9.0))
         else:
             intrinsic_fO2_log = float(intrinsic_fO2_value)
+        try:
+            melt_dissociation_pO2_bar = 10.0 ** intrinsic_fO2_log
+        except OverflowError:
+            melt_dissociation_pO2_bar = 1e300
+        melt_dissociation_pO2_bar = min(
+            max(melt_dissociation_pO2_bar, 1e-30),
+            1e300,
+        )
         feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
             floor_bar=self._vacuum_floor_bar(),
         )
@@ -432,13 +440,17 @@ class EquilibriumMixin:
                 )
                 pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
                 if pO2_exponent:
+                    # Melt-dissolved non-FeO oxide dissociation sees the
+                    # melt's oxygen chemical potential; headspace pO2 is only
+                    # the transport/backpressure channel.
                     pO2_reference_bar = max(
                         1e-30,
                         float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
                     )
                     P_effective_Pa = _require_finite_vapor_value(
                         P_effective_Pa
-                        * (pO2_bar / pO2_reference_bar) ** pO2_exponent,
+                        * (melt_dissociation_pO2_bar / pO2_reference_bar)
+                        ** pO2_exponent,
                         species=species,
                         field="P_effective_pO2",
                     )
@@ -517,7 +529,14 @@ class EquilibriumMixin:
             K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
 
             # a_M(l) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
-            numerator = K_decomp * (a_oxide ** n_ox) / pO2_bar
+            dissociation_pO2_bar = (
+                pO2_bar if parent_oxide == 'FeO' else melt_dissociation_pO2_bar
+            )
+            # Melt-dissolved non-FeO oxide dissociation sees the melt's
+            # oxygen chemical potential; headspace pO2 remains reserved for
+            # gas transport/backpressure. FeO already carries melt redox
+            # through its Kress91 activity and is intentionally unchanged.
+            numerator = K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar
 
             if numerator <= 0:
                 continue

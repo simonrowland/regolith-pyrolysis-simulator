@@ -177,17 +177,20 @@ def test_yaml_parse_skips_malformed_entries():
 # 3. _build_mre_voltage_sequence — fallback + integration
 # ---------------------------------------------------------------------------
 
-def test_build_falls_back_to_hardcoded_ladder_when_yaml_missing():
-    """No setpoints at all → fallback ladder. Length matches the
-    historic hardcoded set plus NiO (9 entries)."""
+def test_build_falls_back_to_canonical_ladder_when_yaml_missing():
+    """No setpoints at all -> fallback ladder. Length matches the
+    historic fallback species set plus NiO (9 entries)."""
     sim = _sim()
     seq = sim._build_mre_voltage_sequence()
     voltages = [entry["voltage"] for entry in seq]
-    # Documented fallback ladder (sorted ascending in the source).
-    assert voltages == [0.39, 0.75, 0.95, 1.05, 1.45, 1.70, 1.95, 2.2, 2.5]
+    assert voltages == pytest.approx(
+        [0.39, 0.804340, 1.050000, 1.118868, 1.491058, 1.575521,
+         1.792604, 1.857324, 2.208316],
+        abs=1e-6,
+    )
     # Hold-hour pattern matches the documented fallback values.
     hold_hours = [entry["min_hold_hours"] for entry in seq]
-    assert hold_hours == [2, 3, 2, 2, 5, 3, 8, 5, 10]
+    assert hold_hours == [2, 3, 2, 2, 5, 3, 5, 8, 10]
 
 
 def test_build_falls_back_when_yaml_block_is_empty():
@@ -384,10 +387,10 @@ def test_build_with_real_setpoints_yaml_returns_published_shape():
     assert "Na2O" in species_set
     assert "K2O" in species_set
     voltages = [entry["voltage"] for entry in seq]
-    # Sorted + within the published Ellingham band.
+    # Sorted + within the graph-derived Ellingham band.
     assert voltages == sorted(voltages)
-    assert min(voltages) >= 0.39 and max(voltages) <= 3.0
-    assert seq[0]["species"] == ["NiO"]
+    assert min(voltages) >= 0.0 and max(voltages) <= 3.0
+    assert seq[0]["species"] == ["K2O"]
 
 
 def test_nio_voltage_is_grounded_and_ordered_before_feo():
@@ -397,6 +400,7 @@ def test_nio_voltage_is_grounded_and_ordered_before_feo():
     import yaml
 
     from simulator.electrolysis import DECOMP_VOLTAGES, ELECTRONS_PER_OXIDE
+    from simulator import mre_ladder
     from simulator.mre_ladder import MRE_VOLTAGE_LADDER_FALLBACK
     from simulator.state import FARADAY
 
@@ -406,15 +410,21 @@ def test_nio_voltage_is_grounded_and_ordered_before_feo():
     assert source_voltage == pytest.approx(0.39, abs=0.01)
     assert DECOMP_VOLTAGES["NiO"] == pytest.approx(source_voltage, abs=0.01)
     assert ELECTRONS_PER_OXIDE["NiO"] == 2
-    assert DECOMP_VOLTAGES["NiO"] < DECOMP_VOLTAGES["FeO"]
-    assert DECOMP_VOLTAGES["NiO"] == min(DECOMP_VOLTAGES.values())
+    nio_ref = mre_ladder.mre_decomposition_voltage_reference("NiO")
+    feo_ref = mre_ladder.mre_decomposition_voltage_reference("FeO")
+    assert nio_ref is not None
+    assert feo_ref is not None
+    assert nio_ref.authority == "ellingham_fallback"
+    assert feo_ref.authority == "ellingham_graph"
+    assert nio_ref.voltage < feo_ref.voltage
 
     repo_root = Path(__file__).resolve().parent.parent
     setpoints = yaml.safe_load((repo_root / "data" / "setpoints.yaml").read_text())
     yaml_seq = _sim(setpoints)._build_mre_voltage_sequence()
-    yaml_min = min(yaml_seq, key=lambda entry: entry["voltage"])
-    assert yaml_min["species"] == ["NiO"]
-    assert yaml_min["voltage"] == pytest.approx(0.39, abs=0.01)
+    yaml_nio = next(entry for entry in yaml_seq if entry["species"] == ["NiO"])
+    assert yaml_seq[0]["species"] == ["K2O"]
+    assert yaml_nio["voltage"] == pytest.approx(0.39, abs=0.01)
+    assert yaml_nio["voltage_authority"] == "ellingham_fallback"
 
     fallback_min = min(MRE_VOLTAGE_LADDER_FALLBACK, key=lambda entry: entry["voltage"])
     assert fallback_min["species"] == ("NiO",)

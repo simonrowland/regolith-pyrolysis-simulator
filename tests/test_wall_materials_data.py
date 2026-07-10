@@ -375,8 +375,8 @@ def test_wall_equilibrium_phase_windows_are_provenanced():
         assert isinstance(window["needs_calphad"], bool)
 
     thresholds = windows["Na2O-FeO-SiO2"]["engine_redox_thresholds"]
-    assert thresholds["Na_FeO_crossover_C"] == 1173.4
-    assert thresholds["K_FeO_crossover_C"] == 832.0
+    assert thresholds["Na_FeO_crossover_C"] == 1181.5
+    assert thresholds["K_FeO_crossover_C"] == 836.25
     assert thresholds["basis"]
 
 

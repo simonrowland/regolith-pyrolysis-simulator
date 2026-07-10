@@ -550,6 +550,9 @@ class ChemistryKernel:
         self,
         intent: ChemistryIntent,
         proposal: LedgerTransitionProposal,
+        *,
+        transition_source: str = "",
+        transition_meta: Mapping[str, Any] | None = None,
     ) -> LedgerTransition:
         """Apply ``proposal`` to the ledger -- the ONLY writable path.
 
@@ -578,6 +581,10 @@ class ChemistryKernel:
                 intents raise :class:`ProviderUnavailableError` /
                 :class:`UnauthorizedIntentError`.
             proposal: The :class:`LedgerTransitionProposal` to commit.
+            transition_source: Optional source label copied onto every
+                committed material lot.
+            transition_meta: Optional audit metadata copied onto every
+                committed material lot.
 
         Returns the applied :class:`LedgerTransition` so callers can
         record it in their trace.  Raises :class:`ProposalRejected` on
@@ -608,7 +615,10 @@ class ChemistryKernel:
             raise ProposalRejected(str(exc)) from exc
 
         transition = _proposal_to_ledger_transition(
-            proposal, self._species_formula_registry
+            proposal,
+            self._species_formula_registry,
+            lot_source=transition_source,
+            lot_meta=transition_meta,
         )
         try:
             return self._ledger.apply(transition)

@@ -118,7 +118,7 @@ def test_ellingham_authority_flag_is_consumed_by_metallothermic_diagnostic():
     extrapolations = provider._ellingham_pair_fit_extrapolations(
         "Na",
         ("TiO2",),
-        1800.0,
+        2350.0,
     )
     diagnostic = provider._ellingham_fit_diagnostic(extrapolations)
 
@@ -130,7 +130,7 @@ def test_ellingham_authority_flag_is_consumed_by_metallothermic_diagnostic():
     limited = authority["extrapolated_beyond_fit_range_K"]["Na/TiO2"][
         "limited_species"
     ]
-    assert set(limited) == {"Ti"}
+    assert set(limited) == {"Na", "Ti"}
 
 
 # ---------------------------------------------------------------------------
@@ -404,27 +404,25 @@ def test_kernel_commit_accepts_balanced_thermite_proposal(
 
 
 def test_reduction_margin_kj_per_mol_o2_uses_ellingham_difference():
-    # Margin under V1c-constants JANAF Ellingham refit:
-    # Na/FeO @ 1150 C = +9.6 kJ/mol O2 (was +33.9 under pre-V1c table).
-    # Na/Fe crossover dropped from 1331 C to 1173 C per JANAF refit;
-    # 1150 C remains barely positive but the window has narrowed.
+    # Margin under the JANAF-4th multiphase Ellingham re-ground:
+    # Na/FeO @ 1150 C = +11.1 kJ/mol O2.
     provider = BuiltinMetallothermicStepProvider()
 
     margin = provider._reduction_margin_kj_per_mol_o2("Na", "FeO", 1150.0)
 
-    assert margin == pytest.approx(9.6, abs=0.1)
+    assert margin == pytest.approx(11.1, abs=0.1)
 
 
 def test_crossover_temperature_C_reports_physical_roots_only():
-    # K/Fe crossover under V1c-constants JANAF refit dropped from 1216 C
-    # to 832 C (V1c-NEEDS-RECIPE-RETUNE finding: K shuttle no longer
+    # K/Fe crossover under the JANAF-4th multiphase re-ground is 836.25 C
+    # (V1c-NEEDS-RECIPE-RETUNE finding: K shuttle no longer
     # viable in default 1150-1600 C melt window).
     # Na/Ti has only a low-T algebraic root outside the shared JANAF segment,
     # so the diagnostic refuses to report it as an authoritative crossover.
     provider = BuiltinMetallothermicStepProvider()
 
     assert provider._crossover_temperature_C("K", "Fe") == pytest.approx(
-        832.0,
+        836.25,
         abs=0.5,
     )
     assert provider._crossover_temperature_C("Na", "Ti") is None
@@ -436,10 +434,10 @@ def test_crossover_temperature_C_has_single_runtime_helper():
     assert source.count("def _crossover_temperature_C(") == 1
     assert BuiltinMetallothermicStepProvider._crossover_temperature_C(
         "Na", "Fe"
-    ) == pytest.approx(1173.4, abs=0.5)
+    ) == pytest.approx(1181.5, abs=0.5)
     assert BuiltinMetallothermicStepProvider._crossover_temperature_C(
         "K", "Fe"
-    ) == pytest.approx(832.0, abs=0.5)
+    ) == pytest.approx(836.25, abs=0.5)
 
 
 def test_refused_result_has_policy_refusal_shape():
@@ -547,7 +545,7 @@ def test_c3_na_shuttle_flags_ellingham_pair_fit_band_extrapolation(
         "ellingham_extrapolated_beyond_fit_range_K"
     ]
     assert flagged["Na/FeO"]["temperature_K"] == pytest.approx(1073.15)
-    assert tuple(flagged["Na/FeO"]["fit_range_K"]) == (1100.0, 2200.0)
+    assert tuple(flagged["Na/FeO"]["fit_range_K"]) == (1100.0, 2600.0)
     assert result.diagnostic["ellingham_authority"]["consumer"] == (
         "builtin-metallothermic-step"
     )
@@ -669,8 +667,8 @@ def test_extraction_records_shuttle_refusal_diagnostic(
         source="refusal recording test seed",
     )
     sim.shuttle_K_inventory_kg = sim._sync_reagent_counter_from_ledger("K")
-    # Park the melt above the K/FeO crossover (post-V1c JANAF
-    # crossover is ~832 °C; this is well above so refusal is
+    # Park the melt above the K/FeO crossover (JANAF-4th multiphase
+    # crossover is ~836 °C; this is well above so refusal is
     # deterministic).
     sim.melt.temperature_C = 1275.0
     sim.melt.campaign = CampaignPhase.C3_K
@@ -702,7 +700,7 @@ def test_extraction_records_shuttle_refusal_diagnostic(
 def test_c3_na_shuttle_accepts_cr_after_nao05_activity_shift(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Cr becomes favorable once NaO0.5 activity is applied; Ti remains near-margin."""
+    """Cr becomes favorable once NaO0.5 activity is applied; Ti is refused."""
 
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -711,10 +709,9 @@ def test_c3_na_shuttle_accepts_cr_after_nao05_activity_shift(
         setpoints_data,
     )
 
-    # Pick masses so the Cr2O3 cap is reached partway and the leftover
-    # Na bleeds into the TiO2 reduction.  ~3.7 kg Na available this
-    # hour, ~1.5 kg Cr2O3 consumes ~7.4 mol Na -> ~3 kg Na -> ~0.7 kg
-    # Na for TiO2.
+    # Pick masses so Cr2O3 is reducible with leftover Na available. TiO2
+    # must still be refused by the margin gate rather than by reagent
+    # exhaustion or fit-band extrapolation.
     Cr2O3_kg = 1.5
     TiO2_kg = 20.0
     Cr2O3_mol = Cr2O3_kg / (MOLAR_MASS["Cr2O3"] / 1000.0)
@@ -750,7 +747,8 @@ def test_c3_na_shuttle_accepts_cr_after_nao05_activity_shift(
     assert result.diagnostic["target_stage"] == "cr_ti"
     assert result.diagnostic["target_priority"] == ["Cr2O3", "TiO2"]
     assert result.diagnostic["accepted_targets"] == ["Cr2O3"]
-    assert set(result.diagnostic["refused_targets"]) == {"TiO2"}
+    refused = result.diagnostic["refused_targets"]
+    assert set(refused) == {"TiO2"}
     assert result.diagnostic["Na2O_activity_gamma"] == pytest.approx(
         MELT_OXIDE_ACTIVITY_COEFFICIENTS["Na2O"].gamma
     )
@@ -758,8 +756,55 @@ def test_c3_na_shuttle_accepts_cr_after_nao05_activity_shift(
     assert result.diagnostic["Na2O_activity_shift_kJ_per_mol_O2"] < 0.0
     assert result.diagnostic["na_reduction_margin_kJ_per_mol_O2"]["Cr2O3"] > 0.0
     assert result.diagnostic["na_reduction_margin_kJ_per_mol_O2"]["TiO2"] < 0.0
+    assert refused["TiO2"]["margin_kJ_per_mol_O2"] < 0.0
     assert "Cr2O3" in proposal.debits["process.cleaned_melt"]
     assert "TiO2" not in proposal.debits["process.cleaned_melt"]
+
+
+def test_c3_na_shuttle_refuses_in_band_tio2_negative_margin(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "TiO2": 20.0 / (MOLAR_MASS["TiO2"] / 1000.0),
+            },
+            "process.metal_phase": {},
+            "process.reagent_inventory": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=view,
+            temperature_C=1300.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C3_NA,
+                "target_oxides": ["TiO2"],
+                "reagent_available_kg": 30.0,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["target_priority"] == ["TiO2"]
+    assert result.diagnostic["accepted_targets"] == []
+    refused = result.diagnostic["refused_targets"]
+    assert set(refused) == {"TiO2"}
+    assert result.diagnostic["na_reduction_margin_kJ_per_mol_O2"]["TiO2"] < 0.0
+    assert refused["TiO2"]["margin_kJ_per_mol_O2"] < 0.0
+    assert "ellingham_extrapolated_beyond_fit_range_K" not in result.diagnostic
 
 
 def _c3_na_feo_cleanup_request(sim, *, liquid_fraction, na_kg=12.0):

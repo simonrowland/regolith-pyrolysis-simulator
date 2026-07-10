@@ -1421,7 +1421,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         """Return the oxide-stability crossover temperature in Celsius.
 
         V1c JANAF refit crossovers used by the alkali-shuttle diagnostic:
-        K/Fe = 832.0 C, Na/Fe = 1173.4 C. Above a pair's crossover, the
+        K/Fe = 836.25 C, Na/Fe = 1181.5 C. Above a pair's crossover, the
         reagent oxide is less stable than the target oxide, so reduction is
         thermodynamically disfavored; current recipe gates remain handled
         outside this helper. Returns None when the algebraic root falls
@@ -1470,6 +1470,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         delta_g: dict[str, float] = {
             "Na2O": na_standard_delta_g + na_activity_shift
         }
+        activity_shifted_margin: dict[str, float] = {}
         margin: dict[str, float] = {}
         for oxide in targets:
             metal = NA_TARGET_TO_METAL[oxide]
@@ -1477,7 +1478,25 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 metal,
                 temperature_C,
             )
-            margin[oxide] = delta_g[oxide] - delta_g["Na2O"]
+            activity_shifted_margin[oxide] = delta_g[oxide] - delta_g["Na2O"]
+            margin[oxide] = activity_shifted_margin[oxide]
+
+        # Executable acceptance is keyed on the reduction margin, not on
+        # Ellingham fit authority.  A target X is reducible only when
+        # ΔG_X - ΔG_reductant is positive per mol O2; if the margin is <= 0,
+        # X's oxide is more stable and must be refused even when its fit is
+        # in-band.  TiO2 is the C3 stop case exposed by the 2026-07-09
+        # re-ground: NaO0.5 activity can make the shifted Na/Ti diagnostic
+        # near zero, but the raw Na/Ti and Cr/Ti ladder margins remain
+        # strongly negative, so C3 may accept Cr2O3 while refusing TiO2.
+        if "TiO2" in margin:
+            ti_margins = [
+                margin["TiO2"],
+                delta_g["TiO2"] - na_standard_delta_g,
+            ]
+            if "Cr2O3" in delta_g:
+                ti_margins.append(delta_g["TiO2"] - delta_g["Cr2O3"])
+            margin["TiO2"] = min(ti_margins)
 
         index = {oxide: idx for idx, oxide in enumerate(targets)}
         priority = tuple(
@@ -1501,6 +1520,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             ),
             "Na2O_activity_shift_kJ_per_mol_O2": na_activity_shift,
             "Na2O_activity_limitation": MELT_OXIDE_ACTIVITY_LIMITATION,
+            "na_activity_shifted_margin_kJ_per_mol_O2": activity_shifted_margin,
             "margin": margin,
             "ellingham_extrapolated_beyond_fit_range_K": (
                 cls._ellingham_pair_fit_extrapolations(

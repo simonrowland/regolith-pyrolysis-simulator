@@ -53,6 +53,7 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.electrolysis import (
     DECOMP_VOLTAGES,
@@ -64,6 +65,7 @@ from simulator.electrolysis import (
     MRE_NORTH_STAR_POSTURE,
     MRE_OPTIONAL_BANNER,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    MRE_RAW_MARGIN_REFUSAL,
     current_efficiency,
     min_decomposition_voltage,
 )
@@ -71,6 +73,7 @@ from simulator.fe_redox import (
     kress91_split,
     melt_mol_fractions_for_kress91,
 )
+from simulator.mre_ladder import mre_decomposition_voltage_reference
 from simulator.state import (
     FARADAY,
     GAS_CONSTANT,
@@ -78,6 +81,7 @@ from simulator.state import (
     OXIDE_TO_METAL,
     CampaignPhase,
     DecisionType,
+    MeltState,
 )
 from tests.chemistry.conftest import _build_sim
 
@@ -288,11 +292,32 @@ def test_nernst_voltage_includes_evolved_o2_activity_term():
     )
 
 
-def test_min_decomposition_voltage_is_derived_from_runtime_table():
-    assert min_decomposition_voltage() == pytest.approx(min(DECOMP_VOLTAGES.values()))
-    assert min_decomposition_voltage() == pytest.approx(
-        min(ElectrolysisModel().decomp_voltages.values())
+def test_min_decomposition_voltage_is_derived_from_runtime_graph():
+    assert min_decomposition_voltage() == pytest.approx(0.023465, abs=1e-6)
+    assert min(ElectrolysisModel().decomp_voltages.values()) == pytest.approx(0.39)
+
+
+def test_legacy_step_hour_uses_gamma_x_activity_not_wt_fraction():
+    melt = MeltState(composition_kg={"Na2O": 1.0, "FeO": 1.0})
+    account_mol = {
+        oxide: kg * 1000.0 / MOLAR_MASS[oxide]
+        for oxide, kg in melt.composition_kg.items()
+    }
+    expected_activity = melt_oxide_activity("Na2O", account_mol).activity
+
+    result = ElectrolysisModel().step_hour(
+        melt,
+        voltage_V=5.0,
+        current_A=100.0,
+        T_C=1600.0,
     )
+
+    assert result["mre_activity_model"] == "gamma_x_single_cation"
+    assert result["mre_oxide_activity_by_oxide"]["Na2O"] == pytest.approx(
+        expected_activity
+    )
+    assert result["mre_decomposition_voltage_authoritative_by_oxide"]["Na2O"] is True
+    assert result["mre_oxide_activity_by_oxide"]["Na2O"] != pytest.approx(0.5)
 
 
 # ---------------------------------------------------------------------------
@@ -744,6 +769,99 @@ def test_mre_current_partition_refuses_uncertified_multi_oxide_yield(
     assert legacy["reason_refused"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
 
 
+def test_non_authoritative_feo_fallback_cannot_erase_negative_raw_margin(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    feo_mol = 100.0 / (MOLAR_MASS["FeO"] / 1000.0)
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {"FeO": feo_mol},
+            "process.metal_phase": {},
+            "terminal.oxygen_mre_anode_stored": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    held_voltage_V = mre_decomposition_voltage_reference("FeO").voltage
+    temperature_C = 500.0 - 273.15
+    pO2_bar = 1.0e-9
+
+    result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=temperature_C,
+            pressure_bar=pO2_bar,
+            control_inputs={
+                "voltage_V": held_voltage_V,
+                "current_A": 100.0,
+                "dt_hr": 1.0,
+                "pO2_bar": pO2_bar,
+                "allowed_oxides": ["FeO"],
+            },
+        )
+    )
+    diagnostic = dict(result.diagnostic or {})
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert diagnostic["reason_refused"] == MRE_RAW_MARGIN_REFUSAL
+    assert diagnostic["mre_decomposition_voltage_authoritative_by_oxide"]["FeO"] is False
+    refusal = diagnostic["mre_raw_margin_refused_targets"]["FeO"]
+    assert refusal["fallback_margin_V"] > 0.0
+    assert refusal["raw_margin_V"] <= 0.0
+    assert refusal["raw_requirement_V"] > held_voltage_V
+    assert diagnostic["oxides_reduced_mol"] == {}
+    assert diagnostic["metals_produced_mol"] == {}
+    assert diagnostic["O2_produced_mol"] == pytest.approx(0.0)
+
+    boundary_result = BuiltinElectrolysisStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            account_view=view,
+            temperature_C=temperature_C,
+            pressure_bar=pO2_bar,
+            control_inputs={
+                "voltage_V": refusal["raw_requirement_V"],
+                "current_A": 100.0,
+                "dt_hr": 1.0,
+                "pO2_bar": pO2_bar,
+                "allowed_oxides": ["FeO"],
+            },
+        )
+    )
+    boundary_refusal = boundary_result.diagnostic[
+        "mre_raw_margin_refused_targets"
+    ]["FeO"]
+    assert boundary_result.status == "refused"
+    assert boundary_result.transition is None
+    assert boundary_refusal["raw_margin_V"] == pytest.approx(0.0, abs=1.0e-15)
+
+    sim.atom_ledger = sim._new_atom_ledger()
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"FeO": feo_mol},
+        source="negative raw MRE margin test seed",
+    )
+    sim._project_extraction_melt()
+    legacy = sim.electrolysis_model.step_hour(
+        melt_state=sim.melt,
+        voltage_V=held_voltage_V,
+        current_A=100.0,
+        T_C=temperature_C,
+        pO2_bar=pO2_bar,
+    )
+    assert legacy["reason_refused"] == MRE_RAW_MARGIN_REFUSAL
+    assert legacy["mre_raw_margin_refused_targets"]["FeO"]["raw_margin_V"] <= 0.0
+    assert legacy["oxides_reduced_mol"] == {}
+    assert legacy["metals_produced_mol"] == {}
+
+
 def test_allowed_sio2_target_still_converts_ferric_inventory_to_ferrous(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -1084,7 +1202,10 @@ def test_energy_stays_commanded_when_oxide_does_not_deplete(
         feedstocks_data,
         setpoints_data,
     )
-    voltage_V = DECOMP_VOLTAGES["FeO"] + 0.05
+    temperature_C = 1575.0
+    voltage_V = (
+        ElectrolysisModel().nernst_voltage("FeO", temperature_C, 1.0) + 0.05
+    )
     current_A = 100.0
 
     legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
@@ -1093,7 +1214,7 @@ def test_energy_stays_commanded_when_oxide_does_not_deplete(
         oxide_kg=1000.0,
         voltage_V=voltage_V,
         current_A=current_A,
-        temperature_C=1575.0,
+        temperature_C=temperature_C,
     )
     diagnostic = dict(result.diagnostic)
     commanded_energy_kWh = voltage_V * current_A / 1000.0
@@ -1117,9 +1238,11 @@ def test_depletion_hour_energy_scales_by_capped_faradaic_charge(
         setpoints_data,
     )
     oxide_kg = 1.0
-    voltage_V = DECOMP_VOLTAGES["FeO"] + 0.05
-    current_A = 1.0e6
     temperature_C = 1575.0
+    voltage_V = (
+        ElectrolysisModel().nernst_voltage("FeO", temperature_C, 1.0) + 0.05
+    )
+    current_A = 1.0e6
 
     legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
         sim=sim,
@@ -1207,9 +1330,16 @@ def test_mixed_ferric_depletion_does_not_underbill_uncapped_target_current(
     diagnostic = dict(result.diagnostic)
 
     T_K = temperature_C + 273.15
-    total_kg = fe2o3_kg + sio2_kg
-    fe2o3_activity = fe2o3_kg / total_kg
-    sio2_activity = sio2_kg / total_kg
+    melt_mol = {"Fe2O3": fe2o3_mol, "SiO2": sio2_mol}
+    fe2o3_activity = melt_oxide_activity("Fe2O3", melt_mol).activity
+    sio2_activity = melt_oxide_activity("SiO2", melt_mol).activity
+    assert diagnostic["mre_activity_model"] == "gamma_x_single_cation"
+    assert diagnostic["mre_oxide_activity_by_oxide"]["SiO2"] == pytest.approx(
+        sio2_activity
+    )
+    assert diagnostic["mre_oxide_activity_by_oxide"]["SiO2"] != pytest.approx(
+        sio2_kg / (fe2o3_kg + sio2_kg)
+    )
     e_ferric = BuiltinElectrolysisStepProvider._ferric_to_ferrous_voltage(
         T_K,
         fe2o3_activity,
@@ -1227,7 +1357,6 @@ def test_mixed_ferric_depletion_does_not_underbill_uncapped_target_current(
         pO2_bar=pressure_bar,
         gas_constant=GAS_CONSTANT,
         faraday=FARADAY,
-        decomp_voltages=DECOMP_VOLTAGES,
         electrons_per_oxide=ELECTRONS_PER_OXIDE,
         oxide_to_metal=OXIDE_TO_METAL,
     )
@@ -1281,7 +1410,7 @@ def test_provider_matches_legacy_step_hour_pure_feo(
     The provider is a refactor of where the proposal is built; the
     Nernst / Faraday / current-efficiency math is mirrored line-for-
     line from the legacy module (re-importing the same
-    ``DECOMP_VOLTAGES`` + ``ELECTRONS_PER_OXIDE`` tables), so the
+    graph-first E0 helper + ``ELECTRONS_PER_OXIDE`` table), so the
     delta should be exactly zero modulo IEEE-754 round-off.
     """
 
@@ -1302,7 +1431,10 @@ def test_provider_matches_legacy_step_hour_pure_feo(
     sim._project_extraction_melt()
     sim.melt.temperature_C = 1575.0
 
-    voltage_V = DECOMP_VOLTAGES["FeO"] + 0.05
+    voltage_V = (
+        ElectrolysisModel().nernst_voltage("FeO", sim.melt.temperature_C, 1.0)
+        + 0.05
+    )
     current_A = 100.0
 
     legacy = sim.electrolysis_model.step_hour(
@@ -1595,7 +1727,7 @@ def test_low_po2_backpressure_can_cross_c5_mre_decomposition_gate(
                 temperature_C=1575.0,
                 pressure_bar=pO2_bar,
                 control_inputs={
-                    "voltage_V": 1.35,
+                    "voltage_V": 1.40,
                     "current_A": 100.0,
                     "dt_hr": 1.0,
                     "pO2_bar": pO2_bar,
@@ -1710,7 +1842,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
         setpoints_data,
         additives_kg=additives_kg,
     )
-    _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.45)
+    _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.60)
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
@@ -1823,7 +1955,7 @@ def test_full_run_o2_yields_split_across_distinct_bins(
         setpoints_data,
         additives_kg=additives_kg,
     )
-    _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.45)
+    _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.60)
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",

@@ -1193,7 +1193,7 @@ class CampaignManager:
             return (1575.0, 5.0)
 
         elif campaign == CampaignPhase.C6:
-            # Mg/Al crossover is ~1573 C under V1c JANAF constants.
+            # Mg/Al crossover is ~1471.4 C under V1c JANAF constants.
             return (1500.0, 10.0)
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:

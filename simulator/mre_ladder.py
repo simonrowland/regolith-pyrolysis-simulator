@@ -3,10 +3,16 @@
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from typing import Any
 
-# Standard decomposition voltages at ~1873 K / ~1600 C (V).
-# Raw-thermo rungs use E = -DeltaGf(1873 K)/(nF), rounded to 0.05 V.
+from simulator.chemistry import ellingham_graph
+from simulator.chemistry.ellingham_thermo import ellingham_fit_extrapolation
+from simulator.physical_constants import FARADAY
+
+# Static decomposition voltages at ~1873 K / ~1600 C (V).
+# Retained as the non-authoritative fallback anchor for species outside the
+# Ellingham graph coverage or failed graph queries.
 DECOMP_VOLTAGES = {
     # NiO source: DeltaGf(NiO, ~1873 K) ~= -76 kJ/mol
     # [Hemingway 1990 Am. Mineral. 75:781 + Robie & Hemingway + NEA
@@ -42,15 +48,138 @@ DECOMP_VOLTAGES = {
 }
 
 CANONICAL_DECOMPOSITION_VOLTAGE_TOKEN = "canonical"
+MRE_REFERENCE_TEMPERATURE_K = 1873.15
+MRE_GRAPH_AUTHORITY = "ellingham_graph"
+MRE_GRAPH_FALLBACK_AUTHORITY = "ellingham_fallback"
+MRE_DECLARED_AUTHORITY = "operator_declared"
+
+MRE_ELLINGHAM_METAL_BY_OXIDE = {
+    "Na2O": "Na",
+    "K2O": "K",
+    "FeO": "Fe",
+    "Cr2O3": "Cr",
+    "MnO": "Mn",
+    "SiO2": "Si",
+    "TiO2": "Ti",
+    "Al2O3": "Al",
+    "MgO": "Mg",
+    "CaO": "Ca",
+}
+
+
+@dataclass(frozen=True)
+class MREDecompositionVoltageReference:
+    oxide: str
+    voltage: float
+    temperature_K: float
+    authority: str
+    authoritative: bool
+    status: str
+    ellingham_species: str | None = None
+    raw_graph_voltage_V: float | None = None
+
+
+def _coerce_temperature_K(temperature_K: float | None) -> float:
+    if temperature_K is None:
+        return MRE_REFERENCE_TEMPERATURE_K
+    try:
+        value = float(temperature_K)
+    except (TypeError, ValueError):
+        return MRE_REFERENCE_TEMPERATURE_K
+    return value if math.isfinite(value) and value > 0.0 else MRE_REFERENCE_TEMPERATURE_K
+
+
+def mre_decomposition_voltage_reference(
+    species: Any,
+    *,
+    temperature_K: float | None = None,
+) -> MREDecompositionVoltageReference | None:
+    """Return the graph-derived MRE E0(T), or flagged static fallback."""
+    if not species or isinstance(species, bool):
+        return None
+    oxide = str(species)
+    T_K = _coerce_temperature_K(temperature_K)
+    metal_species = MRE_ELLINGHAM_METAL_BY_OXIDE.get(oxide)
+    failure_status: str | None = None
+    raw_graph_voltage_V: float | None = None
+
+    if metal_species is None:
+        failure_status = "ellingham_query_failed:species_not_graph_covered"
+    else:
+        try:
+            delta_g_kj_per_mol_o2 = ellingham_graph.dissociation_delta_g(
+                metal_species,
+                T_K,
+            )
+        except Exception as exc:
+            failure_status = f"ellingham_query_failed:{type(exc).__name__}"
+        else:
+            try:
+                delta_g = float(delta_g_kj_per_mol_o2)
+            except (TypeError, ValueError):
+                delta_g = math.nan
+            voltage = -delta_g * 1000.0 / (4.0 * FARADAY)
+            if math.isfinite(voltage) and voltage > 0.0:
+                raw_graph_voltage_V = voltage
+            extrapolation = ellingham_fit_extrapolation(
+                T_K,
+                species=metal_species,
+                consumer="mre-decomposition-voltage",
+            )
+            if not math.isfinite(delta_g):
+                failure_status = "ellingham_nonfinite_refused:delta_g"
+            elif not math.isfinite(voltage):
+                failure_status = "ellingham_nonfinite_refused:voltage"
+            elif voltage <= 0.0:
+                failure_status = "ellingham_nonpositive_refused:voltage"
+            elif extrapolation is not None:
+                failure_status = "ellingham_extrapolation_refused:extrapolation_limited"
+            else:
+                return MREDecompositionVoltageReference(
+                    oxide=oxide,
+                    voltage=voltage,
+                    temperature_K=T_K,
+                    authority=MRE_GRAPH_AUTHORITY,
+                    authoritative=True,
+                    status="ok",
+                    ellingham_species=metal_species,
+                    raw_graph_voltage_V=raw_graph_voltage_V,
+                )
+
+    fallback_voltage = DECOMP_VOLTAGES.get(oxide)
+    if fallback_voltage is None:
+        return None
+    return MREDecompositionVoltageReference(
+        oxide=oxide,
+        voltage=float(fallback_voltage),
+        temperature_K=T_K,
+        authority=MRE_GRAPH_FALLBACK_AUTHORITY,
+        authoritative=False,
+        status=failure_status or "ellingham_query_failed:unknown",
+        ellingham_species=metal_species,
+        raw_graph_voltage_V=raw_graph_voltage_V,
+    )
+
+
+def _reference_metadata(
+    reference: MREDecompositionVoltageReference,
+) -> dict[str, Any]:
+    return {
+        "voltage_authority": reference.authority,
+        "voltage_authoritative": reference.authoritative,
+        "voltage_status": reference.status,
+        "voltage_temperature_K": reference.temperature_K,
+        "ellingham_species": reference.ellingham_species,
+    }
 
 # Fallback ladder used when the YAML MRE sequence is missing/unusable. Rung
-# voltages are DERIVED from the single-source electrolysis.DECOMP_VOLTAGES
-# raw-thermo reanchor (NIST-JANAF/Chase 1998, Barin, O'Neill 1988,
-# Robie-Hemingway, NEA) -- no second hard-coded copy of the voltage numbers.
+# voltages resolve through the same graph-first canonical helper as the YAML
+# "canonical" token; DECOMP_VOLTAGES remains only the flagged static fallback
+# anchor for graph-uncovered species.
 # Na2O/K2O (C3-depleted, DISABLED_PRESET_TARGETS) and Fe2O3 (ferric Fe is
 # represented by fO2-coupled speciation, not a fixed full-reduction rung) are
 # intentionally absent from the C5 fallback ladder.
-# Each tuple is (species, min_hold_hours); voltage = DECOMP_VOLTAGES[species].
+# Each tuple is (species, min_hold_hours); voltage is resolved at build time.
 _FALLBACK_LADDER_RUNGS = (
     (('NiO',), 2),
     (('FeO',), 3),
@@ -62,13 +191,33 @@ _FALLBACK_LADDER_RUNGS = (
     (('MgO',), 5),
     (('CaO',), 10),
 )
-MRE_VOLTAGE_LADDER_FALLBACK = tuple(
-    {
-        'voltage': DECOMP_VOLTAGES[species[0]],
-        'species': species,
-        'min_hold_hours': min_hold_hours,
-    }
-    for species, min_hold_hours in _FALLBACK_LADDER_RUNGS
+
+
+def _fallback_ladder(
+    *,
+    temperature_K: float | None = None,
+) -> tuple[dict[str, Any], ...]:
+    entries = []
+    for species, min_hold_hours in _FALLBACK_LADDER_RUNGS:
+        reference = mre_decomposition_voltage_reference(
+            species[0],
+            temperature_K=temperature_K,
+        )
+        if reference is None:
+            continue
+        entry = {
+            'voltage': reference.voltage,
+            'species': species,
+            'min_hold_hours': min_hold_hours,
+        }
+        entry.update(_reference_metadata(reference))
+        entries.append(entry)
+    entries.sort(key=lambda entry: entry['voltage'])
+    return tuple(entries)
+
+
+MRE_VOLTAGE_LADDER_FALLBACK = _fallback_ladder(
+    temperature_K=MRE_REFERENCE_TEMPERATURE_K,
 )
 
 MRE_DEFAULT_MIN_HOLD_HOURS = 3
@@ -83,11 +232,17 @@ DISABLED_PRESET_TARGETS = {
 }
 
 
-def canonical_mre_decomposition_voltage(species: Any) -> float | None:
+def canonical_mre_decomposition_voltage(
+    species: Any,
+    *,
+    temperature_K: float | None = None,
+) -> float | None:
     """Return the canonical MRE decomposition voltage for ``species``."""
-    if not species or isinstance(species, bool):
-        return None
-    return DECOMP_VOLTAGES.get(str(species))
+    reference = mre_decomposition_voltage_reference(
+        species,
+        temperature_K=temperature_K,
+    )
+    return None if reference is None else reference.voltage
 
 
 def coerce_mre_decomposition_voltage(value: Any) -> float | None:
@@ -122,21 +277,33 @@ def coerce_mre_decomposition_voltage(value: Any) -> float | None:
     return None
 
 
-def resolve_mre_decomposition_voltage(species: Any, value: Any) -> float | None:
+def resolve_mre_decomposition_voltage(
+    species: Any,
+    value: Any,
+    *,
+    temperature_K: float | None = None,
+) -> float | None:
     """Resolve an explicit YAML voltage or the canonical-voltage token."""
     if isinstance(value, str) and (
         value.strip().lower() == CANONICAL_DECOMPOSITION_VOLTAGE_TOKEN
     ):
-        return canonical_mre_decomposition_voltage(species)
+        return canonical_mre_decomposition_voltage(
+            species,
+            temperature_K=temperature_K,
+        )
     return coerce_mre_decomposition_voltage(value)
 
 
-def parse_mre_voltage_sequence_yaml(setpoints: dict[str, Any] | None) -> list[dict[str, Any]]:
+def parse_mre_voltage_sequence_yaml(
+    setpoints: dict[str, Any] | None,
+    *,
+    temperature_K: float | None = None,
+) -> list[dict[str, Any]]:
     """Parse ``setpoints['mre_voltage_sequence']['sequence']``.
 
     Returns the Python ladder shape used by the simulator:
     ``{voltage, species, min_hold_hours}``. ``decomposition_V: "canonical"``
-    resolves through ``DECOMP_VOLTAGES`` for that species. Malformed entries
+    resolves through the graph-first canonical helper. Malformed entries
     are skipped.
     """
     block = ((setpoints or {}).get('mre_voltage_sequence', {}) or {})
@@ -151,10 +318,18 @@ def parse_mre_voltage_sequence_yaml(setpoints: dict[str, Any] | None) -> list[di
         species = entry.get('species')
         if not species or not isinstance(species, str):
             continue
-        voltage = resolve_mre_decomposition_voltage(
-            species,
-            entry.get('decomposition_V'),
-        )
+        raw_voltage = entry.get('decomposition_V')
+        reference = None
+        if isinstance(raw_voltage, str) and (
+            raw_voltage.strip().lower() == CANONICAL_DECOMPOSITION_VOLTAGE_TOKEN
+        ):
+            reference = mre_decomposition_voltage_reference(
+                species,
+                temperature_K=temperature_K,
+            )
+            voltage = None if reference is None else reference.voltage
+        else:
+            voltage = coerce_mre_decomposition_voltage(raw_voltage)
         if voltage is None:
             continue
         raw_hold = entry.get('min_hold_hours', MRE_DEFAULT_MIN_HOLD_HOURS)
@@ -162,34 +337,52 @@ def parse_mre_voltage_sequence_yaml(setpoints: dict[str, Any] | None) -> list[di
             min_hold = max(0, int(raw_hold))
         except (TypeError, ValueError):
             min_hold = MRE_DEFAULT_MIN_HOLD_HOURS
-        parsed.append({
+        parsed_entry = {
             'voltage': float(voltage),
             'species': [str(species)],
             'min_hold_hours': min_hold,
-        })
+        }
+        if reference is not None:
+            parsed_entry.update(_reference_metadata(reference))
+        else:
+            parsed_entry.update({
+                "voltage_authority": MRE_DECLARED_AUTHORITY,
+                "voltage_authoritative": False,
+                "voltage_status": "operator_declared",
+                "voltage_temperature_K": _coerce_temperature_K(temperature_K),
+                "ellingham_species": None,
+            })
+        parsed.append(parsed_entry)
 
     parsed.sort(key=lambda e: e['voltage'])
     return parsed
 
 
-def build_mre_voltage_sequence(setpoints: dict[str, Any] | None) -> list[dict[str, Any]]:
+def build_mre_voltage_sequence(
+    setpoints: dict[str, Any] | None,
+    *,
+    temperature_K: float | None = None,
+) -> list[dict[str, Any]]:
     """Return the YAML-derived MRE ladder, or fallback if YAML is unusable."""
-    sequence = parse_mre_voltage_sequence_yaml(setpoints)
+    sequence = parse_mre_voltage_sequence_yaml(
+        setpoints,
+        temperature_K=temperature_K,
+    )
     if sequence:
         return sequence
     return [
-        {
-            'voltage': entry['voltage'],
-            'species': list(entry['species']),
-            'min_hold_hours': entry['min_hold_hours'],
-        }
-        for entry in MRE_VOLTAGE_LADDER_FALLBACK
+        dict(entry, species=list(entry['species']))
+        for entry in _fallback_ladder(temperature_K=temperature_K)
     ]
 
 
-def parse_ladder_from_setpoints(setpoints: dict[str, Any] | None) -> list[dict[str, Any]]:
+def parse_ladder_from_setpoints(
+    setpoints: dict[str, Any] | None,
+    *,
+    temperature_K: float | None = None,
+) -> list[dict[str, Any]]:
     """Canonical dispatch helper: return the usable MRE ladder for setpoints."""
-    return build_mre_voltage_sequence(setpoints)
+    return build_mre_voltage_sequence(setpoints, temperature_K=temperature_K)
 
 
 def _coerce_ladder_step(entry: dict[str, Any]) -> dict[str, Any] | None:

@@ -3,32 +3,32 @@
   "campaign": "C2A_continuous",
   "alpha_SiO": 0.0320984652281,
   "alpha_provenance": "Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803; alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited",
-  "sio_evolved_kg": 7.03525888239e-06,
+  "sio_evolved_kg": 7.03489699246e-06,
   "sio_to_silica_fume_kg": {
     "stage_1_fe_condenser_impurity": 0.0,
-    "stage_3_sio_zone_product": 9.77798754333e-07,
-    "stage_4_alkali_mg_carryover": 2.07273310171e-06,
-    "stage_5_dust_filter_carryover": 1.36727757296e-06,
-    "terminal_offgas_escape": 4.36877440631e-07
+    "stage_3_sio_zone_product": 9.77744075833e-07,
+    "stage_4_alkali_mg_carryover": 2.07263011784e-06,
+    "stage_5_dust_filter_carryover": 1.3672081193e-06,
+    "terminal_offgas_escape": 4.36855000124e-07
   },
   "wall_deposit_kg": {
     "Fe": 0.0,
     "K": 0.0,
     "Mg": 0.0,
     "Na": 0.0,
-    "Si": 1.65308943311e-08,
+    "Si": 1.65300050777e-08,
     "SiO": 0.0,
-    "SiO2": 3.53669995614e-08
+    "SiO2": 3.5365096872e-08
   },
   "fouling_rate": {
     "liner_material": "hot_wall_refractory_liner",
     "dominant_species": "SiO2",
-    "dominant_species_wall_deposit_kg": 3.53669995614e-08,
-    "wall_deposit_kg_per_campaign": 5.18978938925e-08,
+    "dominant_species_wall_deposit_kg": 3.5365096872e-08,
+    "wall_deposit_kg_per_campaign": 5.18951019497e-08,
     "wall_deposit_basis": "total_wall_load_by_species",
     "resinter_threshold_kg": null,
     "resinter_threshold_basis": "configurable_parameter_no_sourced_default",
-    "campaigns_to_resinter": "resinter_threshold_kg / 5.18978938925e-08",
+    "campaigns_to_resinter": "resinter_threshold_kg / 5.18951019497e-08",
     "fast_fouling_campaign_threshold": 10,
     "output_status": "status_bearing",
     "authoritative": false,
@@ -60,7 +60,7 @@
     "nominal_verdict": "threshold-parametric: fast-fouling if campaigns_to_resinter < 10, else slow-fouling",
     "verdict": "non-authoritative"
   },
-  "sio_yield_pct_of_feedstock": 7.03525888239e-07,
+  "sio_yield_pct_of_feedstock": 7.03489699246e-07,
   "industrial_benchmark_pct": [
     8,
     15

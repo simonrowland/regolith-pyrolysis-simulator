@@ -30,6 +30,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.chemistry.kernel import ProviderUnavailableError
+from simulator.core import PoisonedHourError
 from simulator.optimize.recipe import (
     C3_ALKALI_DOSING_K_KG_PATH,
     C3_ALKALI_DOSING_NA_KG_PATH,
@@ -45,6 +47,9 @@ from simulator.runner import (
     RunnerError,
     ZERO_INPUT_BASIS_BREACH,
     _c3_alkali_dosing_kg_by_species,
+    _degraded_path_engagement,
+    _melt_redox_gate_floor_fallback_engagement,
+    _runner_failure_result,
     _status_with_mass_balance_invariant,
     _vapor_pressure_source_report,
 )
@@ -75,12 +80,24 @@ TOP_LEVEL_KEYS = frozenset({
     "stage_purity_report",
     "vapor_pressure_source_report",
     "shuttle_refusal_history",
+    "c7_product_report",
+    "c7_refusal_diagnostic",
+    "degraded_path_engagement",
+    "melt_redox_gate_floor_fallback_engagement",
     "pO2_enforcement_by_hour",
     "per_hour_summary",
     "shadow_trace",
     "status",
     "reason",
     "error_message",
+})
+
+DEGRADED_PATH_KEYS = frozenset({
+    "condensation_antoine_extrapolation",
+    "capture_budget_regularizer",
+    "transport_d_ab_proxy",
+    "unmeasured_alpha_evaporation_fallback",
+    "pipe_m_avg_fallback",
 })
 
 # Schema-shape: keys every ``run_metadata`` block must expose.
@@ -225,6 +242,85 @@ def test_pyrolysis_run_folds_internal_analytical_alias_to_stable_stub_token(alia
     """
     run = PyrolysisRun(feedstock_id="lunar_mare_low_ti", backend_name=alias)
     assert run.backend_name == "stub"
+
+
+def test_melt_redox_gate_floor_fallback_engagement_is_explicit_and_aggregated():
+    healthy = SimpleNamespace(
+        _melt_redox_liquidus_gate_fallback_summary=lambda: {},
+    )
+    degraded = SimpleNamespace(
+        _melt_redox_liquidus_gate_fallback_summary=lambda: {
+            "engaged": True,
+            "total_count": 3,
+            "recent_hourly": [
+                {
+                    "campaign": "C0",
+                    "hour": 0,
+                    "campaign_hour": 0,
+                    "count": 2,
+                },
+                {
+                    "campaign": "C0",
+                    "hour": 1,
+                    "campaign_hour": 1,
+                    "count": 1,
+                },
+            ],
+        },
+    )
+
+    assert _melt_redox_gate_floor_fallback_engagement(healthy) == {
+        "engaged": False,
+        "total_count": 0,
+        "by_hour": [],
+    }
+    assert _melt_redox_gate_floor_fallback_engagement(degraded) == {
+        "engaged": True,
+        "total_count": 3,
+        "by_hour": [
+            {
+                "campaign": "C0",
+                "hour": 0,
+                "campaign_hour": 0,
+                "count": 2,
+            },
+            {
+                "campaign": "C0",
+                "hour": 1,
+                "campaign_hour": 1,
+                "count": 1,
+            },
+        ],
+    }
+
+
+def test_degraded_path_engagement_is_explicit_and_aggregated():
+    healthy = SimpleNamespace(_degraded_path_engagement_summary=lambda: {})
+    degraded = SimpleNamespace(
+        _degraded_path_engagement_summary=lambda: {
+            path: {
+                "total_count": index,
+                "by_hour": [{"hour": 0, "count": index}],
+            }
+            for index, path in enumerate(sorted(DEGRADED_PATH_KEYS), start=1)
+        }
+    )
+
+    healthy_summary = _degraded_path_engagement(healthy)
+    assert set(healthy_summary) == DEGRADED_PATH_KEYS
+    assert all(
+        value == {"engaged": False, "total_count": 0, "by_hour": []}
+        for value in healthy_summary.values()
+    )
+
+    degraded_summary = _degraded_path_engagement(degraded)
+    assert set(degraded_summary) == DEGRADED_PATH_KEYS
+    for index, path in enumerate(sorted(DEGRADED_PATH_KEYS), start=1):
+        assert degraded_summary[path] == {
+            "engaged": True,
+            "total_count": index,
+            "by_hour": [{"hour": 0, "count": index}],
+        }
 
 
 def test_c3_alkali_recipe_dose_routes_to_credit_line_not_additives():
@@ -436,6 +532,17 @@ def _assert_schema_shape(payload: dict) -> None:
     )
     assert payload["schema_version"] == RUNNER_SCHEMA_VERSION
 
+    degraded_paths = payload["degraded_path_engagement"]
+    assert set(degraded_paths) == DEGRADED_PATH_KEYS
+    for path, engagement in degraded_paths.items():
+        assert set(engagement) == {"engaged", "total_count", "by_hour"}, path
+        assert engagement["engaged"] is (engagement["total_count"] > 0), path
+        assert isinstance(engagement["total_count"], int), path
+        assert isinstance(engagement["by_hour"], list), path
+        assert sum(int(row["count"]) for row in engagement["by_hour"]) == (
+            engagement["total_count"]
+        ), path
+
     assert set(payload["run_metadata"]).issuperset(RUN_METADATA_KEYS), (
         f"run_metadata missing keys: "
         f"{RUN_METADATA_KEYS - set(payload['run_metadata'])}"
@@ -521,6 +628,8 @@ def _assert_schema_shape(payload: dict) -> None:
         assert isinstance(item["count"], int)
         assert isinstance(item["percentage"], (int, float))
 
+    assert isinstance(payload["c7_product_report"], dict)
+    assert isinstance(payload["c7_refusal_diagnostic"], dict)
     assert isinstance(payload["per_hour_summary"], list)
     assert isinstance(payload["pO2_enforcement_by_hour"], list)
     for row in payload["pO2_enforcement_by_hour"]:
@@ -874,6 +983,58 @@ def test_runner_schema_shape_contract():
     _assert_schema_shape(payload)
 
 
+def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):
+    monkeypatch.setenv("MPLCONFIGDIR", str(tmp_path / "mpl"))
+    run = PyrolysisRun(
+        feedstock_id="targeted_super_kreep_ore",
+        campaign="C7_CA_ALUMINOTHERMIC",
+        hours=2,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        setpoints_patch={
+            "campaigns": {
+                "C7": {
+                    "enabled": True,
+                    "al_credit_limit_kg": 20.0,
+                    "extent_fraction": 0.1,
+                    "hold_time_h": 1.0,
+                    "stir_factor": 6.0,
+                }
+            }
+        },
+        run_metadata_overrides={
+            "started_at_utc": "2026-06-28T00:00:00Z",
+            "kernel_commit_sha": "c7-schema-shape",
+        },
+    )
+
+    success = run.run()
+    failure = _runner_failure_result(
+        error=RunnerError("C7 schema failure probe"),
+        feedstock_id="targeted_super_kreep_ore",
+        campaign="C7_CA_ALUMINOTHERMIC",
+        hours=2,
+        mass_kg=1000.0,
+        additives_kg={},
+        track="pyrolysis",
+        backend_name="stub",
+        engines={},
+        metadata_overrides={
+            "started_at_utc": "2026-06-28T00:00:00Z",
+            "kernel_commit_sha": "c7-schema-shape",
+        },
+    )
+
+    assert success["status"] == "ok"
+    assert set(success) == TOP_LEVEL_KEYS
+    assert success["c7_product_report"]
+    assert success["c7_refusal_diagnostic"]
+    assert set(failure) == TOP_LEVEL_KEYS
+    assert failure["status"] == "failed"
+    assert failure["c7_product_report"] == {}
+    assert failure["c7_refusal_diagnostic"] == {}
+
+
 def test_runner_cli_entry_point_writes_output_file(tmp_path):
     """``python -m simulator.runner`` must write the JSON document.
 
@@ -979,6 +1140,25 @@ def test_status_with_mass_balance_invariant_valid_small_pct_unchanged() -> None:
     )
 
 
+def test_status_with_mass_balance_invariant_fails_earlier_numeric_breach() -> None:
+    execution = SimpleNamespace(
+        status="ok",
+        reason="",
+        error_message="",
+        snapshots=(
+            SimpleNamespace(mass_balance_error_pct=6e-12),
+            SimpleNamespace(mass_balance_error_pct=0.0),
+        ),
+        per_hour=(),
+    )
+
+    status, reason, error_message = _status_with_mass_balance_invariant(execution)
+
+    assert status == "failed"
+    assert reason == "mass_balance_closure_breach"
+    assert "6e-12%" in error_message
+
+
 def test_runner_records_operator_decision_in_shadow_trace():
     """When the simulator pauses for a decision mid-run, the runner
     auto-applies the recommendation and records an ``operator_decision``
@@ -1064,7 +1244,148 @@ def test_runner_failure_envelope_for_unknown_feedstock(tmp_path):
         f"missing={TOP_LEVEL_KEYS - set(payload)}"
     )
     assert payload["shuttle_refusal_history"] == []
+    assert payload["c7_product_report"] == {}
+    assert payload["c7_refusal_diagnostic"] == {}
+    assert set(payload["degraded_path_engagement"]) == DEGRADED_PATH_KEYS
+    assert all(
+        value == {"engaged": False, "total_count": 0, "by_hour": []}
+        for value in payload["degraded_path_engagement"].values()
+    )
+    assert payload["melt_redox_gate_floor_fallback_engagement"] == {
+        "engaged": False,
+        "total_count": 0,
+        "by_hour": [],
+    }
     assert payload["pO2_enforcement_by_hour"] == []
+    assert payload["per_hour_summary"] == []
+    assert payload["shadow_trace"] == []
+
+
+def test_runner_envelopes_poisoned_hour_error_loudly(monkeypatch):
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C5",
+        hours=1,
+        c5_enabled=True,
+        mre_target_species="CaO",
+        mre_max_voltage_V=2.5,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-15T00:00:00Z",
+            "kernel_commit_sha": "poisoned-hour-smoke",
+        },
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.melt.temperature_C = 1600.0
+    sim.melt.target_temperature_C = 1600.0
+    curve_calls = 0
+
+    def fail_to_floor_then_recover():
+        nonlocal curve_calls
+        curve_calls += 1
+        if curve_calls == 1:
+            raise ProviderUnavailableError("runner poison authority probe")
+        return {
+            "source": "test_recovered_real_curve",
+            "solidus_T_C": 1000.0,
+            "liquidus_T_C": 1700.0,
+            "path": ((1000.0, 0.0), (1700.0, 1.0)),
+        }
+
+    monkeypatch.setattr(
+        sim,
+        "_freeze_gate_curve",
+        fail_to_floor_then_recover,
+    )
+    monkeypatch.setattr(sim, "_update_temperature", lambda: None)
+    monkeypatch.setattr(sim, "_apply_oxygen_reservoir_exchange", lambda: None)
+    monkeypatch.setattr(
+        sim,
+        "_get_equilibrium",
+        lambda: (_ for _ in ()).throw(RuntimeError("post-MRE runner abort")),
+    )
+    sim._establish_melt_redox_gate_authority_for_current_hour()
+    sim._apply_fe_redox_respeciation()
+
+    original_step = sim.step
+    observed_errors = []
+
+    def record_step_error():
+        try:
+            return original_step()
+        except Exception as exc:
+            observed_errors.append(exc)
+            raise
+
+    monkeypatch.setattr(sim, "step", record_step_error)
+
+    payload = run._run_session(session)
+
+    assert len(observed_errors) == 1
+    assert type(observed_errors[0]) is RuntimeError
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "poisoned_hour"
+    assert "RuntimeError: post-MRE runner abort" in payload["error_message"]
+    assert "simulator hour 0 is poisoned" in payload["error_message"]
+    assert sim._poisoned_hour is not None
+    assert (
+        f"{sim._poisoned_hour.committed_transition_count} ledger transition(s) committed"
+        in payload["error_message"]
+    )
+    assert "fresh simulator or reload the batch" in payload["error_message"]
+    assert payload["run_metadata"]["hours_completed"] == 0
+    assert payload["per_hour_summary"] == []
+
+    with pytest.raises(PoisonedHourError) as replay_error:
+        session.advance()
+
+    assert type(replay_error.value) is PoisonedHourError
+    assert len(observed_errors) == 2
+    assert observed_errors[-1] is replay_error.value
+
+
+def test_runner_preserves_primary_failure_when_poison_enrichment_fails(
+    monkeypatch,
+):
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+    )
+    class RaisingPoisonSim:
+        @property
+        def _poisoned_hour(self):
+            raise LookupError("poison metadata unavailable")
+
+    class HostileSession:
+        simulator = RaisingPoisonSim()
+
+        def _set_result_document(self, document):
+            self.document = document
+
+    session = HostileSession()
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise RuntimeError("primary abort")
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+
+    payload = run._run_session(session)
+
+    assert set(payload) == TOP_LEVEL_KEYS
+    assert payload["schema_version"] == RUNNER_SCHEMA_VERSION
+    assert payload["status"] == "failed"
+    assert payload["reason"] == ""
+    assert payload["error_message"].splitlines() == [
+        "RuntimeError: primary abort",
+        (
+            "envelope detail unavailable: AttributeError: "
+            "'RaisingPoisonSim' object has no attribute 'record'"
+        ),
+    ]
     assert payload["per_hour_summary"] == []
     assert payload["shadow_trace"] == []
 

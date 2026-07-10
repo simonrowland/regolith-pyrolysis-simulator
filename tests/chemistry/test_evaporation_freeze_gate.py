@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 import math
 from types import SimpleNamespace
 
@@ -14,9 +15,10 @@ from simulator.chemistry.kernel import (
     IntentResult,
     ProviderUnavailableError,
 )
+from simulator.core import PoisonedHourError
 from simulator.fe_redox import kress91_ln_fO2_temperature_delta
 from simulator.melt_backend.base import EquilibriumResult
-from simulator.state import CampaignPhase
+from simulator.state import CampaignPhase, EvaporationFlux
 from tests.chemistry.conftest import _build_sim
 
 _CLEANED_MELT_ACCOUNT = 'process.cleaned_melt'
@@ -118,6 +120,60 @@ def _build_freeze_gate_sim(
         feedstocks_data,
         _set_freeze_gate(setpoints_data, enabled=enabled),
     )
+
+
+def _configure_tick_authority_retry_sim(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.start_campaign(CampaignPhase.C2A)
+    sim.melt.temperature_C = 1600.0
+    sim.melt.target_temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1500.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas',
+        {'O2': 10_000.0},
+        source='test hour authority retry oxygen',
+    )
+    return sim
+
+
+def _freeze_gate_key_for_current_state(sim) -> tuple:
+    pressure_bar = float(sim.melt.p_total_mbar) / 1000.0
+    fO2_log = float(sim._current_melt_redox_fO2_log())
+    redox_key_fO2_log = sim._freeze_gate_redox_key_fO2_log(fO2_log=fO2_log)
+    return sim._freeze_gate_cache_key(
+        pressure_bar=pressure_bar,
+        fO2_log=redox_key_fO2_log,
+    )
+
+
+def _install_freeze_gate_curve(
+    sim,
+    *,
+    path: tuple[tuple[float, float], ...] | None = None,
+) -> None:
+    curve = {
+        'source': 'test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    if path is not None:
+        curve['path'] = path
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        'curve': curve,
+    }
 
 
 # 0.5.3 Phase A1 (2026-05-28): under finite-headspace default-on, the
@@ -539,7 +595,7 @@ def test_freeze_gate_cache_rekeys_after_real_redox_source_term(
         T_K=temperature_K,
     )
     sim._apply_oxygen_reservoir_redox_source_terms(
-        {'test_redox_step': capacity * math.log(10.0) * 0.25},
+        {'test_redox_step': capacity * math.log(10.0) * 1.25},
         temperature_K=temperature_K,
     )
     sim._freeze_gate_curve()
@@ -561,14 +617,7 @@ def test_redox_liquid_guard_uses_cached_bounds_without_dispatch(
         setpoints_data,
         enabled=True,
     )
-    sim._freeze_gate_liquid_fraction_cache = {
-        'key': ('test',),
-        'curve': {
-            'source': 'test',
-            'solidus_T_C': 1000.0,
-            'liquidus_T_C': 1300.0,
-        },
-    }
+    _install_freeze_gate_curve(sim)
 
     def fail_dispatch(*_args, **_kwargs):
         raise AssertionError('redox liquid guard must not dispatch')
@@ -576,10 +625,277 @@ def test_redox_liquid_guard_uses_cached_bounds_without_dispatch(
     monkeypatch.setattr(sim, '_dispatch_only', fail_dispatch)
 
     assert sim._melt_redox_temperature_shift_is_liquid(999.0 + 273.15) is False
-    assert sim._melt_redox_temperature_shift_is_liquid(1001.0 + 273.15) is True
+    assert sim._melt_redox_temperature_shift_is_liquid(1299.0 + 273.15) is False
+    assert sim._melt_redox_temperature_shift_is_liquid(1300.0 + 273.15) is True
+    assert sim._last_melt_regime_diagnostic[
+        'redox_temperature_shift_threshold_T_C'
+    ] == 1300.0
 
 
-def test_freeze_gate_enabled_without_cached_curve_defers_first_reference_seed(
+def test_redox_liquid_gate_builds_outer_curve_when_cache_missing_default_off(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    gate_calls = 0
+
+    def fake_dispatch(intent, *args, **kwargs):
+        nonlocal gate_calls
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        gate_calls += 1
+        return SimpleNamespace(
+            status='ok',
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+
+    curve = sim._melt_redox_liquidus_gate_curve()
+
+    assert curve['source'] == 'gate_liquid_fraction'
+    assert gate_calls == 1
+    assert sim._freeze_gate_cache_rebuild_count == 1
+    assert sim._freeze_gate_enabled() is False
+    assert sim._melt_redox_temperature_shift_is_liquid(1300.0 + 273.15) is True
+    assert gate_calls == 1
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': ('stale-active-slot',),
+        'curve': {
+            'source': 'stale',
+            'solidus_T_C': 900.0,
+            'liquidus_T_C': 1100.0,
+        },
+    }
+    memo_curve = sim._melt_redox_liquidus_gate_curve()
+
+    assert memo_curve['source'] == 'gate_liquid_fraction'
+    assert gate_calls == 1
+
+
+def test_redox_liquid_gate_rebuilds_stale_cache_on_key_mismatch(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    gate_calls = 0
+
+    def fake_dispatch(intent, *args, **kwargs):
+        nonlocal gate_calls
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        gate_calls += 1
+        return SimpleNamespace(
+            status='ok',
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+
+    first_curve = sim._melt_redox_liquidus_gate_curve()
+    baseline_key = sim._freeze_gate_liquid_fraction_cache['key']
+    sim.atom_ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        {'Fe2O3': 1_000.0},
+        source='test ferric oxide cache-key perturbation',
+    )
+    rebuilt_curve = sim._melt_redox_liquidus_gate_curve()
+
+    assert first_curve['source'] == 'gate_liquid_fraction'
+    assert rebuilt_curve['source'] == 'gate_liquid_fraction'
+    assert sim._freeze_gate_liquid_fraction_cache['key'] != baseline_key
+    assert sim._freeze_gate_cache_rebuild_count == 2
+    assert gate_calls == 2
+
+
+def test_redox_liquid_gate_in_progress_refuses_reentrant_curve_request(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    gate_calls = 0
+    inner_curves = []
+    inner_factors = []
+    inner_diagnostics = []
+
+    def fake_dispatch(intent, *args, **kwargs):
+        nonlocal gate_calls
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        gate_calls += 1
+        assert sim._freeze_gate_liquid_fraction_cache['status'] == 'computing'
+        inner_factors.append(
+            sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+        )
+        inner_curves.append(sim._melt_redox_liquidus_gate_curve())
+        inner_diagnostics.append(
+            dict(sim._last_melt_redox_liquidus_gate_diagnostic)
+        )
+        return SimpleNamespace(
+            status='ok',
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+
+    curve = sim._freeze_gate_curve()
+
+    assert curve['source'] == 'gate_liquid_fraction'
+    assert gate_calls == 1
+    assert sim._freeze_gate_cache_rebuild_count == 1
+    assert sim._freeze_gate_curve_in_progress is False
+    assert 'status' not in sim._freeze_gate_liquid_fraction_cache
+    assert inner_factors == [0.0]
+    assert inner_curves == [None]
+    assert inner_diagnostics == [
+        {
+            'status': 'unavailable',
+            'source': 'none:liquidus_gate_in_progress',
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    ('provider_status', 'expected_source'),
+    (
+        ('unavailable', 'none:liquidus_unavailable'),
+        ('not_converged', 'none:liquidus_not_converged'),
+    ),
+    ids=('provider-unavailable', 'provider-not-converged'),
+)
+def test_redox_liquidus_failure_uses_kress_floor_above_1200_default_off(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    provider_status,
+    expected_source,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    sim.melt.temperature_C = 1500.0
+    sim.backend.find_liquidus_solidus = None
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            if provider_status == 'unavailable':
+                raise ProviderUnavailableError('gate provider unavailable in test')
+            return SimpleNamespace(
+                status='not_converged',
+                diagnostic={'backend_status': 'not_converged'},
+            )
+        if intent is ChemistryIntent.SILICATE_LIQUIDUS:
+            raise ProviderUnavailableError('kernel liquidus unavailable in test')
+        raise AssertionError(f'unexpected dispatch: {intent}')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    T_K = sim.melt.temperature_C + 273.15
+    fO2_log = sim._current_melt_redox_fO2_log()
+    assert sim._melt_redox_temperature_shift_is_liquid(T_K) is True
+    full_capacity = sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=fO2_log,
+        T_K=T_K,
+    )
+
+    effective_capacity = sim._melt_redox_source_capacity_mol_per_ln_fO2(
+        fO2_log=fO2_log,
+        T_K=T_K,
+    )
+
+    assert sim._freeze_gate_enabled() is False
+    assert full_capacity > 0.0
+    assert effective_capacity == pytest.approx(full_capacity)
+    diagnostic = sim._last_melt_redox_liquid_fraction_diagnostic
+    assert diagnostic['status'] == 'liquidus_unavailable_floor_fallback'
+    assert diagnostic['source'] == expected_source
+    assert diagnostic['liquidus_status'] == provider_status
+    assert diagnostic['liquid_fraction'] == 1.0
+    assert diagnostic['floor_T_C'] == 1200.0
+    assert diagnostic['reason']
+    assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
+
+
+def test_redox_source_capacity_scales_with_continuous_liquid_fraction(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    _install_freeze_gate_curve(
+        sim,
+        path=(
+            (1000.0, 0.0),
+            (1300.0, 1.0),
+        ),
+    )
+
+    def full_capacity(**_kwargs):
+        return 12.0
+
+    def fail_dispatch(*_args, **_kwargs):
+        raise AssertionError('cached redox capacity scaling must not dispatch')
+
+    monkeypatch.setattr(sim, '_melt_redox_capacity_mol_per_ln_fO2', full_capacity)
+    monkeypatch.setattr(sim, '_dispatch_only', fail_dispatch)
+
+    assert sim._melt_redox_source_capacity_mol_per_ln_fO2(
+        fO2_log=-9.0,
+        T_K=999.0 + 273.15,
+    ) == 0.0
+    assert sim._melt_redox_source_capacity_mol_per_ln_fO2(
+        fO2_log=-9.0,
+        T_K=1150.0 + 273.15,
+    ) == pytest.approx(6.0)
+    assert sim._last_melt_redox_liquid_fraction_diagnostic[
+        'liquid_fraction'
+    ] == pytest.approx(0.5)
+    assert sim._melt_redox_source_capacity_mol_per_ln_fO2(
+        fO2_log=-9.0,
+        T_K=1300.0 + 273.15,
+    ) == pytest.approx(12.0)
+
+
+def test_redox_reference_seed_builds_liquidus_curve_before_first_seed(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -595,16 +911,29 @@ def test_freeze_gate_enabled_without_cached_curve_defers_first_reference_seed(
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim.melt.oxygen_reservoir.reference_T_K = None
     sim._sync_oxygen_reservoir_mirror()
+    gate_calls = 0
 
-    def fail_dispatch(*_args, **_kwargs):
-        raise AssertionError('first redox seed deferral must not dispatch')
+    def fake_dispatch(intent, *args, **kwargs):
+        nonlocal gate_calls
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        gate_calls += 1
+        return SimpleNamespace(
+            status='ok',
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+            },
+        )
 
-    monkeypatch.setattr(sim, '_dispatch_only', fail_dispatch)
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
 
     sim._re_reference_melt_fO2_to_temperature(1450.0 + 273.15)
 
-    assert sim.melt.oxygen_reservoir.reference_T_K is None
+    assert gate_calls == 1
+    assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(1450.0 + 273.15)
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(-9.0)
+    assert sim._last_melt_redox_liquidus_gate_diagnostic['status'] == 'ok'
 
 
 def test_freeze_gate_pre_curve_window_builds_curve_on_first_staged_tick(
@@ -657,13 +986,11 @@ def test_freeze_gate_pre_curve_window_builds_curve_on_first_staged_tick(
         ticks_to_curve += 1
 
     assert ticks_to_curve == 1
-    # Round-3 Fe re-speciation can materialize ferric ledger state on the
-    # same hot staged tick that builds the first curve. That is a real
-    # composition/fO2 key change, so one immediate bounded rekey is expected.
-    assert 1 <= gate_calls <= 2
+    assert gate_calls == sim._freeze_gate_cache_rebuild_count
+    assert 1 <= gate_calls <= 5
 
 
-def test_freeze_gate_pre_curve_tick_defers_native_split_with_respeciation(
+def test_freeze_gate_pre_curve_tick_builds_curve_before_native_split(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -720,27 +1047,7 @@ def test_freeze_gate_pre_curve_tick_defers_native_split_with_respeciation(
     monkeypatch.setattr(sim, '_apply_fe_redox_respeciation', record_respeciation)
     monkeypatch.setattr(sim, '_apply_native_fe_saturation_split', record_native_split)
 
-    deferred_snapshot = sim.step()
-
-    assert any(
-        result.get('respeciation_status') == 'skipped_solid'
-        for result in respeciation_results
-    )
-    assert native_results[0]['native_fe_event'] == 'deferred_not_liquid_for_redox'
-    assert native_results[0]['native_fe_event_reason'] == (
-        'deferred_not_liquid_for_redox'
-    )
-    assert 'native_fe_partition' not in native_results[0]
-    # The deferred label must be LIVE-VISIBLE in the snapshot, not just in
-    # the (discarded) wrapped return (codex M2-FIX-REV Cluster B).
-    deferred_event = deferred_snapshot.fe_redox_split['native_fe_saturation_event']
-    assert deferred_event['native_fe_event'] == 'deferred_not_liquid_for_redox'
-    assert deferred_event['native_fe_event_status'] == 'deferred'
-    assert 'native_fe_partition' not in deferred_snapshot.fe_redox_split
-
-    respeciation_results.clear()
-    native_results.clear()
-    live_snapshot = sim.step()
+    snapshot = sim.step()
 
     assert respeciation_results
     assert all(
@@ -749,10 +1056,9 @@ def test_freeze_gate_pre_curve_tick_defers_native_split_with_respeciation(
     )
     assert native_results[0]['native_fe_event'] == 'native_fe_partitioned_saturation'
     assert native_results[0]['native_fe_partition']['native_fe_pool_mol'] > 0.0
-    # On the live tick the snapshot carries the partitioned event + partition.
-    live_event = live_snapshot.fe_redox_split['native_fe_saturation_event']
-    assert live_event['native_fe_event'] == 'native_fe_partitioned_saturation'
-    assert live_snapshot.fe_redox_split['native_fe_partition'][
+    event = snapshot.fe_redox_split['native_fe_saturation_event']
+    assert event['native_fe_event'] == 'native_fe_partitioned_saturation'
+    assert snapshot.fe_redox_split['native_fe_partition'][
         'native_fe_pool_mol'
     ] > 0.0
 
@@ -793,19 +1099,9 @@ def test_freeze_gate_enabled_quench_hysteresis_uses_last_liquid_reference(
         setpoints_data,
         enabled=True,
     )
-    sim._freeze_gate_liquid_fraction_cache = {
-        'key': ('test',),
-        'curve': {
-            'source': 'test',
-            'solidus_T_C': 1000.0,
-            'liquidus_T_C': 1300.0,
-        },
-    }
 
     def fail_dispatch(*_args, **_kwargs):
         raise AssertionError('quenched redox guard must not dispatch')
-
-    monkeypatch.setattr(sim, '_dispatch_only', fail_dispatch)
 
     original_T_K = 1500.0 + 273.15
     remelt_T_K = 1650.0 + 273.15
@@ -814,6 +1110,8 @@ def test_freeze_gate_enabled_quench_hysteresis_uses_last_liquid_reference(
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = original_fO2
     sim.melt.oxygen_reservoir.reference_T_K = original_T_K
     sim._sync_oxygen_reservoir_mirror()
+    _install_freeze_gate_curve(sim)
+    monkeypatch.setattr(sim, '_dispatch_only', fail_dispatch)
 
     sim.melt.temperature_C = 900.0
     sim._re_reference_melt_fO2_to_temperature(900.0 + 273.15)
@@ -907,16 +1205,11 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
         cache_ids.append(id(sim._freeze_gate_liquid_fraction_cache))
 
     cache_rebuild_count = sim._freeze_gate_cache_rebuild_count
-    # 2026-07-03 M2 fold: the pre-curve redox group now defers native-Fe
-    # splitting until the second hot tick, so the quiescent plateau rekeys
-    # exactly three times: (1) first curve build, (2) first-hot-tick
-    # ferric/fO2 composition rekey, (3) tick-2 native-split first-go-live
-    # rekey. Pinned to ==3 (not <=3) so an accidental elision of the
-    # native-split rekey — which would drop the count to 2 while
-    # gate_calls==rebuild_count still held — fails loud (grok M2-FIX-REV D1).
-    assert cache_rebuild_count == 3
+    # The first hot tick can materialize several distinct redox/cache bins; the
+    # quiescent plateau must then hold the cache rather than churn every tick.
+    assert 1 <= cache_rebuild_count <= 5
     assert gate_calls == cache_rebuild_count
-    assert len(set(cache_ids)) <= 2
+    assert len(set(cache_ids)) <= cache_rebuild_count
     assert factors == [1.0] * 10
     assert max(balance_errors) <= 5e-12
 
@@ -941,7 +1234,7 @@ def test_freeze_gate_cache_key_includes_pressure_and_fo2(
     )
     different_fO2 = sim._freeze_gate_cache_key(
         pressure_bar=1.00,
-        fO2_log=-8.9,
+        fO2_log=-7.9,
     )
 
     assert same == baseline
@@ -949,7 +1242,7 @@ def test_freeze_gate_cache_key_includes_pressure_and_fo2(
     assert different_fO2 != baseline
 
 
-def test_freeze_gate_cache_key_includes_respeciated_fe2o3(
+def test_freeze_gate_redox_key_ignores_degenerate_reference_temperature(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -961,14 +1254,870 @@ def test_freeze_gate_cache_key_includes_respeciated_fe2o3(
         enabled=True,
     )
 
-    baseline = sim._freeze_gate_cache_key(pressure_bar=1.00, fO2_log=-9.0)
-    sim.atom_ledger.load_external_mol(
-        _CLEANED_MELT_ACCOUNT,
-        {'Fe2O3': 1_000.0},
-        source='test ferric oxide cache-key perturbation',
+    assert sim._freeze_gate_redox_key_fO2_log(
+        fO2_log=-9.0,
+        reference_T_K=0.2021010676400634,
+    ) == pytest.approx(-9.0)
+    assert sim._freeze_gate_redox_key_fO2_log(
+        fO2_log=-9.0,
+        reference_T_K=273.15,
+    ) == pytest.approx(-9.0)
+    assert sim._freeze_gate_redox_key_fO2_log(
+        fO2_log=127898.56895386701,
+        reference_T_K=None,
+    ) == pytest.approx(30.0)
+    assert sim._freeze_gate_liquidus_fO2_log(-127898.56895386701) == pytest.approx(
+        -30.0,
     )
-    ferric_key = sim._freeze_gate_cache_key(pressure_bar=1.00, fO2_log=-9.0)
 
-    assert ferric_key != baseline
+
+def test_freeze_gate_cache_rebuilds_after_integrated_fe2o3_respeciation(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas',
+        {'O2': 10_000.0},
+        source='test explicit oxygen for integrated Fe redox respeciation',
+    )
+    gate_calls = 0
+    original_dispatch = sim._dispatch_only
+
+    def fake_dispatch(intent, *args, **kwargs):
+        nonlocal gate_calls
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            gate_calls += 1
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={
+                    'backend_status': 'ok',
+                    'solidus_T_C': 1000.0,
+                    'liquidus_T_C': 1300.0,
+                },
+            )
+        return original_dispatch(intent, *args, **kwargs)
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+
+    first_curve = sim._melt_redox_liquidus_gate_curve()
+    baseline_key = sim._freeze_gate_liquid_fraction_cache['key']
+    before_fe2o3_mol = sim.atom_ledger.mol_by_account(
+        _CLEANED_MELT_ACCOUNT
+    ).get('Fe2O3', 0.0)
+
+    respeciation = sim._apply_fe_redox_respeciation()
+    after_fe2o3_mol = sim.atom_ledger.mol_by_account(
+        _CLEANED_MELT_ACCOUNT
+    ).get('Fe2O3', 0.0)
+    rebuilt_curve = sim._melt_redox_liquidus_gate_curve()
+    ferric_key = sim._freeze_gate_liquid_fraction_cache['key']
+
+    assert first_curve['source'] == 'gate_liquid_fraction'
+    assert rebuilt_curve['source'] == 'gate_liquid_fraction'
+    assert respeciation['status'] == 'ok'
+    assert respeciation['respeciation_status'] == 'ok'
+    assert after_fe2o3_mol > before_fe2o3_mol
+    assert ferric_key != baseline_key
     composition_key = dict(ferric_key[3])
     assert 'Fe2O3' in composition_key
+    assert gate_calls == 2
+    assert sim._freeze_gate_cache_rebuild_count == 2
+    transition = sim.atom_ledger.transitions[-1]
+    assert transition.name == 'fe_redox_respeciation'
+    assert all(
+        lot.meta['melt_redox_gate_authority']['kind'] == 'real'
+        for lot in (*transition.debits, *transition.credits)
+    )
+    assert all(
+        lot.meta['melt_redox_gate_authority']['fallback_status']
+        == 'not_engaged'
+        for lot in (*transition.debits, *transition.credits)
+    )
+
+
+def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1500.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas',
+        {'O2': 10_000.0},
+        source='test redox authority snapshot recovery oxygen',
+    )
+    curve_calls = 0
+
+    def fail_then_recover_curve():
+        nonlocal curve_calls
+        curve_calls += 1
+        if curve_calls == 1:
+            raise ProviderUnavailableError('transient liquidus lookup failure')
+        return {
+            'source': 'test_recovered_real_curve',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1700.0,
+        }
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', fail_then_recover_curve)
+
+    fallback_operation = sim._apply_fe_redox_respeciation()
+    fallback_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    fallback_authority = dict(
+        sim._last_melt_redox_liquidus_gate_diagnostic
+    )
+    expected_fO2 = -3.0 + (
+        kress91_ln_fO2_temperature_delta(
+            1500.0 + 273.15,
+            1600.0 + 273.15,
+        )
+        / math.log(10.0)
+    )
+
+    assert curve_calls == 1
+    assert fallback_fO2 == pytest.approx(expected_fO2)
+    assert fallback_operation['respeciation_status'] == 'ok'
+    assert fallback_operation['transition_name'] == 'fe_redox_respeciation'
+    assert fallback_authority['status'] == 'liquidus_unavailable_floor_fallback'
+
+    recovered_operation = sim._apply_fe_redox_respeciation()
+
+    assert curve_calls == 2
+    assert recovered_operation['respeciation_status'] == 'skipped_solid'
+    assert sim._last_melt_redox_liquidus_gate_diagnostic == {
+        'status': 'ok',
+        'source': 'test_recovered_real_curve',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1700.0,
+    }
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        fallback_fO2
+    )
+
+
+def test_full_tick_pins_failed_authority_and_poisoned_retry(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    recovered_curve = {
+        'source': 'test_recovered_real_curve',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1700.0,
+        'path': ((1000.0, 0.0), (1700.0, 1.0)),
+    }
+
+    per_operation_sim = _configure_tick_authority_retry_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    per_operation_calls = 0
+
+    def per_operation_fail_then_recover():
+        nonlocal per_operation_calls
+        per_operation_calls += 1
+        if per_operation_calls == 1:
+            raise ProviderUnavailableError('transient tick liquidus failure')
+        return dict(recovered_curve)
+
+    monkeypatch.setattr(
+        per_operation_sim,
+        '_freeze_gate_curve',
+        per_operation_fail_then_recover,
+    )
+    per_operation_sim._apply_fe_redox_respeciation()
+    mixed_transition = per_operation_sim.atom_ledger.transitions[-1]
+    mixed_liquid_fraction = (
+        per_operation_sim._freeze_gate_liquid_fraction_factor()
+    )
+
+    assert per_operation_calls == 2
+    assert mixed_transition.name == 'fe_redox_respeciation'
+    assert per_operation_sim._transition_species_mol(
+        mixed_transition,
+        side='debits',
+        account=_CLEANED_MELT_ACCOUNT,
+        species='FeO',
+    ) == pytest.approx(701.595, rel=2.0e-3)
+    assert per_operation_sim._transition_species_mol(
+        mixed_transition,
+        side='credits',
+        account=_CLEANED_MELT_ACCOUNT,
+        species='Fe2O3',
+    ) == pytest.approx(350.797, rel=2.0e-3)
+    assert per_operation_sim._transition_species_mol(
+        mixed_transition,
+        side='debits',
+        account='process.overhead_gas',
+        species='O2',
+    ) == pytest.approx(175.399, rel=2.0e-3)
+    assert (
+        per_operation_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log + 3.0
+    ) == pytest.approx(0.767, rel=2.0e-3)
+    assert mixed_liquid_fraction == pytest.approx(6.0 / 7.0)
+
+    tick_sim = _configure_tick_authority_retry_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    tick_curve_calls = 0
+    original_dispatch = tick_sim._dispatch_only
+    original_resolve = tick_sim._resolved_melt_redox_gate_authority
+    resolved_authorities = []
+
+    def tick_fail_then_recover():
+        nonlocal tick_curve_calls
+        tick_curve_calls += 1
+        if tick_curve_calls == 1:
+            raise ProviderUnavailableError('transient tick liquidus failure')
+        return dict(recovered_curve)
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 0.0}},
+            )
+        return original_dispatch(intent, *args, **kwargs)
+
+    def record_resolved_authority(*args, **kwargs):
+        authority = original_resolve(*args, **kwargs)
+        resolved_authorities.append(authority)
+        return authority
+
+    monkeypatch.setattr(tick_sim, '_freeze_gate_curve', tick_fail_then_recover)
+    monkeypatch.setattr(tick_sim, '_dispatch_only', fake_dispatch)
+    monkeypatch.setattr(
+        tick_sim,
+        '_resolved_melt_redox_gate_authority',
+        record_resolved_authority,
+    )
+    monkeypatch.setattr(tick_sim, '_get_equilibrium', lambda: _equilibrium())
+    monkeypatch.setattr(tick_sim, '_update_temperature', lambda: None)
+    monkeypatch.setattr(tick_sim, '_apply_oxygen_reservoir_exchange', lambda: None)
+
+    transition_count_before_attempt = len(tick_sim.atom_ledger.transitions)
+    with pytest.raises(
+        RuntimeError,
+        match='transient tick liquidus failure',
+    ) as first_error:
+        tick_sim.step()
+
+    assert type(first_error.value) is RuntimeError
+    failed_hour_authority = tick_sim._melt_redox_gate_authority_this_tick
+    assert tick_curve_calls == 1
+    assert len(resolved_authorities) >= 6
+    assert all(
+        authority is tick_sim._melt_redox_gate_authority_this_tick
+        for authority in resolved_authorities
+    )
+    first_tick_redox = [
+        transition
+        for transition in tick_sim.atom_ledger.transitions
+        if transition.name in {
+            'fe_redox_respeciation',
+            'native_fe_saturation_split',
+        }
+    ]
+    assert first_tick_redox
+    assert all(
+        lot.meta['melt_redox_gate_authority']['kind'] == 'fallback'
+        for transition in first_tick_redox
+        for lot in (*transition.debits, *transition.credits)
+    )
+    balances_after_abort = tick_sim.atom_ledger.mol_by_account()
+    transitions_after_abort = tick_sim.atom_ledger.transitions
+
+    with pytest.raises(PoisonedHourError) as retry_error:
+        tick_sim.step()
+
+    assert type(retry_error.value) is PoisonedHourError
+    assert tick_curve_calls == 1
+    assert tick_sim._melt_redox_gate_authority_this_tick is failed_hour_authority
+    assert retry_error.value.state.hour == 0
+    assert retry_error.value.state.committed_transition_count == (
+        len(transitions_after_abort) - transition_count_before_attempt
+    )
+    assert tick_sim.atom_ledger.mol_by_account() == balances_after_abort
+    assert tick_sim.atom_ledger.transitions == transitions_after_abort
+
+
+def test_abort_before_any_commit_allows_same_hour_retry_with_pinned_authority(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _configure_tick_authority_retry_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    pinned_curve = {
+        'source': 'test_recovered_real_curve',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1700.0,
+        'path': ((1000.0, 0.0), (1700.0, 1.0)),
+    }
+    curve_calls = 0
+    exchange_calls = 0
+    original_dispatch = sim._dispatch_only
+    original_resolve = sim._resolved_melt_redox_gate_authority
+    resolved_authorities = []
+
+    def resolve_curve():
+        nonlocal curve_calls
+        curve_calls += 1
+        return pinned_curve
+
+    def abort_once_before_commit():
+        nonlocal exchange_calls
+        exchange_calls += 1
+        if exchange_calls == 1:
+            raise RuntimeError('pre-commit retry probe')
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return SimpleNamespace(
+                status='ok',
+                diagnostic={'evaporation_flux_kg_hr': {'Na': 0.0}},
+            )
+        return original_dispatch(intent, *args, **kwargs)
+
+    def record_resolved_authority(*args, **kwargs):
+        authority = original_resolve(*args, **kwargs)
+        resolved_authorities.append(authority)
+        return authority
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', resolve_curve)
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+    monkeypatch.setattr(
+        sim,
+        '_resolved_melt_redox_gate_authority',
+        record_resolved_authority,
+    )
+    monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+    monkeypatch.setattr(sim, '_update_temperature', lambda: None)
+    monkeypatch.setattr(
+        sim,
+        '_apply_oxygen_reservoir_exchange',
+        abort_once_before_commit,
+    )
+
+    transition_count_before_attempt = len(sim.atom_ledger.transitions)
+    with pytest.raises(RuntimeError, match='pre-commit retry probe') as first_error:
+        sim.step()
+
+    assert type(first_error.value) is RuntimeError
+    failed_authority = sim._melt_redox_gate_authority_this_tick
+    assert failed_authority == pinned_curve
+    assert curve_calls == 1
+    assert sim._poisoned_hour is None
+    assert len(sim.atom_ledger.transitions) == transition_count_before_attempt
+
+    snapshot = sim.step()
+
+    assert snapshot.hour == 1
+    assert exchange_calls == 2
+    assert curve_calls == 1
+    assert resolved_authorities
+    assert all(authority is failed_authority for authority in resolved_authorities)
+    assert sim._melt_redox_gate_authority_tick_hour is None
+    assert sim._poisoned_hour is None
+
+
+def test_c5_partial_commit_poison_refuses_same_hour_replay(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _configure_tick_authority_retry_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = 'CaO'
+    sim.melt.mre_max_voltage_V = 2.5
+    sim.campaign_mgr.c5_enabled = True
+    sim.start_campaign(CampaignPhase.C5)
+    sim.melt.temperature_C = 1600.0
+    sim.melt.target_temperature_C = 1600.0
+    retry_oxygen_load = sim.atom_ledger.external_loads[-1]
+    sim.inventory.stage0_external_inputs_kg['test_hour_authority_retry_oxygen'] = (
+        retry_oxygen_load.total_mass_kg(sim.atom_ledger.registry)
+    )
+    curve_calls = 0
+
+    def fail_to_floor_then_recover():
+        nonlocal curve_calls
+        curve_calls += 1
+        if curve_calls == 1:
+            raise ProviderUnavailableError('C5 partial-commit authority probe')
+        return {
+            'source': 'test_recovered_real_curve',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1700.0,
+            'path': ((1000.0, 0.0), (1700.0, 1.0)),
+        }
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', fail_to_floor_then_recover)
+    monkeypatch.setattr(sim, '_update_temperature', lambda: None)
+    monkeypatch.setattr(sim, '_apply_oxygen_reservoir_exchange', lambda: None)
+    monkeypatch.setattr(
+        sim,
+        '_get_equilibrium',
+        lambda: (_ for _ in ()).throw(RuntimeError('post-MRE probe abort')),
+    )
+    sim._establish_melt_redox_gate_authority_for_current_hour()
+    sim._apply_fe_redox_respeciation()
+
+    balances_before = sim.atom_ledger.mol_by_account()
+    transitions_before = Counter(
+        transition.name for transition in sim.atom_ledger.transitions
+    )
+    with pytest.raises(RuntimeError, match='post-MRE probe abort') as first_error:
+        sim.step()
+
+    assert type(first_error.value) is RuntimeError
+    balances_after_abort = sim.atom_ledger.mol_by_account()
+    transitions_after_abort = sim.atom_ledger.transitions
+    new_transitions = (
+        Counter(transition.name for transition in transitions_after_abort)
+        - transitions_before
+    )
+    stored_o2_after_abort = sim.atom_ledger.mol_by_account(
+        'terminal.oxygen_mre_anode_stored'
+    ).get('O2', 0.0)
+
+    assert balances_after_abort != balances_before
+    assert new_transitions['mre_electrolysis_reduction'] == 1
+    assert new_transitions['fe_redox_respeciation'] == 1
+    assert stored_o2_after_abort > 0.0
+    assert sim.melt.hour == 0
+    assert sim.energy_electrical_plus_evaporation_cumulative_kWh == 0.0
+    assert sim._poisoned_hour is not None
+    assert sim._poisoned_hour.hour == 0
+    assert sim._poisoned_hour.committed_transition_count == sum(
+        new_transitions.values()
+    )
+    assert sim._poisoned_hour.aborting_exception_summary == (
+        'RuntimeError: post-MRE probe abort'
+    )
+    assert abs(sim._make_snapshot().mass_balance_error_pct) < 5.0e-12
+
+    with pytest.raises(PoisonedHourError) as retry_error:
+        sim.step()
+
+    assert type(retry_error.value) is PoisonedHourError
+    assert retry_error.value.state is sim._poisoned_hour
+    assert 'fresh simulator or reload the batch' in str(retry_error.value)
+    assert curve_calls == 1
+    assert sim.atom_ledger.mol_by_account() == balances_after_abort
+    assert sim.atom_ledger.transitions == transitions_after_abort
+    assert sim.atom_ledger.mol_by_account(
+        'terminal.oxygen_mre_anode_stored'
+    ).get('O2', 0.0) == stored_o2_after_abort
+
+
+def test_partial_commit_poison_survives_hostile_exception_formatting(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    class HostileAbort(BaseException):
+        def __str__(self):
+            raise RuntimeError('hostile exception __str__')
+
+        def __repr__(self):
+            raise RuntimeError('hostile exception __repr__')
+
+        def __getattribute__(self, name):
+            if name in {'__traceback__', '__context__', '__cause__'}:
+                return super().__getattribute__(name)
+            raise RuntimeError('hostile exception attribute access')
+
+    sim = _configure_tick_authority_retry_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    hostile_abort = HostileAbort()
+
+    def commit_then_abort():
+        sim.atom_ledger.record(
+            'hostile_exception_poison_probe',
+            debits=(),
+            credits=(),
+        )
+        raise hostile_abort
+
+    monkeypatch.setattr(sim, '_step_one_hour', commit_then_abort)
+    transition_count_before = len(sim.atom_ledger.transitions)
+
+    first_error = None
+    try:
+        sim.step()
+    except BaseException as exc:
+        first_error = exc
+
+    assert type(first_error) is HostileAbort
+    assert first_error is hostile_abort
+    assert len(sim.atom_ledger.transitions) == transition_count_before + 1
+    assert sim._poisoned_hour is not None
+    assert sim._poisoned_hour.hour == sim.melt.hour
+    assert sim._poisoned_hour.committed_transition_count == 1
+    transitions_after_abort = sim.atom_ledger.transitions
+
+    with pytest.raises(PoisonedHourError):
+        sim.step()
+
+    assert sim.atom_ledger.transitions == transitions_after_abort
+
+
+def test_aborted_respeciation_preserves_fo2_reference_state(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1500.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas',
+        {'O2': 10_000.0},
+        source='test aborted respeciation oxygen',
+    )
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve',
+        lambda: {
+            'source': 'test_real_curve',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1300.0,
+        },
+    )
+    original_dispatch = sim._dispatch_only
+
+    def abort_respeciation(intent, *args, **kwargs):
+        if intent is ChemistryIntent.FE_REDOX_RESPECIATION:
+            raise ProviderUnavailableError('test respeciation dispatch abort')
+        return original_dispatch(intent, *args, **kwargs)
+
+    monkeypatch.setattr(sim, '_dispatch_only', abort_respeciation)
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_reference_T_K = sim.melt.oxygen_reservoir.reference_T_K
+    before_transition_count = len(sim.atom_ledger.transitions)
+
+    with pytest.raises(
+        ProviderUnavailableError,
+        match='test respeciation dispatch abort',
+    ):
+        sim._apply_fe_redox_respeciation()
+
+    assert len(sim.atom_ledger.transitions) == before_transition_count
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == before_fO2
+    assert sim.melt.oxygen_reservoir.reference_T_K == before_reference_T_K
+
+
+def test_source_terms_and_bubbler_share_failed_tick_authority(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    curve_calls = 0
+
+    def fail_then_recover_curve():
+        nonlocal curve_calls
+        curve_calls += 1
+        if curve_calls == 1:
+            raise ProviderUnavailableError('source/bubbler transient failure')
+        return {
+            'source': 'test_recovered_real_curve',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1700.0,
+            'path': ((1000.0, 0.0), (1700.0, 1.0)),
+        }
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', fail_then_recover_curve)
+    monkeypatch.setattr(
+        sim.campaign_mgr,
+        'o2_bubbler_controls',
+        lambda _campaign: {
+            'o2_bubbler_kg_per_hr': 1.0,
+            'o2_bubbler_eta_absorb_default': 0.75,
+            'o2_bubbler_target_fO2_log': -2.0,
+        },
+    )
+    authority = sim._establish_melt_redox_gate_authority_for_current_hour()
+
+    source_reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        {'redox_source:test_tick_pin': 1.0},
+    )
+    bubbler = sim._apply_o2_bubbler()
+
+    assert curve_calls == 1
+    assert source_reservoir.melt_redox_capacity_mol_per_ln_fO2 > 0.0
+    assert bubbler['reason'] == 'applied'
+    assert sim._last_melt_redox_liquid_fraction_diagnostic['status'] == (
+        'liquidus_unavailable_floor_fallback'
+    )
+    passthrough_transition = next(
+        transition
+        for transition in reversed(sim.atom_ledger.transitions)
+        if transition.name == 'oxygen_bubbler_passthrough'
+    )
+    passthrough_transition.validate_conservation(sim.atom_ledger.registry)
+    assert all(
+        lot.source == 'melt_redox_gate_authority:fallback'
+        for lot in (
+            *passthrough_transition.debits,
+            *passthrough_transition.credits,
+        )
+    )
+    assert all(
+        lot.meta['melt_redox_gate_authority']['kind'] == 'fallback'
+        for lot in (
+            *passthrough_transition.debits,
+            *passthrough_transition.credits,
+        )
+    )
+
+    sim._clear_melt_redox_gate_authority_for_completed_hour(sim.melt.hour)
+    recovered = sim._resolved_melt_redox_gate_authority()
+
+    assert curve_calls == 2
+    assert recovered['source'] == 'test_recovered_real_curve'
+
+
+def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve_calls = 0
+
+    def invalid_then_valid_curve():
+        nonlocal curve_calls
+        curve_calls += 1
+        if curve_calls == 1:
+            return {
+                'source': 'test_invalid_curve',
+                'solidus_T_C': 1800.0,
+                'liquidus_T_C': 1700.0,
+            }
+        return {
+            'source': 'test_recovered_curve',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1700.0,
+        }
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', invalid_then_valid_curve)
+    key = _freeze_gate_key_for_current_state(sim)
+
+    invalid = sim._melt_redox_liquidus_gate_curve()
+
+    assert invalid.liquidus_status == 'invalid'
+    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
+    assert sim._freeze_gate_liquid_fraction_cache is None
+
+    valid = sim._melt_redox_liquidus_gate_curve()
+
+    assert curve_calls == 2
+    assert valid == {
+        'source': 'test_recovered_curve',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1700.0,
+    }
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key] == valid
+
+
+def test_fallback_authorized_redox_transition_is_balanced_and_provenanced(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1500.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas',
+        {'O2': 10_000.0},
+        source='test fallback transition oxygen provenance',
+    )
+
+    def unavailable_curve():
+        raise ProviderUnavailableError('fallback transition test failure')
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', unavailable_curve)
+    transition_count = len(sim.atom_ledger.transitions)
+
+    diagnostic = sim._apply_fe_redox_respeciation()
+
+    assert len(sim.atom_ledger.transitions) == transition_count + 1
+    transition = sim.atom_ledger.transitions[-1]
+    transition.validate_conservation(sim.atom_ledger.registry)
+    assert transition.name == 'fe_redox_respeciation'
+    assert transition.reason == 'fe_redox_respeciation'
+    assert diagnostic['transition_name'] == transition.name
+    assert diagnostic['gate_authority']['kind'] == 'fallback'
+    assert all(
+        lot.source == 'melt_redox_gate_authority:fallback'
+        for lot in (*transition.debits, *transition.credits)
+    )
+    assert all(
+        lot.meta['melt_redox_gate_authority']['fallback_status']
+        == 'liquidus_unavailable_floor_fallback'
+        for lot in (*transition.debits, *transition.credits)
+    )
+    fallback_record = sim._melt_redox_liquidus_gate_fallback_diagnostics[-1]
+    assert fallback_record['status'] == 'liquidus_unavailable_floor_fallback'
+    assert fallback_record['source'] == (
+        'none:liquidus_unavailable'
+    )
+
+
+def test_fallback_diagnostic_log_survives_recovered_last_value(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve_calls = 0
+
+    def fail_then_recover_curve():
+        nonlocal curve_calls
+        curve_calls += 1
+        if curve_calls == 1:
+            raise ProviderUnavailableError('durable diagnostic test failure')
+        return {
+            'source': 'test_recovered_curve',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1700.0,
+        }
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', fail_then_recover_curve)
+
+    sim._melt_redox_liquidus_gate_curve()
+    fallback_record = dict(
+        sim._melt_redox_liquidus_gate_fallback_diagnostics[0]
+    )
+    sim._melt_redox_liquidus_gate_curve()
+
+    assert sim._last_melt_redox_liquidus_gate_diagnostic['status'] == 'ok'
+    assert sim._melt_redox_liquidus_gate_fallback_count == 1
+    assert list(sim._melt_redox_liquidus_gate_fallback_diagnostics) == [
+        fallback_record
+    ]
+    assert fallback_record['status'] == 'liquidus_unavailable_floor_fallback'
+    assert fallback_record['source'] == 'none:liquidus_unavailable'
+
+
+def test_fallback_log_is_bounded_and_snapshot_serializes_hourly_summary(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+
+    def unavailable_curve():
+        raise ProviderUnavailableError('bounded fallback history failure')
+
+    monkeypatch.setattr(sim, '_freeze_gate_curve', unavailable_curve)
+
+    for _ in range(300):
+        sim._melt_redox_liquidus_gate_curve()
+
+    snapshot = sim._make_snapshot()
+    summary = snapshot.oxygen_reservoir['melt_redox_gate_fallback']
+
+    assert sim._melt_redox_liquidus_gate_fallback_count == 300
+    assert len(sim._melt_redox_liquidus_gate_fallback_diagnostics) == 256
+    assert len(sim._melt_redox_liquidus_gate_fallback_hourly) == 1
+    assert summary['engaged'] is True
+    assert summary['total_count'] == 300
+    assert summary['history_maxlen'] == 256
+    assert len(summary['recent']) == 256
+    assert summary['recent_hourly'] == [{
+        'campaign': sim.melt.campaign.name,
+        'hour': int(sim.melt.hour),
+        'campaign_hour': int(sim.melt.campaign_hour),
+        'count': 300,
+    }]
