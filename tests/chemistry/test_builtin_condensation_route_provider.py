@@ -124,38 +124,44 @@ from tests.chemistry.conftest import _build_sim
 # non-standard-reaction rows to the runtime selector (shared pole/overflow
 # guard), so Na/Ca-class wall values stay at their pre-t-141 behavior
 # (Na back within an LSB of the prior pin) — t-141's wall effect is K-only.
+# 2026-07-10 BH-063: flux-balanced sqrt(Poiseuille) vapor pressure plus
+# configured throat/stage areas redistributes the Type-C wall trace between
+# the first two pipe segments. Recomputed from the executable split path.
+# 2026-07-10 BH-063 round 2: the forward capacity now shares the inverse's
+# integrated 256 law and Loop-3 again preserves over-capacity throttling.
+# Recomputed from the corrected executable split path.
 EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "FeSi": 9.637956153082013e-11,
-            "Si": 1.962793580758873e-07,
-            "SiO2": 4.199747339680675e-07,
+            "FeSi": 8.097453691256337e-11,
+            "Si": 1.6204847009305555e-07,
+            "SiO2": 3.467326416030828e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 1.9631160899910419e-07,
-            "SiO2": 4.199747339680675e-07,
+            "Si": 1.929448410822958e-07,
+            "SiO2": 4.127721163164528e-07,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "FeSi": 7.291762038063996e-11,
-            "Si": 1.5138728550193185e-07,
-            "SiO2": 3.239191133900808e-07,
+            "FeSi": 6.126249628763101e-11,
+            "Si": 1.2578875233655405e-07,
+            "SiO2": 2.6914713557270024e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 1.514116854944064e-07,
-            "SiO2": 3.239191133900808e-07,
+            "Si": 1.4977155346937335e-07,
+            "SiO2": 3.2041033459499225e-07,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "FeSi": 5.0864841492674255e-11,
-            "Si": 1.7171623495060957e-07,
-            "SiO2": 3.673935977685537e-07,
+            "FeSi": 4.273475537202133e-11,
+            "Si": 1.415021600858328e-07,
+            "SiO2": 3.02749990246222e-07,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 1.717332555519836e-07,
-            "SiO2": 3.673935977685537e-07,
+            "Si": 1.6847002817099967e-07,
+            "SiO2": 3.6041248718526517e-07,
         },
     },
 }

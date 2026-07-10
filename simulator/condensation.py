@@ -274,6 +274,12 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
 }
 
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
+STAGE_AREA_KEY_BY_STAGE_NUMBER = {
+    1: 'fe_stage1',
+    3: 'sio_stage3',
+    4: 'alkali_stage4',
+    7: 'terminal',
+}
 SUPPORTED_CARRIER_GAS_LABELS = 'N2/pN2, Ar/pAr, CO2/pCO2'
 STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
 WALL_REACTIVITY_MATRIX_PATH = (
@@ -1613,6 +1619,8 @@ class CondensationRouteResult:
         default_factory=dict)
     transport_parameter_notice: Dict[str, Any] = field(default_factory=dict)
     capture_budget_regularizer_notice: Dict[str, Any] = field(default_factory=dict)
+    stage_area_geometry_provenance_notice: Dict[str, Any] = field(
+        default_factory=dict)
 
     def condensed_for_species(self, species: str) -> float:
         return sum(
@@ -1675,6 +1683,8 @@ class CondensationModel:
         self.wall_temperature_C = float(wall_temperature_C)
         self.overhead_pressure_mbar = 0.0
         self.pipe_diameter_m = DEFAULT_PIPE_DIAMETER_M
+        self.stage_area_m2_by_stage: dict[str, float] = {}
+        self.stage_area_geometry_provenance_notice: dict[str, Any] = {}
         self.gas_temperature_C = float(wall_temperature_C)
         self.carrier_gas = DEFAULT_CARRIER_GAS
         # Induction-stirring intensity — recipe-controlled per
@@ -1765,6 +1775,8 @@ class CondensationModel:
         overhead_pressure_mbar: float | None = None,
         pipe_diameter_m: float | None = None,
         gas_temperature_C: float | None = None,
+        stage_area_m2_by_stage: Mapping[str, float] | None = None,
+        stage_area_geometry_provenance_notice: Mapping[str, Any] | None = None,
         pipe_segment_temperatures_C: Mapping[str, float] | None = None,
         stir_factor: float | None = None,
         radial_stir_factor: float | None = None,
@@ -1802,6 +1814,15 @@ class CondensationModel:
             self.gas_temperature_C = float(gas_temperature_C)
         elif wall_temperature_C is not None:
             self.gas_temperature_C = float(wall_temperature_C)
+        if stage_area_m2_by_stage is not None:
+            self.stage_area_m2_by_stage = {
+                str(stage): max(0.0, float(area_m2))
+                for stage, area_m2 in stage_area_m2_by_stage.items()
+            }
+            self._apply_stage_area_m2_to_pipe_segments()
+        if stage_area_geometry_provenance_notice is not None:
+            self.stage_area_geometry_provenance_notice = dict(
+                stage_area_geometry_provenance_notice)
         if carrier_gas is not None:
             self.carrier_gas = _canonical_carrier_gas_key(carrier_gas)
         # Track requested vs applied stir for the operating-history audit.
@@ -1918,6 +1939,8 @@ class CondensationModel:
                 wall_temperature_C,
                 pipe_diameter_m,
                 gas_temperature_C,
+                stage_area_m2_by_stage,
+                stage_area_geometry_provenance_notice,
                 pipe_segment_temperatures_C,
                 carrier_gas,
             )
@@ -1934,6 +1957,9 @@ class CondensationModel:
                     segment.name: float(segment.wall_temperature_C)
                     for segment in self.pipe_segments
                 },
+                "stage_area_m2_by_stage": dict(self.stage_area_m2_by_stage),
+                "stage_area_geometry_provenance_notice": dict(
+                    self.stage_area_geometry_provenance_notice),
                 "overhead_pressure_mbar": float(self.overhead_pressure_mbar),
                 "stir_factor": float(self.stir_factor),
                 "stir_factor_clamped": bool(_stir_factor_clamped),
@@ -2060,11 +2086,69 @@ class CondensationModel:
                 wall_temperature_C=float(wall_temperature_C),
                 length_m=length_m,
                 inner_diameter_m=diameter_m,
+                declared_area_m2=self._stage_area_m2_for_stage_number(
+                    downstream.stage_number),
                 liner_material=str(
                     downstream_material.get('liner_material') or ''
                 ),
             ))
         return segments
+
+    def _stage_area_m2_for_stage_number(self, stage_number: int) -> float | None:
+        key = STAGE_AREA_KEY_BY_STAGE_NUMBER.get(int(stage_number))
+        raw = None if key is None else self.stage_area_m2_by_stage.get(key)
+        if raw is None:
+            raw = self.stage_area_m2_by_stage.get(f'stage_{stage_number}')
+        if raw is None:
+            raw = self.stage_area_m2_by_stage.get(str(stage_number))
+        if raw is None:
+            return None
+        try:
+            area_m2 = float(raw)
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(area_m2) or area_m2 <= 0.0:
+            return None
+        return area_m2
+
+    def _apply_stage_area_m2_to_pipe_segments(self) -> None:
+        if not self.pipe_segments:
+            return
+        updated: list[PipeSegment] = []
+        for segment in self.pipe_segments:
+            downstream_stage = str(segment.downstream_stage or '')
+            stage_number = None
+            if downstream_stage.startswith('stage_'):
+                try:
+                    stage_number = int(downstream_stage.removeprefix('stage_'))
+                except ValueError:
+                    stage_number = None
+            declared_area_m2 = (
+                self._stage_area_m2_for_stage_number(stage_number)
+                if stage_number is not None
+                else None
+            )
+            updated.append(PipeSegment(
+                name=segment.name,
+                upstream_stage=segment.upstream_stage,
+                downstream_stage=segment.downstream_stage,
+                wall_temperature_C=segment.wall_temperature_C,
+                length_m=segment.length_m,
+                inner_diameter_m=segment.inner_diameter_m,
+                role=segment.role,
+                declared_area_m2=(
+                    declared_area_m2
+                    if declared_area_m2 is not None
+                    else segment.declared_area_m2
+                ),
+                view_factor_from_melt=segment.view_factor_from_melt,
+                line_of_sight_to_melt=segment.line_of_sight_to_melt,
+                source_class=segment.source_class,
+                sensitivity_marker=segment.sensitivity_marker,
+                extraction_note=segment.extraction_note,
+                liner_material=segment.liner_material,
+            ))
+        self.pipe_segments = updated
 
     def _apply_pipe_segment_temperatures(
         self,
@@ -2378,6 +2462,12 @@ class CondensationModel:
             wall_sticking_alpha_by_species,
             wall_sticking_alpha_provenance_by_species,
         )
+        geometry_notice = dict(self.stage_area_geometry_provenance_notice)
+        if geometry_notice:
+            sticking_notice = dict(sticking_notice)
+            sticking_notice['surface_geometry_provenance'] = geometry_notice
+            sticking_notice['stage_area_geometry_provenance_notice'] = (
+                geometry_notice)
         alpha_extrapolation_warnings = (
             _alpha_s_extrapolation_warnings_from_provenance(
                 wall_sticking_alpha_provenance_by_species,
@@ -2443,6 +2533,7 @@ class CondensationModel:
             sticking_alpha_provenance_notice=sticking_notice,
             transport_parameter_notice=transport_notice,
             capture_budget_regularizer_notice=capture_notice,
+            stage_area_geometry_provenance_notice=geometry_notice,
         )
 
     def _current_knudsen_diagnostic(self) -> dict[str, Any]:
@@ -2454,6 +2545,9 @@ class CondensationModel:
             regime_factor=self.regime_factor,
             carrier_gas=self.carrier_gas,
         )
+        diagnostic['stage_area_m2_by_stage'] = dict(self.stage_area_m2_by_stage)
+        diagnostic['stage_area_geometry_provenance_notice'] = dict(
+            self.stage_area_geometry_provenance_notice)
         if self._knudsen_policy_configured:
             if not self._viscous_flow_required:
                 relaxed = dict(diagnostic)

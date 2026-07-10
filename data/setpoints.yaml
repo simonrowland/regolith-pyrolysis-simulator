@@ -1046,6 +1046,34 @@ condensation_train:
 
 
 # ============================================================================
+# 2A. CONDENSER GEOMETRY
+# ============================================================================
+condenser_geometry:
+
+  # BH-063 user-exposed knob candidate. Default is pi * (0.06 m)^2,
+  # which reproduces the historical 12 cm hot-wall throat diameter:
+  # sqrt(4 * initial_throat_area_m2 / pi) = 0.12 m.
+  initial_throat_area_m2: 0.011309733552923255
+  initial_throat_area_source: "BH-063 owner-approved back-compat anchor; 12 cm pipe throat, 2026-07-08"
+  initial_throat_area_knob_candidate: true
+
+  # Physical stage area = initial_throat_area_m2 * ratio. The throat is
+  # the constriction; downstream condenser and terminal capture areas stay
+  # at or above throat area and expose conservative baffle/cyclone surface
+  # multipliers for later per-stage Kn/coating work.
+  stage_area_ratios:
+    fe_stage1: 4.0
+    sio_stage3: 6.0
+    alkali_stage4: 5.0
+    terminal: 2.0
+  stage_area_ratio_sources:
+    fe_stage1: "engineering-default: baffled Fe condenser presents multiple throat areas downstream of the constriction"
+    sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
+    alkali_stage4: "engineering-default: cyclone separator effective wall area exceeds throat but stays below SiO baffle cartridge"
+    terminal: "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics"
+
+
+# ============================================================================
 # 3. DECISION TREE
 # ============================================================================
 decision_tree:
@@ -1757,7 +1785,7 @@ overhead_headspace:
 
   # Phase 1 uses the existing Poiseuille pipe conductance model.
   bleed_model: "poiseuille"
-  conductance_kg_s_per_bar: null
+  conductance_kg_s: null
 
   # null derives from the campaign atmosphere/setpoint.
   downstream_pressure_bar: null

@@ -261,6 +261,7 @@ class CampaignManager:
         source_paths = (
             Path(__file__).resolve(),
             Path(__file__).with_name('lab_schedule.py').resolve(),
+            root / 'simulator' / 'core.py',
             root / 'simulator' / 'runner.py',
             root / 'web' / 'routes.py',
         )

@@ -179,6 +179,70 @@
         }
       ],
       "warnings": [],
+      "stage_area_m2_by_stage": {
+        "fe_stage1": 0.04523893421169302,
+        "sio_stage3": 0.06785840131753954,
+        "alkali_stage4": 0.05654866776461627,
+        "terminal": 0.02261946710584651
+      },
+      "stage_area_geometry_provenance_notice": {
+        "severity": "warning",
+        "code": "wall_deposit_surface_geometry_provenance",
+        "source_class": "engineering-default",
+        "status": "provisional",
+        "output_status": "status_bearing",
+        "provisional": true,
+        "usage": [
+          "stage_area_m2_by_stage",
+          "PipeSegment.declared_area_m2",
+          "PipeSegment.surface_area_m2",
+          "wall_deposit_candidate_for_surface",
+          "coating_lifespan"
+        ],
+        "stage_area_ratio_provenance_by_stage": {
+          "fe_stage1": {
+            "source": "engineering-default: baffled Fe condenser presents multiple throat areas downstream of the constriction",
+            "source_class": "engineering-default",
+            "status": "provisional",
+            "output_status": "status_bearing",
+            "stage": "fe_stage1",
+            "ratio": 4.0,
+            "usage": "condensation_surface_area",
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
+          },
+          "sio_stage3": {
+            "source": "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages",
+            "source_class": "engineering-default",
+            "status": "provisional",
+            "output_status": "status_bearing",
+            "stage": "sio_stage3",
+            "ratio": 6.0,
+            "usage": "condensation_surface_area",
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
+          },
+          "alkali_stage4": {
+            "source": "engineering-default: cyclone separator effective wall area exceeds throat but stays below SiO baffle cartridge",
+            "source_class": "engineering-default",
+            "status": "provisional",
+            "output_status": "status_bearing",
+            "stage": "alkali_stage4",
+            "ratio": 5.0,
+            "usage": "condensation_surface_area",
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
+          },
+          "terminal": {
+            "source": "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics",
+            "source_class": "engineering-default",
+            "status": "provisional",
+            "output_status": "status_bearing",
+            "stage": "terminal",
+            "ratio": 2.0,
+            "usage": "condensation_surface_area",
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
+          }
+        },
+        "message": "Condenser stage-area ratios include provisional/default geometry; wall-deposit and coating readouts are status-bearing until stage surface areas are certified."
+      },
       "viscous_flow_required": true
     },
     "pressure_coating_pareto_diagnostic": {
@@ -800,7 +864,7 @@
     },
     "pipe_m_avg_fallback": {
       "engaged": true,
-      "total_count": 35,
+      "total_count": 34,
       "by_hour": [
         {
           "campaign": "C2A",
@@ -842,7 +906,7 @@
           "campaign": "C2A",
           "hour": 6,
           "campaign_hour": 6,
-          "count": 2
+          "count": 1
         },
         {
           "campaign": "C2A",

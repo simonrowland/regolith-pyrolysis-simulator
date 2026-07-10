@@ -24,6 +24,9 @@ WALL_STICKING_ALPHA_UNCERTIFIED_CODE = (
 WALL_STICKING_ALPHA_MISSING_CODE = (
     "wall_deposit_sticking_alpha_provenance_missing"
 )
+WALL_SURFACE_GEOMETRY_PROVENANCE_CODE = (
+    "wall_deposit_surface_geometry_provenance"
+)
 _WALL_DEPOSIT_AUTHORITY_PAYLOAD_KEYS = frozenset({
     "authoritative",
     "authoritative_for_deposit_mass",
@@ -67,6 +70,40 @@ def wall_deposit_sticking_authority_matches_deposits(
     deposited_species = {str(species) for species in deposited_raw}
     expected_species = set(_positive_wall_deposit_species(wall_deposit_kg))
     return deposited_species == expected_species
+
+
+def _surface_geometry_provenance_notice(
+    alpha_notice: Mapping[str, Any],
+) -> dict[str, Any]:
+    for key in (
+        "surface_geometry_provenance",
+        "stage_area_geometry_provenance_notice",
+    ):
+        raw = alpha_notice.get(key)
+        if isinstance(raw, Mapping):
+            return _plain_mapping(raw)
+    return {}
+
+
+def _surface_geometry_status_bearing(notice: Mapping[str, Any]) -> bool:
+    if not notice:
+        return False
+    if bool(notice.get("provisional", False)):
+        return True
+    if str(notice.get("output_status", "")).lower() == "status_bearing":
+        return True
+    if str(notice.get("status", "")).lower() in {"provisional", "proxy"}:
+        return True
+    if str(notice.get("source_class", "")).lower() == "engineering-default":
+        return True
+    records = notice.get("stage_area_ratio_provenance_by_stage")
+    if isinstance(records, Mapping):
+        for record in records.values():
+            if isinstance(record, Mapping) and _surface_geometry_status_bearing(
+                record
+            ):
+                return True
+    return False
 
 
 def wall_sticking_alpha_provenance_notice(
@@ -178,6 +215,8 @@ def wall_deposit_sticking_authority_status(
         payload_species = _payload_deposited_species(notice)
         if payload_species == deposited_species:
             notice = _plain_mapping(notice)
+    geometry_notice = _surface_geometry_provenance_notice(notice)
+    geometry_status_bearing = _surface_geometry_status_bearing(geometry_notice)
     if not deposited_species:
         return _wall_deposit_authority_payload(
             authoritative=True,
@@ -185,6 +224,8 @@ def wall_deposit_sticking_authority_status(
             deposited_species=(),
             uncertified_species=(),
             provenance={},
+            surface_geometry_provenance=geometry_notice,
+            geometry_status_bearing=False,
         )
 
     provenance = _alpha_provenance_by_species(notice)
@@ -203,6 +244,8 @@ def wall_deposit_sticking_authority_status(
             deposited_species=deposited_species,
             uncertified_species=missing_species,
             provenance=_provenance_subset(provenance, deposited_species),
+            surface_geometry_provenance=geometry_notice,
+            geometry_status_bearing=geometry_status_bearing,
             message=(
                 "Wall-deposit sticking alpha authority missing; provenance is "
                 "missing, so coating and fouling readouts are non-authoritative "
@@ -220,6 +263,24 @@ def wall_deposit_sticking_authority_status(
             deposited_species=deposited_species,
             uncertified_species=uncertified_species,
             provenance=_provenance_subset(provenance, deposited_species),
+            surface_geometry_provenance=geometry_notice,
+            geometry_status_bearing=geometry_status_bearing,
+        )
+
+    if geometry_status_bearing:
+        return _wall_deposit_authority_payload(
+            authoritative=False,
+            code=WALL_SURFACE_GEOMETRY_PROVENANCE_CODE,
+            deposited_species=deposited_species,
+            uncertified_species=(),
+            provenance=_provenance_subset(provenance, deposited_species),
+            surface_geometry_provenance=geometry_notice,
+            geometry_status_bearing=True,
+            message=(
+                "Wall-deposit surface geometry uses provisional or "
+                "engineering-default stage areas; coating and fouling readouts "
+                "are status-bearing until condenser surface areas are certified."
+            ),
         )
 
     return _wall_deposit_authority_payload(
@@ -228,6 +289,8 @@ def wall_deposit_sticking_authority_status(
         deposited_species=deposited_species,
         uncertified_species=(),
         provenance=_provenance_subset(provenance, deposited_species),
+        surface_geometry_provenance=geometry_notice,
+        geometry_status_bearing=False,
     )
 
 
@@ -316,6 +379,8 @@ def _wall_deposit_authority_payload(
     deposited_species: Sequence[str],
     uncertified_species: Sequence[str],
     provenance: Mapping[str, Any],
+    surface_geometry_provenance: Mapping[str, Any] | None = None,
+    geometry_status_bearing: bool = False,
     message: str | None = None,
 ) -> dict[str, Any]:
     if message is None:
@@ -330,7 +395,7 @@ def _wall_deposit_authority_payload(
                 "sticking alpha_s; coating and fouling readouts are "
                 "non-authoritative."
             )
-    return {
+    payload = {
         "authoritative": authoritative,
         "authoritative_for_deposit_mass": authoritative,
         "authoritative_for_coating": authoritative,
@@ -347,6 +412,13 @@ def _wall_deposit_authority_payload(
         "grounding_target": WALL_STICKING_ALPHA_GROUNDING_TARGET,
         "message": message,
     }
+    if surface_geometry_provenance:
+        payload["surface_geometry_provenance"] = _plain_mapping(
+            surface_geometry_provenance)
+        payload["surface_geometry_status_bearing"] = bool(
+            geometry_status_bearing)
+        payload["surface_geometry_code"] = WALL_SURFACE_GEOMETRY_PROVENANCE_CODE
+    return payload
 
 
 def _payload_deposited_species(payload: Mapping[str, Any]) -> tuple[str, ...]:

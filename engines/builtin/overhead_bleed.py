@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 from engines.builtin._common import (
     build_atom_balance_proof,
     diagnostic_control_audit,
@@ -30,6 +32,35 @@ OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT = (
     "terminal.oxygen_bubbler_external_vented_to_vacuum"
 )
 OXYGEN_SPECIES = "O2"
+
+
+def compressible_pressure_capacity_fraction(
+    p_upstream_bar: float,
+    p_downstream_bar: float,
+) -> float:
+    """Fraction of upstream-to-vacuum capacity available at finite P2."""
+
+    try:
+        p_upstream_bar = float(p_upstream_bar)
+        p_downstream_bar = float(p_downstream_bar)
+    except (TypeError, ValueError):
+        return 0.0
+    if (
+        not math.isfinite(p_upstream_bar)
+        or not math.isfinite(p_downstream_bar)
+        or p_upstream_bar <= 0.0
+        or p_downstream_bar >= p_upstream_bar
+    ):
+        return 0.0
+    p_downstream_bar = max(0.0, p_downstream_bar)
+    # DERIVATION: premise — a supplied conductance is the kg/s capacity at
+    # upstream pressure P1 against vacuum. Compressible Poiseuille flow at
+    # fixed geometry is proportional to P1^2-P2^2, so finite downstream
+    # pressure multiplies capacity by (P1^2-P2^2)/P1^2. The factored form
+    # below avoids cancellation as P2 approaches P1. Sanity: P2=0.5*P1
+    # returns 0.75; P2 approaching P1 tends continuously to zero.
+    pressure_ratio = p_downstream_bar / p_upstream_bar
+    return (1.0 - pressure_ratio) * (1.0 + pressure_ratio)
 
 
 class BuiltinOverheadBleedProvider(ChemistryProvider):
@@ -229,15 +260,18 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         if bool(controls.get("force_drain_all", False)):
             return dict(holdup_mol)
 
-        conductance = max(
-            0.0, float(controls.get("bleed_conductance_kg_s_per_bar") or 0.0)
-        )
-        p_total = max(0.0, float(controls.get("p_total_bar") or 0.0))
-        p_downstream = max(
-            0.0, float(controls.get("p_downstream_bar") or 0.0)
-        )
+        conductance_raw = controls.get("bleed_conductance_kg_s")
+        if conductance_raw is None:
+            conductance_raw = controls.get("bleed_conductance_kg_s_per_bar")
+        conductance = max(0.0, float(conductance_raw or 0.0))
         dt_hr = max(0.0, float(controls.get("dt_hr") or 1.0))
-        bleed_kg = conductance * max(0.0, p_total - p_downstream) * dt_hr * 3600.0
+        pressure_square_fraction = compressible_pressure_capacity_fraction(
+            controls.get("p_total_bar") or 0.0,
+            controls.get("p_downstream_bar") or 0.0,
+        )
+        bleed_kg = (
+            conductance * pressure_square_fraction * dt_hr * 3600.0
+        )
         if bleed_kg <= 0.0:
             return {}
         bleed_kg = min(total_kg, bleed_kg)

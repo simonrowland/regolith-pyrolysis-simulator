@@ -2240,6 +2240,9 @@ def _apply_sio_wall_sweep_controls(
             wall_temperature_C=float(liner_temperature_c),
             pipe_diameter_m=sim.overhead_model.pipe_diameter_m,
             gas_temperature_C=float(liner_temperature_c),
+            stage_area_m2_by_stage=sim.overhead_model.stage_area_m2_by_stage(),
+            stage_area_geometry_provenance_notice=(
+                sim.overhead_model.stage_area_geometry_provenance_notice()),
             pipe_segment_temperatures_C={
                 segment.name: float(liner_temperature_c)
                 for segment in sim.condensation_model.pipe_segments
@@ -2485,6 +2488,17 @@ def build_sio_yield_report(
         if sticking_notice:
             diagnostics["wall_sticking_alpha_provenance_notice"] = (
                 sticking_notice
+            )
+        geometry_notice = dict(
+            getattr(
+                condensation_model,
+                "stage_area_geometry_provenance_notice",
+                {},
+            ) or {}
+        )
+        if geometry_notice:
+            diagnostics["stage_area_geometry_provenance_notice"] = (
+                geometry_notice
             )
         transport_notice = dict(
             getattr(

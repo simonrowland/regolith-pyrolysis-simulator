@@ -27,7 +27,7 @@ Reference scale:
 Key equations:
     Crucible volume:   V = m / ρ_melt, h = 1.5d, +20% freeboard    [EQ-1]
     Concentrator:      P = m×c_p×dT/dt + σ×ε×A×T⁴                   [EQ-2]
-    Pipe conductance:  C = π×d⁴×p̄/(128×η×L)  [Poiseuille]          [EQ-3]
+    Pipe capacity:     ṁ = π×d⁴×M×(P₁²-P₂²)/(256×η×L×R×T)       [EQ-3]
     Condenser sizing:  A = Q/(U×ΔT_lm)                              [EQ-4]
     Turbine power:     W = (γ/(γ-1))×nRT×[(p₂/p₁)^((γ-1)/γ) - 1]  [EQ-5]
 """
@@ -47,6 +47,7 @@ from simulator.lab_geometry import (
 )
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.state import GAS_CONSTANT
 
 
 @dataclass
@@ -74,6 +75,8 @@ class PipeSpec:
     diameter_m: float = 0.12
     length_m: float = 1.0
     surface_area_m2: float = math.pi * 0.12 * 1.0
+    initial_throat_area_m2: float = math.pi * 0.06**2
+    stage_area_ratios: Dict[str, float] = field(default_factory=dict)
     conductance_kg_s: float = 0.0
     max_transport_g_s: float = 0.0
 
@@ -160,6 +163,9 @@ class EquipmentDesigner:
     MELT_CP_J_KG_K = 1200.0          # Heat capacity of silicate melt
     # provenance: melt emissivity — REF-047 coefficient_note; engineering default for hot silicates.
     MELT_EMISSIVITY = 0.85            # Radiative emissivity
+
+    def __init__(self, setpoints: Optional[Mapping[str, Any]] = None) -> None:
+        self.setpoints = dict(setpoints or {})
 
     def design_for_batch(self, mass_kg: float,
                           feedstock: dict,
@@ -259,6 +265,8 @@ class EquipmentDesigner:
             diameter_m=diameter_m,
             length_m=length_m,
             surface_area_m2=total_area_m2,
+            initial_throat_area_m2=math.pi * (diameter_m / 2.0) ** 2,
+            stage_area_ratios=self._condenser_stage_area_ratios(),
             conductance_kg_s=0.0,
             max_transport_g_s=0.0,
         )
@@ -340,8 +348,8 @@ class EquipmentDesigner:
         """
         Size the collection pipe.
 
-        Poiseuille conductance:                                 [EQ-3]
-            C = π × d⁴ × p̄ / (128 × η × L)
+        Compressible Poiseuille mass-flow capacity:             [EQ-3]
+            ṁ = π × d⁴ × M × (P₁²-P₂²) / (256 × η × L × R × T)
 
         At millibar pressures: viscous flow (Kn << 0.01).
         Require C ≥ peak_evap_rate / acceptable_pressure_drop.
@@ -350,7 +358,14 @@ class EquipmentDesigner:
         # Scale pipe diameter with batch size
         # Reference: 12 cm for 1 tonne
         scale = (peak_evap_rate_kg_s / 0.010) ** 0.25
-        d = 0.12 * max(scale, 1.0)
+        throat_area_m2 = self._configured_initial_throat_area_m2()
+        if throat_area_m2 is not None:
+            anchor_d = math.sqrt(4.0 * throat_area_m2 / math.pi)
+            d = anchor_d * max(scale, 1.0)
+            throat_area_m2 = math.pi * (d / 2.0) ** 2
+        else:
+            d = 0.12 * max(scale, 1.0)
+            throat_area_m2 = math.pi * (d / 2.0) ** 2
         L = 1.0  # m (crucible to first condenser)
 
         # Calculate actual conductance
@@ -358,18 +373,59 @@ class EquipmentDesigner:
         T_K = 1773.15  # 1500°C pipe temperature
         eta = 1.8e-5 * (T_K / 300.0) ** 0.7
 
-        C_vol = math.pi * d**4 * p_Pa / (128.0 * eta * L)
         M_avg = 0.040  # kg/mol
-        rho = p_Pa * M_avg / (8.314 * T_K)
-        C_mass = C_vol * rho
+        # Apply the shared integrated compressible law derived at
+        # simulator.overhead.PIPE-1; equipment capacity is P1 against vacuum.
+        C_mass = (
+            math.pi * d**4 * M_avg * p_Pa**2
+            / (256.0 * eta * L * GAS_CONSTANT * T_K)
+        )
 
         return PipeSpec(
             diameter_m=d,
             length_m=L,
             surface_area_m2=math.pi * d * L,
+            initial_throat_area_m2=throat_area_m2,
+            stage_area_ratios=self._condenser_stage_area_ratios(),
             conductance_kg_s=C_mass,
             max_transport_g_s=C_mass * 1000.0,
         )
+
+    def _condenser_geometry_config(self) -> Mapping[str, Any]:
+        config = self.setpoints.get("condenser_geometry", {})
+        return config if isinstance(config, Mapping) else {}
+
+    @staticmethod
+    def _config_value(value: Any) -> Any:
+        if isinstance(value, Mapping) and "value" in value:
+            return value.get("value")
+        return value
+
+    @classmethod
+    def _positive_float_or_none(cls, value: Any) -> float | None:
+        try:
+            result = float(cls._config_value(value))
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(result) or result <= 0.0:
+            return None
+        return result
+
+    def _configured_initial_throat_area_m2(self) -> float | None:
+        return self._positive_float_or_none(
+            self._condenser_geometry_config().get("initial_throat_area_m2")
+        )
+
+    def _condenser_stage_area_ratios(self) -> Dict[str, float]:
+        raw = self._condenser_geometry_config().get("stage_area_ratios", {})
+        if not isinstance(raw, Mapping):
+            return {}
+        ratios: Dict[str, float] = {}
+        for stage, value in raw.items():
+            ratio = self._positive_float_or_none(value)
+            if ratio is not None:
+                ratios[str(stage)] = ratio
+        return ratios
 
     def size_turbine(self, mass_kg: float) -> TurbineSpec:
         """

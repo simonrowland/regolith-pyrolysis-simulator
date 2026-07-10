@@ -117,66 +117,130 @@
       "status": "ok",
       "reason": "",
       "regime": "viscous",
-      "knudsen_number": 0.0012252406934889837,
-      "mean_free_path_m": 0.00014702888321867805,
-      "overhead_pressure_mbar": 2.5980727585651713,
+      "knudsen_number": 0.003183264468439228,
+      "mean_free_path_m": 0.0003819917362127073,
+      "overhead_pressure_mbar": 1.0,
       "gas_temperature_C": 1500.0,
       "carrier_gas": "N2",
       "carrier_collision_diameter_m": 3.798e-10,
       "pipe_diameter_m": 0.12,
-      "regime_factor": 0.10915050527154081,
+      "regime_factor": 0.24146253578239074,
       "segments": [
         {
           "name": "stage_0_to_stage_1",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.003183264468439228,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.24146253578239074
         },
         {
           "name": "stage_1_to_stage_2",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.003183264468439228,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.24146253578239074
         },
         {
           "name": "stage_2_to_stage_3",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.003183264468439228,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.24146253578239074
         },
         {
           "name": "stage_3_to_stage_4",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.003183264468439228,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.24146253578239074
         },
         {
           "name": "stage_4_to_stage_5",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.003183264468439228,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.24146253578239074
         },
         {
           "name": "stage_5_to_stage_6",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.003183264468439228,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.24146253578239074
         },
         {
           "name": "stage_6_to_stage_7",
-          "knudsen_number": 0.0012252406934889837,
+          "knudsen_number": 0.003183264468439228,
           "regime": "viscous",
           "characteristic_length_m": 0.12,
-          "regime_factor": 0.10915050527154081
+          "regime_factor": 0.24146253578239074
         }
       ],
       "warnings": [],
+      "stage_area_m2_by_stage": {
+        "fe_stage1": 0.04523893421169302,
+        "sio_stage3": 0.06785840131753954,
+        "alkali_stage4": 0.05654866776461627,
+        "terminal": 0.02261946710584651
+      },
+      "stage_area_geometry_provenance_notice": {
+        "severity": "warning",
+        "code": "wall_deposit_surface_geometry_provenance",
+        "source_class": "engineering-default",
+        "status": "provisional",
+        "output_status": "status_bearing",
+        "provisional": true,
+        "usage": [
+          "stage_area_m2_by_stage",
+          "PipeSegment.declared_area_m2",
+          "PipeSegment.surface_area_m2",
+          "wall_deposit_candidate_for_surface",
+          "coating_lifespan"
+        ],
+        "stage_area_ratio_provenance_by_stage": {
+          "fe_stage1": {
+            "source": "engineering-default: baffled Fe condenser presents multiple throat areas downstream of the constriction",
+            "source_class": "engineering-default",
+            "status": "provisional",
+            "output_status": "status_bearing",
+            "stage": "fe_stage1",
+            "ratio": 4.0,
+            "usage": "condensation_surface_area",
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
+          },
+          "sio_stage3": {
+            "source": "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages",
+            "source_class": "engineering-default",
+            "status": "provisional",
+            "output_status": "status_bearing",
+            "stage": "sio_stage3",
+            "ratio": 6.0,
+            "usage": "condensation_surface_area",
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
+          },
+          "alkali_stage4": {
+            "source": "engineering-default: cyclone separator effective wall area exceeds throat but stays below SiO baffle cartridge",
+            "source_class": "engineering-default",
+            "status": "provisional",
+            "output_status": "status_bearing",
+            "stage": "alkali_stage4",
+            "ratio": 5.0,
+            "usage": "condensation_surface_area",
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
+          },
+          "terminal": {
+            "source": "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics",
+            "source_class": "engineering-default",
+            "status": "provisional",
+            "output_status": "status_bearing",
+            "stage": "terminal",
+            "ratio": 2.0,
+            "usage": "condensation_surface_area",
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
+          }
+        },
+        "message": "Condenser stage-area ratios include provisional/default geometry; wall-deposit and coating readouts are status-bearing until stage surface areas are certified."
+      },
       "viscous_flow_required": false
     },
     "pressure_coating_pareto_diagnostic": {
@@ -199,13 +263,13 @@
         "characteristic_length_source": "knudsen_regime_diagnostic.segments[*].characteristic_length_m"
       },
       "current": {
-        "overhead_pressure_pa": 259.80727585651715,
-        "overhead_pressure_mbar": 2.5980727585651717,
+        "overhead_pressure_pa": 100.0,
+        "overhead_pressure_mbar": 1.0,
         "gas_temperature_K": 1773.15,
         "carrier_gas": "N2",
-        "knudsen_number": 0.0012252406934889837,
+        "knudsen_number": 0.003183264468439228,
         "regime": "viscous",
-        "distance_from_no_warning_gate_pressure_factor": 8.161661666267461,
+        "distance_from_no_warning_gate_pressure_factor": 3.1414292149288667,
         "setpoint_band_distance_from_gate_pressure_factor": {
           "at_5mbar": 15.707146074644335,
           "at_15mbar": 47.121438223933005
@@ -552,11 +616,11 @@
       "designated_species_kg": {},
       "coproduct_species_kg": {},
       "impurity_species_kg": {
-        "Ca": 11.871374535262065
+        "Ca": 11.942274068724926
       },
       "designated_kg": 0,
-      "impurity_kg": 11.871374535262065,
-      "total_kg": 11.871374535262065,
+      "impurity_kg": 11.942274068724926,
+      "total_kg": 11.942274068724926,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -568,11 +632,11 @@
       "designated_species_kg": {},
       "coproduct_species_kg": {},
       "impurity_species_kg": {
-        "Ca": 2.119590456209374
+        "Ca": 2.0486909227465135
       },
       "designated_kg": 0,
-      "impurity_kg": 2.119590456209374,
-      "total_kg": 2.119590456209374,
+      "impurity_kg": 2.0486909227465135,
+      "total_kg": 2.0486909227465135,
       "purity_fraction": 0.0,
       "verdict": "CONTAMINATED",
       "warning": "non-designated condensate present"
@@ -658,7 +722,7 @@
     },
     "pipe_m_avg_fallback": {
       "engaged": true,
-      "total_count": 35,
+      "total_count": 34,
       "by_hour": [
         {
           "campaign": "C2B",
@@ -730,7 +794,7 @@
           "campaign": "C3_K",
           "hour": 11,
           "campaign_hour": 2,
-          "count": 2
+          "count": 1
         }
       ]
     }
@@ -2848,7 +2912,7 @@
       },
       "wall_deposit_delta_kg": {},
       "wall_deposit_cumulative_kg": {},
-      "Kn": 0.0012252406934889837,
+      "Kn": 0.003183264468439228,
       "regime": "viscous",
       "transport_formula_id": "not_applicable_until_p0",
       "redox_source_breakdown": {

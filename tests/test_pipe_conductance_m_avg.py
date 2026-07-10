@@ -17,17 +17,27 @@ These tests pin:
 from __future__ import annotations
 
 import math
+from types import SimpleNamespace
 
 import pytest
 
+from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.condensation import CondensationModel
+from simulator.core import PyrolysisSimulator
+from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.equipment import EquipmentDesigner
 from simulator.overhead import (
+    DEFAULT_INITIAL_THROAT_AREA_M2,
     DEFAULT_PIPE_M_AVG_KG_MOL,
     OverheadGasModel,
     _mean_molar_mass_kg_mol,
 )
 from simulator.state import (
     Atmosphere,
+    CampaignPhase,
+    CondensationTrain,
     EvaporationFlux,
+    GAS_CONSTANT,
     MOLAR_MASS,
     MeltState,
 )
@@ -39,9 +49,8 @@ from simulator.state import (
 
 def test_pure_na_returns_na_molar_mass():
     """A pure-Na vapor mixture returns ``M_Na / 1000`` kg/mol exactly.
-    Alkali sweep mid-recipe approaches this — ~23 g/mol; conductance
-    is correspondingly ~40/23 ≈ 1.7× higher than the legacy
-    placeholder."""
+    Alkali sweep mid-recipe approaches this — ~23 g/mol; legacy
+    over-predicted Na mass conductance by ~1.74x."""
     M_avg = _mean_molar_mass_kg_mol({"Na": 1.0})
     assert M_avg == pytest.approx(MOLAR_MASS["Na"] / 1000.0)
     # Numerically: ~0.023 kg/mol.
@@ -149,25 +158,23 @@ def _make_model() -> OverheadGasModel:
     return model
 
 
-def test_pipe_conductance_no_kwarg_matches_legacy_fallback():
-    """Backward-compat invariant: callers that don't pass
-    ``species_kg_for_M_avg`` get the documented fallback density,
-    which is the pre-W7 hardcoded 0.040 kg/mol value. Any legacy
-    test / probe that called ``_pipe_conductance(p, T)`` directly
-    must keep working."""
+def test_pipe_conductance_no_kwarg_uses_fallback_with_256_law():
+    """Callers without a species mix retain the documented 0.040 kg/mol
+    fallback while using the corrected compressible Poiseuille law."""
     model = _make_model()
     p_Pa = 1000.0
     T_C = 1500.0
-    C_legacy = model._pipe_conductance(p_Pa, T_C)
-    # Manually compute the expected legacy conductance.
+    actual = model._pipe_conductance(p_Pa, T_C)
     T_K = T_C + 273.15
     eta = 1.8e-5 * (T_K / 300.0) ** 0.7
-    C_vol = math.pi * model.pipe_diameter_m ** 4 * p_Pa / (
-        128.0 * eta * model.pipe_length_m
+    expected = (
+        math.pi
+        * model.pipe_diameter_m**4
+        * DEFAULT_PIPE_M_AVG_KG_MOL
+        * p_Pa**2
+        / (256.0 * eta * model.pipe_length_m * GAS_CONSTANT * T_K)
     )
-    rho = p_Pa * DEFAULT_PIPE_M_AVG_KG_MOL / (8.314 * T_K)
-    expected = C_vol * rho
-    assert C_legacy == pytest.approx(expected, rel=1e-12)
+    assert actual == pytest.approx(expected, rel=1e-12)
 
 
 def test_pipe_conductance_records_m_avg_fallback_engagement():
@@ -279,22 +286,20 @@ def test_pipe_conductance_negative_pressure_clamps_to_zero():
     assert result == 0.0
 
 
-def test_pipe_conductance_legal_inputs_still_work_after_guards():
-    """Backward-compat: a legitimate call (positive T, positive
-    geometry, positive p) returns the same conductance as before
-    the A2 guards. Regression check that the guards didn't change
-    the canonical path."""
+def test_pipe_conductance_legal_inputs_match_compressible_closed_form():
     model = _make_model()
     # Reference value computed manually:
     p_Pa = 1000.0
     T_C = 1500.0
     T_K = T_C + 273.15
     eta = 1.8e-5 * (T_K / 300.0) ** 0.7
-    C_vol = math.pi * model.pipe_diameter_m ** 4 * p_Pa / (
-        128.0 * eta * model.pipe_length_m
+    expected = (
+        math.pi
+        * model.pipe_diameter_m**4
+        * DEFAULT_PIPE_M_AVG_KG_MOL
+        * p_Pa**2
+        / (256.0 * eta * model.pipe_length_m * GAS_CONSTANT * T_K)
     )
-    rho = p_Pa * DEFAULT_PIPE_M_AVG_KG_MOL / (8.314 * T_K)
-    expected = C_vol * rho
     actual = model._pipe_conductance(p_Pa, T_C)
     assert actual == pytest.approx(expected, rel=1e-12)
 
@@ -321,3 +326,293 @@ def test_estimate_transport_state_threads_evap_flux_species_through():
     ratio = state_fe["pipe_conductance_kg_hr"] / state_na["pipe_conductance_kg_hr"]
     expected = MOLAR_MASS["Fe"] / MOLAR_MASS["Na"]
     assert ratio == pytest.approx(expected, rel=1e-6)
+
+
+def test_default_throat_area_reproduces_12_cm_diameter():
+    model = _make_model()
+
+    assert model.initial_throat_area_m2 == pytest.approx(
+        DEFAULT_INITIAL_THROAT_AREA_M2,
+        rel=1e-15,
+    )
+    assert math.sqrt(4.0 * model.initial_throat_area_m2 / math.pi) == (
+        pytest.approx(0.12, rel=1e-15)
+    )
+    assert model.pipe_diameter_m == pytest.approx(0.12, rel=1e-15)
+
+
+def test_stage_area_m2_uses_throat_area_ratios():
+    model = OverheadGasModel(
+        {},
+        condenser_geometry_config={
+            "initial_throat_area_m2": 0.02,
+            "stage_area_ratios": {
+                "fe_stage1": 1.5,
+                "sio_stage3": 2.0,
+                "alkali_stage4": 2.5,
+                "terminal": 3.0,
+            },
+        },
+    )
+
+    assert model.pipe_diameter_m == pytest.approx(
+        math.sqrt(4.0 * 0.02 / math.pi)
+    )
+    for stage, ratio in model.stage_area_ratios.items():
+        assert model.stage_area_m2(stage) == pytest.approx(0.02 * ratio)
+
+
+def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
+    setpoints = load_config_bundle(DEFAULT_DATA_DIR).setpoints
+    geometry = setpoints["condenser_geometry"]
+    throat_area_m2 = float(geometry["initial_throat_area_m2"])
+    ratios = geometry["stage_area_ratios"]
+    model = OverheadGasModel({}, condenser_geometry_config=geometry)
+
+    assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(0.12)
+    assert model.pipe_diameter_m == pytest.approx(0.12)
+    for stage, ratio in ratios.items():
+        assert float(ratio) >= 1.0
+        assert model.stage_area_m2(stage) == pytest.approx(
+            throat_area_m2 * float(ratio)
+        )
+
+
+def test_default_condenser_throat_anchor_still_allows_batch_pipe_scaling():
+    config = load_config_bundle(DEFAULT_DATA_DIR)
+    design = EquipmentDesigner(config.setpoints).design_for_batch(
+        16000.0,
+        config.feedstocks["lunar_mare_low_ti"],
+    )
+
+    assert design.pipe.diameter_m == pytest.approx(0.24)
+    assert design.pipe.initial_throat_area_m2 == pytest.approx(
+        math.pi * 0.12**2
+    )
+
+
+def test_stage_area_alias_override_reaches_canonical_stage_area():
+    model = OverheadGasModel(
+        {},
+        condenser_geometry_config={
+            "initial_throat_area_m2": 0.02,
+            "stage_area_ratios": {"stage_1": 9.0},
+        },
+    )
+
+    assert model.stage_area_ratios["fe_stage1"] == pytest.approx(9.0)
+    assert "stage_1" not in model.stage_area_ratios
+    assert model.stage_area_m2(1) == pytest.approx(0.18)
+    assert model.stage_area_m2("stage_1") == pytest.approx(0.18)
+
+
+def test_stage_seven_area_alias_override_reaches_terminal_stage_area():
+    model = OverheadGasModel(
+        {},
+        condenser_geometry_config={
+            "initial_throat_area_m2": 0.02,
+            "stage_area_ratios": {"stage_7": 4.0},
+        },
+    )
+
+    assert model.stage_area_ratios["terminal"] == pytest.approx(4.0)
+    assert "stage_7" not in model.stage_area_ratios
+    assert model.stage_area_m2("stage_7") == pytest.approx(0.08)
+    assert model.stage_area_m2("stage7") == pytest.approx(0.08)
+
+
+def test_stage_area_map_propagates_to_kn_and_coating_segments():
+    train = CondensationTrain.create_default()
+    condensation = CondensationModel(train)
+    stage_areas = {
+        "fe_stage1": 0.04,
+        "sio_stage3": 0.06,
+        "alkali_stage4": 0.05,
+        "terminal": 0.02,
+    }
+
+    condensation.configure_operating_conditions(
+        wall_temperature_C=1500.0,
+        overhead_pressure_mbar=10.0,
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1500.0,
+        stage_area_m2_by_stage=stage_areas,
+    )
+
+    by_name = {segment.name: segment for segment in condensation.pipe_segments}
+    assert by_name["stage_0_to_stage_1"].declared_area_m2 == pytest.approx(0.04)
+    assert by_name["stage_2_to_stage_3"].declared_area_m2 == pytest.approx(0.06)
+    assert by_name["stage_3_to_stage_4"].declared_area_m2 == pytest.approx(0.05)
+    assert by_name["stage_6_to_stage_7"].declared_area_m2 == pytest.approx(0.02)
+    assert by_name["stage_2_to_stage_3"].surface_area_m2 == pytest.approx(0.06)
+    assert (
+        condensation.last_knudsen_regime_diagnostic["stage_area_m2_by_stage"]
+        == stage_areas
+    )
+
+
+def test_default_stage_geometry_provenance_reaches_coating_authority():
+    geometry = load_config_bundle(DEFAULT_DATA_DIR).setpoints["condenser_geometry"]
+    overhead = OverheadGasModel({}, condenser_geometry_config=geometry)
+    condensation = CondensationModel(
+        CondensationTrain.create_default(),
+        wall_temperature_C=900.0,
+    )
+    geometry_notice = overhead.stage_area_geometry_provenance_notice()
+
+    condensation.configure_operating_conditions(
+        wall_temperature_C=900.0,
+        overhead_pressure_mbar=10.0,
+        pipe_diameter_m=overhead.pipe_diameter_m,
+        gas_temperature_C=1500.0,
+        stage_area_m2_by_stage=overhead.stage_area_m2_by_stage(),
+        stage_area_geometry_provenance_notice=geometry_notice,
+    )
+    melt = MeltState()
+    melt.temperature_C = 1700.0
+    route = condensation.route(
+        EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0),
+        melt,
+    )
+
+    assert route.wall_deposit_by_segment_species
+    authority = wall_deposit_sticking_authority_status(
+        route.wall_deposit_by_segment_species,
+        route.sticking_alpha_provenance_notice,
+    )
+    assert authority["authoritative_for_coating"] is False
+    assert authority["code"] == "wall_deposit_surface_geometry_provenance"
+    assert authority["surface_geometry_status_bearing"] is True
+    surface_geometry = authority["surface_geometry_provenance"]
+    assert surface_geometry["provisional"] is True
+    assert surface_geometry["source_class"] == "engineering-default"
+    assert "engineering-default" in (
+        surface_geometry["stage_area_ratio_provenance_by_stage"]
+        ["fe_stage1"]["source"]
+    )
+
+
+def test_legacy_headspace_conductance_alias_survives_new_none_key():
+    model = OverheadGasModel({
+        "conductance_kg_s": None,
+        "conductance_kg_s_per_bar": 0.25,
+    })
+
+    assert model._resolve_bleed_conductance(1.0, None) == pytest.approx(0.25)
+
+
+def test_vapor_pressure_matches_closed_form_known_case():
+    throat_area_m2 = math.pi * 0.04**2
+    model = OverheadGasModel(
+        {},
+        condenser_geometry_config={"initial_throat_area_m2": throat_area_m2},
+    )
+    model.pipe_length_m = 2.0
+    F_kg_s = 0.003
+    T_C = 1200.0
+    T_K = T_C + 273.15
+    species = {"SiO": 1.0}
+    M_avg = MOLAR_MASS["SiO"] / 1000.0
+    eta = model._gas_dynamic_viscosity_Pa_s(T_K)
+
+    expected_mbar = (
+        math.sqrt(
+            256.0
+            * eta
+            * model.pipe_length_m
+            * GAS_CONSTANT
+            * T_K
+            * F_kg_s
+            / (math.pi * M_avg * model.pipe_diameter_m**4)
+        )
+        / 100.0
+    )
+
+    actual_mbar = model._vapor_pressure_mbar_from_flux(
+        F_kg_s,
+        T_C,
+        species_kg_for_M_avg=species,
+    )
+    assert actual_mbar == pytest.approx(expected_mbar, rel=1e-12)
+    assert math.isfinite(actual_mbar)
+    assert actual_mbar > 0.0
+
+
+def test_vapor_pressure_inverse_matches_forward_capacity_at_operating_point():
+    throat_area_m2 = math.pi * 0.04**2
+    model = OverheadGasModel(
+        {},
+        condenser_geometry_config={"initial_throat_area_m2": throat_area_m2},
+    )
+    model.pipe_length_m = 2.0
+    target_kg_s = 0.003
+    species = {"SiO": 1.0}
+
+    required_mbar = model._vapor_pressure_mbar_from_flux(
+        target_kg_s,
+        1200.0,
+        species_kg_for_M_avg=species,
+    )
+    recovered_kg_s = model._pipe_conductance(
+        required_mbar * 100.0,
+        1200.0,
+        species_kg_for_M_avg=species,
+    )
+
+    assert required_mbar == pytest.approx(4.2645, rel=1.0e-5)
+    assert recovered_kg_s == pytest.approx(target_kg_s, rel=1.0e-12)
+
+
+def test_vapor_pressure_scales_with_square_root_of_flux():
+    model = _make_model()
+    melt = MeltState()
+    melt.atmosphere = Atmosphere.PN2_SWEEP
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = 10.0
+
+    base = model.estimate_transport_state(
+        EvaporationFlux(species_kg_hr={"SiO": 3.6}, total_kg_hr=3.6),
+        melt,
+    )
+    doubled = model.estimate_transport_state(
+        EvaporationFlux(species_kg_hr={"SiO": 7.2}, total_kg_hr=7.2),
+        melt,
+    )
+
+    assert base["vapor_pressure_mbar"] > 0.0
+    assert doubled["vapor_pressure_mbar"] / base["vapor_pressure_mbar"] == (
+        pytest.approx(math.sqrt(2.0), rel=1e-12)
+    )
+
+
+def test_loop3_vacuum_overcapacity_exceeds_100_and_throttles_ramp():
+    model = _make_model()
+    melt = MeltState()
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = 0.0
+
+    flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
+    transport = model.estimate_transport_state(flux, melt)
+    gas = model.update(
+        flux,
+        melt,
+        CondensationTrain.create_default(),
+    )
+
+    assert transport["vapor_pressure_mbar"] > 0.0
+    assert gas.transport_saturation_pct > 100.0
+    assert gas.evap_exceeds_transport is True
+
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = melt
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.campaign_hour = 0.0
+    sim.overhead = gas
+    sim.campaign_mgr = SimpleNamespace(
+        get_temp_target=lambda *_args: (1600.0, 100.0)
+    )
+    sim._update_temperature()
+
+    assert sim._last_nominal_ramp == pytest.approx(100.0)
+    assert sim._last_actual_ramp < sim._last_nominal_ramp
+    assert "pipe saturated" in sim._last_throttle_reason

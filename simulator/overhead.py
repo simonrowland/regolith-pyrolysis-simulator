@@ -16,8 +16,8 @@ suppression — the √pO₂ dependence in the equilibrium:
 gives strong suppression of SiO vapor pressure when
 pO₂ is raised from the body/environment vacuum floor to ~1 mbar.
 
-Pipe conductance (Poiseuille viscous flow at mbar pressures):
-    C = π × d⁴ × p̄ / (128 × η × L)                       [PIPE-1]
+Pipe transport (isothermal compressible Poiseuille flow at mbar pressures):
+    ṁ = π × d⁴ × M × (P₁² - P₂²) / (256 × η × L × R × T) [PIPE-1]
 
 where:
     d = pipe inner diameter (m)
@@ -64,6 +64,122 @@ O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0  # kg/mol — O2 molar mass; g/mol -> 
 # → SiO mid → O2 late) — that's a factor-of-2 in conductance, so
 # the live mixture is the canonical source going forward.
 DEFAULT_PIPE_M_AVG_KG_MOL = 0.040  # kg/mol — fallback mole-weighted pipe gas molar mass
+# DERIVATION: premise — steady isothermal ideal-gas flow keeps molar flow
+# constant while local volumetric flow varies as 1/P. Integrating circular
+# Poiseuille along the pipe gives pV throughput
+# π*d^4*(P1^2-P2^2)/(256*eta*L): the incompressible 128 denominator gains
+# the factor 2 from P1^2-P2^2 = 2*p_mean*(P1-P2). Dividing by R*T and
+# multiplying by molar mass M gives kg/s; units are
+# [m^4*Pa^2*kg/mol]/[(Pa*s)*m*(Pa*m^3/(mol*K))*K] = kg/s. Worked check:
+# d=0.08 m, L=2 m, T=1473.15 K, M(SiO)=0.0440845 kg/mol and m_dot=0.003
+# kg/s require P1=426.45 Pa against vacuum; the forward law returns
+# 0.003000 kg/s. Both capacity and pressure inversion use this one factor.
+COMPRESSIBLE_POISEUILLE_DENOMINATOR = 256.0  # dimensionless — integrated mean-pressure factor
+DEFAULT_INITIAL_THROAT_AREA_M2 = math.pi * 0.06**2  # m² — 12 cm diameter throat back-compat anchor
+DEFAULT_CONDENSER_STAGE_AREA_RATIOS = {
+    'fe_stage1': 4.0,
+    'sio_stage3': 6.0,
+    'alkali_stage4': 5.0,
+    'terminal': 2.0,
+}  # dimensionless — physical area / throat area; downstream stages >= throat
+DEFAULT_CONDENSER_STAGE_AREA_RATIO_SOURCES = {
+    'fe_stage1': (
+        'engineering-default: baffled Fe condenser presents multiple throat '
+        'areas downstream of the constriction'
+    ),
+    'sio_stage3': (
+        'engineering-default: removable SiO baffle cartridge needs the '
+        'largest capture surface among named stages'
+    ),
+    'alkali_stage4': (
+        'engineering-default: cyclone separator effective wall area exceeds '
+        'throat but stays below SiO baffle cartridge'
+    ),
+    'terminal': (
+        'engineering-default: terminal vent/capture area is not the '
+        'constriction; keep >= throat for follow-on Kn diagnostics'
+    ),
+}  # provisional source notes for default condenser stage-area ratios
+_STAGE_AREA_ALIASES = {
+    1: 'fe_stage1',
+    '1': 'fe_stage1',
+    'stage1': 'fe_stage1',
+    'stage_1': 'fe_stage1',
+    'fe': 'fe_stage1',
+    3: 'sio_stage3',
+    '3': 'sio_stage3',
+    'stage3': 'sio_stage3',
+    'stage_3': 'sio_stage3',
+    'sio': 'sio_stage3',
+    4: 'alkali_stage4',
+    '4': 'alkali_stage4',
+    'stage4': 'alkali_stage4',
+    'stage_4': 'alkali_stage4',
+    'alkali': 'alkali_stage4',
+    7: 'terminal',
+    '7': 'terminal',
+    'stage7': 'terminal',
+    'stage_7': 'terminal',
+    'terminal': 'terminal',
+}
+
+
+class OverheadConfigurationError(ValueError):
+    """Invalid overhead configuration input."""
+
+
+def canonical_stage_area_key(stage: Any) -> str:
+    """Canonical stage-area ratio key."""
+
+    return _STAGE_AREA_ALIASES.get(
+        stage, _STAGE_AREA_ALIASES.get(str(stage), str(stage)))
+
+
+def _stage_area_key(stage: Any) -> str:
+    return canonical_stage_area_key(stage)
+
+
+def _stage_area_ratio_provenance_record(
+    stage: str,
+    source: Any,
+    *,
+    ratio: float,
+) -> dict[str, Any]:
+    """Normalize a stage-area source note into the local provenance shape."""
+
+    if isinstance(source, Mapping):
+        record = dict(source)
+    else:
+        source_text = str(source or '').strip()
+        if not source_text:
+            source_text = (
+                'configuration: stage-area ratio override without explicit '
+                'source; treat as provisional until geometry is certified'
+            )
+        source_class = source_text.split(':', 1)[0].strip() or 'configuration'
+        is_provisional = (
+            'engineering-default' in source_text.lower()
+            or 'provisional' in source_text.lower()
+            or source_class == 'configuration'
+        )
+        record = {
+            'source': source_text,
+            'source_class': source_class,
+            'status': 'provisional' if is_provisional else 'sourced',
+            'output_status': (
+                'status_bearing' if is_provisional else 'sourced'
+            ),
+        }
+    record.setdefault('stage', stage)
+    record.setdefault('ratio', float(ratio))
+    record.setdefault('usage', 'condensation_surface_area')
+    record.setdefault(
+        'message',
+        'Condenser stage wall-deposit surface area follows the configured '
+        'stage-area ratio; provisional geometry makes deposit/coating '
+        'readouts status-bearing, not refused.',
+    )
+    return record
 
 
 def _mean_molar_mass_kg_mol(
@@ -151,7 +267,8 @@ class OverheadGasModel:
         'temperature_model': 'melt',  # unitless — headspace temperature model selector
         'temperature_offset_K': None,  # K — headspace temperature offset from melt
         'bleed_model': 'poiseuille',  # unitless — finite-headspace bleed model selector
-        'conductance_kg_s_per_bar': None,  # MISNOMER: kg/s mass-flow capacity override, not per-bar
+        'conductance_kg_s': None,  # kg/s — finite-headspace bleed mass-flow override
+        'conductance_kg_s_per_bar': None,  # deprecated compatibility alias; kg/s, not per-bar
         'downstream_pressure_bar': None,  # bar — downstream/reference pressure override
         'liner_temperature_C': DEFAULT_PIPE_TEMPERATURE_C,  # °C — default liner/pipe wall temperature
         'pipe_segment_temperatures_C': None,  # °C — per-pipe-segment wall temperature schedule
@@ -160,18 +277,30 @@ class OverheadGasModel:
     def __init__(
         self,
         headspace_config: Optional[Mapping] = None,
+        condenser_geometry_config: Optional[Mapping] = None,
         *,
         degraded_path_engagement_recorder: Optional[Callable[..., None]] = None,
     ):
         # Pipe geometry (default for 1-tonne batch)
-        self.pipe_diameter_m = 0.12      # m — pipe inner diameter default (12 cm)
+        self.initial_throat_area_m2 = DEFAULT_INITIAL_THROAT_AREA_M2  # m² — configurable throat cross-section
+        self.pipe_diameter_m = self.throat_diameter_m  # m — throat-equivalent inner diameter
         self.pipe_length_m = 1.0         # m — crucible-to-first-condenser pipe length
+        self.stage_area_ratios = dict(DEFAULT_CONDENSER_STAGE_AREA_RATIOS)  # dimensionless — stage area / throat area
+        self.stage_area_ratio_provenance_by_stage = {
+            stage: _stage_area_ratio_provenance_record(
+                stage,
+                source,
+                ratio=DEFAULT_CONDENSER_STAGE_AREA_RATIOS[stage],
+            )
+            for stage, source in DEFAULT_CONDENSER_STAGE_AREA_RATIO_SOURCES.items()
+        }
         self._pipe_temperature_C = DEFAULT_PIPE_TEMPERATURE_C  # °C — active pipe/liner wall temperature
         self._liner_temperature_config: Any = DEFAULT_PIPE_TEMPERATURE_C  # °C or schedule — liner temperature config
         self._pipe_segment_temperature_config: Any = None  # °C or mapping — per-segment wall temperature config
         self._degraded_path_engagement_recorder = (
             degraded_path_engagement_recorder
         )
+        self.configure_condenser_geometry(condenser_geometry_config or {})
         self.configure_headspace(headspace_config or {})
 
     def _record_pipe_m_avg_fallback_engagement(self) -> None:
@@ -193,6 +322,133 @@ class OverheadGasModel:
         self._liner_temperature_config = self._pipe_temperature_C  # °C — scalar liner temperature config
         self._pipe_segment_temperature_config = self._pipe_temperature_C  # °C — scalar segment temperature config
 
+    @property
+    def throat_diameter_m(self) -> float:
+        """Diameter of a circular throat with ``initial_throat_area_m2``."""
+
+        area = max(0.0, float(self.initial_throat_area_m2))  # m² — throat cross-section
+        if area <= 0.0:
+            return 0.0
+        return math.sqrt(4.0 * area / math.pi)  # m — circular equivalent diameter
+
+    def configure_condenser_geometry(self, config: Mapping) -> None:
+        """Resolve throat area and per-stage area ratios from setpoints."""
+
+        source = dict(config or {}) if isinstance(config, Mapping) else {}
+        throat_area = self._optional_positive_float(
+            self._config_value(source.get('initial_throat_area_m2')),
+            DEFAULT_INITIAL_THROAT_AREA_M2,
+        )  # m² — user-exposed throat cross-section
+        self.initial_throat_area_m2 = throat_area
+        self.pipe_diameter_m = self.throat_diameter_m  # m — derived back-compat pipe diameter
+
+        ratios = dict(DEFAULT_CONDENSER_STAGE_AREA_RATIOS)
+        provenance = {
+            stage: _stage_area_ratio_provenance_record(
+                stage,
+                DEFAULT_CONDENSER_STAGE_AREA_RATIO_SOURCES.get(stage),
+                ratio=ratio,
+            )
+            for stage, ratio in ratios.items()
+        }
+        raw_ratios = source.get('stage_area_ratios', {})
+        if isinstance(raw_ratios, Mapping):
+            for raw_stage, raw_ratio in raw_ratios.items():
+                stage = _stage_area_key(raw_stage)
+                ratio = self._optional_positive_float(
+                    self._config_value(raw_ratio),
+                    ratios.get(stage, 1.0),
+                )
+                ratios[stage] = ratio
+                default_ratio = DEFAULT_CONDENSER_STAGE_AREA_RATIOS.get(stage)
+                if (
+                    default_ratio is None
+                    or not math.isclose(
+                        ratio, default_ratio, rel_tol=1e-12, abs_tol=0.0)
+                ):
+                    provenance[stage] = _stage_area_ratio_provenance_record(
+                        stage, None, ratio=ratio)
+                elif stage not in provenance:
+                    provenance[stage] = _stage_area_ratio_provenance_record(
+                        stage, None, ratio=ratio)
+                else:
+                    provenance[stage] = dict(provenance[stage])
+                    provenance[stage]['ratio'] = ratio
+        raw_sources = source.get('stage_area_ratio_sources', {})
+        if isinstance(raw_sources, Mapping):
+            for raw_stage, raw_source in raw_sources.items():
+                stage = _stage_area_key(raw_stage)
+                provenance[stage] = _stage_area_ratio_provenance_record(
+                    stage,
+                    raw_source,
+                    ratio=ratios.get(stage, 1.0),
+                )
+        self.stage_area_ratios = ratios
+        self.stage_area_ratio_provenance_by_stage = provenance
+
+    def stage_area_m2(self, stage: Any) -> float:
+        """Physical area for a named condenser/volatiles stage."""
+
+        key = _stage_area_key(stage)
+        ratio = self.stage_area_ratios[key]
+        return self.initial_throat_area_m2 * ratio  # m² — throat area × dimensionless ratio
+
+    def stage_area_m2_by_stage(self) -> dict[str, float]:
+        """All configured stage physical areas, keyed by stage label."""
+
+        return {
+            stage: self.stage_area_m2(stage)
+            for stage in self.stage_area_ratios
+        }
+
+    def stage_area_geometry_provenance_notice(self) -> dict[str, Any]:
+        """Provenance payload for stage-area geometry used by wall deposits."""
+
+        records = {
+            stage: dict(record)
+            for stage, record in self.stage_area_ratio_provenance_by_stage.items()
+        }
+        status_bearing = {
+            stage: record
+            for stage, record in records.items()
+            if str(record.get('output_status', '')).lower() == 'status_bearing'
+            or str(record.get('status', '')).lower() in {'provisional', 'proxy'}
+            or str(record.get('source_class', '')).lower() == 'engineering-default'
+        }
+        if not records:
+            return {}
+        return {
+            'severity': 'warning' if status_bearing else 'info',
+            'code': 'wall_deposit_surface_geometry_provenance',
+            'source_class': (
+                'engineering-default'
+                if any(
+                    str(record.get('source_class', '')).lower()
+                    == 'engineering-default'
+                    for record in status_bearing.values()
+                )
+                else 'configured_geometry'
+            ),
+            'status': 'provisional' if status_bearing else 'sourced',
+            'output_status': (
+                'status_bearing' if status_bearing else 'sourced_with_surface_proxy'
+            ),
+            'provisional': bool(status_bearing),
+            'usage': [
+                'stage_area_m2_by_stage',
+                'PipeSegment.declared_area_m2',
+                'PipeSegment.surface_area_m2',
+                'wall_deposit_candidate_for_surface',
+                'coating_lifespan',
+            ],
+            'stage_area_ratio_provenance_by_stage': records,
+            'message': (
+                'Condenser stage-area ratios include provisional/default '
+                'geometry; wall-deposit and coating readouts are status-bearing '
+                'until stage surface areas are certified.'
+            ),
+        }
+
     def configure_headspace(self, config: Mapping) -> None:
         merged = dict(self.DEFAULT_HEADSPACE_CONFIG)
         merged.update(dict(config or {}))
@@ -201,7 +457,9 @@ class OverheadGasModel:
         self._temperature_model = str(merged.get('temperature_model') or 'melt')  # unitless — headspace temperature basis
         self._temperature_offset_K = merged.get('temperature_offset_K')  # K or None — headspace temperature offset
         self._bleed_model = str(merged.get('bleed_model') or 'poiseuille')  # unitless — bleed conductance model
-        self._conductance_override = merged.get('conductance_kg_s_per_bar')  # kg/s — legacy-named mass-flow override
+        self._conductance_override = merged.get('conductance_kg_s')  # kg/s — finite-headspace bleed mass-flow override
+        if self._conductance_override is None:
+            self._conductance_override = merged.get('conductance_kg_s_per_bar')  # kg/s — deprecated compatibility alias
         self._downstream_pressure_override = merged.get('downstream_pressure_bar')  # bar or None — downstream pressure override
         self._liner_temperature_config = merged.get(  # °C or schedule — liner temperature config
             'liner_temperature_C',
@@ -270,7 +528,7 @@ class OverheadGasModel:
 
         pipe_temperature_C = self.resolve_pipe_temperature_C(melt)  # °C — active pipe/liner wall temperature
         total_evap_kg_hr = max(0.0, float(evap_flux.total_kg_hr))  # kg/hr — total evaporation mass flow
-        p_mean_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)  # Pa — total pressure; mbar -> Pa with 1 Pa floor
+        allowed_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)  # Pa — allowed upstream pressure; mbar -> Pa with 1 Pa floor
         # Preserve the existing gas-transport path: Poiseuille conductance has
         # historically used melt/gas temperature. The liner trajectory controls
         # wall deposition and Kn diagnostics without changing evaporation totals.
@@ -282,31 +540,44 @@ class OverheadGasModel:
         # ``evap_flux.species_kg_hr`` is the steady-state pipe
         # composition; the time unit cancels in the mole-fraction
         # weighting.
-        conductance = self._pipe_conductance(  # kg/s — pipe mass-flow CAPACITY at p_mean (Poiseuille × ideal-gas ρ); ∝ p̄². NOT per-pressure.
-            p_mean_Pa,
+        conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream pressure against vacuum
+            allowed_pressure_Pa,
             conductance_temperature_C,
             species_kg_for_M_avg=evap_flux.species_kg_hr,  # kg/hr by species — composition basis for M_avg
         )
-        pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — pipe capacity; kg/s -> kg/hr
-        if pipe_conductance_kg_hr > 0.0:
-            pipe_capacity_used_pct = (  # percent — evaporation flow divided by pipe mass-flow capacity
-                total_evap_kg_hr / pipe_conductance_kg_hr * 100.0  # dimensionless -> percent
+        pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
+        if conductance > 0.0:
+            vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, sqrt(Poiseuille balance)
+                total_evap_kg_hr / 3600.0,  # kg/s — evaporation mass flow
+                conductance_temperature_C,
+                species_kg_for_M_avg=evap_flux.species_kg_hr,
             )
         else:
-            pipe_capacity_used_pct = 999.0 if total_evap_kg_hr > 0.0 else 0.0  # percent — saturated sentinel or zero-load
-        if conductance > 0.0:
-            vapor_pressure_mbar = (total_evap_kg_hr / 3600.0) / conductance * 10.0  # mbar (nominal) — coarse proxy: kg/hr -> kg/s, flux/flow-capacity ×10; NOT a rigorous partial pressure (see BH-063).
-        else:
-            vapor_pressure_mbar = 0.0  # mbar (nominal) — zero proxy pressure when pipe capacity is zero
+            vapor_pressure_mbar = 0.0  # mbar — zero pressure when pipe capacity is zero
         pressure_mbar = max(vapor_pressure_mbar, float(melt.p_total_mbar))  # mbar — reported total overhead pressure
+        if total_evap_kg_hr <= 0.0:
+            pipe_capacity_used_pct = 0.0
+        elif pipe_conductance_kg_hr > 0.0:
+            pipe_capacity_used_pct = (
+                total_evap_kg_hr / pipe_conductance_kg_hr * 100.0
+            )  # percent — load / capacity at allowed upstream pressure
+        else:
+            pipe_capacity_used_pct = 999.0
         return {
             'pipe_temperature_C': pipe_temperature_C,  # °C — active pipe/liner wall temperature
             'conductance_temperature_C': conductance_temperature_C,  # °C — gas temperature used for conductance
-            'p_mean_Pa': p_mean_Pa,  # Pa — mean pipe pressure
-            'conductance_kg_s_per_bar': conductance,  # MISNOMER: value is kg/s (mass flow), not per-bar; name kept for API compat, to be corrected with BH-063.
+            'p_mean_Pa': allowed_pressure_Pa,  # Pa — compatibility field; allowed upstream pressure
+            'initial_throat_area_m2': self.initial_throat_area_m2,  # m² — user-configured throat cross-section
+            'throat_diameter_m': self.pipe_diameter_m,  # m — circular-equivalent throat diameter
+            'stage_area_m2_by_stage': self.stage_area_m2_by_stage(),  # m² by stage — throat area × ratio
+            'stage_area_geometry_provenance_notice': (
+                self.stage_area_geometry_provenance_notice()
+            ),
+            'conductance_kg_s': conductance,  # kg/s — pipe mass-flow capacity at p_mean; NOT per-pressure
+            'conductance_kg_s_per_bar': conductance,  # kg/s — deprecated compatibility alias; not per-bar
             'pipe_conductance_kg_hr': pipe_conductance_kg_hr,  # kg/hr — pipe mass-flow capacity
             'pipe_capacity_used_pct': pipe_capacity_used_pct,  # percent — capacity used
-            'vapor_pressure_mbar': vapor_pressure_mbar,  # mbar (nominal) — proxy pressure, not rigorous partial pressure
+            'vapor_pressure_mbar': vapor_pressure_mbar,  # mbar — steady-state vapor partial pressure
             'pressure_mbar': pressure_mbar,  # mbar — reported total overhead pressure
         }
 
@@ -379,6 +650,19 @@ class OverheadGasModel:
         return result
 
     @staticmethod
+    def _config_value(value: Any) -> Any:
+        if isinstance(value, Mapping) and 'value' in value:
+            return value.get('value')
+        return value
+
+    @classmethod
+    def _optional_positive_float(cls, value: Any, default: float) -> float:
+        result = cls._optional_float(value, default)
+        if result <= 0.0:
+            return float(default)
+        return result
+
+    @staticmethod
     def _campaign_matches(configured: Any, campaign_name: str) -> bool:
         aliases = {
             'C2A': {'C2A', 'C2A_continuous'},
@@ -423,7 +707,8 @@ class OverheadGasModel:
                existing_gas: Optional[OverheadGas] = None,
                headspace_volume_m3: Optional[float] = None,  # m³ — explicit finite headspace volume
                p_downstream_bar: Optional[float] = None,  # bar — explicit downstream/reference pressure
-               bleed_conductance_kg_s_per_bar: Optional[float] = None  # MISNOMER: kg/s mass flow, not per-bar
+               bleed_conductance_kg_s: Optional[float] = None,  # kg/s — explicit bleed mass-flow capacity
+               bleed_conductance_kg_s_per_bar: Optional[float] = None  # deprecated compatibility alias; kg/s, not per-bar
                ) -> OverheadGas:
         """
         Calculate overhead gas state for this hour.
@@ -454,13 +739,21 @@ class OverheadGasModel:
 
         # ── Pipe conductance limit ──────────────────────── [PIPE-1]
         transport_state = self.estimate_transport_state(evap_flux, melt)  # mixed units — pipe transport state
-        conductance = transport_state['conductance_kg_s_per_bar']  # kg/s — MISNOMER field value is mass flow, not per-bar
+        conductance = transport_state['conductance_kg_s']  # kg/s — pipe mass-flow capacity
         gas.pipe_conductance_kg_hr = transport_state['pipe_conductance_kg_hr']  # kg/hr — pipe mass-flow capacity
+        gas.initial_throat_area_m2 = transport_state['initial_throat_area_m2']  # m² — user-configured throat cross-section
+        gas.throat_diameter_m = transport_state['throat_diameter_m']  # m — circular-equivalent throat diameter
+        gas.stage_area_m2_by_stage = dict(transport_state['stage_area_m2_by_stage'])  # m² by stage — throat area × ratio
+        gas.stage_area_geometry_provenance_notice = dict(
+            transport_state['stage_area_geometry_provenance_notice'])
         finite_conductance = self._resolve_bleed_conductance(  # kg/s — finite-headspace bleed mass-flow capacity
             conductance,
-            bleed_conductance_kg_s_per_bar,
+            bleed_conductance_kg_s
+            if bleed_conductance_kg_s is not None
+            else bleed_conductance_kg_s_per_bar,
         )
-        gas.bleed_conductance_kg_s_per_bar = finite_conductance  # MISNOMER: kg/s mass flow, not per-bar
+        gas.bleed_conductance_kg_s = finite_conductance  # kg/s — finite-headspace bleed mass-flow capacity
+        gas.bleed_conductance_kg_s_per_bar = finite_conductance  # kg/s — deprecated compatibility alias
         gas.p_downstream_bar = self._resolve_downstream_pressure(  # bar — downstream/reference pressure
             melt, p_downstream_bar)
         gas.headspace_volume_m3 = self._resolve_headspace_volume(  # m³ — finite headspace volume
@@ -708,6 +1001,7 @@ class OverheadGasModel:
         gas.turbine_shaft_power_kW = 0.0  # kW — reset turbine shaft power
         gas.evap_exceeds_transport = False  # dimensionless bool — reset transport over-capacity flag
         gas.transport_saturation_pct = 0.0  # percent — reset pipe capacity used
+        gas.stage_area_geometry_provenance_notice.clear()
 
     @staticmethod
     def _compute_partial_pressures(holdup_mol: Mapping[str, float],  # mol by species — gas holdup
@@ -751,9 +1045,13 @@ class OverheadGasModel:
     def _resolve_downstream_pressure(self, melt: MeltState,
                                      explicit: Optional[float]) -> float:  # bar or None — explicit downstream pressure
         if explicit is not None:
-            return max(0.0, float(explicit))  # bar — explicit downstream/reference pressure
+            return self._finite_nonnegative_downstream_pressure_bar(
+                explicit, 'p_downstream_bar')  # bar — explicit downstream/reference pressure
         if self._downstream_pressure_override is not None:
-            return max(0.0, float(self._downstream_pressure_override))  # bar — configured downstream/reference pressure
+            return self._finite_nonnegative_downstream_pressure_bar(
+                self._downstream_pressure_override,
+                'overhead_headspace.downstream_pressure_bar',
+            )  # bar — configured downstream/reference pressure
         atmosphere_name = getattr(melt.atmosphere, 'name', '')
         if atmosphere_name in {
             'CONTROLLED_O2',
@@ -763,23 +1061,38 @@ class OverheadGasModel:
             return max(0.0, float(melt.pO2_mbar) / 1000.0)  # bar — O2 setpoint; mbar -> bar
         return 0.0  # bar — vacuum downstream/reference pressure
 
+    @staticmethod
+    def _finite_nonnegative_downstream_pressure_bar(
+        value: Any,
+        field: str,
+    ) -> float:
+        try:
+            pressure_bar = float(value)
+        except (TypeError, ValueError) as exc:
+            raise OverheadConfigurationError(
+                f'{field} must be finite, got {value!r}'
+            ) from exc
+        if not math.isfinite(pressure_bar):
+            raise OverheadConfigurationError(
+                f'{field} must be finite, got {value!r}'
+            )
+        return max(0.0, pressure_bar)
+
     def _pipe_conductance(
         self,
-        p_mean_Pa: float,  # Pa — mean pipe pressure
+        p_upstream_Pa: float,  # Pa — allowed upstream pipe pressure
         T_C: float,  # °C — pipe gas temperature
         *,
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
     ) -> float:
         """
-        Poiseuille conductance of the collection pipe.
-
-        C = π × d⁴ × p̄ / (128 × η × L)                   [PIPE-1]
+        Compressible Poiseuille mass-flow capacity of the collection pipe.
 
         At millibar pressures and 1400+°C, the flow is in the
         viscous regime (Knudsen number Kn << 0.01).
 
         Args:
-            p_mean_Pa: Mean pressure in the pipe (Pa)
+            p_upstream_Pa: Allowed upstream pressure in the pipe (Pa)
             T_C:       Pipe temperature (°C)
             species_kg_for_M_avg: optional mapping of species → mass
                 for deriving the live mole-weighted M_avg. Pass the
@@ -789,7 +1102,7 @@ class OverheadGasModel:
                 matches the historical hardcoded value.
 
         Returns:
-            Conductance in kg/s (mass flow per unit pressure drop)
+            Conductance in kg/s (mass-flow capacity)
 
         0.5.4 W7 (CW5 historical-audit closure): the mass-conductance
         density used to derive a hardcoded ``M_avg = 0.040 kg/mol``
@@ -813,28 +1126,76 @@ class OverheadGasModel:
         # instability or a bad test setup could poison the input;
         # fail-closed to 0.0 conductance rather than propagating a
         # complex / NaN / exception downstream. Also guard L, d <= 0
-        # (degenerate pipe geometry; conductance is 0). p_mean_Pa
+        # (degenerate pipe geometry; conductance is 0). p_upstream_Pa
         # < 0 is unphysical; clamp to 0.
         T_K = T_C + CELSIUS_TO_KELVIN_OFFSET  # K — pipe gas temperature; °C -> K
         if T_K <= 0.0 or L <= 0.0 or d <= 0.0:
             return 0.0
-        p_mean_Pa = max(0.0, float(p_mean_Pa))  # Pa — clamped mean pipe pressure
+        p_upstream_Pa = max(0.0, float(p_upstream_Pa))  # Pa — clamped upstream pressure
 
         # Dynamic viscosity of gas mixture (approximate as N₂-like)
         # η ≈ 4e-5 Pa·s at 1500°C (increases with T for gases)
-        eta = 1.8e-5 * (T_K / 300.0) ** 0.7  # Pa·s — dynamic viscosity; 1.8e-5 Pa·s at 300 K, exponent dimensionless
+        eta = self._gas_dynamic_viscosity_Pa_s(T_K)  # Pa·s — dynamic viscosity
 
-        # Volumetric conductance (m³/s)
-        C_vol = math.pi * d**4 * p_mean_Pa / (128.0 * eta * L)  # m³/s — volumetric conductance; 128 dimensionless
-
-        # Convert to mass conductance (kg/s)
-        # Using ideal gas: ρ = p × M / (R × T)
+        # BH-163 provenance: this closes the finite-headspace pipe-conductance
+        # defect. The old path used a legacy constant M_avg = 0.040 kg/mol,
+        # mis-weighting light species (pure Na off by ~1.74x); this now uses
+        # the real evaporating species mix.
         M_avg = _mean_molar_mass_kg_mol(  # kg/mol — mole-weighted gas molar mass
             species_kg_for_M_avg,
             fallback_engagement_recorder=(
                 self._record_pipe_m_avg_fallback_engagement
             ),
         )
-        rho = p_mean_Pa * M_avg / (8.314 * T_K)  # kg/m³ — ideal-gas density; 8.314 J/(mol·K)
+        pressure_square_delta_Pa2 = p_upstream_Pa**2  # Pa² — P1²-P2² against vacuum
+        numerator = math.pi * d**4 * M_avg * pressure_square_delta_Pa2
+        denominator = (
+            COMPRESSIBLE_POISEUILLE_DENOMINATOR
+            * eta
+            * L
+            * GAS_CONSTANT
+            * T_K
+        )
+        return numerator / denominator  # kg/s — capacity at allowed upstream pressure
 
-        return C_vol * rho  # kg/s — pipe mass-flow capacity at p_mean
+    @staticmethod
+    def _gas_dynamic_viscosity_Pa_s(T_K: float) -> float:
+        return 1.8e-5 * (T_K / 300.0) ** 0.7  # Pa·s — 1.8e-5 Pa·s at 300 K, exponent dimensionless
+
+    def _vapor_pressure_mbar_from_flux(
+        self,
+        total_evap_kg_s: float,  # kg/s — evaporation mass flow
+        T_C: float,  # °C — pipe gas temperature
+        *,
+        species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
+    ) -> float:
+        """Invert the shared compressible Poiseuille law against vacuum."""
+
+        F_kg_s = max(0.0, float(total_evap_kg_s))  # kg/s — vapor mass throughput
+        if F_kg_s <= 0.0:
+            return 0.0
+        T_K = T_C + CELSIUS_TO_KELVIN_OFFSET  # K — pipe gas temperature
+        d = self.pipe_diameter_m  # m — throat-equivalent diameter
+        L = self.pipe_length_m  # m — throat/pipe length
+        M_avg = _mean_molar_mass_kg_mol(  # kg/mol — mole-weighted gas molar mass
+            species_kg_for_M_avg,
+            fallback_engagement_recorder=(
+                self._record_pipe_m_avg_fallback_engagement
+            ),
+        )
+        if T_K <= 0.0 or d <= 0.0 or L <= 0.0 or M_avg <= 0.0:
+            return 0.0
+        eta = self._gas_dynamic_viscosity_Pa_s(T_K)  # Pa·s — dynamic viscosity
+        numerator = (
+            COMPRESSIBLE_POISEUILLE_DENOMINATOR
+            * eta
+            * L
+            * GAS_CONSTANT
+            * T_K
+            * F_kg_s
+        )
+        denominator = math.pi * M_avg * d**4
+        if denominator <= 0.0:
+            return 0.0
+        pressure_Pa = math.sqrt(max(0.0, numerator / denominator))  # Pa — sqrt(Pa²)
+        return pressure_Pa / 100.0  # mbar — Pa -> mbar

@@ -179,6 +179,44 @@ DEGRADED_PATH_ENGAGEMENT_KEYS = (
 )
 
 
+def _deep_merge_condenser_geometry(
+    base: Mapping[str, Any],
+    override: Mapping[str, Any],
+) -> Dict[str, Any]:
+    """Deep-merge one condenser geometry layer with override precedence."""
+
+    merged = copy.deepcopy(dict(base or {}))
+    for key, value in dict(override or {}).items():
+        current = merged.get(key)
+        if isinstance(current, Mapping) and isinstance(value, Mapping):
+            merged[key] = _deep_merge_condenser_geometry(current, value)
+        else:
+            merged[key] = copy.deepcopy(value)
+    return merged
+
+
+def _canonicalize_condenser_geometry_stage_keys(
+    config: Mapping[str, Any],
+) -> Dict[str, Any]:
+    from simulator.overhead import canonical_stage_area_key
+
+    resolved = copy.deepcopy(dict(config or {}))
+    for stage_map_key in (
+        'stage_area_ratios',
+        'stage_area_ratio_sources',
+    ):
+        raw_stage_map = resolved.get(stage_map_key)
+        if not isinstance(raw_stage_map, Mapping):
+            continue
+        canonical_stage_map: Dict[str, Any] = {}
+        for stage, value in raw_stage_map.items():
+            canonical_stage_map[canonical_stage_area_key(stage)] = (
+                copy.deepcopy(value)
+            )
+        resolved[stage_map_key] = canonical_stage_map
+    return resolved
+
+
 @dataclass(frozen=True)
 class _MeltRedoxLiquidusFloorFallback:
     source: str
@@ -356,6 +394,7 @@ DEFAULT_OVERHEAD_HEADSPACE_CONFIG = {
     'temperature_model': 'melt',
     'temperature_offset_K': None,
     'bleed_model': 'poiseuille',
+    'conductance_kg_s': None,
     'conductance_kg_s_per_bar': None,
     'downstream_pressure_bar': None,
     'liner_temperature_C': 1500.0,
@@ -585,6 +624,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._overhead_headspace_config = (
             self._resolve_overhead_headspace_config()
         )
+        self._overhead_condenser_geometry_config = (
+            self._resolve_condenser_geometry_config()
+        )
         self._freeze_gate_config = self._resolve_freeze_gate_config()
         self._freeze_gate_liquid_fraction_cache: Optional[Dict[str, Any]] = None
         self._freeze_gate_liquid_fraction_curve_memo: Dict[
@@ -790,6 +832,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             from simulator.overhead import OverheadGasModel
             self._overhead_model = OverheadGasModel(
                 self._overhead_headspace_config,
+                condenser_geometry_config=self._overhead_condenser_geometry_config,
                 degraded_path_engagement_recorder=(
                     self._record_degraded_path_engagement
                 ),
@@ -2417,13 +2460,40 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         return config
 
+    def _resolve_condenser_geometry_config(
+        self, campaign: Optional[CampaignPhase] = None
+    ) -> Dict[str, Any]:
+        config = copy.deepcopy(
+            dict(self.setpoints.get('condenser_geometry', {}) or {})
+        )
+        campaign_key = campaign.name if campaign is not None else None
+        if campaign_key:
+            campaign_cfg = (
+                self.setpoints.get('campaigns', {}) or {}
+            ).get(campaign_key, {}) or {}
+            config = _deep_merge_condenser_geometry(
+                config,
+                dict(campaign_cfg.get('condenser_geometry', {}) or {}),
+            )
+            runtime_override = self.campaign_mgr.overrides.get(campaign_key, {})
+            config = _deep_merge_condenser_geometry(
+                config,
+                dict(runtime_override.get('condenser_geometry', {}) or {})
+            )
+        return _canonicalize_condenser_geometry_stage_keys(config)
+
     def _configure_overhead_headspace(
         self, campaign: Optional[CampaignPhase] = None
     ) -> None:
         self._overhead_headspace_config = (
             self._resolve_overhead_headspace_config(campaign)
         )
+        self._overhead_condenser_geometry_config = (
+            self._resolve_condenser_geometry_config(campaign)
+        )
         if self._overhead_model is not None:
+            self._overhead_model.configure_condenser_geometry(
+                self._overhead_condenser_geometry_config)
             self._overhead_model.configure_headspace(
                 self._overhead_headspace_config)
 
@@ -2564,6 +2634,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             overhead_pressure_mbar=transport['pressure_mbar'],
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             gas_temperature_C=transport['pipe_temperature_C'],
+            stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
+            stage_area_geometry_provenance_notice=transport.get(
+                'stage_area_geometry_provenance_notice', {}),
             pipe_segment_temperatures_C=(
                 self.overhead_model.resolve_pipe_segment_temperatures_C(
                     [
@@ -2712,7 +2785,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         configured = self._overhead_headspace_config.get(
             'downstream_pressure_bar')
         if configured is not None:
-            return max(0.0, float(configured))
+            configured_pressure_bar = float(configured)
+            if not math.isfinite(configured_pressure_bar):
+                return math.nan
+            return max(0.0, configured_pressure_bar)
         atmosphere_name = getattr(self.melt.atmosphere, 'name', '')
         if atmosphere_name in {
             'CONTROLLED_O2',
@@ -2746,17 +2822,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.overhead.composition = composition
         self.overhead.pressure_mbar = p_total_mbar
 
-    def _headspace_bleed_conductance_kg_s_per_bar(self) -> float:
-        configured = self._overhead_headspace_config.get(
-            'conductance_kg_s_per_bar')
+    def _headspace_bleed_conductance_kg_s(
+        self,
+        *,
+        species_kg_for_M_avg: Optional[Mapping[str, float]] = None,
+    ) -> float:
+        configured = self._overhead_headspace_config.get('conductance_kg_s')
+        if configured is None:
+            configured = self._overhead_headspace_config.get(
+                'conductance_kg_s_per_bar')
         if configured is not None:
             return max(0.0, float(configured))
+        if species_kg_for_M_avg is None:
+            species_kg_for_M_avg = self._overhead_holdup_species_kg()
         p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
         return max(
             0.0,
             float(self.overhead_model._pipe_conductance(
-                p_mean_Pa, self.melt.temperature_C)),
+                p_mean_Pa,
+                self.melt.temperature_C,
+                species_kg_for_M_avg=species_kg_for_M_avg,
+            )),
         )
+
+    def _headspace_bleed_conductance_kg_s_per_bar(self) -> float:
+        return self._headspace_bleed_conductance_kg_s()
 
     def _overhead_holdup_mol(self) -> Dict[str, float]:
         return {
@@ -2765,6 +2855,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'process.overhead_gas').items()
             if float(mol) > 0.0
         }
+
+    def _overhead_holdup_species_kg(
+        self,
+        holdup_mol: Optional[Mapping[str, float]] = None,
+    ) -> Dict[str, float]:
+        basis = self._overhead_holdup_mol() if holdup_mol is None else holdup_mol
+        species_kg: Dict[str, float] = {}
+        for species, mol in dict(basis or {}).items():
+            amount_mol = max(0.0, float(mol))
+            if amount_mol <= 0.0:
+                continue
+            formula = resolve_species_formula(
+                species,
+                self.atom_ledger.registry,
+            )
+            species_kg[species] = amount_mol * formula.molar_mass_kg_per_mol()
+        return species_kg
 
     def _overhead_gas_equilibrium_diagnostic(self) -> Dict[str, Any]:
         if self._chem_kernel is None:
@@ -2885,20 +2992,42 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
             total_mol = sum(holdup_mol.values())
             total_kg = 0.0
+            holdup_kg: Dict[str, float] = {}
             for species, mol in holdup_mol.items():
                 formula = resolve_species_formula(
                     species,
                     self.atom_ledger.registry,
                 )
-                total_kg += mol * formula.molar_mass_kg_per_mol()
+                species_kg = mol * formula.molar_mass_kg_per_mol()
+                holdup_kg[species] = species_kg
+                total_kg += species_kg
             if total_mol > 0.0 and total_kg > 0.0:
-                p_total_bar = max(
-                    self._headspace_ledger_pO2_bar_from_o2_mol(total_mol),
-                    max(0.0, float(self.melt.p_total_mbar) / 1000.0),
+                volume_m3 = self._headspace_volume_m3()
+                T_head_K = self._headspace_temperature_K()
+                p_total_bar = 0.0
+                if volume_m3 > 0.0 and T_head_K > 0.0:
+                    p_total_bar = (
+                        total_mol * GAS_CONSTANT * T_head_K
+                        / (volume_m3 * 1.0e5)
+                    )
+                p_downstream_bar = self._headspace_downstream_pressure_bar()
+                from engines.builtin.overhead_bleed import (
+                    compressible_pressure_capacity_fraction,
+                )
+                # DERIVATION: conductance is the kg/s capacity at P1 against
+                # vacuum. The shared compressible-Poiseuille helper supplies
+                # the finite-P2 capacity fraction; fraction * C * seconds is kg.
+                pressure_capacity_fraction = (
+                    compressible_pressure_capacity_fraction(
+                        p_total_bar,
+                        p_downstream_bar,
+                    )
                 )
                 bleed_kg = (
-                    self._headspace_bleed_conductance_kg_s_per_bar()
-                    * max(0.0, p_total_bar - self._headspace_downstream_pressure_bar())
+                    self._headspace_bleed_conductance_kg_s(
+                        species_kg_for_M_avg=holdup_kg,
+                    )
+                    * pressure_capacity_fraction
                     * 3600.0
                 )
                 if bleed_kg > 0.0:
@@ -4836,11 +4965,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         o2_vented_kg: Optional[float] = None,
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
+        species_kg_for_M_avg = self._overhead_holdup_species_kg()
         controls: Dict[str, Any] = {
             'headspace_volume_m3': self._headspace_volume_m3(),
             'headspace_temperature_K': self._headspace_temperature_K(),
-            'bleed_conductance_kg_s_per_bar': (
-                self._headspace_bleed_conductance_kg_s_per_bar()
+            'bleed_conductance_kg_s': (
+                self._headspace_bleed_conductance_kg_s(
+                    species_kg_for_M_avg=species_kg_for_M_avg,
+                )
             ),
             'p_total_bar': float(diagnostic.get('p_total_bar', 0.0) or 0.0),
             'p_downstream_bar': self._headspace_downstream_pressure_bar(),
@@ -9700,8 +9832,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             existing_gas=self.overhead,
             headspace_volume_m3=self._headspace_volume_m3(),
             p_downstream_bar=self._headspace_downstream_pressure_bar(),
-            bleed_conductance_kg_s_per_bar=(
-                self._headspace_bleed_conductance_kg_s_per_bar()))
+            bleed_conductance_kg_s=(
+                self._headspace_bleed_conductance_kg_s()))
 
         # Track cumulative O₂ vented and stored
         if not finite_headspace_enabled:
@@ -9903,7 +10035,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self._equipment is None:
             # Auto-size equipment for this batch
             from simulator.equipment import EquipmentDesigner
-            designer = EquipmentDesigner()
+            equipment_setpoints = dict(self.setpoints)
+            equipment_setpoints['condenser_geometry'] = copy.deepcopy(
+                self._overhead_condenser_geometry_config
+            )
+            designer = EquipmentDesigner(equipment_setpoints)
             feedstock = self.feedstocks.get(self.record.feedstock_key, {})
             self._equipment = designer.design_for_batch(
                 self.record.batch_mass_kg,
@@ -9912,7 +10048,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             # Also store volatiles train spec for Loop 4 throttle
             self._volatiles_train_spec = self._equipment.volatiles_train
-            self.overhead_model.pipe_diameter_m = self._equipment.pipe.diameter_m
             self.overhead_model.pipe_length_m = self._equipment.pipe.length_m
         return self._equipment.turbine
 

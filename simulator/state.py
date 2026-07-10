@@ -861,11 +861,26 @@ class OverheadGas:
     headspace_temperature_K: float = 0.0
     # Gas temperature used for finite-headspace ideal-gas pressure
 
+    bleed_conductance_kg_s: float = 0.0
+    # Headspace bleed mass-flow capacity
+
     bleed_conductance_kg_s_per_bar: float = 0.0
-    # Headspace bleed conductance coefficient
+    # Deprecated compatibility alias; value is kg/s, not per-bar
 
     p_downstream_bar: float = 0.0
     # Downstream sink pressure for the bleed model
+
+    initial_throat_area_m2: float = 0.0
+    # User-configured condenser throat cross-section
+
+    throat_diameter_m: float = 0.0
+    # Circular-equivalent throat diameter
+
+    stage_area_m2_by_stage: Dict[str, float] = field(default_factory=dict)
+    # Condenser/volatiles stage physical areas from throat area ratios
+
+    stage_area_geometry_provenance_notice: Dict[str, Any] = field(default_factory=dict)
+    # Provenance/status for condenser stage-area ratios used by wall deposits
 
     turbine_flow_kg_hr: float = 0.0
     # Mass flow rate through turbine (sets pO₂)

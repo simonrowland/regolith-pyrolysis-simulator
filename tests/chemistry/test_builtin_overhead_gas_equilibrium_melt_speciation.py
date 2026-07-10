@@ -2,11 +2,110 @@
 
 from __future__ import annotations
 
+import copy
+import math
+
 import pytest
 
 from simulator.chemistry.kernel import ChemistryIntent
-from simulator.state import GAS_CONSTANT
+from simulator.campaigns import CampaignManager
+from simulator.state import CampaignPhase, GAS_CONSTANT
 from tests.chemistry.conftest import _build_sim
+
+
+def test_partial_campaign_condenser_geometry_deep_merges_once_at_campaign_start(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    setpoints = copy.deepcopy(setpoints_data)
+    setpoints["condenser_geometry"]["stage_area_ratios"]["terminal"] = 9.0
+    setpoints["condenser_geometry"]["stage_area_ratio_sources"]["terminal"] = (
+        "certified-geometry: terminal ratio 9 test anchor"
+    )
+    setpoints["campaigns"]["C0"]["condenser_geometry"] = {
+        "stage_area_ratios": {"fe_stage1": 1.5},
+    }
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints,
+    )
+
+    sim.start_campaign(CampaignPhase.C0)
+    ratios_at_campaign_start = dict(sim.overhead_model.stage_area_ratios)
+    provenance_at_campaign_start = (
+        sim.overhead_model.stage_area_geometry_provenance_notice()
+    )
+    terminal_provenance = provenance_at_campaign_start[
+        "stage_area_ratio_provenance_by_stage"
+    ]["terminal"]
+
+    assert ratios_at_campaign_start["fe_stage1"] == pytest.approx(1.5)
+    assert ratios_at_campaign_start["terminal"] == pytest.approx(9.0)
+    assert terminal_provenance["status"] == "sourced"
+
+    sim._get_turbine_spec()
+
+    assert sim._equipment.pipe.stage_area_ratios["fe_stage1"] == pytest.approx(1.5)
+    assert sim._equipment.pipe.stage_area_ratios["terminal"] == pytest.approx(9.0)
+    assert sim.overhead_model.stage_area_ratios == pytest.approx(
+        ratios_at_campaign_start
+    )
+    assert (
+        sim.overhead_model.stage_area_geometry_provenance_notice()
+        == provenance_at_campaign_start
+    )
+
+
+def test_runtime_condenser_geometry_override_is_allowed_and_consumed(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.campaign_mgr.overrides["C0"] = {
+        "condenser_geometry": {
+            "stage_area_ratios": {"fe_stage1": 1.5},
+        },
+    }
+    CampaignManager.validate_runtime_campaign_overrides(sim.campaign_mgr.overrides)
+
+    sim.start_campaign(CampaignPhase.C0)
+
+    assert sim.overhead_model.stage_area_ratios["fe_stage1"] == pytest.approx(1.5)
+    assert sim.overhead_model.stage_area_ratios["terminal"] == pytest.approx(2.0)
+
+
+def test_runtime_condenser_geometry_stage_aliases_canonicalize_before_consumers(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.campaign_mgr.overrides["C0"] = {
+        "condenser_geometry": {
+            "stage_area_ratios": {"stage_7": 9.0},
+        },
+    }
+    CampaignManager.validate_runtime_campaign_overrides(sim.campaign_mgr.overrides)
+
+    sim.start_campaign(CampaignPhase.C0)
+    resolved_ratios = sim._overhead_condenser_geometry_config["stage_area_ratios"]
+
+    assert "stage_7" not in resolved_ratios
+    assert resolved_ratios["terminal"] == pytest.approx(9.0)
+    assert sim.overhead_model.stage_area_ratios["terminal"] == pytest.approx(9.0)
+
+    sim._get_turbine_spec()
+
+    assert "stage_7" not in sim._equipment.pipe.stage_area_ratios
+    assert sim._equipment.pipe.stage_area_ratios["terminal"] == pytest.approx(9.0)
 
 
 def test_melt_composition_and_speciation_fill_missing_al_surface(
@@ -146,7 +245,7 @@ def test_materialized_al_o_surface_moves_only_through_commit_batch(
             "dt_hr": 1.0,
             "p_total_bar": 0.0,
             "p_downstream_bar": 0.0,
-            "bleed_conductance_kg_s_per_bar": 0.0,
+            "bleed_conductance_kg_s": 0.0,
             "max_o2_flow_kg_hr": 0.0,
         },
     )
