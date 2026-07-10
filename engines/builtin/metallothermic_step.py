@@ -182,6 +182,7 @@ TARGET_OXIDE_TO_METAL = {
     "MnO": "Mn",
     "Cr2O3": "Cr",
     "TiO2": "Ti",
+    "Al2O3": "Al",
 }
 NA_TARGET_TO_METAL = {
     oxide: TARGET_OXIDE_TO_METAL[oxide]
@@ -217,6 +218,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     NA2O_SOLUBILITY_WT_PCT = 10.0
     TI_ACCESSIBILITY = 0.75
     BACK_REDUCTION_FRACTION = 0.30
+    C6_ABOVE_CROSSOVER_REFUSAL = (
+        "c6_mg_thermite_above_crossover_requires_local_support"
+    )
 
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
@@ -242,7 +246,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if wrong_intent is not None:
             return wrong_intent
 
-        controls = unpack_controls(request)
+        controls = dict(unpack_controls(request))
+        controls["temperature_C"] = float(request.temperature_C)
 
         # Reaction-family early-exit: shared with stage0_pretreatment.py.
         # The metallothermic shuttles run solubility-limit + reagent-mass
@@ -847,6 +852,60 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     # value carried between them).
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _truthy_control(value: Any) -> bool:
+        if isinstance(value, str):
+            return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+        return bool(value)
+
+    @classmethod
+    def _c6_mg_al_support_gate(
+        cls,
+        controls: Mapping[str, Any],
+        temperature_C: float,
+    ) -> tuple[bool, dict[str, Any]]:
+        margin_block = (
+            controls.get("JANAF_4th_multiphase_margin_kJ_per_mol_O2") or {}
+        )
+        if not isinstance(margin_block, Mapping):
+            margin_block = {}
+        crossover_raw = margin_block.get("Mg_Al_crossover_C")
+        try:
+            crossover_C = float(crossover_raw)
+        except (TypeError, ValueError):
+            crossover_C = float(cls._crossover_temperature_C("Mg", "Al") or 0.0)
+        margin = cls._reduction_margin_kj_per_mol_o2(
+            "Mg",
+            "Al2O3",
+            temperature_C,
+        )
+        local_support = any(
+            cls._truthy_control(controls.get(key))
+            for key in (
+                "kinetic_driven_above_crossover",
+                "local_thermite_exotherm_supported",
+                "c6_local_thermite_support",
+            )
+        )
+        above_crossover = (
+            math.isfinite(crossover_C)
+            and crossover_C > 0.0
+            and float(temperature_C) > crossover_C
+        )
+        diagnostic = {
+            "c6_mg_al_margin_kJ_per_mol_O2": float(margin),
+            "c6_mg_al_crossover_C": float(crossover_C),
+            "c6_above_mg_al_crossover": bool(above_crossover),
+            "c6_local_thermite_support": bool(local_support),
+            "c6_local_thermite_support_note": str(
+                controls.get("kinetic_note")
+                or controls.get("local_thermite_support_note")
+                or ""
+            ),
+            "JANAF_4th_multiphase_margin_kJ_per_mol_O2": dict(margin_block),
+        }
+        return (not above_crossover or local_support), diagnostic
+
     def _dispatch_c6_mg_primary(
         self,
         composition_kg: Mapping[str, float],
@@ -877,6 +936,30 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     "coproduct_kg": 0.0,
                     "metal_produced_kg": 0.0,
                     "mol_Al_produced": 0.0,
+                },
+            )
+
+        support_ok, support_diagnostic = self._c6_mg_al_support_gate(
+            controls,
+            float(controls.get("temperature_C", 0.0) or 0.0),
+        )
+        if not support_ok:
+            return IntentResult(
+                intent=ChemistryIntent.METALLOTHERMIC_STEP,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "reason": self.C6_ABOVE_CROSSOVER_REFUSAL,
+                    "reason_refused": self.C6_ABOVE_CROSSOVER_REFUSAL,
+                    "reaction_family": REACTION_FAMILY_C6_MG,
+                    "back_reduction": False,
+                    "reagent_consumed_kg": 0.0,
+                    "oxide_reduced_kg": 0.0,
+                    "coproduct_kg": 0.0,
+                    "metal_produced_kg": 0.0,
+                    "mol_Al_produced": 0.0,
+                    **support_diagnostic,
                 },
             )
 
@@ -956,6 +1039,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 "coproduct_kg": MgO_produced_kg,
                 "metal_produced_kg": Al_produced_kg,
                 "mol_Al_produced": mol_Al_produced,
+                **support_diagnostic,
             },
         )
 

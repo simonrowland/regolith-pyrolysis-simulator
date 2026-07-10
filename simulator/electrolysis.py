@@ -49,6 +49,10 @@ from __future__ import annotations
 import math
 from typing import Dict, List, Mapping, Tuple
 
+from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_METAL_PHASE_CONDENSED,
+    ELLINGHAM_METAL_PHASE_GAS,
+)
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
@@ -252,8 +256,9 @@ def current_efficiency_diagnostic(dV: float, feo_fraction: float) -> dict[str, f
 
 def uncertified_multi_oxide_partition_targets(reducible) -> tuple[str, ...]:
     targets = sorted({
-        str(oxide)
-        for oxide, _E, _dV, _a, mode in reducible
+        str(row[0])
+        for row in reducible
+        for mode in (row[4],)
         if mode == "oxide_to_metal"
     })
     return tuple(targets) if len(targets) > 1 else ()
@@ -369,6 +374,8 @@ class ElectrolysisModel:
             'oxides_reduced_mol': {},
             'metals_produced_kg': {},
             'metals_produced_mol': {},
+            'gas_products_produced_kg': {},
+            'gas_products_produced_mol': {},
             'oxides_produced_kg': {},
             'oxides_produced_mol': {},
             'oxide_charge_electrons': {},
@@ -391,9 +398,12 @@ class ElectrolysisModel:
             'mre_decomposition_voltage_authority_by_oxide': {},
             'mre_decomposition_voltage_authoritative_by_oxide': {},
             'mre_decomposition_voltage_status_by_oxide': {},
+            'mre_metal_product_phase_by_oxide': {},
+            'mre_ellingham_phase_basis_by_oxide': {},
             'mre_raw_graph_requirement_V_by_oxide': {},
             'mre_raw_voltage_margin_V_by_oxide': {},
             'mre_raw_margin_refused_targets': {},
+            'mre_phase_refused_targets': {},
         }
 
         # Find all reducible species at this voltage
@@ -419,6 +429,12 @@ class ElectrolysisModel:
                 )
                 result['mre_decomposition_voltage_status_by_oxide'][oxide] = (
                     reference.status
+                )
+                result['mre_metal_product_phase_by_oxide'][oxide] = (
+                    reference.metal_product_phase
+                )
+                result['mre_ellingham_phase_basis_by_oxide'][oxide] = (
+                    reference.ellingham_phase_basis
                 )
             E_nernst = self.nernst_voltage(
                 oxide, T_C, activity, pO2_bar=pO2_bar)
@@ -461,8 +477,22 @@ class ElectrolysisModel:
                 continue
 
             if fallback_margin_V > 0.0:
+                product_phase = None if reference is None else reference.metal_product_phase
+                if product_phase not in (
+                    ELLINGHAM_METAL_PHASE_CONDENSED,
+                    ELLINGHAM_METAL_PHASE_GAS,
+                ):
+                    result['mre_phase_refused_targets'][oxide] = {
+                        'reason': 'mre_product_phase_missing_or_unknown',
+                        'metal_product_phase': product_phase,
+                        'voltage_status': None if reference is None else reference.status,
+                    }
+                    continue
                 overvoltage = fallback_margin_V
-                reducible.append((oxide, E_nernst, overvoltage, activity, "oxide_to_metal"))
+                reducible.append((
+                    oxide, E_nernst, overvoltage, activity,
+                    "oxide_to_metal", reference,
+                ))
 
         if melt_state.composition_kg.get('Fe2O3', 0.0) >= 1e-6:
             activity = mre_oxide_activity('Fe2O3', melt_account_mol)
@@ -475,6 +505,7 @@ class ElectrolysisModel:
                     voltage_V - E_ferric,
                     activity,
                     "ferric_to_ferrous",
+                    None,
                 ))
 
         if not reducible:
@@ -482,6 +513,8 @@ class ElectrolysisModel:
                 result['energy_kWh'] = voltage_V * current_A / 1000.0
             if result['mre_raw_margin_refused_targets']:
                 result['reason_refused'] = MRE_RAW_MARGIN_REFUSAL
+            if result['mre_phase_refused_targets']:
+                result['reason_refused'] = 'mre_product_phase_mismatch_refused'
             return result
 
         refused_targets = uncertified_multi_oxide_partition_targets(reducible)
@@ -497,7 +530,7 @@ class ElectrolysisModel:
         billable_current_A = 0.0
         any_capped = False
 
-        for oxide, E, dV, a, _mode in reducible:
+        for oxide, E, dV, a, _mode, _reference in reducible:
             weights[oxide] = a * math.exp(min(dV, 3.0))
 
         total_weight = sum(weights.values())
@@ -506,7 +539,7 @@ class ElectrolysisModel:
                 result['energy_kWh'] = voltage_V * current_A / 1000.0
             return result
 
-        for oxide, E, dV, a, mode in reducible:
+        for oxide, E, dV, a, mode, reference in reducible:
             fraction = weights[oxide] / total_weight
             I_species = current_A * fraction
 
@@ -565,12 +598,25 @@ class ElectrolysisModel:
                     M_metal_gmol = MOLAR_MASS[metal]  # g/mol
                     metal_mol = moles_reduced * n_met
                     metal_kg = metal_mol * M_metal_gmol / 1000.0
-                    result['metals_produced_kg'][metal] = (
-                        result['metals_produced_kg'].get(metal, 0.0)
-                        + metal_kg)
-                    result['metals_produced_mol'][metal] = (
-                        result['metals_produced_mol'].get(metal, 0.0)
-                        + metal_mol)
+                    product_phase = (
+                        ELLINGHAM_METAL_PHASE_CONDENSED
+                        if reference is None
+                        else reference.metal_product_phase
+                    )
+                    if product_phase == ELLINGHAM_METAL_PHASE_GAS:
+                        result['gas_products_produced_kg'][metal] = (
+                            result['gas_products_produced_kg'].get(metal, 0.0)
+                            + metal_kg)
+                        result['gas_products_produced_mol'][metal] = (
+                            result['gas_products_produced_mol'].get(metal, 0.0)
+                            + metal_mol)
+                    else:
+                        result['metals_produced_kg'][metal] = (
+                            result['metals_produced_kg'].get(metal, 0.0)
+                            + metal_kg)
+                        result['metals_produced_mol'][metal] = (
+                            result['metals_produced_mol'].get(metal, 0.0)
+                            + metal_mol)
 
                     # O₂ produced
                     O2_mol = moles_reduced * n_oxy / 2.0

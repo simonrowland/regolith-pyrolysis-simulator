@@ -42,6 +42,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_fit_range_K,
     ellingham_segment_for_temperature,
 )
+from simulator.chemistry import ellingham_graph
 from simulator.chemistry import melt_activity
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
@@ -415,6 +416,71 @@ def test_runtime_p_eq_numerator_moves_with_parent_oxide_composition(
     assert high_provenance["pressure_kind"] == "effective_equilibrium"
 
 
+def test_gas_basis_ellingham_pressure_uses_fugacity_not_psat(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    account = dict(_COMPOSITION_SENSITIVITY_BASE_MOL)
+    request = _composition_sensitivity_request(account)
+    result = provider.dispatch(request)
+    diagnostic = result.diagnostic or {}
+
+    provenance = diagnostic["vapor_pressure_numerator_provenance"]["Mg"]
+    root = provenance["raw_metal_activity_root"]
+    assert provenance["metal_standard_state"] == "gas"
+    assert provenance["pressure_rail"] == "gas_fugacity"
+    assert provenance["P_eq_Pa"] == pytest.approx(
+        root * vapor_pressure_module.ELLINGHAM_STANDARD_PRESSURE_PA
+    )
+    assert provenance["P_eq_Pa"] != pytest.approx(
+        root * provenance["P_reference_Antoine_Pa"]
+    )
+
+
+def test_ellingham_graph_gas_basis_pressure_uses_standard_pressure(
+    vapor_pressure_data,
+):
+    temperature_K = 1773.15
+    pO2_bar = 1e-3
+    a_oxide = 0.5
+    root = ellingham_graph.metal_activity_factor(
+        "Mg",
+        temperature_K,
+        pO2_bar,
+        a_oxide=a_oxide,
+        clamp=False,
+    )
+    pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
+        "Mg",
+        temperature_K,
+        pO2_bar,
+        vapor_pressure_data=vapor_pressure_data,
+        a_oxide=a_oxide,
+    )
+
+    assert pressure == pytest.approx(
+        root * vapor_pressure_module.ELLINGHAM_STANDARD_PRESSURE_PA
+    )
+
+
+def test_condensed_basis_ellingham_pressure_uses_raoult_psat(
+    vapor_pressure_data,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    account = dict(_COMPOSITION_SENSITIVITY_BASE_MOL)
+    request = _composition_sensitivity_request(account)
+    result = provider.dispatch(request)
+    diagnostic = result.diagnostic or {}
+
+    provenance = diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
+    root = provenance["raw_metal_activity_root"]
+    assert provenance["metal_standard_state"] == "condensed"
+    assert provenance["pressure_rail"] == "condensed_raoult_psat"
+    assert provenance["P_eq_Pa"] == pytest.approx(
+        min(root, 1.0) * provenance["P_reference_Antoine_Pa"]
+    )
+
+
 def test_neutral_total_pressure_does_not_change_vapor_equilibrium_peq(
     vapor_pressure_data,
 ):
@@ -744,7 +810,9 @@ def test_demaria_1971_na_validation_case_reports_measured_pressure_gap(
 
     assert modeled_p_na > 0.0
     assert p_na_by_T[1538.0] > p_na_by_T[1396.0]
-    assert gap_factor == pytest.approx(31.19182575, rel=1e-6)
+    # E-08: the selected Na Ellingham row is gas-basis, so the runtime
+    # pressure is f_Na = a_Na(g) * p° rather than a second P_sat multiplier.
+    assert gap_factor == pytest.approx(5.056080393750948, rel=1e-6)
 
 
 class _LegacyFallbackStub(EquilibriumMixin):
@@ -1211,7 +1279,7 @@ def test_legacy_fallback_marks_pseudo_vaporock_sources_non_authoritative(
         assert "builtin_authoritative" not in source
 
 
-def test_builtin_provider_marks_mn_above_nbp_source_extrapolation(
+def test_builtin_provider_marks_mn_above_nbp_pure_component_extrapolation(
     vapor_pressure_data,
 ):
     stub = _LegacyFallbackStub(vapor_pressure_data, melt=_MnAboveNbpMelt())
@@ -1220,10 +1288,9 @@ def test_builtin_provider_marks_mn_above_nbp_source_extrapolation(
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
     assert result.vapor_pressures_source["Mn"] == (
-        "builtin_extrapolation_limited:pure_component_extrapolated:"
+        "builtin_authoritative:pure_component_extrapolated:"
         "extrapolated_beyond_source_certified_range_K:"
-        "extrapolated_beyond_valid_range_K:"
-        "extrapolated_beyond_ellingham_fit_range_K"
+        "extrapolated_beyond_valid_range_K"
     )
 
 

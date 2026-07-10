@@ -23,6 +23,8 @@ from typing import Any
 ELLINGHAM_FIT_RANGE_K = (1100.0, 1700.0)
 ELLINGHAM_MBAR_FIT_RANGE_K = (1100.0, 2200.0)
 ELLINGHAM_AUTHORITY_LIMIT_FLAG = "authority_limited_by_ellingham_fit_range"
+ELLINGHAM_METAL_PHASE_GAS = "gas"
+ELLINGHAM_METAL_PHASE_CONDENSED = "condensed"
 
 
 @dataclass(frozen=True)
@@ -600,6 +602,16 @@ def ellingham_segment_for_temperature(
     if T_K < segments[0].range_K[0]:
         return segments[0]
     return segments[-1]
+
+
+def ellingham_metal_phase_kind(species: str, temperature_K: float) -> str:
+    """Return the metal standard-state rail carried by the active row."""
+
+    segment = ellingham_segment_for_temperature(species, temperature_K)
+    phase_basis = str(segment.phase_basis)
+    if f"{species}(g)" in phase_basis:
+        return ELLINGHAM_METAL_PHASE_GAS
+    return ELLINGHAM_METAL_PHASE_CONDENSED
 
 
 def ellingham_delta_g_kj_per_mol_o2(

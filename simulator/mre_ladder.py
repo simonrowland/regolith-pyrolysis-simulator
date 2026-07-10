@@ -6,8 +6,12 @@ import math
 from dataclasses import dataclass
 from typing import Any
 
-from simulator.chemistry import ellingham_graph
-from simulator.chemistry.ellingham_thermo import ellingham_fit_extrapolation
+from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_METAL_PHASE_CONDENSED,
+    ellingham_fit_extrapolation,
+    ellingham_metal_phase_kind,
+    ellingham_segment_for_temperature,
+)
 from simulator.physical_constants import FARADAY
 
 # Static decomposition voltages at ~1873 K / ~1600 C (V).
@@ -52,6 +56,9 @@ MRE_REFERENCE_TEMPERATURE_K = 1873.15
 MRE_GRAPH_AUTHORITY = "ellingham_graph"
 MRE_GRAPH_FALLBACK_AUTHORITY = "ellingham_fallback"
 MRE_DECLARED_AUTHORITY = "operator_declared"
+MRE_MN_DIAGNOSTIC_STATUS = (
+    "diagnostic_reconstructed_mn_row_not_authoritative_for_mre"
+)
 
 MRE_ELLINGHAM_METAL_BY_OXIDE = {
     "Na2O": "Na",
@@ -77,6 +84,8 @@ class MREDecompositionVoltageReference:
     status: str
     ellingham_species: str | None = None
     raw_graph_voltage_V: float | None = None
+    metal_product_phase: str | None = None
+    ellingham_phase_basis: str | None = None
 
 
 def _coerce_temperature_K(temperature_K: float | None) -> float:
@@ -102,15 +111,17 @@ def mre_decomposition_voltage_reference(
     metal_species = MRE_ELLINGHAM_METAL_BY_OXIDE.get(oxide)
     failure_status: str | None = None
     raw_graph_voltage_V: float | None = None
+    metal_product_phase: str | None = None
+    ellingham_phase_basis: str | None = None
 
     if metal_species is None:
         failure_status = "ellingham_query_failed:species_not_graph_covered"
     else:
         try:
-            delta_g_kj_per_mol_o2 = ellingham_graph.dissociation_delta_g(
-                metal_species,
-                T_K,
-            )
+            segment = ellingham_segment_for_temperature(metal_species, T_K)
+            delta_g_kj_per_mol_o2 = segment.delta_g_kJ_per_mol_O2(T_K)
+            metal_product_phase = ellingham_metal_phase_kind(metal_species, T_K)
+            ellingham_phase_basis = segment.phase_basis
         except Exception as exc:
             failure_status = f"ellingham_query_failed:{type(exc).__name__}"
         else:
@@ -135,15 +146,22 @@ def mre_decomposition_voltage_reference(
             elif extrapolation is not None:
                 failure_status = "ellingham_extrapolation_refused:extrapolation_limited"
             else:
+                authoritative = True
+                status = "ok"
+                if oxide == "MnO":
+                    authoritative = False
+                    status = MRE_MN_DIAGNOSTIC_STATUS
                 return MREDecompositionVoltageReference(
                     oxide=oxide,
                     voltage=voltage,
                     temperature_K=T_K,
                     authority=MRE_GRAPH_AUTHORITY,
-                    authoritative=True,
-                    status="ok",
+                    authoritative=authoritative,
+                    status=status,
                     ellingham_species=metal_species,
                     raw_graph_voltage_V=raw_graph_voltage_V,
+                    metal_product_phase=metal_product_phase,
+                    ellingham_phase_basis=ellingham_phase_basis,
                 )
 
     fallback_voltage = DECOMP_VOLTAGES.get(oxide)
@@ -158,6 +176,8 @@ def mre_decomposition_voltage_reference(
         status=failure_status or "ellingham_query_failed:unknown",
         ellingham_species=metal_species,
         raw_graph_voltage_V=raw_graph_voltage_V,
+        metal_product_phase=metal_product_phase or ELLINGHAM_METAL_PHASE_CONDENSED,
+        ellingham_phase_basis=ellingham_phase_basis,
     )
 
 
@@ -170,6 +190,8 @@ def _reference_metadata(
         "voltage_status": reference.status,
         "voltage_temperature_K": reference.temperature_K,
         "ellingham_species": reference.ellingham_species,
+        "metal_product_phase": reference.metal_product_phase,
+        "ellingham_phase_basis": reference.ellingham_phase_basis,
     }
 
 # Fallback ladder used when the YAML MRE sequence is missing/unusable. Rung

@@ -15,7 +15,8 @@ Faraday / CE formulas).
 The provider:
 
 - reads ``process.cleaned_melt`` (debit source for parent oxide),
-  ``process.metal_phase`` (cathode product credit), and
+  ``process.metal_phase`` or ``process.overhead_gas`` (product credit
+  matching the Ellingham metal standard state used for E0), and
   ``terminal.oxygen_mre_anode_stored`` (anode O2 credit) via the
   filtered :class:`ProviderAccountView`. Terminal *credits* are allowed
   through the canonical kernel commit path; terminal *debits* are
@@ -62,8 +63,8 @@ migration (after EVAPORATION_TRANSITION and CONDENSATION_ROUTE) --
 dispatch time AND again at commit time.
 
 Account declaration: ``process.cleaned_melt`` (debit),
-``process.metal_phase`` (credit), ``terminal.oxygen_mre_anode_stored``
-(credit). The MRE anode O2 is its OWN bin per binding spec §3 and
+``process.metal_phase`` / ``process.overhead_gas`` (credit),
+``terminal.oxygen_mre_anode_stored`` (credit). The MRE anode O2 is its OWN bin per binding spec §3 and
 AGENTS.md #6 -- distinct from ``terminal.oxygen_melt_offgas_stored``
 (evaporation O2 coproduct), ``terminal.oxygen_stage0_stored`` (Stage 0
 oxidative pretreatment), and any overhead-headspace transient. The
@@ -95,6 +96,10 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_METAL_PHASE_CONDENSED,
+    ELLINGHAM_METAL_PHASE_GAS,
+)
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_reference
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, FARADAY
@@ -228,6 +233,12 @@ for _oxide, _row in MRE_DECOMP_VOLTAGE_PROVENANCE.items():
             -_reference.voltage * 4.0 * FARADAY / 1000.0
         )
         _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
+    elif _reference.authority == "ellingham_graph":
+        _row["status"] = "diagnostic_ellingham_graph"
+        _row["delta_g_kJ_per_mol_O2"] = (
+            -_reference.voltage * 4.0 * FARADAY / 1000.0
+        )
+        _row["delta_g_relation"] = "DeltaG_dissoc = -E*4F"
     else:
         _row["status"] = "ellingham_fallback"
 
@@ -246,6 +257,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
     DECLARED_ACCOUNTS = frozenset({
         "process.cleaned_melt",
         "process.metal_phase",
+        "process.overhead_gas",
         "terminal.oxygen_mre_anode_stored",
     })
 
@@ -358,6 +370,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "oxides_reduced_mol": {},
             "metals_produced_kg": {},
             "metals_produced_mol": {},
+            "gas_products_produced_kg": {},
+            "gas_products_produced_mol": {},
             "oxides_produced_kg": {},
             "oxides_produced_mol": {},
             "oxide_charge_electrons": {},
@@ -380,9 +394,12 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "mre_decomposition_voltage_authority_by_oxide": {},
             "mre_decomposition_voltage_authoritative_by_oxide": {},
             "mre_decomposition_voltage_status_by_oxide": {},
+            "mre_metal_product_phase_by_oxide": {},
+            "mre_ellingham_phase_basis_by_oxide": {},
             "mre_raw_graph_requirement_V_by_oxide": {},
             "mre_raw_voltage_margin_V_by_oxide": {},
             "mre_raw_margin_refused_targets": {},
+            "mre_phase_refused_targets": {},
             "melt_fO2_log": melt_fO2_log,
             "fe_redox_policy": str(request.fe_redox_policy),
             "fe_redox_split": self._compute_fe_redox_split_diagnostic(
@@ -425,7 +442,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # Find all reducible species at this voltage. Mirrors
         # ElectrolysisModel.step_hour line-for-line: same graph-first E0,
         # same Nernst formula, same 1e-6 kg gate, same gamma-X activity.
-        reducible: list[tuple[str, float, float, float, str]] = []
+        reducible: list[tuple[str, float, float, float, str, Any]] = []
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if allowed_oxides is not None and oxide not in allowed_oxides:
                 continue
@@ -453,6 +470,12 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 )
                 diagnostic["mre_decomposition_voltage_status_by_oxide"][oxide] = (
                     voltage_reference.status
+                )
+                diagnostic["mre_metal_product_phase_by_oxide"][oxide] = (
+                    voltage_reference.metal_product_phase
+                )
+                diagnostic["mre_ellingham_phase_basis_by_oxide"][oxide] = (
+                    voltage_reference.ellingham_phase_basis
                 )
             E_nernst = self._nernst_voltage(
                 oxide,
@@ -502,9 +525,31 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 continue
 
             if fallback_margin_V > 0.0:
+                product_phase = (
+                    None if voltage_reference is None
+                    else voltage_reference.metal_product_phase
+                )
+                if product_phase not in (
+                    ELLINGHAM_METAL_PHASE_CONDENSED,
+                    ELLINGHAM_METAL_PHASE_GAS,
+                ):
+                    diagnostic["mre_phase_refused_targets"][oxide] = {
+                        "reason": "mre_product_phase_missing_or_unknown",
+                        "metal_product_phase": product_phase,
+                        "voltage_status": (
+                            None if voltage_reference is None
+                            else voltage_reference.status
+                        ),
+                    }
+                    continue
                 overvoltage = fallback_margin_V
                 reducible.append((
-                    oxide, E_nernst, overvoltage, activity, "oxide_to_metal"
+                    oxide,
+                    E_nernst,
+                    overvoltage,
+                    activity,
+                    "oxide_to_metal",
+                    voltage_reference,
                 ))
 
         if composition_kg.get("Fe2O3", 0.0) >= 1e-6:
@@ -531,6 +576,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                     voltage_V - E_ferric,
                     activity,
                     "ferric_to_ferrous",
+                    None,
                 ))
 
         if not reducible:
@@ -540,6 +586,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             if diagnostic["mre_raw_margin_refused_targets"]:
                 status = "refused"
                 diagnostic["reason_refused"] = MRE_RAW_MARGIN_REFUSAL
+            if diagnostic["mre_phase_refused_targets"]:
+                status = "refused"
+                diagnostic["reason_refused"] = "mre_product_phase_mismatch_refused"
             return IntentResult(
                 intent=ChemistryIntent.ELECTROLYSIS_STEP,
                 status=status,
@@ -565,7 +614,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # weight by concentration * exp(overvoltage), capped at dV=3.0).
         # Mirrors ElectrolysisModel.step_hour. [SEL-1]
         weights: dict[str, float] = {}
-        for oxide, _E, dV, a, _mode in reducible:
+        for oxide, _E, dV, a, _mode, _reference in reducible:
             weights[oxide] = a * math.exp(min(dV, 3.0))
         total_weight = sum(weights.values())
         if total_weight <= 0.0:
@@ -591,13 +640,14 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # contribute to the same metal, so additive bookkeeping mirrors legacy
         # exactly). Fe2O3 is not a fixed MRE oxide in live redox mode.
         metal_mol_total: dict[str, float] = {}
+        gas_mol_total: dict[str, float] = {}
         O2_mol_total = 0.0
         oxide_mol_total: dict[str, float] = {}
         billable_current_A = 0.0
         any_capped = False
         oxide_produced_mol_total: dict[str, float] = {}
 
-        for oxide, _E, dV, _a, mode in reducible:
+        for oxide, _E, dV, _a, mode, voltage_reference in reducible:
             fraction = weights[oxide] / total_weight
             I_species = current_A * fraction
 
@@ -703,15 +753,33 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             M_metal_gmol = MOLAR_MASS[metal]
             metal_mol = moles_reduced * n_met
             metal_kg = metal_mol * M_metal_gmol / 1000.0
-            diagnostic["metals_produced_kg"][metal] = (
-                diagnostic["metals_produced_kg"].get(metal, 0.0) + metal_kg
+            product_phase = (
+                ELLINGHAM_METAL_PHASE_CONDENSED
+                if voltage_reference is None
+                else voltage_reference.metal_product_phase
             )
-            diagnostic["metals_produced_mol"][metal] = (
-                diagnostic["metals_produced_mol"].get(metal, 0.0) + metal_mol
-            )
-            metal_mol_total[metal] = (
-                metal_mol_total.get(metal, 0.0) + metal_mol
-            )
+            if product_phase == ELLINGHAM_METAL_PHASE_GAS:
+                diagnostic["gas_products_produced_kg"][metal] = (
+                    diagnostic["gas_products_produced_kg"].get(metal, 0.0)
+                    + metal_kg
+                )
+                diagnostic["gas_products_produced_mol"][metal] = (
+                    diagnostic["gas_products_produced_mol"].get(metal, 0.0)
+                    + metal_mol
+                )
+                gas_mol_total[metal] = (
+                    gas_mol_total.get(metal, 0.0) + metal_mol
+                )
+            else:
+                diagnostic["metals_produced_kg"][metal] = (
+                    diagnostic["metals_produced_kg"].get(metal, 0.0) + metal_kg
+                )
+                diagnostic["metals_produced_mol"][metal] = (
+                    diagnostic["metals_produced_mol"].get(metal, 0.0) + metal_mol
+                )
+                metal_mol_total[metal] = (
+                    metal_mol_total.get(metal, 0.0) + metal_mol
+                )
 
             # O2 produced. n_oxy = atoms of O per oxide formula unit
             # (e.g. SiO2 -> n_oxy=2 -> 1 mol O2 per mol SiO2).
@@ -756,6 +824,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             credits_mol["process.cleaned_melt"] = dict(oxide_produced_mol_total)
         if metal_mol_total:
             credits_mol["process.metal_phase"] = dict(metal_mol_total)
+        if gas_mol_total:
+            credits_mol["process.overhead_gas"] = dict(gas_mol_total)
         if O2_mol_total > 0.0:
             credits_mol["terminal.oxygen_mre_anode_stored"] = {
                 "O2": O2_mol_total,

@@ -16,15 +16,18 @@ from pathlib import Path
 from typing import Any
 
 from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_segments,
+    ellingham_metal_phase_kind,
     ellingham_stoichiometry,
 )
 
 # Match simulator.state.GAS_CONSTANT without importing simulator.state here.
 GAS_CONSTANT_J_PER_MOL_K = 8.31446
 CELSIUS_TO_KELVIN_OFFSET = 273.15
+ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
 
 # Same evaporation floor used by BuiltinVaporPressureProvider.
 EVOLUTION_PRESSURE_FLOOR_PA = 1e-15
@@ -90,6 +93,7 @@ def metal_activity_factor(
     pO2_bar: float,
     *,
     a_oxide: float = 1.0,
+    clamp: bool = True,
 ) -> float:
     """Ellingham metal activity ``a_M`` at ``(T, pO2)`` with ``a_oxide``."""
 
@@ -99,7 +103,8 @@ def metal_activity_factor(
     numerator = K * (max(float(a_oxide), 0.0) ** n_ox) / pO2
     if numerator <= 0.0:
         return 0.0
-    return min(numerator ** (1.0 / n_M), 1.0)
+    root = numerator ** (1.0 / n_M)
+    return min(root, 1.0) if clamp else root
 
 
 def _load_default_vapor_pressure_data() -> dict[str, Any]:
@@ -180,6 +185,15 @@ def effective_equilibrium_pressure_Pa(
                 )
                 P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
             return max(P_eq_Pa, 0.0)
+        metal_phase_kind = ellingham_metal_phase_kind(species, T_K)
+        if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
+            # Gas-standard Ellingham roots are fugacity ratios, f_M/p0.
+            # The consistent pressure is root*p0; condensed P_sat belongs
+            # only to condensed-standard Raoultian rows.
+            a_M = metal_activity_factor(
+                species, T_K, pO2, a_oxide=a_ox, clamp=False
+            )
+            return a_M * ELLINGHAM_STANDARD_PRESSURE_PA
         a_M = metal_activity_factor(species, T_K, pO2, a_oxide=a_ox)
         return a_M * P_reference_Pa
 
@@ -253,11 +267,16 @@ def evolution_order(
         )
         metal_activity = None
         if species in ELLINGHAM_THERMO:
+            clamp_activity = (
+                ellingham_metal_phase_kind(species, temperature_K)
+                != ELLINGHAM_METAL_PHASE_GAS
+            )
             metal_activity = metal_activity_factor(
                 species,
                 temperature_K,
                 pO2_bar,
                 a_oxide=a_oxide,
+                clamp=clamp_activity,
             )
         ranked.append(
             EvolutionRankEntry(

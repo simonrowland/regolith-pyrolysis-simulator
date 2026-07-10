@@ -260,6 +260,8 @@ def _runtime_recovered_reference_pressure_pa(
 
 
 def _recovered_reference_pressure_pa(emitted_pa: float, provenance: dict) -> float:
+    if "P_reference_Antoine_Pa" in provenance:
+        return provenance["P_reference_Antoine_Pa"]
     activity_factor = provenance["activity_factor"]
     gamma = provenance.get("melt_oxide_gamma")
     if gamma is not None:

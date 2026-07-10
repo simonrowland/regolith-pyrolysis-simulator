@@ -154,10 +154,21 @@ def test_mre_decomp_voltage_provenance_sidecar_covers_each_rung() -> None:
             assert row["standard_voltage_status"] == "ok"
             assert row["delta_g_relation"] == "DeltaG_dissoc = -E*4F"
         else:
-            assert row["standard_voltage_V"] == pytest.approx(voltage)
-            assert row["standard_voltage_authority"] == "ellingham_fallback"
+            if oxide == "MnO":
+                assert row["standard_voltage_authority"] == "ellingham_graph"
+                assert row["standard_voltage_authoritative"] is False
+                assert row["status"] == "diagnostic_ellingham_graph"
+                assert row["standard_voltage_status"] == (
+                    "diagnostic_reconstructed_mn_row_not_authoritative_for_mre"
+                )
+                assert row["delta_g_relation"] == "DeltaG_dissoc = -E*4F"
+            else:
+                assert row["standard_voltage_V"] == pytest.approx(voltage)
+                assert row["standard_voltage_authority"] == "ellingham_fallback"
+                assert row["standard_voltage_authoritative"] is False
+                assert row["status"] == "ellingham_fallback"
+                continue
             assert row["standard_voltage_authoritative"] is False
-            assert row["status"] == "ellingham_fallback"
 
 
 def test_fallback_ladder_voltages_pin_canonical_literals() -> None:
@@ -169,7 +180,7 @@ def test_fallback_ladder_voltages_pin_canonical_literals() -> None:
     expected_voltage_by_species = {
         "NiO": 0.39,
         "FeO": 0.804340,
-        "MnO": 1.050000,
+        "MnO": 1.254731,
         "Cr2O3": 1.118868,
         "SiO2": 1.491058,
         "TiO2": 1.575521,
@@ -188,8 +199,14 @@ def test_fallback_ladder_voltages_pin_canonical_literals() -> None:
         ), (
             f"fallback voltage for {oxide} drifted from the canonical literal"
         )
-        if oxide in {"NiO", "MnO"}:
+        if oxide == "NiO":
             assert rung["voltage_authority"] == "ellingham_fallback"
+        elif oxide == "MnO":
+            assert rung["voltage_authority"] == "ellingham_graph"
+            assert rung["voltage_authoritative"] is False
+            assert rung["voltage_status"] == (
+                "diagnostic_reconstructed_mn_row_not_authoritative_for_mre"
+            )
         else:
             assert rung["voltage_authority"] == "ellingham_graph"
 

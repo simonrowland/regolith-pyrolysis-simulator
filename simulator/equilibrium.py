@@ -5,11 +5,13 @@ from __future__ import annotations
 import math
 
 from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
     ellingham_authority_diagnostic,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_extrapolation,
     ellingham_fit_range_K,
+    ellingham_metal_phase_kind,
     ellingham_stoichiometry,
 )
 from simulator.chemistry.melt_activity import melt_oxide_activity
@@ -31,6 +33,7 @@ _O2_CONTROLLED_ATMOSPHERES = frozenset({
     Atmosphere.CONTROLLED_O2_FLOW,
     Atmosphere.O2_BACKPRESSURE,
 })
+_ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
 
 class EquilibriumMixin:
     def _get_equilibrium(self):
@@ -131,16 +134,18 @@ class EquilibriumMixin:
     #
     #   K = exp(ΔG_f / (R × T))   [K < 1 since ΔG_f < 0]       [ELLI-2]
     #
-    # For the decomposition reaction per mol O₂:
-    #   n_ox × oxide(melt) → n_M × Metal(liquid) + O₂(gas)
+    # For the decomposition reaction per mol O₂, the selected Ellingham row
+    # supplies the metal standard state:
+    #   n_ox × oxide(melt) → n_M × Metal(phase_basis) + O₂(gas)
     #
-    # The equilibrium liquid metal activity in the melt is:
+    # The equilibrium metal activity root is:
     #
     #   a_M(l) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)          [ELLI-3]
     #
-    # The effective metal vapor pressure above the melt is:
+    # The effective metal vapor pressure above the melt is rail-specific:
     #
-    #   P_metal(g) = a_M(l) × P_reference(T)                    [ELLI-4]
+    #   condensed row: P_metal(g) = a_M(cond) × P_reference(T)   [ELLI-4a]
+    #   gas row:       P_metal(g) = a_M(g) × p°                 [ELLI-4b]
     #
     # where P_reference comes from vapor_pressures.yaml. It is
     # pure-component / first-principles only when
@@ -528,7 +533,7 @@ class EquilibriumMixin:
             # ΔG_f in kJ, R in J/(mol·K) → multiply by 1000
             K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
 
-            # a_M(l) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
+            # a_M(row basis) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
             dissociation_pO2_bar = (
                 pO2_bar if parent_oxide == 'FeO' else melt_dissociation_pO2_bar
             )
@@ -541,17 +546,21 @@ class EquilibriumMixin:
             if numerator <= 0:
                 continue
 
-            a_M_liquid = numerator ** (1.0 / n_M)
-
-            # Clamp to physical range (activity can't exceed 1.0 for
-            # a pure substance, and metal pool formation changes regime)
-            a_M_liquid = min(a_M_liquid, 1.0)
+            metal_activity_root = numerator ** (1.0 / n_M)
 
             # --- Effective vapor pressure ---                     [ELLI-4]
             #
-            # P_metal = a_M(l) × P_reference(T)
+            # Condensed-basis rows produce a Raoultian activity against the
+            # pure-component vapor pressure and may saturate at a metal pool.
+            # Gas-basis rows already produce f_M/p°; multiplying by P_sat again
+            # would double-count the vaporization equilibrium.
+            if ellingham_metal_phase_kind(species, T_K) == ELLINGHAM_METAL_PHASE_GAS:
+                P_effective_Pa = metal_activity_root * _ELLINGHAM_STANDARD_PRESSURE_PA
+            else:
+                P_effective_Pa = min(metal_activity_root, 1.0) * P_reference_Pa
+
             P_effective_Pa = _require_finite_vapor_value(
-                a_M_liquid * P_reference_Pa,
+                P_effective_Pa,
                 species=species,
                 field="P_effective_Pa",
             )

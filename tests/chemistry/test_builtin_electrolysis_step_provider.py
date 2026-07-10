@@ -5,17 +5,16 @@ ledger-mutating intent in the migration.
 Covers:
 
 * Capability profile: the provider is authoritative for
-  ``ELECTROLYSIS_STEP`` and declares the three accounts the MRE
+  ``ELECTROLYSIS_STEP`` and declares the accounts the MRE
   reduction touches (``process.cleaned_melt`` debit,
-  ``process.metal_phase`` credit, ``terminal.oxygen_mre_anode_stored``
-  credit).  The MRE anode O2 bin is intentionally distinct from
+  ``process.metal_phase`` or ``process.overhead_gas`` product credit,
+  ``terminal.oxygen_mre_anode_stored`` credit).  The MRE anode O2 bin is intentionally distinct from
   ``terminal.oxygen_melt_offgas_stored`` and
   ``terminal.oxygen_stage0_stored`` per AGENTS.md #6.
 * Wrong-intent rejection: the provider returns an ``unsupported``
   ``IntentResult`` if dispatched against an intent it does not serve.
 * Account filter: the kernel filter scopes the provider's view to the
-  three declared accounts only -- any other ledger account (overhead
-  gas, condensation_train, alternate O2 bins) is invisible.
+  declared accounts only -- unrelated accounts remain invisible.
 * Atom-balance gate: a malformed proposal that does NOT conserve atoms
   (FeO debit with missing O coproduct) is rejected at
   :meth:`ChemistryKernel.commit_batch` with :class:`AtomBalanceError`.
@@ -91,6 +90,20 @@ def _enable_c5_mre(sim, *, target_species: str, max_voltage_V: float) -> None:
     sim.melt.mre_target_species = target_species
     sim.melt.mre_max_voltage_V = max_voltage_V
     sim.campaign_mgr.c5_enabled = True
+
+
+def _force_fast_redox_liquidus_floor(sim) -> None:
+    def floor_authority():
+        return sim._melt_redox_liquidus_floor_fallback(
+            source="test:electrolysis_full_run_liquidus_floor",
+            reason=(
+                "electrolysis full-run smoke validates MRE ledger/O2 bins; "
+                "live MAGEMin liquidus is covered by dedicated freeze-gate tests"
+            ),
+            liquidus_status="unavailable",
+        )
+
+    sim._melt_redox_liquidus_gate_curve = floor_authority
 
 
 def test_ce_low_feo_colson_haskin_anchor():
@@ -230,14 +243,13 @@ def test_provider_declares_only_electrolysis_step_intent():
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_three_mre_accounts():
-    """The MRE reduction touches melt debit + metal credit + anode O2.
+def test_provider_declares_mre_accounts():
+    """The MRE reduction touches melt debit + product credit + anode O2.
 
     The anode O2 bin is its own terminal account per binding spec §3
     and AGENTS.md #6 (distinct from melt-offgas, Stage-0, headspace).
     Verifying the declared set explicitly stops a future refactor from
-    silently widening the surface (e.g. crediting overhead_gas or any
-    other O2 bin).
+    silently routing gas-basis products to the wrong surface.
     """
 
     provider = BuiltinElectrolysisStepProvider()
@@ -245,12 +257,12 @@ def test_provider_declares_three_mre_accounts():
     assert profile.declared_accounts == frozenset({
         "process.cleaned_melt",
         "process.metal_phase",
+        "process.overhead_gas",
         "terminal.oxygen_mre_anode_stored",
     })
     # Explicit non-membership: the four O2 bins are distinct.
     assert "terminal.oxygen_melt_offgas_stored" not in profile.declared_accounts
     assert "terminal.oxygen_stage0_stored" not in profile.declared_accounts
-    assert "process.overhead_gas" not in profile.declared_accounts
     assert "process.condensation_train" not in profile.declared_accounts
 
 
@@ -409,9 +421,9 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """When other accounts hold material, the provider must see ONLY
-    the three declared MRE accounts. The kernel account filter is the
-    enforcer (binding spec §7); a process.overhead_gas seed must NOT
-    cross the boundary into this provider's view.
+    the declared MRE accounts. The kernel account filter is the
+    enforcer (binding spec §7); condensation_train remains outside
+    this provider's view.
     """
 
     sim = _build_sim(
@@ -454,13 +466,13 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     expected = frozenset({
         "process.cleaned_melt",
         "process.metal_phase",
+        "process.overhead_gas",
         "terminal.oxygen_mre_anode_stored",
     })
     for accounts in seen_accounts:
         assert accounts == expected, (
             "kernel filter leaked an undeclared account into the provider"
         )
-        assert "process.overhead_gas" not in accounts
         assert "process.condensation_train" not in accounts
         assert "terminal.oxygen_melt_offgas_stored" not in accounts
 
@@ -1173,6 +1185,7 @@ def _dispatch_provider_and_legacy_for_pure_oxide(
                 sim.atom_ledger.mol_by_account("process.cleaned_melt")
             ),
             "process.metal_phase": {},
+            "process.overhead_gas": {},
             "terminal.oxygen_mre_anode_stored": {},
         },
         species_formula_registry=sim.species_formula_registry,
@@ -1226,6 +1239,42 @@ def test_energy_stays_commanded_when_oxide_does_not_deplete(
     assert diagnostic["energy_kWh"] == pytest.approx(
         commanded_energy_kWh, rel=1e-12
     )
+
+
+def test_mgo_mre_uses_gas_basis_product_credit_at_c5_hold(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    temperature_C = 1575.0
+    temperature_K = temperature_C + 273.15
+    reference = mre_decomposition_voltage_reference("MgO", temperature_K=temperature_K)
+    assert reference is not None
+    assert reference.voltage == pytest.approx(1.81928, abs=1e-5)
+    assert reference.metal_product_phase == "gas"
+
+    _legacy, result = _dispatch_provider_and_legacy_for_pure_oxide(
+        sim=sim,
+        oxide="MgO",
+        oxide_kg=10.0,
+        voltage_V=reference.voltage + 0.2,
+        current_A=200.0,
+        temperature_C=temperature_C,
+    )
+    proposal = result.transition
+    diagnostic = dict(result.diagnostic)
+
+    assert proposal is not None
+    assert "Mg" not in proposal.credits.get("process.metal_phase", {})
+    assert proposal.credits["process.overhead_gas"]["Mg"] == pytest.approx(
+        diagnostic["gas_products_produced_mol"]["Mg"]
+    )
+    assert diagnostic["mre_metal_product_phase_by_oxide"]["MgO"] == "gas"
+    assert "Mg(g)" in diagnostic["mre_ellingham_phase_basis_by_oxide"]["MgO"]
 
 
 def test_depletion_hour_energy_scales_by_capped_faradaic_charge(
@@ -1817,8 +1866,8 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
       we know the kernel-committed ELECTROLYSIS_STEP path actually
       fired across the C5 campaign),
     * each MRE transition strictly debits cleaned_melt and credits
-      metal_phase + oxygen_mre_anode_stored (no overhead_gas /
-      condensation_train / alternate-O2-bin leak),
+      metal_phase or overhead_gas product + oxygen_mre_anode_stored
+      (no condensation_train / alternate-O2-bin leak),
     * each transition closes mass within a tight 1 mg per-transition
       tolerance,
     * the cumulative per-transition mass imbalance stays within a
@@ -1842,6 +1891,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
         setpoints_data,
         additives_kg=additives_kg,
     )
+    _force_fast_redox_liquidus_floor(sim)
     _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.60)
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {
@@ -1880,6 +1930,7 @@ def test_full_run_mass_balance_holds_with_kernel_committed_electrolysis(
     allowed_credit_accounts = {
         "process.cleaned_melt",
         "process.metal_phase",
+        "process.overhead_gas",
         "terminal.oxygen_mre_anode_stored",
     }
     cumulative_imbalance_kg = 0.0
@@ -1955,6 +2006,7 @@ def test_full_run_o2_yields_split_across_distinct_bins(
         setpoints_data,
         additives_kg=additives_kg,
     )
+    _force_fast_redox_liquidus_floor(sim)
     _enable_c5_mre(sim, target_species="SiO2", max_voltage_V=1.60)
     sim.start_campaign(CampaignPhase.C0)
     decision_choice = {

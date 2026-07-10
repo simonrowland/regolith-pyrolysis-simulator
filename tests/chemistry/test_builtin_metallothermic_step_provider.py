@@ -1314,6 +1314,11 @@ def test_c6_mg_thermite_primary_matches_legacy_stoich(
             "reaction_family": REACTION_FAMILY_C6_MG,
             "reagent_available_kg": Mg_reagent_kg,
             "liquid_fraction": liquid_fraction,
+            "JANAF_4th_multiphase_margin_kJ_per_mol_O2": {
+                "Mg_Al_crossover_C": 1471.4,
+            },
+            "kinetic_driven_above_crossover": True,
+            "kinetic_note": "test-local thermite support",
             "dt_hr": 1.0,
         },
     )
@@ -1383,6 +1388,11 @@ def _c6_mg_primary_request(sim, *, liquid_fraction):
             "reaction_family": REACTION_FAMILY_C6_MG,
             "reagent_available_kg": 50.0,
             "liquid_fraction": liquid_fraction,
+            "JANAF_4th_multiphase_margin_kJ_per_mol_O2": {
+                "Mg_Al_crossover_C": 1471.4,
+            },
+            "kinetic_driven_above_crossover": True,
+            "kinetic_note": "test-local thermite support",
             "dt_hr": 1.0,
         },
     )
@@ -1411,6 +1421,50 @@ def test_c6_mg_thermite_invalid_liquid_fraction_preserves_legacy_fallthrough(
     )
     assert divergence["effective_regime"] == "partial"
     assert divergence["liquid_fraction_invalid"] == "non_finite"
+
+
+def test_c6_mg_thermite_refuses_above_crossover_without_local_support(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=_c6_mg_primary_request(
+                sim,
+                liquid_fraction=None,
+            ).account_view,
+            temperature_C=1500.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C6_MG,
+                "reagent_available_kg": 50.0,
+                "liquid_fraction": None,
+                "JANAF_4th_multiphase_margin_kJ_per_mol_O2": {
+                    "Mg_Al_crossover_C": 1471.4,
+                    "Mg_Al_1500C": -5.6,
+                },
+                "kinetic_driven_above_crossover": False,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == (
+        BuiltinMetallothermicStepProvider.C6_ABOVE_CROSSOVER_REFUSAL
+    )
+    assert result.diagnostic["c6_above_mg_al_crossover"] is True
+    assert result.diagnostic["c6_local_thermite_support"] is False
+    assert result.diagnostic["c6_mg_al_margin_kJ_per_mol_O2"] < 0.0
 
 
 def test_c6_mg_thermite_primary_refuses_no_liquid(

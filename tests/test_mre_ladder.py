@@ -93,8 +93,8 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         "NiO",
         "Na2O",
         "FeO",
-        "MnO",
         "Cr2O3",
+        "MnO",
         "SiO2",
         "TiO2",
         "MgO",
@@ -106,8 +106,8 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         0.39,
         0.408926,
         0.804340,
-        1.050000,
         1.118868,
+        1.254731,
         1.491058,
         1.575521,
         1.792604,
@@ -128,11 +128,13 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         10,
     ]
     assert sequence[1]["voltage_authority"] == "ellingham_fallback"
-    assert sequence[4]["voltage_authority"] == "ellingham_fallback"
+    assert sequence[5]["voltage_authority"] == "ellingham_graph"
+    assert sequence[5]["voltage_authoritative"] is False
+    assert sequence[5]["voltage_status"] == mre_ladder.MRE_MN_DIAGNOSTIC_STATUS
     assert all(
         entry["voltage_authority"] == "ellingham_graph"
         for idx, entry in enumerate(sequence)
-        if idx not in {1, 4}
+        if idx != 1
     )
 
 
@@ -172,8 +174,8 @@ def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
     )
     assert ordered == [
         "FeO",
-        "MnO",
         "Cr2O3",
+        "MnO",
         "SiO2",
         "TiO2",
         "MgO",
@@ -202,6 +204,32 @@ def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
     assert al_high == pytest.approx(1.857324, abs=1e-6)
     assert mg_high == pytest.approx(1.792604, abs=1e-6)
     assert mg_high < al_high
+
+
+def test_mre_reference_carries_gas_phase_basis_for_mg_anchor():
+    ref = mre_ladder.mre_decomposition_voltage_reference(
+        "MgO",
+        temperature_K=1848.15,
+    )
+
+    assert ref is not None
+    assert ref.authority == "ellingham_graph"
+    assert ref.authoritative is True
+    assert ref.voltage == pytest.approx(1.81928, abs=1e-5)
+    assert ref.metal_product_phase == "gas"
+    assert "Mg(g)" in str(ref.ellingham_phase_basis)
+
+
+def test_mn_graph_voltage_is_diagnostic_for_mre_consumption():
+    ref = mre_ladder.mre_decomposition_voltage_reference(
+        "MnO",
+        temperature_K=1600.0,
+    )
+
+    assert ref is not None
+    assert ref.authority == "ellingham_graph"
+    assert ref.authoritative is False
+    assert ref.status == mre_ladder.MRE_MN_DIAGNOSTIC_STATUS
 
 
 def test_uncovered_mre_voltage_falls_back_to_static_with_flag():
@@ -243,15 +271,17 @@ def test_graph_mre_voltage_refuses_extrapolated_or_nonphysical_authority(
 
 
 def test_graph_mre_voltage_refuses_nonfinite_delta_g(monkeypatch):
-    def fake_delta_g(species: str, temperature_K: float) -> float:
-        assert species == "Fe"
-        return float("inf")
+    class FakeSegment:
+        phase_basis = "2 Fe(l) + O2 -> 2 FeO(s); test"
 
-    monkeypatch.setattr(
-        mre_ladder.ellingham_graph,
-        "dissociation_delta_g",
-        fake_delta_g,
-    )
+        def delta_g_kJ_per_mol_O2(self, temperature_K: float) -> float:
+            return float("inf")
+
+    def fake_segment(species: str, temperature_K: float) -> FakeSegment:
+        assert species == "Fe"
+        return FakeSegment()
+
+    monkeypatch.setattr(mre_ladder, "ellingham_segment_for_temperature", fake_segment)
 
     ref = mre_ladder.mre_decomposition_voltage_reference(
         "FeO",
@@ -521,6 +551,17 @@ def test_c5_ellingham_ladder_diagnostic_emits_and_flags_synthetic_reordering(
             return -500.0
         raise KeyError(species)
 
+    class FakeSegment:
+        def __init__(self, species: str):
+            self.species = species
+            self.phase_basis = f"{species}(l) + O2 -> oxide; test"
+
+        def delta_g_kJ_per_mol_O2(self, temperature_K: float) -> float:
+            return fake_delta_g(self.species, temperature_K)
+
+    def fake_segment(species: str, temperature_K: float) -> FakeSegment:
+        return FakeSegment(species)
+
     def fake_dispatch(_intent, *, control_inputs, **_kwargs):
         captured.append(dict(control_inputs))
         return SimpleNamespace(
@@ -533,11 +574,9 @@ def test_c5_ellingham_ladder_diagnostic_emits_and_flags_synthetic_reordering(
             transition=None,
         )
 
-    monkeypatch.setattr(
-        mre_ladder.ellingham_graph,
-        "dissociation_delta_g",
-        fake_delta_g,
-    )
+    monkeypatch.setattr(mre_ladder, "ellingham_segment_for_temperature", fake_segment)
+    monkeypatch.setattr(mre_ladder, "ellingham_fit_extrapolation", lambda *a, **k: None)
+    monkeypatch.setattr(mre_ladder, "ellingham_metal_phase_kind", lambda *a, **k: "condensed")
     sim._commanded_pO2_bar = lambda: 1.0
     sim._dispatch_only = fake_dispatch
     sim._ledger_account_species_kg = lambda _account, _species: 0.0

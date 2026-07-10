@@ -16,6 +16,7 @@ from simulator.state import (
     MOLAR_MASS,
     OXIDE_TO_METAL,
     CampaignPhase,
+    EvaporationFlux,
 )
 
 
@@ -794,6 +795,66 @@ class ExtractionMixin:
             'species': species_rows,
         }
 
+    def _route_mre_gas_products_to_condensation(
+        self,
+        gas_products_kg: Mapping[str, float],
+    ) -> dict[str, Any]:
+        species_kg = {
+            str(species): float(kg)
+            for species, kg in (gas_products_kg or {}).items()
+            if float(kg) > 1e-12
+        }
+        if not species_kg:
+            return {}
+
+        evap_flux = EvaporationFlux(species_kg_hr=species_kg)
+        evap_flux.update_totals()
+        self._configure_condensation_operating_conditions(evap_flux)
+        route_result = self.condensation_model.route(evap_flux, self.melt)
+        route_diagnostic: dict[str, Any] = {}
+        species_order = tuple(
+            getattr(route_result, 'wall_route_species_order', ()) or (
+                species_kg.keys()
+            )
+        )
+        for species in species_order:
+            if species not in species_kg:
+                continue
+            rate_kg_hr = species_kg[species]
+            remaining_kg_hr = float(
+                route_result.remaining_by_species.get(species, 0.0)
+            )
+            condensed_kg = max(0.0, rate_kg_hr - remaining_kg_hr)
+            sp_data = dict(
+                (self.vapor_pressures.get('metals', {}) or {}).get(
+                    species, {}
+                )
+            )
+            credited_condensed_kg = self._dispatch_condensation_route(
+                species,
+                condensed_kg,
+                sp_data,
+                route_result,
+            )
+            product_projection = self._condensed_products_kg(
+                species,
+                credited_condensed_kg,
+                sp_data,
+            )
+            self._project_condensed_stage_collection(
+                route_result,
+                species,
+                credited_condensed_kg,
+                product_projection,
+            )
+            route_diagnostic[species] = {
+                'gas_product_kg': rate_kg_hr,
+                'credited_condensed_kg': float(credited_condensed_kg),
+                'remaining_kg': float(max(0.0, remaining_kg_hr)),
+                'product_projection_kg': dict(product_projection),
+            }
+        return route_diagnostic
+
     def _step_mre(self) -> float:
         """
         Perform one hour of molten regolith electrolysis (C5 or MRE baseline).
@@ -818,8 +879,10 @@ class ExtractionMixin:
         :meth:`ElectrolysisModel.step_hour` Nernst / Faraday / current-
         efficiency math exactly; the provider emits a
         :class:`LedgerTransitionProposal` debiting
-        ``process.cleaned_melt`` (oxide consumed) and crediting
-        ``process.metal_phase`` (cathode metals) +
+        ``process.cleaned_melt`` (oxide consumed) and crediting either
+        ``process.metal_phase`` (condensed-basis cathode metals) or
+        ``process.overhead_gas`` (gas-basis products routed through
+        the condensation train) +
         ``terminal.oxygen_mre_anode_stored`` (anode O2 -- its OWN bin
         per AGENTS.md #6, distinct from melt-offgas / Stage-0 / overhead
         headspace).  :meth:`ChemistryKernel.commit_batch` is the sole
@@ -1071,10 +1134,17 @@ class ExtractionMixin:
 
         produced_metals = set(result.get('metals_produced_kg', {}) or {})
         produced_metals.update(result.get('metals_produced_mol', {}) or {})
+        produced_gases = set(result.get('gas_products_produced_kg', {}) or {})
+        produced_gases.update(result.get('gas_products_produced_mol', {}) or {})
         metal_before_kg = {
             metal: self._ledger_account_species_kg(
                 'process.metal_phase', metal)
             for metal in produced_metals
+        }
+        gas_before_kg = {
+            metal: self._ledger_account_species_kg(
+                'process.overhead_gas', metal)
+            for metal in produced_gases
         }
         o2_before_kg = self._ledger_account_species_kg(
             'terminal.oxygen_mre_anode_stored', 'O2')
@@ -1141,6 +1211,29 @@ class ExtractionMixin:
                     source_account='process.metal_phase',
                     delta_kg=delta_kg,
                 )
+
+        mre_gas_deltas_kg: dict[str, float] = {}
+        for metal in produced_gases:
+            delta_kg = (
+                self._ledger_account_species_kg(
+                    'process.overhead_gas', metal)
+                - gas_before_kg.get(metal, 0.0)
+            )
+            if delta_kg > 1e-10:
+                mre_gas_deltas_kg[metal] = delta_kg
+        gas_route_diagnostic = self._route_mre_gas_products_to_condensation(
+            mre_gas_deltas_kg
+        )
+        if gas_route_diagnostic:
+            result['mre_gas_condensation_route'] = gas_route_diagnostic
+            for route in gas_route_diagnostic.values():
+                for product, kg in (route.get('product_projection_kg') or {}).items():
+                    amount = float(kg)
+                    if amount > 1e-10:
+                        mre_metal_deltas_kg[str(product)] = (
+                            mre_metal_deltas_kg.get(str(product), 0.0)
+                            + amount
+                        )
 
         self._mre_metals_this_hr = dict(sorted(mre_metal_deltas_kg.items()))
 
@@ -1702,6 +1795,7 @@ class ExtractionMixin:
         # short-circuit BEFORE the back-reduction pass (no primary
         # means nothing for the cascade to consume).
         # ------------------------------------------------------------------
+        c6_cfg = ((self.setpoints or {}).get('campaigns', {}) or {}).get('C6', {}) or {}
         primary_result = self._dispatch_only(
             ChemistryIntent.METALLOTHERMIC_STEP,
             control_inputs={
@@ -1711,6 +1805,14 @@ class ExtractionMixin:
                 'true_available_mol_by_species':
                     self._cleaned_melt_available_mol_by_species(('Al2O3',)),
                 'liquid_fraction': liquid_fraction,
+                'JANAF_4th_multiphase_margin_kJ_per_mol_O2': dict(
+                    c6_cfg.get('JANAF_4th_multiphase_margin_kJ_per_mol_O2')
+                    or {}
+                ),
+                'kinetic_driven_above_crossover': bool(
+                    c6_cfg.get('kinetic_driven_above_crossover')
+                ),
+                'kinetic_note': str(c6_cfg.get('kinetic_note') or ''),
                 'dt_hr': 1.0,
             },
         )

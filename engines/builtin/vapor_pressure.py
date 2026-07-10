@@ -79,12 +79,14 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 # import cycle. Re-exported here under the legacy ``_ELLINGHAM_THERMO`` name
 # (consumed by metallothermic_step, vaporock/provider, and tests).
 from simulator.chemistry.ellingham_thermo import (  # noqa: E402
+    ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_THERMO as _ELLINGHAM_THERMO,
     ellingham_authority_diagnostic,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_extrapolation,
     ellingham_fit_range_K,
+    ellingham_metal_phase_kind,
     ellingham_stoichiometry,
 )
 from simulator.chemistry.melt_activity import (  # noqa: E402
@@ -117,6 +119,7 @@ FIT_TARGET_STANDARD_REACTION = "standard_reaction_term"
 COEFF_BLOCK_ANTOINE = "antoine"
 COEFF_BLOCK_PURE_COMPONENT = "pure_component_antoine"
 PSEUDO_VAPOROCK_CURVE_FIT_SOURCE = "vaporock_backsolved_curve_fit"
+ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
 _BUILTIN_VAPOR_SOURCE_CLASSES = frozenset(
     {
         "builtin_authoritative",
@@ -999,15 +1002,29 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if numerator <= 0:
                 continue
 
-            a_M_liquid = numerator ** (1.0 / n_M)
-            a_M_liquid = _require_finite_vapor_value(
-                a_M_liquid,
+            metal_activity_root = numerator ** (1.0 / n_M)
+            metal_activity_root = _require_finite_vapor_value(
+                metal_activity_root,
                 species=species,
                 field="metal_activity",
             )
-            a_M_liquid = min(a_M_liquid, 1.0)
+            metal_phase_kind = ellingham_metal_phase_kind(species, T_K)
+            if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
+                # Gas-standard rows solve for f_M/p0, so P_M = root * p0.
+                # Pairing this root with condensed Antoine P_sat would count
+                # vaporization twice: P_wrong/P_right = P_sat/p0.
+                activity_factor = metal_activity_root
+                pressure_reference_Pa = ELLINGHAM_STANDARD_PRESSURE_PA
+                pressure_rail = "gas_fugacity"
+            else:
+                # Condensed-standard rows solve a Raoultian metal activity.
+                # Only this rail is capped at pure condensed metal and paired
+                # with Antoine P_sat: P_M = min(root, 1) * P_sat.
+                activity_factor = min(metal_activity_root, 1.0)
+                pressure_reference_Pa = P_reference_Pa
+                pressure_rail = "condensed_raoult_psat"
             P_eq_Pa = _require_finite_vapor_value(
-                a_M_liquid * P_reference_Pa,
+                activity_factor * pressure_reference_Pa,
                 species=species,
                 field="P_eq_Pa",
             )
@@ -1037,12 +1054,16 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "pressure_kind": _runtime_pressure_kind(
                         sp_data,
                         coefficient_block,
-                        effective_scaled=(a_M_liquid != 1.0),
+                        effective_scaled=(activity_factor != 1.0),
                     ),
+                    "pressure_rail": pressure_rail,
+                    "metal_standard_state": metal_phase_kind,
                     "P_reference_Antoine_Pa": P_reference_Pa,
+                    "P_standard_Pa": ELLINGHAM_STANDARD_PRESSURE_PA,
                     "P_eq_Pa": P_eq_Pa,
                     "pO2_bar": dissociation_pO2_bar,
-                    "activity_factor": a_M_liquid,
+                    "activity_factor": activity_factor,
+                    "raw_metal_activity_root": metal_activity_root,
                     "source_label": source_label,
                 }
                 if oxide_activity is not None:
