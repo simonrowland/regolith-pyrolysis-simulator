@@ -14,6 +14,9 @@ from scripts import cache_convert
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 LEGACY_DB = ROOT / "docs-private" / "recipe-db" / "reduced-real.db"
+REVIEWED_DESIGN = (
+    ROOT / "docs-private" / "research" / "2026-07-10-t171-schema" / "design.md"
+)
 
 
 def test_encoder_default_materialization_matches_explicit_defaults():
@@ -84,10 +87,9 @@ def test_account_vector_uses_exact_builtin_tuple_and_sorted_extensions():
     assert all(row[1] for row in vector[:4])
 
 
+@pytest.mark.skipif(not REVIEWED_DESIGN.exists(), reason="private reviewed design absent")
 def test_embedded_ddl_matches_reviewed_design_byte_for_byte():
-    design = (
-        ROOT / "docs-private" / "research" / "2026-07-10-t171-schema" / "design.md"
-    ).read_text(encoding="utf-8")
+    design = REVIEWED_DESIGN.read_text(encoding="utf-8")
     reviewed_sql = design.split("```sql", 1)[1].split("```", 1)[0].strip()
 
     assert cache_convert.DDL.strip() == reviewed_sql
@@ -108,6 +110,115 @@ def test_path_gate_rejects_database_and_report_aliases(tmp_path):
     with pytest.raises(cache_convert.ConversionError, match="same file as the source"):
         cache_convert.convert_database(source, destination, report)
     assert source.read_bytes() == b"immutable-source"
+
+
+def test_path_gate_rejects_source_and_destination_sidecars(tmp_path):
+    source = tmp_path / "source.db"
+    source.write_bytes(b"immutable-source")
+    source_wal = pathlib.Path(str(source) + "-wal")
+    source_wal.write_bytes(b"live-wal")
+    destination = tmp_path / "destination.db"
+
+    with pytest.raises(cache_convert.ConversionError, match="source SQLite sidecar"):
+        cache_convert.convert_database(source, destination, source_wal)
+    with pytest.raises(cache_convert.ConversionError, match="source SQLite sidecar"):
+        cache_convert.convert_database(
+            source, pathlib.Path(str(source) + "-shm"), tmp_path / "report.json"
+        )
+
+    assert source.read_bytes() == b"immutable-source"
+    assert source_wal.read_bytes() == b"live-wal"
+
+
+def test_source_snapshot_identity_includes_committed_wal_state(tmp_path):
+    source = tmp_path / "source.db"
+    writer = sqlite3.connect(source)
+    try:
+        writer.execute("PRAGMA journal_mode=WAL")
+        writer.execute("PRAGMA wal_autocheckpoint=0")
+        writer.execute("CREATE TABLE values_table(value TEXT)")
+        writer.execute("INSERT INTO values_table VALUES ('before')")
+        writer.commit()
+        writer.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        before = cache_convert._source_snapshot(source)
+        main_before = cache_convert.file_sha256(source)
+
+        writer.execute("INSERT INTO values_table VALUES ('wal-only')")
+        writer.commit()
+
+        assert cache_convert.file_sha256(source) == main_before
+        after = cache_convert._source_snapshot(source)
+        assert after["sha256"] != before["sha256"]
+    finally:
+        writer.close()
+
+
+def test_destination_checkpoint_reports_blocking_reader(tmp_path):
+    destination = tmp_path / "destination.db"
+    writer = sqlite3.connect(destination)
+    reader = sqlite3.connect(destination)
+    try:
+        writer.execute("PRAGMA journal_mode=WAL")
+        writer.execute("PRAGMA wal_autocheckpoint=0")
+        writer.execute("CREATE TABLE values_table(value TEXT)")
+        writer.execute("INSERT INTO values_table VALUES ('before')")
+        writer.commit()
+        reader.execute("BEGIN")
+        reader.execute("SELECT * FROM values_table").fetchall()
+        writer.execute("INSERT INTO values_table VALUES ('after')")
+        writer.commit()
+
+        checkpoint = cache_convert._checkpoint_destination(writer, destination)
+
+        assert checkpoint["verified"] is False
+        assert checkpoint["busy"] == 1
+        assert checkpoint["wal_size"] > 0
+    finally:
+        reader.close()
+        writer.close()
+
+
+def test_conversion_cannot_report_complete_when_checkpoint_is_unverified(
+    tmp_path, monkeypatch
+):
+    source = tmp_path / "source.db"
+    with sqlite3.connect(source) as connection:
+        connection.execute(
+            "CREATE TABLE reduced_real_metadata(key TEXT PRIMARY KEY, value TEXT)"
+        )
+        connection.execute(
+            "INSERT INTO reduced_real_metadata VALUES "
+            "('store_schema_version', 'test-v1')"
+        )
+        connection.execute(
+            "CREATE TABLE reduced_real_equilibrium_payloads(value TEXT)"
+        )
+    checkpoint = {
+        "busy": 1,
+        "log_frames": 2,
+        "checkpointed_frames": 1,
+        "wal_size": 4096,
+        "verified": False,
+    }
+    monkeypatch.setattr(
+        cache_convert,
+        "_checkpoint_destination",
+        lambda connection, path: dict(checkpoint),
+    )
+
+    report = cache_convert.convert_database(
+        source,
+        tmp_path / "destination.db",
+        tmp_path / "report.json",
+        enforce_expected_counts=False,
+    )
+
+    assert report["status"] == "failed"
+    assert report["destination_checkpoint"] == checkpoint
+    assert any(
+        failure["error_type"] == "DestinationCheckpointError"
+        for failure in report["failures"]
+    )
 
 
 @pytest.mark.skipif(not LEGACY_DB.exists(), reason="private reduced-real corpus absent")

@@ -512,6 +512,244 @@ def test_incremental_harvest_tracks_source_id_and_skips_replay(tmp_path):
         ).fetchone()[0] == 1_000_000_000
 
 
+def _write_harvest_source(path, *, shard, temperature_C, output):
+    with GridCacheWriter(path) as writer:
+        writer.seed_id_block(shard)
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            _inputs(temperature_C),
+            batch_id=batch_id,
+            shuffle_rank=shard,
+            shard=shard,
+            intended_fO2_log=-9.0,
+        )
+        row = writer.pending_rows(batch_id=batch_id)[0]
+        writer.write_result(row["grid_key_id"], output)
+        writer.commit()
+
+
+def test_harvest_reconciles_lower_ids_from_a_later_database(tmp_path):
+    high = tmp_path / "high.db"
+    low = tmp_path / "low.db"
+    accumulator = tmp_path / "accumulator.db"
+    _write_harvest_source(high, shard=2, temperature_C=1200.0, output=_output())
+    _write_harvest_source(low, shard=0, temperature_C=1100.0, output=_output())
+
+    high_summary = harvest_snapshot(high, accumulator, source_host="studio-1")
+    low_summary = harvest_snapshot(low, accumulator, source_host="studio-1")
+
+    assert high_summary["inserted"] == 1
+    assert low_summary["inserted"] == 1
+    with sqlite3.connect(accumulator) as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 2
+        assert connection.execute(
+            "SELECT COUNT(DISTINCT source_database) FROM harvest_pulled_rows"
+        ).fetchone()[0] == 2
+
+
+def test_harvest_records_payload_conflict_without_marking_row_pulled(tmp_path):
+    first = tmp_path / "first.db"
+    conflicting = tmp_path / "conflicting.db"
+    accumulator = tmp_path / "accumulator.db"
+    _write_harvest_source(first, shard=0, temperature_C=1200.0, output=_output())
+    _write_harvest_source(
+        conflicting,
+        shard=1,
+        temperature_C=1200.0,
+        output=_output("refused"),
+    )
+
+    harvest_snapshot(first, accumulator, source_host="studio-1")
+    conflict_summary = harvest_snapshot(
+        conflicting, accumulator, source_host="studio-1"
+    )
+
+    assert conflict_summary["canonical_conflicts_recorded"] == 1
+    with sqlite3.connect(accumulator) as connection:
+        connection.row_factory = sqlite3.Row
+        conflict = connection.execute("SELECT * FROM harvest_conflicts").fetchone()
+        assert conflict is not None
+        assert json.loads(conflict["incoming_row_json"])["status"] == "refused"
+        assert json.loads(conflict["existing_row_json"])["status"] == "ok"
+        assert connection.execute(
+            "SELECT COUNT(*) FROM harvest_pulled_rows "
+            "WHERE source_database=?",
+            (str(conflicting.resolve()),),
+        ).fetchone()[0] == 0
+
+
+def test_harvest_migrates_legacy_cursor_without_trusting_it(tmp_path):
+    source = tmp_path / "source.db"
+    accumulator = tmp_path / "accumulator.db"
+    _write_harvest_source(source, shard=0, temperature_C=1100.0, output=_output())
+    with GridCacheWriter(accumulator) as writer:
+        writer.connection.execute(
+            "CREATE TABLE harvest_state("
+            "source_host TEXT NOT NULL, source_table TEXT NOT NULL, "
+            "last_seen_id INTEGER NOT NULL, updated_at TEXT NOT NULL, "
+            "PRIMARY KEY(source_host, source_table))"
+        )
+        writer.connection.execute(
+            "INSERT INTO harvest_state VALUES (?, ?, ?, ?)",
+            ("studio-1", "alphamelts_outputs", 3_000_000_000, "legacy"),
+        )
+        writer.commit()
+
+    summary = harvest_snapshot(source, accumulator, source_host="studio-1")
+
+    assert summary["inserted"] == 1
+    with sqlite3.connect(accumulator) as connection:
+        assert connection.execute(
+            "SELECT last_seen_id FROM harvest_state_legacy_v1"
+        ).fetchone()[0] == 3_000_000_000
+
+
+def test_harvest_database_generation_detects_same_path_replacement(tmp_path):
+    source = tmp_path / "source.db"
+    accumulator = tmp_path / "accumulator.db"
+    _write_harvest_source(source, shard=0, temperature_C=1100.0, output=_output())
+    with sqlite3.connect(source) as connection:
+        first_generation = connection.execute(
+            "SELECT value FROM metadata WHERE key='database_id'"
+        ).fetchone()[0]
+    harvest_snapshot(source, accumulator, source_host="studio-1")
+
+    source.unlink()
+    _write_harvest_source(source, shard=0, temperature_C=1100.0, output=_output())
+    with sqlite3.connect(source) as connection:
+        second_generation = connection.execute(
+            "SELECT value FROM metadata WHERE key='database_id'"
+        ).fetchone()[0]
+    replacement = harvest_snapshot(source, accumulator, source_host="studio-1")
+
+    assert second_generation != first_generation
+    assert replacement["pulled"] == 1
+    with sqlite3.connect(accumulator) as connection:
+        assert connection.execute(
+            "SELECT COUNT(DISTINCT source_generation) FROM harvest_state"
+        ).fetchone()[0] == 2
+
+
+def test_expedited_key_normalizes_negative_zero_recursively():
+    positive = _inputs(1200.0)
+    negative = _inputs(-0.0)
+    negative["composition_mol"] = dict(negative["composition_mol"], TiO2=-0.0)
+    negative["composition_mol_by_account"] = {
+        "process.cleaned_melt": negative["composition_mol"]
+    }
+    positive["temperature_C"] = 0.0
+
+    assert canonical_input_vector(negative) == canonical_input_vector(positive)
+    assert expedited_key(negative) == expedited_key(positive)
+
+
+def test_numeric_expedited_key_prefix_is_a_valid_retry_selector(tmp_path):
+    database = tmp_path / "grind.db"
+    selected_inputs = None
+    selected_key = None
+    for offset in range(1000):
+        candidate = _inputs(1000.0 + offset)
+        key = expedited_key(candidate)
+        if key[:3].isdigit():
+            selected_inputs = candidate
+            selected_key = key
+            break
+    assert selected_inputs is not None and selected_key is not None
+
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            selected_inputs,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+        )
+        expected = writer.connection.execute(
+            "SELECT id FROM grid_keys WHERE expedited_key = ?", (selected_key,)
+        ).fetchone()[0]
+
+        assert writer.select_grid_key_ids(selectors=[selected_key[:3]]) == [expected]
+
+
+def test_numeric_retry_selector_requires_explicit_disambiguation_on_collision(tmp_path):
+    database = tmp_path / "grind.db"
+    selected_inputs = None
+    selected_key = None
+    for offset in range(10_000):
+        candidate = _inputs(2000.0 + offset)
+        key = expedited_key(candidate)
+        if key[:3].isdigit() and not key.startswith("0"):
+            selected_inputs = candidate
+            selected_key = key
+            break
+    assert selected_inputs is not None and selected_key is not None
+    prefix = selected_key[:3]
+    row_id = int(prefix)
+    unrelated_inputs = _inputs(999.0)
+    assert not expedited_key(unrelated_inputs).startswith(prefix)
+
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.connection.execute(
+            "DELETE FROM sqlite_sequence WHERE name='grid_keys'"
+        )
+        writer.connection.execute(
+            "INSERT INTO sqlite_sequence(name, seq) VALUES ('grid_keys', ?)",
+            (row_id - 1,),
+        )
+        writer.materialize_key(
+            unrelated_inputs,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+        )
+        writer.materialize_key(
+            selected_inputs,
+            batch_id=batch_id,
+            shuffle_rank=1,
+            shard=0,
+        )
+
+        assert writer.select_grid_key_ids(selectors=[prefix]) == [row_id]
+        assert writer.select_grid_key_ids(selectors=[f"id:{prefix}"]) == [row_id]
+        assert writer.select_grid_key_ids(selectors=[f"key:{prefix}"]) == [
+            row_id + 1
+        ]
+
+
+def test_selected_retry_rejects_unrelated_sqlite_without_mutating_it(tmp_path):
+    database = tmp_path / "unrelated.db"
+    with sqlite3.connect(database) as connection:
+        connection.execute("CREATE TABLE sentinel(value TEXT)")
+        connection.execute("INSERT INTO sentinel VALUES ('unchanged')")
+    before = database.read_bytes()
+    args = SimpleNamespace(
+        db=database,
+        engine_epoch=1,
+        keys="1",
+        retry_failed=None,
+        retry_source_epoch=1,
+        retry_limit=None,
+    )
+
+    with pytest.raises(ValueError, match="not a grid cache"):
+        grid_pregrind.run_selected_retry(args)
+
+    assert database.read_bytes() == before
+    with sqlite3.connect(database) as connection:
+        assert connection.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+        ).fetchall() == [("sentinel",)]
+
+
 def test_actual_pressure_and_explicit_iron_couple_are_expedited_key_axes():
     base = _inputs(1200.0)
     pressure = dict(base, pressure_bar=0.015)

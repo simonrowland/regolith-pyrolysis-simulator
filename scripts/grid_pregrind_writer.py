@@ -11,6 +11,7 @@ import os
 import socket
 import sqlite3
 import urllib.parse
+import uuid
 from enum import Enum
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -155,7 +156,7 @@ def to_jsonable(value: Any) -> Any:
     if isinstance(value, float):
         if not math.isfinite(value):
             raise ValueError(f"non-finite float cannot be cached: {value!r}")
-        return value
+        return 0.0 if value == 0.0 else value
     if isinstance(value, Enum):
         return to_jsonable(value.value)
     if isinstance(value, Path):
@@ -443,6 +444,25 @@ class GridCacheWriter:
         if existing_only:
             if not self.path.is_file():
                 raise FileNotFoundError(f"database does not exist: {self.path}")
+            validation_database = (
+                "file:"
+                + urllib.parse.quote(str(self.path.resolve()), safe="/")
+                + "?mode=ro"
+            )
+            validation_connection: sqlite3.Connection | None = None
+            try:
+                validation_connection = sqlite3.connect(
+                    validation_database, timeout=30.0, uri=True
+                )
+                validation_connection.row_factory = sqlite3.Row
+                self._validate_connection(validation_connection)
+            except sqlite3.DatabaseError as exc:
+                raise ValueError(
+                    f"cannot validate existing grid cache {self.path}: {exc}"
+                ) from exc
+            finally:
+                if validation_connection is not None:
+                    validation_connection.close()
             database = (
                 "file:"
                 + urllib.parse.quote(str(self.path.resolve()), safe="/")
@@ -458,10 +478,6 @@ class GridCacheWriter:
         except sqlite3.DatabaseError as exc:
             raise ValueError(f"cannot open grid cache {self.path}: {exc}") from exc
         self.connection.row_factory = sqlite3.Row
-        self.connection.execute("PRAGMA journal_mode=WAL")
-        self.connection.execute("PRAGMA synchronous=NORMAL")
-        self.connection.execute("PRAGMA foreign_keys=ON")
-        self.connection.execute("PRAGMA busy_timeout=30000")
         if existing_only:
             try:
                 self._validate_existing_database()
@@ -473,7 +489,11 @@ class GridCacheWriter:
             except Exception:
                 self.connection.close()
                 raise
-        else:
+        self.connection.execute("PRAGMA journal_mode=WAL")
+        self.connection.execute("PRAGMA synchronous=NORMAL")
+        self.connection.execute("PRAGMA foreign_keys=ON")
+        self.connection.execute("PRAGMA busy_timeout=30000")
+        if not existing_only:
             self.connection.executescript(SCHEMA_SQL)
             self._ensure_v2_provenance_columns()
             self._set_metadata("schema_variant", SCHEMA_VARIANT)
@@ -485,10 +505,15 @@ class GridCacheWriter:
             self._set_metadata("schema_output_field_count", "57")
             self._set_metadata("schema_input_field_count", "24")
             self._set_metadata("grid_realization_revision", GRID_REALIZATION_REVISION)
+            self._set_metadata("database_id", str(uuid.uuid4()), overwrite=False)
             self._set_metadata("created_at", utc_now(), overwrite=False)
             self.connection.commit()
 
     def _validate_existing_database(self) -> None:
+        self._validate_connection(self.connection)
+
+    @staticmethod
+    def _validate_connection(connection: sqlite3.Connection) -> None:
         required_tables = {
             "metadata",
             "id_block_registry",
@@ -498,7 +523,7 @@ class GridCacheWriter:
         }
         tables = {
             str(row[0])
-            for row in self.connection.execute(
+            for row in connection.execute(
                 "SELECT name FROM sqlite_master WHERE type = 'table'"
             )
         }
@@ -508,7 +533,7 @@ class GridCacheWriter:
                 "existing database is not a grid cache; missing tables: "
                 + ", ".join(missing)
             )
-        row = self.connection.execute(
+        row = connection.execute(
             "SELECT value FROM metadata WHERE key = 'schema_variant'"
         ).fetchone()
         if row is None or str(row[0]) != SCHEMA_VARIANT:
@@ -517,7 +542,7 @@ class GridCacheWriter:
                 f"schema variant mismatch: database={value!r}, "
                 f"writer={SCHEMA_VARIANT!r}"
             )
-        provenance_columns = set(table_columns(self.connection, "grid_keys"))
+        provenance_columns = set(table_columns(connection, "grid_keys"))
         missing_columns = {
             "intended_fO2_log",
             "intended_fO2_log_repr",
@@ -783,7 +808,21 @@ class GridCacheWriter:
                 text = str(selector).strip()
                 if not text:
                     continue
-                if text.isdigit():
+                if text.startswith("id:"):
+                    row_id = text.removeprefix("id:")
+                    if not row_id.isdigit():
+                        raise ValueError(f"invalid grid-key id selector: {text!r}")
+                    selector_clauses.append("g.id = ?")
+                    parameters.append(int(row_id))
+                elif text.startswith("key:"):
+                    key_prefix = text.removeprefix("key:")
+                    if not key_prefix:
+                        raise ValueError("expedited-key prefix cannot be empty")
+                    selector_clauses.append("g.expedited_key LIKE ?")
+                    parameters.append(f"{key_prefix}%")
+                elif text.isdigit() and self.connection.execute(
+                    "SELECT 1 FROM grid_keys WHERE id = ?", (int(text),)
+                ).fetchone() is not None:
                     selector_clauses.append("g.id = ?")
                     parameters.append(int(text))
                 else:

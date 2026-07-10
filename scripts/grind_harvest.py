@@ -69,17 +69,145 @@ def _metadata(connection: sqlite3.Connection, key: str) -> str | None:
     return None if row is None else str(row[0])
 
 
+def _ensure_harvest_schema(connection: sqlite3.Connection) -> None:
+    state_table = connection.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='harvest_state'"
+    ).fetchone()
+    if state_table is not None:
+        columns = {
+            str(row[1]) for row in connection.execute("PRAGMA table_info(harvest_state)")
+        }
+        if "source_database" not in columns or "source_generation" not in columns:
+            legacy = connection.execute(
+                "SELECT 1 FROM sqlite_master "
+                "WHERE type='table' AND name='harvest_state_legacy_v1'"
+            ).fetchone()
+            if legacy is not None:
+                raise RuntimeError("unsafe legacy harvest-state migration is incomplete")
+            connection.execute(
+                "ALTER TABLE harvest_state RENAME TO harvest_state_legacy_v1"
+            )
+    connection.executescript(
+        """
+        CREATE TABLE IF NOT EXISTS harvest_state (
+            source_host TEXT NOT NULL,
+            source_database TEXT NOT NULL,
+            source_generation TEXT NOT NULL,
+            source_table TEXT NOT NULL,
+            last_seen_id INTEGER NOT NULL,
+            updated_at TEXT NOT NULL,
+            PRIMARY KEY(source_host, source_database, source_generation, source_table)
+        );
+        CREATE TABLE IF NOT EXISTS harvest_pulled_rows (
+            source_host TEXT NOT NULL,
+            source_database TEXT NOT NULL,
+            source_generation TEXT NOT NULL,
+            source_table TEXT NOT NULL,
+            source_row_id INTEGER NOT NULL,
+            pulled_at TEXT NOT NULL,
+            PRIMARY KEY(
+                source_host, source_database, source_generation,
+                source_table, source_row_id
+            )
+        );
+        CREATE TABLE IF NOT EXISTS harvest_conflicts (
+            conflict_id INTEGER PRIMARY KEY,
+            source_host TEXT NOT NULL,
+            source_database TEXT NOT NULL,
+            source_generation TEXT NOT NULL,
+            source_table TEXT NOT NULL,
+            source_row_id INTEGER NOT NULL,
+            expedited_key TEXT NOT NULL,
+            engine_epoch INTEGER NOT NULL,
+            existing_output_id INTEGER NOT NULL,
+            existing_row_json TEXT NOT NULL,
+            incoming_row_json TEXT NOT NULL,
+            first_seen_at TEXT NOT NULL,
+            last_seen_at TEXT NOT NULL,
+            occurrences INTEGER NOT NULL DEFAULT 1,
+            UNIQUE(
+                source_host, source_database, source_generation,
+                source_table, source_row_id
+            )
+        );
+        """
+    )
+
+
+def _row_json(row: sqlite3.Row) -> str:
+    return json.dumps(
+        dict(row),
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    )
+
+
+def _record_conflict(
+    connection: sqlite3.Connection,
+    *,
+    source_host: str,
+    source_database: str,
+    source_generation: str,
+    source_table: str,
+    incoming: sqlite3.Row,
+    existing: sqlite3.Row,
+) -> None:
+    now = utc_now()
+    connection.execute(
+        """
+        INSERT INTO harvest_conflicts(
+            source_host, source_database, source_generation,
+            source_table, source_row_id,
+            expedited_key, engine_epoch, existing_output_id,
+            existing_row_json, incoming_row_json,
+            first_seen_at, last_seen_at, occurrences
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        ON CONFLICT(
+            source_host, source_database, source_generation,
+            source_table, source_row_id
+        )
+        DO UPDATE SET
+            expedited_key=excluded.expedited_key,
+            engine_epoch=excluded.engine_epoch,
+            existing_output_id=excluded.existing_output_id,
+            existing_row_json=excluded.existing_row_json,
+            incoming_row_json=excluded.incoming_row_json,
+            last_seen_at=excluded.last_seen_at,
+            occurrences=harvest_conflicts.occurrences + 1
+        """,
+        (
+            source_host,
+            source_database,
+            source_generation,
+            source_table,
+            int(incoming["id"]),
+            str(incoming["expedited_key"]),
+            int(incoming["engine_epoch"]),
+            int(existing["id"]),
+            _row_json(existing),
+            _row_json(incoming),
+            now,
+            now,
+        ),
+    )
+
+
 def harvest_snapshot(
     source_path: str | Path,
     accumulator_path: str | Path,
     *,
     source_host: str,
+    source_database: str | None = None,
     table: str = ALLOWED_TABLE,
     limit: int | None = None,
 ) -> dict[str, int]:
     if table != ALLOWED_TABLE:
         raise ValueError(f"unsupported harvest table: {table}")
-    source_uri = f"file:{Path(source_path).resolve()}?mode=ro"
+    resolved_source = Path(source_path).resolve()
+    source_identity = str(source_database or resolved_source)
+    source_uri = f"file:{resolved_source}?mode=ro"
     source = sqlite3.connect(source_uri, uri=True)
     source.row_factory = sqlite3.Row
     try:
@@ -88,6 +216,12 @@ def harvest_snapshot(
             raise ValueError(
                 f"source schema variant mismatch: {variant!r} != {SCHEMA_VARIANT!r}"
             )
+        source_generation = _metadata(source, "database_id")
+        if source_generation is None:
+            created_at = _metadata(source, "created_at")
+            if created_at is None:
+                raise ValueError("source database identity metadata is missing")
+            source_generation = f"created-at:{created_at}"
         with GridCacheWriter(accumulator_path) as accumulator:
             target = accumulator.connection
             for registry_row in source.execute(
@@ -109,32 +243,39 @@ def harvest_snapshot(
                     raise RuntimeError(
                         f"id-block registry collision at {registry_row['block_base']}"
                     )
-            target.execute(
-                """
-                CREATE TABLE IF NOT EXISTS harvest_state (
-                    source_host TEXT NOT NULL,
-                    source_table TEXT NOT NULL,
-                    last_seen_id INTEGER NOT NULL,
-                    updated_at TEXT NOT NULL,
-                    PRIMARY KEY(source_host, source_table)
-                )
-                """
-            )
+            _ensure_harvest_schema(target)
             state = target.execute(
                 "SELECT last_seen_id FROM harvest_state "
-                "WHERE source_host = ? AND source_table = ?",
-                (source_host, table),
+                "WHERE source_host = ? AND source_database = ? "
+                "AND source_generation = ? AND source_table = ?",
+                (source_host, source_identity, source_generation, table),
             ).fetchone()
             last_seen = int(state[0]) if state is not None else 0
             total_source = int(
                 source.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0]
             )
-            query = f'SELECT * FROM "{table}" WHERE id > ? ORDER BY id'
-            parameters: tuple[Any, ...] = (last_seen,)
+            pulled_ids = {
+                int(row[0])
+                for row in target.execute(
+                    "SELECT source_row_id FROM harvest_pulled_rows "
+                    "WHERE source_host = ? AND source_database = ? "
+                    "AND source_generation = ? AND source_table = ?",
+                    (source_host, source_identity, source_generation, table),
+                )
+            }
+            pending_ids = [
+                int(row[0])
+                for row in source.execute(f'SELECT id FROM "{table}" ORDER BY id')
+                if int(row[0]) not in pulled_ids
+            ]
             if limit is not None:
-                query += " LIMIT ?"
-                parameters = (last_seen, int(limit))
-            rows = list(source.execute(query, parameters))
+                pending_ids = pending_ids[: int(limit)]
+            rows = [
+                source.execute(
+                    f'SELECT * FROM "{table}" WHERE id = ?', (source_id,)
+                ).fetchone()
+                for source_id in pending_ids
+            ]
 
             source_input_columns = table_columns(source, "grid_keys")
             target_input_columns = set(table_columns(target, "grid_keys"))
@@ -150,8 +291,11 @@ def harvest_snapshot(
 
             inserted = 0
             conflicts = 0
+            equivalent = 0
             max_seen = last_seen
             for output_row in rows:
+                if output_row is None:
+                    raise RuntimeError("source output disappeared during harvest")
                 source_id = int(output_row["id"])
                 input_row = source.execute(
                     "SELECT * FROM grid_keys WHERE id = ?",
@@ -212,38 +356,97 @@ def harvest_snapshot(
                     raise RuntimeError(
                         f"expedited-key collision while harvesting {input_row['expedited_key']}"
                     )
+                payload_columns = tuple(
+                    column
+                    for column in source_output_columns
+                    if column
+                    not in {"id", "grid_key_id", "source_host", "source_row_id"}
+                )
                 output_values = {
                     column: output_row[column]
-                    for column in source_output_columns
-                    if column not in {"id", "grid_key_id"}
+                    for column in payload_columns
                 }
                 existing_output_id = target.execute(
-                    "SELECT expedited_key FROM alphamelts_outputs WHERE id = ?",
+                    "SELECT expedited_key, engine_epoch "
+                    "FROM alphamelts_outputs WHERE id = ?",
                     (source_id,),
                 ).fetchone()
                 if (
                     existing_output_id is not None
-                    and existing_output_id["expedited_key"]
-                    != output_row["expedited_key"]
+                    and (
+                        existing_output_id["expedited_key"]
+                        != output_row["expedited_key"]
+                        or int(existing_output_id["engine_epoch"])
+                        != int(output_row["engine_epoch"])
+                    )
                 ):
                     raise RuntimeError(f"raw output id collision at {source_id}")
+                existing_output = target.execute(
+                    f'SELECT * FROM "{table}" '
+                    "WHERE expedited_key = ? AND engine_epoch = ?",
+                    (
+                        output_row["expedited_key"],
+                        int(output_row["engine_epoch"]),
+                    ),
+                ).fetchone()
+                if existing_output is not None:
+                    same_payload = all(
+                        existing_output[column] == output_row[column]
+                        for column in payload_columns
+                    )
+                    if same_payload:
+                        equivalent += 1
+                    else:
+                        _record_conflict(
+                            target,
+                            source_host=source_host,
+                            source_database=source_identity,
+                            source_generation=source_generation,
+                            source_table=table,
+                            incoming=output_row,
+                            existing=existing_output,
+                        )
+                        conflicts += 1
+                        continue
                 output_values["id"] = source_id
                 output_values["grid_key_id"] = int(local_input["id"])
                 output_values["source_host"] = source_host
                 output_values["source_row_id"] = source_id
-                cursor = _insert_or_ignore(target, table, output_values)
-                if cursor.rowcount == 1:
+                if existing_output is None:
+                    _insert(target, table, output_values)
                     inserted += 1
-                else:
-                    conflicts += 1
+                target.execute(
+                    "INSERT INTO harvest_pulled_rows("
+                    "source_host, source_database, source_generation, "
+                    "source_table, source_row_id, pulled_at"
+                    ") VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        source_host,
+                        source_identity,
+                        source_generation,
+                        table,
+                        source_id,
+                        utc_now(),
+                    ),
+                )
                 max_seen = max(max_seen, source_id)
 
             target.execute(
-                "INSERT INTO harvest_state(source_host, source_table, "
-                "last_seen_id, updated_at) VALUES (?, ?, ?, ?) "
-                "ON CONFLICT(source_host, source_table) DO UPDATE SET "
+                "INSERT INTO harvest_state("
+                "source_host, source_database, source_generation, source_table, "
+                "last_seen_id, updated_at) VALUES (?, ?, ?, ?, ?, ?) "
+                "ON CONFLICT("
+                "source_host, source_database, source_generation, source_table"
+                ") DO UPDATE SET "
                 "last_seen_id=excluded.last_seen_id, updated_at=excluded.updated_at",
-                (source_host, table, max_seen, utc_now()),
+                (
+                    source_host,
+                    source_identity,
+                    source_generation,
+                    table,
+                    max_seen,
+                    utc_now(),
+                ),
             )
             target.commit()
             accumulator_total = int(
@@ -254,7 +457,8 @@ def harvest_snapshot(
                 "last_seen_after": max_seen,
                 "pulled": len(rows),
                 "inserted": inserted,
-                "canonical_conflicts_skipped": conflicts,
+                "equivalent": equivalent,
+                "canonical_conflicts_recorded": conflicts,
                 "source_total": total_source,
                 "accumulator_total": accumulator_total,
             }
@@ -272,6 +476,20 @@ def _insert_or_ignore(
     placeholders = ",".join("?" for _ in columns)
     return connection.execute(
         f'INSERT OR IGNORE INTO "{table}" ({quoted}) VALUES ({placeholders})',
+        tuple(values[column] for column in columns),
+    )
+
+
+def _insert(
+    connection: sqlite3.Connection,
+    table: str,
+    values: dict[str, Any],
+) -> sqlite3.Cursor:
+    columns = tuple(values)
+    quoted = ",".join(f'"{column}"' for column in columns)
+    placeholders = ",".join("?" for _ in columns)
+    return connection.execute(
+        f'INSERT INTO "{table}" ({quoted}) VALUES ({placeholders})',
         tuple(values[column] for column in columns),
     )
 
@@ -300,6 +518,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.source_db,
             args.accumulator,
             source_host=source_host,
+            source_database=str(args.source_db.resolve()),
             table=args.table,
             limit=args.limit,
         )
@@ -311,6 +530,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 snapshot,
                 args.accumulator,
                 source_host=source_host,
+                source_database=args.remote_db,
                 table=args.table,
                 limit=args.limit,
             )

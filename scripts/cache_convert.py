@@ -2630,13 +2630,86 @@ def _schema_dump_digest(connection: sqlite3.Connection) -> str:
     return sha256_bytes(display_json(value).encode("utf-8"))
 
 
-def _source_snapshot(path: pathlib.Path) -> dict[str, Any]:
+def _source_snapshot(
+    path: pathlib.Path,
+    connection: sqlite3.Connection | None = None,
+) -> dict[str, Any]:
+    owned_connection = connection is None
+    if connection is None:
+        connection = open_source_readonly(path)
+        connection.execute("BEGIN")
+    try:
+        serialized = connection.serialize()
+    finally:
+        if owned_connection:
+            connection.close()
     stat = path.stat()
     return {
         "path": str(path.resolve()),
-        "sha256": file_sha256(path),
-        "size": stat.st_size,
+        "sha256": sha256_bytes(serialized),
+        "size": len(serialized),
         "mtime_ns": stat.st_mtime_ns,
+        "main_file_sha256": file_sha256(path),
+        "main_file_size": stat.st_size,
+    }
+
+
+def _paths_alias(left: pathlib.Path, right: pathlib.Path) -> bool:
+    if left.resolve() == right.resolve():
+        return True
+    return left.exists() and right.exists() and os.path.samefile(left, right)
+
+
+def _sqlite_sidecars(path: pathlib.Path) -> tuple[pathlib.Path, ...]:
+    return tuple(
+        pathlib.Path(str(path) + suffix).resolve()
+        for suffix in ("-wal", "-shm", "-journal")
+    )
+
+
+def _validate_sqlite_path_families(
+    source: pathlib.Path,
+    destination: pathlib.Path,
+    report: pathlib.Path,
+) -> None:
+    for candidate, label in ((destination, "destination"), (report, "report")):
+        if any(_paths_alias(candidate, sidecar) for sidecar in _sqlite_sidecars(source)):
+            raise ConversionError(f"{label} aliases a source SQLite sidecar")
+    if _paths_alias(source, destination) or any(
+        _paths_alias(source, sidecar) for sidecar in _sqlite_sidecars(destination)
+    ):
+        raise ConversionError("destination SQLite family overlaps the source")
+    if any(
+        _paths_alias(report, candidate)
+        for candidate in (destination, *_sqlite_sidecars(destination))
+    ):
+        raise ConversionError("report aliases the destination or a destination SQLite sidecar")
+
+
+def _checkpoint_destination(
+    connection: sqlite3.Connection,
+    path: pathlib.Path,
+) -> dict[str, Any]:
+    row = connection.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+    if row is None or len(row) != 3:
+        return {
+            "busy": None,
+            "log_frames": None,
+            "checkpointed_frames": None,
+            "wal_size": None,
+            "verified": False,
+        }
+    busy, log_frames, checkpointed_frames = (int(value) for value in row)
+    wal_path = pathlib.Path(str(path) + "-wal")
+    wal_size = wal_path.stat().st_size if wal_path.exists() else 0
+    return {
+        "busy": busy,
+        "log_frames": log_frames,
+        "checkpointed_frames": checkpointed_frames,
+        "wal_size": wal_size,
+        "verified": busy == 0
+        and log_frames == checkpointed_frames
+        and wal_size == 0,
     }
 
 
@@ -3071,6 +3144,7 @@ def convert_database(
         report_file, destination_path
     ):
         raise ConversionError("report is the same file as the destination")
+    _validate_sqlite_path_families(source_path, destination_path, report_file)
     if require_sibling and (
         source_path.parent != destination_path.parent
         or destination_path.parent != report_file.parent
@@ -3079,9 +3153,10 @@ def convert_database(
     if batch_size <= 0:
         raise ValueError("batch_size must be positive")
 
-    source_before = _source_snapshot(source_path)
     source_connection = open_source_readonly(source_path)
     try:
+        source_connection.execute("BEGIN")
+        source_before = _source_snapshot(source_path, source_connection)
         source_schema_version = _source_schema_version(source_connection)
         source_before["schema_dump_sha256"] = _schema_dump_digest(source_connection)
         source_before["table_row_count"] = source_connection.execute(
@@ -3276,7 +3351,29 @@ def convert_database(
                 report_path=report_file,
             )
             destination_connection.commit()
-            destination_connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            destination_checkpoint = _checkpoint_destination(
+                destination_connection, destination_path
+            )
+            report["destination_checkpoint"] = destination_checkpoint
+            if not destination_checkpoint["verified"]:
+                final_status = "failed"
+                report["failures"].append(
+                    {
+                        "error_type": "DestinationCheckpointError",
+                        "error": "destination WAL checkpoint did not fully truncate",
+                        "checkpoint": destination_checkpoint,
+                    }
+                )
+                _upsert_checkpoint(
+                    destination_connection,
+                    source_sha256=source_before["sha256"],
+                    source_schema_version=source_schema_version,
+                    last_value=last_value,
+                    source_row_count=len(source_rows),
+                    status="failed",
+                    report_path=report_file,
+                )
+                destination_connection.commit()
             report["wal_retry_statistics"]["busy_or_locked_retries"] = (
                 destination_connection.busy_retry_count
             )
@@ -3287,9 +3384,10 @@ def convert_database(
         source_connection.close()
 
     try:
-        source_after = _source_snapshot(source_path)
         source_after_connection = open_source_readonly(source_path)
         try:
+            source_after_connection.execute("BEGIN")
+            source_after = _source_snapshot(source_path, source_after_connection)
             source_after["schema_dump_sha256"] = _schema_dump_digest(
                 source_after_connection
             )
@@ -3304,11 +3402,20 @@ def convert_database(
             "error": str(exc),
         }
     report["source_after"] = source_after
-    if source_after != source_before:
+    source_identity_fields = (
+        "path",
+        "sha256",
+        "schema_dump_sha256",
+        "table_row_count",
+    )
+    if any(
+        source_after.get(field) != source_before.get(field)
+        for field in source_identity_fields
+    ):
         report["failures"].append(
             {
                 "error_type": "SourceMutationError",
-                "error": "source path/hash/size/mtime changed during conversion",
+                "error": "source logical identity, schema, or row count changed during conversion",
             }
         )
         report["status"] = "failed"
@@ -3327,7 +3434,18 @@ def convert_database(
                 (_utc_now(), source_before["sha256"]),
             )
             failed_connection.commit()
-            failed_connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            failed_checkpoint = _checkpoint_destination(
+                failed_connection, destination_path
+            )
+            report["destination_checkpoint_after_source_mutation"] = failed_checkpoint
+            if not failed_checkpoint["verified"]:
+                report["failures"].append(
+                    {
+                        "error_type": "DestinationCheckpointError",
+                        "error": "failed checkpoint update remains in destination WAL",
+                        "checkpoint": failed_checkpoint,
+                    }
+                )
         finally:
             failed_connection.close()
     report["destination"] = {

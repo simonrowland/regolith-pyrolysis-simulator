@@ -1118,7 +1118,10 @@ def parser() -> argparse.ArgumentParser:
     )
     result.add_argument(
         "--keys",
-        help="comma-separated existing grid-key ids or expedited-key prefixes",
+        help=(
+            "comma-separated grid-key ids or expedited-key prefixes; use id:N or "
+            "key:PREFIX to disambiguate numeric selectors"
+        ),
     )
     result.add_argument(
         "--retry-failed",
@@ -1179,7 +1182,9 @@ def run_selected_retry(args: argparse.Namespace) -> int:
     selectors = tuple(
         item.strip() for item in str(args.keys or "").split(",") if item.strip()
     )
-    with GridCacheWriter(args.db, engine_epoch=args.engine_epoch) as writer:
+    with GridCacheWriter(
+        args.db, engine_epoch=args.engine_epoch, existing_only=True
+    ) as writer:
         grid_key_ids = writer.select_grid_key_ids(
             selectors=selectors,
             refusal_reason=args.retry_failed,
