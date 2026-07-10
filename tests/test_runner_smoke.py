@@ -1522,7 +1522,27 @@ def test_runner_detail_fallback_preserves_refused_status_and_live_rows(monkeypat
             },
         ),
         shadow_trace=({"event": "operator_decision"},),
-        simulator=SimpleNamespace(melt=SimpleNamespace(hour=1)),
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(hour=1),
+            _shuttle_refusal_history=(
+                {
+                    "reaction_family": "C3_K",
+                    "hour": 0,
+                    "temperature_C": 1150.0,
+                },
+            ),
+            _degraded_path_engagement_summary=lambda: {
+                "capture_budget_regularizer": {
+                    "total_count": 1,
+                    "by_hour": [{"hour": 0, "count": 1}],
+                },
+            },
+            _melt_redox_liquidus_gate_fallback_summary=lambda: {
+                "engaged": True,
+                "total_count": 1,
+                "recent_hourly": [{"hour": 0, "count": 1}],
+            },
+        ),
         refusal_diagnostic={
             "status": "refused",
             "reason": "knudsen_outside_viscous_flow",
@@ -1545,6 +1565,23 @@ def test_runner_detail_fallback_preserves_refused_status_and_live_rows(monkeypat
     assert payload["run_metadata"]["knudsen_regime_diagnostic"] == {
         "status": "refused",
         "reason": "knudsen_outside_viscous_flow",
+    }
+    assert payload["shuttle_refusal_history"] == [
+        {
+            "reaction_family": "C3_K",
+            "hour": 0,
+            "temperature_C": 1150.0,
+        },
+    ]
+    assert payload["degraded_path_engagement"]["capture_budget_regularizer"] == {
+        "engaged": True,
+        "total_count": 1,
+        "by_hour": [{"hour": 0, "count": 1}],
+    }
+    assert payload["melt_redox_gate_floor_fallback_engagement"] == {
+        "engaged": True,
+        "total_count": 1,
+        "by_hour": [{"hour": 0, "count": 1}],
     }
     assert payload["per_hour_summary"] == list(execution.per_hour)
     assert payload["pO2_enforcement_by_hour"] == [

@@ -136,14 +136,22 @@ def test_antoine_extrapolation_records_count_same_species_stage_and_wall():
         antoine_extrapolations=records,
         antoine_extrapolation_warnings=warnings,
     )
+    condensation._record_antoine_extrapolation(
+        "Ca",
+        2300.0,
+        data,
+        antoine_extrapolations=records,
+        antoine_extrapolation_warnings=warnings,
+    )
 
-    assert len(records) == 2
+    assert len(records) == 3
     assert "SiO" in records
+    assert "Ca" in records
     assert {record["temperature_K"] for record in records.values()} == {
         1173.15,
         2300.0,
     }
-    assert len(warnings) == 2
+    assert len(warnings) == 3
 
 
 def test_wall_deposition_flux_telemetry_keeps_applied_flux_identical():

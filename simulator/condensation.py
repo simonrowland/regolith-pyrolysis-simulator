@@ -3433,7 +3433,11 @@ def _record_antoine_extrapolation(
         'valid_range_K': (valid_low, valid_high),
     }
     if antoine_extrapolations is not None:
-        existing_records = list(antoine_extrapolations.values())
+        existing_records = [
+            existing
+            for key, existing in antoine_extrapolations.items()
+            if str(key).split("#", 1)[0] == species
+        ]
         if not any(dict(existing) == record for existing in existing_records):
             key = species
             if key in antoine_extrapolations:

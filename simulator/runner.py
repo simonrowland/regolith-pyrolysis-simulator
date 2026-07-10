@@ -3493,7 +3493,14 @@ def _runner_failure_result(
         "final": _json_safe(final),
         "stage_purity_report": _json_safe(stage_report),
         "vapor_pressure_source_report": _json_safe(vapor_report),
-        "shuttle_refusal_history": [],
+        "shuttle_refusal_history": _json_safe(
+            _safe_failure_value(
+                lambda: list(getattr(sim, "_shuttle_refusal_history", []) or []),
+                [],
+            )
+            if sim is not None
+            else []
+        ),
         "c7_product_report": _json_safe(
             _safe_failure_value(lambda: _c7_product_report(sim), {})
             if sim is not None
