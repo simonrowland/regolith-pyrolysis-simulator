@@ -2439,6 +2439,47 @@ def test_optimizer_result_detail_renders_empty_product_summary_inconclusive(
     assert "product summary missing" in html
 
 
+def test_optimizer_result_detail_renders_product_table_missing_outputs_inconclusive(
+    client,
+    tmp_path,
+) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "run-product-table-missing-outputs"
+    run_dir.mkdir(parents=True)
+    spec = _base_spec()
+    product_yield_table = _product_yield_table()
+    del product_yield_table["outputs"]
+    store = ResultStore(run_dir / "cache.sqlite")
+    store.store(
+        spec,
+        _scored(
+            spec,
+            candidate_id="candidate-product-table-missing-outputs",
+            product_summary={"product_yield_table": product_yield_table},
+        ),
+        created_at="2026-06-02T00:00:00Z",
+    )
+
+    summary_response = client.get("/api/optimizer/runs")
+    response = client.get(
+        "/optimizer/runs/run-product-table-missing-outputs/"
+        f"results/{cache_key(spec)}"
+    )
+
+    assert summary_response.status_code == 200
+    panel = summary_response.get_json()["runs"][0]["latest_result"][
+        "product_ledger_panel"
+    ]
+    assert panel["status"] == "inconclusive"
+    assert panel["reason"] == "product_yield_table outputs missing"
+    assert panel["outputs"] == []
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "candidate-product-table-missing-outputs" in html
+    assert "Product inconclusive" in html
+    assert "product_yield_table outputs missing" in html
+
+
 def test_optimizer_result_yaml_download_sanitizes_stored_candidate_id(
     client,
     tmp_path,

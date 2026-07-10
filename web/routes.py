@@ -621,7 +621,10 @@ def _product_ledger_panel(product_summary: Mapping[str, Any]) -> dict[str, Any]:
     if isinstance(product_yield_table, Mapping):
         panel = dict(product_yield_table)
         panel.setdefault('inputs', [])
-        panel.setdefault('outputs', [])
+        if 'outputs' not in product_yield_table:
+            panel['status'] = 'inconclusive'
+            panel['reason'] = 'product_yield_table outputs missing'
+            panel['outputs'] = []
         panel.setdefault('mass_closure', None)
         panel.setdefault('diagnostics', [])
         unclassified = _unclassified_product_mass(product_summary)
