@@ -30,7 +30,6 @@ _MODEL_TO_THERMOENGINE = {
     'MELTSv1.2.0': ('1.2.0', 'v1.2'),
     'pMELTS': ('5.6.1', 'pMELTS'),
 }
-_THERMOENGINE_HEALTH_CACHE: dict[str, tuple[bool, str]] = {}
 
 
 @dataclass(frozen=True)
@@ -65,6 +64,7 @@ class ThermoEngineTransport:
         self._melts_version = '1.0.2'
         self._liq_model = 'v1.0'
         self.engine_version = 'thermoengine unavailable'
+        self._health_cache: dict[str, tuple[bool, str]] = {}
 
     def initialize(self) -> bool:
         setup_thermoengine_dylib_path()
@@ -111,7 +111,7 @@ class ThermoEngineTransport:
     def health_check(self, *, timeout_s: float = 8.0) -> tuple[bool, str]:
         timeout = max(1.0, float(timeout_s))
         cache_key = f'{self._model_name}:{timeout:.3f}'
-        cached = _THERMOENGINE_HEALTH_CACHE.get(cache_key)
+        cached = self._health_cache.get(cache_key)
         if cached is not None:
             return cached
 
@@ -175,7 +175,7 @@ print('ok')
                     'ThermoEngine smoke equilibrium failed'
                     + (f': {detail}' if detail else ''),
                 )
-        _THERMOENGINE_HEALTH_CACHE[cache_key] = health
+        self._health_cache[cache_key] = health
         return health
 
     def equilibrate(

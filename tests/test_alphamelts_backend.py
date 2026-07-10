@@ -934,6 +934,42 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
     assert backend.get_engine_version() == 'thermoengine fake'
 
 
+def test_thermoengine_health_failure_is_scoped_to_transport_lifecycle(
+    monkeypatch,
+):
+    calls = []
+
+    def fake_run(args, **kwargs):
+        calls.append(args)
+        if len(calls) == 1:
+            raise subprocess.TimeoutExpired(args, kwargs['timeout'])
+        return subprocess.CompletedProcess(args, 0, stdout='ok\n', stderr='')
+
+    monkeypatch.setattr(
+        'engines.alphamelts.thermoengine.subprocess.run',
+        fake_run,
+    )
+    first = ThermoEngineTransport(
+        model_name='health-lifecycle-test',
+        activity_converter=activity_from_chem_potential,
+    )
+    second = ThermoEngineTransport(
+        model_name='health-lifecycle-test',
+        activity_converter=activity_from_chem_potential,
+    )
+
+    first_health = first.health_check(timeout_s=1.0)
+
+    assert first_health[0] is False
+    assert first.health_check(timeout_s=1.0) == first_health
+    assert len(calls) == 1
+    assert second.health_check(timeout_s=1.0) == (
+        True,
+        'ThermoEngine smoke equilibrium completed',
+    )
+    assert len(calls) == 2
+
+
 def test_alphamelts_configured_subprocess_skips_thermoengine(monkeypatch):
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
