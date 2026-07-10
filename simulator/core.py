@@ -9680,6 +9680,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_partial_melt_offgassing_diagnostic = {}
         self._last_extraction_completeness_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
+        self._pending_shuttle_bakeout_cycle_increment = ''
         self._reset_redox_source_diagnostics_for_hour()
         self._reset_o2_bubbler_telemetry_for_hour()
 
@@ -9908,6 +9909,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.energy_cumulative_breakdown_kWh)
         snapshot.oxygen_produced_kg = self._oxygen_total_kg()
         self.record.snapshots.append(snapshot)
+        pending_shuttle_cycle = str(
+            getattr(self, '_pending_shuttle_bakeout_cycle_increment', '') or '')
+        if pending_shuttle_cycle == CampaignPhase.C3_K.name:
+            self.shuttle_cycle_K += 1
+        elif pending_shuttle_cycle == CampaignPhase.C3_NA.name:
+            self.shuttle_cycle_Na += 1
+        self._pending_shuttle_bakeout_cycle_increment = ''
         self._clear_melt_redox_gate_authority_for_completed_hour(completed_hour)
 
         if complete_after_snapshot:
@@ -9958,12 +9966,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._last_throttle_reason = ''
             return  # Isothermal hold or MRE — no ramp
 
+        target_T = float(target_T)
+        ramp_rate = float(ramp_rate)
+        if not math.isfinite(target_T):
+            raise ValueError(
+                f'campaign temperature target must be finite; got {target_T!r}')
+        if not math.isfinite(ramp_rate) or ramp_rate < 0.0:
+            raise ValueError(
+                f'campaign ramp rate must be finite and non-negative; got {ramp_rate!r}')
+
         nominal_ramp = ramp_rate
         actual_ramp = ramp_rate
         throttle_reason = ''
 
         # --- Loop 3: Metals train transport saturation throttle ---
-        sat_pct = self.overhead.transport_saturation_pct
+        sat_pct = float(self.overhead.transport_saturation_pct)
+        if not math.isfinite(sat_pct):
+            raise ValueError(
+                'overhead.transport_saturation_pct must be finite before '
+                f'temperature mutation; got {sat_pct!r}')
         if sat_pct > 100.0:
             # Linear scale: 100% → full ramp, 200% → zero ramp
             scale = max(0.0, 2.0 - sat_pct / 100.0)
@@ -9972,7 +9993,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # --- Loop 3b: Turbine overload (milder throttle) ---
         if self.overhead.turbine_limited:
-            turb_util = self.overhead.turbine_utilization_pct
+            turb_util = float(self.overhead.turbine_utilization_pct)
+            if not math.isfinite(turb_util):
+                raise ValueError(
+                    'overhead.turbine_utilization_pct must be finite before '
+                    f'temperature mutation; got {turb_util!r}')
             if turb_util > 120.0:
                 # Gentle throttle: only kicks in above 120% utilization
                 turb_scale = max(0.3, 2.2 - turb_util / 100.0)
@@ -10002,6 +10027,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         for sp in volatile_species
                     )
                 vol_sat = (vol_rate / vol_train.max_throughput_kg_hr) * 100.0
+                if not math.isfinite(vol_sat):
+                    raise ValueError(
+                        'volatiles transport saturation must be finite before '
+                        f'temperature mutation; got {vol_sat!r}')
                 if vol_sat > 100.0:
                     vol_scale = max(0.0, 2.0 - vol_sat / 100.0)
                     actual_ramp *= vol_scale
@@ -10385,9 +10414,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ) or {}
                 ).items()
             },
-            shuttle_cycle=(self.shuttle_cycle_K
-                           if self.melt.campaign == CampaignPhase.C3_K
-                           else self.shuttle_cycle_Na),
+            shuttle_cycle=(
+                self.shuttle_cycle_K
+                + (
+                    1
+                    if getattr(
+                        self,
+                        '_pending_shuttle_bakeout_cycle_increment',
+                        '',
+                    ) == CampaignPhase.C3_K.name
+                    else 0
+                )
+                if self.melt.campaign == CampaignPhase.C3_K
+                else self.shuttle_cycle_Na
+                + (
+                    1
+                    if getattr(
+                        self,
+                        '_pending_shuttle_bakeout_cycle_increment',
+                        '',
+                    ) == CampaignPhase.C3_NA.name
+                    else 0
+                )
+            ),
             # MRE electrolysis
             mre_voltage_V=self._mre_voltage_V,
             mre_current_A=self._mre_current_A,

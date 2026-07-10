@@ -794,6 +794,24 @@ def test_mg_thermite_debits_process_reagent_inventory():
     assert sim.train.total_by_species().get("Si", 0.0) == pytest.approx(0.0)
 
 
+def test_mg_thermite_counters_are_net_after_committed_back_reduction():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"Al2O3": 80.0, "SiO2": 20.0},
+            }
+        }
+    )
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"Mg": 12.0})
+    sim._init_thermite_inventory()
+
+    sim._step_thermite()
+
+    ledger_al_kg = sim.atom_ledger.kg_by_account("process.metal_phase")["Al"]
+    assert sim._thermite_Al_produced_this_hr == pytest.approx(ledger_al_kg)
+
+
 def test_c2a_staged_payload_exposes_terminal_rump_composition():
     sim = _run_c2a_staged()
 

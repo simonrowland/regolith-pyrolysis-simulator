@@ -1748,6 +1748,86 @@ def test_c5_partial_commit_poison_refuses_same_hour_replay(
     ).get('O2', 0.0) == stored_o2_after_abort
 
 
+def test_mre_zero_transition_refusal_does_not_advance_rung_state(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        'lunar_mare_low_ti',
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.start_campaign(CampaignPhase.C5)
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = 'SiO2'
+    sim.melt.mre_max_voltage_V = 1.5
+    sim.melt.temperature_C = 1600.0
+    sim._mre_hold_hours = 2
+    sim._mre_voltage_step_idx = 0
+    sim._mre_rung_ever_effective = True
+    sim._mre_effective_current_A = 0.0
+
+    def refused_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.ELECTROLYSIS_STEP:
+            return IntentResult(
+                intent=intent,
+                status='refused',
+                transition=None,
+                diagnostic={'reason_refused': 'test_zero_transition_refusal'},
+            )
+        return IntentResult(intent=intent, status='ok', transition=None)
+
+    monkeypatch.setattr(sim, '_dispatch_only', refused_dispatch)
+
+    with pytest.raises(RuntimeError, match='test_zero_transition_refusal'):
+        sim._step_mre()
+
+    assert sim._mre_hold_hours == 2
+    assert sim._mre_voltage_step_idx == 0
+    assert sim._mre_rung_ever_effective is True
+    assert sim._poisoned_hour is None
+
+
+def test_shuttle_bakeout_cycle_counter_waits_for_successful_hour(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        'lunar_mare_low_ti',
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={'K': 1.0},
+    )
+    sim.start_campaign(CampaignPhase.C3_K)
+    sim.melt.campaign_hour = 3
+    sim.shuttle_cycle_K = 0
+    monkeypatch.setattr(sim, '_update_temperature', lambda: None)
+    monkeypatch.setattr(
+        sim,
+        '_apply_oxygen_reservoir_exchange',
+        lambda: sim.melt.oxygen_reservoir,
+    )
+    monkeypatch.setattr(sim, '_apply_fe_redox_respeciation', lambda *a, **k: None)
+    monkeypatch.setattr(sim, '_apply_native_fe_saturation_split', lambda *a, **k: None)
+    monkeypatch.setattr(
+        sim,
+        '_get_equilibrium',
+        lambda: (_ for _ in ()).throw(RuntimeError('post-bakeout abort')),
+    )
+
+    with pytest.raises(RuntimeError, match='post-bakeout abort'):
+        sim.step()
+
+    assert sim.shuttle_cycle_K == 0
+    assert sim._poisoned_hour is None
+
+
 def test_partial_commit_poison_survives_hostile_exception_formatting(
     monkeypatch,
     vapor_pressure_data,

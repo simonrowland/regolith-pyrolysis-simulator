@@ -199,6 +199,23 @@ def test_adjust_handles_only_session_parameters_with_live_override_effects():
         session.adjust("speed", 0.0)
 
 
+def test_session_adjust_rejects_nonfinite_numeric_controls():
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+
+    with pytest.raises(ValueError, match="must be finite"):
+        session.adjust(
+            "campaign_override",
+            float("nan"),
+            campaign="C2A",
+            field="hold_temp_C",
+        )
+    with pytest.raises(ValueError, match="must be finite"):
+        session.adjust("pO2_mbar", float("inf"))
+
+    assert "hold_temp_C" not in sim.campaign_mgr.overrides.get("C2A", {})
+
+
 def test_session_adjust_clamps_absurd_stir_factor_to_physical_ceiling():
     """Operator-boundary clamp: a wildly out-of-range ``stir_factor``
     override (e.g. an auto-tuner that proposes ``100`` because it

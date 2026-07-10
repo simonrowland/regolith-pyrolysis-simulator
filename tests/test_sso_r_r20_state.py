@@ -1440,6 +1440,42 @@ def test_c7_mixed_in_situ_and_external_al_counts_only_external_credit_sink(
     )
 
 
+def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
+    monkeypatch.setattr(
+        BuiltinCaAluminothermicStepProvider,
+        "_computed_thermo_margin_kj_per_mol_o2",
+        lambda self, hold_temp_C: 2.0,
+    )
+    setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
+    setpoints["campaigns"]["C7"].update(
+        {
+            "enabled": True,
+            "al_credit_limit_kg": 20.0,
+            "extent_fraction": 0.1,
+            "ca_condenser_temperature_C": 1000.0,
+        }
+    )
+    sim = PyrolysisSimulator(
+        StubBackend(),
+        setpoints,
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("vapor_pressures.yaml"),
+    )
+    sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
+    sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+    sim.melt.temperature_C = 1200.0
+
+    sim._step_c7_ca_aluminothermic()
+
+    diagnostic = sim._last_c7_diagnostic
+    assert diagnostic["r_transport"] == pytest.approx(0.0)
+    assert diagnostic["transport_ca_mol"] == pytest.approx(0.0)
+    assert diagnostic["c7_transport_refusal"] == (
+        "no_active_route_or_pressure_outside_vacuum_envelope"
+    )
+    assert sim._last_c7_refusal_diagnostic == {}
+
+
 def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
@@ -1931,6 +1967,44 @@ def test_pn2_sweep_without_o2_does_not_phantom_oxidize_melt() -> None:
 
     assert reservoir.exchange_direction == "none:headspace_o2_clamped"
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
+
+
+def test_pn2_sweep_transport_prediction_matches_authoritative_bleed_residual() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1450.0
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim.melt.pO2_mbar = 1.0e-6
+    sim.melt.p_total_mbar = 10.0
+    sim._overhead_headspace_config["enabled"] = True
+    sim._overhead_headspace_config["conductance_kg_s"] = 1.0e-7
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 0.001, "N2": 0.099},
+        source="test PN2 predictor/bleed parity holdup",
+    )
+    head_o2_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+
+    predicted_pO2 = sim._pn2_sweep_transport_pO2_bar(head_o2_mol)
+    bleed = sim._dispatch_overhead_bleed(turbine_spec=None)
+    residual_o2_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+    authoritative_residual_pO2 = sim._headspace_ledger_pO2_bar_from_o2_mol(
+        residual_o2_mol
+    )
+
+    assert bleed.diagnostic["bled_o2_mol"] > 0.0
+    assert predicted_pO2 == pytest.approx(authoritative_residual_pO2)
+
+
+def test_update_temperature_refuses_nonfinite_transport_saturation() -> None:
+    sim = _make_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 25.0
+    sim.overhead.transport_saturation_pct = math.nan
+
+    with pytest.raises(ValueError, match="transport_saturation_pct"):
+        sim._update_temperature()
+
+    assert sim.melt.temperature_C == pytest.approx(25.0)
 
 
 def test_c2a_staged_po2_hold_uses_managed_exchange_not_direct_refresh(

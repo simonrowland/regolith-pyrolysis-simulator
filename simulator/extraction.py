@@ -916,6 +916,18 @@ class ExtractionMixin:
 
         # --- Voltage and current selection (stepped holds) ---         [Step 9]
         c5_step_info: Mapping[str, Any] | None = None
+        mre_replay_state_before_dispatch = {
+            'hold_hours': self._mre_hold_hours,
+            'voltage_step_idx': self._mre_voltage_step_idx,
+            'rung_ever_effective': getattr(
+                self, '_mre_rung_ever_effective', False),
+            'sequence_complete_key': getattr(
+                self, '_mre_c5_sequence_complete_key', None),
+            'melt_c5_on_final_rung': getattr(
+                self.melt, 'mre_c5_on_final_rung', False),
+            'melt_c5_ladder_complete': getattr(
+                self.melt, 'mre_c5_ladder_complete', False),
+        }
         if self.melt.campaign == CampaignPhase.MRE_BASELINE:
             seq = self._mre_voltage_sequence
             if not seq:
@@ -1174,6 +1186,18 @@ class ExtractionMixin:
             self.melt.mre_voltage_V = 0.0
             self.melt.mre_declared_rung_V = 0.0
             self.melt.mre_current_A = 0.0
+            self._mre_hold_hours = int(
+                mre_replay_state_before_dispatch['hold_hours'])
+            self._mre_voltage_step_idx = int(
+                mre_replay_state_before_dispatch['voltage_step_idx'])
+            self._mre_rung_ever_effective = bool(
+                mre_replay_state_before_dispatch['rung_ever_effective'])
+            self._mre_c5_sequence_complete_key = (
+                mre_replay_state_before_dispatch['sequence_complete_key'])
+            self.melt.mre_c5_on_final_rung = bool(
+                mre_replay_state_before_dispatch['melt_c5_on_final_rung'])
+            self.melt.mre_c5_ladder_complete = bool(
+                mre_replay_state_before_dispatch['melt_c5_ladder_complete'])
             reason = diagnostic.get('reason_refused', 'electrolysis_step_refused')
             raise RuntimeError(f'MRE electrolysis refused: {reason}')
         if proposal is not None:
@@ -1447,11 +1471,13 @@ class ExtractionMixin:
             # Bakeout is handled by normal evaporation (K/Na have high
             # vapor pressure at 1520-1680°C).  Track cycle transitions.
             if self.melt.campaign_hour % cycle_period == 3:
-                # Just entered bakeout — increment cycle counter
+                # Just entered bakeout. Defer the diagnostic counter until the
+                # hour snapshots successfully; zero-transition aborts must be
+                # replayable without mutating state.
                 if campaign == CampaignPhase.C3_K:
-                    self.shuttle_cycle_K += 1
+                    self._pending_shuttle_bakeout_cycle_increment = campaign.name
                 elif campaign == CampaignPhase.C3_NA:
-                    self.shuttle_cycle_Na += 1
+                    self._pending_shuttle_bakeout_cycle_increment = campaign.name
 
     def _shuttle_inject_K(self, *, liquid_fraction=None):
         """
@@ -1904,14 +1930,16 @@ class ExtractionMixin:
             # skipped at the caller.
             self._chem_no_op_dispatch_count += 1
 
-            # Net Al / Al2O3 deltas after back-reduction (legacy
-            # snapshot semantics: counters track NET removed Al2O3 and
-            # NET produced Al).
-            Al_lost_to_back_kg = float(back_diag.get('Al_consumed_kg', 0.0))
-            Al2O3_regenerated_kg = float(
-                back_diag.get('Al2O3_regenerated_kg', 0.0))
-            Al_produced_kg -= Al_lost_to_back_kg
-            Al2O3_removed_kg -= Al2O3_regenerated_kg
+        # Net Al / Al2O3 deltas after back-reduction (legacy snapshot
+        # semantics: counters track NET removed Al2O3 and NET produced Al).
+        # The kernel ledger is the source of truth for whether the cascade
+        # committed; committed back-reduction diagnostics must reduce the
+        # telemetry counters too, not only the no-op path.
+        Al_lost_to_back_kg = float(back_diag.get('Al_consumed_kg', 0.0))
+        Al2O3_regenerated_kg = float(
+            back_diag.get('Al2O3_regenerated_kg', 0.0))
+        Al_produced_kg -= Al_lost_to_back_kg
+        Al2O3_removed_kg -= Al2O3_regenerated_kg
 
         # Al product remains in the metal-phase product account.
         self._project_extraction_product(
@@ -2051,6 +2079,7 @@ class ExtractionMixin:
         ca_per_extent: float,
     ) -> tuple[float, dict]:
         from engines.builtin.ca_aluminothermic_step import (
+            BuiltinCaAluminothermicStepProvider,
             C7_MAX_TOTAL_PRESSURE_MBAR,
             C7_MIN_TOTAL_PRESSURE_MBAR,
         )
@@ -2073,9 +2102,19 @@ class ExtractionMixin:
         if p_total_raw is None:
             p_total_raw = cfg.get('p_total_mbar_default')
         p_total_mbar = self._c7_float(p_total_raw, self.melt.p_total_mbar)
+        route_controls = {
+            'active_ca_condensation_route': self._c7_bool(
+                cfg.get('active_ca_condensation_route'), True),
+            'dedicated_ca_condenser': self._c7_bool(
+                cfg.get('dedicated_ca_condenser'), True),
+            'ca_condensation_species': str(
+                cfg.get('ca_condensation_species') or 'Ca'),
+            'ca_condenser_temperature_C': self._c7_float(
+                cfg.get('ca_condenser_temperature_C'), 780.0),
+        }
         active_route = (
-            self._c7_bool(cfg.get('active_ca_condensation_route'), True)
-            and self._c7_bool(cfg.get('dedicated_ca_condenser'), True)
+            BuiltinCaAluminothermicStepProvider
+            ._has_dedicated_ca_route(route_controls)
         )
         area_m2 = max(
             0.0,
@@ -2331,7 +2370,8 @@ class ExtractionMixin:
                 cfg.get('active_ca_condensation_route'), True),
             'dedicated_ca_condenser': self._c7_bool(
                 cfg.get('dedicated_ca_condenser'), True),
-            'ca_condensation_species': 'Ca',
+            'ca_condensation_species': str(
+                cfg.get('ca_condensation_species') or 'Ca'),
             'ca_condenser_temperature_C': self._c7_float(
                 cfg.get('ca_condenser_temperature_C'), 780.0),
             'thermo_margin_kj_per_mol_o2': self._c7_float(

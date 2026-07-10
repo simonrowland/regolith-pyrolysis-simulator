@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
+import math
 from typing import Any, Callable, Iterable, Mapping
 
 from simulator.backend_names import canonical_backend_name
@@ -29,6 +30,16 @@ from simulator.state import (
     clamp_stir_factor,
     clamp_stir_state,
 )
+
+
+def _finite_float(value: Any, label: str) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} must be numeric") from exc
+    if not math.isfinite(number):
+        raise ValueError(f"{label} must be finite")
+    return number
 
 
 def _canonical_runtime_campaign_overrides(
@@ -310,7 +321,10 @@ class SimSession:
                 if str(field_name) == LAB_SCHEDULE_OVERRIDE_KEY:
                     target[str(field_name)] = normalize_lab_schedule(value)
                 else:
-                    target[str(field_name)] = float(value)
+                    target[str(field_name)] = _finite_float(
+                        value,
+                        f"runtime_campaign_overrides[{campaign!r}].{field_name}",
+                    )
 
         sim.start_campaign(campaign_phase)
 
@@ -404,7 +418,7 @@ class SimSession:
             # 1/sqrt(pO2) Ellingham SiO suppression becomes live. A
             # value of 0 leaves the atmosphere alone (operator clearing
             # the setpoint, NOT requesting controlled-O2).
-            new_pO2 = float(value)
+            new_pO2 = _finite_float(value, "pO2_mbar")
             sim.melt.pO2_mbar = new_pO2
             sim.melt.p_total_mbar = max(
                 sim.melt.p_total_mbar,
@@ -415,8 +429,9 @@ class SimSession:
                 from simulator.state import Atmosphere
                 sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
         elif param == "c4_max_temp":
-            sim.c4_max_temp_C = float(value)
-            sim.campaign_mgr.c4_max_temp_C = float(value)
+            finite_value = _finite_float(value, "c4_max_temp")
+            sim.c4_max_temp_C = finite_value
+            sim.campaign_mgr.c4_max_temp_C = finite_value
         elif param == "campaign_override":
             campaign_name = str(kw.get("campaign", ""))
             field_name = str(kw.get("field", ""))
@@ -457,7 +472,10 @@ class SimSession:
                 if sim.melt.campaign.name == campaign_name:
                     sim.melt.stir_state = clamped
             else:
-                target[field_name] = float(value)
+                target[field_name] = _finite_float(
+                    value,
+                    f"campaign_override {campaign_name}.{field_name}",
+                )
             if field_name == "pO2_mbar" and sim.melt.campaign.name == campaign_name:
                 # 0.5.4 W5 (post-push P2 convergent finding, codex
                 # review + codex challenge 2026-05-28): mirror the
@@ -476,7 +494,7 @@ class SimSession:
                 # suppression becomes live. ``value == 0`` leaves
                 # atmosphere alone (clearing the setpoint, NOT
                 # requesting controlled-O2).
-                new_pO2 = float(value)
+                new_pO2 = target[field_name]
                 sim.melt.pO2_mbar = new_pO2
                 sim.melt.p_total_mbar = max(
                     sim.melt.p_total_mbar,
