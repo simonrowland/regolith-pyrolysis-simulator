@@ -110,6 +110,42 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
     assert in_range_warnings == []
 
 
+def test_antoine_extrapolation_records_count_same_species_stage_and_wall():
+    records: dict[str, dict[str, object]] = {}
+    warnings: list[str] = []
+    data = {"valid_range_K": (1400.0, 2200.0)}
+
+    condensation._record_antoine_extrapolation(
+        "SiO",
+        1173.15,
+        data,
+        antoine_extrapolations=records,
+        antoine_extrapolation_warnings=warnings,
+    )
+    condensation._record_antoine_extrapolation(
+        "SiO",
+        2300.0,
+        data,
+        antoine_extrapolations=records,
+        antoine_extrapolation_warnings=warnings,
+    )
+    condensation._record_antoine_extrapolation(
+        "SiO",
+        2300.0,
+        data,
+        antoine_extrapolations=records,
+        antoine_extrapolation_warnings=warnings,
+    )
+
+    assert len(records) == 2
+    assert "SiO" in records
+    assert {record["temperature_K"] for record in records.values()} == {
+        1173.15,
+        2300.0,
+    }
+    assert len(warnings) == 2
+
+
 def test_wall_deposition_flux_telemetry_keeps_applied_flux_identical():
     T_wall_K = 1173.15
     kwargs = dict(

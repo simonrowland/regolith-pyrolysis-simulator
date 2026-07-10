@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from types import SimpleNamespace
 
 import pytest
 
+from simulator.condensation import KnudsenRegimeRefusal
 from simulator.run_executor import RunExecution, RunExecutor, _aggregate_backend_status
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession, SimSessionConfig
@@ -139,6 +141,37 @@ def test_backend_status_aggregation_preserves_recovered_domain_edges():
         "not_converged"
     )
     assert _aggregate_backend_status(("ok",), "ok") == "ok"
+
+
+def test_run_executor_degraded_envelope_preserves_refusal(monkeypatch):
+    class BareSession:
+        simulator = SimpleNamespace()
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise KnudsenRegimeRefusal(
+            {
+                "status": "refused",
+                "reason": "knudsen_outside_viscous_flow",
+                "segments": [{"regime": "free_molecular"}],
+            }
+        )
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+
+    execution = RunExecutor().execute_session(BareSession(), hours=1)
+
+    assert execution.status == "refused"
+    assert execution.reason == "knudsen_outside_viscous_flow"
+    assert execution.error_message == "knudsen_outside_viscous_flow"
+    assert execution.refusal_diagnostic == {
+        "status": "refused",
+        "reason": "knudsen_outside_viscous_flow",
+        "segments": [{"regime": "free_molecular"}],
+    }
+    assert "envelope detail unavailable" in execution.envelope_detail_unavailable
 
 
 def _pre_path_ab_c0b_ledger(

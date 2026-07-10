@@ -3428,11 +3428,20 @@ def _record_antoine_extrapolation(
     if valid_low <= T_K <= valid_high:
         return
 
-    if antoine_extrapolations is not None and species not in antoine_extrapolations:
-        antoine_extrapolations[species] = {
-            'temperature_K': T_K,
-            'valid_range_K': (valid_low, valid_high),
-        }
+    record = {
+        'temperature_K': T_K,
+        'valid_range_K': (valid_low, valid_high),
+    }
+    if antoine_extrapolations is not None:
+        existing_records = list(antoine_extrapolations.values())
+        if not any(dict(existing) == record for existing in existing_records):
+            key = species
+            if key in antoine_extrapolations:
+                suffix = 2
+                while f'{species}#{suffix}' in antoine_extrapolations:
+                    suffix += 1
+                key = f'{species}#{suffix}'
+            antoine_extrapolations[key] = record
     if antoine_extrapolation_warnings is not None:
         warning = (
             f"{species} metal Antoine fit extrapolated beyond "

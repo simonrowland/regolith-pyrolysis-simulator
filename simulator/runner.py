@@ -98,7 +98,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.3.3"
+RUNNER_SCHEMA_VERSION = "1.4.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -761,6 +761,10 @@ class PyrolysisRun:
         # token so the serialized run metadata (`"backend"`) and the fidelity-
         # vocabulary backend-token translator both see the legacy token.
         self.backend_name = canonical_backend_name(self.backend_name)
+        if int(self.hours) < 0:
+            raise RunnerError(
+                f"invalid hours: hours must be >= 0; got {int(self.hours)}"
+            )
         overrides = _canonical_runtime_campaign_overrides(
             runtime_campaign_overrides=self.runtime_campaign_overrides,
             setpoints_overrides=self.setpoints_overrides,
@@ -986,7 +990,7 @@ class PyrolysisRun:
         try:
             return self._build_output_detail(execution)
         except Exception as exc:  # noqa: BLE001 -- failure reporting must survive
-            if execution.status != "failed":
+            if execution.status not in {"failed", "refused"}:
                 raise
             return self._minimal_failure_output(
                 execution,
@@ -1015,6 +1019,9 @@ class PyrolysisRun:
             engines=self.engines,
             metadata_overrides=self.run_metadata_overrides,
             reason=execution.reason,
+            status=str(execution.status or "failed"),
+            execution=execution,
+            engines_used=self._safe_failure_engines_used(execution),
             error_message_override=error_message,
         )
 
@@ -1223,6 +1230,19 @@ class PyrolysisRun:
             "registry": _json_safe(capability),
         }
 
+    def _safe_failure_engines_used(
+        self,
+        execution: RunExecution,
+    ) -> dict[str, object]:
+        try:
+            return self._engines_used(execution.simulator)
+        except Exception:  # noqa: BLE001 -- failure envelopes must survive
+            return {
+                "active": {},
+                "requested": {k: v for k, v in self.engines.items()},
+                "registry": {},
+            }
+
     def _requests_o2_bubbler_runtime(self) -> bool:
         for fields in dict(self.runtime_campaign_overrides).values():
             if not isinstance(fields, Mapping):
@@ -1242,6 +1262,19 @@ class PyrolysisRun:
 # ----------------------------------------------------------------------
 
 
+def _empty_vapor_pressure_source_report() -> dict[str, object]:
+    return {
+        "species": {},
+        "summary": {},
+        "total_species": 0,
+        "vapor_pressure_backend_status": "",
+        "vapor_pressure_backend_status_summary": {},
+        "vapor_pressure_backend_status_reason": "",
+        "vapor_pressure_fallback_source": "",
+        "authoritative_for_requested_vapor_pressure": None,
+    }
+
+
 def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
     source_by_species = {
         str(species): str(source)
@@ -1251,6 +1284,10 @@ def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
     }
     total = len(source_by_species)
     counts = Counter(source_by_species.values())
+    diagnostics = dict(getattr(sim, "_last_backend_diagnostics", {}) or {})
+    facet_status = str(
+        diagnostics.get("vapor_pressure_backend_status") or ""
+    ).strip()
     report: dict[str, object] = {
         "species": source_by_species,
         "summary": {
@@ -1261,26 +1298,30 @@ def _vapor_pressure_source_report(sim: PyrolysisSimulator) -> dict[str, object]:
             for source, count in sorted(counts.items())
         },
         "total_species": total,
-    }
-    diagnostics = dict(getattr(sim, "_last_backend_diagnostics", {}) or {})
-    facet_status = str(
-        diagnostics.get("vapor_pressure_backend_status") or ""
-    ).strip()
-    if facet_status:
-        report["vapor_pressure_backend_status"] = facet_status
-        report["vapor_pressure_backend_status_summary"] = {
-            facet_status: {
-                "count": total,
-                "percentage": 100.0 if total else 0.0,
+        "vapor_pressure_backend_status": facet_status,
+        "vapor_pressure_backend_status_summary": (
+            {
+                facet_status: {
+                    "count": total,
+                    "percentage": 100.0 if total else 0.0,
+                }
             }
-        }
-        for key in (
+            if facet_status
+            else {}
+        ),
+        "vapor_pressure_backend_status_reason": diagnostics.get(
             "vapor_pressure_backend_status_reason",
+            "",
+        ),
+        "vapor_pressure_fallback_source": diagnostics.get(
             "vapor_pressure_fallback_source",
+            "",
+        ),
+        "authoritative_for_requested_vapor_pressure": diagnostics.get(
             "authoritative_for_requested_vapor_pressure",
-        ):
-            if key in diagnostics:
-                report[key] = diagnostics[key]
+            None,
+        ),
+    }
     return report
 
 
@@ -2848,7 +2889,13 @@ def run_sio_tsweep(
             },
         }
         with (output_dir / f"{cell_id}.json").open("w") as f:
-            json.dump(cell_doc, f, indent=2, sort_keys=False)
+            json.dump(
+                _json_safe(cell_doc),
+                f,
+                indent=2,
+                sort_keys=False,
+                allow_nan=False,
+            )
             f.write("\n")
         rows.append(row)
 
@@ -3179,7 +3226,13 @@ def run_sio_wall_sweep(
             "diagnostics": diagnostics,
         }
         with (output_dir / f"{cell_id}.json").open("w") as f:
-            json.dump(cell_doc, f, indent=2, sort_keys=False)
+            json.dump(
+                _json_safe(cell_doc),
+                f,
+                indent=2,
+                sort_keys=False,
+                allow_nan=False,
+            )
             f.write("\n")
         rows.append(row)
 
@@ -3277,6 +3330,44 @@ def _parse_runtime_campaign_overrides_json(
     return parsed
 
 
+def _safe_failure_value(builder: Any, default: Any) -> Any:
+    try:
+        return builder()
+    except Exception:  # noqa: BLE001 -- failure reporting must survive
+        return default
+
+
+def _execution_hours_completed(execution: RunExecution | None) -> int:
+    if execution is None:
+        return 0
+    return _safe_failure_value(
+        lambda: int(getattr(execution.simulator.melt, "hour", 0)),
+        0,
+    )
+
+
+def _execution_per_hour_summary(execution: RunExecution | None) -> list[Any]:
+    if execution is None:
+        return []
+    return _json_safe(list(getattr(execution, "per_hour", ()) or ()))
+
+
+def _execution_shadow_trace(execution: RunExecution | None) -> list[Any]:
+    if execution is None:
+        return []
+    return _json_safe(list(getattr(execution, "shadow_trace", ()) or ()))
+
+
+def _execution_pO2_enforcement_by_hour(
+    execution: RunExecution | None,
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in _execution_per_hour_summary(execution):
+        if isinstance(row, Mapping) and isinstance(row.get("pO2_enforcement"), Mapping):
+            rows.append(dict(row["pO2_enforcement"]))
+    return _json_safe(rows)
+
+
 def _runner_failure_result(
     *,
     error: RunnerError,
@@ -3290,6 +3381,9 @@ def _runner_failure_result(
     engines: Mapping[str, str],
     metadata_overrides: Mapping[str, Any],
     reason: str = "",
+    status: str = "failed",
+    execution: RunExecution | None = None,
+    engines_used: Mapping[str, Any] | None = None,
     error_message_override: str | None = None,
 ) -> dict[str, Any]:
     overrides = dict(metadata_overrides)
@@ -3301,48 +3395,123 @@ def _runner_failure_result(
         "kernel_commit_sha",
         _resolve_kernel_commit_sha(),
     )
+    backend_status = (
+        str(getattr(execution, "backend_status", "unavailable"))
+        if execution is not None
+        else "unavailable"
+    )
+    backend_authoritative = (
+        bool(getattr(execution, "backend_authoritative", False))
+        if execution is not None
+        else False
+    )
+    if engines_used is None:
+        engines_used = {"active": {}, "requested": dict(engines), "registry": {}}
     run_metadata = {
         "schema_version": RUNNER_SCHEMA_VERSION,
         "feedstock_id": feedstock_id,
         "campaign": campaign,
         "hours_requested": int(hours),
-        "hours_completed": 0,
-        "mass_kg": float(mass_kg),
-        "additives_kg": dict(additives_kg),
+        "hours_completed": _execution_hours_completed(execution),
+        "mass_kg": _json_safe(float(mass_kg)),
+        "additives_kg": _json_safe(dict(additives_kg)),
         "track": track,
         "backend": backend_name,
+        "backend_status": backend_status,
+        "backend_authoritative": backend_authoritative,
         "started_at_utc": started_at_utc,
-        "engines_used": {"requested": dict(engines), "registry": {}},
+        "engines_used": _json_safe(dict(engines_used)),
         "kernel_commit_sha": kernel_commit_sha,
     }
     for key, value in overrides.items():
-        run_metadata[str(key)] = value
+        run_metadata[str(key)] = _json_safe(value)
+    run_metadata.update(
+        canonicalize_fidelity_emission(
+            backend_name=backend_name,
+            backend_status=backend_status,
+            backend_authoritative=backend_authoritative,
+        )
+    )
+    refusal_diagnostic = (
+        dict(getattr(execution, "refusal_diagnostic", {}) or {})
+        if execution is not None
+        else {}
+    )
+    if refusal_diagnostic:
+        run_metadata["knudsen_regime_diagnostic"] = _json_safe(
+            refusal_diagnostic
+        )
+    sim = getattr(execution, "simulator", None) if execution is not None else None
+    final_state = (
+        _safe_failure_value(lambda: _final_state_from_ledger(sim), {})
+        if sim is not None
+        else {}
+    )
+    final = {
+        "wall_deposit_by_species_kg": {},
+        "deposit_by_surface_species_kg": {},
+        "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
+    }
+    if sim is not None:
+        final = _safe_failure_value(
+            lambda: _final_summary_report(final_state, execution),
+            final,
+        )
+    stage_report = (
+        _safe_failure_value(lambda: stage_purity_report(sim.train), {})
+        if sim is not None
+        else {}
+    )
+    vapor_report = (
+        _safe_failure_value(
+            lambda: _vapor_pressure_source_report(sim),
+            _empty_vapor_pressure_source_report(),
+        )
+        if sim is not None
+        else _empty_vapor_pressure_source_report()
+    )
+    degraded_path_engagement = (
+        _safe_failure_value(
+            lambda: _degraded_path_engagement(sim),
+            _empty_degraded_path_engagement(),
+        )
+        if sim is not None
+        else _empty_degraded_path_engagement()
+    )
+    melt_redox_gate_floor_fallback_engagement = (
+        _safe_failure_value(
+            lambda: _melt_redox_gate_floor_fallback_engagement(sim),
+            _empty_melt_redox_gate_floor_fallback_engagement(),
+        )
+        if sim is not None
+        else _empty_melt_redox_gate_floor_fallback_engagement()
+    )
     return {
         "schema_version": RUNNER_SCHEMA_VERSION,
         "run_metadata": run_metadata,
-        "final_state": {},
-        "final": {
-            "wall_deposit_by_species_kg": {},
-            "deposit_by_surface_species_kg": {},
-            "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
-        },
-        "stage_purity_report": {},
-        "vapor_pressure_source_report": {
-            "species": {},
-            "summary": {},
-            "total_species": 0,
-        },
+        "final_state": _json_safe(final_state),
+        "final": _json_safe(final),
+        "stage_purity_report": _json_safe(stage_report),
+        "vapor_pressure_source_report": _json_safe(vapor_report),
         "shuttle_refusal_history": [],
-        "c7_product_report": _c7_product_report(),
-        "c7_refusal_diagnostic": _c7_refusal_diagnostic(),
-        "degraded_path_engagement": _empty_degraded_path_engagement(),
-        "melt_redox_gate_floor_fallback_engagement": (
-            _empty_melt_redox_gate_floor_fallback_engagement()
+        "c7_product_report": _json_safe(
+            _safe_failure_value(lambda: _c7_product_report(sim), {})
+            if sim is not None
+            else {}
         ),
-        "pO2_enforcement_by_hour": [],
-        "per_hour_summary": [],
-        "shadow_trace": [],
-        "status": "failed",
+        "c7_refusal_diagnostic": _json_safe(
+            _safe_failure_value(lambda: _c7_refusal_diagnostic(sim), {})
+            if sim is not None
+            else {}
+        ),
+        "degraded_path_engagement": degraded_path_engagement,
+        "melt_redox_gate_floor_fallback_engagement": (
+            melt_redox_gate_floor_fallback_engagement
+        ),
+        "pO2_enforcement_by_hour": _execution_pO2_enforcement_by_hour(execution),
+        "per_hour_summary": _execution_per_hour_summary(execution),
+        "shadow_trace": _execution_shadow_trace(execution),
+        "status": status,
         "reason": reason,
         "error_message": (
             error_message_override
@@ -3599,7 +3768,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w") as f:
-        json.dump(result, f, indent=2, sort_keys=False)
+        json.dump(
+            _json_safe(result),
+            f,
+            indent=2,
+            sort_keys=False,
+            allow_nan=False,
+        )
         f.write("\n")
 
     return 0 if result["status"] not in {"failed", "refused"} else 1
@@ -3675,10 +3850,11 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
                 "lab_plume_product_partition"
             ]
             json.dump(
-                cli_diagnostics,
+                _json_safe(cli_diagnostics),
                 f,
                 indent=2,
                 sort_keys=False,
+                allow_nan=False,
             )
             f.write("\n")
     else:
@@ -3687,7 +3863,13 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w") as f:
-        json.dump(report, f, indent=2, sort_keys=False)
+        json.dump(
+            _json_safe(report),
+            f,
+            indent=2,
+            sort_keys=False,
+            allow_nan=False,
+        )
         f.write("\n")
     return 0
 
@@ -3796,7 +3978,13 @@ def main_sio_tsweep(argv: Optional[list[str]] = None) -> int:
         summary_path = Path(args.summary_output)
         summary_path.parent.mkdir(parents=True, exist_ok=True)
         with summary_path.open("w") as f:
-            json.dump(summary, f, indent=2, sort_keys=False)
+            json.dump(
+                _json_safe(summary),
+                f,
+                indent=2,
+                sort_keys=False,
+                allow_nan=False,
+            )
             f.write("\n")
     return 0
 
@@ -3905,7 +4093,13 @@ def main_sio_wall_sweep(argv: Optional[list[str]] = None) -> int:
         summary_path = Path(args.summary_output)
         summary_path.parent.mkdir(parents=True, exist_ok=True)
         with summary_path.open("w") as f:
-            json.dump(summary, f, indent=2, sort_keys=False)
+            json.dump(
+                _json_safe(summary),
+                f,
+                indent=2,
+                sort_keys=False,
+                allow_nan=False,
+            )
             f.write("\n")
     return 0
 

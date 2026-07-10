@@ -196,15 +196,47 @@ class RunExecutor:
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
             if failure_exc is None:
                 raise
+            snapshots = _safe_tuple(lambda: getattr(sim.record, "snapshots", ()))
+            shadow_trace = _safe_tuple(
+                lambda: _collect_shadow_trace(sim, operator_decisions)
+            )
+            reduced_real_cache = _safe_mapping(
+                lambda: _collect_reduced_real_cache_diagnostic(sim)
+            )
+            latest_backend_status = _safe_str(
+                lambda: getattr(
+                    sim,
+                    "_backend_selection_status",
+                    getattr(sim, "_last_backend_status", "ok"),
+                ),
+                "unavailable",
+            )
+            backend_status = _safe_str(
+                lambda: _aggregate_backend_status(
+                    getattr(sim, "_backend_status_history", ()),
+                    latest_backend_status,
+                ),
+                "unavailable",
+            )
+            backend_authoritative = _safe_bool(
+                lambda: getattr(sim, "_backend_authoritative", False),
+                False,
+            )
             return RunExecution(
                 session=session,
                 simulator=sim,
-                snapshots=(),
+                snapshots=snapshots,
                 trace=PhysicsTrace(),
-                status="failed",
-                error_message=_safe_exception_text(failure_exc),
-                backend_status="unavailable",
-                backend_authoritative=False,
+                per_hour=tuple(per_hour),
+                operator_decisions=tuple(operator_decisions),
+                shadow_trace=shadow_trace,
+                status=status,
+                error_message=error_message or _safe_exception_text(failure_exc),
+                reason=reason,
+                refusal_diagnostic=refusal_diagnostic,
+                reduced_real_cache=reduced_real_cache,
+                backend_status=backend_status,
+                backend_authoritative=backend_authoritative,
                 envelope_detail_unavailable=(
                     "envelope detail unavailable: "
                     f"{_safe_exception_text(envelope_exc)}"
@@ -246,6 +278,35 @@ def _safe_exception_text(exc: BaseException) -> str:
     except Exception as message_exc:  # noqa: BLE001 -- reporting must survive
         message = f"<message unavailable: {type(message_exc).__name__}>"
     return f"{type(exc).__name__}: {message}"
+
+
+def _safe_tuple(builder: Any) -> tuple[Any, ...]:
+    try:
+        return tuple(builder() or ())
+    except Exception:  # noqa: BLE001 -- degraded envelope fallback
+        return ()
+
+
+def _safe_mapping(builder: Any) -> Mapping[str, Any]:
+    try:
+        value = builder()
+    except Exception:  # noqa: BLE001 -- degraded envelope fallback
+        return {}
+    return value if isinstance(value, Mapping) else {}
+
+
+def _safe_str(builder: Any, default: str) -> str:
+    try:
+        return str(builder())
+    except Exception:  # noqa: BLE001 -- degraded envelope fallback
+        return default
+
+
+def _safe_bool(builder: Any, default: bool) -> bool:
+    try:
+        return bool(builder())
+    except Exception:  # noqa: BLE001 -- degraded envelope fallback
+        return default
 
 
 def _aggregate_backend_status(history: Any, latest: str) -> str:

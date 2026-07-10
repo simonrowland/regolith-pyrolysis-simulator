@@ -172,6 +172,18 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "redox_source_breakdown",
     "mass_balance_error_category",
     "reduced_real_cache_state",
+    "c2a_staged_gas",
+})
+
+VAPOR_PRESSURE_SOURCE_REPORT_KEYS = frozenset({
+    "species",
+    "summary",
+    "total_species",
+    "vapor_pressure_backend_status",
+    "vapor_pressure_backend_status_summary",
+    "vapor_pressure_backend_status_reason",
+    "vapor_pressure_fallback_source",
+    "authoritative_for_requested_vapor_pressure",
 })
 
 
@@ -600,10 +612,23 @@ def _assert_schema_shape(payload: dict) -> None:
 
     source_report = payload["vapor_pressure_source_report"]
     assert isinstance(source_report, dict)
-    assert set(source_report) == {"species", "summary", "total_species"}
+    assert set(source_report) == VAPOR_PRESSURE_SOURCE_REPORT_KEYS
     assert isinstance(source_report["species"], dict)
     assert isinstance(source_report["summary"], dict)
     assert source_report["total_species"] == len(source_report["species"])
+    assert isinstance(source_report["vapor_pressure_backend_status"], str)
+    assert isinstance(
+        source_report["vapor_pressure_backend_status_summary"],
+        dict,
+    )
+    assert isinstance(
+        source_report["vapor_pressure_backend_status_reason"],
+        str,
+    )
+    assert isinstance(source_report["vapor_pressure_fallback_source"], str)
+    assert source_report[
+        "authoritative_for_requested_vapor_pressure"
+    ] in {True, False, None}
     for species, source in source_report["species"].items():
         assert isinstance(species, str)
         # Per-species sources carry a colon-suffixed evidence detail after the
@@ -624,6 +649,13 @@ def _assert_schema_shape(payload: dict) -> None:
         }
     for source, item in source_report["summary"].items():
         assert isinstance(source, str)
+        assert set(item) == {"count", "percentage"}
+        assert isinstance(item["count"], int)
+        assert isinstance(item["percentage"], (int, float))
+    for status, item in source_report[
+        "vapor_pressure_backend_status_summary"
+    ].items():
+        assert isinstance(status, str)
         assert set(item) == {"count", "percentage"}
         assert isinstance(item["count"], int)
         assert isinstance(item["percentage"], (int, float))
@@ -1103,6 +1135,66 @@ def test_runner_cli_rejects_zero_mass_with_named_failure(tmp_path):
     assert "zero_input_basis_breach" in payload["error_message"]
 
 
+def test_runner_cli_rejects_nan_mass_with_valid_json(tmp_path):
+    output = tmp_path / "nan-mass.json"
+    repo_root = Path(__file__).resolve().parent.parent
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.runner",
+            "--feedstock=lunar_mare_low_ti",
+            "--campaign=C0",
+            "--hours=2",
+            "--mass-kg=nan",
+            f"--output={output}",
+            "--started-at-utc=2026-05-15T00:00:00Z",
+            "--kernel-commit-sha=cli-nan-mass",
+        ],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    text = output.read_text()
+    assert "NaN" not in text
+    payload = json.loads(text)
+    assert payload["status"] == "failed"
+    assert payload["run_metadata"]["mass_kg"] == "nan"
+    assert "zero_input_basis_breach" in payload["error_message"]
+
+
+def test_runner_cli_rejects_negative_hours_with_failure_envelope(tmp_path):
+    output = tmp_path / "negative-hours.json"
+    repo_root = Path(__file__).resolve().parent.parent
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.runner",
+            "--feedstock=lunar_mare_low_ti",
+            "--campaign=C0",
+            "--hours=-1",
+            f"--output={output}",
+            "--started-at-utc=2026-05-15T00:00:00Z",
+            "--kernel-commit-sha=cli-negative-hours",
+        ],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    payload = json.loads(output.read_text())
+    assert payload["status"] == "failed"
+    assert payload["run_metadata"]["hours_requested"] == -1
+    assert payload["run_metadata"]["hours_completed"] == 0
+    assert "hours must be >= 0" in payload["error_message"]
+
+
 def test_status_with_mass_balance_invariant_fails_breach_category() -> None:
     execution = SimpleNamespace(
         status="ok",
@@ -1235,6 +1327,18 @@ def test_runner_failure_envelope_for_unknown_feedstock(tmp_path):
     payload = json.loads(output.read_text())
     assert payload["status"] == "failed"
     assert "unknown feedstock" in payload["error_message"].lower()
+    assert RUN_METADATA_KEYS.issubset(payload["run_metadata"])
+    assert payload["run_metadata"]["backend_status"] == "unavailable"
+    assert payload["run_metadata"]["backend_authoritative"] is False
+    assert payload["run_metadata"]["backend_real_active"] is False
+    assert payload["run_metadata"]["runtime_status"] == "unavailable"
+    assert payload["run_metadata"]["evidence_class"] == "internal-analytical"
+    assert payload["run_metadata"]["certification_allowed"] is False
+    assert set(payload["run_metadata"]["engines_used"]) == {
+        "active",
+        "requested",
+        "registry",
+    }
     # Autoreview r5 P2 (2026-05-27): the failed envelope MUST advertise
     # the SAME top-level shape as a successful run; downstream
     # consumers diffing the schema shouldn't have to special-case
@@ -1380,7 +1484,7 @@ def test_runner_preserves_primary_failure_when_poison_enrichment_fails(
     assert payload["status"] == "failed"
     assert payload["reason"] == ""
     assert payload["error_message"].splitlines() == [
-        "RuntimeError: primary abort",
+        "backend failure: primary abort",
         (
             "envelope detail unavailable: AttributeError: "
             "'RaisingPoisonSim' object has no attribute 'record'"
@@ -1388,6 +1492,66 @@ def test_runner_preserves_primary_failure_when_poison_enrichment_fails(
     ]
     assert payload["per_hour_summary"] == []
     assert payload["shadow_trace"] == []
+
+
+def test_runner_detail_fallback_preserves_refused_status_and_live_rows(monkeypatch):
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-15T00:00:00Z",
+            "kernel_commit_sha": "refused-detail-fallback",
+        },
+    )
+    execution = SimpleNamespace(
+        status="refused",
+        reason="knudsen_outside_viscous_flow",
+        error_message="knudsen_outside_viscous_flow",
+        envelope_detail_unavailable="",
+        per_hour=(
+            {
+                "hour": 0,
+                "pO2_enforcement": {
+                    "hour": 0,
+                    "setpoint_mbar": 1.0,
+                    "achieved_mbar": 1.0,
+                    "limited_by_total_pressure": False,
+                    "status": "ok",
+                },
+            },
+        ),
+        shadow_trace=({"event": "operator_decision"},),
+        simulator=SimpleNamespace(melt=SimpleNamespace(hour=1)),
+        refusal_diagnostic={
+            "status": "refused",
+            "reason": "knudsen_outside_viscous_flow",
+        },
+        backend_status="ok",
+        backend_authoritative=True,
+        reduced_real_cache={},
+    )
+
+    def raise_detail(_execution):
+        raise RuntimeError("detail assembly exploded")
+
+    monkeypatch.setattr(run, "_build_output_detail", raise_detail)
+
+    payload = run._build_output(execution)
+
+    assert payload["status"] == "refused"
+    assert payload["reason"] == "knudsen_outside_viscous_flow"
+    assert payload["run_metadata"]["hours_completed"] == 1
+    assert payload["run_metadata"]["knudsen_regime_diagnostic"] == {
+        "status": "refused",
+        "reason": "knudsen_outside_viscous_flow",
+    }
+    assert payload["per_hour_summary"] == list(execution.per_hour)
+    assert payload["pO2_enforcement_by_hour"] == [
+        execution.per_hour[0]["pO2_enforcement"]
+    ]
+    assert payload["shadow_trace"] == list(execution.shadow_trace)
+    assert "envelope detail unavailable" in payload["error_message"]
 
 
 def test_runner_engines_yaml_optional_load(tmp_path):

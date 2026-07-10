@@ -6,8 +6,14 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.3.3`
+**Schema version:** `1.4.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
+
+Schema 1.4.0 makes the vapor-pressure source report's backend-facet keys
+unconditional, admits the staged-C2A `c2a_staged_gas` per-hour key, and
+keeps handled failure envelopes on the same fidelity/engine metadata surface as
+successful runs. Existing golden runner fixtures need controller regeneration on
+main; this worktree intentionally does not regenerate them.
 
 Run the CLI as:
 
@@ -50,7 +56,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.3.3",
+  "schema_version": "1.4.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
@@ -82,7 +88,7 @@ it does not introduce a new schema version.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.3.3",
+  "schema_version": "1.4.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -145,6 +151,10 @@ it does not introduce a new schema version.
   `ChemistryKernel.registry.capability_summary()` -- the same surface
   used to audit the current builtin-authoritative / VapoRock-shadow
   `VAPOR_PRESSURE` split.
+* Handled failure envelopes emit the same base fidelity fields as successful
+  runs: `backend_status`, `backend_authoritative`, `backend_real_active`,
+  `evidence_class`, `runtime_status`, `label_source`,
+  `certification_allowed`, and `engines_used.active/requested/registry`.
 * Any extra keys passed via `run_metadata_overrides` are forwarded
   verbatim; the runner does not interpret them.
 * `knudsen_regime_diagnostic` reports the transport-regime check for
@@ -197,7 +207,7 @@ it does not introduce a new schema version.
 * `deposit_by_surface_species_kg` is the final wall deposit projection
   by interstage segment/species, sourced from the same snapshot/trace
   wall-deposit data exported per hour.
-* `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.3.3`
+* `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.4.0`
   reports the explicit sentinel `not_applicable_until_p0`; P6b will
   replace it with pump/outlet totals after molecular transport lands.
 
@@ -237,7 +247,14 @@ it does not introduce a new schema version.
   "summary": {
     "builtin_authoritative": {"count": 2, "percentage": 100.0}
   },
-  "total_species": 2
+  "total_species": 2,
+  "vapor_pressure_backend_status": "fallback",
+  "vapor_pressure_backend_status_summary": {
+    "fallback": {"count": 2, "percentage": 100.0}
+  },
+  "vapor_pressure_backend_status_reason": "vaporock_to_antoine_fallback",
+  "vapor_pressure_fallback_source": "antoine_fallback_from_vaporock",
+  "authoritative_for_requested_vapor_pressure": false
 }
 ```
 
@@ -252,6 +269,9 @@ it does not introduce a new schema version.
   is diagnostic-only.
 * Percentages are species-count percentages for the latest vapor
   pressure surface used by the evaporation path.
+* All eight keys are unconditional in schema 1.4.0. When no backend facet
+  status exists, the status and reason/source strings are empty, the facet
+  summary is `{}`, and `authoritative_for_requested_vapor_pressure` is `null`.
 * When VapoRock shadow data exists, `simulator.runner` copies it from
   `_last_vapor_pressure_diagnostic["vaporock_full_speciation_Pa"]` into
   the runner diagnostics under the same key. It is not an authoritative
@@ -337,6 +357,8 @@ The umbrella field and all five path objects are always present in success and
 failure envelopes. A path that did not engage serializes as
 `{engaged: false, total_count: 0, by_hour: []}`. The field is additive in
 schema 1.3.3; it does not change any degraded-path calculation or gate.
+Schema 1.4.0 preserves this field shape and clarifies that Antoine
+extrapolation engagement counts records, not unique species.
 
 `total_count` and each `by_hour[].count` count the path's native engagement
 units: Antoine extrapolation records, capture-regularizer route calls,
@@ -457,6 +479,9 @@ mole, energy, pressure, or partition arithmetic.
   backing source is populated, so it is absent on a plain internal-analytical (`stub`) backend run;
   each is whitelisted in
   `tests/test_runner_smoke.py::PER_HOUR_OPTIONAL_KEYS`:
+  * `c2a_staged_gas` -- emitted for staged C2A gas rows when
+    `HourSnapshot.c2a_staged_gas` is populated. The value is a JSON-safe copy
+    of the staged gas composition map.
   * `evap_plane_selectivity` -- emitted by
     `_evap_plane_selectivity_observables` when
     `HourSnapshot.evap_plane_selectivity` carries a non-empty
