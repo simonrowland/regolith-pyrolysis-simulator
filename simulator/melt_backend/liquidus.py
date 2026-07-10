@@ -212,6 +212,30 @@ def find_liquidus_solidus_by_fraction(
         if deadline is not None and time.monotonic() >= deadline:
             raise _LiquidusFinderBudgetExceeded(budget_warning())
 
+    def _raise_budget_if_engine_exhausted(exc: BaseException) -> None:
+        """Promote residual-timeout / cancel failures to typed budget exhaustion.
+
+        Between-call budget checks alone lose structure when the *engine*
+        path burns the residual (subprocess timeout clamped to remaining,
+        or a cancel for a non-positive residual). Without this promotion
+        those paths surface as generic ``liquidus finder failed: …`` with
+        empty diagnostics, while the in-process post-sample check still
+        emits ``reason=aggregate_budget_exceeded``. Exhaustion must be
+        equally legible on every execution path.
+        """
+        if deadline is None:
+            return
+        message = str(exc).lower()
+        residual_exhausted = remaining_budget_s() is not None and (
+            remaining_budget_s() <= 0.0
+        )
+        explicit_cancel = (
+            'aggregate liquidus budget exhausted' in message
+            or 'aggregate budget' in message
+        )
+        if residual_exhausted or explicit_cancel or time.monotonic() >= deadline:
+            raise _LiquidusFinderBudgetExceeded(budget_warning()) from exc
+
     def sample(T_C: float) -> MeltFractionSample:
         nonlocal last_T_C
         check_budget()
@@ -219,11 +243,17 @@ def find_liquidus_solidus_by_fraction(
         if remaining is not None and remaining <= 0.0:
             raise _LiquidusFinderBudgetExceeded(budget_warning())
         last_T_C = float(T_C)
-        raw = _invoke_sample_fraction(
-            sample_fraction,
-            float(T_C),
-            remaining_budget_s=remaining,
-        )
+        try:
+            raw = _invoke_sample_fraction(
+                sample_fraction,
+                float(T_C),
+                remaining_budget_s=remaining,
+            )
+        except _LiquidusFinderBudgetExceeded:
+            raise
+        except Exception as exc:  # noqa: BLE001 - engine-boundary sample guard
+            _raise_budget_if_engine_exhausted(exc)
+            raise
         frac = _clamp_fraction(raw)
         point = _monotone_point(
             MeltFractionSample(float(T_C), frac),

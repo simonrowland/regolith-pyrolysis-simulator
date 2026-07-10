@@ -585,6 +585,19 @@ class MAGEMinShadowProvider(ChemistryProvider):
         solidus_T_C = _safe_attr_float(equilibrium, 'solidus_T_C')
 
         backend_status = str(getattr(equilibrium, 'status', 'ok') or 'ok')
+        # Thread adapter diagnostics (incl. aggregate-budget exhaustion
+        # reason/elapsed/call_count/last_T) through the provider envelope.
+        # Pre-fix the liquidus finder produced these on
+        # LiquidusSolidusResult.diagnostics for the in-process path only;
+        # without this copy the subprocess/provider projection dropped them.
+        backend_diagnostics = dict(
+            getattr(equilibrium, 'diagnostics', {}) or {}
+        )
+        backend_status_reason = backend_diagnostics.get('backend_status_reason')
+        if backend_status_reason is None:
+            backend_status_reason = backend_diagnostics.get('reason')
+        if backend_status_reason is not None:
+            backend_status_reason = str(backend_status_reason)
 
         return MAGEMinShadowDiagnostics(
             liquidus_T_K=liquidus_T_K,
@@ -599,6 +612,8 @@ class MAGEMinShadowProvider(ChemistryProvider):
             engine_version=engine_version,
             backend_status=backend_status,
             backend_warnings=warnings,
+            backend_diagnostics=backend_diagnostics,
+            backend_status_reason=backend_status_reason,
         )
 
 

@@ -234,3 +234,57 @@ def test_liquidus_finder_threads_remaining_budget_into_each_call(monkeypatch):
         assert result.diagnostics.get('reason') != 'aggregate_budget_exceeded' or len(
             result.samples
         ) >= 2
+
+
+def test_liquidus_finder_engine_residual_timeout_emits_budget_diagnostics(
+    monkeypatch,
+):
+    """Engine path that burns the residual must not fall through as generic fail.
+
+    Simulates the subprocess residual-timeout shape: the sample callable
+    observes the residual, burns wall equal to it, then raises a timeout-
+    shaped error (never returns a fraction). Structured
+    ``aggregate_budget_exceeded`` diagnostics must still be attached.
+    """
+    clock = {'t': 0.0}
+    remaining_seen: list[float] = []
+
+    def fake_monotonic():
+        return clock['t']
+
+    def sample(temperature_C: float, remaining_budget_s=None) -> float:
+        remaining = float(remaining_budget_s)
+        remaining_seen.append(remaining)
+        # Burn residual wall as a real residual-clamped subprocess would.
+        clock['t'] += remaining
+        raise RuntimeError(f'MAGEMin binary timed out after {remaining:g}s')
+
+    monkeypatch.setattr(liquidus_module.time, 'monotonic', fake_monotonic)
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=800.0,
+        max_T_C=1000.0,
+        scan_step_C=100.0,
+        budget_s=0.05,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.samples == ()  # timed out before a sample was recorded
+    assert remaining_seen == [pytest.approx(0.05)]
+    assert any(
+        'liquidus finder exceeded aggregate budget 0.05s after 0 calls'
+        in warning
+        for warning in result.warnings
+    )
+    diagnostics = dict(result.diagnostics)
+    assert diagnostics['reason'] == 'aggregate_budget_exceeded'
+    assert diagnostics['call_count'] == 0
+    assert diagnostics['last_T_C'] == pytest.approx(800.0)
+    assert diagnostics['budget_s'] == pytest.approx(0.05)
+    assert diagnostics['elapsed_s'] == pytest.approx(0.05)
+    # Must not be the generic Exception envelope.
+    assert not any(
+        warning.startswith('liquidus finder failed:')
+        for warning in result.warnings
+    )

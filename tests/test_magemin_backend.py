@@ -447,6 +447,71 @@ def test_magemin_subprocess_timeout_clamped_to_remaining_budget(monkeypatch):
     assert seen_timeouts == [pytest.approx(1.5)]
 
 
+def test_magemin_liquidus_subprocess_path_preserves_budget_diagnostics(
+    monkeypatch,
+):
+    """Subprocess-shaped residual timeout must keep structured budget diagnostics.
+
+    The in-process minimize mock already covers the post-sample budget check.
+    The real default bridge is subprocess; residual-clamped timeouts used to
+    fall through as generic ``liquidus finder failed`` with empty diagnostics.
+    Mock the subprocess boundary (no real engine required).
+    """
+    clock = {"t": 0.0}
+    seen_timeouts: list[float] = []
+
+    def fake_run(*args, **kwargs):
+        timeout = float(kwargs["timeout"])
+        seen_timeouts.append(timeout)
+        # Burn residual wall the way a real residual-clamped hang would.
+        clock["t"] += timeout
+        raise subprocess.TimeoutExpired(cmd=args[0], timeout=timeout)
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.magemin.subprocess.run", fake_run
+    )
+    monkeypatch.setattr(liquidus_module.time, "monotonic", lambda: clock["t"])
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._binary_path = Path("/tmp/fake-MAGEMin")
+    backend._config = {
+        "timeout_s": 60.0,
+        "database": "ig",
+        "liquidus_finder_budget_s": 0.05,
+    }
+    backend._database = "ig"
+    backend._magemin_module = None
+
+    result = backend.find_liquidus_solidus(
+        composition_mol={"SiO2": 1.0, "MgO": 1.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        min_T_C=800.0,
+        max_T_C=1500.0,
+        scan_step_C=100.0,
+        tolerance_C=1.0,
+    )
+
+    assert result.status == "not_converged"
+    assert seen_timeouts == [pytest.approx(0.05)]
+    assert any(
+        "liquidus finder exceeded aggregate budget 0.05s after 0 calls"
+        in warning
+        for warning in result.warnings
+    )
+    assert result.diagnostics["reason"] == "aggregate_budget_exceeded"
+    assert result.diagnostics["call_count"] == 0
+    assert result.diagnostics["last_T_C"] == pytest.approx(800.0)
+    assert result.diagnostics["budget_s"] == pytest.approx(0.05)
+    assert result.diagnostics["elapsed_s"] == pytest.approx(0.05)
+    assert not any(
+        warning.startswith("liquidus finder failed:")
+        for warning in result.warnings
+    )
+
+
 def test_magemin_liquidus_finder_unavailable_without_backend():
     backend = MAGEMinBackend()
 

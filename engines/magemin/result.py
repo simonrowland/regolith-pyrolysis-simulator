@@ -59,6 +59,7 @@ class MAGEMinShadowDiagnostics:
     engine_version: str = 'unavailable'
     backend_status: str = 'unavailable'
     backend_warnings: Tuple[str, ...] = ()
+    backend_diagnostics: Mapping[str, Any] = field(default_factory=dict)
     backend_status_reason: Optional[str] = None
 
     def __post_init__(self) -> None:
@@ -90,6 +91,11 @@ class MAGEMinShadowDiagnostics:
             'backend_warnings',
             tuple(str(w) for w in self.backend_warnings),
         )
+        object.__setattr__(
+            self,
+            'backend_diagnostics',
+            dict(self.backend_diagnostics or {}),
+        )
         object.__setattr__(self, 'mode', str(self.mode))
         object.__setattr__(self, 'engine_version', str(self.engine_version))
         object.__setattr__(self, 'backend_status', str(self.backend_status))
@@ -107,8 +113,26 @@ class MAGEMinShadowDiagnostics:
             object.__setattr__(self, 'liquid_fraction', float(self.liquid_fraction))
 
     def as_diagnostic(self) -> Dict[str, Any]:
-        """Plain-dict projection for the kernel's ``IntentResult.diagnostic``."""
-        return asdict(self)
+        """Plain-dict projection for the kernel's ``IntentResult.diagnostic``.
+
+        Structured finder fields (``reason`` / ``elapsed_s`` / ``call_count`` /
+        ``last_T_C`` / ``budget_s``) are promoted from
+        ``backend_diagnostics`` to the top level so budget exhaustion stays
+        equally legible on the provider path as on the in-process
+        ``LiquidusSolidusResult.diagnostics`` shape.
+        """
+        payload = asdict(self)
+        backend = dict(payload.get('backend_diagnostics') or {})
+        for key in (
+            'reason',
+            'elapsed_s',
+            'call_count',
+            'last_T_C',
+            'budget_s',
+        ):
+            if key in backend and key not in payload:
+                payload[key] = backend[key]
+        return payload
 
 
 __all__ = ('MAGEMinShadowDiagnostics',)
