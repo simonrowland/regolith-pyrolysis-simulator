@@ -2134,7 +2134,11 @@ def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
     elapsed_s = time.monotonic() - started
 
     assert snapshot.hour == 1
-    assert elapsed_s < 5.0
+    # Bound covers a true cold start: the A-CX-02 fix instance-scoped the
+    # ThermoEngine health cache (process-global reuse masked stale health), so
+    # a fresh backend legitimately re-probes engine health (~4 s) before the
+    # step. Warm-worker pools reuse instances and never pay this.
+    assert elapsed_s < 15.0
 
 
 def test_no_mode_marks_status_unavailable():

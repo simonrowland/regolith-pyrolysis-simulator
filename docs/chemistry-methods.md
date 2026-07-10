@@ -378,7 +378,7 @@ fresh equilibrium solve at each instant: it smooths the time integration but ass
 is constant over the tick, which accumulates error when the melt composition swings hard within a
 single hour. It is stated as a current approximation in
 [`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1336 — hourly depletion reservoir -->
+<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1388 — hourly depletion reservoir -->
 
 ### §4.4 The Knudsen and Langmuir limits, the sweep, and self-poisoning
 
@@ -420,7 +420,7 @@ accumulated oxygen self-limits the extraction. Under an inert sweep cover, that 
 off through the pressure-and-conductance path, lowering the transport oxygen pressure and relieving the
 suppression.
 <!-- impl: §4.4 -> engines/builtin/evaporation_transition.py BuiltinEvaporationTransitionProvider.dispatch:262 — O2 overhead credit -->
-<!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:222 — conductance bleed -->
+<!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:253 — conductance bleed -->
 
 **How the sweep is represented, and its current limits.** The inert sweep (the 5–15 mbar pN₂ cover) enters
 the model as an *overhead pressure*, not as a commanded *flow rate*. Raising it lowers the Knudsen number
@@ -446,7 +446,7 @@ species' condensation time constant. Iron is designated to the hottest condenser
 magnesium, sodium, and potassium condensing in progressively cooler stages. SiO that reaches a cold
 surface disproportionates on condensation (`SiO → ½ SiO₂ + ½ Si`), which is why its captured product
 is silica rather than a recoverable monoxide.
-<!-- impl: §5 -> simulator/condensation.py CondensationModel.route:2146 — stage routing efficiency -->
+<!-- impl: §5 -> simulator/condensation.py CondensationModel.route:2228 — stage routing efficiency -->
 <!-- impl: §5 -> engines/builtin/condensation_route.py BuiltinCondensationRouteProvider.dispatch:203 — SiO product credits -->
 
 The condensation reference temperatures used for this routing (for example, iron at 1250 °C, SiO at
@@ -480,7 +480,7 @@ through the condensation route inside the mass-balance closure. At each wall the
 sink competes against the onward condensed sink, and the split is set by a per-species, per-segment,
 temperature-dependent wall sticking coefficient. The remainder — the capture budget minus the wall
 deposit — is what reaches the designated condenser.
-<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:3607 — wall HKL MT split -->
+<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:3704 — wall HKL MT split -->
 
 Wall re-evaporation is handled by a per-species reactivity class:
 
@@ -510,7 +510,7 @@ transient wall state) are enumerated in [`docs/model-limitations.md`](model-limi
 The Knudsen number is reported per segment as a transport diagnostic and drives cold-spot warnings, but
 it does not gate deposition routing — the transport regimes are treated as continuous, consistent with
 modelling coating as a rate rather than a threshold.
-<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:3841 — wall Kn weighting -->
+<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:3940 — wall Kn weighting -->
 
 ---
 
@@ -613,7 +613,7 @@ temperature, and are labelled UNCERTIFIED. The ferric full-reduction rung is ref
 path can reduce ferric to ferrous through an explicitly uncertified diagnostic route rather than a
 validated ferric-current-partition model. Metal-phase settling and drain-tap are not modelled —
 reduced metal accumulates in a single account and is reported directly as product.
-<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider._nernst_voltage:744 — Nernst correction -->
+<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider._nernst_voltage:790 — Nernst correction -->
 <!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider.dispatch:262 — Faraday ledger step -->
 
 ### §7.4 Redox capacity: the liquidus scalar and the negligible-mol floor
@@ -644,8 +644,8 @@ regime, so it leaves the system without re-equilibrating with the melt — apply
 tiny term does not change the physics (the oxygen escapes ballistically either way), so the floor is
 moot precisely where it fires. Graded range/saturation refusals still apply *above* the floor, where a
 real capacity meets an out-of-range or non-finite demand.
-<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._melt_redox_source_capacity_mol_per_ln_fO2:3219 — C_m liquid_fraction -->
-<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._apply_oxygen_reservoir_redox_source_terms:3441 — negligible-mol redox floor -->
+<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._melt_redox_source_capacity_mol_per_ln_fO2:3793 — C_m liquid_fraction -->
+<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._apply_oxygen_reservoir_redox_source_terms:4000 — negligible-mol redox floor -->
 
 ---
 
