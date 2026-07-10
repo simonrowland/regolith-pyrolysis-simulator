@@ -7,7 +7,10 @@ import pytest
 from scripts import rekey_cache_engine_identity as rekey
 
 
-def _write_convergent_rows(db_path: Path) -> None:
+def _write_rekeyable_rows(
+    db_path: Path,
+    engine_versions: tuple[str, ...] = ("one", "two"),
+) -> None:
     conn = sqlite3.connect(db_path)
     conn.execute(
         f"""
@@ -20,7 +23,7 @@ def _write_convergent_rows(db_path: Path) -> None:
         )
         """
     )
-    for engine_version in ("one", "two"):
+    for engine_version in engine_versions:
         key_bytes = rekey.canonical_json_bytes(
             {
                 "backend": {"backend_name": "alphamelts"},
@@ -38,7 +41,7 @@ def _write_convergent_rows(db_path: Path) -> None:
 
 def test_failed_rekey_retry_reuses_content_addressed_backup(tmp_path: Path) -> None:
     db_path = tmp_path / "cache.db"
-    _write_convergent_rows(db_path)
+    _write_rekeyable_rows(db_path)
 
     for _attempt in range(2):
         with pytest.raises(sqlite3.IntegrityError):
@@ -57,3 +60,58 @@ def test_failed_rekey_retry_reuses_content_addressed_backup(tmp_path: Path) -> N
     finally:
         conn.close()
     assert unchanged == 2
+
+
+def test_rekey_locks_identity_decision_before_backup(tmp_path: Path, monkeypatch) -> None:
+    db_path = tmp_path / "cache.db"
+    _write_rekeyable_rows(db_path, ("one",))
+    original_backup = rekey._backup_db
+    race_outcomes: list[str] = []
+
+    def backup_with_racing_identity_update(
+        conn: sqlite3.Connection,
+        path: Path,
+    ) -> tuple[Path, int]:
+        raced_key_bytes = rekey.canonical_json_bytes(
+            {
+                "backend": {
+                    "backend_name": "alphamelts",
+                    "corpus_version": "target",
+                },
+                "corpus_version": "target",
+            }
+        )
+        raced_key_hash = hashlib.sha256(raced_key_bytes).hexdigest()
+        racer = sqlite3.connect(path, timeout=0.0)
+        try:
+            racer.execute(
+                f"""
+                UPDATE {rekey.PT1_EQUILIBRIUM_TABLE}
+                SET key_hash = ?, key_sha256 = ?, key_bytes = ?,
+                    engine_version = NULL, corpus_version = ?
+                """,
+                (raced_key_hash, raced_key_hash, raced_key_bytes, "target"),
+            )
+            racer.commit()
+        except sqlite3.OperationalError as exc:
+            assert "locked" in str(exc).lower()
+            race_outcomes.append("locked")
+        else:
+            race_outcomes.append("committed")
+        finally:
+            racer.close()
+        return original_backup(conn, path)
+
+    monkeypatch.setattr(rekey, "_backup_db", backup_with_racing_identity_update)
+
+    result = rekey.rekey_cache(db_path, target_corpus_version="target")
+
+    assert race_outcomes == ["locked"]
+    assert result.rows_before == 1
+    assert result.rows_updated == 1
+    assert result.backup_path is not None
+    with sqlite3.connect(result.backup_path) as backup_conn:
+        (backup_key_bytes,) = backup_conn.execute(
+            f"SELECT key_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert rekey._json_loads(bytes(backup_key_bytes))["engine_version"] == "one"

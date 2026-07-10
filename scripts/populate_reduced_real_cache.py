@@ -94,13 +94,17 @@ def _wall_deadline(deadline: float) -> Iterator[None]:
 
     previous_handler = signal.signal(signal.SIGALRM, expire)
     armed_at = time.perf_counter()
-    signal.setitimer(signal.ITIMER_REAL, remaining)
+    armed = False
     try:
-        yield
+        signal.setitimer(signal.ITIMER_REAL, remaining)
+        armed = True
+        try:
+            yield
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0.0)
     finally:
-        signal.setitimer(signal.ITIMER_REAL, 0.0)
         signal.signal(signal.SIGALRM, previous_handler)
-        if previous_delay > 0.0:
+        if armed and previous_delay > 0.0:
             elapsed = time.perf_counter() - armed_at
             signal.setitimer(
                 signal.ITIMER_REAL,

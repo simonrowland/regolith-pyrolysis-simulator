@@ -199,6 +199,8 @@ def _file_sha256(path: Path) -> str:
 
 
 def _backup_db(conn: sqlite3.Connection, db_path: Path) -> tuple[Path, int]:
+    if not conn.in_transaction:
+        raise RuntimeError("cache backup requires an active transaction lock")
     source_data_version = int(conn.execute("PRAGMA data_version").fetchone()[0])
     with tempfile.NamedTemporaryFile(
         prefix=f".{db_path.name}.backup-",
@@ -207,11 +209,13 @@ def _backup_db(conn: sqlite3.Connection, db_path: Path) -> tuple[Path, int]:
     ) as temporary:
         temporary_path = Path(temporary.name)
     try:
+        snapshot_conn = sqlite3.connect(db_path)
         backup_conn = sqlite3.connect(temporary_path)
         try:
-            conn.backup(backup_conn)
+            snapshot_conn.backup(backup_conn)
         finally:
             backup_conn.close()
+            snapshot_conn.close()
 
         if int(conn.execute("PRAGMA data_version").fetchone()[0]) != source_data_version:
             raise RuntimeError("cache database changed while the backup was created")
@@ -244,16 +248,25 @@ def rekey_cache(
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     try:
+        if dry_run:
+            before = _count_rows_needing_rekey(
+                conn,
+                engine=engine,
+                target_corpus_version=target,
+            )
+            return RekeyResult(rows_before=before, rows_updated=0, backup_path=None)
+
+        conn.execute("BEGIN IMMEDIATE")
         before = _count_rows_needing_rekey(
             conn,
             engine=engine,
             target_corpus_version=target,
         )
-        if dry_run or before == 0:
+        if before == 0:
+            conn.rollback()
             return RekeyResult(rows_before=before, rows_updated=0, backup_path=None)
 
         backup_path, backup_data_version = _backup_db(conn, db_path)
-        conn.execute("BEGIN IMMEDIATE")
         if int(conn.execute("PRAGMA data_version").fetchone()[0]) != backup_data_version:
             raise RuntimeError("cache database changed after the backup was created")
 

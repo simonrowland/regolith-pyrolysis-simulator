@@ -1045,6 +1045,36 @@ def test_run_case_enforces_wall_cap_during_advance(tmp_path, monkeypatch):
     assert time.perf_counter() - started < 0.5
 
 
+def test_wall_deadline_restores_handler_when_timer_arming_fails(monkeypatch):
+    previous_handler = object()
+    installed_handlers = []
+    setitimer_calls = []
+
+    monkeypatch.setattr(driver.signal, "getitimer", lambda _which: (120.0, 0.0))
+
+    def record_signal(_signum, handler):
+        installed_handlers.append(handler)
+        return previous_handler
+
+    monkeypatch.setattr(driver.signal, "signal", record_signal)
+
+    def fail_timer_arming(*args):
+        setitimer_calls.append(args)
+        if len(setitimer_calls) == 1:
+            raise OSError("timer arming failed")
+        raise OSError("timer restoration should not be attempted")
+
+    monkeypatch.setattr(driver.signal, "setitimer", fail_timer_arming)
+
+    with pytest.raises(OSError, match="timer arming failed"):
+        with driver._wall_deadline(time.perf_counter() + 60.0):
+            pytest.fail("timer arming failure must prevent body execution")
+
+    assert len(installed_handlers) == 2
+    assert installed_handlers[-1] is previous_handler
+    assert len(setitimer_calls) == 1
+
+
 class _FakeSnapshot:
     temperature_C = 1600.0
     mass_balance_error_pct = 0.0
