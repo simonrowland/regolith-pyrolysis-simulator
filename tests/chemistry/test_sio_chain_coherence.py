@@ -74,7 +74,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # 2026-07-07 t-141 L&H K standard-term regen: ppm-scale shift through the
 # coupled headspace pO2 path (delta -1.0176e-10, matches golden-deltas.json;
 # same value as the sio_yield lunar baseline by construction).
-PHASE3BIS_SIO_EVOLVED_KG = 8.71338858761e-06
+# 2026-07-11 0.5.10 E-MOVE: phase-basis/two-rail vapor plus K/S fO2 and
+# alkali-path changes lower the fixed-pO2 SiO-evolved pin.
+PHASE3BIS_SIO_EVOLVED_KG = 8.71303559859e-06
 
 
 @lru_cache(maxsize=None)

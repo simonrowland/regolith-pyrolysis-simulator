@@ -320,46 +320,46 @@
         "terminal.product:CO2": {
           "quantity_kg": 119.41508297304934,
           "accumulated_cost": {
-            "electrical_kWh": 0.0,
+            "electrical_kWh": 0.26170707921287045,
             "thermal_flux_h": 1529.3403136524632,
             "furnace_h": 3.991492401546296,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 1569.2552376679262
+          "owner_ratify_money_projection": 1595.4259455892131
         },
         "terminal.product:Ca": {
           "quantity_kg": 15.735893418400737,
           "accumulated_cost": {
-            "electrical_kWh": 0.0,
+            "electrical_kWh": 0.034486386499971024,
             "thermal_flux_h": 201.5284466329102,
             "furnace_h": 0.5259779371862461,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 206.78822600477267
+          "owner_ratify_money_projection": 210.23686465476976
         },
         "terminal.product:CaCO3": {
           "quantity_kg": 0.24721530067550287,
           "accumulated_cost": {
-            "electrical_kWh": 0.0,
+            "electrical_kWh": 0.0005417908078757441,
             "thermal_flux_h": 3.166068440115636,
             "furnace_h": 0.008263260968590985,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 3.248701049801546
+          "owner_ratify_money_projection": 3.3028801305891204
         },
         "terminal.product:H2O": {
           "quantity_kg": 181.71535447096545,
           "accumulated_cost": {
-            "electrical_kWh": 0.0,
+            "electrical_kWh": 0.39824278041544126,
             "thermal_flux_h": 2327.2153758400423,
             "furnace_h": 6.073901542059355,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 2387.954391260636
+          "owner_ratify_money_projection": 2427.77866930218
         },
         "terminal.product:MgCO3": {
           "quantity_kg": 1.7767742832575095e-10,
@@ -375,35 +375,35 @@
         "terminal.product:N2": {
           "quantity_kg": 1.9950124688279303,
           "accumulated_cost": {
-            "electrical_kWh": 0.0,
+            "electrical_kWh": 0.004372218929228978,
             "thermal_flux_h": 25.54998011018818,
             "furnace_h": 0.06668401438128195,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 26.216820254001
+          "owner_ratify_money_projection": 26.6540421469239
         },
         "terminal.product:Na2CO3": {
           "quantity_kg": 1.664085635333379e-05,
           "accumulated_cost": {
-            "electrical_kWh": 0.0,
+            "electrical_kWh": 3.6469680407246425e-08,
             "thermal_flux_h": 0.00021311824135814366,
             "furnace_h": 5.562266510717569e-07,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 0.00021868050786886124
+          "owner_ratify_money_projection": 0.00022232747590958588
         },
         "terminal.product:S": {
           "quantity_kg": 39.900249376558605,
           "accumulated_cost": {
-            "electrical_kWh": 0.0,
+            "electrical_kWh": 0.08744437858457957,
             "thermal_flux_h": 510.99960220376363,
             "furnace_h": 1.333680287625639,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 524.33640508002
+          "owner_ratify_money_projection": 533.0808429384779
         }
       },
       "active_inventory_costs": {},
@@ -478,6 +478,15 @@
           }
         ],
         "rows": []
+      },
+      "auxiliary_electrical_diagnostic": {
+        "schema_version": "auxiliary-electrical-rollup-v1",
+        "components_kWh": {
+          "condenser": 0.7867946709200369,
+          "pumping": 0.0,
+          "turbine": 0.0
+        },
+        "auxiliary_electrical_kWh": 0.7867946709200369
       },
       "run_input_cost": {
         "thermal_proxy": "thermal_flux_h = absolute_temperature_K * duration_h",

@@ -1057,7 +1057,9 @@ def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):
         },
     )
 
-    assert success["status"] == "ok"
+    # 2026-07-11 0.5.10 E-MOVE: C7 completes its one-hour hold early, so the
+    # two-hour success fixture is partial while preserving success/failure shape.
+    assert success["status"] == "partial"
     assert set(success) == TOP_LEVEL_KEYS
     assert success["c7_product_report"]
     assert success["c7_refusal_diagnostic"]

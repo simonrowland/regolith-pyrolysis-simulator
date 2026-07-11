@@ -307,8 +307,18 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     oxygen_kg = sim._step_mre()
 
     assert oxygen_kg > 0.0
-    assert sim.melt.composition_kg["Na2O"] < 1000.0
-    assert sim.atom_ledger.kg_by_account("process.metal_phase")["Na"] > 0.0
+    assert sim.melt.composition_kg["Na2O"] == pytest.approx(996.8513781574554)
+    # 2026-07-11 0.5.10 E-MOVE: phase-basis rails route gas-basis MRE Na
+    # through overhead/condensation instead of forcing it into metal_phase.
+    assert sim.atom_ledger.kg_by_account("process.metal_phase").get(
+        "Na", 0.0
+    ) == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
+        "Na"
+    ] == pytest.approx(0.8575205152142129)
+    assert sim.atom_ledger.kg_by_account("process.condensation_train")[
+        "Na"
+    ] == pytest.approx(1.469926447936863)
     mre_oxygen = sim.atom_ledger.kg_by_account(
         "terminal.oxygen_mre_anode_stored"
     )["O2"]

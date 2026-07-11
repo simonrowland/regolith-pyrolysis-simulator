@@ -86,7 +86,9 @@ def test_c7_enabled_run_refuses_on_unfavorable_computed_margin_and_closes_mass(
     document = run._build_output(execution)
     report = document["c7_product_report"]
 
-    assert execution.status == "ok"
+    # 2026-07-11 0.5.10 E-MOVE: BCD state-cap endpoint semantics finish the
+    # one-hour C7 hold before the requested two-hour budget is consumed.
+    assert execution.status == "partial"
     worst = max(
         abs(snapshot.mass_balance_error_pct or 0.0)
         for snapshot in execution.snapshots
@@ -141,7 +143,8 @@ def test_c7_set_it_to_11_reports_campaign_knob_saturations(tmp_path, monkeypatch
     saturation = document["c7_product_report"]["diagnostic"]["c7_knob_saturation"]
     paths = {row["path"] for row in saturation}
 
-    assert execution.status == "ok"
+    # Same state-cap endpoint semantics as the direct C7 refusal pin above.
+    assert execution.status == "partial"
     assert "campaigns.C7.al_fraction" in paths
     assert "campaigns.C7.extent_fraction" in paths
     assert "campaigns.C7.stir_factor" in paths

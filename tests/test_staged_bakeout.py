@@ -33,7 +33,9 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # 2026-07-07 t-141 L&H K standard-term regen: reactive SiO wall deposit
 # shifts -1.3605e-7 kg via the K-coupled headspace path (delta matches
 # docs-private/research/2026-07-07-t141-kmox/golden-deltas.json).
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00045317584648602916
+# 2026-07-11 0.5.10 E-MOVE: phase-basis/two-rail vapor plus K/S fO2 and
+# alkali-path changes lower the staged reactive wall deposit.
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00041701305382403056
 
 
 def _run_script(lines: list[str]):

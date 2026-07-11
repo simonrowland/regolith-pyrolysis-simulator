@@ -84,6 +84,8 @@ STAGE_SIO_GAS_MODE = (
 )
 
 
+# 2026-07-11 0.5.10 E-MOVE: version/source/data fingerprint invalidation moves
+# only the code_version token in the canonical EvalSpec payload.
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor"'
     b':false,"allowlist_version":"allowlist-v11","backend_name":"s'
@@ -91,7 +93,7 @@ PINNED_EVALSPEC_JSON = (
     b'3f2ef265b24f4a43a6660e9212","c5_enabled":false,"campaign":"C'
     b'0","chemistry_kernel":{"allow_builtin_fallback":false,"engin'
     b'e":"builtin","pressure_Pa":"0.001000000"},"code_version":"0.'
-    b'5.7","data_digests":{"corpus_version":"corpus-version-digest'
+    b'5.9","data_digests":{"corpus_version":"corpus-version-digest'
     b'","feedstocks":"feedstock-digest","foulant_thermo":"foulant-'
     b'thermo-digest","materials":"materials-digest","profile":"pro'
     b'file-digest","setpoints":"setpoints-digest","species_catalog'
@@ -220,7 +222,7 @@ spec = EvalSpec(
     feedstock_id="lunar_mare_low_ti",
     profile_id="oxygen-yield-v1",
     fidelity="fast",
-    code_version="0.5.7",
+    code_version="0.5.9",
     data_digests={
         "corpus_version": "corpus-version-digest",
         "setpoints": "setpoints-digest",

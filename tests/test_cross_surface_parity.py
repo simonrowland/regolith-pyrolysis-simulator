@@ -29,8 +29,8 @@ MASS_BALANCE_TOLERANCE_PCT = 5e-12
 # (its max_hold_hr must equal sum(stage duration_h), campaigns.py, so a
 # max_hours=1 override would raise) — so the staged path consumes more of the
 # HOURS horizon and reaches C4 but not C6 here. That shortens the expected
-# campaign/decision sequence vs the old continuous default; C6_PROCEED parity is
-# covered in tests/test_web_events_decision_pause.py.
+# campaign/decision sequence vs the old continuous default; 0.5.10 C6 gate
+# unification now records C6_PROCEED on all three surfaces.
 SETPOINT_OVERRIDES = {
     "C0": {"max_hours": 1.0, "ramp_rate": 2000.0},
     "C0B": {"max_hours": 1.0, "ramp_rate": 2000.0},
@@ -80,10 +80,11 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     assert batch.decisions == [
         ("PATH_AB", "A_staged"),
         ("BRANCH_ONE_TWO", "two"),
+        ("C6_PROCEED", "yes"),
     ]
 
     campaigns = _campaigns(batch.summaries)
-    assert campaigns == ["C0", "C0B", "C2A_STAGED", "C3_NA", "C4"]
+    assert campaigns == ["C0", "C0B", "C2A_STAGED", "C3_NA", "C4", "C6"]
     assert _campaign_transition_exercised(batch.summaries)
     assert web.campaign_event_count >= 1
 

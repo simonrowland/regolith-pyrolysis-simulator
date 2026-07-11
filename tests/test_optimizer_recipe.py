@@ -442,7 +442,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # in data_digests.setpoints plus vapor_pressure_provider_code_fingerprint;
     # substituting those two old fields reproduces f448556f..., proving no
     # schema/allowlist drift.
-    assert cache_key(spec) == "2e0a3a9fbffac0a2a5a94d9c4c4a8c05d3b2808fe5ddfce2345f9f08e2df5d8b"
+    # 2026-07-11 0.5.10 E-MOVE: version/source/data fingerprint invalidation;
+    # recipe_id and searchable allowlist hash above are unchanged.
+    assert cache_key(spec) == "41cb00404d5cfc94b0f0c3df8627b5dcbbd1af0b0206660302d7eebf57ea029e"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

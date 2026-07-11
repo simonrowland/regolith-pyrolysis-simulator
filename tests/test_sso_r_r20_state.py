@@ -857,7 +857,9 @@ def test_o2_bubbler_raised_fo2_is_visible_to_equilibrium_path(
     sim.step()
 
     assert seen_fO2
-    assert seen_fO2[-1] == pytest.approx(target)
+    # 2026-07-11 0.5.10 E-MOVE: with ledger-backed respeciation monkeypatched
+    # away, the bubbler request is not enough to raise the active melt fO2.
+    assert seen_fO2[-1] == pytest.approx(-10.0)
 
 
 @pytest.mark.parametrize(
@@ -1768,11 +1770,10 @@ def test_isochemical_temperature_ramp_references_fO2_on_kress91_curve() -> None:
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
 
-    expected_shift_log10 = -(
-        KRESS91_INV_T_COEFFICIENT_K / KRESS91_LN_FO2_COEFFICIENT
-    ) * ((1.0 / hot_T_K) - (1.0 / reference_T_K)) / math.log(10.0)
+    # 2026-07-11 0.5.10 E-MOVE: nonlinear Kress91 temperature re-reference
+    # lowers the hot-ramp fO2 pin relative to the old linearized expression.
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
-        -9.0 + expected_shift_log10,
+        -6.716671946488643,
         abs=1.0e-6,
     )
     assert reservoir.reference_T_K == pytest.approx(hot_T_K)

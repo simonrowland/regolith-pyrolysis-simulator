@@ -59,7 +59,9 @@ SIO_ANCHOR_HOUR = 6
 # holdup-O2 ordering bug this docstring's own design statement forbids.
 # 2026-07-07 t-141 L&H K standard-term regen: decade drift -0.0076276 via the
 # K-coupled headspace path (matches golden-deltas.json enumeration).
-EXPECTED_SIO_DECADE_DRIFT = 0.35630359273564843
+# 2026-07-11 0.5.10 E-MOVE: K/S Kress re-reference plus BCD oxygen/native-state
+# routing lower the finite-pO2/IW SiO drift.
+EXPECTED_SIO_DECADE_DRIFT = 0.2837255260751965
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

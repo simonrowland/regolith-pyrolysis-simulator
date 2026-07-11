@@ -172,14 +172,16 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # 2026-07-06 CF-3 constant gamma*X alkali activity lowers Na/K vapor
     # backpressure, moving the coupled SiO wall pins without changing the
     # fouling-threshold structure.
+    # 2026-07-11 0.5.10 E-MOVE: phase-basis/two-rail vapor plus K/S fO2 and
+    # alkali-path changes lower the coupled wall-product pins.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        5.663826474772e-08, rel=1e-9
+        5.3181504107910006e-08, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
-        6.30430233312e-08, rel=1e-9
+        5.803194925495001e-08, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
-        6.34497943176e-08, rel=1e-9
+        5.8406634082859996e-08, rel=1e-9
     )
 
 
