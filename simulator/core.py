@@ -687,6 +687,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._shuttle_refusal_history: list[Dict[str, Any]] = []
         self._last_c6_refusal_diagnostic: Dict[str, Any] = {}
         self._c6_campaign_refused = False
+        self._last_c3_na_hold_adjustment: Dict[str, Any] = {}
 
         # --- Current state ---
         self.melt = MeltState()
@@ -961,6 +962,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._shuttle_refusal_history = []
         self._last_c6_refusal_diagnostic = {}
         self._c6_campaign_refused = False
+        self._last_c3_na_hold_adjustment = {}
         self._c3_alkali_credit_drawn_kg_by_species = {}
         self._feedstock_recovered_reagent_kg_by_species = {}
         self._non_feedstock_reagent_element_kg_by_account = {}
@@ -1616,12 +1618,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         control_inputs: Mapping[str, Any],
         fO2_log: Optional[float] = None,
         fe_redox_policy: str = 'intrinsic',
+        temperature_C_override: float | None = None,
     ) -> IntentResult:
         """Dispatch one intent through the kernel with melt-derived controls.
 
-        Pulls ``temperature_C`` and ``pressure_bar`` from ``self.melt``
-        so every site quotes the same source-of-truth state (no
-        per-site re-derivation drift).  Returns the ``IntentResult``
+        Pulls ``temperature_C`` and ``pressure_bar`` from ``self.melt`` so
+        every committing site quotes the same source-of-truth state. The
+        temperature override is reserved for non-committing operating-point
+        sweeps; callers must never commit a proposal evaluated under it.
+        Returns the ``IntentResult``
         unchanged -- including ``transition``, ``diagnostic``,
         ``warnings``.
 
@@ -1631,13 +1636,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
         kernel = self._require_chem_kernel()
         control_inputs = dict(control_inputs)
-        temperature_C = float(self.melt.temperature_C)
+        temperature_C = (
+            float(self.melt.temperature_C)
+            if temperature_C_override is None
+            else float(temperature_C_override)
+        )
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
         store = _pt0_determinism_store_for(self)
         account_mol_overrides = None
         if store is not None and getattr(store, 'quantize_live_controls', False):
             controls = store.quantized_controls(self, fO2_log=fO2_log)
-            temperature_C = float(controls['temperature_C'])
+            if temperature_C_override is None:
+                temperature_C = float(controls['temperature_C'])
             pressure_bar = float(controls['pressure_bar'])
             fO2_log = controls['fO2_log']
             if fO2_log is not None and 'melt_fO2_log' in control_inputs:
@@ -2703,6 +2713,50 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             campaign_name=getattr(self.melt.campaign, 'name', ''),
             campaign_hour=float(self.melt.campaign_hour),
         )
+
+    def _apply_c2a_knudsen_pressure_adjustment(self) -> None:
+        if self.melt.campaign not in (
+            CampaignPhase.C2A,
+            CampaignPhase.C2A_STAGED,
+        ):
+            return
+
+        from simulator.campaigns import (
+            C2A_STAGED_PN2_SWEEP_MAX_MBAR,
+            C2A_STAGED_PN2_SWEEP_MIN_MBAR,
+        )
+
+        carrier_gas = self._resolve_condensation_carrier_gas()
+        adjustment = self.condensation_model.adjust_c2a_pressure_setpoint(
+            requested_p_total_mbar=float(self.melt.p_total_mbar),
+            pO2_mbar=float(self.melt.pO2_mbar),
+            gas_temperature_C=(
+                self.overhead_model.resolve_pipe_temperature_C(self.melt)
+            ),
+            pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+            pN2_min_mbar=C2A_STAGED_PN2_SWEEP_MIN_MBAR,
+            pN2_max_mbar=C2A_STAGED_PN2_SWEEP_MAX_MBAR,
+            carrier_gas=carrier_gas,
+        )
+        if adjustment.get('status') != 'applied':
+            return
+
+        applied_pN2_mbar = float(adjustment['applied_pN2_mbar'])
+        applied_total_mbar = float(adjustment['applied_p_total_mbar'])
+        self.melt.p_total_mbar = applied_total_mbar
+        self.melt.background_gas_species = carrier_gas
+        self.melt.background_gas_mole_fraction = 1.0
+        self.overhead.composition[carrier_gas] = applied_pN2_mbar
+        self.overhead.pressure_mbar = max(
+            float(self.overhead.pressure_mbar),
+            applied_total_mbar,
+        )
+        staged_control = self.campaign_mgr.last_c2a_staged_gas_control
+        if isinstance(staged_control, dict):
+            staged_control['pN2_mbar'] = applied_pN2_mbar
+            staged_control['p_total_mbar'] = applied_total_mbar
+            staged_control['knudsen_pressure_adjustment'] = dict(adjustment)
+        self.melt.validate_melt_pressures()
 
     def _active_lab_schedule(self) -> Mapping[str, Any] | None:
         getter = getattr(self.campaign_mgr, "_lab_schedule", None)
@@ -9194,6 +9248,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Initialize shuttle inventory when entering C3 phases
         if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
             self._init_shuttle_inventory(campaign)
+        if campaign == CampaignPhase.C3_NA and self.record.path == 'A_staged':
+            self._recompute_staged_na_fe_hold_setpoint()
 
         # Initialize thermite Mg inventory when entering C6
         if campaign == CampaignPhase.C6:
@@ -9934,6 +9990,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # --- 2. Temperature ramp and carried-in passive exchange ---
         self._update_temperature()
+        self._apply_c2a_knudsen_pressure_adjustment()
         self._establish_melt_redox_gate_authority_for_current_hour()
         self._apply_oxygen_reservoir_exchange()
         self._apply_o2_bubbler()

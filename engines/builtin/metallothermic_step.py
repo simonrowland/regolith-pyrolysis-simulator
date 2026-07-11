@@ -1573,6 +1573,14 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         # re-ground: NaO0.5 activity can make the shifted Na/Ti diagnostic
         # near zero, but the raw Na/Ti and Cr/Ti ladder margins remain
         # strongly negative, so C3 may accept Cr2O3 while refusing TiO2.
+        # FeO likewise keeps the raw Na/Fe crossover executable: the
+        # NaO0.5 activity diagnostic must not turn a standard-state-negative
+        # dispatch above 1181.5 C into an accepted reduction.
+        if "FeO" in margin:
+            margin["FeO"] = min(
+                margin["FeO"],
+                delta_g["FeO"] - na_standard_delta_g,
+            )
         if "TiO2" in margin:
             ti_margins = [
                 margin["TiO2"],

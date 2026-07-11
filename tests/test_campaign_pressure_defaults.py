@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+import simulator.campaigns as campaigns_module
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.core import Atmosphere, CampaignPhase, MeltState
 
@@ -255,13 +256,19 @@ def test_c2a_staged_pn2_sweep_trace_po2_is_not_silent_or_phantom_o2():
     assert gas["pn2_band_action"] == ""
 
 
+# SC-67 adjudication (t-185 x wave-06-pressure fold): an out-of-band configured
+# p_total is a strandable operating point with a COMPUTABLE non-empty feasible
+# band, so it adjusts to the nearest band edge with loud provenance
+# (pn2_band_action + requested_p_total_mbar) instead of refusing; the typed
+# refusal is reserved for the genuinely empty/invalid band (test below).
 @pytest.mark.parametrize(
-    ("p_total_mbar", "requested_pN2_mbar"),
-    [(1.25, 1.0), (20.25, 20.0)],
+    ("p_total_mbar", "expected_pN2", "expected_action"),
+    [(1.25, 5.0, "clamped_low"), (20.25, 15.0, "clamped_high")],
 )
-def test_c2a_staged_pn2_sweep_outside_operating_band_fails_loud(
+def test_c2a_staged_pn2_sweep_outside_operating_band_adjusts_with_provenance(
     p_total_mbar,
-    requested_pN2_mbar,
+    expected_pN2,
+    expected_action,
 ):
     setpoints = deepcopy(_setpoints())
     _stage(setpoints, "alkali_early_fe").update({
@@ -269,24 +276,59 @@ def test_c2a_staged_pn2_sweep_outside_operating_band_fails_loud(
         "pO2_mbar": 0.25,
         "p_total_mbar": p_total_mbar,
     })
-    with pytest.raises(CampaignPressureSetpointRefusal) as exc_info:
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+
+    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    gas = dict(manager.last_c2a_staged_gas_control or {})
+
+    assert melt.atmosphere is Atmosphere.PN2_SWEEP
+    assert gas["pN2_mbar"] == pytest.approx(expected_pN2)
+    assert gas["p_total_mbar"] == pytest.approx(0.25 + expected_pN2)
+    assert gas["requested_p_total_mbar"] == pytest.approx(p_total_mbar)
+    assert gas["pn2_band_action"] == expected_action
+
+
+def test_c2a_staged_pn2_sweep_recovers_when_total_does_not_exceed_po2():
+    setpoints = deepcopy(_setpoints())
+    _stage(setpoints, "alkali_early_fe").update({
+        "gas_cover_mode": "pn2_sweep",
+        "pO2_mbar": 2.0,
+        "p_total_mbar": 1.0,
+    })
+
+    manager = CampaignManager(setpoints)
+    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
+    gas = dict(manager.last_c2a_staged_gas_control or {})
+
+    assert gas["requested_p_total_mbar"] == pytest.approx(1.0)
+    assert gas["pN2_mbar"] == pytest.approx(5.0)
+    assert gas["p_total_mbar"] == pytest.approx(7.0)
+    assert gas["pn2_band_action"] == "clamped_low"
+    assert melt.p_total_mbar == pytest.approx(7.0)
+
+
+def test_c2a_staged_pn2_sweep_refuses_invalid_empty_clamp_band(monkeypatch):
+    setpoints = deepcopy(_setpoints())
+    _stage(setpoints, "alkali_early_fe").update({
+        "gas_cover_mode": "pn2_sweep",
+        "pO2_mbar": 2.0,
+        "p_total_mbar": 1.0,
+    })
+    monkeypatch.setattr(campaigns_module, "C2A_STAGED_PN2_SWEEP_MIN_MBAR", 15.0)
+    monkeypatch.setattr(campaigns_module, "C2A_STAGED_PN2_SWEEP_MAX_MBAR", 5.0)
+
+    # Empty feasible band = the SC-67 boundary case: typed refusal (feeds the
+    # runner failure envelope), not adjustment.
+    with pytest.raises(
+        CampaignPressureSetpointRefusal,
+        match="operating band is empty or invalid",
+    ):
         CampaignManager(setpoints).configure_campaign(
-            MeltState(campaign=CampaignPhase.C2A_STAGED),
+            MeltState(),
             CampaignPhase.C2A_STAGED,
         )
-
-    refusal = exc_info.value
-    assert refusal.reason == "c2a_staged_pn2_outside_operating_band"
-    assert refusal.diagnostic == {
-        "status": "refused",
-        "reason": "c2a_staged_pn2_outside_operating_band",
-        "stage_name": "alkali_early_fe",
-        "gas_cover_mode": "pn2_sweep",
-        "pO2_mbar": pytest.approx(0.25),
-        "requested_p_total_mbar": pytest.approx(p_total_mbar),
-        "requested_pN2_mbar": pytest.approx(requested_pN2_mbar),
-        "allowed_pN2_mbar": [5.0, 15.0],
-    }
 
 
 @pytest.mark.parametrize(
@@ -301,10 +343,6 @@ def test_c2a_staged_pn2_sweep_outside_operating_band_fails_loud(
             {"gas_cover_mode": "po2_hold", "pO2_mbar": 2.0, "p_total_mbar": 1.0},
             "C2A_staged.stages.alkali_early_fe.p_total_mbar",
         ),
-        (
-            {"gas_cover_mode": "pn2_sweep", "pO2_mbar": 2.0, "p_total_mbar": 1.0},
-            "C2A_staged.stages.alkali_early_fe.p_total_mbar",
-        ),
     ],
 )
 def test_c2a_staged_invalid_gas_schedule_fails_loud(stage_patch, message):
@@ -315,6 +353,39 @@ def test_c2a_staged_invalid_gas_schedule_fails_loud(stage_patch, message):
         CampaignManager(setpoints).configure_campaign(
             MeltState(),
             CampaignPhase.C2A_STAGED,
+        )
+
+
+def test_c2a_staged_stale_max_hold_is_recomputed_with_info_note():
+    setpoints = deepcopy(_setpoints())
+    setpoints["campaigns"]["C2A_staged"]["max_hold_hr"] = 999
+    manager = CampaignManager(setpoints)
+
+    applied = manager._configured_staged_max_hold_hr(CampaignPhase.C2A_STAGED)
+    expected = sum(
+        max(1, int(float(stage.get("duration_h", 1.0))))
+        for stage in setpoints["campaigns"]["C2A_staged"]["stages"]
+    )
+
+    assert applied == pytest.approx(expected)
+    assert manager.last_c2a_staged_max_hold_adjustment == {
+        "severity": "info",
+        "code": "c2a_staged_max_hold_recomputed",
+        "field": "C2A_staged.max_hold_hr",
+        "requested_max_hold_hr": 999.0,
+        "applied_max_hold_hr": expected,
+        "derivation": "sum(max(1, int(stage.duration_h)))",
+    }
+
+
+@pytest.mark.parametrize("stages", [[], None, ["invalid-stage"]])
+def test_c2a_staged_max_hold_refuses_genuinely_invalid_stage_lists(stages):
+    setpoints = deepcopy(_setpoints())
+    setpoints["campaigns"]["C2A_staged"]["stages"] = stages
+
+    with pytest.raises(ValueError, match=r"C2A_staged\.stages"):
+        CampaignManager(setpoints)._configured_staged_max_hold_hr(
+            CampaignPhase.C2A_STAGED
         )
 
 

@@ -833,6 +833,310 @@ def _c3_na_feo_cleanup_request(sim, *, liquid_fraction, na_kg=12.0):
     )
 
 
+def _prepare_stranded_staged_na_hold(sim, *, configured_temperature_C=1250.0):
+    sim.record.path = "A_staged"
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.campaign_mgr._active_c3_na_scoped_overrides = {
+        "inject_target_C": configured_temperature_C,
+        "bakeout_target_C": configured_temperature_C,
+        "ramp_rate": 600.0,
+        "staged_duration_h": 3.0,
+    }
+    sim._init_shuttle_inventory(CampaignPhase.C3_NA)
+
+
+def _assert_selected_na_fe_yield_argmax(
+    diagnostic,
+    *,
+    configured_temperature_C,
+):
+    crossover_temperature_C = (
+        BuiltinMetallothermicStepProvider._crossover_temperature_C("Na", "Fe")
+    )
+    assert crossover_temperature_C is not None
+    assert diagnostic["crossover_temperature_C"] == pytest.approx(
+        crossover_temperature_C
+    )
+    assert diagnostic["selection_tie_break"] == (
+        "closest feasible argmax to configured_temperature_C"
+    )
+
+    feasible_rows = [
+        row
+        for row in diagnostic["rows"]
+        if (
+            row["status"] == "ok"
+            and row["Fe_produced_kg"] > 0.0
+        )
+    ]
+    assert feasible_rows
+    max_fe_kg = max(row["Fe_produced_kg"] for row in feasible_rows)
+    argmax_rows = [
+        row
+        for row in feasible_rows
+        if abs(row["Fe_produced_kg"] - max_fe_kg) <= 1.0e-12
+    ]
+    expected = min(
+        argmax_rows,
+        key=lambda row: (
+            abs(row["temperature_C"] - configured_temperature_C),
+            row["temperature_C"],
+        ),
+    )
+    selected = next(
+        row
+        for row in feasible_rows
+        if row["temperature_C"] == diagnostic["selected_temperature_C"]
+    )
+    assert selected == expected
+    assert diagnostic["selected_Fe_produced_kg"] == pytest.approx(max_fe_kg)
+    assert selected["temperature_C"] < crossover_temperature_C
+    assert selected["margin_kJ_per_mol_O2"] > 0.0
+    return selected
+
+
+def test_staged_na_fe_hold_recomputes_stranded_temperature_by_fe_yield_sweep(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"Na": 30.0},
+    )
+    _prepare_stranded_staged_na_hold(sim)
+    curve = {
+        "source": "test:liquid-na-fe-window",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1100.0,
+        "path": ((1000.0, 0.0), (1100.0, 1.0)),
+    }
+    monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
+
+    sim._recompute_staged_na_fe_hold_setpoint()
+
+    diagnostic = sim._last_c3_na_hold_adjustment
+    assert diagnostic["status"] == "applied"
+    assert diagnostic["configured_temperature_C"] == pytest.approx(1250.0)
+    assert diagnostic["selected_Fe_produced_kg"] > 0.0
+    assert diagnostic["liquid_fraction_curve"]["source"] == curve["source"]
+    assert diagnostic["rows"]
+    selected_row = _assert_selected_na_fe_yield_argmax(
+        diagnostic,
+        configured_temperature_C=1250.0,
+    )
+    assert selected_row["liquid_fraction"] > 0.0
+    target, _ = sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C3_NA,
+        0,
+        sim.melt,
+    )
+    assert target == pytest.approx(diagnostic["selected_temperature_C"])
+    bakeout_target, _ = sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C3_NA,
+        4,
+        sim.melt,
+    )
+    assert bakeout_target == pytest.approx(1250.0)
+
+    sim.melt.temperature_C = target
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+    assert sim._ledger_account_species_kg("process.metal_phase", "Fe") > 0.0
+    assert sim._shuttle_refusal_history == []
+
+
+def test_staged_na_fe_hold_recomputes_when_only_partial_melt_window_is_feasible(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"Na": 30.0},
+    )
+    _prepare_stranded_staged_na_hold(sim)
+    curve = {
+        "source": "test:partial-melt-only-na-fe-window",
+        "solidus_T_C": 1100.0,
+        "liquidus_T_C": 1500.0,
+        "path": ((1100.0, 0.0), (1500.0, 1.0)),
+    }
+    monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
+
+    sim._recompute_staged_na_fe_hold_setpoint()
+
+    diagnostic = sim._last_c3_na_hold_adjustment
+    assert diagnostic["status"] == "applied"
+    selected_row = _assert_selected_na_fe_yield_argmax(
+        diagnostic,
+        configured_temperature_C=1250.0,
+    )
+    assert 0.0 < selected_row["liquid_fraction"] < 0.5
+    assert all(
+        0.0 < row["liquid_fraction"] < 0.5
+        for row in diagnostic["rows"]
+        if row["status"] == "ok"
+    )
+
+
+def test_staged_na_fe_hold_solves_subdegree_joint_window(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"Na": 30.0},
+    )
+    _prepare_stranded_staged_na_hold(sim)
+    curve = {
+        "source": "test:reviewer-subdegree-na-fe-window",
+        "solidus_T_C": 1100.0,
+        "liquidus_T_C": 1181.4,
+        "path": (
+            (1100.0, 0.0),
+            (1181.2, 0.0),
+            (1181.4, 0.1),
+        ),
+    }
+    monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
+
+    sim._recompute_staged_na_fe_hold_setpoint()
+
+    diagnostic = sim._last_c3_na_hold_adjustment
+    assert diagnostic["status"] == "applied"
+    assert diagnostic["candidate_rule"] == (
+        "solved boundaries plus curve sample knots"
+    )
+    assert diagnostic["first_positive_liquid_temperature_C"] == pytest.approx(
+        1181.2,
+        abs=diagnostic["boundary_tolerance_C"],
+    )
+    assert diagnostic["joint_window_T_min_exclusive_C"] == (
+        diagnostic["first_positive_liquid_temperature_C"]
+    )
+    assert any(
+        row["temperature_C"] == pytest.approx(1181.4)
+        and row["status"] == "ok"
+        for row in diagnostic["rows"]
+    )
+    selected = _assert_selected_na_fe_yield_argmax(
+        diagnostic,
+        configured_temperature_C=1250.0,
+    )
+    assert 1181.2 < selected["temperature_C"] < 1181.5
+    assert selected["liquid_fraction"] > 0.0
+
+
+def test_staged_na_fe_hold_refuses_non_monotone_liquid_fraction_island(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"Na": 30.0},
+    )
+    _prepare_stranded_staged_na_hold(sim)
+    curve = {
+        "source": "test:non-monotone-na-fe-window",
+        "solidus_T_C": 1100.0,
+        "liquidus_T_C": 1250.0,
+        "path": (
+            (1100.0, 0.0),
+            (1150.0, 0.2),
+            (1170.0, 0.0),
+            (1200.0, 0.0),
+            (1250.0, 1.0),
+        ),
+    }
+    monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
+
+    sim._recompute_staged_na_fe_hold_setpoint()
+
+    diagnostic = sim._last_c3_na_hold_adjustment
+    assert diagnostic["status"] == "unavailable"
+    assert diagnostic["reason"] == (
+        "lf_curve_non_monotone_window_unresolved"
+    )
+    assert diagnostic["liquid_fraction_curve"]["source"] == curve["source"]
+    assert sim._interpolate_freeze_gate_curve(
+        curve,
+        diagnostic["monotonicity_validation_window_T_max_C"],
+    ) == 0.0
+    assert diagnostic["monotonicity_violation"]["earlier_liquid_fraction"] > (
+        diagnostic["monotonicity_violation"]["later_liquid_fraction"]
+    )
+    target, _ = sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C3_NA,
+        0,
+        sim.melt,
+    )
+    assert target == pytest.approx(1250.0)
+
+
+def test_staged_na_fe_hold_keeps_typed_refusal_when_joint_window_is_empty(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"Na": 30.0},
+    )
+    _prepare_stranded_staged_na_hold(sim)
+    curve = {
+        "source": "test:no-liquid-below-na-fe-crossover",
+        "solidus_T_C": 1190.0,
+        "liquidus_T_C": 1250.0,
+        "path": ((1190.0, 0.0), (1250.0, 1.0)),
+    }
+    monkeypatch.setattr(sim, "_melt_redox_liquidus_gate_curve", lambda: curve)
+
+    sim._recompute_staged_na_fe_hold_setpoint()
+
+    diagnostic = sim._last_c3_na_hold_adjustment
+    assert diagnostic["status"] == "empty"
+    assert diagnostic["reason"] == "na_fe_hold_window_empty"
+    assert diagnostic["accepted_residual_window_floor_C"] == pytest.approx(
+        1.0e-9
+    )
+    assert diagnostic["rows"] == []
+    target, _ = sim.campaign_mgr.get_temp_target(
+        CampaignPhase.C3_NA,
+        0,
+        sim.melt,
+    )
+    assert target == pytest.approx(1250.0)
+
+    sim.melt.temperature_C = target
+    sim._shuttle_inject_Na(target_stage="feo_cleanup", liquid_fraction=1.0)
+    refusal = sim._shuttle_refusal_history[-1]
+    assert refusal["diagnostic"]["reason_refused"] == (
+        "thermodynamic_margin_nonpositive"
+    )
+
+
 def _c3_k_feo_request(sim, *, liquid_fraction, k_kg=30.0):
     return IntentRequest(
         intent=ChemistryIntent.METALLOTHERMIC_STEP,

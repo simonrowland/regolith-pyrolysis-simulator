@@ -1742,6 +1742,7 @@ class CondensationModel:
             'upstream_hot_wall_min_C': DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
         }
         self.last_knudsen_regime_diagnostic: dict[str, Any] = {}
+        self.last_knudsen_pressure_adjustment: dict[str, Any] = {}
         self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
         self.last_transport_parameter_notice: dict[str, Any] = {}
         self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
@@ -2536,6 +2537,101 @@ class CondensationModel:
             stage_area_geometry_provenance_notice=geometry_notice,
         )
 
+    def adjust_c2a_pressure_setpoint(
+        self,
+        *,
+        requested_p_total_mbar: float,
+        pO2_mbar: float,
+        gas_temperature_C: float,
+        pipe_diameter_m: float,
+        pN2_min_mbar: float,
+        pN2_max_mbar: float,
+        carrier_gas: str,
+        pressure_margin_fraction: float = 0.01,
+    ) -> dict[str, Any]:
+        """Repair a stranded C2A pressure setpoint or retain typed refusal."""
+
+        band_min = float(pN2_min_mbar)
+        band_max = float(pN2_max_mbar)
+        if (
+                not math.isfinite(band_min)
+                or not math.isfinite(band_max)
+                or band_min <= 0.0
+                or band_max < band_min
+        ):
+            raise ValueError('C2A pN2 operating band is empty or invalid')
+        current = knudsen_regime_diagnostic(
+            overhead_pressure_mbar=requested_p_total_mbar,
+            gas_temperature_C=gas_temperature_C,
+            pipe_diameter_m=pipe_diameter_m,
+            pipe_segments=self.pipe_segments,
+            carrier_gas=carrier_gas,
+        )
+        if current.get('status') != 'refused':
+            prior = self.last_knudsen_pressure_adjustment
+            if (
+                    prior.get('status') == 'applied'
+                    and math.isclose(
+                        float(prior.get('applied_p_total_mbar', -1.0)),
+                        float(requested_p_total_mbar),
+                        rel_tol=0.0,
+                        abs_tol=1.0e-12,
+                    )
+            ):
+                return dict(prior)
+            self.last_knudsen_pressure_adjustment = {}
+            return {}
+
+        basis = minimum_pressure_mbar_for_knudsen(
+            gas_temperature_C=gas_temperature_C,
+            pipe_diameter_m=pipe_diameter_m,
+            pipe_segments=self.pipe_segments,
+            carrier_gas=carrier_gas,
+        )
+        pO2 = max(0.0, float(pO2_mbar))
+        minimum_total_with_margin_mbar = (
+            float(basis['minimum_pressure_mbar'])
+            * (1.0 + float(pressure_margin_fraction))
+        )
+        applied_pN2_mbar = max(
+            band_min,
+            minimum_total_with_margin_mbar - pO2,
+        )
+        diagnostic = {
+            'status': 'applied',
+            'reason': 'c2a_knudsen_pressure_floor',
+            'requested_p_total_mbar': float(requested_p_total_mbar),
+            'requested_pN2_mbar': max(
+                0.0,
+                float(requested_p_total_mbar) - pO2,
+            ),
+            'pO2_mbar': pO2,
+            'physical_pN2_band_mbar': [
+                band_min,
+                band_max,
+            ],
+            'pressure_margin_fraction': float(pressure_margin_fraction),
+            **basis,
+        }
+        if applied_pN2_mbar > band_max:
+            diagnostic.update({
+                'status': 'refused',
+                'reason': 'c2a_knudsen_pressure_window_empty',
+                'reason_refused': KNUDSEN_REFUSAL_REASON,
+                'required_pN2_mbar': applied_pN2_mbar,
+            })
+            self.last_knudsen_pressure_adjustment = dict(diagnostic)
+            refusal = dict(current)
+            refusal['pressure_adjustment'] = dict(diagnostic)
+            raise KnudsenRegimeRefusal(refusal)
+
+        diagnostic.update({
+            'applied_pN2_mbar': applied_pN2_mbar,
+            'applied_p_total_mbar': pO2 + applied_pN2_mbar,
+        })
+        self.last_knudsen_pressure_adjustment = dict(diagnostic)
+        return diagnostic
+
     def _current_knudsen_diagnostic(self) -> dict[str, Any]:
         diagnostic = knudsen_regime_diagnostic(
             overhead_pressure_mbar=self.overhead_pressure_mbar,
@@ -2557,6 +2653,10 @@ class CondensationModel:
                 relaxed['viscous_flow_required'] = False
                 return relaxed
             diagnostic['viscous_flow_required'] = True
+            if self.last_knudsen_pressure_adjustment:
+                diagnostic['pressure_adjustment'] = dict(
+                    self.last_knudsen_pressure_adjustment
+                )
             return diagnostic
         unconfigured = dict(diagnostic)
         unconfigured['status'] = 'unconfigured'
@@ -3995,6 +4095,73 @@ def _knudsen_number(
         )
         / characteristic_length_m
     )
+
+
+def minimum_pressure_mbar_for_knudsen(
+    *,
+    gas_temperature_C: float,
+    pipe_diameter_m: float,
+    pipe_segments: list[PipeSegment] | None = None,
+    carrier_gas: str = DEFAULT_CARRIER_GAS,
+    knudsen_ceiling: float = FREE_MOLECULAR_KNUDSEN_MIN,
+) -> dict[str, Any]:
+    """Return the total-pressure floor set by the controlling pipe diameter."""
+
+    ceiling = float(knudsen_ceiling)
+    if not math.isfinite(ceiling) or ceiling <= 0.0:
+        raise ValueError('knudsen_ceiling must be finite and positive')
+    fallback_diameter_m = require_lab_pipe_diameter(
+        pipe_diameter_m,
+        'pipe_diameter_m',
+    )
+    lengths = [('default_pipe', fallback_diameter_m)]
+    for segment in pipe_segments or ():
+        name = str(getattr(segment, 'name', 'default_pipe'))
+        lengths.append((
+            name,
+            require_lab_pipe_diameter(
+                getattr(segment, 'inner_diameter_m', fallback_diameter_m),
+                f'{name}.inner_diameter_m',
+            ),
+        ))
+    controlling_name, controlling_length_m = min(
+        lengths,
+        key=lambda item: item[1],
+    )
+    temperature_K = max(
+        float(gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+        1.0,
+    )
+    collision = _carrier_collision_diameter_diagnostic(carrier_gas)
+    collision_diameter_m = float(collision['carrier_collision_diameter_m'])
+
+    # Premise: the typed refusal starts at Kn=lambda/L >= Kn_ceiling.
+    # Algebra: lambda=k_B*T/(sqrt(2)*pi*d^2*P), hence
+    # P_min=k_B*T/(sqrt(2)*pi*d^2*L*Kn_ceiling). Unit check: (J/K*K)/m^3
+    # = N/m^2 = Pa; /100 gives mbar. Sanity: hotter gas or a smaller pipe
+    # raises P_min, while a larger pipe lowers it.
+    minimum_pressure_pa = (
+        BOLTZMANN_CONSTANT_J_K
+        * temperature_K
+        / (
+            math.sqrt(2.0)
+            * math.pi
+            * collision_diameter_m ** 2
+            * controlling_length_m
+            * ceiling
+        )
+    )
+    return {
+        'minimum_pressure_pa': minimum_pressure_pa,
+        'minimum_pressure_mbar': minimum_pressure_pa / 100.0,
+        'knudsen_ceiling': ceiling,
+        'gas_temperature_C': float(gas_temperature_C),
+        'carrier_gas': str(carrier_gas),
+        'carrier_collision_diameter_m': collision_diameter_m,
+        'controlling_segment': controlling_name,
+        'controlling_characteristic_length_m': controlling_length_m,
+        'formula': 'k_B*T/(sqrt(2)*pi*d^2*L*Kn_ceiling)',
+    }
 
 
 def _knudsen_regime_factor(knudsen_number: float) -> float:

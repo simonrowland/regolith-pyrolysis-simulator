@@ -171,6 +171,56 @@ def test_true_vacuum_mean_free_path_is_infinite_and_configured_route_refuses():
     assert exc_info.value.diagnostic["regime"] == KnudsenRegime.FREE_MOLECULAR.value
 
 
+def test_c2a_knudsen_pressure_floor_recovers_stranded_setpoint():
+    model = CondensationModel(CondensationTrain.create_default())
+
+    adjustment = model.adjust_c2a_pressure_setpoint(
+        requested_p_total_mbar=1.0e-6,
+        pO2_mbar=0.0,
+        gas_temperature_C=1600.0,
+        pipe_diameter_m=0.12,
+        pN2_min_mbar=5.0,
+        pN2_max_mbar=15.0,
+        carrier_gas="N2",
+    )
+
+    assert adjustment["status"] == "applied"
+    assert adjustment["requested_p_total_mbar"] == pytest.approx(1.0e-6)
+    assert adjustment["minimum_pressure_mbar"] < 5.0
+    assert adjustment["applied_pN2_mbar"] == pytest.approx(5.0)
+    assert adjustment["applied_p_total_mbar"] == pytest.approx(5.0)
+    assert adjustment["formula"] == (
+        "k_B*T/(sqrt(2)*pi*d^2*L*Kn_ceiling)"
+    )
+    applied_kn = condensation_module._knudsen_number(
+        adjustment["applied_p_total_mbar"] * 100.0,
+        1600.0 + 273.15,
+        adjustment["controlling_characteristic_length_m"],
+    )
+    assert applied_kn < condensation_module.FREE_MOLECULAR_KNUDSEN_MIN
+
+
+def test_c2a_knudsen_pressure_floor_retains_typed_refusal_for_empty_band():
+    model = CondensationModel(CondensationTrain.create_default())
+
+    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
+        model.adjust_c2a_pressure_setpoint(
+            requested_p_total_mbar=1.0e-6,
+            pO2_mbar=0.0,
+            gas_temperature_C=1600.0,
+            pipe_diameter_m=1.0e-8,
+            pN2_min_mbar=5.0,
+            pN2_max_mbar=15.0,
+            carrier_gas="N2",
+        )
+
+    adjustment = exc_info.value.diagnostic["pressure_adjustment"]
+    assert adjustment["status"] == "refused"
+    assert adjustment["reason"] == "c2a_knudsen_pressure_window_empty"
+    assert adjustment["required_pN2_mbar"] > 15.0
+    assert exc_info.value.reason == "knudsen_outside_viscous_flow"
+
+
 def test_unknown_carrier_knudsen_diagnostic_fails_loud():
     with pytest.raises(ValueError, match="Unsupported condensation carrier_gas"):
         condensation_module.knudsen_regime_diagnostic(

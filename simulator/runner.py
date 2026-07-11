@@ -1145,6 +1145,13 @@ class PyrolysisRun:
         run_metadata["pressure_coating_pareto_diagnostic"] = _json_safe(
             pressure_coating_pareto_diagnostic(sim, execution.per_hour)
         )
+        c3_na_hold_adjustment = dict(
+            getattr(sim, "_last_c3_na_hold_adjustment", {}) or {}
+        )
+        if c3_na_hold_adjustment:
+            run_metadata["c3_na_hold_adjustment"] = _json_safe(
+                c3_na_hold_adjustment
+            )
         run_metadata["cost_rollup_diagnostic"] = _json_safe(
             build_cost_rollup_diagnostic(
                 cost_ledger=sim.cost_ledger,

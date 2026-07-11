@@ -53,19 +53,41 @@ def test_pyrolysis_run_is_executor_json_adapter():
     assert run._build_output(execution) == _run().run()
 
 
-def test_run_executor_preserves_campaign_pressure_refusal_during_startup():
+# SC-67 adjudication (t-185 x wave-06-pressure): an out-of-band configured
+# p_total now ADJUSTS to the band edge with provenance (see
+# test_campaign_pressure_defaults), so the typed refusal — and the runner
+# envelope plumbing these tests exercise — fires only for the genuinely
+# EMPTY/INVALID band, simulated here by inverting the band constants.
+def _invert_pn2_band(monkeypatch):
+    import simulator.campaigns as campaigns_module
+
+    monkeypatch.setattr(
+        campaigns_module, "C2A_STAGED_PN2_SWEEP_MIN_MBAR", 15.0
+    )
+    monkeypatch.setattr(
+        campaigns_module, "C2A_STAGED_PN2_SWEEP_MAX_MBAR", 5.0
+    )
+
+
+def test_run_executor_preserves_campaign_pressure_refusal_during_startup(
+    monkeypatch,
+):
+    _invert_pn2_band(monkeypatch)
     run = _pressure_refusal_run()
 
     execution = RunExecutor().execute(run._session_config())
 
     assert execution.status == "refused"
     assert execution.reason == "c2a_staged_pn2_outside_operating_band"
-    assert execution.error_message == execution.reason
-    assert execution.refusal_diagnostic["requested_pN2_mbar"] == pytest.approx(1.0)
-    assert execution.refusal_diagnostic["allowed_pN2_mbar"] == [5.0, 15.0]
+    assert execution.error_message.startswith(execution.reason)
+    assert execution.refusal_diagnostic["detail"] == (
+        "pN2 sweep operating band is empty or invalid"
+    )
+    assert execution.refusal_diagnostic["allowed_pN2_mbar"] == [15.0, 5.0]
 
 
-def test_pyrolysis_run_emits_campaign_pressure_refusal_diagnostic():
+def test_pyrolysis_run_emits_campaign_pressure_refusal_diagnostic(monkeypatch):
+    _invert_pn2_band(monkeypatch)
     run = _pressure_refusal_run(sio_hold_temperature_c=1600.0)
 
     payload = run.run()
@@ -74,10 +96,23 @@ def test_pyrolysis_run_emits_campaign_pressure_refusal_diagnostic():
     assert payload["reason"] == "c2a_staged_pn2_outside_operating_band"
     diagnostic = payload["run_metadata"]["refusal_diagnostic"]
     assert diagnostic["reason"] == payload["reason"]
-    assert diagnostic["requested_p_total_mbar"] == pytest.approx(1.25)
-    assert diagnostic["requested_pN2_mbar"] == pytest.approx(1.0)
-    assert diagnostic["allowed_pN2_mbar"] == [5.0, 15.0]
+    assert diagnostic["detail"] == (
+        "pN2 sweep operating band is empty or invalid"
+    )
+    assert diagnostic["allowed_pN2_mbar"] == [15.0, 5.0]
     assert "knudsen_regime_diagnostic" not in payload["run_metadata"]
+
+
+def test_pyrolysis_run_completes_with_band_adjustment_provenance():
+    # The pre-adjudication stranded config (pN2 request below the band) must
+    # now run instead of refusing; the substitution is loud in the campaign
+    # gas-control diagnostic, not a run-level failure.
+    run = _pressure_refusal_run(sio_hold_temperature_c=1600.0)
+
+    payload = run.run()
+
+    assert payload["status"] != "refused"
+    assert "refusal_diagnostic" not in payload["run_metadata"]
 
 
 def test_run_executor_partial_path_sets_status_and_decisions():

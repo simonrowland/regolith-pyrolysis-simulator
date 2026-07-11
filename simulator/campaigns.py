@@ -62,13 +62,23 @@ C2A_STAGED_PN2_BAND_REFUSAL_REASON = (
 
 
 class CampaignPressureSetpointRefusal(ValueError):
-    """Raised when a campaign pressure request would otherwise be rewritten."""
+    """Typed refusal for a campaign pressure request with an EMPTY feasible set.
+
+    SC-67 boundary: when the operating band is computable and non-empty, an
+    out-of-band request is adjusted to the band edge with loud provenance
+    (pn2_band_action) instead of raising. This refusal fires only when there
+    is nothing to recompute toward (empty/invalid band); run_executor maps it
+    into the structured failure envelope.
+    """
 
     reason = C2A_STAGED_PN2_BAND_REFUSAL_REASON
 
     def __init__(self, diagnostic: Mapping[str, object]):
         self.diagnostic = dict(diagnostic)
-        super().__init__(self.reason)
+        detail = self.diagnostic.get('detail')
+        super().__init__(
+            f'{self.reason}: {detail}' if detail else self.reason
+        )
 
 
 @lru_cache(maxsize=None)
@@ -190,6 +200,8 @@ class CampaignManager:
             type(self)._refuse_unknown_override_fields)
         self.last_pO2_enforcement: dict[str, object] | None = None
         self.last_c2a_staged_gas_control: dict[str, object] | None = None
+        self.last_c2a_staged_max_hold_adjustment: dict[str, object] | None = None
+        self.last_c3_na_hold_adjustment: dict[str, object] | None = None
         self.c5_enabled = False
         self._c2a_staged_stage_idx: int = 0
         self._c2a_staged_stage_start_hour: int = 0
@@ -537,17 +549,25 @@ class CampaignManager:
     def _configured_staged_max_hold_hr(self,
                                        campaign: CampaignPhase) -> float:
         max_hold_hr = self._configured_max_hold_hr(campaign)
-        stages = self._campaign_config(campaign).get('stages', [])
+        stages = self._c2a_staged_enabled_stages()
         total_hours = 0
-        if isinstance(stages, list):
-            for stage in stages:
-                if isinstance(stage, dict):
-                    total_hours += max(
-                        1, int(self._float(stage.get('duration_h'), 1.0)))
-        if total_hours and max_hold_hr != total_hours:
+        for idx, stage in enumerate(stages):
+            if not isinstance(stage, dict):
+                raise ValueError(f'C2A_staged.stages[{idx}] must be a mapping')
+            total_hours += max(
+                1, int(self._float(stage.get('duration_h'), 1.0)))
+        if max_hold_hr != total_hours:
             key = self._campaign_config_key(campaign)
-            raise ValueError(
-                f'{key}.max_hold_hr must match summed stage duration_h')
+            self.last_c2a_staged_max_hold_adjustment = {
+                'severity': 'info',
+                'code': 'c2a_staged_max_hold_recomputed',
+                'field': f'{key}.max_hold_hr',
+                'requested_max_hold_hr': float(max_hold_hr),
+                'applied_max_hold_hr': int(total_hours),
+                'derivation': 'sum(max(1, int(stage.duration_h)))',
+            }
+            return float(total_hours)
+        self.last_c2a_staged_max_hold_adjustment = None
         return max_hold_hr
 
     def _c2a_staged_depletion_flux_decay_fraction(self) -> float:
@@ -726,12 +746,6 @@ class CampaignManager:
                 f'C2A_staged.stages.{stage_name}.p_total_mbar '
                 'must be finite and non-negative'
             )
-        if p_total_present and p_total_mbar + 1.0e-12 < pO2_mbar:
-            raise ValueError(
-                f'C2A_staged.stages.{stage_name}.p_total_mbar '
-                'must be >= pO2_mbar'
-            )
-
         band_action = ''
         requested_p_total_mbar = p_total_mbar
         if mode == C2A_STAGED_GAS_COVER_PO2_HOLD:
@@ -751,29 +765,48 @@ class CampaignManager:
             pN2_mbar = max(0.0, p_total_mbar - pO2_mbar)
         else:
             pN2_mbar = p_total_mbar - pO2_mbar
-            if pN2_mbar <= 0.0:
-                raise ValueError(
-                    f'C2A_staged.stages.{stage_name}.pN2_mbar '
-                    'must be positive for gas_cover_mode=pn2_sweep'
-                )
-            if not (
-                C2A_STAGED_PN2_SWEEP_MIN_MBAR
-                <= pN2_mbar
-                <= C2A_STAGED_PN2_SWEEP_MAX_MBAR
+            if (
+                    not math.isfinite(C2A_STAGED_PN2_SWEEP_MIN_MBAR)
+                    or not math.isfinite(C2A_STAGED_PN2_SWEEP_MAX_MBAR)
+                    or C2A_STAGED_PN2_SWEEP_MIN_MBAR <= 0.0
+                    or C2A_STAGED_PN2_SWEEP_MAX_MBAR
+                    < C2A_STAGED_PN2_SWEEP_MIN_MBAR
             ):
+                # SC-67 boundary: an EMPTY/INVALID feasible band is the one
+                # case where refusal (not adjustment) is correct — there is
+                # nothing to recompute toward. Typed so the runner failure
+                # envelope (run_executor) reports it structurally.
                 raise CampaignPressureSetpointRefusal({
                     'status': 'refused',
                     'reason': C2A_STAGED_PN2_BAND_REFUSAL_REASON,
                     'stage_name': stage_name,
                     'gas_cover_mode': mode,
-                    'pO2_mbar': float(pO2_mbar),
-                    'requested_p_total_mbar': float(requested_p_total_mbar),
-                    'requested_pN2_mbar': float(pN2_mbar),
+                    'detail': 'pN2 sweep operating band is empty or invalid',
                     'allowed_pN2_mbar': [
                         C2A_STAGED_PN2_SWEEP_MIN_MBAR,
                         C2A_STAGED_PN2_SWEEP_MAX_MBAR,
                     ],
                 })
+            # SC-67 recompute-and-adjust (t-185): the viscous-flow band is a
+            # computable, non-empty feasible set, so an out-of-band configured
+            # p_total adjusts to the nearest band edge like a physical
+            # regulator hitting its limit stop — LOUDLY: requested vs applied
+            # and the band action are recorded in the diagnostic
+            # (pn2_band_action / requested_p_total_mbar). The fail-loud
+            # doctrine targets SILENT coercion; this substitution is visible.
+            # Refusal is reserved for the empty-band case above.
+            clamped_pN2 = min(
+                C2A_STAGED_PN2_SWEEP_MAX_MBAR,
+                max(C2A_STAGED_PN2_SWEEP_MIN_MBAR, pN2_mbar),
+            )
+            if clamped_pN2 != pN2_mbar:
+                band_action = (
+                    'clamped_low'
+                    if pN2_mbar < C2A_STAGED_PN2_SWEEP_MIN_MBAR
+                    else 'clamped_high'
+                )
+                pN2_mbar = clamped_pN2
+                p_total_mbar = pO2_mbar + pN2_mbar
             atmosphere = Atmosphere.PN2_SWEEP
 
         diagnostic = {

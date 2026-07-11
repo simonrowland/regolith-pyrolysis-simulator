@@ -1379,6 +1379,333 @@ class ExtractionMixin:
             self.shuttle_K_inventory_kg = self._sync_reagent_counter_from_ledger('K')
             self.shuttle_cycle_Na = 0
 
+    def _recompute_staged_na_fe_hold_setpoint(self) -> None:
+        """Repair a stranded staged Na/Fe hold from the live chemistry models."""
+
+        from engines.builtin.metallothermic_step import (
+            BuiltinMetallothermicStepProvider,
+            REACTION_FAMILY_C3_NA,
+        )
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+
+        configured_temperature_C = float(
+            self.campaign_mgr.get_temp_target(
+                CampaignPhase.C3_NA,
+                0,
+                self.melt,
+            )[0]
+        )
+        configured_margin = (
+            BuiltinMetallothermicStepProvider
+            ._reduction_margin_kj_per_mol_o2(
+                'Na',
+                'FeO',
+                configured_temperature_C,
+            )
+        )
+        if configured_margin > 0.0:
+            self._last_c3_na_hold_adjustment = {}
+            self.campaign_mgr.last_c3_na_hold_adjustment = None
+            return
+
+        curve = self._melt_redox_liquidus_gate_curve()
+        crossover_temperature_C = (
+            BuiltinMetallothermicStepProvider._crossover_temperature_C(
+                'Na',
+                'Fe',
+            )
+        )
+        if not isinstance(curve, Mapping) or crossover_temperature_C is None:
+            diagnostic = {
+                'status': 'unavailable',
+                'reason': 'na_fe_hold_window_authority_unavailable',
+                'configured_temperature_C': configured_temperature_C,
+                'configured_margin_kJ_per_mol_O2': configured_margin,
+            }
+            self._last_c3_na_hold_adjustment = diagnostic
+            self.campaign_mgr.last_c3_na_hold_adjustment = diagnostic
+            return
+
+        solidus_temperature_C = float(curve['solidus_T_C'])
+        rows: list[dict[str, Any]] = []
+        feasible_rows: list[dict[str, Any]] = []
+        true_feo_mol = self._cleaned_melt_available_mol_by_species(('FeO',))
+
+        def liquid_fraction_at(temperature_C: float) -> float:
+            try:
+                return float(
+                    self._interpolate_freeze_gate_curve(
+                        curve,
+                        temperature_C,
+                    )
+                )
+            except (IndexError, KeyError, TypeError, ValueError):
+                return 0.0
+
+        boundary_tolerance_C = 1.0e-9
+
+        def margin_at(temperature_C: float) -> float:
+            return (
+                BuiltinMetallothermicStepProvider
+                ._reduction_margin_kj_per_mol_o2(
+                    'Na',
+                    'FeO',
+                    temperature_C,
+                )
+            )
+
+        margin_low_C = min(
+            solidus_temperature_C,
+            float(crossover_temperature_C) - 1.0,
+        )
+        margin_high_C = max(
+            configured_temperature_C,
+            float(crossover_temperature_C) + 1.0,
+        )
+        for _ in range(64):
+            if margin_at(margin_low_C) > 0.0:
+                break
+            margin_low_C -= max(1.0, margin_high_C - margin_low_C)
+        for _ in range(64):
+            if margin_at(margin_high_C) <= 0.0:
+                break
+            margin_high_C += max(1.0, margin_high_C - margin_low_C)
+        for _ in range(64):
+            if margin_high_C - margin_low_C <= boundary_tolerance_C:
+                break
+            midpoint_C = (margin_low_C + margin_high_C) / 2.0
+            if margin_at(midpoint_C) > 0.0:
+                margin_low_C = midpoint_C
+            else:
+                margin_high_C = midpoint_C
+        solved_crossover_temperature_C = (
+            margin_low_C + margin_high_C
+        ) / 2.0
+
+        liquid_fraction_monotonicity_tolerance = 1.0e-9
+        monotonicity_violation: dict[str, float] | None = None
+        if margin_low_C > solidus_temperature_C:
+            bracket_temperatures_C = {
+                solidus_temperature_C,
+                margin_low_C,
+            }
+            for point in tuple(curve.get('path') or ()):
+                try:
+                    sample_temperature_C = float(point[0])
+                except (IndexError, TypeError, ValueError):
+                    continue
+                if (
+                        solidus_temperature_C
+                        < sample_temperature_C
+                        < margin_low_C
+                ):
+                    bracket_temperatures_C.add(sample_temperature_C)
+            previous_sample: tuple[float, float] | None = None
+            for sample_temperature_C in sorted(bracket_temperatures_C):
+                sample_liquid_fraction = liquid_fraction_at(
+                    sample_temperature_C
+                )
+                if (
+                        previous_sample is not None
+                        and sample_liquid_fraction
+                        + liquid_fraction_monotonicity_tolerance
+                        < previous_sample[1]
+                ):
+                    monotonicity_violation = {
+                        'earlier_temperature_C': previous_sample[0],
+                        'earlier_liquid_fraction': previous_sample[1],
+                        'later_temperature_C': sample_temperature_C,
+                        'later_liquid_fraction': sample_liquid_fraction,
+                    }
+                    break
+                previous_sample = (
+                    sample_temperature_C,
+                    sample_liquid_fraction,
+                )
+
+        if monotonicity_violation is not None:
+            diagnostic = {
+                'status': 'unavailable',
+                'reason': 'lf_curve_non_monotone_window_unresolved',
+                'configured_temperature_C': configured_temperature_C,
+                'configured_margin_kJ_per_mol_O2': configured_margin,
+                'crossover_temperature_C': solved_crossover_temperature_C,
+                'boundary_tolerance_C': boundary_tolerance_C,
+                'liquid_fraction_monotonicity_tolerance': (
+                    liquid_fraction_monotonicity_tolerance
+                ),
+                'monotonicity_validation_window_T_min_C': (
+                    solidus_temperature_C
+                ),
+                'monotonicity_validation_window_T_max_C': margin_low_C,
+                'monotonicity_violation': monotonicity_violation,
+                'liquid_fraction_curve': {
+                    'source': curve.get('source'),
+                    'solidus_T_C': curve.get('solidus_T_C'),
+                    'liquidus_T_C': curve.get('liquidus_T_C'),
+                    'path': list(curve.get('path') or ()),
+                },
+            }
+            self._last_c3_na_hold_adjustment = diagnostic
+            self.campaign_mgr.last_c3_na_hold_adjustment = diagnostic
+            return
+
+        first_positive_liquid_temperature_C: float | None = None
+        if (
+                margin_low_C > solidus_temperature_C
+                and liquid_fraction_at(margin_low_C) > 0.0
+        ):
+            liquid_low_C = solidus_temperature_C
+            liquid_high_C = margin_low_C
+            for _ in range(64):
+                if liquid_high_C - liquid_low_C <= boundary_tolerance_C:
+                    break
+                midpoint_C = (liquid_low_C + liquid_high_C) / 2.0
+                if liquid_fraction_at(midpoint_C) > 0.0:
+                    liquid_high_C = midpoint_C
+                else:
+                    liquid_low_C = midpoint_C
+            first_positive_liquid_temperature_C = liquid_high_C
+
+        candidate_temperatures_C: list[float] = []
+        if first_positive_liquid_temperature_C is not None:
+            candidate_temperatures_C.extend((
+                first_positive_liquid_temperature_C,
+                margin_low_C,
+            ))
+            for point in tuple(curve.get('path') or ()):
+                try:
+                    sample_temperature_C = float(point[0])
+                except (IndexError, TypeError, ValueError):
+                    continue
+                if (
+                        first_positive_liquid_temperature_C
+                        <= sample_temperature_C
+                        <= margin_low_C
+                ):
+                    candidate_temperatures_C.append(sample_temperature_C)
+        candidate_temperatures_C = sorted(set(candidate_temperatures_C))
+
+        # Premise: feasibility is the intersection of positive liquid fraction
+        # and positive Na/Fe reduction margin. Method: bisect both governing
+        # curves to their boundary knots, add the liquid-fraction curve's own
+        # sample knots, then let the provider accept/refuse and score each row.
+        # Tolerance: 1e-9 C is an accepted residual floor; a narrower feasible
+        # window may be reported empty, but is physically meaningless against
+        # whole-degree thermal-control granularity. Sanity: for (1100, 0),
+        # (1181.2, 0), (1181.4, 0.1), this samples the real sub-degree window
+        # below the ~1181.4948 C Na/Fe crossover instead of falsely returning
+        # na_fe_hold_window_empty.
+        for temperature_C in candidate_temperatures_C:
+            margin = margin_at(temperature_C)
+            liquid_fraction = liquid_fraction_at(temperature_C)
+            row: dict[str, Any] = {
+                'temperature_C': temperature_C,
+                'margin_kJ_per_mol_O2': margin,
+                'liquid_fraction': liquid_fraction,
+                'status': 'outside_joint_window',
+                'Fe_produced_kg': 0.0,
+            }
+            result = self._dispatch_only(
+                ChemistryIntent.METALLOTHERMIC_STEP,
+                control_inputs={
+                    'reaction_family': REACTION_FAMILY_C3_NA,
+                    'na_target_stage': 'feo_cleanup',
+                    'reagent_available_kg': float(
+                        self.shuttle_Na_inventory_kg
+                    ),
+                    'true_available_mol_by_species': true_feo_mol,
+                    'liquid_fraction': liquid_fraction,
+                    'dt_hr': 1.0,
+                },
+                temperature_C_override=temperature_C,
+            )
+            result_diagnostic = dict(result.diagnostic or {})
+            fe_produced_kg = float(
+                dict(result_diagnostic.get('per_metal_produced_kg') or {})
+                .get('Fe', 0.0)
+            )
+            row.update({
+                'status': str(result.status),
+                'reason_refused': str(
+                    result_diagnostic.get('reason_refused') or ''
+                ),
+                'Fe_produced_kg': fe_produced_kg,
+            })
+            if (
+                    result.status == 'ok'
+                    and result.transition is not None
+                    and fe_produced_kg > 0.0
+            ):
+                feasible_rows.append(row)
+            rows.append(row)
+
+        diagnostic = {
+            'status': 'empty',
+            'reason': 'na_fe_hold_window_empty',
+            'configured_temperature_C': configured_temperature_C,
+            'configured_margin_kJ_per_mol_O2': configured_margin,
+            'crossover_temperature_C': solved_crossover_temperature_C,
+            'crossover_temperature_hint_C': float(crossover_temperature_C),
+            'joint_window_T_min_exclusive_C': (
+                first_positive_liquid_temperature_C
+            ),
+            'first_positive_liquid_temperature_C': (
+                first_positive_liquid_temperature_C
+            ),
+            'joint_window_T_max_exclusive_C': solved_crossover_temperature_C,
+            'boundary_tolerance_C': boundary_tolerance_C,
+            'accepted_residual_window_floor_C': boundary_tolerance_C,
+            'feasibility_authority': (
+                'BuiltinMetallothermicStepProvider.dispatch'
+            ),
+            'liquid_fraction_curve': {
+                'source': curve.get('source'),
+                'solidus_T_C': curve.get('solidus_T_C'),
+                'liquidus_T_C': curve.get('liquidus_T_C'),
+                'path': list(curve.get('path') or ()),
+            },
+            'objective': 'Fe_produced_kg',
+            'candidate_rule': 'solved boundaries plus curve sample knots',
+            'rows': rows,
+            'selection_tie_break': (
+                'closest feasible argmax to configured_temperature_C'
+            ),
+        }
+        if feasible_rows:
+            max_fe_kg = max(row['Fe_produced_kg'] for row in feasible_rows)
+            tied = [
+                row for row in feasible_rows
+                if math.isclose(
+                    row['Fe_produced_kg'],
+                    max_fe_kg,
+                    rel_tol=0.0,
+                    abs_tol=1.0e-12,
+                )
+            ]
+            selected = min(
+                tied,
+                key=lambda row: (
+                    abs(row['temperature_C'] - configured_temperature_C),
+                    row['temperature_C'],
+                ),
+            )
+            selected_temperature_C = float(selected['temperature_C'])
+            active = self.campaign_mgr._active_c3_na_scoped_overrides
+            if isinstance(active, dict):
+                active['inject_target_C'] = selected_temperature_C
+            diagnostic.update({
+                'status': 'applied',
+                'reason': 'na_fe_hold_recomputed',
+                'applied_field': 'inject_target_C',
+                'selected_temperature_C': selected_temperature_C,
+                'selected_Fe_produced_kg': float(
+                    selected['Fe_produced_kg']
+                ),
+            })
+        self._last_c3_na_hold_adjustment = diagnostic
+        self.campaign_mgr.last_c3_na_hold_adjustment = diagnostic
+
     def _step_shuttle(self):
         """
         Perform one hour of alkali metallothermic shuttle processing.
