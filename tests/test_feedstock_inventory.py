@@ -1226,6 +1226,27 @@ def test_unspent_additives_are_accounted_until_consumed():
     assert sim.product_ledger()["unspent_K_reagent"] == pytest.approx(10.0)
 
 
+def test_cost_allocation_product_ledger_excludes_reagent_bookkeeping_products():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {
+                    "SiO2": 50.0,
+                    "FeO": 50.0,
+                },
+            }
+        }
+    )
+
+    sim.load_batch("oxide", mass_kg=1000.0, additives_kg={"K": 10.0})
+    products = sim.product_ledger()
+    cost_products = AccountingQueries(sim).cost_allocation_product_ledger()
+
+    assert products["unspent_K_reagent"] == pytest.approx(10.0)
+    assert "unspent_K_reagent" not in cost_products
+
+
 def test_recovered_reagent_transfer_debits_condenser_product():
     sim = _sim(
         {

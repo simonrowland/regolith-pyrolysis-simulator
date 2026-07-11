@@ -196,7 +196,27 @@ def test_run_input_allocation_uses_existing_species_product_row():
     assert co.thermal_flux_h == pytest.approx(1273.15)
 
 
-def test_cost_rollup_adds_pumping_sidecar_without_costing_run_input():
+def test_run_input_allocation_excludes_reagent_bookkeeping_products():
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=({"T_C": 1000.0},),
+        products_kg={
+            "Fe": 5.0,
+            "unspent_Mg_reagent": 50.0,
+            "consumed_C_reagent": 5.0,
+        },
+    )
+
+    assert "terminal.product:unspent_Mg_reagent" not in diagnostic["product_costs"]
+    assert "terminal.product:consumed_C_reagent" not in diagnostic["product_costs"]
+    fe = CostVector(
+        **diagnostic["product_costs"]["terminal.product:Fe"]["accumulated_cost"]
+    )
+    assert fe.thermal_flux_h == pytest.approx(1273.15)
+    assert fe.furnace_h == pytest.approx(1.0)
+
+
+def test_cost_rollup_allocates_pumping_sidecar_without_costing_run_input():
     diagnostic = build_cost_rollup_diagnostic(
         cost_ledger=CostLedger(),
         per_hour=({"T_C": 1000.0},),
@@ -233,7 +253,34 @@ def test_cost_rollup_adds_pumping_sidecar_without_costing_run_input():
     o2 = CostVector(
         **diagnostic["product_costs"]["terminal.product:O2"]["accumulated_cost"]
     )
-    assert o2.electrical_kWh == pytest.approx(0.0)
+    assert o2.electrical_kWh == pytest.approx(0.3006989878103832)
+
+
+def test_cost_rollup_allocates_non_mre_electrical_to_real_products():
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=(
+            {
+                "campaign": "C2A",
+                "T_C": 1000.0,
+                "energy_electrical_kWh": 9.0,
+            },
+        ),
+        products_kg={"Fe": 2.0, "unspent_Mg_reagent": 8.0},
+    )
+
+    run_input = diagnostic["run_input_cost"]
+    assert run_input["physical_cost"]["electrical_kWh"] == pytest.approx(0.0)
+    assert run_input["owner_ratify_money_projection"] == pytest.approx(
+        1273.15 * THERMAL_USD_PER_FLUX_H.value
+        + 1.0 * FURNACE_USD_PER_H.value
+    )
+    assert "terminal.product:unspent_Mg_reagent" not in diagnostic["product_costs"]
+    fe = CostVector(
+        **diagnostic["product_costs"]["terminal.product:Fe"]["accumulated_cost"]
+    )
+    assert fe.electrical_kWh == pytest.approx(9.0)
+    assert fe.thermal_flux_h == pytest.approx(1273.15)
 
 
 def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture():

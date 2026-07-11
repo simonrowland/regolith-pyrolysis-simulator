@@ -11,6 +11,7 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.accounting.ledger import LedgerTransition
+from simulator.accounting.queries import is_reagent_bookkeeping_product
 from simulator.cost_energy import (
     furnace_thermal_flux_hours,
     owner_ratify_cost_placeholders,
@@ -27,6 +28,17 @@ COST_BEARING_ACCOUNTS = frozenset({
     "process.condensation_train",
     "process.c7_al_credit",
 })
+MRE_ELECTRICAL_CAMPAIGNS = frozenset({"C5", "MRE_BASELINE"})
+_AUXILIARY_ELECTRICAL_BREAKDOWN_FIELDS = (
+    "energy_electrical_breakdown_kWh",
+    "electrical_breakdown_kWh",
+)
+_AUXILIARY_ELECTRICAL_COMPONENT_KEYS = (
+    "turbine_kWh",
+    "turbine",
+    "condenser_kWh",
+    "condenser",
+)
 _RETURN_NONE = object()
 _RETURN_EMPTY_TUPLE = object()
 _RETURN_SUMMARY = object()
@@ -832,19 +844,20 @@ def _build_cost_rollup_diagnostic(
         _run_pumping_input_cost(pumping_context)
         if pumping_enabled else (ZERO_COST, {})
     )
-    product_inputs = _clean_outputs({
-        ("terminal.product", species): kg
-        for species, kg in dict(products_kg or {}).items()
-    })
-    furnace_alloc = (
-        _allocate_by_mass(product_inputs, furnace_input)
+    auxiliary_electrical_input = _run_auxiliary_electrical_input_cost(per_hour)
+    product_allocation_input = (
+        furnace_input + pumping_input + auxiliary_electrical_input
+    )
+    product_inputs = _cost_allocation_product_inputs(products_kg)
+    product_alloc = (
+        _allocate_by_mass(product_inputs, product_allocation_input)
         if product_inputs else {}
     )
     product_costs = {
         key: dict(value)
         for key, value in summary["product_costs"].items()
     }
-    for key in sorted(furnace_alloc, key=_output_sort_key):
+    for key in sorted(product_alloc, key=_output_sort_key):
         account, species = _normalize_output_key(key)
         matches = [
             product_key for product_key in product_costs
@@ -863,7 +876,7 @@ def _build_cost_rollup_diagnostic(
             }
             if sum(quantities.values()) <= VECTOR_TOLERANCE:
                 quantities = {product_key: 1.0 for product_key in matches}
-        split = _allocate_by_mass(quantities, furnace_alloc[key])
+        split = _allocate_by_mass(quantities, product_alloc[key])
         for product_key, added_cost in split.items():
             existing = CostVector(**product_costs.get(product_key, {}).get("accumulated_cost", {}))
             total = existing + added_cost
@@ -888,13 +901,21 @@ def _build_cost_rollup_diagnostic(
             "status": pumping_diagnostic.get("status", "unknown"),
         }
     summary["run_input_cost"] = run_input_cost
-    if not product_inputs and not furnace_input.is_zero():
+    if not product_inputs and not product_allocation_input.is_zero():
         summary["warnings"] = [
             *summary.get("warnings", []),
             "run_input_cost_unallocated_no_product_mass",
         ]
     summary["product_costs"] = product_costs
     return summary
+
+
+def _cost_allocation_product_inputs(products_kg: Mapping[str, float]) -> dict[Any, float]:
+    return _clean_outputs({
+        ("terminal.product", species): kg
+        for species, kg in dict(products_kg or {}).items()
+        if not is_reagent_bookkeeping_product(species)
+    })
 
 
 def _run_furnace_input_cost(per_hour: tuple[dict[str, Any], ...]) -> CostVector:
@@ -909,6 +930,40 @@ def _run_furnace_input_cost(per_hour: tuple[dict[str, Any], ...]) -> CostVector:
         thermal_flux_h += furnace_thermal_flux_hours(temperature_C, 1.0)
         furnace_h += 1.0
     return CostVector(thermal_flux_h=thermal_flux_h, furnace_h=furnace_h)
+
+
+def _run_auxiliary_electrical_input_cost(
+    per_hour: tuple[dict[str, Any], ...],
+) -> CostVector:
+    electrical_kWh = 0.0
+    for row in per_hour:
+        if not isinstance(row, Mapping):
+            continue
+        component_electrical = _auxiliary_electrical_from_breakdown(row)
+        if component_electrical is not None:
+            electrical_kWh += component_electrical
+            continue
+        campaign = str(row.get("campaign", "")).split(".")[-1].upper()
+        if not campaign or campaign in MRE_ELECTRICAL_CAMPAIGNS:
+            continue
+        electrical_kWh += max(0.0, _finite(row.get("energy_electrical_kWh")))
+    return CostVector(electrical_kWh=electrical_kWh)
+
+
+def _auxiliary_electrical_from_breakdown(row: Mapping[str, Any]) -> float | None:
+    for field in _AUXILIARY_ELECTRICAL_BREAKDOWN_FIELDS:
+        breakdown = row.get(field)
+        if isinstance(breakdown, Mapping):
+            return sum(
+                max(0.0, _finite(breakdown.get(key)))
+                for key in _AUXILIARY_ELECTRICAL_COMPONENT_KEYS
+            )
+    if any(key in row for key in _AUXILIARY_ELECTRICAL_COMPONENT_KEYS):
+        return sum(
+            max(0.0, _finite(row.get(key)))
+            for key in _AUXILIARY_ELECTRICAL_COMPONENT_KEYS
+        )
+    return None
 
 
 def _run_pumping_input_cost(

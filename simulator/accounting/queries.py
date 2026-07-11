@@ -69,6 +69,8 @@ PRODUCT_LEDGER_ACCOUNTS = (
     CONDENSATION_TRAIN_ACCOUNT,
     "process.overhead_gas",
 )
+REAGENT_BOOKKEEPING_PRODUCT_PREFIXES = ("unspent_", "consumed_")
+REAGENT_BOOKKEEPING_PRODUCT_SUFFIX = "_reagent"
 TERMINAL_RUMP_ACCOUNTS = (
     "process.cleaned_melt",
     C7_AL_CREDIT_ACCOUNT,
@@ -137,6 +139,13 @@ def _merge_masses(target: dict[str, float], values: Mapping[str, float]) -> None
             target[species] = target.get(species, 0.0) + amount
 
 
+def is_reagent_bookkeeping_product(species: Any) -> bool:
+    name = str(species)
+    return name.endswith(REAGENT_BOOKKEEPING_PRODUCT_SUFFIX) and name.startswith(
+        REAGENT_BOOKKEEPING_PRODUCT_PREFIXES
+    )
+
+
 class AccountingQueries:
     """Single read-side facade for simulator accounting/scoring queries."""
 
@@ -160,6 +169,13 @@ class AccountingQueries:
         if callable(consumed_getter):
             _merge_masses(products, consumed_getter())
         return products
+
+    def cost_allocation_product_ledger(self) -> dict[str, float]:
+        return {
+            species: kg
+            for species, kg in self.product_ledger().items()
+            if not is_reagent_bookkeeping_product(species)
+        }
 
     def species_kg_by_accounts(
         self,
