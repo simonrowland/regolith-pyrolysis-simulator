@@ -850,6 +850,18 @@ def _build_cost_rollup_diagnostic(
     auxiliary_electrical_input, auxiliary_electrical_components = (
         _run_auxiliary_electrical_input_cost(per_hour)
     )
+    if pumping_enabled:
+        # pumping_context is authoritative when present; the per-hour breakdown
+        # remains the fallback only when that typed context is absent.
+        auxiliary_electrical_components = {
+            **auxiliary_electrical_components,
+            "pumping": 0.0,
+        }
+        auxiliary_electrical_input = CostVector(
+            electrical_kWh=sum(auxiliary_electrical_components.values())
+        )
+    # Provenance: owner-approved wave-5 cost-ledger behavior, present in v0.5.10;
+    # pumping/turbine/condenser electrical is allocated per component to products.
     product_allocation_input = (
         furnace_input + pumping_input + auxiliary_electrical_input
     )
@@ -1076,25 +1088,53 @@ def _run_pumping_input_cost(
             "parameter_metadata": parameter_metadata,
             "rows": [],
         }
+    if str(pumping_context.get("status", "")) == "refused":
+        return ZERO_COST, {
+            "schema_version": "pumping-cost-rollup-v1",
+            "status": "refused",
+            "reason": str(pumping_context.get("reason", "unspecified")),
+            "body": str(pumping_context.get("body", "")),
+            "ambient_pressure_pa": _finite(
+                pumping_context.get("ambient_pressure_pa"),
+                default=math.nan,
+            ),
+            "ambient_pressure_source": str(
+                pumping_context.get("ambient_pressure_source", "")
+            ),
+            "pumping_electrical_kWh": 0.0,
+            "feasible": False,
+            "parameter_metadata": parameter_metadata,
+            "rows": [],
+        }
     ambient_pressure_pa = _finite(
         pumping_context.get("ambient_pressure_pa"),
         default=math.nan,
     )
     rows: list[dict[str, Any]] = []
     total_energy_kWh = 0.0
-    all_feasible = True
+    any_infeasible = False
+    any_unresolved = False
     for raw_row in pumping_context.get("rows", ()) or ():
         if not isinstance(raw_row, Mapping):
             continue
+        line_conductance = raw_row.get("validated_line_conductance_m3_s")
         result = estimate_subambient_pump_cost(
             target_pressure_pa=_finite(raw_row.get("target_pressure_pa"), math.nan),
             offgas_mol_per_s=_finite(raw_row.get("offgas_mol_per_s"), math.nan),
             duration_s=_finite(raw_row.get("duration_s"), math.nan),
             ambient_pressure_pa=ambient_pressure_pa,
             gas_temperature_K=_finite(raw_row.get("gas_temperature_K"), math.nan),
+            validated_line_conductance_m3_s=(
+                None
+                if line_conductance is None
+                else _finite(line_conductance, math.nan)
+            ),
         )
         total_energy_kWh += max(0.0, _finite(result.energy_kWh))
-        all_feasible = all_feasible and bool(result.feasible)
+        if result.feasible is None:
+            any_unresolved = True
+        elif not result.feasible:
+            any_infeasible = True
         rows.append({
             "hour": int(_finite(raw_row.get("hour"), len(rows))),
             **result.to_json(),
@@ -1103,8 +1143,13 @@ def _run_pumping_input_cost(
     status = "ok"
     if not rows:
         status = "no_rows"
-    elif not all_feasible:
+    elif any_infeasible:
         status = "infeasible_pumping_point"
+    elif any_unresolved:
+        status = "pumping_feasibility_unresolved"
+    feasible: bool | None = not any_infeasible
+    if any_unresolved and not any_infeasible:
+        feasible = None
     diagnostic = {
         "schema_version": "pumping-cost-rollup-v1",
         "status": status,
@@ -1114,7 +1159,7 @@ def _run_pumping_input_cost(
             pumping_context.get("ambient_pressure_source", "")
         ),
         "pumping_electrical_kWh": cost.electrical_kWh,
-        "feasible": bool(all_feasible),
+        "feasible": feasible,
         "parameter_metadata": parameter_metadata,
         "rows": rows,
     }

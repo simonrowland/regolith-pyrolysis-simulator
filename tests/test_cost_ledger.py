@@ -233,6 +233,7 @@ def test_cost_rollup_allocates_pumping_sidecar_without_costing_run_input():
                     "offgas_mol_per_s": 0.01,
                     "duration_s": 3600.0,
                     "gas_temperature_K": 300.0,
+                    "validated_line_conductance_m3_s": 100.0,
                 },
             ),
         },
@@ -249,16 +250,110 @@ def test_cost_rollup_allocates_pumping_sidecar_without_costing_run_input():
     )
     pumping = diagnostic["pumping_diagnostic"]
     assert pumping["status"] == "ok"
-    assert pumping["pumping_electrical_kWh"] == pytest.approx(0.3006989878103832)
+    expected_pumping_kWh = 0.0735236524284681 / 0.90
+    assert pumping["pumping_electrical_kWh"] == pytest.approx(expected_pumping_kWh)
     assert pumping["rows"][0]["regime"] == "pump"
     components = diagnostic["auxiliary_electrical_diagnostic"]["components_kWh"]
-    assert components["pumping"] == pytest.approx(0.3006989878103832)
+    assert components["pumping"] == pytest.approx(expected_pumping_kWh)
     assert components["turbine"] == pytest.approx(0.0)
     assert components["condenser"] == pytest.approx(0.0)
     o2 = CostVector(
         **diagnostic["product_costs"]["terminal.product:O2"]["accumulated_cost"]
     )
-    assert o2.electrical_kWh == pytest.approx(0.3006989878103832)
+    assert o2.electrical_kWh == pytest.approx(expected_pumping_kWh)
+
+
+def test_cost_rollup_prefers_pumping_context_over_per_hour_breakdown():
+    reviewer_reproduction_kWh = 0.0735236524284681
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=(
+            {
+                "T_C": 1000.0,
+                "energy_electrical_breakdown_kWh": {
+                    "pumping_kWh": reviewer_reproduction_kWh,
+                },
+            },
+        ),
+        products_kg={"O2": 1.0},
+        pumping_context={
+            "body": "mars",
+            "ambient_pressure_pa": 610.0,
+            "ambient_pressure_source": "test.mars_datum",
+            "rows": (
+                {
+                    "hour": 1,
+                    "target_pressure_pa": 100.0,
+                    "offgas_mol_per_s": 0.01,
+                    "duration_s": 3600.0,
+                    "gas_temperature_K": 300.0,
+                    "validated_line_conductance_m3_s": 100.0,
+                },
+            ),
+        },
+    )
+
+    expected_context_kWh = reviewer_reproduction_kWh / 0.90
+    components = diagnostic["auxiliary_electrical_diagnostic"]["components_kWh"]
+    o2 = CostVector(
+        **diagnostic["product_costs"]["terminal.product:O2"]["accumulated_cost"]
+    )
+    assert components["pumping"] == pytest.approx(expected_context_kWh)
+    assert o2.electrical_kWh == pytest.approx(expected_context_kWh)
+    # Reviewer reproduced 0.0735 + 0.0735 = 0.1470 kWh before the authority rule.
+    assert o2.electrical_kWh != pytest.approx(2.0 * reviewer_reproduction_kWh)
+
+
+def test_cost_rollup_marks_pumping_feasibility_unresolved_without_conductance():
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=({"T_C": 1000.0},),
+        products_kg={"O2": 1.0},
+        pumping_context={
+            "body": "mars",
+            "ambient_pressure_pa": 610.0,
+            "ambient_pressure_source": "test.mars_datum",
+            "rows": (
+                {
+                    "hour": 1,
+                    "target_pressure_pa": 100.0,
+                    "offgas_mol_per_s": 0.01,
+                    "duration_s": 3600.0,
+                    "gas_temperature_K": 300.0,
+                },
+            ),
+        },
+    )
+
+    pumping = diagnostic["pumping_diagnostic"]
+    assert pumping["status"] == "pumping_feasibility_unresolved"
+    assert pumping["feasible"] is None
+    assert pumping["rows"][0]["status"] == "missing-validated-line-conductance"
+    assert pumping["pumping_electrical_kWh"] == pytest.approx(
+        0.0735236524284681 / 0.90
+    )
+
+
+def test_cost_rollup_preserves_typed_pumping_context_refusal():
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=({"T_C": 1000.0},),
+        products_kg={"O2": 1.0},
+        pumping_context={
+            "schema_version": "pumping-context-v1",
+            "status": "refused",
+            "reason": "missing-ambient-pressure",
+            "body": "mars",
+            "ambient_pressure_pa": float("nan"),
+            "rows": (),
+        },
+    )
+
+    pumping = diagnostic["pumping_diagnostic"]
+    assert pumping["status"] == "refused"
+    assert pumping["reason"] == "missing-ambient-pressure"
+    assert pumping["feasible"] is False
+    assert pumping["pumping_electrical_kWh"] == 0.0
 
 
 def test_cost_rollup_allocates_non_mre_electrical_to_real_products():
