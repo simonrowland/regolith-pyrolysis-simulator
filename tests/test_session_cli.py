@@ -321,12 +321,11 @@ def test_advance_n_stops_on_first_control_frame():
     frames = _frames(result.stdout)
     assert result.returncode == 0, result.stderr
     assert frames[1]["frame_type"] == "decision_required"
-    # 2026-07-02 BUG-006/-6b: the campaign transition (including the
-    # decision pause) now defers until AFTER the snapshot append, so each
-    # finishing segment's frame contains its final commanded hour. The
-    # decision frame gains that hour: 3 -> 4 steps. Correction-class.
-    assert len(frames[1]["steps"]) == 4
-    assert frames[1]["steps"][-1]["hour"] == 4
+    # Hard caps include the hour that just completed before endpoint dispatch.
+    # With both C0 and C0B capped at 1h, the decision frame contains each
+    # finishing campaign's completed hour.
+    assert len(frames[1]["steps"]) == 2
+    assert frames[1]["steps"][-1]["hour"] == 2
     assert frames[2]["frame_type"] == "snapshot"
 
 
