@@ -33,6 +33,7 @@ Covers:
 
 from __future__ import annotations
 
+import copy
 from pathlib import Path
 
 import pytest
@@ -1467,6 +1468,46 @@ def test_c6_mg_thermite_refuses_above_crossover_without_local_support(
     assert result.diagnostic["c6_mg_al_margin_kJ_per_mol_O2"] < 0.0
 
 
+def test_c6_mg_thermite_proceeds_at_static_hold_without_local_support(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+
+    request = _c6_mg_primary_request(sim, liquid_fraction=1.0)
+    request = IntentRequest(
+        intent=request.intent,
+        account_view=request.account_view,
+        temperature_C=1450.0,
+        pressure_bar=request.pressure_bar,
+        control_inputs={
+            **request.control_inputs,
+            "JANAF_4th_multiphase_margin_kJ_per_mol_O2": {
+                "Mg_Al_crossover_C": 1471.4,
+                "Mg_Al_1450C": 4.153,
+            },
+            "kinetic_driven_above_crossover": False,
+            "kinetic_note": "",
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.diagnostic["reaction_family"] == REACTION_FAMILY_C6_MG
+    assert result.diagnostic["c6_above_mg_al_crossover"] is False
+    assert result.diagnostic["c6_local_thermite_support"] is False
+    assert result.diagnostic["c6_mg_al_margin_kJ_per_mol_O2"] == pytest.approx(
+        4.153046316150039
+    )
+
+
 def test_c6_mg_thermite_primary_refuses_no_liquid(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -1644,6 +1685,179 @@ def test_provider_short_circuits_on_empty_reagent(
 # ---------------------------------------------------------------------------
 # 6. Smoke parity: full C0 -> C6 on two feedstocks (C3 + C6 exercised)
 # ---------------------------------------------------------------------------
+
+
+def test_c6_static_hold_exercises_c6_proceed_decision_path(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    patched_setpoints = copy.deepcopy(setpoints_data)
+    c6_cfg = patched_setpoints["campaigns"]["C6"]
+    c6_cfg["default_hold_T_C"] = 1450.0
+    c6_cfg["hold_temp_C"] = 1450.0
+    c6_cfg["kinetic_driven_above_crossover"] = False
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        patched_setpoints,
+        additives_kg={"K": 30.0, "Na": 25.0, "Mg": 60.0},
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A_staged",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
+    steps = 0
+    while not sim.is_complete() and steps < 5000:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
+        sim.step()
+        steps += 1
+
+    assert sim.is_complete()
+    assert (DecisionType.C6_PROCEED, "yes") in sim.record.decisions
+    assert any(
+        transition.name == "c6_mg_thermite_primary"
+        for transition in sim.atom_ledger.transitions
+    )
+    assert sim.melt.temperature_C == pytest.approx(1450.0)
+    assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
+
+
+def test_c6_waits_for_static_hold_before_thermite_dispatch(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"Mg": 60.0},
+    )
+    sim.start_campaign(CampaignPhase.C6)
+    sim.melt.temperature_C = 1500.0
+    sim.overhead.transport_saturation_pct = 200.0
+
+    sim.step()
+
+    assert sim.melt.campaign == CampaignPhase.C6
+    assert sim.melt.temperature_C == pytest.approx(1500.0)
+    assert sim._last_actual_ramp == pytest.approx(0.0)
+    assert not sim._c6_campaign_refused
+    assert not [
+        transition
+        for transition in sim.atom_ledger.transitions
+        if transition.name in {
+            "c6_mg_thermite_primary",
+            "c6_al_si_back_reduction",
+        }
+    ]
+
+
+def test_c6_ci_empty_window_refusal_precedes_zero_mg_noop(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "ci_carbonaceous_chondrite",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={},
+    )
+    sim.start_campaign(CampaignPhase.C6)
+
+    sim._step_thermite()
+
+    assert sim.thermite_Mg_inventory_kg == pytest.approx(0.0)
+    assert sim._c6_campaign_refused
+    assert sim._last_c6_refusal_diagnostic["diagnostic"]["reason_refused"] == (
+        "c6_joint_thermodynamic_liquid_fraction_window_empty"
+    )
+    assert not [
+        transition
+        for transition in sim.atom_ledger.transitions
+        if transition.name in {
+            "c6_mg_thermite_primary",
+            "c6_al_si_back_reduction",
+        }
+    ]
+
+
+def test_c6_ci_empty_window_records_binding_refusal_without_transitions(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "ci_carbonaceous_chondrite",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"K": 30.0, "Na": 25.0, "Mg": 60.0},
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A_staged",
+        DecisionType.BRANCH_ONE_TWO: "two",
+        DecisionType.C6_PROCEED: "yes",
+    }
+    steps = 0
+    al2o3_mol_before_c6 = None
+    while not sim.is_complete() and steps < 5000:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            if decision.decision_type == DecisionType.C6_PROCEED:
+                al2o3_mol_before_c6 = sim.atom_ledger.mol_by_account(
+                    "process.cleaned_melt"
+                ).get("Al2O3", 0.0)
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
+        sim.step()
+        steps += 1
+
+    assert sim.is_complete()
+    assert (DecisionType.C6_PROCEED, "yes") in sim.record.decisions
+    refusal = sim._last_c6_refusal_diagnostic
+    assert refusal["status"] == "refused"
+    assert refusal["campaign"] == CampaignPhase.C6.name
+    assert refusal["diagnostic"]["reason_refused"] == (
+        "c6_joint_thermodynamic_liquid_fraction_window_empty"
+    )
+    assert refusal["diagnostic"]["liquid_fraction"] == pytest.approx(0.0)
+    assert refusal["diagnostic"]["joint_window"]["status"] == "empty"
+    assert not [
+        transition
+        for transition in sim.atom_ledger.transitions
+        if transition.name in {
+            "c6_mg_thermite_primary",
+            "c6_al_si_back_reduction",
+        }
+    ]
+    assert al2o3_mol_before_c6 is not None
+    assert al2o3_mol_before_c6 > 0.0
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
+        "Al2O3", 0.0
+    ) == pytest.approx(al2o3_mol_before_c6)
+    assert sim._last_campaign_summary["c6_refusal_diagnostic"] == refusal
+    assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
 
 
 @pytest.mark.parametrize(

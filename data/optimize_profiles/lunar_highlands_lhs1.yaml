@@ -26,12 +26,11 @@ fidelities:
 seed_recipes:
   - id: lhs1-highland-al-thermite-seed
     source_campaign: C6
-    rationale: Use the highland Mg thermite seed unchanged for the Al-rich LHS-1 analog.
+    rationale: Use the 2026-07-11 highland Mg thermite seed for the Al-rich LHS-1 analog.
     patch:
       campaigns:
         C6:
-          temp_range_C: [1450, 1550]
-          default_hold_T_C: 1500
+          default_hold_T_C: 1450
           pO2_mbar: [0.08, 0.35]
           pO2_mbar_default: 0.2
           p_total_mbar_default: 0.2

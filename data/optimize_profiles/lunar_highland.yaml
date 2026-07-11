@@ -21,12 +21,11 @@ fidelities:
 seed_recipes:
   - id: highland-al-thermite-seed
     source_campaign: C6
-    rationale: Use the setpoints Mg thermite hold as the high-Al warm start.
+    rationale: Use the 2026-07-11 static Mg thermite hold as the high-Al warm start.
     patch:
       campaigns:
         C6:
-          temp_range_C: [1450, 1550]
-          default_hold_T_C: 1500
+          default_hold_T_C: 1450
           pO2_mbar: [0.08, 0.35]
           pO2_mbar_default: 0.2
           p_total_mbar_default: 0.2

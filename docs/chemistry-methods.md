@@ -594,6 +594,15 @@ does not make Ti reducible. This Ti rule is part of the same uncommitted re-grou
 metallothermy fix and dual review IDs `codex-36227` and `grok-36559`. Inside the gate the reaction is
 treated as temperature-independent; it does not interpolate yields across the crossover band. The
 physics and the crossover values are developed in `docs/concepts.md`.
+
+C6 uses the same Ellingham-margin gate for Mg/Al₂O₃. The JANAF-4th multiphase fit puts the
+Mg/Al₂O₃ crossover at 1471.4 °C; the local slope near 1430-1440 °C is -0.194210
+kJ/mol-O₂/°C, so each degree below the crossover buys about +0.194210 kJ/mol-O₂ of standard-state
+headroom. The static recipe is therefore pinned to the executable 2026-07-11 residual-melt sweep:
+1450 °C, +4.153 kJ/mol-O₂ margin, and `liquid_fraction >= 0.5` workability for lunar mare
+low/high-Ti, lunar highland, and Mars basalt. CI carbonaceous chondrite is not promoted by this
+rule; the MAGEMin sample curve leaves its staged residual below the workability threshold through
+the Mg/Al₂O₃ window, so static C6 is a typed refusal with Al left in the rump.
 <!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider.dispatch:231 — metallothermic refusal behavior -->
 <!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._reduction_margin_kj_per_mol_o2:1198 — Ellingham margin gate -->
 <!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._crossover_temperature_C:1412 — crossover temperatures -->

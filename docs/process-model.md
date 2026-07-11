@@ -15,7 +15,7 @@ The simulated process is organized as staged campaigns:
 - `C3_NA` Na metallothermic shuttle chemistry at the cool 1150 °C FeO window. Legacy `C3_K` and Cr/Ti targets are refused by the S1b engine gate under the V1c JANAF Ellingham refit and recorded in `shuttle_refusal_history`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 - `C4` selective Mg pyrolysis.
 - `C5` limited MRE for Si and selected metals.
-- `C6` Mg thermite reduction for aluminum-rich residues; the default 1500 °C hold now sits above the ~1471 °C Mg/Al crossover under the JANAF-4th multiphase re-ground (2026-07-09), so standard-state Mg→Al₂O₃ is favorable only at the low end of the [1450,1550] °C range and default-T C6 relies on the local thermite exotherm / kinetic basis.
+- `C6` Mg thermite reduction for aluminum-rich residues; the static recipe now holds at 1450 °C, below the 1471.4 °C Mg/Al₂O₃ JANAF-4th multiphase crossover with +4.153 kJ/mol-O₂ margin. The 2026-07-11 executable residual-melt sweep selected that common hold for lunar mare low/high-Ti, lunar highland, and Mars basalt; CI remains a typed refusal because its staged residual has no workable liquid-fraction window.
 - `MRE_BASELINE` full electrolysis comparison path.
 
 ## What the Simulator Tracks

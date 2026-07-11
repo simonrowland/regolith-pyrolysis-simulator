@@ -1773,6 +1773,18 @@ class ExtractionMixin:
             self.thermite_Mg_inventory_kg = self._sync_reagent_counter_from_ledger('Mg')
         return recovered_kg
 
+    def _record_c6_refusal(self, diagnostic: Mapping[str, Any]) -> None:
+        self._last_c6_refusal_diagnostic = {
+            'status': 'refused',
+            'reaction_family': 'c6_mg_thermite',
+            'hour': int(self.melt.hour),
+            'campaign_hour': int(self.melt.campaign_hour),
+            'campaign': self.melt.campaign.name,
+            'temperature_C': float(self.melt.temperature_C),
+            'diagnostic': dict(diagnostic),
+        }
+        self._c6_campaign_refused = True
+
     def _step_thermite(self):
         """
         Perform one hour of Mg thermite reduction (C6).
@@ -1824,6 +1836,20 @@ class ExtractionMixin:
         self._thermite_Al_produced_this_hr = 0.0
         self._thermite_Mg_consumed_this_hr = 0.0
 
+        c6_cfg = ((self.setpoints or {}).get('campaigns', {}) or {}).get('C6', {}) or {}
+        window_by_feedstock = c6_cfg.get('static_window_by_feedstock', {}) or {}
+        window = window_by_feedstock.get(self.record.feedstock_key, {}) or {}
+        if isinstance(window, Mapping) and window.get('status') == 'refused':
+            self._record_c6_refusal({
+                'reason_refused': str(window.get('reason_refused') or ''),
+                'liquid_fraction': float(
+                    window.get('liquid_fraction_at_hold', 0.0) or 0.0),
+                'joint_window': dict(window.get('joint_window', {}) or {}),
+                'source': str(window.get('source') or ''),
+            })
+            self._chem_no_op_dispatch_count += 1
+            return
+
         if self.thermite_Mg_inventory_kg <= 0.01:
             return  # No Mg available
 
@@ -1840,7 +1866,6 @@ class ExtractionMixin:
         # short-circuit BEFORE the back-reduction pass (no primary
         # means nothing for the cascade to consume).
         # ------------------------------------------------------------------
-        c6_cfg = ((self.setpoints or {}).get('campaigns', {}) or {}).get('C6', {}) or {}
         primary_result = self._dispatch_only(
             ChemistryIntent.METALLOTHERMIC_STEP,
             control_inputs={
@@ -1864,6 +1889,8 @@ class ExtractionMixin:
         primary_diag = dict(primary_result.diagnostic or {})
         primary_proposal = primary_result.transition
         if primary_proposal is None:
+            if getattr(primary_result, 'status', '') == 'refused':
+                self._record_c6_refusal(primary_diag)
             # F-A4: counter mirrors the _dispatch_and_commit helper.
             self._chem_no_op_dispatch_count += 1
             return

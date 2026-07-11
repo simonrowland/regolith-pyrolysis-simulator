@@ -21,14 +21,13 @@ fidelities:
 seed_recipes:
   - id: mars-clay-al-thermite-seed
     source_campaigns: [C0, C6]
-    rationale: Use C0 dehydroxylation cleanup plus C6 Al thermite setpoints.
+    rationale: Use C0 dehydroxylation cleanup plus the 2026-07-11 static C6 Al thermite setpoints.
     patch:
       campaigns:
         C0:
           temp_range_C: [20, 950]
           dT_dt_C_per_hr: 50
         C6:
-          temp_range_C: [1450, 1550]
-          default_hold_T_C: 1500
+          default_hold_T_C: 1450
           pO2_mbar_default: 0.2
           p_total_mbar_default: 0.2

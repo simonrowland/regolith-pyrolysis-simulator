@@ -1194,8 +1194,20 @@ class CampaignManager:
             return (1575.0, 5.0)
 
         elif campaign == CampaignPhase.C6:
-            # Mg/Al crossover is ~1471.4 C under V1c JANAF constants.
-            return (1500.0, 10.0)
+            cfg = self._campaign_config(campaign)
+            ovr = self._campaign_overrides(campaign)
+            target = self._float(
+                ovr.get('hold_temp_C', ovr.get('hold_temperature_C')),
+                self._float(cfg.get('default_hold_T_C'), 1500.0),
+            )
+            ramp_raw = ovr.get('ramp_rate_C_per_hr', cfg.get('dT_dt_C_per_hr'))
+            if ramp_raw is None:
+                # C6 is a separate static-hold furnace charge, not a carryover
+                # 10 C/hr ramp from the preceding campaign temperature.
+                ramp = max(10.0, abs(float(target) - float(melt.temperature_C)))
+            else:
+                ramp = self._float(ramp_raw, 10.0)
+            return (target, ramp)
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             cfg = self._campaign_config(campaign)

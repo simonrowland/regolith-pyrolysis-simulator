@@ -684,6 +684,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # thermodynamic refusal were indistinguishable.
         self._last_shuttle_refusal_diagnostic: Dict[str, Any] = {}
         self._shuttle_refusal_history: list[Dict[str, Any]] = []
+        self._last_c6_refusal_diagnostic: Dict[str, Any] = {}
+        self._c6_campaign_refused = False
 
         # --- Current state ---
         self.melt = MeltState()
@@ -956,6 +958,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._rump_expectation_warnings = []
         self._last_shuttle_refusal_diagnostic = {}
         self._shuttle_refusal_history = []
+        self._last_c6_refusal_diagnostic = {}
+        self._c6_campaign_refused = False
         self._c3_alkali_credit_drawn_kg_by_species = {}
         self._feedstock_recovered_reagent_kg_by_species = {}
         self._non_feedstock_reagent_element_kg_by_account = {}
@@ -9187,6 +9191,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # Initialize thermite Mg inventory when entering C6
         if campaign == CampaignPhase.C6:
+            self._last_c6_refusal_diagnostic = {}
+            self._c6_campaign_refused = False
             self._init_thermite_inventory()
 
         if campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
@@ -9817,6 +9823,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if campaign_name == 'C7_CA_ALUMINOTHERMIC':
             summary['c7_product_report'] = dict(
                 getattr(self, '_c7_product_report', {}) or {})
+        elif campaign_name == 'C6':
+            summary['c6_refusal_diagnostic'] = dict(
+                getattr(self, '_last_c6_refusal_diagnostic', {}) or {})
         return summary
 
     # ------------------------------------------------------------------
@@ -9957,7 +9966,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._mre_energy_this_hr = 0.0
             self._mre_anode_O2_kg_this_hr = 0.0
 
+        c6_hold_reached = False
         if self.melt.campaign == CampaignPhase.C6:
+            c6_target_T, _ = self.campaign_mgr.get_temp_target(
+                self.melt.campaign, self.melt.campaign_hour, self.melt)
+            c6_hold_reached = (
+                c6_target_T is not None
+                and abs(float(c6_target_T) - self.melt.temperature_C) < 0.1
+            )
+        if c6_hold_reached:
             self._step_thermite()
         else:
             self._thermite_Al2O3_reduced_this_hr = 0.0
@@ -10086,7 +10103,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         next_campaign: CampaignPhase | None = None
         pending_decision: Any | None = None
         complete_after_snapshot = False
-        campaign_done = self.campaign_mgr.check_endpoint(
+        c6_refused = (
+            self.melt.campaign == CampaignPhase.C6
+            and self._c6_campaign_refused
+        )
+        campaign_done = c6_refused or self.campaign_mgr.check_endpoint(
             self.melt, evap_flux, self.train, self.record)
         if campaign_done:
             # Capture campaign summary before transitioning

@@ -28,7 +28,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **C5** — limited MRE under O₂ backpressure; Branch Two max 1.6 V targeting SiO₂ → Si metal. Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
-**C6** — Mg thermite reduction (3Mg + Al₂O₃ → 3MgO + 2Al); the default 1500 °C hold now sits above the ~1471 °C Mg/Al crossover under the JANAF-4th multiphase re-ground (2026-07-09), so standard-state Mg→Al₂O₃ is favorable only at the low end of the [1450,1550] °C range and default-T C6 relies on the local thermite exotherm / kinetic basis. Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
+**C6** — Mg thermite reduction (3Mg + Al₂O₃ → 3MgO + 2Al); the static recipe now holds at 1450 °C, below the 1471.4 °C Mg/Al₂O₃ JANAF-4th multiphase crossover with +4.153 kJ/mol-O₂ headroom. CI carbonaceous chondrite remains a typed refusal because its staged residual has no workable liquid-fraction window. Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
 **Cleaned melt** — silicate-only melt after Stage 0 removes volatiles, salts, native metals, halides, sulfates, and perchlorates. The input to the C1–C6 extraction sequence. Corresponds to `process.cleaned_melt` in the `AtomLedger`. See [`docs/process-model.md`](process-model.md).
 
