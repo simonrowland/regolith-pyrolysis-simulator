@@ -31,6 +31,10 @@ from engines.builtin.vapor_pressure import (
     vapor_pressure_valid_range_K,
 )
 from engines.domain_reason import OutOfDomainReason, reason_value
+from simulator.alphamelts_reference_pressure import (
+    alphamelts_condensed_phase_pressure_bar,
+    annotate_alphamelts_reference_pressure,
+)
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
     ellingham_authority_diagnostic,
@@ -45,8 +49,10 @@ from simulator.physical_constants import GAS_CONSTANT
 ActivitySource = Callable[..., Any]
 
 PRIMARY_ACTIVITY_PRESSURE_BAR = 1.0
-COMPARISON_ACTIVITY_PRESSURE_BAR = 0.1
+COMPARISON_ACTIVITY_PRESSURE_BAR = 10.0
 
+# Compare two distinct supported subprocess evaluation pressures.  A sub-bar
+# comparison would be substituted to 1 bar and make this gate tautological.
 # The 2026-06-03 pressure sweep found identical melt activities while only the
 # vapor changed. A 0.1% relative gate is deliberately loose versus numerical
 # roundoff but tight enough to catch any pressure-dependent activity model.
@@ -235,12 +241,22 @@ def alphamelts_equilibrium_activity_source(
             "warnings": ("AlphaMELTS backend unavailable",),
             "activity_coefficients": {},
         }
-    return backend.equilibrate(
+    physical_pressure_bar = float(pressure_bar)
+    evaluation_pressure_bar = alphamelts_condensed_phase_pressure_bar(
+        physical_pressure_bar,
+        transport=getattr(backend, "_mode", None),
+    )
+    result = backend.equilibrate(
         temperature_C=float(temperature_C),
         composition_kg=dict(composition_wt_pct),
         fO2_log=float(fO2_log),
-        pressure_bar=float(pressure_bar),
+        pressure_bar=evaluation_pressure_bar,
         subprocess_run_mode="isothermal",
+    )
+    return annotate_alphamelts_reference_pressure(
+        result,
+        physical_pressure_bar=physical_pressure_bar,
+        evaluation_pressure_bar=evaluation_pressure_bar,
     )
 
 

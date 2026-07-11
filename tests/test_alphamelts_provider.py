@@ -453,19 +453,11 @@ def test_provider_returns_liquidus_diagnostics_for_subprocess_path():
     )
 
 
-def test_provider_preserves_typed_subbar_liquidus_refusal():
+def test_provider_uses_explicit_reference_pressure_for_subbar_liquidus():
     backend = _FakeAlphaMELTSBackend(
         mode='subprocess',
         equilibrium=_build_equilibrium_for_basalt(liquidus_C=1280.0),
     )
-
-    def refuse_subbar(**_kwargs):
-        error = RuntimeError('subprocess pressure below minimum')
-        error.backend_failure_reason_code = 'subprocess_pressure_below_minimum'
-        error.backend_failure_category = 'out_of_domain'
-        raise error
-
-    backend.find_liquidus_solidus = refuse_subbar
     result = AlphaMELTSProvider(backend=backend).dispatch(
         _make_request(
             ChemistryIntent.SILICATE_LIQUIDUS,
@@ -474,14 +466,115 @@ def test_provider_preserves_typed_subbar_liquidus_refusal():
         )
     )
 
-    assert result.status == 'out_of_domain'
+    assert result.status == 'ok'
+    assert backend.finder_calls[0]['pressure_bar'] == pytest.approx(1.0)
     diagnostic = dict(result.diagnostic or {})
-    assert diagnostic['backend_status_reason'] == (
-        'subprocess_pressure_below_minimum'
+    assert diagnostic['backend_diagnostics'][
+        'physical_overhead_pressure_bar'
+    ] == pytest.approx(1.0e-6)
+    assert diagnostic['backend_diagnostics'][
+        'condensed_phase_reference_pressure_bar'
+    ] == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize(
+    ('mode', 'expected_pressure_bar', 'substituted'),
+    [
+        ('thermoengine', 1.0e-6, False),
+        ('python_api', 1.0e-6, False),
+        ('subprocess', 1.0, True),
+    ],
+)
+def test_provider_scopes_reference_pressure_to_subprocess_equilibrium(
+    mode,
+    expected_pressure_bar,
+    substituted,
+):
+    backend = _FakeAlphaMELTSBackend(
+        mode=mode,
+        equilibrium=_build_equilibrium_for_basalt(),
     )
-    assert diagnostic['backend_diagnostics']['backend_failure_category'] == (
-        'out_of_domain'
+    result = AlphaMELTSProvider(backend=backend).dispatch(
+        _make_request(
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            composition_mol=_basalt_species_mol(),
+            pressure_bar=1.0e-6,
+        )
     )
+
+    assert result.status == 'ok'
+    assert backend.calls[0]['pressure_bar'] == pytest.approx(
+        expected_pressure_bar
+    )
+    diagnostic = dict(result.diagnostic or {})
+    backend_diagnostics = diagnostic['backend_diagnostics']
+    if substituted:
+        assert backend_diagnostics[
+            'physical_overhead_pressure_bar'
+        ] == pytest.approx(1.0e-6)
+        assert backend_diagnostics[
+            'condensed_phase_reference_pressure_bar'
+        ] == pytest.approx(1.0)
+    else:
+        assert 'physical_overhead_pressure_bar' not in backend_diagnostics
+        assert (
+            'condensed_phase_reference_pressure_bar'
+            not in backend_diagnostics
+        )
+    assert result.control_audit.requested['pressure_bar'] == pytest.approx(
+        1.0e-6
+    )
+    assert result.control_audit.applied['pressure_bar'] == pytest.approx(
+        expected_pressure_bar
+    )
+
+
+@pytest.mark.parametrize(
+    'intent',
+    [
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+    ],
+)
+def test_provider_ec_gate_reports_reference_pressure_provenance(intent):
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=_build_equilibrium_for_basalt(),
+        finder_result=LiquidusSolidusResult(
+            liquidus_T_C=1300.0,
+            solidus_T_C=1000.0,
+            liquid_fraction=1.0,
+            status='ok',
+        ),
+    )
+    result = AlphaMELTSProvider(backend=backend).dispatch(
+        _make_request(
+            intent,
+            composition_mol=_basalt_species_mol(),
+            pressure_bar=1.0e-6,
+        )
+    )
+
+    assert result.status == 'ok'
+    assert backend.finder_calls[0]['pressure_bar'] == pytest.approx(1.0)
+    assert backend.calls
+    assert all(
+        call['pressure_bar'] == pytest.approx(1.0)
+        for call in backend.calls
+    )
+    backend_diagnostics = dict(result.diagnostic or {})[
+        'backend_diagnostics'
+    ]
+    assert backend_diagnostics[
+        'physical_overhead_pressure_bar'
+    ] == pytest.approx(1.0e-6)
+    assert backend_diagnostics[
+        'condensed_phase_reference_pressure_bar'
+    ] == pytest.approx(1.0)
+    assert result.control_audit.requested['pressure_bar'] == pytest.approx(
+        1.0e-6
+    )
+    assert result.control_audit.applied['pressure_bar'] == pytest.approx(1.0)
 
 
 def test_provider_subprocess_required_skips_thermoengine_route(monkeypatch):
@@ -880,7 +973,7 @@ def test_provider_control_audit_records_diagnostic_note():
         ChemistryIntent.SILICATE_LIQUIDUS,
         composition_mol=_basalt_species_mol(),
         temperature_C=1500.0,
-        pressure_bar=1e-6,
+        pressure_bar=1.0,
         fO2_log=-10.5,
     )
     result = provider.dispatch(request)
@@ -888,7 +981,7 @@ def test_provider_control_audit_records_diagnostic_note():
     assert audit is not None
     assert audit.requested == audit.applied  # applied == requested
     assert audit.requested['temperature_C'] == 1500.0
-    assert audit.requested['pressure_bar'] == 1e-6
+    assert audit.requested['pressure_bar'] == 1.0
     assert audit.requested['fO2_log'] == -10.5
     assert audit.requested['fe_redox_policy'] == 'intrinsic'
     assert 'diagnostic, not enforced' in audit.notes

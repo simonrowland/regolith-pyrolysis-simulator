@@ -3,11 +3,16 @@ from __future__ import annotations
 import ast
 import inspect
 import os
+from types import SimpleNamespace
 
 import pytest
 
 import simulator.diagnostic_helpers.alphamelts_volatility as volatility_module
 from engines.domain_reason import OutOfDomainReason
+from simulator.alphamelts_reference_pressure import (
+    alphamelts_condensed_phase_pressure_bar,
+    annotate_alphamelts_reference_pressure,
+)
 from simulator.diagnostic_helpers.alphamelts_volatility import (
     alphamelts_activity_volatility_diagnostic,
 )
@@ -69,11 +74,44 @@ def _domain_composition() -> dict[str, float]:
     }
 
 
+def test_default_activity_source_uses_explicit_reference_pressure(monkeypatch):
+    seen: dict[str, object] = {}
+
+    def fake_initialize(self, config):
+        del config
+        self._mode = "subprocess"
+        return True
+
+    monkeypatch.setattr(AlphaMELTSBackend, "initialize", fake_initialize)
+
+    def fake_equilibrate(self, **kwargs):
+        del self
+        seen.update(kwargs)
+        return SimpleNamespace(diagnostics={})
+
+    monkeypatch.setattr(AlphaMELTSBackend, "equilibrate", fake_equilibrate)
+
+    result = volatility_module.alphamelts_equilibrium_activity_source(
+        temperature_C=1500.0,
+        pressure_bar=0.1,
+        composition_wt_pct=_domain_composition(),
+        fO2_log=-9.0,
+    )
+
+    assert seen["pressure_bar"] == pytest.approx(1.0)
+    assert result.diagnostics["physical_overhead_pressure_bar"] == pytest.approx(
+        0.1
+    )
+    assert result.diagnostics[
+        "condensed_phase_reference_pressure_bar"
+    ] == pytest.approx(1.0)
+
+
 def test_maps_alphamelt_activity_into_analytical_sio_vapor_pressure_grid():
     source = StubActivitySource(
         {
             1.0: {"SiO2": 0.25},
-            0.1: {"SiO2": 0.25},
+            10.0: {"SiO2": 0.25},
         }
     )
 
@@ -85,7 +123,7 @@ def test_maps_alphamelt_activity_into_analytical_sio_vapor_pressure_grid():
         vapor_pressure_data=_SIO_VAPOR_DATA,
     )
 
-    assert source.calls == [1.0, 0.1]
+    assert source.calls == [1.0, 10.0]
     assert diagnostic["status"] == "ok"
     assert diagnostic["melt_oxide_activities"] == {"SiO2": 0.25}
 
@@ -112,7 +150,7 @@ def test_uses_diagnostic_oxide_activities_payload():
                 "activity_coefficients": {"Na2SiO3": 0.8},
                 "diagnostic_oxide_activities": {"SiO2": 0.25, "Na2O": 0.08},
             },
-            0.1: {
+            10.0: {
                 "activity_coefficients": {"Na2SiO3": 0.8},
                 "diagnostic_oxide_activities": {"SiO2": 0.25, "Na2O": 0.08},
             },
@@ -140,7 +178,7 @@ def test_diagnostic_helper_does_not_convert_endmember_labels_to_oxides():
     source = StubActivitySource(
         {
             1.0: {"SiO2_Liq": 0.25, "Na2SiO3": 0.08, "Na": 0.03},
-            0.1: {"SiO2_Liq": 0.25, "Na2SiO3": 0.08, "Na": 0.03},
+            10.0: {"SiO2_Liq": 0.25, "Na2SiO3": 0.08, "Na": 0.03},
         }
     )
 
@@ -163,7 +201,7 @@ def test_composition_domain_violation_reuses_alphamelt_reason_flag():
     source = StubActivitySource(
         {
             1.0: {"SiO2": 0.25},
-            0.1: {"SiO2": 0.25},
+            10.0: {"SiO2": 0.25},
         }
     )
 
@@ -257,7 +295,7 @@ def test_pressure_insensitivity_gate_passes_matched_and_flags_mismatch():
     matched = StubActivitySource(
         {
             1.0: {"SiO2": 0.25},
-            0.1: {"SiO2": 0.2501},
+            10.0: {"SiO2": 0.2501},
         }
     )
     matched_result = alphamelts_activity_volatility_diagnostic(
@@ -272,7 +310,7 @@ def test_pressure_insensitivity_gate_passes_matched_and_flags_mismatch():
     mismatched = StubActivitySource(
         {
             1.0: {"SiO2": 0.25},
-            0.1: {"SiO2": 0.35},
+            10.0: {"SiO2": 0.35},
         }
     )
     mismatch_result = alphamelts_activity_volatility_diagnostic(
@@ -316,7 +354,7 @@ def test_diagnostic_helper_has_no_ledger_or_provider_authority_surface():
     source_stub = StubActivitySource(
         {
             1.0: {"SiO2": 0.25},
-            0.1: {"SiO2": 0.25},
+            10.0: {"SiO2": 0.25},
         }
     )
     diagnostic = alphamelts_activity_volatility_diagnostic(
@@ -358,12 +396,22 @@ def test_live_alphamelt_benign_feedstock_returns_oxide_activities_when_available
     backend_results = []
 
     def source(**kwargs):
+        physical_pressure_bar = float(kwargs["pressure_bar"])
+        evaluation_pressure_bar = alphamelts_condensed_phase_pressure_bar(
+            physical_pressure_bar,
+            transport="subprocess",
+        )
         result = backend.equilibrate(
             temperature_C=float(kwargs["temperature_C"]),
             composition_kg=dict(kwargs["composition_wt_pct"]),
             fO2_log=float(kwargs["fO2_log"]),
-            pressure_bar=float(kwargs["pressure_bar"]),
+            pressure_bar=evaluation_pressure_bar,
             subprocess_run_mode="isothermal",
+        )
+        result = annotate_alphamelts_reference_pressure(
+            result,
+            physical_pressure_bar=physical_pressure_bar,
+            evaluation_pressure_bar=evaluation_pressure_bar,
         )
         backend_results.append(result)
         return result

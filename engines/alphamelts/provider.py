@@ -33,14 +33,14 @@ the provider's :meth:`dispatch` never builds a
 ``transition=None``; the kernel cannot construct a ledger write from a
 None proposal. This is the "diagnostic gate" of the goal title.
 
-Per goal #8 checklist item 6, the :class:`ControlAudit` records
-``applied == requested`` for T / P / fO2 with the note
-``"diagnostic, not enforced"`` so a trace consumer can see the engine
-ran but didn't enforce the requested controls.
+Per goal #8 checklist item 6, the :class:`ControlAudit` records requested and
+applied T / P / fO2 with the note ``"diagnostic, not enforced"`` so a trace
+consumer can see the engine ran but didn't enforce the requested controls.
 """
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Any, Mapping, Optional
 
 from engines.alphamelts.domain import AlphaMELTSDomainGate
@@ -72,12 +72,18 @@ from simulator.chemistry.kernel.dto import (
     IntentResult,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.alphamelts_reference_pressure import (
+    ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR,
+    alphamelts_condensed_phase_pressure_bar,
+    alphamelts_reference_pressure_diagnostics,
+    annotate_alphamelts_reference_pressure,
+)
+from simulator.melt_backend.base import LiquidFractionInvalidError
 from simulator.melt_backend.liquidus import (
     EquilibriumCrystallizationPathResult,
     LiquidusSolidusResult,
     build_equilibrium_crystallization_path,
 )
-from simulator.melt_backend.base import LiquidFractionInvalidError
 
 
 # Intent set: AlphaMELTS-owned silicate diagnostic intents. MAGEMin shadows
@@ -143,8 +149,8 @@ class AlphaMELTSProvider(ChemistryProvider):
 
         1. Validates the intent is one it serves (defence in depth --
            the kernel registry already routes correctly).
-        2. Builds the ControlAudit with ``applied == requested`` and
-           the diagnostic note.
+        2. Builds the ControlAudit with requested and engine-applied controls
+           plus the diagnostic note.
         3. Runs :class:`AlphaMELTSDomainGate`. If rejected, returns
            ``status='out_of_domain'`` with the warnings recorded.
         4. Branches by intent: ``SILICATE_LIQUIDUS`` runs the
@@ -304,7 +310,8 @@ class AlphaMELTSProvider(ChemistryProvider):
         choice). The audit records the values, with solved/clamped
         controls from backend diagnostics when available, and the
         diagnostic note so a trace consumer sees the engine ran but
-        didn't enforce.
+        didn't enforce.  A sub-bar physical overhead remains requested while
+        the explicit condensed-phase model reference is recorded as applied.
         """
         requested = {
             'temperature_C': float(request.temperature_C),
@@ -326,6 +333,12 @@ class AlphaMELTSProvider(ChemistryProvider):
             )
             if executed_temperature_C is not None:
                 applied['temperature_C'] = float(executed_temperature_C)
+            reference_pressure_bar = diagnostics.get(
+                'condensed_phase_reference_pressure_bar'
+            )
+            if reference_pressure_bar is not None:
+                applied['pressure_bar'] = float(reference_pressure_bar)
+                notes.append('1-bar condensed-phase reference pressure')
             engine_reported_fO2_log = diagnostics.get(
                 'engine_reported_fO2_log'
             )
@@ -476,49 +489,71 @@ class AlphaMELTSProvider(ChemistryProvider):
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
+
+        def evaluation_pressure(mode: str) -> float:
+            return alphamelts_condensed_phase_pressure_bar(
+                request.pressure_bar,
+                transport=mode,
+            )
+
+        def completed(
+            mode: str,
+            equilibrium: Any,
+            evaluation_pressure_bar: float,
+        ) -> tuple[str, Any]:
+            return mode, annotate_alphamelts_reference_pressure(
+                equilibrium,
+                physical_pressure_bar=request.pressure_bar,
+                evaluation_pressure_bar=evaluation_pressure_bar,
+            )
+
         subprocess_required = self._subprocess_required()
         if subprocess_required and subprocess_available(self._backend):
+            pressure_bar = evaluation_pressure('subprocess')
             equilibrium = equilibrate_via_subprocess(
                 self._backend,
                 temperature_C=request.temperature_C,
-                pressure_bar=request.pressure_bar,
+                pressure_bar=pressure_bar,
                 fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
                 run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
             )
-            return 'subprocess', equilibrium
+            return completed('subprocess', equilibrium, pressure_bar)
         if not subprocess_required and self._thermoengine_selected():
+            pressure_bar = evaluation_pressure('thermoengine')
             equilibrium = equilibrate_via_thermoengine(
                 self._backend,
                 temperature_C=request.temperature_C,
-                pressure_bar=request.pressure_bar,
+                pressure_bar=pressure_bar,
                 fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )
-            return 'thermoengine', equilibrium
+            return completed('thermoengine', equilibrium, pressure_bar)
         if not subprocess_required and python_api_available(self._backend):
+            pressure_bar = evaluation_pressure('petthermotools')
             equilibrium = equilibrate_via_python_api(
                 self._backend,
                 temperature_C=request.temperature_C,
-                pressure_bar=request.pressure_bar,
+                pressure_bar=pressure_bar,
                 fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )
-            return 'petthermotools', equilibrium
+            return completed('petthermotools', equilibrium, pressure_bar)
         if subprocess_available(self._backend):
+            pressure_bar = evaluation_pressure('subprocess')
             equilibrium = equilibrate_via_subprocess(
                 self._backend,
                 temperature_C=request.temperature_C,
-                pressure_bar=request.pressure_bar,
+                pressure_bar=pressure_bar,
                 fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
                 run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
             )
-            return 'subprocess', equilibrium
+            return completed('subprocess', equilibrium, pressure_bar)
         # _backend_available returned True so this branch should never
         # fire; treat it as unavailable defensively.
         return 'unavailable', None
@@ -557,9 +592,13 @@ class AlphaMELTSProvider(ChemistryProvider):
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
+        evaluation_pressure_bar = alphamelts_condensed_phase_pressure_bar(
+            request.pressure_bar,
+            transport=mode,
+        )
         try:
             result = finder(
-                pressure_bar=request.pressure_bar,
+                pressure_bar=evaluation_pressure_bar,
                 fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
@@ -585,6 +624,18 @@ class AlphaMELTSProvider(ChemistryProvider):
                     ),
                     'backend_failure_reason_code': reason,
                     'backend_failure_category': category,
+                },
+            )
+        pressure_diagnostics = alphamelts_reference_pressure_diagnostics(
+            physical_pressure_bar=request.pressure_bar,
+            evaluation_pressure_bar=evaluation_pressure_bar,
+        )
+        if pressure_diagnostics:
+            result = replace(
+                result,
+                diagnostics={
+                    **dict(result.diagnostics or {}),
+                    **pressure_diagnostics,
                 },
             )
         return mode, result
@@ -627,24 +678,47 @@ class AlphaMELTSProvider(ChemistryProvider):
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
+        # EC/GATE is Python-API-only because it needs residual liquid
+        # composition, but this intent's model-reference contract explicitly
+        # remains 1 bar.  Keep that exception visible here rather than widening
+        # the transport policy used by ordinary ThermoEngine/Python-API calls.
+        evaluation_pressure_bar = max(
+            float(request.pressure_bar),
+            ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR,
+        )
+        pressure_diagnostics = alphamelts_reference_pressure_diagnostics(
+            physical_pressure_bar=request.pressure_bar,
+            evaluation_pressure_bar=evaluation_pressure_bar,
+        )
+
+        def completed(
+            result: EquilibriumCrystallizationPathResult,
+        ) -> EquilibriumCrystallizationPathResult:
+            return replace(
+                result,
+                diagnostics={
+                    **dict(result.diagnostics or {}),
+                    **pressure_diagnostics,
+                },
+            )
         try:
             bounds = finder(
-                pressure_bar=request.pressure_bar,
+                pressure_bar=evaluation_pressure_bar,
                 fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
-            return mode, EquilibriumCrystallizationPathResult(
+            return mode, completed(EquilibriumCrystallizationPathResult(
                 status='not_converged',
                 warnings=(f'AlphaMELTS EC liquidus finder failed: {exc}',),
-            )
+            ))
         if (
             bounds.status != 'ok'
             or bounds.solidus_T_C is None
             or bounds.liquidus_T_C is None
         ):
-            return mode, EquilibriumCrystallizationPathResult(
+            return mode, completed(EquilibriumCrystallizationPathResult(
                 liquidus_T_C=bounds.liquidus_T_C,
                 liquidus_T_K=bounds.liquidus_T_K,
                 solidus_T_C=bounds.solidus_T_C,
@@ -654,7 +728,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                 ),
                 samples=bounds.samples,
                 iterations=bounds.iterations,
-            )
+            ))
 
         sample_warnings: list[str] = []
 
@@ -662,7 +736,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             result = equilibrate_transport(
                 self._backend,
                 temperature_C=float(temperature_C),
-                pressure_bar=request.pressure_bar,
+                pressure_bar=evaluation_pressure_bar,
                 fO2_log=(
                     request.fO2_log if request.fO2_log is not None else -9.0
                 ),
@@ -715,7 +789,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             solidus_T_C=bounds.solidus_T_C,
             liquidus_T_C=bounds.liquidus_T_C,
         )
-        return mode, EquilibriumCrystallizationPathResult(
+        return mode, completed(EquilibriumCrystallizationPathResult(
             liquidus_T_C=path.liquidus_T_C,
             liquidus_T_K=path.liquidus_T_K,
             solidus_T_C=path.solidus_T_C,
@@ -729,7 +803,7 @@ class AlphaMELTSProvider(ChemistryProvider):
             liquid_fraction_path=path.liquid_fraction_path,
             samples=path.samples,
             iterations=bounds.iterations + path.iterations,
-        )
+        ))
 
     def _engine_version(self) -> str:
         if self._backend is None:

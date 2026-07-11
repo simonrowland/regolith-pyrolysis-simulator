@@ -200,7 +200,11 @@ def diagnostics_to_equilibrium(
         'executed_temperature_C',
         requested_temperature_C,
     )
-    pressure_bar = _control_float(controls, 'pressure_bar', 0.0)
+    pressure_bar = _control_float(
+        backend_diagnostics,
+        'condensed_phase_reference_pressure_bar',
+        _control_float(controls, 'pressure_bar', 0.0),
+    )
     if requested_point_non_authoritative:
         temperature_C = _control_float(
             backend_diagnostics,

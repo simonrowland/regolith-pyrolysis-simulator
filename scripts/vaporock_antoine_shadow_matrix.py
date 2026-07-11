@@ -27,6 +27,10 @@ MAX_SOLVES = 50
 
 import yaml  # noqa: E402
 
+from simulator.alphamelts_reference_pressure import (  # noqa: E402
+    alphamelts_condensed_phase_pressure_bar,
+    annotate_alphamelts_reference_pressure,
+)
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend  # noqa: E402
 from simulator.melt_backend.vaporock import VapoRockBackend  # noqa: E402
 from simulator.optimize.canonical import (  # noqa: E402
@@ -456,12 +460,21 @@ def solve_cell(
         return failure_rows(cell, "engine_unavailable:vaporock")
 
     try:
+        evaluation_pressure_bar = alphamelts_condensed_phase_pressure_bar(
+            cell.pressure_bar,
+            transport=getattr(alpha, "_mode", None),
+        )
         result = alpha.equilibrate(
             temperature_C=cell.t_k - 273.15,
             composition_kg=dict(cell.composition_wt_pct),
             fO2_log=cell.fO2_log10_bar,
-            pressure_bar=cell.pressure_bar,
+            pressure_bar=evaluation_pressure_bar,
             subprocess_run_mode="isothermal",
+        )
+        result = annotate_alphamelts_reference_pressure(
+            result,
+            physical_pressure_bar=cell.pressure_bar,
+            evaluation_pressure_bar=evaluation_pressure_bar,
         )
     except Exception as exc:  # noqa: BLE001
         return failure_rows(cell, f"cell_failed:alphamelts_exception:{type(exc).__name__}:{exc}")

@@ -75,12 +75,15 @@ def test_lunar_silicate_equilibrium_uses_kernel_and_matches_legacy_result():
     sim = _build_sim(backend)
 
     before_mol = sim.atom_ledger.mol_by_account()
+    physical_pressure_bar = sim.melt.p_total_mbar / 1000.0
     result = sim._get_equilibrium()
 
     assert len(backend.calls) == 1
     call = backend.calls[0]
     assert 'composition_mol_by_account' in call
     assert 'composition_mol' not in call
+    assert physical_pressure_bar < 1.0
+    assert call['pressure_bar'] == pytest.approx(physical_pressure_bar)
     assert sim.atom_ledger.mol_by_account() == before_mol
 
     legacy = backend.last_result
@@ -98,6 +101,12 @@ def test_lunar_silicate_equilibrium_uses_kernel_and_matches_legacy_result():
     assert result.ledger_transition is None
 
     diagnostic = getattr(result, 'alphamelts_diagnostics')
+    assert 'physical_overhead_pressure_bar' not in diagnostic[
+        'backend_diagnostics'
+    ]
+    assert 'condensed_phase_reference_pressure_bar' not in diagnostic[
+        'backend_diagnostics'
+    ]
     assert diagnostic['liquidus_T_K'] == pytest.approx(1558.15)
     assert diagnostic['phase_masses_kg'] == pytest.approx(
         legacy.phase_masses_kg)

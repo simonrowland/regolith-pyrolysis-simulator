@@ -103,6 +103,10 @@ from simulator.accounting.completeness import (
     extraction_completeness_by_target,
     vapor_contract_completeness,
 )
+from simulator.alphamelts_reference_pressure import (
+    alphamelts_condensed_phase_pressure_bar,
+    annotate_alphamelts_reference_pressure,
+)
 from simulator.state import (
     BOLTZMANN,
     FARADAY,
@@ -6965,12 +6969,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 setattr(result, 'alphamelts_diagnostics', diagnostic)
                 diagnostic_silicate_equilibrium = True
             else:
+                is_alphamelts_backend = self._is_alphamelts_backend(
+                    self.backend
+                )
+                backend_pressure_bar = (
+                    alphamelts_condensed_phase_pressure_bar(
+                        pressure_bar,
+                        transport=getattr(self.backend, '_mode', None),
+                    )
+                    if is_alphamelts_backend
+                    else pressure_bar
+                )
                 backend_kwargs = {
                     'temperature_C': temperature_C,
                     'composition_mol': backend_composition_mol,
                     'species_formula_registry': self.species_formula_registry,
                     'fO2_log': intrinsic_fO2_log,
-                    'pressure_bar': pressure_bar,
+                    'pressure_bar': backend_pressure_bar,
                 }
                 if self._backend_accepts_kwarg('vapor_transport_pO2_bar'):
                     backend_kwargs['vapor_transport_pO2_bar'] = (
@@ -6979,9 +6994,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if self._backend_accepts_kwarg('composition_mol_by_account'):
                     backend_kwargs['composition_mol_by_account'] = (
                         backend_composition_by_account)
-                if self._is_alphamelts_backend(self.backend):
+                if is_alphamelts_backend:
                     backend_kwargs['subprocess_run_mode'] = 'isothermal'
                 result = self.backend.equilibrate(**backend_kwargs)
+                if is_alphamelts_backend:
+                    result = annotate_alphamelts_reference_pressure(
+                        result,
+                        physical_pressure_bar=pressure_bar,
+                        evaluation_pressure_bar=backend_pressure_bar,
+                    )
         except AccountingError:
             raise
         except BACKEND_FALLBACK_EXCEPTIONS as exc:

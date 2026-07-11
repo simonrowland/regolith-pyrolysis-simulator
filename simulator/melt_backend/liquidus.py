@@ -105,6 +105,7 @@ class EquilibriumCrystallizationPathResult:
     liquid_fraction_path: Tuple[LiquidFractionPathPoint, ...] = ()
     samples: Tuple[MeltFractionSample, ...] = ()
     iterations: int = 0
+    diagnostics: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.liquidus_T_C is not None:
@@ -132,6 +133,7 @@ class EquilibriumCrystallizationPathResult:
         )
         object.__setattr__(self, 'samples', tuple(self.samples))
         object.__setattr__(self, 'iterations', int(self.iterations))
+        object.__setattr__(self, 'diagnostics', dict(self.diagnostics or {}))
 
 
 def find_liquidus_solidus_by_fraction(
