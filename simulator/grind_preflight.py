@@ -205,8 +205,9 @@ def assert_strict_vapor_source_report(
     counts = Counter(_source_authority(source) for source in species.values())
     bad_sources = {
         str(source)
-        for source in species.values()
+        for species_name, source in species.items()
         if _source_authority(source) not in approved_sources
+        or _is_noncertifying_mg_extrapolation(species_name, source)
     }
     summary = report.get("summary")
     if isinstance(summary, Mapping):
@@ -612,6 +613,19 @@ def _source_authority(source: Any) -> str:
     if head == "builtin-vapor-pressure":
         return "builtin_authoritative"
     return head
+
+
+def _is_noncertifying_mg_extrapolation(species: Any, source: Any) -> bool:
+    if str(species) != "Mg":
+        return False
+    tokens = set(str(source or "").split(":"))
+    return bool(
+        tokens
+        & {
+            "pure_component_extrapolated",
+            "extrapolated_beyond_valid_range_K",
+        }
+    )
 
 
 def _summary_count(item: Any) -> int:

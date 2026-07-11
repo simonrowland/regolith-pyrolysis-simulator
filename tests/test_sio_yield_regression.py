@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from engines.builtin.vapor_pressure import VaporPressureRangeError
 from simulator import condensation as condensation_module
 from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
 from simulator.overhead import OverheadGasModel
@@ -352,6 +353,27 @@ def test_condensation_route_flags_metal_antoine_valid_range_extrapolation():
         for warning in route.antoine_extrapolation_warnings
     )
     assert route.remaining_by_species["Ca"] >= 0.0
+
+
+def test_wall_mg_psat_refuses_outside_source_certified_range():
+    assert condensation_module._antoine_psat_pa("Mg", 1361.0) > 0.0
+
+    for temperature_K in (700.0, 1361.001):
+        with pytest.raises(
+            VaporPressureRangeError,
+            match=r"species=Mg consumer=wall_condensation",
+        ):
+            condensation_module._antoine_psat_pa("Mg", temperature_K)
+
+    warnings: list[str] = []
+    assert condensation_module._wall_deposition_driving_pressure_pa(
+        "Mg",
+        100.0,
+        1361.001,
+        reactive_product_backstop=False,
+        antoine_extrapolation_warnings=warnings,
+    ) == 0.0
+    assert any("consumer=wall_condensation" in warning for warning in warnings)
 
 
 def test_wall_deposit_flags_antoine_extrapolation_at_wall_temperature():

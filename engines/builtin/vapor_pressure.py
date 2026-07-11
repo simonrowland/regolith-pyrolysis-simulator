@@ -98,7 +98,11 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
 
 
 class VaporPressureComputationError(RuntimeError):
-    """Raised when vapor-pressure math produces a non-finite value."""
+    """Raised when vapor-pressure math cannot produce an authoritative value."""
+
+
+class VaporPressureRangeError(VaporPressureComputationError):
+    """A requested Antoine pressure lies outside its certified source range."""
 
 
 class VaporPressureNumericalOverflowError(OverflowError):
@@ -563,14 +567,11 @@ def warn_pseudo_vapor_pressure_fallback(
 def _is_noncertifying_pseudo_vapor_pressure_runtime(
     species: str,
     row: Mapping[str, Any] | None,
-    coefficient_block: str | None,
     *,
     temperature_K: float | None,
 ) -> bool:
     if (
-        coefficient_block != COEFF_BLOCK_ANTOINE
-        or str(species) != "Fe"
-        or _fit_target(row) != FIT_TARGET_PSEUDO_VAPOROCK
+        _fit_target(row) != FIT_TARGET_PSEUDO_VAPOROCK
         or not _is_high_uncertainty(row)
     ):
         return False
@@ -594,6 +595,48 @@ def reject_noncertifying_vapor_pressure_row(
             "non_certifying_interval_vapor_pressure: "
             f"species={species} interval_required row lacks certified_point"
         )
+
+
+def require_antoine_source_certified_temperature(
+    species: str,
+    row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
+    temperature_K: float,
+    *,
+    consumer: str,
+) -> None:
+    """Refuse Antoine evaluation outside an explicit source-certified range."""
+
+    block = _coefficient_mapping(
+        row,
+        coefficient_block,
+        temperature_K=temperature_K,
+    )
+    certified_range = None
+    if _is_mapping(block):
+        certified_range = block.get("source_certified_range_K")
+        extrapolation_policy = block.get("extrapolation_policy")
+    else:
+        extrapolation_policy = None
+    if certified_range is None:
+        certified_range = (row or {}).get("source_certified_range_K")
+    if extrapolation_policy is None:
+        extrapolation_policy = (row or {}).get("extrapolation_policy")
+    policy = str(extrapolation_policy or "").strip().lower()
+    if policy != "refuse":
+        return
+    bounds = _range_tuple(certified_range)
+    if bounds is None:
+        return
+    low, high = bounds
+    if low <= float(temperature_K) <= high:
+        return
+    raise VaporPressureRangeError(
+        "metal_vapor_pressure_out_of_source_certified_range: "
+        f"species={species} consumer={consumer} "
+        f"temperature_K={float(temperature_K):.3f} "
+        f"source_certified_range_K=[{low:g}, {high:g}]"
+    )
 
 
 def _require_finite_vapor_value(
@@ -786,14 +829,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if not parent_oxide:
                 continue
 
-            antoine, coefficient_block = vapor_pressure_antoine_coefficients(
-                sp_data,
-                temperature_K=T_K,
-            )
+            fit_target = _fit_target(sp_data)
+            metal_phase_kind = ellingham_metal_phase_kind(species, T_K)
             if _is_noncertifying_pseudo_vapor_pressure_runtime(
                 species,
                 sp_data,
-                coefficient_block,
                 temperature_K=T_K,
             ):
                 warnings.append(
@@ -804,43 +844,80 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     f"confidence_tier={_metadata_value(sp_data, 'confidence_tier')}"
                 )
                 continue
-            if bool(sp_data.get("interval_required")):
-                reject_noncertifying_vapor_pressure_row(
+            gas_standard_rail = (
+                fit_target != FIT_TARGET_STANDARD_REACTION
+                and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
+            )
+            coefficient_block: str | None = None
+            P_reference_Pa: float | None = None
+            if not gas_standard_rail:
+                antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+                    sp_data,
+                    temperature_K=T_K,
+                )
+                if bool(sp_data.get("interval_required")):
+                    reject_noncertifying_vapor_pressure_row(
+                        species,
+                        sp_data,
+                        coefficient_block,
+                    )
+                A = antoine.get('A', 0)
+                B = antoine.get('B', 0)
+                C = antoine.get('C', 0)
+                if not (A > 0 and T_K > 300):
+                    continue
+                certified_range = _range_tuple(
+                    antoine.get("source_certified_range_K")
+                    or sp_data.get("source_certified_range_K")
+                )
+                if (
+                    str(sp_data.get("extrapolation_policy", "")).lower()
+                    == "refuse"
+                    and certified_range is not None
+                    and T_K < certified_range[0]
+                ):
+                    warnings.append(
+                        "metal_vapor_pressure_out_of_source_certified_range: "
+                        f"species={species} consumer=builtin_condensed_rail "
+                        f"temperature_K={T_K:.3f} "
+                        "source_certified_range_K="
+                        f"[{certified_range[0]:g}, {certified_range[1]:g}]"
+                    )
+                    continue
+                require_antoine_source_certified_temperature(
                     species,
                     sp_data,
                     coefficient_block,
+                    T_K,
+                    consumer="builtin_condensed_rail",
                 )
-            A = antoine.get('A', 0)
-            B = antoine.get('B', 0)
-            C = antoine.get('C', 0)
-            if not (A > 0 and T_K > 300):
-                continue
-            valid_range = vapor_pressure_valid_range_K(
-                sp_data,
-                coefficient_block,
-                temperature_K=T_K,
-            )
-            if valid_range and len(valid_range) == 2:
-                valid_low = float(valid_range[0])
-                valid_high = float(valid_range[1])
-                if T_K < valid_low or T_K > valid_high:
-                    metal_extrapolations[species] = {
-                        "temperature_K": T_K,
-                        "valid_range_K": (valid_low, valid_high),
-                    }
-                    warnings.append(
-                        f"{species} metal Antoine fit extrapolated beyond "
-                        f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
-                        f"{T_K:.2f} K"
-                    )
-            log_P = A - B / (T_K + C)
-            P_reference_Pa = _pow10_pressure_or_raise(
-                log_P,
-                species=species,
-                field="P_reference_Pa",
-            )
+                valid_range = vapor_pressure_valid_range_K(
+                    sp_data,
+                    coefficient_block,
+                    temperature_K=T_K,
+                )
+                if valid_range and len(valid_range) == 2:
+                    valid_low = float(valid_range[0])
+                    valid_high = float(valid_range[1])
+                    if T_K < valid_low or T_K > valid_high:
+                        metal_extrapolations[species] = {
+                            "temperature_K": T_K,
+                            "valid_range_K": (valid_low, valid_high),
+                        }
+                        warnings.append(
+                            f"{species} metal Antoine fit extrapolated beyond "
+                            f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+                            f"{T_K:.3f} K"
+                        )
+                log_P = A - B / (T_K + C)
+                P_reference_Pa = _pow10_pressure_or_raise(
+                    log_P,
+                    species=species,
+                    field="P_reference_Pa",
+                )
 
             if _fit_target(sp_data) == FIT_TARGET_STANDARD_REACTION:
+                assert P_reference_Pa is not None
                 oxide_activity = melt_oxide_activity(parent_oxide, melt_account_mol)
                 if oxide_activity is None or oxide_activity.activity <= 1e-10:
                     continue
@@ -1008,7 +1085,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 species=species,
                 field="metal_activity",
             )
-            metal_phase_kind = ellingham_metal_phase_kind(species, T_K)
             if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
                 # Gas-standard rows solve for f_M/p0, so P_M = root * p0.
                 # Pairing this root with condensed Antoine P_sat would count
@@ -1021,6 +1097,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # Only this rail is capped at pure condensed metal and paired
                 # with Antoine P_sat: P_M = min(root, 1) * P_sat.
                 activity_factor = min(metal_activity_root, 1.0)
+                assert P_reference_Pa is not None
                 pressure_reference_Pa = P_reference_Pa
                 pressure_rail = "condensed_raoult_psat"
             P_eq_Pa = _require_finite_vapor_value(
@@ -1030,15 +1107,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
             if P_eq_Pa > 1e-15:
                 vapor_pressures[species] = P_eq_Pa
-                source_label = vapor_pressure_source_label(
-                    "builtin_authoritative",
-                    sp_data,
-                    coefficient_block=coefficient_block,
-                    temperature_K=T_K,
-                    authority_limited_by_ellingham_fit_range=(
-                        species in ellingham_extrapolations
-                    ),
-                )
+                if gas_standard_rail:
+                    base_source = (
+                        "builtin_extrapolation_limited"
+                        if species in ellingham_extrapolations
+                        else "builtin_authoritative"
+                    )
+                    source_label = f"{base_source}:gas_standard_fugacity"
+                else:
+                    source_label = vapor_pressure_source_label(
+                        "builtin_authoritative",
+                        sp_data,
+                        coefficient_block=coefficient_block,
+                        temperature_K=T_K,
+                        authority_limited_by_ellingham_fit_range=(
+                            species in ellingham_extrapolations
+                        ),
+                    )
                 if species in metal_extrapolations:
                     source_label = (
                         f"{source_label}:"
@@ -1050,7 +1135,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         "extrapolated_beyond_ellingham_fit_range_K"
                     )
                 vapor_pressure_sources[species] = source_label
-                vapor_pressure_provenance[species] = {
+                provenance: dict[str, float | str] = {
                     "pressure_kind": _runtime_pressure_kind(
                         sp_data,
                         coefficient_block,
@@ -1058,7 +1143,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     ),
                     "pressure_rail": pressure_rail,
                     "metal_standard_state": metal_phase_kind,
-                    "P_reference_Antoine_Pa": P_reference_Pa,
                     "P_standard_Pa": ELLINGHAM_STANDARD_PRESSURE_PA,
                     "P_eq_Pa": P_eq_Pa,
                     "pO2_bar": dissociation_pO2_bar,
@@ -1066,6 +1150,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     "raw_metal_activity_root": metal_activity_root,
                     "source_label": source_label,
                 }
+                if P_reference_Pa is not None:
+                    provenance["P_reference_Antoine_Pa"] = P_reference_Pa
+                vapor_pressure_provenance[species] = provenance
                 if oxide_activity is not None:
                     vapor_pressure_provenance[species].update(
                         oxide_activity.provenance()

@@ -352,7 +352,7 @@ def test_pure_component_antoine_matches_published_vapor_pressure_points(
     )
 
 
-def test_mg_runtime_uses_monotonic_pure_sidecar_without_pseudo_fit() -> None:
+def test_mg_sidecar_is_monotonic_but_gas_runtime_uses_fugacity() -> None:
     data = _vapor_pressure_data()
     row = data["metals"]["Mg"]
 
@@ -365,16 +365,10 @@ def test_mg_runtime_uses_monotonic_pure_sidecar_without_pseudo_fit() -> None:
         _pure_component_antoine_pa(row, temperature_K)
         for temperature_K in temperatures_K
     ]
-    recovered_reference_pa = [
-        _runtime_recovered_reference_pressure_pa(data, "Mg", temperature_K)
-        for temperature_K in temperatures_K
-    ]
-
     assert all(
         high > low
         for low, high in zip(pure_reference_pa, pure_reference_pa[1:])
     )
-    assert recovered_reference_pa == pytest.approx(pure_reference_pa, rel=1e-12)
 
     provider = BuiltinVaporPressureProvider(data)
     effective_pressures_pa = []
@@ -392,7 +386,9 @@ def test_mg_runtime_uses_monotonic_pure_sidecar_without_pseudo_fit() -> None:
             )
         )
         assert result.status == "ok"
-        assert "pure_component" in result.diagnostic["vapor_pressures_source"]["Mg"]
+        assert "gas_standard_fugacity" in result.diagnostic[
+            "vapor_pressures_source"
+        ]["Mg"]
         effective_pressures_pa.append(result.diagnostic["vapor_pressures_Pa"]["Mg"])
 
     assert all(
@@ -512,14 +508,10 @@ def test_mn_source_spread_and_join_resolution_are_documented_in_place() -> None:
     ("species", "temperature_K", "expected_reference_pa", "rel_tol"),
     [
         ("Na", 1118.0, 61_691.685390, 1e-6),
-        ("Mg", 1364.15, PA_PER_ATM, 0.03),
-        ("Fe", 3135.15, PA_PER_ATM, 0.02),
         ("Ca", 1500.0, 21_740.153809, 1e-6),
         ("Al", 2200.0, 46_484.884967, 1e-6),
         ("Si", 2200.0, 2_194.210607, 1e-6),
-        ("Ti", 3560.15, PA_PER_ATM, 1e-6),
         ("Cr", 2200.0, 2_704.347348, 1e-6),
-        ("Mn", 2334.526, PA_PER_ATM, 1e-9),
     ],
 )
 def test_builtin_runtime_provider_uses_pure_component_sidecar_for_reference_pressure(

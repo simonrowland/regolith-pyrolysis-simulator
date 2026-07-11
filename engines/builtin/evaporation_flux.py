@@ -276,12 +276,9 @@ def _series_pressure_provenance_diagnostic(
         pO2_bar_value = float(provenance_pO2)
     except (TypeError, ValueError):
         pO2_bar_value = None
-    return {
+    diagnostic: dict[str, float | str | None] = {
         "pressure_kind": str(
             provenance_map.get("pressure_kind") or "effective_equilibrium"
-        ),
-        "P_reference_Antoine_Pa": float(
-            provenance_map.get("P_reference_Antoine_Pa", P_eq_Pa)
         ),
         "P_eq_Pa": float(provenance_map.get("P_eq_Pa", P_eq_Pa)),
         "P_bulk_Pa": float(P_bulk_Pa),
@@ -289,6 +286,10 @@ def _series_pressure_provenance_diagnostic(
         "activity_factor": activity_factor_value,
         "source_label": source_label,
     }
+    P_reference_Antoine_Pa = provenance_map.get("P_reference_Antoine_Pa")
+    if P_reference_Antoine_Pa is not None:
+        diagnostic["P_reference_Antoine_Pa"] = float(P_reference_Antoine_Pa)
+    return diagnostic
 
 
 def _coerce_frozen_skull_stir_ceiling(

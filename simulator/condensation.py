@@ -3447,10 +3447,11 @@ def _record_antoine_extrapolation(
                 key = f'{species}#{suffix}'
             antoine_extrapolations[key] = record
     if antoine_extrapolation_warnings is not None:
+        temperature_text = f"{T_K:.3f}".rstrip('0').rstrip('.')
         warning = (
             f"{species} metal Antoine fit extrapolated beyond "
             f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
-            f"{T_K:.2f} K"
+            f"{temperature_text} K"
         )
         if warning not in antoine_extrapolation_warnings:
             antoine_extrapolation_warnings.append(warning)
@@ -3468,7 +3469,10 @@ def _antoine_psat_pa(
         species,
         vapor_pressure_data=vapor_pressure_data,
     )
-    from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
+    from engines.builtin.vapor_pressure import (
+        require_antoine_source_certified_temperature,
+        wall_condensation_antoine_coefficients,
+    )
 
     antoine, coefficient_block = wall_condensation_antoine_coefficients(
         data,
@@ -3485,6 +3489,13 @@ def _antoine_psat_pa(
         return None
     if not (A > 0.0 and math.isfinite(T_K) and T_K + C > 0.0):
         return None
+    require_antoine_source_certified_temperature(
+        species,
+        data,
+        coefficient_block,
+        T_K,
+        consumer="wall_condensation",
+    )
     _record_antoine_extrapolation(
         species,
         T_K,
@@ -3497,6 +3508,38 @@ def _antoine_psat_pa(
     return 10.0 ** (A - B / (T_K + C))
 
 
+def _try_antoine_psat_pa(
+    species: str,
+    T_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
+    antoine_extrapolation_warnings: list[str] | None = None,
+) -> tuple[float | None, bool]:
+    """Return a wall pressure or a named, fail-closed range refusal."""
+
+    from engines.builtin.vapor_pressure import VaporPressureRangeError
+
+    try:
+        return (
+            _antoine_psat_pa(
+                species,
+                T_K,
+                vapor_pressure_data=vapor_pressure_data,
+                antoine_extrapolations=antoine_extrapolations,
+                antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            ),
+            False,
+        )
+    except VaporPressureRangeError as exc:
+        if (
+            antoine_extrapolation_warnings is not None
+            and str(exc) not in antoine_extrapolation_warnings
+        ):
+            antoine_extrapolation_warnings.append(str(exc))
+        return None, True
+
+
 def _local_species_pressure_pa(
     species: str,
     T_cond_C: float,
@@ -3505,13 +3548,15 @@ def _local_species_pressure_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
-    P_local_pa = _antoine_psat_pa(
+    P_local_pa, refused = _try_antoine_psat_pa(
         species,
         T_cond_C + CELSIUS_TO_KELVIN_OFFSET,
         vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
+    if refused:
+        return 0.0
     if P_local_pa is not None and P_local_pa > 0.0:
         return P_local_pa
     # Existing condensation temperatures are documented at ~1 mbar.
@@ -3531,7 +3576,7 @@ def _record_wall_surface_antoine_telemetry(
         and antoine_extrapolation_warnings is None
     ):
         return
-    _antoine_psat_pa(
+    _try_antoine_psat_pa(
         species,
         wall_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
         vapor_pressure_data=vapor_pressure_data,
@@ -3549,13 +3594,15 @@ def _local_wall_species_pressure_pa(
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
-    P_source_pa = _antoine_psat_pa(
+    P_source_pa, refused = _try_antoine_psat_pa(
         species,
         melt_temperature_C + CELSIUS_TO_KELVIN_OFFSET,
         vapor_pressure_data=vapor_pressure_data,
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
+    if refused:
+        return 0.0
     if P_source_pa is not None and P_source_pa > 0.0:
         return P_source_pa
     return _local_species_pressure_pa(
@@ -3638,7 +3685,7 @@ def _wall_deposition_driving_pressure_pa(
         antoine_extrapolations,
         antoine_extrapolation_warnings,
     )
-    P_sat_pa = _antoine_psat_pa(
+    P_sat_pa, _ = _try_antoine_psat_pa(
         species,
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,

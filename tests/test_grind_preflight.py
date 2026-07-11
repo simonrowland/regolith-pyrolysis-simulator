@@ -340,6 +340,21 @@ def test_strict_vapor_source_report_rejects_backsolved_vaporock_colon_label() ->
         assert_strict_vapor_source_report(report, context="stored-result")
 
 
+def test_strict_vapor_source_report_rejects_extrapolated_mg() -> None:
+    source = (
+        "builtin_authoritative:pure_component_extrapolated:"
+        "extrapolated_beyond_valid_range_K"
+    )
+    report = {
+        "species": {"Mg": source},
+        "summary": {source: {"count": 1, "percentage": 100.0}},
+        "total_species": 1,
+    }
+
+    with pytest.raises(GrindSourceGateError, match="pure_component_extrapolated"):
+        assert_strict_vapor_source_report(report, context="stored-result")
+
+
 def test_strict_vapor_result_store_rejects_builtin_fallback_report(
     tmp_path: Path,
 ) -> None:

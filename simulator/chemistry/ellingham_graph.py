@@ -146,7 +146,7 @@ def effective_equilibrium_pressure_Pa(
     a_oxide: float = 1.0,
     vacuum_floor_bar: float = 1e-9,
 ) -> float:
-    """Effective equilibrium pressure ``P_eff = a_M · P_sat`` (Pa).
+    """Effective equilibrium pressure on the phase-correct E-08 rail (Pa).
 
     Metals use the builtin Ellingham + Antoine path unless their row declares
     ``fit_target: standard_reaction_term``. Standard-reaction metals and oxide
@@ -168,11 +168,23 @@ def effective_equilibrium_pressure_Pa(
             return 0.0
         if species not in ELLINGHAM_THERMO:
             return 0.0
+        fit_target = str(sp_data.get("fit_target", "") or "")
+        metal_phase_kind = ellingham_metal_phase_kind(species, T_K)
+        if (
+            fit_target != "standard_reaction_term"
+            and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
+        ):
+            # Gas-standard Ellingham roots are already fugacity ratios.
+            # This rail must not depend on a condensed-phase Antoine block.
+            a_M = metal_activity_factor(
+                species, T_K, pO2, a_oxide=a_ox, clamp=False
+            )
+            return a_M * ELLINGHAM_STANDARD_PRESSURE_PA
         antoine, _ = vapor_pressure_antoine_coefficients(sp_data, temperature_K=T_K)
         P_reference_Pa = _antoine_reference_pressure_Pa(antoine, T_K)
         if P_reference_Pa is None:
             return 0.0
-        if str(sp_data.get("fit_target", "") or "") == "standard_reaction_term":
+        if fit_target == "standard_reaction_term":
             activity_exponent = float(
                 sp_data.get("oxide_activity_exponent", 1.0) or 1.0
             )
@@ -185,15 +197,6 @@ def effective_equilibrium_pressure_Pa(
                 )
                 P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
             return max(P_eq_Pa, 0.0)
-        metal_phase_kind = ellingham_metal_phase_kind(species, T_K)
-        if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
-            # Gas-standard Ellingham roots are fugacity ratios, f_M/p0.
-            # The consistent pressure is root*p0; condensed P_sat belongs
-            # only to condensed-standard Raoultian rows.
-            a_M = metal_activity_factor(
-                species, T_K, pO2, a_oxide=a_ox, clamp=False
-            )
-            return a_M * ELLINGHAM_STANDARD_PRESSURE_PA
         a_M = metal_activity_factor(species, T_K, pO2, a_oxide=a_ox)
         return a_M * P_reference_Pa
 

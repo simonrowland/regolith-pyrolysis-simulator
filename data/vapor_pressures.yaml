@@ -182,6 +182,7 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "MgO"
     fit_target: "pure_component_psat"
+    extrapolation_policy: "refuse"
     source: "REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
       source: "REF-033 CRC.b/Stull magnesium pressure-level table fit (1-100000 Pa); cross-checked against REF-034 Kaye-Laby/NPL Ambrose pressure-level table; not an Alcock liquid equation"

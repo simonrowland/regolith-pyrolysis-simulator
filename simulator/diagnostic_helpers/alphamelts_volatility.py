@@ -280,7 +280,6 @@ def _analytical_vapor_pressures_from_activities(
         if _is_noncertifying_pseudo_vapor_pressure_runtime(
             species,
             sp_data,
-            coefficient_block,
             temperature_K=T_K,
         ):
             continue

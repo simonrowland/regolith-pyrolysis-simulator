@@ -31,6 +31,7 @@ import pytest
 
 from engines.builtin.evaporation_flux import (
     BuiltinEvaporationFluxProvider,
+    _series_pressure_provenance_diagnostic,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from simulator.chemistry.kernel import (
@@ -380,6 +381,28 @@ def test_provider_attaches_numerator_provenance_and_resistance_shares():
     assert diagnostic['limiting_resistance_label'] in {'interface', 'gas', 'melt'}
     assert diagnostic['alpha_eff'] == diagnostic['alpha_effective']
     assert diagnostic['Kn'] == diagnostic['knudsen_number']
+
+
+def test_gas_rail_provenance_does_not_fabricate_antoine_reference():
+    diagnostic = _series_pressure_provenance_diagnostic(
+        species="K",
+        P_eq_Pa=12.0,
+        P_bulk_Pa=2.0,
+        pressure_provenance_by_species={
+            "K": {
+                "pressure_kind": "effective_equilibrium",
+                "pressure_rail": "gas_fugacity",
+                "P_eq_Pa": 12.0,
+                "source_label": "builtin_authoritative:gas_standard_fugacity",
+            }
+        },
+        vapor_pressure_sources={},
+        vapor_pressure_activities={},
+        pO2_bar=1e-9,
+    )
+
+    assert diagnostic["P_eq_Pa"] == pytest.approx(12.0)
+    assert "P_reference_Antoine_Pa" not in diagnostic
 
 
 def test_evaporation_aux_fails_loud_without_molar_mass_metadata(

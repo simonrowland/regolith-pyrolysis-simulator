@@ -30,6 +30,7 @@ from engines.builtin._common import composition_wt_pct_from_account_view
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
     VaporPressureComputationError,
+    VaporPressureRangeError,
     _ELLINGHAM_THERMO,
 )
 from simulator.equilibrium import EquilibriumMixin
@@ -63,7 +64,7 @@ from tests.chemistry.conftest import _build_sim
 
 _VP_TOLERANCE_REL = 1e-9
 _VP_TOLERANCE_ABS_PA = 3e-7
-_CA_RANGE_EXTRAPOLATION_T_K = 2000.0
+_CA_RANGE_EXTRAPOLATION_T_K = 1713.0
 
 _V1C_JANAF_ELLINGHAM = {
     "Na": (-1135.130, -0.537417, 4, 2),
@@ -194,12 +195,34 @@ def _ca_range_extrapolation_request() -> IntentRequest:
     )
 
 
+def _mg_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"MgO": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+
 class _CaOnlyMelt:
     temperature_C = _CA_RANGE_EXTRAPOLATION_T_K - 273.15
     p_total_mbar = 1e-3
 
     def composition_wt_pct(self):
         return {"CaO": 100.0}
+
+
+class _MgOnlyMelt:
+    def __init__(self, temperature_K: float):
+        self.temperature_C = temperature_K - 273.15
+        self.p_total_mbar = 1e-3
+
+    def composition_wt_pct(self):
+        return {"MgO": 100.0}
 
 
 class _MnOnlyMelt:
@@ -432,9 +455,7 @@ def test_gas_basis_ellingham_pressure_uses_fugacity_not_psat(
     assert provenance["P_eq_Pa"] == pytest.approx(
         root * vapor_pressure_module.ELLINGHAM_STANDARD_PRESSURE_PA
     )
-    assert provenance["P_eq_Pa"] != pytest.approx(
-        root * provenance["P_reference_Antoine_Pa"]
-    )
+    assert "P_reference_Antoine_Pa" not in provenance
 
 
 def test_ellingham_graph_gas_basis_pressure_uses_standard_pressure(
@@ -854,6 +875,122 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
     )
 
 
+def test_mg_condensed_rail_refuses_outside_source_certified_range(
+    vapor_pressure_data,
+):
+    mg_data = vapor_pressure_data["metals"]["Mg"]
+    mg_coeff = mg_data["pure_component_antoine"]
+    assert mg_coeff["source_certified_range_K"] == [701, 1361]
+    assert mg_coeff["valid_range_K"] == [701, 1361]
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+
+    below_range = provider.dispatch(_mg_vapor_request_at_T_K(700.0))
+    at_boundary = provider.dispatch(_mg_vapor_request_at_T_K(1361.0))
+
+    assert "Mg" not in below_range.diagnostic["vapor_pressures_Pa"]
+    assert any(
+        "species=Mg consumer=builtin_condensed_rail" in warning
+        and "temperature_K=700.000" in warning
+        for warning in below_range.warnings
+    )
+    assert at_boundary.status == "ok"
+    assert at_boundary.diagnostic["vapor_pressures_Pa"]["Mg"] > 0.0
+    assert "Mg" not in at_boundary.diagnostic["extrapolated_beyond_valid_range_K"]
+    assert at_boundary.diagnostic["vapor_pressures_source"]["Mg"].startswith(
+        "builtin_authoritative:pure_component_"
+    )
+    with pytest.raises(
+        VaporPressureRangeError,
+        match=(
+            r"species=Mg consumer=builtin_condensed_rail .*"
+            r"source_certified_range_K=\[701, 1361\]"
+        ),
+    ):
+        provider.dispatch(_mg_vapor_request_at_T_K(1361.001))
+
+
+def test_mg_gas_rail_is_independent_of_antoine_coefficients(
+    vapor_pressure_data,
+):
+    temperature_K = 1873.0
+    baseline_data = copy.deepcopy(vapor_pressure_data)
+    no_antoine_data = copy.deepcopy(vapor_pressure_data)
+    no_antoine_data["metals"]["Mg"].pop("pure_component_antoine")
+
+    baseline = BuiltinVaporPressureProvider(baseline_data).dispatch(
+        _mg_vapor_request_at_T_K(temperature_K)
+    )
+    without_antoine = BuiltinVaporPressureProvider(no_antoine_data).dispatch(
+        _mg_vapor_request_at_T_K(temperature_K)
+    )
+
+    assert without_antoine.status == "ok"
+    assert without_antoine.diagnostic["vapor_pressures_Pa"]["Mg"] == pytest.approx(
+        baseline.diagnostic["vapor_pressures_Pa"]["Mg"]
+    )
+    provenance = without_antoine.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["Mg"]
+    assert provenance["pressure_rail"] == "gas_fugacity"
+    assert "P_reference_Antoine_Pa" not in provenance
+    assert "gas_standard_fugacity" in provenance["source_label"]
+
+    graph_pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
+        "Mg",
+        temperature_K,
+        1e-9,
+        vapor_pressure_data=no_antoine_data,
+        a_oxide=1.0,
+    )
+    baseline_graph_pressure = ellingham_graph.effective_equilibrium_pressure_Pa(
+        "Mg",
+        temperature_K,
+        1e-9,
+        vapor_pressure_data=baseline_data,
+        a_oxide=1.0,
+    )
+    assert graph_pressure == pytest.approx(baseline_graph_pressure)
+
+
+def test_legacy_mg_rails_refuse_condensed_extrapolation_but_ignore_gas_antoine(
+    vapor_pressure_data,
+):
+    below_range = _LegacyInternalAnalyticalModel(
+        vapor_pressure_data,
+        melt=_MgOnlyMelt(700.0),
+    )._internal_analytical_equilibrium()
+    assert "Mg" not in below_range.vapor_pressures_Pa
+    assert any(
+        "species=Mg consumer=legacy_condensed_rail" in warning
+        for warning in below_range.warnings
+    )
+
+    with pytest.raises(
+        VaporPressureRangeError,
+        match=r"species=Mg consumer=legacy_condensed_rail",
+    ):
+        _LegacyInternalAnalyticalModel(
+            vapor_pressure_data,
+            melt=_MgOnlyMelt(1361.001),
+        )._internal_analytical_equilibrium()
+
+    baseline = _LegacyInternalAnalyticalModel(
+        vapor_pressure_data,
+        melt=_MgOnlyMelt(1873.0),
+    )._internal_analytical_equilibrium()
+    no_antoine_data = copy.deepcopy(vapor_pressure_data)
+    no_antoine_data["metals"]["Mg"].pop("pure_component_antoine")
+    without_antoine = _LegacyInternalAnalyticalModel(
+        no_antoine_data,
+        melt=_MgOnlyMelt(1873.0),
+    )._internal_analytical_equilibrium()
+
+    assert without_antoine.vapor_pressures_Pa["Mg"] == pytest.approx(
+        baseline.vapor_pressures_Pa["Mg"]
+    )
+    assert "gas_standard_fugacity" in without_antoine.vapor_pressures_source["Mg"]
+
+
 def test_sio_oxide_vapor_extrapolates_instead_of_disappearing_above_valid_range(
     vapor_pressure_data,
 ):
@@ -991,6 +1128,35 @@ def test_low_confidence_fe_pseudo_vaporock_fallback_is_omitted_outside_range(
     assert "Fe" not in result.diagnostic["vapor_pressures_Pa"]
     assert any(
         "non_certifying_vapor_pressure_fallback_omitted: species=Fe"
+        in warning
+        for warning in result.warnings
+    )
+
+
+def test_low_confidence_k_pseudo_vaporock_gas_rail_is_omitted_outside_range(
+    vapor_pressure_data,
+):
+    data = copy.deepcopy(vapor_pressure_data)
+    data["metals"]["K"]["fit_target"] = "pseudo_psat_backsolved_from_vaporock"
+    data["metals"]["K"]["confidence_tier"] = "low"
+    provider = BuiltinVaporPressureProvider(data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"K2O": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1800.0,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    assert "K" not in result.diagnostic["vapor_pressures_Pa"]
+    assert any(
+        "non_certifying_vapor_pressure_fallback_omitted: species=K"
         in warning
         for warning in result.warnings
     )
@@ -1206,7 +1372,7 @@ def test_builtin_provider_exposes_consumable_ellingham_authority_flag(
     )
 
 
-def test_legacy_fallback_marks_ellingham_fit_range_extrapolation(
+def test_legacy_fallback_omits_noncertifying_fe_above_pseudo_fit_range(
     vapor_pressure_data,
 ):
     result = _LegacyInternalAnalyticalModel(
@@ -1214,10 +1380,12 @@ def test_legacy_fallback_marks_ellingham_fit_range_extrapolation(
         melt=_FeBeyondEllinghamMelt(),
     )._internal_analytical_equilibrium()
 
-    assert result.vapor_pressures_Pa["Fe"] > 0.0
-    assert result.vapor_pressures_source["Fe"].startswith("builtin_authoritative:")
-    assert result.vapor_pressures_source["Fe"].endswith(
-        "extrapolated_beyond_valid_range_K"
+    assert "Fe" not in result.vapor_pressures_Pa
+    assert "Fe" not in result.vapor_pressures_source
+    assert any(
+        "non_certifying_vapor_pressure_fallback_omitted: species=Fe"
+        in warning
+        for warning in result.warnings
     )
 
 
@@ -1241,18 +1409,18 @@ def test_legacy_fallback_grounds_mn_liquid_source_band(
 def test_legacy_fallback_marks_pseudo_vaporock_sources_non_authoritative(
     vapor_pressure_data,
 ):
-    class _KOnlyMelt:
+    class _FeOnlyMelt:
         temperature_C = 1600.0
         p_total_mbar = 1e-3
         melt_fO2_log = -9.0
 
         def composition_wt_pct(self):
-            return {"K2O": 100.0}
+            return {"FeO": 100.0}
 
     metal_data = {
         "metals": {
-            "K": {
-                "parent_oxide": "K2O",
+            "Fe": {
+                "parent_oxide": "FeO",
                 "fit_target": "pseudo_psat_backsolved_from_vaporock",
                 "residual_dex": 1.4,
                 "confidence_tier": "low",
@@ -1263,14 +1431,16 @@ def test_legacy_fallback_marks_pseudo_vaporock_sources_non_authoritative(
     }
     metal_result = _LegacyInternalAnalyticalModel(
         metal_data,
-        melt=_KOnlyMelt(),
+        # t-006 rail-aware refusals: the condensed-phase pseudo case uses Fe;
+        # the K gas-phase pseudo regression lives in its own test below.
+        melt=_FeOnlyMelt(),
     )._internal_analytical_equilibrium()
     oxide_result = _LegacyInternalAnalyticalModel(
         vapor_pressure_data,
         melt=_SiOnlyMelt(),
     )._internal_analytical_equilibrium()
 
-    for result, species in ((metal_result, "K"), (oxide_result, "SiO")):
+    for result, species in ((metal_result, "Fe"), (oxide_result, "SiO")):
         source = result.vapor_pressures_source[species]
         assert source == (
             "vaporock_backsolved_curve_fit:"

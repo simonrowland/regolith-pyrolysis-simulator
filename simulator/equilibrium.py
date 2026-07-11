@@ -198,14 +198,15 @@ class EquilibriumMixin:
         2. Get the decomposition equilibrium constant:            [ELLI-2]
                K = exp(ΔG_f / (R × T))   [< 1 since ΔG_f < 0]
 
-        3. Solve for equilibrium liquid metal activity:           [ELLI-3]
-               a_M(l) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
+        3. Solve for equilibrium metal activity on the phase basis:[ELLI-3]
+               a_M = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
 
-        4. Get pure-metal vapor pressure from Antoine:
+        4. For condensed-standard rows, get P_sat from Antoine:
                P_sat = 10^(A − B/(T+C))   (Pa)
 
-        5. Effective vapor pressure above the oxide melt:         [ELLI-4]
-               P_metal = a_M(l) × P_sat
+        5. Select the phase-correct pressure rail:                 [ELLI-4]
+               condensed: P_metal = min(a_M, 1) × P_sat
+               gas:       P_metal = a_M(g) × p°
 
         This correctly captures:
         - Temperature dependence of BOTH oxide stability AND metal
@@ -236,6 +237,7 @@ class EquilibriumMixin:
             _pow10_pressure_or_raise,
             _require_finite_vapor_value,
             reject_noncertifying_vapor_pressure_row,
+            require_antoine_source_certified_temperature,
             vapor_pressure_source_label,
             vapor_pressure_antoine_coefficients,
             vapor_pressure_valid_range_K,
@@ -328,8 +330,8 @@ class EquilibriumMixin:
         # METAL SPECIES: Ellingham equilibrium + Antoine               [ELLI]
         # ================================================================
         #
-        # For each metal, combine the oxide decomposition equilibrium
-        # (how much liquid metal is "freed") with an Antoine reference term.
+        # For each metal, combine the oxide decomposition equilibrium with
+        # its phase-correct condensed-P_sat or gas-fugacity pressure rail.
         # Only fit_target=pure_component_psat rows are pure-component /
         # first-principles; pseudo rows are backsolved VapoRock curve-fits.
 
@@ -347,7 +349,7 @@ class EquilibriumMixin:
             if not parent_oxide:
                 continue
 
-            # --- Antoine reference pressure ---
+            # --- Pressure reference rail ---
             #
             # We extrapolate the Clausius-Clapeyron equation beyond its
             # validated range because:
@@ -365,14 +367,11 @@ class EquilibriumMixin:
             # Fe has a slightly lower sublimation pressure. That
             # pure-component rationale applies only to
             # fit_target=pure_component_psat rows.
-            antoine, coefficient_block = vapor_pressure_antoine_coefficients(
-                sp_data,
-                temperature_K=T_K,
-            )
+            fit_target = str(sp_data.get("fit_target", "") or "")
+            metal_phase_kind = ellingham_metal_phase_kind(species, T_K)
             if _is_noncertifying_pseudo_vapor_pressure_runtime(
                 species,
                 sp_data,
-                coefficient_block,
                 temperature_K=T_K,
             ):
                 warnings.append(
@@ -383,17 +382,55 @@ class EquilibriumMixin:
                     f"confidence_tier={_metadata_value(sp_data, 'confidence_tier')}"
                 )
                 continue
-            if bool(sp_data.get("interval_required")):
-                reject_noncertifying_vapor_pressure_row(
+            gas_standard_rail = (
+                fit_target != FIT_TARGET_STANDARD_REACTION
+                and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
+            )
+            coefficient_block: str | None = None
+            P_reference_Pa: float | None = None
+            if not gas_standard_rail:
+                antoine, coefficient_block = vapor_pressure_antoine_coefficients(
+                    sp_data,
+                    temperature_K=T_K,
+                )
+                if bool(sp_data.get("interval_required")):
+                    reject_noncertifying_vapor_pressure_row(
+                        species,
+                        sp_data,
+                        coefficient_block,
+                    )
+                A = antoine.get('A', 0)
+                B = antoine.get('B', 0)
+                C = antoine.get('C', 0)
+                if not (A > 0 and T_K > 300):
+                    continue
+                certified_range = (
+                    antoine.get("source_certified_range_K")
+                    or sp_data.get("source_certified_range_K")
+                )
+                if (
+                    str(sp_data.get("extrapolation_policy", "")).lower()
+                    == "refuse"
+                    and isinstance(certified_range, (list, tuple))
+                    and len(certified_range) == 2
+                    and T_K < float(certified_range[0])
+                ):
+                    warnings.append(
+                        "metal_vapor_pressure_out_of_source_certified_range: "
+                        f"species={species} consumer=legacy_condensed_rail "
+                        f"temperature_K={T_K:.3f} "
+                        "source_certified_range_K="
+                        f"[{float(certified_range[0]):g}, "
+                        f"{float(certified_range[1]):g}]"
+                    )
+                    continue
+                require_antoine_source_certified_temperature(
                     species,
                     sp_data,
                     coefficient_block,
+                    T_K,
+                    consumer="legacy_condensed_rail",
                 )
-            A = antoine.get('A', 0)
-            B = antoine.get('B', 0)
-            C = antoine.get('C', 0)
-
-            if A > 0 and T_K > 300:
                 valid_range = vapor_pressure_valid_range_K(
                     sp_data,
                     coefficient_block,
@@ -410,7 +447,7 @@ class EquilibriumMixin:
                         warnings.append(
                             f"{species} metal Antoine fit extrapolated beyond "
                             f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
-                            f"{T_K:.2f} K"
+                            f"{T_K:.3f} K"
                         )
                 log_P = A - B / (T_K + C)
                 P_reference_Pa = _pow10_pressure_or_raise(
@@ -418,10 +455,8 @@ class EquilibriumMixin:
                     species=species,
                     field="P_reference_Pa",
                 )
-            else:
-                continue
-
-            if str(sp_data.get("fit_target", "") or "") == FIT_TARGET_STANDARD_REACTION:
+            if fit_target == FIT_TARGET_STANDARD_REACTION:
+                assert P_reference_Pa is not None
                 oxide_activity = melt_oxide_activity(
                     parent_oxide,
                     melt_account_mol,
@@ -554,9 +589,10 @@ class EquilibriumMixin:
             # pure-component vapor pressure and may saturate at a metal pool.
             # Gas-basis rows already produce f_M/p°; multiplying by P_sat again
             # would double-count the vaporization equilibrium.
-            if ellingham_metal_phase_kind(species, T_K) == ELLINGHAM_METAL_PHASE_GAS:
+            if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
                 P_effective_Pa = metal_activity_root * _ELLINGHAM_STANDARD_PRESSURE_PA
             else:
+                assert P_reference_Pa is not None
                 P_effective_Pa = min(metal_activity_root, 1.0) * P_reference_Pa
 
             P_effective_Pa = _require_finite_vapor_value(
@@ -567,15 +603,23 @@ class EquilibriumMixin:
 
             if P_effective_Pa > 1e-15:
                 vapor_pressures[species] = P_effective_Pa
-                source_label = vapor_pressure_source_label(
-                    'builtin_authoritative',
-                    sp_data,
-                    coefficient_block=coefficient_block,
-                    temperature_K=T_K,
-                    authority_limited_by_ellingham_fit_range=(
-                        species in ellingham_extrapolations
-                    ),
-                )
+                if gas_standard_rail:
+                    base_source = (
+                        'builtin_extrapolation_limited'
+                        if species in ellingham_extrapolations
+                        else 'builtin_authoritative'
+                    )
+                    source_label = f'{base_source}:gas_standard_fugacity'
+                else:
+                    source_label = vapor_pressure_source_label(
+                        'builtin_authoritative',
+                        sp_data,
+                        coefficient_block=coefficient_block,
+                        temperature_K=T_K,
+                        authority_limited_by_ellingham_fit_range=(
+                            species in ellingham_extrapolations
+                        ),
+                    )
                 if species in metal_extrapolations:
                     source_label = (
                         f'{source_label}:'
