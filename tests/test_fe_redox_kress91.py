@@ -9,10 +9,14 @@ from engines.builtin.electrolysis_step import BuiltinElectrolysisStepProvider
 from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import (
     Kress91InvalidControls,
+    KRESS91_INV_T_COEFFICIENT_K,
+    KRESS91_LN_FO2_COEFFICIENT,
     floor_vacuum_pressure_bar,
     feo_iw_log10_fO2_bar,
     kress91_fe3_over_sigma_fe,
     kress91_ferrous_feo_activity,
+    kress91_ln_fO2_temperature_delta,
+    kress91_referenced_log_fO2,
     kress91_split,
     kress91_temperature_band_case,
     melt_mol_fractions_for_kress91,
@@ -128,6 +132,70 @@ def test_kress91_valid_finite_controls_stay_exactly_golden_neutral() -> None:
         'extrapolation': False,
         'high_uncertainty': False,
     }
+
+
+@pytest.mark.parametrize(
+    ('reference_C', 'target_C', 'expected_error_dex'),
+    [
+        (1200.0, 1300.0, 0.04849),
+        (1300.0, 1400.0, 0.01439),
+        (1400.0, 1500.0, -0.01234),
+        (1500.0, 1600.0, -0.03345),
+        (1600.0, 1700.0, -0.05021),
+        (1700.0, 1800.0, -0.06358),
+        (1800.0, 1900.0, -0.07426),
+        (1900.0, 2000.0, -0.08280),
+    ],
+)
+def test_kress91_temperature_delta_includes_nonlinear_worked_errors(
+    reference_C: float,
+    target_C: float,
+    expected_error_dex: float,
+) -> None:
+    reference_T_K = reference_C + 273.15
+    target_T_K = target_C + 273.15
+
+    corrected = (
+        kress91_ln_fO2_temperature_delta(reference_T_K, target_T_K)
+        / math.log(10.0)
+    )
+    released = -(
+        KRESS91_INV_T_COEFFICIENT_K / KRESS91_LN_FO2_COEFFICIENT
+    ) * ((1.0 / target_T_K) - (1.0 / reference_T_K)) / math.log(10.0)
+
+    assert corrected - released == pytest.approx(expected_error_dex, abs=5.0e-6)
+
+
+@pytest.mark.parametrize('target_C', [1200.0, 1630.0, 2000.0])
+def test_kress91_referenced_log_fo2_preserves_forward_ratio(
+    target_C: float,
+) -> None:
+    reference_T_K = 1400.0 + 273.15
+    target_T_K = target_C + 273.15
+    pressure_bar = 0.01
+    reference_fO2_log = -7.75
+
+    referenced_fO2_log = kress91_referenced_log_fO2(
+        reference_fO2_log,
+        reference_T_K=reference_T_K,
+        target_T_K=target_T_K,
+        reference_pressure_bar=pressure_bar,
+        target_pressure_bar=pressure_bar,
+    )
+    reference_ratio = kress91_split(
+        fO2_log=reference_fO2_log,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=reference_T_K,
+        pressure_bar=pressure_bar,
+    )['ratio']
+    target_ratio = kress91_split(
+        fO2_log=referenced_fO2_log,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=target_T_K,
+        pressure_bar=pressure_bar,
+    )['ratio']
+
+    assert target_ratio == pytest.approx(reference_ratio, rel=0.0, abs=1.0e-14)
 
 
 @pytest.mark.parametrize(

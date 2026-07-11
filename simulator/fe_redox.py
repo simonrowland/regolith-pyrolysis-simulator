@@ -24,6 +24,11 @@ KRESS91_MOL_FRACTION_OXIDES = (
 # provenance: Kress91 coefficients — REF-001 CMP 108:82-92; ln(fO2) and inverse-T terms.
 KRESS91_LN_FO2_COEFFICIENT = 0.196
 KRESS91_INV_T_COEFFICIENT_K = 11492.0
+KRESS91_NONLINEAR_REFERENCE_T_K = 1673.0
+KRESS91_NONLINEAR_COEFFICIENT = -3.36
+KRESS91_PRESSURE_INV_T_COEFFICIENT = -0.000000701
+KRESS91_PRESSURE_D_T_COEFFICIENT = -0.000000000154
+KRESS91_PRESSURE_SQUARED_COEFFICIENT = 0.0000000000000000385
 # Kress91 liquid calibration floor. Kress91 coefficients above remain the
 # thermodynamic source; higher-temperature bands are flagged, not model-swapped.
 KRESS91_LIQUID_CALIBRATION_MIN_T_C = 1200.0
@@ -112,6 +117,9 @@ def kress91_temperature_band_case(temperature_C: float) -> dict[str, object]:
 def kress91_ln_fO2_temperature_delta(
     reference_T_K: float,
     target_T_K: float,
+    *,
+    reference_pressure_bar: float | None = None,
+    target_pressure_bar: float | None = None,
 ) -> float:
     """Return the Kress91 ln(fO2) shift for fixed redox composition."""
 
@@ -132,9 +140,53 @@ def kress91_ln_fO2_temperature_delta(
                 f'Kress91 invalid control {name}: expected finite positive '
                 f'value, got {value!r}'
             )
-    return -(
-        KRESS91_INV_T_COEFFICIENT_K / KRESS91_LN_FO2_COEFFICIENT
-    ) * ((1.0 / float(target_T_K)) - (1.0 / float(reference_T_K)))
+    reference_term = _kress91_temperature_pressure_term(
+        float(reference_T_K),
+        reference_pressure_bar,
+    )
+    target_term = _kress91_temperature_pressure_term(
+        float(target_T_K),
+        target_pressure_bar,
+    )
+    # Fixed Fe3+/Fe2+ means a*Delta ln(fO2) exactly cancels the endpoint
+    # difference of the Kress91 temperature+pressure family.  The omitted
+    # -3.36*dG term was 0.049 dex per +100 C inside the calibrated band
+    # and 0.083 dex per +100 C across reachable extrapolations.
+    return -(target_term - reference_term) / KRESS91_LN_FO2_COEFFICIENT
+
+
+def _kress91_temperature_pressure_term(
+    T_K: float,
+    pressure_bar: float | None = None,
+) -> float:
+    term = KRESS91_INV_T_COEFFICIENT_K / float(T_K)
+    term += KRESS91_NONLINEAR_COEFFICIENT * (
+        1.0
+        - (KRESS91_NONLINEAR_REFERENCE_T_K / float(T_K))
+        - math.log(float(T_K) / KRESS91_NONLINEAR_REFERENCE_T_K)
+    )
+    if pressure_bar is None:
+        return term
+    try:
+        p_bar = float(pressure_bar)
+    except (TypeError, ValueError) as exc:
+        raise Kress91InvalidControls(
+            'Kress91 invalid control pressure_bar: expected finite positive '
+            f'value or None, got {pressure_bar!r}'
+        ) from exc
+    if not math.isfinite(p_bar) or p_bar <= 0.0:
+        raise Kress91InvalidControls(
+            'Kress91 invalid control pressure_bar: expected finite positive '
+            f'value or None, got {pressure_bar!r}'
+        )
+    p_pa = max(p_bar, 1.0e-9) * 100000.0
+    return (
+        term
+        + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / float(T_K))
+        + KRESS91_PRESSURE_D_T_COEFFICIENT
+        * (((float(T_K) - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / float(T_K))
+        + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / float(T_K))
+    )
 
 
 def kress91_referenced_log_fO2(
@@ -142,6 +194,8 @@ def kress91_referenced_log_fO2(
     *,
     reference_T_K: float | None,
     target_T_K: float,
+    reference_pressure_bar: float | None = None,
+    target_pressure_bar: float | None = None,
 ) -> float:
     redox_fO2_log = float(fO2_log)
     if reference_T_K is None:
@@ -158,6 +212,8 @@ def kress91_referenced_log_fO2(
     delta_ln_fO2 = kress91_ln_fO2_temperature_delta(
         redox_reference_T_K,
         redox_target_T_K,
+        reference_pressure_bar=reference_pressure_bar,
+        target_pressure_bar=target_pressure_bar,
     )
     return (redox_fO2_log * math.log(10.0) + delta_ln_fO2) / math.log(10.0)
 
@@ -558,7 +614,6 @@ def _kress91_fe2o3_over_feo_molar(
     )
     x = mol_fractions
     p_pa = max(float(pressure_bar), 1.0e-9) * 100000.0
-    to_K = 1673.0
     ln_ratio = (
         # a*ln(fO2) with fO2 = 10**fO2_log, computed as fO2_log*ln(10) directly.
         # The prior 10.0**fO2_log underflows to 0.0 at extreme-reducing fO2 and
@@ -573,10 +628,16 @@ def _kress91_fe2o3_over_feo_molar(
         + 3.201 * x.get('CaO', 0.0)
         + 5.854 * x.get('Na2O', 0.0)
         + 6.215 * x.get('K2O', 0.0)
-        - 3.36 * (1.0 - (to_K / T_K) - math.log(T_K / to_K))
-        - 0.000000701 * (p_pa / T_K)
-        - 0.000000000154 * (((T_K - 1673.0) * p_pa) / T_K)
-        + 0.0000000000000000385 * ((p_pa ** 2.0) / T_K)
+        + KRESS91_NONLINEAR_COEFFICIENT * (
+            1.0
+            - (KRESS91_NONLINEAR_REFERENCE_T_K / T_K)
+            - math.log(T_K / KRESS91_NONLINEAR_REFERENCE_T_K)
+        )
+        + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / T_K)
+        + KRESS91_PRESSURE_D_T_COEFFICIENT * (
+            ((T_K - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / T_K
+        )
+        + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K)
     )
     return math.exp(max(-745.0, min(709.0, ln_ratio)))
 

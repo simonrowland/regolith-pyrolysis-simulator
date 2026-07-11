@@ -952,6 +952,50 @@ def test_redox_source_capacity_scales_with_continuous_liquid_fraction(
     ) == pytest.approx(12.0)
 
 
+def test_passive_exchange_refuses_zero_liquid_capacity(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 900.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1500.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    _install_freeze_gate_curve(
+        sim,
+        path=((1000.0, 0.0), (1300.0, 1.0)),
+    )
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas',
+        {'O2': 10_000.0},
+        source='test frozen passive exchange oxygen',
+    )
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_reference_T_K = sim.melt.oxygen_reservoir.reference_T_K
+    before_overhead_o2 = sim.atom_ledger.mol_by_account('process.overhead_gas')[
+        'O2'
+    ]
+    before_transition_count = len(sim.atom_ledger.transitions)
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+
+    assert reservoir.exchange_direction == 'none:no_melt_redox_capacity'
+    assert reservoir.melt_redox_capacity_mol_per_ln_fO2 == pytest.approx(0.0)
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
+    assert reservoir.reference_T_K == pytest.approx(before_reference_T_K)
+    assert sim.atom_ledger.mol_by_account('process.overhead_gas')['O2'] == (
+        pytest.approx(before_overhead_o2)
+    )
+    assert len(sim.atom_ledger.transitions) == before_transition_count
+
+
 def test_redox_reference_seed_builds_liquidus_curve_before_first_seed(
     monkeypatch,
     vapor_pressure_data,
@@ -1516,27 +1560,29 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
 
     assert per_operation_calls == 2
     assert mixed_transition.name == 'fe_redox_respeciation'
+    # K-01 complete Kress91 re-reference lowers the target fO2 shift in this
+    # mixed liquidus gate probe; the liquid-fraction authority remains pinned.
     assert per_operation_sim._transition_species_mol(
         mixed_transition,
         side='debits',
         account=_CLEANED_MELT_ACCOUNT,
         species='FeO',
-    ) == pytest.approx(701.595, rel=2.0e-3)
+    ) == pytest.approx(694.169, rel=2.0e-3)
     assert per_operation_sim._transition_species_mol(
         mixed_transition,
         side='credits',
         account=_CLEANED_MELT_ACCOUNT,
         species='Fe2O3',
-    ) == pytest.approx(350.797, rel=2.0e-3)
+    ) == pytest.approx(347.085, rel=2.0e-3)
     assert per_operation_sim._transition_species_mol(
         mixed_transition,
         side='debits',
         account='process.overhead_gas',
         species='O2',
-    ) == pytest.approx(175.399, rel=2.0e-3)
+    ) == pytest.approx(173.542, rel=2.0e-3)
     assert (
         per_operation_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log + 3.0
-    ) == pytest.approx(0.767, rel=2.0e-3)
+    ) == pytest.approx(0.733213, rel=2.0e-3)
     assert mixed_liquid_fraction == pytest.approx(6.0 / 7.0)
 
     tick_sim = _configure_tick_authority_retry_sim(

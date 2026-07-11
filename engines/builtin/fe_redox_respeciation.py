@@ -33,9 +33,14 @@ OXYGEN_ACCOUNT = "process.overhead_gas"
 FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
 OXYGEN_SPECIES = "O2"
 OXYGEN_SOURCE_OVERHEAD = "overhead_gas"
+OXYGEN_SOURCE_FO2_BUFFER = "fo2_buffer"
 OXYGEN_SOURCE_INTERNAL_EVAPORATIVE_METAL_LOSS = (
     "evaporative_metal_loss_internal"
 )
+BUFFER_BACKED_OXYGEN_SOURCES = frozenset({
+    OXYGEN_SOURCE_FO2_BUFFER,
+    OXYGEN_SOURCE_INTERNAL_EVAPORATIVE_METAL_LOSS,
+})
 NOOP_MOL = 1.0e-12
 TRANSITION_NAME = "fe_redox_respeciation"
 
@@ -81,6 +86,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         oxygen_source = str(controls.get("oxygen_source") or OXYGEN_SOURCE_OVERHEAD)
         if oxygen_source not in {
             OXYGEN_SOURCE_OVERHEAD,
+            OXYGEN_SOURCE_FO2_BUFFER,
             OXYGEN_SOURCE_INTERNAL_EVAPORATIVE_METAL_LOSS,
         }:
             raise ValueError(f"unsupported Fe redox oxygen_source {oxygen_source!r}")
@@ -95,7 +101,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             raise ValueError("internal_o2_capacity_mol must be finite")
         o2_account = (
             FO2_BUFFER_ACCOUNT
-            if oxygen_source == OXYGEN_SOURCE_INTERNAL_EVAPORATIVE_METAL_LOSS
+            if oxygen_source in BUFFER_BACKED_OXYGEN_SOURCES
             else OXYGEN_ACCOUNT
         )
         if request.fO2_log is None:
@@ -193,7 +199,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         registry = request.account_view.species_formula_registry
         if delta_fe2o3_mol > 0.0:
             required_o2_mol = 0.5 * delta_fe2o3_mol
-            if oxygen_source == OXYGEN_SOURCE_INTERNAL_EVAPORATIVE_METAL_LOSS:
+            if oxygen_source in BUFFER_BACKED_OXYGEN_SOURCES:
                 available_o2_mol = internal_o2_capacity_mol
                 applied_delta_fe2o3_mol = min(
                     delta_fe2o3_mol,
@@ -230,11 +236,13 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                         "direction": "oxidizing",
                         "reason": (
                             (
-                                "fe_redox_respeciation_internal_o_unavailable"
-                                if (
-                                    oxygen_source
+                                (
+                                    "fe_redox_respeciation_internal_o_unavailable"
+                                    if oxygen_source
                                     == OXYGEN_SOURCE_INTERNAL_EVAPORATIVE_METAL_LOSS
+                                    else "fe_redox_respeciation_buffer_o_unavailable"
                                 )
+                                if oxygen_source in BUFFER_BACKED_OXYGEN_SOURCES
                                 else "fe_redox_respeciation_o2_unavailable"
                             )
                             if (

@@ -473,6 +473,154 @@ def test_o2_bubbler_reoxidizes_by_kress91_capacity_math() -> None:
     ) == pytest.approx(0.0)
 
 
+def test_o2_bubbler_absorption_is_ledger_funded_before_fo2_move() -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+    before = sim._current_melt_redox_fO2_log()
+    T_K = sim.melt.temperature_C + 273.15
+    capacity = sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=before,
+        T_K=T_K,
+    )
+    delta_log10 = 0.05
+    requested_absorbed_mol = capacity * math.log(10.0) * delta_log10
+    _configure_o2_bubbler(
+        sim,
+        rate_kg_per_hr=2.0 * requested_absorbed_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL,
+        eta_absorb=1.0,
+        target_fO2_log=before + delta_log10,
+    )
+
+    diagnostic = sim._apply_o2_bubbler()
+
+    transition = next(
+        transition
+        for transition in reversed(sim.atom_ledger.transitions)
+        if transition.name == "fe_redox_respeciation"
+    )
+    absorbed_mol = diagnostic["absorbed_mol"]
+    assert absorbed_mol > 0.0
+    assert _transition_account_species_mol(
+        sim,
+        transition,
+        side="debits",
+        account="reservoir.fo2_buffer",
+        species="O2",
+    ) == pytest.approx(absorbed_mol)
+    assert diagnostic["absorption_respeciation"]["oxygen_source"] == "fo2_buffer"
+    assert sim.melt.oxygen_reservoir.redox_source_applied_terms_mol_o2_equiv[
+        "redox_source:o2_bubbler"
+    ] == pytest.approx(absorbed_mol)
+    assert sim._current_melt_redox_fO2_log() - before == pytest.approx(
+        absorbed_mol / (capacity * math.log(10.0))
+    )
+
+
+def test_o2_bubbler_respeciation_refusal_leaves_fo2_unchanged_and_passes_through(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+    before = sim._current_melt_redox_fO2_log()
+    T_K = sim.melt.temperature_C + 273.15
+    capacity = sim._melt_redox_capacity_mol_per_ln_fO2(
+        fO2_log=before,
+        T_K=T_K,
+    )
+    requested_absorbed_mol = capacity * math.log(10.0) * 0.05
+    _configure_o2_bubbler(
+        sim,
+        rate_kg_per_hr=2.0 * requested_absorbed_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL,
+        eta_absorb=1.0,
+        target_fO2_log=before + 0.05,
+    )
+
+    monkeypatch.setattr(
+        sim,
+        "_apply_fe_redox_respeciation",
+        lambda **_kwargs: {
+            "status": "refused",
+            "reason": "test_respeciation_refusal",
+            "applied_o2_mol": 0.0,
+        },
+    )
+
+    diagnostic = sim._apply_o2_bubbler()
+
+    assert diagnostic["reason"] == "test_respeciation_refusal"
+    assert diagnostic["absorbed_mol"] == pytest.approx(0.0)
+    assert diagnostic["passthrough_mol"] == pytest.approx(
+        diagnostic["injected_mol"]
+    )
+    assert sim._current_melt_redox_fO2_log() == pytest.approx(before)
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"] == (
+        pytest.approx(diagnostic["injected_mol"])
+    )
+
+
+def test_o2_bubbler_capacity_floor_refuses_without_fo2_move_or_transition(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+    before = sim._current_melt_redox_fO2_log()
+    before_transitions = len(sim.atom_ledger.transitions)
+    before_overhead_o2 = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    before_buffer_o2 = sim.atom_ledger.mol_by_account(
+        "reservoir.fo2_buffer"
+    ).get("O2", 0.0)
+    _configure_o2_bubbler(
+        sim,
+        rate_kg_per_hr=0.01,
+        eta_absorb=1.0,
+        target_fO2_log=before + 0.5,
+    )
+    requested_absorbed_mol = 0.01 / OXYGEN_MOLAR_MASS_KG_PER_MOL
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_source_capacity_mol_per_ln_fO2",
+        lambda **_: OXYGEN_RESERVOIR_NOOP_MOL * 0.5,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_apply_fe_redox_respeciation",
+        lambda **_kwargs: pytest.fail("capacity-floor bubbler respeciated"),
+    )
+
+    diagnostic = sim._apply_o2_bubbler()
+
+    reservoir = sim.melt.oxygen_reservoir
+    assert diagnostic["reason"] == "no_melt_redox_capacity"
+    assert diagnostic["injected_mol"] == pytest.approx(0.0)
+    assert diagnostic["absorbed_mol"] == pytest.approx(0.0)
+    assert diagnostic["passthrough_mol"] == pytest.approx(0.0)
+    assert diagnostic["absorption_respeciation"]["status"] == "refused"
+    assert diagnostic["absorption_respeciation"]["reason"] == (
+        "no_melt_redox_capacity"
+    )
+    assert sim._current_melt_redox_fO2_log() == pytest.approx(before)
+    assert len(sim.atom_ledger.transitions) == before_transitions
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2",
+        0.0,
+    ) == pytest.approx(before_overhead_o2)
+    assert sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get(
+        "O2",
+        0.0,
+    ) == pytest.approx(before_buffer_o2)
+    assert reservoir.redox_source_terms_applied is False
+    assert reservoir.redox_source_skip_reason == "no_melt_redox_capacity"
+    assert reservoir.redox_source_applied_terms_mol_o2_equiv == {}
+    assert reservoir.redox_source_skipped_terms_mol_o2_equiv == pytest.approx(
+        {"redox_source:o2_bubbler": requested_absorbed_mol}
+    )
+    assert reservoir.exchange_direction.endswith(
+        ":skipped:no_melt_redox_capacity"
+    )
+
+
 def test_o2_bubbler_cap_prevents_overoxidation_and_overhead_transition() -> None:
     sim = _make_sim()
     _seed_o2_bubbler_redox_state(sim, fO2_log=-8.0)

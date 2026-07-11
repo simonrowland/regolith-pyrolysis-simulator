@@ -172,6 +172,42 @@ def test_oxidizing_respeciation_can_consume_internal_evaporative_o_carrier(
     )
 
 
+def test_oxidizing_respeciation_can_consume_fo2_buffer_carrier(
+    formula_registry,
+):
+    result = BuiltinFeRedoxRespeciationProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"FeO": 10.0, "SiO2": 20.0},
+                "process.overhead_gas": {},
+                "reservoir.fo2_buffer": {},
+            },
+            fO2_log=-3.0,
+            control_inputs={
+                "oxygen_source": "fo2_buffer",
+                "internal_o2_capacity_mol": 10.0,
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    transition = result.transition
+    assert transition.accounts_touched() == frozenset({
+        "process.cleaned_melt",
+        "reservoir.fo2_buffer",
+    })
+    validate_atom_balance(transition, formula_registry)
+    _atom_check(transition, formula_registry, tol=1e-12)
+
+    fe2o3_credit = transition.credits["process.cleaned_melt"]["Fe2O3"]
+    assert transition.debits["reservoir.fo2_buffer"]["O2"] == pytest.approx(
+        0.5 * fe2o3_credit,
+    )
+    assert result.diagnostic["oxygen_source"] == "fo2_buffer"
+
+
 def test_reducing_respeciation_credits_explicit_o2_and_matches_kress91(
     formula_registry,
 ):
