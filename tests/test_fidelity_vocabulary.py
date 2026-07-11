@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import pytest
 
+import simulator.backend_names as backend_names
 from simulator.fidelity_vocabulary import (
     CANONICAL_DIMENSIONS,
     CERTIFICATION_DENYLIST,
     DESIGN_LEGACY_MAPPING_ROW_COUNT,
+    LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN,
     LEGACY_VOCABULARY_TOKENS,
     EvidenceClass,
     FidelityVocabularyTranslationError,
@@ -200,6 +202,25 @@ def test_design_token_inventory_is_pinned_to_spec_table() -> None:
         family: set(tokens) for family, tokens in LEGACY_VOCABULARY_TOKENS.items()
     } == EXPECTED_LEGACY_TOKENS
     assert DESIGN_LEGACY_MAPPING_ROW_COUNT == 25
+
+
+def test_legacy_stub_vocabulary_survives_backend_identity_hinge_flip(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        backend_names,
+        "ANALYTICAL_BACKEND_SERIALIZATION_TOKEN",
+        "internal-analytical",
+    )
+
+    assert LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN == "stub"
+    assert translate_legacy_token(
+        "backend/status alias",
+        "stub",
+    ).as_dict() == {
+        "evidence_class": "internal-analytical",
+        "label_source": "legacy_backend_alias:stub",
+    }
 
 
 def test_auto_requires_and_decomposes_selected_backend() -> None:

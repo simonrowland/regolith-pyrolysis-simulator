@@ -54,15 +54,15 @@ DEFAULT_HIGH_HOURS = 1
 SCENARIO_ORDER = (
     "backend_init",
     "equilibrate_once",
-    "evaluate_stub_1h",
-    "evaluate_stub_repeat",
+    "evaluate_internal_analytical_1h",
+    "evaluate_internal_analytical_repeat",
     "evaluate_alphamelts_1h",
     "evaluate_repeat",
-    "fidelity_fork_stub",
+    "fidelity_fork_internal_analytical",
 )
 SCENARIO_ALIASES = {
     "thermoengine_init_only": "backend_init",
-    "fork_spawn_tax": "fidelity_fork_stub",
+    "fork_spawn_tax": "fidelity_fork_internal_analytical",
 }
 MARE_OXIDES_WT = {
     "SiO2": 44.5,
@@ -228,7 +228,7 @@ def _init_thermoengine_backend() -> AlphaMELTSBackend:
     return backend
 
 
-def _evaluate_stub_once(profile: Mapping[str, Any], *, candidate_id: str) -> None:
+def _evaluate_internal_analytical_once(profile: Mapping[str, Any], *, candidate_id: str) -> None:
     feedstock = str(profile["feedstock"])
     evaluate(
         _empty_patch(),
@@ -296,7 +296,7 @@ def scenario_equilibrate_once(repeat: int) -> dict[str, Any]:
     )
 
 
-def scenario_evaluate_stub_1h(
+def scenario_evaluate_internal_analytical_1h(
     profile: Mapping[str, Any],
     repeat: int,
 ) -> dict[str, Any]:
@@ -305,17 +305,17 @@ def scenario_evaluate_stub_1h(
     def _once() -> None:
         nonlocal counter
         counter += 1
-        _evaluate_stub_once(profile, candidate_id=f"profile-stub-{counter}")
+        _evaluate_internal_analytical_once(profile, candidate_id=f"profile-internal-analytical-{counter}")
 
     return _timed_result(
-        "evaluate_stub_1h",
-        "Full evaluate() on stub fidelity, 1 hour, empty patch",
+        "evaluate_internal_analytical_1h",
+        "Full evaluate() on internal-analytical fidelity, 1 hour, empty patch",
         _once,
         repeat=repeat,
     )
 
 
-def scenario_evaluate_stub_repeat(
+def scenario_evaluate_internal_analytical_repeat(
     profile: Mapping[str, Any],
     repeat: int,
 ) -> dict[str, Any]:
@@ -324,18 +324,19 @@ def scenario_evaluate_stub_repeat(
     def _pair() -> None:
         nonlocal pair_counter
         pair_counter += 1
-        _evaluate_stub_once(
+        _evaluate_internal_analytical_once(
             profile,
-            candidate_id=f"profile-stub-repeat-{pair_counter}-1",
+            candidate_id=f"profile-internal-analytical-repeat-{pair_counter}-1",
         )
-        _evaluate_stub_once(
+        _evaluate_internal_analytical_once(
             profile,
-            candidate_id=f"profile-stub-repeat-{pair_counter}-2",
+            candidate_id=f"profile-internal-analytical-repeat-{pair_counter}-2",
         )
 
     return _timed_result(
-        "evaluate_stub_repeat",
-        "Two sequential stub evaluate() calls in one PID; samples are seconds per eval",
+        "evaluate_internal_analytical_repeat",
+        "Two sequential internal-analytical evaluate() calls in one PID; "
+        "samples are seconds per eval",
         _pair,
         repeat=repeat,
         scale=0.5,
@@ -443,7 +444,7 @@ def _fork_worker(queue: Any, payload: str) -> None:
         profile = yaml.safe_load(Path(payload).read_text())
         if not isinstance(profile, dict):
             raise ValueError(f"profile must load to a mapping: {payload}")
-        _evaluate_stub_once(profile, candidate_id="profile-fork")
+        _evaluate_internal_analytical_once(profile, candidate_id="profile-fork")
         queue.put(("ok", None))
     except Exception as exc:  # noqa: BLE001 - child reports compact reason
         queue.put(("error", f"{type(exc).__name__}: {exc}"))
@@ -469,26 +470,26 @@ def _process_start_method() -> str:
     return "fork" if "fork" in mp.get_all_start_methods() else "spawn"
 
 
-def scenario_fidelity_fork_stub(profile_path: Path, repeat: int) -> dict[str, Any]:
+def scenario_fidelity_fork_internal_analytical(profile_path: Path, repeat: int) -> dict[str, Any]:
     start_method = _process_start_method()
     noop_samples = [
         _fork_join("noop", start_method=start_method)
         for _ in range(repeat)
     ]
-    stub_samples = [
+    internal_analytical_samples = [
         _fork_join(str(profile_path), start_method=start_method)
         for _ in range(repeat)
     ]
     noop_median = _median(noop_samples)
-    stub_median = _median(stub_samples)
+    internal_analytical_median = _median(internal_analytical_samples)
     tax_median = None
-    if noop_median is not None and stub_median is not None:
-        tax_median = max(0.0, stub_median - noop_median)
+    if noop_median is not None and internal_analytical_median is not None:
+        tax_median = max(0.0, internal_analytical_median - noop_median)
     return {
-        "name": "fidelity_fork_stub",
+        "name": "fidelity_fork_internal_analytical",
         "description": (
             "Fidelity harness fork/spawn tax: empty child vs child running one "
-            "stub evaluate()"
+            "internal-analytical evaluate()"
         ),
         "status": "ok",
         "runs": repeat,
@@ -497,16 +498,16 @@ def scenario_fidelity_fork_stub(profile_path: Path, repeat: int) -> dict[str, An
             "samples_s": noop_samples,
             "median_s": noop_median,
         },
-        "stub_evaluate": {
-            "samples_s": stub_samples,
-            "median_s": stub_median,
+        "internal_analytical_evaluate": {
+            "samples_s": internal_analytical_samples,
+            "median_s": internal_analytical_median,
         },
         "tax_median_s": tax_median,
     }
 
 
 def _scenario_median(scenario: Mapping[str, Any]) -> float | None:
-    if scenario.get("name") == "fidelity_fork_stub":
+    if scenario.get("name") == "fidelity_fork_internal_analytical":
         value = scenario.get("tax_median_s")
     else:
         value = scenario.get("median_s")
@@ -527,7 +528,7 @@ def _fmt_seconds(value: float | None) -> str:
 
 def _rank_hypotheses(results: Mapping[str, Any]) -> list[dict[str, Any]]:
     scenarios = results["scenarios"]
-    h1 = _scenario_median(scenarios["fidelity_fork_stub"])
+    h1 = _scenario_median(scenarios["fidelity_fork_internal_analytical"])
     h2 = _scenario_median(scenarios["backend_init"])
     h3 = _scenario_median(scenarios["equilibrate_once"])
     hypotheses = [
@@ -536,7 +537,7 @@ def _rank_hypotheses(results: Mapping[str, Any]) -> list[dict[str, Any]]:
             "name": "Fidelity fork/spawn tax",
             "signal": "T_fork",
             "median_s": h1,
-            "scenario": "fidelity_fork_stub",
+            "scenario": "fidelity_fork_internal_analytical",
             "candidate_fix": "simulator/optimize/fidelity.py:201",
             "chunk": "G9.7c",
             "expected_impact": "remove per-eval child startup from fidelity harness",
@@ -580,9 +581,9 @@ def _derived(results: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "T_init_s": _scenario_median(scenarios["backend_init"]),
         "T_eq_s": _scenario_median(scenarios["equilibrate_once"]),
-        "T_fork_s": _scenario_median(scenarios["fidelity_fork_stub"]),
-        "T_stub_s": _scenario_median(scenarios["evaluate_stub_1h"]),
-        "T_stub_repeat_per_eval_s": _scenario_median(scenarios["evaluate_stub_repeat"]),
+        "T_fork_s": _scenario_median(scenarios["fidelity_fork_internal_analytical"]),
+        "T_internal_analytical_s": _scenario_median(scenarios["evaluate_internal_analytical_1h"]),
+        "T_internal_analytical_repeat_per_eval_s": _scenario_median(scenarios["evaluate_internal_analytical_repeat"]),
         "T_high_1h_s": _scenario_median(scenarios["evaluate_alphamelts_1h"]),
         "T_high_repeat_per_eval_s": _scenario_median(scenarios["evaluate_repeat"]),
     }
@@ -592,30 +593,32 @@ def _study_pool_note(results: Mapping[str, Any]) -> str:
     derived = results["derived"]
     high = derived["T_high_1h_s"]
     repeat = derived["T_high_repeat_per_eval_s"]
-    stub = derived["T_stub_s"]
-    stub_repeat = derived["T_stub_repeat_per_eval_s"]
+    internal_analytical = derived["T_internal_analytical_s"]
+    internal_analytical_repeat = derived["T_internal_analytical_repeat_per_eval_s"]
     fork = derived["T_fork_s"]
-    stub_note = ""
-    if stub is not None and stub_repeat is not None:
-        stub_delta = stub_repeat - stub
-        stub_note = (
-            " Stub same-PID repeat was "
-            f"{_fmt_seconds(stub_repeat)} s/eval vs cold stub "
-            f"{_fmt_seconds(stub)} s (delta {_fmt_seconds(stub_delta)} s/eval)."
+    internal_analytical_note = ""
+    if internal_analytical is not None and internal_analytical_repeat is not None:
+        internal_analytical_delta = internal_analytical_repeat - internal_analytical
+        internal_analytical_note = (
+            " Internal-analytical same-PID repeat was "
+            f"{_fmt_seconds(internal_analytical_repeat)} s/eval vs cold "
+            f"internal-analytical {_fmt_seconds(internal_analytical)} s "
+            f"(delta {_fmt_seconds(internal_analytical_delta)} s/eval)."
         )
     if high is None or repeat is None:
         return (
             "Study-pool reuse could not be measured for high fidelity because "
             "AlphaMELTS high-evaluate scenarios were skipped."
-            f"{stub_note}"
+            f"{internal_analytical_note}"
         )
     delta = repeat - high
     return (
         "Same-PID high repeat median was "
         f"{_fmt_seconds(repeat)} s/eval vs cold high median {_fmt_seconds(high)} s "
         f"(delta {_fmt_seconds(delta)} s/eval). Fidelity T_fork applies to "
-        f"fidelity._run_eval only ({_fmt_seconds(fork)} s measured on stub child start)."
-        f"{stub_note}"
+        f"fidelity._run_eval only ({_fmt_seconds(fork)} s measured on "
+        "internal-analytical child start)."
+        f"{internal_analytical_note}"
     )
 
 
@@ -636,10 +639,10 @@ def _hypothesis_verdicts(results: Mapping[str, Any]) -> list[dict[str, str]]:
     t_init = derived["T_init_s"]
     t_eq = derived["T_eq_s"]
     h1_evidence = (
-        f"T_fork={_fmt_seconds(t_fork)} from `fidelity_fork_stub`; "
+        f"T_fork={_fmt_seconds(t_fork)} from `fidelity_fork_internal_analytical`; "
         "`fidelity._run_eval` forks at `simulator/optimize/fidelity.py:201`."
         if t_fork is not None
-        else f"`fidelity_fork_stub` skipped: {_skip_reason(results, 'fidelity_fork_stub')}."
+        else f"`fidelity_fork_internal_analytical` skipped: {_skip_reason(results, 'fidelity_fork_internal_analytical')}."
     )
     h2_evidence = (
         f"T_init={_fmt_seconds(t_init)} from `backend_init`; "
@@ -677,7 +680,8 @@ def _hypothesis_verdicts(results: Mapping[str, Any]) -> list[dict[str, str]]:
             "hypothesis": "VapoRock second pass rivals MELTS per sim hour",
             "verdict": "inconclusive",
             "evidence": (
-                "Closeout run uses microbenches plus stub cProfile; no high full-run "
+                "Closeout run uses microbenches plus internal-analytical cProfile; "
+                "no high full-run "
                 "VapoRock/MELTS cProfile was collected."
             ),
         },
@@ -721,10 +725,10 @@ def _required_median_rows(results: Mapping[str, Any]) -> list[str]:
         f"- `T_init`: {_fmt_seconds(derived['T_init_s'])} s",
         f"- `T_eq`: {_fmt_seconds(derived['T_eq_s'])} s",
         f"- `T_fork`: {_fmt_seconds(derived['T_fork_s'])} s",
-        f"- `T_stub`: {_fmt_seconds(derived['T_stub_s'])} s",
+        f"- `T_internal_analytical`: {_fmt_seconds(derived['T_internal_analytical_s'])} s",
         (
-            "- `T_stub_repeat_same_pid`: "
-            f"{_fmt_seconds(derived['T_stub_repeat_per_eval_s'])} s/eval"
+            "- `T_internal_analytical_repeat_same_pid`: "
+            f"{_fmt_seconds(derived['T_internal_analytical_repeat_per_eval_s'])} s/eval"
         ),
         f"- `T_high`: {_fmt_seconds(derived['T_high_1h_s'])} s",
         (
@@ -746,11 +750,11 @@ def _scenario_rows(results: Mapping[str, Any]) -> list[str]:
         runs = int(scenario.get("runs") or 0)
         if status == "skipped":
             notes = str(scenario.get("skip_reason") or "")
-        elif name == "fidelity_fork_stub":
+        elif name == "fidelity_fork_internal_analytical":
             notes = (
                 f"start={scenario['start_method']}; "
                 f"noop={_fmt_seconds(scenario['noop']['median_s'])}; "
-                f"stub_child={_fmt_seconds(scenario['stub_evaluate']['median_s'])}"
+                f"internal_analytical_child={_fmt_seconds(scenario['internal_analytical_evaluate']['median_s'])}"
             )
         else:
             notes = str(scenario["description"])
@@ -910,11 +914,11 @@ def _run_cprofile(
     runners: dict[str, Callable[[], Any]] = {
         "backend_init": lambda: _init_thermoengine_backend(),
         "equilibrate_once": lambda: scenario_equilibrate_once(1),
-        "evaluate_stub_1h": lambda: _evaluate_stub_once(
+        "evaluate_internal_analytical_1h": lambda: _evaluate_internal_analytical_once(
             profile,
-            candidate_id="profile-stub-cprofile",
+            candidate_id="profile-internal-analytical-cprofile",
         ),
-        "evaluate_stub_repeat": lambda: scenario_evaluate_stub_repeat(profile, 1),
+        "evaluate_internal_analytical_repeat": lambda: scenario_evaluate_internal_analytical_repeat(profile, 1),
         "evaluate_alphamelts_1h": lambda: _evaluate_alphamelts_once(
             profile,
             candidate_id="profile-high-cprofile",
@@ -926,7 +930,7 @@ def _run_cprofile(
             alphamelts_probe,
             high_hours,
         ),
-        "fidelity_fork_stub": lambda: scenario_fidelity_fork_stub(profile_path, 1),
+        "fidelity_fork_internal_analytical": lambda: scenario_fidelity_fork_internal_analytical(profile_path, 1),
     }
     if normalized not in runners:
         raise SystemExit(f"unknown --cprofile scenario {scenario!r}")
@@ -965,10 +969,10 @@ def _run_selected(
             scenarios[name] = scenario_backend_init(repeat)
         elif name == "equilibrate_once":
             scenarios[name] = scenario_equilibrate_once(repeat)
-        elif name == "evaluate_stub_1h":
-            scenarios[name] = scenario_evaluate_stub_1h(profile, repeat)
-        elif name == "evaluate_stub_repeat":
-            scenarios[name] = scenario_evaluate_stub_repeat(profile, repeat)
+        elif name == "evaluate_internal_analytical_1h":
+            scenarios[name] = scenario_evaluate_internal_analytical_1h(profile, repeat)
+        elif name == "evaluate_internal_analytical_repeat":
+            scenarios[name] = scenario_evaluate_internal_analytical_repeat(profile, repeat)
         elif name == "evaluate_alphamelts_1h":
             scenarios[name] = scenario_evaluate_alphamelts_1h(
                 profile,
@@ -983,8 +987,8 @@ def _run_selected(
                 alphamelts_probe,
                 high_hours,
             )
-        elif name == "fidelity_fork_stub":
-            scenarios[name] = scenario_fidelity_fork_stub(profile_path, repeat)
+        elif name == "fidelity_fork_internal_analytical":
+            scenarios[name] = scenario_fidelity_fork_internal_analytical(profile_path, repeat)
     return scenarios
 
 

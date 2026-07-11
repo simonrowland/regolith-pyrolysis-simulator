@@ -36,7 +36,7 @@ correctness is proven directly off ``sim.record.decisions`` instead.
 Synchronization is STATE-driven, not sleep-timed: the negative assertions ("no
 re-emit", "no tick") are taken only after the loop thread is provably dead
 (``_wait_loop_settled``), so they can't false-pass on a fast box or false-fail
-on a slow one. Determinism: the StubBackend is the deterministic baseline, so
+on a slow one. Determinism: the InternalAnalyticalBackend is the deterministic baseline, so
 two identical runs must produce a bit-identical completion payload; any
 divergence under pause/resume churn is a real regression, surfaced loudly here.
 """
@@ -74,9 +74,9 @@ def _deterministic_liquidus_gate(monkeypatch):
         lambda self: dict(curve),
     )
 
-# StubBackend = deterministic baseline: no AlphaMELTS dependence (opt-in + slow
+# InternalAnalyticalBackend = deterministic baseline: no AlphaMELTS dependence (opt-in + slow
 # here) and no float drift between runs. The decision-gate state machine is
-# backend-independent, so the stub is both correct and fast for this test.
+# backend-independent, so internal-analytical is correct and fast here.
 START_PARAMS = {
     'feedstock': 'lunar_mare_low_ti',
     'mass_kg': 1000,
@@ -87,8 +87,9 @@ START_PARAMS = {
     'additives': {},
 }
 
-# Deterministic gate order for the params above (verified by driving the stub
-# session to completion under AUTO_APPLY): three gates, each answered with its
+# Deterministic gate order for the params above (verified by driving the
+# internal-analytical session to completion under AUTO_APPLY): three gates,
+# each answered with its
 # own recommendation; the run completes at hour 132.
 EXPECTED_DECISIONS = ['PATH_AB', 'BRANCH_ONE_TWO', 'C6_PROCEED']
 

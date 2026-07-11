@@ -14,6 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN  # noqa: E402
 from simulator.optimize.sso2_evidence import (  # noqa: E402
     SSO2_CHUNK3B_READER_HANDOFF,
     SSO2_OWNER_RECIPE_ID,
@@ -35,7 +36,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--hours", type=int, default=9)
-    parser.add_argument("--backend-name", default="stub")
+    parser.add_argument(
+        "--backend-name",
+        default=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    )
     parser.add_argument("--json", action="store_true", help="also write a .json sidecar")
     args = parser.parse_args()
 

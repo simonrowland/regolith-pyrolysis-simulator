@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.mre_ladder import canonical_mre_decomposition_voltage
 from simulator.optimize.evaluate import evaluate
 from simulator.optimize.physics import PhysicsConstraintSet
@@ -104,7 +104,7 @@ def _captured_c5_voltages(*, target_species: str, max_voltage_V: float) -> list[
             ],
         },
     }
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -140,7 +140,7 @@ def _captured_c5_voltages(*, target_species: str, max_voltage_V: float) -> list[
     return captured
 
 
-def test_tc8_si_target_mre_policy_splits_cache_key_and_stub_outcome() -> None:
+def test_tc8_si_target_mre_policy_splits_cache_key_and_internal_analytical_outcome() -> None:
     off = _evaluate_policy(c5_enabled=False)
     si_target = _evaluate_policy(c5_enabled=True)
 
@@ -192,7 +192,7 @@ def test_c5_mre_dispatch_uses_live_o2_backpressure() -> None:
             ],
         },
     }
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -234,7 +234,7 @@ def test_c5_mre_dispatch_uses_live_o2_backpressure() -> None:
 
 
 @pytest.mark.parametrize("c5_enabled", (False, True))
-def test_tc8_stub_path_mass_balance_closes_for_mre_policy(c5_enabled: bool) -> None:
+def test_tc8_internal_analytical_path_mass_balance_closes_for_mre_policy(c5_enabled: bool) -> None:
     result = _evaluate_policy(c5_enabled=c5_enabled)
     snapshots = result.run_reference.trace.snapshots
 

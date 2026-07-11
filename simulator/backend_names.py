@@ -20,6 +20,10 @@ the EvalSpec cache-key path without pulling in ``simulator.core``.
 from __future__ import annotations
 
 
+# CORPUS-BUMP MIGRATION HINGE: t-011 must change this token only as part of the
+# atomic corpus_version bump described in
+# docs-private/research/2026-07-11-t172-rename/flip-list.md. Never rename it in
+# an ordinary internal-analytical wording or symbol cleanup.
 ANALYTICAL_BACKEND_SERIALIZATION_TOKEN = "stub"
 ANALYTICAL_BACKEND_DISPLAY_NAME = "internal-analytical"
 ANALYTICAL_BACKEND_ALIASES = frozenset(

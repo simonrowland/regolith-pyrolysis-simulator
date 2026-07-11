@@ -6,8 +6,9 @@ worker subprocess with ``AttributeError: 'Namespace' object has no attribute
 ``--campaign`` register with ``action="append"`` (plural dests), so the worker
 body must resolve the single scalar it expects and fail loud otherwise.
 
-Stub backend only -- CAL is golden-neutral and stub data is explicitly
-non-authoritative, but the harness plumbing must still execute end to end.
+Internal-analytical backend only -- CAL is golden-neutral and analytical data
+is explicitly non-authoritative, but the harness plumbing must still execute
+end to end.
 """
 
 from __future__ import annotations
@@ -48,7 +49,7 @@ def _worker_args(*extra: str):
     )
 
 
-def test_worker_payload_stub_path_runs_and_returns_rows():
+def test_worker_payload_internal_analytical_path_runs_and_returns_rows():
     # Regression: this exact call raised AttributeError before the
     # feedstocks->feedstock resolution was added to _worker_payload.
     args = _worker_args("--feedstock", "lunar_mare_low_ti", "--campaign", "C2B")
@@ -58,8 +59,10 @@ def test_worker_payload_stub_path_runs_and_returns_rows():
         "feedstock": "lunar_mare_low_ti",
         "campaign": "C2B",
     }
-    assert payload["backend"]["name"] == "StubBackend"
-    assert payload["rows"], "stub worker must collect at least one per-target row"
+    assert payload["backend"]["name"] == "InternalAnalyticalBackend"
+    assert payload["rows"], (
+        "internal-analytical worker must collect at least one per-target row"
+    )
     # C2B targets Fe (CAMPAIGN_TARGETS); every row carries the case identity.
     assert {row["target"] for row in payload["rows"]} == {"Fe"}
     assert all(row["campaign"] == "C2B" for row in payload["rows"])
@@ -69,7 +72,7 @@ def test_worker_payload_stub_path_runs_and_returns_rows():
     "backend",
     ("stub", "internal-analytical", " Internal-Analytical ", "INTERNAL_ANALYTICAL"),
 )
-def test_stub_equivalent_backend_requires_allow_stub(backend, tmp_path):
+def test_internal_analytical_equivalent_backend_requires_explicit_opt_in(backend, tmp_path):
     with pytest.raises(SystemExit) as exc:
         cal.main(
             [
@@ -83,8 +86,15 @@ def test_stub_equivalent_backend_requires_allow_stub(backend, tmp_path):
         )
 
     assert str(exc.value) == (
-        "stub backend requires --allow-stub; not authoritative for CAL"
+        "internal-analytical backend requires --allow-internal-analytical; "
+        "not authoritative for CAL"
     )
+
+
+def test_legacy_allow_stub_flag_alias_is_accepted():
+    args = cal._parse_args(["--allow-stub"])
+
+    assert args.allow_internal_analytical is True
 
 
 @pytest.mark.parametrize(
@@ -103,7 +113,7 @@ def test_internal_analytical_run_metadata_is_stub_non_authoritative(
         assert backend == "stub"
         return {
             "case": {"feedstock": case.feedstock, "campaign": case.campaign},
-            "backend": {"name": "StubBackend"},
+            "backend": {"name": "InternalAnalyticalBackend"},
             "stop_reason": "complete",
             "elapsed_s": 0.0,
             "rows": [
@@ -125,7 +135,7 @@ def test_internal_analytical_run_metadata_is_stub_non_authoritative(
         [
             "--backend",
             "internal-analytical",
-            "--allow-stub",
+            "--allow-internal-analytical",
             "--feedstock",
             "lunar_mare_low_ti",
             "--campaign",
@@ -140,7 +150,10 @@ def test_internal_analytical_run_metadata_is_stub_non_authoritative(
     assert rc == 0
     payload = json.loads((tmp_path / "out" / "raw_curves.json").read_text())
     assert payload["metadata"]["backend"] == "stub"
-    assert payload["metadata"]["backend_fidelity"] == "stub-non-authoritative"
+    assert (
+        payload["metadata"]["backend_fidelity"]
+        == "stub-non-authoritative"
+    )
 
 
 def test_worker_payload_requires_exactly_one_feedstock():
@@ -276,7 +289,7 @@ def test_c2a_campaign_targets_match_setpoints_contract():
     assert "Mg" not in cal.CAMPAIGN_TARGETS["C2A_continuous"]
 
 
-def test_stub_backend_never_blocked_by_partial_matrix():
+def test_internal_analytical_backend_never_blocked_by_partial_matrix():
     assert not cal._is_real_backend_calibration_blocked(
         [{"rows": [], "stop_reason": "timeout"}],
         {"row_count": 0, "analysis_by_feedstock_campaign_target": {}},

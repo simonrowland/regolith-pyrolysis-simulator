@@ -11,7 +11,7 @@ from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import PyrolysisSimulator
 from simulator.equipment import EquipmentDesigner
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.optimize import job_runner as optimizer_job_runner
 from simulator.optimize.objective import compute_objectives
 from web import routes as web_routes
@@ -86,7 +86,7 @@ def client(tmp_path):
 
 
 def _sim(feedstocks: dict) -> PyrolysisSimulator:
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,

@@ -3,7 +3,7 @@ import importlib
 import pytest
 
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import MOLAR_MASS, OXIDE_TO_METAL
 
 
@@ -17,7 +17,7 @@ def _required_attr(module_name, attr_name):
 
 
 def _sim(feedstocks):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,

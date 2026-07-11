@@ -4,7 +4,8 @@
 Opt-in batch driver. It attaches ``PT0DeterminismStore(db_path=...)`` to
 normal ``PyrolysisSimulator.step()`` runs and records only compact metrics.
 Correct reduced-real population uses ``--backend alphamelts --require-magemin``;
-stub-backed equilibrium rows are rejected before persistent merge.
+internal-analytical-backed equilibrium rows are rejected before persistent
+merge.
 """
 
 from __future__ import annotations
@@ -30,7 +31,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.backends import BackendSelectionPolicy
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.config import load_config_bundle
@@ -339,7 +343,7 @@ def _start_session(
     mass_kg: float,
     additives_kg: Mapping[str, float],
     store: PT0DeterminismStore,
-    allow_stub_equilibrium: bool,
+    allow_internal_analytical_equilibrium: bool,
 ) -> SimSession:
     cfg = load_config_bundle()
     session = SimSession().start(
@@ -356,11 +360,12 @@ def _start_session(
         )
     )
     session.simulator.configure_pt0_determinism_store(store)
-    if backend_name == "stub":
-        if not allow_stub_equilibrium:
+    if backend_name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
+        if not allow_internal_analytical_equilibrium:
             raise RuntimeError(
-                "stub backend selected for gate population; pass "
-                "--allow-stub-equilibrium to use stub equilibrium only as the "
+                "internal-analytical backend selected for gate population; pass "
+                "--allow-internal-analytical-equilibrium to use the analytical "
+                "equilibrium only as the "
                 "non-gate step driver while MAGEMin populates GATE_LIQUID_FRACTION"
             )
         session.simulator.backend.is_available = lambda: True
@@ -488,7 +493,7 @@ def _run_case(
     db_path: Path,
     mode: str,
     disable_live: bool,
-    allow_stub_equilibrium: bool,
+    allow_internal_analytical_equilibrium: bool,
     control_quantization: ControlQuantization | None = None,
 ) -> dict[str, Any]:
     store = PT0DeterminismStore(
@@ -505,7 +510,7 @@ def _run_case(
         mass_kg=mass_kg,
         additives_kg=additives_kg,
         store=store,
-        allow_stub_equilibrium=allow_stub_equilibrium,
+        allow_internal_analytical_equilibrium=allow_internal_analytical_equilibrium,
     )
     if disable_live:
         _disable_live_providers(session)
@@ -933,7 +938,12 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--validate-replay", action="store_true")
     parser.add_argument("--include-kreep", action="store_true")
     parser.add_argument("--require-magemin", action="store_true")
-    parser.add_argument("--allow-stub-equilibrium", action="store_true")
+    parser.add_argument(
+        "--allow-internal-analytical-equilibrium",
+        "--allow-stub-equilibrium",
+        dest="allow_internal_analytical_equilibrium",
+        action="store_true",
+    )
     parser.add_argument(
         "--control-quantization",
         type=_parse_control_quantization_arg,
@@ -964,9 +974,12 @@ def main(argv: list[str]) -> int:
     campaigns = tuple(args.campaigns or _profile_campaigns(profile))
     cli_additives_kg = _cli_additives(args.additives)
     magemin = _magemin_status()
-    if str(args.backend).strip().lower() == "stub":
+    if (
+        str(args.backend).strip().lower()
+        == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    ):
         raise RuntimeError(
-            "stub backend cannot populate the PT-1 reduced-real cache; "
+            "internal-analytical backend cannot populate the PT-1 reduced-real cache; "
             "use --backend alphamelts --require-magemin"
         )
     if args.require_magemin and not magemin["available"]:
@@ -1030,7 +1043,7 @@ def main(argv: list[str]) -> int:
                         db_path=shard_db,
                         mode="capture",
                         disable_live=False,
-                        allow_stub_equilibrium=args.allow_stub_equilibrium,
+                        allow_internal_analytical_equilibrium=args.allow_internal_analytical_equilibrium,
                         control_quantization=args.control_quantization,
                     )
                 except (RuntimeError, ValueError) as exc:
@@ -1093,7 +1106,8 @@ def main(argv: list[str]) -> int:
                             additives_by_feedstock,
                         ),
                         "db": str(args.db),
-                        "allow_stub_equilibrium": bool(args.allow_stub_equilibrium),
+                        "allow_stub_equilibrium": bool(args.allow_internal_analytical_equilibrium),
+                        "allow_internal_analytical_equilibrium": bool(args.allow_internal_analytical_equilibrium),
                         "magemin": magemin,
                         "live": live_results,
                         "replay": [],
@@ -1162,7 +1176,7 @@ def main(argv: list[str]) -> int:
                         db_path=replay_db_path,
                         mode="replay",
                         disable_live=True,
-                        allow_stub_equilibrium=args.allow_stub_equilibrium,
+                        allow_internal_analytical_equilibrium=args.allow_internal_analytical_equilibrium,
                         control_quantization=args.control_quantization,
                     )
                 )
@@ -1202,7 +1216,8 @@ def main(argv: list[str]) -> int:
             "campaigns": list(campaigns),
             "additives_kg": _additives_result(feedstocks, additives_by_feedstock),
             "db": str(args.db),
-            "allow_stub_equilibrium": bool(args.allow_stub_equilibrium),
+            "allow_stub_equilibrium": bool(args.allow_internal_analytical_equilibrium),
+            "allow_internal_analytical_equilibrium": bool(args.allow_internal_analytical_equilibrium),
             "magemin": magemin,
             "live": live_results,
             "replay": replay_results,

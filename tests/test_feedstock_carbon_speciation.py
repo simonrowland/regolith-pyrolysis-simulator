@@ -6,7 +6,7 @@ import yaml
 from simulator.accounting import resolve_species_formula
 from simulator.core import PyrolysisSimulator
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 
 
 DATA_PATH = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
@@ -18,7 +18,7 @@ def feedstocks():
 
 
 def _sim(feedstocks):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,

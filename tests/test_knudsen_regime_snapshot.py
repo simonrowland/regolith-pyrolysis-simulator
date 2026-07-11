@@ -68,7 +68,7 @@ def test_snapshot_knudsen_summary_carries_canonical_fields_after_route():
     populated by directly invoking ``condensation_model.route(...)``
     before reading the snapshot, instead of relying on the C2A
     integration path firing the route within 4 ticks (which it
-    doesn't in stub-backend mode). The test now actually exercises
+    doesn't in internal-analytical mode). The test now actually exercises
     the populated-summary code path instead of passing vacuously."""
     from simulator.state import EvaporationFlux
 

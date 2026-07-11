@@ -8,7 +8,7 @@ from simulator.melt_backend.base import (
     EquilibriumResult,
     LiquidFractionInvalidError,
     MeltCompositionError,
-    StubBackend,
+    InternalAnalyticalBackend,
     projection_diagnostics_for_melt_input,
     project_melt_to_oxide_projection,
 )
@@ -31,8 +31,8 @@ def test_equilibrium_result_default_viscosity_is_unknown():
     assert result.liquid_viscosity_Pa_s is None
 
 
-def test_stub_backend_reports_unavailable_with_no_liquid_fraction():
-    result = StubBackend().equilibrate(temperature_C=1500.0)
+def test_internal_analytical_backend_reports_unavailable_with_no_liquid_fraction():
+    result = InternalAnalyticalBackend().equilibrate(temperature_C=1500.0)
 
     assert result.status != 'ok'
     assert result.liquid_fraction is None

@@ -8,7 +8,7 @@ import pytest
 import simulator.optimize.pool as pool_module
 import simulator.optimize.worker_runtime as worker_runtime_module
 import simulator.session as session_module
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.optimize.evaluate import EngineBugAbort, evaluate
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.worker_runtime import (
@@ -61,8 +61,8 @@ def _clear_runtime() -> object:
     clear_worker_runtime()
 
 
-def _stub_backend() -> StubBackend:
-    backend = StubBackend()
+def _internal_analytical_backend() -> InternalAnalyticalBackend:
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return backend
 
@@ -82,9 +82,9 @@ def test_warm_runtime_reuses_backend_but_creates_fresh_sim_and_ledger(
     monkeypatch.delenv(WARM_WORKERS_ENV, raising=False)
     resolve_calls: list[str] = []
 
-    def resolve_once(backend_name: str, *_args: object, **_kwargs: object) -> StubBackend:
+    def resolve_once(backend_name: str, *_args: object, **_kwargs: object) -> InternalAnalyticalBackend:
         resolve_calls.append(backend_name)
-        return _stub_backend()
+        return _internal_analytical_backend()
 
     monkeypatch.setattr(worker_runtime_module, "resolve_backend", resolve_once)
     context = warm_worker_runtime(
@@ -137,9 +137,9 @@ def test_cold_env_forces_fresh_backend_resolve(
         backend_name: str,
         *_args: object,
         **_kwargs: object,
-    ) -> StubBackend:
+    ) -> InternalAnalyticalBackend:
         resolve_calls.append(backend_name)
-        return _stub_backend()
+        return _internal_analytical_backend()
 
     monkeypatch.setattr(session_module, "resolve_backend", resolve_every_time)
 
@@ -176,7 +176,7 @@ def test_worker_runtime_keyed_by_feedstock_and_subprocess_required(
     monkeypatch.setattr(
         worker_runtime_module,
         "resolve_backend",
-        lambda *_args, **_kwargs: _stub_backend(),
+        lambda *_args, **_kwargs: _internal_analytical_backend(),
     )
 
     context = warm_worker_runtime(
@@ -205,7 +205,7 @@ def test_backend_from_worker_runtime_rejects_feedstock_mismatch(
     monkeypatch.setattr(
         worker_runtime_module,
         "resolve_backend",
-        lambda *_args, **_kwargs: _stub_backend(),
+        lambda *_args, **_kwargs: _internal_analytical_backend(),
     )
     context = warm_worker_runtime(
         "stub",
@@ -224,7 +224,7 @@ def test_backend_from_worker_runtime_rejects_subprocess_mismatch(
     monkeypatch.setattr(
         worker_runtime_module,
         "resolve_backend",
-        lambda *_args, **_kwargs: _stub_backend(),
+        lambda *_args, **_kwargs: _internal_analytical_backend(),
     )
     context = warm_worker_runtime(
         "stub",
@@ -243,7 +243,7 @@ def test_evaluate_uses_thread_local_worker_runtime(
     monkeypatch.setattr(
         worker_runtime_module,
         "resolve_backend",
-        lambda *_args, **_kwargs: _stub_backend(),
+        lambda *_args, **_kwargs: _internal_analytical_backend(),
     )
     context = warm_worker_runtime(
         "stub",
@@ -279,7 +279,7 @@ def test_evaluate_declines_thread_local_worker_runtime_for_feedstock_mismatch(
     monkeypatch.setattr(
         worker_runtime_module,
         "resolve_backend",
-        lambda *_args, **_kwargs: _stub_backend(),
+        lambda *_args, **_kwargs: _internal_analytical_backend(),
     )
     context = warm_worker_runtime(
         "stub",

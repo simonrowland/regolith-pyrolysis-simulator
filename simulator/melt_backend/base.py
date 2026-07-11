@@ -5,7 +5,7 @@ Melt Backend — Abstract Interface & Data Classes
 Defines the abstract MeltBackend interface and EquilibriumResult
 that all thermodynamic backends must implement:
 AlphaMELTSBackend, VapoRockBackend, MAGEMinBackend, and
-StubBackend.
+InternalAnalyticalBackend.
 """
 
 from __future__ import annotations
@@ -507,7 +507,7 @@ class MeltBackend(ABC):
       or subprocess)
     - VapoRockBackend (vapor-melt equilibrium / vapor-side only)
     - MAGEMinBackend (silicate phase equilibrium, shadow second opinion)
-    - StubBackend (no phase equilibrium; core.py owns Antoine fallback)
+    - InternalAnalyticalBackend (no phase equilibrium; core.py owns Antoine fallback)
     """
 
     @abstractmethod
@@ -575,15 +575,14 @@ class MeltBackend(ABC):
         return ', '.join(enabled) if enabled else 'none'
 
 
-class StubBackend(MeltBackend):
+class InternalAnalyticalBackend(MeltBackend):
     """
     The builtin analytical melt backend (``internal-analytical``).
 
     Named ``internal-analytical`` in trust-architecture vocabulary; ``stub`` is
-    the legacy backend name and the stable serialization token (the class name
-    ``StubBackend`` is kept as the denylist hinge — ``backend_resolution_status``
-    keys non-authoritative status off it). Returns empty equilibrium results;
-    the simulator's ``_stub_equilibrium()`` method handles Ellingham/Antoine
+    the legacy input alias and stable serialization token. Returns empty
+    equilibrium results; the simulator's
+    ``_internal_analytical_equilibrium()`` method handles Ellingham/Antoine
     vapor pressures independently of this class. Denylisted from certification
     gates: it never holds ledger authority and never certifies.
     """
@@ -592,13 +591,14 @@ class StubBackend(MeltBackend):
         return True
 
     def is_available(self) -> bool:
-        return False  # Signals core.py to use its own stub logic
+        return False  # Signals core.py to use its internal analytical model.
 
     def equilibrate(self, temperature_C, composition_kg=None,
                     fO2_log=-9.0, pressure_bar=1e-6, *,
                     composition_mol=None, composition_mol_by_account=None,
                     species_formula_registry=None):
-        # The stub wraps no real engine; is_available() is False and
+        # The internal analytical backend wraps no external engine;
+        # is_available() is False and
         # core.py runs its own Ellingham/Antoine path instead.
         return EquilibriumResult(
             temperature_C=temperature_C,

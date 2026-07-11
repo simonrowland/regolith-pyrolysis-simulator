@@ -10,7 +10,7 @@ import yaml
 from simulator.backends import BackendSelectionPolicy, CachedRealBackend, CachedRealConfig
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session import SimSession, SimSessionConfig
 from simulator.stage0_harness import (
     FOULANT_GROUPS,
@@ -140,7 +140,7 @@ def test_messy_harness_forces_subprocess_backend_route(monkeypatch, feedstock_ke
 
     def fake_resolve_backend(backend_name, policy, **kwargs):
         calls.append((backend_name, policy, kwargs))
-        backend = StubBackend()
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 

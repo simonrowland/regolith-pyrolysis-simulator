@@ -7,7 +7,10 @@ from enum import Enum
 import math
 from typing import Any, Callable, Iterable, Mapping
 
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.backends import (
     BackendSelectionPolicy,
     CACHED_REAL_BACKEND_NAME,
@@ -135,7 +138,7 @@ class SimSessionConfig:
     vapor_pressures: Mapping[str, Any]
     materials: Mapping[str, Any] | None = None
     campaign: str = "C0"
-    backend_name: str = "stub"
+    backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
     backend_policy: BackendSelectionPolicy = BackendSelectionPolicy.RUNNER_STRICT
     hours: int = 0
     mass_kg: float = 1000.0

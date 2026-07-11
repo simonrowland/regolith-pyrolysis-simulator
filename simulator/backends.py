@@ -26,7 +26,7 @@ from simulator.melt_backend.alphamelts import (
     MELTS_MAJOR_OXIDES,
     MELTS_OXIDE_ALIASES,
 )
-from simulator.melt_backend.base import DEFAULT_BACKEND_CAPABILITIES, StubBackend
+from simulator.melt_backend.base import DEFAULT_BACKEND_CAPABILITIES, InternalAnalyticalBackend
 
 
 INELIGIBLE_ACTIVE_BACKENDS = ("vaporock", "magemin")
@@ -185,7 +185,7 @@ class CachedRealBackend:
     """MeltBackend-shaped cached-real facade.
 
     Cache lookup is owned by ``PT0DeterminismStore`` in ``core.py``. This
-    facade gives the public resolver a distinct, non-stub backend identity and
+    facade gives the public resolver a distinct, non-analytical backend identity and
     delegates only explicit ``live-fill`` misses to an active-safe real backend.
     """
 
@@ -588,7 +588,7 @@ def stage0_subprocess_backend_config(
     if not subprocess_required:
         return copied
     name = str(backend_name or "").strip().lower()
-    if name == "stub":
+    if name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
         return copied
     if name not in ("", "auto", "alphamelts", CACHED_REAL_BACKEND_NAME):
         return copied
@@ -635,7 +635,10 @@ def assert_stage0_subprocess_backend_safe(
     if not subprocess_required:
         return
     active = str(getattr(backend, "name", type(backend).__name__) or "").lower()
-    if active == "stub" or type(backend).__name__ == "StubBackend":
+    if (
+        active == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        or isinstance(backend, InternalAnalyticalBackend)
+    ):
         return
     if active == CACHED_REAL_BACKEND_NAME:
         cached_config = getattr(backend, "config", None)
@@ -691,7 +694,7 @@ def resolve_backend(
     log_selection: Callable[[object], None] | None = None,
     log_message: Callable[[str], None] | None = None,
     alphamelts_backend_cls: type = AlphaMELTSBackend,
-    stub_backend_cls: type = StubBackend,
+    internal_analytical_backend_cls: type = InternalAnalyticalBackend,
     cached_real_config: CachedRealConfig | Mapping[str, Any] | None = None,
     cached_real_live_backend_cls: type | None = None,
     required_intents: Iterable[Any] | None = None,
@@ -727,7 +730,7 @@ def resolve_backend(
             log_selection=log_selection,
             log_message=log_message,
             alphamelts_backend_cls=alphamelts_backend_cls,
-            stub_backend_cls=stub_backend_cls,
+            internal_analytical_backend_cls=internal_analytical_backend_cls,
             cached_real_config=cached_real_config,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
             backend_config=effective_backend_config,
@@ -737,7 +740,7 @@ def resolve_backend(
             backend_name,
             unavailable_error_cls=unavailable_error_cls,
             alphamelts_backend_cls=alphamelts_backend_cls,
-            stub_backend_cls=stub_backend_cls,
+            internal_analytical_backend_cls=internal_analytical_backend_cls,
             cached_real_config=cached_real_config,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
             backend_config=effective_backend_config,
@@ -791,19 +794,21 @@ def backend_resolution_status(backend: Any) -> BackendResolutionStatus:
     if isinstance(status, BackendResolutionStatus):
         return status
 
-    active_backend = type(backend).__name__
-    is_stub = isinstance(backend, StubBackend) or active_backend == "StubBackend"
-    backend_status = (
-        BACKEND_STATUS_UNAVAILABLE if is_stub else BACKEND_STATUS_OK
+    is_internal_analytical = isinstance(backend, InternalAnalyticalBackend)
+    active_backend = (
+        "StubBackend" if is_internal_analytical else type(backend).__name__
     )
-    authoritative = backend_status == BACKEND_STATUS_OK and not is_stub
+    backend_status = (
+        BACKEND_STATUS_UNAVAILABLE if is_internal_analytical else BACKEND_STATUS_OK
+    )
+    authoritative = backend_status == BACKEND_STATUS_OK and not is_internal_analytical
     return BackendResolutionStatus(
         requested_backend=str(getattr(backend, "name", active_backend) or active_backend),
         active_backend=active_backend,
         backend_status=backend_status,
         authoritative=authoritative,
         selection_policy="unknown",
-        message=_backend_status_message(backend, is_stub=is_stub),
+        message=_backend_status_message(backend, is_internal_analytical=is_internal_analytical),
     )
 
 
@@ -835,18 +840,22 @@ def _make_backend_resolution_status(
     requested_backend: str,
     policy: BackendSelectionPolicy,
 ) -> BackendResolutionStatus:
-    active_backend = type(backend).__name__
-    is_stub = isinstance(backend, StubBackend) or active_backend == "StubBackend"
+    is_internal_analytical = isinstance(backend, InternalAnalyticalBackend)
+    # This value is serialized. Keep the legacy class identity until the
+    # corpus-bump migration flips stored backend identities atomically.
+    active_backend = (
+        "StubBackend" if is_internal_analytical else type(backend).__name__
+    )
     backend_status = (
-        BACKEND_STATUS_UNAVAILABLE if is_stub else BACKEND_STATUS_OK
+        BACKEND_STATUS_UNAVAILABLE if is_internal_analytical else BACKEND_STATUS_OK
     )
     return BackendResolutionStatus(
         requested_backend=requested_backend,
         active_backend=active_backend,
         backend_status=backend_status,
-        authoritative=backend_status == BACKEND_STATUS_OK and not is_stub,
+        authoritative=backend_status == BACKEND_STATUS_OK and not is_internal_analytical,
         selection_policy=policy.value,
-        message=_backend_status_message(backend, is_stub=is_stub),
+        message=_backend_status_message(backend, is_internal_analytical=is_internal_analytical),
     )
 
 
@@ -862,15 +871,18 @@ def _attach_backend_resolution_status(
         return
 
 
-def _backend_status_message(backend: Any, *, is_stub: bool) -> str:
+def _backend_status_message(backend: Any, *, is_internal_analytical: bool) -> str:
     fallback_message = _backend_selection_fallback_message(backend)
     if fallback_message:
         return fallback_message
-    if is_stub:
+    if is_internal_analytical:
         # Serialized via BackendResolutionStatus.as_payload() -> keep this
         # message byte-identical (golden-neutral). The `internal-analytical`
         # display wording lives in non-serialized UI/docs only.
-        return "stub backend selected; no authoritative melt result available"
+        return (
+            "stub backend selected; "
+            "no authoritative melt result available"
+        )
     return "backend selected"
 
 
@@ -942,7 +954,7 @@ def _resolve_web_autodetect(
     log_selection: Callable[[object], None] | None,
     log_message: Callable[[str], None] | None,
     alphamelts_backend_cls: type,
-    stub_backend_cls: type,
+    internal_analytical_backend_cls: type,
     cached_real_config: CachedRealConfig | Mapping[str, Any] | None,
     cached_real_live_backend_cls: type | None,
     backend_config: Mapping[str, Any] | None,
@@ -966,18 +978,22 @@ def _resolve_web_autodetect(
         _log_selection(backend, log_selection, log_message)
         return backend
 
-    if name not in ("", "auto", "stub", "alphamelts"):
+    if name not in (
+        "",
+        "auto",
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "alphamelts",
+    ):
         raise unavailable_error_cls(
             f"unknown backend {name!r}; select auto, internal-analytical, "
             "alphamelts, or cached-real (internal-analytical legacy alias: stub)"
         )
 
-    # D1 fix: an explicit 'stub' request pins StubBackend deterministically;
-    # only 'auto'/'' fall through to the AlphaMELTS->Stub autodetect chain.
-    # (Previously 'stub' silently autodetected, so a caller asking for the
-    # deterministic stub got AlphaMELTS when it was available.)
-    if name == "stub":
-        backend = _stub_backend(stub_backend_cls)
+    # D1 fix: an explicit legacy alias request pins InternalAnalyticalBackend
+    # deterministically; only 'auto'/'' fall through to the
+    # AlphaMELTS->internal-analytical autodetect chain.
+    if name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
+        backend = _internal_analytical_backend(internal_analytical_backend_cls)
         _log_selection(backend, log_selection, log_message)
         return backend
 
@@ -1002,7 +1018,7 @@ def _resolve_web_autodetect(
     if backend is not None:
         _log_selection(backend, log_selection, log_message)
         return backend
-    backend = _stub_backend(stub_backend_cls)
+    backend = _internal_analytical_backend(internal_analytical_backend_cls)
     if forced_subprocess_probe:
         _attach_backend_selection_fallback_message(
             backend,
@@ -1017,13 +1033,13 @@ def _resolve_runner_strict(
     *,
     unavailable_error_cls: type[_E],
     alphamelts_backend_cls: type,
-    stub_backend_cls: type,
+    internal_analytical_backend_cls: type,
     cached_real_config: CachedRealConfig | Mapping[str, Any] | None,
     cached_real_live_backend_cls: type | None,
     backend_config: Mapping[str, Any] | None,
 ):
-    if name in ("", "stub"):
-        return _stub_backend(stub_backend_cls)
+    if name in ("", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN):
+        return _internal_analytical_backend(internal_analytical_backend_cls)
     if name == "auto":
         raise unavailable_error_cls(
             "auto backend selection is unavailable under runner-strict; "
@@ -1059,8 +1075,8 @@ def _try_alphamelts(
     return None
 
 
-def _stub_backend(stub_backend_cls: type):
-    backend = stub_backend_cls()
+def _internal_analytical_backend(internal_analytical_backend_cls: type):
+    backend = internal_analytical_backend_cls()
     backend.initialize({})
     return backend
 

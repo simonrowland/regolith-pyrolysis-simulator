@@ -7,7 +7,7 @@ from typing import Any
 
 import app as app_module
 import web.events as web_events
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import PyrolysisRun
 from simulator.session_cli import SessionScriptRunner
 
@@ -282,8 +282,8 @@ def _run_web_session(monkeypatch) -> SurfaceResult:
 def _install_stepwise_web(monkeypatch) -> list:
     captured_tasks = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -296,7 +296,7 @@ def _install_stepwise_web(monkeypatch) -> list:
             raise StopAfterStep()
 
     monkeypatch.setattr(web_events, "_safe_log", lambda _message: None)
-    monkeypatch.setattr(web_events, "_get_backend", force_stub_backend)
+    monkeypatch.setattr(web_events, "_get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(app_module.socketio, "sleep", stop_after_step)
     monkeypatch.setattr(
         app_module.socketio,

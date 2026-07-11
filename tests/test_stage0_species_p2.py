@@ -15,7 +15,7 @@ from simulator.core import (
     STAGE0_CHLORIDE_SALT_DISPOSITION,
     PyrolysisSimulator,
 )
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 
 # NIST-normal boiling points (C) for halide volatility anchors.
 NACL_BOILING_POINT_C = 1465.0
@@ -24,7 +24,7 @@ CAF2_BOILING_POINT_C = 2530.0
 
 
 def _sim(feedstocks):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,

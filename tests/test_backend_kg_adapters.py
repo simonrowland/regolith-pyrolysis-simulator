@@ -6,7 +6,7 @@ from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.accounting import AccountingError
 from simulator.equilibrium import EquilibriumMixin
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import EquilibriumResult, StubBackend
+from simulator.melt_backend.base import EquilibriumResult, InternalAnalyticalBackend
 from simulator.state import MOLAR_MASS
 
 
@@ -19,7 +19,7 @@ def _required_attr(module_name, attr_name):
     return getattr(module, attr_name)
 
 
-class RecordingStubBackend(StubBackend):
+class RecordingInternalAnalyticalBackend(InternalAnalyticalBackend):
     def __init__(self):
         self.calls = []
 
@@ -54,7 +54,7 @@ class RecordingStubBackend(StubBackend):
         return []
 
 
-class AtomDeltaBackend(RecordingStubBackend):
+class AtomDeltaBackend(RecordingInternalAnalyticalBackend):
     def __init__(self, MaterialLot, LedgerTransition):
         super().__init__()
         self.MaterialLot = MaterialLot
@@ -147,8 +147,8 @@ def _sim(backend):
     )
 
 
-def test_stub_backend_receives_mol_kernel_payload():
-    backend = RecordingStubBackend()
+def test_internal_analytical_backend_receives_mol_kernel_payload():
+    backend = RecordingInternalAnalyticalBackend()
     sim = _sim(backend)
     sim.load_batch("oxide", mass_kg=1000.0)
 
@@ -171,7 +171,7 @@ def test_stub_backend_receives_mol_kernel_payload():
 
 
 def test_backend_payload_ignores_stale_mutated_meltstate_kg():
-    backend = RecordingStubBackend()
+    backend = RecordingInternalAnalyticalBackend()
     sim = _sim(backend)
     sim.load_batch("oxide", mass_kg=1000.0)
     sim.melt.composition_kg["SiO2"] = 9999.0
@@ -254,7 +254,7 @@ def test_backend_result_cannot_credit_terminal_accounts():
 
 def test_backend_composition_mol_uses_empty_ledger_not_stale_melt_kg():
     MaterialLot = _required_attr("simulator.accounting", "MaterialLot")
-    backend = RecordingStubBackend()
+    backend = RecordingInternalAnalyticalBackend()
     sim = _sim(backend)
     sim.load_batch("oxide", mass_kg=1000.0)
     ledger_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
@@ -286,7 +286,7 @@ def test_backend_composition_mol_uses_empty_ledger_not_stale_melt_kg():
 
 
 def test_backend_composition_mol_preserves_noncanonical_ledger_species():
-    backend = RecordingStubBackend()
+    backend = RecordingInternalAnalyticalBackend()
     sim = _sim(backend)
     sim.load_batch("oxide", mass_kg=1000.0)
     sim.atom_ledger.load_external(
@@ -303,7 +303,7 @@ def test_backend_composition_mol_preserves_noncanonical_ledger_species():
 
 
 def test_backend_composition_mol_includes_spent_reductant_residue():
-    backend = RecordingStubBackend()
+    backend = RecordingInternalAnalyticalBackend()
     sim = _sim(backend)
     sim.load_batch("oxide", mass_kg=1000.0)
     before = sim._backend_composition_mol().get("Na2O", 0.0)

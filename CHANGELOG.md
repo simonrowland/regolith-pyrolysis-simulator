@@ -383,7 +383,7 @@ deferred to dedicated sessions. Gate stable at **938 passed / 77 skipped
   Previously when `VAPOR_PRESSURE` dispatch returned `status='unavailable'`
   (the import succeeded but the adapter call yielded no result), the
   empty kernel payload was treated identically to `status='ok'` with no
-  evaporation expected — silently falling back to stub/AlphaMELTS
+  evaporation expected — silently falling back to internal-analytical/AlphaMELTS
   pressures with no operator-visible signal. Now ANY non-'ok' kernel
   status with no pressures raises `RuntimeError` loud when
   `allow_fallback_vapor=False` (the production default) and surfaces
@@ -701,7 +701,7 @@ fully testable headlessly. Cross-surface scientific parity verified **exact**.
 - Lunar-operator nav link hidden (the operator game is a stub; route + code intact).
 
 ### Fixed
-- Web `backend='stub'` now deterministically selects `StubBackend` (previously routed
+- Web `backend='stub'` now deterministically selects `InternalAnalyticalBackend` (previously routed
   through autodetect and returned AlphaMELTS when installed).
 
 ### Validated

@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 
 from simulator.core import Atmosphere, CampaignPhase, PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 
 
 C0_ENDPOINT_SETPOINTS = {
@@ -17,7 +17,7 @@ C0_ENDPOINT_SETPOINTS = {
 
 
 def _sim(feedstocks):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,

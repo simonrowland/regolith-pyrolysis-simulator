@@ -35,6 +35,7 @@ from simulator.core import (
     PyrolysisSimulator,
 )
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.session import SimSession, SimSessionConfig, StepResult
 from simulator.state import CampaignPhase, DecisionType
 
@@ -607,7 +608,15 @@ def run_stage0_harness(
 
     cleaned_melt_kg = _capture_cleaned_melt_kg(sim)
     config = session._config
-    engine = str(getattr(config, "backend_name", "stub") if config else "stub")
+    engine = str(
+        getattr(
+            config,
+            "backend_name",
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        )
+        if config
+        else ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    )
     T_in_C = float(sim.melt.temperature_C)
     verdicts = build_harness_verdicts(
         cleaned_melt_kg=cleaned_melt_kg,

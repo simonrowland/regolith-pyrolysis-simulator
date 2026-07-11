@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Generate a REAL-fidelity optimizer profile from a shipped stub profile.
+"""Generate a REAL-fidelity profile from a shipped internal-analytical profile.
 
-Flips backend stub->cached-real with live-fill, wiring the alphamelts subprocess
+Flips backend internal-analytical -> cached-real with live-fill, wiring the
+AlphaMELTS subprocess
 and a shared reduced-real equilibrium cache. The local engine identity is
 printed for provenance; cache authority comes from the committed corpus version.
 

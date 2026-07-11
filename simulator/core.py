@@ -135,7 +135,7 @@ from simulator.state import (
 from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import EvaporationMixin
 from simulator.extraction import ExtractionMixin
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.sulfsat import (
     SulfSatGate,
     SulfurSaturationResult,
@@ -510,7 +510,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ):
         """
         Args:
-            melt_backend: A MeltBackend instance (AlphaMELTS, stub, etc.)
+            melt_backend: A MeltBackend instance (AlphaMELTS,
+                          internal-analytical, etc.)
                           for thermodynamic equilibrium calculations.
             setpoints:    Campaign parameters loaded from setpoints.yaml.
                           May contain a top-level ``chemistry_kernel``
@@ -1349,7 +1350,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Register the AlphaMELTS diagnostic provider when the active
         # backend is an AlphaMELTSBackend (\goal ALPHAMELTS-DIAGNOSTIC-GATE,
         # #8). The provider wraps the today-hook adapter; if the user has
-        # selected a different backend (Stub / FactSAGE / MAGEMin / VapoRock)
+        # selected a different backend (internal-analytical / FactSAGE /
+        # MAGEMin / VapoRock)
         # nothing is registered for SILICATE_LIQUIDUS / SILICATE_EQUILIBRIUM
         # and the kernel raises ProviderUnavailableError for those intents
         # -- the equilibrium call site at simulator/equilibrium.py guards
@@ -1445,7 +1447,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         * Only one authoritative provider may exist per intent
           (:class:`ProviderRegistry` enforces this).
-        * Users may select a different backend (Stub / FactSAGE / etc.);
+        * Users may select a different backend (internal-analytical /
+          FactSAGE / etc.);
           registering AlphaMELTS unconditionally would crash when the
           backend is not an AlphaMELTSBackend (the provider would have
           nowhere to delegate).
@@ -5206,7 +5209,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # in docs-private/research/2026-06-18-staged-selectivity-optimizer/
         # sso-r-fe-redox-design.md. That replacement is golden-affecting
         # for sulfate feedstocks, so it is gated/re-baselined there, not a
-        # de-stub.
+        # replace the placeholder implementation.
         log_iw = -27215.0 / T_K + 6.57
         redox_offset = 0.0
         if feo > 0.0 and fe2o3 > 0.0:
@@ -6792,31 +6795,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'reduced-real cache miss requires a live backend; '
                     'no backend is configured'
                 )
-            return self._record_equilibrium_status(self._stub_equilibrium())
+            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
         if self._backend_failed:
             if cache_write_through:
                 raise RuntimeError(
                     self._last_backend_error
                     or 'reduced-real cache miss requires a live backend'
                 )
-            if not self._backend_allows_stub_fallback():
+            if not self._backend_allows_internal_analytical_fallback():
                 raise RuntimeError(
                     self._last_backend_error
                     or 'configured backend is disabled after failure'
                 )
-            return self._record_equilibrium_status(self._stub_equilibrium())
+            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
         if not self.backend.is_available():
             if cache_write_through:
                 raise RuntimeError(
                     self._last_backend_error
                     or f'{type(self.backend).__name__} is unavailable'
                 )
-            if not self._backend_allows_stub_fallback():
+            if not self._backend_allows_internal_analytical_fallback():
                 raise RuntimeError(
                     self._last_backend_error
                     or f'{type(self.backend).__name__} is unavailable'
                 )
-            return self._record_equilibrium_status(self._stub_equilibrium())
+            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
 
         diagnostic_silicate_equilibrium = False
         try:
@@ -6930,17 +6933,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._disable_backend_after_failure()
             if cache_write_through:
                 raise
-            if not self._backend_allows_stub_fallback():
+            if not self._backend_allows_internal_analytical_fallback():
                 raise
-            return self._record_equilibrium_status(self._stub_equilibrium())
+            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
         except ValueError as exc:
             self._last_backend_error = str(exc)
             self._disable_backend_after_failure()
             if cache_write_through:
                 raise
-            if not self._backend_allows_stub_fallback():
+            if not self._backend_allows_internal_analytical_fallback():
                 raise
-            return self._record_equilibrium_status(self._stub_equilibrium())
+            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
 
         transition = getattr(result, 'ledger_transition', None)
         if (
@@ -6953,9 +6956,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'AtomLedger transition'
             )
             self._disable_backend_after_failure()
-            if not self._backend_allows_stub_fallback():
+            if not self._backend_allows_internal_analytical_fallback():
                 raise RuntimeError(self._last_backend_error)
-            return self._record_equilibrium_status(self._stub_equilibrium())
+            return self._record_equilibrium_status(self._internal_analytical_equilibrium())
         if transition is not None:
             self._validate_backend_ledger_transition(transition)
             balances_before = self.atom_ledger.kg_by_account()
@@ -6992,7 +6995,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # vapor pressures; this call replaces result.vapor_pressures_Pa
         # with the kernel diagnostic so downstream consumers
         # (_calculate_evaporation, _route_to_condensation) read from the
-        # kernel-owned path. The legacy _stub_equilibrium still computes
+        # kernel-owned path. The legacy _internal_analytical_equilibrium still computes
         # vapor pressures (the Antoine/Ellingham math IS the underlying
         # implementation behind the kernel) but that result is overwritten
         # here. Shadow parity verified clean across a full smoke run
@@ -7023,7 +7026,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         Belongs to the VAPOR_PRESSURE flip in
         \\goal BUILTIN-ENGINE-EXTRACTION (#7). Called from
         :meth:`_record_equilibrium_status` after the backend (or the
-        legacy stub) produces an EquilibriumResult.
+        legacy internal analytical path) produces an EquilibriumResult.
 
         Behaviour:
           - Below 400 K both the legacy path and the kernel return an
@@ -7035,7 +7038,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             still stays kernel-owned but the source tag is promoted to
             ``thermoengine`` so the report can prove the L5 activity path
             reached the evaporation surface without changing flux values.
-            The activities dict is replaced too (the legacy stub set both
+            The activities dict is replaced too (the internal analytical path
+            set both
             atomically and downstream code keys off the same source).
           - If the equilibrium result proves zero liquid fraction,
             no liquid surface exists.  Clear any backend vapor pressures
@@ -7198,7 +7202,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # result) identically to ``status='ok'`` with no
             # evaporation expected. Under ``allow_fallback_vapor=False``
             # that is a silent downgrade: the run continues on
-            # stub/AlphaMELTS pressures with no operator-visible
+            # internal-analytical/AlphaMELTS pressures with no operator-visible
             # signal. Now we distinguish:
             #
             #   - status='ok' / empty kernel_vp: legit (e.g. melt
@@ -7325,10 +7329,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return False
         return name in signature.parameters
 
-    def _backend_allows_stub_fallback(self) -> bool:
+    def _backend_allows_internal_analytical_fallback(self) -> bool:
         return (
             self.backend is None
-            or isinstance(self.backend, StubBackend)
+            or isinstance(self.backend, InternalAnalyticalBackend)
         )
 
     def _disable_backend_after_failure(self) -> None:

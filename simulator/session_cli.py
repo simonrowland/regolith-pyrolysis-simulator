@@ -10,7 +10,10 @@ import shlex
 import sys
 from typing import Any, Iterable, Mapping, TextIO
 
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.backends import BackendSelectionPolicy
 from simulator.config import load_config_bundle
 from simulator.runner import DATA_DIR, RunnerError, build_per_hour_summary
@@ -300,11 +303,16 @@ def _start_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mass-kg", dest="mass_kg", type=float, default=1000.0)
     parser.add_argument(
         "--backend",
-        default="stub",
+        default=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
         # type folds the internal-analytical alias (any case / whitespace) onto
         # `stub` BEFORE choices validation, matching resolver tolerance.
         type=canonical_backend_name,
-        choices=("stub", "internal-analytical", "internal_analytical", "alphamelts"),
+        choices=(
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            "internal-analytical",
+            "internal_analytical",
+            "alphamelts",
+        ),
     )
     parser.add_argument(
         "--track",

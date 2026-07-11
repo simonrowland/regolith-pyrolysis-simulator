@@ -17,12 +17,12 @@ from simulator.accounting.completeness import (
     vapor_contract_completeness,
 )
 from simulator.feedstock_guard import BlockedFeedstockError, is_blocked_feedstock
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CampaignPhase, MOLAR_MASS
 
 
 def _sim(feedstocks):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,
@@ -34,7 +34,7 @@ def _sim(feedstocks):
 
 def _sim_with_data(feedstocks):
     data_dir = Path(__file__).parent.parent / "data"
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,

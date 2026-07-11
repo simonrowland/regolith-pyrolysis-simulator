@@ -63,7 +63,7 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # Post-0.5.0 (2026-05-27) thermo-data refresh (MnO NIST-JANAF +
     # autoreview-r8 vapor-pressure unavailable-path raise): 1 PPM
     # numerical drift on the SiO surface (Mn entry change shifts the
-    # _stub_equilibrium iteration order which alters FP rounding on
+    # _internal_analytical_equilibrium iteration order which alters FP rounding on
     # downstream dict-iterated quantities). 6.589955385e-06 →
     # 6.5899485456e-06 (rel ~1e-6). No physics change; pure FP noise
     # from a documented thermo-table update.

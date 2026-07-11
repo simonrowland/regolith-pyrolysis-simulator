@@ -180,7 +180,7 @@ class EquilibriumMixin:
     #   n_ox = moles of oxide per mol O₂ in the decomposition reaction
     _ELLINGHAM_THERMO = _CANONICAL_ELLINGHAM_THERMO
 
-    def _stub_equilibrium(self):
+    def _internal_analytical_equilibrium(self):
         """
         Fallback equilibrium using Ellingham thermodynamics + Antoine
         vapor pressures.

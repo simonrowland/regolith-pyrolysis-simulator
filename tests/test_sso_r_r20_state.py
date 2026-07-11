@@ -28,7 +28,7 @@ from simulator.fe_redox import (
     KRESS91_INV_T_COEFFICIENT_K,
     KRESS91_LN_FO2_COEFFICIENT,
 )
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase, EvaporationFlux, MeltState
 from scripts import evaporation_selectivity_map as selectivity_map
@@ -52,7 +52,7 @@ def _make_sim(
     setpoints = _load_yaml("setpoints.yaml")
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
     sim = PyrolysisSimulator(
-        StubBackend(),
+        InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
         _load_yaml("vapor_pressures.yaml"),
@@ -266,7 +266,7 @@ def _make_custom_feedstock_sim(
     setpoints = _load_yaml("setpoints.yaml")
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
     sim = PyrolysisSimulator(
-        StubBackend(),
+        InternalAnalyticalBackend(),
         setpoints,
         feedstocks,
         _load_yaml("vapor_pressures.yaml"),
@@ -1419,7 +1419,7 @@ def test_c7_external_al_credit_lowers_fO2_from_committed_transition(
         {"enabled": True, "al_credit_limit_kg": 20.0, "extent_fraction": 0.1}
     )
     sim = PyrolysisSimulator(
-        StubBackend(),
+        InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
         _load_yaml("vapor_pressures.yaml"),
@@ -1479,7 +1479,7 @@ def test_c7_in_situ_al_route_does_not_double_count_prior_reducing_power(
         {"enabled": True, "al_credit_limit_kg": 0.0, "extent_fraction": 0.1}
     )
     sim = PyrolysisSimulator(
-        StubBackend(),
+        InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
         _load_yaml("vapor_pressures.yaml"),
@@ -1532,7 +1532,7 @@ def test_c7_mixed_in_situ_and_external_al_counts_only_external_credit_sink(
         {"enabled": True, "al_credit_limit_kg": 20.0, "extent_fraction": 0.1}
     )
     sim = PyrolysisSimulator(
-        StubBackend(),
+        InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
         _load_yaml("vapor_pressures.yaml"),
@@ -1607,7 +1607,7 @@ def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
         }
     )
     sim = PyrolysisSimulator(
-        StubBackend(),
+        InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
         _load_yaml("vapor_pressures.yaml"),
@@ -2230,7 +2230,7 @@ def test_live_paths_do_not_call_intrinsic_heuristic(monkeypatch) -> None:
     monkeypatch.setattr(sim._sulfsat_gate, "compute_sulfur_saturation", fake_sulfsat)
 
     assert sim._freeze_gate_curve()["source"] == "test_cached_curve"
-    assert sim._stub_equilibrium().fO2_log == pytest.approx(-6.5)
+    assert sim._internal_analytical_equilibrium().fO2_log == pytest.approx(-6.5)
     sim._attach_post_equilibrium_sulfsat(SimpleNamespace(warnings=[]))
 
     assert seen_sulfsat_fO2 == pytest.approx([-6.5])

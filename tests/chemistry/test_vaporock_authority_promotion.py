@@ -21,7 +21,7 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from engines.vaporock import VapoRockDiagnostics, VapoRockProvider
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import EquilibriumResult, StubBackend
+from simulator.melt_backend.base import EquilibriumResult, InternalAnalyticalBackend
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
@@ -53,7 +53,7 @@ def _build_sim(
     *,
     allow_fallback_vapor: bool = False,
 ) -> PyrolysisSimulator:
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     setpoints = dict(setpoints_data)
     kernel_cfg = dict(setpoints.get("chemistry_kernel", {}) or {})

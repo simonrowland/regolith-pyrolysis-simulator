@@ -6,7 +6,7 @@ import pytest
 import simulator.evaporation as evaporation_module
 from simulator.accounting import AccountingError, MaterialLot
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import (
     Atmosphere,
     CampaignPhase,
@@ -17,7 +17,7 @@ from simulator.state import (
 
 
 def _gas_train_sim(mass_kg=100.0):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -37,7 +37,7 @@ def _gas_train_sim(mass_kg=100.0):
 
 
 def _sio_train_sim():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -69,7 +69,7 @@ def _sio_o2_kg(sio_kg):
 
 
 def _cro2_train_sim():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     cr2o3_mw = MOLAR_MASS["Cr2O3"]
     cro2_mw = MOLAR_MASS["CrO2"]
@@ -107,7 +107,7 @@ def _bypass_analytic_depletion(sim):
 
 
 def test_turbine_venting_uses_actual_o2_not_total_evaporation_mass():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -132,7 +132,7 @@ def test_turbine_venting_uses_actual_o2_not_total_evaporation_mass():
 
 
 def test_mre_anode_o2_is_not_turbine_throughput():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -428,7 +428,7 @@ def test_condensation_projection_waits_for_ledger_credit():
 
 
 def test_sio_vapor_requires_explicit_stoich_metadata():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -453,7 +453,7 @@ def test_sio_vapor_requires_explicit_stoich_metadata():
 
 
 def test_vapor_species_without_parent_oxide_fails_before_flux():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -477,7 +477,7 @@ def test_vapor_species_without_parent_oxide_fails_before_flux():
 
 
 def test_sio_vapor_explicit_stoich_must_mass_close():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -504,7 +504,7 @@ def test_sio_vapor_explicit_stoich_must_mass_close():
 
 
 def test_intact_oxide_vapor_allows_zero_o2_stoich():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -535,7 +535,7 @@ def test_intact_oxide_vapor_allows_zero_o2_stoich():
 
 
 def test_explicit_vapor_stoich_must_conserve_atoms_not_just_mass():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -582,7 +582,7 @@ def test_cro2_condenses_to_terminal_chromium_oxide_account():
 
 
 def test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     oxide_per_feo = 0.5 * MOLAR_MASS["Fe2O3"] / MOLAR_MASS["FeO"]
     o2_per_feo = 0.25 * MOLAR_MASS["O2"] / MOLAR_MASS["FeO"]
@@ -633,9 +633,9 @@ def test_elemental_stoich_fallback_is_mass_and_atom_checked(monkeypatch):
 
 def _sio_o2_train_sim():
     """SiO + O2 train with explicit Antoine data so the builtin
-    _stub_equilibrium actually emits a SiO vapor pressure and the
+    _internal_analytical_equilibrium actually emits a SiO vapor pressure and the
     SiO √pO₂ suppression path is exercised."""
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -671,17 +671,17 @@ def _sio_o2_train_sim():
     return sim
 
 
-def test_stub_equilibrium_ok_paths_are_vapor_only_without_liquid_fraction():
+def test_internal_analytical_equilibrium_ok_paths_are_vapor_only_without_liquid_fraction():
     sim = _sio_o2_train_sim()
 
     sim.melt.temperature_C = 25.0
-    cold = sim._stub_equilibrium()
+    cold = sim._internal_analytical_equilibrium()
     assert cold.status == "ok"
     assert cold.liquid_fraction is None
     assert cold.phase_assemblage_available is False
 
     sim.melt.temperature_C = 1600.0
-    hot = sim._stub_equilibrium()
+    hot = sim._internal_analytical_equilibrium()
     assert hot.status == "ok"
     assert hot.liquid_fraction is None
     assert hot.phase_assemblage_available is False
@@ -770,8 +770,8 @@ def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
 
     sim._headspace_transport_pO2_bar = _spy_transport
 
-    equilibrium = sim._stub_equilibrium()
-    assert calls, "_stub_equilibrium must consult _headspace_transport_pO2_bar"
+    equilibrium = sim._internal_analytical_equilibrium()
+    assert calls, "_internal_analytical_equilibrium must consult _headspace_transport_pO2_bar"
     assert calls[0] == pytest.approx(reservoir.headspace_transport_pO2_bar)
     assert equilibrium.fO2_log == pytest.approx(
         reservoir.melt_intrinsic_fO2_log
@@ -799,7 +799,7 @@ def test_evaporation_flux_does_not_reapply_commanded_po2():
         return real_commanded()
 
     sim._commanded_pO2_bar = _spy_commanded
-    equilibrium = sim._stub_equilibrium()
+    equilibrium = sim._internal_analytical_equilibrium()
     calls.clear()
     flux = sim._calculate_evaporation(equilibrium)
     sim._commanded_pO2_bar = real_commanded
@@ -809,7 +809,7 @@ def test_evaporation_flux_does_not_reapply_commanded_po2():
 
 
 def test_equilibrium_does_not_emit_o2_vapor_species():
-    """_stub_equilibrium only ever writes metal + declared oxide vapors
+    """_internal_analytical_equilibrium only ever writes metal + declared oxide vapors
     into vapor_pressures_Pa -- never an 'O2' key. This pins the
     Finding 2 dead-branch removal in _calculate_evaporation: the
     `if species == 'O2'` ambient-pressure branch was unreachable because

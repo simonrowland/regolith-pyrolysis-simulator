@@ -57,6 +57,12 @@ def test_control_quantization_cli_parse_tier_json_and_bad() -> None:
         driver._parse_args(["--control-quantization", "bad-tier"])
 
 
+def test_legacy_allow_stub_equilibrium_cli_alias_is_preserved() -> None:
+    args = driver._parse_args(["--allow-stub-equilibrium"])
+
+    assert args.allow_internal_analytical_equilibrium is True
+
+
 def _write_magemin_row(db_path, suffix, payload=None):
     key = {
         "schema_version": "test",
@@ -265,7 +271,7 @@ def _patch_common(monkeypatch, emitted):
     "backend",
     ("stub", "internal-analytical", " Internal-Analytical ", "INTERNAL_ANALYTICAL"),
 )
-def test_stub_equivalent_backend_cannot_populate_reduced_real_cache(
+def test_internal_analytical_equivalent_backend_cannot_populate_reduced_real_cache(
     tmp_path,
     monkeypatch,
     backend,
@@ -291,7 +297,7 @@ def test_stub_equivalent_backend_cannot_populate_reduced_real_cache(
         )
 
     assert str(exc.value) == (
-        "stub backend cannot populate the PT-1 reduced-real cache; "
+        "internal-analytical backend cannot populate the PT-1 reduced-real cache; "
         "use --backend alphamelts --require-magemin"
     )
     assert emitted == []
@@ -345,6 +351,8 @@ def test_multi_feedstock_run_resolves_additives_per_feedstock_in_replay(
         "mars_basalt": {"C": 30.0},
         "lunar_mare_low_ti": {},
     }
+    assert emitted[-1]["allow_stub_equilibrium"] is False
+    assert emitted[-1]["allow_internal_analytical_equilibrium"] is False
     assert {call["mode"] for call in calls} == {"capture", "replay"}
     for call in calls:
         if call["feedstock"] == "mars_basalt":
@@ -754,12 +762,12 @@ def test_merge_cache_shard_rolls_back_mid_merge_error(tmp_path):
     assert driver._cache_row_summary(target_db)["rows"] == 0
 
 
-def test_merge_cache_shard_rejects_stub_equilibrium_post_record(tmp_path):
+def test_merge_cache_shard_rejects_internal_analytical_equilibrium_post_record(tmp_path):
     shard_db = tmp_path / "shard.db"
     target_db = tmp_path / "target.db"
     _write_equilibrium_post_record_row_raw(
         shard_db,
-        backend_name="StubBackend",
+        backend_name="InternalAnalyticalBackend",
         provider_id="builtin-backend-equilibrium",
     )
 
@@ -978,7 +986,7 @@ def test_run_case_records_all_builtin_authoritative_source_report(tmp_path, monk
         db_path=tmp_path / "case.db",
         mode="capture",
         disable_live=False,
-        allow_stub_equilibrium=False,
+        allow_internal_analytical_equilibrium=False,
     )
 
     source_report = result["rows"][0]["vapor_pressure_source_report"]
@@ -1002,7 +1010,7 @@ def test_run_case_rejects_builtin_fallback_source_report(tmp_path, monkeypatch):
             db_path=tmp_path / "case.db",
             mode="capture",
             disable_live=False,
-            allow_stub_equilibrium=False,
+            allow_internal_analytical_equilibrium=False,
         )
 
 
@@ -1038,7 +1046,7 @@ def test_run_case_enforces_wall_cap_during_advance(tmp_path, monkeypatch):
             db_path=tmp_path / "case.db",
             mode="capture",
             disable_live=False,
-            allow_stub_equilibrium=False,
+            allow_internal_analytical_equilibrium=False,
         )
 
     assert advance_started is True

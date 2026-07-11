@@ -26,10 +26,11 @@ from simulator.backends import (
     emit_web_engine_selection_log,
     resolve_backend,
 )
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
 from simulator.core import PoisonedHourError
 from simulator.furnace_materials import resolve_furnace_max_T_C
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.recipe_io import RecipeIOError, normalize_recipe_patch
 from simulator.runner import RunnerError, _deep_merge_setpoints
@@ -300,10 +301,10 @@ def _get_backend(backend_name: str):
       AtomLedger transition" reject).  Promotion is blocked on
       ``\\goal CHEMISTRY-KERNEL-CARVE-OUT``.
     * ``'internal-analytical'`` (legacy alias ``'stub'``) — deterministic
-      ``StubBackend`` selection. Both names fold onto the stable ``stub``
+      ``InternalAnalyticalBackend`` selection. Both names fold onto the stable ``stub``
       serialization token via ``canonical_backend_name``.
     * ``'auto'`` / unset — autodetect chain: probe
-      AlphaMELTS first, falling back to ``StubBackend`` as the
+      AlphaMELTS first, falling back to ``InternalAnalyticalBackend`` as the
       always-available primary fallback.  No silent cross-backend
       fallback at runtime: if the selected primary throws inside
       ``_get_equilibrium`` after selection, ``core.py``'s fail-closed
@@ -320,7 +321,7 @@ def _get_backend(backend_name: str):
         ),
         log_message=_safe_log,
         alphamelts_backend_cls=AlphaMELTSBackend,
-        stub_backend_cls=StubBackend,
+        internal_analytical_backend_cls=InternalAnalyticalBackend,
     )
 
 
@@ -329,7 +330,7 @@ def _backend_name_for_session(backend) -> str:
     backend_type = type(backend).__name__
     if isinstance(backend, AlphaMELTSBackend) or backend_type == 'AlphaMELTSBackend':
         return 'alphamelts'
-    return 'stub'
+    return ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 
 
 def _coerce_bool(value) -> bool:
@@ -1211,10 +1212,10 @@ def register_events(socketio):
                 'backend_authoritative': False,
             }, room=sid)
             return
-        backend_type = type(backend).__name__
         resolution_status = backend_resolution_status(backend)
+        backend_type = resolution_status.active_backend
         backend_message = ''
-        if isinstance(backend, StubBackend):
+        if isinstance(backend, InternalAnalyticalBackend):
             backend_message = 'Using built-in fallback'
         else:
             backend_message = f'Using {backend_type}'

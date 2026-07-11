@@ -10,7 +10,7 @@ Policy under test:
 * AlphaMELTS is probed first; selected when ``is_available()`` is True.
 * VapoRock and MAGEMin are **never** selected as the active backend; an
   explicit request for either raises ``BackendUnavailableError``.
-* StubBackend is the always-available fallback for ``auto`` / unset.
+* InternalAnalyticalBackend is the always-available fallback for ``auto`` / unset.
 * Explicit unknown names fail loud.
 * The selection emits one ``engine selection: ...`` log line per call.
 """
@@ -40,7 +40,7 @@ from simulator.grind_preflight import (
     GrindSourceGateError,
     assert_grind_feedstock_stage0_route_coverage,
 )
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from web.events import BackendUnavailableError, _get_backend
 
 SPINEL_COMPOSITION_HANG_FEEDSTOCK_IDS = (
@@ -144,19 +144,19 @@ def test_web_autodetect_policy_preserves_probe_order():
         calls.append('alphamelts')
         return _FakeAlphaMELTS(available=False)
 
-    def make_stub():
+    def make_internal_analytical():
         calls.append('stub')
-        return StubBackend()
+        return InternalAnalyticalBackend()
 
     backend = resolve_backend(
         'auto',
         BackendSelectionPolicy.WEB_AUTODETECT,
         alphamelts_backend_cls=make_alphamelts,
-        stub_backend_cls=make_stub,
+        internal_analytical_backend_cls=make_internal_analytical,
         log_selection=lambda selected: None,
     )
 
-    assert isinstance(backend, StubBackend)
+    assert isinstance(backend, InternalAnalyticalBackend)
     assert calls == ['alphamelts', 'stub']
 
 
@@ -434,22 +434,22 @@ def test_stage0_required_auto_falls_back_when_forced_alphamelts_absent():
         instances.append(backend)
         return backend
 
-    def make_stub():
+    def make_internal_analytical():
         calls.append("stub")
-        return StubBackend()
+        return InternalAnalyticalBackend()
 
     backend = resolve_backend(
         "auto",
         BackendSelectionPolicy.WEB_AUTODETECT,
         alphamelts_backend_cls=make_alphamelts,
-        stub_backend_cls=make_stub,
+        internal_analytical_backend_cls=make_internal_analytical,
         log_selection=lambda selected: None,
         backend_config=source_config,
         feedstock_id="spinel-feed",
         feedstocks={"spinel-feed": {"spinel_rich": True}},
     )
 
-    assert isinstance(backend, StubBackend)
+    assert isinstance(backend, InternalAnalyticalBackend)
     assert calls == ["alphamelts", "stub"]
     assert instances[0].init_calls == [
         {
@@ -467,8 +467,9 @@ def test_stage0_required_auto_falls_back_when_forced_alphamelts_absent():
     assert resolution.active_backend == "StubBackend"
     assert resolution.backend_status == "unavailable"
     assert resolution.authoritative is False
-    assert "forced AlphaMELTS backend unavailable" in resolution.message
-    assert "substituted StubBackend" in resolution.message
+    assert resolution.message.startswith(
+        "forced AlphaMELTS backend unavailable; substituted StubBackend"
+    )
 
 
 def test_stage0_required_rejects_reused_non_subprocess_backend():
@@ -488,15 +489,15 @@ def test_stage0_required_rejects_reused_non_subprocess_backend():
 # ---------------------------------------------------------------------------
 
 
-def test_autodetect_all_primaries_unavailable_falls_back_to_stub(
+def test_autodetect_all_primaries_unavailable_falls_back_to_internal_analytical(
         monkeypatch, captured_logs):
     _install_fakes(monkeypatch,
                    alphamelts_available=False)
 
     backend = _get_backend('auto')
 
-    assert isinstance(backend, StubBackend)
-    assert any('engine selection: StubBackend' in line
+    assert isinstance(backend, InternalAnalyticalBackend)
+    assert any('engine selection: InternalAnalyticalBackend' in line
                for line in captured_logs)
 
 
@@ -543,7 +544,7 @@ def test_autodetect_alphamelts_wins_even_when_vaporock_and_magemin_report_availa
     assert isinstance(backend, _FakeAlphaMELTS)
 
 
-def test_autodetect_with_vaporock_or_magemin_available_still_picks_stub(
+def test_autodetect_with_vaporock_or_magemin_available_still_picks_internal_analytical(
         monkeypatch, captured_logs):
     """VapoRock/MAGEMin is_available()=True must not influence selection."""
 
@@ -568,7 +569,7 @@ def test_autodetect_with_vaporock_or_magemin_available_still_picks_stub(
 
     backend = _get_backend('auto')
 
-    assert isinstance(backend, StubBackend)
+    assert isinstance(backend, InternalAnalyticalBackend)
 
 
 # ---------------------------------------------------------------------------
@@ -595,12 +596,12 @@ def test_explicit_alphamelts_request_raises_when_unavailable(monkeypatch):
         _get_backend('alphamelts')
 
 
-def test_explicit_stub_request_pins_stub_backend(
+def test_explicit_stub_request_pins_internal_analytical_backend(
         monkeypatch, captured_logs):
-    """``backend='stub'`` deterministically pins StubBackend (D1 fix).
+    """``backend='stub'`` deterministically pins InternalAnalyticalBackend (D1 fix).
 
     An explicit 'stub' request must NOT autodetect: even when AlphaMELTS
-    is available, asking for the deterministic stub returns StubBackend.
+    is available, asking for the deterministic stub returns InternalAnalyticalBackend.
     Only 'auto'/'' follow the autodetect chain. (Bug D1: 'stub'
     previously routed through autodetect and returned AlphaMELTS when it
     was installed, so a caller asking for a deterministic backend silently
@@ -611,13 +612,13 @@ def test_explicit_stub_request_pins_stub_backend(
 
     backend = _get_backend('stub')
 
-    assert isinstance(backend, StubBackend)
-    assert any('engine selection: StubBackend' in line
+    assert isinstance(backend, InternalAnalyticalBackend)
+    assert any('engine selection: InternalAnalyticalBackend' in line
                for line in captured_logs)
 
 
 def test_web_autodetect_stub_bypasses_primary_probes():
-    """Under WEB_AUTODETECT, 'stub' returns StubBackend without probing
+    """Under WEB_AUTODETECT, 'stub' returns InternalAnalyticalBackend without probing
     AlphaMELTS (D1 fix at the resolver level)."""
     calls: list[str] = []
 
@@ -625,19 +626,19 @@ def test_web_autodetect_stub_bypasses_primary_probes():
         calls.append('alphamelts')
         return _FakeAlphaMELTS(available=True)
 
-    def make_stub():
+    def make_internal_analytical():
         calls.append('stub')
-        return StubBackend()
+        return InternalAnalyticalBackend()
 
     backend = resolve_backend(
         'stub',
         BackendSelectionPolicy.WEB_AUTODETECT,
         alphamelts_backend_cls=make_alphamelts,
-        stub_backend_cls=make_stub,
+        internal_analytical_backend_cls=make_internal_analytical,
         log_selection=lambda selected: None,
     )
 
-    assert isinstance(backend, StubBackend)
+    assert isinstance(backend, InternalAnalyticalBackend)
     assert calls == ['stub']  # primaries never probed
 
 
@@ -649,7 +650,7 @@ def test_web_autodetect_stub_bypasses_primary_probes():
 # (design-fidelity-surface-2026-06-10.md §STUB REBRAND; AGENTS.md C3). The
 # rebrand is alias-preserving: the new name is accepted on input but folds onto
 # the stable `stub` serialization token, so caches/goldens do not move and the
-# denylist (StubBackend is never authoritative) is unchanged.
+# denylist (InternalAnalyticalBackend is never authoritative) is unchanged.
 
 
 @pytest.mark.parametrize(
@@ -657,26 +658,26 @@ def test_web_autodetect_stub_bypasses_primary_probes():
     ['internal-analytical', 'INTERNAL-ANALYTICAL', 'internal_analytical',
      ' internal-analytical '],
 )
-def test_internal_analytical_alias_pins_stub_backend(monkeypatch, name):
+def test_internal_analytical_alias_pins_internal_analytical_backend(monkeypatch, name):
     """``backend='internal-analytical'`` resolves exactly like ``'stub'``.
 
     Even when AlphaMELTS is available the alias deterministically pins
-    StubBackend (it folds onto ``stub`` before the autodetect branch).
+    InternalAnalyticalBackend (it folds onto ``stub`` before the autodetect branch).
     """
     _install_fakes(monkeypatch, alphamelts_available=True)
 
     backend = _get_backend(name)
 
-    assert isinstance(backend, StubBackend)
+    assert isinstance(backend, InternalAnalyticalBackend)
 
 
 def test_internal_analytical_alias_runner_strict_resolves_like_stub():
     backend = resolve_backend(
         'internal-analytical',
         BackendSelectionPolicy.RUNNER_STRICT,
-        stub_backend_cls=StubBackend,
+        internal_analytical_backend_cls=InternalAnalyticalBackend,
     )
-    assert isinstance(backend, StubBackend)
+    assert isinstance(backend, InternalAnalyticalBackend)
 
 
 def test_internal_analytical_alias_serializes_stable_stub_token_and_denylists():
@@ -689,13 +690,16 @@ def test_internal_analytical_alias_serializes_stable_stub_token_and_denylists():
     backend = resolve_backend(
         'internal-analytical',
         BackendSelectionPolicy.WEB_AUTODETECT,
-        stub_backend_cls=StubBackend,
+        internal_analytical_backend_cls=InternalAnalyticalBackend,
         log_selection=lambda selected: None,
     )
     resolution = backend_resolution_status(backend)
 
     assert resolution.requested_backend == 'stub'
     assert resolution.active_backend == 'StubBackend'
+    assert resolution.message == (
+        'stub backend selected; no authoritative melt result available'
+    )
     assert resolution.backend_status == 'unavailable'
     assert resolution.authoritative is False
 
@@ -717,19 +721,19 @@ def test_unset_backend_still_autodetects(monkeypatch):
         calls.append('alphamelts')
         return _FakeAlphaMELTS(available=False)
 
-    def make_stub():
+    def make_internal_analytical():
         calls.append('stub')
-        return StubBackend()
+        return InternalAnalyticalBackend()
 
     backend = resolve_backend(
         '',
         BackendSelectionPolicy.WEB_AUTODETECT,
         alphamelts_backend_cls=make_alphamelts,
-        stub_backend_cls=make_stub,
+        internal_analytical_backend_cls=make_internal_analytical,
         log_selection=lambda selected: None,
     )
 
-    assert isinstance(backend, StubBackend)
+    assert isinstance(backend, InternalAnalyticalBackend)
     assert calls == ['alphamelts', 'stub']
 
 
@@ -757,7 +761,8 @@ def test_explicit_alphamelts_request_is_case_insensitive_raises_when_unavailable
     # raise BackendUnavailableError instead of silently falling through to
     # the autodetect chain. If case-folding is broken in `_get_backend`,
     # the uppercase variants miss the `if name == 'alphamelts':` branch
-    # and fall into autodetect, returning Stub -- this test catches that.
+    # and fall into autodetect, returning InternalAnalyticalBackend -- this
+    # test catches that.
     _install_fakes(monkeypatch,
                    alphamelts_available=False)
 
@@ -836,7 +841,7 @@ def test_engine_selection_log_emitted_on_every_selection(
     assert 'VapoRock/MAGEMin not eligible until kernel' in line
 
 
-def test_engine_selection_log_also_emitted_on_stub_fallback(
+def test_engine_selection_log_also_emitted_on_internal_analytical_fallback(
         monkeypatch, captured_logs):
     _install_fakes(monkeypatch,
                    alphamelts_available=False)
@@ -844,7 +849,7 @@ def test_engine_selection_log_also_emitted_on_stub_fallback(
     _get_backend('auto')
 
     selection_lines = [line for line in captured_logs
-                       if line.startswith('engine selection: StubBackend')]
+                       if line.startswith('engine selection: InternalAnalyticalBackend')]
     assert len(selection_lines) == 1
 
 

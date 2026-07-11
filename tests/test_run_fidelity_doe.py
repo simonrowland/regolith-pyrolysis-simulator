@@ -5,6 +5,37 @@ import pytest
 from scripts import run_fidelity_doe as doe
 
 
+@pytest.mark.parametrize(
+    "env_name",
+    (
+        "FIDELITY_DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH",
+        "FIDELITY_DIAGNOSTIC_STUB_HIGH",
+    ),
+)
+def test_diagnostic_high_env_names_are_dual_aliases(env_name: str) -> None:
+    assert doe._diagnostic_internal_analytical_high_from_env({env_name: "1"}) is True
+
+
+@pytest.mark.parametrize(
+    "backend_alias",
+    ("stub", "internal-analytical", "Internal_Analytical"),
+)
+def test_analytical_high_backend_aliases_require_diagnostic_opt_in(
+    backend_alias: str,
+) -> None:
+    high_backend = doe._high_backend_from_env(
+        {"FIDELITY_HIGH_BACKEND": backend_alias},
+        diagnostic_internal_analytical_high=False,
+    )
+
+    assert high_backend == "stub"
+    with pytest.raises(RuntimeError, match="diagnostic only"):
+        doe._validate_high_backend_selection(
+            high_backend,
+            diagnostic_internal_analytical_high=False,
+        )
+
+
 def test_timing_log_failure_does_not_replace_evaluator_failure(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

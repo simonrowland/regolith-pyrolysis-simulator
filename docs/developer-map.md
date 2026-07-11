@@ -41,7 +41,7 @@ This guide is for contributors and coding agents that need to find the right fil
 
 ## Backends
 
-- `simulator/melt_backend/base.py` defines `MeltBackend` ABC, `EquilibriumResult` DTO, and `StubBackend` fallback (the `internal-analytical` model; legacy backend name `stub`).
+- `simulator/melt_backend/base.py` defines `MeltBackend` ABC, `EquilibriumResult` DTO, and `InternalAnalyticalBackend` fallback (the `internal-analytical` model; legacy backend name `stub`).
 - `simulator/backend_names.py` defines the canonical analytical-backend naming (`internal-analytical` display alias folds onto the stable `stub` serialization token).
 - `simulator/melt_backend/alphamelts.py` wires PetThermoTools and subprocess paths.
 - `simulator/melt_backend/magemin.py` is the MAGEMin today-hook adapter (`MeltBackend` subclass), a shadow silicate solver alongside alphaMELTS.

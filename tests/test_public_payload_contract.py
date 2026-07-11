@@ -3,12 +3,12 @@ import numbers
 import pytest
 
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 import web.events as events
 
 
 def _sim():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -50,10 +50,10 @@ def test_socket_start_payload_keeps_existing_kg_shape():
         feedstock_key="oxide",
         mass_kg=1000.0,
         backend_requested="stub",
-        backend_active="StubBackend",
+        backend_active="InternalAnalyticalBackend",
         backend_status="stub",
         backend_authoritative=False,
-        backend_message="Using StubBackend",
+        backend_message="Using InternalAnalyticalBackend",
         c5_enabled=True,
         mre_target_species="SiO2",
         mre_max_voltage_V=1.45,
@@ -63,7 +63,7 @@ def test_socket_start_payload_keeps_existing_kg_shape():
     assert payload["mass_kg"] == pytest.approx(1000.0)
     assert isinstance(payload["mass_kg"], numbers.Real)
     assert payload["backend_requested"] == "stub"
-    assert payload["backend_active"] == "StubBackend"
+    assert payload["backend_active"] == "InternalAnalyticalBackend"
     assert payload["backend_status"] == "stub"
     assert payload["backend_authoritative"] is False
     assert payload["c5_enabled"] is True
@@ -79,7 +79,7 @@ def test_tick_payload_keeps_existing_kg_keys():
     payload = tick_payload(
         sim=sim,
         snapshot=snapshot,
-        backend_message="Using StubBackend",
+        backend_message="Using InternalAnalyticalBackend",
         backend_status="stub",
         backend_authoritative=False,
     )

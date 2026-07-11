@@ -44,7 +44,10 @@ from typing import Any, Mapping, Optional
 
 import yaml
 
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.backends import (
     BackendSelectionPolicy,
 )
@@ -729,7 +732,7 @@ class PyrolysisRun:
     engines: dict[str, str] = field(default_factory=dict)
     additives_kg: dict[str, float] = field(default_factory=dict)
     mass_kg: float = 1000.0
-    backend_name: str = "stub"
+    backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
     setpoints_patch: Mapping[str, Any] = field(default_factory=dict)
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None = None
     setpoints_overrides: Mapping[str, Mapping[str, Any]] | None = None
@@ -2379,7 +2382,7 @@ def build_sio_yield_report(
         campaign=campaign,
         hours=int(hours),
         mass_kg=mass_kg,
-        backend_name="stub",
+        backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
         track="pyrolysis",
         additives_kg=additives_kg,
         engines={"vapor_pressure": "builtin-antoine"},
@@ -3605,11 +3608,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         help="Hours of simulated wallclock to advance")
     parser.add_argument("--mass-kg", type=float, default=None,
                         help="Batch mass in kg (default: 1000)")
-    parser.add_argument("--backend", default="stub",
+    parser.add_argument(
+                        "--backend",
+                        default=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
                         # type folds the internal-analytical alias (any case /
                         # whitespace) onto `stub` before choices validation.
                         type=canonical_backend_name,
-                        choices=("stub", "internal-analytical",
+                        choices=(ANALYTICAL_BACKEND_SERIALIZATION_TOKEN, "internal-analytical",
                                  "internal_analytical", "alphamelts"),
                         help="Melt backend selection (default: internal-analytical, "
                              "legacy alias: stub)")

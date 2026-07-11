@@ -31,11 +31,11 @@ GOLDENS = (
 # Post-0.5.0 (2026-05-27) MnO NIST-JANAF refit + autoreview-r8 vapor-pressure
 # raise-on-unavailable: lunar shifted 0.00078662141565 -> 0.000786620599287
 # (PPM-scale FP roundoff drift from the Mn entry change altering
-# _stub_equilibrium iteration order); mars unchanged.
+# _internal_analytical_equilibrium iteration order); mars unchanged.
 # Post-0.5.1 Phase A2 (2026-05-27) Mn high-T linear refit (Mn(l) basis):
 # tiny FP roundoff again, lunar 0.000786620599287 -> 0.000786620612837;
 # mars unchanged. Mn doesn't itself evaporate in this recipe band; the
-# drift is purely from the Mn entry's effect on _stub_equilibrium
+# drift is purely from the Mn entry's effect on _internal_analytical_equilibrium
 # dict-iteration order rounding.
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip exposes
 # backpressure-floor physics; previously the synthetic no-headspace pO2

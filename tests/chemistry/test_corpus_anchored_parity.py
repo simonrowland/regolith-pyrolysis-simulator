@@ -62,7 +62,7 @@ from simulator.chemistry.kernel import (
     ProviderUnavailableError,
 )
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 
 from tests.chemistry.corpus_fixtures import (
     AtomicRatioAnchor,
@@ -128,7 +128,7 @@ def _build_sim_for_anchor(
     # Shallow copy keeps the module-scoped fixture immutable.
     setpoints = dict(setpoints_data)
 
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend, setpoints, feedstocks, vapor_pressure_data
@@ -358,7 +358,7 @@ def _build_sim_for_atomic_ratio_anchor(
         "composition_wt_pct": dict(anchor.composition_wt_pct),
     }
 
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend, setpoints_data, feedstocks, vapor_pressure_data

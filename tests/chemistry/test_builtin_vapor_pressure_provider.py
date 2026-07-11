@@ -4,13 +4,13 @@
 Covers:
 
 * Unit: the provider returns the same vapor pressures as the legacy
-  :meth:`EquilibriumMixin._stub_equilibrium` for a known composition + T.
+  :meth:`EquilibriumMixin._internal_analytical_equilibrium` for a known composition + T.
 * Unit: the kernel filter actually scopes the provider's account view to
   the single declared account (``process.cleaned_melt``).
 * Unit: capability profile declares ``VAPOR_PRESSURE`` only and is
   authoritative for it.
 * Shadow parity: across a multi-step simulation run on lunar + Mars +
-  asteroid feedstocks, the legacy ``_stub_equilibrium`` and the kernel
+  asteroid feedstocks, the legacy ``_internal_analytical_equilibrium`` and the kernel
   dispatch agree species-by-species within 1e-9 Pa (relative + absolute
   floor). This is the parity gate that justified the flip; it stays in
   the suite as a regression guard against future intent flips that touch
@@ -815,7 +815,7 @@ def test_demaria_1971_na_validation_case_reports_measured_pressure_gap(
     assert gap_factor == pytest.approx(5.056080393750948, rel=1e-6)
 
 
-class _LegacyFallbackStub(EquilibriumMixin):
+class _LegacyInternalAnalyticalModel(EquilibriumMixin):
     def __init__(self, vapor_pressure_data, melt=None):
         self.vapor_pressures = vapor_pressure_data
         self.melt = melt or _CaOnlyMelt()
@@ -1023,9 +1023,9 @@ def test_default_in_range_builtin_provider_keeps_fe_pseudo_fallback_and_legacy_s
     )
 
     provider_result = provider.dispatch(request)
-    legacy_result = _LegacyFallbackStub(
+    legacy_result = _LegacyInternalAnalyticalModel(
         vapor_pressure_data, melt=_FeOnlyHighTMelt()
-    )._stub_equilibrium()
+    )._internal_analytical_equilibrium()
     provider_vp = dict(
         (provider_result.diagnostic or {}).get("vapor_pressures_Pa") or {}
     )
@@ -1175,7 +1175,7 @@ def test_builtin_provider_marks_pure_component_range_extrapolation(
     vapor_pressure_data,
 ):
     assert vapor_pressure_data["metals"]["Ca"]["valid_range_K"] == [1115, 1757]
-    result = _LegacyFallbackStub(vapor_pressure_data)._stub_equilibrium()
+    result = _LegacyInternalAnalyticalModel(vapor_pressure_data)._internal_analytical_equilibrium()
 
     assert result.vapor_pressures_Pa["Ca"] > 0.0
     assert result.vapor_pressures_source["Ca"] == (
@@ -1209,10 +1209,10 @@ def test_builtin_provider_exposes_consumable_ellingham_authority_flag(
 def test_legacy_fallback_marks_ellingham_fit_range_extrapolation(
     vapor_pressure_data,
 ):
-    result = _LegacyFallbackStub(
+    result = _LegacyInternalAnalyticalModel(
         vapor_pressure_data,
         melt=_FeBeyondEllinghamMelt(),
-    )._stub_equilibrium()
+    )._internal_analytical_equilibrium()
 
     assert result.vapor_pressures_Pa["Fe"] > 0.0
     assert result.vapor_pressures_source["Fe"].startswith("builtin_authoritative:")
@@ -1224,9 +1224,9 @@ def test_legacy_fallback_marks_ellingham_fit_range_extrapolation(
 def test_legacy_fallback_grounds_mn_liquid_source_band(
     vapor_pressure_data,
 ):
-    stub = _LegacyFallbackStub(vapor_pressure_data, melt=_MnOnlyMelt())
+    legacy_model = _LegacyInternalAnalyticalModel(vapor_pressure_data, melt=_MnOnlyMelt())
 
-    result = stub._stub_equilibrium()
+    result = legacy_model._internal_analytical_equilibrium()
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
     assert result.vapor_pressures_source["Mn"] == (
@@ -1261,14 +1261,14 @@ def test_legacy_fallback_marks_pseudo_vaporock_sources_non_authoritative(
         },
         "oxide_vapors": {},
     }
-    metal_result = _LegacyFallbackStub(
+    metal_result = _LegacyInternalAnalyticalModel(
         metal_data,
         melt=_KOnlyMelt(),
-    )._stub_equilibrium()
-    oxide_result = _LegacyFallbackStub(
+    )._internal_analytical_equilibrium()
+    oxide_result = _LegacyInternalAnalyticalModel(
         vapor_pressure_data,
         melt=_SiOnlyMelt(),
-    )._stub_equilibrium()
+    )._internal_analytical_equilibrium()
 
     for result, species in ((metal_result, "K"), (oxide_result, "SiO")):
         source = result.vapor_pressures_source[species]
@@ -1282,9 +1282,12 @@ def test_legacy_fallback_marks_pseudo_vaporock_sources_non_authoritative(
 def test_builtin_provider_marks_mn_above_nbp_pure_component_extrapolation(
     vapor_pressure_data,
 ):
-    stub = _LegacyFallbackStub(vapor_pressure_data, melt=_MnAboveNbpMelt())
+    legacy_model = _LegacyInternalAnalyticalModel(
+        vapor_pressure_data,
+        melt=_MnAboveNbpMelt(),
+    )
 
-    result = stub._stub_equilibrium()
+    result = legacy_model._internal_analytical_equilibrium()
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
     assert result.vapor_pressures_source["Mn"] == (
@@ -1318,10 +1321,10 @@ def test_inactive_metal_species_do_not_diverge_between_provider_and_legacy(
         or {}
     )
     legacy_vp = dict(
-        _LegacyFallbackStub(
+        _LegacyInternalAnalyticalModel(
             vapor_pressure_data,
             melt=_SiOnlyMelt(),
-        )._stub_equilibrium().vapor_pressures_Pa
+        )._internal_analytical_equilibrium().vapor_pressures_Pa
         or {}
     )
 
@@ -1514,7 +1517,7 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
 # ---------------------------------------------------------------------------
 
 
-def test_provider_matches_legacy_stub_for_known_lunar_composition(
+def test_provider_matches_legacy_internal_analytical_for_known_lunar_composition(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """Direct unit-level parity: build a simulator, advance into a campaign
@@ -1547,7 +1550,7 @@ def test_provider_matches_legacy_stub_for_known_lunar_composition(
             continue
         sim.step()
 
-    legacy_result = sim._stub_equilibrium()
+    legacy_result = sim._internal_analytical_equilibrium()
     kernel_result = sim._chem_kernel.dispatch(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=sim.melt.temperature_C,
@@ -1643,7 +1646,7 @@ def test_shadow_parity_across_short_simulation_run(
         T_C = sim.melt.temperature_C
         if T_C + 273.15 < 400:
             continue
-        legacy_result = sim._stub_equilibrium()
+        legacy_result = sim._internal_analytical_equilibrium()
         kernel_result = sim._chem_kernel.dispatch(
             ChemistryIntent.VAPOR_PRESSURE,
             temperature_C=T_C,

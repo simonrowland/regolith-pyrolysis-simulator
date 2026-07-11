@@ -2,8 +2,9 @@
 """CAL harness for SG-3 vapor yield-threshold calibration.
 
 Runs instrumented, golden-neutral simulator cases and writes calibration
-artifacts. The default backend is AlphaMELTS; stub runs require an explicit
---allow-stub opt-in and are marked non-authoritative.
+artifacts. The default backend is AlphaMELTS; internal-analytical runs require
+an explicit ``--allow-internal-analytical`` opt-in and are marked
+non-authoritative. ``--allow-stub`` remains a legacy CLI alias.
 """
 
 from __future__ import annotations
@@ -26,7 +27,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 
 DEFAULT_OUTPUT_DIR = (
     REPO_ROOT / "docs-private" / "research" / "2026-06-03-cal-calibration"
@@ -460,7 +464,7 @@ def _is_real_backend_calibration_blocked(
 ) -> bool:
     """True when a real-backend CAL run must not emit authoritative thresholds."""
 
-    if backend == "stub":
+    if backend == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
         return False
     if summary.get("row_count", 0) == 0:
         return True
@@ -596,7 +600,8 @@ def _markdown_findings(
         "## Caveats",
         "",
         "- CAL is golden-neutral: this script writes analysis artifacts only.",
-        "- Stub backend results are non-authoritative and must not seed thresholds.",
+        "- Internal-analytical backend results are non-authoritative and must "
+        "not seed thresholds.",
         "- AlphaMELTS is the active real backend available in this checkout; MAGEMin is not an active runner backend here.",
     ]
     if blocked:
@@ -657,7 +662,8 @@ def _worker_result(
     lines += [
         "",
         f"Case stops: {stops or 'none'}.",
-        "Caveat: AlphaMELTS smoke exceeded the cap in this environment; stub data intentionally not used for threshold proposals.",
+        "Caveat: AlphaMELTS smoke exceeded the cap in this environment; "
+        "internal-analytical data intentionally not used for threshold proposals.",
         (
             f"BLOCKED: real-backend runtime prohibited calibration artifact completion; "
             f"see {DEFAULT_REVIEW_DIR.relative_to(REPO_ROOT) / 'worker-result.md'}"
@@ -671,7 +677,12 @@ def _worker_result(
 def _parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--backend", default="alphamelts", type=canonical_backend_name)
-    parser.add_argument("--allow-stub", action="store_true")
+    parser.add_argument(
+        "--allow-internal-analytical",
+        "--allow-stub",
+        dest="allow_internal_analytical",
+        action="store_true",
+    )
     parser.add_argument("--feedstock", action="append", dest="feedstocks")
     parser.add_argument("--include-optional-feedstocks", action="store_true")
     parser.add_argument("--campaign", action="append", dest="campaigns")
@@ -686,8 +697,15 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(list(sys.argv[1:] if argv is None else argv))
-    if args.backend == "stub" and not args.allow_stub and not args.worker:
-        raise SystemExit("stub backend requires --allow-stub; not authoritative for CAL")
+    if (
+        args.backend == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        and not args.allow_internal_analytical
+        and not args.worker
+    ):
+        raise SystemExit(
+            "internal-analytical backend requires "
+            "--allow-internal-analytical; not authoritative for CAL"
+        )
 
     if args.worker:
         payload = _worker_payload(args)
@@ -712,7 +730,9 @@ def main(argv: list[str] | None = None) -> int:
     ]
     rows = [row for result in results for row in result.get("rows", [])]
     backend_fidelity = (
-        "real-active-melt-backend" if args.backend != "stub" else "stub-non-authoritative"
+        "real-active-melt-backend"
+        if args.backend != ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        else "stub-non-authoritative"
     )
     metadata = {
         "backend": args.backend,

@@ -13,7 +13,7 @@ from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import EvaporationFlux
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import PyrolysisRun, build_per_hour_summary
 from simulator.session import SimSession
 from simulator.state import CampaignPhase, EnergyRecord, MeltState, MOLAR_MASS
@@ -25,7 +25,7 @@ def _repo_setpoints() -> dict:
 
 
 def _sim(setpoints: dict) -> PyrolysisSimulator:
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,

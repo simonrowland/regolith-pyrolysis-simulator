@@ -5,7 +5,7 @@ import pytest
 
 import app as app_module
 import web.events as web_events
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 
 
 GOLDEN_TRACE = (
@@ -94,8 +94,8 @@ def _required_events_present(trace):
 def _install_deterministic_web(monkeypatch):
     captured_tasks = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -108,7 +108,7 @@ def _install_deterministic_web(monkeypatch):
             raise StopRunLoop()
 
     monkeypatch.setattr(web_events, "_safe_log", lambda _message: None)
-    monkeypatch.setattr(web_events, "_get_backend", force_stub_backend)
+    monkeypatch.setattr(web_events, "_get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(app_module.socketio, "sleep", stop_when_paused)
     monkeypatch.setattr(
         app_module.socketio,
@@ -136,6 +136,10 @@ def _record_trace(app, captured_tasks):
             },
         )
         trace.extend(_drain(client))
+        # Serialization tokens stay legacy-stable (alias-preserving rename,
+        # t-172): the web payload reports the stable "StubBackend" label; the
+        # InternalAnalyticalBackend name is internal-only. Matches
+        # test_web_events.py:974 and the retained golden.
         assert trace[0]["payload"]["backend_active"] == "StubBackend"
 
         start_task_count = len(captured_tasks)

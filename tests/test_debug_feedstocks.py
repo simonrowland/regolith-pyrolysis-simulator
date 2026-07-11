@@ -5,7 +5,7 @@ import app as app_module
 from simulator.campaigns import CampaignManager
 from simulator.core import PyrolysisSimulator
 from simulator.feedstock_guard import is_blocked_feedstock
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import BatchRecord, CampaignPhase, DecisionType, MeltState
 from web.feedstock_data import (
     DATA_DIR,
@@ -90,7 +90,7 @@ def test_debug_feedstocks_and_inventory_panel_are_visible_when_enabled(
 )
 def test_debug_feedstocks_are_loadable_sanity_batches(monkeypatch, key):
     monkeypatch.setenv("REGOLITH_DEBUG_FEEDSTOCKS", "1")
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -262,7 +262,7 @@ def test_branch_decision_context_matches_c5_default_off():
 
 
 def test_branch_one_completes_when_c5_default_off():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -292,7 +292,7 @@ def test_normal_batches_still_pause_for_branching_decisions():
 
 def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     monkeypatch.setenv("REGOLITH_DEBUG_FEEDSTOCKS", "1")
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -329,7 +329,7 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
 
 def test_c5_step_noops_when_c5_disabled(monkeypatch):
     monkeypatch.setenv("REGOLITH_DEBUG_FEEDSTOCKS", "1")
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

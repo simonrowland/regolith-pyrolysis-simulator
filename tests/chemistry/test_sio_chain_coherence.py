@@ -33,7 +33,7 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # to the VapoRock-consistent activity-corrected value.
 # Post-0.5.0 (2026-05-27) MnO NIST-JANAF refit + autoreview-r8 vapor-pressure
 # raise-on-unavailable: PPM-scale FP roundoff drift from the Mn entry change
-# altering _stub_equilibrium iteration order. 0.00078662141565 ->
+# altering _internal_analytical_equilibrium iteration order. 0.00078662141565 ->
 # 0.000786620599287 (rel ~1e-6). No physics change; pure FP noise from a
 # documented thermo-table update.
 # Post-0.5.1 Phase A2 (2026-05-27) Mn high-T linear refit (Mn(l) basis):

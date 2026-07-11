@@ -5,7 +5,7 @@ from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
     MeltBackend,
-    StubBackend,
+    InternalAnalyticalBackend,
     normalize_backend_capabilities,
 )
 from simulator.melt_backend.magemin import MAGEMinBackend
@@ -18,7 +18,7 @@ __all__ = [
     'EquilibriumResult',
     'MAGEMinBackend',
     'MeltBackend',
-    'StubBackend',
+    'InternalAnalyticalBackend',
     'SulfSatGate',
     'SulfurSaturationResult',
     'VapoRockBackend',

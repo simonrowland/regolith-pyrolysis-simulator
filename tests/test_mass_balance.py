@@ -17,7 +17,7 @@ from simulator.core import (
     PyrolysisSimulator,
 )
 from simulator.mass_balance import MassBalance, ZERO_INPUT_BASIS_BREACH
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_sio_yield_report
 from simulator.state import (
     CampaignPhase,
@@ -64,7 +64,7 @@ def test_flow_mass_accounts_cover_non_reservoir_ledger_accounts():
 
 
 def test_flow_mass_out_includes_dynamic_wall_deposit_segment_accounts():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -85,7 +85,7 @@ def test_flow_mass_out_includes_dynamic_wall_deposit_segment_accounts():
 
 
 def test_flow_mass_out_includes_captured_melt_offgas_oxygen():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -363,7 +363,7 @@ def test_cumulative_transition_mass_closure_bounded():
     kernel_config["allow_unmeasured_alpha_fallback"] = True
     setpoints["chemistry_kernel"] = kernel_config
 
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)

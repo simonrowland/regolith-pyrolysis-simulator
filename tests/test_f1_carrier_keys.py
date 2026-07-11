@@ -20,7 +20,7 @@ from simulator.core import (
     PyrolysisSimulator,
 )
 from simulator.feedstock_guard import is_blocked_feedstock
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.magemin import MAGEMinBackend, MeltCompositionError
 
 FEEDSTOCKS_PATH = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
@@ -150,7 +150,7 @@ def audit_foulant_carrier_bindings(
 
 
 def _sim(feedstocks: Mapping[str, Any]) -> PyrolysisSimulator:
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,

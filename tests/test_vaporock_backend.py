@@ -14,7 +14,7 @@ from simulator.core import PyrolysisSimulator
 from engines.domain_reason import OutOfDomainReason
 from simulator.melt_backend.base import (
     DEFAULT_BACKEND_CAPABILITIES,
-    StubBackend,
+    InternalAnalyticalBackend,
 )
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.state import OXIDE_SPECIES
@@ -621,7 +621,7 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
         }
     }
     sim = PyrolysisSimulator(
-        StubBackend(), {"campaigns": {}}, feedstocks, vapor_pressures
+        InternalAnalyticalBackend(), {"campaigns": {}}, feedstocks, vapor_pressures
     )
     sim.load_batch("basalt_analog", mass_kg=1000.0)
     sim.melt.temperature_C = 1600.0
@@ -686,7 +686,7 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log_iw
     sim.melt.fO2_log = fO2_log_iw
     sim.melt.melt_fO2_log = fO2_log_iw
-    builtin = sim._stub_equilibrium()
+    builtin = sim._internal_analytical_equilibrium()
     assert builtin.fO2_log == pytest.approx(fO2_log_iw, abs=0.05)
 
     vaporock_builtin = backend.equilibrate(
@@ -824,8 +824,8 @@ def test_vaporock_as_active_backend_fails_closed_with_clear_message():
 
     # A bare VapoRockBackend() is un-initialized (the simulator
     # constructor never calls initialize()), so is_available() is False
-    # and core.py refuses to fall back to the stub for a non-stub
-    # backend.
+    # and core.py refuses to fall back to internal-analytical for a
+    # non-analytical backend.
     with pytest.raises(RuntimeError, match="VapoRockBackend is unavailable"):
         sim.step()
 

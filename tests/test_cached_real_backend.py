@@ -23,7 +23,7 @@ from simulator.backends import (
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.config import load_config_bundle
 from simulator.corpus_version import CorpusVersionConfigError, current_corpus_version
-from simulator.melt_backend.base import EquilibriumResult, StubBackend
+from simulator.melt_backend.base import EquilibriumResult, InternalAnalyticalBackend
 from simulator.reduced_real_determinism import (
     ControlQuantization,
     PT0CacheCollision,
@@ -364,7 +364,7 @@ def test_cached_real_resolver_requires_cache_config() -> None:
         resolve_backend("cached-real", BackendSelectionPolicy.RUNNER_STRICT)
 
 
-def test_cached_real_resolver_returns_non_stub_backend(tmp_path: Path) -> None:
+def test_cached_real_resolver_returns_non_internal_analytical_backend(tmp_path: Path) -> None:
     backend = resolve_backend(
         "cached-real",
         BackendSelectionPolicy.RUNNER_STRICT,
@@ -372,7 +372,7 @@ def test_cached_real_resolver_returns_non_stub_backend(tmp_path: Path) -> None:
     )
 
     assert isinstance(backend, CachedRealBackend)
-    assert not isinstance(backend, StubBackend)
+    assert not isinstance(backend, InternalAnalyticalBackend)
 
 
 def test_cached_real_live_fill_populates_then_fail_loud_hits(tmp_path: Path) -> None:
@@ -852,7 +852,7 @@ def test_cached_real_live_fill_forwards_account_scoped_composition(
     )
 
 
-def test_cached_real_fail_loud_miss_never_calls_stub(tmp_path: Path) -> None:
+def test_cached_real_fail_loud_miss_never_calls_internal_analytical(tmp_path: Path) -> None:
     cache_config = _cache_config(tmp_path / "empty.db", "fail-loud")
     backend = resolve_backend(
         "cached-real",

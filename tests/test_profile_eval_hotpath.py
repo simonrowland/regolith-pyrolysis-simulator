@@ -18,7 +18,7 @@ def test_profile_eval_hotpath_imports() -> None:
     spec.loader.exec_module(module)
     assert module.DEFAULT_REPEAT >= 3
     assert module.DEFAULT_HIGH_HOURS == 1
-    assert "evaluate_stub_repeat" in module.SCENARIO_ORDER
+    assert "evaluate_internal_analytical_repeat" in module.SCENARIO_ORDER
 
 
 def test_profile_eval_hotpath_help() -> None:
@@ -30,6 +30,6 @@ def test_profile_eval_hotpath_help() -> None:
         check=False,
     )
     assert result.returncode == 0
-    assert "evaluate_stub_1h" in result.stdout
-    assert "evaluate_stub_repeat" in result.stdout
+    assert "evaluate_internal_analytical_1h" in result.stdout
+    assert "evaluate_internal_analytical_repeat" in result.stdout
     assert "--high-hours" in result.stdout

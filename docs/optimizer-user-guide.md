@@ -192,10 +192,10 @@ The cache key is a SHA-256 digest of canonical EvalSpec JSON. Same EvalSpec, sam
 The backend badge displays active backend and backend status, for example:
 
 ```text
-StubBackend / unavailable
+InternalAnalyticalBackend / unavailable
 ```
 
-Internal-analytical results — active backend `StubBackend`, or backend status `diagnostic_stub` — are not authoritative. A real-backend result should show a non-analytical active backend and a backend status that is not `unavailable`.
+Internal-analytical results — active backend `InternalAnalyticalBackend`, or backend status `diagnostic_stub` — are not authoritative. A real-backend result should show a non-analytical active backend and a backend status that is not `unavailable`.
 
 ### Stale Version Badge
 

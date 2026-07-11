@@ -6,6 +6,46 @@ from pathlib import Path
 from simulator.accounting import load_species_formulas
 
 
+def test_internal_analytical_implementation_has_no_legacy_stub_symbols():
+    repo = Path(__file__).parent.parent
+    forbidden = {
+        "StubBackend",
+        "stub_backend_cls",
+        "_stub_backend",
+        "_stub_equilibrium",
+        "_backend_allows_stub_fallback",
+    }
+    violations = []
+    for root in (
+        repo / "simulator",
+        repo / "engines",
+        repo / "scripts",
+        repo / "web",
+    ):
+        for path in root.rglob("*.py"):
+            relative = path.relative_to(repo).as_posix()
+            if relative.startswith("simulator/optimize/"):
+                continue
+            tree = ast.parse(path.read_text(), filename=relative)
+            for node in ast.walk(tree):
+                names = []
+                if isinstance(node, ast.Name):
+                    names.append(node.id)
+                elif isinstance(node, ast.Attribute):
+                    names.append(node.attr)
+                elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+                    names.append(node.name)
+                elif isinstance(node, ast.arg):
+                    names.append(node.arg)
+                elif isinstance(node, ast.alias):
+                    names.extend((node.name, node.asname))
+                for name in names:
+                    if name in forbidden:
+                        violations.append(f"{relative}:{node.lineno}: {name}")
+
+    assert not violations, "\n".join(violations)
+
+
 def test_simulator_has_no_forbidden_internal_kg_mutations():
     repo = Path(__file__).parent.parent
     forbidden = [

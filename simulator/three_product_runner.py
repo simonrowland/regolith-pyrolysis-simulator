@@ -30,6 +30,7 @@ from typing import Any, Mapping
 
 import yaml
 
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.backends import BackendSelectionPolicy
 from simulator.session import SimSession, SimSessionConfig
 from simulator.three_product_report import classify_products
@@ -54,7 +55,7 @@ def _build_session(
     feedstock_id: str,
     campaign: str,
     data_dir: Path,
-    backend_name: str = "stub",
+    backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
 ) -> SimSession:
     """Build a SimSession with the canonical project setpoints +
     vapor pressures + feedstock catalog."""
@@ -77,7 +78,7 @@ def run(
     campaign: str,
     hours: int,
     data_dir: Path | None = None,
-    backend_name: str = "stub",
+    backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     early_tap_mode: bool = False,
 ) -> dict[str, Any]:
     """Programmatic entry point: build the session, run for
@@ -92,8 +93,8 @@ def run(
         hours: Max simulated hours to advance.
         data_dir: Optional override for the data directory; defaults
             to the project's ``data/`` next to ``simulator/``.
-        backend_name: Backend to select; ``"stub"`` is the default
-            for runs without AlphaMELTS/MAGEMin installed.
+        backend_name: Backend to select; ``"internal-analytical"`` is the
+            canonical name for runs without AlphaMELTS/MAGEMin installed.
         early_tap_mode: Pass-through to ``classify_products``; when
             True the residual ``cleaned_melt`` mass surfaces as the
             ``industrial_mixed_glass`` product class. Default False
@@ -193,8 +194,11 @@ def _build_argparser() -> argparse.ArgumentParser:
                             "override the data/ directory "
                             "(default: project root data/)"
                         ))
-    parser.add_argument("--backend", default="stub",
-                        help="melt backend name (default: stub)")
+    parser.add_argument(
+        "--backend",
+        default=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        help="melt backend name (default: internal-analytical)",
+    )
     parser.add_argument("--early-tap", action="store_true",
                         help=(
                             "operator declares early-tap intent: "

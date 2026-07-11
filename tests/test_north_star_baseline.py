@@ -315,7 +315,7 @@ def test_snapshots_carry_all_expected_north_star_fields():
 @pytest.mark.skip(
     reason=(
         "E1b still skipped after t-025 grounding run "
-        "(2026-07-06, lunar_mare_low_ti, StubBackend, C0 -> C0B -> "
+        "(2026-07-06, lunar_mare_low_ti, InternalAnalyticalBackend, C0 -> C0B -> "
         "C2A_STAGED -> C3_NA -> C4 -> C6, C5/MRE disabled). "
         "Corrected-denominator yields: Na=0.211855, K=0.435267, "
         "Fe=0.008236, Mg=0.000975, SiO=0.000205; all below the "

@@ -78,7 +78,7 @@ def composition_wt_pct_from_account_view(
 
     Mirrors :meth:`MeltState.composition_wt_pct` so the activity proxy
     (``a_oxide = wt fraction``) matches the legacy
-    :meth:`EquilibriumMixin._stub_equilibrium` exactly.
+    :meth:`EquilibriumMixin._internal_analytical_equilibrium` exactly.
 
     Fail-closed on unregistered species: if any species in the account
     cannot resolve a formula, raises :class:`AccountingError` to match

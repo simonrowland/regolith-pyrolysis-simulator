@@ -7,7 +7,7 @@ import pytest
 import yaml
 
 from simulator.accounting import resolve_species_formula
-from simulator.backends import BackendSelectionPolicy, StubBackend
+from simulator.backends import BackendSelectionPolicy, InternalAnalyticalBackend
 from simulator.core import PyrolysisSimulator
 from simulator.session import SimSessionConfig
 from simulator.stage0_harness import run_stage0_harness_from_config
@@ -22,7 +22,7 @@ def _load_yaml(name: str) -> dict[str, Any]:
 
 
 def _real_sim(feedstock_key: str, *, diagnostics_enabled: bool) -> PyrolysisSimulator:
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

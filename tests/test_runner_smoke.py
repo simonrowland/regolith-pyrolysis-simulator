@@ -157,7 +157,8 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "pO2_enforcement",
     # Conditionally-emitted per-hour keys: present on a row only when the
     # backing source is populated (staged / diagnostic / real-backend runs),
-    # so they are absent on the plain stub-backend smoke SCENARIOS. Whitelisted
+    # so they are absent on plain internal-analytical smoke scenarios.
+    # Whitelisted
     # so the per_hour_summary issubset gate accepts a legitimate row instead of
     # flagging key drift (BUG-032 + same-class sweep; see
     # docs/runner-output-schema.md "Per-hour summary"). Most come from

@@ -25,7 +25,7 @@ import pytest
 
 from simulator.core import PyrolysisSimulator
 from simulator.extraction import ExtractionMixin
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import (
     CampaignPhase,
     CondensationStage,
@@ -282,7 +282,7 @@ def test_audit_negative_delta_on_phantom_projection_with_partial_ledger():
 # ---------------------------------------------------------------------------
 
 def _basic_sim() -> PyrolysisSimulator:
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

@@ -1198,7 +1198,7 @@ def test_store_accepts_closure_clean_authoritative_in_domain_cache_write(
         assert conn.execute("SELECT count(*) FROM results").fetchone()[0] == 1
 
 
-def test_store_rejects_stub_backend_name_with_spoofed_authority_markers(
+def test_store_rejects_internal_analytical_backend_name_with_spoofed_authority_markers(
     tmp_path,
 ) -> None:
     spec = _base_spec()

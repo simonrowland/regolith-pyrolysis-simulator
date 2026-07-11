@@ -16,7 +16,7 @@ from simulator.cost_energy import (
 from simulator.cost_ledger import CostImportContext, CostLedger, CostVector
 from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import PyrolysisRun
 
 
@@ -444,7 +444,7 @@ def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture():
 def test_cost_observation_exception_does_not_abort_chemistry_commit(
     monkeypatch,
 ):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -496,7 +496,7 @@ def test_cost_observation_exception_does_not_abort_chemistry_commit(
 def test_cost_seed_exception_does_not_abort_additive_atom_load(
     monkeypatch,
 ):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

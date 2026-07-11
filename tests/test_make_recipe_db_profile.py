@@ -579,7 +579,7 @@ def test_no_declared_campaign_window_is_target_visible(
 
 
 @pytest.mark.parametrize("target_id", RUNNABLE_TARGET_IDS)
-def test_target_menu_generated_profiles_stub_eval_no_campaign_vocabulary_abort(
+def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_vocabulary_abort(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
     target_id: str,

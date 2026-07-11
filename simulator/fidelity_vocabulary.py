@@ -10,6 +10,9 @@ from typing import Any, Mapping, Sequence
 from simulator.backend_names import canonical_backend_name
 
 
+LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN = "stub"
+
+
 class CanonicalDimension(str, Enum):
     EVIDENCE_CLASS = "evidence_class"
     CACHE_STATE = "cache_state"
@@ -59,8 +62,8 @@ class LabelSource(str, Enum):
     TERMINAL_RUMP_EARNED_CRASH = "terminal_rump:earned_crash"
     TERMINAL_RUMP_COMPLETED_RUN = "terminal_rump:completed_run"
     TERMINAL_RUMP_TAP_TRUNCATED = "terminal_rump:tap_truncated"
-    LEGACY_BACKEND_ALIAS_STUB = "legacy_backend_alias:stub"
-    DIAGNOSTIC_STUB = "diagnostic_stub"
+    LEGACY_BACKEND_ALIAS_INTERNAL_ANALYTICAL = "legacy_backend_alias:stub"
+    DIAGNOSTIC_INTERNAL_ANALYTICAL = "diagnostic_stub"
     BACKEND_ALIAS_ALPHAMELTS = "backend_alias:alphamelts"
     BACKEND_SELECTION_AUTO = "backend_selection:auto"
     CACHED_REAL = "cached-real"
@@ -84,7 +87,10 @@ CERTIFICATION_DENYLIST: frozenset[str] = frozenset(
 )
 
 LEGACY_EVIDENCE_CLASS_SERIALIZATION_ALIASES: Mapping[str, str] = MappingProxyType(
-    {EvidenceClass.INTERNAL_ANALYTICAL.value: "stub"}
+    {
+        EvidenceClass.INTERNAL_ANALYTICAL.value:
+            LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN
+    }
 )
 
 LEGACY_VOCABULARY_TOKENS: Mapping[str, frozenset[str]] = MappingProxyType(
@@ -110,7 +116,7 @@ LEGACY_VOCABULARY_TOKENS: Mapping[str, frozenset[str]] = MappingProxyType(
         ),
         "backend/status alias": frozenset(
             {
-                "stub",
+                LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN,
                 "diagnostic_stub",
                 "alphamelts",
                 "auto",
@@ -252,13 +258,16 @@ _SIMPLE_TRANSLATIONS: Mapping[tuple[str, str], CanonicalFidelityMapping] = Mappi
             cache_state=CacheState.SERVED_NEIGHBOR.value,
             degradation_reason=DegradationReason.LEGACY_CACHED_INTERPOLATED.value,
         ),
-        ("backend/status alias", "stub"): CanonicalFidelityMapping(
+        (
+            "backend/status alias",
+            LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN,
+        ): CanonicalFidelityMapping(
             evidence_class=EvidenceClass.INTERNAL_ANALYTICAL.value,
-            label_source=LabelSource.LEGACY_BACKEND_ALIAS_STUB.value,
+            label_source=LabelSource.LEGACY_BACKEND_ALIAS_INTERNAL_ANALYTICAL.value,
         ),
         ("backend/status alias", "diagnostic_stub"): CanonicalFidelityMapping(
             evidence_class=EvidenceClass.INTERNAL_ANALYTICAL.value,
-            label_source=LabelSource.DIAGNOSTIC_STUB.value,
+            label_source=LabelSource.DIAGNOSTIC_INTERNAL_ANALYTICAL.value,
             degradation_reason=DegradationReason.DIAGNOSTIC_ONLY.value,
         ),
         ("backend/status alias", "alphamelts"): CanonicalFidelityMapping(

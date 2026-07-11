@@ -274,7 +274,7 @@ def _run_authoritative_alphamelts_equilibrium(
     store: PT0DeterminismStore | None,
     provider: _CountingSilicateEquilibriumProvider,
     *,
-    allow_stub_fallback: bool = True,
+    allow_internal_analytical_fallback: bool = True,
 ):
     sim = _build_pt0_sim(store)
     class AlphaMELTSBackend:
@@ -285,8 +285,8 @@ def _run_authoritative_alphamelts_equilibrium(
             return provider.engine_version
 
     sim.backend = AlphaMELTSBackend()
-    if not allow_stub_fallback:
-        sim._backend_allows_stub_fallback = lambda: False
+    if not allow_internal_analytical_fallback:
+        sim._backend_allows_internal_analytical_fallback = lambda: False
 
     def fail_backend_equilibrate(*_args, **_kwargs):
         raise AssertionError(
@@ -307,7 +307,7 @@ def test_pt2_alphamelts_diagnostic_no_store_bypasses_ledger_guard() -> None:
     result = _run_authoritative_alphamelts_equilibrium(
         None,
         provider,
-        allow_stub_fallback=False,
+        allow_internal_analytical_fallback=False,
     )
 
     assert provider.calls == 1
@@ -1277,7 +1277,7 @@ def test_pt2_ladder_columns_are_nullable_additive(tmp_path: Path) -> None:
 
 
 def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -> None:
-    class NonStubBackend:
+    class NonAnalyticalBackend:
         def get_engine_version(self) -> str:
             return "non-stub-test"
 
@@ -1298,7 +1298,7 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
     )
     capture_store = PT0DeterminismStore("capture", db_path=db_path)
     capture_sim = _build_pt0_sim(capture_store)
-    capture_sim.backend = NonStubBackend()
+    capture_sim.backend = NonAnalyticalBackend()
     capture_sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -1320,7 +1320,7 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
 
     replay_store = PT0DeterminismStore("capture", db_path=db_path)
     replay_sim = _build_pt0_sim(replay_store)
-    replay_sim.backend = NonStubBackend()
+    replay_sim.backend = NonAnalyticalBackend()
     replay_sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -1349,7 +1349,7 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
 def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
     tmp_path: Path,
 ) -> None:
-    class NonStubBackend:
+    class NonAnalyticalBackend:
         def get_engine_version(self) -> str:
             return "non-stub-test"
 
@@ -1364,7 +1364,7 @@ def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
         control_quantization=ControlQuantization.from_name("coarse"),
     )
     capture_sim = _build_pt0_sim(capture_store)
-    capture_sim.backend = NonStubBackend()
+    capture_sim.backend = NonAnalyticalBackend()
     capture_sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -1390,7 +1390,7 @@ def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
         control_quantization=ControlQuantization.from_name("fine"),
     )
     replay_sim = _build_pt0_sim(replay_store)
-    replay_sim.backend = NonStubBackend()
+    replay_sim.backend = NonAnalyticalBackend()
     replay_sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -1716,7 +1716,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(tmp_path: Path) -> None:
     assert replay.replay_sequence[-1]["cache_state"] == "cached_exact"
 
 
-def test_pt1_capture_equilibrium_rejects_stub_provider(
+def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / "pt1-equilibrium-status.db"

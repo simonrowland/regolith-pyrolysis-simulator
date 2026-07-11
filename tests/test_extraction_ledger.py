@@ -22,7 +22,7 @@ from simulator.electrolysis import (
     ElectrolysisModel,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
 )
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session_cli import SessionScriptRunner
 from simulator.state import (
     MOLAR_MASS,
@@ -34,7 +34,7 @@ from web.events import _completion_payload
 
 
 def _sim(feedstocks):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,
@@ -241,7 +241,7 @@ def test_rump_element_kg_includes_c7_al_credit():
 
 
 def test_c7_credit_seeded_as_non_feedstock_provenance():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

@@ -14,14 +14,14 @@ import pytest
 from engines.builtin.foulant_disposition import chi_decomp, load_foulant_registry
 from simulator.accounting import resolve_species_formula
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FOULANT_THERMO = REPO_ROOT / "data" / "foulant_thermo.yaml"
 
 
 def _sim(feedstocks):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     return PyrolysisSimulator(
         backend,

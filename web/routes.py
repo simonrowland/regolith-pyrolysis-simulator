@@ -490,8 +490,8 @@ def _optimizer_backend_payload(
     stored_status = _latest_backend_status(result_blob) or _latest_backend_status(run_reference)
     if stored_status is None:
         stored_status = 'unavailable'
-    stubish = requested in {'stub', 'diagnostic_stub'} or stored_status == 'diagnostic_stub'
-    backend_status = 'unavailable' if stubish else stored_status
+    internal_analyticalish = requested in {'stub', 'diagnostic_stub'} or stored_status == 'diagnostic_stub'
+    backend_status = 'unavailable' if internal_analyticalish else stored_status
     canonical_backend_name = (
         'diagnostic_stub'
         if stored_status == 'diagnostic_stub'
@@ -516,7 +516,7 @@ def _optimizer_backend_payload(
     )
     resolution = BackendResolutionStatus(
         requested_backend=requested,
-        active_backend='StubBackend' if stubish else requested,
+        active_backend='InternalAnalyticalBackend' if internal_analyticalish else requested,
         backend_status=backend_status,
         authoritative=authoritative,
         selection_policy='stored-result',

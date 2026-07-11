@@ -14,7 +14,7 @@ from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.vaporock import VapoRockBackend
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CampaignPhase, MOLAR_MASS
 
 
@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def _registry():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -149,7 +149,7 @@ def _total_chromium_mol(sim: PyrolysisSimulator) -> float:
 def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
     setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

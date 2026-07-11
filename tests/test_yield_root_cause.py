@@ -15,7 +15,7 @@ from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import ELECTRONS_PER_OXIDE, FARADAY, MOLAR_MASS
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.run_executor import RunExecutor
 from simulator.session import SimSessionConfig
 from simulator.state import CampaignPhase, STOICH_RATIOS
@@ -158,7 +158,7 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives():
 
 
 def test_c5_targeted_feo_rung_survives_pre_reducible_low_current_hours():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -212,7 +212,7 @@ def test_c5_targeted_feo_rung_survives_pre_reducible_low_current_hours():
 
 
 def test_c5_declared_ladder_hold_scopes_shared_voltage_species_before_refusal():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -269,7 +269,7 @@ def test_c5_targeted_feo_full_track_reduces_target_after_low_temperature_hours()
 
 
 def test_c3_k_entry_transfers_condensed_na_without_native_melt_banking():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -306,7 +306,7 @@ def test_c3_k_entry_transfers_condensed_na_without_native_melt_banking():
 
 
 def test_c3_entry_without_dose_does_not_bank_native_na2o_as_reagent():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -332,7 +332,7 @@ def test_c3_entry_without_dose_does_not_bank_native_na2o_as_reagent():
 
 
 def test_c3_credit_draw_does_not_debit_native_cleaned_melt_na2o():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     setpoints = _load("setpoints.yaml")
     setpoints["campaigns"]["C3"]["alkali_dosing"]["Na_kg"] = 12.0
@@ -361,7 +361,7 @@ def test_c3_credit_draw_does_not_debit_native_cleaned_melt_na2o():
 
 
 def test_c3_shuttle_injects_na_from_condensed_alkali_alone():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

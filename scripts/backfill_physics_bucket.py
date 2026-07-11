@@ -343,7 +343,7 @@ def _physics_values_from_admitted_row(row: sqlite3.Row) -> PhysicsBucketValues:
     if key_artifact and key_artifact != artifact:
         raise ValueError("row artifact does not match key artifact")
 
-    _reject_stub_backend_key(key)
+    _reject_internal_analytical_backend_key(key)
     validate_reduced_real_equilibrium_record_key(artifact, key)
     assert_strict_vapor_pt1_row(
         artifact=artifact,
@@ -397,16 +397,16 @@ def _physics_values_from_replay_key(key: Mapping[str, Any]) -> PhysicsBucketValu
     )
 
 
-def _reject_stub_backend_key(key: Mapping[str, Any]) -> None:
+def _reject_internal_analytical_backend_key(key: Mapping[str, Any]) -> None:
     backend = key.get("backend", {})
     if not isinstance(backend, Mapping):
         backend = {}
     for field in ("backend_name", "backend_class"):
         name = str(backend.get(field, "") or "").strip().split(".")[-1]
-        if name == "StubBackend":
+        if name in {"InternalAnalyticalBackend", "StubBackend"}:
             raise RuntimeError(
                 "physics-bucket backfill requires authorized real backend rows; "
-                "got StubBackend"
+                "got InternalAnalyticalBackend"
             )
 
 

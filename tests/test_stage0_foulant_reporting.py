@@ -11,7 +11,7 @@ import yaml
 
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.queries import AccountingQueries
-from simulator.backends import StubBackend
+from simulator.backends import InternalAnalyticalBackend
 from simulator.core import PyrolysisSimulator
 from simulator.stage0_foulant_report_markdown import (
     format_stage0_foulant_report_markdown,
@@ -42,7 +42,7 @@ def _load_batch_sim(
     setpoints_data: dict,
     diagnostics_enabled: bool,
 ) -> PyrolysisSimulator:
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

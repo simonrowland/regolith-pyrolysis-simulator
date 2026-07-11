@@ -15,7 +15,7 @@ import pytest
 import yaml
 
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
@@ -49,7 +49,7 @@ def _build_sim(
     additives_kg: dict | None = None,
     builtin_vapor_pressure: bool = True,
 ) -> PyrolysisSimulator:
-    """Build a PyrolysisSimulator with a fresh StubBackend.
+    """Build a PyrolysisSimulator with a fresh InternalAnalyticalBackend.
 
     Helper -- intentionally not a pytest fixture so callers can pass
     feedstock-specific arguments per test.
@@ -68,7 +68,7 @@ def _build_sim(
     wiring used by ``test_vaporock_authority_promotion.py``.
     """
 
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     if builtin_vapor_pressure:
         # Goal #10 historical name only: keep these tests on the builtin

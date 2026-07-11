@@ -20,7 +20,7 @@ from simulator.environment import (
     vacuum_floor_bar_for_body,
     vacuum_floor_bar_for_environment,
 )
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -60,7 +60,7 @@ def _fo2_request(fO2_log: float) -> IntentRequest:
 
 def _sim(feedstocks: dict | None = None) -> PyrolysisSimulator:
     return PyrolysisSimulator(
-        StubBackend(),
+        InternalAnalyticalBackend(),
         _load_yaml("setpoints.yaml"),
         feedstocks or _load_yaml("feedstocks.yaml"),
         _load_yaml("vapor_pressures.yaml"),

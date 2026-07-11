@@ -123,7 +123,14 @@ _ALPHAMELTS_PROVIDER_ID = "alphamelts-diagnostic"
 _ALPHAMELTS_DEFAULT_MODEL = "MELTSv1.0.2"
 _ALPHAMELTS_DEFAULT_MODE = "subprocess"
 _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID = "builtin-backend-equilibrium"
-_STUB_BACKEND_NAME = "StubBackend"
+_INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME = "InternalAnalyticalBackend"
+# CORPUS-BUMP MIGRATION HINGE: these legacy class strings are serialized into
+# reduced-real cache identity and stay byte-identical until t-011 bumps
+# corpus_version atomically.
+_INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME = "StubBackend"
+_INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_CLASS = (
+    "simulator.melt_backend.base.StubBackend"
+)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -2276,7 +2283,7 @@ def validate_reduced_real_equilibrium_record_key(
         backend = key.get("backend", {})
         if not isinstance(backend, Mapping):
             backend = {}
-        if not _is_stub_backend_key(backend):
+        if not _is_internal_analytical_backend_key(backend):
             return
         raise RuntimeError(
             "PT-1 reduced-real equilibrium_post_record rows require an "
@@ -2286,16 +2293,20 @@ def validate_reduced_real_equilibrium_record_key(
     backend = key.get("backend", {})
     if not isinstance(backend, Mapping):
         backend = {}
-    if _is_stub_backend_key(backend):
+    if _is_internal_analytical_backend_key(backend):
         raise RuntimeError(
             "PT-1 reduced-real equilibrium_post_record rows require "
-            "an authorized real backend_name; got StubBackend."
+            "an authorized real backend_name; got InternalAnalyticalBackend."
         )
 
 
-def _is_stub_backend_key(backend: Mapping[str, Any]) -> bool:
+def _is_internal_analytical_backend_key(backend: Mapping[str, Any]) -> bool:
     return any(
-        str(backend.get(field, "")).strip().split(".")[-1] == _STUB_BACKEND_NAME
+        str(backend.get(field, "")).strip().split(".")[-1]
+        in {
+            _INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME,
+            _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME,
+        }
         for field in ("backend_name", "backend_class")
     )
 
@@ -2766,7 +2777,8 @@ def _is_alphamelts_key_identity(
     # A RESOLVED non-alphamelts provider (e.g. the magemin-shadow gate fallback) is NOT an
     # alphamelts key identity even when the cached-real config's authorized backend is
     # alphamelts. Do not fold engine_version into its key — that would change a non-alphamelts
-    # cache identity (magemin-shadow / stub), which must stay byte-identical.
+    # cache identity (magemin-shadow / internal-analytical), which must stay
+    # byte-identical.
     resolved = str(provider_identity.get("resolved_provider_id") or "").strip()
     if resolved and resolved != _ALPHAMELTS_PROVIDER_ID:
         return False
@@ -3195,12 +3207,16 @@ def _authorized_backend_identity_for_key(
 def _backend_name_for_key(backend: Any) -> str:
     if _is_alphamelts_backend(backend):
         return _ALPHAMELTS_BACKEND_NAME
+    if type(backend).__name__ == _INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME:
+        return _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME
     return type(backend).__name__
 
 
 def _backend_class_for_key(backend: Any) -> str:
     if _is_alphamelts_backend(backend):
         return _ALPHAMELTS_BACKEND_CLASS
+    if type(backend).__name__ == _INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME:
+        return _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_CLASS
     return _qualified_type(backend)
 
 

@@ -1,4 +1,4 @@
-"""Pilot: fast(stub) vs high(real by default) fidelity-correlation DOE, one feedstock.
+"""Pilot: fast(internal-analytical) vs high(real) fidelity DOE, one feedstock.
 
 Hard pilot constraints (DO NOT relax without operator sign-off — each real high
 eval is ~6+ min of ThermoEngine MELTS):
@@ -6,14 +6,16 @@ eval is ~6+ min of ThermoEngine MELTS):
   - per_eval_timeout_s     = 900
   - top_k                  = (2,)
   - parallelism            : simulator/optimize/fidelity.py uses a warm fidelity
-    pool. Stub tiers use a small pool; real backend tiers serialize at W=1 so one
+    pool. Internal-analytical tiers use a small pool; real backend tiers
+    serialize at W=1 so one
     warmed AlphaMELTS backend is reused across all four high evals.
 
 Run:
   .venv/bin/python scripts/run_fidelity_doe.py
 
 Default high backend is alphamelts so the pilot cannot silently self-parity.
-Set FIDELITY_DIAGNOSTIC_STUB_HIGH=1 for the explicit stub-vs-stub diagnostic;
+Set FIDELITY_DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH=1 for the explicit
+internal-analytical self-comparison diagnostic;
 that run may validate zero-drop mechanics but cannot claim a trust verdict.
 Per-eval wall-clock is captured via a process-safe timing shim that appends one
 JSONL row per evaluate() call to TIMING_LOG.
@@ -26,6 +28,7 @@ import os
 import sys
 import time
 import traceback
+from collections.abc import Mapping
 from pathlib import Path
 
 import yaml
@@ -34,6 +37,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.optimize.doe import DoeSpec
 from simulator.optimize.evaluate import evaluate as _evaluate
 from simulator.optimize.fidelity import run_fidelity_correlation
@@ -43,8 +50,58 @@ PROFILE = ROOT / "data/optimize_profiles/lunar_mare_low_ti.yaml"
 N = 4                       # HARD: exactly four candidates
 PER_EVAL_TIMEOUT_S = 900.0  # HARD
 TOP_K = (2,)                # HARD
-DIAGNOSTIC_STUB_HIGH = os.environ.get("FIDELITY_DIAGNOSTIC_STUB_HIGH") == "1"
-HIGH_BACKEND = os.environ.get("FIDELITY_HIGH_BACKEND", "stub" if DIAGNOSTIC_STUB_HIGH else "alphamelts")
+
+
+def _diagnostic_internal_analytical_high_from_env(
+    environ: Mapping[str, str],
+) -> bool:
+    return any(
+        environ.get(name) == "1"
+        for name in (
+            "FIDELITY_DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH",
+            "FIDELITY_DIAGNOSTIC_STUB_HIGH",
+        )
+    )
+
+
+def _high_backend_from_env(
+    environ: Mapping[str, str],
+    *,
+    diagnostic_internal_analytical_high: bool,
+) -> str:
+    default = (
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        if diagnostic_internal_analytical_high
+        else "alphamelts"
+    )
+    return canonical_backend_name(environ.get("FIDELITY_HIGH_BACKEND", default))
+
+
+def _validate_high_backend_selection(
+    high_backend: str,
+    *,
+    diagnostic_internal_analytical_high: bool,
+) -> None:
+    if (
+        canonical_backend_name(high_backend)
+        == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        and not diagnostic_internal_analytical_high
+    ):
+        raise RuntimeError(
+            "FIDELITY_HIGH_BACKEND=stub requires "
+            "FIDELITY_DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH=1 (or legacy "
+            "FIDELITY_DIAGNOSTIC_STUB_HIGH=1); internal-analytical "
+            "self-comparison is diagnostic only, not a pilot trust verdict"
+        )
+
+
+DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH = (
+    _diagnostic_internal_analytical_high_from_env(os.environ)
+)
+HIGH_BACKEND = _high_backend_from_env(
+    os.environ,
+    diagnostic_internal_analytical_high=DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH,
+)
 HIGH_HOURS = int(os.environ.get("FIDELITY_HIGH_HOURS", "1"))
 # /tmp (non-Dropbox) avoids a CloudStorage sync race that can zero artifact files
 # mid-run; the constraint explicitly permits temp/ or /tmp.
@@ -112,24 +169,29 @@ def main() -> int:
     profile = yaml.safe_load(Path(PROFILE).read_text())
     feedstock = profile["feedstock"]
 
-    if HIGH_BACKEND == "stub" and not DIAGNOSTIC_STUB_HIGH:
-        raise RuntimeError(
-            "FIDELITY_HIGH_BACKEND=stub requires FIDELITY_DIAGNOSTIC_STUB_HIGH=1; "
-            "stub-vs-stub is diagnostic only, not a pilot trust verdict"
-        )
+    _validate_high_backend_selection(
+        HIGH_BACKEND,
+        diagnostic_internal_analytical_high=DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH,
+    )
 
-    # Per-tier backend override: fast -> cheap deterministic stub; high defaults
-    # to real MELTS, with stub diagnostic allowed only by explicit env flag.
-    # Stock profile pins ALL tiers to "stub"; evaluate() reads
+    # Per-tier backend override: fast -> deterministic internal-analytical;
+    # high defaults to real MELTS, with analytical self-comparison allowed only
+    # by explicit env flag. Stock profiles serialize all backend names as
+    # "stub"; evaluate() reads
     # profile["fidelities"][fidelity]["backend_name"] (simulator/optimize/evaluate.py
-    # _run_options). Without this override both arms would be identical stubs.
+    # _run_options). Without this override both arms would be identical
+    # internal-analytical runs.
     profile = dict(profile)
     profile["fidelities"] = dict(profile["fidelities"])
-    profile["fidelities"]["fast"] = {"backend_name": "stub", "hours": 1}
+    profile["fidelities"]["fast"] = {
+        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "hours": 1,
+    }
     profile["fidelities"]["high"] = {"backend_name": HIGH_BACKEND, "hours": HIGH_HOURS}
     print(
         f"[runner] high_backend={HIGH_BACKEND!r} high_hours={HIGH_HOURS} "
-        f"diagnostic_stub_high={DIAGNOSTIC_STUB_HIGH}"
+        "diagnostic_internal_analytical_high="
+        f"{DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH}"
     )
 
     schema = RecipeSchema()
@@ -160,7 +222,7 @@ def main() -> int:
             per_eval_timeout_s=PER_EVAL_TIMEOUT_S,
             feedstock_id=feedstock,
             profile=profile,
-            fast_fidelity_name="fast",   # -> stub
+            fast_fidelity_name="fast",   # -> internal-analytical
             high_fidelity_name="high",   # -> alphamelts (real)
             top_k=TOP_K,
             max_samples=N,

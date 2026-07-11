@@ -7,7 +7,7 @@ from simulator.accounting import AccountingError
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.core import PyrolysisSimulator
 
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import Atmosphere, CampaignPhase
 
 
@@ -49,7 +49,7 @@ def test_high_temp_fallback_routes_fe_as_metallic_fe_without_accountingerror():
         "campaigns": {},
         "chemistry_kernel": {"allow_fallback_vapor": True},
     }
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
     sim.load_batch("feo_regression", mass_kg=1000.0)
@@ -83,7 +83,7 @@ def test_high_temp_fallback_routes_fe_as_metallic_fe_without_accountingerror():
     assert abs(snapshot.mass_balance_error_pct) <= MASS_BALANCE_LIMIT_PCT
 
 
-def test_stub_equilibrium_feo_activity_ignores_neutral_total_pressure():
+def test_internal_analytical_equilibrium_feo_activity_ignores_neutral_total_pressure():
     # Kress91 pressure terms are pressure-sensitive redox-split corrections.
     # Legacy vapor equilibrium uses fixed T/fO2/composition FeO activity, not
     # neutral overhead p_total.
@@ -100,7 +100,7 @@ def test_stub_equilibrium_feo_activity_ignores_neutral_total_pressure():
         "campaigns": {},
         "chemistry_kernel": {"allow_fallback_vapor": True},
     }
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
     sim.load_batch("feo_regression", mass_kg=1000.0)
@@ -113,7 +113,7 @@ def test_stub_equilibrium_feo_activity_ignores_neutral_total_pressure():
     p_eq_by_total_mbar: dict[float, dict[str, float]] = {}
     for p_total_mbar in (5.0, 10.0, 15.0):
         sim.melt.p_total_mbar = p_total_mbar
-        equilibrium = sim._stub_equilibrium()
+        equilibrium = sim._internal_analytical_equilibrium()
         p_eq_by_total_mbar[p_total_mbar] = {
             species: equilibrium.vapor_pressures_Pa[species]
             for species in ("Fe", "SiO")

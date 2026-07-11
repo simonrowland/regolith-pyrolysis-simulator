@@ -25,7 +25,7 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.vaporock import VapoRockBackend
 from tests.chemistry.corpus_fixtures import GRID_25_FEEDSTOCKS
 
@@ -45,7 +45,7 @@ def _build_lunar_12022_sim(vapor_pressure_data: dict) -> PyrolysisSimulator:
         ],
     }
     sim = PyrolysisSimulator(
-        StubBackend(), {"campaigns": {}}, feedstocks, vapor_pressure_data
+        InternalAnalyticalBackend(), {"campaigns": {}}, feedstocks, vapor_pressure_data
     )
     sim.load_batch("lunar_mare_12022", mass_kg=1000.0)
     sim.melt.p_total_mbar = 1.0e-3
@@ -137,7 +137,7 @@ def test_intrinsic_kress91_iw_regime_guards_against_vacuum_floor_conflation():
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = intrinsic_fO2_log
     sim.melt.fO2_log = intrinsic_fO2_log
     sim.melt.melt_fO2_log = intrinsic_fO2_log
-    equilibrium = sim._stub_equilibrium()
+    equilibrium = sim._internal_analytical_equilibrium()
 
     assert -8.10 <= intrinsic_fO2_log <= -7.85
     assert equilibrium.fO2_log == pytest.approx(intrinsic_fO2_log, abs=0.05)

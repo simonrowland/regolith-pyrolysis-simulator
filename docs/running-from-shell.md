@@ -35,7 +35,7 @@ stdout. Convention is to drop outputs under `runs/`.
 | `--campaign` | `C0` | campaign / recipe phase (see §4) |
 | `--hours` | `24` | simulated hours to advance |
 | `--mass-kg` | `1000.0` | batch mass |
-| `--backend` | `stub` | `internal-analytical` (legacy alias `stub`) or `alphamelts` (see §5) |
+| `--backend` | `internal-analytical` | `internal-analytical` (legacy alias `stub`) or `alphamelts` (see §5) |
 | `--track` | `pyrolysis` | or `mre_baseline` |
 | `--additive` | *(none)* | repeatable, e.g. `--additive=C=30` |
 | `--engine` / `--engines` | *(none)* | per-intent engine override / config YAML |
@@ -131,7 +131,7 @@ accepts the alias `C2A` → `C2A_continuous`.
 ## 5. Backend selection (fidelity)
 
 - **`--backend internal-analytical`** (legacy alias `stub`; default): fast, deterministic, and
-  *physically grounded for the extraction side* — `_stub_equilibrium` uses first-principles
+  *physically grounded for the extraction side* — `_internal_analytical_equilibrium` uses first-principles
   **Ellingham oxide-stability + Antoine vapor-pressure** thermodynamics (the real pO₂ /
   temperature / composition levers, including the `SiO₂ ⇌ SiO + ½O₂` pathway). What it does
   **not** include is a silicate-**melt solution model** — no liquidus, melt/solid phase
@@ -164,7 +164,7 @@ accepts the alias `C2A` → `C2A_continuous`.
 |---|---|
 | `python -m simulator.optimize.cli --feedstock <id> --strategy {bayes,nsga2,random,screen,staged} --fidelity {stub,fast,high,auto} --budget N` | Phase-O recipe optimizer |
 | `python scripts/populate_reduced_real_cache.py --profile <p> --feedstock <id> --campaign <c> --db <path>` | build the reduced-real equilibrium cache from real trajectories |
-| `python scripts/cal_threshold_calibration.py --feedstock <id> --campaign <c> --output-dir <d>` | SG-3 vapor yield-threshold calibration (default `--backend alphamelts`; `--allow-stub` to fall back to the `internal-analytical` model) |
+| `python scripts/cal_threshold_calibration.py --feedstock <id> --campaign <c> --output-dir <d>` | SG-3 vapor yield-threshold calibration (default `--backend alphamelts`; `--allow-internal-analytical` to use the `internal-analytical` model; legacy flag alias `--allow-stub`) |
 | `python scripts/vaporock_antoine_shadow_matrix.py` | record alphaMELTS/VapoRock vs Antoine shadow vapor pressures |
 
 ---

@@ -7,7 +7,7 @@ from typing import Optional
 import yaml
 
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import CampaignPhase
 
 
@@ -37,7 +37,7 @@ def build_headspace_sim(
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
     setpoints["overhead_headspace"]["enabled"] = bool(enabled)
 
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

@@ -329,12 +329,12 @@ def test_pyrolysis_simulator_uses_instance_isolation_not_module_mutation():
     instance, NOT the module dict. Two sims with different SiO
     Tcond values keep their values independently."""
     from simulator.core import PyrolysisSimulator
-    from simulator.melt_backend.base import StubBackend
+    from simulator.melt_backend.base import InternalAnalyticalBackend
 
     pre_module_dict = dict(CONDENSATION_TEMPS_C)
 
     def _build(sio_override: float) -> PyrolysisSimulator:
-        b = StubBackend()
+        b = InternalAnalyticalBackend()
         b.initialize({})
         return PyrolysisSimulator(
             b,
@@ -372,7 +372,7 @@ def test_simulator_construction_applies_setpoints_overrides():
     condensation model accesses
     ``CONDENSATION_TEMPS_C['SiO']``."""
     from simulator.core import PyrolysisSimulator
-    from simulator.melt_backend.base import StubBackend
+    from simulator.melt_backend.base import InternalAnalyticalBackend
 
     custom_setpoints = {
         'campaigns': {},
@@ -382,7 +382,7 @@ def test_simulator_construction_applies_setpoints_overrides():
             },
         },
     }
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -404,7 +404,7 @@ def test_simulator_construction_applies_setpoints_overrides():
 def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
     from simulator.backends import SimulatorBuildConfig, build_simulator
     from simulator.config import load_config_bundle
-    from simulator.melt_backend.base import StubBackend
+    from simulator.melt_backend.base import InternalAnalyticalBackend
 
     default_model = CondensationModel(
         CondensationTrain.create_default(),
@@ -444,7 +444,7 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
         ]["value_ref"]
         == "data/literature/vacuum_pyrolysis_sticking.yaml::species.SiO.value"
     )
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = build_simulator(
         SimulatorBuildConfig(

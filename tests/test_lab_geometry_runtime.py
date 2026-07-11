@@ -14,7 +14,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.lab_schedule import LabScheduleValidationError, normalize_lab_schedule
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.runner import _wall_deposit_mol_by_species, _wall_deposit_report_kg
 from simulator.runner import PyrolysisRun
@@ -602,7 +602,7 @@ def test_provider_wall_deposit_authority_is_instance_scoped_poison_pair() -> Non
 def test_simulator_wall_deposit_authority_does_not_cross_instances() -> None:
     holder_account = "process.wall_deposit_segment_holder"
 
-    lab_backend = StubBackend()
+    lab_backend = InternalAnalyticalBackend()
     lab_backend.initialize({})
     lab_sim = PyrolysisSimulator(
         lab_backend, {"lab_geometry": robinot_geometry_fixture()}, {}, {}
@@ -643,7 +643,7 @@ def test_simulator_wall_deposit_authority_does_not_cross_instances() -> None:
     assert lab_result.transition is not None
     assert holder_account in lab_result.transition.credits
 
-    industrial_backend = StubBackend()
+    industrial_backend = InternalAnalyticalBackend()
     industrial_backend.initialize({})
     industrial_sim = PyrolysisSimulator(industrial_backend, {}, {}, {})
     industrial_sim._build_chemistry_kernel()

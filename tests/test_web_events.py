@@ -15,7 +15,7 @@ from web import events as web_events
 from web import routes as web_routes
 from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
 from simulator.runner import build_per_hour_summary
 from simulator.session import drive_auto_apply
@@ -55,7 +55,7 @@ def _assert_recipe_defining_marker(source: str, element_id: str) -> None:
 
 
 def _sim_with_mass_balance_snapshot(error_pct, category=None):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -87,7 +87,7 @@ def _producer_backed_redox_per_hour_summary() -> dict[str, object]:
     root = Path(__file__).resolve().parents[1]
     setpoints = yaml.safe_load((root / "data/setpoints.yaml").read_text())
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -190,11 +190,11 @@ def _recipe_metadata(title: str, campaign: str = "C4") -> dict[str, object]:
     }
 
 
-def _force_socketio_stub(monkeypatch) -> list[tuple[object, tuple, dict]]:
+def _force_socketio_internal_analytical(monkeypatch) -> list[tuple[object, tuple, dict]]:
     captured_tasks: list[tuple[object, tuple, dict]] = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -202,7 +202,7 @@ def _force_socketio_stub(monkeypatch) -> list[tuple[object, tuple, dict]]:
         captured_tasks.append((target, args, kwargs))
         return {"captured_task": len(captured_tasks)}
 
-    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",
@@ -322,7 +322,7 @@ def test_loaded_recipe_start_ignores_stale_runtime_levers(
         loaded_patch,
         metadata=_recipe_metadata("Loaded C4", "C4"),
     )
-    _force_socketio_stub(monkeypatch)
+    _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     app.config["RECIPE_LIBRARY_DIR"] = tmp_path
     loaded = app.test_client().post("/recipes/load", json={"name": "loaded-c4"})
@@ -432,7 +432,7 @@ def test_staged_recipe_save_load_start_is_identity(
     staged_patch = load_recipe_patch(
         _RECIPE_DIR / "c2a_staged_temperature_ladder.yaml"
     )
-    _force_socketio_stub(monkeypatch)
+    _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     app.config["RECIPE_LIBRARY_DIR"] = tmp_path
     http_client = app.test_client()
@@ -872,7 +872,7 @@ def test_web_backend_path_uses_shared_resolve_backend(monkeypatch):
 
     def fake_resolve_backend(backend_name, policy, **kwargs):
         calls.append((backend_name, policy, kwargs))
-        backend = StubBackend()
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -880,7 +880,7 @@ def test_web_backend_path_uses_shared_resolve_backend(monkeypatch):
 
     backend = _get_backend("stub")
 
-    assert isinstance(backend, StubBackend)
+    assert isinstance(backend, InternalAnalyticalBackend)
     assert len(calls) == 1
     assert calls[0][0] == "stub"
     assert calls[0][1] is BackendSelectionPolicy.WEB_AUTODETECT
@@ -888,7 +888,7 @@ def test_web_backend_path_uses_shared_resolve_backend(monkeypatch):
 
 
 def test_web_start_payload_exposes_backend_status():
-    expected_backend = backend_resolution_status(StubBackend()).as_payload()
+    expected_backend = backend_resolution_status(InternalAnalyticalBackend()).as_payload()
     payload = _start_payload(
         sim=object(),
         feedstock_key="lunar_mare_low_ti",
@@ -916,8 +916,8 @@ def test_web_start_payload_exposes_backend_status():
 def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
     captured_tasks = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -925,7 +925,7 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
         captured_tasks.append((target, args, kwargs))
         return {"captured_task": len(captured_tasks)}
 
-    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",
@@ -971,6 +971,11 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
         assert started["mre_target_species"] == "SiO2"
         assert started["mre_max_voltage_V"] == pytest.approx(1.45)
         assert started["backend_status"] == "unavailable"
+        assert started["backend_active"] == "StubBackend"
+        assert started["backend_message"] == "Using built-in fallback"
+        assert started["backend_status_message"] == (
+            "stub backend selected; no authoritative melt result available"
+        )
 
         new_sids = set(_simulations) - before
         assert len(new_sids) == 1
@@ -1196,8 +1201,8 @@ def test_web_start_event_resolves_furnace_material_cap(
 ):
     captured_tasks = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -1205,7 +1210,7 @@ def test_web_start_event_resolves_furnace_material_cap(
         captured_tasks.append((target, args, kwargs))
         return {"captured_task": len(captured_tasks)}
 
-    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",
@@ -1261,8 +1266,8 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
             return copy.deepcopy(setpoints)
         return original_load_yaml(filename)
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -1271,7 +1276,7 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
         return {"captured_task": len(captured_tasks)}
 
     monkeypatch.setattr(web_events, "_load_yaml", fake_load_yaml)
-    monkeypatch.setattr(web_events, "_get_backend", force_stub_backend)
+    monkeypatch.setattr(web_events, "_get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",
@@ -1371,7 +1376,7 @@ def test_web_start_event_rejects_unselectable_furnace_material_before_session(
 
 
 def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch):
-    monkeypatch.setattr("web.events._get_backend", lambda _backend_name: StubBackend())
+    monkeypatch.setattr("web.events._get_backend", lambda _backend_name: InternalAnalyticalBackend())
     app = app_module.create_app()
     client = app_module.socketio.test_client(app)
     assert client.is_connected()
@@ -1498,8 +1503,8 @@ def test_web_start_event_rejects_invalid_numeric_payload_before_session(
 def test_make_decision_rejects_bad_payload(monkeypatch, bad_payload, message):
     captured_tasks = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -1507,7 +1512,7 @@ def test_make_decision_rejects_bad_payload(monkeypatch, bad_payload, message):
         captured_tasks.append((target, args, kwargs))
         return {"captured_task": len(captured_tasks)}
 
-    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",
@@ -1554,8 +1559,8 @@ def test_make_decision_rejects_bad_payload(monkeypatch, bad_payload, message):
 def test_make_decision_rejects_choice_not_in_pending_options(monkeypatch):
     captured_tasks = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -1563,7 +1568,7 @@ def test_make_decision_rejects_choice_not_in_pending_options(monkeypatch):
         captured_tasks.append((target, args, kwargs))
         return {"captured_task": len(captured_tasks)}
 
-    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",
@@ -1634,8 +1639,8 @@ def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
 ):
     captured_tasks = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -1643,7 +1648,7 @@ def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
         captured_tasks.append((target, args, kwargs))
         return {"captured_task": len(captured_tasks)}
 
-    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",
@@ -1745,7 +1750,7 @@ def test_stale_run_id_cannot_emit_after_restart():
 
 
 def test_completion_payload_exposes_final_mass_reconciliation():
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -1779,7 +1784,7 @@ def test_completion_payload_exposes_final_mass_reconciliation():
 def test_web_payloads_preserve_full_precision_mass_balance_error(
     monkeypatch,
 ):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -1902,7 +1907,7 @@ def test_web_mass_balance_non_finite_error_fails_closed(error_pct):
 def test_completion_payload_exposes_mass_balance_category_when_pct_none(
     monkeypatch,
 ):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -1943,8 +1948,8 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
     captured_tasks = []
     drive_calls = {"count": 0}
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -1974,7 +1979,7 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
             )
         ])
 
-    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr("web.events.drive_session", one_tick_drive)
     monkeypatch.setattr(
         app_module.socketio,
@@ -2025,7 +2030,7 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
 def test_web_failure_status_and_cleanup_survive_poison_enrichment_failure(
     monkeypatch,
 ):
-    captured_tasks = _force_socketio_stub(monkeypatch)
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     client = app_module.socketio.test_client(app)
     assert client.is_connected()
@@ -2098,8 +2103,8 @@ def test_per_hour_summary_redox_fields_reach_socket_and_recipe_capture_live_path
 ):
     captured_tasks = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -2118,7 +2123,7 @@ def test_per_hour_summary_redox_fields_reach_socket_and_recipe_capture_live_path
         target()
         return {"captured_task": len(captured_tasks)}
 
-    monkeypatch.setattr(web_events, "_get_backend", force_stub_backend)
+    monkeypatch.setattr(web_events, "_get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(web_events, "_emit_if_current", emit_and_stop_after_summary)
     monkeypatch.setattr(
         app_module.socketio,
@@ -2221,8 +2226,8 @@ def test_optional_native_fe_nested_redox_payloads_reach_socket_and_recipe_captur
         "native_fe_vapor_escape_fraction_of_pool": 0.04,
     }
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -2247,7 +2252,7 @@ def test_optional_native_fe_nested_redox_payloads_reach_socket_and_recipe_captur
             )
         ])
 
-    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr("web.events.drive_session", one_tick_drive)
     monkeypatch.setattr(
         app_module.socketio,
@@ -2317,8 +2322,8 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
     captured_tasks = []
     drive_calls = {"count": 0}
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -2349,7 +2354,7 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
             )
         ])
 
-    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr("web.events.drive_session", one_tick_drive)
     monkeypatch.setattr(
         app_module.socketio,
@@ -2399,7 +2404,7 @@ class RaisingCleanedMeltLedger:
 def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
     ledger,
 ):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -2436,8 +2441,8 @@ def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
 def test_web_pause_resume_is_result_neutral(monkeypatch):
     captured_tasks = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -2445,7 +2450,7 @@ def test_web_pause_resume_is_result_neutral(monkeypatch):
         captured_tasks.append(target)
         return {"captured_task": len(captured_tasks)}
 
-    monkeypatch.setattr("web.events._get_backend", force_stub_backend)
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",

@@ -33,7 +33,7 @@ function updateBackendBadge(data) {
     const authoritative = data.backend_authoritative === true;
     badge.textContent = `Backend: ${active} / ${status}`;
     badge.className = 'backend-badge '
-        + (authoritative ? 'backend-badge-ok' : 'backend-badge-stub');
+        + (authoritative ? 'backend-badge-ok' : 'backend-badge-internal-analytical');
     badge.title = data.backend_status_message || data.backend_message || '';
 }
 

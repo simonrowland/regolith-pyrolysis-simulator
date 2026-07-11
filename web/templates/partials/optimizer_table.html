@@ -43,13 +43,13 @@
                 <td>{{ entry.fidelity }}</td>
                 <td>
                     {% set tier = entry.tier_label or {} %}
-                    <span class="backend-badge {{ 'backend-badge-ok' if tier.ux_label == 'CERTIFIED' else ('backend-badge-stub' if tier.ux_label == 'ESTIMATED' else 'backend-badge-unknown') }}"
+                    <span class="backend-badge {{ 'backend-badge-ok' if tier.ux_label == 'CERTIFIED' else ('backend-badge-internal-analytical' if tier.ux_label == 'ESTIMATED' else 'backend-badge-unknown') }}"
                           title="{{ tier.title or 'cache tier from stored artifact' }}">
                         {{ tier.ux_label or 'UNVERIFIED' }} / {{ tier.tier or 'unknown' }}
                     </span>
                 </td>
                 <td>
-                    <span class="backend-badge {{ 'backend-badge-ok' if entry.backend.backend_authoritative else 'backend-badge-stub' }}"
+                    <span class="backend-badge {{ 'backend-badge-ok' if entry.backend.backend_authoritative else 'backend-badge-internal-analytical' }}"
                           title="{{ entry.backend.backend_status_message }}">
                         {{ entry.backend.backend_active }} / {{ entry.backend.backend_status }}
                     </span>

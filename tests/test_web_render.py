@@ -6,7 +6,7 @@ import pytest
 
 import app as app_module
 import web.events as web_events
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -72,8 +72,8 @@ def producer_backed_operator_tick(monkeypatch):
     """Capture a UI payload through the same socket producer used in runtime."""
     captured_tasks = []
 
-    def force_stub_backend(_backend_name):
-        backend = StubBackend()
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
         backend.initialize({})
         return backend
 
@@ -86,7 +86,7 @@ def producer_backed_operator_tick(monkeypatch):
             raise _StopAfterFirstTick()
 
     monkeypatch.setattr(web_events, "_safe_log", lambda _message: None)
-    monkeypatch.setattr(web_events, "_get_backend", force_stub_backend)
+    monkeypatch.setattr(web_events, "_get_backend", force_internal_analytical_backend)
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",

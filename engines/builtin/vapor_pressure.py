@@ -697,7 +697,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         T_C = request.temperature_C
         T_K = T_C + 273.15
         if T_K < 400:
-            # Mirrors _stub_equilibrium: below 400 K, no significant
+            # Mirrors _internal_analytical_equilibrium: below 400 K, no significant
             # evaporation. Return an empty vapor-pressure dict with an
             # 'ok' status -- this is a converged outcome, not a failure.
             return IntentResult(
@@ -1294,7 +1294,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         The simulator computes the commanded overhead pO2 in
         :meth:`EquilibriumMixin._commanded_pO2_bar` and passes it through
         ``control_inputs['pO2_bar']`` to keep parity with the legacy
-        ``_stub_equilibrium``. If that explicit transport channel is
+        ``_internal_analytical_equilibrium``. If that explicit transport channel is
         absent, preserve the old fallback to the standard ``fO2_log``
         channel; if neither is supplied, fall back to the
         numerical vacuum floor.

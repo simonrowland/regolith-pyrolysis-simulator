@@ -33,7 +33,7 @@ from simulator.core import (
     STAGE0_FOULANT_PHASE2_TEMP_C,
     PyrolysisSimulator,
 )
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from tests.chemistry.conftest import _build_sim
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -465,7 +465,7 @@ def _load_batch_sim(
     setpoints_data,
     diagnostics_enabled: bool = True,
 ) -> PyrolysisSimulator:
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,
@@ -592,7 +592,7 @@ def test_foulant_diagnostics_byte_identical_golden_neutral(
 def test_mars_sulfate_emits_sulfate_decomp_diagnostic(
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

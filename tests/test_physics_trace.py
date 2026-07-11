@@ -17,7 +17,7 @@ from simulator.accounting.queries import (
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.mass_balance import MassBalance
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import EvaporationFlux, MOLAR_MASS
 from simulator.trace import PhysicsTrace
 
@@ -39,7 +39,7 @@ def _representative_sim(hours: int = 33) -> PyrolysisSimulator:
     kernel_config["allow_unmeasured_alpha_fallback"] = True
     setpoints["chemistry_kernel"] = kernel_config
 
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
     sim.load_batch("mars_basalt", mass_kg=1000.0, additives_kg={"C": 30.0})
@@ -278,7 +278,7 @@ def test_from_simulator_provenance_gate_matches_legacy_verdict():
     campaigns["C2A"] = c2a
     setpoints["campaigns"] = campaigns
 
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
     sim.load_batch("mars_basalt", mass_kg=1000.0, additives_kg={"C": 30.0})

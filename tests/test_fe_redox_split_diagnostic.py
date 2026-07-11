@@ -10,7 +10,7 @@ import yaml
 
 from simulator.accounting import resolve_species_formula
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import build_per_hour_summary
 from simulator.state import CampaignPhase
 
@@ -26,7 +26,7 @@ def _make_sim(feedstock_id: str, *, temperature_C: float = 1600.0) -> PyrolysisS
     setpoints = _load_yaml("setpoints.yaml")
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
     sim = PyrolysisSimulator(
-        StubBackend(),
+        InternalAnalyticalBackend(),
         setpoints,
         _load_yaml("feedstocks.yaml"),
         _load_yaml("vapor_pressures.yaml"),

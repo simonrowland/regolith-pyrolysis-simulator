@@ -46,7 +46,7 @@ import pytest
 import simulator.melt_backend.sulfsat as sulfsat_module
 from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91
-from simulator.melt_backend.base import StubBackend
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.sulfsat import (
     SulfSatGate,
     SulfurSaturationResult,
@@ -360,7 +360,7 @@ def _sim_with_sulfur_feedstock() -> PyrolysisSimulator:
     so the Stage 0 SulfSat hook actually runs (it short-circuits on
     zero S_input_ppm).
     """
-    backend = StubBackend()
+    backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
         backend,

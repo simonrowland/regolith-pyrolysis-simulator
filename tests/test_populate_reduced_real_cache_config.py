@@ -94,7 +94,7 @@ def test_start_session_passes_profile_additives_to_load_batch(tmp_path):
             "capture",
             db_path=tmp_path / "cache.db",
         ),
-        allow_stub_equilibrium=True,
+        allow_internal_analytical_equilibrium=True,
     )
 
 
@@ -111,5 +111,5 @@ def test_profile_c0b_campaign_key_is_accepted_by_session(tmp_path):
             "capture",
             db_path=tmp_path / "cache.db",
         ),
-        allow_stub_equilibrium=True,
+        allow_internal_analytical_equilibrium=True,
     )
