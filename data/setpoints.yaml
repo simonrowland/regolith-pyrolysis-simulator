@@ -409,6 +409,19 @@ campaigns:
     pO2_mbar: [0.08, 0.35]
     pO2_mbar_default: 0.2
     p_total_mbar_default: 0.2
+    # The N2 continuum floor derives from hard-sphere kinetic theory:
+    # p_min = k_B*T/(sqrt(2)*pi*sigma_N2^2*Kn_max*D), with T=1670 C,
+    # sigma_N2=3.798e-10 m, Kn_max=0.01, and hot-wall D=0.12 m. The
+    # formula returns Pa; divide by 100 for mbar. The operational 5-15 mbar
+    # pN2 band keeps Kn well below 0.01. Derive total pressure as pO2+pN2.
+    # The optimizer pressure-cap chunk consumes this data; it is not a clamp.
+    continuum_pressure_bounds:
+      pN2_mbar: [5.0, 15.0]
+      derived_pN2_floor_mbar: 0.348846
+      knudsen_max: 0.01
+      carrier_gas: "N2"
+      gas_temperature_C: 1670
+      pipe_diameter_m: 0.12
     target_species: ["Mg"]
     Mg_vapour_pressure_bar_1600C: 0.5  # Legacy inert note; MgO congruent vaporization follows overhead pO2, not this fossil scalar.
     prerequisite: "SiO2 activity reduced 30-50% by C3 conditioning"
@@ -517,6 +530,15 @@ campaigns:
     pO2_mbar: [0.08, 0.35]              # bakeout pO2
     pO2_mbar_default: 0.2
     p_total_mbar_default: 0.2
+    # Same N2 continuum derivation and operational band as C4, evaluated at
+    # the C6 maximum 1550 C operating temperature for the derived floor.
+    continuum_pressure_bounds:
+      pN2_mbar: [5.0, 15.0]
+      derived_pN2_floor_mbar: 0.327303
+      knudsen_max: 0.01
+      carrier_gas: "N2"
+      gas_temperature_C: 1550
+      pipe_diameter_m: 0.12
     target_species: ["Al"]
     reaction: "3Mg(l) + Al2O3(melt) -> 3MgO(slag) + 2Al(l)"
     # 2026-07-11 C6 static-recipe sweep:

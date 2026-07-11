@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from typing import Any, Mapping
 
 from simulator.backends import requires_stage0_subprocess
+from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.core import (
@@ -58,7 +59,17 @@ class RunExecutor:
         worker_runtime: Any | None = None,
     ) -> RunExecution:
         session = SimSession()
-        session.start(config, backend=_backend_from_worker_runtime(config, worker_runtime))
+        try:
+            session.start(
+                config,
+                backend=_backend_from_worker_runtime(config, worker_runtime),
+            )
+        except CampaignPressureSetpointRefusal as exc:
+            return self.execute_session(
+                session,
+                hours=int(config.hours),
+                initial_refusal=exc,
+            )
         kwargs: dict[str, Any] = {"hours": int(config.hours)}
         if bool(config.stop_at_stage0_exit):
             kwargs["stop_at_stage0_exit"] = True
@@ -70,6 +81,7 @@ class RunExecutor:
         *,
         hours: int,
         stop_at_stage0_exit: bool | None = None,
+        initial_refusal: CampaignPressureSetpointRefusal | None = None,
     ) -> RunExecution:
         sim = session.simulator
         per_hour: list[dict[str, Any]] = []
@@ -87,6 +99,8 @@ class RunExecutor:
             )
 
         try:
+            if initial_refusal is not None:
+                raise initial_refusal
             for result in drive_session(
                 session,
                 hours,
@@ -112,7 +126,7 @@ class RunExecutor:
                 reason = "stage0_exit"
             elif sim.melt.hour < hours:
                 status = "partial"
-        except KnudsenRegimeRefusal as exc:
+        except (KnudsenRegimeRefusal, CampaignPressureSetpointRefusal) as exc:
             failure_exc = exc
             status = "refused"
             reason = exc.reason

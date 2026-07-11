@@ -326,15 +326,17 @@ class SimSession:
                         f"runtime_campaign_overrides[{campaign!r}].{field_name}",
                     )
 
-        sim.start_campaign(campaign_phase)
-
-        sim.validate_lab_surface_temperature_resolver()
+        # Retain the loaded simulator before campaign configuration so a typed
+        # startup refusal can still be projected through the runner envelope.
         self._sim = sim
         self._config = config
         self._paused = False
         self._step_results = []
         self._operator_decisions = []
         self._result_document = None
+
+        sim.start_campaign(campaign_phase)
+        sim.validate_lab_surface_temperature_resolver()
         return self
 
     def advance(self) -> StepResult:

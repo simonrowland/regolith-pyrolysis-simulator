@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.campaigns import CampaignManager
+from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.core import Atmosphere, CampaignPhase, MeltState
 
 
@@ -255,24 +255,38 @@ def test_c2a_staged_pn2_sweep_trace_po2_is_not_silent_or_phantom_o2():
     assert gas["pn2_band_action"] == ""
 
 
-def test_c2a_staged_pn2_sweep_clamps_to_operating_band():
+@pytest.mark.parametrize(
+    ("p_total_mbar", "requested_pN2_mbar"),
+    [(1.25, 1.0), (20.25, 20.0)],
+)
+def test_c2a_staged_pn2_sweep_outside_operating_band_fails_loud(
+    p_total_mbar,
+    requested_pN2_mbar,
+):
     setpoints = deepcopy(_setpoints())
     _stage(setpoints, "alkali_early_fe").update({
         "gas_cover_mode": "pn2_sweep",
         "pO2_mbar": 0.25,
-        "p_total_mbar": 1.25,
+        "p_total_mbar": p_total_mbar,
     })
-    manager = CampaignManager(setpoints)
-    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+    with pytest.raises(CampaignPressureSetpointRefusal) as exc_info:
+        CampaignManager(setpoints).configure_campaign(
+            MeltState(campaign=CampaignPhase.C2A_STAGED),
+            CampaignPhase.C2A_STAGED,
+        )
 
-    manager.configure_campaign(melt, CampaignPhase.C2A_STAGED)
-    gas = dict(manager.last_c2a_staged_gas_control or {})
-
-    assert melt.atmosphere is Atmosphere.PN2_SWEEP
-    assert gas["pN2_mbar"] == pytest.approx(5.0)
-    assert gas["p_total_mbar"] == pytest.approx(5.25)
-    assert gas["requested_p_total_mbar"] == pytest.approx(1.25)
-    assert gas["pn2_band_action"] == "clamped_low"
+    refusal = exc_info.value
+    assert refusal.reason == "c2a_staged_pn2_outside_operating_band"
+    assert refusal.diagnostic == {
+        "status": "refused",
+        "reason": "c2a_staged_pn2_outside_operating_band",
+        "stage_name": "alkali_early_fe",
+        "gas_cover_mode": "pn2_sweep",
+        "pO2_mbar": pytest.approx(0.25),
+        "requested_p_total_mbar": pytest.approx(p_total_mbar),
+        "requested_pN2_mbar": pytest.approx(requested_pN2_mbar),
+        "allowed_pN2_mbar": [5.0, 15.0],
+    }
 
 
 @pytest.mark.parametrize(

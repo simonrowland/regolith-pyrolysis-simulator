@@ -50,7 +50,7 @@ from simulator.backends import (
 )
 from simulator.config import ConfigBundle, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
-from simulator.campaigns import CampaignManager
+from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.accounting import AccountingQueries
 from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
@@ -62,6 +62,7 @@ from simulator.core import (
     PyrolysisSimulator,
 )
 from simulator.condensation import (
+    KNUDSEN_REFUSAL_REASON,
     gram_lab_exposed_melt_area_bridge,
     stage_purity_report,
 )
@@ -787,13 +788,22 @@ class PyrolysisRun:
 
         lab_area_bridge = self._lab_area_bridge()
         if self._has_sio_pre_run_controls() or lab_area_bridge:
-            session = self._start_session()
-            self._apply_lab_area_bridge(session.simulator, lab_area_bridge)
-            self._apply_sio_pre_run_controls(session.simulator)
-            execution = RunExecutor().execute_session(
-                session,
-                hours=int(self.hours),
-            )
+            session = SimSession()
+            try:
+                session.start(self._session_config())
+            except CampaignPressureSetpointRefusal as exc:
+                execution = RunExecutor().execute_session(
+                    session,
+                    hours=int(self.hours),
+                    initial_refusal=exc,
+                )
+            else:
+                self._apply_lab_area_bridge(session.simulator, lab_area_bridge)
+                self._apply_sio_pre_run_controls(session.simulator)
+                execution = RunExecutor().execute_session(
+                    session,
+                    hours=int(self.hours),
+                )
         else:
             config = self._session_config()
             execution = RunExecutor().execute(config)
@@ -1116,9 +1126,15 @@ class PyrolysisRun:
         )
 
         final_state = _final_state_from_ledger(sim)
+        refusal_diagnostic = dict(execution.refusal_diagnostic or {})
+        if refusal_diagnostic:
+            run_metadata["refusal_diagnostic"] = _json_safe(
+                refusal_diagnostic
+            )
         knudsen_diagnostic = dict(
-            execution.refusal_diagnostic
-            or _knudsen_regime_diagnostic_from_sim(sim)
+            refusal_diagnostic
+            if execution.reason == KNUDSEN_REFUSAL_REASON
+            else _knudsen_regime_diagnostic_from_sim(sim)
         )
         if knudsen_diagnostic:
             run_metadata["knudsen_regime_diagnostic"] = _json_safe(
@@ -3439,9 +3455,13 @@ def _runner_failure_result(
         else {}
     )
     if refusal_diagnostic:
-        run_metadata["knudsen_regime_diagnostic"] = _json_safe(
+        run_metadata["refusal_diagnostic"] = _json_safe(
             refusal_diagnostic
         )
+        if str(reason or "") == KNUDSEN_REFUSAL_REASON:
+            run_metadata["knudsen_regime_diagnostic"] = _json_safe(
+                refusal_diagnostic
+            )
     sim = getattr(execution, "simulator", None) if execution is not None else None
     final_state = (
         _safe_failure_value(lambda: _final_state_from_ledger(sim), {})

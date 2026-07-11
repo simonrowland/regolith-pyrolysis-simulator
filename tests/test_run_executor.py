@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
 
+from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.run_executor import RunExecution, RunExecutor, _aggregate_backend_status
 from simulator.runner import PyrolysisRun
@@ -49,6 +51,33 @@ def test_pyrolysis_run_is_executor_json_adapter():
     execution = RunExecutor().execute(run._session_config())
 
     assert run._build_output(execution) == _run().run()
+
+
+def test_run_executor_preserves_campaign_pressure_refusal_during_startup():
+    run = _pressure_refusal_run()
+
+    execution = RunExecutor().execute(run._session_config())
+
+    assert execution.status == "refused"
+    assert execution.reason == "c2a_staged_pn2_outside_operating_band"
+    assert execution.error_message == execution.reason
+    assert execution.refusal_diagnostic["requested_pN2_mbar"] == pytest.approx(1.0)
+    assert execution.refusal_diagnostic["allowed_pN2_mbar"] == [5.0, 15.0]
+
+
+def test_pyrolysis_run_emits_campaign_pressure_refusal_diagnostic():
+    run = _pressure_refusal_run(sio_hold_temperature_c=1600.0)
+
+    payload = run.run()
+
+    assert payload["status"] == "refused"
+    assert payload["reason"] == "c2a_staged_pn2_outside_operating_band"
+    diagnostic = payload["run_metadata"]["refusal_diagnostic"]
+    assert diagnostic["reason"] == payload["reason"]
+    assert diagnostic["requested_p_total_mbar"] == pytest.approx(1.25)
+    assert diagnostic["requested_pN2_mbar"] == pytest.approx(1.0)
+    assert diagnostic["allowed_pN2_mbar"] == [5.0, 15.0]
+    assert "knudsen_regime_diagnostic" not in payload["run_metadata"]
 
 
 def test_run_executor_partial_path_sets_status_and_decisions():
@@ -172,6 +201,55 @@ def test_run_executor_degraded_envelope_preserves_refusal(monkeypatch):
         "segments": [{"regime": "free_molecular"}],
     }
     assert "envelope detail unavailable" in execution.envelope_detail_unavailable
+
+
+def test_run_executor_preserves_campaign_pressure_refusal_during_execution(
+    monkeypatch,
+):
+    class BareSession:
+        simulator = SimpleNamespace()
+
+    diagnostic = {
+        "status": "refused",
+        "reason": "c2a_staged_pn2_outside_operating_band",
+        "requested_pN2_mbar": 20.0,
+        "allowed_pN2_mbar": [5.0, 15.0],
+    }
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise CampaignPressureSetpointRefusal(diagnostic)
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+
+    execution = RunExecutor().execute_session(BareSession(), hours=1)
+
+    assert execution.status == "refused"
+    assert execution.reason == diagnostic["reason"]
+    assert execution.error_message == diagnostic["reason"]
+    assert execution.refusal_diagnostic == diagnostic
+
+
+def _pressure_refusal_run(**overrides) -> PyrolysisRun:
+    base = _run(campaign="C2A_staged", hours=1)
+    stages = deepcopy(
+        base._session_config().setpoints["campaigns"]["C2A_staged"]["stages"]
+    )
+    stages[0].update({
+        "gas_cover_mode": "pn2_sweep",
+        "pO2_mbar": 0.25,
+        "p_total_mbar": 1.25,
+    })
+    return _run(
+        campaign="C2A_staged",
+        hours=1,
+        setpoints_patch={
+            "campaigns": {"C2A_staged": {"stages": stages}},
+        },
+        **overrides,
+    )
 
 
 def _pre_path_ab_c0b_ledger(

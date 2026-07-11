@@ -14,6 +14,10 @@ unconditional, admits the staged-C2A `c2a_staged_gas` per-hour key, and
 keeps handled failure envelopes on the same fidelity/engine metadata surface as
 successful runs. Existing golden runner fixtures need controller regeneration on
 main; this worktree intentionally does not regenerate them.
+The conditional `run_metadata.refusal_diagnostic` is an additive metadata field:
+campaign-pressure refusals populate that generic field only, while Knudsen
+refusals populate it and the transport-specific
+`knudsen_regime_diagnostic` compatibility field.
 
 Run the CLI as:
 
@@ -117,6 +121,12 @@ it does not introduce a new schema version.
     }
   },
   "kernel_commit_sha": "882250f10c...",       // repo HEAD; "unknown" off-tree
+  "refusal_diagnostic": {                     // present only for a typed refusal
+    "status": "refused",
+    "reason": "c2a_staged_pn2_outside_operating_band",
+    "requested_pN2_mbar": 1.0,
+    "allowed_pN2_mbar": [5.0, 15.0]
+  },
   "knudsen_regime_diagnostic": {              // present after condensation routing
     "status": "ok" | "warning" | "refused",
     "reason": "",
@@ -157,6 +167,10 @@ it does not introduce a new schema version.
   `certification_allowed`, and `engines_used.active/requested/registry`.
 * Any extra keys passed via `run_metadata_overrides` are forwarded
   verbatim; the runner does not interpret them.
+* `refusal_diagnostic` preserves the typed reason and structured evidence for
+  any handled simulation refusal. Campaign-pressure refusals populate only
+  this generic field. Knudsen refusals also populate
+  `knudsen_regime_diagnostic` for transport-specific consumers.
 * `knudsen_regime_diagnostic` reports the transport-regime check for
   the condensation train when a run reaches condensation routing.
 * `pressure_coating_pareto_diagnostic` is diagnostic-only. It replays the

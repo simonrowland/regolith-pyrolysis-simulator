@@ -56,6 +56,19 @@ C2A_STAGED_GAS_COVER_MODES = frozenset({
 })
 C2A_STAGED_PN2_SWEEP_MIN_MBAR = 5.0
 C2A_STAGED_PN2_SWEEP_MAX_MBAR = 15.0
+C2A_STAGED_PN2_BAND_REFUSAL_REASON = (
+    'c2a_staged_pn2_outside_operating_band'
+)
+
+
+class CampaignPressureSetpointRefusal(ValueError):
+    """Raised when a campaign pressure request would otherwise be rewritten."""
+
+    reason = C2A_STAGED_PN2_BAND_REFUSAL_REASON
+
+    def __init__(self, diagnostic: Mapping[str, object]):
+        self.diagnostic = dict(diagnostic)
+        super().__init__(self.reason)
 
 
 @lru_cache(maxsize=None)
@@ -743,18 +756,24 @@ class CampaignManager:
                     f'C2A_staged.stages.{stage_name}.pN2_mbar '
                     'must be positive for gas_cover_mode=pn2_sweep'
                 )
-            clamped_pN2 = min(
-                C2A_STAGED_PN2_SWEEP_MAX_MBAR,
-                max(C2A_STAGED_PN2_SWEEP_MIN_MBAR, pN2_mbar),
-            )
-            if clamped_pN2 != pN2_mbar:
-                band_action = (
-                    'clamped_low'
-                    if pN2_mbar < C2A_STAGED_PN2_SWEEP_MIN_MBAR
-                    else 'clamped_high'
-                )
-                pN2_mbar = clamped_pN2
-                p_total_mbar = pO2_mbar + pN2_mbar
+            if not (
+                C2A_STAGED_PN2_SWEEP_MIN_MBAR
+                <= pN2_mbar
+                <= C2A_STAGED_PN2_SWEEP_MAX_MBAR
+            ):
+                raise CampaignPressureSetpointRefusal({
+                    'status': 'refused',
+                    'reason': C2A_STAGED_PN2_BAND_REFUSAL_REASON,
+                    'stage_name': stage_name,
+                    'gas_cover_mode': mode,
+                    'pO2_mbar': float(pO2_mbar),
+                    'requested_p_total_mbar': float(requested_p_total_mbar),
+                    'requested_pN2_mbar': float(pN2_mbar),
+                    'allowed_pN2_mbar': [
+                        C2A_STAGED_PN2_SWEEP_MIN_MBAR,
+                        C2A_STAGED_PN2_SWEEP_MAX_MBAR,
+                    ],
+                })
             atmosphere = Atmosphere.PN2_SWEEP
 
         diagnostic = {
