@@ -311,10 +311,10 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
     steps = _run_c2a_staged_to_completion(sim)
 
     # C5 is default-off: the staged path now stops after the branch
-    # decision instead of appending a default C5 cleanup segment. The
-    # transition tick is credited to the finishing campaign, so the staged
-    # campaign receives its full commanded hour window.
-    assert steps == 41
+    # decision instead of appending a default C5 cleanup segment. Endpoint
+    # caps count the hour just processed, because check_endpoint runs before
+    # core increments campaign_hour.
+    assert steps == 39
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions

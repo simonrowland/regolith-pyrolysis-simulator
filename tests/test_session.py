@@ -10,6 +10,7 @@ import yaml
 
 import simulator.session as session_module
 from simulator.backends import BackendSelectionPolicy
+from simulator.campaigns import CampaignManager
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.session import (
     DecisionPolicy,
@@ -611,6 +612,60 @@ def test_mre_baseline_track_start_tags_track_without_jumping_campaign():
     assert session.simulator.record.track == "mre_baseline"
     assert session.simulator.melt.campaign == CampaignPhase.C0
     assert session.simulator.melt.campaign != CampaignPhase.MRE_BASELINE
+
+
+def test_c0b_hard_cap_ignores_sub_soft_temperature():
+    manager = CampaignManager(_load_yaml("setpoints.yaml"))
+    melt = SimpleNamespace(
+        campaign=CampaignPhase.C0B,
+        campaign_hour=2.0,
+        temperature_C=1199.0,
+    )
+
+    assert manager.check_endpoint(
+        melt,
+        SimpleNamespace(total_kg_hr=0.0),
+        SimpleNamespace(),
+        SimpleNamespace(),
+    )
+
+
+def test_core_apply_decision_rejects_pending_type_mismatch():
+    session = SimSession().start(_config())
+    sim = session.simulator
+    pending = DecisionPoint(
+        DecisionType.PATH_AB,
+        options=["A", "A_staged", "B"],
+        recommendation="A_staged",
+        context="choose path",
+    )
+    sim.pending_decision = pending
+    sim.paused_for_decision = True
+
+    with pytest.raises(ValueError, match="pending decision is PATH_AB"):
+        sim.apply_decision(DecisionType.BRANCH_ONE_TWO, "two")
+
+    assert sim.pending_decision is pending
+    assert sim.paused_for_decision is True
+    assert sim.record.decisions[-1:] == []
+
+
+def test_core_apply_decision_handles_c7_proceed():
+    session = SimSession().start(_config(campaign="C6"))
+    sim = session.simulator
+    sim.pending_decision = DecisionPoint(
+        DecisionType.C7_PROCEED,
+        options=["yes", "no"],
+        recommendation="yes",
+        context="run C7",
+    )
+    sim.paused_for_decision = True
+
+    sim.apply_decision(DecisionType.C7_PROCEED, "yes")
+
+    assert sim.melt.campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC
+    assert sim.pending_decision is None
+    assert sim.paused_for_decision is False
 
 
 def test_pause_resume_are_result_neutral_pacing_flags():

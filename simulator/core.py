@@ -168,6 +168,14 @@ from simulator.chemistry.kernel import (
 # ============================================================================
 
 _PRESERVE_REFERENCE_T_K = object()
+_VALID_DECISION_CHOICES = {
+    DecisionType.ROOT_BRANCH: ('pyrolysis', 'mre_baseline'),
+    DecisionType.PATH_AB: ('A', 'A_staged', 'B'),
+    DecisionType.BRANCH_ONE_TWO: ('two', 'one'),
+    DecisionType.TI_RETENTION: ('retain', 'extract'),
+    DecisionType.C6_PROCEED: ('yes', 'no'),
+    DecisionType.C7_PROCEED: ('yes', 'no'),
+}
 _RESOLVE_MELT_REDOX_GATE_AUTHORITY = object()
 _MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN = 256
 DEGRADED_PATH_ENGAGEMENT_KEYS = (
@@ -5868,9 +5876,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         proposal = kernel_result.transition
         diagnostic = dict(kernel_result.diagnostic or {})
+        split_commit_status = str(
+            getattr(kernel_result, 'status', '')
+            or diagnostic.get('status', '')
+            or 'ok'
+        )
         transition = None
         if proposal is None:
             self._chem_no_op_dispatch_count += 1
+            split_commit_status = (
+                split_commit_status
+                if split_commit_status and split_commit_status != 'ok'
+                else 'no_commit'
+            )
         else:
             transition_source, transition_meta = (
                 self._melt_redox_transition_provenance(gate_authority)
@@ -5896,10 +5914,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else 0.0
         )
         requested_vapor_mol = float(partition.get('native_fe_vapor_mol', 0.0) or 0.0)
-        vapor_route = self._route_native_fe_vapor_to_condensation(
-            requested_vapor_mol,
-            sample_time_h=sample_time_h,
-        )
+        if transition is None:
+            vapor_route = {
+                'native_fe_vapor_route_status': 'suppressed_no_committed_split',
+                'native_fe_vapor_route_suppressed_mol': requested_vapor_mol,
+            }
+        else:
+            vapor_route = self._route_native_fe_vapor_to_condensation(
+                requested_vapor_mol,
+                sample_time_h=sample_time_h,
+            )
         self._project_cleaned_melt_from_atom_ledger()
         committed_vapor_mol = float(
             vapor_route.get('native_fe_vapor_mol', 0.0) or 0.0
@@ -5912,6 +5936,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._native_fe_vapor_residual_capacity_mol_this_hr = residual_capacity_mol
         partition.update({
+            'native_fe_split_commit_status': split_commit_status,
+            'native_fe_vapor_route_status': str(
+                vapor_route.get('native_fe_vapor_route_status', '')
+                or 'unknown'
+            ),
+            'native_fe_vapor_route_suppressed_mol': float(
+                vapor_route.get('native_fe_vapor_route_suppressed_mol', 0.0)
+                or 0.0
+            ),
             'native_fe_pool_mol': committed_pool_mol,
             'native_fe_vapor_mol': committed_vapor_mol,
             'native_fe_tap_mol': committed_tap_mol,
@@ -5966,11 +5999,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             exchange_direction='redox_source:native_fe_saturation_split',
             gate_authority=gate_authority,
         )
-        event = {
-            'native_fe_event': 'native_fe_partitioned_saturation',
-            'native_fe_event_reason': 'native_fe_saturation_split_applied',
-            'native_fe_event_status': 'ok',
-        }
+        if transition is None:
+            event_reason = str(
+                diagnostic.get('reason_refused')
+                or diagnostic.get('reason')
+                or 'native_fe_saturation_split_no_commit'
+            )
+            event = {
+                'native_fe_event': 'native_fe_saturation_no_commit',
+                'native_fe_event_reason': event_reason,
+                'native_fe_event_status': (
+                    'refused' if split_commit_status == 'refused' else 'no_commit'
+                ),
+            }
+        else:
+            event = {
+                'native_fe_event': 'native_fe_partitioned_saturation',
+                'native_fe_event_reason': 'native_fe_saturation_split_applied',
+                'native_fe_event_status': 'ok',
+            }
         self._last_native_fe_saturation_event = dict(event)
         return {**split, 'native_fe_partition': dict(partition), **event}
 
@@ -10260,6 +10307,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             decision_type: Which decision was made
             choice:        The chosen option string
         """
+        choice = str(choice)
+        if decision_type not in _VALID_DECISION_CHOICES:
+            raise ValueError(f"unsupported decision type {decision_type.name}")
+        pending = self.pending_decision
+        if pending is not None:
+            if pending.decision_type is not decision_type:
+                raise ValueError(
+                    f"pending decision is {pending.decision_type.name}, "
+                    f"got {decision_type.name}"
+                )
+            valid_choices = tuple(str(option) for option in pending.options)
+        else:
+            valid_choices = _VALID_DECISION_CHOICES.get(decision_type, ())
+        if valid_choices and choice not in valid_choices:
+            raise ValueError(
+                f"invalid {decision_type.name} choice {choice!r}; "
+                f"valid choices: {', '.join(valid_choices)}"
+            )
         self.record.decisions.append((decision_type, choice))
 
         if decision_type == DecisionType.ROOT_BRANCH:
@@ -10297,6 +10362,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.start_campaign(CampaignPhase.C6)
             else:
                 self.melt.campaign = CampaignPhase.COMPLETE
+
+        elif decision_type == DecisionType.C7_PROCEED:
+            if choice == 'yes':
+                self.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+            else:
+                self.melt.campaign = CampaignPhase.COMPLETE
+
+        else:
+            raise ValueError(f"unsupported decision type {decision_type.name}")
 
         self.paused_for_decision = False
         self.pending_decision = None

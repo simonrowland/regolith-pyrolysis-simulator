@@ -1337,6 +1337,12 @@ class CampaignManager:
     # Endpoint detection
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _completed_campaign_hour_for_endpoint(melt: MeltState) -> float:
+        # check_endpoint runs after the hour's work and before core increments
+        # campaign_hour, so hard duration caps must include the current hour.
+        return float(melt.campaign_hour) + 1.0
+
     def check_endpoint(self, melt: MeltState,
                        evap_flux: EvaporationFlux,
                        train: CondensationTrain,
@@ -1360,12 +1366,13 @@ class CampaignManager:
         Returns True if the campaign should end.
         """
         campaign = melt.campaign
+        completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt)
 
         # Check user-specified max_hours override first
         ovr = self._campaign_overrides(campaign)
         if 'max_hours' in ovr:
             max_h = float(ovr['max_hours'])
-            if max_h > 0 and melt.campaign_hour >= max_h:
+            if max_h > 0 and completed_campaign_hour >= max_h:
                 return True
 
         if campaign == CampaignPhase.C0:
@@ -1380,16 +1387,12 @@ class CampaignManager:
             if (melt.temperature_C >= min_temperature_C
                     and melt.campaign_hour >= min_hold_hr):
                 return True
-            if melt.campaign_hour >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C0B:
-            soft = self._configured_endpoint(campaign, 'soft_endpoint')
             max_hold_hr = self._max_hold_hr(campaign)
-            min_temperature_C = self._endpoint_float(
-                campaign, soft, 'temperature_min_C')
-            if (melt.campaign_hour >= max_hold_hr
-                    and melt.temperature_C >= min_temperature_C):
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C2A:
@@ -1407,7 +1410,7 @@ class CampaignManager:
             if (melt.campaign_hour >= min_hold_hr
                     and total_rate < threshold_kg_hr):
                 return True
-            if melt.campaign_hour >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C2A_STAGED:
@@ -1421,7 +1424,7 @@ class CampaignManager:
                     'per-stage depletion_log_slope_epsilon_per_hr'
                 )
             if legacy_fraction <= 0.0 and not has_log_slope_depletion:
-                if melt.campaign_hour + 1 >= max_hold_hr:
+                if completed_campaign_hour >= max_hold_hr:
                     self.last_c2a_staged_termination = {
                         'reason': 'fixed_duration',
                         'campaign_hour': int(melt.campaign_hour),
@@ -1430,7 +1433,7 @@ class CampaignManager:
                 return False
 
             if not stages:
-                if melt.campaign_hour + 1 >= max_hold_hr:
+                if completed_campaign_hour >= max_hold_hr:
                     self.last_c2a_staged_termination = {
                         'reason': 'fixed_duration',
                         'campaign_hour': int(melt.campaign_hour),
@@ -1528,7 +1531,7 @@ class CampaignManager:
                 self._c2a_staged_cumulative_yield_mol_by_species = {}
                 self._c2a_staged_last_log_slope_by_species = {}
                 return False
-            if melt.campaign_hour + 1 >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 self.last_c2a_staged_termination = {
                     'reason': 'max_hold_ceiling',
                     'stage': self._c2a_staged_stage_label(stage),
@@ -1554,7 +1557,7 @@ class CampaignManager:
             rate = evap_flux.species_kg_hr.get(species, 0.0)
             if melt.campaign_hour >= min_hold_hr and rate < threshold_kg_hr:
                 return True
-            if melt.campaign_hour >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C3_K:
@@ -1563,12 +1566,12 @@ class CampaignManager:
                     self._campaign_overrides(campaign).get('staged_duration_h'),
                     self._configured_max_hold_hr(campaign, 'C3_K', 'A_staged'),
                 ))
-                if melt.campaign_hour >= max(1, staged_hours):
+                if completed_campaign_hour >= max(1, staged_hours):
                     return True
             path_key = 'A' if record.path == 'A' else 'default'
             max_hold_hr = self._configured_max_hold_hr(
                 campaign, 'C3_K', path_key)
-            if melt.campaign_hour >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C3_NA:
@@ -1589,12 +1592,12 @@ class CampaignManager:
                     self._campaign_overrides(campaign).get('staged_duration_h'),
                     self._configured_max_hold_hr(campaign, 'C3_NA', 'A_staged'),
                 ))
-                if melt.campaign_hour >= max(1, staged_hours):
+                if completed_campaign_hour >= max(1, staged_hours):
                     return True
             path_key = 'A' if record.path == 'A' else 'default'
             max_hold_hr = self._configured_max_hold_hr(
                 campaign, 'C3_NA', path_key)
-            if melt.campaign_hour >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C4:
@@ -1612,7 +1615,7 @@ class CampaignManager:
             rate = evap_flux.species_kg_hr.get(species, 0.0)
             if melt.campaign_hour >= min_hold_hr and rate < threshold_kg_hr:
                 return True
-            if melt.campaign_hour >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C5:
@@ -1666,7 +1669,7 @@ class CampaignManager:
                 melt.mre_low_current_hours = 0
             if melt.mre_low_current_hours >= consecutive_hours:
                 return True
-            if melt.campaign_hour >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C6:
@@ -1684,12 +1687,12 @@ class CampaignManager:
             refractory_pct = sum(comp.get(str(name), 0.0) for name in species)
             if melt.campaign_hour >= min_hold_hr and refractory_pct < threshold_wt_pct:
                 return True
-            if melt.campaign_hour >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             max_hold_hr = self._max_hold_hr(campaign)
-            if melt.campaign_hour >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.MRE_BASELINE:
@@ -1707,7 +1710,7 @@ class CampaignManager:
                 melt.mre_low_current_hours = 0
             if melt.mre_low_current_hours >= consecutive_hours:
                 return True
-            if melt.campaign_hour >= max_hold_hr:
+            if completed_campaign_hour >= max_hold_hr:
                 return True
 
         return False

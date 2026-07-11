@@ -1233,13 +1233,20 @@ def _unspent_additive_reagent_element_mol(element: str, queries: Any) -> float:
 
 
 def _credit_line_reagent_element_mol(element: str, queries: Any) -> float:
+    total = 0.0
     credit_helper = getattr(queries, "c3_alkali_credit_outstanding_kg_by_species", None)
-    if not callable(credit_helper):
-        return 0.0
-    values = credit_helper()
-    if not isinstance(values, Mapping):
-        return math.inf
-    return _target_relevant_element_mol(element, values)
+    if callable(credit_helper):
+        values = credit_helper()
+        if not isinstance(values, Mapping):
+            return math.inf
+        total += _target_relevant_element_mol(element, values)
+    c7_helper = getattr(queries, "c7_al_credit_kg_by_species", None)
+    if callable(c7_helper):
+        values = c7_helper()
+        if not isinstance(values, Mapping):
+            return math.inf
+        total += _target_relevant_element_mol(element, values)
+    return total
 
 
 def _external_reagent_inventory_element_mol(element: str, queries: Any) -> float:

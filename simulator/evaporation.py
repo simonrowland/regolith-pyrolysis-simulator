@@ -1690,7 +1690,9 @@ class EvaporationMixin:
         overhead_o2_mol = 0.0
         overhead_fe_mol = 0.0
         feo_debit_mol = 0.0
+        route_status = 'no_transition'
         if transition is not None:
+            route_status = 'committed'
             feo_debit_mol = self._transition_species_mol(
                 transition,
                 side='debits',
@@ -1712,6 +1714,7 @@ class EvaporationMixin:
             routed_fe_mol = overhead_fe_mol
         remaining_kg = float(route_diag.get('remaining_kg', 0.0) or 0.0)
         return {
+            'native_fe_vapor_route_status': route_status,
             'native_fe_vapor_mol': float(routed_fe_mol),
             'native_fe_vapor_kg': float(routed_fe_mol * fe_molar_mass),
             'native_fe_overhead_o2_mol': float(overhead_o2_mol),

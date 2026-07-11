@@ -259,6 +259,15 @@ class AccountingQueries:
             if float(kg) > 0.0
         }
 
+    def c7_al_credit_kg_by_species(self) -> dict[str, float]:
+        input_kg = max(
+            0.0,
+            float(getattr(self.sim, "_c7_al_credit_input_kg", 0.0) or 0.0),
+        )
+        if input_kg > 0.0:
+            return {"Al": input_kg}
+        return self.species_kg_by_accounts((C7_AL_CREDIT_ACCOUNT,))
+
     def initial_cleaned_melt_kg(self) -> dict[str, float]:
         record = getattr(self.sim, "record", None)
         inventory = getattr(record, "initial_inventory", None)

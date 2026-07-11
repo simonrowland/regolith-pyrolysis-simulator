@@ -4,7 +4,7 @@ import pytest
 
 from engines.builtin.metallothermic_step import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
-from simulator.accounting import MaterialLot
+from simulator.accounting import AccountingQueries, MaterialLot
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
     ChemistryIntent,
@@ -238,6 +238,31 @@ def test_rump_element_kg_includes_c7_al_credit():
     assert sum(sim._terminal_rump_by_class().values()) == pytest.approx(
         al_credit_kg
     )
+
+
+def test_c7_credit_seeded_as_non_feedstock_provenance():
+    backend = StubBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {"C7": {"al_credit_limit_kg": 7.5}}},
+        {
+            "oxide": {
+                "label": "Al oxide",
+                "composition_wt_pct": {"Al2O3": 100.0},
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("oxide", mass_kg=MOLAR_MASS["Al2O3"])
+
+    sim._init_c7_al_credit()
+
+    assert sim.product_ledger()["Al"] == pytest.approx(7.5)
+    assert sim._rump_element_kg("Al") >= 7.5
+    assert AccountingQueries(sim).non_feedstock_reagent_element_kg_by_account()[
+        C7_AL_CREDIT_ACCOUNT
+    ]["Al"] == pytest.approx(7.5)
 
 
 def test_c2a_staged_rump_expectation_keeps_ca_and_al():

@@ -2045,6 +2045,11 @@ class ExtractionMixin:
             {'Al': credit_kg},
             source='C7 imported Al credit line',
         )
+        self._add_non_feedstock_reagent_element(
+            C7_AL_CREDIT_ACCOUNT,
+            'Al',
+            credit_kg,
+        )
         self.cost_ledger.seed_external_material(
             account=C7_AL_CREDIT_ACCOUNT,
             species='Al',

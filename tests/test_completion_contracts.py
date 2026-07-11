@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
 from simulator.accounting.formulas import parse_formula
 from simulator.accounting.completeness import (
     CompletionContractBlocked,
@@ -56,6 +57,7 @@ class _FakeQueries:
         reagents: dict[str, float] | None = None,
         feedstock_recovered_reagents: dict[str, float] | None = None,
         c3_credit_outstanding: dict[str, float] | None = None,
+        c7_al_credit: dict[str, float] | None = None,
         additives_kg: dict[str, float] | None = None,
         non_feedstock_reagent_element_by_account: (
             dict[str, dict[str, float]] | None
@@ -68,6 +70,7 @@ class _FakeQueries:
         self._reagents = reagents or {}
         self._feedstock_recovered_reagents = feedstock_recovered_reagents or {}
         self._c3_credit_outstanding = c3_credit_outstanding or {}
+        self._c7_al_credit = c7_al_credit or {}
         self._non_feedstock_reagent_element_by_account = (
             non_feedstock_reagent_element_by_account or {}
         )
@@ -99,6 +102,9 @@ class _FakeQueries:
 
     def c3_alkali_credit_outstanding_kg_by_species(self) -> dict[str, float]:
         return dict(self._c3_credit_outstanding)
+
+    def c7_al_credit_kg_by_species(self) -> dict[str, float]:
+        return dict(self._c7_al_credit)
 
     def non_feedstock_reagent_element_kg_by_account(
         self,
@@ -827,6 +833,22 @@ def test_e1b_target_yield_fails_closed_on_unclean_additive_provenance() -> None:
 
     assert result.yield_fraction is None
     assert "unclean additive/reagent provenance for Na" in result.reason
+
+
+def test_e1b_target_yield_fails_closed_on_c7_credit_without_provenance() -> None:
+    al_kg = MOLAR_MASS["Al"] / 1000.0
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Al",),
+        {"Al2O3": 0.5 * MOLAR_MASS["Al2O3"] / 1000.0},
+        _FakeQueries(
+            {C7_AL_CREDIT_ACCOUNT: {"Al": al_kg}},
+            c7_al_credit={"Al": al_kg},
+        ),
+    )["Al"]
+
+    assert result.yield_fraction is None
+    assert "unclean additive/reagent provenance for Al" in result.reason
 
 
 def test_vapor_contract_blocks_unsupported_provenance_rule() -> None:
