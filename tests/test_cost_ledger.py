@@ -1,6 +1,7 @@
 import copy
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -250,6 +251,10 @@ def test_cost_rollup_allocates_pumping_sidecar_without_costing_run_input():
     assert pumping["status"] == "ok"
     assert pumping["pumping_electrical_kWh"] == pytest.approx(0.3006989878103832)
     assert pumping["rows"][0]["regime"] == "pump"
+    components = diagnostic["auxiliary_electrical_diagnostic"]["components_kWh"]
+    assert components["pumping"] == pytest.approx(0.3006989878103832)
+    assert components["turbine"] == pytest.approx(0.0)
+    assert components["condenser"] == pytest.approx(0.0)
     o2 = CostVector(
         **diagnostic["product_costs"]["terminal.product:O2"]["accumulated_cost"]
     )
@@ -280,6 +285,133 @@ def test_cost_rollup_allocates_non_mre_electrical_to_real_products():
         **diagnostic["product_costs"]["terminal.product:Fe"]["accumulated_cost"]
     )
     assert fe.electrical_kWh == pytest.approx(9.0)
+    assert fe.thermal_flux_h == pytest.approx(1273.15)
+
+
+def test_cost_rollup_allocates_c5_mre_auxiliary_electrical_by_component():
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=(
+            {
+                "campaign": "C5",
+                "T_C": 1500.0,
+                "energy_electrical_kWh": 1000.0,
+                "energy_electrical_breakdown_kWh": {
+                    "turbine_kWh": 2.0,
+                    "condenser_kWh": 3.0,
+                    "pumping_kWh": 0.5,
+                    "mre_kWh": 994.5,
+                },
+            },
+            {
+                "campaign": "MRE_BASELINE",
+                "T_C": 1600.0,
+                "energy_electrical_kWh": 2000.0,
+                "energy_electrical_breakdown_kWh": {
+                    "turbine_kWh": 4.0,
+                    "condenser_kWh": 1.0,
+                    "pumping_electrical_kWh": 1.5,
+                    "mre_kWh": 1993.5,
+                },
+            },
+        ),
+        products_kg={"O2": 1.0},
+    )
+
+    components = diagnostic["auxiliary_electrical_diagnostic"]["components_kWh"]
+    assert components["turbine"] == pytest.approx(6.0)
+    assert components["condenser"] == pytest.approx(4.0)
+    assert components["pumping"] == pytest.approx(2.0)
+    o2 = CostVector(
+        **diagnostic["product_costs"]["terminal.product:O2"]["accumulated_cost"]
+    )
+    assert o2.electrical_kWh == pytest.approx(12.0)
+
+
+def test_cost_rollup_uses_snapshot_electrical_breakdown_for_mre_auxiliary():
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=(
+            {
+                "hour": 7,
+                "campaign": "C5",
+                "T_C": 1500.0,
+                "energy_electrical_kWh": 100.0,
+            },
+        ),
+        products_kg={"O2": 1.0},
+        snapshots=(
+            SimpleNamespace(
+                hour=7,
+                energy=SimpleNamespace(
+                    turbine_kWh=2.0,
+                    condenser_kWh=3.0,
+                    mre_kWh=95.0,
+                ),
+            ),
+        ),
+    )
+
+    components = diagnostic["auxiliary_electrical_diagnostic"]["components_kWh"]
+    assert components["turbine"] == pytest.approx(2.0)
+    assert components["condenser"] == pytest.approx(3.0)
+    assert components["pumping"] == pytest.approx(0.0)
+    o2 = CostVector(
+        **diagnostic["product_costs"]["terminal.product:O2"]["accumulated_cost"]
+    )
+    assert o2.electrical_kWh == pytest.approx(5.0)
+
+
+def test_cost_rollup_breakdown_aliases_do_not_double_sum():
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=(
+            {
+                "campaign": "C5",
+                "T_C": 1500.0,
+                "energy_electrical_breakdown_kWh": {
+                    "turbine_kWh": 2.0,
+                    "turbine": 2.0,
+                    "condenser_kWh": 3.0,
+                    "condenser": 3.0,
+                    "pumping_kWh": 0.5,
+                    "pumping": 0.5,
+                },
+            },
+        ),
+        products_kg={"O2": 1.0},
+    )
+
+    components = diagnostic["auxiliary_electrical_diagnostic"]["components_kWh"]
+    assert components["turbine"] == pytest.approx(2.0)
+    assert components["condenser"] == pytest.approx(3.0)
+    assert components["pumping"] == pytest.approx(0.5)
+    o2 = CostVector(
+        **diagnostic["product_costs"]["terminal.product:O2"]["accumulated_cost"]
+    )
+    assert o2.electrical_kWh == pytest.approx(5.5)
+
+
+def test_cost_rollup_empty_electrical_breakdown_mapping_means_zero():
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=CostLedger(),
+        per_hour=(
+            {
+                "campaign": "C2A",
+                "T_C": 1000.0,
+                "energy_electrical_kWh": 99.0,
+                "energy_electrical_breakdown_kWh": {},
+            },
+        ),
+        products_kg={"Fe": 1.0},
+    )
+
+    components = diagnostic["auxiliary_electrical_diagnostic"]["components_kWh"]
+    assert components == {"condenser": 0.0, "pumping": 0.0, "turbine": 0.0}
+    fe = CostVector(
+        **diagnostic["product_costs"]["terminal.product:Fe"]["accumulated_cost"]
+    )
+    assert fe.electrical_kWh == pytest.approx(0.0)
     assert fe.thermal_flux_h == pytest.approx(1273.15)
 
 

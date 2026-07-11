@@ -1132,6 +1132,7 @@ class PyrolysisRun:
                 per_hour=execution.per_hour,
                 products_kg=sim.product_ledger(),
                 pumping_context=pumping_context_from_sim(sim, execution.snapshots),
+                snapshots=execution.snapshots,
             )
         )
         sim.record.cost_rollup = dict(run_metadata["cost_rollup_diagnostic"])

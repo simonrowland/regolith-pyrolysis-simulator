@@ -33,12 +33,11 @@ _AUXILIARY_ELECTRICAL_BREAKDOWN_FIELDS = (
     "energy_electrical_breakdown_kWh",
     "electrical_breakdown_kWh",
 )
-_AUXILIARY_ELECTRICAL_COMPONENT_KEYS = (
-    "turbine_kWh",
-    "turbine",
-    "condenser_kWh",
-    "condenser",
-)
+_AUXILIARY_ELECTRICAL_COMPONENT_ALIASES = MappingProxyType({
+    "turbine": ("turbine_kWh", "turbine"),
+    "condenser": ("condenser_kWh", "condenser"),
+    "pumping": ("pumping_electrical_kWh", "pumping_kWh", "pumping"),
+})
 _RETURN_NONE = object()
 _RETURN_EMPTY_TUPLE = object()
 _RETURN_SUMMARY = object()
@@ -806,6 +805,7 @@ def build_cost_rollup_diagnostic(
     per_hour: tuple[dict[str, Any], ...],
     products_kg: Mapping[str, float],
     pumping_context: Mapping[str, Any] | None = None,
+    snapshots: tuple[Any, ...] = (),
 ) -> dict[str, Any]:
     try:
         return _build_cost_rollup_diagnostic(
@@ -813,6 +813,7 @@ def build_cost_rollup_diagnostic(
             per_hour=per_hour,
             products_kg=products_kg,
             pumping_context=pumping_context,
+            snapshots=snapshots,
         )
     except Exception as exc:  # noqa: BLE001 -- cost diagnostics must not abort runner output
         cost_ledger._record_best_effort_error(
@@ -836,7 +837,9 @@ def _build_cost_rollup_diagnostic(
     per_hour: tuple[dict[str, Any], ...],
     products_kg: Mapping[str, float],
     pumping_context: Mapping[str, Any] | None = None,
+    snapshots: tuple[Any, ...] = (),
 ) -> dict[str, Any]:
+    per_hour = _per_hour_with_snapshot_electrical_breakdown(per_hour, snapshots)
     summary = cost_ledger.summary()
     furnace_input = _run_furnace_input_cost(per_hour)
     pumping_enabled = isinstance(pumping_context, Mapping)
@@ -844,7 +847,9 @@ def _build_cost_rollup_diagnostic(
         _run_pumping_input_cost(pumping_context)
         if pumping_enabled else (ZERO_COST, {})
     )
-    auxiliary_electrical_input = _run_auxiliary_electrical_input_cost(per_hour)
+    auxiliary_electrical_input, auxiliary_electrical_components = (
+        _run_auxiliary_electrical_input_cost(per_hour)
+    )
     product_allocation_input = (
         furnace_input + pumping_input + auxiliary_electrical_input
     )
@@ -900,6 +905,21 @@ def _build_cost_rollup_diagnostic(
             "pumping_electrical_kWh": pumping_input.electrical_kWh,
             "status": pumping_diagnostic.get("status", "unknown"),
         }
+    electrical_components = {
+        **auxiliary_electrical_components,
+        "pumping": auxiliary_electrical_components.get("pumping", 0.0)
+        + pumping_input.electrical_kWh,
+    }
+    summary["auxiliary_electrical_diagnostic"] = {
+        "schema_version": "auxiliary-electrical-rollup-v1",
+        "components_kWh": {
+            component: float(electrical_components.get(component, 0.0))
+            for component in sorted(_AUXILIARY_ELECTRICAL_COMPONENT_ALIASES)
+        },
+        "auxiliary_electrical_kWh": float(
+            sum(electrical_components.values())
+        ),
+    }
     summary["run_input_cost"] = run_input_cost
     if not product_inputs and not product_allocation_input.is_zero():
         summary["warnings"] = [
@@ -932,38 +952,116 @@ def _run_furnace_input_cost(per_hour: tuple[dict[str, Any], ...]) -> CostVector:
     return CostVector(thermal_flux_h=thermal_flux_h, furnace_h=furnace_h)
 
 
+def _per_hour_with_snapshot_electrical_breakdown(
+    per_hour: tuple[dict[str, Any], ...],
+    snapshots: tuple[Any, ...],
+) -> tuple[dict[str, Any], ...]:
+    try:
+        snapshot_rows = tuple(snapshots or ())
+    except TypeError:
+        snapshot_rows = ()
+    if not snapshot_rows:
+        return tuple(per_hour)
+    snapshots_by_hour: dict[int, Any] = {}
+    for snapshot in snapshot_rows:
+        hour = _finite(getattr(snapshot, "hour", math.nan), default=math.nan)
+        if math.isfinite(hour):
+            snapshots_by_hour[int(hour)] = snapshot
+
+    rows: list[dict[str, Any]] = []
+    for index, row in enumerate(tuple(per_hour)):
+        if not isinstance(row, Mapping):
+            rows.append(row)
+            continue
+        augmented = dict(row)
+        if not any(field in augmented for field in _AUXILIARY_ELECTRICAL_BREAKDOWN_FIELDS):
+            snapshot = _snapshot_for_per_hour_row(
+                augmented,
+                index,
+                snapshot_rows,
+                snapshots_by_hour,
+            )
+            breakdown = _electrical_breakdown_from_snapshot(snapshot)
+            if breakdown is not None:
+                augmented["energy_electrical_breakdown_kWh"] = breakdown
+        rows.append(augmented)
+    return tuple(rows)
+
+
+def _snapshot_for_per_hour_row(
+    row: Mapping[str, Any],
+    index: int,
+    snapshots: tuple[Any, ...],
+    snapshots_by_hour: Mapping[int, Any],
+) -> Any:
+    hour = _finite(row.get("hour"), default=math.nan)
+    if math.isfinite(hour) and int(hour) in snapshots_by_hour:
+        return snapshots_by_hour[int(hour)]
+    if index < len(snapshots):
+        return snapshots[index]
+    return None
+
+
+def _electrical_breakdown_from_snapshot(snapshot: Any) -> dict[str, float] | None:
+    energy = getattr(snapshot, "energy", None)
+    if energy is None:
+        return None
+    return {
+        "turbine_kWh": max(0.0, _finite(getattr(energy, "turbine_kWh", 0.0))),
+        "condenser_kWh": max(0.0, _finite(getattr(energy, "condenser_kWh", 0.0))),
+        "mre_kWh": max(0.0, _finite(getattr(energy, "mre_kWh", 0.0))),
+    }
+
+
 def _run_auxiliary_electrical_input_cost(
     per_hour: tuple[dict[str, Any], ...],
-) -> CostVector:
-    electrical_kWh = 0.0
+) -> tuple[CostVector, dict[str, float]]:
+    components = {
+        component: 0.0
+        for component in _AUXILIARY_ELECTRICAL_COMPONENT_ALIASES
+    }
     for row in per_hour:
         if not isinstance(row, Mapping):
             continue
-        component_electrical = _auxiliary_electrical_from_breakdown(row)
-        if component_electrical is not None:
-            electrical_kWh += component_electrical
+        row_components = _auxiliary_electrical_from_breakdown(row)
+        if row_components is not None:
+            for component, value in row_components.items():
+                components[component] += value
             continue
         campaign = str(row.get("campaign", "")).split(".")[-1].upper()
         if not campaign or campaign in MRE_ELECTRICAL_CAMPAIGNS:
             continue
-        electrical_kWh += max(0.0, _finite(row.get("energy_electrical_kWh")))
-    return CostVector(electrical_kWh=electrical_kWh)
+        components["turbine"] += max(0.0, _finite(row.get("energy_electrical_kWh")))
+    return CostVector(electrical_kWh=sum(components.values())), components
 
 
-def _auxiliary_electrical_from_breakdown(row: Mapping[str, Any]) -> float | None:
+def _auxiliary_electrical_from_breakdown(
+    row: Mapping[str, Any],
+) -> dict[str, float] | None:
     for field in _AUXILIARY_ELECTRICAL_BREAKDOWN_FIELDS:
         breakdown = row.get(field)
         if isinstance(breakdown, Mapping):
-            return sum(
-                max(0.0, _finite(breakdown.get(key)))
-                for key in _AUXILIARY_ELECTRICAL_COMPONENT_KEYS
-            )
-    if any(key in row for key in _AUXILIARY_ELECTRICAL_COMPONENT_KEYS):
-        return sum(
-            max(0.0, _finite(row.get(key)))
-            for key in _AUXILIARY_ELECTRICAL_COMPONENT_KEYS
-        )
+            return _canonical_auxiliary_electrical_components(breakdown)
+    if any(
+        alias in row
+        for aliases in _AUXILIARY_ELECTRICAL_COMPONENT_ALIASES.values()
+        for alias in aliases
+    ):
+        return _canonical_auxiliary_electrical_components(row)
     return None
+
+
+def _canonical_auxiliary_electrical_components(
+    values: Mapping[str, Any],
+) -> dict[str, float]:
+    components: dict[str, float] = {}
+    for component, aliases in _AUXILIARY_ELECTRICAL_COMPONENT_ALIASES.items():
+        components[component] = 0.0
+        for alias in aliases:
+            if alias in values:
+                components[component] = max(0.0, _finite(values.get(alias)))
+                break
+    return components
 
 
 def _run_pumping_input_cost(
