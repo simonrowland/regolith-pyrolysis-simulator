@@ -6925,6 +6925,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if self._backend_accepts_kwarg('composition_mol_by_account'):
                     backend_kwargs['composition_mol_by_account'] = (
                         backend_composition_by_account)
+                if self._is_alphamelts_backend(self.backend):
+                    backend_kwargs['subprocess_run_mode'] = 'isothermal'
                 result = self.backend.equilibrate(**backend_kwargs)
         except AccountingError:
             raise

@@ -453,6 +453,37 @@ def test_provider_returns_liquidus_diagnostics_for_subprocess_path():
     )
 
 
+def test_provider_preserves_typed_subbar_liquidus_refusal():
+    backend = _FakeAlphaMELTSBackend(
+        mode='subprocess',
+        equilibrium=_build_equilibrium_for_basalt(liquidus_C=1280.0),
+    )
+
+    def refuse_subbar(**_kwargs):
+        error = RuntimeError('subprocess pressure below minimum')
+        error.backend_failure_reason_code = 'subprocess_pressure_below_minimum'
+        error.backend_failure_category = 'out_of_domain'
+        raise error
+
+    backend.find_liquidus_solidus = refuse_subbar
+    result = AlphaMELTSProvider(backend=backend).dispatch(
+        _make_request(
+            ChemistryIntent.SILICATE_LIQUIDUS,
+            composition_mol=_basalt_species_mol(),
+            pressure_bar=1.0e-6,
+        )
+    )
+
+    assert result.status == 'out_of_domain'
+    diagnostic = dict(result.diagnostic or {})
+    assert diagnostic['backend_status_reason'] == (
+        'subprocess_pressure_below_minimum'
+    )
+    assert diagnostic['backend_diagnostics']['backend_failure_category'] == (
+        'out_of_domain'
+    )
+
+
 def test_provider_subprocess_required_skips_thermoengine_route(monkeypatch):
     backend = _FakeAlphaMELTSBackend(
         mode='thermoengine',
@@ -557,6 +588,10 @@ def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
     legacy = _build_equilibrium_for_basalt(liquidus_C=1290.0)
     legacy.diagnostics = {
         'backend_status': 'out_of_domain',
+        'requested_temperature_C': 1425.0,
+        'executed_temperature_C': 1424.5,
+        'liquid_viscosity_Pa_s': 2.5,
+        'liquid_density_kg_m3': 2650.0,
         'out_of_domain_crash_point': {
             'temperature_C': 865.0,
             'composition_wt_pct': {'SiO2': 45.0},
@@ -577,12 +612,15 @@ def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
         },
     )
 
-    assert result.temperature_C == pytest.approx(1425.0)
+    assert result.temperature_C == pytest.approx(1424.5)
+    assert result.requested_temperature_C == pytest.approx(1425.0)
     assert result.pressure_bar == pytest.approx(1e-6)
     assert result.phases_present == ['liquid', 'olivine']
     assert result.phase_masses_kg == pytest.approx({'liquid': 0.8, 'olivine': 0.2})
     assert result.liquid_fraction == pytest.approx(0.8)
     assert result.liquid_composition_wt_pct == pytest.approx(_basalt_wt_pct())
+    assert result.liquid_viscosity_Pa_s == pytest.approx(2.5)
+    assert result.liquid_density_kg_m3 == pytest.approx(2650.0)
     assert result.activity_coefficients == pytest.approx({'SiO2': 0.95, 'FeO': 1.1})
     assert result.fO2_log == pytest.approx(-8.25)
     assert result.diagnostics == legacy.diagnostics
@@ -896,6 +934,32 @@ def test_provider_control_audit_records_clamped_applied_controls():
     assert audit.applied['pressure_bar'] == 1.0
     assert audit.applied['fO2_log'] == -8.25
     assert 'clamped operating point' in audit.notes
+
+
+def test_provider_control_audit_uses_engine_reported_subprocess_controls():
+    equilibrium = _build_equilibrium_for_basalt()
+    equilibrium.diagnostics = {
+        'requested_temperature_C': 1400.0,
+        'executed_temperature_C': 1400.0,
+        'engine_reported_fO2_log': -8.2,
+    }
+    backend = _FakeAlphaMELTSBackend(
+        mode='python_api',
+        equilibrium=equilibrium,
+    )
+    request = _make_request(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        composition_mol=_basalt_species_mol(),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+    )
+
+    audit = AlphaMELTSProvider(backend=backend).dispatch(request).control_audit
+
+    assert audit is not None
+    assert audit.requested['fO2_log'] == -9.0
+    assert audit.applied['fO2_log'] == pytest.approx(-8.2)
 
 
 def test_provider_control_audit_present_for_unavailable_backend():

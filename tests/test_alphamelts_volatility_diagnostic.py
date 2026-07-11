@@ -363,6 +363,7 @@ def test_live_alphamelt_benign_feedstock_returns_oxide_activities_when_available
             composition_kg=dict(kwargs["composition_wt_pct"]),
             fO2_log=float(kwargs["fO2_log"]),
             pressure_bar=float(kwargs["pressure_bar"]),
+            subprocess_run_mode="isothermal",
         )
         backend_results.append(result)
         return result

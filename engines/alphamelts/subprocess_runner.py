@@ -17,6 +17,10 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
+from simulator.melt_backend.alphamelts_contract import (
+    AlphaMELTSSubprocessRunMode,
+)
+
 
 def equilibrate_via_subprocess(
     backend: Any,
@@ -26,6 +30,7 @@ def equilibrate_via_subprocess(
     fO2_log: float,
     composition_mol_by_account: Mapping[str, Mapping[str, float]],
     species_formula_registry: Mapping[str, Any],
+    run_mode: AlphaMELTSSubprocessRunMode | str,
 ) -> Any:
     """Run AlphaMELTS via the binary subprocess path.
 
@@ -51,6 +56,7 @@ def equilibrate_via_subprocess(
         fO2_log=float(fO2_log),
         composition_mol_by_account=composition_mol_by_account,
         species_formula_registry=species_formula_registry,
+        subprocess_run_mode=run_mode,
     )
 
 

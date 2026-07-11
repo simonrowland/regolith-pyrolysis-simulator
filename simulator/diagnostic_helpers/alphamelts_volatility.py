@@ -240,6 +240,7 @@ def alphamelts_equilibrium_activity_source(
         composition_kg=dict(composition_wt_pct),
         fO2_log=float(fO2_log),
         pressure_bar=float(pressure_bar),
+        subprocess_run_mode="isothermal",
     )
 
 

@@ -474,6 +474,15 @@ class EquilibriumResult:
     # tail for the same positional-constructor reason as ``liquidus_T_C``.
     diagnostics: Dict[str, Any] = field(default_factory=dict)
 
+    # Requested and executed temperatures are distinct at engine boundaries.
+    # ``temperature_C`` is the executed temperature; adapters that can report
+    # the caller's request separately populate this ABI-safe tail field.
+    requested_temperature_C: Optional[float] = None
+
+    # Engine-reported liquid density.  This remains ``None`` when the engine
+    # did not print a density; adapters must not synthesize a substitute.
+    liquid_density_kg_m3: Optional[float] = None
+
     def __post_init__(self) -> None:
         if self.status != 'ok':
             return

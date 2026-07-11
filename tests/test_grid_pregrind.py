@@ -10,7 +10,6 @@ import pytest
 
 import scripts.grid_pregrind as grid_pregrind
 from scripts.grid_pregrind import (
-    ALPHAMELTS_UNCONSTRAINED_FO2_ARGUMENT,
     DEFAULT_FEEDSTOCKS,
     build_grid_points,
     composition_wt_pct_to_mol,
@@ -111,18 +110,18 @@ def test_kress_partition_preserves_iron_and_moves_target_into_composition():
     assert oxidizing["FeO"] < reducing["FeO"]
 
 
-def test_iron_free_points_collapse_nonidentity_fo2_provenance_before_sharding():
+def test_iron_free_points_retain_engine_fo2_constraint_axis_before_sharding():
     composition = {"SiO2": 50.0, "MgO": 25.0, "CaO": 25.0}
     total, points = build_grid_points(
         [composition], [1200.0, 1300.0], [-12.0, -9.0, -5.0], seed=178
     )
 
-    assert total == len(points) == 2
-    assert {point.intended_fO2_log for point in points} == {-12.0}
-    assert {point.ordinal % 3 for point in points} == {0, 1}
+    assert total == len(points) == 6
+    assert {point.intended_fO2_log for point in points} == {-12.0, -9.0, -5.0}
+    assert {point.ordinal % 3 for point in points} == {0, 1, 2}
 
 
-def test_intended_fo2_is_provenance_while_partitioned_couple_keys_the_point():
+def test_intended_fo2_is_serialized_and_partitioned_couple_keys_the_point():
     composition = {"SiO2": 50.0, "FeO": 25.0, "MgO": 25.0}
     _total, points = build_grid_points(
         [composition], [1400.0], [-12.0, -5.0], seed=178
@@ -135,9 +134,8 @@ def test_intended_fo2_is_provenance_while_partitioned_couple_keys_the_point():
     vectors = [point_inputs(point, args) for point in points]
 
     assert {item["pressure_bar"] for item in vectors} == {1.0}
-    assert {item["fO2_log"] for item in vectors} == {
-        ALPHAMELTS_UNCONSTRAINED_FO2_ARGUMENT
-    }
+    assert {item["fO2_log"] for item in vectors} == {-12.0, -5.0}
+    assert {item["subprocess_run_mode"] for item in vectors} == {"isothermal"}
     assert vectors[0]["composition_mol"] != vectors[1]["composition_mol"]
     assert expedited_key(vectors[0]) != expedited_key(vectors[1])
     assert "intended_fO2_log" not in canonical_input_vector(vectors[0])
@@ -169,6 +167,7 @@ def _inputs(temperature_C: float) -> dict:
         "composition_mol_by_account": {"process.cleaned_melt": composition},
         "species_formula_registry": None,
         "mode": "subprocess",
+        "subprocess_run_mode": "isothermal",
         "redox_buffer": None,
         "fO2_offset": None,
         "Fe3Fet_Liq": None,
@@ -192,9 +191,12 @@ def _output(status: str = "ok") -> dict:
         "engine_version": "alphaMELTS test",
         "engine_mode": "subprocess",
         "engine_model": "MELTSv1.0.2",
+        "run_mode": "isothermal",
+        "applied_timeout_s": 20.0,
         "native_input": {"SiO2": 66.66666666666667},
         "generic": {
             "temperature_C": 1200.1234567890123,
+            "requested_temperature_C": 1200.0,
             "pressure_bar": 1.0,
             "phases_present": ["liquid"],
             "phase_masses_kg": {"liquid": 0.1},
@@ -204,7 +206,8 @@ def _output(status: str = "ok") -> dict:
             "liquid_fraction": 1.0,
             "phase_assemblage_available": True,
             "liquid_composition_wt_pct": {"SiO2": 66.66666666666667},
-            "liquid_viscosity_Pa_s": None,
+            "liquid_viscosity_Pa_s": 2.5,
+            "liquid_density_kg_m3": 2650.0,
             "vapor_pressures_Pa": {},
             "vapor_pressures_source": {},
             "activity_coefficients": {},
@@ -221,10 +224,168 @@ def _output(status: str = "ok") -> dict:
             "backend_warnings": [],
             "engine_version": "alphaMELTS test",
             "mode": "subprocess",
+            "fO2_log": -9.0,
+            "intrinsic_fO2_log": -9.0,
         },
         "finder": {},
         "host": "test-host",
     }
+
+
+def test_subprocess_crash_is_failure_not_refusal():
+    assert grid_pregrind._status_kind(
+        "out_of_domain", "subprocess_died"
+    ) == "failure"
+    assert grid_pregrind._status_kind(
+        "out_of_domain", "no_convergence"
+    ) == "refusal"
+
+
+def test_worker_failure_output_records_positive_wall_time(monkeypatch):
+    monkeypatch.setattr(grid_pregrind.time, "monotonic", lambda: 15.25)
+
+    output = grid_pregrind._worker_failure_output(
+        RuntimeError("synthetic failure"),
+        started=10.0,
+        captures=[],
+        native_input=None,
+    )
+
+    assert output["status_kind"] == "failure"
+    assert output["timing_s"] == pytest.approx(5.25)
+
+
+def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeypatch):
+    result = SimpleNamespace(**dict(_output()["generic"]))
+
+    class FakeBackend:
+        _mode = "subprocess"
+        _model = "MELTSv1.0.2"
+        _timeout_s = 5.0
+
+        def _equilibrate_subprocess(
+            self,
+            temperature_C,
+            composition_wt_pct,
+            fO2_log,
+            pressure_bar,
+            warnings=None,
+            *,
+            diagnostics=None,
+            run_mode,
+        ):
+            del (
+                temperature_C,
+                composition_wt_pct,
+                fO2_log,
+                pressure_bar,
+                warnings,
+                diagnostics,
+                run_mode,
+            )
+            module.subprocess.run(
+                ["fake-alphamelts"],
+                input="fixture",
+                timeout=self._timeout_s,
+            )
+            return result
+
+        def equilibrate(self, **kwargs):
+            return self._equilibrate_subprocess(
+                kwargs["temperature_C"],
+                kwargs["composition_mol"],
+                kwargs["fO2_log"],
+                kwargs["pressure_bar"],
+                diagnostics={},
+                run_mode=kwargs["subprocess_run_mode"],
+            )
+
+    module = SimpleNamespace(
+        subprocess=SimpleNamespace(
+            run=lambda *args, **kwargs: SimpleNamespace(
+                returncode=0,
+                stdout="",
+                stderr="",
+            )
+        )
+    )
+    backend = FakeBackend()
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", backend)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_MODULE", module)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_ENGINE_VERSION", "fixture-engine")
+
+    grid_key_id, output = grid_pregrind._run_point(
+        grid_pregrind.WorkerJob(
+            grid_key_id=7,
+            shuffle_rank=0,
+            inputs=_inputs(1200.0),
+        )
+    )
+
+    capture = json.loads(output["raw_payload"])["captures"][0]
+    assert grid_key_id == 7
+    assert backend._timeout_s == pytest.approx(20.0)
+    assert capture["timeout"] == pytest.approx(20.0)
+    assert output["applied_timeout_s"] == pytest.approx(20.0)
+    assert output["run_mode"] == "isothermal"
+
+
+@pytest.mark.parametrize("timeout_s", [None, 0.0, -1.0, math.nan])
+def test_queued_job_timeout_must_be_positive_and_finite(timeout_s):
+    inputs = _inputs(1200.0)
+    inputs["timeout_s"] = timeout_s
+
+    with pytest.raises(ValueError, match="timeout_s"):
+        grid_pregrind._job_runtime_settings(
+            grid_pregrind.WorkerJob(
+                grid_key_id=7,
+                shuffle_rank=0,
+                inputs=inputs,
+            )
+        )
+
+
+def test_existing_grid_database_adds_nullable_runmode_output_columns(tmp_path):
+    database = tmp_path / "legacy-grid.db"
+    with GridCacheWriter(database):
+        pass
+    connection = sqlite3.connect(database)
+    for table, column in (
+        ("grid_keys", "subprocess_run_mode"),
+        ("alphamelts_outputs", "generic_requested_temperature_C"),
+        ("alphamelts_outputs", "generic_requested_temperature_C_repr"),
+        ("alphamelts_outputs", "generic_liquid_density_kg_m3"),
+        ("alphamelts_outputs", "generic_liquid_density_kg_m3_repr"),
+        ("alphamelts_outputs", "run_mode"),
+        ("alphamelts_outputs", "applied_timeout_s"),
+        ("alphamelts_outputs", "applied_timeout_s_repr"),
+    ):
+        connection.execute(f'ALTER TABLE "{table}" DROP COLUMN "{column}"')
+    connection.commit()
+    connection.close()
+
+    with GridCacheWriter(database, existing_only=True) as writer:
+        grid_columns = {
+            row[1]
+            for row in writer.connection.execute('PRAGMA table_info("grid_keys")')
+        }
+        output_columns = {
+            row[1]
+            for row in writer.connection.execute(
+                'PRAGMA table_info("alphamelts_outputs")'
+            )
+        }
+
+    assert "subprocess_run_mode" in grid_columns
+    assert {
+        "generic_requested_temperature_C",
+        "generic_requested_temperature_C_repr",
+        "generic_liquid_density_kg_m3",
+        "generic_liquid_density_kg_m3_repr",
+        "run_mode",
+        "applied_timeout_s",
+        "applied_timeout_s_repr",
+    } <= output_columns
 
 
 def _prepared_drain_database(database):
@@ -265,8 +426,9 @@ class _ImmediateResult:
 
 class _ImmediatePool:
     def __init__(self, processes, initializer, initargs):
-        del initializer, initargs
+        del initializer
         self.processes = processes
+        self.initargs = initargs
         self.submissions = 0
 
     def apply_async(self, function, args):
@@ -319,6 +481,7 @@ def test_drain_only_uses_prepared_queue_without_importing_fe_redox(
 
     def fake_run_point(job):
         assert "simulator.fe_redox" not in sys.modules
+        assert job.inputs["timeout_s"] == pytest.approx(20.0)
         return job.grid_key_id, _output()
 
     monkeypatch.setattr(grid_pregrind, "_run_point", fake_run_point)
@@ -353,6 +516,8 @@ def test_drain_only_uses_prepared_queue_without_importing_fe_redox(
                 str(status),
                 "--workers",
                 "2",
+                "--timeout-s",
+                "5",
                 "--limit",
                 "6",
                 "--shard",
@@ -363,6 +528,7 @@ def test_drain_only_uses_prepared_queue_without_importing_fe_redox(
     )
     assert "simulator.fe_redox" not in sys.modules
     assert context.pool.processes == 2
+    assert context.pool.initargs[0]["timeout_s"] == pytest.approx(5.0)
     assert context.pool.submissions == 1
 
     with sqlite3.connect(database) as connection:
@@ -372,12 +538,17 @@ def test_drain_only_uses_prepared_queue_without_importing_fe_redox(
             connection.execute("SELECT COUNT(*) FROM alphamelts_outputs").fetchone()[0]
             == 1
         )
+        run_mode, applied_timeout_s = connection.execute(
+            "SELECT run_mode, applied_timeout_s FROM alphamelts_outputs"
+        ).fetchone()
         metadata = json.loads(
             connection.execute(
                 "SELECT value FROM metadata WHERE key = 'last_drain_run'"
             ).fetchone()[0]
         )
     assert metadata["workers"] == 2
+    assert run_mode == "isothermal"
+    assert applied_timeout_s == pytest.approx(20.0)
     assert metadata["engine_probe"]["engine_version"] == "fixture-engine"
     assert metadata["batch_params_refs"][0]["params_source"] == "batches.params_json"
     assert metadata["batch_params_refs"][0]["kress91_partition"]["version"] == "fixture-v1"
@@ -447,7 +618,11 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
             "SELECT h.temperature_C, h.temperature_C_repr, "
             "h.intended_fO2_log, h.intended_fO2_log_repr, "
             "o.timing_s, o.timing_s_repr, o.raw_payload, "
-            "o.generic_liquid_composition_wt_pct_json "
+            "o.generic_liquid_composition_wt_pct_json, "
+            "o.generic_requested_temperature_C, "
+            "o.generic_liquid_viscosity_Pa_s, "
+            "o.generic_liquid_density_kg_m3, o.generic_fO2_log, "
+            "o.alpha_intrinsic_fO2_log "
             "FROM grid_keys h JOIN alphamelts_outputs o ON o.grid_key_id = h.id"
         ).fetchone()
         assert row["temperature_C"] == inputs["temperature_C"]
@@ -460,6 +635,11 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
         assert json.loads(row["generic_liquid_composition_wt_pct_json"])[
             "SiO2"
         ] == 66.66666666666667
+        assert row["generic_requested_temperature_C"] == 1200.0
+        assert row["generic_liquid_viscosity_Pa_s"] == 2.5
+        assert row["generic_liquid_density_kg_m3"] == 2650.0
+        assert row["generic_fO2_log"] == -9.0
+        assert row["alpha_intrinsic_fO2_log"] == -9.0
         assert writer.counts() == {
             "success": 1,
             "refusal": 0,

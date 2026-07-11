@@ -54,6 +54,9 @@ from engines.alphamelts.subprocess_runner import (
     equilibrate_via_subprocess,
     subprocess_available,
 )
+from simulator.melt_backend.alphamelts_contract import (
+    AlphaMELTSSubprocessRunMode,
+)
 from engines.alphamelts.thermoengine import (
     equilibrate_via_thermoengine,
     thermoengine_available,
@@ -317,6 +320,17 @@ class AlphaMELTSProvider(ChemistryProvider):
             getattr(equilibrium, 'diagnostics', {}) if equilibrium is not None
             else {}
         )
+        if isinstance(diagnostics, Mapping):
+            executed_temperature_C = diagnostics.get(
+                'executed_temperature_C'
+            )
+            if executed_temperature_C is not None:
+                applied['temperature_C'] = float(executed_temperature_C)
+            engine_reported_fO2_log = diagnostics.get(
+                'engine_reported_fO2_log'
+            )
+            if engine_reported_fO2_log is not None:
+                applied['fO2_log'] = float(engine_reported_fO2_log)
         if isinstance(diagnostics, Mapping) and (
             diagnostics.get('operating_point_clamped')
             or diagnostics.get('authoritative_for_requested_conditions') is False
@@ -471,6 +485,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                 fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
+                run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
             )
             return 'subprocess', equilibrium
         if not subprocess_required and self._thermoengine_selected():
@@ -501,6 +516,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                 fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
+                run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
             )
             return 'subprocess', equilibrium
         # _backend_available returned True so this branch should never
@@ -549,14 +565,26 @@ class AlphaMELTSProvider(ChemistryProvider):
                 species_formula_registry=species_registry,
             )
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            reason = (
+                getattr(exc, 'backend_failure_reason_code', None)
+                or getattr(exc, 'backend_status_reason', None)
+            )
+            category = getattr(exc, 'backend_failure_category', None)
+            status = (
+                'out_of_domain'
+                if reason == 'subprocess_pressure_below_minimum'
+                else 'not_converged'
+            )
             result = LiquidusSolidusResult(
-                status='not_converged',
+                status=status,
                 warnings=(f'AlphaMELTS liquidus finder failed: {exc}',),
                 diagnostics={
-                    'backend_status': 'not_converged',
+                    'backend_status': status,
                     'backend_status_reason': (
-                        OutOfDomainReason.NOT_CONVERGED.value
+                        reason or OutOfDomainReason.NOT_CONVERGED.value
                     ),
+                    'backend_failure_reason_code': reason,
+                    'backend_failure_category': category,
                 },
             )
         return mode, result

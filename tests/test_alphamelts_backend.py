@@ -24,9 +24,12 @@ from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_NONZERO_EXIT,
     ALPHAMELTS_REASON_NO_CONVERGENCE,
     ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT,
+    ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED,
     ALPHAMELTS_REASON_SUBPROCESS_DIED,
     ALPHAMELTS_REASON_TIMEOUT,
     AlphaMELTSBackend,
+    AlphaMELTSSubprocessContractError,
+    AlphaMELTSSubprocessRunMode,
     activity_from_chem_potential,
 )
 from simulator.melt_backend.base import (
@@ -144,20 +147,23 @@ def test_alphamelts_ok_result_requires_finite_phase_mass_fraction(
         )
 
 
-def test_alphamelts_subprocess_liquidus_finder_uses_fraction_samples():
+def test_alphamelts_subprocess_liquidus_finder_selects_native_mode():
     class FakeFinderBackend(AlphaMELTSBackend):
         def __init__(self):
             super().__init__()
             self._mode = 'subprocess'
 
         def equilibrate(self, temperature_C, **kwargs):
-            frac = max(0.0, min(1.0, (float(temperature_C) - 1000.0) / 300.0))
+            assert kwargs['subprocess_run_mode'] is (
+                AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER
+            )
             return EquilibriumResult(
-                temperature_C=float(temperature_C),
+                temperature_C=1300.0,
                 pressure_bar=float(kwargs.get('pressure_bar', 1e-6)),
-                liquid_fraction=frac,
-                phases_present=['liq'] if frac > 0.0 else ['ol'],
-                phase_masses_kg={'liq': frac, 'ol': 1.0 - frac},
+                liquid_fraction=1.0,
+                phases_present=['liq'],
+                phase_masses_kg={'liq': 1.0},
+                liquidus_T_C=1300.0,
                 status='ok',
             )
 
@@ -174,7 +180,7 @@ def test_alphamelts_subprocess_liquidus_finder_uses_fraction_samples():
     )
 
     assert result.status == 'ok'
-    assert result.solidus_T_C == pytest.approx(1000.0, abs=1.0)
+    assert result.solidus_T_C is None
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
 
 
@@ -187,6 +193,48 @@ def _melts_domain_composition() -> dict[str, float]:
         'CaO': 10.0,
         'Na2O': 5.0,
     }
+
+
+def _system_main_fixture(
+    *,
+    temperature_C: float,
+    fO2_log: float = -9.0,
+    density_g_cm3: float = 2.638918,
+    log10_viscosity_poise: float = 1.409,
+) -> str:
+    return (
+        "System Thermodynamic Data:\n"
+        "index Pressure Temperature mass F phi H S V Cp dVdP*10^6 "
+        "dVdT*10^6 fO2(absolute) fO2-9.0) rhol rhos viscosity aH2O chisqr\n"
+        f"1 1.00 {temperature_C:.6f} 100 1 1 -1 1 1 1 0 0 "
+        f"{fO2_log:.6f} 0 {density_g_cm3:.6f} 0 "
+        f"{log10_viscosity_poise:.6f} n/a n/a\n"
+    )
+
+
+def _parse_subprocess_fixture(
+    backend: AlphaMELTSBackend,
+    output: str,
+    *,
+    temperature_C: float,
+    pressure_bar: float = 1.0,
+    total_input_kg: float = 1000.0,
+    system_output: str | None = None,
+):
+    return backend._parse_single_point_stdout(
+        output,
+        requested_temperature_C=temperature_C,
+        pressure_bar=pressure_bar,
+        fO2_log=-9.0,
+        total_input_kg=total_input_kg,
+        run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+        system_output=(
+            _system_main_fixture(temperature_C=temperature_C)
+            if system_output is None
+            else system_output
+        ),
+        fO2_constraint={"path": "Absolute", "offset": -9.0},
+    )
 
 
 def _clamped_success_diagnostics() -> LiquidusDiagnostics:
@@ -234,7 +282,53 @@ def test_diagnostics_to_equilibrium_clamped_success_is_requested_point_ood():
     assert result.diagnostics['authoritative_for_requested_conditions'] is False
 
 
-def test_alphamelts_subprocess_clamped_pt_reports_solved_conditions(
+def test_alphamelts_subprocess_subbar_pressure_refuses_before_execution(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.subprocess.run',
+        lambda *args, **kwargs: pytest.fail('subprocess must not run'),
+    )
+
+    with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
+        backend.equilibrate(
+            temperature_C=650.0,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1e-6,
+            subprocess_run_mode='isothermal',
+        )
+
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED
+    )
+
+
+def test_alphamelts_subprocess_requires_explicit_run_mode(monkeypatch):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.subprocess.run',
+        lambda *args, **kwargs: pytest.fail('subprocess must not run'),
+    )
+
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='run mode was not selected explicitly',
+    ):
+        backend.equilibrate(
+            temperature_C=1400.0,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+        )
+
+
+def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     monkeypatch,
 ):
     backend = AlphaMELTSBackend()
@@ -243,77 +337,215 @@ def test_alphamelts_subprocess_clamped_pt_reports_solved_conditions(
     seen = {}
 
     def fake_run(*args, **kwargs):
+        seen['stdin'] = kwargs['input']
+        seen['env'] = dict(kwargs['env'])
         seen['input_melts'] = (
             Path(kwargs['cwd']) / 'input.melts'
         ).read_text()
+        (Path(kwargs['cwd']) / 'System_main_tbl.txt').write_text(
+            _system_main_fixture(temperature_C=1400.0, fO2_log=-9.0)
+        )
         return types.SimpleNamespace(
             returncode=0,
-            stdout='<> Stable synthetic assemblage achieved.',
+            stdout=(
+                '<> Stable liquid assemblage achieved.\n'
+                'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+                'T 1400.000000 (C)\n'
+                'liquid: SiO2 Al2O3 FeO MgO CaO Na2O\n'
+                '100.0 g 50 15 10 10 10 5\n'
+                'Melt fraction = 1.0\n'
+            ),
             stderr='',
-        )
-
-    def fake_parse(
-        output,
-        *,
-        temperature_C,
-        pressure_bar,
-        fO2_log,
-        total_input_kg,
-        warnings=None,
-        diagnostics=None,
-        success_diagnostics=None,
-    ):
-        result_diagnostics = (
-            success_diagnostics if success_diagnostics is not None
-            else diagnostics
-        )
-        return EquilibriumResult(
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
-            phases_present=['liquid'],
-            phase_masses_kg={'liquid': 1.0},
-            liquid_fraction=1.0,
-            warnings=list(warnings or []),
-            status='ok',
-            diagnostics=dict(result_diagnostics or {}),
         )
 
     monkeypatch.setattr(
         'simulator.melt_backend.alphamelts.subprocess.run',
         fake_run,
     )
-    monkeypatch.setattr(backend, '_parse_single_point_stdout', fake_parse)
 
     result = backend.equilibrate(
-        temperature_C=650.0,
+        temperature_C=1400.0,
         composition_kg=_melts_domain_composition(),
         fO2_log=-9.0,
-        pressure_bar=1e-6,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
     )
 
-    assert 'Initial Temperature: 800.0' in seen['input_melts']
-    assert 'Initial Pressure: 1.0' in seen['input_melts']
-    assert result.temperature_C == pytest.approx(800.0)
-    assert result.pressure_bar == pytest.approx(1.0)
-    assert result.diagnostics['operating_point_clamped'] is True
-    assert result.diagnostics['temperature_clamped'] is True
-    assert result.diagnostics['pressure_clamped'] is True
-    assert result.diagnostics['requested_temperature_C'] == pytest.approx(650.0)
-    assert result.diagnostics['requested_pressure_bar'] == pytest.approx(1e-6)
-    assert result.diagnostics['solved_temperature_C'] == pytest.approx(800.0)
-    assert result.diagnostics['solved_pressure_bar'] == pytest.approx(1.0)
-    assert result.status == 'out_of_domain'
-    assert result.diagnostics['backend_status'] == 'out_of_domain'
-    assert (
-        result.diagnostics['backend_status_reason']
-        == 'clamped_operating_point'
+    assert seen['stdin'] == '1\ninput.melts\n4\n1\n1\nx\n'
+    assert seen['env']['ALPHAMELTS_RUN_MODE'] == 'isobaric'
+    assert 'Log fO2 Path: Absolute' in seen['input_melts']
+    # Shipped alphaMELTS 2.3.1 accepts and echoes "log fo2 offset"; replacing
+    # Offset with Delta is rejected as an offending MELTS-file record.
+    assert 'Log fO2 Offset: -9' in seen['input_melts']
+    assert 'Log fO2 Delta:' not in seen['input_melts']
+    assert result.temperature_C == pytest.approx(1400.0)
+    assert result.requested_temperature_C == pytest.approx(1400.0)
+    assert result.fO2_log == pytest.approx(-9.0)
+    assert result.liquid_density_kg_m3 == pytest.approx(2638.918)
+    assert result.liquid_viscosity_Pa_s == pytest.approx(0.1 * 10**1.409)
+    assert result.diagnostics['intrinsic_fO2_log'] == pytest.approx(-9.0)
+
+
+@pytest.mark.parametrize(
+    'system_output',
+    [
+        (
+            'index Pressure Temperature mass fO2(absolute)\n'
+            '1 1.0 1400.0 100.0 -9.0\n'
+        ),
+        (
+            'index Pressure Temperature mass fO2(absolute) rhol viscosity\n'
+            '1 1.0 1400.0 100.0 -9.0 n/a n/a\n'
+        ),
+    ],
+    ids=['properties-absent', 'properties-nonnumeric'],
+)
+def test_alphamelts_system_table_optional_properties_stay_none(system_output):
+    backend = AlphaMELTSBackend()
+    output = (
+        '<> Stable liquid assemblage achieved.\n'
+        'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+        'T 1400.000000 (C)\n'
+        'liquid: SiO2\n100.0 g 100.0\nMelt fraction = 1.0\n'
     )
-    assert (
-        result.diagnostics['authoritative_for_requested_conditions']
-        is False
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1400.0,
+        system_output=system_output,
     )
-    assert any('clamped operating point' in warning for warning in result.warnings)
+
+    assert result.liquid_density_kg_m3 is None
+    assert result.liquid_viscosity_Pa_s is None
+
+
+def test_alphamelts_subprocess_isothermal_rejects_executed_temperature_mismatch():
+    backend = AlphaMELTSBackend()
+    output = (
+        '<> Stable liquid assemblage achieved.\n'
+        'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+        'T 1300.000000 (C)\n'
+        'liquid: SiO2\n100.0 g 100.0\nMelt fraction = 1.0\n'
+    )
+
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='other than the isothermal request',
+    ):
+        backend._parse_single_point_stdout(
+            output,
+            requested_temperature_C=1400.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            total_input_kg=100.0,
+            run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+            system_output=_system_main_fixture(temperature_C=1300.0),
+            fO2_constraint={'path': 'Absolute', 'offset': -9.0},
+        )
+
+
+def test_alphamelts_subprocess_no_phase_still_rejects_temperature_mismatch():
+    backend = AlphaMELTSBackend()
+    output = (
+        'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+        'T 1300.000000 (C)\n'
+        '...Quadratic convergence failure. Aborting.\n'
+    )
+
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='other than the isothermal request',
+    ):
+        backend._parse_single_point_stdout(
+            output,
+            requested_temperature_C=1400.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            total_input_kg=100.0,
+            run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+            system_output='',
+            fO2_constraint={'path': 'Absolute', 'offset': -9.0},
+        )
+
+
+def test_alphamelts_subprocess_failure_line_rejects_temperature_mismatch():
+    # Regression for the request-echo defect: with NO banner line, the
+    # failure line's temperature is the only executed-T evidence. A parser
+    # that echoes the requested temperature would sail past this mismatch
+    # (requested 1250.0 vs executed 1249.414062 from the failure line).
+    backend = AlphaMELTSBackend()
+    output = (
+        '<> Found the liquidus at T = 1249.41 (C).\n'
+        '...Quadratic convergence failure. Aborting.\n'
+        'Initial calculation failed (1.000000 bars, 1249.414062 C)!\n'
+    )
+
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='other than the isothermal request',
+    ):
+        backend._parse_single_point_stdout(
+            output,
+            requested_temperature_C=1250.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            total_input_kg=100.0,
+            run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+            system_output='',
+            fO2_constraint={'path': 'Absolute', 'offset': -9.0},
+        )
+
+
+def test_alphamelts_subprocess_requires_finite_absolute_fo2_echo():
+    backend = AlphaMELTSBackend()
+    output = (
+        '<> Stable liquid assemblage achieved.\n'
+        'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+        'T 1400.000000 (C)\n'
+        'liquid: SiO2\n100.0 g 100.0\nMelt fraction = 1.0\n'
+    )
+    system_output = (
+        'index Pressure Temperature fO2(absolute) rhol viscosity\n'
+        '1 1.0 1400.0 n/a 2.6 1.4\n'
+    )
+
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='lacks absolute engine fO2 echo',
+    ):
+        backend._parse_single_point_stdout(
+            output,
+            requested_temperature_C=1400.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            total_input_kg=100.0,
+            run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+            system_output=system_output,
+            fO2_constraint={'path': 'Absolute', 'offset': -9.0},
+        )
+
+
+def test_alphamelts_subprocess_serializes_configured_qfm_buffer(tmp_path):
+    backend = AlphaMELTSBackend()
+    backend._redox_buffer = 'QFM'
+    backend._fo2_offset = -1.5
+
+    constraint = backend._subprocess_fo2_constraint(-9.0)
+    path = tmp_path / 'input.melts'
+    backend._write_melts_file(
+        path,
+        _melts_domain_composition(),
+        1400.0,
+        1.0,
+        fO2_path=constraint[0],
+        fO2_offset=constraint[1],
+    )
+
+    text = path.read_text()
+    assert 'Log fO2 Path: FMQ' in text
+    assert 'Log fO2 Offset: -1.5' in text
+    assert 'Log fO2 Delta:' not in text
 
 
 def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
@@ -390,7 +622,7 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     assert any('clamped operating point' in warning for warning in result.warnings)
 
 
-def test_alphamelts_subprocess_signal_exit_is_out_of_domain_without_mode_flip(
+def test_alphamelts_subprocess_signal_exit_is_typed_crash_without_mode_flip(
     monkeypatch,
 ):
     backend = AlphaMELTSBackend()
@@ -410,7 +642,7 @@ def test_alphamelts_subprocess_signal_exit_is_out_of_domain_without_mode_flip(
 
     def fake_parse(*args, **kwargs):
         return EquilibriumResult(
-            temperature_C=kwargs['temperature_C'],
+            temperature_C=kwargs['requested_temperature_C'],
             pressure_bar=kwargs['pressure_bar'],
             fO2_log=kwargs['fO2_log'],
             phases_present=['liquid'],
@@ -422,33 +654,27 @@ def test_alphamelts_subprocess_signal_exit_is_out_of_domain_without_mode_flip(
     monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
     monkeypatch.setattr(backend, '_parse_single_point_stdout', fake_parse)
 
-    first = backend.equilibrate(
-        temperature_C=1600.0,
-        composition_kg=_melts_domain_composition(),
-        fO2_log=-9.0,
-        pressure_bar=1.0,
-    )
+    with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
+        backend.equilibrate(
+            temperature_C=1600.0,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+            subprocess_run_mode='isothermal',
+        )
     second = backend.equilibrate(
         temperature_C=1600.0,
         composition_kg=_melts_domain_composition(),
         fO2_log=-9.0,
         pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
     )
 
-    assert first.status == 'out_of_domain'
-    assert any('SIGABRT' in warning for warning in first.warnings)
-    assert (
-        first.diagnostics.get('backend_status_reason')
-        == ALPHAMELTS_REASON_SUBPROCESS_DIED
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_SUBPROCESS_DIED
     )
-    assert (
-        first.diagnostics.get('backend_failure_reason_code')
-        == ALPHAMELTS_REASON_SUBPROCESS_DIED
-    )
-    assert first.diagnostics.get('backend_failure_category') == 'out_of_domain'
-    assert 'subprocess exited' in (
-        first.diagnostics.get('backend_status_reason_message') or ''
-    )
+    assert excinfo.value.backend_failure_category == 'engine_crash'
+    assert 'SIGABRT' in str(excinfo.value)
     assert backend._mode == 'subprocess'
     assert second.status == 'ok'
     assert len(calls) == 2
@@ -472,6 +698,7 @@ def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch)
             composition_kg=_melts_domain_composition(),
             fO2_log=-9.0,
             pressure_bar=1.0,
+            subprocess_run_mode='isothermal',
         )
 
     assert (
@@ -507,16 +734,17 @@ def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
 
     monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
 
-    result = backend.equilibrate(
-        temperature_C=1600.0,
-        composition_kg=_melts_domain_composition(),
-        fO2_log=-9.0,
-        pressure_bar=1.0,
-    )
+    with pytest.raises(AlphaMELTSSubprocessContractError) as exc_info:
+        backend.equilibrate(
+            temperature_C=1600.0,
+            composition_kg=_melts_domain_composition(),
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+            subprocess_run_mode='isothermal',
+        )
 
-    assert result.status == 'out_of_domain'
     assert (
-        result.diagnostics.get('backend_status_reason')
+        exc_info.value.backend_failure_reason_code
         == ALPHAMELTS_REASON_SUBPROCESS_DIED
     )
     assert seen['timeout'] == 37.5
@@ -539,6 +767,7 @@ def test_alphamelts_subprocess_missing_binary_is_loud_and_disables_mode(monkeypa
             composition_kg=_melts_domain_composition(),
             fO2_log=-9.0,
             pressure_bar=1.0,
+            subprocess_run_mode='isothermal',
         )
 
     assert (
@@ -572,6 +801,7 @@ def test_alphamelts_subprocess_unconfigured_binary_reports_missing_binary():
             composition_kg=_melts_domain_composition(),
             fO2_log=-9.0,
             pressure_bar=1.0,
+            subprocess_run_mode='isothermal',
         )
 
     assert (
@@ -610,6 +840,7 @@ def test_alphamelts_subprocess_positive_exit_stays_loud_without_mode_flip(
             composition_kg=_melts_domain_composition(),
             fO2_log=-9.0,
             pressure_bar=1.0,
+            subprocess_run_mode='isothermal',
         )
 
     assert (
@@ -649,6 +880,7 @@ def test_alphamelts_subprocess_exit_zero_without_assemblage_stays_loud(
             composition_kg=_melts_domain_composition(),
             fO2_log=-9.0,
             pressure_bar=1.0,
+            subprocess_run_mode='isothermal',
         )
 
     assert (
@@ -706,7 +938,7 @@ def test_alphamelts_rejects_metal_and_gas_account_inputs():
             'process.overhead_gas': {'O2': 0.5},
         },
         fO2_log=-9.0,
-        pressure_bar=1e-6,
+        pressure_bar=1.0,
     )
 
     assert result.phases_present == []
@@ -1223,6 +1455,7 @@ def test_subprocess_stdout_parser_reports_activity_labels_and_exact_oxide_diagno
     backend = AlphaMELTSBackend()
     output = """
 <> Stable phase assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1500.000000 (C)
 liquid: SiO2 Al2O3 FeO Na2O
 100.0 g 50.0 15.0 10.0 5.0
 Melt fraction = 1.0
@@ -1231,11 +1464,10 @@ SiO2_Liq Na K Fe
 0.42 0.08 0.03 0.25
 """
 
-    result = backend._parse_single_point_stdout(
+    result = _parse_subprocess_fixture(
+        backend,
         output,
         temperature_C=1500.0,
-        pressure_bar=1.0,
-        fO2_log=-9.0,
         total_input_kg=100.0,
     )
 
@@ -1574,6 +1806,10 @@ def test_thermoengine_transport_shadow_parity_against_subprocess_when_available(
         composition_kg=composition_kg,
         fO2_log=-9.0,
         pressure_bar=1.0,
+        # Explicit mode: the live parity comparison is an isothermal
+        # equilibrate; without this the no-mode contract error fires
+        # before parity is ever compared.
+        subprocess_run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
     )
     if not subprocess_result.phase_masses_kg:
         pytest.skip('AlphaMELTS subprocess did not report modal phase masses')
@@ -1897,14 +2133,14 @@ def test_alphamelts_stdout_parser_solid_only_reports_zero_liquid_fraction():
     backend = AlphaMELTSBackend()
     output = """
 <> Stable solid assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1100.000000 (C)
 olivine: 90.3451 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
 """
 
-    result = backend._parse_single_point_stdout(
+    result = _parse_subprocess_fixture(
+        backend,
         output,
         temperature_C=1100.0,
-        pressure_bar=1.0,
-        fO2_log=-9.0,
         total_input_kg=1000.0,
     )
 
@@ -1926,11 +2162,10 @@ Activity of H2O = 0  Melt fraction = 0.921889
 olivine: 7.654887 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
 """
 
-    result = backend._parse_single_point_stdout(
+    result = _parse_subprocess_fixture(
+        backend,
         output,
         temperature_C=1200.0,
-        pressure_bar=1.0,
-        fO2_log=-9.0,
         total_input_kg=1000.0,
     )
 
@@ -1956,11 +2191,10 @@ Activity of H2O = 0  Melt fraction = 0.921889
 olivine: 7.654887 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
 """
 
-    result = backend._parse_single_point_stdout(
+    result = _parse_subprocess_fixture(
+        backend,
         output,
         temperature_C=1200.0,
-        pressure_bar=1.0,
-        fO2_log=-9.0,
         total_input_kg=1000.0,
     )
 
@@ -1984,15 +2218,15 @@ def test_alphamelts_stdout_parser_classifies_no_phase_convergence_failure():
 Initial calculation failed (1.000000 bars, 1249.414062 C)!
 """
 
-    result = backend._parse_single_point_stdout(
+    result = _parse_subprocess_fixture(
+        backend,
         output,
-        temperature_C=1250.0,
-        pressure_bar=1.0,
-        fO2_log=-9.0,
+        temperature_C=1249.414062,
         total_input_kg=1000.0,
     )
 
     assert result.status == "out_of_domain"
+    assert result.temperature_C == pytest.approx(1249.414062)
     assert result.phases_present == []
     assert result.warnings == [
         "AlphaMELTS liquidus_C=1249.410",
@@ -2026,15 +2260,15 @@ def test_alphamelts_stdout_parser_classifies_initial_calculation_failed():
 Initial calculation failed (1.000000 bars, 1249.414062 C)!
 """
 
-    result = backend._parse_single_point_stdout(
+    result = _parse_subprocess_fixture(
+        backend,
         output,
-        temperature_C=1250.0,
-        pressure_bar=1.0,
-        fO2_log=-9.0,
+        temperature_C=1249.414062,
         total_input_kg=1000.0,
     )
 
     assert result.status == "out_of_domain"
+    assert result.temperature_C == pytest.approx(1249.414062)
     assert result.phases_present == []
     assert (
         "AlphaMELTS subprocess failed before phase rows: "
@@ -2061,11 +2295,10 @@ def test_alphamelts_stdout_parser_fails_without_stable_assemblage():
         RuntimeError,
         match="parseable phase assemblage",
     ) as excinfo:
-        backend._parse_single_point_stdout(
+        _parse_subprocess_fixture(
+            backend,
             "Error in SILMIN file input procedure.",
             temperature_C=1200.0,
-            pressure_bar=1.0,
-            fO2_log=-9.0,
             total_input_kg=1000.0,
         )
 
@@ -2102,7 +2335,8 @@ def test_project_local_alphamelts_reports_liquidus_when_installed():
             "TiO2": 20.0,
         },
         fO2_log=-9.0,
-        pressure_bar=1e-6,
+        pressure_bar=1.0,
+        subprocess_run_mode='liquidus_finder',
     )
 
     assert result.liquid_fraction == pytest.approx(1.0)

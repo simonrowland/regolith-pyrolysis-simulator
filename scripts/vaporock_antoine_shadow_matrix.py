@@ -461,6 +461,7 @@ def solve_cell(
             composition_kg=dict(cell.composition_wt_pct),
             fO2_log=cell.fO2_log10_bar,
             pressure_bar=cell.pressure_bar,
+            subprocess_run_mode="isothermal",
         )
     except Exception as exc:  # noqa: BLE001
         return failure_rows(cell, f"cell_failed:alphamelts_exception:{type(exc).__name__}:{exc}")

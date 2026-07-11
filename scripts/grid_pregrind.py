@@ -85,12 +85,10 @@ DEFAULT_INTENDED_FO2_GRID = (
     -5.0,
 )
 ENGINE_PRESSURE_BAR = 1.0
-# AlphaMELTSBackend.equilibrate requires a finite fO2 argument, but the frozen
-# subprocess adapter does not serialize it into input.melts. Keep one invariant
-# API placeholder while the explicit Fe2O3/FeO couple carries redox to the engine.
-ALPHAMELTS_UNCONSTRAINED_FO2_ARGUMENT = -9.0
 KRESS91_PARTITION_VERSION = "REF-001-kress-carmichael-1991"
-RAW_PAYLOAD_FORMAT = "alphamelts-subprocess-capture-v2-kress-composition"
+RAW_PAYLOAD_FORMAT = (
+    "alphamelts-subprocess-capture-v3-isothermal-fO2-properties"
+)
 
 
 def kress91_partition_parameters():
@@ -381,15 +379,9 @@ def build_grid_points(
         (composition_index, temperature_C, intended_fO2_log)
         for composition_index in range(len(compositions))
         for temperature_C in temperatures_C
-        for intended_fO2_log in (
-            intended_fO2_logs
-            if (
-                float(compositions[composition_index].get("FeO", 0.0))
-                + float(compositions[composition_index].get("Fe2O3", 0.0))
-            )
-            > 0.0
-            else intended_fO2_logs[:1]
-        )
+        # fO2 is now an engine constraint, not Fe-partition provenance only;
+        # retain the full axis even when the input composition has no iron.
+        for intended_fO2_log in intended_fO2_logs
     ]
     unfiltered_total = len(pairs)
     eligible_pairs = []
@@ -541,7 +533,7 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
     values: dict[str, Any] = {
         "temperature_C": point.temperature_C,
         "composition_kg": None,
-        "fO2_log": ALPHAMELTS_UNCONSTRAINED_FO2_ARGUMENT,
+        "fO2_log": point.intended_fO2_log,
         "pressure_bar": point.pressure_bar,
         "composition_mol": composition_mol,
         "composition_mol_by_account": {
@@ -549,6 +541,7 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
         },
         "species_formula_registry": None,
         "mode": "subprocess",
+        "subprocess_run_mode": "isothermal",
         "redox_buffer": None,
         "fO2_offset": None,
         "Fe3Fet_Liq": None,
@@ -649,7 +642,9 @@ def _alpha_result(result: Any, backend: Any, engine_version: str) -> dict[str, A
     return values
 
 
-def _status_kind(status: str) -> str:
+def _status_kind(status: str, reason: str | None = None) -> str:
+    if reason == "subprocess_died":
+        return "failure"
     if status == "ok":
         return "success"
     if status in {"out_of_domain", "not_converged"}:
@@ -676,6 +671,8 @@ def _worker_failure_output(
     started: float,
     captures: Sequence[Mapping[str, Any]],
     native_input: Mapping[str, Any] | None,
+    run_mode: str | None = None,
+    applied_timeout_s: float | None = None,
 ) -> dict[str, Any]:
     reason = (
         getattr(exc, "backend_failure_reason_code", None)
@@ -687,7 +684,11 @@ def _worker_failure_output(
     raw = {
         "format": RAW_PAYLOAD_FORMAT,
         "engine_invoked": bool(captures),
-        "fO2_constraint": None,
+        "fO2_constraint": (
+            dict(native_input.get("fO2_constraint") or {})
+            if native_input is not None
+            else None
+        ),
         "captures": list(captures),
         "exception": {
             "type": type(exc).__name__,
@@ -708,6 +709,8 @@ def _worker_failure_output(
         "engine_version": _WORKER_ENGINE_VERSION,
         "engine_mode": "subprocess",
         "engine_model": str(getattr(_WORKER_BACKEND, "_model", "unknown")),
+        "run_mode": run_mode,
+        "applied_timeout_s": applied_timeout_s,
         "native_input": native_input,
         "generic": {},
         "alphamelts": {
@@ -724,17 +727,70 @@ def _worker_failure_output(
     }
 
 
+def _job_runtime_settings(job: WorkerJob) -> tuple[float, str]:
+    try:
+        timeout_s = float(job.inputs["timeout_s"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError("queued AlphaMELTS job has invalid timeout_s") from exc
+    if not math.isfinite(timeout_s) or timeout_s <= 0.0:
+        raise ValueError(
+            f"queued AlphaMELTS job timeout_s must be positive and finite: {timeout_s!r}"
+        )
+    run_mode = str(job.inputs.get("subprocess_run_mode") or "")
+    if run_mode != "isothermal":
+        raise ValueError(
+            "queued AlphaMELTS job subprocess_run_mode must be 'isothermal': "
+            f"{run_mode!r}"
+        )
+    return timeout_s, run_mode
+
+
+def _record_job_runtime(
+    job: WorkerJob,
+    output: MutableMapping[str, Any],
+) -> None:
+    timeout_s, run_mode = _job_runtime_settings(job)
+    output_run_mode = output.get("run_mode")
+    if output_run_mode is not None and str(output_run_mode) != run_mode:
+        raise RuntimeError(
+            f"worker run-mode mismatch: queued={run_mode!r}, applied={output_run_mode!r}"
+        )
+    output_timeout = output.get("applied_timeout_s")
+    if output_timeout is not None and float(output_timeout) != timeout_s:
+        raise RuntimeError(
+            "worker timeout mismatch: "
+            f"queued={timeout_s!r}, applied={output_timeout!r}"
+        )
+    output["run_mode"] = run_mode
+    output["applied_timeout_s"] = timeout_s
+
+
 def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
     started = time.monotonic()
     captures: list[dict[str, Any]] = []
     native_input: dict[str, Any] | None = None
+    try:
+        applied_timeout_s, run_mode = _job_runtime_settings(job)
+    except Exception as exc:
+        return job.grid_key_id, _worker_failure_output(
+            exc,
+            started=started,
+            captures=captures,
+            native_input=native_input,
+        )
     if _WORKER_BACKEND is None or _WORKER_MODULE is None:
         exc = RuntimeError(_WORKER_INIT_ERROR or "AlphaMELTS worker unavailable")
         return job.grid_key_id, _worker_failure_output(
-            exc, started=started, captures=captures, native_input=native_input
+            exc,
+            started=started,
+            captures=captures,
+            native_input=native_input,
+            run_mode=run_mode,
+            applied_timeout_s=applied_timeout_s,
         )
 
     backend = _WORKER_BACKEND
+    backend._timeout_s = applied_timeout_s
     module = _WORKER_MODULE
     original_equilibrate_subprocess = backend._equilibrate_subprocess
     original_run = module.subprocess.run
@@ -744,6 +800,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
         event: dict[str, Any] = {
             "argv": list(command) if isinstance(command, (list, tuple)) else command,
             "stdin": _raw_stream(kwargs.get("input")),
+            "timeout": kwargs.get("timeout"),
         }
         cwd = kwargs.get("cwd")
         input_file = Path(cwd) / "input.melts" if cwd is not None else None
@@ -769,6 +826,13 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 "stderr": _raw_stream(completed.stderr),
             }
         )
+        if cwd is not None:
+            output_files = {
+                output_path.name: output_path.read_text(errors="replace")
+                for output_path in sorted(Path(cwd).glob("*_tbl.txt"))
+            }
+            if output_files:
+                event["output_files"] = output_files
         captures.append(event)
         return completed
 
@@ -780,14 +844,20 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
         warnings: Sequence[str] | None = None,
         *,
         diagnostics: Mapping[str, Any] | None = None,
+        run_mode: Any,
     ) -> Any:
         nonlocal native_input
         native_input = {
             "temperature_C": float(temperature_C),
             "composition_wt_pct": dict(composition_wt_pct),
-            "fO2_constraint": None,
+            "fO2_constraint": {
+                "path": "Absolute",
+                "offset": float(fO2_log),
+            },
             "adapter_fO2_log_argument": float(fO2_log),
             "pressure_bar": float(pressure_bar),
+            "run_mode": run_mode.value if hasattr(run_mode, "value") else str(run_mode),
+            "applied_timeout_s": applied_timeout_s,
             "warnings": list(warnings or []),
             "diagnostics": dict(diagnostics or {}),
         }
@@ -799,6 +869,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 pressure_bar,
                 warnings,
                 diagnostics=diagnostics,
+                run_mode=run_mode,
             )
 
     try:
@@ -815,6 +886,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                     "composition_mol_by_account"
                 ],
                 species_formula_registry=job.inputs["species_formula_registry"],
+                subprocess_run_mode=run_mode,
             )
         if result.ledger_transition is not None:
             raise RuntimeError(
@@ -823,27 +895,27 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
         raw = {
             "format": RAW_PAYLOAD_FORMAT,
             "engine_invoked": bool(captures),
-            "fO2_constraint": None,
+            "fO2_constraint": {
+                "path": "Absolute",
+                "offset": float(job.inputs["fO2_log"]),
+            },
             "captures": captures,
         }
         generic_output = _generic_result(result)
         alpha_output = _alpha_result(result, backend, _WORKER_ENGINE_VERSION)
-        # The frozen subprocess adapter echoes its required API placeholder in
-        # result.fO2_log even though input.melts contains no fO2 constraint.
-        # Preserve the raw adapter evidence above, but do not promote that
-        # placeholder into typed thermodynamic output.
-        generic_output["fO2_log"] = None
-        alpha_output["fO2_log"] = None
+        reason = _refusal_reason(result)
         output = {
             "status": result.status,
-            "status_kind": _status_kind(result.status),
-            "refusal_reason": _refusal_reason(result),
+            "status_kind": _status_kind(result.status, reason),
+            "refusal_reason": reason,
             "raw_payload": canonical_json(raw),
             "raw_payload_format": RAW_PAYLOAD_FORMAT,
             "timing_s": time.monotonic() - started,
             "engine_version": _WORKER_ENGINE_VERSION,
             "engine_mode": str(getattr(backend, "_mode", "subprocess")),
             "engine_model": str(getattr(backend, "_model", "unknown")),
+            "run_mode": run_mode,
+            "applied_timeout_s": applied_timeout_s,
             "native_input": native_input,
             "generic": generic_output,
             "alphamelts": alpha_output,
@@ -854,7 +926,12 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
         return job.grid_key_id, output
     except Exception as exc:
         return job.grid_key_id, _worker_failure_output(
-            exc, started=started, captures=captures, native_input=native_input
+            exc,
+            started=started,
+            captures=captures,
+            native_input=native_input,
+            run_mode=run_mode,
+            applied_timeout_s=applied_timeout_s,
         )
 
 
@@ -980,7 +1057,7 @@ def run_cycle(
                 )
 
     iterator = iter(pending_jobs())
-    active: list[tuple[Any, WorkerJob]] = []
+    active: list[tuple[Any, WorkerJob, float]] = []
     pool = context.Pool(
         processes=args.workers,
         initializer=_worker_initialize,
@@ -993,22 +1070,26 @@ def run_cycle(
                     job = next(iterator)
                 except StopIteration:
                     return
-                active.append((pool.apply_async(_run_point, (job,)), job))
+                active.append((
+                    pool.apply_async(_run_point, (job,)),
+                    job,
+                    time.monotonic(),
+                ))
 
         fill()
         while active:
             ready = [item for item in active if item[0].ready()]
             if not ready:
                 time.sleep(0.1)
-            for async_result, fallback_job in ready:
-                active.remove((async_result, fallback_job))
+            for async_result, fallback_job, submitted_at in ready:
+                active.remove((async_result, fallback_job, submitted_at))
                 try:
                     grid_key_id, output = async_result.get()
                 except Exception as exc:
                     grid_key_id = fallback_job.grid_key_id
                     output = _worker_failure_output(
                         exc,
-                        started=time.monotonic(),
+                        started=submitted_at,
                         captures=[],
                         native_input=None,
                     )
@@ -1018,6 +1099,7 @@ def run_cycle(
                         "worker grid-key mismatch: "
                         f"expected {job.grid_key_id}, got {grid_key_id}"
                     )
+                _record_job_runtime(job, output)
                 if writer.write_result(job.grid_key_id, output):
                     inserted += 1
                 completed += 1
@@ -1089,7 +1171,15 @@ def parser() -> argparse.ArgumentParser:
         "--batch-label", default="fixed-backbone-v3-window-filtered"
     )
     result.add_argument("--shard", choices=("all", "0", "1", "2"), default="all")
-    result.add_argument("--engine-epoch", type=int, default=1)
+    result.add_argument(
+        "--engine-epoch",
+        type=int,
+        default=2,
+        help=(
+            "output epoch (default: 2, the explicit isothermal/fO2/property "
+            "contract; epoch 1 retains legacy liquidus-mode rows)"
+        ),
+    )
     result.add_argument("--composition-step-pct", type=float, default=10.0)
     result.add_argument("--composition-margin-pct", type=float, default=5.0)
     result.add_argument("--temperature-min-C", type=float, default=800.0)
@@ -1098,8 +1188,8 @@ def parser() -> argparse.ArgumentParser:
         "--fo2-grid",
         default=",".join(str(value) for value in DEFAULT_INTENDED_FO2_GRID),
         help=(
-            "intended log10(fO2/bar) provenance levels used to pre-partition "
-            "Fe2O3/FeO with Kress91; never serialized as an engine constraint"
+            "absolute log10(fO2/bar) levels imposed on alphaMELTS and used "
+            "to pre-partition Fe2O3/FeO with Kress91"
         ),
     )
     result.add_argument("--model", default="MELTSv1.0.2")
@@ -1491,7 +1581,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             "intended_fO2_log_grid": intended_fO2_logs,
             "kress91_partition": kress91_partition_parameters(),
             "pressure_bar_grid": [ENGINE_PRESSURE_BAR],
-            "engine_fO2_constraint": None,
+            "engine_fO2_constraint": (
+                "absolute log10(fO2/bar) from each grid point"
+            ),
             "pre_filter_grid_points": filter_stats["unfiltered_grid_points"],
             "filtered_silicate_window_points": filter_stats[
                 "filtered_silicate_window_points"
@@ -1558,7 +1650,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "intended_fO2_log_grid": intended_fO2_logs,
                 "kress91_partition": kress91_partition_parameters(),
                 "pressure_bar_grid": [ENGINE_PRESSURE_BAR],
-                "engine_fO2_constraint": None,
+                "engine_fO2_constraint": (
+                    "absolute log10(fO2/bar) from each grid point"
+                ),
                 "pre_filter_grid_points": filter_stats["unfiltered_grid_points"],
                 "filtered_silicate_window_points": filter_stats[
                     "filtered_silicate_window_points"

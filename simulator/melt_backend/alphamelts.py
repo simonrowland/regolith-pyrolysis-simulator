@@ -43,7 +43,11 @@ from simulator.melt_backend.base import (
     EquilibriumResult,
     LiquidFractionInvalidError,
     MeltBackend,
+    MeltBackendError,
     liquid_fraction_from_phase_masses,
+)
+from simulator.melt_backend.alphamelts_contract import (
+    AlphaMELTSSubprocessRunMode,
 )
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.melt_backend.liquidus import (
@@ -86,16 +90,31 @@ ALPHAMELTS_REASON_NONZERO_EXIT = 'nonzero_exit'
 ALPHAMELTS_REASON_NO_CONVERGENCE = 'no_convergence'
 ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT = 'parse_empty_output'
 ALPHAMELTS_REASON_MISSING_BINARY = 'missing_binary'
+ALPHAMELTS_REASON_RUN_MODE_REQUIRED = 'subprocess_run_mode_required'
+ALPHAMELTS_REASON_RUN_MODE_INVALID = 'subprocess_run_mode_invalid'
+ALPHAMELTS_REASON_EXECUTED_T_MISSING = 'executed_temperature_missing'
+ALPHAMELTS_REASON_EXECUTED_T_MISMATCH = 'executed_temperature_mismatch'
+ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED = 'subprocess_pressure_below_minimum'
+ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID = 'fo2_constraint_invalid'
+ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING = 'system_output_missing'
+ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 0.01
 
 ALPHAMELTS_BACKEND_FAILURE_REASON_CODE_KEY = 'backend_failure_reason_code'
 ALPHAMELTS_BACKEND_FAILURE_CATEGORY_KEY = 'backend_failure_category'
 ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_TIMEOUT: OutOfDomainReason.NOT_CONVERGED.value,
-    ALPHAMELTS_REASON_SUBPROCESS_DIED: 'out_of_domain',
+    ALPHAMELTS_REASON_SUBPROCESS_DIED: 'engine_crash',
     ALPHAMELTS_REASON_NONZERO_EXIT: OutOfDomainReason.NOT_CONVERGED.value,
     ALPHAMELTS_REASON_NO_CONVERGENCE: 'out_of_domain',
     ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT: OutOfDomainReason.NOT_CONVERGED.value,
     ALPHAMELTS_REASON_MISSING_BINARY: OutOfDomainReason.BACKEND_UNAVAILABLE.value,
+    ALPHAMELTS_REASON_RUN_MODE_REQUIRED: 'contract_error',
+    ALPHAMELTS_REASON_RUN_MODE_INVALID: 'contract_error',
+    ALPHAMELTS_REASON_EXECUTED_T_MISSING: 'parse_error',
+    ALPHAMELTS_REASON_EXECUTED_T_MISMATCH: 'contract_error',
+    ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED: 'out_of_domain',
+    ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: 'contract_error',
+    ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: 'parse_error',
 }
 
 ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
@@ -115,7 +134,32 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
     ALPHAMELTS_REASON_MISSING_BINARY: (
         'AlphaMELTS subprocess binary was not available'
     ),
+    ALPHAMELTS_REASON_RUN_MODE_REQUIRED: (
+        'AlphaMELTS subprocess run mode was not selected explicitly'
+    ),
+    ALPHAMELTS_REASON_RUN_MODE_INVALID: (
+        'AlphaMELTS subprocess run mode was invalid'
+    ),
+    ALPHAMELTS_REASON_EXECUTED_T_MISSING: (
+        'AlphaMELTS did not report its executed temperature'
+    ),
+    ALPHAMELTS_REASON_EXECUTED_T_MISMATCH: (
+        'AlphaMELTS executed at a temperature other than the isothermal request'
+    ),
+    ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED: (
+        'AlphaMELTS subprocess does not support the requested pressure'
+    ),
+    ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: (
+        'AlphaMELTS subprocess fO2 constraint was invalid'
+    ),
+    ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: (
+        'AlphaMELTS did not emit required system properties'
+    ),
 }
+
+
+class AlphaMELTSSubprocessContractError(MeltBackendError):
+    """Typed failure for subprocess request/output contract violations."""
 
 
 def _alphamelts_backend_failure_category(reason_code: str,
@@ -167,8 +211,8 @@ def _alphamelts_backend_failure_detail(reason_code: str,
 
 def _alphamelts_backend_failure_error(reason_code: str,
                                       detail: str | None = None
-                                      ) -> RuntimeError:
-    error = RuntimeError(
+                                      ) -> AlphaMELTSSubprocessContractError:
+    error = AlphaMELTSSubprocessContractError(
         _alphamelts_backend_failure_detail(reason_code, detail)
     )
     error.backend_status_reason = reason_code  # type: ignore[attr-defined]
@@ -180,6 +224,24 @@ def _alphamelts_backend_failure_error(reason_code: str,
         ALPHAMELTS_BACKEND_FAILURE_MESSAGES[reason_code]
     )
     return error
+
+
+def _normalize_subprocess_run_mode(
+    value: AlphaMELTSSubprocessRunMode | str | None,
+) -> AlphaMELTSSubprocessRunMode:
+    if value is None:
+        raise _alphamelts_backend_failure_error(
+            ALPHAMELTS_REASON_RUN_MODE_REQUIRED
+        )
+    if isinstance(value, AlphaMELTSSubprocessRunMode):
+        return value
+    try:
+        return AlphaMELTSSubprocessRunMode(str(value))
+    except ValueError as exc:
+        raise _alphamelts_backend_failure_error(
+            ALPHAMELTS_REASON_RUN_MODE_INVALID,
+            repr(value),
+        ) from exc
 PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'All', 'Mass', 'Volume', 'rho', 'Conditions', 'Input', 'Affinity',
     'Activities', 'activities', 'activity_coefficients',
@@ -618,6 +680,7 @@ class AlphaMELTSBackend(MeltBackend):
                     composition_mol: Optional[Dict[str, float]] = None,
                     composition_mol_by_account: Optional[Mapping[str, Mapping[str, float]]] = None,
                     species_formula_registry: Optional[Mapping[str, object]] = None,
+                    subprocess_run_mode: AlphaMELTSSubprocessRunMode | str | None = None,
                     ) -> EquilibriumResult:
         """
         Calculate thermodynamic equilibrium.
@@ -719,7 +782,11 @@ class AlphaMELTSBackend(MeltBackend):
         elif self._mode == 'subprocess':
             return self._equilibrate_subprocess(
                 temperature_C, comp_wt, fO2_log, pressure_bar, warnings,
-                diagnostics=crash_diagnostics)
+                diagnostics=crash_diagnostics,
+                run_mode=_normalize_subprocess_run_mode(
+                    subprocess_run_mode
+                ),
+            )
         else:
             # No PetThermoTools, no binary -- the engine is not present.
             return self._emit_equilibrium_result(
@@ -769,6 +836,37 @@ class AlphaMELTSBackend(MeltBackend):
         if isinstance(comp_wt_result, LiquidusSolidusResult):
             return comp_wt_result
         comp_wt = comp_wt_result
+
+        if self._mode == 'subprocess':
+            # The subprocess has a native liquidus-start mode.  Keep it
+            # explicit and separate from isothermal fraction samples: using
+            # liquidus mode inside a temperature scan would repeat the same
+            # liquidus equilibrium at every requested sample temperature.
+            result = self.equilibrate(
+                max(min_T_C, ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C),
+                composition_kg=composition_kg,
+                fO2_log=fO2_log,
+                pressure_bar=pressure_bar,
+                composition_mol=composition_mol,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_formula_registry,
+                subprocess_run_mode=(
+                    AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER
+                ),
+            )
+            liquidus_C = result.liquidus_T_C
+            if liquidus_C is None and result.status == 'ok':
+                liquidus_C = result.temperature_C
+            return LiquidusSolidusResult(
+                liquidus_T_C=liquidus_C,
+                liquidus_T_K=(
+                    liquidus_C + 273.15 if liquidus_C is not None else None
+                ),
+                liquid_fraction=result.liquid_fraction,
+                status=result.status,
+                warnings=tuple(result.warnings),
+                diagnostics=dict(result.diagnostics or {}),
+            )
 
         ptt_liquidus_C: Optional[float] = None
         ptt_warnings: tuple[str, ...] = ()
@@ -898,10 +996,13 @@ class AlphaMELTSBackend(MeltBackend):
         temperature_C: float,
         pressure_bar: float,
         fO2_log: float,
+        requested_temperature_C: Optional[float] = None,
         phases_present: Optional[List[str]] = None,
         phase_masses_kg: Optional[Mapping[str, float]] = None,
         liquid_fraction: Optional[float] = None,
         liquid_composition_wt_pct: Optional[Mapping[str, float]] = None,
+        liquid_viscosity_Pa_s: Optional[float] = None,
+        liquid_density_kg_m3: Optional[float] = None,
         activity_coefficients: Optional[Mapping[str, float]] = None,
         vapor_pressures_Pa: Optional[Mapping[str, float]] = None,
         vapor_pressures_source: Optional[Mapping[str, str]] = None,
@@ -937,12 +1038,27 @@ class AlphaMELTSBackend(MeltBackend):
             phase_masses_kg=phase_masses,
             liquid_fraction=resolved_liquid_fraction,
             liquid_composition_wt_pct=dict(liquid_composition_wt_pct or {}),
+            liquid_viscosity_Pa_s=(
+                None
+                if liquid_viscosity_Pa_s is None
+                else float(liquid_viscosity_Pa_s)
+            ),
             activity_coefficients=reported_activities,
             vapor_pressures_Pa=dict(vapor_pressures_Pa or {}),
             vapor_pressures_source=dict(vapor_pressures_source or {}),
             warnings=list(warnings or []),
             status=result_status,
             diagnostics=result_diagnostics,
+            requested_temperature_C=(
+                None
+                if requested_temperature_C is None
+                else float(requested_temperature_C)
+            ),
+            liquid_density_kg_m3=(
+                None
+                if liquid_density_kg_m3 is None
+                else float(liquid_density_kg_m3)
+            ),
         )
 
     @staticmethod
@@ -1736,6 +1852,7 @@ class AlphaMELTSBackend(MeltBackend):
         warnings=None,
         *,
         diagnostics: Optional[Mapping[str, object]] = None,
+        run_mode: AlphaMELTSSubprocessRunMode,
     ):
         """
         Run alphaMELTS binary via subprocess.
@@ -1745,26 +1862,34 @@ class AlphaMELTSBackend(MeltBackend):
 
         Slower (~1-3s per call) but reliable.
         """
+        requested_temperature_C = float(temperature_C)
+        requested_pressure_bar = float(pressure_bar)
+        if requested_pressure_bar < ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED,
+                f'requested={requested_pressure_bar:g} bar; '
+                f'minimum={ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR:g} bar',
+            )
+        fO2_path, fO2_offset = self._subprocess_fo2_constraint(fO2_log)
         with tempfile.TemporaryDirectory() as tmpdir:
             # Write .melts file
             melts_path = Path(tmpdir) / 'input.melts'
-            calculation_temperature_C = max(
-                float(temperature_C), ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C)
-            calculation_pressure_bar = max(
-                float(pressure_bar), ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR)
-            clamp_diagnostics, result_warnings = (
-                self._clamped_operating_point_context(
-                    requested_temperature_C=temperature_C,
-                    requested_pressure_bar=pressure_bar,
-                    solved_temperature_C=calculation_temperature_C,
-                    solved_pressure_bar=calculation_pressure_bar,
-                    transport='subprocess',
-                    warnings=warnings,
+            calculation_temperature_C = requested_temperature_C
+            if run_mode is AlphaMELTSSubprocessRunMode.LIQUIDUS_FINDER:
+                calculation_temperature_C = max(
+                    calculation_temperature_C,
+                    ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C,
                 )
+            calculation_pressure_bar = requested_pressure_bar
+            result_warnings = list(warnings or [])
+            self._write_melts_file(
+                melts_path,
+                comp_wt,
+                calculation_temperature_C,
+                calculation_pressure_bar,
+                fO2_path=fO2_path,
+                fO2_offset=fO2_offset,
             )
-            self._write_melts_file(melts_path, comp_wt,
-                                    calculation_temperature_C,
-                                    calculation_pressure_bar)
 
             binary = self._binary_path or self._engine_path
             if binary is None:
@@ -1772,9 +1897,22 @@ class AlphaMELTSBackend(MeltBackend):
                     ALPHAMELTS_REASON_MISSING_BINARY,
                     'subprocess binary is not configured',
                 )
-            menu_input = '1\ninput.melts\n3\n2\nx\n'
+            starting_guess = (
+                '1'
+                if run_mode is AlphaMELTSSubprocessRunMode.ISOTHERMAL
+                else '2'
+            )
+            # Menu option 4 with a one-step bound is required by alphaMELTS 2
+            # to emit System_main_tbl.txt.  That file is the engine-owned
+            # source for fO2, liquid density, and liquid viscosity.
+            menu_input = f'1\ninput.melts\n4\n{starting_guess}\n1\nx\n'
             env = os.environ.copy()
             env.setdefault('ALPHAMELTS_CALC_MODE', 'MELTS')
+            env['ALPHAMELTS_RUN_MODE'] = 'isobaric'
+            env['ALPHAMELTS_DELTAT'] = '0'
+            env['ALPHAMELTS_MINT'] = f'{calculation_temperature_C:.12g}'
+            env['ALPHAMELTS_MAXT'] = f'{calculation_temperature_C:.12g}'
+            env['ALPHAMELTS_CELSIUS_OUTPUT'] = 'true'
 
             # Run alphaMELTS directly. The alphaMELTS 2 app runner only
             # emits *_tbl.txt for path-style runs; single-point equilibria
@@ -1805,23 +1943,9 @@ class AlphaMELTSBackend(MeltBackend):
 
             if result.returncode < 0:
                 signal_name = _signal_name(result.returncode)
-                return self._emit_equilibrium_result(
-                    temperature_C=calculation_temperature_C,
-                    pressure_bar=calculation_pressure_bar,
-                    fO2_log=fO2_log,
-                    warnings=[
-                        *result_warnings,
-                        'AlphaMELTS subprocess exited via '
-                        f'{signal_name} (returncode {result.returncode}); '
-                        'composition outside Rhyolite-MELTS calibration domain',
-                    ],
-                    status='out_of_domain',
-                    diagnostics=self._diagnostics_with_backend_status_reason(
-                        self._merge_diagnostics(
-                            diagnostics, clamp_diagnostics),
-                        backend_status='out_of_domain',
-                        reason=ALPHAMELTS_REASON_SUBPROCESS_DIED,
-                    ),
+                raise _alphamelts_backend_failure_error(
+                    ALPHAMELTS_REASON_SUBPROCESS_DIED,
+                    f'{signal_name} (returncode {result.returncode})',
                 )
             if result.returncode > 0:
                 raise _alphamelts_backend_failure_error(
@@ -1830,21 +1954,50 @@ class AlphaMELTSBackend(MeltBackend):
                     f'{result.stderr or result.stdout}',
                 )
 
+            system_output_path = Path(tmpdir) / 'System_main_tbl.txt'
+            system_output = (
+                system_output_path.read_text(errors='replace')
+                if system_output_path.is_file()
+                else ''
+            )
             eq = self._parse_single_point_stdout(
                 f'{result.stdout}\n{result.stderr}',
-                temperature_C=calculation_temperature_C,
+                requested_temperature_C=requested_temperature_C,
                 pressure_bar=calculation_pressure_bar,
                 fO2_log=fO2_log,
                 total_input_kg=100.0,
                 warnings=result_warnings,
-                diagnostics=self._merge_diagnostics(
-                    diagnostics, clamp_diagnostics),
-                success_diagnostics=clamp_diagnostics,
+                diagnostics=diagnostics,
+                success_diagnostics=diagnostics,
+                run_mode=run_mode,
+                system_output=system_output,
+                fO2_constraint={
+                    'path': fO2_path,
+                    'offset': fO2_offset,
+                },
             )
-            return self._fail_closed_on_clamped_operating_point(eq)
+            return eq
+
+    def _subprocess_fo2_constraint(self, fO2_log: float) -> tuple[str, float]:
+        if self._redox_buffer is not None:
+            path = 'FMQ' if self._redox_buffer == 'QFM' else self._redox_buffer
+            return path, float(self._fo2_offset or 0.0)
+        if self._fo2_offset is not None:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID,
+                'fO2_offset requires fO2_buffer',
+            )
+        value = float(fO2_log)
+        if not math.isfinite(value):
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID,
+                f'absolute fO2_log={fO2_log!r}',
+            )
+        return 'Absolute', value
 
     def _write_melts_file(self, path: Path, comp_wt: dict,
-                           T_C: float, P_bar: float):
+                           T_C: float, P_bar: float, *,
+                           fO2_path: str, fO2_offset: float):
         """Write a .melts input file for alphaMELTS."""
         lines = ['Title: regolith_pyrolysis_simulator']
         for oxide, wt in sorted(comp_wt.items()):
@@ -1853,8 +2006,9 @@ class AlphaMELTSBackend(MeltBackend):
                 melts_name = oxide.replace('2O3', '2O3').replace('2O', '2O')
                 lines.append(f'Initial Composition: {melts_name} {wt:.4f}')
         lines.append(f'Initial Temperature: {T_C:.1f}')
-        pressure_for_file = max(P_bar, ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR)
-        lines.append(f'Initial Pressure: {pressure_for_file:.1f}')
+        lines.append(f'Initial Pressure: {P_bar:.6g}')
+        lines.append(f'Log fO2 Path: {fO2_path}')
+        lines.append(f'Log fO2 Offset: {fO2_offset:.12g}')
 
         with open(path, 'w') as f:
             f.write('\n'.join(lines) + '\n')
@@ -1867,6 +2021,67 @@ class AlphaMELTSBackend(MeltBackend):
         if match is None:
             return None
         return float(match.group(1))
+
+    def _parse_executed_temperatures_C(self, output: str) -> list[float]:
+        matches = re.finditer(
+            r'Initial alphaMELTS calculation at:.*?\bT\s+'
+            r'(?P<started>[0-9.+\-Ee]+)\s*\(C\)'
+            r'|Initial calculation failed\s*\([^,]+,\s*'
+            r'(?P<failed>[0-9.+\-Ee]+)\s+C\s*\)!',
+            output,
+        )
+        return [
+            float(match.group('started') or match.group('failed'))
+            for match in matches
+        ]
+
+    def _parse_system_main_output(self, output: str) -> dict[str, object]:
+        lines = [line.strip() for line in output.splitlines() if line.strip()]
+        for index, line in enumerate(lines):
+            headers = line.split()
+            if (
+                'Temperature' not in headers
+                or not any(name.startswith('fO2(') for name in headers)
+            ):
+                continue
+            if index + 1 >= len(lines):
+                break
+            values = lines[index + 1].split()
+            if len(values) < len(headers):
+                break
+
+            def number(name: str) -> float:
+                return float(values[headers.index(name)])
+
+            def optional_number(name: str) -> Optional[float]:
+                try:
+                    value = number(name)
+                except (ValueError, IndexError):
+                    return None
+                return value if math.isfinite(value) else None
+
+            fO2_index = next(
+                (i for i, name in enumerate(headers) if name.startswith('fO2(')),
+                None,
+            )
+            payload: dict[str, object] = {}
+            density_g_cm3 = optional_number('rhol')
+            if density_g_cm3 is not None and density_g_cm3 > 0.0:
+                payload['liquid_density_kg_m3'] = density_g_cm3 * 1000.0
+            log10_viscosity_poise = optional_number('viscosity')
+            if log10_viscosity_poise is not None:
+                payload['liquid_viscosity_Pa_s'] = (
+                    0.1 * (10.0 ** log10_viscosity_poise)
+                )
+            if fO2_index is not None:
+                payload['fO2_header'] = headers[fO2_index]
+                fO2_value = optional_number(headers[fO2_index])
+                if fO2_value is not None:
+                    payload['fO2_value'] = fO2_value
+            if 'Temperature' in headers:
+                payload['temperature_C'] = number('Temperature')
+            return payload
+        return {}
 
     def _extract_subprocess_activity_mapping(self, output: str) -> dict:
         lines = output.splitlines()
@@ -1948,7 +2163,8 @@ class AlphaMELTSBackend(MeltBackend):
             return False
         return bool(re.search(r'[A-Za-z]', label))
 
-    def _parse_single_point_stdout(self, output: str, *, temperature_C: float,
+    def _parse_single_point_stdout(self, output: str, *,
+                                   requested_temperature_C: float,
                                    pressure_bar: float, fO2_log: float,
                                    total_input_kg: float,
                                    warnings=None,
@@ -1958,7 +2174,13 @@ class AlphaMELTSBackend(MeltBackend):
                                    success_diagnostics: Optional[
                                        Mapping[str, object]
                                    ] = None,
+                                   run_mode: AlphaMELTSSubprocessRunMode,
+                                   system_output: str,
+                                   fO2_constraint: Mapping[str, object],
                                    ) -> EquilibriumResult:
+        del total_input_kg
+        executed_temperatures_C = self._parse_executed_temperatures_C(output)
+        system_values = self._parse_system_main_output(system_output)
         stable_verdict = re.search(r'<> Stable .+ assemblage achieved\.', output)
 
         phases_present: List[str] = []
@@ -1971,7 +2193,6 @@ class AlphaMELTSBackend(MeltBackend):
         if liquidus_C is not None:
             result_warnings.append(f'AlphaMELTS liquidus_C={liquidus_C:.3f}')
         lines = output.splitlines()
-
         for idx, line in enumerate(lines):
             stripped = line.strip()
             if stripped.startswith('liquid:'):
@@ -2017,8 +2238,32 @@ class AlphaMELTSBackend(MeltBackend):
             no_phase_reason = self._no_phase_subprocess_failure_reason(output)
             if no_phase_reason is not None:
                 result_warnings.append(no_phase_reason)
+                if not executed_temperatures_C:
+                    raise _alphamelts_backend_failure_error(
+                        ALPHAMELTS_REASON_EXECUTED_T_MISSING,
+                        no_phase_reason,
+                    )
+                if (
+                    run_mode is AlphaMELTSSubprocessRunMode.ISOTHERMAL
+                    and any(
+                        not math.isclose(
+                            value,
+                            float(requested_temperature_C),
+                            rel_tol=0.0,
+                            abs_tol=ALPHAMELTS_EXECUTED_T_TOLERANCE_C,
+                        )
+                        for value in executed_temperatures_C
+                    )
+                ):
+                    raise _alphamelts_backend_failure_error(
+                        ALPHAMELTS_REASON_EXECUTED_T_MISMATCH,
+                        f'requested={float(requested_temperature_C):.9g} C; '
+                        f'executed={executed_temperatures_C!r} C',
+                    )
+                failure_temperature_C = executed_temperatures_C[-1]
                 return self._emit_equilibrium_result(
-                    temperature_C=temperature_C,
+                    temperature_C=failure_temperature_C,
+                    requested_temperature_C=requested_temperature_C,
                     pressure_bar=pressure_bar,
                     fO2_log=fO2_log,
                     warnings=result_warnings,
@@ -2033,22 +2278,103 @@ class AlphaMELTSBackend(MeltBackend):
                 ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT,
                 'no parseable phase assemblage',
             )
+        if not executed_temperatures_C:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_EXECUTED_T_MISSING
+            )
+        executed_temperature_C = executed_temperatures_C[-1]
+        if run_mode is AlphaMELTSSubprocessRunMode.ISOTHERMAL:
+            mismatches = [
+                value for value in executed_temperatures_C
+                if not math.isclose(
+                    value,
+                    float(requested_temperature_C),
+                    rel_tol=0.0,
+                    abs_tol=ALPHAMELTS_EXECUTED_T_TOLERANCE_C,
+                )
+            ]
+            if mismatches:
+                raise _alphamelts_backend_failure_error(
+                    ALPHAMELTS_REASON_EXECUTED_T_MISMATCH,
+                    f'requested={float(requested_temperature_C):.9g} C; '
+                    f'executed={mismatches!r} C; '
+                    f'tolerance={ALPHAMELTS_EXECUTED_T_TOLERANCE_C:g} C',
+                )
+        if not system_values:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING,
+                'System_main_tbl.txt missing or unparseable',
+            )
+        table_temperature_C = system_values.get('temperature_C')
+        if (
+            table_temperature_C is not None
+            and not math.isclose(
+                float(table_temperature_C),
+                executed_temperature_C,
+                rel_tol=0.0,
+                abs_tol=ALPHAMELTS_EXECUTED_T_TOLERANCE_C,
+            )
+        ):
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_EXECUTED_T_MISMATCH,
+                f'stdout={executed_temperature_C:.9g} C; '
+                f'system_table={float(table_temperature_C):.9g} C',
+            )
+        property_diagnostics = {
+            key: system_values[key]
+            for key in (
+                'liquid_density_kg_m3',
+                'liquid_viscosity_Pa_s',
+            )
+            if key in system_values
+        }
+        result_diagnostics = self._merge_diagnostics(
+            success_diagnostics,
+            {
+                'requested_temperature_C': float(requested_temperature_C),
+                'executed_temperature_C': executed_temperature_C,
+                'subprocess_run_mode': run_mode.value,
+                'fO2_constraint': dict(fO2_constraint),
+                'liquid_properties_source': 'System_main_tbl.txt',
+                **property_diagnostics,
+            },
+        )
+        fO2_header = str(system_values.get('fO2_header') or '')
+        if (
+            not fO2_header.lower().startswith('fo2(absolute)')
+            or 'fO2_value' not in system_values
+        ):
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING,
+                'System_main_tbl.txt lacks absolute engine fO2 echo',
+            )
+        executed_fO2_log = float(system_values['fO2_value'])
+        result_diagnostics['intrinsic_fO2_log'] = executed_fO2_log
+        result_diagnostics['engine_reported_fO2_log'] = executed_fO2_log
+        result_diagnostics['engine_reported_fO2_header'] = fO2_header
         if stable_verdict is None:
             result_warnings.append(
                 'AlphaMELTS stable assemblage banner absent; accepted parseable phase rows'
             )
         eq = self._emit_equilibrium_result(
-            temperature_C=temperature_C,
+            temperature_C=executed_temperature_C,
+            requested_temperature_C=requested_temperature_C,
             pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
+            fO2_log=executed_fO2_log,
             phases_present=phases_present,
             phase_masses_kg=phase_masses_kg,
             liquid_fraction=liquid_fraction,
             liquid_composition_wt_pct=liquid_composition_wt_pct,
+            liquid_viscosity_Pa_s=float(
+                system_values['liquid_viscosity_Pa_s']
+            ) if 'liquid_viscosity_Pa_s' in system_values else None,
+            liquid_density_kg_m3=float(
+                system_values['liquid_density_kg_m3']
+            ) if 'liquid_density_kg_m3' in system_values else None,
             activity_coefficients=activity_coefficients,
             warnings=result_warnings,
             status='ok',
-            diagnostics=success_diagnostics,
+            diagnostics=result_diagnostics,
         )
         if liquidus_C is not None:
             eq.liquidus_T_C = float(liquidus_C)

@@ -194,7 +194,12 @@ def diagnostics_to_equilibrium(
                     f'phase_masses={computed!r}'
                 )
         liquid_fraction = computed
-    temperature_C = _control_float(controls, 'temperature_C', 0.0)
+    requested_temperature_C = _control_float(controls, 'temperature_C', 0.0)
+    temperature_C = _control_float(
+        backend_diagnostics,
+        'executed_temperature_C',
+        requested_temperature_C,
+    )
     pressure_bar = _control_float(controls, 'pressure_bar', 0.0)
     if requested_point_non_authoritative:
         temperature_C = _control_float(
@@ -214,11 +219,26 @@ def diagnostics_to_equilibrium(
         phase_masses_kg=phase_masses_kg,
         liquid_fraction=liquid_fraction,
         liquid_composition_wt_pct=dict(diagnostics.liquid_composition_wt_pct),
+        liquid_viscosity_Pa_s=_control_float(
+            backend_diagnostics,
+            'liquid_viscosity_Pa_s',
+            0.0,
+        ) or None,
         activity_coefficients=dict(diagnostics.activity_coefficients),
         fO2_log=float(fO2_log),
         warnings=list(diagnostics.backend_warnings),
         status=status,
         diagnostics=backend_diagnostics,
+        requested_temperature_C=_control_float(
+            backend_diagnostics,
+            'requested_temperature_C',
+            requested_temperature_C,
+        ),
+        liquid_density_kg_m3=_control_float(
+            backend_diagnostics,
+            'liquid_density_kg_m3',
+            0.0,
+        ) or None,
     )
 
 

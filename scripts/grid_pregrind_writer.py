@@ -49,6 +49,7 @@ COMMON_INPUT_FIELDS = (
 
 ALPHAMELTS_CONFIG_FIELDS = (
     "mode",
+    "subprocess_run_mode",
     "redox_buffer",
     "fO2_offset",
     "Fe3Fet_Liq",
@@ -74,6 +75,7 @@ INPUT_FIELDS = COMMON_INPUT_FIELDS + ALPHAMELTS_CONFIG_FIELDS + FINDER_INPUT_FIE
 
 GENERIC_OUTPUT_FIELDS = (
     "temperature_C",
+    "requested_temperature_C",
     "pressure_bar",
     "phases_present",
     "phase_masses_kg",
@@ -84,6 +86,7 @@ GENERIC_OUTPUT_FIELDS = (
     "phase_assemblage_available",
     "liquid_composition_wt_pct",
     "liquid_viscosity_Pa_s",
+    "liquid_density_kg_m3",
     "vapor_pressures_Pa",
     "vapor_pressures_source",
     "activity_coefficients",
@@ -138,12 +141,12 @@ FINDER_OUTPUT_FIELDS = (
     "curve_path_liquid_fraction",
 )
 
-assert len(INPUT_FIELDS) == 24
+assert len(INPUT_FIELDS) == 25
 assert (
     len(GENERIC_OUTPUT_FIELDS)
     + len(ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS)
     + len(FINDER_OUTPUT_FIELDS)
-) == 57
+) == 59
 
 
 def utc_now() -> str:
@@ -299,6 +302,7 @@ CREATE TABLE IF NOT EXISTS grid_keys (
     species_formula_registry_json TEXT,
     species_formula_registry_digest TEXT,
     mode TEXT,
+    subprocess_run_mode TEXT,
     redox_buffer TEXT,
     fO2_offset REAL,
     fO2_offset_repr TEXT,
@@ -338,6 +342,9 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     engine_version TEXT NOT NULL,
     engine_mode TEXT NOT NULL,
     engine_model TEXT NOT NULL,
+    run_mode TEXT,
+    applied_timeout_s REAL,
+    applied_timeout_s_repr TEXT,
     native_input_json TEXT,
     created_at TEXT NOT NULL,
     host TEXT NOT NULL,
@@ -346,6 +353,8 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
 
     generic_temperature_C REAL,
     generic_temperature_C_repr TEXT,
+    generic_requested_temperature_C REAL,
+    generic_requested_temperature_C_repr TEXT,
     generic_pressure_bar REAL,
     generic_pressure_bar_repr TEXT,
     generic_phases_present_json TEXT,
@@ -359,6 +368,8 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     generic_liquid_composition_wt_pct_json TEXT,
     generic_liquid_viscosity_Pa_s REAL,
     generic_liquid_viscosity_Pa_s_repr TEXT,
+    generic_liquid_density_kg_m3 REAL,
+    generic_liquid_density_kg_m3_repr TEXT,
     generic_vapor_pressures_Pa_json TEXT,
     generic_vapor_pressures_source_json TEXT,
     generic_activity_coefficients_json TEXT,
@@ -493,17 +504,23 @@ class GridCacheWriter:
         self.connection.execute("PRAGMA synchronous=NORMAL")
         self.connection.execute("PRAGMA foreign_keys=ON")
         self.connection.execute("PRAGMA busy_timeout=30000")
-        if not existing_only:
+        if existing_only:
+            # Retry/drain opens an existing database read-write. Add nullable
+            # forward columns only; historical rows remain untouched.
+            self._ensure_runmode_output_columns()
+            self.connection.commit()
+        else:
             self.connection.executescript(SCHEMA_SQL)
             self._ensure_v2_provenance_columns()
+            self._ensure_runmode_output_columns()
             self._set_metadata("schema_variant", SCHEMA_VARIANT)
             self._set_metadata(
                 "expedited_key_note",
                 "variant-local bookkeeping only; recompute reviewed canonical_state_bytes "
                 "from typed full-precision inputs; never transplant this hash",
             )
-            self._set_metadata("schema_output_field_count", "57")
-            self._set_metadata("schema_input_field_count", "24")
+            self._set_metadata("schema_output_field_count", "59")
+            self._set_metadata("schema_input_field_count", "25")
             self._set_metadata("grid_realization_revision", GRID_REALIZATION_REVISION)
             self._set_metadata("database_id", str(uuid.uuid4()), overwrite=False)
             self._set_metadata("created_at", utc_now(), overwrite=False)
@@ -598,6 +615,30 @@ class GridCacheWriter:
                 self.connection.execute(
                     f'ALTER TABLE grid_keys ADD COLUMN "{name}" {column_type}'
                 )
+
+    def _ensure_runmode_output_columns(self) -> None:
+        additions = {
+            "grid_keys": {
+                "subprocess_run_mode": "TEXT",
+            },
+            "alphamelts_outputs": {
+                "generic_requested_temperature_C": "REAL",
+                "generic_requested_temperature_C_repr": "TEXT",
+                "generic_liquid_density_kg_m3": "REAL",
+                "generic_liquid_density_kg_m3_repr": "TEXT",
+                "run_mode": "TEXT",
+                "applied_timeout_s": "REAL",
+                "applied_timeout_s_repr": "TEXT",
+            },
+        }
+        for table, columns_to_add in additions.items():
+            columns = set(table_columns(self.connection, table))
+            for name, column_type in columns_to_add.items():
+                if name not in columns:
+                    self.connection.execute(
+                        f'ALTER TABLE "{table}" ADD COLUMN '
+                        f'"{name}" {column_type}'
+                    )
 
     def _set_metadata(self, key: str, value: str, *, overwrite: bool = True) -> None:
         existing = self.connection.execute(
@@ -1107,6 +1148,7 @@ class GridCacheWriter:
             "species_formula_registry_json": registry_json,
             "species_formula_registry_digest": registry_digest,
             "mode": inputs["mode"],
+            "subprocess_run_mode": inputs["subprocess_run_mode"],
             "redox_buffer": inputs["redox_buffer"],
             "fO2_offset": _float(inputs["fO2_offset"]),
             "fO2_offset_repr": _repr(inputs["fO2_offset"]),
@@ -1183,6 +1225,9 @@ class GridCacheWriter:
             "engine_version": str(output["engine_version"]),
             "engine_mode": str(output["engine_mode"]),
             "engine_model": str(output["engine_model"]),
+            "run_mode": output.get("run_mode"),
+            "applied_timeout_s": _float(output.get("applied_timeout_s")),
+            "applied_timeout_s_repr": _repr(output.get("applied_timeout_s")),
             "native_input_json": _json(output.get("native_input")),
             "created_at": str(output.get("created_at") or utc_now()),
             "host": str(output.get("host") or socket.gethostname()),
@@ -1190,6 +1235,12 @@ class GridCacheWriter:
             "source_row_id": output.get("source_row_id"),
             "generic_temperature_C": _float(generic.get("temperature_C")),
             "generic_temperature_C_repr": _repr(generic.get("temperature_C")),
+            "generic_requested_temperature_C": _float(
+                generic.get("requested_temperature_C")
+            ),
+            "generic_requested_temperature_C_repr": _repr(
+                generic.get("requested_temperature_C")
+            ),
             "generic_pressure_bar": _float(generic.get("pressure_bar")),
             "generic_pressure_bar_repr": _repr(generic.get("pressure_bar")),
             "generic_phases_present_json": _json(generic.get("phases_present")),
@@ -1212,6 +1263,12 @@ class GridCacheWriter:
             ),
             "generic_liquid_viscosity_Pa_s_repr": _repr(
                 generic.get("liquid_viscosity_Pa_s")
+            ),
+            "generic_liquid_density_kg_m3": _float(
+                generic.get("liquid_density_kg_m3")
+            ),
+            "generic_liquid_density_kg_m3_repr": _repr(
+                generic.get("liquid_density_kg_m3")
             ),
             "generic_vapor_pressures_Pa_json": _json(generic.get("vapor_pressures_Pa")),
             "generic_vapor_pressures_source_json": _json(
