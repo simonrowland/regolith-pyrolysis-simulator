@@ -18,6 +18,7 @@ import yaml
 from werkzeug.exceptions import BadRequest
 
 from simulator.backends import BackendResolutionStatus, backend_resolution_status
+from simulator.backend_names import canonical_backend_name
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
     CONTINUUM_BUFFER_KN,
@@ -486,16 +487,19 @@ def _optimizer_backend_payload(
     run_reference: Mapping[str, Any],
 ) -> dict[str, Any]:
     raw_requested = eval_spec.get('backend_name') or run_reference.get('backend_name')
-    requested = str(raw_requested) if raw_requested else 'not declared'
+    requested_token = (
+        canonical_backend_name(str(raw_requested)) if raw_requested else None
+    )
+    requested = str(requested_token) if requested_token else 'not declared'
     stored_status = _latest_backend_status(result_blob) or _latest_backend_status(run_reference)
     if stored_status is None:
         stored_status = 'unavailable'
     internal_analyticalish = requested in {'stub', 'diagnostic_stub'} or stored_status == 'diagnostic_stub'
     backend_status = 'unavailable' if internal_analyticalish else stored_status
-    canonical_backend_name = (
+    emission_backend_name = (
         'diagnostic_stub'
         if stored_status == 'diagnostic_stub'
-        else str(raw_requested) if raw_requested else None
+        else requested_token
     )
     backend_authoritative = _optional_bool(
         run_reference.get('backend_real_active')
@@ -503,7 +507,7 @@ def _optimizer_backend_payload(
         else run_reference.get('backend_authoritative')
     )
     canonical = canonicalize_fidelity_emission(
-        backend_name=canonical_backend_name,
+        backend_name=emission_backend_name,
         backend_status=backend_status,
         backend_authoritative=backend_authoritative,
         evidence_class=(
@@ -516,7 +520,7 @@ def _optimizer_backend_payload(
     )
     resolution = BackendResolutionStatus(
         requested_backend=requested,
-        active_backend='InternalAnalyticalBackend' if internal_analyticalish else requested,
+        active_backend='StubBackend' if internal_analyticalish else requested,
         backend_status=backend_status,
         authoritative=authoritative,
         selection_policy='stored-result',

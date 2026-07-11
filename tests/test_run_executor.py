@@ -103,6 +103,100 @@ def test_pyrolysis_run_emits_campaign_pressure_refusal_diagnostic(monkeypatch):
     assert "knudsen_regime_diagnostic" not in payload["run_metadata"]
 
 
+def test_run_executor_promotes_binding_c6_refusal_from_campaign_summary():
+    execution = RunExecutor().execute(_c6_refusal_run()._session_config())
+
+    assert execution.status == "refused"
+    assert execution.reason == (
+        "c6_joint_thermodynamic_liquid_fraction_window_empty"
+    )
+    assert execution.error_message == execution.reason
+    assert execution.refusal_diagnostic["status"] == "refused"
+    assert execution.refusal_diagnostic["campaign"] == "C6"
+    assert (
+        execution.refusal_diagnostic["diagnostic"]["reason_refused"]
+        == execution.reason
+    )
+
+
+def test_pyrolysis_run_emits_binding_c6_refusal_diagnostic():
+    payload = _c6_refusal_run().run()
+
+    assert payload["status"] == "refused"
+    assert payload["reason"] == (
+        "c6_joint_thermodynamic_liquid_fraction_window_empty"
+    )
+    diagnostic = payload["run_metadata"]["refusal_diagnostic"]
+    assert diagnostic["status"] == "refused"
+    assert diagnostic["campaign"] == "C6"
+    assert diagnostic["diagnostic"]["reason_refused"] == payload["reason"]
+
+
+def test_run_executor_degraded_envelope_preserves_binding_c6_refusal(
+    monkeypatch,
+):
+    def fail_cost_rollup(**_kwargs):
+        raise RuntimeError("cost rollup unavailable")
+
+    monkeypatch.setattr(
+        "simulator.run_executor.build_cost_rollup_diagnostic",
+        fail_cost_rollup,
+    )
+
+    execution = RunExecutor().execute(_c6_refusal_run()._session_config())
+
+    assert execution.status == "refused"
+    assert execution.reason == (
+        "c6_joint_thermodynamic_liquid_fraction_window_empty"
+    )
+    assert execution.refusal_diagnostic["status"] == "refused"
+    assert "envelope detail unavailable" in execution.envelope_detail_unavailable
+
+
+def test_ci_c0_to_c6_refusal_preserves_prior_rows_and_ledger_accounts():
+    payload = _run(
+        feedstock_id="ci_carbonaceous_chondrite",
+        campaign="C0",
+        hours=500,
+    ).run()
+
+    rows = payload["per_hour_summary"]
+    assert payload["status"] == "refused"
+    assert payload["reason"] == (
+        "c6_joint_thermodynamic_liquid_fraction_window_empty"
+    )
+    assert len(rows) == 43
+    assert list(dict.fromkeys(row["campaign"] for row in rows)) == [
+        "C0",
+        "C0B",
+        "C2A_STAGED",
+        "C3_NA",
+        "C4",
+        "C6",
+    ]
+    # Preservation contract: the pre-refusal campaigns' accounts survive the
+    # C6 refusal. Subset, not equality — additional accounts appearing as
+    # upstream chemistry fixes let MORE of the sequence execute (e.g.
+    # process.metal_phase once the Mg rail boundary landed) are legitimate.
+    assert set(payload["final_state"]) >= {
+        "process.cleaned_melt",
+        "process.condensation_train",
+        "process.overhead_gas",
+        "process.reagent_inventory",
+        "process.stage0_volatile_feed",
+        "process.wall_deposit_segment_stage_0_to_stage_1",
+        "process.wall_deposit_segment_stage_1_to_stage_2",
+        "reservoir.fo2_buffer",
+        "reservoir.reagent.C",
+        "reservoir.stage0_oxidant",
+        "terminal.offgas",
+        "terminal.oxygen_melt_offgas_stored",
+        "terminal.stage0_salt_phase",
+        "terminal.stage0_sulfide_matte",
+    }
+    assert set(payload) == set(_run().run())
+
+
 def test_pyrolysis_run_completes_with_band_adjustment_provenance():
     # The pre-adjudication stranded config (pN2 request below the band) must
     # now run instead of refusing; the substitution is loud in the campaign
@@ -284,6 +378,15 @@ def _pressure_refusal_run(**overrides) -> PyrolysisRun:
             "campaigns": {"C2A_staged": {"stages": stages}},
         },
         **overrides,
+    )
+
+
+def _c6_refusal_run() -> PyrolysisRun:
+    return _run(
+        feedstock_id="ci_carbonaceous_chondrite",
+        campaign="C6",
+        hours=1,
+        additives_kg={},
     )
 
 

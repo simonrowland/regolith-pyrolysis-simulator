@@ -531,13 +531,15 @@ campaigns:
     pO2_mbar_default: 0.2
     p_total_mbar_default: 0.2
     # Same N2 continuum derivation and operational band as C4, evaluated at
-    # the C6 maximum 1550 C operating temperature for the derived floor.
+    # the C6 recipe maximum 1450 C: k_B*(1450+273.15) /
+    # (sqrt(2)*pi*(3.798e-10 m)^2*0.12 m*0.01) = 30.935 Pa = 0.309350 mbar.
+    # The 5.0 mbar operating floor remains conservative at 16.16x that minimum.
     continuum_pressure_bounds:
       pN2_mbar: [5.0, 15.0]
-      derived_pN2_floor_mbar: 0.327303
+      derived_pN2_floor_mbar: 0.309350
       knudsen_max: 0.01
       carrier_gas: "N2"
-      gas_temperature_C: 1550
+      gas_temperature_C: 1450
       pipe_diameter_m: 0.12
     target_species: ["Al"]
     reaction: "3Mg(l) + Al2O3(melt) -> 3MgO(slag) + 2Al(l)"

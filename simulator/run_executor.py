@@ -113,6 +113,28 @@ class RunExecutor:
                 if cache_state is not None:
                     per_hour_summary["reduced_real_cache_state"] = str(cache_state)
                 per_hour.append(per_hour_summary)
+                campaign_summary = result.campaign_summary
+                c6_refusal = (
+                    campaign_summary.get("c6_refusal_diagnostic")
+                    if isinstance(campaign_summary, Mapping)
+                    else None
+                )
+                if (
+                    isinstance(c6_refusal, Mapping)
+                    and c6_refusal.get("status") == "refused"
+                ):
+                    refusal_diagnostic = dict(c6_refusal)
+                    diagnostic = c6_refusal.get("diagnostic")
+                    refusal_reason = (
+                        diagnostic.get("reason_refused")
+                        if isinstance(diagnostic, Mapping)
+                        else c6_refusal.get("reason")
+                    )
+                    reason = str(refusal_reason or "c6_mg_thermite_refused")
+                    error_message = reason
+                    status = "refused"
+                    failure_exc = RuntimeError(reason)
+                    break
             # Status semantics:
             #   * "ok"      -- the run consumed its full hour budget and
             #                  the simulator is either mid-batch or
@@ -121,11 +143,14 @@ class RunExecutor:
             #                  the campaign closed early or operator
             #                  decisions consumed iteration slots
             #                  without advancing the hour counter).
+            #   * "refused" -- a binding campaign diagnostic or typed
+            #                  operating-envelope refusal stopped the run.
             #   * "failed"  -- set in the except blocks below.
-            if bool(stop_at_stage0_exit) and _session_at_stage0_exit(session):
-                reason = "stage0_exit"
-            elif sim.melt.hour < hours:
-                status = "partial"
+            if status == "ok":
+                if bool(stop_at_stage0_exit) and _session_at_stage0_exit(session):
+                    reason = "stage0_exit"
+                elif sim.melt.hour < hours:
+                    status = "partial"
         except (KnudsenRegimeRefusal, CampaignPressureSetpointRefusal) as exc:
             failure_exc = exc
             status = "refused"

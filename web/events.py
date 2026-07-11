@@ -1028,6 +1028,50 @@ def _start_background_loop(
                 ):
                     break
 
+            campaign_summary = step_result.campaign_summary
+            c6_refusal = (
+                campaign_summary.get('c6_refusal_diagnostic')
+                if isinstance(campaign_summary, Mapping)
+                else None
+            )
+            if (
+                isinstance(c6_refusal, Mapping)
+                and c6_refusal.get('status') == 'refused'
+            ):
+                diagnostic = c6_refusal.get('diagnostic')
+                reason = (
+                    diagnostic.get('reason_refused')
+                    if isinstance(diagnostic, Mapping)
+                    else c6_refusal.get('reason')
+                )
+                reason = str(reason or 'c6_mg_thermite_refused')
+                refusal_payload = {
+                    'status': 'refused',
+                    'reason': reason,
+                    'message': reason,
+                    'c6_refusal_diagnostic': dict(c6_refusal),
+                    'backend_status': backend_status,
+                    'backend_authoritative': backend_authoritative,
+                    'backend_message': backend_message,
+                }
+                if not _emit_if_current(
+                    socketio,
+                    sid,
+                    run_id,
+                    'simulation_status',
+                    refusal_payload,
+                ):
+                    break
+                with _simulations_guard:
+                    current = _simulations.get(sid)
+                    if (
+                        current is not None
+                        and current.get('run_id') == run_id
+                    ):
+                        current['running'] = False
+                        current['paused'] = False
+                break
+
             if step_result.decision_event is not None:
                 with _simulations_guard:
                     current = _simulations.get(sid)

@@ -9,6 +9,8 @@ import yaml
 import simulator.campaigns as campaigns_module
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.core import Atmosphere, CampaignPhase, MeltState
+from simulator.run_executor import RunExecutor
+from simulator.runner import PyrolysisRun
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -91,6 +93,14 @@ def test_configure_campaign_pressure_defaults_match_legacy_constants(
     assert melt.pO2_mbar == pytest.approx(pO2_mbar)
     assert melt.p_total_mbar == pytest.approx(p_total_mbar)
     assert melt.atmosphere is atmosphere
+
+
+def test_c6_continuum_derivation_uses_recipe_maximum_temperature():
+    campaign = _setpoints()["campaigns"]["C6"]
+
+    assert campaign["continuum_pressure_bounds"]["gas_temperature_C"] == 1450
+    assert campaign["default_hold_T_C"] == 1450
+    assert max(campaign["temp_range_C"]) == 1450
 
 
 def test_campaign_pressure_default_override_reaches_melt_state():
@@ -376,6 +386,47 @@ def test_c2a_staged_stale_max_hold_is_recomputed_with_info_note():
         "applied_max_hold_hr": expected,
         "derivation": "sum(max(1, int(stage.duration_h)))",
     }
+
+    melt = MeltState(campaign=CampaignPhase.C2A_STAGED)
+    manager.apply_c2a_staged_gas_controls(melt)
+    assert manager.last_c2a_staged_gas_control["max_hold_adjustment"] == (
+        manager.last_c2a_staged_max_hold_adjustment
+    )
+
+
+def test_c2a_staged_max_hold_adjustment_reaches_snapshot_and_runner_diagnostic():
+    run = PyrolysisRun(
+        feedstock_id="mars_basalt",
+        campaign="C2A_staged",
+        hours=1,
+        additives_kg={"C": 30.0},
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        setpoints_patch={
+            "campaigns": {"C2A_staged": {"max_hold_hr": 999}},
+        },
+        run_metadata_overrides={
+            "started_at_utc": "2026-07-11T00:00:00Z",
+            "kernel_commit_sha": "c2a-max-hold-provenance-test",
+        },
+    )
+
+    execution = RunExecutor().execute(run._session_config())
+    snapshot_adjustment = execution.snapshots[0].c2a_staged_gas[
+        "max_hold_adjustment"
+    ]
+
+    assert snapshot_adjustment["code"] == "c2a_staged_max_hold_recomputed"
+    assert snapshot_adjustment["requested_max_hold_hr"] == pytest.approx(999.0)
+    assert snapshot_adjustment["applied_max_hold_hr"] == 9
+    assert (
+        execution.per_hour[0]["c2a_staged_gas"]["max_hold_adjustment"]
+        == snapshot_adjustment
+    )
+    runner_adjustment = run.run()["per_hour_summary"][0]["c2a_staged_gas"][
+        "max_hold_adjustment"
+    ]
+    assert runner_adjustment == snapshot_adjustment
 
 
 @pytest.mark.parametrize("stages", [[], None, ["invalid-stage"]])

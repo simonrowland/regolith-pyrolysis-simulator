@@ -768,7 +768,7 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     assert run["latest_result"]["eval_spec"]["mre_max_voltage_V"] == 1.45
     assert run["latest_result"]["eval_spec"]["mre_target_species"] == "SiO2"
     assert run["latest_result"]["backend"]["backend_requested"] == "stub"
-    assert run["latest_result"]["backend"]["backend_active"] == "InternalAnalyticalBackend"
+    assert run["latest_result"]["backend"]["backend_active"] == "StubBackend"
     assert run["latest_result"]["backend"]["backend_status"] == "unavailable"
     assert run["latest_result"]["backend"]["backend_authoritative"] is False
     assert (
@@ -880,6 +880,23 @@ def test_optimizer_backend_payload_unknown_status_fails_closed() -> None:
         )
 
 
+@pytest.mark.parametrize("backend_name", ["internal-analytical", "stub"])
+def test_optimizer_backend_payload_preserves_analytical_alias_contract(
+    backend_name: str,
+) -> None:
+    payload = web_routes._optimizer_backend_payload(
+        {"backend_name": backend_name},
+        {"backend_status": "ok"},
+        {},
+    )
+
+    assert payload["backend_requested"] == "stub"
+    assert payload["backend_active"] == "StubBackend"
+    assert payload["backend_status"] == "unavailable"
+    assert payload["evidence_class"] == "internal-analytical"
+    assert payload["certification_allowed"] is False
+
+
 def test_optimizer_backend_payload_diagnostic_stub_does_not_masquerade_as_real() -> None:
     payload = web_routes._optimizer_backend_payload(
         {"backend_name": "alphamelts"},
@@ -888,7 +905,7 @@ def test_optimizer_backend_payload_diagnostic_stub_does_not_masquerade_as_real()
     )
 
     assert payload["backend_requested"] == "alphamelts"
-    assert payload["backend_active"] == "InternalAnalyticalBackend"
+    assert payload["backend_active"] == "StubBackend"
     assert payload["evidence_class"] == "internal-analytical"
     assert payload["certification_allowed"] is False
 
@@ -2191,7 +2208,7 @@ def test_optimizer_page_and_table_render_feedstock_profile_winners(
     assert "Captured volatiles" in table
     assert "Refractory ceramic/rump" in table
     assert "backend-badge" in table
-    assert "InternalAnalyticalBackend / unavailable" in table
+    assert "StubBackend / unavailable" in table
     assert "current" in table
     assert current_corpus_version() in table
 
@@ -2371,7 +2388,7 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
     assert "computed from EvalSpec.hours" in html
     assert "Backend" in html
     assert "backend-badge" in html
-    assert "InternalAnalyticalBackend / unavailable" in html
+    assert "StubBackend / unavailable" in html
     assert "Target thermal window" in html
     assert "pc-glass-clear: C2B window 1260-1480 C" in html
 

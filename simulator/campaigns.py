@@ -558,7 +558,7 @@ class CampaignManager:
                 1, int(self._float(stage.get('duration_h'), 1.0)))
         if max_hold_hr != total_hours:
             key = self._campaign_config_key(campaign)
-            self.last_c2a_staged_max_hold_adjustment = {
+            adjustment = {
                 'severity': 'info',
                 'code': 'c2a_staged_max_hold_recomputed',
                 'field': f'{key}.max_hold_hr',
@@ -566,8 +566,15 @@ class CampaignManager:
                 'applied_max_hold_hr': int(total_hours),
                 'derivation': 'sum(max(1, int(stage.duration_h)))',
             }
+            self.last_c2a_staged_max_hold_adjustment = adjustment
+            if isinstance(self.last_c2a_staged_gas_control, dict):
+                self.last_c2a_staged_gas_control['max_hold_adjustment'] = dict(
+                    adjustment
+                )
             return float(total_hours)
         self.last_c2a_staged_max_hold_adjustment = None
+        if isinstance(self.last_c2a_staged_gas_control, dict):
+            self.last_c2a_staged_gas_control.pop('max_hold_adjustment', None)
         return max_hold_hr
 
     def _c2a_staged_depletion_flux_decay_fraction(self) -> float:
@@ -819,6 +826,9 @@ class CampaignManager:
             'requested_p_total_mbar': float(requested_p_total_mbar),
             'pn2_band_action': band_action,
         }
+        adjustment = self.last_c2a_staged_max_hold_adjustment
+        if isinstance(adjustment, Mapping):
+            diagnostic['max_hold_adjustment'] = dict(adjustment)
         return atmosphere, diagnostic
 
     def apply_c2a_staged_gas_controls(

@@ -2394,6 +2394,114 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
             _clear_simulation_state(sid)
 
 
+def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
+    monkeypatch,
+):
+    captured_tasks = []
+
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
+        backend.initialize({})
+        return backend
+
+    def capture_background_task(target, *args, **kwargs):
+        captured_tasks.append(target)
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr("web.events._get_backend", force_internal_analytical_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    events = []
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "ci_carbonaceous_chondrite",
+                "mass_kg": 1000,
+                "additives": {"C": 30.0},
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        events.extend(client.get_received())
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        sid = new_sids.pop()
+
+        for _ in range(10):
+            captured_tasks[-1]()
+            events.extend(client.get_received())
+            state = _simulations[sid]
+            if not state["running"]:
+                break
+            decision = state["session"].pending_decision()
+            assert decision is not None
+            client.emit("make_decision", {"choice": decision.recommendation})
+            events.extend(client.get_received())
+        else:
+            raise AssertionError("Socket.IO run did not reach the C6 refusal")
+
+        names = [event["name"] for event in events]
+        statuses = [
+            event["args"][0]
+            for event in events
+            if event["name"] == "simulation_status"
+        ]
+        refusal = next(
+            status for status in statuses if status.get("status") == "refused"
+        )
+        refusal_event_index = next(
+            index
+            for index, event in enumerate(events)
+            if (
+                event["name"] == "simulation_status"
+                and event["args"][0].get("status") == "refused"
+            )
+        )
+
+        assert names.count("simulation_tick") == 43
+        assert names.count("per_hour_summary") == 43
+        assert "campaign_complete_summary" in names
+        assert "simulation_complete" not in names
+        assert max(
+            index
+            for index, name in enumerate(names)
+            if name in {"simulation_tick", "per_hour_summary"}
+        ) < refusal_event_index
+        assert set(refusal) == {
+            "status",
+            "reason",
+            "message",
+            "c6_refusal_diagnostic",
+            "backend_status",
+            "backend_authoritative",
+            "backend_message",
+        }
+        assert refusal["reason"] == (
+            "c6_joint_thermodynamic_liquid_fraction_window_empty"
+        )
+        assert refusal["message"] == refusal["reason"]
+        assert refusal["c6_refusal_diagnostic"]["campaign"] == "C6"
+        assert (
+            refusal["c6_refusal_diagnostic"]["diagnostic"]["reason_refused"]
+            == refusal["reason"]
+        )
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
 class RaisingCleanedMeltLedger:
     def kg_by_account(self, account):
         assert account == "process.cleaned_melt"
