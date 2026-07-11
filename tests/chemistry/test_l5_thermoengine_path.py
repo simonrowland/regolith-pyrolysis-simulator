@@ -196,6 +196,12 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
         fO2_log=sim._compute_intrinsic_melt_fO2(),
     )
     kernel_vp = dict((kernel.diagnostic or {}).get("vapor_pressures_Pa") or {})
+    kernel_provenance = dict(
+        (kernel.diagnostic or {}).get("vapor_pressure_numerator_provenance") or {}
+    )["Na"]
+    assert kernel_provenance["pressure_rail"] == "gas_fugacity"
+    assert kernel_provenance["metal_standard_state"] == "gas"
+    assert "P_reference_Antoine_Pa" not in kernel_provenance
     bad_na = kernel_vp["Na"] * 2.0
     result = EquilibriumResult(
         temperature_C=sim.melt.temperature_C,
@@ -209,8 +215,9 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
     sim._refresh_vapor_pressures_from_kernel(result)
 
     assert result.vapor_pressures_Pa["Na"] == pytest.approx(kernel_vp["Na"])
-    assert result.vapor_pressures_source["Na"].startswith(
-        "builtin_authoritative:pure_component_source_equation_fit"
+    assert (
+        result.vapor_pressures_source["Na"]
+        == "builtin_authoritative:gas_standard_fugacity"
     )
 
 

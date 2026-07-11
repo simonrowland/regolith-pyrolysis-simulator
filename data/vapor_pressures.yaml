@@ -206,7 +206,7 @@ metals:
       T_band_K: [1873, 2373]
       envelope: [0.10, 0.21]
       tier: 2
-    boiling_point_C: 1091
+    boiling_point_C: 1090  # NIST WebBook SRD 69: 1363 K (Honig and Kramer 1969; TRC +/-1.5 K)
     condensation_T_C_at_1mbar: 580
     notes: "Runtime reference is the CRC/Stull pure-component Mg sidecar, multiplied by the builtin Ellingham MgO activity path. The 2026-06-14 VapoRock dense-grid pseudo-fit was removed on 2026-06-29 because its negative-B Antoine row was non-monotonic for T > 1000 K and non-certifying outside its fit intent."
 

@@ -26,6 +26,14 @@ ELLINGHAM_AUTHORITY_LIMIT_FLAG = "authority_limited_by_ellingham_fit_range"
 ELLINGHAM_METAL_PHASE_GAS = "gas"
 ELLINGHAM_METAL_PHASE_CONDENSED = "condensed"
 
+# Mg rail boundary, distinct from the 1366 K JANAF coefficient splice below.
+# NIST Chemistry WebBook SRD 69 (Mg, CAS 7439-95-4; Honig and Kramer 1969)
+# reports T_boiling=1363 K with TRC uncertainty 1.5 K; 1090 C converts to
+# 1363.15 K. At and above that boundary Mg(g) is the physical standard state,
+# so use the gas-basis fit without retuning its coefficients or consulting the
+# condensed-phase Antoine rail.
+MG_NORMAL_BOILING_POINT_K = 1363.15
+
 
 @dataclass(frozen=True)
 class EllinghamFitSegment:
@@ -110,7 +118,9 @@ _LEGACY_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
 # nearest 100 K row; those intervals have no source-grid row to residual-check.
 # Metal-boil no-row intervals are constrained to the shared endpoint value at
 # T_b so the condensed-metal and gas-metal standard states meet continuously;
-# only dG/dT kinks at the phase transition.
+# only dG/dT kinks at the phase transition. Mg is the documented exception:
+# its source-fit join remains at 1366 K while runtime phase ownership switches
+# at the NIST-backed 1363.15 K physical boundary above.
 ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
     **_LEGACY_SEGMENTS,
     # Na premise: Chase 1998 JANAF Na-014 rows 1100-2600 K, split at Na
@@ -355,8 +365,12 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
             "Chase 1998 NIST-JANAF Cr-016; confidence: primary-refit",
         ),
     ),
-    # Mg premise: Chase 1998 JANAF Mg-010 rows 1100-2600 K, split at Mg
-    # boil 1366 K; MgO melt is outside the grid at 3105 K. Fit max residual
+    # Mg premise: Chase 1998 JANAF Mg-010 rows 1100-2600 K, with the retained
+    # condensed/gas coefficient join at 1366 K; MgO melt is outside the grid
+    # at 3105 K. Runtime selects the gas segment from physical T_boiling
+    # 1363.15 K, back-extrapolating it 2.85 K without retuning coefficients;
+    # the two fits therefore do not join exactly at the runtime boundary.
+    # Fit max residual
     # 0.457 kJ/mol O2; dS unit is kJ/mol/K/mol O2. Sanity: dG(2600 K)
     # = -398.384 vs grid -398.744. Boil kink: Mg(g) is a higher-energy
     # reactant than Mg(l), so post-boil oxide-formation dG is less negative
@@ -595,13 +609,18 @@ def ellingham_segment_for_temperature(
 ) -> EllinghamFitSegment:
     segments = ellingham_fit_segments(species)
     T_K = float(temperature_K)
-    for segment in segments:
+    selectable_segments = segments
+    if str(species) == "Mg" and T_K >= MG_NORMAL_BOILING_POINT_K:
+        selectable_segments = tuple(
+            segment for segment in segments if "Mg(g)" in segment.phase_basis
+        )
+    for segment in selectable_segments:
         low, high = segment.range_K
         if low <= T_K <= high:
             return segment
-    if T_K < segments[0].range_K[0]:
-        return segments[0]
-    return segments[-1]
+    if T_K < selectable_segments[0].range_K[0]:
+        return selectable_segments[0]
+    return selectable_segments[-1]
 
 
 def ellingham_metal_phase_kind(species: str, temperature_K: float) -> str:

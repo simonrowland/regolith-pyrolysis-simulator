@@ -293,7 +293,7 @@ def _require_certified_pure_component_antoine(entry: dict, temperature_K: float)
     [
         # Mg now uses a CRC/Stull source-table fit; it remains within a few
         # percent of the NIST normal boiling point.
-        ("Mg", 1364.15, 0.03),  # CRC/NIST element data: Mg normal boiling point 1091 C.
+        ("Mg", 1363.15, 0.03),  # NIST SRD 69: 1363 K (1090 C), Honig and Kramer 1969.
         ("Fe", 3135.15, 0.02),  # CRC/NIST element data: Fe normal boiling point 2862 C.
         # CRC/CR2 / Alcock-Itkin-Horrigan and NIST-JANAF derived fits.
         ("Ti", 3560.15, 1e-6),

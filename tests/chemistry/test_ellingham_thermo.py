@@ -3,7 +3,11 @@ from __future__ import annotations
 import pytest
 
 from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_METAL_PHASE_CONDENSED,
+    ELLINGHAM_METAL_PHASE_GAS,
+    MG_NORMAL_BOILING_POINT_K,
     ellingham_fit_segments,
+    ellingham_metal_phase_kind,
     ellingham_segment_for_temperature,
 )
 
@@ -25,21 +29,32 @@ def _delta_g_jump_at_breakpoint(species: str, temperature_K: float) -> float:
 
 
 @pytest.mark.parametrize(
-    ("species", "boiling_point_K"),
+    ("species", "fit_breakpoint_K"),
     [
         ("Na", 1156.1),
         ("Mg", 1366.0),
         ("Ca", 1757.0),
     ],
 )
-def test_metal_boiling_breakpoints_are_delta_g_continuous(
+def test_metal_phase_fit_breakpoints_are_delta_g_continuous(
     species: str,
-    boiling_point_K: float,
+    fit_breakpoint_K: float,
 ) -> None:
-    assert _delta_g_jump_at_breakpoint(species, boiling_point_K) == pytest.approx(
+    assert _delta_g_jump_at_breakpoint(species, fit_breakpoint_K) == pytest.approx(
         0.0,
         abs=1e-6,
     )
+
+
+def test_mg_runtime_rail_switches_at_physical_boiling_boundary() -> None:
+    assert ellingham_metal_phase_kind(
+        "Mg",
+        MG_NORMAL_BOILING_POINT_K - 1e-6,
+    ) == ELLINGHAM_METAL_PHASE_CONDENSED
+    assert ellingham_metal_phase_kind(
+        "Mg",
+        MG_NORMAL_BOILING_POINT_K,
+    ) == ELLINGHAM_METAL_PHASE_GAS
 
 
 def test_mn_primary_fit_is_split_at_solid_allotrope_breakpoints() -> None:

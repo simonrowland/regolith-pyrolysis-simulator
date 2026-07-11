@@ -909,10 +909,11 @@ def test_mg_condensed_rail_refuses_outside_source_certified_range(
         provider.dispatch(_mg_vapor_request_at_T_K(1361.001))
 
 
+@pytest.mark.parametrize("temperature_K", [1363.15, 1873.0])
 def test_mg_gas_rail_is_independent_of_antoine_coefficients(
     vapor_pressure_data,
+    temperature_K,
 ):
-    temperature_K = 1873.0
     baseline_data = copy.deepcopy(vapor_pressure_data)
     no_antoine_data = copy.deepcopy(vapor_pressure_data)
     no_antoine_data["metals"]["Mg"].pop("pure_component_antoine")
@@ -1133,7 +1134,7 @@ def test_low_confidence_fe_pseudo_vaporock_fallback_is_omitted_outside_range(
     )
 
 
-def test_low_confidence_k_pseudo_vaporock_gas_rail_is_omitted_outside_range(
+def test_low_confidence_k_pseudo_vaporock_gas_rail_ignores_condensed_fallback(
     vapor_pressure_data,
 ):
     data = copy.deepcopy(vapor_pressure_data)
@@ -1154,11 +1155,20 @@ def test_low_confidence_k_pseudo_vaporock_gas_rail_is_omitted_outside_range(
     result = provider.dispatch(request)
 
     assert result.status == "ok"
-    assert "K" not in result.diagnostic["vapor_pressures_Pa"]
-    assert any(
-        "non_certifying_vapor_pressure_fallback_omitted: species=K"
-        in warning
+    assert result.diagnostic["vapor_pressures_Pa"]["K"] > 0.0
+    assert not any(
+        "non_certifying_vapor_pressure_fallback_omitted: species=K" in warning
         for warning in result.warnings
+    )
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["K"]
+    assert provenance["pressure_rail"] == "gas_fugacity"
+    assert provenance["metal_standard_state"] == "gas"
+    assert "P_reference_Antoine_Pa" not in provenance
+    assert provenance["source_label"].startswith(
+        "builtin_extrapolation_limited:gas_standard_fugacity"
+    )
+    assert provenance["source_label"].endswith(
+        "extrapolated_beyond_ellingham_fit_range_K"
     )
 
 
@@ -1372,19 +1382,38 @@ def test_builtin_provider_exposes_consumable_ellingham_authority_flag(
     )
 
 
-def test_legacy_fallback_omits_noncertifying_fe_above_pseudo_fit_range(
+def test_legacy_fallback_keeps_fe_pure_sidecar_above_pseudo_fit_range(
     vapor_pressure_data,
 ):
+    fe_data = vapor_pressure_data["metals"]["Fe"]
+    coefficients, coefficient_block = (
+        vapor_pressure_module.vapor_pressure_antoine_coefficients(
+            fe_data,
+            temperature_K=2250.0,
+        )
+    )
+    assert coefficients is fe_data["pure_component_antoine"]
+    assert coefficient_block == vapor_pressure_module.COEFF_BLOCK_PURE_COMPONENT
+    assert (
+        vapor_pressure_module.vapor_pressure_valid_range_K(
+            fe_data,
+            coefficient_block,
+            temperature_K=2250.0,
+        )
+        is None
+    )
+
     result = _LegacyInternalAnalyticalModel(
         vapor_pressure_data,
         melt=_FeBeyondEllinghamMelt(),
     )._internal_analytical_equilibrium()
 
-    assert "Fe" not in result.vapor_pressures_Pa
-    assert "Fe" not in result.vapor_pressures_source
-    assert any(
-        "non_certifying_vapor_pressure_fallback_omitted: species=Fe"
-        in warning
+    assert result.vapor_pressures_Pa["Fe"] > 0.0
+    assert result.vapor_pressures_source["Fe"] == (
+        "builtin_authoritative:pure_component_derived_from_evaluation"
+    )
+    assert not any(
+        "species=Fe" in warning
         for warning in result.warnings
     )
 

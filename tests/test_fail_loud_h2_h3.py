@@ -187,8 +187,8 @@ def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
     provider = BuiltinVaporPressureProvider(
         {
             "metals": {
-                "K": {
-                    "parent_oxide": "K2O",
+                "Fe": {
+                    "parent_oxide": "FeO",
                     "fit_target": "pseudo_psat_backsolved_from_vaporock",
                     "residual_dex": 1.4,
                     "confidence_tier": "low",
@@ -201,13 +201,13 @@ def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
     request = _vapor_request(
         temperature_c=1600.0,
         pO2_bar=1.0e-9,
-        accounts={"process.cleaned_melt": {"K2O": 1.0}},
+        accounts={"process.cleaned_melt": {"FeO": 1.0}},
     )
 
     with pytest.warns(
         HighUncertaintyVaporPressureFallbackWarning,
         match=(
-            "HIGH-UNCERTAINTY WARNING: K vapor pressure uses a backsolved "
+            "HIGH-UNCERTAINTY WARNING: Fe vapor pressure uses a backsolved "
             "VapoRock fallback \\(curve-fit\\), NOT first-principles; "
             "residual_dex=1.4; confidence_tier=low; "
             "builtin provider emits a VapoRock-derived curve-fit; "
@@ -231,7 +231,7 @@ def test_builtin_vapor_pressure_warns_once_for_pseudo_curvefit() -> None:
         separators=(",", ":"),
     )
     assert first.diagnostic["vapor_pressures_source"] == {
-        "K": (
+        "Fe": (
             "vaporock_backsolved_curve_fit:"
             "backsolved_vaporock_curve_fit"
         )
@@ -266,5 +266,9 @@ def test_builtin_vapor_pressure_uncertified_pure_component_row_is_silent() -> No
 
     assert caught == []
     assert result.diagnostic["vapor_pressures_source"] == {
-        "K": "builtin_authoritative:legacy_pure_component_estimate"
+        "K": "builtin_authoritative:gas_standard_fugacity"
     }
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["K"]
+    assert provenance["pressure_rail"] == "gas_fugacity"
+    assert provenance["metal_standard_state"] == "gas"
+    assert "P_reference_Antoine_Pa" not in provenance

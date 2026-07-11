@@ -350,6 +350,13 @@ def vapor_pressure_valid_range_K(
     )
     if _is_mapping(block) and block.get("valid_range_K") is not None:
         return block.get("valid_range_K")
+    if (
+        coefficient_block == COEFF_BLOCK_PURE_COMPONENT
+        and _fit_target(row) == FIT_TARGET_PSEUDO_VAPOROCK
+    ):
+        # The row-level range certifies the fallback pseudo-Antoine fit, not
+        # the independently sourced pure-component sidecar selected here.
+        return None
     return (row or {}).get("valid_range_K")
 
 
@@ -567,11 +574,13 @@ def warn_pseudo_vapor_pressure_fallback(
 def _is_noncertifying_pseudo_vapor_pressure_runtime(
     species: str,
     row: Mapping[str, Any] | None,
+    coefficient_block: str | None,
     *,
     temperature_K: float | None,
 ) -> bool:
     if (
-        _fit_target(row) != FIT_TARGET_PSEUDO_VAPOROCK
+        coefficient_block != COEFF_BLOCK_ANTOINE
+        or _fit_target(row) != FIT_TARGET_PSEUDO_VAPOROCK
         or not _is_high_uncertainty(row)
     ):
         return False
@@ -831,19 +840,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
             fit_target = _fit_target(sp_data)
             metal_phase_kind = ellingham_metal_phase_kind(species, T_K)
-            if _is_noncertifying_pseudo_vapor_pressure_runtime(
-                species,
-                sp_data,
-                temperature_K=T_K,
-            ):
-                warnings.append(
-                    "non_certifying_vapor_pressure_fallback_omitted: "
-                    f"species={species} "
-                    f"fit_target={FIT_TARGET_PSEUDO_VAPOROCK} "
-                    f"residual_dex={_metadata_value(sp_data, 'residual_dex')} "
-                    f"confidence_tier={_metadata_value(sp_data, 'confidence_tier')}"
-                )
-                continue
             gas_standard_rail = (
                 fit_target != FIT_TARGET_STANDARD_REACTION
                 and metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS
@@ -855,6 +851,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     sp_data,
                     temperature_K=T_K,
                 )
+                if _is_noncertifying_pseudo_vapor_pressure_runtime(
+                    species,
+                    sp_data,
+                    coefficient_block,
+                    temperature_K=T_K,
+                ):
+                    warnings.append(
+                        "non_certifying_vapor_pressure_fallback_omitted: "
+                        f"species={species} "
+                        f"fit_target={FIT_TARGET_PSEUDO_VAPOROCK} "
+                        f"residual_dex={_metadata_value(sp_data, 'residual_dex')} "
+                        f"confidence_tier={_metadata_value(sp_data, 'confidence_tier')}"
+                    )
+                    continue
                 if bool(sp_data.get("interval_required")):
                     reject_noncertifying_vapor_pressure_row(
                         species,
