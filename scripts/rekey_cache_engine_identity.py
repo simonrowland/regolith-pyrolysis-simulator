@@ -18,7 +18,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from simulator.corpus_version import current_corpus_version  # noqa: E402
+from simulator.corpus_version import (  # noqa: E402
+    current_corpus_version,
+    interoperable_corpus_versions,
+)
 from simulator.engine_local_config import is_legacy_cache_version  # noqa: E402
 from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_EQUILIBRIUM_TABLE,
@@ -114,6 +117,19 @@ def _replace_cache_identity(key: dict[str, Any], target_corpus_version: str) -> 
     return changed
 
 
+def _validated_target_corpus_version(target_corpus_version: str | None) -> str:
+    target = (target_corpus_version or current_corpus_version()).strip()
+    if not target:
+        raise SystemExit("target corpus version must be non-empty")
+    allowed = frozenset(interoperable_corpus_versions())
+    if target not in allowed:
+        raise SystemExit(
+            "target corpus version is not declared interoperable in "
+            f"data/corpus_version.yaml: {target!r}"
+        )
+    return target
+
+
 def _needs_rekey(key: dict[str, Any], target_corpus_version: str) -> bool:
     if key.get("corpus_version") != target_corpus_version:
         return True
@@ -150,12 +166,9 @@ def _table_columns(conn: sqlite3.Connection) -> set[str]:
 
 
 def _physics_columns(key: dict[str, Any]) -> dict[str, Any]:
-    try:
-        physics_key = canonical_physics_bucket_key_from_replay_key(key)
-        physics_bytes = canonical_json_bytes(physics_key)
-        ladder_values = _physics_ladder_values_from_replay_key(key)
-    except Exception:  # noqa: BLE001 - old test fixtures may be skeletal
-        return {}
+    physics_key = canonical_physics_bucket_key_from_replay_key(key)
+    physics_bytes = canonical_json_bytes(physics_key)
+    ladder_values = _physics_ladder_values_from_replay_key(key)
     return {
         "physics_bucket_schema_version": str(physics_key.get("schema_version")),
         "physics_bucket_sha256": hashlib.sha256(physics_bytes).hexdigest(),
@@ -241,9 +254,7 @@ def rekey_cache(
     target_corpus_version: str | None = None,
     dry_run: bool = False,
 ) -> RekeyResult:
-    target = (target_corpus_version or current_corpus_version()).strip()
-    if not target:
-        raise SystemExit("target corpus version must be non-empty")
+    target = _validated_target_corpus_version(target_corpus_version)
 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
@@ -289,7 +300,21 @@ def rekey_cache(
                 continue
             key_bytes = canonical_json_bytes(key)
             key_hash = hashlib.sha256(key_bytes).hexdigest()
-            physics = _physics_columns(key)
+            physics_columns_present = {
+                "physics_bucket_schema_version",
+                "physics_bucket_sha256",
+                "replay_scope_sha256",
+                "physics_key_bytes",
+                "physics_bucket_h40_sha256",
+                "physics_bucket_h40_distance",
+                "physics_bucket_h30_sha256",
+                "physics_bucket_h30_distance",
+                "physics_bucket_h40c_sha256",
+                "physics_bucket_h40c_distance",
+                "physics_bucket_h30c_sha256",
+                "physics_bucket_h30c_distance",
+            } & table_columns
+            physics = _physics_columns(key) if physics_columns_present else {}
             assignments = [
                 "key_bytes = ?",
                 "key_sha256 = ?",

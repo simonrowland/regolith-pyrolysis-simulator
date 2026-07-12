@@ -484,12 +484,16 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
 
 def test_map_live_semantics_parity_is_computed_from_live_owner_tick(smoke_payload):
     parity = _assertion(smoke_payload, "map_live_semantics_parity")
+    probe = smoke_payload["live_owner_probe"]
 
-    assert parity["passed"] is True
+    assert probe["native_split_observed"] is False
+    assert probe["native_fe_pool_mol"] == pytest.approx(0.0)
+    assert parity["passed"] is False
     assert "map_pO2_bar=" in parity["detail"]
     assert "live_pO2_bar=" in parity["detail"]
     assert "map_SiO_kg_hr=" in parity["detail"]
     assert "live_SiO_kg_hr=" in parity["detail"]
+    assert "native_split_observed=False" in parity["detail"]
 
 
 def test_owner_live_probe_is_recipe_reachable(smoke_payload):
@@ -538,11 +542,14 @@ def test_owner_live_pn2_tick_uses_sweep_floor_and_drains_o2(smoke_payload):
 
 def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     window = _assertion(smoke_payload, "grind_ready_target_window")
+    parity = _assertion(smoke_payload, "map_live_semantics_parity")
 
-    assert window["passed"] is True
-    assert "first_passing_T_C=" in window["detail"]
+    assert smoke_payload["live_owner_probe"]["native_split_observed"] is False
+    assert parity["passed"] is False
+    assert window["passed"] is False
+    assert "first_passing_T_C=None" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
-    assert "live parity=confirmed" in window["detail"]
+    assert "live parity=missing" in window["detail"]
 
 
 def test_certification_surfaces_require_owner_pass_and_live_parity(
@@ -625,9 +632,12 @@ def test_map_live_semantics_parity_tolerances_bind(smoke_payload, monkeypatch):
         grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
         live_owner_probe=live_probe,
     )
-    assert _assertion({"assertions": widened_assertions}, "map_live_semantics_parity")[
-        "passed"
-    ] is True
+    widened_parity = _assertion(
+        {"assertions": widened_assertions}, "map_live_semantics_parity"
+    )
+    assert live_probe["native_split_observed"] is False
+    assert widened_parity["passed"] is False
+    assert "native_split_observed=False" in widened_parity["detail"]
 
 
 def test_distilled_golden_fixture_matches_current_anchors(smoke_payload):

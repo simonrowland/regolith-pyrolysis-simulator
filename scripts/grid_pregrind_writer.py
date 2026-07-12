@@ -72,6 +72,7 @@ FINDER_INPUT_FIELDS = (
 )
 
 INPUT_FIELDS = COMMON_INPUT_FIELDS + ALPHAMELTS_CONFIG_FIELDS + FINDER_INPUT_FIELDS
+POINT_PROVENANCE_FIELDS = ("kress91_partition_provenance",)
 
 GENERIC_OUTPUT_FIELDS = (
     "temperature_C",
@@ -190,8 +191,9 @@ def canonical_json(value: Any) -> str:
 
 
 def canonical_input_vector(inputs: Mapping[str, Any]) -> str:
-    missing = [name for name in INPUT_FIELDS if name not in inputs]
-    extra = sorted(set(inputs) - set(INPUT_FIELDS))
+    allowed_fields = INPUT_FIELDS + POINT_PROVENANCE_FIELDS
+    missing = [name for name in allowed_fields if name not in inputs]
+    extra = sorted(set(inputs) - set(allowed_fields))
     if missing or extra:
         raise ValueError(f"input vector mismatch: missing={missing}, extra={extra}")
     return canonical_json({name: inputs[name] for name in INPUT_FIELDS})
@@ -263,6 +265,7 @@ CREATE TABLE IF NOT EXISTS grid_keys (
     -- Provenance only: excluded from canonical_vector and expedited_key.
     intended_fO2_log REAL,
     intended_fO2_log_repr TEXT,
+    kress91_partition_provenance_json TEXT,
     fO2_log REAL NOT NULL,
     fO2_log_repr TEXT NOT NULL,
     pressure_bar REAL NOT NULL,
@@ -507,6 +510,7 @@ class GridCacheWriter:
         if existing_only:
             # Retry/drain opens an existing database read-write. Add nullable
             # forward columns only; historical rows remain untouched.
+            self._ensure_v2_provenance_columns()
             self._ensure_runmode_output_columns()
             self.connection.commit()
         else:
@@ -609,6 +613,7 @@ class GridCacheWriter:
         additions = {
             "intended_fO2_log": "REAL",
             "intended_fO2_log_repr": "TEXT",
+            "kress91_partition_provenance_json": "TEXT",
         }
         for name, column_type in additions.items():
             if name not in columns:
@@ -739,13 +744,28 @@ class GridCacheWriter:
         if cursor.rowcount == 0:
             vector = values["canonical_vector"]
             row = self.connection.execute(
-                "SELECT canonical_vector, batch_id, shuffle_rank, shard "
+                "SELECT canonical_vector, batch_id, shuffle_rank, shard, "
+                "kress91_partition_provenance_json "
                 "FROM grid_keys WHERE expedited_key = ?",
                 (values["expedited_key"],),
             ).fetchone()
             if row is None or row["canonical_vector"] != vector:
                 raise RuntimeError(
                     f"expedited-key collision for {values['expedited_key']}"
+                )
+            existing_provenance = row["kress91_partition_provenance_json"]
+            point_provenance = values["kress91_partition_provenance_json"]
+            if existing_provenance is None:
+                self.connection.execute(
+                    "UPDATE grid_keys "
+                    "SET kress91_partition_provenance_json = ? "
+                    "WHERE expedited_key = ?",
+                    (point_provenance, values["expedited_key"]),
+                )
+            elif existing_provenance != point_provenance:
+                raise ValueError(
+                    "Kress91 point provenance drift for expedited key "
+                    f"{values['expedited_key']}"
                 )
         return cursor.rowcount == 1
 
@@ -779,6 +799,7 @@ class GridCacheWriter:
             parameters.extend(int(value) for value in grid_key_ids)
         query = (
             "SELECT g.id, g.expedited_key, g.canonical_vector, "
+            "g.kress91_partition_provenance_json, "
             "g.shuffle_rank, g.shard FROM grid_keys g "
             "LEFT JOIN alphamelts_outputs o ON o.expedited_key = g.expedited_key "
             "AND o.engine_epoch = ? WHERE "
@@ -793,7 +814,14 @@ class GridCacheWriter:
             {
                 "grid_key_id": int(row["id"]),
                 "expedited_key": str(row["expedited_key"]),
-                "inputs": json.loads(row["canonical_vector"]),
+                "inputs": {
+                    **json.loads(row["canonical_vector"]),
+                    "kress91_partition_provenance": (
+                        json.loads(row["kress91_partition_provenance_json"])
+                        if row["kress91_partition_provenance_json"] is not None
+                        else None
+                    ),
+                },
                 "shuffle_rank": int(row["shuffle_rank"]),
                 "shard": int(row["shard"]),
             }
@@ -1135,6 +1163,9 @@ class GridCacheWriter:
             "composition_kg_json": _json(inputs["composition_kg"]),
             "intended_fO2_log": _float(intended_fO2_log),
             "intended_fO2_log_repr": _repr(intended_fO2_log),
+            "kress91_partition_provenance_json": _json(
+                inputs["kress91_partition_provenance"]
+            ),
             "fO2_log": _float(inputs["fO2_log"]),
             "fO2_log_repr": _repr(inputs["fO2_log"]),
             "pressure_bar": _float(inputs["pressure_bar"]),

@@ -63,7 +63,10 @@ def validate(db_path: Path, *, sample_limit: int) -> dict[str, Any]:
 
     by_scope: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
-        scope = row["replay_scope_sha256"] or rci.replay_scope_for_interpolation(row["key"])
+        scope = _validated_replay_scope(
+            row["key"],
+            row["replay_scope_sha256"],
+        )
         by_scope.setdefault(scope, []).append(row)
 
     gated_errors: list[float] = []
@@ -165,22 +168,107 @@ def _payload_relative_errors(
     exact_payload: Mapping[str, Any],
     interpolated_payload: Mapping[str, Any],
 ) -> list[float]:
+    if not isinstance(exact_payload, Mapping) or not isinstance(
+        interpolated_payload, Mapping
+    ):
+        raise ValueError("both interpolation payloads must be mappings")
     exact = exact_payload.get("equilibrium_result", {})
     interpolated = interpolated_payload.get("equilibrium_result", {})
     if not isinstance(exact, Mapping) or not isinstance(interpolated, Mapping):
-        return []
-    errors: list[float] = []
-    for species in sorted(
-        set(exact.get("vapor_pressures_Pa", {})) |
-        set(interpolated.get("vapor_pressures_Pa", {}))
-    ):
-        exact_value = float(exact.get("vapor_pressures_Pa", {}).get(species, 0.0) or 0.0)
-        interp_value = float(
-            interpolated.get("vapor_pressures_Pa", {}).get(species, 0.0) or 0.0
+        raise ValueError("equilibrium_result must be a mapping in both payloads")
+    exact_liquid_fraction = _finite_number(
+        exact.get("liquid_fraction"),
+        "exact/equilibrium_result/liquid_fraction",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    interpolated_liquid_fraction = _finite_number(
+        interpolated.get("liquid_fraction"),
+        "interpolated/equilibrium_result/liquid_fraction",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    errors = [
+        _relative_error(exact_liquid_fraction, interpolated_liquid_fraction)
+    ]
+    errors.extend(
+        _mapping_relative_errors(
+            exact.get("phase_masses_kg"),
+            interpolated.get("phase_masses_kg"),
+            field="phase_masses_kg",
         )
-        scale = max(abs(exact_value), abs(interp_value), 1.0e-30)
-        errors.append(abs(exact_value - interp_value) / scale)
+    )
+    errors.extend(
+        _mapping_relative_errors(
+            exact.get("vapor_pressures_Pa"),
+            interpolated.get("vapor_pressures_Pa"),
+            field="vapor_pressures_Pa",
+        )
+    )
     return errors
+
+
+def _validated_replay_scope(key: Mapping[str, Any], stored_scope: str) -> str:
+    reconstructed = rci.replay_scope_for_interpolation(key)
+    stored = str(stored_scope or "").strip()
+    if stored and stored != reconstructed:
+        raise ValueError(
+            "stored replay_scope_sha256 disagrees with provider/config-derived scope: "
+            f"stored={stored!r} reconstructed={reconstructed!r}"
+        )
+    return reconstructed
+
+
+def _finite_number(
+    value: Any,
+    label: str,
+    *,
+    minimum: float | None = None,
+    maximum: float | None = None,
+) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{label} must be a JSON number")
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError(f"{label} must be finite")
+    if minimum is not None and number < minimum:
+        raise ValueError(f"{label} must be >= {minimum}")
+    if maximum is not None and number > maximum:
+        raise ValueError(f"{label} must be <= {maximum}")
+    return number
+
+
+def _mapping_relative_errors(
+    exact: Any,
+    interpolated: Any,
+    *,
+    field: str,
+) -> list[float]:
+    if not isinstance(exact, Mapping) or not isinstance(interpolated, Mapping):
+        raise ValueError(f"{field} must be a mapping in both payloads")
+    if not exact or not interpolated:
+        raise ValueError(f"{field} must be non-empty in both payloads")
+    if not all(isinstance(key, str) and key for key in (*exact, *interpolated)):
+        raise ValueError(f"{field} keys must be non-empty strings")
+    errors: list[float] = []
+    for key in sorted(set(exact) | set(interpolated)):
+        exact_value = _finite_number(
+            exact.get(key, 0.0),
+            f"exact/equilibrium_result/{field}/{key}",
+            minimum=0.0,
+        )
+        interpolated_value = _finite_number(
+            interpolated.get(key, 0.0),
+            f"interpolated/equilibrium_result/{field}/{key}",
+            minimum=0.0,
+        )
+        errors.append(_relative_error(exact_value, interpolated_value))
+    return errors
+
+
+def _relative_error(exact: float, interpolated: float) -> float:
+    scale = max(abs(exact), abs(interpolated), 1.0e-30)
+    return abs(exact - interpolated) / scale
 
 
 def _distribution(values: list[float]) -> dict[str, float | None]:

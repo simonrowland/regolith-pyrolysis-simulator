@@ -58,6 +58,10 @@ MAP_LIVE_PARITY_ASSERTION = "map_live_semantics_parity"
 MAP_LIVE_PARITY_PO2_ABS_TOL_BAR = 1.0e-15
 MAP_LIVE_PARITY_SIO_REL_TOL = 1.0e-9
 MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR = 1.0e-12
+MAP_LIVE_PARITY_NATIVE_MOL_REL_TOL = 1.0e-9
+MAP_LIVE_PARITY_NATIVE_MOL_ABS_TOL_MOL = 1.0e-12
+MAP_LIVE_PARITY_NATIVE_ESCAPE_REL_TOL = 1.0e-9
+MAP_LIVE_PARITY_NATIVE_ESCAPE_ABS_TOL_FRACTION = 1.0e-12
 ANCHOR_REFERENCE_SOURCE = (
     "docs-private/research/2026-07-01-sso-r-scope/findings.md lines 107 and 259; "
     "CH1-CLOSEOUT.md lines 23-26 and 107-118 record the ch1/ch1c redox-state provenance"
@@ -731,6 +735,9 @@ def run_owner_live_step_probe(
         for transition in sim.atom_ledger.transitions
         if transition.name == "native_fe_saturation_split"
     ]
+    native_partition = dict(
+        snapshot.fe_redox_split.get("native_fe_partition", {}) or {}
+    )
     bleed_transitions = [
         transition
         for transition in sim.atom_ledger.transitions
@@ -787,6 +794,13 @@ def run_owner_live_step_probe(
         ),
         "post_tick_overhead_o2_mol": overhead_o2_mol,
         "native_split_o2_mol": native_o2_mol,
+        "native_split_observed": bool(native_splits),
+        "native_fe_pool_mol": _positive(native_partition.get("native_fe_pool_mol")),
+        "native_fe_tap_mol": _positive(native_partition.get("native_fe_tap_mol")),
+        "native_fe_vapor_mol": _positive(native_partition.get("native_fe_vapor_mol")),
+        "native_fe_vapor_escape_fraction_of_pool": _positive(
+            native_partition.get("native_fe_vapor_escape_fraction_of_pool")
+        ),
         "bled_o2_mol": bled_o2_mol,
         "terminal_stored_o2_mol": terminal_stored_o2_mol,
         "terminal_vented_o2_mol": terminal_vented_o2_mol,
@@ -849,6 +863,95 @@ def _certification_pass(assertions_by_name: Mapping[str, Mapping[str, Any]]) -> 
     owner = assertions_by_name.get(OWNER_CERTIFICATION_ASSERTION, {})
     parity = assertions_by_name.get(MAP_LIVE_PARITY_ASSERTION, {})
     return bool(owner.get("passed")) and bool(parity.get("passed"))
+
+
+def _map_live_semantics_parity(
+    map_row: Mapping[str, Any],
+    live_probe: Mapping[str, Any],
+) -> tuple[bool, str]:
+    def number(source: Mapping[str, Any], field: str) -> float:
+        try:
+            value = float(source.get(field, math.nan))
+        except (TypeError, ValueError):
+            return math.nan
+        return value if math.isfinite(value) else math.nan
+
+    map_pO2 = number(map_row, "SiO_provider_pO2_bar")
+    live_pO2 = number(live_probe, "SiO_provider_pO2_bar")
+    map_sio = number(map_row, "SiO_flux_kg_hr")
+    live_sio = number(live_probe, "SiO_flux_kg_hr")
+    pO2_ok = (
+        math.isfinite(map_pO2)
+        and math.isfinite(live_pO2)
+        and abs(live_pO2 - map_pO2) <= MAP_LIVE_PARITY_PO2_ABS_TOL_BAR
+    )
+    sio_ok = (
+        math.isfinite(map_sio)
+        and math.isfinite(live_sio)
+        and math.isclose(
+            live_sio,
+            map_sio,
+            rel_tol=MAP_LIVE_PARITY_SIO_REL_TOL,
+            abs_tol=MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR,
+        )
+    )
+    native_mol_fields = (
+        "native_fe_pool_mol",
+        "native_fe_tap_mol",
+        "native_fe_vapor_mol",
+    )
+    native_escape_field = "native_fe_vapor_escape_fraction_of_pool"
+    native_pairs = [
+        (field, number(map_row, field), number(live_probe, field))
+        for field in (*native_mol_fields, native_escape_field)
+    ]
+    native_mol_ok = all(
+        math.isfinite(map_value)
+        and math.isfinite(live_value)
+        and math.isclose(
+            live_value,
+            map_value,
+            rel_tol=MAP_LIVE_PARITY_NATIVE_MOL_REL_TOL,
+            abs_tol=MAP_LIVE_PARITY_NATIVE_MOL_ABS_TOL_MOL,
+        )
+        for field, map_value, live_value in native_pairs
+        if field in native_mol_fields
+    )
+    map_escape = number(map_row, native_escape_field)
+    live_escape = number(live_probe, native_escape_field)
+    native_escape_ok = (
+        math.isfinite(map_escape)
+        and math.isfinite(live_escape)
+        and math.isclose(
+            live_escape,
+            map_escape,
+            rel_tol=MAP_LIVE_PARITY_NATIVE_ESCAPE_REL_TOL,
+            abs_tol=MAP_LIVE_PARITY_NATIVE_ESCAPE_ABS_TOL_FRACTION,
+        )
+    )
+    native_ok = (
+        bool(live_probe.get("native_split_observed"))
+        and native_mol_ok
+        and native_escape_ok
+    )
+    detail = (
+        f"map_pO2_bar={map_pO2:.12g} live_pO2_bar={live_pO2:.12g} "
+        f"map_SiO_kg_hr={map_sio:.12g} live_SiO_kg_hr={live_sio:.12g} "
+        f"native_split_observed={bool(live_probe.get('native_split_observed'))} "
+        + " ".join(
+            f"map_{field}={map_value:.12g} live_{field}={live_value:.12g}"
+            for field, map_value, live_value in native_pairs
+        )
+        + f" pO2_abs_tol={MAP_LIVE_PARITY_PO2_ABS_TOL_BAR:.1e}"
+        + f" SiO_rel_tol={MAP_LIVE_PARITY_SIO_REL_TOL:.1e}"
+        + f" SiO_abs_tol={MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR:.1e}"
+        + f" native_mol_rel_tol={MAP_LIVE_PARITY_NATIVE_MOL_REL_TOL:.1e}"
+        + f" native_mol_abs_tol_mol={MAP_LIVE_PARITY_NATIVE_MOL_ABS_TOL_MOL:.1e}"
+        + f" native_escape_rel_tol={MAP_LIVE_PARITY_NATIVE_ESCAPE_REL_TOL:.1e}"
+        + " native_escape_abs_tol_fraction="
+        + f"{MAP_LIVE_PARITY_NATIVE_ESCAPE_ABS_TOL_FRACTION:.1e}"
+    )
+    return pO2_ok and sio_ok and native_ok, detail
 
 
 def evaluate_assertions(
@@ -1038,30 +1141,12 @@ def evaluate_assertions(
             ).format(**row),
         )
         if live_owner_probe is not None:
-            live_pO2 = float(live_owner_probe.get("SiO_provider_pO2_bar", math.nan))
-            live_sio = float(live_owner_probe.get("SiO_flux_kg_hr", math.nan))
-            map_pO2 = float(row["SiO_provider_pO2_bar"])
-            map_sio = float(row["SiO_flux_kg_hr"])
-            pO2_ok = (
-                math.isfinite(live_pO2)
-                and abs(live_pO2 - map_pO2) <= MAP_LIVE_PARITY_PO2_ABS_TOL_BAR
-            )
-            sio_ok = (
-                math.isfinite(live_sio)
-                and math.isclose(
-                    live_sio,
-                    map_sio,
-                    rel_tol=MAP_LIVE_PARITY_SIO_REL_TOL,
-                    abs_tol=MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR,
-                )
-            )
-            map_live_semantics_parity_pass = pO2_ok and sio_ok
-            map_live_detail = (
-                f"map_pO2_bar={map_pO2:.12g} live_pO2_bar={live_pO2:.12g} "
-                f"map_SiO_kg_hr={map_sio:.12g} live_SiO_kg_hr={live_sio:.12g} "
-                f"pO2_abs_tol={MAP_LIVE_PARITY_PO2_ABS_TOL_BAR:.1e} "
-                f"SiO_rel_tol={MAP_LIVE_PARITY_SIO_REL_TOL:.1e} "
-                f"SiO_abs_tol={MAP_LIVE_PARITY_SIO_ABS_TOL_KG_HR:.1e}"
+            (
+                map_live_semantics_parity_pass,
+                map_live_detail,
+            ) = _map_live_semantics_parity(
+                row,
+                live_owner_probe,
             )
         else:
             map_live_detail = "live owner probe missing"

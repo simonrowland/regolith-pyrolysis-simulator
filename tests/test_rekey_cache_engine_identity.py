@@ -7,6 +7,13 @@ import pytest
 from scripts import rekey_cache_engine_identity as rekey
 
 
+@pytest.fixture
+def target_corpus_version(monkeypatch) -> str:
+    target = "target"
+    monkeypatch.setattr(rekey, "interoperable_corpus_versions", lambda: (target,))
+    return target
+
+
 def _write_rekeyable_rows(
     db_path: Path,
     engine_versions: tuple[str, ...] = ("one", "two"),
@@ -39,13 +46,19 @@ def _write_rekeyable_rows(
     conn.close()
 
 
-def test_failed_rekey_retry_reuses_content_addressed_backup(tmp_path: Path) -> None:
+def test_failed_rekey_retry_reuses_content_addressed_backup(
+    tmp_path: Path,
+    target_corpus_version: str,
+) -> None:
     db_path = tmp_path / "cache.db"
     _write_rekeyable_rows(db_path)
 
     for _attempt in range(2):
         with pytest.raises(sqlite3.IntegrityError):
-            rekey.rekey_cache(db_path, target_corpus_version="target")
+            rekey.rekey_cache(
+                db_path,
+                target_corpus_version=target_corpus_version,
+            )
         assert len(list(tmp_path.glob("cache.db.backup-*"))) == 1
 
     conn = sqlite3.connect(db_path)
@@ -62,7 +75,11 @@ def test_failed_rekey_retry_reuses_content_addressed_backup(tmp_path: Path) -> N
     assert unchanged == 2
 
 
-def test_rekey_locks_identity_decision_before_backup(tmp_path: Path, monkeypatch) -> None:
+def test_rekey_locks_identity_decision_before_backup(
+    tmp_path: Path,
+    monkeypatch,
+    target_corpus_version: str,
+) -> None:
     db_path = tmp_path / "cache.db"
     _write_rekeyable_rows(db_path, ("one",))
     original_backup = rekey._backup_db
@@ -76,9 +93,9 @@ def test_rekey_locks_identity_decision_before_backup(tmp_path: Path, monkeypatch
             {
                 "backend": {
                     "backend_name": "alphamelts",
-                    "corpus_version": "target",
+                    "corpus_version": target_corpus_version,
                 },
-                "corpus_version": "target",
+                "corpus_version": target_corpus_version,
             }
         )
         raced_key_hash = hashlib.sha256(raced_key_bytes).hexdigest()
@@ -90,7 +107,12 @@ def test_rekey_locks_identity_decision_before_backup(tmp_path: Path, monkeypatch
                 SET key_hash = ?, key_sha256 = ?, key_bytes = ?,
                     engine_version = NULL, corpus_version = ?
                 """,
-                (raced_key_hash, raced_key_hash, raced_key_bytes, "target"),
+                (
+                    raced_key_hash,
+                    raced_key_hash,
+                    raced_key_bytes,
+                    target_corpus_version,
+                ),
             )
             racer.commit()
         except sqlite3.OperationalError as exc:
@@ -104,7 +126,10 @@ def test_rekey_locks_identity_decision_before_backup(tmp_path: Path, monkeypatch
 
     monkeypatch.setattr(rekey, "_backup_db", backup_with_racing_identity_update)
 
-    result = rekey.rekey_cache(db_path, target_corpus_version="target")
+    result = rekey.rekey_cache(
+        db_path,
+        target_corpus_version=target_corpus_version,
+    )
 
     assert race_outcomes == ["locked"]
     assert result.rows_before == 1

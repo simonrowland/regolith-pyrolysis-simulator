@@ -110,6 +110,22 @@ def kress91_partition_parameters():
         "mole_fraction_oxides": KRESS91_MOL_FRACTION_OXIDES,
         "liquid_calibration_min_C": KRESS91_LIQUID_CALIBRATION_MIN_T_C,
         "liquid_calibration_max_C": KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+        "authority_gate": {
+            "policy": (
+                "partition_T_C=max(requested_T_C, known_liquidus_T_C, "
+                "liquid_calibration_min_C)"
+            ),
+            "liquidus_source": "unavailable_during_pregrind_key_generation",
+            "non_authoritative": (
+                "compute_with_liquidus_unverified_or_extrapolation_provenance"
+            ),
+            "per_point_provenance": (
+                "deterministic from grid key temperature_C and this policy; "
+                "requested/applied temperature and band fields are exposed by "
+                "kress91_partition_authority_record"
+            ),
+            "typed_refusal": "invalid_non_finite_control_only",
+        },
         "pressure_bar": ENGINE_PRESSURE_BAR,
     }
 
@@ -201,7 +217,26 @@ def load_feedstock_box(
             oxide: float(ranges.get(oxide, (nominal[oxide], nominal[oxide]))[1])
             for oxide in MAJOR_OXIDES
         }
-        for vector in (nominal, low, high):
+        vectors = [nominal]
+        for target_oxide in MAJOR_OXIDES:
+            vectors.append(
+                {
+                    oxide: low[oxide] if oxide == target_oxide else high[oxide]
+                    for oxide in MAJOR_OXIDES
+                }
+            )
+            vectors.append(
+                {
+                    oxide: high[oxide] if oxide == target_oxide else low[oxide]
+                    for oxide in MAJOR_OXIDES
+                }
+            )
+        # Premise: normalized wt_i = 100*m_i/sum(m_j). The minimum uses the
+        # target oxide's low bound with every denominator term high; the
+        # maximum reverses those extremes. Units remain wt% because the ratio
+        # is dimensionless * 100. Sanity: all-low/all-high can cancel a wide
+        # FeO or MgO range, while these cross-extremes cannot hide it.
+        for vector in vectors:
             normalized = normalize_composition(vector)
             for oxide in MAJOR_OXIDES:
                 value = normalized.get(oxide, 0.0)
@@ -386,6 +421,11 @@ def build_grid_points(
     unfiltered_total = len(pairs)
     eligible_pairs = []
     filtered_silicate_window = 0
+    eligible_kress91_computed = 0
+    eligible_kress91_floor_adjusted = 0
+    eligible_kress91_non_authoritative = 0
+    eligible_kress91_extrapolated = 0
+    eligible_kress91_iron_free = 0
     for composition_index, temperature_C, intended_fO2_log in pairs:
         candidate = GridPoint(
             ordinal=-1,
@@ -402,6 +442,22 @@ def build_grid_points(
         eligible_pairs.append(
             (composition_index, temperature_C, intended_fO2_log)
         )
+        has_iron = any(
+            float(candidate.composition_wt_pct.get(species, 0.0) or 0.0) > 0.0
+            for species in ("FeO", "Fe2O3")
+        )
+        if not has_iron:
+            eligible_kress91_iron_free += 1
+            continue
+        record = kress91_partition_authority_record(
+            temperature_C=candidate.temperature_C
+        )
+        eligible_kress91_computed += 1
+        eligible_kress91_floor_adjusted += int(bool(record["adjusted"]))
+        eligible_kress91_non_authoritative += int(
+            not bool(record["authoritative"])
+        )
+        eligible_kress91_extrapolated += int(bool(record["extrapolation"]))
     random.Random(seed).shuffle(eligible_pairs)
     total = len(eligible_pairs)
     if filter_stats is not None:
@@ -409,6 +465,17 @@ def build_grid_points(
             {
                 "unfiltered_grid_points": unfiltered_total,
                 "filtered_silicate_window_points": filtered_silicate_window,
+                "eligible_kress91_computed_points": eligible_kress91_computed,
+                "eligible_kress91_floor_adjusted_points": (
+                    eligible_kress91_floor_adjusted
+                ),
+                "eligible_kress91_non_authoritative_points": (
+                    eligible_kress91_non_authoritative
+                ),
+                "eligible_kress91_extrapolated_points": (
+                    eligible_kress91_extrapolated
+                ),
+                "eligible_kress91_iron_free_points": eligible_kress91_iron_free,
                 "eligible_grid_points": total,
             }
         )
@@ -452,6 +519,7 @@ def kress91_partitioned_composition_mol(
     intended_fO2_log: float,
     pressure_bar: float = ENGINE_PRESSURE_BAR,
     batch_mass_kg: float = DEFAULT_BATCH_MASS_KG,
+    liquidus_T_C: float | None = None,
 ) -> dict[str, float]:
     baseline_mol = composition_wt_pct_to_mol(
         composition_wt_pct, batch_mass_kg=batch_mass_kg
@@ -462,13 +530,18 @@ def kress91_partitioned_composition_mol(
     if total_fe_mol <= 0.0:
         return baseline_mol
 
+    authority = kress91_partition_authority_record(
+        temperature_C=temperature_C,
+        liquidus_T_C=liquidus_T_C,
+    )
+
     from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91
 
     mol_fractions = melt_mol_fractions_for_kress91(composition_wt_pct)
     split = kress91_split(
         fO2_log=float(intended_fO2_log),
         mol_fractions=mol_fractions,
-        T_K=float(temperature_C) + 273.15,
+        T_K=float(authority["partition_temperature_C"]) + 273.15,
         pressure_bar=float(pressure_bar),
     )
     ferric_fraction = float(split["fe3"])
@@ -478,14 +551,72 @@ def kress91_partitioned_composition_mol(
     # kress91_split as dimensionless Fe3+/sum(Fe). Therefore n(Fe2O3) =
     # 0.5*ferric_fraction*n(Fe_total) and n(FeO) = (1-ferric_fraction)*
     # n(Fe_total). Units: dimensionless * mol Fe -> mol oxide; the identity
-    # 2*n(Fe2O3)+n(FeO)=n(Fe_total) closes exactly. Sanity: the independent
-    # REF-001 MORB-like basalt anchor (50 wt% SiO2, 10 wt% FeO, log fO2=-9,
-    # 1400 K, 1 bar) gives Fe3+/sum(Fe)=0.174210724, matching the published
-    # Kress & Carmichael coefficient expansion pinned in test_sulfsat_gate.py.
+    # 2*n(Fe2O3)+n(FeO)=n(Fe_total) closes exactly. Sanity: the authority
+    # record distinguishes floor adjustment and extrapolation from certified
+    # use while this Fe-atom identity remains invariant in every branch.
     partitioned = dict(baseline_mol)
     partitioned["Fe2O3"] = 0.5 * ferric_fraction * total_fe_mol
     partitioned["FeO"] = (1.0 - ferric_fraction) * total_fe_mol
     return dict(sorted(partitioned.items()))
+
+
+def kress91_partition_authority_record(
+    *,
+    temperature_C: float,
+    liquidus_T_C: float | None = None,
+) -> dict[str, Any]:
+    """Return the liquid-regime action and authority provenance."""
+    from simulator.fe_redox import (
+        KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+        kress91_temperature_band_case,
+    )
+
+    requested = float(temperature_C)
+    if not math.isfinite(requested):
+        raise ValueError("Kress91 requested temperature must be finite")
+    liquidus = None if liquidus_T_C is None else float(liquidus_T_C)
+    if liquidus is not None and not math.isfinite(liquidus):
+        raise ValueError("Kress91 liquidus temperature must be finite when provided")
+    gate = max(
+        KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+        liquidus if liquidus is not None else KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+    )
+    partition_temperature = max(requested, gate)
+    band = kress91_temperature_band_case(partition_temperature)
+    liquidus_verified = liquidus is not None
+    authoritative = bool(band["authoritative"]) and liquidus_verified
+    # Premise: Kress91 is a liquid-silicate relation, so the usable partition
+    # temperature is max(requested T, actual liquidus when known, 1200 C
+    # calibration floor). Units remain degC. Sanity: an 800 C grid point
+    # partitions at 1200 C instead of silently extrapolating or disappearing;
+    # absent liquidus evidence keeps the result explicitly non-authoritative.
+    return {
+        "requested_temperature_C": requested,
+        "partition_temperature_C": partition_temperature,
+        "applied_temperature_C": partition_temperature,
+        "gate_temperature_C": gate,
+        "liquidus_temperature_C": liquidus,
+        "action": "apply_kress91_partition",
+        "action_reason": (
+            "adjusted_to_liquid_authority_gate"
+            if partition_temperature != requested
+            else "computed_at_requested_temperature"
+        ),
+        "adjusted": partition_temperature != requested,
+        "liquidus_verified": liquidus_verified,
+        "authority_source": (
+            "liquidus_plus_calibrated_floor"
+            if liquidus is not None
+            else "calibrated_floor_only_liquidus_unavailable"
+        ),
+        "temperature_band_case": band["case"],
+        "temperature_band_status": band["status"],
+        "temperature_band_source": band["source"],
+        "temperature_band_authoritative": band["authoritative"],
+        "authoritative": authoritative,
+        "extrapolation": band["extrapolation"],
+        "high_uncertainty": band["high_uncertainty"],
+    }
 
 
 def alphamelts_queue_domain_reason(point: GridPoint) -> str | None:
@@ -524,6 +655,9 @@ def backend_config(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
+    partition_provenance = kress91_partition_authority_record(
+        temperature_C=point.temperature_C,
+    )
     composition_mol = kress91_partitioned_composition_mol(
         point.composition_wt_pct,
         temperature_C=point.temperature_C,
@@ -532,6 +666,7 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
     )
     values: dict[str, Any] = {
         "temperature_C": point.temperature_C,
+        "kress91_partition_provenance": partition_provenance,
         "composition_kg": None,
         "fO2_log": point.intended_fO2_log,
         "pressure_bar": point.pressure_bar,
@@ -1519,6 +1654,22 @@ def main(argv: Sequence[str] | None = None) -> int:
         limit=args.limit,
         filter_stats=filter_stats,
     )
+    kress91_provenance_counts = {
+        name: filter_stats[name]
+        for name in (
+            "eligible_kress91_computed_points",
+            "eligible_kress91_floor_adjusted_points",
+            "eligible_kress91_non_authoritative_points",
+            "eligible_kress91_extrapolated_points",
+            "eligible_kress91_iron_free_points",
+        )
+    }
+    kress91_partition_by_temperature_C = {
+        str(float(temperature_C)): kress91_partition_authority_record(
+            temperature_C=float(temperature_C)
+        )
+        for temperature_C in temperatures
+    }
     iron_bearing_compositions = sum(
         1
         for composition in compositions
@@ -1550,6 +1701,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "filtered_silicate_window_points": filter_stats[
             "filtered_silicate_window_points"
         ],
+        **kress91_provenance_counts,
         "full_grid_points": grid_total,
         "shard_points_modulo_3": {
             str(shard): (grid_total + 2 - shard) // 3 for shard in range(3)
@@ -1580,6 +1732,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             "temperature_grid_C": temperatures,
             "intended_fO2_log_grid": intended_fO2_logs,
             "kress91_partition": kress91_partition_parameters(),
+            "kress91_partition_by_temperature_C": (
+                kress91_partition_by_temperature_C
+            ),
             "pressure_bar_grid": [ENGINE_PRESSURE_BAR],
             "engine_fO2_constraint": (
                 "absolute log10(fO2/bar) from each grid point"
@@ -1588,6 +1743,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "filtered_silicate_window_points": filter_stats[
                 "filtered_silicate_window_points"
             ],
+            **kress91_provenance_counts,
             "full_grid_points": grid_total,
             "cartesian_grid_points": cartesian_grid_points,
             "deduplicated_nonidentity_points": (
@@ -1649,6 +1805,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "temperature_grid_C": temperatures,
                 "intended_fO2_log_grid": intended_fO2_logs,
                 "kress91_partition": kress91_partition_parameters(),
+                "kress91_partition_by_temperature_C": (
+                    kress91_partition_by_temperature_C
+                ),
                 "pressure_bar_grid": [ENGINE_PRESSURE_BAR],
                 "engine_fO2_constraint": (
                     "absolute log10(fO2/bar) from each grid point"
@@ -1657,6 +1816,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "filtered_silicate_window_points": filter_stats[
                     "filtered_silicate_window_points"
                 ],
+                **kress91_provenance_counts,
                 "grid_total_points": grid_total,
                 "cartesian_grid_points": cartesian_grid_points,
                 "deduplicated_nonidentity_points": (

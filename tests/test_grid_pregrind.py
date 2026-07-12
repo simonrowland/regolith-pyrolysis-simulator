@@ -141,6 +141,90 @@ def test_intended_fo2_is_serialized_and_partitioned_couple_keys_the_point():
     assert "intended_fO2_log" not in canonical_input_vector(vectors[0])
 
 
+def test_adjusted_kress_partition_and_row_provenance_stay_coupled(
+    monkeypatch,
+    tmp_path,
+):
+    from simulator import fe_redox
+
+    composition = {
+        "SiO2": 50.0,
+        "TiO2": 0.0,
+        "Al2O3": 0.0,
+        "Fe2O3": 0.0,
+        "Cr2O3": 0.0,
+        "FeO": 25.0,
+        "MnO": 0.0,
+        "MgO": 25.0,
+        "NiO": 0.0,
+        "CoO": 0.0,
+        "CaO": 0.0,
+        "Na2O": 0.0,
+        "K2O": 0.0,
+        "P2O5": 0.0,
+    }
+    point = grid_pregrind.GridPoint(
+        ordinal=0,
+        temperature_C=1100.0,
+        intended_fO2_log=-9.0,
+        pressure_bar=1.0,
+        composition_wt_pct=composition,
+    )
+    args = SimpleNamespace(
+        model="MELTSv1.0.2",
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+    )
+    applied_temperatures_K: list[float] = []
+    original_split = fe_redox.kress91_split
+
+    def capture_split(*args, **kwargs):
+        applied_temperatures_K.append(float(kwargs["T_K"]))
+        return original_split(*args, **kwargs)
+
+    monkeypatch.setattr(fe_redox, "kress91_split", capture_split)
+
+    inputs = point_inputs(point, args)
+    provenance = inputs["kress91_partition_provenance"]
+
+    assert inputs["temperature_C"] == 1100.0
+    assert provenance["requested_temperature_C"] == inputs["temperature_C"]
+    assert provenance["applied_temperature_C"] == 1200.0
+    assert provenance["action_reason"] == "adjusted_to_liquid_authority_gate"
+    assert applied_temperatures_K == [
+        pytest.approx(provenance["applied_temperature_C"] + 273.15)
+    ]
+    assert inputs["composition_mol"] != composition_wt_pct_to_mol(composition)
+    with GridCacheWriter(tmp_path / "grid.db") as writer:
+        batch_id = writer.ensure_batch(
+            label="kress-provenance",
+            kind="fixed",
+            seed=178,
+            params={"test": True},
+        )
+        assert writer.materialize_key(
+            inputs,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=point.intended_fO2_log,
+        )
+        writer.connection.execute(
+            "UPDATE grid_keys SET kress91_partition_provenance_json = NULL"
+        )
+        assert not writer.materialize_key(
+            inputs,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=point.intended_fO2_log,
+        )
+        pending = writer.pending_rows(batch_id=batch_id)
+
+    assert pending[0]["inputs"]["kress91_partition_provenance"] == provenance
+    assert pending[0]["inputs"]["composition_mol"] == inputs["composition_mol"]
+
+
 def _inputs(temperature_C: float) -> dict:
     composition = {
         "SiO2": 10.0,
@@ -160,6 +244,11 @@ def _inputs(temperature_C: float) -> dict:
     }
     values = {
         "temperature_C": temperature_C,
+        "kress91_partition_provenance": (
+            grid_pregrind.kress91_partition_authority_record(
+                temperature_C=temperature_C
+            )
+        ),
         "composition_kg": None,
         "fO2_log": -9.0,
         "pressure_bar": 1.0,
@@ -1183,14 +1272,12 @@ def test_harvest_conflict_limit_does_not_starve_later_rows(tmp_path):
 
 
 def test_expedited_key_normalizes_negative_zero_recursively():
-    positive = _inputs(1200.0)
+    positive = _inputs(0.0)
     negative = _inputs(-0.0)
     negative["composition_mol"] = dict(negative["composition_mol"], TiO2=-0.0)
     negative["composition_mol_by_account"] = {
         "process.cleaned_melt": negative["composition_mol"]
     }
-    positive["temperature_C"] = 0.0
-
     assert canonical_input_vector(negative) == canonical_input_vector(positive)
     assert expedited_key(negative) == expedited_key(positive)
 

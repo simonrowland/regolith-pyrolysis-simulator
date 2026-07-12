@@ -44,13 +44,21 @@ chunk-20/Phase-A-cohort-1 acceptance criterion.
 from __future__ import annotations
 
 from collections import Counter
+import hashlib
 import math
+import sqlite3
 import warnings
 from pathlib import Path
 from typing import Mapping
 
 import pytest
 import yaml
+
+from scripts import cache_convert
+from scripts import grid_pregrind
+from scripts import rekey_cache_engine_identity as rekey
+from scripts import sso_r_validation_map
+from scripts import validate_cache_c4_interpolation as c4_validation
 
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
@@ -228,13 +236,20 @@ def _dispatch_vapor_pressure(
     pO2_bar = max(10.0 ** anchor.fO2_log, 1e-9)
     engine = getattr(sim, "_corpus_vapor_engine", "builtin-antoine")
     before = len(sim._chem_kernel.planner.shadow_trace)
-    result = sim._chem_kernel.dispatch(
-        ChemistryIntent.VAPOR_PRESSURE,
-        temperature_C=anchor.T_K - 273.15,
-        pressure_bar=1e-12,
-        control_inputs={"pO2_bar": pO2_bar},
-        fO2_log=anchor.fO2_log,
-    )
+    try:
+        result = sim._chem_kernel.dispatch(
+            ChemistryIntent.VAPOR_PRESSURE,
+            temperature_C=anchor.T_K - 273.15,
+            pressure_bar=1e-12,
+            control_inputs={"pO2_bar": pO2_bar},
+            fO2_log=anchor.fO2_log,
+        )
+    except ProviderUnavailableError as exc:
+        if engine == "vaporock":
+            raise AssertionError(
+                f"VapoRock routing failed after initialization: {exc}"
+            ) from exc
+        raise
     if engine != "vaporock":
         diagnostic = dict(result.diagnostic or {})
         return dict(diagnostic.get("vapor_pressures_Pa") or {})
@@ -246,25 +261,85 @@ def _dispatch_vapor_pressure(
         and record.get("provider_id") == "vaporock"
     ]
     if errors:
-        pytest.skip(f"VapoRock shadow unavailable: {errors[-1].get('error')}")
+        raise AssertionError(
+            "VapoRock shadow failed after initialization: "
+            f"{errors[-1].get('error')}"
+        )
     dispatches = [
         record for record in new_trace
         if record.get("event") == "shadow_dispatch"
         and record.get("provider_id") == "vaporock"
     ]
     if not dispatches:
-        pytest.skip("VapoRock shadow did not dispatch")
+        raise AssertionError("VapoRock shadow did not dispatch after initialization")
     shadow_result = dispatches[-1]["result"]
     diagnostic = dict(shadow_result.diagnostic or {})
     vapor = dict(diagnostic.get("vaporock_full_speciation_Pa") or {})
     if not vapor:
         vapor = dict(diagnostic.get("vapor_pressures_Pa") or {})
     if not vapor:
-        pytest.skip(
+        raise AssertionError(
             f"VapoRock diagnostic empty: status={shadow_result.status!r}, "
             f"warnings={shadow_result.warnings!r}"
         )
     return vapor
+
+
+def test_vaporock_post_initialization_failure_cannot_skip_corpus_gate() -> None:
+    class Planner:
+        shadow_trace: list[dict] = []
+
+    class Kernel:
+        planner = Planner()
+
+        def dispatch(self, intent, **kwargs):
+            del intent, kwargs
+            raise ProviderUnavailableError("synthetic routing failure")
+
+    class Sim:
+        _corpus_vapor_engine = "vaporock"
+        _chem_kernel = Kernel()
+
+    class Anchor:
+        T_K = 1700.0
+        fO2_log = -9.0
+
+    with pytest.raises(AssertionError, match="routing failed after initialization"):
+        _dispatch_vapor_pressure(Sim(), Anchor())  # type: ignore[arg-type]
+
+
+def test_vaporock_shadow_error_after_primary_dispatch_cannot_skip_corpus_gate() -> None:
+    class Planner:
+        shadow_trace: list[dict] = []
+
+    class Kernel:
+        planner = Planner()
+
+        def dispatch(self, intent, **kwargs):
+            del intent, kwargs
+            self.planner.shadow_trace.append(
+                {
+                    "event": "shadow_error",
+                    "provider_id": "vaporock",
+                    "error": "synthetic shadow routing failure",
+                }
+            )
+
+            class Result:
+                diagnostic: dict = {"vapor_pressures_Pa": {"SiO": 1.0}}
+
+            return Result()
+
+    class Sim:
+        _corpus_vapor_engine = "vaporock"
+        _chem_kernel = Kernel()
+
+    class Anchor:
+        T_K = 1700.0
+        fO2_log = -9.0
+
+    with pytest.raises(AssertionError, match="shadow failed after initialization"):
+        _dispatch_vapor_pressure(Sim(), Anchor())  # type: ignore[arg-type]
 
 
 def _engine_pressure(
@@ -1658,3 +1733,351 @@ expected:
     assert atomic_species_seen == ["K", "Na"], (
         f"atomic-ratio loader missed an entry; got {atomic_species_seen}"
     )
+
+
+# ---------------------------------------------------------------------
+# Tooling-quality wave regressions (lane-owned test surface)
+# ---------------------------------------------------------------------
+
+def test_f348_kress91_partition_computes_with_provenance_outside_authority() -> None:
+    composition = {"SiO2": 80.0, "FeO": 20.0}
+    baseline = grid_pregrind.composition_wt_pct_to_mol(composition)
+
+    below = grid_pregrind.kress91_partitioned_composition_mol(
+        composition,
+        temperature_C=1100.0,
+        intended_fO2_log=-9.0,
+    )
+    above = grid_pregrind.kress91_partitioned_composition_mol(
+        composition,
+        temperature_C=1700.0,
+        intended_fO2_log=-9.0,
+    )
+    in_band = grid_pregrind.kress91_partitioned_composition_mol(
+        composition,
+        temperature_C=1400.0,
+        intended_fO2_log=-9.0,
+    )
+
+    assert below != baseline
+    assert above != baseline
+    assert in_band != baseline
+    for partitioned in (below, in_band, above):
+        assert math.isclose(
+            partitioned["FeO"] + 2.0 * partitioned["Fe2O3"],
+            baseline["FeO"],
+            rel_tol=0.0,
+            abs_tol=1.0e-12,
+        )
+
+
+def test_f348_kress91_authority_actions_are_explicit() -> None:
+    below = grid_pregrind.kress91_partition_authority_record(
+        temperature_C=1100.0
+    )
+    in_band = grid_pregrind.kress91_partition_authority_record(
+        temperature_C=1400.0
+    )
+    above = grid_pregrind.kress91_partition_authority_record(
+        temperature_C=1700.0
+    )
+    liquidus_verified = grid_pregrind.kress91_partition_authority_record(
+        temperature_C=1400.0,
+        liquidus_T_C=1300.0,
+    )
+
+    assert below["action"] == "apply_kress91_partition"
+    assert below["partition_temperature_C"] == 1200.0
+    assert below["adjusted"] is True
+    assert below["authoritative"] is False
+    assert in_band["action"] == "apply_kress91_partition"
+    assert in_band["temperature_band_authoritative"] is True
+    assert in_band["authoritative"] is False
+    assert in_band["liquidus_verified"] is False
+    assert above["action"] == "apply_kress91_partition"
+    assert above["extrapolation"] is True
+    assert liquidus_verified["authoritative"] is True
+    assert all(row["temperature_band_source"] for row in (below, in_band, above))
+
+
+def test_f348_grid_records_partition_actions_without_filtering_them() -> None:
+    stats: dict[str, int] = {}
+    grid_pregrind.build_grid_points(
+        [
+            {"SiO2": 50.0, "MgO": 30.0, "FeO": 20.0},
+            {"SiO2": 50.0, "MgO": 30.0, "Al2O3": 20.0},
+        ],
+        [1100.0, 1400.0, 1700.0],
+        [-9.0],
+        seed=1,
+        filter_stats=stats,
+    )
+
+    assert stats["unfiltered_grid_points"] == 6
+    assert stats["eligible_grid_points"] == 6
+    assert stats["eligible_kress91_computed_points"] == 3
+    assert stats["eligible_kress91_floor_adjusted_points"] == 1
+    assert stats["eligible_kress91_non_authoritative_points"] == 3
+    assert stats["eligible_kress91_extrapolated_points"] == 1
+    assert stats["eligible_kress91_iron_free_points"] == 3
+
+
+def test_f349_composition_bounds_include_cross_extremes(tmp_path: Path) -> None:
+    feedstocks = tmp_path / "feedstocks.yaml"
+    feedstocks.write_text(
+        yaml.safe_dump(
+            {
+                "sample": {
+                    "composition_wt_pct": {"FeO": 20.0, "MgO": 40.0},
+                    "composition_ranges": {
+                        "FeO": [10.0, 30.0],
+                        "MgO": [10.0, 90.0],
+                    },
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    bounds = grid_pregrind.load_feedstock_box(
+        feedstocks,
+        anchors=("sample",),
+        step_pct=1.0,
+        margin_pct=0.0,
+    )
+
+    assert bounds["FeO"] == (10.0, 75.0)
+    assert bounds["MgO"] == (25.0, 90.0)
+
+
+@pytest.mark.parametrize(
+    ("metadata", "reason_fragment"),
+    (
+        (
+            cache_convert._alpha_legacy_result_metadata(
+                {"status": "out_of_domain"},
+                {"backend_status": "out_of_domain"},
+            ),
+            "equilibrium_result.status='out_of_domain'",
+        ),
+        (
+            cache_convert._vaporock_legacy_result_metadata(
+                {"backend_status": "out_of_domain"}
+            ),
+            "last_vapor_pressure_diagnostic.backend_status='out_of_domain'",
+        ),
+        (
+            cache_convert._sulfsat_legacy_result_metadata(
+                {"calibration_status": "out_of_range"}
+            ),
+            "sulfur_saturation.calibration_status='out_of_range'",
+        ),
+    ),
+)
+def test_f353_known_physics_statuses_preserve_typed_refusal(
+    metadata: dict,
+    reason_fragment: str,
+) -> None:
+    assert metadata["result_class"] == "physics_refusal"
+    assert metadata["authoritative"] == 0
+    assert metadata["negative_class"] == "legacy_non_success_status"
+    assert reason_fragment in metadata["refusal_reason"]
+
+
+@pytest.mark.parametrize(
+    "status",
+    ("not_converged", "unavailable", "failed", "fallback", "status_typo"),
+)
+def test_f353_backend_or_unknown_status_is_not_physics_refusal(status: str) -> None:
+    with pytest.raises(cache_convert.ConversionError, match="unsupported"):
+        cache_convert._vaporock_legacy_result_metadata({"backend_status": status})
+
+
+def _write_rekey_table_with_physics_column(db_path: Path) -> None:
+    key_bytes = rekey.canonical_json_bytes(
+        {
+            "backend": {"backend_name": "alphamelts"},
+            "engine_version": "legacy-engine",
+        }
+    )
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"""
+            CREATE TABLE {rekey.PT1_EQUILIBRIUM_TABLE} (
+                key_hash TEXT PRIMARY KEY,
+                key_sha256 TEXT,
+                key_bytes BLOB,
+                engine_version TEXT,
+                corpus_version TEXT,
+                replay_scope_sha256 TEXT
+            )
+            """
+        )
+        conn.execute(
+            f"INSERT INTO {rekey.PT1_EQUILIBRIUM_TABLE} VALUES (?, ?, ?, ?, ?, ?)",
+            (key_hash, key_hash, key_bytes, "legacy-engine", None, "stale-scope"),
+        )
+
+
+def test_f354_physics_derivation_failure_rolls_back_identity_rewrite(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "cache.db"
+    _write_rekey_table_with_physics_column(db_path)
+
+    def fail_physics(_key):
+        raise ValueError("synthetic physics derivation failure")
+
+    monkeypatch.setattr(rekey, "_physics_columns", fail_physics)
+    with pytest.raises(ValueError, match="physics derivation failure"):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=rekey.current_corpus_version(),
+        )
+
+    with sqlite3.connect(db_path) as conn:
+        corpus_version, replay_scope = conn.execute(
+            f"SELECT corpus_version, replay_scope_sha256 "
+            f"FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert corpus_version is None
+    assert replay_scope == "stale-scope"
+
+
+def test_f360_rekey_rejects_undeclared_corpus_version() -> None:
+    with pytest.raises(SystemExit, match="not declared interoperable"):
+        rekey._validated_target_corpus_version("analytical-corpus-typo")
+
+
+def _tooling_payload(
+    *,
+    liquid_fraction: float,
+    liquid_mass_kg: float,
+    solid_mass_kg: float,
+) -> dict:
+    return {
+        "equilibrium_result": {
+            "liquid_fraction": liquid_fraction,
+            "phase_masses_kg": {
+                "liquid": liquid_mass_kg,
+                "solid": solid_mass_kg,
+            },
+            "vapor_pressures_Pa": {"SiO": 1.0},
+        }
+    }
+
+
+def test_f355_c4_error_scores_liquid_fraction_and_phase_masses() -> None:
+    exact = _tooling_payload(
+        liquid_fraction=1.0,
+        liquid_mass_kg=100.0,
+        solid_mass_kg=0.0,
+    )
+    interpolated = _tooling_payload(
+        liquid_fraction=0.0,
+        liquid_mass_kg=0.0,
+        solid_mass_kg=100.0,
+    )
+
+    errors = c4_validation._payload_relative_errors(exact, interpolated)
+
+    assert errors[:3] == [1.0, 1.0, 1.0]
+    assert errors[-1] == 0.0
+
+
+def test_f355_c4_error_rejects_nonfinite_proof_dimension() -> None:
+    exact = _tooling_payload(
+        liquid_fraction=1.0,
+        liquid_mass_kg=100.0,
+        solid_mass_kg=0.0,
+    )
+    interpolated = _tooling_payload(
+        liquid_fraction=float("nan"),
+        liquid_mass_kg=100.0,
+        solid_mass_kg=0.0,
+    )
+
+    with pytest.raises(ValueError, match="must be finite"):
+        c4_validation._payload_relative_errors(exact, interpolated)
+
+
+def test_f361_c4_validation_reconstructs_stored_replay_scope(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        c4_validation.rci,
+        "replay_scope_for_interpolation",
+        lambda key: "provider-derived-scope",
+    )
+
+    with pytest.raises(ValueError, match="disagrees"):
+        c4_validation._validated_replay_scope({}, "stored-typo-scope")
+    assert (
+        c4_validation._validated_replay_scope({}, "provider-derived-scope")
+        == "provider-derived-scope"
+    )
+
+
+def _native_parity_rows() -> tuple[dict, dict]:
+    map_row = {
+        "SiO_provider_pO2_bar": 1.0e-9,
+        "SiO_flux_kg_hr": 1.0,
+        "native_fe_pool_mol": 10.0,
+        "native_fe_tap_mol": 9.0,
+        "native_fe_vapor_mol": 1.0,
+        "native_fe_vapor_escape_fraction_of_pool": 0.1,
+    }
+    live_probe = dict(map_row)
+    live_probe["native_split_observed"] = True
+    return map_row, live_probe
+
+
+def test_f365_map_live_parity_requires_native_fe_split() -> None:
+    map_row, live_probe = _native_parity_rows()
+    live_probe["native_split_observed"] = False
+
+    passed, detail = sso_r_validation_map._map_live_semantics_parity(
+        map_row,
+        live_probe,
+    )
+    assert passed is False
+    assert "native_split_observed=False" in detail
+
+    live_probe["native_split_observed"] = True
+    passed, _detail = sso_r_validation_map._map_live_semantics_parity(
+        map_row,
+        live_probe,
+    )
+    assert passed is True
+
+
+def test_f365_native_mol_tolerance_does_not_widen_escape_tolerance(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    map_row, live_probe = _native_parity_rows()
+    live_probe["native_fe_vapor_escape_fraction_of_pool"] = 0.2
+    monkeypatch.setattr(
+        sso_r_validation_map,
+        "MAP_LIVE_PARITY_NATIVE_MOL_ABS_TOL_MOL",
+        1.0,
+    )
+
+    passed, detail = sso_r_validation_map._map_live_semantics_parity(
+        map_row,
+        live_probe,
+    )
+    assert passed is False
+    assert "native_escape_abs_tol_fraction=" in detail
+
+    monkeypatch.setattr(
+        sso_r_validation_map,
+        "MAP_LIVE_PARITY_NATIVE_ESCAPE_ABS_TOL_FRACTION",
+        1.0,
+    )
+    passed, _detail = sso_r_validation_map._map_live_semantics_parity(
+        map_row,
+        live_probe,
+    )
+    assert passed is True

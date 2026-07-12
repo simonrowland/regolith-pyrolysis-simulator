@@ -1436,6 +1436,118 @@ class MaterializedRow:
     sulfsat: dict[str, Any] | None
 
 
+def _legacy_result_metadata(
+    engine: str,
+    status_fields: Mapping[str, Any],
+    *,
+    success_statuses: Mapping[str, frozenset[str]],
+    physics_refusal_statuses: Mapping[str, frozenset[str]],
+) -> dict[str, Any]:
+    if not status_fields:
+        raise ConversionError(f"{engine}: result status fields must be non-empty")
+    if not (
+        set(status_fields)
+        == set(success_statuses)
+        == set(physics_refusal_statuses)
+    ):
+        raise ConversionError(f"{engine}: result-status schema mismatch")
+    normalized: dict[str, str] = {}
+    for field, raw_status in status_fields.items():
+        if not isinstance(raw_status, str) or not raw_status.strip():
+            raise ConversionError(f"{engine}/{field}: expected non-empty status string")
+        normalized[field] = raw_status.strip().lower()
+        supported = success_statuses[field] | physics_refusal_statuses[field]
+        if normalized[field] not in supported:
+            raise ConversionError(
+                f"{engine}/{field}: unsupported legacy result status "
+                f"{normalized[field]!r}"
+            )
+    if all(
+        normalized[field] in success_statuses[field]
+        for field in normalized
+    ):
+        return {
+            "result_class": "success",
+            "authoritative": 1,
+            "negative_class": None,
+            "refusal_reason": None,
+        }
+    detail = ", ".join(
+        f"{field}={normalized[field]!r}" for field in sorted(normalized)
+    )
+    return {
+        "result_class": "physics_refusal",
+        "authoritative": 0,
+        "negative_class": "legacy_non_success_status",
+        "refusal_reason": f"{engine} legacy result is not successful: {detail}",
+    }
+
+
+def _alpha_legacy_result_metadata(
+    equilibrium_result: Mapping[str, Any],
+    alpha_diagnostics: Mapping[str, Any],
+) -> dict[str, Any]:
+    return _legacy_result_metadata(
+        "alphamelts",
+        {
+            "equilibrium_result.status": equilibrium_result.get("status"),
+            "alphamelts_diagnostics.backend_status": alpha_diagnostics.get(
+                "backend_status"
+            ),
+        },
+        success_statuses={
+            "equilibrium_result.status": frozenset({"ok"}),
+            "alphamelts_diagnostics.backend_status": frozenset({"ok"}),
+        },
+        physics_refusal_statuses={
+            "equilibrium_result.status": frozenset({"out_of_domain"}),
+            "alphamelts_diagnostics.backend_status": frozenset(
+                {"out_of_domain"}
+            ),
+        },
+    )
+
+
+def _vaporock_legacy_result_metadata(
+    vaporock_diagnostics: Mapping[str, Any],
+) -> dict[str, Any]:
+    return _legacy_result_metadata(
+        "vaporock",
+        {
+            "last_vapor_pressure_diagnostic.backend_status": (
+                vaporock_diagnostics.get("backend_status")
+            )
+        },
+        success_statuses={
+            "last_vapor_pressure_diagnostic.backend_status": frozenset({"ok"})
+        },
+        physics_refusal_statuses={
+            "last_vapor_pressure_diagnostic.backend_status": frozenset(
+                {"out_of_domain"}
+            )
+        },
+    )
+
+
+def _sulfsat_legacy_result_metadata(
+    sulfur_saturation: Mapping[str, Any],
+) -> dict[str, Any]:
+    return _legacy_result_metadata(
+        "sulfsat",
+        {
+            "sulfur_saturation.calibration_status": sulfur_saturation.get(
+                "calibration_status"
+            )
+        },
+        success_statuses={
+            "sulfur_saturation.calibration_status": frozenset({"in_range"})
+        },
+        physics_refusal_statuses={
+            "sulfur_saturation.calibration_status": frozenset({"out_of_range"})
+        },
+    )
+
+
 def materialize_legacy_row(
     row: sqlite3.Row,
     source_db_sha256: str,
@@ -1541,6 +1653,7 @@ def materialize_legacy_row(
     eq = payload["equilibrium_result"]
     alpha_diag = payload["alphamelts_diagnostics"]
     vapo_diag = payload["last_vapor_pressure_diagnostic"]
+    alpha_result_metadata = _alpha_legacy_result_metadata(eq, alpha_diag)
     alpha_config = materialize_alphamelts_engine_config(
         {
             "model": key["model"]["model"],
@@ -1703,11 +1816,8 @@ def materialize_legacy_row(
         "budget_config_sha256": "none",
         "budget_config_json": None,
         "native_input_json": display_json(alpha_native_input),
-        "result_class": "success",
+        **alpha_result_metadata,
         "status": str(eq["status"]).strip().lower(),
-        "authoritative": 1,
-        "negative_class": None,
-        "refusal_reason": None,
         "temperature_C": _f64(eq["temperature_C"], "alpha/temperature_C"),
         "pressure_bar": _f64(eq["pressure_bar"], "alpha/pressure_bar"),
         "fO2_log": _f64(eq["fO2_log"], "alpha/fO2_log"),
@@ -1783,6 +1893,7 @@ def materialize_legacy_row(
     vapo_native_input: dict[str, Any] = {}
     vapo_control_audit: dict[str, Any] = {}
     if include_followers and vapo_diag:
+        vapo_result_metadata = _vaporock_legacy_result_metadata(vapo_diag)
         vapo_native_input = {
             "activities": vapo_diag["activities"],
             "liquid_composition_wt_pct": eq["liquid_composition_wt_pct"],
@@ -1801,11 +1912,8 @@ def materialize_legacy_row(
             "engine_config_sha256": vapo_config_hash,
             "engine_config_json": display_json(vapo_config),
             "native_input_json": display_json(vapo_native_input),
-            "result_class": "success",
+            **vapo_result_metadata,
             "status": str(vapo_diag["backend_status"]).strip().lower(),
-            "authoritative": 1,
-            "negative_class": None,
-            "refusal_reason": None,
             "temperature_C": _f64(eq["temperature_C"], "vapo/temperature_C"),
             "pressure_bar": _f64(eq["pressure_bar"], "vapo/pressure_bar"),
             "fO2_log": _f64(eq["fO2_log"], "vapo/fO2_log"),
@@ -1891,6 +1999,7 @@ def materialize_legacy_row(
     sulf_native_input: dict[str, Any] = {}
     sulf_control_audit: dict[str, Any] = {}
     if include_followers and sulfur is not None:
+        sulf_result_metadata = _sulfsat_legacy_result_metadata(sulfur)
         sulf_native_input = {
             "liquid_composition_wt_pct": eq["liquid_composition_wt_pct"],
             "T_K": _f64(controls["T_K"], "sulfsat/T_K"),
@@ -1911,11 +2020,8 @@ def materialize_legacy_row(
             "applied_fe3fet_liq": None if alpha_diag["applied_fe3fet"] is None else _f64(alpha_diag["applied_fe3fet"], "sulfsat/applied_fe3fet_liq"),
             "applied_fe3fet_source": None if alpha_diag["applied_fe3fet"] is None else "alphamelts_diagnostics.applied_fe3fet",
             "native_input_json": display_json(sulf_native_input),
-            "result_class": "success",
+            **sulf_result_metadata,
             "status": str(sulfur["calibration_status"]).strip().lower(),
-            "authoritative": 1,
-            "negative_class": None,
-            "refusal_reason": None,
             "SCSS_ppm": _f64(sulfur["SCSS_ppm"], "sulfsat/SCSS_ppm"),
             "SCAS_ppm": _f64(sulfur["SCAS_ppm"], "sulfsat/SCAS_ppm"),
             "S6_fraction": _f64(sulfur["S6_fraction"], "sulfsat/S6_fraction"),
