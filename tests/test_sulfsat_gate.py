@@ -180,7 +180,9 @@ def _make_fake_pysulfsat(
 
     fake = types.ModuleType('PySulfSat')
 
-    def _calc_scss(df=None, T_K=None, P_kbar=None, Fe_FeNiCu_Sulf=None):
+    def _calc_scss(
+        df=None, T_K=None, P_kbar=None, Fe3Fet_Liq=None, Fe_FeNiCu_Sulf=None
+    ):
         return pd.DataFrame({'SCSS2_ppm_ideal_Smythe2017': [scss_ppm]})
 
     def _calc_scas(df=None, T_K=None):
@@ -319,15 +321,14 @@ def test_gate_flags_out_of_range_composition(monkeypatch):
     gate = SulfSatGate()
     assert gate.initialize({}) is True
 
-    # FeO well past the 25 wt% upper SCSS/SCAS bound encoded in
-    # sulfsat._CALIBRATION_BOUNDS_WT_PCT.  Other oxides stay in-range so
-    # we can pinpoint the violating oxide in the warning.
+    # FeO past the CD2019 SCAS bound. Other oxides stay in-range so we can
+    # pinpoint the violating oxide in the warning.
     out_of_range_comp = {
-        'SiO2': 40.0,
+        'SiO2': 50.0,
         'FeO': 38.0,
         'MgO': 12.0,
         'CaO': 7.0,
-        'Al2O3': 3.0,
+        'Al2O3': 15.0,
     }
 
     result = gate.compute_sulfur_saturation(
@@ -346,6 +347,55 @@ def test_gate_flags_out_of_range_composition(monkeypatch):
     assert len(result.warnings) >= 1
     assert any('FeO' in w for w in result.warnings)
     assert any('calibration' in w.lower() for w in result.warnings)
+
+
+def test_gate_flags_cd2019_temperature_range(monkeypatch):
+    fake = _make_fake_pysulfsat()
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+
+    gate = SulfSatGate()
+    assert gate.initialize({}) is True
+
+    result = gate.compute_sulfur_saturation(
+        liquid_comp_wt=_MORB_COMP_WT,
+        T_K=1873.15,
+        P_bar=1.0,
+        fO2_log=-9.0,
+        S_input_ppm=500.0,
+    )
+
+    assert result.calibration_status == 'out_of_range'
+    assert any(
+        'T_K=1873.15 K outside Chowdhury-Dasgupta 2019 SCAS' in w
+        for w in result.warnings
+    )
+
+
+def test_malformed_liquid_composition_returns_unavailable(monkeypatch):
+    captured: Dict[str, Any] = {}
+    fake = _make_fake_pysulfsat()
+
+    def _calc_scss(**kwargs):
+        captured['called'] = True
+        raise AssertionError('malformed compositions must not reach PySulfSat')
+
+    fake.calculate_S2017_SCSS = _calc_scss
+    monkeypatch.setitem(sys.modules, 'PySulfSat', fake)
+
+    gate = SulfSatGate()
+    assert gate.initialize({}) is True
+
+    result = gate.compute_sulfur_saturation(
+        liquid_comp_wt={'SiO2': 'bad'},
+        T_K=1400.0,
+        P_bar=1.0,
+        fO2_log=-9.0,
+        S_input_ppm=500.0,
+    )
+
+    assert captured == {}
+    assert result.calibration_status == 'unavailable'
+    assert any('invalid liquid_comp_wt' in w for w in result.warnings)
 
 
 # ---------------------------------------------------------------------------
@@ -441,9 +491,12 @@ def test_operator_fe3fet_override_takes_precedence(monkeypatch):
     captured: Dict[str, Any] = {}
     fake = _make_fake_pysulfsat()
 
-    def _calc_scss(df=None, T_K=None, P_kbar=None, Fe_FeNiCu_Sulf=None):
+    def _calc_scss(
+        df=None, T_K=None, P_kbar=None, Fe3Fet_Liq=None, Fe_FeNiCu_Sulf=None
+    ):
         import pandas as pd
         captured['Fe3Fet_Liq'] = float(df['Fe3Fet_Liq'].iloc[0])
+        captured['Fe3Fet_arg'] = Fe3Fet_Liq
         return pd.DataFrame({'SCSS2_ppm_ideal_Smythe2017': [1200.0]})
 
     def _kress_split(**kwargs):
@@ -465,6 +518,7 @@ def test_operator_fe3fet_override_takes_precedence(monkeypatch):
 
     assert captured.get('kress_called') is None
     assert captured['Fe3Fet_Liq'] == pytest.approx(0.25)
+    assert captured['Fe3Fet_arg'] == pytest.approx(0.25)
     assert result.calibration_status == 'in_range'
 
 
@@ -499,9 +553,12 @@ def test_kress_carmichael_fe3fet_uses_shared_split(monkeypatch):
     captured: Dict[str, Any] = {}
     fake = _make_fake_pysulfsat()
 
-    def _calc_scss(df=None, T_K=None, P_kbar=None, Fe_FeNiCu_Sulf=None):
+    def _calc_scss(
+        df=None, T_K=None, P_kbar=None, Fe3Fet_Liq=None, Fe_FeNiCu_Sulf=None
+    ):
         import pandas as pd
         captured['Fe3Fet_Liq'] = float(df['Fe3Fet_Liq'].iloc[0])
+        captured['Fe3Fet_arg'] = Fe3Fet_Liq
         return pd.DataFrame({'SCSS2_ppm_ideal_Smythe2017': [1200.0]})
 
     fake.calculate_S2017_SCSS = _calc_scss
@@ -522,6 +579,7 @@ def test_kress_carmichael_fe3fet_uses_shared_split(monkeypatch):
         pressure_bar=1.0,
     )['fe3']
     assert captured['Fe3Fet_Liq'] == pytest.approx(expected)
+    assert captured['Fe3Fet_arg'] == pytest.approx(expected)
     assert result.calibration_status == 'in_range'
 
 

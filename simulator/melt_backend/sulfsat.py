@@ -47,14 +47,13 @@ with PySulfSat 1.0.12 (``src/PySulfSat/Cali_Smythe17.pkl`` for SCSS and
 * SCAS (CD2019):      SiO2 ~42-77 wt%, FeOt ~0-12 wt%, CaO ~0-13 wt%,
   Al2O3 ~8-22 wt%, T ~1023-1598 K.
 
-The calibration check encoded here uses a *union* of the relevant SCSS
-ranges (the broader window) plus a hard upper FeOt bound at 25 wt% that
-flags very iron-rich melts where the SCAS extrapolation is least
-defensible. A composition falling outside any single bound triggers
-``calibration_status == 'out_of_range'`` with a warning naming the
-violating oxide. The gate **never** silently extrapolates: an
-out-of-range result is still returned, but the caller is expected to
-honour the status and fall back to the builtin Stage 0 path.
+The calibration check encoded here evaluates the SCSS and SCAS windows
+separately. A composition or temperature falling outside any model
+bound triggers ``calibration_status == 'out_of_range'`` with a warning
+naming the violating oxide or temperature. The gate **never** silently
+extrapolates: an out-of-range result is still returned, but the caller
+is expected to honour the status and fall back to the builtin Stage 0
+path.
 
 Authority posture
 -----------------
@@ -100,23 +99,27 @@ _OXIDE_TO_PYSULFSAT_COL = {
 
 # Calibration-window bounds in oxide wt%, derived from the SCSS Smythe
 # 2017 and SCAS CD2019 calibration datasets shipped with PySulfSat
-# 1.0.12. Bounds are union-relaxed in some places (a composition that
-# violates SCAS but satisfies SCSS still gets a useful S2- estimate; the
-# warning lists which oxide and which model). The hard upper FeOt at
-# 25 wt% is conservative — Smythe's calibration extends to ~40 wt% but
-# the SCAS partitioning at that iron content is poorly constrained.
-_CALIBRATION_BOUNDS_WT_PCT = {
+# 1.0.12. Both model windows must be satisfied for the gate to report
+# in_range because Stage 0 consumes the paired SCSS/SCAS partition.
+_SCSS_CALIBRATION_BOUNDS_WT_PCT = {
     'SiO2': (28.0, 78.0),
     'TiO2': (0.0, 16.0),
     'Al2O3': (0.0, 35.0),
-    'FeO_total': (0.0, 25.0),
+    'FeO_total': (0.0, 40.0),
     'MnO': (0.0, 3.0),
     'MgO': (0.0, 33.0),
     'CaO': (0.0, 33.0),
     'Na2O': (0.0, 8.0),
     'K2O': (0.0, 9.0),
 }
-SULFSAT_CALIBRATION_VERSION = 'pysulfsat-1.0.12-calibration-bounds-v1'
+_SCAS_CALIBRATION_BOUNDS_WT_PCT = {
+    'SiO2': (42.0, 77.0),
+    'Al2O3': (8.0, 22.0),
+    'FeO_total': (0.0, 12.0),
+    'CaO': (0.0, 13.0),
+}
+_SCAS_T_K_RANGE = (1023.0, 1598.0)
+SULFSAT_CALIBRATION_VERSION = 'pysulfsat-1.0.12-calibration-bounds-v2'
 
 
 @dataclass
@@ -321,7 +324,17 @@ class SulfSatGate:
                     calibration_status='unavailable',
                 )
 
-        in_range, range_warnings = self._check_calibration_range(liquid_comp_wt)
+        try:
+            cleaned_comp_wt = self._coerce_liquid_comp_wt(liquid_comp_wt)
+        except (TypeError, ValueError) as exc:
+            return SulfurSaturationResult(
+                warnings=[f'invalid liquid_comp_wt for SulfSatGate: {exc!r}'],
+                calibration_status='unavailable',
+            )
+
+        in_range, range_warnings = self._check_calibration_range(
+            cleaned_comp_wt, T_K=T_K_f
+        )
         warnings_list.extend(range_warnings)
         calibration_status = 'in_range' if in_range else 'out_of_range'
 
@@ -333,7 +346,7 @@ class SulfSatGate:
                 redox_warnings,
                 redox_in_range,
             ) = self._run_pysulfsat(
-                liquid_comp_wt=liquid_comp_wt,
+                liquid_comp_wt=cleaned_comp_wt,
                 T_K=T_K_f,
                 P_bar=P_bar_f,
                 fO2_log=fO2_log_f,
@@ -372,7 +385,7 @@ class SulfSatGate:
     # ------------------------------------------------------------------
 
     def _check_calibration_range(
-        self, liquid_comp_wt: Mapping[str, float]
+        self, liquid_comp_wt: Mapping[str, float], *, T_K: float
     ) -> tuple[bool, List[str]]:
         """
         Return ``(in_range, warnings)`` for the SCSS+SCAS calibration
@@ -385,31 +398,33 @@ class SulfSatGate:
         """
         notes: List[str] = []
 
-        normalised = {
-            str(name): float(value)
-            for name, value in liquid_comp_wt.items()
-            if value is not None and float(value) > 0.0
-        }
         feo_total = (
-            normalised.get('FeO', 0.0)
-            + normalised.get('Fe2O3', 0.0) * (2.0 * 71.844 / 159.687)
+            liquid_comp_wt.get('FeO', 0.0)
+            + liquid_comp_wt.get('Fe2O3', 0.0) * (2.0 * 71.844 / 159.687)
         )
 
-        bounds = dict(_CALIBRATION_BOUNDS_WT_PCT)
-        feo_lo, feo_hi = bounds.pop('FeO_total')
-        if not (feo_lo <= feo_total <= feo_hi):
-            notes.append(
-                f'FeO_total={feo_total:.2f} wt% outside SCSS/SCAS '
-                f'calibration window [{feo_lo:.1f}, {feo_hi:.1f}]'
-            )
-
-        for oxide, (lo, hi) in bounds.items():
-            value = normalised.get(oxide, 0.0)
-            if not (lo <= value <= hi):
-                notes.append(
-                    f'{oxide}={value:.2f} wt% outside SCSS/SCAS '
-                    f'calibration window [{lo:.1f}, {hi:.1f}]'
+        for model, bounds in (
+            ('Smythe 2017 SCSS', _SCSS_CALIBRATION_BOUNDS_WT_PCT),
+            ('Chowdhury-Dasgupta 2019 SCAS', _SCAS_CALIBRATION_BOUNDS_WT_PCT),
+        ):
+            for oxide, (lo, hi) in bounds.items():
+                value = (
+                    feo_total
+                    if oxide == 'FeO_total'
+                    else liquid_comp_wt.get(oxide, 0.0)
                 )
+                if not (lo <= value <= hi):
+                    notes.append(
+                        f'{oxide}={value:.2f} wt% outside {model} '
+                        f'calibration window [{lo:.1f}, {hi:.1f}]'
+                    )
+
+        t_lo, t_hi = _SCAS_T_K_RANGE
+        if not (t_lo <= T_K <= t_hi):
+            notes.append(
+                f'T_K={T_K:.2f} K outside Chowdhury-Dasgupta 2019 SCAS '
+                f'calibration window [{t_lo:.1f}, {t_hi:.1f}]'
+            )
 
         return (not notes), notes
 
@@ -473,6 +488,7 @@ class SulfSatGate:
                 df=df,
                 T_K=T_K,
                 P_kbar=P_kbar,
+                Fe3Fet_Liq=fe3fet_value,
                 Fe_FeNiCu_Sulf=0.65,
             )
             scss_ppm = float(scss_df['SCSS2_ppm_ideal_Smythe2017'].iloc[0])
@@ -623,6 +639,19 @@ class SulfSatGate:
                     row[col] = value
         row['FeOt_Liq'] = feo_total_wt
         return pd.DataFrame([row])
+
+    @staticmethod
+    def _coerce_liquid_comp_wt(
+        liquid_comp_wt: Mapping[str, float],
+    ) -> Dict[str, float]:
+        cleaned: Dict[str, float] = {}
+        for oxide, wt in liquid_comp_wt.items():
+            if wt is None:
+                continue
+            value = float(wt)
+            if value > 0.0:
+                cleaned[str(oxide)] = value
+        return cleaned
 
     @staticmethod
     def _finite_capacity_ppm(
