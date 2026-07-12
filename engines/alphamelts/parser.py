@@ -232,6 +232,7 @@ def diagnostics_to_equilibrium(
         fO2_log=float(fO2_log),
         warnings=list(diagnostics.backend_warnings),
         status=status,
+        liquidus_T_C=diagnostics.liquidus_T_C,
         diagnostics=backend_diagnostics,
         requested_temperature_C=_control_float(
             backend_diagnostics,

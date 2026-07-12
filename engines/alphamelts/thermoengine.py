@@ -10,6 +10,7 @@ from __future__ import annotations
 import math
 import subprocess
 import sys
+import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Optional
 
@@ -55,6 +56,12 @@ class ThermoEngineTransport:
         activity_converter: ActivityConverter,
     ) -> None:
         self._model_name = str(model_name or 'MELTSv1.0.2')
+        if self._model_name not in _MODEL_TO_THERMOENGINE:
+            known = ', '.join(sorted(_MODEL_TO_THERMOENGINE))
+            raise ValueError(
+                f'unknown ThermoEngine MELTS model {self._model_name!r}; '
+                f'expected one of: {known}'
+            )
         self._activity_converter = activity_converter
         self._thermoengine = None
         self._equilibrate = None
@@ -64,17 +71,14 @@ class ThermoEngineTransport:
         self._melts_version = '1.0.2'
         self._liq_model = 'v1.0'
         self.engine_version = 'thermoengine unavailable'
-        self._health_cache: dict[str, tuple[bool, str]] = {}
+        self._health_cache: dict[str, tuple[bool, str, float]] = {}
 
     def initialize(self) -> bool:
         setup_thermoengine_dylib_path()
         import thermoengine
         from thermoengine import chem, equilibrate, model
 
-        melts_version, liq_model = _MODEL_TO_THERMOENGINE.get(
-            self._model_name,
-            _MODEL_TO_THERMOENGINE['MELTSv1.0.2'],
-        )
+        melts_version, liq_model = _MODEL_TO_THERMOENGINE[self._model_name]
         database = model.Database(
             database='Berman',
             liq_mod=liq_model,
@@ -108,12 +112,25 @@ class ThermoEngineTransport:
             )
         return True
 
-    def health_check(self, *, timeout_s: float = 8.0) -> tuple[bool, str]:
+    def clear_health_cache(self) -> None:
+        self._health_cache.clear()
+
+    def health_check(
+        self,
+        *,
+        timeout_s: float = 8.0,
+        failure_cache_ttl_s: float = 30.0,
+        force_refresh: bool = False,
+    ) -> tuple[bool, str]:
         timeout = max(1.0, float(timeout_s))
         cache_key = f'{self._model_name}:{timeout:.3f}'
         cached = self._health_cache.get(cache_key)
-        if cached is not None:
-            return cached
+        now = time.monotonic()
+        if cached is not None and not force_refresh:
+            ok, message, cached_at = cached
+            ttl = max(0.0, float(failure_cache_ttl_s))
+            if ok or (now - cached_at) < ttl:
+                return ok, message
 
         code = f"""
 from engines.alphamelts.thermoengine import ThermoEngineTransport
@@ -144,8 +161,15 @@ payload = transport.equilibrate(
         'P2O5': 0.3,
     }},
 )
-if not payload.phases_present:
-    raise RuntimeError('ThermoEngine smoke equilibrium returned no phases')
+positive_phase_mass_kg = sum(
+    float(value)
+    for value in payload.phase_masses_kg.values()
+    if float(value) > 0.0
+)
+if not payload.phases_present or positive_phase_mass_kg <= 0.0:
+    raise RuntimeError(
+        'ThermoEngine smoke equilibrium returned no positive phase masses'
+    )
 print('ok')
 """
         try:
@@ -175,7 +199,7 @@ print('ok')
                     'ThermoEngine smoke equilibrium failed'
                     + (f': {detail}' if detail else ''),
                 )
-        self._health_cache[cache_key] = health
+        self._health_cache[cache_key] = (health[0], health[1], now)
         return health
 
     def equilibrate(

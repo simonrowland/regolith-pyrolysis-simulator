@@ -141,7 +141,13 @@ class AlphaMELTSDomainGate:
                     f'AlphaMELTSDomainGate: non-finite wt% for {raw_name!r}'
                 )
                 continue
-            if wt <= 0.0:
+            if wt < 0.0:
+                reason = reason or OutOfDomainReason.MAJOR_SUM
+                warnings.append(
+                    f'AlphaMELTSDomainGate: negative wt% for {raw_name!r}'
+                )
+                continue
+            if wt == 0.0:
                 continue
             oxide = _canonical_oxide_name(raw_name)
             if oxide is None:
@@ -153,8 +159,9 @@ class AlphaMELTSDomainGate:
             if oxide == 'FeO_total':
                 # FeO_total is recognised by the adapter (it triggers the
                 # explicit-redox-policy gate) but is NOT a MELTS 14-oxide
-                # basis member -- exclude from the canonical sum so the
-                # adapter's redox split runs cleanly downstream.
+                # basis member. Keep it in the canonical accounting map so
+                # the major-oxide gate sees valid total-iron basalt while the
+                # adapter's redox split still runs cleanly downstream.
                 canonical_wt[oxide] = canonical_wt.get(oxide, 0.0) + wt
             else:
                 canonical_wt[oxide] = canonical_wt.get(oxide, 0.0) + wt
@@ -182,11 +189,14 @@ class AlphaMELTSDomainGate:
                 f'[{_SIO2_MIN_WT_PCT}, {_SIO2_MAX_WT_PCT}] wt%.'
             )
 
-        # Major oxide sum: MELTS 14-oxide basis members only (FeO_total
-        # is excluded; if present it indicates an upstream redox-policy
-        # issue but does not count toward the silicate-network criterion).
-        major_total = sum(
-            canonical_wt.get(oxide, 0.0) for oxide in MELTS_OXIDE_BASIS
+        # Major oxide sum: MELTS 14-oxide basis members plus FeO_total.
+        # FeO_total is not sent to MELTS directly; it is admitted into the
+        # silicate-network criterion so the downstream explicit redox split
+        # can reject or project it under the redox-policy gate instead of this
+        # composition-only gate undercounting valid total-iron basalt.
+        major_total = (
+            sum(canonical_wt.get(oxide, 0.0) for oxide in MELTS_OXIDE_BASIS)
+            + canonical_wt.get('FeO_total', 0.0)
         )
         if major_total <= _MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
             reason = reason or OutOfDomainReason.MAJOR_SUM

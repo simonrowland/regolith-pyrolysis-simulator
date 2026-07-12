@@ -25,6 +25,7 @@ from __future__ import annotations
 import pytest
 
 from engines.magemin import (
+    MAGEMinParityComparator,
     MAGEMinShadowDiagnostics,
     MAGEMinShadowProvider,
 )
@@ -556,6 +557,25 @@ def test_parity_within_tolerance_does_not_fire():
         e for e in planner.shadow_trace if e.get('event') == 'parity_warning'
     ]
     assert parity_warnings == []
+
+
+def test_nonfinite_liquidus_forces_parity_disagreement():
+    comparator = MAGEMinParityComparator()
+
+    report = comparator.compare(
+        {
+            'liquidus_T_K': 1700.0,
+            'phase_modes_wt_pct': {'liquid': 100.0},
+        },
+        {
+            'liquidus_T_K': float('nan'),
+            'phase_modes_wt_pct': {'liquid': 100.0},
+        },
+    )
+
+    assert report.agreement is False
+    assert report.liquidus_T_delta_K is None
+    assert any('finite liquidus T' in warning for warning in report.warnings)
 
 
 def test_shadow_unavailable_skips_parity_check():

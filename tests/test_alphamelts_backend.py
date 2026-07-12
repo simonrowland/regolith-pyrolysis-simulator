@@ -1187,11 +1187,11 @@ def test_thermoengine_health_failure_is_scoped_to_transport_lifecycle(
         fake_run,
     )
     first = ThermoEngineTransport(
-        model_name='health-lifecycle-test',
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     second = ThermoEngineTransport(
-        model_name='health-lifecycle-test',
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
 
@@ -1200,11 +1200,51 @@ def test_thermoengine_health_failure_is_scoped_to_transport_lifecycle(
     assert first_health[0] is False
     assert first.health_check(timeout_s=1.0) == first_health
     assert len(calls) == 1
-    assert second.health_check(timeout_s=1.0) == (
+    assert first.health_check(timeout_s=1.0, failure_cache_ttl_s=0.0) == (
         True,
         'ThermoEngine smoke equilibrium completed',
     )
     assert len(calls) == 2
+    first.clear_health_cache()
+    assert first.health_check(timeout_s=1.0) == (
+        True,
+        'ThermoEngine smoke equilibrium completed',
+    )
+    assert len(calls) == 3
+    assert second.health_check(timeout_s=1.0) == (
+        True,
+        'ThermoEngine smoke equilibrium completed',
+    )
+    assert len(calls) == 4
+
+
+def test_thermoengine_transport_rejects_unknown_model_name():
+    with pytest.raises(ValueError, match='unknown ThermoEngine MELTS model'):
+        ThermoEngineTransport(
+            model_name='MELTSv1.O.2',
+            activity_converter=activity_from_chem_potential,
+        )
+
+
+def test_thermoengine_health_smoke_requires_positive_phase_mass(monkeypatch):
+    def fake_run(args, **kwargs):
+        code = args[-1]
+        assert 'positive_phase_mass_kg' in code
+        assert 'payload.phase_masses_kg' in code
+        return subprocess.CompletedProcess(args, 0, stdout='ok\n', stderr='')
+
+    monkeypatch.setattr(
+        'engines.alphamelts.thermoengine.subprocess.run',
+        fake_run,
+    )
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+
+    assert transport.health_check(timeout_s=1.0) == (
+        True,
+        'ThermoEngine smoke equilibrium completed',
+    )
 
 
 def test_alphamelts_configured_subprocess_skips_thermoengine(monkeypatch):
@@ -1279,6 +1319,29 @@ def test_normalize_composition_splits_feo_total_with_explicit_ratio():
     assert pytest.approx(sum(comp.values())) == 100.0
     assert comp['FeO'] > comp['Fe2O3'] > 0.0
 
+
+
+def test_alphamelts_domain_gate_rejects_negative_wt_percent():
+    valid, warnings = AlphaMELTSDomainGate.validate({
+        'SiO2': 50.0,
+        'MgO': 50.0,
+        'NaCl': -10.0,
+    })
+
+    assert valid is False
+    assert any('negative wt%' in warning for warning in warnings)
+
+
+def test_alphamelts_domain_gate_counts_feo_total_in_major_sum():
+    valid, warnings = AlphaMELTSDomainGate.validate({
+        'SiO2': 50.0,
+        'Al2O3': 20.0,
+        'FeO_total': 10.0,
+        'MgO': 20.0,
+    })
+
+    assert valid is True
+    assert warnings == []
 
 
 def test_alphamelts_domain_gate_rejects_unrecognized_oxide_like_species():

@@ -714,6 +714,7 @@ def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
     assert result.liquid_composition_wt_pct == pytest.approx(_basalt_wt_pct())
     assert result.liquid_viscosity_Pa_s == pytest.approx(2.5)
     assert result.liquid_density_kg_m3 == pytest.approx(2650.0)
+    assert result.liquidus_T_C == pytest.approx(1290.0)
     assert result.activity_coefficients == pytest.approx({'SiO2': 0.95, 'FeO': 1.1})
     assert result.fO2_log == pytest.approx(-8.25)
     assert result.diagnostics == legacy.diagnostics

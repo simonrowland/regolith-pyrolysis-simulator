@@ -106,6 +106,18 @@ class MAGEMinParityComparator:
                     f'exceeds tolerance ±{self.liquidus_tolerance_K:.0f} K. '
                     'Likely fO2-sensitivity or solid-solution model difference.'
                 )
+        elif auth_liquidus_K is not None or shadow_liquidus_K is not None:
+            report.agreement = False
+            report.warnings.append(
+                'MAGEMin parity: one side did not report a finite liquidus T; '
+                'cannot evaluate liquidus parity.'
+            )
+        else:
+            report.agreement = False
+            report.warnings.append(
+                'MAGEMin parity: neither side reported a finite liquidus T; '
+                'cannot evaluate liquidus parity.'
+            )
 
         auth_modes = _extract_phase_modes_wt_pct(authoritative_result)
         shadow_modes = _extract_phase_modes_wt_pct(shadow_result)
@@ -197,7 +209,9 @@ def _extract_liquidus_K(result: Any) -> Optional[float]:
         value = _lookup(result, key)
         if value is not None:
             try:
-                return float(value)
+                number = float(value)
+                if _is_finite(number):
+                    return number
             except (TypeError, ValueError):
                 continue
 
@@ -205,7 +219,9 @@ def _extract_liquidus_K(result: Any) -> Optional[float]:
         value = _lookup(result, key)
         if value is not None:
             try:
-                return float(value) + CELSIUS_TO_KELVIN_OFFSET
+                number = float(value) + CELSIUS_TO_KELVIN_OFFSET
+                if _is_finite(number):
+                    return number
             except (TypeError, ValueError):
                 continue
 
