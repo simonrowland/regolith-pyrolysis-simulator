@@ -31,6 +31,9 @@ The provider:
   * ``current_A`` -- total cell current,
   * ``pO2_bar`` -- evolved-O2 activity/partial pressure at the anode,
     referenced to 1 bar for the Nernst gas-product term,
+  * ``gas_product_fugacity_bar`` -- optional ``{metal: bar}`` fugacity
+    ratios for gas-basis cathode products; omitted metals use the 1 bar
+    standard state,
   * ``melt_fO2_log`` -- diagnostic melt oxygen fugacity used only for the
     inert Kress91 Fe-redox split reported in ``diagnostic``,
   * ``dt_hr`` -- tick duration in hours (always 1.0 in the current
@@ -105,9 +108,12 @@ from simulator.mre_ladder import DECOMP_VOLTAGES, mre_decomposition_voltage_refe
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, FARADAY
 
 MRE_CURRENT_PARTITION_SOURCE = (
-    "heuristic:activity_exp_overvoltage_SEL-1_not_literature_grounded"
+    "heuristic:activity_exp_FdV_over_RT_SEL-1_not_literature_grounded"
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
+MRE_INVALID_CONTROL_REFUSAL = "invalid_electrolysis_control"
+MRE_INVALID_TARGET_REFUSAL = "invalid_allowed_oxides"
+MRE_INVALID_GAS_FUGACITY_REFUSAL = "invalid_gas_product_fugacity"
 
 MRE_DECOMP_VOLTAGE_PROVENANCE = {
     "NiO": {
@@ -295,7 +301,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             MRE_NORTH_STAR_POSTURE,
             MRE_OPTIONAL_BANNER,
             CURRENT_EFFICIENCY_MODEL_ID,
+            coerce_gas_product_fugacity_bar,
             current_efficiency_diagnostic,
+            mre_selectivity_weight,
             uncertified_multi_oxide_partition_targets,
         )
         from simulator.state import (
@@ -312,12 +320,40 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             return wrong_intent
 
         controls = unpack_controls(request)
-        voltage_V = float(controls.get("voltage_V") or 0.0)
-        current_A = float(controls.get("current_A") or 0.0)
-        dt_hr = float(controls.get("dt_hr", 1.0))
-        pO2_bar = self._coerce_pO2_bar(controls.get("pO2_bar", 1.0))
-        T_C = float(request.temperature_C)
+        validated, invalid_controls = self._validate_controls(request, controls)
+        if invalid_controls:
+            return self._invalid_result(
+                request,
+                reason=MRE_INVALID_CONTROL_REFUSAL,
+                invalid=invalid_controls,
+            )
+        voltage_V = validated["voltage_V"]
+        current_A = validated["current_A"]
+        dt_hr = validated["dt_hr"]
+        pO2_bar = validated["pO2_bar"]
+        T_C = validated["temperature_C"]
         T_K = T_C + CELSIUS_TO_KELVIN_OFFSET
+        try:
+            allowed_oxides = self._coerce_allowed_oxides(
+                controls.get("allowed_oxides"),
+                known_oxides=frozenset(MRE_FIXED_REDUCIBLE_OXIDES),
+            )
+        except (TypeError, ValueError) as exc:
+            return self._invalid_result(
+                request,
+                reason=MRE_INVALID_TARGET_REFUSAL,
+                invalid={"allowed_oxides": str(exc)},
+            )
+        try:
+            gas_product_fugacity_bar = coerce_gas_product_fugacity_bar(
+                controls.get("gas_product_fugacity_bar")
+            )
+        except (TypeError, ValueError) as exc:
+            return self._invalid_result(
+                request,
+                reason=MRE_INVALID_GAS_FUGACITY_REFUSAL,
+                invalid={"gas_product_fugacity_bar": str(exc)},
+            )
         melt_fO2_log = self._coerce_optional_float(
             controls.get("melt_fO2_log", request.fO2_log)
         )
@@ -333,6 +369,14 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         melt_mol = dict(
             request.account_view.accounts.get("process.cleaned_melt", {}) or {}
         )
+        overhead_mol = {
+            str(species): float(mol)
+            for species, mol in (
+                request.account_view.accounts.get("process.overhead_gas", {}) or {}
+            ).items()
+            if float(mol) > 0.0
+        }
+        total_overhead_mol = sum(overhead_mol.values())
         if not melt_mol:
             return self._empty_result(
                 diagnostic_skipped="empty melt",
@@ -391,6 +435,9 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "current_efficiency_by_oxide": {},
             "mre_activity_model": "gamma_x_single_cation",
             "mre_oxide_activity_by_oxide": {},
+            "mre_parent_activity_exponent_by_oxide": {},
+            "mre_gas_product_fugacity_bar_by_oxide": {},
+            "mre_gas_product_fugacity_source_by_oxide": {},
             "mre_decomposition_voltage_authority_by_oxide": {},
             "mre_decomposition_voltage_authoritative_by_oxide": {},
             "mre_decomposition_voltage_status_by_oxide": {},
@@ -421,8 +468,6 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic=diagnostic,
             )
 
-        allowed_oxides_raw = controls.get("allowed_oxides")
-        allowed_oxides: set[str] | None = None
         # None means "no operator target rung -> reduce every reducible
         # oxide". An EMPTY list is a real selectivity filter ("operator
         # targeted a rung unreachable within the voltage cap"), NOT an
@@ -436,9 +481,6 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         # The production caller (simulator/extraction.py) early-returns on
         # the empty-sequence case today, so this is defence-in-depth that
         # pins the None-vs-empty contract correct-by-construction.
-        if allowed_oxides_raw is not None:
-            allowed_oxides = {str(item) for item in allowed_oxides_raw if item}
-
         # Find all reducible species at this voltage. Mirrors
         # ElectrolysisModel.step_hour line-for-line: same graph-first E0,
         # same Nernst formula, same 1e-6 kg gate, same gamma-X activity.
@@ -477,6 +519,50 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 diagnostic["mre_ellingham_phase_basis_by_oxide"][oxide] = (
                     voltage_reference.ellingham_phase_basis
                 )
+            metal, cations_per_oxide, _n_oxy = OXIDE_TO_METAL.get(
+                oxide, ("", 1, 0)
+            )
+            diagnostic["mre_parent_activity_exponent_by_oxide"][oxide] = (
+                cations_per_oxide
+            )
+            if (
+                voltage_reference is not None
+                and voltage_reference.metal_product_phase
+                == ELLINGHAM_METAL_PHASE_GAS
+            ):
+                if metal in gas_product_fugacity_bar:
+                    metal_fugacity_bar = gas_product_fugacity_bar[metal]
+                    fugacity_source = "control_inputs.gas_product_fugacity_bar"
+                elif (
+                    request.pressure_bar > 0.0
+                    and total_overhead_mol > 0.0
+                    and overhead_mol.get(metal, 0.0) > 0.0
+                ):
+                    metal_fugacity_bar = (
+                        request.pressure_bar
+                        * overhead_mol[metal]
+                        / total_overhead_mol
+                    )
+                    fugacity_source = (
+                        "account_view.process.overhead_gas_ideal_partial_pressure"
+                    )
+                else:
+                    # E0 for gas-basis products is referenced to pure gas at
+                    # 1 bar.  With neither an explicit control nor an evolved
+                    # headspace partial pressure, that standard state remains
+                    # a computable non-empty boundary condition.  Preserve it
+                    # with loud provenance; invalid explicit controls already
+                    # refuse atomically during coercion above.
+                    metal_fugacity_bar = 1.0
+                    fugacity_source = "standard_state_default_1_bar"
+                diagnostic["mre_gas_product_fugacity_bar_by_oxide"][oxide] = (
+                    metal_fugacity_bar
+                )
+                diagnostic["mre_gas_product_fugacity_source_by_oxide"][oxide] = (
+                    fugacity_source
+                )
+            else:
+                metal_fugacity_bar = 1.0
             E_nernst = self._nernst_voltage(
                 oxide,
                 T_K,
@@ -486,6 +572,12 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 electrons_per_oxide=ELECTRONS_PER_OXIDE,
                 oxide_to_metal=OXIDE_TO_METAL,
                 pO2_bar=pO2_bar,
+                metal_fugacity_bar=metal_fugacity_bar,
+                metal_product_phase=(
+                    None
+                    if voltage_reference is None
+                    else voltage_reference.metal_product_phase
+                ),
             )
             fallback_margin_V = voltage_V - E_nernst
             raw_margin_V = None
@@ -559,6 +651,12 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 if activity_reference is None
                 else max(0.0, float(activity_reference.activity))
             )
+            feo_activity_reference = melt_oxide_activity("FeO", melt_mol)
+            feo_activity = (
+                0.0
+                if feo_activity_reference is None
+                else max(0.0, float(feo_activity_reference.activity))
+            )
             E_ferric = self._ferric_to_ferrous_voltage(
                 T_K,
                 activity,
@@ -568,6 +666,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 electrons=FERRIC_TO_FERROUS_ELECTRONS,
                 o2_per_fe2o3=FERRIC_TO_FERROUS_O2_PER_FE2O3,
                 pO2_bar=pO2_bar,
+                feo_activity=feo_activity,
             )
             if E_ferric < voltage_V:
                 reducible.append((
@@ -611,11 +710,11 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             )
 
         # Partition current among reducible species (selectivity:
-        # weight by concentration * exp(overvoltage), capped at dV=3.0).
+        # weight by concentration * exp(F*dV/(R*T)), exponent capped at 3).
         # Mirrors ElectrolysisModel.step_hour. [SEL-1]
         weights: dict[str, float] = {}
         for oxide, _E, dV, a, _mode, _reference in reducible:
-            weights[oxide] = a * math.exp(min(dV, 3.0))
+            weights[oxide] = mre_selectivity_weight(a, dV, T_K)
         total_weight = sum(weights.values())
         if total_weight <= 0.0:
             if voltage_V > 0.0 and current_A > 0.0:
@@ -867,36 +966,41 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         electrons_per_oxide: Mapping[str, int],
         oxide_to_metal: Mapping[str, tuple[str, int, int]],
         pO2_bar: float = 1.0,
+        metal_fugacity_bar: float = 1.0,
+        metal_product_phase: str | None = None,
         decomp_voltages: Mapping[str, float] | None = None,
     ) -> float:
         """Nernst-adjusted decomposition voltage.
 
         Mirrors :meth:`ElectrolysisModel.nernst_voltage` line-for-line:
-        ``E = E0 + (RT/nF) ln(aO2^νO2 / a_oxide)``.
-        Pure function; no provider state. Returns ``E0 + 1.0`` for
-        essentially-depleted species (activity < 1e-10), same as legacy.
+        ``E = E0 + (RT/nF) ln(Q)``. Pure function; no provider state.
         """
 
+        reference = None
         if decomp_voltages is None:
             reference = mre_decomposition_voltage_reference(oxide, temperature_K=T_K)
             E0 = 2.5 if reference is None else reference.voltage
         else:
             E0 = decomp_voltages.get(oxide, 2.5)
         n = electrons_per_oxide.get(oxide, 2)
-        if activity <= 1e-10:
-            return E0 + 1.0
-        metal_info = oxide_to_metal.get(oxide)
-        o2_mol_per_oxide = 0.0
-        if metal_info:
-            _metal, _n_met, n_oxy = metal_info
-            o2_mol_per_oxide = n_oxy / 2.0
-        pO2_activity = max(float(pO2_bar), 1e-30)
-        term = (gas_constant * T_K) / (n * faraday)
-        return (
-            E0
-            - term * math.log(activity)
-            + term * o2_mol_per_oxide * math.log(pO2_activity)
+        if metal_product_phase is None and reference is not None:
+            metal_product_phase = reference.metal_product_phase
+
+        # Premise: the melt model reports single-cation MOx activity, while
+        # E0 and n are per parent oxide. Algebra and unit check live in the
+        # shared legacy helper; the standard-state ratios make ln(Q)
+        # dimensionless. Sanity: condensed monoxides at unit activities keep E0.
+        from simulator.electrolysis import mre_parent_oxide_log_quotient
+
+        log_Q = mre_parent_oxide_log_quotient(
+            oxide,
+            activity,
+            pO2_bar,
+            metal_product_phase=metal_product_phase,
+            metal_fugacity_bar=metal_fugacity_bar,
+            oxide_to_metal=oxide_to_metal,
         )
+        return E0 + (gas_constant * T_K) / (n * faraday) * log_Q
 
     @staticmethod
     def _ferric_to_ferrous_voltage(
@@ -909,26 +1013,114 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         electrons: int,
         o2_per_fe2o3: float,
         pO2_bar: float,
+        feo_activity: float = 1.0,
     ) -> float:
-        activity = max(float(activity), 1.0e-30)
-        pO2_activity = max(float(pO2_bar), 1.0e-30)
-        return (
-            float(reference_V)
-            - (gas_constant * float(T_K))
-            / (int(electrons) * faraday)
-            * math.log(activity)
-            + (gas_constant * float(T_K))
-            / (int(electrons) * faraday)
-            * float(o2_per_fe2o3)
-            * math.log(pO2_activity)
+        from simulator.electrolysis import mre_ferric_log_quotient
+
+        # Fe2O3 -> 2FeO + 0.5O2. The shared helper supplies both squared
+        # single-cation activity terms; all activities are dimensionless.
+        log_Q = mre_ferric_log_quotient(
+            activity,
+            feo_activity,
+            pO2_bar,
+            o2_per_fe2o3=o2_per_fe2o3,
         )
+        return float(reference_V) + (
+            gas_constant * float(T_K)
+        ) / (int(electrons) * faraday) * log_Q
 
     @staticmethod
-    def _coerce_pO2_bar(value: Any) -> float:
-        pO2_bar = float(value)
-        if not math.isfinite(pO2_bar):
-            return 1.0
-        return max(pO2_bar, 1e-30)
+    def _validate_controls(
+        request: IntentRequest,
+        controls: Mapping[str, Any],
+    ) -> tuple[dict[str, float], dict[str, str]]:
+        raw_values = {
+            "voltage_V": (
+                0.0
+                if controls.get("voltage_V") is None
+                else controls.get("voltage_V")
+            ),
+            "current_A": (
+                0.0
+                if controls.get("current_A") is None
+                else controls.get("current_A")
+            ),
+            "dt_hr": controls.get("dt_hr", 1.0),
+            "pO2_bar": controls.get("pO2_bar", 1.0),
+            "temperature_C": request.temperature_C,
+            "pressure_bar": request.pressure_bar,
+        }
+        values: dict[str, float] = {}
+        invalid: dict[str, str] = {}
+        for name, raw in raw_values.items():
+            if isinstance(raw, bool):
+                invalid[name] = "boolean_not_allowed"
+                continue
+            try:
+                value = float(raw)
+            except (TypeError, ValueError, OverflowError):
+                invalid[name] = "not_numeric"
+                continue
+            if not math.isfinite(value):
+                invalid[name] = "not_finite"
+                continue
+            values[name] = value
+
+        nonnegative = ("voltage_V", "current_A", "pressure_bar")
+        for name in nonnegative:
+            if name in values and values[name] < 0.0:
+                invalid[name] = "must_be_nonnegative"
+        if "dt_hr" in values and values["dt_hr"] < 0.0:
+            invalid["dt_hr"] = "must_be_nonnegative"
+        if "pO2_bar" in values and values["pO2_bar"] <= 0.0:
+            invalid["pO2_bar"] = "must_be_positive"
+        if (
+            "temperature_C" in values
+            and values["temperature_C"] <= -CELSIUS_TO_KELVIN_OFFSET
+        ):
+            invalid["temperature_C"] = "must_be_above_absolute_zero"
+        return values, invalid
+
+    @staticmethod
+    def _coerce_allowed_oxides(
+        value: Any,
+        *,
+        known_oxides: frozenset[str],
+    ) -> set[str] | None:
+        if value is None:
+            return None
+        if not isinstance(value, (list, tuple, set, frozenset)):
+            raise TypeError("must be a list, tuple, set, or frozenset")
+        targets: set[str] = set()
+        for item in value:
+            if not isinstance(item, str) or not item:
+                raise TypeError("each target must be a non-empty string")
+            if item not in known_oxides:
+                raise ValueError(f"unknown oxide target: {item}")
+            targets.add(item)
+        return targets
+
+    @staticmethod
+    def _invalid_result(
+        request: IntentRequest,
+        *,
+        reason: str,
+        invalid: Mapping[str, str],
+    ) -> IntentResult:
+        return IntentResult(
+            intent=request.intent,
+            status="refused",
+            transition=None,
+            diagnostic={
+                "reason_refused": reason,
+                "invalid_controls": dict(invalid),
+                "energy_kWh": 0.0,
+                "oxides_reduced_mol": {},
+                "metals_produced_mol": {},
+                "gas_products_produced_mol": {},
+                "O2_produced_mol": 0.0,
+            },
+        )
 
     @staticmethod
     def _coerce_optional_float(value: Any) -> float | None:

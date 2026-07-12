@@ -1381,6 +1381,10 @@ def test_mixed_ferric_depletion_does_not_underbill_uncapped_target_current(
     T_K = temperature_C + 273.15
     melt_mol = {"Fe2O3": fe2o3_mol, "SiO2": sio2_mol}
     fe2o3_activity = melt_oxide_activity("Fe2O3", melt_mol).activity
+    feo_activity_reference = melt_oxide_activity("FeO", melt_mol)
+    feo_activity = (
+        0.0 if feo_activity_reference is None else feo_activity_reference.activity
+    )
     sio2_activity = melt_oxide_activity("SiO2", melt_mol).activity
     assert diagnostic["mre_activity_model"] == "gamma_x_single_cation"
     assert diagnostic["mre_oxide_activity_by_oxide"]["SiO2"] == pytest.approx(
@@ -1398,6 +1402,7 @@ def test_mixed_ferric_depletion_does_not_underbill_uncapped_target_current(
         electrons=2,
         o2_per_fe2o3=0.5,
         pO2_bar=pressure_bar,
+        feo_activity=feo_activity,
     )
     e_sio2 = BuiltinElectrolysisStepProvider._nernst_voltage(
         "SiO2",
@@ -1409,8 +1414,13 @@ def test_mixed_ferric_depletion_does_not_underbill_uncapped_target_current(
         electrons_per_oxide=ELECTRONS_PER_OXIDE,
         oxide_to_metal=OXIDE_TO_METAL,
     )
-    fe2o3_weight = fe2o3_activity * math.exp(min(voltage_V - e_ferric, 3.0))
-    sio2_weight = sio2_activity * math.exp(min(voltage_V - e_sio2, 3.0))
+    # One electron gains F*dV joules/mol; R*T is the molar thermal energy.
+    # Their ratio is the dimensionless selectivity exponent, capped at 3.
+    thermal_voltage_V = GAS_CONSTANT * T_K / FARADAY
+    fe2o3_exponent = min(max(0.0, voltage_V - e_ferric) / thermal_voltage_V, 3.0)
+    sio2_exponent = min(max(0.0, voltage_V - e_sio2) / thermal_voltage_V, 3.0)
+    fe2o3_weight = fe2o3_activity * math.exp(fe2o3_exponent)
+    sio2_weight = sio2_activity * math.exp(sio2_exponent)
     total_weight = fe2o3_weight + sio2_weight
     fe2o3_current_A = current_A * fe2o3_weight / total_weight
     sio2_current_A = current_A * sio2_weight / total_weight

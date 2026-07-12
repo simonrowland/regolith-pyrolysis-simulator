@@ -78,11 +78,13 @@ MRE_CERTIFICATION_DENYLIST_REASON = (
     "mre_current_partition_uncited_heuristic_denied_certification"
 )
 MRE_CURRENT_PARTITION_SOURCE = (
-    "heuristic:activity_exp_overvoltage_SEL-1_plus_bounded_FeO_CE_v1_not_certified"
+    "heuristic:activity_exp_FdV_over_RT_SEL-1_plus_bounded_FeO_CE_v1_not_certified"
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
 MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
+MRE_ACTIVITY_FLOOR = 1.0e-30
+MRE_SELECTIVITY_EXPONENT_CAP = 3.0
 # C1-01 validates the fallback/raw acceptance split for FeO.  Other fallback
 # oxides keep their existing policy until their margins are independently
 # validated; their raw requirements are still surfaced in diagnostics below.
@@ -133,6 +135,105 @@ def mre_oxide_activity(
     if activity is None:
         return 0.0
     return max(0.0, float(activity.activity))
+
+
+def coerce_gas_product_fugacity_bar(value) -> dict[str, float]:
+    """Validate the optional per-metal gas fugacity control mapping."""
+
+    if value is None:
+        return {}
+    if not isinstance(value, Mapping):
+        raise TypeError("gas_product_fugacity_bar must be a mapping")
+    known_metals = frozenset(
+        metal for metal, _n_met, _n_oxy in OXIDE_TO_METAL.values()
+    )
+    fugacities: dict[str, float] = {}
+    for metal, raw_fugacity in value.items():
+        if not isinstance(metal, str) or metal not in known_metals:
+            raise ValueError(f"unknown gas-product metal species: {metal}")
+        if isinstance(raw_fugacity, bool):
+            raise TypeError(f"{metal} fugacity must not be boolean")
+        try:
+            fugacity = float(raw_fugacity)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise TypeError(f"{metal} fugacity is not numeric") from exc
+        if not math.isfinite(fugacity) or fugacity <= 0.0:
+            raise ValueError(f"{metal} fugacity must be finite and positive")
+        fugacities[metal] = fugacity
+    return fugacities
+
+
+def mre_parent_oxide_log_quotient(
+    oxide: str,
+    single_cation_activity: float,
+    pO2_bar: float,
+    *,
+    metal_product_phase: str | None,
+    metal_fugacity_bar: float = 1.0,
+    oxide_to_metal: Mapping[str, tuple[str, int, int]] = OXIDE_TO_METAL,
+) -> float:
+    """Return ln(Q) for parent-oxide decomposition on standard-state ratios."""
+
+    _metal, cations_per_oxide, n_oxy = oxide_to_metal.get(
+        oxide, ('', 1, 0)
+    )
+    oxide_activity = max(float(single_cation_activity), MRE_ACTIVITY_FLOOR)
+    pO2_activity = float(pO2_bar)
+    if not math.isfinite(pO2_activity) or pO2_activity <= 0.0:
+        raise ValueError("pO2_bar must be finite and positive")
+    metal_log_term = 0.0
+    if metal_product_phase == ELLINGHAM_METAL_PHASE_GAS:
+        metal_activity = float(metal_fugacity_bar)
+        if not math.isfinite(metal_activity) or metal_activity <= 0.0:
+            raise ValueError("gas-product fugacity must be finite and positive")
+        metal_log_term = cations_per_oxide * math.log(metal_activity)
+    return (
+        metal_log_term
+        + (n_oxy / 2.0) * math.log(pO2_activity)
+        - cations_per_oxide * math.log(oxide_activity)
+    )
+
+
+def mre_ferric_log_quotient(
+    fe2o3_single_cation_activity: float,
+    feo_activity: float,
+    pO2_bar: float,
+    *,
+    o2_per_fe2o3: float = FERRIC_TO_FERROUS_O2_PER_FE2O3,
+) -> float:
+    """Return ln(Q) for Fe2O3 -> 2 FeO + 0.5 O2."""
+
+    ferric = max(float(fe2o3_single_cation_activity), MRE_ACTIVITY_FLOOR)
+    ferrous = max(float(feo_activity), MRE_ACTIVITY_FLOOR)
+    oxygen = float(pO2_bar)
+    if not math.isfinite(oxygen) or oxygen <= 0.0:
+        raise ValueError("pO2_bar must be finite and positive")
+    return (
+        2.0 * math.log(ferrous)
+        + float(o2_per_fe2o3) * math.log(oxygen)
+        - 2.0 * math.log(ferric)
+    )
+
+
+def mre_selectivity_weight(
+    activity: float,
+    overvoltage_V: float,
+    temperature_K: float,
+) -> float:
+    """Return the dimensionless SEL-1 current-partition weight."""
+
+    # Premise: one electron crossing dV gains F*dV J/mol; thermal energy is
+    # R*T J/mol. Algebra: exponent=F*dV/(R*T)=dV/(R*T/F). Unit check:
+    # (C/mol*J/C)/(J/mol/K*K)=1. Sanity: dV=0 gives no voltage multiplier;
+    # the existing cap still prevents runaway dominance far above threshold.
+    thermal_voltage_V = GAS_CONSTANT * float(temperature_K) / FARADAY
+    if not math.isfinite(thermal_voltage_V) or thermal_voltage_V <= 0.0:
+        return 0.0
+    exponent = min(
+        max(0.0, float(overvoltage_V)) / thermal_voltage_V,
+        MRE_SELECTIVITY_EXPONENT_CAP,
+    )
+    return max(0.0, float(activity)) * math.exp(exponent)
 
 
 # Electrons transferred per formula unit of oxide reduced
@@ -282,6 +383,7 @@ class ElectrolysisModel:
         T_C: float,
         activity: float = 1.0,
         pO2_bar: float = 1.0,
+        metal_fugacity_bar: float | None = None,
     ) -> float:
         """
         Nernst-adjusted decomposition voltage.
@@ -297,6 +399,8 @@ class ElectrolysisModel:
             T_C:      Temperature (°C)
             activity: Oxide activity in the melt (0-1)
             pO2_bar:  Evolved-O2 activity, referenced to 1 bar
+            metal_fugacity_bar: Gas-product fugacity relative to 1 bar;
+                omitted values use the 1-bar standard state
 
         Returns:
             Adjusted decomposition voltage (V)
@@ -306,46 +410,50 @@ class ElectrolysisModel:
         reference = mre_decomposition_voltage_reference(oxide, temperature_K=T_K)
         E0 = 2.5 if reference is None else reference.voltage
 
-        if activity <= 1e-10:
-            return E0 + 1.0  # Very high — species essentially depleted
-
-        metal_info = OXIDE_TO_METAL.get(oxide)
-        o2_mol_per_oxide = 0.0
-        if metal_info:
-            _metal, _n_met, n_oxy = metal_info
-            o2_mol_per_oxide = n_oxy / 2.0
-        pO2_activity = max(float(pO2_bar), 1e-30)
-
-        # Nernst adjustment. For MOx -> M + νO2 O2, Q = aO2^νO2 / a_oxide.
-        E = E0 - (GAS_CONSTANT * T_K) / (n * FARADAY) * math.log(activity)
-        E += (
-            (GAS_CONSTANT * T_K)
-            / (n * FARADAY)
-            * o2_mol_per_oxide
-            * math.log(pO2_activity)
+        reference_phase = (
+            None if reference is None else reference.metal_product_phase
         )
-        return E
+        # Premise: melt activity is per single-cation MOx, while E0 is per
+        # parent oxide M_cO_y. Algebra: ln(Q)=c*ln(a_M)+νO2*ln(pO2)
+        # -c*ln(a_MOx). Units: every activity/fugacity is relative to its
+        # 1-bar or Raoultian standard state, so ln(Q) is dimensionless.
+        # Sanity: c=1 condensed products recover the prior monoxides formula.
+        log_Q = mre_parent_oxide_log_quotient(
+            oxide,
+            activity,
+            pO2_bar,
+            metal_product_phase=reference_phase,
+            metal_fugacity_bar=(
+                1.0 if metal_fugacity_bar is None else metal_fugacity_bar
+            ),
+        )
+        return E0 + (GAS_CONSTANT * T_K) / (n * FARADAY) * log_Q
 
     def ferric_to_ferrous_voltage(self, T_C: float, activity: float,
-                                  pO2_bar: float = 1.0) -> float:
-        activity = max(float(activity), 1e-30)
-        pO2_activity = max(float(pO2_bar), 1e-30)
+                                  pO2_bar: float = 1.0,
+                                  feo_activity: float = 1.0) -> float:
         T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
-        return (
-            FERRIC_TO_FERROUS_REFERENCE_V
-            - (GAS_CONSTANT * T_K) / (
-                FERRIC_TO_FERROUS_ELECTRONS * FARADAY
-            ) * math.log(activity)
-            + (GAS_CONSTANT * T_K) / (
-                FERRIC_TO_FERROUS_ELECTRONS * FARADAY
-            ) * FERRIC_TO_FERROUS_O2_PER_FE2O3 * math.log(pO2_activity)
+        # Fe2O3 -> 2 FeO + 0.5 O2: Q=a_FeO^2*pO2^0.5/a_Fe2O3.
+        # Both ferric and ferrous melt activities use a single-cation basis,
+        # so a_Fe2O3=(a_FeO1.5)^2. All log arguments are dimensionless;
+        # at unit activities and 1 bar this reduces to the reference voltage.
+        log_Q = mre_ferric_log_quotient(
+            activity,
+            feo_activity,
+            pO2_bar,
+            o2_per_fe2o3=FERRIC_TO_FERROUS_O2_PER_FE2O3,
         )
+        return FERRIC_TO_FERROUS_REFERENCE_V + (
+            GAS_CONSTANT * T_K
+        ) / (FERRIC_TO_FERROUS_ELECTRONS * FARADAY) * log_Q
 
     def step_hour(self, melt_state: MeltState,
                    voltage_V: float,
                    current_A: float,
                    T_C: float,
-                   pO2_bar: float = 1.0) -> Dict:
+                   pO2_bar: float = 1.0,
+                   gas_product_fugacity_bar: Mapping[str, float] | None = None,
+                   ) -> Dict:
         """
         Simulate one hour of electrolysis.
 
@@ -367,6 +475,9 @@ class ElectrolysisModel:
                 energy_kWh:         float
         """
         comp = melt_state.composition_wt_pct()
+        gas_product_fugacity_bar = coerce_gas_product_fugacity_bar(
+            gas_product_fugacity_bar
+        )
         melt_account_mol = melt_account_mol_from_kg(melt_state.composition_kg)
         feo_fraction = max(0.0, comp.get('FeO', 0.0)) / 100.0
         result = {
@@ -395,6 +506,9 @@ class ElectrolysisModel:
             'current_efficiency_by_oxide': {},
             'mre_activity_model': 'gamma_x_single_cation',
             'mre_oxide_activity_by_oxide': {},
+            'mre_parent_activity_exponent_by_oxide': {},
+            'mre_gas_product_fugacity_bar_by_oxide': {},
+            'mre_gas_product_fugacity_source_by_oxide': {},
             'mre_decomposition_voltage_authority_by_oxide': {},
             'mre_decomposition_voltage_authoritative_by_oxide': {},
             'mre_decomposition_voltage_status_by_oxide': {},
@@ -437,7 +551,37 @@ class ElectrolysisModel:
                     reference.ellingham_phase_basis
                 )
             E_nernst = self.nernst_voltage(
-                oxide, T_C, activity, pO2_bar=pO2_bar)
+                oxide,
+                T_C,
+                activity,
+                pO2_bar=pO2_bar,
+                metal_fugacity_bar=(
+                    None
+                    if reference is None
+                    else gas_product_fugacity_bar.get(
+                        OXIDE_TO_METAL[oxide][0]
+                    )
+                ),
+            )
+            cations_per_oxide = OXIDE_TO_METAL.get(oxide, ('', 1, 0))[1]
+            result['mre_parent_activity_exponent_by_oxide'][oxide] = (
+                cations_per_oxide
+            )
+            if (
+                reference is not None
+                and reference.metal_product_phase == ELLINGHAM_METAL_PHASE_GAS
+            ):
+                result['mre_gas_product_fugacity_bar_by_oxide'][oxide] = float(
+                    (gas_product_fugacity_bar or {}).get(
+                        OXIDE_TO_METAL[oxide][0],
+                        1.0,
+                    )
+                )
+                result['mre_gas_product_fugacity_source_by_oxide'][oxide] = (
+                    'control_inputs.gas_product_fugacity_bar'
+                    if OXIDE_TO_METAL[oxide][0] in (gas_product_fugacity_bar or {})
+                    else 'standard_state_default_1_bar'
+                )
 
             fallback_margin_V = voltage_V - E_nernst
             raw_margin_V = None
@@ -496,8 +640,13 @@ class ElectrolysisModel:
 
         if melt_state.composition_kg.get('Fe2O3', 0.0) >= 1e-6:
             activity = mre_oxide_activity('Fe2O3', melt_account_mol)
+            feo_activity = mre_oxide_activity('FeO', melt_account_mol)
             E_ferric = self.ferric_to_ferrous_voltage(
-                T_C, activity, pO2_bar=pO2_bar)
+                T_C,
+                activity,
+                pO2_bar=pO2_bar,
+                feo_activity=feo_activity,
+            )
             if E_ferric < voltage_V:
                 reducible.append((
                     'Fe2O3',
@@ -531,7 +680,11 @@ class ElectrolysisModel:
         any_capped = False
 
         for oxide, E, dV, a, _mode, _reference in reducible:
-            weights[oxide] = a * math.exp(min(dV, 3.0))
+            weights[oxide] = mre_selectivity_weight(
+                a,
+                dV,
+                T_C + CELSIUS_TO_KELVIN_OFFSET,
+            )
 
         total_weight = sum(weights.values())
         if total_weight <= 0:
@@ -637,6 +790,7 @@ class ElectrolysisModel:
         melt_state: MeltState,
         T_C: float,
         pO2_bar: float = 1.0,
+        gas_product_fugacity_bar: Mapping[str, float] | None = None,
     ) -> List[Tuple[str, float]]:
         """
         Return oxide species in order of increasing Nernst voltage.
@@ -645,13 +799,25 @@ class ElectrolysisModel:
         at the current melt composition and temperature.
         """
         melt_account_mol = melt_account_mol_from_kg(melt_state.composition_kg)
+        gas_product_fugacity_bar = coerce_gas_product_fugacity_bar(
+            gas_product_fugacity_bar
+        )
         sequence = []
 
         for oxide in MRE_FIXED_REDUCIBLE_OXIDES:
             if melt_state.composition_kg.get(oxide, 0.0) < 1e-6:
                 continue
             activity = mre_oxide_activity(oxide, melt_account_mol)
-            E = self.nernst_voltage(oxide, T_C, activity, pO2_bar=pO2_bar)
+            metal = OXIDE_TO_METAL.get(oxide, ('', 1, 0))[0]
+            E = self.nernst_voltage(
+                oxide,
+                T_C,
+                activity,
+                pO2_bar=pO2_bar,
+                metal_fugacity_bar=float(
+                    gas_product_fugacity_bar[metal]
+                ) if metal in gas_product_fugacity_bar else None,
+            )
             sequence.append((oxide, E))
 
         sequence.sort(key=lambda x: x[1])
