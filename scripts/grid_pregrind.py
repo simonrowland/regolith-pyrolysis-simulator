@@ -151,6 +151,7 @@ _WORKER_BACKEND: Any = None
 _WORKER_MODULE: Any = None
 _WORKER_ENGINE_VERSION = "unavailable"
 _WORKER_INIT_ERROR: str | None = None
+_WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY = False
 
 
 @dataclasses.dataclass(frozen=True)
@@ -167,6 +168,7 @@ class WorkerJob:
     grid_key_id: int
     shuffle_rank: int
     inputs: dict[str, Any]
+    engine_epoch: int = 2
 
 
 def _request_stop(signum: int, frame: Any) -> None:
@@ -651,6 +653,9 @@ def backend_config(args: argparse.Namespace) -> dict[str, Any]:
         "timeout_s": args.timeout_s,
         "require_petthermotools": False,
         "thermoengine_health_timeout_s": args.thermoengine_health_timeout_s,
+        "allow_zero_component_boundary": bool(
+            getattr(args, "allow_zero_component_boundary", False)
+        ),
     }
 
 
@@ -718,13 +723,19 @@ def _worker_initialize(
     # module, so the parent's _ASSUMED_QUEUED_RUN_MODE global is lost unless
     # threaded through initargs explicitly.
     global _WORKER_BACKEND, _WORKER_MODULE, _WORKER_ENGINE_VERSION, _WORKER_INIT_ERROR
+    global _WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY
     global _ASSUMED_QUEUED_RUN_MODE
     _ASSUMED_QUEUED_RUN_MODE = assumed_queued_run_mode
+    _WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY = bool(
+        config.get("allow_zero_component_boundary", False)
+    )
     try:
         import simulator.melt_backend.alphamelts as alphamelts_module
 
         backend = alphamelts_module.AlphaMELTSBackend()
-        available = backend.initialize(dict(config))
+        backend_options = dict(config)
+        backend_options.pop("allow_zero_component_boundary", None)
+        available = backend.initialize(backend_options)
         if not available or not backend.is_available():
             raise RuntimeError("AlphaMELTS subprocess transport unavailable")
         _WORKER_BACKEND = backend
@@ -870,6 +881,50 @@ def _worker_failure_output(
     }
 
 
+def _worker_refusal_output(
+    reason: str,
+    *,
+    started: float,
+    diagnostics: Mapping[str, Any],
+    run_mode: str | None = None,
+    applied_timeout_s: float | None = None,
+) -> dict[str, Any]:
+    """Build a typed pre-engine refusal with the normal persisted shape."""
+    raw = {
+        "format": RAW_PAYLOAD_FORMAT,
+        "engine_invoked": False,
+        "fO2_constraint": None,
+        "captures": [],
+        "preflight_refusal": {"reason": reason, **dict(diagnostics)},
+    }
+    return {
+        "status": "out_of_domain",
+        "status_kind": "refusal",
+        "refusal_reason": reason,
+        "raw_payload": canonical_json(raw),
+        "raw_payload_format": RAW_PAYLOAD_FORMAT,
+        "timing_s": time.monotonic() - started,
+        "engine_version": _WORKER_ENGINE_VERSION,
+        "engine_mode": "subprocess",
+        "engine_model": str(getattr(_WORKER_BACKEND, "_model", "unknown")),
+        "run_mode": run_mode,
+        "applied_timeout_s": applied_timeout_s,
+        "native_input": None,
+        "generic": {},
+        "alphamelts": {
+            "backend_status": "out_of_domain",
+            "backend_status_reason": reason,
+            "backend_diagnostics": dict(diagnostics),
+            "backend_warnings": [],
+            "engine_version": _WORKER_ENGINE_VERSION,
+            "mode": "subprocess",
+        },
+        "finder": {},
+        "created_at": utc_now(),
+        "host": socket.gethostname(),
+    }
+
+
 # Pre-run-mode-era grid keys (e.g. the fixed-backbone-v3 batch) carry no
 # subprocess_run_mode in their canonical vectors, and the vector is key
 # IDENTITY — it must never be backfilled. --assume-queued-run-mode lets the
@@ -933,6 +988,48 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             started=started,
             captures=captures,
             native_input=native_input,
+        )
+    persisted_fO2_log = job.inputs.get("fO2_log")
+    intended_fO2_log = job.inputs.get("intended_fO2_log")
+    try:
+        persisted_fO2_value = float(persisted_fO2_log)
+        intended_fO2_value = float(intended_fO2_log)
+    except (TypeError, ValueError):
+        persisted_fO2_value = math.nan
+        intended_fO2_value = math.nan
+    if job.engine_epoch >= 2 and (
+        not math.isfinite(intended_fO2_value)
+        or not math.isfinite(persisted_fO2_value)
+        or persisted_fO2_value != intended_fO2_value
+    ):
+        return job.grid_key_id, _worker_refusal_output(
+            "stale_explicit_fo2_key",
+            started=started,
+            run_mode=run_mode,
+            applied_timeout_s=applied_timeout_s,
+            diagnostics={
+                "persisted_fO2_log": persisted_fO2_log,
+                "intended_fO2_log": intended_fO2_log,
+            },
+        )
+    composition_mol = job.inputs.get("composition_mol")
+    zero_boundary_components = [
+        oxide
+        for oxide in ("CaO", "FeO", "Fe2O3")
+        if not isinstance(composition_mol, Mapping)
+        or float(composition_mol.get(oxide, 0.0)) == 0.0
+    ]
+    if zero_boundary_components and not _WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY:
+        return job.grid_key_id, _worker_refusal_output(
+            "zero_component_boundary",
+            started=started,
+            run_mode=run_mode,
+            applied_timeout_s=applied_timeout_s,
+            diagnostics={
+                "zero_boundary_components": zero_boundary_components,
+                "boundary_predicate": "component_mol == 0.0",
+                "diagnostic_override_available": True,
+            },
         )
     if _WORKER_BACKEND is None or _WORKER_MODULE is None:
         exc = RuntimeError(_WORKER_INIT_ERROR or "AlphaMELTS worker unavailable")
@@ -1215,6 +1312,7 @@ def run_cycle(
                     grid_key_id=int(row["grid_key_id"]),
                     shuffle_rank=after_rank,
                     inputs=dict(row["inputs"]),
+                    engine_epoch=writer.engine_epoch,
                 )
 
     iterator = iter(pending_jobs())
@@ -1367,6 +1465,14 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--model", default="MELTSv1.0.2")
     result.add_argument("--timeout-s", type=float, default=20.0)
     result.add_argument("--thermoengine-health-timeout-s", type=float, default=8.0)
+    result.add_argument(
+        "--allow-zero-component-boundary",
+        action="store_true",
+        help=(
+            "diagnostic override: launch alphaMELTS for GRIND cells whose CaO, "
+            "FeO, or Fe2O3 molar component is exactly zero or missing"
+        ),
+    )
     result.add_argument("--commit-every", type=int, default=25)
     result.add_argument("--heartbeat-s", type=float, default=60.0)
     result.add_argument("--loop", action="store_true")

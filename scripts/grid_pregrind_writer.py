@@ -865,7 +865,7 @@ class GridCacheWriter:
                 parameters.extend(int(value) for value in grid_key_ids)
             query = (
                 "SELECT g.id, g.expedited_key, g.canonical_vector, "
-                "g.kress91_partition_provenance_json, "
+                "g.kress91_partition_provenance_json, g.intended_fO2_log, "
                 "g.shuffle_rank, g.shard, g.timeout_s FROM grid_keys g "
                 "LEFT JOIN alphamelts_outputs o ON o.expedited_key = g.expedited_key "
                 "AND o.engine_epoch = ? "
@@ -907,6 +907,9 @@ class GridCacheWriter:
                 "expedited_key": str(row["expedited_key"]),
                 "inputs": {
                     **json.loads(row["canonical_vector"]),
+                    # Provenance is intentionally outside canonical key identity,
+                    # but the drain must compare it with the persisted engine input.
+                    "intended_fO2_log": row["intended_fO2_log"],
                     "kress91_partition_provenance": (
                         json.loads(row["kress91_partition_provenance_json"])
                         if row["kress91_partition_provenance_json"] is not None

@@ -141,6 +141,59 @@ def test_intended_fo2_is_serialized_and_partitioned_couple_keys_the_point():
     assert "intended_fO2_log" not in canonical_input_vector(vectors[0])
 
 
+def test_epoch3_fo2_materialization_yields_eight_absolute_keys(tmp_path):
+    composition = {
+        "SiO2": 45.0,
+        "Al2O3": 15.0,
+        "FeO": 10.0,
+        "Fe2O3": 5.0,
+        "MgO": 10.0,
+        "CaO": 10.0,
+        "Na2O": 5.0,
+        "TiO2": 0.0,
+        "Cr2O3": 0.0,
+        "MnO": 0.0,
+        "NiO": 0.0,
+        "CoO": 0.0,
+        "K2O": 0.0,
+        "P2O5": 0.0,
+    }
+    levels = tuple(float(value) for value in range(-12, -4))
+    _total, points = build_grid_points(
+        [composition], [1400.0], levels, seed=178
+    )
+    args = SimpleNamespace(
+        model="MELTSv1.0.2",
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+    )
+    database = tmp_path / "epoch3-slice.db"
+    with GridCacheWriter(database, engine_epoch=3) as writer:
+        batch_id = writer.ensure_batch(
+            label="epoch3-verification-slice",
+            kind="fixed",
+            seed=178,
+            params={"engine_fO2_constraint": "absolute"},
+        )
+        for point in points:
+            assert writer.materialize_key(
+                point_inputs(point, args),
+                batch_id=batch_id,
+                shuffle_rank=point.ordinal,
+                shard=0,
+                intended_fO2_log=point.intended_fO2_log,
+            )
+        rows = writer.connection.execute(
+            "SELECT canonical_vector, intended_fO2_log, expedited_key FROM grid_keys "
+            "ORDER BY intended_fO2_log"
+        ).fetchall()
+
+    persisted = [json.loads(row[0])["fO2_log"] for row in rows]
+    intended = [row[1] for row in rows]
+    assert persisted == intended == list(levels)
+    assert len({row[2] for row in rows}) == 8
+
+
 def test_adjusted_kress_partition_and_row_provenance_stay_coupled(
     monkeypatch,
     tmp_path,
@@ -230,14 +283,14 @@ def _inputs(temperature_C: float) -> dict:
         "SiO2": 10.0,
         "TiO2": 0.0,
         "Al2O3": 0.0,
-        "Fe2O3": 0.0,
+        "Fe2O3": 1.0,
         "Cr2O3": 0.0,
         "FeO": 5.0,
         "MnO": 0.0,
         "MgO": 0.0,
         "NiO": 0.0,
         "CoO": 0.0,
-        "CaO": 0.0,
+        "CaO": 1.0,
         "Na2O": 0.0,
         "K2O": 0.0,
         "P2O5": 0.0,
@@ -330,6 +383,101 @@ def test_subprocess_crash_is_failure_not_refusal():
     ) == "refusal"
 
 
+def test_stale_explicit_fo2_key_is_typed_refusal_before_engine(monkeypatch):
+    class NoCallBackend:
+        _model = "MELTSv1.0.2"
+
+        def equilibrate(self, **_kwargs):
+            pytest.fail("stale key reached engine")
+
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", NoCallBackend())
+    monkeypatch.setattr(grid_pregrind, "_WORKER_MODULE", SimpleNamespace())
+    inputs = {**_inputs(1400.0), "intended_fO2_log": -8.0}
+
+    _key_id, output = grid_pregrind._run_point(
+        grid_pregrind.WorkerJob(7, 0, inputs)
+    )
+
+    assert output["status_kind"] == "refusal"
+    assert output["refusal_reason"] == "stale_explicit_fo2_key"
+    raw = json.loads(output["raw_payload"])
+    assert raw["engine_invoked"] is False
+    assert raw["preflight_refusal"]["persisted_fO2_log"] == -9.0
+    assert raw["preflight_refusal"]["intended_fO2_log"] == -8.0
+
+
+@pytest.mark.parametrize("oxide", ["CaO", "FeO", "Fe2O3"])
+def test_grind_zero_component_boundary_refuses_before_engine(oxide, monkeypatch):
+    class NoCallBackend:
+        _model = "MELTSv1.0.2"
+
+        def equilibrate(self, **_kwargs):
+            pytest.fail("zero-component GRIND cell reached engine")
+
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", NoCallBackend())
+    monkeypatch.setattr(grid_pregrind, "_WORKER_MODULE", SimpleNamespace())
+    inputs = {**_inputs(1400.0), "intended_fO2_log": -9.0}
+    inputs["composition_mol"] = dict(inputs["composition_mol"])
+    inputs["composition_mol"][oxide] = 0.0
+
+    _key_id, output = grid_pregrind._run_point(
+        grid_pregrind.WorkerJob(7, 0, inputs)
+    )
+
+    assert output["status_kind"] == "refusal"
+    assert output["refusal_reason"] == "zero_component_boundary"
+    raw = json.loads(output["raw_payload"])
+    assert raw["engine_invoked"] is False
+    assert raw["preflight_refusal"]["zero_boundary_components"] == [oxide]
+    assert raw["preflight_refusal"]["boundary_predicate"] == "component_mol == 0.0"
+
+
+def test_grind_missing_boundary_component_refuses_before_engine(monkeypatch):
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", SimpleNamespace())
+    monkeypatch.setattr(grid_pregrind, "_WORKER_MODULE", SimpleNamespace())
+    inputs = {**_inputs(1400.0), "intended_fO2_log": -9.0}
+    inputs["composition_mol"] = dict(inputs["composition_mol"])
+    del inputs["composition_mol"]["Fe2O3"]
+
+    _key_id, output = grid_pregrind._run_point(
+        grid_pregrind.WorkerJob(7, 0, inputs)
+    )
+
+    assert output["status_kind"] == "refusal"
+    assert output["refusal_reason"] == "zero_component_boundary"
+    raw = json.loads(output["raw_payload"])
+    assert raw["preflight_refusal"]["zero_boundary_components"] == ["Fe2O3"]
+
+
+def test_grind_positive_subthreshold_component_is_not_refused(monkeypatch):
+    inputs = {**_inputs(1400.0), "intended_fO2_log": -9.0}
+    inputs["composition_mol"] = dict(inputs["composition_mol"])
+    inputs["composition_mol"]["Fe2O3"] = 1.0e-300
+
+    class CalledBackend:
+        _mode = "subprocess"
+        _model = "MELTSv1.0.2"
+        _timeout_s = 5.0
+        _equilibrate_subprocess = staticmethod(lambda *_args, **_kwargs: None)
+
+        def equilibrate(self, **_kwargs):
+            raise RuntimeError("positive boundary reached backend")
+
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", CalledBackend())
+    monkeypatch.setattr(
+        grid_pregrind,
+        "_WORKER_MODULE",
+        SimpleNamespace(subprocess=SimpleNamespace(run=lambda *_args, **_kwargs: None)),
+    )
+
+    _key_id, output = grid_pregrind._run_point(
+        grid_pregrind.WorkerJob(7, 0, inputs)
+    )
+
+    assert output["status_kind"] == "failure"
+    assert "positive boundary reached backend" in output["raw_payload"]
+
+
 def test_worker_failure_output_records_positive_wall_time(monkeypatch):
     monkeypatch.setattr(grid_pregrind.time, "monotonic", lambda: 15.25)
 
@@ -414,7 +562,7 @@ def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeyp
         grid_pregrind.WorkerJob(
             grid_key_id=7,
             shuffle_rank=0,
-            inputs=_inputs(1200.0),
+            inputs={**_inputs(1200.0), "intended_fO2_log": -9.0},
         )
     )
 

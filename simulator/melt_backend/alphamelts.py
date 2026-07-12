@@ -102,6 +102,9 @@ ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING = 'system_output_missing'
 ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE = 'phase_mass_incomplete'
 ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 0.01
 ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10 = 1.0e-6
+# alphaMELTS input serialization emits an oxide only above this wt% value.
+# Values at/below it are native zero-component cells, regardless of Python sign.
+ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT = 0.001
 
 ALPHAMELTS_BACKEND_FAILURE_REASON_CODE_KEY = 'backend_failure_reason_code'
 ALPHAMELTS_BACKEND_FAILURE_CATEGORY_KEY = 'backend_failure_category'
@@ -2074,7 +2077,7 @@ class AlphaMELTSBackend(MeltBackend):
         """Write a .melts input file for alphaMELTS."""
         lines = ['Title: regolith_pyrolysis_simulator']
         for oxide, wt in sorted(comp_wt.items()):
-            if wt > 0.001:
+            if wt > ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT:
                 # Map our oxide names to MELTS format
                 melts_name = oxide.replace('2O3', '2O3').replace('2O', '2O')
                 lines.append(f'Initial Composition: {melts_name} {wt:.4f}')
@@ -2099,14 +2102,25 @@ class AlphaMELTSBackend(MeltBackend):
         matches = re.finditer(
             r'Initial alphaMELTS calculation at:.*?\bT\s+'
             r'(?P<started>[0-9.+\-Ee]+)\s*\(C\)'
-            r'|Initial calculation failed\s*\([^,]+,\s*'
+            r'|Initial calculation failed\s*\(\s*'
+            r'(?P<failed_pressure>[0-9.+\-Ee]+)\s+bars\s*,\s*'
             r'(?P<failed>[0-9.+\-Ee]+)\s+C\s*\)!',
             output,
         )
-        return [
-            float(match.group('started') or match.group('failed'))
-            for match in matches
-        ]
+        temperatures = []
+        for match in matches:
+            started = match.group('started')
+            if started is not None:
+                temperatures.append(float(started))
+                continue
+            pressure_bar = float(match.group('failed_pressure'))
+            failed_temperature_C = float(match.group('failed'))
+            # alphaMELTS 2.3.1 emits its internal reset state as 0 bar, 0 K.
+            # -273.15 C is therefore not an executed thermodynamic state.
+            if pressure_bar == 0.0 and failed_temperature_C == -273.15:
+                continue
+            temperatures.append(failed_temperature_C)
+        return temperatures
 
     def _parse_system_main_output(self, output: str) -> dict[str, object]:
         lines = [line.strip() for line in output.splitlines() if line.strip()]
@@ -2274,14 +2288,20 @@ class AlphaMELTSBackend(MeltBackend):
         if liquidus_C is not None:
             result_warnings.append(f'AlphaMELTS liquidus_C={liquidus_C:.3f}')
         lines = output.splitlines()
-        for idx, line in enumerate(lines):
+        stable_indices = [
+            index for index, line in enumerate(lines)
+            if re.search(r'<> Stable .+ assemblage achieved\.', line)
+        ]
+        phase_lines = lines[stable_indices[-1]:] if stable_indices else lines
+        phase_instance_masses_kg: Dict[str, float] = {}
+        for idx, line in enumerate(phase_lines):
             stripped = line.strip()
             if stripped.startswith('liquid:'):
                 if 'liquid' not in phases_present:
                     phases_present.append('liquid')
                 headers = stripped.split(':', 1)[1].split()
-                if idx + 1 < len(lines):
-                    values = lines[idx + 1].split()
+                if idx + 1 < len(phase_lines):
+                    values = phase_lines[idx + 1].split()
                     if len(values) >= 2 and values[1] == 'g':
                         try:
                             phase_masses_kg['liquid'] = float(values[0]) / 1000.0
@@ -2299,7 +2319,8 @@ class AlphaMELTSBackend(MeltBackend):
                 stripped,
             )
             if phase_match:
-                phase = phase_match.group(1)
+                phase_instance = phase_match.group(1)
+                phase = re.sub(r'\d+$', '', phase_instance)
                 if phase != 'liquid' and phase not in phases_present:
                     phases_present.append(phase)
                 try:
@@ -2307,7 +2328,14 @@ class AlphaMELTSBackend(MeltBackend):
                 except ValueError:
                     mass_g = 0.0
                 if mass_g > 0.0:
-                    phase_masses_kg[phase] = mass_g / 1000.0
+                    mass_kg = mass_g / 1000.0
+                    phase_masses_kg[phase] = (
+                        phase_masses_kg.get(phase, 0.0) + mass_kg
+                    )
+                    phase_instance_masses_kg[phase_instance] = (
+                        phase_instance_masses_kg.get(phase_instance, 0.0)
+                        + mass_kg
+                    )
 
             melt_match = re.search(
                 r'Melt fraction\s*=\s*([0-9.+\-Ee]+)', stripped)
@@ -2417,6 +2445,9 @@ class AlphaMELTSBackend(MeltBackend):
                 'fO2_constraint': dict(fO2_constraint),
                 'liquid_properties_source': 'System_main_tbl.txt',
                 **property_diagnostics,
+                'phase_instance_masses_solver_basis_kg': (
+                    phase_instance_masses_kg
+                ),
             },
         )
         fO2_header = str(system_values.get('fO2_header') or '')

@@ -187,9 +187,10 @@ def test_alphamelts_subprocess_liquidus_finder_selects_native_mode():
 
 def _melts_domain_composition() -> dict[str, float]:
     return {
-        'SiO2': 50.0,
+        'SiO2': 49.0,
         'Al2O3': 15.0,
         'FeO': 10.0,
+        'Fe2O3': 1.0,
         'MgO': 10.0,
         'CaO': 10.0,
         'Na2O': 5.0,
@@ -308,6 +309,42 @@ def test_alphamelts_subprocess_subbar_pressure_refuses_before_execution(
     assert excinfo.value.backend_failure_reason_code == (
         ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED
     )
+
+
+@pytest.mark.parametrize('fe2o3', [None, 0.0, 1.0e-12, 0.001])
+def test_production_alphamelts_fe2o3_absent_or_subthreshold_still_launches(
+    fe2o3,
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    composition = _melts_domain_composition()
+    if fe2o3 is None:
+        del composition['Fe2O3']
+    else:
+        composition['Fe2O3'] = fe2o3
+    monkeypatch.setattr(
+        backend,
+        '_equilibrate_subprocess',
+        lambda *args, **kwargs: ('production-launch', args[1]),
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg=composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
+
+    assert result[0] == 'production-launch'
+    if fe2o3 is None:
+        assert result[1]['Fe2O3'] == 0.0
+    elif fe2o3 == 0.0:
+        assert result[1]['Fe2O3'] == 0.0
+    else:
+        assert result[1]['Fe2O3'] > 0.0
 
 
 def test_alphamelts_subprocess_requires_explicit_run_mode(monkeypatch):
@@ -498,6 +535,65 @@ def test_alphamelts_subprocess_failure_line_rejects_temperature_mismatch():
             system_output='',
             fO2_constraint={'path': 'Absolute', 'offset': -9.0},
         )
+
+
+def test_alphamelts_reset_sentinel_is_not_an_executed_temperature():
+    backend = AlphaMELTSBackend()
+    output = (
+        'Initial calculation failed (1.000000 bars, 1250.000000 C)!\n'
+        'Initial calculation failed (0.000000 bars, -273.150000 C)!\n'
+    )
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1250.0,
+        system_output='',
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.temperature_C == pytest.approx(1250.0)
+    assert result.diagnostics['backend_status_reason'] == 'no_convergence'
+
+
+def test_alphamelts_reset_sentinel_alone_fails_closed():
+    backend = AlphaMELTSBackend()
+    output = 'Initial calculation failed (0.000000 bars, -273.150000 C)!\n'
+
+    with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
+        _parse_subprocess_fixture(
+            backend,
+            output,
+            temperature_C=1250.0,
+            system_output='',
+        )
+
+    assert excinfo.value.backend_failure_reason_code == 'executed_temperature_missing'
+
+
+def test_alphamelts_final_assemblage_accumulates_numbered_phase_instances():
+    backend = AlphaMELTSBackend()
+    output = (
+        '<> Stable spinel assemblage achieved.\n'
+        'Initial alphaMELTS calculation at: P 1.000000 (bars), T 1400.000000 (C)\n'
+        'spinel1: 90.0 g\n'
+        '<> Stable spinel assemblage achieved.\n'
+        'Initial alphaMELTS calculation at: P 1.000000 (bars), T 1400.000000 (C)\n'
+        'spinel1: 40.0 g\n'
+        'spinel2: 60.0 g\n'
+    )
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1400.0,
+    )
+
+    assert result.phase_masses_kg == {'spinel': pytest.approx(0.1)}
+    assert result.diagnostics['phase_instance_masses_solver_basis_kg'] == {
+        'spinel1': pytest.approx(0.04),
+        'spinel2': pytest.approx(0.06),
+    }
 
 
 def test_alphamelts_subprocess_requires_finite_absolute_fo2_echo():
