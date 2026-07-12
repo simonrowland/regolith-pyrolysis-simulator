@@ -1154,6 +1154,18 @@ class ExtractionMixin:
                 getattr(self, '_mre_uncertified_yield', {}) or {}),
             'ellingham_ladder_diagnostic': dict(
                 getattr(self, '_mre_ellingham_ladder_diagnostic', {}) or {}),
+            'effective_voltage_margin_by_oxide': dict(
+                getattr(
+                    self,
+                    '_mre_effective_voltage_margin_V_by_oxide',
+                    {},
+                ) or {}
+            ),
+            'effective_voltage_margin_temperature_C': getattr(
+                self,
+                '_mre_effective_voltage_margin_temperature_C',
+                None,
+            ),
         }
         self._mre_uncertified_yield = {}
         self._mre_ellingham_ladder_diagnostic = {}
@@ -1191,6 +1203,13 @@ class ExtractionMixin:
             'ellingham_ladder_diagnostic': dict(
                 mre_diagnostic_state_before_step[
                     'ellingham_ladder_diagnostic']),
+            'effective_voltage_margin_by_oxide': dict(
+                mre_diagnostic_state_before_step[
+                    'effective_voltage_margin_by_oxide']),
+            'effective_voltage_margin_temperature_C': (
+                mre_diagnostic_state_before_step[
+                    'effective_voltage_margin_temperature_C']
+            ),
         }
         if self.melt.campaign == CampaignPhase.MRE_BASELINE:
             seq = self._mre_voltage_sequence
@@ -1309,6 +1328,47 @@ class ExtractionMixin:
                         self.melt.composition_kg.get(oxide, 0.0) < 1e-6
                         for oxide in step_info['species']
                     )
+                    present_rung_species = {
+                        oxide
+                        for oxide in rung_allowed_oxides
+                        if self.melt.composition_kg.get(oxide, 0.0) >= 1e-6
+                    }
+                    prior_voltage_margins = mre_diagnostic_state_before_step[
+                        'effective_voltage_margin_by_oxide'
+                    ]
+                    campaign_target_C, _ramp_rate = (
+                        self.campaign_mgr.get_temp_target(
+                            self.melt.campaign,
+                            self.melt.campaign_hour,
+                            self.melt,
+                        )
+                    )
+                    at_campaign_temperature = (
+                        campaign_target_C is None
+                        or self.melt.temperature_C >= float(campaign_target_C)
+                    )
+                    margin_temperature_C = mre_diagnostic_state_before_step[
+                        'effective_voltage_margin_temperature_C'
+                    ]
+                    margin_measured_at_campaign_temperature = (
+                        campaign_target_C is None
+                        or (
+                            margin_temperature_C is not None
+                            and float(margin_temperature_C)
+                            >= float(campaign_target_C)
+                        )
+                    )
+                    rung_present_but_unreachable = (
+                        at_campaign_temperature
+                        and margin_measured_at_campaign_temperature
+                        and bool(present_rung_species)
+                        and all(
+                            prior_voltage_margins.get(
+                                oxide, float('inf')
+                            ) <= 0.0
+                            for oxide in present_rung_species
+                        )
+                    )
                     safety_max_hold = (
                         self._mre_hold_hours
                         >= mre_ladder.C5_DEPLETION_SAFETY_MAX_HOLD_HR
@@ -1317,7 +1377,11 @@ class ExtractionMixin:
                         target_current_low
                         and (rung_ever_effective or rung_species_absent)
                     )
-                    if depleted_after_effective or safety_max_hold:
+                    if (
+                        depleted_after_effective
+                        or rung_present_but_unreachable
+                        or safety_max_hold
+                    ):
                         self._mre_voltage_step_idx += 1
                         if idx >= len(seq) - 1:
                             self._mre_c5_sequence_complete_key = sequence_completion_key
@@ -1397,6 +1461,14 @@ class ExtractionMixin:
             fe_redox_policy='kress91_live',
         )
         diagnostic = dict(kernel_result.diagnostic or {})
+        self._mre_effective_voltage_margin_V_by_oxide = dict(
+            diagnostic.get('mre_effective_voltage_margin_V_by_oxide') or {}
+        )
+        self._mre_effective_voltage_margin_temperature_C = (
+            float(self.melt.temperature_C)
+            if self._mre_effective_voltage_margin_V_by_oxide
+            else None
+        )
         if c5_ellingham_ladder_diagnostic:
             diagnostic['mre_ellingham_ladder_diagnostic'] = (
                 c5_ellingham_ladder_diagnostic
@@ -1468,6 +1540,13 @@ class ExtractionMixin:
             self._mre_ellingham_ladder_diagnostic = dict(
                 mre_replay_state_before_dispatch[
                     'ellingham_ladder_diagnostic'])
+            self._mre_effective_voltage_margin_V_by_oxide = dict(
+                mre_replay_state_before_dispatch[
+                    'effective_voltage_margin_by_oxide'])
+            self._mre_effective_voltage_margin_temperature_C = (
+                mre_replay_state_before_dispatch[
+                    'effective_voltage_margin_temperature_C']
+            )
             reason = diagnostic.get('reason_refused', 'electrolysis_step_refused')
             raise RuntimeError(f'MRE electrolysis refused: {reason}')
         if proposal is not None:

@@ -355,7 +355,10 @@ def test_partial_sio_condensation_keeps_overhead_gas_in_mass_balance():
     condensed_total = sum(condensed.values())
 
     assert overhead > 0.0
-    assert wall_total > 0.0
+    # The 1500 C wall candidate is ~1e-35 kg, below the provider's 1e-12 kg
+    # commit floor. The credited mass therefore closes through the baffle and
+    # overhead accounts without fabricating a positive wall deposit.
+    assert wall_total == pytest.approx(0.0)
     assert "SiO" not in stage_totals
     assert stage_totals["Si"] == pytest.approx(condensed["Si"])
     assert stage_totals["SiO2"] == pytest.approx(condensed["SiO2"])

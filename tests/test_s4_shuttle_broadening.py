@@ -8,6 +8,7 @@ from engines.builtin.metallothermic_step import (
     REACTION_FAMILY_C3_NA,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
+from simulator.account_ids import METAL_PHASE_ACCOUNTS
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.session_cli import SessionScriptRunner
@@ -341,10 +342,11 @@ def test_c2a_staged_k_plus_na_shuttle_beats_k_only_and_stays_cool():
     k_only_recovery = k_only_fe / initial_fe
     broadened_recovery = broadened_fe / initial_fe
     increment = broadened_recovery - k_only_recovery
-    na_fe = broadened.atom_ledger.kg_by_account("process.metal_phase").get(
-        "Fe",
-        0.0,
-    ) - k_only.atom_ledger.kg_by_account("process.metal_phase").get("Fe", 0.0)
+    na_fe = sum(
+        broadened.atom_ledger.kg_by_account(account).get("Fe", 0.0)
+        - k_only.atom_ledger.kg_by_account(account).get("Fe", 0.0)
+        for account in METAL_PHASE_ACCOUNTS
+    )
     shuttle_snapshots = [
         s
         for s in broadened.record.snapshots

@@ -6,7 +6,13 @@ from simulator.campaigns import CampaignManager
 from simulator.core import PyrolysisSimulator
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.state import BatchRecord, CampaignPhase, DecisionType, MeltState
+from simulator.state import (
+    BatchRecord,
+    CampaignPhase,
+    DecisionType,
+    MeltState,
+    PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
+)
 from web.feedstock_data import (
     DATA_DIR,
     get_visible_feedstock,
@@ -309,7 +315,8 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     assert oxygen_kg > 0.0
     assert sim.melt.composition_kg["Na2O"] == pytest.approx(996.8513781574554)
     # 2026-07-11 0.5.10 E-MOVE: phase-basis rails route gas-basis MRE Na
-    # through overhead/condensation instead of forcing it into metal_phase.
+    # through overhead, reactive wall capture, and the condensation train
+    # instead of forcing it into metal_phase.
     assert sim.atom_ledger.kg_by_account("process.metal_phase").get(
         "Na", 0.0
     ) == pytest.approx(0.0)
@@ -318,7 +325,15 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     ] == pytest.approx(0.8575205152142129)
     assert sim.atom_ledger.kg_by_account("process.condensation_train")[
         "Na"
-    ] == pytest.approx(1.469926447936863)
+    ] == pytest.approx(0.002038061119616019)
+    wall_na_kg = sum(
+        sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
+        for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
+    )
+    assert wall_na_kg == pytest.approx(1.4762851331783949)
+    assert wall_na_kg > sim.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    )["Na"]
     mre_oxygen = sim.atom_ledger.kg_by_account(
         "terminal.oxygen_mre_anode_stored"
     )["O2"]

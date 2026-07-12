@@ -445,6 +445,8 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             "mre_ellingham_phase_basis_by_oxide": {},
             "mre_raw_graph_requirement_V_by_oxide": {},
             "mre_raw_voltage_margin_V_by_oxide": {},
+            "mre_effective_requirement_V_by_oxide": {},
+            "mre_effective_voltage_margin_V_by_oxide": {},
             "mre_raw_margin_refused_targets": {},
             "mre_phase_refused_targets": {},
             "melt_fO2_log": melt_fO2_log,
@@ -580,6 +582,10 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                 ),
             )
             fallback_margin_V = voltage_V - E_nernst
+            diagnostic["mre_effective_requirement_V_by_oxide"][oxide] = E_nernst
+            diagnostic["mre_effective_voltage_margin_V_by_oxide"][oxide] = (
+                fallback_margin_V
+            )
             raw_margin_V = None
             if (
                 voltage_reference is not None

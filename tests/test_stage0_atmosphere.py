@@ -8,6 +8,8 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 
 
 C0_ENDPOINT_SETPOINTS = {
+    "temp_range_C": [20, 950],
+    "dT_dt_C_per_hr": 50,
     "max_hold_hr": 25,
     "soft_endpoint": {
         "min_hold_hr": 10,

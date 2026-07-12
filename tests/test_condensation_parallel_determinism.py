@@ -13,7 +13,10 @@ from simulator.state import (
 )
 
 
-EXPECTED_COLD_WALL_SIO_SEGMENT_KG = 0.0006148297942046674
+# 2026-07-10 BH-063: configured throat/stage areas now drive each pipe
+# segment's declared capture surface. This replaces the legacy circumference-
+# derived area and is the same mechanism used by the recomputed wall goldens.
+EXPECTED_COLD_WALL_SIO_SEGMENT_KG = 0.05606386174412921
 EXPECTED_COLD_WALL_SIO_SEGMENT_SI_KG = (
     EXPECTED_COLD_WALL_SIO_SEGMENT_KG
     * 0.5
@@ -28,6 +31,8 @@ EXPECTED_COLD_WALL_SIO_SEGMENT_SIO2_KG = (
 )
 MULTI_TICK_COUNT = 4
 C0_ENDPOINT_SETPOINTS = {
+    "temp_range_C": [20, 950],
+    "dT_dt_C_per_hr": 50,
     "max_hold_hr": 25,
     "soft_endpoint": {
         "min_hold_hr": 10,
@@ -148,7 +153,7 @@ def _has_runtime_wall_keys(mapping: dict) -> bool:
     return False
 
 
-def test_cold_wall_segment_attribution_matches_pre_refactor_values():
+def test_cold_wall_segment_attribution_matches_configured_geometry_values():
     session = _start_session()
     session.advance()
 

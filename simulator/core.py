@@ -777,6 +777,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._mre_energy_this_hr = 0.0
         self._mre_uncertified_yield: Dict[str, Any] = {}
         self._mre_ellingham_ladder_diagnostic: Dict[str, Any] = {}
+        self._mre_effective_voltage_margin_V_by_oxide: Dict[str, float] = {}
+        self._mre_effective_voltage_margin_temperature_C: float | None = None
         self._mre_voltage_step_idx = 0
         self._mre_hold_hours = 0
         self._mre_rung_ever_effective = False
@@ -9510,6 +9512,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._mre_hold_hours = 0
             self._mre_effective_current_A = 0.0
             self._mre_rung_ever_effective = False
+            self._mre_effective_voltage_margin_V_by_oxide = {}
+            self._mre_effective_voltage_margin_temperature_C = None
             self.melt.mre_low_current_hours = 0
             # Ladder bookkeeping must not leak across campaign (re)starts:
             # a sticky complete flag/key would trip the C5 endpoint (or

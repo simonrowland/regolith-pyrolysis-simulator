@@ -147,11 +147,12 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives():
 
     assert feo_initial > 100.0
     assert reduced_pct > 80.0
-    # 2026-07-09 full-track 2x2: multiphase Na2O dG raises the final-gate
-    # residual 0.085182 -> 0.305797 kg; liquid-fraction-scaled redox capacity
-    # counteracts it (0.366145 -> 0.305797 kg), so this is not muted cooldown
-    # respeciation. The delta is lower C2A Na evaporation plus a higher C5 floor.
-    assert na2o_left == pytest.approx(0.30579659, abs=1e-6)
+    # 793f897 made the Nernst quotient parent-oxide stoichiometric: Na2O uses
+    # the square of single-cation activity. At the 1575 C C5 hold its effective
+    # requirement is 2.15044 V, so the 1.6 V cap cannot consume the remaining
+    # Na2O. The scheduler now skips that unreachable rung instead of spending
+    # the full C5 hold there; this residual is therefore mechanism-backed.
+    assert na2o_left == pytest.approx(4.10129509, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT
@@ -209,6 +210,74 @@ def test_c5_targeted_feo_rung_survives_pre_reducible_low_current_hours():
     assert not hasattr(sim, "_mre_c5_sequence_complete_key")
     # extraction->endpoint stamp: single-rung seq means this hold IS final
     assert sim.melt.mre_c5_on_final_rung is True
+
+
+def test_c5_present_rung_unreachable_at_cap_advances_after_minimum_hold():
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        _load("setpoints.yaml"),
+        _load("feedstocks.yaml"),
+        _load("vapor_pressures.yaml"),
+    )
+    sim.load_batch(FEEDSTOCK, mass_kg=1000.0)
+    sim._mre_voltage_sequence = [
+        {"voltage": 0.5, "species": ["K2O"], "min_hold_hours": 2},
+        {"voltage": 0.9, "species": ["FeO"], "min_hold_hours": 3},
+    ]
+    sim.melt.campaign = CampaignPhase.C5
+    sim.melt.c5_enabled = True
+    sim.melt.mre_target_species = ""
+    sim.melt.mre_max_voltage_V = 1.6
+    sim._mre_hold_hours = 1
+    sim._mre_effective_current_A = 0.0
+    sim._mre_rung_ever_effective = False
+    sim._mre_effective_voltage_margin_V_by_oxide = {"K2O": -0.25}
+    sim._mre_effective_voltage_margin_temperature_C = 1500.0
+    sim.melt.temperature_C = 1500.0
+
+    captured: list[dict] = []
+
+    def fake_dispatch(_intent, *, control_inputs, **_kwargs):
+        captured.append(dict(control_inputs))
+        return SimpleNamespace(
+            status="ok",
+            diagnostic={
+                "energy_kWh": 0.0,
+                "metals_produced_kg": {},
+                "metals_produced_mol": {},
+                "oxides_reduced_kg": {},
+                "mre_effective_voltage_margin_V_by_oxide": {"K2O": -0.25},
+            },
+            transition=None,
+        )
+
+    sim._dispatch_only = fake_dispatch
+    sim._ledger_account_species_kg = lambda _account, _species: 0.0
+    sim._project_extraction_melt = lambda: None
+    sim._sync_oxygen_kg_counters = lambda: None
+
+    sim._step_mre()
+
+    electrolysis_controls = [
+        control for control in captured if "voltage_V" in control
+    ]
+    assert electrolysis_controls
+    assert electrolysis_controls[0]["allowed_oxides"] == ["K2O"]
+    assert sim._mre_voltage_step_idx == 0
+    assert sim._mre_hold_hours == 2
+
+    sim.melt.temperature_C = 1575.0
+    sim._step_mre()
+
+    assert sim._mre_voltage_step_idx == 0
+    assert sim._mre_hold_hours == 3
+
+    sim._step_mre()
+
+    assert sim._mre_voltage_step_idx == 1
+    assert sim._mre_hold_hours == 0
 
 
 def test_c5_declared_ladder_hold_scopes_shared_voltage_species_before_refusal():

@@ -76,7 +76,10 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # same value as the sio_yield lunar baseline by construction).
 # 2026-07-11 0.5.10 E-MOVE: phase-basis/two-rail vapor plus K/S fO2 and
 # alkali-path changes lower the fixed-pO2 SiO-evolved pin.
-PHASE3BIS_SIO_EVOLVED_KG = 8.71303559859e-06
+# 2026-07-11 integrated-runtime: the 24 h track enters controlled-O2 C3 at
+# global hour 19. O2 is now the condensation carrier for that campaign rather
+# than the old N2 fallback; wall-temperature invariance remains exact.
+PHASE3BIS_SIO_EVOLVED_KG = 8.71384522005e-06
 
 
 @lru_cache(maxsize=None)

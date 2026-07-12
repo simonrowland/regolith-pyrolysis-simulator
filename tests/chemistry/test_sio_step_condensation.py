@@ -27,14 +27,18 @@ def _stage3_silica_kg(liner_temperature_c: float) -> float:
     )
 
 
-def _terminal_escape_kg(liner_temperature_c: float) -> float:
-    report, _ = _report_at_wall_T(liner_temperature_c)
-    return float(report["sio_to_silica_fume_kg"]["terminal_offgas_escape"])
+def _terminal_escape_sio_mol(liner_temperature_c: float) -> float:
+    _, diagnostics = _report_at_wall_T(liner_temperature_c)
+    return float(diagnostics["sio_escape_mol"])
 
 
-def _sio_wall_deposit_kg(liner_temperature_c: float) -> float:
-    report, _ = _report_at_wall_T(liner_temperature_c)
-    return float(report["wall_deposit_kg"].get("SiO", 0.0))
+def _captured_sio_equivalent_mol(liner_temperature_c: float) -> float:
+    _, diagnostics = _report_at_wall_T(liner_temperature_c)
+    return float(
+        diagnostics["si_terminal_mol"]
+        + diagnostics["sio2_terminal_mol"]
+        + diagnostics["sio_wall_mol"]
+    )
 
 
 def test_sio_routes_to_stage3_for_c2a_after_band_aware_hk_fix():
@@ -42,36 +46,21 @@ def test_sio_routes_to_stage3_for_c2a_after_band_aware_hk_fix():
 
 
 def test_wall_band_capture_stays_bounded_after_reactive_sio_fix():
-    capture_1050 = _stage3_silica_kg(1050.0) + _sio_wall_deposit_kg(1050.0)
-    capture_1300 = _stage3_silica_kg(1300.0) + _sio_wall_deposit_kg(1300.0)
-    capture_1400 = _stage3_silica_kg(1400.0) + _sio_wall_deposit_kg(1400.0)
+    capture_1050 = _captured_sio_equivalent_mol(1050.0)
+    capture_1300 = _captured_sio_equivalent_mol(1300.0)
+    capture_1400 = _captured_sio_equivalent_mol(1400.0)
 
-    # Reactive SiO wall products no longer re-evaporate against SiO's own
-    # Antoine curve, so hot-wall capture is nonzero and the old strict
-    # cooler-wall monotone is no longer the invariant. Keep the capture band
-    # tight enough to catch routing regressions without forcing a false zero.
+    # Count every Si-bearing terminal and reactive wall product on a common
+    # SiO-mol basis. Direct wall SiO is now zero because the wall route emits
+    # Si, SiO2, and FeSi; counting only SiO created the false 57% spread.
     captures = (capture_1050, capture_1300, capture_1400)
     assert min(captures) > 0.0
     assert max(captures) - min(captures) <= 0.04 * max(captures)
-    # Post-r7 autoreview fix (2026-05-27): equal-temperature wall routing
-    # now restricts deposit candidates to reachable (upstream-of-designated-
-    # stage) pipe segments. Pre-r7, downstream-of-stage-3 pipe segments
-    # were spuriously credited with SiO wall deposits that physically
-    # could not reach them — that ghost-mass was effectively absorbed by
-    # the wall_deposit account when the honest accounting puts it into
-    # `terminal_offgas_escape` (mass that flows past stage 3 to the
-    # cold-vent line). The fix makes terminal_escape more honest at the
-    # cold-liner end. At 1050 °C wall T the wall deposit drops ~57%
-    # (1.5e-5 → 6.6e-6 kg, see test_wall_deposit_crosses_*) and the
-    # released phantom-wall mass routes into terminal_escape, lifting
-    # escape(1050) above escape(1300) by ~1.4e-7 kg (0.13% of total
-    # escape ~1e-4 kg). The strict monotone `escape(1050) <= escape(1300)`
-    # is no longer guaranteed at FP scale; relax to a 1%-of-largest
-    # tolerance so the assertion still catches gross routing regressions
-    # without false-failing on the honest physics correction.
-    escape_1050 = _terminal_escape_kg(1050.0)
-    escape_1300 = _terminal_escape_kg(1300.0)
-    escape_1400 = _terminal_escape_kg(1400.0)
-    band_tolerance_kg = 0.01 * max(escape_1050, escape_1300, escape_1400)
-    assert escape_1050 <= escape_1300 + band_tolerance_kg
-    assert escape_1300 <= escape_1400 + band_tolerance_kg
+    # The report's presentation bucket named terminal_offgas_escape also adds
+    # downstream collected SiO2, so it is not an escape-only invariant. Use the
+    # ledger-derived SiO escape mol on the same basis as the capture check.
+    escapes = tuple(
+        _terminal_escape_sio_mol(temperature_C)
+        for temperature_C in (1050.0, 1300.0, 1400.0)
+    )
+    assert max(escapes) - min(escapes) <= 0.01 * max(escapes)

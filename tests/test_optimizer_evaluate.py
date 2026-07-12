@@ -2122,31 +2122,26 @@ def test_mass_balance_zero_input_nonzero_output_fires_named_gate() -> None:
     assert per_hour["mass_balance_error_category"] == "zero_input_basis_breach"
 
 
-def test_zero_mass_direct_run_executor_has_no_nonzero_output_input_seam() -> None:
+def test_zero_mass_direct_run_executor_refuses_before_execution() -> None:
     bundle = load_config_bundle()
-    execution = RunExecutor().execute(
-        SimSessionConfig(
-            feedstock_id="lunar_mare_low_ti",
-            feedstocks=bundle.feedstocks,
-            setpoints=bundle.setpoints,
-            vapor_pressures=bundle.vapor_pressures,
-            campaign="C0",
-            backend_name="stub",
-            backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
-            hours=1,
-            mass_kg=0.0,
-            force_builtin_vapor_pressure=_force_builtin_vapor_pressure,
+    with pytest.raises(
+        RuntimeError,
+        match="load_batch failed: batch mass_kg must be finite and > 0",
+    ):
+        RunExecutor().execute(
+            SimSessionConfig(
+                feedstock_id="lunar_mare_low_ti",
+                feedstocks=bundle.feedstocks,
+                setpoints=bundle.setpoints,
+                vapor_pressures=bundle.vapor_pressures,
+                campaign="C0",
+                backend_name="stub",
+                backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
+                hours=1,
+                mass_kg=0.0,
+                force_builtin_vapor_pressure=_force_builtin_vapor_pressure,
+            )
         )
-    )
-
-    assert execution.status == "ok"
-    assert execution.snapshots
-    snapshot = execution.snapshots[0]
-    assert snapshot.mass_in_kg == pytest.approx(0.0)
-    assert snapshot.mass_out_kg == pytest.approx(0.0)
-    assert snapshot.mass_balance_error_pct == pytest.approx(0.0)
-    assert not hasattr(snapshot, "mass_balance_error_category")
-    assert execution.per_hour[0]["mass_balance_pct"] == pytest.approx(0.0)
 
 
 def test_mass_balance_zero_input_zero_output_is_vacuously_closed_for_gate() -> None:
