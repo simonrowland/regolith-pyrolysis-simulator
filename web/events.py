@@ -27,6 +27,7 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.campaigns import CampaignManager
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
 from simulator.core import PoisonedHourError
 from simulator.furnace_materials import resolve_furnace_max_T_C
@@ -101,21 +102,32 @@ def _replace_simulation_state(
     speed: float,
 ) -> tuple[dict, threading.Lock]:
     """Install one active simulation for a client and stop any prior run."""
-    with _simulations_guard:
-        previous = _simulations.get(sid)
-        if previous is not None:
-            previous['running'] = False
-        run_lock = threading.Lock()
-        state = {
-            'session': session,
-            'running': True,
-            'paused': False,
-            'speed': speed,
-            'run_id': uuid.uuid4().hex,
-        }
-        _simulations[sid] = state
-        _sim_locks[sid] = run_lock
-        return state, run_lock
+    while True:
+        with _simulations_guard:
+            previous = _simulations.get(sid)
+            previous_lock = _sim_locks.get(sid)
+        if previous_lock is not None:
+            previous_lock.acquire()
+        try:
+            with _simulations_guard:
+                if _simulations.get(sid) is not previous:
+                    continue
+                if previous is not None:
+                    previous['running'] = False
+                run_lock = threading.RLock()
+                state = {
+                    'session': session,
+                    'running': True,
+                    'paused': False,
+                    'speed': speed,
+                    'run_id': uuid.uuid4().hex,
+                }
+                _simulations[sid] = state
+                _sim_locks[sid] = run_lock
+                return state, run_lock
+        finally:
+            if previous_lock is not None:
+                previous_lock.release()
 
 
 def _current_simulation_state(
@@ -135,14 +147,24 @@ def _current_simulation_state(
 def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bool:
     with _simulations_guard:
         state = _simulations.get(sid)
-        if (
-            state is None
-            or state.get('run_id') != run_id
-            or not state['running']
-        ):
+        run_lock = _sim_locks.get(sid)
+        if state is None or run_lock is None or state.get('run_id') != run_id:
             return False
-    socketio.emit(event, payload, room=sid)
-    return True
+    with run_lock:
+        with _simulations_guard:
+            state = _simulations.get(sid)
+            if (
+                state is None
+                or state.get('run_id') != run_id
+                or not state['running']
+            ):
+                return False
+        emitted_payload = payload
+        if isinstance(payload, Mapping):
+            emitted_payload = dict(payload)
+            emitted_payload['run_id'] = run_id
+        socketio.emit(event, emitted_payload, room=sid)
+        return True
 
 
 def recipe_save_context(sid: str) -> dict[str, object]:
@@ -455,12 +477,22 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float]]:
                     f'runtime_campaign_overrides.{campaign_name} '
                     'field names must be non-empty'
                 )
-            clean_fields[field_key] = _coerce_bounded_float(
+            clean_value = _coerce_bounded_float(
                 field_value,
                 field=f'runtime_campaign_overrides.{campaign_name}.{field_key}',
             )
+            if field_key == 'pO2_mbar' and clean_value < 0.0:
+                raise InputValidationError(
+                    f'runtime_campaign_overrides.{campaign_name}.{field_key} '
+                    'must be >= 0'
+                )
+            clean_fields[field_key] = clean_value
         if clean_fields:
             overrides[campaign_name] = clean_fields
+    try:
+        CampaignManager.validate_runtime_campaign_overrides(overrides)
+    except ValueError as exc:
+        raise InputValidationError(str(exc)) from exc
     return overrides
 
 
@@ -842,6 +874,52 @@ def _start_background_loop(
     backend_status: str,
     backend_authoritative: bool,
 ):
+    def stop_with_status(payload: Mapping[str, object]) -> None:
+        try:
+            _emit_if_current(
+                socketio,
+                sid,
+                run_id,
+                'simulation_status',
+                payload,
+            )
+        except Exception as exc:  # noqa: BLE001 -- cleanup must still run
+            _safe_log(f'Simulation status emission failed: {exc}')
+        finally:
+            with _simulations_guard:
+                current = _simulations.get(sid)
+                if current is not None and current.get('run_id') == run_id:
+                    current['running'] = False
+                    current['paused'] = False
+
+    def stop_for_failure(exc: Exception, sim) -> None:
+        _safe_log(f'Simulation loop failed: {exc}')
+        message = str(exc)
+        unenriched_message = message
+        poisoned = None
+        try:
+            poisoned = getattr(sim, '_poisoned_hour', None)
+            if poisoned is not None:
+                poisoned_error = PoisonedHourError(poisoned)
+                poisoned_detail = f'PoisonedHourError: {poisoned_error}'
+                if message == str(poisoned_error):
+                    message = poisoned_detail
+                elif message != poisoned_detail:
+                    message = f'{message}; {poisoned_detail}'
+        except Exception:  # noqa: BLE001 -- best-effort enrichment
+            message = unenriched_message
+            poisoned = None
+        error_payload = {
+            'status': 'error',
+            'message': message,
+            'backend_status': backend_status,
+            'backend_authoritative': backend_authoritative,
+            'backend_message': backend_message,
+        }
+        if poisoned is not None:
+            error_payload['reason'] = 'poisoned_hour'
+        stop_with_status(error_payload)
+
     def run_loop():
         while True:
             state, _ = _current_simulation_state(sid, run_id)
@@ -863,22 +941,29 @@ def _start_background_loop(
                     or not state['running']
                 ):
                     break
+                if state['paused']:
+                    continue
                 session = state['session']
                 sim = session.simulator
                 if session.is_complete():
-                    completion_payload = _completion_payload(sim)
-                    _record_last_recipe_capture(
-                        sid,
-                        run_id,
-                        completion_payload=completion_payload,
-                    )
-                    if not _emit_if_current(
-                        socketio,
-                        sid,
-                        run_id,
-                        'simulation_complete',
-                        completion_payload,
-                    ):
+                    try:
+                        completion_payload = _completion_payload(sim)
+                        _record_last_recipe_capture(
+                            sid,
+                            run_id,
+                            completion_payload=completion_payload,
+                        )
+                        emitted = _emit_if_current(
+                            socketio,
+                            sid,
+                            run_id,
+                            'simulation_complete',
+                            completion_payload,
+                        )
+                    except Exception as exc:  # noqa: BLE001 -- loop boundary
+                        stop_for_failure(exc, sim)
+                        break
+                    if not emitted:
                         break
                     with _simulations_guard:
                         current = _simulations.get(sid)
@@ -911,65 +996,10 @@ def _start_background_loop(
                         'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,
                     }
-                    if not _emit_if_current(
-                        socketio,
-                        sid,
-                        run_id,
-                        'simulation_status',
-                        error_payload,
-                    ):
-                        break
-                    with _simulations_guard:
-                        current = _simulations.get(sid)
-                        if (
-                            current is not None
-                            and current.get('run_id') == run_id
-                        ):
-                            current['running'] = False
-                            current['paused'] = False
+                    stop_with_status(error_payload)
                     break
                 except Exception as exc:
-                    _safe_log(f'Simulation loop failed: {exc}')
-                    message = str(exc)
-                    unenriched_message = message
-                    poisoned = None
-                    try:
-                        poisoned = getattr(sim, '_poisoned_hour', None)
-                        if poisoned is not None:
-                            poisoned_error = PoisonedHourError(poisoned)
-                            poisoned_detail = f'PoisonedHourError: {poisoned_error}'
-                            if message == str(poisoned_error):
-                                message = poisoned_detail
-                            elif message != poisoned_detail:
-                                message = f'{message}; {poisoned_detail}'
-                    except Exception:  # noqa: BLE001 -- best-effort enrichment
-                        message = unenriched_message
-                        poisoned = None
-                    error_payload = {
-                        'status': 'error',
-                        'message': message,
-                        'backend_status': backend_status,
-                        'backend_authoritative': backend_authoritative,
-                        'backend_message': backend_message,
-                    }
-                    if poisoned is not None:
-                        error_payload['reason'] = 'poisoned_hour'
-                    if not _emit_if_current(
-                        socketio,
-                        sid,
-                        run_id,
-                        'simulation_status',
-                        error_payload,
-                    ):
-                        break
-                    with _simulations_guard:
-                        current = _simulations.get(sid)
-                        if (
-                            current is not None
-                            and current.get('run_id') == run_id
-                        ):
-                            current['running'] = False
-                            current['paused'] = False
+                    stop_for_failure(exc, sim)
                     break
 
             if step_result is None:
@@ -990,43 +1020,47 @@ def _start_background_loop(
                 break
 
             sim = session.simulator
-            tick_data = _tick_payload(
-                sim=sim,
-                snapshot=step_result.snapshot,
-                backend_message=backend_message,
-                backend_status=backend_status,
-                backend_authoritative=backend_authoritative,
-                backend_error=step_result.backend_error,
-            )
-            _record_last_recipe_capture(
-                sid,
-                run_id,
-                tick_data=tick_data,
-                per_hour_summary=step_result.per_hour_summary,
-            )
-            if not _emit_if_current(
-                socketio, sid, run_id, 'simulation_tick', tick_data
-            ):
-                break
+            try:
+                tick_data = _tick_payload(
+                    sim=sim,
+                    snapshot=step_result.snapshot,
+                    backend_message=backend_message,
+                    backend_status=backend_status,
+                    backend_authoritative=backend_authoritative,
+                    backend_error=step_result.backend_error,
+                )
+                _record_last_recipe_capture(
+                    sid,
+                    run_id,
+                    tick_data=tick_data,
+                    per_hour_summary=step_result.per_hour_summary,
+                )
+                if not _emit_if_current(
+                    socketio, sid, run_id, 'simulation_tick', tick_data
+                ):
+                    break
 
-            if not _emit_if_current(
-                socketio,
-                sid,
-                run_id,
-                'per_hour_summary',
-                step_result.per_hour_summary,
-            ):
-                break
-
-            if step_result.campaign_summary is not None:
                 if not _emit_if_current(
                     socketio,
                     sid,
                     run_id,
-                    'campaign_complete_summary',
-                    step_result.campaign_summary,
+                    'per_hour_summary',
+                    step_result.per_hour_summary,
                 ):
                     break
+
+                if step_result.campaign_summary is not None:
+                    if not _emit_if_current(
+                        socketio,
+                        sid,
+                        run_id,
+                        'campaign_complete_summary',
+                        step_result.campaign_summary,
+                    ):
+                        break
+            except Exception as exc:  # noqa: BLE001 -- loop boundary
+                stop_for_failure(exc, sim)
+                break
 
             campaign_summary = step_result.campaign_summary
             c6_refusal = (
@@ -1300,6 +1334,12 @@ def register_events(socketio):
                 'backend_authoritative': resolution_status.authoritative,
             }, room=sid)
             return
+        except (TypeError, ValueError) as exc:
+            socketio.emit('simulation_status', {
+                'status': 'error',
+                'message': str(exc),
+            }, room=sid)
+            return
         sim = session.simulator
 
         state, run_lock = _replace_simulation_state(sid, session, speed)
@@ -1360,32 +1400,42 @@ def register_events(socketio):
     @socketio.on('pause_simulation')
     def handle_pause():
         sid = request.sid
-        state, _ = _current_simulation_state(sid)
-        if state:
-            state['session'].pause()
-            state['paused'] = True
-            _emit_if_current(
-                socketio,
-                sid,
-                state['run_id'],
-                'simulation_status',
-                {'status': 'paused'},
-            )
+        state, lock = _current_simulation_state(sid)
+        if state and lock:
+            run_id = state['run_id']
+            with lock:
+                current, _ = _current_simulation_state(sid, run_id)
+                if current is not state or not state['running']:
+                    return
+                state['session'].pause()
+                state['paused'] = True
+                _emit_if_current(
+                    socketio,
+                    sid,
+                    run_id,
+                    'simulation_status',
+                    {'status': 'paused'},
+                )
 
     @socketio.on('resume_simulation')
     def handle_resume():
         sid = request.sid
-        state, _ = _current_simulation_state(sid)
-        if state:
-            state['session'].resume()
-            state['paused'] = False
-            _emit_if_current(
-                socketio,
-                sid,
-                state['run_id'],
-                'simulation_status',
-                {'status': 'resumed'},
-            )
+        state, lock = _current_simulation_state(sid)
+        if state and lock:
+            run_id = state['run_id']
+            with lock:
+                current, _ = _current_simulation_state(sid, run_id)
+                if current is not state or not state['running']:
+                    return
+                state['session'].resume()
+                state['paused'] = False
+                _emit_if_current(
+                    socketio,
+                    sid,
+                    run_id,
+                    'simulation_status',
+                    {'status': 'resumed'},
+                )
 
     @socketio.on('make_decision')
     def handle_decision(data):
@@ -1419,6 +1469,9 @@ def register_events(socketio):
         if state and lock:
             resume_loop = False
             with lock:
+                current, _ = _current_simulation_state(sid, state['run_id'])
+                if current is not state or not state['running']:
+                    return
                 session = state['session']
                 decision = session.pending_decision()
                 if decision is None:
@@ -1440,17 +1493,17 @@ def register_events(socketio):
                 session.decide(choice)
                 resume_loop = True
                 session.resume()
-            state['paused'] = False
-            _emit_if_current(
-                socketio,
-                sid,
-                state['run_id'],
-                'simulation_status',
-                {
-                    'status': 'decision_applied',
-                    'choice': choice,
-                },
-            )
+                state['paused'] = False
+                _emit_if_current(
+                    socketio,
+                    sid,
+                    state['run_id'],
+                    'simulation_status',
+                    {
+                        'status': 'decision_applied',
+                        'choice': choice,
+                    },
+                )
             if resume_loop:
                 _start_background_loop(
                     socketio,
@@ -1479,67 +1532,126 @@ def register_events(socketio):
             }, room=sid)
             return
         state, lock = _current_simulation_state(sid)
-        if not state:
+        if not state or not lock:
             return
 
-        param = data.get('param', '')
+        param = str(data.get('param', '') or '').strip()
         value = data.get('value')
 
-        if param == 'speed':
-            try:
-                speed = _coerce_bounded_float(
-                    value,
-                    field='speed',
-                    minimum=0.0,
-                    maximum=_MAX_SIM_SPEED_SECONDS,
-                )
-            except InputValidationError as exc:
-                _emit_if_current(
-                    socketio,
-                    sid,
-                    state['run_id'],
-                    'simulation_status',
-                    {'status': 'error', 'message': str(exc)},
+        def reject_adjustment(message: str) -> None:
+            _emit_if_current(
+                socketio,
+                sid,
+                state['run_id'],
+                'simulation_status',
+                {'status': 'error', 'message': message},
+            )
+
+        supported = {
+            'speed',
+            'stir_factor',
+            'pO2_mbar',
+            'c4_max_temp',
+            'campaign_override',
+        }
+        if param not in supported:
+            reject_adjustment(f'unsupported parameter adjustment {param!r}')
+            return
+        if param == 'campaign_override':
+            campaign_name = str(data.get('campaign', '') or '').strip()
+            field_name = str(data.get('field', '') or '').strip()
+            if not campaign_name or not field_name:
+                reject_adjustment(
+                    'campaign_override requires campaign and field'
                 )
                 return
-            if lock:
-                with lock:
+        else:
+            campaign_name = ''
+            field_name = ''
+
+        run_id = state['run_id']
+        with lock:
+            current, _ = _current_simulation_state(sid, run_id)
+            if current is not state or not state['running']:
+                return
+            melt_snapshot = None
+            campaign_overrides_snapshot = None
+            try:
+                if param == 'speed':
+                    speed = _coerce_bounded_float(
+                        value,
+                        field='speed',
+                        minimum=0.0,
+                        maximum=_MAX_SIM_SPEED_SECONDS,
+                    )
                     state['speed'] = speed
-            else:
-                state['speed'] = speed
-            value = speed
-        elif param == 'stir_factor' and lock:
-            with lock:
-                state['session'].adjust('stir_factor', value)
-        elif param == 'pO2_mbar' and lock:
-            with lock:
-                state['session'].adjust('pO2_mbar', value)
-        elif param == 'c4_max_temp' and lock:
-            with lock:
-                state['session'].adjust('c4_max_temp', value)
-        elif param == 'campaign_override' and lock:
-            # data = {param: 'campaign_override', campaign: 'C2A',
-            #         field: 'ramp_rate', value: 10.0}
-            campaign_name = data.get('campaign', '')
-            field_name = data.get('field', '')
-            field_value = data.get('value')
-            if campaign_name and field_name:
-                with lock:
+                    value = speed
+                elif param == 'stir_factor':
+                    state['session'].adjust('stir_factor', value)
+                elif param == 'pO2_mbar':
+                    pO2 = _coerce_bounded_float(
+                        value,
+                        field='pO2_mbar',
+                        minimum=0.0,
+                    )
+                    melt = state['session'].simulator.melt
+                    melt_snapshot = {
+                        'pO2_mbar': melt.pO2_mbar,
+                        'p_total_mbar': melt.p_total_mbar,
+                        'atmosphere': melt.atmosphere,
+                    }
+                    state['session'].adjust('pO2_mbar', pO2)
+                    value = pO2
+                elif param == 'c4_max_temp':
+                    c4_max_temp = _coerce_bounded_float(
+                        value,
+                        field='c4_max_temp',
+                        minimum=0.0,
+                        maximum=_MAX_C4_TEMP_C,
+                    )
+                    state['session'].adjust('c4_max_temp', c4_max_temp)
+                    value = c4_max_temp
+                else:
+                    sim = state['session'].simulator
+                    campaign_overrides_snapshot = copy.deepcopy(
+                        sim.campaign_mgr.overrides
+                    )
+                    melt = sim.melt
+                    if melt.campaign.name == campaign_name:
+                        melt_snapshot = {
+                            'pO2_mbar': melt.pO2_mbar,
+                            'p_total_mbar': melt.p_total_mbar,
+                            'atmosphere': melt.atmosphere,
+                            'stir_state': copy.deepcopy(melt.stir_state),
+                        }
+                    CampaignManager.validate_runtime_campaign_overrides(
+                        {campaign_name: {field_name: value}}
+                    )
                     state['session'].adjust(
                         'campaign_override',
-                        field_value,
+                        value,
                         campaign=campaign_name,
                         field=field_name,
                     )
+            except (InputValidationError, TypeError, ValueError) as exc:
+                sim = state['session'].simulator
+                if campaign_overrides_snapshot is not None:
+                    sim.campaign_mgr.overrides = campaign_overrides_snapshot
+                if melt_snapshot is not None:
+                    melt = sim.melt
+                    for attr, snapshot_value in melt_snapshot.items():
+                        setattr(melt, attr, snapshot_value)
+                reject_adjustment(str(exc))
+                return
 
-        _emit_if_current(
-            socketio,
-            sid,
-            state['run_id'],
-            'simulation_status',
-            {
-                'status': 'parameter_adjusted',
-                'param': param,
-                'value': value,
-            },
-        )
+            _emit_if_current(
+                socketio,
+                sid,
+                run_id,
+                'simulation_status',
+                {
+                    'status': 'parameter_adjusted',
+                    'param': param,
+                    'value': value,
+                },
+            )

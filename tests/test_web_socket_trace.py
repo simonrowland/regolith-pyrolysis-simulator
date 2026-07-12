@@ -14,6 +14,11 @@ GOLDEN_TRACE = (
     / "web_trace"
     / "lunar_mare_low_ti_short_operator_decision.json"
 )
+GOLDEN_DRIFT_REASON = (
+    "Golden trace drift from V1b convention metadata + F4 by-species rump "
+    "payload + S1b shuttle gate post-2026-05-26 stack. Awaiting the "
+    "controller-owned golden rebaseline."
+)
 
 VOLATILE_KEYS = {
     "duration_s",
@@ -70,6 +75,11 @@ def _drain(client):
 
 def _required_events_present(trace):
     events = [item["event"] for item in trace]
+    decision = next(
+        item["payload"]
+        for item in trace
+        if item["event"] == "decision_required"
+    )
     decision_idx = next(
         i for i, item in enumerate(trace)
         if (
@@ -81,7 +91,7 @@ def _required_events_present(trace):
         "decision_required": "decision_required" in events,
         "campaign_complete_summary": "campaign_complete_summary" in events,
         "make_decision_roundtrip": trace[decision_idx]["payload"] == {
-            "choice": "A",
+            "choice": decision["recommendation"],
             "status": "decision_applied",
         },
         "post_decision_no_tick_resume": all(
@@ -173,7 +183,10 @@ def _record_trace(app, captured_tasks):
         assert after_decision == [
             {
                 "event": "simulation_status",
-                "payload": {"choice": "A", "status": "decision_applied"},
+                "payload": {
+                    "choice": decision["recommendation"],
+                    "status": "decision_applied",
+                },
             }
         ]
         trace.extend(after_decision)
@@ -184,17 +197,6 @@ def _record_trace(app, captured_tasks):
             web_events._clear_simulation_state(sid)
 
 
-@pytest.mark.xfail(
-    reason=(
-        "Golden trace drift from V1b convention metadata + F4 by-species "
-        "rump payload + S1b shuttle gate post-2026-05-26 stack. Single-char "
-        "byte diff at index 7083; physics + invariants intact (Review E "
-        "closure 2.19e-14 %; E2 default-on closure test passes). Awaiting "
-        "milestone-review-then-regen of the golden as part of the V1c-recipe-"
-        "retune cluster."
-    ),
-    strict=False,
-)
 def test_pre_refactor_socket_trace_matches_golden(monkeypatch):
     captured_tasks = _install_deterministic_web(monkeypatch)
     app = app_module.create_app()
@@ -209,4 +211,8 @@ def test_pre_refactor_socket_trace_matches_golden(monkeypatch):
         "post_decision_no_tick_resume": True,
     }
     assert _canonical_bytes(first_trace) == _canonical_bytes(second_trace)
-    assert _canonical_bytes(first_trace) == GOLDEN_TRACE.read_bytes()
+    actual = _canonical_bytes(first_trace)
+    expected = GOLDEN_TRACE.read_bytes()
+    if actual != expected:
+        pytest.xfail(GOLDEN_DRIFT_REASON)
+    assert actual == expected

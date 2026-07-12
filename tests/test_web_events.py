@@ -1436,6 +1436,18 @@ def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch
             },
             "runtime_campaign_overrides.C2A.pO2_mbar",
         ),
+        (
+            {"runtime_campaign_overrides": {"C2A": {"pO2_mbar": -1}}},
+            "runtime_campaign_overrides.C2A.pO2_mbar",
+        ),
+        (
+            {"runtime_campaign_overrides": {"NOT_A_CAMPAIGN": {"x": 1}}},
+            "unknown runtime_campaign_overrides campaign",
+        ),
+        (
+            {"runtime_campaign_overrides": {"C2A": {"not_a_field": 1}}},
+            "unknown runtime_campaign_overrides",
+        ),
         ({"c4_max_temp_C": "nan"}, "c4_max_temp_C"),
         ({"c5_enabled": True, "mre_max_voltage_V": "abc"}, "mre_max_voltage_V"),
         ({"additives": {"Na": "abc"}}, "additives.Na"),
@@ -1698,6 +1710,162 @@ def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
             _clear_simulation_state(sid)
 
 
+def test_adjust_po2_rolls_back_when_post_mutation_validation_fails(monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+        sid = (set(_simulations) - before).pop()
+        state, _ = _current_simulation_state(sid)
+        melt = state["session"].simulator.melt
+        snapshot = (melt.pO2_mbar, melt.p_total_mbar, melt.atmosphere)
+
+        def reject_pressure_state():
+            raise ValueError("pressure validation failed")
+
+        monkeypatch.setattr(melt, "validate_melt_pressures", reject_pressure_state)
+        client.emit("adjust_parameter", {"param": "pO2_mbar", "value": 1.5})
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+
+        assert (melt.pO2_mbar, melt.p_total_mbar, melt.atmosphere) == snapshot
+        assert statuses[-1]["status"] == "error"
+        assert "pressure validation failed" in statuses[-1]["message"]
+        assert all(item["status"] != "parameter_adjusted" for item in statuses)
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_adjust_campaign_override_rolls_back_after_validation_failure(monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+        sid = (set(_simulations) - before).pop()
+        state, _ = _current_simulation_state(sid)
+        sim = state["session"].simulator
+        melt = sim.melt
+        campaign_name = melt.campaign.name
+        melt_snapshot = (melt.pO2_mbar, melt.p_total_mbar, melt.atmosphere)
+        overrides_snapshot = copy.deepcopy(sim.campaign_mgr.overrides)
+
+        def reject_pressure_state():
+            raise ValueError("pressure validation failed")
+
+        monkeypatch.setattr(melt, "validate_melt_pressures", reject_pressure_state)
+        client.emit(
+            "adjust_parameter",
+            {
+                "param": "campaign_override",
+                "campaign": campaign_name,
+                "field": "pO2_mbar",
+                "value": 1.5,
+            },
+        )
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+
+        assert (melt.pO2_mbar, melt.p_total_mbar, melt.atmosphere) == melt_snapshot
+        assert sim.campaign_mgr.overrides == overrides_snapshot
+        assert statuses[-1]["status"] == "error"
+        assert "pressure validation failed" in statuses[-1]["message"]
+        assert all(item["status"] != "parameter_adjusted" for item in statuses)
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize(
+    ("payload", "message"),
+    [
+        ({"param": ""}, "unsupported parameter adjustment"),
+        ({"param": "not_supported", "value": 1}, "unsupported parameter adjustment"),
+        (
+            {"param": "campaign_override", "campaign": "C2A", "value": 1},
+            "requires campaign and field",
+        ),
+        (
+            {"param": "campaign_override", "field": "pO2_mbar", "value": 1},
+            "requires campaign and field",
+        ),
+    ],
+)
+def test_adjust_parameter_rejects_unknown_or_incomplete_noops(
+    monkeypatch,
+    payload,
+    message,
+):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "stub",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+        client.emit("adjust_parameter", payload)
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+
+        assert statuses[-1]["status"] == "error"
+        assert message in statuses[-1]["message"]
+        assert all(item["status"] != "parameter_adjusted" for item in statuses)
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
 def test_replacing_simulation_state_stops_prior_run():
     sid = "test-replace"
     try:
@@ -1743,8 +1911,187 @@ def test_stale_run_id_cannot_emit_after_restart():
             recorder, sid, second["run_id"], "simulation_tick", {"fresh": True}
         ) is True
         assert recorder.emitted == [
-            ("simulation_tick", {"fresh": True}, sid)
+            (
+                "simulation_tick",
+                {"fresh": True, "run_id": second["run_id"]},
+                sid,
+            )
         ]
+    finally:
+        _clear_simulation_state(sid)
+
+
+def test_restart_waits_for_current_emit_and_payload_identifies_run():
+    sid = "test-emit-restart-order"
+    emit_entered = threading.Event()
+    release_emit = threading.Event()
+    replacement_done = threading.Event()
+    emitted = []
+
+    class BlockingRecorder:
+        def emit(self, event, payload, room=None):
+            emitted.append((event, payload, room))
+            emit_entered.set()
+            assert release_emit.wait(timeout=2.0)
+
+    try:
+        first, _ = _replace_simulation_state(sid, object(), speed=0.0)
+        emitter = threading.Thread(
+            target=_emit_if_current,
+            args=(
+                BlockingRecorder(),
+                sid,
+                first["run_id"],
+                "simulation_tick",
+                {"hour": 1},
+            ),
+        )
+        emitter.start()
+        assert emit_entered.wait(timeout=2.0)
+
+        def replace():
+            _replace_simulation_state(sid, object(), speed=0.0)
+            replacement_done.set()
+
+        replacer = threading.Thread(target=replace)
+        replacer.start()
+        assert not replacement_done.wait(timeout=0.05)
+        release_emit.set()
+        emitter.join(timeout=2.0)
+        replacer.join(timeout=2.0)
+
+        assert replacement_done.is_set()
+        assert emitted == [
+            (
+                "simulation_tick",
+                {"hour": 1, "run_id": first["run_id"]},
+                sid,
+            )
+        ]
+    finally:
+        release_emit.set()
+        _clear_simulation_state(sid)
+
+
+def test_loop_rechecks_pause_after_acquiring_run_lock(monkeypatch):
+    sid = "test-pause-after-lock"
+    state, _ = _replace_simulation_state(
+        sid,
+        SimpleNamespace(simulator=object(), is_complete=lambda: False),
+        speed=0.0,
+    )
+    drive_calls = []
+
+    class PauseOnEnter:
+        def __enter__(self):
+            state["paused"] = True
+
+        def __exit__(self, *_args):
+            return False
+
+    class StopPausedLoop(Exception):
+        pass
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+        def sleep(self, _seconds):
+            raise StopPausedLoop
+
+    socket = Socket()
+    monkeypatch.setattr(
+        web_events,
+        "drive_session",
+        lambda *_args, **_kwargs: drive_calls.append(True),
+    )
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            PauseOnEnter(),
+            "backend",
+            "available",
+            True,
+        )
+        with pytest.raises(StopPausedLoop):
+            socket.target()
+        assert drive_calls == []
+    finally:
+        _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize("failure_site", ["completion", "tick", "emit"])
+def test_loop_projection_and_emit_failures_stop_current_run(
+    monkeypatch,
+    failure_site,
+):
+    sid = f"test-loop-failure-{failure_site}"
+    emitted = []
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+        def emit(self, event, payload, room=None):
+            if failure_site == "emit" and event == "simulation_tick":
+                self.failed_tick = True
+                raise RuntimeError("tick emit failed")
+            emitted.append((event, payload, room))
+
+    socket = Socket()
+    sim = SimpleNamespace(_poisoned_hour=None)
+    session = SimpleNamespace(
+        simulator=sim,
+        is_complete=lambda: failure_site == "completion",
+    )
+    state, lock = _replace_simulation_state(sid, session, speed=0.0)
+    step_result = SimpleNamespace(
+        snapshot=object(),
+        backend_error="",
+        per_hour_summary={},
+        campaign_summary=None,
+        decision_event=None,
+    )
+    monkeypatch.setattr(
+        web_events,
+        "drive_session",
+        lambda *_args, **_kwargs: iter([step_result]),
+    )
+    if failure_site == "completion":
+        monkeypatch.setattr(
+            web_events,
+            "_completion_payload",
+            lambda _sim: (_ for _ in ()).throw(RuntimeError("completion failed")),
+        )
+    elif failure_site == "tick":
+        monkeypatch.setattr(
+            web_events,
+            "_tick_payload",
+            lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("tick failed")),
+        )
+    else:
+        monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            lock,
+            "backend",
+            "available",
+            True,
+        )
+        socket.target()
+        assert state["running"] is False
+        assert state["paused"] is False
+        statuses = [payload for event, payload, _room in emitted if event == "simulation_status"]
+        assert statuses[-1]["status"] == "error"
+        assert statuses[-1]["run_id"] == state["run_id"]
     finally:
         _clear_simulation_state(sid)
 
@@ -2088,6 +2435,7 @@ def test_web_failure_status_and_cleanup_survive_poison_enrichment_failure(
                 "backend_status": "unavailable",
                 "backend_authoritative": False,
                 "backend_message": "Using built-in fallback",
+                "run_id": state["run_id"],
             }
         ]
         assert state["running"] is False
@@ -2486,7 +2834,9 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
             "backend_status",
             "backend_authoritative",
             "backend_message",
+            "run_id",
         }
+        assert refusal["run_id"] == _simulations[sid]["run_id"]
         assert refusal["reason"] == (
             "c6_joint_thermodynamic_liquid_fraction_window_empty"
         )

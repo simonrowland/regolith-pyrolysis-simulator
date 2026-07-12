@@ -349,7 +349,12 @@ def test_pause_resume_around_every_gate_is_ledger_identical(client):
     # No mis-route, no duplicate: each recommendation routed to its own gate.
     assert routed == EXPECTED_ROUTING
     # Bit-identical final ledger -- the strongest "no perturbation" guarantee.
-    assert pert_completion == base_completion
+    assert pert_completion["run_id"] != base_completion["run_id"]
+    assert {
+        key: value for key, value in pert_completion.items() if key != "run_id"
+    } == {
+        key: value for key, value in base_completion.items() if key != "run_id"
+    }
 
 
 def _started(client):
