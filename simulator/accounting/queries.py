@@ -113,6 +113,7 @@ STAGE0_FOULANT_PARTITION_FIELDS = (
 )
 STAGE0_FOULANT_CLOSURE_TOLERANCE_KG = 1e-9
 STAGE0_FOULANT_CLOSURE_REL_TOL = 1e-9
+SECONDS_PER_HOUR = 3600.0
 ROBINOT_EXP1_ANALYZER_VISIBLE_O2_KG = 35.0e-6
 ROBINOT_EXP2_ANALYZER_VISIBLE_O2_KG = 39.229e-6
 ROBINOT_RAW_FAITHFUL_SOURCE_SIDE_O2_KG = 0.881913e-3
@@ -395,6 +396,7 @@ class AccountingQueries:
 
         by_group = getattr(snapshot, "by_group", None)
         if isinstance(by_group, Mapping) and by_group:
+            hourly_events: list[tuple[str, Mapping[str, Any]]] = []
             for group, events in by_group.items():
                 if group not in STAGE0_FOULANT_GROUPS:
                     if _stage0_hourly_events_positive_mass_kg(events) > 0.0:
@@ -404,11 +406,12 @@ class AccountingQueries:
                         )
                     continue
                 for event in _stage0_hourly_event_mappings(events):
-                    _add_stage0_foulant_hourly_event(
-                        groups,
-                        str(group),
-                        event,
-                    )
+                    hourly_events.append((str(group), event))
+            _validate_stage0_hourly_declared_carbon_partitions(
+                tuple(event for _, event in hourly_events)
+            )
+            for group, event in hourly_events:
+                _add_stage0_foulant_hourly_event(groups, group, event)
             return _finalize_stage0_foulant_hourly_groups(groups)
 
         evap = getattr(snapshot, "evap_flux", None)
@@ -1114,8 +1117,10 @@ def _stage0_foulant_registry(sim: Any) -> Any | None:
         return None
     try:
         return getter()
-    except Exception:
-        return None
+    except Exception as exc:
+        raise AccountingError(
+            "Stage-0 foulant registry loading failed"
+        ) from exc
 
 
 def _stage0_positive_float(value: Any) -> float:
@@ -1377,7 +1382,7 @@ def _coalesced_stage0_foulant_diagnostics(
     diagnostics: Any,
 ) -> list[Mapping[str, Any]]:
     coalesced: list[Mapping[str, Any]] = []
-    sulfate: dict[tuple[str, float], dict[str, Any]] = {}
+    sulfate: dict[tuple[str, float, str], dict[str, Any]] = {}
     seen_non_sulfate: set[tuple[str, str, float, str]] = set()
     for diagnostic in diagnostics:
         if not isinstance(diagnostic, Mapping):
@@ -1398,7 +1403,10 @@ def _coalesced_stage0_foulant_diagnostics(
             seen_non_sulfate.add(key)
             coalesced.append(diagnostic)
             continue
-        key = (carrier, feed_kg)
+        source_component = _stage0_normalized_component_key(
+            diagnostic.get("source_component")
+        )
+        key = (carrier, feed_kg, source_component)
         row = sulfate.setdefault(
             key,
             {
@@ -1782,6 +1790,8 @@ def _stage0_hourly_event_positive_mass_kg(event: Mapping[str, Any]) -> float:
     total += _stage0_positive_float(event.get("amount_kg"))
     total += _stage0_positive_float(event.get("decomposed_kg"))
     total += _stage0_positive_float(event.get("evolved_kg_hr"))
+    total += _stage0_positive_float(event.get("refractory_residual_C_kg"))
+    total += _stage0_positive_float(event.get("carbonate_C_kg"))
     return total
 
 
@@ -1795,17 +1805,28 @@ def _add_stage0_foulant_hourly_event(
     amount_kg = _stage0_positive_float(event.get("amount_kg"))
     decomposed_kg = _stage0_positive_float(event.get("decomposed_kg"))
     evolved_kg = _stage0_positive_float(event.get("evolved_kg_hr"))
+    producer_retained_kg = 0.0
+    if disposition == "residual" and "refractory_residual_C_kg" in event:
+        producer_retained_kg = _stage0_required_non_negative_float(
+            event.get("refractory_residual_C_kg"),
+            "refractory_residual_C_kg",
+        )
+    elif disposition == "carbonate_residual" and "carbonate_C_kg" in event:
+        producer_retained_kg = _stage0_required_non_negative_float(
+            event.get("carbonate_C_kg"),
+            "carbonate_C_kg",
+        )
     explicit_fields = {
         field: _stage0_positive_float(event.get(field))
         for field in STAGE0_FOULANT_PARTITION_FIELDS
     }
     explicit_total_kg = sum(explicit_fields.values())
-    feed_kg = _stage0_positive_float(event.get("feed_kg"))
     channel_count = sum((
         explicit_total_kg > 0.0,
         disposition != "" and amount_kg > 0.0,
         decomposed_kg > 0.0,
         evolved_kg > 0.0,
+        producer_retained_kg > 0.0,
     ))
     if channel_count > 1:
         raise AccountingError(
@@ -1813,27 +1834,271 @@ def _add_stage0_foulant_hourly_event(
             "channels"
         )
     if explicit_total_kg > 0.0:
-        _validate_stage0_hourly_feed_closure(feed_kg, explicit_total_kg)
+        _validate_stage0_hourly_mass_basis(event, explicit_total_kg)
         for field, amount in explicit_fields.items():
             payload[field] += amount
     elif disposition in {"escaped", "evolved"} and amount_kg > 0.0:
-        _validate_stage0_hourly_feed_closure(feed_kg, amount_kg)
+        _validate_stage0_hourly_mass_basis(event, amount_kg)
         payload["escaped_kg"] += amount_kg
     elif disposition == "rump" and amount_kg > 0.0:
-        _validate_stage0_hourly_feed_closure(feed_kg, amount_kg)
+        _validate_stage0_hourly_mass_basis(event, amount_kg)
         payload["rump_kg"] += amount_kg
     elif disposition in {"residual", "carbonate_residual"} and amount_kg > 0.0:
-        _validate_stage0_hourly_feed_closure(feed_kg, amount_kg)
+        _validate_stage0_hourly_mass_basis(event, amount_kg)
         payload["retained_kg"] += amount_kg
+    elif producer_retained_kg > 0.0:
+        _validate_stage0_hourly_mass_basis(event, producer_retained_kg)
+        payload["retained_kg"] += producer_retained_kg
     elif decomposed_kg > 0.0:
-        _validate_stage0_hourly_feed_closure(feed_kg, decomposed_kg)
+        _validate_stage0_hourly_mass_basis(event, decomposed_kg)
         payload["escaped_kg"] += decomposed_kg
     elif evolved_kg > 0.0:
-        _validate_stage0_hourly_feed_closure(feed_kg, evolved_kg)
+        _validate_stage0_hourly_mass_basis(event, evolved_kg)
         payload["escaped_kg"] += evolved_kg
     interval = event.get("residual_interval")
     if isinstance(interval, Mapping):
-        payload["_residual_intervals"].append(dict(interval))
+        payload["_residual_intervals"].append(
+            _stage0_hourly_residual_interval(event, interval)
+        )
+
+
+def _validate_stage0_hourly_mass_basis(
+    event: Mapping[str, Any],
+    allocated_kg: float,
+) -> None:
+    if str(event.get("mass_basis") or "") != "declared_C":
+        _validate_stage0_hourly_feed_closure(
+            _stage0_positive_float(event.get("feed_kg")),
+            allocated_kg,
+        )
+        return
+    declared_c_mol = _stage0_required_non_negative_float(
+        event.get("declared_c_mol"),
+        "declared_c_mol",
+    )
+    declared_c_kg = (
+        declared_c_mol * ATOMIC_WEIGHTS_G_PER_MOL["C"] / 1000.0
+    )
+    partition_basis_kg = sum(
+        _stage0_required_non_negative_float(event.get(field), field)
+        for field in ("labile_C_kg", "refractory_C_kg", "carbonate_C_kg")
+        if field in event
+    )
+    if (
+        partition_basis_kg
+        > declared_c_kg + STAGE0_FOULANT_CLOSURE_TOLERANCE_KG
+    ):
+        raise AccountingError(
+            "Stage-0 foulant hourly declared-carbon channel bases exceed "
+            f"partition: {partition_basis_kg:.15g} kg channel C vs "
+            f"{declared_c_kg:.15g} kg declared C"
+        )
+    channel_basis = _stage0_hourly_declared_carbon_channel_basis(event)
+    if (
+        allocated_kg > STAGE0_FOULANT_CLOSURE_TOLERANCE_KG
+        and channel_basis is None
+    ):
+        raise AccountingError(
+            "Stage-0 foulant hourly declared-carbon output has no "
+            "authoritative channel basis"
+        )
+    if (
+        channel_basis is not None
+        and allocated_kg
+        > channel_basis[1] + STAGE0_FOULANT_CLOSURE_TOLERANCE_KG
+    ):
+        raise AccountingError(
+            "Stage-0 foulant hourly declared-carbon output exceeds "
+            f"{channel_basis[0]} basis: {allocated_kg:.15g} kg allocated vs "
+            f"{channel_basis[1]:.15g} kg channel C"
+        )
+    if allocated_kg > declared_c_kg + STAGE0_FOULANT_CLOSURE_TOLERANCE_KG:
+        raise AccountingError(
+            "Stage-0 foulant hourly declared-carbon output exceeds basis: "
+            f"{allocated_kg:.15g} kg allocated vs "
+            f"{declared_c_kg:.15g} kg declared C"
+        )
+
+
+def _stage0_hourly_declared_carbon_channel_basis(
+    event: Mapping[str, Any],
+) -> tuple[str, float] | None:
+    disposition = str(event.get("disposition") or "")
+    if _stage0_positive_float(event.get("burned_kg")) > 0.0:
+        field = "labile_C_kg"
+    elif disposition == "residual":
+        field = "refractory_C_kg"
+    elif disposition == "carbonate_residual":
+        field = "carbonate_C_kg"
+    else:
+        return None
+    return field, _stage0_required_non_negative_float(event.get(field), field)
+
+
+def _validate_stage0_hourly_declared_carbon_partitions(
+    events: tuple[Mapping[str, Any], ...],
+) -> None:
+    partitions: dict[tuple[Any, ...], dict[str, Any]] = {}
+    for event in events:
+        key = _stage0_hourly_declared_carbon_partition_key(event)
+        if key is None:
+            continue
+        declared_c_mol = _stage0_required_non_negative_float(
+            event.get("declared_c_mol"),
+            "declared_c_mol",
+        )
+        declared_c_kg = (
+            declared_c_mol * ATOMIC_WEIGHTS_G_PER_MOL["C"] / 1000.0
+        )
+        bucket = partitions.setdefault(
+            key,
+            {
+                "declared_c_kg": declared_c_kg,
+                "basis_kg": 0.0,
+                "channels": set(),
+            },
+        )
+        if not math.isclose(
+            bucket["declared_c_kg"],
+            declared_c_kg,
+            rel_tol=STAGE0_FOULANT_CLOSURE_REL_TOL,
+            abs_tol=STAGE0_FOULANT_CLOSURE_TOLERANCE_KG,
+        ):
+            raise AccountingError(
+                "Stage-0 foulant hourly partition has conflicting "
+                "declared-carbon bases"
+            )
+        for field in ("labile_C_kg", "refractory_C_kg", "carbonate_C_kg"):
+            if field not in event:
+                continue
+            if field in bucket["channels"]:
+                raise AccountingError(
+                    "Stage-0 foulant hourly partition has duplicate "
+                    f"{field} channel evidence"
+                )
+            bucket["channels"].add(field)
+            bucket["basis_kg"] += _stage0_required_non_negative_float(
+                event.get(field),
+                field,
+            )
+
+    for bucket in partitions.values():
+        if (
+            bucket["basis_kg"]
+            > bucket["declared_c_kg"] + STAGE0_FOULANT_CLOSURE_TOLERANCE_KG
+        ):
+            raise AccountingError(
+                "Stage-0 foulant hourly declared-carbon channel bases exceed "
+                f"partition: {bucket['basis_kg']:.15g} kg channel C vs "
+                f"{bucket['declared_c_kg']:.15g} kg declared C"
+            )
+
+
+def _stage0_hourly_declared_carbon_partition_key(
+    event: Mapping[str, Any],
+) -> tuple[Any, ...] | None:
+    if str(event.get("mass_basis") or "") != "declared_C":
+        return None
+    partition_id = event.get("partition_id")
+    diagnostic_id = event.get("diagnostic_id")
+    if (
+        partition_id is not None
+        and diagnostic_id is not None
+        and str(partition_id) != str(diagnostic_id)
+    ):
+        raise AccountingError(
+            "Stage-0 foulant hourly event has conflicting partition identifiers"
+        )
+    explicit_id = partition_id if partition_id is not None else diagnostic_id
+    if explicit_id is not None:
+        identifier = str(explicit_id).strip()
+        if not identifier:
+            raise AccountingError(
+                "Stage-0 foulant hourly partition identifier is empty"
+            )
+        return ("explicit", identifier)
+    if str(event.get("source") or "") != "diagnostic":
+        return None
+    # The producer walks mapping-backed gas_volatiles once per carrier. Its
+    # split channel events therefore share one authoritative implicit identity.
+    return (
+        "producer",
+        str(event.get("carrier") or ""),
+        str(event.get("reaction_family") or ""),
+    )
+
+
+def _stage0_hourly_residual_interval(
+    event: Mapping[str, Any],
+    interval: Mapping[str, Any],
+) -> dict[str, Any]:
+    if "low_kg" in interval or "high_kg" in interval:
+        if "low_kg" not in interval or "high_kg" not in interval:
+            raise AccountingError(
+                "Stage-0 foulant residual interval requires low_kg and high_kg"
+            )
+        low_kg = _stage0_required_non_negative_float(
+            interval.get("low_kg"),
+            "residual_interval.low_kg",
+        )
+        high_kg = _stage0_required_non_negative_float(
+            interval.get("high_kg"),
+            "residual_interval.high_kg",
+        )
+    elif "low" in interval or "high" in interval:
+        if "low" not in interval or "high" not in interval:
+            raise AccountingError(
+                "Stage-0 foulant residual interval requires low and high"
+            )
+        if "refractory_C_kg" not in event:
+            raise AccountingError(
+                "Stage-0 foulant fractional residual interval requires "
+                "refractory_C_kg basis"
+            )
+        basis_kg = _stage0_required_non_negative_float(
+            event.get("refractory_C_kg"),
+            "refractory_C_kg",
+        )
+        low = _stage0_required_non_negative_float(
+            interval.get("low"),
+            "residual_interval.low",
+        )
+        high = _stage0_required_non_negative_float(
+            interval.get("high"),
+            "residual_interval.high",
+        )
+        if not (0.0 <= low <= high <= 1.0):
+            raise AccountingError(
+                "Stage-0 foulant residual interval must satisfy "
+                "0 <= low <= high <= 1"
+            )
+        low_kg = basis_kg * low
+        high_kg = basis_kg * high
+    else:
+        raise AccountingError(
+            "Stage-0 foulant residual interval has no low/high bounds"
+        )
+    if low_kg > high_kg + STAGE0_FOULANT_CLOSURE_TOLERANCE_KG:
+        raise AccountingError(
+            "Stage-0 foulant residual interval low exceeds high"
+        )
+    return {
+        "low_kg": low_kg,
+        "high_kg": high_kg,
+        "reason": interval.get("reason"),
+    }
+
+
+def _stage0_required_non_negative_float(value: Any, name: str) -> float:
+    try:
+        amount = float(value)
+    except (TypeError, ValueError) as exc:
+        raise AccountingError(f"Stage-0 foulant {name} must be numeric") from exc
+    if not math.isfinite(amount) or amount < 0.0:
+        raise AccountingError(
+            f"Stage-0 foulant {name} must be finite and non-negative"
+        )
+    return amount
 
 
 def _validate_stage0_hourly_feed_closure(
@@ -2033,55 +2298,6 @@ def wall_deposit_candidates_by_segment_kg(
     reachable_segments = model._mixed_temperature_wall_candidate_segments(species)
     if not reachable_segments:
         return {}
-    transport_signatures = {
-        (
-            float(segment.wall_temperature_C),
-            float(getattr(segment, "inner_diameter_m", model.pipe_diameter_m)),
-            round(_segment_wall_regime_factor(model, segment), 15),
-            round(_wall_alpha_for_segment(model, species, segment), 15),
-        )
-        for segment in reachable_segments
-    }
-    if len(transport_signatures) == 1:
-        wall_temperature_C = float(reachable_segments[0].wall_temperature_C)
-        conductance_weights = {
-            segment.name: _wall_geometry_conductance_weight(segment)
-            for segment in reachable_segments
-        }
-        reachable_surface_m2 = sum(conductance_weights.values())
-        if reachable_surface_m2 <= 0.0:
-            return {}
-        total_candidate = wall_deposit_candidate_for_surface_kg(
-            model,
-            species=species,
-            rate_kg_hr=rate_kg_hr,
-            T_cond_C=T_cond_C,
-            melt_temperature_C=melt_temperature_C,
-            wall_temperature_C=wall_temperature_C,
-            surface_area_m2=reachable_surface_m2,
-            pipe_diameter_m=float(
-                getattr(reachable_segments[0], "inner_diameter_m", model.pipe_diameter_m)
-            ),
-            regime_factor=_segment_wall_regime_factor(model, reachable_segments[0]),
-            segment=reachable_segments[0],
-        )
-        from simulator.condensation import _allocate_total_by_weights
-
-        candidates = _allocate_total_by_weights(
-            total_candidate,
-            conductance_weights,
-        )
-        for segment in reachable_segments:
-            supply_kg = min(
-                max(0.0, float(supply_by_segment_kg.get(
-                    segment.name, rate_kg_hr))),
-                rate_kg_hr,
-            )
-            if segment.name in candidates:
-                candidates[segment.name] = min(
-                    candidates[segment.name], supply_kg)
-        return candidates
-
     candidates: dict[str, float] = {}
     for segment in reachable_segments:
         supply_kg = min(
@@ -2132,7 +2348,6 @@ def wall_deposit_candidate_for_surface_kg(
         return 0.0
 
     from simulator.condensation import (
-        _hkl_impingement_flux_mol_m2_s,
         _local_wall_species_pressure_pa,
         _series_resistance_deposition_flux_mol_m2_s,
         _wall_alpha_s,
@@ -2155,16 +2370,6 @@ def wall_deposit_candidate_for_surface_kg(
         vapor_pressure_data=vapor_pressure_data,
     )
     if P_local_pa <= 0.0:
-        return 0.0
-
-    T_ref_K = max(T_cond_C + CELSIUS_TO_KELVIN_OFFSET, 1.0)
-    reference_flux = _hkl_impingement_flux_mol_m2_s(
-        species,
-        P_local_pa,
-        T_ref_K,
-        vapor_pressure_data=vapor_pressure_data,
-    )
-    if reference_flux <= 0.0:
         return 0.0
 
     T_wall_K = max(float(wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
@@ -2192,12 +2397,39 @@ def wall_deposit_candidate_for_surface_kg(
     if flux <= 0.0:
         return 0.0
 
-    residence_s = float(model.residence_time_s.get(0, 0.5))
-    rate_s_inv = (
-        flux / reference_flux
-    ) * max(0.0, float(surface_area_m2))
-    eta = 1.0 - math.exp(-max(0.0, residence_s * rate_s_inv))
-    return max(0.0, min(rate_kg_hr, rate_kg_hr * eta))
+    budget_kg_hr = _wall_deposition_flux_budget_kg_hr(
+        species=species,
+        flux_mol_m2_s=flux,
+        surface_area_m2=surface_area_m2,
+    )
+    return min(rate_kg_hr, budget_kg_hr)
+
+
+def _wall_deposition_flux_budget_kg_hr(
+    *,
+    species: str,
+    flux_mol_m2_s: float,
+    surface_area_m2: float,
+) -> float:
+    values = {
+        "flux_mol_m2_s": flux_mol_m2_s,
+        "surface_area_m2": surface_area_m2,
+    }
+    for name, value in values.items():
+        if not math.isfinite(float(value)) or float(value) < 0.0:
+            raise AccountingError(f"wall capture {name} must be finite and non-negative")
+
+    # Premise: the transport solver returns deposited molar flux at the wall.
+    # Algebra: m_dot = J*A*M. Unit check:
+    # (mol/m2/s)*(m2)*(kg/mol)*(3600 s/h) = kg/h.
+    # Sanity: the budget is zero at zero flux/area and linear before supply cap.
+    molar_mass_kg_mol = resolve_species_formula(species).molar_mass_kg_per_mol()
+    return (
+        flux_mol_m2_s
+        * surface_area_m2
+        * molar_mass_kg_mol
+        * SECONDS_PER_HOUR
+    )
 
 
 def _segment_wall_regime_factor(model: Any, segment: Any) -> float:
@@ -2220,21 +2452,6 @@ def _segment_wall_regime_factor(model: Any, segment: Any) -> float:
         return _knudsen_regime_factor(kn)
     except Exception:
         return float(getattr(model, "regime_factor", 1.0) or 1.0)
-
-
-def _wall_alpha_for_segment(model: Any, species: str, segment: Any) -> float:
-    from simulator.condensation import _wall_alpha_s
-
-    return _wall_alpha_s(
-        species,
-        getattr(model, "materials", None),
-        segment=segment,
-        T_K=max(
-            float(getattr(segment, "wall_temperature_C", 0.0))
-            + CELSIUS_TO_KELVIN_OFFSET,
-            1.0,
-        ),
-    )
 
 
 def _wall_geometry_conductance_weight(segment: Any) -> float:

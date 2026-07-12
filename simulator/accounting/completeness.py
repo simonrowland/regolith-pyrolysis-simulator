@@ -22,9 +22,11 @@ _REQUIRED_CONTRACT_FIELDS = (
     "mid_run_vs_terminal",
     "aggregation",
 )
+_VAPOR_TERMINAL_OFFGAS_ACCOUNT = "terminal.offgas"
 _VAPOR_PRODUCT_ACCOUNTS = (
     "process.condensation_train",
     "process.overhead_gas",
+    _VAPOR_TERMINAL_OFFGAS_ACCOUNT,
     "terminal.chromium_condensed_oxide_stored",
 )
 _VAPOR_RESIDUAL_ACCOUNTS = (
@@ -34,7 +36,7 @@ _VAPOR_RESIDUAL_ACCOUNTS = (
 _VAPOR_WALL_ACCOUNT = "process.wall_deposit_segment_*"
 _VAPOR_PROVENANCE_RULE = "narrow_account_feedstock_clean"
 TARGET_YIELD_PRODUCT_ACCOUNTS = (
-    "terminal.offgas",
+    _VAPOR_TERMINAL_OFFGAS_ACCOUNT,
     "terminal.stage0_salt_phase",
     "terminal.stage0_chloride_salt_phase",
     "terminal.stage0_sulfide_matte",
@@ -146,7 +148,10 @@ class CompletionContract:
     @property
     def allowed_species(self) -> tuple[str, ...]:
         values = self.element_map.get(self.element, ())
-        return tuple(str(species) for species in values)
+        return tuple(dict.fromkeys((
+            *(str(species) for species in values),
+            self.element,
+        )))
 
 
 @dataclass(frozen=True)
@@ -204,8 +209,19 @@ def extraction_completeness_by_target(
             )
             continue
         try:
-            product_mol = _target_equivalent_mol(
-                target, target, products.get(target, 0.0))
+            product_species = tuple(dict.fromkeys((
+                target,
+                _target_element(target),
+                *residual_map.get(target, ()),
+            )))
+            product_mol = sum(
+                _target_equivalent_mol(
+                    target,
+                    species,
+                    products.get(species, 0.0),
+                )
+                for species in product_species
+            )
             residual_mol = 0.0
             for residual in residual_map.get(target, (target,)):
                 residual_mol += _target_equivalent_mol(
@@ -411,6 +427,7 @@ def completion_contracts_from_setpoints(
                 raw_stage.get("contracts", []),
             ))
     _validate_unique_contract_ids(contracts)
+    _validate_unique_contract_targets(contracts)
     return tuple(contracts)
 
 
@@ -507,7 +524,11 @@ def vapor_contract_completeness(
     _validate_contract(contract)
 
     target = contract.target_species or contract.target_key
-    product_kg = _species_kg_by_accounts(queries, contract.product_accounts)
+    product_accounts = tuple(dict.fromkeys((
+        *contract.product_accounts,
+        _VAPOR_TERMINAL_OFFGAS_ACCOUNT,
+    )))
+    product_kg = _species_kg_by_accounts(queries, product_accounts)
     residual_kg = _species_kg_by_accounts(queries, contract.residual_accounts)
     wall_kg: Mapping[str, Any] = {}
     if contract.wall_account:
@@ -523,7 +544,8 @@ def vapor_contract_completeness(
     product_non_feedstock_mol = _non_feedstock_reagent_element_mol(
         contract.element,
         queries,
-        accounts=contract.product_accounts,
+        accounts=product_accounts,
+        gross_surface_target_equiv_mol=gross_product_account_mol,
     )
     product_account_mol = max(
         0.0,
@@ -537,6 +559,7 @@ def vapor_contract_completeness(
         contract.element,
         queries,
         accounts=contract.residual_accounts,
+        gross_surface_target_equiv_mol=residual_mol,
     )
     residual_mol = max(
         0.0,
@@ -548,6 +571,7 @@ def vapor_contract_completeness(
             contract.element,
             queries,
             account_pattern=contract.wall_account,
+            gross_surface_target_equiv_mol=wall_mol,
         )
         wall_mol = max(0.0, wall_mol - min(wall_mol, wall_non_feedstock_mol))
     if wall_mol > _WALL_EPS and not contract.wall_account:
@@ -732,6 +756,31 @@ def _validate_unique_contract_ids(
         )
 
 
+def _validate_unique_contract_targets(
+    contracts: tuple[CompletionContract, ...] | list[CompletionContract],
+) -> None:
+    seen: dict[tuple[str, str | None, str], str] = {}
+    duplicates: list[str] = []
+    for contract in contracts:
+        key = (contract.campaign, contract.stage, contract.target_key)
+        prior_id = seen.get(key)
+        if prior_id is not None:
+            step = (
+                f"{contract.campaign}.{contract.stage}"
+                if contract.stage
+                else contract.campaign
+            )
+            duplicates.append(
+                f"{step}.{contract.target_key}: {prior_id}, {contract.contract_id}"
+            )
+        else:
+            seen[key] = contract.contract_id
+    if duplicates:
+        raise ValueError(
+            "duplicate completion contract targets: " + "; ".join(duplicates)
+        )
+
+
 def _validate_contract(contract: CompletionContract) -> None:
     if contract.deferred:
         if not contract.deferred_reason:
@@ -763,7 +812,8 @@ def _validate_contract(contract: CompletionContract) -> None:
         raise ValueError(
             f"{contract.contract_id}: wall_account is required"
         )
-    if not contract.allowed_species:
+    configured_species = contract.element_map.get(contract.element, ())
+    if not configured_species:
         raise ValueError(
             f"{contract.contract_id}: element_map must include target_element"
         )
@@ -939,16 +989,39 @@ def _non_feedstock_reagent_element_mol(
     *,
     accounts: tuple[str, ...] = (),
     account_pattern: str | None = None,
+    gross_surface_target_equiv_mol: float,
 ) -> float:
     helper = getattr(queries, "non_feedstock_reagent_element_kg_by_account", None)
     if not callable(helper):
+        if (
+            gross_surface_target_equiv_mol > _EPS
+            and _target_element_has_reagent_signal(element, queries)
+        ):
+            raise CompletionContractBlocked(
+                f"unclean additive/reagent provenance for {element}: "
+                "non_feedstock_reagent_element_kg_by_account surface unavailable"
+            )
         return 0.0
     values = helper()
     if not isinstance(values, Mapping):
-        return 0.0
+        raise CompletionContractBlocked(
+            f"unclean additive/reagent provenance for {element}: "
+            "non_feedstock_reagent_element_kg_by_account is not a mapping"
+        )
     element_kg = 0.0
+    provenance_element_kg = 0.0
     for account, element_values in values.items():
         account_name = str(account)
+        if not isinstance(element_values, Mapping):
+            raise CompletionContractBlocked(
+                f"unclean additive/reagent provenance for {element}: "
+                f"{account_name} provenance entry is not a mapping"
+            )
+        account_element_kg = _non_negative_number(
+            element_values.get(element, 0.0),
+            f"non_feedstock_reagent.{account_name}.{element}",
+        )
+        provenance_element_kg += account_element_kg
         if accounts and account_name not in accounts:
             continue
         if account_pattern is not None and not _account_matches_pattern(
@@ -956,11 +1029,20 @@ def _non_feedstock_reagent_element_mol(
             account_pattern,
         ):
             continue
-        if not isinstance(element_values, Mapping):
-            continue
-        element_kg += _non_negative_number(
-            element_values.get(element, 0.0),
-            f"non_feedstock_reagent.{account_name}.{element}",
+        element_kg += account_element_kg
+    required_provenance_mol = _target_element_required_provenance_mol(
+        element,
+        queries,
+    )
+    provenance_mol = _species_mol(element, provenance_element_kg)
+    if (
+        gross_surface_target_equiv_mol > _EPS
+        and required_provenance_mol > _EPS
+        and provenance_mol + _EPS < required_provenance_mol
+    ):
+        raise CompletionContractBlocked(
+            f"unclean additive/reagent provenance for {element}: "
+            "provenance map does not account for declared additive/credit signal"
         )
     return _species_mol(element, element_kg)
 
@@ -1203,14 +1285,13 @@ def _target_element_required_provenance_mol(element: str, queries: Any) -> float
     inventory_mol = _external_reagent_inventory_element_mol(element, queries)
     if any(math.isinf(value) for value in (declared_mol, unspent_mol, credit_mol, inventory_mol)):
         return math.inf
-    declared_required = max(0.0, declared_mol - max(unspent_mol, inventory_mol))
-    credit_required = max(0.0, credit_mol - inventory_mol)
-    inventory_required = (
-        inventory_mol
-        if declared_mol <= _EPS and credit_mol <= _EPS
-        else 0.0
-    )
-    return max(declared_required, credit_required, inventory_required)
+    introduced_mol = declared_mol + credit_mol
+    if introduced_mol <= _EPS:
+        return inventory_mol
+    # Unspent and live-inventory surfaces overlap: subtract their maximum once
+    # from total declared-plus-credited introduction to obtain spent provenance.
+    live_unspent_mol = max(unspent_mol, inventory_mol)
+    return max(0.0, introduced_mol - live_unspent_mol)
 
 
 def _external_unspent_additive_reagent_element_mol(element: str, queries: Any) -> float:
