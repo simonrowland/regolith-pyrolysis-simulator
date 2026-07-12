@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import ast
 import copy
+import hashlib
 import json
 import math
 import signal
@@ -44,7 +45,12 @@ from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
     PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
+    PT1_STORE_SCHEMA_VERSION,
     PT1PersistentEquilibriumStore,
+    _physics_ladder_values_from_replay_key,
+    _replay_scope_hash,
+    canonical_json_bytes,
+    canonical_physics_bucket_key_from_replay_key,
     validate_reduced_real_equilibrium_record_key,
 )
 from simulator.grind_preflight import (
@@ -77,6 +83,10 @@ GATE_LIQUIDUS_UNAVAILABLE_PREFIX = (
 
 class WallCapExceeded(BaseException):
     """Raised when a cache-population case exceeds its absolute wall deadline."""
+
+
+class CacheShardCorpusVersionMismatch(ValueError):
+    """Raised before merge when shard and accumulator corpora differ."""
 
 
 @contextmanager
@@ -345,6 +355,15 @@ def _start_session(
     store: PT0DeterminismStore,
     allow_internal_analytical_equilibrium: bool,
 ) -> SimSession:
+    canonical_backend = canonical_backend_name(backend_name)
+    if canonical_backend == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
+        if not allow_internal_analytical_equilibrium:
+            raise RuntimeError(
+                "internal-analytical backend selected for gate population; pass "
+                "--allow-internal-analytical-equilibrium to use the analytical "
+                "equilibrium only as the "
+                "non-gate step driver while MAGEMin populates GATE_LIQUID_FRACTION"
+            )
     cfg = load_config_bundle()
     session = SimSession().start(
         SimSessionConfig(
@@ -353,21 +372,14 @@ def _start_session(
             setpoints=_setpoints_for_population(cfg.setpoints),
             vapor_pressures=cfg.vapor_pressures,
             campaign=campaign,
-            backend_name=backend_name,
+            backend_name=canonical_backend,
             backend_policy=BackendSelectionPolicy.RUNNER_STRICT,
             mass_kg=mass_kg,
             additives_kg=additives_kg,
         )
     )
     session.simulator.configure_pt0_determinism_store(store)
-    if backend_name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
-        if not allow_internal_analytical_equilibrium:
-            raise RuntimeError(
-                "internal-analytical backend selected for gate population; pass "
-                "--allow-internal-analytical-equilibrium to use the analytical "
-                "equilibrium only as the "
-                "non-gate step driver while MAGEMin populates GATE_LIQUID_FRACTION"
-            )
+    if canonical_backend == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
         session.simulator.backend.is_available = lambda: True
     return session
 
@@ -496,6 +508,10 @@ def _run_case(
     allow_internal_analytical_equilibrium: bool,
     control_quantization: ControlQuantization | None = None,
 ) -> dict[str, Any]:
+    if not math.isfinite(wall_cap_s) or wall_cap_s <= 0.0:
+        raise ValueError("wall_cap_s must be finite and greater than zero")
+    if hours <= 0:
+        raise ValueError("hours must be greater than zero")
     store = PT0DeterminismStore(
         mode,
         db_path=db_path,
@@ -516,8 +532,6 @@ def _run_case(
         _disable_live_providers(session)
 
     rows: list[dict[str, Any]] = []
-    if not math.isfinite(wall_cap_s) or wall_cap_s <= 0.0:
-        raise ValueError("wall_cap_s must be finite and greater than zero")
     started = time.perf_counter()
     deadline = started + wall_cap_s
     stop_reason = "max_hours"
@@ -653,6 +667,24 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
             if "corpus_version" in columns
             else "NULL AS corpus_version"
         )
+        identity_columns = (
+            "physics_bucket_schema_version",
+            "physics_bucket_sha256",
+            "replay_scope_sha256",
+            "physics_key_bytes",
+            "physics_bucket_h40_sha256",
+            "physics_bucket_h40_distance",
+            "physics_bucket_h30_sha256",
+            "physics_bucket_h30_distance",
+            "physics_bucket_h40c_sha256",
+            "physics_bucket_h40c_distance",
+            "physics_bucket_h30c_sha256",
+            "physics_bucket_h30c_distance",
+        )
+        identity_selects = ",\n                    ".join(
+            name if name in columns else f"NULL AS {name}"
+            for name in identity_columns
+        )
         return [
             dict(row)
             for row in conn.execute(
@@ -670,12 +702,102 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
                     {corpus_column},
                     engine_version,
                     data_digests_json,
+                    {identity_selects},
                     created_at,
                     git_dirty
                 FROM {PT1_EQUILIBRIUM_TABLE}
                 """
             )
         ]
+
+
+def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
+    artifact = str(row["artifact"])
+    key_bytes = bytes(row["key_bytes"])
+    payload_bytes = bytes(row["payload_bytes"])
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    payload_hash = hashlib.sha256(payload_bytes).hexdigest()
+    if str(row["key_hash"]) != key_hash or str(row["key_sha256"]) != key_hash:
+        raise RuntimeError(f"PT-1 cache shard row key hash mismatch: {row['key_hash']}")
+    if str(row["payload_sha256"]) != payload_hash:
+        raise RuntimeError(
+            f"PT-1 cache shard row payload hash mismatch: {row['key_hash']}"
+        )
+    try:
+        key = json.loads(key_bytes.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        raise RuntimeError(
+            f"PT-1 cache shard row has invalid key bytes: {row['key_hash']}"
+        ) from exc
+    try:
+        payload = json.loads(payload_bytes.decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        raise RuntimeError(
+            f"PT-1 cache shard row has invalid payload bytes: {row['key_hash']}"
+        ) from exc
+    if not isinstance(key, Mapping):
+        raise RuntimeError(
+            f"PT-1 cache shard row key must be a mapping: {row['key_hash']}"
+        )
+    if not isinstance(payload, Mapping):
+        raise RuntimeError(
+            f"PT-1 cache shard row payload must be a mapping: {row['key_hash']}"
+        )
+    if canonical_json_bytes(key) != key_bytes:
+        raise RuntimeError(
+            f"PT-1 cache shard row has non-canonical key bytes: {row['key_hash']}"
+        )
+    if canonical_json_bytes(payload) != payload_bytes:
+        raise RuntimeError(
+            f"PT-1 cache shard row has non-canonical payload bytes: {row['key_hash']}"
+        )
+    if str(row["store_schema_version"]) != PT1_STORE_SCHEMA_VERSION:
+        raise RuntimeError(
+            "PT-1 cache shard row store schema version drift: "
+            f"{row['store_schema_version']}"
+        )
+    if str(row["request_schema_version"]) != str(key.get("schema_version")):
+        raise RuntimeError(
+            f"PT-1 cache shard row request schema drift: {row['key_hash']}"
+        )
+    row_corpus_version = str(row.get("corpus_version") or "")
+    key_corpus_version = str(key.get("corpus_version") or "")
+    if row_corpus_version != key_corpus_version:
+        raise CacheShardCorpusVersionMismatch(
+            "PT-1 cache shard row corpus version mismatch: "
+            f"row={row_corpus_version!r} key={key_corpus_version!r} "
+            f"key_hash={row['key_hash']}"
+        )
+    data_digests_json = canonical_json_bytes(key.get("data_digests", {})).decode(
+        "utf-8"
+    )
+    if str(row["data_digests_json"]) != data_digests_json:
+        raise RuntimeError(f"PT-1 cache shard row data digest drift: {row['key_hash']}")
+    validate_reduced_real_equilibrium_record_key(artifact, key)
+    assert_strict_vapor_pt1_row(
+        artifact=artifact,
+        key=key,
+        key_hash=key_hash,
+        payload=payload,
+        context=f"PT-1 cache shard {artifact}:{key_hash}",
+    )
+    physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
+    physics_bucket_hash = hashlib.sha256(physics_bucket_bytes).hexdigest()
+    return {
+        "artifact": artifact,
+        "key": key,
+        "key_bytes": key_bytes,
+        "key_hash": key_hash,
+        "payload": payload,
+        "payload_bytes": payload_bytes,
+        "payload_hash": payload_hash,
+        "physics_bucket_key": physics_bucket_key,
+        "physics_bucket_bytes": physics_bucket_bytes,
+        "physics_bucket_hash": physics_bucket_hash,
+        "ladder_values": _physics_ladder_values_from_replay_key(key),
+        "data_digests_json": data_digests_json,
+    }
 
 
 def _cache_row_summary(db_path: Path) -> dict[str, Any]:
@@ -723,57 +845,56 @@ def _magemin_key_hashes(db_path: Path) -> set[str]:
 
 def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
     rows = _cache_payload_rows(shard_path)
+    validated_rows = [_validated_cache_payload_row(row) for row in rows]
+    shard_versions = {str(row["key"].get("corpus_version") or "") for row in validated_rows}
+    target_rows = _cache_payload_rows(target_path)
+    target_versions = {
+        str(row.get("corpus_version") or "") for row in target_rows
+    }
+    if len(shard_versions) > 1 or len(target_versions) > 1 or (
+        shard_versions and target_versions and shard_versions != target_versions
+    ):
+        raise CacheShardCorpusVersionMismatch(
+            "PT-1 cache shard corpus version mismatch: "
+            f"shard={sorted(shard_versions)!r} target={sorted(target_versions)!r}"
+        )
     target_store = PT1PersistentEquilibriumStore(target_path)
     inserted_rows = 0
     with target_store._connect() as conn:
         target_store._initialize(conn)
-        for row in rows:
-            artifact = str(row["artifact"])
-            key_hash = str(row["key_hash"])
-            key_bytes = bytes(row["key_bytes"])
-            payload_bytes = bytes(row["payload_bytes"])
-            payload_hash = str(row["payload_sha256"])
-            try:
-                key = json.loads(key_bytes.decode("utf-8"))
-            except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-                raise RuntimeError(
-                    f"PT-1 cache shard row has invalid key bytes: {key_hash}"
-                ) from exc
-            try:
-                payload = json.loads(payload_bytes.decode("utf-8"))
-            except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-                raise RuntimeError(
-                    f"PT-1 cache shard row has invalid payload bytes: {key_hash}"
-                ) from exc
-            if not isinstance(payload, Mapping):
-                raise RuntimeError(
-                    f"PT-1 cache shard row payload must be a mapping: {key_hash}"
-                )
-            validate_reduced_real_equilibrium_record_key(artifact, key)
-            assert_strict_vapor_pt1_row(
-                artifact=artifact,
-                key=key,
-                key_hash=key_hash,
-                payload=payload,
-                context=f"PT-1 cache shard {artifact}:{key_hash}",
-            )
-            existing = conn.execute(
-                f"""
-                SELECT artifact, key_sha256, payload_sha256, key_bytes, payload_bytes
-                FROM {PT1_EQUILIBRIUM_TABLE}
-                WHERE key_hash = ?
-                """,
-                (key_hash,),
-            ).fetchone()
+        for row, validated in zip(rows, validated_rows, strict=True):
+            artifact = validated["artifact"]
+            key = validated["key"]
+            key_hash = validated["key_hash"]
+            key_bytes = validated["key_bytes"]
+            payload = validated["payload"]
+            payload_bytes = validated["payload_bytes"]
+            payload_hash = validated["payload_hash"]
+            physics_bucket_key = validated["physics_bucket_key"]
+            physics_bucket_bytes = validated["physics_bucket_bytes"]
+            physics_bucket_hash = validated["physics_bucket_hash"]
+            ladder_values = validated["ladder_values"]
+            existing = target_store._fetch(conn, key_hash)
             if existing is not None:
-                if (
-                    str(existing["artifact"]) != artifact
-                    or str(existing["key_sha256"]) != str(row["key_sha256"])
-                    or str(existing["payload_sha256"]) != payload_hash
-                    or bytes(existing["key_bytes"]) != key_bytes
-                    or bytes(existing["payload_bytes"]) != payload_bytes
+                entry = target_store._entry_from_row(
+                    existing,
+                    artifact=artifact,
+                    key=key,
+                    key_bytes=key_bytes,
+                    key_hash=key_hash,
+                )
+                if entry["payload_hash"] != payload_hash or (
+                    canonical_json_bytes(entry["payload"]) != payload_bytes
                 ):
                     raise RuntimeError(f"PT-1 cache collision while merging {key_hash}")
+                target_store._update_physics_bucket_columns(
+                    conn,
+                    key_hash=key_hash,
+                    physics_bucket_key=physics_bucket_key,
+                    physics_bucket_bytes=physics_bucket_bytes,
+                    physics_bucket_hash=physics_bucket_hash,
+                    ladder_values=ladder_values,
+                )
                 continue
             conn.execute(
                 f"""
@@ -790,23 +911,47 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     corpus_version,
                     engine_version,
                     data_digests_json,
+                    physics_bucket_schema_version,
+                    physics_bucket_sha256,
+                    replay_scope_sha256,
+                    physics_key_bytes,
+                    physics_bucket_h40_sha256,
+                    physics_bucket_h40_distance,
+                    physics_bucket_h30_sha256,
+                    physics_bucket_h30_distance,
+                    physics_bucket_h40c_sha256,
+                    physics_bucket_h40c_distance,
+                    physics_bucket_h30c_sha256,
+                    physics_bucket_h30c_distance,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
                     artifact,
-                    str(row["store_schema_version"]),
-                    str(row["request_schema_version"]),
-                    str(row["key_sha256"]),
+                    PT1_STORE_SCHEMA_VERSION,
+                    str(key.get("schema_version")),
+                    key_hash,
                     payload_hash,
                     sqlite3.Binary(key_bytes),
                     sqlite3.Binary(payload_bytes),
                     str(row["code_version"]),
                     row.get("corpus_version"),
-                    row["engine_version"],
-                    str(row["data_digests_json"]),
+                    row.get("engine_version"),
+                    validated["data_digests_json"],
+                    str(physics_bucket_key.get("schema_version")),
+                    physics_bucket_hash,
+                    _replay_scope_hash(physics_bucket_key),
+                    sqlite3.Binary(physics_bucket_bytes),
+                    ladder_values["h40"]["sha256"],
+                    ladder_values["h40"]["distance"],
+                    ladder_values["h30"]["sha256"],
+                    ladder_values["h30"]["distance"],
+                    ladder_values["h40c"]["sha256"],
+                    ladder_values["h40c"]["distance"],
+                    ladder_values["h30c"]["sha256"],
+                    ladder_values["h30c"]["distance"],
                     str(row["created_at"]),
                     int(row["git_dirty"]),
                 ),

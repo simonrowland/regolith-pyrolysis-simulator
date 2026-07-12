@@ -1327,7 +1327,7 @@ class PT1PersistentEquilibriumStore:
         exclude_key_hash: str | None = None,
     ) -> list[dict[str, Any]]:
         query = f"""
-            SELECT key_hash, key_bytes, payload_bytes
+            SELECT *
             FROM {{table}}
             WHERE artifact = ?
               AND replay_scope_sha256 = ?
@@ -1352,15 +1352,27 @@ class PT1PersistentEquilibriumStore:
                         continue
                     seen_hashes.add(row_hash)
                     row_key_bytes = _sqlite_bytes(row["key_bytes"])
-                    row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
                     row_key = json.loads(row_key_bytes.decode("utf-8"))
-                    row_payload = json.loads(row_payload_bytes.decode("utf-8"))
+                    entry = self._entry_from_row(
+                        row,
+                        artifact=artifact,
+                        key=row_key,
+                        key_bytes=row_key_bytes,
+                        key_hash=row_hash,
+                    )
+                    row_replay_scope = _replay_scope_hash(
+                        canonical_physics_bucket_key_from_replay_key(entry["key"])
+                    )
+                    if row_replay_scope != replay_scope_sha256:
+                        raise PT1PersistentStoreCorrupt(
+                            f"PT-1 row exact key replay scope mismatch: {row_hash}"
+                        )
                     candidates.append(
                         {
                             "artifact": artifact,
-                            "key": copy.deepcopy(dict(row_key)),
+                            "key": copy.deepcopy(dict(entry["key"])),
                             "key_hash": row_hash,
-                            "payload": copy.deepcopy(dict(row_payload)),
+                            "payload": copy.deepcopy(dict(entry["payload"])),
                         }
                     )
             return candidates
@@ -1711,6 +1723,10 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row key hash mismatch for {artifact}: {key_hash}"
             )
+        if _sha256(row_key_bytes) != key_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row key bytes hash mismatch for {artifact}: {key_hash}"
+            )
         if row_key_bytes != key_bytes:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row canonical request bytes mismatch: {key_hash}"
@@ -1791,6 +1807,16 @@ class PT1PersistentEquilibriumStore:
             )
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_key = json.loads(row_key_bytes.decode("utf-8"))
+        exact_physics_key = canonical_physics_bucket_key_from_replay_key(row_key)
+        exact_physics_bytes = canonical_json_bytes(exact_physics_key)
+        if (
+            exact_physics_bytes != physics_bucket_bytes
+            or _sha256(exact_physics_bytes) != physics_bucket_hash
+        ):
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row exact key does not reproduce physics bucket: "
+                f"{physics_bucket_hash}"
+            )
         return self._entry_from_row(
             row,
             artifact=artifact,
