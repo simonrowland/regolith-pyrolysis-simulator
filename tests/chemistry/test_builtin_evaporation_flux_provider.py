@@ -980,6 +980,38 @@ def test_provider_refuses_missing_species_transport_parameters():
     )
 
 
+def test_provider_keeps_nonempty_computable_transport_set_when_flux_is_zero():
+    result = _w3_result_with_controls(
+        1.0,
+        melt_surface_area_m2=0.0,
+        vapor_pressures_Pa={"Na": 100.0, "Si": 100.0},
+        molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
+        stoich_by_species={
+            "Na": {
+                "parent_oxide": "Na2O",
+                "oxide_per_product_kg": 1.347,
+                "O2_per_product_kg": 0.347,
+            },
+            "Si": {
+                "parent_oxide": "SiO2",
+                "oxide_per_product_kg": 2.139,
+                "O2_per_product_kg": 1.139,
+            },
+        },
+        available_oxide_kg={"Na": 10.0, "Si": 10.0},
+        alpha={"Na": 0.5, "Si": 0.5},
+    )
+
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    assert set(result.diagnostic["evaporation_series_resistance"]) == {"Na"}
+    assert set(result.diagnostic["missing_transport_parameters"]) == {"Si"}
+    assert result.warnings == (
+        "excluded evaporation species with missing Chapman-Enskog transport "
+        "parameters: Si",
+    )
+
+
 def test_provider_refuses_dict_axial_nan():
     result = _w3_result_with_controls({"axial": float("nan")})
 

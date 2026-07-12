@@ -531,3 +531,31 @@ def test_configure_campaign_reset_does_not_clobber_lab_schedule_background():
     assert melt.p_total_mbar == pytest.approx(10.0)
     assert melt.background_gas_species == "N2"
     assert melt.background_gas_mole_fraction == pytest.approx(0.8)
+
+
+def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, EvaporationFlux
+
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"]["species"] = "Ar"
+    schedule["gas_boundary"]["background_gas"]["mole_fraction"] = 0.8
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+    melt = MeltState()
+
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+
+    assert melt.pO2_mbar == pytest.approx(0.0)
+    assert melt.p_total_mbar == pytest.approx(10.0)
+    assert melt.atmosphere is Atmosphere.CONTROLLED_O2
+    assert melt.background_gas_species == "Ar"
+
+    gas = OverheadGasModel({
+        "overhead_headspace": {"enabled": True},
+        "headspace_volume_m3": 1.0,
+        "headspace_temperature_K": 1773.15,
+    }).update(EvaporationFlux(), melt, CondensationTrain.create_default())
+
+    assert gas.composition.get("Ar", 0.0) == pytest.approx(8.0)
+    assert gas.composition.get("N2", 0.0) == pytest.approx(0.0)

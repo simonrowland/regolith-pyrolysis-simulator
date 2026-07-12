@@ -1118,11 +1118,13 @@ condenser_geometry:
   # multipliers for later per-stage Kn/coating work.
   stage_area_ratios:
     fe_stage1: 4.0
+    cr_stage2: 4.5
     sio_stage3: 6.0
     alkali_stage4: 5.0
     terminal: 2.0
   stage_area_ratio_sources:
     fe_stage1: "engineering-default: baffled Fe condenser presents multiple throat areas downstream of the constriction"
+    cr_stage2: "engineering-default: removable Cr oxide cartridge sits between Fe condenser and SiO baffles with intermediate capture surface"
     sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
     alkali_stage4: "engineering-default: cyclone separator effective wall area exceeds throat but stays below SiO baffle cartridge"
     terminal: "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics"
@@ -1640,9 +1642,10 @@ mre_stepped_voltage_holds:
     below 5% of applied current, then advance to next step.
     C5 limited MRE uses only steps up to 1.6 V.
     NOTE: voltages reanchored to raw-thermo (matching DECOMP_VOLTAGES /
-    mre_voltage_sequence, MRE-COVERAGE #32B). This block appears UNCONSUMED
-    (no code reader; the live schedule is mre_voltage_sequence) and is a
-    single-source-of-truth consolidation candidate (SC-09 ladder-drift).
+    mre_voltage_sequence, MRE-COVERAGE #32B). Config normalization reads this
+    block, but live MRE scheduling still consumes mre_voltage_sequence; keep
+    this block as a consolidation candidate until the live ladder reader is
+    unified (SC-09 ladder-drift).
   # voltage: "canonical" resolves through simulator/mre_ladder.py
   # DECOMP_VOLTAGES.
   sequence:
@@ -1891,11 +1894,12 @@ chemistry_kernel:
   # verified present 2026-06-12) and are routinely sampled in
   # default lunar/Mars extraction recipes (Cr2O3 trace ~0.3-0.5 wt%; CrO2(g)
   # is a real VapoRock species). Setting this true makes production use α=1.0
-  # as the HK upper-bound placeholder for those species, with the fallback
-  # status surfaced in the evaporation flux diagnostic so the operator sees
-  # which species are using it. V1e-followon (task #36) is the post-0.5.0
-  # work to either measure α or refine the placeholder policy.
-  allow_unmeasured_alpha_fallback: true
+  # as the HK upper-bound placeholder for those species only when a run opts in
+  # explicitly. The project default is strict/fail-loud so missing Cr, CrO2, and
+  # Mn measurements cannot silently execute production evaporation with α=1.0.
+  # V1e-followon (task #36) is the post-0.5.0 work to either measure α or refine
+  # the placeholder policy.
+  allow_unmeasured_alpha_fallback: false
   evaporation_series_resistance:
     melt_resistance_enabled: true
     melt_surface_renewal_base_kg_s_m2_pa: 1.0e-4

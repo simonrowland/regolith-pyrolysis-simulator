@@ -27,6 +27,7 @@ from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.vaporock import VapoRockBackend
+from simulator.state import Atmosphere
 from tests.chemistry.corpus_fixtures import GRID_25_FEEDSTOCKS
 
 
@@ -142,3 +143,49 @@ def test_intrinsic_kress91_iw_regime_guards_against_vacuum_floor_conflation():
     assert -8.10 <= intrinsic_fO2_log <= -7.85
     assert equilibrium.fO2_log == pytest.approx(intrinsic_fO2_log, abs=0.05)
     assert abs(equilibrium.fO2_log - (-9.0)) > 0.75
+
+
+def test_builtin_sio_suppression_uses_calibrated_reference_not_body_floor():
+    vapor_pressure_data = _load_vapor_pressure_data()
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+
+    def pressure_for_body(body: str) -> float:
+        result = provider.dispatch(
+            IntentRequest(
+                intent=ChemistryIntent.VAPOR_PRESSURE,
+                account_view=ProviderAccountView(
+                    accounts={"process.cleaned_melt": {"SiO2": 1.0}},
+                    species_formula_registry={},
+                ),
+                temperature_C=1600.0,
+                pressure_bar=1.0e-6,
+                control_inputs={"pO2_bar": 1.0e-6, "body": body},
+            )
+        )
+        assert result.status == "ok"
+        return result.diagnostic["vapor_pressures_Pa"]["SiO"]
+
+    moon = pressure_for_body("moon")
+    asteroid = pressure_for_body("asteroid")
+
+    assert moon == pytest.approx(0.06616218437532036)
+    assert asteroid == pytest.approx(moon)
+
+
+def test_legacy_sio_suppression_uses_calibrated_reference_not_body_floor():
+    vapor_pressure_data = _load_vapor_pressure_data()
+
+    def pressure_for_body(body: str) -> float:
+        sim = _build_lunar_12022_sim(vapor_pressure_data)
+        sim.melt.body = body
+        sim.melt.temperature_C = 1600.0
+        sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+        sim.melt.pO2_mbar = 1.0e-3
+        equilibrium = sim._internal_analytical_equilibrium()
+        return equilibrium.vapor_pressures_Pa["SiO"]
+
+    moon = pressure_for_body("moon")
+    asteroid = pressure_for_body("asteroid")
+
+    assert moon == pytest.approx(0.9130172734006163)
+    assert asteroid == pytest.approx(moon)

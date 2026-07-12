@@ -852,6 +852,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         missing_alpha: dict[str, dict[str, float | str]] = {}
         missing_molar_mass: dict[str, dict[str, float | str]] = {}
         missing_transport_parameters: dict[str, dict[str, float | str]] = {}
+        computable_transport_species: set[str] = set()
 
         for species, P_eq_Pa in vapor_pressures.items():
             P_eq_Pa = float(P_eq_Pa)
@@ -979,6 +980,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     "reason": str(exc),
                 }
                 continue
+            computable_transport_species.add(species)
             J_kg_s_m2 = series_flux.flux_kg_s_m2
 
             series_diagnostic = series_flux.as_diagnostic()
@@ -1004,7 +1006,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             if rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR:
                 flux_kg_hr[species] = rate_kg_hr
 
-        if missing_transport_parameters:
+        if missing_transport_parameters and not computable_transport_species:
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
                 status="unavailable",
@@ -1065,6 +1067,13 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 unmeasured_alpha_fallback_species
             )
         warning_messages: list[str] = []
+        if missing_transport_parameters:
+            diagnostic["missing_transport_parameters"] = missing_transport_parameters
+            warning_messages.append(
+                "excluded evaporation species with missing Chapman-Enskog "
+                "transport parameters: "
+                + ", ".join(sorted(missing_transport_parameters))
+            )
         if missing_molar_mass:
             diagnostic["missing_molar_mass"] = missing_molar_mass
             warning_messages.append(

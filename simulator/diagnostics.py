@@ -241,15 +241,30 @@ def wall_deposit_sticking_authority_status(
 
     provenance = _alpha_provenance_by_species(notice)
     status_bearing_species = _status_bearing_alpha_species(provenance)
-    missing_species = tuple(
-        species
-        for species in deposited_species
-        if not _alpha_species_has_provenance_record(provenance.get(species))
-    )
+    deposit_pairs = _positive_wall_deposit_segment_species(wall_deposit_kg)
+    if deposit_pairs:
+        missing_pairs = tuple(
+            pair
+            for pair in deposit_pairs
+            if not _alpha_segment_species_has_provenance_record(
+                provenance,
+                segment=pair[0],
+                species=pair[1],
+            )
+        )
+        missing_species = tuple(sorted({species for _, species in missing_pairs}))
+    else:
+        missing_pairs = ()
+        missing_species = tuple(
+            species
+            for species in deposited_species
+            if not _alpha_species_has_provenance_record(provenance.get(species))
+        )
     if str(notice.get("code", "")) == WALL_STICKING_ALPHA_MISSING_CODE:
         missing_species = deposited_species
+        missing_pairs = deposit_pairs
     if missing_species:
-        return _wall_deposit_authority_payload(
+        payload = _wall_deposit_authority_payload(
             authoritative=False,
             code=WALL_STICKING_ALPHA_MISSING_CODE,
             deposited_species=deposited_species,
@@ -263,6 +278,12 @@ def wall_deposit_sticking_authority_status(
                 "until the coefficient status travels with the deposit."
             ),
         )
+        if missing_pairs:
+            payload["missing_alpha_segment_species"] = [
+                {"segment": segment, "species": species}
+                for segment, species in missing_pairs
+            ]
+        return payload
 
     uncertified_species = tuple(
         species for species in deposited_species if species in status_bearing_species
@@ -494,6 +515,23 @@ def _positive_wall_deposit_species(
     return tuple(sorted(species))
 
 
+def _positive_wall_deposit_segment_species(
+    wall_deposit_kg: Mapping[Any, Any],
+) -> tuple[tuple[str, str], ...]:
+    pairs: set[tuple[str, str]] = set()
+    for key, value in wall_deposit_kg.items():
+        if isinstance(key, tuple) and len(key) == 2:
+            if _positive_number(value):
+                pairs.add((str(key[0]), str(key[1])))
+            continue
+        if isinstance(value, Mapping):
+            segment = str(key)
+            for nested_species, kg in value.items():
+                if _positive_number(kg):
+                    pairs.add((segment, str(nested_species)))
+    return tuple(sorted(pairs))
+
+
 def _alpha_provenance_by_species(
     alpha_notice: Mapping[str, Any],
 ) -> dict[str, Mapping[str, Any]]:
@@ -526,6 +564,21 @@ def _alpha_species_has_provenance_record(value: Any) -> bool:
         isinstance(record, Mapping)
         and _valid_sticking_probability(record.get("alpha_s"))
         for record in value.values()
+    )
+
+
+def _alpha_segment_species_has_provenance_record(
+    provenance: Mapping[str, Mapping[str, Any]],
+    *,
+    segment: str,
+    species: str,
+) -> bool:
+    by_segment = provenance.get(species)
+    if not isinstance(by_segment, Mapping):
+        return False
+    record = by_segment.get(segment)
+    return isinstance(record, Mapping) and _valid_sticking_probability(
+        record.get("alpha_s")
     )
 
 

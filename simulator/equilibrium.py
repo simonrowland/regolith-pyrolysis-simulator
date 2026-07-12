@@ -724,20 +724,25 @@ class EquilibriumMixin:
                     field="P_sat_pO2",
                 )
 
-            # SiO suppression by pO₂: p(SiO) ∝ 1/√pO₂         [THERMO-8]
-            #
-            # The Antoine equation gives P_SiO at the environment vacuum
-            # floor.  At higher pO₂, the equilibrium
-            # shifts toward SiO₂, suppressing SiO vapor:
-            #   At floor:     suppression = 1.0  (reference)
-            #   At 10^-6 bar: suppression follows sqrt(floor / pO2)
+            # SiO suppression by pO2: p(SiO) scales as 1/sqrt(pO2).
+            # Premise: the fitted Antoine row is calibrated at its declared
+            # pO2_reference_bar, not at the current body vacuum floor. Algebra:
+            # P = P_ref * sqrt(p_ref / pO2). Unit check: bar/bar is
+            # dimensionless. Sanity: changing lunar/asteroid environmental
+            # floors must not retune the SiO fit itself.
             vacuum_floor_bar = self._vacuum_floor_bar()
+            sio_reference_bar = vacuum_floor_bar
+            if name == 'SiO':
+                sio_reference_bar = max(
+                    1e-30,
+                    float(data.get('pO2_reference_bar', vacuum_floor_bar) or vacuum_floor_bar),
+                )
             if (
                 name == 'SiO'
                 and not pO2_exponent
-                and pO2_bar > vacuum_floor_bar
+                and pO2_bar > sio_reference_bar
             ):
-                suppression = math.sqrt(vacuum_floor_bar / pO2_bar)
+                suppression = math.sqrt(sio_reference_bar / pO2_bar)
                 P_sat = _require_finite_vapor_value(
                     P_sat * suppression,
                     species=name,

@@ -104,11 +104,19 @@ class LedgerTransitionProposal:
     ``account -> species_mol -> amount`` dicts.  ``atom_balance_proof``
     records the net element-by-element atom count the provider asserts
     is zero; the kernel re-checks this on commit.
+
+    ``producer_provider_id`` and ``producer_intent`` are stamped by the
+    kernel after a provider returns through the dispatch path.  They are
+    provenance, not credentials: :meth:`ChemistryKernel.commit_batch`
+    accepts only the live proposal object the kernel stamped and bound
+    to a dispatch origin.
     """
 
     debits: Mapping[str, Mapping[str, float]]
     credits: Mapping[str, Mapping[str, float]]
     reason: str = ""
+    producer_provider_id: str = field(default="", init=False)
+    producer_intent: str = field(default="", init=False)
     # Optional provider self-check: element -> claimed net credit-debit
     # mol.  :func:`validate_atom_balance` no-ops if empty; populated
     # entries are cross-checked against the kernel's computed atom
@@ -122,6 +130,16 @@ class LedgerTransitionProposal:
         object.__setattr__(self, "debits", _freeze_nested_mol(self.debits))
         object.__setattr__(self, "credits", _freeze_nested_mol(self.credits))
         object.__setattr__(self, "reason", str(self.reason or ""))
+        object.__setattr__(
+            self,
+            "producer_provider_id",
+            str(self.producer_provider_id or ""),
+        )
+        object.__setattr__(
+            self,
+            "producer_intent",
+            str(self.producer_intent or ""),
+        )
         object.__setattr__(
             self,
             "atom_balance_proof",

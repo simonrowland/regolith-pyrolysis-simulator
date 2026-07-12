@@ -82,7 +82,13 @@ def _cro2_train_sim():
             "metals": {},
             "oxide_vapors": {
                 "CrO2": {
+                    "formula": "CrO2",
+                    "molar_mass_g_mol": cro2_mw * 1000.0,
                     "parent_oxide": "Cr2O3",
+                    "fit_target": "pure_component_psat",
+                    "condensation_T_C_at_1mbar": 1800.0,
+                    "antoine": {"A": 10.0, "B": 20000.0, "C": 0.0},
+                    "valid_range_K": [1500.0, 2200.0],
                     "stoich_oxide_per_vapor": 0.5 * cr2o3_mw / cro2_mw,
                     "stoich_O2_per_vapor": -0.25 * o2_mw / cro2_mw,
                     "condensation_products_mol_per_mol_vapor": {
@@ -98,6 +104,7 @@ def _cro2_train_sim():
         },
     )
     sim.load_batch("chromia", mass_kg=1000.0)
+    sim.condensation_model.condensation_temperatures_C["CrO2"] = 1800.0
     return sim
 
 
@@ -518,6 +525,7 @@ def test_intact_oxide_vapor_allows_zero_o2_stoich():
             "oxide_vapors": {
                 "FeO": {
                     "parent_oxide": "FeO",
+                    "condensation_T_C_at_1mbar": 1800.0,
                     "stoich_oxide_per_vapor": 1.0,
                     "stoich_O2_per_vapor": 0.0,
                 },
@@ -602,6 +610,7 @@ def test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked():
             "oxide_vapors": {
                 "FeO": {
                     "parent_oxide": "Fe2O3",
+                    "condensation_T_C_at_1mbar": 1800.0,
                     "stoich_oxide_per_vapor": oxide_per_feo,
                     "stoich_O2_per_vapor": o2_per_feo,
                 },
@@ -985,6 +994,65 @@ def test_commanded_po2_overhead_composition_o2_carried_when_above_setpoint():
     sim.overhead.composition = {"O2": 10.0}  # 0.01 bar holdup, above floor
     # max(0.01, 0.0005) = 0.01 bar
     assert sim._commanded_pO2_bar() == pytest.approx(0.01)
+
+
+def test_overhead_total_pressure_covers_additive_partial_floors():
+    from simulator.state import (
+        CondensationTrain,
+        EvaporationFlux,
+        MeltState,
+    )
+    from simulator.overhead import OverheadGasModel
+
+    melt = MeltState()
+    melt.atmosphere = Atmosphere.CONTROLLED_O2
+    melt.pO2_mbar = 1.0
+    melt.p_total_mbar = 1.0
+    melt.temperature_C = 1500.0
+    flux = EvaporationFlux(total_kg_hr=0.1, species_kg_hr={"Na": 0.1})
+
+    gas = OverheadGasModel({"enabled": False}).update(
+        flux,
+        melt,
+        CondensationTrain.create_default(),
+    )
+
+    partial_sum = sum(max(0.0, float(v)) for v in gas.composition.values())
+    assert gas.pressure_mbar + 1e-12 >= partial_sum
+
+
+def test_overhead_product_partials_use_mole_fractions_not_mass_fractions():
+    from simulator.state import (
+        CondensationTrain,
+        EvaporationFlux,
+        MeltState,
+        MOLAR_MASS,
+    )
+    from simulator.overhead import OverheadGasModel
+
+    melt = MeltState()
+    melt.temperature_C = 1500.0
+    melt.p_total_mbar = 0.0
+    flux = EvaporationFlux(
+        total_kg_hr=2.0,
+        species_kg_hr={"Na": 1.0, "Fe": 1.0},
+    )
+
+    gas = OverheadGasModel({"enabled": False}).update(
+        flux,
+        melt,
+        CondensationTrain.create_default(),
+    )
+
+    na_mol_hr = 1.0 / (MOLAR_MASS["Na"] / 1000.0)
+    fe_mol_hr = 1.0 / (MOLAR_MASS["Fe"] / 1000.0)
+    expected_na_fraction = na_mol_hr / (na_mol_hr + fe_mol_hr)
+    total_product_pressure = gas.composition["Na"] + gas.composition["Fe"]
+
+    assert gas.composition["Na"] / total_product_pressure == pytest.approx(
+        expected_na_fraction
+    )
+    assert gas.composition["Na"] > gas.composition["Fe"]
 
 
 def test_commanded_po2_numerical_floor_when_all_inputs_zero():

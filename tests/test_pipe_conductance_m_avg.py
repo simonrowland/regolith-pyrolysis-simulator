@@ -26,6 +26,7 @@ from simulator.condensation import CondensationModel
 from simulator.core import PyrolysisSimulator
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.equipment import EquipmentDesigner
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.overhead import (
     DEFAULT_INITIAL_THROAT_AREA_M2,
     DEFAULT_PIPE_M_AVG_KG_MOL,
@@ -175,6 +176,42 @@ def test_pipe_conductance_no_kwarg_uses_fallback_with_256_law():
         / (256.0 * eta * model.pipe_length_m * GAS_CONSTANT * T_K)
     )
     assert actual == pytest.approx(expected, rel=1e-12)
+
+
+def test_pipe_conductance_uses_downstream_pressure_square_delta():
+    model = _make_model()
+    p_upstream_Pa = 1000.0
+    p_downstream_Pa = 600.0
+    vacuum = model._pipe_conductance(p_upstream_Pa, 1500.0)
+    finite_downstream = model._pipe_conductance(
+        p_upstream_Pa,
+        1500.0,
+        p_downstream_Pa=p_downstream_Pa,
+    )
+
+    assert finite_downstream == pytest.approx(
+        vacuum * (p_upstream_Pa**2 - p_downstream_Pa**2) / p_upstream_Pa**2,
+        rel=1e-12,
+    )
+    assert model._pipe_conductance(
+        p_upstream_Pa,
+        1500.0,
+        p_downstream_Pa=p_upstream_Pa,
+    ) == pytest.approx(0.0)
+
+
+def test_inverse_pipe_pressure_includes_downstream_pressure():
+    model = _make_model()
+    flow_kg_s = 1.0e-6
+    vacuum_mbar = model._vapor_pressure_mbar_from_flux(flow_kg_s, 1500.0)
+    downstream_mbar = model._vapor_pressure_mbar_from_flux(
+        flow_kg_s,
+        1500.0,
+        p_downstream_bar=0.5,
+    )
+
+    assert downstream_mbar > vacuum_mbar
+    assert downstream_mbar > 500.0
 
 
 def test_pipe_conductance_records_m_avg_fallback_engagement():
@@ -389,6 +426,35 @@ def test_default_condenser_throat_anchor_still_allows_batch_pipe_scaling():
     assert design.pipe.initial_throat_area_m2 == pytest.approx(
         math.pi * 0.12**2
     )
+
+
+def test_auto_design_geometry_reaches_runtime_melt_and_overhead_model():
+    config = load_config_bundle(DEFAULT_DATA_DIR)
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        config.setpoints,
+        config.feedstocks,
+        config.vapor_pressures,
+    )
+    sim.load_batch("lunar_mare_low_ti", mass_kg=16000.0)
+
+    sim._get_turbine_spec()
+    design = sim._equipment
+
+    assert design is not None
+    assert sim.melt.melt_surface_area_m2 == pytest.approx(
+        design.crucible.melt_surface_area_m2
+    )
+    assert sim.overhead_model.pipe_length_m == pytest.approx(design.pipe.length_m)
+    assert sim.overhead_model.initial_throat_area_m2 == pytest.approx(
+        design.pipe.initial_throat_area_m2
+    )
+    assert sim.overhead_model.pipe_diameter_m == pytest.approx(
+        design.pipe.diameter_m
+    )
+    assert sim.overhead_model.stage_area_ratios == design.pipe.stage_area_ratios
 
 
 def test_stage_area_alias_override_reaches_canonical_stage_area():

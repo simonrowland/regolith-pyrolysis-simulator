@@ -1919,7 +1919,7 @@ def build_per_hour_summary(
     enforcement = getattr(sim.campaign_mgr, "last_pO2_enforcement", None)
     if isinstance(enforcement, Mapping) and int(enforcement.get("hour", -1)) == int(snapshot.hour):
         summary["pO2_enforcement"] = _json_safe(dict(enforcement))
-    return summary
+    return _json_safe(summary)
 
 
 # ----------------------------------------------------------------------

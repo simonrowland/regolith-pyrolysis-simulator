@@ -78,6 +78,7 @@ COMPRESSIBLE_POISEUILLE_DENOMINATOR = 256.0  # dimensionless — integrated mean
 DEFAULT_INITIAL_THROAT_AREA_M2 = math.pi * 0.06**2  # m² — 12 cm diameter throat back-compat anchor
 DEFAULT_CONDENSER_STAGE_AREA_RATIOS = {
     'fe_stage1': 4.0,
+    'cr_stage2': 4.5,
     'sio_stage3': 6.0,
     'alkali_stage4': 5.0,
     'terminal': 2.0,
@@ -86,6 +87,10 @@ DEFAULT_CONDENSER_STAGE_AREA_RATIO_SOURCES = {
     'fe_stage1': (
         'engineering-default: baffled Fe condenser presents multiple throat '
         'areas downstream of the constriction'
+    ),
+    'cr_stage2': (
+        'engineering-default: removable Cr oxide cartridge sits between Fe '
+        'condenser and SiO baffles with intermediate capture surface'
     ),
     'sio_stage3': (
         'engineering-default: removable SiO baffle cartridge needs the '
@@ -106,6 +111,12 @@ _STAGE_AREA_ALIASES = {
     'stage1': 'fe_stage1',
     'stage_1': 'fe_stage1',
     'fe': 'fe_stage1',
+    2: 'cr_stage2',
+    '2': 'cr_stage2',
+    'stage2': 'cr_stage2',
+    'stage_2': 'cr_stage2',
+    'cr': 'cr_stage2',
+    'chromium': 'cr_stage2',
     3: 'sio_stage3',
     '3': 'sio_stage3',
     'stage3': 'sio_stage3',
@@ -596,12 +607,16 @@ class OverheadGasModel:
         self,
         evap_flux: EvaporationFlux,
         melt: MeltState,
+        p_downstream_bar: Optional[float] = None,
     ) -> dict[str, float]:
         """Estimate pipe pressure/capacity with the existing Poiseuille model."""
 
         pipe_temperature_C = self.resolve_pipe_temperature_C(melt)  # °C — active pipe/liner wall temperature
         total_evap_kg_hr = max(0.0, float(evap_flux.total_kg_hr))  # kg/hr — total evaporation mass flow
         allowed_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)  # Pa — allowed upstream pressure; mbar -> Pa with 1 Pa floor
+        downstream_pressure_Pa = (
+            self._resolve_downstream_pressure(melt, p_downstream_bar) * 1.0e5
+        )  # Pa — downstream/reference pressure; bar -> Pa
         # Preserve the existing gas-transport path: Poiseuille conductance has
         # historically used melt/gas temperature. The liner trajectory controls
         # wall deposition and Kn diagnostics without changing evaporation totals.
@@ -613,9 +628,10 @@ class OverheadGasModel:
         # ``evap_flux.species_kg_hr`` is the steady-state pipe
         # composition; the time unit cancels in the mole-fraction
         # weighting.
-        conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream pressure against vacuum
+        conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
             allowed_pressure_Pa,
             conductance_temperature_C,
+            p_downstream_Pa=downstream_pressure_Pa,
             species_kg_for_M_avg=evap_flux.species_kg_hr,  # kg/hr by species — composition basis for M_avg
         )
         pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
@@ -623,6 +639,7 @@ class OverheadGasModel:
             vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, sqrt(Poiseuille balance)
                 total_evap_kg_hr / 3600.0,  # kg/s — evaporation mass flow
                 conductance_temperature_C,
+                p_downstream_bar=downstream_pressure_Pa / 1.0e5,
                 species_kg_for_M_avg=evap_flux.species_kg_hr,
             )
         else:
@@ -811,7 +828,11 @@ class OverheadGasModel:
         total_evap_kg_hr = evap_flux.total_kg_hr  # kg/hr — total evaporation mass flow
 
         # ── Pipe conductance limit ──────────────────────── [PIPE-1]
-        transport_state = self.estimate_transport_state(evap_flux, melt)  # mixed units — pipe transport state
+        transport_state = self.estimate_transport_state(
+            evap_flux,
+            melt,
+            p_downstream_bar=p_downstream_bar,
+        )  # mixed units — pipe transport state
         conductance = transport_state['conductance_kg_s']  # kg/s — pipe mass-flow capacity
         gas.pipe_conductance_kg_hr = transport_state['pipe_conductance_kg_hr']  # kg/hr — pipe mass-flow capacity
         gas.initial_throat_area_m2 = transport_state['initial_throat_area_m2']  # m² — user-configured throat cross-section
@@ -862,9 +883,35 @@ class OverheadGasModel:
 
         # ── Product partial pressures (proportional to evaporation rates) ──
         if total_evap_kg_hr > 0:
+            molar_flow_by_species: dict[str, float] = {}
             for sp, rate in evap_flux.species_kg_hr.items():  # kg/hr — species evaporation mass flow
-                gas.composition[sp] = (rate / total_evap_kg_hr  # mbar — species proxy partial pressure
-                                        * vapor_pressure_mbar)  # mbar — species proxy partial pressure
+                molar_mass_g_mol = MOLAR_MASS.get(sp)
+                if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
+                    continue
+                molar_flow_by_species[sp] = max(0.0, float(rate)) / (  # mol/hr — kg/hr / kg/mol
+                    molar_mass_g_mol / 1000.0
+                )
+            total_molar_flow = sum(molar_flow_by_species.values())  # mol/hr — total gas molar flow
+            # F-316 derivation:
+            # premise: ideal-gas partial pressure fractions are mole fractions,
+            # while evap_flux arrives as species mass rates.
+            # algebra: y_i = n_dot_i / Σ n_dot_i, p_i = y_i * P_vapor.
+            # unit check: (kg/hr)/(kg/mol)=mol/hr; the ratio is dimensionless;
+            # multiplying by mbar yields mbar partial pressure.
+            # sanity: equal masses of light Na and heavy Fe no longer produce
+            # equal partial pressures; if every molar mass is unknown, retain
+            # the legacy mass-fraction fallback rather than dropping pressure.
+            if total_molar_flow > 0.0:
+                for sp, molar_flow in molar_flow_by_species.items():
+                    gas.composition[sp] = (
+                        molar_flow / total_molar_flow * vapor_pressure_mbar
+                    )  # mbar — species proxy partial pressure from mole fraction
+            else:
+                for sp, rate in evap_flux.species_kg_hr.items():
+                    gas.composition[sp] = (
+                        max(0.0, float(rate)) / total_evap_kg_hr
+                        * vapor_pressure_mbar
+                    )  # mbar — legacy fallback for unknown species
 
         # Controlled/background atmosphere partial pressures.
         if melt.pO2_mbar > 0.0:
@@ -896,6 +943,20 @@ class OverheadGasModel:
                     max(0.0, melt.p_total_mbar - melt.pO2_mbar)
                     * background_fraction,  # mbar — background gas partial pressure share
                 )
+
+        partial_pressure_sum_mbar = sum(  # mbar — sum of nonnegative reported partial pressures
+            max(0.0, float(partial_pressure))
+            for partial_pressure in gas.composition.values()
+        )
+        # F-113 derivation:
+        # premise: after controlled/background floors are added, reported
+        # partial pressures are additive components of the same gas state.
+        # algebra: P_total >= Σ_i p_i.
+        # unit check: every p_i and P_total here is mbar.
+        # sanity: when floors add nothing, this is a no-op; when floors would
+        # exceed the prior max-floor total, the total rises instead of
+        # advertising an impossible sum(partials) > total state.
+        gas.pressure_mbar = max(gas.pressure_mbar, partial_pressure_sum_mbar)
 
         # ── Turbine flow + capacity enforcement ─────────── [LOOP-2]
         O2_flow_kg_hr = max(0.0, actual_O2_kg_hr)  # kg/hr — melt/offgas O2 mass flow
@@ -1156,6 +1217,7 @@ class OverheadGasModel:
         p_upstream_Pa: float,  # Pa — allowed upstream pipe pressure
         T_C: float,  # °C — pipe gas temperature
         *,
+        p_downstream_Pa: float = 0.0,  # Pa — downstream/reference pressure
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
     ) -> float:
         """
@@ -1205,6 +1267,7 @@ class OverheadGasModel:
         if T_K <= 0.0 or L <= 0.0 or d <= 0.0:
             return 0.0
         p_upstream_Pa = max(0.0, float(p_upstream_Pa))  # Pa — clamped upstream pressure
+        p_downstream_Pa = max(0.0, float(p_downstream_Pa))  # Pa — clamped downstream pressure
 
         # Dynamic viscosity of gas mixture (approximate as N₂-like)
         # η ≈ 4e-5 Pa·s at 1500°C (increases with T for gases)
@@ -1220,7 +1283,19 @@ class OverheadGasModel:
                 self._record_pipe_m_avg_fallback_engagement
             ),
         )
-        pressure_square_delta_Pa2 = p_upstream_Pa**2  # Pa² — P1²-P2² against vacuum
+        # F-112 derivation:
+        # premise: compressible laminar pipe mass flow is proportional to
+        # (P_up^2 - P_down^2), not P_up^2 unless the downstream reference is
+        # vacuum.
+        # algebra: capacity = C * max(P_up^2 - P_down^2, 0).
+        # unit check: Pa^2 enters the Poiseuille numerator and the remaining
+        # constants reduce the result to kg/s.
+        # sanity: P_down=0 preserves the legacy vacuum result; P_down>=P_up
+        # yields zero forward capacity instead of imaginary/negative flow.
+        pressure_square_delta_Pa2 = max(
+            0.0,
+            p_upstream_Pa**2 - p_downstream_Pa**2,
+        )  # Pa² — compressible pressure-square driving term
         numerator = math.pi * d**4 * M_avg * pressure_square_delta_Pa2
         denominator = (
             COMPRESSIBLE_POISEUILLE_DENOMINATOR
@@ -1240,9 +1315,10 @@ class OverheadGasModel:
         total_evap_kg_s: float,  # kg/s — evaporation mass flow
         T_C: float,  # °C — pipe gas temperature
         *,
+        p_downstream_bar: float = 0.0,  # bar — downstream/reference pressure
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
     ) -> float:
-        """Invert the shared compressible Poiseuille law against vacuum."""
+        """Invert the shared compressible Poiseuille law."""
 
         F_kg_s = max(0.0, float(total_evap_kg_s))  # kg/s — vapor mass throughput
         if F_kg_s <= 0.0:
@@ -1270,5 +1346,14 @@ class OverheadGasModel:
         denominator = math.pi * M_avg * d**4
         if denominator <= 0.0:
             return 0.0
-        pressure_Pa = math.sqrt(max(0.0, numerator / denominator))  # Pa — sqrt(Pa²)
+        p_downstream_Pa = max(0.0, float(p_downstream_bar)) * 1.0e5  # Pa — bar -> Pa
+        # F-112 inverse derivation:
+        # premise: F = C * (P_up^2 - P_down^2).
+        # algebra: P_up = sqrt(F / C + P_down^2).
+        # unit check: numerator/denominator is Pa^2, and P_down^2 is Pa^2.
+        # sanity: zero downstream reproduces the legacy sqrt(F/C); non-zero
+        # downstream raises the required upstream pressure for the same flow.
+        pressure_Pa = math.sqrt(  # Pa — upstream pressure from pressure-square balance
+            max(0.0, numerator / denominator + p_downstream_Pa**2)
+        )
         return pressure_Pa / 100.0  # mbar — Pa -> mbar

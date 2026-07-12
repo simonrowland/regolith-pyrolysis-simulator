@@ -232,6 +232,86 @@ class CampaignManager:
         'ovr',
         'runtime_override',
     })
+    _COMMON_OVERRIDE_FIELDS = frozenset({
+        'condenser_geometry',
+        'duration_h',
+        'freeze_gate',
+        'hold_time_h',
+        'lab_schedule',
+        'lab_schedule_pO2_setpoint_mbar',
+        'max_hours',
+        'min_hold_hr',
+        'o2_bubbler_eta_absorb_default',
+        'o2_bubbler_kg_per_hr',
+        'o2_bubbler_target_fO2_log',
+        'overhead_headspace',
+        'overhead_pressure_mbar',
+        'pO2_Pa',
+        'pO2_mbar',
+        'p_total_Pa',
+        'p_total_mbar',
+        'po2_mbar',
+        'pressure_Pa',
+        'pressure_mbar',
+        'ramp_C_per_h',
+        'ramp_rate',
+        'ramp_rate_C_per_h',
+        'ramp_rate_C_per_hr',
+        'setpoints',
+        'stir_factor',
+        'stir_state',
+        'temperature_ramp_C_per_h',
+        'thermal_window_duration_h',
+        'thermal_window_high_C',
+        'thermal_window_low_C',
+        'thermal_window_preheat_hours',
+        'thermal_window_preheat_ramp_C_per_hr',
+        'thermal_window_ramp_C_per_hr',
+    })
+    _PHASE_OVERRIDE_FIELDS = {
+        CampaignPhase.C2A: frozenset({
+            'threshold_kg_hr',
+        }),
+        CampaignPhase.C2A_STAGED: frozenset({
+            'depletion_flux_decay_fraction',
+            'hold_temp_C',
+            'hold_temperature_C',
+            'knudsen_pN2_mbar',
+            'pN2_Pa',
+            'pN2_mbar',
+            'pn2_mbar',
+        }),
+        CampaignPhase.C2B: frozenset({
+            'threshold_kg_hr',
+        }),
+        CampaignPhase.C3_K: frozenset({
+            'alkali_dosing',
+            'bakeout_target_C',
+            'dosing',
+            'inject_target_C',
+            'staged_duration_h',
+        }),
+        CampaignPhase.C3_NA: frozenset({
+            'alkali_dosing',
+            'bakeout_target_C',
+            'dosing',
+            'inject_target_C',
+            'staged_duration_h',
+        }),
+        CampaignPhase.C4: frozenset({
+            'hold_temp_C',
+            'hold_temperature_C',
+            'threshold_kg_hr',
+        }),
+        CampaignPhase.C6: frozenset({
+            'hold_temp_C',
+            'hold_temperature_C',
+        }),
+        CampaignPhase.C7_CA_ALUMINOTHERMIC: frozenset({
+            'hold_temp_C',
+            'hold_temperature_C',
+        }),
+    }
 
     @staticmethod
     def _is_noninteractive_test_batch(record: BatchRecord) -> bool:
@@ -277,7 +357,11 @@ class CampaignManager:
         phases = cls._campaign_phases_for_override_key(str(campaign_name))
         if not phases:
             return ()
-        return tuple(sorted(cls._derived_override_field_names()))
+        derived = cls._derived_override_field_names()
+        known = set(cls._COMMON_OVERRIDE_FIELDS)
+        for phase in phases:
+            known.update(cls._PHASE_OVERRIDE_FIELDS.get(phase, ()))
+        return tuple(sorted(field for field in known if field in derived))
 
     @classmethod
     @lru_cache(maxsize=1)
@@ -560,7 +644,10 @@ class CampaignManager:
         if not path:
             ovr = self._campaign_overrides(campaign)
             if 'max_hours' in ovr:
-                return self._float(ovr.get('max_hours'), 0.0)
+                max_hours = self._float(ovr.get('max_hours'), 0.0)
+                if max_hours <= 0.0:
+                    return self._configured_max_hold_hr(campaign, *path)
+                return max_hours
             if 'hold_time_h' in ovr:
                 return self._float(ovr.get('hold_time_h'), 0.0)
             if 'duration_h' in ovr:
@@ -1429,6 +1516,12 @@ class CampaignManager:
         melt.background_gas_species = background_species
         melt.background_gas_mole_fraction = background_fraction
         if melt.pO2_mbar > 0.0:
+            melt.atmosphere = Atmosphere.CONTROLLED_O2
+        elif background_species and background_species.upper() not in {'N2', 'O2'}:
+            # F-080: a positive-pressure zero-O2 inert schedule is a measured
+            # background cover, not a nitrogen sweep. Keep it on the controlled
+            # pressure path so overhead composes the declared species instead
+            # of synthesizing N2 from total-minus-O2.
             melt.atmosphere = Atmosphere.CONTROLLED_O2
         elif melt.p_total_mbar > 0.0:
             melt.atmosphere = Atmosphere.PN2_SWEEP

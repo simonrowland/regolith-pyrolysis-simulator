@@ -162,6 +162,31 @@ class _FallbackCommitProvider(_CommitProvider):
         )
 
 
+class _ShadowCommitProvider(_CommitProvider):
+    name = "shadow_commit_provider"
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id=self.name,
+            intents=frozenset({ChemistryIntent.EVAPORATION_TRANSITION}),
+            is_authoritative_for=frozenset(),
+            declared_accounts=frozenset(
+                {"process.cleaned_melt", "process.overhead_gas"}
+            ),
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        return IntentResult(
+            intent=request.intent,
+            status="ok",
+            transition=LedgerTransitionProposal(
+                debits={"process.cleaned_melt": {"SiO2": 0.25}},
+                credits={"process.overhead_gas": {"SiO2": 0.25}},
+                reason="shadow_evap_step",
+            ),
+        )
+
+
 class _RuntimeDriftProvider(_CommitProvider):
     name = "runtime_drift_provider"
 
@@ -189,6 +214,28 @@ class _RuntimeDriftProvider(_CommitProvider):
         return super().dispatch(request)
 
 
+class _AccountDriftProvider(_CommitProvider):
+    name = "account_drift_provider"
+
+    def __init__(self) -> None:
+        self.drop_output_account = False
+
+    def capability_profile(self) -> CapabilityProfile:
+        accounts = (
+            frozenset({"process.cleaned_melt"})
+            if self.drop_output_account
+            else frozenset({"process.cleaned_melt", "process.overhead_gas"})
+        )
+        return CapabilityProfile(
+            provider_id=self.name,
+            intents=frozenset({ChemistryIntent.EVAPORATION_TRANSITION}),
+            is_authoritative_for=frozenset(
+                {ChemistryIntent.EVAPORATION_TRANSITION}
+            ),
+            declared_accounts=accounts,
+        )
+
+
 class _BackendEquilibriumProvider(ChemistryProvider):
     name = "backend_equilibrium_provider"
 
@@ -209,6 +256,16 @@ class _BackendEquilibriumProvider(ChemistryProvider):
             intent=ChemistryIntent.BACKEND_EQUILIBRIUM,
             status="unsupported",
         )
+
+
+def _dispatch_commit_proposal(kernel: ChemistryKernel) -> LedgerTransitionProposal:
+    result = kernel.dispatch(
+        ChemistryIntent.EVAPORATION_TRANSITION,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+    )
+    assert result.transition is not None
+    return result.transition
 
 
 def test_commit_batch_is_sole_writer_and_applies_transition():
@@ -314,8 +371,40 @@ def test_off_path_proposal_cannot_borrow_fallback_account_authority():
         reason="unbound_fallback_shape",
     )
 
-    with pytest.raises(AccountFilterViolation):
+    with pytest.raises(UnauthorizedIntentError, match="not produced"):
         kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, off_path)
+
+
+def test_shadow_trace_proposal_cannot_borrow_authoritative_commit_slot():
+    ledger = AtomLedger()
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    registry = ProviderRegistry()
+    registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
+    registry.register(
+        _ShadowCommitProvider(),
+        [ChemistryIntent.EVAPORATION_TRANSITION],
+        shadow=True,
+    )
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+
+    result = kernel.dispatch(
+        ChemistryIntent.EVAPORATION_TRANSITION,
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+    )
+    assert result.transition is not None
+    shadow_record = next(
+        record for record in kernel.planner.shadow_trace
+        if record.get("event") == "shadow_dispatch"
+    )
+    shadow_transition = shadow_record["result"].transition
+    assert shadow_transition is not None
+
+    with pytest.raises(UnauthorizedIntentError, match="not produced"):
+        kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, shadow_transition)
+
+    assert ledger.mol_by_account("process.cleaned_melt")["SiO2"] == pytest.approx(1.0)
+    assert "process.overhead_gas" not in ledger.mol_by_account()
 
 
 def test_commit_materialization_retains_exact_mol_provenance():
@@ -324,11 +413,7 @@ def test_commit_materialization_retains_exact_mol_provenance():
     registry = ProviderRegistry()
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
-    proposal = LedgerTransitionProposal(
-        debits={"process.cleaned_melt": {"SiO2": 0.1}},
-        credits={"process.overhead_gas": {"SiO2": 0.1}},
-        reason="mol_provenance",
-    )
+    proposal = _dispatch_commit_proposal(kernel)
 
     transition = kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, proposal)
 
@@ -338,9 +423,9 @@ def test_commit_materialization_retains_exact_mol_provenance():
     assert type(debit["species_mol"]) is dict
     assert type(debit["meta"]) is dict
     assert type(debit["meta"]["species_mol"]) is dict
-    assert debit["species_mol"] == {"SiO2": pytest.approx(0.1)}
+    assert debit["species_mol"] == {"SiO2": pytest.approx(0.25)}
     assert debit["meta"]["amount_basis"] == "mol"
-    assert debit["meta"]["species_mol"] == {"SiO2": pytest.approx(0.1)}
+    assert debit["meta"]["species_mol"] == {"SiO2": pytest.approx(0.25)}
     with pytest.raises(TypeError, match="metadata is immutable"):
         transition.debits[0].meta["species_mol"]["SiO2"] = 0.2
 
@@ -353,11 +438,7 @@ def test_committed_nested_metadata_is_detached_and_immutable():
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
     provenance = {"provider": "original", "sources": ["source-a"]}
     transition_meta = {"provenance": provenance}
-    proposal = LedgerTransitionProposal(
-        debits={"process.cleaned_melt": {"SiO2": 0.1}},
-        credits={"process.overhead_gas": {"SiO2": 0.1}},
-        reason="immutable_provenance",
-    )
+    proposal = _dispatch_commit_proposal(kernel)
 
     transition = kernel.commit_batch(
         ChemistryIntent.EVAPORATION_TRANSITION,
@@ -484,14 +565,10 @@ def test_commit_validated_transition_aggregates_duplicate_account_lots():
     assert ledger.mol_by_account("process.overhead_gas")["SiO2"] == pytest.approx(1.0)
 
 
-def test_commit_batch_rejects_unbalanced_proposal():
+def test_commit_batch_rejects_unbound_unbalanced_proposal_before_mutation():
     ledger = AtomLedger()
     ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
     registry = ProviderRegistry()
-    # Register an authoritative provider so commit_batch's
-    # intent-authority + account-filter re-validation has a profile to
-    # check against; the atom-balance gate is what should reject the
-    # proposal here.
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
 
@@ -500,7 +577,7 @@ def test_commit_batch_rejects_unbalanced_proposal():
         credits={"process.overhead_gas": {"SiO2": 0.5}},
         reason="bad",
     )
-    with pytest.raises(AtomBalanceError):
+    with pytest.raises(UnauthorizedIntentError, match="not produced"):
         kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, bad)
     # Ledger must be untouched.
     assert ledger.mol_by_account("process.cleaned_melt")["SiO2"] == pytest.approx(
@@ -517,11 +594,7 @@ def test_commit_batch_propagates_overdraft_as_proposal_rejected():
     registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
 
-    overdraft = LedgerTransitionProposal(
-        debits={"process.cleaned_melt": {"SiO2": 10.0}},
-        credits={"process.overhead_gas": {"SiO2": 10.0}},
-        reason="overdraft",
-    )
+    overdraft = _dispatch_commit_proposal(kernel)
     with pytest.raises(ProposalRejected):
         kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, overdraft)
     assert ledger.mol_by_account("process.cleaned_melt")["SiO2"] == pytest.approx(
@@ -537,35 +610,22 @@ def test_commit_batch_propagates_overdraft_as_proposal_rejected():
 # gates dispatch() runs.
 
 
-def test_commit_batch_rejects_proposal_touching_undeclared_terminal_account():
-    """A proposal that credits ``terminal.offgas`` (outside the provider's
-    declared accounts) must be rejected at commit time -- even though the
-    proposal is atom-balanced.
-
-    Previously commit_batch only ran atom-balance; an off-path proposal
-    could write to any account the kernel could project to, including
-    terminal sinks.  Defence in depth: commit_batch now re-runs
-    :func:`validate_proposal_accounts` against the authoritative
-    provider's declared set.
-    """
+def test_commit_batch_rechecks_account_filter_against_current_profile():
+    """Commit-time account filtering still catches post-dispatch drift."""
 
     ledger = AtomLedger()
     ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
     registry = ProviderRegistry()
-    # _CommitProvider declares ONLY {process.cleaned_melt,
-    # process.overhead_gas}.  terminal.offgas is outside that set.
-    registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
+    provider = _AccountDriftProvider()
+    registry.register(provider, [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+    proposal = _dispatch_commit_proposal(kernel)
+    provider.drop_output_account = True
 
-    off_path = LedgerTransitionProposal(
-        debits={"process.cleaned_melt": {"SiO2": 0.5}},
-        credits={"terminal.offgas": {"SiO2": 0.5}},  # undeclared sink
-        reason="off_path_attempt",
-    )
     with pytest.raises(AccountFilterViolation):
-        kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, off_path)
+        kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, proposal)
     # Ledger untouched.
-    assert "terminal.offgas" not in ledger.mol_by_account()
+    assert "process.overhead_gas" not in ledger.mol_by_account()
     assert ledger.mol_by_account("process.cleaned_melt")["SiO2"] == pytest.approx(
         1.0, rel=1e-9
     )
@@ -595,33 +655,44 @@ class _LiquidusOnlyProvider(ChemistryProvider):
         )
 
 
-def test_commit_batch_rejects_proposal_for_intent_with_no_authoritative_provider():
-    """Submitting a proposal for an intent that has no authoritative
-    provider must raise :class:`ProviderUnavailableError` at commit time,
-    even if the proposal is balanced and touches declared accounts of
-    SOME other provider.
-    """
+def test_commit_batch_rejects_dispatch_proposal_after_provider_unregistered():
+    """A live proposal cannot outlive the registry slot that produced it."""
 
     ledger = AtomLedger()
     ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
     registry = ProviderRegistry()
-    # Register an authoritative provider for SILICATE_LIQUIDUS only;
-    # NOTHING is registered for EVAPORATION_TRANSITION.
-    registry.register(_LiquidusOnlyProvider(), [ChemistryIntent.SILICATE_LIQUIDUS])
+    registry.register(_CommitProvider(), [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+    proposal = _dispatch_commit_proposal(kernel)
+    registry.replace_for_test(ChemistryIntent.EVAPORATION_TRANSITION, None)
 
-    balanced = LedgerTransitionProposal(
-        debits={"process.cleaned_melt": {"SiO2": 0.25}},
-        credits={"process.overhead_gas": {"SiO2": 0.25}},
-        reason="unauthoritative_intent",
-    )
     with pytest.raises(ProviderUnavailableError):
-        kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, balanced)
+        kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, proposal)
     # Ledger untouched.
     assert "process.overhead_gas" not in ledger.mol_by_account()
     assert ledger.mol_by_account("process.cleaned_melt")["SiO2"] == pytest.approx(
         1.0, rel=1e-9
     )
+
+
+def test_commit_batch_requires_same_provider_object_after_registry_replacement():
+    ledger = AtomLedger()
+    ledger.load_external_mol("process.cleaned_melt", {"SiO2": 1.0})
+    registry = ProviderRegistry()
+    original = _CommitProvider()
+    registry.register(original, [ChemistryIntent.EVAPORATION_TRANSITION])
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+    proposal = _dispatch_commit_proposal(kernel)
+
+    replacement = _CommitProvider()
+    registry.replace_for_test(
+        ChemistryIntent.EVAPORATION_TRANSITION, replacement
+    )
+
+    with pytest.raises(ProviderUnavailableError, match="no longer registered"):
+        kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, proposal)
+    assert ledger.mol_by_account("process.cleaned_melt")["SiO2"] == pytest.approx(1.0)
+    assert "process.overhead_gas" not in ledger.mol_by_account()
 
 
 def test_commit_batch_rejects_unauthoritative_intent_with_drifting_profile(monkeypatch):
@@ -642,12 +713,7 @@ def test_commit_batch_rejects_unauthoritative_intent_with_drifting_profile(monke
     registry.register(provider, [ChemistryIntent.EVAPORATION_TRANSITION])
     kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
 
-    # Build a balanced proposal touching declared accounts.
-    balanced = LedgerTransitionProposal(
-        debits={"process.cleaned_melt": {"SiO2": 0.25}},
-        credits={"process.overhead_gas": {"SiO2": 0.25}},
-        reason="drift_test",
-    )
+    balanced = _dispatch_commit_proposal(kernel)
 
     # Drift: provider's profile no longer claims authority for
     # EVAPORATION_TRANSITION.

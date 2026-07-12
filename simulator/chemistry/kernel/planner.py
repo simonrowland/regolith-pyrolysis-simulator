@@ -406,32 +406,73 @@ class ChemistryKernel:
             intent,
         )
 
+    def _stamp_proposal_origin(
+        self,
+        proposal: LedgerTransitionProposal,
+        provider: ChemistryProvider,
+        intent: ChemistryIntent,
+    ) -> LedgerTransitionProposal:
+        profile = provider.capability_profile()
+        stamped = LedgerTransitionProposal(
+            debits=proposal.debits,
+            credits=proposal.credits,
+            reason=proposal.reason,
+            atom_balance_proof=proposal.atom_balance_proof,
+        )
+        object.__setattr__(stamped, "producer_provider_id", profile.provider_id)
+        object.__setattr__(stamped, "producer_intent", intent.value)
+        return stamped
+
     def _bound_provider_for_commit(
         self,
         intent: ChemistryIntent,
         proposal: LedgerTransitionProposal,
-    ) -> ChemistryProvider | None:
+    ) -> ChemistryProvider:
         entry = self._proposal_origins.get(id(proposal))
         if entry is None:
-            return None
+            raise UnauthorizedIntentError(
+                "proposal was not produced by this kernel dispatch path; "
+                "commit_batch accepts only live dispatch-bound proposals"
+            )
         proposal_ref, provider, dispatched_intent = entry
         if proposal_ref() is not proposal:
             self._proposal_origins.pop(id(proposal), None)
-            return None
+            raise UnauthorizedIntentError(
+                "proposal dispatch origin expired before commit"
+            )
         if dispatched_intent != intent:
             raise UnauthorizedIntentError(
                 f"proposal was dispatched for intent {dispatched_intent.value!r}, "
                 f"not {intent.value!r}"
             )
-        if provider is self._registry.authoritative_for(intent):
+        if proposal.producer_intent != intent.value:
+            raise UnauthorizedIntentError(
+                f"proposal provenance names intent {proposal.producer_intent!r}, "
+                f"not {intent.value!r}"
+            )
+        provider_id = str(proposal.producer_provider_id or "")
+        if not provider_id:
+            raise UnauthorizedIntentError(
+                "dispatch-bound proposal is missing producer_provider_id"
+            )
+        bound_provider_id = provider.capability_profile().provider_id
+        if provider_id != bound_provider_id:
+            raise UnauthorizedIntentError(
+                f"proposal provenance names provider {provider_id!r}, "
+                f"but dispatch origin was {bound_provider_id!r}"
+            )
+
+        authoritative = self._registry.authoritative_for(intent)
+        if authoritative is provider:
             return provider
+        fallback = self._registry.fallback_for(intent)
         if (
             intent in self._allow_fallback_intents
-            and provider is self._registry.fallback_for(intent)
+            and fallback is provider
         ):
             return provider
         raise ProviderUnavailableError(
-            f"proposal origin provider {provider.capability_profile().provider_id!r} "
+            f"proposal origin provider {provider_id!r} "
             f"is no longer registered for intent {intent.value!r}"
         )
 
@@ -637,7 +678,18 @@ class ChemistryKernel:
         if result.control_audit is not None:
             validate_control_audit(result.control_audit, request)
         if result.transition is not None:
-            self._remember_proposal_origin(result.transition, provider, intent)
+            stamped_transition = self._stamp_proposal_origin(
+                result.transition, provider, intent
+            )
+            result = IntentResult(
+                intent=result.intent,
+                status=result.status,
+                transition=stamped_transition,
+                control_audit=result.control_audit,
+                diagnostic=result.diagnostic,
+                warnings=result.warnings,
+            )
+            self._remember_proposal_origin(stamped_transition, provider, intent)
 
         # Tag the result so a trace consumer can tell whether the
         # authoritative or the fallback provider answered.  The kernel
@@ -672,16 +724,17 @@ class ChemistryKernel:
 
         Re-runs the full pre-commit validator stack against the current
         registry (defence in depth: the proposal DTO is in the public
-        surface, so a replay harness or future shadow tool may submit
-        one off the dispatch path -- atom balance alone is not enough
-        gate).  In order:
+        surface, but a replay harness, shadow tool, or caller-forged DTO
+        may not borrow a registry slot -- atom balance alone is not
+        enough gate).  In order:
 
         1. :func:`validate_intent_authority` -- a proposal returned by
            :meth:`dispatch` is re-bound to the registered provider that
-           produced it (including an explicitly enabled fallback); an
-           off-path proposal is checked only against the authoritative
-           provider. The selected provider must still declare the intent in
-           its ``is_authoritative_for`` set.
+           produced it (including an explicitly enabled fallback).  Any
+           proposal not returned by this kernel's live dispatch path is
+           refused before account, atom, or ledger mutation checks.  The
+           selected provider must still declare the intent in its
+           ``is_authoritative_for`` set.
         2. :func:`validate_proposal_accounts` -- every account touched
            must be in the selected provider's
            :attr:`CapabilityProfile.declared_accounts`.
@@ -693,9 +746,8 @@ class ChemistryKernel:
 
         Args:
             intent: The :class:`ChemistryIntent` this proposal was produced
-                for. Re-validation checks the bound dispatch provider or,
-                for off-path proposals, the authoritative registry slot;
-                mismatched or unauthoritative intents raise
+                for. Re-validation checks the bound dispatch provider;
+                off-path, mismatched, or unauthoritative proposals raise
                 :class:`ProviderUnavailableError` /
                 :class:`UnauthorizedIntentError`.
             proposal: The :class:`LedgerTransitionProposal` to commit.
@@ -712,18 +764,11 @@ class ChemistryKernel:
         """
 
         provider = self._bound_provider_for_commit(intent, proposal)
-        proposal_was_dispatched = provider is not None
-        if provider is None:
-            provider = self._registry.authoritative_for(intent)
-        if provider is None:
-            raise ProviderUnavailableError(
-                f"no authoritative provider registered for intent {intent.value!r}; "
-                "cannot commit proposal"
-            )
+        proposal_was_dispatched = True
         profile = provider.capability_profile()
         # Re-check intent authority + account-filter at commit time so an
-        # off-path proposal cannot borrow the fallback's account scope and a
-        # bound proposal cannot outlive its provider's current capability.
+        # shadow/off-path proposal cannot borrow a registry slot and a bound
+        # proposal cannot outlive its provider's current capability.
         validate_intent_authority(intent, profile)
         validate_proposal_accounts(proposal, profile.declared_accounts)
 

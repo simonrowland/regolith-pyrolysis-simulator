@@ -175,3 +175,14 @@ capture_budget_regularizer_floor:
   usage: simulator/condensation.py::_pressure_isolated_stage_efficiency
   uncertainty_flag: numerical_safeguard
   output_status: uncertainty_only
+
+capture_budget_regularizer_time_s:
+  value: 1.0
+  status: UNCERTIFIED
+  source_class: numerical_regularizer_not_literature_constant
+  source: "Legacy one-second pressure-isolated capture-budget timescale made explicit so the provisional time constant has units; not a physical condensation/sticking constant."
+  source_url: null
+  temperature_range_K: not_applicable_numerical
+  usage: simulator/condensation.py::_pressure_isolated_stage_efficiency
+  uncertainty_flag: numerical_safeguard
+  output_status: uncertainty_only

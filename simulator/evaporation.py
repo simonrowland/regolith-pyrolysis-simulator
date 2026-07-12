@@ -336,6 +336,17 @@ class EvaporationMixin:
                 f"{missing}; set chemistry_kernel.allow_unmeasured_alpha_fallback "
                 "for alpha=1.0 prototype fallback"
             )
+        if (
+            str(kernel_result.status) != 'ok'
+            and 'missing_transport_parameters' in diagnostic
+        ):
+            missing = ', '.join(
+                sorted(diagnostic['missing_transport_parameters'])
+            )
+            raise ProviderUnavailableError(
+                'missing Chapman-Enskog transport parameters for sampled '
+                f'species: {missing}'
+            )
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
         liquid_fraction_factor = 1.0
         if flux_kg_hr and self._freeze_gate_enabled():
@@ -1556,6 +1567,22 @@ class EvaporationMixin:
         """
         phase_scalar = self._record_phase_context_diagnostic(
             'condensation_feed', scalar_liquid_fraction=1.0)
+        if not getattr(self.condensation_model, '_knudsen_policy_configured', False):
+            transport = self.overhead_model.estimate_transport_state(
+                evap_flux,
+                self.melt,
+            )
+            self.condensation_model.configure_operating_conditions(
+                overhead_pressure_mbar=transport['pressure_mbar'],
+                pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+                gas_temperature_C=transport['pipe_temperature_C'],
+                stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
+                stage_area_geometry_provenance_notice=transport.get(
+                    'stage_area_geometry_provenance_notice', {}),
+                carrier_gas=self._resolve_condensation_carrier_gas(),
+                campaign_name=str(getattr(self.melt.campaign, 'name', '')),
+                campaign_hour=float(getattr(self.melt, 'campaign_hour', 0.0) or 0.0),
+            )
         route_result = self.condensation_model.route(
             evap_flux, self.melt)
 
@@ -1824,6 +1851,17 @@ class EvaporationMixin:
         actually deposited onto ``process.condensation_train``, used by
         the caller to drive ``_project_condensed_stage_collection``.
         """
+        wall_deposit_fraction = float(
+            route_result.wall_deposit_fraction_by_species.get(species, 0.0)
+        )
+        wall_deposit_account_fractions = dict(
+            route_result
+            .wall_deposit_account_fractions_by_species
+            .get(species, {})
+        )
+        if wall_deposit_fraction <= 1.0e-12 or not wall_deposit_account_fractions:
+            wall_deposit_fraction = 0.0
+            wall_deposit_account_fractions = {}
 
         kernel_result = self._dispatch_and_commit(
             ChemistryIntent.CONDENSATION_ROUTE,
@@ -1831,13 +1869,8 @@ class EvaporationMixin:
                 'species': species,
                 'condensed_kg': float(condensed_kg),
                 'sp_data': dict(sp_data or {}),
-                'wall_deposit_fraction': float(
-                    route_result.wall_deposit_fraction_by_species.get(
-                        species, 0.0)),
-                'wall_deposit_account_fractions': dict(
-                    route_result
-                    .wall_deposit_account_fractions_by_species
-                    .get(species, {})),
+                'wall_deposit_fraction': wall_deposit_fraction,
+                'wall_deposit_account_fractions': wall_deposit_account_fractions,
                 'wall_temperature_K': float(
                     self.condensation_model.wall_temperature_C) + 273.15,
                 'wall_deposit_account_temperatures_K': {

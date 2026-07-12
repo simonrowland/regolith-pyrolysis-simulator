@@ -24,6 +24,16 @@ def _load_sticking_data() -> dict:
     return yaml.safe_load(DATA_PATH.read_text(encoding="utf-8"))
 
 
+def _configure_knudsen_policy(model: CondensationModel) -> CondensationModel:
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+    )
+    return model
+
+
 def test_wall_sticking_coefficients_are_cited_or_uncertified():
     data = _load_sticking_data()
     assert data["schema_version"] == 1
@@ -179,6 +189,30 @@ def test_sio_pressure_isolated_stage_eval_uses_cold_wall_gate():
     assert stage_eval["alpha_s_cold_wall_condensation"] is True
 
 
+def test_pressure_isolated_efficiency_uses_declared_time_constant(monkeypatch):
+    stage = CondensationStage(
+        stage_number=1,
+        label="cold pressure stage",
+        temp_range_C=(400.0, 600.0),
+        target_species=["SiO"],
+    )
+    monkeypatch.setattr(
+        condensation,
+        "CAPTURE_BUDGET_REGULARIZER_TIME_S",
+        2.0,
+    )
+
+    efficiency = condensation._pressure_isolated_stage_efficiency(
+        stage,
+        T_cond_C=1000.0,
+        residence_s=2.0,
+        alpha_s=1.0,
+    )
+
+    # delta_T/T_cond = 0.5, so tau = 2.0 s / 0.5 = 4.0 s.
+    assert efficiency == pytest.approx(1.0 - math.exp(-2.0 / 4.0))
+
+
 def test_sticking_yaml_rejects_boolean_numeric_value(tmp_path: Path):
     with pytest.raises(ValueError, match="not boolean"):
         condensation._validate_sticking_value(tmp_path / "sticking.yaml", "SiO", True)
@@ -265,7 +299,9 @@ def test_sio_stage_band_flux_uses_cold_wall_gate(monkeypatch):
         capture_flux,
     )
 
-    model = CondensationModel(CondensationTrain.create_default())
+    model = _configure_knudsen_policy(
+        CondensationModel(CondensationTrain.create_default())
+    )
     route = model.route(
         EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
         MeltState(),
@@ -348,6 +384,7 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
     )
+    _configure_knudsen_policy(model)
     melt = MeltState()
     melt.temperature_C = 1700.0
 
@@ -366,25 +403,29 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
     )
     legacy = route_sio()
 
-    # e73fde5 closes the wall budget as J * A * M * 3600 per segment, so both
-    # grounded and legacy-alpha deposits must move together. Recomputed on
-    # combined main; see docs-private/reviews/2026-07-11-wave08/
-    # runtime-golden-attribution.md.
-    # 2026-07-12 wave-10 wall-flux closeout: restored area-integrated wall flux
-    # after the process-condensation fold moves both pins together.
-    assert grounded == pytest.approx(0.11244702040073114, rel=1e-12)
-    assert legacy == pytest.approx(0.44637305334927246, rel=1e-12)
-    assert grounded < legacy
+    # Explicit stage area makes baffle capture compete with wall capture; the
+    # grounded lower-alpha case leaves more vapor for the wall sink.
+    assert grounded == pytest.approx(0.9572497805330464, rel=1e-12)
+    assert legacy == pytest.approx(0.8899330724166838, rel=1e-12)
+    assert grounded > legacy
 
 
 def test_capture_budget_regularizer_is_marked_numerical_uncertified():
     data = _load_sticking_data()
     floor = data["capture_budget_regularizer_floor"]
+    time_constant = data["capture_budget_regularizer_time_s"]
 
     assert floor["value"] == pytest.approx(0.01)
     assert floor["status"] == "UNCERTIFIED"
     assert floor["source_class"] == "numerical_regularizer_not_literature_constant"
     assert floor["output_status"] == "uncertainty_only"
+    assert time_constant["value"] == pytest.approx(1.0)
+    assert time_constant["status"] == "UNCERTIFIED"
+    assert time_constant["source_class"] == "numerical_regularizer_not_literature_constant"
+    assert time_constant["output_status"] == "uncertainty_only"
     assert condensation.CAPTURE_BUDGET_REGULARIZER_NOTICE[
         "citation_status"
+    ] == "UNCERTIFIED"
+    assert condensation.CAPTURE_BUDGET_REGULARIZER_NOTICE[
+        "time_constant_citation_status"
     ] == "UNCERTIFIED"

@@ -444,21 +444,28 @@ def test_c2a_recipe_free_molecular_transport_is_refused(monkeypatch):
     )
 
 
-def test_direct_condensation_model_without_pressure_reports_unconfigured():
+def test_direct_condensation_model_without_pressure_refuses_before_routing():
     train = CondensationTrain.create_default()
     model = CondensationModel(train, wall_temperature_C=1800.0)
     melt = MeltState()
     melt.temperature_C = 1700.0
     flux = EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0)
+    stage_collections = [dict(stage.collected_kg) for stage in model.train.stages]
+    operating_history = list(model.operating_history)
 
-    route = model.route(flux, melt)
+    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
+        model.route(flux, melt)
 
-    # Direct callers with no pressure policy get telemetry, not a refusal.
-    assert route.knudsen_regime_diagnostic["status"] == "unconfigured"
+    assert exc_info.value.reason == "knudsen_policy_unconfigured"
+    assert exc_info.value.diagnostic["status"] == "refused"
     assert (
-        route.knudsen_regime_diagnostic["reason"]
+        exc_info.value.diagnostic["reason"]
         == "knudsen_policy_unconfigured"
     )
+    assert [dict(stage.collected_kg) for stage in model.train.stages] == (
+        stage_collections
+    )
+    assert model.operating_history == operating_history
 
 
 def _midpoint(value):

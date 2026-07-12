@@ -100,6 +100,7 @@ class RunExecutor:
         *,
         worker_runtime: Any | None = None,
     ) -> RunExecution:
+        hours = _coerce_nonnegative_hours(config.hours)
         session = SimSession()
         try:
             session.start(
@@ -109,10 +110,10 @@ class RunExecutor:
         except CampaignPressureSetpointRefusal as exc:
             return self.execute_session(
                 session,
-                hours=int(config.hours),
+                hours=hours,
                 initial_refusal=exc,
             )
-        kwargs: dict[str, Any] = {"hours": int(config.hours)}
+        kwargs: dict[str, Any] = {"hours": hours}
         if bool(config.stop_at_stage0_exit):
             kwargs["stop_at_stage0_exit"] = True
         return self.execute_session(session, **kwargs)
@@ -133,7 +134,10 @@ class RunExecutor:
         reason = ""
         refusal_diagnostic: dict[str, Any] = {}
         failure_exc: Exception | None = None
-        hours = int(hours)
+        hours = _coerce_nonnegative_hours(hours)
+        snapshot_start = len(
+            tuple(getattr(getattr(sim, "record", None), "snapshots", ()))
+        )
         if stop_at_stage0_exit is None:
             config = getattr(session, "_config", None)
             stop_at_stage0_exit = bool(
@@ -223,8 +227,12 @@ class RunExecutor:
             #                  operating-envelope refusal stopped the run.
             #   * "failed"  -- set in the except blocks below.
             if status == "ok":
+                pending_decision = _safe_pending_decision(session)
                 if bool(stop_at_stage0_exit) and _session_at_stage0_exit(session):
                     reason = "stage0_exit"
+                elif pending_decision is not None:
+                    status = "partial"
+                    reason = "pending_decision"
                 elif sim.melt.hour < hours:
                     status = "partial"
         except (KnudsenRegimeRefusal, CampaignPressureSetpointRefusal) as exc:
@@ -242,15 +250,15 @@ class RunExecutor:
             failure_exc = exc
             status = "failed"
             reason = "poisoned_hour"
-            error_message = f"PoisonedHourError: {exc}"
+            error_message = _safe_exception_text(exc)
         except BACKEND_FALLBACK_EXCEPTIONS as exc:
             failure_exc = exc
             status = "failed"
-            error_message = f"backend failure: {exc}"
+            error_message = f"backend failure: {_safe_exception_text(exc)}"
         except Exception as exc:  # noqa: BLE001 -- envelope the error
             failure_exc = exc
             status = "failed"
-            error_message = f"{type(exc).__name__}: {exc}"
+            error_message = _safe_exception_text(exc)
 
         try:
             unenriched_failure = (status, reason, error_message)
@@ -260,9 +268,9 @@ class RunExecutor:
                 if poisoned is not None:
                     status = "failed"
                     reason = "poisoned_hour"
-                    poisoned_detail = (
-                        f"PoisonedHourError: {PoisonedHourError(poisoned)}"
-                    )
+                    poisoned_exc = PoisonedHourError(poisoned)
+                    failure_exc = failure_exc or poisoned_exc
+                    poisoned_detail = _safe_exception_text(poisoned_exc)
                     if error_message != poisoned_detail:
                         error_message = (
                             f"{error_message}; {poisoned_detail}"
@@ -274,7 +282,8 @@ class RunExecutor:
                 poisoned = None
 
             shadow_trace = _collect_shadow_trace(sim, operator_decisions)
-            snapshots = tuple(getattr(sim.record, "snapshots", ()))
+            all_snapshots = tuple(getattr(sim.record, "snapshots", ()))
+            snapshots = all_snapshots[snapshot_start:]
             sim.record.cost_rollup = build_cost_rollup_diagnostic(
                 cost_ledger=sim.cost_ledger,
                 per_hour=tuple(per_hour),
@@ -282,7 +291,7 @@ class RunExecutor:
                 pumping_context=pumping_context_from_sim(sim, snapshots),
                 snapshots=snapshots,
             )
-            trace = PhysicsTrace.from_simulator(sim)
+            trace = _slice_trace(PhysicsTrace.from_simulator(sim), snapshot_start)
             reduced_real_cache = _collect_reduced_real_cache_diagnostic(sim)
             latest_backend_status = str(
                 getattr(
@@ -391,6 +400,39 @@ def _backend_from_worker_runtime(
     if config.reduced_real_cache is not None:
         return None
     return getattr(worker_runtime, "backend", None)
+
+
+def _coerce_nonnegative_hours(value: Any) -> int:
+    hours = int(value)
+    if hours < 0:
+        raise ValueError("hours must be non-negative")
+    return hours
+
+
+def _slice_trace(trace: PhysicsTrace, snapshot_start: int) -> PhysicsTrace:
+    if snapshot_start <= 0:
+        return trace
+    return dataclasses.replace(
+        trace,
+        snapshots=trace.snapshots[snapshot_start:],
+        condensed_by_stage_species_delta=(
+            trace.condensed_by_stage_species_delta[snapshot_start:]
+        ),
+        wall_deposit_by_segment_species_delta=(
+            trace.wall_deposit_by_segment_species_delta[snapshot_start:]
+        ),
+        impurity_delta=trace.impurity_delta[snapshot_start:],
+    )
+
+
+def _safe_pending_decision(session: SimSession) -> Any | None:
+    pending_decision = getattr(session, "pending_decision", None)
+    if not callable(pending_decision):
+        return None
+    try:
+        return pending_decision()
+    except Exception:  # noqa: BLE001 -- status enrichment must not self-fail
+        return None
 
 
 def _safe_exception_text(exc: BaseException) -> str:
@@ -503,7 +545,12 @@ def _collect_reduced_real_cache_diagnostic(
 
 
 def _json_safe(value: Any) -> Any:
-    """Recursively convert ``value`` into a JSON-serialisable form."""
+    """Recursively convert ``value`` into a JSON-serialisable form.
+
+    Non-finite numeric telemetry exports as ``None`` so strict JSON consumers
+    see schema-compatible nulls instead of Python-only NaN/Infinity tokens or
+    stringified pseudo-numbers.
+    """
 
     if isinstance(value, Mapping):
         return {str(k): _json_safe(v) for k, v in value.items()}
@@ -513,7 +560,7 @@ def _json_safe(value: Any) -> Any:
         return value
     if isinstance(value, (int, float)):
         if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
-            return str(value)
+            return None
         return value
     if dataclasses.is_dataclass(value):
         return _json_safe(dataclasses.asdict(value))

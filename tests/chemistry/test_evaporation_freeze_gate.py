@@ -207,6 +207,159 @@ def test_native_fe_no_commit_split_suppresses_vapor_route(
     assert partition['native_fe_vapor_mol'] == pytest.approx(0.0)
 
 
+def test_native_fe_vapor_only_route_survives_no_tap_proposal(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
+    sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
+    sim._compute_native_fe_saturation_extent = lambda: {
+        'native_fe_frac': 0.5,
+        'native_fe_mol': 1.0,
+    }
+    sim._compute_fe_redox_split_diagnostic = lambda: {}
+    sim._native_fe_partition_diagnostic = lambda mol: {
+        'native_fe_vapor_mol': 0.25,
+        'native_fe_vapor_capacity_mol_hr': 1.0,
+    }
+    sim._dispatch_only = lambda *a, **k: IntentResult(
+        intent=ChemistryIntent.NATIVE_FE_SATURATION,
+        status='ok',
+        transition=None,
+        diagnostic={'routed_fe_vapor_mol': 0.25},
+    )
+    sim._project_cleaned_melt_from_atom_ledger = lambda: None
+    sim._project_drain_tap_from_atom_ledger = lambda: None
+    route_calls: list[float] = []
+
+    def route_vapor(mol, **kwargs):
+        route_calls.append(mol)
+        return {
+            'native_fe_vapor_route_status': 'committed',
+            'native_fe_vapor_mol': mol,
+            'native_fe_condensed_kg': 0.0,
+            'native_fe_uncondensed_mol': 0.0,
+            'native_fe_overhead_o2_mol': 0.0,
+        }
+
+    sim._route_native_fe_vapor_to_condensation = route_vapor
+
+    diagnostic = sim._apply_native_fe_saturation_split(sample_time_h=1.0)
+
+    assert route_calls == [pytest.approx(0.25)]
+    assert diagnostic['native_fe_event_status'] == 'ok'
+    assert diagnostic['native_fe_event_reason'] == (
+        'native_fe_vapor_route_applied_without_tap_split'
+    )
+    partition = diagnostic['native_fe_partition']
+    assert partition['native_fe_split_commit_status'] == 'no_commit'
+    assert partition['native_fe_vapor_route_status'] == 'committed'
+    assert partition['native_fe_vapor_mol'] == pytest.approx(0.25)
+    assert partition['native_fe_vapor_route_suppressed_mol'] == pytest.approx(0.0)
+
+
+def test_native_fe_transitionless_route_requires_explicit_mol_native_attribution(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data, feedstocks_data, setpoints_data, enabled=False,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
+    sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
+    sim._compute_native_fe_saturation_extent = lambda: {
+        'native_fe_frac': 0.5, 'native_fe_mol': 1.0,
+    }
+    sim._compute_fe_redox_split_diagnostic = lambda: {}
+    sim._native_fe_partition_diagnostic = lambda mol: {
+        'native_fe_vapor_mol': 0.25,
+        'native_fe_vapor_capacity_mol_hr': 1.0,
+    }
+    sim._dispatch_only = lambda *a, **k: IntentResult(
+        intent=ChemistryIntent.NATIVE_FE_SATURATION,
+        status='ok',
+        transition=None,
+        diagnostic={},
+    )
+    sim._project_cleaned_melt_from_atom_ledger = lambda: None
+    sim._project_drain_tap_from_atom_ledger = lambda: None
+    sim._route_native_fe_vapor_to_condensation = lambda *a, **k: pytest.fail(
+        'unattributed transitionless vapor must not route'
+    )
+
+    diagnostic = sim._apply_native_fe_saturation_split(sample_time_h=1.0)
+
+    partition = diagnostic['native_fe_partition']
+    assert partition['native_fe_vapor_route_status'] == (
+        'suppressed_no_committed_split'
+    )
+    assert partition['native_fe_vapor_route_suppressed_mol'] == pytest.approx(0.25)
+
+
+def test_native_fe_error_without_transition_refuses_before_vapor_mutation(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim._melt_redox_temperature_shift_is_liquid = lambda *a, **k: True
+    sim._re_reference_melt_fO2_to_temperature = lambda *a, **k: None
+    sim._compute_native_fe_saturation_extent = lambda: {
+        'native_fe_frac': 0.5,
+        'native_fe_mol': 1.0,
+    }
+    sim._compute_fe_redox_split_diagnostic = lambda: {}
+    sim._native_fe_partition_diagnostic = lambda mol: {
+        'native_fe_vapor_mol': 0.25,
+        'native_fe_vapor_capacity_mol_hr': 1.0,
+    }
+    sim._dispatch_only = lambda *a, **k: IntentResult(
+        intent=ChemistryIntent.NATIVE_FE_SATURATION,
+        status='error',
+        transition=None,
+        diagnostic={'reason': 'test_engine_error'},
+    )
+    sim._project_cleaned_melt_from_atom_ledger = lambda: None
+    sim._project_drain_tap_from_atom_ledger = lambda: None
+    route_calls: list[float] = []
+    sim._route_native_fe_vapor_to_condensation = (
+        lambda mol, **k: route_calls.append(mol) or {}
+    )
+    balances_before = sim.atom_ledger.mol_by_account()
+    transitions_before = tuple(sim.atom_ledger.transitions)
+
+    diagnostic = sim._apply_native_fe_saturation_split(sample_time_h=1.0)
+
+    assert route_calls == []
+    assert sim.atom_ledger.mol_by_account() == balances_before
+    assert tuple(sim.atom_ledger.transitions) == transitions_before
+    assert diagnostic['native_fe_event_status'] == 'no_commit'
+    assert diagnostic['native_fe_event_reason'] == 'test_engine_error'
+    partition = diagnostic['native_fe_partition']
+    assert partition['native_fe_split_commit_status'] == 'error'
+    assert partition['native_fe_vapor_route_status'] == (
+        'suppressed_no_committed_split'
+    )
+    assert partition['native_fe_vapor_route_suppressed_mol'] == pytest.approx(0.25)
+    assert partition['native_fe_vapor_mol'] == pytest.approx(0.0)
+
+
 def _install_freeze_gate_curve(
     sim,
     *,
@@ -285,6 +438,39 @@ def test_freeze_gate_default_off_leaves_evaporation_flux_unchanged(
     assert ChemistryIntent.GATE_LIQUID_FRACTION not in calls
     assert ChemistryIntent.SILICATE_LIQUIDUS not in calls
     assert flux.species_kg_hr['Na'] == pytest.approx(7.5)
+
+
+def test_evaporation_missing_transport_data_raises_typed_refusal(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data, feedstocks_data, setpoints_data, enabled=False,
+    )
+    sim.melt.temperature_C = 1600.0
+
+    def fake_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.EVAPORATION_FLUX:
+            return SimpleNamespace(
+                status='unavailable',
+                diagnostic={
+                    'evaporation_flux_kg_hr': {},
+                    'missing_transport_parameters': {'SiO': {}},
+                },
+            )
+        if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
+            return _OVERHEAD_GAS_EQUILIBRIUM_STUB
+        raise AssertionError(f'unexpected dispatch: {intent}')
+
+    monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
+
+    with pytest.raises(
+        ProviderUnavailableError,
+        match='missing Chapman-Enskog transport parameters.*SiO',
+    ):
+        sim._calculate_evaporation(_equilibrium())
 
 
 def test_freeze_gate_enabled_uses_ec_table_zero_mush_full(

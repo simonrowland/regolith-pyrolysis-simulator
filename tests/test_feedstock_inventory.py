@@ -18,7 +18,7 @@ from simulator.accounting.completeness import (
 )
 from simulator.feedstock_guard import BlockedFeedstockError, is_blocked_feedstock
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.state import CampaignPhase, MOLAR_MASS
+from simulator.state import CampaignPhase, DecisionType, MOLAR_MASS
 
 
 def _sim(feedstocks):
@@ -78,6 +78,55 @@ def test_load_batch_refuses_invalid_additive_before_mutation(additive_kg):
     assert sim.atom_ledger is original_ledger
 
 
+@pytest.mark.parametrize("declared_value", [-1.0, float("nan"), "bad", True, None])
+def test_load_batch_refuses_invalid_composition_before_mutation(declared_value):
+    sim = _sim(
+        {
+            "test": {
+                "composition_wt_pct": {
+                    "SiO2": 100.0,
+                    "FeO": declared_value,
+                }
+            }
+        }
+    )
+    original_ledger = sim.atom_ledger
+    original_melt = dict(sim.melt.composition_kg)
+
+    with pytest.raises(ValueError, match="composition_wt_pct.FeO"):
+        sim.load_batch("test", mass_kg=1000.0)
+
+    assert sim.atom_ledger is original_ledger
+    assert sim.melt.composition_kg == original_melt
+
+
+def test_load_batch_refuses_invalid_stage0_before_replacing_inventory():
+    sim = _sim(
+        {
+            "test": {
+                "stage0_profile": "mars_carbon_cleanup",
+                "composition_wt_pct": {"SiO2": 100.0},
+                "stage0_carbon_cleanup": {
+                    "carbon_reductant_kg_per_tonne": 5.0,
+                    "reactions": ["unknown_reaction"],
+                },
+            }
+        }
+    )
+    original_ledger = sim.atom_ledger
+    original_inventory = sim.inventory
+    original_registry = sim.species_formula_registry
+
+    with pytest.raises(
+        AccountingError, match="unsupported Stage 0 carbon cleanup reaction"
+    ):
+        sim.load_batch("test", mass_kg=1000.0, additives_kg={"C": 5.0})
+
+    assert sim.atom_ledger is original_ledger
+    assert sim.inventory is original_inventory
+    assert sim.species_formula_registry is original_registry
+
+
 def test_load_batch_clears_prior_native_fe_and_redox_diagnostics():
     data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
     feedstocks = yaml.safe_load(data_path.read_text())
@@ -92,6 +141,39 @@ def test_load_batch_clears_prior_native_fe_and_redox_diagnostics():
     assert sim._last_native_fe_saturation_event == {}
     assert sim._last_fe_redox_respeciation_diagnostic == {}
     assert sim._last_melt_redox_liquidus_gate_diagnostic == {}
+
+
+def test_campaign_summary_counts_current_pre_increment_hour():
+    data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
+    feedstocks = yaml.safe_load(data_path.read_text())
+    sim = _sim_with_data(feedstocks)
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.hour = sim._campaign_start_hour
+
+    summary = sim._capture_campaign_summary("C0")
+
+    assert summary["duration_h"] == 1
+
+
+def test_apply_decision_refuses_before_record_mutation_on_bad_campaign_config():
+    data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
+    feedstocks = yaml.safe_load(data_path.read_text())
+    sim = _sim_with_data(feedstocks)
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.campaign_mgr.campaigns["C2A_continuous"]["condenser_geometry"] = {
+        "stage_area_ratios": {"stage_1": 0.5},
+    }
+    before_decisions = list(sim.record.decisions)
+    before_path = sim.record.path
+    before_campaign = sim.melt.campaign
+
+    with pytest.raises(ValueError, match="stage_area_ratios"):
+        sim.apply_decision(DecisionType.PATH_AB, "A")
+
+    assert sim.record.decisions == before_decisions
+    assert sim.record.path == before_path
+    assert sim.melt.campaign is before_campaign
 
 
 def test_builtin_feedstocks_initially_conserve_batch_mass():

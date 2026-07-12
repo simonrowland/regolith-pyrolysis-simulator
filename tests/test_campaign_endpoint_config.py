@@ -183,6 +183,22 @@ def test_configured_campaign_endpoints_match_legacy_trip_points(
     assert manager.check_endpoint(melt, flux, CondensationTrain(), record) is expected
 
 
+def test_zero_runtime_max_hours_uses_configured_campaign_default():
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"max_hours": 0.0}
+    melt = _melt(CampaignPhase.C2A, 0)
+
+    assert (
+        manager.check_endpoint(
+            melt,
+            _flux(99.0),
+            CondensationTrain(),
+            BatchRecord(),
+        )
+        is False
+    )
+
+
 def test_c5_low_current_endpoint_is_gated_on_final_rung():
     # The C5 cell dispatches at the stage voltage cap for EVERY ladder hold
     # (2026-07-06 rung fix), so at-cap + low-current no longer means "ladder

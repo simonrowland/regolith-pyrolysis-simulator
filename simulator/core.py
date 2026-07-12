@@ -922,13 +922,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f"additive {species!r} mass must be finite and non-negative"
                 )
             additives[species] = additive_kg
+        self._validate_feedstock_composition_declarations(fs)
+        self._validate_stage0_preload_declarations(fs, mass_value, additives)
         ledger_additives = dict(additives)
-        self._activated_additive_reagents = set()
+
+        previous_registry = self.species_formula_registry
+        previous_carbonate_specs = self._stage0_carbonate_decomposition_specs
+        previous_foulant_diagnostics = self._stage0_foulant_diagnostics
         self.species_formula_registry = self._registry_for_feedstock(fs)
+        try:
+            inventory = self._build_process_inventory(
+                fs, mass_value, feedstock_key=feedstock_key,
+            )
+        except Exception:
+            self.species_formula_registry = previous_registry
+            self._stage0_carbonate_decomposition_specs = previous_carbonate_specs
+            self._stage0_foulant_diagnostics = previous_foulant_diagnostics
+            raise
+
+        self._activated_additive_reagents = set()
         self.atom_ledger = self._new_atom_ledger()
-        self.inventory = self._build_process_inventory(
-            fs, mass_value, feedstock_key=feedstock_key,
-        )
+        self.inventory = inventory
         self._stage0_carbon_cleanup_specs = []
         self._stage0_carbonate_decomposition_specs = []
         self._stage0_perchlorate_cleanup_specs = []
@@ -3065,11 +3079,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if species_kg_for_M_avg is None:
             species_kg_for_M_avg = self._overhead_holdup_species_kg()
         p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
+        p_downstream_Pa = max(0.0, self._headspace_downstream_pressure_bar()) * 1.0e5
         return max(
             0.0,
             float(self.overhead_model._pipe_conductance(
                 p_mean_Pa,
                 self.melt.temperature_C,
+                p_downstream_Pa=p_downstream_Pa,
                 species_kg_for_M_avg=species_kg_for_M_avg,
             )),
         )
@@ -4496,11 +4512,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return math.log10(pO2_mbar / 1000.0), 'controlled_o2_pO2_mbar'
 
     def _reset_o2_bubbler_telemetry_for_hour(self) -> None:
+        retained_external_o2_mol = self._o2_bubbler_external_o2_overhead_mol()
+        retained_external_o2_kg = (
+            retained_external_o2_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        )
         self._o2_bubbler_injected_kg = 0.0
         self._o2_bubbler_absorbed_kg = 0.0
         self._o2_bubbler_passthrough_kg = 0.0
         self._o2_bubbler_vented_kg = 0.0
-        self._o2_bubbler_overhead_passthrough_pending_kg = 0.0
+        self._o2_bubbler_overhead_passthrough_pending_kg = retained_external_o2_kg
+        if retained_external_o2_kg > 0.0:
+            self._last_o2_bubbler_diagnostic = {
+                'status': 'ok',
+                'reason': 'retained_overhead_passthrough_pending',
+                'retained_external_o2_mol': retained_external_o2_mol,
+                'pending_passthrough_kg': retained_external_o2_kg,
+            }
+            return
         self._last_o2_bubbler_diagnostic = {
             'status': 'ok',
             'reason': 'not_run',
@@ -6228,14 +6256,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else 0.0
         )
         requested_vapor_mol = float(partition.get('native_fe_vapor_mol', 0.0) or 0.0)
-        if transition is None:
+        routed_vapor_mol = diagnostic.get('routed_fe_vapor_mol')
+        explicit_mol_native_vapor_route = False
+        if routed_vapor_mol is not None:
+            try:
+                routed_vapor_mol = float(routed_vapor_mol)
+                explicit_mol_native_vapor_route = (
+                    native_fe_intent == ChemistryIntent.NATIVE_FE_SATURATION
+                    and math.isfinite(routed_vapor_mol)
+                    and routed_vapor_mol > 1.0e-12
+                    and math.isclose(
+                        routed_vapor_mol,
+                        requested_vapor_mol,
+                        rel_tol=1.0e-9,
+                        abs_tol=1.0e-12,
+                    )
+                )
+            except (TypeError, ValueError):
+                explicit_mol_native_vapor_route = False
+        if (
+            transition is None
+            and (
+                split_commit_status != 'no_commit'
+                or requested_vapor_mol <= 1.0e-12
+                or not explicit_mol_native_vapor_route
+            )
+        ):
             vapor_route = {
                 'native_fe_vapor_route_status': 'suppressed_no_committed_split',
                 'native_fe_vapor_route_suppressed_mol': requested_vapor_mol,
             }
         else:
+            vapor_route_mol = (
+                float(routed_vapor_mol)
+                if transition is None
+                else requested_vapor_mol
+            )
             vapor_route = self._route_native_fe_vapor_to_condensation(
-                requested_vapor_mol,
+                vapor_route_mol,
                 sample_time_h=sample_time_h,
                 source_account=native_fe_source_account,
             )
@@ -6314,7 +6372,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             exchange_direction='redox_source:native_fe_saturation_split',
             gate_authority=gate_authority,
         )
-        if transition is None:
+        if transition is None and committed_vapor_mol > 1.0e-12:
+            event = {
+                'native_fe_event': 'native_fe_partitioned_saturation',
+                'native_fe_event_reason': (
+                    'native_fe_vapor_route_applied_without_tap_split'
+                ),
+                'native_fe_event_status': 'ok',
+            }
+        elif transition is None:
             event_reason = str(
                 diagnostic.get('reason_refused')
                 or diagnostic.get('reason')
@@ -8198,6 +8264,134 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             stage0_mass_balance_delta_kg=stage0_mass_balance_delta_kg,
         )
 
+    @classmethod
+    def _validate_feedstock_composition_declarations(
+        cls, feedstock: Mapping[str, Any]
+    ) -> None:
+        sections = (
+            ('composition_wt_pct', feedstock.get('composition_wt_pct', {}) or {}),
+            (
+                'non_oxide_components',
+                feedstock.get('non_oxide_components', {}) or {},
+            ),
+            ('bulk_additions', feedstock.get('bulk_additions', {}) or {}),
+            ('structural_water', feedstock.get('structural_water', {}) or {}),
+        )
+        stage0 = feedstock.get('anhydrous_silicate_after_degassing') or {}
+        if stage0:
+            if not isinstance(stage0, Mapping):
+                raise ValueError(
+                    'anhydrous_silicate_after_degassing must be a mapping'
+                )
+            sections += (
+                (
+                    'anhydrous_silicate_after_degassing.composition_wt_pct',
+                    stage0.get('composition_wt_pct', {}) or {},
+                ),
+            )
+        for section_name, values in sections:
+            if not isinstance(values, Mapping):
+                raise ValueError(f'{section_name} must be a mapping')
+            for component, raw_value in values.items():
+                cls._declared_nonnegative_number(
+                    raw_value, f'{section_name}.{component}')
+
+    @classmethod
+    def _validate_stage0_preload_declarations(
+        cls,
+        feedstock: Mapping[str, Any],
+        batch_mass_kg: float,
+        additives_kg: Mapping[str, float],
+    ) -> None:
+        if feedstock.get('anhydrous_silicate_after_degassing'):
+            if not cls._uses_carbonaceous_degas_cleanup(feedstock):
+                raise ValueError(
+                    "anhydrous_silicate_after_degassing requires explicit "
+                    "stage0_profile: carbonaceous_degas_cleanup"
+                )
+            cls._stage0_temp_range_from_feedstock(
+                feedstock,
+                default=STAGE0_CARBON_CLEANUP_TEMP_RANGE_C,
+                require_explicit=True,
+            )
+
+        if not cls._uses_mars_carbon_cleanup(feedstock):
+            cls._validate_stage0_perchlorate_declarations(feedstock)
+            return
+
+        cls._stage0_temp_range_from_feedstock(
+            feedstock,
+            default=STAGE0_CARBON_CLEANUP_TEMP_RANGE_C,
+            require_explicit=False,
+        )
+        required_kg = cls._carbon_reductant_required_kg(
+            feedstock, batch_mass_kg)
+        available_c_kg = float(additives_kg.get('C', 0.0))
+        if required_kg > 1e-12 and available_c_kg + 1e-12 < required_kg:
+            raise AccountingError(
+                f"{feedstock.get('label', 'feedstock')} requires "
+                f"{required_kg:.6g} kg C reductant for Stage 0 "
+                "carbon cleanup; supply additives_kg={'C': ...}"
+            )
+        if required_kg > 1e-12:
+            cls._validate_stage0_carbon_cleanup_declarations(feedstock)
+        cls._validate_stage0_perchlorate_declarations(feedstock)
+
+    @classmethod
+    def _validate_stage0_carbon_cleanup_declarations(
+        cls, feedstock: Mapping[str, Any]
+    ) -> None:
+        reaction_ids = cls._stage0_carbon_cleanup_reaction_ids(feedstock)
+        if not reaction_ids:
+            raise AccountingError(
+                'Stage 0 carbon cleanup requires explicit '
+                'stage0_carbon_cleanup.reactions'
+            )
+        cls._validate_stage0_carbon_reaction_order(reaction_ids)
+        supported = {'sulfate_so3_to_so2_co', 'co2_boudouard_to_co'}
+        for reaction_id in reaction_ids:
+            if reaction_id not in supported:
+                raise AccountingError(
+                    f'unsupported Stage 0 carbon cleanup reaction {reaction_id!r}'
+                )
+        if (
+            'co2_boudouard_to_co' in reaction_ids
+            and not cls._has_stage0_co2_source(feedstock)
+        ):
+            raise AccountingError(
+                'co2_boudouard_to_co requires a declared CO2 atmosphere '
+                'or stage0_carbon_cleanup.co2_source'
+            )
+
+    @staticmethod
+    def _validate_stage0_perchlorate_declarations(
+        feedstock: Mapping[str, Any]
+    ) -> None:
+        cleanup = feedstock.get('stage0_perchlorate_cleanup') or {}
+        if not cleanup:
+            return
+        if not isinstance(cleanup, Mapping):
+            raise ValueError('stage0_perchlorate_cleanup must be a mapping')
+        raw_reactions = cleanup.get('reactions') or []
+        if not isinstance(raw_reactions, (list, tuple)):
+            raise ValueError('stage0_perchlorate_cleanup.reactions must be a list')
+        reactions = [
+            str(item.get('id', '') if isinstance(item, Mapping) else item)
+            for item in raw_reactions
+        ]
+        supported_reactions = {'perchlorate_to_chloride_o2'}
+        for reaction_id in reactions:
+            if reaction_id not in supported_reactions:
+                raise AccountingError(
+                    f"stage0_perchlorate_cleanup.reactions contains "
+                    f"unsupported reaction {reaction_id!r}"
+                )
+        if 'perchlorate_to_chloride_o2' not in reactions:
+            raise AccountingError(
+                'stage0_perchlorate_cleanup.reactions must include '
+                'perchlorate_to_chloride_o2'
+            )
+
     @staticmethod
     def _bucket_species(
         buckets: Mapping[str, Mapping[str, float]]
@@ -8518,6 +8712,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _melt_from_composition(
         cls, comp: Mapping[str, Any], mass_kg: float
     ) -> Dict[str, float]:
+        for component, raw_value in comp.items():
+            cls._declared_nonnegative_number(
+                raw_value, f'composition_wt_pct.{component}')
         return {
             oxide: cls._mass_from_wt_pct(comp.get(oxide, 0.0), mass_kg) or 0.0
             for oxide in OXIDE_SPECIES
@@ -8577,7 +8774,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         for component, raw_value in comp.items():
             if component in OXIDE_SPECIES:
                 continue
-            kg = cls._mass_from_wt_pct(raw_value, cleaned_mass)
+            kg = cls._mass_from_declared_wt_pct(
+                raw_value, cleaned_mass,
+                f'anhydrous_silicate_after_degassing.composition_wt_pct.{component}')
             if kg is not None and kg > 0.0:
                 residual[f'cleaned_melt_{component}'] = kg
         return residual
@@ -8869,7 +9068,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> Dict[str, float]:
         masses: Dict[str, float] = {}
         for component, raw_value in values.items():
-            kg = cls._mass_from_wt_pct(raw_value, mass_kg)
+            kg = cls._mass_from_declared_wt_pct(
+                raw_value, mass_kg, f'composition_wt_pct.{component}')
             if kg is not None and kg > 0.0:
                 masses[str(component)] = kg
         return masses
@@ -8882,9 +9082,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         for raw_name, raw_value in values.items():
             name = cls._component_name_from_field(str(raw_name))
             if str(raw_name).endswith('_kg_per_tonne'):
-                kg = cls._mass_from_kg_per_tonne(raw_value, mass_kg)
+                kg = cls._mass_from_declared_kg_per_tonne(
+                    raw_value, mass_kg, str(raw_name))
             else:
-                kg = cls._mass_from_wt_pct(raw_value, mass_kg)
+                kg = cls._mass_from_declared_wt_pct(
+                    raw_value, mass_kg, str(raw_name))
             if kg is not None and kg > 0.0:
                 masses[name] = masses.get(name, 0.0) + kg
         return masses
@@ -9467,6 +9669,64 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if number is None:
             return None
         return batch_mass_kg * number / 1000.0
+
+    @classmethod
+    def _mass_from_declared_wt_pct(
+        cls, value: Any, mass_kg: float, field: str
+    ) -> Optional[float]:
+        number = cls._declared_nonnegative_number(value, field)
+        if number is None:
+            return None
+        return mass_kg * number / 100.0
+
+    @classmethod
+    def _mass_from_declared_kg_per_tonne(
+        cls, value: Any, batch_mass_kg: float, field: str
+    ) -> Optional[float]:
+        number = cls._declared_nonnegative_number(value, field)
+        if number is None:
+            return None
+        return batch_mass_kg * number / 1000.0
+
+    @staticmethod
+    def _declared_nonnegative_number(value: Any, field: str) -> Optional[float]:
+        if value is None:
+            raise ValueError(
+                f'{field} must be a finite non-negative number or [low, high] range'
+            )
+        if isinstance(value, bool):
+            raise ValueError(
+                f'{field} must be a finite non-negative number or [low, high] range'
+            )
+        if isinstance(value, (int, float)):
+            number = float(value)
+        elif isinstance(value, (list, tuple)) and len(value) == 2:
+            try:
+                low = float(value[0])
+                high = float(value[1])
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f'{field} must be a finite non-negative number or [low, high] range'
+                ) from exc
+            if (
+                not math.isfinite(low)
+                or not math.isfinite(high)
+                or low < 0.0
+                or high < 0.0
+            ):
+                raise ValueError(
+                    f'{field} must be a finite non-negative number or [low, high] range'
+                )
+            number = (low + high) / 2.0
+        else:
+            raise ValueError(
+                f'{field} must be a finite non-negative number or [low, high] range'
+            )
+        if not math.isfinite(number) or number < 0.0:
+            raise ValueError(
+                f'{field} must be a finite non-negative number or [low, high] range'
+            )
+        return number
 
     @staticmethod
     def _representative_number(value: Any) -> Optional[float]:
@@ -10133,7 +10393,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _capture_campaign_summary(self, campaign_name: str) -> dict:
         """Capture a summary of what happened during the just-completed campaign."""
-        duration_h = self.melt.hour - self._campaign_start_hour
+        duration_h = self.melt.hour - self._campaign_start_hour + 1
         end_mass = self.melt.total_mass_kg
         mass_lost = self._campaign_start_mass - end_mass
 
@@ -10675,8 +10935,48 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             # Also store volatiles train spec for Loop 4 throttle
             self._volatiles_train_spec = self._equipment.volatiles_train
-            self.overhead_model.pipe_length_m = self._equipment.pipe.length_m
+        self._apply_equipment_runtime_geometry()
         return self._equipment.turbine
+
+    def _apply_equipment_runtime_geometry(self) -> None:
+        if self._equipment is None:
+            return
+        crucible_area_m2 = max(
+            0.0,
+            float(self._equipment.crucible.melt_surface_area_m2 or 0.0),
+        )
+        current_area_m2 = max(
+            0.0,
+            float(getattr(self.melt, 'melt_surface_area_m2', 0.0) or 0.0),
+        )
+        if crucible_area_m2 > 0.0 and (
+            current_area_m2 <= 0.0
+            or math.isclose(current_area_m2, 0.2, rel_tol=0.0, abs_tol=1e-12)
+        ):
+            self.melt.melt_surface_area_m2 = crucible_area_m2
+
+        pipe = self._equipment.pipe
+        geometry_config = copy.deepcopy(self._overhead_condenser_geometry_config)
+        throat_area_m2 = max(
+            0.0,
+            float(getattr(pipe, 'initial_throat_area_m2', 0.0) or 0.0),
+        )
+        if throat_area_m2 > 0.0:
+            geometry_config['initial_throat_area_m2'] = throat_area_m2
+        stage_ratios = getattr(pipe, 'stage_area_ratios', None)
+        if isinstance(stage_ratios, Mapping) and stage_ratios:
+            geometry_config['stage_area_ratios'] = dict(stage_ratios)
+        from simulator.overhead import validate_condenser_geometry_config
+
+        geometry_config = validate_condenser_geometry_config(
+            _canonicalize_condenser_geometry_stage_keys(geometry_config)
+        )
+        self._overhead_condenser_geometry_config = geometry_config
+        self.overhead_model.configure_condenser_geometry(geometry_config)
+
+        pipe_length_m = max(0.0, float(getattr(pipe, 'length_m', 0.0) or 0.0))
+        if pipe_length_m > 0.0:
+            self.overhead_model.pipe_length_m = pipe_length_m
 
     # ------------------------------------------------------------------
     # Decision handling
@@ -10708,33 +11008,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f"invalid {decision_type.name} choice {choice!r}; "
                 f"valid choices: {', '.join(valid_choices)}"
             )
-        self.record.decisions.append((decision_type, choice))
+        record_updates: dict[str, str] = {}
+        next_campaign: CampaignPhase | None = None
+        complete = False
 
         if decision_type == DecisionType.ROOT_BRANCH:
             if choice == 'mre_baseline':
-                self.record.track = 'mre_baseline'
-                self.start_campaign(CampaignPhase.MRE_BASELINE)
+                record_updates['track'] = 'mre_baseline'
+                next_campaign = CampaignPhase.MRE_BASELINE
             else:
-                self.record.track = 'pyrolysis'
-                self.start_campaign(CampaignPhase.C0)
+                record_updates['track'] = 'pyrolysis'
+                next_campaign = CampaignPhase.C0
 
         elif decision_type == DecisionType.PATH_AB:
-            self.record.path = choice  # 'A', 'A_staged', or 'B'
+            record_updates['path'] = choice  # 'A', 'A_staged', or 'B'
             if choice == 'A':
-                self.start_campaign(CampaignPhase.C2A)
+                next_campaign = CampaignPhase.C2A
             elif choice == 'A_staged':
-                self.start_campaign(CampaignPhase.C2A_STAGED)
+                next_campaign = CampaignPhase.C2A_STAGED
             else:
-                self.start_campaign(CampaignPhase.C2B)
+                next_campaign = CampaignPhase.C2B
 
         elif decision_type == DecisionType.BRANCH_ONE_TWO:
-            self.record.branch = choice  # 'one' or 'two'
+            record_updates['branch'] = choice  # 'one' or 'two'
             if choice == 'two':
-                self.start_campaign(CampaignPhase.C4)
+                next_campaign = CampaignPhase.C4
             elif self.melt.c5_enabled:
-                self.start_campaign(CampaignPhase.C5)
+                next_campaign = CampaignPhase.C5
             else:
-                self.melt.campaign = CampaignPhase.COMPLETE
+                complete = True
 
         elif decision_type == DecisionType.TI_RETENTION:
             # Handled within C5 campaign logic
@@ -10742,19 +11044,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         elif decision_type == DecisionType.C6_PROCEED:
             if choice == 'yes':
-                self.start_campaign(CampaignPhase.C6)
+                next_campaign = CampaignPhase.C6
             else:
-                self.melt.campaign = CampaignPhase.COMPLETE
+                complete = True
 
         elif decision_type == DecisionType.C7_PROCEED:
             if choice == 'yes':
-                self.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+                next_campaign = CampaignPhase.C7_CA_ALUMINOTHERMIC
             else:
-                self.melt.campaign = CampaignPhase.COMPLETE
+                complete = True
 
         else:
             raise ValueError(f"unsupported decision type {decision_type.name}")
 
+        if next_campaign is not None:
+            self.start_campaign(next_campaign)
+        if complete:
+            self.melt.campaign = CampaignPhase.COMPLETE
+        self.record.decisions.append((decision_type, choice))
+        for field_name, field_value in record_updates.items():
+            setattr(self.record, field_name, field_value)
         self.paused_for_decision = False
         self.pending_decision = None
         if self.is_complete():

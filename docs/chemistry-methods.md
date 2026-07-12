@@ -190,8 +190,9 @@ ideal solution would predict — their true single-cation activity coefficients 
 Because the alkali partial pressure is **linear** in that coefficient (see below), taking γ = 1
 overstates the alkali activity, and therefore the alkali vapor pressure and evaporation rate, by
 roughly that same factor of a thousand. An ideal treatment predicts sodium and potassium boiling off
-far too readily. This is why the grounded alkali coefficients matter, and why they are recorded even
-though the builtin activity path does not yet consume them.
+far too readily. This is why the grounded alkali coefficients matter: the builtin vapor-pressure path
+now applies them through `melt_oxide_activity`, so these values directly scale the authoritative
+alkali partial pressures rather than serving only as archived provenance.
 <!-- impl: §3 -> docs/chemistry-provenance.yaml gamma_alkali_melt_activity:34 — alkali gamma provenance -->
 
 ### §3.1 The grounded alkali coefficients and why the basis is load-bearing

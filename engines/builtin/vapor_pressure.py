@@ -1309,14 +1309,24 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 pO2_scaled = True
 
-            # SiO suppression by pO2: p(SiO) ~ 1/sqrt(pO2). Reference is
-            # the body/environment vacuum floor.
+            # SiO suppression by pO2: p(SiO) scales as 1/sqrt(pO2).
+            # Premise: the fitted SiO Antoine row is calibrated at its
+            # declared pO2_reference_bar, not at the current body vacuum
+            # floor. Algebra: P = P_ref * sqrt(p_ref / pO2). Unit check:
+            # bar/bar is dimensionless. Sanity: changing lunar/asteroid
+            # environmental floors must not retune the SiO fit itself.
+            sio_reference_bar = vacuum_floor_bar
+            if name == 'SiO':
+                sio_reference_bar = max(
+                    1e-30,
+                    float(data.get('pO2_reference_bar', vacuum_floor_bar) or vacuum_floor_bar),
+                )
             if (
                 name == 'SiO'
                 and not pO2_exponent
-                and transport_pO2_bar > vacuum_floor_bar
+                and transport_pO2_bar > sio_reference_bar
             ):
-                suppression = math.sqrt(vacuum_floor_bar / transport_pO2_bar)
+                suppression = math.sqrt(sio_reference_bar / transport_pO2_bar)
                 P_eq_Pa = _require_finite_vapor_value(
                     P_eq_Pa * suppression,
                     species=name,

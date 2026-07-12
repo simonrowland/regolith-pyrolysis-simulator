@@ -10,7 +10,7 @@ from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.run_executor import RunExecution, RunExecutor, _aggregate_backend_status
 from simulator.runner import PyrolysisRun
-from simulator.session import SimSession, SimSessionConfig
+from simulator.session import SimSession, SimSessionConfig, StepResult
 from simulator.state import CampaignPhase, DecisionType
 from simulator.trace import PhysicsTrace
 
@@ -165,8 +165,8 @@ def test_ci_c0_to_c6_refusal_preserves_prior_rows_and_ledger_accounts():
     assert payload["reason"] == (
         "c6_joint_thermodynamic_liquid_fraction_window_empty"
     )
-    # C6 cold-hold (1450 -> 1400 C, wave-09): the CI run reaches its binding
-    # refusal one ramp-hour earlier (42 rows; was 43 at the 1450 recipe).
+    # The binding C6 refusal now fires on the first C6 tick, after all prior
+    # campaign rows have been preserved in the envelope.
     assert len(rows) == 42
     assert list(dict.fromkeys(row["campaign"] for row in rows)) == [
         "C0",
@@ -227,6 +227,48 @@ def test_run_executor_partial_path_sets_status_and_decisions():
     assert execution.shadow_trace == execution.operator_decisions
 
 
+def test_run_executor_final_budget_pending_decision_is_partial(monkeypatch):
+    snapshot = SimpleNamespace()
+    simulator = SimpleNamespace(
+        record=SimpleNamespace(snapshots=(snapshot,)),
+        cost_ledger=SimpleNamespace(),
+        product_ledger=lambda: {},
+        melt=SimpleNamespace(hour=1),
+    )
+
+    def pending_decision(_self):
+        return SimpleNamespace()
+
+    BareSession = type(
+        "BareSession",
+        (),
+        {"simulator": simulator, "pending_decision": pending_decision},
+    )
+
+    def one_step(*_args, **_kwargs):
+        yield StepResult(snapshot=snapshot, per_hour_summary={"hour": 1})
+
+    monkeypatch.setattr("simulator.run_executor.drive_session", one_step)
+    monkeypatch.setattr(
+        "simulator.run_executor.build_cost_rollup_diagnostic",
+        lambda *_args, **_kwargs: {},
+    )
+    monkeypatch.setattr(
+        "simulator.run_executor.pumping_context_from_sim",
+        lambda *_args, **_kwargs: {},
+    )
+    monkeypatch.setattr(
+        PhysicsTrace,
+        "from_simulator",
+        classmethod(lambda cls, _sim: cls(snapshots=(snapshot,))),
+    )
+
+    execution = RunExecutor().execute_session(BareSession(), hours=1)
+
+    assert execution.status == "partial"
+    assert execution.reason == "pending_decision"
+
+
 @pytest.mark.parametrize(
     "feedstock_id",
     (
@@ -243,6 +285,7 @@ def test_run_executor_stop_at_stage0_exit_is_ok_for_real_and_synthetic_feedstock
             campaign="C0",
             hours=500,
             allow_fallback_vapor=True,
+            allow_unmeasured_alpha_fallback=True,
             run_metadata_overrides={
                 "started_at_utc": "2026-06-17T00:00:00Z",
                 "kernel_commit_sha": "stage0-stop-test",
@@ -269,6 +312,7 @@ def test_run_executor_stage0_stop_ledger_matches_pre_path_ab_c0b_cut() -> None:
             campaign="C0",
             hours=500,
             allow_fallback_vapor=True,
+            allow_unmeasured_alpha_fallback=True,
             run_metadata_overrides={
                 "started_at_utc": "2026-06-17T00:00:00Z",
                 "kernel_commit_sha": "stage0-stop-parity",
@@ -361,6 +405,94 @@ def test_run_executor_preserves_campaign_pressure_refusal_during_execution(
     assert execution.reason == diagnostic["reason"]
     assert execution.error_message == diagnostic["reason"]
     assert execution.refusal_diagnostic == diagnostic
+
+
+def test_run_executor_failure_envelope_uses_safe_exception_text(monkeypatch):
+    class BadStr(Exception):
+        def __str__(self):
+            raise RuntimeError("secondary string failure")
+
+    class BareSession:
+        simulator = SimpleNamespace()
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise BadStr()
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+
+    execution = RunExecutor().execute_session(BareSession(), hours=1)
+
+    assert execution.status == "failed"
+    assert execution.error_message == (
+        "BadStr: <message unavailable: RuntimeError>"
+    )
+
+
+def test_run_executor_poison_enrichment_survives_rollup_failure(monkeypatch):
+    poisoned = SimpleNamespace(
+        hour=3,
+        committed_transition_count=2,
+        aborting_exception_summary="projection failed",
+    )
+    simulator = SimpleNamespace(
+        _poisoned_hour=poisoned,
+        record=SimpleNamespace(snapshots=()),
+        cost_ledger=SimpleNamespace(),
+        product_ledger=lambda: {},
+        melt=SimpleNamespace(hour=1),
+    )
+
+    BareSession = type("BareSession", (), {"simulator": simulator})
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        lambda *_args, **_kwargs: (),
+    )
+    monkeypatch.setattr(
+        "simulator.run_executor.pumping_context_from_sim",
+        lambda *_args, **_kwargs: {},
+    )
+
+    def fail_rollup(*_args, **_kwargs):
+        raise RuntimeError("rollup unavailable")
+
+    monkeypatch.setattr(
+        "simulator.run_executor.build_cost_rollup_diagnostic",
+        fail_rollup,
+    )
+
+    execution = RunExecutor().execute_session(BareSession(), hours=1)
+
+    assert execution.status == "failed"
+    assert execution.reason == "poisoned_hour"
+    assert execution.error_message.startswith("PoisonedHourError:")
+    assert "envelope detail unavailable" in execution.envelope_detail_unavailable
+
+
+def test_run_executor_rejects_negative_hours_before_stepping():
+    session = SimSession().start(_run()._session_config())
+    before_hour = session.simulator.melt.hour
+
+    with pytest.raises(ValueError, match="hours must be non-negative"):
+        RunExecutor().execute_session(session, hours=-1)
+
+    assert session.simulator.melt.hour == before_hour
+
+
+def test_run_executor_slices_resumed_session_snapshots_to_execution_window():
+    session = SimSession().start(_run()._session_config())
+    session.advance()
+    snapshot_start = len(session.simulator.record.snapshots)
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert len(execution.per_hour) == 1
+    assert execution.snapshots == tuple(session.simulator.record.snapshots[snapshot_start:])
+    assert len(execution.snapshots) == 1
+    assert execution.trace.snapshots == execution.snapshots
 
 
 def _pressure_refusal_run(**overrides) -> PyrolysisRun:

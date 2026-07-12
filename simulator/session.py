@@ -45,6 +45,9 @@ def _finite_float(value: Any, label: str) -> float:
     return number
 
 
+_ALLOWED_SESSION_TRACKS = frozenset({"pyrolysis", "mre_baseline"})
+
+
 def _canonical_runtime_campaign_overrides(
     *,
     runtime_campaign_overrides: Mapping[str, Mapping[str, Any]] | None,
@@ -175,6 +178,11 @@ class SimSessionConfig:
         )
         object.__setattr__(self, "runtime_campaign_overrides", overrides)
         object.__setattr__(self, "setpoints_overrides", overrides)
+        track = str(self.track)
+        if track not in _ALLOWED_SESSION_TRACKS:
+            valid = ", ".join(sorted(_ALLOWED_SESSION_TRACKS))
+            raise ValueError(f"unknown track {track!r}; valid options: {valid}")
+        object.__setattr__(self, "track", track)
         if self.c4_max_temp is not None:
             c4_max_temp = _finite_float(self.c4_max_temp, "c4_max_temp")
             if c4_max_temp < 0.0:
@@ -478,8 +486,11 @@ class SimSession:
                 raise ValueError(
                     "campaign_override requires campaign and field keywords"
                 )
-            target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
             if field_name == "stir_factor":
+                sim.campaign_mgr._refuse_unknown_override_fields(
+                    campaign_name,
+                    {field_name: value},
+                )
                 # 0.5.2 Phase B codex autoreview-r2 P3: route the
                 # campaign_override write through ``clamp_stir_factor``
                 # BEFORE the float() coercion below, otherwise
@@ -489,15 +500,21 @@ class SimSession:
                 # path. The overrides dict carries the canonical
                 # clamped value so any re-entry path applies the
                 # operator-bounded contract.
-                target[field_name] = clamp_stir_factor(value)
+                clamped = clamp_stir_factor(value)
+                target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
+                target[field_name] = clamped
                 if sim.melt.campaign.name == campaign_name:
                     # Live-update the melt field too if this override
                     # targets the currently-active campaign. The
                     # legacy ``stir_factor`` write touches AXIAL only
                     # (via the backward-compat property setter on
                     # MeltState).
-                    sim.melt.stir_factor = target[field_name]
+                    sim.melt.stir_factor = clamped
             elif field_name == "stir_state":
+                sim.campaign_mgr._refuse_unknown_override_fields(
+                    campaign_name,
+                    {field_name: value},
+                )
                 # 0.5.3 Phase B: canonical 2-axis campaign override.
                 # Stored as a StirState dataclass in the overrides
                 # dict so any re-entry path (e.g.
@@ -507,6 +524,7 @@ class SimSession:
                 # the melt too if the override targets the active
                 # campaign.
                 clamped = clamp_stir_state(value)
+                target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
                 target[field_name] = clamped
                 if sim.melt.campaign.name == campaign_name:
                     sim.melt.stir_state = clamped
@@ -515,8 +533,13 @@ class SimSession:
                     value,
                     f"campaign_override {campaign_name}.{field_name}",
                 )
+                sim.campaign_mgr._refuse_unknown_override_fields(
+                    campaign_name,
+                    {field_name: value},
+                )
                 if field_name == "pO2_mbar" and finite_value < 0.0:
                     raise ValueError("pO2_mbar must be non-negative")
+                target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
                 target[field_name] = finite_value
             if field_name == "pO2_mbar" and sim.melt.campaign.name == campaign_name:
                 # 0.5.4 W5 (post-push P2 convergent finding, codex
@@ -536,7 +559,7 @@ class SimSession:
                 # suppression becomes live. ``value == 0`` leaves
                 # atmosphere alone (clearing the setpoint, NOT
                 # requesting controlled-O2).
-                new_pO2 = target[field_name]
+                new_pO2 = finite_value
                 sim.melt.pO2_mbar = new_pO2
                 sim.melt.p_total_mbar = max(
                     sim.melt.p_total_mbar,

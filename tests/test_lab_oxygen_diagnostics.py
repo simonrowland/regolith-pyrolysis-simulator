@@ -450,6 +450,33 @@ def test_impossible_sticking_probability_is_non_authoritative():
     assert authority["authoritative_for_resinter"] is False
 
 
+def test_segment_deposit_requires_matching_sticking_provenance_record():
+    notice = wall_sticking_alpha_provenance_notice(
+        {"Na": 0.5},
+        {
+            "Na": {
+                "stage_1": {
+                    "alpha_s": 0.5,
+                    "citation_status": "CITED",
+                    "status": "sourced",
+                    "output_status": "sourced_with_surface_proxy",
+                }
+            }
+        },
+    )
+
+    authority = wall_deposit_sticking_authority_status(
+        {"stage_1": {"Na": 0.1}, "stage_2": {"Na": 0.2}},
+        notice,
+    )
+
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["code"] == "wall_deposit_sticking_alpha_provenance_missing"
+    assert authority["missing_alpha_segment_species"] == [
+        {"segment": "stage_2", "species": "Na"}
+    ]
+
+
 def test_missing_sticking_provenance_is_warning_and_non_authoritative():
     notice = wall_sticking_alpha_provenance_notice({"Na": 0.5}, {})
 

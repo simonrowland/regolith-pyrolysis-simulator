@@ -24,6 +24,7 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     kress91_fe3_over_sigma_fe,
+    kress91_temperature_band_case,
     melt_mol_fractions_for_kress91,
 )
 
@@ -111,6 +112,28 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         pressure_bar = floor_vacuum_pressure_bar(float(request.pressure_bar))
         if not math.isfinite(fO2_log):
             raise ValueError(f"fO2_log must be finite, got {request.fO2_log!r}")
+        temperature_band = kress91_temperature_band_case(float(request.temperature_C))
+        if not bool(temperature_band.get("authoritative")):
+            return IntentResult(
+                intent=ChemistryIntent.FE_REDOX_RESPECIATION,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "respeciation_status": "refused",
+                    "direction": "none",
+                    "reason": "fe_redox_respeciation_temperature_unauthorized",
+                    "temperature_C": float(request.temperature_C),
+                    "temperature_band_case": temperature_band.get("case"),
+                    "temperature_band_status": temperature_band.get("status"),
+                    "temperature_band_source": temperature_band.get("source"),
+                    "temperature_band_authoritative": bool(
+                        temperature_band.get("authoritative")
+                    ),
+                    "o2_account": o2_account,
+                    "oxygen_source": oxygen_source,
+                },
+            )
 
         accounts = request.account_view.accounts
         cleaned_melt = dict(accounts.get(CLEANED_MELT_ACCOUNT, {}) or {})

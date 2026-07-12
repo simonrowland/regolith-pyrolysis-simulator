@@ -281,6 +281,7 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
 STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     1: 'fe_stage1',
+    2: 'cr_stage2',
     3: 'sio_stage3',
     4: 'alkali_stage4',
     7: 'terminal',
@@ -338,6 +339,21 @@ def _load_sticking_data(path: Path = STICKING_DATA_PATH) -> dict[str, Any]:
         raise ValueError(f'{path}: regularizer floor must be CITED or UNCERTIFIED')
     if not floor.get('source') or not floor.get('source_class'):
         raise ValueError(f'{path}: regularizer floor needs source/source_class')
+    time_constant = raw.get('capture_budget_regularizer_time_s')
+    if not isinstance(time_constant, Mapping):
+        raise ValueError(f'{path}: missing capture_budget_regularizer_time_s')
+    if isinstance(time_constant.get('value'), bool):
+        raise ValueError(f'{path}: regularizer time must be numeric, not boolean')
+    try:
+        time_s = float(time_constant.get('value'))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f'{path}: regularizer time must be numeric') from exc
+    if not math.isfinite(time_s) or time_s <= 0.0:
+        raise ValueError(f'{path}: regularizer time must be finite and > 0')
+    if str(time_constant.get('status', '')).upper() not in STICKING_STATUSES:
+        raise ValueError(f'{path}: regularizer time must be CITED or UNCERTIFIED')
+    if not time_constant.get('source') or not time_constant.get('source_class'):
+        raise ValueError(f'{path}: regularizer time needs source/source_class')
     return dict(raw)
 
 
@@ -1216,13 +1232,21 @@ STICKING_COEFF = {
 CAPTURE_BUDGET_REGULARIZER_FLOOR = float(
     STICKING_DATA['capture_budget_regularizer_floor']['value']
 )
+CAPTURE_BUDGET_REGULARIZER_TIME_S = float(
+    STICKING_DATA['capture_budget_regularizer_time_s']['value']
+)
 CAPTURE_BUDGET_REGULARIZER_NOTICE = {
     'severity': 'warning',
     'code': 'pressure_isolated_capture_budget_regularizer_uncertified',
     'source_class': STICKING_DATA['capture_budget_regularizer_floor']['source_class'],
     'floor': CAPTURE_BUDGET_REGULARIZER_FLOOR,
+    'time_constant_s': CAPTURE_BUDGET_REGULARIZER_TIME_S,
     'source': STICKING_DATA['capture_budget_regularizer_floor']['source'],
+    'time_constant_source': STICKING_DATA['capture_budget_regularizer_time_s']['source'],
     'citation_status': STICKING_DATA['capture_budget_regularizer_floor']['status'],
+    'time_constant_citation_status': (
+        STICKING_DATA['capture_budget_regularizer_time_s']['status']
+    ),
     'uncertainty_flag': (
         STICKING_DATA['capture_budget_regularizer_floor']['uncertainty_flag']
     ),
@@ -1559,7 +1583,12 @@ class KnudsenRegimeRefusal(RuntimeError):
 
     def __init__(self, diagnostic: Mapping[str, Any]):
         self.diagnostic = dict(diagnostic)
-        super().__init__(KNUDSEN_REFUSAL_REASON)
+        self.reason = str(
+            diagnostic.get('reason_refused')
+            or diagnostic.get('reason')
+            or KNUDSEN_REFUSAL_REASON
+        )
+        super().__init__(self.reason)
 
 
 # Condensation temperatures at ~1 mbar partial pressure (°C).
@@ -2764,15 +2793,18 @@ class CondensationModel:
                 )
             return diagnostic
         unconfigured = dict(diagnostic)
-        unconfigured['status'] = 'unconfigured'
+        unconfigured['status'] = 'refused'
         unconfigured['reason'] = 'knudsen_policy_unconfigured'
+        unconfigured['reason_refused'] = 'knudsen_policy_unconfigured'
+        unconfigured['message'] = (
+            'Knudsen pressure policy is unconfigured; condensation routing '
+            'refused.'
+        )
         return unconfigured
 
     def _enforce_knudsen_regime(self) -> dict[str, Any]:
         diagnostic = self._current_knudsen_diagnostic()
         self.last_knudsen_regime_diagnostic = diagnostic
-        if not self._knudsen_policy_configured:
-            return diagnostic
         if diagnostic.get('status') == 'refused':
             raise KnudsenRegimeRefusal(diagnostic)
         warnings = tuple(diagnostic.get('warnings', ()))
@@ -3134,8 +3166,14 @@ class CondensationModel:
             )
             eta = capturable_mol / available_mol
         else:
-            rate_s_inv = max(0.0, band_flux_fraction)
-            eta = 1.0 - math.exp(-residence_s * rate_s_inv)
+            # Premise: ``band_flux_fraction = flux / reference_flux`` is
+            # dimensionless. Algebra requires capturable mol =
+            # flux(mol m^-2 s^-1) * area(m^2) * residence(s), then
+            # eta = capturable_mol / available_mol. Unit check: without a
+            # configured area there is no m^2 term, so treating the ratio as
+            # s^-1 invents a rate constant. Sanity: leave vapor un-baffled
+            # rather than create synthetic capture.
+            eta = 0.0
         return max(0.0, min(1.0, eta))
 
 
@@ -4663,12 +4701,16 @@ def _pressure_isolated_stage_efficiency(
     if T_stage_C >= T_cond_C:
         return 0.0
     delta_T = T_cond_C - T_stage_C
-    tau_s = 1.0 / (
-        alpha_s * max(
-            delta_T / max(T_cond_C, 1.0),
-            CAPTURE_BUDGET_REGULARIZER_FLOOR,
-        )
+    normalized_drive = max(
+        delta_T / max(T_cond_C, 1.0),
+        CAPTURE_BUDGET_REGULARIZER_FLOOR,
     )
+    # Premise: alpha_s and normalized_drive are dimensionless. Algebra:
+    # tau_s = t_ref_s / (alpha_s * normalized_drive). Unit check:
+    # s / 1 = s, so residence_s / tau_s is dimensionless. Sanity:
+    # colder stages or higher sticking shorten tau; the explicit
+    # one-second t_ref_s is surfaced as an uncertified numerical regularizer.
+    tau_s = CAPTURE_BUDGET_REGULARIZER_TIME_S / (alpha_s * normalized_drive)
     eta = 1.0 - math.exp(-residence_s / tau_s)
     return max(0.0, min(1.0, eta))
 

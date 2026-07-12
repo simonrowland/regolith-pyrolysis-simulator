@@ -11,6 +11,7 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
+SETPOINTS_PATH = REPO_ROOT / "data" / "setpoints.yaml"
 
 EXPECTED_ALPHA = {
     ("metals", "Fe"): {
@@ -189,3 +190,12 @@ def test_tier_3_species_have_fail_loud_policy_not_placeholder_alpha():
         assert policy["tier"] == 3
         assert policy["policy"] == "fail_loud_missing_alpha"
         assert source_marker in policy["source"]
+
+
+def test_default_setpoints_refuse_unmeasured_alpha_fallback():
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text()) or {}
+
+    assert (
+        setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
+        is False
+    )

@@ -834,6 +834,23 @@ def test_forged_precomputed_authority_without_grounding_fails_closed() -> None:
     assert readout["authoritative"] is False
 
 
+def test_segment_deposit_without_matching_alpha_record_fails_closed() -> None:
+    payload = wall_deposit_sticking_authority_status(
+        {
+            "hot_wall": {"Fe": 0.05},
+            "cold_wall": {"Fe": 0.02},
+        },
+        _alpha_notice("Fe", cited=True),
+    )
+
+    assert payload["authoritative_for_coating"] is False
+    assert payload["code"] == "wall_deposit_sticking_alpha_provenance_missing"
+    assert payload["uncertified_alpha_species"] == ["Fe"]
+    assert payload["missing_alpha_segment_species"] == [
+        {"segment": "cold_wall", "species": "Fe"}
+    ]
+
+
 def test_cited_deposited_alpha_without_value_fails_closed() -> None:
     surfaces = _coating_surfaces("Fe", _cited_missing_alpha_notice("Fe"))
     coating = surfaces["coating"]

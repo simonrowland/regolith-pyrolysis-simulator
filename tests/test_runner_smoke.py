@@ -40,7 +40,7 @@ from simulator.optimize.recipe import (
     RecipePatch,
     RecipeSchema,
 )
-from simulator.run_executor import RunExecutor
+from simulator.run_executor import RunExecutor, _json_safe
 from simulator.state import CampaignPhase
 from simulator.runner import (
     EngineBugAbort,
@@ -49,6 +49,7 @@ from simulator.runner import (
     RUNNER_SCHEMA_VERSION,
     RunnerError,
     ZERO_INPUT_BASIS_BREACH,
+    build_per_hour_summary,
     _c3_alkali_dosing_kg_by_species,
     _degraded_path_engagement,
     _melt_redox_gate_floor_fallback_engagement,
@@ -66,6 +67,63 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures" / "runner"
 # ``tests/test_mass_balance.py``; surfacing the same number here means a
 # runner change that opens a balance gap fails fast against the goldens.
 MASS_BALANCE_MAX_PCT = 5e-12
+
+
+def test_json_safe_nonfinite_numbers_export_null():
+    assert _json_safe(
+        {"nan": float("nan"), "inf": [float("inf"), -float("inf")]}
+    ) == {"nan": None, "inf": [None, None]}
+
+
+def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+        record=SimpleNamespace(snapshots=()),
+    )
+    energy = SimpleNamespace(
+        electrical_plus_evaporation_kWh=0.0,
+        electrical_total_kWh=0.0,
+        evaporation_thermal_kWh=0.0,
+        energy_scope="test",
+        furnace_heat_status="test",
+        latent_kWh=0.0,
+        dissociation_kWh=0.0,
+        evaporation_breakdown_kWh={},
+    )
+    snapshot = SimpleNamespace(
+        hour=1,
+        campaign=CampaignPhase.C0,
+        temperature_C=float("nan"),
+        overhead=SimpleNamespace(
+            pressure_mbar=float("nan"),
+            composition={"O2": float("inf")},
+        ),
+        mass_balance_error_pct=float("nan"),
+        mass_balance_error_category="non_finite_mass_balance_error",
+        oxygen_produced_kg=float("inf"),
+        energy=energy,
+        energy_electrical_plus_evaporation_cumulative_kWh=0.0,
+        energy_cumulative_breakdown_kWh={},
+        condensation_totals={},
+        evap_flux=SimpleNamespace(species_kg_hr={}),
+        wall_deposit_by_segment_species_delta={},
+        knudsen_regime_summary={},
+    )
+
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+
+    assert summary["T_C"] is None
+    assert summary["P_total_bar"] is None
+    assert summary["pO2_bar"] is None
+    assert summary["mass_balance_pct"] is None
+    assert summary["O2_yield_kg_cumulative"] is None
+    json.dumps(summary, allow_nan=False)
+
 
 VPR_P6A_TRACE_CONTROLS = {
     "sio_start_temperature_c": 1050.0,
@@ -202,6 +260,13 @@ SCENARIOS = [
         "campaign": "C0",
         "hours": 24,
         "additives_kg": {},
+        # Golden mechanism attribution: SC-67 prevents the legacy hour-5 Ca
+        # fallback spike (80.9228 kg/h), so the evaporation freeze gate no
+        # longer inserts an extra 275 C hold. C2A_STAGED starts one hour
+        # earlier and contributes two 1250 C rows instead of one; summing those
+        # executable rows moves Fe 9.31e-7 -> 3.39e-6 kg/h-row, SiO
+        # 2.98e-7 -> 1.12e-6, Na 2.56e-4 -> 1.82e-3, and K
+        # 3.96e-5 -> 2.61e-4.
         "fixture": "lunar_mare_low_ti_C0_24h.json",
     },
     {
@@ -212,6 +277,13 @@ SCENARIOS = [
         # mars_basalt requires Stage 0 carbon reductant; without it
         # load_batch raises an AccountingError.
         "additives_kg": {"C": 30.0},
+        # Golden mechanism attribution: SC-67 makes mixed transport coverage a
+        # partial authoritative result: successful species remain computable
+        # while missing rows are excluded. Avoiding whole-intent unavailability
+        # also avoids legacy allow_fallback_vapor, which produced the hour-7 Na
+        # spike (25.7078 kg/h), 95.8781 kWh, and 279.557 mol O2-equivalent
+        # evaporative-metal-loss; later cumulative/ledger deltas propagate from
+        # removing that spike.
         "fixture": "mars_basalt_C2A_12h.json",
     },
     {
@@ -220,6 +292,12 @@ SCENARIOS = [
         "campaign": "C2B",
         "hours": 12,
         "additives_kg": {},
+        # Golden mechanism attribution: SC-67 keeps successfully computed
+        # species authoritative when another transport row is missing, instead
+        # of making the whole intent unavailable and entering legacy
+        # allow_fallback_vapor. Removing that fallback deletes the final-hour Ca
+        # spike (15.8319 kg/h), 87.3334 kWh, and 197.513 mol O2-equivalent
+        # evaporative-metal-loss; later ledger/purity deltas propagate from it.
         "fixture": "ci_carbonaceous_chondrite_C2B_12h.json",
     },
 ]
@@ -239,6 +317,7 @@ def _run_scenario(scenario: dict) -> dict:
         hours=scenario["hours"],
         additives_kg=dict(scenario["additives_kg"]),
         allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
         run_metadata_overrides={
             "started_at_utc": "2026-05-15T00:00:00Z",
             "kernel_commit_sha": "goal-18-fixture",
@@ -1210,7 +1289,7 @@ def test_runner_cli_rejects_nan_mass_with_valid_json(tmp_path):
     assert "NaN" not in text
     payload = json.loads(text)
     assert payload["status"] == "failed"
-    assert payload["run_metadata"]["mass_kg"] == "nan"
+    assert payload["run_metadata"]["mass_kg"] is None
     assert "zero_input_basis_breach" in payload["error_message"]
 
 
@@ -1483,6 +1562,8 @@ def test_runner_records_operator_decision_in_shadow_trace():
         # past the C0 endpoint (which fires around T~950C, ~18h on the
         # default ramp) so the decision pause is reached.
         hours=500,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
         run_metadata_overrides={
             "started_at_utc": "2026-05-15T00:00:00Z",
             "kernel_commit_sha": "decision-fixture",
@@ -1693,7 +1774,7 @@ def test_runner_preserves_primary_failure_when_poison_enrichment_fails(
     assert payload["status"] == "failed"
     assert payload["reason"] == ""
     assert payload["error_message"].splitlines() == [
-        "backend failure: primary abort",
+        "backend failure: RuntimeError: primary abort",
         (
             "envelope detail unavailable: AttributeError: "
             "'RaisingPoisonSim' object has no attribute 'record'"

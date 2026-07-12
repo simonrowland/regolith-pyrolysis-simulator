@@ -645,6 +645,35 @@ def test_session_rejects_invalid_po2_before_mutation(value):
     assert after == before
 
 
+@pytest.mark.parametrize("campaign_name", ["C2A", "C2B"])
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), -1.0])
+def test_session_rejects_invalid_campaign_po2_before_mutation(campaign_name, value):
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+    before_melt = (
+        sim.melt.pO2_mbar,
+        sim.melt.p_total_mbar,
+        sim.melt.atmosphere,
+    )
+    before_overrides = dict(sim.campaign_mgr.overrides)
+
+    with pytest.raises(ValueError, match="pO2_mbar"):
+        session.adjust(
+            "campaign_override",
+            value,
+            campaign=campaign_name,
+            field="pO2_mbar",
+        )
+
+    after_melt = (
+        sim.melt.pO2_mbar,
+        sim.melt.p_total_mbar,
+        sim.melt.atmosphere,
+    )
+    assert after_melt == before_melt
+    assert dict(sim.campaign_mgr.overrides) == before_overrides
+
+
 def test_auto_apply_driver_applies_recommendation_before_advancing():
     decision = DecisionPoint(
         DecisionType.PATH_AB,
@@ -691,6 +720,11 @@ def test_mre_baseline_track_start_tags_track_without_jumping_campaign():
     assert session.simulator.record.track == "mre_baseline"
     assert session.simulator.melt.campaign == CampaignPhase.C0
     assert session.simulator.melt.campaign != CampaignPhase.MRE_BASELINE
+
+
+def test_session_config_rejects_unknown_track():
+    with pytest.raises(ValueError, match="unknown track"):
+        _config(track="mre_basline")
 
 
 def test_c0b_hard_cap_ignores_sub_soft_temperature():
