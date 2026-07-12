@@ -1675,6 +1675,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'canonicalization support'
                 )
             account_mol_overrides = canonicalizer(self)
+        if (
+            intent is ChemistryIntent.METALLOTHERMIC_STEP
+            and temperature_C_override is None
+        ):
+            self._record_phase_context_diagnostic(
+                'metallothermic',
+                scalar_liquid_fraction=control_inputs.get('liquid_fraction'),
+            )
         return kernel.dispatch(
             intent,
             temperature_C=temperature_C,
@@ -1684,6 +1692,74 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             control_inputs=control_inputs,
             account_mol_overrides=account_mol_overrides,
         )
+
+    def _record_phase_context_diagnostic(
+        self,
+        site: str,
+        *,
+        scalar_liquid_fraction: float | None = None,
+    ) -> None:
+        """Relog PhaseContext without changing a consumer's inputs or output."""
+        try:
+            verified_scalar_source = None
+            pinned_hour = getattr(
+                self, '_melt_redox_gate_authority_tick_hour', None)
+            gate_authority = getattr(
+                self,
+                '_melt_redox_gate_authority_this_tick',
+                _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+            )
+            if (
+                scalar_liquid_fraction is None
+                and pinned_hour == int(self.melt.hour)
+                and gate_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+            ):
+                scalar_liquid_fraction = (
+                    self._melt_redox_liquid_fraction_factor(
+                        float(self.melt.temperature_C) + 273.15,
+                        gate_authority=gate_authority,
+                    )
+                )
+                verified_scalar_source = 'hour_pinned_melt_redox_gate'
+
+            from simulator.chemistry.phase_context import PhaseContext
+
+            liquidus_temperature_C = None
+            if isinstance(gate_authority, Mapping):
+                liquidus_temperature_C = gate_authority.get('liquidus_T_C')
+
+            per_species = PhaseContext(
+                float(self.melt.temperature_C),
+                float(self.melt.p_total_mbar) / 1000.0,
+                self._backend_composition_mol(),
+                self._current_melt_redox_fO2_log(),
+                molar_masses=MOLAR_MASS,
+                scalar_liquid_fraction=scalar_liquid_fraction,
+                verified_scalar_source=verified_scalar_source,
+                liquidus_temperature_C=liquidus_temperature_C,
+            )
+            record = {
+                'schema': 'phase_context_diagnostic_v1',
+                'diagnostic_only': True,
+                'behavioral_authority': False,
+                'site': str(site),
+                'hour': int(self.melt.hour),
+                'campaign_hour': int(self.melt.campaign_hour),
+                'per_species': per_species,
+            }
+        except Exception as exc:  # noqa: BLE001 - diagnostics cannot gate chemistry
+            record = {
+                'schema': 'phase_context_diagnostic_v1',
+                'diagnostic_only': True,
+                'behavioral_authority': False,
+                'site': str(site),
+                'status': f'diagnostic_failed:{type(exc).__name__}',
+            }
+        diagnostics = getattr(self, '_last_phase_context_diagnostic', None)
+        if not isinstance(diagnostics, dict):
+            diagnostics = {}
+            self._last_phase_context_diagnostic = diagnostics
+        diagnostics[str(site)] = record
 
     def _commit_proposal(
         self,
@@ -9999,6 +10075,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_extraction_completeness_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
         self._last_metal_phase_stratification_diagnostic = {}
+        self._last_phase_context_diagnostic = {}
         self._pending_shuttle_bakeout_cycle_increment = ''
         self._reset_redox_source_diagnostics_for_hour()
         self._reset_o2_bubbler_telemetry_for_hour()

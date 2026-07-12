@@ -1392,6 +1392,8 @@ class EvaporationMixin:
         if dt_hr <= 0.0 or not evap_flux.species_kg_hr:
             return evap_flux
 
+        self._record_phase_context_diagnostic('evaporation_depletion')
+
         metals_data = self.vapor_pressures.get('metals', {}) or {}
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
         cleaned_melt_kg = self.atom_ledger.kg_by_account(
@@ -1548,6 +1550,7 @@ class EvaporationMixin:
         Per the goal spec, the shadow comparator was removed at flip
         time (the parity test owns the regression surface from now on).
         """
+        self._record_phase_context_diagnostic('condensation_feed')
         route_result = self.condensation_model.route(
             evap_flux, self.melt)
 
