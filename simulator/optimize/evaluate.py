@@ -18,7 +18,10 @@ from collections.abc import Iterable, Mapping as MappingABC, Set as AbstractSet
 
 from engines.builtin.vapor_pressure import VaporPressureNumericalOverflowError
 from simulator.accounting import OverdraftError, resolve_species_formula
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.backends import (
     BackendUnavailableError,
     real_backend_feedstock_domain_reason,
@@ -2257,7 +2260,9 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
     # at this single run-config read so EvalSpec, session config, resolver, and
     # the fidelity-vocabulary backend-token translator all see the legacy token
     # (the vocabulary fail-loud rejects an unknown `internal-analytical` token).
-    backend_name = canonical_backend_name(str(merged.get("backend_name", "stub")))
+    backend_name = canonical_backend_name(
+        str(merged.get("backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN))
+    )
     raw_cache_config = (
         merged.get("reduced_real_cache")
         if backend_name == "cached-real"
@@ -4570,7 +4575,7 @@ def _abort_on_non_authoritative_backend_status(
     candidate_id: str | None,
     key: str,
 ) -> None:
-    if spec.backend_name == "stub":
+    if spec.backend_name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
         return
     backend_status = _latest_backend_status(run_execution)
     if backend_status is None:

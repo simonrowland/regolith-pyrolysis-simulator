@@ -165,7 +165,9 @@ def test_ci_c0_to_c6_refusal_preserves_prior_rows_and_ledger_accounts():
     assert payload["reason"] == (
         "c6_joint_thermodynamic_liquid_fraction_window_empty"
     )
-    assert len(rows) == 43
+    # C6 cold-hold (1450 -> 1400 C, wave-09): the CI run reaches its binding
+    # refusal one ramp-hour earlier (42 rows; was 43 at the 1450 recipe).
+    assert len(rows) == 42
     assert list(dict.fromkeys(row["campaign"] for row in rows)) == [
         "C0",
         "C0B",

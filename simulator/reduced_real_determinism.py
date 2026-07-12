@@ -25,6 +25,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, ClassVar
 
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME,
+    ANALYTICAL_BACKEND_QUALIFIED_CLASS_NAME,
+    canonical_backend_class_name,
+)
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.corpus_version import (
     current_corpus_version,
@@ -124,13 +129,8 @@ _ALPHAMELTS_DEFAULT_MODEL = "MELTSv1.0.2"
 _ALPHAMELTS_DEFAULT_MODE = "subprocess"
 _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID = "builtin-backend-equilibrium"
 _INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME = "InternalAnalyticalBackend"
-# CORPUS-BUMP MIGRATION HINGE: these legacy class strings are serialized into
-# reduced-real cache identity and stay byte-identical until t-011 bumps
-# corpus_version atomically.
-_INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME = "StubBackend"
-_INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_CLASS = (
-    "simulator.melt_backend.base.StubBackend"
-)
+_INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME = ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME
+_INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_CLASS = ANALYTICAL_BACKEND_QUALIFIED_CLASS_NAME
 
 
 @dataclasses.dataclass(frozen=True)
@@ -2302,11 +2302,8 @@ def validate_reduced_real_equilibrium_record_key(
 
 def _is_internal_analytical_backend_key(backend: Mapping[str, Any]) -> bool:
     return any(
-        str(backend.get(field, "")).strip().split(".")[-1]
-        in {
-            _INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME,
-            _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME,
-        }
+        str(canonical_backend_class_name(backend.get(field, ""))).strip().split(".")[-1]
+        == _INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME
         for field in ("backend_name", "backend_class")
     )
 

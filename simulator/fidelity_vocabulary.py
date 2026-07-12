@@ -7,10 +7,17 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Any, Mapping, Sequence
 
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
+    LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 
 
-LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN = "stub"
+LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN = (
+    LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+)
 
 
 class CanonicalDimension(str, Enum):
@@ -63,7 +70,8 @@ class LabelSource(str, Enum):
     TERMINAL_RUMP_COMPLETED_RUN = "terminal_rump:completed_run"
     TERMINAL_RUMP_TAP_TRUNCATED = "terminal_rump:tap_truncated"
     LEGACY_BACKEND_ALIAS_INTERNAL_ANALYTICAL = "legacy_backend_alias:stub"
-    DIAGNOSTIC_INTERNAL_ANALYTICAL = "diagnostic_stub"
+    BACKEND_INTERNAL_ANALYTICAL = "backend_alias:internal-analytical"
+    DIAGNOSTIC_INTERNAL_ANALYTICAL = "diagnostic_internal_analytical"
     BACKEND_ALIAS_ALPHAMELTS = "backend_alias:alphamelts"
     BACKEND_SELECTION_AUTO = "backend_selection:auto"
     CACHED_REAL = "cached-real"
@@ -89,7 +97,7 @@ CERTIFICATION_DENYLIST: frozenset[str] = frozenset(
 LEGACY_EVIDENCE_CLASS_SERIALIZATION_ALIASES: Mapping[str, str] = MappingProxyType(
     {
         EvidenceClass.INTERNAL_ANALYTICAL.value:
-            LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
     }
 )
 
@@ -117,7 +125,7 @@ LEGACY_VOCABULARY_TOKENS: Mapping[str, frozenset[str]] = MappingProxyType(
         "backend/status alias": frozenset(
             {
                 LEGACY_INTERNAL_ANALYTICAL_VOCABULARY_TOKEN,
-                "diagnostic_stub",
+                LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
                 "alphamelts",
                 "auto",
                 "cached-real",
@@ -265,7 +273,17 @@ _SIMPLE_TRANSLATIONS: Mapping[tuple[str, str], CanonicalFidelityMapping] = Mappi
             evidence_class=EvidenceClass.INTERNAL_ANALYTICAL.value,
             label_source=LabelSource.LEGACY_BACKEND_ALIAS_INTERNAL_ANALYTICAL.value,
         ),
-        ("backend/status alias", "diagnostic_stub"): CanonicalFidelityMapping(
+        (
+            "backend/status alias",
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        ): CanonicalFidelityMapping(
+            evidence_class=EvidenceClass.INTERNAL_ANALYTICAL.value,
+            label_source=LabelSource.BACKEND_INTERNAL_ANALYTICAL.value,
+        ),
+        (
+            "backend/status alias",
+            LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
+        ): CanonicalFidelityMapping(
             evidence_class=EvidenceClass.INTERNAL_ANALYTICAL.value,
             label_source=LabelSource.DIAGNOSTIC_INTERNAL_ANALYTICAL.value,
             degradation_reason=DegradationReason.DIAGNOSTIC_ONLY.value,

@@ -2,7 +2,7 @@
 # Simulant-specific adjustment: MGS-1 is kept as a dry oxide base-simulant
 # profile, using the closest source-captured no-cleanup basaltic simulant shape.
 # TODO(vpr-p4): capture lot-variant volatile sidecar before any Mars salt/perchlorate profile.
-# H1 scope note: stub/fast/high/auto share the existing physics constraint posture;
+# H1 scope note: internal-analytical/fast/high/auto share the existing physics constraint posture;
 # the H1/G3 backend-honesty gate is deferred and not closed by this profile.
 profile_id: mars-global-mgs1-objectives-v1
 profile_schema_version: profile-schema-v1
@@ -18,12 +18,12 @@ objectives:
   - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: furnace occupancy}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
-run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: internal-analytical}
 fidelities:
-  stub: {backend_name: stub, hours: 1}
-  fast: {backend_name: stub, hours: 1}
-  high: {backend_name: stub, hours: 1}
-  auto: {backend_name: stub, hours: 1}
+  internal-analytical: {backend_name: internal-analytical, hours: 1}
+  fast: {backend_name: internal-analytical, hours: 1}
+  high: {backend_name: internal-analytical, hours: 1}
+  auto: {backend_name: internal-analytical, hours: 1}
 seed_recipes:
   - id: mgs1-base-simulant-path-a-seed
     source_campaign: C2A_continuous

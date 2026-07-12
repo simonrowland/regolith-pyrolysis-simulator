@@ -178,7 +178,11 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # across repeated canonical-environment runs. Reviewer-sandbox keys differ
     # (the documented reduced-real sandbox-drift class); the canonical
     # interpreter on main is the authority for this pin.
-    assert key_hash == "beba272b9365fc3fec998fb4f703e46f99d6c06f238be7ad373e7c91926f5a1f"
+    # 2026-07-12 v0.6.0 gate: the t-172 token flip moved the serialized backend
+    # identity ('stub' -> 'internal-analytical'), which is a cache-key input —
+    # this IS the corpus_version-gated key migration the flip was deferred
+    # for. Determinism re-proven by repeated canonical runs.
+    assert key_hash == "ab37831293ebc6289b8dedb5241479dba268148d175b459cf29aa53d4196a5f8"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -553,8 +557,8 @@ def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> No
     key = _freeze_gate_key()
 
     assert key["backend"] == {
-        "backend_name": "StubBackend",
-        "backend_class": "simulator.melt_backend.base.StubBackend",
+        "backend_name": "InternalAnalyticalBackend",
+        "backend_class": "simulator.melt_backend.base.InternalAnalyticalBackend",
         "corpus_version": current_corpus_version(),
     }
     assert key["provider"] == {

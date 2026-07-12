@@ -12,6 +12,10 @@ from typing import Any
 
 import yaml
 
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
 from simulator.config import DEFAULT_DATA_DIR
 from simulator.feedstock_guard import is_blocked_feedstock
@@ -38,7 +42,12 @@ from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpo
 PROFILE_SCHEMA_VERSION = "profile-schema-v1"
 SSO2_OWNER_RECIPE_ID = "sso2_pn2_fe_drain_silica"
 PROFILE_DIRNAME = "optimize_profiles"
-VALID_FIDELITIES = ("stub", "fast", "high", "auto")
+VALID_FIDELITIES = (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    "fast",
+    "high",
+    "auto",
+)
 KNOWN_STUDY_CONSTRAINTS = frozenset({"physics"})
 DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
 DEFAULT_COLD_START_TEMPERATURE_C = 25.0
@@ -283,7 +292,7 @@ def validate_profile(
 ) -> Mapping[str, Any]:
     if not isinstance(raw, Mapping):
         raise ProfileValidationError(f"{source}: profile must be a mapping")
-    profile = dict(raw)
+    profile = _canonicalize_profile_backend_names(raw, source=source)
     _reject_unknown_keys(profile, _TOP_LEVEL_KEYS, source=source, where="profile")
 
     required = {
@@ -330,6 +339,40 @@ def validate_profile(
     if "early_tap_mode" in profile and not isinstance(profile["early_tap_mode"], bool):
         raise ProfileValidationError(f"{source}: early_tap_mode must be boolean")
     return ValidatedProfile(profile, source=source)
+
+
+def _canonicalize_profile_backend_names(
+    raw: Mapping[str, Any],
+    *,
+    source: str | Path,
+) -> dict[str, Any]:
+    profile = copy.deepcopy(dict(raw))
+    run = profile.get("run")
+    if isinstance(run, Mapping) and "backend_name" in run:
+        normalized_run = dict(run)
+        normalized_run["backend_name"] = canonical_backend_name(
+            str(run["backend_name"])
+        )
+        profile["run"] = normalized_run
+    fidelities = profile.get("fidelities")
+    if not isinstance(fidelities, Mapping):
+        return profile
+    normalized_fidelities: dict[str, Any] = {}
+    for raw_name, raw_options in fidelities.items():
+        name = str(canonical_backend_name(str(raw_name)))
+        if name in normalized_fidelities:
+            raise ProfileValidationError(
+                f"{source}: duplicate fidelity after alias normalization {name!r}"
+            )
+        options = copy.deepcopy(raw_options)
+        if isinstance(options, Mapping) and "backend_name" in options:
+            options = dict(options)
+            options["backend_name"] = canonical_backend_name(
+                str(options["backend_name"])
+            )
+        normalized_fidelities[name] = options
+    profile["fidelities"] = normalized_fidelities
+    return profile
 
 
 def constrained_max_profile(

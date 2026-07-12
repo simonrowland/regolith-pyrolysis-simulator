@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any, Callable, Iterable, Mapping, TypeVar
 
 from simulator.backend_names import (  # noqa: F401 - re-exported for callers
     ANALYTICAL_BACKEND_ALIASES,
+    ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME,
     ANALYTICAL_BACKEND_DISPLAY_NAME,
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
@@ -716,10 +717,8 @@ def resolve_backend(
 ):
     """Resolve and initialize the active melt backend under an explicit policy."""
 
-    # Alias-preserving rebrand: fold `internal-analytical` onto the stable
-    # `stub` token before any name-keyed branch or serialization (requested
-    # backend, stage-0 subprocess config). Existing `stub` callers are
-    # byte-unchanged. See canonical_backend_name + the module naming note.
+    # Accept legacy analytical names before every name-keyed branch and emit
+    # only the 0.6 serialization token.
     backend_name = canonical_backend_name(backend_name)
 
     subprocess_required = requires_stage0_subprocess(
@@ -807,7 +806,9 @@ def backend_resolution_status(backend: Any) -> BackendResolutionStatus:
 
     is_internal_analytical = isinstance(backend, InternalAnalyticalBackend)
     active_backend = (
-        "StubBackend" if is_internal_analytical else type(backend).__name__
+        ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME
+        if is_internal_analytical
+        else type(backend).__name__
     )
     backend_status = (
         BACKEND_STATUS_UNAVAILABLE if is_internal_analytical else BACKEND_STATUS_OK
@@ -852,10 +853,10 @@ def _make_backend_resolution_status(
     policy: BackendSelectionPolicy,
 ) -> BackendResolutionStatus:
     is_internal_analytical = isinstance(backend, InternalAnalyticalBackend)
-    # This value is serialized. Keep the legacy class identity until the
-    # corpus-bump migration flips stored backend identities atomically.
     active_backend = (
-        "StubBackend" if is_internal_analytical else type(backend).__name__
+        ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME
+        if is_internal_analytical
+        else type(backend).__name__
     )
     backend_status = (
         BACKEND_STATUS_UNAVAILABLE if is_internal_analytical else BACKEND_STATUS_OK
@@ -887,11 +888,8 @@ def _backend_status_message(backend: Any, *, is_internal_analytical: bool) -> st
     if fallback_message:
         return fallback_message
     if is_internal_analytical:
-        # Serialized via BackendResolutionStatus.as_payload() -> keep this
-        # message byte-identical (golden-neutral). The `internal-analytical`
-        # display wording lives in non-serialized UI/docs only.
         return (
-            "stub backend selected; "
+            "internal-analytical backend selected; "
             "no authoritative melt result available"
         )
     return "backend selected"
@@ -916,7 +914,10 @@ def _attach_backend_selection_fallback_message(
 
 
 def _forced_alphamelts_unavailable_message(error: Exception | None) -> str:
-    message = "forced AlphaMELTS backend unavailable; substituted StubBackend"
+    message = (
+        "forced AlphaMELTS backend unavailable; substituted "
+        f"{ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME}"
+    )
     if error is None:
         return f"{message} (probe returned unavailable)"
     return f"{message} ({type(error).__name__}: {error})"
@@ -997,10 +998,10 @@ def _resolve_web_autodetect(
     ):
         raise unavailable_error_cls(
             f"unknown backend {name!r}; select auto, internal-analytical, "
-            "alphamelts, or cached-real (internal-analytical legacy alias: stub)"
+            "alphamelts, or cached-real"
         )
 
-    # D1 fix: an explicit legacy alias request pins InternalAnalyticalBackend
+    # D1 fix: an explicit analytical request pins InternalAnalyticalBackend
     # deterministically; only 'auto'/'' fall through to the
     # AlphaMELTS->internal-analytical autodetect chain.
     if name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
@@ -1054,8 +1055,7 @@ def _resolve_runner_strict(
     if name == "auto":
         raise unavailable_error_cls(
             "auto backend selection is unavailable under runner-strict; "
-            "select internal-analytical, alphamelts, or cached-real "
-            "(internal-analytical legacy alias: stub)"
+            "select internal-analytical, alphamelts, or cached-real"
         )
     if name == "alphamelts":
         backend = _try_alphamelts(alphamelts_backend_cls, backend_config)
@@ -1063,7 +1063,7 @@ def _resolve_runner_strict(
             return backend
         raise unavailable_error_cls(
             "AlphaMELTS unavailable; rerun with --backend=internal-analytical "
-            "(legacy alias: stub) or install via install-dependencies.py"
+            "or install via install-dependencies.py"
         )
     if name == CACHED_REAL_BACKEND_NAME:
         return _cached_real_backend(

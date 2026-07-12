@@ -22,7 +22,10 @@ import tempfile
 import time
 from typing import Any
 
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.backends import requires_stage0_subprocess
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evaluate import (
@@ -610,14 +613,14 @@ def _ensure_pool_backend_provenance(
     ref = getattr(result, "run_reference", None)
     if ref is None or _result_backend_status(result) is not None:
         return result
-    if _task_backend_name(task) != "stub":
+    if _task_backend_name(task) != ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
         return result
 
     return replace(
         result,
         run_reference=replace(
             ref,
-            backend_status="diagnostic_stub",
+            backend_status="unavailable",
             backend_authoritative=False,
         ),
     )
@@ -698,7 +701,12 @@ def _task_backend_name(task: _PoolTask) -> str:
             merged.update(selected)
     # Fold the `internal-analytical` display alias onto the stable `stub` token
     # (read raw from the profile; mirrors EvalSpec.backend_name canonicalization).
-    return canonical_backend_name(str(merged.get("backend_name", "stub") or "stub"))
+    return canonical_backend_name(
+        str(
+            merged.get("backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN)
+            or ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        )
+    )
 
 
 def _task_stage0_subprocess_required(feedstock_id: str) -> bool:

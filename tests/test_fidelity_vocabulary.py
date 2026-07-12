@@ -124,7 +124,7 @@ EXPECTED_LEGACY_TOKENS = {
             "diagnostic_stub",
             {
                 "evidence_class": "internal-analytical",
-                "label_source": "diagnostic_stub",
+                "label_source": "diagnostic_internal_analytical",
                 "degradation_reason": "diagnostic_only",
             },
         ),
@@ -277,7 +277,7 @@ def test_mixed_suffix_decomposes_contributors() -> None:
     assert [item.label_source for item in result.contributors] == [
         "legacy_backend_alias:stub",
         "backend_alias:alphamelts",
-        "diagnostic_stub",
+        "diagnostic_internal_analytical",
     ]
 
 
@@ -411,7 +411,7 @@ def test_stub_alias_round_trips_to_internal_analytical() -> None:
     assert result.evidence_class == "internal-analytical"
     assert (
         legacy_backend_alias_for_evidence_class(result.evidence_class)
-        == "stub"
+        == "internal-analytical"
     )
 
 

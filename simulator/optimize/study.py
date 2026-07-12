@@ -20,6 +20,10 @@ from typing import Any
 
 import yaml
 
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.backends import CACHE_TIER_CEILINGS, DEFAULT_CACHE_TIER_CEILING
 from simulator.ceramic_classifier import (
     CeramicMatch,
@@ -113,7 +117,12 @@ from simulator.optimize.strategy.staged import (
 )
 from web.advisory import ceramic_rump_payload
 
-VALID_FIDELITIES = ("stub", "fast", "high", "auto")
+VALID_FIDELITIES = (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    "fast",
+    "high",
+    "auto",
+)
 _LOGGER = logging.getLogger(__name__)
 STRATEGY_CLASS_NAMES = {
     "random": "RandomStrategy",
@@ -214,13 +223,25 @@ DEFAULT_PROFILES: Mapping[str, Mapping[str, Any]] = MappingProxyType(
                     "campaign": "C0",
                     "hours": 1,
                     "mass_kg": 1000.0,
-                    "backend_name": "stub",
+                    "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
                 },
                 "fidelities": {
-                    "stub": {"backend_name": "stub", "hours": 1},
-                    "fast": {"backend_name": "stub", "hours": 1},
-                    "high": {"backend_name": "stub", "hours": 1},
-                    "auto": {"backend_name": "stub", "hours": 1},
+                    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN: {
+                        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+                        "hours": 1,
+                    },
+                    "fast": {
+                        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+                        "hours": 1,
+                    },
+                    "high": {
+                        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+                        "hours": 1,
+                    },
+                    "auto": {
+                        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+                        "hours": 1,
+                    },
                 },
                 "seed_recipes": [
                     {
@@ -456,7 +477,7 @@ def run(
         profile=profile,
         feedstock=feedstock,
         strategy=strategy,
-        fidelity=fidelity,
+        fidelity=str(canonical_backend_name(fidelity)),
         parallel=parallel,
         budget=budget,
         out_dir=out_dir,
@@ -1176,7 +1197,12 @@ def _profile_for_cache_phase(
     fidelities = dict(result.get("fidelities", {}) or {})
     fid_opts = dict(fidelities.get(fidelity, {}) or {})
     run = dict(result.get("run", {}) or {})
-    backend_name = str(fid_opts.get("backend_name", run.get("backend_name", "stub")))
+    backend_name = str(
+        fid_opts.get(
+            "backend_name",
+            run.get("backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN),
+        )
+    )
     fid_opts["cache_tier_ceiling"] = cache_tier_ceiling
     if miss_policy is not None:
         fid_opts["miss_policy"] = miss_policy
@@ -3692,8 +3718,12 @@ def _result_backend_status(scored: ScoredResult) -> str | None:
     status = getattr(reference, "backend_status", None)
     if status is None:
         status = _backend_status_from_trace(getattr(reference, "trace", None))
-    if status is None and getattr(getattr(scored, "eval_spec", None), "backend_name", None) == "stub":
-        return "diagnostic_stub"
+    if (
+        status is None
+        and getattr(getattr(scored, "eval_spec", None), "backend_name", None)
+        == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    ):
+        return "unavailable"
     return str(status) if status is not None else None
 
 
@@ -4909,8 +4939,13 @@ def _diagnostic_warnings(records: Sequence[StudyRecord]) -> list[str]:
         trace = _mapping_or_empty(record.trace_summary)
         backend_name = str(trace.get("backend_name") or "")
         backend_status = str(trace.get("backend_status") or "")
-        if backend_name in {"stub", "diagnostic_stub"} or backend_status == "diagnostic_stub":
-            warnings.add("stub-backend")
+        if (
+            canonical_backend_name(backend_name)
+            == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+            or canonical_backend_name(backend_status)
+            == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        ):
+            warnings.add("internal-analytical-backend")
         if record.failure_category == "diagnostic_only":
             warnings.add("diagnostic-only rows")
         if _is_tap_truncated(_composition_target_payload(record)):

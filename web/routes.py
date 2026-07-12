@@ -20,7 +20,11 @@ import yaml
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
 from simulator.backends import BackendResolutionStatus, backend_resolution_status
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME,
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
     CONTINUUM_BUFFER_KN,
@@ -110,7 +114,12 @@ OPTIMIZER_ARTIFACT_NAMES = (
 )
 OPTIMIZER_JOBS_DIR_NAME = 'jobs'
 OPTIMIZER_JOB_STRATEGIES = ('random', 'screen', 'bayes', 'nsga2', 'staged')
-OPTIMIZER_JOB_FIDELITIES = ('stub', 'fast', 'high', 'auto')
+OPTIMIZER_JOB_FIDELITIES = (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    'fast',
+    'high',
+    'auto',
+)
 DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP = 4
 DEFAULT_OPTIMIZER_JOB_BUDGET_CAP = 256
 DEFAULT_OPTIMIZER_JOB_QUEUE_CAP = 64
@@ -573,11 +582,15 @@ def _optimizer_backend_payload(
     stored_status = _latest_backend_status(result_blob) or _latest_backend_status(run_reference)
     if stored_status is None:
         stored_status = 'unavailable'
-    internal_analyticalish = requested in {'stub', 'diagnostic_stub'} or stored_status == 'diagnostic_stub'
+    internal_analyticalish = (
+        requested == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        or canonical_backend_name(stored_status)
+        == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    )
     backend_status = 'unavailable' if internal_analyticalish else stored_status
     emission_backend_name = (
-        'diagnostic_stub'
-        if stored_status == 'diagnostic_stub'
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        if internal_analyticalish
         else requested_token
     )
     backend_authoritative = _optional_bool(
@@ -599,7 +612,11 @@ def _optimizer_backend_payload(
     )
     resolution = BackendResolutionStatus(
         requested_backend=requested,
-        active_backend='StubBackend' if internal_analyticalish else requested,
+        active_backend=(
+            ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME
+            if internal_analyticalish
+            else requested
+        ),
         backend_status=backend_status,
         authoritative=authoritative,
         selection_policy='stored-result',

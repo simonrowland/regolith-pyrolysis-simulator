@@ -20,6 +20,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from simulator.backend_names import (  # noqa: E402
+    ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME,
+    canonical_backend_class_name,
+)
 from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_SCHEMA_VERSION,
     PHYSICS_BUCKET_ALL_LADDER_RUNGS,
@@ -402,8 +406,10 @@ def _reject_internal_analytical_backend_key(key: Mapping[str, Any]) -> None:
     if not isinstance(backend, Mapping):
         backend = {}
     for field in ("backend_name", "backend_class"):
-        name = str(backend.get(field, "") or "").strip().split(".")[-1]
-        if name in {"InternalAnalyticalBackend", "StubBackend"}:
+        name = str(
+            canonical_backend_class_name(backend.get(field, "")) or ""
+        ).strip().split(".")[-1]
+        if name == ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME:
             raise RuntimeError(
                 "physics-bucket backfill requires authorized real backend rows; "
                 "got InternalAnalyticalBackend"

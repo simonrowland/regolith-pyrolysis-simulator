@@ -9,7 +9,7 @@
     "mass_kg": 1000.0,
     "additives_kg": {},
     "track": "pyrolysis",
-    "backend": "stub",
+    "backend": "internal-analytical",
     "started_at_utc": "2026-05-15T00:00:00Z",
     "engines_used": {
       "active": {
@@ -110,9 +110,9 @@
     "runtime_status": "unavailable",
     "degradation_reason": "unavailable",
     "backend_real_active": false,
-    "label_source": "legacy_backend_alias:stub",
+    "label_source": "backend_alias:internal-analytical",
     "label_sources": [
-      "legacy_backend_alias:stub",
+      "backend_alias:internal-analytical",
       "legacy_backend_authoritative"
     ],
     "degraded_from": [

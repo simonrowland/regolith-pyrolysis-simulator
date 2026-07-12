@@ -20,7 +20,10 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Mapping
 
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.optimize.canonical import (
     FLOAT_QUANTUM,
     CanonicalizationError,
@@ -75,7 +78,7 @@ class EvalSpec:
     mass_kg: float = 1000.0
     additives_kg: Mapping[str, Any] = field(default_factory=dict)
     track: str = "pyrolysis"
-    backend_name: str = "stub"
+    backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
     c5_enabled: bool = False
     mre_max_voltage_V: float = 0.0
     mre_target_species: str = ""
@@ -127,11 +130,8 @@ class EvalSpec:
         ):
             if not isinstance(getattr(self, field_name), str):
                 raise TypeError(f"{field_name} must be a string")
-        # Alias-preserving rebrand: fold the `internal-analytical` display name
-        # onto the stable `stub` token so a config authored with the new name
-        # produces the SAME cache key as the legacy `stub` spec and still trips
-        # the C3 stub-as-real denylist (`spec.backend_name == "stub"`). Existing
-        # `stub`/`alphamelts`/`cached-real`/`auto` specs are byte-unchanged.
+        # Normalize legacy input before cache-key serialization and authority
+        # checks; the 0.6 corpus emits only the canonical analytical token.
         object.__setattr__(
             self, "backend_name", canonical_backend_name(self.backend_name)
         )

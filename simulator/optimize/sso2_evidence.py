@@ -6,6 +6,7 @@ import math
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.account_ids import METAL_PHASE_ACCOUNTS
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation_routing import accepted_species_for_stage_number
@@ -98,7 +99,7 @@ def build_sso2_owner_recipe_execution(
     *,
     hours: int = 9,
     mass_kg: float = 1000.0,
-    backend_name: str = "stub",
+    backend_name: str = ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
 ) -> RunExecution:
     setpoints_patch = sso2_owner_recipe_setpoints_patch()
     dose_kg = _certified_full_feo_equiv_na_dose_kg(

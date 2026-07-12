@@ -337,7 +337,7 @@ def test_loaded_recipe_start_ignores_stale_runtime_levers(
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -464,7 +464,7 @@ def test_staged_recipe_save_load_start_is_identity(
         socket_client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -878,11 +878,11 @@ def test_web_backend_path_uses_shared_resolve_backend(monkeypatch):
 
     monkeypatch.setattr("web.events.resolve_backend", fake_resolve_backend)
 
-    backend = _get_backend("stub")
+    backend = _get_backend("internal-analytical")
 
     assert isinstance(backend, InternalAnalyticalBackend)
     assert len(calls) == 1
-    assert calls[0][0] == "stub"
+    assert calls[0][0] == "internal-analytical"
     assert calls[0][1] is BackendSelectionPolicy.WEB_AUTODETECT
     assert calls[0][2]["unavailable_error_cls"] is BackendUnavailableError
 
@@ -893,8 +893,8 @@ def test_web_start_payload_exposes_backend_status():
         sim=object(),
         feedstock_key="lunar_mare_low_ti",
         mass_kg=1000.0,
-        backend_requested="stub",
-        backend_active="StubBackend",
+        backend_requested="internal-analytical",
+        backend_active="InternalAnalyticalBackend",
         backend_status="unavailable",
         backend_authoritative=False,
         backend_message="Using built-in fallback",
@@ -941,7 +941,7 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -971,10 +971,13 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
         assert started["mre_target_species"] == "SiO2"
         assert started["mre_max_voltage_V"] == pytest.approx(1.45)
         assert started["backend_status"] == "unavailable"
-        assert started["backend_active"] == "StubBackend"
+        assert started["backend_active"] == "InternalAnalyticalBackend"
         assert started["backend_message"] == "Using built-in fallback"
+        # v0.6.0 t-172 flip: the emitted display token is now
+        # internal-analytical (legacy 'stub' accepted on input only).
         assert started["backend_status_message"] == (
-            "stub backend selected; no authoritative melt result available"
+            "internal-analytical backend selected; "
+            "no authoritative melt result available"
         )
 
         new_sids = set(_simulations) - before
@@ -1222,7 +1225,7 @@ def test_web_start_event_resolves_furnace_material_cap(
     client.get_received()
     before = set(_simulations)
     payload = {
-        "backend": "stub",
+        "backend": "internal-analytical",
         "feedstock": "lunar_mare_low_ti",
         "mass_kg": 1000,
         "speed": 0,
@@ -1288,7 +1291,7 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
     client.get_received()
     before = set(_simulations)
     payload = {
-        "backend": "stub",
+        "backend": "internal-analytical",
         "feedstock": "lunar_mare_low_ti",
         "mass_kg": 1000,
         "speed": 0,
@@ -1349,7 +1352,7 @@ def test_web_start_event_rejects_unselectable_furnace_material_before_session(
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -1387,7 +1390,7 @@ def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -1474,7 +1477,7 @@ def test_web_start_event_rejects_invalid_numeric_payload_before_session(
     client.get_received()
     before = set(_simulations)
     payload = {
-        "backend": "stub",
+        "backend": "internal-analytical",
         "feedstock": "lunar_mare_low_ti",
         "mass_kg": 1000,
         "speed": 0,
@@ -1540,7 +1543,7 @@ def test_make_decision_rejects_bad_payload(monkeypatch, bad_payload, message):
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -1596,7 +1599,7 @@ def test_make_decision_rejects_choice_not_in_pending_options(monkeypatch):
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -1676,7 +1679,7 @@ def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 1.0,
@@ -1721,7 +1724,7 @@ def test_adjust_po2_rolls_back_when_post_mutation_validation_fails(monkeypatch):
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -1766,7 +1769,7 @@ def test_adjust_campaign_override_rolls_back_after_validation_failure(monkeypatc
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -1842,7 +1845,7 @@ def test_adjust_parameter_rejects_unknown_or_incomplete_noops(
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -2160,7 +2163,7 @@ def test_web_payloads_preserve_full_precision_mass_balance_error(
         sim=sim,
         snapshot=snapshot,
         backend_message="",
-        backend_status="stub",
+        backend_status="internal-analytical",
         backend_authoritative=False,
     )
     completion_payload = _completion_payload(sim)
@@ -2202,7 +2205,7 @@ def test_web_mass_balance_breach_numeric_boundary(
         sim=sim,
         snapshot=snapshot,
         backend_message="",
-        backend_status="stub",
+        backend_status="internal-analytical",
         backend_authoritative=False,
     )
 
@@ -2221,7 +2224,7 @@ def test_web_mass_balance_category_breaches_with_small_numeric_error():
         sim=sim,
         snapshot=snapshot,
         backend_message="",
-        backend_status="stub",
+        backend_status="internal-analytical",
         backend_authoritative=False,
     )
 
@@ -2238,7 +2241,7 @@ def test_web_mass_balance_non_finite_error_fails_closed(error_pct):
         sim=sim,
         snapshot=snapshot,
         backend_message="",
-        backend_status="stub",
+        backend_status="internal-analytical",
         backend_authoritative=False,
     )
 
@@ -2342,7 +2345,7 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -2388,7 +2391,7 @@ def test_web_failure_status_and_cleanup_survive_poison_enrichment_failure(
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -2488,7 +2491,7 @@ def test_per_hour_summary_redox_fields_reach_socket_and_recipe_capture_live_path
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -2617,7 +2620,7 @@ def test_optional_native_fe_nested_redox_payloads_reach_socket_and_recipe_captur
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -2718,7 +2721,7 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -2773,7 +2776,7 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "ci_carbonaceous_chondrite",
                 "mass_kg": 1000,
                 "additives": {"C": 30.0},
@@ -2817,8 +2820,11 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
             )
         )
 
-        assert names.count("simulation_tick") == 43
-        assert names.count("per_hour_summary") == 43
+        # C6 cold-hold (1450 -> 1400 C, wave-09) reaches the binding CI
+        # refusal one ramp-hour earlier: 42 hours (was 43 at the 1450 recipe;
+        # controller-verified pre-existing vs the token flip).
+        assert names.count("simulation_tick") == 42
+        assert names.count("per_hour_summary") == 42
         assert "campaign_complete_summary" in names
         assert "simulation_complete" not in names
         assert max(
@@ -2888,7 +2894,7 @@ def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
         sim=sim,
         snapshot=snapshot,
         backend_message="",
-        backend_status="stub",
+        backend_status="internal-analytical",
         backend_authoritative=False,
     )
 
@@ -2924,7 +2930,7 @@ def test_web_pause_resume_is_result_neutral(monkeypatch):
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,

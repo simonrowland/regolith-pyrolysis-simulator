@@ -110,7 +110,7 @@ class SessionScriptRunner:
             "campaign": parsed.campaign,
             "mass_kg": float(parsed.mass_kg),
             # Emit the canonicalized config token (folds the internal-analytical
-            # alias onto the stable `stub`), not the raw CLI arg.
+            # alias onto the canonical token), not the raw CLI arg.
             "backend": config.backend_name,
             "backend_active": type(self.session.simulator.backend).__name__,
             "track": parsed.track,
@@ -304,13 +304,10 @@ def _start_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--backend",
         default=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
-        # type folds the internal-analytical alias (any case / whitespace) onto
-        # `stub` BEFORE choices validation, matching resolver tolerance.
+        # type folds legacy analytical aliases before choices validation.
         type=canonical_backend_name,
         choices=(
             ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
-            "internal-analytical",
-            "internal_analytical",
             "alphamelts",
         ),
     )

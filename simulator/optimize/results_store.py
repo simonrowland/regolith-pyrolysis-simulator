@@ -45,7 +45,10 @@ from simulator.optimize.objective import (
     objective_metric_aliases,
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
+    canonical_backend_name,
+)
 from simulator.fidelity_vocabulary import backend_name_denies_authority
 from simulator.optimize.result_scope import result_scope_json, selector_where
 
@@ -54,7 +57,9 @@ OBJECTIVE_EVIDENCE_SCHEMA_VERSION = 1
 DEFAULT_BUSY_TIMEOUT_MS = 30000
 WRITE_RETRY_ATTEMPTS = 8
 WRITE_RETRY_BASE_DELAY_S = 0.05
-NON_AUTHORITATIVE_BACKEND_STATUSES = frozenset({"diagnostic_stub", "unavailable"})
+NON_AUTHORITATIVE_BACKEND_STATUSES = frozenset(
+    {LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN, "unavailable"}
+)
 APPROXIMATE_REDUCED_REAL_CACHE_STATES = frozenset(
     {"cached_interpolated", "cached_physics_bucket"}
 )

@@ -39,6 +39,7 @@ if str(ROOT) not in sys.path:
 
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    LEGACY_ANALYTICAL_FIDELITY_DIAGNOSTIC_ENV,
     canonical_backend_name,
 )
 from simulator.optimize.doe import DoeSpec
@@ -59,7 +60,7 @@ def _diagnostic_internal_analytical_high_from_env(
         environ.get(name) == "1"
         for name in (
             "FIDELITY_DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH",
-            "FIDELITY_DIAGNOSTIC_STUB_HIGH",
+            LEGACY_ANALYTICAL_FIDELITY_DIAGNOSTIC_ENV,
         )
     )
 
@@ -88,9 +89,8 @@ def _validate_high_backend_selection(
         and not diagnostic_internal_analytical_high
     ):
         raise RuntimeError(
-            "FIDELITY_HIGH_BACKEND=stub requires "
-            "FIDELITY_DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH=1 (or legacy "
-            "FIDELITY_DIAGNOSTIC_STUB_HIGH=1); internal-analytical "
+            "FIDELITY_HIGH_BACKEND=internal-analytical requires "
+            "FIDELITY_DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH=1; internal-analytical "
             "self-comparison is diagnostic only, not a pilot trust verdict"
         )
 
@@ -177,7 +177,7 @@ def main() -> int:
     # Per-tier backend override: fast -> deterministic internal-analytical;
     # high defaults to real MELTS, with analytical self-comparison allowed only
     # by explicit env flag. Stock profiles serialize all backend names as
-    # "stub"; evaluate() reads
+    # "internal-analytical"; evaluate() reads
     # profile["fidelities"][fidelity]["backend_name"] (simulator/optimize/evaluate.py
     # _run_options). Without this override both arms would be identical
     # internal-analytical runs.

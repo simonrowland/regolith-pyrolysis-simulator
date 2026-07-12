@@ -3644,13 +3644,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
                         "--backend",
                         default=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
-                        # type folds the internal-analytical alias (any case /
-                        # whitespace) onto `stub` before choices validation.
+                        # type folds legacy analytical aliases before choices validation.
                         type=canonical_backend_name,
-                        choices=(ANALYTICAL_BACKEND_SERIALIZATION_TOKEN, "internal-analytical",
-                                 "internal_analytical", "alphamelts"),
-                        help="Melt backend selection (default: internal-analytical, "
-                             "legacy alias: stub)")
+                        choices=(ANALYTICAL_BACKEND_SERIALIZATION_TOKEN, "alphamelts"),
+                        help="Melt backend selection (default: internal-analytical)")
     parser.add_argument("--track", default="pyrolysis",
                         choices=("pyrolysis", "mre_baseline"),
                         help="Process track tag (default: pyrolysis)")

@@ -292,18 +292,13 @@ def test_o2_bubbler_refusal_is_visible_in_runner_envelope_without_advancing():
     }
 
 
-@pytest.mark.parametrize("alias", ["internal-analytical", "internal_analytical"])
-def test_pyrolysis_run_folds_internal_analytical_alias_to_stable_stub_token(alias):
-    """A `--backend internal-analytical` run serializes the stable `stub` token.
-
-    The display alias folds onto `stub` in PyrolysisRun.__post_init__, so the
-    serialized run metadata (`"backend"`) stays the byte-stable legacy token and
-    the fidelity-vocabulary backend-token translator never sees an unknown
-    `internal-analytical` token. The runner CLI `--backend` choices accept the
-    alias.
-    """
+@pytest.mark.parametrize(
+    "alias",
+    ["internal-analytical", "internal_analytical", "stub", "diagnostic_stub"],
+)
+def test_pyrolysis_run_accepts_legacy_aliases_and_emits_canonical_token(alias):
     run = PyrolysisRun(feedstock_id="lunar_mare_low_ti", backend_name=alias)
-    assert run.backend_name == "stub"
+    assert run.backend_name == "internal-analytical"
 
 
 def test_melt_redox_gate_floor_fallback_engagement_is_explicit_and_aggregated():
@@ -1099,7 +1094,7 @@ def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):
         mass_kg=1000.0,
         additives_kg={},
         track="pyrolysis",
-        backend_name="stub",
+        backend_name="internal-analytical",
         engines={},
         metadata_overrides={
             "started_at_utc": "2026-06-28T00:00:00Z",
@@ -1107,7 +1102,7 @@ def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):
         },
     )
 
-    # 2026-07-11 0.5.10 E-MOVE: C7 completes its one-hour hold early, so the
+    # 2026-07-11 0.6.0 E-MOVE: C7 completes its one-hour hold early, so the
     # two-hour success fixture is partial while preserving success/failure shape.
     assert success["status"] == "partial"
     assert set(success) == TOP_LEVEL_KEYS

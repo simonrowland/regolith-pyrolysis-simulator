@@ -1,7 +1,7 @@
 profile_id: composition-target-demo-v1
 profile_schema_version: profile-schema-v1
 feedstock: lunar_mare_low_ti
-description: Demo composition-target objective for stub optimizer smoke runs.
+description: Demo composition-target objective for internal-analytical optimizer smoke runs.
 north_star_rationale: Exercise the v1 composition-target objective without adding a shipped feedstock profile.
 objective_emphasis:
   primary: composition-target demo score
@@ -43,13 +43,13 @@ run:
   campaign: C0
   hours: 1
   mass_kg: 1000.0
-  backend_name: stub
+  backend_name: internal-analytical
 fidelities:
-  stub:
-    backend_name: stub
+  internal-analytical:
+    backend_name: internal-analytical
     hours: 1
 seed_recipes:
   - id: composition-target-demo-seed
     source_campaign: C0
-    rationale: Minimal no-op seed for stub smoke.
+    rationale: Minimal no-op seed for internal-analytical smoke.
     patch: {}

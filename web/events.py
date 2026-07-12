@@ -322,9 +322,9 @@ def _get_backend(backend_name: str):
       "backend returned post-equilibrium phase material without an
       AtomLedger transition" reject).  Promotion is blocked on
       ``\\goal CHEMISTRY-KERNEL-CARVE-OUT``.
-    * ``'internal-analytical'`` (legacy alias ``'stub'``) — deterministic
-      ``InternalAnalyticalBackend`` selection. Both names fold onto the stable ``stub``
-      serialization token via ``canonical_backend_name``.
+    * ``'internal-analytical'`` — deterministic
+      ``InternalAnalyticalBackend`` selection. Legacy spellings are accepted
+      on input and folded onto the 0.6 serialization token.
     * ``'auto'`` / unset — autodetect chain: probe
       AlphaMELTS first, falling back to ``InternalAnalyticalBackend`` as the
       always-available primary fallback.  No silent cross-backend
@@ -1240,8 +1240,7 @@ def register_events(socketio):
             }, room=sid)
             return
         # Default is 'auto' (AlphaMELTS-preferred autodetect per
-        # \goal BACKEND-DEFAULT-SWITCH), not 'stub'.  Explicit UI choices
-        # ('alphamelts', 'stub') are still honoured.
+        # \goal BACKEND-DEFAULT-SWITCH). Explicit UI choices are still honoured.
         backend_name = data.get('backend', 'auto')
         track = data.get('track', 'pyrolysis')
 

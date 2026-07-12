@@ -12,12 +12,12 @@ objectives:
   - {metric: duration_h, sense: minimize, units: h, weight: 0.06, rationale: throughput}
 constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
-run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: stub}
+run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: internal-analytical}
 fidelities:
-  stub: {backend_name: stub, hours: 1}
-  fast: {backend_name: stub, hours: 1}
-  high: {backend_name: stub, hours: 1}
-  auto: {backend_name: stub, hours: 1}
+  internal-analytical: {backend_name: internal-analytical, hours: 1}
+  fast: {backend_name: internal-analytical, hours: 1}
+  high: {backend_name: internal-analytical, hours: 1}
+  auto: {backend_name: internal-analytical, hours: 1}
 seed_recipes:
   - id: highland-al-thermite-seed
     source_campaign: C6

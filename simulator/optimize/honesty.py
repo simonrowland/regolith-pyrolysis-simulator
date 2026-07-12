@@ -5,11 +5,20 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from simulator.backend_names import (
+    LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
+    LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+)
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 
 _CERTIFIED_CACHE_TIERS = frozenset({"cached_exact", "live_fill"})
 _ESTIMATED_CACHE_TIERS = frozenset({"cached_physics_bucket", "cached_interpolated"})
-_LEGACY_EVIDENCE_BACKEND_ALIASES = frozenset({"stub", "diagnostic_stub"})
+_LEGACY_EVIDENCE_BACKEND_ALIASES = frozenset(
+    {
+        LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
+    }
+)
 
 
 def optimizer_tier_label(

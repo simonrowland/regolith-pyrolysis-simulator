@@ -84,18 +84,18 @@ STAGE_SIO_GAS_MODE = (
 )
 
 
-# 2026-07-11 0.5.10 E-MOVE: version/source/data fingerprint invalidation moves
+# 2026-07-11 0.6.0 E-MOVE: version/source/data fingerprint invalidation moves
 # only the code_version token in the canonical EvalSpec payload.
 # 2026-07-12 C6 1400 C hold-window bounds [1380, 1450] moved the bounds digest
 # from 67f7eae1... to 32e9d2e9...; payload recomputed from _base_spec().
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor"'
-    b':false,"allowlist_version":"allowlist-v11","backend_name":"s'
-    b'tub","bounds_digest":"32e9d2e945bd870a2af90d5fc46259dd7b7244'
+    b':false,"allowlist_version":"allowlist-v11","backend_name":"internal-'
+    b'analytical","bounds_digest":"32e9d2e945bd870a2af90d5fc46259dd7b7244'
     b'04d9066c4505d98921b8fd4252","c5_enabled":false,"campaign":"C'
     b'0","chemistry_kernel":{"allow_builtin_fallback":false,"engin'
     b'e":"builtin","pressure_Pa":"0.001000000"},"code_version":"0.'
-    b'5.10","data_digests":{"corpus_version":"corpus-version-digest'
+    b'6.0","data_digests":{"corpus_version":"corpus-version-digest'
     b'","feedstocks":"feedstock-digest","foulant_thermo":"foulant-'
     b'thermo-digest","materials":"materials-digest","profile":"pro'
     b'file-digest","setpoints":"setpoints-digest","species_catalog'
@@ -150,7 +150,7 @@ def _base_spec(**overrides: object) -> EvalSpec:
         "mass_kg": 1000.0,
         "additives_kg": {"CaO": 1.5},
         "track": "pyrolysis",
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
         "runtime_campaign_overrides": {"C0": {"hold_time_h": 1.0}},
     }
     data.update(overrides)
@@ -176,7 +176,7 @@ def _mre_cap_profile(**run_overrides: object) -> dict[str, object]:
         "campaign": "C5",
         "hours": 1,
         "mass_kg": 1000.0,
-        "backend_name": "stub",
+        "backend_name": "internal-analytical",
     }
     run.update(run_overrides)
     return {
@@ -195,7 +195,7 @@ def _mre_cap_profile(**run_overrides: object) -> dict[str, object]:
         "constraints": {"gates": ["delivered_stream_purity"]},
         "seed_recipes": [{"id": "seed", "source_campaign": "C0", "patch": {}}],
         "run": run,
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
 
 
@@ -224,7 +224,7 @@ spec = EvalSpec(
     feedstock_id="lunar_mare_low_ti",
     profile_id="oxygen-yield-v1",
     fidelity="fast",
-    code_version="0.5.10",
+    code_version="0.6.0",
     data_digests={
         "corpus_version": "corpus-version-digest",
         "setpoints": "setpoints-digest",
@@ -245,7 +245,7 @@ spec = EvalSpec(
     mass_kg=1000.0,
     additives_kg={"CaO": 1.5},
     track="pyrolysis",
-    backend_name="stub",
+    backend_name="internal-analytical",
     runtime_campaign_overrides={"C0": {"hold_time_h": 1.0}},
 )
 print(json.dumps({
@@ -270,19 +270,15 @@ def test_evalspec_cache_key_changes_when_allowlist_version_changes() -> None:
     )
 
 
-@pytest.mark.parametrize("alias", ["internal-analytical", "internal_analytical"])
-def test_internal_analytical_backend_name_folds_to_stable_stub_cache_key(
+@pytest.mark.parametrize(
+    "alias", ["internal-analytical", "internal_analytical", "stub", "diagnostic_stub"]
+)
+def test_internal_analytical_backend_name_accepts_old_and_emits_new_cache_key(
     alias: str,
 ) -> None:
-    """The `internal-analytical` display alias is byte-identical to `stub`.
-
-    Alias-preserving rebrand: a config authored with the new name folds onto
-    the stable `stub` serialization token, so it shares the legacy cache key
-    (caches/goldens do not move) and the canonicalized field is `stub`.
-    """
     aliased = _base_spec(backend_name=alias)
-    assert aliased.backend_name == "stub"
-    assert cache_key(aliased) == cache_key(_base_spec(backend_name="stub"))
+    assert aliased.backend_name == "internal-analytical"
+    assert cache_key(aliased) == cache_key(_base_spec(backend_name="internal-analytical"))
 
 
 def test_build_eval_inputs_keys_schema_allowlist_version_in_production_path() -> None:
@@ -295,14 +291,14 @@ def test_build_eval_inputs_keys_schema_allowlist_version_in_production_path() ->
     old_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         old_schema,
     )
     new_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         new_schema,
     )
@@ -333,14 +329,14 @@ def test_build_eval_inputs_keys_schema_bounds_digest_in_production_path() -> Non
     old_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         old_schema,
     )
     new_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         new_schema,
     )
@@ -359,21 +355,21 @@ def test_o2_bubbler_default_and_zero_settings_preserve_evalspec_identity() -> No
     baseline, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         legacy_schema,
     )
     default_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     zero_spec, _ = _build_eval_inputs(
         RecipePatch({O2_C3_RATE: 0.0}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -396,14 +392,14 @@ def test_o2_bubbler_nonzero_setting_splits_recipe_id_and_cache_key() -> None:
     neutral_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     bubbler_spec, bubbler_config = _build_eval_inputs(
         RecipePatch({O2_C3_RATE: 0.25}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -472,7 +468,7 @@ def test_data_corpus_digests_change_evalspec_cache_key() -> None:
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -899,18 +895,18 @@ def test_build_eval_inputs_populates_mre_policy_from_profile_run_options() -> No
             "campaign": "C5",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "c5_enabled": True,
             "mre_max_voltage_V": 1.45,
             "mre_target_species": "SiO2",
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
 
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -929,14 +925,14 @@ def test_build_eval_inputs_mre_cap_zero_is_default_no_mre_cache_neutral() -> Non
     default_spec, default_run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     cap_zero_spec, cap_zero_run_config = _build_eval_inputs(
         RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -966,35 +962,35 @@ def test_build_eval_inputs_mre_cap_below_min_rung_is_no_mre_cache_neutral() -> N
     default_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     cap_zero_spec, _ = _build_eval_inputs(
         RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     below_min_spec, below_min_run_config = _build_eval_inputs(
         RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: below_min}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     just_below_spec, just_below_run_config = _build_eval_inputs(
         RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: just_below_min}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     min_spec, min_run_config = _build_eval_inputs(
         RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: min_rung}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1036,14 +1032,14 @@ def test_build_eval_inputs_mre_cap_int_and_float_share_recipe_id() -> None:
     cap_int_spec, _ = _build_eval_inputs(
         RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 1}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     cap_float_spec, _ = _build_eval_inputs(
         RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 1.0}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1057,21 +1053,21 @@ def test_build_eval_inputs_mre_cap_positive_enables_c5_and_partitions_cache() ->
     default_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     cap_145_spec, cap_145_run_config = _build_eval_inputs(
         RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 1.45}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     cap_16_spec, cap_16_run_config = _build_eval_inputs(
         RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 1.6}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1093,14 +1089,14 @@ def test_build_eval_inputs_c2a_staged_stage_knob_partitions_cache_and_schedule()
     default_spec, default_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     staged_spec, staged_config = _build_eval_inputs(
         RecipePatch({STAGE_SIO_TARGET: 1585.0}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1129,7 +1125,7 @@ def test_build_eval_inputs_c2a_staged_stage_gas_knobs_partition_cache() -> None:
     default_spec, default_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1149,7 +1145,7 @@ def test_build_eval_inputs_c2a_staged_stage_gas_knobs_partition_cache() -> None:
         spec, config = _build_eval_inputs(
             RecipePatch({path: value}),
             "lunar_mare_low_ti",
-            "stub",
+            "internal-analytical",
             profile,
             schema,
         )
@@ -1171,14 +1167,14 @@ def test_build_eval_inputs_c2a_staged_order_partitions_cache_and_schedule() -> N
     default_spec, default_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     order_spec, order_config = _build_eval_inputs(
         RecipePatch({C2A_STAGED_ORDER_PATH: "fe_then_sio"}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1204,14 +1200,14 @@ def test_build_eval_inputs_c2a_staged_depletion_zero_is_cache_neutral() -> None:
     default_spec, default_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     zero_spec, zero_config = _build_eval_inputs(
         RecipePatch({C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.0}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1229,14 +1225,14 @@ def test_build_eval_inputs_c2a_staged_depletion_floor_partitions_cache_and_runti
     default_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     subfloor_spec, subfloor_config = _build_eval_inputs(
         RecipePatch({C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.005}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1249,14 +1245,14 @@ def test_build_eval_inputs_c2a_staged_depletion_floor_partitions_cache_and_runti
             }
         ),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     quarter_spec, quarter_config = _build_eval_inputs(
         RecipePatch({C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH: 0.25}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1285,14 +1281,14 @@ def test_build_eval_inputs_c2a_staged_depletion_log_slope_zero_is_cache_neutral(
     default_spec, default_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     zero_spec, zero_config = _build_eval_inputs(
         RecipePatch({alkali_path: 0.0}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1320,35 +1316,35 @@ def test_build_eval_inputs_c2a_staged_depletion_log_slope_partitions_cache_by_st
     default_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     subfloor_spec, subfloor_config = _build_eval_inputs(
         RecipePatch({alkali_path: 0.005}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     floor_spec, floor_config = _build_eval_inputs(
         RecipePatch({alkali_path: C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     quarter_spec, quarter_config = _build_eval_inputs(
         RecipePatch({alkali_path: 0.25}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     same_value_sio_spec, _ = _build_eval_inputs(
         RecipePatch({sio_path: C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1381,14 +1377,14 @@ def test_build_eval_inputs_c4_hold_temp_knob_partitions_cache_and_runtime() -> N
     default_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     hold_spec, hold_config = _build_eval_inputs(
         RecipePatch({C4_HOLD_TEMP_C_PATH: 1600.0}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1419,14 +1415,14 @@ def test_build_eval_inputs_c4_default_hold_temp_is_cache_neutral() -> None:
     default_spec, default_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     explicit_default_spec, explicit_default_config = _build_eval_inputs(
         RecipePatch({C4_HOLD_TEMP_C_PATH: 1670.0}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -1531,17 +1527,17 @@ def test_build_eval_inputs_keys_effective_vapor_provider_by_availability(
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "allow_fallback_vapor": True,
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
 
     monkeypatch.setattr(evaluate_module, "_vaporock_available", lambda: True)
     available_spec, _ = evaluate_module._build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -1549,7 +1545,7 @@ def test_build_eval_inputs_keys_effective_vapor_provider_by_availability(
     unavailable_spec, _ = evaluate_module._build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -1585,10 +1581,10 @@ def test_build_eval_inputs_vaporock_import_visible_init_failure_keys_builtin(
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "allow_fallback_vapor": True,
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
     init_calls = []
 
@@ -1618,7 +1614,7 @@ def test_build_eval_inputs_vaporock_import_visible_init_failure_keys_builtin(
         spec, _ = evaluate_module._build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
-            "stub",
+            "internal-analytical",
             profile,
             RecipeSchema(),
         )
@@ -1659,18 +1655,18 @@ def test_build_eval_inputs_strict_vaporock_unavailable_keeps_vaporock_key(
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "allow_fallback_vapor": False,
             "force_builtin_vapor_pressure": False,
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
 
     monkeypatch.setattr(evaluate_module, "_vaporock_available", lambda: False)
     spec, _ = evaluate_module._build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -1698,7 +1694,7 @@ def test_build_eval_inputs_strict_thermal_window_keeps_vaporock_provider(
     spec, _ = evaluate_module._build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -1732,7 +1728,7 @@ def test_build_eval_inputs_thermal_window_preserves_explicit_force_builtin(
     spec, _ = evaluate_module._build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -1766,11 +1762,11 @@ def test_build_eval_inputs_force_builtin_short_circuits_vaporock_probe(
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "allow_fallback_vapor": True,
             "force_builtin_vapor_pressure": True,
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
 
     def fail_probe() -> bool:
@@ -1780,7 +1776,7 @@ def test_build_eval_inputs_force_builtin_short_circuits_vaporock_probe(
     spec, _ = evaluate_module._build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -1813,10 +1809,10 @@ def test_build_eval_inputs_keys_provider_code_fingerprint(
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "force_builtin_vapor_pressure": True,
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
 
     monkeypatch.setattr(
@@ -1827,7 +1823,7 @@ def test_build_eval_inputs_keys_provider_code_fingerprint(
     first_spec, _ = evaluate_module._build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -1839,7 +1835,7 @@ def test_build_eval_inputs_keys_provider_code_fingerprint(
     second_spec, _ = evaluate_module._build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -1935,7 +1931,7 @@ def test_build_eval_inputs_records_lab_overlay_scope_without_runtime_behavior() 
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
             "lab_overlay_scope": {
                 "lab_alpha_digest": "robinot-alpha-v1",
                 "geometry_digest": "robinot-geometry-v1",
@@ -1947,13 +1943,13 @@ def test_build_eval_inputs_records_lab_overlay_scope_without_runtime_behavior() 
                 },
             },
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
 
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -1991,16 +1987,16 @@ def test_build_eval_inputs_rejects_zero_mass_with_named_category() -> None:
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 0.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
 
     with pytest.raises(EvaluationInputError, match="zero_input_basis_breach"):
         _build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
-            "stub",
+            "internal-analytical",
             profile,
             RecipeSchema(),
         )
@@ -2026,9 +2022,9 @@ def test_build_eval_inputs_projects_c3_alkali_dose_into_evalspec_additives() -> 
             "campaign": "C3_NA",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
     schema = RecipeSchema()
     na_dose = ("campaigns", "C3", "alkali_dosing", "Na_kg")
@@ -2037,14 +2033,14 @@ def test_build_eval_inputs_projects_c3_alkali_dose_into_evalspec_additives() -> 
     undosed_spec, undosed_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     dosed_spec, dosed_config = _build_eval_inputs(
         RecipePatch({na_dose: 12.0, k_dose: 4.0}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -2083,9 +2079,9 @@ def test_build_eval_inputs_keys_disabled_stage0_redox_doses_without_runtime_effe
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
     schema = RecipeSchema()
     patch = RecipePatch(
@@ -2098,14 +2094,14 @@ def test_build_eval_inputs_keys_disabled_stage0_redox_doses_without_runtime_effe
     undosed_spec, undosed_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
     dosed_spec, dosed_config = _build_eval_inputs(
         patch,
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         schema,
     )
@@ -2121,7 +2117,7 @@ def test_c2a_profile_window_schedules_measured_temperature_window() -> None:
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         _c2a_window_profile(1050.0, 1600.0, 24),
         RecipeSchema(),
     )
@@ -2149,7 +2145,7 @@ def test_c2b_profile_window_schedules_measured_temperature_window() -> None:
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         _campaign_window_profile("C2B", 1320.0, 1480.0, 17),
         RecipeSchema(),
     )
@@ -2181,7 +2177,7 @@ def test_c2b_profile_window_over_campaign_cap_fails_loud() -> None:
         _build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
-            "stub",
+            "internal-analytical",
             _campaign_window_profile("C2B", 1320.0, 1480.0, 24),
             RecipeSchema(),
         )
@@ -2191,14 +2187,14 @@ def test_c2a_profile_window_splits_cache_key_from_cold_start() -> None:
     cold_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         _c2a_window_profile(None, None, 24),
         RecipeSchema(),
     )
     warm_spec, _ = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         _c2a_window_profile(1050.0, 1600.0, 24),
         RecipeSchema(),
     )
@@ -2226,7 +2222,7 @@ def test_build_eval_inputs_refuses_unknown_runtime_campaign_override_fields() ->
         _build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
-            "stub",
+            "internal-analytical",
             profile,
             RecipeSchema(),
         )
@@ -2250,7 +2246,7 @@ def test_build_eval_inputs_accepts_profile_window_override_shapes(
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         _campaign_window_profile(campaign, low_C, high_C, duration_h),
         RecipeSchema(),
     )
@@ -2277,7 +2273,7 @@ def test_web_default_c4_override_shape_is_allowed_and_controls_target() -> None:
         campaign="C4",
         hours=1,
         mass_kg=1000.0,
-        backend_name="stub",
+        backend_name="internal-analytical",
         runtime_campaign_overrides={
             "C4": {
                 "pO2_mbar": 0.2,
@@ -2309,7 +2305,7 @@ def test_session_campaign_override_rejects_unknown_fields_at_adjust_time() -> No
         campaign="C4",
         hours=1,
         mass_kg=1000.0,
-        backend_name="stub",
+        backend_name="internal-analytical",
         force_builtin_vapor_pressure=True,
         allow_fallback_vapor=True,
     )
@@ -2342,7 +2338,7 @@ def test_c2a_profile_window_above_furnace_ceiling_fails_loud() -> None:
         _build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
-            "stub",
+            "internal-analytical",
             _c2a_window_profile(1400.0, 1450.0, 18),
             RecipeSchema(),
             constraints=constraints,
@@ -2365,7 +2361,7 @@ def test_c2a_profile_window_uses_setpoints_furnace_ceiling_when_constraint_unset
         evaluate_module._build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
-            "stub",
+            "internal-analytical",
             _c2a_window_profile(1350.0, 1450.0, 18),
             RecipeSchema(),
         )
@@ -2396,7 +2392,7 @@ def test_lab_schedule_uses_setpoints_furnace_ceiling_when_constraint_unset(
         evaluate_module._build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
-            "stub",
+            "internal-analytical",
             _lab_schedule_profile(schedule),
             RecipeSchema(),
         )
@@ -2406,7 +2402,7 @@ def test_in_window_c2a_run_captures_na_product() -> None:
     _, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         _c2a_window_profile(1400.0, 1450.0, 18),
         RecipeSchema(),
     )
@@ -2437,7 +2433,7 @@ def test_lab_schedule_profile_schedules_declared_piecewise_temperature_pressure(
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         _lab_schedule_profile(schedule),
         RecipeSchema(),
     )
@@ -2490,7 +2486,7 @@ def test_build_eval_inputs_strict_lab_schedule_keeps_vaporock_provider(
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -2655,7 +2651,7 @@ def test_lab_schedule_profile_reports_window_semantics_to_runtime_overrides() ->
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         _lab_schedule_profile(schedule),
         RecipeSchema(),
     )
@@ -2688,7 +2684,7 @@ def test_lab_schedule_profile_bridges_experiment_windows_to_window_semantics() -
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         _lab_schedule_profile(schedule),
         RecipeSchema(),
     )
@@ -2820,7 +2816,7 @@ def test_lab_schedule_profile_fail_loud_rules_are_named(
         _build_eval_inputs(
             RecipePatch({}),
             "lunar_mare_low_ti",
-            "stub",
+            "internal-analytical",
             _lab_schedule_profile(schedule),
             RecipeSchema(),
             constraints=constraints,
@@ -2870,7 +2866,7 @@ def test_lab_schedule_pO2_setpoint_above_total_pressure_clips_per_hour() -> None
     _, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
-        "stub",
+        "internal-analytical",
         profile,
         RecipeSchema(),
     )
@@ -2949,9 +2945,9 @@ def _campaign_window_profile(
             "campaign": campaign,
             "hours": duration_h,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
         },
-        "fidelities": {"stub": {"backend_name": "stub"}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical"}},
     }
 
 

@@ -7,6 +7,7 @@ import math
 from types import MappingProxyType
 from typing import Any, Mapping, Sequence
 
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.optimize.doe import (
     SAMPLER_NAMES,
     STREAMING_SAMPLER_NAMES,
@@ -1810,8 +1811,12 @@ def _strip_trace(scored: ScoredResult) -> ScoredResult:
 
 def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, str] | None:
     status = _result_backend_status(scored)
-    if status is None and getattr(getattr(scored, "eval_spec", None), "backend_name", None) == "stub":
-        status = "diagnostic_stub"
+    if (
+        status is None
+        and getattr(getattr(scored, "eval_spec", None), "backend_name", None)
+        == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    ):
+        status = "unavailable"
     return {"backend_status": status} if status is not None else None
 
 

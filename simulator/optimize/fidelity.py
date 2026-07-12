@@ -23,7 +23,10 @@ from simulator.optimize.doe import (
     FidelityCorrelationResult,
     sample_recipe_patches,
 )
-from simulator.backend_names import canonical_backend_name
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.backends import requires_stage0_subprocess
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.optimize.evaluate import EvaluationAbort, ScoredResult
@@ -559,19 +562,25 @@ def _fidelity_worker_count(tasks: Sequence[_FidelityTask], n_total: int) -> int:
     if not tasks:
         return 1
     backend_name = _task_backend_name(tasks[0])
-    if backend_name not in {"stub", "auto", "cached-real"}:
+    if backend_name not in {
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "auto",
+        "cached-real",
+    }:
         return 1
     return max(1, min(n_total, 2))
 
 
 def _task_backend_name(task: _FidelityTask) -> str:
     # Read raw from the profile (not the EvalSpec), so fold the
-    # `internal-analytical` display alias onto the stable `stub` token here too,
-    # to stay consistent with the canonicalized EvalSpec.backend_name (otherwise
-    # a new `internal-analytical` profile would spuriously read as a `mixed:`
-    # backend against the canonicalized spec name).
+    # Normalize legacy profile inputs before comparing them with EvalSpec.
     return canonical_backend_name(
-        str(_task_run_options(task).get("backend_name", "stub") or "stub")
+        str(
+            _task_run_options(task).get(
+                "backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+            )
+            or ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        )
     )
 
 
@@ -602,7 +611,7 @@ def _arm_backend_authority(
         if raw_name:
             backend_names.add(str(raw_name))
     if not backend_names:
-        backend_names.add("stub")
+        backend_names.add(ANALYTICAL_BACKEND_SERIALIZATION_TOKEN)
     ordered_names = tuple(sorted(backend_names))
     backend_name = ordered_names[0] if len(ordered_names) == 1 else "mixed:" + ",".join(ordered_names)
 
@@ -612,8 +621,8 @@ def _arm_backend_authority(
     if len(ordered_names) != 1:
         backend_status = "mixed_backend"
         authoritative = False
-    elif backend_name == "stub":
-        backend_status = "diagnostic_stub"
+    elif backend_name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
+        backend_status = "unavailable"
         authoritative = False
     elif not results:
         backend_status = "not_run"
@@ -926,10 +935,16 @@ def _verdict(
 def _high_arm_authority_reason(backend_arms: Mapping[str, Mapping[str, Any]]) -> str:
     high = backend_arms.get("high", {})
     fast = backend_arms.get("fast", {})
-    high_backend = str(high.get("backend_name", "stub") or "stub")
-    fast_backend = str(fast.get("backend_name", "stub") or "stub")
-    if high_backend == "stub":
-        if fast_backend == "stub":
+    high_backend = str(
+        high.get("backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN)
+        or ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    )
+    fast_backend = str(
+        fast.get("backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN)
+        or ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    )
+    if canonical_backend_name(high_backend) == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
+        if canonical_backend_name(fast_backend) == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
             return STUB_DIAGNOSTIC_REASON
         return "high arm stub diagnostic, not authoritative"
     if high.get("evidence_class") is not None and not high.get(

@@ -69,6 +69,10 @@ from typing import Any, Dict
 
 import yaml
 
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.transport_constants import (
     COLLISION_DIAMETERS_M,
     FREE_MOLECULAR_KNUDSEN_MIN,
@@ -707,10 +711,9 @@ def _alpha_certification_source_class_token(value: Any) -> str:
 
 
 def _alpha_source_class_cannot_certify(value: Any) -> bool:
-    return _alpha_certification_source_class_token(value) in {
-        'internal-analytical',
-        'stub',
-    }
+    return canonical_backend_name(_alpha_certification_source_class_token(value)) == (
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    )
 
 
 def _sticking_record_payload(record: Mapping[str, Any]) -> dict[str, Any]:

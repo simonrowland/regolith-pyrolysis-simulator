@@ -124,7 +124,7 @@ def captured_logs(monkeypatch):
 
 def test_shared_resolver_requires_explicit_policy():
     with pytest.raises(TypeError):
-        resolve_backend('stub')
+        resolve_backend('internal-analytical')
 
 
 def test_runner_strict_rejects_auto():
@@ -145,7 +145,7 @@ def test_web_autodetect_policy_preserves_probe_order():
         return _FakeAlphaMELTS(available=False)
 
     def make_internal_analytical():
-        calls.append('stub')
+        calls.append('internal-analytical')
         return InternalAnalyticalBackend()
 
     backend = resolve_backend(
@@ -157,7 +157,7 @@ def test_web_autodetect_policy_preserves_probe_order():
     )
 
     assert isinstance(backend, InternalAnalyticalBackend)
-    assert calls == ['alphamelts', 'stub']
+    assert calls == ['alphamelts', 'internal-analytical']
 
 
 def test_stage0_required_alphamelts_resolution_forces_subprocess_copy():
@@ -435,7 +435,7 @@ def test_stage0_required_auto_falls_back_when_forced_alphamelts_absent():
         return backend
 
     def make_internal_analytical():
-        calls.append("stub")
+        calls.append("internal-analytical")
         return InternalAnalyticalBackend()
 
     backend = resolve_backend(
@@ -450,7 +450,7 @@ def test_stage0_required_auto_falls_back_when_forced_alphamelts_absent():
     )
 
     assert isinstance(backend, InternalAnalyticalBackend)
-    assert calls == ["alphamelts", "stub"]
+    assert calls == ["alphamelts", "internal-analytical"]
     assert instances[0].init_calls == [
         {
             "mode": "subprocess",
@@ -464,11 +464,11 @@ def test_stage0_required_auto_falls_back_when_forced_alphamelts_absent():
 
     resolution = backend_resolution_status(backend)
     assert resolution.requested_backend == "auto"
-    assert resolution.active_backend == "StubBackend"
+    assert resolution.active_backend == "InternalAnalyticalBackend"
     assert resolution.backend_status == "unavailable"
     assert resolution.authoritative is False
     assert resolution.message.startswith(
-        "forced AlphaMELTS backend unavailable; substituted StubBackend"
+        "forced AlphaMELTS backend unavailable; substituted InternalAnalyticalBackend"
     )
 
 
@@ -598,15 +598,8 @@ def test_explicit_alphamelts_request_raises_when_unavailable(monkeypatch):
 
 def test_explicit_stub_request_pins_internal_analytical_backend(
         monkeypatch, captured_logs):
-    """``backend='stub'`` deterministically pins InternalAnalyticalBackend (D1 fix).
+    """The legacy ``stub`` input still pins InternalAnalyticalBackend."""
 
-    An explicit 'stub' request must NOT autodetect: even when AlphaMELTS
-    is available, asking for the deterministic stub returns InternalAnalyticalBackend.
-    Only 'auto'/'' follow the autodetect chain. (Bug D1: 'stub'
-    previously routed through autodetect and returned AlphaMELTS when it
-    was installed, so a caller asking for a deterministic backend silently
-    got AlphaMELTS.)
-    """
     _install_fakes(monkeypatch,
                    alphamelts_available=True)
 
@@ -618,7 +611,7 @@ def test_explicit_stub_request_pins_internal_analytical_backend(
 
 
 def test_web_autodetect_stub_bypasses_primary_probes():
-    """Under WEB_AUTODETECT, 'stub' returns InternalAnalyticalBackend without probing
+    """Under WEB_AUTODETECT, 'internal-analytical' returns InternalAnalyticalBackend without probing
     AlphaMELTS (D1 fix at the resolver level)."""
     calls: list[str] = []
 
@@ -627,11 +620,11 @@ def test_web_autodetect_stub_bypasses_primary_probes():
         return _FakeAlphaMELTS(available=True)
 
     def make_internal_analytical():
-        calls.append('stub')
+        calls.append('internal-analytical')
         return InternalAnalyticalBackend()
 
     backend = resolve_backend(
-        'stub',
+        'internal-analytical',
         BackendSelectionPolicy.WEB_AUTODETECT,
         alphamelts_backend_cls=make_alphamelts,
         internal_analytical_backend_cls=make_internal_analytical,
@@ -639,27 +632,25 @@ def test_web_autodetect_stub_bypasses_primary_probes():
     )
 
     assert isinstance(backend, InternalAnalyticalBackend)
-    assert calls == ['stub']  # primaries never probed
+    assert calls == ['internal-analytical']  # primaries never probed
 
 
 # ---------------------------------------------------------------------------
-# `internal-analytical` display alias (alias-preserving stub rebrand)
+# Analytical backend input aliases
 # ---------------------------------------------------------------------------
 #
 # Trust-architecture vocabulary names the analytical model `internal-analytical`
 # (design-fidelity-surface-2026-06-10.md §STUB REBRAND; AGENTS.md C3). The
-# rebrand is alias-preserving: the new name is accepted on input but folds onto
-# the stable `stub` serialization token, so caches/goldens do not move and the
-# denylist (InternalAnalyticalBackend is never authoritative) is unchanged.
+# Legacy names are accepted on input, while serialization emits the 0.6 token.
 
 
 @pytest.mark.parametrize(
     'name',
-    ['internal-analytical', 'INTERNAL-ANALYTICAL', 'internal_analytical',
+    ['internal-analytical', 'INTERNAL-ANALYTICAL', 'internal_analytical', 'stub',
      ' internal-analytical '],
 )
 def test_internal_analytical_alias_pins_internal_analytical_backend(monkeypatch, name):
-    """``backend='internal-analytical'`` resolves exactly like ``'stub'``.
+    """``backend='internal-analytical'`` resolves exactly like ``'internal-analytical'``.
 
     Even when AlphaMELTS is available the alias deterministically pins
     InternalAnalyticalBackend (it folds onto ``stub`` before the autodetect branch).
@@ -680,13 +671,7 @@ def test_internal_analytical_alias_runner_strict_resolves_like_stub():
     assert isinstance(backend, InternalAnalyticalBackend)
 
 
-def test_internal_analytical_alias_serializes_stable_stub_token_and_denylists():
-    """The alias keeps the stable `stub` token and stays non-authoritative.
-
-    requested_backend must serialize as ``stub`` (not ``internal-analytical``)
-    so existing caches/goldens are byte-stable, and the resolution must remain
-    non-authoritative so the certification denylist is preserved.
-    """
+def test_internal_analytical_alias_serializes_new_token_and_denylists():
     backend = resolve_backend(
         'internal-analytical',
         BackendSelectionPolicy.WEB_AUTODETECT,
@@ -695,10 +680,11 @@ def test_internal_analytical_alias_serializes_stable_stub_token_and_denylists():
     )
     resolution = backend_resolution_status(backend)
 
-    assert resolution.requested_backend == 'stub'
-    assert resolution.active_backend == 'StubBackend'
+    assert resolution.requested_backend == 'internal-analytical'
+    assert resolution.active_backend == 'InternalAnalyticalBackend'
     assert resolution.message == (
-        'stub backend selected; no authoritative melt result available'
+        'internal-analytical backend selected; '
+        'no authoritative melt result available'
     )
     assert resolution.backend_status == 'unavailable'
     assert resolution.authoritative is False
@@ -722,7 +708,7 @@ def test_unset_backend_still_autodetects(monkeypatch):
         return _FakeAlphaMELTS(available=False)
 
     def make_internal_analytical():
-        calls.append('stub')
+        calls.append('internal-analytical')
         return InternalAnalyticalBackend()
 
     backend = resolve_backend(
@@ -734,7 +720,7 @@ def test_unset_backend_still_autodetects(monkeypatch):
     )
 
     assert isinstance(backend, InternalAnalyticalBackend)
-    assert calls == ['alphamelts', 'stub']
+    assert calls == ['alphamelts', 'internal-analytical']
 
 
 # ---------------------------------------------------------------------------

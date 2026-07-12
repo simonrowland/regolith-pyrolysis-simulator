@@ -41,6 +41,7 @@ Path(os.environ["XDG_CACHE_HOME"]).mkdir(parents=True, exist_ok=True)
 
 import yaml
 
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.backends import BackendSelectionPolicy, resolve_backend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.optimize.determinism import pin_worker_env
@@ -233,7 +234,7 @@ def _evaluate_internal_analytical_once(profile: Mapping[str, Any], *, candidate_
     evaluate(
         _empty_patch(),
         feedstock,
-        "stub",
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
         profile=profile,
         candidate_id=candidate_id,
     )

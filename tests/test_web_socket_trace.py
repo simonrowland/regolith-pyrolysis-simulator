@@ -138,7 +138,7 @@ def _record_trace(app, captured_tasks):
         client.emit(
             "start_simulation",
             {
-                "backend": "stub",
+                "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
                 "speed": 0,
@@ -146,11 +146,7 @@ def _record_trace(app, captured_tasks):
             },
         )
         trace.extend(_drain(client))
-        # Serialization tokens stay legacy-stable (alias-preserving rename,
-        # t-172): the web payload reports the stable "StubBackend" label; the
-        # InternalAnalyticalBackend name is internal-only. Matches
-        # test_web_events.py:974 and the retained golden.
-        assert trace[0]["payload"]["backend_active"] == "StubBackend"
+        assert trace[0]["payload"]["backend_active"] == "InternalAnalyticalBackend"
 
         start_task_count = len(captured_tasks)
         assert start_task_count >= 1

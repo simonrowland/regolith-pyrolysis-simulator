@@ -340,9 +340,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
             "campaign": "C0",
             "hours": 1,
             "mass_kg": 1000.0,
-            "backend_name": "stub",
+            "backend_name": "internal-analytical",
         },
-        "fidelities": {"stub": {"backend_name": "stub", "hours": 1}},
+        "fidelities": {"internal-analytical": {"backend_name": "internal-analytical", "hours": 1}},
         "seed_recipes": [
             {
                 "id": "seed",
@@ -364,7 +364,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
         FEEDSTOCK,
-        "stub",
+        "internal-analytical",
         profile,
         unpinned,
     )
@@ -444,7 +444,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # in data_digests.setpoints plus vapor_pressure_provider_code_fingerprint;
     # substituting those two old fields reproduces f448556f..., proving no
     # schema/allowlist drift.
-    # 2026-07-11 0.5.10 E-MOVE: version/source/data fingerprint invalidation;
+    # 2026-07-11 0.6.0 E-MOVE: version/source/data fingerprint invalidation;
     # recipe_id and searchable allowlist hash above are unchanged.
     # 2026-07-12 combined-main rebaseline: the C6 1400 C window changes the
     # bounds/setpoints identity while t-005 changes optimizer source inputs;
@@ -452,7 +452,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-12 wave-11 audit-contract request-shape fix: fO2-independent
     # intents no longer receive fO2-shaped requests. The source fingerprint
     # moves the cache identity; recipe_id and search-list hash above stay fixed.
-    assert cache_key(spec) == "12a231b089f618babf7e1ccd4318c171baa95f43113c5eece268b6736f655509"
+    assert cache_key(spec) == "0e0e6ce28e018b6cf517b2b3db26d73dfbb8b33dab485b7575e689eaa8c1975e"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

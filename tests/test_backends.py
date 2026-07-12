@@ -11,7 +11,7 @@ from simulator.melt_backend.base import InternalAnalyticalBackend
 
 
 def test_backend_honesty_internal_analytical_resolution_surfaces_unavailable_status():
-    backend = resolve_backend("stub", BackendSelectionPolicy.RUNNER_STRICT)
+    backend = resolve_backend("internal-analytical", BackendSelectionPolicy.RUNNER_STRICT)
 
     status = backend_resolution_status(backend)
 
@@ -28,7 +28,7 @@ def test_backend_honesty_internal_analytical_rejected_for_real_liquid_fraction_i
         match="gate_liquid_fraction",
     ):
         resolve_backend(
-            "stub",
+            "internal-analytical",
             BackendSelectionPolicy.RUNNER_STRICT,
             required_intents=[ChemistryIntent.GATE_LIQUID_FRACTION],
         )
