@@ -14,6 +14,7 @@ Tuple per species: ``(dH_f kJ/mol_O2, dS_f kJ/(mol*K), n_M, n_ox)``
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Any
 
@@ -603,12 +604,19 @@ def ellingham_fit_range_K(species: str) -> tuple[float, float]:
     )
 
 
+def _finite_temperature_K(temperature_K: float) -> float:
+    T_K = float(temperature_K)
+    if not math.isfinite(T_K):
+        raise ValueError("Ellingham temperature_K must be finite")
+    return T_K
+
+
 def ellingham_segment_for_temperature(
     species: str,
     temperature_K: float,
 ) -> EllinghamFitSegment:
     segments = ellingham_fit_segments(species)
-    T_K = float(temperature_K)
+    T_K = _finite_temperature_K(temperature_K)
     selectable_segments = segments
     if str(species) == "Mg" and T_K >= MG_NORMAL_BOILING_POINT_K:
         selectable_segments = tuple(
@@ -637,8 +645,9 @@ def ellingham_delta_g_kj_per_mol_o2(
     species: str,
     temperature_K: float,
 ) -> float:
-    segment = ellingham_segment_for_temperature(species, temperature_K)
-    return segment.delta_g_kJ_per_mol_O2(temperature_K)
+    T_K = _finite_temperature_K(temperature_K)
+    segment = ellingham_segment_for_temperature(species, T_K)
+    return segment.delta_g_kJ_per_mol_O2(T_K)
 
 
 def ellingham_stoichiometry(species: str) -> tuple[float, float]:
@@ -655,7 +664,7 @@ def ellingham_fit_extrapolation(
     species: str,
     consumer: str,
 ) -> dict[str, Any] | None:
-    T_K = float(temperature_K)
+    T_K = _finite_temperature_K(temperature_K)
     for segment in ellingham_fit_segments(species):
         valid_low, valid_high = segment.range_K
         if valid_low <= T_K <= valid_high:

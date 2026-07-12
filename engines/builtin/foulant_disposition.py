@@ -238,9 +238,13 @@ def _derive_sigmoid_width_C(
     slope_j = slope_kj * 1000.0
     if math.isclose(slope_j, 0.0):
         raise ValueError("cannot derive sigmoid width from zero dG slope")
+    # Premise: near dG=0, dG(T) ~= (dG/dT)(T - T_onset).
+    # Algebra: one thermodynamic e-fold has |dG| = R*T*ln(e), so the
+    # logistic scale is R*T/|dG/dT|, not the full two-sided interval.
+    # Unit check: (J/mol)/(J/mol/K) = K. Sanity: +/- one returned width
+    # maps to logistic odds e:+1 and e:-1 respectively.
     delta_g_j = abs(GAS_CONSTANT_J_PER_MOL_K * onset_K * math.log(activity_ratio))
-    half_width_K = delta_g_j / abs(slope_j)
-    return 2.0 * half_width_K
+    return delta_g_j / abs(slope_j)
 
 
 def _parse_dg_points(dg_row: Mapping[str, Any]) -> list[tuple[float, float]]:
@@ -442,6 +446,22 @@ def partition_carbon(
     f_process = _fraction_from_row(process_row, key="value")
     f_refractory_interval = refractory_fraction_interval(source_row)
 
+    named_fractions = {
+        "f_refractory_organic_C": f_refractory,
+        "f_carbonate_C": f_carbonate,
+        "f_process_reductant_C": f_process,
+    }
+    known_fractions: list[float] = []
+    for name, fraction in named_fractions.items():
+        if fraction == NOT_SPECIFIED:
+            continue
+        value = float(fraction)
+        if not math.isfinite(value) or not 0.0 <= value <= 1.0:
+            raise ValueError(f"{name} must be finite and within [0, 1]")
+        known_fractions.append(value)
+    if sum(known_fractions) > 1.0 + 1e-12:
+        raise ValueError("carbon partition fractions exceed declared carbon")
+
     if f_refractory == NOT_SPECIFIED:
         refractory_mol = NOT_SPECIFIED
         labile_mol = NOT_SPECIFIED
@@ -450,6 +470,8 @@ def partition_carbon(
         labile_mol = max(total - refractory_mol, 0.0)
         if f_carbonate != NOT_SPECIFIED:
             labile_mol = max(labile_mol - total * float(f_carbonate), 0.0)
+        if f_process != NOT_SPECIFIED:
+            labile_mol = max(labile_mol - total * float(f_process), 0.0)
 
     if f_carbonate == NOT_SPECIFIED:
         carbonate_mol = NOT_SPECIFIED

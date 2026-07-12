@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from engines.builtin.foulant_disposition import (
+    GAS_CONSTANT_J_PER_MOL_K,
     NOT_SPECIFIED,
     UNGROUNDABLE_PROCESS_EXTENT,
     CarbonPartition,
@@ -180,7 +181,12 @@ def test_sigmoid_width_is_physical_logistic_not_step(
     onset_c = onset_k - 273.15
     width_c = _derive_sigmoid_width_C(dg_points, onset_k)
 
-    assert width_c >= 10.0
+    nearest = sorted(dg_points, key=lambda row: abs(row[0] - onset_k))[:2]
+    (t0, dg0), (t1, dg1) = sorted(nearest, key=lambda row: row[0])
+    slope_j_per_mol_k = abs((dg1 - dg0) / (t1 - t0)) * 1000.0
+    assert width_c == pytest.approx(
+        GAS_CONSTANT_J_PER_MOL_K * onset_k / slope_j_per_mol_k
+    )
     extent_plus = _sigmoid_extent(onset_c + width_c, onset_c, width_c)
     extent_minus = _sigmoid_extent(onset_c - width_c, onset_c, width_c)
     assert extent_plus == pytest.approx(1.0 / (1.0 + math.e ** -1), rel=1e-6)
@@ -265,6 +271,37 @@ def test_partition_carbon_missing_process_share_is_not_speciated() -> None:
     assert result.process_reductant_mol == NOT_SPECIFIED
     assert "f_process_reductant_C" in result.not_speciated
     assert result.process_reductant_mol != 0.0
+
+
+def test_partition_carbon_subtracts_every_declared_bucket() -> None:
+    source_row = {
+        "f_refractory_organic_C": {"floor": 0.39},
+        "f_carbonate_C": {"value": 0.10},
+        "f_process_reductant_C": {"value": 0.20},
+    }
+
+    result = partition_carbon("carbonaceous_organic", 100.0, source_row)
+
+    assert result.labile_mol == pytest.approx(31.0)
+    assert sum(
+        (
+            result.labile_mol,
+            result.refractory_mol,
+            result.carbonate_mol,
+            result.process_reductant_mol,
+        )
+    ) == pytest.approx(100.0)
+
+
+def test_partition_carbon_rejects_overspecified_fractions() -> None:
+    source_row = {
+        "f_refractory_organic_C": {"floor": 0.7},
+        "f_carbonate_C": {"value": 0.2},
+        "f_process_reductant_C": {"value": 0.2},
+    }
+
+    with pytest.raises(ValueError, match="exceed declared carbon"):
+        partition_carbon("carbonaceous_organic", 100.0, source_row)
 
 
 def test_load_foulant_registry_builds_alias_index(foulant_registry_yaml: Path) -> None:

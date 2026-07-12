@@ -6,6 +6,8 @@ from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_CONDENSED,
     ELLINGHAM_METAL_PHASE_GAS,
     MG_NORMAL_BOILING_POINT_K,
+    ellingham_delta_g_kj_per_mol_o2,
+    ellingham_fit_extrapolation,
     ellingham_fit_segments,
     ellingham_metal_phase_kind,
     ellingham_segment_for_temperature,
@@ -55,6 +57,20 @@ def test_mg_runtime_rail_switches_at_physical_boiling_boundary() -> None:
         "Mg",
         MG_NORMAL_BOILING_POINT_K,
     ) == ELLINGHAM_METAL_PHASE_GAS
+
+
+@pytest.mark.parametrize("temperature_K", [float("nan"), float("inf"), float("-inf")])
+def test_non_finite_temperature_is_refused(temperature_K: float) -> None:
+    with pytest.raises(ValueError, match="temperature_K must be finite"):
+        ellingham_segment_for_temperature("Na", temperature_K)
+    with pytest.raises(ValueError, match="temperature_K must be finite"):
+        ellingham_delta_g_kj_per_mol_o2("Na", temperature_K)
+    with pytest.raises(ValueError, match="temperature_K must be finite"):
+        ellingham_fit_extrapolation(
+            temperature_K,
+            species="Na",
+            consumer="test",
+        )
 
 
 def test_mn_primary_fit_is_split_at_solid_allotrope_breakpoints() -> None:
