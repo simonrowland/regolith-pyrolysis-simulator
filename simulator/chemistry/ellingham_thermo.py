@@ -24,6 +24,10 @@ from typing import Any
 ELLINGHAM_FIT_RANGE_K = (1100.0, 1700.0)
 ELLINGHAM_MBAR_FIT_RANGE_K = (1100.0, 2200.0)
 ELLINGHAM_AUTHORITY_LIMIT_FLAG = "authority_limited_by_ellingham_fit_range"
+ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG = (
+    "authority_limited_by_reconstructed_ellingham_segment"
+)
+ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS = "reconstructed_limited"
 ELLINGHAM_METAL_PHASE_GAS = "gas"
 ELLINGHAM_METAL_PHASE_CONDENSED = "condensed"
 
@@ -49,6 +53,7 @@ class EllinghamFitSegment:
     dg_1727C_kJ_per_mol_O2: float | None = None
     dg_1800C_kJ_per_mol_O2: float | None = None
     dg_1900C_kJ_per_mol_O2: float | None = None
+    authority_status: str = "authoritative"
 
     def delta_g_kJ_per_mol_O2(self, temperature_K: float) -> float:
         return (
@@ -331,6 +336,7 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
             (1519.0, 2058.0),
             "2 Mn(l) + O2 -> 2 MnO(s); project rows 1600-2000 K",
             "Project Mn(l) reconstruction; confidence: reconstructed",
+            authority_status=ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS,
         ),
         EllinghamFitSegment(
             -794.540,
@@ -340,6 +346,7 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
             (2058.0, 2600.0),
             "2 Mn(l) + O2 -> 2 MnO(lit. liquid range); project rows 2100-2600 K",
             "Project Mn(l) reconstruction; confidence: reconstructed",
+            authority_status=ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS,
         ),
     ),
     # Cr premise: Chase 1998 JANAF Cr-016 rows 1100-2600 K, split at Cr
@@ -660,6 +667,37 @@ def ellingham_stoichiometry(species: str) -> tuple[float, float]:
     return segment.n_M, segment.n_ox
 
 
+def _ellingham_segment_is_reconstructed(segment: EllinghamFitSegment) -> bool:
+    return segment.authority_status == ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS
+
+
+def _ellingham_reconstructed_authority_limit(
+    species: str,
+    temperature_K: float,
+    segment: EllinghamFitSegment,
+    *,
+    consumer: str,
+) -> dict[str, Any]:
+    # Premise: a fit segment may be inside its numeric K range while still
+    # carrying reconstructed, non-authoritative provenance.
+    # Algebra: dG(T) = dH - T*dS remains computable; only authority metadata
+    # changes. Unit check: temperature_K and range_K are kelvin, while the
+    # segment coefficients remain kJ/mol O2. Sanity: Mn at 1873.15 K selects the
+    # project reconstruction and must not collapse to "authoritative".
+    return {
+        "temperature_K": temperature_K,
+        "segment_range_K": segment.range_K,
+        "species": species,
+        "consumer": consumer,
+        "authority_status": ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS,
+        "authority_flag": ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
+        ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG: True,
+        "authority_reason": "reconstructed_segment",
+        "phase_basis": segment.phase_basis,
+        "source_basis": segment.janaf_anchor,
+    }
+
+
 def ellingham_fit_extrapolation(
     temperature_K: float,
     *,
@@ -667,10 +705,10 @@ def ellingham_fit_extrapolation(
     consumer: str,
 ) -> dict[str, Any] | None:
     T_K = _finite_temperature_K(temperature_K)
-    for segment in ellingham_fit_segments(species):
-        valid_low, valid_high = segment.range_K
-        if valid_low <= T_K <= valid_high:
-            return None
+    segment = ellingham_segment_for_temperature(species, T_K)
+    valid_low, valid_high = segment.range_K
+    if valid_low <= T_K <= valid_high:
+        return None
     valid_low, valid_high = ellingham_fit_range_K(species)
     return {
         "temperature_K": T_K,
@@ -682,18 +720,70 @@ def ellingham_fit_extrapolation(
     }
 
 
+def ellingham_authority_limit(
+    temperature_K: float,
+    *,
+    species: str,
+    consumer: str,
+) -> dict[str, Any] | None:
+    T_K = _finite_temperature_K(temperature_K)
+    extrapolation = ellingham_fit_extrapolation(
+        T_K,
+        species=species,
+        consumer=consumer,
+    )
+    if extrapolation is not None:
+        return extrapolation
+    segment = ellingham_segment_for_temperature(species, T_K)
+    if _ellingham_segment_is_reconstructed(segment):
+        return _ellingham_reconstructed_authority_limit(
+            species,
+            T_K,
+            segment,
+            consumer=consumer,
+        )
+    return None
+
+
 def ellingham_authority_diagnostic(
     extrapolations: dict[str, dict[str, Any]],
     *,
     consumer: str,
 ) -> dict[str, Any]:
     limited = bool(extrapolations)
+    reconstructed_limited = any(
+        isinstance(data, dict)
+        and data.get(ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG) is True
+        for data in extrapolations.values()
+    )
+    statuses = {
+        str(data.get("authority_status"))
+        for data in extrapolations.values()
+        if isinstance(data, dict) and data.get("authority_status") is not None
+    }
+    status = "authoritative"
+    if limited:
+        status = (
+            "authority_limited"
+            if statuses == {ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS}
+            else "extrapolation_limited"
+        )
     return {
         "consumer": consumer,
-        "status": "extrapolation_limited" if limited else "authoritative",
-        ELLINGHAM_AUTHORITY_LIMIT_FLAG: limited,
+        "status": status,
+        ELLINGHAM_AUTHORITY_LIMIT_FLAG: any(
+            data.get("authority_status") == "extrapolation_limited"
+            for data in extrapolations.values()
+            if isinstance(data, dict)
+        ),
+        ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG: reconstructed_limited,
+        "authority_limits": {
+            str(species): dict(data)
+            for species, data in extrapolations.items()
+        },
         "extrapolated_beyond_fit_range_K": {
             str(species): dict(data)
             for species, data in extrapolations.items()
+            if data.get("authority_status") == "extrapolation_limited"
         },
     }

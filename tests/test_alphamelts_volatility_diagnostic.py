@@ -143,6 +143,34 @@ def test_maps_alphamelt_activity_into_analytical_sio_vapor_pressure_grid():
     assert oxidized["P_eq_wt_fraction_Pa"] == pytest.approx(5.0)
 
 
+def test_reconstructed_mn_is_authority_limited_not_fit_extrapolated():
+    source = StubActivitySource(
+        {
+            1.0: {"MnO": 0.25},
+        }
+    )
+
+    diagnostic = alphamelts_activity_volatility_diagnostic(
+        composition_wt_pct={**_domain_composition(), "MnO": 1.0},
+        pO2_grid_bar=[1e-9],
+        temperature_C=1326.85,
+        activity_source=source,
+        vapor_pressure_data=volatility_module._load_default_vapor_pressure_data(),
+        primary_pressure_bar=1.0,
+        comparison_pressure_bar=1.0,
+    )
+
+    authority = diagnostic["ellingham_authority"]
+    assert authority["authority_limited_by_reconstructed_ellingham_segment"] is True
+    mn_limit = authority["authority_limits"]["Mn"]
+    assert mn_limit["authority_status"] == "reconstructed_limited"
+    assert "fit_range_K" not in mn_limit
+    assert "Mn" not in authority["extrapolated_beyond_fit_range_K"]
+    assert "extrapolated" not in diagnostic["grid"][0]["species"]["Mn"][
+        "source_label"
+    ]
+
+
 def test_uses_diagnostic_oxide_activities_payload():
     source = StubActivitySource(
         {

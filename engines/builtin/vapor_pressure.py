@@ -83,8 +83,8 @@ from simulator.chemistry.ellingham_thermo import (  # noqa: E402
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_THERMO as _ELLINGHAM_THERMO,
     ellingham_authority_diagnostic,
+    ellingham_authority_limit,
     ellingham_delta_g_kj_per_mol_o2,
-    ellingham_fit_extrapolation,
     ellingham_fit_range_K,
     ellingham_metal_phase_kind,
     ellingham_stoichiometry,
@@ -669,12 +669,12 @@ def _require_finite_vapor_value(
     return checked
 
 
-def _ellingham_fit_extrapolation(
+def _ellingham_authority_limit(
     temperature_K: float,
     *,
     species: str,
 ) -> dict[str, object] | None:
-    return ellingham_fit_extrapolation(
+    return ellingham_authority_limit(
         temperature_K,
         species=species,
         consumer="builtin-vapor-pressure",
@@ -1044,18 +1044,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             ):
                 continue
 
-            ellingham_extrapolation = _ellingham_fit_extrapolation(
+            ellingham_extrapolation = _ellingham_authority_limit(
                 T_K,
                 species=species,
             )
             if ellingham_extrapolation is not None:
                 ellingham_extrapolations[species] = ellingham_extrapolation
-                valid_low, valid_high = ellingham_fit_range_K(species)
-                warnings.append(
-                    f"{species} Ellingham JANAF high-T fit extrapolated beyond "
-                    f"fit_range_K [{valid_low:g}, {valid_high:g}] at "
-                    f"{T_K:.2f} K"
-                )
+                if ellingham_extrapolation["authority_status"] == "extrapolation_limited":
+                    valid_low, valid_high = ellingham_fit_range_K(species)
+                    warnings.append(
+                        f"{species} Ellingham JANAF high-T fit extrapolated beyond "
+                        f"fit_range_K [{valid_low:g}, {valid_high:g}] at "
+                        f"{T_K:.2f} K"
+                    )
 
             activities[species] = (
                 a_oxide if oxide_activity is None else oxide_activity.activity
@@ -1121,11 +1122,24 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
             if P_eq_Pa > 1e-15:
                 vapor_pressures[species] = P_eq_Pa
+                ellingham_limit = ellingham_extrapolations.get(species)
+                fit_extrapolated = (
+                    ellingham_limit is not None
+                    and ellingham_limit["authority_status"] == "extrapolation_limited"
+                )
+                reconstructed_limited = (
+                    ellingham_limit is not None
+                    and ellingham_limit["authority_status"] == "reconstructed_limited"
+                )
                 if gas_standard_rail:
                     base_source = (
                         "builtin_extrapolation_limited"
-                        if species in ellingham_extrapolations
-                        else "builtin_authoritative"
+                        if fit_extrapolated
+                        else (
+                            "builtin_authority_limited"
+                            if reconstructed_limited
+                            else "builtin_authoritative"
+                        )
                     )
                     source_label = f"{base_source}:gas_standard_fugacity"
                 else:
@@ -1135,19 +1149,27 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         coefficient_block=coefficient_block,
                         temperature_K=T_K,
                         authority_limited_by_ellingham_fit_range=(
-                            species in ellingham_extrapolations
+                            fit_extrapolated
                         ),
                     )
+                    if reconstructed_limited:
+                        source_label = source_label.replace(
+                            "builtin_authoritative",
+                            "builtin_authority_limited",
+                            1,
+                        )
                 if species in metal_extrapolations:
                     source_label = (
                         f"{source_label}:"
                         "extrapolated_beyond_valid_range_K"
                     )
-                if species in ellingham_extrapolations:
+                if fit_extrapolated:
                     source_label = (
                         f"{source_label}:"
                         "extrapolated_beyond_ellingham_fit_range_K"
                     )
+                elif reconstructed_limited:
+                    source_label = f"{source_label}:reconstructed_ellingham_segment"
                 vapor_pressure_sources[species] = source_label
                 provenance: dict[str, float | str] = {
                     "pressure_kind": _runtime_pressure_kind(
@@ -1359,7 +1381,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 **oxide_vapor_extrapolations,
             },
             "ellingham_extrapolated_beyond_fit_range_K": (
-                ellingham_extrapolations
+                {
+                    species: data
+                    for species, data in ellingham_extrapolations.items()
+                    if data.get("authority_status") == "extrapolation_limited"
+                }
             ),
             "ellingham_authority": ellingham_authority_diagnostic(
                 ellingham_extrapolations,

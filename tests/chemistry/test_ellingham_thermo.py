@@ -3,9 +3,14 @@ from __future__ import annotations
 import pytest
 
 from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_AUTHORITY_LIMIT_FLAG,
     ELLINGHAM_METAL_PHASE_CONDENSED,
     ELLINGHAM_METAL_PHASE_GAS,
+    ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
+    ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS,
     MG_NORMAL_BOILING_POINT_K,
+    ellingham_authority_limit,
+    ellingham_authority_diagnostic,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_extrapolation,
     ellingham_fit_segments,
@@ -102,6 +107,48 @@ def test_mn_primary_fit_is_split_at_solid_allotrope_breakpoints() -> None:
         0.0,
         abs=1e-6,
     )
+
+
+def test_mn_reconstructed_tail_is_computable_but_not_authoritative() -> None:
+    temperature_K = 1873.15
+
+    segment = ellingham_segment_for_temperature("Mn", temperature_K)
+    authority_limit = ellingham_authority_limit(
+        temperature_K,
+        species="Mn",
+        consumer="test",
+    )
+
+    assert "Mn(l)" in segment.phase_basis
+    assert "confidence: reconstructed" in segment.janaf_anchor
+    assert ellingham_delta_g_kj_per_mol_o2("Mn", temperature_K) == pytest.approx(
+        -484.2527025,
+        abs=1e-9,
+    )
+    assert authority_limit is not None
+    assert authority_limit["authority_status"] == (
+        ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS
+    )
+    assert authority_limit["authority_flag"] == ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG
+    assert authority_limit[ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG] is True
+    assert authority_limit["authority_reason"] == "reconstructed_segment"
+    assert authority_limit["segment_range_K"] == (1519.0, 2058.0)
+    assert authority_limit["source_basis"] == segment.janaf_anchor
+
+    diagnostic = ellingham_authority_diagnostic(
+        {"Mn": authority_limit},
+        consumer="test",
+    )
+    assert diagnostic["status"] == "authority_limited"
+    assert diagnostic[ELLINGHAM_AUTHORITY_LIMIT_FLAG] is False
+    assert diagnostic[ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG] is True
+    assert diagnostic["extrapolated_beyond_fit_range_K"] == {}
+
+    assert ellingham_fit_extrapolation(
+        temperature_K,
+        species="Mn",
+        consumer="test",
+    ) is None
 
 
 @pytest.mark.parametrize(

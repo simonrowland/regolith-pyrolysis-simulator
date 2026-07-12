@@ -38,8 +38,8 @@ from simulator.alphamelts_reference_pressure import (
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
     ellingham_authority_diagnostic,
+    ellingham_authority_limit,
     ellingham_delta_g_kj_per_mol_o2,
-    ellingham_fit_extrapolation,
     ellingham_fit_range_K,
     ellingham_stoichiometry,
 )
@@ -181,18 +181,26 @@ def alphamelts_activity_volatility_diagnostic(
             }
         )
 
+    ellingham_limits = {
+        key: value
+        for key, value in vapor_model_limits.items()
+        if isinstance(value, Mapping)
+        and value.get("authority_status")
+        in {"extrapolation_limited", "reconstructed_limited"}
+    }
     ellingham_authority = ellingham_authority_diagnostic(
-        {
-            key: value
-            for key, value in vapor_model_limits.items()
-            if isinstance(value, Mapping)
-            and value.get("authority_flag") == ELLINGHAM_AUTHORITY_LIMIT_FLAG
-        },
+        ellingham_limits,
         consumer="alphamelts-volatility-diagnostic",
     )
+    actual_vapor_extrapolations = {
+        key: value
+        for key, value in vapor_model_limits.items()
+        if key not in ellingham_limits
+        or value.get("authority_status") == "extrapolation_limited"
+    }
     extrapolation_limited = bool(
         extrapolation_limited
-        or vapor_model_limits
+        or actual_vapor_extrapolations
         or ellingham_authority.get(ELLINGHAM_AUTHORITY_LIMIT_FLAG)
     )
 
@@ -365,11 +373,15 @@ def _analytical_vapor_pressures_from_activities(
                     sp_data,
                     coefficient_block=coefficient_block,
                     temperature_K=T_K,
-                    extrapolated=str(species) in extrapolations,
+                    extrapolated=(
+                        str(species) in extrapolations
+                        and extrapolations[str(species)]["authority_status"]
+                        == "extrapolation_limited"
+                    ),
                 ),
             )
             continue
-        ellingham_extrapolation = ellingham_fit_extrapolation(
+        ellingham_extrapolation = ellingham_authority_limit(
             T_K,
             species=species,
             consumer="alphamelts-volatility-diagnostic",

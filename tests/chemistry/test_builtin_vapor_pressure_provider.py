@@ -38,6 +38,7 @@ from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.ledger import AtomLedger
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_AUTHORITY_LIMIT_FLAG,
+    ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_extrapolation,
     ellingham_fit_range_K,
@@ -200,6 +201,19 @@ def _mg_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=ProviderAccountView(
             accounts={"process.cleaned_melt": {"MgO": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+
+def _mn_vapor_request_at_T_K(temperature_K: float) -> IntentRequest:
+    return IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"MnO": 1.0}},
             species_formula_registry={},
         ),
         temperature_C=temperature_K - 273.15,
@@ -1517,11 +1531,35 @@ def test_legacy_fallback_grounds_mn_liquid_source_band(
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
     assert result.vapor_pressures_source["Mn"] == (
-        "builtin_authoritative:pure_component_derived_from_evaluation"
+        "builtin_authority_limited:pure_component_derived_from_evaluation:"
+        "reconstructed_ellingham_segment"
     )
-    assert (
-        result.diagnostics["ellingham_authority"]["status"]
-        == "authoritative"
+    assert result.diagnostics["ellingham_authority"]["status"] == (
+        "authority_limited"
+    )
+
+
+def test_active_provider_labels_reconstructed_mn_authority_end_to_end(
+    vapor_pressure_data,
+):
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(
+        _mn_vapor_request_at_T_K(1873.15)
+    )
+
+    assert result.status == "ok"
+    source = result.diagnostic["vapor_pressures_source"]["Mn"]
+    assert source.startswith("builtin_authority_limited:")
+    assert source.endswith(":reconstructed_ellingham_segment")
+    authority = result.diagnostic["ellingham_authority"]
+    assert authority["status"] == "authority_limited"
+    assert authority[ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG] is True
+    assert authority["authority_limits"]["Mn"]["authority_status"] == (
+        "reconstructed_limited"
+    )
+    assert result.diagnostic["ellingham_extrapolated_beyond_fit_range_K"] == {}
+    assert not any(
+        "Mn Ellingham JANAF high-T fit extrapolated" in warning
+        for warning in result.warnings
     )
 
 
@@ -1580,9 +1618,9 @@ def test_builtin_provider_marks_mn_above_nbp_pure_component_extrapolation(
 
     assert result.vapor_pressures_Pa["Mn"] > 0.0
     assert result.vapor_pressures_source["Mn"] == (
-        "builtin_authoritative:pure_component_extrapolated:"
+        "builtin_authority_limited:pure_component_extrapolated:"
         "extrapolated_beyond_source_certified_range_K:"
-        "extrapolated_beyond_valid_range_K"
+        "extrapolated_beyond_valid_range_K:reconstructed_ellingham_segment"
     )
 
 

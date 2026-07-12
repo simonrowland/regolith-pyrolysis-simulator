@@ -53,7 +53,10 @@ from engines.builtin.metallothermic_step import (
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
 )
-from simulator.chemistry.ellingham_thermo import ELLINGHAM_AUTHORITY_LIMIT_FLAG
+from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_AUTHORITY_LIMIT_FLAG,
+    ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
+)
 from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
@@ -134,6 +137,30 @@ def test_ellingham_authority_flag_is_consumed_by_metallothermic_diagnostic():
         "limited_species"
     ]
     assert set(limited) == {"Na", "Ti"}
+
+
+def test_reconstructed_mn_authority_is_not_mislabeled_as_fit_extrapolation():
+    provider = BuiltinMetallothermicStepProvider()
+
+    limits = provider._ellingham_pair_fit_extrapolations(
+        "Na",
+        ("MnO",),
+        1600.0,
+    )
+    diagnostic = provider._ellingham_fit_diagnostic(limits)
+
+    pair = limits["Na/MnO"]
+    assert pair["authority_status"] == "reconstructed_limited"
+    assert pair[ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG] is True
+    assert pair["limited_species"]["Mn"]["authority_status"] == (
+        "reconstructed_limited"
+    )
+    authority = diagnostic["ellingham_authority"]
+    assert authority["status"] == "authority_limited"
+    assert authority[ELLINGHAM_AUTHORITY_LIMIT_FLAG] is False
+    assert authority[ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG] is True
+    assert "ellingham_extrapolated_beyond_fit_range_K" not in diagnostic
+    assert provider._ellingham_fit_warnings(limits) == ()
 
 
 # ---------------------------------------------------------------------------

@@ -133,9 +133,10 @@ from engines.builtin.vapor_pressure import (
     _ELLINGHAM_THERMO,
 )
 from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
     ellingham_authority_diagnostic,
+    ellingham_authority_limit,
     ellingham_delta_g_kj_per_mol_o2,
-    ellingham_fit_extrapolation,
     ellingham_fit_range_K,
     ellingham_fit_segments,
 )
@@ -1607,8 +1608,13 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     ) -> dict[str, Any]:
         if not extrapolations:
             return {}
-        return {
-            "ellingham_extrapolated_beyond_fit_range_K": {
+        actual_extrapolations = {
+            str(pair): dict(data)
+            for pair, data in extrapolations.items()
+            if data.get("authority_status") == "extrapolation_limited"
+        }
+        diagnostic = {
+            "ellingham_authority_limits": {
                 str(pair): dict(data)
                 for pair, data in extrapolations.items()
             },
@@ -1620,6 +1626,11 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 consumer="builtin-metallothermic-step",
             ),
         }
+        if actual_extrapolations:
+            diagnostic["ellingham_extrapolated_beyond_fit_range_K"] = (
+                actual_extrapolations
+            )
+        return diagnostic
 
     @staticmethod
     def _ellingham_fit_warnings(
@@ -1627,6 +1638,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     ) -> tuple[str, ...]:
         warnings: list[str] = []
         for pair, data in extrapolations.items():
+            if data.get("authority_status") != "extrapolation_limited":
+                continue
             valid_low, valid_high = data["fit_range_K"]
             warnings.append(
                 f"{pair} Ellingham JANAF high-T fit extrapolated beyond "
@@ -1649,7 +1662,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             pair = f"{reductant}/{target_oxide}"
             limited_species: dict[str, dict[str, Any]] = {}
             for species in (reductant, target_metal):
-                extrapolation = ellingham_fit_extrapolation(
+                extrapolation = ellingham_authority_limit(
                     temperature_K,
                     species=species,
                     consumer="builtin-metallothermic-step",
@@ -1658,23 +1671,37 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     limited_species[species] = extrapolation
             if not limited_species:
                 continue
-            fit_lows_highs = [
-                ellingham_fit_range_K(species)
-                for species in (reductant, target_metal)
-            ]
-            flagged[pair] = {
+            extrapolation_limited = any(
+                data["authority_status"] == "extrapolation_limited"
+                for data in limited_species.values()
+            )
+            pair_limit = {
                 "temperature_K": temperature_K,
-                "fit_range_K": (
-                    max(bounds[0] for bounds in fit_lows_highs),
-                    min(bounds[1] for bounds in fit_lows_highs),
-                ),
                 "reductant": reductant,
                 "target_oxide": target_oxide,
                 "target_metal": target_metal,
                 "limited_species": limited_species,
                 "consumer": "builtin-metallothermic-step",
-                "authority_status": "extrapolation_limited",
+                "authority_status": (
+                    "extrapolation_limited"
+                    if extrapolation_limited
+                    else "reconstructed_limited"
+                ),
+                ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG: any(
+                    data.get(ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG) is True
+                    for data in limited_species.values()
+                ),
             }
+            if extrapolation_limited:
+                fit_lows_highs = [
+                    ellingham_fit_range_K(species)
+                    for species in (reductant, target_metal)
+                ]
+                pair_limit["fit_range_K"] = (
+                    max(bounds[0] for bounds in fit_lows_highs),
+                    min(bounds[1] for bounds in fit_lows_highs),
+                )
+            flagged[pair] = pair_limit
         return flagged
 
     @staticmethod

@@ -8,8 +8,8 @@ from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
     ellingham_authority_diagnostic,
+    ellingham_authority_limit,
     ellingham_delta_g_kj_per_mol_o2,
-    ellingham_fit_extrapolation,
     ellingham_fit_range_K,
     ellingham_metal_phase_kind,
     ellingham_stoichiometry,
@@ -539,7 +539,7 @@ class EquilibriumMixin:
             ):
                 continue
 
-            ellingham_extrapolation = ellingham_fit_extrapolation(
+            ellingham_extrapolation = ellingham_authority_limit(
                 T_K,
                 species=species,
                 consumer='legacy-equilibrium-fallback',
@@ -547,11 +547,12 @@ class EquilibriumMixin:
             if ellingham_extrapolation is not None:
                 ellingham_extrapolations[species] = ellingham_extrapolation
                 valid_low, valid_high = ellingham_fit_range_K(species)
-                warnings.append(
-                    f"{species} Ellingham JANAF high-T fit extrapolated beyond "
-                    f"fit_range_K [{valid_low:g}, {valid_high:g}] at "
-                    f"{T_K:.2f} K"
-                )
+                if ellingham_extrapolation["authority_status"] == "extrapolation_limited":
+                    warnings.append(
+                        f"{species} Ellingham JANAF high-T fit extrapolated beyond "
+                        f"fit_range_K [{valid_low:g}, {valid_high:g}] at "
+                        f"{T_K:.2f} K"
+                    )
 
             activities[species] = (
                 a_oxide if oxide_activity is None else oxide_activity.activity
@@ -604,11 +605,25 @@ class EquilibriumMixin:
 
             if P_effective_Pa > 1e-15:
                 vapor_pressures[species] = P_effective_Pa
+                ellingham_limit = ellingham_extrapolations.get(species)
+                fit_extrapolated = (
+                    ellingham_limit is not None
+                    and ellingham_limit["authority_status"] == "extrapolation_limited"
+                )
+                reconstructed_limited = (
+                    ellingham_limit is not None
+                    and ellingham_limit["authority_status"]
+                    == "reconstructed_limited"
+                )
                 if gas_standard_rail:
                     base_source = (
                         'builtin_extrapolation_limited'
-                        if species in ellingham_extrapolations
-                        else 'builtin_authoritative'
+                        if fit_extrapolated
+                        else (
+                            'builtin_authority_limited'
+                            if reconstructed_limited
+                            else 'builtin_authoritative'
+                        )
                     )
                     source_label = f'{base_source}:gas_standard_fugacity'
                 else:
@@ -618,19 +633,27 @@ class EquilibriumMixin:
                         coefficient_block=coefficient_block,
                         temperature_K=T_K,
                         authority_limited_by_ellingham_fit_range=(
-                            species in ellingham_extrapolations
+                            fit_extrapolated
                         ),
                     )
+                    if reconstructed_limited:
+                        source_label = source_label.replace(
+                            'builtin_authoritative',
+                            'builtin_authority_limited',
+                            1,
+                        )
                 if species in metal_extrapolations:
                     source_label = (
                         f'{source_label}:'
                         'extrapolated_beyond_valid_range_K'
                     )
-                if species in ellingham_extrapolations:
+                if fit_extrapolated:
                     source_label = (
                         f'{source_label}:'
                         'extrapolated_beyond_ellingham_fit_range_K'
                     )
+                elif reconstructed_limited:
+                    source_label = f'{source_label}:reconstructed_ellingham_segment'
                 vapor_pressure_sources[species] = source_label
                 if coefficient_block == COEFF_BLOCK_ANTOINE:
                     warn_pseudo_vapor_pressure_fallback(
