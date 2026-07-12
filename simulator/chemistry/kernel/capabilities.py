@@ -1,12 +1,13 @@
 """Chemistry intents and per-provider capability declarations.
 
-The :class:`ChemistryIntent` enum enumerates every state-machine
-operation a provider may own (see ``docs-private/chemistry-engine-
-binding-spec-2026-05-14.md`` §2).  :class:`CapabilityProfile` is the
-provider's declaration of which intents it can dispatch, which subset it
-holds authority for (i.e. may emit a :class:`LedgerTransitionProposal`),
-which AtomLedger accounts it requests to see, and whether request-level
-fO2 is a consumed control.
+The :class:`ChemistryIntent` enum is the live source of truth for every
+state-machine operation a provider may own. Historical binding-spec
+tables can lag the runtime, so binding/doc exports must derive their
+intent list from this enum instead of copying a static table.
+:class:`CapabilityProfile` is the provider's declaration of which intents
+it can dispatch, which subset it holds authority for (i.e. may emit a
+:class:`LedgerTransitionProposal`), which AtomLedger accounts it requests
+to see, and whether request-level fO2 is a consumed control.
 """
 
 from __future__ import annotations
@@ -18,8 +19,9 @@ from enum import Enum
 class ChemistryIntent(str, Enum):
     """Enumeration of every dispatchable chemistry intent.
 
-    The string values match the binding-spec table verbatim so trace
-    output / config files can reference them as plain strings.
+    String values are the stable trace/config tokens. Generate any
+    binding table from :meth:`binding_table_values` so newly promoted
+    kernel intents cannot silently fall out of the exported surface.
     """
 
     SILICATE_LIQUIDUS = "silicate_liquidus"
@@ -47,6 +49,18 @@ class ChemistryIntent(str, Enum):
     BACKEND_EQUILIBRIUM = "backend_equilibrium"
     SULFUR_SATURATION_GATE = "sulfur_saturation_gate"
     T_P_VALIDATION = "t_p_validation"
+
+    @classmethod
+    def binding_table_values(cls) -> tuple[str, ...]:
+        """Return every live intent token in enum order for binding tables."""
+
+        return tuple(intent.value for intent in cls)
+
+    @classmethod
+    def binding_table_rows(cls) -> tuple[tuple[str, str], ...]:
+        """Return canonical ``(enum_name, token)`` rows for binding tables."""
+
+        return tuple((intent.name, intent.value) for intent in cls)
 
 
 @dataclass(frozen=True)
