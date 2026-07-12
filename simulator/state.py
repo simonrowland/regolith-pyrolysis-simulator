@@ -1182,9 +1182,11 @@ class HourSnapshot:
     # the UNION of species across both surfaces (0.5.4
     # milestone-review P2 fix, codex /challenge 2026-05-28) so a
     # projection-only stale state (UI carries phantom kg with no
-    # ledger backing) surfaces with negative drift. Diagnostic only —
-    # the global ≤5e-12 % closure on ``mass_balance_error_pct`` remains
-    # the hard gate. Empty dict means all metal species are in sync
+    # ledger backing) surfaces with negative drift. The snapshot audit
+    # is diagnostic only and never raises; the runner-strict result
+    # consumer remaps nonempty drift to a failed status. The global
+    # ≤5e-12 % closure on ``mass_balance_error_pct`` remains a hard gate.
+    # Empty dict means all metal species are in sync
     # across BOTH surfaces. Drift typically arises in transit-of-
     # flight ticks where a recipe has credited metal to the ledger
     # but the projection sweep hasn't run yet; the steady-state

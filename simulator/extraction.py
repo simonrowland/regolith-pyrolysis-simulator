@@ -420,8 +420,9 @@ class ExtractionMixin:
         surface still includes them honestly so an operator-visible
         bug would be audit-visible rather than silent.
 
-        Diagnostic only — does NOT raise on drift. The ≤5e-12 %
-        global mass-balance closure invariant
+        Diagnostic only — does NOT raise on drift. The runner-strict
+        result consumer remaps a nonempty audit to failed status. The
+        ≤5e-12 % global mass-balance closure invariant
         (``HourSnapshot.mass_balance_error_pct``) remains the hard
         gate; this per-species view gives earlier-warning visibility
         when ledger ↔ UI drift opens up. Audit dict carried on

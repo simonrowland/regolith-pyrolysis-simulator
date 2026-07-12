@@ -75,7 +75,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
   "per_hour_summary": [...],    // see "Per-hour summary"
   "shadow_trace": [...],        // see "Shadow trace"
   "status": "ok" | "partial" | "failed" | "refused",
-  "reason": "",                 // machine-readable refusal reason, if any
+  "reason": "",                 // machine-readable refusal/failure reason, if any
   "error_message": ""           // populated when status != "ok"
 }
 ```
@@ -83,6 +83,10 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 All top-level keys are required.  Tests assert the **exact** set --
 adding a new key requires bumping `RUNNER_SCHEMA_VERSION` and the
 schema-shape assertion.
+
+For a runner-strict result, a nonempty per-snapshot
+`metal_projection_drift_kg` audit remaps an otherwise successful result to
+`status: "failed"` with top-level `reason: "metal_projection_drift"`.
 
 The C7 report and refusal fields were already conditionally emitted by
 schema 1.3.2. Making them unconditional completes that existing contract;

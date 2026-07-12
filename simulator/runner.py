@@ -760,6 +760,7 @@ class PyrolysisRun:
     # the live values.
     run_metadata_overrides: dict[str, Any] = field(default_factory=dict)
     reduced_real_cache: Mapping[str, Any] | None = None
+    strict_result_contract: bool = field(init=False, default=True)
 
     def __post_init__(self) -> None:
         # Fold the `internal-analytical` display alias onto the stable `stub`
@@ -1184,7 +1185,9 @@ class PyrolysisRun:
             if isinstance(row, Mapping) and isinstance(row.get("pO2_enforcement"), Mapping)
         ]
         status, reason, error_message = _status_with_mass_balance_invariant(
-            execution)
+            execution,
+            strict_result_contract=self.strict_result_contract,
+        )
 
         payload = {
             "schema_version": RUNNER_SCHEMA_VERSION,
@@ -1469,6 +1472,8 @@ def _coerce_mass_balance_pct(value: Any, *, source: str) -> float:
 
 def _status_with_mass_balance_invariant(
     execution: RunExecution,
+    *,
+    strict_result_contract: bool,
 ) -> tuple[str, str, str]:
     status = str(execution.status)
     reason = str(execution.reason)
@@ -1487,6 +1492,22 @@ def _status_with_mass_balance_invariant(
         mass_balance_pct is None
         or abs(mass_balance_pct) <= RUNNER_MASS_BALANCE_LIMIT_PCT
     ):
+        if strict_result_contract:
+            config = getattr(getattr(execution, "session", None), "_config", None)
+            if config is None:
+                raise RuntimeError("run execution session missing config")
+            snapshots = tuple(getattr(execution, "snapshots", ()) or ())
+            for snapshot in snapshots:
+                drift = dict(
+                    getattr(snapshot, "metal_projection_drift_kg", {}) or {}
+                )
+                if drift:
+                    reason = "metal_projection_drift"
+                    species = ", ".join(sorted(str(key) for key in drift))
+                    error_message = (
+                        f"{reason}: ledger and UI projection differ for {species}"
+                    )
+                    return "failed", reason, error_message
         return status, reason, error_message
 
     reason = "mass_balance_closure_breach"

@@ -991,13 +991,14 @@ def test_vpr_p6a_cli_artifact_matches_in_process_trace(tmp_path):
         text=True,
         check=False,
     )
-    assert result.returncode == 0, (
-        f"CLI exited non-zero (rc={result.returncode}): "
+    assert result.returncode == 1, (
+        f"CLI exit did not reflect runner-strict failure (rc={result.returncode}): "
         f"stdout={result.stdout!r} stderr={result.stderr!r}"
     )
     assert output.exists(), f"CLI did not write {output}"
     cli_payload = json.loads(output.read_text())
-    assert cli_payload["status"] == "ok"
+    assert cli_payload["status"] == "failed"
+    assert cli_payload["reason"] == "metal_projection_drift"
     _assert_p6a_payload_matches_trace(cli_payload, execution.trace)
 
 
@@ -1256,7 +1257,10 @@ def test_status_with_mass_balance_invariant_fails_breach_category() -> None:
         per_hour=(),
     )
 
-    status, reason, error_message = _status_with_mass_balance_invariant(execution)
+    status, reason, error_message = _status_with_mass_balance_invariant(
+        execution,
+        strict_result_contract=True,
+    )
 
     assert status == "failed"
     assert reason == ZERO_INPUT_BASIS_BREACH
@@ -1265,6 +1269,7 @@ def test_status_with_mass_balance_invariant_fails_breach_category() -> None:
 
 def test_status_with_mass_balance_invariant_valid_small_pct_unchanged() -> None:
     execution = SimpleNamespace(
+        session=SimpleNamespace(_config=SimpleNamespace()),
         status="ok",
         reason="still-valid",
         error_message="",
@@ -1272,11 +1277,135 @@ def test_status_with_mass_balance_invariant_valid_small_pct_unchanged() -> None:
         per_hour=(),
     )
 
-    assert _status_with_mass_balance_invariant(execution) == (
+    assert _status_with_mass_balance_invariant(
+        execution,
+        strict_result_contract=True,
+    ) == (
         "ok",
         "still-valid",
         "",
     )
+
+
+@pytest.mark.parametrize("drift_kg", [0.02, -0.02])
+def test_runner_strict_fails_nonempty_metal_projection_drift(drift_kg) -> None:
+    execution = SimpleNamespace(
+        session=SimpleNamespace(_config=SimpleNamespace()),
+        status="ok",
+        reason="",
+        error_message="",
+        snapshots=(
+            SimpleNamespace(
+                mass_balance_error_pct=0.0,
+                metal_projection_drift_kg={"Fe": drift_kg},
+            ),
+        ),
+        per_hour=(),
+    )
+
+    status, reason, error_message = _status_with_mass_balance_invariant(
+        execution,
+        strict_result_contract=True,
+    )
+
+    assert status == "failed"
+    assert reason == "metal_projection_drift"
+    assert "Fe" in error_message
+
+
+def test_diagnostic_result_contract_preserves_metal_projection_drift() -> None:
+    execution = SimpleNamespace(
+        status="ok",
+        reason="diagnostic-only",
+        error_message="",
+        snapshots=(
+            SimpleNamespace(
+                mass_balance_error_pct=0.0,
+                metal_projection_drift_kg={"Fe": 0.02},
+            ),
+        ),
+        per_hour=(),
+    )
+
+    assert _status_with_mass_balance_invariant(
+        execution,
+        strict_result_contract=False,
+    ) == (
+        "ok",
+        "diagnostic-only",
+        "",
+    )
+
+
+def test_runner_strict_fails_drift_from_earlier_tick() -> None:
+    execution = SimpleNamespace(
+        session=SimpleNamespace(_config=SimpleNamespace()),
+        status="ok",
+        reason="",
+        error_message="",
+        snapshots=(
+            SimpleNamespace(
+                mass_balance_error_pct=0.0,
+                metal_projection_drift_kg={"Na": 0.01},
+            ),
+            SimpleNamespace(
+                mass_balance_error_pct=0.0,
+                metal_projection_drift_kg={},
+            ),
+        ),
+        per_hour=(),
+    )
+
+    status, reason, _ = _status_with_mass_balance_invariant(
+        execution,
+        strict_result_contract=True,
+    )
+
+    assert status == "failed"
+    assert reason == "metal_projection_drift"
+
+
+@pytest.mark.parametrize("strict_result_contract", [True, False])
+def test_empty_metal_projection_drift_is_noop(strict_result_contract) -> None:
+    execution = SimpleNamespace(
+        session=SimpleNamespace(_config=SimpleNamespace()),
+        status="partial",
+        reason="",
+        error_message="",
+        snapshots=(
+            SimpleNamespace(
+                mass_balance_error_pct=0.0,
+                metal_projection_drift_kg={},
+            ),
+        ),
+        per_hour=(),
+    )
+
+    assert _status_with_mass_balance_invariant(
+        execution,
+        strict_result_contract=strict_result_contract,
+    ) == ("partial", "", "")
+
+
+def test_runner_strict_requires_session_config_for_drift_check() -> None:
+    execution = SimpleNamespace(
+        status="ok",
+        reason="",
+        error_message="",
+        snapshots=(
+            SimpleNamespace(
+                mass_balance_error_pct=0.0,
+                metal_projection_drift_kg={"Fe": 0.02},
+            ),
+        ),
+        per_hour=(),
+    )
+
+    with pytest.raises(RuntimeError, match="run execution session missing config"):
+        _status_with_mass_balance_invariant(
+            execution,
+            strict_result_contract=True,
+        )
 
 
 def test_status_with_mass_balance_invariant_fails_earlier_numeric_breach() -> None:
@@ -1291,7 +1420,10 @@ def test_status_with_mass_balance_invariant_fails_earlier_numeric_breach() -> No
         per_hour=(),
     )
 
-    status, reason, error_message = _status_with_mass_balance_invariant(execution)
+    status, reason, error_message = _status_with_mass_balance_invariant(
+        execution,
+        strict_result_contract=True,
+    )
 
     assert status == "failed"
     assert reason == "mass_balance_closure_breach"
@@ -1311,7 +1443,7 @@ def test_status_with_mass_balance_invariant_refuses_mixed_missing_evidence() -> 
     )
 
     with pytest.raises(EngineBugAbort, match="key_missing_in_snapshot"):
-        _status_with_mass_balance_invariant(execution)
+        _status_with_mass_balance_invariant(execution, strict_result_contract=True)
 
 
 def test_status_with_mass_balance_invariant_refuses_completed_run_without_evidence() -> None:
@@ -1325,7 +1457,7 @@ def test_status_with_mass_balance_invariant_refuses_completed_run_without_eviden
     )
 
     with pytest.raises(EngineBugAbort, match="evidence_missing"):
-        _status_with_mass_balance_invariant(execution)
+        _status_with_mass_balance_invariant(execution, strict_result_contract=True)
 
 
 def test_runner_records_operator_decision_in_shadow_trace():
