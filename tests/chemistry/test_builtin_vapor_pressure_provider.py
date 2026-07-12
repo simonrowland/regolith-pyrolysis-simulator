@@ -619,6 +619,60 @@ def test_k_wall_condensation_uses_pure_component_sidecar(vapor_pressure_data):
     assert wall_coeff is row["pure_component_antoine"]
 
 
+def test_cro2_wall_condensation_rejects_standard_reaction_term(
+    vapor_pressure_data,
+):
+    row = vapor_pressure_data["oxide_vapors"]["CrO2"]
+
+    runtime_coeff, runtime_block = vapor_pressure_module.vapor_pressure_antoine_coefficients(
+        row,
+        temperature_K=1523.15,
+    )
+    wall_coeff, wall_block = vapor_pressure_module.wall_condensation_antoine_coefficients(
+        row,
+        temperature_K=1523.15,
+    )
+
+    assert runtime_block == "antoine"
+    assert runtime_coeff is row["antoine"]
+    assert wall_block == "pure_component_antoine"
+    assert wall_coeff == {}
+
+
+def test_sodium_pure_component_fit_rejects_nonphysical_pole_branch(
+    vapor_pressure_data,
+):
+    row = vapor_pressure_data["metals"]["Na"]
+    pure = row["pure_component_antoine"]
+
+    assert 400.0 + pure["C"] < 0.0
+    assert vapor_pressure_module._pure_segment_usable(pure, 400.0) is False
+    assert vapor_pressure_module._pure_segment_usable(pure, 924.0) is True
+
+
+@pytest.mark.parametrize("temperature_K", [400.0, 410.0])
+def test_sodium_provider_omits_nonphysical_pole_branch(
+    vapor_pressure_data,
+    temperature_K,
+):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Na2O": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    assert "Na" not in result.diagnostic["vapor_pressures_Pa"]
+
+
 def test_demaria_1971_k_validation_case_uses_measured_table1_po2(
     vapor_pressure_data,
 ):
@@ -996,12 +1050,12 @@ def test_sio_oxide_vapor_extrapolates_instead_of_disappearing_above_valid_range(
     vapor_pressure_data,
 ):
     sio_data = vapor_pressure_data["oxide_vapors"]["SiO"]
-    assert sio_data["valid_range_K"] == [1400, 2200]
+    assert sio_data["valid_range_K"] == [1400, 1950]
     assert sio_data["extrapolation_allowed_range_K"] == [1400, 2273.15]
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
 
-    in_range = provider.dispatch(_si_only_vapor_request_at_T_K(2199.15))
-    just_above = provider.dispatch(_si_only_vapor_request_at_T_K(2200.15))
+    in_range = provider.dispatch(_si_only_vapor_request_at_T_K(1950.0))
+    just_above = provider.dispatch(_si_only_vapor_request_at_T_K(2000.0))
     process_cap = provider.dispatch(_si_only_vapor_request_at_T_K(2273.15))
 
     assert in_range.status == "ok"
@@ -1013,14 +1067,14 @@ def test_sio_oxide_vapor_extrapolates_instead_of_disappearing_above_valid_range(
     assert "SiO" not in in_range.diagnostic["extrapolated_beyond_valid_range_K"]
 
     for result, temperature_K in (
-        (just_above, 2200.15),
+        (just_above, 2000.0),
         (process_cap, 2273.15),
     ):
         extrapolation = result.diagnostic[
             "extrapolated_beyond_valid_range_K"
         ]["SiO"]
         assert extrapolation["temperature_K"] == pytest.approx(temperature_K)
-        assert tuple(extrapolation["valid_range_K"]) == (1400.0, 2200.0)
+        assert tuple(extrapolation["valid_range_K"]) == (1400.0, 1950.0)
         assert tuple(extrapolation["extrapolation_allowed_range_K"]) == (
             1400.0,
             2273.15,
@@ -1035,11 +1089,47 @@ def test_sio_oxide_vapor_extrapolates_instead_of_disappearing_above_valid_range(
         )
 
 
+def test_absent_metals_do_not_emit_range_warnings(vapor_pressure_data):
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = _si_only_vapor_request_at_T_K(1923.15)
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    metal_species = set(vapor_pressure_data["metals"])
+    assert metal_species.isdisjoint(
+        result.diagnostic["extrapolated_beyond_valid_range_K"]
+    )
+    assert metal_species.isdisjoint(
+        result.diagnostic["ellingham_extrapolated_beyond_fit_range_K"]
+    )
+    assert all(
+        not any(warning.startswith(f"{species} ") for warning in result.warnings)
+        for species in metal_species
+    )
+
+    present_k = provider.dispatch(
+        replace(
+            request,
+            account_view=ProviderAccountView(
+                accounts={
+                    "process.cleaned_melt": {"SiO2": 1.0, "K2O": 0.1},
+                },
+                species_formula_registry={},
+            ),
+        )
+    )
+    assert any(
+        warning.startswith("K ") and "extrapolated" in warning
+        for warning in present_k.warnings
+    )
+
+
 def test_builtin_provider_marks_sio_pseudo_vaporock_source_non_authoritative(
     vapor_pressure_data,
 ):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
-    result = provider.dispatch(_si_only_vapor_request_at_T_K(2199.15))
+    result = provider.dispatch(_si_only_vapor_request_at_T_K(1949.0))
 
     source = result.diagnostic["vapor_pressures_source"]["SiO"]
     assert source == (

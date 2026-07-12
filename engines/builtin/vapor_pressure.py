@@ -296,6 +296,10 @@ def _pure_segment_usable(
         return True
     try:
         denominator = float(temperature_K) + float(selected.get("C", 0.0))
+        # Antoine's shifted inverse-temperature fit is calibrated on the
+        # T + C > 0 branch; crossing its pole is not a physical continuation.
+        if denominator <= 0.0:
+            return False
         projected_log_pressure = float(selected.get("A", 0.0)) - (
             float(selected.get("B", 0.0)) / denominator
         )
@@ -331,11 +335,7 @@ def wall_condensation_antoine_coefficients(
             # temperature: fail closed (caller's reference fallback) rather
             # than extrapolate through a pole or substitute the melt term.
             return {}, COEFF_BLOCK_PURE_COMPONENT
-    # No pure sidecar at all: keep the pre-t-141 legacy behavior (the
-    # standard term serves as the wall reference). Whether that basis is
-    # defensible for CrO2-class rows is the t-162 chemistry ruling; do not
-    # change routing behavior here as a side effect.
-    return vapor_pressure_antoine_coefficients(row, temperature_K)
+    return {}, COEFF_BLOCK_PURE_COMPONENT
 
 
 def vapor_pressure_valid_range_K(
@@ -836,6 +836,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
+                continue
+            # A fit range has no diagnostic meaning when its parent oxide is
+            # absent; gate presence before selecting or warning about the fit.
+            if float(comp_wt.get(parent_oxide, 0.0) or 0.0) <= 0.0:
                 continue
 
             fit_target = _fit_target(sp_data)

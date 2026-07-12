@@ -75,6 +75,10 @@ DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
 )
 
 
+class EvaporationFluxConfigurationError(ValueError):
+    """Invalid or unsupported transport inputs for authoritative flux."""
+
+
 @dataclass(frozen=True)
 class SeriesEvaporationFlux:
     flux_kg_s_m2: float
@@ -113,6 +117,11 @@ class SeriesEvaporationFlux:
                 ),
                 key=lambda item: item[1],
             )[0]
+        elif math.isinf(self.r_melt):
+            r_interface_fraction = 0.0
+            r_gas_fraction = 0.0
+            r_melt_fraction = 1.0
+            limiting_resistance_label = "melt"
         else:
             r_interface_fraction = 0.0
             r_gas_fraction = 0.0
@@ -220,6 +229,24 @@ def _stir_was_clamped(value, applied: float) -> bool:
     if not math.isfinite(raw):
         return True
     return raw != applied
+
+
+def _validated_stir_factor(value: Any, *, axis: str) -> float:
+    if isinstance(value, bool):
+        raise EvaporationFluxConfigurationError(
+            f"{axis}_stir_factor must be finite and non-negative"
+        )
+    try:
+        raw = float(value)
+    except (TypeError, ValueError) as exc:
+        raise EvaporationFluxConfigurationError(
+            f"{axis}_stir_factor must be finite and non-negative"
+        ) from exc
+    if not math.isfinite(raw) or raw < 0.0:
+        raise EvaporationFluxConfigurationError(
+            f"{axis}_stir_factor must be finite and non-negative"
+        )
+    return raw
 
 
 def _fuchs_sutugin_gas_resistance_weight(
@@ -392,7 +419,6 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     """
 
     from simulator.condensation import (
-        DEFAULT_BINARY_DIFFUSION_M2_S,
         DEFAULT_CARRIER_GAS,
         GAS_CONSTANT_J_MOL_K,
         _chapman_enskog_d_ab_m2_s,
@@ -410,15 +436,23 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     overhead_pa = _finite_float(overhead_pressure_pa, 0.0)
     effective_T_gas_K = _finite_float(T_gas_K, T_surface)
 
-    axial_clamped = clamp_stir_factor(axial_stir_factor)
-    radial_clamped = clamp_stir_factor(radial_stir_factor)
+    axial_stir_validated = _validated_stir_factor(
+        axial_stir_factor,
+        axis="axial",
+    )
+    radial_stir_validated = _validated_stir_factor(
+        radial_stir_factor,
+        axis="radial",
+    )
+    axial_clamped = clamp_stir_factor(axial_stir_validated)
+    radial_clamped = clamp_stir_factor(radial_stir_validated)
     axial_stir_ceiling, ceiling_diag = _coerce_frozen_skull_stir_ceiling(
         cold_skull_envelope
     )
     axial_stir_applied = min(axial_clamped, axial_stir_ceiling)
     radial_stir_applied = radial_clamped
-    axial_was_clamped = _stir_was_clamped(axial_stir_factor, axial_clamped)
-    radial_was_clamped = _stir_was_clamped(radial_stir_factor, radial_clamped)
+    axial_was_clamped = _stir_was_clamped(axial_stir_validated, axial_clamped)
+    radial_was_clamped = _stir_was_clamped(radial_stir_validated, radial_clamped)
     frozen_skull_clamped = axial_stir_applied < axial_clamped
 
     if (
@@ -468,6 +502,36 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             transport_length_m=max(0.0, diameter_m),
         )
 
+    base_k_melt = _finite_float(
+        melt_surface_renewal_base_kg_s_m2_pa,
+        math.nan,
+    )
+    if melt_resistance_enabled and (
+        not math.isfinite(base_k_melt) or base_k_melt <= 0.0
+    ):
+        raise EvaporationFluxConfigurationError(
+            "melt_surface_renewal_base_kg_s_m2_pa must be finite and positive"
+        )
+    if melt_resistance_enabled and axial_stir_applied == 0.0:
+        # k_melt = k0 * sqrt(stir); zero conductance gives R_melt = 1/k = inf,
+        # so a static surface halts renewal-limited evaporation.
+        return _zero_series_evaporation_flux(
+            alpha_intrinsic=alpha_intrinsic,
+            k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
+            r_interface=r_interface,
+            r_melt=math.inf,
+            axial_stir_applied=axial_stir_applied,
+            radial_stir_applied=radial_stir_applied,
+            axial_stir_clamped=axial_was_clamped,
+            radial_stir_clamped=radial_was_clamped,
+            frozen_skull_stir_clamped=frozen_skull_clamped,
+            frozen_skull_stir_ceiling=ceiling_diag,
+            melt_resistance_enabled=melt_resistance_enabled,
+            melt_surface_renewal_base_kg_s_m2_pa=base_k_melt,
+            melt_surface_renewal_source=melt_surface_renewal_source,
+            transport_length_m=diameter_m,
+        )
+
     if knudsen_number is None:
         knudsen = _knudsen_number(
             overhead_pa,
@@ -493,15 +557,21 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         sherwood_eff = _stirring_enhanced_sherwood(
             radial_stir_factor=radial_stir_applied
         )
-        if overhead_pa > 0.0:
-            d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
-                species,
-                max(effective_T_gas_K, 1.0),
-                overhead_pa,
-                carrier=str(carrier_gas or DEFAULT_CARRIER_GAS),
+        if overhead_pa <= 0.0:
+            raise EvaporationFluxConfigurationError(
+                "gas resistance requires positive overhead_pressure_pa"
             )
+        d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
+            species,
+            max(effective_T_gas_K, 1.0),
+            overhead_pa,
+            carrier=str(carrier_gas or DEFAULT_CARRIER_GAS),
+        )
         if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
-            d_ab_m2_s = DEFAULT_BINARY_DIFFUSION_M2_S
+            raise EvaporationFluxConfigurationError(
+                "missing Chapman-Enskog transport parameters for "
+                f"species={species!r} carrier_gas={carrier_gas!r}"
+            )
         k_mt_mol_s_m2_pa = (
             sherwood_eff
             * d_ab_m2_s
@@ -532,15 +602,8 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         r_gas = gas_weight / k_mt_kg_s_m2_pa
 
     r_melt = 0.0
-    base_k_melt = max(
-        0.0,
-        _finite_float(
-            melt_surface_renewal_base_kg_s_m2_pa,
-            DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
-        ),
-    )
-    if melt_resistance_enabled and base_k_melt > 0.0:
-        surface_renewal = math.sqrt(max(1.0, axial_stir_applied))
+    if melt_resistance_enabled:
+        surface_renewal = math.sqrt(axial_stir_applied)
         k_melt_kg_s_m2_pa = base_k_melt * surface_renewal
         r_melt = 1.0 / k_melt_kg_s_m2_pa
 
@@ -666,7 +729,22 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         stoich_by_species = dict(controls.get("stoich_by_species") or {})
         available_oxide_kg = dict(controls.get("available_oxide_kg") or {})
 
-        melt_surface_area_m2 = float(controls.get("melt_surface_area_m2", 0.0))
+        try:
+            melt_surface_area_m2 = float(controls.get("melt_surface_area_m2", 0.0))
+        except (TypeError, ValueError):
+            melt_surface_area_m2 = math.nan
+        if not math.isfinite(melt_surface_area_m2) or melt_surface_area_m2 < 0.0:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": "invalid_melt_surface_area_m2",
+                    "value": repr(controls.get("melt_surface_area_m2")),
+                },
+            )
         _stir_control = controls.get("stir_factor", 0.0)
         if isinstance(_stir_control, Mapping):
             axial_stir_factor = _stir_control.get("axial", 0.0)
@@ -674,6 +752,27 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         else:
             axial_stir_factor = _stir_control
             radial_stir_factor = 1.0
+        try:
+            axial_stir_factor = _validated_stir_factor(
+                axial_stir_factor,
+                axis="axial",
+            )
+            radial_stir_factor = _validated_stir_factor(
+                radial_stir_factor,
+                axis="radial",
+            )
+        except EvaporationFluxConfigurationError as exc:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": "invalid_stir_factor",
+                    "detail": str(exc),
+                },
+            )
         series_config = controls.get("evaporation_series_resistance") or {}
         if not isinstance(series_config, Mapping):
             series_config = {}
@@ -697,13 +796,34 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 controls.get("gas_resistance_enabled", True),
             )
         )
-        melt_surface_renewal_base = _finite_float(
-            series_config.get(
-                "melt_surface_renewal_base_kg_s_m2_pa",
-                controls.get("melt_surface_renewal_base_kg_s_m2_pa"),
-            ),
-            DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
+        melt_surface_renewal_raw = series_config.get(
+            "melt_surface_renewal_base_kg_s_m2_pa",
+            controls.get("melt_surface_renewal_base_kg_s_m2_pa"),
         )
+        if melt_surface_renewal_raw is None:
+            melt_surface_renewal_base = (
+                DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA
+            )
+        else:
+            melt_surface_renewal_base = _finite_float(
+                melt_surface_renewal_raw,
+                math.nan,
+            )
+        if melt_resistance_enabled and (
+            not math.isfinite(melt_surface_renewal_base)
+            or melt_surface_renewal_base <= 0.0
+        ):
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": "invalid_melt_surface_renewal_base",
+                    "value": repr(melt_surface_renewal_raw),
+                },
+            )
         melt_surface_renewal_source = str(
             series_config.get(
                 "melt_surface_renewal_source",
@@ -731,6 +851,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         unmeasured_alpha_fallback_species: list[str] = []
         missing_alpha: dict[str, dict[str, float | str]] = {}
         missing_molar_mass: dict[str, dict[str, float | str]] = {}
+        missing_transport_parameters: dict[str, dict[str, float | str]] = {}
 
         for species, P_eq_Pa in vapor_pressures.items():
             P_eq_Pa = float(P_eq_Pa)
@@ -831,27 +952,50 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             if uncertainty_pct is not None:
                 flux_uncertainty_pct[species] = uncertainty_pct
 
-            series_flux = _series_resistance_evaporation_flux_kg_m2_s(
-                species=species,
-                P_eq_pa=P_eq_Pa,
-                P_bulk_pa=P_bulk_Pa,
-                T_surface_K=T_K,
-                molar_mass_kg_mol=M_kg_mol,
-                alpha_i=alpha,
-                pipe_diameter_m=pipe_diameter_m,
-                overhead_pressure_pa=overhead_pressure_pa,
-                axial_stir_factor=axial_stir_factor,
-                radial_stir_factor=radial_stir_factor,
-                cold_skull_envelope=cold_skull_envelope,
-                carrier_gas=carrier_gas,
-                T_gas_K=gas_temperature_K,
-                melt_resistance_enabled=melt_resistance_enabled,
-                gas_resistance_enabled=gas_resistance_enabled,
-                melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
-                melt_surface_renewal_source=melt_surface_renewal_source,
-            )
+            try:
+                series_flux = _series_resistance_evaporation_flux_kg_m2_s(
+                    species=species,
+                    P_eq_pa=P_eq_Pa,
+                    P_bulk_pa=P_bulk_Pa,
+                    T_surface_K=T_K,
+                    molar_mass_kg_mol=M_kg_mol,
+                    alpha_i=alpha,
+                    pipe_diameter_m=pipe_diameter_m,
+                    overhead_pressure_pa=overhead_pressure_pa,
+                    axial_stir_factor=axial_stir_factor,
+                    radial_stir_factor=radial_stir_factor,
+                    cold_skull_envelope=cold_skull_envelope,
+                    carrier_gas=carrier_gas,
+                    T_gas_K=gas_temperature_K,
+                    melt_resistance_enabled=melt_resistance_enabled,
+                    gas_resistance_enabled=gas_resistance_enabled,
+                    melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
+                    melt_surface_renewal_source=melt_surface_renewal_source,
+                )
+            except EvaporationFluxConfigurationError as exc:
+                missing_transport_parameters[species] = {
+                    "policy": "fail_loud_missing_transport_parameters",
+                    "carrier_gas": carrier_gas,
+                    "reason": str(exc),
+                }
+                continue
             J_kg_s_m2 = series_flux.flux_kg_s_m2
 
+            series_diagnostic = series_flux.as_diagnostic()
+            series_diagnostic.update(
+                _series_pressure_provenance_diagnostic(
+                    species=species,
+                    P_eq_Pa=P_eq_Pa,
+                    P_bulk_Pa=P_bulk_Pa,
+                    pressure_provenance_by_species=(
+                        pressure_provenance_by_species
+                    ),
+                    vapor_pressure_sources=vapor_pressure_sources,
+                    vapor_pressure_activities=vapor_pressure_activities,
+                    pO2_bar=pO2_bar,
+                )
+            )
+            series_flux_diagnostics[species] = series_diagnostic
             if J_kg_s_m2 <= 0:
                 continue
 
@@ -859,21 +1003,24 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
 
             if rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR:
                 flux_kg_hr[species] = rate_kg_hr
-                series_diagnostic = series_flux.as_diagnostic()
-                series_diagnostic.update(
-                    _series_pressure_provenance_diagnostic(
-                        species=species,
-                        P_eq_Pa=P_eq_Pa,
-                        P_bulk_Pa=P_bulk_Pa,
-                        pressure_provenance_by_species=(
-                            pressure_provenance_by_species
-                        ),
-                        vapor_pressure_sources=vapor_pressure_sources,
-                        vapor_pressure_activities=vapor_pressure_activities,
-                        pO2_bar=pO2_bar,
-                    )
-                )
-                series_flux_diagnostics[species] = series_diagnostic
+
+        if missing_transport_parameters:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="unavailable",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "missing_transport_parameters": missing_transport_parameters,
+                    "temperature_C": T_C,
+                    "evaporation_series_resistance": series_flux_diagnostics,
+                },
+                warnings=(
+                    "missing Chapman-Enskog transport parameters for sampled species: "
+                    + ", ".join(sorted(missing_transport_parameters)),
+                ),
+            )
 
         if missing_alpha:
             missing_alpha_warnings = [

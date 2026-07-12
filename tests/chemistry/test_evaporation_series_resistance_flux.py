@@ -8,6 +8,7 @@ import pytest
 
 from engines.builtin.evaporation_flux import (
     BuiltinEvaporationFluxProvider,
+    EvaporationFluxConfigurationError,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
@@ -124,6 +125,49 @@ def test_resistances_move_monotonically_with_kn_and_stir_axes():
     assert gas_by_radial == sorted(gas_by_radial, reverse=True)
 
 
+def test_zero_axial_stir_halts_melt_renewal_limited_evaporation():
+    halted = _evap(axial_stir_factor=0.0, gas_resistance_enabled=False)
+    stirred = _evap(axial_stir_factor=1.0, gas_resistance_enabled=False)
+
+    assert halted.flux_kg_s_m2 == 0.0
+    assert halted.alpha_effective == 0.0
+    assert math.isinf(halted.r_melt)
+    assert halted.as_diagnostic()["limiting_resistance_label"] == "melt"
+    assert stirred.flux_kg_s_m2 > 0.0
+
+    unsupported_transport = _evap(species="Si", axial_stir_factor=0.0)
+    assert unsupported_transport.flux_kg_s_m2 == 0.0
+    assert math.isinf(unsupported_transport.r_melt)
+
+
+@pytest.mark.parametrize("conductance", [-1.0, 0.0, float("nan"), float("inf")])
+def test_invalid_melt_renewal_conductance_refuses_flux(conductance):
+    with pytest.raises(
+        EvaporationFluxConfigurationError,
+        match="melt_surface_renewal_base_kg_s_m2_pa must be finite and positive",
+    ):
+        _evap(
+            melt_surface_renewal_base_kg_s_m2_pa=conductance,
+            gas_resistance_enabled=False,
+        )
+
+
+def test_missing_chapman_enskog_parameters_do_not_fall_back_to_constant():
+    with pytest.raises(
+        EvaporationFluxConfigurationError,
+        match="missing Chapman-Enskog transport parameters.*species='Si'",
+    ):
+        _evap(species="Si", knudsen_number=1.0e-7)
+
+    free_molecular = _evap(
+        species="Si",
+        knudsen_number=math.inf,
+        melt_resistance_enabled=False,
+    )
+    assert free_molecular.flux_kg_s_m2 > 0.0
+    assert free_molecular.r_gas == 0.0
+
+
 def test_anti_exploit_stir_bounds_and_defensive_clamps():
     max_axial = _evap(
         axial_stir_factor=MAX_STIR_FACTOR,
@@ -147,27 +191,21 @@ def test_anti_exploit_stir_bounds_and_defensive_clamps():
             melt_resistance_enabled=False,
         ).flux_kg_s_m2 == pytest.approx(max_radial.flux_kg_s_m2, rel=1e-12)
 
-    axial_zero = _evap(axial_stir_factor=0.0, gas_resistance_enabled=False)
-    radial_zero = _evap(
-        radial_stir_factor=0.0,
-        knudsen_number=1.0e-7,
-        melt_resistance_enabled=False,
-    )
-    for bad in (float("nan"), float("inf"), True):
-        bad_axial = _evap(axial_stir_factor=bad, gas_resistance_enabled=False)
-        bad_radial = _evap(
-            radial_stir_factor=bad,
-            knudsen_number=1.0e-7,
-            melt_resistance_enabled=False,
-        )
-        assert bad_axial.axial_stir_clamped is True
-        assert bad_axial.flux_kg_s_m2 == pytest.approx(
-            axial_zero.flux_kg_s_m2, rel=1e-12
-        )
-        assert bad_radial.radial_stir_clamped is True
-        assert bad_radial.flux_kg_s_m2 == pytest.approx(
-            radial_zero.flux_kg_s_m2, rel=1e-12
-        )
+    for bad in (-1.0, float("nan"), float("inf"), True):
+        with pytest.raises(
+            EvaporationFluxConfigurationError,
+            match="axial_stir_factor must be finite and non-negative",
+        ):
+            _evap(axial_stir_factor=bad, gas_resistance_enabled=False)
+        with pytest.raises(
+            EvaporationFluxConfigurationError,
+            match="radial_stir_factor must be finite and non-negative",
+        ):
+            _evap(
+                radial_stir_factor=bad,
+                knudsen_number=1.0e-7,
+                melt_resistance_enabled=False,
+            )
 
 
 @pytest.mark.parametrize("p_bulk", [_K_BASE["P_eq_pa"], _K_BASE["P_eq_pa"] * 2.0])

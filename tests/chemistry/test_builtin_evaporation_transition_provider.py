@@ -499,11 +499,10 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
         t for t in sim.atom_ledger.transitions
         if t.name.startswith("evaporate_")
     ]
-    if not evap_transitions:
-        pytest.skip(
-            "simulator produced no evaporation transitions in this run; "
-            "the parity assertion is vacuous"
-        )
+    assert evap_transitions, (
+        "simulator produced no evaporation transitions; provider parity "
+        "coverage would be vacuous"
+    )
 
     legal_accounts = {
         "process.cleaned_melt",

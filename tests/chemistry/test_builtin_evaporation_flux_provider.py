@@ -681,6 +681,16 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
     dispatch reproduces the standalone series-resistance flux reference
     species-by-species within tolerance."""
 
+    setpoints_data = dict(setpoints_data)
+    kernel_config = dict(setpoints_data.get("chemistry_kernel", {}) or {})
+    series_config = dict(
+        kernel_config.get("evaporation_series_resistance", {}) or {}
+    )
+    # This parity fixture exercises caller wiring. F-230 separately pins that
+    # finite-pressure transport refuses species without Chapman-Enskog data.
+    series_config["gas_resistance_enabled"] = False
+    kernel_config["evaporation_series_resistance"] = series_config
+    setpoints_data["chemistry_kernel"] = kernel_config
     sim = _build_sim(
         "lunar_mare_low_ti",
         vapor_pressure_data,
@@ -720,8 +730,10 @@ def test_provider_matches_legacy_loop_for_known_lunar_composition(
 
     equilibrium = sim._get_equilibrium()
     vapor_pressures_Pa = dict(equilibrium.vapor_pressures_Pa or {})
-    if not vapor_pressures_Pa:
-        pytest.skip("simulator did not produce any vapor pressures to test")
+    assert vapor_pressures_Pa, (
+        "simulator produced no vapor pressures; provider parity coverage "
+        "would be vacuous"
+    )
 
     reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
     kernel_flux = dict(sim._calculate_evaporation(equilibrium).species_kg_hr)
@@ -779,6 +791,11 @@ def test_shadow_parity_across_short_simulation_run(
     setpoints_data = dict(setpoints_data)
     kernel_config = dict(setpoints_data.get("chemistry_kernel", {}) or {})
     kernel_config["allow_unmeasured_alpha_fallback"] = True
+    series_config = dict(
+        kernel_config.get("evaporation_series_resistance", {}) or {}
+    )
+    series_config["gas_resistance_enabled"] = False
+    kernel_config["evaporation_series_resistance"] = series_config
     setpoints_data["chemistry_kernel"] = kernel_config
     sim = _build_sim(
         feedstock_key,
@@ -845,69 +862,136 @@ def test_shadow_parity_across_short_simulation_run(
 
 
 # ---------------------------------------------------------------------------
-# 7. W3 (0.5.4): defensive clamp on stir_factor / stir_state dict input
+# 7. Stir-factor validation and bounded feasible adjustment
 # ---------------------------------------------------------------------------
 #
-# The canonical sim path through ``simulator.evaporation`` pre-clamps the
-# stir_factor before it lands in the IntentRequest. Direct-provider callers
-# (ACP probes, ad-hoc dispatch, tests) bypass that path; W3 adds an
-# idempotent inner clamp in the provider so the contract holds regardless
-# of who built the request.
+# Exact zero is a valid halt and values above the feasible maximum clamp to the
+# ceiling. Negative, non-finite, and boolean inputs carry no physical state and
+# must refuse rather than masquerade as a valid zero-stir request.
 
 
-def _w3_dispatch_with_stir(stir_control) -> dict:
-    """Dispatch with custom stir control and return series diagnostics."""
-
+def _w3_result_with_controls(stir_control, **control_overrides):
     provider = BuiltinEvaporationFluxProvider()
     view = ProviderAccountView(
         accounts={"process.cleaned_melt": {"SiO2": 10.0, "Na2O": 1.0}},
         species_formula_registry={},
     )
 
-    request = IntentRequest(
+    controls = {
+        'vapor_pressures_Pa': {'Na': 100.0},
+        'overhead_partials_Pa': {},
+        'molar_mass_kg_mol': {'Na': 0.023},
+        'stoich_by_species': {
+            'Na': {
+                'parent_oxide': 'Na2O',
+                'oxide_per_product_kg': 1.347,
+                'O2_per_product_kg': 0.347,
+            },
+        },
+        'available_oxide_kg': {'Na': 10.0},
+        'melt_surface_area_m2': 0.2,
+        'stir_factor': stir_control,
+        'alpha': 0.5,
+    }
+    controls.update(control_overrides)
+    return provider.dispatch(IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=view,
         temperature_C=1500.0,
         pressure_bar=1e-6,
         fO2_log=None,
-        control_inputs={
-            'vapor_pressures_Pa': {'Na': 100.0},
-            'overhead_partials_Pa': {},
-            'molar_mass_kg_mol': {'Na': 0.023},
-            'stoich_by_species': {
-                'Na': {
-                    'parent_oxide': 'Na2O',
-                    'oxide_per_product_kg': 1.347,
-                    'O2_per_product_kg': 0.347,
-                },
-            },
-            'available_oxide_kg': {'Na': 10.0},
-            'melt_surface_area_m2': 0.2,
-            'stir_factor': stir_control,
-            'alpha': 0.5,
-        },
-    )
-    result = provider.dispatch(request)
+        control_inputs=controls,
+    ))
+
+
+def _w3_dispatch_with_stir(stir_control) -> dict:
+    """Dispatch with custom stir control and return series diagnostics."""
+
+    result = _w3_result_with_controls(stir_control)
     return result.diagnostic['evaporation_series_resistance']['Na']
 
 
-def test_provider_clamps_dict_axial_nan_to_zero():
-    """``{"axial": NaN}`` maps to no melt-side stir enhancement."""
+@pytest.mark.parametrize("area", [-1.0, float("nan"), float("inf"), "invalid"])
+def test_provider_refuses_invalid_melt_surface_area(area):
+    result = _w3_result_with_controls(1.0, melt_surface_area_m2=area)
 
-    diagnostic = _w3_dispatch_with_stir({"axial": float("nan")})
-    assert diagnostic["axial_stir_clamped"] is True
-    assert diagnostic["axial_stir_applied"] == 0.0
+    assert result.status == "refused"
+    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    assert result.diagnostic["reason"] == "invalid_melt_surface_area_m2"
 
 
-def test_provider_clamps_dict_axial_negative_to_zero():
-    """Negative stir is unphysical and reads as a halt-evap signal per
-    ``clamp_stir_factor`` (the lower bound is 0.0). The provider must
-    not silently pass through a negative multiplier — which would
-    invert the flux sign and break mass balance."""
+def test_provider_accepts_zero_melt_surface_area_as_valid_halt():
+    result = _w3_result_with_controls(1.0, melt_surface_area_m2=0.0)
 
-    diagnostic = _w3_dispatch_with_stir({"axial": -5.0})
-    assert diagnostic["axial_stir_clamped"] is True
-    assert diagnostic["axial_stir_applied"] == 0.0
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+
+
+def test_provider_zero_axial_stir_halts_melt_renewal_flux():
+    result = _w3_result_with_controls({"axial": 0.0})
+
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    diagnostic = result.diagnostic["evaporation_series_resistance"]["Na"]
+    assert diagnostic["flux_kg_s_m2"] == 0.0
+    assert diagnostic["limiting_resistance_label"] == "melt"
+
+
+@pytest.mark.parametrize("conductance", [-1.0, 0.0, float("nan"), float("inf")])
+def test_provider_refuses_invalid_melt_renewal_conductance(conductance):
+    result = _w3_result_with_controls(
+        1.0,
+        evaporation_series_resistance={
+            "melt_surface_renewal_base_kg_s_m2_pa": conductance,
+        },
+    )
+
+    assert result.status == "refused"
+    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    assert result.diagnostic["reason"] == "invalid_melt_surface_renewal_base"
+
+
+def test_provider_refuses_missing_species_transport_parameters():
+    result = _w3_result_with_controls(
+        1.0,
+        vapor_pressures_Pa={"Si": 100.0},
+        molar_mass_kg_mol={"Si": 0.028085},
+        stoich_by_species={
+            "Si": {
+                "parent_oxide": "SiO2",
+                "oxide_per_product_kg": 2.139,
+                "O2_per_product_kg": 1.139,
+            }
+        },
+        available_oxide_kg={"Si": 10.0},
+        alpha={"Si": 0.5},
+    )
+
+    assert result.status == "unavailable"
+    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    missing = result.diagnostic["missing_transport_parameters"]["Si"]
+    assert missing["policy"] == "fail_loud_missing_transport_parameters"
+    assert "missing Chapman-Enskog" in missing["reason"]
+    # Warnings must be a 1-tuple of the full message — a bare string here
+    # would iterate per-character into the operator warning rail.
+    assert len(result.warnings) == 1
+    assert result.warnings[0].startswith(
+        "missing Chapman-Enskog transport parameters for sampled species:"
+    )
+
+
+def test_provider_refuses_dict_axial_nan():
+    result = _w3_result_with_controls({"axial": float("nan")})
+
+    assert result.status == "refused"
+    assert result.diagnostic["reason"] == "invalid_stir_factor"
+
+
+def test_provider_refuses_dict_axial_negative():
+    result = _w3_result_with_controls({"axial": -5.0})
+
+    assert result.status == "refused"
+    assert result.diagnostic["reason"] == "invalid_stir_factor"
 
 
 def test_provider_clamps_dict_axial_over_max_to_ceiling():
@@ -922,27 +1006,27 @@ def test_provider_clamps_dict_axial_over_max_to_ceiling():
     )
 
 
-def test_provider_clamps_scalar_legacy_input_too():
-    """Legacy single-axis scalar caller must get the same defensive
-    clamp — pre-W3, the scalar branch went straight through
-    ``float(...)`` with only a TypeError/ValueError fallback. Now
-    NaN/inf/over-MAX all funnel through clamp_stir_factor."""
-
-    assert _w3_dispatch_with_stir(float("nan"))["axial_stir_applied"] == 0.0
+def test_provider_validates_scalar_legacy_input_too():
     assert _w3_dispatch_with_stir(500.0)["axial_stir_applied"] == pytest.approx(10.0)
-    assert _w3_dispatch_with_stir(-3.0)["axial_stir_applied"] == 0.0
+    for invalid in (float("nan"), float("inf"), -3.0):
+        result = _w3_result_with_controls(invalid)
+        assert result.status == "refused"
+        assert result.diagnostic["reason"] == "invalid_stir_factor"
 
 
-def test_provider_clamps_bool_input_to_zero():
-    """Codex chunk-review P3: bool is a Python int subclass; a YAML/
-    JSON deserialiser that hands ``True`` would otherwise coerce to
-    1.0 (laminar baseline) and ``False`` to 0.0 (halt). Both lies
-    silently. ``clamp_stir_factor`` rejects bool explicitly, so the
-    direct-provider path must too. Pin both values: True → 0.0
-    (halt-evap), False → 0.0 (halt-evap), unambiguous audit trail."""
+def test_provider_refuses_bool_input():
+    for invalid in (True, False):
+        result = _w3_result_with_controls(invalid)
+        assert result.status == "refused"
+        assert result.diagnostic["reason"] == "invalid_stir_factor"
 
-    assert _w3_dispatch_with_stir(True)["axial_stir_applied"] == 0.0
-    assert _w3_dispatch_with_stir(False)["axial_stir_applied"] == 0.0
+
+@pytest.mark.parametrize("axis", ["axial", "radial"])
+def test_provider_refuses_invalid_stir_on_both_axes(axis):
+    result = _w3_result_with_controls({axis: -1.0})
+
+    assert result.status == "refused"
+    assert result.diagnostic["reason"] == "invalid_stir_factor"
 
 
 def test_provider_canonical_path_is_idempotent_under_clamp():
