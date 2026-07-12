@@ -1246,6 +1246,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'pre-storm native-metal exsolution.',
         ),
         (
+            'engines.builtin.native_fe_metallic_tap',
+            'BuiltinNativeFeMetallicTapProvider',
+            (ChemistryIntent.NATIVE_FE_METALLIC_TAP,),
+            False,
+            'NATIVE_FE_METALLIC_TAP -- AUTHORITATIVE: partitions existing '
+            'process.metal_phase Fe between drain tap and vapor.',
+        ),
+        (
             'engines.builtin.fe_redox_respeciation',
             'BuiltinFeRedoxRespeciationProvider',
             (ChemistryIntent.FE_REDOX_RESPECIATION,),
@@ -5989,27 +5997,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             0.0,
             float(native_extent.get('native_fe_frac', 0.0) or 0.0),
         )
-        if native_frac <= 1.0e-12:
-            event = {
-                'native_fe_event': 'no_native_fe_below_threshold',
-                'native_fe_event_reason': 'native_fe_frac_below_threshold',
-                'native_fe_event_status': 'ok',
-            }
-            self._last_native_fe_saturation_event = dict(event)
-            return {**split, **event}
+        native_fe_source_account = 'process.cleaned_melt'
+        native_fe_intent = ChemistryIntent.NATIVE_FE_SATURATION
         native_fe_mol = max(
             0.0,
             float(native_extent.get('native_fe_mol', 0.0) or 0.0),
         )
+        if (
+            native_fe_mol <= 1.0e-12
+            and self.melt.campaign == CampaignPhase.C2A_STAGED
+        ):
+            native_fe_mol = max(0.0, float(
+                self.atom_ledger.mol_by_account('process.metal_phase').get(
+                    'Fe', 0.0,
+                )
+                or 0.0
+            ))
+            if native_fe_mol > 1.0e-12:
+                native_fe_source_account = 'process.metal_phase'
+                native_fe_intent = ChemistryIntent.NATIVE_FE_METALLIC_TAP
         if native_fe_mol <= 1.0e-12:
             event = {
                 'native_fe_event': 'no_native_fe_below_threshold',
-                'native_fe_event_reason': 'native_fe_mol_below_threshold',
+                'native_fe_event_reason': 'native_fe_inventory_below_threshold',
                 'native_fe_event_status': 'ok',
             }
             self._last_native_fe_saturation_event = dict(event)
             return {**split, **event}
         partition = self._native_fe_partition_diagnostic(native_fe_mol)
+        partition['native_fe_source_account'] = native_fe_source_account
 
         control_inputs = {
             'native_fe_mol': native_fe_mol,
@@ -6017,10 +6033,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 partition.get('native_fe_vapor_mol', 0.0)
             ),
             'native_fe_frac': native_frac,
-            'source': 'native Fe saturation FeO split',
+            'native_fe_source_account': native_fe_source_account,
+            'source': (
+                'native Fe saturation FeO split'
+                if native_fe_source_account == 'process.cleaned_melt'
+                else 'pre-existing native Fe metal partition'
+            ),
         }
         kernel_result = self._dispatch_only(
-            ChemistryIntent.NATIVE_FE_SATURATION,
+            native_fe_intent,
             control_inputs=control_inputs,
         )
         proposal = kernel_result.transition
@@ -6043,7 +6064,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._melt_redox_transition_provenance(gate_authority)
             )
             transition = self._commit_proposal(
-                ChemistryIntent.NATIVE_FE_SATURATION,
+                native_fe_intent,
                 proposal,
                 diagnostic=diagnostic,
                 control_inputs=control_inputs,
@@ -6072,6 +6093,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             vapor_route = self._route_native_fe_vapor_to_condensation(
                 requested_vapor_mol,
                 sample_time_h=sample_time_h,
+                source_account=native_fe_source_account,
             )
         self._project_cleaned_melt_from_atom_ledger()
         committed_vapor_mol = float(

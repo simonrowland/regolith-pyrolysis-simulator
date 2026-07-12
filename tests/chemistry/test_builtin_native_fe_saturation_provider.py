@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import pytest
 
+from engines.builtin.native_fe_metallic_tap import (
+    BuiltinNativeFeMetallicTapProvider,
+)
 from engines.builtin.native_fe_saturation import BuiltinNativeFeSaturationProvider
 from simulator.chemistry.kernel import (
     AccountFilterViolation,
@@ -19,6 +22,11 @@ from tests.chemistry.conftest import _atom_check, _build_sim
 
 DECLARED_ACCOUNTS = frozenset({
     "process.cleaned_melt",
+    "terminal.drain_tap_material",
+    "process.overhead_gas",
+})
+METALLIC_TAP_DECLARED_ACCOUNTS = frozenset({
+    "process.metal_phase",
     "terminal.drain_tap_material",
     "process.overhead_gas",
 })
@@ -101,6 +109,9 @@ def test_native_fe_intent_authority_is_registered(
     assert summary[ChemistryIntent.NATIVE_FE_SATURATION.value][
         "authoritative"
     ] == "builtin-native-fe-saturation"
+    assert summary[ChemistryIntent.NATIVE_FE_METALLIC_TAP.value][
+        "authoritative"
+    ] == "builtin-native-fe-metallic-tap"
 
 
 def test_account_filter_rejects_wider_native_fe_proposal():
@@ -167,6 +178,61 @@ def test_native_fe_proposal_partitions_tap_and_vapor(formula_registry):
     assert result.diagnostic["tap_fe_credit_mol"] == pytest.approx(1.75)
     _atom_check(result.transition, formula_registry, tol=1e-12)
     validate_atom_balance(result.transition, formula_registry)
+
+
+def test_native_metal_proposal_partitions_without_creating_oxygen(formula_registry):
+    profile = BuiltinNativeFeMetallicTapProvider().capability_profile()
+    assert profile.intents == frozenset(
+        {ChemistryIntent.NATIVE_FE_METALLIC_TAP}
+    )
+    assert profile.is_authoritative_for == frozenset(
+        {ChemistryIntent.NATIVE_FE_METALLIC_TAP}
+    )
+    assert profile.declared_accounts == METALLIC_TAP_DECLARED_ACCOUNTS
+
+    request = IntentRequest(
+        intent=ChemistryIntent.NATIVE_FE_METALLIC_TAP,
+        account_view=ProviderAccountView(
+            accounts={"process.metal_phase": {"Fe": 3.0}},
+            species_formula_registry=formula_registry,
+        ),
+        temperature_C=1650.0,
+        pressure_bar=1e-5,
+        control_inputs={
+            "native_fe_mol": 2.0,
+            "native_fe_vapor_mol": 0.25,
+        },
+    )
+
+    result = BuiltinNativeFeMetallicTapProvider().dispatch(request)
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.transition.reason == "native_fe_metal_partition"
+    assert dict(result.transition.debits) == {
+        "process.metal_phase": {"Fe": 2.0},
+    }
+    assert dict(result.transition.credits) == {
+        "process.overhead_gas": {"Fe": 0.25},
+        "terminal.drain_tap_material": {"Fe": 1.75},
+    }
+    assert "O2" not in result.transition.credits["process.overhead_gas"]
+    assert result.transition.accounts_touched() == METALLIC_TAP_DECLARED_ACCOUNTS
+    assert result.diagnostic["overhead_o2_credit_mol"] == pytest.approx(0.0)
+    validate_proposal_accounts(result.transition, profile.declared_accounts)
+    _atom_check(result.transition, formula_registry, tol=1e-12)
+    validate_atom_balance(result.transition, formula_registry)
+
+
+def test_metallic_tap_account_filter_rejects_cleaned_melt_proposal():
+    proposal = LedgerTransitionProposal(
+        debits={"process.cleaned_melt": {"FeO": 1.0}},
+        credits={"terminal.drain_tap_material": {"Fe": 1.0}},
+        reason="native_fe_metallic_tap_bad_account",
+    )
+
+    with pytest.raises(AccountFilterViolation):
+        validate_proposal_accounts(proposal, METALLIC_TAP_DECLARED_ACCOUNTS)
 
 
 def _native_fe_saturating_sim(

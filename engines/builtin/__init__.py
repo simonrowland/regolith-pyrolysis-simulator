@@ -24,6 +24,9 @@ Public exports:
 - :class:`BuiltinNativeFeSaturationProvider` -- authoritative provider
   for ``ChemistryIntent.NATIVE_FE_SATURATION`` (mol-native
   FeO -> Fe + 0.5 O2 split).
+- :class:`BuiltinNativeFeMetallicTapProvider` -- authoritative provider
+  for ``ChemistryIntent.NATIVE_FE_METALLIC_TAP`` (mol-native existing-Fe
+  partition between drain tap and vapor).
 
 Package-init cycle convention (binding for every provider in this
 package): the providers must NOT top-level-import
@@ -57,6 +60,9 @@ from engines.builtin.metallothermic_step import (
 from engines.builtin.native_fe_saturation import (
     BuiltinNativeFeSaturationProvider,
 )
+from engines.builtin.native_fe_metallic_tap import (
+    BuiltinNativeFeMetallicTapProvider,
+)
 from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
 from engines.builtin.overhead_gas_equilibrium import (
     BuiltinOverheadGasEquilibriumProvider,
@@ -73,6 +79,7 @@ __all__ = [
     "BuiltinEvaporationFluxProvider",
     "BuiltinEvaporationTransitionProvider",
     "BuiltinMetallothermicStepProvider",
+    "BuiltinNativeFeMetallicTapProvider",
     "BuiltinNativeFeSaturationProvider",
     "BuiltinOverheadBleedProvider",
     "BuiltinOverheadGasEquilibriumProvider",

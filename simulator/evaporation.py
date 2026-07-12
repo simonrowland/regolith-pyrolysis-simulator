@@ -1668,6 +1668,7 @@ class EvaporationMixin:
         native_fe_vapor_mol: float,
         *,
         sample_time_h: float | None = None,
+        source_account: str = 'process.cleaned_melt',
     ) -> dict[str, float]:
         native_fe_vapor_mol = max(0.0, float(native_fe_vapor_mol or 0.0))
         if native_fe_vapor_mol <= 1.0e-12:
@@ -1681,6 +1682,73 @@ class EvaporationMixin:
         if sample_time_h is not None:
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
         route_result = self.condensation_model.route(evap_flux, self.melt)
+        if source_account == 'process.metal_phase':
+            remaining_kg = float(
+                route_result.remaining_by_species.get('Fe', 0.0) or 0.0
+            )
+            if remaining_kg < -1e-12 or remaining_kg > rate_kg_hr + 1e-12:
+                raise AccountingError(
+                    "native Fe metal partition returned unphysical remaining vapor mass"
+                )
+            condensed_kg = max(0.0, rate_kg_hr - remaining_kg)
+            fe_row = dict(
+                (self.vapor_pressures.get('metals', {}) or {}).get('Fe') or {}
+            )
+            overhead_fe_before_kg = float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    'Fe', 0.0,
+                )
+                or 0.0
+            )
+            credited_condensed_kg = self._dispatch_condensation_route(
+                'Fe', condensed_kg, fe_row, route_result,
+            )
+            overhead_fe_after_kg = float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    'Fe', 0.0,
+                )
+                or 0.0
+            )
+            committed_condensed_kg = max(
+                0.0, overhead_fe_before_kg - overhead_fe_after_kg,
+            )
+            uncredited_condensed_kg = max(
+                0.0, condensed_kg - committed_condensed_kg,
+            )
+            ledger_remaining_kg = remaining_kg + uncredited_condensed_kg
+            if condensed_kg <= 1e-12:
+                route_status = 'committed_uncondensed'
+            elif committed_condensed_kg <= 1e-12:
+                route_status = 'condensation_no_commit'
+            elif committed_condensed_kg + 1e-12 < condensed_kg:
+                route_status = 'partial_condensation'
+            else:
+                route_status = 'committed'
+            product_projection = self._condensed_products_kg(
+                'Fe', credited_condensed_kg, fe_row,
+            )
+            self._project_condensed_stage_collection(
+                route_result,
+                'Fe',
+                credited_condensed_kg,
+                product_projection,
+            )
+            self._sync_oxygen_kg_counters()
+            return {
+                'native_fe_vapor_route_status': route_status,
+                'native_fe_vapor_mol': native_fe_vapor_mol,
+                'native_fe_vapor_kg': rate_kg_hr,
+                'native_fe_overhead_o2_mol': 0.0,
+                'native_fe_vapor_feo_debit_mol': 0.0,
+                'native_fe_overhead_fe_mol_before_condensation': native_fe_vapor_mol,
+                'native_fe_condensed_kg': float(credited_condensed_kg),
+                'native_fe_uncondensed_kg': ledger_remaining_kg,
+                'native_fe_uncondensed_mol': float(
+                    ledger_remaining_kg / fe_molar_mass
+                ),
+            }
+        if source_account != 'process.cleaned_melt':
+            raise ValueError(f'unsupported native Fe vapor source account {source_account!r}')
         route_diag = self._route_evaporated_species_to_condensation(
             route_result,
             'Fe',

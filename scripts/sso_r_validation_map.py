@@ -62,6 +62,10 @@ MAP_LIVE_PARITY_NATIVE_MOL_REL_TOL = 1.0e-9
 MAP_LIVE_PARITY_NATIVE_MOL_ABS_TOL_MOL = 1.0e-12
 MAP_LIVE_PARITY_NATIVE_ESCAPE_REL_TOL = 1.0e-9
 MAP_LIVE_PARITY_NATIVE_ESCAPE_ABS_TOL_FRACTION = 1.0e-12
+NATIVE_FE_PARTITION_TRANSITIONS = frozenset({
+    "native_fe_saturation_split",
+    "native_fe_metal_partition",
+})
 ANCHOR_REFERENCE_SOURCE = (
     "docs-private/research/2026-07-01-sso-r-scope/findings.md lines 107 and 259; "
     "CH1-CLOSEOUT.md lines 23-26 and 107-118 record the ch1/ch1c redox-state provenance"
@@ -733,7 +737,7 @@ def run_owner_live_step_probe(
     native_splits = [
         transition
         for transition in sim.atom_ledger.transitions
-        if transition.name == "native_fe_saturation_split"
+        if transition.name in NATIVE_FE_PARTITION_TRANSITIONS
     ]
     native_partition = dict(
         snapshot.fe_redox_split.get("native_fe_partition", {}) or {}

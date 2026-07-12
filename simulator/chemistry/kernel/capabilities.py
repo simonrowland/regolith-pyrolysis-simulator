@@ -36,6 +36,7 @@ class ChemistryIntent(str, Enum):
     METALLOTHERMIC_STEP = "metallothermic_step"
     CA_ALUMINOTHERMIC_STEP = "ca_aluminothermic_step"
     NATIVE_FE_SATURATION = "native_fe_saturation"
+    NATIVE_FE_METALLIC_TAP = "native_fe_metallic_tap"
     FE_REDOX_RESPECIATION = "fe_redox_respeciation"
     STAGE0_PRETREATMENT = "stage0_pretreatment"
     OVERHEAD_GAS_EQUILIBRIUM = "overhead_gas_equilibrium"

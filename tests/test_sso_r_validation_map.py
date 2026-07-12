@@ -486,13 +486,42 @@ def test_map_live_semantics_parity_is_computed_from_live_owner_tick(smoke_payloa
     parity = _assertion(smoke_payload, "map_live_semantics_parity")
     probe = smoke_payload["live_owner_probe"]
 
-    assert probe["native_split_observed"] is False
-    assert probe["native_fe_pool_mol"] == pytest.approx(0.0)
-    assert parity["passed"] is False
+    assert probe["native_split_observed"] is True
+    assert probe["native_fe_pool_mol"] > 0.0
+    assert probe["native_fe_tap_mol"] + probe["native_fe_vapor_mol"] == pytest.approx(
+        probe["native_fe_pool_mol"]
+    )
+    assert parity["passed"] is True
     assert "map_pO2_bar=" in parity["detail"]
     assert "live_pO2_bar=" in parity["detail"]
     assert "map_SiO_kg_hr=" in parity["detail"]
     assert "live_SiO_kg_hr=" in parity["detail"]
+    assert "native_split_observed=True" in parity["detail"]
+
+
+def test_map_live_semantics_parity_refuses_genuinely_absent_native_split(
+    smoke_payload,
+):
+    live_probe = dict(smoke_payload["live_owner_probe"])
+    live_probe["native_split_observed"] = False
+    for field in (
+        "native_fe_pool_mol",
+        "native_fe_tap_mol",
+        "native_fe_vapor_mol",
+        "native_fe_vapor_escape_fraction_of_pool",
+    ):
+        live_probe[field] = 0.0
+
+    assertions = validation_map.evaluate_assertions(
+        smoke_payload["rows"],
+        smoke_payload["manual_fO2_anchors"],
+        expected_rows=validation_map.expected_grid_count(smoke=True),
+        grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
+        live_owner_probe=live_probe,
+    )
+    parity = _assertion({"assertions": assertions}, "map_live_semantics_parity")
+
+    assert parity["passed"] is False
     assert "native_split_observed=False" in parity["detail"]
 
 
@@ -544,12 +573,12 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     window = _assertion(smoke_payload, "grind_ready_target_window")
     parity = _assertion(smoke_payload, "map_live_semantics_parity")
 
-    assert smoke_payload["live_owner_probe"]["native_split_observed"] is False
-    assert parity["passed"] is False
+    assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
+    assert parity["passed"] is True
     assert window["passed"] is False
-    assert "first_passing_T_C=None" in window["detail"]
+    assert "first_passing_T_C=1600.0" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
-    assert "live parity=missing" in window["detail"]
+    assert "live parity=confirmed" in window["detail"]
 
 
 def test_certification_surfaces_require_owner_pass_and_live_parity(
@@ -560,9 +589,7 @@ def test_certification_surfaces_require_owner_pass_and_live_parity(
     for row in smoke_payload["rows"]:
         updated = dict(row)
         if _is_owner_recipe_row(updated):
-            updated["native_fe_vapor_escape_fraction_of_pool"] = (
-                validation_map.OWNER_RECIPE_MAX_ESCAPE_FRACTION * 10.0
-            )
+            updated["ferric_divergence_material"] = True
         rows.append(updated)
     assertions = validation_map.evaluate_assertions(
         rows,
@@ -635,9 +662,9 @@ def test_map_live_semantics_parity_tolerances_bind(smoke_payload, monkeypatch):
     widened_parity = _assertion(
         {"assertions": widened_assertions}, "map_live_semantics_parity"
     )
-    assert live_probe["native_split_observed"] is False
-    assert widened_parity["passed"] is False
-    assert "native_split_observed=False" in widened_parity["detail"]
+    assert live_probe["native_split_observed"] is True
+    assert widened_parity["passed"] is True
+    assert "native_split_observed=True" in widened_parity["detail"]
 
 
 def test_distilled_golden_fixture_matches_current_anchors(smoke_payload):
