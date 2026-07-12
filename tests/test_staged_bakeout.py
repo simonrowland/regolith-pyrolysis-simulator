@@ -35,7 +35,16 @@ MASS_BALANCE_MAX_PCT = 5e-12
 # docs-private/research/2026-07-07-t141-kmox/golden-deltas.json).
 # 2026-07-11 0.5.10 E-MOVE: phase-basis/two-rail vapor plus K/S fO2 and
 # alkali-path changes lower the staged reactive wall deposit.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.00041701305382403056
+# 2026-07-11 wave-08 accounting-closure: the old wall-capture pseudo-efficiency
+# divided a reference HKL flux into the deposited flux and folded area into a
+# dimensionally invalid exponential pseudo-rate; the closed form converts the
+# deposited molar wall flux directly (kg/h = J[mol/m2/s] * A[m2] * M[kg/mol]
+# * 3600[s/h], per reachable segment, supply-capped). Recomputed by rerun on
+# main; mechanism attribution:
+# docs-private/reviews/2026-07-11-wave08/runtime-golden-attribution.md
+# +1.98e-6 kg (0.0035%) on top of the attribution's worktree value from the
+# native-Fe metallic tap fold (shared condensation-train competition).
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.056588484701026474
 
 
 def _run_script(lines: list[str]):
@@ -207,7 +216,15 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     assert continuous_products.get("Fe", 0.0) > staged_products.get("Fe", 0.0)
     # CF-3 constant gamma*X activity removes the old mode-equality pin: lower
     # alkali vapor makes the staged/continuous thermal histories visible again.
-    assert staged_products.get("Na", 0.0) > continuous_products.get("Na", 0.0) > 0.0
+    # 2026-07-11 ordering corrected: the staged>continuous flip committed with
+    # the v0.5.9 epoch (6d72725) was a test-history defect — live physics
+    # already produced continuous > staged at that commit. Mechanism: the
+    # continuous path dwells longer in the low-T shuttle/condensed-rail window
+    # (same dwell effect as Fe above), and the E-08 two-rail contract removed
+    # the gas-row P_sat double-count that had inflated staged high-T Na
+    # (gas-standard rows use activity_root * p_standard). Attribution:
+    # docs-private/reviews/2026-07-11-wave08/runtime-golden-attribution.md
+    assert continuous_products.get("Na", 0.0) > staged_products.get("Na", 0.0) > 0.0
     assert staged_silica > continuous_silica
     # Builtin-authoritative vapor pressure makes Stage 3 a mixed SiO/Fe
     # hot-trap instead of the old VapoRock-dominant silica-purity surface.
