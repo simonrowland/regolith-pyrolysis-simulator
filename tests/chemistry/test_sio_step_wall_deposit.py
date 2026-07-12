@@ -174,14 +174,19 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # fouling-threshold structure.
     # 2026-07-11 0.5.10 E-MOVE: phase-basis/two-rail vapor plus K/S fO2 and
     # alkali-path changes lower the coupled wall-product pins.
+    # 2026-07-12 accounting-closure rebaseline: e73fde5 replaced the
+    # dimensionally invalid capture efficiency with the direct per-segment
+    # wall budget J * A * M * 3600, capped by available supply. Recomputed on
+    # combined main; attribution: docs-private/reviews/2026-07-11-wave08/
+    # runtime-golden-attribution.md.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        5.3181504107910006e-08, rel=1e-9
+        6.9580380111987995e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
-        5.803194925495001e-08, rel=1e-9
+        8.08095351593e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
-        5.8406634082859996e-08, rel=1e-9
+        8.07180750236e-06, rel=1e-9
     )
 
 

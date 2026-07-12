@@ -446,9 +446,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # schema/allowlist drift.
     # 2026-07-11 0.5.10 E-MOVE: version/source/data fingerprint invalidation;
     # recipe_id and searchable allowlist hash above are unchanged.
-    # 2026-07-12: C6 bounds digest 67f7eae1... -> 32e9d2e9... rebaselines
-    # the EvalSpec cache identity for the 1400 C hold window.
-    assert cache_key(spec) == "a76af733f72d8c07992970b4be2d9d18f2edf73d09878ef0337d9bbef7394e85"
+    # 2026-07-12 combined-main rebaseline: the C6 1400 C window changes the
+    # bounds/setpoints identity while t-005 changes optimizer source inputs;
+    # recomputing only after both folds yields their shared cache identity.
+    assert cache_key(spec) == "a31258f215ba70c26dba4c569dbab94036a637283fb5c7b8fd67d5bc463dc7e8"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

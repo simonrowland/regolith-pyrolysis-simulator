@@ -139,11 +139,19 @@ GOLDENS = (
 # (lunar -0.0012%, mars -0.0048%). Recomputed controller-side from fresh
 # CLI runs in the t-141 epoch regen; deltas match the worker enumeration
 # (docs-private/research/2026-07-07-t141-kmox/golden-deltas.json).
+# 2026-07-12 accounting-closure rebaseline: e73fde5 replaces the old capture
+# pseudo-efficiency with the dimensionally closed per-segment wall budget
+# J * A * M * 3600, capped by available supply. The Mars baseline also carries
+# the 9de6ffb foulant sigmoid-width fold: the review counterfactual moves Mars
+# from 8.76896703816e-06 to 8.77043404354e-06 while lunar stays unchanged.
+# Fresh CLI runs on combined main move wall capture, downstream routing, and the
+# coupled evolved-SiO baseline. Attribution:
+# docs-private/reviews/2026-07-11-wave08/runtime-golden-attribution.md.
 BASELINE_SIO_EVOLVED_KG = {
     # 2026-07-11 0.5.10 E-MOVE: phase-basis/two-rail vapor plus K/S fO2 and
     # alkali-path changes lower the generated SiO-yield fixture baselines.
-    "lunar_mare_low_ti": 8.71303559859e-06,
-    "mars_basalt": 7.03303377654e-06,
+    "lunar_mare_low_ti": 8.71385905254e-06,
+    "mars_basalt": 8.7690897664e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -439,8 +447,10 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
         melt,
     )
 
+    # Same e73fde5 J * A * M * 3600 wall-budget rebaseline cited above and in
+    # docs-private/reviews/2026-07-11-wave08/runtime-golden-attribution.md.
     assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        0.0012296595884093348,
+        0.11212772348825843,
         rel=1e-12,
     )
     assert (

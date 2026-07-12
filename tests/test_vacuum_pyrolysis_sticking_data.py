@@ -366,8 +366,12 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
     )
     legacy = route_sio()
 
-    assert grounded == pytest.approx(0.0012296595884093348, rel=1e-12)
-    assert legacy == pytest.approx(0.03398921856191324, rel=1e-12)
+    # e73fde5 closes the wall budget as J * A * M * 3600 per segment, so both
+    # grounded and legacy-alpha deposits must move together. Recomputed on
+    # combined main; see docs-private/reviews/2026-07-11-wave08/
+    # runtime-golden-attribution.md.
+    assert grounded == pytest.approx(0.11212772348825843, rel=1e-12)
+    assert legacy == pytest.approx(0.4453644288843845, rel=1e-12)
     assert grounded < legacy
 
 

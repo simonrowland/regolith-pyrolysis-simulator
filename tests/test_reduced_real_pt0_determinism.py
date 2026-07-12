@@ -167,7 +167,11 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-07-07 (t-141 epoch): reduced-real key moves with the K standard-term
     # data digest; value matches the worker enumeration in golden-deltas.json
     # (the interim 62a416... reading in the refutation pass was the stale one).
-    assert key_hash == "f594594f971d2e0dc3d0e5b4ceb24fbb14a51648252fc21d4ad2e20abe49c0ba"
+    # 2026-07-12 combined-main rebaseline: the C6 window fold moves both the
+    # parsed setpoints digest and recipe.py source-module digest. These are
+    # cache-identity version moves; the production key was rerun after all
+    # wave-09 folds landed.
+    assert key_hash == "d05a2860e9523643f1a132f22c7937da844530320b386b3cba153920de2f83df"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
