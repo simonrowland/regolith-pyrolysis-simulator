@@ -277,6 +277,8 @@ CREATE TABLE rr_alphamelts_outputs (
     phase_species_kg_json TEXT,
     phase_compositions_json TEXT,
     liquid_fraction REAL,
+    liquid_density_kg_m3 REAL,
+    liquid_viscosity_Pa_s REAL,
     phase_assemblage_available INTEGER,
     liquid_composition_wt_pct_json TEXT,
     activity_coefficients_json TEXT,
@@ -988,7 +990,6 @@ EQ_REQUIRED = {
     "fO2_log",
     "liquid_composition_wt_pct",
     "liquid_fraction",
-    "liquid_viscosity_Pa_s",
     "liquidus_T_C",
     "phase_assemblage_available",
     "phase_compositions",
@@ -1052,7 +1053,16 @@ def _validate_legacy_payload(
         },
         "payload",
     )
-    eq = _expect_subset_keys(payload["equilibrium_result"], EQ_REQUIRED, {"diagnostics"}, "payload/equilibrium_result")
+    eq = _expect_subset_keys(
+        payload["equilibrium_result"],
+        EQ_REQUIRED,
+        {
+            "diagnostics",
+            "liquid_density_kg_m3",
+            "liquid_viscosity_Pa_s",
+        },
+        "payload/equilibrium_result",
+    )
     alpha = _expect_subset_keys(
         payload["alphamelts_diagnostics"],
         ALPHA_REQUIRED,
@@ -1203,6 +1213,7 @@ def _compatibility_paths(
         "/alphamelts_diagnostics/solidus_T_C",
         "/equilibrium_result/activity_coefficients",
         "/equilibrium_result/diagnostics",
+        "/equilibrium_result/liquid_density_kg_m3",
         "/equilibrium_result/liquid_viscosity_Pa_s",
         "/equilibrium_result/liquidus_T_C",
         "/equilibrium_result/phase_compositions",
@@ -1379,6 +1390,7 @@ ALPHA_OUTPUT_FIELDS = (
     "temperature_C", "pressure_bar", "fO2_log", "phases_present_json",
     "phase_masses_kg_json", "phase_modes_wt_pct_json", "phase_species_mol_json",
     "phase_species_kg_json", "phase_compositions_json", "liquid_fraction",
+    "liquid_density_kg_m3", "liquid_viscosity_Pa_s",
     "phase_assemblage_available", "liquid_composition_wt_pct_json",
     "activity_coefficients_json", "result_liquidus_T_C", "result_warnings_json",
     "result_diagnostics_json", "diagnostic_liquidus_T_C", "diagnostic_liquidus_T_K",
@@ -1720,19 +1732,29 @@ def materialize_legacy_row(
     vapo_config_hash = sha256_bytes(encode("rr-engine-config-v1", vapo_config))
     sulfsat_config_hash = sha256_bytes(encode("rr-engine-config-v1", sulfsat_config))
 
-    viscosity_pointer = "/equilibrium_result/liquid_viscosity_Pa_s"
-    if viscosity_pointer not in payload_tokens:
-        raise CanonicalizationError("missing legacy viscosity number token")
-    if f64_bytes(float(payload_tokens[viscosity_pointer])) != f64_bytes(eq["liquid_viscosity_Pa_s"]):
-        raise CanonicalizationError("legacy viscosity token bits disagree")
+    typed_liquid_outputs: dict[str, float | None] = {}
+    compatibility_value_tokens: list[list[str]] = []
+    for name in ("liquid_density_kg_m3", "liquid_viscosity_Pa_s"):
+        pointer = f"/equilibrium_result/{name}"
+        if name not in eq:
+            typed_liquid_outputs[name] = None
+            continue
+        value = eq[name]
+        typed_liquid_outputs[name] = (
+            None if value is None else _f64(value, f"alpha/{name}")
+        )
+        if value is not None:
+            if pointer not in payload_tokens:
+                raise CanonicalizationError(f"missing legacy {name} number token")
+            if f64_bytes(float(payload_tokens[pointer])) != f64_bytes(value):
+                raise CanonicalizationError(f"legacy {name} token bits disagree")
+            compatibility_value_tokens.append([pointer, payload_tokens[pointer]])
     compatibility_shape = {
         "schema": "rr-compat-shape-v1",
         "paths": _compatibility_paths(
             payload, include_followers=include_followers
         ),
-        "compatibility_value_tokens": [
-            [viscosity_pointer, payload_tokens[viscosity_pointer]]
-        ],
+        "compatibility_value_tokens": compatibility_value_tokens,
     }
     compatibility_shape_json = display_json(compatibility_shape)
 
@@ -1828,6 +1850,8 @@ def materialize_legacy_row(
         "phase_species_kg_json": display_json(eq["phase_species_kg"]),
         "phase_compositions_json": display_json(eq["phase_compositions"]),
         "liquid_fraction": _f64(eq["liquid_fraction"], "alpha/liquid_fraction"),
+        "liquid_density_kg_m3": typed_liquid_outputs["liquid_density_kg_m3"],
+        "liquid_viscosity_Pa_s": typed_liquid_outputs["liquid_viscosity_Pa_s"],
         "phase_assemblage_available": int(bool(eq["phase_assemblage_available"])),
         "liquid_composition_wt_pct_json": display_json(eq["liquid_composition_wt_pct"]),
         "activity_coefficients_json": display_json(eq["activity_coefficients"]),
@@ -2124,6 +2148,8 @@ def materialize_legacy_row(
                 "pressure_bar": _f64(eq["pressure_bar"], "source/alpha/pressure_bar"),
                 "fO2_log": _f64(eq["fO2_log"], "source/alpha/fO2_log"),
                 "liquid_fraction": _f64(eq["liquid_fraction"], "source/alpha/liquid_fraction"),
+                "liquid_density_kg_m3": typed_liquid_outputs["liquid_density_kg_m3"],
+                "liquid_viscosity_Pa_s": typed_liquid_outputs["liquid_viscosity_Pa_s"],
                 "phase_assemblage_available": int(bool(eq["phase_assemblage_available"])),
                 "result_liquidus_T_C": None if eq["liquidus_T_C"] is None else _f64(eq["liquidus_T_C"], "source/alpha/result_liquidus_T_C"),
                 "diagnostic_liquidus_T_C": _f64(alpha_diag["liquidus_T_C"], "source/alpha/diagnostic_liquidus_T_C"),
@@ -2457,9 +2483,16 @@ def reconstruct_legacy_payload(connection: sqlite3.Connection, state_id: int) ->
     if not isinstance(token_pairs, list):
         raise ParityError("compatibility value-token ledger missing")
     tokens = {pair[0]: pair[1] for pair in token_pairs}
-    if set(tokens) != {"/equilibrium_result/liquid_viscosity_Pa_s"}:
+    liquid_output_pointers = {
+        "/equilibrium_result/liquid_density_kg_m3",
+        "/equilibrium_result/liquid_viscosity_Pa_s",
+    }
+    if not set(tokens).issubset(liquid_output_pointers):
         raise ParityError("unsupported compatibility value-token paths")
-    viscosity = float(tokens["/equilibrium_result/liquid_viscosity_Pa_s"])
+    for pointer, token in tokens.items():
+        column = pointer.rsplit("/", 1)[-1]
+        if alpha[column] is None or f64_bytes(float(token)) != f64_bytes(alpha[column]):
+            raise ParityError(f"{column} compatibility token disagrees with typed value")
 
     if vapo is None:
         vapor_pressures = _shape_value(states, "/equilibrium_result/vapor_pressures_Pa")
@@ -2514,7 +2547,6 @@ def reconstruct_legacy_payload(connection: sqlite3.Connection, state_id: int) ->
         "fO2_log": alpha["fO2_log"],
         "liquid_composition_wt_pct": _json_column(alpha, "liquid_composition_wt_pct_json"),
         "liquid_fraction": alpha["liquid_fraction"],
-        "liquid_viscosity_Pa_s": viscosity,
         "liquidus_T_C": alpha["result_liquidus_T_C"],
         "phase_assemblage_available": bool(alpha["phase_assemblage_available"]),
         "phase_compositions": _json_column(alpha, "phase_compositions_json"),
@@ -2530,6 +2562,11 @@ def reconstruct_legacy_payload(connection: sqlite3.Connection, state_id: int) ->
         "vapor_pressures_source": vapor_sources,
         "warnings": _json_column(alpha, "result_warnings_json"),
     }
+    for name in ("liquid_density_kg_m3", "liquid_viscosity_Pa_s"):
+        pointer = f"/equilibrium_result/{name}"
+        value = _shape_value(states, pointer, alpha[name])
+        if value is not MISSING:
+            eq[name] = value
     if diagnostics is not MISSING:
         eq["diagnostics"] = diagnostics
 
@@ -3013,10 +3050,6 @@ def _new_report(source: dict[str, Any], selected_count: int) -> dict[str, Any]:
             "physics_key_bytes": {
                 "count": selected_count,
                 "reason": "duplicate/derived compatibility object; all leaves validated",
-            },
-            "equilibrium_result.liquid_viscosity_Pa_s": {
-                "count": selected_count,
-                "reason": "SC-50 unsourced constant; exact token retained only in compatibility ledger",
             },
             "last_vapor_pressures_source": {
                 "count": selected_count,

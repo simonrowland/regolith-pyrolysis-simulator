@@ -324,6 +324,70 @@ def test_future_vaporock_species_is_retained_generically_with_byte_parity(tmp_pa
         destination.close()
 
 
+@pytest.mark.skipif(not LEGACY_DB.exists(), reason="private reduced-real corpus absent")
+@pytest.mark.parametrize("state", ["populated", "zero", "null", "absent"])
+def test_typed_liquid_outputs_round_trip_populated_zero_null_and_absent(tmp_path, state):
+    connection = cache_convert.open_source_readonly(LEGACY_DB)
+    try:
+        source = dict(
+            connection.execute(
+                "SELECT rowid AS legacy_rowid, * FROM "
+                "reduced_real_equilibrium_payloads WHERE rowid=1"
+            ).fetchone()
+        )
+    finally:
+        connection.close()
+
+    payload = json.loads(source["payload_bytes"])
+    equilibrium = payload["equilibrium_result"]
+    if state == "populated":
+        equilibrium["liquid_density_kg_m3"] = 2638.918
+        equilibrium["liquid_viscosity_Pa_s"] = 2.5
+    elif state == "zero":
+        equilibrium["liquid_density_kg_m3"] = 0.0
+        equilibrium["liquid_viscosity_Pa_s"] = 0.0
+    elif state == "null":
+        equilibrium["liquid_density_kg_m3"] = None
+        equilibrium["liquid_viscosity_Pa_s"] = None
+    else:
+        equilibrium.pop("liquid_density_kg_m3", None)
+        equilibrium.pop("liquid_viscosity_Pa_s", None)
+    payload_bytes = json.dumps(
+        payload, ensure_ascii=True, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    source["payload_bytes"] = payload_bytes
+    source["payload_sha256"] = cache_convert.sha256_bytes(payload_bytes)
+
+    materialized = cache_convert.materialize_legacy_row(source, "0" * 64)
+    expected_density = {"populated": 2638.918, "zero": 0.0}.get(state)
+    expected_viscosity = {"populated": 2.5, "zero": 0.0}.get(state)
+    assert materialized.alpha["liquid_density_kg_m3"] == expected_density
+    assert materialized.alpha["liquid_viscosity_Pa_s"] == expected_viscosity
+
+    destination = cache_convert._open_destination(
+        tmp_path / "cache-v2.db",
+        source_sha256="0" * 64,
+        created_at="2026-07-10T00:00:00Z",
+    )
+    try:
+        cache_convert._insert_materialized(destination, materialized)
+        reconstructed = json.loads(
+            cache_convert.reconstruct_legacy_payload(destination, 1)
+        )["equilibrium_result"]
+        present = state != "absent"
+        assert ("liquid_density_kg_m3" in reconstructed) is present
+        assert ("liquid_viscosity_Pa_s" in reconstructed) is present
+        if state != "absent":
+            assert reconstructed["liquid_density_kg_m3"] == expected_density
+            assert reconstructed["liquid_viscosity_Pa_s"] == expected_viscosity
+        assert cache_convert.verify_inserted_row(destination, materialized) == {
+            "key": True,
+            "payload": True,
+        }
+    finally:
+        destination.close()
+
+
 def test_follower_rejection_tally_names_the_failing_engine():
     report = cache_convert._new_report({"sha256": "0" * 64}, 1)
     cache_convert._mark_failed_tables(
@@ -378,55 +442,32 @@ def test_writer_gate_rejects_independent_projection_mutations():
 
 
 @pytest.mark.skipif(not LEGACY_DB.exists(), reason="private reduced-real corpus absent")
-def test_twenty_row_golden_byte_parity_and_idempotence(tmp_path):
+@pytest.mark.serial
+def test_full_corpus_golden_byte_parity_and_idempotence(tmp_path):
     destination = tmp_path / "cache-v2.db"
     report_path = tmp_path / "cache-v2.report.json"
-    stratified_rowids = (
-        1,
-        3,
-        25,
-        100,
-        981,
-        982,
-        987,
-        988,
-        1200,
-        1500,
-        2000,
-        2331,
-        2332,
-        2342,
-        2343,
-        2444,
-        2445,
-        2500,
-        2520,
-        2531,
-    )
 
     first = cache_convert.convert_database(
         LEGACY_DB,
         destination,
         report_path,
-        row_ids=stratified_rowids,
-        enforce_expected_counts=False,
         require_sibling=False,
         batch_size=7,
     )
 
     assert first["status"] == "complete", first["failures"][:1]
     assert first["alpha_preflight"] == {
-        "checked": 20,
+        "checked": 2531,
         "failed": 0,
         "fully_green": True,
         "runtime_s": first["alpha_preflight"]["runtime_s"],
     }
-    assert first["tables"]["rr_input_states"]["converted"] == 20
-    assert first["tables"]["rr_alphamelts_outputs"]["converted"] == 20
+    assert first["tables"]["rr_input_states"]["converted"] == 2531
+    assert first["tables"]["rr_alphamelts_outputs"]["converted"] == 2531
     assert first["tables"]["rr_vaporock_outputs"]["converted"] > 0
     assert first["tables"]["rr_sulfsat_outputs"]["converted"] > 0
     assert first["tables"]["rr_input_states"]["parity_failed"] == 0
-    assert len(first["parity_rows"]) == 20
+    assert len(first["parity_rows"]) == 2531
     assert all(
         row["key_byte_equal"] and row["payload_byte_equal"]
         for row in first["parity_rows"]
@@ -436,8 +477,6 @@ def test_twenty_row_golden_byte_parity_and_idempotence(tmp_path):
         LEGACY_DB,
         destination,
         report_path,
-        row_ids=stratified_rowids,
-        enforce_expected_counts=False,
         require_sibling=False,
         batch_size=7,
     )
@@ -445,8 +484,8 @@ def test_twenty_row_golden_byte_parity_and_idempotence(tmp_path):
     assert second["status"] == "complete", second["failures"][:1]
     assert second["tables"]["rr_input_states"]["converted"] == 0
     assert second["tables"]["rr_alphamelts_outputs"]["converted"] == 0
-    assert second["tables"]["rr_input_states"]["skipped"] == 20
-    assert second["tables"]["rr_alphamelts_outputs"]["skipped"] == 20
+    assert second["tables"]["rr_input_states"]["skipped"] == 2531
+    assert second["tables"]["rr_alphamelts_outputs"]["skipped"] == 2531
     assert second["tables"]["rr_vaporock_outputs"]["skipped"] == first["tables"]["rr_vaporock_outputs"]["converted"]
     assert second["tables"]["rr_sulfsat_outputs"]["skipped"] == first["tables"]["rr_sulfsat_outputs"]["converted"]
-    assert len(second["parity_rows"]) == 20
+    assert len(second["parity_rows"]) == 2531
