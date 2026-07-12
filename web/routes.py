@@ -25,6 +25,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
+from simulator.campaigns import CampaignManager
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
     CONTINUUM_BUFFER_KN,
@@ -1168,10 +1169,13 @@ def _request_arg(name: str) -> str | None:
 
 
 def _request_limit(default: int = 10, maximum: int = 100) -> int:
-    try:
-        limit = int(request.args.get('limit', default))
-    except (TypeError, ValueError):
+    raw = request.args.get('limit')
+    if raw is None:
         limit = default
+    else:
+        limit = _strict_integer(raw)
+        if limit is None:
+            raise BadRequest('limit must be an integer')
     return min(max(limit, 1), maximum)
 
 
@@ -2515,36 +2519,238 @@ def _generated_recipe_patch_from_context(context: Mapping[str, Any]) -> dict[str
     if c4_patch:
         campaigns['C4'] = c4_patch
 
-    if inputs.get('c5_enabled'):
-        cap = _finite_or_none(inputs.get('mre_max_voltage_V'))
-        if cap is not None and cap > 0:
-            campaigns.setdefault('C5', {})['allow_mre_voltage_cap_V'] = cap
-
-    additives = inputs.get('additives_kg') or {}
-    if isinstance(additives, Mapping):
-        alkali: dict[str, float] = {}
-        for species in ('Na', 'K'):
-            amount = _finite_or_none(additives.get(species))
-            if amount is not None and amount > 0:
-                alkali[f'{species}_kg'] = amount
-        if alkali:
-            campaigns.setdefault('C3', {})['alkali_dosing'] = alkali
-
     if campaigns:
         generated['campaigns'] = campaigns
 
-    existing = context.get('setpoints_patch') or {}
+    existing = copy.deepcopy(context.get('setpoints_patch') or {})
     if not isinstance(existing, Mapping):
         existing = {}
+    else:
+        existing = dict(existing)
+    if context.get('manual_recipe_controls_supplied'):
+        existing_campaigns = existing.get('campaigns')
+        if isinstance(existing_campaigns, Mapping):
+            clean_campaigns = copy.deepcopy(dict(existing_campaigns))
+            c5 = clean_campaigns.get('C5')
+            if isinstance(c5, Mapping):
+                c5 = dict(c5)
+                c5.pop('allow_mre_voltage_cap_V', None)
+                if c5:
+                    clean_campaigns['C5'] = c5
+                else:
+                    clean_campaigns.pop('C5', None)
+            c3 = clean_campaigns.get('C3')
+            if isinstance(c3, Mapping):
+                c3 = dict(c3)
+                c3.pop('alkali_dosing', None)
+                if c3:
+                    clean_campaigns['C3'] = c3
+                else:
+                    clean_campaigns.pop('C3', None)
+            if clean_campaigns:
+                existing['campaigns'] = clean_campaigns
+            else:
+                existing.pop('campaigns', None)
     return _deep_merge_recipe_patch(existing, generated)
 
 
 def _canonical_recipe_patch_from_context(context: Mapping[str, Any]) -> dict[str, Any]:
+    if context.get('manual_recipe_controls_supplied'):
+        return _generated_recipe_patch_from_context(context)
     for key in ('resolved_setpoints_patch', 'setpoints_patch'):
         candidate = context.get(key) or {}
         if isinstance(candidate, Mapping) and candidate:
             return normalize_recipe_patch(candidate, source=f'{key} recipe save context')
     return _generated_recipe_patch_from_context(context)
+
+
+def _recipe_text_value(value: Any) -> str:
+    return str(value or '').strip()
+
+
+def _recipe_non_negative_number(value: Any, field: str) -> float | None:
+    if value in (None, ''):
+        return None
+    number = _finite_or_none(value)
+    if number is None or number < 0:
+        raise BadRequest(f'{field} must be a finite non-negative number')
+    return number
+
+
+def _recipe_positive_number(value: Any, field: str) -> float | None:
+    number = _recipe_non_negative_number(value, field)
+    if number is not None and number <= 0:
+        raise BadRequest(f'{field} must be a finite number > 0')
+    return number
+
+
+def _recipe_bool(value: Any, field: str) -> bool:
+    if isinstance(value, bool):
+        return value
+    raise BadRequest(f'{field} must be a boolean')
+
+
+def _recipe_additives_from_controls(controls: Mapping[str, Any]) -> dict[str, float]:
+    raw = controls.get('additives_kg')
+    if raw is None:
+        raw = controls.get('additives')
+    if raw in (None, ''):
+        return {}
+    if not isinstance(raw, Mapping):
+        raise BadRequest('controls.additives must be an object')
+    additives: dict[str, float] = {}
+    for species in ('Na', 'K', 'Mg', 'Ca', 'C'):
+        amount = _recipe_non_negative_number(
+            raw.get(species),
+            f'controls.additives.{species}',
+        )
+        if amount is not None:
+            additives[species] = amount
+    return additives
+
+
+def _recipe_runtime_overrides_from_controls(
+    controls: Mapping[str, Any],
+) -> dict[str, dict[str, Any]]:
+    raw = controls.get('runtime_campaign_overrides') or {}
+    if not raw:
+        return {}
+    if not isinstance(raw, Mapping):
+        raise BadRequest('controls.runtime_campaign_overrides must be an object')
+    overrides: dict[str, dict[str, Any]] = {}
+    for campaign, fields in raw.items():
+        campaign_name = _recipe_text_value(campaign)
+        if not campaign_name:
+            raise BadRequest('controls.runtime_campaign_overrides campaign is required')
+        if not isinstance(fields, Mapping):
+            raise BadRequest(
+                f'controls.runtime_campaign_overrides.{campaign_name} must be an object'
+            )
+        clean_fields: dict[str, Any] = {}
+        for field, raw_value in fields.items():
+            field_name = _recipe_text_value(field)
+            if not field_name:
+                raise BadRequest(
+                    f'controls.runtime_campaign_overrides.{campaign_name} field is required'
+                )
+            value = _recipe_non_negative_number(
+                raw_value,
+                f'controls.runtime_campaign_overrides.{campaign_name}.{field_name}',
+            )
+            if value is not None:
+                clean_fields[field_name] = value
+        if clean_fields:
+            overrides[campaign_name] = clean_fields
+    return overrides
+
+
+def _recipe_inputs_from_controls(controls: Mapping[str, Any]) -> dict[str, Any]:
+    inputs: dict[str, Any] = {}
+    for control_key, input_key in (
+        ('feedstock', 'feedstock'),
+        ('track', 'track'),
+        ('backend', 'backend'),
+        ('mre_target_species', 'mre_target_species'),
+        ('mre_preset_id', 'mre_preset_id'),
+        ('furnace_material_id', 'furnace_material_id'),
+    ):
+        text = _recipe_text_value(controls.get(control_key))
+        if text:
+            inputs[input_key] = text
+    for control_key, input_key in (
+        ('mass_kg', 'mass_kg'),
+        ('speed', 'speed'),
+        ('c4_max_temp_C', 'c4_max_temp_C'),
+        ('furnace_max_T_C', 'furnace_max_T_C'),
+        ('mre_max_voltage_V', 'mre_max_voltage_V'),
+    ):
+        number = (
+            _recipe_positive_number(controls.get(control_key), f'controls.{control_key}')
+            if control_key in {'mass_kg', 'c4_max_temp_C', 'furnace_max_T_C'}
+            else _recipe_non_negative_number(
+                controls.get(control_key),
+                f'controls.{control_key}',
+            )
+        )
+        if number is not None:
+            inputs[input_key] = number
+    if 'c5_enabled' in controls:
+        inputs['c5_enabled'] = _recipe_bool(
+            controls.get('c5_enabled'),
+            'controls.c5_enabled',
+        )
+    overrides = _recipe_runtime_overrides_from_controls(controls)
+    if 'runtime_campaign_overrides' in controls:
+        inputs['runtime_campaign_overrides'] = overrides
+    additives = _recipe_additives_from_controls(controls)
+    if 'additives' in controls or 'additives_kg' in controls:
+        inputs['additives_kg'] = additives
+    return inputs
+
+
+def _overlay_recipe_capture_from_inputs(
+    context: dict[str, Any],
+    inputs: Mapping[str, Any],
+) -> None:
+    capture = copy.deepcopy(context.get('last_recipe_capture') or {})
+    if not isinstance(capture, Mapping):
+        capture = {}
+    tick = copy.deepcopy(capture.get('tick') or {})
+    if not isinstance(tick, Mapping):
+        tick = {}
+    overrides = inputs.get('runtime_campaign_overrides') or {}
+    if isinstance(overrides, Mapping) and overrides:
+        campaign, fields = next(iter(overrides.items()))
+        tick['campaign'] = str(campaign)
+        if isinstance(fields, Mapping):
+            if fields.get('pO2_mbar') is not None:
+                tick['pO2_mbar'] = fields.get('pO2_mbar')
+            if fields.get('p_total_mbar') is not None:
+                tick['p_total_mbar'] = fields.get('p_total_mbar')
+    capture['tick'] = tick
+    context['last_recipe_capture'] = capture
+
+
+def _recipe_payload_setpoints_patch(payload: Mapping[str, Any]) -> dict[str, Any] | None:
+    raw = payload.get('setpoints_patch')
+    if raw in (None, {}, ''):
+        return None
+    if not isinstance(raw, Mapping):
+        raise BadRequest('setpoints_patch must be an object')
+    return normalize_recipe_patch(raw, source='recipes/save setpoints_patch')
+
+
+def _recipe_context_from_payload(
+    context: Mapping[str, Any],
+    payload: Mapping[str, Any],
+) -> dict[str, Any]:
+    controls = payload.get('controls')
+    setpoints_patch = _recipe_payload_setpoints_patch(payload)
+    if controls in (None, '') and setpoints_patch is None:
+        return copy.deepcopy(dict(context))
+    if controls in (None, ''):
+        controls = None
+    elif not isinstance(controls, Mapping):
+        raise BadRequest('controls must be an object')
+
+    updated = copy.deepcopy(dict(context))
+    if setpoints_patch is not None:
+        updated['setpoints_patch'] = copy.deepcopy(setpoints_patch)
+        updated['resolved_setpoints_patch'] = copy.deepcopy(setpoints_patch)
+    elif controls is not None:
+        updated['setpoints_patch'] = {}
+        updated['resolved_setpoints_patch'] = {}
+
+    if controls is not None:
+        recipe_inputs = copy.deepcopy(updated.get('recipe_inputs') or {})
+        if not isinstance(recipe_inputs, Mapping):
+            recipe_inputs = {}
+        recipe_inputs = dict(recipe_inputs)
+        recipe_inputs.update(_recipe_inputs_from_controls(controls))
+        updated['recipe_inputs'] = recipe_inputs
+        updated['manual_recipe_controls_supplied'] = True
+        _overlay_recipe_capture_from_inputs(updated, recipe_inputs)
+    return updated
 
 
 def _temperature_ladder_from_inputs(inputs: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -2718,7 +2924,10 @@ def _metadata_from_context(title: str, context: Mapping[str, Any]) -> dict[str, 
     )
     headline_recipe = {
         'feedstock': inputs.get('feedstock'),
+        'mass_kg': inputs.get('mass_kg'),
         'campaign': campaign,
+        'track': inputs.get('track') or '',
+        'backend': inputs.get('backend') or '',
         'hours': tick.get('hour'),
         'temperature_ladder': temperature_ladder,
         'pO2_mbar': tick.get('pO2_mbar'),
@@ -2734,6 +2943,8 @@ def _metadata_from_context(title: str, context: Mapping[str, Any]) -> dict[str, 
             'c4_max_temp_C': inputs.get('c4_max_temp_C'),
             'additives_kg': copy.deepcopy(inputs.get('additives_kg') or {}),
             'furnace_material_id': inputs.get('furnace_material_id') or '',
+            'mre_preset_id': inputs.get('mre_preset_id') or '',
+            'speed': inputs.get('speed'),
         },
     }
     return {
@@ -2817,6 +3028,69 @@ def _recipe_controls_from_patch(patch: Mapping[str, Any]) -> dict[str, Any]:
     return controls
 
 
+def _recipe_controls_from_metadata(metadata: Mapping[str, Any]) -> dict[str, Any]:
+    recipe = metadata.get('headline_recipe') or {}
+    if not isinstance(recipe, Mapping):
+        recipe = {}
+    pinned = recipe.get('pinned_knobs') or {}
+    if not isinstance(pinned, Mapping):
+        pinned = {}
+
+    controls: dict[str, Any] = {}
+    simple_fields = {
+        'feedstock': recipe.get('feedstock') or metadata.get('feedstock'),
+        'mass_kg': recipe.get('mass_kg'),
+        'track': recipe.get('track'),
+        'backend': recipe.get('backend'),
+        'speed': pinned.get('speed'),
+        'furnace_material_id': pinned.get('furnace_material_id'),
+        'mre_preset_id': pinned.get('mre_preset_id'),
+        'mre_enabled': recipe.get('mre_enabled'),
+        'mre_target_species': recipe.get('mre_target_species'),
+        'mre_max_voltage_V': recipe.get('mre_max_voltage_V'),
+        'c4_max_temp_C': pinned.get('c4_max_temp_C'),
+    }
+    for key, value in simple_fields.items():
+        if value not in (None, ''):
+            controls[key] = copy.deepcopy(value)
+
+    additives = pinned.get('additives_kg')
+    if isinstance(additives, Mapping):
+        controls['additives'] = copy.deepcopy(dict(additives))
+
+    overrides = pinned.get('runtime_campaign_overrides')
+    if isinstance(overrides, Mapping) and overrides:
+        try:
+            CampaignManager.validate_runtime_campaign_overrides(dict(overrides))
+        except (TypeError, ValueError) as exc:
+            raise BadRequest(
+                f'invalid saved runtime_campaign_overrides: {exc}'
+            ) from exc
+        controls['runtime_campaign_overrides'] = copy.deepcopy(dict(overrides))
+        campaign, fields = next(iter(overrides.items()))
+        controls['lever_campaign'] = str(campaign)
+        if isinstance(fields, Mapping):
+            field_map = {
+                'pO2_mbar': 'pO2_mbar',
+                'hold_temp_C': 'stage_temp_C',
+                'max_hours': 'stage_duration_h',
+                'ramp_rate': 'stage_ramp_C_per_h',
+            }
+            for source_key, control_key in field_map.items():
+                if fields.get(source_key) is not None:
+                    controls[control_key] = copy.deepcopy(fields.get(source_key))
+    return controls
+
+
+def _recipe_controls_for_response(
+    patch: Mapping[str, Any],
+    metadata: Mapping[str, Any],
+) -> dict[str, Any]:
+    controls = _recipe_controls_from_patch(patch)
+    controls.update(_recipe_controls_from_metadata(metadata))
+    return controls
+
+
 @bp.route('/recipes', methods=['GET'])
 def list_recipes():
     recipes = []
@@ -2844,7 +3118,7 @@ def save_recipe():
         if not sid:
             raise BadRequest('recipe save requires a socket session id')
         from web.events import RecipeStateError, recipe_save_context
-        context = recipe_save_context(sid)
+        context = _recipe_context_from_payload(recipe_save_context(sid), payload)
         metadata = _metadata_from_context(title, context)
         setpoints_patch = _canonical_recipe_patch_from_context(context)
         name = _recipe_slug(title)
@@ -2876,6 +3150,7 @@ def load_recipe():
         source = recipe_library_path(raw_name, library_dir=_recipe_library_dir())
         setpoints_patch = load_recipe_patch(source)
         metadata = read_recipe_metadata(source)
+        controls = _recipe_controls_for_response(setpoints_patch, metadata)
         sid = str(payload.get('sid') or '').strip()
         applied_to_session = False
         if sid:
@@ -2895,7 +3170,7 @@ def load_recipe():
         'title': title,
         'summary': summary,
         'setpoints_patch': setpoints_patch,
-        'controls': _recipe_controls_from_patch(setpoints_patch),
+        'controls': controls,
         'applied_to_session': applied_to_session,
     })
 

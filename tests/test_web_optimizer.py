@@ -2046,15 +2046,278 @@ def test_recipe_collision_reservation_is_atomic(tmp_path, monkeypatch) -> None:
     assert destination.read_text(encoding="utf-8") == "complete: true\n"
 
 
-@pytest.mark.skip(
-    reason=(
-        "F-300 re-laned: save->load->start identity requires web/static/js "
-        "to apply returned metadata controls, but the web-routes lane owns "
-        "only Flask route/template/test files."
-    ),
-)
-def test_recipe_save_load_start_behavior_identity_relaned_to_frontend() -> None:
-    pass
+def test_recipe_save_load_start_behavior_identity_uses_browser_controls(
+    client,
+    tmp_path,
+    monkeypatch,
+) -> None:
+    import web.events as web_events
+
+    stale_patch = {
+        "campaigns": {
+            "C4": {
+                "temp_range_C": [1580.0, 1580.0],
+                "pO2_mbar_default": 0.08,
+                "p_total_mbar_default": 0.08,
+            }
+        }
+    }
+
+    def fake_recipe_save_context(sid: str) -> dict[str, object]:
+        assert sid == "sid-1"
+        return {
+            "recipe_inputs": {
+                "feedstock": "stale_feedstock",
+                "runtime_campaign_overrides": {
+                    "C4": {"hold_temp_C": 1580.0, "pO2_mbar": 0.08}
+                },
+                "c4_max_temp_C": 1580.0,
+            },
+            "setpoints_patch": stale_patch,
+            "resolved_setpoints_patch": stale_patch,
+            "last_recipe_capture": {"tick": {"campaign": "C4", "pO2_mbar": 0.08}},
+            "last_completion_payload": {},
+        }
+
+    monkeypatch.setattr(web_events, "recipe_save_context", fake_recipe_save_context)
+    recipe_dir = tmp_path / "recipes"
+    client.application.config["RECIPE_LIBRARY_DIR"] = recipe_dir
+
+    save = client.post(
+        "/recipes/save",
+        json={
+            "title": "Identity Recipe",
+            "sid": "sid-1",
+            "controls": {
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1250.0,
+                "backend": "internal-analytical",
+                "track": "mre_baseline",
+                "speed": 0.0,
+                "runtime_campaign_overrides": {
+                    "C4": {
+                        "hold_temp_C": 1600.0,
+                        "pO2_mbar": 0.12,
+                    }
+                },
+                "c4_max_temp_C": 1660.0,
+                "c5_enabled": True,
+                "mre_target_species": "SiO2",
+                "mre_max_voltage_V": 1.25,
+                "mre_preset_id": "si-limited",
+                "additives": {
+                    "Na": 10.0,
+                    "K": 2.0,
+                    "Mg": 3.0,
+                    "Ca": 4.0,
+                    "C": 5.0,
+                },
+                "furnace_material_id": "alumina-hot-face",
+            },
+        },
+    )
+
+    assert save.status_code == 200, save.get_json()
+    recipe_path = recipe_dir / "identity-recipe.yaml"
+    saved = yaml.safe_load(recipe_path.read_text(encoding="utf-8"))
+    assert saved["campaigns"]["C4"]["temp_range_C"] == [1600.0, 1660.0]
+    assert saved["campaigns"]["C4"]["pO2_mbar_default"] == 0.12
+    assert "C5" not in saved["campaigns"]
+    assert "C3" not in saved["campaigns"]
+    assert saved["metadata"]["headline_recipe"]["feedstock"] == "lunar_mare_low_ti"
+    assert saved["metadata"]["headline_recipe"]["mass_kg"] == 1250.0
+
+    load = client.post("/recipes/load", json={"name": "identity-recipe"})
+
+    assert load.status_code == 200
+    controls = load.get_json()["controls"]
+    assert controls["feedstock"] == "lunar_mare_low_ti"
+    assert controls["mass_kg"] == 1250.0
+    assert controls["backend"] == "internal-analytical"
+    assert controls["track"] == "mre_baseline"
+    assert controls["speed"] == 0.0
+    assert controls["lever_campaign"] == "C4"
+    assert controls["stage_temp_C"] == 1600.0
+    assert controls["c4_max_temp_C"] == 1660.0
+    assert controls["mre_preset_id"] == "si-limited"
+    assert controls["mre_target_species"] == "SiO2"
+    assert controls["additives"] == {
+        "Na": 10.0,
+        "K": 2.0,
+        "Mg": 3.0,
+        "Ca": 4.0,
+        "C": 5.0,
+    }
+    assert controls["furnace_material_id"] == "alumina-hot-face"
+
+
+def test_loaded_recipe_start_payload_keeps_patch_and_runtime_overrides() -> None:
+    source = (
+        Path(web_routes.__file__).parent
+        / "static"
+        / "js"
+        / "simulator-controls.js"
+    ).read_text(encoding="utf-8")
+    function = source.split(
+        "function applyLoadedRecipeStartIdentity(payload) {", 1
+    )[1].split("\n}", 1)[0]
+
+    assert "payload.setpoints_patch = loadedRecipePatch" in function
+    assert "payload.runtime_campaign_overrides = buildRuntimeCampaignOverrides()" in function
+    assert "applyLoadedRecipeStartIdentity(payload);" in source
+
+
+def test_recipe_manual_controls_clear_stale_disabled_campaigns(
+    client,
+    tmp_path,
+    monkeypatch,
+) -> None:
+    import web.events as web_events
+
+    stale_patch = {
+        "campaigns": {
+            "C4": {
+                "temp_range_C": [1600.0, 1660.0],
+                "pO2_mbar_default": 0.12,
+                "p_total_mbar_default": 0.12,
+            },
+            "C3": {"alkali_dosing": {"Na_kg": 4.0}},
+            "C5": {"allow_mre_voltage_cap_V": 1.4},
+        }
+    }
+    monkeypatch.setattr(
+        web_events,
+        "recipe_save_context",
+        lambda _sid: {
+            "recipe_inputs": {
+                "c5_enabled": True,
+                "mre_max_voltage_V": 1.4,
+                "additives_kg": {"Na": 4.0},
+            },
+            "setpoints_patch": stale_patch,
+            "resolved_setpoints_patch": stale_patch,
+        },
+    )
+    client.application.config["RECIPE_LIBRARY_DIR"] = tmp_path / "recipes"
+
+    response = client.post(
+        "/recipes/save",
+        json={
+            "title": "Disabled Campaigns",
+            "sid": "sid-1",
+            "controls": {
+                "runtime_campaign_overrides": {
+                    "C4": {"hold_temp_C": 1600.0, "pO2_mbar": 0.12}
+                },
+                "c4_max_temp_C": 1660.0,
+                "c5_enabled": False,
+                "mre_max_voltage_V": 0,
+                "additives": {"Na": 0, "K": 0, "Mg": 0, "Ca": 0, "C": 0},
+            },
+        },
+    )
+
+    assert response.status_code == 200, response.get_json()
+    saved = yaml.safe_load(
+        (tmp_path / "recipes" / "disabled-campaigns.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert "C3" not in saved.get("campaigns", {})
+    assert "C5" not in saved.get("campaigns", {})
+
+
+def test_recipe_manual_controls_overwrite_positive_c3_c5_patch_values() -> None:
+    stale_patch = {
+        "campaigns": {
+            "C4": {
+                "temp_range_C": [1600.0, 1660.0],
+                "pO2_mbar_default": 0.12,
+                "p_total_mbar_default": 0.12,
+            },
+            "C3": {"alkali_dosing": {"Na_kg": 4.0, "K_kg": 3.0}},
+            "C5": {"allow_mre_voltage_cap_V": 1.4},
+        }
+    }
+    patch = web_routes._canonical_recipe_patch_from_context(
+        {
+            "setpoints_patch": stale_patch,
+            "manual_recipe_controls_supplied": True,
+            "recipe_inputs": {
+                "c5_enabled": True,
+                "mre_max_voltage_V": 1.45,
+                "additives_kg": {"Na": 1.5, "K": 1.0},
+            },
+        },
+    )
+    assert patch == {"campaigns": {"C4": stale_patch["campaigns"]["C4"]}}
+
+
+@pytest.mark.parametrize("value", ["true", "false", "yes", "1", 1, None])
+def test_recipe_save_rejects_non_boolean_c5_enabled(
+    client,
+    tmp_path,
+    monkeypatch,
+    value,
+) -> None:
+    import web.events as web_events
+
+    monkeypatch.setattr(web_events, "recipe_save_context", lambda _sid: {})
+    client.application.config["RECIPE_LIBRARY_DIR"] = tmp_path / "recipes"
+
+    response = client.post(
+        "/recipes/save",
+        json={
+            "title": "Strict Boolean",
+            "sid": "sid-1",
+            "controls": {"c5_enabled": value},
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "controls.c5_enabled must be a boolean"
+
+
+def test_recipe_load_rejects_invalid_saved_runtime_overrides(client, tmp_path) -> None:
+    recipe_dir = tmp_path / "recipes"
+    recipe_dir.mkdir()
+    client.application.config["RECIPE_LIBRARY_DIR"] = recipe_dir
+    (recipe_dir / "invalid-runtime.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "furnace_max_T_C": 1800.0,
+                "metadata": {
+                    "title": "Invalid Runtime",
+                    "created_utc": "2026-07-12T00:00:00Z",
+                    "feedstock": "lunar_mare_low_ti",
+                    "campaign": "C4",
+                    "headline_recipe": {
+                        "pinned_knobs": {
+                            "runtime_campaign_overrides": {
+                                "NOT_A_CAMPAIGN": {"not_a_field": 1.0}
+                            }
+                        }
+                    },
+                    "headline_results": {},
+                },
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+    response = client.post("/recipes/load", json={"name": "invalid-runtime"})
+
+    assert response.status_code == 400
+    assert "invalid saved runtime_campaign_overrides" in response.get_json()["error"]
+
+
+@pytest.mark.parametrize("limit", ["1.5", "true", "Infinity", "NaN"])
+def test_optimizer_leaderboard_refuses_non_integer_limit(client, limit) -> None:
+    response = client.get("/api/optimizer/leaderboard", query_string={"limit": limit})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "limit must be an integer"
 
 
 def test_optimizer_job_exit_zero_without_results_fails_loud(client) -> None:

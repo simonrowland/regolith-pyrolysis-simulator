@@ -1227,12 +1227,9 @@ def register_events(socketio):
                     )
                 except RecipeIOError as exc:
                     raise InputValidationError(str(exc)) from exc
-            if setpoints_patch:
-                runtime_campaign_overrides: dict[str, dict[str, float]] = {}
-            else:
-                runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
-                    data.get('runtime_campaign_overrides')
-                )
+            runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
+                data.get('runtime_campaign_overrides')
+            )
         except InputValidationError as exc:
             socketio.emit('simulation_status', {
                 'status': 'error',

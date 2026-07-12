@@ -167,6 +167,57 @@ function buildRuntimeCampaignOverrides() {
     return Object.keys(fields).length ? {[campaign]: fields} : {};
 }
 
+function selectedRadioValue(name) {
+    return document.querySelector(`input[name="${name}"]:checked`)?.value || '';
+}
+
+function setRadioValue(name, value) {
+    const radio = document.querySelector(`input[name="${name}"][value="${String(value)}"]`);
+    if (radio) radio.checked = true;
+}
+
+function finiteInputValue(id) {
+    const value = parseFloat(document.getElementById(id)?.value || '');
+    return Number.isFinite(value) ? value : null;
+}
+
+function currentAdditivesPayload() {
+    const ids = {Na: 'add-na', K: 'add-k', Mg: 'add-mg', Ca: 'add-ca', C: 'add-c'};
+    return Object.fromEntries(
+        Object.entries(ids).map(([species, id]) => [
+            species,
+            finiteInputValue(id) ?? 0,
+        ]),
+    );
+}
+
+function currentRecipeControlsPayload() {
+    const speedMs = parseInt(selectedRadioValue('speed') || '1000', 10);
+    const mre = selectedMrePayload();
+    const mreOption = selectedMreOption();
+    return {
+        feedstock: document.getElementById('feedstock-select')?.value || '',
+        mass_kg: finiteInputValue('batch-mass'),
+        backend: document.getElementById('engine-select')?.value || '',
+        track: selectedRadioValue('track') || 'pyrolysis',
+        speed: Number.isFinite(speedMs) ? speedMs / 1000.0 : 1.0,
+        runtime_campaign_overrides: buildRuntimeCampaignOverrides(),
+        c4_max_temp_C: selectedC4MaxTempC(),
+        c5_enabled: mre.c5_enabled,
+        mre_target_species: mre.mre_target_species,
+        mre_max_voltage_V: mre.mre_max_voltage_V,
+        mre_preset_id: mreOption?.value || '',
+        additives: currentAdditivesPayload(),
+        furnace_material_id: selectedFurnaceMaterialId(),
+    };
+}
+
+function applyLoadedRecipeStartIdentity(payload) {
+    if (loadedRecipePatch) payload.setpoints_patch = loadedRecipePatch;
+    payload.runtime_campaign_overrides = buildRuntimeCampaignOverrides();
+    return payload;
+}
+
 let loadedRecipePatch = null;
 let recipeChoices = [];
 let lastRecipeTick = null;
@@ -459,14 +510,52 @@ function applyLoadedRecipeControls(controls) {
         const el = document.getElementById(id);
         if (el && value !== undefined && value !== null) el.value = String(value);
     };
+    const setAdditive = (id, value) => {
+        const el = document.getElementById(id);
+        if (el && value !== undefined && value !== null) {
+            el.value = String(value);
+            el.dataset.userEdited = 'true';
+        }
+    };
+    setValue('feedstock-select', controls.feedstock);
+    setValue('batch-mass', controls.mass_kg);
+    setValue('engine-select', controls.backend);
+    setRadioValue('track', controls.track);
+    if (controls.speed !== undefined && controls.speed !== null) {
+        setRadioValue('speed', Math.round(Number(controls.speed) * 1000));
+    }
     setValue('lever-campaign', controls.lever_campaign);
     setValue('lever-po2-mbar', controls.pO2_mbar);
     setValue('lever-pn2-mbar', controls.p_total_mbar);
     setValue('lever-stage-temp', controls.stage_temp_C);
+    setValue('lever-stage-duration', controls.stage_duration_h);
+    setValue('lever-stage-ramp', controls.stage_ramp_C_per_h);
     setValue('c4-max-temp', controls.c4_max_temp_C ?? controls.furnace_max_T_C);
+    setValue('furnace-material', controls.furnace_material_id);
+    setAdditive('add-na', controls.additives?.Na);
+    setAdditive('add-k', controls.additives?.K);
+    setAdditive('add-mg', controls.additives?.Mg);
+    setAdditive('add-ca', controls.additives?.Ca);
+    setAdditive('add-c', controls.additives?.C);
     if (controls.mre_enabled !== undefined) {
         const mreEnabled = document.getElementById('mre-enabled');
         if (mreEnabled) mreEnabled.checked = controls.mre_enabled === true;
+        setValue('mre-preset', controls.mre_preset_id);
+        const mrePreset = document.getElementById('mre-preset');
+        if (
+            mrePreset
+            && controls.mre_target_species
+            && mrePreset.value !== controls.mre_preset_id
+        ) {
+            const targetOption = Array.from(mrePreset.options).find(option => (
+                option.dataset.targetSpecies === controls.mre_target_species
+                && (
+                    controls.mre_max_voltage_V === undefined
+                    || Number(option.dataset.maxVoltage || 0) === Number(controls.mre_max_voltage_V)
+                )
+            ));
+            if (targetOption) mrePreset.value = targetOption.value;
+        }
         updateMreFields();
     }
     updateKnudsenIndicator();
@@ -615,7 +704,12 @@ document.getElementById('recipe-save-confirm')?.addEventListener('click', () => 
     recipeFetchJson('/recipes/save', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({title, sid}),
+        body: JSON.stringify({
+            title,
+            sid,
+            controls: currentRecipeControlsPayload(),
+            setpoints_patch: loadedRecipePatch,
+        }),
     }).then(data => {
         hideRecipeModal('save-recipe-modal');
         setStatusText(`Saved recipe: ${data.title || data.name}`);
@@ -643,7 +737,10 @@ document.getElementById('recipe-load-confirm')?.addEventListener('click', () => 
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({name, sid}),
     }).then(data => {
-        loadedRecipePatch = data.setpoints_patch || null;
+        loadedRecipePatch = (
+            data.setpoints_patch
+            && Object.keys(data.setpoints_patch).length
+        ) ? data.setpoints_patch : null;
         applyLoadedRecipeControls(data.controls || {});
         hideRecipeModal('load-recipe-modal');
         setStatusText(`Loaded recipe: ${data.title || data.name}`);
@@ -686,11 +783,7 @@ document.getElementById('btn-start').addEventListener('click', () => {
             C: parseFloat(document.getElementById('add-c').value) || 0,
         },
     };
-    if (loadedRecipePatch) {
-        payload.setpoints_patch = loadedRecipePatch;
-    } else {
-        payload.runtime_campaign_overrides = buildRuntimeCampaignOverrides();
-    }
+    applyLoadedRecipeStartIdentity(payload);
     if (furnaceMaterialId) payload.furnace_material_id = furnaceMaterialId;
     socket.emit('start_simulation', payload);
 

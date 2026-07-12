@@ -304,7 +304,7 @@ def test_recipe_save_list_load_endpoints_round_trip_without_run(
             _clear_simulation_state(active_sid)
 
 
-def test_loaded_recipe_start_ignores_stale_runtime_levers(
+def test_loaded_recipe_start_applies_restored_runtime_levers(
     tmp_path,
     monkeypatch,
 ):
@@ -366,8 +366,13 @@ def test_loaded_recipe_start_ignores_stale_runtime_levers(
         state, _ = _current_simulation_state(new_sids.pop())
         assert state is not None
         sim = state["session"].simulator
-        assert state["recipe_inputs"]["runtime_campaign_overrides"] == {}
-        assert sim.campaign_mgr.overrides.get("C4", {}) == {}
+        assert state["recipe_inputs"]["runtime_campaign_overrides"] == {
+            "C4": {"pO2_mbar": 0.2, "hold_temp_C": 1600.0}
+        }
+        assert sim.campaign_mgr.overrides["C4"] == {
+            "pO2_mbar": 0.2,
+            "hold_temp_C": 1600.0,
+        }
         assert sim.campaign_mgr.c4_max_temp_C == pytest.approx(1595.0)
         assert sim.setpoints["campaigns"]["C4"]["temp_range_C"] == pytest.approx(
             [1585.0, 1595.0]
@@ -486,7 +491,9 @@ def test_staged_recipe_save_load_start_is_identity(
         assert len(new_sids) == 1
         state, _ = _current_simulation_state(new_sids.pop())
         assert state is not None
-        assert state["recipe_inputs"]["runtime_campaign_overrides"] == {}
+        assert state["recipe_inputs"]["runtime_campaign_overrides"] == {
+            "C4": {"hold_temp_C": 1600.0, "pO2_mbar": 0.2}
+        }
         assert state["resolved_setpoints_patch"] == saved_patch
         assert (
             state["session"]
@@ -636,6 +643,91 @@ def test_recipe_ui_uses_text_content_for_loaded_titles() -> None:
         in controls
     )
     assert "clearLoadedRecipeForManualEdit" in controls
+
+
+def test_loaded_recipe_dom_controls_reach_start_payload() -> None:
+    controls_path = _REPO_ROOT / "web/static/js/simulator-controls.js"
+    harness = r"""
+const fs = require('fs');
+const vm = require('vm');
+const source = fs.readFileSync(process.argv[2], 'utf8');
+function functionSource(name) {
+    const start = source.indexOf(`function ${name}(`);
+    if (start < 0) throw new Error(`missing function ${name}`);
+    const open = source.indexOf('{', start);
+    let depth = 0;
+    for (let i = open; i < source.length; i += 1) {
+        if (source[i] === '{') depth += 1;
+        if (source[i] === '}' && --depth === 0) return source.slice(start, i + 1);
+    }
+    throw new Error(`unterminated function ${name}`);
+}
+const elements = Object.fromEntries([
+    'lever-campaign', 'lever-po2-mbar', 'lever-pn2-mbar',
+    'lever-stage-temp', 'lever-stage-duration', 'lever-stage-ramp',
+    'c4-max-temp', 'feedstock-select', 'batch-mass', 'engine-select',
+    'furnace-material', 'add-na', 'add-k', 'add-mg', 'add-ca', 'add-c',
+].map(id => [id, {id, value: '', dataset: {}}]));
+const leverFields = {
+    'lever-po2-mbar': 'pO2_mbar',
+    'lever-pn2-mbar': 'p_total_mbar',
+    'lever-stage-temp': 'hold_temp_C',
+    'lever-stage-duration': 'max_hours',
+    'lever-stage-ramp': 'ramp_rate',
+};
+for (const [id, field] of Object.entries(leverFields)) elements[id].dataset.field = field;
+const context = {
+    document: {
+        getElementById: id => elements[id] || null,
+        querySelectorAll: selector => selector === '.recipe-lever[data-field]'
+            ? Object.keys(leverFields).map(id => elements[id]) : [],
+        querySelector: () => null,
+    },
+    updateMreFields: () => {},
+    updateKnudsenIndicator: () => {},
+    updateLeverWarning: () => {},
+    console,
+};
+vm.createContext(context);
+vm.runInContext([
+    functionSource('selectedLeverCampaign'),
+    functionSource('buildRuntimeCampaignOverrides'),
+    functionSource('setRadioValue'),
+    functionSource('applyLoadedRecipeControls'),
+    functionSource('applyLoadedRecipeStartIdentity'),
+    'let loadedRecipePatch = null;',
+].join('\n'), context);
+vm.runInContext(`
+applyLoadedRecipeControls({
+    lever_campaign: 'C4', pO2_mbar: 0.12, p_total_mbar: 0.12,
+    stage_temp_C: 1600, stage_duration_h: 7.5, stage_ramp_C_per_h: 22
+});
+loadedRecipePatch = {campaigns: {C4: {temp_range_C: [1600, 1660]}}};
+const payload = {};
+applyLoadedRecipeStartIdentity(payload);
+console.log(JSON.stringify(payload));
+`, context);
+"""
+    completed = subprocess.run(
+        ["node", "-", str(controls_path)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert json.loads(completed.stdout) == {
+        "setpoints_patch": {"campaigns": {"C4": {"temp_range_C": [1600, 1660]}}},
+        "runtime_campaign_overrides": {
+            "C4": {
+                "pO2_mbar": 0.12,
+                "p_total_mbar": 0.12,
+                "hold_temp_C": 1600,
+                "max_hours": 7.5,
+                "ramp_rate": 22,
+            }
+        },
+    }
 
 
 def test_recipe_ui_renders_per_hour_redox_summary_payload_keys() -> None:
@@ -1316,6 +1408,77 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
         sim = state["session"].simulator
         assert sim.c4_max_temp_C == pytest.approx(1715)
         assert sim.campaign_mgr.c4_max_temp_C == pytest.approx(1715)
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_loaded_recipe_start_applies_patch_and_runtime_overrides(monkeypatch):
+    captured_tasks = []
+
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
+        backend.initialize({})
+        return backend
+
+    def capture_background_task(target, *args, **kwargs):
+        captured_tasks.append((target, args, kwargs))
+        return {"captured_task": len(captured_tasks)}
+
+    monkeypatch.setattr(web_events, "_get_backend", force_internal_analytical_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        capture_background_task,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+                "setpoints_patch": {
+                    "campaigns": {
+                        "C4": {
+                            "temp_range_C": [1600.0, 1660.0],
+                            "pO2_mbar_default": 0.12,
+                            "p_total_mbar_default": 0.12,
+                        }
+                    }
+                },
+                "runtime_campaign_overrides": {
+                    "C4": {"max_hours": 7.5, "ramp_rate": 22.0}
+                },
+            },
+        )
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["status"] == "started"
+
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        state, _ = _current_simulation_state(new_sids.pop())
+        assert state is not None
+        assert state["setpoints_patch"]["campaigns"]["C4"]["temp_range_C"] == [
+            1600.0,
+            1660.0,
+        ]
+        assert state["recipe_inputs"]["runtime_campaign_overrides"] == {
+            "C4": {"max_hours": 7.5, "ramp_rate": 22.0}
+        }
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
