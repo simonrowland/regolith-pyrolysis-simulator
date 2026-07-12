@@ -1398,3 +1398,31 @@ def test_actual_pressure_and_explicit_iron_couple_are_expedited_key_axes():
 
     assert expedited_key(base) != expedited_key(pressure)
     assert expedited_key(base) != expedited_key(ferric)
+
+
+def test_job_runtime_settings_run_mode_sourcing(monkeypatch):
+    """Pre-run-mode-era keys need the explicit drain assumption; identity is
+    never backfilled, so the assumption is recorded as the source."""
+    import scripts.grid_pregrind as gp
+
+    class _Job:
+        def __init__(self, inputs):
+            self.inputs = inputs
+
+    queued = _Job({"timeout_s": 20.0, "subprocess_run_mode": "isothermal"})
+    legacy = _Job({"timeout_s": 20.0})
+
+    monkeypatch.setattr(gp, "_ASSUMED_QUEUED_RUN_MODE", None)
+    assert gp._job_runtime_settings(queued) == (20.0, "isothermal", "queued")
+    import pytest as _pytest
+    with _pytest.raises(ValueError, match="subprocess_run_mode"):
+        gp._job_runtime_settings(legacy)
+
+    monkeypatch.setattr(gp, "_ASSUMED_QUEUED_RUN_MODE", "isothermal")
+    assert gp._job_runtime_settings(legacy) == (
+        20.0,
+        "isothermal",
+        "drain_assumption",
+    )
+    # A queued mode always wins over the assumption.
+    assert gp._job_runtime_settings(queued) == (20.0, "isothermal", "queued")

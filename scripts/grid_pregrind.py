@@ -862,7 +862,15 @@ def _worker_failure_output(
     }
 
 
-def _job_runtime_settings(job: WorkerJob) -> tuple[float, str]:
+# Pre-run-mode-era grid keys (e.g. the fixed-backbone-v3 batch) carry no
+# subprocess_run_mode in their canonical vectors, and the vector is key
+# IDENTITY — it must never be backfilled. --assume-queued-run-mode lets the
+# drain operator state the batch's intended mode explicitly; the assumption
+# is recorded per output row (run_mode_source) so provenance stays honest.
+_ASSUMED_QUEUED_RUN_MODE: str | None = None
+
+
+def _job_runtime_settings(job: WorkerJob) -> tuple[float, str, str]:
     try:
         timeout_s = float(job.inputs["timeout_s"])
     except (KeyError, TypeError, ValueError) as exc:
@@ -872,19 +880,23 @@ def _job_runtime_settings(job: WorkerJob) -> tuple[float, str]:
             f"queued AlphaMELTS job timeout_s must be positive and finite: {timeout_s!r}"
         )
     run_mode = str(job.inputs.get("subprocess_run_mode") or "")
+    run_mode_source = "queued"
+    if not run_mode and _ASSUMED_QUEUED_RUN_MODE:
+        run_mode = _ASSUMED_QUEUED_RUN_MODE
+        run_mode_source = "drain_assumption"
     if run_mode != "isothermal":
         raise ValueError(
             "queued AlphaMELTS job subprocess_run_mode must be 'isothermal': "
             f"{run_mode!r}"
         )
-    return timeout_s, run_mode
+    return timeout_s, run_mode, run_mode_source
 
 
 def _record_job_runtime(
     job: WorkerJob,
     output: MutableMapping[str, Any],
 ) -> None:
-    timeout_s, run_mode = _job_runtime_settings(job)
+    timeout_s, run_mode, run_mode_source = _job_runtime_settings(job)
     output_run_mode = output.get("run_mode")
     if output_run_mode is not None and str(output_run_mode) != run_mode:
         raise RuntimeError(
@@ -897,6 +909,7 @@ def _record_job_runtime(
             f"queued={timeout_s!r}, applied={output_timeout!r}"
         )
     output["run_mode"] = run_mode
+    output["run_mode_source"] = run_mode_source
     output["applied_timeout_s"] = timeout_s
 
 
@@ -905,7 +918,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
     captures: list[dict[str, Any]] = []
     native_input: dict[str, Any] | None = None
     try:
-        applied_timeout_s, run_mode = _job_runtime_settings(job)
+        applied_timeout_s, run_mode, _run_mode_source = _job_runtime_settings(job)
     except Exception as exc:
         return job.grid_key_id, _worker_failure_output(
             exc,
@@ -1307,6 +1320,17 @@ def parser() -> argparse.ArgumentParser:
     )
     result.add_argument("--shard", choices=("all", "0", "1", "2"), default="all")
     result.add_argument(
+        "--assume-queued-run-mode",
+        choices=("isothermal",),
+        default=None,
+        help=(
+            "Explicit operator statement of the intended run mode for "
+            "pre-run-mode-era queued keys whose canonical vectors lack "
+            "subprocess_run_mode (key identity is never backfilled); "
+            "recorded per output row as run_mode_source=drain_assumption."
+        ),
+    )
+    result.add_argument(
         "--engine-epoch",
         type=int,
         default=2,
@@ -1604,6 +1628,8 @@ def run_drain_only(args: argparse.Namespace) -> int:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parser().parse_args(argv)
+    global _ASSUMED_QUEUED_RUN_MODE
+    _ASSUMED_QUEUED_RUN_MODE = args.assume_queued_run_mode
     _validate_args(args)
     signal.signal(signal.SIGTERM, _request_stop)
     signal.signal(signal.SIGINT, _request_stop)
