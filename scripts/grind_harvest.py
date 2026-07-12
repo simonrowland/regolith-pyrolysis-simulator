@@ -179,6 +179,18 @@ def _ensure_harvest_schema(connection: sqlite3.Connection) -> None:
                 source_table, source_row_id
             )
         );
+        CREATE TABLE IF NOT EXISTS harvest_batch_map (
+            source_host TEXT NOT NULL,
+            source_database TEXT NOT NULL,
+            source_generation TEXT NOT NULL,
+            source_batch_id INTEGER NOT NULL,
+            source_label TEXT NOT NULL,
+            target_batch_id INTEGER NOT NULL REFERENCES batches(batch_id),
+            mapped_at TEXT NOT NULL,
+            PRIMARY KEY(
+                source_host, source_database, source_generation, source_batch_id
+            )
+        );
         """
     )
 
@@ -339,6 +351,155 @@ def _mark_consumed(
     )
 
 
+def _mapped_batch_id(
+    connection: sqlite3.Connection,
+    source: sqlite3.Connection,
+    batch_row: sqlite3.Row,
+    *,
+    source_host: str,
+    source_database: str,
+    source_generation: str,
+    source_table: str,
+) -> int:
+    source_batch_id = int(batch_row["batch_id"])
+    mapping = connection.execute(
+        "SELECT source_label, target_batch_id FROM harvest_batch_map "
+        "WHERE source_host = ? AND source_database = ? "
+        "AND source_generation = ? AND source_batch_id = ?",
+        (source_host, source_database, source_generation, source_batch_id),
+    ).fetchone()
+    if mapping is not None:
+        if str(mapping["source_label"]) != str(batch_row["label"]):
+            raise RuntimeError(
+                f"source batch definition changed for {source_batch_id}"
+            )
+        target_batch_id = int(mapping["target_batch_id"])
+        target_batch = connection.execute(
+            "SELECT kind, seed, params_json FROM batches WHERE batch_id = ?",
+            (target_batch_id,),
+        ).fetchone()
+        if target_batch is None or tuple(target_batch) != (
+            batch_row["kind"],
+            batch_row["seed"],
+            batch_row["params_json"],
+        ):
+            raise RuntimeError(
+                f"mapped batch definition drift for {source_batch_id}"
+            )
+        return target_batch_id
+
+    legacy_target_batch_ids: set[int] = set()
+    for receipt in connection.execute(
+        "SELECT source_row_id, expedited_key, engine_epoch "
+        "FROM harvest_pulled_rows WHERE source_host = ? "
+        "AND source_database = ? AND source_generation = ? "
+        "AND source_table = ? AND terminal_state IN (?, ?)",
+        (
+            source_host,
+            source_database,
+            source_generation,
+            source_table,
+            _TERMINAL_PULLED,
+            _TERMINAL_EQUIVALENT,
+        ),
+    ):
+        source_output = source.execute(
+            f'SELECT grid_key_id, expedited_key, engine_epoch FROM "{source_table}" '
+            "WHERE id = ?",
+            (int(receipt["source_row_id"]),),
+        ).fetchone()
+        if source_output is None or (
+            str(source_output["expedited_key"]) != str(receipt["expedited_key"])
+            or int(source_output["engine_epoch"]) != int(receipt["engine_epoch"])
+        ):
+            continue
+        source_input = source.execute(
+            "SELECT batch_id FROM grid_keys WHERE id = ?",
+            (int(source_output["grid_key_id"]),),
+        ).fetchone()
+        if source_input is None or int(source_input["batch_id"]) != source_batch_id:
+            continue
+        target_input = connection.execute(
+            "SELECT g.batch_id FROM alphamelts_outputs o "
+            "JOIN grid_keys g ON g.id = o.grid_key_id "
+            "WHERE o.expedited_key = ? AND o.engine_epoch = ?",
+            (str(receipt["expedited_key"]), int(receipt["engine_epoch"])),
+        ).fetchone()
+        if target_input is not None:
+            legacy_target_batch_ids.add(int(target_input["batch_id"]))
+    if len(legacy_target_batch_ids) > 1:
+        raise RuntimeError(
+            f"ambiguous legacy batch mapping for source batch {source_batch_id}"
+        )
+    if legacy_target_batch_ids:
+        target_batch_id = next(iter(legacy_target_batch_ids))
+        target_batch = connection.execute(
+            "SELECT kind, seed, params_json FROM batches WHERE batch_id = ?",
+            (target_batch_id,),
+        ).fetchone()
+        if target_batch is None or tuple(target_batch) != (
+            batch_row["kind"],
+            batch_row["seed"],
+            batch_row["params_json"],
+        ):
+            raise RuntimeError(
+                f"legacy batch definition drift for {source_batch_id}"
+            )
+        connection.execute(
+            "INSERT INTO harvest_batch_map("
+            "source_host, source_database, source_generation, source_batch_id, "
+            "source_label, target_batch_id, mapped_at"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (
+                source_host,
+                source_database,
+                source_generation,
+                source_batch_id,
+                str(batch_row["label"]),
+                target_batch_id,
+                utc_now(),
+            ),
+        )
+        return target_batch_id
+
+    identity = json.dumps(
+        [source_host, source_database, source_generation, source_batch_id],
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    suffix = hashlib.sha256(identity.encode("utf-8")).hexdigest()
+    target_label = f"{batch_row['label']}--harvest-{suffix}"
+    cursor = connection.execute(
+        "INSERT INTO batches(label, kind, seed, params_json, created_at, generator_host) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (
+            target_label,
+            batch_row["kind"],
+            batch_row["seed"],
+            batch_row["params_json"],
+            batch_row["created_at"],
+            batch_row["generator_host"],
+        ),
+    )
+    target_batch_id = int(cursor.lastrowid)
+    connection.execute(
+        "INSERT INTO harvest_batch_map("
+        "source_host, source_database, source_generation, source_batch_id, "
+        "source_label, target_batch_id, mapped_at"
+        ") VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (
+            source_host,
+            source_database,
+            source_generation,
+            source_batch_id,
+            str(batch_row["label"]),
+            target_batch_id,
+            utc_now(),
+        ),
+    )
+    return target_batch_id
+
+
 def harvest_snapshot(
     source_path: str | Path,
     accumulator_path: str | Path,
@@ -482,22 +643,15 @@ def harvest_snapshot(
                     raise RuntimeError(
                         f"source grid key {input_row['id']} references missing batch"
                     )
-                batch_values = dict(batch_row)
-                _insert_or_ignore(target, "batches", batch_values)
-                local_batch = target.execute(
-                    "SELECT label, kind, seed, params_json FROM batches "
-                    "WHERE batch_id = ?",
-                    (int(batch_row["batch_id"]),),
-                ).fetchone()
-                if local_batch is None or tuple(local_batch) != (
-                    batch_row["label"],
-                    batch_row["kind"],
-                    batch_row["seed"],
-                    batch_row["params_json"],
-                ):
-                    raise RuntimeError(
-                        f"batch-id collision while harvesting {batch_row['batch_id']}"
-                    )
+                local_batch_id = _mapped_batch_id(
+                    target,
+                    source,
+                    batch_row,
+                    source_host=source_host,
+                    source_database=source_identity,
+                    source_generation=source_generation,
+                    source_table=table,
+                )
                 # Canonical key is identity. Raw source ids are preferred only
                 # when free; after a restore (fingerprint mismatch) an old id
                 # may carry a different key — never abort before key reconcile.
@@ -511,18 +665,19 @@ def harvest_snapshot(
                         column: input_row[column]
                         for column in source_input_columns
                     }
+                    input_values["batch_id"] = local_batch_id
                     preferred_grid_id = int(input_row["id"])
                     grid_id_holder = target.execute(
                         "SELECT expedited_key FROM grid_keys WHERE id = ?",
                         (preferred_grid_id,),
                     ).fetchone()
                     rank_holder = target.execute(
-                        "SELECT expedited_key FROM grid_keys "
-                        "WHERE batch_id = ? AND shuffle_rank = ?",
-                        (
-                            int(input_row["batch_id"]),
-                            int(input_row["shuffle_rank"]),
-                        ),
+                            "SELECT expedited_key FROM grid_keys "
+                            "WHERE batch_id = ? AND shuffle_rank = ?",
+                            (
+                                local_batch_id,
+                                int(input_row["shuffle_rank"]),
+                            ),
                     ).fetchone()
                     # Restore can reuse raw id and/or (batch, shuffle_rank) under
                     # a new key. Prefer source placement only when free; otherwise
@@ -545,7 +700,7 @@ def harvest_snapshot(
                                 target.execute(
                                     "SELECT COALESCE(MAX(shuffle_rank), -1) + 1 "
                                     "FROM grid_keys WHERE batch_id = ?",
-                                    (int(input_row["batch_id"]),),
+                                    (local_batch_id,),
                                 ).fetchone()[0]
                             )
                             input_values["shuffle_rank"] = free_rank

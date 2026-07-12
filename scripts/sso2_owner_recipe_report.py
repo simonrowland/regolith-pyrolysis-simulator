@@ -8,7 +8,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -32,7 +32,7 @@ DEFAULT_OUTPUT = (
 )
 
 
-def main() -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--hours", type=int, default=9)
@@ -41,7 +41,7 @@ def main() -> int:
         default=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     )
     parser.add_argument("--json", action="store_true", help="also write a .json sidecar")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     execution = build_sso2_owner_recipe_execution(
         hours=args.hours,
@@ -58,7 +58,7 @@ def main() -> int:
         )
     print(f"status: {evidence['status']}")
     print(f"report: {_display_path(output)}")
-    return 0
+    return 0 if evidence["status"] == "available" else 2
 
 
 def _markdown_report(evidence: Mapping[str, Any], execution: Any) -> str:

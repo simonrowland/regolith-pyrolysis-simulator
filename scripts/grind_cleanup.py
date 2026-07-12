@@ -23,7 +23,18 @@ ALLOWLIST_PATTERNS: tuple[str, ...] = (
     "regolith-cache-archive-*",
 )
 PROTECTED_REPO_NAMES = {".git", ".venv", "docs-private"}
-REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _repo_root_from_script(script_file: str) -> Path | None:
+    if script_file.startswith("<") and script_file.endswith(">"):
+        return None
+    resolved = Path(script_file).resolve(strict=False)
+    if len(resolved.parents) < 2:
+        return None
+    return resolved.parents[1]
+
+
+REPO_ROOT = _repo_root_from_script(__file__)
 
 
 @dataclass(frozen=True)
@@ -61,7 +72,10 @@ def matched_allowlist_pattern(path: Path) -> str | None:
 
 
 def protected_paths(repo_root: Path | None = None) -> tuple[Path, ...]:
-    root = (repo_root or REPO_ROOT).resolve(strict=False)
+    root_value = repo_root or REPO_ROOT
+    if root_value is None:
+        return ()
+    root = root_value.resolve(strict=False)
     return (
         root,
         root / ".git",

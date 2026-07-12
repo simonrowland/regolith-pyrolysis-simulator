@@ -10,6 +10,7 @@ import math
 import os
 import socket
 import sqlite3
+import time
 import urllib.parse
 import uuid
 from enum import Enum
@@ -330,6 +331,15 @@ CREATE TABLE IF NOT EXISTS grid_keys (
     UNIQUE(batch_id, shuffle_rank)
 );
 
+CREATE TABLE IF NOT EXISTS grid_key_claims (
+    grid_key_id INTEGER NOT NULL REFERENCES grid_keys(id),
+    engine_epoch INTEGER NOT NULL,
+    claim_owner TEXT NOT NULL,
+    claimed_at_epoch REAL NOT NULL,
+    expires_at_epoch REAL NOT NULL,
+    PRIMARY KEY(grid_key_id, engine_epoch)
+);
+
 CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     grid_key_id INTEGER NOT NULL REFERENCES grid_keys(id),
@@ -440,6 +450,8 @@ CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_status
     ON alphamelts_outputs(status, engine_epoch);
 CREATE INDEX IF NOT EXISTS idx_grid_keys_drain
     ON grid_keys(batch_id, shard, shuffle_rank);
+CREATE INDEX IF NOT EXISTS idx_grid_key_claims_expiry
+    ON grid_key_claims(expires_at_epoch);
 """
 
 
@@ -453,6 +465,7 @@ class GridCacheWriter:
     ):
         self.path = Path(path)
         self.engine_epoch = int(engine_epoch)
+        self.claim_owner = f"{socket.gethostname()}:{os.getpid()}:{uuid.uuid4()}"
         if self.engine_epoch < 1:
             raise ValueError("engine_epoch must be >= 1")
         if existing_only:
@@ -512,11 +525,13 @@ class GridCacheWriter:
             # forward columns only; historical rows remain untouched.
             self._ensure_v2_provenance_columns()
             self._ensure_runmode_output_columns()
+            self._ensure_claim_table()
             self.connection.commit()
         else:
             self.connection.executescript(SCHEMA_SQL)
             self._ensure_v2_provenance_columns()
             self._ensure_runmode_output_columns()
+            self._ensure_claim_table()
             self._set_metadata("schema_variant", SCHEMA_VARIANT)
             self._set_metadata(
                 "expedited_key_note",
@@ -644,6 +659,42 @@ class GridCacheWriter:
                         f'ALTER TABLE "{table}" ADD COLUMN '
                         f'"{name}" {column_type}'
                     )
+
+    def _ensure_claim_table(self) -> None:
+        self.connection.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS grid_key_claims (
+                grid_key_id INTEGER NOT NULL REFERENCES grid_keys(id),
+                engine_epoch INTEGER NOT NULL,
+                claim_owner TEXT NOT NULL,
+                claimed_at_epoch REAL NOT NULL,
+                expires_at_epoch REAL NOT NULL,
+                PRIMARY KEY(grid_key_id, engine_epoch)
+            );
+            CREATE INDEX IF NOT EXISTS idx_grid_key_claims_expiry
+                ON grid_key_claims(expires_at_epoch);
+            """
+        )
+
+    def _begin_write_section(self, savepoint_name: str) -> str | None:
+        if self.connection.in_transaction:
+            self.connection.execute(f"SAVEPOINT {savepoint_name}")
+            return savepoint_name
+        self.connection.execute("BEGIN IMMEDIATE")
+        return None
+
+    def _finish_write_section(self, savepoint_name: str | None) -> None:
+        if savepoint_name is None:
+            self.connection.commit()
+        else:
+            self.connection.execute(f"RELEASE SAVEPOINT {savepoint_name}")
+
+    def _rollback_write_section(self, savepoint_name: str | None) -> None:
+        if savepoint_name is None:
+            self.connection.rollback()
+        else:
+            self.connection.execute(f"ROLLBACK TO SAVEPOINT {savepoint_name}")
+            self.connection.execute(f"RELEASE SAVEPOINT {savepoint_name}")
 
     def _set_metadata(self, key: str, value: str, *, overwrite: bool = True) -> None:
         existing = self.connection.execute(
@@ -779,37 +830,77 @@ class GridCacheWriter:
         fetch_limit: int | None = None,
         grid_key_ids: Sequence[int] | None = None,
     ) -> list[dict[str, Any]]:
-        clauses = ["g.batch_id = ?", "o.id IS NULL", "g.shuffle_rank > ?"]
-        parameters: list[Any] = [
-            self.engine_epoch,
-            int(batch_id),
-            int(after_shuffle_rank),
-        ]
-        if shard is not None:
-            clauses.append("g.shard = ?")
-            parameters.append(int(shard))
-        if rank_limit is not None:
-            clauses.append("g.shuffle_rank < ?")
-            parameters.append(int(rank_limit))
-        if grid_key_ids is not None:
-            if not grid_key_ids:
+        now = time.time()
+        if grid_key_ids is not None and not grid_key_ids:
+            return []
+        if fetch_limit is not None and int(fetch_limit) <= 0:
+            return []
+        write_section = self._begin_write_section("grid_key_claim_pending")
+        try:
+            self.connection.execute(
+                "DELETE FROM grid_key_claims WHERE expires_at_epoch <= ?",
+                (now,),
+            )
+            clauses = [
+                "g.batch_id = ?",
+                "o.id IS NULL",
+                "c.grid_key_id IS NULL",
+                "g.shuffle_rank > ?",
+            ]
+            parameters: list[Any] = [
+                self.engine_epoch,
+                self.engine_epoch,
+                int(batch_id),
+                int(after_shuffle_rank),
+            ]
+            if shard is not None:
+                clauses.append("g.shard = ?")
+                parameters.append(int(shard))
+            if rank_limit is not None:
+                clauses.append("g.shuffle_rank < ?")
+                parameters.append(int(rank_limit))
+            if grid_key_ids is not None:
+                placeholders = ",".join("?" for _ in grid_key_ids)
+                clauses.append(f"g.id IN ({placeholders})")
+                parameters.extend(int(value) for value in grid_key_ids)
+            query = (
+                "SELECT g.id, g.expedited_key, g.canonical_vector, "
+                "g.kress91_partition_provenance_json, "
+                "g.shuffle_rank, g.shard, g.timeout_s FROM grid_keys g "
+                "LEFT JOIN alphamelts_outputs o ON o.expedited_key = g.expedited_key "
+                "AND o.engine_epoch = ? "
+                "LEFT JOIN grid_key_claims c ON c.grid_key_id = g.id "
+                "AND c.engine_epoch = ? WHERE "
+                + " AND ".join(clauses)
+                + " ORDER BY g.shuffle_rank"
+            )
+            if fetch_limit is not None:
+                # The drain caller asks in pages, but claims must follow actual
+                # worker capacity rather than reserving an entire page at once.
+                query += " LIMIT 1"
+            rows = self.connection.execute(query, tuple(parameters)).fetchall()
+            if not rows:
+                self._finish_write_section(write_section)
                 return []
-            placeholders = ",".join("?" for _ in grid_key_ids)
-            clauses.append(f"g.id IN ({placeholders})")
-            parameters.extend(int(value) for value in grid_key_ids)
-        query = (
-            "SELECT g.id, g.expedited_key, g.canonical_vector, "
-            "g.kress91_partition_provenance_json, "
-            "g.shuffle_rank, g.shard FROM grid_keys g "
-            "LEFT JOIN alphamelts_outputs o ON o.expedited_key = g.expedited_key "
-            "AND o.engine_epoch = ? WHERE "
-            + " AND ".join(clauses)
-            + " ORDER BY g.shuffle_rank"
-        )
-        if fetch_limit is not None:
-            query += " LIMIT ?"
-            parameters.append(int(fetch_limit))
-        rows = self.connection.execute(query, tuple(parameters))
+            for row in rows:
+                lease_s = max(3600.0, float(row["timeout_s"]) * 2.0 + 300.0)
+                self.connection.execute(
+                    "INSERT INTO grid_key_claims("
+                    "grid_key_id, engine_epoch, claim_owner, "
+                    "claimed_at_epoch, expires_at_epoch"
+                    ") VALUES (?, ?, ?, ?, ?)",
+                    (
+                        int(row["id"]),
+                        self.engine_epoch,
+                        self.claim_owner,
+                        now,
+                        now + lease_s,
+                    ),
+                )
+            self._finish_write_section(write_section)
+        except BaseException:
+            self._rollback_write_section(write_section)
+            raise
         return [
             {
                 "grid_key_id": int(row["id"]),
@@ -1238,8 +1329,45 @@ class GridCacheWriter:
                 "engine_epoch": self.engine_epoch,
             }
         )
-        cursor = self._insert_or_ignore("alphamelts_outputs", output_values)
-        return cursor.rowcount == 1
+        write_section = self._begin_write_section("grid_key_claim_result")
+        try:
+            existing = self.connection.execute(
+                "SELECT 1 FROM alphamelts_outputs "
+                "WHERE expedited_key = ? AND engine_epoch = ?",
+                (str(row["expedited_key"]), self.engine_epoch),
+            ).fetchone()
+            if existing is not None:
+                self.connection.execute(
+                    "DELETE FROM grid_key_claims "
+                    "WHERE grid_key_id = ? AND engine_epoch = ? "
+                    "AND claim_owner = ?",
+                    (int(grid_key_id), self.engine_epoch, self.claim_owner),
+                )
+                self._finish_write_section(write_section)
+                return False
+            claim = self.connection.execute(
+                "SELECT claim_owner, expires_at_epoch FROM grid_key_claims "
+                "WHERE grid_key_id = ? AND engine_epoch = ?",
+                (int(grid_key_id), self.engine_epoch),
+            ).fetchone()
+            if claim is None or (
+                str(claim["claim_owner"]) != self.claim_owner
+                or float(claim["expires_at_epoch"]) <= time.time()
+            ):
+                raise RuntimeError(
+                    f"grid key {grid_key_id} is not claimed by this writer"
+                )
+            cursor = self._insert_or_ignore("alphamelts_outputs", output_values)
+            self.connection.execute(
+                "DELETE FROM grid_key_claims "
+                "WHERE grid_key_id = ? AND engine_epoch = ? AND claim_owner = ?",
+                (int(grid_key_id), self.engine_epoch, self.claim_owner),
+            )
+            self._finish_write_section(write_section)
+            return cursor.rowcount == 1
+        except BaseException:
+            self._rollback_write_section(write_section)
+            raise
 
     def _output_values(self, output: Mapping[str, Any]) -> dict[str, Any]:
         generic = dict(output.get("generic") or {})
@@ -1416,17 +1544,27 @@ class GridCacheWriter:
         self.connection.commit()
 
     def close(self) -> None:
+        self._release_owned_claims()
         self.connection.commit()
         self.connection.close()
+
+    def _release_owned_claims(self) -> None:
+        self.connection.execute(
+            "DELETE FROM grid_key_claims WHERE claim_owner = ?",
+            (self.claim_owner,),
+        )
 
     def __enter__(self) -> "GridCacheWriter":
         return self
 
     def __exit__(self, exc_type: Any, exc: Any, traceback: Any) -> None:
         if exc_type is None:
+            self._release_owned_claims()
             self.connection.commit()
         else:
             self.connection.rollback()
+            self._release_owned_claims()
+            self.connection.commit()
         self.connection.close()
 
 
