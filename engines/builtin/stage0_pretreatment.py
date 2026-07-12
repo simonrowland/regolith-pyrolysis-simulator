@@ -622,6 +622,11 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             reason=f"stage0_carbonate_decomposition_{species}",
             atom_balance_proof=atom_proof,
         )
+        retained_oxide_kg = sum(float(value) for value in oxide_products_kg.values())
+        escaped_co2_kg = float(offgas_products_kg.get("CO2", 0.0) or 0.0)
+        decomposed_carbonate_kg = retained_oxide_kg + sum(
+            float(value) for value in offgas_products_kg.values()
+        )
         return IntentResult(
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="ok",
@@ -633,6 +638,13 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 "feed_kg": feed_kg,
                 "oxide_products_kg": dict(oxide_products_kg),
                 "offgas_products_kg": dict(offgas_products_kg),
+                "decomposed_carbonate_kg": decomposed_carbonate_kg,
+                "retained_oxide_kg": retained_oxide_kg,
+                "escaped_CO2_kg": escaped_co2_kg,
+                "undecomposed_carbonate_kg": max(
+                    0.0,
+                    feed_kg - decomposed_carbonate_kg,
+                ),
             },
         )
 
@@ -671,8 +683,39 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             formula = resolve_species_formula(str(species), registry)
             mol_by_species[str(species)] = (
                 kg_val / formula.molar_mass_kg_per_mol()
-            )
+                )
         return mol_by_species
+
+    @staticmethod
+    def _carbonate_extent_mass_diagnostic(
+        species: str,
+        feed_kg: float,
+        extent: float,
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+    ) -> dict[str, float]:
+        feed_formula = resolve_species_formula(species, registry)
+        co2_formula = resolve_species_formula("CO2", registry)
+        feed_mol = feed_kg / feed_formula.molar_mass_kg_per_mol()
+        carbon_mol = feed_formula.atom_moles(feed_mol).get("C", 0.0)
+        decomposed_carbonate_kg = feed_kg * extent
+        escaped_co2_kg = (
+            carbon_mol
+            * extent
+            * co2_formula.molar_mass_kg_per_mol()
+        )
+        return {
+            "decomposed_carbonate_kg": decomposed_carbonate_kg,
+            "retained_oxide_kg": max(
+                0.0,
+                decomposed_carbonate_kg - escaped_co2_kg,
+            ),
+            "escaped_CO2_kg": escaped_co2_kg,
+            "undecomposed_carbonate_kg": max(
+                0.0,
+                feed_kg - decomposed_carbonate_kg,
+            ),
+        }
 
     @staticmethod
     def _kg_payload_to_mol_accounts(
@@ -1192,6 +1235,13 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             foulant_registry = load_foulant_registry(path)
 
         extent = chi_decomp(species, t_c, 0.0, 0.0, foulant_registry)
+        mass_diagnostic = self._carbonate_extent_mass_diagnostic(
+            species,
+            feed_kg,
+            extent.extent,
+            registry,
+            resolve_species_formula,
+        )
         return IntentResult(
             intent=ChemistryIntent.STAGE0_PRETREATMENT,
             status="ok",
@@ -1207,6 +1257,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 "onset_K": extent.onset_K,
                 "confidence": extent.confidence,
                 "behavior_change_gate": "instrument_first",
+                **mass_diagnostic,
             },
         )
 

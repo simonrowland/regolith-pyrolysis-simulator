@@ -162,13 +162,24 @@ def test_chi_decomp_returns_disposition_extent_with_derived_width(
     assert isinstance(low_pO2, DispositionExtent)
     assert isinstance(high_pO2, DispositionExtent)
     assert low_pO2.path == "thermal"
-    assert low_pO2.extent > high_pO2.extent
+    assert low_pO2.extent == pytest.approx(high_pO2.extent)
     assert 1100.0 < low_pO2.onset_K - 273.15 < 1300.0
 
     carb = chi_decomp("CaSO4", 1100.0, 0.01, 10.0, registry)
     assert carb.path == "carbothermic"
     assert carb.extent > 0.0
     assert carb.onset_K == pytest.approx(1000.0 + 273.15)
+
+
+def test_chi_decomp_o2_suppression_does_not_cap_high_temperature_extent(
+    foulant_registry_yaml: Path,
+) -> None:
+    registry = load_foulant_registry(foulant_registry_yaml)
+
+    result = chi_decomp("CaSO4", 10_000.0, 0.2, 0.0, registry)
+
+    assert result.path == "thermal"
+    assert result.extent == pytest.approx(1.0)
 
 
 def test_sigmoid_width_is_physical_logistic_not_step(

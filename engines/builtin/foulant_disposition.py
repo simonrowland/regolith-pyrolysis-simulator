@@ -330,11 +330,7 @@ def chi_decomp(
     extent = _sigmoid_extent(float(T_C), onset_c, width_c)
 
     o2_dependence = gating.get("o2_dependence")
-    if o2_dependence == "suppresses" and float(pX_bar) > 0.0:
-        p_ref_bar = float(gating.get("o2_reference_bar", 0.2))
-        suppression = 1.0 / (1.0 + (float(pX_bar) / p_ref_bar))
-        extent *= suppression
-    elif o2_dependence == "requires" and float(pX_bar) <= 0.0:
+    if o2_dependence == "requires" and float(pX_bar) <= 0.0:
         extent = 0.0
 
     confidence = str(entry.warning_flags.get("confidence", "partly_grounded"))

@@ -142,6 +142,7 @@ from simulator.chemistry.ellingham_thermo import (
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_ACTIVITY_LIMITATION,
+    melt_oxide_activity,
     na_reductant_activity_shift_kj_per_mol_o2,
 )
 from simulator.chemistry.kernel.capabilities import (
@@ -298,6 +299,17 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         for species, kg in spent_residue_kg.items():
             composition_kg[species] = composition_kg.get(species, 0.0) + kg
         total_kg += spent_residue_total_kg
+        composition_mol = dict(
+            request.account_view.accounts.get("process.cleaned_melt", {}) or {}
+        )
+        for species, mol in (
+            request.account_view.accounts.get(
+                SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+                {},
+            )
+            or {}
+        ).items():
+            composition_mol[species] = composition_mol.get(species, 0.0) + mol
         composition_wt_pct = self._wt_pct_from_kg(composition_kg, total_kg)
         true_available_mol = self._true_available_mol_by_species(controls)
 
@@ -317,6 +329,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         elif reaction_family == REACTION_FAMILY_C3_NA:
             result = self._dispatch_c3_na(
                 composition_kg,
+                composition_mol,
                 composition_wt_pct,
                 total_kg,
                 true_available_mol,
@@ -336,6 +349,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     true_available_mol,
                     metal_mol,
                     controls,
+                    request.temperature_C,
                     MOLAR_MASS,
                     registry,
                     resolve_species_formula,
@@ -533,6 +547,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
     def _dispatch_c3_na(
         self,
         composition_kg: Mapping[str, float],
+        composition_mol: Mapping[str, float],
         composition_wt_pct: Mapping[str, float],
         total_kg: float,
         true_available_mol: Mapping[str, float],
@@ -563,17 +578,22 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 control_audit=control_audit,
             )
 
-        Na2O_max_kg = max(
-            0.0,
-            total_kg * self.NA2O_SOLUBILITY_WT_PCT / 100.0
-            - composition_kg.get("Na2O", 0.0),
-        )
-        Na_for_Na2O_limit_kg = (
-            Na2O_max_kg * (2 * molar_mass["Na"] / molar_mass["Na2O"])
+        Na2O_current_kg = composition_kg.get("Na2O", 0.0)
+        initial_Na2O_headroom_kg = self._product_cap_kg_for_solubility(
+            total_kg=total_kg,
+            current_product_kg=Na2O_current_kg,
+            removed_kg=0.0,
+            added_product_kg=0.0,
+            removed_kg_per_product_kg=0.0,
+            solubility_wt_pct=self.NA2O_SOLUBILITY_WT_PCT,
         )
 
         target_stage, target_priority, thermo_audit = (
-            self._resolve_na_target_priority(controls, temperature_C)
+            self._resolve_na_target_priority(
+                controls,
+                temperature_C,
+                composition_mol,
+            )
         )
         if not target_priority:
             if controls.get("target_oxides") is not None:
@@ -621,9 +641,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         Cr2O3_available_kg = mol_Cr2O3_available * molar_mass["Cr2O3"] / 1000.0
 
         Na_available_this_hr = Na_available_kg / 3.0
-        Na_inject_kg = max(
-            0.0, min(Na_available_this_hr, Na_for_Na2O_limit_kg)
-        )
+        Na_inject_kg = max(0.0, Na_available_this_hr)
         if Na_inject_kg < 0.001:
             return self._empty_result(
                 "c3_na_shuttle skipped: injection floor (<0.001 kg Na)",
@@ -643,6 +661,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         total_Fe_produced_mol = 0.0
         total_Cr_produced_mol = 0.0
         total_Ti_produced_mol = 0.0
+        total_melt_oxide_removed_kg = 0.0
         accepted_targets: list[str] = []
         refused_targets: dict[str, dict[str, Any]] = {}
         activity_audit = {
@@ -653,8 +672,11 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 "standard_deltaG",
                 "Na2O_activity_gamma",
                 "Na2O_activity_component",
+                "Na2O_activity_X_single_cation",
+                "Na2O_activity",
                 "Na2O_activity_shift_kJ_per_mol_O2",
                 "Na2O_activity_limitation",
+                "na_activity_shifted_margin_kJ_per_mol_O2",
             }
         }
 
@@ -673,7 +695,25 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     }
                     continue
 
-                mol_FeO_reduced = min(mol_Na / 2.0, mol_FeO_available)
+                na2o_cap_mol = self._product_cap_kg_for_solubility(
+                    total_kg=total_kg,
+                    current_product_kg=Na2O_current_kg,
+                    removed_kg=total_melt_oxide_removed_kg,
+                    added_product_kg=(
+                        total_Na2O_added_mol * molar_mass["Na2O"] / 1000.0
+                    ),
+                    removed_kg_per_product_kg=(
+                        molar_mass["FeO"] / molar_mass["Na2O"]
+                    ),
+                    solubility_wt_pct=self.NA2O_SOLUBILITY_WT_PCT,
+                ) / (molar_mass["Na2O"] / 1000.0)
+                mol_FeO_reduced = min(
+                    mol_Na / 2.0,
+                    mol_FeO_available,
+                    na2o_cap_mol,
+                )
+                if mol_FeO_reduced <= 0.0:
+                    continue
                 mol_Na_for_Fe = mol_FeO_reduced * 2.0
                 mol_Na2O_from_Fe = mol_FeO_reduced
                 mol_Fe_produced = mol_FeO_reduced
@@ -682,6 +722,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 total_Na2O_added_mol += mol_Na2O_from_Fe
                 total_FeO_removed_mol += mol_FeO_reduced
                 total_Fe_produced_mol += mol_Fe_produced
+                total_melt_oxide_removed_kg += (
+                    mol_FeO_reduced * molar_mass["FeO"] / 1000.0
+                )
                 mol_Na -= mol_Na_for_Fe
                 accepted_targets.append(target)
             elif target == "Cr2O3":
@@ -698,7 +741,25 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     }
                     continue
 
-                mol_Cr2O3_reduced = min(mol_Na / 6.0, mol_Cr2O3_available)
+                na2o_cap_mol = self._product_cap_kg_for_solubility(
+                    total_kg=total_kg,
+                    current_product_kg=Na2O_current_kg,
+                    removed_kg=total_melt_oxide_removed_kg,
+                    added_product_kg=(
+                        total_Na2O_added_mol * molar_mass["Na2O"] / 1000.0
+                    ),
+                    removed_kg_per_product_kg=(
+                        molar_mass["Cr2O3"] / 3.0 / molar_mass["Na2O"]
+                    ),
+                    solubility_wt_pct=self.NA2O_SOLUBILITY_WT_PCT,
+                ) / (molar_mass["Na2O"] / 1000.0)
+                mol_Cr2O3_reduced = min(
+                    mol_Na / 6.0,
+                    mol_Cr2O3_available,
+                    na2o_cap_mol / 3.0,
+                )
+                if mol_Cr2O3_reduced <= 0.0:
+                    continue
                 mol_Na_for_Cr = mol_Cr2O3_reduced * 6.0
                 mol_Na2O_from_Cr = mol_Cr2O3_reduced * 3.0
                 mol_Cr_produced = mol_Cr2O3_reduced * 2.0
@@ -707,6 +768,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 total_Na2O_added_mol += mol_Na2O_from_Cr
                 total_Cr2O3_removed_mol += mol_Cr2O3_reduced
                 total_Cr_produced_mol += mol_Cr_produced
+                total_melt_oxide_removed_kg += (
+                    mol_Cr2O3_reduced * molar_mass["Cr2O3"] / 1000.0
+                )
                 mol_Na -= mol_Na_for_Cr
                 accepted_targets.append(target)
             elif target == "TiO2":
@@ -723,10 +787,26 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     }
                     continue
 
+                na2o_cap_mol = self._product_cap_kg_for_solubility(
+                    total_kg=total_kg,
+                    current_product_kg=Na2O_current_kg,
+                    removed_kg=total_melt_oxide_removed_kg,
+                    added_product_kg=(
+                        total_Na2O_added_mol * molar_mass["Na2O"] / 1000.0
+                    ),
+                    removed_kg_per_product_kg=(
+                        molar_mass["TiO2"] / 2.0 / molar_mass["Na2O"]
+                    ),
+                    solubility_wt_pct=self.NA2O_SOLUBILITY_WT_PCT,
+                ) / (molar_mass["Na2O"] / 1000.0)
                 mol_TiO2_accessible = mol_TiO2_available * self.TI_ACCESSIBILITY
                 mol_TiO2_reduced = min(
-                    mol_Na / 4.0, mol_TiO2_accessible
+                    mol_Na / 4.0,
+                    mol_TiO2_accessible,
+                    na2o_cap_mol / 2.0,
                 )
+                if mol_TiO2_reduced <= 0.0:
+                    continue
                 mol_Na_for_Ti = mol_TiO2_reduced * 4.0
                 mol_Na2O_from_Ti = mol_TiO2_reduced * 2.0
                 mol_Ti_produced = mol_TiO2_reduced
@@ -735,6 +815,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 total_Na2O_added_mol += mol_Na2O_from_Ti
                 total_TiO2_removed_mol += mol_TiO2_reduced
                 total_Ti_produced_mol += mol_Ti_produced
+                total_melt_oxide_removed_kg += (
+                    mol_TiO2_reduced * molar_mass["TiO2"] / 1000.0
+                )
                 mol_Na -= mol_Na_for_Ti
                 accepted_targets.append(target)
 
@@ -858,8 +941,17 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             "spent_reductant_residue_kg": {
                 "Na2O": Na2O_added_kg,
             },
-            "na2o_melt_kg_for_solubility_cap": composition_kg.get("Na2O", 0.0),
-            "na2o_solubility_headroom_kg": Na2O_max_kg,
+            "na2o_melt_kg_for_solubility_cap": Na2O_current_kg,
+            "na2o_solubility_headroom_kg": initial_Na2O_headroom_kg,
+            "na2o_post_reaction_wt_pct": (
+                (Na2O_current_kg + Na2O_added_kg)
+                / (
+                    total_kg
+                    - total_melt_oxide_removed_kg
+                    + Na2O_added_kg
+                )
+                * 100.0
+            ),
         }
         diagnostic.update(activity_audit)
         diagnostic.update(self._ellingham_fit_diagnostic(fit_extrapolations))
@@ -1084,12 +1176,49 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         true_available_mol: Mapping[str, float],
         metal_mol: Mapping[str, float],
         controls: Mapping[str, Any],
+        temperature_C: float,
         molar_mass: Mapping[str, float],
         registry: Mapping[str, Any],
         resolve_species_formula,
         control_audit,
     ) -> IntentResult:
-        mol_Al_produced = float(controls.get("mol_Al_produced") or 0.0)
+        if self._liquid_fraction_blocks_metallothermic(controls):
+            return IntentResult(
+                intent=ChemistryIntent.METALLOTHERMIC_STEP,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "reason": "no_liquid_phase",
+                    "reason_refused": "no_liquid_phase",
+                    "reaction_family": REACTION_FAMILY_C6_MG,
+                    "back_reduction": True,
+                    "liquid_fraction": 0.0,
+                },
+            )
+        support_ok, support_diagnostic = self._c6_mg_al_support_gate(
+            controls,
+            float(temperature_C),
+        )
+        if not support_ok:
+            return IntentResult(
+                intent=ChemistryIntent.METALLOTHERMIC_STEP,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "reason": self.C6_ABOVE_CROSSOVER_REFUSAL,
+                    "reason_refused": self.C6_ABOVE_CROSSOVER_REFUSAL,
+                    "reaction_family": REACTION_FAMILY_C6_MG,
+                    "back_reduction": True,
+                    **support_diagnostic,
+                },
+            )
+        mol_Al_control = float(controls.get("mol_Al_produced") or 0.0)
+        if not math.isfinite(mol_Al_control):
+            mol_Al_control = 0.0
+        mol_Al_available = max(0.0, float(metal_mol.get("Al", 0.0) or 0.0))
+        mol_Al_produced = min(mol_Al_control, mol_Al_available)
         mol_SiO2_available = self._available_mol(
             "SiO2",
             composition_kg,
@@ -1105,6 +1234,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             return self._empty_result(
                 "c6_back_reduction skipped: SiO2 <= 0.1 kg or Al <= 0.01 kg",
                 control_audit=control_audit,
+                diagnostic={
+                    "reaction_family": REACTION_FAMILY_C6_MG,
+                    "back_reduction": True,
+                    "mol_Al_control": mol_Al_control,
+                    "mol_Al_available": mol_Al_available,
+                },
             )
 
         # Legacy:
@@ -1163,6 +1298,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             diagnostic={
                 "reaction_family": REACTION_FAMILY_C6_MG,
                 "back_reduction": True,
+                "mol_Al_control": mol_Al_control,
+                "mol_Al_available": mol_Al_available,
                 "Al_consumed_kg": Al_consumed_kg,
                 "oxide_consumed_kg": SiO2_consumed_kg,
                 "Al2O3_regenerated_kg": Al2O3_regenerated_kg,
@@ -1187,6 +1324,28 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         if total_kg <= 0.0:
             return {}
         return {sp: (kg / total_kg) * 100.0 for sp, kg in composition_kg.items()}
+
+    @staticmethod
+    def _product_cap_kg_for_solubility(
+        *,
+        total_kg: float,
+        current_product_kg: float,
+        removed_kg: float,
+        added_product_kg: float,
+        removed_kg_per_product_kg: float,
+        solubility_wt_pct: float,
+    ) -> float:
+        limit = float(solubility_wt_pct) / 100.0
+        if limit <= 0.0 or limit >= 1.0:
+            raise ValueError("solubility_wt_pct must be between 0 and 100")
+        denominator = 1.0 - limit * (1.0 - float(removed_kg_per_product_kg))
+        if denominator <= 0.0:
+            return 0.0
+        numerator = (
+            limit * (float(total_kg) - float(removed_kg) + float(added_product_kg))
+            - (float(current_product_kg) + float(added_product_kg))
+        )
+        return max(0.0, numerator / denominator)
 
     def _true_available_mol_by_species(
         self,
@@ -1394,6 +1553,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         cls,
         controls: Mapping[str, Any],
         temperature_C: float,
+        composition_mol: Mapping[str, float],
     ) -> tuple[str, tuple[str, ...], dict[str, Any]]:
         requested_targets = controls.get("target_oxides")
         if requested_targets is not None:
@@ -1412,6 +1572,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         thermo_priority, thermo_audit = cls._na_thermo_priority(
             target_set,
             temperature_C,
+            composition_mol,
         )
         return target_stage, thermo_priority, thermo_audit
 
@@ -1567,6 +1728,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         cls,
         targets: tuple[str, ...],
         temperature_C: float,
+        composition_mol: Mapping[str, float],
     ) -> tuple[tuple[str, ...], dict[str, Any]]:
         temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         na_standard_delta_g = cls._delta_g_kj_per_mol_o2(
@@ -1574,7 +1736,17 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             temperature_C,
         )
         na_activity_shift = na_reductant_activity_shift_kj_per_mol_o2(
-            temperature_K
+            temperature_K,
+            composition_mol,
+        )
+        na_activity = melt_oxide_activity("Na2O", composition_mol)
+        na_activity_value = (
+            MELT_OXIDE_ACTIVITY_COEFFICIENTS["Na2O"].gamma
+            if na_activity is None
+            else na_activity.activity
+        )
+        na_x_single_cation = (
+            0.0 if na_activity is None else na_activity.x_single_cation
         )
         delta_g: dict[str, float] = {
             "Na2O": na_standard_delta_g + na_activity_shift
@@ -1635,6 +1807,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     "Na2O"
                 ].single_cation_component
             ),
+            "Na2O_activity_X_single_cation": na_x_single_cation,
+            "Na2O_activity": na_activity_value,
             "Na2O_activity_shift_kJ_per_mol_O2": na_activity_shift,
             "Na2O_activity_limitation": MELT_OXIDE_ACTIVITY_LIMITATION,
             "na_activity_shifted_margin_kJ_per_mol_O2": activity_shifted_margin,

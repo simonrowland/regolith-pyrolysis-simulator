@@ -102,3 +102,24 @@ def test_mn_primary_fit_is_split_at_solid_allotrope_breakpoints() -> None:
         0.0,
         abs=1e-6,
     )
+
+
+@pytest.mark.parametrize(
+    ("species", "breakpoint_K", "phase_fragment"),
+    [
+        ("Na", 1156.1, "Na(g)"),
+        ("Mn", 1360.0, "Mn(gamma,s)"),
+        ("Mn", 1410.0, "Mn(delta,s)"),
+    ],
+)
+def test_ellingham_shared_breakpoints_select_next_segment(
+    species: str,
+    breakpoint_K: float,
+    phase_fragment: str,
+) -> None:
+    segment = ellingham_segment_for_temperature(species, breakpoint_K)
+
+    assert phase_fragment in segment.phase_basis
+    assert ellingham_delta_g_kj_per_mol_o2(species, breakpoint_K) == pytest.approx(
+        segment.delta_g_kJ_per_mol_O2(breakpoint_K)
+    )

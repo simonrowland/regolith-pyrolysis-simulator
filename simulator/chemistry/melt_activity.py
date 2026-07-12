@@ -209,12 +209,14 @@ def melt_oxide_activity(
 
     parent = str(parent_oxide)
     cation_mol_fraction = single_cation_mole_fractions(account_mol)
-    x_single_cation = cation_mol_fraction.get(parent, 0.0)
-    if x_single_cation <= 0.0:
+    if not cation_mol_fraction:
         return None
+    x_single_cation = cation_mol_fraction.get(parent, 0.0)
 
     coeff = MELT_OXIDE_ACTIVITY_COEFFICIENTS.get(parent)
     if coeff is None:
+        if x_single_cation <= 0.0:
+            return None
         cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(parent, 1.0)
         component = parent if cations == 1.0 else f"{parent}:single_cation"
         warning = (
@@ -229,6 +231,16 @@ def melt_oxide_activity(
             x_single_cation,
             "ASSUMED unity fallback; no documented non-FeO gamma table row",
             warning,
+        )
+
+    if x_single_cation <= 0.0:
+        return MeltOxideActivity(
+            parent,
+            coeff.single_cation_component,
+            coeff.gamma,
+            0.0,
+            0.0,
+            coeff.citation,
         )
 
     # Raoultian standard state requires the pure single-cation component to
@@ -249,11 +261,24 @@ def melt_oxide_activity(
     )
 
 
-def na_reductant_activity_shift_kj_per_mol_o2(temperature_K: float) -> float:
-    """Na2O Ellingham-row shift from gamma_NaO0.5 on the per-mol-O2 basis."""
+def na_reductant_activity_shift_kj_per_mol_o2(
+    temperature_K: float,
+    account_mol: Mapping[str, float] | None = None,
+) -> float:
+    """Na2O Ellingham-row shift from a_NaO0.5 on the per-mol-O2 basis."""
 
     temperature = float(temperature_K)
     if not math.isfinite(temperature) or temperature <= 0.0:
         raise ValueError("temperature_K must be finite and positive")
     gamma = MELT_OXIDE_ACTIVITY_COEFFICIENTS["Na2O"].gamma
-    return 4.0 * R_KJ_PER_MOL_K * temperature * math.log(gamma)
+    if account_mol is None:
+        activity = gamma
+    else:
+        resolved = melt_oxide_activity("Na2O", account_mol)
+        activity = gamma if resolved is None else resolved.activity
+    if activity <= 0.0:
+        return float("-inf")
+
+    # For 4 Na + O2 -> 2 Na2O = 4 NaO0.5, the product activity term is
+    # RT ln(a^4) = 4 RT ln(a) on the per-mol-O2 Ellingham basis.
+    return 4.0 * R_KJ_PER_MOL_K * temperature * math.log(activity)

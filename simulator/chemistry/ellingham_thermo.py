@@ -622,9 +622,11 @@ def ellingham_segment_for_temperature(
         selectable_segments = tuple(
             segment for segment in segments if "Mg(g)" in segment.phase_basis
         )
-    for segment in selectable_segments:
+    for index, segment in enumerate(selectable_segments):
         low, high = segment.range_K
-        if low <= T_K <= high:
+        if low <= T_K and (
+            T_K < high or index == len(selectable_segments) - 1
+        ):
             return segment
     if T_K < selectable_segments[0].range_K[0]:
         return selectable_segments[0]

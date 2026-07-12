@@ -106,8 +106,6 @@ def _source_dg_sigmoid_extent(
     width_c = _source_sigmoid_width_c(points, onset_k)
     x = (T_C - (onset_k - 273.15)) / width_c
     extent = 1.0 / (1.0 + math.exp(-x))
-    if o2_reference_bar is not None and pX_bar > 0.0:
-        extent *= 1.0 / (1.0 + pX_bar / o2_reference_bar)
     return extent
 
 
@@ -344,6 +342,16 @@ def test_carbonate_decomposition_diagnostic_extent(
     expected = chi_decomp("CaCO3", STAGE0_FOULANT_PHASE1_TEMP_C, 0.0, 0.0, foulant_registry)
     assert result.diagnostic["extent"] == pytest.approx(expected.extent, abs=1e-9)
     assert result.diagnostic["fiat_extent"] == 1.0
+    assert result.diagnostic["decomposed_carbonate_kg"] == pytest.approx(
+        8.0 * expected.extent,
+        abs=1e-9,
+    )
+    assert result.diagnostic["escaped_CO2_kg"] > 0.0
+    assert result.diagnostic["retained_oxide_kg"] > 0.0
+    assert result.diagnostic["undecomposed_carbonate_kg"] == pytest.approx(
+        8.0 * (1.0 - expected.extent),
+        abs=1e-9,
+    )
 
 
 def test_partition_carbon_diagnostic_sephton_anchors(

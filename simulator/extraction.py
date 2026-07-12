@@ -2591,6 +2591,15 @@ class ExtractionMixin:
                 'reagent_available_kg': 0.0,
                 'true_available_mol_by_species':
                     self._cleaned_melt_available_mol_by_species(('SiO2',)),
+                'liquid_fraction': liquid_fraction,
+                'JANAF_4th_multiphase_margin_kJ_per_mol_O2': dict(
+                    c6_cfg.get('JANAF_4th_multiphase_margin_kJ_per_mol_O2')
+                    or {}
+                ),
+                'kinetic_driven_above_crossover': bool(
+                    c6_cfg.get('kinetic_driven_above_crossover')
+                ),
+                'kinetic_note': str(c6_cfg.get('kinetic_note') or ''),
                 'dt_hr': 1.0,
             },
         )

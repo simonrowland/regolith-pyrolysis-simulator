@@ -185,7 +185,7 @@ def clamp_stir_factor(value: float) -> float:
         return 0.0
     try:
         raw = float(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return 0.0
     if not math.isfinite(raw):
         return 0.0
@@ -310,9 +310,13 @@ def clamp_stir_state(value: Any) -> StirState:
         # extras are still ignored, only the warning is new.
         unknown_keys = set(value.keys()) - _KNOWN_STIR_STATE_KEYS
         if unknown_keys:
+            # Mapping keys may be heterogeneous after YAML/JSON decoding.
+            # Sort their representations so warning construction cannot turn
+            # an ignored unknown key into an incidental TypeError.
+            display_unknown_keys = sorted(repr(key) for key in unknown_keys)
             warnings.warn(
                 f"clamp_stir_state: ignoring unknown StirState keys "
-                f"{sorted(unknown_keys)}; valid keys are "
+                f"{display_unknown_keys}; valid keys are "
                 f"{sorted(_KNOWN_STIR_STATE_KEYS)}. "
                 f"Common typos: 'radail' → 'radial', 'axail' → 'axial'.",
                 UserWarning,
@@ -839,6 +843,8 @@ class EvaporationFlux:
         if self.species_kg_hr:
             self.dominant_species = max(self.species_kg_hr,
                                         key=self.species_kg_hr.get)
+        else:
+            self.dominant_species = ''
 
 
 @dataclass
@@ -953,8 +959,7 @@ class EnergyRecord:
         self.electrical_total_kWh = (
             self.turbine_kWh + self.condenser_kWh + self.mre_kWh
         )
-        if self.evaporation_thermal_kWh <= 0.0:
-            self.evaporation_thermal_kWh = self.latent_kWh + self.dissociation_kWh
+        self.evaporation_thermal_kWh = self.latent_kWh + self.dissociation_kWh
         self.electrical_plus_evaporation_kWh = (
             self.electrical_total_kWh + self.evaporation_thermal_kWh
         )

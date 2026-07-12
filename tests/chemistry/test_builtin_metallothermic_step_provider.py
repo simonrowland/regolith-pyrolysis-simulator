@@ -1295,15 +1295,13 @@ def test_c3_na_explicit_duplicate_targets_do_not_double_debit_feo(
     assert result.transition is not None
     assert result.diagnostic["target_priority"] == ["FeO"]
     assert result.diagnostic["accepted_targets"] == ["FeO"]
-    na2o_limit_kg = 10.0 * 0.10
-    na_limited_mol = (
-        na2o_limit_kg
-        * (2 * MOLAR_MASS["Na"] / MOLAR_MASS["Na2O"])
-        / MOLAR_MASS["Na"]
-        * 1000.0
+    removed_kg_per_na2o_kg = MOLAR_MASS["FeO"] / MOLAR_MASS["Na2O"]
+    na2o_cap_kg = (10.0 * 0.10) / (
+        1.0 - 0.10 * (1.0 - removed_kg_per_na2o_kg)
     )
+    na2o_limited_mol = na2o_cap_kg / (MOLAR_MASS["Na2O"] / 1000.0)
     assert result.transition.debits["process.cleaned_melt"]["FeO"] == pytest.approx(
-        min(feo_mol, na_limited_mol / 2.0)
+        min(feo_mol, na2o_limited_mol)
     )
 
 
@@ -1936,12 +1934,8 @@ def test_c6_back_reduction_matches_legacy_stoich(
     view = ProviderAccountView(
         accounts={
             "process.cleaned_melt": melt_mol,
-            # The Al hasn't been committed to metal_phase yet -- the
-            # legacy reads the freshly-produced Al_produced_kg from
-            # the primary thermite output, not from the metal_phase
-            # account. The back-reduction proposal will debit
-            # metal_phase, but the gate is on the freshly-produced
-            # mol_Al_produced control input.
+            # Back-reduction may only debit Al that the matched primary
+            # transition has already credited to metal_phase.
             "process.metal_phase": {"Al": mol_Al_produced},
             "process.reagent_inventory": {},
         },
@@ -1957,6 +1951,12 @@ def test_c6_back_reduction_matches_legacy_stoich(
             "reagent_available_kg": 0.0,  # not used in back-reduction
             "back_reduction": True,
             "mol_Al_produced": mol_Al_produced,
+            "liquid_fraction": 1.0,
+            "JANAF_4th_multiphase_margin_kJ_per_mol_O2": {
+                "Mg_Al_crossover_C": 1471.4,
+            },
+            "kinetic_driven_above_crossover": True,
+            "kinetic_note": "test-local thermite support",
             "dt_hr": 1.0,
         },
     )
@@ -1988,6 +1988,97 @@ def test_c6_back_reduction_matches_legacy_stoich(
     )
 
     _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
+
+
+def test_c6_back_reduction_refuses_no_liquid_before_transition(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "SiO2": 50.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+            },
+            "process.metal_phase": {"Al": 10.0},
+            "process.reagent_inventory": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    result = BuiltinMetallothermicStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=view,
+            temperature_C=1700.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C6_MG,
+                "back_reduction": True,
+                "mol_Al_produced": 10.0,
+                "liquid_fraction": 0.0,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == "no_liquid_phase"
+    assert result.diagnostic["back_reduction"] is True
+
+
+def test_c6_back_reduction_caps_control_to_actual_metal_al_inventory(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    view = ProviderAccountView(
+        accounts={
+            "process.cleaned_melt": {
+                "SiO2": 50.0 / (MOLAR_MASS["SiO2"] / 1000.0),
+            },
+            "process.metal_phase": {"Al": 1.0},
+            "process.reagent_inventory": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+
+    result = BuiltinMetallothermicStepProvider().dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=view,
+            temperature_C=1700.0,
+            pressure_bar=1e-6,
+            control_inputs={
+                "reaction_family": REACTION_FAMILY_C6_MG,
+                "back_reduction": True,
+                "mol_Al_produced": 10.0,
+                "liquid_fraction": 1.0,
+                "JANAF_4th_multiphase_margin_kJ_per_mol_O2": {
+                    "Mg_Al_crossover_C": 1471.4,
+                },
+                "kinetic_driven_above_crossover": True,
+                "dt_hr": 1.0,
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.diagnostic["mol_Al_control"] == pytest.approx(10.0)
+    assert result.diagnostic["mol_Al_available"] == pytest.approx(1.0)
+    assert result.transition.debits["process.metal_phase"]["Al"] == pytest.approx(
+        BuiltinMetallothermicStepProvider.BACK_REDUCTION_FRACTION
+    )
 
 
 def test_provider_short_circuits_on_empty_reagent(
