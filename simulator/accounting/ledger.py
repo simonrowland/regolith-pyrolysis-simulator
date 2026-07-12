@@ -36,6 +36,11 @@ TERMINAL_DEBIT_EXCEPTIONS = {
         "terminal.oxygen_melt_offgas_vented_to_vacuum",
     ): frozenset({"O2"}),
 }
+C7_TERMINAL_SLAG_DEBIT_PREFIXES = (
+    "ca_aluminothermic_c3a_",
+    "ca_aluminothermic_c12a7_",
+)
+_C7_TERMINAL_SLAG_REWORK_CAPABILITY = object()
 TERMINAL_ACCOUNT_ALLOWED_SPECIES = {
     "terminal.oxygen_stage0_stored": frozenset({"O2"}),
     "terminal.oxygen_melt_offgas_stored": frozenset({"O2"}),
@@ -195,7 +200,13 @@ class LedgerTransition:
         return cls(
             name=name,
             debits=(MaterialLot(debit_account, species_kg, source=source),),
-            credits=(MaterialLot(credit_account, credit_species_kg or species_kg, source=source),),
+            credits=(
+                MaterialLot(
+                    credit_account,
+                    species_kg if credit_species_kg is None else credit_species_kg,
+                    source=source,
+                ),
+            ),
             reason=reason,
         )
 
@@ -264,15 +275,22 @@ class AtomLedger:
         allowed_account_prefixes: tuple[str, ...] = (),
     ) -> None:
         self.registry = dict(registry or {})
-        self.mass_tolerance_kg = float(mass_tolerance_kg)
-        self.atom_tolerance_mol = float(atom_tolerance_mol)
-        self.relative_tolerance = float(relative_tolerance)
+        self.mass_tolerance_kg = _finite_nonnegative_tolerance(
+            "mass_tolerance_kg", mass_tolerance_kg
+        )
+        self.atom_tolerance_mol = _finite_nonnegative_tolerance(
+            "atom_tolerance_mol", atom_tolerance_mol
+        )
+        self.relative_tolerance = _finite_nonnegative_tolerance(
+            "relative_tolerance", relative_tolerance
+        )
         self.balance_tolerance_kg = DEFAULT_BALANCE_TOLERANCE_KG
         # Canonical balances are species mol. Public kg accessors are
         # projections at the simulator boundary.
         self._balances: dict[str, dict[str, float]] = {}
         self._policies: dict[str, AccountPolicy] = {}
         self._transitions: list[LedgerTransition] = []
+        self._terminal_debit_authorized_transition_ids: set[int] = set()
         self._external_loads: list[MaterialLot] = []
         self._allowed_accounts = (
             None
@@ -415,8 +433,16 @@ class AtomLedger:
         transition = LedgerTransition(name=name, debits=tuple(debits), credits=tuple(credits), reason=reason)
         return self.apply(transition)
 
-    def apply(self, transition: LedgerTransition) -> LedgerTransition:
-        self._validate_terminal_debits(transition)
+    def apply(
+        self,
+        transition: LedgerTransition,
+        *,
+        _terminal_debit_capability: object | None = None,
+    ) -> LedgerTransition:
+        self._validate_terminal_debits(
+            transition,
+            terminal_debit_capability=_terminal_debit_capability,
+        )
         transition.validate_conservation(
             self.registry,
             mass_tolerance_kg=self.mass_tolerance_kg,
@@ -427,6 +453,8 @@ class AtomLedger:
         self._validate_account_policies(projected)
         self._balances = projected
         self._transitions.append(transition)
+        if _terminal_debit_capability is _C7_TERMINAL_SLAG_REWORK_CAPABILITY:
+            self._terminal_debit_authorized_transition_ids.add(id(transition))
         return transition
 
     def move(
@@ -490,8 +518,18 @@ class AtomLedger:
     ) -> None:
         name = str(account)
         self._validate_account_known(name)
-        self._policies[name] = _coerce_account_policy(name, policy)
-        self.assert_balanced()
+        replacement = _coerce_account_policy(name, policy)
+        previous = self._policies.get(name)
+        had_previous = name in self._policies
+        self._policies[name] = replacement
+        try:
+            self.assert_balanced()
+        except Exception:
+            if had_previous:
+                self._policies[name] = previous
+            else:
+                self._policies.pop(name, None)
+            raise
 
     def account_policy(self, account: str) -> AccountPolicy:
         name = str(account)
@@ -632,7 +670,15 @@ class AtomLedger:
     def assert_balanced(self) -> bool:
         self._assert_balances_finite()
         for transition in self._transitions:
-            self._validate_terminal_debits(transition)
+            capability = (
+                _C7_TERMINAL_SLAG_REWORK_CAPABILITY
+                if id(transition) in self._terminal_debit_authorized_transition_ids
+                else None
+            )
+            self._validate_terminal_debits(
+                transition,
+                terminal_debit_capability=capability,
+            )
             transition.validate_conservation(
                 self.registry,
                 mass_tolerance_kg=self.mass_tolerance_kg,
@@ -758,10 +804,20 @@ class AtomLedger:
             "(typo? add to KNOWN_LEDGER_ACCOUNTS)"
         )
 
-    def _validate_terminal_debits(self, transition: LedgerTransition) -> None:
+    def _validate_terminal_debits(
+        self,
+        transition: LedgerTransition,
+        *,
+        terminal_debit_capability: object | None = None,
+    ) -> None:
         credit_accounts = {lot.account for lot in transition.credits}
         for lot in transition.debits:
             if not self.account_policy(lot.account).terminal:
+                continue
+            if (
+                terminal_debit_capability is _C7_TERMINAL_SLAG_REWORK_CAPABILITY
+                and _is_c7_terminal_slag_rework(transition, lot)
+            ):
                 continue
             allowed_accounts = {
                 credit
@@ -824,7 +880,14 @@ def _coerce_account_policy(
         raise AccountingError(f"unknown account policy {policy!r}")
     if isinstance(policy, Mapping):
         data = dict(policy)
-        data.setdefault("account", str(account))
+        expected_account = str(account).strip()
+        embedded_account = str(data.get("account", expected_account)).strip()
+        if embedded_account != expected_account:
+            raise AccountingError(
+                f"policy account {embedded_account!r} does not match key "
+                f"{expected_account!r}"
+            )
+        data["account"] = expected_account
         return AccountPolicy(**data)
     raise AccountingError("account policy must be AccountPolicy, mapping, string, or None")
 
@@ -969,14 +1032,67 @@ def _lot_report(lot: MaterialLot) -> dict[str, Any]:
     return {
         "account": lot.account,
         "species_kg": dict(lot.species_kg),
-        "species_mol": dict(lot.meta.get("species_mol", {})),
+        "species_mol": _thaw_report_value(lot.meta.get("species_mol", {})),
         "source": lot.source,
-        "meta": dict(lot.meta),
+        "meta": _thaw_report_value(lot.meta),
     }
+
+
+def _thaw_report_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {key: _thaw_report_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_thaw_report_value(item) for item in value]
+    if isinstance(value, (set, frozenset)):
+        return [_thaw_report_value(item) for item in sorted(value, key=repr)]
+    return value
 
 
 def _is_terminal_account(account: str) -> bool:
     return str(account).startswith("terminal.") or str(account) == "vent"
+
+
+def _finite_nonnegative_tolerance(name: str, value: float) -> float:
+    tolerance = float(value)
+    if not math.isfinite(tolerance) or tolerance < 0.0:
+        raise AccountingError(f"{name} must be finite and non-negative")
+    return tolerance
+
+
+def _is_c7_terminal_slag_rework(
+    transition: LedgerTransition,
+    debit_lot: MaterialLot,
+) -> bool:
+    if debit_lot.account != "terminal.slag":
+        return False
+    if not transition.name.startswith(C7_TERMINAL_SLAG_DEBIT_PREFIXES):
+        return False
+    if set(debit_lot.species_kg) != {"CaO"}:
+        return False
+
+    debit_accounts = {lot.account for lot in transition.debits}
+    if not debit_accounts <= {
+        "process.cleaned_melt",
+        "process.metal_phase",
+        "process.c7_al_credit",
+        "terminal.slag",
+    }:
+        return False
+
+    credit_species: defaultdict[str, set[str]] = defaultdict(set)
+    for lot in transition.credits:
+        credit_species[lot.account].update(lot.species_kg)
+    expected_slag_species = (
+        {"Ca3Al2O6"}
+        if transition.name.startswith("ca_aluminothermic_c3a_")
+        else {"Ca12Al14O33"}
+    )
+    # C7 reworks CaO already classified as slag: Ca leaves through overhead
+    # while the residual Al-Ca-O product returns to the same terminal bucket.
+    return dict(credit_species) == {
+        "process.overhead_gas": {"Ca"},
+        "terminal.slag": expected_slag_species,
+    }
 
 
 def _close_enough(left: float, right: float, absolute: float, relative: float) -> bool:

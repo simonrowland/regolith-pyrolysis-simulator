@@ -11,13 +11,21 @@ from engines.builtin.metallothermic_step import (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
+from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.ledger import AtomLedger, LedgerTransition
 from simulator.chemistry.kernel import (
     AccountFilterViolation,
+    CapabilityProfile,
     ChemistryIntent,
+    ChemistryKernel,
+    ChemistryProvider,
     IntentRequest,
+    IntentResult,
     LedgerTransitionProposal,
     ProviderAccountView,
+    ProviderRegistry,
+    ProposalRejected,
 )
 from simulator.chemistry.kernel.validation import validate_proposal_accounts
 from tests.chemistry.conftest import _atom_check, _build_sim
@@ -73,6 +81,44 @@ class _ThermoStubbedCaProvider(BuiltinCaAluminothermicStepProvider):
 
 def _provider(margin_kj_per_mol_o2: float = 2.0):
     return _ThermoStubbedCaProvider(margin_kj_per_mol_o2)
+
+
+class _MalformedC7TerminalSlagProvider(ChemistryProvider):
+    name = "malformed_c7_terminal_slag_provider"
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id=self.name,
+            intents=frozenset({ChemistryIntent.CA_ALUMINOTHERMIC_STEP}),
+            is_authoritative_for=frozenset(
+                {ChemistryIntent.CA_ALUMINOTHERMIC_STEP}
+            ),
+            declared_accounts=frozenset(
+                {
+                    C7_AL_CREDIT_ACCOUNT,
+                    "process.cleaned_melt",
+                    "process.overhead_gas",
+                    "terminal.slag",
+                }
+            ),
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        return IntentResult(
+            intent=request.intent,
+            status="ok",
+            transition=LedgerTransitionProposal(
+                debits={
+                    "terminal.slag": {"CaO": 6.0},
+                    C7_AL_CREDIT_ACCOUNT: {"Al": 2.0},
+                },
+                credits={
+                    "process.overhead_gas": {"Ca": 3.0},
+                    "process.cleaned_melt": {"Ca3Al2O6": 1.0},
+                },
+                reason="ca_aluminothermic_c3a_wrong_slag_destination",
+            ),
+        )
 
 
 def _request(registry, accounts, controls):
@@ -218,6 +264,115 @@ def test_c7_c12a7_stoichiometry_from_in_situ_al(formula_registry):
         "terminal.slag": {"Ca12Al14O33": 1.0},
     }
     _atom_check(result.transition, formula_registry, tol=1e-12)
+
+
+def test_c7_can_commit_narrow_terminal_slag_cao_rework(formula_registry):
+    provider = _provider()
+    registry = ProviderRegistry()
+    registry.register(provider, [ChemistryIntent.CA_ALUMINOTHERMIC_STEP])
+    ledger = AtomLedger(registry=formula_registry)
+    ledger.load_external_mol("terminal.slag", {"CaO": 6.0})
+    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0})
+    kernel = ChemistryKernel(ledger, registry, formula_registry)
+
+    result = kernel.dispatch(
+        ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+        temperature_C=1400.0,
+        pressure_bar=1e-6,
+        control_inputs=_controls(
+            objective_extent_mol=1.0,
+            transport_extent_mol=1.0,
+        ),
+    )
+    assert result.transition is not None
+
+    kernel.commit_batch(ChemistryIntent.CA_ALUMINOTHERMIC_STEP, result.transition)
+
+    slag = ledger.mol_by_account("terminal.slag")
+    assert slag.get("CaO", 0.0) == pytest.approx(0.0, abs=1e-12)
+    assert slag["Ca3Al2O6"] == pytest.approx(1.0)
+    assert ledger.mol_by_account("process.overhead_gas")["Ca"] == pytest.approx(3.0)
+
+
+def test_spoofed_c7_transition_cannot_reopen_terminal_slag(formula_registry):
+    ledger = AtomLedger(registry=formula_registry)
+    ledger.load_external_mol("terminal.slag", {"CaO": 6.0})
+    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0})
+    # Balanced C3A reaction: 6 CaO + 2 Al -> Ca3Al2O6 + 3 Ca.
+    spoofed = LedgerTransition(
+        name="ca_aluminothermic_c3a_credit_al",
+        debits=(
+            ledger.debit_mol("terminal.slag", {"CaO": 6.0}),
+            ledger.debit_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0}),
+        ),
+        credits=(
+            ledger.credit_mol("process.overhead_gas", {"Ca": 3.0}),
+            ledger.credit_mol("terminal.slag", {"Ca3Al2O6": 1.0}),
+        ),
+    )
+
+    with pytest.raises(AccountingError, match="terminal account"):
+        ledger.apply(spoofed)
+
+
+def test_dispatch_bound_malformed_c7_terminal_slag_rework_is_rejected(
+    formula_registry,
+):
+    provider = _MalformedC7TerminalSlagProvider()
+    registry = ProviderRegistry()
+    registry.register(provider, [ChemistryIntent.CA_ALUMINOTHERMIC_STEP])
+    ledger = AtomLedger(registry=formula_registry)
+    ledger.load_external_mol("terminal.slag", {"CaO": 6.0})
+    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0})
+    kernel = ChemistryKernel(ledger, registry, formula_registry)
+
+    result = kernel.dispatch(
+        ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+        temperature_C=1400.0,
+        pressure_bar=1e-6,
+        control_inputs=_controls(),
+    )
+    assert result.transition is not None
+    before_balances = ledger.mol_by_account()
+    before_transitions = ledger.transitions
+
+    with pytest.raises(ProposalRejected, match="terminal account"):
+        kernel.commit_batch(
+            ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+            result.transition,
+        )
+
+    assert ledger.mol_by_account() == before_balances
+    assert ledger.transitions == before_transitions
+
+
+def test_off_path_c7_terminal_slag_rework_proposal_is_rejected(formula_registry):
+    provider = _provider()
+    registry = ProviderRegistry()
+    registry.register(provider, [ChemistryIntent.CA_ALUMINOTHERMIC_STEP])
+    ledger = AtomLedger(registry=formula_registry)
+    ledger.load_external_mol("terminal.slag", {"CaO": 6.0})
+    ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0})
+    kernel = ChemistryKernel(ledger, registry, formula_registry)
+    proposal = LedgerTransitionProposal(
+        debits={
+            "terminal.slag": {"CaO": 6.0},
+            C7_AL_CREDIT_ACCOUNT: {"Al": 2.0},
+        },
+        credits={
+            "process.overhead_gas": {"Ca": 3.0},
+            "terminal.slag": {"Ca3Al2O6": 1.0},
+        },
+        reason="ca_aluminothermic_c3a_credit_al",
+    )
+    before_balances = ledger.mol_by_account()
+    before_transitions = ledger.transitions
+
+    with pytest.raises(ProposalRejected, match="terminal account"):
+        kernel.commit_batch(ChemistryIntent.CA_ALUMINOTHERMIC_STEP, proposal)
+
+    assert ledger.mol_by_account() == before_balances
+    assert ledger.transitions == before_transitions
 
 
 @pytest.mark.parametrize("reductant", ["Na", "K", "Si", "Mg"])

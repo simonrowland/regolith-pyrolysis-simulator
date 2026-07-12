@@ -819,3 +819,85 @@ def test_mass_tolerance_boundary_on_apply() -> None:
                 ),
             )
         )
+
+
+def test_policy_mapping_rejects_embedded_account_mismatch_before_mutation() -> None:
+    ledger = _strict_ledger()
+
+    with pytest.raises(AccountingError, match="does not match key"):
+        ledger.set_account_policy(
+            "process.cleaned_melt",
+            {
+                "account": "reservoir.reagent.K",
+                "allow_negative": True,
+                "credit_limit_kg_by_species": {"SiO2": 1.0},
+            },
+        )
+
+    assert ledger.account_policy("process.cleaned_melt") == AccountPolicy.normal(
+        "process.cleaned_melt"
+    )
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["mass_tolerance_kg", "atom_tolerance_mol", "relative_tolerance"],
+)
+@pytest.mark.parametrize("value", [math.inf, -math.inf, math.nan, -1.0])
+def test_ledger_rejects_nonfinite_or_negative_tolerances(
+    field: str,
+    value: float,
+) -> None:
+    with pytest.raises(AccountingError, match="finite and non-negative"):
+        AtomLedger(**{field: value})
+
+
+def test_default_tolerances_cannot_admit_hydrogen_to_oxygen_conversion() -> None:
+    ledger = AtomLedger()
+    ledger.load_external("process.cleaned_melt", {"H2": 1.0})
+
+    # Equal mass does not conserve elements: H2 contributes only H atoms,
+    # while O2 contributes only O atoms, so neither elemental total cancels.
+    with pytest.raises(UnbalancedTransitionError, match="does not conserve atoms"):
+        ledger.move(
+            "h2_to_o2",
+            "process.cleaned_melt",
+            "process.overhead_gas",
+            {"H2": 1.0},
+            credit_species_kg={"O2": 1.0},
+        )
+
+
+def test_failed_policy_replacement_restores_previous_reservoir_policy() -> None:
+    account = "reservoir.reagent.K"
+    original = AccountPolicy.reservoir(account, {"K": 1.0})
+    ledger = _strict_ledger(account_policies={account: original})
+    ledger.move(
+        "borrow_k",
+        account,
+        "process.cleaned_melt",
+        {"K": 0.5},
+    )
+
+    with pytest.raises(OverdraftError):
+        ledger.set_account_policy(account, AccountPolicy.normal(account))
+
+    assert ledger.account_policy(account) == original
+    assert ledger.assert_balanced()
+
+
+def test_explicit_empty_move_credit_is_not_replaced_by_debit_species() -> None:
+    ledger = AtomLedger()
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+
+    with pytest.raises(UnbalancedTransitionError):
+        ledger.move(
+            "empty_products",
+            "process.cleaned_melt",
+            "process.overhead_gas",
+            {"SiO2": 0.5},
+            credit_species_kg={},
+        )
+
+    assert ledger.transitions == ()
+    assert ledger.kg_by_account("process.cleaned_melt")["SiO2"] == pytest.approx(1.0)

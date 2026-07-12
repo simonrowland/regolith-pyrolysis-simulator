@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from copy import deepcopy
 from collections import defaultdict
 from collections.abc import Iterator, Mapping
 from dataclasses import dataclass, field
@@ -13,6 +14,52 @@ from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import resolve_species_formula
 
 EMPTY_KG_TOLERANCE = 1e-12
+
+
+class _FrozenMapping(Mapping[Any, Any]):
+    def __init__(self, data: Mapping[Any, Any]) -> None:
+        self._data = MappingProxyType(dict(data))
+
+    def __getitem__(self, key: Any) -> Any:
+        return self._data[key]
+
+    def __iter__(self) -> Iterator[Any]:
+        return iter(self._data)
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+    def __repr__(self) -> str:
+        return repr(dict(self._data))
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, Mapping):
+            return dict(self._data) == dict(other)
+        return False
+
+    def _immutable(self, *args: Any, **kwargs: Any) -> None:
+        raise TypeError("material lot metadata is immutable")
+
+    __setitem__ = _immutable
+    __delitem__ = _immutable
+    clear = _immutable
+    pop = _immutable
+    popitem = _immutable
+    setdefault = _immutable
+    update = _immutable
+    __ior__ = _immutable
+
+
+def _freeze_meta(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return _FrozenMapping(
+            {key: _freeze_meta(item) for key, item in value.items()}
+        )
+    if isinstance(value, (list, tuple)):
+        return tuple(_freeze_meta(item) for item in value)
+    if isinstance(value, (set, frozenset)):
+        return frozenset(_freeze_meta(item) for item in value)
+    return deepcopy(value)
 
 
 @dataclass(frozen=True)
@@ -46,7 +93,7 @@ class MaterialLot:
         object.__setattr__(self, "account", account)
         object.__setattr__(self, "species_kg", MappingProxyType(dict(sorted(normalized.items()))))
         object.__setattr__(self, "source", str(self.source or ""))
-        object.__setattr__(self, "meta", MappingProxyType(dict(self.meta or {})))
+        object.__setattr__(self, "meta", _freeze_meta(dict(self.meta or {})))
 
     def without_empty(self, tolerance_kg: float = EMPTY_KG_TOLERANCE) -> "MaterialLot":
         kept = {species: kg for species, kg in self.species_kg.items() if abs(kg) > tolerance_kg}

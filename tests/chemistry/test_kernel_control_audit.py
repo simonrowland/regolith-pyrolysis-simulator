@@ -71,6 +71,18 @@ def test_validate_control_audit_drift_with_notes_passes():
     validate_control_audit(audit, request)
 
 
+def test_validate_control_audit_missing_applied_evidence_always_raises():
+    request = _build_request(1400.0, 1.0)
+    audit = ControlAudit(
+        requested={"temperature_C": 1400.0, "pressure_bar": 1.0},
+        applied={},
+        notes=("provider supplied no independent readback",),
+    )
+
+    with pytest.raises(ControlAuditMismatch, match="missing applied-control evidence"):
+        validate_control_audit(audit, request)
+
+
 def test_validate_control_audit_temperature_drift_without_notes_raises():
     request = _build_request(1400.0, 1.0)
     audit = ControlAudit(

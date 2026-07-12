@@ -23,10 +23,15 @@ reference.  This is the invariant covered by
 
 from __future__ import annotations
 
+import weakref
 from collections.abc import Mapping
 from typing import Any, Optional
 
-from simulator.accounting.ledger import AtomLedger, LedgerTransition
+from simulator.accounting.ledger import (
+    _C7_TERMINAL_SLAG_REWORK_CAPABILITY,
+    AtomLedger,
+    LedgerTransition,
+)
 from simulator.chemistry.kernel.account_filters import build_provider_account_view
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.config import (
@@ -44,6 +49,7 @@ from simulator.chemistry.kernel.errors import (
     KernelError,
     ProposalRejected,
     ProviderUnavailableError,
+    UnauthorizedIntentError,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.chemistry.kernel.registry import ProviderRegistry
@@ -332,6 +338,14 @@ class ChemistryKernel:
         self._allow_fallback_intents: frozenset[ChemistryIntent] = frozenset(
             allow_fallback_intents or ()
         )
+        self._proposal_origins: dict[
+            int,
+            tuple[
+                weakref.ReferenceType[LedgerTransitionProposal],
+                ChemistryProvider,
+                ChemistryIntent,
+            ],
+        ] = {}
         self._oxygen_sink_channel_mode = normalize_oxygen_sink_channel_mode(
             oxygen_sink_channel_mode
         )
@@ -362,6 +376,62 @@ class ChemistryKernel:
         """Pass-through to :meth:`Planner.clear_shadow_trace`."""
 
         self._planner.clear_shadow_trace()
+
+    def _remember_proposal_origin(
+        self,
+        proposal: LedgerTransitionProposal,
+        provider: ChemistryProvider,
+        intent: ChemistryIntent,
+    ) -> None:
+        dead = [
+            key
+            for key, (proposal_ref, _, _) in self._proposal_origins.items()
+            if proposal_ref() is None
+        ]
+        for key in dead:
+            self._proposal_origins.pop(key, None)
+        proposal_id = id(proposal)
+        kernel_ref = weakref.ref(self)
+
+        def forget_origin(_: weakref.ReferenceType[LedgerTransitionProposal]) -> None:
+            kernel = kernel_ref()
+            if kernel is not None:
+                kernel._proposal_origins.pop(proposal_id, None)
+
+        self._proposal_origins[proposal_id] = (
+            weakref.ref(proposal, forget_origin),
+            provider,
+            intent,
+        )
+
+    def _bound_provider_for_commit(
+        self,
+        intent: ChemistryIntent,
+        proposal: LedgerTransitionProposal,
+    ) -> ChemistryProvider | None:
+        entry = self._proposal_origins.get(id(proposal))
+        if entry is None:
+            return None
+        proposal_ref, provider, dispatched_intent = entry
+        if proposal_ref() is not proposal:
+            self._proposal_origins.pop(id(proposal), None)
+            return None
+        if dispatched_intent != intent:
+            raise UnauthorizedIntentError(
+                f"proposal was dispatched for intent {dispatched_intent.value!r}, "
+                f"not {intent.value!r}"
+            )
+        if provider is self._registry.authoritative_for(intent):
+            return provider
+        if (
+            intent in self._allow_fallback_intents
+            and provider is self._registry.fallback_for(intent)
+        ):
+            return provider
+        raise ProviderUnavailableError(
+            f"proposal origin provider {provider.capability_profile().provider_id!r} "
+            f"is no longer registered for intent {intent.value!r}"
+        )
 
     def dispatch(
         self,
@@ -506,6 +576,11 @@ class ChemistryKernel:
         """
 
         profile = provider.capability_profile()
+        if not profile.can_dispatch(intent):
+            raise UnauthorizedIntentError(
+                f"provider {profile.provider_id!r} no longer declares dispatch "
+                f"capability for intent {intent.value!r}"
+            )
         if declared_accounts is None:
             declared_accounts = profile.declared_accounts
         else:
@@ -559,6 +634,8 @@ class ChemistryKernel:
             validate_atom_balance(result.transition, self._species_formula_registry)
         if result.control_audit is not None:
             validate_control_audit(result.control_audit, request)
+        if result.transition is not None:
+            self._remember_proposal_origin(result.transition, provider, intent)
 
         # Tag the result so a trace consumer can tell whether the
         # authoritative or the fallback provider answered.  The kernel
@@ -597,11 +674,14 @@ class ChemistryKernel:
         one off the dispatch path -- atom balance alone is not enough
         gate).  In order:
 
-        1. :func:`validate_intent_authority` -- the registry's
-           authoritative provider for ``intent`` must declare it in its
-           ``is_authoritative_for`` set.
+        1. :func:`validate_intent_authority` -- a proposal returned by
+           :meth:`dispatch` is re-bound to the registered provider that
+           produced it (including an explicitly enabled fallback); an
+           off-path proposal is checked only against the authoritative
+           provider. The selected provider must still declare the intent in
+           its ``is_authoritative_for`` set.
         2. :func:`validate_proposal_accounts` -- every account touched
-           must be in the authoritative provider's
+           must be in the selected provider's
            :attr:`CapabilityProfile.declared_accounts`.
         3. :func:`validate_atom_balance` -- conservation gate.
 
@@ -610,10 +690,11 @@ class ChemistryKernel:
         :meth:`AtomLedger.apply`.
 
         Args:
-            intent: The :class:`ChemistryIntent` this proposal was
-                produced for. Re-validation looks up the authoritative
-                provider via the registry; mismatched or unauthoritative
-                intents raise :class:`ProviderUnavailableError` /
+            intent: The :class:`ChemistryIntent` this proposal was produced
+                for. Re-validation checks the bound dispatch provider or,
+                for off-path proposals, the authoritative registry slot;
+                mismatched or unauthoritative intents raise
+                :class:`ProviderUnavailableError` /
                 :class:`UnauthorizedIntentError`.
             proposal: The :class:`LedgerTransitionProposal` to commit.
             transition_source: Optional source label copied onto every
@@ -628,17 +709,19 @@ class ChemistryKernel:
         :class:`KernelError` subclasses).
         """
 
-        provider = self._registry.authoritative_for(intent)
+        provider = self._bound_provider_for_commit(intent, proposal)
+        proposal_was_dispatched = provider is not None
+        if provider is None:
+            provider = self._registry.authoritative_for(intent)
         if provider is None:
             raise ProviderUnavailableError(
                 f"no authoritative provider registered for intent {intent.value!r}; "
                 "cannot commit proposal"
             )
         profile = provider.capability_profile()
-        # Re-check intent authority + account-filter at commit time so
-        # an off-path proposal (replay, future API, hand-built test)
-        # cannot bypass the dispatch-time gates.  Defence in depth
-        # matches the docstring contract.
+        # Re-check intent authority + account-filter at commit time so an
+        # off-path proposal cannot borrow the fallback's account scope and a
+        # bound proposal cannot outlive its provider's current capability.
         validate_intent_authority(intent, profile)
         validate_proposal_accounts(proposal, profile.declared_accounts)
 
@@ -656,9 +739,19 @@ class ChemistryKernel:
             lot_meta=transition_meta,
         )
         try:
-            return self._ledger.apply(transition)
+            terminal_debit_capability = (
+                _C7_TERMINAL_SLAG_REWORK_CAPABILITY
+                if proposal_was_dispatched
+                and intent == ChemistryIntent.CA_ALUMINOTHERMIC_STEP
+                else None
+            )
+            applied = self._ledger.apply(
+                transition,
+                _terminal_debit_capability=terminal_debit_capability,
+            )
         except Exception as exc:  # noqa: BLE001
             raise ProposalRejected(str(exc)) from exc
+        return applied
 
     def _transition_lots_to_proposal_accounts(
         self,

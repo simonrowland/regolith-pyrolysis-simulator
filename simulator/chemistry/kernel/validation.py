@@ -157,15 +157,16 @@ def validate_control_audit(audit: ControlAudit, request: IntentRequest) -> None:
         "fO2_log": request.fO2_log,
     }
     drift: list[str] = []
+    missing_applied: list[str] = []
     for key, requested_value in requested.items():
-        applied_value = audit.applied.get(key, audit.requested.get(key))
         if requested_value is None:
             # Caller did not specify this control; engine response is
             # informational only.
             continue
-        if applied_value is None:
-            drift.append(f"{key}: applied=None requested={requested_value}")
+        if key not in audit.applied or audit.applied.get(key) is None:
+            missing_applied.append(key)
             continue
+        applied_value = audit.applied[key]
         tol_abs = _CONTROL_TOLERANCE_ABS.get(key, 1e-9)
         if not math.isclose(
             float(applied_value),
@@ -176,6 +177,11 @@ def validate_control_audit(audit: ControlAudit, request: IntentRequest) -> None:
             drift.append(
                 f"{key}: applied={applied_value!r} requested={requested_value!r}"
             )
+    if missing_applied:
+        raise ControlAuditMismatch(
+            "missing applied-control evidence for requested controls: "
+            + ", ".join(missing_applied)
+        )
     if drift and not audit.notes:
         raise ControlAuditMismatch(
             "applied controls drift from requested without notes: " + "; ".join(drift)
@@ -192,7 +198,8 @@ def _proposal_to_ledger_transition(
     """Translate a mol-native proposal into a kg-native :class:`LedgerTransition`.
 
     Reuses the registry-driven mol -> kg projection that the rest of the
-    accounting layer uses.  Empty species entries are dropped (matches
+    accounting layer uses while retaining the exact mol-native input in lot
+    metadata. Empty species entries are dropped (matches
     :class:`MaterialLot.without_empty`).
     """
 
@@ -231,6 +238,7 @@ def _build_lots(
     lots: list[MaterialLot] = []
     for account, species_mol in dict(side or {}).items():
         species_kg: dict[str, float] = {}
+        retained_species_mol: dict[str, float] = {}
         for species, mol in dict(species_mol or {}).items():
             value = float(mol)
             if not math.isfinite(value):
@@ -246,13 +254,17 @@ def _build_lots(
                 continue
             formula = resolve_species_formula(str(species), registry)
             species_kg[str(species)] = value * formula.molar_mass_kg_per_mol()
+            retained_species_mol[str(species)] = value
         if species_kg:
+            lot_meta = dict(meta or {})
+            lot_meta["amount_basis"] = "mol"
+            lot_meta["species_mol"] = retained_species_mol
             lots.append(
                 MaterialLot(
                     str(account),
                     species_kg,
                     source=source,
-                    meta=meta or {},
+                    meta=lot_meta,
                 )
             )
     return lots
