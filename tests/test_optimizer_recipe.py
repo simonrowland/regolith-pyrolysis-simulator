@@ -449,7 +449,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-12 combined-main rebaseline: the C6 1400 C window changes the
     # bounds/setpoints identity while t-005 changes optimizer source inputs;
     # recomputing only after both folds yields their shared cache identity.
-    assert cache_key(spec) == "a31258f215ba70c26dba4c569dbab94036a637283fb5c7b8fd67d5bc463dc7e8"
+    # 2026-07-12 wave-11 audit-contract request-shape fix: fO2-independent
+    # intents no longer receive fO2-shaped requests. The source fingerprint
+    # moves the cache identity; recipe_id and search-list hash above stay fixed.
+    assert cache_key(spec) == "12a231b089f618babf7e1ccd4318c171baa95f43113c5eece268b6736f655509"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

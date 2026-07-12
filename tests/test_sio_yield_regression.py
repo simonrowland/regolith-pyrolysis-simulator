@@ -147,28 +147,24 @@ GOLDENS = (
 # Fresh CLI runs on combined main move wall capture, downstream routing, and the
 # coupled evolved-SiO baseline. Attribution:
 # docs-private/reviews/2026-07-11-wave08/runtime-golden-attribution.md.
+# 2026-07-12 wave-10 wall-flux closeout + wave-11 audit-contract request-shape
+# fix: area-integrated wall flux is restored after the process-condensation fold,
+# and fO2-independent diagnostics no longer receive fO2-shaped requests. The
+# lunar continuous fixture now follows the corrected wall-flux/request path;
+# Mars evolved SiO is unchanged, but routing bins are regenerated below.
 BASELINE_SIO_EVOLVED_KG = {
-    # 2026-07-11 0.5.10 E-MOVE: phase-basis/two-rail vapor plus K/S fO2 and
-    # alkali-path changes lower the generated SiO-yield fixture baselines.
-    "lunar_mare_low_ti": 8.71385905254e-06,
+    "lunar_mare_low_ti": 2.56436221494e-07,
     "mars_basalt": 8.7690897664e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
-# default `StirState(radial=1.0)` (laminar gas-side Sherwood) produces
+# default `StirState(radial=1.0)` (laminar gas-side Sherwood) produced
 # Stage 4 SiO carryover ABOVE Stage 3 SiO zone product — documented
-# "Known limitation" in CHANGELOG 0.5.3 as a routing trade-off
-# (operators bump `stir_state.radial > 1.0` for Stage 3 dominance,
-# or retune Stage 3 temps). This is physics-honest: the +146% SiO
-# release from synthetic→holdup pO2 saturates Stage 3's laminar Sh
-# capture cap and overflows downstream. The two assertions below
-# pin both:
-#   1. Absolute ceiling on Stage 4 (regression catch — runaway), and
-#   2. Stage 4 > Stage 3 ordering invariant (forces CHANGELOG update
-#      if defaults change in a way that restores Stage 3 dominance).
-# After the 2026-06-28 alpha-series source model, stage_3 is 1.69e-7 kg
-# (lunar) / 1.32e-7 kg (mars), and stage_4 remains higher at 3.18e-7 kg
-# (lunar) / 2.47e-7 kg (mars).
+# "Known limitation" in CHANGELOG 0.5.3 as a routing trade-off.
+# 2026-07-12 wave-10 wall-flux closeout: the restored area-integrated
+# wall budget moves default C2A routing again. Stage 3 is now a pinned
+# zero for these fixtures; the regression catch is wall-dominant routing
+# plus a retained Stage 4 runaway ceiling, not stale Stage 4 > Stage 3.
 # Predecessor history (for legacy reviewers): pre-Phase-A1 values were
 # 1.65257779038 / 1.69466902181 kg, sat above the legacy stage_3 ~1 kg
 # magnitude; the post-flip regime is ~1.94 mg total SiO evolved
@@ -241,19 +237,12 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     placement = actual["sio_to_silica_fume_kg"]
     stage_3 = placement["stage_3_sio_zone_product"]
     stage_4 = placement["stage_4_alkali_mg_carryover"]
-    assert stage_3 > 0.0
+    wall_total = sum(float(value) for value in actual["wall_deposit_kg"].values())
+    routed_total = sum(float(value) for value in placement.values())
+    assert all(float(value) >= 0.0 for value in placement.values())
+    assert stage_3 == pytest.approx(0.0)
     assert stage_4 < BASELINE_STAGE4_SIO2_KG[feedstock]
-    # 0.5.3 Phase A1 routing-trade-off invariant: under default
-    # `StirState(radial=1.0)` laminar gas-side Sherwood + finite-headspace
-    # ON, Stage 4 SiO carryover > Stage 3 SiO zone product on this
-    # feedstock. Documented as "Known limitation" in CHANGELOG 0.5.3.
-    # Pinned so a future defaults change (e.g., radial→2.0 globally,
-    # or a Stage 3 temp retune) that restores Stage 3 dominance forces
-    # both this assertion update AND a CHANGELOG entry.
-    assert stage_4 > stage_3, (
-        f"Phase A1 SiO routing trade-off changed: stage_3={stage_3:.3e} "
-        f"stage_4={stage_4:.3e} for {feedstock}. Update CHANGELOG."
-    )
+    assert wall_total > routed_total
     assert 0.0 <= actual["sio_yield_pct_of_feedstock"] <= 30.0
     assert actual["alpha_SiO"] == pytest.approx(0.0320984652281)
     assert actual["alpha_provenance"] == (
@@ -449,8 +438,11 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
 
     # Same e73fde5 J * A * M * 3600 wall-budget rebaseline cited above and in
     # docs-private/reviews/2026-07-11-wave08/runtime-golden-attribution.md.
+    # Wave-10 wall-flux closeout moved the restored direct wall-budget pin after
+    # the final process-condensation fold; two-pass deterministic extra probe:
+    # docs-private/research/2026-07-12-pin-final/wall-flux-extra-run{1,2}.json.
     assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        0.11212772348825843,
+        0.11244702040073114,
         rel=1e-12,
     )
     assert (

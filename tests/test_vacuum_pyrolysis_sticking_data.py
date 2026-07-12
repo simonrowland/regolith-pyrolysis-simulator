@@ -370,8 +370,10 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
     # grounded and legacy-alpha deposits must move together. Recomputed on
     # combined main; see docs-private/reviews/2026-07-11-wave08/
     # runtime-golden-attribution.md.
-    assert grounded == pytest.approx(0.11212772348825843, rel=1e-12)
-    assert legacy == pytest.approx(0.4453644288843845, rel=1e-12)
+    # 2026-07-12 wave-10 wall-flux closeout: restored area-integrated wall flux
+    # after the process-condensation fold moves both pins together.
+    assert grounded == pytest.approx(0.11244702040073114, rel=1e-12)
+    assert legacy == pytest.approx(0.44637305334927246, rel=1e-12)
     assert grounded < legacy
 
 

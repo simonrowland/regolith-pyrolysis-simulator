@@ -1,129 +1,129 @@
 {
-  "feedstock_id": "lunar_mare_low_ti",
-  "campaign": "C2A_continuous",
   "alpha_SiO": 0.0320984652281,
   "alpha_provenance": "Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803; alpha_s_SiO(T)=0.52*exp(-3685/T), reaction-rate-limited",
-  "sio_evolved_kg": 8.71385905254e-06,
-  "sio_to_silica_fume_kg": {
-    "stage_1_fe_condenser_impurity": 0.0,
-    "stage_3_sio_zone_product": 3.93688314987e-08,
-    "stage_4_alkali_mg_carryover": 8.93227392987e-08,
-    "stage_5_dust_filter_carryover": 5.83065410041e-08,
-    "terminal_offgas_escape": 3.78299850646e-07
-  },
-  "wall_deposit_kg": {
-    "Fe": 0.0,
-    "K": 0.0,
-    "Mg": 0.0,
-    "Na": 0.0,
-    "Si": 2.56693525695e-06,
-    "SiO": 0.0,
-    "SiO2": 5.49151401258e-06
-  },
+  "campaign": "C2A_continuous",
+  "feedstock_id": "lunar_mare_low_ti",
   "fouling_rate": {
-    "liner_material": "hot_wall_refractory_liner",
-    "dominant_species": "SiO2",
-    "dominant_species_wall_deposit_kg": 5.49151401258e-06,
-    "wall_deposit_kg_per_campaign": 8.05844926953e-06,
-    "wall_deposit_basis": "total_wall_load_by_species",
-    "resinter_threshold_kg": null,
-    "resinter_threshold_basis": "configurable_parameter_no_sourced_default",
-    "campaigns_to_resinter": "resinter_threshold_kg / 8.05844926953e-06",
-    "fast_fouling_campaign_threshold": 10,
-    "output_status": "status_bearing",
     "authoritative": false,
     "authoritative_for_resinter": false,
-    "verdict_authoritative": false,
+    "campaigns_to_resinter": "resinter_threshold_kg / 2.42735332523e-07",
+    "dominant_species": "SiO2",
+    "dominant_species_wall_deposit_kg": 1.65414515289e-07,
+    "fast_fouling_campaign_threshold": 10,
+    "liner_material": "hot_wall_refractory_liner",
+    "nominal_verdict": "threshold-parametric: fast-fouling if campaigns_to_resinter < 10, else slow-fouling",
+    "output_status": "status_bearing",
+    "resinter_threshold_basis": "configurable_parameter_no_sourced_default",
+    "resinter_threshold_kg": null,
     "status": "warning",
     "status_reason": "Wall-deposit sticking alpha authority missing; provenance is missing, so coating and fouling readouts are non-authoritative until the coefficient status travels with the deposit.",
     "sticking_alpha_authority": {
+      "alpha_s_provenance_by_species": {},
       "authoritative": false,
-      "authoritative_for_deposit_mass": false,
       "authoritative_for_coating": false,
+      "authoritative_for_deposit_mass": false,
       "authoritative_for_resinter": false,
-      "severity": "warning",
       "code": "wall_deposit_sticking_alpha_provenance_missing",
-      "output_status": "status_bearing",
       "deposited_species": [
         "Si",
         "SiO2"
       ],
-      "uncertified_alpha_species": [
-        "Si",
-        "SiO2"
-      ],
-      "status_bearing_alpha_count": 2,
-      "alpha_s_provenance_by_species": {},
       "grounding_target": "data/literature/vacuum_pyrolysis_sticking.yaml",
       "message": "Wall-deposit sticking alpha authority missing; provenance is missing, so coating and fouling readouts are non-authoritative until the coefficient status travels with the deposit.",
+      "output_status": "status_bearing",
+      "severity": "warning",
+      "status_bearing_alpha_count": 2,
+      "surface_geometry_code": "wall_deposit_surface_geometry_provenance",
       "surface_geometry_provenance": {
-        "severity": "warning",
         "code": "wall_deposit_surface_geometry_provenance",
-        "source_class": "engineering-default",
-        "status": "provisional",
+        "message": "Condenser stage-area ratios include provisional/default geometry; wall-deposit and coating readouts are status-bearing until stage surface areas are certified.",
         "output_status": "status_bearing",
         "provisional": true,
+        "severity": "warning",
+        "source_class": "engineering-default",
+        "stage_area_ratio_provenance_by_stage": {
+          "alkali_stage4": {
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused.",
+            "output_status": "status_bearing",
+            "ratio": 5.0,
+            "source": "engineering-default: cyclone separator effective wall area exceeds throat but stays below SiO baffle cartridge",
+            "source_class": "engineering-default",
+            "stage": "alkali_stage4",
+            "status": "provisional",
+            "usage": "condensation_surface_area"
+          },
+          "fe_stage1": {
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused.",
+            "output_status": "status_bearing",
+            "ratio": 4.0,
+            "source": "engineering-default: baffled Fe condenser presents multiple throat areas downstream of the constriction",
+            "source_class": "engineering-default",
+            "stage": "fe_stage1",
+            "status": "provisional",
+            "usage": "condensation_surface_area"
+          },
+          "sio_stage3": {
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused.",
+            "output_status": "status_bearing",
+            "ratio": 6.0,
+            "source": "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages",
+            "source_class": "engineering-default",
+            "stage": "sio_stage3",
+            "status": "provisional",
+            "usage": "condensation_surface_area"
+          },
+          "terminal": {
+            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused.",
+            "output_status": "status_bearing",
+            "ratio": 2.0,
+            "source": "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics",
+            "source_class": "engineering-default",
+            "stage": "terminal",
+            "status": "provisional",
+            "usage": "condensation_surface_area"
+          }
+        },
+        "status": "provisional",
         "usage": [
           "stage_area_m2_by_stage",
           "PipeSegment.declared_area_m2",
           "PipeSegment.surface_area_m2",
           "wall_deposit_candidate_for_surface",
           "coating_lifespan"
-        ],
-        "stage_area_ratio_provenance_by_stage": {
-          "fe_stage1": {
-            "source": "engineering-default: baffled Fe condenser presents multiple throat areas downstream of the constriction",
-            "source_class": "engineering-default",
-            "status": "provisional",
-            "output_status": "status_bearing",
-            "stage": "fe_stage1",
-            "ratio": 4.0,
-            "usage": "condensation_surface_area",
-            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
-          },
-          "sio_stage3": {
-            "source": "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages",
-            "source_class": "engineering-default",
-            "status": "provisional",
-            "output_status": "status_bearing",
-            "stage": "sio_stage3",
-            "ratio": 6.0,
-            "usage": "condensation_surface_area",
-            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
-          },
-          "alkali_stage4": {
-            "source": "engineering-default: cyclone separator effective wall area exceeds throat but stays below SiO baffle cartridge",
-            "source_class": "engineering-default",
-            "status": "provisional",
-            "output_status": "status_bearing",
-            "stage": "alkali_stage4",
-            "ratio": 5.0,
-            "usage": "condensation_surface_area",
-            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
-          },
-          "terminal": {
-            "source": "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics",
-            "source_class": "engineering-default",
-            "status": "provisional",
-            "output_status": "status_bearing",
-            "stage": "terminal",
-            "ratio": 2.0,
-            "usage": "condensation_surface_area",
-            "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
-          }
-        },
-        "message": "Condenser stage-area ratios include provisional/default geometry; wall-deposit and coating readouts are status-bearing until stage surface areas are certified."
+        ]
       },
       "surface_geometry_status_bearing": true,
-      "surface_geometry_code": "wall_deposit_surface_geometry_provenance"
+      "uncertified_alpha_species": [
+        "Si",
+        "SiO2"
+      ]
     },
-    "nominal_verdict": "threshold-parametric: fast-fouling if campaigns_to_resinter < 10, else slow-fouling",
-    "verdict": "non-authoritative"
+    "verdict": "non-authoritative",
+    "verdict_authoritative": false,
+    "wall_deposit_basis": "total_wall_load_by_species",
+    "wall_deposit_kg_per_campaign": 2.42735332523e-07
   },
-  "sio_yield_pct_of_feedstock": 8.71385905254e-07,
   "industrial_benchmark_pct": [
     8,
     15
   ],
-  "verdict": "below industrial-Si envelope (order-of-magnitude regime check, not 1-decade fidelity)"
+  "sio_evolved_kg": 2.56436221494e-07,
+  "sio_to_silica_fume_kg": {
+    "stage_1_fe_condenser_impurity": 0.0,
+    "stage_3_sio_zone_product": 0.0,
+    "stage_4_alkali_mg_carryover": 0.0,
+    "stage_5_dust_filter_carryover": 1.69507542205e-09,
+    "terminal_offgas_escape": 1.11312529667e-08
+  },
+  "sio_yield_pct_of_feedstock": 2.56436221494e-08,
+  "verdict": "below industrial-Si envelope (order-of-magnitude regime check, not 1-decade fidelity)",
+  "wall_deposit_kg": {
+    "Fe": 0.0,
+    "K": 0.0,
+    "Mg": 0.0,
+    "Na": 0.0,
+    "Si": 7.73208172343e-08,
+    "SiO": 0.0,
+    "SiO2": 1.654145152891e-07
+  }
 }

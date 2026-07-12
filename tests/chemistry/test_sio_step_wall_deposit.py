@@ -179,14 +179,18 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # wall budget J * A * M * 3600, capped by available supply. Recomputed on
     # combined main; attribution: docs-private/reviews/2026-07-11-wave08/
     # runtime-golden-attribution.md.
+    # 2026-07-12 wave-10 wall-flux closeout: the area-integrated wall-flux
+    # contract is now restored end-to-end after the process-condensation fold,
+    # and wave-11's request-shape audit fix is in main. Two-pass probe:
+    # docs-private/research/2026-07-12-pin-final/reconcile_run{1,2}.json.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        6.9580380111987995e-06, rel=1e-9
+        2.281305845076e-07, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
-        8.08095351593e-06, rel=1e-9
+        2.429765790373e-07, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
-        8.07180750236e-06, rel=1e-9
+        2.428777052747e-07, rel=1e-9
     )
 
 
