@@ -710,8 +710,16 @@ def probe_engine(config: Mapping[str, Any]) -> dict[str, Any]:
         }
 
 
-def _worker_initialize(config: Mapping[str, Any]) -> None:
+def _worker_initialize(
+    config: Mapping[str, Any],
+    assumed_queued_run_mode: str | None = None,
+) -> None:
+    # macOS multiprocessing uses the spawn context: workers re-import this
+    # module, so the parent's _ASSUMED_QUEUED_RUN_MODE global is lost unless
+    # threaded through initargs explicitly.
     global _WORKER_BACKEND, _WORKER_MODULE, _WORKER_ENGINE_VERSION, _WORKER_INIT_ERROR
+    global _ASSUMED_QUEUED_RUN_MODE
+    _ASSUMED_QUEUED_RUN_MODE = assumed_queued_run_mode
     try:
         import simulator.melt_backend.alphamelts as alphamelts_module
 
@@ -1209,7 +1217,7 @@ def run_cycle(
     pool = context.Pool(
         processes=args.workers,
         initializer=_worker_initialize,
-        initargs=(backend_config(args),),
+        initargs=(backend_config(args), args.assume_queued_run_mode),
     )
     try:
         def fill() -> None:
