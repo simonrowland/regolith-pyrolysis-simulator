@@ -1014,6 +1014,9 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             "adapter_fO2_log_argument": float(fO2_log),
             "pressure_bar": float(pressure_bar),
             "run_mode": run_mode.value if hasattr(run_mode, "value") else str(run_mode),
+            "total_input_kg": (
+                float(total_input_kg) if total_input_kg is not None else None
+            ),
             "applied_timeout_s": applied_timeout_s,
             "warnings": list(warnings or []),
             "diagnostics": dict(diagnostics or {}),
@@ -1025,6 +1028,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 fO2_log,
                 pressure_bar,
                 warnings,
+                total_input_kg=total_input_kg,
                 diagnostics=diagnostics,
                 run_mode=run_mode,
             )
