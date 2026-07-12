@@ -81,6 +81,7 @@ from simulator.optimize.objective import (
     product_summary,
 )
 from simulator.optimize.physics import (
+    CoatingFeasibilityReportError,
     GATE_ORDER,
     FeasibilityResult,
     GateMargin,
@@ -505,6 +506,19 @@ class _TraceOverrideRunExecution:
         return getattr(self.run_execution, name)
 
 
+class _TraceAttributeOverlay:
+    __slots__ = ("original_trace", "overrides")
+
+    def __init__(self, original_trace: Any, overrides: Mapping[str, Any]) -> None:
+        self.original_trace = original_trace
+        self.overrides = overrides
+
+    def __getattr__(self, name: str) -> Any:
+        if name in self.overrides:
+            return self.overrides[name]
+        return getattr(self.original_trace, name)
+
+
 @dataclass(frozen=True)
 class _CertifiedPumpingDiagnosticRunExecution:
     run_execution: Any
@@ -895,7 +909,7 @@ def evaluate(
     try:
         feasibility = _evaluate_physics_constraints(
             active_constraints,
-            run_execution.trace,
+            _trace_with_optimizer_coating_report(run_execution, active_constraints),
             spec=spec,
             profile=profile,
             run_config=run_config,
@@ -1260,6 +1274,80 @@ def _evaluate_physics_constraints(
         )
     feasibility = _with_knudsen_fallback_margin_detail(feasibility, prepared_trace)
     return _with_extraction_not_attempted_verdicts(feasibility, prepared_trace)
+
+
+def _trace_with_optimizer_coating_report(
+    run_execution: Any,
+    constraints: PhysicsConstraintSet | None,
+) -> Any:
+    trace = getattr(run_execution, "trace", None)
+    if constraints is not None and "coating" not in getattr(
+        constraints,
+        "active_gates",
+        (),
+    ):
+        return trace
+    raw_deposit = getattr(trace, "wall_deposit_by_segment_species_kg", None)
+    if not isinstance(raw_deposit, Mapping):
+        raise CoatingFeasibilityReportError(
+            "wall_deposit_by_segment_species_kg trace is missing or malformed"
+        )
+    by_species: dict[str, float] = {}
+    for key, raw_kg in raw_deposit.items():
+        if not isinstance(key, tuple) or len(key) != 2:
+            raise CoatingFeasibilityReportError(
+                "wall deposit key must be (segment, species)"
+            )
+        try:
+            kg = float(raw_kg)
+        except (TypeError, ValueError) as exc:
+            raise CoatingFeasibilityReportError(
+                f"wall deposit {key!r} must be numeric"
+            ) from exc
+        if not math.isfinite(kg) or kg < 0.0:
+            raise CoatingFeasibilityReportError(
+                f"wall deposit {key!r} must be finite and non-negative"
+            )
+        by_species[str(key[1])] = by_species.get(str(key[1]), 0.0) + kg
+    from simulator.runner import _wall_fouling_report
+
+    runner_report = _wall_fouling_report(
+        by_species,
+        alpha_notice=getattr(trace, "wall_deposit_sticking_authority", {}) or {},
+    )
+    try:
+        campaigns = runner_report["campaigns_to_resinter"]
+        authoritative = runner_report["authoritative_for_resinter"]
+        output_status = runner_report["output_status"]
+        status_reason = runner_report["status_reason"]
+    except KeyError as exc:
+        raise CoatingFeasibilityReportError(
+            f"runner wall-fouling report missing required field: {exc.args[0]}"
+        ) from exc
+    if campaigns == "infinite":
+        campaigns = math.inf
+    elif isinstance(campaigns, str) and campaigns.startswith(
+        "resinter_threshold_kg / "
+    ):
+        authoritative = False
+        output_status = "non-authoritative-threshold"
+        status_reason = "resinter threshold is not grounded"
+        campaigns = math.inf
+    report = dict(runner_report)
+    report.update(
+        campaigns_to_resinter_total=campaigns,
+        authoritative_for_resinter=authoritative,
+        output_status=output_status,
+        status_reason=status_reason,
+    )
+    if not authoritative:
+        report.update(
+            authoritative=False,
+            verdict_authoritative=False,
+            status="warning",
+            verdict="non-authoritative",
+        )
+    return _TraceAttributeOverlay(trace, {"wall_fouling_report": report})
 
 
 def _knudsen_summary_from_eval_inputs(
@@ -1856,6 +1944,9 @@ def _finite_float_or_none(value: Any) -> float | None:
 
 
 def _replace_trace_snapshots(trace: Any, snapshots: tuple[Any, ...]) -> Any:
+    if isinstance(trace, _TraceAttributeOverlay):
+        original_trace = _replace_trace_snapshots(trace.original_trace, snapshots)
+        return _TraceAttributeOverlay(original_trace, trace.overrides)
     try:
         return replace(trace, snapshots=snapshots)
     except TypeError:
@@ -3716,7 +3807,7 @@ def _out_of_domain_result(
     if assessment.earned:
         feasibility = _evaluate_physics_constraints(
             constraints,
-            run_execution.trace,
+            _trace_with_optimizer_coating_report(run_execution, constraints),
             spec=spec,
             profile=profile,
         )

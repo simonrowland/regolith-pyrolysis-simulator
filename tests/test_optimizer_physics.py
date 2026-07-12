@@ -8,6 +8,7 @@ import pytest
 
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.optimize.physics import (
+    CoatingFeasibilityReportError,
     GATE_ORDER,
     PhysicsConstraintSet,
     ThresholdSpec,
@@ -386,6 +387,83 @@ def test_authoritative_bad_coating_fails_grounded_campaign_gate() -> None:
         "fail-closed: grounded coating criterion "
         "campaigns_to_resinter=0.2 < 10"
     ) in coating.detail
+
+
+def test_runner_fouling_report_binds_authoritative_coating_gate() -> None:
+    trace = _valid_trace_object(
+        wall_fouling_report={
+            "campaigns_to_resinter_total": 9.5,
+            "authoritative_for_resinter": True,
+            "output_status": "authoritative",
+            "status_reason": "",
+        }
+    )
+
+    result = PhysicsConstraintSet().evaluate(trace)
+
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    assert result.margins["coating"].observed == pytest.approx(9.5)
+
+
+def test_runner_fouling_report_non_authoritative_is_unconstrained_and_surfaced() -> None:
+    trace = _valid_trace_object(
+        wall_fouling_report={
+            "campaigns_to_resinter_total": 0.5,
+            "authoritative_for_resinter": False,
+            "output_status": "non-authoritative-threshold",
+            "status_reason": "resinter threshold is not grounded",
+        }
+    )
+
+    result = PhysicsConstraintSet().evaluate(trace)
+    coating = result.margins["coating"]
+
+    assert result.feasible
+    assert coating.feasible
+    assert coating.authoritative is False
+    assert coating.output_status == "non-authoritative-threshold"
+    assert "resinter threshold is not grounded" in coating.detail
+
+
+@pytest.mark.parametrize(
+    "report",
+    (
+        None,
+        {},
+        {"campaigns_to_resinter_total": "unknown"},
+    ),
+)
+def test_malformed_runner_fouling_report_fails_loud(report: object) -> None:
+    with pytest.raises(CoatingFeasibilityReportError):
+        PhysicsConstraintSet().evaluate(
+            _valid_trace_object(wall_fouling_report=report)
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("output_status", None),
+        ("status_reason", {"message": "bad"}),
+    ),
+)
+def test_malformed_runner_fouling_status_fields_fail_loud(
+    field: str,
+    value: object,
+) -> None:
+    report = {
+        "campaigns_to_resinter_total": 9.5,
+        "authoritative_for_resinter": True,
+        "output_status": "authoritative",
+        "status_reason": "",
+    }
+    report[field] = value
+
+    with pytest.raises(CoatingFeasibilityReportError, match=field):
+        PhysicsConstraintSet().evaluate(
+            _valid_trace_object(wall_fouling_report=report)
+        )
 
 
 def test_non_authoritative_bad_coating_stays_feasible_with_warning() -> None:
@@ -956,6 +1034,7 @@ def test_extraction_completeness_reports_target_denominator_residual_and_product
     )
 
     assert summary["extraction_completeness"]["targets"]["Cr"]["product_bin"] == "Cr"
+    assert "campaigns_to_resinter_total" not in summary
 
 
 @pytest.mark.parametrize(

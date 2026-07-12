@@ -122,6 +122,10 @@ class FeasibilityResult:
         )
 
 
+class CoatingFeasibilityReportError(ValueError):
+    """Runner wall-fouling report cannot support a coating verdict."""
+
+
 @dataclass(frozen=True)
 class PhysicsConstraintSet:
     """Stage-1 hard feasibility constraints for optimizer traces."""
@@ -419,6 +423,8 @@ class PhysicsConstraintSet:
             return _fail_closed("delivered_stream_purity", self.stream_purity_min, str(exc))
 
     def coating(self, trace: Any) -> GateMargin:
+        if hasattr(trace, "wall_fouling_report"):
+            return self.coating_from_fouling_report(trace.wall_fouling_report)
         try:
             snapshots = _required_sequence(trace, "snapshots")
             deltas = _required_sequence(trace, "wall_deposit_by_segment_species_delta")
@@ -569,6 +575,84 @@ class PhysicsConstraintSet:
             )
         except (KeyError, TypeError, ValueError) as exc:
             return _fail_closed("coating", self.coating_min_campaigns_to_resinter, str(exc))
+
+    def coating_from_fouling_report(self, report: Any) -> GateMargin:
+        """Classify the runner's total-load lifespan verdict.
+
+        A non-authoritative wall-sticking or threshold verdict is deliberately
+        unconstrained by coating: heuristics remain visible, but never become a
+        hard feasibility block.
+        """
+        if not isinstance(report, Mapping):
+            raise CoatingFeasibilityReportError(
+                "wall-fouling report must be a mapping"
+            )
+        required = (
+            "campaigns_to_resinter_total",
+            "authoritative_for_resinter",
+            "output_status",
+            "status_reason",
+        )
+        missing = tuple(key for key in required if key not in report)
+        if missing:
+            raise CoatingFeasibilityReportError(
+                f"wall-fouling report missing required fields: {missing}"
+            )
+        authoritative_raw = report["authoritative_for_resinter"]
+        if not isinstance(authoritative_raw, bool):
+            raise CoatingFeasibilityReportError(
+                "wall-fouling authoritative_for_resinter must be bool"
+            )
+        authoritative = authoritative_raw
+        output_status = report["output_status"]
+        status_reason = report["status_reason"]
+        if not isinstance(output_status, str):
+            raise CoatingFeasibilityReportError(
+                "wall-fouling output_status must be str"
+            )
+        if not isinstance(status_reason, str):
+            raise CoatingFeasibilityReportError(
+                "wall-fouling status_reason must be str"
+            )
+        raw_observed = report["campaigns_to_resinter_total"]
+        if isinstance(raw_observed, bool) or not isinstance(raw_observed, int | float):
+            raise CoatingFeasibilityReportError(
+                "wall-fouling campaigns_to_resinter_total must be numeric"
+            )
+        observed = float(raw_observed)
+        if math.isnan(observed) or observed < 0.0:
+            raise CoatingFeasibilityReportError(
+                "wall-fouling campaigns_to_resinter_total must be non-negative"
+            )
+        margin = observed - self.coating_min_campaigns_to_resinter.value
+        feasible = (
+            not authoritative
+            or margin >= -self.coating_min_campaigns_to_resinter.tolerance
+        )
+        if authoritative:
+            detail = (
+                f"runner wall-fouling campaigns_to_resinter_total={observed:.6g}; "
+                f"minimum={self.coating_min_campaigns_to_resinter.value:.6g}"
+            )
+        else:
+            detail = (
+                "non-authoritative: coating feasibility unconstrained; "
+                f"output_status={output_status}; "
+                f"status_reason={status_reason}"
+            )
+        return GateMargin(
+            gate="coating",
+            feasible=feasible,
+            margin=margin,
+            threshold=self.coating_min_campaigns_to_resinter,
+            observed=observed,
+            detail=detail,
+            status="available" if authoritative else "warning",
+            authoritative=authoritative,
+            output_status=output_status,
+            status_reason="" if authoritative else status_reason,
+            status_payload=report,
+        )
 
     def extraction_completeness(self, trace: Any) -> GateMargin:
         try:

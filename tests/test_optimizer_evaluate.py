@@ -2766,7 +2766,7 @@ def test_trace_only_out_of_domain_earned_rump_terminal_scores_earned_crash() -> 
     assert result.run_reference.trace["composition_target"]["terminal_rump_source"] == "earned_crash"
 
 
-def test_composition_target_forces_coating_gate_for_arbitrary_target_id() -> None:
+def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic() -> None:
     trace = _trace()
     delattr(trace, "wall_deposit_by_segment_species_delta")
     result = evaluate(
@@ -2780,10 +2780,151 @@ def test_composition_target_forces_coating_gate_for_arbitrary_target_id() -> Non
         executor=FakeExecutor(_execution(trace=trace)),
     )
 
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.objectives is not None
+    assert result.failing_gates == ()
+    coating = result.feasibility_margins["coating"]
+    assert coating.observed == math.inf
+    assert "runner wall-fouling" in coating.detail
+
+
+def test_runner_wall_fouling_report_binds_optimizer_candidate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.runner as runner_module
+
+    monkeypatch.setattr(
+        runner_module,
+        "_wall_fouling_report",
+        lambda *_args, **_kwargs: {
+            "campaigns_to_resinter": 9.0,
+            "resinter_threshold_kg": 4.5,
+            "wall_deposit_kg_per_campaign": 0.5,
+            "authoritative_for_resinter": True,
+            "output_status": "authoritative",
+            "status_reason": "",
+            "sticking_alpha_authority": {"citation_status": "CITED"},
+        },
+    )
+    profile = {
+        **PROFILE,
+        "constraints": {
+            **PROFILE["constraints"],
+            "gates": ["coating"],
+            "coating_min_campaigns_to_resinter": 10.123,
+        },
+    }
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(_execution()),
+    )
+
     assert not result.feasible
-    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
-    assert result.objectives is None
     assert result.failing_gates == ("coating",)
+    coating = result.feasibility_margins["coating"]
+    assert coating.observed == pytest.approx(9.0)
+    assert coating.status_payload["resinter_threshold_kg"] == pytest.approx(4.5)
+    assert coating.status_payload["wall_deposit_kg_per_campaign"] == pytest.approx(0.5)
+    assert coating.status_payload["sticking_alpha_authority"] == {
+        "citation_status": "CITED"
+    }
+
+
+def test_inactive_coating_gate_does_not_construct_runner_overlay(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.runner as runner_module
+
+    def fail_if_called(*_args: object, **_kwargs: object) -> object:
+        raise AssertionError("inactive coating gate constructed runner overlay")
+
+    monkeypatch.setattr(runner_module, "_wall_fouling_report", fail_if_called)
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(_execution()),
+    )
+
+    assert result.feasible
+
+
+def test_parametric_runner_fouling_report_has_coherent_non_authority(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.runner as runner_module
+
+    monkeypatch.setattr(
+        runner_module,
+        "_wall_fouling_report",
+        lambda *_args, **_kwargs: {
+            "campaigns_to_resinter": "resinter_threshold_kg / 0.5",
+            "resinter_threshold_basis": "parameter required",
+            "authoritative": True,
+            "authoritative_for_resinter": True,
+            "verdict_authoritative": True,
+            "output_status": "authoritative",
+            "status": "available",
+            "status_reason": "",
+            "nominal_verdict": "slow-fouling",
+            "verdict": "slow-fouling",
+        },
+    )
+    profile = {
+        **PROFILE,
+        "constraints": {"gates": ["coating"]},
+    }
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=profile,
+        executor=FakeExecutor(_execution()),
+    )
+
+    report = result.feasibility_margins["coating"].status_payload
+    assert report["campaigns_to_resinter"] == "resinter_threshold_kg / 0.5"
+    assert report["resinter_threshold_basis"] == "parameter required"
+    assert report["authoritative"] is False
+    assert report["authoritative_for_resinter"] is False
+    assert report["verdict_authoritative"] is False
+    assert report["output_status"] == "non-authoritative-threshold"
+    assert report["status"] == "warning"
+    assert report["verdict"] == "non-authoritative"
+    assert report["nominal_verdict"] == "slow-fouling"
+
+
+def test_knudsen_snapshot_replacement_preserves_coating_overlay() -> None:
+    trace = _trace()
+    trace.snapshots = (
+        SimpleNamespace(
+            knudsen_regime_summary={
+                "status": "ok",
+                "regime": "viscous",
+                "knudsen_number": 0.001,
+            }
+        ),
+    )
+    report = {"campaigns_to_resinter_total": 7.0}
+    overlay = evaluate_module._TraceAttributeOverlay(
+        trace,
+        {"wall_fouling_report": report},
+    )
+
+    prepared, missing = evaluate_module._trace_with_knudsen_observables(overlay)
+
+    assert missing is None
+    assert prepared is not overlay
+    assert prepared.wall_fouling_report is report
+    assert prepared.snapshots[0].knudsen_regime_summary["segments"]
 
 
 def test_composition_target_constraint_augmentation_skips_stub_smoke_constraints() -> None:
