@@ -360,6 +360,7 @@ def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeyp
             pressure_bar,
             warnings=None,
             *,
+            total_input_kg=None,
             diagnostics=None,
             run_mode,
         ):
@@ -369,6 +370,7 @@ def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeyp
                 fO2_log,
                 pressure_bar,
                 warnings,
+                total_input_kg,
                 diagnostics,
                 run_mode,
             )
@@ -385,6 +387,11 @@ def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeyp
                 kwargs["composition_mol"],
                 kwargs["fO2_log"],
                 kwargs["pressure_bar"],
+                total_input_kg=(
+                    sum(float(v) for v in kwargs["composition_kg"].values())
+                    if kwargs.get("composition_kg")
+                    else 100.0
+                ),
                 diagnostics={},
                 run_mode=kwargs["subprocess_run_mode"],
             )
