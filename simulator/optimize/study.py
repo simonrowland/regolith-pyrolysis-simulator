@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
+from contextlib import nullcontext
 from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 import copy
@@ -437,6 +438,57 @@ class StudyReplayResult:
         object.__setattr__(self, "strategy_state", MappingProxyType(dict(self.strategy_state)))
 
 
+def _study_write_lock_path(out: Path) -> Path:
+    """Shared commit lock for cache.sqlite plus materialized study artifacts.
+
+    Evaluations run outside this lock. Final artifact files are latest snapshots
+    for the run directory, so concurrent finishers serialize and the later
+    completed artifact commit wins.
+    """
+
+    return out / ".study-results.write.lock"
+
+
+class _LockedLineWriter:
+    def __init__(self, path: Path, mode: str, store: ResultStore) -> None:
+        if mode not in {"a", "w", "r"}:
+            raise ValueError(f"unsupported line writer mode: {mode!r}")
+        self.path = path
+        self._mode = mode
+        self._store = store
+
+    def write(self, text: str) -> None:
+        with self._store.write_lock():
+            self.write_with_write_lock(text)
+
+    def initialize(self) -> None:
+        if self._mode == "r":
+            with self.path.open("r", encoding="utf-8"):
+                return
+        with self._store.write_lock():
+            if self._mode == "w":
+                self.path.write_text("", encoding="utf-8")
+                self._mode = "a"
+            else:
+                self.path.touch(exist_ok=True)
+
+    def write_with_write_lock(self, text: str) -> None:
+        if self._mode == "r":
+            raise ValueError(f"line writer is read-only: {self.path}")
+        with self.path.open(self._mode, encoding="utf-8") as handle:
+            handle.write(text)
+            handle.flush()
+        if self._mode == "w":
+            self._mode = "a"
+
+    def flush(self) -> None:
+        return None
+
+
+def _store_write_context(store: ResultStore | None) -> Any:
+    return store.write_lock() if store is not None else nullcontext()
+
+
 @dataclass(frozen=True)
 class _JournalResumePosition:
     event_seq: int = 0
@@ -521,7 +573,10 @@ def run(
         active_constraints = None
     out = _resolve_out_dir(config.out_dir)
     _prepare_out_dir(out)
-    store = result_store or ResultStore(out / "cache.sqlite")
+    store = result_store or ResultStore(
+        out / "cache.sqlite",
+        write_lock_path=_study_write_lock_path(out),
+    )
     warm_start_source = _resolve_warm_start_source(
         resolved_profile,
         config.warm_start_from,
@@ -639,80 +694,83 @@ def run(
         if not pending_resume_candidates and evaluated == config.budget:
             provenance_mode = "r"
     try:
-        with (
-            provenance_path.open(provenance_mode, encoding="utf-8") as provenance,
-            events_path.open(journal_mode, encoding="utf-8") as events,
-            strategy_state_path.open(journal_mode, encoding="utf-8") as strategy_state,
-        ):
-            journal = _StudyJournalWriter(
-                events,
-                strategy_state,
-                schema=active_schema,
-                strategy_name=_strategy_label(active_strategy),
-                event_seq=journal_event_seq,
-                ask_seq=journal_ask_seq,
-                tell_seq=journal_tell_seq,
-            )
-            while evaluated < config.budget:
-                owners: dict[str, StagedStrategy] = {}
-                if pending_resume_candidates:
-                    candidates = pending_resume_candidates
-                    pending_resume_candidates = []
-                    if pending_resume_batch_seq is None:
-                        raise StudyReplayError("study resume pending asks are missing batch_seq")
-                    current_batch_seq = pending_resume_batch_seq
-                    pending_resume_batch_seq = None
+        provenance_writer = _LockedLineWriter(provenance_path, provenance_mode, store)
+        events_writer = _LockedLineWriter(events_path, journal_mode, store)
+        strategy_state_writer = _LockedLineWriter(strategy_state_path, journal_mode, store)
+        provenance_writer.initialize()
+        events_writer.initialize()
+        strategy_state_writer.initialize()
+        journal = _StudyJournalWriter(
+            events_writer,
+            strategy_state_writer,
+            schema=active_schema,
+            strategy_name=_strategy_label(active_strategy),
+            event_seq=journal_event_seq,
+            ask_seq=journal_ask_seq,
+            tell_seq=journal_tell_seq,
+        )
+        while evaluated < config.budget:
+            owners: dict[str, StagedStrategy] = {}
+            if pending_resume_candidates:
+                candidates = pending_resume_candidates
+                pending_resume_candidates = []
+                if pending_resume_batch_seq is None:
+                    raise StudyReplayError("study resume pending asks are missing batch_seq")
+                current_batch_seq = pending_resume_batch_seq
+                pending_resume_batch_seq = None
+            else:
+                batch_size = min(config.parallel, config.budget - evaluated)
+                if staged_strategies:
+                    candidates, topology_cursor, owners = _ask_staged_topology_candidates(
+                        staged_strategies,
+                        cursor=topology_cursor,
+                        batch_size=batch_size,
+                    )
                 else:
-                    batch_size = min(config.parallel, config.budget - evaluated)
-                    if staged_strategies:
-                        candidates, topology_cursor, owners = _ask_staged_topology_candidates(
-                            staged_strategies,
-                            cursor=topology_cursor,
-                            batch_size=batch_size,
-                        )
-                    else:
-                        candidates = active_strategy.ask(batch_size)
-                        if not candidates and isinstance(active_strategy, StagedStrategy):
-                            if active_strategy.run_backward_pass() or active_strategy.joint_refine():
-                                candidates = active_strategy.ask(batch_size)
-                    if not candidates:
-                        break
-                    batch_seq += 1
-                    current_batch_seq = batch_seq
-                    ask_seq_by_id.update(
-                        journal.write_ask_batch(
-                            batch_seq=batch_seq,
-                            candidates=candidates,
-                            owners=owners,
-                        )
-                    )
-                    journal.write_strategy_state(
+                    candidates = active_strategy.ask(batch_size)
+                    if not candidates and isinstance(active_strategy, StagedStrategy):
+                        if active_strategy.run_backward_pass() or active_strategy.joint_refine():
+                            candidates = active_strategy.ask(batch_size)
+                if not candidates:
+                    break
+                batch_seq += 1
+                current_batch_seq = batch_seq
+                ask_seq_by_id.update(
+                    journal.write_ask_batch(
                         batch_seq=batch_seq,
-                        strategy=active_strategy,
-                        staged_strategies=staged_strategies,
+                        candidates=candidates,
+                        owners=owners,
                     )
-                results = _evaluate_candidates(
-                    candidates,
-                    profile=loop_profile,
-                    feedstock=config.feedstock,
-                    fidelity=config.fidelity,
-                    parallel=config.parallel,
-                    out_dir=out,
-                    evaluator=evaluator,
-                    schema=active_schema,
-                    constraints=active_constraints,
-                    store=store,
-                    definitions=definitions,
-                    prefix_replay_cache=prefix_replay_cache,
-                    per_eval_timeout_seconds=config.per_eval_timeout_seconds,
                 )
-                tell_batch: list[tuple[Candidate, ScoredResult]] = []
-                for candidate, scored, cache_hit in results:
-                    _assert_honest_result(scored, definitions)
-                    light_scored = _strip_heavy_result(scored)
+                journal.write_strategy_state(
+                    batch_seq=batch_seq,
+                    strategy=active_strategy,
+                    staged_strategies=staged_strategies,
+                )
+            results = _evaluate_candidates(
+                candidates,
+                profile=loop_profile,
+                feedstock=config.feedstock,
+                fidelity=config.fidelity,
+                parallel=config.parallel,
+                out_dir=out,
+                evaluator=evaluator,
+                schema=active_schema,
+                constraints=active_constraints,
+                store=store,
+                definitions=definitions,
+                prefix_replay_cache=prefix_replay_cache,
+                per_eval_timeout_seconds=config.per_eval_timeout_seconds,
+            )
+            tell_batch: list[tuple[Candidate, ScoredResult]] = []
+            for candidate, scored, cache_hit in results:
+                _assert_honest_result(scored, definitions)
+                light_scored = _strip_heavy_result(scored)
+                record = _to_record(candidate, scored, cache_hit=cache_hit)
+                with store.write_lock():
                     if scored.eval_spec is not None:
                         try:
-                            store.store(
+                            store.store_with_write_lock(
                                 scored.eval_spec,
                                 light_scored,
                                 created_at=datetime.now(UTC).isoformat(),
@@ -724,9 +782,8 @@ def run(
                                 scored.cache_key,
                                 ",".join(exc.reasons),
                             )
-                    record = _to_record(candidate, scored, cache_hit=cache_hit)
                     records.append(record)
-                    provenance.write(
+                    provenance_writer.write_with_write_lock(
                         json.dumps(
                             _record_payload(
                                 record,
@@ -741,7 +798,7 @@ def run(
                         + "\n"
                     )
                     tell_batch.append((candidate, light_scored))
-                    journal.write_tell(
+                    journal.write_tell_with_write_lock(
                         batch_seq=current_batch_seq,
                         ask_seq=ask_seq_by_id[candidate.id],
                         candidate=candidate,
@@ -749,20 +806,20 @@ def run(
                         source_scored=scored,
                         cache_hit=cache_hit,
                     )
-                if staged_strategies:
-                    grouped: dict[StagedStrategy, list[tuple[Candidate, ScoredResult]]] = {}
-                    for candidate, scored in tell_batch:
-                        grouped.setdefault(owners[candidate.id], []).append((candidate, scored))
-                    for owner, owner_batch in grouped.items():
-                        owner.tell(owner_batch)
-                else:
-                    active_strategy.tell(tell_batch)
-                journal.write_strategy_state(
-                    batch_seq=current_batch_seq,
-                    strategy=active_strategy,
-                    staged_strategies=staged_strategies,
-                )
-                evaluated += len(candidates)
+            if staged_strategies:
+                grouped: dict[StagedStrategy, list[tuple[Candidate, ScoredResult]]] = {}
+                for candidate, scored in tell_batch:
+                    grouped.setdefault(owners[candidate.id], []).append((candidate, scored))
+                for owner, owner_batch in grouped.items():
+                    owner.tell(owner_batch)
+            else:
+                active_strategy.tell(tell_batch)
+            journal.write_strategy_state(
+                batch_seq=current_batch_seq,
+                strategy=active_strategy,
+                staged_strategies=staged_strategies,
+            )
+            evaluated += len(candidates)
     except (KeyboardInterrupt, StudyAbort):
         _write_aborted_artifacts_from_cache(
             out,
@@ -783,6 +840,7 @@ def run(
             strategy_name=_strategy_label(active_strategy),
             sampler_name=_resolved_strategy_sampler(active_strategy),
             constraints=active_constraints,
+            write_store=store,
         )
         raise
 
@@ -808,6 +866,7 @@ def run(
             failure_counts=failure_counts,
             config=config,
             constraints=active_constraints,
+            write_store=store,
         )
         raise StudyNoFeasibleError("no candidates were evaluated")
     if records and non_finite_count == len(records):
@@ -820,6 +879,7 @@ def run(
             failure_counts=failure_counts,
             config=config,
             constraints=active_constraints,
+            write_store=store,
         )
         raise StudyNoFeasibleError(
             "all candidates failed with non_finite_payload; "
@@ -836,6 +896,7 @@ def run(
                 failure_counts=failure_counts,
                 config=config,
                 constraints=active_constraints,
+                write_store=store,
             )
             raise StudyNoFeasibleError(
                 "no feasible candidates due to config/runtime failure; "
@@ -863,6 +924,7 @@ def run(
             strategy_name=_strategy_label(active_strategy),
             sampler_name=_resolved_strategy_sampler(active_strategy),
             study_status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
+            write_store=store,
         )
         artifacts["provenance"] = provenance_path
         artifacts["store"] = store.path
@@ -943,17 +1005,19 @@ def run(
         strategy_name=_strategy_label(active_strategy),
         sampler_name=_resolved_strategy_sampler(active_strategy),
         study_status=result_status,
+        write_store=store,
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
     if certification_artifact is not None:
         certification_path = out / _TWO_PHASE_CERTIFICATION_NAME
         certification_artifact = _json_member_payload(certification_artifact)
-        certification_path.write_text(
-            json.dumps(certification_artifact, indent=2, sort_keys=True, allow_nan=False)
-            + "\n",
-            encoding="utf-8",
-        )
+        with store.write_lock():
+            certification_path.write_text(
+                json.dumps(certification_artifact, indent=2, sort_keys=True, allow_nan=False)
+                + "\n",
+                encoding="utf-8",
+            )
         artifacts["two_phase_certification"] = certification_path
     return StudyResult(
         out_dir=out,
@@ -1025,7 +1089,10 @@ def run_certify(
         active_constraints = None
     out = _resolve_out_dir(config.out_dir)
     _prepare_out_dir(out)
-    store = ResultStore(out / "cache.sqlite")
+    store = ResultStore(
+        out / "cache.sqlite",
+        write_lock_path=_study_write_lock_path(out),
+    )
     source = ResultStore(Path(source_store))
     stored = source.fetch(certify_cache_key)
     if stored is None:
@@ -1072,26 +1139,26 @@ def run_certify(
     # like the main loop — an inadmissible-but-recordable row (e.g. feasible+OOD)
     # is rejected by the admission gate; skip the cache write and keep the
     # certified result flowing rather than aborting the certification.
-    try:
-        store.store(
-            scored.eval_spec,
-            _strip_heavy_result(scored),
-            created_at=datetime.now(UTC).isoformat(),
-        )
-    except ResultStoreWriteRejected as exc:
-        _LOGGER.warning(
-            "result_store_write_rejected candidate_id=%s cache_key=%s reasons=%s",
-            scored.candidate_id,
-            scored.cache_key,
-            ",".join(exc.reasons),
-        )
     # Grind-infra sweep Finding 4: run_certify() previously labelled the
     # provenance artifact but never wrote it (unlike run() at the loop sink),
     # so certified/cached results pointed at a non-existent audit trail. Emit
     # the certification record in the same JSONL format run() uses.
     provenance_path = out / "provenance.jsonl"
-    with provenance_path.open("w", encoding="utf-8") as provenance:
-        provenance.write(
+    with store.write_lock():
+        try:
+            store.store_with_write_lock(
+                scored.eval_spec,
+                _strip_heavy_result(scored),
+                created_at=datetime.now(UTC).isoformat(),
+            )
+        except ResultStoreWriteRejected as exc:
+            _LOGGER.warning(
+                "result_store_write_rejected candidate_id=%s cache_key=%s reasons=%s",
+                scored.candidate_id,
+                scored.cache_key,
+                ",".join(exc.reasons),
+            )
+        _LockedLineWriter(provenance_path, "w", store).write_with_write_lock(
             json.dumps(
                 _record_payload(
                     record,
@@ -1121,6 +1188,7 @@ def run_certify(
         strategy_name="certify",
         sampler_name=_resolved_strategy_sampler(config.strategy),
         study_status=COMPLETED_STATUS,
+        write_store=store,
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
@@ -1314,8 +1382,8 @@ def _is_certified_cache_state(cache_state: str | None) -> bool:
 class _StudyJournalWriter:
     def __init__(
         self,
-        events: Any,
-        strategy_state: Any,
+        events: _LockedLineWriter,
+        strategy_state: _LockedLineWriter,
         *,
         schema: RecipeSchema,
         strategy_name: str,
@@ -1339,29 +1407,51 @@ class _StudyJournalWriter:
         owners: Mapping[str, StagedStrategy],
     ) -> dict[str, int]:
         ask_seq_by_id: dict[str, int] = {}
-        for candidate_index, candidate in enumerate(candidates):
-            self._ask_seq += 1
-            ask_seq_by_id[candidate.id] = self._ask_seq
-            owner = owners.get(candidate.id)
-            self._write_event(
-                {
-                    "event_kind": "candidate_asked",
-                    "replay_relevant": True,
-                    "batch_seq": batch_seq,
-                    "ask_seq": self._ask_seq,
-                    "candidate_index": candidate_index,
-                    "candidate_id": candidate.id,
-                    "strategy": self._strategy_name,
-                    "owner_strategy": _owner_strategy_payload(owner),
-                    "candidate": _candidate_journal_payload(candidate, self._schema),
-                    "cache_state": None,
-                    "rung": None,
-                    "cache_tier": None,
-                }
-            )
+        with self._events._store.write_lock():
+            for candidate_index, candidate in enumerate(candidates):
+                self._ask_seq += 1
+                ask_seq_by_id[candidate.id] = self._ask_seq
+                owner = owners.get(candidate.id)
+                self._write_event(
+                    {
+                        "event_kind": "candidate_asked",
+                        "replay_relevant": True,
+                        "batch_seq": batch_seq,
+                        "ask_seq": self._ask_seq,
+                        "candidate_index": candidate_index,
+                        "candidate_id": candidate.id,
+                        "strategy": self._strategy_name,
+                        "owner_strategy": _owner_strategy_payload(owner),
+                        "candidate": _candidate_journal_payload(candidate, self._schema),
+                        "cache_state": None,
+                        "rung": None,
+                        "cache_tier": None,
+                    },
+                    lock_already_held=True,
+                )
         return ask_seq_by_id
 
     def write_tell(
+        self,
+        *,
+        batch_seq: int,
+        ask_seq: int,
+        candidate: Candidate,
+        scored: ScoredResult,
+        source_scored: ScoredResult,
+        cache_hit: bool,
+    ) -> None:
+        with self._events._store.write_lock():
+            self.write_tell_with_write_lock(
+                batch_seq=batch_seq,
+                ask_seq=ask_seq,
+                candidate=candidate,
+                scored=scored,
+                source_scored=source_scored,
+                cache_hit=cache_hit,
+            )
+
+    def write_tell_with_write_lock(
         self,
         *,
         batch_seq: int,
@@ -1396,10 +1486,25 @@ class _StudyJournalWriter:
                 "feasibility_margins": _serialize_margins(scored.feasibility_margins),
                 "failing_gates": list(scored.failing_gates),
                 "scored_result": _scored_result_journal_payload(scored),
-            }
+            },
+            lock_already_held=True,
         )
 
     def write_strategy_state(
+        self,
+        *,
+        batch_seq: int,
+        strategy: Strategy,
+        staged_strategies: Sequence[StagedStrategy],
+    ) -> None:
+        with self._strategy_state._store.write_lock():
+            self.write_strategy_state_with_write_lock(
+                batch_seq=batch_seq,
+                strategy=strategy,
+                staged_strategies=staged_strategies,
+            )
+
+    def write_strategy_state_with_write_lock(
         self,
         *,
         batch_seq: int,
@@ -1414,10 +1519,14 @@ class _StudyJournalWriter:
             "journal_metadata": {"created_at": datetime.now(UTC).isoformat()},
             "strategy_state": _strategy_replay_state(strategy, *staged_strategies),
         }
-        self._strategy_state.write(_json_dump_value(payload) + "\n")
-        self._strategy_state.flush()
+        self._strategy_state.write_with_write_lock(_json_dump_value(payload) + "\n")
 
-    def _write_event(self, payload: Mapping[str, Any]) -> None:
+    def _write_event(
+        self,
+        payload: Mapping[str, Any],
+        *,
+        lock_already_held: bool = False,
+    ) -> None:
         self._event_seq += 1
         row = {
             "member_schema_version": MEMBER_SCHEMA_VERSION,
@@ -1426,8 +1535,11 @@ class _StudyJournalWriter:
             "journal_metadata": {"created_at": datetime.now(UTC).isoformat()},
             **payload,
         }
-        self._events.write(_json_dump_value(row) + "\n")
-        self._events.flush()
+        text = _json_dump_value(row) + "\n"
+        if lock_already_held:
+            self._events.write_with_write_lock(text)
+        else:
+            self._events.write(text)
 
 
 def replay_study(run_dir: str | Path, *, schema: RecipeSchema | None = None) -> StudyReplayResult:
@@ -4362,6 +4474,7 @@ def _write_artifacts(
     strategy_name: str | None = None,
     sampler_name: str | None = None,
     study_status: str | None = None,
+    write_store: ResultStore | None = None,
 ) -> dict[str, Path]:
     created_at = datetime.now(UTC).isoformat()
     resolved_study_status = study_status or (
@@ -4422,46 +4535,6 @@ def _write_artifacts(
     pareto_payload["best_non_seeded_lineage_candidate_id"] = (
         best_non_seeded.candidate_id if best_non_seeded is not None else None
     )
-    pareto_path.write_text(
-        json.dumps(
-            pareto_payload,
-            indent=2,
-            sort_keys=True,
-            allow_nan=False,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    search_provenance_path.write_text(
-        json.dumps(
-            _json_member_payload(
-                _search_provenance_payload(
-                    leaderboard,
-                    winner=winner,
-                    best_non_seeded=best_non_seeded,
-                    strategy_provenance=strategy_provenance,
-                )
-            ),
-            indent=2,
-            sort_keys=True,
-            allow_nan=False,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    _write_leaderboard(
-        leaderboard_path,
-        leaderboard,
-        pareto,
-        winner,
-        definitions,
-        schema,
-        profile=profile,
-    )
-    profile_path.write_text(
-        yaml.safe_dump(_jsonable_value(profile), sort_keys=True),
-        encoding="utf-8",
-    )
     summary_payload = _study_summary_payload(
         study_id=study_id_value,
         created_at=created_at,
@@ -4476,40 +4549,102 @@ def _write_artifacts(
         config=config,
         strategy_name=resolved_strategy,
     )
-    summary_path.write_text(
-        json.dumps(summary_payload, indent=2, sort_keys=True, allow_nan=False) + "\n",
-        encoding="utf-8",
-    )
-    manifest_path.write_text(
-        json.dumps(
-            _study_manifest_payload(
-                study_id=study_id_value,
-                created_at=created_at,
-                study_status=resolved_study_status,
-                profile=profile,
-                feedstock=feedstock,
-                fidelity=fidelity,
-                config=config,
-                strategy_name=resolved_strategy,
-                sampler_name=resolved_sampler,
-                search_space_identity=search_space_identity,
-                strategy_config=strategy_config,
-                # journal replay reconstructs strategy state from the ask/tell
-                # journal alone; a warm_start_from study needs bundled seed
-                # state replay cannot rebuild, so it is not journal-replayable
-                # even though the events journal exists.
-                replayable=(
-                    (out / "study.events.jsonl").is_file()
-                    and getattr(config, "warm_start_from", None) is None
-                ),
-            ),
-            indent=2,
-            sort_keys=True,
-            allow_nan=False,
+    winner_written = False
+    tap_sidecar_written = False
+    with _store_write_context(write_store):
+        pareto_path.write_text(
+            json.dumps(
+                pareto_payload,
+                indent=2,
+                sort_keys=True,
+                allow_nan=False,
+            )
+            + "\n",
+            encoding="utf-8",
         )
-        + "\n",
-        encoding="utf-8",
-    )
+        search_provenance_path.write_text(
+            json.dumps(
+                _json_member_payload(
+                    _search_provenance_payload(
+                        leaderboard,
+                        winner=winner,
+                        best_non_seeded=best_non_seeded,
+                        strategy_provenance=strategy_provenance,
+                    )
+                ),
+                indent=2,
+                sort_keys=True,
+                allow_nan=False,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        _write_leaderboard(
+            leaderboard_path,
+            leaderboard,
+            pareto,
+            winner,
+            definitions,
+            schema,
+            profile=profile,
+        )
+        profile_path.write_text(
+            yaml.safe_dump(_jsonable_value(profile), sort_keys=True),
+            encoding="utf-8",
+        )
+        summary_path.write_text(
+            json.dumps(summary_payload, indent=2, sort_keys=True, allow_nan=False) + "\n",
+            encoding="utf-8",
+        )
+        manifest_path.write_text(
+            json.dumps(
+                _study_manifest_payload(
+                    study_id=study_id_value,
+                    created_at=created_at,
+                    study_status=resolved_study_status,
+                    profile=profile,
+                    feedstock=feedstock,
+                    fidelity=fidelity,
+                    config=config,
+                    strategy_name=resolved_strategy,
+                    sampler_name=resolved_sampler,
+                    search_space_identity=search_space_identity,
+                    strategy_config=strategy_config,
+                    # journal replay reconstructs strategy state from the ask/tell
+                    # journal alone; a warm_start_from study needs bundled seed
+                    # state replay cannot rebuild, so it is not journal-replayable
+                    # even though the events journal exists.
+                    replayable=(
+                        (out / "study.events.jsonl").is_file()
+                        and getattr(config, "warm_start_from", None) is None
+                    ),
+                ),
+                indent=2,
+                sort_keys=True,
+                allow_nan=False,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        if winner is not None:
+            winner_patch = _materialized_winner_patch(winner, schema, profile)
+            winner_path.write_text(
+                yaml.safe_dump(winner_patch, sort_keys=True),
+                encoding="utf-8",
+            )
+            winner_written = True
+            tap_sidecar = _tap_truncated_sidecar(
+                winner,
+                winner_patch,
+                schema.to_setpoints_patch(winner.patch),
+            )
+            if tap_sidecar is not None:
+                tap_sidecar = _json_member_payload(tap_sidecar)
+                tap_sidecar_path.write_text(
+                    json.dumps(tap_sidecar, indent=2, sort_keys=True, allow_nan=False) + "\n",
+                    encoding="utf-8",
+                )
+                tap_sidecar_written = True
     artifacts = {
         "manifest": manifest_path,
         "summary": summary_path,
@@ -4524,25 +4659,10 @@ def _write_artifacts(
     strategy_state_path = out / STRATEGY_STATE_NAME
     if strategy_state_path.is_file():
         artifacts["strategy_state"] = strategy_state_path
-    if winner is not None:
-        winner_patch = _materialized_winner_patch(winner, schema, profile)
-        winner_path.write_text(
-            yaml.safe_dump(winner_patch, sort_keys=True),
-            encoding="utf-8",
-        )
+    if winner_written:
         artifacts["winner"] = winner_path
-        tap_sidecar = _tap_truncated_sidecar(
-            winner,
-            winner_patch,
-            schema.to_setpoints_patch(winner.patch),
-        )
-        if tap_sidecar is not None:
-            tap_sidecar = _json_member_payload(tap_sidecar)
-            tap_sidecar_path.write_text(
-                json.dumps(tap_sidecar, indent=2, sort_keys=True, allow_nan=False) + "\n",
-                encoding="utf-8",
-            )
-            artifacts["winner_tap_truncated"] = tap_sidecar_path
+    if tap_sidecar_written:
+        artifacts["winner_tap_truncated"] = tap_sidecar_path
     return artifacts
 
 
@@ -5299,6 +5419,7 @@ def _write_aborted_artifacts_from_cache(
     strategy_name: str | None = None,
     sampler_name: str | None = None,
     constraints: Any = None,
+    write_store: ResultStore | None = None,
 ) -> bool:
     records = _records_from_cache_sqlite(
         out,
@@ -5307,6 +5428,7 @@ def _write_aborted_artifacts_from_cache(
         feedstock=feedstock,
         fidelity=fidelity,
         constraints=constraints,
+        write_store=write_store,
     )
     if not records:
         records = tuple(fallback_records)
@@ -5350,6 +5472,7 @@ def _write_aborted_artifacts_from_cache(
         strategy_name=strategy_name,
         sampler_name=sampler_name,
         study_status=ABORTED_STATUS,
+        write_store=write_store,
     )
     return True
 
@@ -5362,11 +5485,18 @@ def _records_from_cache_sqlite(
     feedstock: str,
     fidelity: str,
     constraints: Any = None,
+    write_store: ResultStore | None = None,
 ) -> tuple[StudyRecord, ...]:
     store_path = out / "cache.sqlite"
     if not store_path.is_file():
         return ()
-    store = ResultStore(store_path)
+    store = ResultStore(
+        store_path,
+        write_lock_path=write_store.write_lock_path if write_store is not None else None,
+        write_lock_timeout_ms=(
+            write_store.write_lock_timeout_ms if write_store is not None else None
+        ),
+    )
     active_constraints = constraints
     if active_constraints is None:
         try:
@@ -5430,6 +5560,7 @@ def _write_empty_artifacts(
     failure_counts: Mapping[str, int],
     config: StudyConfig | None = None,
     constraints: Any = None,
+    write_store: ResultStore | None = None,
 ) -> None:
     schema = RecipeSchema()
     strategy_name = _strategy_label(config.strategy) if config is not None else "unknown"
@@ -5451,6 +5582,7 @@ def _write_empty_artifacts(
         strategy_name=strategy_name,
         sampler_name=sampler_name,
         constraints=constraints,
+        write_store=write_store,
     ):
         return
 
@@ -5471,80 +5603,81 @@ def _write_empty_artifacts(
         strategy_config_digest=strategy_config_digest,
         search_space_identity=None,
     )
-    (out / "study.profile.yaml").write_text(
-        yaml.safe_dump(_jsonable_value(profile), sort_keys=True),
-        encoding="utf-8",
-    )
-    (out / "study.summary.json").write_text(
-        json.dumps(
-            _study_summary_payload(
-                study_id=study_id_value,
-                created_at=created_at,
-                study_status=ABORTED_STATUS,
-                profile=profile,
-                feedstock=feedstock,
-                fidelity=fidelity,
-                definitions=definitions,
-                leaderboard=(),
-                winner=None,
-                failure_counts=failure_counts,
-                config=config,
-                strategy_name=strategy_name,
-            ),
-            indent=2,
-            sort_keys=True,
-            allow_nan=False,
+    with _store_write_context(write_store):
+        (out / "study.profile.yaml").write_text(
+            yaml.safe_dump(_jsonable_value(profile), sort_keys=True),
+            encoding="utf-8",
         )
-        + "\n",
-        encoding="utf-8",
-    )
-    (out / "study.manifest.json").write_text(
-        json.dumps(
-            _study_manifest_payload(
-                study_id=study_id_value,
-                created_at=created_at,
-                study_status=ABORTED_STATUS,
-                profile=profile,
-                feedstock=feedstock,
-                fidelity=fidelity,
-                config=config,
-                strategy_name=strategy_name,
-                sampler_name=sampler_name,
-                search_space_identity=None,
-                strategy_config=strategy_config,
-                replayable=(
-                    (out / "study.events.jsonl").is_file()
-                    and getattr(config, "warm_start_from", None) is None
+        (out / "study.summary.json").write_text(
+            json.dumps(
+                _study_summary_payload(
+                    study_id=study_id_value,
+                    created_at=created_at,
+                    study_status=ABORTED_STATUS,
+                    profile=profile,
+                    feedstock=feedstock,
+                    fidelity=fidelity,
+                    definitions=definitions,
+                    leaderboard=(),
+                    winner=None,
+                    failure_counts=failure_counts,
+                    config=config,
+                    strategy_name=strategy_name,
                 ),
-            ),
-            indent=2,
-            sort_keys=True,
-            allow_nan=False,
+                indent=2,
+                sort_keys=True,
+                allow_nan=False,
+            )
+            + "\n",
+            encoding="utf-8",
         )
-        + "\n",
-        encoding="utf-8",
-    )
-    (out / "pareto.json").write_text(
-        json.dumps(
-            {
-                "member_schema_version": MEMBER_SCHEMA_VERSION,
-                "feedstock": feedstock,
-                "fidelity": fidelity,
-                "failure_counts": dict(failure_counts),
-                "objectives": [_definition_payload(definition) for definition in definitions],
-                "pareto": [],
-                "profile": profile_id(profile),
-                "selection_rule": WINNER_SELECTION_RULE,
-                "status": ABORTED_STATUS,
-                "winner_candidate_id": None,
-            },
-            indent=2,
-            sort_keys=True,
+        (out / "study.manifest.json").write_text(
+            json.dumps(
+                _study_manifest_payload(
+                    study_id=study_id_value,
+                    created_at=created_at,
+                    study_status=ABORTED_STATUS,
+                    profile=profile,
+                    feedstock=feedstock,
+                    fidelity=fidelity,
+                    config=config,
+                    strategy_name=strategy_name,
+                    sampler_name=sampler_name,
+                    search_space_identity=None,
+                    strategy_config=strategy_config,
+                    replayable=(
+                        (out / "study.events.jsonl").is_file()
+                        and getattr(config, "warm_start_from", None) is None
+                    ),
+                ),
+                indent=2,
+                sort_keys=True,
+                allow_nan=False,
+            )
+            + "\n",
+            encoding="utf-8",
         )
-        + "\n",
-        encoding="utf-8",
-    )
-    _write_leaderboard(out / "leaderboard.csv", (), (), None, definitions, schema)
+        (out / "pareto.json").write_text(
+            json.dumps(
+                {
+                    "member_schema_version": MEMBER_SCHEMA_VERSION,
+                    "feedstock": feedstock,
+                    "fidelity": fidelity,
+                    "failure_counts": dict(failure_counts),
+                    "objectives": [_definition_payload(definition) for definition in definitions],
+                    "pareto": [],
+                    "profile": profile_id(profile),
+                    "selection_rule": WINNER_SELECTION_RULE,
+                    "status": ABORTED_STATUS,
+                    "winner_candidate_id": None,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        _write_leaderboard(out / "leaderboard.csv", (), (), None, definitions, schema)
 
 
 def _pareto_payload(

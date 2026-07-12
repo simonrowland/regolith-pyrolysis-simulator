@@ -11,6 +11,7 @@ from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+import threading
 import time
 from types import SimpleNamespace
 from typing import Any, Mapping
@@ -1958,6 +1959,94 @@ class _SingleCandidateStrategy:
 
     def tell(self, results) -> None:
         return None
+
+
+def test_study_write_lock_is_not_held_during_solve(tmp_path) -> None:
+    out_dir = tmp_path / "slow-solve"
+    constraints = physics_constraints_from_profile(PROFILE)
+    store = ResultStore(
+        out_dir / "cache.sqlite",
+        busy_timeout_ms=1000,
+        write_lock_path=out_dir / ".study-results.write.lock",
+        write_lock_timeout_ms=1000,
+    )
+    solve_entered = out_dir / "solve-entered"
+    release_solve = out_dir / "release-solve"
+    failures: list[BaseException] = []
+
+    def slow_evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        solve_entered.write_text("entered\n", encoding="utf-8")
+        deadline = time.monotonic() + 5
+        while not release_solve.exists() and time.monotonic() < deadline:
+            time.sleep(0.01)
+        if not release_solve.exists():
+            raise TimeoutError("test slow solve was not released")
+        return _evaluator()(
+            patch,
+            feedstock,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            **kwargs,
+        )
+
+    def run_study() -> None:
+        try:
+            study.run(
+                PROFILE,
+                FEEDSTOCK,
+                _SingleCandidateStrategy(),
+                "stub",
+                parallel=1,
+                budget=1,
+                out_dir=out_dir,
+                evaluator=slow_evaluator,
+                result_store=store,
+                constraints=constraints,
+            )
+        except BaseException as exc:  # pragma: no cover - asserted by parent thread
+            failures.append(exc)
+
+    thread = threading.Thread(target=run_study)
+    thread.start()
+    deadline = time.monotonic() + 5
+    while not solve_entered.exists() and time.monotonic() < deadline:
+        if failures:
+            break
+        time.sleep(0.01)
+    assert solve_entered.exists(), failures
+
+    patch = RecipePatch({})
+    spec = _spec(patch, FEEDSTOCK, "stub", PROFILE, constraints)
+    direct_scored = _evaluator()(
+        patch,
+        FEEDSTOCK,
+        "stub",
+        profile=PROFILE,
+        candidate_id="direct-000000",
+        constraints=constraints,
+    )
+    started = time.perf_counter()
+    store.store(spec, direct_scored, created_at="direct")
+    elapsed = time.perf_counter() - started
+
+    release_solve.write_text("release\n", encoding="utf-8")
+    thread.join(timeout=5)
+
+    assert elapsed < 0.8
+    assert not thread.is_alive()
+    assert failures == []
+    loaded = store.lookup(spec)
+    assert loaded is not None
+    assert loaded.candidate_id == "single-000000"
 
 
 class _FixedCandidateStrategy:

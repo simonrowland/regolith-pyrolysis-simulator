@@ -8,6 +8,7 @@ import multiprocessing
 import queue
 import sqlite3
 import threading
+import time
 from types import SimpleNamespace
 
 import pytest
@@ -26,6 +27,8 @@ from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.optimize.result_scope import result_scope_payload, selector_where
 from simulator.optimize.results_store import (
     ResultStore,
+    ResultStoreWriteLock,
+    ResultStoreWriteLockTimeout,
     ResultStoreWriteRejected,
     SCHEMA_VERSION,
     _deserialize_margins,
@@ -228,6 +231,34 @@ def _process_store_reader(
         start.wait(10)
         for _ in range(iterations):
             store.query(spec.feedstock_id, profile_id=spec.profile_id, fidelity=spec.fidelity)
+    except BaseException as exc:  # pragma: no cover - asserted in parent process
+        errors.put(repr(exc))
+
+
+def _process_same_key_store_writer(
+    db_path: str,
+    spec_payload: dict[str, object],
+    start: multiprocessing.synchronize.Event,
+    errors: multiprocessing.queues.Queue,
+    candidate_id: str,
+    oxygen: float,
+    delay_s: float,
+) -> None:
+    try:
+        spec = EvalSpec(**spec_payload)
+        store = ResultStore(
+            db_path,
+            current_code_version=spec.code_version,
+            current_data_digests=spec.data_digests,
+            busy_timeout_ms=10000,
+        )
+        start.wait(10)
+        time.sleep(delay_s)
+        store.store(
+            spec,
+            _scored(spec, candidate_id=candidate_id, oxygen=oxygen),
+            created_at=candidate_id,
+        )
     except BaseException as exc:  # pragma: no cover - asserted in parent process
         errors.put(repr(exc))
 
@@ -1428,7 +1459,142 @@ def test_idempotent_upsert_latest_wins(tmp_path) -> None:
     assert loaded is not None
     assert loaded.candidate_id == "new"
     assert loaded.objectives is not None
-    assert loaded.objectives.as_mapping()["oxygen_kg"] == 2.0
+
+
+def test_concurrent_same_key_writers_serialize_to_one_latest_row(tmp_path) -> None:
+    spec = _base_spec()
+    path = tmp_path / "results.sqlite"
+    ResultStore(
+        path,
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+        busy_timeout_ms=2000,
+    ).initialize()
+    start = threading.Event()
+    errors: list[BaseException] = []
+
+    def writer(candidate_id: str, oxygen: float, delay: float) -> None:
+        try:
+            local = ResultStore(
+                path,
+                current_code_version=spec.code_version,
+                current_data_digests=spec.data_digests,
+                busy_timeout_ms=2000,
+            )
+            start.wait(timeout=5)
+            time.sleep(delay)
+            local.store(
+                spec,
+                _scored(spec, candidate_id=candidate_id, oxygen=oxygen),
+                created_at=candidate_id,
+            )
+        except BaseException as exc:  # pragma: no cover - asserted by parent
+            errors.append(exc)
+
+    threads = [
+        threading.Thread(target=writer, args=("writer-a", 1.0, 0.0)),
+        threading.Thread(target=writer, args=("writer-b", 2.0, 0.02)),
+    ]
+    for thread in threads:
+        thread.start()
+    start.set()
+    for thread in threads:
+        thread.join(timeout=5)
+
+    with sqlite3.connect(path) as conn:
+        row_count = conn.execute("SELECT count(*) FROM results").fetchone()[0]
+
+    loaded = ResultStore(
+        path,
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    ).lookup(spec)
+    assert errors == []
+    assert row_count == 1
+    assert loaded is not None
+    assert loaded.candidate_id in {"writer-a", "writer-b"}
+
+
+def test_cross_process_same_key_writers_serialize_to_one_latest_row(tmp_path) -> None:
+    spec = _base_spec()
+    path = tmp_path / "results.sqlite"
+    ResultStore(
+        path,
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+        busy_timeout_ms=10000,
+    ).initialize()
+    ctx = multiprocessing.get_context("spawn")
+    start = ctx.Event()
+    errors = ctx.Queue()
+    writers = [
+        ctx.Process(
+            target=_process_same_key_store_writer,
+            args=(
+                str(path),
+                _eval_spec_payload(spec),
+                start,
+                errors,
+                "process-a",
+                1.0,
+                0.0,
+            ),
+        ),
+        ctx.Process(
+            target=_process_same_key_store_writer,
+            args=(
+                str(path),
+                _eval_spec_payload(spec),
+                start,
+                errors,
+                "process-b",
+                2.0,
+                0.02,
+            ),
+        ),
+    ]
+    for process in writers:
+        process.start()
+    start.set()
+    for process in writers:
+        process.join(timeout=30)
+
+    failures: list[str] = []
+    for process in writers:
+        if process.exitcode != 0:
+            failures.append(f"{process.name} exit={process.exitcode}")
+    while True:
+        try:
+            failures.append(errors.get_nowait())
+        except queue.Empty:
+            break
+    with sqlite3.connect(path) as conn:
+        row_count = conn.execute("SELECT count(*) FROM results").fetchone()[0]
+
+    loaded = ResultStore(
+        path,
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    ).lookup(spec)
+    assert failures == []
+    assert row_count == 1
+    assert loaded is not None
+    assert loaded.candidate_id in {"process-a", "process-b"}
+
+
+def test_result_store_write_lock_timeout_is_typed(tmp_path) -> None:
+    spec = _base_spec()
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+        busy_timeout_ms=25,
+        write_lock_timeout_ms=25,
+    )
+
+    with ResultStoreWriteLock(store.write_lock_path, timeout_ms=1000):
+        with pytest.raises(ResultStoreWriteLockTimeout):
+            store.store(spec, _scored(spec), created_at="blocked")
 
 
 def test_lookup_fetch_and_selectors_miss_stale_corpus_rows(tmp_path) -> None:

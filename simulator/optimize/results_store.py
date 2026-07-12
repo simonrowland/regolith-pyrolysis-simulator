@@ -1,17 +1,22 @@
 """SQLite/WAL result store for recipe optimizer evaluations.
 
 Selector reads require an explicit current code/data scope from the caller;
-stored rows never define "current". The store supports concurrent readers plus
-serialized writers via WAL, BEGIN IMMEDIATE, and bounded database-locked retry.
-O-P3 may designate one write owner or rely on this SQLite serialization.
+stored rows never define "current". The store supports concurrent readers and
+serializes writers with one timeout-bounded process/thread lock around the
+write transaction. Concurrent writes to the same cache key use SQLite
+ON CONFLICT last-writer-wins semantics because the cache row is a materialized
+latest result for that EvalSpec, not an append-only audit log.
 """
 
 from __future__ import annotations
 
 from collections.abc import Sequence as SequenceABC
 from dataclasses import MISSING, fields
+import errno
+import fcntl
 import json
 import math
+import os
 from pathlib import Path
 import sqlite3
 import threading
@@ -69,6 +74,8 @@ __all__ = [
     "SCHEMA_VERSION",
     "ResultStore",
     "ResultStoreSchemaError",
+    "ResultStoreWriteLock",
+    "ResultStoreWriteLockTimeout",
     "ResultStoreWriteRejected",
     "ResultsStore",
     "selector_where",
@@ -79,6 +86,18 @@ class ResultStoreSchemaError(RuntimeError):
     """Raised when an optimizer result-store schema is unsupported."""
 
 
+class ResultStoreWriteLockTimeout(TimeoutError):
+    """Raised when the optimizer store write lock cannot be acquired in time."""
+
+    def __init__(self, lock_path: str | Path, timeout_ms: int) -> None:
+        self.lock_path = Path(lock_path)
+        self.timeout_ms = int(timeout_ms)
+        super().__init__(
+            "optimizer result-store write lock timed out: "
+            f"path={self.lock_path} timeout_ms={self.timeout_ms}"
+        )
+
+
 class ResultStoreWriteRejected(ValueError):
     """Raised when a result is not admissible for authoritative cache writes."""
 
@@ -87,6 +106,74 @@ class ResultStoreWriteRejected(ValueError):
         super().__init__(
             "result store write rejected: " + ", ".join(self.reasons)
         )
+
+
+_ACTIVE_LOCK_PATHS: set[Path] = set()
+_ACTIVE_LOCK_PATHS_GUARD = threading.Lock()
+
+
+class ResultStoreWriteLock:
+    """Timeout-bounded exclusive file lock for optimizer store write commits."""
+
+    def __init__(self, path: str | Path, *, timeout_ms: int) -> None:
+        self.path = Path(path)
+        self.timeout_ms = int(timeout_ms)
+        self._handle: Any = None
+        self._claimed_path: Path | None = None
+
+    def __enter__(self) -> "ResultStoreWriteLock":
+        deadline = time.monotonic() + max(self.timeout_ms, 0) / 1000
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        handle = self.path.open("a+", encoding="utf-8")
+        resolved_path = self.path.resolve()
+        while True:
+            if self._claim_process_path(resolved_path):
+                try:
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except OSError as exc:
+                    self._release_process_path()
+                    if exc.errno not in {errno.EACCES, errno.EAGAIN}:
+                        handle.close()
+                        raise
+                else:
+                    self._handle = handle
+                    handle.seek(0)
+                    handle.truncate()
+                    handle.write(f"pid={os.getpid()} acquired_at={time.time():.6f}\n")
+                    handle.flush()
+                    return self
+            now = time.monotonic()
+            if now >= deadline:
+                handle.close()
+                raise ResultStoreWriteLockTimeout(self.path, self.timeout_ms)
+            time.sleep(min(0.05, max(deadline - now, 0.001)))
+
+    def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
+        handle = self._handle
+        self._handle = None
+        try:
+            if handle is not None:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+        finally:
+            if handle is not None:
+                handle.close()
+            self._release_process_path()
+
+    def _claim_process_path(self, resolved_path: Path) -> bool:
+        with _ACTIVE_LOCK_PATHS_GUARD:
+            if resolved_path in _ACTIVE_LOCK_PATHS:
+                return False
+            _ACTIVE_LOCK_PATHS.add(resolved_path)
+            self._claimed_path = resolved_path
+            return True
+
+    def _release_process_path(self) -> None:
+        claimed_path = self._claimed_path
+        if claimed_path is None:
+            return
+        with _ACTIVE_LOCK_PATHS_GUARD:
+            _ACTIVE_LOCK_PATHS.discard(claimed_path)
+        self._claimed_path = None
 
 
 class ResultStore:
@@ -107,6 +194,8 @@ class ResultStore:
         data_digests: Mapping[str, str] | None = None,
         result_scope: Mapping[str, Any] | None = None,
         busy_timeout_ms: int = DEFAULT_BUSY_TIMEOUT_MS,
+        write_lock_path: str | Path | None = None,
+        write_lock_timeout_ms: int | None = None,
     ) -> None:
         if code_version is not None:
             if current_code_version is not None and current_code_version != code_version:
@@ -129,7 +218,16 @@ class ResultStore:
             current_result_scope = result_scope
         self.path = Path(path)
         self.busy_timeout_ms = int(busy_timeout_ms)
-        self._write_lock = threading.Lock()
+        self.write_lock_path = (
+            Path(write_lock_path)
+            if write_lock_path is not None
+            else self.path.with_name(f"{self.path.name}.write.lock")
+        )
+        self.write_lock_timeout_ms = (
+            int(write_lock_timeout_ms)
+            if write_lock_timeout_ms is not None
+            else self.busy_timeout_ms
+        )
         self._scope_code_version = current_code_version
         self._scope_data_digests_json = (
             _canonical_json(current_data_digests)
@@ -141,8 +239,13 @@ class ResultStore:
         self.initialize()
 
     def initialize(self) -> None:
-        with self._write_lock:
-            self._execute_write(self._initialize)
+        self._execute_write(self._initialize)
+
+    def write_lock(self) -> ResultStoreWriteLock:
+        return ResultStoreWriteLock(
+            self.write_lock_path,
+            timeout_ms=self.write_lock_timeout_ms,
+        )
 
     @property
     def schema_version(self) -> int:
@@ -183,6 +286,20 @@ class ResultStore:
         *,
         created_at: str,
     ) -> None:
+        with self.write_lock():
+            self.store_with_write_lock(
+                eval_spec,
+                scored_result,
+                created_at=created_at,
+            )
+
+    def store_with_write_lock(
+        self,
+        eval_spec: EvalSpec,
+        scored_result: ScoredResult,
+        *,
+        created_at: str,
+    ) -> None:
         key = cache_key(eval_spec)
         if scored_result.cache_key is not None and scored_result.cache_key != key:
             raise ValueError("scored_result.cache_key does not match eval_spec")
@@ -193,91 +310,90 @@ class ResultStore:
         objectives = _serialize_objectives(scored_result.objectives)
         result_blob = _result_blob(scored_result)
         corpus_version = current_corpus_version()
-        with self._write_lock:
-            def write(conn: sqlite3.Connection) -> None:
-                conn.execute(
-                    """
-                    INSERT INTO results (
-                        cache_key, feedstock_id, recipe_id, profile_id, fidelity,
-                        code_version, corpus_version, data_digests, result_scope,
-                        feasible, failure_category, objectives, feasibility_margins,
-                        failing_gates, candidate_id,
-                        result_blob, run_reference, eval_spec, notes, created_at
-                    )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(cache_key) DO UPDATE SET
-                        feedstock_id = excluded.feedstock_id,
-                        recipe_id = excluded.recipe_id,
-                        profile_id = excluded.profile_id,
-                        fidelity = excluded.fidelity,
-                        code_version = excluded.code_version,
-                        corpus_version = excluded.corpus_version,
-                        data_digests = excluded.data_digests,
-                        result_scope = excluded.result_scope,
-                        feasible = excluded.feasible,
-                        failure_category = excluded.failure_category,
-                        objectives = excluded.objectives,
-                        feasibility_margins = excluded.feasibility_margins,
-                        failing_gates = excluded.failing_gates,
-                        candidate_id = excluded.candidate_id,
-                        result_blob = excluded.result_blob,
-                        run_reference = excluded.run_reference,
-                        eval_spec = excluded.eval_spec,
-                        notes = excluded.notes,
-                        created_at = excluded.created_at
-                    """,
+        def write(conn: sqlite3.Connection) -> None:
+            conn.execute(
+                """
+                INSERT INTO results (
+                    cache_key, feedstock_id, recipe_id, profile_id, fidelity,
+                    code_version, corpus_version, data_digests, result_scope,
+                    feasible, failure_category, objectives, feasibility_margins,
+                    failing_gates, candidate_id,
+                    result_blob, run_reference, eval_spec, notes, created_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(cache_key) DO UPDATE SET
+                    feedstock_id = excluded.feedstock_id,
+                    recipe_id = excluded.recipe_id,
+                    profile_id = excluded.profile_id,
+                    fidelity = excluded.fidelity,
+                    code_version = excluded.code_version,
+                    corpus_version = excluded.corpus_version,
+                    data_digests = excluded.data_digests,
+                    result_scope = excluded.result_scope,
+                    feasible = excluded.feasible,
+                    failure_category = excluded.failure_category,
+                    objectives = excluded.objectives,
+                    feasibility_margins = excluded.feasibility_margins,
+                    failing_gates = excluded.failing_gates,
+                    candidate_id = excluded.candidate_id,
+                    result_blob = excluded.result_blob,
+                    run_reference = excluded.run_reference,
+                    eval_spec = excluded.eval_spec,
+                    notes = excluded.notes,
+                    created_at = excluded.created_at
+                """,
+                (
+                    key,
+                    eval_spec.feedstock_id,
+                    eval_spec.recipe_id,
+                    eval_spec.profile_id,
+                    eval_spec.fidelity,
+                    eval_spec.code_version,
+                    corpus_version,
+                    _canonical_json(eval_spec.data_digests),
+                    result_scope_json(eval_spec),
+                    int(scored_result.feasible),
+                    (
+                        scored_result.failure_category.value
+                        if scored_result.failure_category is not None
+                        else None
+                    ),
+                    _json_dump(objectives),
+                    _json_dump(_serialize_margins(scored_result.feasibility_margins)),
+                    _json_dump(list(scored_result.failing_gates)),
+                    scored_result.candidate_id,
+                    _json_dump(result_blob),
+                    _json_dump(_serialize_run_reference(scored_result.run_reference)),
+                    _json_dump(_serialize_eval_spec(eval_spec)),
+                    _json_dump(list(scored_result.notes)),
+                    created_at,
+                ),
+            )
+            conn.execute(
+                "DELETE FROM objective_values WHERE cache_key = ?",
+                (key,),
+            )
+            conn.executemany(
+                """
+                INSERT INTO objective_values (
+                    cache_key, metric, sense, value, value_status, units, ordinal
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                [
                     (
                         key,
-                        eval_spec.feedstock_id,
-                        eval_spec.recipe_id,
-                        eval_spec.profile_id,
-                        eval_spec.fidelity,
-                        eval_spec.code_version,
-                        corpus_version,
-                        _canonical_json(eval_spec.data_digests),
-                        result_scope_json(eval_spec),
-                        int(scored_result.feasible),
-                        (
-                            scored_result.failure_category.value
-                            if scored_result.failure_category is not None
-                            else None
-                        ),
-                        _json_dump(objectives),
-                        _json_dump(_serialize_margins(scored_result.feasibility_margins)),
-                        _json_dump(list(scored_result.failing_gates)),
-                        scored_result.candidate_id,
-                        _json_dump(result_blob),
-                        _json_dump(_serialize_run_reference(scored_result.run_reference)),
-                        _json_dump(_serialize_eval_spec(eval_spec)),
-                        _json_dump(list(scored_result.notes)),
-                        created_at,
-                    ),
-                )
-                conn.execute(
-                    "DELETE FROM objective_values WHERE cache_key = ?",
-                    (key,),
-                )
-                conn.executemany(
-                    """
-                    INSERT INTO objective_values (
-                        cache_key, metric, sense, value, value_status, units, ordinal
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    [
-                        (
-                            key,
-                            objective["metric"],
-                            objective["sense"],
-                            objective["value"],
-                            objective["value_status"],
-                            objective["units"],
-                            objective["ordinal"],
-                        )
-                        for objective in objectives
-                    ],
-                )
+                        objective["metric"],
+                        objective["sense"],
+                        objective["value"],
+                        objective["value_status"],
+                        objective["units"],
+                        objective["ordinal"],
+                    )
+                    for objective in objectives
+                ],
+            )
 
-            self._execute_write(write)
+        self._execute_write(write, lock_already_held=True)
 
     def lookup(self, eval_spec: EvalSpec) -> ScoredResult | None:
         key = cache_key(eval_spec)
@@ -611,7 +727,13 @@ class ResultStore:
             """
         )
 
-    def _execute_write(self, operation: Any) -> Any:
+    def _execute_write(self, operation: Any, *, lock_already_held: bool = False) -> Any:
+        if lock_already_held:
+            return self._execute_write_locked(operation)
+        with self.write_lock():
+            return self._execute_write_locked(operation)
+
+    def _execute_write_locked(self, operation: Any) -> Any:
         last_error: sqlite3.OperationalError | None = None
         for attempt in range(WRITE_RETRY_ATTEMPTS):
             conn: sqlite3.Connection | None = None
