@@ -1712,9 +1712,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             intent is ChemistryIntent.METALLOTHERMIC_STEP
             and temperature_C_override is None
         ):
-            self._record_phase_context_diagnostic(
-                'metallothermic',
-                scalar_liquid_fraction=control_inputs.get('liquid_fraction'),
+            control_inputs['liquid_fraction'] = (
+                self._record_phase_context_diagnostic(
+                    'metallothermic',
+                    scalar_liquid_fraction=control_inputs.get(
+                        'liquid_fraction'),
+                )
             )
         return kernel.dispatch(
             intent,
@@ -1731,8 +1734,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         site: str,
         *,
         scalar_liquid_fraction: float | None = None,
-    ) -> None:
-        """Relog PhaseContext without changing a consumer's inputs or output."""
+    ) -> float | None:
+        """Record PhaseContext and return only its caller-resolved scalar tier."""
+        resolved_scalar_liquid_fraction = (
+            None
+            if scalar_liquid_fraction is None
+            else float(scalar_liquid_fraction)
+        )
         try:
             verified_scalar_source = None
             pinned_hour = getattr(
@@ -1793,6 +1801,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostics = {}
             self._last_phase_context_diagnostic = diagnostics
         diagnostics[str(site)] = record
+        return resolved_scalar_liquid_fraction
 
     def _commit_proposal(
         self,

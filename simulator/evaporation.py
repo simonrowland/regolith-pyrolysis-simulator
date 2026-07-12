@@ -1392,7 +1392,8 @@ class EvaporationMixin:
         if dt_hr <= 0.0 or not evap_flux.species_kg_hr:
             return evap_flux
 
-        self._record_phase_context_diagnostic('evaporation_depletion')
+        phase_scalar = self._record_phase_context_diagnostic(
+            'evaporation_depletion', scalar_liquid_fraction=1.0)
 
         metals_data = self.vapor_pressures.get('metals', {}) or {}
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
@@ -1401,7 +1402,10 @@ class EvaporationMixin:
         parent_groups: dict[str, list[dict]] = defaultdict(list)
 
         for species in sorted(evap_flux.species_kg_hr):
-            raw_rate_kg_hr = float(evap_flux.species_kg_hr.get(species, 0.0))
+            raw_rate_kg_hr = (
+                float(evap_flux.species_kg_hr.get(species, 0.0))
+                * phase_scalar
+            )
             if raw_rate_kg_hr <= 1e-12:
                 continue
             sp_data = metals_data.get(species, {})
@@ -1550,7 +1554,8 @@ class EvaporationMixin:
         Per the goal spec, the shadow comparator was removed at flip
         time (the parity test owns the regression surface from now on).
         """
-        self._record_phase_context_diagnostic('condensation_feed')
+        phase_scalar = self._record_phase_context_diagnostic(
+            'condensation_feed', scalar_liquid_fraction=1.0)
         route_result = self.condensation_model.route(
             evap_flux, self.melt)
 
@@ -1588,7 +1593,7 @@ class EvaporationMixin:
         for species in species_order:
             if species not in evap_flux.species_kg_hr:
                 continue
-            rate_kg_hr = evap_flux.species_kg_hr[species]
+            rate_kg_hr = evap_flux.species_kg_hr[species] * phase_scalar
             self._route_evaporated_species_to_condensation(
                 route_result,
                 species,

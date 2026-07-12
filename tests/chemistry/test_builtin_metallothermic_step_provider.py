@@ -41,6 +41,7 @@ from pathlib import Path
 import pytest
 
 import engines.builtin.metallothermic_step as metallothermic_step_module
+import simulator.chemistry.phase_context as phase_context_module
 from engines.builtin.metallothermic_step import (
     BuiltinMetallothermicStepProvider,
     NA_STAGE_TARGETS,
@@ -1230,6 +1231,54 @@ def _c3_k_feo_request(sim, *, liquid_fraction, k_kg=30.0):
             "dt_hr": 1.0,
         },
     )
+
+
+def test_metallothermic_dispatch_consumes_only_phase_context_scalar_tier(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    captured = {}
+
+    class _CaptureKernel:
+        def dispatch(self, intent, **kwargs):
+            captured.update(kwargs)
+            return "proposal"
+
+    sim._chem_kernel = _CaptureKernel()
+    phase_context_calls = []
+
+    def _tier_one_context(*args, **kwargs):
+        phase_context_calls.append((args, kwargs))
+        return {
+            "FeO": {
+                "liquid_fraction": 0.0,
+                "activity_basis": "forbidden_tier_one_value",
+                "provenance": {"selected_tier": "grind_cache_assemblage"},
+            }
+        }
+
+    monkeypatch.setattr(phase_context_module, "PhaseContext", _tier_one_context)
+    result = sim._dispatch_only(
+        ChemistryIntent.METALLOTHERMIC_STEP,
+        control_inputs={"liquid_fraction": 0.375},
+    )
+
+    assert result == "proposal"
+    assert len(phase_context_calls) == 1
+    assert captured["control_inputs"] == {"liquid_fraction": 0.375}
+
+    sim._dispatch_only(
+        ChemistryIntent.METALLOTHERMIC_STEP,
+        control_inputs={"liquid_fraction": None},
+    )
+
+    assert len(phase_context_calls) == 2
+    assert captured["control_inputs"] == {"liquid_fraction": None}
 
 
 def test_c3_na_draw_uses_true_ledger_availability_not_quantized_view(

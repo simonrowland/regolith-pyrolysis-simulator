@@ -6,6 +6,7 @@ import math
 
 import pytest
 
+import simulator.chemistry.phase_context as phase_context_module
 from simulator.state import CampaignPhase, EvaporationFlux
 from tests.chemistry.conftest import _build_sim
 
@@ -59,6 +60,41 @@ def test_parent_grouped_analytic_depletion_is_shared_and_deterministic(
         first.species_kg_hr["Si"] * stoich_si["oxide_per_product_kg"]
         / parent_draw_kg
     ) == pytest.approx(3.0 / 5.0, rel=1e-12)
+
+
+def test_depletion_output_ignores_tier_one_phase_context_fields(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    baseline = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    migrated = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    flux = _flux({"Na": 0.01})
+    expected = baseline._apply_analytic_evaporation_depletion(flux)
+
+    monkeypatch.setattr(
+        phase_context_module,
+        "PhaseContext",
+        lambda *args, **kwargs: {
+            "Na2O": {
+                "liquid_fraction": 0.0,
+                "activity_basis": "forbidden_tier_one_value",
+                "provenance": {"selected_tier": "grind_cache_assemblage"},
+            }
+        },
+    )
+    actual = migrated._apply_analytic_evaporation_depletion(_flux({"Na": 0.01}))
+
+    assert actual.species_kg_hr == expected.species_kg_hr
+    assert actual.total_kg_hr == expected.total_kg_hr
 
 
 def test_o2_consuming_vapors_share_overhead_o2_reactant(

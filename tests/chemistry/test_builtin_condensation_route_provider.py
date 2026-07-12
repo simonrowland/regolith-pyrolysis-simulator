@@ -37,6 +37,7 @@ import warnings
 
 import pytest
 
+import simulator.chemistry.phase_context as phase_context_module
 from engines.builtin.condensation_route import (
     BuiltinCondensationRouteProvider,
 )
@@ -663,6 +664,53 @@ def test_evaporation_caller_dispatches_condensation_floor_to_provider(
         assert sim.atom_ledger.kg_by_account("process.condensation_train")[
             "Na"
         ] == pytest.approx(condensed_kg)
+
+
+def test_condensation_proposal_ignores_tier_one_phase_context_fields(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
+):
+    def _run(sim):
+        rate_kg_hr = 1e-6
+        sim.condensation_model.route = lambda evap_flux, melt: (
+            CondensationRouteResult(remaining_by_species={"Na": 0.25e-6})
+        )
+        seen = []
+        original = sim._dispatch_and_commit
+
+        def _capture(intent, *, control_inputs):
+            result = original(intent, control_inputs=control_inputs)
+            if intent is ChemistryIntent.CONDENSATION_ROUTE:
+                seen.append((dict(control_inputs), result.transition))
+            return result
+
+        sim._dispatch_and_commit = _capture
+        sim._route_to_condensation(EvaporationFlux(
+            species_kg_hr={"Na": rate_kg_hr}, total_kg_hr=rate_kg_hr,
+        ))
+        return seen[-1]
+
+    baseline = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    expected_controls, expected_transition = _run(baseline)
+    monkeypatch.setattr(
+        phase_context_module,
+        "PhaseContext",
+        lambda *args, **kwargs: {
+            "Na2O": {
+                "liquid_fraction": 0.0,
+                "activity_basis": "forbidden_tier_one_value",
+                "provenance": {"selected_tier": "grind_cache_assemblage"},
+            }
+        },
+    )
+    migrated = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    actual_controls, actual_transition = _run(migrated)
+
+    assert actual_controls == expected_controls
+    assert actual_transition == expected_transition
 
 
 def test_evaporation_caller_counts_condensation_degraded_path_engagement(
