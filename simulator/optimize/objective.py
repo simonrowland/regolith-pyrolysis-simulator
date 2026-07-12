@@ -2862,7 +2862,13 @@ def _captured_products_mol(
                     continue
                 if not (
                     account_name.startswith("terminal.")
-                    or account_name in {"process.metal_phase", "process.condensation_train"}
+                    or account_name
+                    in {
+                        "process.metal_phase",
+                        "process.metal_phase_bottom_pool",
+                        "process.metal_phase_float_layer",
+                        "process.condensation_train",
+                    }
                 ):
                     continue
                 if not isinstance(species_mol, Mapping):

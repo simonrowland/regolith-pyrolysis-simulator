@@ -1321,6 +1321,13 @@ furnace:
     thermal_cycling_C: [50, 80]
     note: "continuous; ensures surface renewal for evaporation kinetics"
 
+  metal_phase_stratification:
+    mode: "diagnostic_only_instrument_before_gate"
+    default_operating_assumption: "induction mixing plus aggressive float tap keeps the silicate interface open"
+    k_mix_optimizer_exposure: "deferred_owner_knobs_gate"
+    tap_routing_behavior: "unchanged; activation is a separate reviewed gate"
+    density_authority: "engine liquid EOS; labeled 2700 kg/m3 fallback only when unavailable"
+
   melt_viscosity:
     FeO_fluxed_basalt_Pa_s: [3, 10]      # fresh C2 melt
     Fe_depleted_aluminosilicate: "higher; better for electrode stability"

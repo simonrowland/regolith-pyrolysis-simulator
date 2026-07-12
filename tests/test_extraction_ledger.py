@@ -1,9 +1,15 @@
 import shlex
+from types import SimpleNamespace
 
 import pytest
 
 from engines.builtin.metallothermic_step import SPENT_REDUCTANT_RESIDUE_ACCOUNT
-from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
+from simulator.account_ids import (
+    C7_AL_CREDIT_ACCOUNT,
+    METAL_BOTTOM_POOL_ACCOUNT,
+    METAL_FLOAT_LAYER_ACCOUNT,
+    METAL_PHASE_ACCOUNT,
+)
 from simulator.accounting import AccountingQueries, MaterialLot
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
@@ -431,6 +437,74 @@ def test_mre_reduction_records_atom_ledger_transition():
     assert sim._mre_metals_this_hr["Fe"] == pytest.approx(fe_kg)
     assert sim._mre_energy_this_hr == pytest.approx(1.25)
     assert sim._oxygen_stored_kg() == pytest.approx(o2_kg)
+
+    product_before = sim.product_ledger()["Fe"]
+    sim._step_metal_phase_stratification(
+        SimpleNamespace(liquid_density_kg_m3=2650.0)
+    )
+    sim.atom_ledger.assert_balanced()
+    assert sim.atom_ledger.kg_by_account("process.metal_phase").get("Fe", 0.0) == 0.0
+    assert sim.atom_ledger.kg_by_account(METAL_BOTTOM_POOL_ACCOUNT)[
+        "Fe"
+    ] == pytest.approx(fe_kg)
+    assert sim.atom_ledger.kg_by_account(METAL_FLOAT_LAYER_ACCOUNT).get(
+        "Fe", 0.0
+    ) == 0.0
+    assert sim.product_ledger()["Fe"] == pytest.approx(product_before)
+    diagnostic = sim._last_metal_phase_stratification_diagnostic
+    assert diagnostic["melt_density_tier"] == "engine_liquid_eos"
+    assert diagnostic["pools"]["bottom_pool"]["buoyancy"]["verdict"] == "sink"
+    assert diagnostic["existing_extraction_behavior"] == "unchanged_diagnostic_only"
+
+    sim._restore_metal_phase_staging()
+    sim.atom_ledger.assert_balanced()
+    assert sim.atom_ledger.kg_by_account("process.metal_phase")[
+        "Fe"
+    ] == pytest.approx(fe_kg)
+    assert sim.atom_ledger.kg_by_account(METAL_BOTTOM_POOL_ACCOUNT).get(
+        "Fe", 0.0
+    ) == 0.0
+    assert sim.product_ledger()["Fe"] == pytest.approx(product_before)
+
+
+def test_al_si_film_threshold_and_runner_telemetry_are_emitted_end_to_end():
+    from simulator.runner import build_per_hour_summary
+
+    sim = _sim({
+        "silica": {
+            "label": "silica",
+            "composition_wt_pct": {"SiO2": 100.0},
+        }
+    })
+    sim.load_batch("silica", mass_kg=MOLAR_MASS["SiO2"])
+    sim.melt.temperature_C = 1600.0
+    sim.atom_ledger.load_external_mol(
+        METAL_PHASE_ACCOUNT,
+        {"Al": 10.0, "Si": 10.0},
+    )
+    sim._step_metal_phase_stratification(
+        SimpleNamespace(liquid_density_kg_m3=2638.918)
+    )
+
+    diagnostic = sim._last_metal_phase_stratification_diagnostic
+    interface = diagnostic["interface"]
+    expected_mass_kg = 10.0 * (MOLAR_MASS["Al"] + MOLAR_MASS["Si"]) / 1000.0
+    float_density = diagnostic["pools"]["float_layer"]["density_kg_m3"]
+    expected_thickness_m = expected_mass_kg / (
+        float_density * sim.melt.melt_surface_area_m2
+    )
+    assert interface["equivalent_film_thickness_m"] == pytest.approx(
+        expected_thickness_m
+    )
+    assert interface["coverage_reference_thickness_m"] == pytest.approx(0.001)
+    assert expected_thickness_m > interface["coverage_reference_thickness_m"]
+    assert interface["coverage_fraction_at_reference_thickness"] == 1.0
+    assert interface["aggressive_float_tap_assumption_load_bearing"] is True
+
+    snapshot = sim._make_snapshot()
+    assert snapshot.metal_phase_stratification["interface"] == interface
+    summary = build_per_hour_summary(sim, snapshot)
+    assert summary["metal_phase_stratification"]["interface"] == interface
 
 
 def test_mre_returned_oxygen_kg_comes_from_ledger_mol():

@@ -50,6 +50,8 @@ from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    METAL_BOTTOM_POOL_ACCOUNT,
+    METAL_FLOAT_LAYER_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
@@ -343,6 +345,8 @@ FLOW_MASS_ACCOUNTS = (
     *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     'process.overhead_gas',
     'process.metal_phase',
+    METAL_BOTTOM_POOL_ACCOUNT,
+    METAL_FLOAT_LAYER_ACCOUNT,
     'process.reagent_inventory',
     'terminal.offgas',
     'terminal.stage0_salt_phase',
@@ -657,6 +661,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ] = deque(maxlen=_MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN)
         self._melt_redox_liquidus_gate_fallback_count = 0
         self._degraded_path_engagement: Dict[str, Dict[str, Any]] = {}
+        self._last_metal_phase_stratification_diagnostic: Dict[str, Any] = {}
+        # Identity-only carry copied from committed pool accounts before their
+        # temporary legacy-physics restore. It never owns or mutates mass.
+        self._metal_phase_stratification_prior_pools_mol: Dict[str, Any] = {}
         self._melt_redox_gate_authority_this_tick: object = (
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         )
@@ -6123,6 +6131,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._melt_redox_liquidus_gate_fallback_count = 0
         self._degraded_path_engagement = {}
+        self._last_metal_phase_stratification_diagnostic = {}
+        self._metal_phase_stratification_prior_pools_mol = {}
         self._melt_redox_gate_authority_this_tick = (
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         )
@@ -9988,6 +9998,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_partial_melt_offgassing_diagnostic = {}
         self._last_extraction_completeness_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
+        self._last_metal_phase_stratification_diagnostic = {}
         self._pending_shuttle_bakeout_cycle_increment = ''
         self._reset_redox_source_diagnostics_for_hour()
         self._reset_o2_bubbler_telemetry_for_hour()
@@ -9996,6 +10007,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.paused_for_decision:
             # Return current state without advancing
             return self._make_snapshot()
+        self._restore_metal_phase_staging()
         self._mre_anode_O2_kg_this_hr = 0.0
 
         sample_time_h = float(self.melt.campaign_hour) + 1.0
@@ -10208,6 +10220,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # Decision needed before proceeding
                 pending_decision = self.campaign_mgr.get_decision(
                     self.melt.campaign, self.record)
+
+        # Stratification remains an hour-boundary diagnostic: all legacy
+        # physics has read the canonical staging account before this move.
+        self._step_metal_phase_stratification(equilibrium)
 
         # --- 10. Record snapshot ---
         completed_hour = int(self.melt.hour)
@@ -10797,6 +10813,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mre_ellingham_ladder_diagnostic=dict(
                 self._mre_ellingham_ladder_diagnostic
             ),
+            metal_phase_stratification=dict(
+                self._last_metal_phase_stratification_diagnostic
+            ),
             c2a_staged_gas=dict(
                 getattr(
                     self.campaign_mgr,
@@ -10818,7 +10837,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self, '_o2_bubbler_vented_kg', 0.0) or 0.0
             ),
             # 0.5.4 W8 (M2 historical-audit closure): per-species drift
-            # between ``process.metal_phase`` ledger and the
+            # between aggregate metal-phase ledger accounts and the
             # ``train.stages[*].collected_kg`` UI projection. Empty dict
             # means all metals in sync. Diagnostic only — the global
             # ``mass_balance_error_pct`` ≤5e-12 % gate remains hard.

@@ -10,6 +10,7 @@ from functools import wraps
 from types import MappingProxyType
 from typing import Any
 
+from simulator.account_ids import METAL_PHASE_ACCOUNTS
 from simulator.accounting.ledger import LedgerTransition
 from simulator.accounting.queries import is_reagent_bookkeeping_product
 from simulator.cost_energy import (
@@ -24,7 +25,7 @@ COST_LEDGER_SCHEMA_VERSION = "cost-ledger-v1"
 COST_POLICY_ID = "mass-allocation-default__reagent-full-cost-v1"
 COST_BEARING_ACCOUNTS = frozenset({
     "process.reagent_inventory",
-    "process.metal_phase",
+    *METAL_PHASE_ACCOUNTS,
     "process.condensation_train",
     "process.c7_al_credit",
 })
@@ -1230,7 +1231,7 @@ def _split_beneficiary_outputs(lots: tuple[Any, ...]) -> tuple[dict[Any, float],
 def _is_target_product_account(account: str) -> bool:
     account = str(account)
     return (
-        account == "process.metal_phase"
+        account in METAL_PHASE_ACCOUNTS
         or account == "process.condensation_train"
         or account.startswith("terminal.")
         and account not in {"terminal.slag"}

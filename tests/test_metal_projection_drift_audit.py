@@ -223,7 +223,8 @@ def test_audit_skips_non_coercible_ledger_entry():
         metal_phase_kg={'Bad': 'not a number', 'Fe': 0.02},
         train_kg_by_stage=[{}],
     )
-    audit = target._audit_metal_projection_drift()
+    with pytest.warns(RuntimeWarning, match="skipped malformed ledger value"):
+        audit = target._audit_metal_projection_drift()
     assert 'Bad' not in audit
     assert audit.get('Fe') == pytest.approx(0.02)
 

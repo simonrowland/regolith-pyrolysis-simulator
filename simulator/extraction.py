@@ -3,10 +3,17 @@
 from __future__ import annotations
 
 import math
+import warnings
 from typing import Any, Dict, Mapping
 
 import simulator.mre_ladder as mre_ladder
-from simulator.account_ids import C7_AL_CREDIT_ACCOUNT
+from simulator.account_ids import (
+    C7_AL_CREDIT_ACCOUNT,
+    METAL_BOTTOM_POOL_ACCOUNT,
+    METAL_FLOAT_LAYER_ACCOUNT,
+    METAL_PHASE_ACCOUNT,
+    METAL_PHASE_ACCOUNTS,
+)
 from simulator.accounting.queries import AccountingQueries
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.condensation_routing import product_stage_number
@@ -39,6 +46,18 @@ class ExtractionMixin:
     # their only call sites with ``ChemistryKernel.commit_batch``.
 
     def _ledger_account_species_kg(self, account: str, species: str) -> float:
+        if account == METAL_PHASE_ACCOUNT:
+            return sum(
+                max(
+                    0.0,
+                    float(
+                        self.atom_ledger.kg_by_account(metal_account).get(
+                            species, 0.0
+                        )
+                    ),
+                )
+                for metal_account in METAL_PHASE_ACCOUNTS
+            )
         return max(
             0.0,
             float(self.atom_ledger.kg_by_account(account).get(species, 0.0)),
@@ -385,8 +404,8 @@ class ExtractionMixin:
 
     def _audit_metal_projection_drift(self) -> Dict[str, float]:
         """0.5.4 W8 (M2 historical-audit closure, 2026-05-28):
-        per-species drift between ``process.metal_phase`` (the
-        canonical AtomLedger metal account) and the UI projection
+        per-species drift between aggregate mol-native metal-phase accounts
+        (staging + diagnostic pools) and the UI projection
         sum across ``train.stages[*].collected_kg``.
 
         Returns a dict ``{species: drift_kg}`` for metal species
@@ -409,7 +428,20 @@ class ExtractionMixin:
         ``HourSnapshot.metal_projection_drift_kg`` so external tools
         + tests can read it without touching simulator internals.
         """
-        ledger_metals = self.atom_ledger.kg_by_account('process.metal_phase')
+        ledger_metals: Dict[str, float] = {}
+        for account in METAL_PHASE_ACCOUNTS:
+            for species, kg in self.atom_ledger.kg_by_account(account).items():
+                try:
+                    ledger_kg = float(kg)
+                except (TypeError, ValueError):
+                    warnings.warn(
+                        "metal projection drift audit skipped malformed ledger "
+                        f"value for {species!r} in {account!r}: {kg!r}",
+                        RuntimeWarning,
+                        stacklevel=2,
+                    )
+                    continue
+                ledger_metals[species] = ledger_metals.get(species, 0.0) + ledger_kg
         # 0.5.4 milestone-review P2 (codex /challenge 2026-05-28):
         # iterate the UNION of species across both ledger and
         # projection, not just ledger keys. Pre-fix, an empty ledger
@@ -450,6 +482,225 @@ class ExtractionMixin:
             if abs(delta) > self._LEDGER_KG_TOL:
                 drift[species] = delta
         return drift
+
+    def _ensure_metal_phase_stratification_provider(self) -> None:
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+
+        if self._chem_registry.authoritative_for(
+            ChemistryIntent.METAL_PHASE_STRATIFICATION
+        ) is not None:
+            return
+        from engines.builtin.metal_phase_stratification import (
+            BuiltinMetalPhaseStratificationProvider,
+        )
+
+        self._chem_registry.register_idempotent(
+            BuiltinMetalPhaseStratificationProvider(),
+            [ChemistryIntent.METAL_PHASE_STRATIFICATION],
+        )
+
+    def _restore_metal_phase_staging(self) -> None:
+        """Restore diagnostic pools before legacy physics reads metal staging."""
+
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+
+        prior_pools = {
+            'bottom_pool': dict(
+                self.atom_ledger.mol_by_account(METAL_BOTTOM_POOL_ACCOUNT)
+            ),
+            'float_layer': dict(
+                self.atom_ledger.mol_by_account(METAL_FLOAT_LAYER_ACCOUNT)
+            ),
+        }
+        if not any(prior_pools.values()):
+            return
+        # The copy preserves pool identity across the temporary staging view;
+        # committed ledger accounts remain the only mass authority.
+        self._metal_phase_stratification_prior_pools_mol = prior_pools
+        self._ensure_metal_phase_stratification_provider()
+        controls = {
+            'mode': 'restore_staging',
+            'k_mix_per_hr': 0.0,
+            'dt_hr': 0.0,
+        }
+        result = self._dispatch_only(
+            ChemistryIntent.METAL_PHASE_STRATIFICATION,
+            control_inputs=controls,
+        )
+        if result.transition is not None:
+            self._commit_proposal(
+                ChemistryIntent.METAL_PHASE_STRATIFICATION,
+                result.transition,
+                diagnostic=result.diagnostic,
+                control_inputs=controls,
+                transition_source='metal_phase_stratification_restore',
+                transition_meta={'behavior_gate': 'diagnostic_only'},
+            )
+
+    def _step_metal_phase_stratification(self, equilibrium) -> None:
+        """Commit diagnostic alloy disposition, then report density/film state."""
+
+        from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from simulator.material_densities import (
+            alloy_density_kg_m3,
+            alloy_density_uncertainty_relative_fraction,
+            buoyancy_verdict,
+            liquid_metal_density_provenance,
+            material_density_data,
+            resolve_melt_density_kg_m3,
+        )
+        from simulator.metal_stratification import (
+            BOTTOM_POOL_SPECIES,
+            FLOAT_LAYER_SPECIES,
+            k_mix_from_axial_stirring,
+            pool_weight_percent,
+        )
+
+        balances = self.atom_ledger.mol_by_account()
+        classified_species = BOTTOM_POOL_SPECIES | FLOAT_LAYER_SPECIES
+        if not any(
+            any(
+                species in classified_species and float(amount) > 0.0
+                for species, amount in balances.get(account, {}).items()
+            )
+            for account in METAL_PHASE_ACCOUNTS
+        ):
+            self._last_metal_phase_stratification_diagnostic = {}
+            self._metal_phase_stratification_prior_pools_mol = {}
+            return
+
+        self._ensure_metal_phase_stratification_provider()
+
+        k_mix_per_hr = k_mix_from_axial_stirring(self.melt.stir_state.axial)
+        temperature_K = float(self.melt.temperature_C) + 273.15
+        melt_density, melt_density_tier = resolve_melt_density_kg_m3(
+            getattr(equilibrium, 'liquid_density_kg_m3', None)
+        )
+        controls = {
+            'mode': 'stratify',
+            'k_mix_per_hr': k_mix_per_hr,
+            'dt_hr': 1.0,
+            'temperature_K': temperature_K,
+            'melt_density_kg_m3': melt_density,
+            'prior_pool_mol': dict(
+                self._metal_phase_stratification_prior_pools_mol
+            ),
+        }
+        result = self._dispatch_only(
+            ChemistryIntent.METAL_PHASE_STRATIFICATION,
+            control_inputs=controls,
+        )
+        if result.transition is not None:
+            self._commit_proposal(
+                ChemistryIntent.METAL_PHASE_STRATIFICATION,
+                result.transition,
+                diagnostic=result.diagnostic,
+                control_inputs=controls,
+                transition_source='metal_phase_stratification',
+                transition_meta={'behavior_gate': 'diagnostic_only'},
+            )
+
+        pools_mol = {
+            'bottom_pool': dict(
+                self.atom_ledger.mol_by_account(METAL_BOTTOM_POOL_ACCOUNT)
+            ),
+            'float_layer': dict(
+                self.atom_ledger.mol_by_account(METAL_FLOAT_LAYER_ACCOUNT)
+            ),
+        }
+        self._metal_phase_stratification_prior_pools_mol = {
+            pool_name: dict(species_mol)
+            for pool_name, species_mol in pools_mol.items()
+        }
+        pool_reports: dict[str, dict[str, Any]] = {}
+        for pool_name, species_mol in pools_mol.items():
+            positive = {
+                species: max(0.0, float(amount))
+                for species, amount in species_mol.items()
+                if float(amount) > 0.0
+            }
+            report: dict[str, Any] = {
+                'species_mol': positive,
+                'composition_wt_pct': pool_weight_percent(positive),
+                'density_correlation_provenance': {
+                    species: liquid_metal_density_provenance(
+                        species, temperature_K
+                    )
+                    for species in sorted(positive)
+                },
+            }
+            if positive:
+                density = alloy_density_kg_m3(positive, temperature_K)
+                report['density_kg_m3'] = density
+                report['buoyancy'] = buoyancy_verdict(
+                    density,
+                    melt_density,
+                    alloy_uncertainty_relative_fraction=(
+                        alloy_density_uncertainty_relative_fraction(positive)
+                    ),
+                )
+            pool_reports[pool_name] = report
+
+        assumptions = material_density_data()['diagnostic_assumptions']
+        reference_thickness = float(
+            assumptions['coherent_float_layer_reference_thickness_m']
+        )
+        float_mol = pools_mol['float_layer']
+        float_mass_kg = sum(
+            max(0.0, float(amount))
+            * float(ATOMIC_WEIGHTS_G_PER_MOL[species])
+            / 1000.0
+            for species, amount in float_mol.items()
+            if species in ATOMIC_WEIGHTS_G_PER_MOL
+        )
+        float_density = float(
+            pool_reports['float_layer'].get('density_kg_m3', 0.0) or 0.0
+        )
+        interface_area_m2 = max(1e-12, float(self.melt.melt_surface_area_m2))
+        # Premise: a spread layer's volume is mass/density and V=A*h.
+        # Algebra: h=m/(rho*A). Unit check: kg/[(kg/m3)*m2]=m. Sanity:
+        # 0.54 kg Al-Si over the configured 0.2 m2 at ~2.7 Mg/m3 is 1 mm.
+        thickness_m = (
+            float_mass_kg / (float_density * interface_area_m2)
+            if float_density > 0.0
+            else 0.0
+        )
+        coverage_fraction = min(
+            1.0,
+            thickness_m / reference_thickness if reference_thickness > 0.0 else 0.0,
+        )
+        load_bearing = coverage_fraction >= 1.0
+        has_metal = any(
+            any(float(amount) > 0.0 for amount in species_mol.values())
+            for species_mol in pools_mol.values()
+        )
+        has_unclassified = bool(
+            dict(result.diagnostic or {}).get('unclassified_staging_mol')
+        )
+        if not has_metal and not has_unclassified:
+            self._last_metal_phase_stratification_diagnostic = {}
+            return
+
+        self._last_metal_phase_stratification_diagnostic = {
+            **dict(result.diagnostic or {}),
+            'temperature_K': temperature_K,
+            'melt_density_kg_m3': melt_density,
+            'melt_density_tier': melt_density_tier,
+            'melt_density_fallback_engaged': (
+                melt_density_tier != 'engine_liquid_eos'
+            ),
+            'pools': pool_reports,
+            'interface': {
+                'area_m2': interface_area_m2,
+                'float_layer_mass_kg': float_mass_kg,
+                'equivalent_film_thickness_m': thickness_m,
+                'coverage_reference_thickness_m': reference_thickness,
+                'coverage_fraction_at_reference_thickness': coverage_fraction,
+                'aggressive_float_tap_assumption_load_bearing': load_bearing,
+            },
+            'existing_extraction_behavior': 'unchanged_diagnostic_only',
+        }
 
     def _project_condensed_species(
         self,
@@ -2697,8 +2948,9 @@ class ExtractionMixin:
         )
         slag_cao = max(0.0, float(balances.get('terminal.slag', {}).get('CaO', 0.0)))
         cao_available = cleaned_cao + slag_cao
-        in_situ_al_available = max(
-            0.0, float(balances.get('process.metal_phase', {}).get('Al', 0.0))
+        in_situ_al_available = sum(
+            max(0.0, float(balances.get(account, {}).get('Al', 0.0)))
+            for account in (METAL_PHASE_ACCOUNT, METAL_FLOAT_LAYER_ACCOUNT)
         )
         in_situ_al_budget = in_situ_al_available * al_fraction
         credit_al_available = max(

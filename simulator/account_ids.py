@@ -1,6 +1,14 @@
 """Shared process account identifiers."""
 
 OXYGEN_SPECIES = "O2"
+METAL_PHASE_ACCOUNT = "process.metal_phase"
+METAL_BOTTOM_POOL_ACCOUNT = "process.metal_phase_bottom_pool"
+METAL_FLOAT_LAYER_ACCOUNT = "process.metal_phase_float_layer"
+METAL_PHASE_ACCOUNTS = (
+    METAL_PHASE_ACCOUNT,
+    METAL_BOTTOM_POOL_ACCOUNT,
+    METAL_FLOAT_LAYER_ACCOUNT,
+)
 OXYGEN_STAGE0_ACCOUNT = "terminal.oxygen_stage0_stored"
 OXYGEN_MELT_OFFGAS_ACCOUNT = "terminal.oxygen_melt_offgas_stored"
 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT = (

@@ -32,6 +32,7 @@ class ChemistryIntent(str, Enum):
     EVAPORATION_TRANSITION = "evaporation_transition"
     CONDENSATION_ROUTE = "condensation_route"
     ELECTROLYSIS_STEP = "electrolysis_step"
+    METAL_PHASE_STRATIFICATION = "metal_phase_stratification"
     METALLOTHERMIC_STEP = "metallothermic_step"
     CA_ALUMINOTHERMIC_STEP = "ca_aluminothermic_step"
     NATIVE_FE_SATURATION = "native_fe_saturation"

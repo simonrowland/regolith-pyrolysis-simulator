@@ -1864,6 +1864,13 @@ def build_per_hour_summary(
                 field="stage_3_capture Fe_wt_pct",
             ),
         }
+    metal_phase_stratification = dict(
+        getattr(snapshot, "metal_phase_stratification", {}) or {}
+    )
+    if metal_phase_stratification:
+        summary["metal_phase_stratification"] = _json_safe(
+            metal_phase_stratification
+        )
     if mass_balance_category:
         summary["mass_balance_error_category"] = mass_balance_category
     c2a_staged_gas = dict(getattr(snapshot, "c2a_staged_gas", {}) or {})

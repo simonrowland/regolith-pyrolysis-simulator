@@ -1013,6 +1013,9 @@ class HourSnapshot:
     mre_metals_kg_hr: Dict[str, float] = field(default_factory=dict)
     mre_uncertified_yield: Dict[str, Any] = field(default_factory=dict)
     mre_ellingham_ladder_diagnostic: Dict[str, Any] = field(default_factory=dict)
+    metal_phase_stratification: Dict[str, Any] = field(default_factory=dict)
+    # Diagnostic-only bottom/float alloy vectors, density contrast, and
+    # interface-film load-bearing signal. No tap or extraction gate reads it.
     # Per-tick MRE yield entries that came from heuristic / unanchored
     # chemistry branches. Empty dict means the tick produced no uncertified
     # yield.
@@ -1166,8 +1169,8 @@ class HourSnapshot:
     # --- Metal-projection drift audit (0.5.4 W8 / M2 closure) ---
     metal_projection_drift_kg: Dict[str, float] = field(default_factory=dict)
     # Per-species drift (ledger_kg - projection_kg) for metal species
-    # whose ``process.metal_phase`` account (canonical AtomLedger entry)
-    # differs from the sum across
+    # whose aggregate metal-phase ledger accounts (staging + diagnostic pools)
+    # differ from the sum across
     # ``train.stages[*].collected_kg`` (UI projection) by more than
     # ``ExtractionMixin._LEDGER_KG_TOL = 1e-9 kg``. The audit iterates
     # the UNION of species across both surfaces (0.5.4

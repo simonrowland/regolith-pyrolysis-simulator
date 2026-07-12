@@ -174,6 +174,7 @@ PER_HOUR_OPTIONAL_KEYS = frozenset({
     "mass_balance_error_category",
     "reduced_real_cache_state",
     "c2a_staged_gas",
+    "metal_phase_stratification",
 })
 
 VAPOR_PRESSURE_SOURCE_REPORT_KEYS = frozenset({

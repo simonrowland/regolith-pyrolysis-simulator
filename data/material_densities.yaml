@@ -1,0 +1,123 @@
+schema_version: 1
+units:
+  temperature: K
+  density: kg/m3
+  density_slope: kg/m3/K
+
+# rho(T) = rho_at_melting_kg_m3 - slope_kg_m3_K * (T - melting_temperature_K)
+# Values are the cited authors' 0.1 MPa linear reference correlations.
+liquid_metals:
+  Al:
+    melting_temperature_K: 933.473
+    valid_range_K: [933.0, 1190.0]
+    rho_at_melting_kg_m3: 2377.23
+    slope_kg_m3_K: 0.311
+    uncertainty_95_pct: 0.65
+    source: "Assael et al. (2006), J. Phys. Chem. Ref. Data 35, 285-300, doi:10.1063/1.2149380"
+  Si:
+    melting_temperature_K: 1687.0
+    valid_range_K: [1687.0, 2000.0]
+    rho_at_melting_kg_m3: 2550.0
+    slope_kg_m3_K: 0.264
+    uncertainty_95_pct: 2.2
+    source: "Assael et al. (2012), J. Phys. Chem. Ref. Data 41, 033101, doi:10.1063/1.4729873"
+  Ti:
+    melting_temperature_K: 1941.0
+    valid_range_K: [1941.0, 3520.0]
+    rho_at_melting_kg_m3: 4222.1
+    slope_kg_m3_K: 0.3952
+    uncertainty_95_pct: 2.0
+    source: "Assael et al. (2024), Int. J. Thermophys. 45, 13, doi:10.1007/s10765-023-03305-z"
+  Cr:
+    melting_temperature_K: 2180.0
+    valid_range_K: [2186.0, 2503.0]
+    rho_at_melting_kg_m3: 6097.1
+    slope_kg_m3_K: 0.6536
+    uncertainty_95_pct: 3.2
+    source: "Assael et al. (2024), Int. J. Thermophys. 45, 13, doi:10.1007/s10765-023-03305-z"
+  Mn:
+    melting_temperature_K: 1519.0
+    valid_range_K: [1519.0, 2334.0]
+    rho_at_melting_kg_m3: 5757.33
+    slope_kg_m3_K: 0.930
+    uncertainty_95_pct: null
+    source: "Saito, Shiraishi and Sakuma correlation compiled by Iida and Guthrie (1988), The Physical Properties of Liquid Metals, density tables"
+  Fe:
+    melting_temperature_K: 1810.94
+    valid_range_K: [1809.0, 2480.0]
+    rho_at_melting_kg_m3: 7034.96
+    slope_kg_m3_K: 0.926
+    uncertainty_95_pct: 0.77
+    source: "Assael et al. (2006), J. Phys. Chem. Ref. Data 35, 285-300, doi:10.1063/1.2149380"
+  Ni:
+    melting_temperature_K: 1728.3
+    valid_range_K: [1728.0, 2500.0]
+    rho_at_melting_kg_m3: 7861.0
+    slope_kg_m3_K: 0.988
+    uncertainty_95_pct: 1.7
+    source: "Assael et al. (2012), High Temperatures-High Pressures 41, 161-184"
+
+fe_si_excess_volume:
+  model: mizuno_2014_piecewise_composition_fit
+  calibration_temperature_K: 1820.0
+  # Mizuno et al. form V_E from these internally consistent pure endpoints.
+  endpoint_correlations:
+    Fe:
+      reference_temperature_K: 1808.0
+      rho_at_reference_kg_m3: 7162.0
+      slope_kg_m3_K: 0.735
+    Si:
+      reference_temperature_K: 1687.0
+      rho_at_reference_kg_m3: 2580.0
+      slope_kg_m3_K: 0.184
+  # Faithful piecewise representation of every cited Table 1 composition at
+  # 1820 K. The pure endpoints close V_E to zero. Values are
+  # 1 - V_measured/V_ideal; small negative values retain the reported scatter
+  # instead of silently replacing the source data with a smoothed invention.
+  fractional_contraction_anchors:
+    - [0.0, 0.0]
+    - [0.05, -0.023910042858639]
+    - [0.10, -0.009466429468127]
+    - [0.15, -0.002534824191039]
+    - [0.20, 0.042495245809103]
+    - [0.25, 0.016577241181315]
+    - [0.34, 0.063298082318772]
+    - [0.38, 0.079316705059607]
+    - [0.40, 0.110838185137215]
+    - [0.45, 0.089492722793377]
+    - [0.50, 0.098476124295153]
+    - [0.55, 0.088218612429505]
+    - [0.60, 0.092845365312342]
+    - [0.70, 0.050282174611702]
+    - [0.75, 0.004292045159276]
+    - [0.80, 0.052110546294800]
+    - [0.90, 0.003824412874122]
+    - [1.0, 0.0]
+  measured_density_anchors_kg_m3:
+    "0.05": 6676.407
+    "0.10": 6470.075
+    "0.15": 6222.541
+    "0.20": 6220.700
+    "0.25": 5780.645
+    "0.34": 5573.343
+    "0.38": 5456.484
+    "0.40": 5541.545
+    "0.45": 5153.425
+    "0.50": 4952.829
+    "0.55": 4656.292
+    "0.60": 4445.923
+    "0.70": 3820.700
+    "0.75": 3450.594
+    "0.80": 3427.518
+    "0.90": 2902.980
+  source: "Mizuno et al. (2014), ISIJ International 54, 2120-2124, doi:10.2355/isijinternational.54.2120"
+
+diagnostic_assumptions:
+  melt_density_fallback_kg_m3: 2700.0
+  melt_density_fallback_source: "labeled basaltic-melt fallback; engine liquid EOS is authoritative"
+  buoyancy_ambiguity_relative_fraction: 0.05
+  buoyancy_ambiguity_absolute_kg_m3: 100.0
+  coherent_float_layer_reference_thickness_m: 0.001
+  settling_floor_k_mix_per_hr: 0.0001
+  well_mixed_fraction_per_hour_at_default_stirring: 0.99
+  default_axial_stir_factor: 6.0

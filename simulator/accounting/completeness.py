@@ -9,6 +9,7 @@ from typing import Any, Mapping
 
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import parse_formula
+from simulator.account_ids import METAL_BOTTOM_POOL_ACCOUNT, METAL_FLOAT_LAYER_ACCOUNT
 from simulator.state import MOLAR_MASS
 
 _EPS = 1.0e-12
@@ -40,6 +41,8 @@ TARGET_YIELD_PRODUCT_ACCOUNTS = (
     "terminal.drain_tap_material",
     "terminal.chromium_condensed_oxide_stored",
     "process.metal_phase",
+    METAL_BOTTOM_POOL_ACCOUNT,
+    METAL_FLOAT_LAYER_ACCOUNT,
     "process.condensation_train",
     "process.overhead_gas",
 )

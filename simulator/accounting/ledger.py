@@ -50,6 +50,8 @@ KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
     "process.c7_al_credit",
     "process.condensation_train",
     "process.metal_phase",
+    "process.metal_phase_bottom_pool",
+    "process.metal_phase_float_layer",
     "process.overhead_gas",
     "process.raw_feedstock",
     "process.reagent_inventory",

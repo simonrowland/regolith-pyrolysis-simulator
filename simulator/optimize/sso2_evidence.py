@@ -6,6 +6,7 @@ import math
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from simulator.account_ids import METAL_PHASE_ACCOUNTS
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.condensation_routing import accepted_species_for_stage_number
 from simulator.core import PyrolysisSimulator
@@ -37,6 +38,7 @@ SSO2_CERTIFIED_SURFACE_SOURCE = OWNER_CERTIFIED_SURFACE_SOURCE
 SSO2_SILICA_SPECIES = ("SiO", "SiO2", "Si")
 SSO2_FE_TAP_ACCOUNT = "terminal.drain_tap_material"
 SSO2_METAL_PHASE_ACCOUNT = "process.metal_phase"
+SSO2_METAL_PHASE_ACCOUNTS = METAL_PHASE_ACCOUNTS
 SSO2_MASS_BALANCE_TOLERANCE_PCT = 5.0e-12
 SSO2_CHUNK3B_READER_HANDOFF = (
     "PhysicsConstraintSet.delivered_stream_purity plus the SSO-2 profile/objective "
@@ -241,8 +243,8 @@ def sso2_owner_recipe_evidence(
     tap_kg_by_species, tap_status, tap_reason = _ledger_account_kg(
         ledger, SSO2_FE_TAP_ACCOUNT
     )
-    metal_phase_kg_by_species, metal_status, metal_reason = _ledger_account_kg(
-        ledger, SSO2_METAL_PHASE_ACCOUNT
+    metal_phase_kg_by_species, metal_status, metal_reason = _ledger_accounts_kg(
+        ledger, SSO2_METAL_PHASE_ACCOUNTS
     )
     product_fe_kg = _product_species_kg(sim, "Fe")
     native_split_count = _transition_count(ledger, "native_fe_saturation_split")
@@ -354,6 +356,7 @@ def sso2_owner_recipe_evidence(
             "status": metal_status,
             "status_reason": metal_reason,
             "account": SSO2_METAL_PHASE_ACCOUNT,
+            "account_scope": list(SSO2_METAL_PHASE_ACCOUNTS),
             "Fe_kg": (
                 metal_phase_kg_by_species.get("Fe", 0.0)
                 if metal_status == "available"
@@ -651,6 +654,24 @@ def _ledger_account_kg(ledger: Any, account: str) -> tuple[dict[str, float], str
         except ValueError as exc:
             return {}, "missing_fe_tap_evidence", str(exc)
     return species_kg, "available", ""
+
+
+def _ledger_accounts_kg(
+    ledger: Any,
+    accounts: Sequence[str],
+) -> tuple[dict[str, float], str, str]:
+    totals: dict[str, float] = {}
+    reasons: list[str] = []
+    for account in accounts:
+        species_kg, status, reason = _ledger_account_kg(ledger, str(account))
+        if status != "available":
+            reasons.append(reason)
+            continue
+        for species, kg in species_kg.items():
+            totals[species] = totals.get(species, 0.0) + kg
+    if totals:
+        return totals, "available", ""
+    return {}, "missing_fe_tap_evidence", "; ".join(reasons)
 
 
 def _transition_count(ledger: Any, name: str) -> int:
