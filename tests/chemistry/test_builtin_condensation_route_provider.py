@@ -133,35 +133,38 @@ from tests.chemistry.conftest import _build_sim
 # 2026-07-11 0.5.10 E-MOVE: BCD/native-Fe state-cap plus two-rail/phase-basis
 # vapor routing lowers segment wall products to ~7.7-9.7% of the prior pins;
 # FeSi is absent. Recomputed from the executable split path.
+# 2026-07-12 wave10 process-condensation: area-integrated HKL/transport
+# wall-flux family (J*A*M*residence, capped by available vapor) raises wall
+# segment deposits. Recomputed from the executable split path.
 EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 1.5682700615023095e-08,
-            "SiO2": 3.355145272361839e-08,
+            "Si": 2.9713548283180754e-06,
+            "SiO2": 6.356699738288584e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 1.8668807490862695e-08,
-            "SiO2": 3.993990749368873e-08,
+            "Si": 3.177858364748269e-06,
+            "SiO2": 6.798478338229312e-06,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 9.744924167614848e-09,
-            "SiO2": 2.0847579802841475e-08,
+            "Si": 2.4095050497985687e-06,
+            "SiO2": 5.154719313051358e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 1.1600670221435767e-08,
-            "SiO2": 2.481864234896979e-08,
+            "Si": 2.609148006790817e-06,
+            "SiO2": 5.581820889870488e-06,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 1.3570073140626961e-08,
-            "SiO2": 2.9030824443948358e-08,
+            "Si": 2.5985956260550898e-06,
+            "SiO2": 5.5592458963955116e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 1.6153928974817463e-08,
-            "SiO2": 3.45596061799401e-08,
+            "Si": 2.7791419905777254e-06,
+            "SiO2": 5.945493616517054e-06,
         },
     },
 }
@@ -202,7 +205,7 @@ def _alkali_route_request(
             "condensed_kg": arrival_mol * mw,
             "sp_data": {},
             "wall_deposit_fraction": 1.0,
-            "wall_deposit_account_fractions": {},
+            "wall_deposit_account_fractions": {"process.wall_deposit": 1.0},
             "wall_temperature_K": wall_temperature_K,
             "wall_deposit_account_temperatures_K": {
                 "process.wall_deposit": wall_temperature_K,
@@ -210,6 +213,40 @@ def _alkali_route_request(
             "wall_alkali_binding_diagnostic_state_by_account": state or {},
             "dt_hr": 1.0,
         },
+    )
+
+
+def _route_validation_request(
+    sim,
+    *,
+    species: str = "SiO",
+    sp_data: dict | None = None,
+    controls: dict | None = None,
+) -> IntentRequest:
+    mw = resolve_species_formula(
+        species, sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    control_inputs = {
+        "species": species,
+        "condensed_kg": mw,
+        "sp_data": dict(sp_data or {}),
+        "dt_hr": 1.0,
+    }
+    control_inputs.update(controls or {})
+    return IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {species: 1.0},
+                "process.condensation_train": {},
+                "process.wall_deposit": {},
+                "terminal.chromium_condensed_oxide_stored": {},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs=control_inputs,
     )
 
 
@@ -254,6 +291,129 @@ def test_provider_declares_condensation_accounts():
         *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     })
     assert "process.cleaned_melt" not in profile.declared_accounts
+
+
+def test_provider_refuses_primary_condensate_routed_back_to_overhead(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    result = BuiltinCondensationRouteProvider().dispatch(
+        _route_validation_request(
+            sim,
+            sp_data={"condensation_product_accounts": {"SiO": "process.overhead_gas"}},
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == (
+        "invalid_gaseous_condensation_coproduct"
+    )
+
+
+def test_provider_refuses_undeclared_product_destination(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    result = BuiltinCondensationRouteProvider().dispatch(
+        _route_validation_request(
+            sim,
+            sp_data={"condensation_product_accounts": {"SiO": "terminal.typo"}},
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == (
+        "undeclared_condensation_product_account"
+    )
+
+
+def test_provider_allows_declared_oxygen_gaseous_coproduct(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    result = BuiltinCondensationRouteProvider().dispatch(
+        _route_validation_request(
+            sim,
+            species="CrO2",
+            sp_data={
+                "condensation_products_mol_per_mol_vapor": {
+                    "Cr2O3": 0.5,
+                    "O2": 0.25,
+                },
+                "condensation_product_accounts": {
+                    "Cr2O3": "terminal.chromium_condensed_oxide_stored",
+                    "O2": "process.overhead_gas",
+                },
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert set(result.transition.credits["process.overhead_gas"]) == {"O2"}
+
+
+@pytest.mark.parametrize("ratio", [0.0, -1.0, math.nan])
+def test_provider_refuses_invalid_condensation_product_ratio(
+    ratio, vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    result = BuiltinCondensationRouteProvider().dispatch(
+        _route_validation_request(
+            sim,
+            sp_data={"condensation_products_mol_per_mol_vapor": {"Si": ratio}},
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == (
+        "invalid_condensation_product_ratios"
+    )
+
+
+@pytest.mark.parametrize(
+    "controls",
+    [
+        {"wall_deposit_fraction": math.nan},
+        {
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {"process.wall_deposit": math.nan},
+        },
+        {
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {"process.wall_deposit": 0.5},
+        },
+        {"wall_deposit_fraction": 1.0, "wall_deposit_account_fractions": {}},
+        {
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {"process.overhead_gas": 1.0},
+        },
+    ],
+)
+def test_provider_refuses_invalid_wall_fraction_mapping(
+    controls, vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data, setpoints_data
+    )
+    result = BuiltinCondensationRouteProvider().dispatch(
+        _route_validation_request(sim, controls=controls)
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"].startswith("invalid_wall_deposit_")
 
 
 # ---------------------------------------------------------------------------
@@ -762,7 +922,7 @@ def test_provider_splits_baffle_product_from_wall_deposit(
             "condensed_kg": condensed_kg,
             "sp_data": sp_data,
             "wall_deposit_fraction": wall_fraction,
-            "wall_deposit_account_fractions": {},
+            "wall_deposit_account_fractions": {"process.wall_deposit": 1.0},
             "dt_hr": 1.0,
         },
     )
@@ -904,7 +1064,7 @@ def test_c4b_mg_wall_reaction_consumes_sio2_and_caps_residual_mg(
             "condensed_kg": mw_mg,
             "sp_data": {},
             "wall_deposit_fraction": 1.0,
-            "wall_deposit_account_fractions": {},
+             "wall_deposit_account_fractions": {"process.wall_deposit": 1.0},
             "wall_temperature_K": 1062.0,
             "wall_deposit_account_temperatures_K": {
                 "process.wall_deposit": 1062.0,
@@ -956,7 +1116,7 @@ def test_c4b_fe_wall_reaction_forms_fesi_only_against_free_si(
             "condensed_kg": mw_fe,
             "sp_data": {},
             "wall_deposit_fraction": 1.0,
-            "wall_deposit_account_fractions": {},
+            "wall_deposit_account_fractions": {"process.wall_deposit": 1.0},
             "dt_hr": 1.0,
         },
     )
@@ -1060,7 +1220,7 @@ def test_c4b_alkali_wall_reaction_credits_elemental_only(
             "condensed_kg": 2.0 * mw,
             "sp_data": {},
             "wall_deposit_fraction": 1.0,
-            "wall_deposit_account_fractions": {},
+            "wall_deposit_account_fractions": {"process.wall_deposit": 1.0},
             "wall_temperature_K": 1062.0,
             "wall_deposit_account_temperatures_K": {
                 "process.wall_deposit": 1062.0,
@@ -1617,9 +1777,21 @@ def test_split_path_end_state_matches_pre_flip_account_balances(
         species_kg = sim.atom_ledger.kg_by_account(account)
         if species_kg:
             wall_segment_deposits_kg[account] = dict(sorted(species_kg.items()))
-    assert wall_segment_deposits_kg == (
+    expected_wall_segment_deposits_kg = (
         EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG[feedstock_key]
     )
+    assert wall_segment_deposits_kg.keys() == (
+        expected_wall_segment_deposits_kg.keys()
+    )
+    for account, expected_species_kg in (
+        expected_wall_segment_deposits_kg.items()
+    ):
+        actual_species_kg = wall_segment_deposits_kg[account]
+        assert actual_species_kg.keys() == expected_species_kg.keys()
+        for species, expected_kg in expected_species_kg.items():
+            assert actual_species_kg[species] == pytest.approx(
+                expected_kg, rel=1e-12, abs=0.0
+            )
 
     # Final assertion: end-of-batch closure stays tight (same bound as
     # the standalone smoke test).

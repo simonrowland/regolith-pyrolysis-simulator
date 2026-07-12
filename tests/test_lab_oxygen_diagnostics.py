@@ -4,6 +4,12 @@ import pytest
 
 from simulator.accounting import AccountingQueries, AtomLedger
 from simulator.accounting.queries import FROZEN_SIO_SOURCE_VAPOR_CEILING_MOL
+from simulator.diagnostics import (
+    pressure_coating_pareto_diagnostic,
+    wall_deposit_remobilization_by_segment_species,
+    wall_deposit_sticking_authority_status,
+    wall_sticking_alpha_provenance_notice,
+)
 from simulator.runner import RunnerError, build_sio_yield_report
 
 
@@ -406,3 +412,172 @@ def test_lab_plume_product_partition_outlet_only_sio2_trips_ceiling_breach():
     assert below["ceiling_breach"]["offending_species"] == []
     assert above["ceiling_breach"]["breached"] is True
     assert above["ceiling_breach"]["offending_species"] == ["SiO"]
+
+
+def _alpha_provenance(alpha_s):
+    return {
+        "Na": {
+            "stage_1": {
+                "alpha_s": alpha_s,
+                "citation_status": "CITED",
+                "status": "sourced",
+                "output_status": "sourced_with_surface_proxy",
+            }
+        }
+    }
+
+
+@pytest.mark.parametrize("alpha_s", [0.0, 1.0])
+def test_sticking_probability_boundaries_remain_authoritative(alpha_s):
+    notice = wall_sticking_alpha_provenance_notice(
+        {"Na": alpha_s}, _alpha_provenance(alpha_s)
+    )
+    assert notice["authoritative_for_deposit_mass"] is True
+
+
+def test_impossible_sticking_probability_is_non_authoritative():
+    notice = wall_sticking_alpha_provenance_notice(
+        {"Na": 2.0}, _alpha_provenance(2.0)
+    )
+    authority = wall_deposit_sticking_authority_status(
+        {("stage_1", "Na"): 1.0}, notice
+    )
+
+    assert notice["severity"] == "warning"
+    assert notice["authoritative_for_deposit_mass"] is False
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert authority["authoritative_for_coating"] is False
+    assert authority["authoritative_for_resinter"] is False
+
+
+def test_missing_sticking_provenance_is_warning_and_non_authoritative():
+    notice = wall_sticking_alpha_provenance_notice({"Na": 0.5}, {})
+
+    assert notice["code"] == "wall_deposit_sticking_alpha_provenance_missing"
+    assert notice["severity"] == "warning"
+    assert notice["source_class"] == "assumption_ungrounded_fitted_coefficient"
+    assert notice["authoritative_for_deposit_mass"] is False
+    assert notice["deposit_output_status"] == "status_bearing"
+
+
+def _remobilization_sim(snapshots, operating_history, temperatures=None):
+    return SimpleNamespace(
+        condensation_model=SimpleNamespace(
+            operating_history=operating_history,
+            condensation_temperatures_C=dict(temperatures or {"Na": 480.0}),
+            vapor_pressure_data={},
+        ),
+        record=SimpleNamespace(snapshots=snapshots),
+    )
+
+
+def _wall_snapshot(hour, delta=None):
+    return SimpleNamespace(
+        hour=hour,
+        wall_deposit_by_segment_species_delta=dict(delta or {}),
+    )
+
+
+def test_campaign_relative_history_aligns_to_global_snapshot_hours():
+    segment = "stage_1_to_stage_2"
+    sim = _remobilization_sim(
+        (
+            _wall_snapshot(5, {(segment, "Na"): 1.0}),
+            _wall_snapshot(6),
+        ),
+        [
+            {"campaign_hour": 0.0, "pipe_segment_temperatures_C": {segment: 400.0}},
+            {"campaign_hour": 1.0, "pipe_segment_temperatures_C": {segment: 600.0}},
+        ],
+    )
+
+    row = wall_deposit_remobilization_by_segment_species(sim)[segment]["Na"]
+    assert row["later_max_T_C"] == pytest.approx(600.0)
+    assert row["thermal_remobilization_threshold_exceeded"] is True
+
+
+def test_late_small_deposit_does_not_erase_earlier_hot_excursion():
+    segment = "stage_1_to_stage_2"
+    sim = _remobilization_sim(
+        (
+            _wall_snapshot(1, {(segment, "Na"): 1.0}),
+            _wall_snapshot(2),
+            _wall_snapshot(3, {(segment, "Na"): 1.0e-6}),
+        ),
+        [
+            {"hour": 1, "pipe_segment_temperatures_C": {segment: 400.0}},
+            {"hour": 2, "pipe_segment_temperatures_C": {segment: 600.0}},
+            {"hour": 3, "pipe_segment_temperatures_C": {segment: 400.0}},
+        ],
+    )
+
+    row = wall_deposit_remobilization_by_segment_species(sim)[segment]["Na"]
+    assert row["deposited_kg"] == pytest.approx(1.000001)
+    assert row["deposit_first_hour"] == 1
+    assert row["deposit_last_hour"] == 3
+    assert row["later_max_T_C"] == pytest.approx(600.0)
+    assert row["thermal_remobilization_threshold_exceeded"] is True
+    assert row["re_evaporated_kg"] is None
+
+
+def test_missing_wall_product_temperature_is_unavailable_not_500_c():
+    segment = "stage_1_to_stage_2"
+    sim = _remobilization_sim(
+        (_wall_snapshot(1, {(segment, "SiO2"): 1.0}),),
+        [{"hour": 1, "pipe_segment_temperatures_C": {segment: 600.0}}],
+        temperatures={},
+    )
+
+    row = wall_deposit_remobilization_by_segment_species(sim)[segment]["SiO2"]
+    assert row["status"] == "unavailable"
+    assert row["condensation_T_C"] is None
+
+
+def test_pressure_coating_pareto_refuses_missing_knudsen_provenance():
+    diagnostic = pressure_coating_pareto_diagnostic(
+        SimpleNamespace(), target_species=()
+    )
+
+    assert diagnostic["status"] == "unavailable"
+    assert diagnostic["reason"] == "knudsen_regime_diagnostic_unavailable"
+    assert diagnostic["gate"] == {"status": "unavailable"}
+    assert diagnostic["current"] == {"status": "unavailable"}
+
+
+def test_pressure_coating_current_kn_and_regime_share_controlling_segment():
+    knudsen = {
+        "gas_temperature_C": 1000.0,
+        "carrier_gas": "N2",
+        "overhead_pressure_mbar": 10.0,
+        "pipe_diameter_m": 0.12,
+        "knudsen_number": 0.001,
+        "regime": "free_molecular",
+        "segments": [
+            {
+                "name": "main",
+                "characteristic_length_m": 0.12,
+                "knudsen_number": 0.001,
+                "regime": "viscous",
+            },
+            {
+                "name": "narrow",
+                "characteristic_length_m": 0.01,
+                "knudsen_number": 0.12,
+                "regime": "free_molecular",
+            },
+        ],
+    }
+    sim = SimpleNamespace(
+        condensation_model=SimpleNamespace(
+            last_knudsen_regime_diagnostic=knudsen,
+            gas_temperature_C=1000.0,
+            carrier_gas="N2",
+        )
+    )
+
+    diagnostic = pressure_coating_pareto_diagnostic(sim, target_species=())
+
+    assert diagnostic["gate"]["controlling_segment"] == "narrow"
+    assert diagnostic["current"]["segment"] == "narrow"
+    assert diagnostic["current"]["knudsen_number"] == pytest.approx(0.12)
+    assert diagnostic["current"]["regime"] == "free_molecular"

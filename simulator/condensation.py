@@ -828,17 +828,21 @@ def _cold_wall_condensation_record_payload(
     if block is None:
         return {}
     status = str(block.get('status', '')).upper()
+    denied = _alpha_source_class_cannot_certify(block.get('source_class'))
+    cited = status == 'CITED' and not denied
     output_status = str(block.get('output_status') or (
         'sourced_with_surface_proxy'
-        if status == 'CITED'
+        if cited
         else 'status_bearing'
     ))
+    if not cited:
+        output_status = 'status_bearing'
     payload = {
         'source': str(block.get('source', '')),
         'source_url': block.get('source_url'),
         'source_class': str(block.get('source_class', '')),
-        'status': 'sourced' if status == 'CITED' else 'UNCERTIFIED',
-        'citation_status': status,
+        'status': 'sourced' if cited else 'UNCERTIFIED',
+        'citation_status': 'CITED' if cited else 'UNCERTIFIED',
         'envelope': block.get('uncertainty_envelope'),
         'uncertainty_flag': block.get('uncertainty_flag'),
         'output_status': output_status,
@@ -847,6 +851,12 @@ def _cold_wall_condensation_record_payload(
             'T_K < alpha_s_valid_range_K[0]'
         ),
     }
+    if denied:
+        payload['certification_status_reason'] = (
+            'cold-wall condensation source_class '
+            f'{_alpha_certification_source_class_token(block.get("source_class"))} '
+            'cannot certify'
+        )
     floor = evaluation.get('alpha_s_cold_wall_validity_floor_K')
     if floor is not None:
         payload['cold_wall_condensation_validity_floor_K'] = floor
@@ -999,7 +1009,10 @@ def _alpha_s_spec_from_entry(species: str, entry: Any) -> Any:
                 entry,
             )
             if ref_record is None:
-                return None
+                raise ValueError(
+                    f'alpha_s({species}): unresolved value_ref '
+                    f'{entry.get("value_ref")!r}'
+                )
             return _scalar_alpha_s_spec(
                 ref_record.get('value'),
                 ref_record.get('temperature_range_K'),
@@ -2191,7 +2204,7 @@ class CondensationModel:
             area_m2 = float(raw)
         except (TypeError, ValueError):
             return None
-        if not math.isfinite(area_m2) or area_m2 <= 0.0:
+        if not math.isfinite(area_m2) or area_m2 < 0.0:
             return None
         return area_m2
 
@@ -2401,6 +2414,7 @@ class CondensationModel:
                     T_cond_C=T_cond,
                     residence_s=self.residence_time_s.get(
                         stage.stage_number, 1.0),
+                    available_kg=remaining_kg,
                     alpha_s_value=float(stage_alpha_record.get('alpha_s', 0.0)),
                     alpha_record=stage_alpha_record,
                     antoine_extrapolations=antoine_extrapolations,
@@ -2965,6 +2979,7 @@ class CondensationModel:
         species: str,
         T_cond_C: float,
         residence_s: float,
+        available_kg: float,
         alpha_s_value: float,
         alpha_record: MutableMapping[str, Any] | None = None,
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
@@ -3014,6 +3029,7 @@ class CondensationModel:
             lo_C, hi_C = hi_C, lo_C
 
         band_flux_fraction = 0.0
+        band_flux_mol_m2_s = 0.0
         width_C = hi_C - lo_C
         spec = (
             alpha_record.get('alpha_s_coefficient_spec')
@@ -3077,7 +3093,9 @@ class CondensationModel:
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
             band_flux_fraction += flux / reference_flux
+            band_flux_mol_m2_s += flux
         band_flux_fraction /= HKL_BAND_SAMPLES
+        band_flux_mol_m2_s /= HKL_BAND_SAMPLES
         if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
             alpha_record['alpha_s_sample_temperature_range_K'] = [
                 max(lo_C + CELSIUS_TO_KELVIN_OFFSET, 1.0),
@@ -3085,8 +3103,36 @@ class CondensationModel:
             ]
             alpha_record['alpha_s_sample_extrapolated'] = sample_extrapolated
 
-        rate_s_inv = max(0.0, band_flux_fraction)
-        eta = 1.0 - math.exp(-residence_s * rate_s_inv)
+        stage_area_m2 = self._stage_area_m2_for_stage_number(stage.stage_number)
+        if stage_area_m2 is not None:
+            molar_mass_kg_mol = (
+                _molecular_mass_kg_per_molecule(
+                    species,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                )
+                * AVOGADRO_MOL
+            )
+            if (
+                not math.isfinite(available_kg)
+                or available_kg <= 0.0
+                or molar_mass_kg_mol <= 0.0
+            ):
+                return 0.0
+            available_mol = available_kg / molar_mass_kg_mol
+            # HKL/transport flux is mol m^-2 s^-1. Integrating over physical
+            # baffle area and residence time gives capturable mol:
+            # (mol m^-2 s^-1)(m^2)(s) = mol. Dividing by available vapor mol
+            # makes eta dimensionless and lets configured Stage-3 area affect
+            # capture without inventing an area-normalized rate constant.
+            capturable_mol = (
+                max(0.0, band_flux_mol_m2_s)
+                * stage_area_m2
+                * residence_s
+            )
+            eta = capturable_mol / available_mol
+        else:
+            rate_s_inv = max(0.0, band_flux_fraction)
+            eta = 1.0 - math.exp(-residence_s * rate_s_inv)
         return max(0.0, min(1.0, eta))
 
 
@@ -3255,10 +3301,22 @@ def _species_condensation_temperature_C(
         species,
         vapor_pressure_data=vapor_pressure_data,
     )
+    raw_temperature = data.get('condensation_T_C_at_1mbar')
+    if raw_temperature is None:
+        raise ValueError(
+            f'condensation temperature unavailable for species {species!r}'
+        )
     try:
-        return float(data.get('condensation_T_C_at_1mbar', 500.0))
-    except (TypeError, ValueError):
-        return 500.0
+        temperature_C = float(raw_temperature)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            f'invalid condensation temperature for species {species!r}'
+        ) from exc
+    if not math.isfinite(temperature_C):
+        raise ValueError(
+            f'invalid condensation temperature for species {species!r}'
+        )
+    return temperature_C
 
 
 def _materials_source(materials: Mapping[str, Any] | None = None) -> Mapping[str, Any]:
@@ -3382,8 +3440,6 @@ def _alpha_record(
         record.update(_sticking_record_payload(ref_record))
         record['value_ref'] = entry.get('value_ref')
         record['material_source'] = source
-    if record.get('alpha_s_cold_wall_condensation') is True:
-        record.update(_cold_wall_condensation_record_payload(species, record))
     if liner_material:
         record['liner_material'] = str(liner_material)
     if segment is not None:
@@ -3398,6 +3454,8 @@ def _alpha_record(
         record,
         source=source,
     ))
+    if record.get('alpha_s_cold_wall_condensation') is True:
+        record.update(_cold_wall_condensation_record_payload(species, record))
     spec = _alpha_s_spec_from_entry(species, entry)
     if isinstance(spec, Mapping):
         record['alpha_s_coefficient_spec'] = dict(spec)
@@ -4037,13 +4095,19 @@ def _series_resistance_deposition_flux_mol_m2_s(
     if driving_pressure_pa <= 0.0:
         return 0.0
 
-    # k_HKL per Pa: α_s × (1 / √(2π·m·k_B·T_surface)) / N_A. Extract the
-    # per-Pa rate coefficient by calling the unit-pressure impingement-flux
-    # helper.
+    _t_gas_raw = float(T_gas_K) if T_gas_K is not None else T_surface_K
+    if not math.isfinite(_t_gas_raw) or _t_gas_raw <= 0.0:
+        return 0.0
+    effective_T_gas_K = _t_gas_raw
+
+    # Incoming HKL incidence is J_inc = p/sqrt(2*pi*m*k_B*T_gas), so the
+    # kinetic gas temperature belongs in this coefficient. T_surface remains
+    # in P_sat(T_surface) above; conflating the two overstates cold-wall arrival.
+    # Extract the per-Pa coefficient by calling the unit-pressure helper.
     k_hkl_per_pa = alpha_s * _hkl_impingement_flux_mol_m2_s(
         species,
         1.0,
-        T_surface_K,
+        effective_T_gas_K,
         vapor_pressure_data=vapor_pressure_data,
     )
     if not math.isfinite(k_hkl_per_pa) or k_hkl_per_pa <= 0.0:
@@ -4076,12 +4140,6 @@ def _series_resistance_deposition_flux_mol_m2_s(
     # k_MT per Pa: Sh_eff × D_AB / (L_pipe × R × T_gas). T_gas (bulk) sets
     # the ideal-gas denominator; T_surface (wall) sets the saturation
     # pressure (already consumed by the driving_pressure_pa above).
-    _t_gas_raw = float(T_gas_K) if T_gas_K is not None else T_surface_K
-    if not math.isfinite(_t_gas_raw):
-        # NaN/inf bulk gas T poisons k_MT (and is not a recoverable
-        # state); fail closed. Codex pre-0.5.2 Phase B P1.
-        return 0.0
-    effective_T_gas_K = max(_t_gas_raw, 1.0)
     # 0.5.3 Phase B: Sh enhancement reads the RADIAL stirring axis
     # (in-plane EM stirring drives gas-side bulk-to-wall transport).
     # Backward-compat: if the caller passes only the legacy positional
@@ -4669,10 +4727,11 @@ def _wall_segment_account_fractions(
 
 
 def _segment_stage_number(stage_name: str) -> int | None:
-    try:
-        return int(str(stage_name).rsplit('_', 1)[-1])
-    except (TypeError, ValueError):
+    token = str(stage_name)
+    if not token.startswith('stage_'):
         return None
+    suffix = token.removeprefix('stage_')
+    return int(suffix) if suffix.isdecimal() else None
 
 
 def cold_spot_diagnostic(

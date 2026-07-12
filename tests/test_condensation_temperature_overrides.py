@@ -675,3 +675,56 @@ def test_partial_custom_antoine_block_falls_back_to_global_coefficients():
 
     assert fallback_psat == default_psat
     assert fallback_psat < 1.0
+
+
+def test_invalid_explicit_value_ref_fails_closed_in_both_alpha_consumers():
+    entry = {
+        "species": "SiO",
+        "value_ref": (
+            "data/literature/vacuum_pyrolysis_sticking.yaml::species.Fe.value"
+        ),
+    }
+
+    with pytest.raises(ValueError, match="unresolved value_ref"):
+        condensation_module._coerce_alpha_s(entry, species="SiO", T_K=1200.0)
+    with pytest.raises(ValueError, match="unresolved value_ref"):
+        condensation_module.alpha_s("SiO", 1200.0, {"entry": entry})
+
+
+def test_configured_stage_area_scales_baffle_capture(monkeypatch):
+    model = CondensationModel(CondensationTrain.create_default())
+    stage = next(item for item in model.train.stages if item.stage_number == 3)
+    monkeypatch.setattr(
+        condensation_module,
+        "_local_species_pressure_pa",
+        lambda *args, **kwargs: 1.0,
+    )
+    monkeypatch.setattr(
+        condensation_module,
+        "_hkl_impingement_flux_mol_m2_s",
+        lambda *args, **kwargs: 1.0,
+    )
+    monkeypatch.setattr(
+        condensation_module,
+        "_series_resistance_deposition_flux_mol_m2_s",
+        lambda *args, **kwargs: 2.0,
+    )
+    available_kg = (
+        condensation_module._molecular_mass_kg_per_molecule("SiO")
+        * condensation_module.AVOGADRO_MOL
+        * 10.0
+    )
+
+    def efficiency(area_m2: float) -> float:
+        model.stage_area_m2_by_stage = {"sio_stage3": area_m2}
+        return model._condensation_efficiency(
+            stage=stage,
+            species="SiO",
+            T_cond_C=1050.0,
+            residence_s=1.0,
+            available_kg=available_kg,
+            alpha_s_value=1.0,
+        )
+
+    assert efficiency(0.25) == pytest.approx(0.05)
+    assert efficiency(1.0) == pytest.approx(0.2)

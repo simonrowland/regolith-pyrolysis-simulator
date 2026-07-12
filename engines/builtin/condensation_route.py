@@ -109,6 +109,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
 
     name = "builtin-condensation-route"
     CHROMIUM_CONDENSED_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
+    GASEOUS_CONDENSATION_COPRODUCTS = frozenset({"O2"})
 
     BASE_DECLARED_ACCOUNTS = frozenset({
         "process.overhead_gas",
@@ -180,6 +181,15 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     "reason_skipped": "below numerical floor",
                 },
             )
+
+        invalid_route = self._invalid_route_input_refusal(
+            species,
+            sp_data,
+            controls,
+            control_audit,
+        )
+        if invalid_route is not None:
+            return invalid_route
 
         registry = request.account_view.species_formula_registry
         declared_accounts = self._declared_accounts()
@@ -347,6 +357,143 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     # Helpers (mirror legacy _condensed_products_for_vapor /
     # _condensation_product_mol_ratios exactly).
     # ------------------------------------------------------------------
+
+    def _invalid_route_input_refusal(
+        self,
+        species: str,
+        sp_data: Mapping[str, Any],
+        controls: Mapping[str, Any],
+        control_audit: Any,
+    ) -> IntentResult | None:
+        ratios = sp_data.get("condensation_products_mol_per_mol_vapor")
+        if ratios is not None:
+            if not isinstance(ratios, Mapping) or not ratios:
+                return self._route_refusal(
+                    "invalid_condensation_product_ratios",
+                    control_audit,
+                    field="condensation_products_mol_per_mol_vapor",
+                )
+            for product, raw_ratio in ratios.items():
+                try:
+                    ratio = float(raw_ratio)
+                except (TypeError, ValueError):
+                    ratio = math.nan
+                if not str(product) or not math.isfinite(ratio) or ratio <= 0.0:
+                    return self._route_refusal(
+                        "invalid_condensation_product_ratios",
+                        control_audit,
+                        field="condensation_products_mol_per_mol_vapor",
+                        product=str(product),
+                    )
+
+        raw_product_accounts = sp_data.get("condensation_product_accounts")
+        if raw_product_accounts is not None:
+            if not isinstance(raw_product_accounts, Mapping):
+                return self._route_refusal(
+                    "invalid_condensation_product_accounts",
+                    control_audit,
+                    field="condensation_product_accounts",
+                )
+            for product, raw_account in raw_product_accounts.items():
+                product_name = str(product)
+                account = str(raw_account or "")
+                if account not in self._declared_accounts():
+                    return self._route_refusal(
+                        "undeclared_condensation_product_account",
+                        control_audit,
+                        field="condensation_product_accounts",
+                        product=product_name,
+                        account=account,
+                    )
+                if (
+                    account == "process.overhead_gas"
+                    and (
+                        product_name == species
+                        or product_name not in self.GASEOUS_CONDENSATION_COPRODUCTS
+                    )
+                ):
+                    return self._route_refusal(
+                        "invalid_gaseous_condensation_coproduct",
+                        control_audit,
+                        field="condensation_product_accounts",
+                        product=product_name,
+                        account=account,
+                    )
+
+        raw_wall_fraction = controls.get("wall_deposit_fraction", 0.0)
+        try:
+            wall_fraction = float(raw_wall_fraction)
+        except (TypeError, ValueError):
+            wall_fraction = math.nan
+        if not math.isfinite(wall_fraction) or not 0.0 <= wall_fraction <= 1.0:
+            return self._route_refusal(
+                "invalid_wall_deposit_fraction",
+                control_audit,
+                field="wall_deposit_fraction",
+            )
+
+        raw_account_fractions = controls.get("wall_deposit_account_fractions")
+        if raw_account_fractions is None or raw_account_fractions == {}:
+            if wall_fraction > 0.0:
+                return self._route_refusal(
+                    "invalid_wall_deposit_account_fractions",
+                    control_audit,
+                    field="wall_deposit_account_fractions",
+                )
+            return None
+        if not isinstance(raw_account_fractions, Mapping):
+            return self._route_refusal(
+                "invalid_wall_deposit_account_fractions",
+                control_audit,
+                field="wall_deposit_account_fractions",
+            )
+        allowed_wall_accounts = frozenset({WALL_DEPOSIT_ACCOUNT}) | (
+            self._declared_wall_deposit_accounts
+        )
+        total = 0.0
+        for account, raw_fraction in raw_account_fractions.items():
+            account_name = str(account)
+            try:
+                fraction = float(raw_fraction)
+            except (TypeError, ValueError):
+                fraction = math.nan
+            if (
+                account_name not in allowed_wall_accounts
+                or not math.isfinite(fraction)
+                or fraction <= 0.0
+            ):
+                return self._route_refusal(
+                    "invalid_wall_deposit_account_fractions",
+                    control_audit,
+                    field="wall_deposit_account_fractions",
+                    account=account_name,
+                )
+            total += fraction
+        if not math.isclose(total, 1.0, rel_tol=0.0, abs_tol=1.0e-9):
+            return self._route_refusal(
+                "invalid_wall_deposit_account_fractions",
+                control_audit,
+                field="wall_deposit_account_fractions",
+            )
+        return None
+
+    @staticmethod
+    def _route_refusal(
+        reason: str,
+        control_audit: Any,
+        **diagnostic: Any,
+    ) -> IntentResult:
+        return IntentResult(
+            intent=ChemistryIntent.CONDENSATION_ROUTE,
+            status="refused",
+            transition=None,
+            control_audit=control_audit,
+            diagnostic={
+                "reason": reason,
+                "reason_refused": reason,
+                **diagnostic,
+            },
+        )
 
     def _wall_reaction_plan(
         self,
@@ -793,7 +940,9 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 product_accounts.get(product) or "process.condensation_train"
             )
             if account not in self._declared_accounts():
-                account = "process.condensation_train"
+                raise ValueError(
+                    f"undeclared condensation product account {account!r}"
+                )
             species_mol = credits.setdefault(account, {})
             species_mol[str(product)] = species_mol.get(str(product), 0.0) + mol
         return credits
@@ -810,9 +959,14 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             "wall_deposit_account_fractions", {})
         if not isinstance(raw_segment_fractions, Mapping):
             return None
+        allowed_wall_accounts = frozenset({WALL_DEPOSIT_ACCOUNT}) | frozenset(
+            account
+            for account in declared_accounts
+            if account.startswith("process.wall_deposit_segment_")
+        )
         for account in raw_segment_fractions:
             account_name = str(account)
-            if account_name not in declared_accounts:
+            if account_name not in allowed_wall_accounts:
                 return account_name
         return None
 
@@ -849,10 +1003,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     fractions[account_name] = fraction
             total = sum(fractions.values())
             if total > 0.0:
-                return {
-                    account: fraction / total
-                    for account, fraction in fractions.items()
-                }
+                return fractions
 
         return {WALL_DEPOSIT_ACCOUNT: 1.0}
 

@@ -42,13 +42,21 @@ def _status_bearing_alpha_record(record: Mapping[str, Any]) -> bool:
     status = str(record.get("status", "proxy"))
     output_status = str(record.get("output_status", "status_bearing"))
     return (
-        citation_status != "CITED"
+        not _valid_sticking_probability(record.get("alpha_s"))
+        or citation_status != "CITED"
         or status != "sourced"
         or output_status in {
             "status_bearing",
             "uncertainty_only",
         }
     )
+
+
+def _valid_sticking_probability(value: Any) -> bool:
+    # alpha_s is a dimensionless sticking/accommodation probability, so its
+    # physically admissible range is the closed interval [0, 1].
+    number = _finite_float(value)
+    return number is not None and 0.0 <= number <= 1.0
 
 
 def wall_deposit_sticking_authority_is_payload(value: Any) -> bool:
@@ -141,12 +149,15 @@ def wall_sticking_alpha_provenance_notice(
         for record in records
         if record.get("source_class")
     })
-    has_status_bearing = bool(status_bearing)
+    provenance_missing = not records
+    has_status_bearing = bool(status_bearing) or provenance_missing
     return {
         "severity": "warning" if has_status_bearing else "info",
         "code": (
-            WALL_STICKING_ALPHA_UNCERTIFIED_CODE
-            if has_status_bearing
+            WALL_STICKING_ALPHA_MISSING_CODE
+            if provenance_missing
+            else WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+            if status_bearing
             else WALL_STICKING_ALPHA_NOTICE_CODE
         ),
         "source_class": (
@@ -154,9 +165,7 @@ def wall_sticking_alpha_provenance_notice(
             if has_status_bearing
             else "sourced_material_alpha"
         ) if provenance else (
-            "status_bearing_sticking_alpha"
-            if has_status_bearing
-            else "assumption_ungrounded_fitted_coefficient"
+            "assumption_ungrounded_fitted_coefficient"
         ),
         "source_classes": source_classes,
         "source": (
@@ -192,7 +201,9 @@ def wall_sticking_alpha_provenance_notice(
             if has_status_bearing
             else "sourced_with_surface_proxy"
         ),
-        "status_bearing_alpha_count": len(status_bearing),
+        "status_bearing_alpha_count": (
+            len(species) if provenance_missing else len(status_bearing)
+        ),
         "message": (
             "Wall-deposition sticking alpha_s values are read from the "
             "literature sidecar where available; UNCERTIFIED or fail-closed "
@@ -513,7 +524,7 @@ def _alpha_species_has_provenance_record(value: Any) -> bool:
         return False
     return any(
         isinstance(record, Mapping)
-        and _finite_float(record.get("alpha_s")) is not None
+        and _valid_sticking_probability(record.get("alpha_s"))
         for record in value.values()
     )
 
@@ -562,6 +573,10 @@ def wall_deposit_remobilization_by_segment_species(
     if not cumulative_deposits_kg:
         return {}
 
+    deposit_first_hour = _deposit_first_hour_by_segment_species(
+        snapshots,
+        through_hour=through_hour,
+    )
     deposit_last_hour = _deposit_last_hour_by_segment_species(
         snapshots,
         through_hour=through_hour,
@@ -575,23 +590,40 @@ def wall_deposit_remobilization_by_segment_species(
     result: dict[str, dict[str, dict[str, Any]]] = {}
     for (segment, species), deposited_kg in cumulative_deposits_kg.items():
         last_hour = deposit_last_hour.get((segment, species))
+        first_hour = deposit_first_hour.get((segment, species))
         later_max_T_C = _later_max_segment_temperature_C(
             segment,
-            deposit_last_hour=last_hour,
+            deposit_last_hour=first_hour,
             history_hours=history_hours,
             through_hour=through_hour,
         )
-        condensation_T_C = _species_condensation_temperature_C(
-            species,
-            temps=instance_temps,
-            vapor_pressure_data=vapor_pressure_data,
-        )
+        try:
+            condensation_T_C = _species_condensation_temperature_C(
+                species,
+                temps=instance_temps,
+                vapor_pressure_data=vapor_pressure_data,
+            )
+        except ValueError:
+            result.setdefault(segment, {})[species] = {
+                "status": "unavailable",
+                "reason": "condensation_temperature_unavailable",
+                "deposited_kg": float(deposited_kg),
+                "deposit_first_hour": first_hour,
+                "deposit_last_hour": last_hour,
+                "later_max_T_C": later_max_T_C,
+                "condensation_T_C": None,
+                "thermal_remobilization_threshold_exceeded": False,
+                "re_evaporated_kg": None,
+                "pressure_and_flux_modeled": False,
+            }
+            continue
         threshold_exceeded = (
             later_max_T_C is not None
             and later_max_T_C > condensation_T_C
         )
         result.setdefault(segment, {})[species] = {
             "deposited_kg": float(deposited_kg),
+            "deposit_first_hour": first_hour,
             "deposit_last_hour": last_hour,
             "later_max_T_C": later_max_T_C,
             "condensation_T_C": float(condensation_T_C),
@@ -651,6 +683,30 @@ def _deposit_last_hour_by_segment_species(
     return last_hour
 
 
+def _deposit_first_hour_by_segment_species(
+    snapshots: Sequence[Any],
+    *,
+    through_hour: int | None,
+) -> dict[tuple[str, str], int]:
+    first_hour: dict[tuple[str, str], int] = {}
+    for snapshot in snapshots:
+        hour = _snapshot_hour(snapshot)
+        if through_hour is not None and hour > through_hour:
+            continue
+        raw = getattr(snapshot, "wall_deposit_by_segment_species_delta", None)
+        if not isinstance(raw, Mapping):
+            continue
+        for key, kg in raw.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                continue
+            amount = _finite_float(kg)
+            if amount is None or amount <= _EPS:
+                continue
+            pair = (str(key[0]), str(key[1]))
+            first_hour.setdefault(pair, hour)
+    return first_hour
+
+
 def _operating_history_hours(
     sim: Any,
     snapshots: Sequence[Any],
@@ -676,14 +732,17 @@ def _resolve_operating_history_hour(
 ) -> int | None:
     if "hour" in entry:
         return _positive_int(entry["hour"])
+    if index < len(snapshot_hours):
+        # Production records campaign_hour before the campaign tick increments,
+        # while HourSnapshot.hour is global/post-tick. Index alignment is the
+        # supplied conversion into the global snapshot-hour domain.
+        return int(snapshot_hours[index])
+    if snapshot_hours:
+        return None
     if "campaign_hour" in entry:
         campaign_hour = _positive_int(entry["campaign_hour"])
         if campaign_hour is not None:
             return campaign_hour
-    if index < len(snapshot_hours):
-        return int(snapshot_hours[index])
-    if snapshot_hours:
-        return int(snapshot_hours[-1])
     return index + 1 if index >= 0 else None
 
 
@@ -741,6 +800,23 @@ def _finite_float(value: Any) -> float | None:
     return number
 
 
+def _pressure_coating_pareto_unavailable(
+    target_species: Sequence[str],
+    reason: str,
+) -> dict[str, Any]:
+    return {
+        "schema_version": "pressure-coating-pareto-v1",
+        "status": "unavailable",
+        "reason": reason,
+        "gate": {"status": "unavailable"},
+        "current": {"status": "unavailable"},
+        "by_species": {
+            str(species): {"status": "unavailable", "reason": reason}
+            for species in target_species
+        },
+    }
+
+
 def pressure_coating_pareto_diagnostic(
     sim: Any,
     per_hour: Sequence[Mapping[str, Any]] = (),
@@ -763,6 +839,17 @@ def pressure_coating_pareto_diagnostic(
     knudsen_diagnostic = dict(
         getattr(condensation_model, "last_knudsen_regime_diagnostic", {}) or {}
     )
+    segment_records = tuple(knudsen_diagnostic.get("segments", ()) or ())
+    if (
+        _finite_float(knudsen_diagnostic.get("gas_temperature_C")) is None
+        or not str(knudsen_diagnostic.get("carrier_gas") or "")
+        or _finite_float(knudsen_diagnostic.get("overhead_pressure_mbar")) is None
+        or not segment_records
+    ):
+        return _pressure_coating_pareto_unavailable(
+            target_species,
+            "knudsen_regime_diagnostic_unavailable",
+        )
     gas_temperature_C = _first_finite(
         knudsen_diagnostic.get("gas_temperature_C"),
         getattr(condensation_model, "gas_temperature_C", None),
@@ -777,12 +864,12 @@ def pressure_coating_pareto_diagnostic(
     )
     lengths = _knudsen_characteristic_lengths(
         knudsen_diagnostic,
-        fallback_length_m=_first_finite(
-            knudsen_diagnostic.get("pipe_diameter_m"),
-            getattr(condensation_model, "pipe_diameter_m", None),
-            getattr(getattr(sim, "overhead_model", None), "pipe_diameter_m", 0.12),
-        ),
     )
+    if not lengths:
+        return _pressure_coating_pareto_unavailable(
+            target_species,
+            "knudsen_characteristic_length_unavailable",
+        )
     controlling = max(
         (
             {
@@ -805,6 +892,30 @@ def pressure_coating_pareto_diagnostic(
         ),
         key=lambda item: item["no_warning_pressure_pa"],
     )
+    controlling_record = next(
+        (
+            item
+            for item in segment_records
+            if isinstance(item, Mapping)
+            and str(item.get("name") or "segment") == controlling["name"]
+        ),
+        None,
+    )
+    controlling_kn = (
+        _finite_float(controlling_record.get("knudsen_number"))
+        if isinstance(controlling_record, Mapping)
+        else None
+    )
+    controlling_regime = (
+        str(controlling_record.get("regime") or "")
+        if isinstance(controlling_record, Mapping)
+        else ""
+    )
+    if controlling_kn is None or not controlling_regime:
+        return _pressure_coating_pareto_unavailable(
+            target_species,
+            "controlling_knudsen_segment_unavailable",
+        )
     gate_pressure_pa = float(controlling["no_warning_pressure_pa"])
     hard_refusal_pressure_pa = float(controlling["hard_refusal_pressure_pa"])
     pressure_points = _pressure_sweep_points_pa(
@@ -923,6 +1034,7 @@ def pressure_coating_pareto_diagnostic(
 
     return {
         "schema_version": "pressure-coating-pareto-v1",
+        "status": "ok",
         "pressure_range_pa": {
             "min": _PRESSURE_SWEEP_MIN_PA,
             "max": _PRESSURE_SWEEP_MAX_PA,
@@ -949,10 +1061,16 @@ def pressure_coating_pareto_diagnostic(
             "overhead_pressure_mbar": current_pressure_pa / 100.0,
             "gas_temperature_K": gas_temperature_K,
             "carrier_gas": carrier_gas,
-            "knudsen_number": _finite_float(
-                knudsen_diagnostic.get("knudsen_number")
-            ),
-            "regime": str(knudsen_diagnostic.get("regime") or ""),
+            # At fixed pressure, temperature, and carrier gas, Kn = lambda/L;
+            # the smallest characteristic length has the largest Kn and owns
+            # both the validity regime and the adjacent numeric Kn claim.
+            "knudsen_number": controlling_kn,
+            "regime": controlling_regime,
+            "segment": controlling["name"],
+            "characteristic_length_m": controlling[
+                "characteristic_length_m"
+            ],
+            "knudsen_source": "controlling_segment",
             "distance_from_no_warning_gate_pressure_factor": _ratio_or_none(
                 current_pressure_pa,
                 gate_pressure_pa,
@@ -1052,8 +1170,6 @@ def _pressure_sweep_points_pa(
 
 def _knudsen_characteristic_lengths(
     diagnostic: Mapping[str, Any],
-    *,
-    fallback_length_m: float,
 ) -> tuple[tuple[str, float], ...]:
     lengths: list[tuple[str, float]] = []
     for item in diagnostic.get("segments", ()) or ():
@@ -1062,10 +1178,6 @@ def _knudsen_characteristic_lengths(
         length = _finite_float(item.get("characteristic_length_m"))
         if length is not None and length > 0.0:
             lengths.append((str(item.get("name") or "segment"), length))
-    if not lengths and fallback_length_m > 0.0:
-        lengths.append(("pipe_diameter_m", fallback_length_m))
-    if not lengths:
-        lengths.append(("default_pipe_diameter_m", 0.12))
     return tuple(lengths)
 
 

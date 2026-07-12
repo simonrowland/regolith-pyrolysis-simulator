@@ -247,3 +247,91 @@ def test_sio_high_side_arrhenius_warning_reaches_alpha_provenance_report():
         and "[1000, 1800]" in warning
         for warning in warnings
     )
+
+
+def test_cold_spot_stage_parser_rejects_numeric_lab_surface_suffix():
+    segments = [
+        PipeSegment(
+            name="lab_surface",
+            upstream_stage="lab_surface_1",
+            downstream_stage="lab_surface_2",
+            wall_temperature_C=500.0,
+            length_m=1.0,
+            inner_diameter_m=0.12,
+        ),
+        PipeSegment(
+            name="production_stage",
+            upstream_stage="stage_1",
+            downstream_stage="stage_2",
+            wall_temperature_C=500.0,
+            length_m=1.0,
+            inner_diameter_m=0.12,
+        ),
+    ]
+
+    diagnostic = condensation.cold_spot_diagnostic(
+        segments,
+        {"SiO": 1.0},
+        upstream_hot_wall_min_C=None,
+    )
+
+    assert {row["segment"] for row in diagnostic["findings"]} == {
+        "production_stage"
+    }
+
+
+def test_free_molecular_hkl_incidence_uses_gas_temperature(monkeypatch):
+    monkeypatch.setattr(
+        condensation,
+        "_wall_deposition_driving_pressure_pa",
+        lambda *args, **kwargs: 1.0,
+    )
+    kwargs = {
+        "species": "SiO",
+        "P_local_pa": 1.0,
+        "T_surface_K": 900.0,
+        "alpha_s": 0.5,
+        "regime_factor": 1.0,
+    }
+
+    cold_gas_flux = condensation._series_resistance_deposition_flux_mol_m2_s(
+        **kwargs, T_gas_K=400.0
+    )
+    hot_gas_flux = condensation._series_resistance_deposition_flux_mol_m2_s(
+        **kwargs, T_gas_K=1600.0
+    )
+
+    # J_inc is proportional to T_gas^-1/2 at fixed pressure and molecular mass.
+    assert cold_gas_flux / hot_gas_flux == pytest.approx(2.0)
+
+
+@pytest.mark.parametrize(
+    ("source_class", "expected_status", "expected_output_status"),
+    [
+        ("internal-analytical", "UNCERTIFIED", "status_bearing"),
+        ("cited_hkl_accommodation", "sourced", "sourced_with_surface_proxy"),
+    ],
+)
+def test_cold_wall_source_class_controls_certification(
+    monkeypatch, source_class, expected_status, expected_output_status
+):
+    monkeypatch.setattr(
+        condensation,
+        "_cold_wall_condensation_spec",
+        lambda species: {
+            "value": 1.0,
+            "source": "test cold-wall source",
+            "source_url": "https://example.invalid/source",
+            "source_class": source_class,
+            "status": "CITED",
+            "output_status": "sourced_with_surface_proxy",
+            "uncertainty_envelope": [0.5, 1.0],
+            "uncertainty_flag": "test",
+        },
+    )
+    record = condensation._cold_wall_condensation_record_payload("SiO", {})
+
+    assert record["status"] == expected_status
+    assert record["output_status"] == expected_output_status
+    if source_class == "internal-analytical":
+        assert "cannot certify" in record["certification_status_reason"]
