@@ -1014,6 +1014,204 @@ def test_pool_process_termination_kills_child_process_group(tmp_path: Path) -> N
     assert not survivor.exists()
 
 
+def test_pgrep_process_tree_scan_respects_snapshot_deadline(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setitem(sys.modules, "psutil", None)
+    observed_timeouts: list[float] = []
+
+    def fake_run(
+        args: list[str],
+        *,
+        check: bool,
+        capture_output: bool,
+        text: bool,
+        timeout: float,
+    ) -> subprocess.CompletedProcess[str]:
+        del check, capture_output, text
+        observed_timeouts.append(float(timeout))
+        raise subprocess.TimeoutExpired(args, timeout)
+
+    monkeypatch.setattr(pool_module.subprocess, "run", fake_run)
+
+    started = time.monotonic()
+    found = pool_module._process_tree_pids(999_999, deadline=started + 0.05)
+
+    assert found == ()
+    assert observed_timeouts
+    assert max(observed_timeouts) <= 0.05
+    assert time.monotonic() - started < 0.25
+
+
+def test_pgrep_process_tree_discovers_root_child(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_run(
+        args: list[str],
+        **kwargs: object,
+    ) -> subprocess.CompletedProcess[str]:
+        del kwargs
+        output = "202\n" if args[-1] == "101" else ""
+        return subprocess.CompletedProcess(args, 0, output, "")
+
+    monkeypatch.setattr(pool_module.subprocess, "run", fake_run)
+
+    assert pool_module._process_tree_pids_via_pgrep(101) == (202,)
+
+
+def test_pgrep_process_tree_retries_child_timeout_and_discovers_grandchild(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    child_calls = 0
+
+    def fake_run(
+        args: list[str],
+        **kwargs: object,
+    ) -> subprocess.CompletedProcess[str]:
+        nonlocal child_calls
+        timeout = float(kwargs["timeout"])
+        if args[-1] == "202":
+            child_calls += 1
+            if child_calls == 1:
+                raise subprocess.TimeoutExpired(args, timeout)
+            return subprocess.CompletedProcess(args, 0, "303\n", "")
+        output = "202\n" if args[-1] == "101" else ""
+        return subprocess.CompletedProcess(args, 0, output, "")
+
+    monkeypatch.setattr(pool_module.subprocess, "run", fake_run)
+
+    assert pool_module._process_tree_pids_via_pgrep(
+        101,
+        deadline=time.monotonic() + 1.0,
+    ) == (202, 303)
+    assert child_calls == 2
+
+
+def test_descendant_snapshot_retry_discovers_grandchild(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    now = 0.0
+    scans = 0
+
+    def fake_monotonic() -> float:
+        return now
+
+    def fake_sleep(seconds: float) -> None:
+        nonlocal now
+        now += seconds
+
+    def fake_process_tree_pids(
+        root_pid: int,
+        *,
+        deadline: float | None = None,
+    ) -> tuple[int, ...]:
+        nonlocal scans
+        assert root_pid == 101
+        assert deadline == pytest.approx(0.05)
+        scans += 1
+        return (202,) if scans == 1 else (202, 303)
+
+    monkeypatch.setattr(pool_module, "_DESCENDANT_SNAPSHOT_SECONDS", 0.05)
+    monkeypatch.setattr(pool_module.time, "monotonic", fake_monotonic)
+    monkeypatch.setattr(pool_module.time, "sleep", fake_sleep)
+    monkeypatch.setattr(pool_module, "_process_tree_pids", fake_process_tree_pids)
+
+    found = pool_module._snapshot_descendant_pids(101)
+
+    assert scans >= 2
+    assert found == (202, 303)
+
+
+def test_descendant_snapshot_merges_tracked_and_discovered_pids(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    scans: list[int] = []
+
+    def fake_process_tree_pids(
+        root_pid: int,
+        *,
+        deadline: float | None = None,
+    ) -> tuple[int, ...]:
+        assert deadline is not None
+        scans.append(root_pid)
+        return (303,)
+
+    monkeypatch.setattr(pool_module, "_process_tree_pids", fake_process_tree_pids)
+
+    found = pool_module._snapshot_descendant_pids(101, extra_pids=(202,))
+
+    assert len(scans) >= 2
+    assert set(scans) == {101}
+    assert found == (202, 303)
+
+
+@pytest.mark.timeout(10)
+def test_cleanup_deadline_expiry_reclaims_tracked_straggler_and_worker(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    survivor = tmp_path / "tracked-straggler-survived.txt"
+    straggler = subprocess.Popen(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import pathlib, sys, time; "
+                "time.sleep(1.0); "
+                "pathlib.Path(sys.argv[1]).write_text('alive', encoding='utf-8')"
+            ),
+            str(survivor),
+        ],
+        start_new_session=True,
+    )
+    worker = subprocess.Popen(
+        [sys.executable, "-c", "import time; time.sleep(30.0)"],
+        start_new_session=True,
+    )
+    monkeypatch.setattr(
+        pool_module,
+        "_process_tree_pids",
+        lambda root_pid, *, deadline=None: (),
+    )
+
+    class ProcessAdapter:
+        pid = worker.pid
+
+        def is_alive(self) -> bool:
+            return worker.poll() is None
+
+        def join(self, timeout: float | None = None) -> None:
+            try:
+                worker.wait(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                return
+
+        def terminate(self) -> None:
+            worker.terminate()
+
+        def kill(self) -> None:
+            worker.kill()
+
+    try:
+        pool_module._terminate_pool_process(ProcessAdapter(), extra_pids=(straggler.pid,))
+        deadline = time.monotonic() + 2.0
+        while (
+            (worker.poll() is None or straggler.poll() is None)
+            and time.monotonic() < deadline
+        ):
+            time.sleep(0.05)
+        time.sleep(1.1)
+
+        assert worker.poll() is not None
+        assert straggler.poll() is not None
+        assert not survivor.exists()
+    finally:
+        for process in (worker, straggler):
+            if process.poll() is None:
+                process.kill()
+                process.wait(timeout=2.0)
+
+
 def test_hashseed_result_view_rejects_or_normalizes_unordered_fields() -> None:
     code = """
 import json

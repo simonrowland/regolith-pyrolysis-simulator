@@ -60,6 +60,9 @@ _INFLIGHT_PER_WORKER = 1
 _POOL_POLL_SECONDS = 0.1
 _WORKER_TERMINATE_GRACE_SECONDS = 5.0
 _DESCENDANT_SNAPSHOT_SECONDS = 0.25
+_DESCENDANT_PGREP_TIMEOUT_SECONDS = 1.0
+_DESCENDANT_PGREP_MAX_SECONDS = 0.05
+_DESCENDANT_MAX_PROCESSES = 4096
 _LOGGER = logging.getLogger(__name__)
 _POOL_UNAVAILABLE_ERRNOS = {errno.EACCES, errno.EPERM, errno.ENOSYS}
 _ORIGINAL_POPEN = subprocess.Popen
@@ -1063,13 +1066,7 @@ def _terminate_pool_process(process: Any, *, extra_pids: Sequence[int] = ()) -> 
             _signal_pids(descendant_pids, signal.SIGKILL)
             if not process.is_alive():
                 return
-        _signal_pids(
-            _merge_pids(
-                (*descendant_pids, *_process_tree_pids(pid_int), *tuple(extra_pids)),
-                exclude={pid_int, os.getpid()},
-            ),
-            signal.SIGKILL,
-        )
+        _signal_pids(descendant_pids, signal.SIGKILL)
         try:
             os.kill(pid_int, signal.SIGKILL)
         except ProcessLookupError:
@@ -1107,15 +1104,24 @@ def _snapshot_descendant_pids(
     extra_pids: Sequence[int] = (),
 ) -> tuple[int, ...]:
     deadline = time.monotonic() + _DESCENDANT_SNAPSHOT_SECONDS
-    captured: tuple[int, ...] = ()
+    captured = _merge_pids(tuple(extra_pids), exclude={root_pid, os.getpid()})
     while True:
+        if time.monotonic() >= deadline:
+            return captured
         captured = _merge_pids(
-            (*captured, *_process_tree_pids(root_pid), *tuple(extra_pids)),
+            (
+                *captured,
+                *_process_tree_pids(root_pid, deadline=deadline),
+                *tuple(extra_pids),
+            ),
             exclude={root_pid, os.getpid()},
         )
-        if captured or time.monotonic() >= deadline:
+        if time.monotonic() >= deadline:
             return captured
-        time.sleep(0.02)
+        remaining = _remaining_deadline_seconds(deadline)
+        if remaining <= 0.0:
+            return captured
+        time.sleep(min(0.02, remaining))
 
 
 def _merge_pids(
@@ -1138,20 +1144,57 @@ def _merge_pids(
     return tuple(merged)
 
 
-def _process_tree_pids(root_pid: int) -> tuple[int, ...]:
+def _remaining_deadline_seconds(deadline: float | None) -> float:
+    if deadline is None:
+        return float("inf")
+    return max(0.0, deadline - time.monotonic())
+
+
+def _process_tree_pids(root_pid: int, *, deadline: float | None = None) -> tuple[int, ...]:
     try:
         import psutil  # type: ignore[import-not-found]
 
-        root = psutil.Process(root_pid)
-        return tuple(int(child.pid) for child in root.children(recursive=True))
+        found: list[int] = []
+        seen: set[int] = set()
+        pending = [root_pid]
+        while pending and len(found) < _DESCENDANT_MAX_PROCESSES:
+            if _remaining_deadline_seconds(deadline) <= 0.0:
+                break
+            parent = pending.pop()
+            # psutil exposes no timeout for this synchronous OS query, so an
+            # individual call cannot be preempted; bound the traversal between
+            # calls by both the shared deadline and a maximum process count.
+            children = psutil.Process(parent).children(recursive=False)
+            for child_process in children:
+                if _remaining_deadline_seconds(deadline) <= 0.0:
+                    break
+                child = int(child_process.pid)
+                if child not in seen:
+                    seen.add(child)
+                    found.append(child)
+                    pending.append(child)
+                    if len(found) >= _DESCENDANT_MAX_PROCESSES:
+                        break
+        return tuple(found)
     except Exception:
-        return _process_tree_pids_via_pgrep(root_pid)
+        return _process_tree_pids_via_pgrep(root_pid, deadline=deadline)
 
 
-def _process_tree_pids_via_pgrep(root_pid: int) -> tuple[int, ...]:
+def _process_tree_pids_via_pgrep(
+    root_pid: int,
+    *,
+    deadline: float | None = None,
+) -> tuple[int, ...]:
     found: list[int] = []
+    seen: set[int] = set()
     pending = [root_pid]
-    while pending:
+    while pending and len(found) < _DESCENDANT_MAX_PROCESSES:
+        remaining = _remaining_deadline_seconds(deadline)
+        if remaining <= 0.0:
+            break
+        timeout = _DESCENDANT_PGREP_TIMEOUT_SECONDS
+        if deadline is not None:
+            timeout = min(_DESCENDANT_PGREP_MAX_SECONDS, remaining)
         parent = pending.pop()
         try:
             completed = subprocess.run(
@@ -1159,16 +1202,26 @@ def _process_tree_pids_via_pgrep(root_pid: int) -> tuple[int, ...]:
                 check=False,
                 capture_output=True,
                 text=True,
-                timeout=1.0,
+                timeout=timeout,
             )
+        except subprocess.TimeoutExpired:
+            if deadline is not None:
+                pending.insert(0, parent)
+            continue
         except Exception:
             continue
         for line in completed.stdout.splitlines():
+            if (
+                len(found) >= _DESCENDANT_MAX_PROCESSES
+                or _remaining_deadline_seconds(deadline) <= 0.0
+            ):
+                break
             try:
                 child = int(line.strip())
             except ValueError:
                 continue
-            if child not in found:
+            if child not in seen:
+                seen.add(child)
                 found.append(child)
                 pending.append(child)
     return tuple(found)
