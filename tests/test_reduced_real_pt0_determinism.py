@@ -171,7 +171,14 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # parsed setpoints digest and recipe.py source-module digest. These are
     # cache-identity version moves; the production key was rerun after all
     # wave-09 folds landed.
-    assert key_hash == "d05a2860e9523643f1a132f22c7937da844530320b386b3cba153920de2f83df"
+    # 2026-07-12 control-audit contract fix: fO2-independent intents no longer
+    # receive fO2_log in the dispatched request (CapabilityProfile.consumes_fO2
+    # filtering at request construction), so the canonical replay payload — and
+    # this key — legitimately moved. Determinism verified: byte-identical
+    # across repeated canonical-environment runs. Reviewer-sandbox keys differ
+    # (the documented reduced-real sandbox-drift class); the canonical
+    # interpreter on main is the authority for this pin.
+    assert key_hash == "beba272b9365fc3fec998fb4f703e46f99d6c06f238be7ad373e7c91926f5a1f"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 

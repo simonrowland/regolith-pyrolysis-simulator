@@ -231,6 +231,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 {ChemistryIntent.METALLOTHERMIC_STEP}
             ),
             declared_accounts=self.DECLARED_ACCOUNTS,
+            consumes_fO2=False,
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:

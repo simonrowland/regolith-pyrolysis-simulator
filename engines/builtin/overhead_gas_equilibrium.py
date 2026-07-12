@@ -66,6 +66,7 @@ class BuiltinOverheadGasEquilibriumProvider(ChemistryProvider):
                 {ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM}
             ),
             declared_accounts=frozenset({self.DECLARED_ACCOUNT}),
+            consumes_fO2=False,
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:

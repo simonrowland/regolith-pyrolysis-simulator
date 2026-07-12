@@ -5,7 +5,8 @@ operation a provider may own (see ``docs-private/chemistry-engine-
 binding-spec-2026-05-14.md`` §2).  :class:`CapabilityProfile` is the
 provider's declaration of which intents it can dispatch, which subset it
 holds authority for (i.e. may emit a :class:`LedgerTransitionProposal`),
-and which AtomLedger accounts it requests to see.
+which AtomLedger accounts it requests to see, and whether request-level
+fO2 is a consumed control.
 """
 
 from __future__ import annotations
@@ -66,12 +67,17 @@ class CapabilityProfile:
             outside this set is filtered out before the provider sees
             the snapshot, and any proposal touching an undeclared
             account is rejected.
+        consumes_fO2: Whether request-level ``fO2_log`` is a real input
+            for this provider. Providers that ignore fO2 set this false
+            so the kernel does not request applied fO2 evidence from
+            their control audit.
     """
 
     provider_id: str
     intents: frozenset[ChemistryIntent] = field(default_factory=frozenset)
     is_authoritative_for: frozenset[ChemistryIntent] = field(default_factory=frozenset)
     declared_accounts: frozenset[str] = field(default_factory=frozenset)
+    consumes_fO2: bool = True
 
     def __post_init__(self) -> None:
         provider_id = str(self.provider_id).strip()
@@ -92,6 +98,7 @@ class CapabilityProfile:
         object.__setattr__(self, "intents", intents)
         object.__setattr__(self, "is_authoritative_for", authoritative)
         object.__setattr__(self, "declared_accounts", declared)
+        object.__setattr__(self, "consumes_fO2", bool(self.consumes_fO2))
 
     def can_dispatch(self, intent: ChemistryIntent) -> bool:
         """Whether this provider may receive ``intent`` at all."""

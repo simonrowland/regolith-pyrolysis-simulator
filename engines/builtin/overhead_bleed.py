@@ -81,6 +81,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             intents=frozenset({ChemistryIntent.OVERHEAD_BLEED}),
             is_authoritative_for=frozenset({ChemistryIntent.OVERHEAD_BLEED}),
             declared_accounts=self.DECLARED_ACCOUNTS,
+            consumes_fO2=False,
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:

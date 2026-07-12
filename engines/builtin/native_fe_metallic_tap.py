@@ -39,6 +39,7 @@ class BuiltinNativeFeMetallicTapProvider(ChemistryProvider):
                 {ChemistryIntent.NATIVE_FE_METALLIC_TAP}
             ),
             declared_accounts=self.DECLARED_ACCOUNTS,
+            consumes_fO2=False,
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:

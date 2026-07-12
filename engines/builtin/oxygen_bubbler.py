@@ -54,6 +54,7 @@ class BuiltinOxygenBubblerProvider(ChemistryProvider):
             intents=frozenset({ChemistryIntent.OXYGEN_BUBBLER}),
             is_authoritative_for=frozenset({ChemistryIntent.OXYGEN_BUBBLER}),
             declared_accounts=self.DECLARED_ACCOUNTS,
+            consumes_fO2=False,
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:

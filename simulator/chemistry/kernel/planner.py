@@ -177,7 +177,9 @@ class Planner:
                     ),
                     temperature_C=request.temperature_C,
                     pressure_bar=request.pressure_bar,
-                    fO2_log=request.fO2_log,
+                    fO2_log=(
+                        request.fO2_log if profile.consumes_fO2 else None
+                    ),
                     fe_redox_policy=request.fe_redox_policy,
                     control_inputs=request.control_inputs,
                 )
@@ -600,7 +602,7 @@ class ChemistryKernel:
             account_view=account_view,
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
+            fO2_log=fO2_log if profile.consumes_fO2 else None,
             fe_redox_policy=fe_redox_policy,
             control_inputs=control_inputs or {},
         )

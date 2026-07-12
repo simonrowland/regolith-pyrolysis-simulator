@@ -50,6 +50,7 @@ class BuiltinMetalPhaseStratificationProvider(ChemistryProvider):
                 ChemistryIntent.METAL_PHASE_STRATIFICATION,
             }),
             declared_accounts=self.DECLARED_ACCOUNTS,
+            consumes_fO2=False,
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:

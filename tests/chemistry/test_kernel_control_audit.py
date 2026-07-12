@@ -157,6 +157,82 @@ class _PressureClampingProvider(ChemistryProvider):
         )
 
 
+class _F02IndependentProvider(ChemistryProvider):
+    """Provider declares that request-level fO2 is not a consumed control."""
+
+    name = "fo2_independent"
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id="fo2_independent",
+            intents=frozenset({ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM}),
+            is_authoritative_for=frozenset({
+                ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM
+            }),
+            declared_accounts=frozenset({"process.overhead_gas"}),
+            consumes_fO2=False,
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        return IntentResult(
+            intent=request.intent,
+            status="ok",
+            transition=None,
+            control_audit=ControlAudit(
+                requested={
+                    "temperature_C": request.temperature_C,
+                    "pressure_bar": request.pressure_bar,
+                },
+                applied={
+                    "temperature_C": request.temperature_C,
+                    "pressure_bar": request.pressure_bar,
+                },
+                notes=(),
+            ),
+            diagnostic={"request_fO2_log": request.fO2_log},
+            warnings=(),
+        )
+
+
+class _F02DriftingProvider(ChemistryProvider):
+    """Provider consumes fO2 but reports mismatched applied evidence."""
+
+    name = "fo2_drift_bad"
+
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id="fo2_drift_bad",
+            intents=frozenset({ChemistryIntent.FE_REDOX_RESPECIATION}),
+            is_authoritative_for=frozenset({
+                ChemistryIntent.FE_REDOX_RESPECIATION
+            }),
+            declared_accounts=frozenset({"process.cleaned_melt"}),
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        assert request.fO2_log is not None
+        return IntentResult(
+            intent=request.intent,
+            status="ok",
+            transition=None,
+            control_audit=ControlAudit(
+                requested={
+                    "temperature_C": request.temperature_C,
+                    "pressure_bar": request.pressure_bar,
+                    "fO2_log": request.fO2_log,
+                },
+                applied={
+                    "temperature_C": request.temperature_C,
+                    "pressure_bar": request.pressure_bar,
+                    "fO2_log": request.fO2_log + 1.0,
+                },
+                notes=(),
+            ),
+            diagnostic={},
+            warnings=(),
+        )
+
+
 def test_kernel_dispatch_surfaces_control_audit_mismatch():
     ledger = AtomLedger()
     registry = ProviderRegistry()
@@ -168,6 +244,45 @@ def test_kernel_dispatch_surfaces_control_audit_mismatch():
             ChemistryIntent.SILICATE_LIQUIDUS,
             temperature_C=1400.0,
             pressure_bar=1.0,
+            declared_accounts=frozenset({"process.cleaned_melt"}),
+        )
+
+
+def test_kernel_filters_unconsumed_fO2_before_provider_dispatch():
+    ledger = AtomLedger()
+    registry = ProviderRegistry()
+    registry.register(
+        _F02IndependentProvider(),
+        [ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM],
+    )
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+
+    result = kernel.dispatch(
+        ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM,
+        temperature_C=1400.0,
+        pressure_bar=1e-6,
+        fO2_log=-9.0,
+        declared_accounts=frozenset({"process.overhead_gas"}),
+    )
+
+    assert result.diagnostic["request_fO2_log"] is None
+
+
+def test_kernel_still_rejects_consumed_fO2_mismatch():
+    ledger = AtomLedger()
+    registry = ProviderRegistry()
+    registry.register(
+        _F02DriftingProvider(),
+        [ChemistryIntent.FE_REDOX_RESPECIATION],
+    )
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+
+    with pytest.raises(ControlAuditMismatch):
+        kernel.dispatch(
+            ChemistryIntent.FE_REDOX_RESPECIATION,
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
             declared_accounts=frozenset({"process.cleaned_melt"}),
         )
 

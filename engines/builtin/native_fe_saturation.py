@@ -46,6 +46,7 @@ class BuiltinNativeFeSaturationProvider(ChemistryProvider):
                 {ChemistryIntent.NATIVE_FE_SATURATION}
             ),
             declared_accounts=self.DECLARED_ACCOUNTS,
+            consumes_fO2=False,
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
