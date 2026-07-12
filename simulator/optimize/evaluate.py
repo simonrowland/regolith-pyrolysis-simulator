@@ -16,7 +16,11 @@ from types import MappingProxyType, SimpleNamespace
 from typing import Any, Mapping, Sequence
 from collections.abc import Iterable, Mapping as MappingABC, Set as AbstractSet
 
-from engines.builtin.vapor_pressure import VaporPressureNumericalOverflowError
+from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
+from engines.builtin.vapor_pressure import (
+    VaporPressureNumericalOverflowError,
+    VaporPressureRangeError,
+)
 from simulator.accounting import OverdraftError, resolve_species_formula
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -27,9 +31,11 @@ from simulator.backends import (
     real_backend_feedstock_domain_reason,
     requires_stage0_subprocess,
 )
+from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
 from simulator.condensation import (
     DEFAULT_PIPE_DIAMETER_M,
+    KnudsenRegimeRefusal,
     knudsen_regime_diagnostic,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
@@ -107,6 +113,7 @@ from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun, RunnerError
+from simulator.transport_regime import TransportRegimeRefusal
 
 
 MASS_BALANCE_ABORT_PCT = 5e-12
@@ -125,6 +132,7 @@ EXTRACTION_CLASS_GATES = frozenset((
     "delivered_stream_purity",
     "extraction_completeness",
 ))
+PHYSICS_REFUSAL_GATE = "physics_refusal"
 DEFAULT_THERMAL_PREHEAT_RAMP_C_PER_HR = 600.0
 DEFAULT_COLD_START_TEMPERATURE_C = 25.0
 SYNTHETIC_BACKEND_NOT_RUN = "not_run"
@@ -162,6 +170,13 @@ _RUN_REFERENCE_CANONICAL_FIELDS = (
     "degradation_reason",
     "backend_real_active",
     "certification_allowed",
+)
+_TYPED_PHYSICS_REFUSAL_EXCEPTION_CLASSES = (
+    CampaignPressureSetpointRefusal,
+    CertifiedPointRefusedError,
+    KnudsenRegimeRefusal,
+    TransportRegimeRefusal,
+    VaporPressureRangeError,
 )
 
 
@@ -725,6 +740,13 @@ def evaluate(
             eval_spec=spec,
             cache_key_value=key,
         ) from exc
+    except _TYPED_PHYSICS_REFUSAL_EXCEPTION_CLASSES as exc:
+        return _typed_physics_refusal_result(
+            candidate_id,
+            spec,
+            key,
+            exc,
+        )
     except RunnerError as exc:
         if _is_backend_unavailable_message(str(exc)):
             raise BackendUnavailableAbort(
@@ -857,20 +879,14 @@ def evaluate(
     )
 
     if status == "refused":
-        return ScoredResult(
-            candidate_id=candidate_id,
-            eval_spec=spec,
-            cache_key=key,
-            feasible=False,
-            failure_category=FailureCategory.PHYSICS_REFUSED,
-            run_reference=_run_reference(run_execution, profile),
-            notes=tuple(
-                note for note in (
-                    str(getattr(run_execution, "reason", "")),
-                    error_message,
-                )
-                if note
-            ),
+        return _physics_refused_result(
+            candidate_id,
+            spec,
+            key,
+            reason=_run_execution_refusal_reason(run_execution),
+            error_message=error_message,
+            run_execution=run_execution,
+            profile=profile,
         )
 
     try:
@@ -1039,6 +1055,157 @@ def _execute_run(
     if worker_runtime is not None and _accepts_keyword(execute, "worker_runtime"):
         return execute(run_config, worker_runtime=worker_runtime)
     return execute(run_config)
+
+
+def _typed_physics_refusal_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    exc: BaseException,
+) -> ScoredResult:
+    reason = _typed_physics_refusal_reason(exc)
+    return _physics_refused_result(
+        candidate_id,
+        spec,
+        key,
+        reason=reason,
+        error_message=str(exc) or reason,
+        diagnostic=getattr(exc, "diagnostic", None),
+    )
+
+
+def _physics_refused_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    *,
+    reason: str,
+    error_message: str,
+    run_execution: Any | None = None,
+    profile: Mapping[str, Any] | None = None,
+    diagnostic: Any | None = None,
+) -> ScoredResult:
+    reason = str(reason or "typed_physics_refusal")
+    message = str(error_message or reason)
+    if run_execution is None:
+        run_reference = RunReference(
+            status="refused",
+            error_message=message,
+            reason=reason,
+            trace=_physics_refusal_trace(reason, diagnostic),
+            backend_name=None,
+            backend_status=SYNTHETIC_BACKEND_NOT_RUN,
+            backend_authoritative=False,
+        )
+    else:
+        run_reference = replace(
+            _run_reference(run_execution, profile or {}),
+            status="refused",
+            error_message=message,
+            reason=reason,
+        )
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.PHYSICS_REFUSED,
+        feasibility_margins={
+            PHYSICS_REFUSAL_GATE: _physics_refusal_margin(reason),
+        },
+        failing_gates=(PHYSICS_REFUSAL_GATE,),
+        run_reference=run_reference,
+        notes=tuple(dict.fromkeys(note for note in (reason, message) if note)),
+    )
+
+
+def _physics_refusal_margin(reason: str) -> GateMargin:
+    threshold = ThresholdSpec(
+        id="typed_physics_refusal",
+        value=0.0,
+        units="refusal_count",
+        source="runtime_refusal_taxonomy",
+        source_ref="simulator.optimize.evaluate: typed physics refusal",
+    )
+    return GateMargin(
+        gate=PHYSICS_REFUSAL_GATE,
+        feasible=False,
+        margin=-1.0,
+        threshold=threshold,
+        observed=1.0,
+        detail=str(reason or "typed_physics_refusal"),
+    )
+
+
+def _physics_refusal_trace(reason: str, diagnostic: Any | None) -> dict[str, Any]:
+    payload = _synthetic_not_run_trace()
+    payload["refusal_reason"] = str(reason or "typed_physics_refusal")
+    if isinstance(diagnostic, MappingABC):
+        payload["refusal_diagnostic"] = _compact_jsonable(dict(diagnostic))
+    return payload
+
+
+def _run_execution_refusal_reason(run_execution: Any) -> str:
+    reason = str(getattr(run_execution, "reason", "") or "")
+    if reason:
+        return reason
+    diagnostic = getattr(run_execution, "refusal_diagnostic", None)
+    mapped = _reason_from_mapping(diagnostic)
+    if mapped:
+        return mapped
+    error_message = str(getattr(run_execution, "error_message", "") or "")
+    return _reason_from_message(error_message) or "typed_physics_refusal"
+
+
+def _typed_physics_refusal_reason(exc: BaseException) -> str:
+    mapped = _reason_from_mapping(getattr(exc, "diagnostic", None))
+    if mapped:
+        return mapped
+    for attr in (
+        "reason",
+        "category",
+        "backend_failure_reason_code",
+        "backend_status_reason",
+    ):
+        value = getattr(exc, attr, None)
+        if value:
+            return str(value)
+    message_reason = _reason_from_message(str(exc))
+    if message_reason:
+        return message_reason
+    if isinstance(exc, CertifiedPointRefusedError):
+        message = str(exc).lower()
+        if "liquidus" in message:
+            return "liquidus_authority_refused"
+        return "certified_point_refused"
+    return "typed_physics_refusal"
+
+
+def _reason_from_mapping(value: Any) -> str:
+    if not isinstance(value, MappingABC):
+        return ""
+    for key in (
+        "reason_refused",
+        "reason",
+        "status_reason",
+        "backend_status_reason",
+        "backend_failure_reason_code",
+        "category",
+    ):
+        raw = value.get(key)
+        if raw:
+            return str(raw)
+    nested = value.get("diagnostic")
+    if isinstance(nested, MappingABC):
+        return _reason_from_mapping(nested)
+    return ""
+
+
+def _reason_from_message(message: str) -> str:
+    prefix = str(message or "").split(":", 1)[0].strip()
+    if re.fullmatch(r"[a-z][a-z0-9_]*(?:_[a-z0-9]+)*", prefix):
+        return prefix
+    return ""
 
 
 def _evaluate_physics_constraints(
@@ -4508,6 +4675,15 @@ def _cache_trace_payload(
     reduced_real_cache = getattr(run_execution, "reduced_real_cache", None)
     if isinstance(reduced_real_cache, Mapping) and reduced_real_cache:
         payload["reduced_real_cache"] = _compact_jsonable(reduced_real_cache)
+
+    refusal_diagnostic = getattr(run_execution, "refusal_diagnostic", None)
+    refusal_reason = str(getattr(run_execution, "reason", "") or "")
+    if not refusal_reason:
+        refusal_reason = _reason_from_mapping(refusal_diagnostic)
+    if refusal_reason:
+        payload["refusal_reason"] = refusal_reason
+    if isinstance(refusal_diagnostic, Mapping) and refusal_diagnostic:
+        payload["refusal_diagnostic"] = _compact_jsonable(dict(refusal_diagnostic))
 
     per_hour_cache: list[dict[str, Any]] = []
     pO2_enforcement_by_hour: list[dict[str, Any]] = []

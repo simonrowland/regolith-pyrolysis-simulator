@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import dataclasses
 import math
+from copy import copy, deepcopy
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
+from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
+from engines.builtin.vapor_pressure import VaporPressureRangeError
 from simulator.backends import requires_stage0_subprocess
 from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.condensation import KnudsenRegimeRefusal
@@ -26,6 +29,45 @@ from simulator.session import (
 )
 from simulator.state import HourSnapshot
 from simulator.trace import PhysicsTrace
+from simulator.transport_regime import TransportRegimeRefusal
+
+
+_TYPED_PHYSICS_REFUSALS = (
+    VaporPressureRangeError,
+    CertifiedPointRefusedError,
+    TransportRegimeRefusal,
+)
+_ALL_TYPED_PHYSICS_REFUSALS = (
+    KnudsenRegimeRefusal,
+    CampaignPressureSetpointRefusal,
+    *_TYPED_PHYSICS_REFUSALS,
+)
+
+
+def _typed_refusal_reason(exc: BaseException) -> str:
+    for attr in ("reason", "category"):
+        value = getattr(exc, attr, None)
+        if value:
+            return str(value)
+    if isinstance(exc, CertifiedPointRefusedError):
+        if "liquidus" in str(exc).lower():
+            return "liquidus_authority_refused"
+        return "certified_point_refused"
+    prefix = str(exc).partition(":")[0].strip().lower().replace(" ", "_")
+    return prefix or "typed_physics_refusal"
+
+
+def _snapshot_atom_ledger(ledger: Any) -> Any:
+    """Copy mutable ledger state without copying its immutable registries."""
+    snapshot = copy(ledger)
+    snapshot._balances = deepcopy(ledger._balances)
+    snapshot._policies = dict(ledger._policies)
+    snapshot._transitions = list(ledger._transitions)
+    snapshot._terminal_debit_authorized_transition_ids = set(
+        ledger._terminal_debit_authorized_transition_ids
+    )
+    snapshot._external_loads = list(ledger._external_loads)
+    return snapshot
 
 
 @dataclass(frozen=True)
@@ -101,13 +143,29 @@ class RunExecutor:
         try:
             if initial_refusal is not None:
                 raise initial_refusal
-            for result in drive_session(
+            driver = iter(drive_session(
                 session,
                 hours,
                 DecisionPolicy.AUTO_APPLY,
                 operator_decisions=operator_decisions,
                 stop_at_stage0_exit=bool(stop_at_stage0_exit),
-            ):
+            ))
+            while True:
+                # A typed refusal is an infeasible point, not a partially
+                # executed hour. Snapshot both authoritative state surfaces
+                # immediately before advancing the generator so refusal can
+                # roll the current hour back while retaining prior hours.
+                ledger_before_hour = _snapshot_atom_ledger(sim.atom_ledger)
+                melt_before_hour = deepcopy(sim.melt)
+                try:
+                    result = next(driver)
+                except StopIteration:
+                    break
+                except _ALL_TYPED_PHYSICS_REFUSALS:
+                    sim.atom_ledger = ledger_before_hour
+                    sim.melt = melt_before_hour
+                    sim._chem_kernel = sim._build_chemistry_kernel()
+                    raise
                 per_hour_summary = dict(result.per_hour_summary)
                 cache_state = getattr(sim, "_last_reduced_real_cache_state", None)
                 if cache_state is not None:
@@ -175,6 +233,11 @@ class RunExecutor:
             reason = exc.reason
             error_message = exc.reason
             refusal_diagnostic = dict(exc.diagnostic)
+        except _TYPED_PHYSICS_REFUSALS as exc:
+            failure_exc = exc
+            status = "refused"
+            reason = _typed_refusal_reason(exc)
+            error_message = str(exc)
         except PoisonedHourError as exc:
             failure_exc = exc
             status = "failed"

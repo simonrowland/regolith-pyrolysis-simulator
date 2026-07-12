@@ -20,7 +20,15 @@ import zipfile
 import pytest
 import yaml
 
+from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
+from engines.builtin.vapor_pressure import VaporPressureRangeError
 import scripts.make_recipe_db_profile as generator
+from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.condensation import KnudsenRegimeRefusal
+from simulator.electrolysis import (
+    MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    MRE_RAW_MARGIN_REFUSAL,
+)
 from simulator.optimize import cli as optimizer_cli
 from simulator.optimize import physics as physics_module
 from simulator.optimize import study
@@ -48,6 +56,7 @@ from simulator.optimize.strategy import (
     RandomStrategy,
     StagedStrategy,
 )
+from simulator.transport_regime import TransportRegimeRefusal
 
 
 PROFILE = {
@@ -82,6 +91,7 @@ PROFILE = {
     ],
 }
 FEEDSTOCK = "lunar_mare_low_ti"
+C6_WINDOW_REFUSAL = "c6_joint_thermodynamic_liquid_fraction_window_empty"
 
 
 def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
@@ -143,6 +153,99 @@ def _spec(
         constraints=constraints,
     )
     return spec
+
+
+class _StudyFakeExecutor:
+    def __init__(self, *, exc: Exception | None = None, execution: object | None = None):
+        self.exc = exc
+        self.execution = execution
+
+    def execute(self, config: object) -> object:
+        if self.exc is not None:
+            raise self.exc
+        assert self.execution is not None
+        return self.execution
+
+
+def _study_refused_execution(reason: str) -> SimpleNamespace:
+    return SimpleNamespace(
+        session=SimpleNamespace(),
+        simulator=SimpleNamespace(),
+        snapshots=(SimpleNamespace(mass_balance_error_pct=0.0),),
+        trace={"backend_status": "ok"},
+        per_hour=(),
+        backend_status="ok",
+        backend_authoritative=True,
+        status="refused",
+        error_message=reason,
+        reason=reason,
+        refusal_diagnostic={
+            "status": "refused",
+            "diagnostic": {"reason_refused": reason},
+        },
+    )
+
+
+def _study_typed_refusal_cases() -> tuple[tuple[str, str, Exception | None, object | None], ...]:
+    campaign_pressure = CampaignPressureSetpointRefusal(
+        {"status": "refused", "detail": "empty pN2 operating band"}
+    )
+    return (
+        (
+            "mre_raw_margin",
+            MRE_RAW_MARGIN_REFUSAL,
+            None,
+            _study_refused_execution(MRE_RAW_MARGIN_REFUSAL),
+        ),
+        (
+            "mre_multi_oxide_partition",
+            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            None,
+            _study_refused_execution(MRE_MULTI_OXIDE_PARTITION_REFUSAL),
+        ),
+        (
+            "c6_static_window",
+            C6_WINDOW_REFUSAL,
+            None,
+            _study_refused_execution(C6_WINDOW_REFUSAL),
+        ),
+        (
+            "campaign_pressure",
+            campaign_pressure.reason,
+            campaign_pressure,
+            None,
+        ),
+        (
+            "knudsen",
+            KnudsenRegimeRefusal.reason,
+            KnudsenRegimeRefusal(
+                {"status": "refused", "reason_refused": KnudsenRegimeRefusal.reason}
+            ),
+            None,
+        ),
+        (
+            "vapor_pressure_range",
+            "metal_vapor_pressure_out_of_source_certified_range",
+            VaporPressureRangeError(
+                "metal_vapor_pressure_out_of_source_certified_range: species=Mg"
+            ),
+            None,
+        ),
+        (
+            "liquidus_authority",
+            "liquidus_authority_refused",
+            CertifiedPointRefusedError(
+                "certified-point refused for ungrounded effect CI.liquidus"
+            ),
+            None,
+        ),
+        (
+            "transport_regime",
+            "invalid_transport_regime_input",
+            TransportRegimeRefusal("invalid_transport_regime_input", "bad Kn"),
+            None,
+        ),
+    )
 
 
 def _scope_spec() -> EvalSpec:
@@ -1478,6 +1581,8 @@ class _Sso2AbsenceSim:
 
 def _sso2_absent_tap_run_execution() -> SimpleNamespace:
     native_partition = {
+        "native_fe_source_account": "process.cleaned_melt",
+        "native_fe_split_commit_status": "ok",
         "native_fe_pool_mol": 1.0,
         "native_fe_tap_mol": 1.0,
         "native_fe_vapor_mol": 0.0,
@@ -4426,6 +4531,81 @@ def test_invalid_recipe_result_continues_and_counts_failure(tmp_path) -> None:
         row.failure_category is FailureCategory.INVALID_RECIPE
         for row in stored
     )
+
+
+def test_typed_physics_refusals_are_stored_and_study_continues(tmp_path) -> None:
+    refusal_cases = _study_typed_refusal_cases()
+    profile = copy.deepcopy(PROFILE)
+    profile["fidelities"]["internal-analytical"] = copy.deepcopy(
+        profile["fidelities"]["stub"]
+    )
+
+    def evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        index = _sequence(candidate_id)
+        if index < len(refusal_cases):
+            _, _, exc, execution = refusal_cases[index]
+            return evaluate(
+                patch,
+                feedstock,
+                fidelity,
+                profile=profile,
+                candidate_id=candidate_id,
+                executor=_StudyFakeExecutor(exc=exc, execution=execution),
+                schema=kwargs.get("schema") or RecipeSchema(),
+                constraints=kwargs.get("constraints"),
+            )
+        spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=True,
+            objectives=ObjectiveVector(
+                (
+                    ObjectiveValue("oxygen_kg", "maximize", 10.0 + index, "kg", ordinal=0),
+                    ObjectiveValue("energy_kWh", "minimize", 5.0 + index, "kWh", ordinal=1),
+                )
+            ),
+            feasibility_margins={"delivered_stream_purity": _margin()},
+            run_reference=RunReference(status="ok", trace={"backend_status": "ok"}),
+        )
+
+    result = study.run(
+        profile,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        1,
+        len(refusal_cases) + 1,
+        tmp_path,
+        seed=7,
+        evaluator=evaluator,
+    )
+
+    winner_id = f"random-7-{len(refusal_cases):06d}"
+    assert result.winner is not None
+    assert result.winner.candidate_id == winner_id
+    summary = json.loads((tmp_path / "pareto.json").read_text())
+    assert summary["failure_counts"] == {"physics_refused": len(refusal_cases)}
+    provenance = {row["candidate_id"]: row for row in _read_provenance(tmp_path)}
+
+    for index, (family, expected_reason, _, _) in enumerate(refusal_cases):
+        candidate_id = f"random-7-{index:06d}"
+        row = provenance[candidate_id]
+        assert family
+        assert row["status"] == "physics_refused"
+        assert row["failure_category"] == "physics_refused"
+        assert expected_reason in row["notes"]
+        assert row["feasibility_margins"]["physics_refusal"]["detail"] == expected_reason
+        assert row["trace_summary"]["refusal_reason"] == expected_reason
 
 
 def test_all_invalid_recipe_results_fail_loud_with_counts(tmp_path) -> None:

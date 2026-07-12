@@ -9,17 +9,27 @@ import pytest
 from engines.alphamelts import AlphaMELTSProvider
 from engines.alphamelts.parser import diagnostics_to_equilibrium
 from engines.alphamelts.result import LiquidusDiagnostics
-from engines.builtin.vapor_pressure import _pow10_pressure_or_raise
+from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
+from engines.builtin.vapor_pressure import (
+    VaporPressureRangeError,
+    _pow10_pressure_or_raise,
+)
 import simulator.optimize.evaluate as evaluate_module
 from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
+from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryKernel,
     ProposalRejected,
     ProviderRegistry,
 )
+from simulator.condensation import KnudsenRegimeRefusal
 from simulator.config import load_config_bundle
+from simulator.electrolysis import (
+    MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+    MRE_RAW_MARGIN_REFUSAL,
+)
 from simulator.fidelity_vocabulary import (
     FidelityVocabularyTranslationError,
     UnknownFidelityVocabularyTokenError,
@@ -53,10 +63,12 @@ from simulator.run_executor import RunExecutor
 from simulator.runner import RunnerError, _force_builtin_vapor_pressure
 from simulator.session import SimSession, SimSessionConfig
 from simulator.state import CampaignPhase, HourSnapshot
+from simulator.transport_regime import TransportRegimeRefusal
 from optimizer_fixtures import StubSmokeConstraintSet
 
 
 PO2_DEFAULT = ("campaigns", "C0b_p_cleanup", "pO2_mbar_default")
+C6_WINDOW_REFUSAL = "c6_joint_thermodynamic_liquid_fraction_window_empty"
 
 
 PROFILE = {
@@ -424,6 +436,7 @@ def _execution(
     backend_authoritative: bool | None = None,
     backend_diagnostics: dict[str, object] | None = None,
     freeze_curve: dict[str, object] | None = None,
+    refusal_diagnostic: dict[str, object] | None = None,
 ) -> SimpleNamespace:
     per_hour_entries = per_hour
     if per_hour_entries is None and backend_status is not None:
@@ -446,7 +459,7 @@ def _execution(
         status=status,
         error_message=error_message,
         reason=reason,
-        refusal_diagnostic={},
+        refusal_diagnostic=refusal_diagnostic or {},
     )
 
 
@@ -3545,6 +3558,125 @@ def test_physics_refused_is_infeasible_trial_with_note() -> None:
     assert result.failure_category is FailureCategory.PHYSICS_REFUSED
     assert result.objectives is None
     assert "free molecular" in result.notes
+
+
+def _typed_refusal_execution(reason: str) -> SimpleNamespace:
+    return _execution(
+        status="refused",
+        error_message=reason,
+        reason=reason,
+        backend_status="ok",
+        backend_authoritative=True,
+        refusal_diagnostic={
+            "status": "refused",
+            "diagnostic": {"reason_refused": reason},
+        },
+    )
+
+
+def _typed_refusal_cases() -> tuple[tuple[str, str, Exception | None, object | None], ...]:
+    campaign_pressure = CampaignPressureSetpointRefusal(
+        {"status": "refused", "detail": "empty pN2 operating band"}
+    )
+    return (
+        (
+            "mre_raw_margin",
+            MRE_RAW_MARGIN_REFUSAL,
+            None,
+            _typed_refusal_execution(MRE_RAW_MARGIN_REFUSAL),
+        ),
+        (
+            "mre_multi_oxide_partition",
+            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            None,
+            _typed_refusal_execution(MRE_MULTI_OXIDE_PARTITION_REFUSAL),
+        ),
+        (
+            "c6_static_window",
+            C6_WINDOW_REFUSAL,
+            None,
+            _typed_refusal_execution(C6_WINDOW_REFUSAL),
+        ),
+        (
+            "campaign_pressure",
+            campaign_pressure.reason,
+            campaign_pressure,
+            None,
+        ),
+        (
+            "knudsen",
+            KnudsenRegimeRefusal.reason,
+            KnudsenRegimeRefusal(
+                {"status": "refused", "reason_refused": KnudsenRegimeRefusal.reason}
+            ),
+            None,
+        ),
+        (
+            "vapor_pressure_range",
+            "metal_vapor_pressure_out_of_source_certified_range",
+            VaporPressureRangeError(
+                "metal_vapor_pressure_out_of_source_certified_range: species=Mg"
+            ),
+            None,
+        ),
+        (
+            "liquidus_authority",
+            "liquidus_authority_refused",
+            CertifiedPointRefusedError(
+                "certified-point refused for ungrounded effect CI.liquidus"
+            ),
+            None,
+        ),
+        (
+            "transport_regime",
+            "invalid_transport_regime_input",
+            TransportRegimeRefusal("invalid_transport_regime_input", "bad Kn"),
+            None,
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    ("family", "expected_reason", "exc", "execution"),
+    _typed_refusal_cases(),
+    ids=lambda value: value if isinstance(value, str) else None,
+)
+def test_typed_physics_refusals_are_infeasible_trials_with_reason(
+    family: str,
+    expected_reason: str,
+    exc: Exception | None,
+    execution: object | None,
+) -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(execution=execution, exc=exc),
+    )
+
+    assert family
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.run_reference is not None
+    assert result.run_reference.status == "refused"
+    assert result.run_reference.reason == expected_reason
+    assert expected_reason in result.notes
+    assert result.failing_gates == ("physics_refusal",)
+    assert result.feasibility_margins["physics_refusal"].detail == expected_reason
+
+
+def test_untyped_executor_exception_still_aborts_as_engine_bug() -> None:
+    with pytest.raises(EngineBugAbort, match="oxide ledger exploded") as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(exc=RuntimeError("oxide ledger exploded")),
+        )
+
+    assert raised.value.category is FailureCategory.ENGINE_BUG
 
 
 def test_evalspec_cache_key_and_scored_result_are_deterministic() -> None:
