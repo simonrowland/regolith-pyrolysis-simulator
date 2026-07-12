@@ -14,6 +14,7 @@ from types import MappingProxyType
 
 import pytest
 
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 import simulator.optimize.pool as pool_module
 from simulator.optimize.determinism import THREAD_ENV_VARS, deterministic_result_view, pin_worker_env
 from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
@@ -203,7 +204,31 @@ def test_warm_runtime_spec_requires_one_backend_and_one_feedstock() -> None:
     )
 
     assert spec == pool_module._WarmRuntimeSpec(
-        backend_name="stub",
+        backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        feedstock_id="lunar_mare_low_ti",
+        stage0_subprocess_required=True,
+    )
+
+    # Alias equivalence: legacy "stub" and the canonical token are one backend
+    # identity, so a mixed alias pair must still warm (not fall back to None).
+    alias_spec = pool_module._warm_runtime_spec(
+        (
+            _pool_task(
+                0,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=True,
+                backend_name="stub",
+            ),
+            _pool_task(
+                1,
+                feedstock_id="lunar_mare_low_ti",
+                stage0_subprocess_required=True,
+                backend_name="internal-analytical",
+            ),
+        )
+    )
+    assert alias_spec == pool_module._WarmRuntimeSpec(
+        backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
         feedstock_id="lunar_mare_low_ti",
         stage0_subprocess_required=True,
     )
