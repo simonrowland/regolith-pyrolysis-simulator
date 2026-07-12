@@ -36,7 +36,14 @@ PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
         "native_vapor_Fe_kg": 0.15843535412267737,
     },
     "mars_basalt": {
-        "native_fe_mol": 1683.715115709812,
+        # Recomputed after 9de6ffb8: counterfactual tracing attributes the
+        # move to the corrected Stage-0 carbonate-decomposition sigmoid width
+        # (one thermodynamic e-fold; old-width emulation reproduces the prior
+        # golden within tolerance) — NOT the carbon-partition change,
+        # which changes cleaned-melt CaO and therefore FeO activity.  The
+        # regression below proves this remains the FeO-saturation path: the
+        # later metallic-tap fold never touches process.metal_phase here.
+        "native_fe_mol": 1683.5583423071594,
     },
 }
 
@@ -274,6 +281,10 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         for account in DECLARED_ACCOUNTS
     }
     before_fo2_buffer = dict(sim.atom_ledger.mol_by_account("reservoir.fo2_buffer"))
+    before_metal_phase = dict(
+        sim.atom_ledger.mol_by_account("process.metal_phase")
+    )
+    transition_count_before = len(sim.atom_ledger.transitions)
     golden = PINNED_NATIVE_FE_MIGRATION_GOLDENS[feedstock_id]
     expected_native_fe_mol = golden["native_fe_mol"]
 
@@ -284,6 +295,13 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         for account in DECLARED_ACCOUNTS
     }
     after_fo2_buffer = dict(sim.atom_ledger.mol_by_account("reservoir.fo2_buffer"))
+    after_metal_phase = dict(
+        sim.atom_ledger.mol_by_account("process.metal_phase")
+    )
+    transition_names = [
+        transition.name
+        for transition in sim.atom_ledger.transitions[transition_count_before:]
+    ]
     feo_debit_mol = (
         before["process.cleaned_melt"].get("FeO", 0.0)
         - after["process.cleaned_melt"].get("FeO", 0.0)
@@ -301,6 +319,10 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         - before_fo2_buffer.get("O2", 0.0)
     )
     partition = sim._compute_fe_redox_split_diagnostic()["native_fe_partition"]
+    assert after_metal_phase == before_metal_phase
+    assert transition_names.count("native_fe_saturation_split") == 1
+    assert "native_fe_metal_partition" not in transition_names
+    assert partition["native_fe_source_account"] == "process.cleaned_melt"
     assert feo_debit_mol == pytest.approx(expected_native_fe_mol, abs=2e-2)
     assert partition["native_fe_pool_mol"] == pytest.approx(
         expected_native_fe_mol,

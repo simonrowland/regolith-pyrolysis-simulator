@@ -39,6 +39,13 @@ SSO2_SILICA_SPECIES = ("SiO", "SiO2", "Si")
 SSO2_FE_TAP_ACCOUNT = "terminal.drain_tap_material"
 SSO2_METAL_PHASE_ACCOUNT = "process.metal_phase"
 SSO2_METAL_PHASE_ACCOUNTS = METAL_PHASE_ACCOUNTS
+SSO2_NATIVE_FE_PARTITION_TRANSITION_BY_SOURCE = {
+    "process.cleaned_melt": "native_fe_saturation_split",
+    "process.metal_phase": "native_fe_metal_partition",
+}
+SSO2_NATIVE_FE_PARTITION_TRANSITIONS = tuple(
+    SSO2_NATIVE_FE_PARTITION_TRANSITION_BY_SOURCE.values()
+)
 SSO2_MASS_BALANCE_TOLERANCE_PCT = 5.0e-12
 SSO2_CHUNK3B_READER_HANDOFF = (
     "PhysicsConstraintSet.delivered_stream_purity plus the SSO-2 profile/objective "
@@ -248,9 +255,32 @@ def sso2_owner_recipe_evidence(
     )
     product_fe_kg = _product_species_kg(sim, "Fe")
     native_split_count = _transition_count(ledger, "native_fe_saturation_split")
+    native_metal_partition_count = _transition_count(
+        ledger, "native_fe_metal_partition"
+    )
+    native_partition_transition_count = (
+        native_split_count + native_metal_partition_count
+    )
+    if (
+        metal_status != "available"
+        and native_metal_partition_count > 0
+        and tap_status == "available"
+    ):
+        metal_status = "drained_to_tap"
+        metal_reason = (
+            "native_fe_metal_partition committed and drained the source "
+            "metal phase"
+        )
     dose_transition_count = _transition_count(ledger, "c3_na_shuttle_reduction")
     stage_gas_snapshot = _stage_gas_snapshot_payload(run_execution)
-    native_partition_basis = _native_fe_partition_basis(run_execution, sim)
+    native_partition_basis = _native_fe_partition_basis(
+        run_execution,
+        sim,
+        partition_transition_counts={
+            "native_fe_saturation_split": native_split_count,
+            "native_fe_metal_partition": native_metal_partition_count,
+        },
+    )
     fe_tap_total_kg = sum(tap_kg_by_species.values())
     fe_tap_si_impurity_kg = sum(
         tap_kg_by_species.get(species, 0.0) for species in SSO2_SILICA_SPECIES
@@ -267,15 +297,15 @@ def sso2_owner_recipe_evidence(
     partition_basis_available = native_partition_basis.get("status") == "available"
     dependency_status = (
         "available"
-        if native_split_count > 0 and partition_basis_available
+        if native_partition_transition_count > 0 and partition_basis_available
         else "missing_fe_drain_vapor_partition"
     )
     dependency_reason = (
         ""
         if dependency_status == "available"
         else (
-            "no native_fe_saturation_split transition observed for this run"
-            if native_split_count <= 0
+            "no committed native Fe partition transition observed for this run"
+            if native_partition_transition_count <= 0
             else str(
                 native_partition_basis.get(
                     "status_reason",
@@ -359,13 +389,13 @@ def sso2_owner_recipe_evidence(
             "account_scope": list(SSO2_METAL_PHASE_ACCOUNTS),
             "Fe_kg": (
                 metal_phase_kg_by_species.get("Fe", 0.0)
-                if metal_status == "available"
+                if metal_status in {"available", "drained_to_tap"}
                 else None
             ),
             "product_ledger_Fe_kg": product_fe_kg,
             "species_kg": (
                 dict(sorted(metal_phase_kg_by_species.items()))
-                if metal_status == "available"
+                if metal_status in {"available", "drained_to_tap"}
                 else {}
             ),
         },
@@ -390,7 +420,11 @@ def sso2_owner_recipe_evidence(
             "status": dependency_status,
             "status_reason": dependency_reason,
             "native_fe_saturation_split_count": native_split_count,
-            "required_transition": "native_fe_saturation_split",
+            "native_fe_metal_partition_count": native_metal_partition_count,
+            "native_fe_partition_transition_count": (
+                native_partition_transition_count
+            ),
+            "accepted_transitions": list(SSO2_NATIVE_FE_PARTITION_TRANSITIONS),
             "stage_gas_snapshot": stage_gas_snapshot,
             "native_fe_partition_basis": native_partition_basis,
             "tap_basis": {
@@ -783,9 +817,23 @@ def _stage_gas_payload_from_raw(
     return payload
 
 
-def _native_fe_partition_basis(run_execution: Any, sim: Any) -> dict[str, Any]:
+def _native_fe_partition_basis(
+    run_execution: Any,
+    sim: Any,
+    *,
+    partition_transition_counts: Mapping[str, int],
+) -> dict[str, Any]:
     raw: Mapping[str, Any] | None = None
     source = "run_execution.snapshot.fe_redox_split.native_fe_partition"
+    if sum(partition_transition_counts.values()) <= 0:
+        return {
+            "status": "missing_fe_drain_vapor_partition",
+            "status_reason": (
+                "no committed native Fe partition transition corroborates "
+                "the diagnostic basis"
+            ),
+            "source": source,
+        }
     for snapshot in reversed(_execution_snapshots(run_execution)):
         split = getattr(snapshot, "fe_redox_split", None)
         if not isinstance(split, Mapping):
@@ -804,6 +852,45 @@ def _native_fe_partition_basis(run_execution: Any, sim: Any) -> dict[str, Any]:
             "status": "missing_fe_drain_vapor_partition",
             "status_reason": "native_fe_partition basis missing from snapshots",
             "source": source,
+        }
+
+    native_fe_source_account = str(
+        raw.get("native_fe_source_account", "") or ""
+    )
+    required_transition = SSO2_NATIVE_FE_PARTITION_TRANSITION_BY_SOURCE.get(
+        native_fe_source_account
+    )
+    if required_transition is None:
+        return {
+            "status": "missing_fe_drain_vapor_partition",
+            "status_reason": (
+                "native_fe_partition.native_fe_source_account is missing or "
+                "unsupported"
+            ),
+            "source": source,
+        }
+    if partition_transition_counts.get(required_transition, 0) <= 0:
+        return {
+            "status": "missing_fe_drain_vapor_partition",
+            "status_reason": (
+                f"no committed {required_transition} transition corroborates "
+                f"native Fe source account {native_fe_source_account}"
+            ),
+            "source": source,
+        }
+    native_fe_split_commit_status = str(
+        raw.get("native_fe_split_commit_status", "") or ""
+    )
+    if native_fe_split_commit_status != "ok":
+        return {
+            "status": "missing_fe_drain_vapor_partition",
+            "status_reason": (
+                "native Fe partition diagnostic lacks a committed split: "
+                f"native_fe_split_commit_status={native_fe_split_commit_status!r}"
+            ),
+            "source": source,
+            "native_fe_source_account": native_fe_source_account,
+            "native_fe_split_commit_status": native_fe_split_commit_status,
         }
 
     payload: dict[str, Any] = {
@@ -854,6 +941,9 @@ def _native_fe_partition_basis(run_execution: Any, sim: Any) -> dict[str, Any]:
         "carrier_gas",
         "alpha_source",
         "source_label",
+        "native_fe_source_account",
+        "native_fe_split_commit_status",
+        "native_fe_vapor_route_status",
     ):
         if raw.get(key) is not None:
             payload[key] = str(raw.get(key))

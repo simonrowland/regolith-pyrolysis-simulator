@@ -599,7 +599,8 @@ class _FakeUnclassifiedProductSim(_FakeProductSim):
 
 
 class _FakeSso2Transition:
-    name = "native_fe_saturation_split"
+    def __init__(self, name: str = "native_fe_saturation_split") -> None:
+        self.name = name
 
 
 class _FakeSso2Ledger:
@@ -608,9 +609,12 @@ class _FakeSso2Ledger:
         accounts: dict[str, dict[str, float]],
         *,
         split_present: bool = True,
+        transition_name: str = "native_fe_saturation_split",
     ) -> None:
         self._accounts = accounts
-        self.transitions = (_FakeSso2Transition(),) if split_present else ()
+        self.transitions = (
+            (_FakeSso2Transition(transition_name),) if split_present else ()
+        )
 
     def kg_by_account(self, account: str) -> dict[str, float]:
         return dict(self._accounts.get(account, {}))
@@ -628,7 +632,11 @@ def _fake_sso2_stage_gas() -> dict[str, float | str]:
     }
 
 
-def _fake_sso2_partition_basis() -> dict[str, float | str]:
+def _fake_sso2_partition_basis(
+    *,
+    native_fe_source_account: str = "process.cleaned_melt",
+    native_fe_split_commit_status: str = "ok",
+) -> dict[str, float | str]:
     return {
         "native_fe_pool_mol": 12.0,
         "native_fe_tap_mol": 11.5,
@@ -640,6 +648,9 @@ def _fake_sso2_partition_basis() -> dict[str, float | str]:
         "overhead_pressure_source": "melt.p_total_mbar",
         "carrier_gas": "N2",
         "source_label": "fake native Fe partition basis",
+        "native_fe_source_account": native_fe_source_account,
+        "native_fe_split_commit_status": native_fe_split_commit_status,
+        "native_fe_vapor_route_status": "committed",
     }
 
 
@@ -647,16 +658,24 @@ def _sso2_execution(
     *,
     condensed_delta: dict[tuple[int, str], float] | None = None,
     ledger: _FakeSso2Ledger | None = None,
+    snapshot_partition_present: bool | None = None,
+    snapshot_partition_source_account: str = "process.cleaned_melt",
+    snapshot_partition_commit_status: str = "ok",
 ):
     split_present = bool(getattr(ledger, "transitions", ())) if ledger is not None else False
+    if snapshot_partition_present is None:
+        snapshot_partition_present = split_present
     snapshot = SimpleNamespace(
         hour=1,
         campaign="C2A_staged",
         mass_balance_error_pct=1.2e-13,
         c2a_staged_gas=_fake_sso2_stage_gas(),
         fe_redox_split=(
-            {"native_fe_partition": _fake_sso2_partition_basis()}
-            if split_present
+            {"native_fe_partition": _fake_sso2_partition_basis(
+                native_fe_source_account=snapshot_partition_source_account,
+                native_fe_split_commit_status=snapshot_partition_commit_status,
+            )}
+            if snapshot_partition_present
             else {}
         ),
     )
@@ -724,20 +743,29 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert surface["pN2_mbar"] == pytest.approx(SSO2_CERTIFIED_PN2_MBAR)
     assert surface["pO2_mbar"] == pytest.approx(stage_gas["pO2_mbar"])
     assert surface["pN2_mbar"] == pytest.approx(stage_gas["pN2_mbar"])
-    # JANAF-4th multiphase re-ground keeps the certified Na reduction, but the
-    # Holzheid FeO-activity saturation criterion is not crossed at the SSO-2
-    # pO2/temperature point, so no native-Fe drain/vapor split is applicable.
-    assert partition["status"] == "missing_fe_drain_vapor_partition"
-    assert "no native_fe_saturation_split transition" in partition["status_reason"]
+    # adf1059's authoritative metallic-tap provider commits
+    # native_fe_metal_partition from process.metal_phase, while the hour
+    # snapshot carries the matching drain/vapor basis.  Both ledger commit and
+    # snapshot basis are required before this evidence may report available.
+    assert partition["status"] == "available"
+    assert partition["status_reason"] == ""
     assert partition["stage_gas_snapshot"]["pO2_mbar"] == pytest.approx(
         surface["pO2_mbar"]
     )
-    assert partition_basis["status"] == "missing_fe_drain_vapor_partition"
+    assert partition_basis["status"] == "available"
+    assert partition_basis["native_fe_source_account"] == "process.metal_phase"
+    assert partition_basis["native_fe_split_commit_status"] == "ok"
+    assert partition_basis["native_fe_vapor_route_status"] == "committed"
     assert partition["native_fe_saturation_split_count"] == 0
-    assert partition["tap_basis"]["status"] == "missing_fe_tap_evidence"
-    assert evidence["fe_tap"]["status"] == "missing_fe_tap_evidence"
-    assert evidence["metal_product_path"]["status"] == "available"
-    assert evidence["metal_product_path"]["Fe_kg"] > 0.0
+    assert partition["native_fe_metal_partition_count"] >= 1
+    assert partition["native_fe_partition_transition_count"] >= 1
+    assert partition["tap_basis"]["status"] == "available"
+    assert evidence["fe_tap"]["status"] == "available"
+    # The tap drained the source metal phase, so the terminal tap and aggregate
+    # product ledger now carry Fe while the source account is empty.
+    assert evidence["metal_product_path"]["status"] == "drained_to_tap"
+    assert evidence["metal_product_path"]["Fe_kg"] == pytest.approx(0.0)
+    assert evidence["metal_product_path"]["product_ledger_Fe_kg"] > 0.0
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:
@@ -797,6 +825,103 @@ def test_sso2_evidence_missing_partition_preempts_empty_fe_tap_status() -> None:
     assert evidence["status"] == "missing_fe_drain_vapor_partition"
     assert evidence["fe_tap"]["status"] == "missing_fe_tap_evidence"
     assert evidence["fe_tap"]["Fe_kg"] is None
+
+
+def test_sso2_partition_basis_requires_committed_partition_transition() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 1.0},
+        ledger=_FakeSso2Ledger(
+            {"terminal.drain_tap_material": {"Fe": 1.0}},
+            split_present=False,
+        ),
+        snapshot_partition_present=True,
+    )
+
+    evidence = sso2_owner_recipe_evidence(execution)
+    dependency = evidence["fe_drain_vapor_partition_dependency"]
+
+    assert dependency["status"] == "missing_fe_drain_vapor_partition"
+    assert dependency["native_fe_partition_transition_count"] == 0
+    assert (
+        dependency["native_fe_partition_basis"]["status"]
+        == "missing_fe_drain_vapor_partition"
+    )
+    assert "no committed native Fe partition transition" in (
+        dependency["native_fe_partition_basis"]["status_reason"]
+    )
+
+
+def test_sso2_partition_basis_accepts_committed_metallic_tap_transition() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 1.0},
+        ledger=_FakeSso2Ledger(
+            {"terminal.drain_tap_material": {"Fe": 1.0}},
+            transition_name="native_fe_metal_partition",
+        ),
+        snapshot_partition_source_account="process.metal_phase",
+    )
+
+    dependency = sso2_owner_recipe_evidence(execution)[
+        "fe_drain_vapor_partition_dependency"
+    ]
+
+    assert dependency["status"] == "available"
+    assert dependency["native_fe_saturation_split_count"] == 0
+    assert dependency["native_fe_metal_partition_count"] == 1
+    assert dependency["native_fe_partition_transition_count"] == 1
+    assert dependency["native_fe_partition_basis"]["status"] == "available"
+
+
+def test_sso2_partition_basis_rejects_mismatched_transition_source() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 1.0},
+        ledger=_FakeSso2Ledger({
+            "terminal.drain_tap_material": {"Fe": 1.0},
+        }),
+        snapshot_partition_source_account="process.metal_phase",
+    )
+
+    dependency = sso2_owner_recipe_evidence(execution)[
+        "fe_drain_vapor_partition_dependency"
+    ]
+
+    assert dependency["status"] == "missing_fe_drain_vapor_partition"
+    assert dependency["native_fe_saturation_split_count"] == 1
+    assert dependency["native_fe_metal_partition_count"] == 0
+    assert (
+        dependency["native_fe_partition_basis"]["status"]
+        == "missing_fe_drain_vapor_partition"
+    )
+    assert "no committed native_fe_metal_partition transition" in (
+        dependency["native_fe_partition_basis"]["status_reason"]
+    )
+
+
+def test_sso2_partition_basis_rejects_uncommitted_snapshot_diagnostic() -> None:
+    execution = _sso2_execution(
+        condensed_delta={(3, "SiO2"): 1.0},
+        ledger=_FakeSso2Ledger({
+            "terminal.drain_tap_material": {"Fe": 1.0},
+        }),
+        snapshot_partition_commit_status="refused",
+    )
+
+    dependency = sso2_owner_recipe_evidence(execution)[
+        "fe_drain_vapor_partition_dependency"
+    ]
+
+    assert dependency["status"] == "missing_fe_drain_vapor_partition"
+    assert dependency["native_fe_saturation_split_count"] == 1
+    assert (
+        dependency["native_fe_partition_basis"]["status"]
+        == "missing_fe_drain_vapor_partition"
+    )
+    assert dependency["native_fe_partition_basis"][
+        "native_fe_split_commit_status"
+    ] == "refused"
+    assert "lacks a committed split" in (
+        dependency["native_fe_partition_basis"]["status_reason"]
+    )
 
 
 def test_sso2_evidence_negative_condensed_kg_fails_closed_without_raise() -> None:
