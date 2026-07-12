@@ -23,6 +23,8 @@ Branch One (full MRE to 2.5 V): 2650-4050 kWh total.
 
 from __future__ import annotations
 
+import math
+
 from simulator.core import (
     EnergyRecord, EvaporationFlux, MeltState, OverheadGas,
 )
@@ -74,8 +76,13 @@ class EnergyTracker:
         # which already accounts for turbine capacity capping (Loop 2).
         # Vented O₂ doesn't consume compression energy.
         # Fallback to estimate if shaft power not set.
-        if overhead.turbine_shaft_power_kW > 0:
-            record.turbine_kWh = overhead.turbine_shaft_power_kW  # kW × 1 hr = kWh
+        shaft_power_kW = float(overhead.turbine_shaft_power_kW)
+        if not math.isfinite(shaft_power_kW) or shaft_power_kW < 0.0:
+            raise ValueError(
+                "overhead.turbine_shaft_power_kW must be non-negative and finite"
+            )
+        if shaft_power_kW > 0:
+            record.turbine_kWh = shaft_power_kW  # kW × 1 hr = kWh
         else:
             # Legacy fallback: ~20 kWh per tonne O₂
             O2_kg_hr = overhead.turbine_flow_kg_hr * 0.3

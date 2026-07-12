@@ -316,6 +316,65 @@ def test_heat_flow_decomposition_omits_gas_cooling_terms():
     assert result["heat_flows_kW"]["net_unallocated"]["value"] is not None
 
 
+def test_cold_skull_active_extraction_is_an_explicit_heat_flow_sink():
+    result = thermal_budget_decomposition(
+        **BASE_THERMAL_BUDGET_ARGS,
+        heat_in_kW=100.0,
+        feed_sensible_fusion_enthalpy_kW=0.0,
+        reaction_disproportionation_enthalpy_kW=0.0,
+        product_vapor_enthalpy_kW=0.0,
+        melt_T_C=1000.0,
+        melt_surface_area_m2=1.0,
+    )
+
+    active = result["cold_skull"]["cold_skull_cooling_flux_kW_min"]
+    assert result["heat_flows_kW"]["cold_skull_active_extraction_sink"][
+        "value"
+    ] == pytest.approx(active)
+    sinks = sum(
+        term["value"]
+        for name, term in result["heat_flows_kW"].items()
+        if name not in {"heat_in", "net_unallocated"}
+    )
+    assert result["heat_flows_kW"]["net_unallocated"]["value"] == pytest.approx(
+        100.0 - sinks
+    )
+
+
+def test_missing_heat_flow_cannot_be_retagged_as_cited():
+    result = thermal_budget_decomposition(
+        **BASE_THERMAL_BUDGET_ARGS,
+        source_tags={
+            "heat_in": {"status": CITED, "source": "fabricated citation"}
+        },
+    )
+
+    assert result["heat_flows_kW"]["heat_in"] == {
+        "value": None,
+        "unit": "kW",
+        "status": UNCERTIFIED,
+        "source": "not supplied",
+    }
+
+
+def test_reverse_conduction_and_radiation_remain_signed_diagnostics():
+    result = thermal_budget_decomposition(
+        wall_area_m2=1.0,
+        wall_thickness_m=0.10,
+        wall_conductivity_W_m_K=1.0,
+        wall_inner_solidus_T_C=100.0,
+        wall_outer_T_C=200.0,
+        T_sky_K=600.0,
+        view_factor=1.0,
+        melt_T_C=100.0,
+        melt_surface_area_m2=1.0,
+    )
+
+    assert result["cold_skull"]["q_to_wall_kW_per_m2"] < 0.0
+    assert result["cold_skull"]["outer_wall_radiative_capacity_kW_per_m2"] < 0.0
+    assert result["heat_flows_kW"]["melt_surface_radiative_loss"]["value"] < 0.0
+
+
 def test_furnace_material_context_marks_missing_conductivity_uncertified():
     context = furnace_material_context("sintered_regolith")
 
@@ -327,3 +386,23 @@ def test_furnace_material_context_marks_missing_conductivity_uncertified():
     assert "not a certified refractory hot-face" in context["max_service_T_C"]["caveat"]
     assert context["grounding"]["tier"] == "proxy-sintering"
     assert "WARN-tier" in context["source_note"]
+
+
+def test_injected_furnace_catalog_is_not_labeled_as_canonical_evidence():
+    context = furnace_material_context(
+        "fixture",
+        catalog={
+            "furnace_materials": {
+                "fixture": {
+                    "display_name": "Fixture",
+                    "max_service_T_C": 1400.0,
+                    "conductivity_W_m_K": 2.0,
+                }
+            }
+        },
+    )
+
+    assert context["max_service_T_C"]["status"] == ASSUMED
+    assert context["conductivity_W_m_K"]["status"] == ASSUMED
+    assert "caller-supplied" in context["max_service_T_C"]["source"]
+    assert "caller-supplied" in context["conductivity_W_m_K"]["source"]

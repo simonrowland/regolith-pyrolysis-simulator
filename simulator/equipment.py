@@ -85,6 +85,7 @@ class PipeSpec:
 class CondenserSpec:
     """Single condensation stage sizing."""
     stage_number: int = 0
+    stage_name: str = ""
     volume_m3: float = 0.0
     surface_area_m2: float = 0.0
     n_baffles: int = 0
@@ -163,6 +164,20 @@ class EquipmentDesigner:
     MELT_CP_J_KG_K = 1200.0          # Heat capacity of silicate melt
     # provenance: melt emissivity — REF-047 coefficient_note; engineering default for hot silicates.
     MELT_EMISSIVITY = 0.85            # Radiative emissivity
+    CONDENSER_STAGE_NUMBER_BY_NAME = {
+        "fe_stage1": 1,
+        "stage_1": 1,
+        "stage1": 1,
+        "sio_stage3": 3,
+        "stage_3": 3,
+        "stage3": 3,
+        "alkali_stage4": 4,
+        "stage_4": 4,
+        "stage4": 4,
+        "terminal": 7,
+        "stage_7": 7,
+        "stage7": 7,
+    }
 
     def __init__(self, setpoints: Optional[Mapping[str, Any]] = None) -> None:
         self.setpoints = dict(setpoints or {})
@@ -211,11 +226,11 @@ class EquipmentDesigner:
             math.pi * design.pipe.diameter_m**2 / 4.0
             * design.pipe.length_m
         )
-        crucible_freeboard_m3 = (
-            design.crucible.volume_m3
-            * design.crucible.freeboard_pct / 100.0
+        crucible_freeboard_m3 = self._crucible_freeboard_volume_m3(
+            design.crucible
         )
         design.headspace_volume_m3 = crucible_freeboard_m3 + pipe_volume_m3
+        design.condensers = self._condenser_specs(design.pipe)
 
         design.turbine = self.size_turbine(mass_kg)
         design.volatiles_train = self.size_volatiles_train(mass_kg, feedstock)
@@ -270,9 +285,18 @@ class EquipmentDesigner:
             conductance_kg_s=0.0,
             max_transport_g_s=0.0,
         )
-        design.headspace_volume_m3 = (
-            design.crucible.volume_m3 * design.crucible.freeboard_pct / 100.0
+        # Each declared segment contributes its own cylindrical gas volume;
+        # surface-area-equivalent pipe dimensions are not volume-equivalent
+        # when segment diameters differ.
+        pipe_volume_m3 = sum(
+            math.pi * (segment.inner_diameter_m / 2.0) ** 2 * segment.length_m
+            for segment in segments
         )
+        design.headspace_volume_m3 = (
+            self._crucible_freeboard_volume_m3(design.crucible)
+            + pipe_volume_m3
+        )
+        design.condensers = self._condenser_specs(design.pipe)
         design.turbine = self.size_turbine(batch_mass_kg)
         design.volatiles_train = self.size_volatiles_train(batch_mass_kg, feedstock)
         design.buffer_tank = self.size_buffer_tanks(batch_mass_kg)
@@ -355,6 +379,12 @@ class EquipmentDesigner:
         Require C ≥ peak_evap_rate / acceptable_pressure_drop.
         Reference: 12 cm pipe handles 7-16 g/s SiO at 10 mbar.
         """
+        # EQ-3 uses absolute upstream pressure against vacuum; a signed gauge
+        # value cannot be squared without destroying its physical meaning.
+        pressure_mbar = float(pressure_mbar)
+        if not math.isfinite(pressure_mbar) or pressure_mbar <= 0.0:
+            raise ValueError("pressure_mbar must be a positive finite value")
+
         # Scale pipe diameter with batch size
         # Reference: 12 cm for 1 tonne
         scale = (peak_evap_rate_kg_s / 0.010) ** 0.25
@@ -392,8 +422,12 @@ class EquipmentDesigner:
         )
 
     def _condenser_geometry_config(self) -> Mapping[str, Any]:
-        config = self.setpoints.get("condenser_geometry", {})
-        return config if isinstance(config, Mapping) else {}
+        if "condenser_geometry" not in self.setpoints:
+            return {}
+        config = self.setpoints["condenser_geometry"]
+        if not isinstance(config, Mapping):
+            raise ValueError("condenser_geometry must be a mapping")
+        return config
 
     @staticmethod
     def _config_value(value: Any) -> Any:
@@ -412,20 +446,62 @@ class EquipmentDesigner:
         return result
 
     def _configured_initial_throat_area_m2(self) -> float | None:
-        return self._positive_float_or_none(
-            self._condenser_geometry_config().get("initial_throat_area_m2")
-        )
+        config = self._condenser_geometry_config()
+        if "initial_throat_area_m2" not in config:
+            return None
+        area = self._positive_float_or_none(config["initial_throat_area_m2"])
+        if area is None:
+            raise ValueError(
+                "condenser_geometry.initial_throat_area_m2 must be a positive "
+                "finite value"
+            )
+        return area
 
     def _condenser_stage_area_ratios(self) -> Dict[str, float]:
-        raw = self._condenser_geometry_config().get("stage_area_ratios", {})
+        config = self._condenser_geometry_config()
+        raw = config.get("stage_area_ratios", {})
         if not isinstance(raw, Mapping):
-            return {}
+            raise ValueError("condenser_geometry.stage_area_ratios must be a mapping")
         ratios: Dict[str, float] = {}
         for stage, value in raw.items():
             ratio = self._positive_float_or_none(value)
-            if ratio is not None:
-                ratios[str(stage)] = ratio
+            # A_stage = A_throat * ratio. The declared throat remains the
+            # constriction only when every downstream ratio is at least one.
+            if ratio is None or ratio < 1.0:
+                raise ValueError(
+                    "condenser_geometry.stage_area_ratios values must be finite "
+                    "and >= 1.0"
+                )
+            ratios[str(stage)] = ratio
         return ratios
+
+    @staticmethod
+    def _crucible_freeboard_volume_m3(crucible: CrucibleSpec) -> float:
+        # volume_m3 is already total capacity: V_total = V_melt * (1 + f).
+        # Therefore V_freeboard = V_total * f / (1 + f), not V_total * f.
+        fraction = crucible.freeboard_pct / 100.0
+        return crucible.volume_m3 * fraction / (1.0 + fraction)
+
+    @staticmethod
+    def _condenser_stage_number(stage: str, fallback: int) -> int:
+        return EquipmentDesigner.CONDENSER_STAGE_NUMBER_BY_NAME.get(
+            str(stage), fallback
+        )
+
+    @staticmethod
+    def _condenser_specs(pipe: PipeSpec) -> List[CondenserSpec]:
+        return [
+            CondenserSpec(
+                stage_number=EquipmentDesigner._condenser_stage_number(
+                    stage, index
+                ),
+                stage_name=stage,
+                surface_area_m2=pipe.initial_throat_area_m2 * ratio,
+            )
+            for index, (stage, ratio) in enumerate(
+                pipe.stage_area_ratios.items(), start=1
+            )
+        ]
 
     def size_turbine(self, mass_kg: float) -> TurbineSpec:
         """

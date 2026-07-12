@@ -11,6 +11,11 @@ FEEDSTOCK = "lunar_mare_low_ti"
 NA_DOSE_KG = 12.0
 HOT_HOLD_C = 1750.0
 MASS_BALANCE_MAX_PCT = 5e-12
+METAL_PHASE_FE_ACCOUNTS = (
+    "process.metal_phase",
+    "process.metal_phase_bottom_pool",
+    "process.metal_phase_float_layer",
+)
 # 2026-07-02 SSO-R ch1(+1c): conserved fO2 integrator + Kress91 isochemical
 # T re-referencing replace the per-tick intrinsic-fO2 heuristic re-seed.
 # Staged wall SiO shifts -7.1% (2.9403e-4 -> 2.7316e-4); correction-class.
@@ -54,15 +59,32 @@ def _run_script(lines: list[str]):
     return runner.session._sim
 
 
-def _run_staged():
-    return _run_script([
+def _complete_recommended_path(runner: SessionScriptRunner) -> None:
+    for _ in range(8):
+        sim = runner.session._sim
+        if sim.is_complete():
+            return
+        decision = sim.pending_decision
+        if decision is None:
+            return
+        sim.apply_decision(decision.decision_type, decision.recommendation)
+        runner.execute(shlex.split("advance 96"), "advance 96")
+
+
+def _run_staged(*, complete: bool = False):
+    runner = SessionScriptRunner()
+    for line in [
         (
             f"start --feedstock={FEEDSTOCK} --campaign=C2A_staged "
             f"--additive=Na={NA_DOSE_KG}"
         ),
         f"adjust campaign_override C2A_staged hold_temp_C {HOT_HOLD_C}",
         "advance 30",
-    ])
+    ]:
+        runner.execute(shlex.split(line), line)
+    if complete:
+        _complete_recommended_path(runner)
+    return runner.session._sim
 
 
 def _run_continuous():
@@ -82,6 +104,13 @@ def _fe_element_kg(oxides_kg: dict[str, float]) -> float:
     )
 
 
+def _metal_phase_fe_kg(sim) -> float:
+    return sum(
+        sim.atom_ledger.kg_by_account(account).get("Fe", 0.0)
+        for account in METAL_PHASE_FE_ACCOUNTS
+    )
+
+
 def _max_mass_balance_pct(sim) -> float:
     return max(abs(s.mass_balance_error_pct) for s in sim.record.snapshots)
 
@@ -97,7 +126,7 @@ def _cumulative_transition_imbalance_kg(sim) -> float:
 def _staged_metrics(sim) -> tuple[float, ...]:
     products = sim.product_ledger()
     initial_fe = _fe_element_kg(sim.record.snapshots[0].inventory.raw_components_kg)
-    shuttle_fe = sim.atom_ledger.kg_by_account("process.metal_phase").get("Fe", 0.0)
+    shuttle_fe = _metal_phase_fe_kg(sim)
     sio_stage = sim.train.stages[3].collected_kg
     return (
         round(products.get("Fe", 0.0) / initial_fe, 8),
@@ -107,63 +136,23 @@ def _staged_metrics(sim) -> tuple[float, ...]:
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "Premise (thermal Fe plateaus at an ~86% ceiling that the Na/K shuttle then "
-        "breaks) is an artifact of the OLD forward-Euler evaporation integrator, which "
-        "over-extracted by dumping the whole pool when flux*dt>pool. The sub-tick "
-        "analytic depletion (2026-05-21, merged b84a4af) is PHYSICS-CORRECT (codex "
-        "review b2ndlns3w: no regression, conservation proven, integration-only) and "
-        "shows there is NO real thermal ceiling -- with enough dwell FeO depletes "
-        "toward ~0. That full-depletion is itself UNPHYSICAL because the evaporation "
-        "flux is not gated on liquidus/liquid_fraction (pre-existing model gap: "
-        "core.py:3487/3500 gate only on campaign+temperature; AlphaMELTS liquidus is "
-        "diagnostic-only, core.py:2026-2028): as Na2O/K2O/SiO2/FeO (melting-point "
-        "depressants) boil off, liquidus rises and at fixed furnace T the pot freezes, "
-        "trapping a residual floor. Re-enabling this acceptance requires the "
-        "liquidus-gating follow-up chunk (gate flux on SILICATE_LIQUIDUS/"
-        "liquid_fraction before EVAPORATION_FLUX) to establish the real freezing-floor "
-        "residual and the shuttle's residual-clearing role. Do NOT retune to ~100% or "
-        "to the floorless finite-cut value -- both are artifacts."
-    ),
-)
-def test_c2a_staged_recipe_separates_products_and_k_shuttle_breaks_fe_ceiling():
-    sim = _run_staged()
-    products = sim.product_ledger()
-    initial_fe = _fe_element_kg(sim.record.snapshots[0].inventory.raw_components_kg)
-    shuttle_fe = sim.atom_ledger.kg_by_account("process.metal_phase").get("Fe", 0.0)
-    thermal_fe = products.get("Fe", 0.0) - shuttle_fe
+@pytest.fixture(scope="module")
+def staged_ceiling_case():
+    return _run_staged(complete=True)
 
-    alkali_snapshots = [
-        s for s in sim.record.snapshots
-        if s.campaign.name == "C2A_STAGED" and s.temperature_C <= 1250.0
-    ]
-    sio_snapshots = [
-        s for s in sim.record.snapshots
-        if (
-            s.campaign.name == "C2A_STAGED"
-            and 1250.0 < s.temperature_C < 1700.0
-        )
-    ]
-    hot_snapshots = [
-        s for s in sim.record.snapshots
-        if s.campaign.name == "C2A_STAGED" and s.temperature_C >= HOT_HOLD_C
-    ]
+
+def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
+    staged_ceiling_case,
+):
+    sim = staged_ceiling_case
+    shuttle_fe = _metal_phase_fe_kg(sim)
     shuttle_snapshots = [
         s for s in sim.record.snapshots
         if s.shuttle_phase == "inject" and s.shuttle_metal_produced_kg_hr > 0.0
     ]
-
-    alkali_kg = sum(
-        s.evap_flux.species_kg_hr.get("Na", 0.0)
-        + s.evap_flux.species_kg_hr.get("K", 0.0)
-        for s in alkali_snapshots
+    shuttle_produced_kg = sum(
+        snapshot.shuttle_metal_produced_kg_hr for snapshot in shuttle_snapshots
     )
-    sio_kg = sum(s.evap_flux.species_kg_hr.get("SiO", 0.0)
-                 for s in sio_snapshots)
-    hot_fe_kg = sum(s.evap_flux.species_kg_hr.get("Fe", 0.0)
-                    for s in hot_snapshots)
 
     assert sim.is_complete()
     assert sim.record.additives_kg["Na"] == pytest.approx(NA_DOSE_KG)
@@ -172,15 +161,33 @@ def test_c2a_staged_recipe_separates_products_and_k_shuttle_breaks_fe_ceiling():
     assert sim.campaign_mgr.overrides["C2A_staged"]["hold_temp_C"] == pytest.approx(
         HOT_HOLD_C
     )
-    assert alkali_kg > 3.0
-    assert sio_kg > 3.0
-    assert hot_fe_kg > 100.0
-    assert 0.84 <= thermal_fe / initial_fe <= 0.90
-    assert products.get("Fe", 0.0) / initial_fe >= 0.90
+    assert shuttle_snapshots
+    assert shuttle_produced_kg > 10.0
     assert shuttle_fe > 10.0
     assert max(s.temperature_C for s in shuttle_snapshots) < 1200.0
     assert _max_mass_balance_pct(sim) < MASS_BALANCE_MAX_PCT
     assert _cumulative_transition_imbalance_kg(sim) < 1e-6
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "Premise (thermal Fe plateaus at an ~86% ceiling that the Na/K shuttle then "
+        "breaks) is an artifact of the OLD forward-Euler evaporation integrator. "
+        "Re-enabling this one acceptance requires liquid-fraction-gated evaporation "
+        "to establish a physical freezing-floor residual; do not retune the ceiling."
+    ),
+)
+def test_c2a_staged_thermal_fe_ceiling_pending_liquid_fraction_gate(
+    staged_ceiling_case,
+):
+    sim = staged_ceiling_case
+    products = sim.product_ledger()
+    initial_fe = _fe_element_kg(sim.record.snapshots[0].inventory.raw_components_kg)
+    shuttle_fe = _metal_phase_fe_kg(sim)
+    thermal_fe = products.get("Fe", 0.0) - shuttle_fe
+
+    assert 0.84 <= thermal_fe / initial_fe <= 0.90
 
 
 def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():

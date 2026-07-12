@@ -135,6 +135,79 @@ def canonical_stage_area_key(stage: Any) -> str:
         stage, _STAGE_AREA_ALIASES.get(str(stage), str(stage)))
 
 
+def _config_value(value: Any) -> Any:
+    if isinstance(value, Mapping) and 'value' in value:
+        return value.get('value')
+    return value
+
+
+def _required_positive_finite_float(
+    value: Any,
+    field_name: str,
+    *,
+    minimum: float = 0.0,
+) -> float:
+    try:
+        result = float(_config_value(value))
+    except (TypeError, ValueError) as exc:
+        raise OverheadConfigurationError(
+            f'{field_name} must be a positive finite value'
+        ) from exc
+    if not math.isfinite(result) or result <= 0.0 or result < minimum:
+        if minimum > 0.0:
+            raise OverheadConfigurationError(
+                f'{field_name} values must be finite and >= {minimum:g}'
+            )
+        raise OverheadConfigurationError(
+            f'{field_name} must be a positive finite value'
+        )
+    return result
+
+
+def validate_condenser_geometry_config(config: Mapping | None) -> dict[str, Any]:
+    """Fail closed and canonicalize condenser geometry before model use."""
+
+    if config is None:
+        return {}
+    if not isinstance(config, Mapping):
+        raise OverheadConfigurationError('condenser_geometry must be a mapping')
+
+    resolved = dict(config)
+    if 'initial_throat_area_m2' in resolved:
+        _required_positive_finite_float(
+            resolved['initial_throat_area_m2'],
+            'condenser_geometry.initial_throat_area_m2',
+        )
+
+    raw_ratios = resolved.get('stage_area_ratios', {})
+    if not isinstance(raw_ratios, Mapping):
+        raise OverheadConfigurationError(
+            'condenser_geometry.stage_area_ratios must be a mapping'
+        )
+    ratios: dict[str, Any] = {}
+    for raw_stage, raw_ratio in raw_ratios.items():
+        stage = _stage_area_key(raw_stage)
+        ratio = _required_positive_finite_float(
+            raw_ratio,
+            'condenser_geometry.stage_area_ratios',
+            minimum=1.0,
+        )
+        ratios[stage] = ratio
+    resolved['stage_area_ratios'] = ratios
+
+    raw_sources = resolved.get('stage_area_ratio_sources')
+    if raw_sources is not None:
+        if not isinstance(raw_sources, Mapping):
+            raise OverheadConfigurationError(
+                'condenser_geometry.stage_area_ratio_sources must be a mapping'
+            )
+        resolved['stage_area_ratio_sources'] = {
+            _stage_area_key(stage): source
+            for stage, source in raw_sources.items()
+        }
+    return resolved
+
+
 def _stage_area_key(stage: Any) -> str:
     return canonical_stage_area_key(stage)
 
@@ -334,7 +407,7 @@ class OverheadGasModel:
     def configure_condenser_geometry(self, config: Mapping) -> None:
         """Resolve throat area and per-stage area ratios from setpoints."""
 
-        source = dict(config or {}) if isinstance(config, Mapping) else {}
+        source = validate_condenser_geometry_config(config)
         throat_area = self._optional_positive_float(
             self._config_value(source.get('initial_throat_area_m2')),
             DEFAULT_INITIAL_THROAT_AREA_M2,

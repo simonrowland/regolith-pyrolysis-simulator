@@ -138,6 +138,24 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
     )
 
 
+@pytest.mark.parametrize(
+    "setpoints",
+    [
+        "malformed outer block",
+        ["malformed outer block"],
+        {"mre_voltage_sequence": "malformed ladder block"},
+        {"mre_voltage_sequence": ["malformed ladder block"]},
+    ],
+)
+def test_unusable_mre_yaml_blocks_use_documented_fallback(setpoints):
+    sequence = mre_ladder.build_mre_voltage_sequence(setpoints)
+
+    assert sequence
+    assert _voltage_pairs(sequence) == _voltage_pairs(
+        mre_ladder.MRE_VOLTAGE_LADDER_FALLBACK
+    )
+
+
 def test_authoritative_mre_voltage_reference_matches_ellingham_graph():
     cr = mre_ladder.mre_decomposition_voltage_reference(
         "Cr2O3",

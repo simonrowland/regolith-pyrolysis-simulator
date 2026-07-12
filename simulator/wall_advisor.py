@@ -271,8 +271,8 @@ def advise_wall_materials(
     assessments = []
     for material_id, entry in data["materials"].items():
         service_temp = _service_temperature(entry["service_temp"])
-        limiting_temperature_C = service_temp.max_operating_C
-        temp_ok = limiting_temperature_C is not None and temperature_C <= limiting_temperature_C
+        limiting_temperature_C = _limiting_service_temperature_C(service_temp)
+        temp_ok = _service_temperature_allows(service_temp, temperature_C)
         material_exchange = reactive_exchange.get(material_id) or {}
         species_assessments = {
             name: _species_assessment(name, entry, material_exchange, operating_point)
@@ -335,6 +335,8 @@ def _resolve_zone_temperature(
 
 
 def _service_temperature(cell: dict[str, Any]) -> WallServiceTemperature:
+    if not isinstance(cell, dict):
+        raise ValueError("wall material service_temp must be a mapping")
     return WallServiceTemperature(
         continuous_C=_optional_float(cell.get("continuous_C")),
         max_operating_C=_optional_float(cell.get("max_operating_C")),
@@ -343,6 +345,35 @@ def _service_temperature(cell: dict[str, Any]) -> WallServiceTemperature:
         evidence=str(cell.get("evidence", "uncharacterized")),
         citations=tuple(cell.get("citations") or ()),
         note=str(cell.get("note") or ""),
+    )
+
+
+def _limiting_service_temperature_C(
+    service_temp: WallServiceTemperature,
+) -> float | None:
+    # No exposure duration is supplied to the advisor. Continuous service is
+    # therefore the governing envelope; peak/max ratings cannot certify an
+    # unspecified-duration use. Degradation onset is an independent hard gate.
+    if service_temp.continuous_C is None:
+        return None
+    limits = [service_temp.continuous_C]
+    if service_temp.max_operating_C is not None:
+        limits.append(service_temp.max_operating_C)
+    if service_temp.degradation_onset_C is not None:
+        limits.append(service_temp.degradation_onset_C)
+    return min(limits)
+
+
+def _service_temperature_allows(
+    service_temp: WallServiceTemperature,
+    temperature_C: float,
+) -> bool:
+    limit = _limiting_service_temperature_C(service_temp)
+    if limit is None or temperature_C > limit:
+        return False
+    return (
+        service_temp.degradation_onset_C is None
+        or temperature_C < service_temp.degradation_onset_C
     )
 
 
@@ -562,4 +593,7 @@ def _max_rank(current: str, candidate: str | None, ranks: dict[str, int]) -> str
 def _optional_float(value: Any) -> float | None:
     if value is None:
         return None
-    return float(value)
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("wall service temperature values must be finite")
+    return number

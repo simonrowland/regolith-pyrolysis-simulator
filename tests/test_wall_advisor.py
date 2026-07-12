@@ -24,12 +24,48 @@ def test_wall_material_service_temp_below_zone_temperature_is_gated_out():
     fused_silica = _material(results, "fused_silica")
 
     assert fused_silica.temp_ok is False
-    assert fused_silica.limiting_temperature_C == 1200
+    assert fused_silica.limiting_temperature_C == 1000
     assert fused_silica.rollup == "temperature-limited"
 
 
+def test_wall_material_uses_continuous_and_degradation_limits_without_duration():
+    results = advise_wall_materials([], zone_temperature_C=1100)
+
+    fused_silica = _material(results, "fused_silica")
+
+    assert fused_silica.service_temp.continuous_C == 1050
+    assert fused_silica.service_temp.max_operating_C == 1200
+    assert fused_silica.service_temp.peak_C == 1250
+    assert fused_silica.service_temp.degradation_onset_C == 1000
+    assert fused_silica.limiting_temperature_C == 1000
+    assert fused_silica.temp_ok is False
+    assert fused_silica.rollup == "temperature-limited"
+
+
+def test_wall_material_refuses_at_degradation_onset_boundary():
+    results = advise_wall_materials([], zone_temperature_C=1000)
+
+    fused_silica = _material(results, "fused_silica")
+
+    assert fused_silica.service_temp.degradation_onset_C == 1000
+    assert fused_silica.temp_ok is False
+    assert fused_silica.rollup == "temperature-limited"
+
+
+def test_transient_max_does_not_override_dense_alumina_continuous_rating():
+    results = advise_wall_materials([], zone_temperature_C=1800)
+
+    dense_alumina = _material(results, "dense_alumina")
+
+    assert dense_alumina.service_temp.continuous_C == 1700
+    assert dense_alumina.service_temp.max_operating_C > 1800
+    assert dense_alumina.limiting_temperature_C == 1700
+    assert dense_alumina.temp_ok is False
+    assert dense_alumina.rollup == "temperature-limited"
+
+
 def test_uncharacterized_wall_cell_surfaces_without_substituted_rating():
-    results = advise_wall_materials(["SiO"], zone_temperature_C=1000)
+    results = advise_wall_materials(["SiO"], zone_temperature_C=999)
 
     fused_silica = _material(results, "fused_silica")
     sio = fused_silica.species["SiO"]
@@ -57,7 +93,7 @@ def test_characterized_wall_cell_surfaces_data_value_and_evidence():
 
 
 def test_unknown_active_vapor_species_is_uncharacterized_not_inferred():
-    results = advise_wall_materials(["Mg"], zone_temperature_C=1000)
+    results = advise_wall_materials(["Mg"], zone_temperature_C=999)
 
     fused_silica = _material(results, "fused_silica")
     mg = fused_silica.species["Mg"]
@@ -69,7 +105,7 @@ def test_unknown_active_vapor_species_is_uncharacterized_not_inferred():
 
 
 def test_mixed_active_species_fused_silica_flags_known_hazard_over_holes():
-    results = advise_wall_materials(["Na", "SiO"], zone_temperature_C=1000)
+    results = advise_wall_materials(["Na", "SiO"], zone_temperature_C=999)
 
     fused_silica = _material(results, "fused_silica")
     alkali = fused_silica.species["alkali"]
@@ -130,7 +166,7 @@ def test_all_uncharacterized_active_species_cells_never_roll_up_usable(tmp_path)
 
     results = advise_wall_materials(
         ["Na", "SiO"],
-        zone_temperature_C=1000,
+        zone_temperature_C=999,
         data_path=data_path,
     )
 
@@ -190,7 +226,7 @@ def test_operating_point_rejects_non_finite_knobs(kwargs):
 
 
 def test_sic_reactive_verdict_flips_on_dosed_o2_excursion():
-    default_results = advise_wall_materials(["SiO"], zone_temperature_C=1000)
+    default_results = advise_wall_materials(["SiO"], zone_temperature_C=999)
     sic_default = _material(default_results, "silicon_carbide_coating")
     reactive_default = sic_default.species["SiO"].reactive
 
@@ -201,7 +237,7 @@ def test_sic_reactive_verdict_flips_on_dosed_o2_excursion():
     assert reactive_default.regime_raw == "reducing_vacuum"
 
     dosed_results = advise_wall_materials(
-        ["SiO"], zone_temperature_C=1000, pO2_mbar=9.0
+        ["SiO"], zone_temperature_C=999, pO2_mbar=9.0
     )
     sic_dosed = _material(dosed_results, "silicon_carbide_coating")
     reactive_dosed = sic_dosed.species["SiO"].reactive
@@ -218,7 +254,7 @@ def test_reactive_hazard_is_po2_keyed_and_survives_millibar_sweep():
     # A redox hazard (SiC active oxidation) does not vanish when the buffer
     # gas moves the transport regime from vacuum to millibar sweep.
     results = advise_wall_materials(
-        ["SiO"], zone_temperature_C=1000, pO2_mbar=0.0, p_buffer_mbar=9.0
+        ["SiO"], zone_temperature_C=999, pO2_mbar=0.0, p_buffer_mbar=9.0
     )
 
     sic = _material(results, "silicon_carbide_coating")
@@ -244,7 +280,7 @@ def test_uncharacterized_regime_hole_yields_fail_closed_verdict():
     # mzo_coating only carries reducing_vacuum rows; the dosed-O2 operating
     # point is a material x species x regime hole and must surface as
     # needs-experiment, never as a silent pass.
-    results = advise_wall_materials(["SiO"], zone_temperature_C=1000, pO2_mbar=9.0)
+    results = advise_wall_materials(["SiO"], zone_temperature_C=999, pO2_mbar=9.0)
 
     mzo = _material(results, "mzo_coating")
     reactive = mzo.species["SiO"].reactive
@@ -368,7 +404,7 @@ def test_air_provenance_reactive_rows_never_drive_a_verdict(tmp_path):
     # always pumped-down low-pO2, so it must stay provenance-only even at the
     # dosed-O2 (oxidizing) operating point it would otherwise match.
     results = advise_wall_materials(
-        ["SiO"], zone_temperature_C=1000, pO2_mbar=9.0, data_path=data_path
+        ["SiO"], zone_temperature_C=999, pO2_mbar=9.0, data_path=data_path
     )
     material = _material(results, "test_material")
 
@@ -393,7 +429,7 @@ def test_vacuum_only_stickiness_rows_are_pressure_gated(tmp_path):
     data_path = _write_pressure_gated_stickiness_data(tmp_path)
 
     vacuum_results = advise_wall_materials(
-        ["Fe"], zone_temperature_C=1000, data_path=data_path
+        ["Fe"], zone_temperature_C=999, data_path=data_path
     )
     vacuum = _material(vacuum_results, "test_material")
     vacuum_fe = vacuum.species["Fe"]
@@ -406,7 +442,7 @@ def test_vacuum_only_stickiness_rows_are_pressure_gated(tmp_path):
 
     sweep_results = advise_wall_materials(
         ["Fe"],
-        zone_temperature_C=1000,
+        zone_temperature_C=999,
         p_buffer_mbar=9.0,
         data_path=data_path,
     )
@@ -427,7 +463,7 @@ def test_unmapped_regime_value_fails_loud(tmp_path):
 
     with pytest.raises(ValueError, match="unmapped wall-materials regime"):
         advise_wall_materials(
-            ["SiO"], zone_temperature_C=1000, data_path=data_path
+            ["SiO"], zone_temperature_C=999, data_path=data_path
         )
 
     with pytest.raises(ValueError, match="unmapped wall-materials regime"):

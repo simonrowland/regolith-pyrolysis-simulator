@@ -56,6 +56,26 @@ def test_energy_tracker_adds_thermal_diagnostics_without_changing_mre_kwh():
     )
 
 
+@pytest.mark.parametrize(
+    "shaft_power_kW", [-1.0, float("nan"), float("inf"), float("-inf")]
+)
+def test_energy_tracker_rejects_invalid_turbine_shaft_power(shaft_power_kW):
+    tracker = EnergyTracker()
+    melt = MeltState(campaign=CampaignPhase.C2A)
+    overhead = OverheadGas(
+        turbine_shaft_power_kW=shaft_power_kW,
+        turbine_flow_kg_hr=100.0,
+    )
+
+    with pytest.raises(ValueError, match="turbine_shaft_power_kW"):
+        tracker.calculate_hour(
+            melt,
+            overhead,
+            EvaporationFlux(),
+            vapor_pressures=_na_vapor_pressures(),
+        )
+
+
 def test_hour_snapshot_exposes_decomposed_energy_total():
     energy = EnergyRecord(
         turbine_kWh=1.0,

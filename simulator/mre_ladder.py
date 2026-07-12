@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
@@ -328,7 +329,11 @@ def parse_mre_voltage_sequence_yaml(
     resolves through the graph-first canonical helper. Malformed entries
     are skipped.
     """
-    block = ((setpoints or {}).get('mre_voltage_sequence', {}) or {})
+    if not isinstance(setpoints, Mapping):
+        return []
+    block = setpoints.get('mre_voltage_sequence', {}) or {}
+    if not isinstance(block, Mapping):
+        return []
     entries = block.get('sequence', []) or []
     if not isinstance(entries, list):
         return []

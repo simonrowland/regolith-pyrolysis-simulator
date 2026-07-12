@@ -79,6 +79,43 @@ def test_runtime_condenser_geometry_override_is_allowed_and_consumed(
     assert sim.overhead_model.stage_area_ratios["terminal"] == pytest.approx(2.0)
 
 
+def test_invalid_runtime_condenser_geometry_refuses_before_campaign_mutation(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.start_campaign(CampaignPhase.C0)
+    before = {
+        "campaign": sim.melt.campaign,
+        "campaign_hour": sim.melt.campaign_hour,
+        "paused_for_decision": sim.paused_for_decision,
+        "pending_decision": sim.pending_decision,
+        "condenser_geometry": copy.deepcopy(
+            sim._overhead_condenser_geometry_config
+        ),
+        "stage_area_ratios": dict(sim.overhead_model.stage_area_ratios),
+    }
+    sim.campaign_mgr.overrides["C2A"] = {
+        "condenser_geometry": {
+            "stage_area_ratios": {"fe_stage1": 0.5},
+        },
+    }
+
+    with pytest.raises(ValueError, match="stage_area_ratios"):
+        sim.start_campaign(CampaignPhase.C2A)
+
+    assert sim.melt.campaign == before["campaign"]
+    assert sim.melt.campaign_hour == before["campaign_hour"]
+    assert sim.paused_for_decision == before["paused_for_decision"]
+    assert sim.pending_decision == before["pending_decision"]
+    assert sim._overhead_condenser_geometry_config == before["condenser_geometry"]
+    assert sim.overhead_model.stage_area_ratios == before["stage_area_ratios"]
+
+
 def test_runtime_condenser_geometry_stage_aliases_canonicalize_before_consumers(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):

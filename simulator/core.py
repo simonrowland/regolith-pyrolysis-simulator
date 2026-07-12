@@ -214,6 +214,8 @@ def _canonicalize_condenser_geometry_stage_keys(
 ) -> Dict[str, Any]:
     from simulator.overhead import canonical_stage_area_key
 
+    if not isinstance(config, Mapping):
+        raise ValueError('condenser_geometry must be a mapping')
     resolved = copy.deepcopy(dict(config or {}))
     for stage_map_key in (
         'stage_area_ratios',
@@ -2604,34 +2606,46 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _resolve_condenser_geometry_config(
         self, campaign: Optional[CampaignPhase] = None
     ) -> Dict[str, Any]:
+        from simulator.overhead import validate_condenser_geometry_config
+
         config = _canonicalize_condenser_geometry_stage_keys(
-            copy.deepcopy(dict(self.setpoints.get('condenser_geometry', {}) or {}))
+            copy.deepcopy(self.setpoints.get('condenser_geometry', {}) or {})
         )
         if campaign is not None:
             campaign_cfg = self.campaign_mgr._campaign_config(campaign)
             config = _deep_merge_condenser_geometry(
                 config,
                 _canonicalize_condenser_geometry_stage_keys(
-                    dict(campaign_cfg.get('condenser_geometry', {}) or {})
+                    campaign_cfg.get('condenser_geometry', {}) or {}
                 ),
             )
             runtime_override = self.campaign_mgr._campaign_overrides(campaign)
             config = _deep_merge_condenser_geometry(
                 config,
                 _canonicalize_condenser_geometry_stage_keys(
-                    dict(runtime_override.get('condenser_geometry', {}) or {})
+                    runtime_override.get('condenser_geometry', {}) or {}
                 ),
             )
-        return _canonicalize_condenser_geometry_stage_keys(config)
+        return validate_condenser_geometry_config(
+            _canonicalize_condenser_geometry_stage_keys(config)
+        )
 
     def _configure_overhead_headspace(
-        self, campaign: Optional[CampaignPhase] = None
+        self,
+        campaign: Optional[CampaignPhase] = None,
+        *,
+        headspace_config: Optional[Mapping[str, Any]] = None,
+        condenser_geometry_config: Optional[Mapping[str, Any]] = None,
     ) -> None:
-        self._overhead_headspace_config = (
-            self._resolve_overhead_headspace_config(campaign)
+        self._overhead_headspace_config = dict(
+            headspace_config
+            if headspace_config is not None
+            else self._resolve_overhead_headspace_config(campaign)
         )
-        self._overhead_condenser_geometry_config = (
-            self._resolve_condenser_geometry_config(campaign)
+        self._overhead_condenser_geometry_config = copy.deepcopy(
+            condenser_geometry_config
+            if condenser_geometry_config is not None
+            else self._resolve_condenser_geometry_config(campaign)
         )
         if self._overhead_model is not None:
             self._overhead_model.configure_condenser_geometry(
@@ -2655,10 +2669,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return config
 
     def _configure_freeze_gate(
-        self, campaign: Optional[CampaignPhase] = None
+        self,
+        campaign: Optional[CampaignPhase] = None,
+        *,
+        freeze_gate_config: Optional[Mapping[str, Any]] = None,
     ) -> None:
         previous_config = getattr(self, '_freeze_gate_config', None)
-        self._freeze_gate_config = self._resolve_freeze_gate_config(campaign)
+        self._freeze_gate_config = dict(
+            freeze_gate_config
+            if freeze_gate_config is not None
+            else self._resolve_freeze_gate_config(campaign)
+        )
         self._freeze_gate_liquid_fraction_cache = None
         if previous_config != self._freeze_gate_config:
             self._freeze_gate_liquid_fraction_curve_memo = {}
@@ -9464,6 +9485,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def start_campaign(self, campaign: CampaignPhase):
         """Begin a campaign phase.  Sets atmosphere, temp targets, etc."""
+        overhead_headspace_config = self._resolve_overhead_headspace_config(
+            campaign
+        )
+        condenser_geometry_config = self._resolve_condenser_geometry_config(
+            campaign
+        )
+        freeze_gate_config = self._resolve_freeze_gate_config(campaign)
+
         self.melt.campaign = campaign
         self.melt.campaign_hour = 0
         self.paused_for_decision = False
@@ -9482,8 +9511,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Configure atmosphere and targets from setpoints
         self.campaign_mgr.configure_campaign(self.melt, campaign)
         self.melt.validate_melt_pressures()
-        self._configure_overhead_headspace(campaign)
-        self._configure_freeze_gate(campaign)
+        self._configure_overhead_headspace(
+            campaign,
+            headspace_config=overhead_headspace_config,
+            condenser_geometry_config=condenser_geometry_config,
+        )
+        self._configure_freeze_gate(campaign, freeze_gate_config=freeze_gate_config)
         self._refresh_oxygen_reservoir_without_exchange(
             exchange_direction='none:campaign_start',
         )

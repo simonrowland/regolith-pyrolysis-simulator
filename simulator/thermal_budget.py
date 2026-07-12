@@ -313,9 +313,11 @@ def thermal_budget_decomposition(
     wall_outer_K = _c_to_k(wall_outer_T_C, "wall_outer_T_C")
     T_sky_K = _kelvin(T_sky_K, "T_sky_K")
 
+    # Fourier's law is signed on this inner-to-outer coordinate: reversing the
+    # temperature gradient reverses q instead of erasing the diagnostic.
     conductive_W_per_m2 = (
         wall_conductivity_W_m_K
-        * max(0.0, solidus_K - wall_outer_K)
+        * (solidus_K - wall_outer_K)
         / wall_thickness_m
     )
     wall_heat_kW_per_m2 = conductive_W_per_m2 / 1000.0
@@ -365,6 +367,7 @@ def thermal_budget_decomposition(
         ),
         "melt_surface_radiative_loss": melt_surface_radiative_loss_kW,
         "outer_wall_radiative_loss": outer_wall_radiative_kW,
+        "cold_skull_active_extraction_sink": cooling_kW,
     }
     heat_flows_kW["net_unallocated"] = _net_unallocated(heat_flows_kW)
 
@@ -481,7 +484,8 @@ def furnace_material_context(
 ) -> dict[str, Any]:
     """Return material max-service context and conductivity certification state."""
 
-    raw_catalog = catalog or load_furnace_materials()
+    catalog_is_canonical = catalog is None
+    raw_catalog = load_furnace_materials() if catalog_is_canonical else catalog
     items = raw_catalog.get("furnace_materials", raw_catalog)
     material = items.get(material_id)
     if not isinstance(material, Mapping):
@@ -493,16 +497,27 @@ def furnace_material_context(
     grounding_tier = str(grounding.get("tier") or "")
 
     conductivity = material.get("conductivity_W_m_K")
-    conductivity_status = CITED if conductivity is not None else UNCERTIFIED
+    conductivity_status = (
+        CITED
+        if catalog_is_canonical and conductivity is not None
+        else UNCERTIFIED if conductivity is None else ASSUMED
+    )
+    catalog_source = (
+        "data/furnace_materials.yaml"
+        if catalog_is_canonical
+        else "caller-supplied furnace-material catalog"
+    )
     conductivity_source = (
-        f"data/furnace_materials.yaml:{material_id}.conductivity_W_m_K"
+        f"{catalog_source}:{material_id}.conductivity_W_m_K"
         if conductivity is not None
-        else "data/furnace_materials.yaml has no conductivity_W_m_K field"
+        else f"{catalog_source} has no conductivity_W_m_K field"
     )
     max_service_status = (
-        CITED if material.get("max_service_T_C") is not None else UNCERTIFIED
+        CITED
+        if catalog_is_canonical and material.get("max_service_T_C") is not None
+        else UNCERTIFIED if material.get("max_service_T_C") is None else ASSUMED
     )
-    max_service_source = f"data/furnace_materials.yaml:{material_id}.max_service_T_C"
+    max_service_source = f"{catalog_source}:{material_id}.max_service_T_C"
     max_service_provenance = {
         "status": max_service_status,
         "source": max_service_source,
@@ -541,13 +556,14 @@ def _radiative_flux_kW_per_m2(
     emissivity: float,
     view_factor: float,
 ) -> float:
-    return max(
-        0.0,
+    # Net Stefan-Boltzmann exchange is signed; a hotter environment is a heat
+    # source (negative loss), not a zero-loss condition.
+    return (
         emissivity
         * STEFAN_BOLTZMANN
         * view_factor
         * (hot_K**4 - cold_K**4)
-        / 1000.0,
+        / 1000.0
     )
 
 
@@ -568,9 +584,13 @@ def _tagged_heat_term(
     value: float | None,
     tags: Mapping[str, Mapping[str, str]],
 ) -> dict[str, Any]:
-    status = UNCERTIFIED if value is None else ASSUMED
-    source = "not supplied" if value is None else "caller supplied"
-    return _figure(value, "kW", _tag(tags, key, status, source))
+    if value is None:
+        return _figure(
+            value,
+            "kW",
+            {"status": UNCERTIFIED, "source": "not supplied"},
+        )
+    return _figure(value, "kW", _tag(tags, key, ASSUMED, "caller supplied"))
 
 
 def _vapor_metadata(
