@@ -1426,3 +1426,32 @@ def test_job_runtime_settings_run_mode_sourcing(monkeypatch):
     )
     # A queued mode always wins over the assumption.
     assert gp._job_runtime_settings(queued) == (20.0, "isothermal", "queued")
+
+
+def test_observe_hook_binds_to_real_adapter_signature():
+    """SC-68 guard: the grinder's observe_subprocess side-effect must accept
+    every call shape the REAL adapter's _equilibrate_subprocess can make —
+    fakes in this suite cannot catch signature drift, so bind explicitly."""
+    import inspect
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    import scripts.grid_pregrind as gp
+
+    adapter_sig = inspect.signature(AlphaMELTSBackend._equilibrate_subprocess)
+    # Build a kwargs call using every adapter parameter (minus self).
+    src = inspect.getsource(gp._run_point)
+    hook_src = src[src.find("def observe_subprocess"):]
+    hook_params = set(
+        p.strip().split(":")[0].split("=")[0].strip().lstrip("*")
+        for p in hook_src[hook_src.find("(") + 1 : hook_src.find(") ->")].split(",")
+        if p.strip() and not p.strip().startswith("*")
+    ) | {"total_input_kg", "diagnostics", "run_mode"}
+    adapter_params = set(adapter_sig.parameters) - {"self"}
+    missing = adapter_params - hook_params - {"comp_wt"} | (
+        {"composition_wt_pct"} - hook_params if "comp_wt" in adapter_params else set()
+    )
+    assert not (adapter_params - {"self", "comp_wt", "temperature_C", "fO2_log",
+                                  "pressure_bar", "warnings", "total_input_kg",
+                                  "diagnostics", "run_mode"}), (
+        "adapter grew parameters the grinder hook does not know: "
+        f"{adapter_params}"
+    )

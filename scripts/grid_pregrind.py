@@ -999,6 +999,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
         pressure_bar: float,
         warnings: Sequence[str] | None = None,
         *,
+        total_input_kg: float | None = None,
         diagnostics: Mapping[str, Any] | None = None,
         run_mode: Any,
     ) -> Any:
