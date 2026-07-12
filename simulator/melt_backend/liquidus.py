@@ -30,12 +30,44 @@ from simulator.melt_backend.base import LiquidFractionInvalidError
 #   900 << 101 min so the aggregate still bounds the spinel-hang class.
 # Unit check: all terms in seconds; product is seconds.
 DEFAULT_LIQUIDUS_FINDER_BUDGET_S = 900.0
+MAX_LIQUIDUS_SCAN_POINTS = 100_000
+LIQUIDUS_REFUSAL_STATUSES = frozenset({
+    'not_converged',
+    'out_of_domain',
+    'unavailable',
+})
+
+
+class LiquidusSampleError(RuntimeError):
+    """Typed backend sample rejection preserved through the finder."""
+
+    def __init__(
+        self,
+        status: str,
+        warnings: tuple[str, ...],
+        diagnostics: Mapping[str, Any],
+    ) -> None:
+        self.status = str(status)
+        if self.status not in LIQUIDUS_REFUSAL_STATUSES:
+            raise ValueError(
+                'LiquidusSampleError status must be a canonical refusal: '
+                f'{self.status!r}'
+            )
+        self.warnings = tuple(str(warning) for warning in warnings)
+        self.diagnostics = dict(diagnostics or {})
+        super().__init__('; '.join(self.warnings) or self.status)
 
 
 @dataclass(frozen=True)
 class MeltFractionSample:
     temperature_C: float
     frac_M: float
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, 'temperature_C', float(self.temperature_C))
+        object.__setattr__(self, 'frac_M', float(self.frac_M))
+        _validate_temperature_C(self.temperature_C, 'sample_temperature_C')
+        _validate_optional_fraction(self.frac_M, 'sample_frac_M')
 
 
 @dataclass(frozen=True)
@@ -69,9 +101,31 @@ class LiquidusSolidusResult:
             )
         object.__setattr__(self, 'status', str(self.status))
         object.__setattr__(self, 'warnings', tuple(str(w) for w in self.warnings))
-        object.__setattr__(self, 'samples', tuple(self.samples))
+        object.__setattr__(
+            self,
+            'samples',
+            tuple(_coerce_sample(sample) for sample in self.samples),
+        )
         object.__setattr__(self, 'iterations', int(self.iterations))
         object.__setattr__(self, 'diagnostics', dict(self.diagnostics or {}))
+        _validate_temperature_pair(
+            self.liquidus_T_C,
+            self.liquidus_T_K,
+            context='liquidus',
+        )
+        _validate_temperature_C(self.solidus_T_C, 'solidus_T_C')
+        _validate_optional_fraction(self.liquid_fraction, 'liquid_fraction')
+        if (
+            self.liquidus_T_C is not None
+            and self.solidus_T_C is not None
+            and self.liquidus_T_C < self.solidus_T_C
+        ):
+            raise ValueError('liquidus_T_C must not be below solidus_T_C')
+        if self.status == 'ok':
+            if self.liquidus_T_C is None:
+                raise ValueError('status=ok requires liquidus_T_C')
+            if self.liquid_fraction is None:
+                raise ValueError('status=ok requires liquid_fraction')
 
 
 @dataclass(frozen=True)
@@ -131,9 +185,33 @@ class EquilibriumCrystallizationPathResult:
             'liquid_fraction_path',
             tuple(_coerce_path_point(p) for p in self.liquid_fraction_path),
         )
-        object.__setattr__(self, 'samples', tuple(self.samples))
+        object.__setattr__(
+            self,
+            'samples',
+            tuple(_coerce_sample(sample) for sample in self.samples),
+        )
         object.__setattr__(self, 'iterations', int(self.iterations))
         object.__setattr__(self, 'diagnostics', dict(self.diagnostics or {}))
+        _validate_temperature_pair(
+            self.liquidus_T_C,
+            self.liquidus_T_K,
+            context='liquidus',
+        )
+        _validate_temperature_C(self.solidus_T_C, 'solidus_T_C')
+        _validate_optional_fraction(self.liquid_fraction, 'liquid_fraction')
+        if (
+            self.liquidus_T_C is not None
+            and self.solidus_T_C is not None
+            and self.liquidus_T_C < self.solidus_T_C
+        ):
+            raise ValueError('liquidus_T_C must not be below solidus_T_C')
+        if self.status == 'ok':
+            if self.liquidus_T_C is None or self.solidus_T_C is None:
+                raise ValueError(
+                    'EC status=ok requires liquidus_T_C and solidus_T_C'
+                )
+            if self.liquid_fraction is None:
+                raise ValueError('EC status=ok requires liquid_fraction')
 
 
 def find_liquidus_solidus_by_fraction(
@@ -167,6 +245,8 @@ def find_liquidus_solidus_by_fraction(
         budget = None if budget_s is None else float(budget_s)
     except (TypeError, ValueError) as exc:
         return _not_converged(f'invalid finder parameter: {exc}')
+    if not all(math.isfinite(value) for value in (min_T, max_T, step, tolerance)):
+        return _not_converged('invalid finder parameter: temperatures and steps must be finite')
     if not min_T < max_T:
         return _not_converged('invalid finder window: min_T_C must be below max_T_C')
     if step <= 0.0:
@@ -269,13 +349,7 @@ def find_liquidus_solidus_by_fraction(
         return point
 
     try:
-        grid = []
-        T = min_T
-        while T < max_T:
-            grid.append(T)
-            T += step
-        if not grid or grid[-1] != max_T:
-            grid.append(max_T)
+        grid = _bounded_scan_grid(min_T, max_T, step)
         grid_points = [sample(T) for T in grid]
 
         solidus_bracket = None
@@ -338,6 +412,14 @@ def find_liquidus_solidus_by_fraction(
             samples=tuple(samples),
             iterations=iterations,
             diagnostics=_budget_diagnostics(),
+        )
+    except LiquidusSampleError as exc:
+        return LiquidusSolidusResult(
+            status=exc.status,
+            warnings=tuple([*smoothing_warnings, *exc.warnings]),
+            samples=tuple(samples),
+            iterations=iterations,
+            diagnostics=exc.diagnostics,
         )
     except Exception as exc:  # noqa: BLE001 - library-boundary finder guard
         return LiquidusSolidusResult(
@@ -540,8 +622,36 @@ def _monotone_point(
 def _clamp_fraction(value: float) -> float:
     frac = float(value)
     if not math.isfinite(frac):
-        raise RuntimeError(f'invalid frac_M value: {value!r}')
+        raise LiquidFractionInvalidError(f'invalid frac_M value: {value!r}')
+    if frac < -1.0e-12 or frac > 1.0 + 1.0e-12:
+        raise LiquidFractionInvalidError(
+            f'invalid frac_M value outside [0, 1]: {value!r}'
+        )
     return max(0.0, min(1.0, frac))
+
+
+def _bounded_scan_grid(
+    min_T_C: float,
+    max_T_C: float,
+    scan_step_C: float,
+) -> Tuple[float, ...]:
+    span = float(max_T_C) - float(min_T_C)
+    step = float(scan_step_C)
+    if float(min_T_C) + step == float(min_T_C):
+        raise RuntimeError(
+            'invalid finder scan_step_C: step does not advance temperature'
+        )
+    intervals = math.ceil(span / step)
+    point_count = intervals + 1
+    if point_count > MAX_LIQUIDUS_SCAN_POINTS:
+        raise RuntimeError(
+            'invalid finder scan grid: '
+            f'{point_count} points exceeds cap {MAX_LIQUIDUS_SCAN_POINTS}'
+        )
+    return tuple(
+        min(float(max_T_C), float(min_T_C) + index * step)
+        for index in range(point_count)
+    )
 
 
 def _temperature_grid(
@@ -592,6 +702,26 @@ def _coerce_path_point(point: object) -> LiquidFractionPathPoint:
     )
 
 
+def _coerce_sample(sample: object) -> MeltFractionSample:
+    if isinstance(sample, MeltFractionSample):
+        return sample
+    if isinstance(sample, Mapping):
+        temperature_C = sample.get('temperature_C')
+        if temperature_C is None:
+            temperature_C = sample.get('T_C', sample.get('T'))
+        frac_M = sample.get('frac_M')
+        if frac_M is None:
+            frac_M = sample.get('liquid_fraction')
+        return MeltFractionSample(
+            temperature_C=float(temperature_C),
+            frac_M=float(frac_M),
+        )
+    return MeltFractionSample(
+        temperature_C=float(getattr(sample, 'temperature_C')),
+        frac_M=float(getattr(sample, 'frac_M')),
+    )
+
+
 def _coerce_composition(composition: Mapping[str, float]) -> dict[str, float]:
     result: dict[str, float] = {}
     for species, value in dict(composition or {}).items():
@@ -600,8 +730,59 @@ def _coerce_composition(composition: Mapping[str, float]) -> dict[str, float]:
             raise RuntimeError(
                 f'invalid liquid_composition_wt_pct value for {species}: {value!r}'
             )
+        if amount < 0.0:
+            raise RuntimeError(
+                'invalid liquid_composition_wt_pct negative value for '
+                f'{species}: {value!r}'
+            )
         result[str(species)] = amount
     return result
+
+
+def _validate_optional_finite(value: Optional[float], name: str) -> None:
+    if value is not None and not math.isfinite(float(value)):
+        raise ValueError(f'{name} must be finite')
+
+
+def _validate_optional_fraction(value: Optional[float], name: str) -> None:
+    if value is None:
+        return
+    _validate_optional_finite(value, name)
+    if not 0.0 <= float(value) <= 1.0:
+        raise ValueError(f'{name} must be in [0, 1]')
+
+
+def _validate_temperature_C(value: Optional[float], name: str) -> None:
+    _validate_optional_finite(value, name)
+    if value is not None and float(value) < -273.15:
+        raise ValueError(f'{name} must not be below absolute zero')
+
+
+def _validate_temperature_pair(
+    temperature_C: Optional[float],
+    temperature_K: Optional[float],
+    *,
+    context: str,
+) -> None:
+    _validate_temperature_C(temperature_C, f'{context}_T_C')
+    _validate_optional_finite(temperature_K, f'{context}_T_K')
+    if temperature_K is not None and float(temperature_K) < 0.0:
+        raise ValueError(f'{context}_T_K must not be below absolute zero')
+    if temperature_C is None or temperature_K is None:
+        return
+    # Premise: T_K = T_C + 273.15 by thermodynamic temperature definition.
+    # Algebra: residual = T_K - T_C - 273.15; unit check: kelvin increments
+    # and Celsius increments are identical. Sanity: contradictory serialized
+    # unit fields must fail rather than let consumers choose different physics.
+    if not math.isclose(
+        float(temperature_K),
+        float(temperature_C) + 273.15,
+        rel_tol=0.0,
+        abs_tol=1.0e-9,
+    ):
+        raise ValueError(
+            f'{context}_T_C and {context}_T_K are inconsistent'
+        )
 
 
 def _not_converged(message: str) -> LiquidusSolidusResult:
@@ -658,6 +839,7 @@ __all__ = (
     'DEFAULT_LIQUIDUS_FINDER_BUDGET_S',
     'EquilibriumCrystallizationPathResult',
     'LiquidFractionPathPoint',
+    'LiquidusSampleError',
     'LiquidusSolidusResult',
     'MeltFractionSample',
     'build_equilibrium_crystallization_path',

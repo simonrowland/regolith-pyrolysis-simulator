@@ -18,6 +18,7 @@ import engines.alphamelts.provider as alphamelts_provider_module
 from engines.alphamelts.parser import diagnostics_to_equilibrium
 from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.chemistry.kernel import ChemistryIntent
+from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_MISSING_BINARY,
@@ -53,9 +54,9 @@ def test_alphamelts_python_failures_mark_backend_unavailable():
     backend._mode = 'python_api'
 
     with pytest.raises(ImportError, match='not preloaded'):
-        backend.equilibrate(
-            temperature_C=1600.0,
-            composition_kg={
+        backend._equilibrate_python(
+            1600.0,
+            {
                 'SiO2': 50.0,
                 'Al2O3': 15.0,
                 'FeO': 10.0,
@@ -63,8 +64,8 @@ def test_alphamelts_python_failures_mark_backend_unavailable():
                 'CaO': 10.0,
                 'Na2O': 5.0,
             },
-            fO2_log=-9.0,
-            pressure_bar=1e-6,
+            -9.0,
+            1e-6,
         )
 
     assert backend.is_available() is False
@@ -201,12 +202,13 @@ def _system_main_fixture(
     fO2_log: float = -9.0,
     density_g_cm3: float = 2.638918,
     log10_viscosity_poise: float = 1.409,
+    system_mass_g: float = 100.0,
 ) -> str:
     return (
         "System Thermodynamic Data:\n"
         "index Pressure Temperature mass F phi H S V Cp dVdP*10^6 "
         "dVdT*10^6 fO2(absolute) fO2-9.0) rhol rhos viscosity aH2O chisqr\n"
-        f"1 1.00 {temperature_C:.6f} 100 1 1 -1 1 1 1 0 0 "
+        f"1 1.00 {temperature_C:.6f} {system_mass_g:.9g} 1 1 -1 1 1 1 0 0 "
         f"{fO2_log:.6f} 0 {density_g_cm3:.6f} 0 "
         f"{log10_viscosity_poise:.6f} n/a n/a\n"
     )
@@ -218,14 +220,15 @@ def _parse_subprocess_fixture(
     *,
     temperature_C: float,
     pressure_bar: float = 1.0,
-    total_input_kg: float = 1000.0,
+    total_input_kg: float = 0.1,
     system_output: str | None = None,
+    fO2_log: float = -9.0,
 ):
     return backend._parse_single_point_stdout(
         output,
         requested_temperature_C=temperature_C,
         pressure_bar=pressure_bar,
-        fO2_log=-9.0,
+        fO2_log=fO2_log,
         total_input_kg=total_input_kg,
         run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
         system_output=(
@@ -233,7 +236,7 @@ def _parse_subprocess_fixture(
             if system_output is None
             else system_output
         ),
-        fO2_constraint={"path": "Absolute", "offset": -9.0},
+        fO2_constraint={"path": "Absolute", "offset": fO2_log},
     )
 
 
@@ -567,6 +570,8 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
         pressure_bar,
         fO2_log,
         comp_wt,
+        total_input_kg,
+        require_solved_fo2,
         warnings=None,
         diagnostics=None,
     ):
@@ -594,11 +599,11 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
         lambda *args, **kwargs: {},
     )
 
-    result = backend.equilibrate(
-        temperature_C=1600.0,
-        composition_kg=_melts_domain_composition(),
-        fO2_log=-9.0,
-        pressure_bar=1e-9,
+    result = backend._equilibrate_python(
+        1600.0,
+        _melts_domain_composition(),
+        -9.0,
+        1e-9,
     )
 
     assert seen['P_bar'] == pytest.approx(1e-6)
@@ -1352,12 +1357,13 @@ def test_petthermotools_result_parser_uses_verified_schema():
         pressure_bar=1.0,
         fO2_log=-9.0,
         comp_wt={'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+        total_input_kg=10.0,
     )
 
     assert result.phases_present == ['liquid1', 'olivine1']
     assert result.phase_masses_kg == {
-        'liquid1': pytest.approx(0.08),
-        'olivine1': pytest.approx(0.02),
+        'liquid1': pytest.approx(8.0),
+        'olivine1': pytest.approx(2.0),
     }
     assert result.liquid_fraction == pytest.approx(0.8)
     assert result.liquid_composition_wt_pct['SiO2'] == pytest.approx(50.0)
@@ -1365,6 +1371,25 @@ def test_petthermotools_result_parser_uses_verified_schema():
     assert result.diagnostics['diagnostic_oxide_activities'] == {}
     assert result.warnings == []
     assert result.ledger_transition is None
+
+
+def test_petthermotools_result_parser_rejects_out_of_range_liquid_mass_fraction():
+    backend = AlphaMELTSBackend()
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': {'SiO2': 50.0},
+        'liquid1_prop': {'mass': 120.0},
+    }, {})
+
+    with pytest.raises(LiquidFractionInvalidError, match='mismatch'):
+        backend._parse_petthermotools_result(
+            results,
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            comp_wt={'SiO2': 50.0},
+            total_input_kg=10.0,
+        )
 
 
 @pytest.mark.parametrize(
@@ -1449,6 +1474,37 @@ def test_petthermotools_result_parser_prefers_reported_oxide_activities():
     assert result.diagnostics['diagnostic_oxide_activities'] == pytest.approx({
         'SiO2': 0.42,
     })
+
+
+def test_petthermotools_activity_coefficients_are_multiplied_by_mole_fraction():
+    backend = AlphaMELTSBackend()
+    na2o_mass = resolve_species_formula('Na2O').molar_mass_kg_per_mol()
+    sio2_mass = resolve_species_formula('SiO2').molar_mass_kg_per_mol()
+    liquid_composition = {
+        'Na2O': 0.02 * na2o_mass,
+        'SiO2': 0.98 * sio2_mass,
+    }
+    results = ({
+        'Conditions': {'mass': 100.0},
+        'liquid1': liquid_composition,
+        'liquid1_prop': {'mass': 100.0},
+        'activity_coefficients': {'Na2O': 0.5},
+    }, {})
+
+    result = backend._parse_petthermotools_result(
+        results,
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        comp_wt=liquid_composition,
+        total_input_kg=1.0,
+    )
+
+    assert result.activity_coefficients['Na2O'] == pytest.approx(0.01)
+    assert (
+        result.diagnostics['diagnostic_activity_source']
+        == 'activity_coefficients_times_oxide_mole_fraction'
+    )
 
 
 def test_subprocess_stdout_parser_reports_activity_labels_and_exact_oxide_diagnostic():
@@ -1731,9 +1787,7 @@ def test_thermoengine_transport_equilibrates_live_when_installed():
     if not available:
         pytest.skip('ThermoEngine transport unavailable')
 
-    result = backend.equilibrate(
-        temperature_C=1200.0,
-        composition_kg={
+    comp_wt = backend._normalize_composition_to_melts_basis({
             'SiO2': 490.0,
             'TiO2': 15.0,
             'Al2O3': 140.0,
@@ -1746,9 +1800,9 @@ def test_thermoengine_transport_equilibrates_live_when_installed():
             'Cr2O3': 2.0,
             'MnO': 2.0,
             'P2O5': 3.0,
-        },
-        fO2_log=-9.0,
-        pressure_bar=1.0,
+    })
+    result = backend._equilibrate_thermoengine(
+        1200.0, comp_wt, -9.0, 1.0,
     )
 
     assert result.status == 'ok'
@@ -2083,12 +2137,20 @@ def test_decompression_path_calls_verified_petthermotools_api():
         calls.append(kwargs)
         return {
             0: {
-                'Conditions': {'mass': 100.0},
+                'Conditions': {
+                    'mass': 100.0,
+                    'P_bar': 1000.0,
+                    'fO2_log': -10.5,
+                },
                 'liquid1': {'SiO2': 50.0},
                 'liquid1_prop': {'mass': 100.0},
             },
             1: {
-                'Conditions': {'mass': 100.0},
+                'Conditions': {
+                    'mass': 100.0,
+                    'P_bar': 1.0,
+                    'fO2_log': -10.5,
+                },
                 'liquid1': {'SiO2': 49.0},
                 'liquid1_prop': {'mass': 95.0},
                 'olivine1': {'SiO2': 40.0},
@@ -2127,6 +2189,8 @@ def test_decompression_path_calls_verified_petthermotools_api():
     assert calls[0]['fO2_buffer'] == 'QFM'
     assert calls[0]['fO2_offset'] == -1.5
     assert calls[0]['bulk']['FeOt_Liq'] == pytest.approx(10.0)
+    assert [result.pressure_bar for result in results] == [1000.0, 1.0]
+    assert [result.fO2_log for result in results] == [-10.5, -10.5]
 
 
 def test_alphamelts_stdout_parser_solid_only_reports_zero_liquid_fraction():
@@ -2142,6 +2206,10 @@ olivine: 90.3451 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
         output,
         temperature_C=1100.0,
         total_input_kg=1000.0,
+        system_output=_system_main_fixture(
+            temperature_C=1100.0,
+            system_mass_g=90.3451,
+        ),
     )
 
     assert result.liquid_fraction == pytest.approx(0.0)
@@ -2167,15 +2235,20 @@ olivine: 7.654887 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
         output,
         temperature_C=1200.0,
         total_input_kg=1000.0,
+        system_output=_system_main_fixture(
+            temperature_C=1200.0,
+            system_mass_g=97.999987,
+        ),
     )
 
     assert result.liquid_fraction == pytest.approx(0.921889)
     assert result.liquid_composition_wt_pct["SiO2"] == pytest.approx(46.49)
     assert result.phases_present == ["liquid", "olivine"]
-    assert result.phase_masses_kg == {
-        "liquid": pytest.approx(0.0903451),
-        "olivine": pytest.approx(0.007654887),
-    }
+    assert sum(result.phase_masses_kg.values()) == pytest.approx(1000.0)
+    assert (
+        result.phase_masses_kg['liquid']
+        / sum(result.phase_masses_kg.values())
+    ) == pytest.approx(result.liquid_fraction)
     assert result.warnings == ["AlphaMELTS liquidus_C=1220.310"]
     assert result.ledger_transition is None
     assert result.status == 'ok'
@@ -2196,6 +2269,10 @@ olivine: 7.654887 g, composition (Ca0.01Mg0.80Fe''0.20Mn0.00Co0.00Ni0.00)2SiO4
         output,
         temperature_C=1200.0,
         total_input_kg=1000.0,
+        system_output=_system_main_fixture(
+            temperature_C=1200.0,
+            system_mass_g=97.999987,
+        ),
     )
 
     assert result.status == "ok"
@@ -2230,7 +2307,7 @@ Initial calculation failed (1.000000 bars, 1249.414062 C)!
     assert result.phases_present == []
     assert result.warnings == [
         "AlphaMELTS liquidus_C=1249.410",
-        "AlphaMELTS subprocess failed before phase rows: "
+        "AlphaMELTS subprocess reported convergence failure: "
         "Quadratic convergence failure. Aborting.",
     ]
     assert (
@@ -2245,6 +2322,216 @@ Initial calculation failed (1.000000 bars, 1249.414062 C)!
     assert 'no convergence' in (
         result.diagnostics.get("backend_status_reason_message") or ''
     )
+
+
+def test_alphamelts_stdout_parser_rejects_provisional_rows_after_abort():
+    backend = AlphaMELTSBackend()
+    output = """
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1200.000000 (C)
+liquid: SiO2 Al2O3 FeO
+80.0 g 60.0 20.0 20.0
+olivine: 20.0 g, composition (Mg,Fe)2SiO4
+...Quadratic convergence failure. Aborting.
+"""
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1200.0,
+        total_input_kg=10.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.phases_present == []
+    assert result.phase_masses_kg == {}
+    assert (
+        result.diagnostics['backend_status_reason']
+        == ALPHAMELTS_REASON_NO_CONVERGENCE
+    )
+
+
+def test_alphamelts_subprocess_phase_masses_scale_to_physical_input_mass():
+    backend = AlphaMELTSBackend()
+    output = """
+<> Stable phase assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1200.000000 (C)
+liquid: SiO2 Al2O3 FeO
+80.0 g 60.0 20.0 20.0
+Melt fraction = 0.8
+olivine: 20.0 g, composition (Mg,Fe)2SiO4
+"""
+
+    ten_kg = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1200.0,
+        total_input_kg=10.0,
+    )
+    twenty_kg = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1200.0,
+        total_input_kg=20.0,
+    )
+
+    assert sum(ten_kg.phase_masses_kg.values()) == pytest.approx(10.0)
+    assert sum(twenty_kg.phase_masses_kg.values()) == pytest.approx(20.0)
+    assert twenty_kg.phase_masses_kg['liquid'] == pytest.approx(
+        2.0 * ten_kg.phase_masses_kg['liquid']
+    )
+    assert ten_kg.liquid_fraction == twenty_kg.liquid_fraction == pytest.approx(0.8)
+
+
+def test_alphamelts_subprocess_rejects_partial_phase_mass_parse():
+    backend = AlphaMELTSBackend()
+    output = """
+<> Stable solid assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1100.000000 (C)
+olivine: 98.0 g, composition (Mg,Fe)2SiO4
+"""
+
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='phase_mass_incomplete',
+    ):
+        _parse_subprocess_fixture(
+            backend,
+            output,
+            temperature_C=1100.0,
+            total_input_kg=10.0,
+        )
+
+
+def test_alphamelts_subprocess_reports_solved_fo2_without_claiming_request():
+    backend = AlphaMELTSBackend()
+    output = """
+<> Stable liquid assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1200.000000 (C)
+liquid: SiO2 Al2O3 FeO
+100.0 g 60.0 20.0 20.0
+Melt fraction = 1.0
+"""
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1200.0,
+        total_input_kg=10.0,
+        system_output=_system_main_fixture(
+            temperature_C=1200.0,
+            fO2_log=-8.0,
+        ),
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.fO2_log == pytest.approx(-8.0)
+    assert result.diagnostics['requested_fO2_log'] == pytest.approx(-9.0)
+    assert result.diagnostics['solved_fO2_log'] == pytest.approx(-8.0)
+    assert result.diagnostics['authoritative_for_requested_conditions'] is False
+
+
+def test_alphamelts_subprocess_accepts_fo2_echo_rounding():
+    backend = AlphaMELTSBackend()
+    output = """
+<> Stable liquid assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1200.000000 (C)
+liquid: SiO2 Al2O3 FeO
+100.0 g 60.0 20.0 20.0
+Melt fraction = 1.0
+"""
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1200.0,
+        total_input_kg=10.0,
+        fO2_log=-9.0000004,
+        system_output=_system_main_fixture(
+            temperature_C=1200.0,
+            fO2_log=-9.0,
+        ),
+    )
+
+    assert result.status == 'ok'
+    assert 'operating_point_clamped' not in result.diagnostics
+
+
+def test_alphamelts_refuses_unapplied_thermoengine_absolute_fo2():
+    backend = AlphaMELTSBackend()
+    backend._mode = 'thermoengine'
+
+    result = backend.equilibrate(
+        temperature_C=1500.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-3.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.phases_present == []
+    assert result.diagnostics['backend_status_reason'] == 'fo2_constraint_unapplied'
+    assert result.diagnostics['authoritative_for_requested_conditions'] is False
+
+
+def test_alphamelts_python_requires_solved_fo2_echo():
+    backend = AlphaMELTSBackend()
+    backend._mode = 'python_api'
+    backend._pet_melts = object()
+    backend._pet_payload_preloaded = True
+    backend._pet_module = types.SimpleNamespace(
+        equilibrate_MELTS=lambda **_kwargs: ({
+            'Conditions': {'mass': 100.0},
+            'liquid1': {'SiO2': 50.0},
+            'liquid1_prop': {'mass': 100.0},
+        }, {})
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1500.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-3.0,
+        pressure_bar=1.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.phases_present == []
+    assert result.diagnostics['backend_status_reason'] == 'fo2_constraint_unapplied'
+
+
+def test_alphamelts_python_preserves_solved_fo2_and_scales_physical_batches():
+    backend = AlphaMELTSBackend()
+    backend._mode = 'python_api'
+    backend._pet_melts = object()
+    backend._pet_payload_preloaded = True
+    backend._pet_module = types.SimpleNamespace(
+        equilibrate_MELTS=lambda **_kwargs: ({
+            'Conditions': {'mass': 100.0, 'P_bar': 1.0, 'fO2_log': -8.0},
+            'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
+            'liquid1_prop': {'mass': 80.0},
+            'olivine1': {'SiO2': 40.0, 'MgO': 50.0},
+            'olivine1_prop': {'mass': 20.0},
+        }, {})
+    )
+    base = _melts_domain_composition()
+
+    ten_kg = backend.equilibrate(
+        temperature_C=1500.0,
+        composition_kg={oxide: mass * 0.1 for oxide, mass in base.items()},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+    twenty_kg = backend.equilibrate(
+        temperature_C=1500.0,
+        composition_kg={oxide: mass * 0.2 for oxide, mass in base.items()},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    assert ten_kg.status == twenty_kg.status == 'out_of_domain'
+    assert ten_kg.fO2_log == twenty_kg.fO2_log == pytest.approx(-8.0)
+    assert sum(ten_kg.phase_masses_kg.values()) == pytest.approx(10.0)
+    assert sum(twenty_kg.phase_masses_kg.values()) == pytest.approx(20.0)
+    assert ten_kg.diagnostics['authoritative_for_requested_conditions'] is False
 
 
 def test_alphamelts_stdout_parser_classifies_initial_calculation_failed():
@@ -2271,7 +2558,7 @@ Initial calculation failed (1.000000 bars, 1249.414062 C)!
     assert result.temperature_C == pytest.approx(1249.414062)
     assert result.phases_present == []
     assert (
-        "AlphaMELTS subprocess failed before phase rows: "
+        "AlphaMELTS subprocess reported convergence failure: "
         "Initial calculation failed."
     ) in result.warnings
     assert (
@@ -2659,12 +2946,12 @@ def test_thermoengine_callsite_wires_vaporock_source_and_solved_liquid(monkeypat
     helper = _vaporock_helper_returning({'Na': 9.9, 'SiO': 0.3})
     backend._vaporock_helper = helper
 
-    eq = backend.equilibrate(
-        temperature_C=1600.0,
-        composition_kg={'SiO2': 45.0, 'FeO': 18.0, 'MgO': 9.0,
-                        'CaO': 11.0, 'Al2O3': 12.0, 'Na2O': 4.0, 'K2O': 1.0},
-        fO2_log=-7.96,
-        pressure_bar=1e-6,
+    eq = backend._equilibrate_thermoengine(
+        1600.0,
+        {'SiO2': 45.0, 'FeO': 18.0, 'MgO': 9.0,
+         'CaO': 11.0, 'Al2O3': 12.0, 'Na2O': 4.0, 'K2O': 1.0},
+        -7.96,
+        1e-6,
     )
 
     assert eq.vapor_pressures_Pa == {'Na': 9.9, 'SiO': 0.3}
@@ -2709,9 +2996,9 @@ def test_thermoengine_vaporock_empty_fallback_marks_vapor_facet_degraded():
 
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter('always')
-        eq = backend.equilibrate(
-            temperature_C=1600.0,
-            composition_kg={
+        eq = backend._equilibrate_thermoengine(
+            1600.0,
+            {
                 'SiO2': 45.0,
                 'FeO': 18.0,
                 'MgO': 9.0,
@@ -2720,8 +3007,8 @@ def test_thermoengine_vaporock_empty_fallback_marks_vapor_facet_degraded():
                 'Na2O': 4.0,
                 'K2O': 1.0,
             },
-            fO2_log=-7.96,
-            pressure_bar=1e-6,
+            -7.96,
+            1e-6,
         )
 
     assert any(
@@ -2783,9 +3070,9 @@ def test_thermoengine_vaporock_unavailable_marks_not_attempted_without_churn():
         },
     }
 
-    eq = backend.equilibrate(
-        temperature_C=1600.0,
-        composition_kg={
+    eq = backend._equilibrate_thermoengine(
+        1600.0,
+        {
             'SiO2': 45.0,
             'FeO': 18.0,
             'MgO': 9.0,
@@ -2794,8 +3081,8 @@ def test_thermoengine_vaporock_unavailable_marks_not_attempted_without_churn():
             'Na2O': 4.0,
             'K2O': 1.0,
         },
-        fO2_log=-7.96,
-        pressure_bar=1e-6,
+        -7.96,
+        1e-6,
     )
 
     assert eq.status == 'ok'

@@ -98,6 +98,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
@@ -481,6 +482,28 @@ class MAGEMinBackend(MeltBackend):
         result_status = 'ok'
         result_fO2_log = fO2_log
         result_diagnostics = dict(result_diagnostics)
+        converged = (
+            raw.get('converged')
+            if isinstance(raw, Mapping)
+            else getattr(raw, 'converged', None)
+        )
+        if converged is not None and not bool(converged):
+            message = (
+                'MAGEMin bridge reported converged=False; refusing '
+                'provisional phase rows'
+            )
+            result_diagnostics.update({
+                'backend_status': 'not_converged',
+                'backend_status_reason': 'negative_convergence_evidence',
+            })
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='not_converged',
+                warnings=[*all_warnings, message],
+                diagnostics=result_diagnostics,
+            )
         if isinstance(raw, dict):
             buffer_warnings = raw.get('buffer_warnings') or []
             for line in buffer_warnings:
@@ -921,6 +944,7 @@ class MAGEMinBackend(MeltBackend):
         both steps named so the conversion is auditable.
         """
         module = self._magemin_module
+        call_started = time.monotonic()
         temperature_K = temperature_C + 273.15
         pressure_GPa = self._pressure_bar_to_GPa(pressure_bar)
         pressure_kbar = self._GPa_to_kbar(pressure_GPa)
@@ -958,7 +982,10 @@ class MAGEMinBackend(MeltBackend):
                             fO2_log=fO2_log,
                             bridge='pymagemin',
                             exc=exc,
-                            call_timeout_s=call_timeout_s,
+                            call_timeout_s=self._residual_call_timeout_s(
+                                call_timeout_s,
+                                call_started,
+                            ),
                         )
                     raise
             if self._binary_path is not None:
@@ -969,7 +996,10 @@ class MAGEMinBackend(MeltBackend):
                     fO2_log=fO2_log,
                     bridge='pymagemin',
                     exc=RuntimeError('pymagemin exposes no minimize/run/equilibrium entry point'),
-                    call_timeout_s=call_timeout_s,
+                    call_timeout_s=self._residual_call_timeout_s(
+                        call_timeout_s,
+                        call_started,
+                    ),
                 )
 
         if self._bridge == 'julia':
@@ -994,7 +1024,10 @@ class MAGEMinBackend(MeltBackend):
                         fO2_log=fO2_log,
                         bridge='julia',
                         exc=exc,
-                        call_timeout_s=call_timeout_s,
+                        call_timeout_s=self._residual_call_timeout_s(
+                            call_timeout_s,
+                            call_started,
+                        ),
                     )
                 raise
 
@@ -1020,6 +1053,24 @@ class MAGEMinBackend(MeltBackend):
 
         raise RuntimeError(
             f'MAGEMin bridge {self._bridge!r} has no recognised entry point')
+
+    @staticmethod
+    def _residual_call_timeout_s(
+        call_timeout_s: Optional[float],
+        started_at: float,
+    ) -> Optional[float]:
+        if call_timeout_s is None:
+            return None
+        residual = float(call_timeout_s) - max(
+            0.0,
+            time.monotonic() - float(started_at),
+        )
+        if not math.isfinite(residual) or residual <= 0.0:
+            raise RuntimeError(
+                'MAGEMin bridge consumed aggregate liquidus budget; '
+                'subprocess retry cancelled'
+            )
+        return residual
 
     def _call_magemin_subprocess_after_bridge_failure(
         self,
@@ -1424,14 +1475,30 @@ class MAGEMinBackend(MeltBackend):
         if not names or len(names) != len(values):
             return {}
 
-        phases: Dict[str, Dict[str, float]] = {}
+        parsed_modes: list[tuple[str, float]] = []
         for name, raw in zip(names, values):
-            if name.lower() in MAGEMinBackend._BUFFER_CHOICES:
-                continue  # buffer control row, not a phase
             try:
                 fraction = float(raw)
-            except ValueError:
-                continue
+            except ValueError as exc:
+                raise RuntimeError(
+                    f'MAGEMin Mode token for {name!r} is not numeric: {raw!r}'
+                ) from exc
+            if not math.isfinite(fraction) or not 0.0 <= fraction <= 1.0:
+                raise RuntimeError(
+                    f'MAGEMin Mode token for {name!r} is invalid: {raw!r}'
+                )
+            parsed_modes.append((name, fraction))
+        mode_total = sum(fraction for _, fraction in parsed_modes)
+        if not math.isclose(mode_total, 1.0, rel_tol=0.0, abs_tol=1.0e-4):
+            raise RuntimeError(
+                'MAGEMin Mode vector must sum to 1.0; '
+                f'got {mode_total:.9g}'
+            )
+
+        phases: Dict[str, Dict[str, float]] = {}
+        for name, fraction in parsed_modes:
+            if name.lower() in MAGEMinBackend._BUFFER_CHOICES:
+                continue  # buffer control row, not a phase
             if fraction <= 0.0:
                 continue
             phases[name] = {'mass_kg': fraction}

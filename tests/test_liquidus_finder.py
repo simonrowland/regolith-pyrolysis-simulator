@@ -5,7 +5,11 @@ from __future__ import annotations
 import pytest
 
 import simulator.melt_backend.liquidus as liquidus_module
-from simulator.melt_backend.liquidus import find_liquidus_solidus_by_fraction
+from simulator.melt_backend.liquidus import (
+    LiquidusSampleError,
+    LiquidusSolidusResult,
+    find_liquidus_solidus_by_fraction,
+)
 
 
 def _piecewise_fraction(anchors: dict[float, float]):
@@ -154,6 +158,106 @@ def test_liquidus_finder_default_budget_is_unbounded():
     assert result.status == 'not_converged'
     assert calls['n'] == 3  # 800, 900, 1000
     assert result.diagnostics.get('reason') != 'aggregate_budget_exceeded'
+
+
+def test_liquidus_finder_rejects_non_advancing_scan_step_without_sampling():
+    calls = 0
+
+    def sample(_temperature_C: float) -> float:
+        nonlocal calls
+        calls += 1
+        return 0.0
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=400.0,
+        max_T_C=500.0,
+        scan_step_C=1.0e-300,
+        budget_s=0.01,
+    )
+
+    assert result.status == 'not_converged'
+    assert calls == 0
+    assert any('does not advance temperature' in warning for warning in result.warnings)
+
+
+@pytest.mark.parametrize('fraction', [-0.5, 1.5])
+def test_liquidus_finder_rejects_out_of_range_sampler_fraction(fraction):
+    result = find_liquidus_solidus_by_fraction(
+        lambda _temperature_C: fraction,
+        min_T_C=800.0,
+        max_T_C=1000.0,
+        scan_step_C=100.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert any('outside [0, 1]' in warning for warning in result.warnings)
+
+
+def test_liquidus_finder_preserves_typed_backend_sample_failure():
+    diagnostics = {'backend_status': 'out_of_domain', 'crash_point': 900.0}
+
+    def sample(_temperature_C: float) -> float:
+        raise LiquidusSampleError(
+            'out_of_domain',
+            ('engine rejected composition',),
+            diagnostics,
+        )
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        min_T_C=800.0,
+        max_T_C=1000.0,
+        scan_step_C=100.0,
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics == diagnostics
+    assert result.warnings == ('engine rejected composition',)
+
+
+def test_liquidus_sample_error_rejects_noncanonical_status():
+    with pytest.raises(ValueError, match='canonical refusal'):
+        LiquidusSampleError('failed', ('engine failed',), {})
+
+
+def test_liquidus_result_rejects_contradictory_success_fields():
+    with pytest.raises(ValueError, match='inconsistent'):
+        LiquidusSolidusResult(
+            liquidus_T_C=1000.0,
+            liquidus_T_K=999.0,
+            liquid_fraction=1.0,
+            status='ok',
+        )
+
+    with pytest.raises(ValueError, match=r'\[0, 1\]'):
+        LiquidusSolidusResult(
+            liquidus_T_C=1000.0,
+            liquid_fraction=1.5,
+            status='ok',
+        )
+
+    with pytest.raises(ValueError, match='absolute zero'):
+        LiquidusSolidusResult(
+            liquidus_T_C=-274.0,
+            liquid_fraction=1.0,
+            status='ok',
+        )
+
+    with pytest.raises(ValueError, match='absolute zero'):
+        LiquidusSolidusResult(solidus_T_C=-274.0)
+
+
+@pytest.mark.parametrize(
+    'sample',
+    [
+        {'temperature_C': 1000.0, 'frac_M': 1.01},
+        {'temperature_C': -274.0, 'frac_M': 0.5},
+    ],
+)
+def test_liquidus_result_validates_nested_samples(sample):
+    with pytest.raises(ValueError):
+        LiquidusSolidusResult(status='unavailable', samples=(sample,))
 
 
 def test_liquidus_finder_stops_on_aggregate_budget(monkeypatch):

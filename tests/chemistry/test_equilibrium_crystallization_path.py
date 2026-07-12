@@ -177,6 +177,19 @@ def test_table_builder_refuses_magemin_scale_nonmonotone_dip():
     assert any('would require smoothing' in w for w in result.warnings)
 
 
+def test_ec_path_rejects_negative_liquid_composition():
+    result = build_equilibrium_crystallization_path(
+        lambda _temperature_C: (0.5, {'SiO2': -10.0, 'MgO': 110.0}),
+        solidus_T_C=1000.0,
+        liquidus_T_C=1100.0,
+        grid_step_C=100.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert any('negative value' in warning for warning in result.warnings)
+    assert result.liquid_fraction_path == ()
+
+
 class _FakeECAlphaMELTSBackend:
     def __init__(self, mode: str = 'python_api', *, empty_comp: bool = False):
         self._mode = mode

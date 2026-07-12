@@ -51,6 +51,7 @@ from simulator.melt_backend.alphamelts_contract import (
 )
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.melt_backend.liquidus import (
+    LiquidusSampleError,
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
 )
@@ -96,8 +97,11 @@ ALPHAMELTS_REASON_EXECUTED_T_MISSING = 'executed_temperature_missing'
 ALPHAMELTS_REASON_EXECUTED_T_MISMATCH = 'executed_temperature_mismatch'
 ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED = 'subprocess_pressure_below_minimum'
 ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID = 'fo2_constraint_invalid'
+ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED = 'fo2_constraint_unapplied'
 ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING = 'system_output_missing'
+ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE = 'phase_mass_incomplete'
 ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 0.01
+ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10 = 1.0e-6
 
 ALPHAMELTS_BACKEND_FAILURE_REASON_CODE_KEY = 'backend_failure_reason_code'
 ALPHAMELTS_BACKEND_FAILURE_CATEGORY_KEY = 'backend_failure_category'
@@ -114,7 +118,9 @@ ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_EXECUTED_T_MISMATCH: 'contract_error',
     ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED: 'out_of_domain',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: 'contract_error',
+    ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED: 'contract_error',
     ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: 'parse_error',
+    ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE: 'parse_error',
 }
 
 ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
@@ -152,8 +158,14 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: (
         'AlphaMELTS subprocess fO2 constraint was invalid'
     ),
+    ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED: (
+        'AlphaMELTS transport cannot apply the requested absolute fO2'
+    ),
     ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: (
         'AlphaMELTS did not emit required system properties'
+    ),
+    ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE: (
+        'AlphaMELTS phase rows do not close to the engine system mass'
     ),
 }
 
@@ -730,6 +742,12 @@ class AlphaMELTSBackend(MeltBackend):
         else:
             composition_kg = dict(composition_kg or {})
 
+        total_input_kg = sum(
+            float(mass_kg)
+            for mass_kg in composition_kg.values()
+            if math.isfinite(float(mass_kg)) and float(mass_kg) > 0.0
+        )
+
         raw_comp_wt = self._composition_kg_to_wt_pct(composition_kg)
         crash_diagnostics = self._out_of_domain_diagnostics(
             temperature_C=temperature_C,
@@ -774,14 +792,27 @@ class AlphaMELTSBackend(MeltBackend):
         warnings = list(self._last_normalization_warnings)
 
         if self._mode == 'thermoengine':
-            return self._equilibrate_thermoengine(
-                temperature_C, comp_wt, fO2_log, pressure_bar, warnings)
+            return self._unapplied_absolute_fo2_result(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                transport='thermoengine',
+                warnings=warnings,
+            )
         elif self._mode == 'python_api':
             return self._equilibrate_python(
-                temperature_C, comp_wt, fO2_log, pressure_bar, warnings)
+                temperature_C,
+                comp_wt,
+                fO2_log,
+                pressure_bar,
+                warnings,
+                total_input_kg=total_input_kg,
+                require_solved_fo2=True,
+            )
         elif self._mode == 'subprocess':
             return self._equilibrate_subprocess(
                 temperature_C, comp_wt, fO2_log, pressure_bar, warnings,
+                total_input_kg=total_input_kg,
                 diagnostics=crash_diagnostics,
                 run_mode=_normalize_subprocess_run_mode(
                     subprocess_run_mode
@@ -887,10 +918,7 @@ class AlphaMELTSBackend(MeltBackend):
                 )
 
         sample_warnings: list[str] = []
-        last_out_of_domain_diagnostics: dict[str, Any] = {}
-
         def sample_fraction(temperature_C: float) -> float:
-            nonlocal last_out_of_domain_diagnostics
             result = self.equilibrate(
                 float(temperature_C),
                 composition_kg=composition_kg,
@@ -901,10 +929,11 @@ class AlphaMELTSBackend(MeltBackend):
                 species_formula_registry=species_formula_registry,
             )
             if result.status != 'ok':
-                if result.status == 'out_of_domain' and result.diagnostics:
-                    last_out_of_domain_diagnostics = dict(result.diagnostics)
-                warning = '; '.join(result.warnings) or result.status
-                raise RuntimeError(warning)
+                raise LiquidusSampleError(
+                    result.status,
+                    tuple(result.warnings),
+                    dict(result.diagnostics or {}),
+                )
             for warning in result.warnings:
                 if warning not in sample_warnings:
                     sample_warnings.append(warning)
@@ -940,9 +969,39 @@ class AlphaMELTSBackend(MeltBackend):
             warnings=tuple(warnings_out),
             samples=result.samples,
             iterations=result.iterations,
-            diagnostics=last_out_of_domain_diagnostics
-            if result.status == 'out_of_domain'
-            else {},
+            diagnostics=dict(result.diagnostics or {}),
+        )
+
+    def _unapplied_absolute_fo2_result(
+        self,
+        *,
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: float,
+        transport: str,
+        warnings: Optional[List[str]] = None,
+    ) -> EquilibriumResult:
+        message = (
+            f'AlphaMELTS {transport} refused absolute fO2_log={fO2_log:g}: '
+            'the transport exposes only initialization-time redox controls'
+        )
+        diagnostics = self._diagnostics_with_backend_status_reason(
+            {
+                'requested_fO2_log': float(fO2_log),
+                'fO2_transport': str(transport),
+                'authoritative_for_requested_conditions': False,
+            },
+            backend_status='out_of_domain',
+            reason=ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED,
+            message=message,
+        )
+        return self._emit_equilibrium_result(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            warnings=[*(warnings or []), message],
+            status='out_of_domain',
+            diagnostics=diagnostics,
         )
 
     def _unsupported_accounts(
@@ -1533,8 +1592,17 @@ class AlphaMELTSBackend(MeltBackend):
     # Python API mode (PetThermoTools)
     # ------------------------------------------------------------------
 
-    def _equilibrate_python(self, temperature_C, comp_wt,
-                             fO2_log, pressure_bar, warnings=None):
+    def _equilibrate_python(
+        self,
+        temperature_C,
+        comp_wt,
+        fO2_log,
+        pressure_bar,
+        warnings=None,
+        *,
+        total_input_kg: float = 0.1,
+        require_solved_fo2: bool = False,
+    ):
         """
         Use PetThermoTools for equilibrium calculation.
 
@@ -1571,9 +1639,13 @@ class AlphaMELTSBackend(MeltBackend):
                 pressure_bar=solved_pressure_bar,
                 fO2_log=fO2_log,
                 comp_wt=comp_wt,
+                total_input_kg=total_input_kg,
+                require_solved_fo2=require_solved_fo2,
                 warnings=result_warnings,
                 diagnostics=clamp_diagnostics,
             )
+            if eq.status != 'ok':
+                return eq
 
             # Vapor pressures via the real VapoRock helper if available,
             # fed the SOLVED equilibrium liquid composition (not the
@@ -1851,6 +1923,7 @@ class AlphaMELTSBackend(MeltBackend):
         pressure_bar,
         warnings=None,
         *,
+        total_input_kg: float,
         diagnostics: Optional[Mapping[str, object]] = None,
         run_mode: AlphaMELTSSubprocessRunMode,
     ):
@@ -1965,7 +2038,7 @@ class AlphaMELTSBackend(MeltBackend):
                 requested_temperature_C=requested_temperature_C,
                 pressure_bar=calculation_pressure_bar,
                 fO2_log=fO2_log,
-                total_input_kg=100.0,
+                total_input_kg=total_input_kg,
                 warnings=result_warnings,
                 diagnostics=diagnostics,
                 success_diagnostics=diagnostics,
@@ -2080,6 +2153,9 @@ class AlphaMELTSBackend(MeltBackend):
                     payload['fO2_value'] = fO2_value
             if 'Temperature' in headers:
                 payload['temperature_C'] = number('Temperature')
+            system_mass_g = optional_number('mass')
+            if system_mass_g is not None and system_mass_g > 0.0:
+                payload['system_mass_g'] = system_mass_g
             return payload
         return {}
 
@@ -2178,7 +2254,12 @@ class AlphaMELTSBackend(MeltBackend):
                                    system_output: str,
                                    fO2_constraint: Mapping[str, object],
                                    ) -> EquilibriumResult:
-        del total_input_kg
+        physical_input_kg = float(total_input_kg)
+        if not math.isfinite(physical_input_kg) or physical_input_kg <= 0.0:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT,
+                f'invalid physical input mass {total_input_kg!r}',
+            )
         executed_temperatures_C = self._parse_executed_temperatures_C(output)
         system_values = self._parse_system_main_output(system_output)
         stable_verdict = re.search(r'<> Stable .+ assemblage achieved\.', output)
@@ -2231,49 +2312,48 @@ class AlphaMELTSBackend(MeltBackend):
             melt_match = re.search(
                 r'Melt fraction\s*=\s*([0-9.+\-Ee]+)', stripped)
             if melt_match:
-                liquid_fraction = max(
-                    0.0, min(1.0, float(melt_match.group(1))))
+                liquid_fraction = float(melt_match.group(1))
 
-        if not phases_present:
-            no_phase_reason = self._no_phase_subprocess_failure_reason(output)
-            if no_phase_reason is not None:
-                result_warnings.append(no_phase_reason)
-                if not executed_temperatures_C:
-                    raise _alphamelts_backend_failure_error(
-                        ALPHAMELTS_REASON_EXECUTED_T_MISSING,
-                        no_phase_reason,
-                    )
-                if (
-                    run_mode is AlphaMELTSSubprocessRunMode.ISOTHERMAL
-                    and any(
-                        not math.isclose(
-                            value,
-                            float(requested_temperature_C),
-                            rel_tol=0.0,
-                            abs_tol=ALPHAMELTS_EXECUTED_T_TOLERANCE_C,
-                        )
-                        for value in executed_temperatures_C
-                    )
-                ):
-                    raise _alphamelts_backend_failure_error(
-                        ALPHAMELTS_REASON_EXECUTED_T_MISMATCH,
-                        f'requested={float(requested_temperature_C):.9g} C; '
-                        f'executed={executed_temperatures_C!r} C',
-                    )
-                failure_temperature_C = executed_temperatures_C[-1]
-                return self._emit_equilibrium_result(
-                    temperature_C=failure_temperature_C,
-                    requested_temperature_C=requested_temperature_C,
-                    pressure_bar=pressure_bar,
-                    fO2_log=fO2_log,
-                    warnings=result_warnings,
-                    status='out_of_domain',
-                    diagnostics=self._diagnostics_with_backend_status_reason(
-                        diagnostics,
-                        backend_status='out_of_domain',
-                        reason=ALPHAMELTS_REASON_NO_CONVERGENCE,
-                    ),
+        failure_reason = self._subprocess_failure_reason(output)
+        if failure_reason is not None:
+            result_warnings.append(failure_reason)
+            if not executed_temperatures_C:
+                raise _alphamelts_backend_failure_error(
+                    ALPHAMELTS_REASON_EXECUTED_T_MISSING,
+                    failure_reason,
                 )
+            if (
+                run_mode is AlphaMELTSSubprocessRunMode.ISOTHERMAL
+                and any(
+                    not math.isclose(
+                        value,
+                        float(requested_temperature_C),
+                        rel_tol=0.0,
+                        abs_tol=ALPHAMELTS_EXECUTED_T_TOLERANCE_C,
+                    )
+                    for value in executed_temperatures_C
+                )
+            ):
+                raise _alphamelts_backend_failure_error(
+                    ALPHAMELTS_REASON_EXECUTED_T_MISMATCH,
+                    f'requested={float(requested_temperature_C):.9g} C; '
+                    f'executed={executed_temperatures_C!r} C',
+                )
+            failure_temperature_C = executed_temperatures_C[-1]
+            return self._emit_equilibrium_result(
+                temperature_C=failure_temperature_C,
+                requested_temperature_C=requested_temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                warnings=result_warnings,
+                status='out_of_domain',
+                diagnostics=self._diagnostics_with_backend_status_reason(
+                    diagnostics,
+                    backend_status='out_of_domain',
+                    reason=ALPHAMELTS_REASON_NO_CONVERGENCE,
+                ),
+            )
+        if not phases_present:
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT,
                 'no parseable phase assemblage',
@@ -2352,10 +2432,62 @@ class AlphaMELTSBackend(MeltBackend):
         result_diagnostics['intrinsic_fO2_log'] = executed_fO2_log
         result_diagnostics['engine_reported_fO2_log'] = executed_fO2_log
         result_diagnostics['engine_reported_fO2_header'] = fO2_header
+        if not math.isclose(
+            executed_fO2_log,
+            float(fO2_log),
+            rel_tol=0.0,
+            abs_tol=ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10,
+        ):
+            result_diagnostics.update({
+                'operating_point_clamped': True,
+                'fO2_clamped': True,
+                'requested_fO2_log': float(fO2_log),
+                'solved_fO2_log': executed_fO2_log,
+                'authoritative_for_requested_conditions': False,
+                'authoritative_for_solved_conditions': True,
+            })
+            result_warnings.append(
+                'AlphaMELTS solved at a different fO2: '
+                f'requested={float(fO2_log):g}, solved={executed_fO2_log:g}'
+            )
         if stable_verdict is None:
             result_warnings.append(
                 'AlphaMELTS stable assemblage banner absent; accepted parseable phase rows'
             )
+        solver_basis_kg = sum(phase_masses_kg.values())
+        if not math.isfinite(solver_basis_kg) or solver_basis_kg <= 0.0:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT,
+                'phase rows have zero total solver-basis mass',
+            )
+        system_mass_g = system_values.get('system_mass_g')
+        if system_mass_g is None:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING,
+                'System_main_tbl.txt lacks engine system mass',
+            )
+        system_mass_kg = float(system_mass_g) / 1000.0
+        if not math.isclose(
+            solver_basis_kg,
+            system_mass_kg,
+            rel_tol=1.0e-6,
+            abs_tol=1.0e-9,
+        ):
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE,
+                f'parsed={solver_basis_kg * 1000.0:.9g} g; '
+                f'system={float(system_mass_g):.9g} g',
+            )
+        # Premise: alphaMELTS phase rows are modal masses on an arbitrary
+        # solver basis; the adapter input carries the physical batch mass.
+        # Algebra: m_i,physical = (m_i,basis / sum(m_basis)) * m_input.
+        # Unit check: kg / kg * kg = kg. Sanity: phase masses now sum to the
+        # caller's batch mass without changing modal fractions.
+        mass_scale = physical_input_kg / solver_basis_kg
+        phase_masses_kg = {
+            phase: mass_kg * mass_scale
+            for phase, mass_kg in phase_masses_kg.items()
+        }
         eq = self._emit_equilibrium_result(
             temperature_C=executed_temperature_C,
             requested_temperature_C=requested_temperature_C,
@@ -2380,22 +2512,24 @@ class AlphaMELTSBackend(MeltBackend):
             eq.liquidus_T_C = float(liquidus_C)
         return eq
 
-    def _no_phase_subprocess_failure_reason(self, output: str) -> Optional[str]:
+    def _subprocess_failure_reason(self, output: str) -> Optional[str]:
         if re.search(r'Quadratic convergence failure\. Aborting\.', output):
             return (
-                'AlphaMELTS subprocess failed before phase rows: '
+                'AlphaMELTS subprocess reported convergence failure: '
                 'Quadratic convergence failure. Aborting.'
             )
         if re.search(r'Initial calculation failed', output):
             return (
-                'AlphaMELTS subprocess failed before phase rows: '
+                'AlphaMELTS subprocess reported convergence failure: '
                 'Initial calculation failed.'
             )
         return None
 
     def _parse_petthermotools_result(self, results, *, temperature_C: float,
                                      pressure_bar: float, fO2_log: float,
-                                     comp_wt: dict, warnings=None,
+                                     comp_wt: dict, total_input_kg: float = 0.1,
+                                     require_solved_fo2: bool = False,
+                                     warnings=None,
                                      diagnostics: Optional[
                                          Mapping[str, object]
                                      ] = None,
@@ -2403,6 +2537,52 @@ class AlphaMELTSBackend(MeltBackend):
         run_result = self._select_petthermotools_run(results)
         conditions = self._first_row_mapping(run_result.get('Conditions', {}))
         total_mass = self._first_number(conditions, ('mass', 'Mass'))
+        solved_pressure_bar = self._first_number(
+            conditions,
+            ('P_bar', 'pressure_bar', 'Pressure_bar'),
+        )
+        if solved_pressure_bar is None:
+            solved_pressure_bar = float(pressure_bar)
+        solved_fO2_log = self._first_number(
+            conditions,
+            ('fO2_log', 'logfO2', 'log_fO2'),
+        )
+        if require_solved_fo2 and solved_fO2_log is None:
+            return self._unapplied_absolute_fo2_result(
+                temperature_C=temperature_C,
+                pressure_bar=solved_pressure_bar,
+                fO2_log=fO2_log,
+                transport='python_api',
+                warnings=list(warnings or []),
+            )
+        result_fO2_log = (
+            float(solved_fO2_log)
+            if solved_fO2_log is not None
+            else float(fO2_log)
+        )
+        fO2_diagnostics: dict[str, object] = {}
+        fO2_warnings: list[str] = []
+        if (
+            solved_fO2_log is not None
+            and not math.isclose(
+                result_fO2_log,
+                float(fO2_log),
+                rel_tol=0.0,
+                abs_tol=1.0e-9,
+            )
+        ):
+            fO2_diagnostics = {
+                'operating_point_clamped': True,
+                'fO2_clamped': True,
+                'requested_fO2_log': float(fO2_log),
+                'solved_fO2_log': result_fO2_log,
+                'authoritative_for_requested_conditions': False,
+                'authoritative_for_solved_conditions': True,
+            }
+            fO2_warnings.append(
+                'PetThermoTools solved at a different fO2: '
+                f'requested={float(fO2_log):g}, solved={result_fO2_log:g}'
+            )
 
         phases_present: List[str] = []
         phase_masses_g: Dict[str, float] = {}
@@ -2421,8 +2601,25 @@ class AlphaMELTSBackend(MeltBackend):
                     phases_present.append(phase_name)
                 phase_masses_g[phase_name] = mass_g
 
+        physical_input_kg = float(total_input_kg)
+        solver_basis_g = total_mass or sum(phase_masses_g.values())
+        if (
+            not math.isfinite(physical_input_kg)
+            or physical_input_kg <= 0.0
+            or not solver_basis_g
+            or not math.isfinite(float(solver_basis_g))
+            or float(solver_basis_g) <= 0.0
+        ):
+            raise MeltBackendError(
+                'PetThermoTools phase mass scaling requires positive '
+                'physical input and solver-basis masses'
+            )
+        # Premise: PetThermoTools phase masses are grams on its solver basis.
+        # Algebra: m_i,physical = m_i,basis / m_total,basis * m_input.
+        # Unit check: g / g * kg = kg. Sanity: changing batch size scales every
+        # phase mass linearly while leaving liquid_fraction unchanged.
         phase_masses_kg = {
-            phase: mass_g / 1000.0
+            phase: mass_g / float(solver_basis_g) * physical_input_kg
             for phase, mass_g in phase_masses_g.items()
         }
         liquid_fraction: Optional[float] = None
@@ -2437,10 +2634,15 @@ class AlphaMELTSBackend(MeltBackend):
                 liquid_mass = phase_masses_g.get(
                     liquid_key[:-1] if liquid_key.endswith('_Liq') else liquid_key)
             if liquid_mass is not None and total_mass and total_mass > 0.0:
-                liquid_fraction = max(0.0, min(1.0, liquid_mass / total_mass))
+                liquid_fraction = liquid_mass / total_mass
 
-        result_warnings = list(warnings or [])
-        activity_coefficients = self._extract_activity_mapping(run_result)
+        result_warnings = [*(warnings or []), *fO2_warnings]
+        activity_coefficients, activity_diagnostics = (
+            self._extract_activity_mapping(
+                run_result,
+                liquid_composition_wt_pct=liquid_composition_wt_pct,
+            )
+        )
         if not activity_coefficients:
             activity_coefficients = (
                 self._extract_activities_from_chemical_potentials(
@@ -2448,6 +2650,10 @@ class AlphaMELTSBackend(MeltBackend):
                     temperature_C=temperature_C,
                 )
             )
+            if activity_coefficients:
+                activity_diagnostics = {
+                    'diagnostic_activity_source': 'chemical_potential_mu_minus_mu0'
+                }
         if not activity_coefficients:
             result_warnings.append(
                 'PetThermoTools chemical potentials absent; '
@@ -2455,8 +2661,8 @@ class AlphaMELTSBackend(MeltBackend):
             )
         return self._emit_equilibrium_result(
             temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
+            pressure_bar=solved_pressure_bar,
+            fO2_log=result_fO2_log,
             phases_present=phases_present,
             phase_masses_kg=phase_masses_kg,
             liquid_fraction=liquid_fraction,
@@ -2464,7 +2670,11 @@ class AlphaMELTSBackend(MeltBackend):
             activity_coefficients=activity_coefficients,
             warnings=result_warnings,
             status='ok',
-            diagnostics=diagnostics,
+            diagnostics=self._merge_diagnostics(
+                diagnostics,
+                fO2_diagnostics,
+                activity_diagnostics,
+            ),
         )
 
     def _select_petthermotools_run(self, results) -> dict:
@@ -2552,22 +2762,49 @@ class AlphaMELTSBackend(MeltBackend):
                 composition[oxide] = float(value)
         return composition
 
-    def _extract_activity_mapping(self, results: Mapping[str, object]) -> dict:
+    def _extract_activity_mapping(
+        self,
+        results: Mapping[str, object],
+        *,
+        liquid_composition_wt_pct: Mapping[str, float],
+    ) -> tuple[dict, dict[str, object]]:
         for key in ('melt_oxide_activities',):
             if key not in results:
                 continue
             row = self._first_row_mapping(results[key])
             mapped = self._finite_activity_mapping(row)
             if mapped:
-                return mapped
+                return mapped, {'diagnostic_activity_source': key}
 
-        for key in ('activity_coefficients', 'activities', 'Activities'):
+        for key in ('activities', 'Activities'):
             if key not in results:
                 continue
             row = self._liquid_activity_row_mapping(results[key])
             mapped = self._finite_activity_mapping(row)
             if mapped:
-                return mapped
+                return mapped, {'diagnostic_activity_source': key}
+
+        if 'activity_coefficients' in results:
+            row = self._liquid_activity_row_mapping(
+                results['activity_coefficients']
+            )
+            if not row and isinstance(results['activity_coefficients'], Mapping):
+                raw_coefficients = dict(results['activity_coefficients'])
+                if raw_coefficients and all(
+                    not isinstance(value, Mapping)
+                    for value in raw_coefficients.values()
+                ):
+                    row = raw_coefficients
+            mapped = self._activities_from_coefficients(
+                row,
+                liquid_composition_wt_pct,
+            )
+            if mapped:
+                return mapped, {
+                    'diagnostic_activity_source': (
+                        'activity_coefficients_times_oxide_mole_fraction'
+                    )
+                }
 
         activities: Dict[str, float] = {}
         for key, value in results.items():
@@ -2591,7 +2828,51 @@ class AlphaMELTSBackend(MeltBackend):
                     continue
                 if self._looks_like_activity_label(species):
                     activities[species] = float(prop_value)
-        return self._finite_activity_mapping(activities)
+        mapped = self._finite_activity_mapping(activities)
+        if mapped:
+            return mapped, {'diagnostic_activity_source': 'phase_activity_fields'}
+        return {}, {}
+
+    def _activities_from_coefficients(
+        self,
+        coefficients: Mapping[str, object],
+        liquid_composition_wt_pct: Mapping[str, float],
+    ) -> dict[str, float]:
+        mole_amounts: dict[str, float] = {}
+        for raw_name, raw_wt_pct in dict(liquid_composition_wt_pct or {}).items():
+            oxide = canonical_melt_oxide_activity_name(raw_name)
+            if oxide is None:
+                continue
+            wt_pct = float(raw_wt_pct)
+            if not math.isfinite(wt_pct) or wt_pct < 0.0:
+                raise MeltBackendError(
+                    f'invalid liquid composition for activity conversion: '
+                    f'{raw_name}={raw_wt_pct!r}'
+                )
+            molar_mass = resolve_species_formula(
+                oxide
+            ).molar_mass_kg_per_mol()
+            mole_amounts[oxide] = wt_pct / molar_mass
+        total_moles = sum(mole_amounts.values())
+        if total_moles <= 0.0:
+            return {}
+
+        activities: dict[str, float] = {}
+        for raw_name, raw_gamma in dict(coefficients or {}).items():
+            oxide = canonical_melt_oxide_activity_name(raw_name)
+            if oxide is None or oxide not in mole_amounts:
+                continue
+            gamma = float(raw_gamma)
+            if not math.isfinite(gamma) or gamma <= 0.0:
+                continue
+            mole_fraction = mole_amounts[oxide] / total_moles
+            # Premise: thermodynamic activity is a_i = gamma_i * x_i.
+            # Algebra uses oxide mole fraction from wt_i / M_i normalized by
+            # sum(wt_j / M_j). Unit check: gamma and x are dimensionless, so
+            # activity is dimensionless. Sanity: gamma=0.5 and x=0.02 gives
+            # a=0.01, not the 0.5 value that inflated vapor flux by 50x.
+            activities[str(raw_name)] = gamma * mole_fraction
+        return activities
 
     def _finite_activity_mapping(self, values: Mapping[str, object]) -> dict:
         activities: Dict[str, float] = {}
@@ -2792,6 +3073,11 @@ class AlphaMELTSBackend(MeltBackend):
             }
         if composition_kg is None:
             raise ValueError('decompression_path requires composition input')
+        total_input_kg = sum(
+            float(mass_kg)
+            for mass_kg in composition_kg.values()
+            if math.isfinite(float(mass_kg)) and float(mass_kg) > 0.0
+        )
 
         raw_comp_wt = self._composition_kg_to_wt_pct(composition_kg)
         domain_rejection = self._domain_gate(
@@ -2833,6 +3119,8 @@ class AlphaMELTSBackend(MeltBackend):
                 pressure_bar=P_start_bar,
                 fO2_log=fO2_log,
                 comp_wt=comp_wt,
+                total_input_kg=total_input_kg,
+                require_solved_fo2=True,
                 warnings=self._last_normalization_warnings,
             )
             for run in runs

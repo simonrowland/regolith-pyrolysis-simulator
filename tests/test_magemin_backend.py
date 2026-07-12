@@ -251,6 +251,111 @@ def test_magemin_explicit_pymagemin_runtime_failure_retries_subprocess(monkeypat
     )
 
 
+def test_magemin_bridge_fallback_subtracts_elapsed_aggregate_budget(monkeypatch):
+    clock = {'t': 0.0}
+
+    def minimize(**_kwargs):
+        clock['t'] += 39.0
+        raise RuntimeError('bridge failed late')
+
+    backend = MAGEMinBackend()
+    backend._bridge = 'pymagemin'
+    backend._magemin_module = types.SimpleNamespace(minimize=minimize)
+    backend._binary_path = Path('/tmp/fake-MAGEMin')
+    seen = []
+
+    def fake_subprocess(**kwargs):
+        seen.append(kwargs['call_timeout_s'])
+        return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.magemin.time.monotonic',
+        lambda: clock['t'],
+    )
+    monkeypatch.setattr(backend, '_call_magemin_subprocess', fake_subprocess)
+
+    backend._call_magemin(
+        bulk_projection=types.SimpleNamespace(
+            composition_wt_pct={'SiO2': 50.0, 'MgO': 50.0},
+            vector=(50.0, 50.0),
+        ),
+        temperature_C=1200.0,
+        pressure_bar=1000.0,
+        fO2_log=-8.0,
+        call_timeout_s=40.0,
+    )
+
+    assert seen == [pytest.approx(1.0)]
+
+
+def test_magemin_negative_convergence_evidence_discards_phase_rows(monkeypatch):
+    fake_module = types.SimpleNamespace(
+        minimize=lambda **_kwargs: {
+            'converged': False,
+            'phases': {'liq': {'mass_kg': 0.8}, 'ol': {'mass_kg': 0.2}},
+        }
+    )
+    _make_available_magemin(monkeypatch, fake_module)
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', UserWarning)
+        assert backend.initialize({'python_bridge': 'pymagemin'}) is True
+
+    result = backend.equilibrate(
+        1200.0,
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
+        pressure_bar=1000.0,
+        fO2_log=-8.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.phases_present == []
+    assert result.diagnostics['backend_status_reason'] == 'negative_convergence_evidence'
+
+
+def test_magemin_object_negative_convergence_discards_phase_rows(monkeypatch):
+    fake_module = types.SimpleNamespace(
+        minimize=lambda **_kwargs: types.SimpleNamespace(
+            converged=False,
+            phases={'liq': {'mass_kg': 0.8}, 'ol': {'mass_kg': 0.2}},
+        )
+    )
+    _make_available_magemin(monkeypatch, fake_module)
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', UserWarning)
+        assert backend.initialize({'python_bridge': 'pymagemin'}) is True
+
+    result = backend.equilibrate(
+        1200.0,
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
+        pressure_bar=1000.0,
+        fO2_log=-8.0,
+    )
+
+    assert result.status == 'not_converged'
+    assert result.phases_present == []
+    assert result.diagnostics['backend_status_reason'] == 'negative_convergence_evidence'
+
+
+@pytest.mark.parametrize(
+    'mode_line',
+    ['0.8 bad', '0.8 nan', '0.8 -0.2', '0.8 1.2'],
+)
+def test_magemin_subprocess_parser_rejects_any_invalid_mode_token(mode_line):
+    with pytest.raises(RuntimeError, match='Mode token'):
+        MAGEMinBackend._parse_subprocess_stdout(
+            f'Phase: liq ol\nMode: {mode_line}\n'
+        )
+
+
+def test_magemin_subprocess_parser_rejects_nonunit_mode_vector():
+    with pytest.raises(RuntimeError, match='Mode vector must sum to 1.0'):
+        MAGEMinBackend._parse_subprocess_stdout(
+            'Phase: liq ol\nMode: 0.8 0.8\n'
+        )
+
+
 def test_magemin_explicit_julia_runtime_failure_retries_subprocess(monkeypatch):
     def single_point_minimization(*args):
         raise RuntimeError("julia minimizer crashed")
