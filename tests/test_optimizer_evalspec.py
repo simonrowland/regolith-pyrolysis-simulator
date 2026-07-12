@@ -88,26 +88,34 @@ STAGE_SIO_GAS_MODE = (
 # only the code_version token in the canonical EvalSpec payload.
 # 2026-07-12 C6 1400 C hold-window bounds [1380, 1450] moved the bounds digest
 # from 67f7eae1... to 32e9d2e9...; payload recomputed from _base_spec().
+# 2026-07-12 wave-12-cost-params: default cost parameters are now part of the
+# EvalSpec identity so cost-sensitive optimizer cache entries are reproducible.
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor"'
-    b':false,"allowlist_version":"allowlist-v11","backend_name":"internal-'
-    b'analytical","bounds_digest":"32e9d2e945bd870a2af90d5fc46259dd7b7244'
-    b'04d9066c4505d98921b8fd4252","c5_enabled":false,"campaign":"C'
-    b'0","chemistry_kernel":{"allow_builtin_fallback":false,"engin'
-    b'e":"builtin","pressure_Pa":"0.001000000"},"code_version":"0.'
-    b'6.0","data_digests":{"corpus_version":"corpus-version-digest'
-    b'","feedstocks":"feedstock-digest","foulant_thermo":"foulant-'
-    b'thermo-digest","materials":"materials-digest","profile":"pro'
-    b'file-digest","setpoints":"setpoints-digest","species_catalog'
-    b'":"species-catalog-digest","vapor_pressures":"vapor-digest"}'
-    b',"feedstock_id":"lunar_mare_low_ti","feedstock_recipe_digest'
-    b'":"feedstock-recipe-digest","fidelity":"fast","force_builtin'
-    b'_vapor_pressure":false,"hours":24,"mass_kg":"1000.000000000"'
-    b',"mre_max_voltage_V":"0.000000000","mre_target_species":"","'
-    b'profile_id":"oxygen-yield-v1","recipe_id":"recipe-id","runti'
-    b'me_campaign_overrides":{"C0":{"hold_time_h":"1.000000000"}},'
-    b'"track":"pyrolysis","vapor_pressure_provider_id":"builtin-va'
-    b'por-pressure"}'
+    b':false,"allowlist_version":"allowlist-v11","backend_name":"i'
+    b'nternal-analytical","bounds_digest":"32e9d2e945bd870a2af90d5'
+    b'fc46259dd7b724404d9066c4505d98921b8fd4252","c5_enabled":fals'
+    b'e,"campaign":"C0","chemistry_kernel":{"allow_builtin_fallbac'
+    b'k":false,"engine":"builtin","pressure_Pa":"0.001000000"},"co'
+    b'de_version":"0.6.0","cost_parameters":{"parameters":{"deprec'
+    b'iation_expense_per_run":"50.000000000","electricity_cost_per'
+    b'_kWh":"0.150000000","furnace_resinter_cost_usd":"5000.000000'
+    b'000","generic_reagent_cost_per_kg":"10.000000000","shuttle_r'
+    b'eagent_replacement_cost_per_kg":{"Ca":"0.500000000","K":"1.0'
+    b'00000000","Mg":"0.750000000","Na":"0.500000000"}},"schema_ve'
+    b'rsion":"optimize-costs-v1"},"data_digests":{"corpus_version"'
+    b':"corpus-version-digest","feedstocks":"feedstock-digest","fo'
+    b'ulant_thermo":"foulant-thermo-digest","materials":"materials'
+    b'-digest","profile":"profile-digest","setpoints":"setpoints-d'
+    b'igest","species_catalog":"species-catalog-digest","vapor_pre'
+    b'ssures":"vapor-digest"},"feedstock_id":"lunar_mare_low_ti","'
+    b'feedstock_recipe_digest":"feedstock-recipe-digest","fidelity'
+    b'":"fast","force_builtin_vapor_pressure":false,"hours":24,"ma'
+    b'ss_kg":"1000.000000000","mre_max_voltage_V":"0.000000000","m'
+    b're_target_species":"","profile_id":"oxygen-yield-v1","recipe'
+    b'_id":"recipe-id","runtime_campaign_overrides":{"C0":{"hold_t'
+    b'ime_h":"1.000000000"}},"track":"pyrolysis","vapor_pressure_p'
+    b'rovider_id":"builtin-vapor-pressure"}'
 )
 PINNED_FEEDSTOCK_JSON = (
     b'[["Al2O3","13.500000000"],["FeO","16.500000000"],["SiO2","44.500000000"]]'
@@ -628,7 +636,7 @@ def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-3]
+    old_args = args[:16] + args[19:-4]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -648,7 +656,7 @@ def test_pre_bubbler_evalspec_reduce_payloads_get_empty_settings_default() -> No
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-3]
+    old_args = args[:18] + args[19:-4]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -668,7 +676,7 @@ def test_pre_redox_prefix_evalspec_reduce_payloads_get_zero_dose_defaults() -> N
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-3]
+    old_args = args[:16] + args[19:-4]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -691,7 +699,7 @@ def test_pre_bubbler_prefix_evalspec_reduce_payloads_get_empty_settings_default(
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-3]
+    old_args = args[:18] + args[19:-4]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -709,7 +717,7 @@ def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
         _prefix_spec(stop_at_stage0_exit=False),
     ):
         _, new_args = spec.__reduce__()
-        old_args = new_args[:-3]
+        old_args = new_args[:-4]
         restored = type(spec)(*old_args)
 
         assert restored.stop_at_stage0_exit is False

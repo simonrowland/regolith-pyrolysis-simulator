@@ -29,6 +29,7 @@ from simulator.electrolysis import (
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
 )
+from simulator.cost_parameters import default_cost_parameters_block
 from simulator.optimize import cli as optimizer_cli
 from simulator.optimize import physics as physics_module
 from simulator.optimize import study
@@ -143,6 +144,7 @@ def _spec(
     fidelity: str,
     profile: Mapping[str, Any],
     constraints: Any | None = None,
+    cost_parameters: Mapping[str, Any] | None = None,
 ) -> EvalSpec:
     spec, _ = _build_eval_inputs(
         patch.validated(RecipeSchema()),
@@ -151,6 +153,7 @@ def _spec(
         profile,
         RecipeSchema(),
         constraints=constraints,
+        cost_parameters=cost_parameters,
     )
     return spec
 
@@ -258,7 +261,9 @@ def _scope_spec() -> EvalSpec:
     )
 
 
-def _save_format_record() -> study.StudyRecord:
+def _save_format_record(
+    cost_parameters: Mapping[str, Any] | None = None,
+) -> study.StudyRecord:
     return study.StudyRecord(
         candidate_id="candidate-001",
         patch=RecipePatch({}),
@@ -317,6 +322,13 @@ def _save_format_record() -> study.StudyRecord:
         result_blob={"cache_state": "live_fill", "cache_rung": 3},
         proposal_source="staged_child",
         seed_lineage=False,
+        eval_spec=_spec(
+            RecipePatch({}),
+            FEEDSTOCK,
+            "stub",
+            PROFILE,
+            cost_parameters=cost_parameters,
+        ),
     )
 
 
@@ -325,6 +337,7 @@ def _write_save_format_artifacts(
     monkeypatch: pytest.MonkeyPatch,
     *,
     warm_start_from: Path | None = None,
+    cost_parameters: Mapping[str, Any] | None = None,
 ) -> Path:
     out = tmp_path / "run"
     out.mkdir()
@@ -347,7 +360,7 @@ def _write_save_format_artifacts(
         }
 
     monkeypatch.setattr(study, "optimizer_tier_label", fake_honesty)
-    record = _save_format_record()
+    record = _save_format_record(cost_parameters)
     config = study.StudyConfig(
         profile=PROFILE,
         feedstock=FEEDSTOCK,
@@ -394,6 +407,25 @@ def _write_save_format_artifacts(
     )
     assert calls == [(record.trace_summary, record.result_blob)]
     return out
+
+
+def test_winner_recipe_records_evaluated_cost_parameters(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    cost_parameters = default_cost_parameters_block()
+    cost_parameters["parameters"]["electricity_cost_per_kWh"]["value"] = 0.42
+
+    out = _write_save_format_artifacts(
+        tmp_path,
+        monkeypatch,
+        cost_parameters=cost_parameters,
+    )
+
+    winner = yaml.safe_load((out / "winner.recipe.yaml").read_text(encoding="utf-8"))
+    assert winner["cost_parameters"]["parameters"]["electricity_cost_per_kWh"][
+        "value"
+    ] == pytest.approx(0.42)
 
 
 def test_write_artifacts_emits_study_summary_schema(
@@ -3591,6 +3623,7 @@ def test_tap_truncated_winner_materializes_recipe_and_sidecar(tmp_path) -> None:
         objectives={"composition_target:pc-glass-clear": 1.0},
         feasibility_margins={},
         cache_key="cache",
+        eval_spec=_scope_spec(),
         trace_summary={
             "composition_target": {
                 "best_tap_enabled": True,

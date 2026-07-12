@@ -8,6 +8,7 @@ import pytest
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 import simulator.optimize.objective as objective_module
 from scripts import sso_r_validation_map as validation_map
+from simulator.cost_parameters import CostParameters
 from simulator.optimize.objective import (
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
@@ -317,7 +318,20 @@ def test_certified_pumping_diagnostic_without_energy_fails_closed() -> None:
 
 def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch) -> None:
     monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 2.0)
+    cost_parameters = CostParameters(
+        electricity_cost_per_kWh=2.0,
+        furnace_resinter_cost_usd=100.0,
+        depreciation_expense_per_run=7.0,
+        generic_reagent_cost_per_kg=5.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+    )
     sim = SimpleNamespace(
+        energy_electrical_plus_evaporation_cumulative_kWh=10.0,
         record=SimpleNamespace(
             cost_rollup={
                 "run_input_cost": {
@@ -358,10 +372,11 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
     assert _metric_value(
         "throughput_cost_owner_ratify_usd",
         sim,
-        {},
+        {"consumed_Fe_reagent": 2.0},
         product_classes,
         run_execution=run_execution,
-    ) == pytest.approx(1294.0)
+        cost_parameters=cost_parameters,
+    ) == pytest.approx(42.5)
     assert _metric_value(
         "furnace_lifespan_consumed_fraction",
         sim,
@@ -402,7 +417,38 @@ def test_lifespan_cost_metric_is_not_costed_when_threshold_is_unavailable(monkey
     }
 
 
-def test_cost_objective_ranking_ignores_pumping_sidecar() -> None:
+def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() -> None:
+    cost_parameters = CostParameters(
+        electricity_cost_per_kWh=7.0,
+        furnace_resinter_cost_usd=999.0,
+        depreciation_expense_per_run=11.0,
+        generic_reagent_cost_per_kg=5.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 13.0,
+            "K": 17.0,
+            "Mg": 19.0,
+            "Ca": 23.0,
+        },
+    )
+    sim = SimpleNamespace(
+        energy_electrical_plus_evaporation_cumulative_kWh=1.0,
+        record=SimpleNamespace(cost_rollup={}),
+    )
+
+    assert _metric_value(
+        "throughput_cost_owner_ratify_usd",
+        sim,
+        {
+            "consumed_Fe_reagent": 2.0,
+            "consumed_Na_reagent": 3.0,
+        },
+        {},
+        run_execution=SimpleNamespace(simulator=sim),
+        cost_parameters=cost_parameters,
+    ) == pytest.approx(67.0)
+
+
+def test_cost_objective_ranking_prices_pumping_sidecar() -> None:
     definitions = (
         ObjectiveDefinition(
             "throughput_cost_owner_ratify_usd",
@@ -412,14 +458,27 @@ def test_cost_objective_ranking_ignores_pumping_sidecar() -> None:
         ),
     )
 
-    def sim_with(cost_usd: float, *, pumping_electrical_kWh: float | None = None):
+    cost_parameters = CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=0.0,
+        depreciation_expense_per_run=0.0,
+        generic_reagent_cost_per_kg=0.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 0.0,
+            "K": 0.0,
+            "Mg": 0.0,
+            "Ca": 0.0,
+        },
+    )
+
+    def sim_with(base_energy_kWh: float, *, pumping_electrical_kWh: float | None = None):
         cost_rollup = {
             "run_input_cost": {
                 "physical_cost": {
                     "thermal_flux_h": 1234.0,
                     "furnace_h": 6.0,
                 },
-                "owner_ratify_money_projection": cost_usd,
+                "owner_ratify_money_projection": 0.0,
             }
         }
         if pumping_electrical_kWh is not None:
@@ -427,7 +486,10 @@ def test_cost_objective_ranking_ignores_pumping_sidecar() -> None:
                 "status": "ok",
                 "pumping_electrical_kWh": pumping_electrical_kWh,
             }
-        return SimpleNamespace(record=SimpleNamespace(cost_rollup=cost_rollup))
+        return SimpleNamespace(
+            energy_electrical_plus_evaporation_cumulative_kWh=base_energy_kWh,
+            record=SimpleNamespace(cost_rollup=cost_rollup),
+        )
 
     def score(sim: SimpleNamespace) -> tuple[float, ...]:
         value = _metric_value(
@@ -436,6 +498,7 @@ def test_cost_objective_ranking_ignores_pumping_sidecar() -> None:
             {},
             {},
             run_execution=SimpleNamespace(simulator=sim),
+            cost_parameters=cost_parameters,
         )
         return objective_scores(
             {"throughput_cost_owner_ratify_usd": value},
@@ -466,7 +529,8 @@ def test_cost_objective_ranking_ignores_pumping_sidecar() -> None:
         )
     ]
 
-    assert rank_with == rank_without == ["lower_cost", "higher_cost"]
+    assert rank_without == ["lower_cost", "higher_cost"]
+    assert rank_with == ["higher_cost", "lower_cost"]
 
 
 def test_incomplete_objective_importance_evidence_raises_insufficient_evidence() -> None:

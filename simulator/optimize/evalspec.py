@@ -24,6 +24,10 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
+from simulator.cost_parameters import (
+    cost_parameter_values,
+    default_cost_parameters_block,
+)
 from simulator.optimize.canonical import (
     FLOAT_QUANTUM,
     CanonicalizationError,
@@ -106,6 +110,10 @@ class EvalSpec:
     allowlist_version: str = field(default=DEFAULT_ALLOWLIST_VERSION, kw_only=True)
     bounds_digest: str = field(default_factory=default_bounds_digest, kw_only=True)
     stop_at_stage0_exit: bool = field(default=False, kw_only=True)
+    cost_parameters: Mapping[str, Any] = field(
+        default_factory=default_cost_parameters_block,
+        kw_only=True,
+    )
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -217,6 +225,15 @@ class EvalSpec:
             "target_provenance",
             _freeze_value(self.target_provenance, "target_provenance"),
         )
+        object.__setattr__(
+            self,
+            "cost_parameters",
+            _freeze_value(
+                self.cost_parameters,
+                "cost_parameters",
+            ),
+        )
+        cost_parameter_values(self.cost_parameters)
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
         return (
@@ -262,6 +279,7 @@ class EvalSpec:
                 self.allowlist_version,
                 self.bounds_digest,
                 self.stop_at_stage0_exit,
+                _thaw_value(self.cost_parameters),
             ),
         )
 
@@ -332,6 +350,7 @@ class PrefixEvalSpec(EvalSpec):
                 self.allowlist_version,
                 self.bounds_digest,
                 self.stop_at_stage0_exit,
+                _thaw_value(self.cost_parameters),
             ),
         )
 
@@ -430,6 +449,14 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
             bounds_digest=args[-2],
             stop_at_stage0_exit=args[-1],
         )
+    if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 4:
+        return EvalSpec(
+            *_with_legacy_data_digest_args(args[:-4]),
+            allowlist_version=args[-4],
+            bounds_digest=args[-3],
+            stop_at_stage0_exit=args[-2],
+            cost_parameters=args[-1],
+        )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 2:
         return EvalSpec(
             *_with_legacy_data_digest_args(args[:-2]),
@@ -489,6 +516,14 @@ def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
             bounds_digest=args[-2],
             stop_at_stage0_exit=args[-1],
         )
+    if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 4:
+        return PrefixEvalSpec(
+            *_with_legacy_data_digest_args(args[:-4]),
+            allowlist_version=args[-4],
+            bounds_digest=args[-3],
+            stop_at_stage0_exit=args[-2],
+            cost_parameters=args[-1],
+        )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 2:
         return PrefixEvalSpec(
             *_with_legacy_data_digest_args(args[:-2]),
@@ -524,6 +559,7 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "campaign": spec.campaign,
         "chemistry_kernel": _chemistry_kernel_key_payload(spec.chemistry_kernel),
         "code_version": spec.code_version,
+        "cost_parameters": cost_parameter_values(spec.cost_parameters),
         "data_digests": spec.data_digests,
         "feedstock_id": spec.feedstock_id,
         "feedstock_recipe_digest": spec.feedstock_recipe_digest,

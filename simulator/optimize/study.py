@@ -31,6 +31,9 @@ from simulator.ceramic_classifier import (
     CeramicServiceTemperature,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.cost_parameters import (
+    RECIPE_COST_PARAMETERS_KEY,
+)
 from simulator.corpus_version import current_corpus_version
 from simulator.diagnostics import coating_summary_with_grounded_authority
 from simulator.optimize.canonical import canonical_json_dumps
@@ -47,6 +50,7 @@ from simulator.optimize.evaluate import (
     evaluate,
 )
 from simulator.optimize.evalspec import (
+    EvalSpec,
     PrefixEvalSpec,
     cache_key,
     canonical_evalspec_json,
@@ -332,6 +336,7 @@ class StudyRecord:
     proposal_source: str = "unknown"
     seed_lineage: bool = False
     search_provenance: Mapping[str, Any] = field(default_factory=dict)
+    eval_spec: EvalSpec | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "objectives", MappingProxyType(dict(self.objectives)))
@@ -3968,6 +3973,7 @@ def _to_record(candidate: Candidate, scored: ScoredResult, *, cache_hit: bool) -
         proposal_source=str(search_provenance["proposal_source"]),
         seed_lineage=bool(search_provenance["seed_lineage"]),
         search_provenance=search_provenance,
+        eval_spec=light_scored.eval_spec,
     )
 
 
@@ -4628,8 +4634,16 @@ def _write_artifacts(
         )
         if winner is not None:
             winner_patch = _materialized_winner_patch(winner, schema, profile)
+            if winner.eval_spec is None:
+                raise ValueError("winner record missing EvalSpec cost parameters")
+            winner_document = {
+                RECIPE_COST_PARAMETERS_KEY: _jsonable_value(
+                    winner.eval_spec.cost_parameters
+                ),
+                **dict(winner_patch),
+            }
             winner_path.write_text(
-                yaml.safe_dump(winner_patch, sort_keys=True),
+                yaml.safe_dump(winner_document, sort_keys=False),
                 encoding="utf-8",
             )
             winner_written = True

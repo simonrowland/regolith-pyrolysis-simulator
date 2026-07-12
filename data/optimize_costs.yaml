@@ -1,0 +1,50 @@
+schema_version: optimize-costs-v1
+
+# Future distiller for shuttle replacement rates:
+# run a representative C3/C6 recipe, record additive input kg minus
+# unspent_*_reagent and consumed_*_reagent ledger outputs by species, divide
+# observed inventory-loss replacement spend by kg lost, then update the static
+# Na/K/Mg/Ca values below. Do not substitute spot-market metal prices; the
+# shuttle regenerates inventory and the marginal cost is replacement loss.
+parameters:
+  electricity_cost_per_kWh:
+    value: 0.15
+    units: USD/kWh
+    rationale: "Bootstrap microgrid planning rate; rounded above recent EIA industrial retail electricity to cover off-Earth generation/storage margin."
+    source_tag: "U.S. EIA, Electric Power Monthly, Table 5.6.A, Average Price of Electricity to Ultimate Customers by End-Use Sector, accessed 2026-07-12, https://www.eia.gov/electricity/monthly/epm_table_grapher.php?t=epmt_5_06_a; owner bootstrap margin"
+
+  furnace_resinter_cost_usd:
+    value: 5000.0
+    units: USD/resinter
+    rationale: "Bootstrap refractory relining/resinter campaign allowance until furnace material vendor quotes exist."
+    source_tag: "owner ratified 2026-07-12: cost metrics as YAML parameters; marginal-cost accounting; 5000 USD/resinter bootstrap pending refractory campaign cost quote"
+
+  depreciation_expense_per_run:
+    value: 50.0
+    units: USD/run
+    rationale: "Fallback only: furnace_resinter_cost_usd divided by a 100-campaign placeholder when campaigns_to_resinter is unavailable."
+    source_tag: "owner ratified 2026-07-12: marginal-cost accounting bootstrap derived as 5000 USD / 100 campaigns pending measured campaigns-to-resinter"
+
+  generic_reagent_cost_per_kg:
+    value: 10.0
+    units: USD/kg
+    rationale: "Bootstrap non-shuttle reagent replacement rate for consumables without species-specific costing."
+    source_tag: "owner bootstrap estimate pending reagent-specific procurement basis"
+
+  shuttle_reagent_replacement_cost_per_kg:
+    units: USD/kg
+    rationale: "Static amortized inventory-loss replacement estimates for regenerated shuttle inventory; not market purchase prices."
+    source_tag: "owner ratified 2026-07-12: cost metrics as YAML parameters; marginal-cost accounting; shuttle Na/K/Mg/Ca static bootstrap values pending distillation from a sample run"
+    values:
+      Na:
+        value: 0.50
+        rationale: "Bootstrap Na shuttle inventory-loss replacement estimate."
+      K:
+        value: 1.00
+        rationale: "Bootstrap K shuttle inventory-loss replacement estimate."
+      Mg:
+        value: 0.75
+        rationale: "Bootstrap Mg shuttle inventory-loss replacement estimate."
+      Ca:
+        value: 0.50
+        rationale: "Bootstrap Ca shuttle inventory-loss replacement estimate."

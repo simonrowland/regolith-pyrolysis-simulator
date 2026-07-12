@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import copy
 import hashlib
 import io
 import json
@@ -10,8 +11,10 @@ import zipfile
 
 from flask import Flask
 import pytest
+import yaml
 
 from simulator.corpus_version import current_corpus_version
+from simulator.cost_parameters import default_cost_parameters_block
 from simulator.optimize.evalspec import EvalSpec, current_code_version
 from simulator.optimize.evaluate import RunReference, ScoredResult
 from simulator.optimize import import_bundle as import_bundle_module
@@ -64,6 +67,7 @@ def _eval_spec_payload(
     *,
     code_version: str = current_code_version(),
     data_digests: dict[str, str] | None = None,
+    cost_parameters: dict[str, object] | None = None,
 ) -> dict[str, object]:
     schema = _schema()
     return {
@@ -78,6 +82,7 @@ def _eval_spec_payload(
         "chemistry_kernel": {"engine": "builtin"},
         "allowlist_version": schema.allowlist_version,
         "bounds_digest": schema.bounds_digest,
+        "cost_parameters": cost_parameters or default_cost_parameters_block(),
     }
 
 
@@ -108,8 +113,9 @@ def _scored(
     oxygen: float,
     code_version: str = current_code_version(),
     candidate_id: str = "candidate-a",
+    cost_parameters: dict[str, object] | None = None,
 ) -> ScoredResult:
-    spec = _eval_spec(code_version=code_version)
+    spec = _eval_spec(code_version=code_version, cost_parameters=cost_parameters)
     return ScoredResult(
         candidate_id=candidate_id,
         eval_spec=spec,
@@ -127,7 +133,12 @@ def _scored(
     )
 
 
-def _evaluator(*, oxygen: float, code_version: str = current_code_version()):
+def _evaluator(
+    *,
+    oxygen: float,
+    code_version: str = current_code_version(),
+    cost_parameters: dict[str, object] | None = None,
+):
     def evaluate_patch(
         patch,
         feedstock_id,
@@ -136,11 +147,13 @@ def _evaluator(*, oxygen: float, code_version: str = current_code_version()):
         profile,
         candidate_id=None,
         schema=None,
+        cost_parameters=None,
     ) -> ScoredResult:
         return _scored(
             oxygen=oxygen,
             code_version=code_version,
             candidate_id=candidate_id or "candidate-a",
+            cost_parameters=cost_parameters,
         )
 
     return evaluate_patch
@@ -152,6 +165,7 @@ def _sqlite_bytes(
     oxygen: float = 10.0,
     code_version: str = current_code_version(),
     rows: list[dict[str, object]] | None = None,
+    cost_parameters: dict[str, object] | None = None,
 ) -> bytes:
     path = tmp_path / f"cache-{len(list(tmp_path.glob('cache-*.sqlite')))}.sqlite"
     records = rows or [
@@ -181,7 +195,14 @@ def _sqlite_bytes(
         )
         for record in records:
             row_code_version = str(record.get("code_version") or code_version)
-            spec_payload = _eval_spec_payload(code_version=row_code_version)
+            spec_payload = _eval_spec_payload(
+                code_version=row_code_version,
+                cost_parameters=(
+                    record.get("cost_parameters")
+                    if isinstance(record.get("cost_parameters"), dict)
+                    else cost_parameters
+                ),
+            )
             conn.execute(
                 """
                 INSERT INTO results
@@ -310,6 +331,7 @@ def _members(
     sqlite_rows: list[dict[str, object]] | None = None,
     leaderboard_patch: dict[str, object] | None = None,
     leaderboard_patch_json: str | None = None,
+    cost_parameters: dict[str, object] | None = None,
 ) -> dict[str, bytes]:
     schema = _schema()
     summary = {
@@ -362,6 +384,7 @@ def _members(
             oxygen=oxygen,
             code_version=code_version,
             rows=sqlite_rows,
+            cost_parameters=cost_parameters,
         ),
         "pareto.json": _json_bytes(
             {"member_schema_version": MEMBER_SCHEMA_VERSION, "pareto": []}
@@ -1135,6 +1158,27 @@ def test_tier1_verifies_winner_and_all_pareto_candidates(tmp_path: Path) -> None
 def test_winner_recipe_yaml_fallback_is_used_for_missing_leaderboard_patch(
     tmp_path: Path,
 ) -> None:
+    cost_parameters = default_cost_parameters_block()
+    cost_parameters["parameters"]["electricity_cost_per_kWh"]["value"] = 0.42
+    observed_cost_parameters: list[dict[str, object]] = []
+
+    def evaluator(
+        patch,
+        feedstock_id,
+        fidelity,
+        *,
+        profile,
+        candidate_id=None,
+        schema=None,
+        cost_parameters=None,
+    ) -> ScoredResult:
+        observed_cost_parameters.append(cost_parameters)
+        return _scored(
+            oxygen=10.0,
+            candidate_id=candidate_id or "candidate-a",
+            cost_parameters=cost_parameters,
+        )
+
     bundle = _export_bundle(
         tmp_path,
         {
@@ -1142,15 +1186,70 @@ def test_winner_recipe_yaml_fallback_is_used_for_missing_leaderboard_patch(
                 tmp_path,
                 study_id="winner-fallback",
                 leaderboard_patch_json="",
+                cost_parameters=cost_parameters,
             ),
-            "winner.recipe.yaml": b"furnace_max_T_C: 1500.0\n",
+            "winner.recipe.yaml": yaml.safe_dump(
+                {
+                    "cost_parameters": cost_parameters,
+                    "furnace_max_T_C": 1500.0,
+                },
+                sort_keys=False,
+            ).encode("utf-8"),
         },
     )
 
-    imported = import_study_bundle(bundle, tmp_path / "runs", evaluator=_evaluator(oxygen=10.0))
+    imported = import_study_bundle(bundle, tmp_path / "runs", evaluator=evaluator)
     verification = imported_study_model(imported.path, tmp_path / "runs")["verification"]
 
     assert verification["candidates"][0]["verdict"] == "confirmed"
+    assert observed_cost_parameters[0]["parameters"]["electricity_cost_per_kWh"][
+        "value"
+    ] == pytest.approx(0.42)
+
+
+def test_import_identity_detects_cost_parameter_drift() -> None:
+    local_costs = default_cost_parameters_block()
+    local_costs["parameters"]["electricity_cost_per_kWh"]["value"] = 0.42
+    local = import_bundle_module._local_claim(
+        _scored(oxygen=10.0, cost_parameters=local_costs)
+    )["identity"]
+    imported = copy.deepcopy(local)
+    imported["cost_parameters"] = default_cost_parameters_block()
+
+    same, moved = import_bundle_module._same_identity_epoch(local, imported)
+
+    assert same is False
+    assert moved == ["cost_parameters"]
+
+
+def test_bundle_verification_detects_winner_recipe_cost_drift(tmp_path: Path) -> None:
+    recipe_costs = default_cost_parameters_block()
+    recipe_costs["parameters"]["electricity_cost_per_kWh"]["value"] = 0.42
+    bundle = _export_bundle(
+        tmp_path,
+        {
+            **_members(tmp_path, study_id="cost-drift"),
+            "winner.recipe.yaml": yaml.safe_dump(
+                {
+                    "cost_parameters": recipe_costs,
+                    "furnace_max_T_C": 1500.0,
+                },
+                sort_keys=False,
+            ).encode("utf-8"),
+        },
+    )
+
+    imported = import_study_bundle(
+        bundle,
+        tmp_path / "runs",
+        evaluator=_evaluator(oxygen=10.0),
+    )
+    candidate = imported_study_model(imported.path, tmp_path / "runs")[
+        "verification"
+    ]["candidates"][0]
+
+    assert candidate["verdict"] == "unchanged"
+    assert candidate["reason_codes"] == ["cost_parameters"]
 
 
 def test_not_reevaluable_vocabulary_drift_uses_locked_reason_code(tmp_path: Path) -> None:

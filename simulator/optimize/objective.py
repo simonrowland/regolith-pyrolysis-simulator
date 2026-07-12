@@ -14,6 +14,11 @@ from typing import Any, Iterable, Mapping, TypeVar
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.cost_parameters import (
+    SHUTTLE_REAGENT_SPECIES,
+    CostParameters,
+    cost_parameters_from_mapping,
+)
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
@@ -1330,9 +1335,15 @@ def objective_importance_evidence(
     return tuple(rows)
 
 
-def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> ObjectiveVector:
+def compute_objectives(
+    profile: Mapping[str, Any],
+    run_execution: Any,
+    *,
+    cost_parameters: Mapping[str, Any] | None = None,
+) -> ObjectiveVector:
     """Compute the declared objective vector from real simulator outputs."""
 
+    active_cost_parameters = cost_parameters_from_mapping(cost_parameters)
     definitions = objective_definitions(profile)
     raw_objectives = profile.get("objectives")
     if not isinstance(raw_objectives, (list, tuple)):
@@ -1380,7 +1391,17 @@ def compute_objectives(profile: Mapping[str, Any], run_execution: Any) -> Object
                 product_ledger,
                 product_classes,
                 run_execution=run_execution,
+                cost_parameters=active_cost_parameters,
             )
+            if definition.metric in THROUGHPUT_OWNER_COST_METRICS:
+                evidence[definition.metric] = _plain_payload(
+                    _marginal_extraction_cost_summary(
+                        sim,
+                        product_ledger,
+                        run_execution=run_execution,
+                        cost_parameters=active_cost_parameters,
+                    )
+                )
             if definition.metric in FURNACE_LIFESPAN_COST_METRICS:
                 evidence[definition.metric] = _plain_payload(
                     _furnace_lifespan_cost_summary(run_execution, sim)
@@ -3796,6 +3817,7 @@ def _metric_value(
     product_classes: Mapping[str, Any],
     *,
     run_execution: Any | None = None,
+    cost_parameters: CostParameters | None = None,
 ) -> float | None:
     if metric == "pure_silica_glass_kg":
         return _nested_float(product_classes, ("pure_silica_glass", "class_total_kg"))
@@ -3850,7 +3872,12 @@ def _metric_value(
     if metric in FURNACE_TIME_METRICS:
         return _cost_rollup_physical_metric(sim, "furnace_h", metric)
     if metric in THROUGHPUT_OWNER_COST_METRICS:
-        return _cost_rollup_run_input_money(sim, metric)
+        return _marginal_extraction_cost_summary(
+            sim,
+            product_ledger,
+            run_execution=run_execution,
+            cost_parameters=cost_parameters or cost_parameters_from_mapping(),
+        )["marginal_cost_usd"]
     if metric in FURNACE_LIFESPAN_COST_METRICS:
         return _furnace_lifespan_consumed_fraction(run_execution, sim)
     if metric.endswith("_kg"):
@@ -3860,6 +3887,209 @@ def _metric_value(
     raise ObjectiveComputationError(
         f"objective metric {metric!r} is not available from run outputs"
     )
+
+
+def _marginal_extraction_cost_summary(
+    sim: Any,
+    product_ledger: Mapping[str, float],
+    *,
+    run_execution: Any | None,
+    cost_parameters: CostParameters,
+) -> Mapping[str, Any]:
+    energy_kWh = _variable_energy_kWh(sim, run_execution=run_execution)
+    # Unit check: kWh * USD/kWh = USD. The simulator energy total already
+    # includes condenser, turbine, MRE electrical, and evaporation-equivalent
+    # kWh; _pumping_energy_penalty_kWh adds the T-005 pumping sidecar.
+    energy_cost_usd = energy_kWh * cost_parameters.electricity_cost_per_kWh
+    reagent = _reagent_consumption_cost_summary(
+        sim,
+        product_ledger,
+        cost_parameters=cost_parameters,
+    )
+    depreciation = _depreciation_expense_per_run_summary(
+        run_execution,
+        sim,
+        cost_parameters=cost_parameters,
+    )
+    # Marginal extraction cost = variable energy + reagent replacement loss +
+    # per-run furnace depreciation. Capital purchase and launch costs are not
+    # included in this run-local objective.
+    total = (
+        energy_cost_usd
+        + float(reagent["reagent_cost_usd"])
+        + float(depreciation["depreciation_expense_per_run_usd"])
+    )
+    return MappingProxyType({
+        "schema_version": "optimizer-marginal-cost-v1",
+        "accounting_principle": (
+            "marginal extraction cost: variable energy + reagent consumption "
+            "+ per-run depreciation"
+        ),
+        "marginal_cost_usd": total,
+        "energy_kWh": energy_kWh,
+        "electricity_cost_per_kWh": cost_parameters.electricity_cost_per_kWh,
+        "energy_cost_usd": energy_cost_usd,
+        "reagent": reagent,
+        "depreciation": depreciation,
+    })
+
+
+def _variable_energy_kWh(
+    sim: Any,
+    *,
+    run_execution: Any | None,
+) -> float:
+    return (
+        _sim_float(
+            sim,
+            "energy_electrical_plus_evaporation_cumulative_kWh",
+            "energy_electrical_plus_evaporation_kWh",
+        )
+        + _pumping_energy_penalty_kWh(sim, run_execution=run_execution)
+    )
+
+
+def _reagent_consumption_cost_summary(
+    sim: Any,
+    product_ledger: Mapping[str, float],
+    *,
+    cost_parameters: CostParameters,
+) -> Mapping[str, Any]:
+    consumed = _reagent_consumption_kg_by_species(sim, product_ledger)
+    rows: dict[str, Mapping[str, Any]] = {}
+    total = 0.0
+    for species in sorted(consumed):
+        kg = consumed[species]
+        if kg <= _EPS:
+            continue
+        unit_cost = cost_parameters.reagent_cost_per_kg(species)
+        # Unit check: kg of net consumed/lost reagent * USD/kg = USD.
+        cost = kg * unit_cost
+        total += cost
+        rows[species] = MappingProxyType({
+            "consumed_kg": kg,
+            "cost_per_kg_usd": unit_cost,
+            "cost_usd": cost,
+            "pricing_policy": (
+                "static_shuttle_inventory_loss_replacement"
+                if species in SHUTTLE_REAGENT_SPECIES
+                else "generic_reagent_replacement"
+            ),
+        })
+    return MappingProxyType({
+        "reagent_cost_usd": total,
+        "consumed_kg_by_species": MappingProxyType(dict(consumed)),
+        "rows": MappingProxyType(rows),
+    })
+
+
+def _reagent_consumption_kg_by_species(
+    sim: Any,
+    product_ledger: Mapping[str, float],
+) -> Mapping[str, float]:
+    consumed_bookkeeping: dict[str, float] = {}
+    unspent_bookkeeping: dict[str, float] = {}
+    for species, kg in product_ledger.items():
+        reagent = _reagent_species_from_bookkeeping_product(str(species), "consumed")
+        if reagent is not None:
+            consumed_bookkeeping[reagent] = consumed_bookkeeping.get(reagent, 0.0) + _finite_float(
+                kg,
+                f"product_ledger[{species!r}]",
+            )
+            continue
+        reagent = _reagent_species_from_bookkeeping_product(str(species), "unspent")
+        if reagent is not None:
+            unspent_bookkeeping[reagent] = unspent_bookkeeping.get(reagent, 0.0) + _finite_float(
+                kg,
+                f"product_ledger[{species!r}]",
+            )
+    if consumed_bookkeeping:
+        return MappingProxyType({
+            species: max(0.0, kg)
+            for species, kg in consumed_bookkeeping.items()
+        })
+
+    inputs = _additive_reagent_inputs_kg(sim)
+    consumed: dict[str, float] = {}
+    for species, kg in inputs.items():
+        consumed[species] = max(0.0, kg - unspent_bookkeeping.get(species, 0.0))
+    return MappingProxyType(consumed)
+
+
+def _reagent_species_from_bookkeeping_product(name: str, prefix: str) -> str | None:
+    marker = f"{prefix}_"
+    suffix = "_reagent"
+    if not name.startswith(marker) or not name.endswith(suffix):
+        return None
+    species = name[len(marker):-len(suffix)]
+    return species or None
+
+
+def _additive_reagent_inputs_kg(sim: Any) -> Mapping[str, float]:
+    record = getattr(sim, "record", None)
+    raw = getattr(record, "additives_kg", None)
+    if raw is None:
+        raw = getattr(sim, "additives_kg", {})
+    if not isinstance(raw, Mapping):
+        return MappingProxyType({})
+    return MappingProxyType({
+        str(species): _finite_float(kg, f"additives_kg[{species!r}]")
+        for species, kg in raw.items()
+    })
+
+
+def _depreciation_expense_per_run_summary(
+    run_execution: Any | None,
+    sim: Any,
+    *,
+    cost_parameters: CostParameters,
+) -> Mapping[str, Any]:
+    try:
+        summary = _furnace_lifespan_cost_summary(run_execution, sim)
+    except ObjectiveComputationError:
+        return MappingProxyType({
+            "status": "configured_default_missing_fouling_trace",
+            "furnace_resinter_cost_usd": cost_parameters.furnace_resinter_cost_usd,
+            "depreciation_expense_per_run_usd": (
+                cost_parameters.depreciation_expense_per_run
+            ),
+            "configured_default_depreciation_expense_per_run_usd": (
+                cost_parameters.depreciation_expense_per_run
+            ),
+            "campaigns_to_resinter": None,
+            "resinter_threshold_kg": None,
+            "wall_deposit_total_kg": None,
+        })
+    threshold = summary.get("resinter_threshold_kg")
+    wall_load = _finite_float(summary.get("wall_deposit_total_kg", 0.0), "wall_deposit_total_kg")
+    if threshold is not None:
+        threshold_kg = _finite_float(threshold, "resinter_threshold_kg")
+        if threshold_kg <= 0.0:
+            raise ObjectiveComputationError("resinter_threshold_kg must be positive")
+        if wall_load <= 0.0:
+            campaigns_to_resinter = None
+            depreciation = 0.0
+            status = "no_wall_deposit"
+        else:
+            campaigns_to_resinter = threshold_kg / wall_load
+            # Unit check: USD/resinter / runs/resinter = USD/run.
+            depreciation = cost_parameters.furnace_resinter_cost_usd / campaigns_to_resinter
+            status = "campaigns_to_resinter"
+    else:
+        campaigns_to_resinter = None
+        depreciation = cost_parameters.depreciation_expense_per_run
+        status = "configured_default"
+    return MappingProxyType({
+        "status": status,
+        "furnace_resinter_cost_usd": cost_parameters.furnace_resinter_cost_usd,
+        "depreciation_expense_per_run_usd": depreciation,
+        "configured_default_depreciation_expense_per_run_usd": (
+            cost_parameters.depreciation_expense_per_run
+        ),
+        "campaigns_to_resinter": campaigns_to_resinter,
+        "resinter_threshold_kg": threshold,
+        "wall_deposit_total_kg": wall_load,
+    })
 
 
 def _objective_mapping(objectives: ObjectiveLike) -> Mapping[str, float | None]:
@@ -3896,15 +4126,6 @@ def _cost_rollup_physical_metric(sim: Any, field: str, metric: str) -> float:
     if field not in physical_cost:
         raise ObjectiveComputationError(f"cost_rollup physical_cost missing {field!r}")
     return _finite_float(physical_cost[field], metric)
-
-
-def _cost_rollup_run_input_money(sim: Any, metric: str) -> float:
-    run_input = _cost_rollup_run_input(sim)
-    if "owner_ratify_money_projection" not in run_input:
-        raise ObjectiveComputationError(
-            "cost_rollup run_input_cost missing owner_ratify_money_projection"
-        )
-    return _finite_float(run_input["owner_ratify_money_projection"], metric)
 
 
 def _cost_rollup_run_input_physical_cost(sim: Any) -> Mapping[str, Any]:

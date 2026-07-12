@@ -9,6 +9,10 @@ from typing import Any, Mapping
 
 import yaml
 
+from simulator.cost_parameters import (
+    RECIPE_COST_PARAMETERS_KEY,
+    recipe_cost_parameters_from_payload,
+)
 from simulator.optimize.recipe import (
     RecipePatch,
     RecipeSchema,
@@ -47,6 +51,12 @@ def read_recipe_metadata(path: str | Path) -> dict[str, Any]:
     if "metadata" not in payload:
         return {}
     return _validate_recipe_metadata(payload["metadata"], source=str(recipe_path))
+
+
+def read_recipe_cost_parameters(path: str | Path) -> dict[str, Any]:
+    recipe_path = Path(path)
+    payload = _load_recipe_mapping(recipe_path)
+    return recipe_cost_parameters_from_payload(payload, source=str(recipe_path))
 
 
 def normalize_recipe_patch(
@@ -110,23 +120,26 @@ def write_recipe_patch(
     recipe_path = Path(path)
     if metadata is None and "metadata" in payload:
         metadata = payload["metadata"]
+    cost_parameters = recipe_cost_parameters_from_payload(
+        payload,
+        source=str(recipe_path),
+    )
     normalized = normalize_recipe_patch(payload, source=str(recipe_path))
     recipe_path.parent.mkdir(parents=True, exist_ok=True)
+    document: dict[str, Any] = {
+        RECIPE_COST_PARAMETERS_KEY: cost_parameters,
+    }
     if metadata is not None:
-        document: dict[str, Any] = {
+        document = {
             "metadata": _validate_recipe_metadata(
                 metadata,
                 source=str(recipe_path),
             ),
+            **document,
         }
-        document.update(normalized)
-        recipe_path.write_text(
-            yaml.safe_dump(document, sort_keys=False),
-            encoding="utf-8",
-        )
-        return recipe_path
+    document.update(normalized)
     recipe_path.write_text(
-        yaml.safe_dump(normalized, sort_keys=True),
+        yaml.safe_dump(document, sort_keys=False),
         encoding="utf-8",
     )
     return recipe_path
@@ -143,9 +156,71 @@ def save_recipe_to_library(
     source_path = Path(source)
     if source_path.is_dir():
         source_path = source_path / "winner.recipe.yaml"
-    normalized = load_recipe_patch(source_path)
+    source_payload = _load_recipe_mapping(source_path)
+    normalized = normalize_recipe_patch(source_payload, source=str(source_path))
+    recipe_cost_parameters_from_payload(source_payload, source=str(source_path))
     destination = recipe_library_path(name, library_dir=library_dir)
-    return write_recipe_patch(destination, normalized)
+    output_payload = dict(normalized)
+    if RECIPE_COST_PARAMETERS_KEY in source_payload:
+        output_payload = {
+            RECIPE_COST_PARAMETERS_KEY: source_payload[RECIPE_COST_PARAMETERS_KEY],
+            **output_payload,
+        }
+    write_recipe_patch(destination, output_payload)
+    if RECIPE_COST_PARAMETERS_KEY in source_payload:
+        source_block = _top_level_yaml_block(
+            source_path.read_bytes(),
+            RECIPE_COST_PARAMETERS_KEY,
+        )
+        destination_bytes = destination.read_bytes()
+        destination.write_bytes(
+            _replace_top_level_yaml_block(
+                destination_bytes,
+                RECIPE_COST_PARAMETERS_KEY,
+                source_block,
+            )
+        )
+    return destination
+
+
+def _top_level_yaml_block(document: bytes, key: str) -> bytes:
+    lines = document.splitlines(keepends=True)
+    encoded_key = re.escape(key.encode("utf-8"))
+    key_pattern = (
+        rb"^(?:"
+        + encoded_key
+        + rb"|'"
+        + encoded_key
+        + rb"'|\""
+        + encoded_key
+        + rb"\")\s*:"
+    )
+    start = next(
+        (
+            index
+            for index, line in enumerate(lines)
+            if re.match(key_pattern, line)
+        ),
+        None,
+    )
+    if start is None:
+        raise RecipeIOError(f"recipe file is missing raw {key} block")
+    end = next(
+        (
+            index
+            for index in range(start + 1, len(lines))
+            if lines[index].strip()
+            and not lines[index].startswith((b" ", b"\t", b"#"))
+        ),
+        len(lines),
+    )
+    return b"".join(lines[start:end])
+
+
+def _replace_top_level_yaml_block(document: bytes, key: str, replacement: bytes) -> bytes:
+    current = _top_level_yaml_block(document, key)
+    start = document.index(current)
+    return document[:start] + replacement + document[start + len(current) :]
 
 
 def _load_recipe_mapping(path: Path) -> Mapping[str, Any]:
@@ -169,7 +244,7 @@ def _recipe_payload_without_metadata(payload: Mapping[str, Any]) -> dict[str, An
     return {
         key: value
         for key, value in payload.items()
-        if key != "metadata"
+        if key not in {"metadata", RECIPE_COST_PARAMETERS_KEY}
     }
 
 
@@ -257,6 +332,7 @@ def _validate_top_level_keys(
 def _allowed_top_level_keys(schema: RecipeSchema) -> set[str]:
     keys = {spec.path[0] for spec in schema.allowlist}
     keys.update(path[0] for path in schema.FORBIDDEN_EXACT_PATH_EXCEPTIONS)
+    keys.add(RECIPE_COST_PARAMETERS_KEY)
     return keys
 
 

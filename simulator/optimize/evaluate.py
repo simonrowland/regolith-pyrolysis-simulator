@@ -40,6 +40,7 @@ from simulator.condensation import (
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
 from simulator.cost_ledger import run_pumping_input_cost
+from simulator.cost_parameters import default_cost_parameters_block
 from simulator.corpus_version import current_corpus_version
 from simulator.electrolysis import min_decomposition_voltage
 from simulator.lab_schedule import (
@@ -628,6 +629,7 @@ def evaluate(
     constraints: PhysicsConstraintSet | None = None,
     schema: RecipeSchema | None = None,
     worker_runtime: Any | None = None,
+    cost_parameters: Mapping[str, Any] | None = None,
 ) -> ScoredResult:
     """Run one recipe candidate and return its feasible-only score."""
 
@@ -653,6 +655,7 @@ def evaluate(
             profile,
             active_schema,
             constraints=active_constraints,
+            cost_parameters=cost_parameters,
         )
     except ProfileValidationError as exc:
         if _is_stale_profile_refusal(exc):
@@ -965,6 +968,7 @@ def evaluate(
                 run_execution,
                 pumping_diagnostic,
             ),
+            cost_parameters=spec.cost_parameters,
         )
         objectives = _objectives_with_thermal_window_metadata(objectives, spec)
         trace_payload = _composition_target_trace_payload(
@@ -2067,6 +2071,7 @@ def _build_eval_inputs(
     schema: RecipeSchema,
     *,
     constraints: Any | None = None,
+    cost_parameters: Mapping[str, Any] | None = None,
 ) -> tuple[EvalSpec, Any]:
     bundle = load_config_bundle(DEFAULT_DATA_DIR)
     if feedstock_id not in bundle.feedstocks:
@@ -2217,6 +2222,11 @@ def _build_eval_inputs(
         target_spec_digest=str(target_metadata["target_spec_digest"]),
         target_maturity=target_metadata["target_maturity"],
         target_provenance=target_metadata["target_provenance"],
+        cost_parameters=(
+            cost_parameters
+            if cost_parameters is not None
+            else default_cost_parameters_block()
+        ),
     )
     return spec, run_config
 
@@ -3726,7 +3736,11 @@ def _out_of_domain_result(
             assessment.trace_payload,
         )
         try:
-            objectives = compute_objectives(profile, scoring_execution)
+            objectives = compute_objectives(
+                profile,
+                scoring_execution,
+                cost_parameters=spec.cost_parameters,
+            )
         except OverflowError as exc:
             raise EngineBugAbort(
                 f"{type(exc).__name__}: {exc}",

@@ -92,6 +92,7 @@ _IDENTITY_FIELDS = (
     "data_digests",
     "backend_name",
     "chemistry_kernel",
+    "cost_parameters",
 )
 _LEADERBOARD_META_COLUMNS = frozenset(
     {
@@ -1126,7 +1127,7 @@ def _verify_candidate(
         "candidate_id": candidate_id,
     }
     try:
-        patch = _patch_from_leaderboard(candidate, root=root)
+        patch, recipe_cost_parameters = _patch_from_leaderboard(candidate, root=root)
         schema = RecipeSchema()
         patch.validated(schema)
     except RecipeValidationError as exc:
@@ -1145,6 +1146,10 @@ def _verify_candidate(
         }
 
     claim = _imported_claim(candidate, imported_row)
+    if recipe_cost_parameters is None:
+        imported_cost_parameters = claim.get("identity", {}).get("cost_parameters")
+        if isinstance(imported_cost_parameters, Mapping):
+            recipe_cost_parameters = imported_cost_parameters
     feedstock = str(
         claim.get("feedstock_id")
         or candidate.get("feedstock_id")
@@ -1166,6 +1171,7 @@ def _verify_candidate(
             profile=profile,
             candidate_id=candidate_id,
             schema=schema,
+            cost_parameters=recipe_cost_parameters,
         )
     except ProfileValidationError as exc:
         return {
@@ -1209,7 +1215,11 @@ def _verify_candidate(
     }
 
 
-def _patch_from_leaderboard(candidate: Mapping[str, Any], *, root: Path) -> RecipePatch:
+def _patch_from_leaderboard(
+    candidate: Mapping[str, Any],
+    *,
+    root: Path,
+) -> tuple[RecipePatch, Mapping[str, Any] | None]:
     raw = candidate.get("patch_json")
     if isinstance(raw, str) and raw.strip():
         payload = json.loads(raw)
@@ -1218,16 +1228,21 @@ def _patch_from_leaderboard(candidate: Mapping[str, Any], *, root: Path) -> Reci
             payload,
             format_name="JSON",
         )
+        cost_parameters = None
+        if _truthy(candidate.get("is_winner")):
+            winner_path = root / "winner.recipe.yaml"
+            if winner_path.is_file():
+                _, cost_parameters = _load_winner_recipe(winner_path)
     elif _truthy(candidate.get("is_winner")):
-        payload = _load_winner_recipe_patch(root / "winner.recipe.yaml")
+        payload, cost_parameters = _load_winner_recipe(root / "winner.recipe.yaml")
     else:
         raise ValueError("leaderboard row missing patch_json")
     if not isinstance(payload, Mapping):
         raise ValueError("leaderboard patch_json must decode to object")
-    return RecipePatch.from_nested(payload)
+    return RecipePatch.from_nested(payload), cost_parameters
 
 
-def _load_winner_recipe_patch(path: Path) -> dict[str, Any]:
+def _load_winner_recipe(path: Path) -> tuple[dict[str, Any], Mapping[str, Any] | None]:
     if not path.is_file():
         raise ValueError("winner row missing patch_json and winner.recipe.yaml")
     if path.stat().st_size > YAML_CAP_BYTES:
@@ -1247,11 +1262,14 @@ def _load_winner_recipe_patch(path: Path) -> dict[str, Any]:
     recipe_payload = {
         str(key): value
         for key, value in payload.items()
-        if key != "metadata"
+        if key not in {"metadata", "cost_parameters"}
     }
     if not recipe_payload:
         raise ValueError("winner.recipe.yaml produced an empty setpoints_patch")
-    return recipe_payload
+    cost_parameters = payload.get("cost_parameters")
+    if cost_parameters is not None and not isinstance(cost_parameters, Mapping):
+        raise ValueError("winner.recipe.yaml cost_parameters must be a mapping")
+    return recipe_payload, cost_parameters
 
 
 def _imported_claim(
@@ -1281,6 +1299,7 @@ def _imported_claim(
             "data_digests": eval_spec.get("data_digests") or {},
             "backend_name": eval_spec.get("backend_name"),
             "chemistry_kernel": eval_spec.get("chemistry_kernel") or {},
+            "cost_parameters": eval_spec.get("cost_parameters") or {},
         },
     }
 
@@ -1306,6 +1325,7 @@ def _local_claim(scored: ScoredResult) -> dict[str, Any]:
             "data_digests": dict(spec.data_digests),
             "backend_name": spec.backend_name,
             "chemistry_kernel": dict(spec.chemistry_kernel),
+            "cost_parameters": _normalize_compare(spec.cost_parameters),
         },
     }
 

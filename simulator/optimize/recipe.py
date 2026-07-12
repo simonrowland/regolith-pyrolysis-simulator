@@ -29,6 +29,7 @@ recipe_schema_version = "recipe-schema-v1"
 allowlist_version = "allowlist-v11"
 O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v11"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
+_RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
 
 # Hot-wall bounds: mandate invariant keeps ducts upstream of the designated
 # condenser above ~1400 C; Stage 0 setpoints cap the Doloma-REE hot duct at
@@ -1753,6 +1754,8 @@ class RecipePatch:
         flat: dict[KeyPath, Any] = {}
 
         def walk(prefix: KeyPath, node: Any) -> None:
+            if len(prefix) == 1 and prefix[0] in _RECIPE_ENVELOPE_KEYS:
+                return
             if prefix == C2A_STAGED_MAX_HOLD_HR_PATH:
                 return
             if prefix == C2A_STAGED_STAGES_PATH and isinstance(node, list):
