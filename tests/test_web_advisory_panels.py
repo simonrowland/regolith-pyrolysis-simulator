@@ -162,6 +162,62 @@ def test_wall_risk_routes_reject_malformed_operating_point_float(
     assert "pO2_mbar must be a finite number" in response.get_data(as_text=True)
 
 
+@pytest.mark.parametrize(
+    ("path", "query", "message"),
+    (
+        ("/api/wall-risk", "species=SiO&pO2_mbar=-0.1", "pO2_mbar must be >= 0"),
+        (
+            "/partials/wall-risk-panel",
+            "species=SiO&p_buffer_mbar=-0.1",
+            "p_buffer_mbar must be >= 0",
+        ),
+        (
+            "/api/ceramic-rump",
+            "SiO2=100&tolerance_wt_pct=-0.1",
+            "tolerance_wt_pct must be >= 0",
+        ),
+        (
+            "/partials/ceramic-rump-panel",
+            "SiO2=-0.1",
+            "SiO2 must be non-negative",
+        ),
+    ),
+)
+def test_advisory_routes_reject_negative_domain_values(
+    client,
+    path: str,
+    query: str,
+    message: str,
+) -> None:
+    response = client.get(f"{path}?{query}")
+
+    assert response.status_code == 400
+    assert response.get_json() == {"error": message}
+
+
+@pytest.mark.parametrize(
+    "path",
+    ("/api/wall-risk", "/partials/wall-risk-panel"),
+)
+@pytest.mark.parametrize("offset_delta", (0.0, -0.01))
+def test_wall_risk_routes_reject_sub_absolute_zero_zone_temperature(
+    client,
+    path: str,
+    offset_delta: float,
+) -> None:
+    minimum = (
+        -web_routes.CELSIUS_TO_KELVIN_OFFSET
+        - min(web_routes.WALL_ZONE_TEMPERATURES_C.values())
+    )
+
+    response = client.get(
+        f"{path}?species=SiO&wall_temp_offset_C={minimum + offset_delta}"
+    )
+
+    assert response.status_code == 400
+    assert "stay above absolute zero" in response.get_json()["error"]
+
+
 def test_wall_risk_api_defaults_absent_operating_point_and_applies_valid(
     client,
 ) -> None:

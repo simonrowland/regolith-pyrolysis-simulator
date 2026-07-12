@@ -161,7 +161,8 @@
     <div class="section-card">
         <h3>Product Ledger</h3>
         {% include "partials/optimizer_product_strip.html" %}
-        {% if result.product_ledger_panel.outputs %}
+        {% set product_ledger_panel = result.product_ledger_panel or {} %}
+        {% if product_ledger_panel.outputs %}
         <table class="composition-table">
             <thead>
                 <tr>
@@ -173,7 +174,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for row in result.product_ledger_panel.inputs or [] %}
+                {% for row in product_ledger_panel.inputs or [] %}
                 <tr>
                     <td>{{ row.label }}</td>
                     <td>{{ row.kg }} kg</td>
@@ -182,7 +183,7 @@
                     <td>{{ row.id }}</td>
                 </tr>
                 {% endfor %}
-                {% for row in result.product_ledger_panel.outputs %}
+                {% for row in product_ledger_panel.outputs or [] %}
                 <tr>
                     <td>{{ row.label }}</td>
                     <td></td>
@@ -191,13 +192,13 @@
                     <td>{{ row.product_bin if row.product_bin is defined else row.id }}</td>
                 </tr>
                 {% endfor %}
-                {% if result.product_ledger_panel.mass_closure %}
+                {% if product_ledger_panel.mass_closure %}
                 <tr>
                     <td>Mass closure</td>
-                    <td>{{ result.product_ledger_panel.mass_closure.mass_in_kg }} kg</td>
-                    <td>{{ result.product_ledger_panel.mass_closure.accountable_mass_out_kg }} kg</td>
-                    <td>{{ result.product_ledger_panel.mass_closure.balance_error_pct }} % error</td>
-                    <td>{{ result.product_ledger_panel.mass_closure.status }}</td>
+                    <td>{{ product_ledger_panel.mass_closure.mass_in_kg }} kg</td>
+                    <td>{{ product_ledger_panel.mass_closure.accountable_mass_out_kg }} kg</td>
+                    <td>{{ product_ledger_panel.mass_closure.balance_error_pct }} % error</td>
+                    <td>{{ product_ledger_panel.mass_closure.status }}</td>
                 </tr>
                 {% endif %}
             </tbody>

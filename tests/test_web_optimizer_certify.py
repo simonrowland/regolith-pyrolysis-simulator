@@ -193,6 +193,41 @@ def test_optimizer_certify_route_spawns_live_fill_cli(client) -> None:
     assert "--strategy" not in cmd
 
 
+def test_optimizer_certify_rejects_unknown_fidelity_before_submit(client) -> None:
+    popen = _FakePopenFactory()
+    client.application.config["OPTIMIZER_JOB_POPEN_FACTORY"] = popen
+    run_id, key = _seed_certify_fixture(client)
+
+    response = client.post(
+        "/api/optimizer/certify",
+        json={
+            "run_id": run_id,
+            "cache_key": key,
+            "fidelity": "oracle",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.get_json() == {"error": "unknown fidelity: oracle"}
+    assert popen.calls == []
+
+
+def test_optimizer_certify_respects_shared_queue_cap(client) -> None:
+    popen = _FakePopenFactory()
+    client.application.config["OPTIMIZER_JOB_POPEN_FACTORY"] = popen
+    client.application.config["OPTIMIZER_JOB_QUEUE_CAP"] = 1
+    run_id, key = _seed_certify_fixture(client)
+    payload = {"run_id": run_id, "cache_key": key, "fidelity": "fast"}
+
+    first = client.post("/api/optimizer/certify", json=payload)
+    second = client.post("/api/optimizer/certify", json=payload)
+
+    assert first.status_code == 202
+    assert second.status_code == 429
+    assert second.get_json() == {"error": "optimizer job queue is full"}
+    assert len(popen.calls) == 1
+
+
 def test_web_routes_do_not_import_or_call_evaluate_inline() -> None:
     source = Path(web_routes.__file__).read_text(encoding="utf-8")
     tree = ast.parse(source)

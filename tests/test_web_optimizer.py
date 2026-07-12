@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import ast
+from concurrent.futures import ThreadPoolExecutor
 import io
 import json
 import math
 import sqlite3
+import threading
 import zipfile
 from collections.abc import Mapping
 from dataclasses import replace
@@ -376,6 +378,11 @@ def test_optimizer_run_download_route_returns_rpstudy_zip(client) -> None:
         + "\n",
         encoding="utf-8",
     )
+    before = {
+        path.name: path.read_bytes()
+        for path in run_dir.iterdir()
+        if path.is_file()
+    }
 
     response = client.get("/optimizer/runs/manual-run/download.rpstudy.zip")
 
@@ -384,6 +391,29 @@ def test_optimizer_run_download_route_returns_rpstudy_zip(client) -> None:
     with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
         assert "artifact.index.json" in archive.namelist()
         assert "study.summary.json" in archive.namelist()
+    assert {
+        path.name: path.read_bytes()
+        for path in run_dir.iterdir()
+        if path.is_file()
+    } == before
+
+    barrier = threading.Barrier(2)
+
+    def download() -> tuple[int, bytes]:
+        with client.application.test_client() as concurrent_client:
+            barrier.wait()
+            concurrent = concurrent_client.get(
+                "/optimizer/runs/manual-run/download.rpstudy.zip"
+            )
+            return concurrent.status_code, concurrent.data
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        concurrent_downloads = list(executor.map(lambda _index: download(), range(2)))
+
+    assert [status for status, _body in concurrent_downloads] == [200, 200]
+    for _status, body in concurrent_downloads:
+        with zipfile.ZipFile(io.BytesIO(body)) as archive:
+            assert archive.testzip() is None
 
 
 class _FakeProcess:
@@ -534,7 +564,7 @@ def test_mre_preset_catalog_route_returns_shared_ladder(client) -> None:
     assert by_target["SiO2"]["mre_max_voltage_V"] == pytest.approx(
         1.4910580719159003
     )
-    assert by_target["SiO2"]["included_species"] == ["Ni", "Fe", "Mn", "Cr", "Si"]
+    assert by_target["SiO2"]["included_species"] == ["Ni", "Fe", "Cr", "Mn", "Si"]
     assert by_target["Na2O"]["enabled"] is False
     assert "pre-depleted" in by_target["Na2O"]["disabled_reason"]
     assert by_target["K2O"]["enabled"] is False
@@ -549,7 +579,7 @@ def test_mre_preset_catalog_fragment_is_golden(client) -> None:
     assert 'data-c5-enabled="false"' in html
     assert 'value="target:SiO2"' in html
     assert 'data-max-voltage="1.4910580719159003"' in html
-    assert 'data-included-species="Ni, Fe, Mn, Cr, Si"' in html
+    assert 'data-included-species="Ni, Fe, Cr, Mn, Si"' in html
     assert "Na2O" in html
     assert "disabled" in html
     assert "pre-depleted by C3" in html
@@ -1773,6 +1803,50 @@ def test_optimizer_job_submit_spawns_cli_under_runs_jobs(client) -> None:
     assert meta["pid"] == popen.processes[0].pid
 
 
+def test_optimizer_job_submit_rejects_cross_origin_before_mutation(client) -> None:
+    response = client.post(
+        "/api/optimizer/jobs",
+        headers={"Origin": "https://attacker.example"},
+        json={},
+    )
+
+    assert response.status_code == 403
+    assert response.get_json() == {"error": "cross-origin mutation refused"}
+    jobs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"]) / "jobs"
+    assert not jobs_dir.exists()
+
+
+def test_optimizer_job_submit_refuses_when_open_queue_is_full(client) -> None:
+    popen = _FakePopenFactory()
+    client.application.config["OPTIMIZER_JOB_POPEN_FACTORY"] = popen
+    client.application.config["OPTIMIZER_JOB_QUEUE_CAP"] = 1
+    payload = {
+        "feedstock_id": "lunar_mare_low_ti",
+        "profile_id": "lunar-mare-low-ti-objectives-v1",
+        "strategy": "random",
+        "fidelity": "stub",
+        "budget": 1,
+        "parallel": 1,
+        "seed": 0,
+    }
+
+    barrier = threading.Barrier(2)
+
+    def submit() -> tuple[int, dict[str, object]]:
+        with client.application.test_client() as concurrent_client:
+            barrier.wait()
+            response = concurrent_client.post("/api/optimizer/jobs", json=payload)
+            return response.status_code, response.get_json()
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        responses = list(executor.map(lambda _index: submit(), range(2)))
+
+    assert sorted(status for status, _payload in responses) == [202, 429]
+    refused = next(payload for status, payload in responses if status == 429)
+    assert refused == {"error": "optimizer job queue is full"}
+    assert len(popen.calls) == 1
+
+
 def test_optimizer_jobs_partial_keeps_polling_attrs_after_outer_swap(client) -> None:
     response = client.get("/partials/optimizer-jobs")
 
@@ -1810,12 +1884,19 @@ def test_optimizer_job_submit_rejects_unknown_profile_before_spawn(client) -> No
     ("override", "expected_error"),
     [
         ({"budget": "many"}, "budget must be a positive integer"),
+        ({"budget": True}, "budget must be a positive integer"),
+        ({"budget": 1.5}, "budget must be a positive integer"),
+        ({"budget": math.inf}, "budget must be a positive integer"),
+        ({"budget": "9" * 5000}, "budget must be a positive integer"),
         ({"budget": 0}, "budget must be a positive integer"),
         ({"budget": 6}, "budget must be <= 5"),
         ({"parallel": "wide"}, "parallel must be a positive integer"),
+        ({"parallel": False}, "parallel must be a positive integer"),
+        ({"parallel": 1.0}, "parallel must be a positive integer"),
         ({"parallel": 0}, "parallel must be a positive integer"),
         ({"parallel": 3}, "parallel must be <= 2"),
         ({"seed": "late"}, "seed must be a non-negative integer"),
+        ({"seed": -math.inf}, "seed must be a non-negative integer"),
         ({"seed": -1}, "seed must be a non-negative integer"),
         ({"strategy": "magic"}, "unknown strategy: magic"),
         ({"fidelity": "oracle"}, "unknown fidelity: oracle"),
@@ -1848,6 +1929,132 @@ def test_optimizer_job_submit_rejects_bad_launch_values_before_spawn(
     assert popen.calls == []
     jobs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"]) / "jobs"
     assert not jobs_dir.exists() or list(jobs_dir.iterdir()) == []
+
+
+def test_optimizer_routes_surface_corrupt_result_store_as_error(client) -> None:
+    runs_dir = Path(client.application.config["OPTIMIZER_RUNS_DIR"])
+    run_dir = runs_dir / "corrupt-run"
+    run_dir.mkdir(parents=True)
+    (run_dir / "cache.sqlite").write_bytes(b"not a sqlite database")
+
+    table = client.get("/partials/optimizer-table")
+    detail = client.get("/optimizer/runs/corrupt-run/results/missing")
+
+    assert table.status_code == 500
+    assert table.get_json() == {"error": "optimizer result store unreadable"}
+    assert detail.status_code == 500
+    assert detail.get_json() == {"error": "optimizer result store unreadable"}
+
+
+def test_headline_results_preserve_declared_zero_completion_values() -> None:
+    context = {
+        "last_completion_payload": {
+            "products": {"glass": 0.0, "pure_silica_glass": 8.0},
+            "oxygen_kg": 0.0,
+            "terminal_rump_kg": 0.0,
+            "yield_pct": 0.0,
+            "energy_electrical_plus_evaporation_kWh": 0.0,
+        },
+        "last_recipe_capture": {
+            "tick": {
+                "oxygen_kg": 9.0,
+                "glass_kg": 9.0,
+                "yield_pct": 9.0,
+                "energy_electrical_plus_evaporation_cumulative_kWh": 9.0,
+                "process_buckets_kg": {"terminal_slag": {"SiO2": 9.0}},
+            },
+            "per_hour_summary": {"wall_deposit_cumulative_kg": 0.0},
+        },
+    }
+
+    payload = web_routes._headline_results_from_context(context)
+
+    assert payload["oxygen_kg"] == 0.0
+    assert payload["glass_kg"] == 0.0
+    assert payload["refractory_rump_kg"] == 0.0
+    assert payload["yield_pct"] == 0.0
+    assert payload["energy_electrical_plus_evaporation_kWh"] == 0.0
+    assert payload["wall_deposit_kg"] == 0.0
+
+
+def test_import_route_records_canonical_upload_filename(
+    client,
+    tmp_path,
+    monkeypatch,
+) -> None:
+    captured = {}
+
+    class Imported:
+        path = tmp_path / "imported"
+        deduped = False
+
+    def fake_import(_source, _root, *, uploader_note, origin):
+        captured["uploader_note"] = uploader_note
+        captured["origin"] = origin
+        return Imported()
+
+    monkeypatch.setattr(web_routes, "import_study_bundle", fake_import)
+    monkeypatch.setattr(
+        web_routes,
+        "imported_study_model",
+        lambda _path, _root: {"study_id": "imported"},
+    )
+
+    response = client.post(
+        "/api/optimizer/import",
+        data={"bundle": (io.BytesIO(b"bundle"), "source.rpstudy.zip")},
+        content_type="multipart/form-data",
+    )
+
+    assert response.status_code == 201
+    assert captured["origin"] == {"filename": "source.rpstudy.zip"}
+
+
+def test_import_route_rejects_oversize_body_before_multipart_parse(client) -> None:
+    response = client.open(
+        "/api/optimizer/import",
+        method="POST",
+        environ_overrides={
+            "CONTENT_LENGTH": str(web_routes.BUNDLE_CAP_BYTES + 1),
+        },
+    )
+
+    assert response.status_code == 413
+    assert response.get_json() == {"error": "request body exceeds 512MB cap"}
+
+
+def test_recipe_collision_reservation_is_atomic(tmp_path, monkeypatch) -> None:
+    destination = tmp_path / "same-name.yaml"
+
+    def fake_write(path, _patch, *, metadata):
+        assert metadata == {"title": "Same Name"}
+        Path(path).write_text("complete: true\n", encoding="utf-8")
+
+    monkeypatch.setattr(web_routes, "write_recipe_patch", fake_write)
+
+    def reserve() -> bool:
+        return web_routes._write_recipe_patch_exclusive(
+            destination,
+            {},
+            metadata={"title": "Same Name"},
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(lambda _index: reserve(), range(2)))
+
+    assert sorted(results) == [False, True]
+    assert destination.read_text(encoding="utf-8") == "complete: true\n"
+
+
+@pytest.mark.skip(
+    reason=(
+        "F-300 re-laned: save->load->start identity requires web/static/js "
+        "to apply returned metadata controls, but the web-routes lane owns "
+        "only Flask route/template/test files."
+    ),
+)
+def test_recipe_save_load_start_behavior_identity_relaned_to_frontend() -> None:
+    pass
 
 
 def test_optimizer_job_exit_zero_without_results_fails_loud(client) -> None:

@@ -4,18 +4,20 @@ import json
 import math
 import os
 import re
+import shutil
 import sqlite3
 import copy
+import threading
 from collections.abc import Mapping
 from datetime import datetime, timezone
 from pathlib import Path
 import tempfile
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 
 from flask import Blueprint, Response, current_app, render_template, jsonify, request, send_file
 import yaml
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
 from simulator.backends import BackendResolutionStatus, backend_resolution_status
 from simulator.backend_names import canonical_backend_name
@@ -64,7 +66,7 @@ from simulator.optimize.results_store import (
     _deserialize_grounding_margins,
     grounded_result_feasible,
 )
-from simulator.optimize.save_bundle import export_study_bundle
+from simulator.optimize.save_bundle import ALLOWED_MEMBERS, export_study_bundle
 from simulator.recipe_io import (
     RECIPE_LIBRARY_DIR,
     RecipeIOError,
@@ -75,6 +77,7 @@ from simulator.recipe_io import (
     write_recipe_patch,
 )
 from simulator.state import CondensationTrain
+from simulator.wall_advisor import WALL_ZONE_TEMPERATURES_C
 from web.feedstock_data import (
     debug_feedstocks_enabled,
     get_visible_feedstock,
@@ -110,10 +113,63 @@ OPTIMIZER_JOB_STRATEGIES = ('random', 'screen', 'bayes', 'nsga2', 'staged')
 OPTIMIZER_JOB_FIDELITIES = ('stub', 'fast', 'high', 'auto')
 DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP = 4
 DEFAULT_OPTIMIZER_JOB_BUDGET_CAP = 256
+DEFAULT_OPTIMIZER_JOB_QUEUE_CAP = 64
 MAX_ADDITIVE_CALC_MASS_KG = 1_000_000_000.0
 _SAFE_FILENAME_RE = re.compile(r'[^A-Za-z0-9._-]+')
 _RECIPE_TITLE_MAX_CHARS = 120
 _RECIPE_SLUG_RE = re.compile(r'[^a-z0-9]+')
+_OPTIMIZER_SUBMIT_LOCK = threading.Lock()
+
+
+@bp.record_once
+def _configure_request_size_limit(state) -> None:
+    configured = state.app.config.get('MAX_CONTENT_LENGTH')
+    if configured is None or configured > BUNDLE_CAP_BYTES:
+        state.app.config['MAX_CONTENT_LENGTH'] = BUNDLE_CAP_BYTES
+
+
+@bp.before_request
+def _reject_unsafe_cross_origin_request():
+    if request.method in {'GET', 'HEAD', 'OPTIONS'}:
+        return None
+    if request.content_length is not None and request.content_length > BUNDLE_CAP_BYTES:
+        return _json_error('request body exceeds 512MB cap', 413)
+    if _request_is_same_origin():
+        return None
+    return _json_error('cross-origin mutation refused', 403)
+
+
+@bp.errorhandler(BadRequest)
+def _bad_request_response(exc: BadRequest):
+    return _json_error(exc.description, 400)
+
+
+@bp.errorhandler(RequestEntityTooLarge)
+def _request_too_large_response(_exc: RequestEntityTooLarge):
+    return _json_error('request body exceeds 512MB cap', 413)
+
+
+@bp.errorhandler(sqlite3.Error)
+def _sqlite_error_response(_exc: sqlite3.Error):
+    return _json_error('optimizer result store unreadable', 500)
+
+
+def _request_is_same_origin() -> bool:
+    source = request.headers.get('Origin') or request.headers.get('Referer')
+    if source is None:
+        return request.headers.get('Sec-Fetch-Site') != 'cross-site'
+    try:
+        candidate = urlsplit(source)
+        expected = urlsplit(request.host_url)
+    except ValueError:
+        return False
+    return (
+        candidate.scheme.lower(),
+        candidate.netloc.lower(),
+    ) == (
+        expected.scheme.lower(),
+        expected.netloc.lower(),
+    )
 
 
 class _StoredBackendResolutionCarrier:
@@ -157,12 +213,35 @@ def _optimizer_job_budget_cap() -> int:
     return max(1, cap)
 
 
+def _optimizer_job_queue_cap() -> int:
+    configured = current_app.config.get('OPTIMIZER_JOB_QUEUE_CAP')
+    try:
+        cap = int(configured)
+    except (TypeError, ValueError):
+        cap = DEFAULT_OPTIMIZER_JOB_QUEUE_CAP
+    return max(1, cap)
+
+
 def _optimizer_job_runner() -> optimizer_job_runner.OptimizerJobRunner:
     popen_factory = current_app.config.get('OPTIMIZER_JOB_POPEN_FACTORY')
     kwargs: dict[str, Any] = {}
     if popen_factory is not None:
         kwargs['popen_factory'] = popen_factory
     return optimizer_job_runner.get_runner(_optimizer_runs_root(), **kwargs)
+
+
+def _submit_optimizer_job(
+    job_request: optimizer_job_runner.OptimizerJobRequest,
+) -> tuple[dict[str, Any] | None, str | None]:
+    with _OPTIMIZER_SUBMIT_LOCK:
+        runner = _optimizer_job_runner()
+        open_jobs = sum(
+            str(job.get('status') or '').lower() in {'queued', 'running'}
+            for job in runner.list_jobs()
+        )
+        if open_jobs >= _optimizer_job_queue_cap():
+            return None, 'optimizer job queue is full'
+        return runner.submit(job_request), None
 
 
 def _version_badge(stored_version: Any) -> dict[str, Any]:
@@ -1001,15 +1080,12 @@ def _leaderboard_entries(
 
     for run_dir in run_dirs:
         run_id = _optimizer_run_id(run_dir, root)
-        try:
-            result_rows, digest_scope = _query_result_rows(
-                run_dir / OPTIMIZER_CACHE_NAME,
-                feedstock_id=feedstock_id,
-                profile_id=profile_id,
-                fidelity=fidelity,
-            )
-        except sqlite3.Error:
-            continue
+        result_rows, digest_scope = _query_result_rows(
+            run_dir / OPTIMIZER_CACHE_NAME,
+            feedstock_id=feedstock_id,
+            profile_id=profile_id,
+            fidelity=fidelity,
+        )
         digest_scope = {**digest_scope, 'run_id': run_id}
         digest_scopes.append(digest_scope)
         for row in result_rows:
@@ -1179,9 +1255,8 @@ def _positive_int_payload(
     maximum: int | None = None,
 ) -> tuple[int | None, str | None]:
     raw = _payload_value(payload, name, default)
-    try:
-        value = int(raw)
-    except (TypeError, ValueError):
+    value = _strict_integer(raw)
+    if value is None:
         return None, f'{name} must be a positive integer'
     if value <= 0:
         return None, f'{name} must be a positive integer'
@@ -1197,13 +1272,25 @@ def _non_negative_int_payload(
     default: int,
 ) -> tuple[int | None, str | None]:
     raw = _payload_value(payload, name, default)
-    try:
-        value = int(raw)
-    except (TypeError, ValueError):
+    value = _strict_integer(raw)
+    if value is None:
         return None, f'{name} must be a non-negative integer'
     if value < 0:
         return None, f'{name} must be a non-negative integer'
     return value, None
+
+
+def _strict_integer(value: Any) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and re.fullmatch(r'[+-]?\d+', value):
+        try:
+            return int(value)
+        except ValueError:
+            return None
+    return None
 
 
 def _optimizer_job_payload() -> Mapping[str, Any]:
@@ -1305,7 +1392,7 @@ def _parse_optimizer_certify_request(
     feedstock_id = feedstock_id or stored_feedstock
     profile_id = profile_id or stored_profile
     if fidelity not in OPTIMIZER_JOB_FIDELITIES:
-        fidelity = stored_fidelity if stored_fidelity in OPTIMIZER_JOB_FIDELITIES else 'fast'
+        return None, f'unknown fidelity: {fidelity}'
 
     feedstock_profiles = _optimizer_feedstock_profiles_payload()
     profile_by_id = _optimizer_profile_by_id(feedstock_profiles)
@@ -1915,15 +2002,12 @@ def _selector_pairs(
 ) -> list[tuple[str, str]]:
     pairs: set[tuple[str, str]] = set()
     for run_dir in run_dirs:
-        try:
-            rows, _digest_scope = _query_result_rows(
-                run_dir / OPTIMIZER_CACHE_NAME,
-                feedstock_id=feedstock_id,
-                profile_id=profile_id,
-                fidelity=fidelity,
-            )
-        except sqlite3.Error:
-            continue
+        rows, _digest_scope = _query_result_rows(
+            run_dir / OPTIMIZER_CACHE_NAME,
+            feedstock_id=feedstock_id,
+            profile_id=profile_id,
+            fidelity=fidelity,
+        )
         for row in rows:
             pairs.add((
                 str(row['feedstock_id'] or ''),
@@ -2007,23 +2091,20 @@ def _optimizer_result_row(
     for run_dir in _optimizer_run_dirs(root):
         if _optimizer_run_id(run_dir, root) != run_id:
             continue
-        try:
-            with _connect_result_store(run_dir / OPTIMIZER_CACHE_NAME) as conn:
-                corpus_where, corpus_params = _corpus_filter_clause(
-                    conn,
-                    tuple(interoperable_corpus_versions()),
-                )
-                row = conn.execute(
-                    f"""
-                    SELECT *
-                    FROM results
-                    WHERE cache_key = ? AND {corpus_where}
-                    LIMIT 1
-                    """,
-                    (cache_key, *corpus_params),
-                ).fetchone()
-        except sqlite3.Error:
-            return None
+        with _connect_result_store(run_dir / OPTIMIZER_CACHE_NAME) as conn:
+            corpus_where, corpus_params = _corpus_filter_clause(
+                conn,
+                tuple(interoperable_corpus_versions()),
+            )
+            row = conn.execute(
+                f"""
+                SELECT *
+                FROM results
+                WHERE cache_key = ? AND {corpus_where}
+                LIMIT 1
+                """,
+                (cache_key, *corpus_params),
+            ).fetchone()
         if row is None:
             return None
         return root, run_dir, row
@@ -2321,6 +2402,36 @@ def _recipe_slug(title: str) -> str:
     return slug[:80].strip('-')
 
 
+def _write_recipe_patch_exclusive(
+    destination: Path,
+    setpoints_patch: Mapping[str, Any],
+    *,
+    metadata: Mapping[str, Any],
+) -> bool:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    fd, raw_temp_path = tempfile.mkstemp(
+        dir=destination.parent,
+        prefix=f'.{destination.name}.',
+        suffix='.tmp',
+    )
+    os.close(fd)
+    temp_path = Path(raw_temp_path)
+    try:
+        write_recipe_patch(temp_path, setpoints_patch, metadata=metadata)
+        try:
+            os.link(temp_path, destination)
+        except FileExistsError:
+            return False
+        return True
+    except OSError as exc:
+        raise RecipeIOError(f'could not save recipe {destination}: {exc}') from exc
+    finally:
+        try:
+            temp_path.unlink()
+        except OSError:
+            pass
+
+
 def _json_error(message: str, code: int):
     return jsonify({'error': message}), code
 
@@ -2333,6 +2444,14 @@ def _finite_or_none(value: Any) -> float | None:
     except (TypeError, ValueError):
         return None
     return number if math.isfinite(number) else None
+
+
+def _first_finite(*values: Any) -> float | None:
+    for value in values:
+        number = _finite_or_none(value)
+        if number is not None:
+            return number
+    return None
 
 
 def _deep_merge_recipe_patch(
@@ -2500,49 +2619,50 @@ def _headline_results_from_context(context: Mapping[str, Any]) -> dict[str, Any]
     if not isinstance(products, Mapping):
         products = {}
 
-    wall_deposit = (
-        per_hour.get('wall_deposit_cumulative_kg')
-        or tick.get('wall_deposit_cumulative_kg')
-        or tick.get('wall_deposit_kg')
-    )
-    glass_kg = (
-        _finite_or_none(products.get('glass'))
-        or _finite_or_none(products.get('pure_silica_glass'))
-        or _finite_or_none(products.get('industrial_mixed_glass'))
-        or _finite_or_none(tick.get('glass_kg'))
+    wall_deposit = next((
+        value
+        for value in (
+            per_hour.get('wall_deposit_cumulative_kg'),
+            tick.get('wall_deposit_cumulative_kg'),
+            tick.get('wall_deposit_kg'),
+        )
+        if value is not None
+    ), None)
+    glass_kg = _first_finite(
+        products.get('glass'),
+        products.get('pure_silica_glass'),
+        products.get('industrial_mixed_glass'),
+        tick.get('glass_kg'),
     )
     terminal_slag = buckets.get('terminal_slag')
-    refractory_rump_kg = (
-        _finite_or_none(completion.get('terminal_rump_kg'))
-        or _finite_or_none(completion.get('terminal_slag_kg'))
-        or _sum_nested_numbers(terminal_slag)
+    refractory_rump_kg = _first_finite(
+        completion.get('terminal_rump_kg'),
+        completion.get('terminal_slag_kg'),
+        _sum_nested_numbers(terminal_slag),
     )
     metals = buckets.get('metal_alloy') if isinstance(buckets, Mapping) else {}
     return {
-        'oxygen_kg': (
-            _finite_or_none(completion.get('oxygen_kg'))
-            or _finite_or_none(tick.get('oxygen_kg'))
+        'oxygen_kg': _first_finite(
+            completion.get('oxygen_kg'),
+            tick.get('oxygen_kg'),
         ),
         'metals_kg': copy.deepcopy(dict(metals)) if isinstance(metals, Mapping) else {},
         'glass_kg': glass_kg,
         'refractory_rump_kg': refractory_rump_kg,
-        'yield_pct': (
-            _finite_or_none(completion.get('yield_pct'))
-            or _finite_or_none(tick.get('yield_pct'))
-            or _finite_or_none(per_hour.get('yield_pct'))
+        'yield_pct': _first_finite(
+            completion.get('yield_pct'),
+            tick.get('yield_pct'),
+            per_hour.get('yield_pct'),
         ),
         'mass_balance_error_pct': (
             _finite_or_none(completion.get('mass_balance_error_pct'))
             if completion.get('mass_balance_error_pct') is not None
             else _finite_or_none(tick.get('mass_balance_error_pct'))
         ),
-        'energy_electrical_plus_evaporation_kWh': (
-            _finite_or_none(
-                completion.get('energy_electrical_plus_evaporation_kWh'))
-            or _finite_or_none(
-                tick.get('energy_electrical_plus_evaporation_cumulative_kWh'))
-            or _finite_or_none(
-                tick.get('energy_electrical_plus_evaporation_kWh'))
+        'energy_electrical_plus_evaporation_kWh': _first_finite(
+            completion.get('energy_electrical_plus_evaporation_kWh'),
+            tick.get('energy_electrical_plus_evaporation_cumulative_kWh'),
+            tick.get('energy_electrical_plus_evaporation_kWh'),
         ),
         'energy_scope': (
             completion.get('energy_scope')
@@ -2712,9 +2832,12 @@ def save_recipe():
         setpoints_patch = _canonical_recipe_patch_from_context(context)
         name = _recipe_slug(title)
         destination = recipe_library_path(name, library_dir=_recipe_library_dir())
-        if destination.exists():
+        if not _write_recipe_patch_exclusive(
+            destination,
+            setpoints_patch,
+            metadata=metadata,
+        ):
             return _json_error(f'recipe already exists: {name}', 409)
-        write_recipe_patch(destination, setpoints_patch, metadata=metadata)
     except BadRequest as exc:
         return _json_error(exc.description, 400)
     except (RecipeIOError, RecipeStateError, ValueError) as exc:
@@ -2780,9 +2903,9 @@ def simulator():
 def wall_risk_api():
     payload = wall_advisory_payload(
         _query_species(),
-        wall_temp_offset_C=_query_float('wall_temp_offset_C', default=0.0),
-        pO2_mbar=_query_optional_float('pO2_mbar'),
-        p_buffer_mbar=_query_optional_float('p_buffer_mbar'),
+        wall_temp_offset_C=_query_wall_temp_offset_C(),
+        pO2_mbar=_query_optional_float('pO2_mbar', minimum=0.0),
+        p_buffer_mbar=_query_optional_float('p_buffer_mbar', minimum=0.0),
     )
     return jsonify(payload)
 
@@ -2791,9 +2914,9 @@ def wall_risk_api():
 def wall_risk_panel_partial():
     payload = wall_advisory_payload(
         _query_species(),
-        wall_temp_offset_C=_query_float('wall_temp_offset_C', default=0.0),
-        pO2_mbar=_query_optional_float('pO2_mbar'),
-        p_buffer_mbar=_query_optional_float('p_buffer_mbar'),
+        wall_temp_offset_C=_query_wall_temp_offset_C(),
+        pO2_mbar=_query_optional_float('pO2_mbar', minimum=0.0),
+        p_buffer_mbar=_query_optional_float('p_buffer_mbar', minimum=0.0),
     )
     return render_template('partials/wall_risk_panel.html', wall_risk=payload)
 
@@ -2802,7 +2925,7 @@ def wall_risk_panel_partial():
 def ceramic_rump_api():
     payload = ceramic_rump_payload(
         _query_composition_wt_pct(),
-        tolerance_wt_pct=_query_optional_float('tolerance_wt_pct'),
+        tolerance_wt_pct=_query_optional_float('tolerance_wt_pct', minimum=0.0),
     )
     return jsonify(payload)
 
@@ -2811,7 +2934,7 @@ def ceramic_rump_api():
 def ceramic_rump_panel_partial():
     payload = ceramic_rump_payload(
         _query_composition_wt_pct(),
-        tolerance_wt_pct=_query_optional_float('tolerance_wt_pct'),
+        tolerance_wt_pct=_query_optional_float('tolerance_wt_pct', minimum=0.0),
     )
     return render_template(
         'partials/ceramic_rump_panel.html',
@@ -2862,6 +2985,8 @@ def _query_composition_wt_pct() -> dict[str, float]:
             continue
         amount = _optional_query_float(value, name=key)
         if amount is not None:
+            if amount < 0.0:
+                raise BadRequest(f'{key} must be non-negative')
             composition[key] = amount
     return composition
 
@@ -2885,16 +3010,37 @@ def _query_vapor_pressure_diagnostics() -> dict[str, object]:
     return diagnostics
 
 
-def _query_float(name: str, *, default: float) -> float:
-    value = _query_optional_float(name)
-    return default if value is None else value
+def _query_wall_temp_offset_C() -> float:
+    offset = _query_optional_float('wall_temp_offset_C')
+    if offset is None:
+        return 0.0
+    # For every zone, T_K = T_zone_C + offset_C + 273.15 must stay non-negative.
+    minimum = -CELSIUS_TO_KELVIN_OFFSET - min(WALL_ZONE_TEMPERATURES_C.values())
+    if offset <= minimum:
+        raise BadRequest(
+            f'wall_temp_offset_C must be > {minimum:g} to stay above absolute zero'
+        )
+    return offset
 
 
-def _query_optional_float(name: str) -> float | None:
-    return _optional_query_float(request.args.get(name), name=name)
+def _query_optional_float(
+    name: str,
+    *,
+    minimum: float | None = None,
+) -> float | None:
+    return _optional_query_float(
+        request.args.get(name),
+        name=name,
+        minimum=minimum,
+    )
 
 
-def _optional_query_float(value: object, *, name: str) -> float | None:
+def _optional_query_float(
+    value: object,
+    *,
+    name: str,
+    minimum: float | None = None,
+) -> float | None:
     if value is None:
         return None
     try:
@@ -2903,6 +3049,8 @@ def _optional_query_float(value: object, *, name: str) -> float | None:
         raise BadRequest(f"{name} must be a finite number") from None
     if not math.isfinite(number):
         raise BadRequest(f"{name} must be a finite number")
+    if minimum is not None and number < minimum:
+        raise BadRequest(f'{name} must be >= {minimum:g}')
     return number
 
 
@@ -2954,7 +3102,13 @@ def optimizer_certify_submit():
         context['job_error'] = error
         return render_template('partials/optimizer_jobs.html', **context), 400
 
-    job = _optimizer_job_runner().submit(job_request)
+    job, capacity_error = _submit_optimizer_job(job_request)
+    if capacity_error is not None or job is None:
+        if _wants_json_response():
+            return jsonify({'error': capacity_error}), 429
+        context = _optimizer_launch_context()
+        context['job_error'] = capacity_error
+        return render_template('partials/optimizer_jobs.html', **context), 429
     if _wants_json_response():
         return jsonify({'job': job}), 202
     return render_template(
@@ -2975,7 +3129,13 @@ def optimizer_job_submit():
         context['job_error'] = error
         return render_template('partials/optimizer_jobs.html', **context), 400
 
-    job = _optimizer_job_runner().submit(job_request)
+    job, capacity_error = _submit_optimizer_job(job_request)
+    if capacity_error is not None or job is None:
+        if _wants_json_response():
+            return jsonify({'error': capacity_error}), 429
+        context = _optimizer_launch_context()
+        context['job_error'] = capacity_error
+        return render_template('partials/optimizer_jobs.html', **context), 429
     if _wants_json_response():
         return jsonify({'job': job}), 202
     context = _optimizer_jobs_context()
@@ -3047,17 +3207,36 @@ def optimizer_run_download(run_id: str):
     if resolved is None:
         return jsonify({'error': 'Optimizer run not found'}), 404
     _root, run_dir = resolved
+    temp_dir = tempfile.TemporaryDirectory(prefix='regolith-study-export-')
+    export_root = Path(temp_dir.name) / run_dir.name
+    export_root.mkdir()
     try:
-        bundle_path = export_study_bundle(run_dir)
+        for name in ALLOWED_MEMBERS:
+            if name == 'artifact.index.json':
+                continue
+            source = run_dir / name
+            if source.is_file():
+                shutil.copy2(source, export_root / name)
+        bundle_path = export_study_bundle(
+            export_root,
+            output_path=Path(temp_dir.name) / f'{run_dir.name}.rpstudy.zip',
+        )
     except (FileNotFoundError, ValueError) as exc:
+        temp_dir.cleanup()
         return jsonify({'error': str(exc)}), 409
-    return send_file(
-        bundle_path,
-        mimetype='application/zip',
-        as_attachment=True,
-        download_name=bundle_path.name,
-        max_age=0,
-    )
+    try:
+        response = send_file(
+            bundle_path,
+            mimetype='application/zip',
+            as_attachment=True,
+            download_name=bundle_path.name,
+            max_age=0,
+        )
+    except Exception:
+        temp_dir.cleanup()
+        raise
+    response.call_on_close(temp_dir.cleanup)
+    return response
 
 
 def _uploaded_bundle_tempfile() -> tuple[Path | None, str | None]:
@@ -3109,7 +3288,7 @@ def optimizer_import_upload():
             tmp_path,
             _optimizer_runs_root(),
             uploader_note=str(request.form.get('uploader_note') or ''),
-            origin={'upload_filename': request.files['bundle'].filename},
+            origin={'filename': request.files['bundle'].filename},
         )
     except ImportBundleError as exc:
         try:
