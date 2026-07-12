@@ -845,7 +845,7 @@ def _build_cost_rollup_diagnostic(
     furnace_input = _run_furnace_input_cost(per_hour)
     pumping_enabled = isinstance(pumping_context, Mapping)
     pumping_input, pumping_diagnostic = (
-        _run_pumping_input_cost(pumping_context)
+        run_pumping_input_cost(pumping_context)
         if pumping_enabled else (ZERO_COST, {})
     )
     auxiliary_electrical_input, auxiliary_electrical_components = (
@@ -1077,7 +1077,7 @@ def _canonical_auxiliary_electrical_components(
     return components
 
 
-def _run_pumping_input_cost(
+def run_pumping_input_cost(
     pumping_context: Mapping[str, Any] | None,
 ) -> tuple[CostVector, dict[str, Any]]:
     parameter_metadata = [p.to_json() for p in pumping_cost_parameters()]
@@ -1094,6 +1094,7 @@ def _run_pumping_input_cost(
             "schema_version": "pumping-cost-rollup-v1",
             "status": "refused",
             "reason": str(pumping_context.get("reason", "unspecified")),
+            "feedstock_id": str(pumping_context.get("feedstock_id", "")),
             "body": str(pumping_context.get("body", "")),
             "ambient_pressure_pa": _finite(
                 pumping_context.get("ambient_pressure_pa"),
@@ -1138,6 +1139,14 @@ def _run_pumping_input_cost(
             any_infeasible = True
         rows.append({
             "hour": int(_finite(raw_row.get("hour"), len(rows))),
+            "target_pressure_pa": _finite(
+                raw_row.get("target_pressure_pa"), math.nan
+            ),
+            "offgas_mol_per_s": _finite(raw_row.get("offgas_mol_per_s"), math.nan),
+            "duration_s": _finite(raw_row.get("duration_s"), math.nan),
+            "gas_temperature_K": _finite(
+                raw_row.get("gas_temperature_K"), math.nan
+            ),
             **result.to_json(),
         })
     cost = CostVector(electrical_kWh=total_energy_kWh)
@@ -1154,6 +1163,7 @@ def _run_pumping_input_cost(
     diagnostic = {
         "schema_version": "pumping-cost-rollup-v1",
         "status": status,
+        "feedstock_id": str(pumping_context.get("feedstock_id", "")),
         "body": str(pumping_context.get("body", "")),
         "ambient_pressure_pa": ambient_pressure_pa,
         "ambient_pressure_source": str(

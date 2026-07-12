@@ -38,6 +38,7 @@ from simulator.optimize.sso2_evidence import (
     sso2_owner_recipe_objective_reader,
     sso2_owner_recipe_setpoints_patch,
 )
+from simulator.pumping_cost import MARS_DATUM_AMBIENT_PA, estimate_subambient_pump_cost
 
 
 DEFINITIONS = (
@@ -231,6 +232,87 @@ def test_energy_component_and_per_product_metrics_read_scoped_energy() -> None:
         {},
         product_classes,
     ) == pytest.approx(7.0 / 3.0)
+
+
+def test_energy_objective_adds_staged_pumping_once_without_readding_turbine() -> None:
+    # Helper anchor: Mars datum 610 Pa -> 500 Pa, 0.01 mol/s, 300 K, 1 h.
+    # Its staged electrical result is ~0.008100986 kWh (the 5 mbar anchor in
+    # test_pumping_cost), and it is disjoint from turbine-compressed O2.
+    pumping = estimate_subambient_pump_cost(
+        target_pressure_pa=500.0,
+        offgas_mol_per_s=0.01,
+        duration_s=3600.0,
+        ambient_pressure_pa=MARS_DATUM_AMBIENT_PA,
+        gas_temperature_K=300.0,
+    )
+    sim = SimpleNamespace(
+        energy_electrical_plus_evaporation_cumulative_kWh=18.0,
+        energy_cumulative_breakdown_kWh={
+            "electrical": 6.0,
+            "evaporation_thermal": 12.0,
+            "electrical_plus_evaporation": 18.0,
+        },
+        record=SimpleNamespace(
+            cost_rollup={
+                "pumping_diagnostic": {
+                    "status": "pumping_feasibility_unresolved",
+                    "pumping_electrical_kWh": pumping.energy_kWh,
+                },
+                # This aggregate already includes 2 kWh turbine work. Reading
+                # it would re-add turbine energy already present in the 6 kWh
+                # electrical baseline; the objective must read pump only.
+                "auxiliary_electrical_diagnostic": {
+                    "components_kWh": {
+                        "turbine": 2.0,
+                        "pumping": pumping.energy_kWh,
+                    },
+                    "auxiliary_electrical_kWh": 2.0 + pumping.energy_kWh,
+                },
+            },
+        ),
+    )
+    product_classes = {"metals_plus_O2": {"class_total_kg": 3.0}}
+
+    assert pumping.energy_kWh == pytest.approx(0.008100986135507714)
+    assert _metric_value(
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+        sim,
+        {},
+        product_classes,
+    ) == pytest.approx(18.0 + pumping.energy_kWh)
+    assert _metric_value(
+        "electrical_energy_kWh", sim, {}, product_classes
+    ) == pytest.approx(6.0 + pumping.energy_kWh)
+    assert _metric_value(
+        "evaporation_thermal_energy_kWh", sim, {}, product_classes
+    ) == pytest.approx(12.0)
+    assert _metric_value(
+        "energy_electrical_plus_evaporation_per_product_kWh_per_kg",
+        sim,
+        {},
+        product_classes,
+    ) == pytest.approx((18.0 + pumping.energy_kWh) / 3.0)
+
+
+def test_certified_pumping_diagnostic_without_energy_fails_closed() -> None:
+    sim = SimpleNamespace(
+        energy_electrical_plus_evaporation_cumulative_kWh=18.0,
+    )
+    execution = SimpleNamespace(
+        certified_pumping_diagnostic={"status": "ok", "feasible": True},
+    )
+
+    with pytest.raises(
+        ObjectiveComputationError,
+        match="pumping_diagnostic.pumping_electrical_kWh is not numeric",
+    ):
+        _metric_value(
+            ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+            sim,
+            {},
+            {},
+            run_execution=execution,
+        )
 
 
 def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch) -> None:

@@ -2,9 +2,9 @@
 
 Purpose (KNOB-COST-PRESSURE, #52): report first-order compression energy and a
 fail-closed holding-pressure diagnostic when a recipe asks to hold an overhead
-pressure BELOW local ambient. This sidecar is not wired into optimizer objectives
-or gates. It encodes the Moon-vs-Mars asymmetry that the pressure lever lives or
-dies on:
+pressure BELOW local ambient. The cost rollup feeds this sidecar into optimizer
+energy objectives and the hard pumping-feasibility gate. It encodes the
+Moon-vs-Mars asymmetry that the pressure lever lives or dies on:
 
   * Vacuum bodies (Moon ~nanotorr, asteroids lower): the ambient is already below
     any useful process pressure, so evolved offgas VENTS OUT for free. The deep
@@ -49,6 +49,86 @@ MARS_DATUM_AMBIENT_PA = MARS_DATUM_PRESSURE_BAR * _PA_PER_BAR
 MARS_OLYMPUS_SUMMIT_AMBIENT_PA = MARS_OLYMPUS_PRESSURE_BAR * _PA_PER_BAR
 MOON_AMBIENT_PA = MOON_VACUUM_FLOOR_BAR * _PA_PER_BAR
 ASTEROID_AMBIENT_PA = ASTEROID_VACUUM_FLOOR_BAR * _PA_PER_BAR
+
+_PUMPING_BODY_BY_FEEDSTOCK = {
+    # Lunar feedstocks and simulants.
+    **{
+        feedstock_id: "moon"
+        for feedstock_id in (
+            "lunar_mare_low_ti",
+            "lunar_mare_high_ti",
+            "lunar_highland",
+            "lunar_pkt_kreep_average",
+            "lunar_spa_kreep_influenced",
+            "targeted_super_kreep_ore",
+            "lunar_highlands_lhs1",
+            "lunar_mare_lms1",
+            "lunar_mare_oprl2n",
+            "lunar_highlands_nuw_lht_5m",
+            "lunar_mare_jsc_1a_legacy",
+            "lunar_eac_1a",
+            "lunar_mls_1a",
+            "lunar_highlands_nu_lht_2m",
+        )
+    },
+    # Airless/deep-space small-body feedstocks.
+    **{
+        feedstock_id: "asteroid"
+        for feedstock_id in (
+            "s_type_asteroid_silicate",
+            "m_type_metallic_phase",
+            "m_type_silicate_phase",
+            "v_type_vesta_hed",
+            "e_type_enstatite_aubrite",
+            "ci_carbonaceous_chondrite",
+            "cm_carbonaceous_chondrite",
+            "ceres_regolith",
+            "comet_nucleus",
+        )
+    },
+    **{
+        feedstock_id: "mars"
+        for feedstock_id in (
+            "mars_global_mgs1",
+            "mars_basalt",
+            "mars_sulfate_rich",
+            "mars_phyllosilicate_clay",
+            "mars_perchlorate_rich",
+        )
+    },
+}
+
+_PUMPING_AMBIENT_PA_BY_BODY = {
+    "moon": MOON_AMBIENT_PA,
+    "asteroid": ASTEROID_AMBIENT_PA,
+    "mars": MARS_DATUM_AMBIENT_PA,
+}
+
+
+def pumping_environment_for_feedstock(feedstock_id: object) -> dict[str, Any]:
+    """Return the pumping-only body/ambient map for a configured feedstock."""
+
+    key = str(feedstock_id or "").strip()
+    body = _PUMPING_BODY_BY_FEEDSTOCK.get(key, "")
+    if not body:
+        return {
+            "schema_version": "pumping-feedstock-environment-v1",
+            "status": "refused",
+            "reason": "unsupported-feedstock",
+            "feedstock_id": key,
+            "body": "",
+            "ambient_pressure_pa": math.nan,
+        }
+    return {
+        "schema_version": "pumping-feedstock-environment-v1",
+        "status": "ok",
+        "feedstock_id": key,
+        "body": body,
+        "ambient_pressure_pa": _PUMPING_AMBIENT_PA_BY_BODY[body],
+        "ambient_pressure_source": (
+            f"pumping-feedstock-map-v1:{key}->{body}"
+        ),
+    }
 
 
 @dataclass(frozen=True)
@@ -338,17 +418,50 @@ def estimate_subambient_pump_cost(
     )
 
 
-def pumping_context_from_sim(sim: Any, snapshots: Any) -> dict[str, Any]:
+def pumping_context_from_sim(
+    sim: Any,
+    snapshots: Any,
+    *,
+    feedstock_id_override: str | None = None,
+) -> dict[str, Any]:
     melt = getattr(sim, "melt", None)
-    body = normalize_body_name(getattr(melt, "body", ""))
-    ambient_pressure_mbar = _float_or_nan(
-        getattr(melt, "ambient_pressure_mbar", math.nan)
+    record = getattr(sim, "record", None)
+    feedstock_id = str(
+        feedstock_id_override
+        if feedstock_id_override is not None
+        else getattr(record, "feedstock_key", "") or ""
     )
-    ambient_pressure_pa = _ambient_pressure_pa(
-        ambient_pressure_mbar=ambient_pressure_mbar,
+    mapped_environment = (
+        pumping_environment_for_feedstock(feedstock_id)
+        if feedstock_id
+        else None
     )
+    if mapped_environment is not None:
+        if mapped_environment["status"] != "ok":
+            return _pumping_context_refusal(
+                str(mapped_environment["reason"]),
+                feedstock_id=feedstock_id,
+            )
+        body = str(mapped_environment["body"])
+        ambient_pressure_pa = float(mapped_environment["ambient_pressure_pa"])
+        ambient_pressure_source = str(
+            mapped_environment["ambient_pressure_source"]
+        )
+    else:
+        body = normalize_body_name(getattr(melt, "body", ""))
+        ambient_pressure_mbar = _float_or_nan(
+            getattr(melt, "ambient_pressure_mbar", math.nan)
+        )
+        ambient_pressure_pa = _ambient_pressure_pa(
+            ambient_pressure_mbar=ambient_pressure_mbar,
+        )
+        ambient_pressure_source = "melt.ambient_pressure_mbar"
     if not math.isfinite(ambient_pressure_pa) or ambient_pressure_pa <= 0.0:
-        return _pumping_context_refusal("missing-ambient-pressure", body=body)
+        return _pumping_context_refusal(
+            "missing-ambient-pressure",
+            body=body,
+            feedstock_id=feedstock_id,
+        )
     if body and body not in {"mars", "moon", "asteroid"}:
         return _pumping_context_refusal("unsupported-body", body=body)
     rows: list[dict[str, Any]] = []
@@ -376,6 +489,7 @@ def pumping_context_from_sim(sim: Any, snapshots: Any) -> dict[str, Any]:
             return _pumping_context_refusal(
                 "invalid-o2-vented-flow",
                 body=body,
+                feedstock_id=feedstock_id,
                 hour=int(getattr(snapshot, "hour", len(rows))),
             )
         if uncompressed_o2_mol_hr == 0.0:
@@ -385,6 +499,7 @@ def pumping_context_from_sim(sim: Any, snapshots: Any) -> dict[str, Any]:
             return _pumping_context_refusal(
                 "missing-target-pressure",
                 body=body,
+                feedstock_id=feedstock_id,
                 hour=int(getattr(snapshot, "hour", len(rows))),
             )
         target_pressure_pa = pressure_mbar * _PA_PER_MBAR
@@ -395,21 +510,33 @@ def pumping_context_from_sim(sim: Any, snapshots: Any) -> dict[str, Any]:
             temperature_C = _float_or_nan(getattr(snapshot, "temperature_C", math.nan))
             gas_temperature_K = temperature_C + 273.15
         offgas_mol_per_s = uncompressed_o2_mol_hr / _SECONDS_PER_HOUR
-        rows.append(
-            {
-                "hour": int(getattr(snapshot, "hour", len(rows))),
-                "target_pressure_pa": target_pressure_pa,
-                "offgas_mol_per_s": offgas_mol_per_s,
-                "duration_s": _SECONDS_PER_HOUR,
-                "gas_temperature_K": gas_temperature_K,
-            }
+        row = {
+            "hour": int(getattr(snapshot, "hour", len(rows))),
+            "target_pressure_pa": target_pressure_pa,
+            "offgas_mol_per_s": offgas_mol_per_s,
+            "duration_s": _SECONDS_PER_HOUR,
+            "gas_temperature_K": gas_temperature_K,
+        }
+        validated_line_conductance = getattr(
+            overhead,
+            "validated_line_conductance_m3_s",
+            None,
         )
+        if validated_line_conductance is not None:
+            row["validated_line_conductance_m3_s"] = validated_line_conductance
+        # The live pipe_conductance_kg_hr field is a mass-throughput cap, not a
+        # regime-validated volumetric line conductance, so it is deliberately
+        # not converted here. Without the explicit certified field above, Mars
+        # sub-ambient rows remain unresolved and refuse under the conductance
+        # fence instead of claiming false feasibility.
+        rows.append(row)
     return {
         "schema_version": "pumping-context-v1",
         "status": "ok",
+        "feedstock_id": feedstock_id,
         "body": body,
         "ambient_pressure_pa": ambient_pressure_pa,
-        "ambient_pressure_source": "melt.ambient_pressure_mbar",
+        "ambient_pressure_source": ambient_pressure_source,
         "energy_accounting_policy": (
             "uncompressed_o2_only; turbine-compressed_o2_is_already_charged"
         ),
@@ -430,12 +557,14 @@ def _pumping_context_refusal(
     reason: str,
     *,
     body: str = "",
+    feedstock_id: str = "",
     hour: int | None = None,
 ) -> dict[str, Any]:
     refusal: dict[str, Any] = {
         "schema_version": "pumping-context-v1",
         "status": "refused",
         "reason": reason,
+        "feedstock_id": feedstock_id,
         "body": body,
         "ambient_pressure_pa": math.nan,
         "rows": (),

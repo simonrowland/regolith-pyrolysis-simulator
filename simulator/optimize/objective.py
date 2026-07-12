@@ -3810,14 +3810,21 @@ def _metric_value(
     if metric == "oxygen_vented_kg":
         return _oxygen_partition_value(sim, "vented")
     if metric in ENERGY_ELECTRICAL_PLUS_EVAPORATION_ALIASES:
-        return _sim_float(
-            sim,
-            "energy_electrical_plus_evaporation_cumulative_kWh",
-            "energy_electrical_plus_evaporation_kWh",
+        return (
+            _sim_float(
+                sim,
+                "energy_electrical_plus_evaporation_cumulative_kWh",
+                "energy_electrical_plus_evaporation_kWh",
+            )
+            + _pumping_energy_penalty_kWh(sim, run_execution=run_execution)
         )
     energy_component = _energy_component_metric(metric)
     if energy_component is not None:
-        return _energy_component_value(sim, energy_component)
+        return _energy_component_value(
+            sim,
+            energy_component,
+            run_execution=run_execution,
+        )
     energy_per_product_component = _energy_per_product_metric(metric)
     if energy_per_product_component is not None:
         product_kg = _nested_float(
@@ -3828,7 +3835,14 @@ def _metric_value(
             raise ObjectiveComputationError(
                 f"{metric} denominator metals_plus_O2 class_total_kg is zero"
             )
-        return _energy_component_value(sim, energy_per_product_component) / product_kg
+        return (
+            _energy_component_value(
+                sim,
+                energy_per_product_component,
+                run_execution=run_execution,
+            )
+            / product_kg
+        )
     if metric in {"duration_h", "total_hours"}:
         return _duration_hours(sim)
     if metric in SOLAR_THERMAL_FLUX_METRICS:
@@ -3994,17 +4008,30 @@ def _energy_per_product_metric(metric: str) -> str | None:
     return aliases.get(metric)
 
 
-def _energy_component_value(sim: Any, component: str) -> float:
+def _energy_component_value(
+    sim: Any,
+    component: str,
+    *,
+    run_execution: Any | None = None,
+) -> float:
     if component == "electrical_plus_evaporation":
-        return _sim_float(
-            sim,
-            "energy_electrical_plus_evaporation_cumulative_kWh",
-            "energy_electrical_plus_evaporation_kWh",
+        return (
+            _sim_float(
+                sim,
+                "energy_electrical_plus_evaporation_cumulative_kWh",
+                "energy_electrical_plus_evaporation_kWh",
+            )
+            + _pumping_energy_penalty_kWh(sim, run_execution=run_execution)
         )
 
     breakdown = getattr(sim, "energy_cumulative_breakdown_kWh", _MISSING)
     if isinstance(breakdown, Mapping) and component in breakdown:
-        return _finite_float(breakdown[component], f"energy[{component!r}]")
+        value = _finite_float(breakdown[component], f"energy[{component!r}]")
+        return value + (
+            _pumping_energy_penalty_kWh(sim, run_execution=run_execution)
+            if component == "electrical"
+            else 0.0
+        )
 
     tracker = getattr(sim, "_energy_tracker", None)
     if tracker is not None:
@@ -4012,7 +4039,15 @@ def _energy_component_value(sim: Any, component: str) -> float:
         if callable(cumulative_breakdown):
             raw = cumulative_breakdown()
             if isinstance(raw, Mapping) and component in raw:
-                return _finite_float(raw[component], f"energy[{component!r}]")
+                value = _finite_float(raw[component], f"energy[{component!r}]")
+                return value + (
+                    _pumping_energy_penalty_kWh(
+                        sim,
+                        run_execution=run_execution,
+                    )
+                    if component == "electrical"
+                    else 0.0
+                )
 
     record = getattr(sim, "record", None)
     record_attr = {
@@ -4022,8 +4057,60 @@ def _energy_component_value(sim: Any, component: str) -> float:
         "dissociation": "energy_dissociation_kWh",
     }.get(component)
     if record is not None and record_attr is not None:
-        return _required_attr_float(record, record_attr)
+        value = _required_attr_float(record, record_attr)
+        return value + (
+            _pumping_energy_penalty_kWh(sim, run_execution=run_execution)
+            if component == "electrical"
+            else 0.0
+        )
     raise ObjectiveComputationError(f"energy component {component!r} unavailable")
+
+
+def _pumping_energy_penalty_kWh(
+    sim: Any,
+    *,
+    run_execution: Any | None = None,
+) -> float:
+    """Return the disjoint Mars sub-ambient electrical penalty.
+
+    EnergyTracker already books turbine work for the captured melt/offgas O2
+    fraction.  The pumping helper intentionally sees only ``O2_vented_mol_hr``
+    (the turbine-bypass fraction), so the optimizer arithmetic is
+
+        scoped objective kWh = existing scoped kWh + sub-ambient pump kWh.
+
+    Reading the pumping diagnostic directly is load-bearing: the auxiliary
+    rollup also contains turbine and condenser components and would re-add work
+    already present in the existing scoped total.
+    """
+
+    pumping = (
+        getattr(run_execution, "certified_pumping_diagnostic", _MISSING)
+        if run_execution is not None
+        else _MISSING
+    )
+    if pumping is not _MISSING:
+        if not isinstance(pumping, Mapping):
+            raise ObjectiveComputationError(
+                "certified pumping diagnostic must be a mapping"
+            )
+    else:
+        record = getattr(sim, "record", None)
+        cost_rollup = getattr(sim, "cost_rollup", _MISSING)
+        if not isinstance(cost_rollup, Mapping) and record is not None:
+            cost_rollup = getattr(record, "cost_rollup", _MISSING)
+        if not isinstance(cost_rollup, Mapping):
+            return 0.0
+        pumping = cost_rollup.get("pumping_diagnostic")
+        if not isinstance(pumping, Mapping):
+            return 0.0
+    penalty = _finite_float(
+        pumping.get("pumping_electrical_kWh", _MISSING),
+        "pumping_diagnostic.pumping_electrical_kWh",
+    )
+    if penalty < 0.0:
+        raise ObjectiveComputationError("pumping electrical energy must be non-negative")
+    return penalty
 
 
 def _duration_hours(sim: Any) -> float:

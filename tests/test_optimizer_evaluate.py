@@ -47,6 +47,7 @@ from simulator.optimize.product_pools import forbidden_gates_for_pool
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
+from simulator.pumping_cost import MARS_DATUM_AMBIENT_PA, estimate_subambient_pump_cost
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
 from simulator.runner import RunnerError, _force_builtin_vapor_pressure
@@ -451,6 +452,322 @@ def _execution(
 
 def _valid_patch() -> RecipePatch:
     return RecipePatch({PO2_DEFAULT: 9.0})
+
+
+def test_mars_deep_vacuum_pumping_gate_returns_typed_sc67_proposal() -> None:
+    execution = _execution(backend_status="ok", backend_authoritative=True)
+    deep = estimate_subambient_pump_cost(
+        target_pressure_pa=1.0e-4,  # 1e-9 bar deep-vacuum point
+        offgas_mol_per_s=0.02,
+        duration_s=7.0 * 3600.0,
+        ambient_pressure_pa=MARS_DATUM_AMBIENT_PA,
+        gas_temperature_K=1500.0,
+    )
+    execution.simulator.record.cost_rollup = {
+        "pumping_diagnostic": {
+            "schema_version": "pumping-cost-rollup-v1",
+            "status": "pumping_feasibility_unresolved",
+            "feedstock_id": "mars_global_mgs1",
+            "body": "mars",
+            "ambient_pressure_pa": MARS_DATUM_AMBIENT_PA,
+            "pumping_electrical_kWh": deep.energy_kWh,
+            "feasible": None,
+            "rows": [
+                {
+                    "hour": 1,
+                    "target_pressure_pa": 1.0e-4,
+                    "offgas_mol_per_s": 0.02,
+                    "duration_s": 7.0 * 3600.0,
+                    "gas_temperature_K": 1500.0,
+                    **deep.to_json(),
+                }
+            ],
+        }
+    }
+
+    result = evaluate(
+        RecipePatch({}),
+        "mars_global_mgs1",
+        "fast",
+        profile={**PROFILE, "feedstock": "mars_global_mgs1"},
+        executor=FakeExecutor(execution=execution),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.PROPOSED
+    assert result.requires_re_evaluation
+    assert result.failing_gates == ("pumping_feasibility",)
+    margin = result.feasibility_margins["pumping_feasibility"]
+    assert margin.status == "available"
+    assert margin.status_reason == "pumping_feasibility_unresolved"
+    evidence = margin.status_payload["pumping_cost_evidence"]
+    assert evidence["rows"][0]["required_pump_speed_m3_s"] == pytest.approx(
+        2_494_338.7854,
+        rel=1.0e-9,
+    )
+    proposal = margin.status_payload["pressure_proposal"]
+    assert proposal["status"] == "proposed"
+    assert proposal["feasibility_scope"] == "pumping_only"
+    assert proposal["requires_full_recipe_species_re_evaluation"] is True
+    assert proposal["rows"][0]["requested_target_pressure_pa"] == pytest.approx(1.0e-4)
+    assert proposal["rows"][0]["proposed_target_pressure_pa"] == pytest.approx(
+        MARS_DATUM_AMBIENT_PA
+    )
+    assert proposal["rows"][0]["pumping_cost_evidence"]["regime"] == "vent-free"
+    assert proposal["rows"][0]["pumping_cost_evidence"]["energy_kWh"] == 0.0
+
+
+def test_sc67_pressure_proposal_reports_mixed_failing_rows_as_partial() -> None:
+    proposal = evaluate_module._pumping_pressure_proposal(
+        {
+            "body": "mars",
+            "ambient_pressure_pa": MARS_DATUM_AMBIENT_PA,
+            "rows": [
+                {
+                    "hour": 1,
+                    "feasible": None,
+                    "target_pressure_pa": 1.0e-4,
+                    "offgas_mol_per_s": 0.02,
+                    "duration_s": 3600.0,
+                    "gas_temperature_K": 300.0,
+                },
+                {
+                    "hour": 2,
+                    "feasible": False,
+                    "target_pressure_pa": 1.0e-4,
+                    "offgas_mol_per_s": 0.02,
+                    "duration_s": None,
+                    "gas_temperature_K": 300.0,
+                },
+            ],
+        }
+    )
+
+    assert proposal["status"] == "partial"
+    assert proposal["failing_row_count"] == 2
+    assert proposal["proposed_row_count"] == 1
+    assert proposal["unavailable_row_count"] == 1
+    assert proposal["rows"][0]["hour"] == 1
+    assert proposal["unavailable_rows"] == [
+        {
+            "row_index": 1,
+            "hour": 2,
+            "reason": "pumping row inputs are incomplete or invalid",
+        }
+    ]
+
+
+def test_sc67_pressure_proposal_does_not_call_missing_boundary_an_empty_set() -> None:
+    proposal = evaluate_module._pumping_pressure_proposal(
+        {
+            "status": "refused",
+            "reason": "missing-ambient-pressure",
+            "body": "mars",
+            "ambient_pressure_pa": math.nan,
+            "rows": [
+                {
+                    "hour": 1,
+                    "feasible": False,
+                    "target_pressure_pa": 1.0e-4,
+                }
+            ],
+        }
+    )
+
+    assert proposal["status"] == "unavailable"
+    assert proposal["failing_row_count"] == 1
+    assert proposal["proposed_row_count"] == 0
+    assert proposal["unavailable_row_count"] == 1
+
+
+def test_missing_pumping_rollup_recomputes_and_refuses_subambient_flow() -> None:
+    pumping_snapshot = SimpleNamespace(
+        hour=1,
+        temperature_C=300.0,
+        overhead=SimpleNamespace(
+            pressure_mbar=1.0e-6,
+            headspace_temperature_K=300.0,
+        ),
+        O2_vented_mol_hr=72.0,
+        mass_balance_error_pct=0.0,
+        mass_in_kg=1000.0,
+        mass_out_kg=1000.0,
+    )
+    execution = _execution(
+        snapshots=(pumping_snapshot,),
+        backend_status="ok",
+        backend_authoritative=True,
+    )
+    assert not hasattr(execution.simulator.record, "cost_rollup")
+
+    result = evaluate(
+        RecipePatch({}),
+        "mars_global_mgs1",
+        "fast",
+        profile={**PROFILE, "feedstock": "mars_global_mgs1"},
+        executor=FakeExecutor(execution=execution),
+    )
+
+    assert not result.feasible
+    margin = result.feasibility_margins["pumping_feasibility"]
+    evidence = margin.status_payload["pumping_cost_evidence"]
+    assert evidence["evidence_source"] == "evaluate-recomputed-missing-rollup"
+    assert evidence["status"] == "pumping_feasibility_unresolved"
+    assert evidence["rows"][0]["target_pressure_pa"] == pytest.approx(1.0e-4)
+
+
+def test_missing_pumping_rollup_certified_energy_reaches_objective() -> None:
+    pumping_snapshot = SimpleNamespace(
+        hour=1,
+        temperature_C=300.0,
+        overhead=SimpleNamespace(
+            pressure_mbar=5.0,
+            headspace_temperature_K=300.0,
+            validated_line_conductance_m3_s=1.0,
+        ),
+        O2_vented_mol_hr=36.0,
+        mass_balance_error_pct=0.0,
+        mass_in_kg=1000.0,
+        mass_out_kg=1000.0,
+    )
+    execution = _execution(
+        snapshots=(pumping_snapshot,),
+        backend_status="ok",
+        backend_authoritative=True,
+    )
+    expected = estimate_subambient_pump_cost(
+        target_pressure_pa=500.0,
+        offgas_mol_per_s=0.01,
+        duration_s=3600.0,
+        ambient_pressure_pa=MARS_DATUM_AMBIENT_PA,
+        gas_temperature_K=300.0,
+        validated_line_conductance_m3_s=1.0,
+    )
+
+    result = evaluate(
+        RecipePatch({}),
+        "mars_global_mgs1",
+        "fast",
+        profile={**PROFILE, "feedstock": "mars_global_mgs1"},
+        executor=FakeExecutor(execution=execution),
+    )
+
+    assert result.feasible
+    assert result.objectives is not None
+    assert result.objectives.as_mapping()[
+        ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC
+    ] == pytest.approx(44.0 + expected.energy_kWh)
+    assert not hasattr(execution.simulator.record, "cost_rollup")
+
+
+def test_malformed_ok_pumping_diagnostic_fails_closed() -> None:
+    malformed = (
+        {
+            "status": "ok",
+            "pumping_electrical_kWh": 0.0,
+            "feasible": True,
+            "rows": [],
+        },
+        {
+            "status": "no_rows",
+            "pumping_electrical_kWh": 99.0,
+            "feasible": True,
+            "rows": [],
+        },
+        {
+            "status": "ok",
+            "pumping_electrical_kWh": 0.0,
+            "feasible": True,
+            "rows": [{"feasible": True}],
+        },
+    )
+    for diagnostic in malformed:
+        execution = _execution(backend_status="ok", backend_authoritative=True)
+        execution.simulator.record.cost_rollup = {
+            "pumping_diagnostic": {
+                "feedstock_id": "mars_global_mgs1",
+                "body": "mars",
+                "ambient_pressure_pa": MARS_DATUM_AMBIENT_PA,
+                **diagnostic,
+            }
+        }
+
+        result = evaluate(
+            RecipePatch({}),
+            "mars_global_mgs1",
+            "fast",
+            profile={**PROFILE, "feedstock": "mars_global_mgs1"},
+            executor=FakeExecutor(execution=execution),
+        )
+
+        assert not result.feasible
+        margin = result.feasibility_margins["pumping_feasibility"]
+        assert margin.status_payload["pressure_proposal"]["status"] == "unavailable"
+
+
+def test_pumping_gate_rejects_diagnostic_from_different_feedstock_body() -> None:
+    execution = _execution(backend_status="ok", backend_authoritative=True)
+    execution.simulator.record.cost_rollup = {
+        "pumping_diagnostic": {
+            "status": "no_rows",
+            "feedstock_id": "lunar_mare_low_ti",
+            "body": "moon",
+            "ambient_pressure_pa": 1.3e-7,
+            "pumping_electrical_kWh": 0.0,
+            "feasible": True,
+            "rows": [],
+        }
+    }
+
+    result = evaluate(
+        RecipePatch({}),
+        "mars_global_mgs1",
+        "fast",
+        profile={**PROFILE, "feedstock": "mars_global_mgs1"},
+        executor=FakeExecutor(execution=execution),
+    )
+
+    assert not result.feasible
+    evidence = result.feasibility_margins["pumping_feasibility"].status_payload[
+        "pumping_cost_evidence"
+    ]
+    assert evidence["reason"] == "pumping-diagnostic-environment-mismatch"
+    mismatch = evidence["identity_mismatch"]
+    assert mismatch["expected_feedstock_id"] == "mars_global_mgs1"
+    assert mismatch["observed_feedstock_id"] == "lunar_mare_low_ti"
+
+
+def test_pumping_gate_marks_unavailable_pressure_set_without_fabricated_proposal() -> None:
+    execution = _execution(backend_status="ok", backend_authoritative=True)
+    execution.simulator.record.cost_rollup = {
+        "pumping_diagnostic": {
+            "schema_version": "pumping-cost-rollup-v1",
+            "status": "refused",
+            "reason": "missing-ambient-pressure",
+            "feedstock_id": "lunar_mare_low_ti",
+            "body": "",
+            "ambient_pressure_pa": math.nan,
+            "pumping_electrical_kWh": 0.0,
+            "feasible": False,
+            "rows": [],
+        }
+    }
+
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(execution=execution),
+    )
+
+    assert not result.feasible
+    margin = result.feasibility_margins["pumping_feasibility"]
+    proposal = margin.status_payload["pressure_proposal"]
+    assert proposal["status"] == "unavailable"
+    assert proposal["reason"] == "pumping rows unavailable"
+    assert proposal["proposed_row_count"] == 0
+    assert proposal["unavailable_rows"] == []
 
 
 def _real_backend_profile() -> dict:

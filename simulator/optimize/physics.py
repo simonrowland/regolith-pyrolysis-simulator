@@ -42,7 +42,10 @@ SourceKind = Literal[
 # additive exclusion, honest denominator) when present -- a semantic flip,
 # so pre-S2c cached feasibility verdicts must not be served under the same
 # physics_constraints_digest.
-PHYSICS_GATE_VERSION = "physics-feasibility-v3-provenance-completeness"
+# v4 (2026-07-12, t-005): optimizer results now include the body-aware
+# sub-ambient pumping hard gate, so pre-wiring feasibility/cache identities
+# cannot be reused.
+PHYSICS_GATE_VERSION = "physics-feasibility-v4-subambient-pumping"
 DEFAULT_ACTIVE_GATES: tuple[str, ...] = (
     "delivered_stream_purity",
     "coating",

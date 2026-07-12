@@ -30,6 +30,7 @@ from simulator.condensation import (
     knudsen_regime_diagnostic,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.cost_ledger import run_pumping_input_cost
 from simulator.corpus_version import current_corpus_version
 from simulator.electrolysis import min_decomposition_voltage
 from simulator.lab_schedule import (
@@ -94,6 +95,11 @@ from simulator.optimize.recipe import (
     _effective_o2_bubbler_allowlist_version,
 )
 from simulator.optimize.worker_runtime import get_worker_runtime
+from simulator.pumping_cost import (
+    estimate_subambient_pump_cost,
+    pumping_context_from_sim,
+    pumping_environment_for_feedstock,
+)
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor
@@ -103,6 +109,7 @@ from simulator.runner import PyrolysisRun, RunnerError
 MASS_BALANCE_ABORT_PCT = 5e-12
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 NUMERICAL_OVERFLOW = "numerical_overflow"
+PUMPING_FEASIBILITY_GATE = "pumping_feasibility"
 RUMP_TERMINAL_LIQUID_FRACTION_MAX = 1e-9
 KNUDSEN_FALLBACK_EVAL_INPUTS = "fallback:eval-inputs"
 KNUDSEN_FALLBACK_GLOBAL_SUMMARY = "fallback:global-summary"
@@ -189,6 +196,7 @@ class _RunReferenceTraceOverlay(MappingABC):
 
 
 class FailureCategory(str, Enum):
+    PROPOSED = "proposed"
     INVALID_PATCH = "invalid_patch"
     INFEASIBLE_RECIPE = "infeasible_recipe"
     OUT_OF_DOMAIN = "out_of_domain"
@@ -479,6 +487,15 @@ class _TraceOverrideRunExecution:
 
 
 @dataclass(frozen=True)
+class _CertifiedPumpingDiagnosticRunExecution:
+    run_execution: Any
+    certified_pumping_diagnostic: Mapping[str, Any]
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.run_execution, name)
+
+
+@dataclass(frozen=True)
 class ScoredResult:
     candidate_id: str | None
     eval_spec: EvalSpec | None
@@ -507,6 +524,23 @@ class ScoredResult:
         else:
             if self.objectives is not None:
                 raise ValueError("infeasible result must not carry objectives")
+        if self.failure_category is FailureCategory.PROPOSED:
+            pumping_margin = self.feasibility_margins.get(PUMPING_FEASIBILITY_GATE)
+            pressure_proposal = (
+                pumping_margin.status_payload.get("pressure_proposal", {})
+                if pumping_margin is not None
+                else {}
+            )
+            if self.feasible or pressure_proposal.get("status") != "proposed":
+                raise ValueError(
+                    "proposed result requires a complete pumping pressure proposal"
+                )
+
+    @property
+    def requires_re_evaluation(self) -> bool:
+        """Whether this unscored candidate carries a non-terminal retry proposal."""
+
+        return self.failure_category is FailureCategory.PROPOSED
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
         return (
@@ -854,6 +888,20 @@ def evaluate(
         ) from exc
     if not feasibility.feasible:
         return _infeasible_result(candidate_id, spec, key, feasibility, run_execution, profile)
+    pumping_diagnostic = _pumping_diagnostic_for_gate(
+        run_execution,
+        feedstock_id=spec.feedstock_id,
+    )
+    pumping_margin = _pumping_feasibility_margin(pumping_diagnostic)
+    if pumping_margin is not None and not pumping_margin.feasible:
+        return _pumping_infeasible_result(
+            candidate_id,
+            spec,
+            key,
+            run_execution,
+            profile,
+            pumping_margin,
+        )
     target_reason = composition_target_infeasible_reason(profile)
     if target_reason:
         return _target_infeasible_result(
@@ -892,7 +940,13 @@ def evaluate(
             )
 
     try:
-        objectives = compute_objectives(objective_profile, run_execution)
+        objectives = compute_objectives(
+            objective_profile,
+            _CertifiedPumpingDiagnosticRunExecution(
+                run_execution,
+                pumping_diagnostic,
+            ),
+        )
         objectives = _objectives_with_thermal_window_metadata(objectives, spec)
         trace_payload = _composition_target_trace_payload(
             objective_profile,
@@ -2969,6 +3023,408 @@ def _target_infeasible_result(
             trace_payload=trace_payload,
         ),
         notes=notes,
+    )
+
+
+def _pumping_feasibility_margin(
+    diagnostic: Mapping[str, Any],
+) -> GateMargin | None:
+    status = str(diagnostic.get("status", "missing-status"))
+    if _pumping_diagnostic_is_certified_pass(diagnostic):
+        return None
+
+    pressure_proposal = _pumping_pressure_proposal(diagnostic)
+    status_payload = {
+        "schema_version": "pumping-feasibility-gate-v1",
+        "pumping_cost_evidence": _compact_jsonable(diagnostic),
+        "pressure_proposal": pressure_proposal,
+    }
+    detail = f"{status}: sub-ambient pumping point is not certified feasible"
+    proposal_status = pressure_proposal["status"]
+    if proposal_status == "proposed":
+        detail += "; pump-feasible ambient candidate proposed for recipe re-evaluation"
+    elif proposal_status == "partial":
+        detail += "; ambient candidates are incomplete across failing pumping rows"
+    elif proposal_status == "unavailable":
+        detail += "; pressure alternative recomputation is unavailable"
+    else:
+        detail += "; feasible pressure set is empty"
+    return GateMargin(
+        gate=PUMPING_FEASIBILITY_GATE,
+        feasible=False,
+        margin=-1.0,
+        threshold=ThresholdSpec(
+            id="subambient_pumping_feasible_required",
+            value=1.0,
+            units="boolean",
+            source="code_default",
+            source_ref=(
+                "simulator.pumping_cost: staged compression plus validated "
+                "line-conductance feasibility fence"
+            ),
+        ),
+        observed=0.0,
+        detail=detail,
+        status="available",
+        status_reason=status,
+        status_payload=status_payload,
+    )
+
+
+def _pumping_diagnostic_for_gate(
+    run_execution: Any,
+    *,
+    feedstock_id: str,
+) -> Mapping[str, Any]:
+    sim = getattr(run_execution, "simulator", run_execution)
+    cost_rollup = getattr(sim, "cost_rollup", None)
+    if not isinstance(cost_rollup, MappingABC):
+        cost_rollup = getattr(getattr(sim, "record", None), "cost_rollup", None)
+    if isinstance(cost_rollup, MappingABC):
+        diagnostic = cost_rollup.get("pumping_diagnostic")
+        if isinstance(diagnostic, MappingABC):
+            mismatch = _pumping_diagnostic_environment_mismatch(
+                diagnostic,
+                feedstock_id=feedstock_id,
+            )
+            if mismatch is not None:
+                return {
+                    "schema_version": "pumping-cost-rollup-v1",
+                    "status": "refused",
+                    "reason": "pumping-diagnostic-environment-mismatch",
+                    "feedstock_id": feedstock_id,
+                    "body": str(mismatch["expected_body"]),
+                    "ambient_pressure_pa": mismatch["expected_ambient_pressure_pa"],
+                    "pumping_electrical_kWh": 0.0,
+                    "feasible": False,
+                    "rows": [],
+                    "identity_mismatch": mismatch,
+                }
+            return diagnostic
+
+    # RunExecutor normally materializes the rollup. Recompute from the same
+    # helper inputs when that envelope is missing so absent diagnostic plumbing
+    # cannot bypass the hard gate. No line conductance is invented: a real
+    # sub-ambient row therefore remains unresolved and refuses.
+    context = pumping_context_from_sim(
+        sim,
+        getattr(run_execution, "snapshots", ()),
+        feedstock_id_override=feedstock_id,
+    )
+    _, raw_diagnostic = run_pumping_input_cost(context)
+    diagnostic = dict(raw_diagnostic)
+    diagnostic["evidence_source"] = "evaluate-recomputed-missing-rollup"
+    return diagnostic
+
+
+def _pumping_diagnostic_environment_mismatch(
+    diagnostic: Mapping[str, Any],
+    *,
+    feedstock_id: str,
+) -> dict[str, Any] | None:
+    expected = pumping_environment_for_feedstock(feedstock_id)
+    expected_body = str(expected.get("body", ""))
+    expected_ambient = _finite_optional_float(expected.get("ambient_pressure_pa"))
+    observed_feedstock = str(diagnostic.get("feedstock_id", ""))
+    observed_body = str(diagnostic.get("body", ""))
+    observed_ambient = _finite_optional_float(
+        diagnostic.get("ambient_pressure_pa")
+    )
+    matches = (
+        expected.get("status") == "ok"
+        and expected_ambient is not None
+        and observed_feedstock == feedstock_id
+        and observed_body == expected_body
+        and observed_ambient is not None
+        and math.isclose(
+            observed_ambient,
+            expected_ambient,
+            rel_tol=0.0,
+            abs_tol=max(1.0e-18, expected_ambient * 1.0e-12),
+        )
+    )
+    if matches:
+        return None
+    return {
+        "expected_feedstock_id": feedstock_id,
+        "expected_body": expected_body,
+        "expected_ambient_pressure_pa": expected_ambient,
+        "observed_feedstock_id": observed_feedstock,
+        "observed_body": observed_body,
+        "observed_ambient_pressure_pa": observed_ambient,
+    }
+
+
+def _pumping_diagnostic_is_certified_pass(
+    diagnostic: Mapping[str, Any],
+) -> bool:
+    status = str(diagnostic.get("status", ""))
+    body = str(diagnostic.get("body", ""))
+    ambient_pressure_pa = _finite_optional_float(
+        diagnostic.get("ambient_pressure_pa")
+    )
+    raw_rows = diagnostic.get("rows")
+    observed_energy_kWh = _finite_optional_float(
+        diagnostic.get("pumping_electrical_kWh")
+    )
+    if (
+        body not in {"mars", "moon", "asteroid"}
+        or ambient_pressure_pa is None
+        or ambient_pressure_pa <= 0.0
+        or not isinstance(raw_rows, (tuple, list))
+        or diagnostic.get("feasible") is not True
+        or observed_energy_kWh is None
+        or observed_energy_kWh < 0.0
+    ):
+        return False
+    if status == "no_rows":
+        return not raw_rows and observed_energy_kWh == 0.0
+    if status != "ok" or not raw_rows:
+        return False
+
+    context_rows: list[dict[str, Any]] = []
+    for row in raw_rows:
+        if not isinstance(row, MappingABC) or row.get("feasible") is not True:
+            return False
+        target_pressure_pa = _finite_optional_float(row.get("target_pressure_pa"))
+        offgas_mol_per_s = _finite_optional_float(row.get("offgas_mol_per_s"))
+        duration_s = _finite_optional_float(row.get("duration_s"))
+        gas_temperature_K = _finite_optional_float(row.get("gas_temperature_K"))
+        if (
+            target_pressure_pa is None
+            or target_pressure_pa <= 0.0
+            or offgas_mol_per_s is None
+            or offgas_mol_per_s <= 0.0
+            or duration_s is None
+            or duration_s <= 0.0
+            or gas_temperature_K is None
+            or gas_temperature_K <= 0.0
+        ):
+            return False
+        context_row = {
+            "hour": int(row.get("hour", len(context_rows))),
+            "target_pressure_pa": target_pressure_pa,
+            "offgas_mol_per_s": offgas_mol_per_s,
+            "duration_s": duration_s,
+            "gas_temperature_K": gas_temperature_K,
+        }
+        line_conductance = _finite_optional_float(
+            row.get("line_conductance_m3_s")
+        )
+        if target_pressure_pa < ambient_pressure_pa:
+            if line_conductance is None or line_conductance <= 0.0:
+                return False
+            context_row["validated_line_conductance_m3_s"] = line_conductance
+        context_rows.append(context_row)
+
+    _, recomputed = run_pumping_input_cost(
+        {
+            "status": "ok",
+            "feedstock_id": str(diagnostic.get("feedstock_id", "")),
+            "body": body,
+            "ambient_pressure_pa": ambient_pressure_pa,
+            "ambient_pressure_source": str(
+                diagnostic.get("ambient_pressure_source", "")
+            ),
+            "rows": context_rows,
+        }
+    )
+    recomputed_energy = _finite_optional_float(
+        recomputed.get("pumping_electrical_kWh")
+    )
+    return (
+        recomputed.get("status") == "ok"
+        and recomputed.get("feasible") is True
+        and recomputed_energy is not None
+        and math.isclose(
+            observed_energy_kWh,
+            recomputed_energy,
+            rel_tol=1.0e-12,
+            abs_tol=1.0e-15,
+        )
+        and _compact_jsonable(raw_rows)
+        == _compact_jsonable(recomputed.get("rows", ()))
+    )
+
+
+def _pumping_pressure_proposal(diagnostic: Mapping[str, Any]) -> dict[str, Any]:
+    ambient_pressure_pa = _finite_optional_float(
+        diagnostic.get("ambient_pressure_pa")
+    )
+    body = str(diagnostic.get("body", ""))
+    raw_rows = diagnostic.get("rows")
+    rows = tuple(raw_rows) if isinstance(raw_rows, (tuple, list)) else ()
+    if (
+        ambient_pressure_pa is None
+        or ambient_pressure_pa <= 0.0
+        or body not in {"mars", "moon", "asteroid"}
+    ):
+        explicitly_empty = (
+            diagnostic.get("status") == "empty_feasible_set"
+            or diagnostic.get("reason") == "empty_feasible_set"
+        )
+        return {
+            "status": "empty_feasible_set" if explicitly_empty else "unavailable",
+            "reason": (
+                "empty pressure alternative set"
+                if explicitly_empty
+                else "ambient pressure boundary unavailable or invalid"
+            ),
+            "failing_row_count": len(rows),
+            "proposed_row_count": 0,
+            "unavailable_row_count": 0 if explicitly_empty else len(rows),
+            "unavailable_rows": [] if explicitly_empty else [
+                {
+                    "row_index": row_index,
+                    "reason": "ambient pressure boundary unavailable or invalid",
+                }
+                for row_index in range(len(rows))
+            ],
+            "provenance": (
+                "SC-67 empty-set refusal"
+                if explicitly_empty
+                else "SC-67 recomputation unavailable"
+            ),
+        }
+    if not rows:
+        return {
+            "status": "unavailable",
+            "reason": "pumping rows unavailable",
+            "failing_row_count": 0,
+            "proposed_row_count": 0,
+            "unavailable_row_count": 0,
+            "unavailable_rows": [],
+            "provenance": "SC-67 recomputation unavailable",
+        }
+
+    proposals: list[dict[str, Any]] = []
+    unavailable_rows: list[dict[str, Any]] = []
+    for row_index, raw_row in enumerate(rows):
+        if isinstance(raw_row, MappingABC) and raw_row.get("feasible") is True:
+            continue
+        row_identity: dict[str, Any] = {"row_index": row_index}
+        if isinstance(raw_row, MappingABC) and "hour" in raw_row:
+            row_identity["hour"] = _compact_jsonable(raw_row.get("hour"))
+        if not isinstance(raw_row, MappingABC):
+            unavailable_rows.append(
+                {**row_identity, "reason": "pumping row is not a mapping"}
+            )
+            continue
+        target_pressure_pa = _finite_optional_float(raw_row.get("target_pressure_pa"))
+        offgas_mol_per_s = _finite_optional_float(raw_row.get("offgas_mol_per_s"))
+        duration_s = _finite_optional_float(raw_row.get("duration_s"))
+        gas_temperature_K = _finite_optional_float(raw_row.get("gas_temperature_K"))
+        if (
+            target_pressure_pa is None
+            or target_pressure_pa <= 0.0
+            or offgas_mol_per_s is None
+            or offgas_mol_per_s <= 0.0
+            or duration_s is None
+            or duration_s <= 0.0
+            or gas_temperature_K is None
+            or gas_temperature_K <= 0.0
+        ):
+            unavailable_rows.append(
+                {
+                    **row_identity,
+                    "reason": "pumping row inputs are incomplete or invalid",
+                }
+            )
+            continue
+        proposed = estimate_subambient_pump_cost(
+            target_pressure_pa=ambient_pressure_pa,
+            offgas_mol_per_s=offgas_mol_per_s,
+            duration_s=duration_s,
+            ambient_pressure_pa=ambient_pressure_pa,
+            gas_temperature_K=gas_temperature_K,
+        )
+        if proposed.feasible is not True:
+            unavailable_rows.append(
+                {
+                    **row_identity,
+                    "reason": "ambient-boundary pumping recomputation unavailable",
+                    "pumping_cost_evidence": _compact_jsonable(proposed.to_json()),
+                }
+            )
+            continue
+        raw_hour = raw_row.get("hour", row_index)
+        try:
+            proposal_hour = int(raw_hour)
+        except (TypeError, ValueError, OverflowError):
+            proposal_hour = row_index
+        proposals.append(
+            {
+                "hour": proposal_hour,
+                "requested_target_pressure_pa": target_pressure_pa,
+                "proposed_target_pressure_pa": ambient_pressure_pa,
+                "proposed_target_pressure_mbar": ambient_pressure_pa / 100.0,
+                "pumping_cost_evidence": _compact_jsonable(proposed.to_json()),
+            }
+        )
+    if not proposals:
+        return {
+            "status": "unavailable",
+            "reason": "no failing pumping row could be recomputed",
+            "failing_row_count": len(unavailable_rows),
+            "proposed_row_count": 0,
+            "unavailable_row_count": len(unavailable_rows),
+            "unavailable_rows": unavailable_rows,
+            "provenance": "SC-67 recomputation unavailable",
+        }
+    return {
+        "status": "partial" if unavailable_rows else "proposed",
+        "action": "raise_target_pressure_to_ambient_boundary",
+        "feasibility_scope": "pumping_only",
+        "requires_full_recipe_species_re_evaluation": True,
+        "failing_row_count": len(proposals) + len(unavailable_rows),
+        "proposed_row_count": len(proposals),
+        "unavailable_row_count": len(unavailable_rows),
+        "rows": proposals,
+        "unavailable_rows": unavailable_rows,
+        "provenance": {
+            "rule": "SC-67 recompute-and-propose",
+            "source_ref": (
+                "simulator.pumping_cost.estimate_subambient_pump_cost: "
+                "target_pressure_pa >= ambient_pressure_pa is vent-free"
+            ),
+            "capture_claim": (
+                "not claimed; proposed pressure must be re-evaluated against "
+                "species capture objectives"
+            ),
+        },
+    }
+
+
+def _pumping_infeasible_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    run_execution: Any,
+    profile: Mapping[str, Any],
+    margin: GateMargin,
+) -> ScoredResult:
+    trace_payload = {
+        PUMPING_FEASIBILITY_GATE: _compact_jsonable(margin.status_payload)
+    }
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=(
+            FailureCategory.PROPOSED
+            if margin.status_payload.get("pressure_proposal", {}).get("status")
+            == "proposed"
+            else FailureCategory.INFEASIBLE_RECIPE
+        ),
+        feasibility_margins={PUMPING_FEASIBILITY_GATE: margin},
+        failing_gates=(PUMPING_FEASIBILITY_GATE,),
+        run_reference=_run_reference(
+            run_execution,
+            profile,
+            trace_payload=trace_payload,
+        ),
+        notes=(margin.detail,),
     )
 
 
