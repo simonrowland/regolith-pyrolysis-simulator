@@ -11,7 +11,11 @@ from simulator.chemistry.structural_activity import (
     structural_activity_diagnostic,
     structural_activity_features,
 )
-from simulator.chemistry.melt_activity import melt_oxide_activity
+from simulator.chemistry.melt_activity import (
+    melt_oxide_activity,
+    na_reductant_activity_shift_kj_per_mol_o2,
+    single_cation_mole_fractions,
+)
 from simulator.state import MOLAR_MASS
 
 
@@ -79,6 +83,20 @@ def test_reference_gamma_na_reproduces_demaria_seed_anchors() -> None:
     # provisional 6.0e-3 K anchor (~170x high vs the primary).
     assert gamma_1500["KO0.5"] == pytest.approx(3.5e-5, rel=1e-12)
     assert gamma_1300["KO0.5"] == pytest.approx(7.2e-5, rel=1e-12)
+
+
+@pytest.mark.parametrize("amount", [float("nan"), float("inf"), -1.0])
+def test_single_cation_basis_refuses_corrupt_known_oxide_inventory(amount):
+    with pytest.raises(ValueError, match="must be finite and non-negative"):
+        single_cation_mole_fractions({"SiO2": 1.0, "Na2O": amount})
+
+
+@pytest.mark.parametrize(
+    "temperature_K", [float("nan"), float("inf"), -1.0, 0.0]
+)
+def test_na_activity_shift_refuses_invalid_temperature(temperature_K):
+    with pytest.raises(ValueError, match="temperature_K"):
+        na_reductant_activity_shift_kj_per_mol_o2(temperature_K)
 
 
 def test_liquidus_flag_trips_for_demaria_12022_sub_liquidus_case() -> None:

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import copy
 import math
+from types import SimpleNamespace
 
 import pytest
 
@@ -49,6 +51,7 @@ def test_force_drain_bleed_commits_pure_move_o2_partition(
     )
 
     result = sim._dispatch_overhead_bleed(
+        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
         o2_vented_kg=3.0,
     )
@@ -198,6 +201,195 @@ def test_bleed_rate_tends_continuously_to_zero_with_pressure_delta():
     assert one_bar_delta == pytest.approx(0.0075)
     assert 0.0 < tiny_delta < one_bar_delta * 1.0e-10
     assert equal_pressure == {}
+
+
+@pytest.mark.parametrize(
+    ("control_name", "control_value"),
+    [
+        ("force_drain_all", "false"),
+        ("bleed_conductance_kg_s", float("inf")),
+        ("dt_hr", float("nan")),
+        ("dt_hr", -1.0),
+        ("dt_hr", None),
+        ("p_total_bar", float("nan")),
+        ("p_downstream_bar", float("inf")),
+        ("o2_vented_kg", float("inf")),
+        ("o2_vented_kg", None),
+        ("max_o2_flow_kg_hr", -1.0),
+        ("external_o2_in_overhead_mol", float("inf")),
+    ],
+)
+def test_destructive_bleed_controls_fail_closed_without_ledger_mutation(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    control_name,
+    control_value,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen"
+    )
+    controls = {
+        "force_drain_all": False,
+        "bleed_conductance_kg_s": 0.01,
+        "dt_hr": 1.0,
+        "p_total_bar": 2.0,
+        "p_downstream_bar": 0.0,
+    }
+    controls[control_name] = control_value
+
+    result = sim._chem_kernel.dispatch(
+        ChemistryIntent.OVERHEAD_BLEED,
+        temperature_C=1500.0,
+        pressure_bar=2.0,
+        control_inputs=controls,
+    )
+
+    assert result.status == "unsupported"
+    assert result.transition is None
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
+        "O2"
+    ] == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize(
+    ("probe", "expected_reason"),
+    [
+        ("negative_o2_vented", "o2_vented_kg"),
+        ("nan_o2_vented", "o2_vented_kg"),
+        ("negative_downstream_pressure", "p_downstream_bar"),
+        ("absent_total_pressure", "p_total_bar"),
+        ("absent_turbine_limit", "max_o2_flow_kg_hr"),
+        ("negative_external_o2", "external_o2_in_overhead_mol"),
+    ],
+)
+def test_core_passes_raw_destructive_bleed_controls_to_provider_guard(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    probe,
+    expected_reason,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen"
+    )
+    sim._overhead_headspace_config = {
+        "conductance_kg_s": 0.01,
+        "downstream_pressure_bar": 0.0,
+    }
+    monkeypatch.setattr(
+        sim,
+        "_overhead_gas_equilibrium_diagnostic",
+        lambda: {"p_total_bar": 2.0},
+    )
+    turbine_spec = SimpleNamespace(max_O2_flow_kg_hr=1.0)
+    dispatch_kwargs = {"force_drain_all": True}
+    if probe == "negative_o2_vented":
+        dispatch_kwargs["o2_vented_kg"] = -1.0
+    elif probe == "nan_o2_vented":
+        dispatch_kwargs["o2_vented_kg"] = float("nan")
+    elif probe == "negative_downstream_pressure":
+        sim._overhead_headspace_config["downstream_pressure_bar"] = -1.0
+    elif probe == "absent_total_pressure":
+        monkeypatch.setattr(sim, "_overhead_gas_equilibrium_diagnostic", lambda: {})
+    elif probe == "absent_turbine_limit":
+        turbine_spec = SimpleNamespace()
+    elif probe == "negative_external_o2":
+        sim._o2_bubbler_external_o2_in_overhead_mol = -1.0
+
+    before_melt = copy.deepcopy(sim.melt)
+    before_overhead = copy.deepcopy(sim.overhead)
+    before_overhead_ledger = copy.deepcopy(
+        sim.atom_ledger.kg_by_account("process.overhead_gas")
+    )
+    before_transitions = copy.deepcopy(tuple(sim.atom_ledger.transitions))
+    before_recorded_snapshots = copy.deepcopy(tuple(sim.record.snapshots))
+
+    result = sim._dispatch_overhead_bleed(
+        turbine_spec=turbine_spec,
+        **dispatch_kwargs,
+    )
+
+    assert result.status == "unsupported"
+    assert result.transition is None
+    assert (result.diagnostic or {})["reason"] == (
+        f"{expected_reason} must be a finite non-negative number"
+    )
+    assert sim.melt == before_melt
+    assert sim.overhead == before_overhead
+    assert sim.atom_ledger.kg_by_account(
+        "process.overhead_gas"
+    ) == before_overhead_ledger
+    assert tuple(sim.atom_ledger.transitions) == before_transitions
+    assert tuple(sim.record.snapshots) == before_recorded_snapshots
+
+
+def test_core_passes_raw_invalid_bleed_conductance_to_provider_guard(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen"
+    )
+    sim._overhead_headspace_config = {"conductance_kg_s": -0.01}
+    before = sim.atom_ledger.kg_by_account("process.overhead_gas")["O2"]
+
+    result = sim._dispatch_overhead_bleed()
+
+    assert result.status == "unsupported"
+    assert result.transition is None
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
+        "O2"
+    ] == pytest.approx(before)
+
+
+def test_zero_duration_bleed_is_a_zero_transition(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas", {"O2": 1.0}, source="test overhead oxygen"
+    )
+
+    result = sim._dispatch_and_commit(
+        ChemistryIntent.OVERHEAD_BLEED,
+        control_inputs={
+            "force_drain_all": False,
+            "bleed_conductance_kg_s": 1.0,
+            "dt_hr": 0.0,
+            "p_total_bar": 2.0,
+            "p_downstream_bar": 0.0,
+        },
+    )
+
+    assert result.status == "ok"
+    assert result.transition is None
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
+        "O2"
+    ] == pytest.approx(1.0)
 
 
 def test_live_headspace_bleed_conductance_uses_headspace_species_m_avg(

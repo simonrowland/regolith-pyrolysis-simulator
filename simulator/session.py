@@ -92,11 +92,16 @@ def normalize_mre_policy(
     enabled = bool(c5_enabled)
     if not enabled:
         return False, "", 0.0
-    return (
-        True,
-        str(mre_target_species or "").strip(),
-        float(mre_max_voltage_V or 0.0),
-    )
+    target = str(mre_target_species or "").strip()
+    voltage = _finite_float(mre_max_voltage_V, "mre_max_voltage_V")
+    if voltage < 0.0:
+        raise ValueError("mre_max_voltage_V must be non-negative")
+    if not target and voltage <= 0.0:
+        raise ValueError(
+            "c5_enabled requires mre_target_species or a positive "
+            "mre_max_voltage_V"
+        )
+    return True, target, voltage
 
 
 class InvalidDecisionChoiceError(ValueError):
@@ -170,6 +175,19 @@ class SimSessionConfig:
         )
         object.__setattr__(self, "runtime_campaign_overrides", overrides)
         object.__setattr__(self, "setpoints_overrides", overrides)
+        if self.c4_max_temp is not None:
+            c4_max_temp = _finite_float(self.c4_max_temp, "c4_max_temp")
+            if c4_max_temp < 0.0:
+                raise ValueError("c4_max_temp must be non-negative")
+            object.__setattr__(self, "c4_max_temp", c4_max_temp)
+        c5_enabled, mre_target_species, mre_max_voltage_V = normalize_mre_policy(
+            self.c5_enabled,
+            self.mre_target_species,
+            self.mre_max_voltage_V,
+        )
+        object.__setattr__(self, "c5_enabled", c5_enabled)
+        object.__setattr__(self, "mre_target_species", mre_target_species)
+        object.__setattr__(self, "mre_max_voltage_V", mre_max_voltage_V)
 
 
 @dataclass(frozen=True)
@@ -197,6 +215,7 @@ class SimSession:
         self._step_results: list[StepResult] = []
         self._operator_decisions: list[dict[str, Any]] = []
         self._result_document: Mapping[str, Any] | None = None
+        self._poisoned_error: RuntimeError | None = None
 
     @property
     def simulator(self) -> PyrolysisSimulator:
@@ -337,6 +356,7 @@ class SimSession:
         self._step_results = []
         self._operator_decisions = []
         self._result_document = None
+        self._poisoned_error = None
 
         sim.start_campaign(campaign_phase)
         sim.validate_lab_surface_temperature_resolver()
@@ -346,6 +366,12 @@ class SimSession:
         """Run exactly one policy-free simulator step."""
 
         sim = self._require_sim()
+        if self._poisoned_error is not None:
+            raise RuntimeError("session is poisoned after projection failure") from (
+                self._poisoned_error
+            )
+        if sim.is_complete():
+            raise RuntimeError("cannot advance a complete session")
         snapshot = sim.step()
         campaign_summary = getattr(sim, "_last_campaign_summary", None)
         backend_error = str(getattr(sim, "_last_backend_error", "") or "")
@@ -356,13 +382,19 @@ class SimSession:
             and sim.pending_decision is not None
             else None
         )
-        result = StepResult(
-            snapshot=snapshot,
-            per_hour_summary=self._build_per_hour_summary(sim, snapshot),
-            campaign_summary=campaign_summary,
-            decision_event=_decision_event(decision) if decision else None,
-            backend_error=backend_error,
-        )
+        try:
+            result = StepResult(
+                snapshot=snapshot,
+                per_hour_summary=self._build_per_hour_summary(sim, snapshot),
+                campaign_summary=campaign_summary,
+                decision_event=_decision_event(decision) if decision else None,
+                backend_error=backend_error,
+            )
+        except Exception as exc:
+            self._poisoned_error = RuntimeError(
+                "session projection failed after simulator state committed"
+            )
+            raise self._poisoned_error from exc
         self._step_results.append(result)
         return result
 
@@ -424,6 +456,8 @@ class SimSession:
             # value of 0 leaves the atmosphere alone (operator clearing
             # the setpoint, NOT requesting controlled-O2).
             new_pO2 = _finite_float(value, "pO2_mbar")
+            if new_pO2 < 0.0:
+                raise ValueError("pO2_mbar must be non-negative")
             sim.melt.pO2_mbar = new_pO2
             sim.melt.p_total_mbar = max(
                 sim.melt.p_total_mbar,
@@ -477,10 +511,13 @@ class SimSession:
                 if sim.melt.campaign.name == campaign_name:
                     sim.melt.stir_state = clamped
             else:
-                target[field_name] = _finite_float(
+                finite_value = _finite_float(
                     value,
                     f"campaign_override {campaign_name}.{field_name}",
                 )
+                if field_name == "pO2_mbar" and finite_value < 0.0:
+                    raise ValueError("pO2_mbar must be non-negative")
+                target[field_name] = finite_value
             if field_name == "pO2_mbar" and sim.melt.campaign.name == campaign_name:
                 # 0.5.4 W5 (post-push P2 convergent finding, codex
                 # review + codex challenge 2026-05-28): mirror the

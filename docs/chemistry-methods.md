@@ -222,12 +222,12 @@ mistakes a ~1/735 suppression for a ~1/27 one. A correct coefficient applied on 
 new, wrong number wearing a real citation; the code and its provenance record therefore fix the basis
 and apply it consistently.
 
-The grounded values, at 1673 K on a ferrobasalt melt, are:
+The grounded point-anchor values are:
 
-| Component | γ (single-cation, Raoultian) | 1σ | Tier |
-|---|---|---|---|
-| NaO₀.₅ | 1.0 × 10⁻³ | ± 2.2 × 10⁻⁴ | UNCERTIFIED |
-| KO₀.₅ | 2.2 × 10⁻⁴ | ± 5.5 × 10⁻⁵ | UNCERTIFIED |
+| Component | γ (single-cation, Raoultian) | Anchor T | Uncertainty | Tier |
+|---|---|---|---|---|
+| NaO₀.₅ | 1.0 × 10⁻³ | 1673 K | ± 2.2 × 10⁻⁴ | UNCERTIFIED |
+| KO₀.₅ | 3.5 × 10⁻⁵ | 1500 K | point anchor; comparison envelope 6.3 × 10⁻⁵ to 7.1 × 10⁻⁴ at 1573 K | UNCERTIFIED |
 
 They are tagged UNCERTIFIED because they are a single-temperature datum extrapolated into the hotter
 1773–2173 K recipe band, where the true coefficient rises toward unity (the melt holds the alkali less
@@ -552,10 +552,10 @@ them it blends smoothly, with the activity clamped at the pure-FeO ceiling.
 **`max(actual liquidus, ~1200 °C)`** rather than a flat 1400 °C, and — as the evaporation path already
 does but the redox path did not — the redox capacity is scaled by the **continuous melt fraction**
 through the sub-liquidus mush rather than switched
-on/off, so reactivity follows the amount of liquid actually present. At the high end the relation extrapolates
-well to ~2100 °C with *experimental* confirmation (Aithala, Macris & Hirschmann 2026, *Geochem. Persp. Lett.*
-40:18–23, [doi:10.7185/geochemlet.2617](https://doi.org/10.7185/geochemlet.2617) — Kress91 matches their ΔCp
-model within uncertainty over 1250–2100 °C); uncertainty grows above ~2500 K. Kilinc 1983
+on/off, so reactivity follows the amount of liquid actually present. Above the calibrated band the relation is
+an extrapolation. REF-053 is retained only as provisional comparison evidence until its quote-gated source
+ingestion verifies the claimed high-temperature locus; it does not currently widen runtime authority.
+Uncertainty grows above ~2500 K. Kilinc 1983
 ([doi:10.1007/BF00373086](https://doi.org/10.1007/BF00373086)) and Jayasuriya 2004
 ([doi:10.2138/am-2004-11-1203](https://doi.org/10.2138/am-2004-11-1203)) were considered but do not widen the
 T-range; the code retains Kress91 across the furnace band, tagged by temperature band in-comment.
@@ -857,13 +857,11 @@ disagrees with reference data the response is investigation, never retuning a co
 agreement. The appropriate and inappropriate uses of the simulator's numbers are enumerated in
 [`docs/model-limitations.md`](model-limitations.md).
 
-When a value comes from a **real** external phase engine (alphaMELTS, MAGEMin) rather than an internal
-analytic model, its reproducibility is protected by the cache identity, not just the source citation.
-Real-engine results are memoized under a key that includes the feedstock/state inputs **and** the
-resolved engine name, the evaluation mode, and the engine's own version string — so a cached value is
-served only for the exact engine configuration that produced it, and a result computed under a prior
-engine version or a different mode is invalidated rather than silently reused. The key matches on the
-declared version, not a cross-machine content digest, so the same engine build reproduces its cache on
-another cluster node while a genuine engine change still busts it. This is what lets a validation number
+When a value comes from a real external phase engine rather than an internal analytic model, its
+reproducibility is protected by provider-specific cache identity, not just source citation. AlphaMELTS
+and cached-real identities include feedstock/state inputs, engine name, evaluation mode, and declared
+engine version. The diagnostic-only `magemin-shadow` identity uses provider/model/mode and intentionally
+has no AlphaMELTS version field. A mode or declared-version change therefore invalidates the applicable
+identity rather than silently reusing it. This is what lets a validation number
 be re-derived and audited rather than taken on trust that "the cache had it."
-<!-- impl: §11 -> simulator/reduced_real_determinism.py _engine_version_provenance:2624 — real-provider cache identity (model+mode+engine version) -->
+<!-- impl: §11 -> simulator/reduced_real_determinism.py _provider_identity_components — provider-specific cache identity -->

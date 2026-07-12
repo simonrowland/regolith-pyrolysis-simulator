@@ -463,6 +463,43 @@ class CampaignManager:
             raise ValueError(f'Malformed campaign rate band {label}: non-finite')
         return (low + high) / 2.0
 
+    def _configured_temperature_ramp(
+        self,
+        campaign: CampaignPhase,
+    ) -> tuple[float, float]:
+        campaign_key = self._campaign_config_key(campaign)
+        cfg = self._campaign_config(campaign)
+        temperature_range = cfg.get('temp_range_C')
+        if (
+            not isinstance(temperature_range, (list, tuple))
+            or len(temperature_range) != 2
+        ):
+            raise ValueError(
+                f'Malformed campaign temperature range: '
+                f'{campaign_key}.temp_range_C'
+            )
+        low = self._required_float(
+            temperature_range[0], f'{campaign_key}.temp_range_C[0]'
+        )
+        high = self._required_float(
+            temperature_range[1], f'{campaign_key}.temp_range_C[1]'
+        )
+        ramp = self._required_float(
+            cfg.get('dT_dt_C_per_hr'),
+            f'{campaign_key}.dT_dt_C_per_hr',
+        )
+        if (
+            not math.isfinite(low)
+            or not math.isfinite(high)
+            or not math.isfinite(ramp)
+            or low > high
+            or ramp <= 0.0
+        ):
+            raise ValueError(
+                f'Invalid campaign thermal configuration: {campaign_key}'
+            )
+        return high, ramp
+
     def _scalar_config_float(self,
                              config: Mapping[str, object],
                              key: str) -> float | None:
@@ -890,6 +927,16 @@ class CampaignManager:
             self._c2a_staged_last_log_slope_by_species = {}
             return False
 
+        molar_mass_by_species: dict[str, float] = {}
+        for species_name in species:
+            molar_mass = _species_molar_mass_kg_per_mol(species_name)
+            if molar_mass is None or molar_mass <= 0.0:
+                raise ValueError(
+                    "endpoint.flux_decay_species contains unknown species "
+                    f"{species_name!r}"
+                )
+            molar_mass_by_species[species_name] = molar_mass
+
         slopes: dict[str, float] = {}
         observed_species: list[str] = []
         for species_name in species:
@@ -897,9 +944,7 @@ class CampaignManager:
                 0.0,
                 self._float(evap_flux.species_kg_hr.get(species_name, 0.0), 0.0),
             )
-            molar_mass = _species_molar_mass_kg_per_mol(species_name)
-            if molar_mass is None or molar_mass <= 0.0:
-                continue
+            molar_mass = molar_mass_by_species[species_name]
             previous = max(
                 0.0,
                 self._c2a_staged_cumulative_yield_mol_by_species.get(
@@ -1167,8 +1212,7 @@ class CampaignManager:
             return thermal_window
 
         if campaign == CampaignPhase.C0:
-            # Ramp from current T to 950°C at 50°C/hr
-            return (950.0, 50.0)
+            return self._configured_temperature_ramp(campaign)
 
         elif campaign == CampaignPhase.C0B:
             # Isothermal hold at midpoint of [1180, 1320]
@@ -1222,8 +1266,7 @@ class CampaignManager:
             return (target, ramp)
 
         elif campaign == CampaignPhase.C2B:
-            # Ramp 1320 → 1480°C (pO₂-controlled)
-            return (1480.0, 10.0)
+            return self._configured_temperature_ramp(campaign)
 
         elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
             # Legacy C3 alternates injection/bakeout. V1c staged Na cleanup

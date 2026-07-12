@@ -22,7 +22,7 @@ Alphabetised one-line definitions for project-specific terms. Standard thermodyn
 
 **C2B** — pO₂-managed Fe pyrolysis (Path B); preserves CMAS glass in the melt. Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
-**C3 (C3_NA, C3_K)** — alkali metallothermic polish campaign family. Under the JANAF-4th multiphase re-ground (2026-07-09), the surviving recipe is **C3_NA** (Na-only at the cool 1150 °C window); **C3_K** is refused by the S1b engine gate at any practical melt T (K/Fe crossover ~836 °C), and Cr/Ti targets are refused at C3 temperatures. Refused dispatches are recorded in `shuttle_refusal_history`. Source: `data/setpoints.yaml` §1 `C3:`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
+**C3 (C3_NA, C3_K)** — alkali metallothermic polish campaign family. Under the JANAF-4th multiphase re-ground (2026-07-09), the surviving recipe is **C3_NA** (Na-only at the cool 1150 °C window); **C3_K** is refused by the S1b engine gate at any practical melt T (K/Fe crossover ~836 °C). The Na gate can accept Cr₂O₃ when its in-band margin is positive, currently refuses TiO₂, and does not support MnO as a C3 target. Refused dispatches are recorded in `shuttle_refusal_history`. Source: `data/setpoints.yaml` §1 `C3:`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 
 **C4** — selective Mg pyrolysis campaign (Branch Two preferred). Source: `data/setpoints.yaml`. See [`docs/recipe-playbook.md`](recipe-playbook.md).
 

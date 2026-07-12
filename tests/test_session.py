@@ -566,6 +566,85 @@ def test_advance_is_policy_free_and_surfaces_decision_without_applying():
     assert fake.applied_decisions == []
 
 
+def test_advance_refuses_complete_session_without_stepping():
+    fake = _FakeSim()
+    fake.is_complete = lambda: True
+    session = _fake_session(fake)
+
+    with pytest.raises(RuntimeError, match="complete session"):
+        session.advance()
+
+    assert fake.melt.hour == 0
+
+
+def test_projection_failure_poisons_committed_session(monkeypatch):
+    fake = _FakeSim()
+    session = _fake_session(fake)
+    monkeypatch.setattr(
+        session,
+        "_build_per_hour_summary",
+        lambda *_args: (_ for _ in ()).throw(ValueError("projection broke")),
+    )
+
+    with pytest.raises(RuntimeError, match="projection failed"):
+        session.advance()
+    assert fake.melt.hour == 1
+
+    with pytest.raises(RuntimeError, match="session is poisoned"):
+        session.advance()
+    assert fake.melt.hour == 1
+
+
+def test_paused_core_poll_preserves_last_hour_diagnostics():
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+    sim._last_extraction_completeness_diagnostic = {"marker": "retained"}
+    sim.paused_for_decision = True
+    before_hour = sim.melt.hour
+
+    snapshot = sim.step()
+
+    assert snapshot.hour == before_hour
+    assert sim.melt.hour == before_hour
+    assert sim._last_extraction_completeness_diagnostic == {
+        "marker": "retained"
+    }
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), -1.0])
+def test_session_refuses_invalid_mre_voltage_before_start(value):
+    with pytest.raises(ValueError, match="mre_max_voltage_V"):
+        _config(
+            c5_enabled=True,
+            mre_target_species="SiO2",
+            mre_max_voltage_V=value,
+        )
+
+
+def test_session_refuses_empty_enabled_mre_policy():
+    with pytest.raises(ValueError, match="c5_enabled requires"):
+        _config(c5_enabled=True, mre_target_species="", mre_max_voltage_V=0.0)
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), -1.0])
+def test_session_rejects_invalid_po2_before_mutation(value):
+    session = SimSession().start(_config(campaign="C2A"))
+    before = (
+        session.simulator.melt.pO2_mbar,
+        session.simulator.melt.p_total_mbar,
+        session.simulator.melt.atmosphere,
+    )
+
+    with pytest.raises(ValueError, match="pO2_mbar"):
+        session.adjust("pO2_mbar", value)
+
+    after = (
+        session.simulator.melt.pO2_mbar,
+        session.simulator.melt.p_total_mbar,
+        session.simulator.melt.atmosphere,
+    )
+    assert after == before
+
+
 def test_auto_apply_driver_applies_recommendation_before_advancing():
     decision = DecisionPoint(
         DecisionType.PATH_AB,

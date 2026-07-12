@@ -12,7 +12,7 @@ from simulator.condensation import (
 )
 from simulator.core import PyrolysisSimulator
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
-from simulator.state import CampaignPhase
+from simulator.state import Atmosphere, CampaignPhase
 from simulator.runner import PyrolysisRun
 
 
@@ -256,6 +256,7 @@ def test_blank_explicit_carrier_gas_fails_loud():
         ("pN2", "N2"),
         ("N2 sweep", "N2"),
         ("pAr", "Ar"),
+        ("pO2", "O2"),
         ("pCO2", "CO2"),
         ("CO2_BACKPRESSURE", "CO2"),
         ("96% CO2", "CO2"),
@@ -290,6 +291,30 @@ def test_invalid_campaign_carrier_gas_fails_before_defaulting_to_n2(carrier_gas)
 
     with pytest.raises(ValueError, match="Unsupported condensation carrier_gas"):
         sim._resolve_condensation_carrier_gas()
+
+
+def test_controlled_o2_atmosphere_uses_o2_transport_properties():
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = MeltState(
+        campaign=CampaignPhase.C2B,
+        atmosphere=Atmosphere.CONTROLLED_O2,
+    )
+    sim.setpoints = {"campaigns": {"C2B": {}}}
+
+    assert sim._resolve_condensation_carrier_gas() == "O2"
+
+
+def test_explicit_campaign_pn2_carrier_precedes_controlled_o2_inference():
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = MeltState(
+        campaign=CampaignPhase.C2A,
+        atmosphere=Atmosphere.CONTROLLED_O2,
+    )
+    sim.setpoints = {
+        "campaigns": {"C2A_continuous": {"carrier_gas": "pN2"}}
+    }
+
+    assert sim._resolve_condensation_carrier_gas() == "N2"
 
 
 def test_default_setpoint_recipes_are_viscous():

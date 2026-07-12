@@ -302,7 +302,7 @@ campaigns:
     label: "pO2-Managed Fe Pyrolysis (Path B)"
     activation_condition: "Path_B -- preserving CMAS glass for Material 1 or terminal ceramics"
     temp_range_C: [1320, 1480]
-    dT_dt_C_per_hr: null                 # pO2-ramped with temperature
+    dT_dt_C_per_hr: 10                   # pO2-ramped with temperature
     atmosphere: "controlled_O2"
     pO2_mbar: [0.8, 2.3]                # ramped with temperature
     pO2_mbar_default: 1.5
@@ -340,8 +340,9 @@ campaigns:
     JANAF_4th_multiphase_status: >
       K/FeO is refused throughout practical melt temperatures (formal
       crossover 836 C). Na/FeO survives only below 1181.5 C and is therefore
-      used only by the C2A_staged 1150 C FeO cleanup override. Default C3
-      Cr/Ti reductions remain refused by the executable temperature gate.
+      used only by the C2A_staged 1150 C FeO cleanup override. Cr2O3 can pass
+      when its in-band margin is positive; TiO2 is refused and MnO is not a
+      supported C3 target.
     pO2_mbar_default: 1.0
     p_total_mbar_default: 1.0
     sequencing: "legacy K-first then Na; physics gate may refuse all targets"
@@ -1041,7 +1042,7 @@ condensation_train:
           Fe: "370 nm"
           SiO: "230 nm UV"
         note: "Na 589 nm early, Fe 370 nm mid, SiO 230 nm UV dominant >1400 C"
-      compatibility: "Excellent with alkali and SiO"
+      compatibility: "High SiO attack; alkali behavior uncharacterized"
 
     stage_1_fe_condenser:
       label: "Fe Condenser"
@@ -1066,11 +1067,11 @@ condensation_train:
       temp_range_C: [900, 1200]
       material: "fused silica baffles (removable cartridge)"
       max_service_T_C: 1300
-      product: "fused silica glass (SiO2 on SiO2 -- self-compatible)"
+      product: "fused silica glass (SiO2 capture on fused-silica substrate)"
       note: >
         Only grams per campaign at >300x suppression under pO2 control;
         100-160 kg under Path A pN2 sweep.
-      compatibility: "Self-compatible with condensate"
+      compatibility: "Uncertain/reactive under low-pO2 SiO conditions"
 
     stage_4_alkali_mg_cyclone:
       label: "Alkali / Mg Cyclone Separator"
@@ -1135,7 +1136,7 @@ decision_tree:
         label: "Continuous Adaptive pN2 Ramp (default)"
         campaign: "C2A_continuous"
         condition: "SiO2 extraction desired (most feedstocks)"
-        products: ["Fe", "fused_silica_glass"]
+        products: ["Fe", "fused_silica_glass", "elemental_Si_byproduct"]
         downstream_effects:
           - "C3 scope halved (0-1 K + 1 Na cycles)"
           - "C5 MRE scope reduced 20-40%"
@@ -1345,7 +1346,7 @@ refractory_compatibility:
     - zone: "Stage 0 hot duct"
       material: "Doloma-REE ceramic"
       max_T_C: 1750
-      compatibility: "Excellent with alkali and SiO"
+      compatibility: "High SiO attack; alkali behavior uncharacterized"
 
     - zone: "Stage 1 Fe condenser"
       material: "MZO (MgO-ZrO2) coating"
@@ -1355,7 +1356,7 @@ refractory_compatibility:
     - zone: "Stage 2 SiO2 capture"
       material: "Removable fused silica"
       max_T_C: 1300
-      compatibility: "Self-compatible with condensate"
+      compatibility: "Uncertain/reactive under low-pO2 SiO conditions"
 
     - zone: "Main crucible / tap"
       material: "Mo-lined or SiC freeze-valve"

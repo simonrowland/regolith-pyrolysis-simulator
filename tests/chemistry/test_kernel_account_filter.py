@@ -179,3 +179,22 @@ def test_kernel_dispatch_filters_account_view_before_provider_sees_it():
     assert "process.metal_phase" not in seen
     assert "process.overhead_gas" not in seen
     assert seen <= {"process.cleaned_melt"}
+
+
+def test_caller_cannot_widen_provider_declared_accounts():
+    ledger = _ledger_with_accounts()
+    registry = ProviderRegistry()
+    provider = _AccountRecordingProvider()
+    registry.register(provider, [ChemistryIntent.SILICATE_LIQUIDUS])
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+
+    kernel.dispatch(
+        ChemistryIntent.SILICATE_LIQUIDUS,
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        declared_accounts=frozenset(
+            {"process.cleaned_melt", "process.metal_phase"}
+        ),
+    )
+
+    assert provider.seen_accounts == [frozenset({"process.cleaned_melt"})]

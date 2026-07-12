@@ -122,13 +122,6 @@ class Planner:
         except BaseException:  # noqa: BLE001 -- diagnostics cannot replace failure
             return "<exception repr unavailable>"
 
-    @staticmethod
-    def _safe_provider_id(provider: ChemistryProvider) -> str:
-        try:
-            return provider.capability_profile().provider_id
-        except Exception:  # noqa: BLE001 -- diagnostic identity cannot block authority
-            return "<provider id unavailable>"
-
     def dispatch(self, request: IntentRequest) -> IntentResult:
         """Run the authoritative + shadow providers for ``request``.
 
@@ -160,9 +153,29 @@ class Planner:
         shadows = self._registry.shadows_for(request.intent)
         shadow_results: list[tuple[ChemistryProvider, str, IntentResult]] = []
         for shadow in shadows:
-            provider_id = self._safe_provider_id(shadow)
+            provider_id = f"<{type(shadow).__name__}>"
             try:
-                shadow_result = shadow.dispatch(request)
+                profile = shadow.capability_profile()
+                provider_id = profile.provider_id
+                shadow_request = IntentRequest(
+                    intent=request.intent,
+                    account_view=ProviderAccountView(
+                        accounts={
+                            account: species_mol
+                            for account, species_mol in request.account_view.accounts.items()
+                            if account in profile.declared_accounts
+                        },
+                        species_formula_registry=(
+                            request.account_view.species_formula_registry
+                        ),
+                    ),
+                    temperature_C=request.temperature_C,
+                    pressure_bar=request.pressure_bar,
+                    fO2_log=request.fO2_log,
+                    fe_redox_policy=request.fe_redox_policy,
+                    control_inputs=request.control_inputs,
+                )
+                shadow_result = shadow.dispatch(shadow_request)
             except Exception as exc:  # noqa: BLE001 -- never block dispatch
                 self._append_shadow_trace(
                     {
@@ -495,6 +508,10 @@ class ChemistryKernel:
         profile = provider.capability_profile()
         if declared_accounts is None:
             declared_accounts = profile.declared_accounts
+        else:
+            declared_accounts = frozenset(declared_accounts).intersection(
+                profile.declared_accounts
+            )
         declared_accounts = frozenset(declared_accounts or ())
 
         account_view = build_provider_account_view(
@@ -532,6 +549,11 @@ class ChemistryKernel:
             )
 
         if result.transition is not None:
+            if str(result.status) != "ok":
+                raise KernelError(
+                    f"provider {profile.provider_id!r} returned a transition "
+                    f"with non-committable status {result.status!r}"
+                )
             validate_intent_authority(intent, profile)
             validate_proposal_accounts(result.transition, declared_accounts)
             validate_atom_balance(result.transition, self._species_formula_registry)

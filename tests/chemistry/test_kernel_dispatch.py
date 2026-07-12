@@ -22,6 +22,7 @@ from simulator.chemistry.kernel import (
     ChemistryProvider,
     IntentRequest,
     IntentResult,
+    KernelError,
     LedgerTransitionProposal,
     ProviderRegistry,
     ProviderUnavailableError,
@@ -69,11 +70,56 @@ class _AuthoritativeProvider(ChemistryProvider):
         )
 
 
+class _RefusingProvider(_AuthoritativeProvider):
+    def capability_profile(self) -> CapabilityProfile:
+        return CapabilityProfile(
+            provider_id="refusing",
+            intents=frozenset({ChemistryIntent.VAPOR_PRESSURE}),
+            is_authoritative_for=frozenset({ChemistryIntent.VAPOR_PRESSURE}),
+            declared_accounts=frozenset(
+                {"process.cleaned_melt", "process.overhead_gas"}
+            ),
+        )
+
+    def dispatch(self, request: IntentRequest) -> IntentResult:
+        return IntentResult(
+            intent=request.intent,
+            status="unsupported",
+            transition=LedgerTransitionProposal(
+                debits={"process.cleaned_melt": {"SiO2": 1.0}},
+                credits={"process.overhead_gas": {"SiO2": 1.0}},
+            ),
+        )
+
+
+def test_non_ok_provider_result_cannot_carry_committable_transition():
+    registry = ProviderRegistry()
+    registry.register(_RefusingProvider(), [ChemistryIntent.VAPOR_PRESSURE])
+    ledger = AtomLedger()
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+    before_mol = ledger.mol_by_account("process.cleaned_melt")["SiO2"]
+    kernel = ChemistryKernel(
+        ledger,
+        registry,
+        species_formula_registry={"SiO2": {"Si": 1, "O": 2}},
+    )
+
+    with pytest.raises(KernelError, match="non-committable status"):
+        kernel.dispatch(
+            ChemistryIntent.VAPOR_PRESSURE,
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+        )
+
+    assert ledger.mol_by_account("process.cleaned_melt")["SiO2"] == before_mol
+
+
 class _ShadowProvider(ChemistryProvider):
     name = "shadow"
 
     def __init__(self) -> None:
         self.call_count = 0
+        self.seen_accounts: list[frozenset[str]] = []
 
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
@@ -85,6 +131,7 @@ class _ShadowProvider(ChemistryProvider):
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
         self.call_count += 1
+        self.seen_accounts.append(frozenset(request.account_view.accounts))
         # Even if a shadow ATTEMPTS a transition, the planner never
         # routes it to commit.
         return IntentResult(
@@ -105,6 +152,31 @@ class _RaisingShadowProvider(_ShadowProvider):
     def dispatch(self, request: IntentRequest) -> IntentResult:
         self.call_count += 1
         raise RuntimeError("shadow backend failed")
+
+
+def test_planner_filters_each_shadow_to_its_own_declared_accounts():
+    registry = ProviderRegistry()
+    registry.register(
+        _AuthoritativeProvider(), [ChemistryIntent.VAPOR_PRESSURE]
+    )
+    shadow = _ShadowProvider()
+    registry.register(shadow, [ChemistryIntent.VAPOR_PRESSURE], shadow=True)
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {"SiO2": 1.0},
+                "process.overhead_gas": {"O2": 1.0},
+            },
+            species_formula_registry={},
+        ),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+    )
+
+    Planner(registry).dispatch(request)
+
+    assert shadow.seen_accounts == [frozenset({"process.cleaned_melt"})]
 
 
 class _HostileReprError(RuntimeError):

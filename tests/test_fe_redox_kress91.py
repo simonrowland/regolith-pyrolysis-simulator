@@ -198,6 +198,34 @@ def test_kress91_referenced_log_fo2_preserves_forward_ratio(
     assert target_ratio == pytest.approx(reference_ratio, rel=0.0, abs=1.0e-14)
 
 
+def test_kress91_equal_temperature_still_references_pressure_change() -> None:
+    temperature_K = 1400.0 + 273.15
+    reference_fO2_log = -7.75
+
+    referenced = kress91_referenced_log_fO2(
+        reference_fO2_log,
+        reference_T_K=temperature_K,
+        target_T_K=temperature_K,
+        reference_pressure_bar=1.0,
+        target_pressure_bar=10_000.0,
+    )
+
+    assert referenced != pytest.approx(reference_fO2_log)
+    reference_ratio = kress91_split(
+        fO2_log=reference_fO2_log,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=temperature_K,
+        pressure_bar=1.0,
+    )["ratio"]
+    target_ratio = kress91_split(
+        fO2_log=referenced,
+        mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=temperature_K,
+        pressure_bar=10_000.0,
+    )["ratio"]
+    assert target_ratio == pytest.approx(reference_ratio, rel=0.0, abs=1e-14)
+
+
 @pytest.mark.parametrize(
     ('temperature_C', 'case', 'authoritative', 'extrapolation', 'high_uncertainty'),
     [
@@ -517,6 +545,12 @@ def test_core_inline_kress91_full_split_regression_pins() -> None:
     assert split['feo_equiv_wt_pct'] == pytest.approx(
         13.066348090398607, rel=0, abs=1.0e-12
     )
+
+
+@pytest.mark.parametrize("amount", [float("nan"), float("inf"), -1.0])
+def test_kress91_mol_basis_refuses_corrupt_composition(amount: float) -> None:
+    with pytest.raises(Kress91InvalidControls, match="must be finite"):
+        melt_mol_fractions_for_kress91({"SiO2": 50.0, "FeO": amount})
 
 
 def test_kress91_no_iron_and_empty_basis() -> None:

@@ -900,13 +900,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             raise ValueError(f"Unknown feedstock: {feedstock_key}")
         assert_feedstock_loadable(feedstock_key, fs)
 
+        if isinstance(mass_kg, bool):
+            raise ValueError("batch mass_kg must be finite and > 0")
+        mass_value = float(mass_kg)
+        if not math.isfinite(mass_value) or mass_value <= 0.0:
+            raise ValueError("batch mass_kg must be finite and > 0")
+
         additives = dict(additives_kg or {})
+        for species, raw_kg in additives.items():
+            if isinstance(raw_kg, bool):
+                raise ValueError(
+                    f"additive {species!r} mass must be finite and non-negative"
+                )
+            additive_kg = float(raw_kg)
+            if not math.isfinite(additive_kg) or additive_kg < 0.0:
+                raise ValueError(
+                    f"additive {species!r} mass must be finite and non-negative"
+                )
+            additives[species] = additive_kg
         ledger_additives = dict(additives)
         self._activated_additive_reagents = set()
         self.species_formula_registry = self._registry_for_feedstock(fs)
         self.atom_ledger = self._new_atom_ledger()
         self.inventory = self._build_process_inventory(
-            fs, mass_kg, feedstock_key=feedstock_key,
+            fs, mass_value, feedstock_key=feedstock_key,
         )
         self._stage0_carbon_cleanup_specs = []
         self._stage0_carbonate_decomposition_specs = []
@@ -968,6 +985,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
         self._last_native_fe_partition_diagnostic = {}
+        self._last_native_fe_saturation_event = {}
+        self._last_fe_redox_respeciation_diagnostic = {}
+        self._last_melt_redox_liquidus_gate_diagnostic = {}
+        self._last_melt_redox_liquid_fraction_diagnostic = {}
         self._native_fe_vapor_residual_capacity_mol_this_hr = None
         self._rump_expectation_warnings = []
         self._last_shuttle_refusal_diagnostic = {}
@@ -2569,13 +2590,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> Dict[str, Any]:
         config = dict(DEFAULT_OVERHEAD_HEADSPACE_CONFIG)
         config.update(dict(self.setpoints.get('overhead_headspace', {}) or {}))
-        campaign_key = campaign.name if campaign is not None else None
-        if campaign_key:
-            campaign_cfg = (
-                self.setpoints.get('campaigns', {}) or {}
-            ).get(campaign_key, {}) or {}
+        if campaign is not None:
+            campaign_cfg = self.campaign_mgr._campaign_config(campaign)
             config.update(dict(campaign_cfg.get('overhead_headspace', {}) or {}))
-            runtime_override = self.campaign_mgr.overrides.get(campaign_key, {})
+            runtime_override = self.campaign_mgr._campaign_overrides(campaign)
             config.update(
                 dict(runtime_override.get('overhead_headspace', {}) or {})
             )
@@ -2584,22 +2602,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _resolve_condenser_geometry_config(
         self, campaign: Optional[CampaignPhase] = None
     ) -> Dict[str, Any]:
-        config = copy.deepcopy(
-            dict(self.setpoints.get('condenser_geometry', {}) or {})
+        config = _canonicalize_condenser_geometry_stage_keys(
+            copy.deepcopy(dict(self.setpoints.get('condenser_geometry', {}) or {}))
         )
-        campaign_key = campaign.name if campaign is not None else None
-        if campaign_key:
-            campaign_cfg = (
-                self.setpoints.get('campaigns', {}) or {}
-            ).get(campaign_key, {}) or {}
+        if campaign is not None:
+            campaign_cfg = self.campaign_mgr._campaign_config(campaign)
             config = _deep_merge_condenser_geometry(
                 config,
-                dict(campaign_cfg.get('condenser_geometry', {}) or {}),
+                _canonicalize_condenser_geometry_stage_keys(
+                    dict(campaign_cfg.get('condenser_geometry', {}) or {})
+                ),
             )
-            runtime_override = self.campaign_mgr.overrides.get(campaign_key, {})
+            runtime_override = self.campaign_mgr._campaign_overrides(campaign)
             config = _deep_merge_condenser_geometry(
                 config,
-                dict(runtime_override.get('condenser_geometry', {}) or {})
+                _canonicalize_condenser_geometry_stage_keys(
+                    dict(runtime_override.get('condenser_geometry', {}) or {})
+                ),
             )
         return _canonicalize_condenser_geometry_stage_keys(config)
 
@@ -2626,13 +2645,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> Dict[str, Any]:
         config = dict(DEFAULT_FREEZE_GATE_CONFIG)
         config.update(dict(self.setpoints.get('freeze_gate', {}) or {}))
-        campaign_key = campaign.name if campaign is not None else None
-        if campaign_key:
-            campaign_cfg = (
-                self.setpoints.get('campaigns', {}) or {}
-            ).get(campaign_key, {}) or {}
+        if campaign is not None:
+            campaign_cfg = self.campaign_mgr._campaign_config(campaign)
             config.update(dict(campaign_cfg.get('freeze_gate', {}) or {}))
-            runtime_override = self.campaign_mgr.overrides.get(campaign_key, {})
+            runtime_override = self.campaign_mgr._campaign_overrides(campaign)
             config.update(dict(runtime_override.get('freeze_gate', {}) or {}))
         return config
 
@@ -2691,6 +2707,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return 'N2'
         if upper in {'AR', 'PAR'}:
             return 'Ar'
+        if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
+            return 'O2'
         if upper in {'CO2', 'PCO2', 'CO2BACKPRESSURE'}:
             return 'CO2'
         if upper.endswith('%CO2'):
@@ -2702,7 +2720,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return 'CO2'
         raise ValueError(
             f'Unsupported condensation carrier_gas {value!r}; supported '
-            'carrier gases: N2/pN2, Ar/pAr, CO2/pCO2'
+            'carrier gases: N2/pN2, Ar/pAr, O2/pO2, CO2/pCO2'
         )
 
     def _resolve_condensation_carrier_gas(self) -> str:
@@ -2710,15 +2728,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(self.melt, 'background_gas_species', ''))
         if background:
             return background
-
-        atmosphere_name = str(getattr(self.melt.atmosphere, 'name', '') or '')
-        ambient_atmosphere = str(
-            getattr(self.melt, 'ambient_atmosphere', '') or '')
-        if (
-            atmosphere_name == 'CO2_BACKPRESSURE'
-            or self._normalize_condensation_carrier_gas(ambient_atmosphere) == 'CO2'
-        ):
-            return 'CO2'
 
         campaign_name = str(getattr(self.melt.campaign, 'name', '') or '')
         campaign_keys = {
@@ -2739,6 +2748,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
                 if carrier:
                     return carrier
+
+        atmosphere_name = str(getattr(self.melt.atmosphere, 'name', '') or '')
+        ambient_atmosphere = str(
+            getattr(self.melt, 'ambient_atmosphere', '') or '')
+        if (
+            atmosphere_name == 'CO2_BACKPRESSURE'
+            or self._normalize_condensation_carrier_gas(ambient_atmosphere) == 'CO2'
+        ):
+            return 'CO2'
+        if atmosphere_name in {
+            'CONTROLLED_O2',
+            'O2_BACKPRESSURE',
+            'CONTROLLED_O2_FLOW',
+        }:
+            return 'O2'
 
         return 'N2'
 
@@ -2991,13 +3015,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         *,
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,
-    ) -> float:
+    ) -> Any:
         configured = self._overhead_headspace_config.get('conductance_kg_s')
         if configured is None:
             configured = self._overhead_headspace_config.get(
                 'conductance_kg_s_per_bar')
         if configured is not None:
-            return max(0.0, float(configured))
+            if isinstance(configured, bool):
+                return configured
+            try:
+                value = float(configured)
+            except (TypeError, ValueError):
+                return configured
+            if not math.isfinite(value) or value < 0.0:
+                return configured
+            return value
         if species_kg_for_M_avg is None:
             species_kg_for_M_avg = self._overhead_holdup_species_kg()
         p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
@@ -3066,7 +3098,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         k_max = float(config.get('k_O_max_m_s', 5.0e-5))
         T_ref = float(config.get('T_ref_K', 1773.15))
         Ea = float(config.get('Ea_J_mol', 150000.0))
-        if min(k_ref, k_min, k_max, T_ref) <= 0.0 or k_min > k_max:
+        if (
+            not all(math.isfinite(value) for value in (
+                T_K, k_ref, k_min, k_max, T_ref, Ea
+            ))
+            or T_K <= 0.0
+            or min(k_ref, k_min, k_max, T_ref) <= 0.0
+            or Ea < 0.0
+            or k_min > k_max
+        ):
             raise ValueError(
                 'invalid sso_r.oxygen_exchange k_O config: '
                 f'k_ref={k_ref:g} k_min={k_min:g} '
@@ -4434,6 +4474,53 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'reason': 'not_run',
         }
 
+    def _o2_bubbler_control_refusal(self) -> Dict[str, Any] | None:
+        controls = self.campaign_mgr.o2_bubbler_controls(self.melt.campaign)
+        raw_rate = controls.get('o2_bubbler_kg_per_hr')
+        if raw_rate is None:
+            return None
+        rate_kg_hr = self._finite_float_or_none(raw_rate)
+        if rate_kg_hr is None:
+            return {
+                'status': 'refused',
+                'reason': 'invalid_rate_kg_per_hr',
+                'injected_mol': 0.0,
+            }
+        if rate_kg_hr < 0.0:
+            return {
+                'status': 'refused',
+                'reason': 'negative_rate_kg_per_hr',
+                'rate_kg_per_hr': rate_kg_hr,
+                'injected_mol': 0.0,
+            }
+
+        raw_eta = controls.get('o2_bubbler_eta_absorb_default')
+        eta_absorb = (
+            0.75 if raw_eta is None else self._finite_float_or_none(raw_eta)
+        )
+        if eta_absorb is None or not 0.0 <= eta_absorb <= 1.0:
+            diagnostic: Dict[str, Any] = {
+                'status': 'refused',
+                'reason': 'invalid_eta_absorb',
+                'rate_kg_per_hr': rate_kg_hr,
+                'injected_mol': 0.0,
+            }
+            if raw_eta is not None:
+                diagnostic['raw_eta_absorb'] = raw_eta
+            return diagnostic
+
+        raw_target = controls.get('o2_bubbler_target_fO2_log')
+        target_fO2_log, target_source = self._o2_bubbler_target_fO2_log(raw_target)
+        if target_fO2_log is None:
+            return {
+                'status': 'refused',
+                'reason': target_source,
+                'rate_kg_per_hr': rate_kg_hr,
+                'eta_absorb': eta_absorb,
+                'injected_mol': 0.0,
+            }
+        return None
+
     def _apply_o2_bubbler(
         self,
         *,
@@ -4441,6 +4528,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ),
     ) -> Dict[str, Any]:
+        refusal = self._o2_bubbler_control_refusal()
+        if refusal is not None:
+            self._last_o2_bubbler_diagnostic = refusal
+            return refusal
         controls = self.campaign_mgr.o2_bubbler_controls(self.melt.campaign)
         raw_rate = controls.get('o2_bubbler_kg_per_hr')
         raw_eta = controls.get('o2_bubbler_eta_absorb_default')
@@ -4451,10 +4542,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 reason = 'rate_absent'
             else:
                 reason = 'invalid_rate_kg_per_hr'
-            diagnostic = {'status': 'ok', 'reason': reason, 'injected_mol': 0.0}
+            diagnostic = {
+                'status': 'ok' if raw_rate is None else 'refused',
+                'reason': reason,
+                'injected_mol': 0.0,
+            }
             self._last_o2_bubbler_diagnostic = diagnostic
             return diagnostic
-        rate_kg_hr = max(0.0, rate_kg_hr)
+        if rate_kg_hr < 0.0:
+            diagnostic = {
+                'status': 'refused',
+                'reason': 'negative_rate_kg_per_hr',
+                'rate_kg_per_hr': rate_kg_hr,
+                'injected_mol': 0.0,
+            }
+            self._last_o2_bubbler_diagnostic = diagnostic
+            return diagnostic
 
         if raw_eta is None:
             eta_absorb = 0.75
@@ -4462,7 +4565,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             eta_absorb = self._finite_float_or_none(raw_eta)
             if eta_absorb is None:
                 diagnostic = {
-                    'status': 'ok',
+                    'status': 'refused',
                     'reason': 'invalid_eta_absorb',
                     'rate_kg_per_hr': rate_kg_hr,
                     'raw_eta_absorb': raw_eta,
@@ -4472,7 +4575,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return diagnostic
         if eta_absorb < 0.0 or eta_absorb > 1.0:
             diagnostic = {
-                'status': 'ok',
+                'status': 'refused',
                 'reason': 'invalid_eta_absorb',
                 'rate_kg_per_hr': rate_kg_hr,
                 'eta_absorb': eta_absorb,
@@ -4484,7 +4587,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         target_fO2_log, target_source = self._o2_bubbler_target_fO2_log(raw_target)
         if target_fO2_log is None:
             diagnostic = {
-                'status': 'ok',
+                'status': 'refused',
                 'reason': target_source,
                 'rate_kg_per_hr': rate_kg_hr,
                 'eta_absorb': eta_absorb,
@@ -5298,6 +5401,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
+        configured_downstream_pressure_bar = self._overhead_headspace_config.get(
+            'downstream_pressure_bar'
+        )
         controls: Dict[str, Any] = {
             'headspace_volume_m3': self._headspace_volume_m3(),
             'headspace_temperature_K': self._headspace_temperature_K(),
@@ -5306,19 +5412,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     species_kg_for_M_avg=species_kg_for_M_avg,
                 )
             ),
-            'p_total_bar': float(diagnostic.get('p_total_bar', 0.0) or 0.0),
-            'p_downstream_bar': self._headspace_downstream_pressure_bar(),
+            'p_total_bar': diagnostic.get('p_total_bar'),
+            'p_downstream_bar': (
+                configured_downstream_pressure_bar
+                if configured_downstream_pressure_bar is not None
+                else self._headspace_downstream_pressure_bar()
+            ),
             'dt_hr': 1.0,
             'force_drain_all': bool(force_drain_all),
-            'max_o2_flow_kg_hr': float(
-                getattr(turbine_spec, 'max_O2_flow_kg_hr', 0.0) or 0.0
+            'max_o2_flow_kg_hr': getattr(
+                turbine_spec, 'max_O2_flow_kg_hr', None
             ),
-            'external_o2_in_overhead_mol': (
-                self._o2_bubbler_external_o2_overhead_mol()
+            'external_o2_in_overhead_mol': getattr(
+                self,
+                '_o2_bubbler_external_o2_in_overhead_mol',
+                0.0,
             ),
         }
         if o2_vented_kg is not None:
-            controls['o2_vented_kg'] = max(0.0, float(o2_vented_kg))
+            controls['o2_vented_kg'] = o2_vented_kg
         result = self._dispatch_and_commit(
             ChemistryIntent.OVERHEAD_BLEED,
             control_inputs=controls,
@@ -10087,6 +10199,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         Returns:
             HourSnapshot with full system state at this hour
         """
+        # A paused poll is observational: preserve the last committed hour's
+        # diagnostics and return a detached snapshot without clearing evidence.
+        if self.paused_for_decision:
+            return self._make_snapshot()
+        o2_bubbler_refusal = self._o2_bubbler_control_refusal()
+        if o2_bubbler_refusal is not None:
+            self._last_o2_bubbler_diagnostic = o2_bubbler_refusal
+            return self._make_snapshot()
         self._last_condensed_by_stage_species_delta = {}
         self._last_wall_deposit_by_segment_species_delta = {}
         self._last_impurity_delta = {}
@@ -10103,9 +10223,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._reset_o2_bubbler_telemetry_for_hour()
 
         # --- 1. Decision check ---
-        if self.paused_for_decision:
-            # Return current state without advancing
-            return self._make_snapshot()
         self._restore_metal_phase_staging()
         self._mre_anode_O2_kg_this_hr = 0.0
 
@@ -10816,7 +10933,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_mass_kg=self.melt.total_mass_kg,
             composition_wt_pct=self.melt.composition_wt_pct(),
             inventory=self.inventory.copy(),
-            overhead=self.overhead,
+            overhead=copy.deepcopy(self.overhead),
             condensation_totals=condensation_totals,
             condensed_by_stage_species_delta=dict(
                 self._last_condensed_by_stage_species_delta),
@@ -10934,6 +11051,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             o2_bubbler_vented_kg=float(
                 getattr(self, '_o2_bubbler_vented_kg', 0.0) or 0.0
+            ),
+            o2_bubbler_diagnostic=dict(
+                getattr(self, '_last_o2_bubbler_diagnostic', {}) or {}
             ),
             # 0.5.4 W8 (M2 historical-audit closure): per-species drift
             # between aggregate metal-phase ledger accounts and the

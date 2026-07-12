@@ -248,6 +248,16 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
 
         controls = dict(unpack_controls(request))
         controls["temperature_C"] = float(request.temperature_C)
+        if not math.isfinite(controls["temperature_C"]):
+            return IntentResult(
+                intent=ChemistryIntent.METALLOTHERMIC_STEP,
+                status="unsupported",
+                transition=None,
+                control_audit=diagnostic_control_audit(
+                    request, include_fO2=False
+                ),
+                diagnostic={"reason": "temperature_C must be finite"},
+            )
 
         # Reaction-family early-exit: shared with stage0_pretreatment.py.
         # The metallothermic shuttles run solubility-limit + reagent-mass
@@ -565,6 +575,24 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         target_stage, target_priority, thermo_audit = (
             self._resolve_na_target_priority(controls, temperature_C)
         )
+        if not target_priority:
+            if controls.get("target_oxides") is not None:
+                return self._empty_result(
+                    "c3_na_shuttle skipped: explicit target set is empty",
+                    control_audit=control_audit,
+                    diagnostic={"target_stage": target_stage},
+                )
+            return IntentResult(
+                intent=ChemistryIntent.METALLOTHERMIC_STEP,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "reason": "unknown_na_target_stage",
+                    "reason_refused": "unknown_na_target_stage",
+                    "target_stage": target_stage,
+                },
+            )
         fit_extrapolations = dict(
             thermo_audit.get("ellingham_extrapolated_beyond_fit_range_K") or {}
         )
@@ -1379,10 +1407,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                 or controls.get("target_stage")
                 or NA_TARGET_CR_TI
             )
-            target_set = NA_STAGE_TARGETS.get(
-                target_stage,
-                NA_STAGE_TARGETS[NA_TARGET_CR_TI],
-            )
+            target_set = NA_STAGE_TARGETS.get(target_stage, ())
 
         thermo_priority, thermo_audit = cls._na_thermo_priority(
             target_set,

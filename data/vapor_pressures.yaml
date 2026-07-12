@@ -265,9 +265,9 @@ metals:
     electrons_per_atom: 2
     parent_oxide: "CaO"
     fit_target: "pure_component_psat"
-    source: "REF-002 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); runtime pure-component source is pure_component_antoine"
+    source: "REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); runtime pure-component source is pure_component_antoine"
     pure_component_antoine:
-      source: "REF-002 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5"
+      source: "REF-043 NIST Chemistry WebBook SRD 69 Hartmann and Schneider 1929 calcium (C7440702); log10(P/bar)=2.78473-3121.368/(T-594.591), converted to Pa by A+5"
       source_certification: "source_equation_fit"
       A: 7.784730
       B: 3121.368
@@ -730,7 +730,7 @@ foulant_vapor:
 
 # Condensation temperature reference (at ~1 mbar partial pressure)
 # Used by condensation train model for species routing
-# provenance: condensation routing temps -- chemistry-provenance condensation_reference_at_1mbar_routing_temps; ASSUMED dead reference block.
+# provenance: condensation routing temps -- chemistry-provenance condensation_reference_at_1mbar_routing_temps; ASSUMED routing reference consumed by condensation overrides.
 condensation_reference_at_1mbar:
   Fe: 1250    # Stage 1
   SiO: 1050   # Stage 2 (as amorphous SiO2)

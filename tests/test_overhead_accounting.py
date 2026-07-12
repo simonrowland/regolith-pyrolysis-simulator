@@ -526,7 +526,11 @@ def test_intact_oxide_vapor_allows_zero_o2_stoich():
 
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
-    sim._dispatch_overhead_bleed(force_drain_all=True, o2_vented_kg=0.0)
+    sim._dispatch_overhead_bleed(
+        turbine_spec=types.SimpleNamespace(max_O2_flow_kg_hr=0.0),
+        force_drain_all=True,
+        o2_vented_kg=0.0,
+    )
 
     products = sim.product_ledger()
     assert products["FeO"] == pytest.approx(100.0)
@@ -606,7 +610,11 @@ def test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked():
 
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
-    sim._dispatch_overhead_bleed(force_drain_all=True, o2_vented_kg=0.0)
+    sim._dispatch_overhead_bleed(
+        turbine_spec=types.SimpleNamespace(max_O2_flow_kg_hr=0.0),
+        force_drain_all=True,
+        o2_vented_kg=0.0,
+    )
 
     products = sim.product_ledger()
     assert products["FeO"] == pytest.approx(100.0)

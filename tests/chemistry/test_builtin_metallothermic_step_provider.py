@@ -33,6 +33,8 @@ Covers:
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import copy
 from pathlib import Path
 
@@ -831,6 +833,48 @@ def _c3_na_feo_cleanup_request(sim, *, liquid_fraction, na_kg=12.0):
             "dt_hr": 1.0,
         },
     )
+
+
+def test_metallothermic_provider_refuses_nonfinite_temperature(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    request = replace(
+        _c3_na_feo_cleanup_request(sim, liquid_fraction=1.0),
+        temperature_C=float("nan"),
+    )
+
+    result = BuiltinMetallothermicStepProvider().dispatch(request)
+
+    assert result.status == "unsupported"
+    assert result.transition is None
+
+
+def test_c3_na_unknown_target_stage_is_refused_without_chemistry(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    request = _c3_na_feo_cleanup_request(sim, liquid_fraction=1.0)
+    controls = dict(request.control_inputs)
+    controls["na_target_stage"] = "typo"
+
+    result = BuiltinMetallothermicStepProvider().dispatch(
+        replace(request, control_inputs=controls)
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    assert result.diagnostic["reason_refused"] == "unknown_na_target_stage"
 
 
 def _prepare_stranded_staged_na_hold(sim, *, configured_temperature_C=1250.0):

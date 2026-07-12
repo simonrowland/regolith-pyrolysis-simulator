@@ -120,11 +120,11 @@ This is the surviving alkali shuttle: alkalis evolved during C2 (or dosed extern
 
 The shuttle serves two distinct roles:
 
-1. **Oxygen reductant**: Na chemically frees Fe from FeO only below the Na/Fe crossover. Cr₂O₃, TiO₂, and MnO are refused in the current C3 temperature window by the executable thermodynamic gate.
+1. **Oxygen reductant**: Na chemically frees Fe from FeO only below the Na/Fe crossover. The executable gate can also reduce Cr₂O₃ when its in-band margin is positive; TiO₂ is currently refused, and MnO is not a supported C3 target.
 
 2. **Selectivity tool**: Fe and SiO vapor-pressure windows overlap in the ~1500–1700 °C band, and pO₂ alone cannot separate them (both require low pO₂ or vacuum, so the SiO₂ ⇌ SiO + ½O₂ lever is the same for both). The shuttle reduces FeO chemically at a temperature where SiO activity is lower, allowing Fe to be extracted at a different point in the sequence and keeping condenser stages clean.
 
-Honest limits: the `C2A_staged` recipe cools to 1150 °C for Na FeO cleanup because the JANAF-4th multiphase Na/Fe crossover is 1181.5 °C, leaving a ~31 °C positive margin (the 2026-07-09 re-ground widened it from the ~23 °C margin under the earlier linear 1173.4 °C fit). K/FeO is refused above its 836 °C crossover, and Cr/Ti targets are refused at C3 temperatures. See `docs/model-limitations.md` for the explicit caveat. The shuttle also cannot chemically free Ca, Mg (in the main melt), Al, or Ti — those oxides are more stable than the available alkali-oxide path in the process window.
+Honest limits: the `C2A_staged` recipe cools to 1150 °C for Na FeO cleanup because the JANAF-4th multiphase Na/Fe crossover is 1181.5 °C, leaving a ~31 °C positive margin (the 2026-07-09 re-ground widened it from the ~23 °C margin under the earlier linear 1173.4 °C fit). K/FeO is refused above its 836 °C crossover. At C3 temperatures Cr₂O₃ can pass the margin gate, TiO₂ is refused, and MnO is unsupported. See `docs/model-limitations.md` for the explicit caveat. The shuttle also cannot chemically free Ca, Mg (in the main melt), Al, or Ti — those oxides are more stable than the available alkali-oxide path in the process window.
 
 ### Bidirectional melt-redox control (design-accepted, not yet implemented)
 

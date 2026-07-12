@@ -202,13 +202,6 @@ def kress91_referenced_log_fO2(
         return redox_fO2_log
     redox_reference_T_K = float(reference_T_K)
     redox_target_T_K = float(target_T_K)
-    if math.isclose(
-        redox_reference_T_K,
-        redox_target_T_K,
-        rel_tol=0.0,
-        abs_tol=1.0e-9,
-    ):
-        return redox_fO2_log
     delta_ln_fO2 = kress91_ln_fO2_temperature_delta(
         redox_reference_T_K,
         redox_target_T_K,
@@ -584,10 +577,22 @@ def melt_mol_fractions_for_kress91(comp_wt: Mapping[str, float]) -> dict[str, fl
     # GAS_CONSTANT. Keeping fe_redox.py a true leaf avoids that cycle.
     from simulator.state import MOLAR_MASS
 
+    for oxide in (*KRESS91_MOL_FRACTION_OXIDES, 'FeO', 'Fe2O3'):
+        raw = comp_wt.get(oxide, 0.0)
+        try:
+            value = float(raw)
+        except (TypeError, ValueError) as exc:
+            raise Kress91InvalidControls(
+                f'Kress91 composition {oxide} must be finite and non-negative'
+            ) from exc
+        if not math.isfinite(value) or value < 0.0:
+            raise Kress91InvalidControls(
+                f'Kress91 composition {oxide} must be finite and non-negative'
+            )
     feot_wt = feot_equivalent_wt_pct(comp_wt)
     mol_counts: dict[str, float] = {}
     for oxide in KRESS91_MOL_FRACTION_OXIDES:
-        wt = max(0.0, float(comp_wt.get(oxide, 0.0) or 0.0))
+        wt = float(comp_wt.get(oxide, 0.0) or 0.0)
         molar_mass = float(MOLAR_MASS.get(oxide, 0.0) or 0.0)
         if wt > 0.0 and molar_mass > 0.0:
             mol_counts[oxide] = wt / molar_mass

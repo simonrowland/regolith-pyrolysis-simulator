@@ -59,6 +59,19 @@ def test_snapshot_has_knudsen_regime_summary_field():
     assert isinstance(snap.knudsen_regime_summary, dict)
 
 
+def test_snapshot_overhead_is_detached_from_live_state():
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+    sim.overhead.pressure_mbar = 1.0
+    snapshot = sim._make_snapshot()
+
+    sim.overhead.pressure_mbar = 9.0
+    sim.overhead.composition["O2"] = 3.0
+
+    assert snapshot.overhead.pressure_mbar == 1.0
+    assert snapshot.overhead.composition.get("O2", 0.0) == 0.0
+
+
 def test_snapshot_knudsen_summary_carries_canonical_fields_after_route():
     """After a few ticks of C2A_continuous, the condensation route
     has fired at least once → the summary carries the documented

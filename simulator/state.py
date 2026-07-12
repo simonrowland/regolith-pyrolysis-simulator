@@ -1141,6 +1141,7 @@ class HourSnapshot:
     o2_bubbler_absorbed_kg: float = 0.0
     o2_bubbler_passthrough_kg: float = 0.0
     o2_bubbler_vented_kg: float = 0.0
+    o2_bubbler_diagnostic: Dict[str, Any] = field(default_factory=dict)
     # Chunk B runtime `_apply_o2_bubbler` is the named writer/reader.
 
     # --- Knudsen regime warning sticker (0.5.4.1 E3) ---

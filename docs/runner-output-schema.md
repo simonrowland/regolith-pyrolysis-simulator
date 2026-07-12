@@ -415,6 +415,16 @@ mole, energy, pressure, or partition arithmetic.
     "P_total_bar": 0.0,                      // overhead total pressure (bar)
     "pO2_bar":     0.0,                      // pO2 in bar
     "mass_balance_pct": 2.6e-13,             // |mass_in - mass_out| / mass_in * 100
+    "energy_electrical_plus_evaporation_kWh": 1.2, // this-hour known electrical + evaporation energy
+    "energy_electrical_kWh": 0.8,            // this-hour electrical energy
+    "energy_evaporation_thermal_kWh": 0.4,   // this-hour known evaporation thermal energy
+    "energy_scope": "electrical_plus_known_evaporation_enthalpy",
+    "furnace_heat_status": "partial",        // furnace sensible/loss heat is not complete
+    "energy_latent_kWh": 0.2,                // this-hour latent component
+    "energy_dissociation_kWh": 0.2,          // this-hour dissociation component
+    "energy_electrical_plus_evaporation_cumulative_kWh": 4.8,
+    "energy_cumulative_breakdown_kWh": {},   // cumulative components by named mechanism
+    "energy_evaporation_breakdown_kWh": {},  // this-hour evaporation components
     "O2_yield_kg_cumulative": 0.0,           // legacy key; source-side O2 potential, kg
     "O2_source_side_potential_kg_cumulative": 0.0, // honest alias for the same value
     "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
@@ -467,6 +477,11 @@ mole, energy, pressure, or partition arithmetic.
 
 * One entry per simulated hour up to `hours_requested`, or until the
   simulator marks the batch `is_complete()` (whichever comes first).
+* The ten `energy_*`/`furnace_heat_status` fields are required. Per-hour
+  fields describe the current step; `*_cumulative_*` fields are monotonic
+  batch totals. `energy_scope` and `furnace_heat_status` state that the
+  reported total covers electrical plus known evaporation enthalpy, not a
+  complete furnace heat-loss model.
 * `mass_balance_pct` is the simulator's own
   `HourSnapshot.mass_balance_error_pct` -- expected to stay below
   `5e-12 %` per the invariant tracked in `tests/test_mass_balance.py`.

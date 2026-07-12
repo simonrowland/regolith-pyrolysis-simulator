@@ -123,7 +123,12 @@ def _load_required_yaml(
         raise FileNotFoundError(f"required config file missing: {path}")
     raw = path.read_bytes()
     parsed = yaml.safe_load(raw.decode("utf-8"))
-    loaded = parsed if isinstance(parsed, dict) else {}
+    if not isinstance(parsed, dict):
+        raise TypeError(
+            f"required config file must have a mapping root: {path}; "
+            f"got {type(parsed).__name__}"
+        )
+    loaded = parsed
     digest = (
         # #89 review-fold: digest the ACTUAL parsed root, not the `or {}` fallback,
         # so a degenerate root ({}, [], null, empty file, scalar) hashes distinctly

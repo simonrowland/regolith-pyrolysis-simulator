@@ -62,7 +62,7 @@ import math
 import warnings
 from collections.abc import Mapping, MutableMapping
 from contextvars import ContextVar
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict
@@ -103,6 +103,7 @@ from simulator.condensation_routing import (
     is_designated_for_stage,
 )
 from simulator.state import (
+    CampaignPhase,
     MAX_STIR_FACTOR,
     MOLAR_MASS,
     PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
@@ -361,6 +362,8 @@ def _validate_sticking_reactivity_class(path: Path, name: str, value: Any) -> No
 
 
 def _validate_sticking_value(path: Path, name: str, value: Any) -> None:
+    if isinstance(value, bool):
+        raise ValueError(f'{path}: {name} must be numeric, not boolean')
     try:
         alpha_s = float(value)
     except (TypeError, ValueError) as exc:
@@ -1050,6 +1053,15 @@ def _alpha_s_evaluation(
             raise ValueError(
                 f'alpha_s({species}): malformed arrhenius coefficient spec'
             ) from exc
+        if (
+            not math.isfinite(A)
+            or not math.isfinite(B)
+            or A <= 0.0
+            or B <= 0.0
+        ):
+            raise ValueError(
+                f'alpha_s({species}): arrhenius A/B must be finite and > 0'
+            )
         cite = str(spec.get('cite') or '').strip()
         status = str(spec.get('status') or '').upper()
         if not cite or status not in {'CITED', 'UNCERTIFIED'}:
@@ -1445,6 +1457,8 @@ def _canonical_carrier_gas_key(carrier_gas: str | None) -> str:
         return 'N2'
     if upper in {'AR', 'PAR'}:
         return 'Ar'
+    if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
+        return 'O2'
     if upper in {'CO2', 'PCO2', 'CO2BACKPRESSURE'}:
         return 'CO2'
     if upper.endswith('%CO2'):
@@ -1806,18 +1820,84 @@ class CondensationModel:
         here.
         """
 
+        # Validate the complete candidate first. A late invalid pressure,
+        # campaign, area, or segment must not leave earlier fields mutated.
+        for label, raw_temperature in (
+            ('wall_temperature_C', wall_temperature_C),
+            ('gas_temperature_C', gas_temperature_C),
+        ):
+            if raw_temperature is None:
+                continue
+            value = float(raw_temperature)
+            if not math.isfinite(value) or value <= -273.15:
+                raise ValueError(
+                    f'{label} must be finite and above absolute zero'
+                )
+        if pipe_diameter_m is not None:
+            require_lab_pipe_diameter(pipe_diameter_m, 'pipe_diameter_m')
+        if stage_area_m2_by_stage is not None:
+            for stage, raw_area in stage_area_m2_by_stage.items():
+                if isinstance(raw_area, bool):
+                    raise ValueError(f'stage area {stage!r} must be finite and non-negative')
+                area = float(raw_area)
+                if not math.isfinite(area) or area < 0.0:
+                    raise ValueError(f'stage area {stage!r} must be finite and non-negative')
+        if overhead_pressure_mbar is not None:
+            pressure = float(overhead_pressure_mbar)
+            if not math.isfinite(pressure) or pressure < 0.0:
+                raise ValueError(
+                    'overhead_pressure_mbar must be finite and non-negative'
+                )
+            _campaign_requires_viscous_flow(campaign_name)
+        if carrier_gas is not None:
+            _canonical_carrier_gas_key(carrier_gas)
+        if campaign_hour is not None:
+            if isinstance(campaign_hour, bool):
+                raise ValueError('campaign_hour must be finite and non-negative')
+            try:
+                hour = float(campaign_hour)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    'campaign_hour must be finite and non-negative'
+                ) from exc
+            if not math.isfinite(hour) or hour < 0.0:
+                raise ValueError('campaign_hour must be finite and non-negative')
+        if pipe_segment_temperatures_C is not None:
+            for segment in self.pipe_segments:
+                raw_temperature = float(pipe_segment_temperatures_C.get(
+                    segment.name, self.wall_temperature_C
+                ))
+                if (
+                    not math.isfinite(raw_temperature)
+                    or raw_temperature <= -273.15
+                ):
+                    raise ValueError(
+                        f'{segment.name} wall temperature must be finite '
+                        'and above absolute zero'
+                    )
+
         if wall_temperature_C is not None:
-            self.wall_temperature_C = float(wall_temperature_C)
+            wall_temperature = float(wall_temperature_C)
+            if not math.isfinite(wall_temperature) or wall_temperature <= -273.15:
+                raise ValueError('wall_temperature_C must be finite and above absolute zero')
+            self.wall_temperature_C = wall_temperature
         if pipe_diameter_m is not None:
             self.pipe_diameter_m = require_lab_pipe_diameter(
                 pipe_diameter_m, 'pipe_diameter_m')
+            self.pipe_segments = [
+                replace(segment, inner_diameter_m=self.pipe_diameter_m)
+                for segment in self.pipe_segments
+            ]
         if gas_temperature_C is not None:
-            self.gas_temperature_C = float(gas_temperature_C)
+            gas_temperature = float(gas_temperature_C)
+            if not math.isfinite(gas_temperature) or gas_temperature <= -273.15:
+                raise ValueError('gas_temperature_C must be finite and above absolute zero')
+            self.gas_temperature_C = gas_temperature
         elif wall_temperature_C is not None:
             self.gas_temperature_C = float(wall_temperature_C)
         if stage_area_m2_by_stage is not None:
             self.stage_area_m2_by_stage = {
-                str(stage): max(0.0, float(area_m2))
+                str(stage): float(area_m2)
                 for stage, area_m2 in stage_area_m2_by_stage.items()
             }
             self._apply_stage_area_m2_to_pipe_segments()
@@ -1899,7 +1979,10 @@ class CondensationModel:
                     abs_tol=0.0,
                 )
         if overhead_pressure_mbar is not None:
-            self.overhead_pressure_mbar = max(0.0, float(overhead_pressure_mbar))
+            pressure_mbar = float(overhead_pressure_mbar)
+            if not math.isfinite(pressure_mbar) or pressure_mbar < 0.0:
+                raise ValueError('overhead_pressure_mbar must be finite and non-negative')
+            self.overhead_pressure_mbar = pressure_mbar
             self._knudsen_policy_configured = True
             self._viscous_flow_required = _campaign_requires_viscous_flow(
                 campaign_name)
@@ -2160,13 +2243,18 @@ class CondensationModel:
                 self.wall_temperature_C)
         updated: list[PipeSegment] = []
         for segment in self.pipe_segments:
-            raw_temperature = temperatures_C.get(
+            raw_temperature = float(temperatures_C.get(
                 segment.name, self.wall_temperature_C)
+            )
+            if not math.isfinite(raw_temperature) or raw_temperature <= -273.15:
+                raise ValueError(
+                    f'{segment.name} wall temperature must be finite and above absolute zero'
+                )
             updated.append(PipeSegment(
                 name=segment.name,
                 upstream_stage=segment.upstream_stage,
                 downstream_stage=segment.downstream_stage,
-                wall_temperature_C=max(0.0, float(raw_temperature)),
+                wall_temperature_C=raw_temperature,
                 length_m=segment.length_m,
                 inner_diameter_m=segment.inner_diameter_m,
                 role=segment.role,
@@ -4425,6 +4513,11 @@ def _campaign_requires_viscous_flow(campaign_name: str | None) -> bool:
     name = str(campaign_name)
     if not name:
         return True
+    known_campaigns = {phase.name for phase in CampaignPhase} | {
+        'C0b_p_cleanup', 'C2A_continuous', 'C2A_staged', 'C3',
+    }
+    if name not in known_campaigns:
+        raise ValueError(f'unknown campaign for viscous-flow policy: {name!r}')
     return name in {
         'C2A',
         'C2A_continuous',
@@ -4496,6 +4589,15 @@ def _pressure_isolated_stage_efficiency(
     alpha_s: float,
 ) -> float:
     lo_C, hi_C = stage.temp_range_C
+    values = (T_cond_C, residence_s, alpha_s, lo_C, hi_C)
+    if not all(math.isfinite(float(value)) for value in values):
+        raise ValueError('pressure-isolated capture inputs must be finite')
+    if residence_s < 0.0 or not 0.0 <= alpha_s <= 1.0:
+        raise ValueError('residence_s and alpha_s are outside physical bounds')
+    if float(lo_C) > float(hi_C):
+        raise ValueError('stage temperature bounds must be ordered low-to-high')
+    if residence_s == 0.0 or alpha_s == 0.0:
+        return 0.0
     T_stage_C = (float(lo_C) + float(hi_C)) / 2.0
     if T_stage_C >= T_cond_C:
         return 0.0

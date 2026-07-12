@@ -183,10 +183,15 @@ def single_cation_mole_fractions(
     total = 0.0
     for parent_oxide, mol in account_mol.items():
         mol_value = float(mol)
-        if not math.isfinite(mol_value) or mol_value <= 0.0:
-            continue
         cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(str(parent_oxide))
         if cations is None:
+            continue
+        if not math.isfinite(mol_value) or mol_value < 0.0:
+            raise ValueError(
+                f"melt inventory for {parent_oxide!r} must be finite "
+                "and non-negative"
+            )
+        if mol_value == 0.0:
             continue
         cation_value = mol_value * cations
         cation_mol[str(parent_oxide)] = cation_value
@@ -247,5 +252,8 @@ def melt_oxide_activity(
 def na_reductant_activity_shift_kj_per_mol_o2(temperature_K: float) -> float:
     """Na2O Ellingham-row shift from gamma_NaO0.5 on the per-mol-O2 basis."""
 
+    temperature = float(temperature_K)
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        raise ValueError("temperature_K must be finite and positive")
     gamma = MELT_OXIDE_ACTIVITY_COEFFICIENTS["Na2O"].gamma
-    return 4.0 * R_KJ_PER_MOL_K * float(temperature_K) * math.log(gamma)
+    return 4.0 * R_KJ_PER_MOL_K * temperature * math.log(gamma)

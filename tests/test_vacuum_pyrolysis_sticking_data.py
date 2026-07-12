@@ -179,6 +179,67 @@ def test_sio_pressure_isolated_stage_eval_uses_cold_wall_gate():
     assert stage_eval["alpha_s_cold_wall_condensation"] is True
 
 
+def test_sticking_yaml_rejects_boolean_numeric_value(tmp_path: Path):
+    with pytest.raises(ValueError, match="not boolean"):
+        condensation._validate_sticking_value(tmp_path / "sticking.yaml", "SiO", True)
+
+
+def test_runtime_arrhenius_rejects_nonpositive_coefficients():
+    spec = {
+        "form": "arrhenius",
+        "A": 0.0,
+        "B": 1.0,
+        "valid_range_K": [300.0, 2000.0],
+        "uncertainty_envelope": [0.0, 1.0],
+        "cite": "test",
+        "status": "UNCERTIFIED",
+    }
+
+    with pytest.raises(ValueError, match="A/B must be finite"):
+        condensation._alpha_s_evaluation("SiO", 1000.0, spec)
+
+
+def test_pressure_isolated_efficiency_handles_zero_alpha_and_refuses_nonfinite():
+    stage = CondensationStage(
+        stage_number=1,
+        label="test",
+        temp_range_C=(500.0, 600.0),
+        target_species=["SiO"],
+    )
+
+    assert condensation._pressure_isolated_stage_efficiency(
+        stage, 1000.0, 1.0, 0.0
+    ) == 0.0
+    with pytest.raises(ValueError, match="must be finite"):
+        condensation._pressure_isolated_stage_efficiency(
+            stage, 1000.0, 1.0, float("nan")
+        )
+
+
+@pytest.mark.parametrize(
+    "temp_range_C",
+    [
+        (float("nan"), 600.0),
+        (500.0, float("inf")),
+        (600.0, 500.0),
+    ],
+)
+def test_pressure_isolated_efficiency_refuses_invalid_stage_temperature_bounds(
+    temp_range_C,
+):
+    stage = CondensationStage(
+        stage_number=1,
+        label="invalid stage",
+        temp_range_C=temp_range_C,
+        target_species=["SiO"],
+    )
+
+    with pytest.raises(ValueError, match="temperature|finite"):
+        condensation._pressure_isolated_stage_efficiency(
+            stage, 1000.0, 1.0, 1.0
+        )
+
+
 def test_sio_stage_band_flux_uses_cold_wall_gate(monkeypatch):
     valid_floor_K = _load_sticking_data()["species"]["SiO"]["value"][
         "valid_range_K"

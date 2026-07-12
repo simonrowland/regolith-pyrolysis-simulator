@@ -31,6 +31,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.chemistry.kernel import ProviderUnavailableError
+from simulator.campaigns import CampaignManager
 from simulator.core import PoisonedHourError
 from simulator.optimize.recipe import (
     C3_ALKALI_DOSING_K_KG_PATH,
@@ -40,7 +41,9 @@ from simulator.optimize.recipe import (
     RecipeSchema,
 )
 from simulator.run_executor import RunExecutor
+from simulator.state import CampaignPhase
 from simulator.runner import (
+    EngineBugAbort,
     NOT_APPLICABLE_UNTIL_P0,
     PyrolysisRun,
     RUNNER_SCHEMA_VERSION,
@@ -242,6 +245,51 @@ def _run_scenario(scenario: dict) -> dict:
         },
     )
     return run.run()
+
+
+def test_o2_bubbler_engine_evidence_uses_effective_zero_override():
+    manager = CampaignManager({
+        "campaigns": {"C4": {"o2_bubbler_kg_per_hr": 1.0}},
+    })
+    manager.overrides[CampaignPhase.C4.name] = {
+        "o2_bubbler_kg_per_hr": 0.0,
+    }
+    sim = SimpleNamespace(campaign_mgr=manager)
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        runtime_campaign_overrides={
+            "C4": {"o2_bubbler_kg_per_hr": 0.0},
+        },
+    )
+
+    assert run._requests_o2_bubbler_runtime(sim) is False
+
+    manager.overrides[CampaignPhase.C4.name] = {
+        "o2_bubbler_kg_per_hr": 0.25,
+    }
+    assert run._requests_o2_bubbler_runtime(sim) is True
+
+
+def test_o2_bubbler_refusal_is_visible_in_runner_envelope_without_advancing():
+    payload = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        runtime_campaign_overrides={
+            "C0": {"o2_bubbler_kg_per_hr": -1.0},
+        },
+    ).run()
+
+    assert payload["status"] == "refused"
+    assert payload["reason"] == "negative_rate_kg_per_hr"
+    assert payload["run_metadata"]["hours_completed"] == 0
+    assert payload["run_metadata"]["refusal_diagnostic"] == {
+        "status": "refused",
+        "reason": "negative_rate_kg_per_hr",
+        "rate_kg_per_hr": -1.0,
+        "injected_mol": 0.0,
+    }
 
 
 @pytest.mark.parametrize("alias", ["internal-analytical", "internal_analytical"])
@@ -1253,6 +1301,36 @@ def test_status_with_mass_balance_invariant_fails_earlier_numeric_breach() -> No
     assert status == "failed"
     assert reason == "mass_balance_closure_breach"
     assert "6e-12%" in error_message
+
+
+def test_status_with_mass_balance_invariant_refuses_mixed_missing_evidence() -> None:
+    execution = SimpleNamespace(
+        status="ok",
+        reason="",
+        error_message="",
+        snapshots=(
+            SimpleNamespace(mass_balance_error_pct=0.0),
+            SimpleNamespace(mass_balance_error_pct=None),
+        ),
+        per_hour=(),
+    )
+
+    with pytest.raises(EngineBugAbort, match="key_missing_in_snapshot"):
+        _status_with_mass_balance_invariant(execution)
+
+
+def test_status_with_mass_balance_invariant_refuses_completed_run_without_evidence() -> None:
+    execution = SimpleNamespace(
+        status="ok",
+        reason="",
+        error_message="",
+        snapshots=(),
+        per_hour=(),
+        simulator=SimpleNamespace(melt=SimpleNamespace(hour=1)),
+    )
+
+    with pytest.raises(EngineBugAbort, match="evidence_missing"):
+        _status_with_mass_balance_invariant(execution)
 
 
 def test_runner_records_operator_decision_in_shadow_trace():

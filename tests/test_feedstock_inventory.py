@@ -56,6 +56,44 @@ def _mol(species: str, kg: float) -> float:
     return kg * 1000.0 / MOLAR_MASS[species]
 
 
+@pytest.mark.parametrize("mass_kg", [0.0, -1.0, float("nan"), float("inf"), True])
+def test_load_batch_refuses_invalid_mass_before_mutation(mass_kg):
+    sim = _sim({"test": {"composition_wt_pct": {"SiO2": 100.0}}})
+    original_ledger = sim.atom_ledger
+
+    with pytest.raises(ValueError, match="mass_kg must be finite"):
+        sim.load_batch("test", mass_kg=mass_kg)
+
+    assert sim.atom_ledger is original_ledger
+
+
+@pytest.mark.parametrize("additive_kg", [-1.0, float("nan"), float("inf"), True])
+def test_load_batch_refuses_invalid_additive_before_mutation(additive_kg):
+    sim = _sim({"test": {"composition_wt_pct": {"SiO2": 100.0}}})
+    original_ledger = sim.atom_ledger
+
+    with pytest.raises(ValueError, match="additive 'Na' mass"):
+        sim.load_batch("test", additives_kg={"Na": additive_kg})
+
+    assert sim.atom_ledger is original_ledger
+
+
+def test_load_batch_clears_prior_native_fe_and_redox_diagnostics():
+    data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
+    feedstocks = yaml.safe_load(data_path.read_text())
+    sim = _sim_with_data(feedstocks)
+    sim.load_batch("lunar_mare_low_ti")
+    sim._last_native_fe_saturation_event = {"stale": True}
+    sim._last_fe_redox_respeciation_diagnostic = {"stale": True}
+    sim._last_melt_redox_liquidus_gate_diagnostic = {"stale": True}
+
+    sim.load_batch("lunar_mare_low_ti")
+
+    assert sim._last_native_fe_saturation_event == {}
+    assert sim._last_fe_redox_respeciation_diagnostic == {}
+    assert sim._last_melt_redox_liquidus_gate_diagnostic == {}
+
+
 def test_builtin_feedstocks_initially_conserve_batch_mass():
     data_path = Path(__file__).parent.parent / "data" / "feedstocks.yaml"
     feedstocks = yaml.safe_load(data_path.read_text())
@@ -1601,7 +1639,11 @@ def test_oxygen_is_not_duplicated_in_product_ledger():
     )
     sim.train.stages[1].collected_kg["O2"] = 1.5
     sim.train.stages[4].collected_kg["O2"] = 3.5
-    sim._dispatch_overhead_bleed(force_drain_all=True, o2_vented_kg=3.0)
+    sim._dispatch_overhead_bleed(
+        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
+        force_drain_all=True,
+        o2_vented_kg=3.0,
+    )
     snapshot = sim._make_snapshot()
     sim.melt.campaign = CampaignPhase.COMPLETE
     sim._finalize_record()

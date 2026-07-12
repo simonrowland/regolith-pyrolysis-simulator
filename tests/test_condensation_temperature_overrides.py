@@ -323,6 +323,108 @@ def test_stage0_hot_wall_diagnostic_is_sibling_and_route_neutral():
     )
 
 
+def test_operating_conditions_preserve_valid_subzero_wall_temperature():
+    model = CondensationModel(CondensationTrain.create_default())
+    names = {segment.name for segment in model.pipe_segments}
+
+    model.configure_operating_conditions(
+        wall_temperature_C=-20.0,
+        pipe_segment_temperatures_C={name: -20.0 for name in names},
+    )
+
+    assert model.wall_temperature_C == -20.0
+    assert {segment.wall_temperature_C for segment in model.pipe_segments} == {-20.0}
+
+
+def test_operating_conditions_refuse_nonfinite_pressure_before_mutation():
+    model = CondensationModel(CondensationTrain.create_default())
+    before = model.overhead_pressure_mbar
+
+    with pytest.raises(ValueError, match="overhead_pressure_mbar"):
+        model.configure_operating_conditions(overhead_pressure_mbar=float("inf"))
+
+    assert model.overhead_pressure_mbar == before
+
+
+def test_operating_condition_refusal_is_atomic_across_mixed_fields():
+    model = CondensationModel(CondensationTrain.create_default())
+    before = (
+        model.wall_temperature_C,
+        model.pipe_diameter_m,
+        tuple(model.pipe_segments),
+        dict(model.stage_area_m2_by_stage),
+    )
+
+    with pytest.raises(ValueError, match="stage area"):
+        model.configure_operating_conditions(
+            wall_temperature_C=1200.0,
+            pipe_diameter_m=0.25,
+            stage_area_m2_by_stage={"stage_3": float("inf")},
+        )
+
+    after = (
+        model.wall_temperature_C,
+        model.pipe_diameter_m,
+        tuple(model.pipe_segments),
+        dict(model.stage_area_m2_by_stage),
+    )
+    assert after == before
+
+
+def test_operating_condition_invalid_campaign_hour_refuses_before_mutation():
+    model = CondensationModel(CondensationTrain.create_default())
+    before = (
+        model.wall_temperature_C,
+        model.gas_temperature_C,
+        tuple(model.pipe_segments),
+        list(model.operating_history),
+    )
+
+    with pytest.raises(ValueError, match="campaign_hour"):
+        model.configure_operating_conditions(
+            wall_temperature_C=1200.0,
+            campaign_hour="not-an-hour",
+        )
+
+    after = (
+        model.wall_temperature_C,
+        model.gas_temperature_C,
+        tuple(model.pipe_segments),
+        list(model.operating_history),
+    )
+    assert after == before
+
+
+def test_runtime_pipe_diameter_updates_segment_transport_geometry():
+    model = CondensationModel(CondensationTrain.create_default())
+
+    model.configure_operating_conditions(pipe_diameter_m=0.25)
+
+    assert model.pipe_diameter_m == pytest.approx(0.25)
+    assert {segment.inner_diameter_m for segment in model.pipe_segments} == {0.25}
+
+
+def test_unknown_campaign_refuses_viscous_flow_policy():
+    model = CondensationModel(CondensationTrain.create_default())
+
+    with pytest.raises(ValueError, match="unknown campaign"):
+        model.configure_operating_conditions(
+            overhead_pressure_mbar=1.0,
+            campaign_name="C2A_typo",
+        )
+
+
+def test_idle_campaign_is_known_and_does_not_require_viscous_flow():
+    model = CondensationModel(CondensationTrain.create_default())
+
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        campaign_name="IDLE",
+    )
+
+    assert model._viscous_flow_required is False
+
+
 def test_pyrolysis_simulator_uses_instance_isolation_not_module_mutation():
     """End-to-end: a fresh PyrolysisSimulator built with custom
     setpoints applies the override on the CondensationModel

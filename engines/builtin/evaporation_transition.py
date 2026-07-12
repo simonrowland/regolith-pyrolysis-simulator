@@ -194,7 +194,11 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         # dispatch; this is defence in depth that returns an
         # ``unsupported`` IntentResult if a future caller bypasses the
         # pre-validation.
-        if remaining_kg_hr < -1e-12 or remaining_kg_hr > rate_kg_hr + 1e-12:
+        if (
+            not math.isfinite(remaining_kg_hr)
+            or remaining_kg_hr < -1e-12
+            or remaining_kg_hr > rate_kg_hr + 1e-12
+        ):
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="unsupported",

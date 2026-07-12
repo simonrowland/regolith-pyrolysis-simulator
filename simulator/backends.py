@@ -265,7 +265,18 @@ def normalize_cached_real_config(
             "reduced_real_cache.miss_policy"
         )
     if isinstance(value, CachedRealConfig):
-        return value
+        value = {
+            "db_path": value.db_path,
+            "authorized_backend_name": value.authorized_backend_name,
+            "authorized_backend_version": value.authorized_backend_version,
+            "authorized_model": value.authorized_model,
+            "authorized_mode": value.authorized_mode,
+            "miss_policy": value.miss_policy,
+            "cache_tier_ceiling": value.cache_tier_ceiling,
+            "read_only_base_db_path": value.read_only_base_db_path,
+            "strict_vapor_gate": value.strict_vapor_gate,
+            "control_quantization": value.control_quantization,
+        }
     if not isinstance(value, Mapping):
         raise unavailable_error_cls("cached-real cache config must be a mapping")
     raw_db_path = value.get("db_path")
@@ -1102,7 +1113,10 @@ def _cached_real_backend(
                 "cached-real live-fill requires an available live real backend"
             )
         live_identity = _live_backend_identity(live_backend)
-        expected_identity = (config.authorized_backend_name, config.corpus_version)
+        expected_identity = (
+            config.authorized_backend_name,
+            config.authorized_backend_version,
+        )
         if not _backend_identity_matches(
             live_identity,
             expected_identity,
@@ -1110,8 +1124,9 @@ def _cached_real_backend(
         ):
             raise unavailable_error_cls(
                 "cached-real live-fill backend identity mismatch: "
-                f"configured {expected_identity[0]} for corpus "
-                f"{expected_identity[1]}, got {live_identity[0]}"
+                f"configured {expected_identity[0]} version "
+                f"{expected_identity[1]}, got {live_identity[0]} version "
+                f"{live_identity[1]}"
             )
     return CachedRealBackend(config=config, live_backend=live_backend)
 
@@ -1141,13 +1156,13 @@ def _backend_identity_matches(
     *,
     unavailable_error_cls: type[_E] = BackendUnavailableError,
 ) -> bool:
-    live_name, _live_version = live_identity
-    expected_name, _expected_corpus_version = expected_identity
-    if _is_alphamelts_authorized_name(live_name) and _is_alphamelts_authorized_name(
-        expected_name
-    ):
-        return True
-    return live_name.strip().lower() == expected_name.strip().lower()
+    live_name, live_version = live_identity
+    expected_name, expected_version = expected_identity
+    names_match = (
+        _is_alphamelts_authorized_name(live_name)
+        and _is_alphamelts_authorized_name(expected_name)
+    ) or live_name.strip().lower() == expected_name.strip().lower()
+    return names_match and live_version.strip() == expected_version.strip()
 
 
 def _is_alphamelts_authorized_name(value: Any) -> bool:

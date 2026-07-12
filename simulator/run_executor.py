@@ -113,6 +113,24 @@ class RunExecutor:
                 if cache_state is not None:
                     per_hour_summary["reduced_real_cache_state"] = str(cache_state)
                 per_hour.append(per_hour_summary)
+                o2_bubbler_refusal = getattr(
+                    result.snapshot,
+                    "o2_bubbler_diagnostic",
+                    None,
+                )
+                if (
+                    isinstance(o2_bubbler_refusal, Mapping)
+                    and o2_bubbler_refusal.get("status") == "refused"
+                ):
+                    refusal_diagnostic = dict(o2_bubbler_refusal)
+                    reason = str(
+                        o2_bubbler_refusal.get("reason")
+                        or "o2_bubbler_refused"
+                    )
+                    error_message = reason
+                    status = "refused"
+                    failure_exc = RuntimeError(reason)
+                    break
                 campaign_summary = result.campaign_summary
                 c6_refusal = (
                     campaign_summary.get("c6_refusal_diagnostic")

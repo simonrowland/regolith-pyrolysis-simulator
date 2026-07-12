@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
 import hashlib
 import json
 import sqlite3
@@ -199,12 +200,7 @@ def test_cached_real_config_defaults_model_mode_for_alphamelts_alias(
 
     assert normalized.authorized_model == "MELTSv1.0.2"
     assert normalized.authorized_mode == "subprocess"
-    assert resolve_backend(
-        "cached-real",
-        BackendSelectionPolicy.RUNNER_STRICT,
-        cached_real_config=normalized,
-        cached_real_live_backend_cls=AlphaMELTSBackend,
-    ).config == normalized
+    assert normalized.authorized_backend_name == "AlphaMELTSBackend"
 
 
 def test_cached_real_config_threads_control_quantization_to_store(
@@ -606,10 +602,7 @@ def test_cached_real_cache_key_uses_corpus_not_engine_metadata(tmp_path: Path) -
     live_config = _cache_config(
         db_path,
         "live-fill",
-        version=(
-            "fake-live-real 1.0.0 (server=studio-a) "
-            "(path=/opt/grind/fake-live-real) (digest=sha256:abc123)"
-        ),
+        version=_FakeLiveRealBackend.engine_version,
     )
     live_backend = resolve_backend(
         "cached-real",
@@ -654,7 +647,7 @@ def test_cached_real_cache_key_uses_corpus_not_engine_metadata(tmp_path: Path) -
     assert replay_sim._pt0_store().summary()["misses"] == 0
 
 
-def test_cached_real_live_fill_accepts_engine_upgrade_with_same_corpus(
+def test_cached_real_live_fill_rejects_engine_upgrade_without_authorization(
     tmp_path: Path,
 ) -> None:
     config = _cache_config(
@@ -668,17 +661,16 @@ def test_cached_real_live_fill_accepts_engine_upgrade_with_same_corpus(
         ),
     )
 
-    backend = resolve_backend(
-        "cached-real",
-        BackendSelectionPolicy.RUNNER_STRICT,
-        cached_real_config=config,
-        cached_real_live_backend_cls=_AlphaMELTSClusterIdentityBackend,
-    )
+    with pytest.raises(BackendUnavailableError, match="identity mismatch"):
+        resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=config,
+            cached_real_live_backend_cls=_AlphaMELTSClusterIdentityBackend,
+        )
 
-    assert isinstance(backend, CachedRealBackend)
 
-
-def test_cached_real_live_fill_accepts_path_only_engine_provenance(
+def test_cached_real_live_fill_rejects_path_only_engine_provenance(
     tmp_path: Path,
 ) -> None:
     config = _cache_config(
@@ -692,14 +684,13 @@ def test_cached_real_live_fill_accepts_path_only_engine_provenance(
         ),
     )
 
-    backend = resolve_backend(
-        "cached-real",
-        BackendSelectionPolicy.RUNNER_STRICT,
-        cached_real_config=config,
-        cached_real_live_backend_cls=_AlphaMELTSClusterIdentityBackend,
-    )
-
-    assert isinstance(backend, CachedRealBackend)
+    with pytest.raises(BackendUnavailableError, match="identity mismatch"):
+        resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=config,
+            cached_real_live_backend_cls=_AlphaMELTSClusterIdentityBackend,
+        )
 
 
 def test_cached_real_missing_corpus_version_fails_loud(
@@ -811,13 +802,53 @@ def test_cached_real_live_fill_rejects_identity_mismatch(tmp_path: Path) -> None
         version="other-live-real 1.0.0",
     )
 
-    with pytest.raises(BackendUnavailableError, match="identity mismatch"):
+    with pytest.raises(BackendUnavailableError, match="identity mismatch") as exc_info:
         resolve_backend(
             "cached-real",
             BackendSelectionPolicy.RUNNER_STRICT,
             cached_real_config=cache_config,
             cached_real_live_backend_cls=_FakeLiveRealBackend,
         )
+
+    message = str(exc_info.value)
+    assert "configured other-live-real version other-live-real 1.0.0" in message
+    assert (
+        f"got fake-live-real version {_FakeLiveRealBackend.engine_version}"
+        in message
+    )
+
+
+def test_cached_real_live_fill_rejects_version_mismatch(tmp_path: Path) -> None:
+    cache_config = _cache_config(
+        tmp_path / "cached-real.db",
+        "live-fill",
+        version="wrong-version",
+    )
+
+    with pytest.raises(BackendUnavailableError, match="identity mismatch") as exc_info:
+        resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=cache_config,
+            cached_real_live_backend_cls=_FakeLiveRealBackend,
+        )
+
+    message = str(exc_info.value)
+    assert "configured fake-live-real version wrong-version" in message
+    assert (
+        f"got fake-live-real version {_FakeLiveRealBackend.engine_version}"
+        in message
+    )
+
+
+def test_cached_real_config_instance_is_revalidated(tmp_path: Path) -> None:
+    valid = normalize_cached_real_config(
+        _cache_config(tmp_path / "cached-real.db", "live-fill")
+    )
+    invalid = replace(valid, miss_policy="silently-fabricate")
+
+    with pytest.raises(BackendUnavailableError, match="miss_policy"):
+        normalize_cached_real_config(invalid)
 
 
 def test_cached_real_live_fill_forwards_account_scoped_composition(

@@ -94,6 +94,14 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
 
         control_audit = diagnostic_control_audit(request, include_fO2=False)
         controls = unpack_controls(request)
+        invalid_control = self._invalid_destructive_control(controls)
+        if invalid_control is not None:
+            return IntentResult(
+                intent=ChemistryIntent.OVERHEAD_BLEED,
+                status="unsupported",
+                control_audit=control_audit,
+                diagnostic={"reason": invalid_control},
+            )
         holdup_mol = {
             str(species): max(0.0, float(mol))
             for species, mol in dict(
@@ -257,14 +265,14 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         total_kg: float,
         controls: dict,
     ) -> dict[str, float]:
-        if bool(controls.get("force_drain_all", False)):
+        if controls.get("force_drain_all", False):
             return dict(holdup_mol)
 
         conductance_raw = controls.get("bleed_conductance_kg_s")
         if conductance_raw is None:
             conductance_raw = controls.get("bleed_conductance_kg_s_per_bar")
         conductance = max(0.0, float(conductance_raw or 0.0))
-        dt_hr = max(0.0, float(controls.get("dt_hr") or 1.0))
+        dt_hr = max(0.0, float(controls.get("dt_hr", 1.0)))
         pressure_square_fraction = compressible_pressure_capacity_fraction(
             controls.get("p_total_bar") or 0.0,
             controls.get("p_downstream_bar") or 0.0,
@@ -286,6 +294,49 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         }
 
     @staticmethod
+    def _invalid_destructive_control(controls: dict) -> str | None:
+        force_drain_all = controls.get("force_drain_all", False)
+        if not isinstance(force_drain_all, bool):
+            return "force_drain_all must be a boolean"
+        conductance_name = None
+        if controls.get("bleed_conductance_kg_s") is not None:
+            conductance_name = "bleed_conductance_kg_s"
+        elif controls.get("bleed_conductance_kg_s_per_bar") is not None:
+            conductance_name = "bleed_conductance_kg_s_per_bar"
+        if conductance_name is not None:
+            raw_conductance = controls[conductance_name]
+            if isinstance(raw_conductance, bool):
+                return f"{conductance_name} must be a finite non-negative number"
+            try:
+                conductance = float(raw_conductance)
+            except (TypeError, ValueError):
+                return f"{conductance_name} must be a finite non-negative number"
+            if not math.isfinite(conductance) or conductance < 0.0:
+                return f"{conductance_name} must be a finite non-negative number"
+        for name, default in (
+            ("dt_hr", 1.0),
+            ("p_total_bar", 0.0),
+            ("p_downstream_bar", 0.0),
+            ("o2_vented_kg", 0.0),
+            ("max_o2_flow_kg_hr", 0.0),
+            ("external_o2_in_overhead_mol", 0.0),
+        ):
+            if name not in controls:
+                continue
+            raw = controls.get(name, default)
+            if raw is None:
+                return f"{name} must be a finite non-negative number"
+            if isinstance(raw, bool):
+                return f"{name} must be a finite non-negative number"
+            try:
+                value = float(raw)
+            except (TypeError, ValueError):
+                return f"{name} must be a finite non-negative number"
+            if not math.isfinite(value) or value < 0.0:
+                return f"{name} must be a finite non-negative number"
+        return None
+
+    @staticmethod
     def _o2_vented_kg(bled_o2_kg: float, controls: dict) -> float:
         if bled_o2_kg <= 0.0:
             return 0.0
@@ -296,6 +347,6 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         )
         if max_o2_flow_kg_hr <= 0.0:
             return 0.0
-        dt_hr = max(0.0, float(controls.get("dt_hr") or 1.0))
+        dt_hr = max(0.0, float(controls.get("dt_hr", 1.0)))
         max_stored_kg = max_o2_flow_kg_hr * dt_hr
         return max(0.0, bled_o2_kg - max_stored_kg)

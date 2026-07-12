@@ -159,6 +159,43 @@ def test_c2a_continuous_ramp_rate_band_malformed_fails_loud():
         )
 
 
+@pytest.mark.parametrize(
+    ("phase", "config_key", "target", "ramp"),
+    [
+        (CampaignPhase.C0, "C0", 910.0, 37.0),
+        (CampaignPhase.C2B, "C2B", 1460.0, 12.0),
+    ],
+)
+def test_c0_and_c2b_temperature_ramps_follow_campaign_config(
+    phase, config_key, target, ramp
+):
+    setpoints = deepcopy(_setpoints())
+    setpoints["campaigns"][config_key]["temp_range_C"][-1] = target
+    setpoints["campaigns"][config_key]["dT_dt_C_per_hr"] = ramp
+
+    actual = CampaignManager(setpoints).get_temp_target(
+        phase,
+        0,
+        MeltState(campaign=phase, temperature_C=25.0),
+    )
+
+    assert actual == (target, ramp)
+
+
+@pytest.mark.parametrize("config_key", ["C0", "C2B"])
+def test_configured_temperature_ramp_refuses_nonfinite_values(config_key):
+    setpoints = deepcopy(_setpoints())
+    setpoints["campaigns"][config_key]["dT_dt_C_per_hr"] = float("nan")
+    phase = CampaignPhase[config_key]
+
+    with pytest.raises(ValueError, match="Invalid campaign thermal"):
+        CampaignManager(setpoints).get_temp_target(
+            phase,
+            0,
+            MeltState(campaign=phase, temperature_C=25.0),
+        )
+
+
 def test_melt_pressure_validator_refuses_partial_pressure_above_total():
     melt = MeltState()
     melt.p_total_mbar = 1.0

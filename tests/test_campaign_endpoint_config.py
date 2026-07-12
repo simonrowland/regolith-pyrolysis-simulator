@@ -54,6 +54,35 @@ def _flux(total_kg_hr: float = 0.0, **species_kg_hr: float) -> EvaporationFlux:
     )
 
 
+def test_c2a_staged_endpoint_refuses_unknown_species():
+    manager = CampaignManager(_setpoints())
+
+    with pytest.raises(ValueError, match="unknown species"):
+        manager._c2a_staged_log_slope_depletion_complete(
+            species=("TypoSpecies",),
+            evap_flux=_flux(),
+            epsilon_per_hr=0.01,
+        )
+
+
+def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
+    manager = CampaignManager(_setpoints())
+    manager._c2a_staged_cumulative_yield_mol_by_species = {"Na": 2.0}
+    manager._c2a_staged_last_log_slope_by_species = {"Na": 0.25}
+    before_yield = dict(manager._c2a_staged_cumulative_yield_mol_by_species)
+    before_slopes = dict(manager._c2a_staged_last_log_slope_by_species)
+
+    with pytest.raises(ValueError, match="unknown species"):
+        manager._c2a_staged_log_slope_depletion_complete(
+            species=("Na", "TypoSpecies"),
+            evap_flux=_flux(Na=1.0),
+            epsilon_per_hr=0.01,
+        )
+
+    assert manager._c2a_staged_cumulative_yield_mol_by_species == before_yield
+    assert manager._c2a_staged_last_log_slope_by_species == before_slopes
+
+
 @pytest.mark.parametrize(
     (
         "campaign",

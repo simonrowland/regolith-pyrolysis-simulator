@@ -96,6 +96,7 @@ from simulator.session import (
 )
 from simulator.state import (
     Atmosphere,
+    CampaignPhase,
     HourSnapshot,
     MOLAR_MASS,
     PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX,
@@ -1233,13 +1234,14 @@ class PyrolysisRun:
             return {"active": {}, "requested": echoed, "registry": {}}
         try:
             registry = kernel.registry
-            capability = registry.capability_summary()
         except AttributeError:
             capability = {}
+        else:
+            capability = registry.capability_summary()
         internal_intents = {"backend_equilibrium"}
         if not getattr(sim, "_c7_product_report", None):
             internal_intents.add("ca_aluminothermic_step")
-        if not self._requests_o2_bubbler_runtime():
+        if not self._requests_o2_bubbler_runtime(sim):
             internal_intents.add("oxygen_bubbler")
         capability = {
             intent: slots
@@ -1270,11 +1272,13 @@ class PyrolysisRun:
                 "registry": {},
             }
 
-    def _requests_o2_bubbler_runtime(self) -> bool:
-        for fields in dict(self.runtime_campaign_overrides).values():
-            if not isinstance(fields, Mapping):
-                continue
-            raw_rate = fields.get("o2_bubbler_kg_per_hr")
+    def _requests_o2_bubbler_runtime(self, sim: PyrolysisSimulator) -> bool:
+        manager = getattr(sim, "campaign_mgr", None)
+        if manager is None:
+            return False
+        for campaign in CampaignPhase:
+            controls = manager.o2_bubbler_controls(campaign)
+            raw_rate = controls.get("o2_bubbler_kg_per_hr")
             try:
                 rate = float(raw_rate)
             except (TypeError, ValueError):
@@ -1385,12 +1389,17 @@ def _worst_execution_mass_balance_pct(execution: RunExecution) -> float | None:
     snapshots = tuple(getattr(execution, "snapshots", ()) or ())
     for index, snapshot in enumerate(snapshots):
         raw = getattr(snapshot, "mass_balance_error_pct", None)
-        if raw is not None:
-            values.append(
-                _coerce_mass_balance_pct(
-                    raw, source=f"execution.snapshots[{index}]",
-                )
+        if raw is None:
+            raise EngineBugAbort(
+                "mass_balance_key_missing_in_snapshot: "
+                f"source=execution.snapshots[{index}] "
+                "key=mass_balance_error_pct"
             )
+        values.append(
+            _coerce_mass_balance_pct(
+                raw, source=f"execution.snapshots[{index}]",
+            )
+        )
 
     if not values:
         per_hour = tuple(getattr(execution, "per_hour", ()) or ())
@@ -1408,6 +1417,16 @@ def _worst_execution_mass_balance_pct(execution: RunExecution) -> float | None:
             )
 
     if not values:
+        completed_hours = int(
+            getattr(getattr(execution, "simulator", None), "melt", None).hour
+            if getattr(getattr(execution, "simulator", None), "melt", None)
+            is not None
+            else 0
+        )
+        if completed_hours > 0:
+            raise EngineBugAbort(
+                "mass_balance_evidence_missing_for_completed_run"
+            )
         return None
     # Closure is a per-hour invariant, so later cancellation cannot erase the
     # largest absolute excursion observed during the run.
@@ -3791,14 +3810,15 @@ def main(argv: Optional[list[str]] = None) -> int:
             run_metadata_overrides=metadata_overrides,
         )
         result = run.run()
-    except RunnerError as exc:
+    except (RunnerError, json.JSONDecodeError, TypeError, ValueError) as exc:
         if isinstance(exc, PresetRunnerError) and exc.provenance:
             metadata_overrides.setdefault(
                 PRESET_PROVENANCE_METADATA_KEY,
                 dict(exc.provenance),
             )
+        runner_error = exc if isinstance(exc, RunnerError) else RunnerError(str(exc))
         result = _runner_failure_result(
-            error=exc,
+            error=runner_error,
             feedstock_id=feedstock_id,
             campaign=campaign,
             hours=hours,

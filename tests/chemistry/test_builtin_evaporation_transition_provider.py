@@ -542,6 +542,47 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.parametrize("remaining_kg_hr", [float("nan"), float("inf")])
+def test_evaporation_transition_refuses_nonfinite_condensation_route(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    remaining_kg_hr,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_TRANSITION,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Na2O": 100.0}},
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Na",
+            "stoich": {
+                "parent_oxide": "Na2O",
+                "oxide_per_product_kg": 2.0,
+                "O2_per_product_kg": 0.347,
+            },
+            "rate_kg_hr": 1.0,
+            "remaining_kg_hr": remaining_kg_hr,
+            "dt_hr": 1.0,
+            "available_kg": 10.0,
+        },
+    )
+
+    result = BuiltinEvaporationTransitionProvider().dispatch(request)
+
+    assert result.status == "unsupported"
+    assert result.transition is None
+
+
 def test_evaporation_transition_does_not_apply_per_species_scale(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):

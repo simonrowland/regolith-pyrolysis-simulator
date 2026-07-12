@@ -688,6 +688,71 @@ def test_o2_bubbler_invalid_config_fails_closed_no_raise(
     ) == pytest.approx(0.0)
 
 
+@pytest.mark.parametrize(
+    ("field", "value", "expected_diagnostic"),
+    [
+        (
+            "o2_bubbler_kg_per_hr",
+            -1.0,
+            {
+                "status": "refused",
+                "reason": "negative_rate_kg_per_hr",
+                "rate_kg_per_hr": -1.0,
+                "injected_mol": 0.0,
+            },
+        ),
+        (
+            "o2_bubbler_eta_absorb_default",
+            1.5,
+            {
+                "status": "refused",
+                "reason": "invalid_eta_absorb",
+                "rate_kg_per_hr": 1.0,
+                "raw_eta_absorb": 1.5,
+                "injected_mol": 0.0,
+            },
+        ),
+        (
+            "o2_bubbler_target_fO2_log",
+            "bad-target",
+            {
+                "status": "refused",
+                "reason": "invalid_target_fO2_log",
+                "rate_kg_per_hr": 1.0,
+                "eta_absorb": 1.0,
+                "injected_mol": 0.0,
+            },
+        ),
+    ],
+)
+def test_o2_bubbler_step_refuses_before_process_state_mutation(
+    field: str,
+    value: object,
+    expected_diagnostic: dict[str, object],
+):
+    sim = _make_sim()
+    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
+    sim.melt.campaign = CampaignPhase.C4
+    sim.campaign_mgr.overrides.setdefault(CampaignPhase.C4.name, {}).update({
+        "o2_bubbler_kg_per_hr": 1.0,
+        "o2_bubbler_eta_absorb_default": 1.0,
+        "o2_bubbler_target_fO2_log": -9.5,
+        field: value,
+    })
+    before_melt = copy.deepcopy(sim.melt)
+    before_overhead = copy.deepcopy(sim.overhead)
+    before_transitions = copy.deepcopy(tuple(sim.atom_ledger.transitions))
+    before_recorded_snapshots = copy.deepcopy(tuple(sim.record.snapshots))
+
+    snapshot = sim.step()
+
+    assert snapshot.o2_bubbler_diagnostic == expected_diagnostic
+    assert sim.melt == before_melt
+    assert sim.overhead == before_overhead
+    assert tuple(sim.atom_ledger.transitions) == before_transitions
+    assert tuple(sim.record.snapshots) == before_recorded_snapshots
+
+
 def test_o2_bubbler_passthrough_credits_overhead_without_absorbed_double_count() -> None:
     sim = _make_sim()
     _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
@@ -747,7 +812,7 @@ def test_o2_bubbler_sub_liquid_routes_all_injected_o2_to_overhead(
     monkeypatch.setattr(
         sim,
         "_melt_redox_temperature_shift_is_liquid",
-        lambda _T_K: False,
+        lambda _T_K, **_kwargs: False,
     )
     monkeypatch.setattr(
         sim,
@@ -801,6 +866,7 @@ def test_o2_bubbler_external_passthrough_not_terminal_product_o2() -> None:
     )
 
     bleed_result = sim._dispatch_overhead_bleed(
+        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
         o2_vented_kg=0.0,
     )
@@ -2135,7 +2201,9 @@ def test_pn2_sweep_transport_prediction_matches_authoritative_bleed_residual() -
     head_o2_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
 
     predicted_pO2 = sim._pn2_sweep_transport_pO2_bar(head_o2_mol)
-    bleed = sim._dispatch_overhead_bleed(turbine_spec=None)
+    bleed = sim._dispatch_overhead_bleed(
+        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0)
+    )
     residual_o2_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
     authoritative_residual_pO2 = sim._headspace_ledger_pO2_bar_from_o2_mol(
         residual_o2_mol
