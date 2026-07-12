@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from copy import deepcopy
 from pathlib import Path
 
@@ -95,12 +96,25 @@ def test_configure_campaign_pressure_defaults_match_legacy_constants(
     assert melt.atmosphere is atmosphere
 
 
-def test_c6_continuum_derivation_uses_recipe_maximum_temperature():
+def test_c6_continuum_derivation_uses_selected_static_hold_temperature():
     campaign = _setpoints()["campaigns"]["C6"]
+    continuum = campaign["continuum_pressure_bounds"]
 
-    assert campaign["continuum_pressure_bounds"]["gas_temperature_C"] == 1450
-    assert campaign["default_hold_T_C"] == 1450
-    assert max(campaign["temp_range_C"]) == 1450
+    # The validated sweep range is physics evidence and remains wider than the
+    # selected recipe. Pressure provenance follows the 1400 C hold chosen when
+    # within-noise Al-yield ties break toward Ellingham-margin headroom.
+    assert continuum["gas_temperature_C"] == 1400
+    assert campaign["default_hold_T_C"] == 1400
+    assert campaign["temp_range_C"] == [1380, 1450]
+
+    expected_mbar = (
+        1.380649e-23 * (1400.0 + 273.15)
+        / (math.sqrt(2.0) * math.pi * (3.798e-10) ** 2 * 0.12 * 0.01)
+        / 100.0
+    )
+    assert continuum["derived_pN2_floor_mbar"] == pytest.approx(
+        expected_mbar, abs=5e-7
+    )
 
 
 def test_campaign_pressure_default_override_reaches_melt_state():

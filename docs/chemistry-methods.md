@@ -599,10 +599,12 @@ C6 uses the same Ellingham-margin gate for Mg/Al₂O₃. The JANAF-4th multiphas
 Mg/Al₂O₃ crossover at 1471.4 °C; the local slope near 1430-1440 °C is -0.194210
 kJ/mol-O₂/°C, so each degree below the crossover buys about +0.194210 kJ/mol-O₂ of standard-state
 headroom. The static recipe is therefore pinned to the executable 2026-07-11 residual-melt sweep:
-1450 °C, +4.153 kJ/mol-O₂ margin, and `liquid_fraction >= 0.5` workability for lunar mare
-low/high-Ti, lunar highland, and Mars basalt. CI carbonaceous chondrite is not promoted by this
-rule; the MAGEMin sample curve leaves its staged residual below the workability threshold through
-the Mg/Al₂O₃ window, so static C6 is a typed refusal with Al left in the rump.
+1400 °C, +13.864 kJ/mol-O₂ margin, and `liquid_fraction >= 0.5` workability for lunar mare
+low/high-Ti, lunar highland, and Mars basalt. The 1400-1450 °C Al-yield spread is numerical
+noise, so within-noise yield ties break toward margin headroom; the colder hold also reduces
+heating energy and exposure to thermochemistry-refit movement. CI carbonaceous chondrite is not
+promoted by this rule; the MAGEMin sample curve leaves its staged residual below the workability
+threshold through the Mg/Al₂O₃ window, so static C6 is a typed refusal with Al left in the rump.
 <!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider.dispatch:231 — metallothermic refusal behavior -->
 <!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._reduction_margin_kj_per_mol_o2:1198 — Ellingham margin gate -->
 <!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._crossover_temperature_C:1412 — crossover temperatures -->

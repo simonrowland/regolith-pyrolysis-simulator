@@ -368,7 +368,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
         profile,
         unpinned,
     )
-    assert spec.recipe_id == "83c9f53379af2bd92def8844f6144d197fcd793770f371e023ccd800433b3041"
+    # 2026-07-12: the C6 1400 C hold-window bounds changed the active bounds
+    # digest from 67f7eae1... to 32e9d2e9...; recomputed via _build_eval_inputs.
+    assert spec.recipe_id == "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
     # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
     # moves when the live searchable allowlist identity changes.
     # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed,
@@ -444,7 +446,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # schema/allowlist drift.
     # 2026-07-11 0.5.10 E-MOVE: version/source/data fingerprint invalidation;
     # recipe_id and searchable allowlist hash above are unchanged.
-    assert cache_key(spec) == "41cb00404d5cfc94b0f0c3df8627b5dcbbd1af0b0206660302d7eebf57ea029e"
+    # 2026-07-12: C6 bounds digest 67f7eae1... -> 32e9d2e9... rebaselines
+    # the EvalSpec cache identity for the 1400 C hold window.
+    assert cache_key(spec) == "a76af733f72d8c07992970b4be2d9d18f2edf73d09878ef0337d9bbef7394e85"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -1355,9 +1359,11 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     ).validated()
 
     assert first.recipe_id() == second.recipe_id()
+    # 2026-07-12: recomputed after the C6 1400 C hold-window bounds moved the
+    # active bounds digest from 67f7eae1... to 32e9d2e9....
     assert (
         first.recipe_id()
-            == "f9009351603a0dd72503f6ddbc40381c6ca127f5f62c3f9955d0d31c7177accd"
+            == "7236cc9dee164395c000645da3846140bff1e17aa6772a057d26b0cfe3ae8801"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

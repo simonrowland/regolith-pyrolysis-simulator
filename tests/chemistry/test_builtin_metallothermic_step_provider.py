@@ -1831,13 +1831,15 @@ def test_c6_mg_thermite_proceeds_at_static_hold_without_local_support(
     request = IntentRequest(
         intent=request.intent,
         account_view=request.account_view,
-        temperature_C=1450.0,
+        # The yield response is numerically flat through 1400-1450 C; the
+        # recipe tie-break chooses the colder point for margin headroom.
+        temperature_C=1400.0,
         pressure_bar=request.pressure_bar,
         control_inputs={
             **request.control_inputs,
             "JANAF_4th_multiphase_margin_kJ_per_mol_O2": {
                 "Mg_Al_crossover_C": 1471.4,
-                "Mg_Al_1450C": 4.153,
+                "Mg_Al_1400C": 13.864,
             },
             "kinetic_driven_above_crossover": False,
             "kinetic_note": "",
@@ -1852,7 +1854,7 @@ def test_c6_mg_thermite_proceeds_at_static_hold_without_local_support(
     assert result.diagnostic["c6_above_mg_al_crossover"] is False
     assert result.diagnostic["c6_local_thermite_support"] is False
     assert result.diagnostic["c6_mg_al_margin_kJ_per_mol_O2"] == pytest.approx(
-        4.153046316150039
+        13.863535266150052
     )
 
 
@@ -2042,8 +2044,10 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
 ):
     patched_setpoints = copy.deepcopy(setpoints_data)
     c6_cfg = patched_setpoints["campaigns"]["C6"]
-    c6_cfg["default_hold_T_C"] = 1450.0
-    c6_cfg["hold_temp_C"] = 1450.0
+    # Pin the selected recipe mechanism: within-noise yield ties choose the
+    # colder hold for greater Mg/Al2O3 margin and lower heating energy.
+    c6_cfg["default_hold_T_C"] = 1400.0
+    c6_cfg["hold_temp_C"] = 1400.0
     c6_cfg["kinetic_driven_above_crossover"] = False
 
     sim = _build_sim(
@@ -2078,7 +2082,7 @@ def test_c6_static_hold_exercises_c6_proceed_decision_path(
         transition.name == "c6_mg_thermite_primary"
         for transition in sim.atom_ledger.transitions
     )
-    assert sim.melt.temperature_C == pytest.approx(1450.0)
+    assert sim.melt.temperature_C == pytest.approx(1400.0)
     assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
 
 

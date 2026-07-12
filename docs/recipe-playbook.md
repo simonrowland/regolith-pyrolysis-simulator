@@ -129,7 +129,7 @@ Source: `data/setpoints.yaml` campaign key `campaigns.C5`.
 
 ### C6 — Mg Thermite Reduction
 
-**Temperature**: 1450 °C static hold, reaction-controlled. The hold is below the 1471.4 °C Mg/Al₂O₃ multiphase crossover and carries +4.153 kJ/mol-O₂ standard-state margin; the executable 2026-07-11 C6-stage sweep selected it as the common argmax for lunar mare low/high-Ti, lunar highland, and Mars basalt with `liquid_fraction >= 0.5`. CI carbonaceous chondrite remains a typed refusal because its staged residual is not workable in the static window.
+**Temperature**: 1400 °C static hold, reaction-controlled. The hold is below the 1471.4 °C Mg/Al₂O₃ multiphase crossover and carries +13.864 kJ/mol-O₂ standard-state margin. Across the executable 2026-07-11 C6-stage sweep, the 1400-1450 °C Al-yield spread is numerical noise for lunar mare low/high-Ti, lunar highland, and Mars basalt with `liquid_fraction >= 0.5`; within-noise yield ties therefore break toward margin headroom and lower heating energy. CI carbonaceous chondrite remains a typed refusal because its staged residual is not workable in the static window.
 **Reaction**: 3Mg(l) + Al₂O₃(melt) → 3MgO(slag) + 2Al(l).
 **Mg demand**: 50–60 kg/tonne (stoichiometric, for low-Ti mare).  
 **Self-terminating criterion**: liquidus exceeds 1700 °C when residual SiO₂ + Al₂O₃ < 15–20 wt%.

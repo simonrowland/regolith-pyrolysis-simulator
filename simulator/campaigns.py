@@ -1303,7 +1303,7 @@ class CampaignManager:
             ovr = self._campaign_overrides(campaign)
             target = self._float(
                 ovr.get('hold_temp_C', ovr.get('hold_temperature_C')),
-                self._float(cfg.get('default_hold_T_C'), 1500.0),
+                self._float(cfg.get('default_hold_T_C'), 1400.0),
             )
             ramp_raw = ovr.get('ramp_rate_C_per_hr', cfg.get('dT_dt_C_per_hr'))
             if ramp_raw is None:

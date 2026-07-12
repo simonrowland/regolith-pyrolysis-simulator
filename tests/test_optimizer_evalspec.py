@@ -86,14 +86,16 @@ STAGE_SIO_GAS_MODE = (
 
 # 2026-07-11 0.5.10 E-MOVE: version/source/data fingerprint invalidation moves
 # only the code_version token in the canonical EvalSpec payload.
+# 2026-07-12 C6 1400 C hold-window bounds [1380, 1450] moved the bounds digest
+# from 67f7eae1... to 32e9d2e9...; payload recomputed from _base_spec().
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor"'
     b':false,"allowlist_version":"allowlist-v11","backend_name":"s'
-    b'tub","bounds_digest":"67f7eae112e069c9b5566ad93a42392e37931d'
-    b'3f2ef265b24f4a43a6660e9212","c5_enabled":false,"campaign":"C'
+    b'tub","bounds_digest":"32e9d2e945bd870a2af90d5fc46259dd7b7244'
+    b'04d9066c4505d98921b8fd4252","c5_enabled":false,"campaign":"C'
     b'0","chemistry_kernel":{"allow_builtin_fallback":false,"engin'
     b'e":"builtin","pressure_Pa":"0.001000000"},"code_version":"0.'
-    b'5.9","data_digests":{"corpus_version":"corpus-version-digest'
+    b'5.10","data_digests":{"corpus_version":"corpus-version-digest'
     b'","feedstocks":"feedstock-digest","foulant_thermo":"foulant-'
     b'thermo-digest","materials":"materials-digest","profile":"pro'
     b'file-digest","setpoints":"setpoints-digest","species_catalog'
@@ -222,7 +224,7 @@ spec = EvalSpec(
     feedstock_id="lunar_mare_low_ti",
     profile_id="oxygen-yield-v1",
     fidelity="fast",
-    code_version="0.5.9",
+    code_version="0.5.10",
     data_digests={
         "corpus_version": "corpus-version-digest",
         "setpoints": "setpoints-digest",
@@ -2236,7 +2238,7 @@ def test_build_eval_inputs_refuses_unknown_runtime_campaign_override_fields() ->
         ("C2A_continuous", 1050.0, 1600.0, 24),
         ("C2B", 1320.0, 1480.0, 17),
         ("C4", 1580.0, 1670.0, 10),
-        ("C6", 1450.0, 1550.0, 10),
+        ("C6", 1380.0, 1450.0, 10),
     ),
 )
 def test_build_eval_inputs_accepts_profile_window_override_shapes(

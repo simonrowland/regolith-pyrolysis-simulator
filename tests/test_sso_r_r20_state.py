@@ -1382,8 +1382,9 @@ def test_c6_primary_source_term_from_transition_and_back_reduction_nets_zero(
         additives_kg={"Mg": mg_dose_kg},
     )
     sim._init_thermite_inventory()
-    # Exercise source-term accounting inside the binding C6 static window.
-    sim.melt.temperature_C = 1450.0
+    # Exercise source-term accounting at the selected C6 hold. Within-noise
+    # yield ties choose 1400 C for greater Ellingham-margin headroom.
+    sim.melt.temperature_C = 1400.0
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log

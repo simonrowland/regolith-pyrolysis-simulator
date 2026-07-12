@@ -525,38 +525,40 @@ campaigns:
   C6:
     label: "Mg Thermite Reduction (Separate Solar Furnace)"
     temp_range_C: [1380, 1450]
-    default_hold_T_C: 1450
+    default_hold_T_C: 1400
     dT_dt_C_per_hr: null                 # reaction-controlled
     atmosphere: "controlled_O2"          # bakeout atmosphere for Mg recovery
     pO2_mbar: [0.08, 0.35]              # bakeout pO2
     pO2_mbar_default: 0.2
     p_total_mbar_default: 0.2
     # Same N2 continuum derivation and operational band as C4, evaluated at
-    # the C6 recipe maximum 1450 C: k_B*(1450+273.15) /
-    # (sqrt(2)*pi*(3.798e-10 m)^2*0.12 m*0.01) = 30.935 Pa = 0.309350 mbar.
-    # The 5.0 mbar operating floor remains conservative at 16.16x that minimum.
+    # the selected C6 static hold 1400 C: k_B*(1400+273.15) /
+    # (sqrt(2)*pi*(3.798e-10 m)^2*0.12 m*0.01) = 30.037 Pa = 0.300374 mbar.
+    # The 5.0 mbar operating floor remains conservative at 16.65x that minimum.
     continuum_pressure_bounds:
       pN2_mbar: [5.0, 15.0]
-      derived_pN2_floor_mbar: 0.309350
+      derived_pN2_floor_mbar: 0.300374
       knudsen_max: 0.01
       carrier_gas: "N2"
-      gas_temperature_C: 1450
+      gas_temperature_C: 1400
       pipe_diameter_m: 0.12
     target_species: ["Al"]
     reaction: "3Mg(l) + Al2O3(melt) -> 3MgO(slag) + 2Al(l)"
     # 2026-07-11 C6 static-recipe sweep:
     # staged residuals from executable C0->C0B->C2A_STAGED->C3_NA->C4,
     # MAGEMin liquid_fraction(T) workability threshold >=0.5, C6 Al-yield
-    # sweep 1380..1470 C with 5 C refinement near 1430..1455, and selection
-    # tie-break requiring >=4 kJ/mol-O2 Mg/Al2O3 headroom. Feasible static
-    # feedstocks (low/high-Ti mare, highland, Mars basalt) all select 1450 C;
+    # sweep 1380..1470 C with 5 C refinement near 1430..1455. The 1400..1450 C
+    # Al-yield spread is numerical noise, so within-noise yield ties break
+    # toward greater Mg/Al2O3 margin headroom (and lower heating energy).
+    # Feasible static feedstocks (low/high-Ti mare, highland, Mars basalt) all
+    # select 1400 C; the validated physical sweep window remains unchanged.
     # CI remains a typed refusal (liquid_fraction=0.0 through the window).
     # Yield curve excerpt, Al kg per tonne at T C:
-    # feedstock                 window          lf1450  1380    1430    1450    1470   recipe
-    # lunar_mare_low_ti         [1380,1471.4)   0.992  25.129  25.129  25.129  25.130  1450
-    # lunar_mare_high_ti        [1380,1471.4)   0.999  25.537  25.538  25.538  25.538  1450
-    # lunar_highland            [1380,1471.4)   0.970  28.503  28.503  28.503  28.503  1450
-    # mars_basalt               [1380,1471.4)   0.899  25.440  25.441  25.442  25.442  1450
+    # feedstock                 window          lf1400  1380    1400    1450    1470   recipe
+    # lunar_mare_low_ti         [1380,1471.4)   0.983  25.129  25.129  25.129  25.130  1400
+    # lunar_mare_high_ti        [1380,1471.4)   0.994  25.537  25.537  25.538  25.538  1400
+    # lunar_highland            [1380,1471.4)   0.910  28.503  28.503  28.503  28.503  1400
+    # mars_basalt               [1380,1471.4)   0.862  25.440  25.441  25.442  25.442  1400
     # ci_carbonaceous_chondrite empty           0.000  forced-only, not recipe-feasible
     # Evidence: docs-private/research/2026-07-11-c6-static-temperature/results.json
     static_window_by_feedstock:
@@ -570,14 +572,16 @@ campaigns:
           T_max_exclusive_C: 1471.4
         source: "docs-private/research/2026-07-11-c6-static-temperature/results.json"
     JANAF_4th_multiphase_margin_kJ_per_mol_O2:   # recomputed from ellingham_thermo multiphase fits
-      Mg_Al_1450C: 4.153
+      Mg_Al_1400C: 13.864
       Mg_Al_crossover_C: 1471.4
       Mg_Al_1500C: -5.557
       Mg_Al_1600C: -24.978
     kinetic_driven_above_crossover: false
     kinetic_note: >
-      The static recipe holds at 1450 C, below the 1471.4 C Mg/Al2O3
-      multiphase crossover with +4.153 kJ/mol-O2 standard-state headroom.
+      The static recipe holds at 1400 C, below the 1471.4 C Mg/Al2O3
+      multiphase crossover with +13.864 kJ/mol-O2 standard-state headroom.
+      Within-noise Al-yield ties break toward margin headroom; the colder hold
+      also reduces heating energy and thermochemistry-refit sensitivity.
       Operation above the crossover is not part of the static recipe and must be
       refused unless a future optimizer-owned local thermite/exotherm model
       supplies separate evidence.
@@ -1521,8 +1525,9 @@ ellingham_V1c_reference:
       window at 1150 C (a positive ~31 C margin) and is refused above the 1181.5 C crossover.
     C6_thermite: >
       Mg/Al2O3 is favorable only below the 1471 C multiphase crossover. The
-      static recipe now holds at 1450 C (+4.153 kJ/mol O2), selected by the
-      2026-07-11 executable C6 residual-melt sweep with >=4 kJ/mol O2 headroom.
+      static recipe now holds at 1400 C (+13.864 kJ/mol O2), selected from the
+      2026-07-11 executable C6 residual-melt sweep because within-noise yield
+      ties break toward margin headroom and lower heating energy.
       CI carbonaceous chondrite has no workable static C6 window and remains a
       typed refusal rather than a kinetic/exotherm claim.
 
