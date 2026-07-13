@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 try:
-    from flask import request
+    from flask import request, session as flask_session
 except ModuleNotFoundError:
     class _MissingFlaskRequest:
         sid = None
@@ -26,6 +26,7 @@ from simulator.backends import (
     emit_web_engine_selection_log,
     resolve_backend,
 )
+from simulator.accounting.ledger_api import LedgerAPI
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.campaigns import CampaignManager
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
@@ -100,6 +101,8 @@ def _replace_simulation_state(
     sid: str,
     session,
     speed: float,
+    *,
+    ledger_client_id: str | None = None,
 ) -> tuple[dict, threading.Lock]:
     """Install one active simulation for a client and stop any prior run."""
     while True:
@@ -121,6 +124,7 @@ def _replace_simulation_state(
                     'paused': False,
                     'speed': speed,
                     'run_id': uuid.uuid4().hex,
+                    'ledger_client_id': ledger_client_id,
                 }
                 _simulations[sid] = state
                 _sim_locks[sid] = run_lock
@@ -142,6 +146,63 @@ def _current_simulation_state(
         if run_id is not None and state.get('run_id') != run_id:
             return None, None
         return state, _sim_locks.get(sid)
+
+
+def read_ledger_api(
+    sid: str,
+    resource: str,
+    *,
+    include_run_id: bool = False,
+    **params,
+):
+    """Read one L1 ledger resource from an active session under its run lock."""
+    state, lock = _current_simulation_state(sid)
+    if state is None:
+        raise LookupError("no active simulation")
+    run_id = state.get('run_id')
+
+    def read():
+        api = LedgerAPI(state['session'].simulator)
+        if resource == 'accounts':
+            return api.accounts()
+        if resource == 'account':
+            units = str(params.get('units', 'kg'))
+            pattern = params.get('pattern')
+            if pattern:
+                return api.account_pattern(str(pattern), units=units)
+            return api.account(str(params.get('account', '')), units=units)
+        if resource == 'view':
+            return api.view(str(params.get('view', '')))
+        if resource == 'snapshot':
+            return api.snapshot()
+        raise ValueError("unknown ledger resource")
+
+    def response():
+        payload = read()
+        if include_run_id and isinstance(payload, Mapping):
+            payload = dict(payload)
+            payload['run_id'] = run_id
+        return payload
+
+    if lock is None:
+        return response()
+    with lock:
+        current, _ = _current_simulation_state(sid, run_id)
+        if current is not state:
+            raise LookupError("simulation run changed")
+        return response()
+
+
+def read_ledger_api_for_client(client_id: str, resource: str, **params):
+    """Resolve an active run owned by one signed Flask browser session."""
+    with _simulations_guard:
+        matches = [
+            sid for sid, state in _simulations.items()
+            if state.get('ledger_client_id') == client_id
+        ]
+    if len(matches) != 1:
+        raise LookupError("no unique active simulation for this browser session")
+    return read_ledger_api(matches[0], resource, **params)
 
 
 def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bool:
@@ -1143,6 +1204,21 @@ def register_events(socketio):
     def handle_connect():
         _safe_log(f"Client connected: {request.sid}")
 
+    @socketio.on('ledger_api')
+    def handle_ledger_api(data=None):
+        """Serve the caller's active simulation through the generic ledger API."""
+        try:
+            params = dict(data or {})
+            resource = str(params.pop('resource', 'snapshot'))
+            return read_ledger_api(
+                request.sid,
+                resource,
+                include_run_id=True,
+                **params,
+            )
+        except (KeyError, LookupError, TypeError, ValueError) as exc:
+            return {"error": str(exc)}
+
     @socketio.on('disconnect')
     def handle_disconnect():
         sid = request.sid
@@ -1338,7 +1414,12 @@ def register_events(socketio):
             return
         sim = session.simulator
 
-        state, run_lock = _replace_simulation_state(sid, session, speed)
+        state, run_lock = _replace_simulation_state(
+            sid,
+            session,
+            speed,
+            ledger_client_id=flask_session.get('ledger_client_id'),
+        )
         run_id = state['run_id']
         state['backend_message'] = backend_message
         state['backend_status'] = resolution_status.backend_status

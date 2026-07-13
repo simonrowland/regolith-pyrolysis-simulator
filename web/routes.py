@@ -15,7 +15,7 @@ import tempfile
 from typing import Any
 from urllib.parse import quote, urlsplit
 
-from flask import Blueprint, Response, current_app, render_template, jsonify, request, send_file
+from flask import Blueprint, Response, current_app, render_template, jsonify, request, send_file, session
 import yaml
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
@@ -3178,6 +3178,7 @@ def load_recipe():
 @bp.route('/')
 def simulator():
     """Main simulator interface."""
+    session.setdefault('ledger_client_id', os.urandom(16).hex())
     feedstocks, debug_feedstocks = load_feedstock_groups()
     return render_template(
         'simulator.html',
@@ -3189,6 +3190,59 @@ def simulator():
         debug_feedstocks=debug_feedstocks,
         debug_mode=debug_feedstocks_enabled(),
     )
+
+
+def _ledger_get(resource: str, **params):
+    client_id = str(session.get('ledger_client_id') or '')
+    if not client_id:
+        return _json_error('ledger request requires an initialized browser session', 400)
+    try:
+        from web.events import read_ledger_api_for_client
+        return jsonify(read_ledger_api_for_client(client_id, resource, **params))
+    except LookupError as exc:
+        return _json_error(str(exc), 404)
+    except KeyError as exc:
+        identifier = exc.args[0] if exc.args else ''
+        return _json_error(f'unknown ledger {resource}: {identifier}', 404)
+    except (TypeError, ValueError) as exc:
+        return _json_error(str(exc), 400)
+
+
+@bp.route('/api/ledger/accounts', methods=['GET'])
+def ledger_accounts_api():
+    return _ledger_get('accounts')
+
+
+@bp.route('/api/ledger/account/<path:account_id>', methods=['GET'])
+def ledger_account_api(account_id: str):
+    return _ledger_get(
+        'account',
+        account=account_id,
+        pattern=request.args.get('pattern'),
+        units=request.args.get('units', 'kg'),
+    )
+
+
+@bp.route('/api/ledger/account', methods=['GET'])
+def ledger_account_pattern_api():
+    pattern = str(request.args.get('pattern') or '').strip()
+    if not pattern:
+        return _json_error('ledger account pattern is required', 400)
+    return _ledger_get(
+        'account',
+        pattern=pattern,
+        units=request.args.get('units', 'kg'),
+    )
+
+
+@bp.route('/api/ledger/snapshot', methods=['GET'])
+def ledger_snapshot_api():
+    return _ledger_get('snapshot')
+
+
+@bp.route('/api/ledger/views/<view_name>', methods=['GET'])
+def ledger_view_api(view_name: str):
+    return _ledger_get('view', view=view_name)
 
 
 @bp.route('/api/wall-risk')

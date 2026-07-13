@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import re
 from collections.abc import Iterable, Mapping
 from typing import Any
+
+from simulator.accounting.ledger_api import oxide_wt_pct_from_kg
 
 from simulator.ceramic_classifier import (
     CeramicClassification,
@@ -30,7 +31,6 @@ WALL_ZONE_LABELS = {
     "rest": "Rest",
 }
 _NON_DEPOSIT_FLUE_SPECIES = {"O2", "N2", "CO2"}
-_OXIDE_FORMULA_RE = re.compile(r"^(?:[A-Z][a-z]?\d*)*O\d*$")
 _VAPOR_PRESSURE_FACET_PANEL_STATUSES = {"fallback", "not_attempted"}
 
 
@@ -173,25 +173,6 @@ def vapor_pressure_authority_payload(
             "authoritative_for_requested_vapor_pressure"
         ),
         "diagnostic_only": True,
-    }
-
-
-def oxide_wt_pct_from_kg(species_kg: Mapping[str, Any] | None) -> dict[str, float]:
-    if not isinstance(species_kg, Mapping):
-        return {}
-    oxide_kg = {
-        str(species): amount
-        for species, value in species_kg.items()
-        if _is_oxide_species(str(species))
-        for amount in [_float_or_none(value)]
-        if amount is not None and amount > 0.0
-    }
-    total = sum(oxide_kg.values())
-    if total <= 0.0:
-        return {}
-    return {
-        species: round(amount / total * 100.0, 3)
-        for species, amount in sorted(oxide_kg.items())
     }
 
 
@@ -349,14 +330,6 @@ def _positive_float_mapping(
         if amount is not None and amount > 0.0:
             result[str(key)] = amount
     return result
-
-
-def _is_oxide_species(species: str) -> bool:
-    if species in {"O2", "H2O", "CO2"}:
-        return False
-    if species == "REE_oxides":
-        return True
-    return bool(_OXIDE_FORMULA_RE.fullmatch(species))
 
 
 def _float_or_none(value: Any) -> float | None:

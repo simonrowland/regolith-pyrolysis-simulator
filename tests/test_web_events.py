@@ -211,6 +211,46 @@ def _force_socketio_internal_analytical(monkeypatch) -> list[tuple[object, tuple
     return captured_tasks
 
 
+def test_socketio_ledger_api_is_byte_identical_read_only(monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    assert client.is_connected()
+    before_sids = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        new_sids = set(_simulations) - before_sids
+        assert len(new_sids) == 1
+        sid = new_sids.pop()
+        ledger = _simulations[sid]["session"].simulator.atom_ledger
+        before = json.dumps(ledger.close_report(), sort_keys=True).encode()
+
+        response = client.emit(
+            "ledger_api",
+            {"resource": "account", "account": "process.cleaned_melt"},
+            callback=True,
+        )
+
+        after = json.dumps(ledger.close_report(), sort_keys=True).encode()
+        assert response["account"] == "process.cleaned_melt"
+        assert response["run_id"] == _simulations[sid]["run_id"]
+        assert after == before
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before_sids:
+            _clear_simulation_state(sid)
+
+
 def test_recipe_save_list_load_endpoints_round_trip_without_run(
     tmp_path,
     monkeypatch,
