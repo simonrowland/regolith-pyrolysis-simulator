@@ -2970,6 +2970,8 @@ def _force_builtin_run_from_config(run_config) -> PyrolysisRun:
         runtime_campaign_overrides=run_config.runtime_campaign_overrides,
         force_builtin_vapor_pressure=True,
         allow_fallback_vapor=True,
+        # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+        allow_unmeasured_alpha_fallback=True,
     )
 
 

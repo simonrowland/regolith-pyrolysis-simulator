@@ -208,6 +208,8 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
             "C2A_continuous",
             "--hours",
             "24",
+            # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+            "--allow-unmeasured-alpha-fallback",
             "--output",
             str(output_path),
         ],
@@ -259,6 +261,8 @@ def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
         feedstock_id="lunar_mare_low_ti",
         hours=1,
         include_diagnostics=True,
+        # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+        allow_unmeasured_alpha_fallback=True,
     )
 
     assert "wall_deposit_kg" in report

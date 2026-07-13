@@ -18,6 +18,23 @@ pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
 GOLDEN_PATH = Path("tests/goldens/sso_r_validation_map_lunar_mare_low_ti.json")
 
 
+@pytest.fixture(scope="module", autouse=True)
+def _allow_prototype_crmn_alpha_fallback():
+    original_load_data = validation_map._load_data
+
+    def load_data_with_alpha_fallback():
+        setpoints, feedstocks, vapor_pressures = original_load_data()
+        # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+        setpoints.setdefault("chemistry_kernel", {})["allow_unmeasured_alpha_fallback"] = True
+        return setpoints, feedstocks, vapor_pressures
+
+    validation_map._load_data = load_data_with_alpha_fallback
+    try:
+        yield
+    finally:
+        validation_map._load_data = original_load_data
+
+
 @pytest.fixture(scope="module")
 def smoke_payload():
     return validation_map.run_validation_map(smoke=True)

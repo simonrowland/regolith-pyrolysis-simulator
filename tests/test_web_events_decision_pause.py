@@ -47,6 +47,7 @@ from collections import Counter
 import pytest
 
 import app as app_module
+import web.events as events_module
 from simulator.core import PyrolysisSimulator
 from web.events import (
     _clear_simulation_state,
@@ -73,6 +74,19 @@ def _deterministic_liquidus_gate(monkeypatch):
         '_freeze_gate_curve',
         lambda self: dict(curve),
     )
+    original_load_yaml = events_module._load_yaml
+
+    def load_yaml_with_alpha_fallback(filename):
+        payload = original_load_yaml(filename)
+        if filename == 'setpoints.yaml':
+            payload = dict(payload)
+            kernel_config = dict(payload.get('chemistry_kernel', {}) or {})
+            # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+            kernel_config['allow_unmeasured_alpha_fallback'] = True
+            payload['chemistry_kernel'] = kernel_config
+        return payload
+
+    monkeypatch.setattr(events_module, '_load_yaml', load_yaml_with_alpha_fallback)
 
 # InternalAnalyticalBackend = deterministic baseline: no AlphaMELTS dependence (opt-in + slow
 # here) and no float drift between runs. The decision-gate state machine is

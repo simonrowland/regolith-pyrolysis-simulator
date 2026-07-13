@@ -49,6 +49,8 @@ def _run_tsweep(tmp_path: Path, feedstock: str, label: str, *grid_args: str):
             feedstock,
             "--output-dir",
             str(output_dir),
+            # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+            "--allow-unmeasured-alpha-fallback",
             *grid_args,
         ],
         check=False,
@@ -127,6 +129,8 @@ def test_sio_wall_sweep_cli_smoke(tmp_path):
             "1100,1500",
             "--pO2-modes",
             "no_suppress,o2_1mbar",
+            # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+            "--allow-unmeasured-alpha-fallback",
             "--output-dir",
             str(output_dir),
             "--summary-output",

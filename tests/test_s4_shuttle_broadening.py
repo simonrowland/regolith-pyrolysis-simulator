@@ -51,6 +51,10 @@ def _run_script(lines: list[str]):
         if line.startswith("start "):
             sim = runner.session.simulator
             sim._allow_fallback_vapor = True
+            # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+            sim.setpoints.setdefault("chemistry_kernel", {})[
+                "allow_unmeasured_alpha_fallback"
+            ] = True
             sim._chem_kernel = sim._build_chemistry_kernel()
             _force_vaporock_unavailable_for_sim(sim)
     return runner.session._sim

@@ -903,6 +903,20 @@ def _mass_balance_gate_profile() -> dict:
     }
 
 
+def _with_prototype_crmn_alpha_fallback(config):
+    setpoints = dict(config.setpoints)
+    kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
+    # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+    kernel_config["allow_unmeasured_alpha_fallback"] = True
+    setpoints["chemistry_kernel"] = kernel_config
+    return replace(config, setpoints=setpoints)
+
+
+class AlphaFallbackRunExecutor(RunExecutor):
+    def execute(self, config):
+        return super().execute(_with_prototype_crmn_alpha_fallback(config))
+
+
 @dataclass
 class ProductionMassBalanceReplayExecutor:
     mass_balance_error_pct: float | None = 0.0
@@ -914,7 +928,7 @@ class ProductionMassBalanceReplayExecutor:
 
     def execute(self, config: object) -> object:
         self.calls += 1
-        execution = RunExecutor().execute(config)
+        execution = RunExecutor().execute(_with_prototype_crmn_alpha_fallback(config))
         snapshots = tuple(getattr(execution, "snapshots", ()))
         assert snapshots
         overrides = {"mass_balance_error_pct": self.mass_balance_error_pct}
@@ -945,6 +959,7 @@ class ProductionMassBalanceRealPathExecutor:
 
     def execute(self, config: object) -> object:
         self.calls += 1
+        config = _with_prototype_crmn_alpha_fallback(config)
         session = SimSession()
         session.start(config)
         sim = session.simulator
@@ -1464,7 +1479,7 @@ def test_zero_input_extraction_completeness_is_named_and_serializable(tmp_path) 
         "lunar_mare_low_ti",
         "fast",
         profile=green_profile,
-        executor=RunExecutor(),
+        executor=AlphaFallbackRunExecutor(),
     )
     green_margin = green.feasibility_margins["extraction_completeness"]
     green_target = green.run_reference.product_summary["extraction_completeness"][
@@ -1484,7 +1499,7 @@ def test_zero_input_extraction_completeness_is_named_and_serializable(tmp_path) 
         "lunar_highlands_lhs1",
         "fast",
         profile=poison_profile,
-        executor=RunExecutor(),
+        executor=AlphaFallbackRunExecutor(),
     )
 
     assert not result.feasible

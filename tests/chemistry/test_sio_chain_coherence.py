@@ -91,6 +91,8 @@ def _report_at_wall_T(liner_temperature_c: float) -> tuple[dict[str, Any], dict[
         include_diagnostics=True,
         liner_temperature_c=liner_temperature_c,
         pO2_mbar=None,
+        # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+        allow_unmeasured_alpha_fallback=True,
     )
 
 

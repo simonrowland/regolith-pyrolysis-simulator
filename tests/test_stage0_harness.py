@@ -39,10 +39,13 @@ def _feedstocks(*, include_debug: bool = False) -> dict:
 
 
 def _session_config(feedstock_id: str, **overrides) -> SimSessionConfig:
+    setpoints = _load_yaml("setpoints.yaml")
+    # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+    setpoints.setdefault("chemistry_kernel", {})["allow_unmeasured_alpha_fallback"] = True
     values = {
         "feedstock_id": feedstock_id,
         "feedstocks": _feedstocks(),
-        "setpoints": _load_yaml("setpoints.yaml"),
+        "setpoints": setpoints,
         "vapor_pressures": _load_yaml("vapor_pressures.yaml"),
         "campaign": "C0",
         "backend_name": "stub",

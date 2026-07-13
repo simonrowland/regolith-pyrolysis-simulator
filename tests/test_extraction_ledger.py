@@ -1,5 +1,7 @@
 import shlex
+from dataclasses import replace
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 
@@ -30,6 +32,7 @@ from simulator.electrolysis import (
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.session_cli import SessionScriptRunner
+import simulator.session_cli as session_cli_module
 from simulator.state import (
     MOLAR_MASS,
     OXIDE_TO_METAL,
@@ -53,7 +56,26 @@ def _sim(feedstocks):
 def _run_session_script(lines: list[str]):
     runner = SessionScriptRunner()
     for line in lines:
-        runner.execute(shlex.split(line), line)
+        if line.startswith("start "):
+            original_load_config_bundle = session_cli_module.load_config_bundle
+
+            def load_config_bundle_with_alpha_fallback(*args, **kwargs):
+                bundle = original_load_config_bundle(*args, **kwargs)
+                setpoints = dict(bundle.setpoints)
+                kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
+                # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+                kernel_config["allow_unmeasured_alpha_fallback"] = True
+                setpoints["chemistry_kernel"] = kernel_config
+                return replace(bundle, setpoints=setpoints)
+
+            with patch.object(
+                session_cli_module,
+                "load_config_bundle",
+                load_config_bundle_with_alpha_fallback,
+            ):
+                runner.execute(shlex.split(line), line)
+        else:
+            runner.execute(shlex.split(line), line)
     return runner.session._sim
 
 

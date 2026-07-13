@@ -25,6 +25,8 @@ def _load_yaml(name: str) -> dict[str, Any]:
 def _make_sim(feedstock_id: str, *, temperature_C: float = 1600.0) -> PyrolysisSimulator:
     setpoints = _load_yaml("setpoints.yaml")
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
+    # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+    setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"] = True
     sim = PyrolysisSimulator(
         InternalAnalyticalBackend(),
         setpoints,

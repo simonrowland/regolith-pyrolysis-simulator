@@ -35,6 +35,8 @@ def build_headspace_sim(
     """
     setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
     setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
+    # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+    setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"] = True
     setpoints["overhead_headspace"]["enabled"] = bool(enabled)
 
     backend = InternalAnalyticalBackend()
