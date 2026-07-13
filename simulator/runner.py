@@ -2482,6 +2482,9 @@ def build_sio_yield_report(
             terminal_offgas[species] = (
                 terminal_offgas.get(species, 0.0) + float(mol)
             )
+    retained_holdup = final_state.get(
+        "process.condensation_retained_holdup", {}
+    )
 
     final_sio2_mol = float(cleaned_melt.get("SiO2", 0.0))
     sio_evaporated_mol = max(0.0, initial_sio2_mol - final_sio2_mol)
@@ -2489,11 +2492,13 @@ def build_sio_yield_report(
     sio2_terminal_mol = float(condensation_train.get("SiO2", 0.0))
     sio_wall_mol = _sio_wall_terminal_mol(wall_deposit)
     sio_escape_mol = float(terminal_offgas.get("SiO", 0.0))
+    sio_retained_holdup_mol = float(retained_holdup.get("SiO", 0.0))
     terminal_mol = (
         si_terminal_mol
         + sio2_terminal_mol
         + sio_wall_mol
         + sio_escape_mol
+        + sio_retained_holdup_mol
     )
     if sio_evaporated_mol > 0.0:
         closure_error_pct = abs(
@@ -2563,6 +2568,7 @@ def build_sio_yield_report(
             "sio2_terminal_mol": sio2_terminal_mol,
             "sio_wall_mol": sio_wall_mol,
             "sio_escape_mol": sio_escape_mol,
+            "sio_retained_holdup_mol": sio_retained_holdup_mol,
             "closure_error_pct": closure_error_pct,
             "mass_balance_error_pct": _latest_mass_balance_pct(result),
             "wall_deposit_total_kg": sum(float(v) for v in wall_deposit_kg.values()),

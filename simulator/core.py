@@ -50,6 +50,7 @@ from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
@@ -343,6 +344,7 @@ FLOW_MASS_ACCOUNTS = (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
     'process.raw_feedstock',
     'process.condensation_train',
+    CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     WALL_DEPOSIT_ACCOUNT,
     *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
     'process.overhead_gas',

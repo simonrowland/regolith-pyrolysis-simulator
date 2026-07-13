@@ -16,6 +16,7 @@ from simulator.accounting.exceptions import (
 )
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, resolve_species_formula
 from simulator.accounting.lots import MaterialLot
+from simulator.account_ids import CONDENSATION_RETAINED_HOLDUP_ACCOUNT
 
 # Per-transition mass-closure slack. The element gate below is the binding
 # conservation check for known formulas; this mass gate gives unknown-species
@@ -54,6 +55,7 @@ KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
     "process.cleaned_melt",
     "process.c7_al_credit",
     "process.condensation_train",
+    CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     "process.metal_phase",
     "process.metal_phase_bottom_pool",
     "process.metal_phase_float_layer",

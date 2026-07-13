@@ -12,8 +12,9 @@ provider receives the per-species condensed-mass projection via
 
 The provider:
 
-- reads ``process.overhead_gas``, ``process.condensation_train``,
-  ``process.wall_deposit``, and
+- reads ``process.overhead_gas``,
+  ``process.condensation_retained_holdup``,
+  ``process.condensation_train``, ``process.wall_deposit``, and
   declared product bins from the account view -- the accounts the
   deposition leg touches (debit vapor from overhead, credit deposits).
   ``process.cleaned_melt`` is NOT in the declared set: the
@@ -56,7 +57,8 @@ engages atom-balance validation at dispatch time AND again at commit
 time.
 
 Account declaration: ``process.overhead_gas``,
-``process.condensation_train``, and ``process.wall_deposit``. The
+``process.condensation_retained_holdup``, ``process.condensation_train``,
+and ``process.wall_deposit``. The
 deposition leg is strictly an overhead -> destination transfer; declaring
 ``process.cleaned_melt`` here would be an account-scope leak (the melt is
 the EVAPORATION_TRANSITION provider's responsibility, not ours). The
@@ -88,6 +90,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.account_ids import CONDENSATION_RETAINED_HOLDUP_ACCOUNT
 from simulator.condensation import (
     C4B_WALL_ROUTE_ORDER,
     WALL_DEPOSIT_ACCOUNT,
@@ -110,10 +113,12 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
     name = "builtin-condensation-route"
     CHROMIUM_CONDENSED_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
     GASEOUS_CONDENSATION_COPRODUCTS = frozenset({"O2"})
+    RETAINED_HOLDUP_ACCOUNT = CONDENSATION_RETAINED_HOLDUP_ACCOUNT
 
     BASE_DECLARED_ACCOUNTS = frozenset({
         "process.overhead_gas",
         "process.condensation_train",
+        RETAINED_HOLDUP_ACCOUNT,
         WALL_DEPOSIT_ACCOUNT,
         CHROMIUM_CONDENSED_ACCOUNT,
     })
@@ -162,16 +167,20 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 diagnostic={"reason": "missing 'species' control input"},
             )
 
-        condensed_kg = float(controls.get("condensed_kg") or 0.0)
+        current_condensed_kg = float(controls.get("condensed_kg") or 0.0)
         sp_data = dict(controls.get("sp_data") or {})
         dt_hr = float(controls.get("dt_hr", 1.0))  # noqa: F841 -- kept for unit symmetry
+        registry = request.account_view.species_formula_registry
+        vapor_formula = resolve_species_formula(species, registry)
+        vapor_molar_mass = vapor_formula.molar_mass_kg_per_mol()
+        prior_holdup_mol = float(
+            request.account_view.accounts.get(
+                self.RETAINED_HOLDUP_ACCOUNT, {}
+            ).get(species, 0.0)
+        )
+        retained_holdup_kg = prior_holdup_mol * vapor_molar_mass
 
-        # Below the numerical floor: emit an ok-no-op so the caller's
-        # downstream stage-projection skip path stays unambiguous. The
-        # legacy `CondensationModel.route` short-circuits on the same
-        # 1e-15 kg / 1e-12 kg thresholds; we use 1e-12 here matching
-        # `_credit_evaporation_transition` for cross-provider consistency.
-        if condensed_kg <= 1e-12:
+        if current_condensed_kg <= 1e-12:
             return IntentResult(
                 intent=ChemistryIntent.CONDENSATION_ROUTE,
                 status="ok",
@@ -180,6 +189,12 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 diagnostic={
                     "credited_condensed_kg": 0.0,
                     "reason_skipped": "below numerical floor",
+                    "retained_holdup_account": "process.overhead_gas",
+                    "retained_holdup_kg": float(current_condensed_kg),
+                    "retained_holdup_lifecycle": (
+                        "nonretryable_overhead_holdup_pending_typed_bleed"
+                    ),
+                    "typed_retry_holdup_kg": float(retained_holdup_kg),
                 },
             )
 
@@ -192,7 +207,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         if invalid_route is not None:
             return invalid_route
 
-        registry = request.account_view.species_formula_registry
+        condensed_kg = current_condensed_kg
         declared_accounts = self._declared_accounts()
         refused_account = self._undeclared_wall_deposit_account(
             controls, declared_accounts)
@@ -273,6 +288,35 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         )
 
         credits = self._credits_by_product_account(condensed_product_mol, sp_data)
+        # Prior retained vapor retries only through stable baffle chemistry;
+        # newly arriving vapor keeps this tick's physical wall split. Merging
+        # identical product/account components lets prior+current cross the
+        # MaterialLot floor without rerouting current wall deposition.
+        prior_product_mol = self._condensed_product_mol(
+            species,
+            retained_holdup_kg,
+            sp_data,
+            registry,
+            resolve_species_formula,
+        )
+        prior_credits = self._credits_by_product_account(
+            prior_product_mol, sp_data
+        )
+        prior_credits_materializable = bool(prior_credits) and all(
+            float(mol)
+            * resolve_species_formula(
+                product_species, registry
+            ).molar_mass_kg_per_mol()
+            > EMPTY_KG_TOLERANCE
+            for product_mol in prior_credits.values()
+            for product_species, mol in product_mol.items()
+        )
+        for account, product_mol in prior_credits.items():
+            account_credits = credits.setdefault(account, {})
+            for product_species, mol in product_mol.items():
+                account_credits[product_species] = (
+                    account_credits.get(product_species, 0.0) + float(mol)
+                )
         (
             subfloor_baffle_credits_kg,
             folded_baffle_kg_by_wall_account,
@@ -304,6 +348,76 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         retained_wall_kg = sum(retained_wall_kg_by_account.values())
         credited_wall_deposit_kg = max(0.0, wall_deposit_kg - retained_wall_kg)
 
+        retry_failed = bool(subfloor_baffle_credits_kg) or retained_wall_kg > 0.0
+        if retry_failed:
+            # Retained-holdup derivation (t-054 pO2-hold -> pN2-sweep
+            # analogue): D_overhead(current) + optional D_holdup(prior)
+            # equals C_holdup(current) + prior baffle-route credits exactly,
+            # atom-for-atom. Until prior baffle products materialize, prior is
+            # untouched and current joins it. Once they materialize, prior
+            # drains even if current wall chemistry still fails; current alone
+            # replaces the hold. Thus new vapor keeps current wall physics and
+            # stable, validated positive baffle product ratios bound the hold
+            # by floor/min(product mass fraction) plus one current parcel. A
+            # finite value with no later arrival is reported terminal holdup.
+            current_mol = current_condensed_kg / vapor_molar_mass
+            retain_debits = {
+                "process.overhead_gas": {species: current_mol},
+            }
+            retain_credits = {
+                self.RETAINED_HOLDUP_ACCOUNT: {species: current_mol},
+            }
+            drained_prior_kg = 0.0
+            if prior_holdup_mol > 0.0 and prior_credits_materializable:
+                retain_debits[self.RETAINED_HOLDUP_ACCOUNT] = {
+                    species: prior_holdup_mol
+                }
+                for account, product_mol in prior_credits.items():
+                    account_credits = retain_credits.setdefault(account, {})
+                    for product_species, mol in product_mol.items():
+                        account_credits[product_species] = (
+                            account_credits.get(product_species, 0.0)
+                            + float(mol)
+                        )
+                drained_prior_kg = retained_holdup_kg
+            retain_proposal = LedgerTransitionProposal(
+                debits=retain_debits,
+                credits=retain_credits,
+                reason=f"retain_condensation_holdup_{species}",
+                atom_balance_proof=build_atom_balance_proof(
+                    retain_debits,
+                    retain_credits,
+                    registry,
+                    resolve_species_formula,
+                ),
+            )
+            return IntentResult(
+                intent=ChemistryIntent.CONDENSATION_ROUTE,
+                status="ok",
+                transition=retain_proposal,
+                control_audit=control_audit,
+                diagnostic={
+                    "credited_condensed_kg": float(drained_prior_kg),
+                    "credited_wall_deposit_kg": 0.0,
+                    "retained_holdup_account": self.RETAINED_HOLDUP_ACCOUNT,
+                    "retained_holdup_kg": float(
+                        current_condensed_kg
+                        + (0.0 if drained_prior_kg else retained_holdup_kg)
+                    ),
+                    "retained_holdup_added_kg": float(current_condensed_kg),
+                    "retained_holdup_drained_kg": float(drained_prior_kg),
+                    "retained_holdup_retry_route": "stable_baffle_chemistry",
+                    "reason_skipped": "coupled product below numerical floor",
+                    "wall_alkali_binding_diagnostic_state_by_account": (
+                        self._copy_alkali_state(
+                            controls.get(
+                                "wall_alkali_binding_diagnostic_state_by_account"
+                            )
+                        )
+                    ),
+                },
+            )
+
         if not credits and not wall_plan["product_mol_by_account"]:
             return IntentResult(
                 intent=ChemistryIntent.CONDENSATION_ROUTE,
@@ -316,21 +430,23 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 },
             )
 
+        baffle_condensed_kg += retained_holdup_kg
+
         # ------------------------------------------------------------------
         # Build the mol-native proposal. Per-account species_mol dicts:
         #   debits:  process.overhead_gas         -> {species: mol}
         #   credits: process.condensation_train   -> {product: mol, ...}
         #            or product-specific accounts declared in sp_data
         # ------------------------------------------------------------------
-        vapor_formula = resolve_species_formula(species, registry)
-        credited_vapor_kg = max(
-            0.0,
-            condensed_kg - retained_baffle_kg - retained_wall_kg,
-        )
-        vapor_mol = credited_vapor_kg / vapor_formula.molar_mass_kg_per_mol()
         debits: dict[str, dict[str, float]] = {
-            "process.overhead_gas": {species: vapor_mol},
+            "process.overhead_gas": {
+                species: current_condensed_kg / vapor_molar_mass
+            },
         }
+        if prior_holdup_mol > 0.0:
+            debits[self.RETAINED_HOLDUP_ACCOUNT] = {
+                species: prior_holdup_mol
+            }
         for account, species_mol in wall_plan[
             "substrate_debit_mol_by_account"
         ].items():
@@ -392,6 +508,12 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 "numerical_floor_retained_overhead_kg": float(
                     retained_baffle_kg + retained_wall_kg
                 ),
+                "retained_holdup_account": self.RETAINED_HOLDUP_ACCOUNT,
+                "retained_holdup_kg": float(
+                    retained_baffle_kg + retained_wall_kg
+                ),
+                "retained_holdup_drained_kg": float(retained_holdup_kg),
+                "retained_holdup_retry_route": "stable_baffle_chemistry",
                 "numerical_floor_retained_baffle_kg": float(retained_baffle_kg),
                 "numerical_floor_retained_wall_kg_by_account": (
                     retained_wall_kg_by_account

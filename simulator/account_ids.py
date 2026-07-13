@@ -4,6 +4,9 @@ OXYGEN_SPECIES = "O2"
 METAL_PHASE_ACCOUNT = "process.metal_phase"
 METAL_BOTTOM_POOL_ACCOUNT = "process.metal_phase_bottom_pool"
 METAL_FLOAT_LAYER_ACCOUNT = "process.metal_phase_float_layer"
+CONDENSATION_RETAINED_HOLDUP_ACCOUNT = (
+    "process.condensation_retained_holdup"
+)
 METAL_PHASE_ACCOUNTS = (
     METAL_PHASE_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,

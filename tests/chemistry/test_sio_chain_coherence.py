@@ -109,6 +109,7 @@ def test_sio_chain_closes_evolved_to_stage_wall_and_terminal_products():
         + diagnostics["sio2_terminal_mol"]
         + diagnostics["sio_wall_mol"]
         + diagnostics["sio_escape_mol"]
+        + diagnostics["sio_retained_holdup_mol"]
     )
 
     assert terminal_mol == pytest.approx(diagnostics["sio_evaporated_mol"])

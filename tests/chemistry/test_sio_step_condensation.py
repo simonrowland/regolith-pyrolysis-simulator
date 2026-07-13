@@ -34,6 +34,11 @@ def _terminal_escape_sio_mol(liner_temperature_c: float) -> float:
     return float(diagnostics["sio_escape_mol"])
 
 
+def _retained_holdup_sio_mol(liner_temperature_c: float) -> float:
+    _, diagnostics = _report_at_wall_T(liner_temperature_c)
+    return float(diagnostics["sio_retained_holdup_mol"])
+
+
 def _captured_sio_equivalent_mol(liner_temperature_c: float) -> float:
     _, diagnostics = _report_at_wall_T(liner_temperature_c)
     return float(
@@ -47,9 +52,13 @@ def test_subfloor_sio_does_not_create_unmaterialized_stage3_product():
     # At this wall temperature the Stage-3 Si and SiO2 product components are
     # each at or below MaterialLot's 1e-12 kg per-species floor.  Reporting a
     # positive collection would project material that the ledger refused to
-    # retain; the uncommitted parcel must remain in the SiO escape inventory.
+    # retain; the parcel must enter the typed condensation holdup lifecycle,
+    # then either drain on a later tick or remain separately reported from
+    # terminal escape inventory.
     assert _stage3_silica_kg(1400.0) == 0.0
-    assert _terminal_escape_sio_mol(1400.0) > 0.0
+    retained_mol = _retained_holdup_sio_mol(1400.0)
+    assert retained_mol >= 0.0
+    assert retained_mol + _terminal_escape_sio_mol(1400.0) > 0.0
 
 
 def test_wall_band_capture_stays_bounded_after_reactive_sio_fix():

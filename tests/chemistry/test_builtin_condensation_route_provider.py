@@ -294,6 +294,7 @@ def test_provider_declares_condensation_accounts():
     assert profile.declared_accounts == frozenset({
         "process.overhead_gas",
         "process.condensation_train",
+        "process.condensation_retained_holdup",
         "process.wall_deposit",
         "terminal.chromium_condensed_oxide_stored",
         *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
@@ -510,6 +511,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     expected = frozenset({
         "process.overhead_gas",
         "process.condensation_train",
+        "process.condensation_retained_holdup",
         "process.wall_deposit",
         "terminal.chromium_condensed_oxide_stored",
         *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
@@ -694,6 +696,15 @@ def test_evaporation_caller_dispatches_condensation_floor_to_provider(
         assert result.transition is None
         assert result.diagnostic["reason_skipped"] == "below numerical floor"
         assert result.diagnostic["credited_condensed_kg"] == pytest.approx(0.0)
+        assert result.diagnostic["retained_holdup_account"] == (
+            "process.overhead_gas"
+        )
+        assert result.diagnostic["retained_holdup_kg"] == pytest.approx(
+            condensed_kg
+        )
+        assert result.diagnostic["retained_holdup_lifecycle"] == (
+            "nonretryable_overhead_holdup_pending_typed_bleed"
+        )
         assert sim._chem_no_op_dispatch_count == no_op_count_before + 1
     else:
         assert result.transition is not None
@@ -704,6 +715,121 @@ def test_evaporation_caller_dispatches_condensation_floor_to_provider(
         assert sim.atom_ledger.kg_by_account("process.condensation_train")[
             "Na"
         ] == pytest.approx(condensed_kg)
+
+
+def test_subfloor_holdup_persists_one_tick_then_accumulates_and_drains(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    parcel_kg = 2.0e-12
+    total_kg = 2.0 * parcel_kg
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"SiO": parcel_kg},
+        source="two-tick retained-condensation-holdup tick-1 seed",
+    )
+    route_result = CondensationRouteResult()
+    seen_diagnostics = []
+    seen_transitions = []
+    original_dispatch_and_commit = sim._dispatch_and_commit
+
+    def _capture(intent, *, control_inputs):
+        result = original_dispatch_and_commit(
+            intent,
+            control_inputs=control_inputs,
+        )
+        if intent is ChemistryIntent.CONDENSATION_ROUTE:
+            seen_diagnostics.append(dict(result.diagnostic or {}))
+            seen_transitions.append(result.transition)
+        return result
+
+    sim._dispatch_and_commit = _capture
+
+    first_credit_kg = sim._dispatch_condensation_route(
+        "SiO",
+        parcel_kg,
+        {
+            "condensation_products_mol_per_mol_vapor": {
+                "Si": 0.5,
+                "SiO2": 0.5,
+            },
+        },
+        route_result,
+    )
+    assert first_credit_kg == pytest.approx(0.0)
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas").get(
+        "SiO", 0.0
+    ) == pytest.approx(0.0, rel=0.0, abs=1e-24)
+    assert sim.atom_ledger.kg_by_account(
+        "process.condensation_retained_holdup"
+    )["SiO"] == (
+        pytest.approx(parcel_kg, rel=0.0, abs=1e-24)
+    )
+    assert seen_diagnostics[-1]["retained_holdup_account"] == (
+        "process.condensation_retained_holdup"
+    )
+    assert seen_diagnostics[-1]["retained_holdup_kg"] == pytest.approx(
+        parcel_kg, rel=0.0, abs=1e-24
+    )
+    assert seen_transitions[-1] is not None
+    assert set(seen_transitions[-1].debits) == {"process.overhead_gas"}
+    assert set(seen_transitions[-1].credits) == {
+        "process.condensation_retained_holdup"
+    }
+
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"SiO": parcel_kg},
+        source="two-tick retained-condensation-holdup tick-2 seed",
+    )
+    second_credit_kg = sim._dispatch_condensation_route(
+        "SiO",
+        parcel_kg,
+        {
+            "condensation_products_mol_per_mol_vapor": {
+                "Si": 0.5,
+                "SiO2": 0.5,
+            },
+        },
+        route_result,
+    )
+    assert second_credit_kg == pytest.approx(total_kg, rel=0.0, abs=1e-24)
+    assert sim.atom_ledger.kg_by_account("process.overhead_gas").get(
+        "SiO", 0.0
+    ) == pytest.approx(0.0, rel=0.0, abs=1e-24)
+    assert sim.atom_ledger.kg_by_account(
+        "process.condensation_retained_holdup"
+    ).get("SiO", 0.0) == pytest.approx(0.0, rel=0.0, abs=1e-24)
+    assert sum(
+        sim.atom_ledger.kg_by_account("process.condensation_train").values()
+    ) == pytest.approx(total_kg, rel=0.0, abs=1e-24)
+    assert set(
+        sim.atom_ledger.kg_by_account("process.condensation_train")
+    ) == {"Si", "SiO2"}
+    assert seen_diagnostics[-1]["retained_holdup_kg"] == pytest.approx(0.0)
+    assert seen_diagnostics[-1]["retained_holdup_drained_kg"] == pytest.approx(
+        parcel_kg, rel=0.0, abs=1e-24
+    )
+    assert seen_transitions[-1] is not None
+    assert set(seen_transitions[-1].debits) == {
+        "process.overhead_gas",
+        "process.condensation_retained_holdup",
+    }
+    drained_mol = seen_transitions[-1].debits[
+        "process.condensation_retained_holdup"
+    ]["SiO"]
+    assert drained_mol * resolve_species_formula(
+        "SiO", sim.species_formula_registry
+    ).molar_mass_kg_per_mol() == pytest.approx(
+        parcel_kg, rel=0.0, abs=1e-24
+    )
 
 
 def test_condensation_proposal_ignores_tier_one_phase_context_fields(
@@ -1225,7 +1351,7 @@ def test_provider_rolls_back_near_floor_wall_chemistry_to_unchanged_species(
     "species, substrate_species",
     [("Mg", "SiO2"), ("Fe", "Si")],
 )
-def test_subfloor_wall_debit_retains_only_that_parcel_and_commits_baffle(
+def test_subfloor_wall_component_retains_whole_coupled_candidate(
     species,
     substrate_species,
     vapor_pressure_data,
@@ -1270,19 +1396,148 @@ def test_subfloor_wall_debit_retains_only_that_parcel_and_commits_baffle(
 
     assert result.transition is not None
     proposal = result.transition
-    expected_baffle_mol = (condensed_kg - wall_kg) / vapor_molar_mass
+    expected_candidate_mol = condensed_kg / vapor_molar_mass
     assert proposal.debits["process.overhead_gas"][species] == pytest.approx(
-        expected_baffle_mol
+        expected_candidate_mol
     )
-    assert proposal.credits["process.condensation_train"][species] == pytest.approx(
-        expected_baffle_mol
+    assert proposal.credits[
+        "process.condensation_retained_holdup"
+    ][species] == pytest.approx(
+        expected_candidate_mol
     )
+    assert "process.condensation_train" not in proposal.credits
     assert "process.wall_deposit" not in proposal.debits
     assert "process.wall_deposit" not in proposal.credits
-    assert result.diagnostic["numerical_floor_retained_overhead_kg"] == pytest.approx(
-        wall_kg, rel=0.0, abs=1e-24
+    assert result.diagnostic["retained_holdup_kg"] == pytest.approx(
+        condensed_kg, rel=0.0, abs=1e-24
     )
     _assert_atom_proof_closed(proposal)
+
+
+def test_retained_holdup_drain_ignores_adversarially_shrinking_wall_fraction(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    species = "Mg"
+    parcel_kg = 1.0e-8
+    molar_mass = resolve_species_formula(
+        species, sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    parcel_mol = parcel_kg / molar_mass
+    result = provider.dispatch(IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {species: parcel_mol},
+                "process.condensation_retained_holdup": {species: parcel_mol},
+                "process.condensation_train": {},
+                "process.wall_deposit": {"SiO2": 1.0},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": species,
+            "condensed_kg": parcel_kg,
+            "sp_data": {},
+            # Without the stable retry route this ever-smaller split can keep
+            # a wall component below the floor while the whole hold grows.
+            "wall_deposit_fraction": 1.0e-20,
+            "wall_deposit_account_fractions": {
+                "process.wall_deposit": 1.0,
+            },
+            "dt_hr": 1.0,
+        },
+    ))
+
+    assert result.transition is not None
+    assert set(result.transition.debits) == {
+        "process.overhead_gas",
+        "process.condensation_retained_holdup",
+    }
+    assert result.transition.credits == {
+        "process.condensation_retained_holdup": {
+            species: pytest.approx(parcel_mol)
+        },
+        "process.condensation_train": {
+            species: pytest.approx(parcel_mol)
+        },
+    }
+    assert "process.wall_deposit" not in result.transition.credits
+    assert result.diagnostic["retained_holdup_kg"] == pytest.approx(parcel_kg)
+    assert result.diagnostic["retained_holdup_drained_kg"] == pytest.approx(
+        parcel_kg
+    )
+    assert result.diagnostic["credited_condensed_kg"] == pytest.approx(parcel_kg)
+    _assert_atom_proof_closed(result.transition)
+
+
+def test_prior_holdup_drains_without_bypassing_current_wall_route(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    species = "Na"
+    parcel_kg = 1.0e-8
+    molar_mass = resolve_species_formula(
+        species, sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    parcel_mol = parcel_kg / molar_mass
+    result = provider.dispatch(IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {species: parcel_mol},
+                "process.condensation_retained_holdup": {species: parcel_mol},
+                "process.condensation_train": {},
+                "process.wall_deposit": {"SiO2": 1.0},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": species,
+            "condensed_kg": parcel_kg,
+            "sp_data": {},
+            "wall_deposit_fraction": 0.5,
+            "wall_deposit_account_fractions": {
+                "process.wall_deposit": 1.0,
+            },
+            "wall_temperature_K": 1062.0,
+            "wall_deposit_account_temperatures_K": {
+                "process.wall_deposit": 1062.0,
+            },
+            "dt_hr": 1.0,
+        },
+    ))
+
+    assert result.transition is not None
+    assert set(result.transition.debits) == {
+        "process.overhead_gas",
+        "process.condensation_retained_holdup",
+    }
+    assert "process.wall_deposit" in result.transition.credits
+    assert "process.condensation_train" in result.transition.credits
+    assert result.diagnostic["credited_wall_deposit_kg"] == pytest.approx(
+        0.5 * parcel_kg
+    )
+    assert result.diagnostic["retained_holdup_drained_kg"] == pytest.approx(
+        parcel_kg
+    )
+    _assert_atom_proof_closed(result.transition)
 
 
 def test_provider_routes_wall_deposit_to_segment_accounts(
