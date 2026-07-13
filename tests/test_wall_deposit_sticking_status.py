@@ -24,6 +24,9 @@ from simulator.trace import PhysicsTrace
 from web.routes import _coating_readout
 
 
+pytestmark = pytest.mark.usefixtures("production_configured_condensation_route")
+
+
 def _alpha_notice(species: str, *, cited: bool) -> dict[str, object]:
     return {
         "alpha_s_provenance_by_species": {

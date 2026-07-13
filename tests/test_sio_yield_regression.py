@@ -19,6 +19,9 @@ from simulator.state import (
 )
 
 
+pytestmark = pytest.mark.usefixtures("production_configured_condensation_route")
+
+
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "sio_yield"
 
 GOLDENS = (

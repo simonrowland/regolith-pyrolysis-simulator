@@ -5,6 +5,9 @@ import re
 import shutil
 import tempfile
 from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
 
 
 def _safe_worker_id(worker_id: str) -> str:
@@ -54,3 +57,68 @@ def _configure_worker_cache_isolation() -> None:
 
 
 _configure_worker_cache_isolation()
+
+
+@pytest.fixture
+def production_configured_condensation_route(monkeypatch):
+    """Auto-configure direct condensation routes from live transport state."""
+
+    from simulator.condensation import CondensationModel
+    from simulator.core import PyrolysisSimulator
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import clamp_stir_factor
+
+    route = CondensationModel.route
+
+    def configured_route(model, evap_flux, melt):
+        if not model._knudsen_policy_configured:
+            segment_temperatures_C = {
+                segment.name: segment.wall_temperature_C
+                for segment in model.pipe_segments
+            }
+            overhead_model = OverheadGasModel(
+                {
+                    "liner_temperature_C": model.wall_temperature_C,
+                    "pipe_segment_temperatures_C": {
+                        "default_C": model.wall_temperature_C,
+                        "segments": segment_temperatures_C,
+                    },
+                }
+            )
+            transport = overhead_model.estimate_transport_state(evap_flux, melt)
+            carrier_context = SimpleNamespace(
+                melt=melt,
+                setpoints={},
+                _normalize_condensation_carrier_gas=(
+                    PyrolysisSimulator._normalize_condensation_carrier_gas
+                ),
+            )
+            model.configure_operating_conditions(
+                wall_temperature_C=transport["pipe_temperature_C"],
+                overhead_pressure_mbar=transport["pressure_mbar"],
+                pipe_diameter_m=overhead_model.pipe_diameter_m,
+                gas_temperature_C=transport["pipe_temperature_C"],
+                stage_area_m2_by_stage=transport["stage_area_m2_by_stage"],
+                stage_area_geometry_provenance_notice=transport.get(
+                    "stage_area_geometry_provenance_notice", {}
+                ),
+                pipe_segment_temperatures_C=(
+                    overhead_model.resolve_pipe_segment_temperatures_C(
+                        list(segment_temperatures_C), melt
+                    )
+                ),
+                stir_factor=clamp_stir_factor(
+                    getattr(getattr(melt, "stir_state", None), "axial", None)
+                ),
+                radial_stir_factor=clamp_stir_factor(
+                    getattr(getattr(melt, "stir_state", None), "radial", None)
+                ),
+                carrier_gas=PyrolysisSimulator._resolve_condensation_carrier_gas(
+                    carrier_context
+                ),
+                campaign_name=str(getattr(melt.campaign, "name", "")),
+                campaign_hour=float(getattr(melt, "campaign_hour", 0.0) or 0.0),
+            )
+        return route(model, evap_flux, melt)
+
+    monkeypatch.setattr(CondensationModel, "route", configured_route)
