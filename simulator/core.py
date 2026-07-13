@@ -716,6 +716,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.oxygen_cumulative_kg = 0.0
         self._last_condensed_by_stage_species_delta: Dict[
             Tuple[int, str], float] = {}
+        self._stage_collection_kg_by_source: Dict[
+            Tuple[str, int, str], float
+        ] = {}
         self._last_wall_deposit_by_segment_species_delta: Dict[
             Tuple[str, str], float] = {}
         self._last_impurity_delta: Dict[Tuple[int, str], float] = {}

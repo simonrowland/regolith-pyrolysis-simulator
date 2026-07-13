@@ -2351,6 +2351,12 @@ class EvaporationMixin:
                         stage.collected_kg.get(product, 0.0)
                         + stage_product_kg)
                 })
+                self._record_stage_collection_source(
+                    'process.condensation_train',
+                    stage_number,
+                    product,
+                    stage_product_kg,
+                )
 
     def _update_melt_composition(self, evap_flux: EvaporationFlux):
         """Project the cleaned-melt account onto MeltState kg fields."""
