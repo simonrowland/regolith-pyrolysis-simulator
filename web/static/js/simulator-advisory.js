@@ -562,6 +562,7 @@ function renderThermalTrainHeadline(response) {
 
 function refreshThermalTrainHeadline(isRetry) {
     if (!document.getElementById('thermal-train-headline')) return;
+    if (typeof socket.emit !== 'function') return;
     const generation = thermalTrainHeadlineGeneration;
     socket.emit(
         'ledger_api',
