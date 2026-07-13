@@ -760,6 +760,10 @@ def _assert_schema_shape(payload: dict) -> None:
         # "vaporock_backsolved_curve_fit:backsolved_vaporock_curve_fit",
         # "builtin_extrapolation_limited:..."). The contract pins the CLASS
         # prefix, not the exact suffixed string.
+        # "builtin_authority_limited" is the reconstructed-authority class
+        # introduced by the Ellingham-authority provenance fix (4256fda):
+        # authority limited by reconstruction, distinct from authoritative
+        # fits and from fit-range extrapolation.
         assert source.split(":", 1)[0] in {
             "thermoengine",
             "alphamelts_python_api",
@@ -768,6 +772,7 @@ def _assert_schema_shape(payload: dict) -> None:
             "vaporock_backsolved_curve_fit",
             "builtin_fallback",
             "builtin_authoritative",
+            "builtin_authority_limited",
             "builtin_extrapolation_limited",
             "kernel_diagnostic",
         }
