@@ -13,6 +13,7 @@ from flask import Flask
 import pytest
 import yaml
 
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.corpus_version import current_corpus_version
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.optimize.evalspec import EvalSpec, current_code_version
@@ -78,7 +79,7 @@ def _eval_spec_payload(
         "fidelity": "fast",
         "code_version": code_version,
         "data_digests": data_digests or _data_digests(),
-        "backend_name": "stub",
+        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
         "chemistry_kernel": {"engine": "builtin"},
         "allowlist_version": schema.allowlist_version,
         "bounds_digest": schema.bounds_digest,

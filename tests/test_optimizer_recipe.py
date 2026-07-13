@@ -453,7 +453,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # wave-11 audit-contract request-shape fix moves the source fingerprint AND
     # wave-12-cost-params hashes default cost parameters into EvalSpec; the key
     # below is their joint cache identity at v0.6.0 code_version.
-    assert cache_key(spec) == "ff9ba84f76ff9433a63df7709a11bdc914991f5ba272efb72cb5ab3eda049ee4"
+    # 2026-07-12 runtime-pressure rebaseline: vapor_pressure.py is an explicit
+    # EvalSpec source-fingerprint input, so the provider change moves this key.
+    assert cache_key(spec) == "3b5f9dcbff39fd55d9c31b3aa4e501e2e5701f5da8f012f4842675a408966e80"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
