@@ -41,8 +41,13 @@ Action = Callable[[], None]
 class _AdmissibilityProvider(ChemistryProvider):
     name = "admissibility_provider"
 
-    def __init__(self, declared_accounts: set[str] | frozenset[str]) -> None:
+    def __init__(
+        self,
+        declared_accounts: set[str] | frozenset[str],
+        transition: LedgerTransitionProposal | None = None,
+    ) -> None:
         self._declared_accounts = frozenset(declared_accounts)
+        self._transition = transition
 
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
@@ -53,7 +58,13 @@ class _AdmissibilityProvider(ChemistryProvider):
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
-        return IntentResult(intent=request.intent, status="unsupported")
+        if self._transition is None:
+            return IntentResult(intent=request.intent, status="unsupported")
+        return IntentResult(
+            intent=request.intent,
+            status="ok",
+            transition=self._transition,
+        )
 
 
 def _strict_ledger(**kwargs) -> AtomLedger:
@@ -68,6 +79,7 @@ def _kernel(
     ledger: AtomLedger,
     *,
     declared_accounts: set[str] | frozenset[str] | None = None,
+    transition: LedgerTransitionProposal | None = None,
 ) -> ChemistryKernel:
     accounts = set(KNOWN_LEDGER_ACCOUNTS)
     accounts.update(
@@ -82,14 +94,21 @@ def _kernel(
         accounts.update(declared_accounts)
     registry = ProviderRegistry()
     registry.register(
-        _AdmissibilityProvider(accounts),
+        _AdmissibilityProvider(accounts, transition),
         [ChemistryIntent.EVAPORATION_TRANSITION],
     )
     return ChemistryKernel(ledger, registry, species_formula_registry={})
 
 
 def _commit(ledger: AtomLedger, proposal: LedgerTransitionProposal) -> None:
-    _kernel(ledger).commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, proposal)
+    kernel = _kernel(ledger, transition=proposal)
+    result = kernel.dispatch(
+        ChemistryIntent.EVAPORATION_TRANSITION,
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+    )
+    assert result.transition is not None
+    kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, result.transition)
 
 
 def _assert_valid_kernel_control() -> None:

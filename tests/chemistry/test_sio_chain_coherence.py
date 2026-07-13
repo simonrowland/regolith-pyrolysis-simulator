@@ -79,7 +79,12 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # 2026-07-11 integrated-runtime: the 24 h track enters controlled-O2 C3 at
 # global hour 19. O2 is now the condensation carrier for that campaign rather
 # than the old N2 fallback; wall-temperature invariance remains exact.
-PHASE3BIS_SIO_EVOLVED_KG = 8.71384522005e-06
+# 2026-07-12 runtime-pressure replaces the synthetic transport-pressure path
+# with summed runtime partials plus physical regulator/valve/throat controls.
+# The resulting coupled headspace trajectory moves this executable pin
+# independently of the condensation accounting repair; all four wall
+# temperatures execute to the same value.
+PHASE3BIS_SIO_EVOLVED_KG = 1.77220591892e-05
 
 
 @lru_cache(maxsize=None)

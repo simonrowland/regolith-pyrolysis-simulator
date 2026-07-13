@@ -139,6 +139,7 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         # init -- see engines/builtin/__init__.py for the cycle
         # description.
         from simulator.accounting.formulas import resolve_species_formula
+        from simulator.accounting.lots import EMPTY_KG_TOLERANCE
 
         wrong_intent = reject_wrong_intent(
             request, ChemistryIntent.CONDENSATION_ROUTE
@@ -246,7 +247,64 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             controls,
         )
 
-        if not condensed_product_mol and not wall_plan["product_mol_by_account"]:
+        # MaterialLot applies its floor independently to every account/species
+        # component on both sides.  Roll back only wall parcels whose coupled
+        # reaction cannot materialize exactly; the arriving vapor then lands
+        # unchanged on that same wall account and the substrate stays put.
+        # This preserves the exact invariant, per species/form and therefore
+        # per element: sum(debits) == sum(credits).  Removing a coupled
+        # reaction removes all of its substrate debits and product credits,
+        # while replacing the parcel's vapor debit with an equal-mol credit of
+        # the unchanged vapor species.
+        wall_plan, retained_wall_mol_by_account = (
+            self._materialization_safe_wall_plan(
+                species,
+                wall_deposit_mol_by_account,
+                wall_plan,
+                self._copy_alkali_state(
+                    controls.get(
+                        "wall_alkali_binding_diagnostic_state_by_account"
+                    )
+                ),
+                registry,
+                resolve_species_formula,
+                EMPTY_KG_TOLERANCE,
+            )
+        )
+
+        credits = self._credits_by_product_account(condensed_product_mol, sp_data)
+        (
+            subfloor_baffle_credits_kg,
+            folded_baffle_kg_by_wall_account,
+        ) = self._fold_subfloor_baffle_credits(
+            credits,
+            wall_plan["product_mol_by_account"],
+            registry,
+            resolve_species_formula,
+            EMPTY_KG_TOLERANCE,
+        )
+        retained_baffle_kg = 0.0
+        if subfloor_baffle_credits_kg:
+            # A remaining sub-floor component has no active destination with
+            # identical species/form.  Keep the whole coupled baffle parcel in
+            # overhead (subtract it from the proposed vapor debit) rather than
+            # alter chemistry or discard only one product.  Other wall parcels
+            # remain computable and commit normally.
+            credits = {}
+            retained_baffle_kg = baffle_condensed_kg
+            baffle_condensed_kg = 0.0
+
+        retained_wall_kg_by_account = {
+            account: mol
+            * resolve_species_formula(
+                species, registry
+            ).molar_mass_kg_per_mol()
+            for account, mol in retained_wall_mol_by_account.items()
+        }
+        retained_wall_kg = sum(retained_wall_kg_by_account.values())
+        credited_wall_deposit_kg = max(0.0, wall_deposit_kg - retained_wall_kg)
+
+        if not credits and not wall_plan["product_mol_by_account"]:
             return IntentResult(
                 intent=ChemistryIntent.CONDENSATION_ROUTE,
                 status="ok",
@@ -265,7 +323,11 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         #            or product-specific accounts declared in sp_data
         # ------------------------------------------------------------------
         vapor_formula = resolve_species_formula(species, registry)
-        vapor_mol = condensed_kg / vapor_formula.molar_mass_kg_per_mol()
+        credited_vapor_kg = max(
+            0.0,
+            condensed_kg - retained_baffle_kg - retained_wall_kg,
+        )
+        vapor_mol = credited_vapor_kg / vapor_formula.molar_mass_kg_per_mol()
         debits: dict[str, dict[str, float]] = {
             "process.overhead_gas": {species: vapor_mol},
         }
@@ -277,7 +339,6 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 account_debits[debit_species] = (
                     account_debits.get(debit_species, 0.0) + mol
                 )
-        credits = self._credits_by_product_account(condensed_product_mol, sp_data)
         for account, product_mol in wall_plan["product_mol_by_account"].items():
             species_mol = credits.setdefault(account, {})
             for product_species, mol in product_mol.items():
@@ -324,12 +385,26 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             control_audit=control_audit,
             diagnostic={
                 "credited_condensed_kg": float(baffle_condensed_kg),
-                "credited_wall_deposit_kg": float(wall_deposit_kg),
+                "credited_wall_deposit_kg": float(credited_wall_deposit_kg),
+                "numerical_floor_baffle_to_wall_kg": float(
+                    sum(folded_baffle_kg_by_wall_account.values())
+                ),
+                "numerical_floor_retained_overhead_kg": float(
+                    retained_baffle_kg + retained_wall_kg
+                ),
+                "numerical_floor_retained_baffle_kg": float(retained_baffle_kg),
+                "numerical_floor_retained_wall_kg_by_account": (
+                    retained_wall_kg_by_account
+                ),
+                "subfloor_baffle_credits_kg": subfloor_baffle_credits_kg,
                 "credited_wall_deposit_accounts_kg": {
-                    account: float(wall_deposit_kg) * float(fraction)
-                    for account, fraction in (
-                        wall_account_fractions.items()
+                    account: max(
+                        0.0,
+                        float(wall_deposit_mol_by_account.get(account, 0.0))
+                        * vapor_formula.molar_mass_kg_per_mol()
+                        - retained_wall_kg_by_account.get(account, 0.0),
                     )
+                    for account in wall_deposit_mol_by_account
                 },
                 "wall_deposit_accounts_kg_by_species": product_kg_by_account,
                 "wall_substrate_debit_accounts_kg_by_species": (
@@ -603,6 +678,154 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
             "diagnostics_by_account": diagnostics_by_account,
             "alkali_state_by_account": alkali_state_by_account,
         }
+
+    @staticmethod
+    def _materialization_safe_wall_plan(
+        species: str,
+        arrival_mol_by_account: Mapping[str, float],
+        wall_plan: Mapping[str, Any],
+        prior_alkali_state_by_account: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        floor_kg: float,
+    ) -> tuple[dict[str, Any], dict[str, float]]:
+        products_by_account = {
+            account: dict(species_mol)
+            for account, species_mol in dict(
+                wall_plan["product_mol_by_account"]
+            ).items()
+        }
+        debits_by_account = {
+            account: dict(species_mol)
+            for account, species_mol in dict(
+                wall_plan["substrate_debit_mol_by_account"]
+            ).items()
+        }
+        diagnostics_by_account = {
+            account: dict(diagnostic)
+            for account, diagnostic in dict(
+                wall_plan["diagnostics_by_account"]
+            ).items()
+        }
+        retained_by_account: dict[str, float] = {}
+        alkali_state_by_account = dict(wall_plan["alkali_state_by_account"])
+
+        def has_subfloor_component(side: Mapping[str, float]) -> bool:
+            return any(
+                0.0
+                < float(mol)
+                * resolve_species_formula(
+                    component_species, registry
+                ).molar_mass_kg_per_mol()
+                <= floor_kg
+                for component_species, mol in side.items()
+            )
+
+        vapor_molar_mass = resolve_species_formula(
+            species, registry
+        ).molar_mass_kg_per_mol()
+        for account, arrival_mol in arrival_mol_by_account.items():
+            products = products_by_account.get(account, {})
+            debits = debits_by_account.get(account, {})
+            if not (
+                has_subfloor_component(products)
+                or has_subfloor_component(debits)
+            ):
+                continue
+
+            diagnostics_by_account.setdefault(account, {}).update({
+                "materialization_adjustment": (
+                    "rollback_coupled_reaction_to_unchanged_arrival"
+                ),
+                "pre_adjustment_products_mol": dict(products),
+                "pre_adjustment_substrate_debits_mol": dict(debits),
+            })
+            debits_by_account.pop(account, None)
+            if account in prior_alkali_state_by_account:
+                alkali_state_by_account[account] = prior_alkali_state_by_account[
+                    account
+                ]
+            else:
+                alkali_state_by_account.pop(account, None)
+            if float(arrival_mol) * vapor_molar_mass > floor_kg:
+                products_by_account[account] = {species: float(arrival_mol)}
+            else:
+                products_by_account.pop(account, None)
+                retained_by_account[account] = float(arrival_mol)
+                diagnostics_by_account[account]["materialization_adjustment"] = (
+                    "retain_unmaterializable_arrival_in_overhead"
+                )
+
+        return ({
+            "product_mol_by_account": products_by_account,
+            "substrate_debit_mol_by_account": debits_by_account,
+            "diagnostics_by_account": diagnostics_by_account,
+            "alkali_state_by_account": alkali_state_by_account,
+        }, retained_by_account)
+
+    @staticmethod
+    def _fold_subfloor_baffle_credits(
+        baffle_credits: dict[str, dict[str, float]],
+        wall_products_by_account: dict[str, dict[str, float]],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        floor_kg: float,
+    ) -> tuple[dict[str, dict[str, float]], dict[str, float]]:
+        """Fold only identical species into an active materializable wall lot."""
+        unresolved: dict[str, dict[str, float]] = {}
+        folds: list[tuple[str, str, str, float, float]] = []
+        for source_account, species_mol in baffle_credits.items():
+            for product_species, mol in species_mol.items():
+                molar_mass = resolve_species_formula(
+                    product_species, registry
+                ).molar_mass_kg_per_mol()
+                product_kg = float(mol) * molar_mass
+                if not (0.0 < product_kg <= floor_kg):
+                    continue
+                destination = next((
+                    account
+                    for account in sorted(wall_products_by_account)
+                    if product_species in wall_products_by_account[account]
+                    and float(
+                        wall_products_by_account[account][product_species]
+                    ) * molar_mass > floor_kg
+                ), None)
+                if destination is None:
+                    unresolved.setdefault(source_account, {})[
+                        product_species
+                    ] = product_kg
+                    continue
+                folds.append((
+                    source_account,
+                    product_species,
+                    destination,
+                    float(mol),
+                    product_kg,
+                ))
+
+        # A coupled baffle parcel is residualized as a whole when any one of
+        # its products lacks a same-species destination.  Apply planned folds
+        # only after proving all sub-floor products have destinations, so a
+        # partial mutation cannot survive that rollback.
+        if unresolved:
+            return unresolved, {}
+
+        folded_kg_by_account: dict[str, float] = {}
+        for (
+            source_account,
+            product_species,
+            destination,
+            mol,
+            product_kg,
+        ) in folds:
+            wall_products_by_account[destination][product_species] += mol
+            del baffle_credits[source_account][product_species]
+            if not baffle_credits[source_account]:
+                del baffle_credits[source_account]
+            folded_kg_by_account[destination] = (
+                folded_kg_by_account.get(destination, 0.0) + product_kg
+            )
+        return unresolved, folded_kg_by_account
 
     @staticmethod
     def _matrix_reaction(name: str) -> Mapping[str, Any]:

@@ -43,8 +43,13 @@ def _captured_sio_equivalent_mol(liner_temperature_c: float) -> float:
     )
 
 
-def test_sio_routes_to_stage3_for_c2a_after_band_aware_hk_fix():
-    assert _stage3_silica_kg(1400.0) > 0.0
+def test_subfloor_sio_does_not_create_unmaterialized_stage3_product():
+    # At this wall temperature the Stage-3 Si and SiO2 product components are
+    # each at or below MaterialLot's 1e-12 kg per-species floor.  Reporting a
+    # positive collection would project material that the ledger refused to
+    # retain; the uncommitted parcel must remain in the SiO escape inventory.
+    assert _stage3_silica_kg(1400.0) == 0.0
+    assert _terminal_escape_sio_mol(1400.0) > 0.0
 
 
 def test_wall_band_capture_stays_bounded_after_reactive_sio_fix():

@@ -9,7 +9,7 @@
     "mass_kg": 1000.0,
     "additives_kg": {},
     "track": "pyrolysis",
-    "backend": "stub",
+    "backend": "internal-analytical",
     "started_at_utc": "2026-05-15T00:00:00Z",
     "engines_used": {
       "active": {
@@ -110,9 +110,9 @@
     "runtime_status": "unavailable",
     "degradation_reason": "unavailable",
     "backend_real_active": false,
-    "label_source": "legacy_backend_alias:stub",
+    "label_source": "backend_alias:internal-analytical",
     "label_sources": [
-      "legacy_backend_alias:stub",
+      "backend_alias:internal-analytical",
       "legacy_backend_authoritative"
     ],
     "degraded_from": [
@@ -296,12 +296,12 @@
           "at_15mbar": 40.30262073982433
         },
         "wall_deposit_flux_kg_hr_by_species": {
-          "Si": 1.7990198679657974e-07,
-          "SiO2": 3.84869185426345e-07
+          "Si": 1.799022598466075e-07,
+          "SiO2": 3.848697695696535e-07
         },
         "wall_deposit_cumulative_kg_by_species": {
-          "Si": 3.424186942777379e-07,
-          "SiO2": 7.325455726647435e-07
+          "Si": 3.4241921399091973e-07,
+          "SiO2": 7.325466845012082e-07
         }
       },
       "by_species": {
@@ -1067,8 +1067,8 @@
     },
     "process.overhead_gas": {},
     "process.wall_deposit_segment_stage_0_to_stage_1": {
-      "Si": 5.737518571190195e-06,
-      "SiO2": 5.737518571190195e-06
+      "Si": 5.7375370761993415e-06,
+      "SiO2": 5.7375370761993415e-06
     },
     "process.wall_deposit_segment_stage_1_to_stage_2": {
       "Si": 6.454708392588969e-06,
@@ -1095,14 +1095,14 @@
       "K": 0.0,
       "Mg": 0.0,
       "Na": 0.0,
-      "Si": 3.42418694278e-07,
+      "Si": 3.42419213991e-07,
       "SiO": 0.0,
-      "SiO2": 7.32545572665e-07
+      "SiO2": 7.32546684501e-07
     },
     "deposit_by_surface_species_kg": {
       "stage_0_to_stage_1": {
-        "Si": 1.6113820907187664e-07,
-        "SiO2": 3.447273283128205e-07
+        "Si": 1.6113872878505853e-07,
+        "SiO2": 3.44728440149285e-07
       },
       "stage_1_to_stage_2": {
         "Si": 1.8128048520586122e-07,
@@ -1261,7 +1261,7 @@
       "Fe": "builtin_authoritative:pure_component_derived_from_evaluation",
       "K": "builtin_authoritative:standard_reaction_term",
       "Mg": "builtin_authoritative:gas_standard_fugacity",
-      "Mn": "builtin_authoritative:pure_component_derived_from_evaluation",
+      "Mn": "builtin_authority_limited:pure_component_derived_from_evaluation:reconstructed_ellingham_segment",
       "Na": "builtin_authoritative:gas_standard_fugacity",
       "SiO": "vaporock_backsolved_curve_fit:backsolved_vaporock_curve_fit"
     },
@@ -1271,8 +1271,8 @@
         "percentage": 20.0
       },
       "builtin_authoritative:pure_component_derived_from_evaluation": {
-        "count": 2,
-        "percentage": 20.0
+        "count": 1,
+        "percentage": 10.0
       },
       "builtin_authoritative:pure_component_source_equation_fit": {
         "count": 1,
@@ -1285,6 +1285,10 @@
       "builtin_authoritative:standard_reaction_term": {
         "count": 2,
         "percentage": 20.0
+      },
+      "builtin_authority_limited:pure_component_derived_from_evaluation:reconstructed_ellingham_segment": {
+        "count": 1,
+        "percentage": 10.0
       },
       "vaporock_backsolved_curve_fit:backsolved_vaporock_curve_fit": {
         "count": 1,
@@ -6072,7 +6076,7 @@
       "T_C": 1250.0,
       "P_total_bar": 0.01,
       "pO2_bar": 0.0,
-      "mass_balance_pct": 1.1368683772161603e-13,
+      "mass_balance_pct": 3.410605131648481e-14,
       "O2_yield_kg_cumulative": 1.934290971197474e-07,
       "O2_source_side_potential_kg_cumulative": 1.934290971197474e-07,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
@@ -6124,8 +6128,8 @@
       },
       "wall_deposit_delta_kg": {
         "stage_0_to_stage_1": {
-          "Si": 7.647845057936853e-08,
-          "SiO2": 1.6361241752395224e-07
+          "Si": 7.647869724252264e-08,
+          "SiO2": 1.6361294521710832e-07
         },
         "stage_1_to_stage_2": {
           "Si": 8.60382569017896e-08,
@@ -6134,8 +6138,8 @@
       },
       "wall_deposit_cumulative_kg": {
         "stage_0_to_stage_1": {
-          "Si": 7.647845057936853e-08,
-          "SiO2": 1.6361241752395224e-07
+          "Si": 7.647869724252264e-08,
+          "SiO2": 1.6361294521710832e-07
         },
         "stage_1_to_stage_2": {
           "Si": 8.60382569017896e-08,
@@ -6395,7 +6399,7 @@
       "T_C": 1250.0,
       "P_total_bar": 0.01,
       "pO2_bar": 0.0,
-      "mass_balance_pct": 1.9326762412674727e-13,
+      "mass_balance_pct": 3.410605131648481e-14,
       "O2_yield_kg_cumulative": 4.075503368091841e-07,
       "O2_source_side_potential_kg_cumulative": 4.075503368091841e-07,
       "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
@@ -6447,8 +6451,8 @@
       },
       "wall_deposit_delta_kg": {
         "stage_0_to_stage_1": {
-          "Si": 8.465975849250812e-08,
-          "SiO2": 1.8111491078886824e-07
+          "Si": 8.466003154253588e-08,
+          "SiO2": 1.811154949321767e-07
         },
         "stage_1_to_stage_2": {
           "Si": 9.524222830407163e-08,
@@ -6457,8 +6461,8 @@
       },
       "wall_deposit_cumulative_kg": {
         "stage_0_to_stage_1": {
-          "Si": 1.6113820907187666e-07,
-          "SiO2": 3.447273283128205e-07
+          "Si": 1.6113872878505853e-07,
+          "SiO2": 3.44728440149285e-07
         },
         "stage_1_to_stage_2": {
           "Si": 1.8128048520586122e-07,

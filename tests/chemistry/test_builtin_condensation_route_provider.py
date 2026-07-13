@@ -45,6 +45,7 @@ from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
     IntentRequest,
+    IntentResult,
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -137,35 +138,41 @@ from tests.chemistry.conftest import _build_sim
 # 2026-07-12 wave10 process-condensation: area-integrated HKL/transport
 # wall-flux family (J*A*M*residence, capped by available vapor) raises wall
 # segment deposits. Recomputed from the executable split path.
+# 2026-07-12 runtime-pressure replaces the synthetic fixed transport pressure
+# with summed runtime partials and physical throat/regulator controls. These
+# mechanism-derived wall pins are recomputed from that executable path; the
+# 2026-07-13 subfloor repair folds only identical Si product components into
+# an active wall Si lot, changing these pins only by the explicitly conserved
+# sub-floor components.
 EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 2.9713548283180754e-06,
-            "SiO2": 6.356699738288584e-06,
+            "Si": 8.674071065810759e-07,
+            "SiO2": 1.8556674803172791e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 3.177858364748269e-06,
-            "SiO2": 6.798478338229312e-06,
+            "Si": 9.758055561681058e-07,
+            "SiO2": 2.0875672149278365e-06,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 2.4095050497985687e-06,
-            "SiO2": 5.154719313051358e-06,
+            "Si": 8.737586063321803e-07,
+            "SiO2": 1.8692554154978237e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 2.609148006790817e-06,
-            "SiO2": 5.581820889870488e-06,
+            "Si": 9.829559624065655e-07,
+            "SiO2": 2.1028642723615334e-06,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 2.5985956260550898e-06,
-            "SiO2": 5.5592458963955116e-06,
+            "Si": 7.265713972604444e-07,
+            "SiO2": 1.5543738387608785e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 2.7791419905777254e-06,
-            "SiO2": 5.945493616517054e-06,
+            "Si": 8.173665116123509e-07,
+            "SiO2": 1.7486142822576064e-06,
         },
     },
 }
@@ -520,18 +527,14 @@ def test_kernel_filters_provider_to_declared_accounts_only(
 # ---------------------------------------------------------------------------
 
 
-def test_kernel_commit_rejects_atom_unbalanced_proposal(
-    vapor_pressure_data, feedstocks_data, setpoints_data
+def test_kernel_dispatch_rejects_atom_unbalanced_proposal(
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch
 ):
     """Construct a hand-rolled :class:`LedgerTransitionProposal` where
     the credit atoms do NOT conserve the debit atoms (SiO
     disproportionation with the SiO2 product dropped, leaking 0.5 mol
-    O per mol SiO), and verify that
-    :meth:`ChemistryKernel.commit_batch` raises
-    :class:`AtomBalanceError`. This proves the authoritative
-    ledger-write path actually engages atom-balance validation -- the
-    second intent in the migration where ``commit_batch`` is
-    load-bearing for the ledger.
+    O per mol SiO), and verify that live kernel dispatch raises
+    :class:`AtomBalanceError` before the proposal can become commit-bound.
     """
 
     sim = _build_sim(
@@ -553,14 +556,30 @@ def test_kernel_commit_rejects_atom_unbalanced_proposal(
         atom_balance_proof={"Si": 0.0, "O": 0.0},
     )
 
+    provider = sim._chem_kernel.registry.authoritative_for(
+        ChemistryIntent.CONDENSATION_ROUTE
+    )
+    assert provider is not None
+    monkeypatch.setattr(
+        provider,
+        "dispatch",
+        lambda request: IntentResult(
+            intent=request.intent,
+            status="ok",
+            transition=bad_proposal,
+        ),
+    )
+
     with pytest.raises(AtomBalanceError):
-        sim._chem_kernel.commit_batch(
-            ChemistryIntent.CONDENSATION_ROUTE, bad_proposal
+        sim._chem_kernel.dispatch(
+            ChemistryIntent.CONDENSATION_ROUTE,
+            temperature_C=1100.0,
+            pressure_bar=1e-6,
         )
 
 
 def test_kernel_commit_accepts_balanced_proposal(
-    vapor_pressure_data, feedstocks_data, setpoints_data
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch
 ):
     """Companion to the rejection test: a correctly atom-balanced SiO
     disproportionation proposal must commit cleanly. Sanity check that
@@ -593,9 +612,30 @@ def test_kernel_commit_accepts_balanced_proposal(
         atom_balance_proof={"Si": 0.0, "O": 0.0},
     )
 
-    # Should not raise.
+    provider = sim._chem_kernel.registry.authoritative_for(
+        ChemistryIntent.CONDENSATION_ROUTE
+    )
+    assert provider is not None
+    monkeypatch.setattr(
+        provider,
+        "dispatch",
+        lambda request: IntentResult(
+            intent=request.intent,
+            status="ok",
+            transition=balanced_proposal,
+        ),
+    )
+    result = sim._chem_kernel.dispatch(
+        ChemistryIntent.CONDENSATION_ROUTE,
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+    )
+    assert result.transition is not None
+
+    # Commit the exact dispatch-bound object; caller-built lookalikes are
+    # intentionally rejected by the provider-identity gate.
     sim._chem_kernel.commit_batch(
-        ChemistryIntent.CONDENSATION_ROUTE, balanced_proposal
+        ChemistryIntent.CONDENSATION_ROUTE, result.transition
     )
 
 
@@ -1007,6 +1047,244 @@ def test_provider_splits_baffle_product_from_wall_deposit(
         assert abs(net) < 1e-9
 
 
+def test_provider_folds_only_same_species_subfloor_baffle_product_into_wall(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    view = ProviderAccountView(
+        accounts={
+            "process.overhead_gas": {"SiO": 10.0},
+            "process.condensation_train": {},
+            "process.wall_deposit": {},
+        },
+        species_formula_registry=sim.species_formula_registry,
+    )
+    condensed_kg = 1.0e-8
+    # The baffle parcel itself exceeds MaterialLot's 1e-12 kg floor, but its
+    # 0.5 Si product is only ~6.4e-13 kg.  Product-level detection is required;
+    # comparing the unsplit baffle mass with the floor would still leak Si.
+    baffle_residual_kg = 2.0e-12
+    request = IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=view,
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "SiO",
+            "condensed_kg": condensed_kg,
+            "sp_data": {
+                "condensation_products_mol_per_mol_vapor": {
+                    "Si": 0.5,
+                    "SiO2": 0.5,
+                },
+            },
+            "wall_deposit_fraction": (
+                condensed_kg - baffle_residual_kg
+            ) / condensed_kg,
+            "wall_deposit_account_fractions": {"process.wall_deposit": 1.0},
+            "dt_hr": 1.0,
+        },
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    proposal = result.transition
+    train_products = proposal.credits["process.condensation_train"]
+    wall_products = proposal.credits["process.wall_deposit"]
+    input_sio_mol = condensed_kg / resolve_species_formula(
+        "SiO", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    # Only the sub-floor Si component moves to the already-active wall Si
+    # destination.  The materializable baffle SiO2 remains on the train; no
+    # parcel is fed back through wall chemistry.
+    assert (
+        wall_products["Si"]
+        + wall_products["SiO2"]
+        + train_products["SiO2"]
+    ) == pytest.approx(
+        input_sio_mol, rel=0.0, abs=1e-18
+    )
+    baffle_mol = baffle_residual_kg / resolve_species_formula(
+        "SiO", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    folded_si_kg = 0.5 * baffle_mol * resolve_species_formula(
+        "Si", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    assert result.diagnostic["credited_condensed_kg"] == pytest.approx(
+        baffle_residual_kg, rel=0.0, abs=1e-24
+    )
+    assert result.diagnostic["credited_wall_deposit_kg"] == pytest.approx(
+        condensed_kg - baffle_residual_kg,
+        rel=0.0,
+        abs=1e-24,
+    )
+    assert result.diagnostic["numerical_floor_baffle_to_wall_kg"] == pytest.approx(
+        folded_si_kg, rel=0.0, abs=1e-24
+    )
+
+    # Exercise the mol -> MaterialLot -> ledger boundary that caused the leak.
+    # Proposal-level atom balance alone cannot catch per-product kg zeroing.
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas", {"SiO": input_sio_mol}, source="test seed"
+    )
+    kernel_result = sim._chem_kernel.dispatch(
+        ChemistryIntent.CONDENSATION_ROUTE,
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs=request.control_inputs,
+    )
+    assert kernel_result.transition is not None
+    committed = sim._chem_kernel.commit_batch(
+        ChemistryIntent.CONDENSATION_ROUTE, kernel_result.transition
+    )
+    registry = sim.atom_ledger.registry
+    assert committed.debit_mass_kg(registry) == pytest.approx(
+        condensed_kg, rel=0.0, abs=1e-20
+    )
+    assert committed.credit_mass_kg(registry) == pytest.approx(
+        condensed_kg, rel=0.0, abs=1e-20
+    )
+
+
+def test_provider_rolls_back_near_floor_wall_chemistry_to_unchanged_species(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    condensed_kg = 1.1e-12
+    input_sio_mol = condensed_kg / resolve_species_formula(
+        "SiO", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas", {"SiO": input_sio_mol}, source="test seed"
+    )
+    affected_accounts = (
+        "process.overhead_gas",
+        "process.wall_deposit",
+        "process.condensation_train",
+    )
+    si_before = sum(
+        sim.atom_ledger.atom_moles_by_account(account).get("Si", 0.0)
+        for account in affected_accounts
+    )
+
+    result = sim._chem_kernel.dispatch(
+        ChemistryIntent.CONDENSATION_ROUTE,
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "SiO",
+            "condensed_kg": condensed_kg,
+            "sp_data": {
+                "condensation_products_mol_per_mol_vapor": {
+                    "Si": 0.5,
+                    "SiO2": 0.5,
+                },
+            },
+            "wall_deposit_fraction": 1.0,
+            "wall_deposit_account_fractions": {
+                "process.wall_deposit": 1.0,
+            },
+            "dt_hr": 1.0,
+        },
+    )
+    if result.transition is not None:
+        sim._chem_kernel.commit_batch(
+            ChemistryIntent.CONDENSATION_ROUTE, result.transition
+        )
+
+    si_after = sum(
+        sim.atom_ledger.atom_moles_by_account(account).get("Si", 0.0)
+        for account in affected_accounts
+    )
+    assert si_after == pytest.approx(si_before, rel=0.0, abs=1e-24)
+    assert result.transition is not None
+    wall_credit = result.transition.credits["process.wall_deposit"]
+    assert wall_credit == {"SiO": pytest.approx(input_sio_mol)}
+    assert "process.wall_deposit" not in result.transition.debits
+    assert result.diagnostic["wall_reaction_diagnostics_by_account"][
+        "process.wall_deposit"
+    ]["materialization_adjustment"] == (
+        "rollback_coupled_reaction_to_unchanged_arrival"
+    )
+
+
+@pytest.mark.parametrize(
+    "species, substrate_species",
+    [("Mg", "SiO2"), ("Fe", "Si")],
+)
+def test_subfloor_wall_debit_retains_only_that_parcel_and_commits_baffle(
+    species,
+    substrate_species,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    condensed_kg = 1.0e-8
+    wall_kg = 5.0e-13
+    vapor_molar_mass = resolve_species_formula(
+        species, sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    result = provider.dispatch(IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {species: 1.0},
+                "process.condensation_train": {},
+                "process.wall_deposit": {substrate_species: 1.0},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": species,
+            "condensed_kg": condensed_kg,
+            "sp_data": {},
+            "wall_deposit_fraction": wall_kg / condensed_kg,
+            "wall_deposit_account_fractions": {
+                "process.wall_deposit": 1.0,
+            },
+            "dt_hr": 1.0,
+        },
+    ))
+
+    assert result.transition is not None
+    proposal = result.transition
+    expected_baffle_mol = (condensed_kg - wall_kg) / vapor_molar_mass
+    assert proposal.debits["process.overhead_gas"][species] == pytest.approx(
+        expected_baffle_mol
+    )
+    assert proposal.credits["process.condensation_train"][species] == pytest.approx(
+        expected_baffle_mol
+    )
+    assert "process.wall_deposit" not in proposal.debits
+    assert "process.wall_deposit" not in proposal.credits
+    assert result.diagnostic["numerical_floor_retained_overhead_kg"] == pytest.approx(
+        wall_kg, rel=0.0, abs=1e-24
+    )
+    _assert_atom_proof_closed(proposal)
+
+
 def test_provider_routes_wall_deposit_to_segment_accounts(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
@@ -1300,6 +1578,61 @@ def test_c4b_alkali_wall_reaction_credits_elemental_only(
     assert state["authoritative"] is False
     assert state["bound_alkali_equiv_mol"][equivalent] == pytest.approx(1.0)
     _assert_atom_proof_closed(proposal)
+
+
+@pytest.mark.parametrize("species", ["Na", "K"])
+def test_subfloor_alkali_wall_parcel_preserves_prior_diagnostic_state(
+    species, vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinCondensationRouteProvider()
+    condensed_kg = 1.0e-8
+    wall_kg = 5.0e-13
+    prior_state = {
+        "process.wall_deposit": {
+            "authoritative": False,
+            "bound_alkali_equiv_mol": {f"{species}2O": 0.25},
+        },
+    }
+    result = provider.dispatch(IntentRequest(
+        intent=ChemistryIntent.CONDENSATION_ROUTE,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.overhead_gas": {species: 1.0},
+                "process.condensation_train": {},
+                "process.wall_deposit": {"SiO2": 1.0},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1100.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": species,
+            "condensed_kg": condensed_kg,
+            "sp_data": {},
+            "wall_deposit_fraction": wall_kg / condensed_kg,
+            "wall_deposit_account_fractions": {
+                "process.wall_deposit": 1.0,
+            },
+            "wall_temperature_K": 1062.0,
+            "wall_deposit_account_temperatures_K": {
+                "process.wall_deposit": 1062.0,
+            },
+            "wall_alkali_binding_diagnostic_state_by_account": prior_state,
+            "dt_hr": 1.0,
+        },
+    ))
+
+    assert result.transition is not None
+    assert "process.wall_deposit" not in result.transition.credits
+    assert result.diagnostic[
+        "wall_alkali_binding_diagnostic_state_by_account"
+    ] == prior_state
 
 
 def test_c4b_alkali_diagnostic_saturation_does_not_change_ledger_mol(
@@ -1837,9 +2170,9 @@ def test_split_path_end_state_matches_pre_flip_account_balances(
         actual_species_kg = wall_segment_deposits_kg[account]
         assert actual_species_kg.keys() == expected_species_kg.keys()
         for species, expected_kg in expected_species_kg.items():
-            assert actual_species_kg[species] == pytest.approx(
-                expected_kg, rel=1e-12, abs=0.0
-            )
+                assert actual_species_kg[species] == pytest.approx(
+                    expected_kg, rel=1e-12, abs=0.0
+                ), f"{account}: {actual_species_kg!r}"
 
     # Final assertion: end-of-batch closure stays tight (same bound as
     # the standalone smoke test).
