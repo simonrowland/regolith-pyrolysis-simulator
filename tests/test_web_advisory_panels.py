@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from flask import Flask
 import pytest
 
@@ -11,8 +13,11 @@ from web import routes as web_routes
 @pytest.fixture
 def client(tmp_path):
     app = Flask(__name__)
-    app.config["TESTING"] = True
-    app.config["OPTIMIZER_RUNS_DIR"] = str(tmp_path / "runs")
+    app.config.update(
+        TESTING=True,
+        SECRET_KEY="advisory-panel-test",
+        OPTIMIZER_RUNS_DIR=str(tmp_path / "runs"),
+    )
     app.register_blueprint(web_routes.bp)
     return app.test_client()
 
@@ -28,7 +33,21 @@ def test_dashboard_renders_advisory_panels(client) -> None:
     assert 'id="product-ledger-panel"' in html
     assert 'id="overlap-evaporation-panel"' in html
     assert 'id="knudsen-regime-panel"' in html
+    assert 'id="thermal-train-headline"' in html
+    assert 'data-state="no_data"' in html
+    assert 'href="/thermal-train"' in html
+    assert 'href="/optimizer"' in html
+    assert "observed_peak_design_capacity" in html
+    assert "display-only" in html
     assert "simulator-advisory.js" in html
+
+
+def test_thermal_train_headline_uses_named_ledger_view() -> None:
+    source = Path("web/static/js/simulator-advisory.js").read_text(encoding="utf-8")
+
+    assert "{ resource: 'view', view: 'thermal_train' }" in source
+    assert "response.error" in source
+    assert "report.status === 'no_data'" in source
 
 
 def test_vapor_pressure_authority_payload_surfaces_fallback() -> None:

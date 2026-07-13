@@ -31,6 +31,8 @@
         </div>
         <div class="nav-links">
             <a href="/" class="{% if request.path == '/' %}active{% endif %}">Simulator</a>
+            <a href="/thermal-train" class="{% if request.path == '/thermal-train' or request.path.startswith('/thermal-train/') %}active{% endif %}">Thermal Train</a>
+            <a href="/optimizer" class="{% if request.path == '/optimizer' or request.path.startswith('/optimizer/') %}active{% endif %}">Optimizer</a>
         </div>
     </nav>
 

@@ -223,6 +223,41 @@
             Select a feedstock and press <strong>Start</strong> to run a campaign. Charts and results populate here.
         </div>
 
+        <section id="thermal-train-headline"
+                 class="section-card advisory-card thermal-train-headline"
+                 data-state="no_data"
+                 aria-labelledby="thermal-train-headline-title">
+            <div class="advisory-panel-header">
+                <h3 id="thermal-train-headline-title">Thermal Train Quick Check</h3>
+                <span id="thermal-train-headline-state" class="advisory-state advisory-state-n/a">no run</span>
+            </div>
+            <div class="thermal-train-headline-grid">
+                <a href="{{ url_for('web.thermal_train_page') }}" class="thermal-train-headline-item">
+                    <span>Peak cold O2</span>
+                    <strong id="thermal-train-cold-o2">n/a</strong>
+                </a>
+                <a href="{{ url_for('web.thermal_train_page') }}" class="thermal-train-headline-item">
+                    <span>Max-concurrent hot vapor</span>
+                    <strong id="thermal-train-hot-vapor">n/a</strong>
+                </a>
+                <a href="{{ url_for('web.thermal_train_page') }}" class="thermal-train-headline-item">
+                    <span>Train closes</span>
+                    <strong id="thermal-train-closes">n/a</strong>
+                    <small id="thermal-train-excluded-species"></small>
+                </a>
+                <a href="{{ url_for('web.thermal_train_page') }}" class="thermal-train-headline-item">
+                    <span>Overflow vs rated capacity</span>
+                    <strong id="thermal-train-capacity">n/a</strong>
+                    <small id="thermal-train-capacity-basis">observed_peak_design_capacity</small>
+                </a>
+                <a href="{{ url_for('web.thermal_train_page') }}" class="thermal-train-headline-item">
+                    <span>Amortized capex / campaign</span>
+                    <strong id="thermal-train-capex">n/a</strong>
+                    <small>display-only</small>
+                </a>
+            </div>
+        </section>
+
         <!-- Charts grid -->
         <div class="charts-grid">
             <div class="chart-container">

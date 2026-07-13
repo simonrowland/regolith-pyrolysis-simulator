@@ -484,6 +484,119 @@ function renderVaporPressureAuthorityPanel(payload) {
     appendCeramicLine(content, 'Diagnostic only', String(!!payload.diagnostic_only));
 }
 
+function thermalTrainHeadlineMetric(value, unit) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return 'n/a';
+    const absolute = Math.abs(number);
+    const formatted = absolute > 0 && (absolute < 0.01 || absolute >= 1000000)
+        ? number.toPrecision(4)
+        : number.toLocaleString(undefined, { maximumFractionDigits: 3 });
+    return `${formatted} ${unit}`;
+}
+
+// Generation token: bumped on run start/error so an in-flight ledger_api
+// acknowledgement from a PREVIOUS run cannot repopulate a cleared strip
+// (stale-ack race — a completed run's read can land after 'started').
+let thermalTrainHeadlineGeneration = 0;
+
+function clearThermalTrainHeadline(label) {
+    const panel = document.getElementById('thermal-train-headline');
+    if (!panel) return;
+    panel.dataset.state = label === 'unavailable' ? 'error' : 'no_data';
+    updateAdvisoryState('thermal-train-headline-state', 'n/a');
+    advisorySetText('thermal-train-headline-state', label || 'no run');
+    advisorySetText('thermal-train-cold-o2', 'n/a');
+    advisorySetText('thermal-train-hot-vapor', 'n/a');
+    advisorySetText('thermal-train-closes', 'n/a');
+    advisorySetText('thermal-train-excluded-species', '');
+    advisorySetText('thermal-train-capacity', 'n/a');
+    advisorySetText('thermal-train-capacity-basis', 'observed_peak_design_capacity');
+    advisorySetText('thermal-train-capex', 'n/a');
+}
+
+function renderThermalTrainHeadline(response) {
+    const panel = document.getElementById('thermal-train-headline');
+    if (!panel) return;
+    const report = advisoryObject(response && response.data);
+    if (!report || report.status === 'no_data') {
+        clearThermalTrainHeadline();
+        return;
+    }
+
+    const peaks = advisoryObject(report.peaks) || {};
+    const capacity = advisoryObject(report.capacity) || {};
+    const costs = advisoryObject(report.display_costs) || {};
+    const excluded = advisoryObject(report.excluded_species) || {};
+    const excludedNames = Object.keys(excluded).sort();
+
+    panel.dataset.state = 'live';
+    updateAdvisoryState('thermal-train-headline-state', report.status || 'n/a');
+    advisorySetText(
+        'thermal-train-cold-o2',
+        thermalTrainHeadlineMetric(peaks.cold_o2_kg_hr, 'kg/hr')
+    );
+    advisorySetText(
+        'thermal-train-hot-vapor',
+        thermalTrainHeadlineMetric(peaks.hot_total_vapor_kg_hr, 'kg/hr')
+    );
+    advisorySetText('thermal-train-closes', report.train_closes_for_run ? 'yes' : 'no');
+    advisorySetText(
+        'thermal-train-excluded-species',
+        !report.train_closes_for_run && excludedNames.length
+            ? `excluded: ${excludedNames.join(', ')}`
+            : ''
+    );
+    advisorySetText(
+        'thermal-train-capacity',
+        `${thermalTrainHeadlineMetric(capacity.thermal_train_overflow_kg_hr, 'kg/hr')} overflow vs ${thermalTrainHeadlineMetric(capacity.rated_cold_train_kg_hr, 'kg/hr')} rated`
+    );
+    advisorySetText(
+        'thermal-train-capacity-basis',
+        capacity.basis || 'observed_peak_design_capacity'
+    );
+    advisorySetText(
+        'thermal-train-capex',
+        thermalTrainHeadlineMetric(costs.amortized_per_campaign_usd, 'USD')
+    );
+}
+
+function refreshThermalTrainHeadline(isRetry) {
+    if (!document.getElementById('thermal-train-headline')) return;
+    const generation = thermalTrainHeadlineGeneration;
+    socket.emit(
+        'ledger_api',
+        { resource: 'view', view: 'thermal_train' },
+        (response) => {
+            if (generation !== thermalTrainHeadlineGeneration) return;
+            if (!response || response.error) {
+                // "no active simulation" is the typed no-run case, not a
+                // transport/view failure — label the two states distinctly.
+                const noRun = response
+                    && typeof response.error === 'string'
+                    && response.error.includes('no active simulation');
+                if (noRun) {
+                    clearThermalTrainHeadline('no run');
+                    return;
+                }
+                // Transient errors (e.g. "simulation run changed" during the
+                // start/replace window) would otherwise paint a sticky
+                // 'unavailable' with nothing to repaint it while a run is
+                // paused at a gate — retry once before labeling.
+                if (!isRetry) {
+                    setTimeout(() => {
+                        if (generation !== thermalTrainHeadlineGeneration) return;
+                        refreshThermalTrainHeadline(true);
+                    }, 1500);
+                    return;
+                }
+                clearThermalTrainHeadline('unavailable');
+                return;
+            }
+            renderThermalTrainHeadline(response);
+        }
+    );
+}
+
 socket.on('simulation_tick', (data) => {
     renderWallRiskPanel(data.wall_risk_panel);
     renderVaporPressureAuthorityPanel(data.vapor_pressure_authority_panel);
@@ -498,19 +611,40 @@ socket.on('simulation_complete', (data) => {
         data.knudsen_regime_diagnostic,
         'Completion diagnostic'
     );
+    refreshThermalTrainHeadline();
 });
 
 socket.on('simulation_status', (data) => {
+    if (data && data.status === 'started') {
+        thermalTrainHeadlineGeneration += 1;
+        clearThermalTrainHeadline();
+    }
     if (data && data.knudsen_regime_diagnostic) {
         renderKnudsenRegimePanelFromDiagnostic(
             data.knudsen_regime_diagnostic,
             'Refusal diagnostic'
         );
     }
+    if (data && (data.status === 'refused' || data.status === 'error')) {
+        // 'error' statuses can be per-hour advisories on a run that keeps
+        // going (e.g. a typed evaporation refusal) — never assume fatal.
+        // Re-reading the view is self-truthing: a live run repaints live,
+        // a torn-down run returns "no active simulation" -> 'no run'.
+        refreshThermalTrainHeadline();
+    }
 });
 
 socket.on('per_hour_summary', (data) => {
     renderKnudsenRegimePanelFromPerHour(data);
+    // Live quick-check: hourly cadence is the natural throttle for the
+    // ledger_api view read (walks the snapshot history once per call).
+    refreshThermalTrainHeadline();
+});
+
+// A run parked at a decision gate emits no further per-hour events — paint
+// the strip at the gate, where the operator is actually looking.
+socket.on('decision_required', () => {
+    refreshThermalTrainHeadline();
 });
 
 window.renderWallRiskPanel = renderWallRiskPanel;
@@ -520,3 +654,20 @@ window.renderProductLedgerPanel = renderProductLedgerPanel;
 window.renderOverlapEvaporationPanel = renderOverlapEvaporationPanel;
 window.renderKnudsenRegimePanelFromDiagnostic = renderKnudsenRegimePanelFromDiagnostic;
 window.renderKnudsenRegimePanelFromPerHour = renderKnudsenRegimePanelFromPerHour;
+window.renderThermalTrainHeadline = renderThermalTrainHeadline;
+
+// Initial paint: a reload mid-run (or onto a paused/completed run) gets the
+// current view immediately instead of waiting for the next per-hour event.
+// Both hooks are needed: 'connect' can fire before the panel DOM exists (the
+// refresh guard no-ops on a missing panel), and DOM-ready can precede the
+// socket connection; whichever lands second does the paint.
+socket.on('connect', () => {
+    refreshThermalTrainHeadline();
+});
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        refreshThermalTrainHeadline();
+    });
+} else {
+    refreshThermalTrainHeadline();
+}

@@ -97,6 +97,10 @@ or cache identity.
 
 ## Known Phase-1a limitations
 
+- The cryogenic tail is sized to the 54 K frost endpoint. This is a valid upper
+  bound but is about 2x conservative in cold-end work versus the intended 77 K
+  liquefier endpoint (Carnot factor plus ΔH_vap rather than ΔH_sub); Phase 2
+  models the endpoint as a configuration choice.
 - SiO and CrO₂ carry reaction-class condensation enthalpies, not simple latents;
   until a condenser-side enthalpy source lands they route to `excluded_species`
   (fail-closed), so SiO-heavy runs will report the train as not closing. They are
