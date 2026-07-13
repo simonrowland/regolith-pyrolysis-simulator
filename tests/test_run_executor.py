@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.accounting.ledger import AtomLedger
 from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.run_executor import RunExecution, RunExecutor, _aggregate_backend_status
@@ -230,6 +231,7 @@ def test_run_executor_partial_path_sets_status_and_decisions():
 def test_run_executor_final_budget_pending_decision_is_partial(monkeypatch):
     snapshot = SimpleNamespace()
     simulator = SimpleNamespace(
+        atom_ledger=AtomLedger(),
         record=SimpleNamespace(snapshots=(snapshot,)),
         cost_ledger=SimpleNamespace(),
         product_ledger=lambda: {},
@@ -439,6 +441,7 @@ def test_run_executor_poison_enrichment_survives_rollup_failure(monkeypatch):
     )
     simulator = SimpleNamespace(
         _poisoned_hour=poisoned,
+        atom_ledger=AtomLedger(),
         record=SimpleNamespace(snapshots=()),
         cost_ledger=SimpleNamespace(),
         product_ledger=lambda: {},

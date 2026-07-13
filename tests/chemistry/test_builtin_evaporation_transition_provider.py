@@ -26,6 +26,7 @@ Covers:
 from __future__ import annotations
 
 import math
+from unittest.mock import patch
 
 import pytest
 
@@ -36,12 +37,32 @@ from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
     IntentRequest,
+    IntentResult,
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.state import CampaignPhase, DecisionType
 from tests.chemistry.conftest import _build_sim
+
+
+def _dispatch_bound_proposal(kernel, proposal):
+    with patch.object(
+        BuiltinEvaporationTransitionProvider,
+        "dispatch",
+        return_value=IntentResult(
+            intent=ChemistryIntent.EVAPORATION_TRANSITION,
+            status="ok",
+            transition=proposal,
+        ),
+    ):
+        result = kernel.dispatch(
+            ChemistryIntent.EVAPORATION_TRANSITION,
+            temperature_C=1400.0,
+            pressure_bar=1e-6,
+        )
+    assert result.transition is not None
+    return result.transition
 
 
 # mass-balance smoke parity runs clip/fail under xdist coscheduling.
@@ -179,9 +200,7 @@ def test_kernel_commit_rejects_atom_unbalanced_proposal(
     )
 
     with pytest.raises(AtomBalanceError):
-        sim._chem_kernel.commit_batch(
-            ChemistryIntent.EVAPORATION_TRANSITION, bad_proposal
-        )
+        _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
 
 
 def test_kernel_commit_accepts_balanced_proposal(
@@ -215,9 +234,12 @@ def test_kernel_commit_accepts_balanced_proposal(
         atom_balance_proof={"Na": 0.0, "O": 0.0},
     )
 
+    bound_proposal = _dispatch_bound_proposal(
+        sim._chem_kernel, balanced_proposal
+    )
     # Should not raise.
     sim._chem_kernel.commit_batch(
-        ChemistryIntent.EVAPORATION_TRANSITION, balanced_proposal
+        ChemistryIntent.EVAPORATION_TRANSITION, bound_proposal
     )
 
 

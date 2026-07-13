@@ -86,6 +86,9 @@ def _provider(margin_kj_per_mol_o2: float = 2.0):
 class _MalformedC7TerminalSlagProvider(ChemistryProvider):
     name = "malformed_c7_terminal_slag_provider"
 
+    def __init__(self, transition: LedgerTransitionProposal | None = None):
+        self._transition = transition
+
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
             provider_id=self.name,
@@ -104,10 +107,9 @@ class _MalformedC7TerminalSlagProvider(ChemistryProvider):
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
-        return IntentResult(
-            intent=request.intent,
-            status="ok",
-            transition=LedgerTransitionProposal(
+        transition = self._transition
+        if transition is None:
+            transition = LedgerTransitionProposal(
                 debits={
                     "terminal.slag": {"CaO": 6.0},
                     C7_AL_CREDIT_ACCOUNT: {"Al": 2.0},
@@ -117,7 +119,11 @@ class _MalformedC7TerminalSlagProvider(ChemistryProvider):
                     "process.cleaned_melt": {"Ca3Al2O6": 1.0},
                 },
                 reason="ca_aluminothermic_c3a_wrong_slag_destination",
-            ),
+            )
+        return IntentResult(
+            intent=request.intent,
+            status="ok",
+            transition=transition,
         )
 
 
@@ -347,9 +353,7 @@ def test_dispatch_bound_malformed_c7_terminal_slag_rework_is_rejected(
 
 
 def test_off_path_c7_terminal_slag_rework_proposal_is_rejected(formula_registry):
-    provider = _provider()
     registry = ProviderRegistry()
-    registry.register(provider, [ChemistryIntent.CA_ALUMINOTHERMIC_STEP])
     ledger = AtomLedger(registry=formula_registry)
     ledger.load_external_mol("terminal.slag", {"CaO": 6.0})
     ledger.load_external_mol(C7_AL_CREDIT_ACCOUNT, {"Al": 2.0})
@@ -363,13 +367,24 @@ def test_off_path_c7_terminal_slag_rework_proposal_is_rejected(formula_registry)
             "process.overhead_gas": {"Ca": 3.0},
             "terminal.slag": {"Ca3Al2O6": 1.0},
         },
-        reason="ca_aluminothermic_c3a_credit_al",
+        reason="off_path_ca_aluminothermic_c3a_credit_al",
     )
+    provider = _MalformedC7TerminalSlagProvider(proposal)
+    registry.register(provider, [ChemistryIntent.CA_ALUMINOTHERMIC_STEP])
+    result = kernel.dispatch(
+        ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+        temperature_C=1400.0,
+        pressure_bar=1e-6,
+        control_inputs=_controls(),
+    )
+    assert result.transition is not None
     before_balances = ledger.mol_by_account()
     before_transitions = ledger.transitions
 
     with pytest.raises(ProposalRejected, match="terminal account"):
-        kernel.commit_batch(ChemistryIntent.CA_ALUMINOTHERMIC_STEP, proposal)
+        kernel.commit_batch(
+            ChemistryIntent.CA_ALUMINOTHERMIC_STEP, result.transition
+        )
 
     assert ledger.mol_by_account() == before_balances
     assert ledger.transitions == before_transitions

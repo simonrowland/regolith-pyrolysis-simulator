@@ -34,6 +34,7 @@ Covers:
 from __future__ import annotations
 
 from dataclasses import replace
+from unittest.mock import patch
 
 import copy
 from pathlib import Path
@@ -62,6 +63,7 @@ from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
     IntentRequest,
+    IntentResult,
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -71,6 +73,25 @@ from simulator.state import (
     DecisionType,
 )
 from tests.chemistry.conftest import _atom_check, _build_sim
+
+
+def _dispatch_bound_proposal(kernel, proposal):
+    with patch.object(
+        BuiltinMetallothermicStepProvider,
+        "dispatch",
+        return_value=IntentResult(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            status="ok",
+            transition=proposal,
+        ),
+    ):
+        result = kernel.dispatch(
+            ChemistryIntent.METALLOTHERMIC_STEP,
+            temperature_C=1400.0,
+            pressure_bar=1e-6,
+        )
+    assert result.transition is not None
+    return result.transition
 
 
 # ---------------------------------------------------------------------------
@@ -347,9 +368,7 @@ def test_kernel_commit_rejects_atom_unbalanced_thermite_proposal(
     )
 
     with pytest.raises(AtomBalanceError):
-        sim._chem_kernel.commit_batch(
-            ChemistryIntent.METALLOTHERMIC_STEP, bad_proposal
-        )
+        _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
 
 
 def test_kernel_commit_rejects_atom_unbalanced_k_shuttle_proposal(
@@ -382,9 +401,7 @@ def test_kernel_commit_rejects_atom_unbalanced_k_shuttle_proposal(
     )
 
     with pytest.raises(AtomBalanceError):
-        sim._chem_kernel.commit_batch(
-            ChemistryIntent.METALLOTHERMIC_STEP, bad_proposal
-        )
+        _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
 
 
 def test_kernel_commit_accepts_balanced_thermite_proposal(
@@ -423,9 +440,12 @@ def test_kernel_commit_accepts_balanced_thermite_proposal(
         atom_balance_proof={"Mg": 0.0, "Al": 0.0, "O": 0.0},
     )
 
+    bound_proposal = _dispatch_bound_proposal(
+        sim._chem_kernel, balanced_proposal
+    )
     # Should not raise.
     sim._chem_kernel.commit_batch(
-        ChemistryIntent.METALLOTHERMIC_STEP, balanced_proposal
+        ChemistryIntent.METALLOTHERMIC_STEP, bound_proposal
     )
 
 

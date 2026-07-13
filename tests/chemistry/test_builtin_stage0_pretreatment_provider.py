@@ -39,6 +39,8 @@ Covers:
 
 from __future__ import annotations
 
+from unittest.mock import patch
+
 import pytest
 
 from engines.builtin.stage0_pretreatment import (
@@ -66,10 +68,30 @@ from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
     IntentRequest,
+    IntentResult,
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from tests.chemistry.conftest import _atom_check, _build_sim
+
+
+def _dispatch_bound_proposal(kernel, proposal):
+    with patch.object(
+        BuiltinStage0PretreatmentProvider,
+        "dispatch",
+        return_value=IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=proposal,
+        ),
+    ):
+        result = kernel.dispatch(
+            ChemistryIntent.STAGE0_PRETREATMENT,
+            temperature_C=500.0,
+            pressure_bar=1.0,
+        )
+    assert result.transition is not None
+    return result.transition
 
 
 # ---------------------------------------------------------------------------
@@ -289,9 +311,7 @@ def test_kernel_commit_rejects_atom_unbalanced_perchlorate_proposal(
     )
 
     with pytest.raises(AtomBalanceError):
-        sim._chem_kernel.commit_batch(
-            ChemistryIntent.STAGE0_PRETREATMENT, bad_proposal
-        )
+        _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
 
 
 def test_kernel_commit_rejects_atom_unbalanced_sulfate_carbon_proposal(
@@ -325,9 +345,7 @@ def test_kernel_commit_rejects_atom_unbalanced_sulfate_carbon_proposal(
     )
 
     with pytest.raises(AtomBalanceError):
-        sim._chem_kernel.commit_batch(
-            ChemistryIntent.STAGE0_PRETREATMENT, bad_proposal
-        )
+        _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
 
 
 def test_kernel_commit_accepts_balanced_perchlorate_proposal(
@@ -367,9 +385,12 @@ def test_kernel_commit_accepts_balanced_perchlorate_proposal(
         atom_balance_proof={"Cl": 0.0, "O": 0.0},
     )
 
+    bound_proposal = _dispatch_bound_proposal(
+        sim._chem_kernel, balanced_proposal
+    )
     # Should not raise.
     sim._chem_kernel.commit_batch(
-        ChemistryIntent.STAGE0_PRETREATMENT, balanced_proposal
+        ChemistryIntent.STAGE0_PRETREATMENT, bound_proposal
     )
 
 

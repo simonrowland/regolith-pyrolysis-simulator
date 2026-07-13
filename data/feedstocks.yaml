@@ -52,7 +52,7 @@ lunar_mare_low_ti:
   preferred_for: "General ISRU baseline; Fe/Mg shuttle feedstock"
   process_notes: "Standard C0-C6 flowsheet; ~0.5 wt% nanophase Fe0 present"
   solar_wind_volatiles:
-    status: "inventory-only (FB-33): NOT consumed by Stage-0/C0 yet — kernel wiring + rebaseline is the FB-33 implementation step"
+    status: "inventory-only (FB-33): NOT consumed by Stage-0/C0 yet -- kernel wiring + rebaseline is the FB-33 implementation step"
     adopted: "2026-07-07 owner-directed (t-052); values web-verified (docs-private/research/2026-07-07-volatiles-dispatch/findings-literature-grok.md)"
     basis: "solar-wind implantation, low-Ti mare site-mean synthesis; maturity- and grain-size-dependent; S is mostly indigenous sulfide (troilite), not solar wind"
     species_ppm:
@@ -76,7 +76,7 @@ lunar_mare_low_ti:
       the volatiles-train CHNOPS cold traps (50-400 C) hold only H2O/S/salt species: H2, He, He-3, N2
       and CO/CO2 pass to the pump stream, so capture needs a cryogenic trap stage (FB-33 equipment add).
       Favourable capture window (owner note 2026-07-07): during the C0 volatiles bakeout no kg-scale O2
-      is being emitted — pyrolytic metal decomposition has not started — so the noble-gas stream is not
+      is being emitted -- pyrolytic metal decomposition has not started -- so the noble-gas stream is not
       diluted by bulk oxygen; the cryo stage sees a clean, low-O2 feed.
 
 lunar_mare_high_ti:
@@ -119,7 +119,7 @@ lunar_mare_high_ti:
   preferred_for: "TiO2 recovery; ilmenite H2 reduction (alternative O2 pathway)"
   process_notes: "Standard C0-C6 flowsheet; ilmenite (FeTiO3) alters C2 Fe reduction kinetics; ~0.5 wt% nanophase Fe0 present"
   solar_wind_volatiles:
-    status: "inventory-only (FB-33): NOT consumed by Stage-0/C0 yet — kernel wiring + rebaseline is the FB-33 implementation step"
+    status: "inventory-only (FB-33): NOT consumed by Stage-0/C0 yet -- kernel wiring + rebaseline is the FB-33 implementation step"
     adopted: "2026-07-07 owner-directed (t-052); values web-verified (docs-private/research/2026-07-07-volatiles-dispatch/findings-literature-grok.md)"
     basis: "solar-wind implantation, high-Ti mare (A11/A17-like) site-mean synthesis; ilmenite-rich soils retain He ~3x low-Ti; capture/O2-window notes: see lunar_mare_low_ti.solar_wind_volatiles.capture_note"
     species_ppm:
@@ -130,7 +130,7 @@ lunar_mare_high_ti:
       S:   {value: 800, interval: [500, 1400], source: "Gibson E.K. 1977; Fegley & Swindle 1993 synthesis", basis: "indigenous mare sulfide, mostly", confidence: High}
       Ne:  {value: 1,   interval: [0.2, 2],    source: "Fegley & Swindle 1993 (via Crawford 2015 review)", basis: "order-of-magnitude SW noble gas", confidence: Medium}
       Ar:  {value: 1,   interval: [0.2, 2],    source: "Fegley & Swindle 1993 (via Crawford 2015 review)", basis: "order-of-magnitude SW noble gas", confidence: Medium}
-    He3_ppb: {value: 10, interval: [5, 20], source: "Fa W. & Jin Y-Q. 2007, Icarus 190:15, DOI 10.1016/j.icarus.2007.03.014", basis: "TiO2 x maturity correlation — richest terrain class", confidence: Medium}
+    He3_ppb: {value: 10, interval: [5, 20], source: "Fa W. & Jin Y-Q. 2007, Icarus 190:15, DOI 10.1016/j.icarus.2007.03.014", basis: "TiO2 x maturity correlation -- richest terrain class", confidence: Medium}
     isotope_ratio_He3_He4: {value: 3.7e-4, basis: "solar-wind 3He/4He mass-ratio approximation", confidence: Medium, owner_ratify: pending}
     release_windows_C:
       H_He:  [200, 700]
@@ -175,7 +175,7 @@ lunar_highland:
   preferred_for: "Al production, mullite, anorthite, CA cement, near-pure alumina"
   process_notes: "Mg shuttle draw 100-115 kg; ~neutral at >=80% bakeout recovery; mare batches replenish Mg"
   solar_wind_volatiles:
-    status: "inventory-only (FB-33): NOT consumed by Stage-0/C0 yet — kernel wiring + rebaseline is the FB-33 implementation step"
+    status: "inventory-only (FB-33): NOT consumed by Stage-0/C0 yet -- kernel wiring + rebaseline is the FB-33 implementation step"
     adopted: "2026-07-07 owner-directed (t-052); values web-verified (docs-private/research/2026-07-07-volatiles-dispatch/findings-literature-grok.md)"
     basis: "solar-wind implantation, highland (A16-like) site-mean synthesis; low ilmenite -> weakest He retention; capture/O2-window notes: see lunar_mare_low_ti.solar_wind_volatiles.capture_note. Polar PSR water ice (LCROSS Cabeus 5.6±2.9 wt%, Colaprete 2010 DOI 10.1126/science.1186986) is a SEPARATE future feedstock, not mixed into equatorial highland soil."
     species_ppm:
@@ -1564,7 +1564,7 @@ mars_basalt:
       value_wt_pct: 2.0
       interval_wt_pct: [1.5, 3.0]
       source: "Leshin L.A. et al. 2013, Science 341, DOI 10.1126/science.1238937 (Rocknest fines, MSL SAM EGA)."
-      basis: "Adsorbed/bound H2O in global-dust-derived fines. INVENTORY-ONLY (FB-33, adopted 2026-07-07, t-052): NOT in composition_wt_pct — adding it changes mass balance and is the golden-affecting kernel-wiring step."
+      basis: "Adsorbed/bound H2O in global-dust-derived fines. INVENTORY-ONLY (FB-33, adopted 2026-07-07, t-052): NOT in composition_wt_pct -- adding it changes mass balance and is the golden-affecting kernel-wiring step."
   environment:
     surface_pressure_mbar: 6    # range 0.7 (Olympus Mons) to 11 (Hellas)
     atmosphere: "96% CO2"

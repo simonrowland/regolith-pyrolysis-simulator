@@ -5,7 +5,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from simulator.chemistry.kernel import ChemistryIntent, LedgerTransitionProposal
+from simulator.chemistry.kernel import (
+    ChemistryIntent,
+    IntentResult,
+    LedgerTransitionProposal,
+)
 from simulator.cost_energy import (
     ELECTRICAL_USD_PER_KWH,
     FURNACE_USD_PER_H,
@@ -548,6 +552,7 @@ def test_cost_observation_exception_does_not_abort_chemistry_commit(
         {"metals": {}, "oxide_vapors": {}},
     )
     sim.load_batch("sample", mass_kg=1.0)
+    intent = ChemistryIntent.CA_ALUMINOTHERMIC_STEP
     before_cleaned_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")[
         "SiO2"
     ]
@@ -561,13 +566,26 @@ def test_cost_observation_exception_does_not_abort_chemistry_commit(
         "simulator.cost_ledger._process_step",
         raise_injected_cost_failure,
     )
+    provider = sim._chem_registry.authoritative_for(intent)
+    assert provider is not None
+
+    def dispatch_cost_isolation_proposal(request):
+        return IntentResult(
+            intent=request.intent,
+            status="ok",
+            transition=LedgerTransitionProposal(
+                debits={"process.cleaned_melt": {"SiO2": move_mol}},
+                credits={"terminal.slag": {"SiO2": move_mol}},
+                reason="cost_exception_isolation_smoke",
+            ),
+        )
+
+    monkeypatch.setattr(provider, "dispatch", dispatch_cost_isolation_proposal)
+    result = sim._dispatch_only(intent, control_inputs={})
+    assert result.transition is not None
     transition = sim._commit_proposal(
-        ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
-        LedgerTransitionProposal(
-            debits={"process.cleaned_melt": {"SiO2": move_mol}},
-            credits={"terminal.slag": {"SiO2": move_mol}},
-            reason="cost_exception_isolation_smoke",
-        ),
+        intent,
+        result.transition,
     )
 
     assert transition.name == "cost_exception_isolation_smoke"

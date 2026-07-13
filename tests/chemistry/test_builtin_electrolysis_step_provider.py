@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
+from unittest.mock import patch
 
 import pytest
 
@@ -49,6 +50,7 @@ from simulator.chemistry.kernel import (
     AtomBalanceError,
     ChemistryIntent,
     IntentRequest,
+    IntentResult,
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -83,6 +85,25 @@ from simulator.state import (
     MeltState,
 )
 from tests.chemistry.conftest import _build_sim
+
+
+def _dispatch_bound_proposal(kernel, proposal):
+    with patch.object(
+        BuiltinElectrolysisStepProvider,
+        "dispatch",
+        return_value=IntentResult(
+            intent=ChemistryIntent.ELECTROLYSIS_STEP,
+            status="ok",
+            transition=proposal,
+        ),
+    ):
+        result = kernel.dispatch(
+            ChemistryIntent.ELECTROLYSIS_STEP,
+            temperature_C=1600.0,
+            pressure_bar=1e-6,
+        )
+    assert result.transition is not None
+    return result.transition
 
 
 def _enable_c5_mre(sim, *, target_species: str, max_voltage_V: float) -> None:
@@ -1064,9 +1085,7 @@ def test_kernel_commit_rejects_atom_unbalanced_proposal(
     )
 
     with pytest.raises(AtomBalanceError):
-        sim._chem_kernel.commit_batch(
-            ChemistryIntent.ELECTROLYSIS_STEP, bad_proposal
-        )
+        _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
 
 
 def test_kernel_commit_accepts_balanced_proposal(
@@ -1097,9 +1116,12 @@ def test_kernel_commit_accepts_balanced_proposal(
         atom_balance_proof={"Fe": 0.0, "O": 0.0},
     )
 
+    bound_proposal = _dispatch_bound_proposal(
+        sim._chem_kernel, balanced_proposal
+    )
     # Should not raise.
     sim._chem_kernel.commit_batch(
-        ChemistryIntent.ELECTROLYSIS_STEP, balanced_proposal
+        ChemistryIntent.ELECTROLYSIS_STEP, bound_proposal
     )
 
 
@@ -1135,8 +1157,9 @@ def test_kernel_commit_accepts_terminal_oxygen_credit(
         },
         reason="terminal_credit_smoke",
     )
+    bound_proposal = _dispatch_bound_proposal(sim._chem_kernel, proposal)
     sim._chem_kernel.commit_batch(
-        ChemistryIntent.ELECTROLYSIS_STEP, proposal,
+        ChemistryIntent.ELECTROLYSIS_STEP, bound_proposal,
     )
 
     after_anode_kg = sim.atom_ledger.kg_by_account(
@@ -1608,7 +1631,6 @@ def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
     sim._project_extraction_melt()
     sim.melt.temperature_C = 1600.0
 
-    provider = BuiltinElectrolysisStepProvider()
     view = ProviderAccountView(
         accounts={
             "process.cleaned_melt": dict(
@@ -1632,7 +1654,12 @@ def test_provider_reduces_nio_to_nickel_and_anode_oxygen(
         },
     )
 
-    result = provider.dispatch(request)
+    result = sim._chem_kernel.dispatch(
+        ChemistryIntent.ELECTROLYSIS_STEP,
+        temperature_C=request.temperature_C,
+        pressure_bar=request.pressure_bar,
+        control_inputs=request.control_inputs,
+    )
     assert result.transition is not None
     diagnostic = dict(result.diagnostic)
     assert diagnostic["oxides_reduced_mol"]["NiO"] == pytest.approx(

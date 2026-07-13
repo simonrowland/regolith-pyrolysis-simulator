@@ -34,10 +34,15 @@ def _session_config(
     c5_enabled: bool = True,
     mre_target_species: str = "",
 ) -> SimSessionConfig:
+    setpoints = _load("setpoints.yaml")
+    setpoints["chemistry_kernel"] = {
+        **dict(setpoints.get("chemistry_kernel", {}) or {}),
+        "allow_unmeasured_alpha_fallback": True,
+    }
     return SimSessionConfig(
         feedstock_id=FEEDSTOCK,
         feedstocks=_load("feedstocks.yaml"),
-        setpoints=_load("setpoints.yaml"),
+        setpoints=setpoints,
         vapor_pressures=_load("vapor_pressures.yaml"),
         campaign="C0",
         hours=hours,

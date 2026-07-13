@@ -57,6 +57,12 @@ def test_stage_purity_report_flags_non_designated_stage_landings():
 def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     train = CondensationTrain.create_default()
     model = CondensationModel(train)
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=1.0,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in train.stages
+        },
+    )
     flux = EvaporationFlux({"K": 1.0})
     flux.update_totals()
 

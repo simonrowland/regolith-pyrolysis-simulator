@@ -45,8 +45,8 @@ def _alpha_notice(species: str, *, cited: bool = True) -> dict[str, object]:
     return {
         "alpha_s_provenance_by_species": {
             species: {
-                "hot_wall": {
-                    "segment": "hot_wall",
+                "duct_a": {
+                    "segment": "duct_a",
                     "species": species,
                     "alpha_s": 0.02 if cited else 1.0,
                     "citation_status": "CITED" if cited else "UNCERTIFIED",

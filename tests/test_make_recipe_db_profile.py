@@ -9,6 +9,7 @@ import yaml
 
 import scripts.make_recipe_db_profile as generator
 from simulator.optimize.evaluate import (
+    BackendUnavailableAbort,
     EngineBugAbort,
     _build_eval_inputs,
     _composition_target_constraints,
@@ -596,6 +597,12 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
             profile=profile,
             candidate_id=f"smoke-{target_id}",
         )
+    except BackendUnavailableAbort as exc:
+        message = str(exc)
+        assert "missing evaporation_alpha for sampled species: Cr, Mn" in message
+        assert "allow_unmeasured_alpha_fallback" in message
+        assert "unknown campaign" not in message
+        assert "valid options:" not in message
     except EngineBugAbort as exc:
         message = str(exc)
         assert "unknown campaign" not in message

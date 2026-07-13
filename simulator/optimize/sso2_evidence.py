@@ -114,6 +114,7 @@ def build_sso2_owner_recipe_execution(
         mass_kg=float(mass_kg),
         backend_name=backend_name,
         additives_kg={SSO2_CERTIFIED_DOSE_SPECIES: dose_kg},
+        allow_unmeasured_alpha_fallback=True,
         setpoints_patch=setpoints_patch,
     )
     session = SimSession().start(run._session_config())
