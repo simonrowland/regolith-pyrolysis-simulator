@@ -7,6 +7,10 @@ import pytest
 
 import simulator.optimize.pool as pool_module
 import simulator.optimize.worker_runtime as worker_runtime_module
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+)
 import simulator.session as session_module
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.optimize.evaluate import EngineBugAbort, evaluate
@@ -88,12 +92,12 @@ def test_warm_runtime_reuses_backend_but_creates_fresh_sim_and_ledger(
 
     monkeypatch.setattr(worker_runtime_module, "resolve_backend", resolve_once)
     context = warm_worker_runtime(
-        "stub",
+        LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
         feedstock_id="lunar_mare_low_ti",
         stage0_subprocess_required=True,
     )
     assert context is not None
-    assert resolve_calls == ["stub"]
+    assert resolve_calls == [ANALYTICAL_BACKEND_SERIALIZATION_TOKEN]
 
     def fail_cold_resolve(*_args: object, **_kwargs: object) -> object:
         raise AssertionError("cold backend resolve should not run")
@@ -118,7 +122,7 @@ def test_warm_runtime_reuses_backend_but_creates_fresh_sim_and_ledger(
     executor.execute(_session_config(), worker_runtime=context)
     executor.execute(_session_config(), worker_runtime=context)
 
-    assert resolve_calls == ["stub"]
+    assert resolve_calls == [ANALYTICAL_BACKEND_SERIALIZATION_TOKEN]
     assert seen[0][2] is context.backend
     assert seen[1][2] is context.backend
     assert seen[0][0] is not seen[1][0]
@@ -129,7 +133,7 @@ def test_cold_env_forces_fresh_backend_resolve(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv(WARM_WORKERS_ENV, "0")
-    assert warm_worker_runtime("stub") is None
+    assert warm_worker_runtime(LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN) is None
     assert get_worker_runtime() is None
     resolve_calls: list[str] = []
 
@@ -152,7 +156,10 @@ def test_cold_env_forces_fresh_backend_resolve(
     executor.execute(_session_config())
     executor.execute(_session_config())
 
-    assert resolve_calls == ["stub", "stub"]
+    assert resolve_calls == [
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    ]
 
 
 def test_bare_real_warm_runtime_declines_without_feedstock(

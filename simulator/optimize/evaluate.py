@@ -269,10 +269,9 @@ class RunReference:
             "product_summary",
             MappingProxyType(dict(self.product_summary)),
         )
-        # Fold the `internal-analytical` display alias onto the stable `stub`
-        # token before it reaches the fidelity-vocabulary translator below
-        # (which fail-loud rejects an unknown `internal-analytical` token) and
-        # so the stored/serialized field stays the byte-stable legacy token.
+        # Fold the legacy `stub` alias onto canonical `internal-analytical` at
+        # this acceptance boundary before fidelity-vocabulary translation and
+        # storage.
         if self.backend_name is not None:
             object.__setattr__(
                 self, "backend_name", canonical_backend_name(self.backend_name)
@@ -2524,10 +2523,8 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
             selected = dict(raw_selected)
     merged = dict(profile.get("run", {}) if isinstance(profile.get("run"), Mapping) else {})
     merged.update(selected)
-    # Fold the `internal-analytical` display alias onto the stable `stub` token
-    # at this single run-config read so EvalSpec, session config, resolver, and
-    # the fidelity-vocabulary backend-token translator all see the legacy token
-    # (the vocabulary fail-loud rejects an unknown `internal-analytical` token).
+    # Fold the legacy `stub` alias onto canonical `internal-analytical` at this
+    # run-config acceptance boundary so downstream consumers see one token.
     backend_name = canonical_backend_name(
         str(merged.get("backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN))
     )

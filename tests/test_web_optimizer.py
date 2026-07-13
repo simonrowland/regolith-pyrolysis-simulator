@@ -19,6 +19,7 @@ import yaml
 
 from simulator import mre_ladder
 from simulator.backends import backend_resolution_status
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
     CONTINUUM_BUFFER_KN,
@@ -797,8 +798,13 @@ def test_optimizer_reader_returns_fixture_db_metadata(client, tmp_path) -> None:
     assert run["latest_result"]["eval_spec"]["c5_enabled"] is True
     assert run["latest_result"]["eval_spec"]["mre_max_voltage_V"] == 1.45
     assert run["latest_result"]["eval_spec"]["mre_target_species"] == "SiO2"
-    assert run["latest_result"]["backend"]["backend_requested"] == "stub"
-    assert run["latest_result"]["backend"]["backend_active"] == "StubBackend"
+    assert run["latest_result"]["backend"]["backend_requested"] == (
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    )
+    assert (
+        run["latest_result"]["backend"]["backend_active"]
+        == "InternalAnalyticalBackend"
+    )
     assert run["latest_result"]["backend"]["backend_status"] == "unavailable"
     assert run["latest_result"]["backend"]["backend_authoritative"] is False
     assert (
@@ -920,8 +926,8 @@ def test_optimizer_backend_payload_preserves_analytical_alias_contract(
         {},
     )
 
-    assert payload["backend_requested"] == "stub"
-    assert payload["backend_active"] == "StubBackend"
+    assert payload["backend_requested"] == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    assert payload["backend_active"] == "InternalAnalyticalBackend"
     assert payload["backend_status"] == "unavailable"
     assert payload["evidence_class"] == "internal-analytical"
     assert payload["certification_allowed"] is False
@@ -935,7 +941,7 @@ def test_optimizer_backend_payload_diagnostic_stub_does_not_masquerade_as_real()
     )
 
     assert payload["backend_requested"] == "alphamelts"
-    assert payload["backend_active"] == "StubBackend"
+    assert payload["backend_active"] == "InternalAnalyticalBackend"
     assert payload["evidence_class"] == "internal-analytical"
     assert payload["certification_allowed"] is False
 
@@ -1788,7 +1794,9 @@ def test_optimizer_job_submit_spawns_cli_under_runs_jobs(client) -> None:
     assert cmd[1:3] == ["-m", "simulator.optimize"]
     assert cmd[cmd.index("--feedstock") + 1] == "lunar_mare_low_ti"
     assert cmd[cmd.index("--strategy") + 1] == "random"
-    assert cmd[cmd.index("--fidelity") + 1] == "stub"
+    assert cmd[cmd.index("--fidelity") + 1] == (
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    )
     assert cmd[cmd.index("--budget") + 1] == "3"
     assert cmd[cmd.index("--parallel") + 1] == "1"
     assert cmd[cmd.index("--seed") + 1] == "11"

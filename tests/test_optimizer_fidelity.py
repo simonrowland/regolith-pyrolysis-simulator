@@ -531,6 +531,9 @@ def test_stub_high_self_parity_withholds_trust_verdict(tmp_path: Path) -> None:
     payload = json.loads(Path(result.artifact_paths["json"]).read_text())
     assert payload["fast_screen_trustworthy"] is False
     assert payload["reason"] == "stub-vs-stub diagnostic, not authoritative"
+    # The canonical internal-analytical arm is diagnostic evidence, not an
+    # available certifying runtime. Perfect self-parity must therefore retain
+    # backend_status="unavailable" and withhold the trust verdict.
     assert {
         key: payload["backend_arms"]["fast"][key]
         for key in (
@@ -543,12 +546,12 @@ def test_stub_high_self_parity_withholds_trust_verdict(tmp_path: Path) -> None:
     } == {
         "tier": "fast",
         "fidelity_name": "fast",
-        "backend_name": "stub",
-        "backend_status": "diagnostic_stub",
+        "backend_name": "internal-analytical",
+        "backend_status": "unavailable",
         "authoritative": False,
     }
     assert payload["backend_arms"]["fast"]["evidence_class"] == "internal-analytical"
-    assert payload["backend_arms"]["fast"]["degradation_reason"] == "diagnostic_only"
+    assert payload["backend_arms"]["fast"]["degradation_reason"] == "unavailable"
     assert payload["backend_arms"]["fast"]["certification_allowed"] is False
     assert {
         key: payload["backend_arms"]["high"][key]
@@ -562,12 +565,12 @@ def test_stub_high_self_parity_withholds_trust_verdict(tmp_path: Path) -> None:
     } == {
         "tier": "high",
         "fidelity_name": "high",
-        "backend_name": "stub",
-        "backend_status": "diagnostic_stub",
+        "backend_name": "internal-analytical",
+        "backend_status": "unavailable",
         "authoritative": False,
     }
     assert payload["backend_arms"]["high"]["evidence_class"] == "internal-analytical"
-    assert payload["backend_arms"]["high"]["degradation_reason"] == "diagnostic_only"
+    assert payload["backend_arms"]["high"]["degradation_reason"] == "unavailable"
     assert payload["backend_arms"]["high"]["certification_allowed"] is False
 
 

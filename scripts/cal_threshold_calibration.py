@@ -464,7 +464,7 @@ def _is_real_backend_calibration_blocked(
 ) -> bool:
     """True when a real-backend CAL run must not emit authoritative thresholds."""
 
-    if backend == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
+    if canonical_backend_name(backend) == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN:
         return False
     if summary.get("row_count", 0) == 0:
         return True
@@ -732,7 +732,7 @@ def main(argv: list[str] | None = None) -> int:
     backend_fidelity = (
         "real-active-melt-backend"
         if args.backend != ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
-        else "stub-non-authoritative"
+        else f"{ANALYTICAL_BACKEND_SERIALIZATION_TOKEN}-non-authoritative"
     )
     metadata = {
         "backend": args.backend,

@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from scripts import run_fidelity_doe as doe
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 
 
 @pytest.mark.parametrize(
@@ -28,7 +29,7 @@ def test_analytical_high_backend_aliases_require_diagnostic_opt_in(
         diagnostic_internal_analytical_high=False,
     )
 
-    assert high_backend == "stub"
+    assert high_backend == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
     with pytest.raises(RuntimeError, match="diagnostic only"):
         doe._validate_high_backend_selection(
             high_backend,

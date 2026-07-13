@@ -11,6 +11,7 @@ import sys
 import tempfile
 
 from simulator.session_cli import SessionScriptRunner
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -120,14 +121,6 @@ def test_session_start_carries_c5_mre_fields_into_session():
 
 
 def test_session_start_accepts_internal_analytical_backend_alias():
-    """`--backend internal-analytical` (any case) is accepted, serializes stable `stub`.
-
-    The CLI `type=` normalizer folds the display alias (any case / underscore
-    form) onto the stable `stub` token before `choices` validation, matching the
-    resolver's tolerance; SimSessionConfig folds again, so the start frame's
-    `backend` field stays byte-stable and it still resolves to the
-    non-authoritative InternalAnalyticalBackend.
-    """
     for alias in ("internal-analytical", "INTERNAL-ANALYTICAL", "internal_analytical"):
         command = f"start feedstock=lunar_mare_low_ti backend={alias}"
         runner = SessionScriptRunner()
@@ -135,7 +128,7 @@ def test_session_start_accepts_internal_analytical_backend_alias():
         frame = runner.execute(shlex.split(command), command)
 
         assert frame["frame_type"] == "start", alias
-        assert frame["backend"] == "stub", alias
+        assert frame["backend"] == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN, alias
         assert frame["backend_active"] == "InternalAnalyticalBackend", alias
 
 
@@ -187,7 +180,7 @@ def test_session_script_exercises_every_verb_as_ndjson():
         "quit",
     ]
     assert all(frame["ok"] for frame in frames)
-    assert frames[0]["backend"] == "stub"
+    assert frames[0]["backend"] == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
     assert frames[0]["backend_active"] == "InternalAnalyticalBackend"
     assert set(frames[1]["snapshot"]) == PER_HOUR_KEYS
     assert frames[1]["snapshot"]["energy_scope"] == (

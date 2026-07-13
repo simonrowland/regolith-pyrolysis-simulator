@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import pytest
 
 import simulator.reduced_real_determinism as rrd
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.corpus_version import current_corpus_version
 
 
@@ -248,7 +249,10 @@ def test_start_session_canonicalizes_analytical_alias_identity(tmp_path, monkeyp
             allow_internal_analytical_equilibrium=True,
         )
 
-    assert [config.backend_name for config in captured_configs] == ["stub", "stub"]
+    assert [config.backend_name for config in captured_configs] == [
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    ]
 
 
 def test_run_case_rejects_zero_hours_before_session_start(tmp_path, monkeypatch):

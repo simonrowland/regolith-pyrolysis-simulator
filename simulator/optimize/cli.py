@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 from typing import Sequence
 
+from simulator.backend_names import canonical_backend_name
 from simulator.optimize.profiles import (
     ProfileValidationError,
     constrained_max_profile,
@@ -127,6 +128,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--fidelity",
         required=True,
+        type=canonical_backend_name,
         choices=VALID_FIDELITIES,
         help="evaluation fidelity",
     )

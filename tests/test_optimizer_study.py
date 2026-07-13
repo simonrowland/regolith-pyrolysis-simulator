@@ -24,6 +24,11 @@ from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
 from engines.builtin.vapor_pressure import VaporPressureRangeError
 import scripts.make_recipe_db_profile as generator
 from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    canonical_backend_name,
+)
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.electrolysis import (
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
@@ -81,8 +86,18 @@ PROFILE = {
         },
     ],
     "constraints": {"gates": ["delivered_stream_purity"]},
-    "run": {"campaign": "C0", "hours": 1, "mass_kg": 1000.0, "backend_name": "stub"},
-    "fidelities": {"stub": {"backend_name": "stub", "hours": 1}},
+    "run": {
+        "campaign": "C0",
+        "hours": 1,
+        "mass_kg": 1000.0,
+        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    },
+    "fidelities": {
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN: {
+            "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            "hours": 1,
+        }
+    },
     "seed_recipes": [
         {
             "id": "study-c0-seed",
@@ -149,7 +164,7 @@ def _spec(
     spec, _ = _build_eval_inputs(
         patch.validated(RecipeSchema()),
         feedstock,
-        fidelity,
+        str(canonical_backend_name(fidelity)),
         profile,
         RecipeSchema(),
         constraints=constraints,
@@ -4570,7 +4585,7 @@ def test_typed_physics_refusals_are_stored_and_study_continues(tmp_path) -> None
     refusal_cases = _study_typed_refusal_cases()
     profile = copy.deepcopy(PROFILE)
     profile["fidelities"]["internal-analytical"] = copy.deepcopy(
-        profile["fidelities"]["stub"]
+        profile["fidelities"][ANALYTICAL_BACKEND_SERIALIZATION_TOKEN]
     )
 
     def evaluator(
@@ -4865,6 +4880,23 @@ def test_study_result_records_are_light_no_trace_or_snapshots(tmp_path) -> None:
     assert not hasattr(result.leaderboard[0], "run_reference")
     assert not hasattr(result.leaderboard[0], "snapshots")
     assert not _contains_key(result, "snapshots")
+
+
+def test_cli_folds_legacy_fidelity_before_choices_validation() -> None:
+    args = optimizer_cli._parser().parse_args(
+        [
+            "--feedstock",
+            FEEDSTOCK,
+            "--strategy",
+            "random",
+            "--fidelity",
+            LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            "--budget",
+            "1",
+        ]
+    )
+
+    assert args.fidelity == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 
 
 def test_cli_help_unknowns_and_budget_one_stub_run(tmp_path) -> None:

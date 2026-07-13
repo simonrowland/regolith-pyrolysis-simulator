@@ -1328,7 +1328,9 @@ def _parse_optimizer_job_request(
     feedstock_id = str(_payload_value(payload, 'feedstock_id', '') or '')
     profile_id = str(_payload_value(payload, 'profile_id', '') or '')
     strategy = str(_payload_value(payload, 'strategy', '') or '')
-    fidelity = str(_payload_value(payload, 'fidelity', '') or '')
+    fidelity = str(
+        canonical_backend_name(str(_payload_value(payload, 'fidelity', '') or ''))
+    )
     feedstock_profiles = _optimizer_feedstock_profiles_payload()
     profile_by_id = _optimizer_profile_by_id(feedstock_profiles)
     feedstocks = feedstock_profiles.get('feedstocks')
@@ -1387,7 +1389,11 @@ def _parse_optimizer_certify_request(
     cache_key = str(_payload_value(payload, 'cache_key', '') or '')
     feedstock_id = str(_payload_value(payload, 'feedstock_id', '') or '')
     profile_id = str(_payload_value(payload, 'profile_id', '') or '')
-    fidelity = str(_payload_value(payload, 'fidelity', '') or 'fast')
+    fidelity = str(
+        canonical_backend_name(
+            str(_payload_value(payload, 'fidelity', '') or 'fast')
+        )
+    )
 
     if not run_id:
         return None, 'run_id is required'

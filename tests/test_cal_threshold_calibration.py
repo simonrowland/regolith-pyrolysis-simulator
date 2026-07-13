@@ -21,6 +21,11 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+)
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 _SPEC = importlib.util.spec_from_file_location(
@@ -41,7 +46,7 @@ def _worker_args(*extra: str):
         [
             "--worker",
             "--backend",
-            "stub",
+            LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
             "--max-hours",
             "2",
             *extra,
@@ -101,16 +106,18 @@ def test_legacy_allow_stub_flag_alias_is_accepted():
     "backend",
     ("internal-analytical", " Internal-Analytical ", "INTERNAL_ANALYTICAL"),
 )
-def test_backend_alias_variants_parse_to_stable_stub_token(backend):
-    assert cal._parse_args(["--backend", backend]).backend == "stub"
+def test_backend_alias_variants_parse_to_canonical_token(backend):
+    assert cal._parse_args(["--backend", backend]).backend == (
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    )
 
 
-def test_internal_analytical_run_metadata_is_stub_non_authoritative(
+def test_internal_analytical_run_metadata_is_canonical_non_authoritative(
     tmp_path,
     monkeypatch,
 ):
     def fake_run_worker_case(case, *, backend, **kwargs):
-        assert backend == "stub"
+        assert backend == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
         return {
             "case": {"feedstock": case.feedstock, "campaign": case.campaign},
             "backend": {"name": "InternalAnalyticalBackend"},
@@ -149,10 +156,10 @@ def test_internal_analytical_run_metadata_is_stub_non_authoritative(
 
     assert rc == 0
     payload = json.loads((tmp_path / "out" / "raw_curves.json").read_text())
-    assert payload["metadata"]["backend"] == "stub"
+    assert payload["metadata"]["backend"] == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
     assert (
         payload["metadata"]["backend_fidelity"]
-        == "stub-non-authoritative"
+        == f"{ANALYTICAL_BACKEND_SERIALIZATION_TOKEN}-non-authoritative"
     )
 
 

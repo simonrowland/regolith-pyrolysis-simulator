@@ -16,10 +16,12 @@ from __future__ import annotations
 
 import inspect
 import json
+import pickle
 
 import pytest
 
 from simulator.accounting.ledger import AtomLedger, LedgerTransition
+from simulator.accounting.lots import MaterialLot
 from simulator.chemistry.kernel import (
     AccountFilterViolation,
     AtomBalanceError,
@@ -462,6 +464,24 @@ def test_committed_nested_metadata_is_detached_and_immutable():
     with pytest.raises(TypeError):
         dict.__setitem__(committed, "provider", "descriptor bypass")
     assert committed == {"provider": "original", "sources": ("source-a",)}
+
+
+def test_committed_material_lot_pickle_round_trip_preserves_immutability():
+    lot = MaterialLot(
+        "process.cleaned_melt",
+        {"SiO2": 0.1},
+        source="provider",
+        meta={"provenance": {"sources": ["source-a"]}},
+    )
+
+    restored = pickle.loads(pickle.dumps(lot))
+
+    assert restored == lot
+    assert restored.meta == {"provenance": {"sources": ("source-a",)}}
+    with pytest.raises(TypeError, match="metadata is immutable"):
+        restored.meta["provenance"]["sources"] = ("source-b",)
+    with pytest.raises(TypeError):
+        restored.species_kg["SiO2"] = 0.2
 
 
 def test_runtime_capability_drift_rejects_before_provider_invocation():

@@ -292,7 +292,7 @@ def validate_profile(
 ) -> Mapping[str, Any]:
     if not isinstance(raw, Mapping):
         raise ProfileValidationError(f"{source}: profile must be a mapping")
-    profile = _canonicalize_profile_backend_names(raw, source=source)
+    profile = canonicalize_profile_backend_names(raw, source=source)
     _reject_unknown_keys(profile, _TOP_LEVEL_KEYS, source=source, where="profile")
 
     required = {
@@ -341,12 +341,12 @@ def validate_profile(
     return ValidatedProfile(profile, source=source)
 
 
-def _canonicalize_profile_backend_names(
+def canonicalize_profile_backend_names(
     raw: Mapping[str, Any],
     *,
     source: str | Path,
 ) -> dict[str, Any]:
-    profile = copy.deepcopy(dict(raw))
+    profile = _copy_profile_value(raw)
     run = profile.get("run")
     if isinstance(run, Mapping) and "backend_name" in run:
         normalized_run = dict(run)
@@ -364,7 +364,7 @@ def _canonicalize_profile_backend_names(
             raise ProfileValidationError(
                 f"{source}: duplicate fidelity after alias normalization {name!r}"
             )
-        options = copy.deepcopy(raw_options)
+        options = _copy_profile_value(raw_options)
         if isinstance(options, Mapping) and "backend_name" in options:
             options = dict(options)
             options["backend_name"] = canonical_backend_name(
@@ -373,6 +373,21 @@ def _canonicalize_profile_backend_names(
         normalized_fidelities[name] = options
     profile["fidelities"] = normalized_fidelities
     return profile
+
+
+def _copy_profile_value(value: Any) -> Any:
+    """Copy authored profile data without pickling immutable mapping views."""
+    if isinstance(value, Mapping):
+        return {key: _copy_profile_value(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_copy_profile_value(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_copy_profile_value(item) for item in value)
+    if isinstance(value, set):
+        return {_copy_profile_value(item) for item in value}
+    if isinstance(value, frozenset):
+        return frozenset(_copy_profile_value(item) for item in value)
+    return copy.deepcopy(value)
 
 
 def constrained_max_profile(

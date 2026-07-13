@@ -702,8 +702,8 @@ def _task_backend_name(task: _PoolTask) -> str:
         selected = fidelities.get(task.fidelity, {})
         if isinstance(selected, Mapping):
             merged.update(selected)
-    # Fold the `internal-analytical` display alias onto the stable `stub` token
-    # (read raw from the profile; mirrors EvalSpec.backend_name canonicalization).
+    # Fold legacy `stub` onto canonical `internal-analytical` when reading the
+    # profile boundary; mirrors EvalSpec.backend_name canonicalization.
     return canonical_backend_name(
         str(
             merged.get("backend_name", ANALYTICAL_BACKEND_SERIALIZATION_TOKEN)

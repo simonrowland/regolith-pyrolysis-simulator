@@ -17,6 +17,7 @@ from engines.builtin.vapor_pressure import (
 import simulator.optimize.evaluate as evaluate_module
 from simulator.accounting.ledger import AtomLedger
 from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.chemistry.kernel import (
     ChemistryIntent,
@@ -4003,8 +4004,8 @@ def test_stub_fidelity_drops_inherited_cached_real_cache_config(tmp_path) -> Non
     )
 
     assert result.eval_spec is not None
-    assert result.eval_spec.backend_name == "stub"
-    assert executor.config.backend_name == "stub"
+    assert result.eval_spec.backend_name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    assert executor.config.backend_name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
     assert executor.config.reduced_real_cache is None
 
 
@@ -4053,11 +4054,8 @@ def test_run_reference_derives_real_engine_canonical_class() -> None:
     assert reference.certification_allowed is True
 
 
-def test_run_reference_folds_internal_analytical_alias_to_stub() -> None:
-    """Constructing a RunReference with the display alias must not trip the
-    fidelity-vocabulary fail-loud (which rejects an unknown `internal-analytical`
-    backend token) and must fold to the stable `stub` token / same evidence
-    class as the legacy `stub` reference (alias-preserving rebrand)."""
+def test_run_reference_folds_legacy_alias_to_canonical_analytical_token() -> None:
+    """Acceptance boundaries fold legacy ``stub`` to ``internal-analytical``."""
     aliased = evaluate_module.RunReference(
         status="ok",
         trace={"backend_status": "unavailable"},
@@ -4069,7 +4067,8 @@ def test_run_reference_folds_internal_analytical_alias_to_stub() -> None:
         backend_name="stub",
     )
 
-    assert aliased.backend_name == "stub"
+    assert aliased.backend_name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    assert legacy.backend_name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
     assert aliased.evidence_class == legacy.evidence_class
     assert aliased.certification_allowed == legacy.certification_allowed
 

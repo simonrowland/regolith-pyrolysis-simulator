@@ -14,8 +14,12 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.corpus_version import current_corpus_version
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+)
 from simulator.diagnostics import wall_deposit_sticking_authority_status
-from simulator.fidelity_vocabulary import FidelityVocabularyTranslationError
+from simulator.fidelity_vocabulary import FidelityVocabularyTranslationError, LabelSource
 from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
 from simulator.optimize.objective import (
@@ -848,10 +852,10 @@ def test_lookup_rejects_poisoned_run_reference_canonical_fields(tmp_path) -> Non
         payload = json.loads(row[0])
         payload.update(
             {
-                "backend_name": "stub",
+                "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
                 "backend_status": "ok",
                 "backend_authoritative": True,
-                "label_source": "legacy_backend_alias:stub",
+                "label_source": LabelSource.BACKEND_INTERNAL_ANALYTICAL.value,
                 "certification_allowed": True,
             }
         )
@@ -1235,7 +1239,7 @@ def test_store_rejects_internal_analytical_backend_name_with_spoofed_authority_m
     spec = _base_spec()
     trace = _admissible_trace(
         {
-            "backend_name": "stub",
+            "backend_name": LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
             "backend_status": "ok",
             "backend_authoritative": True,
         }
@@ -1250,7 +1254,7 @@ def test_store_rejects_internal_analytical_backend_name_with_spoofed_authority_m
         run_reference=RunReference(
             status="ok",
             trace=trace,
-            backend_name="stub",
+            backend_name=LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
             backend_status="ok",
             backend_authoritative=True,
             product_summary={"oxygen_kg": 10.0},
@@ -1265,7 +1269,10 @@ def test_store_rejects_internal_analytical_backend_name_with_spoofed_authority_m
     with pytest.raises(ResultStoreWriteRejected) as exc_info:
         store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
 
-    assert "backend_name_non_authoritative:stub" in exc_info.value.reasons
+    assert (
+        f"backend_name_non_authoritative:{ANALYTICAL_BACKEND_SERIALIZATION_TOKEN}"
+        in exc_info.value.reasons
+    )
     assert store.lookup(spec) is None
 
 

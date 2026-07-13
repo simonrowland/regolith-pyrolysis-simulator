@@ -78,6 +78,7 @@ from simulator.optimize.pool import (
 )
 from simulator.optimize.profiles import (
     ProfileValidationError,
+    canonicalize_profile_backend_names,
     physics_constraints_from_profile,
     validate_profile,
 )
@@ -552,7 +553,10 @@ def run(
     except ProfileValidationError as exc:
         if not _is_stale_profile_refusal(exc) or not isinstance(config.profile, Mapping):
             raise
-        resolved_profile = dict(config.profile)
+        resolved_profile = canonicalize_profile_backend_names(
+            config.profile,
+            source="<stale-profile>",
+        )
     active_schema = _schema_with_pinned_paths(
         base_schema,
         resolved_profile,
@@ -1616,7 +1620,7 @@ def _load_study_journal(
         profile=resolved_profile,
         feedstock=feedstock,
         strategy=strategy_key,
-        fidelity=str(manifest.get("fidelity")),
+        fidelity=str(canonical_backend_name(str(manifest.get("fidelity")))),
         parallel=int(manifest.get("parallel", 1)),
         budget=int(manifest.get("budget", 0)),
         out_dir=root,
@@ -2213,7 +2217,11 @@ def _assert_resume_manifest_matches_invocation(
             mismatches.append(f"{key}: stored={stored!r} current={current!r}")
 
     note("feedstock_id", manifest.get("feedstock_id"), feedstock)
-    note("fidelity", manifest.get("fidelity"), fidelity)
+    note(
+        "fidelity",
+        canonical_backend_name(str(manifest.get("fidelity"))),
+        canonical_backend_name(fidelity),
+    )
     note("seed", int(manifest.get("seed", 0)), int(config.seed))
     note("budget", int(manifest.get("budget", 0)), int(config.budget))
     note("parallel", int(manifest.get("parallel", 1)), int(config.parallel))

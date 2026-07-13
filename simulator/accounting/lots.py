@@ -62,6 +62,16 @@ def _freeze_meta(value: Any) -> Any:
     return deepcopy(value)
 
 
+def _thaw_meta(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {key: _thaw_meta(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return tuple(_thaw_meta(item) for item in value)
+    if isinstance(value, frozenset):
+        return frozenset(_thaw_meta(item) for item in value)
+    return value
+
+
 @dataclass(frozen=True)
 class MaterialLot:
     """Species masses associated with one account."""
@@ -98,6 +108,13 @@ class MaterialLot:
     def without_empty(self, tolerance_kg: float = EMPTY_KG_TOLERANCE) -> "MaterialLot":
         kept = {species: kg for species, kg in self.species_kg.items() if abs(kg) > tolerance_kg}
         return MaterialLot(self.account, kept, source=self.source, meta=self.meta)
+
+    def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
+        """Rebuild immutable views after crossing a pickle boundary."""
+        return (
+            type(self),
+            (self.account, dict(self.species_kg), self.source, _thaw_meta(self.meta)),
+        )
 
     def total_mass_kg(self, registry: Mapping[str, Any] | None = None) -> float:
         if registry is not None:
