@@ -852,13 +852,54 @@ def test_recovered_condensate_transfers_once_to_reagent_inventory():
         source="test recovered K condensate",
     )
     sim.train.stages[4].collected_kg["K"] = 2.0
+    assert sim._audit_metal_projection_drift() == {}
     assert sim._transfer_condensed_species("K") == pytest.approx(2.0)
+    assert sim._audit_metal_projection_drift() == {}
 
     assert sim._transfer_condensed_species("K") == pytest.approx(0.0)
     assert sim.train.stages[4].collected_kg.get("K", 0.0) == pytest.approx(0.0)
     assert sim.atom_ledger.kg_by_account("process.reagent_inventory")[
         "K"
     ] == pytest.approx(2.0)
+
+
+def test_stage_projection_combines_condensation_and_metal_phase_sources():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"SiO2": 100.0},
+            }
+        }
+    )
+    sim.load_batch("oxide", mass_kg=1000.0)
+    sim.atom_ledger.load_external(
+        "process.condensation_train",
+        {"K": 2.0},
+        source="test recovered K condensate",
+    )
+    sim.atom_ledger.load_external(
+        METAL_PHASE_ACCOUNT,
+        {"K": 1.0},
+        source="test extracted K metal",
+    )
+    sim.train.stages[2].collected_kg["K"] = 2.0
+    sim._record_stage_collection_source(
+        "process.condensation_train", 2, "K", 2.0
+    )
+
+    sim._project_condensed_species(
+        4, "K", source_account=METAL_PHASE_ACCOUNT
+    )
+
+    assert sim.train.total_by_species()["K"] == pytest.approx(3.0)
+    assert sim._audit_metal_projection_drift() == {}
+
+    assert sim._transfer_condensed_species("K") == pytest.approx(2.0)
+    assert sim.train.total_by_species()["K"] == pytest.approx(1.0)
+    assert sim.train.stages[2].collected_kg.get("K", 0.0) == pytest.approx(0.0)
+    assert sim.train.stages[4].collected_kg["K"] == pytest.approx(1.0)
+    assert sim._audit_metal_projection_drift() == {}
 
 
 def test_mg_thermite_debits_process_reagent_inventory():

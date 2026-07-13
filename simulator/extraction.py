@@ -13,6 +13,7 @@ from simulator.account_ids import (
     METAL_FLOAT_LAYER_ACCOUNT,
     METAL_PHASE_ACCOUNT,
     METAL_PHASE_ACCOUNTS,
+    STAGE_COLLECTION_BACKING_ACCOUNTS,
 )
 from simulator.accounting.queries import AccountingQueries
 from simulator.chemistry.melt_activity import melt_oxide_activity
@@ -395,6 +396,9 @@ class ExtractionMixin:
     def _clear_condensed_species_projection(self, species: str) -> None:
         for stage in self.train.stages:
             stage.collected_kg.pop(species, None)
+        for key in tuple(self._stage_collection_kg_by_source):
+            if key[2] == species:
+                self._stage_collection_kg_by_source.pop(key, None)
 
     def _condensed_species_projected_kg(self, species: str) -> float:
         return sum(
@@ -402,23 +406,103 @@ class ExtractionMixin:
             for stage in self.train.stages
         )
 
+    def _stage_collection_backing_kg(self, species: str) -> float:
+        return sum(
+            self._ledger_account_species_kg(account, species)
+            for account in STAGE_COLLECTION_BACKING_ACCOUNTS
+        )
+
+    def _record_stage_collection_source(
+        self,
+        source_account: str,
+        stage_idx: int,
+        species: str,
+        delta_kg: float,
+    ) -> None:
+        key = (source_account, int(stage_idx), species)
+        self._stage_collection_kg_by_source[key] = max(
+            0.0,
+            self._stage_collection_kg_by_source.get(key, 0.0)
+            + float(delta_kg),
+        )
+
+    def _remove_stage_collection_source_projection(
+        self, source_account: str, species: str, remove_kg: float
+    ) -> float:
+        remaining_kg = max(0.0, float(remove_kg))
+        removed_kg = 0.0
+        keys = sorted(
+            (
+                key
+                for key in self._stage_collection_kg_by_source
+                if key[0] == source_account and key[2] == species
+            ),
+            key=lambda key: key[1],
+            reverse=True,
+        )
+        for key in keys:
+            if remaining_kg <= self._LEDGER_KG_TOL:
+                break
+            tracked_kg = self._stage_collection_kg_by_source.get(key, 0.0)
+            take_kg = min(tracked_kg, remaining_kg)
+            stage_idx = key[1]
+            stage = self.train.stages[stage_idx]
+            projected_kg = max(
+                0.0, float(stage.collected_kg.get(species, 0.0))
+            )
+            take_kg = min(take_kg, projected_kg)
+            stage_remaining_kg = projected_kg - take_kg
+            source_remaining_kg = tracked_kg - take_kg
+            if stage_remaining_kg <= self._LEDGER_KG_TOL:
+                stage.collected_kg.pop(species, None)
+            else:
+                stage.collected_kg[species] = stage_remaining_kg
+            if source_remaining_kg <= self._LEDGER_KG_TOL:
+                self._stage_collection_kg_by_source.pop(key, None)
+            else:
+                self._stage_collection_kg_by_source[key] = source_remaining_kg
+            remaining_kg -= take_kg
+            removed_kg += take_kg
+        return removed_kg
+
+    def _trim_condensed_species_projection(
+        self, species: str, target_kg: float
+    ) -> None:
+        excess_kg = max(
+            0.0,
+            self._condensed_species_projected_kg(species)
+            - max(0.0, float(target_kg)),
+        )
+        for stage in reversed(self.train.stages):
+            if excess_kg <= self._LEDGER_KG_TOL:
+                break
+            current_kg = max(
+                0.0, float(stage.collected_kg.get(species, 0.0))
+            )
+            remove_kg = min(current_kg, excess_kg)
+            remaining_kg = current_kg - remove_kg
+            if remaining_kg <= self._LEDGER_KG_TOL:
+                stage.collected_kg.pop(species, None)
+            else:
+                stage.collected_kg[species] = remaining_kg
+            excess_kg -= remove_kg
+
     def _audit_metal_projection_drift(self) -> Dict[str, float]:
         """0.5.4 W8 (M2 historical-audit closure, 2026-05-28):
-        per-species drift between aggregate mol-native metal-phase accounts
-        (staging + diagnostic pools) and the UI projection
+        per-species drift between aggregate mol-native stage-collection backing
+        accounts (metal-phase staging + diagnostic pools + condensation train)
+        and the UI projection
         sum across ``train.stages[*].collected_kg``.
 
-        Returns a dict ``{species: drift_kg}`` for metal species
+        Returns a dict ``{species: drift_kg}`` for species
         where the absolute drift exceeds ``_LEDGER_KG_TOL``. Sign
         convention: ``ledger_kg - projection_kg`` — positive when
-        the ledger account exceeds the UI projection (some metal
-        has been credited but not yet projected; the normal
-        steady-state drift direction), zero when in sync. Negative
-        values should never appear in practice because
-        ``_project_condensed_species`` line 248-250 already clears
-        the projection if it overshoots the ledger; the audit
-        surface still includes them honestly so an operator-visible
-        bug would be audit-visible rather than silent.
+        the combined backing accounts exceed the UI projection
+        (some stage-collected mass has been credited but not yet
+        projected), zero when in sync. Negative values identify
+        projection mass without matching
+        backing-account mass. Both signs remain visible so one-sided
+        ledger or projection mutations cannot pass silently.
 
         Diagnostic only — does NOT raise on drift. The runner-strict
         result consumer remaps a nonempty audit to failed status. The
@@ -430,7 +514,7 @@ class ExtractionMixin:
         + tests can read it without touching simulator internals.
         """
         ledger_metals: Dict[str, float] = {}
-        for account in METAL_PHASE_ACCOUNTS:
+        for account in STAGE_COLLECTION_BACKING_ACCOUNTS:
             for species, kg in self.atom_ledger.kg_by_account(account).items():
                 try:
                     ledger_kg = float(kg)
@@ -711,25 +795,35 @@ class ExtractionMixin:
         *,
         source_account: str = 'process.condensation_train',
     ) -> None:
-        kg = self._ledger_account_species_kg(
-            source_account, species)
-        if kg <= self._LEDGER_KG_TOL:
+        if source_account not in STAGE_COLLECTION_BACKING_ACCOUNTS:
+            raise ValueError(
+                f'unsupported stage-collection source account: {source_account}'
+            )
+        backing_kg = self._stage_collection_backing_kg(species)
+        if backing_kg <= self._LEDGER_KG_TOL:
             self._clear_condensed_species_projection(species)
             return
 
         projected = self._condensed_species_projected_kg(species)
-        if projected > kg + self._LEDGER_KG_TOL:
-            self._clear_condensed_species_projection(species)
-            projected = 0.0
+        if projected > backing_kg + self._LEDGER_KG_TOL:
+            self._trim_condensed_species_projection(species, backing_kg)
+            projected = self._condensed_species_projected_kg(species)
 
-        add_kg = kg - projected if delta_kg is None else float(delta_kg)
-        add_kg = min(max(0.0, add_kg), max(0.0, kg - projected))
+        add_kg = (
+            backing_kg - projected if delta_kg is None else float(delta_kg)
+        )
+        add_kg = min(
+            max(0.0, add_kg), max(0.0, backing_kg - projected)
+        )
         if add_kg <= self._LEDGER_KG_TOL:
             return
         current = max(
             0.0, float(self.train.stages[stage_idx].collected_kg.get(species, 0.0))
         )
         self._set_condensed_species_projection(stage_idx, species, current + add_kg)
+        self._record_stage_collection_source(
+            source_account, stage_idx, species, add_kg
+        )
 
     def _project_extraction_product(
         self,
@@ -2395,8 +2489,10 @@ class ExtractionMixin:
         source_account = 'process.condensation_train'
         recovered_kg = self._ledger_account_species_kg(
             source_account, species)
-        self._clear_condensed_species_projection(species)
         if recovered_kg <= self._LEDGER_KG_TOL:
+            self._trim_condensed_species_projection(
+                species, self._stage_collection_backing_kg(species)
+            )
             return 0.0
         moved_kg = self._move_ledger_species(
             f'recover_{species}_to_reagent_inventory',
@@ -2405,6 +2501,12 @@ class ExtractionMixin:
             species,
             recovered_kg,
             reason=f'recovered {species} condensate transfer',
+        )
+        self._remove_stage_collection_source_projection(
+            source_account, species, moved_kg
+        )
+        self._trim_condensed_species_projection(
+            species, self._stage_collection_backing_kg(species)
         )
         self._move_cost_inventory_lots_best_effort(
             source_account=source_account,

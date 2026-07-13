@@ -1,16 +1,16 @@
 """W8 / M2 historical-audit closure (2026-05-28): per-species drift
-between ``process.metal_phase`` (canonical AtomLedger account) and
-the ``train.stages[*].collected_kg`` UI projection.
+between the stage-collection backing accounts and the
+``train.stages[*].collected_kg`` UI projection.
 
 Diagnostic only — the global ≤5e-12 % closure on
 ``HourSnapshot.mass_balance_error_pct`` remains the hard gate; this
 audit gives earlier-warning visibility when ledger ↔ UI projection
 drift opens up on individual species.
 
-The audit helper reads
-``self.atom_ledger.kg_by_account('process.metal_phase')`` and compares
-to the sum of ``train.stages[*].collected_kg`` for each species in
-the ledger. To exercise the helper in isolation we drive the read
+The audit helper aggregates the metal-phase accounts and
+``process.condensation_train``, then compares that mass to the sum of
+``train.stages[*].collected_kg`` for each species in their union. To
+exercise the helper in isolation we drive the read
 side via a fake-ledger pattern; the snapshot wiring is then verified
 via a stub-sim end-to-end.
 """
@@ -37,6 +37,7 @@ from simulator.state import (
 def _make_audit_target(
     *,
     metal_phase_kg: Dict[str, float],
+    condensation_train_kg: Dict[str, float] | None = None,
     train_kg_by_stage: Iterable[Dict[str, float]],
 ) -> SimpleNamespace:
     """Minimal duck-typed surface for ``_audit_metal_projection_drift``.
@@ -61,6 +62,8 @@ def _make_audit_target(
     def _fake_kg_by_account(account):
         if account == 'process.metal_phase':
             return dict(metal_phase_kg)
+        if account == 'process.condensation_train':
+            return dict(condensation_train_kg or {})
         return {}
 
     ns = SimpleNamespace(
@@ -108,6 +111,44 @@ def test_audit_in_sync_ledger_and_projection_returns_empty_dict():
         ],
     )
     assert target._audit_metal_projection_drift() == {}
+
+
+def test_audit_condensation_credit_and_stage_projection_are_in_sync():
+    target = _make_audit_target(
+        metal_phase_kg={},
+        condensation_train_kg={'K': 0.02, 'Na': 0.03},
+        train_kg_by_stage=[{}, {'K': 0.02}, {'Na': 0.03}],
+    )
+    assert target._audit_metal_projection_drift() == {}
+
+
+def test_audit_sums_condensation_train_and_metal_phase_backing():
+    target = _make_audit_target(
+        metal_phase_kg={'Fe': 0.04, 'Na': 0.01},
+        condensation_train_kg={'Na': 0.02, 'K': 0.03},
+        train_kg_by_stage=[{'Fe': 0.04}, {'Na': 0.03}, {'K': 0.03}],
+    )
+    assert target._audit_metal_projection_drift() == {}
+
+
+def test_audit_surfaces_one_sided_condensation_mutations_with_signed_drift():
+    cleared_ui = _make_audit_target(
+        metal_phase_kg={},
+        condensation_train_kg={'Na': 0.03},
+        train_kg_by_stage=[{}, {}],
+    )
+    moved_ledger_only = _make_audit_target(
+        metal_phase_kg={},
+        condensation_train_kg={},
+        train_kg_by_stage=[{'Na': 0.03}, {}],
+    )
+
+    assert cleared_ui._audit_metal_projection_drift() == {
+        'Na': pytest.approx(0.03),
+    }
+    assert moved_ledger_only._audit_metal_projection_drift() == {
+        'Na': pytest.approx(-0.03),
+    }
 
 
 def test_audit_normal_direction_drift_ledger_above_projection():

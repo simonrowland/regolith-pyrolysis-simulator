@@ -9,6 +9,13 @@ METAL_PHASE_ACCOUNTS = (
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
 )
+# Writer sweep (2026-07-12): evaporation._project_condensed_stage_collection
+# projects condensation-train credits; extraction._project_condensed_species
+# projects condensation-train or metal-phase balances. Other mutations clear.
+STAGE_COLLECTION_BACKING_ACCOUNTS = (
+    *METAL_PHASE_ACCOUNTS,
+    "process.condensation_train",
+)
 OXYGEN_STAGE0_ACCOUNT = "terminal.oxygen_stage0_stored"
 OXYGEN_MELT_OFFGAS_ACCOUNT = "terminal.oxygen_melt_offgas_stored"
 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT = (

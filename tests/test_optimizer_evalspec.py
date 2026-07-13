@@ -2423,6 +2423,7 @@ def test_in_window_c2a_run_captures_na_product() -> None:
         runtime_campaign_overrides=run_config.runtime_campaign_overrides,
         force_builtin_vapor_pressure=True,
         allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
     )
     session = run._start_session()
     result = run._run_session(session)
