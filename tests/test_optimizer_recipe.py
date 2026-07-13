@@ -446,16 +446,14 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # schema/allowlist drift.
     # 2026-07-11 0.6.0 E-MOVE: version/source/data fingerprint invalidation;
     # recipe_id and searchable allowlist hash above are unchanged.
-    # 2026-07-12 combined-main rebaseline: the C6 1400 C window changes the
-    # bounds/setpoints identity while t-005 changes optimizer source inputs;
-    # recomputing only after both folds yields their shared cache identity.
-    # 2026-07-12 combined fold rebaseline (recomputed executably on merged main):
-    # wave-11 audit-contract request-shape fix moves the source fingerprint AND
-    # wave-12-cost-params hashes default cost parameters into EvalSpec; the key
-    # below is their joint cache identity at v0.6.0 code_version.
-    # 2026-07-12 runtime-pressure rebaseline: vapor_pressure.py is an explicit
-    # EvalSpec source-fingerprint input, so the provider change moves this key.
-    assert cache_key(spec) == "3b5f9dcbff39fd55d9c31b3aa4e501e2e5701f5da8f012f4842675a408966e80"
+    # This key is a golden-neutrality tripwire: it moves whenever ANY EvalSpec
+    # identity input legitimately changes (source fingerprint, hashed defaults,
+    # bounds/setpoints). Rebaseline ONLY by executable recompute with the mover
+    # named. Movers to date (2026-07-12): C6 1400 C window + t-005; wave-11
+    # request-shape fingerprint + wave-12 cost-params hashing; runtp
+    # vapor_pressure.py fingerprint; t-190 relocated the oxide-wt%-basis helper
+    # into fingerprinted accounting code (simulator/accounting/ledger_api.py).
+    assert cache_key(spec) == "b12e8aaf1f1fac41da5c1d2b32ebbdd8d214fc22f89130b01fc33cbefea3543b"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
