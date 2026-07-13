@@ -1,0 +1,75 @@
+<div id="thermal-train-report"
+     class="section-card"
+     data-state="{{ data_state }}"
+     hx-get="{{ url_for('web.thermal_train_report_partial') }}"
+     hx-include="#thermal-train-source"
+     hx-trigger="thermal-train-refresh from:body"
+     hx-swap="outerHTML">
+    <h3>Report source: {{ data_state|replace('_', ' ') }}</h3>
+    <p>{{ message }}</p>
+    {% if instructions %}<p class="config-hint">{{ instructions }}</p>{% endif %}
+    {% if default_artifact %}
+    <p class="config-hint">
+        Default {{ default_artifact.artifact_schema_version }}:
+        1 t, pyrolysis, C3 Na shuttle on, C5 off.
+        {% if not report %}<a href="{{ url_for('web.thermal_train_page', default_artifact=default_artifact.artifact_id) }}">Load versioned default</a>{% endif %}
+    </p>
+    {% endif %}
+
+    {% if report %}
+    <p>
+        Status <strong>{{ report.status }}</strong>;
+        train closes for run <strong>{{ 'yes' if report.train_closes_for_run else 'no' }}</strong>;
+        snapshots {{ report.snapshot_count }}.
+    </p>
+    {% if report.peaks %}
+    <table class="composition-table">
+        <thead><tr><th>Design peak</th><th>Value</th></tr></thead>
+        <tbody>
+            <tr><td>Hot total vapor</td><td>{{ '%.6g'|format(report.peaks.hot_total_vapor_kg_hr) }} kg/hr</td></tr>
+            <tr><td>Cold melt-offgas O2</td><td>{{ '%.6g'|format(report.peaks.cold_o2_kg_hr) }} kg/hr; {{ '%.6g'|format(report.peaks.cold_o2_mol_hr) }} mol/hr</td></tr>
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if report.sections %}
+    <table class="composition-table">
+        <thead><tr><th>Section</th><th>Status</th><th>Area / power</th></tr></thead>
+        <tbody>
+        {% for name, section in report.sections.items() %}
+            <tr>
+                <td>{{ name|replace('_', ' ') }}</td>
+                <td>
+                    {{ section.status or 'computed' }}
+                    {% if section.reason %} — {{ section.reason }}{% endif %}
+                </td>
+                <td>
+                    {% if section.area_m2 is defined and section.area_m2 is not none %}{{ '%.6g'|format(section.area_m2) }} m2{% endif %}
+                    {% if section.compressor_shaft_W is defined %}{{ '%.6g'|format(section.compressor_shaft_W) }} W shaft{% endif %}
+                    {% if section.refrigeration_work_W is defined %}{{ '%.6g'|format(section.refrigeration_work_W) }} W lift{% endif %}
+                    {% if section.active_lift_W is defined and section.active_lift_W %}{{ '%.6g'|format(section.active_lift_W) }} W active lift{% endif %}
+                    {% if section.total_J is defined %}{{ '%.6g'|format(section.total_J) }} J/batch{% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    {% if report.excluded_species_nonzero %}
+    <h4>Excluded species — train does not close</h4>
+    <ul>
+    {% for species, row in report.excluded_species.items() %}
+        <li>{{ species }}: {{ row.peak_kg_hr }} kg/hr — {{ row.reason }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if report.display_costs and report.display_costs.status != 'unavailable' %}
+    <p class="config-hint">
+        Display-only installed cost {{ '%.2f'|format(report.display_costs.total_installed_usd) }} USD;
+        not an optimizer objective.
+    </p>
+    {% endif %}
+    {% endif %}
+</div>

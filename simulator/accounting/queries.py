@@ -158,6 +158,60 @@ class AccountingQueries:
         self.sim = sim
         self.ledger = sim.atom_ledger
 
+    def thermal_train_report(self) -> dict[str, Any]:
+        """Return a detached sizing diagnostic derived only from run history."""
+
+        from simulator.thermal_train import (
+            empty_thermal_train_report,
+            report_from_recorded_series,
+        )
+
+        record = getattr(self.sim, "record", None)
+        snapshots = getattr(record, "snapshots", None)
+        if not isinstance(snapshots, (list, tuple)) or not snapshots:
+            return empty_thermal_train_report("no_run_history")
+
+        hot_series: list[dict[str, float]] = []
+        oxygen_series: list[float] = []
+        temperature_series: list[float] = []
+        saturation_series: list[float] = []
+        vented_series: list[float] = []
+        overhead_state_series: list[dict[str, Any]] = []
+        for snapshot in snapshots:
+            evap_flux = getattr(snapshot, "evap_flux", None)
+            species_rates = getattr(evap_flux, "species_kg_hr", {})
+            hot_series.append(
+                {
+                    str(species): float(rate)
+                    for species, rate in dict(species_rates or {}).items()
+                }
+            )
+            oxygen_series.append(float(getattr(snapshot, "melt_offgas_O2_mol_hr", 0.0)))
+            temperature_series.append(float(getattr(snapshot, "temperature_C", 0.0)) + 273.15)
+            overhead = getattr(snapshot, "overhead", None)
+            saturation_series.append(float(getattr(overhead, "transport_saturation_pct", 0.0)))
+            vented_series.append(float(getattr(snapshot, "O2_vented_kg_hr", 0.0)))
+            overhead_state_series.append({
+                "pressure_Pa": float(getattr(overhead, "pressure_mbar", 0.0)) * 100.0,
+                "temperature_K": float(getattr(overhead, "headspace_temperature_K", 0.0)),
+                "composition_mbar": {
+                    str(species): float(pressure)
+                    for species, pressure in dict(getattr(overhead, "composition", {}) or {}).items()
+                },
+                "throat_diameter_m": float(getattr(overhead, "throat_diameter_m", 0.0)),
+            })
+
+        setpoints = getattr(self.sim, "setpoints", {})
+        return report_from_recorded_series(
+            hot_series,
+            oxygen_series,
+            temperature_series,
+            setpoints=setpoints if isinstance(setpoints, Mapping) else {},
+            observed_transport_saturation_pct=saturation_series,
+            observed_o2_vented_kg_hr=vented_series,
+            overhead_state_series=overhead_state_series,
+        )
+
     def product_ledger(self) -> dict[str, float]:
         products: dict[str, float] = {}
         for account in PRODUCT_LEDGER_ACCOUNTS:

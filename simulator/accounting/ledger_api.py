@@ -27,7 +27,7 @@ _ACCOUNT_BASIS = {
 _VIEW_NAMES = (
     "melt_pot_upper_tap", "melt_pot_bottom_tap", "terminal_ceramic",
     "condensation_train", "offgas", "wall_deposits", "oxygen_partition",
-    "industrial_glass", "stage_purity",
+    "industrial_glass", "stage_purity", "thermal_train",
 )
 
 
@@ -152,6 +152,9 @@ class LedgerAPI:
         elif view_name == "stage_purity":
             from simulator.condensation import stage_purity_report
             payload = stage_purity_report(self.sim.train)
+        elif view_name == "thermal_train":
+            # Diagnostic view over run history, not atom inventory.
+            payload = self.queries.thermal_train_report()
         else:
             raise KeyError(view_name)
         return {"ledger_schema_version": LEDGER_SCHEMA_VERSION, "view": view_name, "provenance": True, "data": payload}

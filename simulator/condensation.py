@@ -3360,6 +3360,139 @@ def _species_condensation_temperature_C(
     return temperature_C
 
 
+def authoritative_condensation_temperature(
+    species: str,
+    *,
+    setpoints: Mapping[str, Any] | None = None,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Return the routing temperature and its declared authority source.
+
+    Stage temperature windows validate placement; they do not synthesize a
+    crossing.  This read-only accessor mirrors the instance override order
+    used by ``CondensationModel`` without mutating module state.
+    """
+
+    train = (setpoints or {}).get("condensation_train", {}) or {}
+    temperatures = train.get("condensation_temperatures_C", {}) or {}
+    sources = train.get("condensation_temperature_sources", {}) or {}
+    if isinstance(temperatures, Mapping) and species in temperatures:
+        temperature_C = float(temperatures[species])
+        if not math.isfinite(temperature_C):
+            raise ValueError(f"invalid condensation temperature for species {species!r}")
+        return {
+            "temperature_C": temperature_C,
+            "source": str(sources.get(species, "setpoints.condensation_temperatures_C"))
+            if isinstance(sources, Mapping)
+            else "setpoints.condensation_temperatures_C",
+            "authority": "condensation_temperature_override",
+        }
+    temperature_C = _species_condensation_temperature_C(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    return {
+        "temperature_C": temperature_C,
+        "source": "data.vapor_pressures.condensation_T_C_at_1mbar",
+        "authority": "condensation_temperature_fallback",
+    }
+
+
+def antoine_dew_temperature_diagnostic(
+    species: str,
+    partial_pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Invert the existing Antoine wall-pressure surface for diagnostics.
+
+    The result carries no routing authority.  Certified-range refusals and
+    missing pressure/data return typed status records rather than fallback
+    temperatures.
+    """
+
+    try:
+        target = float(partial_pressure_pa)
+    except (TypeError, ValueError):
+        target = math.nan
+    if not math.isfinite(target) or target <= 0.0:
+        return {
+            "status": "inputs_required",
+            "temperature_K": None,
+            "partial_pressure_Pa": None if not math.isfinite(target) else target,
+            "provenance": "existing_condensation_antoine_surface",
+            "routing_authority": False,
+        }
+
+    data = _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
+    from engines.builtin.vapor_pressure import vapor_pressure_valid_range_K
+
+    candidate_ranges: list[tuple[float, float]] = []
+    for block_name in (None, "pure_component_antoine", "antoine"):
+        valid = vapor_pressure_valid_range_K(data, block_name)
+        if isinstance(valid, (list, tuple)) and len(valid) == 2:
+            try:
+                low, high = float(valid[0]), float(valid[1])
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(low) and math.isfinite(high) and 0.0 < low < high:
+                candidate_ranges.append((low, high))
+    if not candidate_ranges:
+        return {
+            "status": "unavailable_no_certified_antoine_range",
+            "temperature_K": None,
+            "partial_pressure_Pa": target,
+            "provenance": "existing_condensation_antoine_surface",
+            "routing_authority": False,
+        }
+
+    low = min(item[0] for item in candidate_ranges)
+    high = max(item[1] for item in candidate_ranges)
+    try:
+        p_low = _antoine_psat_pa(species, low, vapor_pressure_data=vapor_pressure_data)
+        p_high = _antoine_psat_pa(species, high, vapor_pressure_data=vapor_pressure_data)
+    except (KeyError, ValueError) as exc:
+        return {
+            "status": "refused_outside_certified_surface",
+            "temperature_K": None,
+            "partial_pressure_Pa": target,
+            "reason": str(exc),
+            "provenance": "existing_condensation_antoine_surface",
+            "routing_authority": False,
+        }
+    if p_low is None or p_high is None or not min(p_low, p_high) <= target <= max(p_low, p_high):
+        return {
+            "status": "refused_pressure_outside_certified_range",
+            "temperature_K": None,
+            "partial_pressure_Pa": target,
+            "valid_range_K": [low, high],
+            "provenance": "existing_condensation_antoine_surface",
+            "routing_authority": False,
+        }
+    increasing = p_high > p_low
+    for _ in range(80):
+        midpoint = (low + high) / 2.0
+        pressure = _antoine_psat_pa(
+            species,
+            midpoint,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        if pressure is None:
+            break
+        if (pressure < target) == increasing:
+            low = midpoint
+        else:
+            high = midpoint
+    return {
+        "status": "diagnostic_only",
+        "temperature_K": (low + high) / 2.0,
+        "partial_pressure_Pa": target,
+        "valid_range_K": [min(item[0] for item in candidate_ranges), max(item[1] for item in candidate_ranges)],
+        "provenance": "existing_condensation_antoine_surface",
+        "routing_authority": False,
+    }
+
+
 def _materials_source(materials: Mapping[str, Any] | None = None) -> Mapping[str, Any]:
     return materials if materials is not None else MATERIALS_DATA
 

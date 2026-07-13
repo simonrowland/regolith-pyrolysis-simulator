@@ -96,6 +96,15 @@ _LATENT_VAPORIZATION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
 }
 
 
+def latent_vaporization_kj_per_mol(species: str) -> float:
+    """Return the cited product-vapor latent heat without exposing its table."""
+
+    coefficient = _LATENT_VAPORIZATION_KJ_PER_MOL.get(str(species))
+    if coefficient is None:
+        raise KeyError(f"no latent-vaporization coefficient for {species!r}")
+    return float(coefficient.kJ_per_mol)
+
+
 # Parent-oxide dissociation enthalpies.  Values are kJ/mol parent oxide.
 _OXIDE_DISSOCIATION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
     # NIST-JANAF Chase 1998 ΔfH° Na2O(s)=-414.22 kJ/mol; Na2O -> 2Na + 1/2O2 = +414.22.

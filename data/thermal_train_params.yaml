@@ -1,0 +1,34 @@
+schema_version: thermal-train-v1
+parameters:
+  eta_2ndlaw: {value: 0.30, units: fraction, source_tag: assumption}
+  eta_isen: {value: 0.75, units: fraction, source_tag: assumption}
+  emissivity: {value: 0.85, units: fraction, source_tag: assumption}
+  T_sink_night_K: {value: 90.0, units: K, source_tag: assumption}
+  T_sink_day_K: {value: 250.0, units: K, source_tag: assumption}
+  T_floor_K: {value: 150.0, units: K, source_tag: assumption}
+  T_reject_K: {value: 300.0, units: K, source_tag: assumption}
+  P_suction_Pa: {value: 100.0, units: Pa, source_tag: assumption}
+  P_discharge_Pa: {value: 20000.0, units: Pa, source_tag: assumption}
+  n_compressor_stages: {value: 3, units: count, source_tag: assumption}
+  T_frost_K: {value: 54.361, units: K, source_tag: assumption}
+  T_storage_K: {value: 45.0, units: K, source_tag: assumption}
+  frost_sticking_fraction: {value: 0.90, units: fraction, source_tag: assumption}
+  cavern_capacity_kg: {value: 2850000.0, units: kg, source_tag: assumption}
+  cavern_thermal_mass_J_per_K: {value: 50000000.0, units: J/K, source_tag: assumption}
+  dT_segment_K: {value: 50.0, units: K, source_tag: assumption}
+  knudsen_locations:
+    source_tag: assumption
+    values:
+      throat: {L_m: 0.05, Kn_threshold: 0.01}
+      duct: {L_m: 0.30, Kn_threshold: 0.01}
+display_prices:
+  radiator_cost_per_m2: {value: 500.0, units: USD/m2, source_tag: owner-ratified-2026-07-13}
+  compressor_cost_per_kW: {value: 2000.0, units: USD/kW, source_tag: owner-ratified-2026-07-13}
+  cryo_cost_per_W: {value: 100.0, units: USD/W_lift, source_tag: owner-ratified-2026-07-13}
+  o2_value_per_kg: {value: 100.0, units: USD/kg, source_tag: owner-ratified-2026-07-13}
+  fixed_cost_per_hour: {value: 50.0, units: USD/hr, source_tag: owner-ratified-2026-07-13}
+  o2_storage_keeping_cost_per_kg:
+    source_tag: owner-ratified-2026-07-13
+    units: USD/kg
+    values: {warm_overburden: 0.5, psr: 0.0}
+  amortization_campaigns: {value: 20, units: campaigns, source_tag: owner-ratified-2026-07-13}

@@ -1,0 +1,443 @@
+{
+  "artifact_id": "thermal-train-default-v1",
+  "artifact_schema_version": "thermal-train-default-artifact-v1",
+  "config": {
+    "c3_shuttle_enabled": true,
+    "c3_shuttle_recipe": {
+      "K_kg": 0.0,
+      "Na_kg": 12.0
+    },
+    "c5_enabled": false,
+    "campaign": "C3_NA",
+    "feedstock_id": "lunar_mare_low_ti",
+    "hours": 33,
+    "mass_kg": 1000.0,
+    "track": "pyrolysis"
+  },
+  "provenance": {
+    "allow_unmeasured_alpha_fallback": true,
+    "backend_evidence_class": "internal-analytical",
+    "backend_name": "internal-analytical",
+    "backend_policy": "runner-strict",
+    "command": "MPLCONFIGDIR=/tmp/mpl .venv/bin/python scripts/generate_thermal_train_default_fixture.py",
+    "fallback_scope": "fixture_generation_only",
+    "generator": "scripts/generate_thermal_train_default_fixture.py",
+    "reason": "SC-67 unmeasured evaporation-alpha refusal on current HEAD",
+    "thermal_train_report_schema_version": "thermal-train-report-v1"
+  },
+  "thermal_train_report": {
+    "capacity": {
+      "basis": "observed_peak_design_capacity",
+      "capture_shortfall_kg": 0.0,
+      "capture_status": {
+        "reason": null,
+        "status": "captured"
+      },
+      "captured_batch_kg": 0.0,
+      "cavern_capacity_kg": 2850000.0,
+      "deposition_gate": {
+        "criterion": "p_O2 > P_sub(T_wall)",
+        "frost_forms": true,
+        "partial_pressure_Pa": 20000.0,
+        "sublimation_pressure_Pa": 146.33
+      },
+      "frost_sticking_fraction": 0.9,
+      "rated_cold_train_kg_hr": 0.0,
+      "thermal_train_overflow_kg_hr": 0.0
+    },
+    "closure_status": "excluded_major_heat_carrier_report_incomplete",
+    "condensation_crossings": {
+      "Fe": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 3.738836372437823e-06,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "refused_pressure_outside_certified_range",
+          "temperature_K": null,
+          "valid_range_K": [
+            1400.0,
+            1900.0
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override matching the Fe condenser band; no source-backed 1 mbar condensation-temperature row is declared.",
+        "stage_window_K": [
+          1373.15,
+          1673.15
+        ],
+        "temperature_K": 1523.15
+      },
+      "K": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 0.32887885015751933,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "refused_pressure_outside_certified_range",
+          "temperature_K": null,
+          "valid_range_K": [
+            679.4,
+            1600.0
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override matching the alkali/Mg cyclone band; no source-backed 1 mbar condensation-temperature row is declared.",
+        "stage_window_K": [
+          623.15,
+          973.15
+        ],
+        "temperature_K": 693.15
+      },
+      "Mg": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 1.064671759190174e-05,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "refused_pressure_outside_certified_range",
+          "temperature_K": null,
+          "valid_range_K": [
+            701.0,
+            1361.0
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override matching the alkali/Mg cyclone band; no source-backed 1 mbar condensation-temperature row is declared.",
+        "stage_window_K": [
+          623.15,
+          973.15
+        ],
+        "temperature_K": 853.15
+      },
+      "Na": {
+        "antoine_dew_diagnostic": {
+          "partial_pressure_Pa": 2026.5983028920512,
+          "provenance": "existing_condensation_antoine_surface",
+          "routing_authority": false,
+          "status": "refused_pressure_outside_certified_range",
+          "temperature_K": null,
+          "valid_range_K": [
+            924.0,
+            1900.0
+          ]
+        },
+        "authority": "condensation_temperature_override",
+        "source": "Estimated/operator-routing override matching the alkali/Mg cyclone band; no source-backed 1 mbar condensation-temperature row is declared.",
+        "stage_window_K": [
+          623.15,
+          973.15
+        ],
+        "temperature_K": 753.15
+      }
+    },
+    "display_costs": {
+      "amortized_per_campaign_usd": 0.0016735391654851745,
+      "captured_o2_display_value_usd": 0.0,
+      "compressor_installed_usd": 0.0,
+      "cryo_installed_usd": 0.0,
+      "fixed_run_cost_usd": 1650.0,
+      "radiator_installed_usd": 0.03347078330970349,
+      "source_tag": "owner-ratified-2026-07-13",
+      "status": "display_only_not_optimizer_objective",
+      "storage_keeping_psr_usd": 0.0,
+      "storage_keeping_warm_overburden_usd": 0.0,
+      "total_installed_usd": 0.03347078330970349
+    },
+    "excluded_major_heat_carrier_species": [
+      "Mn",
+      "SiO"
+    ],
+    "excluded_refractory_trace_species": [],
+    "excluded_species": {
+      "Mn": {
+        "chosen_temperature_K": 1273.15,
+        "exclusion_class": "major_heat_carrier_report_incomplete",
+        "heat_load_W": 3.257249896196519e-05,
+        "heat_load_status": "conservative_full_path",
+        "peak_kg_hr": 2.5813567445291126e-08,
+        "reason": "authoritative_condensation_temperature_outside_stage_window",
+        "stage_window_K": [
+          1373.15,
+          1573.15
+        ]
+      },
+      "SiO": {
+        "exclusion_class": "major_heat_carrier_report_incomplete",
+        "heat_load_W": 9.353519192434511e-08,
+        "heat_load_status": "lower_bound_missing_latent",
+        "peak_kg_hr": 3.120149609315694e-10,
+        "reason": "no latent-vaporization coefficient for 'SiO'"
+      }
+    },
+    "excluded_species_nonzero": true,
+    "footnotes": [
+      "Condensed-film sensible heat below each crossing is neglected relative to latent heat.",
+      "Cryogenic work is an upper-bound generic refrigerator surrogate with no direct-O2 turbine credit.",
+      "Cryogenic sizing is the night-path-only case; day-operation strategy remains deferred.",
+      "Melt-offgas O2 sensible duty is charged through S-A to 1000 K, then enters S-B at that post-separator datum.",
+      "SiO/CrO2 condenser enthalpy is not sourced in Phase 1a; exclusions are classified without reusing melt-side reaction enthalpy.",
+      "Default capacity equals the observed peak by design, so overflow is zero unless a declared rated capacity is supplied.",
+      "All kg and USD values are report-edge projections; internal enthalpy arithmetic is mol/s and W.",
+      "Hot and mid radiator sections conservatively sum per-species design maxima; the displayed hot peak is a concurrent snapshot maximum."
+    ],
+    "knudsen_anchors": {
+      "anchors": {
+        "cavern": {
+          "reason": "cavern pressure and characteristic state are not recorded",
+          "status": "inputs_required"
+        },
+        "duct": {
+          "Kn": 0.00030002391485007814,
+          "basis": "mixture",
+          "formula_id": "carrier_mixture_hard_sphere_mean_free_path",
+          "lambda_m": 9.000717445502343e-05,
+          "location": "duct",
+          "rarefaction_threshold_met": false,
+          "regime": "viscous",
+          "threshold": 0.01,
+          "threshold_interpretation": "minimum_Kn_for_rarefaction"
+        },
+        "throat": {
+          "Kn": 0.0007500597871251953,
+          "basis": "mixture",
+          "formula_id": "carrier_mixture_hard_sphere_mean_free_path",
+          "lambda_m": 9.000717445502343e-05,
+          "location": "throat",
+          "rarefaction_threshold_met": false,
+          "regime": "viscous",
+          "threshold": 0.01,
+          "threshold_interpretation": "minimum_Kn_for_rarefaction"
+        }
+      },
+      "refusals": [
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 9
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 10
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 11
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 12
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 13
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 14
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 15
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 16
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 17
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 18
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 19
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 20
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 21
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'K'",
+          "snapshot_index": 22
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'Fe'",
+          "snapshot_index": 23
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'Fe'",
+          "snapshot_index": 24
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'Fe'",
+          "snapshot_index": 25
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'Fe'",
+          "snapshot_index": 26
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'Fe'",
+          "snapshot_index": 27
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'Fe'",
+          "snapshot_index": 28
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'Fe'",
+          "snapshot_index": 29
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'Fe'",
+          "snapshot_index": 30
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'Fe'",
+          "snapshot_index": 31
+        },
+        {
+          "reason": "uncertified_collision_diameter: no P0a collision diameter certified for 'Fe'",
+          "snapshot_index": 32
+        }
+      ],
+      "status": "computed_with_refusals"
+    },
+    "observed_upstream_state": {
+      "O2_vented_peak_kg_hr": 0.0,
+      "note": "observed legacy upstream diagnostics; not thermal-train overflow",
+      "transport_saturation_peak_pct": 999.0
+    },
+    "peaks": {
+      "cold_o2_kg_hr": 0.0,
+      "cold_o2_mol_hr": 0.0,
+      "hot_species_basis": "per_species_design_maxima_not_concurrent_sum",
+      "hot_species_kg_hr": {
+        "Fe": 1.384998129196747e-12,
+        "K": 1.9578524940728706e-07,
+        "Mg": 1.7164841295416866e-12,
+        "Mn": 2.5813567445291126e-08,
+        "Na": 0.0008418245956374401,
+        "SiO": 3.120149609315694e-10
+      },
+      "hot_total_vapor_basis": "maximum_concurrent_snapshot_total",
+      "hot_total_vapor_kg_hr": 0.0008418249076524011,
+      "hot_total_vapor_projection_status": "complete"
+    },
+    "run_hours": 33,
+    "run_hours_basis": "one_hour_per_snapshot",
+    "schema_version": "thermal-train-report-v1",
+    "sections": {
+      "cavern_regeneration": {
+        "cavern_walls_J": 468049999.9999999,
+        "integration_segment_K": 50.0,
+        "oxygen_fusion_J": 0.0,
+        "oxygen_sensible_J": 0.0,
+        "total_J": 468049999.9999999
+      },
+      "compressor": {
+        "compressor_shaft_W": 0.0,
+        "eta_isen": 0.75,
+        "intercooler_reject_W": 0.0,
+        "intercooler_reject_W_per_stage": 0.0,
+        "pressure_ratio_per_stage": 5.848035476425731,
+        "pressure_ratio_total": 200.0,
+        "stage_count": 3
+      },
+      "cryo_tail": {
+        "cold_load_W": 0.0,
+        "model": "full_cold_load_lifted_from_T_frost_upper_bound",
+        "refrigeration_work_W": 0.0,
+        "reject_load_W": 0.0,
+        "sensible_load_W": 0.0,
+        "sizing_path": "night_path_only",
+        "sublimation_load_W": 0.0
+      },
+      "hot_radiator": {
+        "active_lift_W": 0.0,
+        "area_m2": 1.0667285193375247e-06,
+        "latent_area_m2": 9.029116158338451e-15,
+        "latent_crossings": {
+          "Fe": {
+            "area_m2": 9.029116158338451e-15,
+            "load_W": 2.3422934706523714e-09,
+            "temperature_K": 1523.15
+          }
+        },
+        "latent_load_W": 2.3422934706523714e-09,
+        "sensible_area_m2": 1.0667285103084085e-06,
+        "sensible_load_W": 0.11590909011239411,
+        "sizing_basis": "per_species_maxima_conservative",
+        "status": "sized"
+      },
+      "intercooler_radiator": {
+        "area_m2": 0.0,
+        "load_W": 0.0,
+        "sizing_temperature_K": 225.0
+      },
+      "mid_radiator": {
+        "active_lift_W": 0.0,
+        "area_m2": 6.587483810006945e-05,
+        "latent_area_m2": 6.391899699626507e-05,
+        "latent_crossings": {
+          "K": {
+            "area_m2": 9.616782968691007e-09,
+            "load_W": 0.00010696604370281213,
+            "temperature_K": 693.15
+          },
+          "Mg": {
+            "area_m2": 9.788871751527947e-14,
+            "load_W": 2.4992580185102616e-09,
+            "temperature_K": 853.15
+          },
+          "Na": {
+            "area_m2": 6.390938011540766e-05,
+            "load_W": 0.9909063740987202,
+            "temperature_K": 753.15
+          }
+        },
+        "latent_load_W": 0.9910133426416811,
+        "sensible_area_m2": 1.9558411038043773e-06,
+        "sensible_load_W": 0.05219941583881607,
+        "sizing_basis": "per_species_maxima_conservative",
+        "status": "sized"
+      },
+      "o2_passive_radiator_day": {
+        "active_lift_W": 0.0,
+        "area_m2": 0.0,
+        "inlet_basis": "post_separator_S_B",
+        "inlet_temperature_K": 1000.0,
+        "latent_area_m2": 0.0,
+        "latent_crossings": {},
+        "latent_load_W": 0.0,
+        "reason": "target_not_above_effective_sink_margin",
+        "sensible_area_m2": 0.0,
+        "sensible_load_W": 0.0,
+        "status": "passive_refused"
+      },
+      "o2_passive_radiator_night": {
+        "active_lift_W": 0.0,
+        "area_m2": 0.0,
+        "inlet_basis": "post_separator_S_B",
+        "inlet_temperature_K": 1000.0,
+        "latent_area_m2": 0.0,
+        "latent_crossings": {},
+        "latent_load_W": 0.0,
+        "sensible_area_m2": 0.0,
+        "sensible_load_W": 0.0,
+        "status": "sized"
+      },
+      "reject_radiator": {
+        "area_m2": 0.0,
+        "load_W": 0.0
+      }
+    },
+    "snapshot_count": 33,
+    "status": "incomplete",
+    "train_closes_for_run": false
+  }
+}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Thermal Train - Regolith Pyrolysis{% endblock %}
+
+{% block content %}
+<section class="main-area">
+    <div class="section-card">
+        <h2>Downstream Thermal Train</h2>
+        <p class="config-hint">
+            Detached sizing diagnostic. Report reads run history or a stored artifact;
+            it does not mutate the atom ledger, transport path, or optimizer objective.
+        </p>
+        <form id="thermal-train-source"
+              class="campaign-controls"
+              hx-get="{{ url_for('web.thermal_train_report_partial') }}"
+              hx-target="#thermal-train-report"
+              hx-swap="outerHTML">
+            <div class="ctrl-row">
+                <label for="thermal-run-id">Optimizer run ID</label>
+                <input id="thermal-run-id" name="run_id" value="{{ selection.run_id }}" placeholder="optional">
+            </div>
+            <div class="ctrl-row">
+                <label for="thermal-cache-key">Cache key</label>
+                <input id="thermal-cache-key" name="cache_key" value="{{ selection.cache_key }}" placeholder="optional">
+            </div>
+            <div class="control-buttons">
+                <button class="btn btn-primary" type="submit">Load source</button>
+            </div>
+        </form>
+    </div>
+    {% include "partials/thermal_train_report.html" %}
+</section>
+{% endblock %}

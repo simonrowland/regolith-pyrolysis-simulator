@@ -100,6 +100,11 @@ bp = Blueprint('web', __name__,
                static_folder='static')
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
+THERMAL_TRAIN_DEFAULT_ARTIFACT_ID = 'thermal-train-default-v1'
+THERMAL_TRAIN_DEFAULT_ARTIFACT_SCHEMA = 'thermal-train-default-artifact-v1'
+THERMAL_TRAIN_DEFAULT_ARTIFACT_PATH = (
+    DATA_DIR / 'fixtures' / 'thermal_train' / 'default-v1.json'
+)
 OPTIMIZER_CACHE_NAME = 'cache.sqlite'
 OPTIMIZER_ARTIFACT_NAMES = (
     OPTIMIZER_CACHE_NAME,
@@ -3320,6 +3325,160 @@ def optimizer_page():
         'optimizer.html',
         **_optimizer_table_context(),
         **_optimizer_launch_context(),
+    )
+
+
+def _load_default_thermal_train_artifact() -> dict[str, Any] | None:
+    try:
+        artifact = json.loads(
+            THERMAL_TRAIN_DEFAULT_ARTIFACT_PATH.read_text(encoding='utf-8')
+        )
+    except (OSError, TypeError, ValueError):
+        return None
+    if not isinstance(artifact, Mapping):
+        return None
+    config = artifact.get('config')
+    report = artifact.get('thermal_train_report')
+    if (
+        artifact.get('artifact_schema_version') != THERMAL_TRAIN_DEFAULT_ARTIFACT_SCHEMA
+        or artifact.get('artifact_id') != THERMAL_TRAIN_DEFAULT_ARTIFACT_ID
+        or not isinstance(config, Mapping)
+        or not isinstance(report, Mapping)
+        or report.get('schema_version') != 'thermal-train-report-v1'
+        or config.get('mass_kg') != 1000.0
+        or config.get('track') != 'pyrolysis'
+        or config.get('campaign') != 'C3_NA'
+        or config.get('c3_shuttle_enabled') is not True
+        or config.get('c5_enabled') is not False
+    ):
+        return None
+    return copy.deepcopy(dict(artifact))
+
+
+def _thermal_train_context() -> dict[str, Any]:
+    run_id = str(request.args.get('run_id') or '').strip()
+    cache_key = str(request.args.get('cache_key') or '').strip()
+    default_artifact_id = str(request.args.get('default_artifact') or '').strip()
+    if run_id or cache_key:
+        if not run_id or not cache_key:
+            return {
+                'data_state': 'no_data',
+                'report': None,
+                'message': 'Both optimizer run ID and cache key are required.',
+                'instructions': 'Open an optimizer result and supply both identifiers, or start a simulator run.',
+                'selection': {'run_id': run_id, 'cache_key': cache_key},
+            }
+        resolved = _optimizer_result_row(run_id, cache_key)
+        if resolved is None:
+            return {
+                'data_state': 'no_data',
+                'report': None,
+                'message': 'Selected optimizer artifact was not found or is not corpus-compatible.',
+                'instructions': 'Choose a current stored result or start a simulator run.',
+                'selection': {'run_id': run_id, 'cache_key': cache_key},
+            }
+        _root, _run_dir, row = resolved
+        result_blob = _json_value(_row_value(row, 'result_blob'), {})
+        report = None
+        if isinstance(result_blob, Mapping):
+            candidate = result_blob.get('thermal_train_report')
+            if not isinstance(candidate, Mapping):
+                candidate = result_blob.get('thermal_train')
+            if isinstance(candidate, Mapping):
+                report = copy.deepcopy(dict(candidate))
+        if report is None:
+            return {
+                'data_state': 'artifact',
+                'report': None,
+                'message': 'Artifact selected, but it has no authoritative thermal-train report.',
+                'instructions': 'Regenerate it with a CLI version that emits thermal_train_report; cumulative O2 is not substituted for the melt-offgas series.',
+                'selection': {'run_id': run_id, 'cache_key': cache_key},
+            }
+        return {
+            'data_state': 'artifact',
+            'report': report,
+            'message': 'Read-only optimizer artifact report.',
+            'instructions': None,
+            'selection': {'run_id': run_id, 'cache_key': cache_key},
+        }
+
+    if default_artifact_id:
+        artifact = (
+            _load_default_thermal_train_artifact()
+            if default_artifact_id == THERMAL_TRAIN_DEFAULT_ARTIFACT_ID
+            else None
+        )
+        if artifact is None:
+            return {
+                'data_state': 'no_data',
+                'report': None,
+                'message': 'Versioned default thermal-train artifact is unavailable or invalid.',
+                'instructions': 'Regenerate it with scripts/generate_thermal_train_default_fixture.py.',
+                'selection': {'run_id': '', 'cache_key': ''},
+                'default_artifact': None,
+            }
+        return {
+            'data_state': 'artifact',
+            'report': artifact['thermal_train_report'],
+            'message': 'Read-only versioned default artifact report.',
+            'instructions': None,
+            'selection': {'run_id': '', 'cache_key': ''},
+            'default_artifact': {
+                'artifact_id': artifact['artifact_id'],
+                'artifact_schema_version': artifact['artifact_schema_version'],
+                'config': artifact['config'],
+                'provenance': artifact.get('provenance', {}),
+            },
+        }
+
+    session.setdefault('ledger_client_id', os.urandom(16).hex())
+    client_id = str(session.get('ledger_client_id') or '')
+    try:
+        from web.events import read_ledger_api_for_client
+
+        view = read_ledger_api_for_client(client_id, 'view', view='thermal_train')
+    except LookupError:
+        view = None
+    if isinstance(view, Mapping) and isinstance(view.get('data'), Mapping):
+        return {
+            'data_state': 'live',
+            'report': copy.deepcopy(dict(view['data'])),
+            'message': 'Live run history via the thermal_train named ledger view.',
+            'instructions': None,
+            'selection': {'run_id': '', 'cache_key': ''},
+        }
+    return {
+        'data_state': 'no_data',
+        'report': None,
+        'message': 'No live run or selected optimizer artifact.',
+        'instructions': 'Start a simulator run, or enter a stored optimizer run ID and cache key. This page never launches a simulation.',
+        'selection': {'run_id': '', 'cache_key': ''},
+        'default_artifact': {
+            'artifact_id': THERMAL_TRAIN_DEFAULT_ARTIFACT_ID,
+            'artifact_schema_version': THERMAL_TRAIN_DEFAULT_ARTIFACT_SCHEMA,
+            'config': {
+                'mass_kg': 1000.0,
+                'track': 'pyrolysis',
+                'campaign': 'C3_NA',
+                'c3_shuttle_enabled': True,
+                'c5_enabled': False,
+            },
+        },
+    }
+
+
+@bp.route('/thermal-train', methods=['GET'])
+def thermal_train_page():
+    """Detached downstream thermal-train diagnostic page."""
+    return render_template('thermal_train.html', **_thermal_train_context())
+
+
+@bp.route('/partials/thermal-train-report', methods=['GET'])
+def thermal_train_report_partial():
+    """HTMX partial for a live or stored thermal-train report."""
+    return render_template(
+        'partials/thermal_train_report.html',
+        **_thermal_train_context(),
     )
 
 

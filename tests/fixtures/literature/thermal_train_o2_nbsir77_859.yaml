@@ -1,0 +1,16 @@
+source: "H. M. Roder, NBSIR 77-859 (1977), sections 6.2 and 6.4"
+url: "https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nbsir77-859.pdf"
+solid_vapor_pressure:
+  equation: "ln(P_mmHg)=A/T+B*ln(T)+C"
+  coefficients: {A: -1096.562485, B: -2.025578307, C: 28.35976524}
+  source_valid_range_K: [44.0, 54.359]
+  source_anchor_44K_Pa: 1.94543999
+  modern_nist_normalized_anchor_44K_Pa: 1.94288343
+  modern_nist_normalized_anchor_50K_Pa: 29.8403537
+solid_heat_capacity:
+  equation: "Cp_cal_mol_K=A+B*T+C*T^2"
+  coefficients: {A: 16.908081, B: -0.24181777, C: 0.0024809089}
+  joules_per_calorie: 4.184
+  model_valid_range_K: [44.0, 54.361]
+  anchor_50K_J_mol_K: 46.1054405
+  integral_45_to_54_361_J_mol: 432.23400598
