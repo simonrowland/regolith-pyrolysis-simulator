@@ -19,7 +19,10 @@ import yaml
 
 from simulator import mre_ladder
 from simulator.backends import backend_resolution_status
-from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.backend_names import (
+    ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME,
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+)
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
     CONTINUUM_BUFFER_KN,
@@ -332,6 +335,7 @@ def client(tmp_path):
     optimizer_job_runner.reset_runner_cache()
     app = Flask(__name__)
     app.config["TESTING"] = True
+    app.config["SECRET_KEY"] = "test-only-secret-key"
     app.config["OPTIMIZER_RUNS_DIR"] = str(tmp_path / "runs")
     app.register_blueprint(web_routes.bp)
     yield app.test_client()
@@ -2686,7 +2690,7 @@ def test_optimizer_page_and_table_render_feedstock_profile_winners(
     assert "Captured volatiles" in table
     assert "Refractory ceramic/rump" in table
     assert "backend-badge" in table
-    assert "StubBackend / unavailable" in table
+    assert f"{ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME} / unavailable" in table
     assert "current" in table
     assert current_corpus_version() in table
 
@@ -2866,7 +2870,7 @@ def test_optimizer_result_detail_yaml_and_recipe_viewer_contract(
     assert "computed from EvalSpec.hours" in html
     assert "Backend" in html
     assert "backend-badge" in html
-    assert "StubBackend / unavailable" in html
+    assert f"{ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME} / unavailable" in html
     assert "Target thermal window" in html
     assert "pc-glass-clear: C2B window 1260-1480 C" in html
 

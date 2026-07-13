@@ -2167,6 +2167,7 @@ def _build_eval_inputs(
     if feedstock_id not in bundle.feedstocks:
         raise EvaluationInputError(f"unknown feedstock_id {feedstock_id!r}")
     _validate_eval_mass_basis(profile, fidelity)
+    fidelity = str(canonical_backend_name(fidelity))
     patch = patch.validated(schema)
     profile = validate_profile(
         profile,
@@ -2225,6 +2226,12 @@ def _build_eval_inputs(
     diagnostic_chemistry_kernel = _diagnostic_chemistry_kernel_run_config(
         run_options["chemistry_kernel"]
     )
+    allow_unmeasured_alpha_fallback = bool(
+        run_options["allow_unmeasured_alpha_fallback"]
+    )
+    evalspec_chemistry_kernel = dict(diagnostic_chemistry_kernel)
+    if allow_unmeasured_alpha_fallback:
+        evalspec_chemistry_kernel["allow_unmeasured_alpha_fallback"] = True
     force_builtin_vapor_pressure = bool(run_options["force_builtin_vapor_pressure"])
     allow_fallback_vapor = (
         bool(run_options["allow_fallback_vapor"]) or force_builtin_vapor_pressure
@@ -2249,6 +2256,7 @@ def _build_eval_inputs(
         mre_target_species=str(run_options["mre_target_species"]),
         mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),
         chemistry_kernel=diagnostic_chemistry_kernel,
+        allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
         allow_fallback_vapor=bool(run_options["allow_fallback_vapor"]),
         force_builtin_vapor_pressure=force_builtin_vapor_pressure,
     )._session_config()
@@ -2299,7 +2307,7 @@ def _build_eval_inputs(
         o2_bubbler_settings=o2_bubbler_settings,
         runtime_campaign_overrides=run_options["runtime_campaign_overrides"],
         lab_schedule=lab_schedule if isinstance(lab_schedule, MappingABC) else {},
-        chemistry_kernel=diagnostic_chemistry_kernel,
+        chemistry_kernel=evalspec_chemistry_kernel,
         vapor_pressure_provider_id=vapor_pressure_provider_id,
         vapor_pressure_fallback_provider_id=DEFAULT_VAPOR_PRESSURE_FALLBACK_PROVIDER_ID,
         allow_fallback_vapor=allow_fallback_vapor,
@@ -2563,6 +2571,9 @@ def _run_options(profile: Mapping[str, Any], fidelity: str) -> Mapping[str, Any]
         ),
         "lab_schedule": merged.get("lab_schedule"),
         "chemistry_kernel": dict(merged.get("chemistry_kernel", {}) or {}),
+        "allow_unmeasured_alpha_fallback": bool(
+            merged.get("allow_unmeasured_alpha_fallback", False)
+        ),
         "lab_overlay_scope": lab_overlay_scope,
         "allow_fallback_vapor": bool(merged.get("allow_fallback_vapor", False)),
         "force_builtin_vapor_pressure": bool(

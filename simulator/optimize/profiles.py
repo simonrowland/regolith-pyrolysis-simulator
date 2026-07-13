@@ -171,6 +171,7 @@ _RUN_KEYS = frozenset(
         "lab_overlay_scope",
         "lab_overlay",
         "allow_fallback_vapor",
+        "allow_unmeasured_alpha_fallback",
         "force_builtin_vapor_pressure",
         "lab_alpha_digest",
         "geometry_digest",
@@ -768,6 +769,13 @@ def _validate_run(raw: Any, *, source: str | Path, where: str) -> None:
     ):
         raise ProfileValidationError(
             f"{source}: {where}.allow_fallback_vapor must be bool"
+        )
+    if "allow_unmeasured_alpha_fallback" in raw and not isinstance(
+        raw["allow_unmeasured_alpha_fallback"],
+        bool,
+    ):
+        raise ProfileValidationError(
+            f"{source}: {where}.allow_unmeasured_alpha_fallback must be bool"
         )
     if "force_builtin_vapor_pressure" in raw and not isinstance(
         raw["force_builtin_vapor_pressure"],

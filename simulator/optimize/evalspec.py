@@ -624,6 +624,8 @@ def _chemistry_kernel_key_payload(kernel: Mapping[str, Any]) -> Mapping[str, Any
     payload = dict(kernel)
     payload.pop("allow_fallback_vapor", None)
     payload.pop("force_builtin_vapor_pressure", None)
+    if payload.get("allow_unmeasured_alpha_fallback") is False:
+        payload.pop("allow_unmeasured_alpha_fallback")
     return payload
 
 

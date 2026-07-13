@@ -530,12 +530,13 @@ def run(
 ) -> StudyResult:
     """Run one ask/evaluate/tell study and write Phase-O artifacts."""
 
+    fidelity = str(canonical_backend_name(fidelity))
     base_schema = schema or RecipeSchema()
     config = StudyConfig(
         profile=profile,
         feedstock=feedstock,
         strategy=strategy,
-        fidelity=str(canonical_backend_name(fidelity)),
+        fidelity=fidelity,
         parallel=parallel,
         budget=budget,
         out_dir=out_dir,
@@ -3895,11 +3896,19 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
     if reference is not None and reference.cache_state is not None:
         payload["cache_state"] = reference.cache_state
         payload["reduced_real_cache_state"] = reference.cache_state
+    if (
+        reference is not None
+        and reference.status == "refused"
+        and reference.reason
+    ):
+        payload["refusal_reason"] = reference.reason
     if isinstance(trace, Mapping):
         for key in (
             "backend_name",
             "backend_diagnostics",
             "out_of_domain_crash_point",
+            "refusal_reason",
+            "refusal_diagnostic",
             "rump_terminal",
             "terminal_rump_by_species_kg",
             "composition_target",
@@ -4148,6 +4157,8 @@ def _light_backend_status_trace_for_reference(
         payload["backend_authoritative"] = reference.backend_authoritative
     if reference.evidence_class is not None:
         payload["evidence_class"] = reference.evidence_class
+    if reference.status == "refused" and reference.reason:
+        payload["refusal_reason"] = reference.reason
     if reference.cache_state is not None:
         payload["reduced_real_cache_state"] = str(reference.cache_state)
         payload["cache_state"] = str(reference.cache_state)
@@ -4161,6 +4172,8 @@ def _light_backend_status_trace_for_reference(
         for key in (
             "backend_diagnostics",
             "out_of_domain_crash_point",
+            "refusal_reason",
+            "refusal_diagnostic",
             "rump_terminal",
             "terminal_rump_by_species_kg",
             "composition_target",
@@ -5584,6 +5597,7 @@ def _write_empty_artifacts(
     constraints: Any = None,
     write_store: ResultStore | None = None,
 ) -> None:
+    fidelity = str(canonical_backend_name(fidelity))
     schema = RecipeSchema()
     strategy_name = _strategy_label(config.strategy) if config is not None else "unknown"
     sampler_name = (

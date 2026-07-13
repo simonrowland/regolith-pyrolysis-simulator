@@ -272,6 +272,33 @@ print(json.dumps({
     assert fresh["key"] == cache_key(spec)
 
 
+def test_alpha_fallback_default_preserves_legacy_evalspec_identity() -> None:
+    default_spec = _base_spec()
+    kernel = dict(default_spec.chemistry_kernel)
+    explicit_false_spec = _base_spec(
+        chemistry_kernel={
+            **kernel,
+            "allow_unmeasured_alpha_fallback": False,
+        }
+    )
+    enabled_spec = _base_spec(
+        chemistry_kernel={
+            **kernel,
+            "allow_unmeasured_alpha_fallback": True,
+        }
+    )
+
+    default_bytes = canonical_evalspec_json(default_spec)
+    assert default_bytes == PINNED_EVALSPEC_JSON
+    assert canonical_evalspec_json(explicit_false_spec) == PINNED_EVALSPEC_JSON
+    assert cache_key(explicit_false_spec) == cache_key(default_spec)
+    assert b'"allow_unmeasured_alpha_fallback"' not in default_bytes
+    assert b'"allow_unmeasured_alpha_fallback":true' in canonical_evalspec_json(
+        enabled_spec
+    )
+    assert cache_key(enabled_spec) != cache_key(default_spec)
+
+
 def test_evalspec_cache_key_changes_when_allowlist_version_changes() -> None:
     assert cache_key(_base_spec(allowlist_version="allowlist-old")) != cache_key(
         _base_spec(allowlist_version="allowlist-new")

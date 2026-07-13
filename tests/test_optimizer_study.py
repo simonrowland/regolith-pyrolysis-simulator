@@ -113,6 +113,8 @@ C6_WINDOW_REFUSAL = "c6_joint_thermodynamic_liquid_fraction_window_empty"
 def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
     profile = copy.deepcopy(PROFILE)
     profile["profile_id"] = "cli-physics-smoke"
+    # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+    profile["run"]["allow_unmeasured_alpha_fallback"] = True
     profile["constraints"] = {
         "gates": ["furnace_temperature"],
         "furnace_T_max_C": 1800.0,
