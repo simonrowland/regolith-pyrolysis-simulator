@@ -924,7 +924,13 @@ class ExtractionMixin:
             temperature_C = float(getattr(self.melt, 'temperature_C', 1600.0))
         except (TypeError, ValueError):
             temperature_C = 1600.0
-        if temperature_C >= 1000.0:
+        if self.melt.campaign == CampaignPhase.C5:
+            # The ladder is a campaign schedule: derive its canonical rungs at
+            # the same reference temperature used to issue target-preset caps.
+            # An inherited C4/C0 ramp-start temperature can otherwise exclude
+            # the requested rung before the live Nernst gate evaluates it.
+            temperature_K = mre_ladder.MRE_REFERENCE_TEMPERATURE_K
+        elif temperature_C >= 1000.0:
             temperature_K = temperature_C + 273.15
         return mre_ladder.build_mre_voltage_sequence(
             self.setpoints,
