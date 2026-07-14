@@ -206,12 +206,18 @@ def test_builtin_authority_dispatches_even_when_vaporock_available(
     assert "kernel_fallback_used" not in diagnostic
     sources = dict(diagnostic.get("vapor_pressures_source") or {})
     assert sources
-    authoritative_species = {"Al", "Ca", "Cr", "Fe", "K", "Mg", "Mn", "Na", "Ti"}
+    authoritative_species = {"Al", "Ca", "Cr", "Fe", "K", "Mg", "Na", "Ti"}
     pseudo_vaporock_species = {"SiO"}
     assert authoritative_species.issubset(sources)
     assert pseudo_vaporock_species.issubset(sources)
     for species in authoritative_species:
         assert sources[species].startswith("builtin_authoritative:")
+    # 4256fda propagates the reconstructed Ellingham provenance for Mn: the
+    # builtin provider still dispatches, but must not overclaim full authority.
+    assert sources["Mn"] == (
+        "builtin_authority_limited:pure_component_derived_from_evaluation:"
+        "reconstructed_ellingham_segment"
+    )
     for species in pseudo_vaporock_species:
         assert sources[species] == (
             "vaporock_backsolved_curve_fit:"

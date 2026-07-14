@@ -1075,14 +1075,17 @@ def test_vpr_p6a_cli_artifact_matches_in_process_trace(tmp_path):
         text=True,
         check=False,
     )
-    assert result.returncode == 1, (
-        f"CLI exit did not reflect runner-strict failure (rc={result.returncode}): "
+    # 2026-07-13: 6d95572 corrected the drift audit's backing domain to include
+    # condensation-train credits; this C2A trace no longer has the former
+    # 1e-9 kg false-positive metal_projection_drift and exits successfully.
+    assert result.returncode == 0, (
+        f"CLI failed despite the corrected drift audit (rc={result.returncode}): "
         f"stdout={result.stdout!r} stderr={result.stderr!r}"
     )
     assert output.exists(), f"CLI did not write {output}"
     cli_payload = json.loads(output.read_text())
-    assert cli_payload["status"] == "failed"
-    assert cli_payload["reason"] == "metal_projection_drift"
+    assert cli_payload["status"] == "ok"
+    assert cli_payload["reason"] == ""
     _assert_p6a_payload_matches_trace(cli_payload, execution.trace)
 
 

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import json
 import shlex
 from typing import Any
 
 import app as app_module
+import simulator.runner as runner_module
+import simulator.session_cli as session_cli_module
 import web.events as web_events
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import PyrolysisRun
@@ -70,6 +72,7 @@ class StopAfterStep(Exception):
 
 
 def test_batch_cli_web_mol_ledger_parity(monkeypatch):
+    _install_alpha_fallback_fixture(monkeypatch)
     batch = _run_batch()
     cli = _run_cli_session()
     web = _run_web_session(monkeypatch)
@@ -108,6 +111,45 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     ]
     assert max(comparisons) <= LEDGER_TOLERANCE_MOL
     assert _max_mass_balance_pct(surfaces) <= MASS_BALANCE_TOLERANCE_PCT
+
+
+def _install_alpha_fallback_fixture(monkeypatch) -> None:
+    """Opt this Cr/Mn-sampling parity fixture into the prototype alpha path."""
+
+    def with_alpha_fallback(setpoints):
+        payload = dict(setpoints)
+        kernel_config = dict(payload.get("chemistry_kernel", {}) or {})
+        # bbf0134 made missing measured Cr/Mn alphas fail loud by default.
+        # Pending t-194 grounded values, all three surfaces explicitly use the
+        # same alpha=1.0 prototype fallback so this remains a parity test.
+        kernel_config["allow_unmeasured_alpha_fallback"] = True
+        payload["chemistry_kernel"] = kernel_config
+        return payload
+
+    for module in (runner_module, session_cli_module):
+        original_load_config_bundle = module.load_config_bundle
+
+        def load_config_bundle_with_alpha_fallback(
+            *args, _load=original_load_config_bundle, **kwargs
+        ):
+            bundle = _load(*args, **kwargs)
+            return replace(bundle, setpoints=with_alpha_fallback(bundle.setpoints))
+
+        monkeypatch.setattr(
+            module,
+            "load_config_bundle",
+            load_config_bundle_with_alpha_fallback,
+        )
+
+    original_load_yaml = web_events._load_yaml
+
+    def load_yaml_with_alpha_fallback(filename):
+        payload = original_load_yaml(filename)
+        if filename == "setpoints.yaml":
+            return with_alpha_fallback(payload)
+        return payload
+
+    monkeypatch.setattr(web_events, "_load_yaml", load_yaml_with_alpha_fallback)
 
 
 def _run_batch() -> SurfaceResult:

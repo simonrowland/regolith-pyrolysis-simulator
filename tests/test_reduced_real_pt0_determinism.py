@@ -182,7 +182,11 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # identity ('stub' -> 'internal-analytical'), which is a cache-key input —
     # this IS the corpus_version-gated key migration the flip was deferred
     # for. Determinism re-proven by repeated canonical runs.
-    assert key_hash == "ab37831293ebc6289b8dedb5241479dba268148d175b459cf29aa53d4196a5f8"
+    # 2026-07-13 campaign epoch: 3089546 added the canonical EvalSpec cost
+    # block, then bbf0134 moved the functional setpoints/vapor-pressure digests
+    # (Cr stage-2 geometry, strict alpha default, and pO2 reference). Two
+    # in-repo runs produced this identical key; cross-process determinism holds.
+    assert key_hash == "8a1c348e9e3622f8160acde6dd802126ddc14aaf32cb170be8c3ad7d27d50951"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 

@@ -2195,6 +2195,10 @@ def test_c2b_profile_window_schedules_measured_temperature_window() -> None:
     assert overrides["max_hours"] == pytest.approx(20.0)
 
     session = _force_builtin_run_from_config(run_config)._start_session()
+    # bbf0134 made transport use finite downstream pressure. C2B's controlled
+    # 1.5 mbar O2 equals its upstream pressure, so delta(P^2)=0 and the pipe
+    # correctly saturates. Vacuum downstream isolates this scheduler test.
+    session.simulator._overhead_headspace_config["downstream_pressure_bar"] = 0.0
     temperatures = [
         session.advance().snapshot.temperature_C
         for _ in range(run_config.hours)
