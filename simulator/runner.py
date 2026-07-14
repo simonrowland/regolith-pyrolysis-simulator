@@ -2931,6 +2931,7 @@ def run_sio_tsweep(
     campaign: str = SIO_YIELD_CAMPAIGN,
     hours: int = 24,
     mass_kg: float = 1000.0,
+    allow_unmeasured_alpha_fallback: bool = False,
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, Any]] = []
@@ -2947,6 +2948,7 @@ def run_sio_tsweep(
             t_low_c=t_low_c,
             t_hold_c=t_hold_c,
             ramp_c_per_hr=ramp_c_per_hr,
+            allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
         )
         row = _sio_tsweep_row(
             cell_id=cell_id,
@@ -3272,6 +3274,7 @@ def run_sio_wall_sweep(
     campaign: str = SIO_YIELD_CAMPAIGN,
     hours: int = 24,
     mass_kg: float = 1000.0,
+    allow_unmeasured_alpha_fallback: bool = False,
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, Any]] = []
@@ -3293,6 +3296,7 @@ def run_sio_wall_sweep(
             include_diagnostics=True,
             liner_temperature_c=liner_temperature_c,
             pO2_mbar=pO2_mbar,
+            allow_unmeasured_alpha_fallback=allow_unmeasured_alpha_fallback,
         )
         row = _sio_wall_sweep_row(
             cell_id=cell_id,
@@ -3915,6 +3919,11 @@ def build_sio_yield_arg_parser() -> argparse.ArgumentParser:
         "--lab-oxygen-diagnostics-output",
         help="Optional JSON sidecar path for lab oxygen-atom diagnostics",
     )
+    parser.add_argument(
+        "--allow-unmeasured-alpha-fallback",
+        action="store_true",
+        help="Permit configured fallback evaporation alpha",
+    )
     return parser
 
 
@@ -3931,6 +3940,9 @@ def main_sio_yield(argv: Optional[list[str]] = None) -> int:
             include_diagnostics=bool(args.lab_oxygen_diagnostics_output),
             include_lab_oxygen_diagnostics=bool(
                 args.lab_oxygen_diagnostics_output
+            ),
+            allow_unmeasured_alpha_fallback=(
+                args.allow_unmeasured_alpha_fallback
             ),
         )
     except RunnerError as exc:
@@ -4035,6 +4047,11 @@ def build_sio_tsweep_arg_parser() -> argparse.ArgumentParser:
         "--summary-output",
         help="Optional JSON summary path with recommendation metadata",
     )
+    parser.add_argument(
+        "--allow-unmeasured-alpha-fallback",
+        action="store_true",
+        help="Permit configured fallback evaporation alpha",
+    )
     return parser
 
 
@@ -4058,6 +4075,9 @@ def main_sio_tsweep(argv: Optional[list[str]] = None) -> int:
                 args.ramp_grid, label="--ramp-grid"
             ),
             output_dir=Path(args.output_dir),
+            allow_unmeasured_alpha_fallback=(
+                args.allow_unmeasured_alpha_fallback
+            ),
         )
     except RunnerError as exc:
         parser.error(str(exc))
@@ -4142,6 +4162,11 @@ def build_sio_wall_sweep_arg_parser() -> argparse.ArgumentParser:
         "--summary-output",
         help="Optional JSON summary path with thresholds",
     )
+    parser.add_argument(
+        "--allow-unmeasured-alpha-fallback",
+        action="store_true",
+        help="Permit configured fallback evaporation alpha",
+    )
     return parser
 
 
@@ -4178,6 +4203,9 @@ def main_sio_wall_sweep(argv: Optional[list[str]] = None) -> int:
             ),
             pO2_modes=pO2_modes,
             output_dir=Path(args.output_dir),
+            allow_unmeasured_alpha_fallback=(
+                args.allow_unmeasured_alpha_fallback
+            ),
         )
     except RunnerError as exc:
         parser.error(str(exc))

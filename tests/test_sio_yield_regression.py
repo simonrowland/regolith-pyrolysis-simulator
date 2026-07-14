@@ -155,9 +155,13 @@ GOLDENS = (
 # and fO2-independent diagnostics no longer receive fO2-shaped requests. The
 # lunar continuous fixture now follows the corrected wall-flux/request path;
 # Mars evolved SiO is unchanged, but routing bins are regenerated below.
+# 2026-07-13 SC-67 regression catch-up: Cr/Mn now refuse unmeasured sticking
+# alphas by default. These CLI goldens explicitly opt into the documented
+# prototype alpha=1.0 fallback pending t-194; executable regeneration moves the
+# coupled evolved-SiO pins with the fallback-enabled Cr/Mn wall route.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 2.56436221494e-07,
-    "mars_basalt": 8.7690897664e-06,
+    "lunar_mare_low_ti": 1.77220591892e-05,
+    "mars_basalt": 1.78534512944e-05,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -435,6 +439,12 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
     )
+    # This direct-route pin isolates the free-molecular wall budget and
+    # sticking-alpha notice from production's provisional condenser geometry.
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=0.0,
+        campaign_name="C0",
+    )
     melt = MeltState()
     melt.temperature_C = 1700.0
 
@@ -443,13 +453,11 @@ def test_wall_deposit_sticking_alpha_notice_tracks_cold_wall_gate():
         melt,
     )
 
-    # Same e73fde5 J * A * M * 3600 wall-budget rebaseline cited above and in
-    # docs-private/reviews/2026-07-11-wave08/runtime-golden-attribution.md.
-    # Wave-10 wall-flux closeout moved the restored direct wall-budget pin after
-    # the final process-condensation fold; two-pass deterministic extra probe:
-    # docs-private/research/2026-07-12-pin-final/wall-flux-extra-run{1,2}.json.
+    # Re-executed twice at base 3e4b54f after the configured-route alignment;
+    # both -n0 probes produced the same direct wall-budget pin:
+    # docs-private/research/2026-07-13-sio-tsweep-lag/fixed-yield-r{3,4}.log.
     assert route.wall_deposit_by_species["SiO"] == pytest.approx(
-        0.11244702040073114,
+        0.9572497806398499,
         rel=1e-12,
     )
     assert (
