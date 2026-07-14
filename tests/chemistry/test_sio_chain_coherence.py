@@ -84,7 +84,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # The resulting coupled headspace trajectory moves this executable pin
 # independently of the condensation accounting repair; all four wall
 # temperatures execute to the same value.
-PHASE3BIS_SIO_EVOLVED_KG = 1.77220591892e-05
+# 2026-07-14 t-194 Cr grounding: executable C2A_continuous recompute with
+# grounded Cr alpha=0.9 and fallback retained only for Mn/CrO2.
+PHASE3BIS_SIO_EVOLVED_KG = 1.77221126749e-05
 
 
 @lru_cache(maxsize=None)

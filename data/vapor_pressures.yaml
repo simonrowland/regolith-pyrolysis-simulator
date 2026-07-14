@@ -418,10 +418,21 @@ metals:
       B: 16064.989
       C: -83.86
       valid_range_K: [1889, 2755]
-    evaporation_alpha_policy:
-      tier: 3
-      policy: "fail_loud_missing_alpha"
-      source: "REF-014 Fedkin et al. 2006 GCA 70:206-223; no isolated HK alpha found"
+    evaporation_alpha:
+      value: 0.9
+      source: "REF-040 Pound 1972 J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096, selected McCabe, Hudson & Paxton 1958 Trans. Met. Soc. AIME 212:102 Langmuir-vs-Knudsen result for 99.9% polycrystalline solid Cr and monoatomic Cr(g)"
+      T_band_K: [1318, 1563]
+      envelope: [0.8, 1.0]
+      tier: 1
+      # DERIVATION (owner-ratified 2026-07-14): premise = clean 99.9%
+      # polycrystalline SOLID Cr evaporating as monoatomic Cr(g); basis = alpha
+      # is the measured Langmuir free-evaporation flux / Knudsen equilibrium-flux
+      # ratio selected by Pound from McCabe et al.; valid only at 1318-1563 K;
+      # sanity check = 0.9 +/- 0.1 stays <= 1 and matches the near-unity
+      # monoatomic-vapor-metal class. REGIME CAVEAT: this is pure-SOLID-Cr free
+      # evaporation, NOT Cr dissolved in silicate melt (liquid pure Cr was not
+      # separately measured; T_m approximately 2180 K). Melt activity belongs
+      # in P_sat, never in alpha; O-contaminated surfaces can sharply reduce alpha.
     antoine:
       A: 11.420
       B: 20730

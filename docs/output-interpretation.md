@@ -46,9 +46,9 @@ Under JANAF-4th multiphase Ellingham (2026-07-09 re-ground):
 
 Hertz-Knudsen-Langmuir fluxes are scaled by per-species `evaporation_alpha` metadata in `data/vapor_pressures.yaml`. Each numeric alpha block carries a source citation, temperature context, uncertainty envelope, and confidence tier.
 
-- **Tier 1** (Na, K, Fe, Mg, SiO) — measured α with citation.
-- **Tier 2** (Ca, Ti, Al) — proxy or conditional-proxy values. Ca and Ti use Zhang 2014 CaTiO₃ melt coefficients; Al uses a broad conflicting-proxy envelope. Elemental Si is valid only for the inactive pure-element Si branch; the SiO silicate-vapor path keeps its separate SiO alpha.
-- **Tier 3** (Cr, Mn, CrO₂) — intentionally no numeric α. The engine returns a `missing_alpha` diagnostic when fallback is disabled. Released setpoints default `chemistry_kernel.allow_unmeasured_alpha_fallback` to `true`, so normal runs use the explicit α = 1.0 upper-bound fallback and record `unmeasured_alpha_fallback_species`; set it to `false` for fail-loud behavior.
+- **Tier 1** (Na, K, Fe, Mg, SiO, Cr) carries measured α with citation. Cr is α = 0.9 ± 0.1 over 1318–1563 K, selected by Pound (1972) from McCabe, Hudson & Paxton's direct solid-Cr Langmuir/Knudsen comparison. This is clean, pure-solid Cr evaporating as Cr(g), not Cr dissolved in silicate melt; melt activity belongs in `P_sat`, and oxygen-contaminated surfaces can lower α.
+- **Tier 2** (Ca, Ti, Al) contains proxy or conditional-proxy values. Ca and Ti use Zhang 2014 CaTiO₃ melt coefficients; Al uses a broad conflicting-proxy envelope. Elemental Si is valid only for the inactive pure-element Si branch; the SiO silicate-vapor path keeps its separate SiO alpha.
+- **Tier 3** (Mn, CrO₂) intentionally has no numeric α. The engine returns a `missing_alpha` diagnostic when fallback is disabled. Released setpoints default `chemistry_kernel.allow_unmeasured_alpha_fallback` to `true`, so normal runs may use the explicit α = 1.0 upper-bound fallback for Mn and CrO₂ and record `unmeasured_alpha_fallback_species`; set it to `false` for fail-loud behavior. Cr now uses its grounded row regardless of this flag. Mn remains ungrounded pending the second owner-requested literature sweep.
 
 The evaporation diagnostic includes `flux_uncertainty_pct`, a per-species map derived from the alpha envelope. It is alpha-only uncertainty, not a total model uncertainty: vapor-pressure fits, melt activities, temperature dependence, and composition dependence remain separate limitations.
 

@@ -521,6 +521,7 @@ def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture():
         hours=24,
         additives_kg={},
         allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
         run_metadata_overrides={
             "started_at_utc": "2026-05-15T00:00:00Z",
             "kernel_commit_sha": "goal-18-fixture",

@@ -189,7 +189,10 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # push-regression cluster C) changed the feedstock data digest, an EvalSpec
     # identity input, so this digest-based production key advances once more.
     # Two in-repo runs produced this identical key; cross-process determinism holds.
-    assert key_hash == "28b0db7e4bbf884581955e3dca05200811f76b05dabe540da2e32e06aec3e988"
+    # 2026-07-14 t-194 Cr grounding: the functional vapor-pressure data digest
+    # moves because Cr gains its cited tier-1 evaporation_alpha block. Key
+    # schema and quantization are unchanged; value captured by full-suite run.
+    assert key_hash == "c091229055b0ae62c24fada1738fbfb0872509c420ccfa7be3ad602a14d05c26"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 

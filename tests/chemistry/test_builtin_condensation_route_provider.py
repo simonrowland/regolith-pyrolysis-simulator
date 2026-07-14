@@ -145,34 +145,37 @@ from tests.chemistry.conftest import _build_sim
 # an active wall Si lot, changing these pins only by the explicitly conserved
 # sub-floor components.
 EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
+    # 2026-07-14 t-194 Cr grounding: executable C0->C6 reruns use alpha=0.9
+    # for Cr instead of the prototype-unity fallback; coupled trace wall pins
+    # move slightly.
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 8.674071065810759e-07,
-            "SiO2": 1.8556674803172791e-06,
+            "Si": 8.674080659497896e-07,
+            "SiO2": 1.855669532720712e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 9.758055561681058e-07,
-            "SiO2": 2.0875672149278365e-06,
+            "Si": 9.758066353824382e-07,
+            "SiO2": 2.087569523720243e-06,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 8.737586063321803e-07,
-            "SiO2": 1.8692554154978237e-06,
+            "Si": 8.737674437085181e-07,
+            "SiO2": 1.8692743215360117e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 9.829559624065655e-07,
-            "SiO2": 2.1028642723615334e-06,
+            "Si": 9.829659039093528e-07,
+            "SiO2": 2.1028855404872933e-06,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 7.265713972604444e-07,
-            "SiO2": 1.5543738387608785e-06,
+            "Si": 7.265724522449204e-07,
+            "SiO2": 1.554376095717698e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 8.173665116123509e-07,
-            "SiO2": 1.7486142822576064e-06,
+            "Si": 8.173676983591613e-07,
+            "SiO2": 1.7486168210971509e-06,
         },
     },
 }

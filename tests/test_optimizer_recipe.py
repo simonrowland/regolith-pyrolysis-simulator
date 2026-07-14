@@ -459,7 +459,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 98ab367f in FULL-SUITE / warmed-cache context (what CI + the batch runner
     # see) and 6b1388b7 when the test runs alone in a pristine tree. Pin the
     # full-suite (CI) value; hermeticity fix tracked separately.
-    assert cache_key(spec) == "98ab367fc75c9179b10cd2a6a1f07f54eb5ebfd78e421100ff81c72c3241369f"
+    # 2026-07-14 t-194 Cr grounding: full-suite executable recompute after the
+    # functional vapor-pressure digest moved; schema/allowlist remain unchanged.
+    assert cache_key(spec) == "fbbb336108ba9f7faa034141a8186391fb75ccd9864db3b072e9b72e91449a4e"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

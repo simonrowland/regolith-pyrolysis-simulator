@@ -215,7 +215,7 @@ def test_double_count_guard_zeroes_nonpositive_driving_pressure(p_bulk):
     assert result.flux_kg_s_m2 == 0.0
 
 
-def test_missing_alpha_policy_uses_baseline_diagnostic_only():
+def test_grounded_cr_alpha_uses_series_resistance_path_without_fallback():
     provider = BuiltinEvaporationFluxProvider()
     view = ProviderAccountView(
         accounts={"process.cleaned_melt": {"Cr2O3": 10.0}},
@@ -241,14 +241,14 @@ def test_missing_alpha_policy_uses_baseline_diagnostic_only():
             "available_oxide_kg": {"Cr": 10.0},
             "melt_surface_area_m2": 1.0,
             "stir_factor": {"axial": 1000.0, "radial": 1000.0},
-            "alpha": {},
+            "alpha": {"Cr": 0.9},
         },
     )
 
     result = provider.dispatch(request)
 
-    assert result.status == "unavailable"
-    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
-    missing = result.diagnostic["missing_alpha"]["Cr"]
-    assert missing["policy"] == "fail_loud_missing_alpha"
-    assert missing["baseline_alpha_1_rate_kg_hr"] > 0.0
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Cr"] > 0.0
+    assert result.diagnostic["alpha_used_by_species"]["Cr"] == pytest.approx(0.9)
+    assert "missing_alpha" not in result.diagnostic
+    assert "unmeasured_alpha_fallback_species" not in result.diagnostic

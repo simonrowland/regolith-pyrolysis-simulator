@@ -92,6 +92,18 @@ EXPECTED_ALPHA = {
         ),
         "tier": 2,
     },
+    ("metals", "Cr"): {
+        "value": 0.90,
+        "T_band_K": (1318, 1563),
+        "envelope": (0.80, 1.00),
+        "source": (
+            "REF-040 Pound 1972 J. Phys. Chem. Ref. Data 1:135-146 Table 1, "
+            "DOI 10.1063/1.3253096, selected McCabe, Hudson & Paxton 1958 "
+            "Trans. Met. Soc. AIME 212:102 Langmuir-vs-Knudsen result for "
+            "99.9% polycrystalline solid Cr and monoatomic Cr(g)"
+        ),
+        "tier": 1,
+    },
     ("oxide_vapors", "SiO"): {
         "value": {
             "form": "arrhenius",
@@ -125,7 +137,6 @@ EXPECTED_OWNER_RATIFY_ALPHA = {
 }
 
 EXPECTED_MISSING_ALPHA_POLICY = {
-    ("metals", "Cr"): "Fedkin et al. 2006",
     ("metals", "Mn"): "Sossi et al. 2019",
     ("oxide_vapors", "CrO2"): "Fedkin et al. 2006",
 }
@@ -160,6 +171,8 @@ def test_calibrated_evaporation_alpha_values_sources_and_envelopes():
             assert alpha["value"] == pytest.approx(expected["value"])
             assert envelope[0] <= alpha["value"] <= envelope[1]
         assert envelope == pytest.approx(expected["envelope"])
+        if "T_band_K" in expected:
+            assert tuple(alpha["T_band_K"]) == expected["T_band_K"]
         assert alpha["source"] == expected["source"]
         assert alpha["tier"] == expected["tier"]
 
