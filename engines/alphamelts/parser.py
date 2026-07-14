@@ -124,11 +124,41 @@ def project_equilibrium_to_diagnostics(
         phases_present=phases_present,
         phase_modes_wt_pct=phase_modes,
         phase_masses_kg=phase_masses,
+        phase_compositions=dict(
+            getattr(equilibrium_result, 'phase_compositions', {}) or {}
+        ),
+        phase_thermo=dict(
+            getattr(equilibrium_result, 'phase_thermo', {}) or {}
+        ),
+        solid_composition_wt_pct=dict(
+            getattr(equilibrium_result, 'solid_composition_wt_pct', {}) or {}
+        ),
+        bulk_composition_wt_pct=dict(
+            getattr(equilibrium_result, 'bulk_composition_wt_pct', {}) or {}
+        ),
         liquid_fraction=liquid_fraction,
         liquid_composition_wt_pct=liquid_comp,
         liquid_fraction_path=_liquid_fraction_path(equilibrium_result),
         activity_coefficients=activities,
         fO2_log=fO2_log,
+        system_enthalpy=_safe_attr_float(
+            equilibrium_result, 'system_enthalpy'
+        ),
+        system_entropy=_safe_attr_float(equilibrium_result, 'system_entropy'),
+        system_volume=_safe_attr_float(equilibrium_result, 'system_volume'),
+        system_heat_capacity_Cp=_safe_attr_float(
+            equilibrium_result, 'system_heat_capacity_Cp'
+        ),
+        system_dVdP=_safe_attr_float(equilibrium_result, 'system_dVdP'),
+        system_dVdT=_safe_attr_float(equilibrium_result, 'system_dVdT'),
+        system_fO2_delta_QFM=_safe_attr_float(
+            equilibrium_result, 'system_fO2_delta_QFM'
+        ),
+        system_solid_density_rhos=_safe_attr_float(
+            equilibrium_result, 'system_solid_density_rhos'
+        ),
+        system_phi=_safe_attr_float(equilibrium_result, 'system_phi'),
+        system_chisqr=_safe_attr_float(equilibrium_result, 'system_chisqr'),
         fe_redox_policy=fe_redox_policy,
         applied_fe3fet=applied_fe3fet,
         intrinsic_fO2_log=intrinsic_fO2_log,
@@ -221,6 +251,10 @@ def diagnostics_to_equilibrium(
         pressure_bar=pressure_bar,
         phases_present=list(diagnostics.phases_present),
         phase_masses_kg=phase_masses_kg,
+        phase_compositions=dict(diagnostics.phase_compositions),
+        solid_composition_wt_pct=dict(
+            diagnostics.solid_composition_wt_pct
+        ),
         liquid_fraction=liquid_fraction,
         liquid_composition_wt_pct=dict(diagnostics.liquid_composition_wt_pct),
         liquid_viscosity_Pa_s=_control_float(
@@ -244,6 +278,23 @@ def diagnostics_to_equilibrium(
             'liquid_density_kg_m3',
             0.0,
         ) or None,
+        system_enthalpy=diagnostics.system_enthalpy,
+        system_entropy=diagnostics.system_entropy,
+        system_volume=diagnostics.system_volume,
+        system_heat_capacity_Cp=diagnostics.system_heat_capacity_Cp,
+        system_dVdP=diagnostics.system_dVdP,
+        system_dVdT=diagnostics.system_dVdT,
+        system_fO2_delta_QFM=diagnostics.system_fO2_delta_QFM,
+        system_solid_density_rhos=diagnostics.system_solid_density_rhos,
+        system_phi=diagnostics.system_phi,
+        system_chisqr=diagnostics.system_chisqr,
+        phase_thermo={
+            phase: dict(values)
+            for phase, values in diagnostics.phase_thermo.items()
+        },
+        bulk_composition_wt_pct=dict(
+            diagnostics.bulk_composition_wt_pct
+        ),
     )
 
 

@@ -350,6 +350,21 @@ def _output(status: str = "ok") -> dict:
             "liquid_composition_wt_pct": {"SiO2": 66.66666666666667},
             "liquid_viscosity_Pa_s": 2.5,
             "liquid_density_kg_m3": 2650.0,
+            "system_enthalpy": -1059377.10,
+            "system_entropy": 268.91,
+            "system_volume": 34.56,
+            "system_heat_capacity_Cp": 143.47,
+            "system_dVdP": -183.54,
+            "system_dVdT": 2897.97,
+            "system_fO2_delta_QFM": -4.229,
+            "system_solid_density_rhos": None,
+            "system_phi": 1.0,
+            "system_chisqr": None,
+            "phase_thermo": {
+                "liquid": {"enthalpy": -1059377.10, "density_kg_m3": 2893.824}
+            },
+            "solid_composition_wt_pct": {},
+            "bulk_composition_wt_pct": {"SiO2": 49.3753},
             "vapor_pressures_Pa": {},
             "vapor_pressures_source": {},
             "activity_coefficients": {},
@@ -600,6 +615,11 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(tmp_path):
         ("alphamelts_outputs", "generic_requested_temperature_C_repr"),
         ("alphamelts_outputs", "generic_liquid_density_kg_m3"),
         ("alphamelts_outputs", "generic_liquid_density_kg_m3_repr"),
+        ("alphamelts_outputs", "generic_system_enthalpy"),
+        ("alphamelts_outputs", "generic_system_enthalpy_repr"),
+        ("alphamelts_outputs", "generic_phase_thermo_json"),
+        ("alphamelts_outputs", "generic_solid_composition_wt_pct_json"),
+        ("alphamelts_outputs", "generic_bulk_composition_wt_pct_json"),
         ("alphamelts_outputs", "run_mode"),
         ("alphamelts_outputs", "applied_timeout_s"),
         ("alphamelts_outputs", "applied_timeout_s_repr"),
@@ -626,6 +646,11 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(tmp_path):
         "generic_requested_temperature_C_repr",
         "generic_liquid_density_kg_m3",
         "generic_liquid_density_kg_m3_repr",
+        "generic_system_enthalpy",
+        "generic_system_enthalpy_repr",
+        "generic_phase_thermo_json",
+        "generic_solid_composition_wt_pct_json",
+        "generic_bulk_composition_wt_pct_json",
         "run_mode",
         "applied_timeout_s",
         "applied_timeout_s_repr",
@@ -866,6 +891,9 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
             "o.generic_requested_temperature_C, "
             "o.generic_liquid_viscosity_Pa_s, "
             "o.generic_liquid_density_kg_m3, o.generic_fO2_log, "
+            "o.generic_system_enthalpy, o.generic_system_enthalpy_repr, "
+            "o.generic_phase_thermo_json, "
+            "o.generic_bulk_composition_wt_pct_json, "
             "o.alpha_intrinsic_fO2_log "
             "FROM grid_keys h JOIN alphamelts_outputs o ON o.grid_key_id = h.id"
         ).fetchone()
@@ -883,6 +911,14 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
         assert row["generic_liquid_viscosity_Pa_s"] == 2.5
         assert row["generic_liquid_density_kg_m3"] == 2650.0
         assert row["generic_fO2_log"] == -9.0
+        assert row["generic_system_enthalpy"] == -1059377.10
+        assert row["generic_system_enthalpy_repr"] == "-1059377.1"
+        assert json.loads(row["generic_phase_thermo_json"])["liquid"][
+            "density_kg_m3"
+        ] == 2893.824
+        assert json.loads(row["generic_bulk_composition_wt_pct_json"])[
+            "SiO2"
+        ] == 49.3753
         assert row["alpha_intrinsic_fO2_log"] == -9.0
         assert writer.counts() == {
             "success": 1,

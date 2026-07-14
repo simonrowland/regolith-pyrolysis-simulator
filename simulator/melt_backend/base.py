@@ -483,6 +483,24 @@ class EquilibriumResult:
     # did not print a density; adapters must not synthesize a substitute.
     liquid_density_kg_m3: Optional[float] = None
 
+    # Engine-native thermodynamic table values.  AlphaMELTS reports H in J,
+    # S and Cp in J/K, V in cm3, and scaled dVdP/dVdT columns as printed.
+    system_enthalpy: Optional[float] = None
+    system_entropy: Optional[float] = None
+    system_volume: Optional[float] = None
+    system_heat_capacity_Cp: Optional[float] = None
+    system_dVdP: Optional[float] = None
+    system_dVdT: Optional[float] = None
+    system_fO2_delta_QFM: Optional[float] = None
+    system_solid_density_rhos: Optional[float] = None
+    system_phi: Optional[float] = None
+    system_chisqr: Optional[float] = None
+    phase_thermo: Dict[str, Dict[str, Optional[float]]] = field(
+        default_factory=dict
+    )
+    solid_composition_wt_pct: Dict[str, float] = field(default_factory=dict)
+    bulk_composition_wt_pct: Dict[str, float] = field(default_factory=dict)
+
     def __post_init__(self) -> None:
         if self.status != 'ok':
             return

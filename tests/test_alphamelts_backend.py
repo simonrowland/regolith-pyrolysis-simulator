@@ -223,6 +223,7 @@ def _parse_subprocess_fixture(
     pressure_bar: float = 1.0,
     total_input_kg: float = 0.1,
     system_output: str | None = None,
+    table_outputs: dict[str, str] | None = None,
     fO2_log: float = -9.0,
 ):
     return backend._parse_single_point_stdout(
@@ -238,7 +239,107 @@ def _parse_subprocess_fixture(
             else system_output
         ),
         fO2_constraint={"path": "Absolute", "offset": fO2_log},
+        table_outputs=table_outputs,
     )
+
+
+def test_alphamelts_full_table_suite_parsers_capture_all_liquid_and_solids():
+    backend = AlphaMELTSBackend()
+    system = (
+        "System Thermodynamic Data:\n"
+        "index Pressure Temperature mass F phi H S V Cp dVdP*10^6 "
+        "dVdT*10^6 fO2-(QFM) fO2(absolute) rhol rhos viscosity aH2O chisqr\n"
+        "1 1.00 1317.97 100.000002 1.0 1.0 -1059377.10 268.91 "
+        "34.56 143.47 -183.54 2897.97 -4.229 -11.301 2.893824 "
+        "n/a 1.095 n/a n/a\n"
+    )
+    phase = (
+        "index 1 Pressure 1.00 Temperature 1100.00 SiO2 FeO MgO\n"
+        "liquid1 27.5 -298226.6 72.42 10.0 38.55 2.169 46.5 17.4 3.9\n"
+        "olivine0 15.2 -181990.7 35.41 4.56 18.46 "
+        "(Mg0.8Fe0.2)2SiO4 38.9 19.7 40.8\n"
+    )
+    solid_empty = (
+        "Solid Composition:\n"
+        "index Pressure Temperature mass SiO2 FeO MgO\n"
+        "1 1.00 1400.00 0.000000 ---\n"
+    )
+    solid_partial = (
+        "Solid Composition:\n"
+        "index Pressure Temperature mass SiO2 FeO MgO\n"
+        "1 1.00 1100.00 15.2 38.9 19.7 40.8\n"
+    )
+    bulk = (
+        "Bulk Composition:\n"
+        "index Pressure Temperature mass SiO2 FeO MgO\n"
+        "1 1.00 1100.00 42.7 49.0 10.0 10.0\n"
+    )
+    liquid = (
+        "Liquid Composition:\n"
+        "index Pressure Temperature mass SiO2 FeO MgO\n"
+        "1 1.00 1100.00 27.5 46.5 17.4 3.9\n"
+    )
+
+    system_values = backend._parse_system_main_output(system)
+    assert system_values['fO2_value'] == pytest.approx(-11.301)
+    assert system_values['system_enthalpy'] == pytest.approx(-1059377.10)
+    assert system_values['system_entropy'] == pytest.approx(268.91)
+    assert system_values['system_volume'] == pytest.approx(34.56)
+    assert system_values['system_heat_capacity_Cp'] == pytest.approx(143.47)
+    assert system_values['system_dVdP'] == pytest.approx(-183.54)
+    assert system_values['system_dVdT'] == pytest.approx(2897.97)
+    assert system_values['system_fO2_delta_QFM'] == pytest.approx(-4.229)
+    assert system_values['system_solid_density_rhos'] is None
+    assert system_values['system_phi'] == pytest.approx(1.0)
+    assert system_values['system_chisqr'] is None
+
+    phase_values = backend._parse_phase_main_output(phase)
+    assert phase_values['phase_compositions']['olivine'] == pytest.approx({
+        'SiO2': 38.9,
+        'FeO': 19.7,
+        'MgO': 40.8,
+    })
+    assert phase_values['phase_thermo']['liquid']['enthalpy'] == pytest.approx(
+        -298226.6
+    )
+    assert phase_values['phase_thermo']['liquid']['density_kg_m3'] == pytest.approx(
+        2750.0
+    )
+    assert phase_values['phase_thermo']['olivine']['density_kg_m3'] == pytest.approx(
+        15.2 / 4.56 * 1000.0
+    )
+    assert backend._parse_composition_table(
+        solid_empty, table_name='Solid_comp_tbl.txt'
+    ) == {}
+    assert backend._parse_composition_table(
+        solid_partial, table_name='Solid_comp_tbl.txt'
+    ) == pytest.approx({'SiO2': 38.9, 'FeO': 19.7, 'MgO': 40.8})
+    assert backend._parse_composition_table(
+        bulk, table_name='Bulk_comp_tbl.txt'
+    ) == pytest.approx({'SiO2': 49.0, 'FeO': 10.0, 'MgO': 10.0})
+    assert backend._parse_composition_table(
+        liquid, table_name='Liquid_comp_tbl.txt'
+    ) == pytest.approx({'SiO2': 46.5, 'FeO': 17.4, 'MgO': 3.9})
+    with pytest.raises(ValueError, match='invalid H'):
+        backend._parse_system_main_output(
+            system.replace('-1059377.10', 'not-a-number')
+        )
+    stable_output = (
+        '<> Stable liquid assemblage achieved.\n'
+        'Initial alphaMELTS calculation at: P 1.000000 (bars), '
+        'T 1400.000000 (C)\n'
+        'liquid: SiO2\n100.0 g 100.0\nMelt fraction = 1.0\n'
+    )
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match='table suite missing',
+    ):
+        _parse_subprocess_fixture(
+            backend,
+            stable_output,
+            temperature_C=1400.0,
+            table_outputs={'Phase_main_tbl.txt': phase},
+        )
 
 
 def _clamped_success_diagnostics() -> LiquidusDiagnostics:
@@ -385,6 +486,24 @@ def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
         (Path(kwargs['cwd']) / 'System_main_tbl.txt').write_text(
             _system_main_fixture(temperature_C=1400.0, fO2_log=-9.0)
         )
+        (Path(kwargs['cwd']) / 'Phase_main_tbl.txt').write_text(
+            'index 1 Pressure 1.00 Temperature 1400.00 SiO2 Al2O3 FeO '
+            'MgO CaO Na2O\n'
+            'liquid1 100.0 -1059377.1 268.91 34.56 143.47 1.409 '
+            '50 15 10 10 10 5\n'
+        )
+        (Path(kwargs['cwd']) / 'Solid_comp_tbl.txt').write_text(
+            'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            '1 1.00 1400.00 0.0 ---\n'
+        )
+        (Path(kwargs['cwd']) / 'Bulk_comp_tbl.txt').write_text(
+            'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            '1 1.00 1400.00 100.0 50 15 10 10 10 5\n'
+        )
+        (Path(kwargs['cwd']) / 'Liquid_comp_tbl.txt').write_text(
+            'index Pressure Temperature mass SiO2 Al2O3 FeO MgO CaO Na2O\n'
+            '1 1.00 1400.00 100.0 50 15 10 10 10 5\n'
+        )
         return types.SimpleNamespace(
             returncode=0,
             stdout=(
@@ -423,6 +542,16 @@ def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     assert result.fO2_log == pytest.approx(-9.0)
     assert result.liquid_density_kg_m3 == pytest.approx(2638.918)
     assert result.liquid_viscosity_Pa_s == pytest.approx(0.1 * 10**1.409)
+    assert result.system_enthalpy == pytest.approx(-1.0)
+    assert result.system_phi == pytest.approx(1.0)
+    assert result.system_chisqr is None
+    assert result.phase_thermo['liquid']['enthalpy'] == pytest.approx(-1059377.1)
+    assert result.phase_thermo['liquid']['density_kg_m3'] == pytest.approx(
+        100.0 / 34.56 * 1000.0
+    )
+    assert result.phase_compositions['liquid']['SiO2'] == pytest.approx(50.0)
+    assert result.solid_composition_wt_pct == {}
+    assert result.bulk_composition_wt_pct['SiO2'] == pytest.approx(50.0)
     assert result.diagnostics['intrinsic_fO2_log'] == pytest.approx(-9.0)
 
 
@@ -2789,6 +2918,38 @@ def test_project_local_alphamelts_reports_liquidus_when_installed():
     assert any(message.startswith("AlphaMELTS liquidus_C=")
                for message in result.warnings)
     assert result.ledger_transition is None
+
+
+def test_project_local_alphamelts_populates_full_table_suite_when_installed():
+    backend = AlphaMELTSBackend()
+    try:
+        available = backend.initialize({'mode': 'subprocess'})
+    except ImportError as exc:
+        pytest.skip(f"project-local alphaMELTS app is not installed: {exc}")
+    if not available:
+        pytest.skip("project-local alphaMELTS app is not installed")
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg=_melts_domain_composition(),
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        subprocess_run_mode='isothermal',
+    )
+
+    assert result.system_enthalpy is not None
+    assert result.system_entropy is not None
+    assert result.system_volume is not None
+    assert result.system_heat_capacity_Cp is not None
+    assert result.system_dVdP is not None
+    assert result.system_dVdT is not None
+    # Absolute-path runs emit `fO2-9.0)` (delta from the requested absolute
+    # path), not a QFM-relative value. Do not mislabel that zero as delta QFM.
+    assert result.system_fO2_delta_QFM is None
+    assert result.system_phi is not None
+    assert result.phase_thermo
+    assert result.phase_compositions
+    assert result.bulk_composition_wt_pct
 
 
 def test_project_local_alphamelts_cold_c0_step_returns_when_installed():
