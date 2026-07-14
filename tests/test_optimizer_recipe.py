@@ -455,10 +455,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # into fingerprinted accounting code (simulator/accounting/ledger_api.py);
     # 2026-07-13 the em-dash->ASCII '--' fix in data/feedstocks.yaml (latin1
     # guard, push-regression cluster C) moved the feedstock data digest.
-    # t-259: this key is non-hermetic (reads on-disk cache state) — it is
-    # 98ab367f in FULL-SUITE / warmed-cache context (what CI + the batch runner
-    # see) and 6b1388b7 when the test runs alone in a pristine tree. Pin the
-    # full-suite (CI) value; hermeticity fix tracked separately.
+    # t-259 hygiene: 6b1388b7 above pins the 84-path search allowlist hash;
+    # it is not a cache_key value. This cache_key is 98ab367f in both pristine
+    # isolated and FULL-SUITE / warmed-cache contexts, confirming the key is
+    # pure for byte-identical canonical EvalSpec inputs.
     assert cache_key(spec) == "98ab367fc75c9179b10cd2a6a1f07f54eb5ebfd78e421100ff81c72c3241369f"
 
 
