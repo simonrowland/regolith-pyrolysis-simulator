@@ -309,6 +309,7 @@ class AtomLedger:
                 self.registry,
                 tolerance_kg=self.balance_tolerance_kg,
             )
+        self._initial_balances = _copy_balances(self._balances)
         self.assert_balanced()
 
     @property
@@ -598,6 +599,56 @@ class AtomLedger:
         return _signed_atom_moles_from_species_mol(
             self._balances.get(str(account), {}), self.registry)
 
+    def element_atom_drift_report(self) -> dict[str, Any]:
+        """Return report-only cumulative element residuals in mol-atoms."""
+        transition_terms: defaultdict[str, list[float]] = defaultdict(list)
+        for transition in self._transitions:
+            debits = transition.debit_atom_moles(self.registry)
+            credits = transition.credit_atom_moles(self.registry)
+            for element in set(debits) | set(credits):
+                transition_terms[element].append(
+                    credits.get(element, 0.0) - debits.get(element, 0.0)
+                )
+
+        input_terms: defaultdict[str, list[float]] = defaultdict(list)
+        for species_mol in self._initial_balances.values():
+            for element, mol_atoms in _signed_atom_moles_from_species_mol(
+                species_mol, self.registry
+            ).items():
+                input_terms[element].append(mol_atoms)
+        for element, mol_atoms in _sum_lot_atom_moles(
+            self._external_loads, self.registry
+        ).items():
+            input_terms[element].append(mol_atoms)
+
+        final_terms: defaultdict[str, list[float]] = defaultdict(list)
+        for species_mol in self._balances.values():
+            for element, mol_atoms in _signed_atom_moles_from_species_mol(
+                species_mol, self.registry
+            ).items():
+                final_terms[element].append(mol_atoms)
+
+        elements = sorted(
+            set(transition_terms) | set(input_terms) | set(final_terms)
+        )
+        return {
+            "unit": "mol-atoms",
+            "sign_convention": "final_minus_input",
+            "accepted_transition_residual_mol_atoms": {
+                element: math.fsum(transition_terms[element])
+                for element in elements
+            },
+            "whole_run_boundary_residual_mol_atoms": {
+                element: math.fsum(
+                    [
+                        *final_terms[element],
+                        *(-value for value in input_terms[element]),
+                    ]
+                )
+                for element in elements
+            },
+        }
+
     def reservoir_balances(self) -> dict[str, dict[str, Any]]:
         self._assert_balances_finite()
         reservoir_accounts = set(self._policies) | set(self._balances)
@@ -652,6 +703,7 @@ class AtomLedger:
             "kg_by_species": kg_by_species,
             "account_species_kg": account_species,
             "atom_moles_by_account": atom_moles_by_account,
+            "element_atom_drift": self.element_atom_drift_report(),
             "reservoir_balances": self.reservoir_balances(),
             "terminal_accounts": terminal_accounts,
             "external_loads": [

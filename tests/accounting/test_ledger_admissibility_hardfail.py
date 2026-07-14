@@ -840,6 +840,50 @@ def test_mass_tolerance_boundary_on_apply() -> None:
         )
 
 
+def test_element_atom_drift_reports_accepted_sub_tolerance_residual() -> None:
+    ledger = AtomLedger()
+    ledger.load_external_mol("process.cleaned_melt", {"Si": 2.0})
+    residual_mol_atoms = 0.5e-6
+
+    ledger.apply(
+        LedgerTransition(
+            "sub_tolerance_si_fault",
+            debits=(ledger.debit_mol("process.cleaned_melt", {"Si": 1.0}),),
+            credits=(
+                ledger.credit_mol(
+                    "process.overhead_gas",
+                    {"Si": 1.0 - residual_mol_atoms},
+                ),
+            ),
+        )
+    )
+
+    report = ledger.close_report()
+    drift = report["element_atom_drift"]
+    assert report["balanced"] is True
+    assert drift["accepted_transition_residual_mol_atoms"]["Si"] == pytest.approx(
+        -residual_mol_atoms
+    )
+    assert drift["whole_run_boundary_residual_mol_atoms"]["Si"] == pytest.approx(
+        -residual_mol_atoms
+    )
+
+
+def test_element_atom_drift_boundary_catches_pretransition_discard() -> None:
+    ledger = AtomLedger()
+    ledger.load_external_mol("process.cleaned_melt", {"Si": 2.0})
+    residual_mol_atoms = 0.5e-6
+
+    # Deliberate corruption models material discarded before a transition exists.
+    ledger._balances["process.cleaned_melt"]["Si"] -= residual_mol_atoms
+
+    drift = ledger.close_report()["element_atom_drift"]
+    assert drift["accepted_transition_residual_mol_atoms"]["Si"] == 0.0
+    assert drift["whole_run_boundary_residual_mol_atoms"]["Si"] == pytest.approx(
+        -residual_mol_atoms
+    )
+
+
 def test_policy_mapping_rejects_embedded_account_mismatch_before_mutation() -> None:
     ledger = _strict_ledger()
 

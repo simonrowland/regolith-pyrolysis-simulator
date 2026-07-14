@@ -1,3 +1,4 @@
+import math
 import re
 from pathlib import Path
 from types import SimpleNamespace
@@ -414,6 +415,15 @@ def test_cumulative_transition_mass_closure_bounded():
     # magnitude below the per-transition tolerance the AtomLedger
     # enforces.
     assert abs(sim._make_snapshot().mass_balance_error_pct) < 5e-12
+
+    drift = sim.atom_ledger.close_report()["element_atom_drift"]
+    assert drift["unit"] == "mol-atoms"
+    for surface in (
+        "accepted_transition_residual_mol_atoms",
+        "whole_run_boundary_residual_mol_atoms",
+    ):
+        assert drift[surface]
+        assert all(math.isfinite(value) for value in drift[surface].values())
 
 
 def test_sio_disproportionation_closes():
