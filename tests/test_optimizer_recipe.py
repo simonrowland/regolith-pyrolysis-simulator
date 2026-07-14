@@ -452,8 +452,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # named. Movers to date (2026-07-12): C6 1400 C window + t-005; wave-11
     # request-shape fingerprint + wave-12 cost-params hashing; runtp
     # vapor_pressure.py fingerprint; t-190 relocated the oxide-wt%-basis helper
-    # into fingerprinted accounting code (simulator/accounting/ledger_api.py).
-    assert cache_key(spec) == "b12e8aaf1f1fac41da5c1d2b32ebbdd8d214fc22f89130b01fc33cbefea3543b"
+    # into fingerprinted accounting code (simulator/accounting/ledger_api.py);
+    # 2026-07-13 the em-dash->ASCII '--' fix in data/feedstocks.yaml (latin1
+    # guard, push-regression cluster C) moved the feedstock data digest.
+    assert cache_key(spec) == "6b1388b7909a135b18153bdda8503dc36911ed23520914cdbd2246e1c6827249"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
