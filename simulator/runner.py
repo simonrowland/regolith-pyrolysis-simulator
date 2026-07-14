@@ -744,6 +744,7 @@ class PyrolysisRun:
     mre_max_voltage_V: float = 0.0
     allow_fallback_vapor: bool = False
     allow_unmeasured_alpha_fallback: bool = False
+    unmeasured_alpha_fallback_species: tuple[str, ...] = ()
     chemistry_kernel: Mapping[str, Any] | None = None
     force_builtin_vapor_pressure: bool = False
     sio_start_temperature_c: float | None = None
@@ -911,6 +912,7 @@ class PyrolysisRun:
             self.allow_fallback_vapor
             or self.force_builtin_vapor_pressure
             or self.allow_unmeasured_alpha_fallback
+            or self.unmeasured_alpha_fallback_species
         ):
             setpoints = dict(setpoints)
             kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
@@ -918,6 +920,10 @@ class PyrolysisRun:
                 kernel_config["allow_fallback_vapor"] = True
             if self.allow_unmeasured_alpha_fallback:
                 kernel_config["allow_unmeasured_alpha_fallback"] = True
+            if self.unmeasured_alpha_fallback_species:
+                kernel_config["unmeasured_alpha_fallback_species"] = list(
+                    self.unmeasured_alpha_fallback_species
+                )
             setpoints["chemistry_kernel"] = kernel_config
         vapor_pressures = bundle.vapor_pressures
         campaign_name = SIO_YIELD_CAMPAIGN_ALIASES.get(

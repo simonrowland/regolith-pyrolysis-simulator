@@ -71,6 +71,7 @@ def _markdown_report(evidence: Mapping[str, Any], execution: Any) -> str:
     purity = evidence["delivered_stream_purity"]
     coating = evidence["wall_coating"]
     mass_balance = evidence["mass_balance"]
+    alpha_fallback = evidence["prototype_alpha_fallback_provenance"]
     lines = [
         "# SSO-2 Owner Recipe Evidence Report",
         "",
@@ -80,6 +81,18 @@ def _markdown_report(evidence: Mapping[str, Any], execution: Any) -> str:
         f"- evidence_status: `{evidence['status']}`",
         f"- evidence_status_reason: {_fmt(evidence.get('status_reason'))}",
         f"- chunk_3b_reader_handoff: {SSO2_CHUNK3B_READER_HANDOFF}",
+        (
+            "- WARNING prototype_alpha_fallback: "
+            f"status=`{alpha_fallback['status']}`; "
+            f"policy=`{alpha_fallback['policy']}`; "
+            "permitted_species=`"
+            + ", ".join(alpha_fallback["permitted_species"])
+            + "`; engaged_species=`"
+            + ", ".join(alpha_fallback["engaged_species"])
+            + "`; engagement_count=`"
+            + str(alpha_fallback["total_engagement_count"])
+            + "`"
+        ),
         "",
         "## Recipe Surface",
         "",

@@ -39,6 +39,7 @@ from simulator.optimize.sso2_evidence import (
     sso2_owner_recipe_objective_reader,
     sso2_owner_recipe_setpoints_patch,
 )
+from scripts.sso2_owner_recipe_report import _markdown_report
 from simulator.pumping_cost import MARS_DATUM_AMBIENT_PA, estimate_subambient_pump_cost
 
 
@@ -830,6 +831,21 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert evidence["metal_product_path"]["status"] == "drained_to_tap"
     assert evidence["metal_product_path"]["Fe_kg"] == pytest.approx(0.0)
     assert evidence["metal_product_path"]["product_ledger_Fe_kg"] > 0.0
+    fallback = evidence["prototype_alpha_fallback_provenance"]
+    assert fallback == {
+        "severity": "warning",
+        "status": "engaged",
+        "policy": "alpha=1.0 prototype fallback",
+        "scope": "SSO-2 trace Cr/Mn species lacking grounded evaporation alpha",
+        "permitted_species": ["Cr", "CrO2", "Mn"],
+        "engaged_species": ["Cr", "CrO2", "Mn"],
+        "total_engagement_count": fallback["total_engagement_count"],
+    }
+    assert fallback["total_engagement_count"] > 0
+    report = _markdown_report(evidence, execution)
+    assert "WARNING prototype_alpha_fallback" in report
+    assert "alpha=1.0 prototype fallback" in report
+    assert "permitted_species=`Cr, CrO2, Mn`" in report
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:

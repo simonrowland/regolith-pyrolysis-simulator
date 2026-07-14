@@ -10,7 +10,6 @@ import yaml
 import scripts.make_recipe_db_profile as generator
 from simulator.optimize.evaluate import (
     BackendUnavailableAbort,
-    EngineBugAbort,
     _build_eval_inputs,
     _composition_target_constraints,
     evaluate,
@@ -61,6 +60,21 @@ RUNNABLE_TARGET_IDS = tuple(
         for target_id, row in generator.TARGET_MENU.items()
         if _is_runnable_target(row)
     )
+)
+SC67_MISSING_ALPHA_TARGET_IDS = frozenset({
+    "pc-ceramic-ca-al-ratio-seed",
+    "pc-ceramic-ca-al-ree",
+    "pc-extract-fe",
+    "pc-extract-k",
+    "pc-extract-mg",
+    "pc-extract-na",
+    "pc-extract-o2",
+    "pc-glass-clear",
+})
+SC67_MISSING_ALPHA_MESSAGE = (
+    "ProviderUnavailableError: missing evaporation_alpha for sampled species: "
+    "Cr, Mn; set chemistry_kernel.allow_unmeasured_alpha_fallback for "
+    "alpha=1.0 prototype fallback"
 )
 
 
@@ -589,7 +603,7 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
     _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
 
     profile = yaml.safe_load(out.read_text())
-    try:
+    if target_id not in SC67_MISSING_ALPHA_TARGET_IDS:
         evaluate(
             RecipePatch({}),
             "lunar_mare_low_ti",
@@ -597,16 +611,22 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
             profile=profile,
             candidate_id=f"smoke-{target_id}",
         )
-    except BackendUnavailableAbort as exc:
-        message = str(exc)
-        assert "missing evaporation_alpha for sampled species: Cr, Mn" in message
-        assert "allow_unmeasured_alpha_fallback" in message
-        assert "unknown campaign" not in message
-        assert "valid options:" not in message
-    except EngineBugAbort as exc:
-        message = str(exc)
-        assert "unknown campaign" not in message
-        assert "valid options:" not in message
+        return
+
+    with pytest.raises(BackendUnavailableAbort) as exc_info:
+        evaluate(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "stub",
+            profile=profile,
+            candidate_id=f"smoke-{target_id}",
+        )
+
+    message = str(exc_info.value)
+    assert type(exc_info.value) is BackendUnavailableAbort
+    assert message == SC67_MISSING_ALPHA_MESSAGE
+    assert "unknown campaign" not in message
+    assert "valid options:" not in message
 
 
 def test_target_menu_unknown_id_fails_loud(

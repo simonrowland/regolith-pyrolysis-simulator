@@ -310,8 +310,18 @@ def test_kernel_commit_rejects_atom_unbalanced_perchlorate_proposal(
         atom_balance_proof={"Cl": 0.0, "O": 0.0},
     )
 
+    with patch("simulator.chemistry.kernel.planner.validate_atom_balance"):
+        bound_proposal = _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
+    before_balances = sim.atom_ledger.mol_by_account()
+    before_transitions = sim.atom_ledger.transitions
+
     with pytest.raises(AtomBalanceError):
-        _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
+        sim._chem_kernel.commit_batch(
+            ChemistryIntent.STAGE0_PRETREATMENT, bound_proposal
+        )
+
+    assert sim.atom_ledger.mol_by_account() == before_balances
+    assert sim.atom_ledger.transitions == before_transitions
 
 
 def test_kernel_commit_rejects_atom_unbalanced_sulfate_carbon_proposal(
@@ -344,8 +354,18 @@ def test_kernel_commit_rejects_atom_unbalanced_sulfate_carbon_proposal(
         atom_balance_proof={"S": 0.0, "C": 0.0, "O": 0.0},
     )
 
+    with patch("simulator.chemistry.kernel.planner.validate_atom_balance"):
+        bound_proposal = _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
+    before_balances = sim.atom_ledger.mol_by_account()
+    before_transitions = sim.atom_ledger.transitions
+
     with pytest.raises(AtomBalanceError):
-        _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
+        sim._chem_kernel.commit_batch(
+            ChemistryIntent.STAGE0_PRETREATMENT, bound_proposal
+        )
+
+    assert sim.atom_ledger.mol_by_account() == before_balances
+    assert sim.atom_ledger.transitions == before_transitions
 
 
 def test_kernel_commit_accepts_balanced_perchlorate_proposal(
@@ -385,12 +405,22 @@ def test_kernel_commit_accepts_balanced_perchlorate_proposal(
         atom_balance_proof={"Cl": 0.0, "O": 0.0},
     )
 
-    bound_proposal = _dispatch_bound_proposal(
-        sim._chem_kernel, balanced_proposal
-    )
-    # Should not raise.
+    bound_proposal = _dispatch_bound_proposal(sim._chem_kernel, balanced_proposal)
+    before = sim.atom_ledger.mol_by_account()
     sim._chem_kernel.commit_batch(
         ChemistryIntent.STAGE0_PRETREATMENT, bound_proposal
+    )
+    after = sim.atom_ledger.mol_by_account()
+
+    assert after["process.stage0_perchlorate_feed"]["ClO4"] == pytest.approx(
+        before["process.stage0_perchlorate_feed"]["ClO4"] - 0.001
+    )
+    assert after["terminal.stage0_chloride_salt_phase"]["Cl"] == pytest.approx(
+        before.get("terminal.stage0_chloride_salt_phase", {}).get("Cl", 0.0)
+        + 0.001
+    )
+    assert after["terminal.oxygen_stage0_stored"]["O2"] == pytest.approx(
+        before.get("terminal.oxygen_stage0_stored", {}).get("O2", 0.0) + 0.002
     )
 
 

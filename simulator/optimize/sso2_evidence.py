@@ -48,6 +48,7 @@ SSO2_NATIVE_FE_PARTITION_TRANSITIONS = tuple(
     SSO2_NATIVE_FE_PARTITION_TRANSITION_BY_SOURCE.values()
 )
 SSO2_MASS_BALANCE_TOLERANCE_PCT = 5.0e-12
+SSO2_UNMEASURED_ALPHA_FALLBACK_SPECIES = ("Cr", "CrO2", "Mn")
 SSO2_CHUNK3B_READER_HANDOFF = (
     "PhysicsConstraintSet.delivered_stream_purity plus the SSO-2 profile/objective "
     "reader added in chunk 3b; it must consume Stage 3 Fe contamination and Fe tap "
@@ -115,6 +116,9 @@ def build_sso2_owner_recipe_execution(
         backend_name=backend_name,
         additives_kg={SSO2_CERTIFIED_DOSE_SPECIES: dose_kg},
         allow_unmeasured_alpha_fallback=True,
+        unmeasured_alpha_fallback_species=(
+            SSO2_UNMEASURED_ALPHA_FALLBACK_SPECIES
+        ),
         setpoints_patch=setpoints_patch,
     )
     session = SimSession().start(run._session_config())
@@ -317,6 +321,7 @@ def sso2_owner_recipe_evidence(
         )
     )
     mass_balance = _mass_balance_closure(run_execution, trace)
+    alpha_fallback_notice = _unmeasured_alpha_fallback_notice(sim)
 
     if trace_status != "available":
         status = trace_status
@@ -343,6 +348,7 @@ def sso2_owner_recipe_evidence(
         "status_reason": status_reason,
         "feedstock": SSO2_FEEDSTOCK_ID,
         "recipe_patch": sso2_owner_recipe_patch().to_nested(),
+        "prototype_alpha_fallback_provenance": alpha_fallback_notice,
         "certified_sso_r_surface": _certified_surface_payload(
             sim,
             dose_transition_count=dose_transition_count,
@@ -445,6 +451,38 @@ def sso2_owner_recipe_evidence(
                 ),
             },
         },
+    }
+
+
+def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
+    permitted = set(SSO2_UNMEASURED_ALPHA_FALLBACK_SPECIES)
+    engaged_species = {
+        str(species)
+        for species in (
+            getattr(sim, "_unmeasured_alpha_fallback_species_engaged", ()) or ()
+        )
+    }
+    unexpected = engaged_species - permitted
+    if unexpected:
+        raise RuntimeError(
+            "SSO-2 unmeasured-alpha fallback escaped its trace-species scope: "
+            + ", ".join(sorted(unexpected))
+        )
+    degraded = dict(
+        getattr(sim, "_degraded_path_engagement_summary", lambda: {})() or {}
+    )
+    engagement = dict(
+        degraded.get("unmeasured_alpha_evaporation_fallback", {}) or {}
+    )
+    total_count = int(engagement.get("total_count", 0) or 0)
+    return {
+        "severity": "warning",
+        "status": "engaged" if total_count > 0 else "not_engaged",
+        "policy": "alpha=1.0 prototype fallback",
+        "scope": "SSO-2 trace Cr/Mn species lacking grounded evaporation alpha",
+        "permitted_species": sorted(permitted),
+        "engaged_species": sorted(engaged_species),
+        "total_engagement_count": total_count,
     }
 
 

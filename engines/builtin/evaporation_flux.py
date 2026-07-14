@@ -840,6 +840,19 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         allow_unmeasured_alpha_fallback = bool(
             controls.get("allow_unmeasured_alpha_fallback", False)
         )
+        fallback_species_raw = controls.get(
+            "unmeasured_alpha_fallback_species"
+        )
+        if fallback_species_raw is None:
+            unmeasured_alpha_fallback_species_allowlist = None
+        elif isinstance(fallback_species_raw, (str, bytes)):
+            unmeasured_alpha_fallback_species_allowlist = {
+                str(fallback_species_raw)
+            }
+        else:
+            unmeasured_alpha_fallback_species_allowlist = {
+                str(species) for species in fallback_species_raw
+            }
 
         flux_kg_hr: dict[str, float] = {}
         alpha_used_by_species: dict[str, float] = {}
@@ -893,6 +906,13 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 species not in alpha_by_species
                 and "*" not in alpha_by_species
             )
+            alpha_fallback_permitted = (
+                allow_unmeasured_alpha_fallback
+                and (
+                    unmeasured_alpha_fallback_species_allowlist is None
+                    or species in unmeasured_alpha_fallback_species_allowlist
+                )
+            )
             alpha_spec = alpha_by_species.get(
                 species,
                 alpha_by_species.get("*", _DEFAULT_EVAPORATION_ALPHA),
@@ -929,7 +949,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             available_parent_kg = float(available_oxide_kg.get(species, 0.0) or 0.0)
             if (
                 alpha_is_unmeasured
-                and not allow_unmeasured_alpha_fallback
+                and not alpha_fallback_permitted
                 and available_parent_kg > 1.0e-12
                 and baseline_rate_kg_hr > _NONTRIVIAL_FLUX_KG_HR
             ):
@@ -942,7 +962,7 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 }
                 continue
 
-            if alpha_is_unmeasured:
+            if alpha_is_unmeasured and alpha_fallback_permitted:
                 unmeasured_alpha_fallback_species.append(species)
 
             alpha_used_by_species[species] = alpha
@@ -1067,6 +1087,12 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 unmeasured_alpha_fallback_species
             )
         warning_messages: list[str] = []
+        if unmeasured_alpha_fallback_species:
+            warning_messages.append(
+                "WARNING: alpha=1.0 prototype fallback used for unmeasured "
+                "evaporation species: "
+                + ", ".join(sorted(unmeasured_alpha_fallback_species))
+            )
         if missing_transport_parameters:
             diagnostic["missing_transport_parameters"] = missing_transport_parameters
             warning_messages.append(

@@ -1084,8 +1084,18 @@ def test_kernel_commit_rejects_atom_unbalanced_proposal(
         atom_balance_proof={"Fe": 0.0, "O": 0.0},
     )
 
+    with patch("simulator.chemistry.kernel.planner.validate_atom_balance"):
+        bound_proposal = _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
+    before_balances = sim.atom_ledger.mol_by_account()
+    before_transitions = sim.atom_ledger.transitions
+
     with pytest.raises(AtomBalanceError):
-        _dispatch_bound_proposal(sim._chem_kernel, bad_proposal)
+        sim._chem_kernel.commit_batch(
+            ChemistryIntent.ELECTROLYSIS_STEP, bound_proposal
+        )
+
+    assert sim.atom_ledger.mol_by_account() == before_balances
+    assert sim.atom_ledger.transitions == before_transitions
 
 
 def test_kernel_commit_accepts_balanced_proposal(
@@ -1116,12 +1126,21 @@ def test_kernel_commit_accepts_balanced_proposal(
         atom_balance_proof={"Fe": 0.0, "O": 0.0},
     )
 
-    bound_proposal = _dispatch_bound_proposal(
-        sim._chem_kernel, balanced_proposal
-    )
-    # Should not raise.
+    bound_proposal = _dispatch_bound_proposal(sim._chem_kernel, balanced_proposal)
+    before = sim.atom_ledger.mol_by_account()
     sim._chem_kernel.commit_batch(
         ChemistryIntent.ELECTROLYSIS_STEP, bound_proposal
+    )
+    after = sim.atom_ledger.mol_by_account()
+
+    assert after["process.cleaned_melt"]["FeO"] == pytest.approx(
+        before["process.cleaned_melt"]["FeO"] - 1.0
+    )
+    assert after["process.metal_phase"]["Fe"] == pytest.approx(
+        before.get("process.metal_phase", {}).get("Fe", 0.0) + 1.0
+    )
+    assert after["terminal.oxygen_mre_anode_stored"]["O2"] == pytest.approx(
+        before.get("terminal.oxygen_mre_anode_stored", {}).get("O2", 0.0) + 0.5
     )
 
 

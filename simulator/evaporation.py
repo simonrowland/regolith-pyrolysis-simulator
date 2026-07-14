@@ -317,6 +317,18 @@ class EvaporationMixin:
                 'allow_unmeasured_alpha_fallback': bool(
                     kernel_config.get('allow_unmeasured_alpha_fallback', False)
                 ),
+                **(
+                    {
+                        'unmeasured_alpha_fallback_species': tuple(
+                            kernel_config[
+                                'unmeasured_alpha_fallback_species'
+                            ]
+                            or ()
+                        )
+                    }
+                    if 'unmeasured_alpha_fallback_species' in kernel_config
+                    else {}
+                ),
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
@@ -325,6 +337,18 @@ class EvaporationMixin:
             diagnostic.get('unmeasured_alpha_fallback_species', ()) or ()
         )
         if unmeasured_alpha_species:
+            engaged_species = set(
+                getattr(
+                    self,
+                    '_unmeasured_alpha_fallback_species_engaged',
+                    (),
+                )
+                or ()
+            )
+            engaged_species.update(str(species) for species in unmeasured_alpha_species)
+            self._unmeasured_alpha_fallback_species_engaged = tuple(
+                sorted(engaged_species)
+            )
             self._record_degraded_path_engagement(
                 'unmeasured_alpha_evaporation_fallback',
                 count=len(unmeasured_alpha_species),

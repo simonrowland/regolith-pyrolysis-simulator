@@ -313,6 +313,35 @@ def test_evaporation_caller_counts_unmeasured_alpha_fallback_engagement(
     assert summary["unmeasured_alpha_evaporation_fallback"]["total_count"] == 2
 
 
+def test_unmeasured_alpha_fallback_allowlist_is_scoped_and_loud():
+    allowed = _w3_result_with_controls(
+        1.0,
+        alpha={},
+        allow_unmeasured_alpha_fallback=True,
+        unmeasured_alpha_fallback_species=["Na"],
+    )
+
+    assert allowed.status == "ok"
+    assert allowed.diagnostic["unmeasured_alpha_fallback_species"] == ["Na"]
+    assert any(
+        "WARNING" in warning
+        and "alpha=1.0 prototype fallback" in warning
+        and "Na" in warning
+        for warning in allowed.warnings
+    )
+
+    refused = _w3_result_with_controls(
+        1.0,
+        alpha={},
+        allow_unmeasured_alpha_fallback=True,
+        unmeasured_alpha_fallback_species=["Cr", "CrO2", "Mn"],
+    )
+
+    assert refused.status == "unavailable"
+    assert set(refused.diagnostic["missing_alpha"]) == {"Na"}
+    assert "unmeasured_alpha_fallback_species" not in refused.diagnostic
+
+
 def test_provider_attaches_numerator_provenance_and_resistance_shares():
     provider = BuiltinEvaporationFluxProvider()
     view = ProviderAccountView(
