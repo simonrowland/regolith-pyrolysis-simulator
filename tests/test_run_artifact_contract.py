@@ -238,6 +238,23 @@ def test_empty_c3_dose_is_omitted_without_fabricated_zero(c3_dose) -> None:
     assert "c3_dose" not in artifact["header"]
 
 
+@pytest.mark.parametrize("bad_patch", [None, "not-a-mapping", 7])
+def test_missing_or_mistyped_setpoints_patch_omits_snapshot(bad_patch) -> None:
+    # Empty {} is a truthful default-run snapshot (test below); a MISSING or
+    # mistyped patch is not reconstructible and the snapshot must be omitted,
+    # never fabricated.
+    payload = _runner_payload()
+    payload["recipe_snapshot"] = {
+        "setpoints_patch": bad_patch,
+        "pins": [],
+        "recipe_schema_version": "recipe-schema-v1",
+    }
+
+    artifact = build_run_artifact(payload, run_id="run-bad-patch")
+
+    assert "recipe_snapshot" not in artifact["header"]
+
+
 def test_empty_setpoints_patch_yields_truthful_default_run_snapshot() -> None:
     # A default run overrides nothing: an EMPTY patch recorded as empty IS the
     # honest snapshot (omitting it would strip reproducibility from every

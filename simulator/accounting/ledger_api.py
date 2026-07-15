@@ -11,7 +11,12 @@ from simulator.accounting import ledger as ledger_module
 from simulator.accounting.queries import AccountingQueries
 from simulator.three_product_report import classify_products
 
-LEDGER_SCHEMA_VERSION = "1.0.0"
+# 2.0.0: industrial_glass view — removed the fabricated `early_tap_mode: true`
+# flag (it asserted operator intent no run state supports) in favor of
+# `projection_basis: "hypothetical_early_tap"` + an explicit what-if `note`.
+# Field removal is a breaking change for schema-stable clients, hence the
+# major bump.
+LEDGER_SCHEMA_VERSION = "2.0.0"
 _OXIDE_FORMULA_RE = re.compile(r"^(?:[A-Z][a-z]?\d*)*O\d*$")
 
 _ACCOUNT_BASIS = {

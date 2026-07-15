@@ -328,6 +328,50 @@ def test_store_malformed_nested_shape_is_typed_and_quarantined(
     assert (store.runs_dir / "malformed.json.corrupt").exists()
 
 
+@pytest.mark.parametrize(
+    "strip_key, match",
+    [
+        ("header", "expected header"),
+        ("terminal", "expected terminal"),
+        ("timesteps", "missing timesteps"),
+    ],
+)
+def test_store_missing_structural_key_is_typed_and_quarantined(
+    tmp_path, strip_key, match
+) -> None:
+    # Structural keys are required, not merely well-typed-when-present: an
+    # artifact missing header/terminal/timesteps must be quarantined here,
+    # not passed through to crash readers downstream.
+    store = RunArtifactStore(tmp_path / "runs")
+    store.runs_dir.mkdir(parents=True)
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="stripped")
+    del artifact[strip_key]
+    stripped_path = store.runs_dir / "stripped.json"
+    stripped_path.write_text(json.dumps(artifact), encoding="utf-8")
+
+    with pytest.raises(RunStoreCorruptionError, match=match):
+        store.load("stripped")
+
+    assert store.list_runs() == []
+    assert not stripped_path.exists()
+    assert (store.runs_dir / "stripped.json.corrupt").exists()
+
+
+def test_store_timestep_without_summary_is_typed_and_quarantined(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    store.runs_dir.mkdir(parents=True)
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="no-summary")
+    artifact["timesteps"].append({"hour": 999})
+    bad_path = store.runs_dir / "no-summary.json"
+    bad_path.write_text(json.dumps(artifact), encoding="utf-8")
+
+    with pytest.raises(RunStoreCorruptionError, match="summary"):
+        store.load("no-summary")
+
+    assert store.list_runs() == []
+    assert (store.runs_dir / "no-summary.json.corrupt").exists()
+
+
 def test_store_summary_omits_absent_species_and_labels_source_side_o2(tmp_path) -> None:
     store = RunArtifactStore(tmp_path / "runs")
     artifact = build_run_artifact(_runner_payload("ok"), run_id="o2-only")

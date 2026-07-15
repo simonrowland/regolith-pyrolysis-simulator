@@ -121,14 +121,21 @@ class RunArtifactStore:
     def _validate_nested_shape(
         run_id: str, path: Path, artifact: dict[str, Any]
     ) -> None:
+        # Structural keys are REQUIRED, not merely well-typed-when-present:
+        # a stored artifact missing header/terminal/timesteps would pass a
+        # presence-optional check and crash readers downstream instead of
+        # being quarantined here.
         for key in ("header", "terminal"):
-            if key in artifact and not isinstance(artifact[key], dict):
+            if not isinstance(artifact.get(key), dict):
                 raise RunStoreCorruptionError(
                     run_id,
                     path,
-                    f"expected {key} to be an object, got {type(artifact[key]).__name__}",
+                    f"expected {key} to be an object, got "
+                    f"{type(artifact.get(key)).__name__}",
                 )
-        timesteps = artifact.get("timesteps", [])
+        if "timesteps" not in artifact:
+            raise RunStoreCorruptionError(run_id, path, "missing timesteps array")
+        timesteps = artifact["timesteps"]
         if not isinstance(timesteps, list):
             raise RunStoreCorruptionError(
                 run_id,
@@ -142,7 +149,7 @@ class RunArtifactStore:
                     path,
                     f"expected timesteps[{index}] to be an object, got {type(timestep).__name__}",
                 )
-            summary = timestep.get("summary", {})
+            summary = timestep.get("summary")
             if not isinstance(summary, dict):
                 raise RunStoreCorruptionError(
                     run_id,

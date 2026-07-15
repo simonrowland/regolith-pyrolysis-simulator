@@ -66,7 +66,7 @@ function runCard(run) {
   const unavailable = canLoad ? "" : `<p class="demo-note">${esc(run.unavailable_note || "demo metadata — no artifact")}</p>`;
   return `<article class="card run-card">
     <div class="run-card-head">
-      <div><div class="ct">${esc(run.folder)} · ${esc(run.status)}</div><h2>${esc(run.name)}</h2></div>
+      <div><div class="ct">${esc(run.folder ?? "unfiled")} · ${esc(run.status)}</div><h2>${esc(run.name)}</h2></div>
       <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(run.run_id)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${run.name} ${isStarred ? "from" : "to"} favorites`)}">${isStarred ? "★" : "☆"}</button>
     </div>
     <p class="run-summary">${esc(run.summary)}</p>
