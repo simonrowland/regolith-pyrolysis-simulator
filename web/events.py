@@ -233,14 +233,15 @@ def read_ledger_api(
 
 def read_ledger_api_for_client(client_id: str, resource: str, **params):
     """Resolve an active run owned by one signed Flask browser session."""
-    with _simulations_guard:
-        matches = [
-            sid for sid, state in _simulations.items()
-            if state.get('ledger_client_id') == client_id
-        ]
-    if len(matches) != 1:
-        raise LookupError("no unique active simulation for this browser session")
-    return read_ledger_api(matches[0], resource, **params)
+    with _run_command_lock:
+        with _simulations_guard:
+            matches = [
+                sid for sid, state in _simulations.items()
+                if state.get('ledger_client_id') == client_id
+            ]
+        if len(matches) != 1:
+            raise LookupError("no unique active simulation for this browser session")
+        return read_ledger_api(matches[0], resource, **params)
 
 
 def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bool:
@@ -1505,12 +1506,20 @@ def _start_background_loop(
         }
         if poisoned is not None:
             error_payload['reason'] = 'poisoned_hour'
-        artifact = persist_terminal(
-            session,
-            status='failed',
-            reason=str(error_payload.get('reason') or ''),
-            error_message=message,
-        )
+        with run_lock:
+            current, _ = _current_simulation_state(sid, run_id)
+            if (
+                current is None
+                or not current['running']
+                or current.get('artifact_persisted')
+            ):
+                return
+            artifact = persist_terminal(
+                session,
+                status='failed',
+                reason=str(error_payload.get('reason') or ''),
+                error_message=message,
+            )
         if artifact is None:
             stop_with_status({
                 'status': 'error',
@@ -1844,11 +1853,16 @@ def register_events(socketio):
         """
         sid = sid or request.sid
 
-        def reject(payload: dict[str, object], error_type: str):
+        def reject(
+            payload: dict[str, object],
+            error_type: str,
+            status_code: int = 400,
+        ):
             if command_mode:
                 raise RunCommandError(
                     str(payload['message']),
                     error_type=error_type,
+                    status_code=status_code,
                     payload=payload,
                 )
             socketio.emit('simulation_status', payload, room=sid)
@@ -2081,9 +2095,10 @@ def register_events(socketio):
         )
 
         replacement_sid = replace_sid if command_mode else sid
+        cancelled_prior_run_id = None
         if replacement_sid is not None:
             try:
-                _cancel_simulation_state(
+                cancellation = _cancel_simulation_state(
                     socketio,
                     replacement_sid,
                     reason='replaced_by_new_run',
@@ -2093,75 +2108,96 @@ def register_events(socketio):
                     'status': 'error',
                     'message': str(exc),
                 }, 'run_replacement_failed')
+            if cancellation is not None and cancellation.get('cancelled'):
+                cancelled_prior_run_id = str(cancellation['run_id'])
+                # Terminal cancellation is an immutable first write, so rollback
+                # is impossible; any later launch failure reports this run ID.
 
-        state, run_lock = _replace_simulation_state(
-            sid,
-            session,
-            speed,
-            ledger_client_id=(
-                ledger_client_id
-                if ledger_client_id is not None
-                else flask_session.get('ledger_client_id')
-            ),
-            run_store=run_store,
-            runner_projector=runner_projector,
-        )
-        state['http_owned'] = command_mode
-        run_id = state['run_id']
-        state['backend_message'] = backend_message
-        state['backend_status'] = resolution_status.backend_status
-        state['backend_authoritative'] = resolution_status.authoritative
-        state['recipe_inputs'] = _recipe_inputs_payload(
-            feedstock_key=str(feedstock_key),
-            mass_kg=mass_kg,
-            track=str(track),
-            runtime_campaign_overrides=runtime_campaign_overrides,
-            c4_max_temp=c4_max_temp,
-            furnace_max_T_C=setpoints.get('furnace_max_T_C'),
-            c5_enabled=c5_enabled,
-            mre_target_species=mre_target_species,
-            mre_max_voltage_V=mre_max_voltage_V,
-            additives_kg=additives_kg,
-            furnace_material_id=furnace_material_id,
-        )
-        state['setpoints_patch'] = copy.deepcopy(setpoints_patch)
-        if effective_config:
-            state['effective_config'] = effective_config
-        state['resolved_setpoints_patch'] = _resolved_recipe_patch_for_session(
-            setpoints_patch=setpoints_patch,
-            setpoints=setpoints,
-            runtime_campaign_overrides=runtime_campaign_overrides,
-        )
-
-        _emit_if_current(
-            socketio,
-            sid,
-            run_id,
-            'simulation_status',
-            _start_payload(
-                sim=sim,
-                feedstock_key=feedstock_key,
+        try:
+            state, run_lock = _replace_simulation_state(
+                sid,
+                session,
+                speed,
+                ledger_client_id=(
+                    ledger_client_id
+                    if ledger_client_id is not None
+                    else flask_session.get('ledger_client_id')
+                ),
+                run_store=run_store,
+                runner_projector=runner_projector,
+            )
+            state['http_owned'] = command_mode
+            run_id = state['run_id']
+            state['backend_message'] = backend_message
+            state['backend_status'] = resolution_status.backend_status
+            state['backend_authoritative'] = resolution_status.authoritative
+            state['recipe_inputs'] = _recipe_inputs_payload(
+                feedstock_key=str(feedstock_key),
                 mass_kg=mass_kg,
-                backend_requested=backend_name,
-                backend_active=backend_type,
-                backend_status=resolution_status.backend_status,
-                backend_authoritative=resolution_status.authoritative,
-                backend_message=backend_message,
-                backend_payload=resolution_status.as_payload(),
+                track=str(track),
+                runtime_campaign_overrides=runtime_campaign_overrides,
+                c4_max_temp=c4_max_temp,
+                furnace_max_T_C=setpoints.get('furnace_max_T_C'),
                 c5_enabled=c5_enabled,
                 mre_target_species=mre_target_species,
                 mre_max_voltage_V=mre_max_voltage_V,
-            ),
-        )
-        _start_background_loop(
-            socketio,
-            sid,
-            run_id,
-            run_lock,
-            backend_message,
-            resolution_status.backend_status,
-            resolution_status.authoritative,
-        )
+                additives_kg=additives_kg,
+                furnace_material_id=furnace_material_id,
+            )
+            state['setpoints_patch'] = copy.deepcopy(setpoints_patch)
+            if effective_config:
+                state['effective_config'] = effective_config
+            state['resolved_setpoints_patch'] = _resolved_recipe_patch_for_session(
+                setpoints_patch=setpoints_patch,
+                setpoints=setpoints,
+                runtime_campaign_overrides=runtime_campaign_overrides,
+            )
+
+            _emit_if_current(
+                socketio,
+                sid,
+                run_id,
+                'simulation_status',
+                _start_payload(
+                    sim=sim,
+                    feedstock_key=feedstock_key,
+                    mass_kg=mass_kg,
+                    backend_requested=backend_name,
+                    backend_active=backend_type,
+                    backend_status=resolution_status.backend_status,
+                    backend_authoritative=resolution_status.authoritative,
+                    backend_message=backend_message,
+                    backend_payload=resolution_status.as_payload(),
+                    c5_enabled=c5_enabled,
+                    mre_target_species=mre_target_species,
+                    mre_max_voltage_V=mre_max_voltage_V,
+                ),
+            )
+            _start_background_loop(
+                socketio,
+                sid,
+                run_id,
+                run_lock,
+                backend_message,
+                resolution_status.backend_status,
+                resolution_status.authoritative,
+            )
+        except Exception as exc:  # noqa: BLE001 -- typed launch boundary
+            _clear_simulation_state(sid)
+            if cancelled_prior_run_id is not None:
+                return reject({
+                    'status': 'error',
+                    'message': (
+                        f'New run launch failed after prior run '
+                        f'{cancelled_prior_run_id} was cancelled and persisted: {exc}'
+                    ),
+                    'prior_run_id': cancelled_prior_run_id,
+                    'prior_run_cancelled': True,
+                }, 'run_launch_failed_after_replacement', 500)
+            return reject({
+                'status': 'error',
+                'message': f'Run launch failed: {exc}',
+            }, 'run_launch_failed', 500)
         return {'run_id': run_id, 'status': 'started'}
 
     _registered_start_handler = handle_start

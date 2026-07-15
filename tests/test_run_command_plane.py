@@ -211,6 +211,71 @@ def test_socket_restart_persists_displaced_run(tmp_path, monkeypatch):
     client.disconnect()
 
 
+def test_replacement_launch_failure_reports_persisted_prior_cancellation(
+    tmp_path,
+    monkeypatch,
+):
+    def force_backend(_name):
+        backend = InternalAnalyticalBackend()
+        backend.initialize({})
+        return backend
+
+    launch_count = 0
+
+    def launch_then_fail(_target, *_args, **_kwargs):
+        nonlocal launch_count
+        launch_count += 1
+        if launch_count == 2:
+            raise RuntimeError("task launch failed")
+        return object()
+
+    monkeypatch.setattr(web_events, "_get_backend", force_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        launch_then_fail,
+    )
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = app.test_client()
+    with client.session_transaction() as browser_session:
+        browser_session["ledger_client_id"] = "replacement-owner"
+    payload = {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+    }
+
+    first = client.post("/api/runs", json=payload)
+    assert first.status_code == 201
+    prior_run_id = first.get_json()["run_id"]
+    prior_state = next(
+        state
+        for state in web_events._simulations.values()
+        if state.get("run_id") == prior_run_id
+    )
+    prior_state["session"] = _PartialSession()
+
+    replacement = client.post("/api/runs", json={**payload, "mass_kg": 2000})
+
+    assert replacement.status_code == 500
+    body = replacement.get_json()
+    assert body["error_type"] == "run_launch_failed_after_replacement"
+    assert body["prior_run_id"] == prior_run_id
+    assert body["prior_run_cancelled"] is True
+    assert (
+        f"prior run {prior_run_id} was cancelled and persisted"
+        in body["error"]
+    )
+    artifact = RunArtifactStore(tmp_path / "runs").load(prior_run_id)
+    assert artifact["lifecycle"] == "cancelled"
+    assert not any(
+        state.get("ledger_client_id") == "replacement-owner"
+        for state in web_events._simulations.values()
+    )
+
+
 def test_submit_idempotency_is_client_scoped_and_payload_bound(monkeypatch):
     app = app_module.create_app()
     calls = []
@@ -523,6 +588,119 @@ def test_c6_terminal_persist_excludes_concurrent_cancel(tmp_path, monkeypatch):
     assert loop_thread.is_alive() is False
     assert cancel_thread.is_alive() is False
     assert persist_statuses == ["refused"]
+
+
+def test_failure_terminal_persist_excludes_concurrent_cancel(monkeypatch):
+    sid = "http:owner:failure-race"
+    state, run_lock = web_events._replace_simulation_state(
+        sid,
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+    )
+    state["http_owned"] = True
+    step = SimpleNamespace(
+        per_hour_summary={"hour": 1},
+        snapshot={},
+        backend_error=None,
+        campaign_summary=None,
+        decision_event=None,
+    )
+    monkeypatch.setattr(
+        web_events,
+        "drive_session",
+        lambda *_args, **_kwargs: iter([step]),
+    )
+    monkeypatch.setattr(
+        web_events,
+        "_tick_payload",
+        lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("tick failed")),
+    )
+    persist_entered = threading.Event()
+    release_persist = threading.Event()
+    cancel_started = threading.Event()
+    cancel_finished = threading.Event()
+    persist_statuses = []
+    cancel_results = []
+    thread_errors = []
+
+    def blocking_persist(
+        _socketio,
+        persist_sid,
+        run_id,
+        _session,
+        *,
+        status,
+        **_kwargs,
+    ):
+        persist_statuses.append(status)
+        if len(persist_statuses) == 1:
+            persist_entered.set()
+            assert release_persist.wait(2)
+        with web_events._simulations_guard:
+            current = web_events._simulations.get(persist_sid)
+            if current is not None and current.get("run_id") == run_id:
+                current["artifact_persisted"] = True
+        return {"execution_status": status}
+
+    monkeypatch.setattr(web_events, "_persist_terminal", blocking_persist)
+
+    class CapturingSocket(_Socket):
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+    socket = CapturingSocket()
+    web_events._start_background_loop(
+        socket,
+        sid,
+        state["run_id"],
+        run_lock,
+        "backend",
+        "available",
+        True,
+    )
+
+    def run_loop():
+        try:
+            socket.target()
+        except Exception as exc:  # pragma: no cover - assertion captures regression
+            thread_errors.append(exc)
+
+    def cancel():
+        cancel_started.set()
+        try:
+            cancel_results.append(web_events._cancel_simulation_state(
+                socket,
+                sid,
+                reason="replaced_by_new_run",
+            ))
+        except Exception as exc:  # pragma: no cover - assertion captures regression
+            thread_errors.append(exc)
+        finally:
+            cancel_finished.set()
+
+    loop_thread = threading.Thread(target=run_loop, name="failure-loop")
+    loop_thread.start()
+    assert persist_entered.wait(2)
+    cancel_thread = threading.Thread(target=cancel, name="cancel-failure")
+    cancel_thread.start()
+    assert cancel_started.wait(2)
+    assert cancel_finished.wait(0.05) is False
+    assert persist_statuses == ["failed"]
+
+    release_persist.set()
+    loop_thread.join(2)
+    cancel_thread.join(2)
+    assert loop_thread.is_alive() is False
+    assert cancel_thread.is_alive() is False
+    assert thread_errors == []
+    assert persist_statuses == ["failed"]
+    assert cancel_results[0] is None or cancel_results[0] == {
+        "run_id": state["run_id"],
+        "status": "terminal",
+        "cancelled": False,
+    }
 
 
 def test_idempotency_entries_evict_oldest_at_fixed_bound(monkeypatch):
