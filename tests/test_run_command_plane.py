@@ -4,6 +4,7 @@ from types import SimpleNamespace
 import pytest
 
 import app as app_module
+from simulator.backends import BackendUnavailableError
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from web import events as web_events
 from web.run_store import RunArtifactStore
@@ -274,6 +275,121 @@ def test_concurrent_idempotent_submits_launch_once(monkeypatch):
     assert sorted(result["idempotent_replay"] for result in results) == [False, True]
 
 
+def test_second_http_submit_replaces_prior_run_and_keeps_ledger_unique(
+    tmp_path,
+    monkeypatch,
+):
+    store = RunArtifactStore(tmp_path / "runs")
+
+    def fake_start(_payload, *, sid, ledger_client_id, **_kwargs):
+        state, _ = web_events._replace_simulation_state(
+            sid,
+            _PartialSession(),
+            speed=0.0,
+            ledger_client_id=ledger_client_id,
+            run_store=store,
+        )
+        state["http_owned"] = True
+        return {"run_id": state["run_id"], "status": "started"}
+
+    monkeypatch.setattr(web_events, "_registered_start_handler", fake_start)
+    first = web_events.submit_run_command(
+        _Socket(),
+        {"client_token": "first", "mass_kg": 1000},
+        client_id="same-client",
+    )
+    second = web_events.submit_run_command(
+        _Socket(),
+        {"client_token": "second", "mass_kg": 2000},
+        client_id="same-client",
+    )
+
+    first_artifact = store.load(first["run_id"])
+    assert first_artifact["lifecycle"] == "cancelled"
+    assert first_artifact["execution_status"] == "partial"
+    owned = [
+        sid
+        for sid, state in web_events._simulations.items()
+        if state.get("ledger_client_id") == "same-client"
+    ]
+    assert len(owned) == 1
+    assert web_events._simulations[owned[0]]["run_id"] == second["run_id"]
+    monkeypatch.setattr(
+        web_events,
+        "read_ledger_api",
+        lambda sid, _resource, **_params: {"sid": sid},
+    )
+    assert web_events.read_ledger_api_for_client("same-client", "snapshot") == {
+        "sid": owned[0]
+    }
+
+
+def test_http_terminal_run_releases_session_state(tmp_path, monkeypatch):
+    sid = "http:owner:terminal"
+    store = RunArtifactStore(tmp_path / "runs")
+    state, lock = web_events._replace_simulation_state(
+        sid,
+        _CompleteSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+    )
+    state["http_owned"] = True
+
+    class CapturingSocket(_Socket):
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+    socket = CapturingSocket()
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    web_events._start_background_loop(
+        socket,
+        sid,
+        state["run_id"],
+        lock,
+        "backend",
+        "available",
+        True,
+    )
+
+    socket.target()
+
+    assert store.load(state["run_id"]) is not None
+    assert sid not in web_events._simulations
+    assert sid not in web_events._sim_locks
+
+
+def test_idempotency_entries_evict_oldest_at_fixed_bound(monkeypatch):
+    calls = []
+
+    def fake_start(_payload, **_kwargs):
+        run_id = f"run-{len(calls)}"
+        calls.append(run_id)
+        return {"run_id": run_id, "status": "started"}
+
+    monkeypatch.setattr(web_events, "_registered_start_handler", fake_start)
+    monkeypatch.setattr(web_events, "_MAX_RUN_IDEMPOTENCY_ENTRIES", 2)
+    for token in ("oldest", "middle", "newest"):
+        web_events.submit_run_command(
+            _Socket(),
+            {"client_token": token, "mass_kg": 1000},
+            client_id="owner",
+        )
+
+    assert list(web_events._run_idempotency) == [
+        ("owner", "middle"),
+        ("owner", "newest"),
+    ]
+    replay = web_events.submit_run_command(
+        _Socket(),
+        {"client_token": "middle", "mass_kg": 1000},
+        client_id="owner",
+    )
+    assert replay["idempotent_replay"] is True
+    assert len(calls) == 3
+
+
 def test_draft_is_stateless_validate_and_echo(monkeypatch):
     def force_backend(_name):
         backend = InternalAnalyticalBackend()
@@ -328,6 +444,27 @@ def test_command_routes_share_socket_input_validation(path):
 
     assert response.status_code == 400
     assert response.get_json()["error_type"] == "invalid_run_input"
+
+
+def test_http_command_error_preserves_structured_socket_diagnostics(monkeypatch):
+    def unavailable(_name):
+        raise BackendUnavailableError("configured backend is unavailable")
+
+    monkeypatch.setattr(web_events, "_get_backend", unavailable)
+    response = app_module.create_app().test_client().post(
+        "/api/runs",
+        json={"backend": "missing"},
+    )
+
+    assert response.status_code == 400
+    assert response.get_json() == {
+        "backend_authoritative": False,
+        "backend_status": "unavailable",
+        "error": "configured backend is unavailable",
+        "error_type": "backend_unavailable",
+        "message": "configured backend is unavailable",
+        "status": "error",
+    }
 
 
 def test_cancel_unknown_returns_typed_404():

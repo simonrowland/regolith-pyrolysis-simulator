@@ -3288,7 +3288,7 @@ def submit_run_api():
     try:
         result = submit_run_command(socketio, payload, client_id=client_id)
     except RunCommandError as exc:
-        return _typed_json_error(str(exc), exc.error_type, exc.status_code)
+        return jsonify(exc.response_payload()), exc.status_code
     except RuntimeError as exc:
         return _typed_json_error(str(exc), 'run_command_failed', 500)
     return jsonify(result), (200 if result['idempotent_replay'] else 201)
@@ -3310,7 +3310,7 @@ def validate_run_draft_api():
     try:
         result = validate_run_draft(payload, client_id=client_id)
     except RunCommandError as exc:
-        return _typed_json_error(str(exc), exc.error_type, exc.status_code)
+        return jsonify(exc.response_payload()), exc.status_code
     except RuntimeError as exc:
         return _typed_json_error(str(exc), 'run_command_failed', 500)
     return jsonify(result)

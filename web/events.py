@@ -83,6 +83,7 @@ _sim_locks: dict = {}
 _simulations_guard = threading.Lock()
 _run_command_lock = threading.Lock()
 _run_idempotency: dict[tuple[str, str], tuple[str, dict[str, object]]] = {}
+_MAX_RUN_IDEMPOTENCY_ENTRIES = 1024
 _registered_start_handler = None
 _O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 _MAX_WEB_MASS_KG = 1_000_000_000.0
@@ -108,10 +109,18 @@ class RunCommandError(ValueError):
         *,
         error_type: str,
         status_code: int = 400,
+        payload: Mapping[str, object] | None = None,
     ) -> None:
         super().__init__(message)
         self.error_type = error_type
         self.status_code = status_code
+        self.payload = dict(payload or {})
+
+    def response_payload(self) -> dict[str, object]:
+        payload = copy.deepcopy(self.payload)
+        payload['error'] = str(self)
+        payload['error_type'] = self.error_type
+        return payload
 
 
 def _safe_log(message: str) -> None:
@@ -396,6 +405,19 @@ def _clear_simulation_state(sid: str) -> None:
         _sim_locks.pop(sid, None)
 
 
+def _finish_terminal_state(sid: str, run_id: str) -> None:
+    """Stop a terminal run and release synthetic HTTP session state."""
+    with _simulations_guard:
+        state = _simulations.get(sid)
+        if state is None or state.get('run_id') != run_id:
+            return
+        state['running'] = False
+        state['paused'] = False
+        if state.get('http_owned') and state.get('artifact_persisted'):
+            _simulations.pop(sid, None)
+            _sim_locks.pop(sid, None)
+
+
 def _persist_terminal(
     socketio,
     sid: str,
@@ -517,8 +539,7 @@ def _cancel_simulation_state(
             state['running'] = False
             state['paused'] = False
             raise RuntimeError('cancelled run artifact could not be persisted')
-        state['running'] = False
-        state['paused'] = False
+        _finish_terminal_state(sid, run_id)
         return {
             'run_id': run_id,
             'status': 'cancelled',
@@ -596,6 +617,34 @@ def submit_run_command(
         handler = _registered_start_handler
         if handler is None:
             raise RuntimeError('run command handler is unavailable')
+        with _simulations_guard:
+            previous_sid = next(
+                (
+                    candidate_sid
+                    for candidate_sid, state in _simulations.items()
+                    if (
+                        state.get('http_owned')
+                        and state.get('ledger_client_id') == client_id
+                    )
+                ),
+                None,
+            )
+        if previous_sid is not None:
+            try:
+                _cancel_simulation_state(
+                    socketio,
+                    previous_sid,
+                    reason='replaced_by_new_run',
+                )
+            except RuntimeError as exc:
+                raise RunCommandError(
+                    str(exc),
+                    error_type='run_replacement_failed',
+                    payload={
+                        'status': 'error',
+                        'message': str(exc),
+                    },
+                ) from exc
         sid = f'http:{client_id}:{uuid.uuid4().hex}'
         result = handler(
             request_payload,
@@ -605,6 +654,10 @@ def submit_run_command(
         )
         if token:
             _run_idempotency[token_key] = (canonical_payload, dict(result))
+            # Retain only the newest launch-once records across all clients.
+            while len(_run_idempotency) > _MAX_RUN_IDEMPOTENCY_ENTRIES:
+                oldest_key = next(iter(_run_idempotency))
+                _run_idempotency.pop(oldest_key)
         return {**result, 'idempotent_replay': False}
 
 
@@ -1407,11 +1460,7 @@ def _start_background_loop(
         except Exception as exc:  # noqa: BLE001 -- cleanup must still run
             _safe_log(f'Simulation status emission failed: {exc}')
         finally:
-            with _simulations_guard:
-                current = _simulations.get(sid)
-                if current is not None and current.get('run_id') == run_id:
-                    current['running'] = False
-                    current['paused'] = False
+            _finish_terminal_state(sid, run_id)
 
     def stop_for_failure(exc: Exception, session, sim) -> None:
         _safe_log(f'Simulation loop failed: {exc}')
@@ -1439,12 +1488,19 @@ def _start_background_loop(
         }
         if poisoned is not None:
             error_payload['reason'] = 'poisoned_hour'
-        persist_terminal(
+        artifact = persist_terminal(
             session,
             status='failed',
             reason=str(error_payload.get('reason') or ''),
             error_message=message,
         )
+        if artifact is None:
+            stop_with_status({
+                'status': 'error',
+                'reason': 'persistence_failed',
+                'message': 'Run failed but its report was not saved',
+            })
+            return
         stop_with_status(error_payload)
 
     def run_loop():
@@ -1516,13 +1572,7 @@ def _start_background_loop(
                         break
                     if not emitted:
                         break
-                    with _simulations_guard:
-                        current = _simulations.get(sid)
-                        if (
-                            current is not None
-                            and current.get('run_id') == run_id
-                        ):
-                            current['running'] = False
+                    _finish_terminal_state(sid, run_id)
                     break
 
                 try:
@@ -1555,13 +1605,20 @@ def _start_background_loop(
                         'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,
                     }
-                    persist_terminal(
+                    artifact = persist_terminal(
                         session,
                         status='refused',
                         reason=exc.reason,
                         error_message=exc.reason,
                         refusal_diagnostic=exc.diagnostic,
                     )
+                    if artifact is None:
+                        stop_with_status({
+                            'status': 'error',
+                            'reason': 'persistence_failed',
+                            'message': 'Run was refused but its report was not saved',
+                        })
+                        break
                     stop_with_status(error_payload)
                     break
                 except Exception as exc:
@@ -1766,6 +1823,7 @@ def register_events(socketio):
                 raise RunCommandError(
                     str(payload['message']),
                     error_type=error_type,
+                    payload=payload,
                 )
             socketio.emit('simulation_status', payload, room=sid)
             return None
@@ -2019,6 +2077,7 @@ def register_events(socketio):
             run_store=get_run_store(),
             runner_projector=runner_projector,
         )
+        state['http_owned'] = command_mode
         run_id = state['run_id']
         state['backend_message'] = backend_message
         state['backend_status'] = resolution_status.backend_status
