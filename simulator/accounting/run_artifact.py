@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import copy
+import math
 from collections.abc import Mapping
+from numbers import Real
 from typing import Any
 
 from simulator.engine_local_config import cache_version_for
@@ -12,6 +14,13 @@ from simulator.engine_local_config import cache_version_for
 ARTIFACT_SCHEMA_VERSION = "0.2.0"
 EXECUTION_STATUSES = frozenset({"ok", "partial", "refused", "failed"})
 LIFECYCLES = frozenset({"complete", "cancelled"})
+# Matches the project's load-bearing <=5e-12% mass-balance closure gate.
+CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT = 5e-12
+CONFIDENCE_BACKEND_IDENTITY_FIELDS = (
+    "name",
+    "cache_version",
+    "backend_wire_token",
+)
 
 
 class RunArtifactContractError(ValueError):
@@ -55,6 +64,97 @@ def _campaign_chain(per_hour: list[dict[str, Any]]) -> list[str]:
             seen.add(campaign)
             chain.append(campaign)
     return chain
+
+
+def _terminal_confidence(artifact: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Grade only artifact-owned evidence using a fixed three-level ladder.
+
+    A finite numeric mass-balance residual is required; without it confidence is
+    omitted. A closure breach, failed vapor source, or refused/failed execution
+    grades low. Partial execution, unavailable/non-ok vapor status, or incomplete
+    backend identity caps the grade at medium. Only all passing criteria grade high.
+    """
+    terminal = artifact.get("terminal")
+    if not isinstance(terminal, Mapping):
+        return None
+    closure = terminal.get("mass_balance_closure")
+    residual = closure.get("residual_pct") if isinstance(closure, Mapping) else None
+    if (
+        isinstance(residual, bool)
+        or not isinstance(residual, Real)
+        or not math.isfinite(float(residual))
+    ):
+        return None
+
+    hard_degradation = False
+    soft_degradation = False
+    reasons: list[str] = []
+    residual_text = format(float(residual), ".15g")
+    if abs(float(residual)) > CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT:
+        hard_degradation = True
+        reasons.append(
+            f"mass-balance residual {residual_text}% exceeds "
+            f"{CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT:g}% closure gate"
+        )
+    else:
+        reasons.append(
+            f"mass-balance residual {residual_text}% within "
+            f"{CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT:g}% closure gate"
+        )
+
+    source_report = terminal.get("vapor_pressure_source_report")
+    vapor_status = (
+        source_report.get("status") if isinstance(source_report, Mapping) else None
+    )
+    if vapor_status == "ok":
+        reasons.append("vapor-pressure sources: ok")
+    elif vapor_status == "failed":
+        hard_degradation = True
+        reasons.append("vapor-pressure sources: failed")
+    elif vapor_status is None or vapor_status == "":
+        soft_degradation = True
+        reasons.append("vapor-pressure source status absent")
+    elif isinstance(vapor_status, str):
+        soft_degradation = True
+        reasons.append(f"vapor-pressure sources: {vapor_status}")
+    else:
+        soft_degradation = True
+        reasons.append("vapor-pressure source status invalid: non-string")
+
+    header = artifact.get("header")
+    engine_identity = (
+        header.get("engine_identity") if isinstance(header, Mapping) else None
+    )
+    missing_identity_fields = [
+        field
+        for field in CONFIDENCE_BACKEND_IDENTITY_FIELDS
+        if not isinstance(engine_identity, Mapping)
+        or engine_identity.get(field) in (None, "")
+    ]
+    if missing_identity_fields:
+        soft_degradation = True
+        reasons.append(
+            "backend identity incomplete: "
+            + ", ".join(missing_identity_fields)
+            + " absent"
+        )
+    else:
+        reasons.append(
+            "backend identity complete: name, cache_version, backend_wire_token present"
+        )
+
+    execution_status = artifact.get("execution_status")
+    if execution_status == "ok":
+        reasons.append("execution status: ok")
+    elif execution_status == "partial":
+        soft_degradation = True
+        reasons.append("execution status partial caps confidence at medium")
+    else:
+        hard_degradation = True
+        reasons.append(f"execution status {execution_status} caps confidence at low")
+
+    grade = "low" if hard_degradation else "medium" if soft_degradation else "high"
+    return {"grade": grade, "reasons": reasons}
 
 
 def build_run_artifact(
@@ -148,4 +248,7 @@ def build_run_artifact(
             "basis": "final-hour percent",
         },
     }
+    confidence = _terminal_confidence(artifact)
+    if confidence is not None:
+        artifact["terminal"]["confidence"] = confidence
     return artifact

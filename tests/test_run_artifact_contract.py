@@ -35,6 +35,9 @@ TERMINAL_KEYS = {
     "run_metadata",
     "mass_balance_closure",
 }
+# W-A8: confidence is OPTIONAL — present only when the artifact carries the
+# evidence to grade honestly (finite mass-balance residual); never fabricated.
+OPTIONAL_TERMINAL_KEYS = {"confidence"}
 
 
 def _runner_payload(
@@ -125,7 +128,7 @@ def test_zero_timestep_failure_artifact_is_valid() -> None:
         "reason": "synthetic_reason",
         "error_message": "synthetic error",
     }
-    assert set(artifact["terminal"]) == TERMINAL_KEYS
+    assert TERMINAL_KEYS <= set(artifact["terminal"]) <= TERMINAL_KEYS | OPTIONAL_TERMINAL_KEYS
     assert artifact["terminal"]["mass_balance_closure"] == {
         "residual_pct": None,
         "basis": "final-hour percent",
@@ -168,7 +171,7 @@ def test_header_and_terminal_key_contract_omits_unavailable_optional_fields(
         artifact["header"]["engine_identity"]["cache_version"]
         != payload["run_metadata"]["kernel_commit_sha"]
     )
-    assert set(artifact["terminal"]) == TERMINAL_KEYS
+    assert TERMINAL_KEYS <= set(artifact["terminal"]) <= TERMINAL_KEYS | OPTIONAL_TERMINAL_KEYS
     assert artifact["terminal"]["mass_balance_closure"] == {
         "residual_pct": 0.125,
         "basis": "final-hour percent",
