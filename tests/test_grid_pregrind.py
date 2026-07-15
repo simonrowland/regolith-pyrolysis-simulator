@@ -79,6 +79,49 @@ def test_grid_seed_is_deterministic_and_temperature_band_is_dense():
     assert {point.pressure_bar for point in first} == {1.0}
 
 
+def test_backend_selector_defaults_to_subprocess_and_accepts_thermoengine():
+    default_args = grid_pregrind.parser().parse_args([])
+    thermoengine_args = grid_pregrind.parser().parse_args(
+        [
+            "--backend",
+            "thermoengine",
+            "--thermoengine-equilibrate-timeout-s",
+            "91",
+            "--thermoengine-health-timeout-s",
+            "31",
+        ]
+    )
+
+    assert default_args.backend == "subprocess"
+    assert grid_pregrind.backend_config(default_args)["mode"] == "subprocess"
+    explicit_subprocess_args = grid_pregrind.parser().parse_args(
+        ["--backend", "subprocess"]
+    )
+    point = grid_pregrind.GridPoint(
+        ordinal=0,
+        temperature_C=1400.0,
+        intended_fO2_log=-9.0,
+        pressure_bar=1.0,
+        composition_wt_pct={"SiO2": 50.0, "FeO": 25.0, "MgO": 25.0},
+    )
+    assert grid_pregrind.point_inputs(
+        point, default_args
+    ) == grid_pregrind.point_inputs(point, explicit_subprocess_args)
+    assert thermoengine_args.backend == "thermoengine"
+    assert grid_pregrind.backend_config(thermoengine_args) == {
+        **grid_pregrind.backend_config(default_args),
+        "grid_backend_name": "thermoengine",
+        "mode": "thermoengine",
+        "thermoengine_equilibrate_timeout_s": 91.0,
+        "thermoengine_health_timeout_s": 31.0,
+    }
+
+    worker = grid_pregrind._ThermoEngineSpawnContext().Process()
+    assert worker.daemon is False
+    worker.daemon = True
+    assert worker.daemon is False
+
+
 def test_kress_partition_preserves_iron_and_moves_target_into_composition():
     composition = {
         "SiO2": 50.0,
@@ -514,6 +557,20 @@ def test_worker_failure_output_records_positive_wall_time(monkeypatch):
     assert output["status_kind"] == "failure"
     assert output["timing_s"] == pytest.approx(5.25)
 
+    parent_fallback = grid_pregrind._worker_failure_output(
+        RuntimeError("worker transport failure"),
+        started=10.0,
+        captures=[],
+        native_input=None,
+        backend_name="thermoengine",
+    )
+    assert parent_fallback["engine_mode"] == "thermoengine"
+    assert parent_fallback["alphamelts"] == {}
+    assert (
+        parent_fallback["raw_payload_format"]
+        == grid_pregrind.THERMOENGINE_RAW_PAYLOAD_FORMAT
+    )
+
 
 def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeypatch):
     result = SimpleNamespace(**dict(_output()["generic"]))
@@ -595,6 +652,55 @@ def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeyp
     assert capture["timeout"] == pytest.approx(20.0)
     assert output["applied_timeout_s"] == pytest.approx(20.0)
     assert output["run_mode"] == "isothermal"
+
+
+def test_thermoengine_failure_reinitializes_before_next_point(monkeypatch):
+    result = SimpleNamespace(**dict(_output()["generic"]))
+
+    class FailingBackend:
+        _model = "MELTSv1.0.2"
+
+        def equilibrate(self, **_kwargs):
+            raise RuntimeError("forced ThermoEngine failure")
+
+    class ReinitializedBackend:
+        _model = "MELTSv1.0.2"
+
+        def equilibrate(self, **_kwargs):
+            return result
+
+    reinitializations = []
+
+    def fake_initialize(config, assumed_queued_run_mode=None):
+        reinitializations.append((dict(config), assumed_queued_run_mode))
+        monkeypatch.setattr(
+            grid_pregrind, "_WORKER_BACKEND", ReinitializedBackend()
+        )
+        monkeypatch.setattr(
+            grid_pregrind, "_WORKER_ENGINE_VERSION", "reinitialized-engine"
+        )
+
+    inputs = {
+        **_inputs(1400.0),
+        "mode": "thermoengine",
+        "subprocess_run_mode": None,
+        "intended_fO2_log": -9.0,
+    }
+    job = grid_pregrind.WorkerJob(grid_key_id=7, shuffle_rank=0, inputs=inputs)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND_NAME", "thermoengine")
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", FailingBackend())
+    monkeypatch.setattr(grid_pregrind, "_WORKER_MODULE", None)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_CONFIG", {"grid_backend_name": "thermoengine"})
+    monkeypatch.setattr(grid_pregrind, "_WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY", True)
+    monkeypatch.setattr(grid_pregrind, "_worker_initialize", fake_initialize)
+
+    _grid_key_id, failed = grid_pregrind._run_point(job)
+    _grid_key_id, recovered = grid_pregrind._run_point(job)
+
+    assert failed["status_kind"] == "failure"
+    assert reinitializations == [({"grid_backend_name": "thermoengine"}, None)]
+    assert recovered["status_kind"] == "success"
+    assert recovered["engine_version"] == "reinitialized-engine"
 
 
 @pytest.mark.parametrize("timeout_s", [None, 0.0, -1.0, math.nan])
@@ -1019,6 +1125,44 @@ def test_writer_populates_thermoengine_only_json_without_scalar_padding(tmp_path
         or name.startswith("generic_phase_affinity_")
         for name in columns
     )
+
+
+def test_writer_refuses_engine_blending_on_open_and_write(tmp_path):
+    database = tmp_path / "dedicated-thermoengine.db"
+    thermoengine_output = _output()
+    thermoengine_output["engine_mode"] = "thermoengine"
+
+    with GridCacheWriter(database, backend_name="thermoengine") as writer:
+        batch_id = writer.ensure_batch(
+            label="thermoengine", kind="fixed", seed=178, params={"test": True}
+        )
+        assert writer.materialize_key(
+            _inputs(1400.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        writer.commit()
+        subprocess_writer = GridCacheWriter(
+            database, engine_epoch=2, backend_name="subprocess"
+        )
+        with pytest.raises(ValueError, match="engine blend refused"):
+            writer.write_result(grid_key_id, _output())
+        assert writer.write_result(grid_key_id, thermoengine_output)
+        writer.commit()
+        with subprocess_writer:
+            with pytest.raises(ValueError, match="engine blend refused"):
+                subprocess_writer.write_result(grid_key_id, _output())
+
+    with pytest.raises(ValueError, match="dedicated database"):
+        GridCacheWriter(
+            database,
+            engine_epoch=2,
+            existing_only=True,
+            backend_name="subprocess",
+        )
 
 
 def test_incremental_harvest_tracks_source_id_and_skips_replay(tmp_path):

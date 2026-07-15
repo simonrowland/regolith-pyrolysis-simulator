@@ -502,9 +502,11 @@ class GridCacheWriter:
         *,
         engine_epoch: int = 1,
         existing_only: bool = False,
+        backend_name: str | None = None,
     ):
         self.path = Path(path)
         self.engine_epoch = int(engine_epoch)
+        self.backend_name = None if backend_name is None else str(backend_name)
         self.claim_owner = f"{socket.gethostname()}:{os.getpid()}:{uuid.uuid4()}"
         if self.engine_epoch < 1:
             raise ValueError("engine_epoch must be >= 1")
@@ -585,6 +587,37 @@ class GridCacheWriter:
             self._set_metadata("database_id", str(uuid.uuid4()), overwrite=False)
             self._set_metadata("created_at", utc_now(), overwrite=False)
             self.connection.commit()
+        try:
+            self._assert_backend_not_blended(self.backend_name)
+        except Exception:
+            self.connection.close()
+            raise
+
+    @staticmethod
+    def _engine_mode_for_backend(backend_name: str) -> str:
+        if backend_name == "subprocess":
+            return "subprocess"
+        if backend_name == "thermoengine":
+            return "thermoengine"
+        raise ValueError(f"unsupported grid backend: {backend_name!r}")
+
+    def _assert_backend_not_blended(self, backend_name: str | None) -> None:
+        if backend_name is None:
+            return
+        expected_mode = self._engine_mode_for_backend(backend_name)
+        existing_modes = {
+            str(row[0])
+            for row in self.connection.execute(
+                "SELECT DISTINCT engine_mode FROM alphamelts_outputs"
+            )
+        }
+        if existing_modes and existing_modes != {expected_mode}:
+            raise ValueError(
+                "grid cache engine blend refused: "
+                f"requested backend={backend_name!r} engine_mode={expected_mode!r}; "
+                f"database engine_mode values={sorted(existing_modes)!r}. "
+                "Use a dedicated database for each engine."
+            )
 
     def _validate_existing_database(self) -> None:
         self._validate_connection(self.connection)
@@ -1383,6 +1416,19 @@ class GridCacheWriter:
         grid_key_id: int,
         output: Mapping[str, Any],
     ) -> bool:
+        output_mode = str(output["engine_mode"])
+        if self.backend_name is not None:
+            expected_mode = self._engine_mode_for_backend(self.backend_name)
+            if output_mode != expected_mode:
+                raise ValueError(
+                    "grid cache engine blend refused: "
+                    f"writer backend={self.backend_name!r} expects "
+                    f"engine_mode={expected_mode!r}, got {output_mode!r}"
+                )
+        output_backend_name = (
+            "subprocess" if output_mode == "subprocess" else output_mode
+        )
+
         row = self.connection.execute(
             "SELECT id, expedited_key FROM grid_keys WHERE id = ?",
             (int(grid_key_id),),
@@ -1400,6 +1446,9 @@ class GridCacheWriter:
         )
         write_section = self._begin_write_section("grid_key_claim_result")
         try:
+            # The scan must share the BEGIN IMMEDIATE section with the insert:
+            # otherwise opposite-engine writers can both observe an empty DB.
+            self._assert_backend_not_blended(output_backend_name)
             existing = self.connection.execute(
                 "SELECT 1 FROM alphamelts_outputs "
                 "WHERE expedited_key = ? AND engine_epoch = ?",

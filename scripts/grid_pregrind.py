@@ -89,6 +89,7 @@ KRESS91_PARTITION_VERSION = "REF-001-kress-carmichael-1991"
 RAW_PAYLOAD_FORMAT = (
     "alphamelts-subprocess-capture-v3-isothermal-fO2-properties"
 )
+THERMOENGINE_RAW_PAYLOAD_FORMAT = "thermoengine-v1-imposed-fO2-properties"
 
 
 def kress91_partition_parameters():
@@ -149,9 +150,29 @@ DEFAULT_BATCH_MASS_KG = 100.0
 _STOP_REQUESTED = False
 _WORKER_BACKEND: Any = None
 _WORKER_MODULE: Any = None
+_WORKER_BACKEND_NAME = "subprocess"
+_WORKER_CONFIG: dict[str, Any] = {}
 _WORKER_ENGINE_VERSION = "unavailable"
 _WORKER_INIT_ERROR: str | None = None
 _WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY = False
+
+
+class _ThermoEngineWorkerProcess(multiprocessing.get_context("spawn").Process):
+    """Pool worker allowed to own ThermoEngine's isolated native child."""
+
+    @property
+    def daemon(self) -> bool:
+        return False
+
+    @daemon.setter
+    def daemon(self, _value: object) -> None:
+        pass
+
+
+class _ThermoEngineSpawnContext(
+    type(multiprocessing.get_context("spawn"))
+):
+    Process = _ThermoEngineWorkerProcess
 
 
 @dataclasses.dataclass(frozen=True)
@@ -644,8 +665,10 @@ def alphamelts_queue_domain_reason(point: GridPoint) -> str | None:
 
 
 def backend_config(args: argparse.Namespace) -> dict[str, Any]:
+    backend_name = str(getattr(args, "backend", "subprocess"))
     return {
-        "mode": "subprocess",
+        "grid_backend_name": backend_name,
+        "mode": "subprocess" if backend_name == "subprocess" else "thermoengine",
         "fO2_buffer": None,
         "fO2_offset": None,
         "Fe3Fet_Liq": None,
@@ -653,6 +676,9 @@ def backend_config(args: argparse.Namespace) -> dict[str, Any]:
         "timeout_s": args.timeout_s,
         "require_petthermotools": False,
         "thermoengine_health_timeout_s": args.thermoengine_health_timeout_s,
+        "thermoengine_equilibrate_timeout_s": getattr(
+            args, "thermoengine_equilibrate_timeout_s", 60.0
+        ),
         "allow_zero_component_boundary": bool(
             getattr(args, "allow_zero_component_boundary", False)
         ),
@@ -680,8 +706,16 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
             "process.cleaned_melt": composition_mol
         },
         "species_formula_registry": None,
-        "mode": "subprocess",
-        "subprocess_run_mode": "isothermal",
+        "mode": (
+            "subprocess"
+            if str(getattr(args, "backend", "subprocess")) == "subprocess"
+            else "thermoengine"
+        ),
+        "subprocess_run_mode": (
+            "isothermal"
+            if str(getattr(args, "backend", "subprocess")) == "subprocess"
+            else None
+        ),
         "redox_buffer": None,
         "fO2_offset": None,
         "Fe3Fet_Liq": None,
@@ -696,17 +730,27 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
 
 
 def probe_engine(config: Mapping[str, Any]) -> dict[str, Any]:
-    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+    from simulator.backends import BackendSelectionPolicy, resolve_backend
 
     try:
-        backend = AlphaMELTSBackend()
-        available = bool(backend.initialize(dict(config)))
-        return {
-            "available": available and backend.is_available(),
+        backend_options = dict(config)
+        backend_name = str(backend_options.pop("grid_backend_name", "subprocess"))
+        resolved_name = "alphamelts" if backend_name == "subprocess" else backend_name
+        backend = resolve_backend(
+            resolved_name,
+            BackendSelectionPolicy.RUNNER_STRICT,
+            backend_config=backend_options,
+        )
+        result = {
+            "available": backend.is_available(),
             "mode": getattr(backend, "_mode", None),
             "engine_version": backend.get_engine_version(),
             "model": getattr(backend, "_model", None),
         }
+        if backend_name != "subprocess":
+            result["backend_name"] = backend_name
+            backend.close()
+        return result
     except Exception as exc:
         return {
             "available": False,
@@ -723,23 +767,37 @@ def _worker_initialize(
     # module, so the parent's _ASSUMED_QUEUED_RUN_MODE global is lost unless
     # threaded through initargs explicitly.
     global _WORKER_BACKEND, _WORKER_MODULE, _WORKER_ENGINE_VERSION, _WORKER_INIT_ERROR
+    global _WORKER_BACKEND_NAME, _WORKER_CONFIG
     global _WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY
     global _ASSUMED_QUEUED_RUN_MODE
     _ASSUMED_QUEUED_RUN_MODE = assumed_queued_run_mode
     _WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY = bool(
         config.get("allow_zero_component_boundary", False)
     )
+    _WORKER_CONFIG = dict(config)
+    _WORKER_BACKEND_NAME = str(config.get("grid_backend_name", "subprocess"))
     try:
-        import simulator.melt_backend.alphamelts as alphamelts_module
+        from simulator.backends import BackendSelectionPolicy, resolve_backend
 
-        backend = alphamelts_module.AlphaMELTSBackend()
         backend_options = dict(config)
+        backend_name = str(backend_options.pop("grid_backend_name", "subprocess"))
+        resolved_name = "alphamelts" if backend_name == "subprocess" else backend_name
         backend_options.pop("allow_zero_component_boundary", None)
-        available = backend.initialize(backend_options)
-        if not available or not backend.is_available():
-            raise RuntimeError("AlphaMELTS subprocess transport unavailable")
+        backend = resolve_backend(
+            resolved_name,
+            BackendSelectionPolicy.RUNNER_STRICT,
+            backend_config=backend_options,
+        )
+        if not backend.is_available():
+            raise RuntimeError(f"{backend_name} transport unavailable")
         _WORKER_BACKEND = backend
-        _WORKER_MODULE = alphamelts_module
+        _WORKER_BACKEND_NAME = backend_name
+        if backend_name == "subprocess":
+            import simulator.melt_backend.alphamelts as alphamelts_module
+
+            _WORKER_MODULE = alphamelts_module
+        else:
+            _WORKER_MODULE = None
         _WORKER_ENGINE_VERSION = backend.get_engine_version()
         _WORKER_INIT_ERROR = None
     except Exception as exc:
@@ -827,7 +885,14 @@ def _worker_failure_output(
     native_input: Mapping[str, Any] | None,
     run_mode: str | None = None,
     applied_timeout_s: float | None = None,
+    backend_name: str | None = None,
 ) -> dict[str, Any]:
+    effective_backend_name = backend_name or _WORKER_BACKEND_NAME
+    raw_payload_format = (
+        RAW_PAYLOAD_FORMAT
+        if effective_backend_name == "subprocess"
+        else THERMOENGINE_RAW_PAYLOAD_FORMAT
+    )
     reason = (
         getattr(exc, "backend_failure_reason_code", None)
         or getattr(exc, "backend_status_reason", None)
@@ -836,7 +901,7 @@ def _worker_failure_output(
     if reason == "missing_binary":
         status = "unavailable"
     raw = {
-        "format": RAW_PAYLOAD_FORMAT,
+        "format": raw_payload_format,
         "engine_invoked": bool(captures),
         "fO2_constraint": (
             dict(native_input.get("fO2_constraint") or {})
@@ -858,23 +923,23 @@ def _worker_failure_output(
         "status_kind": "failure",
         "refusal_reason": str(reason or type(exc).__name__),
         "raw_payload": canonical_json(raw),
-        "raw_payload_format": RAW_PAYLOAD_FORMAT,
+        "raw_payload_format": raw_payload_format,
         "timing_s": time.monotonic() - started,
         "engine_version": _WORKER_ENGINE_VERSION,
-        "engine_mode": "subprocess",
+        "engine_mode": effective_backend_name,
         "engine_model": str(getattr(_WORKER_BACKEND, "_model", "unknown")),
         "run_mode": run_mode,
         "applied_timeout_s": applied_timeout_s,
         "native_input": native_input,
         "generic": {},
-        "alphamelts": {
+        "alphamelts": ({
             "backend_status": status,
             "backend_status_reason": str(reason or type(exc).__name__),
             "backend_diagnostics": raw["exception"],
             "backend_warnings": [str(exc)],
             "engine_version": _WORKER_ENGINE_VERSION,
             "mode": "subprocess",
-        },
+        } if effective_backend_name == "subprocess" else {}),
         "finder": {},
         "created_at": utc_now(),
         "host": socket.gethostname(),
@@ -890,8 +955,13 @@ def _worker_refusal_output(
     applied_timeout_s: float | None = None,
 ) -> dict[str, Any]:
     """Build a typed pre-engine refusal with the normal persisted shape."""
+    raw_payload_format = (
+        RAW_PAYLOAD_FORMAT
+        if _WORKER_BACKEND_NAME == "subprocess"
+        else THERMOENGINE_RAW_PAYLOAD_FORMAT
+    )
     raw = {
-        "format": RAW_PAYLOAD_FORMAT,
+        "format": raw_payload_format,
         "engine_invoked": False,
         "fO2_constraint": None,
         "captures": [],
@@ -902,23 +972,23 @@ def _worker_refusal_output(
         "status_kind": "refusal",
         "refusal_reason": reason,
         "raw_payload": canonical_json(raw),
-        "raw_payload_format": RAW_PAYLOAD_FORMAT,
+        "raw_payload_format": raw_payload_format,
         "timing_s": time.monotonic() - started,
         "engine_version": _WORKER_ENGINE_VERSION,
-        "engine_mode": "subprocess",
+        "engine_mode": _WORKER_BACKEND_NAME,
         "engine_model": str(getattr(_WORKER_BACKEND, "_model", "unknown")),
         "run_mode": run_mode,
         "applied_timeout_s": applied_timeout_s,
         "native_input": None,
         "generic": {},
-        "alphamelts": {
+        "alphamelts": ({
             "backend_status": "out_of_domain",
             "backend_status_reason": reason,
             "backend_diagnostics": dict(diagnostics),
             "backend_warnings": [],
             "engine_version": _WORKER_ENGINE_VERSION,
             "mode": "subprocess",
-        },
+        } if _WORKER_BACKEND_NAME == "subprocess" else {}),
         "finder": {},
         "created_at": utc_now(),
         "host": socket.gethostname(),
@@ -933,7 +1003,10 @@ def _worker_refusal_output(
 _ASSUMED_QUEUED_RUN_MODE: str | None = None
 
 
-def _job_runtime_settings(job: WorkerJob) -> tuple[float, str, str]:
+def _job_runtime_settings(job: WorkerJob) -> tuple[float | None, str | None, str | None]:
+    mode = str(job.inputs.get("mode") or "subprocess")
+    if mode == "thermoengine":
+        return None, None, None
     try:
         timeout_s = float(job.inputs["timeout_s"])
     except (KeyError, TypeError, ValueError) as exc:
@@ -960,6 +1033,11 @@ def _record_job_runtime(
     output: MutableMapping[str, Any],
 ) -> None:
     timeout_s, run_mode, run_mode_source = _job_runtime_settings(job)
+    if run_mode is None:
+        output["run_mode"] = None
+        output["run_mode_source"] = None
+        output["applied_timeout_s"] = None
+        return
     output_run_mode = output.get("run_mode")
     if output_run_mode is not None and str(output_run_mode) != run_mode:
         raise RuntimeError(
@@ -1031,7 +1109,9 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 "diagnostic_override_available": True,
             },
         )
-    if _WORKER_BACKEND is None or _WORKER_MODULE is None:
+    if _WORKER_BACKEND is None or (
+        _WORKER_BACKEND_NAME == "subprocess" and _WORKER_MODULE is None
+    ):
         exc = RuntimeError(_WORKER_INIT_ERROR or "AlphaMELTS worker unavailable")
         return job.grid_key_id, _worker_failure_output(
             exc,
@@ -1043,6 +1123,62 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
         )
 
     backend = _WORKER_BACKEND
+    if _WORKER_BACKEND_NAME == "thermoengine":
+        try:
+            result = backend.equilibrate(
+                temperature_C=job.inputs["temperature_C"],
+                composition_kg=job.inputs["composition_kg"],
+                fO2_log=job.inputs["fO2_log"],
+                pressure_bar=job.inputs["pressure_bar"],
+                composition_mol=job.inputs["composition_mol"],
+                composition_mol_by_account=job.inputs[
+                    "composition_mol_by_account"
+                ],
+                species_formula_registry=job.inputs["species_formula_registry"],
+            )
+            if result.ledger_transition is not None:
+                raise RuntimeError(
+                    "ThermoEngine returned forbidden diagnostic ledger_transition"
+                )
+            reason = _refusal_reason(result)
+            return job.grid_key_id, {
+                "status": result.status,
+                "status_kind": _status_kind(result.status, reason),
+                "refusal_reason": reason,
+                "raw_payload": canonical_json(
+                    {
+                        "format": THERMOENGINE_RAW_PAYLOAD_FORMAT,
+                        "engine_invoked": True,
+                        "fO2_constraint": {
+                            "path": "Absolute",
+                            "offset": float(job.inputs["fO2_log"]),
+                        },
+                    }
+                ),
+                "raw_payload_format": THERMOENGINE_RAW_PAYLOAD_FORMAT,
+                "timing_s": time.monotonic() - started,
+                "engine_version": _WORKER_ENGINE_VERSION,
+                "engine_mode": "thermoengine",
+                "engine_model": str(getattr(backend, "_model", "unknown")),
+                "run_mode": None,
+                "applied_timeout_s": None,
+                "native_input": None,
+                "generic": _generic_result(result),
+                "alphamelts": {},
+                "finder": {},
+                "created_at": utc_now(),
+                "host": socket.gethostname(),
+            }
+        except Exception as exc:
+            output = _worker_failure_output(
+                exc,
+                started=started,
+                captures=captures,
+                native_input=native_input,
+            )
+            _worker_initialize(_WORKER_CONFIG, _ASSUMED_QUEUED_RUN_MODE)
+            return job.grid_key_id, output
+
     backend._timeout_s = applied_timeout_s
     module = _WORKER_MODULE
     original_equilibrate_subprocess = backend._equilibrate_subprocess
@@ -1291,7 +1427,11 @@ def run_cycle(
         }
 
     next_heartbeat = time.monotonic() + args.heartbeat_s
-    context = multiprocessing.get_context("spawn")
+    context = (
+        _ThermoEngineSpawnContext()
+        if args.backend == "thermoengine"
+        else multiprocessing.get_context("spawn")
+    )
 
     def pending_jobs() -> Iterable[WorkerJob]:
         after_rank = -1
@@ -1351,6 +1491,7 @@ def run_cycle(
                         started=submitted_at,
                         captures=[],
                         native_input=None,
+                        backend_name=args.backend,
                     )
                 job = fallback_job
                 if grid_key_id != job.grid_key_id:
@@ -1421,6 +1562,15 @@ def default_workers() -> int:
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description=__doc__)
     result.add_argument("--db", type=Path, default=DEFAULT_DB)
+    result.add_argument(
+        "--backend",
+        choices=("subprocess", "thermoengine"),
+        default="subprocess",
+        help=(
+            "chemistry engine (default: subprocess). ThermoEngine is diagnostic-only "
+            "and requires a dedicated database; mixing engines in one database is refused"
+        ),
+    )
     result.add_argument("--status-json", type=Path, default=DEFAULT_STATUS)
     result.add_argument("--feedstocks", type=Path, default=DEFAULT_FEEDSTOCKS)
     result.add_argument("--workers", type=int, default=default_workers())
@@ -1464,6 +1614,9 @@ def parser() -> argparse.ArgumentParser:
     )
     result.add_argument("--model", default="MELTSv1.0.2")
     result.add_argument("--timeout-s", type=float, default=20.0)
+    result.add_argument(
+        "--thermoengine-equilibrate-timeout-s", type=float, default=60.0
+    )
     result.add_argument("--thermoengine-health-timeout-s", type=float, default=8.0)
     result.add_argument(
         "--allow-zero-component-boundary",
@@ -1511,6 +1664,10 @@ def _validate_args(args: argparse.Namespace) -> None:
         raise SystemExit("--commit-every must be >= 1")
     if args.timeout_s <= 0.0:
         raise SystemExit("--timeout-s must be positive")
+    if args.thermoengine_equilibrate_timeout_s <= 0.0:
+        raise SystemExit("--thermoengine-equilibrate-timeout-s must be positive")
+    if args.thermoengine_health_timeout_s <= 0.0:
+        raise SystemExit("--thermoengine-health-timeout-s must be positive")
     if args.estimate_s_per_point <= 0.0:
         raise SystemExit("--estimate-s-per-point must be positive")
     if args.keys and args.retry_failed:
@@ -1551,7 +1708,10 @@ def run_selected_retry(args: argparse.Namespace) -> int:
         item.strip() for item in str(args.keys or "").split(",") if item.strip()
     )
     with GridCacheWriter(
-        args.db, engine_epoch=args.engine_epoch, existing_only=True
+        args.db,
+        engine_epoch=args.engine_epoch,
+        existing_only=True,
+        backend_name=getattr(args, "backend", "subprocess"),
     ) as writer:
         grid_key_ids = writer.select_grid_key_ids(
             selectors=selectors,
@@ -1620,6 +1780,7 @@ def run_drain_only(args: argparse.Namespace) -> int:
             args.db,
             engine_epoch=args.engine_epoch,
             existing_only=True,
+            backend_name=getattr(args, "backend", "subprocess"),
         )
     except (FileNotFoundError, ValueError) as exc:
         raise SystemExit(f"DRAIN-ONLY REFUSED: {exc}") from exc
@@ -1865,7 +2026,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     }
     print(f"budget_table={json.dumps(budget, sort_keys=True)}", flush=True)
 
-    with GridCacheWriter(args.db, engine_epoch=args.engine_epoch) as writer:
+    with GridCacheWriter(
+        args.db, engine_epoch=args.engine_epoch, backend_name=args.backend
+    ) as writer:
         shard = None if args.shard == "all" else int(args.shard)
         if shard is not None:
             writer.seed_id_block(shard)
