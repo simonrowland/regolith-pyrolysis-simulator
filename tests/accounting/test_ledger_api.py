@@ -86,7 +86,10 @@ def test_named_views_preserve_tap_and_oxygen_account_distinctions():
     assert api.view("condensation_train")["view"] == "condensation_train"
     assert api.view("offgas")["data"] == {"terminal": {}, "near_melt": {}}
     assert api.view("wall_deposits")["data"]["segments_kg"] == {}
-    assert api.view("industrial_glass")["data"]["early_tap_mode"] is True
+    industrial_glass = api.view("industrial_glass")["data"]
+    assert "early_tap_mode" not in industrial_glass
+    assert industrial_glass["projection_basis"] == "hypothetical_early_tap"
+    assert "does not assert that the run selected an early tap" in industrial_glass["note"]
     assert api.view("stage_purity")["view"] == "stage_purity"
 
 

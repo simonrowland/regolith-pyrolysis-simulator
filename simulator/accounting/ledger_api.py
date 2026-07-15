@@ -148,7 +148,15 @@ class LedgerAPI:
         elif view_name == "oxygen_partition":
             payload = self.queries.oxygen_terminal_partition_kg()
         elif view_name == "industrial_glass":
-            payload = classify_products(self.sim, early_tap_mode=True)["industrial_mixed_glass"]
+            payload = dict(
+                classify_products(self.sim, early_tap_mode=True)["industrial_mixed_glass"]
+            )
+            payload.pop("early_tap_mode", None)
+            payload["projection_basis"] = "hypothetical_early_tap"
+            payload["note"] = (
+                "what-if projection from current cleaned melt; does not assert "
+                "that the run selected an early tap"
+            )
         elif view_name == "stage_purity":
             from simulator.condensation import stage_purity_report
             payload = stage_purity_report(self.sim.train)
