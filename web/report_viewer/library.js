@@ -17,10 +17,16 @@ let runs = [];
 let activeFolder = "All";
 let liveIndexError = null;
 const starred = new Map();
+const starErrors = new Map();
+const starPending = new Set();
+
+function isRunStarred(run) {
+  return run.live === true ? Boolean(run.starred) : Boolean(starred.get(String(run.run_id)));
+}
 
 function folderMatches(run) {
   if (activeFolder === "All") return true;
-  if (activeFolder === "Favorites") return Boolean(starred.get(run.run_id));
+  if (activeFolder === "Favorites") return isRunStarred(run);
   return run.folder === activeFolder;
 }
 
@@ -57,7 +63,10 @@ function yieldChips(run) {
 }
 
 function runCard(run) {
-  const isStarred = Boolean(starred.get(run.run_id));
+  const runId = String(run.run_id);
+  const isStarred = isRunStarred(run);
+  const starError = starErrors.get(runId);
+  const isStarPending = starPending.has(runId);
   const staticArtifact = typeof run.artifact === "string" && /^[A-Za-z0-9._/-]+\.html$/.test(run.artifact);
   const canLoad = Boolean(run.live) || staticArtifact;
   const loadTarget = run.live
@@ -67,8 +76,9 @@ function runCard(run) {
   return `<article class="card run-card">
     <div class="run-card-head">
       <div><div class="ct">${esc(run.folder ?? "unfiled")} · ${esc(run.status)}</div><h2>${esc(run.name)}</h2></div>
-      <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(run.run_id)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${run.name} ${isStarred ? "from" : "to"} favorites`)}">${isStarred ? "★" : "☆"}</button>
+      <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(runId)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${run.name} ${isStarred ? "from" : "to"} favorites`)}"${isStarPending ? " disabled" : ""}>${isStarred ? "★" : "☆"}</button>
     </div>
+    ${starError ? `<p class="demo-note" role="alert">${esc(`Could not save star for ${run.name}. ${starError}`)}</p>` : ""}
     <p class="run-summary">${esc(run.summary)}</p>
     ${yieldChips(run)}
     ${unavailable}
@@ -92,7 +102,7 @@ function renderList() {
 function bindControls() {
   $("#run-filter").addEventListener("input", renderList);
   $("#run-sort").addEventListener("change", renderList);
-  $("#library").addEventListener("click", (event) => {
+  $("#library").addEventListener("click", async (event) => {
     const folderButton = event.target.closest("[data-folder]");
     if (folderButton) {
       activeFolder = folderButton.dataset.folder;
@@ -102,8 +112,42 @@ function bindControls() {
     const starButton = event.target.closest("[data-star]");
     if (starButton) {
       const runId = starButton.dataset.star;
-      starred.set(runId, !starred.get(runId));
+      const run = runs.find((candidate) => String(candidate.run_id) === runId);
+      if (!run || starPending.has(runId)) return;
+      const nextStarred = !isRunStarred(run);
+      if (run.live !== true) {
+        starred.set(runId, nextStarred);
+        renderList();
+        return;
+      }
+      starErrors.delete(runId);
+      starPending.add(runId);
       renderList();
+      try {
+        const response = await fetch(`${LIVE_RUNS_URL}/${encodeURIComponent(runId)}/meta`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ starred: nextStarred })
+        });
+        let payload;
+        try {
+          payload = await response.json();
+        } catch (_error) {
+          payload = null;
+        }
+        if (!response.ok) {
+          throw new Error(payload?.error || `Star update failed (${response.status}).`);
+        }
+        if (typeof payload?.starred !== "boolean") {
+          throw new Error("Star update returned a malformed response.");
+        }
+        run.starred = payload.starred;
+      } catch (error) {
+        starErrors.set(runId, error?.message || String(error));
+      } finally {
+        starPending.delete(runId);
+        renderList();
+      }
       return;
     }
     const loadButton = event.target.closest("[data-load]");
@@ -116,11 +160,12 @@ function bindControls() {
 function render(index) {
   if (!Array.isArray(index)) throw new Error("Run index is malformed.");
   runs = index;
-  runs.forEach((run) => starred.set(String(run.run_id), Boolean(run.starred)));
+  starred.clear();
+  runs.filter((run) => run.live !== true).forEach((run) => starred.set(String(run.run_id), Boolean(run.starred)));
   $("#library").innerHTML = `<header>
     <div class="masthead"><div class="brand"><strong>DIRECT LEAP</strong> TECHNOLOGIES</div><div class="doc-label">Engine-free<br>local index</div></div>
     <div class="eyebrow">PHASE 2 · RUN LIBRARY</div><h1>Run library</h1>
-    <p class="lede">Browse frozen-run metadata. Stars are client state only; this screen does not save or execute runs.</p>
+    <p class="lede">Browse frozen-run metadata. Live-run stars are saved durably; sample-entry stars are client-side only. This screen does not execute runs.</p>
   </header>
   <section><h2><span class="sect">01</span>Find a run</h2><p class="sub">Fixed system folders, text filter, and index-only sorting.</p>
     <div class="library-controls"><nav id="folder-list" class="folder-list" aria-label="System folders"></nav>
