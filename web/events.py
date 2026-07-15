@@ -2,6 +2,8 @@
 
 import copy
 from collections.abc import Mapping
+from dataclasses import replace
+from datetime import datetime, timezone
 import math
 import threading
 import uuid
@@ -34,8 +36,10 @@ from simulator.core import PoisonedHourError
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.optimize.recipe import recipe_schema_version
 from simulator.recipe_io import RecipeIOError, normalize_recipe_patch
-from simulator.runner import RunnerError, _deep_merge_setpoints
+from simulator.run_executor import RunExecutor
+from simulator.runner import PyrolysisRun, RunnerError, _deep_merge_setpoints
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -44,6 +48,7 @@ from simulator.session import (
     normalize_mre_policy,
 )
 from simulator.state import MOLAR_MASS
+from simulator.trace import PhysicsTrace
 # Goal #18 ``JSON-RUNNER-HARNESS``: the SocketIO stream and the CLI
 # runner share ONE per-hour summary builder.  ``SimSession.advance()``
 # owns that runner-format summary and returns it in ``StepResult``; this
@@ -56,6 +61,7 @@ from web.advisory import (
     vapor_pressure_authority_payload,
     wall_advisory_payload,
 )
+from web.run_store import get_run_store, persist_run_artifact
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
@@ -103,6 +109,8 @@ def _replace_simulation_state(
     speed: float,
     *,
     ledger_client_id: str | None = None,
+    run_store=None,
+    runner_projector=None,
 ) -> tuple[dict, threading.Lock]:
     """Install one active simulation for a client and stop any prior run."""
     while True:
@@ -125,6 +133,8 @@ def _replace_simulation_state(
                     'speed': speed,
                     'run_id': uuid.uuid4().hex,
                     'ledger_client_id': ledger_client_id,
+                    'run_store': run_store,
+                    'runner_projector': runner_projector,
                 }
                 _simulations[sid] = state
                 _sim_locks[sid] = run_lock
@@ -926,6 +936,115 @@ def _knudsen_regime_diagnostic_from_sim(sim):
     return dict(diagnostic) if isinstance(diagnostic, dict) else {}
 
 
+def _mapping_leaf_paths(
+    value: Mapping[str, object],
+    prefix: tuple[str, ...] = (),
+) -> list[str]:
+    paths: list[str] = []
+    for key, child in value.items():
+        child_path = (*prefix, str(key))
+        if isinstance(child, Mapping):
+            paths.extend(_mapping_leaf_paths(child, child_path))
+        else:
+            paths.append('.'.join(child_path))
+    return paths
+
+
+def _full_runner_payload(
+    session,
+    *,
+    projector=None,
+    status: str,
+    reason: str = '',
+    error_message: str = '',
+    refusal_diagnostic: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    """Project a web-driven session through the canonical runner envelope."""
+    result_document = getattr(session, 'result_document', None)
+    try:
+        recorded = result_document() if callable(result_document) else None
+    except RuntimeError:
+        recorded = None
+    if isinstance(recorded, Mapping):
+        payload = copy.deepcopy(dict(recorded))
+        payload.setdefault('status', status)
+        payload.setdefault('reason', reason)
+        payload.setdefault('error_message', error_message)
+        return payload
+
+    sim = session.simulator
+    config = session._config
+    if config is None:
+        raise RuntimeError('web session has no runner configuration')
+    execution = RunExecutor().execute_session(session, hours=0)
+    execution = replace(
+        execution,
+        snapshots=tuple(getattr(sim.record, 'snapshots', ()) or ()),
+        trace=PhysicsTrace.from_simulator(sim),
+        per_hour=tuple(session.per_hour_summaries()),
+        operator_decisions=tuple(session.operator_decisions()),
+        status=status,
+        reason=reason,
+        error_message=error_message,
+        refusal_diagnostic=dict(refusal_diagnostic or {}),
+    )
+    if projector is None:
+        raise RuntimeError('web session has no canonical runner projector')
+    active_projector = copy.copy(projector)
+    active_projector.hours = max(
+        int(config.hours),
+        int(getattr(sim.melt, 'hour', 0)),
+    )
+    payload = active_projector._build_output(execution)
+    if active_projector.setpoints_patch:
+        payload['recipe_snapshot'] = {
+            'setpoints_patch': copy.deepcopy(
+                dict(active_projector.setpoints_patch)
+            ),
+            'pins': sorted(_mapping_leaf_paths(active_projector.setpoints_patch)),
+            'recipe_schema_version': recipe_schema_version,
+        }
+    return payload
+
+
+def _available_runner_payload(
+    session,
+    *,
+    status: str,
+    reason: str,
+    error_message: str,
+    refusal_diagnostic: Mapping[str, object] | None,
+) -> dict[str, object]:
+    """Return an honest reduced envelope when canonical projection is unavailable."""
+    config = getattr(session, '_config', None)
+    sim = getattr(session, 'simulator', None)
+    metadata: dict[str, object] = {}
+    if config is not None:
+        metadata = {
+            'feedstock_id': config.feedstock_id,
+            'mass_kg': config.mass_kg,
+            'backend': config.backend_name,
+            'track': config.track,
+        }
+    melt = getattr(sim, 'melt', None) if sim is not None else None
+    if melt is not None:
+        metadata['hours_completed'] = int(getattr(melt, 'hour', 0))
+    if refusal_diagnostic:
+        metadata['refusal_diagnostic'] = copy.deepcopy(
+            dict(refusal_diagnostic)
+        )
+    summaries_builder = getattr(session, 'per_hour_summaries', None)
+    summaries = summaries_builder() if callable(summaries_builder) else []
+    return {
+        'schema_version': 'web-reduced-terminal-v1',
+        'run_metadata': metadata,
+        'per_hour_summary': copy.deepcopy(list(summaries)),
+        'status': status,
+        'reason': reason,
+        'error_message': error_message,
+    }
+
+
 def _start_background_loop(
     socketio,
     sid: str,
@@ -935,6 +1054,82 @@ def _start_background_loop(
     backend_status: str,
     backend_authoritative: bool,
 ):
+    def persist_terminal(
+        session,
+        *,
+        status: str,
+        reason: str = '',
+        error_message: str = '',
+        refusal_diagnostic: Mapping[str, object] | None = None,
+    ) -> dict[str, object] | None:
+        state, _ = _current_simulation_state(sid, run_id)
+        projector = state.get('runner_projector') if state is not None else None
+        try:
+            try:
+                runner_payload = _full_runner_payload(
+                    session,
+                    projector=projector,
+                    status=status,
+                    reason=reason,
+                    error_message=error_message,
+                    refusal_diagnostic=refusal_diagnostic,
+                )
+            except Exception as projection_exc:  # noqa: BLE001
+                _safe_log(
+                    f'Full runner projection unavailable: {projection_exc}'
+                )
+                fallback_status = 'failed' if status == 'ok' else status
+                runner_payload = _available_runner_payload(
+                    session,
+                    status=fallback_status,
+                    reason=(reason or 'runner_projection_failed'),
+                    error_message=(
+                        error_message
+                        or f'Runner projection failed: {projection_exc}'
+                    ),
+                    refusal_diagnostic=refusal_diagnostic,
+                )
+            run_store = state.get('run_store') if state is not None else None
+            if run_store is None:
+                raise RuntimeError('run artifact store is unavailable')
+            artifact = persist_run_artifact(
+                runner_payload,
+                run_id,
+                store=run_store,
+            )
+        except Exception as exc:  # noqa: BLE001 -- durability is client-visible
+            _safe_log(f'Run artifact persistence failed: {exc}')
+            with _simulations_guard:
+                current = _simulations.get(sid)
+                if current is not None and current.get('run_id') == run_id:
+                    current['persistence_retry'] = {
+                        'runner_payload': locals().get('runner_payload'),
+                        'status': status,
+                        'reason': reason,
+                        'error_message': error_message,
+                    }
+            try:
+                _emit_if_current(
+                    socketio,
+                    sid,
+                    run_id,
+                    'simulation_persistence_failed',
+                    {
+                        'status': 'persistence_failed',
+                        'message': str(exc),
+                        'retryable': True,
+                    },
+                )
+            except Exception as emit_exc:  # noqa: BLE001 -- preserve retry state
+                _safe_log(f'Persistence failure emission failed: {emit_exc}')
+            return None
+        with _simulations_guard:
+            current = _simulations.get(sid)
+            if current is not None and current.get('run_id') == run_id:
+                current['artifact_persisted'] = True
+                current.pop('persistence_retry', None)
+        return artifact
+
     def stop_with_status(payload: Mapping[str, object]) -> None:
         try:
             _emit_if_current(
@@ -953,7 +1148,7 @@ def _start_background_loop(
                     current['running'] = False
                     current['paused'] = False
 
-    def stop_for_failure(exc: Exception, sim) -> None:
+    def stop_for_failure(exc: Exception, session, sim) -> None:
         _safe_log(f'Simulation loop failed: {exc}')
         message = str(exc)
         unenriched_message = message
@@ -979,6 +1174,12 @@ def _start_background_loop(
         }
         if poisoned is not None:
             error_payload['reason'] = 'poisoned_hour'
+        persist_terminal(
+            session,
+            status='failed',
+            reason=str(error_payload.get('reason') or ''),
+            error_message=message,
+        )
         stop_with_status(error_payload)
 
     def run_loop():
@@ -1014,6 +1215,21 @@ def _start_background_loop(
                             run_id,
                             completion_payload=completion_payload,
                         )
+                        artifact = persist_terminal(session, status='ok')
+                        if artifact is None:
+                            stop_with_status({
+                                'status': 'error',
+                                'reason': 'persistence_failed',
+                                'message': 'Run completed but its report was not saved',
+                            })
+                            break
+                        if artifact.get('execution_status') != 'ok':
+                            stop_with_status({
+                                'status': 'error',
+                                'reason': 'terminal_run_failed',
+                                'message': 'Run finished with a failed terminal result',
+                            })
+                            break
                         emitted = _emit_if_current(
                             socketio,
                             sid,
@@ -1022,7 +1238,7 @@ def _start_background_loop(
                             completion_payload,
                         )
                     except Exception as exc:  # noqa: BLE001 -- loop boundary
-                        stop_for_failure(exc, sim)
+                        stop_for_failure(exc, session, sim)
                         break
                     if not emitted:
                         break
@@ -1057,10 +1273,17 @@ def _start_background_loop(
                         'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,
                     }
+                    persist_terminal(
+                        session,
+                        status='refused',
+                        reason=exc.reason,
+                        error_message=exc.reason,
+                        refusal_diagnostic=exc.diagnostic,
+                    )
                     stop_with_status(error_payload)
                     break
                 except Exception as exc:
-                    stop_for_failure(exc, sim)
+                    stop_for_failure(exc, session, sim)
                     break
 
             if step_result is None:
@@ -1120,7 +1343,7 @@ def _start_background_loop(
                     ):
                         break
             except Exception as exc:  # noqa: BLE001 -- loop boundary
-                stop_for_failure(exc, sim)
+                stop_for_failure(exc, session, sim)
                 break
 
             campaign_summary = step_result.campaign_summary
@@ -1149,6 +1372,13 @@ def _start_background_loop(
                     'backend_authoritative': backend_authoritative,
                     'backend_message': backend_message,
                 }
+                persist_terminal(
+                    session,
+                    status='refused',
+                    reason=reason,
+                    error_message=reason,
+                    refusal_diagnostic=c6_refusal,
+                )
                 if not _emit_if_current(
                     socketio,
                     sid,
@@ -1414,11 +1644,35 @@ def register_events(socketio):
             return
         sim = session.simulator
 
+        runner_projector = PyrolysisRun(
+            feedstock_id=session._config.feedstock_id,
+            campaign=session._config.campaign,
+            hours=session._config.hours,
+            additives_kg=dict(session._config.additives_kg),
+            mass_kg=float(session._config.mass_kg),
+            backend_name=session._config.backend_name,
+            setpoints_patch=copy.deepcopy(setpoints_patch),
+            runtime_campaign_overrides=(
+                session._config.runtime_campaign_overrides
+            ),
+            track=session._config.track,
+            c5_enabled=session._config.c5_enabled,
+            mre_target_species=session._config.mre_target_species,
+            mre_max_voltage_V=session._config.mre_max_voltage_V,
+            run_metadata_overrides={
+                'started_at_utc': datetime.now(timezone.utc).strftime(
+                    '%Y-%m-%dT%H:%M:%SZ'
+                ),
+            },
+        )
+
         state, run_lock = _replace_simulation_state(
             sid,
             session,
             speed,
             ledger_client_id=flask_session.get('ledger_client_id'),
+            run_store=get_run_store(),
+            runner_projector=runner_projector,
         )
         run_id = state['run_id']
         state['backend_message'] = backend_message

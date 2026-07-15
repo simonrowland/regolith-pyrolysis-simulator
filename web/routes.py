@@ -94,7 +94,11 @@ from web.advisory import (
     vapor_pressure_authority_payload,
     wall_advisory_payload,
 )
-from web.run_store import list_runs, load as load_run_artifact
+from web.run_store import (
+    RunStoreCorruptionError,
+    list_runs,
+    load as load_run_artifact,
+)
 
 bp = Blueprint('web', __name__,
                template_folder='templates',
@@ -3266,6 +3270,11 @@ def runs_api():
 def run_artifact_api(run_id: str):
     try:
         artifact = load_run_artifact(run_id)
+    except RunStoreCorruptionError as exc:
+        return jsonify({
+            'error': str(exc),
+            'error_type': 'run_store_corruption',
+        }), 500
     except ValueError as exc:
         return _json_error(str(exc), 400)
     if artifact is None:

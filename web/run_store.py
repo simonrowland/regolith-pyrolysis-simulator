@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import fcntl
 import json
+import logging
 import os
 import re
 import tempfile
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +19,21 @@ from simulator.accounting.run_artifact import build_run_artifact
 
 DEFAULT_RETENTION = 100
 _RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+_SAVE_LOCK = threading.Lock()
+_LOG = logging.getLogger(__name__)
+
+
+class RunStoreCorruptionError(RuntimeError):
+    """Raised when a stored run exists but is not a decodable JSON object."""
+
+    def __init__(self, run_id: str, path: Path, detail: str) -> None:
+        self.run_id = run_id
+        self.path = path
+        super().__init__(f"corrupt run artifact {run_id!r}: {detail}")
+
+
+class DuplicateRunArtifactError(RuntimeError):
+    """Raised when persistence cannot prove this payload won the first write."""
 
 
 class RunArtifactStore:
@@ -23,21 +41,42 @@ class RunArtifactStore:
         self.runs_dir = Path(runs_dir)
         self.keep = max(0, int(keep))
 
-    def save(self, run_id: str, artifact: dict[str, Any]) -> None:
+    def save(self, run_id: str, artifact: dict[str, Any]) -> bool:
         destination = self._path(run_id)
+        claim_path = destination.with_suffix(".write-lock")
         self.runs_dir.mkdir(parents=True, exist_ok=True)
-        fd, raw_temp_path = tempfile.mkstemp(
-            prefix=f".{run_id}.", suffix=".tmp", dir=self.runs_dir
-        )
-        temp_path = Path(raw_temp_path)
-        try:
-            with os.fdopen(fd, "w", encoding="utf-8") as handle:
-                json.dump(artifact, handle, indent=2, sort_keys=True, allow_nan=False)
-                handle.write("\n")
-            os.link(temp_path, destination)
-        finally:
-            temp_path.unlink(missing_ok=True)
+        with _SAVE_LOCK:
+            with claim_path.open("a", encoding="utf-8") as claim_handle:
+                fcntl.flock(claim_handle.fileno(), fcntl.LOCK_EX)
+                if destination.exists():
+                    _LOG.warning(
+                        "run artifact %s already exists; duplicate save ignored",
+                        run_id,
+                    )
+                    return False
+                temp_path: Path | None = None
+                try:
+                    fd, raw_temp_path = tempfile.mkstemp(
+                        prefix=f".{run_id}.", suffix=".tmp", dir=self.runs_dir
+                    )
+                    temp_path = Path(raw_temp_path)
+                    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                        json.dump(
+                            artifact,
+                            handle,
+                            indent=2,
+                            sort_keys=True,
+                            allow_nan=False,
+                        )
+                        handle.write("\n")
+                        handle.flush()
+                        os.fsync(handle.fileno())
+                    os.replace(temp_path, destination)
+                finally:
+                    if temp_path is not None:
+                        temp_path.unlink(missing_ok=True)
         self._apply_retention()
+        return True
 
     def load(self, run_id: str) -> dict[str, Any] | None:
         path = self._path(run_id)
@@ -46,7 +85,15 @@ class RunArtifactStore:
                 payload = json.load(handle)
         except FileNotFoundError:
             return None
-        return payload if isinstance(payload, dict) else None
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RunStoreCorruptionError(run_id, path, str(exc)) from exc
+        if not isinstance(payload, dict):
+            raise RunStoreCorruptionError(
+                run_id,
+                path,
+                f"expected a JSON object, got {type(payload).__name__}",
+            )
+        return payload
 
     def list_runs(self) -> list[dict[str, Any]]:
         summaries: list[dict[str, Any]] = []
@@ -54,11 +101,12 @@ class RunArtifactStore:
             return summaries
         for path in self.runs_dir.glob("*.json"):
             try:
-                with path.open(encoding="utf-8") as handle:
-                    artifact = json.load(handle)
-                if isinstance(artifact, dict):
+                artifact = self.load(path.stem)
+                if artifact is not None:
                     summaries.append(self._summary(artifact, path.stem))
-            except (OSError, json.JSONDecodeError):
+            except RunStoreCorruptionError as exc:
+                quarantine_path = self._quarantine(path)
+                _LOG.error("%s; quarantined at %s", exc, quarantine_path)
                 continue
         return sorted(
             summaries,
@@ -71,6 +119,16 @@ class RunArtifactStore:
         if not _RUN_ID_RE.fullmatch(value):
             raise ValueError("run_id must use only letters, digits, dot, underscore, or hyphen")
         return self.runs_dir / f"{value}.json"
+
+    @staticmethod
+    def _quarantine(path: Path) -> Path:
+        candidate = path.with_suffix(f"{path.suffix}.corrupt")
+        index = 1
+        while candidate.exists():
+            candidate = path.with_suffix(f"{path.suffix}.corrupt.{index}")
+            index += 1
+        os.replace(path, candidate)
+        return candidate
 
     @staticmethod
     def _summary(artifact: dict[str, Any], fallback_run_id: str) -> dict[str, Any]:
@@ -133,8 +191,8 @@ def get_run_store() -> RunArtifactStore:
     return RunArtifactStore(runs_dir, keep=keep)
 
 
-def save(run_id: str, artifact: dict[str, Any]) -> None:
-    get_run_store().save(run_id, artifact)
+def save(run_id: str, artifact: dict[str, Any]) -> bool:
+    return get_run_store().save(run_id, artifact)
 
 
 def load(run_id: str) -> dict[str, Any] | None:
@@ -149,7 +207,13 @@ def persist_run_artifact(
     runner_payload: dict[str, Any],
     run_id: str,
     name: str | None = None,
+    *,
+    store: RunArtifactStore | None = None,
 ) -> dict[str, Any]:
     artifact = build_run_artifact(runner_payload, run_id=run_id, name=name)
-    save(run_id, artifact)
+    stored = (store.save if store is not None else save)(run_id, artifact)
+    if not stored:
+        raise DuplicateRunArtifactError(
+            f"run artifact {run_id!r} was not written because the id already exists"
+        )
     return artifact

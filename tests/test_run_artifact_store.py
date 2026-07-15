@@ -14,7 +14,11 @@ from simulator.accounting.run_artifact import (
     build_run_artifact,
 )
 from web import routes as web_routes
-from web.run_store import RunArtifactStore, persist_run_artifact
+from web.run_store import (
+    RunArtifactStore,
+    RunStoreCorruptionError,
+    persist_run_artifact,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -153,8 +157,7 @@ def test_store_save_load_list_and_retention(tmp_path) -> None:
     third["header"]["created_at"] = "2026-07-16T12:00:00Z"
 
     store.save("run-1", first)
-    with pytest.raises(FileExistsError):
-        store.save("run-1", second)
+    assert store.save("run-1", second) is False
     store.save("run-2", second)
     store.save("run-3", third)
 
@@ -166,6 +169,36 @@ def test_store_save_load_list_and_retention(tmp_path) -> None:
     assert summaries[0]["peak_T_C"] == 1400.0
     assert summaries[0]["headline_yields_kg"] == {"Fe": 12.5, "O2": 4.25}
     assert summaries[1]["starred"] is True
+
+
+def test_store_corrupt_load_is_typed_and_list_quarantines(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    store.runs_dir.mkdir(parents=True)
+    corrupt_path = store.runs_dir / "broken.json"
+    corrupt_path.write_text("{not-json", encoding="utf-8")
+
+    with pytest.raises(RunStoreCorruptionError, match="corrupt run artifact"):
+        store.load("broken")
+
+    assert store.list_runs() == []
+    assert not corrupt_path.exists()
+    assert (store.runs_dir / "broken.json.corrupt").exists()
+
+
+def test_store_stale_lock_file_does_not_block_retry(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    store.runs_dir.mkdir(parents=True)
+    (store.runs_dir / "run-retry.write-lock").write_text(
+        "stale writer metadata",
+        encoding="utf-8",
+    )
+    artifact = build_run_artifact(
+        _runner_payload("failed"),
+        run_id="run-retry",
+    )
+
+    assert store.save("run-retry", artifact) is True
+    assert store.load("run-retry") == artifact
 
 
 def test_run_artifact_routes_return_index_full_artifact_and_404(tmp_path) -> None:
@@ -189,6 +222,12 @@ def test_run_artifact_routes_return_index_full_artifact_and_404(tmp_path) -> Non
     assert artifact_response.status_code == 200
     assert artifact_response.get_json() == artifact
     assert client.get("/api/runs/missing").status_code == 404
+
+    corrupt_path = tmp_path / "runs" / "corrupt.json"
+    corrupt_path.write_text("{not-json", encoding="utf-8")
+    corrupt_response = client.get("/api/runs/corrupt")
+    assert corrupt_response.status_code == 500
+    assert corrupt_response.get_json()["error_type"] == "run_store_corruption"
 
 
 def test_backfill_run_artifact_cli_round_trips_runner_payload(tmp_path) -> None:

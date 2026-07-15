@@ -14,6 +14,7 @@ import app as app_module
 from web import events as web_events
 from web import routes as web_routes
 from simulator.backends import BackendSelectionPolicy, backend_resolution_status
+from simulator.condensation import KnudsenRegimeRefusal
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
@@ -34,6 +35,7 @@ from web.events import (
     _simulations,
     _tick_payload,
 )
+from web.run_store import RunArtifactStore
 
 
 _DELETE = object()
@@ -2229,6 +2231,236 @@ def test_loop_rechecks_pause_after_acquiring_run_lock(monkeypatch):
         _clear_simulation_state(sid)
 
 
+def _terminal_runner_document(status: str) -> dict[str, object]:
+    return {
+        "schema_version": "1.4.0",
+        "status": status,
+        "reason": "terminal reason" if status != "ok" else "",
+        "error_message": "terminal failure" if status != "ok" else "",
+        "run_metadata": {
+            "started_at_utc": "2026-07-15T12:00:00Z",
+            "feedstock_id": "lunar_mare_low_ti",
+            "mass_kg": 1000.0,
+            "backend": "stub",
+        },
+        "per_hour_summary": [
+            {"hour": 1, "campaign": "C0", "T_C": 900.0, "mass_balance_pct": 0.0}
+        ],
+        "final_state": {"process.cleaned_melt": {"SiO2": 2.0}},
+        "final": {"wall_deposit_by_species_kg": {"SiO": 0.25}},
+        "stage_purity_report": {"stage_1": {"verdict": "PURE"}},
+        "vapor_pressure_source_report": {"status": "ok"},
+    }
+
+
+@pytest.mark.parametrize("outcome", ["ok", "refused", "failed"])
+def test_terminal_outcomes_persist_full_runner_document(tmp_path, monkeypatch, outcome):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = app_module.socketio.test_client(app)
+    before = set(_simulations)
+
+    class Session:
+        simulator = SimpleNamespace(_poisoned_hour=None)
+
+        def is_complete(self):
+            return outcome == "ok"
+
+        def result_document(self):
+            return _terminal_runner_document(outcome)
+
+    if outcome == "ok":
+        monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+    elif outcome == "refused":
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                KnudsenRegimeRefusal({"reason": "binding refusal"})
+            ),
+        )
+    else:
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("boom")),
+        )
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        state["session"] = Session()
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        store = RunArtifactStore(tmp_path / "runs")
+        artifact = store.load(state["run_id"])
+        assert artifact is not None
+        assert artifact["execution_status"] == outcome
+        assert artifact["terminal"]["final_state"] == {
+            "process.cleaned_melt": {"SiO2": 2.0}
+        }
+        assert artifact["terminal"]["final"] == {
+            "wall_deposit_by_species_kg": {"SiO": 0.25}
+        }
+        if outcome != "ok":
+            assert artifact["failure"]["error_message"]
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_real_web_session_uses_canonical_runner_projector(tmp_path, monkeypatch):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = app_module.socketio.test_client(app)
+    before = set(_simulations)
+    setpoints_patch = {
+        "campaigns": {"C4": {"temp_range_C": [1600.0, 1660.0]}}
+    }
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+                "setpoints_patch": setpoints_patch,
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        session = state["session"]
+        session.advance()
+        session.is_complete = lambda: True
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        artifact = RunArtifactStore(tmp_path / "runs").load(state["run_id"])
+        assert artifact is not None
+        assert artifact["execution_status"] == "ok"
+        assert len(artifact["timesteps"]) == 1
+        assert artifact["terminal"]["final_state"]
+        assert artifact["terminal"]["final"]
+        run_metadata = artifact["terminal"]["run_metadata"]
+        assert run_metadata["backend"] == "internal-analytical"
+        assert run_metadata["cost_rollup_diagnostic"]
+        assert artifact["header"]["recipe_snapshot"] == {
+            "setpoints_patch": setpoints_patch,
+            "pins": ["campaigns.C4.temp_range_C"],
+            "recipe_schema_version": "recipe-schema-v1",
+        }
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_real_web_session_failure_persists_non_sparse_terminal(tmp_path, monkeypatch):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = app_module.socketio.test_client(app)
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                RuntimeError("terminal boom")
+            ),
+        )
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        artifact = RunArtifactStore(tmp_path / "runs").load(state["run_id"])
+        assert artifact is not None
+        assert artifact["execution_status"] == "failed"
+        assert artifact["failure"]["error_message"] == "terminal boom"
+        assert artifact["terminal"]["final_state"]
+        assert artifact["terminal"]["final"]
+        assert artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_persist_failure_never_emits_simulation_complete(tmp_path, monkeypatch):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = app_module.socketio.test_client(app)
+    before = set(_simulations)
+
+    session = SimpleNamespace(
+        simulator=SimpleNamespace(_poisoned_hour=None),
+        is_complete=lambda: True,
+        result_document=lambda: _terminal_runner_document("ok"),
+    )
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+    monkeypatch.setattr(
+        web_events,
+        "persist_run_artifact",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(OSError("disk full")),
+    )
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        state["session"] = session
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        names = [event["name"] for event in client.get_received()]
+        assert "simulation_complete" not in names
+        assert "simulation_persistence_failed" in names
+        assert state["persistence_retry"]["runner_payload"]["status"] == "ok"
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
 @pytest.mark.parametrize("failure_site", ["completion", "tick", "emit"])
 def test_loop_projection_and_emit_failures_stop_current_run(
     monkeypatch,
@@ -2582,9 +2814,11 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
 
 def test_web_failure_status_and_cleanup_survive_poison_enrichment_failure(
     monkeypatch,
+    tmp_path,
 ):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
     client = app_module.socketio.test_client(app)
     assert client.is_connected()
     client.get_received()
@@ -2950,6 +3184,7 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
 
 def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
     monkeypatch,
+    tmp_path,
 ):
     captured_tasks = []
 
@@ -2969,6 +3204,7 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
         capture_background_task,
     )
     app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
     client = app_module.socketio.test_client(app)
     assert client.is_connected()
     client.get_received()
@@ -3055,6 +3291,16 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
             refusal["c6_refusal_diagnostic"]["diagnostic"]["reason_refused"]
             == refusal["reason"]
         )
+        artifact = RunArtifactStore(tmp_path / "runs").load(refusal["run_id"])
+        assert artifact is not None
+        assert artifact["execution_status"] == "refused"
+        assert len(artifact["timesteps"]) == 42
+        assert artifact["failure"] == {
+            "reason": refusal["reason"],
+            "error_message": refusal["reason"],
+        }
+        assert artifact["terminal"]["final_state"]
+        assert artifact["terminal"]["final"]
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
@@ -3105,7 +3351,7 @@ def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
     assert payload["pot_composition_wt_pct"] == {}
 
 
-def test_web_pause_resume_is_result_neutral(monkeypatch):
+def test_web_pause_resume_is_result_neutral(monkeypatch, tmp_path):
     captured_tasks = []
 
     def force_internal_analytical_backend(_backend_name):
@@ -3124,6 +3370,7 @@ def test_web_pause_resume_is_result_neutral(monkeypatch):
         capture_background_task,
     )
     app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
 
     def start_web_session():
         before = set(_simulations)
