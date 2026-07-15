@@ -812,8 +812,11 @@ def _calphad_feo_activity_components(
     calphad_weight = _calphad_authority_weight(delta_iw_pure_feo)
     kress91_weight = 1.0 - calphad_weight
     authoritative_unclamped = calphad_weight * central + kress91_weight * kress91_activity
-    # Pure-liquid-FeO standard state: metal saturation is a_FeO = 1, so values
-    # above unity are unphysical supersaturation and must not feed vapor pressure.
+    # Premise: the pure-liquid-FeO standard state has a_FeO = 1 at metal
+    # saturation, so greater activities are unphysical supersaturation.  The
+    # min() therefore creates a continuous kink: below 1 the authority follows
+    # the blend, while above 1 its slope is zero.  At the limiting value both
+    # branches return exactly 1 (and, e.g., an unclamped 1.2 remains authority 1).
     authoritative = min(authoritative_unclamped, 1.0)
     if authoritative > 0.0:
         ratio_current = central / authoritative
@@ -850,7 +853,7 @@ def _calphad_feo_activity_components(
         'a_FeO_authoritative_clamped_to_pure_feo_ceiling': (
             authoritative_unclamped > 1.0
         ),
-        'current_within_calphad_band': low <= authoritative <= high,
+        'current_within_calphad_band': low <= authoritative_unclamped <= high,
         'comparison': {
             'status': (
                 'ok' if ratio_current is not None else 'not_comparable_current_zero'
