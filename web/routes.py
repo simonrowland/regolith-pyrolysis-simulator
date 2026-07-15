@@ -2474,6 +2474,10 @@ def _json_error(message: str, code: int):
     return jsonify({'error': message}), code
 
 
+def _typed_json_error(message: str, error_type: str, code: int):
+    return jsonify({'error': message, 'error_type': error_type}), code
+
+
 def _finite_or_none(value: Any) -> float | None:
     if isinstance(value, bool):
         return None
@@ -3265,6 +3269,88 @@ def ledger_view_api(view_name: str):
 @bp.route('/api/runs', methods=['GET'])
 def runs_api():
     return jsonify(list_runs())
+
+
+@bp.route('/api/runs', methods=['POST'])
+def submit_run_api():
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, Mapping):
+        return _typed_json_error(
+            'run request body must be a JSON object',
+            'invalid_run_request',
+            400,
+        )
+    session.setdefault('ledger_client_id', os.urandom(16).hex())
+    client_id = str(session['ledger_client_id'])
+    from app import socketio
+    from web.events import RunCommandError, submit_run_command
+
+    try:
+        result = submit_run_command(socketio, payload, client_id=client_id)
+    except RunCommandError as exc:
+        return _typed_json_error(str(exc), exc.error_type, exc.status_code)
+    except RuntimeError as exc:
+        return _typed_json_error(str(exc), 'run_command_failed', 500)
+    return jsonify(result), (200 if result['idempotent_replay'] else 201)
+
+
+@bp.route('/api/runs/draft', methods=['POST'])
+def validate_run_draft_api():
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, Mapping):
+        return _typed_json_error(
+            'run draft body must be a JSON object',
+            'invalid_run_request',
+            400,
+        )
+    session.setdefault('ledger_client_id', os.urandom(16).hex())
+    client_id = str(session['ledger_client_id'])
+    from web.events import RunCommandError, validate_run_draft
+
+    try:
+        result = validate_run_draft(payload, client_id=client_id)
+    except RunCommandError as exc:
+        return _typed_json_error(str(exc), exc.error_type, exc.status_code)
+    except RuntimeError as exc:
+        return _typed_json_error(str(exc), 'run_command_failed', 500)
+    return jsonify(result)
+
+
+@bp.route('/api/runs/<run_id>/cancel', methods=['POST'])
+def cancel_run_api(run_id: str):
+    from app import socketio
+    from web.events import cancel_run_command
+
+    client_id = str(session.get('ledger_client_id') or '')
+    try:
+        result = cancel_run_command(
+            socketio,
+            run_id,
+            client_id=client_id,
+        )
+    except RuntimeError as exc:
+        return _typed_json_error(str(exc), 'run_cancel_failed', 500)
+    if result is None:
+        try:
+            artifact = load_run_artifact(run_id)
+        except ValueError as exc:
+            return _typed_json_error(str(exc), 'invalid_run_id', 400)
+        except RunStoreCorruptionError as exc:
+            return _typed_json_error(str(exc), 'run_store_corruption', 500)
+        if artifact is not None:
+            return _typed_json_error(
+                'run is already terminal',
+                'run_not_active',
+                409,
+            )
+        return _typed_json_error('run not found', 'run_not_found', 404)
+    if result['status'] == 'terminal':
+        return _typed_json_error(
+            'run is already terminal',
+            'run_not_active',
+            409,
+        )
+    return jsonify(result)
 
 
 @bp.route('/api/runs/<run_id>', methods=['GET'])
