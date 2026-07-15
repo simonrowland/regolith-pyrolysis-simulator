@@ -29,12 +29,15 @@ _BASALTIC_FE_MELT_WT = {
     "Na2O": 4.0,
     "K2O": 3.0,
 }
-_FEO_RICH_MELT_WT = {
-    "SiO2": 30.0,
-    "Al2O3": 5.0,
-    "CaO": 5.0,
-    "MgO": 10.0,
-    "FeO": 50.0,
+_IRON_RICH_BASALT_WT = {
+    "SiO2": 39.0,
+    "Al2O3": 8.0,
+    "CaO": 7.0,
+    "MgO": 6.0,
+    "FeO": 36.0,
+    "TiO2": 2.5,
+    "Na2O": 1.0,
+    "K2O": 0.5,
 }
 _T_K = 1673.15
 
@@ -321,12 +324,12 @@ def test_feo_activity_iw_pure_feo_basis_documents_melt_offset():
     )
 
 
-def test_feo_rich_authoritative_activity_clamps_at_pure_feo_ceiling(
+def test_iron_rich_basalt_clamp_reports_unclamped_band_and_closes_fe_atoms(
     vapor_pressure_data,
 ):
     fO2_log = feo_iw_log10_fO2_bar(_T_K) - 0.25
     diagnostic = calphad_ferrous_feo_activity_diagnostic(
-        comp_wt=_FEO_RICH_MELT_WT,
+        comp_wt=_IRON_RICH_BASALT_WT,
         fO2_log=fO2_log,
         T_K=_T_K,
         pressure_bar=1e-6,
@@ -336,8 +339,17 @@ def test_feo_rich_authoritative_activity_clamps_at_pure_feo_ceiling(
     assert diagnostic["a_FeO_authoritative_unclamped"] > 1.0
     assert diagnostic["a_FeO_authoritative_clamped_to_pure_feo_ceiling"] is True
     assert diagnostic["a_FeO_current"] == pytest.approx(1.0)
+    band = diagnostic["a_FeO_calphad"]
+    assert diagnostic["current_within_calphad_band"] is (
+        band["low"]
+        <= diagnostic["a_FeO_authoritative_unclamped"]
+        <= band["high"]
+    )
+    split = diagnostic["kress91_split"]
+    feot = melt_mol_fractions_for_kress91(_IRON_RICH_BASALT_WT)["FeOt"]
+    assert split["x_feo"] + 2.0 * split["x_fe2o3"] == pytest.approx(feot)
     assert kress91_ferrous_feo_activity(
-        comp_wt=_FEO_RICH_MELT_WT,
+        comp_wt=_IRON_RICH_BASALT_WT,
         fO2_log=fO2_log,
         T_K=_T_K,
         pressure_bar=1e-6,
@@ -348,7 +360,7 @@ def test_feo_rich_authoritative_activity_clamps_at_pure_feo_ceiling(
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=ProviderAccountView(
             accounts={
-                "process.cleaned_melt": _moles_from_wt_pct(_FEO_RICH_MELT_WT)
+                "process.cleaned_melt": _moles_from_wt_pct(_IRON_RICH_BASALT_WT)
             },
             species_formula_registry={},
         ),
