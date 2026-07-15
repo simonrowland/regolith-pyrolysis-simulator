@@ -2257,6 +2257,8 @@ def _terminal_runner_document(status: str) -> dict[str, object]:
 @pytest.mark.parametrize("outcome", ["ok", "refused", "failed"])
 def test_terminal_outcomes_persist_full_runner_document(tmp_path, monkeypatch, outcome):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    logged = []
+    monkeypatch.setattr(web_events, "_safe_log", logged.append)
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
     client = app_module.socketio.test_client(app)
@@ -2269,7 +2271,8 @@ def test_terminal_outcomes_persist_full_runner_document(tmp_path, monkeypatch, o
             return outcome == "ok"
 
         def result_document(self):
-            return _terminal_runner_document(outcome)
+            recorded_outcome = "failed" if outcome == "ok" else "ok"
+            return _terminal_runner_document(recorded_outcome)
 
     if outcome == "ok":
         monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
@@ -2317,33 +2320,53 @@ def test_terminal_outcomes_persist_full_runner_document(tmp_path, monkeypatch, o
         }
         if outcome != "ok":
             assert artifact["failure"]["error_message"]
+        assert any(
+            f"observed={outcome!r}; using observed outcome" in message
+            for message in logged
+        )
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
 
 
-def test_real_web_session_uses_canonical_runner_projector(tmp_path, monkeypatch):
+@pytest.mark.parametrize(
+    ("submitted_patch", "expected_patch", "expected_pins"),
+    [
+        (None, {}, []),
+        (
+            {"campaigns": {"C4": {"temp_range_C": [1600.0, 1660.0]}}},
+            {"campaigns": {"C4": {"temp_range_C": [1600.0, 1660.0]}}},
+            ["campaigns.C4.temp_range_C"],
+        ),
+    ],
+)
+def test_real_web_session_uses_canonical_runner_projector(
+    tmp_path,
+    monkeypatch,
+    submitted_patch,
+    expected_patch,
+    expected_pins,
+):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
     client = app_module.socketio.test_client(app)
     before = set(_simulations)
-    setpoints_patch = {
-        "campaigns": {"C4": {"temp_range_C": [1600.0, 1660.0]}}
-    }
 
     try:
+        submission = {
+            "backend": "internal-analytical",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+            "speed": 0,
+            "track": "pyrolysis",
+        }
+        if submitted_patch is not None:
+            submission["setpoints_patch"] = submitted_patch
         client.emit(
             "start_simulation",
-            {
-                "backend": "internal-analytical",
-                "feedstock": "lunar_mare_low_ti",
-                "mass_kg": 1000,
-                "speed": 0,
-                "track": "pyrolysis",
-                "setpoints_patch": setpoints_patch,
-            },
+            submission,
         )
         sid = (set(_simulations) - before).pop()
         state = _simulations[sid]
@@ -2363,8 +2386,8 @@ def test_real_web_session_uses_canonical_runner_projector(tmp_path, monkeypatch)
         assert run_metadata["backend"] == "internal-analytical"
         assert run_metadata["cost_rollup_diagnostic"]
         assert artifact["header"]["recipe_snapshot"] == {
-            "setpoints_patch": setpoints_patch,
-            "pins": ["campaigns.C4.temp_range_C"],
+            "setpoints_patch": expected_patch,
+            "pins": expected_pins,
             "recipe_schema_version": "recipe-schema-v1",
         }
     finally:
@@ -2485,7 +2508,12 @@ def test_empty_setpoint_resolution_omits_effective_config():
     assert "effective_config" not in payload
 
 
-def test_persist_failure_never_emits_simulation_complete(tmp_path, monkeypatch):
+@pytest.mark.parametrize("terminal_path", ["ok", "refused", "failed", "c6_refused"])
+def test_persist_failure_visible_on_all_terminal_paths(
+    tmp_path,
+    monkeypatch,
+    terminal_path,
+):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
@@ -2494,10 +2522,48 @@ def test_persist_failure_never_emits_simulation_complete(tmp_path, monkeypatch):
 
     session = SimpleNamespace(
         simulator=SimpleNamespace(_poisoned_hour=None),
-        is_complete=lambda: True,
-        result_document=lambda: _terminal_runner_document("ok"),
+        is_complete=lambda: terminal_path == "ok",
+        result_document=lambda: _terminal_runner_document(
+            "ok" if terminal_path == "ok" else "refused"
+        ),
     )
     monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+    if terminal_path == "refused":
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                KnudsenRegimeRefusal({"reason": "binding refusal"})
+            ),
+        )
+    elif terminal_path == "failed":
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                RuntimeError("terminal boom")
+            ),
+        )
+    elif terminal_path == "c6_refused":
+        monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: iter([
+                SimpleNamespace(
+                    snapshot=object(),
+                    backend_error="",
+                    per_hour_summary={},
+                    campaign_summary={
+                        "c6_refusal_diagnostic": {
+                            "status": "refused",
+                            "diagnostic": {"reason_refused": "c6 refused"},
+                        }
+                    },
+                    decision_event=None,
+                )
+            ]),
+        )
     monkeypatch.setattr(
         web_events,
         "persist_run_artifact",
@@ -2524,11 +2590,102 @@ def test_persist_failure_never_emits_simulation_complete(tmp_path, monkeypatch):
         names = [event["name"] for event in client.get_received()]
         assert "simulation_complete" not in names
         assert "simulation_persistence_failed" in names
-        assert state["persistence_retry"]["runner_payload"]["status"] == "ok"
+        assert "persistence_retry" not in state
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
+
+
+def test_save_ok_completion_emit_failure_is_not_persistence_failure(
+    tmp_path,
+    monkeypatch,
+):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = app_module.socketio.test_client(app)
+    before = set(_simulations)
+    original_emit_if_current = web_events._emit_if_current
+
+    def fail_completion_emit(socketio, sid, run_id, event, payload):
+        if event == "simulation_complete":
+            raise RuntimeError("completion transport failed")
+        return original_emit_if_current(socketio, sid, run_id, event, payload)
+
+    monkeypatch.setattr(web_events, "_emit_if_current", fail_completion_emit)
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        state["session"] = SimpleNamespace(
+            simulator=SimpleNamespace(_poisoned_hour=None),
+            is_complete=lambda: True,
+            result_document=lambda: _terminal_runner_document("ok"),
+        )
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        events = client.get_received()
+        names = [event["name"] for event in events]
+        statuses = [
+            event["args"][0]
+            for event in events
+            if event["name"] == "simulation_status"
+        ]
+        assert "simulation_complete" not in names
+        assert "simulation_persistence_failed" not in names
+        assert statuses[-1]["reason"] == "completion_emit_failed"
+        assert state["artifact_persisted"] is True
+        assert RunArtifactStore(tmp_path / "runs").load(state["run_id"]) is not None
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_reduced_terminal_payload_preserves_available_submission_provenance():
+    projector = SimpleNamespace(
+        setpoints_patch={},
+        run_metadata_overrides={"started_at_utc": "2026-07-15T12:00:00Z"},
+    )
+    session = SimpleNamespace(
+        _config=SimpleNamespace(
+            feedstock_id="lunar_mare_low_ti",
+            mass_kg=1000.0,
+            backend_name="stub",
+            track="pyrolysis",
+        ),
+        simulator=SimpleNamespace(melt=SimpleNamespace(hour=3)),
+        per_hour_summaries=lambda: [],
+    )
+
+    payload = web_events._available_runner_payload(
+        session,
+        projector=projector,
+        status="failed",
+        reason="runner_projection_failed",
+        error_message="projection failed",
+        refusal_diagnostic=None,
+    )
+
+    assert payload["run_metadata"]["started_at_utc"] == "2026-07-15T12:00:00Z"
+    assert payload["recipe_snapshot"] == {
+        "setpoints_patch": {},
+        "pins": [],
+        "recipe_schema_version": "recipe-schema-v1",
+    }
 
 
 @pytest.mark.parametrize("failure_site", ["completion", "tick", "emit"])

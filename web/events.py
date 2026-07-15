@@ -983,6 +983,19 @@ def _effective_config_from_setpoints(
     return effective_config
 
 
+def _recipe_snapshot_from_projector(projector) -> dict[str, object] | None:
+    if projector is None:
+        return None
+    setpoints_patch = getattr(projector, 'setpoints_patch', None)
+    if not isinstance(setpoints_patch, Mapping):
+        return None
+    return {
+        'setpoints_patch': copy.deepcopy(dict(setpoints_patch)),
+        'pins': sorted(_mapping_leaf_paths(setpoints_patch)),
+        'recipe_schema_version': recipe_schema_version,
+    }
+
+
 def _full_runner_payload(
     session,
     *,
@@ -1000,9 +1013,23 @@ def _full_runner_payload(
         recorded = None
     if isinstance(recorded, Mapping):
         payload = copy.deepcopy(dict(recorded))
-        payload.setdefault('status', status)
-        payload.setdefault('reason', reason)
-        payload.setdefault('error_message', error_message)
+        recorded_status = payload.get('status')
+        if recorded_status != status:
+            _safe_log(
+                'Recorded terminal outcome conflicts with observed outcome: '
+                f'recorded={recorded_status!r}, observed={status!r}; '
+                'using observed outcome'
+            )
+        payload['status'] = status
+        payload['reason'] = reason
+        payload['error_message'] = error_message
+        if refusal_diagnostic is not None:
+            payload['refusal_diagnostic'] = copy.deepcopy(
+                dict(refusal_diagnostic)
+            )
+        recipe_snapshot = _recipe_snapshot_from_projector(projector)
+        if recipe_snapshot is not None:
+            payload['recipe_snapshot'] = recipe_snapshot
         return payload
 
     sim = session.simulator
@@ -1029,20 +1056,16 @@ def _full_runner_payload(
         int(getattr(sim.melt, 'hour', 0)),
     )
     payload = active_projector._build_output(execution)
-    if active_projector.setpoints_patch:
-        payload['recipe_snapshot'] = {
-            'setpoints_patch': copy.deepcopy(
-                dict(active_projector.setpoints_patch)
-            ),
-            'pins': sorted(_mapping_leaf_paths(active_projector.setpoints_patch)),
-            'recipe_schema_version': recipe_schema_version,
-        }
+    recipe_snapshot = _recipe_snapshot_from_projector(active_projector)
+    if recipe_snapshot is not None:
+        payload['recipe_snapshot'] = recipe_snapshot
     return payload
 
 
 def _available_runner_payload(
     session,
     *,
+    projector=None,
     status: str,
     reason: str,
     error_message: str,
@@ -1059,6 +1082,11 @@ def _available_runner_payload(
             'backend': config.backend_name,
             'track': config.track,
         }
+    metadata_overrides = getattr(projector, 'run_metadata_overrides', None)
+    if isinstance(metadata_overrides, Mapping):
+        started_at_utc = metadata_overrides.get('started_at_utc')
+        if started_at_utc:
+            metadata['started_at_utc'] = copy.deepcopy(started_at_utc)
     melt = getattr(sim, 'melt', None) if sim is not None else None
     if melt is not None:
         metadata['hours_completed'] = int(getattr(melt, 'hour', 0))
@@ -1068,7 +1096,7 @@ def _available_runner_payload(
         )
     summaries_builder = getattr(session, 'per_hour_summaries', None)
     summaries = summaries_builder() if callable(summaries_builder) else []
-    return {
+    payload = {
         'schema_version': 'web-reduced-terminal-v1',
         'run_metadata': metadata,
         'per_hour_summary': copy.deepcopy(list(summaries)),
@@ -1076,6 +1104,10 @@ def _available_runner_payload(
         'reason': reason,
         'error_message': error_message,
     }
+    recipe_snapshot = _recipe_snapshot_from_projector(projector)
+    if recipe_snapshot is not None:
+        payload['recipe_snapshot'] = recipe_snapshot
+    return payload
 
 
 def _start_background_loop(
@@ -1114,6 +1146,7 @@ def _start_background_loop(
                 fallback_status = 'failed' if status == 'ok' else status
                 runner_payload = _available_runner_payload(
                     session,
+                    projector=projector,
                     status=fallback_status,
                     reason=(reason or 'runner_projection_failed'),
                     error_message=(
@@ -1137,15 +1170,6 @@ def _start_background_loop(
             )
         except Exception as exc:  # noqa: BLE001 -- durability is client-visible
             _safe_log(f'Run artifact persistence failed: {exc}')
-            with _simulations_guard:
-                current = _simulations.get(sid)
-                if current is not None and current.get('run_id') == run_id:
-                    current['persistence_retry'] = {
-                        'runner_payload': locals().get('runner_payload'),
-                        'status': status,
-                        'reason': reason,
-                        'error_message': error_message,
-                    }
             try:
                 _emit_if_current(
                     socketio,
@@ -1155,17 +1179,15 @@ def _start_background_loop(
                     {
                         'status': 'persistence_failed',
                         'message': str(exc),
-                        'retryable': True,
                     },
                 )
-            except Exception as emit_exc:  # noqa: BLE001 -- preserve retry state
+            except Exception as emit_exc:  # noqa: BLE001 -- log lost visibility
                 _safe_log(f'Persistence failure emission failed: {emit_exc}')
             return None
         with _simulations_guard:
             current = _simulations.get(sid)
             if current is not None and current.get('run_id') == run_id:
                 current['artifact_persisted'] = True
-                current.pop('persistence_retry', None)
         return artifact
 
     def stop_with_status(payload: Mapping[str, object]) -> None:
@@ -1268,6 +1290,10 @@ def _start_background_loop(
                                 'message': 'Run finished with a failed terminal result',
                             })
                             break
+                    except Exception as exc:  # noqa: BLE001 -- loop boundary
+                        stop_for_failure(exc, session, sim)
+                        break
+                    try:
                         emitted = _emit_if_current(
                             socketio,
                             sid,
@@ -1275,8 +1301,13 @@ def _start_background_loop(
                             'simulation_complete',
                             completion_payload,
                         )
-                    except Exception as exc:  # noqa: BLE001 -- loop boundary
-                        stop_for_failure(exc, session, sim)
+                    except Exception as exc:  # noqa: BLE001 -- transport boundary
+                        _safe_log(f'Simulation completion emission failed: {exc}')
+                        stop_with_status({
+                            'status': 'error',
+                            'reason': 'completion_emit_failed',
+                            'message': str(exc),
+                        })
                         break
                     if not emitted:
                         break
