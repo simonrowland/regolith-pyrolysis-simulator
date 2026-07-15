@@ -80,11 +80,29 @@ class LiquidusDiagnostics:
     phases_present: Tuple[str, ...] = ()
     phase_modes_wt_pct: Mapping[str, float] = field(default_factory=dict)
     phase_masses_kg: Mapping[str, float] = field(default_factory=dict)
+    phase_compositions: Mapping[str, Mapping[str, float]] = field(
+        default_factory=dict
+    )
+    phase_thermo: Mapping[str, Mapping[str, Optional[float]]] = field(
+        default_factory=dict
+    )
+    solid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
+    bulk_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
     liquid_fraction: Optional[float] = None
     liquid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
     liquid_fraction_path: Tuple[Mapping[str, Any], ...] = ()
     activity_coefficients: Mapping[str, float] = field(default_factory=dict)
     fO2_log: Optional[float] = None
+    system_enthalpy: Optional[float] = None
+    system_entropy: Optional[float] = None
+    system_volume: Optional[float] = None
+    system_heat_capacity_Cp: Optional[float] = None
+    system_dVdP: Optional[float] = None
+    system_dVdT: Optional[float] = None
+    system_fO2_delta_QFM: Optional[float] = None
+    system_solid_density_rhos: Optional[float] = None
+    system_phi: Optional[float] = None
+    system_chisqr: Optional[float] = None
     fe_redox_policy: str = 'intrinsic'
     applied_fe3fet: Optional[float] = None
     intrinsic_fO2_log: Optional[float] = None
@@ -94,6 +112,8 @@ class LiquidusDiagnostics:
     backend_warnings: Tuple[str, ...] = ()
     backend_diagnostics: Mapping[str, Any] = field(default_factory=dict)
     backend_status_reason: Optional[str] = None
+    chem_potentials: Optional[Mapping[str, Mapping[str, float]]] = None
+    phase_affinities: Optional[Mapping[str, Mapping[str, Any]]] = None
 
     def __post_init__(self) -> None:
         # Coerce mappings to plain dict so the asdict() projection drops
@@ -108,6 +128,77 @@ class LiquidusDiagnostics:
             self,
             'phase_masses_kg',
             {str(k): float(v) for k, v in dict(self.phase_masses_kg or {}).items()},
+        )
+        object.__setattr__(
+            self,
+            'phase_compositions',
+            {
+                str(phase): {
+                    str(component): float(value)
+                    for component, value in dict(composition or {}).items()
+                }
+                for phase, composition in dict(
+                    self.phase_compositions or {}
+                ).items()
+            },
+        )
+        object.__setattr__(
+            self,
+            'phase_thermo',
+            {
+                str(phase): {
+                    str(name): None if value is None else float(value)
+                    for name, value in dict(values or {}).items()
+                }
+                for phase, values in dict(self.phase_thermo or {}).items()
+            },
+        )
+        object.__setattr__(
+            self,
+            'chem_potentials',
+            (
+                None
+                if self.chem_potentials is None
+                else {
+                    str(phase): {
+                        str(component): float(value)
+                        for component, value in dict(values or {}).items()
+                    }
+                    for phase, values in self.chem_potentials.items()
+                }
+            ),
+        )
+        object.__setattr__(
+            self,
+            'phase_affinities',
+            (
+                None
+                if self.phase_affinities is None
+                else {
+                    str(phase): dict(values)
+                    for phase, values in self.phase_affinities.items()
+                }
+            ),
+        )
+        object.__setattr__(
+            self,
+            'solid_composition_wt_pct',
+            {
+                str(component): float(value)
+                for component, value in dict(
+                    self.solid_composition_wt_pct or {}
+                ).items()
+            },
+        )
+        object.__setattr__(
+            self,
+            'bulk_composition_wt_pct',
+            {
+                str(component): float(value)
+                for component, value in dict(
+                    self.bulk_composition_wt_pct or {}
+                ).items()
+            },
         )
         object.__setattr__(
             self,
@@ -161,6 +252,21 @@ class LiquidusDiagnostics:
             object.__setattr__(self, 'solidus_T_C', float(self.solidus_T_C))
         if self.fO2_log is not None:
             object.__setattr__(self, 'fO2_log', float(self.fO2_log))
+        for name in (
+            'system_enthalpy',
+            'system_entropy',
+            'system_volume',
+            'system_heat_capacity_Cp',
+            'system_dVdP',
+            'system_dVdT',
+            'system_fO2_delta_QFM',
+            'system_solid_density_rhos',
+            'system_phi',
+            'system_chisqr',
+        ):
+            value = getattr(self, name)
+            if value is not None:
+                object.__setattr__(self, name, float(value))
         if self.applied_fe3fet is not None:
             object.__setattr__(self, 'applied_fe3fet', float(self.applied_fe3fet))
         if self.intrinsic_fO2_log is not None:

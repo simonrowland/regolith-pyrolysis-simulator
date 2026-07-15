@@ -679,6 +679,25 @@ def test_provider_handles_silicate_equilibrium_intent():
 
 def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
     legacy = _build_equilibrium_for_basalt(liquidus_C=1290.0)
+    legacy.phase_compositions = {
+        'olivine': {'SiO2': 40.0, 'FeO': 20.0, 'MgO': 40.0}
+    }
+    legacy.phase_thermo = {
+        'olivine': {
+            'enthalpy': -181990.7,
+            'density_kg_m3': 3333.3333333333335,
+        }
+    }
+    legacy.chem_potentials = {'liquid': {'SiO2': -1234567.89}}
+    legacy.phase_affinities = {
+        'quartz': {'affinity': 321.0, 'composition': 'SiO2'}
+    }
+    legacy.solid_composition_wt_pct = {'SiO2': 40.0, 'FeO': 20.0, 'MgO': 40.0}
+    legacy.bulk_composition_wt_pct = {'SiO2': 49.0, 'FeO': 10.0}
+    legacy.system_enthalpy = -1059377.1
+    legacy.system_fO2_delta_QFM = -4.229
+    legacy.system_solid_density_rhos = 2912.028
+    legacy.system_phi = 0.8
     legacy.diagnostics = {
         'backend_status': 'out_of_domain',
         'requested_temperature_C': 1425.0,
@@ -715,6 +734,22 @@ def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
     assert result.liquid_viscosity_Pa_s == pytest.approx(2.5)
     assert result.liquid_density_kg_m3 == pytest.approx(2650.0)
     assert result.liquidus_T_C == pytest.approx(1290.0)
+    assert result.phase_compositions['olivine'] == pytest.approx(
+        legacy.phase_compositions['olivine']
+    )
+    assert result.phase_thermo == legacy.phase_thermo
+    assert result.chem_potentials == legacy.chem_potentials
+    assert result.phase_affinities == legacy.phase_affinities
+    assert result.solid_composition_wt_pct == pytest.approx(
+        legacy.solid_composition_wt_pct
+    )
+    assert result.bulk_composition_wt_pct == pytest.approx(
+        legacy.bulk_composition_wt_pct
+    )
+    assert result.system_enthalpy == pytest.approx(-1059377.1)
+    assert result.system_fO2_delta_QFM == pytest.approx(-4.229)
+    assert result.system_solid_density_rhos == pytest.approx(2912.028)
+    assert result.system_phi == pytest.approx(0.8)
     assert result.activity_coefficients == pytest.approx({'SiO2': 0.95, 'FeO': 1.1})
     assert result.fO2_log == pytest.approx(-8.25)
     assert result.diagnostics == legacy.diagnostics

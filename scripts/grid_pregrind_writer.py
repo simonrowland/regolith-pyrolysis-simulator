@@ -89,6 +89,21 @@ GENERIC_OUTPUT_FIELDS = (
     "liquid_composition_wt_pct",
     "liquid_viscosity_Pa_s",
     "liquid_density_kg_m3",
+    "system_enthalpy",
+    "system_entropy",
+    "system_volume",
+    "system_heat_capacity_Cp",
+    "system_dVdP",
+    "system_dVdT",
+    "system_fO2_delta_QFM",
+    "system_solid_density_rhos",
+    "system_phi",
+    "system_chisqr",
+    "phase_thermo",
+    "chem_potentials",
+    "phase_affinities",
+    "solid_composition_wt_pct",
+    "bulk_composition_wt_pct",
     "vapor_pressures_Pa",
     "vapor_pressures_source",
     "activity_coefficients",
@@ -148,7 +163,7 @@ assert (
     len(GENERIC_OUTPUT_FIELDS)
     + len(ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS)
     + len(FINDER_OUTPUT_FIELDS)
-) == 59
+) == 74
 
 
 def utc_now() -> str:
@@ -383,6 +398,31 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     generic_liquid_viscosity_Pa_s_repr TEXT,
     generic_liquid_density_kg_m3 REAL,
     generic_liquid_density_kg_m3_repr TEXT,
+    generic_system_enthalpy REAL,
+    generic_system_enthalpy_repr TEXT,
+    generic_system_entropy REAL,
+    generic_system_entropy_repr TEXT,
+    generic_system_volume REAL,
+    generic_system_volume_repr TEXT,
+    generic_system_heat_capacity_Cp REAL,
+    generic_system_heat_capacity_Cp_repr TEXT,
+    generic_system_dVdP REAL,
+    generic_system_dVdP_repr TEXT,
+    generic_system_dVdT REAL,
+    generic_system_dVdT_repr TEXT,
+    generic_system_fO2_delta_QFM REAL,
+    generic_system_fO2_delta_QFM_repr TEXT,
+    generic_system_solid_density_rhos REAL,
+    generic_system_solid_density_rhos_repr TEXT,
+    generic_system_phi REAL,
+    generic_system_phi_repr TEXT,
+    generic_system_chisqr REAL,
+    generic_system_chisqr_repr TEXT,
+    generic_phase_thermo_json TEXT,
+    generic_chem_potentials_json TEXT,
+    generic_phase_affinities_json TEXT,
+    generic_solid_composition_wt_pct_json TEXT,
+    generic_bulk_composition_wt_pct_json TEXT,
     generic_vapor_pressures_Pa_json TEXT,
     generic_vapor_pressures_source_json TEXT,
     generic_activity_coefficients_json TEXT,
@@ -526,6 +566,7 @@ class GridCacheWriter:
             self._ensure_v2_provenance_columns()
             self._ensure_runmode_output_columns()
             self._ensure_claim_table()
+            self._set_metadata("schema_output_field_count", "74")
             self.connection.commit()
         else:
             self.connection.executescript(SCHEMA_SQL)
@@ -538,7 +579,7 @@ class GridCacheWriter:
                 "variant-local bookkeeping only; recompute reviewed canonical_state_bytes "
                 "from typed full-precision inputs; never transplant this hash",
             )
-            self._set_metadata("schema_output_field_count", "59")
+            self._set_metadata("schema_output_field_count", "74")
             self._set_metadata("schema_input_field_count", "25")
             self._set_metadata("grid_realization_revision", GRID_REALIZATION_REVISION)
             self._set_metadata("database_id", str(uuid.uuid4()), overwrite=False)
@@ -646,6 +687,31 @@ class GridCacheWriter:
                 "generic_requested_temperature_C_repr": "TEXT",
                 "generic_liquid_density_kg_m3": "REAL",
                 "generic_liquid_density_kg_m3_repr": "TEXT",
+                "generic_system_enthalpy": "REAL",
+                "generic_system_enthalpy_repr": "TEXT",
+                "generic_system_entropy": "REAL",
+                "generic_system_entropy_repr": "TEXT",
+                "generic_system_volume": "REAL",
+                "generic_system_volume_repr": "TEXT",
+                "generic_system_heat_capacity_Cp": "REAL",
+                "generic_system_heat_capacity_Cp_repr": "TEXT",
+                "generic_system_dVdP": "REAL",
+                "generic_system_dVdP_repr": "TEXT",
+                "generic_system_dVdT": "REAL",
+                "generic_system_dVdT_repr": "TEXT",
+                "generic_system_fO2_delta_QFM": "REAL",
+                "generic_system_fO2_delta_QFM_repr": "TEXT",
+                "generic_system_solid_density_rhos": "REAL",
+                "generic_system_solid_density_rhos_repr": "TEXT",
+                "generic_system_phi": "REAL",
+                "generic_system_phi_repr": "TEXT",
+                "generic_system_chisqr": "REAL",
+                "generic_system_chisqr_repr": "TEXT",
+                "generic_phase_thermo_json": "TEXT",
+                "generic_chem_potentials_json": "TEXT",
+                "generic_phase_affinities_json": "TEXT",
+                "generic_solid_composition_wt_pct_json": "TEXT",
+                "generic_bulk_composition_wt_pct_json": "TEXT",
                 "run_mode": "TEXT",
                 "applied_timeout_s": "REAL",
                 "applied_timeout_s_repr": "TEXT",
@@ -1431,6 +1497,51 @@ class GridCacheWriter:
             ),
             "generic_liquid_density_kg_m3_repr": _repr(
                 generic.get("liquid_density_kg_m3")
+            ),
+            "generic_system_enthalpy": _float(generic.get("system_enthalpy")),
+            "generic_system_enthalpy_repr": _repr(generic.get("system_enthalpy")),
+            "generic_system_entropy": _float(generic.get("system_entropy")),
+            "generic_system_entropy_repr": _repr(generic.get("system_entropy")),
+            "generic_system_volume": _float(generic.get("system_volume")),
+            "generic_system_volume_repr": _repr(generic.get("system_volume")),
+            "generic_system_heat_capacity_Cp": _float(
+                generic.get("system_heat_capacity_Cp")
+            ),
+            "generic_system_heat_capacity_Cp_repr": _repr(
+                generic.get("system_heat_capacity_Cp")
+            ),
+            "generic_system_dVdP": _float(generic.get("system_dVdP")),
+            "generic_system_dVdP_repr": _repr(generic.get("system_dVdP")),
+            "generic_system_dVdT": _float(generic.get("system_dVdT")),
+            "generic_system_dVdT_repr": _repr(generic.get("system_dVdT")),
+            "generic_system_fO2_delta_QFM": _float(
+                generic.get("system_fO2_delta_QFM")
+            ),
+            "generic_system_fO2_delta_QFM_repr": _repr(
+                generic.get("system_fO2_delta_QFM")
+            ),
+            "generic_system_solid_density_rhos": _float(
+                generic.get("system_solid_density_rhos")
+            ),
+            "generic_system_solid_density_rhos_repr": _repr(
+                generic.get("system_solid_density_rhos")
+            ),
+            "generic_system_phi": _float(generic.get("system_phi")),
+            "generic_system_phi_repr": _repr(generic.get("system_phi")),
+            "generic_system_chisqr": _float(generic.get("system_chisqr")),
+            "generic_system_chisqr_repr": _repr(generic.get("system_chisqr")),
+            "generic_phase_thermo_json": _json(generic.get("phase_thermo")),
+            "generic_chem_potentials_json": _json(
+                generic.get("chem_potentials")
+            ),
+            "generic_phase_affinities_json": _json(
+                generic.get("phase_affinities")
+            ),
+            "generic_solid_composition_wt_pct_json": _json(
+                generic.get("solid_composition_wt_pct")
+            ),
+            "generic_bulk_composition_wt_pct_json": _json(
+                generic.get("bulk_composition_wt_pct")
             ),
             "generic_vapor_pressures_Pa_json": _json(generic.get("vapor_pressures_Pa")),
             "generic_vapor_pressures_source_json": _json(

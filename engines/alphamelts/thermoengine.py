@@ -90,6 +90,10 @@ class ThermoEnginePayload:
 
     phases_present: tuple[str, ...] = ()
     phase_masses_kg: Mapping[str, float] = field(default_factory=dict)
+    phase_compositions: Mapping[str, Mapping[str, float]] = field(default_factory=dict)
+    phase_thermo: Mapping[str, Mapping[str, float]] = field(default_factory=dict)
+    chem_potentials: Mapping[str, Mapping[str, float]] = field(default_factory=dict)
+    phase_affinities: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
     liquid_fraction: float = 0.0
     liquid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
     activity_coefficients: Mapping[str, float] = field(default_factory=dict)
@@ -473,6 +477,62 @@ print('ok')
             max(0.0, min(1.0, liquid_mass_kg / total_mass_kg))
             if total_mass_kg > 0.0 else 0.0
         )
+        phase_compositions = {
+            phase: self._strict_finite_mapping(
+                melts.get_composition_of_phase(root, phase, 'oxide_wt'),
+                context=f'ThermoEngine {phase} phase composition',
+            )
+            for phase in phases
+        }
+        property_names = {
+            'gibbs_free_energy': 'GibbsFreeEnergy',
+            'enthalpy': 'Enthalpy',
+            'entropy': 'Entropy',
+            'volume': 'Volume',
+            'heat_capacity_Cp': 'HeatCapacity',
+            'density_kg_m3': 'Density',
+        }
+        phase_thermo: dict[str, dict[str, float]] = {}
+        for phase in phases:
+            values = {
+                name: self._strict_finite_float(
+                    melts.get_property_of_phase(root, phase, property_name),
+                    context=f'ThermoEngine {phase} {property_name}',
+                )
+                for name, property_name in property_names.items()
+            }
+            values['density_kg_m3'] *= 1000.0
+            phase_thermo[phase] = values
+        chem_potentials = {
+            phase: self._strict_finite_mapping(
+                melts.get_thermo_properties_of_phase_components(
+                    root, phase, mode='mu'
+                ),
+                context=f'ThermoEngine {phase} chemical potentials',
+            )
+            for phase in phases
+        }
+        raw_affinities = melts.get_dictionary_of_affinities(root, sort=False)
+        if not isinstance(raw_affinities, Mapping):
+            raise ValueError(
+                'ThermoEngine phase affinities must be a mapping; '
+                f'got {type(raw_affinities).__name__}'
+            )
+        phase_affinities: dict[str, dict[str, Any]] = {}
+        for phase, raw_value in raw_affinities.items():
+            if not isinstance(raw_value, (list, tuple)) or len(raw_value) != 2:
+                raise ValueError(
+                    f'ThermoEngine phase affinity {phase!r} must be '
+                    f'(affinity, composition); got {raw_value!r}'
+                )
+            affinity, composition = raw_value
+            phase_affinities[str(phase)] = {
+                'affinity': self._strict_finite_float(
+                    affinity,
+                    context=f'ThermoEngine {phase} phase affinity',
+                ),
+                'composition': str(composition),
+            }
         # Autoreview r4 P2 (2026-05-27): only emit a liquid composition
         # / activities / Fe-redox split when ThermoEngine actually
         # reports a liquid phase.  The prior code fell back to the
@@ -522,6 +582,10 @@ print('ok')
         return ThermoEnginePayload(
             phases_present=phases,
             phase_masses_kg=phase_masses_kg,
+            phase_compositions=phase_compositions,
+            phase_thermo=phase_thermo,
+            chem_potentials=chem_potentials,
+            phase_affinities=phase_affinities,
             liquid_fraction=liquid_fraction,
             liquid_composition_wt_pct=liquid_comp,
             activity_coefficients=activities,
@@ -915,6 +979,34 @@ print('ok')
                 continue
             if math.isfinite(number):
                 result[str(key)] = number
+        return result
+
+    def _strict_finite_mapping(
+        self,
+        values: Mapping[str, Any],
+        *,
+        context: str,
+    ) -> dict[str, float]:
+        if not isinstance(values, Mapping):
+            raise ValueError(
+                f'{context} must be a mapping; got {type(values).__name__}'
+            )
+        return {
+            str(key): self._strict_finite_float(
+                value,
+                context=f'{context} {key!r}',
+            )
+            for key, value in values.items()
+        }
+
+    @staticmethod
+    def _strict_finite_float(value: Any, *, context: str) -> float:
+        try:
+            result = float(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f'{context} is not numeric: {value!r}') from exc
+        if not math.isfinite(result):
+            raise ValueError(f'{context} is not finite: {value!r}')
         return result
 
 
