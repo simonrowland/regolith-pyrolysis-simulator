@@ -55,7 +55,7 @@ def test_no_source_page_and_htmx_partial_are_typed_and_do_not_resolve_artifacts(
     assert response.status_code == 200
     assert b'data-state="no_data"' in response.data
     assert b"This page never launches a simulation" in response.data
-    assert b"thermal-train-default-artifact-v1" in response.data
+    assert b"thermal-train-default-artifact-v2" in response.data
     assert b"Load versioned default" in response.data
     partial = client.get("/partials/thermal-train-report")
     assert partial.status_code == 200
@@ -69,15 +69,15 @@ def test_versioned_default_artifact_is_exact_and_read_only(client, monkeypatch) 
         "_optimizer_result_row",
         lambda *_args, **_kwargs: pytest.fail("default artifact queried optimizer store"),
     )
-    response = client.get("/thermal-train?default_artifact=thermal-train-default-v1")
+    response = client.get("/thermal-train?default_artifact=thermal-train-default-v2")
     assert response.status_code == 200
     assert b'data-state="artifact"' in response.data
     assert b"Read-only versioned default artifact report" in response.data
     artifact = json.loads(
-        Path("data/fixtures/thermal_train/default-v1.json").read_text(encoding="utf-8")
+        Path("data/fixtures/thermal_train/default-v2.json").read_text(encoding="utf-8")
     )
-    assert artifact["artifact_schema_version"] == "thermal-train-default-artifact-v1"
-    assert artifact["artifact_id"] == "thermal-train-default-v1"
+    assert artifact["artifact_schema_version"] == "thermal-train-default-artifact-v2"
+    assert artifact["artifact_id"] == "thermal-train-default-v2"
     assert artifact["config"] == {
         "c3_shuttle_enabled": True,
         "c3_shuttle_recipe": {"K_kg": 0.0, "Na_kg": 12.0},
@@ -93,7 +93,7 @@ def test_versioned_default_artifact_is_exact_and_read_only(client, monkeypatch) 
     assert artifact["provenance"]["backend_name"] == "internal-analytical"
     assert artifact["provenance"]["backend_policy"] == "runner-strict"
     assert artifact["provenance"]["backend_evidence_class"] == "internal-analytical"
-    assert artifact["thermal_train_report"]["schema_version"] == "thermal-train-report-v1"
+    assert artifact["thermal_train_report"]["schema_version"] == "thermal-train-report-v2"
     assert artifact["thermal_train_report"]["peaks"]["hot_total_vapor_kg_hr"] > 0.0
 
 
@@ -129,7 +129,7 @@ def test_live_page_reads_named_view_for_browser_owned_run(client) -> None:
 
 def test_selected_optimizer_artifact_is_read_only_report_payload(client, monkeypatch) -> None:
     report = {
-        "schema_version": "thermal-train-report-v1",
+        "schema_version": "thermal-train-report-v2",
         "status": "closed",
         "train_closes_for_run": True,
         "snapshot_count": 2,
@@ -174,7 +174,7 @@ def test_selected_legacy_artifact_fails_closed_without_o2_series(client, monkeyp
 
 def test_passive_refusal_renders_reason_and_active_lift(client, monkeypatch) -> None:
     report = {
-        "schema_version": "thermal-train-report-v1",
+        "schema_version": "thermal-train-report-v2",
         "status": "incomplete",
         "train_closes_for_run": False,
         "snapshot_count": 1,

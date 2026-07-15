@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -41,6 +42,36 @@ def test_parameter_schema_rejects_unknown_and_missing_keys() -> None:
     payload["parameters"]["orphan"] = {"value": 1, "units": "x", "source_tag": "assumption"}
     with pytest.raises(ValueError, match="exactly"):
         normalize_thermal_train_parameters(payload, source="test")
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda payload: payload.update(extra_root=True),
+        lambda payload: payload["cold_train"]["rating"].update(extra_rating={}),
+        lambda payload: payload["cold_train"]["orifice"].update(extra_orifice={}),
+        lambda payload: payload["cold_train"]["relief"].update(extra_relief={}),
+        lambda payload: payload["cold_train"]["cycle"].update(extra_cycle={}),
+        lambda payload: payload["cold_train"]["rating"]["p_ref_Pa"].update(extra_entry=True),
+    ],
+)
+def test_raw_and_normalized_parameter_paths_refuse_unknown_keys(mutate) -> None:
+    raw = _raw()
+    mutate(raw)
+    with pytest.raises(ValueError, match="exactly"):
+        thermal_train_parameters_from_mapping(raw)
+
+    normalized = load_thermal_train_parameters()
+    mutate(normalized)
+    with pytest.raises(ValueError, match="exactly"):
+        thermal_train_parameters_from_mapping(normalized)
+
+
+def test_normalized_provenance_schema_is_closed() -> None:
+    normalized = deepcopy(load_thermal_train_parameters())
+    normalized["provenance"]["extra"] = True
+    with pytest.raises(ValueError, match="exactly"):
+        thermal_train_parameters_from_mapping(normalized)
     payload = _raw()
     del payload["display_prices"]["cryo_cost_per_W"]
     with pytest.raises(ValueError, match="exactly"):

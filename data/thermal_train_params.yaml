@@ -1,4 +1,4 @@
-schema_version: thermal-train-v1
+schema_version: thermal-train-v2
 parameters:
   eta_2ndlaw: {value: 0.30, units: fraction, source_tag: assumption}
   eta_isen: {value: 0.75, units: fraction, source_tag: assumption}
@@ -7,8 +7,8 @@ parameters:
   T_sink_day_K: {value: 250.0, units: K, source_tag: assumption}
   T_floor_K: {value: 150.0, units: K, source_tag: assumption}
   T_reject_K: {value: 300.0, units: K, source_tag: assumption}
-  P_suction_Pa: {value: 100.0, units: Pa, source_tag: assumption}
-  P_discharge_Pa: {value: 20000.0, units: Pa, source_tag: assumption}
+  P_suction_Pa: {value: 21000.0, units: Pa, source_tag: assumption}
+  P_discharge_Pa: {value: 600000.0, units: Pa, source_tag: assumption}
   n_compressor_stages: {value: 3, units: count, source_tag: assumption}
   T_frost_K: {value: 54.361, units: K, source_tag: assumption}
   T_storage_K: {value: 45.0, units: K, source_tag: assumption}
@@ -21,6 +21,25 @@ parameters:
     values:
       throat: {L_m: 0.05, Kn_threshold: 0.01}
       duct: {L_m: 0.30, Kn_threshold: 0.01}
+cold_train:
+  rating:
+    compressor_mass_flow_limit_kg_hr: {value: 12.0, units: kg/hr, source_tag: assumption, assumption_class: hardware_rating, range: [0.1, 1000.0], provenance: phase-2 design rating}
+    refrigeration_freeze_rate_kg_hr: {value: 9.856, units: kg/hr, source_tag: assumption, assumption_class: hardware_rating, range: [0.1, 1000.0], provenance: phase-2 design rating}
+    p_ref_Pa: {value: 45000.0, units: Pa, source_tag: assumption, assumption_class: rating_reference, range: [1000.0, 900000.0], provenance: phase-2 scalar-rating reference for later curve upgrade}
+    T_ref_K: {value: 120.0, units: K, source_tag: assumption, assumption_class: rating_reference, range: [54.361, 300.0], provenance: phase-2 scalar-rating reference for later curve upgrade}
+  orifice:
+    discharge_coefficient: {value: 0.80, units: fraction, source_tag: assumption, assumption_class: sizing_coefficient, range: [0.1, 1.0], provenance: owner-ratified worked sizing vector}
+    upstream_pressure_Pa: {value: 45000.0, units: Pa, source_tag: assumption, assumption_class: operating_setpoint, range: [1000.0, 900000.0], provenance: owner-ratified worked sizing vector}
+    upstream_temperature_K: {value: 120.0, units: K, source_tag: assumption, assumption_class: operating_setpoint, range: [100.0, 300.0], provenance: owner-ratified worked sizing vector}
+    back_pressure_Pa: {value: 21000.0, units: Pa, source_tag: assumption, assumption_class: operating_setpoint, range: [0.0, 500000.0], provenance: owner-ratified worked sizing vector}
+  relief:
+    k_relief_kg_hr_Pa: {value: 0.001, units: kg/hr/Pa, source_tag: assumption, assumption_class: relief_sizing, range: [0.000001, 1.0], provenance: phase-2 diagnostic assumption}
+    p_open_Pa: {value: 800000.0, units: Pa, source_tag: assumption, assumption_class: relief_setpoint, range: [1000.0, 2000000.0], provenance: phase-2 diagnostic assumption}
+    vessel_rating_Pa: {value: 1000000.0, units: Pa, source_tag: assumption, assumption_class: hardware_rating, range: [1000.0, 5000000.0], provenance: phase-2 diagnostic assumption}
+  cycle:
+    liquid_yield: {value: 0.25, units: fraction, source_tag: assumption, assumption_class: cycle_performance, range: [0.01, 1.0], provenance: phase-2 diagnostic assumption}
+    expander_bypass_fraction: {value: 0.20, units: fraction, source_tag: assumption, assumption_class: cycle_split, range: [0.0, 0.99], provenance: phase-2 diagnostic assumption}
+  endpoint: {value: liquefier_77K, units: enum, source_tag: assumption, assumption_class: process_endpoint, range: [liquefier_77K], provenance: owner-ratified phase-2 scope}
 display_prices:
   radiator_cost_per_m2: {value: 500.0, units: USD/m2, source_tag: owner-ratified-2026-07-13}
   compressor_cost_per_kW: {value: 2000.0, units: USD/kW, source_tag: owner-ratified-2026-07-13}

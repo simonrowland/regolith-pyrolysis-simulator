@@ -101,10 +101,10 @@ bp = Blueprint('web', __name__,
                static_folder='static')
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
-THERMAL_TRAIN_DEFAULT_ARTIFACT_ID = 'thermal-train-default-v1'
-THERMAL_TRAIN_DEFAULT_ARTIFACT_SCHEMA = 'thermal-train-default-artifact-v1'
+THERMAL_TRAIN_DEFAULT_ARTIFACT_ID = 'thermal-train-default-v2'
+THERMAL_TRAIN_DEFAULT_ARTIFACT_SCHEMA = 'thermal-train-default-artifact-v2'
 THERMAL_TRAIN_DEFAULT_ARTIFACT_PATH = (
-    DATA_DIR / 'fixtures' / 'thermal_train' / 'default-v1.json'
+    DATA_DIR / 'fixtures' / 'thermal_train' / 'default-v2.json'
 )
 OPTIMIZER_CACHE_NAME = 'cache.sqlite'
 OPTIMIZER_ARTIFACT_NAMES = (
@@ -3361,7 +3361,7 @@ def _load_default_thermal_train_artifact() -> dict[str, Any] | None:
         or artifact.get('artifact_id') != THERMAL_TRAIN_DEFAULT_ARTIFACT_ID
         or not isinstance(config, Mapping)
         or not isinstance(report, Mapping)
-        or report.get('schema_version') != 'thermal-train-report-v1'
+        or report.get('schema_version') != 'thermal-train-report-v2'
         or config.get('mass_kg') != 1000.0
         or config.get('track') != 'pyrolysis'
         or config.get('campaign') != 'C3_NA'
