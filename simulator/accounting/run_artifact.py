@@ -100,14 +100,21 @@ def build_run_artifact(
     if seed is not None:
         header["seed"] = seed
     c3_dose = run_metadata.get("c3_alkali_credit_dose_kg_by_species")
-    if c3_dose:
+    if (
+        isinstance(c3_dose, Mapping)
+        and c3_dose.get("Na") is not None
+        and c3_dose.get("K") is not None
+    ):
         header["c3_dose"] = {
-            "Na_kg": c3_dose.get("Na", 0.0),
-            "K_kg": c3_dose.get("K", 0.0),
+            "Na_kg": c3_dose["Na"],
+            "K_kg": c3_dose["K"],
         }
     recipe_snapshot = _recipe_snapshot(runner_payload)
     if recipe_snapshot is not None:
         header["recipe_snapshot"] = recipe_snapshot
+    effective_config = runner_payload.get("effective_config")
+    if effective_config is not None:
+        header["effective_config"] = copy.deepcopy(effective_config)
     artifact["header"] = header
     artifact["timesteps"] = [
         {"hour": row.get("hour"), "summary": row}
