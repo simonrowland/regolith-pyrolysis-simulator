@@ -73,7 +73,10 @@ FINDER_INPUT_FIELDS = (
 )
 
 INPUT_FIELDS = COMMON_INPUT_FIELDS + ALPHAMELTS_CONFIG_FIELDS + FINDER_INPUT_FIELDS
-POINT_PROVENANCE_FIELDS = ("kress91_partition_provenance",)
+POINT_PROVENANCE_FIELDS = (
+    "kress91_partition_provenance",
+    "kress91_fixed_ferric_fraction",
+)
 
 GENERIC_OUTPUT_FIELDS = (
     "temperature_C",
@@ -281,6 +284,8 @@ CREATE TABLE IF NOT EXISTS grid_keys (
     -- Provenance only: excluded from canonical_vector and expedited_key.
     intended_fO2_log REAL,
     intended_fO2_log_repr TEXT,
+    kress91_fixed_ferric_fraction REAL,
+    kress91_fixed_ferric_fraction_repr TEXT,
     kress91_partition_provenance_json TEXT,
     fO2_log REAL NOT NULL,
     fO2_log_repr TEXT NOT NULL,
@@ -363,6 +368,8 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     status TEXT NOT NULL,
     status_kind TEXT NOT NULL,
     refusal_reason TEXT,
+    failure_reason_code TEXT,
+    failure_message TEXT,
     raw_payload TEXT NOT NULL,
     raw_payload_format TEXT NOT NULL,
     timing_s REAL NOT NULL,
@@ -702,6 +709,8 @@ class GridCacheWriter:
         additions = {
             "intended_fO2_log": "REAL",
             "intended_fO2_log_repr": "TEXT",
+            "kress91_fixed_ferric_fraction": "REAL",
+            "kress91_fixed_ferric_fraction_repr": "TEXT",
             "kress91_partition_provenance_json": "TEXT",
         }
         for name, column_type in additions.items():
@@ -716,6 +725,8 @@ class GridCacheWriter:
                 "subprocess_run_mode": "TEXT",
             },
             "alphamelts_outputs": {
+                "failure_reason_code": "TEXT",
+                "failure_message": "TEXT",
                 "generic_requested_temperature_C": "REAL",
                 "generic_requested_temperature_C_repr": "TEXT",
                 "generic_liquid_density_kg_m3": "REAL",
@@ -758,6 +769,10 @@ class GridCacheWriter:
                         f'ALTER TABLE "{table}" ADD COLUMN '
                         f'"{name}" {column_type}'
                     )
+        self.connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_failure_reason "
+            "ON alphamelts_outputs(failure_reason_code, engine_epoch)"
+        )
 
     def _ensure_claim_table(self) -> None:
         self.connection.executescript(
@@ -895,7 +910,8 @@ class GridCacheWriter:
             vector = values["canonical_vector"]
             row = self.connection.execute(
                 "SELECT canonical_vector, batch_id, shuffle_rank, shard, "
-                "kress91_partition_provenance_json "
+                "kress91_partition_provenance_json, "
+                "kress91_fixed_ferric_fraction "
                 "FROM grid_keys WHERE expedited_key = ?",
                 (values["expedited_key"],),
             ).fetchone()
@@ -908,14 +924,35 @@ class GridCacheWriter:
             if existing_provenance is None:
                 self.connection.execute(
                     "UPDATE grid_keys "
-                    "SET kress91_partition_provenance_json = ? "
+                    "SET kress91_partition_provenance_json = ?, "
+                    "kress91_fixed_ferric_fraction = ?, "
+                    "kress91_fixed_ferric_fraction_repr = ? "
                     "WHERE expedited_key = ?",
-                    (point_provenance, values["expedited_key"]),
+                    (
+                        point_provenance,
+                        values["kress91_fixed_ferric_fraction"],
+                        values["kress91_fixed_ferric_fraction_repr"],
+                        values["expedited_key"],
+                    ),
                 )
             elif existing_provenance != point_provenance:
                 raise ValueError(
                     "Kress91 point provenance drift for expedited key "
                     f"{values['expedited_key']}"
+                )
+            elif (
+                row["kress91_fixed_ferric_fraction"] is None
+                and values["kress91_fixed_ferric_fraction"] is not None
+            ):
+                self.connection.execute(
+                    "UPDATE grid_keys SET kress91_fixed_ferric_fraction = ?, "
+                    "kress91_fixed_ferric_fraction_repr = ? "
+                    "WHERE expedited_key = ?",
+                    (
+                        values["kress91_fixed_ferric_fraction"],
+                        values["kress91_fixed_ferric_fraction_repr"],
+                        values["expedited_key"],
+                    ),
                 )
         return cursor.rowcount == 1
 
@@ -964,7 +1001,8 @@ class GridCacheWriter:
                 parameters.extend(int(value) for value in grid_key_ids)
             query = (
                 "SELECT g.id, g.expedited_key, g.canonical_vector, "
-                "g.kress91_partition_provenance_json, g.intended_fO2_log, "
+                "g.kress91_partition_provenance_json, "
+                "g.kress91_fixed_ferric_fraction, g.intended_fO2_log, "
                 "g.shuffle_rank, g.shard, g.timeout_s FROM grid_keys g "
                 "LEFT JOIN alphamelts_outputs o ON o.expedited_key = g.expedited_key "
                 "AND o.engine_epoch = ? "
@@ -1009,6 +1047,9 @@ class GridCacheWriter:
                     # Provenance is intentionally outside canonical key identity,
                     # but the drain must compare it with the persisted engine input.
                     "intended_fO2_log": row["intended_fO2_log"],
+                    "kress91_fixed_ferric_fraction": row[
+                        "kress91_fixed_ferric_fraction"
+                    ],
                     "kress91_partition_provenance": (
                         json.loads(row["kress91_partition_provenance_json"])
                         if row["kress91_partition_provenance_json"] is not None
@@ -1122,7 +1163,11 @@ class GridCacheWriter:
         self, grid_key_ids: Sequence[int]
     ) -> dict[str, dict[str, int]]:
         if not grid_key_ids:
-            return {"status": {}, "refusal_reason": {}}
+            return {
+                "status": {},
+                "refusal_reason": {},
+                "failure_reason_code": {},
+            }
         placeholders = ",".join("?" for _ in grid_key_ids)
         parameters = (self.engine_epoch, *(int(value) for value in grid_key_ids))
         status_rows = self.connection.execute(
@@ -1138,10 +1183,20 @@ class GridCacheWriter:
             "GROUP BY refusal_reason ORDER BY COUNT(*) DESC",
             parameters,
         )
+        failure_reason_rows = self.connection.execute(
+            "SELECT COALESCE(failure_reason_code, '<none>'), COUNT(*) "
+            "FROM alphamelts_outputs "
+            f"WHERE engine_epoch = ? AND grid_key_id IN ({placeholders}) "
+            "GROUP BY failure_reason_code ORDER BY COUNT(*) DESC",
+            parameters,
+        )
         return {
             "status": {str(name): int(count) for name, count in status_rows},
             "refusal_reason": {
                 str(name): int(count) for name, count in reason_rows
+            },
+            "failure_reason_code": {
+                str(name): int(count) for name, count in failure_reason_rows
             },
         }
 
@@ -1356,6 +1411,12 @@ class GridCacheWriter:
             "composition_kg_json": _json(inputs["composition_kg"]),
             "intended_fO2_log": _float(intended_fO2_log),
             "intended_fO2_log_repr": _repr(intended_fO2_log),
+            "kress91_fixed_ferric_fraction": _float(
+                inputs["kress91_fixed_ferric_fraction"]
+            ),
+            "kress91_fixed_ferric_fraction_repr": _repr(
+                inputs["kress91_fixed_ferric_fraction"]
+            ),
             "kress91_partition_provenance_json": _json(
                 inputs["kress91_partition_provenance"]
             ),
@@ -1495,6 +1556,8 @@ class GridCacheWriter:
             "status": str(output["status"]),
             "status_kind": str(output["status_kind"]),
             "refusal_reason": output.get("refusal_reason"),
+            "failure_reason_code": output.get("failure_reason_code"),
+            "failure_message": output.get("failure_message"),
             "raw_payload": str(output["raw_payload"]),
             "raw_payload_format": str(output["raw_payload_format"]),
             "timing_s": _float(output["timing_s"]),
@@ -1688,7 +1751,10 @@ class GridCacheWriter:
     def sample_row(self) -> dict[str, Any] | None:
         row = self.connection.execute(
             "SELECT o.id, o.expedited_key, h.temperature_C, h.pressure_bar, "
-            "h.intended_fO2_log, h.fO2_log AS adapter_fO2_log_argument, "
+            "h.intended_fO2_log, h.kress91_fixed_ferric_fraction, "
+            "CASE WHEN o.engine_mode = 'thermoengine' THEN NULL "
+            "ELSE h.fO2_log END AS adapter_fO2_log_argument, "
+            "o.generic_fO2_log AS solved_fO2_log, "
             "o.status, o.status_kind, o.engine_version, "
             "o.timing_s, o.generic_phases_present_json "
             "FROM alphamelts_outputs o JOIN grid_keys h ON h.id = o.grid_key_id "

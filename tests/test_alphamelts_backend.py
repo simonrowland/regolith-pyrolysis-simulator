@@ -2845,6 +2845,100 @@ def test_thermoengine_imposes_absolute_fo2_with_default_phase_solver(monkeypatch
     )
 
 
+def test_thermoengine_imposed_fo2_seeds_feo_only_bulk_with_positive_kress91(
+    monkeypatch,
+):
+    fractions = []
+
+    class FakeModel:
+        def __init__(self):
+            self.bulk_wt = {}
+
+        def set_bulk_composition(self, bulk_wt):
+            self.bulk_wt = dict(bulk_wt)
+
+        def equilibrate_tp(self, temperature_C, pressure_mpa, *, initialize):
+            return [('success', temperature_C, pressure_mpa, self)]
+
+    class FakeEquilibrate:
+        def MELTSmodel(self, *, version):
+            return FakeModel()
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._equilibrate = FakeEquilibrate()
+
+    def echo(model, _root, **_kwargs):
+        feo = model.bulk_wt['FeO'] / 71.8444
+        fe2o3 = model.bulk_wt['Fe2O3'] / 159.6882
+        fraction = 2.0 * fe2o3 / (feo + 2.0 * fe2o3)
+        fractions.append(fraction)
+        return -10.0 + 10.0 * fraction
+
+    monkeypatch.setattr(transport, '_echo_log_fO2', echo)
+    monkeypatch.setattr(
+        'simulator.fe_redox.kress91_split',
+        lambda **_kwargs: {'fe3': 0.2},
+    )
+
+    _model, _result, solved, _count = transport._solve_imposed_fO2(
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        pressure_mpa=0.1,
+        bulk_wt={'SiO2': 82.0, 'FeO': 18.0, 'Fe2O3': 0.0},
+        target_fO2_log=-8.0,
+    )
+
+    assert fractions[0] == pytest.approx(0.2)
+    assert fractions[0] > 0.0
+    assert solved == pytest.approx(-8.0)
+
+
+def test_thermoengine_echo_clamps_roundoff_negative_fe2o3_to_zero_limit():
+    class FakeMelts:
+        def get_list_of_phases_in_assemblage(self, _root):
+            return ('Liquid',)
+
+        def get_composition_of_phase(self, _root, _phase, _basis):
+            return {'SiO2': 83.0, 'FeO': 17.0, 'Fe2O3': -3.1e-14}
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._database = object()
+    transport._chem = types.SimpleNamespace(
+        OXIDE_ORDER=('SiO2', 'FeO', 'Fe2O3')
+    )
+
+    with pytest.raises(ValueError, match='zero-ferric limiting state'):
+        transport._echo_log_fO2(
+            FakeMelts(), object(), temperature_C=1600.0, pressure_bar=1.0
+        )
+
+
+def test_thermoengine_echo_rejects_negative_fe2o3_beyond_roundoff_tolerance():
+    class FakeMelts:
+        def get_list_of_phases_in_assemblage(self, _root):
+            return ('Liquid',)
+
+        def get_composition_of_phase(self, _root, _phase, _basis):
+            return {'SiO2': 83.0, 'FeO': 17.0, 'Fe2O3': -2.0e-12}
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._database = object()
+    transport._chem = types.SimpleNamespace(
+        OXIDE_ORDER=('SiO2', 'FeO', 'Fe2O3')
+    )
+
+    with pytest.raises(ValueError, match='physically negative beyond'):
+        transport._echo_log_fO2(
+            FakeMelts(), object(), temperature_C=1600.0, pressure_bar=1.0
+        )
+
+
 def test_thermoengine_imposed_fo2_fails_loud_on_buffered_region(monkeypatch):
     transport = ThermoEngineTransport(
         activity_converter=activity_from_chem_potential,

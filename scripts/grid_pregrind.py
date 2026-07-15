@@ -89,7 +89,11 @@ KRESS91_PARTITION_VERSION = "REF-001-kress-carmichael-1991"
 RAW_PAYLOAD_FORMAT = (
     "alphamelts-subprocess-capture-v3-isothermal-fO2-properties"
 )
-THERMOENGINE_RAW_PAYLOAD_FORMAT = "thermoengine-v1-imposed-fO2-properties"
+THERMOENGINE_RAW_PAYLOAD_FORMAT = (
+    "thermoengine-v2-kress91-fixed-ferric-intrinsic-properties"
+)
+FAILURE_REASON_CODE_MAX_LENGTH = 96
+FAILURE_MESSAGE_MAX_LENGTH = 512
 
 
 def kress91_partition_parameters():
@@ -695,9 +699,18 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
         intended_fO2_log=point.intended_fO2_log,
         pressure_bar=point.pressure_bar,
     )
+    total_fe_mol = composition_mol.get("FeO", 0.0) + (
+        2.0 * composition_mol.get("Fe2O3", 0.0)
+    )
+    fixed_ferric_fraction = (
+        None
+        if total_fe_mol <= 0.0
+        else 2.0 * composition_mol.get("Fe2O3", 0.0) / total_fe_mol
+    )
     values: dict[str, Any] = {
         "temperature_C": point.temperature_C,
         "kress91_partition_provenance": partition_provenance,
+        "kress91_fixed_ferric_fraction": fixed_ferric_fraction,
         "composition_kg": None,
         "fO2_log": point.intended_fO2_log,
         "pressure_bar": point.pressure_bar,
@@ -897,6 +910,8 @@ def _worker_failure_output(
         getattr(exc, "backend_failure_reason_code", None)
         or getattr(exc, "backend_status_reason", None)
     )
+    message = str(exc)
+    reason_code = _stable_failure_reason_code(exc, reason=reason)
     status = "timeout" if reason == "timeout" else "error"
     if reason == "missing_binary":
         status = "unavailable"
@@ -911,7 +926,7 @@ def _worker_failure_output(
         "captures": list(captures),
         "exception": {
             "type": type(exc).__name__,
-            "message": str(exc),
+            "message": message,
             "backend_failure_reason_code": reason,
             "backend_failure_category": getattr(
                 exc, "backend_failure_category", None
@@ -922,6 +937,8 @@ def _worker_failure_output(
         "status": status,
         "status_kind": "failure",
         "refusal_reason": str(reason or type(exc).__name__),
+        "failure_reason_code": reason_code,
+        "failure_message": message[:FAILURE_MESSAGE_MAX_LENGTH],
         "raw_payload": canonical_json(raw),
         "raw_payload_format": raw_payload_format,
         "timing_s": time.monotonic() - started,
@@ -943,7 +960,30 @@ def _worker_failure_output(
         "finder": {},
         "created_at": utc_now(),
         "host": socket.gethostname(),
-    }
+}
+
+
+def _stable_failure_reason_code(
+    exc: BaseException,
+    *,
+    reason: Any = None,
+) -> str:
+    message = str(exc).lower()
+    if "zero-ferric limiting state" in message:
+        value = "thermoengine_zero_ferric_limit"
+    elif "non-finite fo2 echo" in message:
+        value = "thermoengine_nonfinite_fo2_echo"
+    elif "thermoengine equilibrium status:" in message:
+        value = "thermoengine_equilibrium_status"
+    elif reason is not None:
+        value = str(reason)
+    else:
+        value = f"exception_{type(exc).__name__.lower()}"
+    stable = "".join(
+        char if char.isalnum() or char in {"_", "-"} else "_"
+        for char in value
+    ).strip("_")
+    return (stable or "exception_unknown")[:FAILURE_REASON_CODE_MAX_LENGTH]
 
 
 def _worker_refusal_output(
@@ -971,6 +1011,8 @@ def _worker_refusal_output(
         "status": "out_of_domain",
         "status_kind": "refusal",
         "refusal_reason": reason,
+        "failure_reason_code": reason[:FAILURE_REASON_CODE_MAX_LENGTH],
+        "failure_message": None,
         "raw_payload": canonical_json(raw),
         "raw_payload_format": raw_payload_format,
         "timing_s": time.monotonic() - started,
@@ -1075,7 +1117,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
     except (TypeError, ValueError):
         persisted_fO2_value = math.nan
         intended_fO2_value = math.nan
-    if job.engine_epoch >= 2 and (
+    if _WORKER_BACKEND_NAME == "subprocess" and job.engine_epoch >= 2 and (
         not math.isfinite(intended_fO2_value)
         or not math.isfinite(persisted_fO2_value)
         or persisted_fO2_value != intended_fO2_value
@@ -1125,10 +1167,23 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
     backend = _WORKER_BACKEND
     if _WORKER_BACKEND_NAME == "thermoengine":
         try:
+            total_fe_mol = float(composition_mol.get("FeO", 0.0)) + (
+                2.0 * float(composition_mol.get("Fe2O3", 0.0))
+            )
+            fixed_ferric_fraction = (
+                2.0 * float(composition_mol.get("Fe2O3", 0.0)) / total_fe_mol
+                if total_fe_mol > 0.0
+                else 0.0
+            )
+            if not 0.0 < fixed_ferric_fraction < 1.0:
+                raise ValueError(
+                    "ThermoEngine fixed-ferric grind requires strictly positive "
+                    "FeO and Fe2O3"
+                )
             result = backend.equilibrate(
                 temperature_C=job.inputs["temperature_C"],
                 composition_kg=job.inputs["composition_kg"],
-                fO2_log=job.inputs["fO2_log"],
+                fO2_log=None,
                 pressure_bar=job.inputs["pressure_bar"],
                 composition_mol=job.inputs["composition_mol"],
                 composition_mol_by_account=job.inputs[
@@ -1145,13 +1200,18 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 "status": result.status,
                 "status_kind": _status_kind(result.status, reason),
                 "refusal_reason": reason,
+                "failure_reason_code": None,
+                "failure_message": None,
                 "raw_payload": canonical_json(
                     {
                         "format": THERMOENGINE_RAW_PAYLOAD_FORMAT,
                         "engine_invoked": True,
                         "fO2_constraint": {
-                            "path": "Absolute",
-                            "offset": float(job.inputs["fO2_log"]),
+                            "path": "Kress91FixedFerricIntrinsic",
+                            "adapter_fO2_log_argument": None,
+                            "intended_fO2_log": intended_fO2_value,
+                            "fixed_ferric_fraction": fixed_ferric_fraction,
+                            "solved_fO2_log": result.fO2_log,
                         },
                     }
                 ),
@@ -1608,8 +1668,9 @@ def parser() -> argparse.ArgumentParser:
         "--fo2-grid",
         default=",".join(str(value) for value in DEFAULT_INTENDED_FO2_GRID),
         help=(
-            "absolute log10(fO2/bar) levels imposed on alphaMELTS and used "
-            "to pre-partition Fe2O3/FeO with Kress91"
+            "intended log10(fO2/bar) levels used to pre-partition Fe2O3/FeO "
+            "with Kress91; subprocess also imposes each level, while "
+            "ThermoEngine solves intrinsically on the fixed-ferric composition"
         ),
     )
     result.add_argument("--model", default="MELTSv1.0.2")
@@ -1989,6 +2050,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     cartesian_grid_points = (
         len(compositions) * len(temperatures) * len(intended_fO2_logs)
     )
+    engine_fO2_constraint = (
+        "absolute log10(fO2/bar) imposed after Kress91 partition"
+        if args.backend == "subprocess"
+        else (
+            "intrinsic ThermoEngine solve on Kress91 fixed-ferric composition; "
+            "intended log10(fO2/bar) retained as provenance"
+        )
+    )
     budget = {
         "major_simplex_points": len(major_compositions),
         "cr2o3_levels": len(composition_spec["cr2o3_levels_wt_pct"]),
@@ -2044,9 +2113,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 kress91_partition_by_temperature_C
             ),
             "pressure_bar_grid": [ENGINE_PRESSURE_BAR],
-            "engine_fO2_constraint": (
-                "absolute log10(fO2/bar) from each grid point"
-            ),
+            "engine_fO2_constraint": engine_fO2_constraint,
             "pre_filter_grid_points": filter_stats["unfiltered_grid_points"],
             "filtered_silicate_window_points": filter_stats[
                 "filtered_silicate_window_points"
@@ -2117,9 +2184,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     kress91_partition_by_temperature_C
                 ),
                 "pressure_bar_grid": [ENGINE_PRESSURE_BAR],
-                "engine_fO2_constraint": (
-                    "absolute log10(fO2/bar) from each grid point"
-                ),
+                "engine_fO2_constraint": engine_fO2_constraint,
                 "pre_filter_grid_points": filter_stats["unfiltered_grid_points"],
                 "filtered_silicate_window_points": filter_stats[
                     "filtered_silicate_window_points"

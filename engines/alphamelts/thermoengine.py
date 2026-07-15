@@ -44,6 +44,7 @@ _DEFAULT_WATCHDOG_GRACE_S = 0.25
 _THERMOENGINE_LOG_DIR_ENV = 'REGOLITH_THERMOENGINE_LOG_DIR'
 _FE_O_MOLAR_MASS = 71.8444
 _FE2_O3_MOLAR_MASS = 159.6882
+_FE2O3_ROUNDOFF_WT_TOLERANCE = 1.0e-12
 
 
 _MODEL_TO_THERMOENGINE = {
@@ -827,7 +828,23 @@ print('ok')
             raise ValueError(
                 'ThermoEngine cannot impose absolute fO2 without FeO/Fe2O3'
             )
-        initial_fraction = 2.0 * fe2o3_moles / total_fe_moles
+        from simulator.fe_redox import (
+            kress91_split,
+            melt_mol_fractions_for_kress91,
+        )
+
+        seed = kress91_split(
+            fO2_log=target_fO2_log,
+            mol_fractions=melt_mol_fractions_for_kress91(bulk_wt),
+            T_K=temperature_C + 273.15,
+            pressure_bar=pressure_bar,
+        )
+        initial_fraction = float(seed['fe3'])
+        if not math.isfinite(initial_fraction) or not 0.0 < initial_fraction < 1.0:
+            raise ValueError(
+                'ThermoEngine Kress91 fO2 seed must have a positive finite '
+                'ferric fraction below one'
+            )
         solve_count = 0
 
         def evaluate(ferric_fraction: float) -> tuple[Any, Any, float]:
@@ -1045,6 +1062,25 @@ print('ok')
         liquid = self._finite_mapping(
             melts.get_composition_of_phase(root, liquid_phase, 'oxide_wt')
         )
+        liquid_fe2o3 = float(liquid.get('Fe2O3', 0.0) or 0.0)
+        if liquid_fe2o3 < -_FE2O3_ROUNDOFF_WT_TOLERANCE:
+            raise ValueError(
+                'ThermoEngine liquid Fe2O3 is physically negative beyond the '
+                f'{_FE2O3_ROUNDOFF_WT_TOLERANCE:g} wt% roundoff tolerance'
+            )
+        if liquid_fe2o3 < 0.0:
+            # MELTS normalization can leave ~1e-14 wt% negative Fe2O3.  A
+            # 1e-12 wt% tolerance is two orders larger than that observed
+            # residue yet eleven orders below a 0.1 wt% reportable oxide.
+            # Clamp only to the physical zero-ferric boundary; never invent a
+            # positive ferric inventory to make Kress91 logarithms finite.
+            liquid['Fe2O3'] = 0.0
+            liquid_fe2o3 = 0.0
+        if liquid_fe2o3 == 0.0:
+            raise ValueError(
+                'ThermoEngine liquid Fe2O3 is at the zero-ferric limiting '
+                'state; finite Kress91 fO2 echo is undefined'
+            )
         import numpy as np
 
         wt = np.array([
@@ -1147,6 +1183,13 @@ print('ok')
     def _fe_redox_split(self, liquid_comp: Mapping[str, float]) -> dict[str, float]:
         feo_wt = float(liquid_comp.get('FeO', 0.0) or 0.0)
         fe2o3_wt = float(liquid_comp.get('Fe2O3', 0.0) or 0.0)
+        if fe2o3_wt < -_FE2O3_ROUNDOFF_WT_TOLERANCE:
+            raise ValueError(
+                'ThermoEngine liquid Fe2O3 is physically negative beyond the '
+                f'{_FE2O3_ROUNDOFF_WT_TOLERANCE:g} wt% roundoff tolerance'
+            )
+        if fe2o3_wt < 0.0:
+            fe2o3_wt = 0.0
         feo_mol = self._oxide_mol('FeO', feo_wt)
         fe2o3_mol = self._oxide_mol('Fe2O3', fe2o3_wt)
         total_fe_mol = feo_mol + 2.0 * fe2o3_mol
