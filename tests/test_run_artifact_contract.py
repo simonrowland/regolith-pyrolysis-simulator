@@ -212,6 +212,19 @@ def test_available_optional_header_fields_keep_verified_shapes(monkeypatch) -> N
     assert artifact["header"]["engine_identity"]["cache_version"] == "stub-cache-v1"
 
 
+def test_lifecycle_argument_is_validated_and_emitted() -> None:
+    payload = _runner_payload()
+
+    cancelled = build_run_artifact(payload, run_id="run-cx", lifecycle="cancelled")
+    assert cancelled["lifecycle"] == "cancelled"
+
+    default = build_run_artifact(payload, run_id="run-def")
+    assert default["lifecycle"] == "complete"
+
+    with pytest.raises(RunArtifactContractError, match="unknown lifecycle"):
+        build_run_artifact(payload, run_id="run-bad", lifecycle="aborted")
+
+
 @pytest.mark.parametrize(
     ("c3_dose", "expected"),
     [

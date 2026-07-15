@@ -11,6 +11,7 @@ from simulator.engine_local_config import cache_version_for
 
 ARTIFACT_SCHEMA_VERSION = "0.2.0"
 EXECUTION_STATUSES = frozenset({"ok", "partial", "refused", "failed"})
+LIFECYCLES = frozenset({"complete", "cancelled"})
 
 
 class RunArtifactContractError(ValueError):
@@ -61,8 +62,11 @@ def build_run_artifact(
     *,
     run_id: str,
     name: str | None = None,
+    lifecycle: str = "complete",
 ) -> dict[str, Any]:
     """Repackage a completed runner payload without running the engine."""
+    if lifecycle not in LIFECYCLES:
+        raise RunArtifactContractError(f"unknown lifecycle: {lifecycle!r}")
     run_metadata = runner_payload.get("run_metadata", {}) or {}
     per_hour = runner_payload.get("per_hour_summary", []) or []
     status = _execution_status(runner_payload)
@@ -70,7 +74,7 @@ def build_run_artifact(
     artifact: dict[str, Any] = {
         "artifact_schema_version": ARTIFACT_SCHEMA_VERSION,
         "execution_status": status,
-        "lifecycle": "complete",
+        "lifecycle": lifecycle,
     }
     if status != "ok":
         artifact["failure"] = {
