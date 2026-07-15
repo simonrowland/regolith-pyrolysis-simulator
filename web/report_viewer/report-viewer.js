@@ -1,6 +1,7 @@
 "use strict";
 
 const ARTIFACT_URL = "./sample-run-artifact.json";
+const SUPPORTED_ARTIFACT_SCHEMA_MAJOR = 0;
 const ELLINGHAM_ORDER = ["Na", "K", "Fe", "Cr", "Mn", "Mg", "Si", "Al", "Ti", "Ca"];
 const COLORS = ["#e8940f", "#1f7798", "#468466", "#8b63a6", "#a95c43", "#6f8c9e"];
 
@@ -13,7 +14,11 @@ const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(N
 const sum = (values) => values.reduce((total, value) => total + n(value), 0);
 const sumObject = (object) => sum(Object.values(object || {}));
 const kg = (value, digits = 3) => `${n(value).toLocaleString(undefined, { maximumFractionDigits: digits })} kg`;
-const exactKg = (value) => hasNumber(value) ? `${String(value)} kg` : "not emitted";
+const exactValue = (value, unit) => hasNumber(value)
+  ? `<span title="${esc(`${String(value)} ${unit}`)}">${Number(value).toLocaleString(undefined, { maximumSignificantDigits: 3 })} ${unit}</span>`
+  : "not emitted";
+const exactKg = (value) => exactValue(value, "kg");
+const exactMol = (value) => exactValue(value, "mol");
 const money = (value) => n(value).toLocaleString(undefined, { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 const sci = (value) => n(value) === 0 ? "0" : n(value).toExponential(3);
 
@@ -86,7 +91,8 @@ function makeHeader(artifact, rows, energy) {
   const header = artifact.header;
   const terminal = artifact.terminal;
   const finalMetal = rows.at(-1).metal_yields_kg || {};
-  const o2 = terminal.final_state?.["terminal.oxygen_mre_anode_stored"]?.O2 || rows.at(-1).O2_yield_kg_cumulative;
+  const o2 = rows.at(-1).O2_yield_kg_cumulative ?? null;
+  const hasCost = Boolean(header.cost_block);
   const status = artifact.execution_status;
   const failureText = [artifact.failure?.reason, artifact.failure?.error_message].filter(Boolean).join(" · ") || "No failure reason or error message was emitted in this artifact.";
   return `<header>
@@ -101,7 +107,7 @@ function makeHeader(artifact, rows, energy) {
       <span class="chip">charge ${kg(header.charge_mass_kg, 0)}</span>
       <span class="chip">engine ${esc(header.engine_identity?.name)}</span>
       <span class="chip">schema ${esc(artifact.artifact_schema_version)}</span>
-      <span class="chip accent">C3 dose ${Object.entries(header.c3_dose || {}).map(([key, value]) => `${key} ${value} kg`).join(" · ")}</span>
+      <span class="chip accent">C3 dose ${Object.entries(header.c3_dose || {}).map(([key, value]) => `${esc(key)} ${esc(value)} kg`).join(" · ")}</span>
     </div>
     <div class="status-banner ${["failed", "refused"].includes(status) ? "failed" : ""}">
       <div class="status-icon">${status === "ok" ? "✓" : "!"}</div><div><strong>Execution status: ${esc(status)}</strong>
@@ -109,9 +115,9 @@ function makeHeader(artifact, rows, energy) {
     </div>
     <div class="glance">
       <div class="metric"><div class="k">Fe evolved</div><div class="v">${kg(finalMetal.Fe || 0, 2)}</div></div>
-      <div class="metric"><div class="k">MRE anode O₂</div><div class="v">${kg(o2, 2)}</div></div>
+      <div class="metric"><div class="k">Cumulative O₂ yield</div><div class="v">${exactKg(o2)}</div></div>
       <div class="metric"><div class="k">Reported energy</div><div class="v">${(energy.electrical + energy.evaporation).toFixed(1)} <small>kWh electrical + evaporation</small></div></div>
-      <div class="metric"><div class="k">Two-price energy cost</div><div class="v">${money(energy.totalCost)}</div></div>
+      <div class="metric"><div class="k">Two-price energy cost</div><div class="v">${hasCost ? money(energy.totalCost) : "pending W-A5a"}</div></div>
     </div>
   </header>`;
 }
@@ -151,9 +157,9 @@ function processSection(artifact, rows, spans) {
 function ledgerSection(finalState) {
   const rows = Object.entries(finalState || {}).map(([account, species]) => {
     const entries = Object.entries(species || {});
-    return `<tr><td class="mono">${esc(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${esc(name)} ${esc(value)}`).join(" · ") : "empty"}</td><td class="num">${exactKg(sum(entries.map(([, value]) => value)))}</td></tr>`;
+    return `<tr><td class="mono">${esc(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${esc(name)} ${exactMol(value)}`).join(" · ") : "empty"}</td><td class="num">${exactMol(sum(entries.map(([, value]) => value)))}</td></tr>`;
   }).join("");
-  return section(3, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.", `<div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · exact kg</th><th class="num">Account total</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+  return section(3, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.", `<div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>`);
 }
 
 function campaignSection(artifact, spans) {
@@ -176,12 +182,15 @@ function tapsAndPuritySection(terminal) {
     const massesPresent = hasNumber(stage.designated_kg) && hasNumber(stage.impurity_kg);
     const designated = massesPresent ? Number(stage.designated_kg) : null;
     const impurity = massesPresent ? Number(stage.impurity_kg) : null;
-    const verdict = !massesPresent ? "UNAVAILABLE" : impurity === 0 ? "PURE" : designated > 0 ? "MIXED" : "CONTAMINATED";
+    const purity = hasNumber(stage.purity_fraction) ? Number(stage.purity_fraction) : null;
+    const backendVerdict = typeof stage.verdict === "string" && stage.verdict.trim() ? stage.verdict.trim().toUpperCase() : null;
+    const verdict = backendVerdict ?? (!massesPresent && purity === null ? "UNAVAILABLE" :
+      purity >= 0.999 || (impurity !== null && impurity <= 1e-3) ? "PURE" : designated > 0 ? "MIXED" : "CONTAMINATED");
     const trace = (value) => hasNumber(value) && Number(value) < .01 ? ` <span class="trace">· trace (&lt;0.01 kg)</span>` : "";
     return `<tr><td>${esc(stage.label || key)}<br><span class="trace mono">${esc(key)}</span></td><td class="species-list">${esc((stage.accepted_species || []).join(" · ") || "none designated")}</td>` +
       `<td class="num">${exactKg(stage.designated_kg)}${trace(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}${trace(stage.impurity_kg)}</td><td><span class="verdict ${verdict.toLowerCase()}">${verdict}</span></td></tr>`;
   }).join("");
-  return section(5, "Metal taps & stage purity", "Display verdict is recomputed from exact designated_kg and impurity_kg; trace is an additional annotation, never a replacement verdict.",
+  return section(5, "Metal taps & stage purity", "Backend verdict is preferred; otherwise purity_fraction and impurity_kg determine the display verdict. Trace is an additional annotation, never a replacement verdict.",
     `<div class="table-wrap"><table><thead><tr><th>Stage</th><th>Accepted species</th><th class="num">Designated</th><th class="num">Impurity</th><th>Display verdict</th></tr></thead><tbody>${stageRows}</tbody></table></div>` +
     pending("W-A10", "Per-species stage activity is not emitted, so intended-versus-contaminant activity is not inferred."));
 }
@@ -192,21 +201,25 @@ function wallAndOxygenSection(artifact, rows) {
   const wallTotal = sumObject(wallSpecies);
   const last = rows.at(-1);
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
-  const o2 = terminal.final_state?.["terminal.oxygen_mre_anode_stored"]?.O2 || last.O2_yield_kg_cumulative;
-  const wall = `<div class="card"><div class="ct">Observed wall deposits · not a lifetime verdict</div><div class="cbig">${exactKg(wallTotal)}</div><div class="kv"><span>Species</span><b class="mono">${Object.entries(wallSpecies).map(([key, value]) => `${key} ${sci(value)}`).join(" · ")}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${sci(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn)}</b></div></div>`;
-  const oxygen = `<div class="card"><div class="ct">MRE anode oxygen</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Metric label</span><b>${esc(last.O2_metric_label)}</b></div><div class="kv"><span>Pumping energy</span><b>${pumping ? `${n(pumping.pumping_electrical_kWh).toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status || "pending")}</b></div></div>`;
+  const o2 = last.O2_yield_kg_cumulative ?? null;
+  const wall = `<div class="card"><div class="ct">Observed wall deposits · not a lifetime verdict</div><div class="cbig">${exactKg(wallTotal)}</div><div class="kv"><span>Species</span><b class="mono">${Object.entries(wallSpecies).map(([key, value]) => `${esc(key)} ${esc(sci(value))}`).join(" · ")}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${sci(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn)}</b></div></div>`;
+  const oxygen = `<div class="card"><div class="ct">Cumulative O₂ yield</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Metric label</span><b>O2_yield_kg_cumulative</b></div><div class="kv"><span>Pumping energy</span><b>${pumping ? `${n(pumping.pumping_electrical_kWh).toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status || "pending")}</b></div></div>`;
   return section(6, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
 }
 
 function ceramicSection(terminal) {
   const melt = terminal.final_state?.["process.cleaned_melt"] || {};
   const total = sumObject(melt);
-  const rows = Object.entries(melt).sort((a, b) => n(b[1]) - n(a[1])).map(([species, value]) => `<tr><td class="mono">${esc(species)}</td><td class="num">${exactKg(value)}</td><td class="num">${total ? (n(value) / total * 100).toFixed(4) : "0.0000"}%</td></tr>`).join("");
-  return section(7, "Terminal ceramic — cleaned melt", "Composition binds directly to process.cleaned_melt; taxonomy is a separate backend-owned result.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Exact mass</th><th class="num">wt%</th></tr></thead><tbody>${rows}</tbody></table></div>${terminal.terminal_product_taxonomy ? "" : pending("W-D7", "terminal.terminal_product_taxonomy is absent. No density, value-grade, use-class, or product label is fabricated.")}`);
+  const rows = Object.entries(melt).sort((a, b) => n(b[1]) - n(a[1])).map(([species, value]) => `<tr><td class="mono">${esc(species)}</td><td class="num">${exactMol(value)}</td><td class="num">${total ? (n(value) / total * 100).toFixed(4) : "0.0000"}%</td></tr>`).join("");
+  return section(7, "Terminal ceramic — cleaned melt", "Composition binds directly to process.cleaned_melt; taxonomy is a separate backend-owned result.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Amount · mol</th><th class="num">mol%</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>${terminal.terminal_product_taxonomy ? "" : pending("W-D7", "terminal.terminal_product_taxonomy is absent. No density, value-grade, use-class, or product label is fabricated.")}`);
 }
 
 function costSection(artifact, energy) {
-  const prices = artifact.header.cost_block || {};
+  const prices = artifact.header.cost_block;
+  if (!prices) {
+    return section(8, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
+      pending("W-A5a", "header.cost_block is absent. Energy cost cannot be calculated without backend-provided prices."));
+  }
   const electricalShare = energy.totalCost ? energy.electricalCost / energy.totalCost * 100 : 0;
   return section(8, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
     `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${energy.electrical.toFixed(6)} <small>kWh</small></div><div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.electricalCost)}</b></div></div>` +
@@ -245,6 +258,10 @@ function renderCurrent(artifact, index) {
 function render(artifact) {
   if (!artifact || !Array.isArray(artifact.timesteps) || !artifact.timesteps.length || !artifact.header || !artifact.terminal) {
     throw new Error("Artifact is missing the required header, timesteps, or terminal envelope fields.");
+  }
+  const schemaMajor = Number.parseInt(String(artifact.artifact_schema_version).split(".")[0], 10);
+  if (!Number.isInteger(schemaMajor) || schemaMajor !== SUPPORTED_ARTIFACT_SCHEMA_MAJOR) {
+    throw new Error(`Unsupported artifact schema ${artifact.artifact_schema_version ?? "(missing)"}; this viewer supports major ${SUPPORTED_ARTIFACT_SCHEMA_MAJOR}.`);
   }
   const rows = artifact.timesteps.map((timestep) => timestep.summary);
   const spans = campaignSpans(artifact.timesteps);
