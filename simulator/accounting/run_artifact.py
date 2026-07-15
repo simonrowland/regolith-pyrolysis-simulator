@@ -9,7 +9,7 @@ from typing import Any
 from simulator.engine_local_config import cache_version_for
 
 
-ARTIFACT_SCHEMA_VERSION = "0.1.0"
+ARTIFACT_SCHEMA_VERSION = "0.2.0"
 EXECUTION_STATUSES = frozenset({"ok", "partial", "refused", "failed"})
 
 
@@ -121,10 +121,16 @@ def build_run_artifact(
     if effective_config is not None:
         header["effective_config"] = copy.deepcopy(effective_config)
     artifact["header"] = header
-    artifact["timesteps"] = [
-        {"hour": row.get("hour"), "summary": row}
-        for row in per_hour
-    ]
+    per_hour_ledger = runner_payload.get("per_hour_ledger")
+    timesteps = []
+    for row in per_hour:
+        timestep = {"hour": row.get("hour"), "summary": row}
+        if isinstance(per_hour_ledger, Mapping):
+            ledger = per_hour_ledger.get(str(row.get("hour")))
+            if isinstance(ledger, Mapping):
+                timestep["ledger"] = copy.deepcopy(dict(ledger))
+        timesteps.append(timestep)
+    artifact["timesteps"] = timesteps
     artifact["terminal"] = {
         "final_state": runner_payload.get("final_state", {}),
         "final": runner_payload.get("final", {}),

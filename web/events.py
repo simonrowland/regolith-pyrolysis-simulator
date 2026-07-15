@@ -132,6 +132,7 @@ def _replace_simulation_state(
                     'paused': False,
                     'speed': speed,
                     'run_id': uuid.uuid4().hex,
+                    'per_hour_ledger': {},
                     'ledger_client_id': ledger_client_id,
                     'run_store': run_store,
                     'runner_projector': runner_projector,
@@ -1160,6 +1161,11 @@ def _start_background_loop(
             )
             if effective_config:
                 runner_payload['effective_config'] = copy.deepcopy(effective_config)
+            per_hour_ledger = (
+                state.get('per_hour_ledger') if state is not None else None
+            )
+            if per_hour_ledger:
+                runner_payload['per_hour_ledger'] = copy.deepcopy(per_hour_ledger)
             run_store = state.get('run_store') if state is not None else None
             if run_store is None:
                 raise RuntimeError('run artifact store is unavailable')
@@ -1331,6 +1337,14 @@ def _start_background_loop(
                         decision = session.pending_decision()
                         if decision is not None:
                             decision_payload = _decision_payload(decision)
+                    elif isinstance(step_result.per_hour_summary, Mapping):
+                        hour = step_result.per_hour_summary.get('hour')
+                        ledger = getattr(sim, 'atom_ledger', None)
+                        mol_by_account = getattr(ledger, 'mol_by_account', None)
+                        if hour is not None and callable(mol_by_account):
+                            state['per_hour_ledger'][str(hour)] = copy.deepcopy(
+                                mol_by_account()
+                            )
                 except KnudsenRegimeRefusal as exc:
                     _safe_log(f'Simulation refused: {exc.reason}')
                     error_payload = {

@@ -89,7 +89,9 @@ def test_all_execution_statuses_construct_contract_envelope(status: str) -> None
     if status != "ok":
         expected_keys.add("failure")
     assert set(artifact) == expected_keys
-    assert artifact["artifact_schema_version"] == ARTIFACT_SCHEMA_VERSION == "0.1.0"
+    # 0.2.0: W-A3 added optional timesteps[].ledger (additive → minor bump).
+    # Bumping this pin is a deliberate controller decision, never a worker edit.
+    assert artifact["artifact_schema_version"] == ARTIFACT_SCHEMA_VERSION == "0.2.0"
     assert artifact["execution_status"] == status
     assert artifact["lifecycle"] == "complete"
     assert ("failure" in artifact) is (status != "ok")

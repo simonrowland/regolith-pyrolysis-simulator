@@ -2254,6 +2254,86 @@ def _terminal_runner_document(status: str) -> dict[str, object]:
     }
 
 
+def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
+    sid = "test-hourly-ledger-capture"
+    captured_payloads = []
+
+    class Ledger:
+        balances = {"process.cleaned_melt": {"SiO2": 1.25}}
+
+        def mol_by_account(self):
+            return self.balances
+
+    ledger = Ledger()
+    sim = SimpleNamespace(atom_ledger=ledger, _poisoned_hour=None)
+
+    class Session:
+        completed = False
+        simulator = sim
+
+        def is_complete(self):
+            return self.completed
+
+        def result_document(self):
+            return _terminal_runner_document("ok")
+
+    session = Session()
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+        def emit(self, event, _payload, room=None):
+            if event == "simulation_tick":
+                ledger.balances["process.cleaned_melt"]["SiO2"] = 99.0
+
+        def sleep(self, _seconds):
+            pass
+
+    socket = Socket()
+    state, lock = _replace_simulation_state(sid, session, speed=0.0)
+    state["run_store"] = object()
+    step_result = SimpleNamespace(
+        snapshot=object(),
+        backend_error="",
+        per_hour_summary={"hour": 1},
+        campaign_summary=None,
+        decision_event=None,
+    )
+
+    def drive_one(*_args, **_kwargs):
+        session.completed = True
+        return iter([step_result])
+
+    def capture_artifact(payload, _run_id, *, store):
+        captured_payloads.append(copy.deepcopy(payload))
+        return {"execution_status": "ok"}
+
+    monkeypatch.setattr(web_events, "drive_session", drive_one)
+    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "persist_run_artifact", capture_artifact)
+
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            lock,
+            "backend",
+            "available",
+            True,
+        )
+        socket.target()
+
+        assert captured_payloads[0]["per_hour_ledger"] == {
+            "1": {"process.cleaned_melt": {"SiO2": 1.25}}
+        }
+    finally:
+        _clear_simulation_state(sid)
+
+
 @pytest.mark.parametrize("outcome", ["ok", "refused", "failed"])
 def test_terminal_outcomes_persist_full_runner_document(tmp_path, monkeypatch, outcome):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
