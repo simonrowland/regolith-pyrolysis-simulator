@@ -1457,13 +1457,20 @@ def _start_background_loop(
                     'backend_authoritative': backend_authoritative,
                     'backend_message': backend_message,
                 }
-                persist_terminal(
+                artifact = persist_terminal(
                     session,
                     status='refused',
                     reason=reason,
                     error_message=reason,
                     refusal_diagnostic=c6_refusal,
                 )
+                if artifact is None:
+                    stop_with_status({
+                        'status': 'error',
+                        'reason': 'persistence_failed',
+                        'message': 'Run was refused but its report was not saved',
+                    })
+                    break
                 stop_with_status(refusal_payload)
                 break
 

@@ -2667,10 +2667,21 @@ def test_persist_failure_visible_on_all_terminal_paths(
         target, args, kwargs = captured_tasks.pop()
         target(*args, **kwargs)
 
-        names = [event["name"] for event in client.get_received()]
+        events = client.get_received()
+        names = [event["name"] for event in events]
         assert "simulation_complete" not in names
         assert "simulation_persistence_failed" in names
         assert "persistence_retry" not in state
+        if terminal_path == "c6_refused":
+            statuses = [
+                event["args"][0]
+                for event in events
+                if event["name"] == "simulation_status"
+            ]
+            assert statuses[-1]["status"] == "error"
+            assert statuses[-1]["reason"] == "persistence_failed"
+            assert state["running"] is False
+            assert state["paused"] is False
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
