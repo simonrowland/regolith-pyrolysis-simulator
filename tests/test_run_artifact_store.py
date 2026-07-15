@@ -17,6 +17,7 @@ from simulator.accounting.run_artifact import (
 from web import routes as web_routes
 from web import run_store as run_store_module
 from web.run_store import (
+    InvalidRunIdError,
     RunArtifactStore,
     RunStoreCorruptionError,
     persist_run_artifact,
@@ -194,8 +195,8 @@ def test_store_meta_round_trip_is_idempotent_and_does_not_rewrite_artifact(
     assert store.update_meta("run-meta", expected) == expected
 
     assert artifact_path.read_bytes() == original_bytes
-    assert json.loads((store.runs_dir / "run-meta.meta.json").read_text()) == expected
-    assert not list(store.runs_dir.glob("*.tmp"))
+    assert json.loads((store.runs_dir / "meta" / "run-meta.json").read_text()) == expected
+    assert not list(store.runs_dir.rglob("*.tmp"))
     summary = store.list_runs()[0]
     assert summary["starred"] is True
     assert summary["folder"] == "Campaign A"
@@ -208,6 +209,24 @@ def test_store_meta_round_trip_is_idempotent_and_does_not_rewrite_artifact(
     assert "folder" not in summary
 
 
+def test_store_rejects_dotted_id_and_keeps_meta_out_of_artifact_namespace(
+    tmp_path,
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="foo")
+
+    assert store.save("foo", artifact) is True
+    assert store.update_meta("foo", {"starred": True}) == {"starred": True}
+    with pytest.raises(InvalidRunIdError, match="run_id"):
+        store.save("foo.meta", artifact)
+
+    assert store.load("foo") == artifact
+    assert json.loads((store.runs_dir / "meta" / "foo.json").read_text()) == {
+        "starred": True
+    }
+    assert [path.name for path in store.runs_dir.glob("*.json")] == ["foo.json"]
+
+
 def test_store_meta_atomic_failure_cleans_temp_and_preserves_previous_sidecar(
     tmp_path, monkeypatch
 ) -> None:
@@ -215,7 +234,7 @@ def test_store_meta_atomic_failure_cleans_temp_and_preserves_previous_sidecar(
     artifact = build_run_artifact(_runner_payload("ok"), run_id="atomic")
     assert store.save("atomic", artifact) is True
     assert store.update_meta("atomic", {"starred": True}) == {"starred": True}
-    meta_path = store.runs_dir / "atomic.meta.json"
+    meta_path = store.runs_dir / "meta" / "atomic.json"
     original_bytes = meta_path.read_bytes()
 
     def fail_replace(_source, _destination):
@@ -226,7 +245,7 @@ def test_store_meta_atomic_failure_cleans_temp_and_preserves_previous_sidecar(
         store.update_meta("atomic", {"folder": "Moon"})
 
     assert meta_path.read_bytes() == original_bytes
-    assert not list(store.runs_dir.glob("*.tmp"))
+    assert not list(store.runs_dir.rglob("*.tmp"))
 
 
 def test_store_corrupt_meta_quarantines_only_sidecar(tmp_path) -> None:
@@ -234,7 +253,8 @@ def test_store_corrupt_meta_quarantines_only_sidecar(tmp_path) -> None:
     artifact = build_run_artifact(_runner_payload("ok"), run_id="meta-corrupt")
     assert store.save("meta-corrupt", artifact) is True
     artifact_path = store.runs_dir / "meta-corrupt.json"
-    meta_path = store.runs_dir / "meta-corrupt.meta.json"
+    meta_path = store.runs_dir / "meta" / "meta-corrupt.json"
+    meta_path.parent.mkdir(parents=True, exist_ok=True)
     meta_path.write_text("{not-json", encoding="utf-8")
 
     summaries = store.list_runs()
@@ -243,7 +263,7 @@ def test_store_corrupt_meta_quarantines_only_sidecar(tmp_path) -> None:
     assert summaries[0]["starred"] is False
     assert artifact_path.exists()
     assert not meta_path.exists()
-    assert (store.runs_dir / "meta-corrupt.meta.json.corrupt").exists()
+    assert (store.runs_dir / "meta" / "meta-corrupt.json.corrupt").exists()
 
 
 def test_store_concurrent_meta_writers_leave_one_complete_valid_sidecar(
@@ -261,10 +281,10 @@ def test_store_concurrent_meta_writers_leave_one_complete_valid_sidecar(
         list(executor.map(lambda update: store.update_meta("concurrent", update), updates))
 
     stored = json.loads(
-        (store.runs_dir / "concurrent.meta.json").read_text(encoding="utf-8")
+        (store.runs_dir / "meta" / "concurrent.json").read_text(encoding="utf-8")
     )
     assert stored in updates
-    assert not list(store.runs_dir.glob("*.tmp"))
+    assert not list(store.runs_dir.rglob("*.tmp"))
 
 
 def test_store_parent_run_id_is_sidecar_only_and_absence_is_omitted(tmp_path) -> None:
@@ -284,12 +304,116 @@ def test_store_parent_run_id_is_sidecar_only_and_absence_is_omitted(tmp_path) ->
     assert "parent_run_id" not in summaries["independent"]
 
 
+def test_store_lineage_failure_does_not_publish_artifact(tmp_path, monkeypatch) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="child")
+    original = store._save_parent_run_id
+    attempts = 0
+
+    def fail_once(run_id, parent_run_id):
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            raise OSError("lineage write failed")
+        original(run_id, parent_run_id)
+
+    monkeypatch.setattr(store, "_save_parent_run_id", fail_once)
+    with pytest.raises(OSError, match="lineage write failed"):
+        store.save("child", artifact, parent_run_id="parent")
+
+    assert not (store.runs_dir / "child.json").exists()
+    assert store.save("child", artifact, parent_run_id="parent") is True
+    assert store.load("child") == artifact
+    assert json.loads((store.runs_dir / "meta" / "child.json").read_text()) == {
+        "parent_run_id": "parent"
+    }
+
+
+def test_store_meta_update_cannot_succeed_after_retention_deletes_run(
+    tmp_path, monkeypatch
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs", keep=2)
+    old = build_run_artifact(_runner_payload("ok"), run_id="old")
+    old["header"]["created_at"] = "2026-07-14T12:00:00Z"
+    assert store.save("old", old) is True
+    store.keep = 1
+    new = build_run_artifact(_runner_payload("ok"), run_id="new")
+    new["header"]["created_at"] = "2026-07-16T12:00:00Z"
+    retention_entered = run_store_module.threading.Event()
+    release_retention = run_store_module.threading.Event()
+    update_started = run_store_module.threading.Event()
+    original_retention = store._apply_retention_locked
+
+    def controlled_retention():
+        retention_entered.set()
+        assert release_retention.wait(timeout=5)
+        original_retention()
+
+    def star_old():
+        update_started.set()
+        return store.update_meta("old", {"starred": True})
+
+    monkeypatch.setattr(store, "_apply_retention_locked", controlled_retention)
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        save_future = executor.submit(store.save, "new", new)
+        assert retention_entered.wait(timeout=5)
+        star_future = executor.submit(star_old)
+        assert update_started.wait(timeout=5)
+        assert not star_future.done()
+        release_retention.set()
+        assert save_future.result(timeout=5) is True
+        with pytest.raises(FileNotFoundError):
+            star_future.result(timeout=5)
+
+    assert store.load("old") is None
+
+
+def test_store_corrupt_meta_is_quarantined_and_skipped_by_retention(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs", keep=2)
+    protected = build_run_artifact(_runner_payload("ok"), run_id="protected")
+    protected["header"]["created_at"] = "2026-07-14T12:00:00Z"
+    assert store.save("protected", protected) is True
+    meta_path = store.runs_dir / "meta" / "protected.json"
+    meta_path.parent.mkdir(parents=True, exist_ok=True)
+    meta_path.write_text("{not-json", encoding="utf-8")
+    store.keep = 0
+    trigger = build_run_artifact(_runner_payload("ok"), run_id="trigger")
+
+    assert store.save("trigger", trigger) is True
+    second_trigger = build_run_artifact(_runner_payload("ok"), run_id="trigger-2")
+    assert store.save("trigger-2", second_trigger) is True
+
+    assert store.load("protected") == protected
+    assert not meta_path.exists()
+    assert (store.runs_dir / "meta" / "protected.json.corrupt").exists()
+
+
+def test_store_unstarred_run_reenters_keep_n_eviction(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs", keep=1)
+    old = build_run_artifact(_runner_payload("ok"), run_id="old-star")
+    old["header"]["created_at"] = "2026-07-14T12:00:00Z"
+    assert store.save("old-star", old) is True
+    store.update_meta("old-star", {"starred": True})
+    middle = build_run_artifact(_runner_payload("ok"), run_id="middle")
+    middle["header"]["created_at"] = "2026-07-15T12:00:00Z"
+    assert store.save("middle", middle) is True
+    store.update_meta("old-star", {"starred": False})
+    newest = build_run_artifact(_runner_payload("ok"), run_id="newest")
+    newest["header"]["created_at"] = "2026-07-16T12:00:00Z"
+
+    assert store.save("newest", newest) is True
+
+    assert store.load("old-star") is None
+    assert store.load("middle") is None
+    assert store.load("newest") == newest
+
+
 def test_store_meta_path_uses_run_id_validation(tmp_path) -> None:
     store = RunArtifactStore(tmp_path / "runs")
 
     with pytest.raises(ValueError, match="run_id"):
         store.update_meta("../escape", {"starred": True})
-    assert not (tmp_path / "escape.meta.json").exists()
+    assert not (tmp_path / "runs" / "meta" / "escape.json").exists()
 
 
 def test_store_corrupt_load_is_typed_and_list_quarantines(tmp_path) -> None:

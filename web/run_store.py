@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from contextlib import contextmanager
 import fcntl
 import json
 import logging
@@ -20,7 +21,7 @@ from simulator.accounting.run_artifact import build_run_artifact
 
 
 DEFAULT_RETENTION = 100
-_RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+_RUN_ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 _SAVE_LOCK = threading.Lock()
 _LOG = logging.getLogger(__name__)
 
@@ -47,6 +48,10 @@ class DuplicateRunArtifactError(RuntimeError):
     """Raised when persistence cannot prove this payload won the first write."""
 
 
+class InvalidRunIdError(ValueError):
+    """Raised before filesystem access when a run ID is not store-safe."""
+
+
 class RunArtifactStore:
     def __init__(self, runs_dir: str | Path, *, keep: int = DEFAULT_RETENTION) -> None:
         self.runs_dir = Path(runs_dir)
@@ -64,7 +69,7 @@ class RunArtifactStore:
             self._path(parent_run_id)
         claim_path = destination.with_suffix(".write-lock")
         self.runs_dir.mkdir(parents=True, exist_ok=True)
-        with _SAVE_LOCK:
+        with self._store_lock():
             with claim_path.open("a", encoding="utf-8") as claim_handle:
                 fcntl.flock(claim_handle.fileno(), fcntl.LOCK_EX)
                 if destination.exists():
@@ -90,13 +95,16 @@ class RunArtifactStore:
                         handle.write("\n")
                         handle.flush()
                         os.fsync(handle.fileno())
+                    if parent_run_id is not None:
+                        # The artifact replace is the commit point. Lineage must
+                        # be durable first so a committed artifact can never be
+                        # left permanently unlineaged after a failed save.
+                        self._save_parent_run_id(run_id, parent_run_id)
                     os.replace(temp_path, destination)
                 finally:
                     if temp_path is not None:
                         temp_path.unlink(missing_ok=True)
-        if parent_run_id is not None:
-            self._save_parent_run_id(run_id, parent_run_id)
-        self._apply_retention()
+            self._apply_retention_locked()
         return True
 
     def load(self, run_id: str) -> dict[str, Any] | None:
@@ -195,18 +203,26 @@ class RunArtifactStore:
     def _path(self, run_id: str) -> Path:
         value = str(run_id)
         if not _RUN_ID_RE.fullmatch(value):
-            raise ValueError("run_id must use only letters, digits, dot, underscore, or hyphen")
+            raise InvalidRunIdError(
+                "run_id must use only letters, digits, underscore, or hyphen"
+            )
         return self.runs_dir / f"{value}.json"
 
     def _meta_path(self, run_id: str) -> Path:
-        return self._path(run_id).with_suffix(".meta.json")
+        value = self._path(run_id).stem
+        return self.runs_dir / "meta" / f"{value}.json"
 
     def _artifact_paths(self):
-        return (
-            path
-            for path in self.runs_dir.glob("*.json")
-            if not path.name.endswith(".meta.json")
-        )
+        return self.runs_dir.glob("*.json")
+
+    @contextmanager
+    def _store_lock(self):
+        self.runs_dir.mkdir(parents=True, exist_ok=True)
+        lock_path = self.runs_dir / ".store.write-lock"
+        with _SAVE_LOCK:
+            with lock_path.open("a", encoding="utf-8") as lock_handle:
+                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+                yield
 
     def _load_meta(self, run_id: str) -> dict[str, Any]:
         path = self._meta_path(run_id)
@@ -225,12 +241,16 @@ class RunArtifactStore:
             )
         return payload
 
+    def _has_quarantined_meta(self, run_id: str) -> bool:
+        path = self._meta_path(run_id)
+        return not path.exists() and any(
+            path.parent.glob(f"{path.name}.corrupt*")
+        )
+
     def update_meta(
         self, run_id: str, updates: Mapping[str, Any]
     ) -> dict[str, Any]:
         artifact_path = self._path(run_id)
-        if not artifact_path.is_file():
-            raise FileNotFoundError(run_id)
         unknown = set(updates) - {"starred", "folder"}
         if unknown:
             raise ValueError(f"unknown run metadata keys: {', '.join(sorted(unknown))}")
@@ -240,7 +260,10 @@ class RunArtifactStore:
             updates["folder"], str
         ):
             raise ValueError("folder must be a string or null")
-        return self._write_meta_updates(run_id, updates)
+        with self._store_lock():
+            if not artifact_path.is_file():
+                raise FileNotFoundError(run_id)
+            return self._write_meta_updates(run_id, updates)
 
     def _save_parent_run_id(self, run_id: str, parent_run_id: str) -> None:
         self._path(parent_run_id)
@@ -251,7 +274,7 @@ class RunArtifactStore:
     ) -> dict[str, Any]:
         destination = self._meta_path(run_id)
         claim_path = destination.with_suffix(".write-lock")
-        self.runs_dir.mkdir(parents=True, exist_ok=True)
+        destination.parent.mkdir(parents=True, exist_ok=True)
         with claim_path.open("a", encoding="utf-8") as claim_handle:
             fcntl.flock(claim_handle.fileno(), fcntl.LOCK_EX)
             metadata = self._load_meta(run_id)
@@ -263,7 +286,7 @@ class RunArtifactStore:
             temp_path: Path | None = None
             try:
                 fd, raw_temp_path = tempfile.mkstemp(
-                    prefix=f".{run_id}.meta.", suffix=".tmp", dir=self.runs_dir
+                    prefix=f".{run_id}.", suffix=".tmp", dir=destination.parent
                 )
                 temp_path = Path(raw_temp_path)
                 with os.fdopen(fd, "w", encoding="utf-8") as handle:
@@ -366,18 +389,25 @@ class RunArtifactStore:
             and math.isfinite(value)
         )
 
-    def _apply_retention(self) -> None:
+    def _apply_retention_locked(self) -> None:
         unstarred: list[tuple[str, Path]] = []
         for path in self._artifact_paths():
             try:
                 with path.open(encoding="utf-8") as handle:
                     artifact = json.load(handle)
                 header = artifact.get("header", {}) or {}
+                if self._has_quarantined_meta(path.stem):
+                    continue
                 metadata = self._load_meta(path.stem)
                 if not bool(metadata.get("starred", False)):
                     created_at = str(header.get("created_at") or "")
                     unstarred.append((created_at, path))
-            except RunMetaCorruptionError:
+            except RunMetaCorruptionError as exc:
+                quarantine_path = self._quarantine(exc.path)
+                _LOG.error("%s; quarantined at %s", exc, quarantine_path)
+                # A corrupt sidecar may be hiding a star. Skip eviction for
+                # this run until metadata is repaired rather than deleting a
+                # possibly protected artifact.
                 continue
             except (OSError, json.JSONDecodeError, AttributeError):
                 continue
