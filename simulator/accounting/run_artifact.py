@@ -2,10 +2,45 @@
 
 from __future__ import annotations
 
+import copy
+from collections.abc import Mapping
 from typing import Any
+
+from simulator.engine_local_config import cache_version_for
 
 
 ARTIFACT_SCHEMA_VERSION = "0.1.0"
+EXECUTION_STATUSES = frozenset({"ok", "partial", "refused", "failed"})
+
+
+class RunArtifactContractError(ValueError):
+    """Raised when a runner payload cannot satisfy the artifact contract."""
+
+
+def _execution_status(runner_payload: dict[str, Any]) -> str:
+    if "status" not in runner_payload:
+        raise RunArtifactContractError("runner payload is missing execution status")
+    status = runner_payload["status"]
+    if not isinstance(status, str) or status not in EXECUTION_STATUSES:
+        raise RunArtifactContractError(f"unknown execution status: {status!r}")
+    return status
+
+
+def _recipe_snapshot(runner_payload: dict[str, Any]) -> dict[str, Any] | None:
+    raw_snapshot = runner_payload.get("recipe_snapshot")
+    source = raw_snapshot if isinstance(raw_snapshot, Mapping) else runner_payload
+    setpoints_patch = source.get("setpoints_patch")
+    pins = source.get("pins")
+    recipe_schema_version = source.get("recipe_schema_version")
+    if not isinstance(setpoints_patch, Mapping) or not setpoints_patch:
+        return None
+    if pins is None or not recipe_schema_version:
+        return None
+    return {
+        "setpoints_patch": copy.deepcopy(dict(setpoints_patch)),
+        "pins": copy.deepcopy(pins),
+        "recipe_schema_version": recipe_schema_version,
+    }
 
 
 def _campaign_chain(per_hour: list[dict[str, Any]]) -> list[str]:
@@ -28,7 +63,7 @@ def build_run_artifact(
     """Repackage a completed runner payload without running the engine."""
     run_metadata = runner_payload.get("run_metadata", {}) or {}
     per_hour = runner_payload.get("per_hour_summary", []) or []
-    status = runner_payload.get("status", "ok")
+    status = _execution_status(runner_payload)
 
     artifact: dict[str, Any] = {
         "artifact_schema_version": ARTIFACT_SCHEMA_VERSION,
@@ -41,25 +76,39 @@ def build_run_artifact(
             "error_message": runner_payload.get("error_message"),
         }
 
-    artifact["header"] = {
+    backend = run_metadata.get("backend")
+    engine_identity = {
+        "name": backend,
+        "cache_version": cache_version_for(backend) if backend else None,
+        "backend_wire_token": backend,
+    }
+    kernel_commit_sha = run_metadata.get("kernel_commit_sha")
+    if kernel_commit_sha is not None:
+        engine_identity["kernel_commit_sha"] = kernel_commit_sha
+
+    header = {
         "run_id": str(run_id),
         "name": name if name is not None else str(run_id),
         "created_at": run_metadata.get("started_at_utc"),
-        "seed": run_metadata.get("seed"),
         "feedstock_id": run_metadata.get("feedstock_id"),
         "charge_mass_kg": run_metadata.get("mass_kg"),
-        "c3_dose": run_metadata.get("c3_alkali_credit_dose_kg_by_species"),
         "campaign_chain": _campaign_chain(per_hour),
-        "engine_identity": {
-            "name": run_metadata.get("backend"),
-            "cache_version": run_metadata.get("kernel_commit_sha"),
-            "backend_wire_token": run_metadata.get("backend"),
-        },
-        "recipe_snapshot": {
-            "note": "not captured in this payload; W-A4 emits the importable recipe"
-        },
+        "engine_identity": engine_identity,
         "target_snapshot": None,
     }
+    seed = run_metadata.get("seed")
+    if seed is not None:
+        header["seed"] = seed
+    c3_dose = run_metadata.get("c3_alkali_credit_dose_kg_by_species")
+    if c3_dose:
+        header["c3_dose"] = {
+            "Na_kg": c3_dose.get("Na", 0.0),
+            "K_kg": c3_dose.get("K", 0.0),
+        }
+    recipe_snapshot = _recipe_snapshot(runner_payload)
+    if recipe_snapshot is not None:
+        header["recipe_snapshot"] = recipe_snapshot
+    artifact["header"] = header
     artifact["timesteps"] = [
         {"hour": row.get("hour"), "summary": row}
         for row in per_hour
@@ -74,7 +123,7 @@ def build_run_artifact(
         "run_metadata": run_metadata,
         "mass_balance_closure": {
             "residual_pct": per_hour[-1].get("mass_balance_pct") if per_hour else None,
-            "basis": "final per-hour mass_balance_pct",
+            "basis": "final-hour percent",
         },
     }
     return artifact

@@ -1,6 +1,10 @@
 "use strict";
 
-const ARTIFACT_URL = "./sample-run-artifact.json";
+const RUN_ID = new URLSearchParams(window.location.search).get("run");
+const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
+const ARTIFACT_URL = RUN_ID
+  ? `/api/runs/${encodeURIComponent(RUN_ID)}`
+  : "./sample-run-artifact.json";
 const $ = (selector, root = document) => root.querySelector(selector);
 const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
@@ -11,7 +15,7 @@ const displayNumber = (value, unit = "") => hasNumber(value)
   : "not emitted";
 
 function dataBlock(value) {
-  if (value === undefined || value === null) return `<div class="pending"><strong>Not captured</strong><p>This field is absent from the sample header.</p></div>`;
+  if (value === undefined || value === null) return `<div class="pending"><strong>Not captured</strong><p>This field is absent from the artifact header.</p></div>`;
   return `<pre class="data-block">${esc(JSON.stringify(value, null, 2))}</pre>`;
 }
 
@@ -91,7 +95,7 @@ function render(artifact) {
     <div class="masthead"><div class="brand"><strong>DIRECT LEAP</strong> TECHNOLOGIES</div><div class="doc-label">Read-only<br>owner T-8</div></div>
     <div class="eyebrow">PHASE 2 · SETTINGS INSPECTOR</div><h1>Captured run settings</h1>
     <p class="lede"><span class="mono">${esc(header.run_id)}</span> · settings copied from the frozen artifact header.</p>
-    <div class="settings-actions"><a href="./index.html">← Back to report</a><button id="download-run" type="button">Download run.yaml</button></div>
+    <div class="settings-actions"><a href="./index.html${RUN_QUERY}">← Back to report</a><button id="download-run" type="button">Download run.yaml</button></div>
     <div class="note"><b>Read-only.</b> Config editing remains owner T-8. The download contains the captured header only.</div>
   </header>
   ${settingsField(1, "Recipe snapshot", "Captured recipe material only; absent values are not reconstructed.", dataBlock(header.recipe_snapshot))}

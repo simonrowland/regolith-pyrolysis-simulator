@@ -1,6 +1,7 @@
 "use strict";
 
-const RUNS_URL = "./runs-index.json";
+const LIVE_RUNS_URL = "/api/runs";
+const STATIC_RUNS_URL = "./runs-index.json";
 const SYSTEM_FOLDERS = ["All", "Favorites", "My runs", "Default runs", "Bootstrap ladder"];
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -43,15 +44,24 @@ function folderButtons() {
 
 function yieldChips(run) {
   const yields = run.headline_yields_kg;
-  if (!yields || typeof yields !== "object") return "";
-  return `<div class="yield-track">${Object.entries(yields).map(([species, value]) =>
+  const entries = yields && typeof yields === "object" ? Object.entries(yields).filter(([species]) => species !== "O2") : [];
+  const o2 = run.O2_source_side_potential_kg_cumulative ?? yields?.O2;
+  if (o2 !== undefined || run.O2_metric_label) {
+    entries.push([run.O2_metric_label || "O₂ source-side potential (not recovered)", o2]);
+  }
+  if (!entries.length) return "";
+  return `<div class="yield-track">${entries.map(([species, value]) =>
     `<div class="yield-chip"><div class="el">${esc(species)}</div><div class="kg">${exactNumber(value, "kg")}</div></div>`
   ).join("")}</div>`;
 }
 
 function runCard(run) {
   const isStarred = Boolean(starred.get(run.run_id));
-  const canLoad = typeof run.artifact === "string" && /^[A-Za-z0-9._/-]+\.html$/.test(run.artifact);
+  const staticArtifact = typeof run.artifact === "string" && /^[A-Za-z0-9._/-]+\.html$/.test(run.artifact);
+  const canLoad = Boolean(run.live) || staticArtifact;
+  const loadTarget = run.live
+    ? `./index.html?run=${encodeURIComponent(run.run_id)}`
+    : run.artifact;
   const unavailable = canLoad ? "" : `<p class="demo-note">${esc(run.unavailable_note || "demo metadata — no artifact")}</p>`;
   return `<article class="card run-card">
     <div class="run-card-head">
@@ -61,7 +71,7 @@ function runCard(run) {
     <p class="run-summary">${esc(run.summary)}</p>
     ${yieldChips(run)}
     ${unavailable}
-    <div class="run-actions"><span class="mono">${esc(run.run_id)}</span><button class="load-button" type="button" data-load="${esc(run.artifact)}"${canLoad ? "" : " disabled"}>Load</button></div>
+    <div class="run-actions"><span class="mono">${esc(run.run_id)}</span><button class="load-button" type="button" data-load="${esc(loadTarget)}"${canLoad ? "" : " disabled"}>Load</button></div>
   </article>`;
 }
 
@@ -114,16 +124,30 @@ function render(index) {
       <label>Sort<select id="run-sort"><option value="created">Newest created</option><option value="name">Name</option><option value="status">Status</option></select></label></div></div>
   </section>
   <section><h2><span class="sect">02</span>Indexed runs</h2><p class="sub">Only entries with a local artifact can be loaded.</p><div id="run-list" class="run-list"></div></section>
-  <footer class="footer"><span>Local flatfile index · engine-free · no backend calls</span><a href="./index.html">Open sample report</a></footer>`;
+  <footer class="footer"><span>Static index + local run API · engine-free</span><a href="./index.html">Open sample report</a></footer>`;
   bindControls();
   renderList();
 }
 
-fetch(RUNS_URL)
+fetch(STATIC_RUNS_URL)
   .then((response) => {
     if (!response.ok) throw new Error(`Run index request failed (${response.status})`);
     return response.json();
   })
+  .then((staticRuns) => fetch(LIVE_RUNS_URL)
+    .then((response) => {
+      if (!response.ok) return [];
+      return response.json();
+    })
+    .then((index) => index.map((run) => ({ ...run, live: true })))
+    .catch(() => [])
+    .then((liveRuns) => {
+      const liveIds = new Set(liveRuns.map((run) => String(run.run_id)));
+      return [
+        ...liveRuns,
+        ...staticRuns.filter((run) => !liveIds.has(String(run.run_id)))
+      ];
+    }))
   .then(render)
   .catch((error) => {
     $("#library").innerHTML = `<div class="fatal"><div class="eyebrow">Library unavailable</div><h1>Could not read the run index</h1><p>${esc(error.message)}</p><p>If your browser blocks local <code>file:</code> fetches, serve this directory with an offline local static server and open <code>library.html</code> there.</p></div>`;
