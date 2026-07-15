@@ -1028,6 +1028,8 @@ def _full_runner_payload(
             payload['refusal_diagnostic'] = copy.deepcopy(
                 dict(refusal_diagnostic)
             )
+        else:
+            payload.pop('refusal_diagnostic', None)
         recipe_snapshot = _recipe_snapshot_from_projector(projector)
         if recipe_snapshot is not None:
             payload['recipe_snapshot'] = recipe_snapshot
@@ -1462,22 +1464,7 @@ def _start_background_loop(
                     error_message=reason,
                     refusal_diagnostic=c6_refusal,
                 )
-                if not _emit_if_current(
-                    socketio,
-                    sid,
-                    run_id,
-                    'simulation_status',
-                    refusal_payload,
-                ):
-                    break
-                with _simulations_guard:
-                    current = _simulations.get(sid)
-                    if (
-                        current is not None
-                        and current.get('run_id') == run_id
-                    ):
-                        current['running'] = False
-                        current['paused'] = False
+                stop_with_status(refusal_payload)
                 break
 
             if step_result.decision_event is not None:

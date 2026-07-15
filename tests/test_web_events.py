@@ -2735,6 +2735,87 @@ def test_save_ok_completion_emit_failure_is_not_persistence_failure(
             _clear_simulation_state(sid)
 
 
+def test_c6_refusal_emit_failure_still_cleans_run_state(tmp_path, monkeypatch):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    logged = []
+    monkeypatch.setattr(web_events, "_safe_log", logged.append)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = app_module.socketio.test_client(app)
+    before = set(_simulations)
+    original_emit_if_current = web_events._emit_if_current
+
+    def fail_refusal_emit(socketio, sid, run_id, event, payload):
+        if event == "simulation_status" and payload.get("status") == "refused":
+            raise RuntimeError("refusal transport failed")
+        return original_emit_if_current(socketio, sid, run_id, event, payload)
+
+    monkeypatch.setattr(web_events, "_emit_if_current", fail_refusal_emit)
+    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+    monkeypatch.setattr(
+        web_events,
+        "drive_session",
+        lambda *_args, **_kwargs: iter([
+            SimpleNamespace(
+                snapshot=object(),
+                backend_error="",
+                per_hour_summary={},
+                campaign_summary={
+                    "c6_refusal_diagnostic": {
+                        "status": "refused",
+                        "diagnostic": {"reason_refused": "c6 refused"},
+                    }
+                },
+                decision_event=None,
+            )
+        ]),
+    )
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        state["session"] = SimpleNamespace(
+            simulator=SimpleNamespace(_poisoned_hour=None),
+            is_complete=lambda: False,
+            result_document=lambda: _terminal_runner_document("refused"),
+        )
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        assert any(
+            "Simulation status emission failed: refusal transport failed" in message
+            for message in logged
+        )
+        assert state["artifact_persisted"] is True
+        assert state["running"] is False
+        assert state["paused"] is False
+        assert RunArtifactStore(tmp_path / "runs").load(state["run_id"]) is not None
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_observed_terminal_without_refusal_diagnostic_clears_recorded_value():
+    recorded = _terminal_runner_document("refused")
+    recorded["refusal_diagnostic"] = {"reason": "stale refusal"}
+    session = SimpleNamespace(result_document=lambda: recorded)
+
+    payload = web_events._full_runner_payload(session, status="ok")
+
+    assert "refusal_diagnostic" not in payload
+
+
 def test_reduced_terminal_payload_preserves_available_submission_provenance():
     projector = SimpleNamespace(
         setpoints_patch={},
