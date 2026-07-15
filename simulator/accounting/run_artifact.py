@@ -70,9 +70,10 @@ def _terminal_confidence(artifact: Mapping[str, Any]) -> dict[str, Any] | None:
     """Grade only artifact-owned evidence using a fixed three-level ladder.
 
     A finite numeric mass-balance residual is required; without it confidence is
-    omitted. A closure breach, failed vapor source, or refused/failed execution
-    grades low. Partial execution, unavailable/non-ok vapor status, or incomplete
-    backend identity caps the grade at medium. Only all passing criteria grade high.
+    omitted. A closure breach, failed vapor/backend status, or refused/failed
+    execution grades low. Partial execution, non-authoritative evidence,
+    unavailable/non-ok status, or incomplete backend identity caps the grade at
+    medium. Only all passing criteria grade high.
     """
     terminal = artifact.get("terminal")
     if not isinstance(terminal, Mapping):
@@ -103,23 +104,42 @@ def _terminal_confidence(artifact: Mapping[str, Any]) -> dict[str, Any] | None:
         )
 
     source_report = terminal.get("vapor_pressure_source_report")
-    vapor_status = (
-        source_report.get("status") if isinstance(source_report, Mapping) else None
-    )
-    if vapor_status == "ok":
-        reasons.append("vapor-pressure sources: ok")
+    vapor_status = None
+    vapor_authoritative = None
+    if isinstance(source_report, Mapping):
+        vapor_status = source_report.get("vapor_pressure_backend_status")
+        vapor_authoritative = source_report.get(
+            "authoritative_for_requested_vapor_pressure"
+        )
+    if vapor_status == "ok" and vapor_authoritative is True:
+        reasons.append("vapor-pressure backend status ok and authoritative")
     elif vapor_status == "failed":
         hard_degradation = True
-        reasons.append("vapor-pressure sources: failed")
-    elif vapor_status is None or vapor_status == "":
+        reasons.append(
+            "vapor-pressure backend status failed; "
+            f"authoritative={vapor_authoritative!r}"
+        )
+    elif not isinstance(source_report, Mapping) or not source_report:
         soft_degradation = True
-        reasons.append("vapor-pressure source status absent")
+        reasons.append("vapor-pressure source report absent")
+    elif vapor_status in (None, ""):
+        soft_degradation = True
+        reasons.append(
+            "vapor-pressure backend status absent; "
+            f"authoritative={vapor_authoritative!r}"
+        )
     elif isinstance(vapor_status, str):
         soft_degradation = True
-        reasons.append(f"vapor-pressure sources: {vapor_status}")
+        reasons.append(
+            f"vapor-pressure backend status {vapor_status}; "
+            f"authoritative={vapor_authoritative!r}"
+        )
     else:
         soft_degradation = True
-        reasons.append("vapor-pressure source status invalid: non-string")
+        reasons.append(
+            f"vapor-pressure backend status invalid: {vapor_status!r}; "
+            f"authoritative={vapor_authoritative!r}"
+        )
 
     header = artifact.get("header")
     engine_identity = (
@@ -143,6 +163,59 @@ def _terminal_confidence(artifact: Mapping[str, Any]) -> dict[str, Any] | None:
             "backend identity complete: name, cache_version, backend_wire_token present"
         )
 
+    run_metadata = terminal.get("run_metadata")
+    backend_status = (
+        run_metadata.get("backend_status")
+        if isinstance(run_metadata, Mapping)
+        else None
+    )
+    backend_authoritative = (
+        run_metadata.get("backend_authoritative")
+        if isinstance(run_metadata, Mapping)
+        else None
+    )
+    backend_name = (
+        engine_identity.get("name")
+        if isinstance(engine_identity, Mapping)
+        and engine_identity.get("name") not in (None, "")
+        else None
+    )
+    if backend_status == "ok":
+        reasons.append("backend status: ok")
+    elif backend_status == "failed":
+        hard_degradation = True
+        reasons.append(
+            f"backend status failed: {backend_name}"
+            if backend_name is not None
+            else "backend status failed; name absent"
+        )
+    elif backend_status in (None, ""):
+        soft_degradation = True
+        reasons.append("backend status absent")
+    else:
+        soft_degradation = True
+        reasons.append(f"backend status not ok: {backend_status!r}")
+
+    if backend_authoritative is True:
+        reasons.append(
+            f"backend authoritative: {backend_name}"
+            if backend_name is not None
+            else "backend authoritative; name absent"
+        )
+    elif backend_authoritative is False:
+        soft_degradation = True
+        reasons.append(
+            f"backend not authoritative: {backend_name}"
+            if backend_name is not None
+            else "backend not authoritative; name absent"
+        )
+    elif backend_authoritative is None:
+        soft_degradation = True
+        reasons.append("backend authority absent")
+    else:
+        soft_degradation = True
+        reasons.append(f"backend authority invalid: {backend_authoritative!r}")
+
     execution_status = artifact.get("execution_status")
     if execution_status == "ok":
         reasons.append("execution status: ok")
@@ -152,6 +225,9 @@ def _terminal_confidence(artifact: Mapping[str, Any]) -> dict[str, Any] | None:
     else:
         hard_degradation = True
         reasons.append(f"execution status {execution_status} caps confidence at low")
+
+    if artifact.get("lifecycle") == "cancelled":
+        reasons.append("lifecycle cancelled")
 
     grade = "low" if hard_degradation else "medium" if soft_degradation else "high"
     return {"grade": grade, "reasons": reasons}
