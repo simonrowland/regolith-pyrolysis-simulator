@@ -96,7 +96,7 @@ function render(artifact) {
   </header>
   ${settingsField(1, "Recipe snapshot", "Captured recipe material only; absent values are not reconstructed.", dataBlock(header.recipe_snapshot))}
   ${settingsField(2, "Engine identity", "Backend identity recorded by the run header.", dataBlock(header.engine_identity))}
-  ${settingsField(3, "C3 dose", "Captured dose values; no recipe inference.", dataBlock(header.c3_dose))}
+  ${settingsField(3, "C3 dose · kg by species", "Captured alkali-shuttle dose in kg (not mol); no recipe inference.", dataBlock(header.c3_dose))}
   ${settingsField(4, "Owner's two energy prices", "Electrical and solar-heat prices bind directly to header.cost_block.", costBlock(header.cost_block))}
   ${settingsField(5, "Effective config", "Per-key merged value and source; every non-default source is highlighted.", effectiveConfig(header.effective_config))}
   <footer class="footer"><span>Frozen header inspection · engine-free · no edit controls</span><a href="./library.html">Run library</a></footer>`;
