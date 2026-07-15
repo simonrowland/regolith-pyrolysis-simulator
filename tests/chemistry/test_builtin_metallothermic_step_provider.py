@@ -37,6 +37,7 @@ from dataclasses import replace
 from unittest.mock import patch
 
 import copy
+import math
 from pathlib import Path
 
 import pytest
@@ -2546,4 +2547,71 @@ def test_full_run_mass_balance_holds_with_kernel_committed_metallothermic(
         f"feedstock {feedstock_key} mass balance closure "
         f"{snapshot.mass_balance_error_pct:.3e} % exceeds the "
         "5e-12 % kernel-path bound"
+    )
+
+
+def test_mars_basalt_c3_shuttle_conserves_total_elemental_fe(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_sim(
+        "mars_basalt",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        additives_kg={"C": 60.0, "K": 30.0, "Na": 25.0},
+    )
+
+    def fe_atoms_by_account():
+        balances = sim.atom_ledger.mol_by_account()
+        return {
+            account: sim.atom_ledger.atom_moles_by_account(account).get("Fe", 0.0)
+            for account in balances
+        }
+
+    fe_before_by_account = fe_atoms_by_account()
+    fe_before = math.fsum(fe_before_by_account.values())
+
+    sim.start_campaign(CampaignPhase.C0)
+    decision_choice = {
+        DecisionType.ROOT_BRANCH: "pyrolysis",
+        DecisionType.PATH_AB: "A_staged",
+        DecisionType.BRANCH_ONE_TWO: "two",
+    }
+    steps = 0
+    while sim.melt.campaign != CampaignPhase.C4 and steps < 5000:
+        if sim.paused_for_decision:
+            decision = sim.pending_decision
+            choice = decision_choice.get(decision.decision_type)
+            if choice not in (decision.options or []):
+                choice = (decision.options or [None])[0]
+            sim.apply_decision(decision.decision_type, choice)
+            continue
+        sim.step()
+        steps += 1
+
+    assert sim.melt.campaign == CampaignPhase.C4, (
+        "Mars-basalt run did not reach the post-C3 boundary in 5000 steps"
+    )
+    assert any(
+        transition.name == "c3_na_shuttle_reduction"
+        and transition.credit_atom_moles(sim.atom_ledger.registry).get("Fe", 0.0)
+        > 0.0
+        for transition in sim.atom_ledger.transitions
+    ), "Mars-basalt C3 run produced no elemental Fe shuttle transition"
+
+    fe_after_by_account = fe_atoms_by_account()
+    all_accounts = set(fe_before_by_account) | set(fe_after_by_account)
+    fe_after = math.fsum(
+        fe_after_by_account.get(account, 0.0) for account in all_accounts
+    )
+    fe_error_pct = abs(fe_after - fe_before) / fe_before * 100.0
+
+    assert fe_error_pct <= 5e-12, (
+        f"total elemental Fe changed by {fe_after - fe_before:.12g} mol-atoms "
+        f"({fe_error_pct:.3e} %) across {len(all_accounts)} ledger accounts; "
+        f"before={fe_before:.12g}, after={fe_after:.12g}; "
+        f"before_by_account={fe_before_by_account}; "
+        f"after_by_account={fe_after_by_account}"
     )
