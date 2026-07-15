@@ -723,6 +723,33 @@ def test_condensed_species_projection_delta_cannot_exceed_ledger_total():
     assert sim.train.total_by_species()["Fe"] == pytest.approx(2.0)
 
 
+def test_trim_condensed_species_projection_uses_stage_position_not_number():
+    sim = _sim(
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"FeO": 100.0},
+            }
+        }
+    )
+    sim.train.stages = [
+        sim.train.stages[stage_idx]
+        for stage_idx in (0, 1, 3, 4)
+    ]
+    stage_3 = sim.train.stages[2]
+    stage_4 = sim.train.stages[3]
+    assert stage_3.stage_number == 3
+    assert stage_4.stage_number == 4
+
+    stage_4.collected_kg.update({"Fe": 2.0})
+
+    sim._trim_condensed_species_projection("Fe", target_kg=1.0)
+
+    assert stage_4.collected_kg["Fe"] == pytest.approx(1.0)
+    assert "Fe" not in stage_3.collected_kg
+    assert sim.train.total_by_species()["Fe"] == pytest.approx(1.0)
+
+
 def test_electrolysis_skips_ferric_full_reduction_with_feo_present():
     melt = MeltState()
     melt.composition_kg = {"FeO": 10.0, "Fe2O3": 10.0}

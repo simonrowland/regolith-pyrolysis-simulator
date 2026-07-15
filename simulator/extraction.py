@@ -456,7 +456,9 @@ class ExtractionMixin:
             if stage_remaining_kg <= self._LEDGER_KG_TOL:
                 stage.collected_kg.pop(species, None)
             else:
-                stage.collected_kg[species] = stage_remaining_kg
+                self._set_condensed_species_projection(
+                    stage_idx, species, stage_remaining_kg
+                )
             if source_remaining_kg <= self._LEDGER_KG_TOL:
                 self._stage_collection_kg_by_source.pop(key, None)
             else:
@@ -473,7 +475,8 @@ class ExtractionMixin:
             self._condensed_species_projected_kg(species)
             - max(0.0, float(target_kg)),
         )
-        for stage in reversed(self.train.stages):
+        for stage_idx in reversed(range(len(self.train.stages))):
+            stage = self.train.stages[stage_idx]
             if excess_kg <= self._LEDGER_KG_TOL:
                 break
             current_kg = max(
@@ -484,7 +487,9 @@ class ExtractionMixin:
             if remaining_kg <= self._LEDGER_KG_TOL:
                 stage.collected_kg.pop(species, None)
             else:
-                stage.collected_kg[species] = remaining_kg
+                self._set_condensed_species_projection(
+                    stage_idx, species, remaining_kg
+                )
             excess_kg -= remove_kg
 
     def _audit_metal_projection_drift(self) -> Dict[str, float]:
