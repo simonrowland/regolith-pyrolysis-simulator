@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 import fcntl
 import json
 import logging
@@ -33,6 +34,15 @@ class RunStoreCorruptionError(RuntimeError):
         super().__init__(f"corrupt run artifact {run_id!r}: {detail}")
 
 
+class RunMetaCorruptionError(RunStoreCorruptionError):
+    """Raised when a run metadata sidecar is not a decodable JSON object."""
+
+    def __init__(self, run_id: str, path: Path, detail: str) -> None:
+        self.run_id = run_id
+        self.path = path
+        RuntimeError.__init__(self, f"corrupt run metadata {run_id!r}: {detail}")
+
+
 class DuplicateRunArtifactError(RuntimeError):
     """Raised when persistence cannot prove this payload won the first write."""
 
@@ -42,8 +52,16 @@ class RunArtifactStore:
         self.runs_dir = Path(runs_dir)
         self.keep = max(0, int(keep))
 
-    def save(self, run_id: str, artifact: dict[str, Any]) -> bool:
+    def save(
+        self,
+        run_id: str,
+        artifact: dict[str, Any],
+        *,
+        parent_run_id: str | None = None,
+    ) -> bool:
         destination = self._path(run_id)
+        if parent_run_id is not None:
+            self._path(parent_run_id)
         claim_path = destination.with_suffix(".write-lock")
         self.runs_dir.mkdir(parents=True, exist_ok=True)
         with _SAVE_LOCK:
@@ -76,6 +94,8 @@ class RunArtifactStore:
                 finally:
                     if temp_path is not None:
                         temp_path.unlink(missing_ok=True)
+        if parent_run_id is not None:
+            self._save_parent_run_id(run_id, parent_run_id)
         self._apply_retention()
         return True
 
@@ -143,15 +163,22 @@ class RunArtifactStore:
         summaries: list[dict[str, Any]] = []
         if not self.runs_dir.exists():
             return summaries
-        for path in self.runs_dir.glob("*.json"):
+        for path in self._artifact_paths():
             try:
                 artifact = self.load(path.stem)
-                if artifact is not None:
-                    summaries.append(self._summary(artifact, path.stem))
             except RunStoreCorruptionError as exc:
                 quarantine_path = self._quarantine(path)
                 _LOG.error("%s; quarantined at %s", exc, quarantine_path)
                 continue
+            if artifact is None:
+                continue
+            try:
+                metadata = self._load_meta(path.stem)
+            except RunMetaCorruptionError as exc:
+                quarantine_path = self._quarantine(exc.path)
+                _LOG.error("%s; quarantined at %s", exc, quarantine_path)
+                metadata = {}
+            summaries.append(self._summary(artifact, path.stem, metadata))
         return sorted(
             summaries,
             key=lambda row: str(row.get("created_at") or ""),
@@ -164,6 +191,93 @@ class RunArtifactStore:
             raise ValueError("run_id must use only letters, digits, dot, underscore, or hyphen")
         return self.runs_dir / f"{value}.json"
 
+    def _meta_path(self, run_id: str) -> Path:
+        return self._path(run_id).with_suffix(".meta.json")
+
+    def _artifact_paths(self):
+        return (
+            path
+            for path in self.runs_dir.glob("*.json")
+            if not path.name.endswith(".meta.json")
+        )
+
+    def _load_meta(self, run_id: str) -> dict[str, Any]:
+        path = self._meta_path(run_id)
+        try:
+            with path.open(encoding="utf-8") as handle:
+                payload = json.load(handle)
+        except FileNotFoundError:
+            return {}
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RunMetaCorruptionError(run_id, path, str(exc)) from exc
+        if not isinstance(payload, dict):
+            raise RunMetaCorruptionError(
+                run_id,
+                path,
+                f"expected metadata to be an object, got {type(payload).__name__}",
+            )
+        return payload
+
+    def update_meta(
+        self, run_id: str, updates: Mapping[str, Any]
+    ) -> dict[str, Any]:
+        artifact_path = self._path(run_id)
+        if not artifact_path.is_file():
+            raise FileNotFoundError(run_id)
+        unknown = set(updates) - {"starred", "folder"}
+        if unknown:
+            raise ValueError(f"unknown run metadata keys: {', '.join(sorted(unknown))}")
+        if "starred" in updates and not isinstance(updates["starred"], bool):
+            raise ValueError("starred must be a boolean")
+        if "folder" in updates and updates["folder"] is not None and not isinstance(
+            updates["folder"], str
+        ):
+            raise ValueError("folder must be a string or null")
+        return self._write_meta_updates(run_id, updates)
+
+    def _save_parent_run_id(self, run_id: str, parent_run_id: str) -> None:
+        self._path(parent_run_id)
+        self._write_meta_updates(run_id, {"parent_run_id": parent_run_id})
+
+    def _write_meta_updates(
+        self, run_id: str, updates: Mapping[str, Any]
+    ) -> dict[str, Any]:
+        destination = self._meta_path(run_id)
+        claim_path = destination.with_suffix(".write-lock")
+        self.runs_dir.mkdir(parents=True, exist_ok=True)
+        with claim_path.open("a", encoding="utf-8") as claim_handle:
+            fcntl.flock(claim_handle.fileno(), fcntl.LOCK_EX)
+            metadata = self._load_meta(run_id)
+            for key, value in updates.items():
+                if key == "folder" and value is None:
+                    metadata.pop(key, None)
+                else:
+                    metadata[key] = value
+            temp_path: Path | None = None
+            try:
+                fd, raw_temp_path = tempfile.mkstemp(
+                    prefix=f".{run_id}.meta.", suffix=".tmp", dir=self.runs_dir
+                )
+                temp_path = Path(raw_temp_path)
+                with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                    json.dump(
+                        metadata,
+                        handle,
+                        indent=2,
+                        sort_keys=True,
+                        allow_nan=False,
+                    )
+                    handle.write("\n")
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                # Atomic whole-sidecar replacement: serialized writers preserve
+                # existing keys and the latest completed write wins.
+                os.replace(temp_path, destination)
+            finally:
+                if temp_path is not None:
+                    temp_path.unlink(missing_ok=True)
+        return metadata
+
     @staticmethod
     def _quarantine(path: Path) -> Path:
         candidate = path.with_suffix(f"{path.suffix}.corrupt")
@@ -175,7 +289,12 @@ class RunArtifactStore:
         return candidate
 
     @staticmethod
-    def _summary(artifact: dict[str, Any], fallback_run_id: str) -> dict[str, Any]:
+    def _summary(
+        artifact: dict[str, Any],
+        fallback_run_id: str,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        metadata = metadata or {}
         header = artifact.get("header", {}) or {}
         timesteps = artifact.get("timesteps", []) or []
         summaries = [
@@ -192,16 +311,19 @@ class RunArtifactStore:
         final_summary = summaries[-1] if summaries else {}
         metal_yields = final_summary.get("metal_yields_kg", {}) or {}
         headline_yields: dict[str, int | float] = {}
+        headline_yield_semantics: dict[str, str] = {}
         summary_parts: list[str] = []
         fe_kg = metal_yields.get("Fe")
         if RunArtifactStore._is_finite_number(fe_kg):
             headline_yields["Fe"] = fe_kg
+            headline_yield_semantics["Fe"] = "evolved_product"
             summary_parts.append(f"Fe {fe_kg:g} kg")
         o2_kg = final_summary.get("O2_source_side_potential_kg_cumulative")
         if not RunArtifactStore._is_finite_number(o2_kg):
             o2_kg = final_summary.get("O2_yield_kg_cumulative")
         if RunArtifactStore._is_finite_number(o2_kg):
             headline_yields["O2"] = o2_kg
+            headline_yield_semantics["O2"] = "source_side_potential"
             summary_parts.append(f"O₂ (source-side) {o2_kg:g} kg")
         execution_status = artifact.get("execution_status")
         result = {
@@ -214,11 +336,19 @@ class RunArtifactStore:
             "execution_status": execution_status,
             "status": execution_status,
             "created_at": header.get("created_at"),
-            "starred": bool(header.get("starred", False)),
+            "starred": bool(metadata.get("starred", False)),
             "summary": " · ".join(summary_parts),
         }
-        if header.get("folder") is not None:
-            result["folder"] = header["folder"]
+        if headline_yield_semantics:
+            result["headline_yield_semantics"] = headline_yield_semantics
+        final_hour = final_summary.get("hour")
+        if RunArtifactStore._is_finite_number(final_hour):
+            result["hours"] = final_hour
+        if metadata.get("folder") is not None:
+            result["folder"] = metadata["folder"]
+        parent_run_id = metadata.get("parent_run_id", header.get("parent_run_id"))
+        if parent_run_id is not None:
+            result["parent_run_id"] = parent_run_id
         return result
 
     @staticmethod
@@ -231,19 +361,23 @@ class RunArtifactStore:
 
     def _apply_retention(self) -> None:
         unstarred: list[tuple[str, Path]] = []
-        for path in self.runs_dir.glob("*.json"):
+        for path in self._artifact_paths():
             try:
                 with path.open(encoding="utf-8") as handle:
                     artifact = json.load(handle)
                 header = artifact.get("header", {}) or {}
-                if not bool(header.get("starred", False)):
+                metadata = self._load_meta(path.stem)
+                if not bool(metadata.get("starred", False)):
                     created_at = str(header.get("created_at") or "")
                     unstarred.append((created_at, path))
+            except RunMetaCorruptionError:
+                continue
             except (OSError, json.JSONDecodeError, AttributeError):
                 continue
         unstarred.sort(key=lambda item: item[0], reverse=True)
         for _created_at, path in unstarred[self.keep:]:
             path.unlink(missing_ok=True)
+            self._meta_path(path.stem).unlink(missing_ok=True)
 
 
 def get_run_store() -> RunArtifactStore:
@@ -254,8 +388,13 @@ def get_run_store() -> RunArtifactStore:
     return RunArtifactStore(runs_dir, keep=keep)
 
 
-def save(run_id: str, artifact: dict[str, Any]) -> bool:
-    return get_run_store().save(run_id, artifact)
+def save(
+    run_id: str,
+    artifact: dict[str, Any],
+    *,
+    parent_run_id: str | None = None,
+) -> bool:
+    return get_run_store().save(run_id, artifact, parent_run_id=parent_run_id)
 
 
 def load(run_id: str) -> dict[str, Any] | None:
@@ -272,9 +411,14 @@ def persist_run_artifact(
     name: str | None = None,
     *,
     store: RunArtifactStore | None = None,
+    parent_run_id: str | None = None,
 ) -> dict[str, Any]:
     artifact = build_run_artifact(runner_payload, run_id=run_id, name=name)
-    stored = (store.save if store is not None else save)(run_id, artifact)
+    stored = (store.save if store is not None else save)(
+        run_id,
+        artifact,
+        parent_run_id=parent_run_id,
+    )
     if not stored:
         raise DuplicateRunArtifactError(
             f"run artifact {run_id!r} was not written because the id already exists"

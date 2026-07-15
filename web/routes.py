@@ -96,6 +96,7 @@ from web.advisory import (
 )
 from web.run_store import (
     RunStoreCorruptionError,
+    get_run_store,
     list_runs,
     load as load_run_artifact,
 )
@@ -3280,6 +3281,34 @@ def run_artifact_api(run_id: str):
     if artifact is None:
         return _json_error('run artifact not found', 404)
     return jsonify(artifact)
+
+
+@bp.route('/api/runs/<run_id>/meta', methods=['PATCH'])
+def run_meta_api(run_id: str):
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, Mapping):
+        return jsonify({
+            'error': 'run metadata request body must be a JSON object',
+            'error_type': 'invalid_run_metadata',
+        }), 400
+    try:
+        metadata = get_run_store().update_meta(run_id, payload)
+    except FileNotFoundError:
+        return jsonify({
+            'error': 'run artifact not found',
+            'error_type': 'run_not_found',
+        }), 404
+    except ValueError as exc:
+        return jsonify({
+            'error': str(exc),
+            'error_type': 'invalid_run_metadata',
+        }), 400
+    except RunStoreCorruptionError as exc:
+        return jsonify({
+            'error': str(exc),
+            'error_type': 'run_store_corruption',
+        }), 500
+    return jsonify({'run_id': run_id, **metadata})
 
 
 @bp.route('/api/wall-risk')

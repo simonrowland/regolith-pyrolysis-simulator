@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import json
 from pathlib import Path
 import subprocess
@@ -14,6 +15,7 @@ from simulator.accounting.run_artifact import (
     build_run_artifact,
 )
 from web import routes as web_routes
+from web import run_store as run_store_module
 from web.run_store import (
     RunArtifactStore,
     RunStoreCorruptionError,
@@ -151,12 +153,12 @@ def test_store_save_load_list_and_retention(tmp_path) -> None:
     store = RunArtifactStore(tmp_path / "runs", keep=1)
     first = build_run_artifact(_runner_payload(), run_id="run-1", name="First")
     first["header"]["created_at"] = "2026-07-14T12:00:00Z"
-    first["header"]["starred"] = True
     second = build_run_artifact(_runner_payload("ok"), run_id="run-2", name="Second")
     third = build_run_artifact(_runner_payload("ok"), run_id="run-3", name="Third")
     third["header"]["created_at"] = "2026-07-16T12:00:00Z"
 
     store.save("run-1", first)
+    store.update_meta("run-1", {"starred": True})
     assert store.save("run-1", second) is False
     store.save("run-2", second)
     store.save("run-3", third)
@@ -168,9 +170,126 @@ def test_store_save_load_list_and_retention(tmp_path) -> None:
     assert [summary["run_id"] for summary in summaries] == ["run-3", "run-1"]
     assert summaries[0]["peak_T_C"] == 1400.0
     assert summaries[0]["headline_yields_kg"] == {"Fe": 12.5, "O2": 4.25}
+    assert summaries[0]["headline_yield_semantics"] == {
+        "Fe": "evolved_product",
+        "O2": "source_side_potential",
+    }
+    assert summaries[0]["hours"] == 2
     assert summaries[0]["summary"] == "Fe 12.5 kg · O₂ (source-side) 4.25 kg"
     assert "folder" not in summaries[0]
     assert summaries[1]["starred"] is True
+
+
+def test_store_meta_round_trip_is_idempotent_and_does_not_rewrite_artifact(
+    tmp_path,
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="run-meta")
+    assert store.save("run-meta", artifact) is True
+    artifact_path = store.runs_dir / "run-meta.json"
+    original_bytes = artifact_path.read_bytes()
+
+    expected = {"starred": True, "folder": "Campaign A"}
+    assert store.update_meta("run-meta", expected) == expected
+    assert store.update_meta("run-meta", expected) == expected
+
+    assert artifact_path.read_bytes() == original_bytes
+    assert json.loads((store.runs_dir / "run-meta.meta.json").read_text()) == expected
+    assert not list(store.runs_dir.glob("*.tmp"))
+    summary = store.list_runs()[0]
+    assert summary["starred"] is True
+    assert summary["folder"] == "Campaign A"
+
+    assert store.update_meta("run-meta", {"starred": False, "folder": None}) == {
+        "starred": False
+    }
+    summary = store.list_runs()[0]
+    assert summary["starred"] is False
+    assert "folder" not in summary
+
+
+def test_store_meta_atomic_failure_cleans_temp_and_preserves_previous_sidecar(
+    tmp_path, monkeypatch
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="atomic")
+    assert store.save("atomic", artifact) is True
+    assert store.update_meta("atomic", {"starred": True}) == {"starred": True}
+    meta_path = store.runs_dir / "atomic.meta.json"
+    original_bytes = meta_path.read_bytes()
+
+    def fail_replace(_source, _destination):
+        raise OSError("replace failed")
+
+    monkeypatch.setattr(run_store_module.os, "replace", fail_replace)
+    with pytest.raises(OSError, match="replace failed"):
+        store.update_meta("atomic", {"folder": "Moon"})
+
+    assert meta_path.read_bytes() == original_bytes
+    assert not list(store.runs_dir.glob("*.tmp"))
+
+
+def test_store_corrupt_meta_quarantines_only_sidecar(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="meta-corrupt")
+    assert store.save("meta-corrupt", artifact) is True
+    artifact_path = store.runs_dir / "meta-corrupt.json"
+    meta_path = store.runs_dir / "meta-corrupt.meta.json"
+    meta_path.write_text("{not-json", encoding="utf-8")
+
+    summaries = store.list_runs()
+
+    assert summaries[0]["run_id"] == "meta-corrupt"
+    assert summaries[0]["starred"] is False
+    assert artifact_path.exists()
+    assert not meta_path.exists()
+    assert (store.runs_dir / "meta-corrupt.meta.json.corrupt").exists()
+
+
+def test_store_concurrent_meta_writers_leave_one_complete_valid_sidecar(
+    tmp_path,
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="concurrent")
+    assert store.save("concurrent", artifact) is True
+    updates = [
+        {"starred": bool(index % 2), "folder": f"folder-{index}"}
+        for index in range(24)
+    ]
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        list(executor.map(lambda update: store.update_meta("concurrent", update), updates))
+
+    stored = json.loads(
+        (store.runs_dir / "concurrent.meta.json").read_text(encoding="utf-8")
+    )
+    assert stored in updates
+    assert not list(store.runs_dir.glob("*.tmp"))
+
+
+def test_store_parent_run_id_is_sidecar_only_and_absence_is_omitted(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    child = persist_run_artifact(
+        _runner_payload("ok"),
+        "child",
+        store=store,
+        parent_run_id="parent",
+    )
+    persist_run_artifact(_runner_payload("ok"), "independent", store=store)
+
+    assert "parent_run_id" not in child["header"]
+    assert store.load("child") == child
+    summaries = {row["run_id"]: row for row in store.list_runs()}
+    assert summaries["child"]["parent_run_id"] == "parent"
+    assert "parent_run_id" not in summaries["independent"]
+
+
+def test_store_meta_path_uses_run_id_validation(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+
+    with pytest.raises(ValueError, match="run_id"):
+        store.update_meta("../escape", {"starred": True})
+    assert not (tmp_path / "escape.meta.json").exists()
 
 
 def test_store_corrupt_load_is_typed_and_list_quarantines(tmp_path) -> None:
@@ -233,6 +352,15 @@ def test_store_summary_omits_absent_species_and_labels_source_side_o2(tmp_path) 
     assert "O₂" not in fe_only_summary["summary"]
     assert fe_only_summary["headline_yields_kg"] == {"Fe": 12.5}
 
+    empty_store = RunArtifactStore(tmp_path / "empty-runs")
+    empty = build_run_artifact(_runner_payload("refused"), run_id="empty")
+    empty["timesteps"] = []
+    assert empty_store.save("empty", empty) is True
+    empty_summary = empty_store.list_runs()[0]
+    assert empty_summary["headline_yields_kg"] == {}
+    assert "headline_yield_semantics" not in empty_summary
+    assert "hours" not in empty_summary
+
 
 def test_store_stale_lock_file_does_not_block_retry(tmp_path) -> None:
     store = RunArtifactStore(tmp_path / "runs")
@@ -277,6 +405,56 @@ def test_run_artifact_routes_return_index_full_artifact_and_404(tmp_path) -> Non
     corrupt_response = client.get("/api/runs/corrupt")
     assert corrupt_response.status_code == 500
     assert corrupt_response.get_json()["error_type"] == "run_store_corruption"
+
+
+def test_run_meta_route_round_trip_validation_and_404(tmp_path) -> None:
+    app = Flask(__name__)
+    app.config.update(
+        TESTING=True,
+        SECRET_KEY="run-meta-test",
+        RUN_ARTIFACT_DIR=str(tmp_path / "runs"),
+    )
+    app.register_blueprint(web_routes.bp)
+    with app.app_context():
+        persist_run_artifact(_runner_payload("ok"), "run-meta")
+    client = app.test_client()
+
+    response = client.patch(
+        "/api/runs/run-meta/meta",
+        json={"starred": True, "folder": "Favorites"},
+    )
+    assert response.status_code == 200
+    assert response.get_json() == {
+        "run_id": "run-meta",
+        "starred": True,
+        "folder": "Favorites",
+    }
+    assert client.patch(
+        "/api/runs/run-meta/meta",
+        json={"starred": True, "folder": "Favorites"},
+    ).get_json() == response.get_json()
+    index_row = client.get("/api/runs").get_json()[0]
+    assert index_row["starred"] is True
+    assert index_row["folder"] == "Favorites"
+
+    unknown = client.patch(
+        "/api/runs/run-meta/meta", json={"arbitrary": "rejected"}
+    )
+    assert unknown.status_code == 400
+    assert unknown.get_json()["error_type"] == "invalid_run_metadata"
+    assert "unknown run metadata keys" in unknown.get_json()["error"]
+
+    malformed = client.patch(
+        "/api/runs/run-meta/meta",
+        data="[]",
+        content_type="application/json",
+    )
+    assert malformed.status_code == 400
+    assert malformed.get_json()["error_type"] == "invalid_run_metadata"
+
+    missing = client.patch("/api/runs/missing/meta", json={"starred": True})
+    assert missing.status_code == 404
+    assert missing.get_json()["error_type"] == "run_not_found"
 
 
 def test_backfill_run_artifact_cli_round_trips_runner_payload(tmp_path) -> None:
