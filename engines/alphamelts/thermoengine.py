@@ -8,14 +8,21 @@ emits a ledger transition.
 from __future__ import annotations
 
 import faulthandler
+import hashlib
+import json
 import math
 import multiprocessing
+import os
 import pickle
+import signal
 import subprocess
 import sys
+import tempfile
 import time
 import traceback
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
 
 from simulator.accounting.formulas import resolve_species_formula
@@ -33,6 +40,8 @@ _FO2_ECHO_TOLERANCE = 1.0e-3
 _FO2_MONOTONIC_EPSILON = 1.0e-7
 _FO2_FRACTION_WIDTH_TOLERANCE = 1.0e-10
 _DEFAULT_EQUILIBRATE_TIMEOUT_S = 60.0
+_DEFAULT_WATCHDOG_GRACE_S = 0.25
+_THERMOENGINE_LOG_DIR_ENV = 'REGOLITH_THERMOENGINE_LOG_DIR'
 _FE_O_MOLAR_MASS = 71.8444
 _FE2_O3_MOLAR_MASS = 159.6882
 
@@ -45,12 +54,77 @@ _MODEL_TO_THERMOENGINE = {
 }
 
 
+def thermoengine_diagnostic_log_path(
+    log_dir: str | os.PathLike[str] | None = None,
+) -> Path:
+    """Return the aggregate, append-only ThermoEngine diagnostic log path."""
+    configured_dir = log_dir or os.environ.get(_THERMOENGINE_LOG_DIR_ENV)
+    directory = Path(configured_dir) if configured_dir else Path(
+        tempfile.gettempdir(), 'regolith-pyrolysis-simulator')
+    return directory / 'thermoengine-diagnostics.log'
+
+
+def _register_worker_fault_handler(
+    error_log_path: str | os.PathLike[str],
+    diagnostic_signal: int,
+) -> Any:
+    path = Path(error_log_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    errlog = path.open('a', encoding='utf-8', buffering=1)
+    try:
+        faulthandler.register(
+            diagnostic_signal,
+            file=errlog,
+            all_threads=True,
+        )
+    except BaseException:
+        errlog.close()
+        raise
+    return errlog
+
+
+def _append_solve_input_line(
+    errlog: Any,
+    *,
+    worker_id: int,
+    temperature_C: float,
+    pressure_bar: float,
+    comp_wt: Mapping[str, float],
+    fO2_log: Optional[float],
+) -> None:
+    normalized_comp = {
+        str(oxide): float(value)
+        for oxide, value in sorted(comp_wt.items())
+    }
+    encoded_comp = json.dumps(
+        normalized_comp,
+        sort_keys=True,
+        separators=(',', ':'),
+    ).encode('utf-8')
+    comp_hash = hashlib.sha256(encoded_comp).hexdigest()[:16]
+    timestamp = datetime.now(timezone.utc).isoformat(
+        timespec='milliseconds').replace('+00:00', 'Z')
+    fO2_value = 'intrinsic' if fO2_log is None else f'{float(fO2_log):g}'
+    errlog.write(
+        f'worker_id={worker_id} | comp_sha256={comp_hash} | '
+        f'T_C={float(temperature_C):g} | P_bar={float(pressure_bar):g} | '
+        f'fO2_log={fO2_value} | timestamp={timestamp}\n'
+    )
+    errlog.flush()
+
+
 def _run_thermoengine_worker(connection: Any, model_name: str,
                              activity_converter: ActivityConverter,
-                             equilibrate_timeout_s: float) -> None:
+                             error_log_path: str,
+                             diagnostic_signal: int) -> None:
     """Own all native ThermoEngine state inside a killable worker."""
     faulthandler.enable()
+    errlog = None
     try:
+        errlog = _register_worker_fault_handler(
+            error_log_path,
+            diagnostic_signal,
+        )
         transport = ThermoEngineTransport(
             model_name=model_name,
             activity_converter=activity_converter,
@@ -64,8 +138,14 @@ def _run_thermoengine_worker(connection: Any, model_name: str,
                 break
             if kwargs is None:
                 break
-            faulthandler.dump_traceback_later(
-                equilibrate_timeout_s, exit=False)
+            _append_solve_input_line(
+                errlog,
+                worker_id=os.getpid(),
+                temperature_C=kwargs['temperature_C'],
+                pressure_bar=kwargs['pressure_bar'],
+                comp_wt=kwargs['comp_wt'],
+                fO2_log=kwargs['fO2_log'],
+            )
             try:
                 connection.send((
                     'ok', transport._equilibrate_in_process(**kwargs)))
@@ -74,13 +154,16 @@ def _run_thermoengine_worker(connection: Any, model_name: str,
                     'error', type(exc).__name__, str(exc),
                     traceback.format_exc(),
                 ))
-            finally:
-                faulthandler.cancel_dump_traceback_later()
     except BaseException as exc:  # pragma: no cover - native/bootstrap faults
         connection.send((
             'error', type(exc).__name__, str(exc), traceback.format_exc(),
         ))
     finally:
+        if errlog is not None:
+            try:
+                faulthandler.unregister(diagnostic_signal)
+            finally:
+                errlog.close()
         connection.close()
 
 
@@ -119,6 +202,9 @@ class ThermoEngineTransport:
         model_name: str = 'MELTSv1.0.2',
         activity_converter: ActivityConverter,
         equilibrate_timeout_s: float = _DEFAULT_EQUILIBRATE_TIMEOUT_S,
+        diagnostic_log_dir: str | os.PathLike[str] | None = None,
+        watchdog_grace_s: float = _DEFAULT_WATCHDOG_GRACE_S,
+        diagnostic_signal: int = signal.SIGUSR1,
     ) -> None:
         self._model_name = str(model_name or 'MELTSv1.0.2')
         if self._model_name not in _MODEL_TO_THERMOENGINE:
@@ -130,6 +216,10 @@ class ThermoEngineTransport:
         self._activity_converter = activity_converter
         self._equilibrate_timeout_s = max(
             1.0, float(equilibrate_timeout_s))
+        self._diagnostic_log_path = thermoengine_diagnostic_log_path(
+            diagnostic_log_dir)
+        self._watchdog_grace_s = max(0.0, float(watchdog_grace_s))
+        self._diagnostic_signal = int(diagnostic_signal)
         self._thermoengine = None
         self._equilibrate = None
         self._model = None
@@ -161,7 +251,8 @@ class ThermoEngineTransport:
                 child,
                 self._model_name,
                 self._activity_converter,
-                self._equilibrate_timeout_s,
+                str(self._diagnostic_log_path),
+                self._diagnostic_signal,
             ),
             daemon=True,
         )
@@ -195,6 +286,31 @@ class ThermoEngineTransport:
         self._worker_process = process
         self._worker_connection = parent
         return True
+
+    @property
+    def diagnostic_log_path(self) -> Path:
+        """Well-known append log harvested after a worker timeout."""
+        return self._diagnostic_log_path
+
+    def _dump_then_kill_worker(self) -> None:
+        """Request a native traceback, allow it to flush, then hard-kill."""
+        process = self._worker_process
+        connection = self._worker_connection
+        self._worker_process = None
+        self._worker_connection = None
+        try:
+            if process is not None and process.is_alive():
+                try:
+                    os.kill(process.pid, self._diagnostic_signal)
+                except OSError:
+                    pass
+                time.sleep(self._watchdog_grace_s)
+                if process.is_alive():
+                    process.kill()
+                process.join(timeout=1.0)
+        finally:
+            if connection is not None:
+                connection.close()
 
     def close(self) -> None:
         """Idempotently stop the native worker and close both pipe ends."""
@@ -385,12 +501,14 @@ print('ok')
         try:
             connection.send(kwargs)
             if not connection.poll(self._equilibrate_timeout_s):
-                self.close()
+                self._dump_then_kill_worker()
                 raise TimeoutError(
                     'ThermoEngine equilibrium exceeded hard timeout of '
                     f'{self._equilibrate_timeout_s:g}s'
                 )
             message = connection.recv()
+        except TimeoutError:
+            raise
         except (BrokenPipeError, EOFError, OSError) as exc:
             self.close()
             raise RuntimeError(
@@ -1139,5 +1257,6 @@ __all__ = (
     'ThermoEnginePayload',
     'ThermoEngineTransport',
     'equilibrate_via_thermoengine',
+    'thermoengine_diagnostic_log_path',
     'thermoengine_available',
 )

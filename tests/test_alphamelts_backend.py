@@ -16,6 +16,7 @@ from engines.domain_reason import OutOfDomainReason
 from engines.alphamelts import AlphaMELTSProvider
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 import engines.alphamelts.provider as alphamelts_provider_module
+import engines.alphamelts.thermoengine as thermoengine_module
 from engines.alphamelts.parser import diagnostics_to_equilibrium
 from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.chemistry.kernel import ChemistryIntent
@@ -1486,6 +1487,113 @@ def test_thermoengine_transport_rejects_unpickleable_worker_converter():
 
     with pytest.raises(TypeError, match='activity_converter must be pickleable'):
         transport.initialize()
+
+
+def test_thermoengine_debug_log_appends_pre_solve_input(tmp_path):
+    log_path = tmp_path / 'thermoengine-diagnostics.log'
+
+    with log_path.open('a', encoding='utf-8') as errlog:
+        thermoengine_module._append_solve_input_line(
+            errlog,
+            worker_id=4123,
+            temperature_C=1400.0,
+            pressure_bar=1.5,
+            comp_wt={'SiO2': 50.0, 'FeO': 10.0},
+            fO2_log=-9.0,
+        )
+
+    line = log_path.read_text(encoding='utf-8').strip()
+    fields = dict(part.split('=', 1) for part in line.split(' | '))
+    assert fields['worker_id'] == '4123'
+    assert len(fields['comp_sha256']) == 16
+    assert fields['T_C'] == '1400'
+    assert fields['P_bar'] == '1.5'
+    assert fields['fO2_log'] == '-9'
+    assert fields['timestamp'].endswith('Z')
+
+
+def test_thermoengine_worker_registers_faulthandler_to_debug_log(
+    monkeypatch,
+    tmp_path,
+):
+    registrations = []
+    monkeypatch.setattr(
+        thermoengine_module.faulthandler,
+        'register',
+        lambda signum, **kwargs: registrations.append((signum, kwargs)),
+    )
+    log_path = tmp_path / 'nested' / 'diagnostics.log'
+
+    errlog = thermoengine_module._register_worker_fault_handler(log_path, 12)
+    try:
+        assert registrations == [(12, {
+            'file': errlog,
+            'all_threads': True,
+        })]
+        assert log_path.exists()
+    finally:
+        errlog.close()
+
+
+def test_thermoengine_timeout_dumps_then_kills_worker(monkeypatch):
+    events = []
+
+    class FakeProcess:
+        pid = 4123
+        alive = True
+
+        def is_alive(self):
+            return self.alive
+
+        def kill(self):
+            events.append('kill')
+            self.alive = False
+
+        def join(self, timeout):
+            events.append(('join', timeout))
+
+    class FakeConnection:
+        def send(self, value):
+            events.append(('send', value))
+
+        def poll(self, timeout):
+            events.append(('poll', timeout))
+            return False
+
+        def close(self):
+            events.append('close')
+
+    monkeypatch.setattr(
+        thermoengine_module.os,
+        'kill',
+        lambda pid, signum: events.append(('diagnostic_signal', pid, signum)),
+    )
+    monkeypatch.setattr(
+        thermoengine_module.time,
+        'sleep',
+        lambda seconds: events.append(('grace', seconds)),
+    )
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+        equilibrate_timeout_s=2.0,
+        watchdog_grace_s=0.125,
+        diagnostic_signal=12,
+    )
+    transport._worker_process = FakeProcess()
+    transport._worker_connection = FakeConnection()
+
+    with pytest.raises(TimeoutError, match='hard timeout of 2s'):
+        transport.equilibrate(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            comp_wt={'SiO2': 50.0},
+            fO2_log=-9.0,
+        )
+
+    order = [event if isinstance(event, str) else event[0] for event in events]
+    assert order[-5:] == ['diagnostic_signal', 'grace', 'kill', 'join', 'close']
+    assert transport._worker_process is None
+    assert transport._worker_connection is None
 
 
 def test_thermoengine_transport_close_is_idempotent():
