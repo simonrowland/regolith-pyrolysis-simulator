@@ -1077,6 +1077,8 @@ class AlphaMELTSBackend(MeltBackend):
         system_chisqr: Optional[float] = None,
         phase_thermo: Optional[Mapping[str, Mapping[str, Optional[float]]]] = None,
         phase_compositions: Optional[Mapping[str, Mapping[str, float]]] = None,
+        chem_potentials: Optional[Mapping[str, Mapping[str, float]]] = None,
+        phase_affinities: Optional[Mapping[str, Mapping[str, object]]] = None,
         solid_composition_wt_pct: Optional[Mapping[str, float]] = None,
         bulk_composition_wt_pct: Optional[Mapping[str, float]] = None,
         activity_coefficients: Optional[Mapping[str, float]] = None,
@@ -1153,6 +1155,22 @@ class AlphaMELTSBackend(MeltBackend):
                 str(phase): dict(values)
                 for phase, values in dict(phase_thermo or {}).items()
             },
+            chem_potentials=(
+                None
+                if chem_potentials is None
+                else {
+                    str(phase): dict(values)
+                    for phase, values in chem_potentials.items()
+                }
+            ),
+            phase_affinities=(
+                None
+                if phase_affinities is None
+                else {
+                    str(phase): dict(values)
+                    for phase, values in phase_affinities.items()
+                }
+            ),
             solid_composition_wt_pct=dict(solid_composition_wt_pct or {}),
             bulk_composition_wt_pct=dict(bulk_composition_wt_pct or {}),
         )
@@ -1600,6 +1618,10 @@ class AlphaMELTSBackend(MeltBackend):
                 phase_masses_kg=payload.phase_masses_kg,
                 liquid_fraction=payload.liquid_fraction,
                 liquid_composition_wt_pct=payload.liquid_composition_wt_pct,
+                phase_compositions=payload.phase_compositions,
+                phase_thermo=payload.phase_thermo,
+                chem_potentials=payload.chem_potentials,
+                phase_affinities=payload.phase_affinities,
                 activity_coefficients=payload.activity_coefficients,
                 vapor_pressures_Pa=vapor_pressures,
                 vapor_pressures_source=self._vapor_pressure_source_map(

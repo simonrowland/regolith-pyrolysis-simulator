@@ -688,6 +688,10 @@ def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
             'density_kg_m3': 3333.3333333333335,
         }
     }
+    legacy.chem_potentials = {'liquid': {'SiO2': -1234567.89}}
+    legacy.phase_affinities = {
+        'quartz': {'affinity': 321.0, 'composition': 'SiO2'}
+    }
     legacy.solid_composition_wt_pct = {'SiO2': 40.0, 'FeO': 20.0, 'MgO': 40.0}
     legacy.bulk_composition_wt_pct = {'SiO2': 49.0, 'FeO': 10.0}
     legacy.system_enthalpy = -1059377.1
@@ -734,6 +738,8 @@ def test_diagnostics_to_equilibrium_round_trips_legacy_fields():
         legacy.phase_compositions['olivine']
     )
     assert result.phase_thermo == legacy.phase_thermo
+    assert result.chem_potentials == legacy.chem_potentials
+    assert result.phase_affinities == legacy.phase_affinities
     assert result.solid_composition_wt_pct == pytest.approx(
         legacy.solid_composition_wt_pct
     )

@@ -501,6 +501,12 @@ class EquilibriumResult:
     solid_composition_wt_pct: Dict[str, float] = field(default_factory=dict)
     bulk_composition_wt_pct: Dict[str, float] = field(default_factory=dict)
 
+    # Engine-specific diagnostic chemistry. ``None`` means the emitting
+    # engine does not provide this facet; cache writers preserve that as SQL
+    # NULL rather than padding rows with empty JSON objects.
+    chem_potentials: Optional[Dict[str, Dict[str, float]]] = None
+    phase_affinities: Optional[Dict[str, Dict[str, Any]]] = None
+
     def __post_init__(self) -> None:
         if self.status != 'ok':
             return

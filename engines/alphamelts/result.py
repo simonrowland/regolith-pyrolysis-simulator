@@ -112,6 +112,8 @@ class LiquidusDiagnostics:
     backend_warnings: Tuple[str, ...] = ()
     backend_diagnostics: Mapping[str, Any] = field(default_factory=dict)
     backend_status_reason: Optional[str] = None
+    chem_potentials: Optional[Mapping[str, Mapping[str, float]]] = None
+    phase_affinities: Optional[Mapping[str, Mapping[str, Any]]] = None
 
     def __post_init__(self) -> None:
         # Coerce mappings to plain dict so the asdict() projection drops
@@ -150,6 +152,33 @@ class LiquidusDiagnostics:
                 }
                 for phase, values in dict(self.phase_thermo or {}).items()
             },
+        )
+        object.__setattr__(
+            self,
+            'chem_potentials',
+            (
+                None
+                if self.chem_potentials is None
+                else {
+                    str(phase): {
+                        str(component): float(value)
+                        for component, value in dict(values or {}).items()
+                    }
+                    for phase, values in self.chem_potentials.items()
+                }
+            ),
+        )
+        object.__setattr__(
+            self,
+            'phase_affinities',
+            (
+                None
+                if self.phase_affinities is None
+                else {
+                    str(phase): dict(values)
+                    for phase, values in self.phase_affinities.items()
+                }
+            ),
         )
         object.__setattr__(
             self,

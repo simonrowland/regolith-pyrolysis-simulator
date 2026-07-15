@@ -100,6 +100,8 @@ GENERIC_OUTPUT_FIELDS = (
     "system_phi",
     "system_chisqr",
     "phase_thermo",
+    "chem_potentials",
+    "phase_affinities",
     "solid_composition_wt_pct",
     "bulk_composition_wt_pct",
     "vapor_pressures_Pa",
@@ -161,7 +163,7 @@ assert (
     len(GENERIC_OUTPUT_FIELDS)
     + len(ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS)
     + len(FINDER_OUTPUT_FIELDS)
-) == 72
+) == 74
 
 
 def utc_now() -> str:
@@ -417,6 +419,8 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     generic_system_chisqr REAL,
     generic_system_chisqr_repr TEXT,
     generic_phase_thermo_json TEXT,
+    generic_chem_potentials_json TEXT,
+    generic_phase_affinities_json TEXT,
     generic_solid_composition_wt_pct_json TEXT,
     generic_bulk_composition_wt_pct_json TEXT,
     generic_vapor_pressures_Pa_json TEXT,
@@ -562,6 +566,7 @@ class GridCacheWriter:
             self._ensure_v2_provenance_columns()
             self._ensure_runmode_output_columns()
             self._ensure_claim_table()
+            self._set_metadata("schema_output_field_count", "74")
             self.connection.commit()
         else:
             self.connection.executescript(SCHEMA_SQL)
@@ -574,7 +579,7 @@ class GridCacheWriter:
                 "variant-local bookkeeping only; recompute reviewed canonical_state_bytes "
                 "from typed full-precision inputs; never transplant this hash",
             )
-            self._set_metadata("schema_output_field_count", "72")
+            self._set_metadata("schema_output_field_count", "74")
             self._set_metadata("schema_input_field_count", "25")
             self._set_metadata("grid_realization_revision", GRID_REALIZATION_REVISION)
             self._set_metadata("database_id", str(uuid.uuid4()), overwrite=False)
@@ -703,6 +708,8 @@ class GridCacheWriter:
                 "generic_system_chisqr": "REAL",
                 "generic_system_chisqr_repr": "TEXT",
                 "generic_phase_thermo_json": "TEXT",
+                "generic_chem_potentials_json": "TEXT",
+                "generic_phase_affinities_json": "TEXT",
                 "generic_solid_composition_wt_pct_json": "TEXT",
                 "generic_bulk_composition_wt_pct_json": "TEXT",
                 "run_mode": "TEXT",
@@ -1524,6 +1531,12 @@ class GridCacheWriter:
             "generic_system_chisqr": _float(generic.get("system_chisqr")),
             "generic_system_chisqr_repr": _repr(generic.get("system_chisqr")),
             "generic_phase_thermo_json": _json(generic.get("phase_thermo")),
+            "generic_chem_potentials_json": _json(
+                generic.get("chem_potentials")
+            ),
+            "generic_phase_affinities_json": _json(
+                generic.get("phase_affinities")
+            ),
             "generic_solid_composition_wt_pct_json": _json(
                 generic.get("solid_composition_wt_pct")
             ),

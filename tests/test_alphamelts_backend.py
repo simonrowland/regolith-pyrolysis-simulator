@@ -2030,6 +2030,30 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
             assert phase == 'Spinel'
             return 1000.0
 
+        def get_composition_of_phase(self, root, phase, mode):
+            assert (root, phase, mode) == ('root', 'Spinel', 'oxide_wt')
+            return {'Al2O3': 71.0, 'FeO': 29.0}
+
+        def get_property_of_phase(self, root, phase, property_name):
+            assert (root, phase) == ('root', 'Spinel')
+            return {
+                'GibbsFreeEnergy': -1000.0,
+                'Enthalpy': -900.0,
+                'Entropy': 10.0,
+                'Volume': 20.0,
+                'HeatCapacity': 30.0,
+                'Density': 3.5,
+            }[property_name]
+
+        def get_thermo_properties_of_phase_components(self, root, phase, mode):
+            assert (root, phase, mode) == ('root', 'Spinel', 'mu')
+            return {'MgAl2O4': -1234.5}
+
+        def get_dictionary_of_affinities(self, root, sort):
+            assert root == 'root'
+            assert sort is False
+            return {'Olivine': (42.5, 'Mg1.8Fe0.2SiO4')}
+
     class FakeEquilibrate:
         def __init__(self):
             self.melts = FakeMelts()
@@ -2064,6 +2088,33 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
     assert result.phase_masses_kg == {'Spinel': pytest.approx(1.0)}
     assert result.liquid_fraction == 0.0
     assert result.liquid_composition_wt_pct == {}
+    assert result.phase_compositions == {
+        'Spinel': {'Al2O3': 71.0, 'FeO': 29.0}
+    }
+    assert result.phase_thermo['Spinel'] == pytest.approx({
+        'gibbs_free_energy': -1000.0,
+        'enthalpy': -900.0,
+        'entropy': 10.0,
+        'volume': 20.0,
+        'heat_capacity_Cp': 30.0,
+        'density_kg_m3': 3500.0,
+    })
+    assert result.chem_potentials == {'Spinel': {'MgAl2O4': -1234.5}}
+    assert result.phase_affinities == {
+        'Olivine': {'affinity': 42.5, 'composition': 'Mg1.8Fe0.2SiO4'}
+    }
+
+
+def test_thermoengine_extras_fail_loud_on_malformed_present_value():
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+
+    with pytest.raises(ValueError, match='chemical potentials.*not finite'):
+        transport._strict_finite_mapping(
+            {'SiO2': float('nan')},
+            context='ThermoEngine liquid chemical potentials',
+        )
 
 
 def test_thermoengine_transport_equilibrates_live_when_installed():
@@ -2090,7 +2141,7 @@ def test_thermoengine_transport_equilibrates_live_when_installed():
             'P2O5': 3.0,
     })
     result = backend._equilibrate_thermoengine(
-        1200.0, comp_wt, -9.0, 1.0,
+        1400.0, comp_wt, -9.0, 1.0,
     )
 
     assert result.status == 'ok'
@@ -2104,6 +2155,10 @@ def test_thermoengine_transport_equilibrates_live_when_installed():
     assert result.activity_coefficients['SiO2'] > 0.0
     assert result.fe_redox_split['FeO_wt_pct'] > 0.0
     assert result.fe_redox_split['Fe2O3_wt_pct'] > 0.0
+    assert result.phase_compositions
+    assert result.phase_thermo
+    assert result.chem_potentials
+    assert result.phase_affinities
 
 
 def test_thermoengine_transport_shadow_parity_against_subprocess_when_available():
@@ -2950,6 +3005,8 @@ def test_project_local_alphamelts_populates_full_table_suite_when_installed():
     assert result.phase_thermo
     assert result.phase_compositions
     assert result.bulk_composition_wt_pct
+    assert result.chem_potentials is None
+    assert result.phase_affinities is None
 
 
 def test_project_local_alphamelts_cold_c0_step_returns_when_installed():

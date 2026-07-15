@@ -130,6 +130,16 @@ def project_equilibrium_to_diagnostics(
         phase_thermo=dict(
             getattr(equilibrium_result, 'phase_thermo', {}) or {}
         ),
+        chem_potentials=(
+            None
+            if getattr(equilibrium_result, 'chem_potentials', None) is None
+            else dict(equilibrium_result.chem_potentials)
+        ),
+        phase_affinities=(
+            None
+            if getattr(equilibrium_result, 'phase_affinities', None) is None
+            else dict(equilibrium_result.phase_affinities)
+        ),
         solid_composition_wt_pct=dict(
             getattr(equilibrium_result, 'solid_composition_wt_pct', {}) or {}
         ),
@@ -292,6 +302,22 @@ def diagnostics_to_equilibrium(
             phase: dict(values)
             for phase, values in diagnostics.phase_thermo.items()
         },
+        chem_potentials=(
+            None
+            if diagnostics.chem_potentials is None
+            else {
+                phase: dict(values)
+                for phase, values in diagnostics.chem_potentials.items()
+            }
+        ),
+        phase_affinities=(
+            None
+            if diagnostics.phase_affinities is None
+            else {
+                phase: dict(values)
+                for phase, values in diagnostics.phase_affinities.items()
+            }
+        ),
         bulk_composition_wt_pct=dict(
             diagnostics.bulk_composition_wt_pct
         ),

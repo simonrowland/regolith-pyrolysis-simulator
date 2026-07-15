@@ -363,6 +363,8 @@ def _output(status: str = "ok") -> dict:
             "phase_thermo": {
                 "liquid": {"enthalpy": -1059377.10, "density_kg_m3": 2893.824}
             },
+            "chem_potentials": None,
+            "phase_affinities": None,
             "solid_composition_wt_pct": {},
             "bulk_composition_wt_pct": {"SiO2": 49.3753},
             "vapor_pressures_Pa": {},
@@ -618,6 +620,8 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(tmp_path):
         ("alphamelts_outputs", "generic_system_enthalpy"),
         ("alphamelts_outputs", "generic_system_enthalpy_repr"),
         ("alphamelts_outputs", "generic_phase_thermo_json"),
+        ("alphamelts_outputs", "generic_chem_potentials_json"),
+        ("alphamelts_outputs", "generic_phase_affinities_json"),
         ("alphamelts_outputs", "generic_solid_composition_wt_pct_json"),
         ("alphamelts_outputs", "generic_bulk_composition_wt_pct_json"),
         ("alphamelts_outputs", "run_mode"),
@@ -625,6 +629,10 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(tmp_path):
         ("alphamelts_outputs", "applied_timeout_s_repr"),
     ):
         connection.execute(f'ALTER TABLE "{table}" DROP COLUMN "{column}"')
+    connection.execute(
+        "UPDATE metadata SET value = '72' "
+        "WHERE key = 'schema_output_field_count'"
+    )
     connection.commit()
     connection.close()
 
@@ -639,6 +647,9 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(tmp_path):
                 'PRAGMA table_info("alphamelts_outputs")'
             )
         }
+        output_field_count = writer.connection.execute(
+            "SELECT value FROM metadata WHERE key = 'schema_output_field_count'"
+        ).fetchone()[0]
 
     assert "subprocess_run_mode" in grid_columns
     assert {
@@ -649,12 +660,15 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(tmp_path):
         "generic_system_enthalpy",
         "generic_system_enthalpy_repr",
         "generic_phase_thermo_json",
+        "generic_chem_potentials_json",
+        "generic_phase_affinities_json",
         "generic_solid_composition_wt_pct_json",
         "generic_bulk_composition_wt_pct_json",
         "run_mode",
         "applied_timeout_s",
         "applied_timeout_s_repr",
     } <= output_columns
+    assert output_field_count == "74"
 
 
 def _prepared_drain_database(database):
@@ -893,6 +907,8 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
             "o.generic_liquid_density_kg_m3, o.generic_fO2_log, "
             "o.generic_system_enthalpy, o.generic_system_enthalpy_repr, "
             "o.generic_phase_thermo_json, "
+            "o.generic_chem_potentials_json, "
+            "o.generic_phase_affinities_json, "
             "o.generic_bulk_composition_wt_pct_json, "
             "o.alpha_intrinsic_fO2_log "
             "FROM grid_keys h JOIN alphamelts_outputs o ON o.grid_key_id = h.id"
@@ -916,6 +932,8 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
         assert json.loads(row["generic_phase_thermo_json"])["liquid"][
             "density_kg_m3"
         ] == 2893.824
+        assert row["generic_chem_potentials_json"] is None
+        assert row["generic_phase_affinities_json"] is None
         assert json.loads(row["generic_bulk_composition_wt_pct_json"])[
             "SiO2"
         ] == 49.3753
@@ -926,6 +944,55 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
             "failure": 0,
             "total": 1,
         }
+
+
+def test_writer_populates_thermoengine_only_json_without_scalar_padding(tmp_path):
+    database = tmp_path / "thermoengine-extras.db"
+    output = _output()
+    output["engine_mode"] = "thermoengine"
+    output["generic"]["chem_potentials"] = {
+        "liquid": {"SiO2": -1234567.8901234567}
+    }
+    output["generic"]["phase_affinities"] = {
+        "quartz": {"affinity": 321.125, "composition": "SiO2"}
+    }
+
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="thermoengine", kind="fixed", seed=178, params={"test": True}
+        )
+        inputs = _inputs(1400.0)
+        assert writer.materialize_key(
+            inputs,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        assert writer.write_result(grid_key_id, output)
+        row = writer.connection.execute(
+            "SELECT generic_chem_potentials_json, "
+            "generic_phase_affinities_json FROM alphamelts_outputs"
+        ).fetchone()
+        columns = {
+            item[1]
+            for item in writer.connection.execute(
+                'PRAGMA table_info("alphamelts_outputs")'
+            )
+        }
+
+    assert json.loads(row["generic_chem_potentials_json"]) == {
+        "liquid": {"SiO2": -1234567.8901234567}
+    }
+    assert json.loads(row["generic_phase_affinities_json"]) == {
+        "quartz": {"affinity": 321.125, "composition": "SiO2"}
+    }
+    assert not any(
+        name.startswith("generic_chem_potential_")
+        or name.startswith("generic_phase_affinity_")
+        for name in columns
+    )
 
 
 def test_incremental_harvest_tracks_source_id_and_skips_replay(tmp_path):
