@@ -1057,9 +1057,9 @@ class _MELTSBackendSupport(MeltBackend):
         system_solid_density_rhos: Optional[float] = None,
         system_phi: Optional[float] = None,
         system_chisqr: Optional[float] = None,
-        phase_thermo: Optional[Mapping[str, Mapping[str, Optional[float]]]] = None,
+        phase_thermo: Optional[Mapping[str, Mapping[str, object]]] = None,
         phase_compositions: Optional[Mapping[str, Mapping[str, float]]] = None,
-        chem_potentials: Optional[Mapping[str, Mapping[str, float]]] = None,
+        chem_potentials: Optional[Mapping[str, Mapping[str, object]]] = None,
         phase_affinities: Optional[Mapping[str, Mapping[str, object]]] = None,
         solid_composition_wt_pct: Optional[Mapping[str, float]] = None,
         bulk_composition_wt_pct: Optional[Mapping[str, float]] = None,
@@ -2279,6 +2279,7 @@ class _MELTSBackendSupport(MeltBackend):
                 'entropy': float(entry['entropy']),
                 'volume': float(entry['volume']),
                 'heat_capacity_Cp': float(entry['heat_capacity_Cp']),
+                'reference_mass_kg': mass_g / 1000.0,
                 'density_kg_m3': (
                     float(entry['density_mass_sum']) / density_mass_g
                     if density_mass_g > 0.0 else None
@@ -2734,6 +2735,40 @@ class _MELTSBackendSupport(MeltBackend):
                 f'parsed={solver_basis_kg * 1000.0:.9g} g; '
                 f'system={float(system_mass_g):.9g} g',
             )
+        normalized_phase_thermo = {}
+        for phase, raw_values in phase_thermo.items():
+            # alphaMELTS Phase_main_tbl extensive values use the solver's
+            # modal-mass basis: H is J, S/Cp are J/K, and V is cm3. Convert
+            # cm3 * 1e-6 = m3 and retain the pre-rescale phase mass so these
+            # values cannot be mistaken for the physical batch basis below.
+            normalized_phase_thermo[phase] = {
+                'enthalpy_J': raw_values.get('enthalpy'),
+                'entropy_J_K': raw_values.get('entropy'),
+                'volume_m3': (
+                    None
+                    if raw_values.get('volume') is None
+                    else float(raw_values['volume']) * 1.0e-6
+                ),
+                'heat_capacity_J_K': raw_values.get('heat_capacity_Cp'),
+                'density_kg_m3': raw_values.get('density_kg_m3'),
+                'reference_mass_kg': raw_values.get('reference_mass_kg'),
+                'reference_basis': 'alphamelts_solver_phase_amount',
+            }
+        phase_thermo = normalized_phase_thermo
+        system_volume_native = system_values.get('system_volume')
+        system_volume_m3 = (
+            None
+            if system_volume_native is None
+            else float(system_volume_native) * 1.0e-6
+        )
+        result_diagnostics['thermodynamic_basis'] = {
+            'reference_basis': 'alphamelts_solver_system_amount',
+            'reference_mass_kg': system_mass_kg,
+            'system_enthalpy': {'units': 'J'},
+            'system_entropy': {'units': 'J/K'},
+            'system_volume': {'units': 'm3', 'source_units': 'cm3'},
+            'system_heat_capacity_Cp': {'units': 'J/K'},
+        }
         # Premise: alphaMELTS phase rows are modal masses on an arbitrary
         # solver basis; the adapter input carries the physical batch mass.
         # Algebra: m_i,physical = (m_i,basis / sum(m_basis)) * m_input.
@@ -2761,7 +2796,7 @@ class _MELTSBackendSupport(MeltBackend):
             ) if 'liquid_density_kg_m3' in system_values else None,
             system_enthalpy=system_values.get('system_enthalpy'),
             system_entropy=system_values.get('system_entropy'),
-            system_volume=system_values.get('system_volume'),
+            system_volume=system_volume_m3,
             system_heat_capacity_Cp=system_values.get(
                 'system_heat_capacity_Cp'
             ),

@@ -83,7 +83,7 @@ class LiquidusDiagnostics:
     phase_compositions: Mapping[str, Mapping[str, float]] = field(
         default_factory=dict
     )
-    phase_thermo: Mapping[str, Mapping[str, Optional[float]]] = field(
+    phase_thermo: Mapping[str, Mapping[str, Any]] = field(
         default_factory=dict
     )
     solid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
@@ -112,7 +112,7 @@ class LiquidusDiagnostics:
     backend_warnings: Tuple[str, ...] = ()
     backend_diagnostics: Mapping[str, Any] = field(default_factory=dict)
     backend_status_reason: Optional[str] = None
-    chem_potentials: Optional[Mapping[str, Mapping[str, float]]] = None
+    chem_potentials: Optional[Mapping[str, Mapping[str, Any]]] = None
     phase_affinities: Optional[Mapping[str, Mapping[str, Any]]] = None
 
     def __post_init__(self) -> None:
@@ -146,10 +146,7 @@ class LiquidusDiagnostics:
             self,
             'phase_thermo',
             {
-                str(phase): {
-                    str(name): None if value is None else float(value)
-                    for name, value in dict(values or {}).items()
-                }
+                str(phase): dict(values or {})
                 for phase, values in dict(self.phase_thermo or {}).items()
             },
         )
@@ -160,10 +157,7 @@ class LiquidusDiagnostics:
                 None
                 if self.chem_potentials is None
                 else {
-                    str(phase): {
-                        str(component): float(value)
-                        for component, value in dict(values or {}).items()
-                    }
+                    str(phase): dict(values or {})
                     for phase, values in self.chem_potentials.items()
                 }
             ),

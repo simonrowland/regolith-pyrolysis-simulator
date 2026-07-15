@@ -550,9 +550,12 @@ def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     assert result.liquid_density_kg_m3 == pytest.approx(2638.918)
     assert result.liquid_viscosity_Pa_s == pytest.approx(0.1 * 10**1.409)
     assert result.system_enthalpy == pytest.approx(-1.0)
+    assert result.system_volume == pytest.approx(1.0e-6)
     assert result.system_phi == pytest.approx(1.0)
     assert result.system_chisqr is None
-    assert result.phase_thermo['liquid']['enthalpy'] == pytest.approx(-1059377.1)
+    assert result.phase_thermo['liquid']['enthalpy_J'] == pytest.approx(-1059377.1)
+    assert result.phase_thermo['liquid']['volume_m3'] == pytest.approx(34.56e-6)
+    assert result.phase_thermo['liquid']['reference_mass_kg'] == pytest.approx(0.1)
     assert result.phase_thermo['liquid']['density_kg_m3'] == pytest.approx(
         100.0 / 34.56 * 1000.0
     )
@@ -560,6 +563,14 @@ def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     assert result.solid_composition_wt_pct == {}
     assert result.bulk_composition_wt_pct['SiO2'] == pytest.approx(50.0)
     assert result.diagnostics['intrinsic_fO2_log'] == pytest.approx(-9.0)
+    assert result.diagnostics['thermodynamic_basis'] == {
+        'reference_basis': 'alphamelts_solver_system_amount',
+        'reference_mass_kg': pytest.approx(0.1),
+        'system_enthalpy': {'units': 'J'},
+        'system_entropy': {'units': 'J/K'},
+        'system_volume': {'units': 'm3', 'source_units': 'cm3'},
+        'system_heat_capacity_Cp': {'units': 'J/K'},
+    }
 
 
 @pytest.mark.parametrize(
@@ -2285,19 +2296,26 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
 
         def get_list_of_phases_in_assemblage(self, root):
             assert root == 'root'
-            return ('Spinel',)
+            return ('Spinel', 'Quartz')
 
         def get_mass_of_phase(self, root, phase):
             assert root == 'root'
-            assert phase == 'Spinel'
-            return 1000.0
+            return {'Spinel': 900.0, 'Quartz': 100.0}[phase]
 
         def get_composition_of_phase(self, root, phase, mode):
-            assert (root, phase, mode) == ('root', 'Spinel', 'oxide_wt')
-            return {'Al2O3': 71.0, 'FeO': 29.0}
+            assert root == 'root'
+            if mode == 'component':
+                assert phase == 'Quartz'
+                return {'formula': 'SiO2'}
+            assert mode == 'oxide_wt'
+            return {
+                'Spinel': {'Al2O3': 71.0, 'FeO': 29.0},
+                'Quartz': {'SiO2': 100.0},
+            }[phase]
 
         def get_property_of_phase(self, root, phase, property_name):
-            assert (root, phase) == ('root', 'Spinel')
+            assert root == 'root'
+            assert phase in {'Spinel', 'Quartz'}
             return {
                 'GibbsFreeEnergy': -1000.0,
                 'Enthalpy': -900.0,
@@ -2308,13 +2326,20 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
             }[property_name]
 
         def get_thermo_properties_of_phase_components(self, root, phase, mode):
-            assert (root, phase, mode) == ('root', 'Spinel', 'mu')
-            return {'MgAl2O4': -1234.5}
+            assert root == 'root'
+            assert mode == 'mu'
+            return {
+                'Spinel': {'MgAl2O4': -1234.5},
+                'Quartz': {'Quartz': -100.0},
+            }[phase]
 
         def get_dictionary_of_affinities(self, root, sort):
             assert root == 'root'
             assert sort is False
-            return {'Olivine': (42.5, 'Mg1.8Fe0.2SiO4')}
+            return {
+                'Olivine': (42.5, 'Mg1.8Fe0.2SiO4'),
+                'Tridymite': (999999.0, 'SiO2'),
+            }
 
     class FakeEquilibrate:
         def __init__(self):
@@ -2346,25 +2371,57 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
 
     assert fake_equilibrate.version == '1.0.2'
     assert fake_equilibrate.melts.bulk_wt == {'SiO2': 50.0}
-    assert result.phases_present == ('Spinel',)
-    assert result.phase_masses_kg == {'Spinel': pytest.approx(1.0)}
+    assert result.phases_present == ('Spinel', 'Quartz')
+    assert result.phase_masses_kg == pytest.approx({
+        'Spinel': 0.9,
+        'Quartz': 0.1,
+    })
     assert result.liquid_fraction == 0.0
     assert result.liquid_composition_wt_pct == {}
     assert result.phase_compositions == {
-        'Spinel': {'Al2O3': 71.0, 'FeO': 29.0}
+        'Spinel': {'Al2O3': 71.0, 'FeO': 29.0},
+        'Quartz': {'SiO2': 100.0},
     }
-    assert result.phase_thermo['Spinel'] == pytest.approx({
-        'gibbs_free_energy': -1000.0,
-        'enthalpy': -900.0,
-        'entropy': 10.0,
-        'volume': 20.0,
-        'heat_capacity_Cp': 30.0,
+    assert result.phase_thermo['Spinel'] == {
+        'gibbs_free_energy_J': -1000.0,
+        'enthalpy_J': -900.0,
+        'entropy_J_K': 10.0,
+        'volume_m3': pytest.approx(2.0e-4),
+        'heat_capacity_J_K': 30.0,
         'density_kg_m3': 3500.0,
-    })
-    assert result.chem_potentials == {'Spinel': {'MgAl2O4': -1234.5}}
-    assert result.phase_affinities == {
-        'Olivine': {'affinity': 42.5, 'composition': 'Mg1.8Fe0.2SiO4'}
+        'reference_mass_kg': pytest.approx(0.9),
+        'reference_basis': 'thermoengine_solver_phase_amount',
     }
+    assert result.chem_potentials['Spinel'] == {
+        'basis': 'chemical_potential',
+        'units': 'J/mol',
+        'source_basis': 'chemical_potential_J_mol',
+        'components': {'MgAl2O4': -1234.5},
+    }
+    assert result.chem_potentials['Quartz'] == {
+        'basis': 'chemical_potential',
+        'units': 'J/mol',
+        'source_basis': 'specific_gibbs_energy_J_g',
+        'components': {'Quartz': pytest.approx(-6008.3)},
+        'formula': 'SiO2',
+        'molar_mass_g_mol': pytest.approx(60.083),
+    }
+    assert result.phase_affinities == {
+        'Olivine': {
+            'affinity_J': 42.5,
+            'state': 'undersaturated',
+            'phase_scope': 'not_in_equilibrium_assemblage',
+            'composition_formula': 'Mg1.8Fe0.2SiO4',
+        },
+        'Tridymite': {
+            'affinity_J': 0.0,
+            'state': 'zero_affinity_sentinel',
+            'phase_scope': 'not_in_equilibrium_assemblage',
+            'composition_formula': 'SiO2',
+        },
+    }
+    assert result.system_volume == pytest.approx(4.0e-4)
+    assert result.thermodynamic_basis['reference_mass_kg'] == pytest.approx(1.0)
 
 
 def test_thermoengine_extras_fail_loud_on_malformed_present_value():
@@ -2439,13 +2496,44 @@ def test_thermoengine_standalone_shadow_parity_with_frozen_legacy_oracle(
                     'olivine': {'SiO2': 40.0, 'MgO': 60.0},
                 },
                 phase_thermo={
-                    'Liquid': {'G': -1.0, 'H': 2.0, 'S': 3.0, 'V': 4.0, 'Cp': 5.0},
+                    'Liquid': {
+                        'gibbs_free_energy_J': -1.0,
+                        'enthalpy_J': 2.0,
+                        'entropy_J_K': 3.0,
+                        'volume_m3': 4.0e-5,
+                        'heat_capacity_J_K': 5.0,
+                        'density_kg_m3': 2650.0,
+                        'reference_mass_kg': 0.75,
+                        'reference_basis': 'thermoengine_solver_phase_amount',
+                    },
                 },
-                chem_potentials={'Liquid': {'SiO2': -10.0}},
+                chem_potentials={'Liquid': {
+                    'basis': 'chemical_potential',
+                    'units': 'J/mol',
+                    'source_basis': 'chemical_potential_J_mol',
+                    'components': {'SiO2': -10.0},
+                }},
                 phase_affinities={
-                    'Liquid': {'affinity': 0.0, 'present': True},
-                    'quartz': {'affinity': 12.5, 'present': False},
+                    'quartz': {
+                        'affinity_J': 12.5,
+                        'state': 'undersaturated',
+                        'phase_scope': 'not_in_equilibrium_assemblage',
+                        'composition_formula': 'SiO2',
+                    },
                 },
+                thermodynamic_basis={
+                    'reference_basis': 'thermoengine_solver_system_amount',
+                    'reference_mass_kg': 1.0,
+                    'system_enthalpy': {'units': 'J'},
+                    'system_entropy': {'units': 'J/K'},
+                    'system_volume': {'units': 'm3', 'source_units': 'J/bar'},
+                    'system_heat_capacity_Cp': {'units': 'J/K'},
+                },
+                liquid_density_kg_m3=2650.0,
+                system_enthalpy=2.0,
+                system_entropy=3.0,
+                system_volume=4.0e-5,
+                system_heat_capacity_Cp=5.0,
                 activity_coefficients={'SiO2': 0.5},
                 fe_redox_split={'FeO_wt_pct': 9.0, 'Fe2O3_wt_pct': 1.0},
                 warnings=('frozen oracle warning',),
@@ -2492,13 +2580,37 @@ def test_thermoengine_standalone_shadow_parity_with_frozen_legacy_oracle(
         'olivine': {'SiO2': 40.0, 'MgO': 60.0},
     }
     assert result.phase_thermo == {
-        'Liquid': {'G': -1.0, 'H': 2.0, 'S': 3.0, 'V': 4.0, 'Cp': 5.0},
+        'Liquid': {
+            'gibbs_free_energy_J': -1.0,
+            'enthalpy_J': 2.0,
+            'entropy_J_K': 3.0,
+            'volume_m3': 4.0e-5,
+            'heat_capacity_J_K': 5.0,
+            'density_kg_m3': 2650.0,
+            'reference_mass_kg': 0.75,
+            'reference_basis': 'thermoengine_solver_phase_amount',
+        },
     }
-    assert result.chem_potentials == {'Liquid': {'SiO2': -10.0}}
+    assert result.chem_potentials == {'Liquid': {
+        'basis': 'chemical_potential',
+        'units': 'J/mol',
+        'source_basis': 'chemical_potential_J_mol',
+        'components': {'SiO2': -10.0},
+    }}
     assert result.phase_affinities == {
-        'Liquid': {'affinity': 0.0, 'present': True},
-        'quartz': {'affinity': 12.5, 'present': False},
+        'quartz': {
+            'affinity_J': 12.5,
+            'state': 'undersaturated',
+            'phase_scope': 'not_in_equilibrium_assemblage',
+            'composition_formula': 'SiO2',
+        },
     }
+    assert result.liquid_density_kg_m3 == pytest.approx(2650.0)
+    assert result.system_enthalpy == pytest.approx(2.0)
+    assert result.system_entropy == pytest.approx(3.0)
+    assert result.system_volume == pytest.approx(4.0e-5)
+    assert result.system_heat_capacity_Cp == pytest.approx(5.0)
+    assert result.diagnostics['thermodynamic_basis']['reference_mass_kg'] == 1.0
     assert result.activity_coefficients == {'SiO2': 0.5}
     assert result.fe_redox_split == {'FeO_wt_pct': 9.0, 'Fe2O3_wt_pct': 1.0}
     assert result.vapor_pressures_Pa == {'SiO': 12.5}

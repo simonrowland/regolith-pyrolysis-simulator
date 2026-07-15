@@ -352,7 +352,7 @@ def _output(status: str = "ok") -> dict:
             "liquid_density_kg_m3": 2650.0,
             "system_enthalpy": -1059377.10,
             "system_entropy": 268.91,
-            "system_volume": 34.56,
+            "system_volume": 34.56e-6,
             "system_heat_capacity_Cp": 143.47,
             "system_dVdP": -183.54,
             "system_dVdT": 2897.97,
@@ -361,7 +361,13 @@ def _output(status: str = "ok") -> dict:
             "system_phi": 1.0,
             "system_chisqr": None,
             "phase_thermo": {
-                "liquid": {"enthalpy": -1059377.10, "density_kg_m3": 2893.824}
+                "liquid": {
+                    "enthalpy_J": -1059377.10,
+                    "volume_m3": 34.56e-6,
+                    "density_kg_m3": 2893.824,
+                    "reference_mass_kg": 0.1,
+                    "reference_basis": "alphamelts_solver_phase_amount",
+                }
             },
             "chem_potentials": None,
             "phase_affinities": None,
@@ -951,10 +957,20 @@ def test_writer_populates_thermoengine_only_json_without_scalar_padding(tmp_path
     output = _output()
     output["engine_mode"] = "thermoengine"
     output["generic"]["chem_potentials"] = {
-        "liquid": {"SiO2": -1234567.8901234567}
+        "liquid": {
+            "basis": "chemical_potential",
+            "units": "J/mol",
+            "source_basis": "chemical_potential_J_mol",
+            "components": {"SiO2": -1234567.8901234567},
+        }
     }
     output["generic"]["phase_affinities"] = {
-        "quartz": {"affinity": 321.125, "composition": "SiO2"}
+        "quartz": {
+            "affinity_J": 321.125,
+            "state": "undersaturated",
+            "phase_scope": "not_in_equilibrium_assemblage",
+            "composition_formula": "SiO2",
+        }
     }
 
     with GridCacheWriter(database) as writer:
@@ -983,10 +999,20 @@ def test_writer_populates_thermoengine_only_json_without_scalar_padding(tmp_path
         }
 
     assert json.loads(row["generic_chem_potentials_json"]) == {
-        "liquid": {"SiO2": -1234567.8901234567}
+        "liquid": {
+            "basis": "chemical_potential",
+            "units": "J/mol",
+            "source_basis": "chemical_potential_J_mol",
+            "components": {"SiO2": -1234567.8901234567},
+        }
     }
     assert json.loads(row["generic_phase_affinities_json"]) == {
-        "quartz": {"affinity": 321.125, "composition": "SiO2"}
+        "quartz": {
+            "affinity_J": 321.125,
+            "state": "undersaturated",
+            "phase_scope": "not_in_equilibrium_assemblage",
+            "composition_formula": "SiO2",
+        }
     }
     assert not any(
         name.startswith("generic_chem_potential_")

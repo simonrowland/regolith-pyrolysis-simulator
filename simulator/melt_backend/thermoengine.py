@@ -277,6 +277,11 @@ class ThermoEngineBackend(_MELTSBackendSupport):
                 phase_masses_kg=payload.phase_masses_kg,
                 liquid_fraction=payload.liquid_fraction,
                 liquid_composition_wt_pct=payload.liquid_composition_wt_pct,
+                liquid_density_kg_m3=payload.liquid_density_kg_m3,
+                system_enthalpy=payload.system_enthalpy,
+                system_entropy=payload.system_entropy,
+                system_volume=payload.system_volume,
+                system_heat_capacity_Cp=payload.system_heat_capacity_Cp,
                 phase_compositions=payload.phase_compositions,
                 phase_thermo=payload.phase_thermo,
                 chem_potentials=payload.chem_potentials,
@@ -289,7 +294,12 @@ class ThermoEngineBackend(_MELTSBackendSupport):
                 warnings=list(payload.warnings),
                 status=status,
                 diagnostics=self._vapor_pressure_diagnostics(
-                    clamp_diagnostics,
+                    {
+                        **clamp_diagnostics,
+                        'thermodynamic_basis': dict(
+                            payload.thermodynamic_basis
+                        ),
+                    },
                     vapor_pressures,
                     vapor_pressure_source,
                 ),

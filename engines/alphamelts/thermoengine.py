@@ -91,9 +91,15 @@ class ThermoEnginePayload:
     phases_present: tuple[str, ...] = ()
     phase_masses_kg: Mapping[str, float] = field(default_factory=dict)
     phase_compositions: Mapping[str, Mapping[str, float]] = field(default_factory=dict)
-    phase_thermo: Mapping[str, Mapping[str, float]] = field(default_factory=dict)
-    chem_potentials: Mapping[str, Mapping[str, float]] = field(default_factory=dict)
+    phase_thermo: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
+    chem_potentials: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
     phase_affinities: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
+    thermodynamic_basis: Mapping[str, Any] = field(default_factory=dict)
+    liquid_density_kg_m3: Optional[float] = None
+    system_enthalpy: Optional[float] = None
+    system_entropy: Optional[float] = None
+    system_volume: Optional[float] = None
+    system_heat_capacity_Cp: Optional[float] = None
     liquid_fraction: float = 0.0
     liquid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
     activity_coefficients: Mapping[str, float] = field(default_factory=dict)
@@ -487,14 +493,14 @@ print('ok')
             for phase in phases
         }
         property_names = {
-            'gibbs_free_energy': 'GibbsFreeEnergy',
-            'enthalpy': 'Enthalpy',
-            'entropy': 'Entropy',
-            'volume': 'Volume',
-            'heat_capacity_Cp': 'HeatCapacity',
+            'gibbs_free_energy_J': 'GibbsFreeEnergy',
+            'enthalpy_J': 'Enthalpy',
+            'entropy_J_K': 'Entropy',
+            'volume_m3': 'Volume',
+            'heat_capacity_J_K': 'HeatCapacity',
             'density_kg_m3': 'Density',
         }
-        phase_thermo: dict[str, dict[str, float]] = {}
+        phase_thermo: dict[str, dict[str, Any]] = {}
         for phase in phases:
             values = {
                 name: self._strict_finite_float(
@@ -503,17 +509,60 @@ print('ok')
                 )
                 for name, property_name in property_names.items()
             }
+            # ThermoEngine documents phase Volume in J/bar. Since
+            # 1 J / 1 bar = 1e-5 m3, convert here; alphaMELTS table volumes
+            # take their separate cm3 -> m3 path before both engines emit the
+            # same ``volume_m3`` key.
+            values['volume_m3'] *= 1.0e-5
             values['density_kg_m3'] *= 1000.0
+            values['reference_mass_kg'] = phase_masses_kg[phase]
+            values['reference_basis'] = 'thermoengine_solver_phase_amount'
             phase_thermo[phase] = values
-        chem_potentials = {
-            phase: self._strict_finite_mapping(
+        chem_potentials: dict[str, dict[str, Any]] = {}
+        for phase in phases:
+            raw_mu = self._strict_finite_mapping(
                 melts.get_thermo_properties_of_phase_components(
                     root, phase, mode='mu'
                 ),
                 context=f'ThermoEngine {phase} chemical potentials',
             )
-            for phase in phases
-        }
+            components = dict(raw_mu)
+            source_basis = 'chemical_potential_J_mol'
+            conversion: dict[str, Any] = {}
+            if len(raw_mu) == 1 and phase in raw_mu:
+                formula_payload = melts.get_composition_of_phase(
+                    root, phase, 'component'
+                )
+                formula = str(dict(formula_payload or {}).get('formula') or '')
+                if not formula:
+                    raise ValueError(
+                        f'ThermoEngine pure phase {phase!r} lacks a formula '
+                        'needed to convert specific Gibbs energy to J/mol'
+                    )
+                molar_mass_g_mol = (
+                    resolve_species_formula(formula, None)
+                    .molar_mass_kg_per_mol() * 1000.0
+                )
+                # ThermoEngine mode='mu' returns solution endmember chemical
+                # potentials in J/mol, but a pure phase as G/mass in J/g.
+                # Multiplying J/g by formula molar mass g/mol gives J/mol, so
+                # every emitted component below has one chemical-potential
+                # reference basis instead of a phase-dependent bare float.
+                components = {
+                    phase: float(raw_mu[phase]) * molar_mass_g_mol,
+                }
+                source_basis = 'specific_gibbs_energy_J_g'
+                conversion = {
+                    'formula': formula,
+                    'molar_mass_g_mol': molar_mass_g_mol,
+                }
+            chem_potentials[phase] = {
+                'basis': 'chemical_potential',
+                'units': 'J/mol',
+                'source_basis': source_basis,
+                'components': components,
+                **conversion,
+            }
         raw_affinities = melts.get_dictionary_of_affinities(root, sort=False)
         if not isinstance(raw_affinities, Mapping):
             raise ValueError(
@@ -528,13 +577,43 @@ print('ok')
                     f'(affinity, composition); got {raw_value!r}'
                 )
             affinity, composition = raw_value
+            affinity_value = self._strict_finite_float(
+                affinity,
+                context=f'ThermoEngine {phase} phase affinity',
+            )
+            sentinel = affinity_value == 999999.0
             phase_affinities[str(phase)] = {
-                'affinity': self._strict_finite_float(
-                    affinity,
-                    context=f'ThermoEngine {phase} phase affinity',
-                ),
-                'composition': str(composition),
+                # get_dictionary_of_affinities contains phases absent from the
+                # assemblage and rewrites a native zero affinity to 999999.
+                # Restore that zero and label its state; never expose the
+                # sentinel as a physical delta-G value. The companion string is
+                # a phase formula, not mole fractions.
+                'affinity_J': 0.0 if sentinel else affinity_value,
+                'state': 'zero_affinity_sentinel' if sentinel else 'undersaturated',
+                'phase_scope': 'not_in_equilibrium_assemblage',
+                'composition_formula': str(composition),
             }
+        system_enthalpy = sum(
+            float(values['enthalpy_J']) for values in phase_thermo.values()
+        )
+        system_entropy = sum(
+            float(values['entropy_J_K']) for values in phase_thermo.values()
+        )
+        system_volume = sum(
+            float(values['volume_m3']) for values in phase_thermo.values()
+        )
+        system_heat_capacity = sum(
+            float(values['heat_capacity_J_K'])
+            for values in phase_thermo.values()
+        )
+        thermodynamic_basis = {
+            'reference_basis': 'thermoengine_solver_system_amount',
+            'reference_mass_kg': total_mass_kg,
+            'system_enthalpy': {'units': 'J'},
+            'system_entropy': {'units': 'J/K'},
+            'system_volume': {'units': 'm3', 'source_units': 'J/bar'},
+            'system_heat_capacity_Cp': {'units': 'J/K'},
+        }
         # Autoreview r4 P2 (2026-05-27): only emit a liquid composition
         # / activities / Fe-redox split when ThermoEngine actually
         # reports a liquid phase.  The prior code fell back to the
@@ -588,6 +667,16 @@ print('ok')
             phase_thermo=phase_thermo,
             chem_potentials=chem_potentials,
             phase_affinities=phase_affinities,
+            thermodynamic_basis=thermodynamic_basis,
+            liquid_density_kg_m3=(
+                None
+                if liquid_phase is None
+                else float(phase_thermo[liquid_phase]['density_kg_m3'])
+            ),
+            system_enthalpy=system_enthalpy,
+            system_entropy=system_entropy,
+            system_volume=system_volume,
+            system_heat_capacity_Cp=system_heat_capacity,
             liquid_fraction=liquid_fraction,
             liquid_composition_wt_pct=liquid_comp,
             activity_coefficients=activities,
