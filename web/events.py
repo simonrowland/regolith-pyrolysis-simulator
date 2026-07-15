@@ -517,6 +517,7 @@ def _cancel_simulation_state(
         if current is not state:
             return None
         if state.get('artifact_persisted'):
+            _finish_terminal_state(sid, run_id)
             return {
                 'run_id': run_id,
                 'status': 'terminal',
@@ -570,6 +571,40 @@ def cancel_run_command(
     return _cancel_simulation_state(socketio, sid, reason='cancelled_by_client')
 
 
+def _idempotency_entry_is_terminal(run_id: object) -> bool:
+    with _simulations_guard:
+        state = next(
+            (
+                candidate
+                for candidate in _simulations.values()
+                if candidate.get('run_id') == run_id
+            ),
+            None,
+        )
+        return state is None or bool(state.get('artifact_persisted'))
+
+
+def _make_idempotency_capacity() -> None:
+    while len(_run_idempotency) >= _MAX_RUN_IDEMPOTENCY_ENTRIES:
+        terminal_key = next(
+            (
+                key
+                for key, (_, result) in _run_idempotency.items()
+                if _idempotency_entry_is_terminal(result.get('run_id'))
+            ),
+            None,
+        )
+        if terminal_key is None:
+            # Launch-once records for nonterminal runs are never evicted. Reject
+            # new tokenized work until a terminal record becomes evictable.
+            raise RunCommandError(
+                'idempotency capacity is occupied by active runs',
+                error_type='idempotency_capacity_exhausted',
+                status_code=503,
+            )
+        _run_idempotency.pop(terminal_key)
+
+
 def submit_run_command(
     socketio,
     payload: Mapping[str, object],
@@ -614,6 +649,7 @@ def submit_run_command(
                         status_code=409,
                     )
                 return {**existing_result, 'idempotent_replay': True}
+            _make_idempotency_capacity()
         handler = _registered_start_handler
         if handler is None:
             raise RuntimeError('run command handler is unavailable')
@@ -629,35 +665,16 @@ def submit_run_command(
                 ),
                 None,
             )
-        if previous_sid is not None:
-            try:
-                _cancel_simulation_state(
-                    socketio,
-                    previous_sid,
-                    reason='replaced_by_new_run',
-                )
-            except RuntimeError as exc:
-                raise RunCommandError(
-                    str(exc),
-                    error_type='run_replacement_failed',
-                    payload={
-                        'status': 'error',
-                        'message': str(exc),
-                    },
-                ) from exc
         sid = f'http:{client_id}:{uuid.uuid4().hex}'
         result = handler(
             request_payload,
             sid=sid,
             ledger_client_id=client_id,
             command_mode=True,
+            replace_sid=previous_sid,
         )
         if token:
             _run_idempotency[token_key] = (canonical_payload, dict(result))
-            # Retain only the newest launch-once records across all clients.
-            while len(_run_idempotency) > _MAX_RUN_IDEMPOTENCY_ENTRIES:
-                oldest_key = next(iter(_run_idempotency))
-                _run_idempotency.pop(oldest_key)
         return {**result, 'idempotent_replay': False}
 
 
@@ -1711,13 +1728,21 @@ def _start_background_loop(
                     'backend_authoritative': backend_authoritative,
                     'backend_message': backend_message,
                 }
-                artifact = persist_terminal(
-                    session,
-                    status='refused',
-                    reason=reason,
-                    error_message=reason,
-                    refusal_diagnostic=c6_refusal,
-                )
+                with run_lock:
+                    current, _ = _current_simulation_state(sid, run_id)
+                    if (
+                        current is None
+                        or not current['running']
+                        or current.get('artifact_persisted')
+                    ):
+                        break
+                    artifact = persist_terminal(
+                        session,
+                        status='refused',
+                        reason=reason,
+                        error_message=reason,
+                        refusal_diagnostic=c6_refusal,
+                    )
                 if artifact is None:
                     stop_with_status({
                         'status': 'error',
@@ -1804,6 +1829,7 @@ def register_events(socketio):
         ledger_client_id: str | None = None,
         command_mode: bool = False,
         draft_mode: bool = False,
+        replace_sid: str | None = None,
     ):
         """
         Start a new simulation run.
@@ -2031,6 +2057,7 @@ def register_events(socketio):
                 'validated_inputs': validated_inputs,
             }
 
+        run_store = get_run_store()
         runner_projector = PyrolysisRun(
             feedstock_id=session._config.feedstock_id,
             campaign=session._config.campaign,
@@ -2053,17 +2080,19 @@ def register_events(socketio):
             },
         )
 
-        try:
-            _cancel_simulation_state(
-                socketio,
-                sid,
-                reason='replaced_by_new_run',
-            )
-        except RuntimeError as exc:
-            return reject({
-                'status': 'error',
-                'message': str(exc),
-            }, 'run_replacement_failed')
+        replacement_sid = replace_sid if command_mode else sid
+        if replacement_sid is not None:
+            try:
+                _cancel_simulation_state(
+                    socketio,
+                    replacement_sid,
+                    reason='replaced_by_new_run',
+                )
+            except RuntimeError as exc:
+                return reject({
+                    'status': 'error',
+                    'message': str(exc),
+                }, 'run_replacement_failed')
 
         state, run_lock = _replace_simulation_state(
             sid,
@@ -2074,7 +2103,7 @@ def register_events(socketio):
                 if ledger_client_id is not None
                 else flask_session.get('ledger_client_id')
             ),
-            run_store=get_run_store(),
+            run_store=run_store,
             runner_projector=runner_projector,
         )
         state['http_owned'] = command_mode

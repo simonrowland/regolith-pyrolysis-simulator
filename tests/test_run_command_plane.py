@@ -281,7 +281,20 @@ def test_second_http_submit_replaces_prior_run_and_keeps_ledger_unique(
 ):
     store = RunArtifactStore(tmp_path / "runs")
 
-    def fake_start(_payload, *, sid, ledger_client_id, **_kwargs):
+    def fake_start(
+        _payload,
+        *,
+        sid,
+        ledger_client_id,
+        replace_sid=None,
+        **_kwargs,
+    ):
+        if replace_sid is not None:
+            web_events._cancel_simulation_state(
+                _Socket(),
+                replace_sid,
+                reason="replaced_by_new_run",
+            )
         state, _ = web_events._replace_simulation_state(
             sid,
             _PartialSession(),
@@ -324,6 +337,38 @@ def test_second_http_submit_replaces_prior_run_and_keeps_ledger_unique(
     }
 
 
+def test_invalid_http_submit_does_not_destroy_active_run(tmp_path, monkeypatch):
+    store = RunArtifactStore(tmp_path / "runs")
+    state, _ = web_events._replace_simulation_state(
+        "http:owner:active",
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+    )
+    state["http_owned"] = True
+
+    def reject_invalid(_payload, **_kwargs):
+        raise web_events.RunCommandError(
+            "mass_kg must be numeric",
+            error_type="invalid_run_input",
+        )
+
+    monkeypatch.setattr(web_events, "_registered_start_handler", reject_invalid)
+
+    with pytest.raises(web_events.RunCommandError, match="mass_kg must be numeric"):
+        web_events.submit_run_command(
+            _Socket(),
+            {"client_token": "invalid", "mass_kg": "bad"},
+            client_id="owner",
+        )
+
+    assert web_events._simulations["http:owner:active"] is state
+    assert state["running"] is True
+    assert state.get("artifact_persisted") is not True
+    assert store.load(state["run_id"]) is None
+
+
 def test_http_terminal_run_releases_session_state(tmp_path, monkeypatch):
     sid = "http:owner:terminal"
     store = RunArtifactStore(tmp_path / "runs")
@@ -360,6 +405,126 @@ def test_http_terminal_run_releases_session_state(tmp_path, monkeypatch):
     assert sid not in web_events._sim_locks
 
 
+def test_c6_terminal_persist_excludes_concurrent_cancel(tmp_path, monkeypatch):
+    sid = "http:owner:c6-race"
+    store = RunArtifactStore(tmp_path / "runs")
+    state, _ = web_events._replace_simulation_state(
+        sid,
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+    )
+    state["http_owned"] = True
+
+    cancel_attempted = threading.Event()
+    cancel_acquired = threading.Event()
+    first_persist_entered = threading.Event()
+    release_persist = threading.Event()
+    inner_lock = threading.RLock()
+
+    class TrackingLock:
+        def __enter__(self):
+            if threading.current_thread().name == "cancel-c6":
+                cancel_attempted.set()
+            inner_lock.acquire()
+            if threading.current_thread().name == "cancel-c6":
+                cancel_acquired.set()
+            return self
+
+        def __exit__(self, *_args):
+            inner_lock.release()
+
+    run_lock = TrackingLock()
+    with web_events._simulations_guard:
+        web_events._sim_locks[sid] = run_lock
+
+    c6_refusal = {
+        "status": "refused",
+        "reason": "no_window",
+        "diagnostic": {"reason_refused": "no_window"},
+    }
+    step = SimpleNamespace(
+        per_hour_summary={"hour": 1},
+        snapshot={},
+        backend_error=None,
+        campaign_summary={"c6_refusal_diagnostic": c6_refusal},
+        decision_event=None,
+    )
+    monkeypatch.setattr(
+        web_events,
+        "drive_session",
+        lambda *_args, **_kwargs: iter([step]),
+    )
+    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+    monkeypatch.setattr(
+        web_events,
+        "_record_last_recipe_capture",
+        lambda *_args, **_kwargs: None,
+    )
+    persist_statuses = []
+
+    def blocking_persist(
+        _socketio,
+        persist_sid,
+        run_id,
+        _session,
+        *,
+        status,
+        **_kwargs,
+    ):
+        persist_statuses.append(status)
+        if len(persist_statuses) == 1:
+            first_persist_entered.set()
+            assert release_persist.wait(2)
+        with web_events._simulations_guard:
+            current = web_events._simulations.get(persist_sid)
+            if current is not None and current.get("run_id") == run_id:
+                current["artifact_persisted"] = True
+        return {"execution_status": status}
+
+    monkeypatch.setattr(web_events, "_persist_terminal", blocking_persist)
+
+    class CapturingSocket(_Socket):
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+    socket = CapturingSocket()
+    web_events._start_background_loop(
+        socket,
+        sid,
+        state["run_id"],
+        run_lock,
+        "backend",
+        "available",
+        True,
+    )
+    loop_thread = threading.Thread(target=socket.target, name="c6-loop")
+    loop_thread.start()
+    assert first_persist_entered.wait(2)
+
+    cancel_thread = threading.Thread(
+        target=lambda: web_events._cancel_simulation_state(
+            socket,
+            sid,
+            reason="replaced_by_new_run",
+        ),
+        name="cancel-c6",
+    )
+    cancel_thread.start()
+    assert cancel_attempted.wait(2)
+    assert cancel_acquired.wait(0.05) is False
+    assert persist_statuses == ["refused"]
+
+    release_persist.set()
+    loop_thread.join(2)
+    cancel_thread.join(2)
+    assert loop_thread.is_alive() is False
+    assert cancel_thread.is_alive() is False
+    assert persist_statuses == ["refused"]
+
+
 def test_idempotency_entries_evict_oldest_at_fixed_bound(monkeypatch):
     calls = []
 
@@ -388,6 +553,51 @@ def test_idempotency_entries_evict_oldest_at_fixed_bound(monkeypatch):
     )
     assert replay["idempotent_replay"] is True
     assert len(calls) == 3
+
+
+def test_active_idempotency_tokens_are_never_evicted(monkeypatch):
+    calls = []
+
+    def fake_start(_payload, *, sid, ledger_client_id, **_kwargs):
+        state, _ = web_events._replace_simulation_state(
+            sid,
+            _PartialSession(),
+            speed=0.0,
+            ledger_client_id=ledger_client_id,
+        )
+        state["http_owned"] = True
+        calls.append(state["run_id"])
+        return {"run_id": state["run_id"], "status": "started"}
+
+    monkeypatch.setattr(web_events, "_registered_start_handler", fake_start)
+    monkeypatch.setattr(web_events, "_MAX_RUN_IDEMPOTENCY_ENTRIES", 2)
+    for client_id, token in (("client-a", "token-a"), ("client-b", "token-b")):
+        web_events.submit_run_command(
+            _Socket(),
+            {"client_token": token, "mass_kg": 1000},
+            client_id=client_id,
+        )
+
+    with pytest.raises(web_events.RunCommandError) as exc_info:
+        web_events.submit_run_command(
+            _Socket(),
+            {"client_token": "token-c", "mass_kg": 1000},
+            client_id="client-c",
+        )
+
+    assert exc_info.value.error_type == "idempotency_capacity_exhausted"
+    assert exc_info.value.status_code == 503
+    assert list(web_events._run_idempotency) == [
+        ("client-a", "token-a"),
+        ("client-b", "token-b"),
+    ]
+    replay = web_events.submit_run_command(
+        _Socket(),
+        {"client_token": "token-a", "mass_kg": 1000},
+        client_id="client-a",
+    )
+    assert replay["idempotent_replay"] is True
+    assert len(calls) == 2
 
 
 def test_draft_is_stateless_validate_and_echo(monkeypatch):
