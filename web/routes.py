@@ -94,6 +94,7 @@ from web.advisory import (
     vapor_pressure_authority_payload,
     wall_advisory_payload,
 )
+from web.run_store import list_runs, load as load_run_artifact
 
 bp = Blueprint('web', __name__,
                template_folder='templates',
@@ -3254,6 +3255,22 @@ def ledger_snapshot_api():
 @bp.route('/api/ledger/views/<view_name>', methods=['GET'])
 def ledger_view_api(view_name: str):
     return _ledger_get('view', view=view_name)
+
+
+@bp.route('/api/runs', methods=['GET'])
+def runs_api():
+    return jsonify(list_runs())
+
+
+@bp.route('/api/runs/<run_id>', methods=['GET'])
+def run_artifact_api(run_id: str):
+    try:
+        artifact = load_run_artifact(run_id)
+    except ValueError as exc:
+        return _json_error(str(exc), 400)
+    if artifact is None:
+        return _json_error('run artifact not found', 404)
+    return jsonify(artifact)
 
 
 @bp.route('/api/wall-risk')
