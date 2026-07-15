@@ -77,6 +77,12 @@ POINT_PROVENANCE_FIELDS = (
     "kress91_partition_provenance",
     "kress91_fixed_ferric_fraction",
 )
+# t-299 added kress91_fixed_ferric_fraction; legacy input vectors (and legacy
+# stored batches replayed by the harvest tooling) predate it, so its presence is
+# OPTIONAL. It is a provenance field, not part of the hashed INPUT_FIELDS
+# identity (canonical_input_vector hashes INPUT_FIELDS only), so absence cannot
+# alter any cache key; row build treats an absent field as None.
+OPTIONAL_PROVENANCE_FIELDS = frozenset({"kress91_fixed_ferric_fraction"})
 
 GENERIC_OUTPUT_FIELDS = (
     "temperature_C",
@@ -211,7 +217,11 @@ def canonical_json(value: Any) -> str:
 
 def canonical_input_vector(inputs: Mapping[str, Any]) -> str:
     allowed_fields = INPUT_FIELDS + POINT_PROVENANCE_FIELDS
-    missing = [name for name in allowed_fields if name not in inputs]
+    missing = [
+        name
+        for name in allowed_fields
+        if name not in inputs and name not in OPTIONAL_PROVENANCE_FIELDS
+    ]
     extra = sorted(set(inputs) - set(allowed_fields))
     if missing or extra:
         raise ValueError(f"input vector mismatch: missing={missing}, extra={extra}")
@@ -1412,10 +1422,10 @@ class GridCacheWriter:
             "intended_fO2_log": _float(intended_fO2_log),
             "intended_fO2_log_repr": _repr(intended_fO2_log),
             "kress91_fixed_ferric_fraction": _float(
-                inputs["kress91_fixed_ferric_fraction"]
+                inputs.get("kress91_fixed_ferric_fraction")
             ),
             "kress91_fixed_ferric_fraction_repr": _repr(
-                inputs["kress91_fixed_ferric_fraction"]
+                inputs.get("kress91_fixed_ferric_fraction")
             ),
             "kress91_partition_provenance_json": _json(
                 inputs["kress91_partition_provenance"]
