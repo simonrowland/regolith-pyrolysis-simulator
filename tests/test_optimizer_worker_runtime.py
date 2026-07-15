@@ -80,6 +80,31 @@ def _session_config():
     )._session_config()
 
 
+def test_warm_runtime_accepts_thermoengine_peer_and_exposes_transport(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv(WARM_WORKERS_ENV, raising=False)
+    transport = object()
+    backend = SimpleNamespace(transport=transport)
+    seen: list[str] = []
+
+    def resolve_peer(name: str, *_args: object, **_kwargs: object) -> object:
+        seen.append(name)
+        return backend
+
+    monkeypatch.setattr(worker_runtime_module, 'resolve_backend', resolve_peer)
+    context = warm_worker_runtime(
+        'thermoengine',
+        feedstock_id='lunar_highland',
+        stage0_subprocess_required=False,
+    )
+
+    assert context is not None
+    assert seen == ['thermoengine']
+    assert context.backend is backend
+    assert context.transport is transport
+
+
 def test_warm_runtime_reuses_backend_but_creates_fresh_sim_and_ledger(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

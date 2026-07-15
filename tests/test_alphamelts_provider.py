@@ -131,7 +131,7 @@ def _make_request(
     composition_mol: dict,
     temperature_C: float = 1400.0,
     pressure_bar: float = 1.0,
-    fO2_log: float = -9.0,
+    fO2_log: float | None = -9.0,
     fe_redox_policy: str = 'intrinsic',
 ) -> IntentRequest:
     """Build an IntentRequest with a ``process.cleaned_melt``-only view."""
@@ -176,6 +176,9 @@ class _FakeAlphaMELTSBackend:
         equilibrate_func=None,
     ) -> None:
         self._mode = mode
+        self.backend_name = (
+            'thermoengine' if mode == 'thermoengine' else 'alphamelts'
+        )
         self._equilibrium = equilibrium
         self._finder_result = finder_result
         self._equilibrate_func = equilibrate_func
@@ -429,6 +432,43 @@ def test_provider_returns_liquidus_diagnostics_for_thermoengine_path():
     assert backend.finder_calls
 
 
+def test_provider_legacy_thermoengine_none_uses_imposed_minus_nine():
+    backend = _FakeAlphaMELTSBackend(
+        mode='thermoengine',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+    backend._legacy_alphamelts_cache_identity = True
+    result = AlphaMELTSProvider(backend=backend).dispatch(
+        _make_request(
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            composition_mol=_basalt_species_mol(),
+            fO2_log=None,
+        )
+    )
+
+    assert result.status == 'ok'
+    assert backend.calls[0]['fO2_log'] == -9.0
+    assert result.transition is None
+
+
+def test_provider_explicit_thermoengine_preserves_intrinsic_none():
+    backend = _FakeAlphaMELTSBackend(
+        mode='thermoengine',
+        equilibrium=_build_equilibrium_for_basalt(),
+    )
+    result = AlphaMELTSProvider(backend=backend).dispatch(
+        _make_request(
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+            composition_mol=_basalt_species_mol(),
+            fO2_log=None,
+        )
+    )
+
+    assert result.status == 'ok'
+    assert backend.calls[0]['fO2_log'] is None
+    assert result.transition is None
+
+
 def test_provider_returns_liquidus_diagnostics_for_subprocess_path():
     backend = _FakeAlphaMELTSBackend(
         mode='subprocess',
@@ -593,18 +633,14 @@ def test_provider_subprocess_required_skips_thermoengine_route(monkeypatch):
     def fail_thermoengine(*_args, **_kwargs):
         raise AssertionError('ThermoEngine route must be skipped')
 
+    backend.equilibrate = fail_thermoengine
+
     def fake_subprocess(*_args, **_kwargs):
         calls.append('subprocess')
         return _build_equilibrium_for_basalt(liquidus_C=1290.0)
 
-    monkeypatch.setattr(provider_module, 'thermoengine_available', lambda _backend: True)
     monkeypatch.setattr(provider_module, 'subprocess_available', lambda _backend: True)
     monkeypatch.setattr(provider_module, 'python_api_available', lambda _backend: True)
-    monkeypatch.setattr(
-        provider_module,
-        'equilibrate_via_thermoengine',
-        fail_thermoengine,
-    )
     monkeypatch.setattr(
         provider_module,
         'equilibrate_via_subprocess',

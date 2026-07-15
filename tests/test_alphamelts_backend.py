@@ -1,4 +1,5 @@
 import math
+import inspect
 import subprocess
 import time
 import types
@@ -20,6 +21,7 @@ from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.core import CampaignPhase, PyrolysisSimulator
+from simulator.backends import BackendSelectionPolicy, resolve_backend
 from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_MISSING_BINARY,
     ALPHAMELTS_REASON_NONZERO_EXIT,
@@ -36,7 +38,9 @@ from simulator.melt_backend.alphamelts import (
 from simulator.melt_backend.base import (
     EquilibriumResult,
     LiquidFractionInvalidError,
+    MeltBackend,
 )
+from simulator.melt_backend.thermoengine import ThermoEngineBackend
 from engines.alphamelts.thermoengine import (
     ThermoEnginePayload,
     ThermoEngineTransport,
@@ -1251,18 +1255,8 @@ def test_alphamelts_provider_production_equilibrium_skips_thermoengine(monkeypat
         fO2_log=-9.0,
     )
 
-    monkeypatch.setattr(alphamelts_provider_module, 'thermoengine_available', lambda _backend: True)
     monkeypatch.setattr(alphamelts_provider_module, 'python_api_available', lambda _backend: False)
     monkeypatch.setattr(alphamelts_provider_module, 'subprocess_available', lambda _backend: False)
-
-    def fail_thermoengine(*args, **kwargs):
-        raise AssertionError('production equilibrium must not call in-process ThermoEngine')
-
-    monkeypatch.setattr(
-        alphamelts_provider_module,
-        'equilibrate_via_thermoengine',
-        fail_thermoengine,
-    )
 
     mode, equilibrium = provider._run_backend(
         request,
@@ -1287,11 +1281,6 @@ def test_alphamelts_provider_liquidus_skips_thermoengine(monkeypatch):
         fO2_log=-9.0,
     )
 
-    monkeypatch.setattr(
-        alphamelts_provider_module,
-        'thermoengine_available',
-        lambda _backend: True,
-    )
     monkeypatch.setattr(
         alphamelts_provider_module,
         'python_api_available',
@@ -1328,11 +1317,6 @@ def test_alphamelts_provider_ec_skips_thermoengine(monkeypatch):
 
     monkeypatch.setattr(
         alphamelts_provider_module,
-        'thermoengine_available',
-        lambda _backend: True,
-    )
-    monkeypatch.setattr(
-        alphamelts_provider_module,
         'python_api_available',
         lambda _backend: False,
     )
@@ -1340,11 +1324,6 @@ def test_alphamelts_provider_ec_skips_thermoengine(monkeypatch):
         alphamelts_provider_module,
         'subprocess_available',
         lambda _backend: False,
-    )
-    monkeypatch.setattr(
-        alphamelts_provider_module,
-        'equilibrate_via_thermoengine',
-        fail_transport,
     )
 
     mode, result = provider._run_equilibrium_crystallization_path(
@@ -1390,16 +1369,48 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
         def initialize(self):
             return True
 
-    backend = AlphaMELTSBackend()
+    backend = ThermoEngineBackend()
     monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts.ThermoEngineTransport',
+        'simulator.melt_backend.thermoengine.ThermoEngineTransport',
         FakeThermoEngineTransport,
     )
 
-    assert backend.initialize({'mode': 'thermoengine'}) is True
+    assert backend.initialize({}) is True
     assert backend._mode == 'thermoengine'
     assert backend.get_engine_version() == 'thermoengine fake'
     assert backend._thermoengine_transport.equilibrate_timeout_s == 60.0
+
+
+def test_alphamelts_backend_rejects_thermoengine_transport_mode():
+    with pytest.raises(ValueError, match='unsupported AlphaMELTS mode'):
+        AlphaMELTSBackend().initialize({'mode': 'thermoengine'})
+
+
+def test_melt_backend_interface_documents_intrinsic_default_opt_in():
+    base_parameters = inspect.signature(MeltBackend.equilibrate).parameters
+    thermo_parameters = inspect.signature(ThermoEngineBackend.equilibrate).parameters
+
+    assert 'subprocess_run_mode' not in base_parameters
+    assert 'subprocess_run_mode' not in thermo_parameters
+    assert base_parameters['fO2_log'].default == -9.0
+    assert thermo_parameters['fO2_log'].default is None
+    assert MeltBackend.supports_intrinsic_fO2 is False
+    assert ThermoEngineBackend.supports_intrinsic_fO2 is True
+
+
+def test_alphamelts_results_carry_backend_and_engine_provenance():
+    backend = AlphaMELTSBackend()
+    backend._engine_version = 'alphamelts fake-v1'
+
+    result = backend._emit_equilibrium_result(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        status='unavailable',
+    )
+
+    assert result.backend_name == 'alphamelts'
+    assert result.engine_version == 'alphamelts fake-v1'
 
 
 def test_thermoengine_health_failure_is_scoped_to_transport_lifecycle(
@@ -1506,6 +1517,114 @@ def test_thermoengine_transport_close_is_idempotent():
     assert transport._worker_connection is None
 
 
+def test_thermoengine_backend_close_clears_availability():
+    class FakeTransport:
+        def __init__(self):
+            self.close_calls = 0
+
+        def close(self):
+            self.close_calls += 1
+
+    backend = ThermoEngineBackend()
+    transport = FakeTransport()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    backend.close()
+    backend.close()
+
+    assert transport.close_calls == 1
+    assert backend._thermoengine_transport is None
+    assert backend._mode is None
+    assert backend.is_available() is False
+
+
+@pytest.mark.parametrize(
+    'failure',
+    [
+        RuntimeError('child solver failure'),
+        ImportError('child import failure'),
+    ],
+)
+def test_thermoengine_backend_equilibrium_failure_closes_worker(failure):
+    class FailingTransport:
+        def __init__(self):
+            self.close_calls = 0
+
+        def equilibrate(self, **_kwargs):
+            raise failure
+
+        def close(self):
+            self.close_calls += 1
+
+    backend = ThermoEngineBackend()
+    transport = FailingTransport()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(type(failure)):
+        backend._equilibrate_thermoengine(
+            1400.0,
+            _melts_domain_composition(),
+            -9.0,
+            1.0,
+        )
+
+    assert transport.close_calls == 1
+    assert backend._thermoengine_transport is None
+    assert backend._mode is None
+    assert backend.is_available() is False
+
+
+def test_thermoengine_backend_failure_preserves_primary_close_error():
+    class FailingTransport:
+        def equilibrate(self, **_kwargs):
+            raise RuntimeError('child solver failure')
+
+        def close(self):
+            raise RuntimeError('pipe close failure')
+
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = FailingTransport()
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(
+        RuntimeError,
+        match='ThermoEngine equilibrium failed: child solver failure',
+    ) as excinfo:
+        backend._equilibrate_thermoengine(
+            1400.0,
+            _melts_domain_composition(),
+            -9.0,
+            1.0,
+        )
+
+    assert excinfo.value.__cause__ is not None
+    assert excinfo.value.__cause__.__notes__ == [
+        'ThermoEngine cleanup also failed: pipe close failure'
+    ]
+    assert backend._thermoengine_transport is None
+    assert backend._mode is None
+    assert backend.is_available() is False
+
+
+def test_thermoengine_intrinsic_out_of_domain_returns_clean_result():
+    backend = ThermoEngineBackend()
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=None,
+        composition_mol_by_account={
+            'process.cleaned_melt': {'SiO2': 1.0},
+            'process.metal': {'Fe': 1.0},
+        },
+    )
+
+    assert result.status == 'out_of_domain'
+    assert result.fO2_log is None
+
+
 def test_thermoengine_transport_broken_pipe_closes_worker():
     events = []
 
@@ -1546,6 +1665,47 @@ def test_thermoengine_transport_broken_pipe_closes_worker():
         )
 
     assert events == [('close',), ('join', 1.0)]
+    assert transport._worker_process is None
+    assert transport._worker_connection is None
+
+
+def test_thermoengine_transport_pipe_close_failure_still_joins_worker():
+    events = []
+
+    class FakeProcess:
+        alive = True
+
+        def is_alive(self):
+            return self.alive
+
+        def join(self, timeout):
+            events.append(('join', timeout))
+            self.alive = False
+
+        def terminate(self):
+            events.append(('terminate',))
+
+        def kill(self):
+            events.append(('kill',))
+
+    class FailingCloseConnection:
+        def send(self, value):
+            events.append(('send', value))
+
+        def close(self):
+            events.append(('close',))
+            raise RuntimeError('pipe close failure')
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker_process = FakeProcess()
+    transport._worker_connection = FailingCloseConnection()
+
+    with pytest.raises(RuntimeError, match='pipe close failure'):
+        transport.close()
+
+    assert events == [('send', None), ('close',), ('join', 1.0)]
     assert transport._worker_process is None
     assert transport._worker_connection is None
 
@@ -2220,7 +2380,7 @@ def test_thermoengine_extras_fail_loud_on_malformed_present_value():
 
 
 def test_alphamelts_thermoengine_default_is_intrinsic_closed(monkeypatch):
-    backend = AlphaMELTSBackend()
+    backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
     seen = {}
 
@@ -2255,6 +2415,108 @@ def test_alphamelts_thermoengine_default_is_intrinsic_closed(monkeypatch):
         'thermoengine_intrinsic_closed'
     )
     assert 'requested_fO2_log' not in result.diagnostics
+
+
+@pytest.mark.parametrize('requested_fO2_log', [None, -12.0, -9.0, -6.0, -3.0, 0.0])
+def test_thermoengine_standalone_shadow_parity_with_frozen_legacy_oracle(
+    requested_fO2_log,
+):
+    class ShadowTransport:
+        engine_version = 'thermoengine shadow-v1'
+
+        def equilibrate(self, **kwargs):
+            solved = -8.25 if kwargs['fO2_log'] is None else kwargs['fO2_log']
+            return ThermoEnginePayload(
+                phases_present=('Liquid', 'olivine'),
+                phase_masses_kg={'Liquid': 0.75, 'olivine': 0.25},
+                liquid_fraction=0.75,
+                liquid_composition_wt_pct={'SiO2': 55.0, 'MgO': 45.0},
+                solved_fO2_log=solved,
+                phase_universe_size=54,
+                fO2_solve_count=0 if kwargs['fO2_log'] is None else 5,
+                phase_compositions={
+                    'Liquid': {'SiO2': 55.0, 'MgO': 45.0},
+                    'olivine': {'SiO2': 40.0, 'MgO': 60.0},
+                },
+                phase_thermo={
+                    'Liquid': {'G': -1.0, 'H': 2.0, 'S': 3.0, 'V': 4.0, 'Cp': 5.0},
+                },
+                chem_potentials={'Liquid': {'SiO2': -10.0}},
+                phase_affinities={
+                    'Liquid': {'affinity': 0.0, 'present': True},
+                    'quartz': {'affinity': 12.5, 'present': False},
+                },
+                activity_coefficients={'SiO2': 0.5},
+                fe_redox_split={'FeO_wt_pct': 9.0, 'Fe2O3_wt_pct': 1.0},
+                warnings=('frozen oracle warning',),
+            )
+
+        def close(self):
+            return None
+
+    class ShadowBackend(ThermoEngineBackend):
+        def initialize(self, _config):
+            self._thermoengine_transport = ShadowTransport()
+            self._engine_version = self._thermoengine_transport.engine_version
+            self._mode = 'thermoengine'
+            self._vaporock_available = False
+            self._activities_times_antoine_or_fail = (
+                lambda *_args, **_kwargs: {'SiO': 12.5}
+            )
+            return True
+
+    standalone = resolve_backend(
+        'thermoengine',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        thermoengine_backend_cls=ShadowBackend,
+    )
+    kwargs = {
+        'temperature_C': 1400.0,
+        'composition_kg': _melts_domain_composition(),
+        'pressure_bar': 1.0,
+        'fO2_log': requested_fO2_log,
+    }
+
+    result = standalone.equilibrate(**kwargs)
+
+    # Frozen projection of the pre-refactor AlphaMELTSBackend
+    # mode='thermoengine' emitter. This oracle is deliberately independent of
+    # ThermoEngineBackend so routing/emission drift cannot self-validate.
+    assert result.phases_present == ['Liquid', 'olivine']
+    assert result.phase_masses_kg == {'Liquid': 0.75, 'olivine': 0.25}
+    assert result.liquid_fraction == 0.75
+    assert result.liquid_composition_wt_pct == {'SiO2': 55.0, 'MgO': 45.0}
+    assert result.fO2_log == (-8.25 if requested_fO2_log is None else requested_fO2_log)
+    assert result.phase_compositions == {
+        'Liquid': {'SiO2': 55.0, 'MgO': 45.0},
+        'olivine': {'SiO2': 40.0, 'MgO': 60.0},
+    }
+    assert result.phase_thermo == {
+        'Liquid': {'G': -1.0, 'H': 2.0, 'S': 3.0, 'V': 4.0, 'Cp': 5.0},
+    }
+    assert result.chem_potentials == {'Liquid': {'SiO2': -10.0}}
+    assert result.phase_affinities == {
+        'Liquid': {'affinity': 0.0, 'present': True},
+        'quartz': {'affinity': 12.5, 'present': False},
+    }
+    assert result.activity_coefficients == {'SiO2': 0.5}
+    assert result.fe_redox_split == {'FeO_wt_pct': 9.0, 'Fe2O3_wt_pct': 1.0}
+    assert result.vapor_pressures_Pa == {'SiO': 12.5}
+    assert result.temperature_C == pytest.approx(1400.0)
+    assert result.pressure_bar == pytest.approx(1.0)
+    assert result.status == 'ok'
+    assert result.warnings == ['frozen oracle warning']
+    assert result.diagnostics['fO2_transport'] == (
+        'thermoengine_intrinsic_closed'
+        if requested_fO2_log is None
+        else 'thermoengine_oxygen_root'
+    )
+    assert result.diagnostics['thermoengine_fO2_solve_count'] == (
+        0 if requested_fO2_log is None else 5
+    )
+    assert result.backend_name == 'thermoengine'
+    assert result.engine_version == 'thermoengine shadow-v1'
+    assert result.ledger_transition is None
 
 
 def test_thermoengine_imposes_absolute_fo2_with_default_phase_solver(monkeypatch):
@@ -2448,9 +2710,9 @@ def test_thermoengine_imposed_fo2_rejects_narrow_target_plateau(monkeypatch):
 
 
 def test_thermoengine_transport_equilibrates_live_when_installed():
-    backend = AlphaMELTSBackend()
+    backend = ThermoEngineBackend()
     try:
-        available = backend.initialize({'mode': 'thermoengine'})
+        available = backend.initialize({})
     except ImportError as exc:
         pytest.skip(f'ThermoEngine transport unavailable: {exc}')
     if not available:
@@ -2492,10 +2754,9 @@ def test_thermoengine_transport_equilibrates_live_when_installed():
 
 
 def test_thermoengine_live_fo2_near_spinel_boundary_is_unique_or_fails_loud():
-    backend = AlphaMELTSBackend()
+    backend = ThermoEngineBackend()
     try:
         available = backend.initialize({
-            'mode': 'thermoengine',
             'thermoengine_equilibrate_timeout_s': 90.0,
             'thermoengine_health_timeout_s': 30.0,
         })
@@ -2547,9 +2808,9 @@ def test_thermoengine_live_fo2_near_spinel_boundary_is_unique_or_fails_loud():
 
 
 def test_thermoengine_intrinsic_shadow_parity_against_subprocess_when_available():
-    thermo = AlphaMELTSBackend()
+    thermo = ThermoEngineBackend()
     try:
-        thermo_ok = thermo.initialize({'mode': 'thermoengine'})
+        thermo_ok = thermo.initialize({})
     except ImportError as exc:
         pytest.skip(f'ThermoEngine transport unavailable: {exc}')
     if not thermo_ok:
@@ -3193,7 +3454,7 @@ Melt fraction = 1.0
 
 
 def test_alphamelts_accepts_applied_thermoengine_absolute_fo2(monkeypatch):
-    backend = AlphaMELTSBackend()
+    backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
 
     class FakeTransport:
@@ -3731,7 +3992,7 @@ def test_thermoengine_callsite_wires_vaporock_source_and_solved_liquid(monkeypat
                 solved_fO2_log=fO2_log,
             )
 
-    backend = AlphaMELTSBackend()
+    backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
     backend._thermoengine_transport = FakeTransport()
     backend._vaporock_available = True
@@ -3771,7 +4032,7 @@ def test_thermoengine_vaporock_empty_fallback_marks_vapor_facet_degraded():
                 solved_fO2_log=fO2_log,
             )
 
-    backend = AlphaMELTSBackend()
+    backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
     backend._thermoengine_transport = FakeTransport()
     backend._vaporock_available = True
@@ -3853,7 +4114,7 @@ def test_thermoengine_vaporock_unavailable_marks_not_attempted_without_churn():
                 solved_fO2_log=fO2_log,
             )
 
-    backend = AlphaMELTSBackend()
+    backend = ThermoEngineBackend()
     backend._mode = 'thermoengine'
     backend._thermoengine_transport = FakeTransport()
     backend._vaporock_available = False

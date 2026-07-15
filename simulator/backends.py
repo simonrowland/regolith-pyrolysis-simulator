@@ -28,11 +28,16 @@ from simulator.melt_backend.alphamelts import (
     MELTS_OXIDE_ALIASES,
 )
 from simulator.melt_backend.base import DEFAULT_BACKEND_CAPABILITIES, InternalAnalyticalBackend
+from simulator.melt_backend.thermoengine import ThermoEngineBackend
 
 
 INELIGIBLE_ACTIVE_BACKENDS = ("vaporock", "magemin")
 CACHED_REAL_BACKEND_NAME = "cached-real"
-REAL_MELT_BACKEND_NAMES = ("alphamelts", CACHED_REAL_BACKEND_NAME)
+REAL_MELT_BACKEND_NAMES = (
+    "alphamelts",
+    "thermoengine",
+    CACHED_REAL_BACKEND_NAME,
+)
 # Pre-grind sweep: these feedstocks can wedge in-process ThermoEngine;
 # tests guard this overlay by content digest, not grep.
 STAGE0_SUBPROCESS_FEEDSTOCK_IDS = (
@@ -303,6 +308,9 @@ def normalize_cached_real_config(
     if _is_alphamelts_authorized_name(authorized_backend_name):
         authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
         authorized_mode = authorized_mode or DEFAULT_ALPHAMELTS_MODE
+    elif _is_thermoengine_authorized_name(authorized_backend_name):
+        authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
+        authorized_mode = authorized_mode or 'thermoengine'
     miss_policy = str(value.get("miss_policy", "fail-loud")).strip().lower()
     miss_policy = miss_policy.replace("_", "-")
     if miss_policy not in CACHED_REAL_MISS_POLICIES:
@@ -638,6 +646,34 @@ def _backend_config_requests_subprocess(
     return False
 
 
+def _backend_config_requests_thermoengine(
+    backend_config: Mapping[str, Any] | None,
+) -> bool:
+    return _legacy_alphamelts_transport_mode(backend_config) == 'thermoengine'
+
+
+def _legacy_alphamelts_transport_mode(
+    backend_config: Mapping[str, Any] | None,
+) -> str:
+    if not isinstance(backend_config, Mapping):
+        return ''
+    top_mode = str(backend_config.get('mode') or '').strip().lower()
+    top_bridge = str(backend_config.get('python_bridge') or '').strip().lower()
+    nested = backend_config.get('alphamelts')
+    nested_mode = ''
+    nested_bridge = ''
+    if isinstance(nested, Mapping):
+        nested_mode = str(nested.get('mode') or '').strip().lower()
+        nested_bridge = str(nested.get('python_bridge') or '').strip().lower()
+    if top_mode in {'subprocess', 'binary'} or top_bridge == 'subprocess':
+        return 'subprocess'
+    mode = nested_mode or top_mode
+    bridge = nested_bridge or top_bridge
+    if bridge == 'subprocess':
+        return 'subprocess'
+    return mode
+
+
 def assert_stage0_subprocess_backend_safe(
     backend: Any,
     *,
@@ -706,6 +742,7 @@ def resolve_backend(
     log_selection: Callable[[object], None] | None = None,
     log_message: Callable[[str], None] | None = None,
     alphamelts_backend_cls: type = AlphaMELTSBackend,
+    thermoengine_backend_cls: type = ThermoEngineBackend,
     internal_analytical_backend_cls: type = InternalAnalyticalBackend,
     cached_real_config: CachedRealConfig | Mapping[str, Any] | None = None,
     cached_real_live_backend_cls: type | None = None,
@@ -740,6 +777,7 @@ def resolve_backend(
             log_selection=log_selection,
             log_message=log_message,
             alphamelts_backend_cls=alphamelts_backend_cls,
+            thermoengine_backend_cls=thermoengine_backend_cls,
             internal_analytical_backend_cls=internal_analytical_backend_cls,
             cached_real_config=cached_real_config,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
@@ -750,6 +788,7 @@ def resolve_backend(
             backend_name,
             unavailable_error_cls=unavailable_error_cls,
             alphamelts_backend_cls=alphamelts_backend_cls,
+            thermoengine_backend_cls=thermoengine_backend_cls,
             internal_analytical_backend_cls=internal_analytical_backend_cls,
             cached_real_config=cached_real_config,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
@@ -966,6 +1005,7 @@ def _resolve_web_autodetect(
     log_selection: Callable[[object], None] | None,
     log_message: Callable[[str], None] | None,
     alphamelts_backend_cls: type,
+    thermoengine_backend_cls: type,
     internal_analytical_backend_cls: type,
     cached_real_config: CachedRealConfig | Mapping[str, Any] | None,
     cached_real_live_backend_cls: type | None,
@@ -984,6 +1024,7 @@ def _resolve_web_autodetect(
             cached_real_config,
             unavailable_error_cls=unavailable_error_cls,
             alphamelts_backend_cls=alphamelts_backend_cls,
+            thermoengine_backend_cls=thermoengine_backend_cls,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
             backend_config=backend_config,
         )
@@ -995,10 +1036,11 @@ def _resolve_web_autodetect(
         "auto",
         ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
         "alphamelts",
+        "thermoengine",
     ):
         raise unavailable_error_cls(
             f"unknown backend {name!r}; select auto, internal-analytical, "
-            "alphamelts, or cached-real"
+            "alphamelts, thermoengine, or cached-real"
         )
 
     # D1 fix: an explicit analytical request pins InternalAnalyticalBackend
@@ -1010,13 +1052,41 @@ def _resolve_web_autodetect(
         return backend
 
     if name == "alphamelts":
-        backend = _try_alphamelts(alphamelts_backend_cls, backend_config)
+        legacy_thermoengine_identity = _backend_config_requests_thermoengine(
+            backend_config
+        )
+        backend = (
+            _try_backend(thermoengine_backend_cls, backend_config)
+            if legacy_thermoengine_identity
+            else _try_alphamelts(alphamelts_backend_cls, backend_config)
+        )
         if backend is not None:
+            if legacy_thermoengine_identity:
+                backend._legacy_alphamelts_cache_identity = True
             _log_selection(backend, log_selection, log_message)
             return backend
         raise unavailable_error_cls(
             "AlphaMELTS unavailable; run install-dependencies.py"
         )
+
+    if name == "thermoengine":
+        backend = _try_backend(thermoengine_backend_cls, backend_config)
+        if backend is not None:
+            _log_selection(backend, log_selection, log_message)
+            return backend
+        raise unavailable_error_cls(
+            "ThermoEngine unavailable; run install-dependencies.py"
+        )
+
+    legacy_thermoengine_identity = _backend_config_requests_thermoengine(
+        backend_config
+    )
+    if legacy_thermoengine_identity:
+        backend = _try_backend(thermoengine_backend_cls, backend_config)
+        if backend is not None:
+            backend._legacy_alphamelts_cache_identity = True
+            _log_selection(backend, log_selection, log_message)
+            return backend
 
     forced_subprocess_probe = _backend_config_requests_subprocess(backend_config)
     probe_error: Exception | None = None
@@ -1045,6 +1115,7 @@ def _resolve_runner_strict(
     *,
     unavailable_error_cls: type[_E],
     alphamelts_backend_cls: type,
+    thermoengine_backend_cls: type,
     internal_analytical_backend_cls: type,
     cached_real_config: CachedRealConfig | Mapping[str, Any] | None,
     cached_real_live_backend_cls: type | None,
@@ -1055,14 +1126,31 @@ def _resolve_runner_strict(
     if name == "auto":
         raise unavailable_error_cls(
             "auto backend selection is unavailable under runner-strict; "
-            "select internal-analytical, alphamelts, or cached-real"
+            "select internal-analytical, alphamelts, thermoengine, or cached-real"
         )
     if name == "alphamelts":
-        backend = _try_alphamelts(alphamelts_backend_cls, backend_config)
+        legacy_thermoengine_identity = _backend_config_requests_thermoengine(
+            backend_config
+        )
+        backend = (
+            _try_backend(thermoengine_backend_cls, backend_config)
+            if legacy_thermoengine_identity
+            else _try_alphamelts(alphamelts_backend_cls, backend_config)
+        )
         if backend is not None:
+            if legacy_thermoengine_identity:
+                backend._legacy_alphamelts_cache_identity = True
             return backend
         raise unavailable_error_cls(
             "AlphaMELTS unavailable; rerun with --backend=internal-analytical "
+            "or install via install-dependencies.py"
+        )
+    if name == "thermoengine":
+        backend = _try_backend(thermoengine_backend_cls, backend_config)
+        if backend is not None:
+            return backend
+        raise unavailable_error_cls(
+            "ThermoEngine unavailable; rerun with --backend=internal-analytical "
             "or install via install-dependencies.py"
         )
     if name == CACHED_REAL_BACKEND_NAME:
@@ -1070,6 +1158,7 @@ def _resolve_runner_strict(
             cached_real_config,
             unavailable_error_cls=unavailable_error_cls,
             alphamelts_backend_cls=alphamelts_backend_cls,
+            thermoengine_backend_cls=thermoengine_backend_cls,
             cached_real_live_backend_cls=cached_real_live_backend_cls,
             backend_config=backend_config,
         )
@@ -1080,7 +1169,14 @@ def _try_alphamelts(
     alphamelts_backend_cls: type,
     backend_config: Mapping[str, Any] | None = None,
 ):
-    backend = alphamelts_backend_cls()
+    return _try_backend(alphamelts_backend_cls, backend_config)
+
+
+def _try_backend(
+    backend_cls: type,
+    backend_config: Mapping[str, Any] | None = None,
+):
+    backend = backend_cls()
     if backend.initialize(dict(backend_config or {})) and backend.is_available():
         return backend
     return None
@@ -1097,6 +1193,7 @@ def _cached_real_backend(
     *,
     unavailable_error_cls: type[_E],
     alphamelts_backend_cls: type,
+    thermoengine_backend_cls: type,
     cached_real_live_backend_cls: type | None,
     backend_config: Mapping[str, Any] | None,
 ) -> CachedRealBackend:
@@ -1106,12 +1203,32 @@ def _cached_real_backend(
     )
     live_backend = None
     if config.miss_policy == "live-fill":
-        live_backend_cls = cached_real_live_backend_cls or alphamelts_backend_cls
-        live_backend = _try_alphamelts(live_backend_cls, backend_config)
+        explicit_thermoengine_identity = _is_thermoengine_authorized_name(
+            config.authorized_backend_name
+        )
+        legacy_thermoengine_identity = (
+            not explicit_thermoengine_identity
+            and cached_real_live_backend_cls is None
+            and _backend_config_requests_thermoengine(backend_config)
+        )
+        live_backend_cls = (
+            cached_real_live_backend_cls
+            or (
+                thermoengine_backend_cls
+                if (
+                    explicit_thermoengine_identity
+                    or legacy_thermoengine_identity
+                )
+                else alphamelts_backend_cls
+            )
+        )
+        live_backend = _try_backend(live_backend_cls, backend_config)
         if live_backend is None:
             raise unavailable_error_cls(
                 "cached-real live-fill requires an available live real backend"
             )
+        if legacy_thermoengine_identity:
+            live_backend._legacy_alphamelts_cache_identity = True
         live_identity = _live_backend_identity(live_backend)
         expected_identity = (
             config.authorized_backend_name,
@@ -1133,7 +1250,9 @@ def _cached_real_backend(
 
 def _live_backend_identity(backend: Any) -> tuple[str, str]:
     raw_name = getattr(backend, "name", None)
-    if raw_name is None and any(
+    if bool(getattr(backend, '_legacy_alphamelts_cache_identity', False)):
+        raw_name = 'alphamelts'
+    elif raw_name is None and any(
         cls.__name__ == "AlphaMELTSBackend" for cls in type(backend).__mro__
     ):
         raw_name = "alphamelts"
@@ -1161,6 +1280,9 @@ def _backend_identity_matches(
     names_match = (
         _is_alphamelts_authorized_name(live_name)
         and _is_alphamelts_authorized_name(expected_name)
+    ) or (
+        _is_thermoengine_authorized_name(live_name)
+        and _is_thermoengine_authorized_name(expected_name)
     ) or live_name.strip().lower() == expected_name.strip().lower()
     return names_match and live_version.strip() == expected_version.strip()
 
@@ -1169,6 +1291,12 @@ def _is_alphamelts_authorized_name(value: Any) -> bool:
     text = str(value or "").strip().lower()
     leaf = text.rsplit(".", 1)[-1]
     return text == "alphamelts" or leaf == "alphameltsbackend"
+
+
+def _is_thermoengine_authorized_name(value: Any) -> bool:
+    text = str(value or '').strip().lower()
+    leaf = text.rsplit('.', 1)[-1]
+    return text == 'thermoengine' or leaf == 'thermoenginebackend'
 
 
 def _log_selection(

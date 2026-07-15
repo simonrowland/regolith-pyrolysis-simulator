@@ -101,6 +101,10 @@ class _FakeAlphaMELTS(_FakeBackend):
     name = 'alphamelts'
 
 
+class _FakeThermoEngine(_FakeBackend):
+    name = 'thermoengine'
+
+
 def _install_fakes(
     monkeypatch,
     *,
@@ -135,6 +139,85 @@ def test_runner_strict_rejects_auto():
 def test_runner_strict_keeps_legacy_exact_name_matching():
     with pytest.raises(BackendUnavailableError, match="unknown backend 'Auto'"):
         resolve_backend('Auto', BackendSelectionPolicy.RUNNER_STRICT)
+
+
+def test_runner_strict_resolves_thermoengine_peer():
+    backend = resolve_backend(
+        'thermoengine',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        thermoengine_backend_cls=lambda: _FakeThermoEngine(available=True),
+    )
+
+    assert isinstance(backend, _FakeThermoEngine)
+    assert backend.init_calls == [{}]
+
+
+def test_legacy_alphamelts_thermoengine_mode_resolves_peer_without_key_rename():
+    backend = resolve_backend(
+        'alphamelts',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        thermoengine_backend_cls=lambda: _FakeThermoEngine(available=True),
+        backend_config={'mode': 'thermoengine'},
+    )
+
+    assert isinstance(backend, _FakeThermoEngine)
+    assert backend.init_calls == [{'mode': 'thermoengine'}]
+    assert backend_resolution_status(backend).requested_backend == 'alphamelts'
+    assert backend._legacy_alphamelts_cache_identity is True
+
+
+@pytest.mark.parametrize(
+    'backend_config',
+    [
+        {'mode': 'subprocess', 'alphamelts': {'mode': 'thermoengine'}},
+        {'mode': 'thermoengine', 'alphamelts': {'mode': 'subprocess'}},
+    ],
+)
+def test_legacy_alphamelts_mode_precedence_keeps_subprocess(backend_config):
+    backend = resolve_backend(
+        'alphamelts',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        alphamelts_backend_cls=lambda: _FakeAlphaMELTS(available=True),
+        thermoengine_backend_cls=lambda: pytest.fail(
+            'ThermoEngine peer must not be selected'
+        ),
+        backend_config=backend_config,
+    )
+
+    assert isinstance(backend, _FakeAlphaMELTS)
+
+
+def test_web_auto_preserves_legacy_thermoengine_mode_selection():
+    backend = resolve_backend(
+        'auto',
+        BackendSelectionPolicy.WEB_AUTODETECT,
+        alphamelts_backend_cls=lambda: pytest.fail(
+            'AlphaMELTS subprocess peer must not be selected'
+        ),
+        thermoengine_backend_cls=lambda: _FakeThermoEngine(available=True),
+        backend_config={'mode': 'thermoengine'},
+    )
+
+    assert isinstance(backend, _FakeThermoEngine)
+    assert backend._legacy_alphamelts_cache_identity is True
+
+
+def test_stage0_required_thermoengine_refuses_instead_of_blending_engines():
+    class _RoutedThermoEngine(_FakeThermoEngine):
+        def initialize(self, config):
+            self._mode = 'thermoengine'
+            return super().initialize(config)
+
+    with pytest.raises(
+        BackendUnavailableError,
+        match='requires subprocess.*ThermoEngine',
+    ):
+        resolve_backend(
+            'thermoengine',
+            BackendSelectionPolicy.RUNNER_STRICT,
+            thermoengine_backend_cls=lambda: _RoutedThermoEngine(available=True),
+            stage0_subprocess_required=True,
+        )
 
 
 def test_web_autodetect_policy_preserves_probe_order():

@@ -196,22 +196,24 @@ class ThermoEngineTransport:
         connection = self._worker_connection
         self._worker_process = None
         self._worker_connection = None
-        if connection is not None:
-            try:
-                if process is not None and process.is_alive():
-                    connection.send(None)
-            except (BrokenPipeError, EOFError, OSError):
-                pass
-            finally:
-                connection.close()
-        if process is not None:
-            process.join(timeout=1.0)
-            if process.is_alive():
-                process.terminate()
+        try:
+            if connection is not None:
+                try:
+                    if process is not None and process.is_alive():
+                        connection.send(None)
+                except (BrokenPipeError, EOFError, OSError):
+                    pass
+                finally:
+                    connection.close()
+        finally:
+            if process is not None:
                 process.join(timeout=1.0)
-            if process.is_alive():
-                process.kill()
-                process.join(timeout=1.0)
+                if process.is_alive():
+                    process.terminate()
+                    process.join(timeout=1.0)
+                if process.is_alive():
+                    process.kill()
+                    process.join(timeout=1.0)
 
     def _initialize_in_process(self) -> bool:
         setup_thermoengine_dylib_path()
@@ -1015,22 +1017,22 @@ def equilibrate_via_thermoengine(
     *,
     temperature_C: float,
     pressure_bar: float,
-    fO2_log: float,
+    fO2_log: float | None,
     composition_mol_by_account: Mapping[str, Mapping[str, float]],
     species_formula_registry: Mapping[str, Any],
 ) -> Any:
-    """Run AlphaMELTS through the ThermoEngine transport mode."""
-    mode = getattr(backend, '_mode', None)
-    if mode != 'thermoengine':
+    """Run a standalone ThermoEngine backend."""
+    backend_name = getattr(backend, 'backend_name', None)
+    if backend_name != 'thermoengine':
         raise RuntimeError(
-            'equilibrate_via_thermoengine requires backend._mode == '
-            f'"thermoengine"; got {mode!r}. Provider must dispatch another '
+            'equilibrate_via_thermoengine requires backend_name == '
+            f'"thermoengine"; got {backend_name!r}. Provider must dispatch another '
             'transport instead.'
         )
     return backend.equilibrate(
         temperature_C=float(temperature_C),
         pressure_bar=float(pressure_bar),
-        fO2_log=float(fO2_log),
+        fO2_log=None if fO2_log is None else float(fO2_log),
         composition_mol_by_account=composition_mol_by_account,
         species_formula_registry=species_formula_registry,
     )
@@ -1038,7 +1040,10 @@ def equilibrate_via_thermoengine(
 
 def thermoengine_available(backend: Any) -> bool:
     """True when the backend has initialized the ThermoEngine path."""
-    return getattr(backend, '_mode', None) == 'thermoengine'
+    return (
+        getattr(backend, 'backend_name', None) == 'thermoengine'
+        and bool(backend.is_available())
+    )
 
 
 __all__ = (

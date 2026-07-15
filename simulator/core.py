@@ -1519,9 +1519,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
           backend is not an AlphaMELTSBackend (the provider would have
           nowhere to delegate).
 
-        The duck-typed check (presence of ``_mode``, ``is_available``,
-        ``get_engine_version``) lets the registration accept future
-        AlphaMELTS subclasses without a hard isinstance gate.
+        The stable backend-name check accepts both peer MELTS engines without
+        importing either optional transport at registration time.
         """
         backend = self._provider_registration_backend(self.backend)
         if backend is None:
@@ -1548,21 +1547,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     @staticmethod
     def _is_alphamelts_backend(backend: Any) -> bool:
-        """Duck-type check for the AlphaMELTSBackend class.
+        """Duck-type check for an AlphaMELTS-family diagnostic backend.
 
-        Avoids a hard import on ``simulator.melt_backend.alphamelts`` at
-        registration time (the adapter has optional dependencies). The
-        check matches the class name on the instance's MRO; this is the
-        same idiom used elsewhere in this module for VapoRock /
-        FactSAGE backend detection.
+        Avoids hard imports on optional MELTS transports at registration time.
         """
         backend = PyrolysisSimulator._provider_registration_backend(backend)
         if backend is None:
             return False
-        for cls in type(backend).__mro__:
-            if cls.__name__ == 'AlphaMELTSBackend':
-                return True
-        return False
+        declared_name = (
+            getattr(backend, 'backend_name', None)
+            or getattr(backend, 'name', None)
+        )
+        if str(declared_name or '').strip().lower() in {
+            'alphamelts',
+            'thermoengine',
+        }:
+            return True
+        return any(
+            cls.__name__ in {'AlphaMELTSBackend', 'ThermoEngineBackend'}
+            for cls in type(backend).__mro__
+        )
 
     def _register_freeze_gate_liquid_fraction_providers(self) -> None:
         """Register providers for the freeze gate scalar intent on demand."""
