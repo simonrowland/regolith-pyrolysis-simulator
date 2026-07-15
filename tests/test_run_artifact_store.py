@@ -248,6 +248,27 @@ def test_store_meta_atomic_failure_cleans_temp_and_preserves_previous_sidecar(
     assert not list(store.runs_dir.rglob("*.tmp"))
 
 
+def test_store_list_survives_alien_files_in_runs_dir(tmp_path) -> None:
+    # One stray file must never take down the whole index: legacy
+    # `<id>.meta.json` sidecars (pre-`meta/` layout) and dotted junk are
+    # skipped with a warning, not raised as InvalidRunIdError out of
+    # list_runs().
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="real-run")
+    assert store.save("real-run", artifact) is True
+    (store.runs_dir / "legacy-run.meta.json").write_text(
+        '{"starred": true}', encoding="utf-8"
+    )
+    (store.runs_dir / "weird.dotted.json").write_text("{}", encoding="utf-8")
+
+    summaries = store.list_runs()
+
+    assert [summary["run_id"] for summary in summaries] == ["real-run"]
+    # Alien files are left in place (skip-and-warn, not quarantine/delete).
+    assert (store.runs_dir / "legacy-run.meta.json").exists()
+    assert (store.runs_dir / "weird.dotted.json").exists()
+
+
 def test_store_corrupt_meta_quarantines_only_sidecar(tmp_path) -> None:
     store = RunArtifactStore(tmp_path / "runs")
     artifact = build_run_artifact(_runner_payload("ok"), run_id="meta-corrupt")

@@ -213,7 +213,17 @@ class RunArtifactStore:
         return self.runs_dir / "meta" / f"{value}.json"
 
     def _artifact_paths(self):
-        return self.runs_dir.glob("*.json")
+        # Only stems this store could have written (see _RUN_ID_RE) are
+        # artifacts. Anything else — legacy `<id>.meta.json` sidecars from the
+        # pre-`meta/` layout, stray dotted files — is skipped with a warning
+        # instead of raising InvalidRunIdError out of list_runs(), where one
+        # alien file would take down the whole run index. Pre-release store:
+        # no deployed legacy data exists, so skip-and-warn, not a migration.
+        for path in sorted(self.runs_dir.glob("*.json")):
+            if _RUN_ID_RE.fullmatch(path.stem):
+                yield path
+            else:
+                _LOG.warning("ignoring non-store file in runs dir: %s", path.name)
 
     @contextmanager
     def _store_lock(self):
