@@ -192,7 +192,9 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-07-14 t-194 Cr grounding: the functional vapor-pressure data digest
     # moves because Cr gains its cited tier-1 evaporation_alpha block. Key
     # schema and quantization are unchanged; value captured by full-suite run.
-    assert key_hash == "c091229055b0ae62c24fada1738fbfb0872509c420ccfa7be3ad602a14d05c26"
+    # 2026-07-14 t-194 Mn grounding: the parsed Mn alpha block advances only the
+    # functional data digest; replay schema and control quantization are unchanged.
+    assert key_hash == "6bb4755414034b8ff0bd99b49fd199eac1de3612fd9e36665de521afae16f683"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 

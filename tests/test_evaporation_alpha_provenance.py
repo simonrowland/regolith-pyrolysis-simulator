@@ -104,6 +104,17 @@ EXPECTED_ALPHA = {
         ),
         "tier": 1,
     },
+    ("metals", "Mn"): {
+        "value": 1.0,
+        "T_band_K": (1519, 2334.526),
+        "envelope": (0.5, 1.0),
+        "source": (
+            "REF-040 Pound 1972 and REF-017 Safarian & Engh 2013 class basis: "
+            "owner-ratified monoatomic-class PROXY, no Mn-specific measurement "
+            "exists; Safarian & Engh 2013 full text read = zero Mn"
+        ),
+        "tier": 2,
+    },
     ("oxide_vapors", "SiO"): {
         "value": {
             "form": "arrhenius",
@@ -132,12 +143,12 @@ EXPECTED_OWNER_RATIFY_ALPHA = {
     ("metals", "Ca"),
     ("metals", "Al"),
     ("metals", "Ti"),
+    ("metals", "Mn"),
     ("foulant_vapor", "NaCl"),
     ("foulant_vapor", "KCl"),
 }
 
 EXPECTED_MISSING_ALPHA_POLICY = {
-    ("metals", "Mn"): "Sossi et al. 2019",
     ("oxide_vapors", "CrO2"): "Fedkin et al. 2006",
 }
 
@@ -188,8 +199,14 @@ def test_calibrated_evaporation_alpha_values_sources_and_envelopes():
 
     for section, species in EXPECTED_OWNER_RATIFY_ALPHA:
         source = data[section][species]["evaporation_alpha"]["source"]
-        assert "OWNER-RATIFY" in source
-        assert "intrinsic" in source
+        if species == "Mn":
+            assert "owner-ratified" in source
+            assert "PROXY" in source
+            assert "no Mn-specific measurement exists" in source
+            assert "zero Mn" in source
+        else:
+            assert "OWNER-RATIFY" in source
+            assert "intrinsic" in source
 
 
 def test_tier_3_species_have_fail_loud_policy_not_placeholder_alpha():

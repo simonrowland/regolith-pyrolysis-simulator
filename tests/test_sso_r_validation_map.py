@@ -607,6 +607,7 @@ def test_certification_surfaces_require_owner_pass_and_live_parity(
         updated = dict(row)
         if _is_owner_recipe_row(updated):
             updated["ferric_divergence_material"] = True
+            updated["row_passes_base_integrity"] = False
         rows.append(updated)
     assertions = validation_map.evaluate_assertions(
         rows,

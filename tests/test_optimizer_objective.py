@@ -836,16 +836,16 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
         "severity": "warning",
         "status": "engaged",
         "policy": "alpha=1.0 prototype fallback",
-        "scope": "SSO-2 trace CrO2/Mn species lacking grounded evaporation alpha",
-        "permitted_species": ["CrO2", "Mn"],
-        "engaged_species": ["CrO2", "Mn"],
+        "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
+        "permitted_species": ["CrO2"],
+        "engaged_species": ["CrO2"],
         "total_engagement_count": fallback["total_engagement_count"],
     }
     assert fallback["total_engagement_count"] > 0
     report = _markdown_report(evidence, execution)
     assert "WARNING prototype_alpha_fallback" in report
     assert "alpha=1.0 prototype fallback" in report
-    assert "permitted_species=`CrO2, Mn`" in report
+    assert "permitted_species=`CrO2`" in report
 
 
 def test_sso2_evidence_reports_stage3_fe_and_delivered_purity_margin() -> None:

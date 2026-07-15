@@ -461,7 +461,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # full-suite (CI) value; hermeticity fix tracked separately.
     # 2026-07-14 t-194 Cr grounding: full-suite executable recompute after the
     # functional vapor-pressure digest moved; schema/allowlist remain unchanged.
-    assert cache_key(spec) == "fbbb336108ba9f7faa034141a8186391fb75ccd9864db3b072e9b72e91449a4e"
+    # 2026-07-14 t-194 Mn grounding: the functional vapor-pressure digest moves
+    # again; the full-suite executable recompute leaves schema and values intact.
+    assert cache_key(spec) == "be16be9b30f3b68f4889933efad83da6eb65b40cd80f7c5d16349a5f891e464b"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

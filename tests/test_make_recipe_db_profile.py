@@ -61,20 +61,19 @@ RUNNABLE_TARGET_IDS = tuple(
         if _is_runnable_target(row)
     )
 )
-SC67_MN_ONLY_TARGET_IDS = frozenset({
-    "pc-ceramic-ca-al-ratio-seed",
-    "pc-ceramic-ca-al-ree",
-    "pc-extract-fe",
-    "pc-extract-mg",
-    "pc-glass-clear",
+SC67_CRO2_TARGET_IDS = frozenset({
     "pc-extract-k",
     "pc-extract-na",
     "pc-extract-o2",
 })
-SC67_MN_ONLY_MESSAGE = (
+SC67_CRO2_MESSAGE = (
     "ProviderUnavailableError: missing evaporation_alpha for sampled species: "
-    "Mn; set chemistry_kernel.allow_unmeasured_alpha_fallback for alpha=1.0 "
-    "prototype fallback"
+    "CrO2; set chemistry_kernel.allow_unmeasured_alpha_fallback for alpha=1.0 "
+    "prototype fallback; PoisonedHourError: simulator hour 9 is poisoned after 1 "
+    "ledger transition(s) committed before abort (ProviderUnavailableError: missing "
+    "evaporation_alpha for sampled species: CrO2; set chemistry_kernel."
+    "allow_unmeasured_alpha_fallback for alpha=1.0 prototype fallback); retry "
+    "refused; create a fresh simulator or reload the batch"
 )
 def _setpoint_campaign_config(campaign: str) -> dict[str, object]:
     path = Path("data/setpoints.yaml")
@@ -601,7 +600,7 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
     _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
 
     profile = yaml.safe_load(out.read_text())
-    if target_id not in SC67_MN_ONLY_TARGET_IDS:
+    if target_id not in SC67_CRO2_TARGET_IDS:
         evaluate(
             RecipePatch({}),
             "lunar_mare_low_ti",
@@ -622,7 +621,8 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
 
     message = str(exc_info.value)
     assert type(exc_info.value) is BackendUnavailableAbort
-    assert message == SC67_MN_ONLY_MESSAGE
+    assert message == SC67_CRO2_MESSAGE
+    assert "sampled species: Mn" not in message
     assert "sampled species: Cr," not in message
     assert "unknown campaign" not in message
     assert "valid options:" not in message

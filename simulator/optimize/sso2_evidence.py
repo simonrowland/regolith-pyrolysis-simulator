@@ -48,7 +48,7 @@ SSO2_NATIVE_FE_PARTITION_TRANSITIONS = tuple(
     SSO2_NATIVE_FE_PARTITION_TRANSITION_BY_SOURCE.values()
 )
 SSO2_MASS_BALANCE_TOLERANCE_PCT = 5.0e-12
-SSO2_UNMEASURED_ALPHA_FALLBACK_SPECIES = ("CrO2", "Mn")
+SSO2_UNMEASURED_ALPHA_FALLBACK_SPECIES = ("CrO2",)
 SSO2_CHUNK3B_READER_HANDOFF = (
     "PhysicsConstraintSet.delivered_stream_purity plus the SSO-2 profile/objective "
     "reader added in chunk 3b; it must consume Stage 3 Fe contamination and Fe tap "
@@ -479,7 +479,7 @@ def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
         "severity": "warning",
         "status": "engaged" if total_count > 0 else "not_engaged",
         "policy": "alpha=1.0 prototype fallback",
-        "scope": "SSO-2 trace CrO2/Mn species lacking grounded evaporation alpha",
+        "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
         "permitted_species": sorted(permitted),
         "engaged_species": sorted(engaged_species),
         "total_engagement_count": total_count,
