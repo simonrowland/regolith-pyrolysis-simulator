@@ -456,10 +456,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-13 the em-dash->ASCII '--' fix in data/feedstocks.yaml (latin1
     # guard, push-regression cluster C) moved the feedstock data digest.
     # t-259 hygiene: 6b1388b7 above pins the 84-path search allowlist hash;
-    # it is not a cache_key value. This cache_key is 98ab367f in both pristine
-    # isolated and FULL-SUITE / warmed-cache contexts, confirming the key is
-    # pure for byte-identical canonical EvalSpec inputs.
-    assert cache_key(spec) == "98ab367fc75c9179b10cd2a6a1f07f54eb5ebfd78e421100ff81c72c3241369f"
+    # it is not a cache_key value. The key is pure (pristine == full-suite)
+    # for byte-identical canonical EvalSpec inputs.
+    # 2026-07-14 t-194 Cr/Mn grounding: the functional vapor-pressure digest
+    # moved with data/vapor_pressures.yaml; merge-time (2026-07-15) empirical
+    # recompute in the integrated tree (t-259 purity fix + t-194 digest move).
+    assert cache_key(spec) == "be16be9b30f3b68f4889933efad83da6eb65b40cd80f7c5d16349a5f891e464b"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

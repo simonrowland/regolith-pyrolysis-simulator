@@ -155,13 +155,13 @@ GOLDENS = (
 # and fO2-independent diagnostics no longer receive fO2-shaped requests. The
 # lunar continuous fixture now follows the corrected wall-flux/request path;
 # Mars evolved SiO is unchanged, but routing bins are regenerated below.
-# 2026-07-13 SC-67 regression catch-up: Cr/Mn now refuse unmeasured sticking
-# alphas by default. These CLI goldens explicitly opt into the documented
-# prototype alpha=1.0 fallback pending t-194; executable regeneration moves the
-# coupled evolved-SiO pins with the fallback-enabled Cr/Mn wall route.
+# 2026-07-14 t-194 Cr grounding: Cr now uses its cited alpha=0.9 row instead of
+# prototype unity. Mn and CrO2 remain ungrounded, so these CLI goldens retain
+# the explicit alpha=1.0 fallback for those species. Executable regeneration
+# moves the coupled evolved-SiO and routing pins through the grounded Cr path.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.77220591892e-05,
-    "mars_basalt": 1.78534512944e-05,
+    "lunar_mare_low_ti": 1.77221126749e-05,
+    "mars_basalt": 1.78539123372e-05,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -215,7 +215,8 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
             "C2A_continuous",
             "--hours",
             "24",
-            # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+            # Mn remains ungrounded pending its follow-up literature sweep;
+            # Cr uses its grounded row while fallback covers Mn/CrO2.
             "--allow-unmeasured-alpha-fallback",
             "--output",
             str(output_path),

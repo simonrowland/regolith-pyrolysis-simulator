@@ -30,6 +30,7 @@ EXPECTED_ALPHA_BY_SPECIES = {
     "Al": 0.30,
     "Si": 1.0,
     "Ti": 0.80,
+    "Cr": 0.90,
 }
 SIO_ALPHA_FORM_T_K = 1500.0 + 273.15
 SIO_ALPHA_AT_1500C = 0.52 * math.exp(-3685.0 / SIO_ALPHA_FORM_T_K)
@@ -175,7 +176,7 @@ def test_new_proxy_species_flux_scales_with_yaml_alpha():
     assert flux["Ti"] / flux["Ca"] == pytest.approx(0.80 / 0.90)
 
 
-def test_missing_alpha_refuses_nontrivial_flux_by_default():
+def test_cro2_missing_alpha_refuses_nontrivial_flux_by_default():
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
@@ -186,17 +187,17 @@ def test_missing_alpha_refuses_nontrivial_flux_by_default():
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
-            "vapor_pressures_Pa": {"Cr": 100.0},
+            "vapor_pressures_Pa": {"CrO2": 100.0},
             "overhead_partials_Pa": {},
-            "molar_mass_kg_mol": {"Cr": 0.052},
+            "molar_mass_kg_mol": {"CrO2": 0.084},
             "stoich_by_species": {
-                "Cr": {
+                "CrO2": {
                     "parent_oxide": "Cr2O3",
                     "oxide_per_product_kg": 1.0,
                     "O2_per_product_kg": 0.0,
                 }
             },
-            "available_oxide_kg": {"Cr": 10.0},
+            "available_oxide_kg": {"CrO2": 10.0},
             "melt_surface_area_m2": 1.0,
             "stir_factor": 1.0,
             "alpha": {},
@@ -207,11 +208,14 @@ def test_missing_alpha_refuses_nontrivial_flux_by_default():
 
     assert result.status == "unavailable"
     assert result.diagnostic["evaporation_flux_kg_hr"] == {}
-    assert set(result.diagnostic["missing_alpha"]) == {"Cr"}
+    assert set(result.diagnostic["missing_alpha"]) == {"CrO2"}
     assert "missing evaporation_alpha" in result.warnings[0]
 
 
-def test_missing_alpha_unity_fallback_requires_explicit_opt_in():
+def test_grounded_cr_ignores_unmeasured_fallback_opt_in():
+    alpha_by_species = _load_evaporation_alpha_by_species(
+        _vapor_pressure_data()
+    )
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
@@ -235,7 +239,7 @@ def test_missing_alpha_unity_fallback_requires_explicit_opt_in():
             "available_oxide_kg": {"Cr": 10.0},
             "melt_surface_area_m2": 1.0,
             "stir_factor": 1.0,
-            "alpha": {},
+            "alpha": alpha_by_species,
             "allow_unmeasured_alpha_fallback": True,
         },
     )
@@ -243,5 +247,5 @@ def test_missing_alpha_unity_fallback_requires_explicit_opt_in():
     result = BuiltinEvaporationFluxProvider().dispatch(request)
 
     assert result.status == "ok"
-    assert result.diagnostic["alpha_used_by_species"]["Cr"] == pytest.approx(1.0)
-    assert result.diagnostic["unmeasured_alpha_fallback_species"] == ["Cr"]
+    assert result.diagnostic["alpha_used_by_species"] == pytest.approx({"Cr": 0.9})
+    assert "unmeasured_alpha_fallback_species" not in result.diagnostic

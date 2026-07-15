@@ -280,7 +280,7 @@ def test_provider_emits_no_ledger_transition():
     assert result.transition is None
 
 
-def test_evaporation_caller_counts_unmeasured_alpha_fallback_engagement(
+def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -296,7 +296,7 @@ def test_evaporation_caller_counts_unmeasured_alpha_fallback_engagement(
         status="ok",
         diagnostic={
             "evaporation_flux_kg_hr": {},
-            "unmeasured_alpha_fallback_species": ["Cr", "Mn"],
+            "unmeasured_alpha_fallback_species": ["CrO2", "Mn"],
         },
     )
     equilibrium = SimpleNamespace(
@@ -334,7 +334,7 @@ def test_unmeasured_alpha_fallback_allowlist_is_scoped_and_loud():
         1.0,
         alpha={},
         allow_unmeasured_alpha_fallback=True,
-        unmeasured_alpha_fallback_species=["Cr", "CrO2", "Mn"],
+        unmeasured_alpha_fallback_species=["CrO2", "Mn"],
     )
 
     assert refused.status == "unavailable"
