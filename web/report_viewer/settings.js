@@ -83,7 +83,7 @@ function downloadHeader(header) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "run.yaml";
+  link.download = "run-header.yaml";
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
@@ -95,8 +95,8 @@ function render(artifact) {
     <div class="masthead"><div class="brand"><strong>DIRECT LEAP</strong> TECHNOLOGIES</div><div class="doc-label">Read-only<br>owner T-8</div></div>
     <div class="eyebrow">PHASE 2 · SETTINGS INSPECTOR</div><h1>Captured run settings</h1>
     <p class="lede"><span class="mono">${esc(header.run_id)}</span> · settings copied from the frozen artifact header.</p>
-    <div class="settings-actions"><a href="./index.html${RUN_QUERY}">← Back to report</a><button id="download-run" type="button">Download run.yaml</button></div>
-    <div class="note"><b>Read-only.</b> Config editing remains owner T-8. The download contains the captured header only.</div>
+    <div class="settings-actions"><a href="./index.html${RUN_QUERY}">← Back to report</a><button id="download-run" type="button">Download captured header (YAML)</button></div>
+    <div class="note"><b>Read-only.</b> Config editing remains owner T-8. The download contains the captured header only; an importable run.yaml export is pending W-A4.</div>
   </header>
   ${settingsField(1, "Recipe snapshot", "Captured recipe material only; absent values are not reconstructed.", dataBlock(header.recipe_snapshot))}
   ${settingsField(2, "Engine identity", "Backend identity recorded by the run header.", dataBlock(header.engine_identity))}

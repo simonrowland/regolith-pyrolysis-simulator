@@ -15,6 +15,7 @@ const exactNumber = (value, unit) => hasNumber(value)
 
 let runs = [];
 let activeFolder = "All";
+let liveIndexError = null;
 const starred = new Map();
 
 function folderMatches(run) {
@@ -78,11 +79,14 @@ function runCard(run) {
 function renderList() {
   $("#folder-list").innerHTML = folderButtons();
   const visible = filteredRuns();
-  $("#run-list").innerHTML = visible.length
+  const fallbackNotice = liveIndexError
+    ? `<div class="fatal"><strong>Live run index unavailable</strong><p>Showing the static sample index only. ${esc(liveIndexError.message || String(liveIndexError))}</p></div>`
+    : "";
+  $("#run-list").innerHTML = fallbackNotice + (visible.length
     ? visible.map(runCard).join("")
     : runs.length
       ? `<div class="pending"><strong>No matching runs</strong><p>No indexed run matches this folder and filter.</p></div>`
-      : `<div class="pending"><strong>No indexed runs</strong><p>The run index is valid but contains no entries.</p></div>`;
+      : `<div class="pending"><strong>No indexed runs</strong><p>The run index is valid but contains no entries.</p></div>`);
 }
 
 function bindControls() {
@@ -136,11 +140,14 @@ fetch(STATIC_RUNS_URL)
   })
   .then((staticRuns) => fetch(LIVE_RUNS_URL)
     .then((response) => {
-      if (!response.ok) return [];
+      if (!response.ok) throw new Error(`Live run index request failed (${response.status})`);
       return response.json();
     })
     .then((index) => index.map((run) => ({ ...run, live: true })))
-    .catch(() => [])
+    .catch((error) => {
+      liveIndexError = error;
+      return [];
+    })
     .then((liveRuns) => {
       const liveIds = new Set(liveRuns.map((run) => String(run.run_id)));
       return [
