@@ -395,6 +395,7 @@ class StudyResult:
     winner: StudyRecord | None = None
     status: str = COMPLETED_STATUS
     reason: str = COMPLETED_STATUS
+    prefix_evals_run: int = 0
     winner_selection_rule: str = WINNER_SELECTION_RULE
 
     def __post_init__(self) -> None:
@@ -637,6 +638,7 @@ def run(
     events_path = out / STUDY_EVENTS_NAME
     strategy_state_path = out / STRATEGY_STATE_NAME
     evaluated = 0
+    prefix_evals_run = 0
     topology_cursor = 0
     batch_seq = 0
     ask_seq_by_id: dict[str, int] = {}
@@ -757,7 +759,7 @@ def run(
                     strategy=active_strategy,
                     staged_strategies=staged_strategies,
                 )
-            results = _evaluate_candidates(
+            results, prefix_evals_in_batch = _evaluate_candidates(
                 candidates,
                 profile=loop_profile,
                 feedstock=config.feedstock,
@@ -772,6 +774,8 @@ def run(
                 prefix_replay_cache=prefix_replay_cache,
                 per_eval_timeout_seconds=config.per_eval_timeout_seconds,
             )
+            # Owner decision deferred: debit config.budget here if prefix evals join it.
+            prefix_evals_run += prefix_evals_in_batch
             tell_batch: list[tuple[Candidate, ScoredResult]] = []
             for candidate, scored, cache_hit in results:
                 _assert_honest_result(scored, definitions)
@@ -851,6 +855,7 @@ def run(
             sampler_name=_resolved_strategy_sampler(active_strategy),
             constraints=active_constraints,
             write_store=store,
+            prefix_evals_run=prefix_evals_run,
         )
         raise
 
@@ -877,6 +882,7 @@ def run(
             config=config,
             constraints=active_constraints,
             write_store=store,
+            prefix_evals_run=prefix_evals_run,
         )
         raise StudyNoFeasibleError("no candidates were evaluated")
     if records and non_finite_count == len(records):
@@ -890,6 +896,7 @@ def run(
             config=config,
             constraints=active_constraints,
             write_store=store,
+            prefix_evals_run=prefix_evals_run,
         )
         raise StudyNoFeasibleError(
             "all candidates failed with non_finite_payload; "
@@ -907,6 +914,7 @@ def run(
                 config=config,
                 constraints=active_constraints,
                 write_store=store,
+                prefix_evals_run=prefix_evals_run,
             )
             raise StudyNoFeasibleError(
                 "no feasible candidates due to config/runtime failure; "
@@ -935,6 +943,7 @@ def run(
             sampler_name=_resolved_strategy_sampler(active_strategy),
             study_status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
             write_store=store,
+            prefix_evals_run=prefix_evals_run,
         )
         artifacts["provenance"] = provenance_path
         artifacts["store"] = store.path
@@ -948,6 +957,7 @@ def run(
             winner=None,
             status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
             reason=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
+            prefix_evals_run=prefix_evals_run,
         )
 
     result_status = COMPLETED_STATUS
@@ -1016,6 +1026,7 @@ def run(
         sampler_name=_resolved_strategy_sampler(active_strategy),
         study_status=result_status,
         write_store=store,
+        prefix_evals_run=prefix_evals_run,
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
@@ -1039,6 +1050,7 @@ def run(
         winner=winner,
         status=result_status,
         reason=result_reason,
+        prefix_evals_run=prefix_evals_run,
     )
 
 
@@ -2481,7 +2493,7 @@ def _run_exact_certification(
 
     for explore_record in certification_pool:
         candidate = _certification_candidate_from_record(explore_record)
-        results = _evaluate_candidates(
+        results, _ = _evaluate_candidates(
             [candidate],
             profile=profile,
             feedstock=feedstock,
@@ -3242,10 +3254,11 @@ def _evaluate_candidates(
     prefix_replay_cache: dict[str, ScoredResult],
     skip_store_lookup: bool = False,
     per_eval_timeout_seconds: float | None = None,
-) -> tuple[tuple[Candidate, ScoredResult, bool], ...]:
+) -> tuple[tuple[tuple[Candidate, ScoredResult, bool], ...], int]:
     results: list[tuple[Candidate, ScoredResult, bool] | None] = [None] * len(candidates)
     misses: list[tuple[int, Candidate]] = []
     staged_prefixes: dict[str, ScoredResult] = {}
+    prefix_evals_run = 0
     for index, candidate in enumerate(candidates):
         cached = None
         if not skip_store_lookup:
@@ -3259,7 +3272,7 @@ def _evaluate_candidates(
                 constraints,
             )
         if cached is None:
-            prefix = _ensure_staged_prefix_replay(
+            prefix, prefix_eval_ran = _ensure_staged_prefix_replay(
                 candidate,
                 profile=profile,
                 feedstock=feedstock,
@@ -3273,6 +3286,7 @@ def _evaluate_candidates(
                 prefix_replay_cache=prefix_replay_cache,
                 per_eval_timeout_seconds=per_eval_timeout_seconds,
             )
+            prefix_evals_run += int(prefix_eval_ran)
             if prefix is not None:
                 if prefix.eval_spec is None:
                     results[index] = (
@@ -3359,7 +3373,7 @@ def _evaluate_candidates(
     completed = tuple(result for result in results if result is not None)
     if len(completed) != len(candidates):
         raise RuntimeError("study evaluation ended without all candidate results")
-    return completed
+    return completed, prefix_evals_run
 
 
 def _ensure_staged_prefix_replay(
@@ -3376,14 +3390,14 @@ def _ensure_staged_prefix_replay(
     definitions: Sequence[ObjectiveDefinition],
     prefix_replay_cache: dict[str, ScoredResult],
     per_eval_timeout_seconds: float | None,
-) -> ScoredResult | None:
+) -> tuple[ScoredResult | None, bool]:
     if not _is_staged_candidate(candidate):
-        return None
+        return None, False
     prefix_depth = candidate.metadata.get("prefix_depth", 0)
     if not isinstance(prefix_depth, int):
         raise StagedBeamStateError("staged prefix_depth metadata must be an int")
     if prefix_depth <= 0:
-        return None
+        return None, False
 
     prefix_patch = _prefix_patch_from_metadata(candidate, schema)
     base_spec, _ = _build_eval_inputs(
@@ -3407,12 +3421,12 @@ def _ensure_staged_prefix_replay(
         cached = store.lookup(prefix_spec)
         if cached is None:
             raise StagedBeamStateError(f"verified staged prefix vanished: {prefix_key}")
-        return cached
+        return cached, False
 
     cached = store.lookup(prefix_spec)
     if cached is not None:
         prefix_replay_cache[prefix_key] = cached
-        return cached
+        return cached, False
 
     fresh = _evaluate_prefix_one(
         candidate,
@@ -3429,7 +3443,7 @@ def _ensure_staged_prefix_replay(
         per_eval_timeout_seconds=per_eval_timeout_seconds,
     )
     if fresh.eval_spec is None:
-        return fresh
+        return fresh, True
     _assert_honest_result(fresh, definitions)
     light_fresh = _strip_heavy_result(fresh)
     # Grind-infra sweep Q2 (completeness): unlike the main/certify sinks, the
@@ -3452,7 +3466,7 @@ def _ensure_staged_prefix_replay(
         raise StagedBeamStateError(f"staged prefix cache write failed: {prefix_key}")
     assert_prefix_replay_equal(cached, light_fresh)
     prefix_replay_cache[prefix_key] = cached
-    return cached
+    return cached, True
 
 
 def _evaluate_prefix_one(
@@ -4502,6 +4516,7 @@ def _write_artifacts(
     sampler_name: str | None = None,
     study_status: str | None = None,
     write_store: ResultStore | None = None,
+    prefix_evals_run: int = 0,
 ) -> dict[str, Path]:
     created_at = datetime.now(UTC).isoformat()
     resolved_study_status = study_status or (
@@ -4575,6 +4590,7 @@ def _write_artifacts(
         failure_counts=failure_counts,
         config=config,
         strategy_name=resolved_strategy,
+        prefix_evals_run=prefix_evals_run,
     )
     winner_written = False
     tap_sidecar_written = False
@@ -4637,6 +4653,7 @@ def _write_artifacts(
                     sampler_name=resolved_sampler,
                     search_space_identity=search_space_identity,
                     strategy_config=strategy_config,
+                    prefix_evals_run=prefix_evals_run,
                     # journal replay reconstructs strategy state from the ask/tell
                     # journal alone; a warm_start_from study needs bundled seed
                     # state replay cannot rebuild, so it is not journal-replayable
@@ -4715,6 +4732,7 @@ def _study_summary_payload(
     failure_counts: Mapping[str, int],
     config: StudyConfig | None,
     strategy_name: str,
+    prefix_evals_run: int = 0,
 ) -> Mapping[str, Any]:
     feasible_count = sum(1 for record in leaderboard if record.feasible)
     infeasible_count = sum(int(value) for value in failure_counts.values())
@@ -4739,6 +4757,7 @@ def _study_summary_payload(
         "seed": int(config.seed) if config is not None else 0,
         "budget": budget,
         "evaluated": evaluated,
+        "prefix_evals_run": int(prefix_evals_run),
         "verdict_counts": {
             "feasible": feasible_count,
             "not_attempted": max(budget - evaluated, 0),
@@ -4791,6 +4810,7 @@ def _study_manifest_payload(
     search_space_identity: Mapping[str, Any] | None,
     strategy_config: Mapping[str, Any],
     replayable: bool,
+    prefix_evals_run: int = 0,
 ) -> Mapping[str, Any]:
     return {
         "save_schema_version": SAVE_SCHEMA_VERSION,
@@ -4806,6 +4826,7 @@ def _study_manifest_payload(
         },
         "seed": int(config.seed) if config is not None else 0,
         "budget": int(config.budget) if config is not None else 0,
+        "prefix_evals_run": int(prefix_evals_run),
         "parallel": int(config.parallel) if config is not None else 1,
         "fidelity": fidelity,
         "profile": {
@@ -5455,6 +5476,7 @@ def _write_aborted_artifacts_from_cache(
     sampler_name: str | None = None,
     constraints: Any = None,
     write_store: ResultStore | None = None,
+    prefix_evals_run: int = 0,
 ) -> bool:
     records = _records_from_cache_sqlite(
         out,
@@ -5508,6 +5530,7 @@ def _write_aborted_artifacts_from_cache(
         sampler_name=sampler_name,
         study_status=ABORTED_STATUS,
         write_store=write_store,
+        prefix_evals_run=prefix_evals_run,
     )
     return True
 
@@ -5596,6 +5619,7 @@ def _write_empty_artifacts(
     config: StudyConfig | None = None,
     constraints: Any = None,
     write_store: ResultStore | None = None,
+    prefix_evals_run: int = 0,
 ) -> None:
     fidelity = str(canonical_backend_name(fidelity))
     schema = RecipeSchema()
@@ -5619,6 +5643,7 @@ def _write_empty_artifacts(
         sampler_name=sampler_name,
         constraints=constraints,
         write_store=write_store,
+        prefix_evals_run=prefix_evals_run,
     ):
         return
 
@@ -5659,6 +5684,7 @@ def _write_empty_artifacts(
                     failure_counts=failure_counts,
                     config=config,
                     strategy_name=strategy_name,
+                    prefix_evals_run=prefix_evals_run,
                 ),
                 indent=2,
                 sort_keys=True,
@@ -5681,6 +5707,7 @@ def _write_empty_artifacts(
                     sampler_name=sampler_name,
                     search_space_identity=None,
                     strategy_config=strategy_config,
+                    prefix_evals_run=prefix_evals_run,
                     replayable=(
                         (out / "study.events.jsonl").is_file()
                         and getattr(config, "warm_start_from", None) is None

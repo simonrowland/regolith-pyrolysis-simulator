@@ -437,6 +437,12 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
     assert prefix_log.exists()
     assert store.prefix_hits >= 1
     assert any("-01-" in record.candidate_id for record in result.records)
+    summary = json.loads(result.artifacts["summary"].read_text(encoding="utf-8"))
+    manifest = json.loads(result.artifacts["manifest"].read_text(encoding="utf-8"))
+    assert result.prefix_evals_run == 1
+    assert summary["prefix_evals_run"] == result.prefix_evals_run
+    assert manifest["prefix_evals_run"] == result.prefix_evals_run
+    assert len(result.records) == summary["evaluated"] == summary["budget"] == 4
 
     prefix_spec = next(spec for spec in prefix_specs if spec.prefix_stage_ids == ("C0",))
     cached = store.lookup(prefix_spec)
