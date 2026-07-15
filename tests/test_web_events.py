@@ -27,6 +27,7 @@ from web.events import (
     _completion_payload,
     _current_simulation_state,
     _emit_if_current,
+    _effective_config_from_setpoints,
     _get_backend,
     _MASS_BALANCE_ERROR_BREACH_PCT,
     _replace_simulation_state,
@@ -2413,6 +2414,75 @@ def test_real_web_session_failure_persists_non_sparse_terminal(tmp_path, monkeyp
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
+
+
+def test_web_run_payload_captures_effective_config_sources(monkeypatch):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    captured_payloads = []
+
+    def capture_persist(runner_payload, _run_id, *, store):
+        assert store is not None
+        captured_payloads.append(copy.deepcopy(runner_payload))
+        return {"execution_status": "ok"}
+
+    monkeypatch.setattr(web_events, "persist_run_artifact", capture_persist)
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+                "setpoints_patch": {
+                    "campaigns": {"C4": {"temp_range_C": [1600.0, 1660.0]}}
+                },
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        state["session"] = SimpleNamespace(
+            simulator=SimpleNamespace(_poisoned_hour=None),
+            is_complete=lambda: True,
+            result_document=lambda: _terminal_runner_document("ok"),
+        )
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        assert len(captured_payloads) == 1
+        effective_config = captured_payloads[0]["effective_config"]
+        assert effective_config["campaigns.C4.temp_range_C"] == {
+            "value": [1600.0, 1660.0],
+            "source": "override",
+        }
+        assert effective_config["campaigns.C4.pO2_mbar_default"]["source"] == (
+            "default"
+        )
+        assert "campaigns.C0.pO2_mbar" not in effective_config
+        assert (
+            "completion_contracts.gated_steps.C0.contracts"
+            not in effective_config
+        )
+        assert "mass_kg" not in effective_config
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_empty_setpoint_resolution_omits_effective_config():
+    payload = {}
+    effective_config = _effective_config_from_setpoints({}, override_paths=set())
+    if effective_config:
+        payload["effective_config"] = effective_config
+
+    assert "effective_config" not in payload
 
 
 def test_persist_failure_never_emits_simulation_complete(tmp_path, monkeypatch):

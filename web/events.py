@@ -950,6 +950,39 @@ def _mapping_leaf_paths(
     return paths
 
 
+def _effective_config_from_setpoints(
+    setpoints: Mapping[str, object],
+    *,
+    override_paths: set[str],
+) -> dict[str, dict[str, object]]:
+    effective_config: dict[str, dict[str, object]] = {}
+
+    def contains_absent(value: object) -> bool:
+        if value is None:
+            return True
+        if isinstance(value, Mapping):
+            return any(contains_absent(child) for child in value.values())
+        if isinstance(value, (list, tuple)):
+            return any(contains_absent(child) for child in value)
+        return False
+
+    def capture(value: object, prefix: tuple[str, ...]) -> None:
+        if isinstance(value, Mapping):
+            for key, child in value.items():
+                capture(child, (*prefix, str(key)))
+            return
+        if not prefix or contains_absent(value):
+            return
+        path = '.'.join(prefix)
+        effective_config[path] = {
+            'value': copy.deepcopy(value),
+            'source': 'override' if path in override_paths else 'default',
+        }
+
+    capture(setpoints, ())
+    return effective_config
+
+
 def _full_runner_payload(
     session,
     *,
@@ -1089,6 +1122,11 @@ def _start_background_loop(
                     ),
                     refusal_diagnostic=refusal_diagnostic,
                 )
+            effective_config = (
+                state.get('effective_config') if state is not None else None
+            )
+            if effective_config:
+                runner_payload['effective_config'] = copy.deepcopy(effective_config)
             run_store = state.get('run_store') if state is not None else None
             if run_store is None:
                 raise RuntimeError('run artifact store is unavailable')
@@ -1582,6 +1620,14 @@ def register_events(socketio):
                 }, room=sid)
                 return
 
+        override_paths = set(_mapping_leaf_paths(setpoints_patch))
+        if furnace_material_id:
+            override_paths.add('furnace_max_T_C')
+        effective_config = _effective_config_from_setpoints(
+            setpoints,
+            override_paths=override_paths,
+        )
+
         try:
             backend = _get_backend(backend_name)
         except BackendUnavailableError as exc:
@@ -1692,6 +1738,8 @@ def register_events(socketio):
             furnace_material_id=furnace_material_id,
         )
         state['setpoints_patch'] = copy.deepcopy(setpoints_patch)
+        if effective_config:
+            state['effective_config'] = effective_config
         state['resolved_setpoints_patch'] = _resolved_recipe_patch_for_session(
             setpoints_patch=setpoints_patch,
             setpoints=setpoints,
