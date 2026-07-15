@@ -168,6 +168,8 @@ def test_store_save_load_list_and_retention(tmp_path) -> None:
     assert [summary["run_id"] for summary in summaries] == ["run-3", "run-1"]
     assert summaries[0]["peak_T_C"] == 1400.0
     assert summaries[0]["headline_yields_kg"] == {"Fe": 12.5, "O2": 4.25}
+    assert summaries[0]["summary"] == "Fe 12.5 kg · O₂ (source-side) 4.25 kg"
+    assert "folder" not in summaries[0]
     assert summaries[1]["starred"] is True
 
 
@@ -183,6 +185,53 @@ def test_store_corrupt_load_is_typed_and_list_quarantines(tmp_path) -> None:
     assert store.list_runs() == []
     assert not corrupt_path.exists()
     assert (store.runs_dir / "broken.json.corrupt").exists()
+
+
+@pytest.mark.parametrize(
+    "malformed_field, malformed_value",
+    [("header", "not-an-object"), ("terminal", [])],
+)
+def test_store_malformed_nested_shape_is_typed_and_quarantined(
+    tmp_path, malformed_field, malformed_value
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    store.runs_dir.mkdir(parents=True)
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="malformed")
+    artifact[malformed_field] = malformed_value
+    malformed_path = store.runs_dir / "malformed.json"
+    malformed_path.write_text(json.dumps(artifact), encoding="utf-8")
+
+    with pytest.raises(RunStoreCorruptionError, match=f"expected {malformed_field}"):
+        store.load("malformed")
+
+    assert store.list_runs() == []
+    assert not malformed_path.exists()
+    assert (store.runs_dir / "malformed.json.corrupt").exists()
+
+
+def test_store_summary_omits_absent_species_and_labels_source_side_o2(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="o2-only")
+    artifact["timesteps"][-1]["summary"]["metal_yields_kg"] = {}
+
+    assert store.save("o2-only", artifact) is True
+
+    summary = store.list_runs()[0]
+    assert summary["summary"] == "O₂ (source-side) 4.25 kg"
+    assert "Fe" not in summary["summary"]
+    assert summary["headline_yields_kg"] == {"O2": 4.25}
+
+    fe_only_store = RunArtifactStore(tmp_path / "fe-only-runs")
+    fe_only = build_run_artifact(_runner_payload("ok"), run_id="fe-only")
+    final_summary = fe_only["timesteps"][-1]["summary"]
+    final_summary.pop("O2_yield_kg_cumulative")
+    final_summary.pop("O2_source_side_potential_kg_cumulative", None)
+    assert fe_only_store.save("fe-only", fe_only) is True
+
+    fe_only_summary = fe_only_store.list_runs()[0]
+    assert fe_only_summary["summary"] == "Fe 12.5 kg"
+    assert "O₂" not in fe_only_summary["summary"]
+    assert fe_only_summary["headline_yields_kg"] == {"Fe": 12.5}
 
 
 def test_store_stale_lock_file_does_not_block_retry(tmp_path) -> None:
@@ -264,3 +313,22 @@ def test_backfill_run_artifact_cli_round_trips_runner_payload(tmp_path) -> None:
     assert artifact["execution_status"] == "ok"
     assert len(artifact["timesteps"]) == len(payload["per_hour_summary"])
     assert artifact["terminal"]["final_state"] == payload["final_state"]
+
+    duplicate = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "backfill_run_artifact.py"),
+            str(payload_path),
+            "legacy-197h",
+            "--runs-dir",
+            str(runs_dir),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert duplicate.returncode == 2
+    assert duplicate.stdout == ""
+    assert "duplicate" in duplicate.stderr
+    assert "nothing stored" in duplicate.stderr

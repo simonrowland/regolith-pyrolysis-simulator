@@ -43,7 +43,12 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError("runner payload must be a JSON object")
         artifact = build_run_artifact(payload, run_id=args.run_id, name=args.name)
         store = RunArtifactStore(args.runs_dir)
-        store.save(args.run_id, artifact)
+        if not store.save(args.run_id, artifact):
+            parser.exit(
+                2,
+                "backfill_run_artifact.py: duplicate: "
+                f"run artifact {args.run_id!r} already exists; nothing stored\n",
+            )
         summary = next(
             row for row in store.list_runs() if row["run_id"] == args.run_id
         )

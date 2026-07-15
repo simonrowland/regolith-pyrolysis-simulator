@@ -5,6 +5,7 @@ from __future__ import annotations
 import fcntl
 import json
 import logging
+import math
 import os
 import re
 import tempfile
@@ -93,7 +94,50 @@ class RunArtifactStore:
                 path,
                 f"expected a JSON object, got {type(payload).__name__}",
             )
+        self._validate_nested_shape(run_id, path, payload)
         return payload
+
+    @staticmethod
+    def _validate_nested_shape(
+        run_id: str, path: Path, artifact: dict[str, Any]
+    ) -> None:
+        for key in ("header", "terminal"):
+            if key in artifact and not isinstance(artifact[key], dict):
+                raise RunStoreCorruptionError(
+                    run_id,
+                    path,
+                    f"expected {key} to be an object, got {type(artifact[key]).__name__}",
+                )
+        timesteps = artifact.get("timesteps", [])
+        if not isinstance(timesteps, list):
+            raise RunStoreCorruptionError(
+                run_id,
+                path,
+                f"expected timesteps to be an array, got {type(timesteps).__name__}",
+            )
+        for index, timestep in enumerate(timesteps):
+            if not isinstance(timestep, dict):
+                raise RunStoreCorruptionError(
+                    run_id,
+                    path,
+                    f"expected timesteps[{index}] to be an object, got {type(timestep).__name__}",
+                )
+            summary = timestep.get("summary", {})
+            if not isinstance(summary, dict):
+                raise RunStoreCorruptionError(
+                    run_id,
+                    path,
+                    f"expected timesteps[{index}].summary to be an object, got {type(summary).__name__}",
+                )
+            metal_yields = summary.get("metal_yields_kg", {})
+            if not isinstance(metal_yields, dict):
+                raise RunStoreCorruptionError(
+                    run_id,
+                    path,
+                    "expected "
+                    f"timesteps[{index}].summary.metal_yields_kg to be an object, "
+                    f"got {type(metal_yields).__name__}",
+                )
 
     def list_runs(self) -> list[dict[str, Any]]:
         summaries: list[dict[str, Any]] = []
@@ -147,12 +191,20 @@ class RunArtifactStore:
         ]
         final_summary = summaries[-1] if summaries else {}
         metal_yields = final_summary.get("metal_yields_kg", {}) or {}
-        headline_yields = {
-            "Fe": metal_yields.get("Fe"),
-            "O2": final_summary.get("O2_yield_kg_cumulative"),
-        }
+        headline_yields: dict[str, int | float] = {}
+        summary_parts: list[str] = []
+        fe_kg = metal_yields.get("Fe")
+        if RunArtifactStore._is_finite_number(fe_kg):
+            headline_yields["Fe"] = fe_kg
+            summary_parts.append(f"Fe {fe_kg:g} kg")
+        o2_kg = final_summary.get("O2_source_side_potential_kg_cumulative")
+        if not RunArtifactStore._is_finite_number(o2_kg):
+            o2_kg = final_summary.get("O2_yield_kg_cumulative")
+        if RunArtifactStore._is_finite_number(o2_kg):
+            headline_yields["O2"] = o2_kg
+            summary_parts.append(f"O₂ (source-side) {o2_kg:g} kg")
         execution_status = artifact.get("execution_status")
-        return {
+        result = {
             "run_id": header.get("run_id", fallback_run_id),
             "name": header.get("name"),
             "feedstock_id": header.get("feedstock_id"),
@@ -163,8 +215,19 @@ class RunArtifactStore:
             "status": execution_status,
             "created_at": header.get("created_at"),
             "starred": bool(header.get("starred", False)),
-            "folder": header.get("folder", "My runs"),
+            "summary": " · ".join(summary_parts),
         }
+        if header.get("folder") is not None:
+            result["folder"] = header["folder"]
+        return result
+
+    @staticmethod
+    def _is_finite_number(value: Any) -> bool:
+        return (
+            isinstance(value, (int, float))
+            and not isinstance(value, bool)
+            and math.isfinite(value)
+        )
 
     def _apply_retention(self) -> None:
         unstarred: list[tuple[str, Path]] = []
