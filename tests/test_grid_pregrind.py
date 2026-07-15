@@ -4,9 +4,11 @@ import json
 import math
 import sqlite3
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 import scripts.grid_pregrind as grid_pregrind
 from scripts.grid_pregrind import (
@@ -27,6 +29,7 @@ from scripts.grid_pregrind_writer import (
     expedited_key,
 )
 from scripts.grind_harvest import harvest_snapshot
+from simulator.melt_backend.thermoengine import ThermoEngineBackend
 
 
 def test_feedstock_simplex_grid_sums_deduplicates_and_respects_bounds():
@@ -79,6 +82,54 @@ def test_grid_seed_is_deterministic_and_temperature_band_is_dense():
     assert {point.pressure_bar for point in first} == {1.0}
 
 
+def test_backend_selector_defaults_to_subprocess_and_accepts_thermoengine():
+    default_args = grid_pregrind.parser().parse_args([])
+    thermoengine_args = grid_pregrind.parser().parse_args(
+        [
+            "--backend",
+            "thermoengine",
+            "--thermoengine-equilibrate-timeout-s",
+            "91",
+            "--thermoengine-health-timeout-s",
+            "31",
+        ]
+    )
+
+    assert default_args.backend == "subprocess"
+    assert grid_pregrind.backend_config(default_args)["mode"] == "subprocess"
+    explicit_subprocess_args = grid_pregrind.parser().parse_args(
+        ["--backend", "subprocess"]
+    )
+    point = grid_pregrind.GridPoint(
+        ordinal=0,
+        temperature_C=1400.0,
+        intended_fO2_log=-9.0,
+        pressure_bar=1.0,
+        composition_wt_pct={"SiO2": 50.0, "FeO": 25.0, "MgO": 25.0},
+    )
+    assert grid_pregrind.point_inputs(
+        point, default_args
+    ) == grid_pregrind.point_inputs(point, explicit_subprocess_args)
+    assert thermoengine_args.backend == "thermoengine"
+    assert grid_pregrind.backend_config(thermoengine_args) == {
+        **grid_pregrind.backend_config(default_args),
+        "grid_backend_name": "thermoengine",
+        "mode": "thermoengine",
+        "thermoengine_equilibrate_timeout_s": 91.0,
+        "thermoengine_health_timeout_s": 31.0,
+    }
+    thermoengine_inputs = grid_pregrind.point_inputs(point, thermoengine_args)
+    assert thermoengine_inputs["fO2_log"] == point.intended_fO2_log
+    assert 0.0 < thermoengine_inputs["kress91_fixed_ferric_fraction"] < 1.0
+    assert thermoengine_inputs["composition_mol"]["FeO"] > 0.0
+    assert thermoengine_inputs["composition_mol"]["Fe2O3"] > 0.0
+
+    worker = grid_pregrind._ThermoEngineSpawnContext().Process()
+    assert worker.daemon is False
+    worker.daemon = True
+    assert worker.daemon is False
+
+
 def test_kress_partition_preserves_iron_and_moves_target_into_composition():
     composition = {
         "SiO2": 50.0,
@@ -108,6 +159,65 @@ def test_kress_partition_preserves_iron_and_moves_target_into_composition():
         )
     assert oxidizing["Fe2O3"] > reducing["Fe2O3"] > 0.0
     assert oxidizing["FeO"] < reducing["FeO"]
+
+
+def test_thermoengine_fixed_ferric_grind_prep_solves_mare_matrix_when_installed():
+    backend = ThermoEngineBackend()
+    try:
+        available = backend.initialize(
+            {
+                "thermoengine_equilibrate_timeout_s": 90.0,
+                "thermoengine_health_timeout_s": 30.0,
+            }
+        )
+    except ImportError as exc:
+        pytest.skip(f"ThermoEngine transport unavailable: {exc}")
+    if not available:
+        pytest.skip("ThermoEngine transport unavailable")
+
+    feedstocks = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "data" / "feedstocks.yaml")
+        .read_text(encoding="utf-8")
+    )
+    args = grid_pregrind.parser().parse_args(["--backend", "thermoengine"])
+    try:
+        for feedstock_id in (
+            "lunar_mare_low_ti",
+            "lunar_mare_high_ti",
+            "lunar_highland",
+            "lunar_mare_lms1",
+        ):
+            composition = feedstocks[feedstock_id]["composition_wt_pct"]
+            for temperature_C in (1500.0, 1600.0, 1700.0):
+                point = grid_pregrind.GridPoint(
+                    ordinal=0,
+                    temperature_C=temperature_C,
+                    intended_fO2_log=-8.0,
+                    pressure_bar=1.0,
+                    composition_wt_pct=composition,
+                )
+                inputs = point_inputs(point, args)
+                result = backend.equilibrate(
+                    temperature_C=temperature_C,
+                    composition_kg=None,
+                    fO2_log=None,
+                    pressure_bar=1.0,
+                    composition_mol=inputs["composition_mol"],
+                    composition_mol_by_account=inputs[
+                        "composition_mol_by_account"
+                    ],
+                    species_formula_registry=None,
+                )
+
+                assert inputs["composition_mol"]["FeO"] > 0.0
+                assert inputs["composition_mol"]["Fe2O3"] > 0.0
+                assert result.status == "ok", (feedstock_id, temperature_C)
+                assert math.isfinite(result.fO2_log)
+                assert result.ledger_transition is None
+                assert result.chem_potentials
+                assert result.phase_affinities
+    finally:
+        backend.close()
 
 
 def test_iron_free_points_retain_engine_fo2_constraint_axis_before_sharding():
@@ -262,8 +372,25 @@ def test_adjusted_kress_partition_and_row_provenance_stay_coupled(
             shard=0,
             intended_fO2_log=point.intended_fO2_log,
         )
+        # A pre-t299 populated row already has the legacy provenance JSON but
+        # lacks the dedicated fixed-ferric scalar columns. Re-materialization
+        # must backfill those columns without treating unchanged provenance as
+        # drift.
         writer.connection.execute(
-            "UPDATE grid_keys SET kress91_partition_provenance_json = NULL"
+            "UPDATE grid_keys SET kress91_fixed_ferric_fraction = NULL, "
+            "kress91_fixed_ferric_fraction_repr = NULL"
+        )
+        assert not writer.materialize_key(
+            inputs,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=point.intended_fO2_log,
+        )
+        writer.connection.execute(
+            "UPDATE grid_keys SET kress91_partition_provenance_json = NULL, "
+            "kress91_fixed_ferric_fraction = NULL, "
+            "kress91_fixed_ferric_fraction_repr = NULL"
         )
         assert not writer.materialize_key(
             inputs,
@@ -275,6 +402,9 @@ def test_adjusted_kress_partition_and_row_provenance_stay_coupled(
         pending = writer.pending_rows(batch_id=batch_id)
 
     assert pending[0]["inputs"]["kress91_partition_provenance"] == provenance
+    assert pending[0]["inputs"]["kress91_fixed_ferric_fraction"] == pytest.approx(
+        inputs["kress91_fixed_ferric_fraction"]
+    )
     assert pending[0]["inputs"]["composition_mol"] == inputs["composition_mol"]
 
 
@@ -297,6 +427,7 @@ def _inputs(temperature_C: float) -> dict:
     }
     values = {
         "temperature_C": temperature_C,
+        "kress91_fixed_ferric_fraction": 2.0 / 7.0,
         "kress91_partition_provenance": (
             grid_pregrind.kress91_partition_authority_record(
                 temperature_C=temperature_C
@@ -350,6 +481,29 @@ def _output(status: str = "ok") -> dict:
             "liquid_composition_wt_pct": {"SiO2": 66.66666666666667},
             "liquid_viscosity_Pa_s": 2.5,
             "liquid_density_kg_m3": 2650.0,
+            "system_enthalpy": -1059377.10,
+            "system_entropy": 268.91,
+            "system_volume": 34.56e-6,
+            "system_heat_capacity_Cp": 143.47,
+            "system_dVdP": -183.54,
+            "system_dVdT": 2897.97,
+            "system_fO2_delta_QFM": -4.229,
+            "system_solid_density_rhos": None,
+            "system_phi": 1.0,
+            "system_chisqr": None,
+            "phase_thermo": {
+                "liquid": {
+                    "enthalpy_J": -1059377.10,
+                    "volume_m3": 34.56e-6,
+                    "density_kg_m3": 2893.824,
+                    "reference_mass_kg": 0.1,
+                    "reference_basis": "alphamelts_solver_phase_amount",
+                }
+            },
+            "chem_potentials": None,
+            "phase_affinities": None,
+            "solid_composition_wt_pct": {},
+            "bulk_composition_wt_pct": {"SiO2": 49.3753},
             "vapor_pressures_Pa": {},
             "vapor_pressures_source": {},
             "activity_coefficients": {},
@@ -490,6 +644,74 @@ def test_worker_failure_output_records_positive_wall_time(monkeypatch):
 
     assert output["status_kind"] == "failure"
     assert output["timing_s"] == pytest.approx(5.25)
+    assert output["failure_reason_code"] == "exception_runtimeerror"
+    assert output["failure_message"] == "synthetic failure"
+
+    parent_fallback = grid_pregrind._worker_failure_output(
+        RuntimeError("worker transport failure"),
+        started=10.0,
+        captures=[],
+        native_input=None,
+        backend_name="thermoengine",
+    )
+    assert parent_fallback["engine_mode"] == "thermoengine"
+    assert parent_fallback["alphamelts"] == {}
+    assert (
+        parent_fallback["raw_payload_format"]
+        == grid_pregrind.THERMOENGINE_RAW_PAYLOAD_FORMAT
+    )
+
+    long_message = "x" * (grid_pregrind.FAILURE_MESSAGE_MAX_LENGTH + 20)
+    bounded = grid_pregrind._worker_failure_output(
+        RuntimeError(long_message),
+        started=10.0,
+        captures=[],
+        native_input=None,
+        backend_name="thermoengine",
+    )
+    assert len(bounded["failure_message"]) == grid_pregrind.FAILURE_MESSAGE_MAX_LENGTH
+    assert json.loads(bounded["raw_payload"])["exception"]["message"] == long_message
+
+
+def test_thermoengine_grind_uses_fixed_ferric_intrinsic_open_loop(monkeypatch):
+    calls = []
+    result = SimpleNamespace(**dict(_output()["generic"]))
+
+    class Backend:
+        _model = "MELTSv1.0.2"
+
+        def equilibrate(self, **kwargs):
+            calls.append(kwargs)
+            return result
+
+    inputs = {
+        **_inputs(1600.0),
+        "mode": "thermoengine",
+        "subprocess_run_mode": None,
+        "intended_fO2_log": -8.0,
+        "fO2_log": -8.0,
+    }
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND_NAME", "thermoengine")
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", Backend())
+    monkeypatch.setattr(grid_pregrind, "_WORKER_MODULE", None)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY", True)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_ENGINE_VERSION", "fixture-engine")
+
+    _grid_key_id, output = grid_pregrind._run_point(
+        grid_pregrind.WorkerJob(7, 0, inputs)
+    )
+
+    assert calls[0]["fO2_log"] is None
+    assert calls[0]["composition_mol"]["FeO"] > 0.0
+    assert calls[0]["composition_mol"]["Fe2O3"] > 0.0
+    constraint = json.loads(output["raw_payload"])["fO2_constraint"]
+    assert constraint == {
+        "adapter_fO2_log_argument": None,
+        "fixed_ferric_fraction": pytest.approx(2.0 / 7.0),
+        "intended_fO2_log": -8.0,
+        "path": "Kress91FixedFerricIntrinsic",
+        "solved_fO2_log": result.fO2_log,
+    }
 
 
 def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeypatch):
@@ -574,6 +796,55 @@ def test_run_point_applies_stored_timeout_and_captures_subprocess_budget(monkeyp
     assert output["run_mode"] == "isothermal"
 
 
+def test_thermoengine_failure_reinitializes_before_next_point(monkeypatch):
+    result = SimpleNamespace(**dict(_output()["generic"]))
+
+    class FailingBackend:
+        _model = "MELTSv1.0.2"
+
+        def equilibrate(self, **_kwargs):
+            raise RuntimeError("forced ThermoEngine failure")
+
+    class ReinitializedBackend:
+        _model = "MELTSv1.0.2"
+
+        def equilibrate(self, **_kwargs):
+            return result
+
+    reinitializations = []
+
+    def fake_initialize(config, assumed_queued_run_mode=None):
+        reinitializations.append((dict(config), assumed_queued_run_mode))
+        monkeypatch.setattr(
+            grid_pregrind, "_WORKER_BACKEND", ReinitializedBackend()
+        )
+        monkeypatch.setattr(
+            grid_pregrind, "_WORKER_ENGINE_VERSION", "reinitialized-engine"
+        )
+
+    inputs = {
+        **_inputs(1400.0),
+        "mode": "thermoengine",
+        "subprocess_run_mode": None,
+        "intended_fO2_log": -9.0,
+    }
+    job = grid_pregrind.WorkerJob(grid_key_id=7, shuffle_rank=0, inputs=inputs)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND_NAME", "thermoengine")
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", FailingBackend())
+    monkeypatch.setattr(grid_pregrind, "_WORKER_MODULE", None)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_CONFIG", {"grid_backend_name": "thermoengine"})
+    monkeypatch.setattr(grid_pregrind, "_WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY", True)
+    monkeypatch.setattr(grid_pregrind, "_worker_initialize", fake_initialize)
+
+    _grid_key_id, failed = grid_pregrind._run_point(job)
+    _grid_key_id, recovered = grid_pregrind._run_point(job)
+
+    assert failed["status_kind"] == "failure"
+    assert reinitializations == [({"grid_backend_name": "thermoengine"}, None)]
+    assert recovered["status_kind"] == "success"
+    assert recovered["engine_version"] == "reinitialized-engine"
+
+
 @pytest.mark.parametrize("timeout_s", [None, 0.0, -1.0, math.nan])
 def test_queued_job_timeout_must_be_positive_and_finite(timeout_s):
     inputs = _inputs(1200.0)
@@ -589,26 +860,46 @@ def test_queued_job_timeout_must_be_positive_and_finite(timeout_s):
         )
 
 
-def test_existing_grid_database_adds_nullable_runmode_output_columns(tmp_path):
+@pytest.mark.parametrize("existing_only", [False, True])
+def test_existing_grid_database_adds_nullable_runmode_output_columns(
+    tmp_path,
+    existing_only,
+):
     database = tmp_path / "legacy-grid.db"
     with GridCacheWriter(database):
         pass
     connection = sqlite3.connect(database)
+    connection.execute("DROP INDEX idx_alphamelts_outputs_failure_reason")
     for table, column in (
+        ("grid_keys", "kress91_fixed_ferric_fraction"),
+        ("grid_keys", "kress91_fixed_ferric_fraction_repr"),
         ("grid_keys", "subprocess_run_mode"),
+        ("alphamelts_outputs", "failure_reason_code"),
+        ("alphamelts_outputs", "failure_message"),
         ("alphamelts_outputs", "generic_requested_temperature_C"),
         ("alphamelts_outputs", "generic_requested_temperature_C_repr"),
         ("alphamelts_outputs", "generic_liquid_density_kg_m3"),
         ("alphamelts_outputs", "generic_liquid_density_kg_m3_repr"),
+        ("alphamelts_outputs", "generic_system_enthalpy"),
+        ("alphamelts_outputs", "generic_system_enthalpy_repr"),
+        ("alphamelts_outputs", "generic_phase_thermo_json"),
+        ("alphamelts_outputs", "generic_chem_potentials_json"),
+        ("alphamelts_outputs", "generic_phase_affinities_json"),
+        ("alphamelts_outputs", "generic_solid_composition_wt_pct_json"),
+        ("alphamelts_outputs", "generic_bulk_composition_wt_pct_json"),
         ("alphamelts_outputs", "run_mode"),
         ("alphamelts_outputs", "applied_timeout_s"),
         ("alphamelts_outputs", "applied_timeout_s_repr"),
     ):
         connection.execute(f'ALTER TABLE "{table}" DROP COLUMN "{column}"')
+    connection.execute(
+        "UPDATE metadata SET value = '72' "
+        "WHERE key = 'schema_output_field_count'"
+    )
     connection.commit()
     connection.close()
 
-    with GridCacheWriter(database, existing_only=True) as writer:
+    with GridCacheWriter(database, existing_only=existing_only) as writer:
         grid_columns = {
             row[1]
             for row in writer.connection.execute('PRAGMA table_info("grid_keys")')
@@ -619,17 +910,34 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(tmp_path):
                 'PRAGMA table_info("alphamelts_outputs")'
             )
         }
+        output_field_count = writer.connection.execute(
+            "SELECT value FROM metadata WHERE key = 'schema_output_field_count'"
+        ).fetchone()[0]
 
     assert "subprocess_run_mode" in grid_columns
     assert {
+        "kress91_fixed_ferric_fraction",
+        "kress91_fixed_ferric_fraction_repr",
+    } <= grid_columns
+    assert {
+        "failure_reason_code",
+        "failure_message",
         "generic_requested_temperature_C",
         "generic_requested_temperature_C_repr",
         "generic_liquid_density_kg_m3",
         "generic_liquid_density_kg_m3_repr",
+        "generic_system_enthalpy",
+        "generic_system_enthalpy_repr",
+        "generic_phase_thermo_json",
+        "generic_chem_potentials_json",
+        "generic_phase_affinities_json",
+        "generic_solid_composition_wt_pct_json",
+        "generic_bulk_composition_wt_pct_json",
         "run_mode",
         "applied_timeout_s",
         "applied_timeout_s_repr",
     } <= output_columns
+    assert output_field_count == "74"
 
 
 def _prepared_drain_database(database):
@@ -866,6 +1174,11 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
             "o.generic_requested_temperature_C, "
             "o.generic_liquid_viscosity_Pa_s, "
             "o.generic_liquid_density_kg_m3, o.generic_fO2_log, "
+            "o.generic_system_enthalpy, o.generic_system_enthalpy_repr, "
+            "o.generic_phase_thermo_json, "
+            "o.generic_chem_potentials_json, "
+            "o.generic_phase_affinities_json, "
+            "o.generic_bulk_composition_wt_pct_json, "
             "o.alpha_intrinsic_fO2_log "
             "FROM grid_keys h JOIN alphamelts_outputs o ON o.grid_key_id = h.id"
         ).fetchone()
@@ -883,6 +1196,16 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
         assert row["generic_liquid_viscosity_Pa_s"] == 2.5
         assert row["generic_liquid_density_kg_m3"] == 2650.0
         assert row["generic_fO2_log"] == -9.0
+        assert row["generic_system_enthalpy"] == -1059377.10
+        assert row["generic_system_enthalpy_repr"] == "-1059377.1"
+        assert json.loads(row["generic_phase_thermo_json"])["liquid"][
+            "density_kg_m3"
+        ] == 2893.824
+        assert row["generic_chem_potentials_json"] is None
+        assert row["generic_phase_affinities_json"] is None
+        assert json.loads(row["generic_bulk_composition_wt_pct_json"])[
+            "SiO2"
+        ] == 49.3753
         assert row["alpha_intrinsic_fO2_log"] == -9.0
         assert writer.counts() == {
             "success": 1,
@@ -890,6 +1213,162 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
             "failure": 0,
             "total": 1,
         }
+
+
+def test_writer_populates_thermoengine_only_json_without_scalar_padding(tmp_path):
+    database = tmp_path / "thermoengine-extras.db"
+    output = _output()
+    output["engine_mode"] = "thermoengine"
+    output["generic"]["chem_potentials"] = {
+        "liquid": {
+            "basis": "chemical_potential",
+            "units": "J/mol",
+            "source_basis": "chemical_potential_J_mol",
+            "components": {"SiO2": -1234567.8901234567},
+        }
+    }
+    output["generic"]["phase_affinities"] = {
+        "quartz": {
+            "affinity_J": 321.125,
+            "state": "undersaturated",
+            "phase_scope": "not_in_equilibrium_assemblage",
+            "composition_formula": "SiO2",
+        }
+    }
+
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="thermoengine", kind="fixed", seed=178, params={"test": True}
+        )
+        inputs = _inputs(1400.0)
+        assert writer.materialize_key(
+            inputs,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        assert writer.write_result(grid_key_id, output)
+        row = writer.connection.execute(
+            "SELECT generic_chem_potentials_json, "
+            "generic_phase_affinities_json, failure_reason_code, "
+            "failure_message FROM alphamelts_outputs"
+        ).fetchone()
+        sample = writer.sample_row()
+        columns = {
+            item[1]
+            for item in writer.connection.execute(
+                'PRAGMA table_info("alphamelts_outputs")'
+            )
+        }
+
+    assert json.loads(row["generic_chem_potentials_json"]) == {
+        "liquid": {
+            "basis": "chemical_potential",
+            "units": "J/mol",
+            "source_basis": "chemical_potential_J_mol",
+            "components": {"SiO2": -1234567.8901234567},
+        }
+    }
+    assert json.loads(row["generic_phase_affinities_json"]) == {
+        "quartz": {
+            "affinity_J": 321.125,
+            "state": "undersaturated",
+            "phase_scope": "not_in_equilibrium_assemblage",
+            "composition_formula": "SiO2",
+        }
+    }
+    assert row["failure_reason_code"] is None
+    assert row["failure_message"] is None
+    assert sample["intended_fO2_log"] == -9.0
+    assert sample["kress91_fixed_ferric_fraction"] == pytest.approx(2.0 / 7.0)
+    assert sample["adapter_fO2_log_argument"] is None
+    assert sample["solved_fO2_log"] == output["generic"]["fO2_log"]
+    assert not any(
+        name.startswith("generic_chem_potential_")
+        or name.startswith("generic_phase_affinity_")
+        for name in columns
+    )
+
+
+def test_writer_surfaces_bounded_failure_diagnostics(tmp_path):
+    database = tmp_path / "thermoengine-failure.db"
+    message = "ThermoEngine returned a non-finite fO2 echo " + "x" * 600
+    output = grid_pregrind._worker_failure_output(
+        RuntimeError(message),
+        started=grid_pregrind.time.monotonic(),
+        captures=[],
+        native_input=None,
+        backend_name="thermoengine",
+    )
+
+    with GridCacheWriter(database, backend_name="thermoengine") as writer:
+        batch_id = writer.ensure_batch(
+            label="thermoengine-failure",
+            kind="fixed",
+            seed=178,
+            params={"test": True},
+        )
+        assert writer.materialize_key(
+            _inputs(1400.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        assert writer.write_result(grid_key_id, output)
+        row = writer.connection.execute(
+            "SELECT failure_reason_code, failure_message, raw_payload "
+            "FROM alphamelts_outputs"
+        ).fetchone()
+        histogram = writer.selected_result_histogram([grid_key_id])
+
+    assert row["failure_reason_code"] == "thermoengine_nonfinite_fo2_echo"
+    assert len(row["failure_message"]) == grid_pregrind.FAILURE_MESSAGE_MAX_LENGTH
+    assert json.loads(row["raw_payload"])["exception"]["message"] == message
+    assert histogram["failure_reason_code"] == {
+        "thermoengine_nonfinite_fo2_echo": 1
+    }
+
+
+def test_writer_refuses_engine_blending_on_open_and_write(tmp_path):
+    database = tmp_path / "dedicated-thermoengine.db"
+    thermoengine_output = _output()
+    thermoengine_output["engine_mode"] = "thermoengine"
+
+    with GridCacheWriter(database, backend_name="thermoengine") as writer:
+        batch_id = writer.ensure_batch(
+            label="thermoengine", kind="fixed", seed=178, params={"test": True}
+        )
+        assert writer.materialize_key(
+            _inputs(1400.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        writer.commit()
+        subprocess_writer = GridCacheWriter(
+            database, engine_epoch=2, backend_name="subprocess"
+        )
+        with pytest.raises(ValueError, match="engine blend refused"):
+            writer.write_result(grid_key_id, _output())
+        assert writer.write_result(grid_key_id, thermoengine_output)
+        writer.commit()
+        with subprocess_writer:
+            with pytest.raises(ValueError, match="engine blend refused"):
+                subprocess_writer.write_result(grid_key_id, _output())
+
+    with pytest.raises(ValueError, match="dedicated database"):
+        GridCacheWriter(
+            database,
+            engine_epoch=2,
+            existing_only=True,
+            backend_name="subprocess",
+        )
 
 
 def test_incremental_harvest_tracks_source_id_and_skips_replay(tmp_path):

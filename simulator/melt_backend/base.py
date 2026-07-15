@@ -407,7 +407,8 @@ class EquilibriumResult:
     activity_coefficients: Dict[str, float] = field(default_factory=dict)
 
     # Oxygen fugacity
-    fO2_log: float = -9.0  # log10(fO2 / 1 bar)
+    # ``None`` records an intrinsic request that was rejected before a solve.
+    fO2_log: Optional[float] = -9.0  # log10(fO2 / 1 bar)
 
     # Backend diagnostics
     warnings: List[str] = field(default_factory=list)
@@ -483,6 +484,31 @@ class EquilibriumResult:
     # did not print a density; adapters must not synthesize a substitute.
     liquid_density_kg_m3: Optional[float] = None
 
+    # Thermodynamic extras on the engine solver reference mass recorded in
+    # ``diagnostics['thermodynamic_basis']``. H is J, S/Cp are J/K, and V is
+    # normalized across engines to m3; scaled dVdP/dVdT remain as printed.
+    system_enthalpy: Optional[float] = None
+    system_entropy: Optional[float] = None
+    system_volume: Optional[float] = None
+    system_heat_capacity_Cp: Optional[float] = None
+    system_dVdP: Optional[float] = None
+    system_dVdT: Optional[float] = None
+    system_fO2_delta_QFM: Optional[float] = None
+    system_solid_density_rhos: Optional[float] = None
+    system_phi: Optional[float] = None
+    system_chisqr: Optional[float] = None
+    phase_thermo: Dict[str, Dict[str, Any]] = field(
+        default_factory=dict
+    )
+    solid_composition_wt_pct: Dict[str, float] = field(default_factory=dict)
+    bulk_composition_wt_pct: Dict[str, float] = field(default_factory=dict)
+
+    # Engine-specific diagnostic chemistry. ``None`` means the emitting
+    # engine does not provide this facet; cache writers preserve that as SQL
+    # NULL rather than padding rows with empty JSON objects.
+    chem_potentials: Optional[Dict[str, Dict[str, Any]]] = None
+    phase_affinities: Optional[Dict[str, Dict[str, Any]]] = None
+
     def __post_init__(self) -> None:
         if self.status != 'ok':
             return
@@ -519,6 +545,9 @@ class MeltBackend(ABC):
     - InternalAnalyticalBackend (no phase equilibrium; core.py owns Antoine fallback)
     """
 
+    backend_name = 'unknown'
+    supports_intrinsic_fO2 = False
+
     @abstractmethod
     def initialize(self, config: dict) -> bool:
         """
@@ -534,7 +563,7 @@ class MeltBackend(ABC):
     @abstractmethod
     def equilibrate(self, temperature_C: float,
                     composition_kg: Optional[Dict[str, float]] = None,
-                    fO2_log: float = -9.0,
+                    fO2_log: Optional[float] = -9.0,
                     pressure_bar: float = 1e-6,
                     *,
                     composition_mol: Optional[Dict[str, float]] = None,
@@ -553,7 +582,12 @@ class MeltBackend(ABC):
             composition_mol_by_account:
                               Canonical per-ledger-account species inventory
             species_formula_registry: Simulator formula registry for kg adapters
-            fO2_log:         log10(oxygen fugacity / 1 bar)
+            fO2_log:         log10(oxygen fugacity / 1 bar). ``None`` requests
+                              intrinsic closed-system redox only from backends
+                              declaring ``supports_intrinsic_fO2``. The ABC's
+                              finite default preserves legacy callers; an
+                              intrinsic-capable implementation may default to
+                              ``None`` explicitly.
             pressure_bar:    Total pressure (bar)
 
         Returns:
@@ -563,6 +597,19 @@ class MeltBackend(ABC):
     @abstractmethod
     def get_vapor_species(self) -> List[str]:
         """Return list of vapor species this backend can calculate."""
+
+    def get_engine_version(self) -> str:
+        """Return the configured engine's stable provenance string."""
+        return 'unavailable'
+
+    @property
+    def engine_version(self) -> str:
+        return self.get_engine_version()
+
+    def health_check(self) -> tuple[bool, str]:
+        """Return backend readiness without exposing transport mechanics."""
+        available = self.is_available()
+        return available, 'ok' if available else 'backend unavailable'
 
     def capabilities(self) -> Dict[str, bool]:
         """Return chemistry/process coverage exposed by this backend."""

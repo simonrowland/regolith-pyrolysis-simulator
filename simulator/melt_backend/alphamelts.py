@@ -6,7 +6,6 @@ Wraps alphaMELTS for thermodynamic equilibrium calculations via:
 
 1. Subprocess transport (default): write .melts files, run binary, parse stdout/tables
 2. Python API fallback: petthermotools -> alphaMELTS for Python
-3. ThermoEngine transport (explicit mode): ENKI MELTS API, including μ output
 
 PetThermoTools 0.4.5 schema verified from installed source:
 
@@ -55,13 +54,11 @@ from simulator.melt_backend.liquidus import (
     LiquidusSolidusResult,
     find_liquidus_solidus_by_fraction,
 )
-from engines.alphamelts.thermoengine import ThermoEngineTransport
 from simulator.physical_constants import GAS_CONSTANT
 
 
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
 ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR = 1.0e-6
-ALPHAMELTS_THERMOENGINE_MIN_PRESSURE_BAR = 1.0e-6
 ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
 MELTS_OXIDE_BASIS = (
     'SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MgO', 'CaO',
@@ -300,21 +297,19 @@ def activity_from_chem_potential(mu: float, mu0: float, T_K: float) -> float:
     return math.exp((mu_val - mu0_val) / (GAS_CONSTANT_J_PER_MOL_K * T_val))
 
 
-class AlphaMELTSBackend(MeltBackend):
+class _MELTSBackendSupport(MeltBackend):
     """
     AlphaMELTS thermodynamic backend.
 
-    Defaults to the real alphaMELTS subprocess binary.  ThermoEngine stays
-    explicit because its rubicon-objc bridge can spin indefinitely inside
-    the native execute() call on this macOS/arm64 environment.
+    Shared MELTS-family input, domain, result, and diagnostic plumbing.
     """
 
+    backend_name = 'alphamelts'
+
     def __init__(self):
-        self._mode: Optional[str] = None  # 'thermoengine', 'python_api', or 'subprocess'
+        self._mode: Optional[str] = None  # 'python_api' or 'subprocess'
         self._engine_path: Optional[Path] = None
         self._binary_path: Optional[Path] = None
-        self._thermoengine_transport: Optional[ThermoEngineTransport] = None
-        self._thermoengine_import_error: Optional[BaseException] = None
         self._pet_available = False
         self._pet_module = None
         self._pet_melts = None
@@ -341,15 +336,14 @@ class AlphaMELTSBackend(MeltBackend):
         1. alphaMELTS binary in engines/alphamelts/
         2. alphaMELTS on system PATH
         3. PetThermoTools Python package
-        4. ThermoEngine Python package (explicit ``mode='thermoengine'``)
         """
         config = self._alphamelts_config(config)
+        self.close()
         requested_mode = self._normalize_mode(config.get('mode'))
         self._mode = None
         self._engine_path = None
         self._binary_path = None
         self._engine_version = None
-        self._thermoengine_transport = None
         self._pet_available = False
         self._pet_module = None
         self._pet_melts = None
@@ -361,44 +355,11 @@ class AlphaMELTSBackend(MeltBackend):
             config.get('Fe3Fet_Liq', config.get('fe3fet_ratio')))
         self._model = str(config.get('model', self._model))
         self._timeout_s = float(config.get('timeout_s', self._timeout_s))
-        require_thermoengine = requested_mode == 'thermoengine'
         require_petthermotools = bool(
             config.get('require_petthermotools')
             or requested_mode == 'python_api'
         )
         require_subprocess = requested_mode == 'subprocess'
-
-        if requested_mode == 'thermoengine':
-            try:
-                self._thermoengine_transport = ThermoEngineTransport(
-                    model_name=self._model,
-                    activity_converter=activity_from_chem_potential,
-                )
-                self._thermoengine_transport.initialize()
-                health_check = getattr(
-                    self._thermoengine_transport,
-                    'health_check',
-                    None,
-                )
-                if callable(health_check):
-                    ok, reason = health_check(
-                        timeout_s=float(
-                            config.get('thermoengine_health_timeout_s', 8.0)
-                        )
-                    )
-                    if not ok:
-                        raise ImportError(reason)
-                self._thermoengine_import_error = None
-                self._engine_version = self._thermoengine_transport.engine_version
-                self._mode = 'thermoengine'
-            except Exception as exc:  # noqa: BLE001 - optional engine boundary
-                self._thermoengine_transport = None
-                self._thermoengine_import_error = exc
-                if require_thermoengine:
-                    raise ImportError(
-                        'ThermoEngine transport unavailable: '
-                        f'{exc}'
-                    ) from exc
 
         if (
             self._mode is None
@@ -471,6 +432,10 @@ class AlphaMELTSBackend(MeltBackend):
 
         return self._mode is not None
 
+    def close(self) -> None:
+        """Idempotently release transport-owned native resources."""
+        return None
+
     def _initialize_petthermotools(
         self,
         *,
@@ -521,7 +486,7 @@ class AlphaMELTSBackend(MeltBackend):
             'binary': 'subprocess',
         }
         mode = aliases.get(mode, mode)
-        if mode not in {'thermoengine', 'python_api', 'subprocess'}:
+        if mode not in {'python_api', 'subprocess'}:
             raise ValueError(f'unsupported AlphaMELTS mode: {value}')
         return mode
 
@@ -609,9 +574,6 @@ class AlphaMELTSBackend(MeltBackend):
     def get_engine_version(self) -> str:
         if self._engine_version:
             return self._engine_version
-        if self._thermoengine_transport is not None:
-            self._engine_version = self._thermoengine_transport.engine_version
-            return self._engine_version
         if self._mode == 'subprocess':
             binary_version = self._subprocess_engine_version()
             if binary_version:
@@ -689,7 +651,7 @@ class AlphaMELTSBackend(MeltBackend):
 
     def equilibrate(self, temperature_C: float,
                     composition_kg: Optional[Dict[str, float]] = None,
-                    fO2_log: float = -9.0,
+                    fO2_log: Optional[float] = None,
                     pressure_bar: float = 1e-6,
                     *,
                     composition_mol: Optional[Dict[str, float]] = None,
@@ -700,8 +662,14 @@ class AlphaMELTSBackend(MeltBackend):
         """
         Calculate thermodynamic equilibrium.
 
-        Routes to the appropriate engine based on available mode.
+        Routes to the configured alphaMELTS transport.
         """
+        if fO2_log is None and not self.supports_intrinsic_fO2:
+            raise ValueError(
+                'intrinsic closed-system fO2 is supported only by the '
+                'ThermoEngine transport; other transports require an '
+                'explicit absolute fO2_log'
+            )
         if composition_mol_by_account is not None:
             unsupported = self._unsupported_accounts(composition_mol_by_account)
             if unsupported:
@@ -794,15 +762,30 @@ class AlphaMELTSBackend(MeltBackend):
         )
         warnings = list(self._last_normalization_warnings)
 
-        if self._mode == 'thermoengine':
-            return self._unapplied_absolute_fo2_result(
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-                transport='thermoengine',
-                warnings=warnings,
-            )
-        elif self._mode == 'python_api':
+        return self._equilibrate_prepared(
+            temperature_C=temperature_C,
+            comp_wt=comp_wt,
+            fO2_log=fO2_log,
+            pressure_bar=pressure_bar,
+            warnings=warnings,
+            total_input_kg=total_input_kg,
+            crash_diagnostics=crash_diagnostics,
+            subprocess_run_mode=subprocess_run_mode,
+        )
+
+    def _equilibrate_prepared(
+        self,
+        *,
+        temperature_C: float,
+        comp_wt: Mapping[str, float],
+        fO2_log: Optional[float],
+        pressure_bar: float,
+        warnings: List[str],
+        total_input_kg: float,
+        crash_diagnostics: Mapping[str, object],
+        subprocess_run_mode: AlphaMELTSSubprocessRunMode | str | None,
+    ) -> EquilibriumResult:
+        if self._mode == 'python_api':
             return self._equilibrate_python(
                 temperature_C,
                 comp_wt,
@@ -812,7 +795,7 @@ class AlphaMELTSBackend(MeltBackend):
                 total_input_kg=total_input_kg,
                 require_solved_fo2=True,
             )
-        elif self._mode == 'subprocess':
+        if self._mode == 'subprocess':
             return self._equilibrate_subprocess(
                 temperature_C, comp_wt, fO2_log, pressure_bar, warnings,
                 total_input_kg=total_input_kg,
@@ -821,15 +804,14 @@ class AlphaMELTSBackend(MeltBackend):
                     subprocess_run_mode
                 ),
             )
-        else:
-            # No PetThermoTools, no binary -- the engine is not present.
-            return self._emit_equilibrium_result(
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-                warnings=warnings,
-                status='unavailable',
-            )
+        # No PetThermoTools or binary -- the engine is not present.
+        return self._emit_equilibrium_result(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            warnings=warnings,
+            status='unavailable',
+        )
 
     def find_liquidus_solidus(self,
                               composition_kg: Optional[Dict[str, float]] = None,
@@ -849,12 +831,12 @@ class AlphaMELTSBackend(MeltBackend):
                               tolerance_C: float = 2.0,
                               ) -> LiquidusSolidusResult:
         """Find solidus/liquidus when a liquid-fraction transport is live."""
-        if self._mode not in {'python_api', 'thermoengine', 'subprocess'}:
+        if not self.is_available():
             return LiquidusSolidusResult(
                 status='unavailable',
                 warnings=(
-                    'AlphaMELTS liquidus finder requires ThermoEngine, '
-                    'PetThermoTools python_api, or subprocess mode',
+                    f'{type(self).__name__} liquidus finder requires an '
+                    'initialized transport',
                 ),
             )
 
@@ -980,7 +962,7 @@ class AlphaMELTSBackend(MeltBackend):
         *,
         temperature_C: float,
         pressure_bar: float,
-        fO2_log: float,
+        fO2_log: Optional[float],
         transport: str,
         warnings: Optional[List[str]] = None,
     ) -> EquilibriumResult:
@@ -1065,6 +1047,22 @@ class AlphaMELTSBackend(MeltBackend):
         liquid_composition_wt_pct: Optional[Mapping[str, float]] = None,
         liquid_viscosity_Pa_s: Optional[float] = None,
         liquid_density_kg_m3: Optional[float] = None,
+        system_enthalpy: Optional[float] = None,
+        system_entropy: Optional[float] = None,
+        system_volume: Optional[float] = None,
+        system_heat_capacity_Cp: Optional[float] = None,
+        system_dVdP: Optional[float] = None,
+        system_dVdT: Optional[float] = None,
+        system_fO2_delta_QFM: Optional[float] = None,
+        system_solid_density_rhos: Optional[float] = None,
+        system_phi: Optional[float] = None,
+        system_chisqr: Optional[float] = None,
+        phase_thermo: Optional[Mapping[str, Mapping[str, object]]] = None,
+        phase_compositions: Optional[Mapping[str, Mapping[str, float]]] = None,
+        chem_potentials: Optional[Mapping[str, Mapping[str, object]]] = None,
+        phase_affinities: Optional[Mapping[str, Mapping[str, object]]] = None,
+        solid_composition_wt_pct: Optional[Mapping[str, float]] = None,
+        bulk_composition_wt_pct: Optional[Mapping[str, float]] = None,
         activity_coefficients: Optional[Mapping[str, float]] = None,
         vapor_pressures_Pa: Optional[Mapping[str, float]] = None,
         vapor_pressures_source: Optional[Mapping[str, str]] = None,
@@ -1092,12 +1090,18 @@ class AlphaMELTSBackend(MeltBackend):
                 'backend_status_reason',
                 'clamped_operating_point',
             )
-        return EquilibriumResult(
+        result_diagnostics.setdefault('backend_name', self.backend_name)
+        result_diagnostics.setdefault('engine_version', self.get_engine_version())
+        result = EquilibriumResult(
             temperature_C=float(temperature_C),
             pressure_bar=float(pressure_bar),
-            fO2_log=float(fO2_log),
+            fO2_log=(None if fO2_log is None else float(fO2_log)),
             phases_present=list(phases_present or []),
             phase_masses_kg=phase_masses,
+            phase_compositions={
+                str(phase): dict(composition)
+                for phase, composition in dict(phase_compositions or {}).items()
+            },
             liquid_fraction=resolved_liquid_fraction,
             liquid_composition_wt_pct=dict(liquid_composition_wt_pct or {}),
             liquid_viscosity_Pa_s=(
@@ -1121,7 +1125,42 @@ class AlphaMELTSBackend(MeltBackend):
                 if liquid_density_kg_m3 is None
                 else float(liquid_density_kg_m3)
             ),
+            system_enthalpy=system_enthalpy,
+            system_entropy=system_entropy,
+            system_volume=system_volume,
+            system_heat_capacity_Cp=system_heat_capacity_Cp,
+            system_dVdP=system_dVdP,
+            system_dVdT=system_dVdT,
+            system_fO2_delta_QFM=system_fO2_delta_QFM,
+            system_solid_density_rhos=system_solid_density_rhos,
+            system_phi=system_phi,
+            system_chisqr=system_chisqr,
+            phase_thermo={
+                str(phase): dict(values)
+                for phase, values in dict(phase_thermo or {}).items()
+            },
+            chem_potentials=(
+                None
+                if chem_potentials is None
+                else {
+                    str(phase): dict(values)
+                    for phase, values in chem_potentials.items()
+                }
+            ),
+            phase_affinities=(
+                None
+                if phase_affinities is None
+                else {
+                    str(phase): dict(values)
+                    for phase, values in phase_affinities.items()
+                }
+            ),
+            solid_composition_wt_pct=dict(solid_composition_wt_pct or {}),
+            bulk_composition_wt_pct=dict(bulk_composition_wt_pct or {}),
         )
+        result.backend_name = self.backend_name
+        result.engine_version = self.get_engine_version()
+        return result
 
     @staticmethod
     def _merge_diagnostics(
@@ -1211,7 +1250,7 @@ class AlphaMELTSBackend(MeltBackend):
         *,
         temperature_C: float,
         pressure_bar: float,
-        fO2_log: float,
+        fO2_log: Optional[float],
         composition_wt_pct: Optional[Mapping[str, float]] = None,
         composition_melts_wt_pct: Optional[Mapping[str, float]] = None,
         composition_mol: Optional[Mapping[str, float]] = None,
@@ -1223,7 +1262,6 @@ class AlphaMELTSBackend(MeltBackend):
         crash_point: dict[str, object] = {
             'temperature_C': float(temperature_C),
             'pressure_bar': float(pressure_bar),
-            'fO2_log': float(fO2_log),
             'composition_wt_pct': self._finite_positive_mapping(
                 composition_wt_pct or {}
             ),
@@ -1231,6 +1269,8 @@ class AlphaMELTSBackend(MeltBackend):
                 composition_mol or {}
             ),
         }
+        if fO2_log is not None:
+            crash_point['fO2_log'] = float(fO2_log)
         melts_wt = self._finite_positive_mapping(composition_melts_wt_pct or {})
         if melts_wt:
             crash_point['composition_melts_wt_pct'] = melts_wt
@@ -1316,7 +1356,7 @@ class AlphaMELTSBackend(MeltBackend):
     def _domain_gate(self, comp_wt: Mapping[str, float], *,
                      temperature_C: float,
                      pressure_bar: float,
-                     fO2_log: float,
+                     fO2_log: Optional[float],
                      diagnostics: Optional[Mapping[str, object]] = None,
                      ) -> Optional[EquilibriumResult]:
         canonical_wt: Dict[str, float] = {}
@@ -1370,7 +1410,7 @@ class AlphaMELTSBackend(MeltBackend):
         )
 
     def _domain_gate_result(self, temperature_C: float, pressure_bar: float,
-                            fO2_log: float,
+                            fO2_log: Optional[float],
                             reasons: List[str],
                             diagnostics: Optional[Mapping[str, object]] = None,
                             reason: OutOfDomainReason | str | None = None,
@@ -1501,95 +1541,6 @@ class AlphaMELTSBackend(MeltBackend):
             oxide: normalized_basis[oxide] / total * 100.0
             for oxide in MELTS_OXIDE_BASIS
         }
-
-    # ------------------------------------------------------------------
-    # ThermoEngine mode
-    # ------------------------------------------------------------------
-
-    def _equilibrate_thermoengine(self, temperature_C, comp_wt,
-                                  fO2_log, pressure_bar, warnings=None):
-        """Use ENKI ThermoEngine MELTS for equilibrium + first-class μ."""
-        if self._thermoengine_transport is None:
-            self._mode = None
-            raise ImportError('ThermoEngine transport not initialized')
-        try:
-            solved_pressure_bar = max(
-                float(pressure_bar), ALPHAMELTS_THERMOENGINE_MIN_PRESSURE_BAR)
-            clamp_diagnostics, result_warnings = (
-                self._clamped_operating_point_context(
-                    requested_temperature_C=temperature_C,
-                    requested_pressure_bar=pressure_bar,
-                    solved_temperature_C=temperature_C,
-                    solved_pressure_bar=solved_pressure_bar,
-                    transport='thermoengine',
-                    warnings=warnings,
-                )
-            )
-            payload = self._thermoengine_transport.equilibrate(
-                temperature_C=temperature_C,
-                pressure_bar=solved_pressure_bar,
-                comp_wt=comp_wt,
-                warnings=tuple(result_warnings),
-            )
-            status = 'ok' if payload.phases_present else 'not_converged'
-            if self._vaporock_available:
-                vapor_pressures, vapor_pressure_source = (
-                    self._vapor_pressures_via_vaporock_or_antoine(
-                        T_C=temperature_C,
-                        solved_melt_wt_pct=payload.liquid_composition_wt_pct,
-                        liquid_fraction=payload.liquid_fraction,
-                        fO2_log=fO2_log,
-                        pressure_bar=solved_pressure_bar,
-                        activities=payload.activity_coefficients,
-                    )
-                )
-            else:
-                vapor_pressures = self._activities_times_antoine_or_fail(
-                    temperature_C,
-                    payload.activity_coefficients,
-                    comp_wt,
-                    context='ThermoEngine VapoRock fallback unavailable',
-                )
-                vapor_pressure_source = (
-                    self._antoine_vapor_pressure_source_by_species(
-                        'thermoengine',
-                        vapor_pressures,
-                    )
-                    if vapor_pressures
-                    else 'no_volatile_species'
-                )
-            eq = self._emit_equilibrium_result(
-                temperature_C=temperature_C,
-                pressure_bar=solved_pressure_bar,
-                fO2_log=fO2_log,
-                phases_present=list(payload.phases_present),
-                phase_masses_kg=payload.phase_masses_kg,
-                liquid_fraction=payload.liquid_fraction,
-                liquid_composition_wt_pct=payload.liquid_composition_wt_pct,
-                activity_coefficients=payload.activity_coefficients,
-                vapor_pressures_Pa=vapor_pressures,
-                vapor_pressures_source=self._vapor_pressure_source_map(
-                    vapor_pressures,
-                    vapor_pressure_source,
-                ),
-                warnings=list(payload.warnings),
-                status=status,
-                diagnostics=self._vapor_pressure_diagnostics(
-                    clamp_diagnostics,
-                    vapor_pressures,
-                    vapor_pressure_source,
-                ),
-            )
-            eq.fe_redox_split = dict(payload.fe_redox_split)
-            return self._fail_closed_on_clamped_operating_point(eq)
-        except ImportError:
-            self._mode = None
-            raise
-        except Exception as e:
-            self._mode = None
-            raise RuntimeError(
-                f'ThermoEngine equilibrium failed: {e}'
-            ) from e
 
     # ------------------------------------------------------------------
     # Python API mode (PetThermoTools)
@@ -2030,12 +1981,20 @@ class AlphaMELTSBackend(MeltBackend):
                     f'{result.stderr or result.stdout}',
                 )
 
-            system_output_path = Path(tmpdir) / 'System_main_tbl.txt'
-            system_output = (
-                system_output_path.read_text(errors='replace')
-                if system_output_path.is_file()
-                else ''
-            )
+            table_outputs = {}
+            for table_name in (
+                'System_main_tbl.txt',
+                'Phase_main_tbl.txt',
+                'Solid_comp_tbl.txt',
+                'Bulk_comp_tbl.txt',
+                'Liquid_comp_tbl.txt',
+            ):
+                table_path = Path(tmpdir) / table_name
+                table_outputs[table_name] = (
+                    table_path.read_text(errors='replace')
+                    if table_path.is_file()
+                    else ''
+                )
             eq = self._parse_single_point_stdout(
                 f'{result.stdout}\n{result.stderr}',
                 requested_temperature_C=requested_temperature_C,
@@ -2046,11 +2005,12 @@ class AlphaMELTSBackend(MeltBackend):
                 diagnostics=diagnostics,
                 success_diagnostics=diagnostics,
                 run_mode=run_mode,
-                system_output=system_output,
+                system_output=table_outputs['System_main_tbl.txt'],
                 fO2_constraint={
                     'path': fO2_path,
                     'offset': fO2_offset,
                 },
+                table_outputs=table_outputs,
             )
             return eq
 
@@ -2132,23 +2092,40 @@ class AlphaMELTSBackend(MeltBackend):
             ):
                 continue
             if index + 1 >= len(lines):
-                break
+                raise ValueError('System_main_tbl.txt lacks data row')
             values = lines[index + 1].split()
-            if len(values) < len(headers):
-                break
+            if len(values) != len(headers):
+                raise ValueError(
+                    'System_main_tbl.txt row width '
+                    f'{len(values)} != header width {len(headers)}'
+                )
 
             def number(name: str) -> float:
                 return float(values[headers.index(name)])
 
             def optional_number(name: str) -> Optional[float]:
-                try:
-                    value = number(name)
-                except (ValueError, IndexError):
+                if name not in headers:
                     return None
-                return value if math.isfinite(value) else None
+                raw_value = values[headers.index(name)]
+                if raw_value.lower() == 'n/a':
+                    return None
+                try:
+                    value = float(raw_value)
+                except ValueError as exc:
+                    raise ValueError(
+                        f'System_main_tbl.txt invalid {name}={raw_value!r}'
+                    ) from exc
+                if not math.isfinite(value):
+                    raise ValueError(
+                        f'System_main_tbl.txt non-finite {name}={raw_value!r}'
+                    )
+                return value
 
             fO2_index = next(
-                (i for i, name in enumerate(headers) if name.startswith('fO2(')),
+                (
+                    i for i, name in enumerate(headers)
+                    if name.lower().startswith('fo2(absolute)')
+                ),
                 None,
             )
             payload: dict[str, object] = {}
@@ -2170,8 +2147,198 @@ class AlphaMELTSBackend(MeltBackend):
             system_mass_g = optional_number('mass')
             if system_mass_g is not None and system_mass_g > 0.0:
                 payload['system_mass_g'] = system_mass_g
+            for header, field in (
+                ('H', 'system_enthalpy'),
+                ('S', 'system_entropy'),
+                ('V', 'system_volume'),
+                ('Cp', 'system_heat_capacity_Cp'),
+                ('dVdP*10^6', 'system_dVdP'),
+                ('dVdT*10^6', 'system_dVdT'),
+                ('phi', 'system_phi'),
+                ('chisqr', 'system_chisqr'),
+            ):
+                if header in headers:
+                    payload[field] = optional_number(header)
+            delta_qfm_header = next(
+                (
+                    name for name in headers
+                    if name.lower() in {'fo2-(qfm)', 'fo2-(fmq)'}
+                ),
+                None,
+            )
+            if delta_qfm_header is not None:
+                payload['system_fO2_delta_QFM'] = optional_number(
+                    delta_qfm_header
+                )
+            solid_density_g_cm3 = optional_number('rhos')
+            payload['system_solid_density_rhos'] = (
+                solid_density_g_cm3 * 1000.0
+                if solid_density_g_cm3 is not None
+                and solid_density_g_cm3 > 0.0
+                else None
+            )
             return payload
         return {}
+
+    def _parse_phase_main_output(self, output: str) -> dict[str, object]:
+        lines = [line.strip() for line in output.splitlines() if line.strip()]
+        header_index = next(
+            (
+                index for index, line in enumerate(lines)
+                if line.startswith('index ')
+                and ' Pressure ' in f' {line} '
+                and ' Temperature ' in f' {line} '
+            ),
+            None,
+        )
+        if header_index is None:
+            if lines:
+                raise ValueError('Phase_main_tbl.txt lacks parseable header')
+            return {}
+        headers = lines[header_index].split()
+        try:
+            oxide_start = headers.index('Temperature') + 2
+        except ValueError as exc:
+            raise ValueError('Phase_main_tbl.txt malformed header') from exc
+        oxides = headers[oxide_start:]
+        if not oxides:
+            raise ValueError('Phase_main_tbl.txt lacks oxide columns')
+
+        accumulated: dict[str, dict[str, object]] = {}
+        for line in lines[header_index + 1:]:
+            tokens = line.split()
+            if len(tokens) < 7 + len(oxides):
+                raise ValueError(
+                    f'Phase_main_tbl.txt malformed row: {line!r}'
+                )
+            phase = re.sub(r'\d+$', '', tokens[0])
+            try:
+                mass_g, enthalpy, entropy, volume, heat_capacity = (
+                    float(value) for value in tokens[1:6]
+                )
+                composition_values = [
+                    float(value) for value in tokens[-len(oxides):]
+                ]
+            except ValueError as exc:
+                raise ValueError(
+                    f'Phase_main_tbl.txt has non-numeric table value: {line!r}'
+                ) from exc
+            property_tokens = tokens[6:-len(oxides)]
+            if not property_tokens:
+                raise ValueError(
+                    f'Phase_main_tbl.txt lacks density/formula field: {line!r}'
+                )
+            # AlphaMELTS prints liquid viscosity or a solid formula in this
+            # slot, despite older table descriptions calling it density.
+            # The table's mass (g) / volume (cm3) is the phase density.
+            density_kg_m3 = (
+                mass_g / volume * 1000.0
+                if mass_g > 0.0 and volume > 0.0 else None
+            )
+
+            entry = accumulated.setdefault(
+                phase,
+                {
+                    'mass_g': 0.0,
+                    'enthalpy': 0.0,
+                    'entropy': 0.0,
+                    'volume': 0.0,
+                    'heat_capacity_Cp': 0.0,
+                    'density_mass_sum': 0.0,
+                    'density_mass_g': 0.0,
+                    'composition_mass_sums': {oxide: 0.0 for oxide in oxides},
+                },
+            )
+            entry['mass_g'] = float(entry['mass_g']) + mass_g
+            for key, value in (
+                ('enthalpy', enthalpy),
+                ('entropy', entropy),
+                ('volume', volume),
+                ('heat_capacity_Cp', heat_capacity),
+            ):
+                entry[key] = float(entry[key]) + value
+            if density_kg_m3 is not None and mass_g > 0.0:
+                entry['density_mass_sum'] = (
+                    float(entry['density_mass_sum']) + density_kg_m3 * mass_g
+                )
+                entry['density_mass_g'] = float(entry['density_mass_g']) + mass_g
+            composition_sums = entry['composition_mass_sums']
+            assert isinstance(composition_sums, dict)
+            for oxide, value in zip(oxides, composition_values):
+                composition_sums[oxide] += value * mass_g
+
+        phase_thermo = {}
+        phase_compositions = {}
+        for phase, entry in accumulated.items():
+            mass_g = float(entry['mass_g'])
+            if mass_g <= 0.0:
+                continue
+            density_mass_g = float(entry['density_mass_g'])
+            phase_thermo[phase] = {
+                'enthalpy': float(entry['enthalpy']),
+                'entropy': float(entry['entropy']),
+                'volume': float(entry['volume']),
+                'heat_capacity_Cp': float(entry['heat_capacity_Cp']),
+                'reference_mass_kg': mass_g / 1000.0,
+                'density_kg_m3': (
+                    float(entry['density_mass_sum']) / density_mass_g
+                    if density_mass_g > 0.0 else None
+                ),
+            }
+            composition_sums = entry['composition_mass_sums']
+            assert isinstance(composition_sums, dict)
+            phase_compositions[phase] = {
+                oxide: float(value) / mass_g
+                for oxide, value in composition_sums.items()
+            }
+        return {
+            'phase_thermo': phase_thermo,
+            'phase_compositions': phase_compositions,
+        }
+
+    def _parse_composition_table(
+        self,
+        output: str,
+        *,
+        table_name: str,
+    ) -> dict[str, float]:
+        lines = [line.strip() for line in output.splitlines() if line.strip()]
+        header_index = next(
+            (
+                index for index, line in enumerate(lines)
+                if line.startswith('index ')
+                and all(name in line.split() for name in ('Pressure', 'Temperature', 'mass'))
+            ),
+            None,
+        )
+        if header_index is None:
+            if lines:
+                raise ValueError(f'{table_name} lacks parseable header')
+            return {}
+        headers = lines[header_index].split()
+        oxides = headers[headers.index('mass') + 1:]
+        if not oxides or header_index + 1 >= len(lines):
+            raise ValueError(f'{table_name} lacks composition row')
+        values = lines[header_index + 1].split()
+        if values[-1:] == ['---']:
+            try:
+                mass_g = float(values[headers.index('mass')])
+            except (IndexError, ValueError) as exc:
+                raise ValueError(f'{table_name} malformed empty row') from exc
+            if mass_g != 0.0:
+                raise ValueError(f'{table_name} non-zero mass uses --- sentinel')
+            return {}
+        if len(values) != len(headers):
+            raise ValueError(
+                f'{table_name} row width {len(values)} != header width {len(headers)}'
+            )
+        try:
+            return {
+                oxide: float(values[headers.index(oxide)])
+                for oxide in oxides
+            }
+        except ValueError as exc:
+            raise ValueError(f'{table_name} has non-numeric composition') from exc
 
     def _extract_subprocess_activity_mapping(self, output: str) -> dict:
         lines = output.splitlines()
@@ -2267,6 +2434,9 @@ class AlphaMELTSBackend(MeltBackend):
                                    run_mode: AlphaMELTSSubprocessRunMode,
                                    system_output: str,
                                    fO2_constraint: Mapping[str, object],
+                                   table_outputs: Optional[
+                                       Mapping[str, str]
+                                   ] = None,
                                    ) -> EquilibriumResult:
         physical_input_kg = float(total_input_kg)
         if not math.isfinite(physical_input_kg) or physical_input_kg <= 0.0:
@@ -2275,7 +2445,47 @@ class AlphaMELTSBackend(MeltBackend):
                 f'invalid physical input mass {total_input_kg!r}',
             )
         executed_temperatures_C = self._parse_executed_temperatures_C(output)
-        system_values = self._parse_system_main_output(system_output)
+        tables = dict(table_outputs or {})
+        missing_tables = [
+            table_name
+            for table_name in (
+                'System_main_tbl.txt',
+                'Phase_main_tbl.txt',
+                'Solid_comp_tbl.txt',
+                'Bulk_comp_tbl.txt',
+                'Liquid_comp_tbl.txt',
+            )
+            if table_outputs is not None
+            and not str(tables.get(table_name) or '').strip()
+        ]
+        try:
+            system_values = self._parse_system_main_output(system_output)
+            phase_values = self._parse_phase_main_output(
+                tables.get('Phase_main_tbl.txt', '')
+            )
+            solid_composition = self._parse_composition_table(
+                tables.get('Solid_comp_tbl.txt', ''),
+                table_name='Solid_comp_tbl.txt',
+            )
+            bulk_composition = self._parse_composition_table(
+                tables.get('Bulk_comp_tbl.txt', ''),
+                table_name='Bulk_comp_tbl.txt',
+            )
+            liquid_table_composition = self._parse_composition_table(
+                tables.get('Liquid_comp_tbl.txt', ''),
+                table_name='Liquid_comp_tbl.txt',
+            )
+        except ValueError as exc:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING,
+                str(exc),
+            ) from exc
+        phase_thermo = dict(phase_values.get('phase_thermo') or {})
+        phase_compositions = dict(
+            phase_values.get('phase_compositions') or {}
+        )
+        if liquid_table_composition:
+            phase_compositions['liquid'] = liquid_table_composition
         stable_verdict = re.search(r'<> Stable .+ assemblage achieved\.', output)
 
         phases_present: List[str] = []
@@ -2386,6 +2596,12 @@ class AlphaMELTSBackend(MeltBackend):
                 ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT,
                 'no parseable phase assemblage',
             )
+        if missing_tables:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING,
+                'AlphaMELTS table suite missing: '
+                + ', '.join(missing_tables),
+            )
         if not executed_temperatures_C:
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_EXECUTED_T_MISSING
@@ -2433,6 +2649,16 @@ class AlphaMELTSBackend(MeltBackend):
             for key in (
                 'liquid_density_kg_m3',
                 'liquid_viscosity_Pa_s',
+                'system_enthalpy',
+                'system_entropy',
+                'system_volume',
+                'system_heat_capacity_Cp',
+                'system_dVdP',
+                'system_dVdT',
+                'system_fO2_delta_QFM',
+                'system_solid_density_rhos',
+                'system_phi',
+                'system_chisqr',
             )
             if key in system_values
         }
@@ -2509,6 +2735,40 @@ class AlphaMELTSBackend(MeltBackend):
                 f'parsed={solver_basis_kg * 1000.0:.9g} g; '
                 f'system={float(system_mass_g):.9g} g',
             )
+        normalized_phase_thermo = {}
+        for phase, raw_values in phase_thermo.items():
+            # alphaMELTS Phase_main_tbl extensive values use the solver's
+            # modal-mass basis: H is J, S/Cp are J/K, and V is cm3. Convert
+            # cm3 * 1e-6 = m3 and retain the pre-rescale phase mass so these
+            # values cannot be mistaken for the physical batch basis below.
+            normalized_phase_thermo[phase] = {
+                'enthalpy_J': raw_values.get('enthalpy'),
+                'entropy_J_K': raw_values.get('entropy'),
+                'volume_m3': (
+                    None
+                    if raw_values.get('volume') is None
+                    else float(raw_values['volume']) * 1.0e-6
+                ),
+                'heat_capacity_J_K': raw_values.get('heat_capacity_Cp'),
+                'density_kg_m3': raw_values.get('density_kg_m3'),
+                'reference_mass_kg': raw_values.get('reference_mass_kg'),
+                'reference_basis': 'alphamelts_solver_phase_amount',
+            }
+        phase_thermo = normalized_phase_thermo
+        system_volume_native = system_values.get('system_volume')
+        system_volume_m3 = (
+            None
+            if system_volume_native is None
+            else float(system_volume_native) * 1.0e-6
+        )
+        result_diagnostics['thermodynamic_basis'] = {
+            'reference_basis': 'alphamelts_solver_system_amount',
+            'reference_mass_kg': system_mass_kg,
+            'system_enthalpy': {'units': 'J'},
+            'system_entropy': {'units': 'J/K'},
+            'system_volume': {'units': 'm3', 'source_units': 'cm3'},
+            'system_heat_capacity_Cp': {'units': 'J/K'},
+        }
         # Premise: alphaMELTS phase rows are modal masses on an arbitrary
         # solver basis; the adapter input carries the physical batch mass.
         # Algebra: m_i,physical = (m_i,basis / sum(m_basis)) * m_input.
@@ -2534,6 +2794,26 @@ class AlphaMELTSBackend(MeltBackend):
             liquid_density_kg_m3=float(
                 system_values['liquid_density_kg_m3']
             ) if 'liquid_density_kg_m3' in system_values else None,
+            system_enthalpy=system_values.get('system_enthalpy'),
+            system_entropy=system_values.get('system_entropy'),
+            system_volume=system_volume_m3,
+            system_heat_capacity_Cp=system_values.get(
+                'system_heat_capacity_Cp'
+            ),
+            system_dVdP=system_values.get('system_dVdP'),
+            system_dVdT=system_values.get('system_dVdT'),
+            system_fO2_delta_QFM=system_values.get(
+                'system_fO2_delta_QFM'
+            ),
+            system_solid_density_rhos=system_values.get(
+                'system_solid_density_rhos'
+            ),
+            system_phi=system_values.get('system_phi'),
+            system_chisqr=system_values.get('system_chisqr'),
+            phase_thermo=phase_thermo,
+            phase_compositions=phase_compositions,
+            solid_composition_wt_pct=solid_composition,
+            bulk_composition_wt_pct=bulk_composition,
             activity_coefficients=activity_coefficients,
             warnings=result_warnings,
             status='ok',
@@ -3583,3 +3863,9 @@ class AlphaMELTSBackend(MeltBackend):
             oxide: mol / total_moles
             for oxide, mol in moles.items()
         }
+
+
+class AlphaMELTSBackend(_MELTSBackendSupport):
+    """alphaMELTS subprocess/PetThermoTools backend."""
+
+    backend_name = 'alphamelts'

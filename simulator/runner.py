@@ -3683,7 +3683,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         default=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
                         # type folds legacy analytical aliases before choices validation.
                         type=canonical_backend_name,
-                        choices=(ANALYTICAL_BACKEND_SERIALIZATION_TOKEN, "alphamelts"),
+                        choices=(
+                            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+                            "alphamelts",
+                            "thermoengine",
+                        ),
                         help="Melt backend selection (default: internal-analytical)")
     parser.add_argument("--track", default="pyrolysis",
                         choices=("pyrolysis", "mre_baseline"),

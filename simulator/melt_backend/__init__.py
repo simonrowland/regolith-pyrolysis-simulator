@@ -9,6 +9,7 @@ from simulator.melt_backend.base import (
     normalize_backend_capabilities,
 )
 from simulator.melt_backend.magemin import MAGEMinBackend
+from simulator.melt_backend.thermoengine import ThermoEngineBackend
 from simulator.melt_backend.sulfsat import SulfSatGate, SulfurSaturationResult
 from simulator.melt_backend.vaporock import VapoRockBackend
 
@@ -18,6 +19,7 @@ __all__ = [
     'EquilibriumResult',
     'MAGEMinBackend',
     'MeltBackend',
+    'ThermoEngineBackend',
     'InternalAnalyticalBackend',
     'SulfSatGate',
     'SulfurSaturationResult',

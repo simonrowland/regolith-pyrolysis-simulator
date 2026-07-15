@@ -73,7 +73,10 @@ FINDER_INPUT_FIELDS = (
 )
 
 INPUT_FIELDS = COMMON_INPUT_FIELDS + ALPHAMELTS_CONFIG_FIELDS + FINDER_INPUT_FIELDS
-POINT_PROVENANCE_FIELDS = ("kress91_partition_provenance",)
+POINT_PROVENANCE_FIELDS = (
+    "kress91_partition_provenance",
+    "kress91_fixed_ferric_fraction",
+)
 
 GENERIC_OUTPUT_FIELDS = (
     "temperature_C",
@@ -89,6 +92,21 @@ GENERIC_OUTPUT_FIELDS = (
     "liquid_composition_wt_pct",
     "liquid_viscosity_Pa_s",
     "liquid_density_kg_m3",
+    "system_enthalpy",
+    "system_entropy",
+    "system_volume",
+    "system_heat_capacity_Cp",
+    "system_dVdP",
+    "system_dVdT",
+    "system_fO2_delta_QFM",
+    "system_solid_density_rhos",
+    "system_phi",
+    "system_chisqr",
+    "phase_thermo",
+    "chem_potentials",
+    "phase_affinities",
+    "solid_composition_wt_pct",
+    "bulk_composition_wt_pct",
     "vapor_pressures_Pa",
     "vapor_pressures_source",
     "activity_coefficients",
@@ -148,7 +166,7 @@ assert (
     len(GENERIC_OUTPUT_FIELDS)
     + len(ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS)
     + len(FINDER_OUTPUT_FIELDS)
-) == 59
+) == 74
 
 
 def utc_now() -> str:
@@ -266,6 +284,8 @@ CREATE TABLE IF NOT EXISTS grid_keys (
     -- Provenance only: excluded from canonical_vector and expedited_key.
     intended_fO2_log REAL,
     intended_fO2_log_repr TEXT,
+    kress91_fixed_ferric_fraction REAL,
+    kress91_fixed_ferric_fraction_repr TEXT,
     kress91_partition_provenance_json TEXT,
     fO2_log REAL NOT NULL,
     fO2_log_repr TEXT NOT NULL,
@@ -348,6 +368,8 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     status TEXT NOT NULL,
     status_kind TEXT NOT NULL,
     refusal_reason TEXT,
+    failure_reason_code TEXT,
+    failure_message TEXT,
     raw_payload TEXT NOT NULL,
     raw_payload_format TEXT NOT NULL,
     timing_s REAL NOT NULL,
@@ -383,6 +405,31 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     generic_liquid_viscosity_Pa_s_repr TEXT,
     generic_liquid_density_kg_m3 REAL,
     generic_liquid_density_kg_m3_repr TEXT,
+    generic_system_enthalpy REAL,
+    generic_system_enthalpy_repr TEXT,
+    generic_system_entropy REAL,
+    generic_system_entropy_repr TEXT,
+    generic_system_volume REAL,
+    generic_system_volume_repr TEXT,
+    generic_system_heat_capacity_Cp REAL,
+    generic_system_heat_capacity_Cp_repr TEXT,
+    generic_system_dVdP REAL,
+    generic_system_dVdP_repr TEXT,
+    generic_system_dVdT REAL,
+    generic_system_dVdT_repr TEXT,
+    generic_system_fO2_delta_QFM REAL,
+    generic_system_fO2_delta_QFM_repr TEXT,
+    generic_system_solid_density_rhos REAL,
+    generic_system_solid_density_rhos_repr TEXT,
+    generic_system_phi REAL,
+    generic_system_phi_repr TEXT,
+    generic_system_chisqr REAL,
+    generic_system_chisqr_repr TEXT,
+    generic_phase_thermo_json TEXT,
+    generic_chem_potentials_json TEXT,
+    generic_phase_affinities_json TEXT,
+    generic_solid_composition_wt_pct_json TEXT,
+    generic_bulk_composition_wt_pct_json TEXT,
     generic_vapor_pressures_Pa_json TEXT,
     generic_vapor_pressures_source_json TEXT,
     generic_activity_coefficients_json TEXT,
@@ -462,9 +509,11 @@ class GridCacheWriter:
         *,
         engine_epoch: int = 1,
         existing_only: bool = False,
+        backend_name: str | None = None,
     ):
         self.path = Path(path)
         self.engine_epoch = int(engine_epoch)
+        self.backend_name = None if backend_name is None else str(backend_name)
         self.claim_owner = f"{socket.gethostname()}:{os.getpid()}:{uuid.uuid4()}"
         if self.engine_epoch < 1:
             raise ValueError("engine_epoch must be >= 1")
@@ -526,6 +575,7 @@ class GridCacheWriter:
             self._ensure_v2_provenance_columns()
             self._ensure_runmode_output_columns()
             self._ensure_claim_table()
+            self._set_metadata("schema_output_field_count", "74")
             self.connection.commit()
         else:
             self.connection.executescript(SCHEMA_SQL)
@@ -538,12 +588,43 @@ class GridCacheWriter:
                 "variant-local bookkeeping only; recompute reviewed canonical_state_bytes "
                 "from typed full-precision inputs; never transplant this hash",
             )
-            self._set_metadata("schema_output_field_count", "59")
+            self._set_metadata("schema_output_field_count", "74")
             self._set_metadata("schema_input_field_count", "25")
             self._set_metadata("grid_realization_revision", GRID_REALIZATION_REVISION)
             self._set_metadata("database_id", str(uuid.uuid4()), overwrite=False)
             self._set_metadata("created_at", utc_now(), overwrite=False)
             self.connection.commit()
+        try:
+            self._assert_backend_not_blended(self.backend_name)
+        except Exception:
+            self.connection.close()
+            raise
+
+    @staticmethod
+    def _engine_mode_for_backend(backend_name: str) -> str:
+        if backend_name == "subprocess":
+            return "subprocess"
+        if backend_name == "thermoengine":
+            return "thermoengine"
+        raise ValueError(f"unsupported grid backend: {backend_name!r}")
+
+    def _assert_backend_not_blended(self, backend_name: str | None) -> None:
+        if backend_name is None:
+            return
+        expected_mode = self._engine_mode_for_backend(backend_name)
+        existing_modes = {
+            str(row[0])
+            for row in self.connection.execute(
+                "SELECT DISTINCT engine_mode FROM alphamelts_outputs"
+            )
+        }
+        if existing_modes and existing_modes != {expected_mode}:
+            raise ValueError(
+                "grid cache engine blend refused: "
+                f"requested backend={backend_name!r} engine_mode={expected_mode!r}; "
+                f"database engine_mode values={sorted(existing_modes)!r}. "
+                "Use a dedicated database for each engine."
+            )
 
     def _validate_existing_database(self) -> None:
         self._validate_connection(self.connection)
@@ -628,6 +709,8 @@ class GridCacheWriter:
         additions = {
             "intended_fO2_log": "REAL",
             "intended_fO2_log_repr": "TEXT",
+            "kress91_fixed_ferric_fraction": "REAL",
+            "kress91_fixed_ferric_fraction_repr": "TEXT",
             "kress91_partition_provenance_json": "TEXT",
         }
         for name, column_type in additions.items():
@@ -642,10 +725,37 @@ class GridCacheWriter:
                 "subprocess_run_mode": "TEXT",
             },
             "alphamelts_outputs": {
+                "failure_reason_code": "TEXT",
+                "failure_message": "TEXT",
                 "generic_requested_temperature_C": "REAL",
                 "generic_requested_temperature_C_repr": "TEXT",
                 "generic_liquid_density_kg_m3": "REAL",
                 "generic_liquid_density_kg_m3_repr": "TEXT",
+                "generic_system_enthalpy": "REAL",
+                "generic_system_enthalpy_repr": "TEXT",
+                "generic_system_entropy": "REAL",
+                "generic_system_entropy_repr": "TEXT",
+                "generic_system_volume": "REAL",
+                "generic_system_volume_repr": "TEXT",
+                "generic_system_heat_capacity_Cp": "REAL",
+                "generic_system_heat_capacity_Cp_repr": "TEXT",
+                "generic_system_dVdP": "REAL",
+                "generic_system_dVdP_repr": "TEXT",
+                "generic_system_dVdT": "REAL",
+                "generic_system_dVdT_repr": "TEXT",
+                "generic_system_fO2_delta_QFM": "REAL",
+                "generic_system_fO2_delta_QFM_repr": "TEXT",
+                "generic_system_solid_density_rhos": "REAL",
+                "generic_system_solid_density_rhos_repr": "TEXT",
+                "generic_system_phi": "REAL",
+                "generic_system_phi_repr": "TEXT",
+                "generic_system_chisqr": "REAL",
+                "generic_system_chisqr_repr": "TEXT",
+                "generic_phase_thermo_json": "TEXT",
+                "generic_chem_potentials_json": "TEXT",
+                "generic_phase_affinities_json": "TEXT",
+                "generic_solid_composition_wt_pct_json": "TEXT",
+                "generic_bulk_composition_wt_pct_json": "TEXT",
                 "run_mode": "TEXT",
                 "applied_timeout_s": "REAL",
                 "applied_timeout_s_repr": "TEXT",
@@ -659,6 +769,10 @@ class GridCacheWriter:
                         f'ALTER TABLE "{table}" ADD COLUMN '
                         f'"{name}" {column_type}'
                     )
+        self.connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_failure_reason "
+            "ON alphamelts_outputs(failure_reason_code, engine_epoch)"
+        )
 
     def _ensure_claim_table(self) -> None:
         self.connection.executescript(
@@ -796,7 +910,8 @@ class GridCacheWriter:
             vector = values["canonical_vector"]
             row = self.connection.execute(
                 "SELECT canonical_vector, batch_id, shuffle_rank, shard, "
-                "kress91_partition_provenance_json "
+                "kress91_partition_provenance_json, "
+                "kress91_fixed_ferric_fraction "
                 "FROM grid_keys WHERE expedited_key = ?",
                 (values["expedited_key"],),
             ).fetchone()
@@ -809,14 +924,35 @@ class GridCacheWriter:
             if existing_provenance is None:
                 self.connection.execute(
                     "UPDATE grid_keys "
-                    "SET kress91_partition_provenance_json = ? "
+                    "SET kress91_partition_provenance_json = ?, "
+                    "kress91_fixed_ferric_fraction = ?, "
+                    "kress91_fixed_ferric_fraction_repr = ? "
                     "WHERE expedited_key = ?",
-                    (point_provenance, values["expedited_key"]),
+                    (
+                        point_provenance,
+                        values["kress91_fixed_ferric_fraction"],
+                        values["kress91_fixed_ferric_fraction_repr"],
+                        values["expedited_key"],
+                    ),
                 )
             elif existing_provenance != point_provenance:
                 raise ValueError(
                     "Kress91 point provenance drift for expedited key "
                     f"{values['expedited_key']}"
+                )
+            elif (
+                row["kress91_fixed_ferric_fraction"] is None
+                and values["kress91_fixed_ferric_fraction"] is not None
+            ):
+                self.connection.execute(
+                    "UPDATE grid_keys SET kress91_fixed_ferric_fraction = ?, "
+                    "kress91_fixed_ferric_fraction_repr = ? "
+                    "WHERE expedited_key = ?",
+                    (
+                        values["kress91_fixed_ferric_fraction"],
+                        values["kress91_fixed_ferric_fraction_repr"],
+                        values["expedited_key"],
+                    ),
                 )
         return cursor.rowcount == 1
 
@@ -865,7 +1001,8 @@ class GridCacheWriter:
                 parameters.extend(int(value) for value in grid_key_ids)
             query = (
                 "SELECT g.id, g.expedited_key, g.canonical_vector, "
-                "g.kress91_partition_provenance_json, g.intended_fO2_log, "
+                "g.kress91_partition_provenance_json, "
+                "g.kress91_fixed_ferric_fraction, g.intended_fO2_log, "
                 "g.shuffle_rank, g.shard, g.timeout_s FROM grid_keys g "
                 "LEFT JOIN alphamelts_outputs o ON o.expedited_key = g.expedited_key "
                 "AND o.engine_epoch = ? "
@@ -910,6 +1047,9 @@ class GridCacheWriter:
                     # Provenance is intentionally outside canonical key identity,
                     # but the drain must compare it with the persisted engine input.
                     "intended_fO2_log": row["intended_fO2_log"],
+                    "kress91_fixed_ferric_fraction": row[
+                        "kress91_fixed_ferric_fraction"
+                    ],
                     "kress91_partition_provenance": (
                         json.loads(row["kress91_partition_provenance_json"])
                         if row["kress91_partition_provenance_json"] is not None
@@ -1023,7 +1163,11 @@ class GridCacheWriter:
         self, grid_key_ids: Sequence[int]
     ) -> dict[str, dict[str, int]]:
         if not grid_key_ids:
-            return {"status": {}, "refusal_reason": {}}
+            return {
+                "status": {},
+                "refusal_reason": {},
+                "failure_reason_code": {},
+            }
         placeholders = ",".join("?" for _ in grid_key_ids)
         parameters = (self.engine_epoch, *(int(value) for value in grid_key_ids))
         status_rows = self.connection.execute(
@@ -1039,10 +1183,20 @@ class GridCacheWriter:
             "GROUP BY refusal_reason ORDER BY COUNT(*) DESC",
             parameters,
         )
+        failure_reason_rows = self.connection.execute(
+            "SELECT COALESCE(failure_reason_code, '<none>'), COUNT(*) "
+            "FROM alphamelts_outputs "
+            f"WHERE engine_epoch = ? AND grid_key_id IN ({placeholders}) "
+            "GROUP BY failure_reason_code ORDER BY COUNT(*) DESC",
+            parameters,
+        )
         return {
             "status": {str(name): int(count) for name, count in status_rows},
             "refusal_reason": {
                 str(name): int(count) for name, count in reason_rows
+            },
+            "failure_reason_code": {
+                str(name): int(count) for name, count in failure_reason_rows
             },
         }
 
@@ -1257,6 +1411,12 @@ class GridCacheWriter:
             "composition_kg_json": _json(inputs["composition_kg"]),
             "intended_fO2_log": _float(intended_fO2_log),
             "intended_fO2_log_repr": _repr(intended_fO2_log),
+            "kress91_fixed_ferric_fraction": _float(
+                inputs["kress91_fixed_ferric_fraction"]
+            ),
+            "kress91_fixed_ferric_fraction_repr": _repr(
+                inputs["kress91_fixed_ferric_fraction"]
+            ),
             "kress91_partition_provenance_json": _json(
                 inputs["kress91_partition_provenance"]
             ),
@@ -1317,6 +1477,19 @@ class GridCacheWriter:
         grid_key_id: int,
         output: Mapping[str, Any],
     ) -> bool:
+        output_mode = str(output["engine_mode"])
+        if self.backend_name is not None:
+            expected_mode = self._engine_mode_for_backend(self.backend_name)
+            if output_mode != expected_mode:
+                raise ValueError(
+                    "grid cache engine blend refused: "
+                    f"writer backend={self.backend_name!r} expects "
+                    f"engine_mode={expected_mode!r}, got {output_mode!r}"
+                )
+        output_backend_name = (
+            "subprocess" if output_mode == "subprocess" else output_mode
+        )
+
         row = self.connection.execute(
             "SELECT id, expedited_key FROM grid_keys WHERE id = ?",
             (int(grid_key_id),),
@@ -1334,6 +1507,9 @@ class GridCacheWriter:
         )
         write_section = self._begin_write_section("grid_key_claim_result")
         try:
+            # The scan must share the BEGIN IMMEDIATE section with the insert:
+            # otherwise opposite-engine writers can both observe an empty DB.
+            self._assert_backend_not_blended(output_backend_name)
             existing = self.connection.execute(
                 "SELECT 1 FROM alphamelts_outputs "
                 "WHERE expedited_key = ? AND engine_epoch = ?",
@@ -1380,6 +1556,8 @@ class GridCacheWriter:
             "status": str(output["status"]),
             "status_kind": str(output["status_kind"]),
             "refusal_reason": output.get("refusal_reason"),
+            "failure_reason_code": output.get("failure_reason_code"),
+            "failure_message": output.get("failure_message"),
             "raw_payload": str(output["raw_payload"]),
             "raw_payload_format": str(output["raw_payload_format"]),
             "timing_s": _float(output["timing_s"]),
@@ -1431,6 +1609,51 @@ class GridCacheWriter:
             ),
             "generic_liquid_density_kg_m3_repr": _repr(
                 generic.get("liquid_density_kg_m3")
+            ),
+            "generic_system_enthalpy": _float(generic.get("system_enthalpy")),
+            "generic_system_enthalpy_repr": _repr(generic.get("system_enthalpy")),
+            "generic_system_entropy": _float(generic.get("system_entropy")),
+            "generic_system_entropy_repr": _repr(generic.get("system_entropy")),
+            "generic_system_volume": _float(generic.get("system_volume")),
+            "generic_system_volume_repr": _repr(generic.get("system_volume")),
+            "generic_system_heat_capacity_Cp": _float(
+                generic.get("system_heat_capacity_Cp")
+            ),
+            "generic_system_heat_capacity_Cp_repr": _repr(
+                generic.get("system_heat_capacity_Cp")
+            ),
+            "generic_system_dVdP": _float(generic.get("system_dVdP")),
+            "generic_system_dVdP_repr": _repr(generic.get("system_dVdP")),
+            "generic_system_dVdT": _float(generic.get("system_dVdT")),
+            "generic_system_dVdT_repr": _repr(generic.get("system_dVdT")),
+            "generic_system_fO2_delta_QFM": _float(
+                generic.get("system_fO2_delta_QFM")
+            ),
+            "generic_system_fO2_delta_QFM_repr": _repr(
+                generic.get("system_fO2_delta_QFM")
+            ),
+            "generic_system_solid_density_rhos": _float(
+                generic.get("system_solid_density_rhos")
+            ),
+            "generic_system_solid_density_rhos_repr": _repr(
+                generic.get("system_solid_density_rhos")
+            ),
+            "generic_system_phi": _float(generic.get("system_phi")),
+            "generic_system_phi_repr": _repr(generic.get("system_phi")),
+            "generic_system_chisqr": _float(generic.get("system_chisqr")),
+            "generic_system_chisqr_repr": _repr(generic.get("system_chisqr")),
+            "generic_phase_thermo_json": _json(generic.get("phase_thermo")),
+            "generic_chem_potentials_json": _json(
+                generic.get("chem_potentials")
+            ),
+            "generic_phase_affinities_json": _json(
+                generic.get("phase_affinities")
+            ),
+            "generic_solid_composition_wt_pct_json": _json(
+                generic.get("solid_composition_wt_pct")
+            ),
+            "generic_bulk_composition_wt_pct_json": _json(
+                generic.get("bulk_composition_wt_pct")
             ),
             "generic_vapor_pressures_Pa_json": _json(generic.get("vapor_pressures_Pa")),
             "generic_vapor_pressures_source_json": _json(
@@ -1528,7 +1751,10 @@ class GridCacheWriter:
     def sample_row(self) -> dict[str, Any] | None:
         row = self.connection.execute(
             "SELECT o.id, o.expedited_key, h.temperature_C, h.pressure_bar, "
-            "h.intended_fO2_log, h.fO2_log AS adapter_fO2_log_argument, "
+            "h.intended_fO2_log, h.kress91_fixed_ferric_fraction, "
+            "CASE WHEN o.engine_mode = 'thermoengine' THEN NULL "
+            "ELSE h.fO2_log END AS adapter_fO2_log_argument, "
+            "o.generic_fO2_log AS solved_fO2_log, "
             "o.status, o.status_kind, o.engine_version, "
             "o.timing_s, o.generic_phases_present_json "
             "FROM alphamelts_outputs o JOIN grid_keys h ON h.id = o.grid_key_id "

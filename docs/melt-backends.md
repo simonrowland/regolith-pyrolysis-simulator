@@ -1,6 +1,6 @@
 # Melt Chemistry Backends
 
-In the current code path, `engines/builtin/vapor_pressure.py::BuiltinVaporPressureProvider` is the authoritative `VAPOR_PRESSURE` provider (Antoine + Ellingham). VapoRock is retained as a diagnostic-only shadow: it may emit full gas speciation for comparison, but it does not own the pressure dict consumed by evaporation and has no ledger authority. PetThermoTools / AlphaMELTS remain the live path for `SILICATE_EQUILIBRIUM`; MAGEMin remains the shadow / narrow-gate engine for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION`. `vaporock` and `petthermotools` are `[project.dependencies]` (required), not optional extras. MAGEMin is a compiled C/Fortran binary built from source per `pyproject.toml [magemin]`. FactSAGE / ChemApp is archived/removed in this checkout and is not selectable.
+In the current code path, `engines/builtin/vapor_pressure.py::BuiltinVaporPressureProvider` is the authoritative `VAPOR_PRESSURE` provider (Antoine + Ellingham). VapoRock is retained as a diagnostic-only shadow: it may emit full gas speciation for comparison, but it does not own the pressure dict consumed by evaporation and has no ledger authority. AlphaMELTS and ThermoEngine are peer diagnostic backends for `SILICATE_EQUILIBRIUM`; MAGEMin remains the shadow / narrow-gate engine for `SILICATE_LIQUIDUS` and `GATE_LIQUID_FRACTION`. `vaporock` and `petthermotools` are `[project.dependencies]` (required), not optional extras. MAGEMin is a compiled C/Fortran binary built from source per `pyproject.toml [magemin]`. FactSAGE / ChemApp is archived/removed in this checkout and is not selectable.
 
 ## Per-call result status
 
@@ -8,10 +8,10 @@ In the current code path, `engines/builtin/vapor_pressure.py::BuiltinVaporPressu
 
 ## Backend Order
 
-`web/events.py::_get_backend` is the single source of truth for active-backend selection. The active-backend eligibility policy
+`simulator/backends.py::resolve_backend` is the single source of truth for active-backend selection. The active-backend eligibility policy
 (see `\goal BACKEND-DEFAULT-SWITCH`, 2026-05-14) is:
 
-1. **AlphaMELTS** is probed first. If `is_available()` (PetThermoTools or the project-local `alphamelts` binary at `engines/alphamelts/run_alphamelts.command`, or `alphamelts` on `PATH`) — selected as the active backend.
+1. **AlphaMELTS** uses the subprocess transport by default (`DEFAULT_ALPHAMELTS_MODE='subprocess'`). **ThermoEngine** is a separate first-class peer backend, selected explicitly with `backend_name='thermoengine'`; it is not an AlphaMELTS transport mode. Both are diagnostic-only and have no ledger authority.
 2. **`InternalAnalyticalBackend`** is the always-available fallback for `auto` when AlphaMELTS is unavailable (built-in Ellingham/Antoine path inside `simulator/core.py`). This is the **`internal-analytical`** model in trust-architecture vocabulary (legacy name `stub`). An explicit `backend=internal-analytical` request (alias `stub`) pins it deterministically without probing AlphaMELTS.
 3. **FactSAGE / ChemApp** is not probed. The adapter was removed/archived; explicit `backend=factsage` is an unknown backend and raises instead of falling through to `auto`.
 
@@ -76,10 +76,8 @@ Test coverage: `tests/chemistry/test_vaporock_authority_promotion.py` (historica
 
 ## AlphaMELTS Adapter Notes
 
-- Transport selection is `thermoengine` -> `python_api` -> `subprocess` when
-  available. `thermoengine` is a transport behind the existing
-  `AlphaMELTSProvider`, not a new provider or authority.
-- The PetThermoTools fallback imports `petthermotools` and preloads `meltsdynamic.MELTSdynamic` during initialization.
+- The production AlphaMELTS transport is `subprocess` (the default). ThermoEngine does not participate in AlphaMELTS transport selection: `resolve_backend` selects the peer `ThermoEngineBackend` only for the explicit `thermoengine` backend name.
+- Both AlphaMELTS and ThermoEngine feed diagnostic silicate results through the kernel provider surface; neither emits a ledger transition.
 - Inputs are gated to `process.cleaned_melt` silicate oxides and normalized to the 14-oxide MELTS basis.
 - Gas, metal, salt, sulfide, halide, and low-major-oxide material is rejected before the engine.
 - `FeO_total` requires `QFM`, `NNO`, `IW`, `HM`, or configured `Fe3Fet`; no silent split.
@@ -98,11 +96,11 @@ where `mu_i` is the melt chemical potential in J/mol and `mu_i0` is the pure-end
 
 Do not interpret a MELTS chemical potential as an activity coefficient `gamma`, and do not compute `P_i = gamma_i * x_i * P_i0` from a chemical-potential engine. That mixes conventions: the mole-fraction term is already embedded in the activity defined by `mu - mu0`. The error is silent and can be O(10^n) in vapor pressure because it exponentiates through `RT`.
 
-ThermoEngine mode populates the AlphaMELTS activity field from live `mu/mu0`
-API calls. The PetThermoTools fallback still reports activities absent unless
-it exposes a verified live `mu/mu0` pair. VapoRock performs its own
-`mu -> a` conversion internally for diagnostic gas speciation; the AlphaMELTS
-activity field is diagnostic transport metadata, not ledger authority.
+`ThermoEngineBackend` populates the shared MELTS diagnostic activity field from
+live `mu/mu0` API calls. The AlphaMELTS subprocess path reports activities only
+when its parsed output provides them. VapoRock performs its own `mu -> a`
+conversion internally for diagnostic gas speciation; MELTS activity data is
+diagnostic transport metadata, not ledger authority.
 
 ## MAGEMin adapter notes
 
