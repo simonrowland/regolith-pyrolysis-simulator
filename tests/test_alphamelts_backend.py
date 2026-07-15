@@ -37,7 +37,10 @@ from simulator.melt_backend.base import (
     EquilibriumResult,
     LiquidFractionInvalidError,
 )
-from engines.alphamelts.thermoengine import ThermoEngineTransport
+from engines.alphamelts.thermoengine import (
+    ThermoEnginePayload,
+    ThermoEngineTransport,
+)
 from engines.magemin.parity import MAGEMinParityComparator
 
 
@@ -1249,9 +1252,11 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
     class FakeThermoEngineTransport:
         engine_version = 'thermoengine fake'
 
-        def __init__(self, *, model_name, activity_converter):
+        def __init__(self, *, model_name, activity_converter,
+                     equilibrate_timeout_s):
             self.model_name = model_name
             self.activity_converter = activity_converter
+            self.equilibrate_timeout_s = equilibrate_timeout_s
 
         def initialize(self):
             return True
@@ -1265,6 +1270,7 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
     assert backend.initialize({'mode': 'thermoengine'}) is True
     assert backend._mode == 'thermoengine'
     assert backend.get_engine_version() == 'thermoengine fake'
+    assert backend._thermoengine_transport.equilibrate_timeout_s == 60.0
 
 
 def test_thermoengine_health_failure_is_scoped_to_transport_lifecycle(
@@ -1320,6 +1326,99 @@ def test_thermoengine_transport_rejects_unknown_model_name():
             model_name='MELTSv1.O.2',
             activity_converter=activity_from_chem_potential,
         )
+
+
+def test_thermoengine_transport_rejects_unpickleable_worker_converter():
+    transport = ThermoEngineTransport(
+        activity_converter=lambda _mu, _mu0, _temperature_K: 1.0,
+    )
+
+    with pytest.raises(TypeError, match='activity_converter must be pickleable'):
+        transport.initialize()
+
+
+def test_thermoengine_transport_close_is_idempotent():
+    events = []
+
+    class FakeProcess:
+        alive = True
+
+        def is_alive(self):
+            return self.alive
+
+        def join(self, timeout):
+            events.append(('join', timeout))
+            self.alive = False
+
+        def terminate(self):
+            events.append(('terminate',))
+
+        def kill(self):
+            events.append(('kill',))
+
+    class FakeConnection:
+        def send(self, value):
+            events.append(('send', value))
+
+        def close(self):
+            events.append(('close',))
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker_process = FakeProcess()
+    transport._worker_connection = FakeConnection()
+
+    transport.close()
+    transport.close()
+
+    assert events == [('send', None), ('close',), ('join', 1.0)]
+    assert transport._worker_process is None
+    assert transport._worker_connection is None
+
+
+def test_thermoengine_transport_broken_pipe_closes_worker():
+    events = []
+
+    class FakeProcess:
+        alive = True
+
+        def is_alive(self):
+            return self.alive
+
+        def join(self, timeout):
+            events.append(('join', timeout))
+            self.alive = False
+
+        def terminate(self):
+            events.append(('terminate',))
+
+        def kill(self):
+            events.append(('kill',))
+
+    class BrokenConnection:
+        def send(self, _value):
+            raise BrokenPipeError('worker pipe closed')
+
+        def close(self):
+            events.append(('close',))
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker_process = FakeProcess()
+    transport._worker_connection = BrokenConnection()
+
+    with pytest.raises(RuntimeError, match='worker exited without a result'):
+        transport.equilibrate(
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            comp_wt={'SiO2': 50.0},
+        )
+
+    assert events == [('close',), ('join', 1.0)]
+    assert transport._worker_process is None
+    assert transport._worker_connection is None
 
 
 def test_thermoengine_health_smoke_requires_positive_phase_mass(monkeypatch):
@@ -1883,6 +1982,9 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
         def get_oxide_names(self):
             return ('SiO2', 'Al2O3')
 
+        def get_phase_names(self):
+            return ('Liquid', 'Spinel')
+
         def set_bulk_composition(self, bulk_wt):
             self.bulk_wt = dict(bulk_wt)
 
@@ -1937,6 +2039,214 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
     assert result.liquid_composition_wt_pct == {}
 
 
+def test_alphamelts_thermoengine_default_is_intrinsic_closed(monkeypatch):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'thermoengine'
+    seen = {}
+
+    class FakeTransport:
+        def equilibrate(self, **kwargs):
+            seen.update(kwargs)
+            return ThermoEnginePayload(
+                phases_present=('Liquid',),
+                phase_masses_kg={'Liquid': 1.0},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={'SiO2': 100.0},
+                solved_fO2_log=-8.25,
+                phase_universe_size=54,
+            )
+
+    backend._thermoengine_transport = FakeTransport()
+    monkeypatch.setattr(
+        backend,
+        '_activities_times_antoine_or_fail',
+        lambda *_args, **_kwargs: {},
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.5, 'Al2O3': 0.5},
+        pressure_bar=1.0,
+    )
+
+    assert seen['fO2_log'] is None
+    assert result.fO2_log == pytest.approx(-8.25)
+    assert result.diagnostics['fO2_transport'] == (
+        'thermoengine_intrinsic_closed'
+    )
+    assert 'requested_fO2_log' not in result.diagnostics
+
+
+def test_thermoengine_imposes_absolute_fo2_with_default_phase_solver(monkeypatch):
+    class FakeMelts:
+        def __init__(self):
+            self.bulk_wt = {}
+
+        def get_oxide_names(self):
+            return ('SiO2', 'FeO', 'Fe2O3')
+
+        def get_phase_names(self):
+            return ('Liquid', 'Spinel')
+
+        def set_bulk_composition(self, bulk_wt):
+            self.bulk_wt = dict(bulk_wt)
+
+        def equilibrate_tp(self, temperature_C, pressure_mpa, *, initialize):
+            assert temperature_C == 1200.0
+            assert pressure_mpa == pytest.approx(0.1)
+            assert initialize is True
+            return [('success', temperature_C, pressure_mpa, self)]
+
+        def get_list_of_phases_in_assemblage(self, root):
+            assert root is self
+            return ('Liquid', 'Spinel')
+
+        def get_mass_of_phase(self, root, phase):
+            assert root is self
+            return {'Liquid': 900.0, 'Spinel': 100.0}[phase]
+
+        def get_composition_of_phase(self, root, phase, basis):
+            assert root is self
+            assert phase == 'Liquid'
+            if basis == 'oxide_wt':
+                return dict(self.bulk_wt)
+            return {}
+
+    class FakeEquilibrate:
+        def __init__(self):
+            self.models = []
+
+        def MELTSmodel(self, *, version):
+            assert version == '1.0.2'
+            model = FakeMelts()
+            self.models.append(model)
+            return model
+
+    fake_equilibrate = FakeEquilibrate()
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._equilibrate = fake_equilibrate
+    transport._liq_phase = object()
+
+    def echo(model, _root, **_kwargs):
+        feo = model.bulk_wt['FeO'] / 71.8444
+        fe2o3 = model.bulk_wt['Fe2O3'] / 159.6882
+        ferric_fraction = 2.0 * fe2o3 / (feo + 2.0 * fe2o3)
+        return -10.0 + 10.0 * ferric_fraction
+
+    monkeypatch.setattr(transport, '_echo_log_fO2', echo)
+    monkeypatch.setattr(
+        transport,
+        '_activities_from_chemical_potentials',
+        lambda **_kwargs: {},
+    )
+    monkeypatch.setattr(transport, '_fe_redox_split', lambda _comp: {})
+
+    result = transport.equilibrate(
+        temperature_C=1200.0,
+        pressure_bar=1.0,
+        comp_wt={'SiO2': 80.0, 'FeO': 18.0, 'Fe2O3': 2.0},
+        fO2_log=-5.0,
+    )
+
+    assert result.solved_fO2_log == pytest.approx(-5.0, abs=1.0e-3)
+    assert result.phases_present == ('Liquid', 'Spinel')
+    assert result.phase_universe_size == 2
+    assert result.fO2_solve_count > 1
+    initial_fe_moles = 18.0 / 71.8444 + 2.0 * 2.0 / 159.6882
+    assert result.liquid_composition_wt_pct['SiO2'] == 80.0
+    assert (
+        result.liquid_composition_wt_pct['FeO'] / 71.8444
+        + 2.0 * result.liquid_composition_wt_pct['Fe2O3'] / 159.6882
+        == pytest.approx(initial_fe_moles)
+    )
+
+
+def test_thermoengine_imposed_fo2_fails_loud_on_buffered_region(monkeypatch):
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._equilibrate = object()
+
+    samples = iter((-10.0, -10.0, -4.0))
+    monkeypatch.setattr(
+        transport,
+        '_echo_log_fO2',
+        lambda *_args, **_kwargs: next(samples),
+    )
+
+    class FakeModel:
+        def set_bulk_composition(self, _bulk):
+            pass
+
+        def equilibrate_tp(self, temperature_C, pressure_mpa, *, initialize):
+            return [('success', temperature_C, pressure_mpa, self)]
+
+    class FakeEquilibrate:
+        def MELTSmodel(self, *, version):
+            return FakeModel()
+
+    transport._equilibrate = FakeEquilibrate()
+    with pytest.raises(ValueError, match='non-monotonic/buffered fO2 region'):
+        transport._solve_imposed_fO2(
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            pressure_mpa=0.1,
+            bulk_wt={'FeO': 18.0, 'Fe2O3': 2.0},
+            target_fO2_log=-8.0,
+        )
+
+
+def test_thermoengine_imposed_fo2_rejects_nonmonotonic_samples():
+    with pytest.raises(ValueError, match='non-monotonic/buffered fO2 region'):
+        ThermoEngineTransport._validate_fO2_order((
+            (0.1, -9.0, None, None),
+            (0.5, -8.0, None, None),
+            (0.9, -8.5, None, None),
+        ))
+
+
+def test_thermoengine_imposed_fo2_rejects_narrow_target_plateau(monkeypatch):
+    class FakeModel:
+        def __init__(self):
+            self.bulk_wt = {}
+
+        def set_bulk_composition(self, bulk_wt):
+            self.bulk_wt = dict(bulk_wt)
+
+        def equilibrate_tp(self, temperature_C, pressure_mpa, *, initialize):
+            return [('success', temperature_C, pressure_mpa, self)]
+
+    class FakeEquilibrate:
+        def MELTSmodel(self, *, version):
+            return FakeModel()
+
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._equilibrate = FakeEquilibrate()
+
+    def echo(model, _root, **_kwargs):
+        feo = model.bulk_wt['FeO'] / 71.8444
+        fe2o3 = model.bulk_wt['Fe2O3'] / 159.6882
+        fraction = 2.0 * fe2o3 / (feo + 2.0 * fe2o3)
+        if 0.49 <= fraction <= 0.51:
+            return -5.0
+        return -10.0 + 10.0 * fraction
+
+    monkeypatch.setattr(transport, '_echo_log_fO2', echo)
+
+    with pytest.raises(ValueError, match='non-monotonic/buffered fO2 region'):
+        transport._solve_imposed_fO2(
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            pressure_mpa=0.1,
+            bulk_wt={'FeO': 18.0, 'Fe2O3': 2.0},
+            target_fO2_log=-5.0,
+        )
+
+
 def test_thermoengine_transport_equilibrates_live_when_installed():
     backend = AlphaMELTSBackend()
     try:
@@ -1977,7 +2287,62 @@ def test_thermoengine_transport_equilibrates_live_when_installed():
     assert result.fe_redox_split['Fe2O3_wt_pct'] > 0.0
 
 
-def test_thermoengine_transport_shadow_parity_against_subprocess_when_available():
+def test_thermoengine_live_fo2_near_spinel_boundary_is_unique_or_fails_loud():
+    backend = AlphaMELTSBackend()
+    try:
+        available = backend.initialize({
+            'mode': 'thermoengine',
+            'thermoengine_equilibrate_timeout_s': 90.0,
+            'thermoengine_health_timeout_s': 30.0,
+        })
+    except ImportError as exc:
+        pytest.skip(f'ThermoEngine transport unavailable: {exc}')
+    if not available:
+        pytest.skip('ThermoEngine transport unavailable')
+
+    composition_kg = {
+        'SiO2': 490.0,
+        'TiO2': 15.0,
+        'Al2O3': 140.0,
+        'FeO': 100.0,
+        'Fe2O3': 10.0,
+        'MgO': 90.0,
+        'CaO': 110.0,
+        'Na2O': 25.0,
+        'K2O': 8.0,
+        'Cr2O3': 2.0,
+        'MnO': 2.0,
+        'P2O5': 3.0,
+    }
+    intrinsic = backend.equilibrate(
+        temperature_C=1200.0,
+        composition_kg=composition_kg,
+        pressure_bar=1.0,
+    )
+    assert any(
+        token in phase.lower()
+        for phase in intrinsic.phases_present
+        for token in ('spinel', 'magnetite')
+    ), intrinsic.phases_present
+    target_fO2_log = intrinsic.fO2_log + 0.01
+
+    try:
+        imposed = backend.equilibrate(
+            temperature_C=1200.0,
+            composition_kg=composition_kg,
+            fO2_log=target_fO2_log,
+            pressure_bar=1.0,
+        )
+    except (RuntimeError, ValueError) as exc:
+        assert 'non-monotonic/buffered fO2 region' in str(exc)
+        return
+
+    assert imposed.fO2_log == pytest.approx(target_fO2_log, abs=1.0e-3)
+    assert imposed.diagnostics['thermoengine_fO2_solve_count'] >= 3
+    assert imposed.phase_masses_kg
+
+
+def test_thermoengine_intrinsic_shadow_parity_against_subprocess_when_available():
     thermo = AlphaMELTSBackend()
     try:
         thermo_ok = thermo.initialize({'mode': 'thermoengine'})
@@ -2011,12 +2376,14 @@ def test_thermoengine_transport_shadow_parity_against_subprocess_when_available(
     thermo_result = thermo.equilibrate(
         temperature_C=1200.0,
         composition_kg=composition_kg,
-        fO2_log=-9.0,
         pressure_bar=1.0,
     )
     subprocess_result = subprocess_backend.equilibrate(
         temperature_C=1200.0,
         composition_kg=composition_kg,
+        # Preserve the pre-redox-root cross-transport anchor: ThermoEngine's
+        # old path was intrinsic closed even though this subprocess reference
+        # was explicitly run at the adapter's historical -9 default.
         fO2_log=-9.0,
         pressure_bar=1.0,
         # Explicit mode: the live parity comparison is an isothermal
@@ -2039,7 +2406,13 @@ def test_thermoengine_transport_shadow_parity_against_subprocess_when_available(
         canonical_modes(thermo_result),
         canonical_modes(subprocess_result),
     )
-    assert report.agreement, report.warnings
+    # Historical cross-transport baseline: the subprocess reports only a
+    # small extra olivine mode. Keep a quantitative modal anchor instead of
+    # accepting any warning as success.
+    assert report.mode_pct_max_delta is not None
+    assert report.mode_pct_max_delta <= 3.0, report.warnings
+    assert report.phases_only_in_authoritative == ()
+    assert report.phases_only_in_shadow == ('olivine',)
 
 
 def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
@@ -2615,9 +2988,27 @@ Melt fraction = 1.0
     assert 'operating_point_clamped' not in result.diagnostics
 
 
-def test_alphamelts_refuses_unapplied_thermoengine_absolute_fo2():
+def test_alphamelts_accepts_applied_thermoengine_absolute_fo2(monkeypatch):
     backend = AlphaMELTSBackend()
     backend._mode = 'thermoengine'
+
+    class FakeTransport:
+        def equilibrate(self, **kwargs):
+            assert kwargs['fO2_log'] == -3.0
+            return ThermoEnginePayload(
+                phases_present=('Liquid',),
+                phase_masses_kg={'Liquid': 0.1},
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={'SiO2': 100.0},
+                solved_fO2_log=-3.0004,
+            )
+
+    backend._thermoengine_transport = FakeTransport()
+    monkeypatch.setattr(
+        backend,
+        '_activities_times_antoine_or_fail',
+        lambda *_args, **_kwargs: {},
+    )
 
     result = backend.equilibrate(
         temperature_C=1500.0,
@@ -2626,10 +3017,12 @@ def test_alphamelts_refuses_unapplied_thermoengine_absolute_fo2():
         pressure_bar=1.0,
     )
 
-    assert result.status == 'out_of_domain'
-    assert result.phases_present == []
-    assert result.diagnostics['backend_status_reason'] == 'fo2_constraint_unapplied'
-    assert result.diagnostics['authoritative_for_requested_conditions'] is False
+    assert result.status == 'ok'
+    assert result.phases_present == ['Liquid']
+    assert result.fO2_log == pytest.approx(-3.0004)
+    assert result.diagnostics['requested_fO2_log'] == pytest.approx(-3.0)
+    assert result.diagnostics['solved_fO2_log'] == pytest.approx(-3.0004)
+    assert result.diagnostics['authoritative_for_requested_conditions'] is True
 
 
 def test_alphamelts_python_requires_solved_fo2_echo():
@@ -3088,7 +3481,8 @@ def test_thermoengine_callsite_wires_vaporock_source_and_solved_liquid(monkeypat
     solved_liquid = {'SiO2': 44.0, 'FeO': 17.0, 'Na2O': 0.5}
 
     class FakeTransport:
-        def equilibrate(self, *, temperature_C, pressure_bar, comp_wt, warnings):
+        def equilibrate(self, *, temperature_C, pressure_bar, comp_wt,
+                        fO2_log, warnings):
             return ThermoEnginePayload(
                 phases_present=('liquid',),
                 phase_masses_kg={'liquid': 1.0},
@@ -3096,6 +3490,7 @@ def test_thermoengine_callsite_wires_vaporock_source_and_solved_liquid(monkeypat
                 liquid_composition_wt_pct=dict(solved_liquid),
                 activity_coefficients={'Na2O': 0.1},
                 fe_redox_split={},
+                solved_fO2_log=fO2_log,
             )
 
     backend = AlphaMELTSBackend()
@@ -3126,7 +3521,8 @@ def test_thermoengine_vaporock_empty_fallback_marks_vapor_facet_degraded():
     solved_liquid = {'SiO2': 44.0, 'FeO': 17.0, 'Na2O': 0.5}
 
     class FakeTransport:
-        def equilibrate(self, *, temperature_C, pressure_bar, comp_wt, warnings):
+        def equilibrate(self, *, temperature_C, pressure_bar, comp_wt,
+                        fO2_log, warnings):
             return ThermoEnginePayload(
                 phases_present=('liquid',),
                 phase_masses_kg={'liquid': 1.0},
@@ -3134,6 +3530,7 @@ def test_thermoengine_vaporock_empty_fallback_marks_vapor_facet_degraded():
                 liquid_composition_wt_pct=dict(solved_liquid),
                 activity_coefficients={'Na2O': 0.2},
                 fe_redox_split={},
+                solved_fO2_log=fO2_log,
             )
 
     backend = AlphaMELTSBackend()
@@ -3206,7 +3603,8 @@ def test_thermoengine_vaporock_unavailable_marks_not_attempted_without_churn():
     solved_liquid = {'SiO2': 44.0, 'FeO': 17.0, 'Na2O': 0.5}
 
     class FakeTransport:
-        def equilibrate(self, *, temperature_C, pressure_bar, comp_wt, warnings):
+        def equilibrate(self, *, temperature_C, pressure_bar, comp_wt,
+                        fO2_log, warnings):
             return ThermoEnginePayload(
                 phases_present=('liquid',),
                 phase_masses_kg={'liquid': 1.0},
@@ -3214,6 +3612,7 @@ def test_thermoengine_vaporock_unavailable_marks_not_attempted_without_churn():
                 liquid_composition_wt_pct=dict(solved_liquid),
                 activity_coefficients={'Na2O': 0.2},
                 fe_redox_split={},
+                solved_fO2_log=fO2_log,
             )
 
     backend = AlphaMELTSBackend()

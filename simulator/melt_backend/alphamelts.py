@@ -344,6 +344,7 @@ class AlphaMELTSBackend(MeltBackend):
         4. ThermoEngine Python package (explicit ``mode='thermoengine'``)
         """
         config = self._alphamelts_config(config)
+        self.close()
         requested_mode = self._normalize_mode(config.get('mode'))
         self._mode = None
         self._engine_path = None
@@ -373,6 +374,8 @@ class AlphaMELTSBackend(MeltBackend):
                 self._thermoengine_transport = ThermoEngineTransport(
                     model_name=self._model,
                     activity_converter=activity_from_chem_potential,
+                    equilibrate_timeout_s=float(config.get(
+                        'thermoengine_equilibrate_timeout_s', 60.0)),
                 )
                 self._thermoengine_transport.initialize()
                 health_check = getattr(
@@ -392,6 +395,8 @@ class AlphaMELTSBackend(MeltBackend):
                 self._engine_version = self._thermoengine_transport.engine_version
                 self._mode = 'thermoengine'
             except Exception as exc:  # noqa: BLE001 - optional engine boundary
+                if self._thermoengine_transport is not None:
+                    self._thermoengine_transport.close()
                 self._thermoengine_transport = None
                 self._thermoengine_import_error = exc
                 if require_thermoengine:
@@ -470,6 +475,11 @@ class AlphaMELTSBackend(MeltBackend):
             )
 
         return self._mode is not None
+
+    def close(self) -> None:
+        """Idempotently release transport-owned native resources."""
+        if self._thermoengine_transport is not None:
+            self._thermoengine_transport.close()
 
     def _initialize_petthermotools(
         self,
@@ -689,7 +699,7 @@ class AlphaMELTSBackend(MeltBackend):
 
     def equilibrate(self, temperature_C: float,
                     composition_kg: Optional[Dict[str, float]] = None,
-                    fO2_log: float = -9.0,
+                    fO2_log: Optional[float] = None,
                     pressure_bar: float = 1e-6,
                     *,
                     composition_mol: Optional[Dict[str, float]] = None,
@@ -702,6 +712,12 @@ class AlphaMELTSBackend(MeltBackend):
 
         Routes to the appropriate engine based on available mode.
         """
+        if fO2_log is None and self._mode != 'thermoengine':
+            raise ValueError(
+                'intrinsic closed-system fO2 is supported only by the '
+                'ThermoEngine transport; other transports require an '
+                'explicit absolute fO2_log'
+            )
         if composition_mol_by_account is not None:
             unsupported = self._unsupported_accounts(composition_mol_by_account)
             if unsupported:
@@ -795,12 +811,12 @@ class AlphaMELTSBackend(MeltBackend):
         warnings = list(self._last_normalization_warnings)
 
         if self._mode == 'thermoengine':
-            return self._unapplied_absolute_fo2_result(
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                fO2_log=fO2_log,
-                transport='thermoengine',
-                warnings=warnings,
+            return self._equilibrate_thermoengine(
+                temperature_C,
+                comp_wt,
+                fO2_log,
+                pressure_bar,
+                warnings,
             )
         elif self._mode == 'python_api':
             return self._equilibrate_python(
@@ -1211,7 +1227,7 @@ class AlphaMELTSBackend(MeltBackend):
         *,
         temperature_C: float,
         pressure_bar: float,
-        fO2_log: float,
+        fO2_log: Optional[float],
         composition_wt_pct: Optional[Mapping[str, float]] = None,
         composition_melts_wt_pct: Optional[Mapping[str, float]] = None,
         composition_mol: Optional[Mapping[str, float]] = None,
@@ -1223,7 +1239,6 @@ class AlphaMELTSBackend(MeltBackend):
         crash_point: dict[str, object] = {
             'temperature_C': float(temperature_C),
             'pressure_bar': float(pressure_bar),
-            'fO2_log': float(fO2_log),
             'composition_wt_pct': self._finite_positive_mapping(
                 composition_wt_pct or {}
             ),
@@ -1231,6 +1246,8 @@ class AlphaMELTSBackend(MeltBackend):
                 composition_mol or {}
             ),
         }
+        if fO2_log is not None:
+            crash_point['fO2_log'] = float(fO2_log)
         melts_wt = self._finite_positive_mapping(composition_melts_wt_pct or {})
         if melts_wt:
             crash_point['composition_melts_wt_pct'] = melts_wt
@@ -1529,8 +1546,40 @@ class AlphaMELTSBackend(MeltBackend):
                 temperature_C=temperature_C,
                 pressure_bar=solved_pressure_bar,
                 comp_wt=comp_wt,
+                fO2_log=fO2_log,
                 warnings=tuple(result_warnings),
             )
+            if payload.solved_fO2_log is None:
+                raise RuntimeError(
+                    'ThermoEngine equilibrium did not report a solved fO2'
+                )
+            solved_fO2_log = float(payload.solved_fO2_log)
+            if fO2_log is None:
+                echo_delta = None
+                fO2_transport = 'thermoengine_intrinsic_closed'
+            else:
+                echo_delta = abs(solved_fO2_log - float(fO2_log))
+                if echo_delta >= 1.0e-3:
+                    raise RuntimeError(
+                        'ThermoEngine absolute fO2 echo outside tolerance: '
+                        f'requested={float(fO2_log):g}, '
+                        f'solved={solved_fO2_log:g}'
+                    )
+                fO2_transport = 'thermoengine_oxygen_root'
+                clamp_diagnostics['requested_fO2_log'] = float(fO2_log)
+                clamp_diagnostics['fO2_echo_abs_delta'] = echo_delta
+            clamp_diagnostics.update({
+                'solved_fO2_log': float(payload.solved_fO2_log),
+                'fO2_transport': fO2_transport,
+                'thermoengine_default_phase_universe_size': (
+                    payload.phase_universe_size
+                ),
+                'thermoengine_fO2_solve_count': payload.fO2_solve_count,
+                'authoritative_for_requested_conditions': not bool(
+                    clamp_diagnostics.get('operating_point_clamped')
+                ),
+                'authoritative_for_solved_conditions': True,
+            })
             status = 'ok' if payload.phases_present else 'not_converged'
             if self._vaporock_available:
                 vapor_pressures, vapor_pressure_source = (
@@ -1538,7 +1587,7 @@ class AlphaMELTSBackend(MeltBackend):
                         T_C=temperature_C,
                         solved_melt_wt_pct=payload.liquid_composition_wt_pct,
                         liquid_fraction=payload.liquid_fraction,
-                        fO2_log=fO2_log,
+                        fO2_log=solved_fO2_log,
                         pressure_bar=solved_pressure_bar,
                         activities=payload.activity_coefficients,
                     )
@@ -1561,7 +1610,7 @@ class AlphaMELTSBackend(MeltBackend):
             eq = self._emit_equilibrium_result(
                 temperature_C=temperature_C,
                 pressure_bar=solved_pressure_bar,
-                fO2_log=fO2_log,
+                fO2_log=float(payload.solved_fO2_log),
                 phases_present=list(payload.phases_present),
                 phase_masses_kg=payload.phase_masses_kg,
                 liquid_fraction=payload.liquid_fraction,
