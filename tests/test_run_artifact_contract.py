@@ -202,18 +202,60 @@ def test_available_optional_header_fields_keep_verified_shapes(monkeypatch) -> N
     assert artifact["header"]["recipe_snapshot"] == payload["recipe_snapshot"]
     assert artifact["header"]["effective_config"] == payload["effective_config"]
     assert artifact["header"]["effective_config"] is not payload["effective_config"]
+    # Deep copy, not shallow: mutating a nested source entry must not reach
+    # the already-built header (stored bytes are authoritative/immutable).
+    payload["effective_config"]["mass_kg"]["value"] = -1.0
+    assert artifact["header"]["effective_config"]["mass_kg"]["value"] == 1000.0
     assert "cost_block" not in artifact["header"]
     assert artifact["header"]["engine_identity"]["cache_version"] == "stub-cache-v1"
 
 
-@pytest.mark.parametrize("c3_dose", [{"Na": 1.25}, {"K": 0.5}, None])
-def test_incomplete_c3_dose_is_omitted_without_fabricated_zero(c3_dose) -> None:
+@pytest.mark.parametrize(
+    ("c3_dose", "expected"),
+    [
+        # A single-species dose is real data — emit exactly that species,
+        # without fabricating a 0.0 for the other one.
+        ({"Na": 1.25}, {"Na_kg": 1.25}),
+        ({"K": 0.5}, {"K_kg": 0.5}),
+    ],
+)
+def test_partial_c3_dose_emits_present_species_only(c3_dose, expected) -> None:
+    payload = _runner_payload()
+    payload["run_metadata"]["c3_alkali_credit_dose_kg_by_species"] = c3_dose
+
+    artifact = build_run_artifact(payload, run_id="run-partial-c3")
+
+    assert artifact["header"]["c3_dose"] == expected
+
+
+@pytest.mark.parametrize("c3_dose", [None, {}, {"Na": None, "K": None}])
+def test_empty_c3_dose_is_omitted_without_fabricated_zero(c3_dose) -> None:
     payload = _runner_payload()
     payload["run_metadata"]["c3_alkali_credit_dose_kg_by_species"] = c3_dose
 
     artifact = build_run_artifact(payload, run_id="run-incomplete-c3")
 
     assert "c3_dose" not in artifact["header"]
+
+
+def test_empty_setpoints_patch_yields_truthful_default_run_snapshot() -> None:
+    # A default run overrides nothing: an EMPTY patch recorded as empty IS the
+    # honest snapshot (omitting it would strip reproducibility from every
+    # default run). Only a missing/mistyped patch disqualifies the snapshot.
+    payload = _runner_payload()
+    payload["recipe_snapshot"] = {
+        "setpoints_patch": {},
+        "pins": [],
+        "recipe_schema_version": "recipe-schema-v1",
+    }
+
+    artifact = build_run_artifact(payload, run_id="run-default-snapshot")
+
+    assert artifact["header"]["recipe_snapshot"]["setpoints_patch"] == {}
+    assert (
+        artifact["header"]["recipe_snapshot"]["recipe_schema_version"]
+        == "recipe-schema-v1"
+    )
 
 
 def test_none_effective_config_is_omitted() -> None:

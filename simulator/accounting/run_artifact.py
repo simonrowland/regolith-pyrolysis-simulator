@@ -32,7 +32,9 @@ def _recipe_snapshot(runner_payload: dict[str, Any]) -> dict[str, Any] | None:
     setpoints_patch = source.get("setpoints_patch")
     pins = source.get("pins")
     recipe_schema_version = source.get("recipe_schema_version")
-    if not isinstance(setpoints_patch, Mapping) or not setpoints_patch:
+    # An EMPTY patch is a truthful snapshot of a default run (nothing was
+    # overridden) — only a missing/mistyped patch disqualifies the snapshot.
+    if not isinstance(setpoints_patch, Mapping):
         return None
     if pins is None or not recipe_schema_version:
         return None
@@ -100,15 +102,18 @@ def build_run_artifact(
     if seed is not None:
         header["seed"] = seed
     c3_dose = run_metadata.get("c3_alkali_credit_dose_kg_by_species")
-    if (
-        isinstance(c3_dose, Mapping)
-        and c3_dose.get("Na") is not None
-        and c3_dose.get("K") is not None
-    ):
-        header["c3_dose"] = {
-            "Na_kg": c3_dose["Na"],
-            "K_kg": c3_dose["K"],
+    if isinstance(c3_dose, Mapping):
+        # Emit exactly the species the runner recorded: a single-species dose is
+        # real data (dropping it loses the dose; padding the other species with
+        # 0.0 fabricates a dose that never happened). Omit the block only when
+        # no species is present.
+        dose_out = {
+            f"{species}_kg": c3_dose[species]
+            for species in ("Na", "K")
+            if c3_dose.get(species) is not None
         }
+        if dose_out:
+            header["c3_dose"] = dose_out
     recipe_snapshot = _recipe_snapshot(runner_payload)
     if recipe_snapshot is not None:
         header["recipe_snapshot"] = recipe_snapshot
