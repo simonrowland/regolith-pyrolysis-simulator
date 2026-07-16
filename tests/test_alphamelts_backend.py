@@ -1,3 +1,5 @@
+import contextlib
+import io
 import math
 import inspect
 import subprocess
@@ -2057,13 +2059,46 @@ def test_thermoengine_transport_pipe_close_failure_still_joins_worker():
     assert transport._worker_connection is None
 
 
-def test_thermoengine_health_smoke_requires_positive_phase_mass(monkeypatch):
-    def fake_run(args, **kwargs):
-        code = args[-1]
-        assert 'positive_phase_mass_kg' in code
-        assert 'payload.phase_masses_kg' in code
-        return subprocess.CompletedProcess(args, 0, stdout='ok\n', stderr='')
+@pytest.mark.parametrize(
+    ('solved_fO2_log', 'expected_ok'),
+    [(-9.0, True), (-8.0, False)],
+)
+def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
+    monkeypatch, solved_fO2_log, expected_ok,
+):
+    class FakeTransport:
+        def __init__(self, **_kwargs):
+            pass
 
+        def _initialize_in_process(self):
+            pass
+
+        def _equilibrate_in_process(self, **_kwargs):
+            return ThermoEnginePayload(
+                phases_present=('Liquid',),
+                phase_masses_kg={'Liquid': 1.0},
+                solved_fO2_log=solved_fO2_log,
+            )
+
+    def fake_run(args, **kwargs):
+        stdout = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(stdout):
+                exec(args[-1], {})
+        except Exception as exc:  # noqa: BLE001 - emulate child process boundary
+            return subprocess.CompletedProcess(
+                args,
+                1,
+                stdout=stdout.getvalue(),
+                stderr=f'{type(exc).__name__}: {exc}\n',
+            )
+        return subprocess.CompletedProcess(
+            args, 0, stdout=stdout.getvalue(), stderr='',
+        )
+
+    monkeypatch.setattr(
+        thermoengine_module, 'ThermoEngineTransport', FakeTransport,
+    )
     monkeypatch.setattr(
         'engines.alphamelts.thermoengine.subprocess.run',
         fake_run,
@@ -2072,10 +2107,15 @@ def test_thermoengine_health_smoke_requires_positive_phase_mass(monkeypatch):
         activity_converter=activity_from_chem_potential,
     )
 
-    assert transport.health_check(timeout_s=1.0) == (
-        True,
-        'ThermoEngine smoke equilibrium completed',
-    )
+    ok, reason = transport.health_check(timeout_s=1.0)
+
+    assert ok is expected_ok
+    if expected_ok:
+        assert reason == 'ThermoEngine smoke equilibrium completed'
+    else:
+        assert 'did not solve at requested absolute fO2' in reason
+        assert 'requested=-9' in reason
+        assert f'solved={solved_fO2_log!r}' in reason
 
 
 def test_alphamelts_configured_subprocess_skips_thermoengine(monkeypatch):
@@ -3467,14 +3507,65 @@ def test_thermoengine_live_fo2_near_spinel_boundary_is_unique_or_fails_loud():
     assert imposed.phase_masses_kg
 
 
-def test_thermoengine_intrinsic_shadow_parity_against_subprocess_when_available():
+def _thermoengine_dependency_is_missing(cause):
+    if isinstance(cause, (ModuleNotFoundError, FileNotFoundError)):
+        return True
+    detail = str(cause).lower()
+    return any(signature in detail for signature in (
+        'no module named',
+        'cannot import name',
+        'no such file or directory',
+        'cannot open shared object file',
+        'library not loaded',
+        'image not found',
+        'dlopen',
+    ))
+
+
+def _initialize_thermoengine_for_parity():
     thermo = ThermoEngineBackend()
     try:
         thermo_ok = thermo.initialize({})
     except ImportError as exc:
-        pytest.skip(f'ThermoEngine transport unavailable: {exc}')
+        if _thermoengine_dependency_is_missing(exc.__cause__):
+            pytest.skip(f'ThermoEngine transport unavailable: {exc}')
+        raise
     if not thermo_ok:
         pytest.skip('ThermoEngine transport unavailable')
+    return thermo
+
+
+@pytest.mark.parametrize(
+    ('cause', 'expected'),
+    [
+        (ModuleNotFoundError("No module named 'thermoengine'"), True),
+        (FileNotFoundError('missing ThermoEngine binary'), True),
+        (RuntimeError('absolute fO2 root solve failed'), False),
+        (TimeoutError('smoke equilibrium timed out after 8.0s'), False),
+    ],
+)
+def test_thermoengine_parity_skip_requires_missing_dependency(
+    monkeypatch, cause, expected,
+):
+    class ExpectedParitySkip(Exception):
+        pass
+
+    def fail_initialize(_backend, _config):
+        raise ImportError('ThermoEngine initialization failed') from cause
+
+    def raise_expected_skip(reason):
+        raise ExpectedParitySkip(reason)
+
+    monkeypatch.setattr(ThermoEngineBackend, 'initialize', fail_initialize)
+    monkeypatch.setattr(pytest, 'skip', raise_expected_skip)
+
+    expected_exception = ExpectedParitySkip if expected else ImportError
+    with pytest.raises(expected_exception):
+        _initialize_thermoengine_for_parity()
+
+
+def test_thermoengine_absolute_fo2_shadow_parity_against_subprocess_when_available():
+    thermo = _initialize_thermoengine_for_parity()
 
     subprocess_backend = AlphaMELTSBackend()
     try:
@@ -3498,18 +3589,17 @@ def test_thermoengine_intrinsic_shadow_parity_against_subprocess_when_available(
         'MnO': 2.0,
         'P2O5': 3.0,
     }
+    target_fO2_log = -9.0
     thermo_result = thermo.equilibrate(
         temperature_C=1200.0,
         composition_kg=composition_kg,
+        fO2_log=target_fO2_log,
         pressure_bar=1.0,
     )
     subprocess_result = subprocess_backend.equilibrate(
         temperature_C=1200.0,
         composition_kg=composition_kg,
-        # Preserve the pre-redox-root cross-transport anchor: ThermoEngine's
-        # old path was intrinsic closed even though this subprocess reference
-        # was explicitly run at the adapter's historical -9 default.
-        fO2_log=-9.0,
+        fO2_log=target_fO2_log,
         pressure_bar=1.0,
         # Explicit mode: the live parity comparison is an isothermal
         # equilibrate; without this the no-mode contract error fires
@@ -3518,6 +3608,20 @@ def test_thermoengine_intrinsic_shadow_parity_against_subprocess_when_available(
     )
     if not subprocess_result.phase_masses_kg:
         pytest.skip('AlphaMELTS subprocess did not report modal phase masses')
+
+    thermo_solved_fO2_log = thermo_result.diagnostics['solved_fO2_log']
+    subprocess_solved_fO2_log = (
+        subprocess_result.diagnostics['engine_reported_fO2_log']
+    )
+    assert thermo_solved_fO2_log == pytest.approx(
+        target_fO2_log, abs=1.0e-3,
+    )
+    assert subprocess_solved_fO2_log == pytest.approx(
+        target_fO2_log, abs=1.0e-3,
+    )
+    assert thermo_solved_fO2_log == pytest.approx(
+        subprocess_solved_fO2_log, abs=1.0e-3,
+    )
 
     def canonical_modes(result):
         return {
