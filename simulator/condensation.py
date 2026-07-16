@@ -1827,6 +1827,7 @@ class CondensationModel:
         self.knudsen_regime = KnudsenRegime.FREE_MOLECULAR
         self._knudsen_policy_configured = False
         self._viscous_flow_required = True
+        self.lab_geometry: LabGeometry | None = None
         self.pipe_segments = self._build_default_pipe_segments(
             float(wall_temperature_C))
         self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
@@ -2969,6 +2970,8 @@ class CondensationModel:
         self,
         species: str,
     ) -> list[PipeSegment]:
+        if self.lab_geometry is not None:
+            return list(self.pipe_segments)
         target_stage_number = designated_stage_number(species)
         if target_stage_number is None:
             return []
@@ -3117,7 +3120,6 @@ class CondensationModel:
         if hi_C < lo_C:
             lo_C, hi_C = hi_C, lo_C
 
-        band_flux_fraction = 0.0
         band_flux_mol_m2_s = 0.0
         width_C = hi_C - lo_C
         spec = (
@@ -3181,9 +3183,7 @@ class CondensationModel:
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
-            band_flux_fraction += flux / reference_flux
             band_flux_mol_m2_s += flux
-        band_flux_fraction /= HKL_BAND_SAMPLES
         band_flux_mol_m2_s /= HKL_BAND_SAMPLES
         if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
             alpha_record['alpha_s_sample_temperature_range_K'] = [

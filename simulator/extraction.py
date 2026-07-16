@@ -1155,6 +1155,8 @@ class ExtractionMixin:
     def _route_mre_gas_products_to_condensation(
         self,
         gas_products_kg: Mapping[str, float],
+        *,
+        sample_time_h: float | None = None,
     ) -> dict[str, Any]:
         species_kg = {
             str(species): float(kg)
@@ -1167,6 +1169,8 @@ class ExtractionMixin:
         evap_flux = EvaporationFlux(species_kg_hr=species_kg)
         evap_flux.update_totals()
         self._configure_condensation_operating_conditions(evap_flux)
+        if sample_time_h is not None:
+            self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
         route_result = self.condensation_model.route(evap_flux, self.melt)
         route_diagnostic: dict[str, Any] = {}
         species_order = tuple(
@@ -1212,7 +1216,7 @@ class ExtractionMixin:
             }
         return route_diagnostic
 
-    def _step_mre(self) -> float:
+    def _step_mre(self, *, sample_time_h: float | None = None) -> float:
         """
         Perform one hour of molten regolith electrolysis (C5 or MRE baseline).
 
@@ -1701,7 +1705,8 @@ class ExtractionMixin:
             if delta_kg > 1e-10:
                 mre_gas_deltas_kg[metal] = delta_kg
         gas_route_diagnostic = self._route_mre_gas_products_to_condensation(
-            mre_gas_deltas_kg
+            mre_gas_deltas_kg,
+            sample_time_h=sample_time_h,
         )
         if gas_route_diagnostic:
             result['mre_gas_condensation_route'] = gas_route_diagnostic
