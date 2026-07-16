@@ -39,6 +39,10 @@ CACHE_V2_SUBPROCESS_PHASE_DICTIONARY = (
     "spinel",
     "plagioclase",
     "feldspar",
+    # Native alphaMELTS 2 Phase_main_tbl labels observed in the epoch-2
+    # subprocess corpus; keep the emitted spelling rather than aliasing it.
+    "ortho-oxide",
+    "alkali-feldspar",
     "quartz",
     "tridymite",
     "cristobalite",
@@ -828,7 +832,9 @@ def cache_v2_identity_manifest() -> dict[str, Any]:
         "dictionaries": dictionaries,
         "dictionary_sources": {
             "phase": (
-                "writer-declared subprocess vocabulary union ThermoEngine "
+                "alphaMELTS 2.3.1 MELTSv1.0.2 Phase_main_tbl.txt and "
+                "assemblage labels from captured subprocess output and the "
+                "bundled executable vocabulary, union ThermoEngine "
                 "MELTSv1.0.2 MELTSmodel.get_phase_names(), canonicalized by "
                 "scripts.grid_pregrind._thermoengine_generic_result"
             ),
