@@ -1591,41 +1591,26 @@ class EvaporationMixin:
         """
         phase_scalar = self._record_phase_context_diagnostic(
             'condensation_feed', scalar_liquid_fraction=1.0)
-        direct_route_without_policy = not getattr(
-            self.condensation_model, '_knudsen_policy_configured', False
-        )
-        if direct_route_without_policy:
-            # Direct helper callers may preconfigure wall temperatures and
-            # geometry without running the hourly transport setup. Establish
-            # only the missing regime policy here; importing a newly estimated
-            # pressure/area state would overwrite those explicit conditions.
+        if not getattr(self.condensation_model, '_knudsen_policy_configured', False):
+            transport = self.overhead_model.estimate_transport_state(
+                evap_flux,
+                self.melt,
+            )
             self.condensation_model.configure_operating_conditions(
-                overhead_pressure_mbar=(
-                    self.condensation_model.overhead_pressure_mbar
-                ),
+                overhead_pressure_mbar=transport['pressure_mbar'],
+                pipe_diameter_m=self.overhead_model.pipe_diameter_m,
+                # Chapman-Enskog diffusion uses bulk-gas temperature; the
+                # separate pipe temperature is a wall/liner condition.
+                gas_temperature_C=transport['conductance_temperature_C'],
+                stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
+                stage_area_geometry_provenance_notice=transport.get(
+                    'stage_area_geometry_provenance_notice', {}),
                 carrier_gas=self._resolve_condensation_carrier_gas(),
                 campaign_name=str(getattr(self.melt.campaign, 'name', '')),
                 campaign_hour=float(getattr(self.melt, 'campaign_hour', 0.0) or 0.0),
             )
-        if direct_route_without_policy:
-            self.condensation_model._direct_route_legacy_stage_rate_without_area = (
-                True
-            )
-            try:
-                route_result = self.condensation_model.route(
-                    evap_flux,
-                    self.melt,
-                )
-            finally:
-                delattr(
-                    self.condensation_model,
-                    "_direct_route_legacy_stage_rate_without_area",
-                )
-        else:
-            route_result = self.condensation_model.route(
-                evap_flux,
-                self.melt,
-            )
+        route_result = self.condensation_model.route(
+            evap_flux, self.melt)
 
         antoine_extrapolations = dict(
             getattr(route_result, 'antoine_extrapolations', {}) or {}

@@ -9,7 +9,11 @@ from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
 from simulator.accounting import AtomLedger, LedgerTransition
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.condensation import CondensationModel, knudsen_regime_diagnostic
+from simulator.condensation import (
+    CondensationModel,
+    KnudsenRegimeRefusal,
+    knudsen_regime_diagnostic,
+)
 from simulator.core import PyrolysisSimulator
 from simulator.lab_schedule import LabScheduleValidationError, normalize_lab_schedule
 from simulator.equipment import EquipmentDesigner
@@ -735,6 +739,10 @@ def test_wall_allocation_uses_view_factor_and_line_of_sight() -> None:
     raw = robinot_geometry_fixture()
     model = CondensationModel(CondensationTrain.create_default())
     model.configure_lab_geometry(parse_lab_geometry(raw))
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1700.0,
+    )
 
     base = model.route(
         EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
@@ -771,6 +779,19 @@ def test_wall_allocation_uses_view_factor_and_line_of_sight() -> None:
         match="invalid_lab_geometry_view_factor",
     ):
         parse_lab_geometry(invalid_view_factor)
+
+
+def test_geometry_only_direct_route_refuses_unconfigured_knudsen_policy() -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_lab_geometry(parse_lab_geometry(robinot_geometry_fixture()))
+
+    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
+        model.route(
+            EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+            MeltState(temperature_C=1700.0),
+        )
+
+    assert exc_info.value.reason == "knudsen_policy_unconfigured"
 
 
 def test_lab_surface_deposit_accounts_conserve_and_roll_up_by_surface() -> None:

@@ -2368,12 +2368,6 @@ class CondensationModel:
             )
             self.gas_temperature_C = self.wall_temperature_C
         self.lab_geometry = geometry
-        if not self._knudsen_policy_configured:
-            # A declared lab geometry is valid in free-molecular operation.
-            # Runtime callers replace this direct-use default with their
-            # campaign pressure policy before routing each physical tick.
-            self._knudsen_policy_configured = True
-            self._viscous_flow_required = False
         return geometry
 
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
@@ -2404,11 +2398,6 @@ class CondensationModel:
         transport_parameter_notice_by_species: dict[str, Any] = {}
         condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
         used_capture_budget_regularizer = False
-        allow_legacy_stage_rate_without_area = bool(getattr(
-            self,
-            "_direct_route_legacy_stage_rate_without_area",
-            False,
-        ))
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
             self.pipe_segments,
@@ -2482,9 +2471,6 @@ class CondensationModel:
                         stage.stage_number, 1.0),
                     available_kg=remaining_kg,
                     alpha_s_value=float(stage_alpha_record.get('alpha_s', 0.0)),
-                    allow_legacy_stage_rate_without_area=(
-                        allow_legacy_stage_rate_without_area
-                    ),
                     alpha_record=stage_alpha_record,
                     antoine_extrapolations=antoine_extrapolations,
                     antoine_extrapolation_warnings=(
@@ -3057,7 +3043,6 @@ class CondensationModel:
         residence_s: float,
         available_kg: float,
         alpha_s_value: float,
-        allow_legacy_stage_rate_without_area: bool = False,
         alpha_record: MutableMapping[str, Any] | None = None,
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
@@ -3105,7 +3090,6 @@ class CondensationModel:
         if hi_C < lo_C:
             lo_C, hi_C = hi_C, lo_C
 
-        band_flux_fraction = 0.0
         band_flux_mol_m2_s = 0.0
         width_C = hi_C - lo_C
         spec = (
@@ -3144,14 +3128,9 @@ class CondensationModel:
             # Chapman-Enskog D_AB(T, P) per Phase A1. stir_factor
             # amplifies the boundary-layer Sherwood per the operator's
             # induction-stirring power.
-            T_gas_K = (
-                T_surface_K
-                if allow_legacy_stage_rate_without_area
-                else max(
-                    float(self.gas_temperature_C)
-                    + CELSIUS_TO_KELVIN_OFFSET,
-                    1.0,
-                )
+            T_gas_K = max(
+                float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+                1.0,
             )
             overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
             flux = _series_resistance_deposition_flux_mol_m2_s(
@@ -3174,9 +3153,7 @@ class CondensationModel:
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
-            band_flux_fraction += flux / reference_flux
             band_flux_mol_m2_s += flux
-        band_flux_fraction /= HKL_BAND_SAMPLES
         band_flux_mol_m2_s /= HKL_BAND_SAMPLES
         if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
             alpha_record['alpha_s_sample_temperature_range_K'] = [
@@ -3212,16 +3189,6 @@ class CondensationModel:
                 * residence_s
             )
             eta = capturable_mol / available_mol
-        elif allow_legacy_stage_rate_without_area:
-            # Compatibility is limited to the direct routing helper, whose
-            # historical cold-wall attribution predates stage-area plumbing.
-            # Premise: band_flux_fraction is dimensionless; the legacy helper
-            # interpreted it as s^-1. Algebra: residence_s * fraction is the
-            # dimensionless exponent. Unit caveat: this is not physical stage
-            # geometry and production hourly routing never enables it.
-            eta = 1.0 - math.exp(
-                -residence_s * max(0.0, band_flux_fraction)
-            )
         else:
             # Premise: ``band_flux_fraction = flux / reference_flux`` is
             # dimensionless. Algebra requires capturable mol =
