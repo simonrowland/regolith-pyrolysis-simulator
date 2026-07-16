@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import hashlib
 import json
 import math
 
@@ -8,6 +9,7 @@ import pytest
 
 import simulator.optimize.doe as doe_module
 from simulator.optimize.doe import (
+    ConditionalSubspaceExhausted,
     DEPENDENCY_FREE_LHC_SAMPLER,
     FIDELITY_CORRELATION_METRICS,
     SCIPY_SOBOL_SAMPLER,
@@ -18,10 +20,14 @@ from simulator.optimize.doe import (
     PHASE_ORDER_VACUUM_FIRST,
     phase_order_grid,
     sample_recipe_patch_at_index,
+    sample_recipe_candidate_at_index,
+    sample_recipe_candidates,
     sample_recipe_patches,
 )
 from simulator.optimize.recipe import (
+    C5_GUARD,
     FURNACE_MAX_T_C_PATH,
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     KnobSpec,
     RecipePatch,
     RecipeSchema,
@@ -30,6 +36,138 @@ from simulator.optimize.recipe import (
 
 C5_PO2_DEFAULT = tuple("campaigns.C5.pO2_mbar_default".split("."))
 C5_PTOTAL_DEFAULT = tuple("campaigns.C5.p_total_mbar_default".split("."))
+
+
+def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal():
+    schema = RecipeSchema()
+    batch = sample_recipe_candidates(
+        schema, n_samples=8, seed=19, sampler_name=SCIPY_SOBOL_SAMPLER
+    )
+    indexed = tuple(
+        sample_recipe_candidate_at_index(
+            schema, index=index, seed=19, sampler_name=SCIPY_SOBOL_SAMPLER
+        )
+        for index in range(8)
+    )
+    assert [len(item.patch.values) for item in batch] == [64, 70] * 4
+    assert [item.patch.canonical_json() for item in batch] == [
+        item.patch.canonical_json() for item in indexed
+    ]
+    for index, item in enumerate(batch):
+        if index % 2 == 0:
+            assert C5_ALLOW_MRE_VOLTAGE_CAP_PATH not in item.patch.values
+            assert item.effective_pins[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] == 0.0
+        else:
+            assert item.patch.values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] > 0.0
+    payload = [
+        {
+            "patch": item.patch.canonical_json(),
+            "mask": item.conditional_mask,
+            "digest": item.conditional_subspace_digest,
+            "pins": [
+                (list(path), value)
+                for path, value in sorted(item.effective_pins.items())
+            ],
+        }
+        for item in batch
+    ]
+    assert hashlib.sha256(
+        doe_module.canonical_json_dumps(payload).encode()
+    ).hexdigest() == "6f8e525bef21ad89bfe4d69dc5504aa6e247dc10d6033cba87513cdf24c36160"
+
+
+def test_t155_conditional_lhc_stream_is_exactly_pinned():
+    batch = sample_recipe_candidates(
+        RecipeSchema(),
+        n_samples=8,
+        seed=19,
+        sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+    )
+    payload = [
+        {
+            "patch": item.patch.canonical_json(),
+            "mask": item.conditional_mask,
+            "digest": item.conditional_subspace_digest,
+            "pins": [
+                (list(path), value)
+                for path, value in sorted(item.effective_pins.items())
+            ],
+        }
+        for item in batch
+    ]
+    assert hashlib.sha256(
+        doe_module.canonical_json_dumps(payload).encode()
+    ).hexdigest() == "da078800efa7a5e4d4a677b05fb522aaac3e5fa86e71ba24f8a7036a730ec5e8"
+
+
+def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():
+    schema = _single_knob_schema(C5_ALLOW_MRE_VOLTAGE_CAP_PATH)
+
+    assert len(
+        sample_recipe_candidates(
+            schema,
+            n_samples=2,
+            seed=19,
+            sampler_name=SCIPY_SOBOL_SAMPLER,
+        )
+    ) == 2
+    with pytest.raises(
+        ConditionalSubspaceExhausted,
+        match="one canonical zero-dimensional sample",
+    ):
+        sample_recipe_candidates(
+            schema,
+            n_samples=3,
+            seed=19,
+            sampler_name=SCIPY_SOBOL_SAMPLER,
+        )
+
+
+def test_t155_log_and_log10_mapping_contract():
+    log_spec = KnobSpec(
+        path=("x",), kind="float", low=1.0, high=100.0, scale="log"
+    )
+    assert doe_module._map_unit_value(log_spec, 0.0) == pytest.approx(1.0)
+    assert doe_module._map_unit_value(log_spec, 0.5) == pytest.approx(10.0)
+    assert doe_module._map_unit_value(log_spec, 1.0) == pytest.approx(100.0)
+    log10_spec = replace(log_spec, low=-20.0, high=0.0, scale="log10")
+    assert doe_module._map_unit_value(log10_spec, 0.5) == pytest.approx(-10.0)
+
+
+def test_t155_anchored_c5_on_stays_above_positive_tail_floor():
+    from simulator.electrolysis import min_decomposition_voltage
+
+    schema = RecipeSchema()
+    initial = sample_recipe_candidate_at_index(
+        schema, index=1, seed=23, sampler_name=SCIPY_SOBOL_SAMPLER
+    )
+    floor = min_decomposition_voltage()
+    anchor = RecipePatch(
+        {**initial.patch.values, C5_ALLOW_MRE_VOLTAGE_CAP_PATH: floor}
+    ).validated(schema)
+    for index in range(4):
+        sampled = sample_recipe_candidate_at_index(
+            schema,
+            index=index,
+            seed=23,
+            sampler_name=SCIPY_SOBOL_SAMPLER,
+            anchor=anchor,
+            conditional_context=initial.conditional_context,
+        )
+        assert sampled.patch.values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] >= floor
+
+    subfloor = RecipePatch(
+        {**initial.patch.values, C5_ALLOW_MRE_VOLTAGE_CAP_PATH: floor / 2.0}
+    ).validated(schema)
+    with pytest.raises(ValueError, match="active C5 anchored sample"):
+        sample_recipe_candidate_at_index(
+            schema,
+            index=0,
+            seed=23,
+            sampler_name=SCIPY_SOBOL_SAMPLER,
+            anchor=subfloor,
+            conditional_context=initial.conditional_context,
+        )
 
 
 def _canonical_patch_set(
@@ -54,7 +192,7 @@ def _small_schema() -> RecipeSchema:
                 high=950,
             ),
             KnobSpec(
-                path=("campaigns", "C3", "endpoint", "hold_time_min"),
+                path=("campaigns", "C3", "endpoint", "hold_time_ticks"),
                 kind="int",
                 low=15,
                 high=60,
@@ -69,8 +207,17 @@ def _small_schema() -> RecipeSchema:
 
 
 def _assert_patch_values_match_specs(schema: RecipeSchema, patches: tuple) -> None:
+    all_paths = {spec.path for spec in schema.search_allowlist}
+    inactive_paths = {
+        spec.path for spec in schema.search_allowlist if spec.guard == C5_GUARD
+    } | {C5_ALLOW_MRE_VOLTAGE_CAP_PATH}
     for patch in patches:
-        assert set(patch.values) == {spec.path for spec in schema.search_allowlist}
+        expected_paths = all_paths
+        if C5_ALLOW_MRE_VOLTAGE_CAP_PATH in all_paths and (
+            C5_ALLOW_MRE_VOLTAGE_CAP_PATH not in patch.values
+        ):
+            expected_paths = all_paths - inactive_paths
+        assert set(patch.values) == expected_paths
         patch.validated(schema)
         for path, value in patch.values.items():
             assert not schema.is_forbidden(path)
@@ -342,7 +489,7 @@ def test_dependency_free_lhc_canonical_json_vector_is_pinned() -> None:
                 high=950,
             ),
             KnobSpec(
-                path=("campaigns", "C3", "endpoint", "hold_time_min"),
+                path=("campaigns", "C3", "endpoint", "hold_time_ticks"),
                 kind="int",
                 low=15,
                 high=60,
@@ -360,9 +507,9 @@ def test_dependency_free_lhc_canonical_json_vector_is_pinned() -> None:
             sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
         )
     ) == (
-        '[{"path":["campaigns","C0","temp_range_C"],"value":798.1766251556933},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":55}]',
-        '[{"path":["campaigns","C0","temp_range_C"],"value":225.76036480263147},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":20}]',
-        '[{"path":["campaigns","C0","temp_range_C"],"value":596.8221746252607},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":45}]',
+        '[{"path":["campaigns","C0","temp_range_C"],"value":798.1766251556933},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":55}]',
+        '[{"path":["campaigns","C0","temp_range_C"],"value":225.76036480263147},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":20}]',
+        '[{"path":["campaigns","C0","temp_range_C"],"value":596.8221746252607},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":45}]',
     )
 
 
@@ -417,16 +564,22 @@ def test_sampler_varies_every_allowlisted_knob_across_samples() -> None:
         )
 
         for spec in schema.search_allowlist:
-            values = {patch.values[spec.path] for patch in patches}
+            values = {
+                patch.values[spec.path]
+                for patch in patches
+                if spec.path in patch.values
+            }
             assert len(values) > 1, ".".join(spec.path)
-            if spec.kind == "int":
+            if spec.kind == "int" and all(
+                spec.path in patch.values for patch in patches
+            ):
                 assert min(values) == spec.low
                 assert max(values) == spec.high
 
 
 def test_int_mapping_reaches_declared_bounds() -> None:
     spec = KnobSpec(
-        path=("campaigns", "C3", "endpoint", "hold_time_min"),
+        path=("campaigns", "C3", "endpoint", "hold_time_ticks"),
         kind="int",
         low=15,
         high=60,
@@ -551,7 +704,7 @@ def test_phase_order_grid_covers_stage0_order_count_and_dwell_skeletons() -> Non
 # --- anchored (neighborhood) sampling -------------------------------------
 
 _TEMP = ("campaigns", "C0", "temp_range_C")
-_HOLD = ("campaigns", "C3", "endpoint", "hold_time_min")
+_HOLD = ("campaigns", "C3", "endpoint", "hold_time_ticks")
 _MODE = ("campaigns", "C0", "mode")
 _C3_PO2_DEFAULT = ("campaigns", "C3", "pO2_mbar_default")
 _C3_PTOTAL_DEFAULT = ("campaigns", "C3", "p_total_mbar_default")
@@ -623,7 +776,7 @@ def test_doe_spec_round_trips_anchor_and_delta_fraction() -> None:
     assert payload["anchor"] == [
         {"path": ["campaigns", "C0", "mode"], "value": "nominal"},
         {"path": ["campaigns", "C0", "temp_range_C"], "value": 500.0},
-        {"path": ["campaigns", "C3", "endpoint", "hold_time_min"], "value": 30},
+        {"path": ["campaigns", "C3", "endpoint", "hold_time_ticks"], "value": 30},
     ]
 
     restored = DoeSpec.from_dict(payload, schema=schema)
@@ -776,14 +929,14 @@ def test_anchored_interior_dependency_free_lhc_canonical_json_matches_legacy() -
             delta_fraction=0.15,
         )
     ) == (
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":453.40763271253763},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":36}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":517.3343123700043},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":29}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":543.0543134472375},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":34}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":419.2745649641729},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":24}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":577.4789490504673},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":27}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":466.4803891941184},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":32}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":364.7420667677326},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":26}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":613.0671952710939},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":31}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":453.40763271253763},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":36}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":517.3343123700043},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":29}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":543.0543134472375},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":34}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":419.2745649641729},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":24}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":577.4789490504673},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":27}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":466.4803891941184},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":32}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":364.7420667677326},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":26}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":613.0671952710939},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":31}]',
     )
 
 
@@ -806,14 +959,14 @@ def test_anchored_interior_scipy_sobol_canonical_json_matches_legacy() -> None:
             delta_fraction=0.15,
         )
     ) == (
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":589.6556176226586},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":26}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":477.6095311231911},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":31}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":415.90245443955064},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":27}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":512.9525380562991},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":35}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":554.9749413356185},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":30}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":372.78716417588294},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":35}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":450.8525401148945},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":24}]',
-        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":617.4994091466069},{"path":["campaigns","C3","endpoint","hold_time_min"],"value":33}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":589.6556176226586},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":26}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":477.6095311231911},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":31}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":415.90245443955064},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":27}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":512.9525380562991},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":35}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":554.9749413356185},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":30}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":372.78716417588294},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":35}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":450.8525401148945},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":24}]',
+        '[{"path":["campaigns","C0","mode"],"value":"nominal"},{"path":["campaigns","C0","temp_range_C"],"value":617.4994091466069},{"path":["campaigns","C3","endpoint","hold_time_ticks"],"value":33}]',
     )
 
 
@@ -1055,7 +1208,7 @@ def test_anchored_sampling_rejects_delta_fraction_above_one() -> None:
 
 def test_anchored_sampling_rejects_anchor_missing_a_sampled_knob() -> None:
     schema = _anchored_schema()
-    partial = RecipePatch({_TEMP: 500.0, _MODE: "nominal"})  # missing hold_time_min
+    partial = RecipePatch({_TEMP: 500.0, _MODE: "nominal"})  # missing hold_time_ticks
     with pytest.raises(ValueError, match="missing sampled knob"):
         sample_recipe_patches(
             schema,

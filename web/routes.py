@@ -3020,7 +3020,9 @@ def _recipe_controls_from_patch(patch: Mapping[str, Any]) -> dict[str, Any]:
         p_total = _finite_or_none(c4.get('p_total_mbar_default'))
         if p_total is not None:
             controls['p_total_mbar'] = p_total
-        hold_temp = _finite_or_none(c4.get('hold_temp_C'))
+        hold_temp = _finite_or_none(c4.get('default_hold_T_C'))
+        if hold_temp is None:
+            hold_temp = _finite_or_none(c4.get('hold_temp_C'))
         if hold_temp is not None:
             controls['stage_temp_C'] = hold_temp
         temp_range = c4.get('temp_range_C')

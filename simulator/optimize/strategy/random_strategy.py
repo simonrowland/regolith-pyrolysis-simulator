@@ -8,9 +8,9 @@ from simulator.optimize.doe import (
     SAMPLER_NAMES,
     STREAMING_SAMPLER_NAMES,
     active_sampler_name,
-    sample_recipe_patch_at_index,
+    sample_recipe_candidate_at_index,
 )
-from simulator.optimize.recipe import RecipeSchema
+from simulator.optimize.recipe import RecipeSchema, conditional_context_metadata
 from simulator.optimize.strategy.protocol import Candidate
 
 if TYPE_CHECKING:
@@ -64,25 +64,26 @@ class RandomStrategy:
 
         start = self._asked
         end = start + n
-        candidates = [
-            Candidate(
-                id=self._candidate_id(sequence),
-                patch=sample_recipe_patch_at_index(
+        candidates = []
+        for sequence in range(start, end):
+            sampled = sample_recipe_candidate_at_index(
                     self.schema,
                     index=sequence,
                     seed=self.seed,
                     sampler_name=self.sampler_name,
-                ),
+                )
+            candidates.append(Candidate(
+                id=self._candidate_id(sequence),
+                patch=sampled.patch,
                 metadata={
                     "strategy": self.name,
                     "seed": self.seed,
                     "sequence": sequence,
                     "sampler_name": self.sampler_name,
                     "proposal_source": "sobol",
+                    **conditional_context_metadata(sampled.conditional_context),
                 },
-            )
-            for sequence in range(start, end)
-        ]
+            ))
         self._asked = end
         return candidates
 

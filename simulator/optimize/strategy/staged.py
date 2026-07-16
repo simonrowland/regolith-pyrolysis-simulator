@@ -15,7 +15,7 @@ from simulator.optimize.doe import (
     _condition_pressure_pair_values,
     _resolve_value_mapper,
     _unit_hypercube_points,
-    sample_recipe_patch_at_index,
+    sample_recipe_candidate_at_index,
 )
 from simulator.optimize.evalspec import EvalSpec, PrefixEvalSpec
 from simulator.optimize.evaluate import RunReference, ScoredResult
@@ -30,6 +30,9 @@ from simulator.optimize.recipe import (
     C2A_STAGED_DEFAULT_ORDER,
     C2A_STAGED_ORDER_CHOICES,
     C2A_STAGED_ORDER_PATH,
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    c5_sampler_context,
+    conditional_context_metadata,
     c2a_staged_stage_order,
 )
 from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
@@ -307,6 +310,9 @@ class StagedStrategy:
         self.joint_refines_completed = 0
         self._joint_refine_done = self.max_joint_refines <= 0
         self.topology = _topology_from_options(options, topology)
+        self._conditional_context_off = c5_sampler_context(
+            self.schema, active=False
+        )
         self._stage0_seed_candidates = _stage0_seeds_for_topology(
             stage0_seed_candidates or (),
             self.topology.id,
@@ -344,6 +350,27 @@ class StagedStrategy:
         self._mode = "forward"
         self._tell_count = 0
         self._build_stage_candidates()
+
+    def _conditional_context_for_stage(
+        self,
+        stage_id: str,
+        patch: RecipePatch | None = None,
+        *,
+        prefix_stage_ids: Sequence[str] | None = None,
+    ):
+        if not self.topology.c5:
+            return self._conditional_context_off
+        full = stage_id == "C5" or (
+            patch is not None and C5_ALLOW_MRE_VOLTAGE_CAP_PATH in patch.values
+        )
+        return c5_sampler_context(
+            self.schema,
+            active=True,
+            scope="full" if full else "prefix-before-guard-stage",
+            prefix_stage_ids=(
+                () if full else tuple(prefix_stage_ids or (stage_id,))
+            ),
+        )
 
     @property
     def seed(self) -> int:
@@ -499,12 +526,15 @@ class StagedStrategy:
                 + parent_index * self.children_per_parent
                 + child_index
             )
-            stage_patch = sample_recipe_patch_at_index(
+            sampled = sample_recipe_candidate_at_index(
                 stage_schema,
                 index=sample_index,
                 seed=self.seed,
                 sampler_name=self.sampler_name,
+                conditional_context=self._conditional_context_for_stage(stage_id),
+                stage_id=stage_id,
             )
+            stage_patch = sampled.patch
             patch = _merge_patches(parent.patch, stage_patch).validated(self.schema)
             candidate_id = (
                 f"{self.name}-{self.seed}-{self.topology.id}-{self._stage_index:02d}-"
@@ -528,6 +558,13 @@ class StagedStrategy:
                 "child_index": child_index,
                 "proposal_source": "sobol" if self._stage_index == 0 else "staged_child",
                 "seed_lineage": parent.seed_lineage,
+                **conditional_context_metadata(
+                    self._conditional_context_for_stage(
+                        stage_id,
+                        patch,
+                        prefix_stage_ids=(*parent.stage_ids, stage_id),
+                    )
+                ),
             }
             return Candidate(id=candidate_id, patch=patch, metadata=metadata)
 
@@ -575,6 +612,13 @@ class StagedStrategy:
                     "seed_lineage": True,
                     "seed_id": seed.id,
                     "seed_origin": seed.origin,
+                    **conditional_context_metadata(
+                        self._conditional_context_for_stage(
+                            stage_id,
+                            seed_patch,
+                            prefix_stage_ids=(stage_id,),
+                        )
+                    ),
                 }
                 append_unique(Candidate(id=candidate_id, patch=seed_patch, metadata=metadata))
 
@@ -708,12 +752,17 @@ class StagedStrategy:
                     + parent_index * self.children_per_parent
                     + child_index
                 )
-                stage_patch = sample_recipe_patch_at_index(
+                sampled = sample_recipe_candidate_at_index(
                     stage_schema,
                     index=sample_index,
                     seed=self.seed,
                     sampler_name=self.sampler_name,
+                    conditional_context=self._conditional_context_for_stage(
+                        target_stage_id, parent.patch
+                    ),
+                    stage_id=target_stage_id,
                 )
+                stage_patch = sampled.patch
                 replay_patch = _combine_patches(stage_patch, suffix_patch)
                 patch = _combine_patches(prefix_patch, replay_patch).validated(self.schema)
                 recipe_id = patch.recipe_id(self.schema)
@@ -746,6 +795,9 @@ class StagedStrategy:
                     "backward_target_stage_id": target_stage_id,
                     "proposal_source": "backward_resample",
                     "seed_lineage": parent.seed_lineage,
+                    **conditional_context_metadata(
+                        self._conditional_context_for_stage(target_stage_id, patch)
+                    ),
                 }
                 candidate = Candidate(id=candidate_id, patch=patch, metadata=metadata)
                 candidates.append(candidate)
@@ -826,6 +878,9 @@ class StagedStrategy:
                     "joint_refine_target_stage_ids": target_stage_ids,
                     "proposal_source": "joint_refine",
                     "seed_lineage": parent.seed_lineage,
+                    **conditional_context_metadata(
+                        self._conditional_context_for_stage(joint_stage_id, patch)
+                    ),
                 }
                 candidate = Candidate(id=candidate_id, patch=patch, metadata=metadata)
                 candidates.append(candidate)
@@ -1357,6 +1412,31 @@ def _stage_path_for_topology(topology: TopologyChoice) -> tuple[str, ...]:
     if topology.c6:
         stages.append("C6")
     return tuple(stages)
+
+
+def authoritative_prefix_stage_ids(
+    schema: RecipeSchema,
+    profile: Mapping[str, Any],
+    topology_id: str,
+    prefix_depth: int,
+) -> tuple[str, ...]:
+    """Rebuild the executed prefix from the selected staged strategy table."""
+    if isinstance(prefix_depth, bool) or not isinstance(prefix_depth, int):
+        raise StagedBeamStateError("staged prefix_depth metadata must be an int")
+    if prefix_depth < 0:
+        raise StagedBeamStateError("staged prefix_depth metadata must be non-negative")
+    try:
+        topology = _coerce_topology(topology_id)
+    except (TypeError, ValueError) as exc:
+        raise StagedBeamStateError("staged topology metadata is not authoritative") from exc
+    configured_allowlist = _staged_options(profile).get("allowlist")
+    stage_ids = tuple(
+        stage_id
+        for stage_id, _ in _stage_specs(schema, configured_allowlist, topology)
+    )
+    if prefix_depth > len(stage_ids):
+        raise StagedBeamStateError("staged prefix_depth exceeds the topology stage table")
+    return stage_ids[:prefix_depth]
 
 
 def _patch_for_topology(topology: TopologyChoice) -> RecipePatch:

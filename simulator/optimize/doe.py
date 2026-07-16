@@ -9,6 +9,7 @@ evaluate recipes or wire into RunExecutor.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import hashlib
 import math
 import random
 from types import MappingProxyType
@@ -18,11 +19,16 @@ import warnings
 from simulator.optimize.recipe import (
     C2A_STAGED_PO2_MBAR_DEFAULT_PATH,
     C2A_STAGED_P_TOTAL_MBAR_DEFAULT_PATH,
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    C5_GUARD,
+    ConditionalExecutionContext,
     KeyPath,
     RecipePatch,
     RecipeSchema,
+    c5_sampler_context,
     _default_setpoint_value,
 )
+from simulator.optimize.canonical import canonical_json_dumps
 
 DEFAULT_ANCHOR_DELTA_FRACTION = 0.15
 
@@ -30,6 +36,26 @@ SCIPY_SOBOL_SAMPLER = "scipy-sobol"
 DEPENDENCY_FREE_LHC_SAMPLER = "dependency-free-lhc"
 SAMPLER_NAMES = (SCIPY_SOBOL_SAMPLER, DEPENDENCY_FREE_LHC_SAMPLER)
 STREAMING_SAMPLER_NAMES = (SCIPY_SOBOL_SAMPLER,)
+
+
+class ConditionalSubspaceExhausted(ValueError):
+    pass
+
+
+@dataclass(frozen=True)
+class SampledRecipePatch:
+    patch: RecipePatch
+    conditional_mask: tuple[tuple[str, str], ...]
+    conditional_subspace_digest: str
+    effective_pins: Mapping[KeyPath, Any]
+
+    @property
+    def conditional_context(self) -> ConditionalExecutionContext:
+        return ConditionalExecutionContext(
+            self.conditional_mask,
+            self.conditional_subspace_digest,
+            self.effective_pins,
+        )
 
 FIDELITY_CORRELATION_METRICS: tuple[str, ...] = (
     "spearman_rank_correlation",
@@ -376,18 +402,29 @@ def sample_recipe_patches(
     anchor: RecipePatch | None = None,
     delta_fraction: float = DEFAULT_ANCHOR_DELTA_FRACTION,
 ) -> tuple[RecipePatch, ...]:
-    """Sample validated RecipePatch objects across the schema allowlist.
+    return tuple(
+        sampled.patch
+        for sampled in sample_recipe_candidates(
+            schema,
+            n_samples=n_samples,
+            seed=seed,
+            sampler_name=sampler_name,
+            anchor=anchor,
+            delta_fraction=delta_fraction,
+        )
+    )
 
-    With ``anchor=None`` (default) this sweeps each knob's full schema range and
-    behaviour is unchanged. With an ``anchor`` RecipePatch, each numeric knob is
-    instead perturbed within ``+/- delta_fraction * (high - low)`` of the anchor
-    center, clipped to ``[low, high]`` and remapped over that clipped interval
-    -- a small neighborhood around a known recipe. The same unit-hypercube
-    generator / ``sampler_name`` is reused, so results stay deterministic for a
-    given seed. Interior anchors retain their historical unit mapping; near-rail
-    anchors intentionally change from map-then-clamp to remap-into-clipped-range
-    semantics to avoid rail pile-up.
-    """
+
+def sample_recipe_candidates(
+    schema: RecipeSchema | None = None,
+    *,
+    n_samples: int,
+    seed: int,
+    sampler_name: str | None = None,
+    anchor: RecipePatch | None = None,
+    delta_fraction: float = DEFAULT_ANCHOR_DELTA_FRACTION,
+) -> tuple[SampledRecipePatch, ...]:
+    """Sample the two fixed-dimensional C5 conditional subspaces."""
 
     active_schema = schema or RecipeSchema()
     _validate_positive_int("n_samples", n_samples)
@@ -396,30 +433,31 @@ def sample_recipe_patches(
     active_sampler = active_sampler_name() if sampler_name is None else sampler_name
     _validate_sampler_name(active_sampler)
 
-    search_allowlist = active_schema.search_allowlist
-    specs = tuple(
-        spec for spec in search_allowlist if not active_schema.is_forbidden(spec.path)
-    )
-    if len(specs) != len(search_allowlist):
-        raise ValueError("RecipeSchema allowlist contains forbidden paths")
-
-    mapper = _resolve_value_mapper(active_schema, specs, anchor, delta_fraction)
-    if not specs:
-        return tuple(RecipePatch({}).validated(active_schema) for _ in range(n_samples))
-
-    points = _unit_hypercube_points(len(specs), n_samples, seed, active_sampler)
-    patches: list[RecipePatch] = []
-    for row in points:
-        values = _map_unit_row(
+    if C5_ALLOW_MRE_VOLTAGE_CAP_PATH not in {
+        spec.path for spec in active_schema.search_allowlist
+    }:
+        return _sample_unconditional_batch(
             active_schema,
-            specs,
-            row,
-            mapper,
+            n_samples=n_samples,
+            seed=seed,
+            sampler_name=active_sampler,
             anchor=anchor,
             delta_fraction=delta_fraction,
         )
-        patches.append(RecipePatch(values).validated(active_schema))
-    return tuple(patches)
+
+    off_count = (n_samples + 1) // 2
+    on_count = n_samples // 2
+    streams = {
+        False: _sample_conditional_batch(
+            active_schema, active=False, n_samples=off_count, seed=seed,
+            sampler_name=active_sampler, anchor=anchor, delta_fraction=delta_fraction,
+        ),
+        True: _sample_conditional_batch(
+            active_schema, active=True, n_samples=on_count, seed=seed,
+            sampler_name=active_sampler, anchor=anchor, delta_fraction=delta_fraction,
+        ),
+    }
+    return tuple(streams[bool(index % 2)][index // 2] for index in range(n_samples))
 
 
 def sample_recipe_patch_at_index(
@@ -430,14 +468,32 @@ def sample_recipe_patch_at_index(
     sampler_name: str | None = None,
     anchor: RecipePatch | None = None,
     delta_fraction: float = DEFAULT_ANCHOR_DELTA_FRACTION,
+    conditional_context: ConditionalExecutionContext | None = None,
+    stage_id: str | None = None,
 ) -> RecipePatch:
-    """Sample one validated RecipePatch at a stable global sequence index.
+    return sample_recipe_candidate_at_index(
+        schema,
+        index=index,
+        seed=seed,
+        sampler_name=sampler_name,
+        anchor=anchor,
+        delta_fraction=delta_fraction,
+        conditional_context=conditional_context,
+        stage_id=stage_id,
+    ).patch
 
-    Honors the same ``anchor`` / ``delta_fraction`` neighborhood semantics as
-    :func:`sample_recipe_patches` for chunk-invariant samplers. Anchored
-    dependency-free LHC streaming is unsupported; use ``sample_recipe_patches``
-    for that sampler.
-    """
+
+def sample_recipe_candidate_at_index(
+    schema: RecipeSchema | None = None,
+    *,
+    index: int,
+    seed: int,
+    sampler_name: str | None = None,
+    anchor: RecipePatch | None = None,
+    delta_fraction: float = DEFAULT_ANCHOR_DELTA_FRACTION,
+    conditional_context: ConditionalExecutionContext | None = None,
+    stage_id: str | None = None,
+) -> SampledRecipePatch:
 
     active_schema = schema or RecipeSchema()
     _validate_non_negative_int("index", index)
@@ -446,35 +502,269 @@ def sample_recipe_patch_at_index(
     active_sampler = active_sampler_name() if sampler_name is None else sampler_name
     _validate_sampler_name(active_sampler)
 
-    search_allowlist = active_schema.search_allowlist
-    specs = tuple(
-        spec for spec in search_allowlist if not active_schema.is_forbidden(spec.path)
-    )
-    if len(specs) != len(search_allowlist):
-        raise ValueError("RecipeSchema allowlist contains forbidden paths")
-
-    if anchor is not None and active_sampler == DEPENDENCY_FREE_LHC_SAMPLER:
-        _validate_anchor(active_schema, anchor, specs=specs)
+    if active_sampler == DEPENDENCY_FREE_LHC_SAMPLER:
+        prefix = "anchored " if anchor is not None else ""
         raise ValueError(
-            "anchored sample_recipe_patch_at_index is unsupported for "
-            "dependency-free-lhc because the sampler is not chunk-invariant; "
-            "use sample_recipe_patches"
+            f"{prefix}sample_recipe_patch_at_index is unsupported for dependency-free-lhc "
+            "because the sampler is not chunk-invariant; use sample_recipe_patches"
         )
-
-    mapper = _resolve_value_mapper(active_schema, specs, anchor, delta_fraction)
-    if not specs:
-        return RecipePatch({}).validated(active_schema)
-
-    point = _unit_hypercube_point(len(specs), index, seed, active_sampler)
-    values = _map_unit_row(
+    if (
+        conditional_context is None
+        and C5_ALLOW_MRE_VOLTAGE_CAP_PATH
+        not in {spec.path for spec in active_schema.search_allowlist}
+    ):
+        return _sample_unconditional_index(
+            active_schema,
+            index=index,
+            seed=seed,
+            sampler_name=active_sampler,
+            anchor=anchor,
+            delta_fraction=delta_fraction,
+        )
+    if conditional_context is not None:
+        active = dict(conditional_context.conditional_mask).get(
+            C5_GUARD.canonicalizer_id
+        ) == "active"
+        return _sample_conditional_index(
+            active_schema,
+            active=active,
+            local_index=index,
+            seed=seed,
+            sampler_name=active_sampler,
+            anchor=anchor,
+            delta_fraction=delta_fraction,
+            context=conditional_context,
+            stage_id=stage_id,
+        )
+    return _sample_conditional_index(
         active_schema,
-        specs,
-        point,
-        mapper,
+        active=bool(index % 2),
+        local_index=index // 2,
+        seed=seed,
+        sampler_name=active_sampler,
         anchor=anchor,
         delta_fraction=delta_fraction,
     )
-    return RecipePatch(values).validated(active_schema)
+
+
+def _conditional_specs(schema: RecipeSchema, *, active: bool) -> tuple[Any, ...]:
+    specs = _sampled_specs(schema)
+    if active:
+        return specs
+    return tuple(
+        spec
+        for spec in specs
+        if spec.path != C5_ALLOW_MRE_VOLTAGE_CAP_PATH and spec.guard != C5_GUARD
+    )
+
+
+def _unconditional_result(patch: RecipePatch) -> SampledRecipePatch:
+    return SampledRecipePatch(patch, (), "", MappingProxyType({}))
+
+
+def _sample_unconditional_batch(
+    schema: RecipeSchema,
+    *,
+    n_samples: int,
+    seed: int,
+    sampler_name: str,
+    anchor: RecipePatch | None,
+    delta_fraction: float,
+) -> tuple[SampledRecipePatch, ...]:
+    specs = _sampled_specs(schema)
+    mapper = _resolve_value_mapper(schema, specs, anchor, delta_fraction)
+    if not specs:
+        return tuple(_unconditional_result(RecipePatch({}).validated(schema)) for _ in range(n_samples))
+    points = _unit_hypercube_points(len(specs), n_samples, seed, sampler_name)
+    return tuple(
+        _unconditional_result(
+            RecipePatch(
+                _map_unit_row(
+                    schema, specs, row, mapper, anchor=anchor,
+                    delta_fraction=delta_fraction,
+                )
+            ).validated(schema)
+        )
+        for row in points
+    )
+
+
+def _sample_unconditional_index(
+    schema: RecipeSchema,
+    *,
+    index: int,
+    seed: int,
+    sampler_name: str,
+    anchor: RecipePatch | None,
+    delta_fraction: float,
+) -> SampledRecipePatch:
+    specs = _sampled_specs(schema)
+    mapper = _resolve_value_mapper(schema, specs, anchor, delta_fraction)
+    if not specs:
+        return _unconditional_result(RecipePatch({}).validated(schema))
+    point = _unit_hypercube_point(len(specs), index, seed, sampler_name)
+    return _unconditional_result(
+        RecipePatch(
+            _map_unit_row(
+                schema, specs, point, mapper, anchor=anchor,
+                delta_fraction=delta_fraction,
+            )
+        ).validated(schema)
+    )
+
+
+def _conditional_seed(seed: int, digest: str) -> int:
+    payload = canonical_json_dumps([seed, digest]).encode("utf-8")
+    return int.from_bytes(hashlib.sha256(payload).digest()[:4], "big")
+
+
+def _project_anchor(anchor: RecipePatch | None, specs: tuple[Any, ...]) -> RecipePatch | None:
+    if anchor is None:
+        return None
+    return RecipePatch({spec.path: anchor.values[spec.path] for spec in specs})
+
+
+def _conditional_mapper(
+    schema: RecipeSchema,
+    specs: tuple[Any, ...],
+    *,
+    active: bool,
+    anchor: RecipePatch | None,
+    delta_fraction: float,
+):
+    projected = _project_anchor(anchor, specs)
+    base_mapper = _resolve_value_mapper(schema, specs, projected, delta_fraction)
+    if not active:
+        return base_mapper
+
+    from simulator.electrolysis import min_decomposition_voltage
+
+    positive_floor = min_decomposition_voltage()
+    if anchor is not None:
+        cap_center = float(anchor.values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH])
+        if cap_center < positive_floor:
+            raise ValueError(
+                "active C5 anchored sample requires cap at or above "
+                "min_decomposition_voltage"
+            )
+
+        def anchored_mapper(spec: Any, unit_value: float) -> Any:
+            if spec.path != C5_ALLOW_MRE_VOLTAGE_CAP_PATH:
+                return base_mapper(spec, unit_value)
+            low, high = _numeric_bounds(spec)
+            half_width = delta_fraction * (high - low)
+            anchored_low = max(positive_floor, cap_center - half_width)
+            anchored_high = min(high, cap_center + half_width)
+            return _map_numeric_unit_value(
+                spec, unit_value, anchored_low, anchored_high
+            )
+
+        return anchored_mapper
+
+    def mapper(spec: Any, unit_value: float) -> Any:
+        if spec.path == C5_ALLOW_MRE_VOLTAGE_CAP_PATH:
+            return _map_numeric_unit_value(
+                spec, unit_value, positive_floor, float(spec.high)
+            )
+        return base_mapper(spec, unit_value)
+
+    return mapper
+
+
+def _sampled_result(
+    schema: RecipeSchema,
+    *,
+    active: bool,
+    specs: tuple[Any, ...],
+    row: tuple[float, ...],
+    mapper,
+    anchor: RecipePatch | None,
+    delta_fraction: float,
+    context: ConditionalExecutionContext | None = None,
+) -> SampledRecipePatch:
+    projected = _project_anchor(anchor, specs)
+    values = _map_unit_row(
+        schema, specs, row, mapper, anchor=projected, delta_fraction=delta_fraction
+    )
+    patch = RecipePatch(values).validated(schema)
+    context = context or c5_sampler_context(schema, active=active)
+    return SampledRecipePatch(
+        patch,
+        context.conditional_mask,
+        context.conditional_subspace_digest,
+        context.effective_pins,
+    )
+
+
+def _sample_conditional_batch(
+    schema: RecipeSchema,
+    *,
+    active: bool,
+    n_samples: int,
+    seed: int,
+    sampler_name: str,
+    anchor: RecipePatch | None,
+    delta_fraction: float,
+) -> tuple[SampledRecipePatch, ...]:
+    if n_samples == 0:
+        return ()
+    specs = _conditional_specs(schema, active=active)
+    context = c5_sampler_context(schema, active=active)
+    if not specs and n_samples > 1:
+        raise ConditionalSubspaceExhausted(
+            "conditional subspace has one canonical zero-dimensional sample"
+        )
+    mapper = _conditional_mapper(
+        schema, specs, active=active, anchor=anchor, delta_fraction=delta_fraction
+    )
+    points = _unit_hypercube_points(
+        len(specs), n_samples, _conditional_seed(seed, context.conditional_subspace_digest), sampler_name
+    )
+    return tuple(
+        _sampled_result(
+            schema, active=active, specs=specs, row=row, mapper=mapper,
+            anchor=anchor, delta_fraction=delta_fraction,
+        )
+        for row in points
+    )
+
+
+def _sample_conditional_index(
+    schema: RecipeSchema,
+    *,
+    active: bool,
+    local_index: int,
+    seed: int,
+    sampler_name: str,
+    anchor: RecipePatch | None,
+    delta_fraction: float,
+    context: ConditionalExecutionContext | None = None,
+    stage_id: str | None = None,
+) -> SampledRecipePatch:
+    specs = _conditional_specs(schema, active=active)
+    context = context or c5_sampler_context(schema, active=active)
+    mapper = _conditional_mapper(
+        schema, specs, active=active, anchor=anchor, delta_fraction=delta_fraction
+    )
+    if not specs:
+        if local_index > 0:
+            raise ConditionalSubspaceExhausted(
+                "conditional subspace has one canonical zero-dimensional sample"
+            )
+        point = ()
+    else:
+        if stage_id is None:
+            derived_seed = _conditional_seed(seed, context.conditional_subspace_digest)
+        else:
+            payload = canonical_json_dumps(
+                [seed, context.conditional_subspace_digest, stage_id]
+            ).encode("utf-8")
+            derived_seed = int.from_bytes(hashlib.sha256(payload).digest()[:4], "big")
+        point = _unit_hypercube_point(len(specs), local_index, derived_seed, sampler_name)
+    return _sampled_result(
+        schema, active=active, specs=specs, row=point, mapper=mapper,
+        anchor=anchor, delta_fraction=delta_fraction, context=context,
+    )
 
 
 def active_sampler_name() -> str:
@@ -566,19 +856,24 @@ def _map_unit_value(spec: Any, unit_value: float) -> Any:
         return spec.choices[index]
 
     low, high = _numeric_bounds(spec)
-    value = low + unit_value * (high - low)
-    if spec.kind == "int":
-        low_int = int(low)
-        high_int = int(high)
-        bucket = min(int(unit_value * (high_int - low_int + 1)), high_int - low_int)
-        return low_int + bucket
-    if spec.kind == "float":
-        return float(value)
-    raise ValueError(f"{'.'.join(spec.path)} has unsupported knob kind {spec.kind!r}")
+    return _map_numeric_unit_value(spec, unit_value, low, high)
 
 
 def _map_numeric_unit_value(spec: Any, unit_value: float, low: float, high: float) -> Any:
-    value = low + unit_value * (high - low)
+    scale = getattr(spec, "scale", "linear")
+    if scale == "log":
+        if low <= 0.0 or high <= 0.0:
+            raise ValueError(f"{'.'.join(spec.path)} log scale requires positive bounds")
+        value = math.exp(math.log(low) + unit_value * (math.log(high) - math.log(low)))
+        value = min(high, max(low, value))
+        if spec.kind == "int":
+            return min(int(high), max(int(low), int(math.floor(value + 0.5))))
+        if spec.kind == "float":
+            return float(value)
+    elif scale in {"linear", "log10", "zero-inflated"}:
+        value = low + unit_value * (high - low)
+    else:
+        raise ValueError(f"{'.'.join(spec.path)} unsupported numeric scale {scale!r}")
     if spec.kind == "int":
         low_int = int(low)
         high_int = int(high)
@@ -848,6 +1143,10 @@ def _map_unit_value_anchored(
     anchored_low, anchored_high = _anchored_numeric_interval(
         spec, center, delta_fraction
     )
+    if getattr(spec, "scale", "linear") == "log":
+        return _map_numeric_unit_value(
+            spec, unit_value, anchored_low, anchored_high
+        )
     if spec.kind == "int":
         return _map_anchored_int_unit_value(
             spec,

@@ -52,6 +52,50 @@ def _doe(n_samples: int = 8) -> DoeSpec:
     )
 
 
+def test_t155_fidelity_tasks_propagate_conditional_context_to_both_arms(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict[str, list[object]] = {"fast": [], "high": []}
+
+    def fake_run_eval_batch(tasks, timeout_s, *, max_workers):
+        del timeout_s, max_workers
+        outcomes = {}
+        for task in tasks:
+            captured[task.tier].append(task.kwargs["conditional_context"])
+            outcomes[(task.tier, task.index)] = (
+                _result(
+                    task.candidate_id,
+                    oxygen_kg=float(task.index + 1),
+                    energy_kwh=float(task.index + 2),
+                    backend_name="internal-analytical",
+                    backend_status="ok",
+                ),
+                None,
+            )
+        return outcomes
+
+    monkeypatch.setattr(fidelity_module, "_run_eval_batch", fake_run_eval_batch)
+    run_fidelity_correlation(
+        DoeSpec(
+            schema=RecipeSchema(),
+            n_samples=2,
+            seed=42,
+            sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
+        ),
+        _perfect_fast,
+        _perfect_high,
+        feedstock_id=FEEDSTOCK_ID,
+        per_eval_timeout_s=1.0,
+    )
+
+    assert captured["fast"] == captured["high"]
+    assert [dict(context.conditional_mask)["mre-cap-v1"] for context in captured["fast"]] == [
+        "inactive",
+        "active",
+    ]
+    assert all(context.conditional_subspace_digest for context in captured["fast"])
+
+
 def _index(candidate_id: str | None) -> int:
     assert candidate_id is not None
     return int(candidate_id.split("-")[-2])

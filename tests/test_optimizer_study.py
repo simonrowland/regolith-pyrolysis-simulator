@@ -38,6 +38,7 @@ from simulator.cost_parameters import default_cost_parameters_block
 from simulator.optimize import cli as optimizer_cli
 from simulator.optimize import physics as physics_module
 from simulator.optimize import study
+from simulator.optimize.doe import SCIPY_SOBOL_SAMPLER, sample_recipe_candidates
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
 from simulator.optimize.evaluate import evaluate
@@ -51,7 +52,13 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.physics import physics_constraints_digest
 from simulator.optimize.profiles import constrained_max_profile, physics_constraints_from_profile
-from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    RecipePatch,
+    RecipeSchema,
+    conditional_context_from_metadata,
+    conditional_context_metadata,
+)
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.save_bundle import ALLOWED_MEMBERS, export_study_bundle
 from simulator.optimize.strategy import (
@@ -5874,3 +5881,108 @@ def _contains_key(value: Any, key: str) -> bool:
     if is_dataclass(value) and not isinstance(value, type):
         return any(_contains_key(getattr(value, field.name), key) for field in fields(value))
     return False
+def test_t155_tpe_and_nsga2_defer_scale_and_guard_metadata() -> None:
+    """Both Optuna strategies share this intentionally legacy-linear suggester."""
+    from simulator.optimize.recipe import GuardSpec, KnobSpec
+    from simulator.optimize.strategy.bayesian import _suggest_value
+
+    calls: list[tuple[str, float, float, bool]] = []
+
+    class Trial:
+        def suggest_float(self, name, low, high, *, log):
+            calls.append((name, low, high, log))
+            return (low + high) / 2.0
+
+    spec = KnobSpec(
+        path=("deferred",),
+        kind="float",
+        low=1.0,
+        high=100.0,
+        scale="log",
+        guard=GuardSpec(parent_paths=(("parent",),), canonicalizer_id="test"),
+    )
+    assert _suggest_value(Trial(), spec) == pytest.approx(50.5)
+    assert calls == [("deferred", 1.0, 100.0, False)]
+
+
+def test_t155_search_provenance_round_trips_conditional_context() -> None:
+    from simulator.optimize.recipe import (
+        c5_sampler_context,
+        conditional_context_from_metadata,
+        conditional_context_metadata,
+    )
+
+    context = c5_sampler_context(RecipeSchema(), active=False)
+    candidate = Candidate(
+        id="conditional-off",
+        patch=RecipePatch({}),
+        metadata={
+            "strategy": "random",
+            "proposal_source": "sobol",
+            **conditional_context_metadata(context),
+        },
+    )
+    provenance = study._search_provenance_from_candidate(candidate)
+    json.dumps(dict(provenance))
+    assert conditional_context_from_metadata(provenance) == context
+
+
+def test_t155_two_stream_sampler_evaluate_evalspec_study_identity_matrix() -> None:
+    schema = RecipeSchema()
+    sampled_streams = sample_recipe_candidates(
+        schema,
+        n_samples=2,
+        seed=19,
+        sampler_name=SCIPY_SOBOL_SAMPLER,
+    )
+
+    for index, (stream, sampled) in enumerate(
+        zip(("no-mre", "mre-on"), sampled_streams, strict=True)
+    ):
+        context = sampled.conditional_context
+        scored = evaluate(
+            sampled.patch,
+            FEEDSTOCK,
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            profile=PROFILE,
+            candidate_id=f"conditional-{index}",
+            executor=_StudyFakeExecutor(
+                exc=CampaignPressureSetpointRefusal(
+                    {"status": "refused", "detail": "matrix sentinel"}
+                )
+            ),
+            schema=schema,
+            conditional_context=context,
+        )
+        assert scored.eval_spec is not None
+        candidate = Candidate(
+            id=f"conditional-{index}",
+            patch=sampled.patch,
+            metadata={
+                "strategy": "random",
+                "proposal_source": "sobol",
+                **conditional_context_metadata(context),
+            },
+        )
+        record = study._to_record(candidate, scored, cache_hit=False)
+
+        expected_active = stream == "mre-on"
+        assert dict(sampled.conditional_mask) == {
+            "mre-cap-v1": "active" if expected_active else "inactive"
+        }
+        assert (
+            C5_ALLOW_MRE_VOLTAGE_CAP_PATH in sampled.patch.values
+        ) is expected_active
+        assert dict(sampled.effective_pins) == (
+            {} if expected_active else {C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0}
+        )
+        assert scored.eval_spec.conditional_subspace_digest == (
+            sampled.conditional_subspace_digest
+        )
+        assert scored.eval_spec.c5_enabled is expected_active
+        assert (scored.eval_spec.mre_max_voltage_V > 0.0) is expected_active
+        assert record.patch.canonical_json() == sampled.patch.canonical_json()
+        assert record.eval_spec == scored.eval_spec
+        assert record.cache_key == cache_key(scored.eval_spec)
+        assert record.eval_spec.recipe_id == scored.eval_spec.recipe_id
+        assert conditional_context_from_metadata(record.search_provenance) == context

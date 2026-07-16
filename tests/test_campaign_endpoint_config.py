@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from pathlib import Path
 
 import pytest
@@ -52,6 +53,36 @@ def _flux(total_kg_hr: float = 0.0, **species_kg_hr: float) -> EvaporationFlux:
         total_kg_hr=total_kg_hr,
         species_kg_hr=species_kg_hr,
     )
+
+
+def test_t155_delta_materializes_once_at_phase_entry_and_defaults_stay_equal():
+    defaults = _setpoints()
+    manager = CampaignManager(copy.deepcopy(defaults))
+    melt = _melt(CampaignPhase.C2B, 0)
+    assert manager._get_base_temp_target(CampaignPhase.C2B, 0, melt) == (1480.0, 10.0)
+    assert manager._get_base_temp_target(CampaignPhase.C5, 0, melt) == (1575.0, 5.0)
+    assert manager._get_base_temp_target(CampaignPhase.C6, 0, melt)[0] == 1400.0
+
+    patched = copy.deepcopy(defaults)
+    patched["campaigns"]["C2B"]["target_delta_below_ceiling_C"] = 20.0
+    patched["campaigns"]["C5"]["target_delta_below_ceiling_C"] = 50.0
+    before = copy.deepcopy(patched)
+    manager = CampaignManager(patched)
+    manager.configure_campaign(melt, CampaignPhase.C2B)
+    assert manager._get_base_temp_target(CampaignPhase.C2B, 0, melt) == (1460.0, 10.0)
+    manager.configure_campaign(melt, CampaignPhase.C5)
+    assert manager._get_base_temp_target(CampaignPhase.C5, 0, melt) == (1600.0, 5.0)
+    assert patched == before
+
+
+def test_t155_delta_translates_below_low_hardware_ceiling_without_low_clamp():
+    patched = _setpoints()
+    patched["furnace_max_T_C"] = 1300.0
+    patched["campaigns"]["C2B"]["target_delta_below_ceiling_C"] = 20.0
+    manager = CampaignManager(patched)
+    melt = _melt(CampaignPhase.C2B, 0)
+    manager.configure_campaign(melt, CampaignPhase.C2B)
+    assert manager._get_base_temp_target(CampaignPhase.C2B, 0, melt)[0] == 1280.0
 
 
 def test_c2a_staged_endpoint_refuses_unknown_species():

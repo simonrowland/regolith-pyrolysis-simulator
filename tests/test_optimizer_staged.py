@@ -30,6 +30,8 @@ from simulator.optimize.recipe import (
     KnobSpec,
     RecipePatch,
     RecipeSchema,
+    c5_sampler_context,
+    conditional_context_metadata,
 )
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.strategy import staged as staged_module
@@ -471,6 +473,64 @@ def test_staged_prefix_replay_hits_cache_and_matches_fresh_prefix(tmp_path) -> N
     assert_prefix_replay_equal(cached, fresh)
 
 
+def test_staged_prefix_replay_refuses_invented_stage_before_identity(
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    context = c5_sampler_context(
+        SCHEMA,
+        active=True,
+        scope="prefix-before-guard-stage",
+        prefix_stage_ids=("NOT_A_STAGE",),
+    )
+    candidate = Candidate(
+        id="invented-prefix-stage",
+        patch=RecipePatch({}),
+        metadata={
+            "strategy": "staged",
+            "stage_index": 1,
+            "prefix_depth": 1,
+            "prefix_stage_ids": ("NOT_A_STAGE",),
+            "prefix_patch_values": {},
+            "topology": TopologyChoice(
+                path_ab="A", branch="two", c5=True, c6=True
+            ).metadata(),
+            **conditional_context_metadata(context),
+        },
+    )
+    prefix_builder_called = False
+
+    def refuse_prefix_builder(*args: Any, **kwargs: Any):
+        nonlocal prefix_builder_called
+        prefix_builder_called = True
+        raise AssertionError("prefix identity builder must not be reached")
+
+    monkeypatch.setattr(study, "_build_prefix_eval_inputs", refuse_prefix_builder)
+    store = SpyStore(tmp_path / "cache.sqlite")
+
+    with pytest.raises(
+        StagedBeamStateError,
+        match="authoritative topology stage table",
+    ):
+        study._ensure_staged_prefix_replay(
+            candidate,
+            profile=PROFILE,
+            feedstock=FEEDSTOCK,
+            fidelity="stub",
+            out_dir=tmp_path,
+            evaluator=SpyEvaluator(),
+            schema=SCHEMA,
+            constraints=None,
+            store=store,
+            definitions=(),
+            prefix_replay_cache={},
+            per_eval_timeout_seconds=None,
+        )
+
+    assert prefix_builder_called is False
+    assert store.lookup_specs == []
+
+
 def test_staged_runtime_rejects_tampered_prefix_cache(tmp_path) -> None:
     class TamperingStore(SpyStore):
         def store(
@@ -587,6 +647,9 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
     assert loaded_base.cache_key == cache_key(base)
     assert loaded_prefix.cache_key == cache_key(prefix)
     assert isinstance(loaded_prefix.eval_spec, PrefixEvalSpec)
+    assert loaded_prefix.eval_spec.conditional_subspace_digest == (
+        prefix.conditional_subspace_digest
+    )
     assert loaded_prefix.eval_spec.prefix_stage_ids == ("C0",)
     assert loaded_prefix.eval_spec.prefix_recipe_ids == (base.recipe_id,)
     assert loaded_prefix.eval_spec.topology_id == "PATH_AB"
@@ -746,6 +809,42 @@ def test_c5_and_c6_topology_changes_stage_path() -> None:
     assert c6_no.stage_ids != c6_yes.stage_ids
     assert "C6" not in c6_no.stage_ids
     assert c6_yes.stage_ids[-1] == "C6"
+
+
+def test_t155_staged_candidate_propagates_conditional_identity_and_prefix_proof() -> None:
+    strategy = StagedStrategy(
+        SCHEMA,
+        seed=3,
+        objective_profile={
+            **PROFILE,
+            "staged": {"beam_width": 1, "children_per_parent": 1},
+        },
+        topology=TopologyChoice(path_ab="A", branch="two", c5=True, c6=True),
+    )
+
+    candidate = strategy.ask(1)[0]
+    assert candidate.metadata["conditional_mask"] == (("mre-cap-v1", "active"),)
+    assert candidate.metadata["conditional_subspace_digest"]
+    assert candidate.metadata["effective_pins"] == ()
+    assert candidate.metadata["conditional_scope"] == "prefix-before-guard-stage"
+    assert candidate.metadata["conditional_prefix_stage_ids"] == (
+        candidate.metadata["stage_id"],
+    )
+    provenance = study._search_provenance_from_candidate(candidate)
+    assert provenance["conditional_mask"] == [["mre-cap-v1", "active"]]
+    assert provenance["conditional_subspace_digest"] == (
+        candidate.metadata["conditional_subspace_digest"]
+    )
+    assert provenance["conditional_prefix_stage_ids"] == [
+        candidate.metadata["stage_id"]
+    ]
+
+
+def test_t155_tap_truncation_structural_paths_are_canonical() -> None:
+    assert set(study._TAP_TRUNCATION_DURATION_PATHS.values()) == {
+        ("campaigns", "C0b_p_cleanup", "duration_hr"),
+        ("campaigns", "C2A_continuous", "duration_hr"),
+    }
 
 
 def test_c2a_staged_topology_order_is_candidate_visible() -> None:

@@ -45,6 +45,7 @@ from simulator.optimize.evaluate import (
     RunReference,
     ScoredResult,
     _build_eval_inputs,
+    _build_prefix_eval_inputs,
     _is_stale_profile_refusal,
     _stale_profile_result,
     evaluate,
@@ -88,6 +89,8 @@ from simulator.optimize.recipe import (
     RecipeValidationError,
     allowlist_version,
     recipe_schema_version,
+    conditional_context_from_metadata,
+    c5_sampler_context,
 )
 from simulator.optimize.result_scope import result_scope_json, result_scope_payload
 from simulator.optimize.save_bundle import MEMBER_SCHEMA_VERSION, SAVE_SCHEMA_VERSION
@@ -117,6 +120,7 @@ from simulator.optimize.strategy.staged import (
     StagedReplayViolation,
     StagedStrategy,
     TopologyChoice,
+    authoritative_prefix_stage_ids,
     assert_prefix_replay_equal,
     enumerate_topologies,
     make_prefix_eval_spec,
@@ -2667,6 +2671,10 @@ def _search_space_identity(
     profile_pinned_paths: Sequence[str],
     cli_pinned_paths: Sequence[str],
 ) -> Mapping[str, Any]:
+    conditional_digests = [
+        c5_sampler_context(schema, active=active).conditional_subspace_digest
+        for active in (False, True)
+    ]
     return MappingProxyType(
         {
             "recipe_schema_version": schema.recipe_schema_version,
@@ -2678,6 +2686,8 @@ def _search_space_identity(
                 ".".join(path) for path in getattr(schema, "pinned_paths", ())
             ],
             "search_knob_paths": [".".join(spec.path) for spec in schema.search_allowlist],
+            "conditional_allocation_version": "optimizer-conditional-subspace-v1",
+            "conditional_subspace_digests": conditional_digests,
         }
     )
 
@@ -3098,6 +3108,7 @@ def _store_warm_start_seeds(
                 profile,
                 schema,
                 constraints=constraints,
+                conditional_context=_full_conditional_context_from_metadata(provenance),
             )
         except ProfileValidationError as exc:
             if _is_stale_profile_refusal(exc):
@@ -3305,7 +3316,10 @@ def _evaluate_candidates(
         requests: list[PoolEvaluationRequest] = []
         for _, candidate in misses:
             call_patch = candidate.patch
+            conditional_context = _full_evaluation_conditional_context(candidate)
             evaluator_kwargs: dict[str, Any] = {}
+            if conditional_context is not None:
+                evaluator_kwargs["conditional_context"] = conditional_context
             staged_prefix = staged_prefixes.get(candidate.id)
             if staged_prefix is not None:
                 stage_patch = _stage_patch_from_metadata(candidate, schema)
@@ -3360,6 +3374,9 @@ def _evaluate_candidates(
                         profile,
                         schema,
                         constraints=constraints,
+                        conditional_context=_full_evaluation_conditional_context(
+                            candidate
+                        ),
                     )
                 except ProfileValidationError as exc:
                     if _is_stale_profile_refusal(exc):
@@ -3399,21 +3416,63 @@ def _ensure_staged_prefix_replay(
     if prefix_depth <= 0:
         return None, False
 
-    prefix_patch = _prefix_patch_from_metadata(candidate, schema)
-    base_spec, _ = _build_eval_inputs(
-        prefix_patch,
-        feedstock,
-        fidelity,
-        profile,
+    prefix_stage_ids = _string_tuple_metadata(candidate, "prefix_stage_ids")
+    stage_index = candidate.metadata.get("stage_index")
+    if (
+        isinstance(stage_index, bool)
+        or not isinstance(stage_index, int)
+        or stage_index != prefix_depth
+    ):
+        raise StagedBeamStateError(
+            "staged prefix_depth does not match candidate stage_index"
+        )
+    authoritative_prefix = authoritative_prefix_stage_ids(
         schema,
-        constraints=constraints,
+        profile,
+        _topology_id_metadata(candidate),
+        prefix_depth,
     )
-    prefix_spec = make_prefix_eval_spec(
-        base_spec,
-        prefix_stage_ids=_string_tuple_metadata(candidate, "prefix_stage_ids"),
-        prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
-        topology_id=_topology_id_metadata(candidate),
-    )
+    if prefix_stage_ids != authoritative_prefix:
+        raise StagedBeamStateError(
+            "staged prefix stage IDs do not match the authoritative topology stage table"
+        )
+    prefix_patch = _prefix_patch_from_metadata(candidate, schema)
+    context = conditional_context_from_metadata(candidate.metadata)
+    if context is not None and context.scope == "prefix-before-guard-stage":
+        context = c5_sampler_context(
+            schema,
+            active=True,
+            scope="prefix-before-guard-stage",
+            prefix_stage_ids=prefix_stage_ids,
+        )
+        prefix_spec, _ = _build_prefix_eval_inputs(
+            prefix_patch,
+            feedstock,
+            fidelity,
+            profile,
+            schema,
+            prefix_stage_ids=prefix_stage_ids,
+            prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
+            topology_id=_topology_id_metadata(candidate),
+            constraints=constraints,
+            conditional_context=context,
+        )
+    else:
+        base_spec, _ = _build_eval_inputs(
+            prefix_patch,
+            feedstock,
+            fidelity,
+            profile,
+            schema,
+            constraints=constraints,
+            conditional_context=context,
+        )
+        prefix_spec = make_prefix_eval_spec(
+            base_spec,
+            prefix_stage_ids=prefix_stage_ids,
+            prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
+            topology_id=_topology_id_metadata(candidate),
+        )
     if not isinstance(prefix_spec, PrefixEvalSpec):
         raise StagedBeamStateError("staged prefix spec was not a PrefixEvalSpec")
     prefix_key = cache_key(prefix_spec)
@@ -3574,6 +3633,19 @@ def _is_staged_candidate(candidate: Candidate) -> bool:
     return candidate.metadata.get("strategy") == "staged"
 
 
+def _full_evaluation_conditional_context(
+    candidate: Candidate,
+):
+    return _full_conditional_context_from_metadata(candidate.metadata)
+
+
+def _full_conditional_context_from_metadata(metadata: Mapping[str, Any]):
+    context = conditional_context_from_metadata(metadata)
+    if context is not None and context.scope == "prefix-before-guard-stage":
+        return None
+    return context
+
+
 def _lookup_cached(
     candidate: Candidate,
     profile: Mapping[str, Any],
@@ -3594,6 +3666,7 @@ def _lookup_cached(
             profile,
             schema,
             constraints=constraints,
+            conditional_context=_full_evaluation_conditional_context(candidate),
         )
     except RecipeValidationError:
         return None
@@ -3626,7 +3699,10 @@ def _evaluate_one_supervised(
 ) -> ScoredResult:
     stage_patch = _stage_patch_from_metadata(candidate, schema)
     call_patch = candidate.patch
+    conditional_context = _full_evaluation_conditional_context(candidate)
     evaluator_kwargs: dict[str, Any] = {}
+    if conditional_context is not None:
+        evaluator_kwargs["conditional_context"] = conditional_context
     if staged_prefix is not None:
         if stage_patch is None:
             raise StagedReplayViolation(
@@ -3676,6 +3752,7 @@ def _evaluate_one_supervised(
                 profile,
                 schema,
                 constraints=constraints,
+                conditional_context=conditional_context,
             )
         except ProfileValidationError as exc:
             if _is_stale_profile_refusal(exc):
@@ -3731,6 +3808,7 @@ def _evaluate_one(
             constraints=constraints,
             output_dir=out_dir / "evals" / candidate.id,
             staged_replay=staged_replay,
+            conditional_context=_full_evaluation_conditional_context(candidate),
         )
     except ProfileValidationError as exc:
         if _is_stale_profile_refusal(exc):
@@ -3750,6 +3828,7 @@ def _evaluate_one(
                 profile,
                 schema,
                 constraints=constraints,
+                conditional_context=_full_evaluation_conditional_context(candidate),
             )
         except ProfileValidationError as exc:
             if _is_stale_profile_refusal(exc):
@@ -4034,6 +4113,11 @@ def _search_provenance_from_candidate(candidate: Candidate) -> Mapping[str, Any]
         "parent_cache_key",
         "trial_number",
         "seed_id",
+        "conditional_mask",
+        "conditional_subspace_digest",
+        "effective_pins",
+        "conditional_scope",
+        "conditional_prefix_stage_ids",
     ):
         value = metadata.get(key)
         if value is not None:
@@ -5327,10 +5411,10 @@ def _round_or_none(value: float | None) -> float | None:
 
 _TAP_TRUNCATION_DURATION_PATHS: Mapping[str, tuple[str, ...]] = MappingProxyType(
     {
-        "C0B": ("campaigns", "C0b_p_cleanup", "duration_h"),
-        "C0b_p_cleanup": ("campaigns", "C0b_p_cleanup", "duration_h"),
-        "C2A": ("campaigns", "C2A_continuous", "duration_h"),
-        "C2A_continuous": ("campaigns", "C2A_continuous", "duration_h"),
+        "C0B": ("campaigns", "C0b_p_cleanup", "duration_hr"),
+        "C0b_p_cleanup": ("campaigns", "C0b_p_cleanup", "duration_hr"),
+        "C2A": ("campaigns", "C2A_continuous", "duration_hr"),
+        "C2A_continuous": ("campaigns", "C2A_continuous", "duration_hr"),
     }
 )
 _UNSUPPORTED_TAP_TRUNCATION_CAMPAIGNS = frozenset(

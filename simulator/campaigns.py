@@ -211,6 +211,7 @@ class CampaignManager:
         self.last_c2a_staged_termination: dict[str, object] | None = None
         self._pending_c3_na_scoped_overrides: dict | None = None
         self._active_c3_na_scoped_overrides: dict | None = None
+        self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -1070,6 +1071,32 @@ class CampaignManager:
         if hasattr(melt, 'background_gas_mole_fraction'):
             melt.background_gas_mole_fraction = 0.0
 
+    def _materialize_target_from_delta(
+        self, campaign: CampaignPhase
+    ) -> float | None:
+        if campaign not in (CampaignPhase.C2B, CampaignPhase.C5):
+            return None
+        config = self._campaign_config(campaign)
+        if 'target_delta_below_ceiling_C' not in config:
+            return None
+        delta = self._required_float(
+            config.get('target_delta_below_ceiling_C'),
+            f'{self._campaign_config_key(campaign)}.target_delta_below_ceiling_C',
+        )
+        temperature_range = config.get('temp_range_C')
+        if not isinstance(temperature_range, (list, tuple)) or len(temperature_range) != 2:
+            raise ValueError(
+                f'Malformed campaign temperature range: '
+                f'{self._campaign_config_key(campaign)}.temp_range_C'
+            )
+        process_high_C = self._required_float(
+            temperature_range[1],
+            f'{self._campaign_config_key(campaign)}.temp_range_C[1]',
+        )
+        if not math.isfinite(delta) or delta < 0.0:
+            raise ValueError('target_delta_below_ceiling_C must be finite and non-negative')
+        return min(self.furnace_max_T_C, process_high_C) - delta
+
     def configure_campaign(self, melt: MeltState, campaign: CampaignPhase):
         """
         Set gas-side atmosphere and process parameters for a campaign.
@@ -1078,6 +1105,10 @@ class CampaignManager:
         Called when starting a new campaign phase.
         """
         self._reset_stage_background_gas(melt)
+        self._materialized_target_T_C_by_phase.pop(campaign, None)
+        materialized_target = self._materialize_target_from_delta(campaign)
+        if materialized_target is not None:
+            self._materialized_target_T_C_by_phase[campaign] = materialized_target
 
         if campaign == CampaignPhase.C3_NA:
             self._active_c3_na_scoped_overrides = (
@@ -1353,7 +1384,11 @@ class CampaignManager:
             return (target, ramp)
 
         elif campaign == CampaignPhase.C2B:
-            return self._configured_temperature_ramp(campaign)
+            target = self._materialized_target_T_C_by_phase.get(campaign)
+            if target is None:
+                return self._configured_temperature_ramp(campaign)
+            _, ramp = self._configured_temperature_ramp(campaign)
+            return (target, ramp)
 
         elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
             # Legacy C3 alternates injection/bakeout. V1c staged Na cleanup
@@ -1383,7 +1418,10 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C5:
             # MRE: hold at process temperature
-            return (1575.0, 5.0)
+            return (
+                self._materialized_target_T_C_by_phase.get(campaign, 1575.0),
+                5.0,
+            )
 
         elif campaign == CampaignPhase.C6:
             cfg = self._campaign_config(campaign)

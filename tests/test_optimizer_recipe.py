@@ -28,11 +28,13 @@ from simulator.optimize.recipe import (
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
     C4_HOLD_TEMP_C_PATH,
     FURNACE_MAX_T_C_PATH,
+    InactiveConditionalChildWarning,
     KnobSpec,
     O2_BUBBLER_CAMPAIGN_RATE_PATHS,
     O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH,
     O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION,
     O2_BUBBLER_TARGET_FO2_LOG_PATH,
+    PATH_ALIASES,
     RecipePatch,
     RecipePinWarning,
     RecipeSchema,
@@ -40,9 +42,10 @@ from simulator.optimize.recipe import (
     STAGE0_CARBON_REDUCTANT_KG_PATH,
     STAGE0_REDOX_OXIDANT_KG_PATH,
     allowlist_version,
+    c5_sampler_context,
 )
 import simulator.optimize.recipe as recipe_module
-from simulator.optimize.canonical import canonical_json_dumps
+from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evaluate import RunReference, _build_eval_inputs
 from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
 from simulator.interpolation_uncertainty import build_interpolation_uncertainty_vector
@@ -54,6 +57,143 @@ from simulator.state import BatchRecord, CondensationTrain, EvaporationFlux, Mel
 
 
 FEEDSTOCK = "lunar_mare_low_ti"
+
+
+def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
+    schema = RecipeSchema()
+    empty = RecipePatch({})
+    assert empty.canonical_json().encode() == b"[]"
+    assert canonical_json_dumps(schema.to_setpoints_patch(empty)).encode() == b"{}"
+    resolved = canonical_json_dumps(
+        normalize_canonical_value(
+            PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch={})
+            ._session_config()
+            .setpoints
+        )
+    ).encode()
+    assert hashlib.sha256(resolved).hexdigest() == (
+        "69ed44ac69342dcbe542b66a6509903c242877c43fff9acc96e4f64bcb9f0f01"
+    )
+    assert schema.bounds_digest == (
+        "2308bef69d19aa7679dda3f5d9838c91f7efd22eaaa16fc64cf5aa8b2cf63eb5"
+    )
+    assert schema.bounds_digest != (
+        "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
+    )
+    assert empty.recipe_id(schema) == (
+        "fcb620b79a966a6412204c76bf87dc220e1c4cb38cda36c44f57d80cd4fa84b4"
+    )
+    assert empty.recipe_id(schema) != (
+        "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
+    )
+    identity = study_module._search_space_identity(
+        schema, profile_pinned_paths=(), cli_pinned_paths=()
+    )
+    identity_digest = hashlib.sha256(
+        canonical_json_dumps(dict(identity)).encode()
+    ).hexdigest()
+    assert identity_digest == (
+        "824a6522b1e802b3fa1fb2f0dd93e1b449930e4990756b0159b9436959187ef2"
+    )
+    assert identity_digest != (
+        "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
+    )
+    subspace_digests = [
+        c5_sampler_context(schema, active=active).conditional_subspace_digest
+        for active in (False, True)
+    ]
+    assert subspace_digests == [
+        "7dfe16aff3f3ce553483953257b9fd3a18280b57b3f4af306342663a78e3a075",
+        "ba10851113c96b4bcc0e52feecb66a80e640ddda38d4a6a21fd5f6fdbfc8bdc3",
+    ]
+    assert subspace_digests == identity["conditional_subspace_digests"]
+
+
+@pytest.mark.parametrize("old_path,alias", tuple(PATH_ALIASES.items()))
+def test_t155_aliases_are_identity_equivalent_and_collisions_refuse(old_path, alias) -> None:
+    schema = RecipeSchema()
+    spec = schema.spec_for(alias.canonical_path)
+    canonical_value = (float(spec.low) + float(spec.high)) / 2.0
+    if spec.kind == "int":
+        canonical_value = int(canonical_value)
+    old_value = canonical_value * 60.0 if alias.transform_id == "minutes-to-hours" else canonical_value
+    old_patch = RecipePatch({old_path: old_value})
+    canonical_patch = RecipePatch({alias.canonical_path: canonical_value})
+    assert old_patch.canonical_json() == canonical_patch.canonical_json()
+    if spec.guard is None:
+        assert old_patch.recipe_id(schema) == canonical_patch.recipe_id(schema)
+    else:
+        for patch in (old_patch, canonical_patch):
+            with pytest.raises(
+                RecipeValidationError, match="conditional guard parent unresolved"
+            ):
+                patch.recipe_id(schema)
+    assert schema.to_setpoints_patch(old_patch) == schema.to_setpoints_patch(canonical_patch)
+    with pytest.raises(RecipeValidationError, match="recipe_alias_collision"):
+        RecipePatch({old_path: old_value, alias.canonical_path: canonical_value})
+
+
+def test_t155_c2b_absolute_and_delta_dual_control_refuses_and_c6_has_no_delta() -> None:
+    schema = RecipeSchema()
+    with pytest.raises(RecipeValidationError, match="recipe_temperature_dual_control"):
+        RecipePatch.from_nested(
+            {
+                "campaigns": {
+                    "C2B": {
+                        "temp_range_C": [1320, 1480],
+                        "target_delta_below_ceiling_C": 20.0,
+                    }
+                }
+            }
+        ).validated(schema)
+    assert schema.spec_for(("campaigns", "C2B", "temp_range_C")).search_enabled is False
+    assert schema.spec_for(("campaigns", "C6", "default_hold_T_C")).search_enabled is True
+    with pytest.raises(RecipeValidationError, match="unknown recipe path"):
+        schema.spec_for(("campaigns", "C6", "target_delta_below_ceiling_C"))
+
+
+@pytest.mark.parametrize(
+    "child_path",
+    (
+        ("campaigns", "C5", "target_delta_below_ceiling_C"),
+        O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH,
+    ),
+)
+def test_t155_guarded_child_only_recipe_identity_refuses(child_path) -> None:
+    with pytest.raises(RecipeValidationError, match="conditional guard parent unresolved"):
+        RecipePatch({child_path: 10.0 if "C5" in child_path else 0.5}).recipe_id(
+            RecipeSchema()
+        )
+
+
+@pytest.mark.parametrize(
+    "patch",
+    (
+        RecipePatch(
+            {
+                C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0,
+                ("campaigns", "C5", "target_delta_below_ceiling_C"): 10.0,
+            }
+        ),
+        RecipePatch(
+            {
+                ("campaigns", "C3", "o2_bubbler_kg_per_hr"): 0.0,
+                O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH: 0.5,
+            }
+        ),
+    ),
+)
+def test_t155_inactive_guarded_children_warn_once_and_resolve_empty(patch) -> None:
+    with pytest.warns(InactiveConditionalChildWarning) as caught:
+        resolved = RecipeSchema().resolve_conditional_patch(patch)
+    assert len(caught) == 1
+    guarded_paths = {
+        spec.path for spec in RecipeSchema().allowlist if spec.guard is not None
+    }
+    assert not guarded_paths.intersection(resolved.patch.values)
+    assert resolved.patch.recipe_id(RecipeSchema()) == RecipePatch({}).recipe_id(
+        RecipeSchema()
+    )
 PO2_DEFAULT = ("campaigns", "C0b_p_cleanup", "pO2_mbar_default")
 PTOTAL_DEFAULT = ("campaigns", "C0b_p_cleanup", "p_total_mbar_default")
 C3_PO2_DEFAULT = ("campaigns", "C3", "pO2_mbar_default")
@@ -73,7 +213,7 @@ STAGE_FE_DURATION = (
     "C2A_staged",
     "stages",
     "fe_hot_hold",
-    "duration_h",
+    "duration_hr",
 )
 STAGE_COOL_RAMP = (
     "campaigns",
@@ -291,7 +431,7 @@ def test_pinned_c2a_temperature_targets_leave_other_knobs_searchable() -> None:
         "C2A_staged",
         "stages",
         "sio_window",
-        "duration_h",
+        "duration_hr",
     ) in search_paths
     assert ("campaigns", "C2B", "pO2_mbar") in search_paths
     assert (
@@ -356,10 +496,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
 
     assert unpinned is schema
-    assert len(paths) == 84
+    assert len(paths) == 70
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "6b1388b7909a135b18153bdda8503dc36911ed23520914cdbd2246e1c6827249"
+        == "20fbfe6d34c8499b006fc44f10288f08ed9c723a2520a5eeffe500de39ed2fdc"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -368,9 +508,8 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
         profile,
         unpinned,
     )
-    # 2026-07-12: the C6 1400 C hold-window bounds changed the active bounds
-    # digest from 67f7eae1... to 32e9d2e9...; recomputed via _build_eval_inputs.
-    assert spec.recipe_id == "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
+    # 2026-07-15 t-155: allowlist-v12 vocabulary identity epoch.
+    assert spec.recipe_id == "fcb620b79a966a6412204c76bf87dc220e1c4cb38cda36c44f57d80cd4fa84b4"
     # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
     # moves when the live searchable allowlist identity changes.
     # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed,
@@ -461,7 +600,8 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-14 t-194 Cr/Mn grounding: the functional vapor-pressure digest
     # moved with data/vapor_pressures.yaml; merge-time (2026-07-15) empirical
     # recompute in the integrated tree (t-259 purity fix + t-194 digest move).
-    assert cache_key(spec) == "be16be9b30f3b68f4889933efad83da6eb65b40cd80f7c5d16349a5f891e464b"
+    assert cache_key(spec) == "872f467f22434f07b6ffa6e34f8d8d29d89620d4f38ae49afeb03a15d719af1d"
+    assert cache_key(spec) != "be16be9b30f3b68f4889933efad83da6eb65b40cd80f7c5d16349a5f891e464b"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -474,15 +614,14 @@ def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
         RecipePatch({PO2_DEFAULT: "9.0"}).validated()
 
 
-def test_int_kind_rejects_float_and_bool() -> None:
-    hold_time = ("campaigns", "C3", "endpoint", "hold_time_min")
-    RecipePatch({hold_time: 30}).validated()
+def test_c3_hold_time_alias_converts_minutes_to_float_hours() -> None:
+    old = ("campaigns", "C3", "endpoint", "hold_time_min")
+    canonical = ("campaigns", "C3", "endpoint", "hold_time_hr")
+    assert RecipePatch({old: 30}).validated().values[canonical] == pytest.approx(0.5)
+    assert RecipePatch({old: 30.5}).validated().values[canonical] == pytest.approx(30.5 / 60)
 
-    with pytest.raises(RecipeValidationError, match="requires int value"):
-        RecipePatch({hold_time: 30.5}).validated()
-
-    with pytest.raises(RecipeValidationError, match="requires int value"):
-        RecipePatch({hold_time: True}).validated()
+    with pytest.raises(RecipeValidationError, match="requires float value"):
+        RecipePatch({canonical: True}).validated()
 
 
 def test_furnace_max_t_c_knob_bounds_and_top_level_patch() -> None:
@@ -516,8 +655,8 @@ def test_furnace_max_t_c_bounds_are_allowlist_epoch_pinned() -> None:
         (spec.low, spec.high),
         FURNACE_MAX_T_BOUNDS_C,
     ) == (
-        "allowlist-v11",
-        "allowlist-v11",
+        "allowlist-v12",
+        "allowlist-v12",
         (1200.0, 2000.0),
         (1200.0, 2000.0),
     )
@@ -612,7 +751,7 @@ def test_nested_yaml_round_trip_and_setpoints_patch_smoke() -> None:
     assert loaded_patch.values[PO2_DEFAULT] == pytest.approx(10.0)
     assert loaded_patch.values[PTOTAL_DEFAULT] == pytest.approx(10.0)
     assert loaded_patch.values[
-        ("campaigns", "C2A_continuous", "duration_h")
+        ("campaigns", "C2A_continuous", "duration_hr")
     ] == [20, 24]
 
     run = PyrolysisRun(feedstock_id=FEEDSTOCK, setpoints_patch=nested)
@@ -740,10 +879,10 @@ def test_c2a_staged_flux_decay_species_setpoints_are_explicit_ascii() -> None:
 def test_c2a_staged_named_stage_knobs_render_to_real_stage_list() -> None:
     schema = RecipeSchema()
     stage_fields = {
-        "alkali_early_fe": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
-        "sio_window": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
-        "fe_hot_hold": ("duration_h", "ramp_rate_C_per_hr"),
-        "cool_for_na_shuttle": ("duration_h", "target_C", "ramp_rate_C_per_hr"),
+        "alkali_early_fe": ("duration_hr", "target_C", "ramp_rate_C_per_hr"),
+        "sio_window": ("duration_hr", "target_C", "ramp_rate_C_per_hr"),
+        "fe_hot_hold": ("duration_hr", "ramp_rate_C_per_hr"),
+        "cool_for_na_shuttle": ("duration_hr", "target_C", "ramp_rate_C_per_hr"),
     }
     stage_paths = {
         (
@@ -1376,7 +1515,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # active bounds digest from 67f7eae1... to 32e9d2e9....
     assert (
         first.recipe_id()
-            == "7236cc9dee164395c000645da3846140bff1e17aa6772a057d26b0cfe3ae8801"
+                == "6b828131b4a825d1f3d761c7b851863fc2ec17dccf8e07665d11ccaa8ae47b89"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
@@ -1538,12 +1677,14 @@ def test_o2_bubbler_zero_rate_preserves_legacy_recipe_identity() -> None:
     assert RecipePatch({c3_rate: 0.25}).recipe_id(schema) != RecipePatch({}).recipe_id(
         legacy_schema
     )
-    assert RecipePatch(
-        {O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH: 0.75}
-    ).recipe_id(schema) == RecipePatch({}).recipe_id(schema)
-    assert RecipePatch(
-        {O2_BUBBLER_TARGET_FO2_LOG_PATH: None}
-    ).recipe_id(schema) == RecipePatch({}).recipe_id(schema)
+    for child_only in (
+        RecipePatch({O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH: 0.75}),
+        RecipePatch({O2_BUBBLER_TARGET_FO2_LOG_PATH: None}),
+    ):
+        with pytest.raises(
+            RecipeValidationError, match="conditional guard parent unresolved"
+        ):
+            child_only.recipe_id(schema)
 
 
 @pytest.mark.parametrize("bad_value", [-1.0, float("nan"), float("inf")])
@@ -1577,7 +1718,8 @@ def test_o2_bubbler_target_none_validates_as_unset() -> None:
     schema = RecipeSchema()
     patch = RecipePatch({O2_BUBBLER_TARGET_FO2_LOG_PATH: None}).validated(schema)
 
-    assert patch.recipe_id(schema) == RecipePatch({}).recipe_id(schema)
+    with pytest.raises(RecipeValidationError, match="conditional guard parent unresolved"):
+        patch.recipe_id(schema)
     assert schema.o2_bubbler_settings(patch) == {}
 
 

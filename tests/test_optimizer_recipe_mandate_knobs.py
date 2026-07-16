@@ -8,6 +8,7 @@ import yaml
 from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
 from simulator.optimize.recipe import (
+    CANONICAL_TO_RUNTIME_PATH,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE,
     FURNACE_MAX_T_C_PATH,
@@ -32,7 +33,7 @@ def _path(dotted: str) -> tuple[str, ...]:
     return tuple(dotted.split("."))
 
 
-C4_RUNTIME_ONLY_PATHS = {_path("campaigns.C4.hold_temp_C")}
+C4_RUNTIME_ONLY_PATHS = {_path("campaigns.C4.default_hold_T_C")}
 C2A_STAGED_STAGE_GAS_PATHS = {
     _path(f"campaigns.C2A_staged.stages.{stage}.{field}")
     for stage in (
@@ -81,7 +82,7 @@ def test_mandate_lever_allowlist_is_default_schema_subset() -> None:
 
     assert mandate_paths == MANDATE_LEVER_PATHS
     assert mandate_paths <= schema_paths
-    assert "allowlist-v11" == schema.allowlist_version
+    assert "allowlist-v12" == schema.allowlist_version
 
     # P1 #1: campaigns.C2A_staged.stages.fe_hot_hold.target_C is a silent no-op
     # (the runtime holds fe_hot_hold at default_hold_T_C / the C4-style override,
@@ -172,7 +173,7 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
         _path("campaigns.C0b_p_cleanup.pO2_mbar_default"),
         _path("campaigns.C2A_continuous.p_total_mbar_default"),
         _path("campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr"),
-        _path("campaigns.C2A_staged.na_shuttle_stage.duration_h"),
+        _path("campaigns.C2A_staged.na_shuttle_stage.duration_hr"),
         _path(
             "campaigns.C2A_staged.stages.alkali_early_fe."
             "depletion_log_slope_epsilon_per_hr"
@@ -181,11 +182,11 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
         _path("campaigns.C2A_staged.stages.sio_window.pO2_mbar"),
         _path("campaigns.C2A_staged.stages.sio_window.p_total_mbar"),
         _path("campaigns.C2A_staged.stages.sio_window.gas_cover_mode"),
-        _path("campaigns.C2A_staged.stages.fe_hot_hold.duration_h"),
-        _path("campaigns.C3.endpoint.hold_time_min"),
+        _path("campaigns.C2A_staged.stages.fe_hot_hold.duration_hr"),
+        _path("campaigns.C3.endpoint.hold_time_hr"),
         _path("campaigns.C3.alkali_dosing.Na_kg"),
         _path("campaigns.C3.alkali_dosing.K_kg"),
-        _path("campaigns.C4.hold_temp_C"),
+        _path("campaigns.C4.default_hold_T_C"),
         _path("campaigns.C5.allow_mre_voltage_cap_V"),
         _path("overhead_headspace.temperature_offset_K"),
         _path(
@@ -207,7 +208,12 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
             | C2A_STAGED_STAGE_GAS_PATHS
             | C2A_STAGED_DEPLETION_LOG_SLOPE_PATHS
         ):
-            _lookup(setpoints, spec.path)
+            if spec.path[-1] == "target_delta_below_ceiling_C":
+                continue
+            runtime_path = CANONICAL_TO_RUNTIME_PATH.get(
+                spec.path, (spec.path, "identity")
+            )[0]
+            _lookup(setpoints, runtime_path)
         values = {spec.path: _sample_value(spec)}
         total_path = pair_map.get(spec.path)
         if total_path is not None:
