@@ -304,6 +304,7 @@ def test_exact_full_dose_oxidizing_pn2_row_refuses_absent_melt_redox_capacity():
 
 def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():
     setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
+    freeze_gate_curve_cache = {}
     exact_gas = validation_map.GasPoint(0.1, 5.0, "n2_carrier")
     cases = {
         (temperature_C, exact_gas, 1.0)
@@ -336,6 +337,7 @@ def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():
             feedstocks,
             vapor_pressures,
             grid_scope_label=validation_map.GRID_SCOPE_FULL,
+            freeze_gate_curve_cache=freeze_gate_curve_cache,
         )
         assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
         assert math.isfinite(row["redox_source_delta_ln_fO2"])
@@ -590,9 +592,14 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     window = _assertion(smoke_payload, "grind_ready_target_window")
     parity = _assertion(smoke_payload, "map_live_semantics_parity")
 
+    # grind_ready_target_window = (first_passing_T is not None) AND
+    # certification_pass(owner ∧ live-parity). After adf1059 restored the
+    # authority-scoped native-Fe metallic tap, live parity certifies and the
+    # window opens at 1600 C; the intermediate 1bac4eb "passed is False" pin
+    # was the native-split-absent regression, not the durable contract.
     assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
     assert parity["passed"] is True
-    assert window["passed"] is False
+    assert window["passed"] is True
     assert "first_passing_T_C=1600.0" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
     assert "live parity=confirmed" in window["detail"]

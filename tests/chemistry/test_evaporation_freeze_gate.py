@@ -1578,6 +1578,119 @@ def test_freeze_gate_cache_key_includes_pressure_and_fo2(
     assert different_fO2 != baseline
 
 
+def test_shared_freeze_gate_curve_cache_requires_engine_identity_and_version(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    shared_cache = {}
+    sims = [
+        _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        for _ in range(4)
+    ]
+    calls = []
+    curves = [
+        {'source': 'first', 'solidus_T_C': 900.0, 'liquidus_T_C': 1300.0},
+        {'source': 'same', 'solidus_T_C': 910.0, 'liquidus_T_C': 1310.0},
+        {'source': 'backend-b-v1', 'solidus_T_C': 1000.0, 'liquidus_T_C': 1500.0},
+        {'source': 'backend-b-v2', 'solidus_T_C': 1050.0, 'liquidus_T_C': 1550.0},
+    ]
+    backend_specs = (
+        ('backend-a', '1.0'),
+        ('backend-a', '1.0'),
+        ('backend-b', '1.0'),
+        ('backend-b', '2.0'),
+    )
+    for index, (sim, (backend_name, engine_version)) in enumerate(
+        zip(sims, backend_specs, strict=True)
+    ):
+        sim.backend = SimpleNamespace(
+            backend_name=backend_name,
+            get_engine_version=lambda version=engine_version: version,
+        )
+        sim._freeze_gate_shared_curve_cache = shared_cache
+        sim._freeze_gate_curve_from_gate_dispatch = (
+            lambda reasons, *, fO2_log, index=index: (
+                calls.append(index) or curves[index]
+            )
+        )
+
+    first = sims[0]._freeze_gate_curve()
+    same_identity = sims[1]._freeze_gate_curve()
+    different_backend = sims[2]._freeze_gate_curve()
+    different_version = sims[3]._freeze_gate_curve()
+
+    assert calls == [0, 2, 3]
+    assert same_identity == first
+    assert different_backend == curves[2]
+    assert different_version == curves[3]
+    assert len(shared_cache) == 3
+
+
+def test_shared_freeze_gate_curve_cache_splits_validation_map_dose_states(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    shared_cache = {}
+    feo_fractions = (0.14776, 0.14671, 0.14566)
+    sims = [
+        _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        for _ in feo_fractions
+    ]
+    calls = []
+    curves = []
+    for index, (sim, feo_fraction) in enumerate(
+        zip(sims, feo_fractions, strict=True)
+    ):
+        liquidus_T_C = 1300.0 + 50.0 * index
+        curve = {
+            'source': f'dose-{index}',
+            'solidus_T_C': 900.0,
+            'liquidus_T_C': liquidus_T_C,
+            'path': ((900.0, 0.0), (liquidus_T_C, 1.0)),
+        }
+        curves.append(curve)
+        composition = {
+            'FeO': feo_fraction,
+            'SiO2': 1.0 - feo_fraction,
+        }
+        monkeypatch.setattr(
+            sim.atom_ledger,
+            'mol_by_account',
+            lambda account, composition=composition: dict(composition),
+        )
+        sim._freeze_gate_shared_curve_cache = shared_cache
+        sim._freeze_gate_curve_from_gate_dispatch = (
+            lambda reasons, *, fO2_log, index=index: (
+                calls.append(index) or curves[index]
+            )
+        )
+
+    keys = [_freeze_gate_key_for_current_state(sim) for sim in sims]
+    produced_curves = [sim._freeze_gate_curve() for sim in sims]
+    liquid_fractions = [
+        sim._interpolate_freeze_gate_curve(curve, 1150.0)
+        for sim, curve in zip(sims, produced_curves, strict=True)
+    ]
+
+    assert len(set(keys)) == 3
+    assert calls == [0, 1, 2]
+    assert len(shared_cache) == 3
+    assert len(set(liquid_fractions)) == 3
+
+
 def test_freeze_gate_redox_key_ignores_degenerate_reference_temperature(
     vapor_pressure_data,
     feedstocks_data,
