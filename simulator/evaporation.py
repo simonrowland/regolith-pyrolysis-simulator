@@ -14,6 +14,7 @@ from simulator.chemistry.kernel import (
     ChemistryIntent,
     ProviderUnavailableError,
 )
+from simulator.corpus_version import current_corpus_version
 from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
     kress91_referenced_log_fO2,
@@ -40,7 +41,10 @@ from simulator.state import (
 _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
 _FREEZE_GATE_ACCOUNT = 'process.cleaned_melt'
 _FREEZE_GATE_EPSILON = 1.0e-12
-_FREEZE_GATE_FRACTION_QUANTUM = 0.01
+# The validation map's smallest adjacent Na-dose step changes the FeO mole
+# fraction by 0.00105. A 0.0001 quantum leaves more than ten bins across that
+# physical delta while remaining well above floating-point composition jitter.
+_FREEZE_GATE_FRACTION_QUANTUM = 0.0001
 _FREEZE_GATE_PRESSURE_BAR_QUANTUM = 0.01
 _FREEZE_GATE_FO2_LOG_QUANTUM = 1.0
 _FREEZE_GATE_FO2_LOG_BOUND = 30.0
@@ -914,11 +918,9 @@ class EvaporationMixin:
             if mol_value > _FREEZE_GATE_EPSILON:
                 relevant_mol[species_key] = mol_value
 
-        # Liquidus is stable to small per-tick evaporation drift; 1 mol-%
-        # bins (0.01 fraction quantum) sit comfortably above mole-fraction
-        # float-arithmetic jitter while still well inside the L1 finder ±30 K
-        # tolerance, and still rebuild for campaign-scale major-oxide
-        # composition shifts.
+        # Liquidus is stable to floating-point composition jitter, but dose
+        # states below liquidus are not interchangeable: their distinct curves
+        # feed F_liquid, melt capacity, and native-Fe behavior.
         composition_key = []
         total_mol = sum(relevant_mol.values())
         if total_mol > _FREEZE_GATE_EPSILON:
@@ -945,11 +947,100 @@ class EvaporationMixin:
         # enough to absorb per-tick float noise, fine enough to split
         # overhead-pressure and campaign/redox control changes.
         return (
-            'oxide_mol_fraction_p_fO2_v2',
+            'oxide_mol_fraction_p_fO2_v3',
             round(pressure_bucket, 6),
             round(fO2_bucket, 6),
             tuple(sorted(composition_key)),
+            self._freeze_gate_engine_cache_identity(),
         )
+
+    def _freeze_gate_engine_cache_identity(self) -> tuple:
+        cached = getattr(self, '_freeze_gate_engine_identity_cache', None)
+        if isinstance(cached, tuple):
+            return cached
+
+        register_gate_providers = getattr(
+            self,
+            '_register_freeze_gate_liquid_fraction_providers',
+            None,
+        )
+        if callable(register_gate_providers):
+            register_gate_providers()
+
+        def provider_identity(provider: Any) -> tuple | None:
+            if provider is None:
+                return None
+            profile = provider.capability_profile()
+            version_getter = getattr(provider, '_engine_version', None)
+            version = 'unavailable'
+            if callable(version_getter):
+                try:
+                    version = str(version_getter()).strip() or 'unavailable'
+                except Exception:  # noqa: BLE001 - cache provenance boundary
+                    version = 'unavailable'
+            return (str(profile.provider_id), version)
+
+        registry = getattr(self, '_chem_registry', None)
+        authoritative = (
+            registry.authoritative_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+            if registry is not None
+            else None
+        )
+        fallback = (
+            registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+            if registry is not None
+            else None
+        )
+
+        backend = getattr(self, 'backend', None)
+        config = getattr(backend, 'config', None)
+        configured_name = str(
+            getattr(config, 'authorized_backend_name', '')
+        ).strip()
+        configured_version = str(
+            getattr(config, 'authorized_backend_version', '')
+        ).strip()
+        effective_backend = getattr(backend, '_live_backend', None) or backend
+        backend_name = (
+            configured_name
+            or str(
+                getattr(effective_backend, 'backend_name', None)
+                or getattr(effective_backend, 'name', None)
+                or type(effective_backend).__name__
+            ).strip()
+        )
+        backend_class = configured_name or (
+            f'{type(effective_backend).__module__}.'
+            f'{type(effective_backend).__qualname__}'
+        )
+        backend_version = configured_version
+        if not backend_version:
+            version_getter = getattr(
+                effective_backend,
+                'get_engine_version',
+                None,
+            )
+            if callable(version_getter):
+                try:
+                    backend_version = (
+                        str(version_getter()).strip() or 'unavailable'
+                    )
+                except Exception:  # noqa: BLE001 - cache provenance boundary
+                    backend_version = 'unavailable'
+        identity = (
+            'freeze_gate_engine_identity_v1',
+            ('authoritative', provider_identity(authoritative)),
+            ('fallback', provider_identity(fallback)),
+            (
+                'backend',
+                backend_name,
+                backend_class,
+                backend_version or 'unavailable',
+            ),
+            ('corpus_version', current_corpus_version()),
+        )
+        self._freeze_gate_engine_identity_cache = identity
+        return identity
 
     def _freeze_gate_curve_from_gate_dispatch(
         self,

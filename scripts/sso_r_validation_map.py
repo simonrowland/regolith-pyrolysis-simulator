@@ -1209,9 +1209,9 @@ def evaluate_assertions(
 def run_validation_map(*, smoke: bool = False) -> dict[str, Any]:
     warnings.filterwarnings("ignore", category=UserWarning, module="simulator.melt_backend.vaporock")
     setpoints, feedstocks, vapor_pressures = _load_data()
-    # Each row requires a fresh ledger, but equivalent rows share nine exact
-    # composition/P/fO2 liquidus keys. Reusing only those exact curves avoids
-    # 50+ redundant MAGEMin searches without weakening the freeze-gate key.
+    # Each row requires a fresh ledger. Rows with matching engine identity and
+    # quantized composition/P/fO2 reuse curves; dose-distinct partial-melt rows
+    # remain separate, while identical rows retain the MAGEMin performance win.
     freeze_gate_curve_cache: dict[tuple, dict[str, Any]] = {}
     calibration = calibrate_dose(
         setpoints,
