@@ -287,7 +287,7 @@ constant, and the Sherwood number carries the **radial** induction-stirring enha
 `Sh_eff = 3.66 × √max(1, radial_stir_factor)`. The radial default is 1.0, so the default Sherwood number
 is the laminar `Sh = 3.66`; `Sh_eff ≈ 9` occurs only when the radial factor is about 6.
 <!-- impl: §4 -> engines/builtin/evaporation_flux.py _fuchs_sutugin_gas_resistance_weight:252 — Fuchs gas weight -->
-<!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1271 — radial Sherwood -->
+<!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1298 — radial Sherwood -->
 
 The **melt-side surface-renewal resistance** `r_melt` accounts for the finite rate at which stirring
 brings fresh, un-depleted melt to the evaporating surface — a resistance in series with the gas-side
@@ -379,7 +379,7 @@ fresh equilibrium solve at each instant: it smooths the time integration but ass
 is constant over the tick, which accumulates error when the melt composition swings hard within a
 single hour. It is stated as a current approximation in
 [`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1423 — hourly depletion reservoir -->
+<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1560 — hourly depletion reservoir -->
 
 ### §4.4 The Knudsen and Langmuir limits, the sweep, and self-poisoning
 
@@ -421,7 +421,7 @@ accumulated oxygen self-limits the extraction. Under an inert sweep cover, that 
 off through the pressure-and-conductance path, lowering the transport oxygen pressure and relieving the
 suppression.
 <!-- impl: §4.4 -> engines/builtin/evaporation_transition.py BuiltinEvaporationTransitionProvider.dispatch:262 — O2 overhead credit -->
-<!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:253 — conductance bleed -->
+<!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:332 — conductance bleed -->
 
 **How the sweep is represented, and its current limits.** The inert sweep (the 5–15 mbar pN₂ cover) enters
 the model as an *overhead pressure*, not as a commanded *flow rate*. Raising it lowers the Knudsen number
@@ -447,7 +447,7 @@ species' condensation time constant. Iron is designated to the hottest condenser
 magnesium, sodium, and potassium condensing in progressively cooler stages. SiO that reaches a cold
 surface disproportionates on condensation (`SiO → ½ SiO₂ + ½ Si`), which is why its captured product
 is silica rather than a recoverable monoxide.
-<!-- impl: §5 -> simulator/condensation.py CondensationModel.route:2362 — stage routing efficiency -->
+<!-- impl: §5 -> simulator/condensation.py CondensationModel.route:2402 — stage routing efficiency -->
 <!-- impl: §5 -> engines/builtin/condensation_route.py BuiltinCondensationRouteProvider.dispatch:203 — SiO product credits -->
 
 The condensation reference temperatures used for this routing (for example, iron at 1250 °C, SiO at
@@ -481,7 +481,7 @@ through the condensation route inside the mass-balance closure. At each wall the
 sink competes against the onward condensed sink, and the split is set by a per-species, per-segment,
 temperature-dependent wall sticking coefficient. The remainder — the capture budget minus the wall
 deposit — is what reaches the designated condenser.
-<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:4184 — wall HKL MT split -->
+<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:4255 — wall HKL MT split -->
 
 Wall re-evaporation is handled by a per-species reactivity class:
 
@@ -511,7 +511,7 @@ transient wall state) are enumerated in [`docs/model-limitations.md`](model-limi
 The Knudsen number is reported per segment as a transport diagnostic and drives cold-spot warnings, but
 it does not gate deposition routing — the transport regimes are treated as continuous, consistent with
 modelling coating as a rate rather than a threshold.
-<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:4487 — wall Kn weighting -->
+<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:4558 — wall Kn weighting -->
 
 ---
 
@@ -779,7 +779,7 @@ refractory carbon after Stage 0. That diagnostic is not ledger-active in the ext
 above; it documents the split that would need to become authoritative before the simplification is
 removed.
 <!-- impl: §10.1 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_partition_carbon_diagnostic:1265 — carbon split diagnostic -->
-<!-- impl: §10.1 -> engines/builtin/foulant_disposition.py partition_carbon:413 — carbon bucket partition -->
+<!-- impl: §10.1 -> engines/builtin/foulant_disposition.py partition_carbon:468 — carbon bucket partition -->
 
 ### §10.2 CNOPS handling
 
