@@ -311,19 +311,22 @@ def build_run_artifact(
                 timestep["ledger"] = copy.deepcopy(dict(ledger))
         timesteps.append(timestep)
     artifact["timesteps"] = timesteps
-    artifact["terminal"] = {
-        "final_state": runner_payload.get("final_state", {}),
-        "final": runner_payload.get("final", {}),
-        "stage_purity": runner_payload.get("stage_purity_report", {}),
-        "vapor_pressure_source_report": runner_payload.get(
-            "vapor_pressure_source_report", {}
-        ),
+    terminal = {
         "run_metadata": run_metadata,
         "mass_balance_closure": {
             "residual_pct": per_hour[-1].get("mass_balance_pct") if per_hour else None,
             "basis": "final-hour percent",
         },
     }
+    for payload_key, artifact_key in (
+        ("final_state", "final_state"),
+        ("final", "final"),
+        ("stage_purity_report", "stage_purity"),
+        ("vapor_pressure_source_report", "vapor_pressure_source_report"),
+    ):
+        if payload_key in runner_payload:
+            terminal[artifact_key] = runner_payload[payload_key]
+    artifact["terminal"] = terminal
     confidence = _terminal_confidence(artifact)
     if confidence is not None:
         artifact["terminal"]["confidence"] = confidence

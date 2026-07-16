@@ -71,7 +71,10 @@ def _runner_payload(
         "final_state": {"process.cleaned_melt": {"SiO2": 2.0}},
         "final": {"wall_deposit_by_species_kg": {"Fe": 0.01}},
         "stage_purity_report": {"stage_1": {"verdict": "PURE"}},
-        "vapor_pressure_source_report": {"status": "ok"},
+        "vapor_pressure_source_report": {
+            "vapor_pressure_backend_status": "ok",
+            "authoritative_for_requested_vapor_pressure": True,
+        },
     }
 
 
@@ -176,6 +179,35 @@ def test_header_and_terminal_key_contract_omits_unavailable_optional_fields(
         "residual_pct": 0.125,
         "basis": "final-hour percent",
     }
+
+
+def test_absent_terminal_payload_sections_are_omitted_but_empty_sections_are_kept(
+) -> None:
+    payload = _runner_payload()
+    section_keys = {
+        "final_state": "final_state",
+        "final": "final",
+        "stage_purity_report": "stage_purity",
+        "vapor_pressure_source_report": "vapor_pressure_source_report",
+    }
+    for payload_key in section_keys:
+        del payload[payload_key]
+
+    absent = build_run_artifact(payload, run_id="run-absent-terminal-sections")
+
+    assert set(section_keys.values()).isdisjoint(absent["terminal"])
+    assert isinstance(absent["terminal"], dict)
+    assert absent["terminal"]["mass_balance_closure"] == {
+        "residual_pct": 0.125,
+        "basis": "final-hour percent",
+    }
+
+    for payload_key in section_keys:
+        payload[payload_key] = {}
+    present_empty = build_run_artifact(payload, run_id="run-empty-terminal-sections")
+
+    for artifact_key in section_keys.values():
+        assert present_empty["terminal"][artifact_key] == {}
 
 
 def test_available_optional_header_fields_keep_verified_shapes(monkeypatch) -> None:

@@ -61,7 +61,10 @@ def _runner_payload(status: str = "partial") -> dict:
         "final_state": {"process.cleaned_melt": {"SiO2": 2.0}},
         "final": {"wall_deposit_by_species_kg": {}},
         "stage_purity_report": {"stage_1": {"verdict": "PURE"}},
-        "vapor_pressure_source_report": {"status": "ok"},
+        "vapor_pressure_source_report": {
+            "vapor_pressure_backend_status": "ok",
+            "authoritative_for_requested_vapor_pressure": True,
+        },
     }
 
 
@@ -323,6 +326,35 @@ def test_store_concurrent_meta_writers_leave_one_complete_valid_sidecar(
     assert not list(store.runs_dir.rglob("*.tmp"))
 
 
+def test_store_concurrent_first_writers_commit_exactly_one_complete_artifact(
+    tmp_path,
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifacts = [
+        build_run_artifact(_runner_payload("ok"), run_id="race", name="First"),
+        build_run_artifact(_runner_payload("ok"), run_id="race", name="Second"),
+    ]
+    barrier = run_store_module.threading.Barrier(2)
+
+    def save_candidate(index):
+        barrier.wait(timeout=5)
+        return index, store.save("race", artifacts[index])
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        outcomes = list(executor.map(save_candidate, range(2)))
+
+    assert sorted(stored for _index, stored in outcomes) == [False, True]
+    winner_index = next(index for index, stored in outcomes if stored)
+    expected_bytes = (
+        json.dumps(artifacts[winner_index], indent=2, sort_keys=True, allow_nan=False)
+        + "\n"
+    ).encode("utf-8")
+    artifact_path = store.runs_dir / "race.json"
+    assert artifact_path.read_bytes() == expected_bytes
+    assert store.load("race") == artifacts[winner_index]
+    assert not list(store.runs_dir.rglob("*.tmp"))
+
+
 def test_store_parent_run_id_is_sidecar_only_and_absence_is_omitted(tmp_path) -> None:
     store = RunArtifactStore(tmp_path / "runs")
     child = persist_run_artifact(
@@ -448,6 +480,62 @@ def test_store_corrupt_meta_is_quarantined_and_skipped_by_retention(tmp_path) ->
     assert store.load("protected") == protected
     assert not meta_path.exists()
     assert (store.runs_dir / "meta" / "protected.json.corrupt").exists()
+
+
+def test_store_quarantine_serializes_with_concurrent_metadata_replace(
+    tmp_path, monkeypatch
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="quarantine-race")
+    assert store.save("quarantine-race", artifact) is True
+    meta_path = store.runs_dir / "meta" / "quarantine-race.json"
+    meta_path.parent.mkdir(parents=True, exist_ok=True)
+    meta_path.write_text("{not-json", encoding="utf-8")
+    quarantine_entered = run_store_module.threading.Event()
+    release_quarantine = run_store_module.threading.Event()
+    update_started = run_store_module.threading.Event()
+    original_quarantine = store._quarantine
+
+    def controlled_quarantine(path):
+        quarantine_entered.set()
+        assert release_quarantine.wait(timeout=5)
+        return original_quarantine(path)
+
+    def update_metadata():
+        update_started.set()
+        return store.update_meta("quarantine-race", {"starred": True})
+
+    monkeypatch.setattr(store, "_quarantine", controlled_quarantine)
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        list_future = executor.submit(store.list_runs)
+        assert quarantine_entered.wait(timeout=5)
+        update_future = executor.submit(update_metadata)
+        assert update_started.wait(timeout=5)
+        assert not update_future.done()
+        release_quarantine.set()
+        assert list_future.result(timeout=5)[0]["run_id"] == "quarantine-race"
+        assert update_future.result(timeout=5) == {"starred": True}
+
+    assert json.loads(meta_path.read_text(encoding="utf-8")) == {"starred": True}
+    assert (meta_path.parent / "quarantine-race.json.corrupt").exists()
+
+
+def test_store_warns_when_starred_count_exceeds_retention_keep(
+    tmp_path, caplog
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs", keep=1)
+    for run_id in ("star-1", "star-2"):
+        artifact = build_run_artifact(_runner_payload("ok"), run_id=run_id)
+        assert store.save(run_id, artifact) is True
+        store.update_meta(run_id, {"starred": True})
+
+    with caplog.at_level("WARNING", logger=run_store_module.__name__):
+        trigger = build_run_artifact(_runner_payload("ok"), run_id="trigger")
+        assert store.save("trigger", trigger) is True
+
+    assert "2 starred artifacts, exceeding retention keep=1" in caplog.text
+    assert store.load("star-1") is not None
+    assert store.load("star-2") is not None
 
 
 def test_store_unstarred_run_reenters_keep_n_eviction(tmp_path) -> None:

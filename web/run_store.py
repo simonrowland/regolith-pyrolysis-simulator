@@ -64,6 +64,11 @@ class RunArtifactStore:
         *,
         parent_run_id: str | None = None,
     ) -> bool:
+        """Persist one artifact, with lineage reserved for the W-B command plane.
+
+        ``parent_run_id`` is the landing surface for the HTTP rerun/draft flow;
+        the W-B run-library lineage display is its intended consumer.
+        """
         destination = self._path(run_id)
         if parent_run_id is not None:
             self._path(parent_run_id)
@@ -178,22 +183,23 @@ class RunArtifactStore:
         summaries: list[dict[str, Any]] = []
         if not self.runs_dir.exists():
             return summaries
-        for path in self._artifact_paths():
-            try:
-                artifact = self.load(path.stem)
-            except RunStoreCorruptionError as exc:
-                quarantine_path = self._quarantine(path)
-                _LOG.error("%s; quarantined at %s", exc, quarantine_path)
-                continue
-            if artifact is None:
-                continue
-            try:
-                metadata = self._load_meta(path.stem)
-            except RunMetaCorruptionError as exc:
-                quarantine_path = self._quarantine(exc.path)
-                _LOG.error("%s; quarantined at %s", exc, quarantine_path)
-                metadata = {}
-            summaries.append(self._summary(artifact, path.stem, metadata))
+        with self._store_lock():
+            for path in self._artifact_paths():
+                try:
+                    artifact = self.load(path.stem)
+                except RunStoreCorruptionError as exc:
+                    quarantine_path = self._quarantine(path)
+                    _LOG.error("%s; quarantined at %s", exc, quarantine_path)
+                    continue
+                if artifact is None:
+                    continue
+                try:
+                    metadata = self._load_meta(path.stem)
+                except RunMetaCorruptionError as exc:
+                    quarantine_path = self._quarantine(exc.path)
+                    _LOG.error("%s; quarantined at %s", exc, quarantine_path)
+                    metadata = {}
+                summaries.append(self._summary(artifact, path.stem, metadata))
         return sorted(
             summaries,
             key=lambda row: str(row.get("created_at") or ""),
@@ -402,7 +408,9 @@ class RunArtifactStore:
         )
 
     def _apply_retention_locked(self) -> None:
+        """Evict old unstarred runs; stars intentionally make growth unbounded."""
         unstarred: list[tuple[str, Path]] = []
+        starred_count = 0
         for path in self._artifact_paths():
             try:
                 with path.open(encoding="utf-8") as handle:
@@ -411,7 +419,9 @@ class RunArtifactStore:
                 if self._has_quarantined_meta(path.stem):
                     continue
                 metadata = self._load_meta(path.stem)
-                if not bool(metadata.get("starred", False)):
+                if bool(metadata.get("starred", False)):
+                    starred_count += 1
+                else:
                     created_at = str(header.get("created_at") or "")
                     unstarred.append((created_at, path))
             except RunMetaCorruptionError as exc:
@@ -423,6 +433,13 @@ class RunArtifactStore:
                 continue
             except (OSError, json.JSONDecodeError, AttributeError):
                 continue
+        if starred_count > self.keep:
+            _LOG.warning(
+                "run store has %d starred artifacts, exceeding retention keep=%d; "
+                "starred artifacts are intentionally never evicted",
+                starred_count,
+                self.keep,
+            )
         unstarred.sort(key=lambda item: item[0], reverse=True)
         for _created_at, path in unstarred[self.keep:]:
             path.unlink(missing_ok=True)
