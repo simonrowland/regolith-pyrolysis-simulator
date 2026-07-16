@@ -67,7 +67,9 @@ function runCard(run) {
   const isStarred = isRunStarred(run);
   const starError = starErrors.get(runId);
   const isStarPending = starPending.has(runId);
-  const staticArtifact = typeof run.artifact === "string" && /^[A-Za-z0-9._/-]+\.html$/.test(run.artifact);
+  // Relative paths only: a leading "/" or "//" (protocol-relative) would let a
+  // crafted index entry navigate the Load button off-origin.
+  const staticArtifact = typeof run.artifact === "string" && /^(?!\/)[A-Za-z0-9._/-]+\.html$/.test(run.artifact) && !run.artifact.includes("..");
   const canLoad = Boolean(run.live) || staticArtifact;
   const loadTarget = run.live
     ? `./index.html?run=${encodeURIComponent(run.run_id)}`
@@ -80,7 +82,7 @@ function runCard(run) {
       <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(runId)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${run.name} ${isStarred ? "from" : "to"} favorites`)}"${isStarPending ? " disabled" : ""}>${isStarred ? "★" : "☆"}</button>
     </div>
     ${starError ? `<p class="demo-note" role="alert">${esc(`Could not save star for ${run.name}. ${starError}`)}</p>` : ""}
-    <p class="run-summary">${esc(run.summary)}</p>
+    <p class="run-summary">${esc(run.summary)}${hasNumber(run.hours) ? esc(` · ${run.hours} h`) : ""}${hasNumber(run.peak_T_C) ? esc(` · peak ${run.peak_T_C} °C`) : ""}</p>
     ${yieldChips(run)}
     ${unavailable}
     <div class="run-actions"><span class="mono">${esc(run.run_id)}</span><button class="load-button" type="button" data-load="${esc(loadTarget)}"${canLoad ? "" : " disabled"}>Load</button></div>

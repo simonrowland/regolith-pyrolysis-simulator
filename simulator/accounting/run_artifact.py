@@ -301,6 +301,12 @@ def build_run_artifact(
     if effective_config is not None:
         header["effective_config"] = copy.deepcopy(effective_config)
     artifact["header"] = header
+    # timesteps[].ledger is the per-hour mol-native dump of the W-A0 ratified
+    # artifact design ("per-timestep dump -> {ledger, ...} is the PRIMARY web
+    # contract" — determinism-as-storage). Consumers: the stored artifact
+    # itself (audit/replay reads it engine-free) and the viewer timestep
+    # inspector's ledger panel (W-B wave). Do not remove for lack of a UI
+    # reader; the dump IS the product.
     per_hour_ledger = runner_payload.get("per_hour_ledger")
     timesteps = []
     for row in per_hour:
