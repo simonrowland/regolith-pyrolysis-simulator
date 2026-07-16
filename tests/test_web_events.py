@@ -417,6 +417,8 @@ def test_loaded_recipe_start_applies_restored_runtime_levers(
                         "hold_temp_C": 1600.0,
                     }
                 },
+                "cost_parameters": loaded.get_json()["cost_parameters"],
+                "cost_parameters_recipe_name": loaded.get_json()["name"],
             },
         )
         received = client.get_received()
@@ -430,11 +432,13 @@ def test_loaded_recipe_start_applies_restored_runtime_levers(
         apply_notices = [
             s
             for s in statuses
-            if s.get("notice_type") == "cost_parameters_from_loaded_recipe"
+            if s.get("notice_type") == "cost_parameters_from_submission"
         ]
         assert len(apply_notices) == 1
         assert apply_notices[0]["recipe_name"] == "loaded-c4"
-        assert "loaded-c4" in apply_notices[0]["message"]
+        assert apply_notices[0]["message"] == (
+            "Applying cost parameters from submission (recipe loaded-c4)."
+        )
 
         new_sids = set(_simulations) - before
         assert len(new_sids) == 1
@@ -488,13 +492,63 @@ def test_recipe_load_omits_cost_parameters_when_recipe_carries_none(tmp_path):
     assert "cost_parameters" not in loaded.get_json()
 
 
-def test_active_run_recipe_load_stages_costs_without_mutating_cost_identity(
+def test_failed_start_does_not_consume_submission_recipe_costs(monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    client.get_received()
+    before = set(_simulations)
+    costs = default_cost_parameters_block()
+    costs["parameters"]["electricity_cost_per_kWh"]["value"] = 12.0
+    payload = {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 0,
+        "speed": 0,
+        "track": "pyrolysis",
+        "cost_parameters": costs,
+        "cost_parameters_recipe_name": "retry-prices",
+    }
+
+    try:
+        client.emit("start_simulation", payload)
+        failed = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert any(status.get("status") == "error" for status in failed)
+        assert set(_simulations) == before
+
+        payload["mass_kg"] = 1000
+        client.emit("start_simulation", payload)
+        statuses = [
+            event["args"][0]
+            for event in client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert any(status.get("status") == "started" for status in statuses)
+        notice = next(
+            status
+            for status in statuses
+            if status.get("notice_type") == "cost_parameters_from_submission"
+        )
+        assert notice["recipe_name"] == "retry-prices"
+        sid = (set(_simulations) - before).pop()
+        assert _simulations[sid]["cost_parameters"]["parameters"][
+            "electricity_cost_per_kWh"
+        ]["value"] == 12.0
+    finally:
+        client.disconnect()
+        for active_sid in list(set(_simulations) - before):
+            _clear_simulation_state(active_sid)
+
+
+def test_recipe_load_patch_does_not_mutate_active_cost_identity(
     monkeypatch,
 ):
     sid = "active-recipe-load-sid"
     original_costs = default_cost_parameters_block()
-    loaded_costs = default_cost_parameters_block()
-    loaded_costs["parameters"]["electricity_cost_per_kWh"]["value"] = 12.0
     emitted = []
     socketio = SimpleNamespace(
         emit=lambda event, payload, **kwargs: emitted.append((event, payload, kwargs))
@@ -511,41 +565,23 @@ def test_active_run_recipe_load_stages_costs_without_mutating_cost_identity(
         applied = web_events.apply_loaded_recipe_patch_to_state(
             sid,
             {"campaigns": {"C4": {"temp_range_C": [1585.0, 1595.0]}}},
-            cost_parameters=loaded_costs,
-            recipe_name="loaded-costs",
         )
 
         assert applied is True
         assert _simulations[sid]["cost_parameters"] == original_costs
-        staged = web_events._loaded_recipe_cost_parameters[sid]
-        assert staged["cost_parameters"] == loaded_costs
-        assert staged["recipe_name"] == "loaded-costs"
-        assert isinstance(staged.get("loaded_at"), str) and staged["loaded_at"]
-        assert len(emitted) == 1
-        event_name, payload, kwargs = emitted[0]
-        assert event_name == "simulation_status"
-        assert kwargs == {"room": sid}
-        assert payload["status"] == "recipe_cost_parameters_staged"
-        assert payload["notice_type"] == "cost_parameters_next_submission"
-        assert payload["run_id"] == "active-run-cost-identity"
-        assert payload["recipe_name"] == "loaded-costs"
-        assert payload["loaded_at"] == staged["loaded_at"]
-        assert "active run cost identity is unchanged" in payload["message"]
+        assert emitted == []
 
         web_events.apply_loaded_recipe_patch_to_state(
             sid,
             {"campaigns": {"C4": {"temp_range_C": [1585.0, 1595.0]}}},
         )
         assert _simulations[sid]["cost_parameters"] == original_costs
-        assert len(emitted) == 1
-        # No-cost reload replaces staged cost identity (does not leave prior prices).
-        assert "cost_parameters" not in web_events._loaded_recipe_cost_parameters[sid]
+        assert emitted == []
     finally:
         _clear_simulation_state(sid)
-        web_events._loaded_recipe_cost_parameters.pop(sid, None)
 
 
-def test_staged_recipe_costs_survive_control_edit_and_apply_on_submit(
+def test_submission_recipe_costs_survive_control_edit_and_apply_on_submit(
     tmp_path,
     monkeypatch,
 ):
@@ -578,27 +614,21 @@ def test_staged_recipe_costs_survive_control_edit_and_apply_on_submit(
     assert client.is_connected()
     client.get_received()
     socket_sid = (set(web_events._socket_client_ids) - socket_sids_before).pop()
-    client_id = web_events._socket_client_ids[socket_sid]
     before = set(_simulations)
 
     try:
-        # Recipe load stages via socket sid → ledger_client_id; HTTP session
-        # need not match because the stash key is resolved from the socket map.
         loaded = app.test_client().post(
             "/recipes/load",
             json={"name": "priced-c4", "sid": socket_sid},
         )
         assert loaded.status_code == 200, loaded.get_json()
-        # Stash is client-bound, not socket-sid-bound.
-        assert client_id in web_events._loaded_recipe_cost_parameters
-        staged = web_events._loaded_recipe_cost_parameters[client_id]
-        assert staged["cost_parameters"]["parameters"][
+        loaded_payload = loaded.get_json()
+        assert loaded_payload["cost_parameters"]["parameters"][
             "electricity_cost_per_kWh"
         ]["value"] == 12.0
-        assert staged["recipe_name"] == "priced-c4"
 
         # Operator edits a control → setpoints no longer match the loaded recipe.
-        edited_patch = copy.deepcopy(loaded.get_json()["setpoints_patch"])
+        edited_patch = copy.deepcopy(loaded_payload["setpoints_patch"])
         edited_patch["campaigns"]["C4"]["temp_range_C"] = [1600.0, 1660.0]
 
         client.emit(
@@ -610,6 +640,8 @@ def test_staged_recipe_costs_survive_control_edit_and_apply_on_submit(
                 "speed": 0,
                 "track": "pyrolysis",
                 "setpoints_patch": edited_patch,
+                "cost_parameters": loaded_payload["cost_parameters"],
+                "cost_parameters_recipe_name": loaded_payload["name"],
             },
         )
         received = client.get_received()
@@ -622,15 +654,15 @@ def test_staged_recipe_costs_survive_control_edit_and_apply_on_submit(
         apply_notices = [
             s
             for s in statuses
-            if s.get("notice_type") == "cost_parameters_from_loaded_recipe"
+            if s.get("notice_type") == "cost_parameters_from_submission"
         ]
         assert len(apply_notices) == 1
         notice = apply_notices[0]
         assert notice["status"] == "recipe_cost_parameters_applied"
         assert notice["recipe_name"] == "priced-c4"
-        assert "priced-c4" in notice["message"]
-        assert staged["loaded_at"] in notice["message"]
-        assert notice["loaded_at"] == staged["loaded_at"]
+        assert notice["message"] == (
+            "Applying cost parameters from submission (recipe priced-c4)."
+        )
 
         new_sids = set(_simulations) - before
         assert len(new_sids) == 1
@@ -642,21 +674,17 @@ def test_staged_recipe_costs_survive_control_edit_and_apply_on_submit(
         assert state["cost_parameters"]["parameters"][
             "solar_heat_cost_per_kWh"
         ]["value"] == 0.07
-        # Stash consumed on submission.
-        assert client_id not in web_events._loaded_recipe_cost_parameters
     finally:
         client.disconnect()
         for active_sid in list(set(_simulations) - before):
             _clear_simulation_state(active_sid)
-        web_events._loaded_recipe_cost_parameters.pop(client_id, None)
-        web_events._loaded_recipe_cost_parameters.pop(socket_sid, None)
 
 
-def test_staged_recipe_costs_apply_into_artifact_cost_block(
+def test_submission_recipe_costs_apply_into_artifact_cost_block(
     tmp_path,
     monkeypatch,
 ):
-    """End-to-end: load → edit control → submit → artifact carries recipe prices."""
+    """End-to-end: client-carried recipe prices reach the artifact."""
     cost_parameters = default_cost_parameters_block()
     cost_parameters["parameters"]["electricity_cost_per_kWh"]["value"] = 12.0
     cost_parameters["parameters"]["solar_heat_cost_per_kWh"]["value"] = 0.07
@@ -692,6 +720,7 @@ def test_staged_recipe_costs_apply_into_artifact_cost_block(
             json={"name": "artifact-priced", "sid": socket_sid},
         )
         assert loaded.status_code == 200, loaded.get_json()
+        loaded_payload = loaded.get_json()
         edited_patch = {
             "campaigns": {"C4": {"temp_range_C": [1610.0, 1670.0]}},
         }
@@ -704,6 +733,8 @@ def test_staged_recipe_costs_apply_into_artifact_cost_block(
                 "speed": 0,
                 "track": "pyrolysis",
                 "setpoints_patch": edited_patch,
+                "cost_parameters": loaded_payload["cost_parameters"],
+                "cost_parameters_recipe_name": loaded_payload["name"],
             },
         )
         statuses = [
@@ -712,7 +743,7 @@ def test_staged_recipe_costs_apply_into_artifact_cost_block(
             if event["name"] == "simulation_status"
         ]
         assert any(
-            s.get("notice_type") == "cost_parameters_from_loaded_recipe"
+            s.get("notice_type") == "cost_parameters_from_submission"
             for s in statuses
         )
         sid = (set(_simulations) - before).pop()
@@ -734,7 +765,9 @@ def test_staged_recipe_costs_apply_into_artifact_cost_block(
             _clear_simulation_state(active_sid)
 
 
-def test_second_recipe_load_replaces_staged_cost_identity(tmp_path, monkeypatch):
+def test_second_recipe_load_response_replaces_tab_submission_cost_identity(
+    tmp_path, monkeypatch
+):
     costs_a = default_cost_parameters_block()
     costs_a["parameters"]["electricity_cost_per_kWh"]["value"] = 12.0
     costs_b = default_cost_parameters_block()
@@ -762,7 +795,6 @@ def test_second_recipe_load_replaces_staged_cost_identity(tmp_path, monkeypatch)
     client = _identified_socket_client(app)
     client.get_received()
     socket_sid = (set(web_events._socket_client_ids) - socket_sids_before).pop()
-    client_id = web_events._socket_client_ids[socket_sid]
     before = set(_simulations)
 
     try:
@@ -771,18 +803,18 @@ def test_second_recipe_load_replaces_staged_cost_identity(tmp_path, monkeypatch)
             json={"name": "recipe-a", "sid": socket_sid},
         )
         assert load_a.status_code == 200, load_a.get_json()
-        assert web_events._loaded_recipe_cost_parameters[client_id][
-            "cost_parameters"
-        ]["parameters"]["electricity_cost_per_kWh"]["value"] == 12.0
+        assert load_a.get_json()["cost_parameters"]["parameters"][
+            "electricity_cost_per_kWh"
+        ]["value"] == 12.0
 
         load_b = app.test_client().post(
             "/recipes/load",
             json={"name": "recipe-b", "sid": socket_sid},
         )
         assert load_b.status_code == 200, load_b.get_json()
-        staged = web_events._loaded_recipe_cost_parameters[client_id]
-        assert staged["recipe_name"] == "recipe-b"
-        assert staged["cost_parameters"]["parameters"][
+        loaded_b = load_b.get_json()
+        assert loaded_b["name"] == "recipe-b"
+        assert loaded_b["cost_parameters"]["parameters"][
             "electricity_cost_per_kWh"
         ]["value"] == 3.5
 
@@ -798,6 +830,8 @@ def test_second_recipe_load_replaces_staged_cost_identity(tmp_path, monkeypatch)
                 "setpoints_patch": {
                     "campaigns": {"C4": {"temp_range_C": [1620.0, 1630.0]}},
                 },
+                "cost_parameters": loaded_b["cost_parameters"],
+                "cost_parameters_recipe_name": loaded_b["name"],
             },
         )
         statuses = [
@@ -808,7 +842,7 @@ def test_second_recipe_load_replaces_staged_cost_identity(tmp_path, monkeypatch)
         apply_notices = [
             s
             for s in statuses
-            if s.get("notice_type") == "cost_parameters_from_loaded_recipe"
+            if s.get("notice_type") == "cost_parameters_from_submission"
         ]
         assert len(apply_notices) == 1
         assert apply_notices[0]["recipe_name"] == "recipe-b"
@@ -820,10 +854,11 @@ def test_second_recipe_load_replaces_staged_cost_identity(tmp_path, monkeypatch)
         client.disconnect()
         for active_sid in list(set(_simulations) - before):
             _clear_simulation_state(active_sid)
-        web_events._loaded_recipe_cost_parameters.pop(client_id, None)
 
 
-def test_explicit_clear_drops_staged_recipe_cost_identity(tmp_path, monkeypatch):
+def test_recipe_load_does_not_create_ambient_cross_tab_cost_identity(
+    tmp_path, monkeypatch
+):
     cost_parameters = default_cost_parameters_block()
     cost_parameters["parameters"]["electricity_cost_per_kWh"]["value"] = 12.0
     write_recipe_patch(
@@ -841,7 +876,6 @@ def test_explicit_clear_drops_staged_recipe_cost_identity(tmp_path, monkeypatch)
     client = _identified_socket_client(app)
     client.get_received()
     socket_sid = (set(web_events._socket_client_ids) - socket_sids_before).pop()
-    client_id = web_events._socket_client_ids[socket_sid]
     before = set(_simulations)
 
     try:
@@ -850,20 +884,9 @@ def test_explicit_clear_drops_staged_recipe_cost_identity(tmp_path, monkeypatch)
             json={"name": "clear-me", "sid": socket_sid},
         )
         assert loaded.status_code == 200, loaded.get_json()
-        assert client_id in web_events._loaded_recipe_cost_parameters
 
-        client.emit("clear_staged_cost_parameters", {})
-        clear_statuses = [
-            event["args"][0]
-            for event in client.get_received()
-            if event["name"] == "simulation_status"
-            and event["args"][0].get("notice_type") == "cost_parameters_cleared"
-        ]
-        assert len(clear_statuses) == 1
-        assert clear_statuses[0]["status"] == "recipe_cost_parameters_cleared"
-        assert clear_statuses[0]["recipe_name"] == "clear-me"
-        assert client_id not in web_events._loaded_recipe_cost_parameters
-
+        # A different tab/socket that does not carry the response's cost block
+        # cannot inherit it through shared browser identity.
         client.emit(
             "start_simulation",
             {
@@ -882,17 +905,16 @@ def test_explicit_clear_drops_staged_recipe_cost_identity(tmp_path, monkeypatch)
         ]
         assert any(s.get("status") == "started" for s in statuses)
         assert not any(
-            s.get("notice_type") == "cost_parameters_from_loaded_recipe"
+            s.get("notice_type") == "cost_parameters_from_submission"
             for s in statuses
         )
         sid = (set(_simulations) - before).pop()
-        # Cleared: no loaded-recipe cost identity on the run.
+        # No payload-carried intent: no loaded-recipe cost identity on the run.
         assert "cost_parameters" not in _simulations[sid]
     finally:
         client.disconnect()
         for active_sid in list(set(_simulations) - before):
             _clear_simulation_state(active_sid)
-        web_events._loaded_recipe_cost_parameters.pop(client_id, None)
 
 
 def test_recipe_save_serializes_resolved_staged_ladder(tmp_path):
@@ -1208,6 +1230,8 @@ vm.runInContext([
     functionSource('applyLoadedRecipeControls'),
     functionSource('applyLoadedRecipeStartIdentity'),
     'let loadedRecipePatch = null;',
+    'let loadedRecipeCostParameters = null;',
+    'let loadedRecipeCostRecipeName = null;',
 ].join('\n'), context);
 vm.runInContext(`
 applyLoadedRecipeControls({
@@ -1215,6 +1239,8 @@ applyLoadedRecipeControls({
     stage_temp_C: 1600, stage_duration_h: 7.5, stage_ramp_C_per_h: 22
 });
 loadedRecipePatch = {campaigns: {C4: {temp_range_C: [1600, 1660]}}};
+loadedRecipeCostParameters = {schema_version: 'optimize-costs-v1', parameters: {}};
+loadedRecipeCostRecipeName = 'tab-local-prices';
 const payload = {};
 applyLoadedRecipeStartIdentity(payload);
 console.log(JSON.stringify(payload));
@@ -1230,6 +1256,11 @@ console.log(JSON.stringify(payload));
     assert completed.returncode == 0, completed.stderr
     assert json.loads(completed.stdout) == {
         "setpoints_patch": {"campaigns": {"C4": {"temp_range_C": [1600, 1660]}}},
+        "cost_parameters": {
+            "schema_version": "optimize-costs-v1",
+            "parameters": {},
+        },
+        "cost_parameters_recipe_name": "tab-local-prices",
         "runtime_campaign_overrides": {
             "C4": {
                 "pO2_mbar": 0.12,
@@ -1240,6 +1271,68 @@ console.log(JSON.stringify(payload));
             }
         },
     }
+
+
+def test_recipe_cost_intent_is_tab_local_replaceable_and_clearable() -> None:
+    controls_path = _REPO_ROOT / "web/static/js/simulator-controls.js"
+    harness = r"""
+const fs = require('fs');
+const vm = require('vm');
+const source = fs.readFileSync(process.argv[2], 'utf8');
+function functionSource(name) {
+    const start = source.indexOf(`function ${name}(`);
+    const open = source.indexOf('{', start);
+    let depth = 0;
+    for (let i = open; i < source.length; i += 1) {
+        if (source[i] === '{') depth += 1;
+        if (source[i] === '}' && --depth === 0) return source.slice(start, i + 1);
+    }
+    throw new Error(`missing function ${name}`);
+}
+function tab() {
+    const context = {buildRuntimeCampaignOverrides: () => ({}), status: ''};
+    vm.createContext(context);
+    vm.runInContext([
+        functionSource('applyLoadedRecipeStartIdentity'),
+        functionSource('clearLoadedRecipeForManualEdit'),
+        'function setStatusText(message) { status = message; }',
+        'let loadedRecipePatch = null;',
+        'let loadedRecipeCostParameters = null;',
+        'let loadedRecipeCostRecipeName = null;',
+    ].join('\n'), context);
+    return context;
+}
+const tabA = tab();
+const tabB = tab();
+vm.runInContext(`
+loadedRecipeCostParameters = {schema_version: 'a', parameters: {}};
+loadedRecipeCostRecipeName = 'recipe-a';
+`, tabA);
+const firstA = vm.runInContext('applyLoadedRecipeStartIdentity({})', tabA);
+const untouchedB = vm.runInContext('applyLoadedRecipeStartIdentity({})', tabB);
+vm.runInContext(`
+loadedRecipeCostParameters = {schema_version: 'b', parameters: {}};
+loadedRecipeCostRecipeName = 'recipe-b';
+`, tabA);
+const replacedA = vm.runInContext('applyLoadedRecipeStartIdentity({})', tabA);
+vm.runInContext('clearLoadedRecipeForManualEdit()', tabA);
+const clearedA = vm.runInContext('applyLoadedRecipeStartIdentity({})', tabA);
+console.log(JSON.stringify({firstA, untouchedB, replacedA, clearedA, status: tabA.status}));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(controls_path)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    result = json.loads(completed.stdout)
+    assert result["firstA"]["cost_parameters_recipe_name"] == "recipe-a"
+    assert "cost_parameters" not in result["untouchedB"]
+    assert result["replacedA"]["cost_parameters_recipe_name"] == "recipe-b"
+    assert "cost_parameters" not in result["clearedA"]
+    assert result["status"] == "Recipe edited; loaded recipe prices cleared"
 
 
 def test_recipe_ui_renders_per_hour_redox_summary_payload_keys() -> None:

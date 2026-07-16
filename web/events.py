@@ -87,7 +87,6 @@ _simulations_guard = threading.Lock()
 _run_command_lock = threading.RLock()
 _run_idempotency_guard = threading.Lock()
 _socket_client_ids: dict[str, str] = {}
-_loaded_recipe_cost_parameters: dict[str, dict[str, object]] = {}
 _run_idempotency: dict[tuple[str, str], tuple[str, dict[str, object]]] = {}
 _MAX_RUN_IDEMPOTENCY_ENTRIES = 1024
 _MAX_ACTIVE_RUNS = 4
@@ -313,249 +312,42 @@ def recipe_save_context(sid: str) -> dict[str, object]:
         return snapshot_context()
 
 
-def _cost_stash_key_for_sid(sid: str) -> str:
-    """Client-bound key for staged recipe cost identity.
-
-    Prefer ledger_client_id so a reconnect or control edit does not orphan
-    the operator's loaded-recipe prices. Fall back to sid only when no client
-    identity is known (unit tests / pre-connect paths).
-    """
-    client_id = _socket_client_ids.get(sid)
-    if isinstance(client_id, str) and client_id:
-        return client_id
-    state = _simulations.get(sid)
-    if isinstance(state, Mapping):
-        state_client = state.get("ledger_client_id")
-        if isinstance(state_client, str) and state_client:
-            return state_client
-    return sid
-
-
-def _store_loaded_recipe_cost_pending(
-    sid: str,
-    pending: Mapping[str, object],
-) -> None:
-    stash_key = _cost_stash_key_for_sid(sid)
-    with _simulations_guard:
-        if _simulations.get(sid) is not None or sid in _socket_client_ids:
-            _loaded_recipe_cost_parameters[stash_key] = copy.deepcopy(dict(pending))
-            # Drop any legacy sid-keyed entry so a prior r3 stash cannot linger.
-            if stash_key != sid:
-                _loaded_recipe_cost_parameters.pop(sid, None)
-
-
 def apply_loaded_recipe_patch_to_state(
     sid: str,
     patch: Mapping[str, object],
-    *,
-    cost_parameters: Mapping[str, object] | None = None,
-    recipe_name: str | None = None,
-    recipe_title: str | None = None,
 ) -> bool:
     normalized = normalize_recipe_patch(
         patch,
         source="recipes/load setpoints_patch",
     )
-    pending: dict[str, object] = {
-        "setpoints_patch": copy.deepcopy(normalized),
-        "loaded_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-    }
-    if isinstance(recipe_name, str) and recipe_name.strip():
-        pending["recipe_name"] = recipe_name.strip()
-    if isinstance(recipe_title, str) and recipe_title.strip():
-        pending["recipe_title"] = recipe_title.strip()
-    if isinstance(cost_parameters, Mapping):
-        pending["cost_parameters"] = copy.deepcopy(dict(cost_parameters))
-    # Always replace any prior staged cost identity for this client — including
-    # a no-cost recipe load, which clears the previous recipe's prices.
-    _store_loaded_recipe_cost_pending(sid, pending)
     with _simulations_guard:
         state = _simulations.get(sid)
         lock = _sim_locks.get(sid)
     if state is None:
-        # Stash may still have been written for a connected socket; live session
-        # patch apply requires an existing simulation state.
         return False
-    active_run = False
-    cost_staged_for_next_run = False
-    active_run_id = None
     if lock is None:
         state["loaded_setpoints_patch"] = normalized
         state["setpoints_patch"] = normalized
-        active_run = bool(state.get("running"))
-        cost_staged_for_next_run = active_run and isinstance(
-            cost_parameters, Mapping
-        )
-        active_run_id = state.get("run_id")
-        if not active_run:
-            if isinstance(cost_parameters, Mapping):
-                state["cost_parameters"] = copy.deepcopy(dict(cost_parameters))
-            else:
-                state.pop("cost_parameters", None)
     else:
         with lock:
             state["loaded_setpoints_patch"] = normalized
             state["setpoints_patch"] = normalized
-            active_run = bool(state.get("running"))
-            cost_staged_for_next_run = active_run and isinstance(
-                cost_parameters, Mapping
-            )
-            active_run_id = state.get("run_id")
-            if not active_run:
-                if isinstance(cost_parameters, Mapping):
-                    state["cost_parameters"] = copy.deepcopy(dict(cost_parameters))
-                else:
-                    state.pop("cost_parameters", None)
-    if cost_staged_for_next_run and _registered_socketio is not None:
-        stage_payload: dict[str, object] = {
-            "status": "recipe_cost_parameters_staged",
-            "notice_type": "cost_parameters_next_submission",
-            "message": (
-                "Loaded recipe cost parameters are staged for the next submission; "
-                "the active run cost identity is unchanged."
-            ),
-            "run_id": active_run_id,
-        }
-        if "recipe_name" in pending:
-            stage_payload["recipe_name"] = pending["recipe_name"]
-        if "loaded_at" in pending:
-            stage_payload["loaded_at"] = pending["loaded_at"]
-        _registered_socketio.emit(
-            "simulation_status",
-            stage_payload,
-            room=sid,
-        )
     return True
-
-
-def _discard_loaded_recipe_cost_parameters(
-    sid: str,
-) -> dict[str, object] | None:
-    """Remove staged recipe cost identity without emitting a notice."""
-    stash_key = _cost_stash_key_for_sid(sid)
-    with _simulations_guard:
-        removed = _loaded_recipe_cost_parameters.pop(stash_key, None)
-        if stash_key != sid:
-            legacy = _loaded_recipe_cost_parameters.pop(sid, None)
-            if removed is None:
-                removed = legacy
-    if not isinstance(removed, Mapping):
-        return None
-    return dict(removed)
-
-
-def clear_loaded_recipe_cost_parameters(sid: str) -> bool:
-    """Explicitly clear this client's staged recipe cost identity.
-
-    Visible operator action: next submission will not inherit loaded-recipe
-    prices unless a new recipe is loaded.
-    """
-    removed = _discard_loaded_recipe_cost_parameters(sid)
-    if removed is None:
-        return False
-    if _registered_socketio is not None:
-        clear_payload: dict[str, object] = {
-            "status": "recipe_cost_parameters_cleared",
-            "notice_type": "cost_parameters_cleared",
-            "message": (
-                "Staged recipe cost parameters were cleared; the next submission "
-                "will not inherit a loaded-recipe cost identity."
-            ),
-        }
-        recipe_name = removed.get("recipe_name")
-        if isinstance(recipe_name, str) and recipe_name:
-            clear_payload["recipe_name"] = recipe_name
-        loaded_at = removed.get("loaded_at")
-        if isinstance(loaded_at, str) and loaded_at:
-            clear_payload["loaded_at"] = loaded_at
-        _registered_socketio.emit(
-            "simulation_status",
-            clear_payload,
-            room=sid,
-        )
-    return True
-
-
-def _loaded_recipe_cost_parameters_for_start(
-    sid: str,
-    setpoints_patch: Mapping[str, object] | None = None,
-    *,
-    consume: bool = True,
-) -> tuple[bool, dict[str, object] | None, dict[str, object] | None]:
-    """Resolve staged recipe cost identity for a submission.
-
-    Bound to the client (ledger_client_id), not to an exact setpoints match —
-    control edits must not silently drop the operator's loaded-recipe prices.
-
-    Returns (found, cost_parameters_or_None, source_meta_or_None). found=True
-    means a staged entry existed (and was consumed when consume=True). A found
-    entry may still carry no cost_parameters when the loaded recipe had none.
-    setpoints_patch is accepted for call-site compatibility and ignored.
-    """
-    del setpoints_patch  # no longer gates application; retained for callers
-    stash_key = _cost_stash_key_for_sid(sid)
-    with _simulations_guard:
-        if consume:
-            pending = _loaded_recipe_cost_parameters.pop(stash_key, None)
-            if stash_key != sid:
-                legacy = _loaded_recipe_cost_parameters.pop(sid, None)
-                if pending is None:
-                    pending = legacy
-        else:
-            pending = _loaded_recipe_cost_parameters.get(stash_key)
-            if pending is None and stash_key != sid:
-                pending = _loaded_recipe_cost_parameters.get(sid)
-    if not isinstance(pending, Mapping):
-        return False, None, None
-    meta: dict[str, object] = {}
-    for key in ("recipe_name", "recipe_title", "loaded_at"):
-        value = pending.get(key)
-        if isinstance(value, str) and value:
-            meta[key] = value
-    cost_parameters = pending.get("cost_parameters")
-    if not isinstance(cost_parameters, Mapping):
-        return True, None, meta or None
-    return True, copy.deepcopy(dict(cost_parameters)), meta or None
 
 
 def _cost_identity_applied_notice(
-    cost_source_meta: Mapping[str, object] | None,
-) -> dict[str, object] | None:
-    if not isinstance(cost_source_meta, Mapping) or not cost_source_meta:
-        return None
-    recipe_name = cost_source_meta.get("recipe_name")
-    recipe_title = cost_source_meta.get("recipe_title")
-    loaded_at = cost_source_meta.get("loaded_at")
-    display_name = None
-    if isinstance(recipe_name, str) and recipe_name:
-        display_name = recipe_name
-    elif isinstance(recipe_title, str) and recipe_title:
-        display_name = recipe_title
-    if display_name is not None and isinstance(loaded_at, str) and loaded_at:
-        message = (
-            f"Applying cost parameters from recipe {display_name} "
-            f"loaded at {loaded_at}."
-        )
-    elif display_name is not None:
-        message = f"Applying cost parameters from recipe {display_name}."
-    elif isinstance(loaded_at, str) and loaded_at:
-        message = (
-            "Applying cost parameters from a previously loaded recipe "
-            f"at {loaded_at}."
-        )
-    else:
-        message = (
-            "Applying cost parameters staged from a previously loaded recipe."
-        )
+    recipe_name: str | None,
+) -> dict[str, object]:
+    message = "Applying cost parameters from submission."
+    if recipe_name:
+        message = f"Applying cost parameters from submission (recipe {recipe_name})."
     notice: dict[str, object] = {
         "status": "recipe_cost_parameters_applied",
-        "notice_type": "cost_parameters_from_loaded_recipe",
+        "notice_type": "cost_parameters_from_submission",
         "message": message,
     }
-    if display_name is not None:
-        notice["recipe_name"] = display_name
-    if isinstance(loaded_at, str) and loaded_at:
-        notice["loaded_at"] = loaded_at
+    if recipe_name:
+        notice["recipe_name"] = recipe_name
     return notice
 
 
@@ -885,11 +677,6 @@ def _disconnect_simulation_client(socketio, sid: str) -> None:
         finally:
             if _socket_client_ids.get(sid) == client_id:
                 _socket_client_ids.pop(sid, None)
-            # Client-bound staged costs survive disconnect/reconnect until
-            # consumed, replaced by another recipe load, or explicitly cleared.
-            # Drop only a legacy sid-keyed entry for this dead socket.
-            with _simulations_guard:
-                _loaded_recipe_cost_parameters.pop(sid, None)
 
 
 def _ensure_global_run_capacity(replacement_sid: str | None) -> None:
@@ -2290,7 +2077,7 @@ def register_events(socketio):
 
         feedstock_key = data.get('feedstock', 'lunar_mare_low_ti')
         cost_parameters = None
-        cost_source_meta: dict[str, object] | None = None
+        cost_parameters_recipe_name = None
         try:
             mass_kg = _coerce_bounded_float(
                 data.get('mass_kg'),
@@ -2349,17 +2136,11 @@ def register_events(socketio):
                 data.get('runtime_campaign_overrides')
             )
             raw_cost_parameters = data.get('cost_parameters')
-            if raw_cost_parameters is None:
-                _, cost_parameters, cost_source_meta = (
-                    _loaded_recipe_cost_parameters_for_start(
-                        sid,
-                        setpoints_patch,
-                        consume=not draft_mode,
-                    )
-                )
-            elif not isinstance(raw_cost_parameters, Mapping):
+            if raw_cost_parameters is not None and not isinstance(
+                raw_cost_parameters, Mapping
+            ):
                 raise InputValidationError('cost_parameters must be an object')
-            else:
+            if isinstance(raw_cost_parameters, Mapping):
                 try:
                     cost_parameters = normalize_cost_parameters(
                         raw_cost_parameters,
@@ -2368,10 +2149,13 @@ def register_events(socketio):
                     )
                 except (TypeError, ValueError) as exc:
                     raise InputValidationError(str(exc)) from exc
-                # Explicit submission supersedes any staged recipe identity
-                # without a "cleared" notice (operator already supplied prices).
-                if not draft_mode:
-                    _discard_loaded_recipe_cost_parameters(sid)
+                raw_recipe_name = data.get('cost_parameters_recipe_name')
+                if raw_recipe_name is not None and not isinstance(raw_recipe_name, str):
+                    raise InputValidationError(
+                        'cost_parameters_recipe_name must be a string'
+                    )
+                if isinstance(raw_recipe_name, str) and raw_recipe_name.strip():
+                    cost_parameters_recipe_name = raw_recipe_name.strip()
         except InputValidationError as exc:
             return reject({
                 'status': 'error',
@@ -2663,16 +2447,15 @@ def register_events(socketio):
             )
             if isinstance(cost_parameters, Mapping):
                 cost_apply_notice = _cost_identity_applied_notice(
-                    cost_source_meta
+                    cost_parameters_recipe_name
                 )
-                if cost_apply_notice is not None:
-                    _emit_if_current(
-                        socketio,
-                        sid,
-                        run_id,
-                        'simulation_status',
-                        cost_apply_notice,
-                    )
+                _emit_if_current(
+                    socketio,
+                    sid,
+                    run_id,
+                    'simulation_status',
+                    cost_apply_notice,
+                )
             _start_background_loop(
                 socketio,
                 sid,
@@ -2713,26 +2496,6 @@ def register_events(socketio):
         return {'run_id': run_id, 'status': 'started'}
 
     _registered_start_handler = handle_start
-
-    @socketio.on('clear_staged_cost_parameters')
-    def handle_clear_staged_cost_parameters(_data=None):
-        """Operator-visible clear of staged loaded-recipe cost identity."""
-        sid = request.sid
-        cleared = clear_loaded_recipe_cost_parameters(sid)
-        if not cleared and _registered_socketio is not None:
-            socketio.emit(
-                'simulation_status',
-                {
-                    'status': 'recipe_cost_parameters_cleared',
-                    'notice_type': 'cost_parameters_cleared',
-                    'message': (
-                        'No staged recipe cost parameters were present to clear.'
-                    ),
-                    'already_clear': True,
-                },
-                room=sid,
-            )
-        return {'cleared': cleared}
 
     @socketio.on('pause_simulation')
     def handle_pause():

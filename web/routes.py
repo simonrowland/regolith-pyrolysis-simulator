@@ -3260,17 +3260,9 @@ def load_recipe():
         applied_to_session = False
         if sid:
             from web.events import apply_loaded_recipe_patch_to_state
-            recipe_title = (
-                str(metadata.get('title') or '').strip()
-                if isinstance(metadata, Mapping)
-                else ''
-            )
             applied_to_session = apply_loaded_recipe_patch_to_state(
                 sid,
                 setpoints_patch,
-                cost_parameters=cost_parameters,
-                recipe_name=source.stem,
-                recipe_title=recipe_title or None,
             )
     except BadRequest as exc:
         return _json_error(exc.description, 400)
