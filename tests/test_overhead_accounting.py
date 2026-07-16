@@ -5,6 +5,7 @@ import pytest
 
 import simulator.evaporation as evaporation_module
 from simulator.accounting import AccountingError, MaterialLot
+from simulator.condensation import CondensationRouteResult
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import (
@@ -1245,6 +1246,46 @@ def test_overhead_product_partials_use_mole_fractions_not_mass_fractions():
         expected_na_fraction
     )
     assert gas.composition["Na"] > gas.composition["Fe"]
+
+
+def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
+    sim = _gas_train_sim()
+    sim.vapor_pressures["oxide_vapors"]["FeO"] = {
+        "parent_oxide": "FeO",
+        "stoich_oxide_per_vapor": 1.0,
+        "stoich_O2_per_vapor": 0.0,
+    }
+    flux = EvaporationFlux(
+        total_kg_hr=2.0,
+        species_kg_hr={"Fe": 1.0, "FeO": 1.0},
+    )
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Fe": 0.25, "FeO": 0.75},
+            condensed_by_stage_species={1: {"Fe": 0.75, "FeO": 0.25}},
+        ),
+    )
+
+    residual_flux = sim._route_to_condensation(flux)
+    monkeypatch.setattr(
+        sim.overhead_model,
+        "_vapor_pressure_mbar_from_flux",
+        lambda *_args, **_kwargs: 10.0,
+    )
+    gas = sim.overhead_model.update(residual_flux, sim.melt, sim.train)
+
+    fe_mol_hr = 0.25 / (MOLAR_MASS["Fe"] / 1000.0)
+    feo_mol_hr = 0.75 / (MOLAR_MASS["FeO"] / 1000.0)
+    expected_fe_mbar = 10.0 * fe_mol_hr / (fe_mol_hr + feo_mol_hr)
+    expected_feo_mbar = 10.0 - expected_fe_mbar
+
+    assert residual_flux.species_kg_hr == pytest.approx(
+        {"Fe": 0.25, "FeO": 0.75}
+    )
+    assert gas.composition["Fe"] == pytest.approx(expected_fe_mbar)
+    assert gas.composition["FeO"] == pytest.approx(expected_feo_mbar)
 
 
 def test_commanded_po2_numerical_floor_when_all_inputs_zero():

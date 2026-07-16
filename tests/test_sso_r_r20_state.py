@@ -153,6 +153,7 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
             object(),
             exchange_direction="redox_source:evaporative_loss",
         )
+        return _evap_flux
 
     monkeypatch.setattr(sim, "_apply_oxygen_reservoir_exchange", fake_exchange)
     monkeypatch.setattr(sim, "_apply_o2_bubbler", fake_bubbler)

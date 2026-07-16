@@ -1635,7 +1635,9 @@ class EvaporationMixin:
                 effective_rates[species] = min(current_rate, allowed_rate)
         return effective_rates
 
-    def _route_to_condensation(self, evap_flux: EvaporationFlux):
+    def _route_to_condensation(
+        self, evap_flux: EvaporationFlux
+    ) -> EvaporationFlux:
         """
         Route evaporated species through the condensation train.
 
@@ -1738,17 +1740,39 @@ class EvaporationMixin:
                 evap_flux.species_kg_hr.keys()
             )
         )
+        residual_species_kg_hr = {
+            species: max(0.0, float(rate_kg_hr) * phase_scalar)
+            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
+        }
         for species in species_order:
             if species not in evap_flux.species_kg_hr:
                 continue
             rate_kg_hr = evap_flux.species_kg_hr[species] * phase_scalar
-            self._route_evaporated_species_to_condensation(
+            route_diag = self._route_evaporated_species_to_condensation(
                 route_result,
                 species,
                 rate_kg_hr,
             )
 
+            # Premise: the committed condensation credit includes both baffle
+            # capture and wall deposition removed from this species' vapor.
+            # Algebra: overhead-passed = evolved - committed-captured.
+            # Unit check: kg/hr - kg/hr = kg/hr. Sanity: zero capture passes
+            # all evolved vapor, while complete capture passes zero.
+            captured_kg_hr = float(
+                route_diag.get('credited_condensed_kg', 0.0) or 0.0
+            )
+            residual_species_kg_hr[species] = max(
+                0.0, rate_kg_hr - captured_kg_hr,
+            )
+
         self._sync_oxygen_kg_counters()
+
+        residual_flux = EvaporationFlux(
+            species_kg_hr=residual_species_kg_hr,
+        )
+        residual_flux.update_totals()
+        return residual_flux
 
     def _route_evaporated_species_to_condensation(
         self,

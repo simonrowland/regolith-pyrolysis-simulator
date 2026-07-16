@@ -11355,6 +11355,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux = self._apply_analytic_evaporation_depletion(
                     evap_flux
                 )
+        overhead_flux = evap_flux
 
         # --- 5. Condensation routing ---
         # Send evaporated species through the 8-stage train.
@@ -11362,7 +11363,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if evap_flux.total_kg_hr > 0:
             self._configure_condensation_operating_conditions(evap_flux)
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
-            self._route_to_condensation(evap_flux)
+            overhead_flux = self._route_to_condensation(evap_flux)
         self._pending_knudsen_zero_overhead_flow_marker = None
 
         # --- 6. Update melt composition ---
@@ -11410,7 +11411,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_offgas_O2_kg_hr = self._ledger_o2_kg(
                 'process.overhead_gas')
         self.overhead = self.overhead_model.update(
-            evap_flux,
+            overhead_flux,
             self.melt,
             self.train,
             actual_O2_kg_hr=melt_offgas_O2_kg_hr,
