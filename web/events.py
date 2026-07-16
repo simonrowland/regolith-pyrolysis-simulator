@@ -34,6 +34,10 @@ from simulator.accounting.run_artifact import build_run_artifact
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.campaigns import CampaignManager
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
+from simulator.cost_parameters import (
+    default_cost_parameters_block,
+    normalize_cost_parameters,
+)
 from simulator.core import PoisonedHourError
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -504,6 +508,9 @@ def _persist_terminal(
         effective_config = state.get('effective_config') if state is not None else None
         if effective_config:
             runner_payload['effective_config'] = copy.deepcopy(effective_config)
+        cost_parameters = state.get('cost_parameters') if state is not None else None
+        if isinstance(cost_parameters, Mapping):
+            runner_payload['cost_parameters'] = copy.deepcopy(cost_parameters)
         per_hour_ledger = state.get('per_hour_ledger') if state is not None else None
         if per_hour_ledger:
             runner_payload['per_hour_ledger'] = copy.deepcopy(per_hour_ledger)
@@ -2107,6 +2114,20 @@ def register_events(socketio):
             runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
                 data.get('runtime_campaign_overrides')
             )
+            raw_cost_parameters = data.get('cost_parameters')
+            if raw_cost_parameters is None:
+                cost_parameters = default_cost_parameters_block()
+            elif not isinstance(raw_cost_parameters, Mapping):
+                raise InputValidationError('cost_parameters must be an object')
+            else:
+                try:
+                    cost_parameters = normalize_cost_parameters(
+                        raw_cost_parameters,
+                        source='start_simulation.cost_parameters',
+                        defaults_applied=False,
+                    )
+                except (TypeError, ValueError) as exc:
+                    raise InputValidationError(str(exc)) from exc
         except InputValidationError as exc:
             return reject({
                 'status': 'error',
@@ -2240,6 +2261,7 @@ def register_events(socketio):
                     runtime_campaign_overrides
                 ),
                 'furnace_material_id': furnace_material_id,
+                'cost_parameters': copy.deepcopy(cost_parameters),
             }
             validated_inputs = {
                 key: value
@@ -2298,6 +2320,7 @@ def register_events(socketio):
                 setpoints=setpoints,
                 runtime_campaign_overrides=runtime_campaign_overrides,
             ),
+            'cost_parameters': copy.deepcopy(cost_parameters),
         }
         if effective_config:
             initial_state['effective_config'] = effective_config

@@ -8,6 +8,7 @@ from collections.abc import Mapping
 from numbers import Real
 from typing import Any
 
+from simulator.cost_parameters import canonical_energy_cost_block
 from simulator.engine_local_config import cache_version_for
 
 
@@ -64,6 +65,44 @@ def _campaign_chain(per_hour: list[dict[str, Any]]) -> list[str]:
             seen.add(campaign)
             chain.append(campaign)
     return chain
+
+
+def _canonical_energy_cost_totals(
+    per_hour: list[dict[str, Any]],
+    cost_block: Mapping[str, Any],
+) -> dict[str, float] | None:
+    if not per_hour:
+        return None
+    energy_fields = (
+        "energy_electrical_kWh",
+        "energy_evaporation_thermal_kWh",
+    )
+    totals: dict[str, float] = {}
+    for field_name in energy_fields:
+        values: list[float] = []
+        for row in per_hour:
+            value = row.get(field_name)
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, Real)
+                or not math.isfinite(float(value))
+            ):
+                return None
+            values.append(float(value))
+        totals[field_name] = sum(values)
+    electrical = (
+        totals["energy_electrical_kWh"]
+        * float(cost_block["electrical_cost_per_kWh"])
+    )
+    solar_heat = (
+        totals["energy_evaporation_thermal_kWh"]
+        * float(cost_block["solar_heat_cost_per_kWh"])
+    )
+    return {
+        "electrical_cost_usd": electrical,
+        "solar_heat_cost_usd": solar_heat,
+        "total_cost_usd": electrical + solar_heat,
+    }
 
 
 def _terminal_confidence(artifact: Mapping[str, Any]) -> dict[str, Any] | None:
@@ -300,6 +339,11 @@ def build_run_artifact(
     effective_config = runner_payload.get("effective_config")
     if effective_config is not None:
         header["effective_config"] = copy.deepcopy(effective_config)
+    cost_parameters = runner_payload.get("cost_parameters")
+    cost_block = canonical_energy_cost_block(
+        cost_parameters if isinstance(cost_parameters, Mapping) else None
+    )
+    header["cost_block"] = cost_block
     artifact["header"] = header
     # timesteps[].ledger is the per-hour mol-native dump of the W-A0 ratified
     # artifact design ("per-timestep dump -> {ledger, ...} is the PRIMARY web
@@ -332,6 +376,9 @@ def build_run_artifact(
     ):
         if payload_key in runner_payload:
             terminal[artifact_key] = runner_payload[payload_key]
+    cost_totals = _canonical_energy_cost_totals(per_hour, cost_block)
+    if cost_totals is not None:
+        terminal["cost_totals"] = cost_totals
     artifact["terminal"] = terminal
     confidence = _terminal_confidence(artifact)
     if confidence is not None:

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from simulator.cost_parameters import DEFAULT_COST_PARAMETERS_PATH
 from simulator.accounting.run_artifact import (
     ARTIFACT_SCHEMA_VERSION,
     EXECUTION_STATUSES,
@@ -19,12 +20,12 @@ REQUIRED_HEADER_KEYS = {
     "campaign_chain",
     "engine_identity",
     "target_snapshot",
+    "cost_block",
 }
 OPTIONAL_HEADER_KEYS = {
     "recipe_snapshot",
     "seed",
     "c3_dose",
-    "cost_block",
     "effective_config",
 }
 TERMINAL_KEYS = {
@@ -37,7 +38,7 @@ TERMINAL_KEYS = {
 }
 # W-A8: confidence is OPTIONAL — present only when the artifact carries the
 # evidence to grade honestly (finite mass-balance residual); never fabricated.
-OPTIONAL_TERMINAL_KEYS = {"confidence"}
+OPTIONAL_TERMINAL_KEYS = {"confidence", "cost_totals"}
 
 
 def _runner_payload(
@@ -243,7 +244,7 @@ def test_available_optional_header_fields_keep_verified_shapes(monkeypatch) -> N
     # the already-built header (stored bytes are authoritative/immutable).
     payload["effective_config"]["mass_kg"]["value"] = -1.0
     assert artifact["header"]["effective_config"]["mass_kg"]["value"] == 1000.0
-    assert "cost_block" not in artifact["header"]
+    assert artifact["header"]["cost_block"]["electrical_cost_per_kWh"] == 10.0
     assert artifact["header"]["engine_identity"]["cache_version"] == "stub-cache-v1"
 
 
@@ -332,3 +333,62 @@ def test_none_effective_config_is_omitted() -> None:
     artifact = build_run_artifact(payload, run_id="run-no-effective-config")
 
     assert "effective_config" not in artifact["header"]
+
+
+def test_cost_block_times_canonical_usage_equals_terminal_cost_totals() -> None:
+    payload = _runner_payload(
+        per_hour_summary=[
+            {
+                "hour": 1,
+                "campaign": "C0",
+                "mass_balance_pct": 0.0,
+                "energy_electrical_kWh": 2.0,
+                "energy_evaporation_thermal_kWh": 3.0,
+                "energy_latent_kWh": 1.0,
+                "energy_dissociation_kWh": 2.0,
+            },
+            {
+                "hour": 2,
+                "campaign": "C1",
+                "mass_balance_pct": 0.0,
+                "energy_electrical_kWh": 5.0,
+                "energy_evaporation_thermal_kWh": 7.0,
+                "energy_latent_kWh": 4.0,
+                "energy_dissociation_kWh": 3.0,
+            },
+        ]
+    )
+
+    artifact = build_run_artifact(payload, run_id="run-cost-golden")
+
+    cost_block = artifact["header"]["cost_block"]
+    totals = artifact["terminal"]["cost_totals"]
+    assert cost_block == {
+        "electrical_cost_per_kWh": 10.0,
+        "solar_heat_cost_per_kWh": 0.05,
+        "provenance": (
+            "default:owner-t7-two-price-energy-v1; base_config:"
+            + str(DEFAULT_COST_PARAMETERS_PATH)
+        ),
+    }
+    assert totals["electrical_cost_usd"] == pytest.approx(7.0 * 10.0)
+    assert totals["solar_heat_cost_usd"] == pytest.approx(10.0 * 0.05)
+    assert totals["total_cost_usd"] == pytest.approx(70.5)
+
+
+def test_cost_totals_omit_when_canonical_usage_is_incomplete() -> None:
+    payload = _runner_payload(
+        per_hour_summary=[
+            {
+                "hour": 1,
+                "campaign": "C0",
+                "mass_balance_pct": 0.0,
+                "energy_electrical_kWh": 2.0,
+            }
+        ]
+    )
+
+    artifact = build_run_artifact(payload, run_id="run-cost-incomplete")
+
+    assert "cost_block" in artifact["header"]
+    assert "cost_totals" not in artifact["terminal"]

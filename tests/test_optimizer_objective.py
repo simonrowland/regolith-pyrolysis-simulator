@@ -333,6 +333,10 @@ def test_throughput_cost_metrics_read_cost_rollup_and_lifespan_rate(monkeypatch)
     )
     sim = SimpleNamespace(
         energy_electrical_plus_evaporation_cumulative_kWh=10.0,
+        energy_cumulative_breakdown_kWh={
+            "electrical": 10.0,
+            "evaporation_thermal": 0.0,
+        },
         record=SimpleNamespace(
             cost_rollup={
                 "run_input_cost": {
@@ -433,6 +437,10 @@ def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() 
     )
     sim = SimpleNamespace(
         energy_electrical_plus_evaporation_cumulative_kWh=1.0,
+        energy_cumulative_breakdown_kWh={
+            "electrical": 1.0,
+            "evaporation_thermal": 0.0,
+        },
         record=SimpleNamespace(cost_rollup={}),
     )
 
@@ -447,6 +455,38 @@ def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() 
         run_execution=SimpleNamespace(simulator=sim),
         cost_parameters=cost_parameters,
     ) == pytest.approx(67.0)
+
+
+def test_marginal_cost_prices_electrical_and_evaporation_thermal_separately() -> None:
+    cost_parameters = CostParameters(
+        electricity_cost_per_kWh=10.0,
+        solar_heat_cost_per_kWh=4.0,
+        furnace_resinter_cost_usd=0.0,
+        depreciation_expense_per_run=0.0,
+        generic_reagent_cost_per_kg=0.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 0.0,
+            "K": 0.0,
+            "Mg": 0.0,
+            "Ca": 0.0,
+        },
+    )
+    sim = SimpleNamespace(
+        energy_cumulative_breakdown_kWh={
+            "electrical": 2.0,
+            "evaporation_thermal": 3.0,
+        },
+        record=SimpleNamespace(cost_rollup={}),
+    )
+
+    assert _metric_value(
+        "throughput_cost_owner_ratify_usd",
+        sim,
+        {},
+        {},
+        run_execution=SimpleNamespace(simulator=sim),
+        cost_parameters=cost_parameters,
+    ) == pytest.approx(32.0)
 
 
 def test_cost_objective_ranking_prices_pumping_sidecar() -> None:
@@ -489,6 +529,10 @@ def test_cost_objective_ranking_prices_pumping_sidecar() -> None:
             }
         return SimpleNamespace(
             energy_electrical_plus_evaporation_cumulative_kWh=base_energy_kWh,
+            energy_cumulative_breakdown_kWh={
+                "electrical": base_energy_kWh,
+                "evaporation_thermal": 0.0,
+            },
             record=SimpleNamespace(cost_rollup=cost_rollup),
         )
 

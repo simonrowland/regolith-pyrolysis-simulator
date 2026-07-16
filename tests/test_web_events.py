@@ -15,6 +15,7 @@ from web import events as web_events
 from web import routes as web_routes
 from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.condensation import KnudsenRegimeRefusal
+from simulator.cost_parameters import default_cost_parameters_block
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
@@ -2817,6 +2818,9 @@ def test_web_run_payload_captures_effective_config_sources(monkeypatch):
     app = app_module.create_app()
     client = _identified_socket_client(app)
     before = set(_simulations)
+    cost_parameters = default_cost_parameters_block()
+    cost_parameters["parameters"]["electricity_cost_per_kWh"]["value"] = 12.0
+    cost_parameters["parameters"]["solar_heat_cost_per_kWh"]["value"] = 0.07
 
     try:
         client.emit(
@@ -2830,6 +2834,7 @@ def test_web_run_payload_captures_effective_config_sources(monkeypatch):
                 "setpoints_patch": {
                     "campaigns": {"C4": {"temp_range_C": [1600.0, 1660.0]}}
                 },
+                "cost_parameters": cost_parameters,
             },
         )
         sid = (set(_simulations) - before).pop()
@@ -2857,6 +2862,9 @@ def test_web_run_payload_captures_effective_config_sources(monkeypatch):
             not in effective_config
         )
         assert "mass_kg" not in effective_config
+        captured_costs = captured_payloads[0]["cost_parameters"]["parameters"]
+        assert captured_costs["electricity_cost_per_kWh"]["value"] == 12.0
+        assert captured_costs["solar_heat_cost_per_kWh"]["value"] == 0.07
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
