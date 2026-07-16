@@ -89,6 +89,7 @@ class RunExecution:
     backend_status: str = "ok"
     backend_authoritative: bool = True
     envelope_detail_unavailable: str = ""
+    campaigns_elapsed: float = 1.0
 
 
 class RunExecutor:
@@ -322,6 +323,9 @@ class RunExecutor:
                 reduced_real_cache=reduced_real_cache,
                 backend_status=backend_status,
                 backend_authoritative=backend_authoritative,
+                campaigns_elapsed=float(
+                    getattr(getattr(session, "_config", None), "campaigns_elapsed", 1.0)
+                ),
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
             if failure_exc is None:
@@ -370,6 +374,9 @@ class RunExecutor:
                 envelope_detail_unavailable=(
                     "envelope detail unavailable: "
                     f"{_safe_exception_text(envelope_exc)}"
+                ),
+                campaigns_elapsed=float(
+                    getattr(getattr(session, "_config", None), "campaigns_elapsed", 1.0)
                 ),
             )
 

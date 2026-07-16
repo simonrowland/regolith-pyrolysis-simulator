@@ -1818,7 +1818,10 @@ def _tap_coating_product_summary(
                 })
                 for segment, species_map in remobilization.items()
             }),
-            "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
+            "campaigns_to_resinter": _campaigns_to_resinter(
+                raw_by_segment,
+                campaigns_elapsed=_campaigns_elapsed(run_execution),
+            ),
             **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
             **_coating_authority_summary(authority),
         }
@@ -3383,7 +3386,10 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
             })
             for segment, species_map in remobilization.items()
         }),
-        "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
+        "campaigns_to_resinter": _campaigns_to_resinter(
+            raw_by_segment,
+            campaigns_elapsed=_campaigns_elapsed(run_execution),
+        ),
         **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
         **_coating_authority_summary(authority),
     })
@@ -3700,15 +3706,47 @@ def _wall_deposit_by_segment_species_summary(
 
 def _campaigns_to_resinter(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+    *,
+    campaigns_elapsed: float = 1.0,
 ) -> float | str:
     by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
     if not by_species:
         return "infinite"
     total_wall_load_kg = sum(by_species.values())
+    elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
+    if elapsed <= 0.0:
+        raise ObjectiveComputationError("campaigns_elapsed must be positive")
+    # Cumulative load L over N campaigns implies rate L/N kg/campaign.
+    # threshold kg / (L/N kg/campaign) = threshold*N/L campaigns; for N=1,
+    # L and threshold=10L, the result is 10 campaigns.
+    wall_load_kg_per_campaign = total_wall_load_kg / elapsed
     threshold = _wall_resinter_threshold_kg()
     if threshold is None:
-        return f"resinter_threshold_kg / {total_wall_load_kg:.12g}"
-    return threshold / total_wall_load_kg
+        return f"resinter_threshold_kg / {wall_load_kg_per_campaign:.12g}"
+    return threshold / wall_load_kg_per_campaign
+
+
+def _campaigns_elapsed(run_execution: Any) -> float:
+    direct = getattr(run_execution, "campaigns_elapsed", None)
+    if direct is not None:
+        elapsed = _finite_float(direct, "run_execution.campaigns_elapsed")
+        if elapsed <= 0.0:
+            raise ObjectiveComputationError(
+                "run_execution.campaigns_elapsed must be positive"
+            )
+        return elapsed
+    metadata = getattr(run_execution, "run_metadata", None)
+    if metadata is None:
+        document = getattr(run_execution, "result_document", None)
+        if isinstance(document, Mapping):
+            metadata = document.get("run_metadata")
+    if not isinstance(metadata, Mapping):
+        return 1.0
+    raw = metadata.get("campaigns_elapsed", metadata.get("campaign_index", 1.0))
+    elapsed = _finite_float(raw, "run_metadata.campaigns_elapsed")
+    if elapsed <= 0.0:
+        raise ObjectiveComputationError("run_metadata.campaigns_elapsed must be positive")
+    return elapsed
 
 
 def _wall_deposit_by_species_summary(

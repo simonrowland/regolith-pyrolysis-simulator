@@ -158,6 +158,68 @@ def test_harness_namespaces_live_runner_total_parity_from_lifecycle_projection()
     assert result.lifecycle_projection.to_dict()["service_life_authoritative"] is False
 
 
+def test_runner_resinter_verdict_uses_worst_segment_liner_load(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "simulator.runner._wall_liner_resinter_config",
+        lambda: {
+            "liner_material": "test-liner",
+            "resinter_threshold_kg": 10.0,
+            "resinter_threshold_basis": "test",
+            "fast_fouling_campaign_threshold": 10,
+        },
+    )
+    deposits = {
+        ("hot_duct", "SiO"): 2.0,
+        ("cold_duct", "Na"): 0.2,
+    }
+
+    report = _wall_fouling_report(
+        {"SiO": 2.0, "Na": 0.2},
+        wall_deposit_by_segment_species=deposits,
+    )
+
+    assert report["campaigns_to_resinter"] == pytest.approx(5.0)
+    assert report["campaigns_to_resinter_by_segment"] == {
+        "cold_duct": pytest.approx(50.0),
+        "hot_duct": pytest.approx(5.0),
+    }
+    assert report["aggregate_campaigns_to_resinter"] == pytest.approx(10.0 / 2.2)
+    assert report["nominal_verdict"] == "fast-fouling"
+
+
+def test_runner_parametric_resinter_uses_worst_segment_and_keeps_aggregate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "simulator.runner._wall_liner_resinter_config",
+        lambda: {
+            "liner_material": "test-liner",
+            "resinter_threshold_kg": None,
+            "resinter_threshold_basis": "parameter required",
+            "fast_fouling_campaign_threshold": 10,
+        },
+    )
+
+    report = _wall_fouling_report(
+        {"SiO": 2.0, "Na": 0.2},
+        wall_deposit_by_segment_species={
+            ("hot_duct", "SiO"): 2.0,
+            ("cold_duct", "Na"): 0.2,
+        },
+    )
+
+    assert report["campaigns_to_resinter"] == "resinter_threshold_kg / 2"
+    assert report["aggregate_campaigns_to_resinter"] == (
+        "resinter_threshold_kg / 2.2"
+    )
+    assert report["campaigns_to_resinter_by_segment"] == {
+        "cold_duct": "resinter_threshold_kg / 0.2",
+        "hot_duct": "resinter_threshold_kg / 2",
+    }
+
+
 def test_harness_derived_total_fails_closed_when_runner_authority_absent() -> None:
     def run_campaign(_index: int) -> FoulingRunArtifact:
         return _artifact(

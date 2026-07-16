@@ -1320,6 +1320,7 @@ def _trace_with_optimizer_coating_report(
 
     runner_report = _wall_fouling_report(
         by_species,
+        wall_deposit_by_segment_species=raw_deposit,
         alpha_notice=getattr(trace, "wall_deposit_sticking_authority", {}) or {},
     )
     try:

@@ -164,6 +164,7 @@ class SimSessionConfig:
     result_document_factory: Callable[["SimSession"], Mapping[str, Any]] | None = None
     reduced_real_cache: Mapping[str, Any] | None = None
     backend_config: Mapping[str, Any] | None = None
+    campaigns_elapsed: float = 1.0
 
     def __post_init__(self) -> None:
         # Fold the `internal-analytical` display alias onto the stable `stub`
@@ -183,6 +184,10 @@ class SimSessionConfig:
             valid = ", ".join(sorted(_ALLOWED_SESSION_TRACKS))
             raise ValueError(f"unknown track {track!r}; valid options: {valid}")
         object.__setattr__(self, "track", track)
+        campaigns_elapsed = _finite_float(self.campaigns_elapsed, "campaigns_elapsed")
+        if campaigns_elapsed <= 0.0:
+            raise ValueError("campaigns_elapsed must be positive")
+        object.__setattr__(self, "campaigns_elapsed", campaigns_elapsed)
         if self.c4_max_temp is not None:
             c4_max_temp = _finite_float(self.c4_max_temp, "c4_max_temp")
             if c4_max_temp < 0.0:

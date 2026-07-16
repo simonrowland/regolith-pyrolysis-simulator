@@ -2858,7 +2858,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             wall_temperature_C=transport['pipe_temperature_C'],
             overhead_pressure_mbar=transport['pressure_mbar'],
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
-            gas_temperature_C=transport['pipe_temperature_C'],
+            # The upstream vapor is evaluated at the melt-side temperature used
+            # by the conductance model; the independently scheduled pipe and
+            # segment temperatures are liner-wall states, not gas states.
+            gas_temperature_C=transport['conductance_temperature_C'],
             stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
             stage_area_geometry_provenance_notice=transport.get(
                 'stage_area_geometry_provenance_notice', {}),

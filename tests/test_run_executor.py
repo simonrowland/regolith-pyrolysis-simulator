@@ -47,6 +47,22 @@ def test_run_executor_returns_structured_execution():
     assert isinstance(execution.operator_decisions, tuple)
 
 
+def test_run_executor_propagates_campaigns_elapsed_from_run_metadata():
+    run = _run(
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-30T00:00:00Z",
+            "kernel_commit_sha": "run-executor-fixture",
+            "campaigns_elapsed": 4,
+        }
+    )
+    config = run._session_config()
+
+    execution = RunExecutor().execute(config)
+
+    assert config.campaigns_elapsed == pytest.approx(4.0)
+    assert execution.campaigns_elapsed == pytest.approx(4.0)
+
+
 def test_pyrolysis_run_is_executor_json_adapter():
     run = _run()
     execution = RunExecutor().execute(run._session_config())
