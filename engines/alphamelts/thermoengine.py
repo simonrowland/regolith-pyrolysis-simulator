@@ -36,6 +36,10 @@ from simulator.engine_local_config import (
 ActivityConverter = Callable[[float, float, float], float]
 
 
+class ThermoEngineIsolationError(RuntimeError):
+    """Refusal to run native ThermoEngine outside its killable worker."""
+
+
 _FO2_ECHO_TOLERANCE = 1.0e-3
 _FO2_MONOTONIC_EPSILON = 1.0e-7
 _FO2_FRACTION_WIDTH_TOLERANCE = 1.0e-10
@@ -495,14 +499,9 @@ print('ok')
     ) -> ThermoEnginePayload:
         """Equilibrate with a hard deadline around all native solve calls."""
         if self._worker_process is None:
-            # Direct injection keeps pure-Python unit tests lightweight. Real
-            # initialized transports always use the isolated worker above.
-            return self._equilibrate_in_process(
-                temperature_C=temperature_C,
-                pressure_bar=pressure_bar,
-                comp_wt=comp_wt,
-                fO2_log=fO2_log,
-                warnings=warnings,
+            raise ThermoEngineIsolationError(
+                'ThermoEngine equilibrium requires an isolated worker; '
+                'in-process native equilibrium is forbidden'
             )
         process = self._worker_process
         connection = self._worker_connection

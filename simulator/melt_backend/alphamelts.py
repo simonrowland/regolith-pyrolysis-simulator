@@ -66,6 +66,9 @@ from simulator.physical_constants import GAS_CONSTANT
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
 ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR = 1.0e-6
 ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
+# 20s is the established per-solve subprocess budget; bracket searches apply
+# it independently to each native call rather than treating it as a run budget.
+ALPHAMELTS_DEFAULT_TIMEOUT_S = 20.0
 MELTS_OXIDE_BASIS = (
     'SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MgO', 'CaO',
     'Na2O', 'K2O', 'Cr2O3', 'MnO', 'P2O5', 'NiO', 'CoO',
@@ -184,6 +187,24 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
 
 class AlphaMELTSSubprocessContractError(MeltBackendError):
     """Typed failure for subprocess request/output contract violations."""
+
+
+class AlphaMELTSConfigurationError(ValueError):
+    """Typed failure for invalid AlphaMELTS backend configuration."""
+
+
+def _validated_timeout_s(value: object) -> float:
+    try:
+        timeout_s = float(value)
+    except (TypeError, ValueError) as exc:
+        raise AlphaMELTSConfigurationError(
+            'AlphaMELTS timeout_s must be finite and positive'
+        ) from exc
+    if not math.isfinite(timeout_s) or timeout_s <= 0.0:
+        raise AlphaMELTSConfigurationError(
+            'AlphaMELTS timeout_s must be finite and positive'
+        )
+    return timeout_s
 
 
 def _alphamelts_backend_failure_category(reason_code: str,
@@ -369,7 +390,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._fo2_offset: Optional[float] = None
         self._fe3fet_ratio: Optional[float] = None
         self._model = 'MELTSv1.0.2'
-        self._timeout_s = 20.0
+        self._timeout_s = ALPHAMELTS_DEFAULT_TIMEOUT_S
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None
         self._subprocess_vapor_pressure_provider = None
@@ -402,7 +423,9 @@ class _MELTSBackendSupport(MeltBackend):
         self._fe3fet_ratio = self._normalize_fe3fet_ratio(
             config.get('Fe3Fet_Liq', config.get('fe3fet_ratio')))
         self._model = str(config.get('model', self._model))
-        self._timeout_s = float(config.get('timeout_s', self._timeout_s))
+        self._timeout_s = _validated_timeout_s(
+            config.get('timeout_s', ALPHAMELTS_DEFAULT_TIMEOUT_S)
+        )
         self._vapor_transport_pO2_bar = float(
             config.get(
                 'vapor_transport_pO2_bar',
@@ -1751,6 +1774,7 @@ class _MELTSBackendSupport(MeltBackend):
         kwargs: Optional[Mapping[str, object]] = None,
     ):
         """Execute a native PetThermoTools operation behind a hard deadline."""
+        timeout_s = _validated_timeout_s(self._timeout_s)
         context = multiprocessing.get_context('spawn')
         parent, child = context.Pipe(duplex=True)
         process = context.Process(
@@ -1774,7 +1798,6 @@ class _MELTSBackendSupport(MeltBackend):
                 f'PetThermoTools {operation} worker failed to start: {exc}',
             ) from exc
         child.close()
-        timeout_s = max(1.0, float(self._timeout_s or 20.0))
         try:
             if not parent.poll(timeout_s):
                 raise _alphamelts_backend_failure_error(
@@ -2097,9 +2120,11 @@ class _MELTSBackendSupport(MeltBackend):
             # Run alphaMELTS directly. The alphaMELTS 2 app runner only
             # emits *_tbl.txt for path-style runs; single-point equilibria
             # report the stable phase assemblage on stdout.
-            timeout_s = getattr(self, '_timeout_s', 20.0)
-            if timeout_s is None:
-                timeout_s = 20.0
+            timeout_s = _validated_timeout_s(getattr(
+                self,
+                '_timeout_s',
+                ALPHAMELTS_DEFAULT_TIMEOUT_S,
+            ))
             try:
                 result = subprocess.run(
                     [str(binary), '1'],

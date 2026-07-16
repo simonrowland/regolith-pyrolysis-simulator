@@ -35,6 +35,7 @@ from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_TIMEOUT,
     ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
     AlphaMELTSBackend,
+    AlphaMELTSConfigurationError,
     AlphaMELTSSubprocessContractError,
     AlphaMELTSSubprocessRunMode,
     activity_from_chem_potential,
@@ -46,6 +47,7 @@ from simulator.melt_backend.base import (
 )
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
 from engines.alphamelts.thermoengine import (
+    ThermoEngineIsolationError,
     ThermoEnginePayload,
     ThermoEngineTransport,
 )
@@ -1331,6 +1333,25 @@ def test_alphamelts_python_worker_start_failure_closes_pipes(monkeypatch):
     assert events == ['close', 'close']
 
 
+def test_alphamelts_python_worker_revalidates_timeout_before_spawn(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._timeout_s = math.inf
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.multiprocessing.get_context',
+        lambda _method: (_ for _ in ()).throw(
+            AssertionError('invalid timeout must refuse before worker spawn')
+        ),
+    )
+
+    with pytest.raises(
+        AlphaMELTSConfigurationError,
+        match='timeout_s.*finite and positive',
+    ):
+        backend._run_petthermotools_isolated('equilibrate_MELTS')
+
+
 def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
@@ -1362,6 +1383,28 @@ def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
     )
     assert seen['timeout'] == 37.5
     assert backend._mode == 'subprocess'
+
+
+@pytest.mark.parametrize(
+    'timeout_s',
+    [math.inf, -math.inf, math.nan, 0.0, -1.0],
+)
+def test_alphamelts_timeout_config_must_be_finite_and_positive(
+    monkeypatch,
+    timeout_s,
+):
+    backend = AlphaMELTSBackend()
+    monkeypatch.setattr(
+        backend,
+        '_find_project_binary',
+        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+    )
+
+    with pytest.raises(
+        AlphaMELTSConfigurationError,
+        match='timeout_s.*finite and positive',
+    ):
+        backend.initialize({'mode': 'subprocess', 'timeout_s': timeout_s})
 
 
 def test_alphamelts_subprocess_missing_binary_is_loud_and_disables_mode(monkeypatch):
@@ -2911,7 +2954,27 @@ def test_thermoengine_activity_extractor_uses_mu_minus_mu0():
     })
 
 
-def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
+def test_thermoengine_equilibrate_refuses_in_process_fallback(monkeypatch):
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    monkeypatch.setattr(
+        transport,
+        '_equilibrate_in_process',
+        lambda **_kwargs: (_ for _ in ()).throw(
+            AssertionError('in-process fallback called')
+        ),
+    )
+
+    with pytest.raises(ThermoEngineIsolationError, match='isolated worker'):
+        transport.equilibrate(
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            comp_wt={'SiO2': 50.0},
+        )
+
+
+def test_thermoengine_private_in_process_equilibrate_parses_payload(monkeypatch):
     class FakeMelts:
         bulk_wt: dict[str, float] | None = None
 
@@ -3000,7 +3063,7 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
 
     monkeypatch.setattr('engines.alphamelts.thermoengine.subprocess.run', fail_run)
 
-    result = transport.equilibrate(
+    result = transport._equilibrate_in_process(
         temperature_C=1200.0,
         pressure_bar=1.0,
         comp_wt={'SiO2': 50.0, 'Al2O3': 0.0},
@@ -3276,7 +3339,9 @@ def test_thermoengine_standalone_shadow_parity_with_frozen_legacy_oracle(
     assert result.ledger_transition is None
 
 
-def test_thermoengine_imposes_absolute_fo2_with_default_phase_solver(monkeypatch):
+def test_thermoengine_private_solver_imposes_absolute_fo2_with_python_fake(
+    monkeypatch,
+):
     class FakeMelts:
         def __init__(self):
             self.bulk_wt = {}
@@ -3362,7 +3427,7 @@ def test_thermoengine_imposes_absolute_fo2_with_default_phase_solver(monkeypatch
     )
     monkeypatch.setattr(transport, '_fe_redox_split', lambda _comp: {})
 
-    result = transport.equilibrate(
+    result = transport._equilibrate_in_process(
         temperature_C=1200.0,
         pressure_bar=1.0,
         comp_wt={'SiO2': 80.0, 'FeO': 18.0, 'Fe2O3': 2.0},
