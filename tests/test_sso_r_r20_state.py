@@ -1723,6 +1723,7 @@ def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
     sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
     sim.melt.temperature_C = 1200.0
+    ledger_before = sim.atom_ledger.mol_by_account()
 
     sim._step_c7_ca_aluminothermic()
 
@@ -1732,7 +1733,18 @@ def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
     assert diagnostic["c7_transport_refusal"] == (
         "no_active_route_or_pressure_outside_vacuum_envelope"
     )
-    assert sim._last_c7_refusal_diagnostic == {}
+    assert sim._last_c7_refusal_diagnostic == {
+        "reason_refused": "no_active_route_or_pressure_outside_vacuum_envelope",
+        "c7_transport_refusal": (
+            "no_active_route_or_pressure_outside_vacuum_envelope"
+        ),
+        "r_transport": pytest.approx(0.0),
+        "transport_ca_mol": pytest.approx(0.0),
+        "c7_overhead_pressure_pa": pytest.approx(
+            diagnostic["c7_overhead_pressure_pa"]
+        ),
+    }
+    assert sim.atom_ledger.mol_by_account() == ledger_before
 
 
 def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:

@@ -3176,6 +3176,18 @@ class ExtractionMixin:
         )
         r_transport, transport_diag = self._c7_transport_extent_mol(
             cfg, ca_per_extent=stoich['Ca'])
+        transport_refusal = str(
+            transport_diag.get('c7_transport_refusal') or '')
+        if transport_refusal:
+            self._last_c7_refusal_diagnostic = {
+                'reason_refused': transport_refusal,
+                'c7_transport_refusal': transport_refusal,
+                'r_transport': r_transport,
+                'transport_ca_mol': float(
+                    transport_diag.get('transport_ca_mol', 0.0) or 0.0),
+                'c7_overhead_pressure_pa': float(
+                    transport_diag.get('c7_overhead_pressure_pa', 0.0) or 0.0),
+            }
         objective_extent = min(r_stoich_total, r_transport)
         objective = str(cfg.get('objective') or 'ree_enrichment')
         p_total_raw = cfg.get('p_total_mbar')
