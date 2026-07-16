@@ -97,11 +97,67 @@ def _campaigns_elapsed_from_session_history(
     *,
     fallback: float,
 ) -> float:
+    step_results = tuple(getattr(session, "_step_results", ()))
     completed_campaigns = sum(
         1
-        for result in getattr(session, "_step_results", ())
+        for result in step_results
         if getattr(result, "campaign_summary", None) is not None
     )
+    last_completed_index = max(
+        (
+            index
+            for index, result in enumerate(step_results)
+            if getattr(result, "campaign_summary", None) is not None
+        ),
+        default=-1,
+    )
+    active_campaign_hours = len(step_results) - last_completed_index - 1
+    if active_campaign_hours:
+        sim = getattr(session, "simulator", None)
+        campaign_mgr = getattr(sim, "campaign_mgr", None)
+        campaign = getattr(getattr(sim, "melt", None), "campaign", None)
+        campaign_duration_h: float | None = None
+        if campaign_mgr is not None and campaign is not None:
+            campaign_name = str(getattr(campaign, "name", ""))
+            if campaign_name == "C2A_STAGED":
+                duration = getattr(
+                    campaign_mgr, "_configured_staged_max_hold_hr", None
+                )
+                if callable(duration):
+                    campaign_duration_h = float(duration(campaign))
+            elif campaign_name in {"C3_K", "C3_NA"}:
+                record_path = str(getattr(getattr(sim, "record", None), "path", ""))
+                duration_path = (
+                    "A_staged"
+                    if record_path == "A_staged"
+                    else "A" if record_path == "A" else "default"
+                )
+                configured_duration = getattr(
+                    campaign_mgr, "_configured_max_hold_hr", None
+                )
+                if callable(configured_duration):
+                    campaign_duration_h = float(
+                        configured_duration(campaign, campaign_name, duration_path)
+                    )
+                if record_path == "A_staged":
+                    overrides = getattr(campaign_mgr, "_campaign_overrides", None)
+                    if callable(overrides):
+                        staged_duration = overrides(campaign).get(
+                            "staged_duration_h"
+                        )
+                        if staged_duration is not None:
+                            campaign_duration_h = float(staged_duration)
+            else:
+                duration = getattr(campaign_mgr, "_max_hold_hr", None)
+                if callable(duration):
+                    campaign_duration_h = float(duration(campaign))
+        if campaign_duration_h is not None:
+            if math.isfinite(campaign_duration_h) and campaign_duration_h > 0.0:
+                # The cumulative wall load includes every executed hour, so
+                # include the active campaign on the same time-complete basis.
+                return float(completed_campaigns) + (
+                    float(active_campaign_hours) / campaign_duration_h
+                )
     if completed_campaigns:
         return float(completed_campaigns)
     return float(fallback)

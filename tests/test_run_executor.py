@@ -52,8 +52,9 @@ def test_run_executor_returns_structured_execution():
     assert isinstance(execution.operator_decisions, tuple)
 
 
-def test_run_executor_propagates_campaigns_elapsed_from_run_metadata():
+def test_run_executor_uses_campaigns_elapsed_override_without_history():
     run = _run(
+        hours=0,
         run_metadata_overrides={
             "started_at_utc": "2026-05-30T00:00:00Z",
             "kernel_commit_sha": "run-executor-fixture",
@@ -81,6 +82,50 @@ def test_campaign_transition_history_overrides_campaign_count_fallback():
         session,
         fallback=99.0,
     ) == pytest.approx(2.0)
+
+
+def test_campaign_count_includes_partial_campaign_hours():
+    session = SimpleNamespace(
+        _step_results=[
+            SimpleNamespace(campaign_summary={"campaign": "C0", "duration_h": 8}),
+            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(campaign_summary=None),
+        ],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C0B),
+            campaign_mgr=SimpleNamespace(_max_hold_hr=lambda _campaign: 8.0),
+        ),
+    )
+
+    campaigns_elapsed = _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    )
+
+    assert campaigns_elapsed == pytest.approx(1.25)
+    assert (8.0 + 2.0) / campaigns_elapsed == pytest.approx(8.0)
+
+
+def test_campaign_count_resolves_structured_c3_duration():
+    campaign_mgr = SimpleNamespace(
+        _configured_max_hold_hr=lambda _campaign, phase, path: {
+            ("C3_NA", "A_staged"): 3.0,
+        }[(phase, path)],
+        _campaign_overrides=lambda _campaign: {},
+    )
+    session = SimpleNamespace(
+        _step_results=[SimpleNamespace(campaign_summary=None)],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C3_NA),
+            record=SimpleNamespace(path="A_staged"),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+
+    assert _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    ) == pytest.approx(1.0 / 3.0)
 
 
 def test_run_metadata_projects_execution_campaign_count_over_override():

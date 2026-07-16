@@ -198,6 +198,28 @@ def test_runner_resinter_verdict_uses_worst_segment_liner_load(
         wall_deposit_by_segment_species=deposits,
     )
 
+    assert set(report) == {
+        "aggregate_campaigns_to_resinter",
+        "authoritative",
+        "authoritative_for_resinter",
+        "campaigns_to_resinter",
+        "campaigns_to_resinter_by_segment",
+        "dominant_species",
+        "dominant_species_wall_deposit_kg",
+        "fast_fouling_campaign_threshold",
+        "liner_material",
+        "nominal_verdict",
+        "output_status",
+        "resinter_threshold_basis",
+        "resinter_threshold_kg",
+        "status",
+        "status_reason",
+        "sticking_alpha_authority",
+        "verdict",
+        "verdict_authoritative",
+        "wall_deposit_basis",
+        "wall_deposit_kg_per_campaign",
+    }
     assert report["campaigns_to_resinter"] == pytest.approx(5.0)
     assert report["campaigns_to_resinter_by_segment"] == {
         "cold_duct": pytest.approx(50.0),

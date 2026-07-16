@@ -105,7 +105,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.4.0"
+RUNNER_SCHEMA_VERSION = "1.5.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -2726,7 +2726,7 @@ def _apply_sio_wall_sweep_controls(
         sim.condensation_model.configure_operating_conditions(
             wall_temperature_C=float(liner_temperature_c),
             pipe_diameter_m=sim.overhead_model.pipe_diameter_m,
-            gas_temperature_C=float(liner_temperature_c),
+            gas_temperature_C=float(sim.melt.temperature_C),
             stage_area_m2_by_stage=sim.overhead_model.stage_area_m2_by_stage(),
             stage_area_geometry_provenance_notice=(
                 sim.overhead_model.stage_area_geometry_provenance_notice()),

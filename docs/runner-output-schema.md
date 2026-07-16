@@ -6,8 +6,14 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.4.0`
+**Schema version:** `1.5.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
+
+Schema 1.5.0 adds the unconditional `run_metadata.campaigns_elapsed` field and
+the `campaigns_to_resinter_by_segment` and
+`aggregate_campaigns_to_resinter` fields in the SiO wall-fouling report.
+Golden runner and SiO-yield fixtures therefore require controller regeneration
+on main; this worktree intentionally does not regenerate them.
 
 Schema 1.4.0 makes the vapor-pressure source report's backend-facet keys
 unconditional, admits the staged-C2A `c2a_staged_gas` per-hour key, and
@@ -60,7 +66,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.4.0",
+  "schema_version": "1.5.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
@@ -96,11 +102,12 @@ it does not introduce a new schema version.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.4.0",
+  "schema_version": "1.5.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
   "hours_completed": 24,                     // <= hours_requested
+  "campaigns_elapsed": 1.25,                 // completed campaigns + active campaign fraction by completed/max-hold hours
   "mass_kg":         1000.0,
   "additives_kg":    {"C": 30.0},            // additive species -> kg
   "track":           "pyrolysis",            // or "mre_baseline"
@@ -170,9 +177,11 @@ it does not introduce a new schema version.
   `evidence_class`, `runtime_status`, `label_source`,
   `certification_allowed`, and `engines_used.active/requested/registry`.
 * Any extra keys passed via `run_metadata_overrides` are forwarded verbatim
-  except `campaigns_elapsed`: completed campaign-transition summaries in the
-  session are authoritative, while the override is an explicit fallback when
-  the run records no completed transition.
+  except `campaigns_elapsed`: session history is authoritative. It counts each
+  completed campaign as 1 and the active partial campaign as completed hours
+  divided by that campaign's configured maximum hold. This matches cumulative
+  wall-load scope; the override is only a fallback when history cannot derive a
+  campaign-equivalent duration.
 * `refusal_diagnostic` preserves the typed reason and structured evidence for
   any handled simulation refusal. Campaign-pressure refusals populate only
   this generic field. Knudsen refusals also populate
@@ -230,6 +239,28 @@ it does not introduce a new schema version.
 * `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.4.0`
   reports the explicit sentinel `not_applicable_until_p0`; P6b will
   replace it with pump/outlet totals after molecular transport lands.
+
+### SiO wall-fouling report
+
+`build_sio_yield_report().fouling_rate` reports both the controlling segment
+and the aggregate liner load:
+
+```jsonc
+{
+  "campaigns_to_resinter": 5.0,
+  "campaigns_to_resinter_by_segment": {
+    "cold_duct": 50.0,
+    "hot_duct": 5.0
+  },
+  "aggregate_campaigns_to_resinter": 4.545454545454546
+}
+```
+
+* `campaigns_to_resinter` is the minimum segment value and controls the verdict.
+* `campaigns_to_resinter_by_segment` exposes each positive segment load.
+* `aggregate_campaigns_to_resinter` retains the whole-liner projection for
+  consumers that explicitly need the aggregate rather than the controlling
+  segment.
 
 ## Stage purity report
 
