@@ -29,6 +29,17 @@ _ACCOUNT_BASIS = {
     "terminal.drain_tap_material": "elemental",
 }
 
+# ``thermal_train`` has live consumers in the simulator advisory and thermal-
+# train page. Every other named view is a deprecated compatibility projection:
+# no current report/library/settings reader consumes it, and removing it would
+# break the schema-2.0.0 wire surface. Frozen-run replacements are:
+#
+# - taps, ceramic, condensation, offgas, wall, oxygen, and industrial glass:
+#   ``timesteps[].ledger`` (plus the matching ``summary``/``terminal`` fields);
+# - stage purity: ``terminal.stage_purity``.
+#
+# Keep these labels beside the registry so a future major-version removal can
+# audit the complete compatibility surface rather than rediscovering it.
 _VIEW_NAMES = (
     "melt_pot_upper_tap", "melt_pot_bottom_tap", "terminal_ceramic",
     "condensation_train", "offgas", "wall_deposits", "oxygen_partition",
@@ -137,6 +148,12 @@ class LedgerAPI:
         }
 
     def view(self, name: str) -> dict[str, Any]:
+        """Return a named compatibility projection or the live thermal-train view.
+
+        Stored-run consumers must use the frozen artifact seam described above;
+        the non-thermal named views remain behavior-stable only for schema-2.0.0
+        compatibility until a coordinated major-version removal.
+        """
         view_name = str(name)
         if view_name == "melt_pot_upper_tap":
             payload = self.account("process.metal_phase_float_layer")
