@@ -168,6 +168,36 @@ def test_missing_chapman_enskog_parameters_do_not_fall_back_to_constant():
     assert free_molecular.r_gas == 0.0
 
 
+def test_cro2_class_proxy_preserves_chapman_enskog_scaling():
+    base = _evap(
+        species="CrO2",
+        molar_mass_kg_mol=0.0839941,
+        knudsen_number=1.0e-7,
+        melt_resistance_enabled=False,
+    )
+    double_pressure = _evap(
+        species="CrO2",
+        molar_mass_kg_mol=0.0839941,
+        knudsen_number=1.0e-7,
+        overhead_pressure_pa=2000.0,
+        melt_resistance_enabled=False,
+    )
+    hotter = _evap(
+        species="CrO2",
+        molar_mass_kg_mol=0.0839941,
+        knudsen_number=1.0e-7,
+        T_surface_K=2400.0,
+        T_gas_K=2400.0,
+        melt_resistance_enabled=False,
+    )
+
+    assert base.d_ab_m2_s > 0.0
+    assert double_pressure.d_ab_m2_s == pytest.approx(
+        base.d_ab_m2_s / 2.0, rel=1e-12
+    )
+    assert hotter.d_ab_m2_s > base.d_ab_m2_s
+
+
 def test_anti_exploit_stir_bounds_and_defensive_clamps():
     max_axial = _evap(
         axial_stir_factor=MAX_STIR_FACTOR,

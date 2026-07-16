@@ -63,6 +63,7 @@ def foulant_registry_yaml(tmp_path: Path) -> Path:
         """
         foulant_dG:
           CaSO4_thermal_decomp:
+            reaction: "CaSO4 -> CaO + SO2 + 1/2 O2"
             points:
               - {T_K: 1373.15, dG_kJ_per_mol: 50.0}
               - {T_K: 1473.15, dG_kJ_per_mol: -50.0}
@@ -180,6 +181,21 @@ def test_chi_decomp_o2_suppression_does_not_cap_high_temperature_extent(
 
     assert result.path == "thermal"
     assert result.extent == pytest.approx(1.0)
+
+
+def test_chi_decomp_po2_edge_semantics(foulant_registry_yaml: Path) -> None:
+    registry = load_foulant_registry(foulant_registry_yaml)
+
+    reference = chi_decomp("CaSO4", 1300.0, 0.2, 0.0, registry)
+    no_overhead = chi_decomp("CaSO4", 1300.0, 0.0, 0.0, registry)
+    floor = chi_decomp("CaSO4", 1300.0, 1.0e-9, 0.0, registry)
+    below_floor = chi_decomp("CaSO4", 1300.0, 1.0e-30, 0.0, registry)
+
+    assert no_overhead == reference
+    assert below_floor == floor
+    for invalid in (-1.0, float("nan"), float("inf")):
+        with pytest.raises(ValueError, match="pX_bar must be finite and non-negative"):
+            chi_decomp("CaSO4", 1300.0, invalid, 0.0, registry)
 
 
 def test_sigmoid_width_is_physical_logistic_not_step(

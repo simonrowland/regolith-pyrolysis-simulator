@@ -217,6 +217,9 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     'Al':  (2.940, 3093.0, 26.982),  # Estimated
     'Ti':  (2.890, 6000.0, 47.867),  # Estimated
     'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
+    # CLASS-PROXY: nearest represented oxide vapor. SiO collision parameters
+    # preserve Chapman-Enskog T^1.5/P scaling; CrO2 keeps its own molar mass.
+    'CrO2': (3.374, 71.4, 83.9941),
 }
 
 _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
@@ -275,6 +278,10 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     'SiO': {
         'status': 'proxy',
         'source': 'estimated sparse-data SiO vapor Lennard-Jones row',
+    },
+    'CrO2': {
+        'status': 'proxy',
+        'source': 'CLASS-PROXY: SiO oxide-vapor Lennard-Jones row; CrO2 molar mass',
     },
 }
 
