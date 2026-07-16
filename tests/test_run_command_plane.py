@@ -402,6 +402,83 @@ def test_second_http_submit_replaces_prior_run_and_keeps_ledger_unique(
     }
 
 
+@pytest.mark.parametrize("first_transport", ["socket", "http"])
+def test_cross_transport_submit_replaces_prior_run_and_keeps_ledger_unique(
+    tmp_path,
+    monkeypatch,
+    first_transport,
+):
+    store = RunArtifactStore(tmp_path / "runs")
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    monkeypatch.setattr(web_events, "_get_backend", lambda _name: backend)
+    monkeypatch.setattr(web_events, "get_run_store", lambda: store)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        lambda _target, *_args, **_kwargs: None,
+    )
+    app = app_module.create_app()
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    with http_client.session_transaction() as browser_session:
+        client_id = browser_session["ledger_client_id"]
+    socket_client = app_module.socketio.test_client(
+        app,
+        flask_test_client=http_client,
+    )
+    payload = {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+        "track": "pyrolysis",
+    }
+
+    try:
+        if first_transport == "socket":
+            first = socket_client.emit(
+                "start_simulation",
+                payload,
+                callback=True,
+            )
+            prior_run_id = first["run_id"]
+            response = http_client.post(
+                "/api/runs",
+                json={**payload, "client_token": "http-replacement"},
+            )
+            assert response.status_code == 201
+            replacement_run_id = response.get_json()["run_id"]
+        else:
+            response = http_client.post(
+                "/api/runs",
+                json={**payload, "client_token": "http-first"},
+            )
+            assert response.status_code == 201
+            prior_run_id = response.get_json()["run_id"]
+            replacement = socket_client.emit(
+                "start_simulation",
+                payload,
+                callback=True,
+            )
+            replacement_run_id = replacement["run_id"]
+
+        prior_artifact = store.load(prior_run_id)
+        assert prior_artifact["lifecycle"] == "cancelled"
+        assert prior_artifact["execution_status"] == "partial"
+        owned = [
+            state
+            for state in web_events._simulations.values()
+            if state.get("ledger_client_id") == client_id
+        ]
+        assert len(owned) == 1
+        assert owned[0]["run_id"] == replacement_run_id
+        ledger_response = http_client.get("/api/ledger/snapshot")
+        assert ledger_response.status_code == 200
+    finally:
+        socket_client.disconnect()
+
+
 def test_invalid_http_submit_does_not_destroy_active_run(tmp_path, monkeypatch):
     store = RunArtifactStore(tmp_path / "runs")
     state, _ = web_events._replace_simulation_state(

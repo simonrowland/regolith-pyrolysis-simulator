@@ -181,6 +181,21 @@ def test_store_save_load_list_and_retention(tmp_path) -> None:
     assert summaries[1]["starred"] is True
 
 
+def test_store_summary_includes_lifecycle_without_changing_status_alias(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(
+        _runner_payload("ok"),
+        run_id="cancelled-ok",
+        lifecycle="cancelled",
+    )
+    assert store.save("cancelled-ok", artifact) is True
+
+    summary = store.list_runs()[0]
+    assert summary["lifecycle"] == "cancelled"
+    assert summary["execution_status"] == "ok"
+    assert summary["status"] == "ok"
+
+
 def test_store_meta_round_trip_is_idempotent_and_does_not_rewrite_artifact(
     tmp_path,
 ) -> None:
@@ -348,6 +363,32 @@ def test_store_lineage_failure_does_not_publish_artifact(tmp_path, monkeypatch) 
     assert json.loads((store.runs_dir / "meta" / "child.json").read_text()) == {
         "parent_run_id": "parent"
     }
+
+
+def test_store_publish_failure_retry_overwrites_orphan_lineage(tmp_path, monkeypatch) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="child")
+    artifact_path = store.runs_dir / "child.json"
+    real_replace = run_store_module.os.replace
+
+    def fail_artifact_publish(source, destination):
+        if Path(destination) == artifact_path:
+            raise OSError("artifact publish failed")
+        return real_replace(source, destination)
+
+    monkeypatch.setattr(run_store_module.os, "replace", fail_artifact_publish)
+    with pytest.raises(OSError, match="artifact publish failed"):
+        store.save("child", artifact, parent_run_id="first-parent")
+
+    meta_path = store.runs_dir / "meta" / "child.json"
+    assert not artifact_path.exists()
+    assert json.loads(meta_path.read_text()) == {"parent_run_id": "first-parent"}
+
+    monkeypatch.setattr(run_store_module.os, "replace", real_replace)
+    assert store.save("child", artifact, parent_run_id="second-parent") is True
+    assert store.load("child") == artifact
+    assert json.loads(meta_path.read_text()) == {"parent_run_id": "second-parent"}
+    assert store.list_runs()[0]["parent_run_id"] == "second-parent"
 
 
 def test_store_meta_update_cannot_succeed_after_retention_deletes_run(

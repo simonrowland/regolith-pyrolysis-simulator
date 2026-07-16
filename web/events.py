@@ -81,7 +81,7 @@ def _load_yaml(filename):
 _simulations: dict = {}
 _sim_locks: dict = {}
 _simulations_guard = threading.Lock()
-_run_command_lock = threading.Lock()
+_run_command_lock = threading.RLock()
 _run_idempotency: dict[tuple[str, str], tuple[str, dict[str, object]]] = {}
 _MAX_RUN_IDEMPOTENCY_ENTRIES = 1024
 _registered_start_handler = None
@@ -121,6 +121,10 @@ class RunCommandError(ValueError):
         payload['error'] = str(self)
         payload['error_type'] = self.error_type
         return payload
+
+
+class _RunReplacementError(RuntimeError):
+    pass
 
 
 def _safe_log(message: str) -> None:
@@ -660,8 +664,7 @@ def submit_run_command(
                     candidate_sid
                     for candidate_sid, state in _simulations.items()
                     if (
-                        state.get('http_owned')
-                        and state.get('ledger_client_id') == client_id
+                        state.get('ledger_client_id') == client_id
                     )
                 ),
                 None,
@@ -2094,39 +2097,57 @@ def register_events(socketio):
             },
         )
 
-        replacement_sid = replace_sid if command_mode else sid
+        resolved_ledger_client_id = (
+            ledger_client_id
+            if ledger_client_id is not None
+            else flask_session.get('ledger_client_id')
+        )
         cancelled_prior_run_id = None
-        if replacement_sid is not None:
-            try:
-                cancellation = _cancel_simulation_state(
-                    socketio,
-                    replacement_sid,
-                    reason='replaced_by_new_run',
-                )
-            except RuntimeError as exc:
-                return reject({
-                    'status': 'error',
-                    'message': str(exc),
-                }, 'run_replacement_failed')
-            if cancellation is not None and cancellation.get('cancelled'):
-                cancelled_prior_run_id = str(cancellation['run_id'])
-                # Terminal cancellation is an immutable first write, so rollback
-                # is impossible; any later launch failure reports this run ID.
-
         try:
-            state, run_lock = _replace_simulation_state(
-                sid,
-                session,
-                speed,
-                ledger_client_id=(
-                    ledger_client_id
-                    if ledger_client_id is not None
-                    else flask_session.get('ledger_client_id')
-                ),
-                run_store=run_store,
-                runner_projector=runner_projector,
-            )
-            state['http_owned'] = command_mode
+            with _run_command_lock:
+                with _simulations_guard:
+                    client_replacement_sid = next(
+                        (
+                            candidate_sid
+                            for candidate_sid, candidate_state in _simulations.items()
+                            if (
+                                resolved_ledger_client_id is not None
+                                and candidate_state.get('ledger_client_id')
+                                == resolved_ledger_client_id
+                            )
+                        ),
+                        None,
+                    )
+                replacement_sid = (
+                    client_replacement_sid
+                    or replace_sid
+                    or (sid if not command_mode else None)
+                )
+                if replacement_sid is not None:
+                    try:
+                        cancellation = _cancel_simulation_state(
+                            socketio,
+                            replacement_sid,
+                            reason='replaced_by_new_run',
+                        )
+                    except RuntimeError as exc:
+                        raise _RunReplacementError(str(exc)) from exc
+                    if cancellation is not None and cancellation.get('cancelled'):
+                        cancelled_prior_run_id = str(cancellation['run_id'])
+                        # Terminal cancellation is an immutable first write, so rollback
+                        # is impossible; any later launch failure reports this run ID.
+                    if replacement_sid != sid and cancellation is not None:
+                        _clear_simulation_state(replacement_sid)
+
+                state, run_lock = _replace_simulation_state(
+                    sid,
+                    session,
+                    speed,
+                    ledger_client_id=resolved_ledger_client_id,
+                    run_store=run_store,
+                    runner_projector=runner_projector,
+                )
+                state['http_owned'] = command_mode
             run_id = state['run_id']
             state['backend_message'] = backend_message
             state['backend_status'] = resolution_status.backend_status
@@ -2182,6 +2203,11 @@ def register_events(socketio):
                 resolution_status.backend_status,
                 resolution_status.authoritative,
             )
+        except _RunReplacementError as exc:
+            return reject({
+                'status': 'error',
+                'message': str(exc),
+            }, 'run_replacement_failed')
         except Exception as exc:  # noqa: BLE001 -- typed launch boundary
             _clear_simulation_state(sid)
             if cancelled_prior_run_id is not None:

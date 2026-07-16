@@ -381,6 +381,8 @@ class RunArtifactStore:
         }
         if headline_yield_semantics:
             result["headline_yield_semantics"] = headline_yield_semantics
+        if "lifecycle" in artifact:
+            result["lifecycle"] = artifact["lifecycle"]
         final_hour = final_summary.get("hour")
         if RunArtifactStore._is_finite_number(final_hour):
             result["hours"] = final_hour
