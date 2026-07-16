@@ -2431,6 +2431,193 @@ def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
         _clear_simulation_state(sid)
 
 
+@pytest.mark.parametrize(
+    ("terminal_path", "terminal_event"),
+    [
+        ("complete", "simulation_complete"),
+        ("refused", "simulation_status"),
+        ("failed", "simulation_status"),
+        ("c6_refused", "simulation_status"),
+    ],
+)
+def test_terminal_state_finishes_before_terminal_emit(
+    monkeypatch,
+    terminal_path,
+    terminal_event,
+):
+    sid = f"test-terminal-order-{terminal_path}"
+    session = SimpleNamespace(
+        simulator=SimpleNamespace(_poisoned_hour=None),
+        is_complete=lambda: terminal_path == "complete",
+    )
+    state, lock = _replace_simulation_state(sid, session, speed=0.0)
+    observed = []
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+        def emit(self, event, payload, room=None):
+            if event == terminal_event:
+                observed.append((state["running"], state["paused"], payload))
+
+    socket = Socket()
+
+    def persist_terminal(*_args, status, **_kwargs):
+        state["artifact_persisted"] = True
+        return {"execution_status": status}
+
+    if terminal_path == "refused":
+        def drive(*_args, **_kwargs):
+            raise KnudsenRegimeRefusal({"reason": "binding refusal"})
+    elif terminal_path == "failed":
+        def drive(*_args, **_kwargs):
+            raise RuntimeError("terminal failure")
+    else:
+        campaign_summary = None
+        if terminal_path == "c6_refused":
+            campaign_summary = {
+                "c6_refusal_diagnostic": {
+                    "status": "refused",
+                    "diagnostic": {"reason_refused": "c6 refused"},
+                }
+            }
+
+        def drive(*_args, **_kwargs):
+            return iter([
+                SimpleNamespace(
+                    snapshot=object(),
+                    backend_error="",
+                    per_hour_summary={"hour": 1},
+                    campaign_summary=campaign_summary,
+                    decision_event=None,
+                )
+            ])
+
+    monkeypatch.setattr(web_events, "_persist_terminal", persist_terminal)
+    monkeypatch.setattr(web_events, "drive_session", drive)
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            lock,
+            "backend",
+            "available",
+            True,
+        )
+        socket.target()
+
+        assert len(observed) == 1
+        assert observed[0][:2] == (False, False)
+    finally:
+        _clear_simulation_state(sid)
+
+
+def test_tick_snapshot_is_built_before_concurrent_mutation(monkeypatch):
+    sid = "test-tick-snapshot-lock-order"
+    sim = SimpleNamespace(live_pressure=1.0, atom_ledger=None)
+    session = SimpleNamespace(simulator=sim, is_complete=lambda: False)
+    state, _ = _replace_simulation_state(sid, session, speed=0.0)
+    payload_started = threading.Event()
+    mutation_attempted = threading.Event()
+    mutation_done = threading.Event()
+    captured_ticks = []
+
+    class TrackingLock:
+        def __init__(self):
+            self._lock = threading.RLock()
+            self.owner = None
+            self.depth = 0
+
+        def __enter__(self):
+            if threading.current_thread().name == "tick-mutator":
+                mutation_attempted.set()
+            self._lock.acquire()
+            self.owner = threading.get_ident()
+            self.depth += 1
+            return self
+
+        def __exit__(self, *_args):
+            self.depth -= 1
+            if self.depth == 0:
+                self.owner = None
+            self._lock.release()
+
+    run_lock = TrackingLock()
+    with web_events._simulations_guard:
+        web_events._sim_locks[sid] = run_lock
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+    socket = Socket()
+    step = SimpleNamespace(
+        snapshot=object(),
+        backend_error="",
+        per_hour_summary={"hour": 1},
+        campaign_summary=None,
+        decision_event=None,
+    )
+    monkeypatch.setattr(
+        web_events,
+        "drive_session",
+        lambda *_args, **_kwargs: iter([step]),
+    )
+
+    def build_tick(**_kwargs):
+        payload_started.set()
+        assert mutation_attempted.wait(2)
+        assert run_lock.owner == threading.get_ident()
+        return {"live_pressure": sim.live_pressure}
+
+    def emit_after_mutation(_socketio, _sid, _run_id, event, payload):
+        if event == "simulation_tick":
+            assert mutation_done.wait(2)
+            captured_ticks.append(copy.deepcopy(payload))
+            state["running"] = False
+            return False
+        return True
+
+    monkeypatch.setattr(web_events, "_tick_payload", build_tick)
+    monkeypatch.setattr(web_events, "_emit_if_current", emit_after_mutation)
+
+    def mutate():
+        assert payload_started.wait(2)
+        with run_lock:
+            sim.live_pressure = 2.0
+            mutation_done.set()
+
+    mutator = threading.Thread(target=mutate, name="tick-mutator")
+    mutator.start()
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            run_lock,
+            "backend",
+            "available",
+            True,
+        )
+        socket.target()
+        mutator.join(2)
+
+        assert mutation_done.is_set()
+        assert sim.live_pressure == 2.0
+        assert captured_ticks == [{"live_pressure": 1.0}]
+        assert state["last_recipe_capture"]["tick"] == {"live_pressure": 1.0}
+    finally:
+        mutator.join(2)
+        _clear_simulation_state(sid)
+
+
 @pytest.mark.parametrize("outcome", ["ok", "refused", "failed"])
 def test_terminal_outcomes_persist_full_runner_document(tmp_path, monkeypatch, outcome):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)

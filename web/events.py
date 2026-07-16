@@ -267,7 +267,10 @@ def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bo
             if (
                 state is None
                 or state.get('run_id') != run_id
-                or not state['running']
+                or (
+                    not state['running']
+                    and not state.get('terminal_emission_pending')
+                )
             ):
                 return False
         emitted_payload = payload
@@ -428,6 +431,7 @@ def _finish_terminal_state(
     run_id: str,
     *,
     idempotency_result: Mapping[str, object] | None = None,
+    defer_cleanup: bool = False,
 ) -> None:
     """Stop a terminal run and release synthetic HTTP session state."""
     terminal_result = None
@@ -440,9 +444,17 @@ def _finish_terminal_state(
                 return
             state['running'] = False
             state['paused'] = False
+            if defer_cleanup:
+                state['terminal_emission_pending'] = True
+            else:
+                state.pop('terminal_emission_pending', None)
             if terminal_result is not None:
                 state['idempotency_terminal_result'] = terminal_result
-            if state.get('http_owned') and state.get('artifact_persisted'):
+            if (
+                not defer_cleanup
+                and state.get('http_owned')
+                and state.get('artifact_persisted')
+            ):
                 _simulations.pop(sid, None)
                 _sim_locks.pop(sid, None)
         if terminal_result is not None:
@@ -514,6 +526,7 @@ def _persist_terminal(
                 raise RuntimeError(f'run artifact {run_id!r} already exists')
     except Exception as exc:  # noqa: BLE001 -- durability is client-visible
         _safe_log(f'Run artifact persistence failed: {exc}')
+        _finish_terminal_state(sid, run_id, defer_cleanup=True)
         try:
             _emit_if_current(
                 socketio,
@@ -1587,6 +1600,16 @@ def _start_background_loop(
         )
 
     def stop_with_status(payload: Mapping[str, object]) -> None:
+        _finish_terminal_state(
+            sid,
+            run_id,
+            idempotency_result=(
+                payload
+                if payload.get('reason') == 'persistence_failed'
+                else None
+            ),
+            defer_cleanup=True,
+        )
         try:
             _emit_if_current(
                 socketio,
@@ -1648,14 +1671,14 @@ def _start_background_loop(
                 reason=str(error_payload.get('reason') or ''),
                 error_message=message,
             )
-        if artifact is None:
-            stop_with_status({
-                'status': 'error',
-                'reason': 'persistence_failed',
-                'message': 'Run failed but its report was not saved',
-            })
-            return
-        stop_with_status(error_payload)
+            if artifact is None:
+                stop_with_status({
+                    'status': 'error',
+                    'reason': 'persistence_failed',
+                    'message': 'Run failed but its report was not saved',
+                })
+                return
+            stop_with_status(error_payload)
 
     def run_loop():
         while True:
@@ -1671,6 +1694,7 @@ def _start_background_loop(
 
             step_result = None
             decision_payload = None
+            tick_data = None
             with run_lock:
                 state, _ = _current_simulation_state(sid, run_id)
                 if (
@@ -1709,6 +1733,11 @@ def _start_background_loop(
                         stop_for_failure(exc, session, sim)
                         break
                     try:
+                        _finish_terminal_state(
+                            sid,
+                            run_id,
+                            defer_cleanup=True,
+                        )
                         emitted = _emit_if_current(
                             socketio,
                             sid,
@@ -1725,6 +1754,7 @@ def _start_background_loop(
                         })
                         break
                     if not emitted:
+                        _finish_terminal_state(sid, run_id)
                         break
                     _finish_terminal_state(sid, run_id)
                     break
@@ -1748,6 +1778,21 @@ def _start_background_loop(
                             state['per_hour_ledger'][str(hour)] = copy.deepcopy(
                                 mol_by_account()
                             )
+                    if step_result is not None:
+                        tick_data = _tick_payload(
+                            sim=sim,
+                            snapshot=step_result.snapshot,
+                            backend_message=backend_message,
+                            backend_status=backend_status,
+                            backend_authoritative=backend_authoritative,
+                            backend_error=step_result.backend_error,
+                        )
+                        _record_last_recipe_capture(
+                            sid,
+                            run_id,
+                            tick_data=tick_data,
+                            per_hour_summary=step_result.per_hour_summary,
+                        )
                 except KnudsenRegimeRefusal as exc:
                     _safe_log(f'Simulation refused: {exc.reason}')
                     error_payload = {
@@ -1798,20 +1843,6 @@ def _start_background_loop(
 
             sim = session.simulator
             try:
-                tick_data = _tick_payload(
-                    sim=sim,
-                    snapshot=step_result.snapshot,
-                    backend_message=backend_message,
-                    backend_status=backend_status,
-                    backend_authoritative=backend_authoritative,
-                    backend_error=step_result.backend_error,
-                )
-                _record_last_recipe_capture(
-                    sid,
-                    run_id,
-                    tick_data=tick_data,
-                    per_hour_summary=step_result.per_hour_summary,
-                )
                 if not _emit_if_current(
                     socketio, sid, run_id, 'simulation_tick', tick_data
                 ):
@@ -1880,14 +1911,14 @@ def _start_background_loop(
                         error_message=reason,
                         refusal_diagnostic=c6_refusal,
                     )
-                if artifact is None:
-                    stop_with_status({
-                        'status': 'error',
-                        'reason': 'persistence_failed',
-                        'message': 'Run was refused but its report was not saved',
-                    })
-                    break
-                stop_with_status(refusal_payload)
+                    if artifact is None:
+                        stop_with_status({
+                            'status': 'error',
+                            'reason': 'persistence_failed',
+                            'message': 'Run was refused but its report was not saved',
+                        })
+                        break
+                    stop_with_status(refusal_payload)
                 break
 
             if step_result.decision_event is not None:
