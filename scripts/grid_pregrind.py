@@ -38,6 +38,7 @@ from scripts.grid_pregrind_writer import (  # noqa: E402
 )
 from engines.alphamelts.domain import AlphaMELTSDomainGate  # noqa: E402
 from engines.domain_reason import OutOfDomainReason  # noqa: E402
+from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR  # noqa: E402
 # simulator.fe_redox is imported LAZILY (see kress91_partition_parameters and
 # kress91_partitioned_composition_mol): Kress partitioning runs only at
 # --prepare-only key-generation time on the laptop's epoch tree. Studio drain
@@ -671,7 +672,7 @@ def alphamelts_queue_domain_reason(point: GridPoint) -> str | None:
 
 def backend_config(args: argparse.Namespace) -> dict[str, Any]:
     backend_name = str(getattr(args, "backend", "subprocess"))
-    return {
+    config = {
         "grid_backend_name": backend_name,
         "mode": "subprocess" if backend_name == "subprocess" else "thermoengine",
         "fO2_buffer": None,
@@ -688,6 +689,9 @@ def backend_config(args: argparse.Namespace) -> dict[str, Any]:
             getattr(args, "allow_zero_component_boundary", False)
         ),
     }
+    if backend_name == "subprocess":
+        config["vapor_transport_pO2_bar"] = DEFAULT_VACUUM_FLOOR_BAR
+    return config
 
 
 def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:

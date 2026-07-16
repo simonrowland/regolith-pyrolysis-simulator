@@ -52,6 +52,7 @@ from simulator.melt_backend.alphamelts_contract import (
     AlphaMELTSSubprocessRunMode,
 )
 from simulator.melt_backend.vaporock import VapoRockBackend
+from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
@@ -335,6 +336,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None
         self._subprocess_vapor_pressure_provider = None
+        self._vapor_transport_pO2_bar = DEFAULT_VACUUM_FLOOR_BAR
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
 
     def initialize(self, config: dict) -> bool:
@@ -364,6 +366,20 @@ class _MELTSBackendSupport(MeltBackend):
             config.get('Fe3Fet_Liq', config.get('fe3fet_ratio')))
         self._model = str(config.get('model', self._model))
         self._timeout_s = float(config.get('timeout_s', self._timeout_s))
+        self._vapor_transport_pO2_bar = float(
+            config.get(
+                'vapor_transport_pO2_bar',
+                DEFAULT_VACUUM_FLOOR_BAR,
+            )
+        )
+        if (
+            not math.isfinite(self._vapor_transport_pO2_bar)
+            or self._vapor_transport_pO2_bar < DEFAULT_VACUUM_FLOOR_BAR
+        ):
+            raise ValueError(
+                'vapor_transport_pO2_bar must be finite and at least the '
+                f'transport model floor {DEFAULT_VACUUM_FLOOR_BAR:g} bar'
+            )
         require_petthermotools = bool(
             config.get('require_petthermotools')
             or requested_mode == 'python_api'
@@ -3652,7 +3668,12 @@ class _MELTSBackendSupport(MeltBackend):
             pressure_bar=eq.pressure_bar,
             fO2_log=eq.fO2_log,
             control_inputs={
-                'pO2_bar': max(10.0 ** float(eq.fO2_log), 1e-30),
+                # The alphaMELTS fO2 is the melt-redox constraint. This
+                # diagnostic has no live headspace ledger, so overhead-
+                # transport pO2 comes from its independent environment
+                # setpoint: the unknown-body model floor until CF-1b supplies
+                # body-aware floors. It must not be derived from melt fO2.
+                'pO2_bar': self._vapor_transport_pO2_bar,
                 'intrinsic_fO2_log': eq.fO2_log,
             },
         )
