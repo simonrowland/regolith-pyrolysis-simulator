@@ -73,6 +73,12 @@ DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA = 1.0e-4
 DEFAULT_MELT_SURFACE_RENEWAL_SOURCE = (
     "owner-ratify:melt-side-surface-renewal-v1"
 )
+# EVAPORATION-only class proxy: CrO2 borrows SiO sigma and epsilon/k because
+# direct CrO2 transport data are absent, but retains its own molar mass. This
+# weak proxy must not alter condensation/deposition transport.
+_EVAPORATION_LJ_PROXY_PARAMS = {
+    "CrO2": (3.374, 71.4, 83.9941),
+}
 
 
 class EvaporationFluxConfigurationError(ValueError):
@@ -566,6 +572,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             max(effective_T_gas_K, 1.0),
             overhead_pa,
             carrier=str(carrier_gas or DEFAULT_CARRIER_GAS),
+            species_params=_EVAPORATION_LJ_PROXY_PARAMS.get(species),
         )
         if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
             raise EvaporationFluxConfigurationError(

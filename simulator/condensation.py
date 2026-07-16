@@ -297,6 +297,12 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
         'status': 'proxy',
         'source': 'estimated sparse-data SiO vapor Lennard-Jones row',
     },
+    # CrO2 deliberately has NO provenance row: condensation/deposition transport
+    # for CrO2 uses the documented DEFAULT_BINARY_DIFFUSION_M2_S fallback (pinned
+    # by test_cro2_condensation_transport_uses_documented_default_fallback). The
+    # SiO-based CLASS-PROXY exists only on the evaporation path
+    # (engines/builtin/evaporation_flux.py::_EVAPORATION_LJ_PROXY_PARAMS); a row
+    # here would falsely report proxy authority for deposition transport.
 }
 
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
@@ -1453,6 +1459,8 @@ def _chapman_enskog_d_ab_m2_s(
     T_K: float,
     pressure_pa: float,
     carrier: str = DEFAULT_CARRIER_GAS,
+    *,
+    species_params: tuple[float, float, float] | None = None,
 ) -> float:
     """Binary diffusion coefficient ``D_AB`` for ``species`` in
     ``carrier`` gas at ``T_K``, ``pressure_pa``. Returns m²/s.
@@ -1468,11 +1476,13 @@ def _chapman_enskog_d_ab_m2_s(
         σ_AB = (σ_A + σ_B) / 2       (collision diameter, Angstrom)
         Ω_D  = Neufeld collision integral at T* = T * k_B / ε_AB
 
-    Returns 0 on unknown species (caller falls back to the legacy
-    constant via the explicit ``diffusion_coefficient_m2_s`` parameter
-    on the flux callers).
+    ``species_params`` lets a caller supply a path-local proxy without adding
+    it to the shared condensation table. Returns 0 on unknown species (caller
+    falls back to the legacy constant via the explicit
+    ``diffusion_coefficient_m2_s`` parameter on the flux callers).
     """
-    species_params = _LENNARD_JONES_PARAMS.get(species)
+    if species_params is None:
+        species_params = _LENNARD_JONES_PARAMS.get(species)
     carrier_key = _canonical_carrier_gas_key(carrier)
     carrier_params = _LENNARD_JONES_PARAMS.get(carrier_key)
     if species_params is None or carrier_params is None:
@@ -4280,7 +4290,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     # math and out the other side as NaN/inf fluxes that poison the
     # downstream ledger. Codex pre-0.5.2 Phase B P1 (NaN propagation +
     # regime_factor escape route). Fail closed at the gate.
-    if pipe_diameter_m <= 0.0 or alpha_s <= 0.0:
+    if pipe_diameter_m <= 0.0 or alpha_s <= 0.0 or T_surface_K <= 0.0:
         return 0.0
     if not (math.isfinite(pipe_diameter_m) and math.isfinite(alpha_s)
             and math.isfinite(P_local_pa) and math.isfinite(T_surface_K)):

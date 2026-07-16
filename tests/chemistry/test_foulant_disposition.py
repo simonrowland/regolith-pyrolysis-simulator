@@ -63,6 +63,7 @@ def foulant_registry_yaml(tmp_path: Path) -> Path:
         """
         foulant_dG:
           CaSO4_thermal_decomp:
+            reaction: "CaSO4 -> CaO + SO2 + 1/2 O2"
             points:
               - {T_K: 1373.15, dG_kJ_per_mol: 50.0}
               - {T_K: 1473.15, dG_kJ_per_mol: -50.0}
@@ -162,7 +163,7 @@ def test_chi_decomp_returns_disposition_extent_with_derived_width(
     assert isinstance(low_pO2, DispositionExtent)
     assert isinstance(high_pO2, DispositionExtent)
     assert low_pO2.path == "thermal"
-    assert low_pO2.extent == pytest.approx(high_pO2.extent)
+    assert low_pO2.extent > high_pO2.extent
     assert 1100.0 < low_pO2.onset_K - 273.15 < 1300.0
 
     carb = chi_decomp("CaSO4", 1100.0, 0.01, 10.0, registry)
@@ -180,6 +181,25 @@ def test_chi_decomp_o2_suppression_does_not_cap_high_temperature_extent(
 
     assert result.path == "thermal"
     assert result.extent == pytest.approx(1.0)
+
+
+def test_chi_decomp_po2_edge_semantics(foulant_registry_yaml: Path) -> None:
+    registry = load_foulant_registry(foulant_registry_yaml)
+
+    vacuum = chi_decomp("CaSO4", 1300.0, 0.0, 0.0, registry)
+    floor = chi_decomp("CaSO4", 1300.0, 1.0e-15, 0.0, registry)
+    below_floor = chi_decomp("CaSO4", 1300.0, 1.0e-30, 0.0, registry)
+
+    # Fixture: T0=1423.15 K, width=R*T0/1000=11.832727 C, nu_O2=1/2.
+    # Vacuum shift = 0.5*width*ln(1e-15/0.2) = -194.821944 C,
+    # giving effective onset 1228.328056 K and near-complete extent at 1300 C.
+    assert vacuum.onset_K == pytest.approx(1228.3280559055947, rel=1e-12)
+    assert vacuum.extent == pytest.approx(0.9999999999997791, rel=1e-12)
+    assert vacuum == floor
+    assert below_floor == floor
+    for invalid in (-1.0, float("nan"), float("inf")):
+        with pytest.raises(ValueError, match="pX_bar must be finite and non-negative"):
+            chi_decomp("CaSO4", 1300.0, invalid, 0.0, registry)
 
 
 def test_sigmoid_width_is_physical_logistic_not_step(

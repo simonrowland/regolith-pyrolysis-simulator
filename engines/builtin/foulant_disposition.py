@@ -9,6 +9,7 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +19,7 @@ GAS_CONSTANT_J_PER_MOL_K = 8.314462618
 PA_PER_BAR = 100_000.0
 UNGROUNDABLE_PROCESS_EXTENT = "UNGROUNDABLE_PROCESS_EXTENT"
 NOT_SPECIFIED = "not_speciated"
+_NUMERICAL_PO2_GUARD_BAR = 1.0e-15
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_VAPOR_PRESSURES_PATH = _REPO_ROOT / "data" / "vapor_pressures.yaml"
@@ -258,6 +260,36 @@ def _parse_dg_points(dg_row: Mapping[str, Any]) -> list[tuple[float, float]]:
     return parsed
 
 
+def _product_o2_stoich(reaction: object) -> float:
+    if not isinstance(reaction, str) or not reaction.strip():
+        raise ValueError("dG row reaction must be a non-empty string")
+    sides = reaction.split("->")
+    if len(sides) != 2:
+        raise ValueError(f"dG row reaction must contain one '->': {reaction!r}")
+    product_o2 = Fraction(0)
+    for term in sides[1].split("+"):
+        tokens = term.strip().split()
+        if not tokens or tokens[-1] != "O2":
+            continue
+        if len(tokens) == 1:
+            coefficient = Fraction(1)
+        elif len(tokens) == 2:
+            try:
+                coefficient = Fraction(tokens[0])
+            except (ValueError, ZeroDivisionError) as exc:
+                raise ValueError(
+                    f"invalid O2 coefficient in dG row reaction {reaction!r}"
+                ) from exc
+        else:
+            raise ValueError(
+                f"invalid O2 product term {term.strip()!r} in reaction {reaction!r}"
+            )
+        if coefficient < 0:
+            raise ValueError(f"O2 product coefficient must be non-negative: {reaction!r}")
+        product_o2 += coefficient
+    return float(product_o2)
+
+
 def _sigmoid_extent(t_c: float, onset_c: float, width_c: float) -> float:
     if width_c <= 0.0:
         raise ValueError("sigmoid width must be positive")
@@ -281,6 +313,13 @@ def chi_decomp(
     entry = registry.carriers.get(carrier_key)
     if entry is None:
         raise KeyError(f"unknown foulant carrier {carrier_key!r}")
+
+    try:
+        p_o2_bar = float(pX_bar)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"pX_bar must be numeric, got {pX_bar!r}") from exc
+    if not math.isfinite(p_o2_bar) or p_o2_bar < 0.0:
+        raise ValueError(f"pX_bar must be finite and non-negative, got {pX_bar!r}")
 
     gating = entry.gating
     if gating.get("chi_model") != "dG_sigmoid":
@@ -327,10 +366,26 @@ def chi_decomp(
     else:
         path = "thermal"
 
+    o2_dependence = gating.get("o2_dependence")
+    if o2_dependence == "suppresses" and path == "thermal":
+        p_ref_bar = float(gating.get("o2_reference_bar", 0.2))
+        if not math.isfinite(p_ref_bar) or p_ref_bar <= 0.0:
+            raise ValueError("o2_reference_bar must be finite and positive")
+        nu_o2 = _product_o2_stoich(dg_row.get("reaction"))
+        # For A(s) -> B(s) + gases + nu_O2 O2,
+        # dG = dG_ref + nu_O2*R*T*ln(pO2/p_ref). Linearizing dG_ref at
+        # its zero crossing gives DeltaT = nu_O2*(R*T/|dG/dT|)*ln(...),
+        # hence nu_O2*width below; no extra gas-mole divisor belongs here.
+        # Zero is a commanded vacuum setpoint. Use a purely numerical guard
+        # below every physical body floor (asteroid 1e-14 bar is the smallest),
+        # so all physical pressures pass through unclamped while log(0) cannot.
+        effective_p_o2_bar = max(p_o2_bar, _NUMERICAL_PO2_GUARD_BAR)
+        onset_c += nu_o2 * width_c * math.log(effective_p_o2_bar / p_ref_bar)
+        reported_onset_k = onset_c + 273.15
+
     extent = _sigmoid_extent(float(T_C), onset_c, width_c)
 
-    o2_dependence = gating.get("o2_dependence")
-    if o2_dependence == "requires" and float(pX_bar) <= 0.0:
+    if o2_dependence == "requires" and p_o2_bar <= 0.0:
         extent = 0.0
 
     confidence = str(entry.warning_flags.get("confidence", "partly_grounded"))

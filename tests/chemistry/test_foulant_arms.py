@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import math
 from pathlib import Path
 
 import pytest
@@ -40,7 +39,6 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 FOULANT_THERMO = REPO_ROOT / "data" / "foulant_thermo.yaml"
 CARBON_PARTITION = REPO_ROOT / "data" / "stage0_carbon_partition.yaml"
 VAPOR_PRESSURES = REPO_ROOT / "data" / "vapor_pressures.yaml"
-GAS_CONSTANT_J_PER_MOL_K = 8.314462618
 PA_PER_BAR = 100_000.0
 
 
@@ -88,27 +86,6 @@ def _source_onset_k(points: list[tuple[float, float]]) -> float:
     raise AssertionError("source dG row has no zero crossing")
 
 
-def _source_sigmoid_width_c(points: list[tuple[float, float]], onset_k: float) -> float:
-    nearest = sorted(points, key=lambda row: abs(row[0] - onset_k))[:2]
-    (t0, dg0), (t1, dg1) = sorted(nearest, key=lambda row: row[0])
-    slope_j_per_mol_k = ((dg1 - dg0) / (t1 - t0)) * 1000.0
-    return abs(GAS_CONSTANT_J_PER_MOL_K * onset_k) / abs(slope_j_per_mol_k)
-
-
-def _source_dg_sigmoid_extent(
-    points: list[tuple[float, float]],
-    T_C: float,
-    *,
-    pX_bar: float = 0.0,
-    o2_reference_bar: float | None = None,
-) -> float:
-    onset_k = _source_onset_k(points)
-    width_c = _source_sigmoid_width_c(points, onset_k)
-    x = (T_C - (onset_k - 273.15)) / width_c
-    extent = 1.0 / (1.0 + math.exp(-x))
-    return extent
-
-
 @pytest.fixture(scope="module")
 def foulant_registry():
     return load_foulant_registry(FOULANT_THERMO)
@@ -154,16 +131,27 @@ def test_caso4_decomposition_anchored_to_nist_dg_rows(foulant_registry):
     ]
     assert _source_onset_k(points) == pytest.approx(1773.15)
 
-    expected_extent = _source_dg_sigmoid_extent(
-        points,
-        1450.0,
-        pX_bar=0.01,
-        o2_reference_bar=0.2,
-    )
+    # Hand derivation, independent of production helpers:
+    # slope = -28 kJ/mol / 100 K = -280 J/mol/K;
+    # width = R*1773.15/280 = 52.652819 K;
+    # nu_O2 = 1/2, so onset = 1773.15 + 0.5*width*ln(0.01/0.2)
+    # = 1694.283125 K (1421.133125 C). At 1450 C, x=0.548488 and
+    # extent=1/(1+exp(-x))=0.6337293361.
+    expected_onset_k = 1694.2831250336649
+    expected_extent = 0.6337293360956355
     observed = chi_decomp("CaSO4", 1450.0, 0.01, 0.0, foulant_registry)
     assert observed.path == "thermal"
-    assert observed.onset_K == pytest.approx(1773.15)
+    assert observed.onset_K == pytest.approx(expected_onset_k, abs=1e-9)
     assert observed.extent == pytest.approx(expected_extent, abs=1e-12)
+
+
+def test_mgso4_extent_is_po2_invariant_without_o2_product(foulant_registry):
+    low_pO2 = chi_decomp("MgSO4", 1150.0, 0.01, 0.0, foulant_registry)
+    high_pO2 = chi_decomp("MgSO4", 1150.0, 0.2, 0.0, foulant_registry)
+
+    assert low_pO2.onset_K == pytest.approx(1453.15)
+    assert high_pO2.onset_K == pytest.approx(1453.15)
+    assert low_pO2.extent == pytest.approx(high_pO2.extent, abs=1e-12)
 
 
 def test_caco3_decomposition_anchored_to_nist_dg_rows(foulant_registry):
@@ -178,10 +166,12 @@ def test_caco3_decomposition_anchored_to_nist_dg_rows(foulant_registry):
     onset_k = _source_onset_k(points)
     assert onset_k == pytest.approx(1087.4357142857143)
 
-    expected_extent = _source_dg_sigmoid_extent(
-        points,
-        STAGE0_FOULANT_PHASE1_TEMP_C,
-    )
+    # Hand derivation: onset=873.15 + 20/(20+8)*300=1087.435714 K;
+    # the two source rows nearest onset are 1173.15/-8 and 1273.15/-35,
+    # so slope=-27/100 kJ/mol/K and width=R*onset/270=33.486828 K.
+    # At 1050 C, x=(1050-(1087.435714-273.15))/width=7.039015005,
+    # giving extent=0.9991237785.
+    expected_extent = 0.9991237784702218
 
     observed = chi_decomp(
         "CaCO3",
