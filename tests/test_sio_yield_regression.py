@@ -387,7 +387,9 @@ def test_wall_mg_psat_refuses_outside_source_certified_range():
 
 def test_wall_deposit_flags_antoine_extrapolation_at_wall_temperature():
     sio_data = condensation_module.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"]
-    assert sio_data["valid_range_K"] == [1400, 2200]
+    # Ground truth: data/vapor_pressures.yaml SiO valid_range_K.
+    certified_range_K = sio_data["valid_range_K"]
+    assert certified_range_K == [1400, 1950]
 
     model = CondensationModel(
         CondensationTrain.create_default(),
@@ -402,9 +404,8 @@ def test_wall_deposit_flags_antoine_extrapolation_at_wall_temperature():
     )
 
     assert "SiO" in route.antoine_extrapolations
-    assert tuple(route.antoine_extrapolations["SiO"]["valid_range_K"]) == (
-        1400.0,
-        2200.0,
+    assert tuple(route.antoine_extrapolations["SiO"]["valid_range_K"]) == tuple(
+        certified_range_K
     )
     assert any(
         "SiO metal Antoine fit extrapolated beyond valid_range_K" in warning

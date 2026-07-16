@@ -62,6 +62,11 @@ def test_scalar_alpha_s_range_travels_through_stage_provenance():
 def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
     T_wall_K = 1173.15
     local_pressure_pa = 100.0
+    # Ground truth: data/vapor_pressures.yaml SiO valid_range_K.
+    certified_range_K = condensation.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"][
+        "valid_range_K"
+    ]
+    assert certified_range_K == [1400, 1950]
     baseline_pressure = condensation._wall_deposition_driving_pressure_pa(
         "SiO",
         local_pressure_pa,
@@ -84,9 +89,8 @@ def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():
     assert antoine_extrapolations["SiO"]["temperature_K"] == pytest.approx(
         T_wall_K
     )
-    assert tuple(antoine_extrapolations["SiO"]["valid_range_K"]) == (
-        1400.0,
-        2200.0,
+    assert tuple(antoine_extrapolations["SiO"]["valid_range_K"]) == tuple(
+        certified_range_K
     )
     assert any(
         "SiO metal Antoine fit extrapolated beyond valid_range_K" in warning
