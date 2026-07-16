@@ -1,7 +1,10 @@
 import ast
 import re
+import shutil
 import subprocess
 from pathlib import Path
+
+import pytest
 
 from simulator.accounting import load_species_formulas
 
@@ -46,6 +49,7 @@ def test_internal_analytical_implementation_has_no_legacy_stub_symbols():
     assert not violations, "\n".join(violations)
 
 
+@pytest.mark.skipif(shutil.which("rg") is None, reason="requires ripgrep (rg)")
 def test_simulator_has_no_forbidden_internal_kg_mutations():
     repo = Path(__file__).parent.parent
     forbidden = [
