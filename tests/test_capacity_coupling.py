@@ -215,6 +215,62 @@ def test_relief_is_capped_by_post_admission_remainder():
     assert partition.debited_mol == pytest.approx(10.0)
 
 
+def test_accumulator_off_is_finite_capacity_partition_parity():
+    controls = {
+        "bled_o2_mol": 10.0,
+        "overhead_o2_mol": 10.0,
+        "external_o2_holdup_mol": 2.0,
+        "capacity": FiniteCapacity(M_O2),
+        "dt_hr": 1.0,
+        "p_o2_Pa": 1.0e6,
+        "k_relief_kg_hr_Pa": 1.0,
+        "p_open_Pa": 1.0,
+        "molar_mass_kg_mol": M_O2,
+    }
+
+    p2_3 = partition_melt_oxygen(**controls)
+    accumulator_off = partition_melt_oxygen(
+        **controls,
+        accumulator_enabled=False,
+        cistern_fill_kg=3.0,
+        cavern_capacity_kg=4.0,
+    )
+
+    assert accumulator_off == p2_3
+    assert accumulator_off.accumulated_mol == 0.0
+
+
+def test_accumulator_precedes_relief_and_full_cistern_restores_relief():
+    controls = {
+        "bled_o2_mol": 10.0,
+        "overhead_o2_mol": 10.0,
+        "external_o2_holdup_mol": 0.0,
+        "capacity": FiniteCapacity(M_O2),
+        "dt_hr": 1.0,
+        "p_o2_Pa": 1.0e6,
+        "k_relief_kg_hr_Pa": 1.0,
+        "p_open_Pa": 1.0,
+        "molar_mass_kg_mol": M_O2,
+        "accumulator_enabled": True,
+        "cavern_capacity_kg": 5.0 * M_O2,
+    }
+
+    filling = partition_melt_oxygen(**controls, cistern_fill_kg=0.0)
+    full = partition_melt_oxygen(
+        **controls,
+        cistern_fill_kg=5.0 * M_O2,
+    )
+
+    assert filling.admitted_mol == pytest.approx(1.0)
+    assert filling.accumulated_mol == pytest.approx(5.0)
+    assert filling.relieved_mol == pytest.approx(4.0)
+    assert filling.held_mol == 0.0
+    assert full.admitted_mol == pytest.approx(1.0)
+    assert full.accumulated_mol == 0.0
+    assert full.relieved_mol == pytest.approx(9.0)
+    assert full.held_mol == 0.0
+
+
 def test_relief_is_additional_to_zero_conductance_and_avoids_vessel_refusal():
     result = solve_capacity_shadow(
         pre_holdup_mol={"O2": 10.0},
@@ -463,6 +519,46 @@ def test_explicit_runtime_enforcement_uses_configured_finite_capacity(monkeypatc
     assert isinstance(capacity, FiniteCapacity)
     assert capacity.value_kg_hr == pytest.approx(9.856)
     assert cold_train.runtime_enforcement is True
+
+
+def test_live_overhead_bleed_routes_binding_capacity_surge_to_accumulator(
+    monkeypatch,
+):
+    sim = _real_capacity_sim()
+    o2_molar_mass = resolve_species_formula(
+        "O2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    cold_train = SimpleNamespace(
+        accumulator_enabled=True,
+        relief={
+            "k_relief_kg_hr_Pa": 1.0e-3,
+            "p_open_Pa": 800000.0,
+            "vessel_rating_Pa": 1000000.0,
+        },
+    )
+    monkeypatch.setattr(
+        sim,
+        "_cold_train_capacity_policy",
+        lambda: (FiniteCapacity(o2_molar_mass), cold_train),
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 10.0 * o2_molar_mass},
+        source="live accumulator surge fixture",
+    )
+
+    result = sim._dispatch_overhead_bleed(
+        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
+        force_drain_all=True,
+    )
+    diagnostic = dict(result.diagnostic or {})
+
+    assert diagnostic["o2_admitted_mol"] == pytest.approx(1.0)
+    assert diagnostic["o2_accumulated_mol"] == pytest.approx(9.0)
+    assert diagnostic["o2_relieved_mol"] == 0.0
+    assert sim.atom_ledger.mol_by_account(
+        "reservoir.oxygen_cistern_liquid_inventory"
+    )["O2"] == pytest.approx(9.0)
 
 
 def test_live_and_picard_share_evaporation_control_construction(monkeypatch):

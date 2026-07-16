@@ -23,6 +23,7 @@ parameters:
       duct: {L_m: 0.30, Kn_threshold: 0.01}
 cold_train:
   runtime_enforcement: {value: false, units: boolean, source_tag: assumption, assumption_class: runtime_policy, range: [false, true], provenance: phase-2 runtime capacity enforcement is explicitly opt-in}
+  accumulator_enabled: {value: false, units: boolean, source_tag: assumption, assumption_class: runtime_policy, range: [false, true], provenance: owner-ratified cistern cold-battery is explicitly opt-in and requires runtime enforcement}
   rating:
     compressor_mass_flow_limit_kg_hr: {value: 12.0, units: kg/hr, source_tag: assumption, assumption_class: hardware_rating, range: [0.1, 1000.0], provenance: phase-2 design rating}
     refrigeration_freeze_rate_kg_hr: {value: 9.856, units: kg/hr, source_tag: assumption, assumption_class: hardware_rating, range: [0.1, 1000.0], provenance: phase-2 design rating}

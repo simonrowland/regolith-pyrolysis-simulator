@@ -25,12 +25,18 @@ DEFAULT_MAX_ITERATIONS = 50
 class OxygenShadowPartition:
     external_mol: float
     admitted_mol: float
+    accumulated_mol: float
     relieved_mol: float
     held_mol: float
 
     @property
     def debited_mol(self) -> float:
-        return self.external_mol + self.admitted_mol + self.relieved_mol
+        return (
+            self.external_mol
+            + self.admitted_mol
+            + self.accumulated_mol
+            + self.relieved_mol
+        )
 
 
 @dataclass(frozen=True)
@@ -93,6 +99,9 @@ def partition_melt_oxygen(
     k_relief_kg_hr_Pa: float,
     p_open_Pa: float,
     molar_mass_kg_mol: float,
+    accumulator_enabled: bool = False,
+    cistern_fill_kg: float = 0.0,
+    cavern_capacity_kg: float = 0.0,
 ) -> OxygenShadowPartition:
     # Ordinary bleed preserves the HEAD provenance split. Admission acts on
     # its melt-origin share. Relief is an additional debit from the full
@@ -116,6 +125,14 @@ def partition_melt_oxygen(
         capacity.value_kg_hr * dt_hr / molar_mass_kg_mol,
     )
     remainder = max(0.0, melt_inventory - admitted)
+    accumulated = 0.0
+    if accumulator_enabled:
+        available_cistern_kg = max(0.0, cavern_capacity_kg - cistern_fill_kg)
+        accumulated = min(
+            remainder,
+            available_cistern_kg / molar_mass_kg_mol,
+        )
+        remainder = max(0.0, remainder - accumulated)
     relief_law_mol = (
         k_relief_kg_hr_Pa
         * max(0.0, p_o2_Pa - p_open_Pa)
@@ -124,7 +141,9 @@ def partition_melt_oxygen(
     )
     relieved = min(remainder, max(0.0, relief_law_mol))
     held = max(0.0, remainder - relieved)
-    return OxygenShadowPartition(external, admitted, relieved, held)
+    return OxygenShadowPartition(
+        external, admitted, accumulated, relieved, held
+    )
 
 
 def combined_saturation(
@@ -171,6 +190,9 @@ def solve_capacity_shadow(
         Callable[[Mapping[str, float]], float] | None
     ) = None,
     vessel_rating_Pa: float | None = None,
+    accumulator_enabled: bool = False,
+    cistern_fill_kg: float = 0.0,
+    cavern_capacity_kg: float = 0.0,
     rel_tol: float = DEFAULT_REL_TOL,
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
 ) -> CapacityShadowResult | CapacityShadowRefusal:
@@ -181,12 +203,23 @@ def solve_capacity_shadow(
         "p_total_bar": 0.0,
         "p_downstream_bar": downstream_pressure_Pa / 100000.0,
     }
+    if not isinstance(accumulator_enabled, bool):
+        return CapacityShadowRefusal(
+            "accumulator_enabled must be a boolean",
+            0,
+        )
     if isinstance(capacity, FiniteCapacity):
         controls.update({
             "k_relief_kg_hr_Pa": k_relief_kg_hr_Pa,
             "p_open_Pa": p_open_Pa,
             "vessel_rating_Pa": vessel_rating_Pa,
         })
+        if accumulator_enabled:
+            controls.update({
+                "accumulator_enabled": True,
+                "cistern_fill_kg": cistern_fill_kg,
+                "cavern_capacity_kg": cavern_capacity_kg,
+            })
     invalid = BuiltinOverheadBleedProvider._invalid_destructive_control(controls)
     if invalid is not None:
         return CapacityShadowRefusal(invalid, 0)
@@ -206,7 +239,7 @@ def solve_capacity_shadow(
             0,
         )
     if not isinstance(capacity, FiniteCapacity):
-        oxygen = OxygenShadowPartition(0.0, 0.0, 0.0, 0.0)
+        oxygen = OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0)
         return CapacityShadowResult(
             capacity=capacity,
             partial_pressures_Pa={},
@@ -235,7 +268,7 @@ def solve_capacity_shadow(
     delta_history: list[float] = []
     final_bled: dict[str, float] = {}
     final_offgas: dict[str, float] = {}
-    final_oxygen = OxygenShadowPartition(0.0, 0.0, 0.0, 0.0)
+    final_oxygen = OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0)
     final_flux: dict[str, float] = {}
     final_source_mol_hr: dict[str, float] = {}
     final_evolved: dict[str, float] = {}
@@ -318,6 +351,9 @@ def solve_capacity_shadow(
                 k_relief_kg_hr_Pa=k_relief_kg_hr_Pa,
                 p_open_Pa=p_open_Pa,
                 molar_mass_kg_mol=molar_mass_kg_mol[OXYGEN_SPECIES],
+                accumulator_enabled=accumulator_enabled,
+                cistern_fill_kg=cistern_fill_kg,
+                cavern_capacity_kg=cavern_capacity_kg,
             )
         final_bled = dict(ordinary_bled)
         if final_oxygen.debited_mol > 0.0:

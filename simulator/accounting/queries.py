@@ -12,6 +12,7 @@ from simulator.account_ids import (
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     OXYGEN_CAPTURED_ACCOUNTS,
+    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
@@ -542,6 +543,8 @@ class AccountingQueries:
                 OXYGEN_MELT_OFFGAS_ACCOUNT, 0.0),
             "mre_anode_stored": stored_by_source.get(
                 OXYGEN_MRE_ANODE_ACCOUNT, 0.0),
+            "cistern_liquid_stored": stored_by_source.get(
+                OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT, 0.0),
             "melt_offgas_vented": vented_by_source.get(
                 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT, 0.0),
             "melt_offgas_captured": captured_by_source.get(

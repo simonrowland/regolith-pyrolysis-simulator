@@ -89,7 +89,8 @@ _PARAMETER_NAMES = frozenset({
     "cavern_thermal_mass_J_per_K", "dT_segment_K", "knudsen_locations",
 })
 _COLD_TRAIN_NAMES = frozenset({
-    "runtime_enforcement", "rating", "orifice", "relief", "cycle", "endpoint",
+    "runtime_enforcement", "accumulator_enabled", "rating", "orifice", "relief",
+    "cycle", "endpoint",
 })
 _COLD_TRAIN_LIMIT_NAMES = frozenset({
     "compressor_mass_flow_limit_kg_hr", "refrigeration_freeze_rate_kg_hr",
@@ -161,6 +162,7 @@ class FiniteCapacity:
 @dataclass(frozen=True)
 class ColdTrainParameters:
     runtime_enforcement: bool
+    accumulator_enabled: bool
     rating: Mapping[str, float | None]
     orifice: Mapping[str, float]
     relief: Mapping[str, float]
@@ -171,6 +173,12 @@ class ColdTrainParameters:
     def __post_init__(self) -> None:
         if not isinstance(self.runtime_enforcement, bool):
             raise TypeError("runtime_enforcement must be a boolean")
+        if not isinstance(self.accumulator_enabled, bool):
+            raise TypeError("accumulator_enabled must be a boolean")
+        if self.accumulator_enabled and not self.runtime_enforcement:
+            raise ValueError(
+                "accumulator_enabled requires runtime_enforcement=true"
+            )
         rating = {
             name: None if self.rating.get(name) is None else _finite_positive(self.rating[name], name)
             for name in _COLD_TRAIN_RATING_NAMES
@@ -388,6 +396,15 @@ def _normalize_cold_train(payload: Mapping[str, Any]) -> dict[str, Any]:
         "runtime_enforcement",
         boolean=True,
     )
+    accumulator_enabled = _validated_assumption_entry(
+        payload["accumulator_enabled"],
+        "accumulator_enabled",
+        boolean=True,
+    )
+    if accumulator_enabled["value"] and not runtime_enforcement["value"]:
+        raise ValueError(
+            "accumulator_enabled requires runtime_enforcement=true"
+        )
 
     normalized_rating = {
         name: _validated_assumption_entry(rating[name], name, allow_none=True)
@@ -418,6 +435,7 @@ def _normalize_cold_train(payload: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("relief p_open_Pa must be below vessel_rating_Pa")
     return {
         "runtime_enforcement": runtime_enforcement,
+        "accumulator_enabled": accumulator_enabled,
         "rating": normalized_rating,
         "orifice": normalized_orifice,
         "relief": normalized_relief,
@@ -429,6 +447,7 @@ def _normalize_cold_train(payload: Mapping[str, Any]) -> dict[str, Any]:
 def _cold_train_parameters(payload: Mapping[str, Any]) -> ColdTrainParameters:
     return ColdTrainParameters(
         runtime_enforcement=payload["runtime_enforcement"]["value"],
+        accumulator_enabled=payload["accumulator_enabled"]["value"],
         rating={name: payload["rating"][name]["value"] for name in _COLD_TRAIN_RATING_NAMES},
         orifice={name: payload["orifice"][name]["value"] for name in _COLD_TRAIN_ORIFICE_NAMES},
         relief={name: payload["relief"][name]["value"] for name in _COLD_TRAIN_RELIEF_NAMES},

@@ -16,7 +16,10 @@ from simulator.accounting.exceptions import (
 )
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, resolve_species_formula
 from simulator.accounting.lots import MaterialLot
-from simulator.account_ids import CONDENSATION_RETAINED_HOLDUP_ACCOUNT
+from simulator.account_ids import (
+    CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
+    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+)
 
 # Per-transition mass-closure slack. The element gate below is the binding
 # conservation check for known formulas; this mass gate gives unknown-species
@@ -43,6 +46,7 @@ C7_TERMINAL_SLAG_DEBIT_PREFIXES = (
 )
 _C7_TERMINAL_SLAG_REWORK_CAPABILITY = object()
 TERMINAL_ACCOUNT_ALLOWED_SPECIES = {
+    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT: frozenset({"O2"}),
     "terminal.oxygen_stage0_stored": frozenset({"O2"}),
     "terminal.oxygen_melt_offgas_stored": frozenset({"O2"}),
     "terminal.oxygen_melt_offgas_vented_to_vacuum": frozenset({"O2"}),
@@ -69,6 +73,7 @@ KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
     "process.stage0_volatile_feed",
     "process.wall_deposit",
     "reservoir.fo2_buffer",
+    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
     "reservoir.stage0_oxidant",
     "reservoir.stage0_process_gas",
     "terminal.slag",

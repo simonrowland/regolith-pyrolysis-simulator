@@ -20,6 +20,8 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.account_ids import OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
+from simulator.thermal_train import OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL
 
 
 PROCESS_OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
@@ -73,6 +75,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         OXYGEN_MELT_OFFGAS_ACCOUNT,
         OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
         OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
+        OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -169,6 +172,9 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         melt_o2_bled_mol = max(0.0, bled_o2_mol - external_o2_bled_mol)
         capacity = controls.get("cold_train_capacity")
         o2_held_mol = 0.0
+        o2_accumulated_mol = 0.0
+        cistern_fill_kg = 0.0
+        accumulator_enabled = controls.get("accumulator_enabled") is True
         from simulator.thermal_train import FiniteCapacity
 
         if isinstance(capacity, FiniteCapacity):
@@ -177,6 +183,31 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 and molar_mass.get(OXYGEN_SPECIES, 0.0) > 0.0
             ):
                 from simulator.capacity_coupling import partition_melt_oxygen
+
+                cistern_fill_mol = float(
+                    request.account_view.accounts.get(
+                        OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT, {}
+                    ).get(OXYGEN_SPECIES, 0.0)
+                    or 0.0
+                )
+                cistern_fill_kg = (
+                    cistern_fill_mol
+                    * molar_mass.get(OXYGEN_SPECIES, 0.0)
+                )
+                if accumulator_enabled and cistern_fill_kg > float(
+                    controls["cavern_capacity_kg"]
+                ):
+                    return IntentResult(
+                        intent=ChemistryIntent.OVERHEAD_BLEED,
+                        status="unsupported",
+                        control_audit=control_audit,
+                        diagnostic={
+                            "reason": (
+                                "cistern_fill_kg must not exceed "
+                                "cavern_capacity_kg"
+                            )
+                        },
+                    )
 
                 partition = partition_melt_oxygen(
                     bled_o2_mol=bled_o2_mol,
@@ -190,12 +221,22 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                     ),
                     p_open_Pa=float(controls.get("p_open_Pa", 0.0)),
                     molar_mass_kg_mol=molar_mass.get(OXYGEN_SPECIES, 0.0),
+                    accumulator_enabled=accumulator_enabled,
+                    cistern_fill_kg=cistern_fill_kg,
+                    cavern_capacity_kg=float(
+                        controls.get("cavern_capacity_kg", 0.0)
+                    ),
                 )
                 external_o2_bled_mol = partition.external_mol
                 o2_stored_mol = partition.admitted_mol
+                o2_accumulated_mol = partition.accumulated_mol
                 melt_o2_vented_mol = partition.relieved_mol
                 o2_held_mol = partition.held_mol
-                melt_o2_bled_mol = o2_stored_mol + melt_o2_vented_mol
+                melt_o2_bled_mol = (
+                    o2_stored_mol
+                    + o2_accumulated_mol
+                    + melt_o2_vented_mol
+                )
             else:
                 o2_stored_mol = 0.0
                 melt_o2_vented_mol = 0.0
@@ -223,6 +264,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         actual_o2_debit_mol = (
             external_o2_bled_mol
             + o2_stored_mol
+            + o2_accumulated_mol
             + melt_o2_vented_mol
         )
         if actual_o2_debit_mol > 0.0:
@@ -232,6 +274,10 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         if o2_stored_mol > 0.0:
             credits[OXYGEN_MELT_OFFGAS_ACCOUNT] = {
                 OXYGEN_SPECIES: o2_stored_mol
+            }
+        if o2_accumulated_mol > 0.0:
+            credits[OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT] = {
+                OXYGEN_SPECIES: o2_accumulated_mol
             }
         if melt_o2_vented_mol > 0.0:
             credits[OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT] = {
@@ -306,6 +352,27 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                     external_o2_bled_mol * molar_mass.get(OXYGEN_SPECIES, 0.0)
                 ),
                 "p_ref_Pa": controls.get("p_ref_Pa"),
+                **(
+                    {
+                        "o2_accumulated_mol": o2_accumulated_mol,
+                        "cistern_fill_kg": cistern_fill_kg,
+                        "cistern_fill_after_kg": (
+                            cistern_fill_kg
+                            + o2_accumulated_mol
+                            * molar_mass.get(OXYGEN_SPECIES, 0.0)
+                        ),
+                        "cavern_capacity_kg": controls[
+                            "cavern_capacity_kg"
+                        ],
+                        "refreeze_duty_kWh_deferred": (
+                            o2_accumulated_mol
+                            * OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL
+                            / 3_600_000.0
+                        ),
+                    }
+                    if accumulator_enabled
+                    else {}
+                ),
             },
         )
 
@@ -372,6 +439,11 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         force_drain_all = controls.get("force_drain_all", False)
         if not isinstance(force_drain_all, bool):
             return "force_drain_all must be a boolean"
+        accumulator_enabled = controls.get("accumulator_enabled", False)
+        if not isinstance(accumulator_enabled, bool):
+            return "accumulator_enabled must be a boolean"
+        if accumulator_enabled and not finite_capacity:
+            return "accumulator_enabled requires FiniteCapacity"
         conductance_name = None
         if controls.get("bleed_conductance_kg_s") is not None:
             conductance_name = "bleed_conductance_kg_s"
@@ -398,6 +470,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             ("p_open_Pa", 0.0),
             ("p_ref_Pa", 0.0),
             ("vessel_rating_Pa", 0.0),
+            ("cavern_capacity_kg", 0.0),
         ):
             if name not in controls:
                 continue
@@ -428,6 +501,15 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 controls["vessel_rating_Pa"]
             ):
                 return "p_open_Pa must be below vessel_rating_Pa"
+        if accumulator_enabled:
+            try:
+                cavern_capacity_kg = float(controls["cavern_capacity_kg"])
+            except (KeyError, TypeError, ValueError):
+                return (
+                    "accumulator requires positive cavern_capacity_kg"
+                )
+            if cavern_capacity_kg <= 0.0:
+                return "cavern_capacity_kg must be a finite positive number"
         return None
 
     @staticmethod

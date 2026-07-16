@@ -34,6 +34,7 @@ def test_default_thermal_train_parameters_are_closed_tagged_and_frozen() -> None
         "psr": 0.0,
     }
     assert params.cold_train.runtime_enforcement is False
+    assert params.cold_train.accumulator_enabled is False
     with pytest.raises(TypeError):
         params.knudsen_locations["duct"]["L_m"] = 1.0
 
@@ -94,6 +95,29 @@ def test_runtime_enforcement_requires_boolean(bad) -> None:
     payload["cold_train"]["runtime_enforcement"]["value"] = bad
     with pytest.raises(TypeError, match="boolean"):
         normalize_thermal_train_parameters(payload, source="test")
+
+
+@pytest.mark.parametrize("bad", [0, 1, "false", None])
+def test_accumulator_enabled_requires_boolean(bad) -> None:
+    payload = _raw()
+    payload["cold_train"]["accumulator_enabled"]["value"] = bad
+    with pytest.raises(TypeError, match="boolean"):
+        normalize_thermal_train_parameters(payload, source="test")
+
+
+def test_accumulator_requires_runtime_enforcement() -> None:
+    payload = _raw()
+    payload["cold_train"]["accumulator_enabled"]["value"] = True
+    with pytest.raises(
+        ValueError,
+        match="accumulator_enabled requires runtime_enforcement=true",
+    ):
+        thermal_train_parameters_from_mapping(payload)
+
+    payload["cold_train"]["runtime_enforcement"]["value"] = True
+    assert thermal_train_parameters_from_mapping(
+        payload
+    ).cold_train.accumulator_enabled is True
 
 
 def test_assumption_and_ratification_source_tags_are_required() -> None:

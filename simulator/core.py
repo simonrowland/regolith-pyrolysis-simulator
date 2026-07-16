@@ -53,6 +53,7 @@ from simulator.account_ids import (
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
+    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
@@ -364,6 +365,7 @@ FLOW_MASS_ACCOUNTS = (
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
     OXYGEN_MRE_ANODE_ACCOUNT,
+    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
 )
 FLOW_MASS_EXCLUDED_ACCOUNTS = (
     'process.stage0_carbonate_feed',
@@ -5520,6 +5522,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         capacity, cold_train = self._cold_train_capacity_policy()
         if isinstance(capacity, FiniteCapacity):
             assert cold_train is not None
+            accumulator_enabled = bool(
+                getattr(cold_train, 'accumulator_enabled', False)
+            )
             p_ref_Pa = (
                 capacity_result.partial_pressures_Pa.get(OXYGEN_SPECIES, 0.0)
                 if capacity_result is not None
@@ -5536,6 +5541,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'p_open_Pa': cold_train.relief['p_open_Pa'],
                 'vessel_rating_Pa': cold_train.relief['vessel_rating_Pa'],
             })
+            if accumulator_enabled:
+                from simulator.thermal_train import (
+                    thermal_train_parameters_from_mapping,
+                )
+
+                controls.update({
+                    'accumulator_enabled': True,
+                    'cavern_capacity_kg': (
+                        thermal_train_parameters_from_mapping()
+                        .cavern_capacity_kg
+                    ),
+                })
             if capacity_result is not None:
                 controls['p_total_bar'] = sum(
                     capacity_result.partial_pressures_Pa.values()
@@ -5569,11 +5586,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.chemistry.kernel.dto import IntentRequest
         from simulator.thermal_train import (
             FiniteCapacity,
+            thermal_train_parameters_from_mapping,
         )
 
         capacity, cold_train = self._cold_train_capacity_policy()
         if not isinstance(capacity, FiniteCapacity) or cold_train is None:
             return None
+        accumulator_enabled = bool(
+            getattr(cold_train, 'accumulator_enabled', False)
+        )
 
         ledger_before = self.atom_ledger.mol_by_account()
         transition_count_before = len(self.atom_ledger.transitions)
@@ -5715,6 +5736,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._evaporation_overhead_total_pressure_Pa
             ),
             vessel_rating_Pa=cold_train.relief['vessel_rating_Pa'],
+            accumulator_enabled=accumulator_enabled,
+            cistern_fill_kg=(
+                self.atom_ledger.kg_by_account(
+                    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
+                ).get(OXYGEN_SPECIES, 0.0)
+                if accumulator_enabled
+                else 0.0
+            ),
+            cavern_capacity_kg=(
+                thermal_train_parameters_from_mapping().cavern_capacity_kg
+                if accumulator_enabled
+                else 0.0
+            ),
         )
         assert self.atom_ledger.mol_by_account() == ledger_before
         assert len(self.atom_ledger.transitions) == transition_count_before

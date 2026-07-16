@@ -21,6 +21,7 @@ from simulator.accounting.ledger import (
     LedgerTransition,
 )
 from simulator.accounting.lots import MaterialLot
+from simulator.account_ids import OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
 from simulator.chemistry.kernel import (
     AtomBalanceError,
     CapabilityProfile,
@@ -73,6 +74,20 @@ def _strict_ledger(**kwargs) -> AtomLedger:
         allowed_account_prefixes=KNOWN_LEDGER_ACCOUNT_PREFIXES,
         **kwargs,
     )
+
+
+def test_cistern_liquid_inventory_accepts_only_o2() -> None:
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+        {"O2": 1.0},
+    )
+
+    with pytest.raises(AccountingError, match="only accepts species: O2"):
+        ledger.load_external_mol(
+            OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+            {"N2": 1.0},
+        )
 
 
 def _kernel(

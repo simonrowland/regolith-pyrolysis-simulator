@@ -28,6 +28,7 @@ def test_provider_declares_overhead_bleed_authority():
     assert profile.declared_accounts == frozenset(
         {
             "process.overhead_gas",
+            "reservoir.oxygen_cistern_liquid_inventory",
             "terminal.offgas",
             "terminal.oxygen_melt_offgas_stored",
             "terminal.oxygen_melt_offgas_vented_to_vacuum",
@@ -796,6 +797,177 @@ def test_finite_capacity_relief_flows_with_zero_ordinary_conductance(
         (abs(value) for value in result.transition.atom_balance_proof.values()),
         default=0.0,
     ) <= 1e-12
+
+
+def test_finite_capacity_accumulator_commits_atom_balanced_cistern_inventory(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    o2_molar_mass = resolve_species_formula(
+        "O2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 10.0 * o2_molar_mass},
+        source="accumulator surge fixture",
+    )
+    total_kg_before = sum(sim.atom_ledger.total_kg_by_account().values())
+
+    result = sim._dispatch_and_commit(
+        ChemistryIntent.OVERHEAD_BLEED,
+        control_inputs={
+            "bleed_conductance_kg_s": 1.0,
+            "p_total_bar": 1.0,
+            "p_downstream_bar": 0.0,
+            "cold_train_capacity": FiniteCapacity(o2_molar_mass),
+            "dt_hr": 1.0,
+            "p_ref_Pa": 1000.0,
+            "p_open_Pa": 900.0,
+            "vessel_rating_Pa": 2000.0,
+            "k_relief_kg_hr_Pa": o2_molar_mass / 100.0,
+            "accumulator_enabled": True,
+            "cavern_capacity_kg": 5.0 * o2_molar_mass,
+        },
+    )
+
+    diagnostic = dict(result.diagnostic or {})
+    assert result.transition is not None
+    assert diagnostic["o2_admitted_mol"] == pytest.approx(1.0)
+    assert diagnostic["o2_accumulated_mol"] == pytest.approx(5.0)
+    assert diagnostic["o2_relieved_mol"] == pytest.approx(1.0)
+    assert diagnostic["o2_held_mol"] == pytest.approx(3.0)
+    assert diagnostic["cistern_fill_kg"] == 0.0
+    assert diagnostic["cistern_fill_after_kg"] == pytest.approx(
+        5.0 * o2_molar_mass
+    )
+    assert diagnostic["refreeze_duty_kWh_deferred"] == pytest.approx(
+        5.0 * 6820.0 / 3_600_000.0
+    )
+    assert sim.atom_ledger.mol_by_account(
+        "reservoir.oxygen_cistern_liquid_inventory"
+    )["O2"] == pytest.approx(5.0)
+    assert max(
+        (abs(value) for value in result.transition.atom_balance_proof.values()),
+        default=0.0,
+    ) <= 1e-12
+    total_kg_after = sum(sim.atom_ledger.total_kg_by_account().values())
+    assert total_kg_after == pytest.approx(total_kg_before, rel=5e-14)
+
+
+def test_finite_capacity_accumulator_off_is_p2_3_provider_parity(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    outcomes = []
+    for explicit_off in (False, True):
+        sim = _build_sim(
+            "lunar_mare_low_ti",
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+        )
+        o2_molar_mass = resolve_species_formula(
+            "O2", sim.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        sim.atom_ledger.load_external(
+            "process.overhead_gas",
+            {"O2": 10.0 * o2_molar_mass},
+            source="accumulator-off parity fixture",
+        )
+        controls = {
+            "bleed_conductance_kg_s": 1.0,
+            "p_total_bar": 1.0,
+            "p_downstream_bar": 0.0,
+            "cold_train_capacity": FiniteCapacity(o2_molar_mass),
+            "dt_hr": 1.0,
+            "p_ref_Pa": 1000.0,
+            "p_open_Pa": 900.0,
+            "vessel_rating_Pa": 2000.0,
+            "k_relief_kg_hr_Pa": o2_molar_mass / 100.0,
+        }
+        if explicit_off:
+            controls["accumulator_enabled"] = False
+        result = sim._dispatch_and_commit(
+            ChemistryIntent.OVERHEAD_BLEED,
+            control_inputs=controls,
+        )
+        outcomes.append((
+            dict(result.diagnostic or {}),
+            result.transition.debits,
+            result.transition.credits,
+            sim.atom_ledger.mol_by_account(),
+        ))
+
+    assert outcomes[1] == outcomes[0]
+    assert "o2_accumulated_mol" not in outcomes[0][0]
+
+
+def test_full_cistern_resumes_relief_through_provider_and_ledger(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    o2_molar_mass = resolve_species_formula(
+        "O2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    cistern_account = "reservoir.oxygen_cistern_liquid_inventory"
+    sim.atom_ledger.load_external(
+        cistern_account,
+        {"O2": 5.0 * o2_molar_mass},
+        source="full cistern fixture",
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 10.0 * o2_molar_mass},
+        source="full cistern surge fixture",
+    )
+    transitions_before = len(sim.atom_ledger.transitions)
+    total_kg_before = sum(sim.atom_ledger.total_kg_by_account().values())
+
+    result = sim._dispatch_and_commit(
+        ChemistryIntent.OVERHEAD_BLEED,
+        control_inputs={
+            "bleed_conductance_kg_s": 1.0,
+            "p_total_bar": 1.0,
+            "p_downstream_bar": 0.0,
+            "cold_train_capacity": FiniteCapacity(o2_molar_mass),
+            "dt_hr": 1.0,
+            "p_ref_Pa": 1000.0,
+            "p_open_Pa": 900.0,
+            "vessel_rating_Pa": 2000.0,
+            "k_relief_kg_hr_Pa": o2_molar_mass,
+            "accumulator_enabled": True,
+            "cavern_capacity_kg": 5.0 * o2_molar_mass,
+        },
+    )
+
+    diagnostic = dict(result.diagnostic or {})
+    assert len(sim.atom_ledger.transitions) == transitions_before + 1
+    assert diagnostic["o2_admitted_mol"] == pytest.approx(1.0)
+    assert diagnostic["o2_accumulated_mol"] == 0.0
+    assert diagnostic["o2_relieved_mol"] == pytest.approx(9.0)
+    assert diagnostic["o2_held_mol"] == 0.0
+    assert diagnostic["cistern_fill_after_kg"] == pytest.approx(
+        5.0 * o2_molar_mass
+    )
+    assert sim.atom_ledger.mol_by_account(cistern_account)[
+        "O2"
+    ] == pytest.approx(5.0)
+    assert cistern_account not in result.transition.credits
+    assert max(
+        (abs(value) for value in result.transition.atom_balance_proof.values()),
+        default=0.0,
+    ) <= 1e-12
+    total_kg_after = sum(sim.atom_ledger.total_kg_by_account().values())
+    assert total_kg_after == pytest.approx(total_kg_before, rel=5e-14)
 
 
 @pytest.mark.parametrize(

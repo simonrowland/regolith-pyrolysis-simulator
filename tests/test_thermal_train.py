@@ -406,9 +406,14 @@ def test_cold_train_assumptions_are_closed_classed_ranged_and_provenanced() -> N
     assert payload["schema_version"] == "thermal-train-v2"
     cold_train = payload["cold_train"]
     assert set(cold_train) == {
-        "runtime_enforcement", "rating", "orifice", "relief", "cycle", "endpoint",
+        "runtime_enforcement", "accumulator_enabled", "rating", "orifice",
+        "relief", "cycle", "endpoint",
     }
-    entries = [cold_train["runtime_enforcement"], cold_train["endpoint"]]
+    entries = [
+        cold_train["runtime_enforcement"],
+        cold_train["accumulator_enabled"],
+        cold_train["endpoint"],
+    ]
     for section in ("rating", "orifice", "relief", "cycle"):
         entries.extend(cold_train[section].values())
     for entry in entries:

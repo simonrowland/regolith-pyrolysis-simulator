@@ -8,6 +8,7 @@ import yaml
 
 from simulator.account_ids import (
     OXYGEN_CAPTURED_ACCOUNTS,
+    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
@@ -104,6 +105,28 @@ def test_flow_mass_out_includes_captured_melt_offgas_oxygen():
     )
 
     assert sim._flow_mass_out_kg() - before == pytest.approx(2.0)
+
+
+def test_oxygen_terminal_partition_exposes_cistern_liquid_stored():
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {"sample": {"composition_wt_pct": {"SiO2": 100.0}}},
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("sample", mass_kg=1.0)
+    sim.atom_ledger.load_external(
+        OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+        {"O2": 2.0},
+        source="test cistern liquid oxygen",
+    )
+
+    partition = sim._oxygen_terminal_partition_kg()
+
+    assert partition["cistern_liquid_stored"] == pytest.approx(2.0)
+    assert partition["stored"] == pytest.approx(2.0)
 
 
 def test_declared_terminal_oxygen_accounts_have_flow_mass_disposition():
