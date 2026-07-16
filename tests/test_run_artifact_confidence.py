@@ -12,8 +12,12 @@ def _runner_payload(
     backend: str = "alphamelts",
     backend_status: str = "ok",
     backend_authoritative: bool = True,
+    # Forward-contract default: no current backend emits ok/True. Today,
+    # simulator/melt_backend/alphamelts.py:3417-3432 emits fallback/False or
+    # not_attempted/None; the intended future emitter is the authoritative
+    # alphaMELTS vapor path.
     vapor_status: str = "ok",
-    vapor_authoritative: bool = True,
+    vapor_authoritative: bool | None = True,
     include_vapor_report: bool = True,
 ) -> dict:
     # Mirrors runner.py:1069-1084,1125-1136 and 1331-1364; do not add
@@ -162,6 +166,45 @@ def test_non_authoritative_vapor_evidence_caps_confidence_at_medium() -> None:
         "vapor-pressure backend status ok; authoritative=False"
         in confidence["reasons"]
     )
+
+
+@pytest.mark.parametrize(
+    ("vapor_status", "vapor_authoritative", "expected_reason"),
+    [
+        (
+            "fallback",
+            False,
+            "vapor-pressure backend status fallback; authoritative=False",
+        ),
+        (
+            "not_attempted",
+            None,
+            "vapor-pressure backend status not_attempted; authoritative=None",
+        ),
+        (
+            "",
+            None,
+            "vapor-pressure backend status absent; authoritative=None",
+        ),
+    ],
+)
+def test_no_currently_emittable_vapor_input_combination_grades_high(
+    vapor_status: str,
+    vapor_authoritative: bool | None,
+    expected_reason: str,
+) -> None:
+    artifact = build_run_artifact(
+        _runner_payload(
+            vapor_status=vapor_status,
+            vapor_authoritative=vapor_authoritative,
+        ),
+        run_id=f"run-current-vapor-{vapor_status or 'empty'}",
+    )
+
+    confidence = artifact["terminal"]["confidence"]
+    assert confidence["grade"] == "medium"
+    assert confidence["grade"] != "high"
+    assert expected_reason in confidence["reasons"]
 
 
 def test_confidence_is_omitted_without_numeric_mass_balance_residual() -> None:
