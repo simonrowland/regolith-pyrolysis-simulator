@@ -55,6 +55,7 @@ from simulator.config import ConfigBundle, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.accounting import AccountingQueries
+from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     normalize_chemistry_kernel_config,
@@ -171,6 +172,7 @@ SIO_WALL_SWEEP_PO2_MODE_CONFIG: dict[str, dict[str, Any]] = {
 }
 SIO_SLOW_FOULING_WALL_DEPOSIT_KG = 1.0e-6
 SIO_WALL_SWEEP_EVOLVED_REL_TOL = 1.0e-6
+C0_CHAR_WARNING_FEO_FRACTION = 0.0
 
 # kg -> bar gauge for the snapshot pressure fields exposed to summaries.
 _MBAR_TO_BAR = 1.0e-3
@@ -1216,6 +1218,15 @@ class PyrolysisRun:
             "reason": reason,
             "error_message": error_message,
         }
+        c0_char_diagnostic = _c0_char_diagnostic(
+            sim,
+            execution.snapshots,
+            feedstock_id=self.feedstock_id,
+        )
+        if c0_char_diagnostic:
+            run_metadata["c0_char_diagnostic"] = _json_safe(
+                c0_char_diagnostic
+            )
         return payload
 
     def _engines_used(self, sim: PyrolysisSimulator) -> dict[str, object]:
@@ -1949,6 +1960,211 @@ def _final_state_from_ledger(sim: PyrolysisSimulator) -> dict[str, dict[str, flo
             if abs(float(mol)) > 0.0
         }
         for account, species_mol in sorted(balances.items())
+    }
+
+
+def _c0_char_diagnostic(
+    sim: PyrolysisSimulator,
+    snapshots: tuple[HourSnapshot, ...],
+    *,
+    feedstock_id: str,
+) -> dict[str, Any]:
+    """Project refractory organic carbon and O2-lance coverage at C0 end."""
+    c0_snapshots = tuple(
+        snapshot
+        for snapshot in snapshots
+        if snapshot.campaign == CampaignPhase.C0
+    )
+    if not c0_snapshots:
+        return {}
+
+    carbon_diagnostics = tuple(
+        row
+        for row in (getattr(sim, "_stage0_foulant_diagnostics", ()) or ())
+        if row.get("reaction_family") == "partition_carbon"
+    )
+    refractory_char_mol = sum(
+        float(row["refractory_mol"])
+        for row in carbon_diagnostics
+        if isinstance(row.get("refractory_mol"), (int, float))
+        and float(row["refractory_mol"]) > 0.0
+    )
+    if refractory_char_mol <= 0.0:
+        return {}
+
+    partition_row = (
+        sim._load_carbon_partition_config()
+        .get("phase_partitions", {})
+        .get(feedstock_id, {})
+    )
+    refractory_partition = dict(
+        partition_row.get("f_refractory_organic_C", {}) or {}
+    )
+    partition_fraction = refractory_partition.get("floor")
+    if partition_fraction is None:
+        partition_fraction = refractory_partition.get("iom_anchor")
+
+    o2_molar_mass_kg_per_mol = MOLAR_MASS["O2"] / 1000.0
+    carbon_molar_mass_kg_per_mol = ATOMIC_WEIGHTS_G_PER_MOL["C"] / 1000.0
+    feo_molar_mass_kg_per_mol = MOLAR_MASS["FeO"] / 1000.0
+    fe_molar_mass_kg_per_mol = MOLAR_MASS["Fe"] / 1000.0
+    o2_injected_kg = sum(
+        max(0.0, float(snapshot.o2_bubbler_injected_kg))
+        for snapshot in c0_snapshots
+    )
+    o2_absorbed_kg = sum(
+        max(0.0, float(snapshot.o2_bubbler_absorbed_kg))
+        for snapshot in c0_snapshots
+    )
+    o2_injected_mol = o2_injected_kg / o2_molar_mass_kg_per_mol
+    o2_absorbed_mol = o2_absorbed_kg / o2_molar_mass_kg_per_mol
+
+    # Premise: residual char can reduce molten FeO once the C/CO Ellingham
+    # line is below Fe/FeO. Algebra: C + O2 -> CO2 needs 1 mol O2/mol C;
+    # C + 1/2 O2 -> CO needs 0.5 mol O2/mol C; FeO + C -> Fe + CO is 1:1.
+    # Unit check: kg O2 / (kg/mol) -> mol; mol C * kg/mol -> kg C/Fe.
+    # Sanity: 1 tonne at 3.5 wt% C and the Sephton floor 0.39 gives
+    # 1.136 kmol (13.65 kg) char, 36.3/18.2 kg O2 (CO2/CO), and at most
+    # 63.5 kg Fe. This report is a projection only; no account is mutated.
+    o2_required_co2_mol = refractory_char_mol
+    o2_required_co_mol = 0.5 * refractory_char_mol
+    injected_residual_co2_mol = max(
+        refractory_char_mol - o2_injected_mol, 0.0
+    )
+    injected_residual_co_mol = max(
+        refractory_char_mol - 2.0 * o2_injected_mol, 0.0
+    )
+    absorbed_residual_co2_mol = max(
+        refractory_char_mol - o2_absorbed_mol, 0.0
+    )
+    absorbed_residual_co_mol = max(
+        refractory_char_mol - 2.0 * o2_absorbed_mol, 0.0
+    )
+
+    c0_end = c0_snapshots[-1]
+    melt_feo_kg = max(
+        0.0,
+        float(c0_end.inventory.melt_oxide_kg.get("FeO", 0.0) or 0.0),
+    )
+    melt_feo_mol = melt_feo_kg / feo_molar_mass_kg_per_mol
+    feo_reducible_mol = min(absorbed_residual_co2_mol, melt_feo_mol)
+    feo_fraction_at_risk = (
+        feo_reducible_mol / melt_feo_mol if melt_feo_mol > 0.0 else 0.0
+    )
+    # No source establishes a safe non-zero residual-char allowance. The
+    # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020
+    # NIST-JANAF/Chase 1998 C/CO and Fe/FeO thermochemistry, makes onset the
+    # warning boundary: any positive FeO fraction at risk warns, but never
+    # refuses or changes process behavior.
+    warning_fired = feo_fraction_at_risk > C0_CHAR_WARNING_FEO_FRACTION
+
+    def coverage_pct(o2_mol: float, required_mol: float) -> float:
+        if required_mol <= 0.0:
+            return 100.0
+        return 100.0 * min(max(o2_mol, 0.0) / required_mol, 1.0)
+
+    warning = None
+    if warning_fired:
+        warning = (
+            "WARNING: un-lanced refractory char can stoichiometrically reduce "
+            "a positive fraction of C0-end melt FeO; diagnostic only, "
+            "no process gate applied."
+        )
+
+    return {
+        "status": "WARN" if warning_fired else "OK",
+        "diagnostic_only": True,
+        "warning": warning,
+        "partition": {
+            "feedstock_id": feedstock_id,
+            "f_refractory_organic_C": float(partition_fraction),
+            "fraction_basis": (
+                "floor"
+                if refractory_partition.get("floor") is not None
+                else "iom_anchor"
+            ),
+            "source": refractory_partition.get("source"),
+            "regime_caveat": refractory_partition.get("regime_caveat"),
+        },
+        "inventory": {
+            "refractory_char_C_mol": refractory_char_mol,
+            "refractory_char_C_kg": (
+                refractory_char_mol * carbon_molar_mass_kg_per_mol
+            ),
+        },
+        "lance_stoichiometry": {
+            "O2_injected_kg": o2_injected_kg,
+            "O2_injected_mol": o2_injected_mol,
+            "O2_absorbed_kg": o2_absorbed_kg,
+            "O2_absorbed_mol": o2_absorbed_mol,
+            "C_plus_O2_to_CO2": {
+                "O2_required_mol": o2_required_co2_mol,
+                "O2_required_kg": (
+                    o2_required_co2_mol * o2_molar_mass_kg_per_mol
+                ),
+                "injected_coverage_pct": coverage_pct(
+                    o2_injected_mol, o2_required_co2_mol
+                ),
+                "absorbed_coverage_pct": coverage_pct(
+                    o2_absorbed_mol, o2_required_co2_mol
+                ),
+                "injected_basis_residual_char_C_mol": (
+                    injected_residual_co2_mol
+                ),
+                "injected_basis_residual_char_C_kg": (
+                    injected_residual_co2_mol * carbon_molar_mass_kg_per_mol
+                ),
+                "un_lanced_char_C_mol": absorbed_residual_co2_mol,
+                "un_lanced_char_C_kg": (
+                    absorbed_residual_co2_mol * carbon_molar_mass_kg_per_mol
+                ),
+            },
+            "C_plus_half_O2_to_CO": {
+                "O2_required_mol": o2_required_co_mol,
+                "O2_required_kg": (
+                    o2_required_co_mol * o2_molar_mass_kg_per_mol
+                ),
+                "injected_coverage_pct": coverage_pct(
+                    o2_injected_mol, o2_required_co_mol
+                ),
+                "absorbed_coverage_pct": coverage_pct(
+                    o2_absorbed_mol, o2_required_co_mol
+                ),
+                "injected_basis_residual_char_C_mol": injected_residual_co_mol,
+                "injected_basis_residual_char_C_kg": (
+                    injected_residual_co_mol * carbon_molar_mass_kg_per_mol
+                ),
+                "un_lanced_char_C_mol": absorbed_residual_co_mol,
+                "un_lanced_char_C_kg": (
+                    absorbed_residual_co_mol * carbon_molar_mass_kg_per_mol
+                ),
+            },
+            "residual_basis": (
+                "absorbed_O2_for_un_lanced_hazard; injected_O2_is_dose_ceiling"
+            ),
+        },
+        "FeO_reduction_potential": {
+            "basis": (
+                "C_plus_O2_to_CO2_absorbed_O2_residual_conservative_case"
+            ),
+            "melt_FeO_available_mol": melt_feo_mol,
+            "melt_FeO_available_kg": melt_feo_kg,
+            "FeO_reducible_mol": feo_reducible_mol,
+            "Fe_equivalent_kg": feo_reducible_mol * fe_molar_mass_kg_per_mol,
+            "CO_equivalent_mol": feo_reducible_mol,
+            "melt_FeO_fraction_at_risk": feo_fraction_at_risk,
+            "warning_threshold_melt_FeO_fraction": (
+                C0_CHAR_WARNING_FEO_FRACTION
+            ),
+            "warning_threshold_basis": (
+                "thermodynamic-onset threshold: no sourced safe non-zero "
+                "residual-char allowance; warn above zero melt-FeO fraction"
+            ),
+            "warning_threshold_source": (
+                "owner-flagged 2026-07-15 Ellingham premise; REF-020 "
+                "NIST-JANAF/Chase 1998 thermochemistry"
+            ),
+        },
     }
 
 
