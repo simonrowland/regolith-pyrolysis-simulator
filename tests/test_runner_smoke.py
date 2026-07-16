@@ -1263,6 +1263,40 @@ def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):
     assert failure["c7_refusal_diagnostic"] == {}
 
 
+def test_c7_transport_refusal_is_exported(tmp_path, monkeypatch):
+    monkeypatch.setenv("MPLCONFIGDIR", str(tmp_path / "mpl"))
+    payload = PyrolysisRun(
+        feedstock_id="targeted_super_kreep_ore",
+        campaign="C7_CA_ALUMINOTHERMIC",
+        hours=2,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        setpoints_patch={
+            "campaigns": {
+                "C7": {
+                    "enabled": True,
+                    "al_credit_limit_kg": 20.0,
+                    "extent_fraction": 0.1,
+                    "hold_time_h": 1.0,
+                    "active_ca_condensation_route": False,
+                }
+            }
+        },
+        run_metadata_overrides={
+            "started_at_utc": "2026-06-28T00:00:00Z",
+            "kernel_commit_sha": "c7-transport-refusal",
+        },
+    ).run()
+
+    refusal = payload["c7_refusal_diagnostic"]
+    assert refusal["reason_refused"] == (
+        "no_active_route_or_pressure_outside_vacuum_envelope"
+    )
+    assert refusal["c7_transport_refusal"] == refusal["reason_refused"]
+    assert refusal["r_transport"] == pytest.approx(0.0)
+    assert refusal["transport_ca_mol"] == pytest.approx(0.0)
+
+
 def test_runner_cli_entry_point_writes_output_file(tmp_path):
     """``python -m simulator.runner`` must write the JSON document.
 

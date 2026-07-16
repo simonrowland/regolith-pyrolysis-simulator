@@ -1721,6 +1721,7 @@ def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
     sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
     sim.melt.temperature_C = 1200.0
+    ledger_before = sim.atom_ledger.mol_by_account()
 
     sim._step_c7_ca_aluminothermic()
 
@@ -1730,7 +1731,81 @@ def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
     assert diagnostic["c7_transport_refusal"] == (
         "no_active_route_or_pressure_outside_vacuum_envelope"
     )
-    assert sim._last_c7_refusal_diagnostic == {}
+    assert sim._last_c7_refusal_diagnostic == {
+        "reason_refused": "no_active_route_or_pressure_outside_vacuum_envelope",
+        "c7_transport_refusal": (
+            "no_active_route_or_pressure_outside_vacuum_envelope"
+        ),
+        "r_transport": pytest.approx(0.0),
+        "transport_ca_mol": pytest.approx(0.0),
+        "c7_overhead_pressure_pa": pytest.approx(
+            diagnostic["c7_overhead_pressure_pa"]
+        ),
+    }
+    assert sim.atom_ledger.mol_by_account() == ledger_before
+
+
+def test_c7_transport_refusal_preserves_preexisting_overhead_ca(monkeypatch) -> None:
+    monkeypatch.setattr(
+        BuiltinCaAluminothermicStepProvider,
+        "_computed_thermo_margin_kj_per_mol_o2",
+        lambda self, hold_temp_C: 2.0,
+    )
+    setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
+    setpoints["campaigns"]["C7"].update(
+        {
+            "enabled": True,
+            "al_credit_limit_kg": 20.0,
+            "extent_fraction": 0.1,
+            "ca_condenser_temperature_C": 1000.0,
+        }
+    )
+    sim = PyrolysisSimulator(
+        InternalAnalyticalBackend(),
+        setpoints,
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("vapor_pressures.yaml"),
+    )
+    sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
+    sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+    sim.melt.temperature_C = 1200.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Ca": 0.25},
+        source="test pre-existing C7 overhead calcium",
+    )
+    capture_operations: list[str] = []
+    dispatch_and_commit = sim._dispatch_and_commit
+
+    def track_dispatch_and_commit(intent, *, control_inputs):
+        capture_operations.append(str(control_inputs.get("operation") or ""))
+        return dispatch_and_commit(intent, control_inputs=control_inputs)
+
+    monkeypatch.setattr(sim, "_dispatch_and_commit", track_dispatch_and_commit)
+    relevant_accounts = (
+        "process.overhead_gas",
+        "process.condensation_train",
+        "process.wall_deposit",
+    )
+    balances_before = sim.atom_ledger.mol_by_account()
+    relevant_before = {
+        account: copy.deepcopy(balances_before.get(account, {}))
+        for account in relevant_accounts
+    }
+    overhead_ca_before = relevant_before["process.overhead_gas"]["Ca"]
+
+    sim._step_c7_ca_aluminothermic()
+
+    balances_after = sim.atom_ledger.mol_by_account()
+    relevant_after = {
+        account: balances_after.get(account, {}) for account in relevant_accounts
+    }
+    assert sim._last_c7_refusal_diagnostic["reason_refused"] == (
+        "no_active_route_or_pressure_outside_vacuum_envelope"
+    )
+    assert "ca_capture" not in capture_operations
+    assert relevant_after == relevant_before
+    assert balances_after["process.overhead_gas"]["Ca"] == overhead_ca_before
 
 
 def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
