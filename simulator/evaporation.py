@@ -236,9 +236,14 @@ class EvaporationMixin:
         )
 
         # Overhead backpressure (Pa)                       [LOOP-1]
-        # Uses the previous hour's overhead partial pressures as
-        # backpressure. Gas pO2 has already been applied once upstream in
-        # the equilibrium vapor pressures consumed here.
+        # Uses the previous hour's upstream melt-headspace/duct partials as
+        # backpressure. ``overhead.composition`` is the physically distinct
+        # post-condensation report, so near-total capture must not erase P_bulk
+        # above the melt. The fallback preserves callers/tests that seed only
+        # the legacy report surface. Gas pO2 has already been applied once
+        # upstream in the equilibrium vapor pressures consumed here.
+        melt_headspace_partials_mbar = getattr(
+            self, '_melt_headspace_composition_mbar', {}) or {}
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))
@@ -246,7 +251,10 @@ class EvaporationMixin:
             }
             if overhead_partials_override_Pa is not None
             else {
-                species: self.overhead.composition.get(species, 0.0) * 100.0
+                species: melt_headspace_partials_mbar.get(
+                    species,
+                    self.overhead.composition.get(species, 0.0),
+                ) * 100.0
                 for species in vapor_pressures
             }
         )
