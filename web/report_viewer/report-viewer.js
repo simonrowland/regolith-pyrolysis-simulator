@@ -154,8 +154,8 @@ function makeHeader(artifact, rows, energy) {
   const campaignChain = Array.isArray(header.campaign_chain) ? header.campaign_chain.join("→") || "—" : "—";
   const status = artifact.execution_status;
   const failureText = [artifact.failure?.reason, artifact.failure?.error_message].filter(Boolean).join(" · ") || "No failure reason or error message was emitted in this artifact.";
-  const costProvenance = typeof header.cost_block?._provenance === "string" && header.cost_block._provenance.trim()
-    ? header.cost_block._provenance.trim()
+  const costProvenance = typeof header.cost_block?.provenance === "string" && header.cost_block.provenance.trim()
+    ? header.cost_block.provenance.trim()
     : null;
   return `<header>
     <div class="masthead">
@@ -209,7 +209,7 @@ function processSection(artifact, rows, spans) {
     `<div class="stepper"><div class="stepper-head"><div><div class="ct">Timestep inspector</div><output id="step-output">Hour ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)} · ${esc(rows[0].campaign)}</output></div><span class="status-pill">1 / ${rows.length}</span></div>` +
     `<input id="stepper" type="range" min="0" max="${rows.length - 1}" value="0" step="1" aria-label="Report hour"><div class="range-labels"><span>h ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)}</span><span>h ${artifact.timesteps.at(-1).hour === undefined || artifact.timesteps.at(-1).hour === null ? "not emitted" : esc(artifact.timesteps.at(-1).hour)}</span></div><div id="current-grid" class="current-grid"></div><div class="timestep-ledger"><div class="ct">Selected timestep ledger · mol-native</div><div id="timestep-ledger"></div></div></div>` +
     `<div class="chart-grid">${charts}</div>` +
-    pending("W-A0", "summary.p_non_O2_bar and carrier_identity are absent. P_total − pO₂ is not used as a substitute, so neutral-sweep pressure is not charted."));
+    pending("W-A0", "summary.p_carrier_bar and carrier_identity are absent. P_total − pO₂ is not used as a substitute, so neutral-sweep pressure is not charted."));
 }
 
 function renderTimestepLedger(timestep) {
@@ -322,8 +322,8 @@ function costSection(artifact, energy) {
   }
   const hasCostShare = hasNumber(energy.totalCost) && energy.totalCost !== 0;
   const electricalShare = hasCostShare ? energy.electricalCost / energy.totalCost * 100 : null;
-  const provenance = typeof prices._provenance === "string" && prices._provenance.trim()
-    ? `<div class="note"><b>Cost provenance:</b> ${esc(prices._provenance.trim())}</div>`
+  const provenance = typeof prices.provenance === "string" && prices.provenance.trim()
+    ? `<div class="note"><b>Cost provenance:</b> ${esc(prices.provenance.trim())}</div>`
     : "";
   return section(8, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
     provenance + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${hasNumber(energy.electrical) ? `${energy.electrical.toFixed(6)} <small>kWh</small>` : "not emitted"}</div><div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.electricalCost)}</b></div></div>` +

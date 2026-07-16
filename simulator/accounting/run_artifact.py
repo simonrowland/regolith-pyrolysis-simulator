@@ -70,7 +70,8 @@ def _campaign_chain(per_hour: list[dict[str, Any]]) -> list[str]:
 def _canonical_energy_cost_totals(
     per_hour: list[dict[str, Any]],
     cost_block: Mapping[str, Any],
-) -> dict[str, float] | None:
+    run_metadata: Mapping[str, Any],
+) -> dict[str, Any] | None:
     if not per_hour:
         return None
     energy_fields = (
@@ -90,19 +91,59 @@ def _canonical_energy_cost_totals(
                 return None
             values.append(float(value))
         totals[field_name] = sum(values)
-    electrical = (
-        totals["energy_electrical_kWh"]
-        * float(cost_block["electrical_cost_per_kWh"])
-    )
+    electrical_price = float(cost_block["electrical_cost_per_kWh"])
+    process_electrical_kWh = totals["energy_electrical_kWh"]
+    pumping_diagnostic = None
+    cost_rollup = run_metadata.get("cost_rollup_diagnostic")
+    if isinstance(cost_rollup, Mapping):
+        pumping_diagnostic = cost_rollup.get("pumping_diagnostic")
+
+    pumping_electrical_kWh = None
+    if isinstance(pumping_diagnostic, Mapping):
+        candidate = pumping_diagnostic.get("pumping_electrical_kWh")
+        if (
+            isinstance(candidate, bool)
+            or not isinstance(candidate, Real)
+            or not math.isfinite(float(candidate))
+            or float(candidate) < 0.0
+        ):
+            return None
+        pumping_electrical_kWh = float(candidate)
+
+    total_electrical_kWh = process_electrical_kWh
+    result: dict[str, Any] = {
+        "process_electrical_energy_kWh": process_electrical_kWh,
+        "process_electrical_cost_usd": process_electrical_kWh * electrical_price,
+        "evaporation_thermal_energy_kWh": totals[
+            "energy_evaporation_thermal_kWh"
+        ],
+    }
+    if pumping_electrical_kWh is None:
+        result["basis_note"] = (
+            "pumping electrical energy not emitted; electrical totals exclude pumping"
+        )
+    else:
+        total_electrical_kWh += pumping_electrical_kWh
+        result.update(
+            {
+                "pumping_electrical_energy_kWh": pumping_electrical_kWh,
+                "pumping_electrical_cost_usd": (
+                    pumping_electrical_kWh * electrical_price
+                ),
+            }
+        )
+    electrical = total_electrical_kWh * electrical_price
     solar_heat = (
         totals["energy_evaporation_thermal_kWh"]
         * float(cost_block["solar_heat_cost_per_kWh"])
     )
-    return {
+    result.update({
+        "electrical_energy_kWh": total_electrical_kWh,
         "electrical_cost_usd": electrical,
         "solar_heat_cost_usd": solar_heat,
         "total_cost_usd": electrical + solar_heat,
-    }
+    })
+    return result
 
 
 def _terminal_confidence(artifact: Mapping[str, Any]) -> dict[str, Any] | None:
@@ -377,7 +418,7 @@ def build_run_artifact(
     ):
         if payload_key in runner_payload:
             terminal[artifact_key] = runner_payload[payload_key]
-    cost_totals = _canonical_energy_cost_totals(per_hour, cost_block)
+    cost_totals = _canonical_energy_cost_totals(per_hour, cost_block, run_metadata)
     if cost_totals is not None:
         terminal["cost_totals"] = cost_totals
     artifact["terminal"] = terminal

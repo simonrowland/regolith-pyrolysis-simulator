@@ -370,20 +370,34 @@ def test_loaded_recipe_start_applies_restored_runtime_levers(
             }
         }
     }
+    cost_parameters = default_cost_parameters_block()
+    cost_parameters["parameters"]["electricity_cost_per_kWh"]["value"] = 12.0
+    cost_parameters["parameters"]["solar_heat_cost_per_kWh"]["value"] = 0.07
+    cost_parameters["provenance"] = {
+        "source": "test optimizer winner",
+        "defaults_applied": False,
+    }
     write_recipe_patch(
         tmp_path / "loaded-c4.yaml",
-        loaded_patch,
+        {"cost_parameters": cost_parameters, **loaded_patch},
         metadata=_recipe_metadata("Loaded C4", "C4"),
     )
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     app.config["RECIPE_LIBRARY_DIR"] = tmp_path
-    loaded = app.test_client().post("/recipes/load", json={"name": "loaded-c4"})
-    assert loaded.status_code == 200, loaded.get_json()
-
+    socket_sids_before = set(web_events._socket_client_ids)
     client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
+    socket_sid = (set(web_events._socket_client_ids) - socket_sids_before).pop()
+    loaded = app.test_client().post(
+        "/recipes/load",
+        json={"name": "loaded-c4", "sid": socket_sid},
+    )
+    assert loaded.status_code == 200, loaded.get_json()
+    assert loaded.get_json()["cost_parameters"]["parameters"][
+        "electricity_cost_per_kWh"
+    ]["value"] == 12.0
     before = set(_simulations)
 
     try:
@@ -430,10 +444,40 @@ def test_loaded_recipe_start_applies_restored_runtime_levers(
         assert sim.setpoints["campaigns"]["C4"]["temp_range_C"] == pytest.approx(
             [1585.0, 1595.0]
         )
+        assert state["cost_parameters"]["parameters"][
+            "electricity_cost_per_kWh"
+        ]["value"] == 12.0
+        assert state["cost_parameters"]["parameters"][
+            "solar_heat_cost_per_kWh"
+        ]["value"] == 0.07
     finally:
         client.disconnect()
         for active_sid in list(_simulations):
             _clear_simulation_state(active_sid)
+
+
+def test_recipe_load_omits_cost_parameters_when_recipe_carries_none(tmp_path):
+    recipe_path = tmp_path / "legacy-no-costs.yaml"
+    recipe_path.write_text(
+        yaml.safe_dump(
+            {
+                "metadata": _recipe_metadata("Legacy no costs", "C4"),
+                "campaigns": {"C4": {"temp_range_C": [1585.0, 1595.0]}},
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    app = app_module.create_app()
+    app.config["RECIPE_LIBRARY_DIR"] = tmp_path
+
+    loaded = app.test_client().post(
+        "/recipes/load",
+        json={"name": recipe_path.stem},
+    )
+
+    assert loaded.status_code == 200, loaded.get_json()
+    assert "cost_parameters" not in loaded.get_json()
 
 
 def test_recipe_save_serializes_resolved_staged_ladder(tmp_path):

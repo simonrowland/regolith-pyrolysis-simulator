@@ -55,6 +55,19 @@ def test_report_viewer_serves_index_and_assets(tmp_path: Path) -> None:
     assert b"Download run.yaml" in script.data
 
 
+def test_report_viewer_reads_canonical_cost_provenance_key() -> None:
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    report_source = (root / "report-viewer.js").read_text(encoding="utf-8")
+    settings_source = (root / "settings.js").read_text(encoding="utf-8")
+    sample = json.loads((root / "sample-run-artifact.json").read_text(encoding="utf-8"))
+
+    assert "cost_block?.provenance" in report_source
+    assert "prices.provenance" in report_source
+    assert "cost.provenance" in settings_source
+    assert sample["header"]["cost_block"]["provenance"]
+    assert "_provenance" not in sample["header"]["cost_block"]
+
+
 @pytest.mark.parametrize("include_activity", [False, True])
 def test_report_viewer_presence_gates_stage_purity_activity(
     include_activity: bool,

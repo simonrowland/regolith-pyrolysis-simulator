@@ -35,7 +35,6 @@ from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.campaigns import CampaignManager
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
 from simulator.cost_parameters import (
-    default_cost_parameters_block,
     normalize_cost_parameters,
 )
 from simulator.core import PoisonedHourError
@@ -88,6 +87,7 @@ _simulations_guard = threading.Lock()
 _run_command_lock = threading.RLock()
 _run_idempotency_guard = threading.Lock()
 _socket_client_ids: dict[str, str] = {}
+_loaded_recipe_cost_parameters: dict[str, dict[str, object]] = {}
 _run_idempotency: dict[tuple[str, str], tuple[str, dict[str, object]]] = {}
 _MAX_RUN_IDEMPOTENCY_ENTRIES = 1024
 _MAX_ACTIVE_RUNS = 4
@@ -315,22 +315,55 @@ def recipe_save_context(sid: str) -> dict[str, object]:
 def apply_loaded_recipe_patch_to_state(
     sid: str,
     patch: Mapping[str, object],
+    *,
+    cost_parameters: Mapping[str, object] | None = None,
 ) -> bool:
-    state, lock = _current_simulation_state(sid)
-    if state is None:
-        return False
     normalized = normalize_recipe_patch(
         patch,
         source="recipes/load setpoints_patch",
     )
+    pending = {"setpoints_patch": copy.deepcopy(normalized)}
+    if isinstance(cost_parameters, Mapping):
+        pending["cost_parameters"] = copy.deepcopy(dict(cost_parameters))
+    with _simulations_guard:
+        state = _simulations.get(sid)
+        lock = _sim_locks.get(sid)
+        if state is not None or sid in _socket_client_ids:
+            _loaded_recipe_cost_parameters[sid] = pending
+    if state is None:
+        return False
     if lock is None:
         state["loaded_setpoints_patch"] = normalized
         state["setpoints_patch"] = normalized
+        if isinstance(cost_parameters, Mapping):
+            state["cost_parameters"] = copy.deepcopy(dict(cost_parameters))
+        else:
+            state.pop("cost_parameters", None)
         return True
     with lock:
         state["loaded_setpoints_patch"] = normalized
         state["setpoints_patch"] = normalized
+        if isinstance(cost_parameters, Mapping):
+            state["cost_parameters"] = copy.deepcopy(dict(cost_parameters))
+        else:
+            state.pop("cost_parameters", None)
     return True
+
+
+def _loaded_recipe_cost_parameters_for_start(
+    sid: str,
+    setpoints_patch: Mapping[str, object],
+) -> tuple[bool, dict[str, object] | None]:
+    with _simulations_guard:
+        pending = _loaded_recipe_cost_parameters.pop(sid, None)
+    if not isinstance(pending, Mapping):
+        return False, None
+    if pending.get("setpoints_patch") != dict(setpoints_patch):
+        return False, None
+    cost_parameters = pending.get("cost_parameters")
+    if not isinstance(cost_parameters, Mapping):
+        return True, None
+    return True, copy.deepcopy(dict(cost_parameters))
 
 
 def _record_last_recipe_capture(
@@ -659,6 +692,8 @@ def _disconnect_simulation_client(socketio, sid: str) -> None:
         finally:
             if _socket_client_ids.get(sid) == client_id:
                 _socket_client_ids.pop(sid, None)
+            with _simulations_guard:
+                _loaded_recipe_cost_parameters.pop(sid, None)
 
 
 def _ensure_global_run_capacity(replacement_sid: str | None) -> None:
@@ -2116,7 +2151,10 @@ def register_events(socketio):
             )
             raw_cost_parameters = data.get('cost_parameters')
             if raw_cost_parameters is None:
-                cost_parameters = default_cost_parameters_block()
+                _, cost_parameters = _loaded_recipe_cost_parameters_for_start(
+                    sid,
+                    setpoints_patch,
+                )
             elif not isinstance(raw_cost_parameters, Mapping):
                 raise InputValidationError('cost_parameters must be an object')
             else:
@@ -2320,8 +2358,9 @@ def register_events(socketio):
                 setpoints=setpoints,
                 runtime_campaign_overrides=runtime_campaign_overrides,
             ),
-            'cost_parameters': copy.deepcopy(cost_parameters),
         }
+        if isinstance(cost_parameters, Mapping):
+            initial_state['cost_parameters'] = copy.deepcopy(cost_parameters)
         if effective_config:
             initial_state['effective_config'] = effective_config
         cancelled_prior_run_id = None

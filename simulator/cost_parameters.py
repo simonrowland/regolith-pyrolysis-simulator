@@ -23,6 +23,9 @@ DEFAULT_COST_PARAMETERS_PATH = DEFAULT_DATA_DIR / "optimize_costs.yaml"
 DEFAULT_ELECTRICAL_COST_PER_KWH = 10.0
 DEFAULT_SOLAR_HEAT_COST_PER_KWH = 0.05
 ENERGY_COST_DEFAULT_SOURCE = "owner-t7-two-price-energy-v1"
+PAYLOAD_ABSENT_COST_PROVENANCE = (
+    "canonical defaults; payload carried no cost parameters"
+)
 SHUTTLE_REAGENT_SPECIES = frozenset({"Na", "K", "Mg", "Ca"})
 _REQUIRED_SCALAR_PARAMETERS = (
     "electricity_cost_per_kWh",
@@ -250,6 +253,8 @@ def canonical_energy_cost_block(
     values = cost_parameter_values(block)["parameters"]
     provenance = block.get("provenance")
     source = provenance.get("source") if isinstance(provenance, Mapping) else None
+    if payload is None:
+        source = PAYLOAD_ABSENT_COST_PROVENANCE
     return {
         "electrical_cost_per_kWh": values["electricity_cost_per_kWh"],
         "solar_heat_cost_per_kWh": values["solar_heat_cost_per_kWh"],

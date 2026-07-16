@@ -1167,15 +1167,17 @@ class PyrolysisRun:
             run_metadata["c3_na_hold_adjustment"] = _json_safe(
                 c3_na_hold_adjustment
             )
-        run_metadata["cost_rollup_diagnostic"] = _json_safe(
-            build_cost_rollup_diagnostic(
-                cost_ledger=sim.cost_ledger,
-                per_hour=execution.per_hour,
-                products_kg=sim.product_ledger(),
-                pumping_context=pumping_context_from_sim(sim, execution.snapshots),
-                snapshots=execution.snapshots,
-            )
+        cost_rollup_diagnostic = build_cost_rollup_diagnostic(
+            cost_ledger=sim.cost_ledger,
+            per_hour=execution.per_hour,
+            products_kg=sim.product_ledger(),
+            pumping_context=pumping_context_from_sim(sim, execution.snapshots),
+            snapshots=execution.snapshots,
         )
+        cost_rollup_diagnostic["price_basis"] = (
+            "legacy_placeholder_awaiting_owner_ratification"
+        )
+        run_metadata["cost_rollup_diagnostic"] = _json_safe(cost_rollup_diagnostic)
         sim.record.cost_rollup = dict(run_metadata["cost_rollup_diagnostic"])
 
         # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
@@ -1787,7 +1789,7 @@ def build_per_hour_summary(
     * ``T_C``: melt temperature in Celsius
     * ``P_total_bar``: total pressure above the melt in bar
     * ``pO2_bar``: pO2 partial pressure in bar
-    * ``p_non_O2_bar``: actual declared carrier partial pressure in bar, when present
+    * ``p_carrier_bar``: actual declared carrier partial pressure in bar, when present
     * ``carrier_identity``: canonical N2/Ar/CO2 carrier token, when present
     * ``mass_balance_pct``: ledger-based mass balance error, percent
     * ``O2_yield_kg_cumulative``: legacy serialized key for source-side
@@ -1980,7 +1982,7 @@ def _carrier_pressure_observables(
     # p_carrier[bar] = p_carrier[mbar] * 1e-3. P_total - pO2 is forbidden
     # because total pressure may also include vapor species or a control floor.
     return {
-        "p_non_O2_bar": partial_mbar * _MBAR_TO_BAR,
+        "p_carrier_bar": partial_mbar * _MBAR_TO_BAR,
         "carrier_identity": carrier,
     }
 

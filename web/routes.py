@@ -25,6 +25,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
+from simulator.cost_parameters import RECIPE_COST_PARAMETERS_KEY
 from simulator.campaigns import CampaignManager
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
@@ -77,6 +78,7 @@ from simulator.recipe_io import (
     RecipeIOError,
     load_recipe_patch,
     normalize_recipe_patch,
+    read_recipe_cost_parameters,
     read_recipe_metadata,
     recipe_library_path,
     write_recipe_patch,
@@ -3246,6 +3248,13 @@ def load_recipe():
         source = recipe_library_path(raw_name, library_dir=_recipe_library_dir())
         setpoints_patch = load_recipe_patch(source)
         metadata = read_recipe_metadata(source)
+        raw_document = yaml.safe_load(source.read_text(encoding='utf-8')) or {}
+        cost_parameters = (
+            read_recipe_cost_parameters(source)
+            if isinstance(raw_document, Mapping)
+            and RECIPE_COST_PARAMETERS_KEY in raw_document
+            else None
+        )
         controls = _recipe_controls_for_response(setpoints_patch, metadata)
         sid = str(payload.get('sid') or '').strip()
         applied_to_session = False
@@ -3254,6 +3263,7 @@ def load_recipe():
             applied_to_session = apply_loaded_recipe_patch_to_state(
                 sid,
                 setpoints_patch,
+                cost_parameters=cost_parameters,
             )
     except BadRequest as exc:
         return _json_error(exc.description, 400)
@@ -3261,14 +3271,17 @@ def load_recipe():
         return _json_error(str(exc), 400)
     title = metadata.get('title') or source.stem
     summary = _recipe_metadata_summary(metadata) if metadata else ''
-    return jsonify({
+    response = {
         'name': source.stem,
         'title': title,
         'summary': summary,
         'setpoints_patch': setpoints_patch,
         'controls': controls,
         'applied_to_session': applied_to_session,
-    })
+    }
+    if cost_parameters is not None:
+        response['cost_parameters'] = cost_parameters
+    return jsonify(response)
 
 
 @bp.route('/')

@@ -153,8 +153,8 @@ def test_per_hour_summary_emits_actual_carrier_partial_pressure(
     )
 
     assert summary["carrier_identity"] == carrier
-    assert summary["p_non_O2_bar"] == pytest.approx(0.0075)
-    assert summary["p_non_O2_bar"] != pytest.approx(
+    assert summary["p_carrier_bar"] == pytest.approx(0.0075)
+    assert summary["p_carrier_bar"] != pytest.approx(
         summary["P_total_bar"] - summary["pO2_bar"]
     )
 
@@ -180,7 +180,7 @@ def test_per_hour_summary_omits_carrier_pair_without_physical_carrier() -> None:
     )
 
     assert "carrier_identity" not in summary
-    assert "p_non_O2_bar" not in summary
+    assert "p_carrier_bar" not in summary
 
 
 VPR_P6A_TRACE_CONTROLS = {
@@ -273,7 +273,7 @@ PER_HOUR_KEYS = frozenset({
     "transport_formula_id",
 })
 PER_HOUR_OPTIONAL_KEYS = frozenset({
-    "p_non_O2_bar",
+    "p_carrier_bar",
     "carrier_identity",
     "pO2_enforcement",
     # Conditionally-emitted per-hour keys: present on a row only when the
