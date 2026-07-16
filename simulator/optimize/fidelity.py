@@ -21,7 +21,7 @@ from simulator.optimize.doe import (
     FIDELITY_CORRELATION_METRICS,
     FidelityCorrelationProtocol,
     FidelityCorrelationResult,
-    sample_recipe_patches,
+    sample_recipe_candidates,
 )
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -130,7 +130,7 @@ def run_fidelity_correlation(
     if n_total <= 0:
         raise ValueError("max_samples must be positive when provided")
 
-    patches = sample_recipe_patches(
+    sampled_candidates = sample_recipe_candidates(
         doe_spec.schema,
         n_samples=n_total,
         seed=doe_spec.seed,
@@ -145,7 +145,9 @@ def run_fidelity_correlation(
 
     fast_tasks: list[_FidelityTask] = []
     high_tasks: list[_FidelityTask] = []
-    for index, patch in enumerate(patches):
+    for index, sampled in enumerate(sampled_candidates):
+        patch = sampled.patch
+        candidate_kwargs = {**kwargs, "conditional_context": sampled.conditional_context}
         fast_id = f"fidelity-doe-{index:06d}-fast"
         high_id = f"fidelity-doe-{index:06d}-high"
         fast_tasks.append(
@@ -158,7 +160,7 @@ def run_fidelity_correlation(
                 fidelity=fast_fidelity_name,
                 profile=prof,
                 candidate_id=fast_id,
-                kwargs=kwargs,
+                kwargs=candidate_kwargs,
             )
         )
         high_tasks.append(
@@ -171,7 +173,7 @@ def run_fidelity_correlation(
                 fidelity=high_fidelity_name,
                 profile=prof,
                 candidate_id=high_id,
-                kwargs=kwargs,
+                kwargs=candidate_kwargs,
             )
         )
 

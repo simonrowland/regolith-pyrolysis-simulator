@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field, fields, replace
 from enum import Enum
 import hashlib
 from functools import lru_cache
@@ -56,6 +56,7 @@ from simulator.optimize.evalspec import (
     DEFAULT_VAPOR_PRESSURE_PROVIDER_ID,
     VAPOROCK_DIAGNOSTIC_PROVIDER_ID,
     EvalSpec,
+    PrefixEvalSpec,
     cache_key,
     current_code_version,
     feedstock_recipe_digest,
@@ -99,10 +100,15 @@ from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR,
     C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    C5_GUARD,
     C4_HOLD_TEMP_C_PATH,
+    ConditionalExecutionContext,
+    O2_BUBBLER_GUARD,
+    O2_BUBBLER_RATE_PATHS,
     RecipePatch,
     RecipeSchema,
     RecipeValidationError,
+    conditional_execution_context,
     _effective_o2_bubbler_allowlist_version,
 )
 from simulator.optimize.worker_runtime import get_worker_runtime
@@ -643,6 +649,7 @@ def evaluate(
     schema: RecipeSchema | None = None,
     worker_runtime: Any | None = None,
     cost_parameters: Mapping[str, Any] | None = None,
+    conditional_context: ConditionalExecutionContext | None = None,
 ) -> ScoredResult:
     """Run one recipe candidate and return its feasible-only score."""
 
@@ -669,6 +676,7 @@ def evaluate(
             active_schema,
             constraints=active_constraints,
             cost_parameters=cost_parameters,
+            conditional_context=conditional_context,
         )
     except ProfileValidationError as exc:
         if _is_stale_profile_refusal(exc):
@@ -2162,6 +2170,76 @@ def _build_eval_inputs(
     *,
     constraints: Any | None = None,
     cost_parameters: Mapping[str, Any] | None = None,
+    conditional_context: ConditionalExecutionContext | None = None,
+) -> tuple[EvalSpec, Any]:
+    return _build_eval_inputs_impl(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile,
+        schema,
+        constraints=constraints,
+        cost_parameters=cost_parameters,
+        conditional_context=conditional_context,
+        executed_prefix_stage_ids=None,
+    )
+
+
+def _build_prefix_eval_inputs(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    profile: Mapping[str, Any],
+    schema: RecipeSchema,
+    *,
+    prefix_stage_ids: Sequence[str],
+    prefix_recipe_ids: Sequence[str] = (),
+    topology_id: str = "PATH_AB",
+    constraints: Any | None = None,
+    cost_parameters: Mapping[str, Any] | None = None,
+    conditional_context: ConditionalExecutionContext,
+) -> tuple[PrefixEvalSpec, Any]:
+    executed = tuple(prefix_stage_ids)
+    if not executed:
+        raise EvaluationInputError("prefix evaluation requires executed stage IDs")
+    base_spec, run_config = _build_eval_inputs_impl(
+        patch,
+        feedstock_id,
+        fidelity,
+        profile,
+        schema,
+        constraints=constraints,
+        cost_parameters=cost_parameters,
+        conditional_context=conditional_context,
+        executed_prefix_stage_ids=executed,
+    )
+    recipe_ids = tuple(prefix_recipe_ids) or (base_spec.recipe_id,) * len(executed)
+    inherited = {
+        spec_field.name: getattr(base_spec, spec_field.name)
+        for spec_field in fields(EvalSpec)
+    }
+    return (
+        PrefixEvalSpec(
+            **inherited,
+            prefix_stage_ids=executed,
+            prefix_recipe_ids=recipe_ids,
+            topology_id=topology_id,
+        ),
+        run_config,
+    )
+
+
+def _build_eval_inputs_impl(
+    patch: RecipePatch,
+    feedstock_id: str,
+    fidelity: str,
+    profile: Mapping[str, Any],
+    schema: RecipeSchema,
+    *,
+    constraints: Any | None = None,
+    cost_parameters: Mapping[str, Any] | None = None,
+    conditional_context: ConditionalExecutionContext | None = None,
+    executed_prefix_stage_ids: tuple[str, ...] | None,
 ) -> tuple[EvalSpec, Any]:
     bundle = load_config_bundle(DEFAULT_DATA_DIR)
     if feedstock_id not in bundle.feedstocks:
@@ -2175,16 +2253,37 @@ def _build_eval_inputs(
         source="<profile>",
         schema=schema,
     )
-    feedstock = bundle.feedstocks[feedstock_id]
-    profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
-    profile_digest = _profile_digest(profile)
-    target_metadata = composition_target_eval_metadata(profile)
-    stop_at_stage0_exit = composition_targets_require_stage0_exit(profile)
     run_options = _thermal_scheduled_run_options(
         _run_options(profile, fidelity),
         profile=profile,
         constraints=constraints,
         setpoints=bundle.setpoints,
+    )
+    parent_values = _conditional_parent_values(run_options)
+    resolved = schema.resolve_conditional_patch(
+        patch,
+        defaults=bundle.setpoints,
+        effective_parent_values=parent_values,
+    )
+    if conditional_context is None:
+        patch = resolved.patch
+        conditional_context = resolved.conditional_context
+    else:
+        _validate_conditional_context(
+            schema,
+            patch,
+            conditional_context,
+            effective_parent_values=parent_values,
+            executed_prefix_stage_ids=executed_prefix_stage_ids,
+        )
+        patch = resolved.patch
+    feedstock = bundle.feedstocks[feedstock_id]
+    profile_id = str(profile.get("profile_id") or profile.get("id") or "inline-profile")
+    profile_digest = _profile_digest(profile)
+    target_metadata = composition_target_eval_metadata(profile)
+    stop_at_stage0_exit = composition_targets_require_stage0_exit(profile)
+    run_options = _run_options_with_conditional_pins(
+        run_options, conditional_context
     )
     run_options = _run_options_with_mre_voltage_cap(run_options, patch)
     c4_default_hold_temp_C = _c4_default_hold_temp_C(bundle.setpoints)
@@ -2286,6 +2385,11 @@ def _build_eval_inputs(
         ),
         allowlist_version=effective_allowlist_version,
         bounds_digest=schema.bounds_digest,
+        conditional_subspace_digest=(
+            conditional_context.conditional_subspace_digest
+            if conditional_context is not None
+            else ""
+        ),
         feedstock_recipe_digest=feedstock_recipe_digest(feedstock),
         feedstock_id=feedstock_id,
         profile_id=profile_id,
@@ -2348,6 +2452,150 @@ def _run_options_with_mre_voltage_cap(
     return MappingProxyType(merged)
 
 
+def _validate_conditional_context(
+    schema: RecipeSchema,
+    patch: RecipePatch,
+    context: ConditionalExecutionContext,
+    *,
+    effective_parent_values: Mapping[Any, Any],
+    executed_prefix_stage_ids: tuple[str, ...] | None,
+) -> None:
+    if not isinstance(context, ConditionalExecutionContext):
+        raise EvaluationInputError("conditional_context must be immutable context data")
+    prefix_scope = context.scope == "prefix-before-guard-stage"
+    if prefix_scope:
+        if executed_prefix_stage_ids is None:
+            raise EvaluationInputError(
+                "prefix conditional context cannot enter full evaluation or cache identity"
+            )
+        if context.prefix_stage_ids != executed_prefix_stage_ids:
+            raise EvaluationInputError(
+                "conditional prefix stage IDs do not match executed stage set"
+            )
+    elif executed_prefix_stage_ids is not None:
+        raise EvaluationInputError("prefix evaluation requires prefix conditional context")
+    raw_states = dict(context.conditional_mask)
+    if len(raw_states) != len(context.conditional_mask):
+        raise EvaluationInputError("conditional_mask contains duplicate guard IDs")
+    allowed_guard_ids = {
+        C5_GUARD.canonicalizer_id,
+        O2_BUBBLER_GUARD.canonicalizer_id,
+    }
+    if set(raw_states).difference(allowed_guard_ids):
+        raise EvaluationInputError("conditional_mask contains unknown guard ID")
+    if any(state not in {"active", "inactive"} for state in raw_states.values()):
+        raise EvaluationInputError("conditional_mask contains invalid guard state")
+
+    touched_guard_ids = set(raw_states)
+    if C5_ALLOW_MRE_VOLTAGE_CAP_PATH in patch.values or any(
+        spec.guard == C5_GUARD and spec.path in patch.values
+        for spec in schema.allowlist
+    ):
+        touched_guard_ids.add(C5_GUARD.canonicalizer_id)
+    if any(path in patch.values for path in O2_BUBBLER_RATE_PATHS) or any(
+        spec.guard == O2_BUBBLER_GUARD and spec.path in patch.values
+        for spec in schema.allowlist
+    ):
+        touched_guard_ids.add(O2_BUBBLER_GUARD.canonicalizer_id)
+
+    expected_states: dict[str, bool] = {}
+    if prefix_scope and C5_GUARD.canonicalizer_id in touched_guard_ids:
+        expected_states[C5_GUARD.canonicalizer_id] = (
+            raw_states[C5_GUARD.canonicalizer_id] == "active"
+        )
+    if C5_GUARD.canonicalizer_id in touched_guard_ids:
+        if not prefix_scope:
+            cap = _canonical_mre_voltage_cap(
+                patch.values.get(
+                    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+                    effective_parent_values.get(C5_ALLOW_MRE_VOLTAGE_CAP_PATH, 0.0),
+                )
+            )
+            expected_states[C5_GUARD.canonicalizer_id] = cap > 0.0
+    if O2_BUBBLER_GUARD.canonicalizer_id in touched_guard_ids:
+        expected_states[O2_BUBBLER_GUARD.canonicalizer_id] = any(
+            float(
+                patch.values.get(path, effective_parent_values.get(path, 0.0))
+                or 0.0
+            )
+            > 0.0
+            for path in O2_BUBBLER_RATE_PATHS
+        )
+    supplied_states = {
+        guard_id: state == "active" for guard_id, state in raw_states.items()
+    }
+    if supplied_states != expected_states:
+        raise EvaluationInputError("conditional_mask does not match resolved patch")
+
+    expected_pins = (
+        {C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0}
+        if expected_states.get(C5_GUARD.canonicalizer_id) is False
+        else {}
+    )
+    if dict(context.effective_pins) != expected_pins:
+        raise EvaluationInputError("conditional effective pins do not match resolved patch")
+    expected = conditional_execution_context(
+        schema,
+        states=expected_states,
+        effective_pins=expected_pins,
+    )
+    if expected.conditional_subspace_digest != context.conditional_subspace_digest:
+        raise EvaluationInputError("conditional_subspace_digest mismatch")
+    c5_active = expected_states.get(C5_GUARD.canonicalizer_id)
+    if c5_active is False and not prefix_scope:
+        if C5_ALLOW_MRE_VOLTAGE_CAP_PATH in patch.values:
+            raise EvaluationInputError("inactive C5 subspace patch contains its parent")
+        for spec in schema.allowlist:
+            if spec.guard == C5_GUARD and spec.path in patch.values:
+                raise EvaluationInputError("inactive C5 subspace patch contains guarded child")
+        if float(context.effective_pins.get(C5_ALLOW_MRE_VOLTAGE_CAP_PATH, -1.0)) != 0.0:
+            raise EvaluationInputError("inactive C5 subspace requires zero effective pin")
+    elif c5_active is True and not prefix_scope:
+        cap = _canonical_mre_voltage_cap(
+            patch.values.get(C5_ALLOW_MRE_VOLTAGE_CAP_PATH, 0.0)
+        )
+        if cap <= 0.0:
+            raise EvaluationInputError("active C5 subspace requires positive effective cap")
+
+
+def _run_options_with_conditional_pins(
+    run_options: Mapping[str, Any],
+    context: ConditionalExecutionContext | None,
+) -> Mapping[str, Any]:
+    if context is None or not context.effective_pins:
+        return run_options
+    unknown = set(context.effective_pins).difference({C5_ALLOW_MRE_VOLTAGE_CAP_PATH})
+    if unknown:
+        raise EvaluationInputError("unsupported conditional effective pin")
+    if C5_ALLOW_MRE_VOLTAGE_CAP_PATH not in context.effective_pins:
+        return run_options
+    cap = _canonical_mre_voltage_cap(
+        context.effective_pins[C5_ALLOW_MRE_VOLTAGE_CAP_PATH]
+    )
+    merged = dict(run_options)
+    merged["c5_enabled"] = cap > 0.0
+    merged["mre_max_voltage_V"] = cap
+    merged["mre_target_species"] = ""
+    return MappingProxyType(merged)
+
+
+def _conditional_parent_values(run_options: Mapping[str, Any]) -> Mapping[Any, Any]:
+    values: dict[Any, Any] = {
+        C5_ALLOW_MRE_VOLTAGE_CAP_PATH: (
+            float(run_options.get("mre_max_voltage_V", 0.0) or 0.0)
+            if bool(run_options.get("c5_enabled", False))
+            else 0.0
+        )
+    }
+    overrides = run_options.get("runtime_campaign_overrides", {})
+    if isinstance(overrides, MappingABC):
+        for path in O2_BUBBLER_RATE_PATHS:
+            campaign = overrides.get(path[1], {})
+            if isinstance(campaign, MappingABC) and path[-1] in campaign:
+                values[path] = campaign[path[-1]]
+    return MappingProxyType(values)
+
+
 def _canonical_mre_voltage_cap(cap: float) -> float:
     """Canonicalize the C5 MRE voltage cap to its behavioral equivalent.
 
@@ -2401,7 +2649,7 @@ def _run_options_with_c4_hold_temp(
         abs_tol=1e-12,
     ):
         raise EvaluationInputError(
-            "campaigns.C4.hold_temp_C conflicts with "
+            "campaigns.C4.default_hold_T_C conflicts with "
             "runtime_campaign_overrides['C4'].hold_temp_C"
         )
     c4_overrides["hold_temp_C"] = hold_temp

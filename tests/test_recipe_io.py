@@ -101,6 +101,17 @@ def test_malformed_recipe_fails_loud(tmp_path: Path) -> None:
         load_recipe_patch(recipe_path)
 
 
+def test_t155_recipe_io_refuses_unresolved_guarded_child(tmp_path: Path) -> None:
+    recipe_path = tmp_path / "unresolved-c5-child.recipe.yaml"
+    recipe_path.write_text(
+        "campaigns:\n  C5:\n    target_delta_below_ceiling_C: 10.0\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(RecipeIOError, match="conditional guard parent unresolved"):
+        load_recipe_patch(recipe_path)
+
+
 def test_metadata_recipe_loads_patch_unchanged(tmp_path: Path) -> None:
     base_patch = load_recipe_patch(RECIPE_DIR / "c2a_staged_temperature_ladder.yaml")
     recipe_path = tmp_path / "metadata.recipe.yaml"

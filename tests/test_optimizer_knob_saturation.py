@@ -21,8 +21,8 @@ DEGENERATE = ("test", "degenerate")
 MISSING_BOUNDS = ("test", "missing_bounds")
 NONFINITE = ("test", "nonfinite")
 CATEGORICAL = ("test", "mode")
-DURATION = ("campaigns", "C0b_p_cleanup", "duration_h")
-C3_DURATION_AFTER_PATHA = ("campaigns", "C3", "duration_after_pathA_h")
+DURATION = ("campaigns", "C0b_p_cleanup", "duration_hr")
+C3_DURATION_AFTER_PATHA = ("campaigns", "C3", "duration_after_pathA_hr")
 VOLTAGE = ("campaigns", "C5", "allow_mre_voltage_cap_V")
 TEMP_RANGE = ("campaigns", "C0", "temp_range_C")
 C2A_STAGED_DURATION = (
@@ -30,7 +30,7 @@ C2A_STAGED_DURATION = (
     "C2A_staged",
     "stages",
     "alkali_early_fe",
-    "duration_h",
+    "duration_hr",
 )
 
 PROFILE = {
@@ -159,7 +159,7 @@ def test_c2a_staged_path_maps_to_dotted_key_and_duration_cost() -> None:
 
     row = _row(
         report,
-        "campaigns.C2A_staged.stages.alkali_early_fe.duration_h",
+        "campaigns.C2A_staged.stages.alkali_early_fe.duration_hr",
     )
     assert row["kind"] == "int"
     assert row["pinned"] == "high"
@@ -182,7 +182,7 @@ def test_no_cost_pinned_red_flags_but_costed_duration_and_voltage_do_not() -> No
         schema,
         active_objective_metrics=("total_hours",),
     )
-    duration_row = _row(duration_costed, "campaigns.C0b_p_cleanup.duration_h")
+    duration_row = _row(duration_costed, "campaigns.C0b_p_cleanup.duration_hr")
     assert duration_row["has_opposing_cost"] is True
     assert duration_row["opposing_cost_metrics"] == ["total_hours"]
     assert duration_costed["red_flag"] is False
@@ -198,7 +198,7 @@ def test_no_cost_pinned_red_flags_but_costed_duration_and_voltage_do_not() -> No
         schema,
         active_objective_metrics=("total_hours",),
     )
-    c3_duration_row = _row(c3_duration_costed, "campaigns.C3.duration_after_pathA_h")
+    c3_duration_row = _row(c3_duration_costed, "campaigns.C3.duration_after_pathA_hr")
     assert c3_duration_row["has_opposing_cost"] is True
     assert c3_duration_row["opposing_cost_metrics"] == ["total_hours"]
     assert c3_duration_costed["red_flag"] is False

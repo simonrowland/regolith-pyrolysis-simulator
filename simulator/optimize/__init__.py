@@ -36,6 +36,8 @@ from simulator.optimize.doe import (
     FidelityCorrelationResult,
     active_sampler_name,
     sample_recipe_patch_at_index,
+    sample_recipe_candidate_at_index,
+    sample_recipe_candidates,
     sample_recipe_patches,
 )
 from simulator.optimize.physics import (
@@ -196,6 +198,8 @@ __all__ = [
     "pin_worker_env",
     "recipe_schema_version",
     "sample_recipe_patch_at_index",
+    "sample_recipe_candidate_at_index",
+    "sample_recipe_candidates",
     "sample_recipe_patches",
     "ThresholdSpec",
     "evaluate_batch",

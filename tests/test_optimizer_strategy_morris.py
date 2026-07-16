@@ -162,14 +162,19 @@ def test_morris_groups_partition_allowlist_and_residual_group_when_needed() -> N
     assert seen == allowlist
 
     groups = _group_by_name(strategy)
-    assert ("campaigns", "C4", "temp_range_C") in groups["thermo"].paths
+    assert ("campaigns", "C4", "default_hold_T_C") in groups["thermo"].paths
     assert (
         "campaigns",
         "C2A_continuous",
         "dT_dt_C_per_hr",
         "early_ramp_1050_1320C",
     ) in groups["schedule"].paths
-    assert ("campaigns", "C3", "K_phase", "pO2_bakeout_mbar") in groups["chemistry"].paths
+    assert (
+        "campaigns",
+        "C2A_staged",
+        "na_shuttle_stage",
+        "duration_hr",
+    ) in groups["chemistry"].paths
 
     residual_spec = KnobSpec(
         path=("campaigns", "custom", "stir_factor"),
