@@ -1123,8 +1123,9 @@ def test_runner_golden_fixture_matches(scenario):
     _assert_mass_balance_bound(actual)
     assert actual == expected, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
-        "regenerate via `python -m simulator.runner --output=tests/fixtures/"
-        f"runner/{scenario['fixture']}` if the change is intentional."
+        "regenerate all canonical scenarios via "
+        "`python3 scripts/regenerate_runner_goldens.py` if the change is "
+        "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
 
 

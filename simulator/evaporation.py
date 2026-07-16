@@ -125,6 +125,7 @@ class EvaporationMixin:
         equilibrium,
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
+        overhead_partials_override_Pa: Mapping[str, float] | None = None,
     ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
@@ -234,97 +235,40 @@ class EvaporationMixin:
             )
         )
 
-        (
-            molar_masses_kg_mol,
-            stoich_by_species,
-            available_oxide_kg,
-        ) = self._build_evaporation_aux_maps(vapor_pressures)
-
         # Overhead backpressure (Pa)                       [LOOP-1]
         # Uses the previous hour's overhead partial pressures as
         # backpressure. Gas pO2 has already been applied once upstream in
         # the equilibrium vapor pressures consumed here.
-        overhead_partials_Pa = {
-            species: self.overhead.composition.get(species, 0.0) * 100.0
-            for species in vapor_pressures
-        }
+        overhead_partials_Pa = (
+            {
+                str(species): max(0.0, float(value))
+                for species, value in overhead_partials_override_Pa.items()
+            }
+            if overhead_partials_override_Pa is not None
+            else {
+                species: self.overhead.composition.get(species, 0.0) * 100.0
+                for species in vapor_pressures
+            }
+        )
+        for species in vapor_pressures:
+            overhead_partials_Pa.setdefault(species, 0.0)
 
         # F-B1: EVAPORATION_FLUX is read-only -- no commit_batch follows.
         # The dispatch-only helper centralises melt-derived T/P plumbing
         # so this call site stays in lock-step with the rest of the
         # simulator's kernel callers.
-        kernel_config = dict(
-            getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
-        )
-        series_resistance_config = dict(
-            kernel_config.get('evaporation_series_resistance', {}) or {}
-        )
-        carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
-        carrier_gas = (
-            carrier_resolver()
-            if callable(carrier_resolver)
-            else 'N2'
-        )
-        gas_temperature_K = float(
-            getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
+        control_inputs, molar_masses_kg_mol = (
+            self._evaporation_flux_control_inputs(
+            equilibrium,
+            overhead_partials_Pa=overhead_partials_Pa,
+            overhead_pressure_pa=self._evaporation_overhead_total_pressure_Pa(
+                overhead_partials_Pa
+            ),
+            )
         )
         kernel_result = self._dispatch_only(
             ChemistryIntent.EVAPORATION_FLUX,
-            control_inputs={
-                'vapor_pressures_Pa': vapor_pressures,
-                'vapor_pressures_source': dict(
-                    getattr(equilibrium, 'vapor_pressures_source', {}) or {}
-                ),
-                'vapor_pressure_numerator_provenance': dict(
-                    vapor_pressure_diagnostic.get(
-                        'vapor_pressure_numerator_provenance'
-                    )
-                    or {}
-                ),
-                'vapor_pressure_activities': dict(
-                    getattr(equilibrium, 'activity_coefficients', {}) or {}
-                ),
-                'pO2_bar': vapor_pressure_diagnostic.get('pO2_bar'),
-                'overhead_partials_Pa': overhead_partials_Pa,
-                'molar_mass_kg_mol': molar_masses_kg_mol,
-                'stoich_by_species': stoich_by_species,
-                'available_oxide_kg': available_oxide_kg,
-                'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
-                'stir_factor': {
-                    'axial': clamp_stir_factor(self.melt.stir_state.axial),
-                    'radial': clamp_stir_factor(self.melt.stir_state.radial),
-                },
-                'pipe_diameter_m': float(
-                    getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
-                ),
-                'overhead_pressure_pa': float(
-                    getattr(self.overhead, 'pressure_mbar', 0.0) or 0.0
-                ) * 100.0,
-                'gas_temperature_K': gas_temperature_K,
-                'carrier_gas': carrier_gas,
-                'evaporation_series_resistance': series_resistance_config,
-                'alpha': _load_evaporation_alpha_by_species(
-                    self.vapor_pressures
-                ),
-                'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
-                    self.vapor_pressures
-                ),
-                'allow_unmeasured_alpha_fallback': bool(
-                    kernel_config.get('allow_unmeasured_alpha_fallback', False)
-                ),
-                **(
-                    {
-                        'unmeasured_alpha_fallback_species': tuple(
-                            kernel_config[
-                                'unmeasured_alpha_fallback_species'
-                            ]
-                            or ()
-                        )
-                    }
-                    if 'unmeasured_alpha_fallback_species' in kernel_config
-                    else {}
-                ),
-            },
+            control_inputs=control_inputs,
         )
         diagnostic = dict(kernel_result.diagnostic or {})
         self._last_evaporation_flux_diagnostic = diagnostic
@@ -1415,6 +1359,23 @@ class EvaporationMixin:
 
         return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
 
+    def _evaporation_overhead_total_pressure_Pa(
+        self,
+        overhead_partials_Pa: Mapping[str, float],
+    ) -> float:
+        partial_sum_Pa = sum(
+            max(0.0, float(value))
+            for value in overhead_partials_Pa.values()
+        )
+        control_floor_Pa = max(
+            0.0,
+            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,
+            float(
+                getattr(self.overhead, 'pressure_mbar', 0.0) or 0.0
+            ) * 100.0,
+        )
+        return max(partial_sum_Pa, control_floor_Pa)
+
     def _evaporation_flux_control_inputs(
         self,
         equilibrium: Any,
@@ -1489,6 +1450,51 @@ class EvaporationMixin:
             )
         return controls, molar_masses_kg_mol
 
+    def _project_evaporation_overhead_source_mol_hr(
+        self,
+        rates_kg_hr: Mapping[str, float],
+        stoich_by_species: Mapping[str, Mapping[str, Any]],
+    ) -> dict[str, float]:
+        source_mol_hr: dict[str, float] = {}
+        o2_molar_mass = resolve_species_formula(
+            'O2', self.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        for species, raw_rate in rates_kg_hr.items():
+            rate_kg_hr = max(0.0, float(raw_rate))
+            if rate_kg_hr <= 0.0:
+                continue
+            formula = resolve_species_formula(
+                species, self.species_formula_registry
+            )
+            source_mol_hr[species] = (
+                source_mol_hr.get(species, 0.0)
+                + rate_kg_hr / formula.molar_mass_kg_per_mol()
+            )
+            stoich = dict(stoich_by_species.get(species) or {})
+            if not stoich:
+                sp_data = dict(
+                    (self.vapor_pressures.get('metals', {}) or {}).get(
+                        species, {}
+                    )
+                    or (self.vapor_pressures.get('oxide_vapors', {}) or {}).get(
+                        species, {}
+                    )
+                )
+                if sp_data:
+                    stoich = dict(self._evaporation_stoich(species, sp_data))
+            o2_kg_hr = rate_kg_hr * float(
+                stoich.get('O2_per_product_kg') or 0.0
+            )
+            vapor_oxygen_atoms = float(
+                formula.elements.get('O', 0.0) or 0.0
+            )
+            if o2_kg_hr < 0.0 or vapor_oxygen_atoms > 0.0:
+                source_mol_hr['O2'] = (
+                    source_mol_hr.get('O2', 0.0)
+                    + o2_kg_hr / o2_molar_mass
+                )
+        return source_mol_hr
+
     def _apply_analytic_evaporation_depletion(
         self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
     ) -> EvaporationFlux:
@@ -1498,16 +1504,46 @@ class EvaporationMixin:
 
         phase_scalar = self._record_phase_context_diagnostic(
             'evaporation_depletion', scalar_liquid_fraction=1.0)
+        effective_rates = self._analytic_evaporation_depletion_rates(
+            evap_flux.species_kg_hr,
+            dt_hr=dt_hr,
+            phase_scalar=phase_scalar,
+            cleaned_melt_kg=self.atom_ledger.kg_by_account(
+                'process.cleaned_melt'
+            ),
+            available_o2_kg=float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    'O2', 0.0
+                )
+            ),
+        )
+        smoothed = EvaporationFlux(species_kg_hr=effective_rates)
+        smoothed.update_totals()
+        return smoothed
+
+    def _analytic_evaporation_depletion_rates(
+        self,
+        raw_rates_kg_hr: Mapping[str, float],
+        *,
+        dt_hr: float,
+        phase_scalar: float,
+        cleaned_melt_kg: Mapping[str, float],
+        available_o2_kg: float,
+    ) -> dict[str, float]:
+        """Pure frozen-inventory transform from raw HK rates to actual rates."""
+        if dt_hr <= 0.0 or not raw_rates_kg_hr:
+            return {
+                str(species): max(0.0, float(rate))
+                for species, rate in raw_rates_kg_hr.items()
+            }
 
         metals_data = self.vapor_pressures.get('metals', {}) or {}
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
-        cleaned_melt_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt')
         parent_groups: dict[str, list[dict]] = defaultdict(list)
 
-        for species in sorted(evap_flux.species_kg_hr):
+        for species in sorted(raw_rates_kg_hr):
             raw_rate_kg_hr = (
-                float(evap_flux.species_kg_hr.get(species, 0.0))
+                float(raw_rates_kg_hr.get(species, 0.0))
                 * phase_scalar
             )
             if raw_rate_kg_hr <= 1e-12:
@@ -1553,19 +1589,6 @@ class EvaporationMixin:
                 if product_kg > 1e-12:
                     effective_rates[entry['species']] = product_kg / dt_hr
 
-        self._apply_shared_o2_reactant_depletion(
-            effective_rates, parent_groups, dt_hr)
-
-        smoothed = EvaporationFlux(species_kg_hr=effective_rates)
-        smoothed.update_totals()
-        return smoothed
-
-    def _apply_shared_o2_reactant_depletion(
-        self,
-        effective_rates: dict[str, float],
-        parent_groups: dict[str, list[dict]],
-        dt_hr: float,
-    ) -> None:
         o2_draws: list[tuple[str, float]] = []
         for parent_oxide in sorted(parent_groups):
             for entry in parent_groups[parent_oxide]:
@@ -1578,14 +1601,12 @@ class EvaporationMixin:
                         (species, rate_kg_hr * abs(O2_per_product_kg)))
         total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
         if total_o2_draw_kg_hr <= 1e-12:
-            return
+            return effective_rates
 
-        available_o2_kg = self.atom_ledger.kg_by_account(
-            'process.overhead_gas').get('O2', 0.0)
         if available_o2_kg <= 1e-12:
             for species, _draw in o2_draws:
                 effective_rates.pop(species, None)
-            return
+            return effective_rates
 
         max_fraction = math.nextafter(1.0, 0.0)
         k_hr = total_o2_draw_kg_hr / float(available_o2_kg)
@@ -1608,6 +1629,7 @@ class EvaporationMixin:
                 effective_rates.pop(species, None)
             else:
                 effective_rates[species] = min(current_rate, allowed_rate)
+        return effective_rates
 
     def _route_to_condensation(self, evap_flux: EvaporationFlux):
         """

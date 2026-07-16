@@ -405,8 +405,10 @@ def test_cold_train_assumptions_are_closed_classed_ranged_and_provenanced() -> N
     payload = yaml.safe_load(Path("data/thermal_train_params.yaml").read_text())
     assert payload["schema_version"] == "thermal-train-v2"
     cold_train = payload["cold_train"]
-    assert set(cold_train) == {"rating", "orifice", "relief", "cycle", "endpoint"}
-    entries = [cold_train["endpoint"]]
+    assert set(cold_train) == {
+        "runtime_enforcement", "rating", "orifice", "relief", "cycle", "endpoint",
+    }
+    entries = [cold_train["runtime_enforcement"], cold_train["endpoint"]]
     for section in ("rating", "orifice", "relief", "cycle"):
         entries.extend(cold_train[section].values())
     for entry in entries:

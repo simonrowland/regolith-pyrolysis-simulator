@@ -10,15 +10,21 @@ import pytest
 import yaml
 
 import simulator.capacity_coupling as capacity_coupling
+from engines.builtin.overhead_bleed import (
+    compressible_pressure_capacity_fraction,
+)
+from simulator.accounting import resolve_species_formula
 from simulator.capacity_coupling import (
+    CapacityCouplingRefusalError,
     CapacityShadowRefusal,
     CapacityShadowResult,
     combined_saturation,
     partition_melt_oxygen,
     solve_capacity_shadow,
 )
+from simulator.core import PyrolysisSimulator
 from simulator.physical_constants import GAS_CONSTANT
-from simulator.state import CampaignPhase
+from simulator.state import CampaignPhase, EvaporationFlux
 from simulator.thermal_train import (
     FiniteCapacity,
     NoColdTrain,
@@ -83,8 +89,9 @@ def _o2_fixture(dt_hr: float = 1.0, *, max_iterations: int = 50):
         dt_hr=dt_hr,
         bleed_conductance_kg_s=1.0,
         downstream_pressure_Pa=0.0,
-        k_relief_kg_hr_Pa=0.0,
+        k_relief_kg_hr_Pa=1.0e-30,
         p_open_Pa=1.0e9,
+        vessel_rating_Pa=1.0e12,
         max_iterations=max_iterations,
     )
     slope = source_slope_kg_hr_pa * dt_hr / M_O2 * 1000.0
@@ -147,8 +154,9 @@ def test_two_species_binding_fixture_preserves_non_o2_head_partition(dt_hr):
         dt_hr=dt_hr,
         bleed_conductance_kg_s=1.0,
         downstream_pressure_Pa=0.0,
-        k_relief_kg_hr_Pa=0.0,
+        k_relief_kg_hr_Pa=1.0e-30,
         p_open_Pa=1.0e9,
+        vessel_rating_Pa=1.0e12,
     )
 
     assert isinstance(result, CapacityShadowResult)
@@ -207,6 +215,77 @@ def test_relief_is_capped_by_post_admission_remainder():
     assert partition.debited_mol == pytest.approx(10.0)
 
 
+def test_relief_is_additional_to_zero_conductance_and_avoids_vessel_refusal():
+    result = solve_capacity_shadow(
+        pre_holdup_mol={"O2": 10.0},
+        molar_mass_kg_mol={"O2": M_O2},
+        flux_kg_hr_at_partials=lambda _partials: {},
+        capacity=FiniteCapacity(M_O2),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=T_FOR_1000_PA_PER_MOL,
+        volume_m3=1.0,
+        dt_hr=1.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=0.0,
+        k_relief_kg_hr_Pa=M_O2 * 5.0e-4,
+        p_open_Pa=9000.0,
+        vessel_rating_Pa=9800.0,
+    )
+
+    assert isinstance(result, CapacityShadowResult)
+    assert result.bled_species_mol["O2"] == pytest.approx(
+        result.oxygen.relieved_mol
+    )
+    assert result.oxygen.external_mol == 0.0
+    assert result.oxygen.admitted_mol == 0.0
+    assert result.oxygen.relieved_mol > 0.0
+    assert result.partial_pressures_Pa["O2"] < 9800.0
+    assert result.mass_closure_error_pct <= 5.0e-12
+
+
+def test_picard_source_uses_frozen_inventory_depletion_vector():
+    sim = _real_capacity_sim()
+    raw = EvaporationFlux(species_kg_hr={"Fe": 1000.0})
+    raw.update_totals()
+    frozen_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    effective_rates = sim._analytic_evaporation_depletion_rates(
+        raw.species_kg_hr,
+        dt_hr=1.0,
+        phase_scalar=1.0,
+        cleaned_melt_kg=frozen_melt,
+        available_o2_kg=0.0,
+    )
+    live_effective = sim._apply_analytic_evaporation_depletion(raw)
+
+    assert 0.0 < effective_rates["Fe"] < raw.species_kg_hr["Fe"]
+    assert live_effective.species_kg_hr == pytest.approx(effective_rates)
+
+    fe_molar_mass = resolve_species_formula(
+        "Fe", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    result = solve_capacity_shadow(
+        pre_holdup_mol={},
+        molar_mass_kg_mol={"Fe": fe_molar_mass},
+        flux_kg_hr_at_partials=lambda _partials: dict(effective_rates),
+        capacity=FiniteCapacity(1.0),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=T_FOR_1000_PA_PER_MOL,
+        volume_m3=1.0,
+        dt_hr=1.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=0.0,
+        k_relief_kg_hr_Pa=1.0e-30,
+        p_open_Pa=1.0e9,
+        vessel_rating_Pa=1.0e12,
+    )
+
+    assert isinstance(result, CapacityShadowResult)
+    assert result.evaporation_flux_kg_hr == pytest.approx(effective_rates)
+    assert result.mass_closure_error_pct <= 5.0e-12
+
+
 def test_non_convergent_picard_returns_typed_refusal_without_last_iterate():
     result, _ = _o2_fixture(max_iterations=1)
 
@@ -222,6 +301,14 @@ def test_core_refusal_leaves_record_and_ledger_close_report_unchanged(
 ):
     sim = _real_capacity_sim()
     sim.start_campaign(CampaignPhase.C0)
+    payload = _load_yaml("thermal_train_params.yaml")
+    payload["cold_train"]["runtime_enforcement"]["value"] = True
+    cold_train = thermal_train_parameters_from_mapping(payload).cold_train
+    monkeypatch.setattr(
+        sim,
+        "_cold_train_capacity_policy",
+        lambda: (capacity_from_hardware(cold_train), cold_train),
+    )
     equilibrium = sim._get_equilibrium()
     record_before = _canonical_bytes(asdict(sim.record))
     ledger_before = _canonical_bytes(sim.atom_ledger.close_report())
@@ -242,11 +329,20 @@ def test_core_refusal_leaves_record_and_ledger_close_report_unchanged(
     assert _canonical_bytes(sim.atom_ledger.close_report()) == ledger_before
 
 
-def test_real_finite_capacity_shadow_is_observational_for_short_session():
+def test_real_finite_capacity_result_drives_live_short_session_once(monkeypatch):
     active = _real_capacity_sim()
-    bypassed = _real_capacity_sim()
-    for sim in (active, bypassed):
-        sim.start_campaign(CampaignPhase.C0)
+    active.start_campaign(CampaignPhase.C0)
+    _capacity, cold_train = active._cold_train_capacity_policy()
+    monkeypatch.setattr(
+        active,
+        "_cold_train_capacity_policy",
+        lambda: (FiniteCapacity(1.0e-8), cold_train),
+    )
+    active.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 1.0e-4},
+        source="binding capacity integration fixture",
+    )
 
     capacity = capacity_from_hardware(
         thermal_train_parameters_from_mapping().cold_train
@@ -262,19 +358,150 @@ def test_real_finite_capacity_shadow_is_observational_for_short_session():
         return result
 
     active._compute_capacity_coupling_shadow = observed_shadow
-    bypassed._compute_capacity_coupling_shadow = lambda _equilibrium: None
-
     active.step()
-    bypassed.step()
 
     assert len(shadow_results) == 1
     assert isinstance(shadow_results[0], CapacityShadowResult)
-    assert _canonical_bytes(asdict(active.record)) == _canonical_bytes(
-        asdict(bypassed.record)
+    assert sum(
+        transition.reason == "overhead_bleed"
+        for transition in active.atom_ledger.transitions
+    ) == 1
+    assert shadow_results[0].mass_closure_error_pct <= 5.0e-12
+
+
+def test_default_runtime_policy_is_no_cold_train():
+    sim = _real_capacity_sim()
+
+    capacity, cold_train = sim._cold_train_capacity_policy()
+
+    assert isinstance(capacity, NoColdTrain)
+    assert capacity.reason == "runtime_enforcement_disabled"
+    assert cold_train.runtime_enforcement is False
+
+
+def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    sim.melt.temperature_C = 1600.0
+    monkeypatch.setattr(
+        sim,
+        "_compute_capacity_coupling_shadow",
+        lambda _equilibrium: (_ for _ in ()).throw(
+            AssertionError("default-off live path must not compute capacity")
+        ),
     )
-    assert _canonical_bytes(
-        active.atom_ledger.close_report()
-    ) == _canonical_bytes(bypassed.atom_ledger.close_report())
+
+    snapshot = sim.step()
+
+    assert (
+        snapshot.hour,
+        snapshot.temperature_C,
+        snapshot.evap_flux.total_kg_hr,
+        snapshot.overhead.transport_saturation_pct,
+        snapshot.melt_mass_kg,
+    ) == pytest.approx(
+        (
+            1,
+            1550.0,
+            0.7799707694183491,
+            340624.79385921155,
+            999.2170011044715,
+        ),
+        rel=1.0e-12,
+        abs=1.0e-12,
+    )
+    assert len(sim.atom_ledger.transitions) == 19
+    assert tuple(
+        transition.reason for transition in sim.atom_ledger.transitions[-5:]
+    ) == (
+        "evaporate_Cr",
+        "condense_Cr",
+        "evaporate_Mn",
+        "fe_redox_respeciation",
+        "overhead_bleed",
+    )
+    assert snapshot.mass_balance_error_pct <= 5.0e-12
+
+    payload = _load_yaml("thermal_train_params.yaml")
+    payload["cold_train"]["runtime_enforcement"]["value"] = True
+    params = thermal_train_parameters_from_mapping(payload)
+    monkeypatch.setattr(
+        "simulator.thermal_train.thermal_train_parameters_from_mapping",
+        lambda: params,
+    )
+    enforced = _real_capacity_sim()
+    enforced.start_campaign(CampaignPhase.C0)
+    enforced.melt.temperature_C = 1600.0
+    calls = []
+
+    def finite_capacity_engaged(_equilibrium):
+        calls.append(True)
+        return CapacityShadowRefusal("finite_capacity_engaged", 0)
+
+    monkeypatch.setattr(
+        enforced,
+        "_compute_capacity_coupling_shadow",
+        finite_capacity_engaged,
+    )
+    with pytest.raises(CapacityCouplingRefusalError, match="finite_capacity_engaged"):
+        enforced.step()
+    assert calls == [True]
+
+
+def test_explicit_runtime_enforcement_uses_configured_finite_capacity(monkeypatch):
+    payload = _load_yaml("thermal_train_params.yaml")
+    payload["cold_train"]["runtime_enforcement"]["value"] = True
+    params = thermal_train_parameters_from_mapping(payload)
+    monkeypatch.setattr(
+        "simulator.thermal_train.thermal_train_parameters_from_mapping",
+        lambda: params,
+    )
+    sim = _real_capacity_sim()
+
+    capacity, cold_train = sim._cold_train_capacity_policy()
+
+    assert isinstance(capacity, FiniteCapacity)
+    assert capacity.value_kg_hr == pytest.approx(9.856)
+    assert cold_train.runtime_enforcement is True
+
+
+def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
+    sim = _real_capacity_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 5.0
+    sim.overhead.pressure_mbar = 12.0
+    equilibrium = SimpleNamespace(
+        vapor_pressures_Pa={"Fe": 100.0},
+        vapor_pressures_source={},
+        activity_coefficients={},
+        liquid_fraction=1.0,
+        diagnostics={},
+    )
+    partials = {"Fe": 100.0, "N2": 200.0}
+    expected, _ = sim._evaporation_flux_control_inputs(
+        equilibrium,
+        overhead_partials_Pa=partials,
+        overhead_pressure_pa=sim._evaporation_overhead_total_pressure_Pa(
+            partials
+        ),
+    )
+    captured = []
+
+    def capture_dispatch(_intent, *, control_inputs, **_kwargs):
+        captured.append(control_inputs)
+        return SimpleNamespace(
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": {}},
+        )
+
+    monkeypatch.setattr(sim, "_dispatch_only", capture_dispatch)
+    sim._calculate_evaporation(
+        equilibrium,
+        overhead_partials_override_Pa=partials,
+    )
+
+    assert captured == [expected]
+    assert captured[0]["overhead_pressure_pa"] == pytest.approx(1200.0)
 
 
 def test_no_cold_train_reuses_head_bleed_without_evaluating_shadow_flux():
@@ -379,3 +606,322 @@ def test_combined_saturation_uses_max_and_pipe_wins_exact_tie():
     assert tie.binding_cause == "pipe"
     assert oxygen.combined == 2.0
     assert oxygen.binding_cause == "oxygen"
+
+
+@pytest.mark.parametrize(
+    ("total_rate", "oxygen_rate", "pipe_capacity", "oxygen_capacity", "label"),
+    [
+        (2.0, 0.1, 1.0, 1.0, "pipe saturated"),
+        (1.0, 2.0, 10.0, 1.0, "O2 capacity saturated"),
+        (2.0, 2.0, 1.0, 1.0, "pipe saturated"),
+    ],
+    ids=["pipe-win", "oxygen-win", "exact-tie-pipe"],
+)
+def test_loop3_renders_live_binding_cause(
+    total_rate,
+    oxygen_rate,
+    pipe_capacity,
+    oxygen_capacity,
+    label,
+):
+    saturation = combined_saturation(
+        total_evaporation_kg_hr=total_rate,
+        oxygen_evaporation_kg_hr=oxygen_rate,
+        pipe_capacity_kg_hr=pipe_capacity,
+        capacity=FiniteCapacity(oxygen_capacity),
+    )
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = SimpleNamespace(
+        temperature_C=1500.0,
+        campaign=CampaignPhase.C2A,
+        campaign_hour=0.0,
+    )
+    sim.overhead = SimpleNamespace(
+        transport_saturation_pct=saturation.combined * 100.0,
+        transport_binding_cause=saturation.binding_cause,
+        turbine_limited=False,
+    )
+    sim.campaign_mgr = SimpleNamespace(
+        get_temp_target=lambda *_args: (1600.0, 100.0)
+    )
+
+    sim._update_temperature()
+
+    assert label in sim._last_throttle_reason
+
+
+def test_total_pressure_vessel_rating_refuses_after_convergence():
+    flux_calls = 0
+
+    def hk_flux(_partials):
+        nonlocal flux_calls
+        flux_calls += 1
+        return {"O2": 0.032}
+
+    result = solve_capacity_shadow(
+        pre_holdup_mol={"O2": 1.0, "N2": 2.0},
+        molar_mass_kg_mol={"O2": M_O2, "N2": M_N2},
+        flux_kg_hr_at_partials=hk_flux,
+        capacity=FiniteCapacity(0.032),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=T_FOR_1000_PA_PER_MOL,
+        volume_m3=1.0,
+        dt_hr=1.0,
+        bleed_conductance_kg_s=0.0,
+        downstream_pressure_Pa=0.0,
+        k_relief_kg_hr_Pa=1.0e-12,
+        p_open_Pa=1.0,
+        vessel_rating_Pa=1500.0,
+    )
+
+    assert isinstance(result, CapacityShadowRefusal)
+    assert result.reason.startswith("vessel_total_pressure_exceeds_rating:")
+    assert result.iterations > 0
+    assert flux_calls == result.iterations
+
+
+def test_zero_bleed_saturation_boundary_refuses_on_picard_non_convergence():
+    result = solve_capacity_shadow(
+        pre_holdup_mol={},
+        molar_mass_kg_mol={"N2": M_N2},
+        flux_kg_hr_at_partials=lambda partials: {
+            "N2": 1.0e-9 if partials["N2"] < 1.0e-6 else 0.0
+        },
+        capacity=FiniteCapacity(1.0),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=T_FOR_1000_PA_PER_MOL,
+        volume_m3=1.0,
+        dt_hr=1.0,
+        bleed_conductance_kg_s=1.0,
+        downstream_pressure_Pa=100.0,
+        k_relief_kg_hr_Pa=1.0e-30,
+        p_open_Pa=1.0e9,
+        vessel_rating_Pa=1.0e12,
+        max_iterations=3,
+    )
+
+    assert isinstance(result, CapacityShadowRefusal)
+    assert result.reason == "picard_non_convergence"
+    assert result.iterations == 3
+
+
+def test_live_capacity_refusal_precedes_overhead_bleed_commit(monkeypatch):
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    _capacity, cold_train = sim._cold_train_capacity_policy()
+    monkeypatch.setattr(
+        sim,
+        "_cold_train_capacity_policy",
+        lambda: (FiniteCapacity(1.0e-8), cold_train),
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 1.0e-4},
+        source="binding capacity refusal fixture",
+    )
+    before_bleeds = sum(
+        transition.reason == "overhead_bleed"
+        for transition in sim.atom_ledger.transitions
+    )
+    monkeypatch.setattr(
+        capacity_coupling,
+        "solve_capacity_shadow",
+        lambda **_kwargs: CapacityShadowRefusal(
+            reason="vessel_total_pressure_exceeds_rating:2000>1500",
+            iterations=3,
+        ),
+    )
+
+    with pytest.raises(CapacityCouplingRefusalError) as exc_info:
+        sim.step()
+
+    assert exc_info.value.refusal.iterations == 3
+    assert sum(
+        transition.reason == "overhead_bleed"
+        for transition in sim.atom_ledger.transitions
+    ) == before_bleeds
+
+
+@pytest.mark.parametrize(
+    ("species", "rate_kg_hr", "capacity_kg_hr", "rating_Pa"),
+    [
+        ("O2", 2.0e-6, 1.0e-6, 1.0e9),
+        ("SiO", 1.0e-3, 1.0e-6, 1.0e9),
+        ("N2", 2.8e-5, 1.0, 1.0e-3),
+    ],
+)
+def test_current_hour_source_cannot_bypass_capacity_or_vessel_refusal(
+    monkeypatch,
+    species,
+    rate_kg_hr,
+    capacity_kg_hr,
+    rating_Pa,
+):
+    sim = _real_capacity_sim()
+    sim.start_campaign(CampaignPhase.C0)
+    cold_train = SimpleNamespace(relief={
+        "k_relief_kg_hr_Pa": 1.0e-3,
+        "p_open_Pa": min(1.0, rating_Pa / 2.0),
+        "vessel_rating_Pa": rating_Pa,
+    })
+    monkeypatch.setattr(
+        sim,
+        "_cold_train_capacity_policy",
+        lambda: (FiniteCapacity(capacity_kg_hr), cold_train),
+    )
+    flux = EvaporationFlux(species_kg_hr={species: rate_kg_hr})
+    flux.update_totals()
+    monkeypatch.setattr(sim, "_calculate_evaporation", lambda *_a, **_k: flux)
+    calls = []
+
+    def refused(**kwargs):
+        calls.append(kwargs)
+        return CapacityShadowRefusal("vessel_or_capacity_refusal", 2)
+
+    monkeypatch.setattr(capacity_coupling, "solve_capacity_shadow", refused)
+
+    with pytest.raises(CapacityCouplingRefusalError):
+        sim.step()
+
+    assert len(calls) == 1
+
+
+@pytest.mark.parametrize("downstream_pressure_Pa", [500.0, 2000.0])
+def test_pipe_saturation_uses_executable_pressure_ratio_capacity(
+    downstream_pressure_Pa,
+):
+    conductance = 1.0e-8
+    result = solve_capacity_shadow(
+        pre_holdup_mol={},
+        molar_mass_kg_mol={"N2": M_N2},
+        flux_kg_hr_at_partials=lambda _partials: {"N2": M_N2},
+        capacity=FiniteCapacity(1.0),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=T_FOR_1000_PA_PER_MOL,
+        volume_m3=1.0,
+        dt_hr=1.0,
+        bleed_conductance_kg_s=conductance,
+        downstream_pressure_Pa=downstream_pressure_Pa,
+        k_relief_kg_hr_Pa=1.0e-30,
+        p_open_Pa=1.0e9,
+        vessel_rating_Pa=1.0e12,
+    )
+
+    assert isinstance(result, CapacityShadowResult)
+    total_pressure_Pa = sum(result.partial_pressures_Pa.values())
+    fraction = compressible_pressure_capacity_fraction(
+        total_pressure_Pa / 100000.0,
+        downstream_pressure_Pa / 100000.0,
+    )
+    executable_capacity = conductance * fraction * 3600.0
+    expected = (
+        M_N2 / executable_capacity if executable_capacity > 0.0 else math.inf
+    )
+    assert result.saturation.pipe == pytest.approx(expected)
+
+
+def test_picard_source_includes_stoichiometric_oxide_vapor_oxygen():
+    sim = _real_capacity_sim()
+    sp_data = sim.vapor_pressures["oxide_vapors"]["SiO"]
+    stoich = sim._evaporation_stoich("SiO", sp_data)
+    sio_rate_kg_hr = 1.0e-3
+    sio_molar_mass = resolve_species_formula(
+        "SiO", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    o2_molar_mass = resolve_species_formula(
+        "O2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+
+    result = solve_capacity_shadow(
+        pre_holdup_mol={},
+        molar_mass_kg_mol={"SiO": sio_molar_mass, "O2": o2_molar_mass},
+        flux_kg_hr_at_partials=lambda _partials: {"SiO": sio_rate_kg_hr},
+        overhead_source_mol_hr_at_partials=lambda _partials: (
+            sim._project_evaporation_overhead_source_mol_hr(
+                {"SiO": sio_rate_kg_hr},
+                {"SiO": stoich},
+            )
+        ),
+        capacity=FiniteCapacity(1.0),
+        head_bled_species_mol={},
+        external_o2_holdup_mol=0.0,
+        temperature_K=T_FOR_1000_PA_PER_MOL,
+        volume_m3=1.0,
+        dt_hr=1.0,
+        bleed_conductance_kg_s=1.0e-10,
+        downstream_pressure_Pa=0.0,
+        k_relief_kg_hr_Pa=1.0e-30,
+        p_open_Pa=1.0e9,
+        vessel_rating_Pa=1.0e12,
+    )
+
+    assert isinstance(result, CapacityShadowResult)
+    expected_o2_mol = (
+        sio_rate_kg_hr
+        * stoich["O2_per_product_kg"]
+        / o2_molar_mass
+    )
+    assert 0.0 < result.partial_pressures_Pa["O2"] < expected_o2_mol * 1000.0
+    expected_o2_kg_hr = expected_o2_mol * o2_molar_mass
+    assert result.saturation.oxygen == pytest.approx(expected_o2_kg_hr)
+    assert result.saturation.pipe == pytest.approx(
+        (sio_rate_kg_hr + expected_o2_kg_hr) / (1.0e-10 * 3600.0)
+    )
+    assert result.saturation.combined == result.saturation.pipe
+
+
+def test_binding_cold_train_does_not_turn_redox_no_capacity_into_fo2_move(
+    monkeypatch,
+):
+    sim = _real_capacity_sim()
+    capacity = capacity_from_hardware(
+        thermal_train_parameters_from_mapping().cold_train
+    )
+    assert isinstance(capacity, FiniteCapacity)
+    sim.melt.temperature_C = 1600.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1873.15
+    sim._sync_oxygen_reservoir_mirror()
+    before_transitions = len(sim.atom_ledger.transitions)
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_capacity_mol_per_ln_fO2",
+        lambda **_kwargs: 0.0,
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:evaporative_metal_loss": 1.0},
+        exchange_direction="redox_source:evaporative_loss",
+        temperature_K=1873.15,
+    )
+
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-9.0)
+    assert reservoir.redox_source_terms_applied is False
+    assert reservoir.redox_source_skip_reason == "no_melt_redox_capacity"
+    assert len(sim.atom_ledger.transitions) == before_transitions
+
+
+@pytest.mark.parametrize("finite_headspace_enabled", [False, True])
+def test_legacy_turbine_cap_is_unbounded_under_finite_capacity(
+    finite_headspace_enabled,
+):
+    sim = _real_capacity_sim()
+    sim.overhead_model._finite_headspace_enabled = finite_headspace_enabled
+
+    gas = sim.overhead_model.update(
+        EvaporationFlux(),
+        sim.melt,
+        sim.train,
+        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=1.0e-6),
+        actual_O2_kg_hr=1.0,
+        actual_O2_mol_hr=1.0 / M_O2,
+        overhead_holdup_mol={},
+        cold_train_capacity=FiniteCapacity(0.1),
+    )
+
+    assert gas.turbine_limited is False
+    assert gas.O2_vented_kg_hr == 0.0
+    assert gas.turbine_flow_kg_hr == pytest.approx(1.0)

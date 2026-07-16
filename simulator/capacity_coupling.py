@@ -7,7 +7,10 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 
-from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
+from engines.builtin.overhead_bleed import (
+    BuiltinOverheadBleedProvider,
+    compressible_pressure_capacity_fraction,
+)
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
 
@@ -40,7 +43,9 @@ class SaturationShadow:
 
 @dataclass(frozen=True)
 class CapacityShadowResult:
+    capacity: NoColdTrain | FiniteCapacity
     partial_pressures_Pa: Mapping[str, float]
+    evaporation_flux_kg_hr: Mapping[str, float]
     bled_species_mol: Mapping[str, float]
     terminal_offgas_mol: Mapping[str, float]
     oxygen: OxygenShadowPartition
@@ -53,6 +58,7 @@ class CapacityShadowResult:
     def __post_init__(self) -> None:
         for name in (
             "partial_pressures_Pa",
+            "evaporation_flux_kg_hr",
             "bled_species_mol",
             "terminal_offgas_mol",
         ):
@@ -70,6 +76,12 @@ class CapacityShadowRefusal:
     authoritative: bool = False
 
 
+class CapacityCouplingRefusalError(RuntimeError):
+    def __init__(self, refusal: CapacityShadowRefusal) -> None:
+        self.refusal = refusal
+        super().__init__(refusal.reason)
+
+
 def partition_melt_oxygen(
     *,
     bled_o2_mol: float,
@@ -82,12 +94,9 @@ def partition_melt_oxygen(
     p_open_Pa: float,
     molar_mass_kg_mol: float,
 ) -> OxygenShadowPartition:
-    # Premise: every bled O2 molecule is either pre-existing external O2 or
-    # melt-origin O2; melt-origin O2 then goes, in order, to admission, relief,
-    # or held inventory. Algebra: n_bled = n_external + n_admitted +
-    # n_relieved + n_held, while n_debited excludes n_held. The external share
-    # is n_bled*n_external_holdup/n_overhead; admission is min(remainder,
-    # C*dt/M); relief is min(post-admission remainder, k*(p-p_open)+*dt/M).
+    # Ordinary bleed preserves the HEAD provenance split. Admission acts on
+    # its melt-origin share. Relief is an additional debit from the full
+    # post-admission melt-origin inventory, independent of ordinary bleed.
     # Unit check: (kg/hr)*hr/(kg/mol) and
     # (kg/(hr Pa))*Pa*hr/(kg/mol) both reduce to mol. Sanity anchors: with no
     # external holdup and ample capacity, all bled O2 is admitted; with zero
@@ -100,12 +109,13 @@ def partition_melt_oxygen(
         if bled_o2_mol > 0.0 and overhead_o2_mol > 0.0
         else 0.0
     )
-    melt_bled = max(0.0, bled_o2_mol - external)
+    melt_inventory = max(0.0, overhead_o2_mol - external_holdup)
+    melt_bled = min(melt_inventory, max(0.0, bled_o2_mol - external))
     admitted = min(
         melt_bled,
         capacity.value_kg_hr * dt_hr / molar_mass_kg_mol,
     )
-    remainder = max(0.0, melt_bled - admitted)
+    remainder = max(0.0, melt_inventory - admitted)
     relief_law_mol = (
         k_relief_kg_hr_Pa
         * max(0.0, p_o2_Pa - p_open_Pa)
@@ -154,6 +164,13 @@ def solve_capacity_shadow(
     downstream_pressure_Pa: float,
     k_relief_kg_hr_Pa: float,
     p_open_Pa: float,
+    overhead_source_mol_hr_at_partials: (
+        Callable[[Mapping[str, float]], Mapping[str, float]] | None
+    ) = None,
+    total_pressure_Pa_at_partials: (
+        Callable[[Mapping[str, float]], float] | None
+    ) = None,
+    vessel_rating_Pa: float | None = None,
     rel_tol: float = DEFAULT_REL_TOL,
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
 ) -> CapacityShadowResult | CapacityShadowRefusal:
@@ -164,6 +181,12 @@ def solve_capacity_shadow(
         "p_total_bar": 0.0,
         "p_downstream_bar": downstream_pressure_Pa / 100000.0,
     }
+    if isinstance(capacity, FiniteCapacity):
+        controls.update({
+            "k_relief_kg_hr_Pa": k_relief_kg_hr_Pa,
+            "p_open_Pa": p_open_Pa,
+            "vessel_rating_Pa": vessel_rating_Pa,
+        })
     invalid = BuiltinOverheadBleedProvider._invalid_destructive_control(controls)
     if invalid is not None:
         return CapacityShadowRefusal(invalid, 0)
@@ -175,10 +198,19 @@ def solve_capacity_shadow(
             "temperature_K, volume_m3, and dt_hr must be finite and positive",
             0,
         )
+    if vessel_rating_Pa is not None and (
+        not math.isfinite(vessel_rating_Pa) or vessel_rating_Pa <= 0.0
+    ):
+        return CapacityShadowRefusal(
+            "vessel_rating_Pa must be finite and positive",
+            0,
+        )
     if not isinstance(capacity, FiniteCapacity):
         oxygen = OxygenShadowPartition(0.0, 0.0, 0.0, 0.0)
         return CapacityShadowResult(
+            capacity=capacity,
             partial_pressures_Pa={},
+            evaporation_flux_kg_hr={},
             bled_species_mol=dict(head_bled_species_mol),
             terminal_offgas_mol={
                 species: mol
@@ -205,6 +237,7 @@ def solve_capacity_shadow(
     final_offgas: dict[str, float] = {}
     final_oxygen = OxygenShadowPartition(0.0, 0.0, 0.0, 0.0)
     final_flux: dict[str, float] = {}
+    final_source_mol_hr: dict[str, float] = {}
     final_evolved: dict[str, float] = {}
     final_residual: dict[str, float] = {}
 
@@ -227,11 +260,32 @@ def solve_capacity_shadow(
                 f"evaporation_flux_refused:{type(exc).__name__}:{exc}",
                 iteration - 1,
             )
+        if overhead_source_mol_hr_at_partials is None:
+            source_mol_hr = {
+                species: final_flux.get(species, 0.0)
+                / molar_mass_kg_mol[species]
+                for species in species_order
+            }
+        else:
+            try:
+                source_mol_hr = {
+                    str(species): float(rate)
+                    for species, rate in overhead_source_mol_hr_at_partials(
+                        partials
+                    ).items()
+                }
+            except Exception as exc:
+                return CapacityShadowRefusal(
+                    f"overhead_source_refused:{type(exc).__name__}:{exc}",
+                    iteration - 1,
+                )
+        final_source_mol_hr = dict(source_mol_hr)
         final_evolved = {
-            species: max(0.0, float(pre_holdup_mol.get(species, 0.0)))
-            + final_flux.get(species, 0.0)
-            * dt_hr
-            / molar_mass_kg_mol[species]
+            species: max(
+                0.0,
+                max(0.0, float(pre_holdup_mol.get(species, 0.0)))
+                + source_mol_hr.get(species, 0.0) * dt_hr,
+            )
             for species in species_order
         }
         total_mol = sum(final_evolved.values())
@@ -239,15 +293,20 @@ def solve_capacity_shadow(
             final_evolved[species] * molar_mass_kg_mol[species]
             for species in species_order
         )
+        total_pressure_Pa = (
+            float(total_pressure_Pa_at_partials(partials))
+            if total_pressure_Pa_at_partials is not None
+            else sum(partials.values())
+        )
         bleed_controls = dict(controls)
-        bleed_controls["p_total_bar"] = sum(partials.values()) / 100000.0
-        final_bled = BuiltinOverheadBleedProvider._bled_species_mol(
+        bleed_controls["p_total_bar"] = total_pressure_Pa / 100000.0
+        ordinary_bled = BuiltinOverheadBleedProvider._bled_species_mol(
             final_evolved,
             total_mol=total_mol,
             total_kg=total_kg,
             controls=bleed_controls,
         ) if total_mol > 0.0 and total_kg > 0.0 else {}
-        bled_o2 = final_bled.get(OXYGEN_SPECIES, 0.0)
+        bled_o2 = ordinary_bled.get(OXYGEN_SPECIES, 0.0)
         if OXYGEN_SPECIES in molar_mass_kg_mol:
             final_oxygen = partition_melt_oxygen(
                 bled_o2_mol=bled_o2,
@@ -260,9 +319,14 @@ def solve_capacity_shadow(
                 p_open_Pa=p_open_Pa,
                 molar_mass_kg_mol=molar_mass_kg_mol[OXYGEN_SPECIES],
             )
+        final_bled = dict(ordinary_bled)
+        if final_oxygen.debited_mol > 0.0:
+            final_bled[OXYGEN_SPECIES] = final_oxygen.debited_mol
+        else:
+            final_bled.pop(OXYGEN_SPECIES, None)
         final_offgas = {
             species: mol
-            for species, mol in final_bled.items()
+            for species, mol in ordinary_bled.items()
             if species != OXYGEN_SPECIES
         }
         final_residual = {
@@ -272,7 +336,7 @@ def solve_capacity_shadow(
                 - (
                     final_oxygen.debited_mol
                     if species == OXYGEN_SPECIES
-                    else final_bled.get(species, 0.0)
+                    else ordinary_bled.get(species, 0.0)
                 ),
             )
             for species in species_order
@@ -296,13 +360,28 @@ def solve_capacity_shadow(
             default=0.0,
         )
         delta_history.append(max_delta)
-        partials = next_partials
         if max_delta <= max(DEFAULT_ABS_TOL_PA, rel_tol * scale):
             break
+        partials = next_partials
     else:
         return CapacityShadowRefusal(
             "picard_non_convergence",
             max_iterations,
+        )
+
+    total_pressure_Pa = (
+        float(total_pressure_Pa_at_partials(partials))
+        if total_pressure_Pa_at_partials is not None
+        else sum(partials.values())
+    )
+    if (
+        vessel_rating_Pa is not None
+        and total_pressure_Pa > vessel_rating_Pa
+    ):
+        return CapacityShadowRefusal(
+            "vessel_total_pressure_exceeds_rating:"
+            f"{total_pressure_Pa:.17g}>{vessel_rating_Pa:.17g}",
+            iteration,
         )
 
     initial_plus_source_kg = sum(
@@ -318,15 +397,31 @@ def solve_capacity_shadow(
         if initial_plus_source_kg > 0.0
         else 0.0
     )
-    pipe_capacity_kg_hr = bleed_conductance_kg_s * 3600.0
+    pipe_capacity_kg_hr = (
+        bleed_conductance_kg_s
+        * compressible_pressure_capacity_fraction(
+            total_pressure_Pa / 100000.0,
+            downstream_pressure_Pa / 100000.0,
+        )
+        * 3600.0
+    )
+    positive_source_kg_hr = {
+        species: max(0.0, source_mol_hr)
+        * molar_mass_kg_mol[species]
+        for species, source_mol_hr in final_source_mol_hr.items()
+    }
     saturation = combined_saturation(
-        total_evaporation_kg_hr=sum(final_flux.values()),
-        oxygen_evaporation_kg_hr=final_flux.get(OXYGEN_SPECIES, 0.0),
+        total_evaporation_kg_hr=sum(positive_source_kg_hr.values()),
+        oxygen_evaporation_kg_hr=positive_source_kg_hr.get(
+            OXYGEN_SPECIES, 0.0
+        ),
         pipe_capacity_kg_hr=pipe_capacity_kg_hr,
         capacity=capacity,
     )
     return CapacityShadowResult(
+        capacity=capacity,
         partial_pressures_Pa=partials,
+        evaporation_flux_kg_hr=final_flux,
         bled_species_mol=final_bled,
         terminal_offgas_mol=final_offgas,
         oxygen=final_oxygen,

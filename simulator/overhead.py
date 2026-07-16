@@ -798,7 +798,8 @@ class OverheadGasModel:
                headspace_volume_m3: Optional[float] = None,  # m³ — explicit finite headspace volume
                p_downstream_bar: Optional[float] = None,  # bar — explicit downstream/reference pressure
                bleed_conductance_kg_s: Optional[float] = None,  # kg/s — explicit bleed mass-flow capacity
-               bleed_conductance_kg_s_per_bar: Optional[float] = None  # deprecated compatibility alias; kg/s, not per-bar
+               bleed_conductance_kg_s_per_bar: Optional[float] = None,  # deprecated compatibility alias; kg/s, not per-bar
+               cold_train_capacity=None,
                ) -> OverheadGas:
         """
         Calculate overhead gas state for this hour.
@@ -823,6 +824,13 @@ class OverheadGasModel:
         """
         gas = existing_gas if existing_gas is not None else OverheadGas()
         self._reset_gas(gas)
+        from simulator.thermal_train import FiniteCapacity
+
+        legacy_turbine_spec = (
+            None
+            if isinstance(cold_train_capacity, FiniteCapacity)
+            else turbine_spec
+        )
 
         # Total evaporation rate → pressure buildup
         total_evap_kg_hr = evap_flux.total_kg_hr  # kg/hr — total evaporation mass flow
@@ -858,6 +866,7 @@ class OverheadGasModel:
         # How much of the pipe capacity is being used.
         # >100% means evaporation exceeds transport → triggers ΔT/dt throttle.
         gas.transport_saturation_pct = transport_state['pipe_capacity_used_pct']  # percent — pipe capacity used
+        gas.transport_binding_cause = 'pipe'
 
         gas.evap_exceeds_transport = gas.transport_saturation_pct > 100.0  # dimensionless bool — transport over-capacity flag
 
@@ -869,7 +878,7 @@ class OverheadGasModel:
                 actual_O2_kg_hr=actual_O2_kg_hr,  # kg/hr — melt/offgas O2 mass flow
                 actual_O2_mol_hr=actual_O2_mol_hr,  # mol/hr — melt/offgas O2 molar flow
                 mre_anode_O2_mol_hr=mre_anode_O2_mol_hr,  # mol/hr — MRE anode O2 flow
-                turbine_spec=turbine_spec,
+                turbine_spec=legacy_turbine_spec,
             )
             return gas
 
@@ -970,8 +979,8 @@ class OverheadGasModel:
         gas.turbine_flow_kg_hr = O2_flow_kg_hr  # kg/hr — O2 turbine mass flow before capacity cap
         gas.turbine_flow_mol_hr = O2_flow_mol_hr  # mol/hr — O2 turbine molar flow before capacity cap
 
-        if turbine_spec is not None and turbine_spec.max_O2_flow_kg_hr > 0:
-            max_O2 = turbine_spec.max_O2_flow_kg_hr  # kg/hr — turbine O2 mass-flow capacity
+        if legacy_turbine_spec is not None and legacy_turbine_spec.max_O2_flow_kg_hr > 0:
+            max_O2 = legacy_turbine_spec.max_O2_flow_kg_hr  # kg/hr — turbine O2 mass-flow capacity
 
             # Turbine utilization
             gas.turbine_utilization_pct = (
@@ -1135,6 +1144,7 @@ class OverheadGasModel:
         gas.turbine_shaft_power_kW = 0.0  # kW — reset turbine shaft power
         gas.evap_exceeds_transport = False  # dimensionless bool — reset transport over-capacity flag
         gas.transport_saturation_pct = 0.0  # percent — reset pipe capacity used
+        gas.transport_binding_cause = 'pipe'
         gas.stage_area_geometry_provenance_notice.clear()
 
     @staticmethod

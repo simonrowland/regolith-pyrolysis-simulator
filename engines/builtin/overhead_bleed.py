@@ -142,26 +142,16 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 diagnostic={"bled_species_mol": {}},
             )
 
-        bled_mol = self._bled_species_mol(
+        candidate_bled_mol = self._bled_species_mol(
             holdup_mol,
             total_mol=total_mol,
             total_kg=total_kg,
             controls=controls,
         )
-        if not bled_mol:
-            return IntentResult(
-                intent=ChemistryIntent.OVERHEAD_BLEED,
-                status="ok",
-                transition=None,
-                control_audit=control_audit,
-                diagnostic={"bled_species_mol": {}},
-            )
-
-        debits = {PROCESS_OVERHEAD_GAS_ACCOUNT: dict(bled_mol)}
         credits: dict[str, dict[str, float]] = {}
         offgas: dict[str, float] = {}
 
-        bled_o2_mol = bled_mol.get(OXYGEN_SPECIES, 0.0)
+        bled_o2_mol = candidate_bled_mol.get(OXYGEN_SPECIES, 0.0)
         bled_o2_kg = bled_o2_mol * molar_mass.get(OXYGEN_SPECIES, 0.0)
         overhead_o2_mol = holdup_mol.get(OXYGEN_SPECIES, 0.0)
         external_o2_holdup_mol = self._external_o2_holdup_mol(
@@ -177,18 +167,68 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             else 0.0
         )
         melt_o2_bled_mol = max(0.0, bled_o2_mol - external_o2_bled_mol)
-        melt_o2_bled_kg = melt_o2_bled_mol * molar_mass.get(OXYGEN_SPECIES, 0.0)
-        melt_o2_vented_kg = self._o2_vented_kg(
-            melt_o2_bled_kg, controls
-        )
-        melt_o2_vented_mol = (
-            melt_o2_vented_kg / molar_mass[OXYGEN_SPECIES]
-            if melt_o2_bled_mol > 0.0 and molar_mass.get(OXYGEN_SPECIES, 0.0) > 0.0
-            else 0.0
-        )
-        melt_o2_vented_mol = min(melt_o2_bled_mol, max(0.0, melt_o2_vented_mol))
-        o2_stored_mol = max(0.0, melt_o2_bled_mol - melt_o2_vented_mol)
+        capacity = controls.get("cold_train_capacity")
+        o2_held_mol = 0.0
+        from simulator.thermal_train import FiniteCapacity
+
+        if isinstance(capacity, FiniteCapacity):
+            if (
+                overhead_o2_mol > 0.0
+                and molar_mass.get(OXYGEN_SPECIES, 0.0) > 0.0
+            ):
+                from simulator.capacity_coupling import partition_melt_oxygen
+
+                partition = partition_melt_oxygen(
+                    bled_o2_mol=bled_o2_mol,
+                    overhead_o2_mol=overhead_o2_mol,
+                    external_o2_holdup_mol=external_o2_holdup_mol,
+                    capacity=capacity,
+                    dt_hr=float(controls.get("dt_hr", 1.0)),
+                    p_o2_Pa=float(controls.get("p_ref_Pa", 0.0)),
+                    k_relief_kg_hr_Pa=float(
+                        controls.get("k_relief_kg_hr_Pa", 0.0)
+                    ),
+                    p_open_Pa=float(controls.get("p_open_Pa", 0.0)),
+                    molar_mass_kg_mol=molar_mass.get(OXYGEN_SPECIES, 0.0),
+                )
+                external_o2_bled_mol = partition.external_mol
+                o2_stored_mol = partition.admitted_mol
+                melt_o2_vented_mol = partition.relieved_mol
+                o2_held_mol = partition.held_mol
+                melt_o2_bled_mol = o2_stored_mol + melt_o2_vented_mol
+            else:
+                o2_stored_mol = 0.0
+                melt_o2_vented_mol = 0.0
+        else:
+            melt_o2_bled_kg = (
+                melt_o2_bled_mol * molar_mass.get(OXYGEN_SPECIES, 0.0)
+            )
+            melt_o2_vented_kg = self._o2_vented_kg(
+                melt_o2_bled_kg, controls
+            )
+            melt_o2_vented_mol = (
+                melt_o2_vented_kg / molar_mass[OXYGEN_SPECIES]
+                if melt_o2_bled_mol > 0.0
+                and molar_mass.get(OXYGEN_SPECIES, 0.0) > 0.0
+                else 0.0
+            )
+            melt_o2_vented_mol = min(
+                melt_o2_bled_mol, max(0.0, melt_o2_vented_mol)
+            )
+            o2_stored_mol = max(
+                0.0, melt_o2_bled_mol - melt_o2_vented_mol
+            )
         o2_vented_mol = melt_o2_vented_mol + external_o2_bled_mol
+        debited_mol = dict(candidate_bled_mol)
+        actual_o2_debit_mol = (
+            external_o2_bled_mol
+            + o2_stored_mol
+            + melt_o2_vented_mol
+        )
+        if actual_o2_debit_mol > 0.0:
+            debited_mol[OXYGEN_SPECIES] = actual_o2_debit_mol
+        else:
+            debited_mol.pop(OXYGEN_SPECIES, None)
         if o2_stored_mol > 0.0:
             credits[OXYGEN_MELT_OFFGAS_ACCOUNT] = {
                 OXYGEN_SPECIES: o2_stored_mol
@@ -202,7 +242,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 OXYGEN_SPECIES: external_o2_bled_mol
             }
 
-        for species, mol in bled_mol.items():
+        for species, mol in candidate_bled_mol.items():
             if species == OXYGEN_SPECIES:
                 continue
             if mol > 0.0:
@@ -210,6 +250,19 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         if offgas:
             credits[TERMINAL_OFFGAS_ACCOUNT] = offgas
 
+        if not debited_mol:
+            return IntentResult(
+                intent=ChemistryIntent.OVERHEAD_BLEED,
+                status="ok",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "bled_species_mol": {},
+                    "candidate_bled_species_mol": dict(candidate_bled_mol),
+                    "o2_held_mol": o2_held_mol,
+                },
+            )
+        debits = {PROCESS_OVERHEAD_GAS_ACCOUNT: debited_mol}
         atom_proof = build_atom_balance_proof(
             debits, credits, registry, resolve_species_formula
         )
@@ -226,14 +279,20 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             transition=proposal,
             control_audit=control_audit,
             diagnostic={
-                "bled_species_mol": dict(bled_mol),
+                "bled_species_mol": dict(debited_mol),
+                "candidate_bled_species_mol": dict(candidate_bled_mol),
                 "bled_total_kg": sum(
                     mol * molar_mass[species]
-                    for species, mol in bled_mol.items()
+                    for species, mol in debited_mol.items()
                 ),
-                "bled_o2_mol": bled_o2_mol,
-                "bled_o2_kg": bled_o2_kg,
+                "bled_o2_mol": debited_mol.get(OXYGEN_SPECIES, 0.0),
+                "bled_o2_kg": debited_mol.get(OXYGEN_SPECIES, 0.0)
+                * molar_mass.get(OXYGEN_SPECIES, 0.0),
+                "candidate_bled_o2_mol": bled_o2_mol,
                 "o2_stored_mol": o2_stored_mol,
+                "o2_admitted_mol": o2_stored_mol,
+                "o2_relieved_mol": melt_o2_vented_mol,
+                "o2_held_mol": o2_held_mol,
                 "o2_vented_mol": o2_vented_mol,
                 "o2_vented_kg": o2_vented_mol * molar_mass.get(
                     OXYGEN_SPECIES, 0.0
@@ -246,6 +305,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 "external_o2_vented_kg": (
                     external_o2_bled_mol * molar_mass.get(OXYGEN_SPECIES, 0.0)
                 ),
+                "p_ref_Pa": controls.get("p_ref_Pa"),
             },
         )
 
@@ -296,6 +356,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
 
     @staticmethod
     def _invalid_destructive_control(controls: dict) -> str | None:
+        finite_capacity = False
         if "cold_train_capacity" in controls:
             from simulator.thermal_train import FiniteCapacity, NoColdTrain
 
@@ -307,6 +368,7 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 or capacity.value_kg_hr <= 0.0
             ):
                 return "cold_train_capacity must be finite and positive"
+            finite_capacity = isinstance(capacity, FiniteCapacity)
         force_drain_all = controls.get("force_drain_all", False)
         if not isinstance(force_drain_all, bool):
             return "force_drain_all must be a boolean"
@@ -332,6 +394,10 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             ("o2_vented_kg", 0.0),
             ("max_o2_flow_kg_hr", 0.0),
             ("external_o2_in_overhead_mol", 0.0),
+            ("k_relief_kg_hr_Pa", 0.0),
+            ("p_open_Pa", 0.0),
+            ("p_ref_Pa", 0.0),
+            ("vessel_rating_Pa", 0.0),
         ):
             if name not in controls:
                 continue
@@ -346,12 +412,33 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 return f"{name} must be a finite non-negative number"
             if not math.isfinite(value) or value < 0.0:
                 return f"{name} must be a finite non-negative number"
+        if finite_capacity:
+            for name in (
+                "k_relief_kg_hr_Pa",
+                "p_open_Pa",
+                "vessel_rating_Pa",
+            ):
+                try:
+                    value = float(controls[name])
+                except (KeyError, TypeError, ValueError):
+                    return f"{name} must be a finite positive number"
+                if not math.isfinite(value) or value <= 0.0:
+                    return f"{name} must be a finite positive number"
+            if float(controls["p_open_Pa"]) >= float(
+                controls["vessel_rating_Pa"]
+            ):
+                return "p_open_Pa must be below vessel_rating_Pa"
         return None
 
     @staticmethod
     def _o2_vented_kg(bled_o2_kg: float, controls: dict) -> float:
         if bled_o2_kg <= 0.0:
             return 0.0
+        if "cold_train_capacity" in controls:
+            from simulator.thermal_train import FiniteCapacity
+
+            if isinstance(controls["cold_train_capacity"], FiniteCapacity):
+                return 0.0
         if "o2_vented_kg" in controls:
             return min(bled_o2_kg, max(0.0, float(controls["o2_vented_kg"])))
         max_o2_flow_kg_hr = max(
