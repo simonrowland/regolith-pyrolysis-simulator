@@ -23,16 +23,25 @@ BELOW_LIQUIDUS_HONEST_REFUSAL = "below-liquidus-honest-refusal"
 SOLIDUS_MISSING = "solidus-missing"
 REFERENCE_MISSING = "reference-missing"
 NOW_RESOLVED = "now-resolved"
+UNVERIFIED = "unverified"
+SUBPROCESS_DIED_ENGINE_FAILURE = "subprocess-died-engine-failure"
 UNCLASSIFIED_PRESERVING_RAW = "unclassified-preserving-raw"
 CLASSIFICATIONS = (
     BELOW_LIQUIDUS_HONEST_REFUSAL,
     SOLIDUS_MISSING,
     REFERENCE_MISSING,
     NOW_RESOLVED,
+    UNVERIFIED,
+    SUBPROCESS_DIED_ENGINE_FAILURE,
     UNCLASSIFIED_PRESERVING_RAW,
 )
 
 RETAINED_REASON = "LiquidFractionInvalidError"
+EXPECTED_RETAINED_COUNTS = {
+    SOLIDUS_MISSING: 48,
+    REFERENCE_MISSING: 9,
+}
+EXPECTED_RETAINED_TOTAL = sum(EXPECTED_RETAINED_COUNTS.values())
 
 # simulator/melt_backend/alphamelts.py:85-99 defines exact backend reason
 # tokens; no_convergence is the typed out-of-domain outcome used here.
@@ -114,8 +123,12 @@ def classify_retained_row(row: Mapping[str, Any]) -> str:
         "alpha_solidus_T_C",
     )
 
+    if row.get("current_identity_matches") is not True:
+        return UNVERIFIED
     if current_kind == "success" or current_status == "ok":
         return NOW_RESOLVED
+    if current_reason == "subprocess_died":
+        return SUBPROCESS_DIED_ENGINE_FAILURE
     if (
         current_kind == "refusal"
         and current_reason in HONEST_REFUSAL_REASONS
@@ -186,6 +199,51 @@ def _coalesce(row: sqlite3.Row | None, *names: str) -> Any:
     return None
 
 
+def _canonical_json(value: Any) -> str | None:
+    if value in (None, ""):
+        return None
+    try:
+        decoded = json.loads(str(value))
+    except (TypeError, ValueError):
+        return None
+    return json.dumps(decoded, sort_keys=True, separators=(",", ":"))
+
+
+def _matching_replay_identity(
+    source: sqlite3.Row, candidate: sqlite3.Row | None
+) -> bool:
+    if candidate is None:
+        return False
+    for name in ("expedited_key", "run_mode", "engine_mode", "engine_model"):
+        if source[name] != candidate[name]:
+            return False
+    source_controls = _canonical_json(source["native_input_json"])
+    candidate_controls = _canonical_json(candidate["native_input_json"])
+    return source_controls is not None and source_controls == candidate_controls
+
+
+def _validate_expected_cohort(rows: Sequence[Mapping[str, Any]]) -> None:
+    counts = {classification: 0 for classification in EXPECTED_RETAINED_COUNTS}
+    for row in rows:
+        liquidus_C = _number(row, "reference_liquidus_C")
+        solidus_C = _number(row, "reference_solidus_C")
+        temperature_C = _number(row, "temperature_C")
+        if liquidus_C is None:
+            counts[REFERENCE_MISSING] += 1
+        elif (
+            temperature_C is not None
+            and temperature_C < liquidus_C
+            and solidus_C is None
+        ):
+            counts[SOLIDUS_MISSING] += 1
+    if len(rows) != EXPECTED_RETAINED_TOTAL or counts != EXPECTED_RETAINED_COUNTS:
+        raise RuntimeError(
+            "retained epoch-2 cohort mismatch: "
+            f"expected total={EXPECTED_RETAINED_TOTAL} counts={EXPECTED_RETAINED_COUNTS}, "
+            f"got total={len(rows)} counts={counts}"
+        )
+
+
 def load_retained_rows(
     db_path: Path,
     *,
@@ -199,6 +257,7 @@ def load_retained_rows(
         retained = connection.execute(
             "SELECT o.id, o.grid_key_id, o.expedited_key, o.engine_epoch, "
             "o.status, o.status_kind, o.refusal_reason, o.raw_payload, "
+            "o.engine_mode, o.engine_model, o.run_mode, o.native_input_json, "
             "o.alpha_backend_status_reason, o.alpha_backend_diagnostics_json, "
             "g.temperature_C FROM alphamelts_outputs o "
             "JOIN grid_keys g ON g.id = o.grid_key_id "
@@ -217,13 +276,23 @@ def load_retained_rows(
                 "AND engine_epoch = ? ORDER BY id DESC LIMIT 1",
                 (source["grid_key_id"], reference_epoch),
             ).fetchone()
-            current = connection.execute(
+            candidates = connection.execute(
                 "SELECT engine_epoch, status, status_kind, refusal_reason, "
-                "alpha_backend_status_reason FROM alphamelts_outputs "
+                "alpha_backend_status_reason, expedited_key, engine_mode, "
+                "engine_model, run_mode, native_input_json "
+                "FROM alphamelts_outputs "
                 "WHERE grid_key_id = ? AND engine_epoch > ? "
-                "ORDER BY engine_epoch DESC, id DESC LIMIT 1",
+                "ORDER BY engine_epoch DESC, id DESC",
                 (source["grid_key_id"], engine_epoch),
-            ).fetchone()
+            ).fetchall()
+            current = next(
+                (
+                    candidate
+                    for candidate in candidates
+                    if _matching_replay_identity(source, candidate)
+                ),
+                None,
+            )
             row = dict(source)
             row["reference_liquidus_C"] = _coalesce(
                 reference,
@@ -245,7 +314,9 @@ def load_retained_rows(
             row["current_backend_status_reason"] = _coalesce(
                 current, "alpha_backend_status_reason"
             )
+            row["current_identity_matches"] = current is not None
             result.append(row)
+        _validate_expected_cohort(result)
         return result
 
 
