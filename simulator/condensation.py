@@ -1686,6 +1686,8 @@ class CondensationRouteResult:
         default_factory=dict)
     transport_parameter_notice: Dict[str, Any] = field(default_factory=dict)
     capture_budget_regularizer_notice: Dict[str, Any] = field(default_factory=dict)
+    condensation_refusals_by_species: Dict[str, Dict[str, Any]] = field(
+        default_factory=dict)
     stage_area_geometry_provenance_notice: Dict[str, Any] = field(
         default_factory=dict)
 
@@ -2393,6 +2395,7 @@ class CondensationModel:
         wall_sticking_alpha_by_species: dict[str, float] = {}
         wall_sticking_alpha_provenance_by_species: dict[str, Any] = {}
         transport_parameter_notice_by_species: dict[str, Any] = {}
+        condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
         used_capture_budget_regularizer = False
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
@@ -2415,6 +2418,17 @@ class CondensationModel:
             remaining_kg = rate_kg_hr  # Mass still in vapor phase
             wall_deposit_fraction_by_species[species] = 0.0
             wall_deposit_account_fractions_by_species[species] = {}
+
+            if not _species_has_antoine_data(
+                species,
+                vapor_pressure_data=self.vapor_pressure_data,
+            ):
+                remaining_by_species[species] = max(0.0, rate_kg_hr)
+                condensation_refusals_by_species[species] = {
+                    'status': 'refused',
+                    'reason': 'antoine_data_unavailable',
+                }
+                continue
 
             T_cond = _species_condensation_temperature_C(
                 species,
@@ -2676,6 +2690,8 @@ class CondensationModel:
             sticking_alpha_provenance_notice=sticking_notice,
             transport_parameter_notice=transport_notice,
             capture_budget_regularizer_notice=capture_notice,
+            condensation_refusals_by_species=(
+                condensation_refusals_by_species),
             stage_area_geometry_provenance_notice=geometry_notice,
         )
 
@@ -3247,6 +3263,23 @@ def _missing_required_antoine_keys(block: Any) -> tuple[str, ...]:
         if key not in candidate
     }
     return tuple(sorted(missing))
+
+
+def _species_has_antoine_data(
+    species: str,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> bool:
+    data = _species_vapor_data(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    return any(
+        isinstance(block, Mapping)
+        and not _missing_required_antoine_keys(block)
+        for block_name in _ANTOINE_COEFFICIENT_BLOCKS
+        if (block := data.get(block_name)) is not None
+    )
 
 
 def apply_setpoints_condensation_temperature_overrides(
