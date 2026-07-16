@@ -2512,9 +2512,14 @@ class _MELTSBackendSupport(MeltBackend):
             if 'activit' not in line.lower():
                 continue
             activities.update(self._activity_pairs_from_line(line))
-            table = self._activity_table_after(lines, idx)
-            if table:
-                activities.update(table)
+            if re.fullmatch(
+                r'\s*(?:[A-Za-z][A-Za-z0-9 _-]*\s+)?activities\s*:\s*',
+                line,
+                flags=re.IGNORECASE,
+            ):
+                table = self._activity_table_after(lines, idx)
+                if table:
+                    activities.update(table)
         return activities
 
     def _activity_assignments_from_line(self, line: str) -> dict:

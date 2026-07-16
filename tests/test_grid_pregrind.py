@@ -1269,7 +1269,18 @@ def test_cache_v2_thermoengine_phase_dictionary_covers_grounded_vocabulary(
     assert "Solid Alloy" in native_labels
     assert "solid alloy" in canonical_labels
     assert "alloy-solid" in grid_pregrind_writer.CACHE_V2_PHASE_DICTIONARY
+    assert "ortho-oxide" in (
+        grid_pregrind_writer.CACHE_V2_SUBPROCESS_PHASE_DICTIONARY
+    )
+    assert "alkali-feldspar" in (
+        grid_pregrind_writer.CACHE_V2_SUBPROCESS_PHASE_DICTIONARY
+    )
+    assert "ortho-oxide" in grid_pregrind_writer.CACHE_V2_PHASE_DICTIONARY
+    assert "alkali-feldspar" in grid_pregrind_writer.CACHE_V2_PHASE_DICTIONARY
     assert canonical_labels <= set(grid_pregrind_writer.CACHE_V2_PHASE_DICTIONARY)
+    assert "alphaMELTS 2.3.1 MELTSv1.0.2 Phase_main_tbl.txt" in (
+        cache_v2_identity_manifest()["dictionary_sources"]["phase"]
+    )
     assert "ThermoEngine MELTSv1.0.2 MELTSmodel.get_phase_names()" in (
         cache_v2_identity_manifest()["dictionary_sources"]["phase"]
     )

@@ -2432,6 +2432,38 @@ SiO2_Liq Na K Fe
     })
 
 
+def test_subprocess_activity_parser_does_not_tokenize_next_stable_assemblage_banner():
+    backend = AlphaMELTSBackend()
+    output = """
+Activity of H2O = 0  Melt fraction = 0.921889
+<> Stable liquid solid assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1200.000000 (C)
+liquid:    SiO2 TiO2 Al2O3 Fe2O3 Cr2O3 FeO
+90.3451 g 46.49 2.21 16.60 0.00 0.00 11.71
+"""
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1200.0,
+        total_input_kg=0.1,
+        system_output=_system_main_fixture(
+            temperature_C=1200.0,
+            system_mass_g=90.3451,
+        ),
+    )
+
+    assert result.activity_coefficients == {'H2O': pytest.approx(0.0)}
+
+
+def test_subprocess_activity_parser_accepts_unqualified_table_heading():
+    backend = AlphaMELTSBackend()
+
+    assert backend._extract_subprocess_activity_mapping(
+        "Activities:\nNa K\n0.08 0.03\n"
+    ) == pytest.approx({'Na': 0.08, 'K': 0.03})
+
+
 def test_equilibrium_emission_keeps_endmember_activities_diagnostic_only():
     backend = AlphaMELTSBackend()
 
