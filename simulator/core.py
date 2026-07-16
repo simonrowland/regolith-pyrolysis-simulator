@@ -11427,6 +11427,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             cold_train_capacity=(
                 configured_capacity
             ),
+            # F-317 derivation: the melt-to-train duct is upstream of capture,
+            # so m_dot_pipe = sum(m_dot_evolved); downstream reporting instead
+            # uses y_i = m_dot_residual_i / sum(m_dot_residual). Both fluxes are
+            # kg/hr, and near-total capture must not erase the upstream load.
+            transport_inlet_kg_hr=evap_flux.total_kg_hr,
         )
         if capacity_result is not None:
             self.overhead.transport_saturation_pct = (

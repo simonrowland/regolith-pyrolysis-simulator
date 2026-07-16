@@ -799,6 +799,7 @@ class OverheadGasModel:
                bleed_conductance_kg_s: Optional[float] = None,  # kg/s — explicit bleed mass-flow capacity
                bleed_conductance_kg_s_per_bar: Optional[float] = None,  # deprecated compatibility alias; kg/s, not per-bar
                cold_train_capacity=None,
+               transport_inlet_kg_hr: Optional[float] = None,
                ) -> OverheadGas:
         """
         Calculate overhead gas state for this hour.
@@ -813,6 +814,9 @@ class OverheadGasModel:
             mre_anode_O2_mol_hr: MRE anode O₂ flow in mol/hr. Recorded as a
                                  separate source bin and not counted as
                                  turbine throughput.
+            transport_inlet_kg_hr: Full evolved mass flux entering the upstream
+                                   transport duct. ``evap_flux`` remains the
+                                   post-condensation composition basis.
 
         Returns:
             Updated OverheadGas with pressure, flow, and feedback data
@@ -837,6 +841,17 @@ class OverheadGasModel:
             melt,
             p_downstream_bar=p_downstream_bar,
         )  # mixed units — pipe transport state
+        if transport_inlet_kg_hr is not None:
+            inlet_load_kg_hr = max(0.0, float(transport_inlet_kg_hr))
+            pipe_capacity_kg_hr = transport_state['pipe_conductance_kg_hr']
+            if inlet_load_kg_hr <= 0.0:
+                transport_state['pipe_capacity_used_pct'] = 0.0
+            elif pipe_capacity_kg_hr > 0.0:
+                transport_state['pipe_capacity_used_pct'] = (
+                    inlet_load_kg_hr / pipe_capacity_kg_hr * 100.0
+                )
+            else:
+                transport_state['pipe_capacity_used_pct'] = 999.0
         conductance = transport_state['conductance_kg_s']  # kg/s — pipe mass-flow capacity
         gas.pipe_conductance_kg_hr = transport_state['pipe_conductance_kg_hr']  # kg/hr — pipe mass-flow capacity
         gas.initial_throat_area_m2 = transport_state['initial_throat_area_m2']  # m² — user-configured throat cross-section

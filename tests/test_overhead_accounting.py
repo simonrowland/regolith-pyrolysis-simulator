@@ -1303,6 +1303,44 @@ def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
     assert gas.composition["FeO"] == pytest.approx(expected_feo_mbar)
 
 
+def test_transport_saturation_uses_full_inlet_when_residual_is_nearly_captured():
+    sim = _gas_train_sim()
+    residual_flux = EvaporationFlux(
+        total_kg_hr=1.0e-12,
+        species_kg_hr={"Fe": 1.0e-12},
+    )
+    residual_transport = sim.overhead_model.estimate_transport_state(
+        residual_flux, sim.melt
+    )
+    pipe_capacity_kg_hr = residual_transport["pipe_conductance_kg_hr"]
+    inlet_flux = EvaporationFlux(
+        total_kg_hr=1.5 * pipe_capacity_kg_hr,
+        species_kg_hr={"Fe": 1.5 * pipe_capacity_kg_hr},
+    )
+
+    gas = sim.overhead_model.update(
+        residual_flux,
+        sim.melt,
+        sim.train,
+        transport_inlet_kg_hr=inlet_flux.total_kg_hr,
+    )
+
+    assert gas.transport_saturation_pct == pytest.approx(150.0)
+    assert gas.evap_exceeds_transport is True
+    assert gas.composition == pytest.approx({
+        "Fe": residual_transport["vapor_pressure_mbar"],
+    })
+
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.campaign_hour = 0.0
+    sim.overhead = gas
+    sim.campaign_mgr.get_temp_target = lambda *_args: (1600.0, 100.0)
+    sim._update_temperature()
+
+    assert sim._last_actual_ramp == pytest.approx(50.0)
+    assert "pipe saturated" in sim._last_throttle_reason
+
+
 def test_condensation_residual_ignores_prior_holdup_drain_credit(monkeypatch):
     sim = _gas_train_sim()
     prior_holdup_kg = 2.0e-8
@@ -1367,6 +1405,7 @@ def test_step_overhead_composition_uses_real_condensation_residual():
 
     def _spy_update(overhead_flux, *args, **kwargs):
         seen["flux"] = overhead_flux
+        seen["transport_inlet_kg_hr"] = kwargs["transport_inlet_kg_hr"]
         return real_update(overhead_flux, *args, **kwargs)
 
     sim.overhead_model.update = _spy_update
@@ -1376,6 +1415,13 @@ def test_step_overhead_composition_uses_real_condensation_residual():
     assert 0.0 < residual_kg < evolved_kg
     expected_transport = sim.overhead_model.estimate_transport_state(
         seen["flux"], sim.melt
+    )
+    expected_saturation_pct = (
+        evolved_kg / expected_transport["pipe_conductance_kg_hr"] * 100.0
+    )
+    assert seen["transport_inlet_kg_hr"] == pytest.approx(evolved_kg)
+    assert sim.overhead.transport_saturation_pct == pytest.approx(
+        expected_saturation_pct
     )
     assert sim.overhead.composition["Fe"] == pytest.approx(
         expected_transport["vapor_pressure_mbar"]
