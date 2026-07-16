@@ -226,7 +226,9 @@ def test_step_orders_source_producers_before_native_split(
         order.append("fe_redox_respeciation")
         return {}
 
-    def fake_producer():
+    def fake_producer(**_kwargs):
+        # Accepts producer-protocol kwargs (e.g. sample_time_h from the t-159
+        # campaigns-elapsed authority) — this stub only records call order.
         order.append(producer_marker)
         return producer_result
 
