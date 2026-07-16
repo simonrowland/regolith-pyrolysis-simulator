@@ -1677,6 +1677,11 @@ class EvaporationMixin:
         3. ``_project_condensed_stage_collection`` projects the actual
            credited_condensed_kg onto stage UI bookkeeping.
 
+        Returns an :class:`EvaporationFlux` containing only this tick's vapor
+        that remains free in ``process.overhead_gas`` after all committed
+        baffle, wall, and retained-holdup routing. Melt depletion still uses
+        the original full evolved flux at the caller.
+
         End-of-tick ledger state is identical to the pre-flip behaviour:
         between the two kernel commits the vapor passes through
         overhead_gas, but the final per-account balances match the
@@ -1748,22 +1753,32 @@ class EvaporationMixin:
             if species not in evap_flux.species_kg_hr:
                 continue
             rate_kg_hr = evap_flux.species_kg_hr[species] * phase_scalar
-            route_diag = self._route_evaporated_species_to_condensation(
+            overhead_before_kg = float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    species, 0.0,
+                )
+                or 0.0
+            )
+            self._route_evaporated_species_to_condensation(
                 route_result,
                 species,
                 rate_kg_hr,
             )
-
-            # Premise: the committed condensation credit includes both baffle
-            # capture and wall deposition removed from this species' vapor.
-            # Algebra: overhead-passed = evolved - committed-captured.
-            # Unit check: kg/hr - kg/hr = kg/hr. Sanity: zero capture passes
-            # all evolved vapor, while complete capture passes zero.
-            captured_kg_hr = float(
-                route_diag.get('credited_condensed_kg', 0.0) or 0.0
+            overhead_after_kg = float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    species, 0.0,
+                )
+                or 0.0
             )
+
+            # Premise: the ledger delta spans this tick's full vapor credit and
+            # every committed removal (baffle, wall, or retained holdup).
+            # Algebra: free-vapor delta = (before + evolved - removals) - before
+            # = evolved - removals. Unit check: kg - kg = kg per one-hour tick,
+            # numerically kg/hr. Sanity: zero removal leaves the evolved rate;
+            # complete committed removal leaves zero, independent of diagnostics.
             residual_species_kg_hr[species] = max(
-                0.0, rate_kg_hr - captured_kg_hr,
+                0.0, overhead_after_kg - overhead_before_kg,
             )
 
         self._sync_oxygen_kg_counters()

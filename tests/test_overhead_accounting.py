@@ -1265,10 +1265,21 @@ def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
         lambda _flux, _melt: CondensationRouteResult(
             remaining_by_species={"Fe": 0.25, "FeO": 0.75},
             condensed_by_stage_species={1: {"Fe": 0.75, "FeO": 0.25}},
+            wall_deposit_by_species={"Fe": 0.15},
+            wall_deposit_fraction_by_species={"Fe": 0.2},
+            wall_deposit_account_fractions_by_species={
+                "Fe": {PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[0]: 1.0},
+            },
         ),
     )
 
     residual_flux = sim._route_to_condensation(flux)
+    captured_baffle_kg = sim.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).get("Fe", 0.0)
+    captured_wall_kg = sim.atom_ledger.kg_by_account(
+        PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[0]
+    ).get("Fe", 0.0)
     monkeypatch.setattr(
         sim.overhead_model,
         "_vapor_pressure_mbar_from_flux",
@@ -1284,8 +1295,91 @@ def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
     assert residual_flux.species_kg_hr == pytest.approx(
         {"Fe": 0.25, "FeO": 0.75}
     )
+    assert captured_wall_kg > 0.0
+    assert captured_baffle_kg + captured_wall_kg + residual_flux.species_kg_hr[
+        "Fe"
+    ] == pytest.approx(1.0, rel=1e-12)
     assert gas.composition["Fe"] == pytest.approx(expected_fe_mbar)
     assert gas.composition["FeO"] == pytest.approx(expected_feo_mbar)
+
+
+def test_condensation_residual_ignores_prior_holdup_drain_credit(monkeypatch):
+    sim = _gas_train_sim()
+    prior_holdup_kg = 2.0e-8
+    evolved_kg = 3.0e-8
+    condensed_kg = 1.0e-8
+    residual_kg = evolved_kg - condensed_kg
+    retained_wall_kg = 5.0e-13
+    sim.atom_ledger.load_external(
+        "process.condensation_retained_holdup",
+        {"Fe": prior_holdup_kg},
+        source="residual-regression prior retained holdup",
+    )
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Fe": residual_kg},
+            wall_deposit_by_species={"Fe": retained_wall_kg},
+            wall_deposit_fraction_by_species={
+                "Fe": retained_wall_kg / condensed_kg,
+            },
+            wall_deposit_account_fractions_by_species={
+                "Fe": {PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[0]: 1.0},
+            },
+        ),
+    )
+
+    residual_flux = sim._route_to_condensation(EvaporationFlux(
+        total_kg_hr=evolved_kg,
+        species_kg_hr={"Fe": evolved_kg},
+    ))
+
+    assert residual_flux.species_kg_hr["Fe"] == pytest.approx(
+        residual_kg, rel=0.0, abs=1e-24
+    )
+    assert sim.atom_ledger.kg_by_account(
+        "process.condensation_retained_holdup"
+    ).get("Fe", 0.0) == pytest.approx(
+        condensed_kg, rel=0.0, abs=1e-24
+    )
+    assert sim.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).get("Fe", 0.0) == pytest.approx(
+        prior_holdup_kg, rel=0.0, abs=1e-24
+    )
+
+
+def test_step_overhead_composition_uses_real_condensation_residual():
+    sim = _gas_train_sim()
+    evolved_kg = 1.0
+    flux = EvaporationFlux(
+        total_kg_hr=evolved_kg,
+        species_kg_hr={"Fe": evolved_kg},
+    )
+    sim.melt.campaign = CampaignPhase.C2A
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    sim._calculate_evaporation = lambda _equilibrium: flux
+    _bypass_analytic_depletion(sim)
+    seen = {}
+    real_update = sim.overhead_model.update
+
+    def _spy_update(overhead_flux, *args, **kwargs):
+        seen["flux"] = overhead_flux
+        return real_update(overhead_flux, *args, **kwargs)
+
+    sim.overhead_model.update = _spy_update
+    sim.step()
+
+    residual_kg = seen["flux"].species_kg_hr["Fe"]
+    assert 0.0 < residual_kg < evolved_kg
+    expected_transport = sim.overhead_model.estimate_transport_state(
+        seen["flux"], sim.melt
+    )
+    assert sim.overhead.composition["Fe"] == pytest.approx(
+        expected_transport["vapor_pressure_mbar"]
+    )
 
 
 def test_commanded_po2_numerical_floor_when_all_inputs_zero():
