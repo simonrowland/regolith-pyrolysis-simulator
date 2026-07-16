@@ -198,16 +198,6 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                 },
             )
 
-        invalid_route = self._invalid_route_input_refusal(
-            species,
-            sp_data,
-            controls,
-            control_audit,
-        )
-        if invalid_route is not None:
-            return invalid_route
-
-        condensed_kg = current_condensed_kg
         declared_accounts = self._declared_accounts()
         refused_account = self._undeclared_wall_deposit_account(
             controls, declared_accounts)
@@ -223,6 +213,16 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     "account": refused_account,
                 },
             )
+
+        invalid_route = self._invalid_route_input_refusal(
+            species,
+            sp_data,
+            controls,
+            control_audit,
+        )
+        if invalid_route is not None:
+            return invalid_route
+        condensed_kg = current_condensed_kg
         wall_account_fractions = self._wall_deposit_account_fractions(
             controls, declared_accounts)
 
@@ -575,7 +575,13 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
                     ratio = float(raw_ratio)
                 except (TypeError, ValueError):
                     ratio = math.nan
-                if not str(product) or not math.isfinite(ratio) or ratio <= 0.0:
+                zero_self_credit = str(product) == species and ratio == 0.0
+                if (
+                    not str(product)
+                    or not math.isfinite(ratio)
+                    or ratio < 0.0
+                    or (ratio == 0.0 and not zero_self_credit)
+                ):
                     return self._route_refusal(
                         "invalid_condensation_product_ratios",
                         control_audit,
@@ -1311,7 +1317,10 @@ class BuiltinCondensationRouteProvider(ChemistryProvider):
         )
         for account in raw_segment_fractions:
             account_name = str(account)
-            if account_name not in allowed_wall_accounts:
+            if (
+                account_name.startswith("process.wall_deposit_segment_")
+                and account_name not in allowed_wall_accounts
+            ):
                 return account_name
         return None
 
