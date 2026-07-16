@@ -10,6 +10,7 @@ from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import (
     Kress91InvalidControls,
     KRESS91_INV_T_COEFFICIENT_K,
+    KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     KRESS91_LN_FO2_COEFFICIENT,
     floor_vacuum_pressure_bar,
     feo_iw_log10_fO2_bar,
@@ -196,6 +197,50 @@ def test_kress91_referenced_log_fo2_preserves_forward_ratio(
     )['ratio']
 
     assert target_ratio == pytest.approx(reference_ratio, rel=0.0, abs=1.0e-14)
+
+
+@pytest.mark.parametrize(
+    ("reference_T_K", "target_T_K", "control"),
+    [
+        (
+            KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15 - 1.0e-6,
+            KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15,
+            "reference_T_K",
+        ),
+        (
+            KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15,
+            KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15 - 1.0e-6,
+            "target_T_K",
+        ),
+    ],
+)
+def test_kress91_referenced_log_fo2_refuses_below_calibration_temperature(
+    reference_T_K: float,
+    target_T_K: float,
+    control: str,
+) -> None:
+    with pytest.raises(
+        Kress91InvalidControls,
+        match=rf"{control}.*below liquid calibration floor",
+    ):
+        kress91_referenced_log_fO2(
+            -7.75,
+            reference_T_K=reference_T_K,
+            target_T_K=target_T_K,
+        )
+
+
+def test_kress91_referenced_log_fo2_refuses_below_calibration_target_without_reference(
+) -> None:
+    with pytest.raises(
+        Kress91InvalidControls,
+        match=r"target_T_K.*below liquid calibration floor",
+    ):
+        kress91_referenced_log_fO2(
+            -7.75,
+            reference_T_K=None,
+            target_T_K=1000.0,
+        )
 
 
 def test_kress91_equal_temperature_still_references_pressure_change() -> None:
