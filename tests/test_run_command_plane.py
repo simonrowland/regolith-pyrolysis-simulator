@@ -31,8 +31,8 @@ def _runner_document(status: str = "ok") -> dict[str, object]:
         "final": {},
         "stage_purity_report": {},
         "vapor_pressure_source_report": {
-            "vapor_pressure_backend_status": "available",
-            "authoritative_for_requested_vapor_pressure": True,
+            "vapor_pressure_backend_status": "fallback",
+            "authoritative_for_requested_vapor_pressure": False,
         },
     }
 
@@ -55,6 +55,15 @@ class _CompleteSession(_PartialSession):
 class _Socket:
     def emit(self, *_args, **_kwargs):
         pass
+
+
+def _identified_socket_client(app):
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    return app_module.socketio.test_client(
+        app,
+        flask_test_client=http_client,
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -204,7 +213,7 @@ def test_disconnect_persists_orphaned_run_as_cancelled_partial(tmp_path, monkeyp
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
     before = set(web_events._simulations)
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     client.emit(
         "start_simulation",
         {
@@ -332,7 +341,7 @@ def test_socket_restart_persists_displaced_run(tmp_path, monkeypatch):
     )
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     payload = {
         "backend": "internal-analytical",
         "feedstock": "lunar_mare_low_ti",
@@ -618,6 +627,48 @@ def test_cross_transport_submit_replaces_prior_run_and_keeps_ledger_unique(
         assert owned[0]["run_id"] == replacement_run_id
         ledger_response = http_client.get("/api/ledger/snapshot")
         assert ledger_response.status_code == 200
+    finally:
+        socket_client.disconnect()
+
+
+def test_socket_before_http_identity_does_not_mint_competing_client_id(
+    monkeypatch,
+):
+    app = app_module.create_app()
+    http_client = app.test_client()
+    socket_client = app_module.socketio.test_client(
+        app,
+        flask_test_client=http_client,
+    )
+
+    try:
+        assert socket_client.is_connected()
+        statuses = [
+            event["args"][0]
+            for event in socket_client.get_received()
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses == [{
+            "status": "error",
+            "message": "browser identity must be established over HTTP first",
+            "error_type": "client_identity_required",
+        }]
+        assert web_events._socket_client_ids == {}
+
+        monkeypatch.setattr(
+            web_events,
+            "validate_run_draft",
+            lambda _payload, *, client_id: {
+                "status": "valid",
+                "client_id": client_id,
+            },
+        )
+        response = http_client.post("/api/runs/draft", json={})
+
+        assert response.status_code == 200
+        http_client_id = response.get_json()["client_id"]
+        assert http_client_id
+        assert http_client_id not in web_events._socket_client_ids.values()
     finally:
         socket_client.disconnect()
 
@@ -1089,6 +1140,27 @@ def test_draft_is_stateless_validate_and_echo(monkeypatch):
     assert web_events._simulations == before
 
 
+def test_draft_validation_returns_typed_503_when_capacity_is_saturated(
+    monkeypatch,
+):
+    slots = threading.BoundedSemaphore(1)
+    assert slots.acquire(blocking=False)
+    monkeypatch.setattr(web_events, "_draft_validation_slots", slots)
+    try:
+        response = app_module.create_app().test_client().post(
+            "/api/runs/draft",
+            json={"mass_kg": 1000},
+        )
+    finally:
+        slots.release()
+
+    assert response.status_code == 503
+    assert response.get_json() == {
+        "error": "run draft validation capacity is exhausted",
+        "error_type": "draft_validation_capacity_exhausted",
+    }
+
+
 @pytest.mark.parametrize(
     ("path", "body", "error_type"),
     [
@@ -1102,6 +1174,23 @@ def test_command_routes_return_typed_json_errors(path, body, error_type):
     assert response.status_code == 400
     assert response.get_json()["error_type"] == error_type
     assert response.get_json()["error"]
+
+
+def test_run_command_route_rejects_dns_rebinding_host_with_typed_403():
+    response = app_module.create_app().test_client().post(
+        "/api/runs/draft",
+        json={},
+        headers={
+            "Host": "attacker.example:3000",
+            "Origin": "http://localhost:3000",
+        },
+    )
+
+    assert response.status_code == 403
+    assert response.get_json() == {
+        "error": "request Host does not match the configured server bind",
+        "error_type": "untrusted_request_host",
+    }
 
 
 @pytest.mark.parametrize(

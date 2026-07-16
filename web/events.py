@@ -86,6 +86,7 @@ _socket_client_ids: dict[str, str] = {}
 _run_idempotency: dict[tuple[str, str], tuple[str, dict[str, object]]] = {}
 _MAX_RUN_IDEMPOTENCY_ENTRIES = 1024
 _MAX_ACTIVE_RUNS = 4
+_draft_validation_slots = threading.BoundedSemaphore(1)
 _registered_start_handler = None
 _O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 _MAX_WEB_MASS_KG = 1_000_000_000.0
@@ -754,13 +755,22 @@ def validate_run_draft(
     handler = _registered_start_handler
     if handler is None:
         raise RuntimeError('run command handler is unavailable')
-    return handler(
-        request_payload,
-        sid=f'draft:{client_id}:{uuid.uuid4().hex}',
-        ledger_client_id=client_id,
-        command_mode=True,
-        draft_mode=True,
-    )
+    if not _draft_validation_slots.acquire(blocking=False):
+        raise RunCommandError(
+            'run draft validation capacity is exhausted',
+            error_type='draft_validation_capacity_exhausted',
+            status_code=503,
+        )
+    try:
+        return handler(
+            request_payload,
+            sid=f'draft:{client_id}:{uuid.uuid4().hex}',
+            ledger_client_id=client_id,
+            command_mode=True,
+            draft_mode=True,
+        )
+    finally:
+        _draft_validation_slots.release()
 
 
 def _get_backend(backend_name: str):
@@ -1857,9 +1867,14 @@ def register_events(socketio):
     @socketio.on('connect')
     def handle_connect():
         with _run_command_lock:
-            client_id = str(
-                flask_session.setdefault('ledger_client_id', uuid.uuid4().hex)
-            )
+            client_id = flask_session.get('ledger_client_id')
+            if not isinstance(client_id, str) or not client_id:
+                socketio.emit('simulation_status', {
+                    'status': 'error',
+                    'message': 'browser identity must be established over HTTP first',
+                    'error_type': 'client_identity_required',
+                }, room=request.sid)
+                return
             _socket_client_ids[request.sid] = client_id
         _safe_log(f"Client connected: {request.sid}")
 
@@ -1932,8 +1947,8 @@ def register_events(socketio):
                 if resolved_ledger_client_id is None:
                     return reject({
                         'status': 'error',
-                        'message': 'client disconnected before run launch',
-                    }, 'client_disconnected', 409)
+                        'message': 'browser identity must be established over HTTP first',
+                    }, 'client_identity_required', 409)
 
         if data is None:
             data = {}

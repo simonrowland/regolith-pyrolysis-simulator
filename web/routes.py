@@ -148,6 +148,11 @@ def _configure_request_size_limit(state) -> None:
     configured = state.app.config.get('MAX_CONTENT_LENGTH')
     if configured is None or configured > BUNDLE_CAP_BYTES:
         state.app.config['MAX_CONTENT_LENGTH'] = BUNDLE_CAP_BYTES
+    # Blueprints are also mounted by focused tests and embedders that do not
+    # call create_app(); authority still comes from app.py's bind contract.
+    from app import _request_authority_config
+    for key, value in _request_authority_config().items():
+        state.app.config.setdefault(key, value)
 
 
 @bp.before_request
@@ -156,6 +161,12 @@ def _reject_unsafe_cross_origin_request():
         return None
     if request.content_length is not None and request.content_length > BUNDLE_CAP_BYTES:
         return _json_error('request body exceeds 512MB cap', 413)
+    if not _request_host_is_configured():
+        return _typed_json_error(
+            'request Host does not match the configured server bind',
+            'untrusted_request_host',
+            403,
+        )
     if _request_is_same_origin():
         return None
     return _json_error('cross-origin mutation refused', 403)
@@ -176,21 +187,53 @@ def _sqlite_error_response(_exc: sqlite3.Error):
     return _json_error('optimizer result store unreadable', 500)
 
 
-def _request_is_same_origin() -> bool:
-    source = request.headers.get('Origin') or request.headers.get('Referer')
-    if source is None:
-        return request.headers.get('Sec-Fetch-Site') != 'cross-site'
+def _configured_request_authority() -> tuple[frozenset[str], int]:
+    """Return the loopback names and port owned by the actual server bind."""
+    hostnames = frozenset(
+        str(host).lower()
+        for host in current_app.config['REGOLITH_ALLOWED_HOSTNAMES']
+    )
+    return hostnames, int(current_app.config['REGOLITH_BIND_PORT'])
+
+
+def _request_host_is_configured() -> bool:
+    hostnames, bind_port = _configured_request_authority()
     try:
-        candidate = urlsplit(source)
-        expected = urlsplit(request.host_url)
+        candidate = urlsplit(f'//{request.host}')
+        candidate_port = candidate.port
     except ValueError:
         return False
     return (
-        candidate.scheme.lower(),
-        candidate.netloc.lower(),
-    ) == (
-        expected.scheme.lower(),
-        expected.netloc.lower(),
+        candidate.hostname is not None
+        and candidate.hostname.lower() in hostnames
+        and (candidate_port if candidate_port is not None else bind_port)
+        == bind_port
+        and candidate.username is None
+        and candidate.password is None
+    )
+
+
+def _request_is_same_origin() -> bool:
+    # request.host_url reflects the untrusted Host header. Pin Host and source
+    # independently to the loopback names plus REGOLITH_PORT from app.py.
+    if not _request_host_is_configured():
+        return False
+    source = request.headers.get('Origin') or request.headers.get('Referer')
+    if source is None:
+        return request.headers.get('Sec-Fetch-Site') != 'cross-site'
+    hostnames, bind_port = _configured_request_authority()
+    try:
+        candidate = urlsplit(source)
+        candidate_port = candidate.port
+    except ValueError:
+        return False
+    return (
+        candidate.scheme.lower() == 'http'
+        and candidate.hostname is not None
+        and candidate.hostname.lower() in hostnames
+        and candidate_port == bind_port
+        and candidate.username is None
+        and candidate.password is None
     )
 
 

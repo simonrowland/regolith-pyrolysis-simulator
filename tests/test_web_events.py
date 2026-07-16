@@ -44,6 +44,15 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 _RECIPE_DIR = _REPO_ROOT / "data" / "recipes"
 
 
+def _identified_socket_client(app):
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    return app_module.socketio.test_client(
+        app,
+        flask_test_client=http_client,
+    )
+
+
 def _tag_with_id(source: str, element_id: str) -> str:
     match = re.search(
         r'<(?:input|select)\b(?=[^>]*\bid="' + re.escape(element_id) + r'")[^>]*>',
@@ -217,7 +226,7 @@ def _force_socketio_internal_analytical(monkeypatch) -> list[tuple[object, tuple
 def test_socketio_ledger_api_is_byte_identical_read_only(monkeypatch):
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     before_sids = set(_simulations)
 
@@ -371,7 +380,7 @@ def test_loaded_recipe_start_applies_restored_runtime_levers(
     loaded = app.test_client().post("/recipes/load", json={"name": "loaded-c4"})
     assert loaded.status_code == 200, loaded.get_json()
 
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -505,7 +514,7 @@ def test_staged_recipe_save_load_start_is_identity(
         assert loaded.status_code == 200, loaded.get_json()
         assert loaded.get_json()["setpoints_patch"] == saved_patch
 
-        socket_client = app_module.socketio.test_client(app)
+        socket_client = _identified_socket_client(app)
         assert socket_client.is_connected()
         socket_client.get_received()
         before = set(_simulations)
@@ -1067,7 +1076,7 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1355,7 +1364,7 @@ def test_web_start_event_resolves_furnace_material_cap(
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1421,7 +1430,7 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1476,7 +1485,7 @@ def test_loaded_recipe_start_applies_patch_and_runtime_overrides(monkeypatch):
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1549,7 +1558,7 @@ def test_web_start_event_rejects_unselectable_furnace_material_before_session(
 
     monkeypatch.setattr("web.events._get_backend", fail_if_backend_resolves)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1587,7 +1596,7 @@ def test_web_start_event_rejects_unselectable_furnace_material_before_session(
 def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch):
     monkeypatch.setattr("web.events._get_backend", lambda _backend_name: InternalAnalyticalBackend())
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1679,7 +1688,7 @@ def test_web_start_event_rejects_invalid_numeric_payload_before_session(
 
     monkeypatch.setattr("web.events._get_backend", fail_if_backend_resolves)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1741,7 +1750,7 @@ def test_make_decision_rejects_bad_payload(monkeypatch, bad_payload, message):
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1797,7 +1806,7 @@ def test_make_decision_rejects_choice_not_in_pending_options(monkeypatch):
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1877,7 +1886,7 @@ def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1923,7 +1932,7 @@ def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
 def test_adjust_po2_rolls_back_when_post_mutation_validation_fails(monkeypatch):
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     client.get_received()
     before = set(_simulations)
 
@@ -1968,7 +1977,7 @@ def test_adjust_po2_rolls_back_when_post_mutation_validation_fails(monkeypatch):
 def test_adjust_campaign_override_rolls_back_after_validation_failure(monkeypatch):
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     client.get_received()
     before = set(_simulations)
 
@@ -2044,7 +2053,7 @@ def test_adjust_parameter_rejects_unknown_or_incomplete_noops(
 ):
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     client.get_received()
     before = set(_simulations)
 
@@ -2121,7 +2130,7 @@ def test_socket_run_is_fully_initialized_when_published(tmp_path, monkeypatch):
         inspect_publication,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     try:
         result = client.emit(
             "start_simulation",
@@ -2139,7 +2148,7 @@ def test_socket_run_is_fully_initialized_when_published(tmp_path, monkeypatch):
         client.disconnect()
 
 
-def test_fresh_socket_binds_client_identity_before_arbitration(
+def test_http_identified_socket_binds_client_identity_before_arbitration(
     tmp_path,
     monkeypatch,
 ):
@@ -2147,7 +2156,7 @@ def test_fresh_socket_binds_client_identity_before_arbitration(
     store = RunArtifactStore(tmp_path / "runs")
     monkeypatch.setattr(web_events, "get_run_store", lambda: store)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     payload = {
         "backend": "internal-analytical",
         "feedstock": "lunar_mare_low_ti",
@@ -2336,8 +2345,8 @@ def _terminal_runner_document(status: str) -> dict[str, object]:
         "final": {"wall_deposit_by_species_kg": {"SiO": 0.25}},
         "stage_purity_report": {"stage_1": {"verdict": "PURE"}},
         "vapor_pressure_source_report": {
-            "vapor_pressure_backend_status": "available",
-            "authoritative_for_requested_vapor_pressure": True,
+            "vapor_pressure_backend_status": "fallback",
+            "authoritative_for_requested_vapor_pressure": False,
         },
     }
 
@@ -2429,7 +2438,7 @@ def test_terminal_outcomes_persist_full_runner_document(tmp_path, monkeypatch, o
     monkeypatch.setattr(web_events, "_safe_log", logged.append)
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     before = set(_simulations)
 
     class Session:
@@ -2519,7 +2528,7 @@ def test_real_web_session_uses_canonical_runner_projector(
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     before = set(_simulations)
 
     try:
@@ -2568,7 +2577,7 @@ def test_real_web_session_failure_persists_non_sparse_terminal(tmp_path, monkeyp
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     before = set(_simulations)
 
     try:
@@ -2619,7 +2628,7 @@ def test_web_run_payload_captures_effective_config_sources(monkeypatch):
     monkeypatch.setattr(web_events, "persist_run_artifact", capture_persist)
     monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     before = set(_simulations)
 
     try:
@@ -2685,7 +2694,7 @@ def test_persist_failure_visible_on_all_terminal_paths(
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     before = set(_simulations)
 
     session = SimpleNamespace(
@@ -2782,7 +2791,7 @@ def test_save_ok_completion_emit_failure_is_not_persistence_failure(
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     before = set(_simulations)
     original_emit_if_current = web_events._emit_if_current
 
@@ -2839,7 +2848,7 @@ def test_c6_refusal_emit_failure_still_cleans_run_state(tmp_path, monkeypatch):
     monkeypatch.setattr(web_events, "_safe_log", logged.append)
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     before = set(_simulations)
     original_emit_if_current = web_events._emit_if_current
 
@@ -3258,7 +3267,7 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
         run_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
 
@@ -3305,7 +3314,7 @@ def test_web_failure_status_and_cleanup_survive_poison_enrichment_failure(
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -3405,7 +3414,7 @@ def test_per_hour_summary_redox_fields_reach_socket_and_recipe_capture_live_path
         run_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -3534,7 +3543,7 @@ def test_optional_native_fe_nested_redox_payloads_reach_socket_and_recipe_captur
         run_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -3636,7 +3645,7 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
         run_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
 
@@ -3691,7 +3700,7 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
     )
     app = app_module.create_app()
     app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -3860,7 +3869,7 @@ def test_web_pause_resume_is_result_neutral(monkeypatch, tmp_path):
 
     def start_web_session():
         before = set(_simulations)
-        client = app_module.socketio.test_client(app)
+        client = _identified_socket_client(app)
         assert client.is_connected()
         client.get_received()
         client.emit(

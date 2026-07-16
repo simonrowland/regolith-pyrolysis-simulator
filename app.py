@@ -24,6 +24,18 @@ from flask_socketio import SocketIO
 socketio = SocketIO()
 
 
+def _request_authority_config() -> dict[str, object]:
+    """Build request authority metadata from the server bind environment."""
+    run_config = _run_config_from_env()
+    return {
+        'REGOLITH_BIND_PORT': run_config['port'],
+        'REGOLITH_ALLOWED_HOSTNAMES': frozenset({
+            'localhost',
+            '127.0.0.1',
+        }),
+    }
+
+
 def _load_secret_key() -> str:
     """Load a stable local secret, generating one on first run if needed."""
     env_secret = os.environ.get('FLASK_SECRET_KEY')
@@ -52,6 +64,7 @@ def create_app():
     )
     app.config['SECRET_KEY'] = _load_secret_key()
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+    app.config.update(_request_authority_config())
 
     # Register simulator web blueprint
     from web.routes import bp as web_bp
