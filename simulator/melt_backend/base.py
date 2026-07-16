@@ -509,6 +509,10 @@ class EquilibriumResult:
     chem_potentials: Optional[Dict[str, Dict[str, Any]]] = None
     phase_affinities: Optional[Dict[str, Dict[str, Any]]] = None
 
+    # AlphaMELTS table rows before same-base phases are aggregated. Kept at
+    # the ABI-safe tail so legacy positional constructors retain their shape.
+    phase_instances: List[Dict[str, Any]] = field(default_factory=list)
+
     def __post_init__(self) -> None:
         if self.status != 'ok':
             return

@@ -477,6 +477,75 @@ def test_alphamelts_subprocess_requires_explicit_run_mode(monkeypatch):
         )
 
 
+def test_alphamelts_phase_main_preserves_same_base_instances_and_formulas():
+    backend = AlphaMELTSBackend()
+    phase = (
+        'index 1 Pressure 1.00 Temperature 1100.00 SiO2 FeO MgO\n'
+        'olivine0 40.0 -100.0 10.0 12.0 5.0 '
+        "(Mg0.8Fe''0.2)2SiO4 40.0 10.0 50.0\n"
+        'olivine1 60.0 -200.0 20.0 18.0 7.0 '
+        '(Mg0.6Fe0.4)2SiO4 35.0 30.0 35.0\n'
+    )
+
+    parsed = backend._parse_phase_main_output(phase)
+
+    assert [row['instance_id'] for row in parsed['phase_instances']] == [
+        'olivine0',
+        'olivine1',
+    ]
+    assert [
+        row['formula_or_endmember_token']
+        for row in parsed['phase_instances']
+    ] == ["(Mg0.8Fe''0.2)2SiO4", '(Mg0.6Fe0.4)2SiO4']
+    assert parsed['phase_instances'][0]['composition_wt_pct'] == {
+        'SiO2': 40.0,
+        'FeO': 10.0,
+        'MgO': 50.0,
+    }
+    assert parsed['phase_compositions']['olivine'] == pytest.approx({
+        'SiO2': 37.0,
+        'FeO': 22.0,
+        'MgO': 41.0,
+    })
+    first_instance = dict(parsed['phase_instances'][0])
+    first_instance['physical_mass_kg'] = 0.04
+    species_mol, species_kg = backend._phase_species_from_instances(
+        [first_instance]
+    )
+    assert species_kg['olivine0'] == {"(Mg0.8Fe''0.2)2SiO4": 0.04}
+    assert species_mol['olivine0']["(Mg0.8Fe''0.2)2SiO4"] > 0.0
+
+
+def test_builtin_subprocess_vapor_projection_populates_representative_melt():
+    backend = AlphaMELTSBackend()
+    result = EquilibriumResult(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={
+            'SiO2': 50.0,
+            'Al2O3': 15.0,
+            'FeO': 10.0,
+            'MgO': 10.0,
+            'CaO': 10.0,
+            'Na2O': 5.0,
+        },
+        status='ok',
+    )
+
+    pressures, sources, diagnostics = (
+        backend._builtin_vapor_projection_for_subprocess(result)
+    )
+
+    assert pressures
+    assert set(pressures) == set(sources)
+    assert all(value > 0.0 for value in pressures.values())
+    assert diagnostics['vapor_pressures_Pa'] == pressures
+
+
 def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     monkeypatch,
 ):
@@ -520,6 +589,7 @@ def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
                 'T 1400.000000 (C)\n'
                 'liquid: SiO2 Al2O3 FeO MgO CaO Na2O\n'
                 '100.0 g 50 15 10 10 10 5\n'
+                'activity Na2O = 0.25\n'
                 'Melt fraction = 1.0\n'
             ),
             stderr='',
@@ -528,6 +598,15 @@ def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     monkeypatch.setattr(
         'simulator.melt_backend.alphamelts.subprocess.run',
         fake_run,
+    )
+    monkeypatch.setattr(
+        backend,
+        '_builtin_vapor_projection_for_subprocess',
+        lambda _eq: (
+            {'Na': 12.5},
+            {'Na': 'builtin_authoritative:test'},
+            {'vapor_pressures_Pa': {'Na': 12.5}},
+        ),
     )
 
     result = backend.equilibrate(
@@ -563,6 +642,10 @@ def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     assert result.phase_compositions['liquid']['SiO2'] == pytest.approx(50.0)
     assert result.solid_composition_wt_pct == {}
     assert result.bulk_composition_wt_pct['SiO2'] == pytest.approx(50.0)
+    assert result.phase_species_kg['liquid1']['Na2O'] == pytest.approx(5.0)
+    assert result.phase_species_mol['liquid1']['Na2O'] > 0.0
+    assert result.vapor_pressures_Pa == {'Na': pytest.approx(12.5)}
+    assert result.vapor_pressures_source['Na'].startswith('builtin_authoritative')
     assert result.diagnostics['intrinsic_fO2_log'] == pytest.approx(-9.0)
     assert result.diagnostics['thermodynamic_basis'] == {
         'reference_basis': 'alphamelts_solver_system_amount',
@@ -902,6 +985,11 @@ def test_alphamelts_subprocess_signal_exit_is_typed_crash_without_mode_flip(
 
     monkeypatch.setattr('simulator.melt_backend.alphamelts.subprocess.run', fake_run)
     monkeypatch.setattr(backend, '_parse_single_point_stdout', fake_parse)
+    monkeypatch.setattr(
+        backend,
+        '_builtin_vapor_projection_for_subprocess',
+        lambda _eq: ({}, {}, {'test_stub': True}),
+    )
 
     with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
         backend.equilibrate(

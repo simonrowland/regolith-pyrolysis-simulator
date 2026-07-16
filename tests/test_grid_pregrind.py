@@ -23,8 +23,11 @@ from scripts.grid_pregrind import (
     temperature_grid,
 )
 from scripts.grid_pregrind_writer import (
+    CACHE_V2_SCHEMA_VERSION,
+    COMPONENT_FIELDS,
     FINDER_INPUT_FIELDS,
     GridCacheWriter,
+    cache_v2_identity_manifest,
     canonical_input_vector,
     expedited_key,
 )
@@ -475,6 +478,26 @@ def _output(status: str = "ok") -> dict:
             "phase_masses_kg": {"liquid": 0.1},
             "phase_species_mol": {},
             "phase_species_kg": {},
+            "phase_instances": [
+                {
+                    "instance_id": "olivine0",
+                    "phase": "olivine",
+                    "solver_basis_mass_kg": 0.04,
+                    "physical_mass_kg": 0.04,
+                    "formula_or_endmember_token": "(Mg0.8Fe0.2)2SiO4",
+                    "composition_wt_pct": {"SiO2": 40.0, "FeO": 10.0},
+                    "reference_basis": "alphamelts_solver_phase_amount",
+                },
+                {
+                    "instance_id": "olivine1",
+                    "phase": "olivine",
+                    "solver_basis_mass_kg": 0.06,
+                    "physical_mass_kg": 0.06,
+                    "formula_or_endmember_token": "(Mg0.6Fe0.4)2SiO4",
+                    "composition_wt_pct": {"SiO2": 35.0, "FeO": 30.0},
+                    "reference_basis": "alphamelts_solver_phase_amount",
+                }
+            ],
             "phase_compositions": {},
             "liquid_fraction": 1.0,
             "phase_assemblage_available": True,
@@ -885,6 +908,7 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(
         ("alphamelts_outputs", "generic_phase_thermo_json"),
         ("alphamelts_outputs", "generic_chem_potentials_json"),
         ("alphamelts_outputs", "generic_phase_affinities_json"),
+        ("alphamelts_outputs", "generic_phase_instances_json"),
         ("alphamelts_outputs", "generic_solid_composition_wt_pct_json"),
         ("alphamelts_outputs", "generic_bulk_composition_wt_pct_json"),
         ("alphamelts_outputs", "run_mode"),
@@ -931,13 +955,72 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(
         "generic_phase_thermo_json",
         "generic_chem_potentials_json",
         "generic_phase_affinities_json",
+        "generic_phase_instances_json",
         "generic_solid_composition_wt_pct_json",
         "generic_bulk_composition_wt_pct_json",
         "run_mode",
         "applied_timeout_s",
         "applied_timeout_s_repr",
     } <= output_columns
-    assert output_field_count == "74"
+    assert output_field_count == "75"
+
+
+def test_cache_v2_immutable_metadata_written_checked_and_refuses_drift(tmp_path):
+    database = tmp_path / "cache-v2-metadata.db"
+    with GridCacheWriter(database) as writer:
+        metadata = dict(
+            writer.connection.execute(
+                "SELECT key, value FROM metadata WHERE key LIKE 'cache_v2_%' "
+                "OR key = 'corpus_version'"
+            )
+        )
+
+    manifest = cache_v2_identity_manifest()
+    assert metadata["cache_v2_schema_version"] == CACHE_V2_SCHEMA_VERSION
+    assert json.loads(metadata["cache_v2_identity_manifest"]) == manifest
+    assert manifest["identity"] == {
+        "fields": ["engine_name", "engine_version", "quantized_inputs"],
+        "cache_lever": "corpus_version",
+        "optimizer_identity_included": False,
+    }
+    quantized_fields = [item["field"] for item in manifest["quantized_inputs"]]
+    assert quantized_fields[:14] == [
+        f"component_{component}_mol"
+        for component in COMPONENT_FIELDS
+    ]
+    assert "timeout_s" not in quantized_fields
+
+    with GridCacheWriter(database, existing_only=True):
+        pass
+    connection = sqlite3.connect(database)
+    connection.execute(
+        "UPDATE metadata SET value = 'drifted' "
+        "WHERE key = 'cache_v2_identity_manifest'"
+    )
+    connection.commit()
+    connection.close()
+    for existing_only in (False, True):
+        with pytest.raises(
+            ValueError,
+            match="cache_v2 immutable metadata mismatch",
+        ):
+            GridCacheWriter(database, existing_only=existing_only)
+
+
+def test_legacy_grid_without_cache_v2_metadata_remains_readable(tmp_path):
+    database = tmp_path / "legacy-no-cache-v2-metadata.db"
+    with GridCacheWriter(database):
+        pass
+    connection = sqlite3.connect(database)
+    connection.execute(
+        "DELETE FROM metadata WHERE key LIKE 'cache_v2_%' "
+        "OR key = 'corpus_version'"
+    )
+    connection.commit()
+    connection.close()
+
+    with GridCacheWriter(database, existing_only=True) as writer:
+        assert writer.counts()["total"] == 0
 
 
 def _prepared_drain_database(database):
@@ -1178,6 +1261,7 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
             "o.generic_phase_thermo_json, "
             "o.generic_chem_potentials_json, "
             "o.generic_phase_affinities_json, "
+            "o.generic_phase_instances_json, "
             "o.generic_bulk_composition_wt_pct_json, "
             "o.alpha_intrinsic_fO2_log "
             "FROM grid_keys h JOIN alphamelts_outputs o ON o.grid_key_id = h.id"
@@ -1203,6 +1287,8 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
         ] == 2893.824
         assert row["generic_chem_potentials_json"] is None
         assert row["generic_phase_affinities_json"] is None
+        phase_instances = json.loads(row["generic_phase_instances_json"])
+        assert phase_instances == _output()["generic"]["phase_instances"]
         assert json.loads(row["generic_bulk_composition_wt_pct_json"])[
             "SiO2"
         ] == 49.3753
