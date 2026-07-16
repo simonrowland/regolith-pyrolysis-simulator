@@ -54,6 +54,7 @@ from simulator.account_ids import (
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+    METAL_PHASE_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
@@ -11518,9 +11519,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 pending_decision = self.campaign_mgr.get_decision(
                     self.melt.campaign, self.record)
 
-        # Stratification remains an hour-boundary diagnostic: all legacy
-        # physics has read the canonical staging account before this move.
-        self._step_metal_phase_stratification(equilibrium)
+        backend_transition = getattr(equilibrium, 'ledger_transition', None)
+        backend_controls_metal_phase = (
+            backend_transition is not None
+            and any(
+                str(lot.account) == METAL_PHASE_ACCOUNT
+                for lot in (
+                    tuple(backend_transition.debits)
+                    + tuple(backend_transition.credits)
+                )
+            )
+        )
+        # A backend-authored metal-phase transition is authoritative for that
+        # account.  Do not immediately overwrite its disposition with the
+        # diagnostic-only builtin stratification provider.
+        if not backend_controls_metal_phase:
+            # Stratification remains an hour-boundary diagnostic: all legacy
+            # physics has read the canonical staging account before this move.
+            self._step_metal_phase_stratification(equilibrium)
 
         # --- 10. Record snapshot ---
         completed_hour = int(self.melt.hour)
