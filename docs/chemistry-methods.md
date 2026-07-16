@@ -55,7 +55,7 @@ Vapor pressure is the driving quantity for the whole extraction sequence: it set
 leave the melt at a given temperature and pressure. The authoritative provider is analytic — an
 Antoine reference for the pure component, coupled to an Ellingham/activity correction that converts the
 pure-component pressure into the effective pressure over the actual melt.
-<!-- impl: §2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:670 — Antoine Ellingham path -->
+<!-- impl: §2 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:733 — Antoine Ellingham path -->
 
 ### §2.1 Pure-component reference
 
@@ -96,7 +96,7 @@ prefers it over the pseudo fallback. The VapoRock target itself comes from
 Wolf et al. 2023 (*ApJ* 947:64,
 [doi:10.3847/1538-4357/acbcc7](https://doi.org/10.3847/1538-4357/acbcc7)).
 <!-- impl: §2.1 -> engines/builtin/vapor_pressure.py _is_noncertifying_pseudo_vapor_pressure_runtime:552 — pseudo guard -->
-<!-- impl: §2.1 -> data/vapor_pressures.yaml oxide_vapors.SiO.backsolve:543 — pseudo grid metadata -->
+<!-- impl: §2.1 -> data/vapor_pressures.yaml oxide_vapors.SiO.backsolve:573 — pseudo grid metadata -->
 
 ### §2.2 From pure component to effective pressure over the melt
 
@@ -138,7 +138,7 @@ hard-vacuum reference rather than extrapolating the divergence.
 The species-specific oxygen-pressure slopes for the other oxides (the `−1/n_M` family in
 `docs/concepts.md`) follow from the same formation-reaction stoichiometry.
 <!-- impl: §2.3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:948 — SiO pO2 suppression -->
-<!-- impl: §2.3 -> data/vapor_pressures.yaml oxide_vapors.SiO.suppression_equation:594 — SiO equation metadata -->
+<!-- impl: §2.3 -> data/vapor_pressures.yaml oxide_vapors.SiO.suppression_equation:626 — SiO equation metadata -->
 
 ### §2.4 Metal vapor versus oxide vapor
 
@@ -169,7 +169,7 @@ pass intrinsic oxygen fugacity into the vapor-pressure provider, so FeO uses the
 activity from the Kress & Carmichael / CALPHAD treatment of §7. The builtin single-cation-gamma,
 Kress-for-iron activity surface is what the vapor pressures of §2 are built on.
 <!-- impl: §3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:745 — FeO Kress activity -->
-<!-- impl: §3 -> simulator/fe_redox.py kress91_ferrous_feo_activity:652 — FeO activity path -->
+<!-- impl: §3 -> simulator/fe_redox.py kress91_ferrous_feo_activity:718 — FeO activity path -->
 
 The silicate-equilibrium engines compute activities too, on the MELTS convention
 
@@ -277,7 +277,7 @@ J = (P_eff − P_bulk) / ( r_melt + r_interface + r_gas )
   β_FS  = (1 + Kn) / (1 + (4/(3α_g)+0.377)Kn + (4/(3α_g))Kn²)
                                                 Fuchs-Sutugin gas-resistance weight; α_g = 1.0
 ```
-<!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:363 — three resistance flux -->
+<!-- impl: §4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:391 — three resistance flux -->
 
 In the free-molecular limit (high Knudsen number) the Fuchs–Sutugin gas-resistance weight sends the
 gas-side boundary-layer resistance to zero and the Hertz–Knudsen interface term rate-limits; in the
@@ -286,8 +286,8 @@ rate-limits. The diffusion coefficient `D_AB` is a per-species Chapman–Enskog 
 constant, and the Sherwood number carries the **radial** induction-stirring enhancement,
 `Sh_eff = 3.66 × √max(1, radial_stir_factor)`. The radial default is 1.0, so the default Sherwood number
 is the laminar `Sh = 3.66`; `Sh_eff ≈ 9` occurs only when the radial factor is about 6.
-<!-- impl: §4 -> engines/builtin/evaporation_flux.py _fuchs_sutugin_gas_resistance_weight:225 — Fuchs gas weight -->
-<!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1215 — radial Sherwood -->
+<!-- impl: §4 -> engines/builtin/evaporation_flux.py _fuchs_sutugin_gas_resistance_weight:252 — Fuchs gas weight -->
+<!-- impl: §4 -> simulator/condensation.py _stirring_enhanced_sherwood:1271 — radial Sherwood -->
 
 The **melt-side surface-renewal resistance** `r_melt` accounts for the finite rate at which stirring
 brings fresh, un-depleted melt to the evaporating surface — a resistance in series with the gas-side
@@ -368,7 +368,7 @@ uses the Pound 1972 high-supersaturation unity condensation coefficient (α_c = 
 Ref. Data* 1:135, [doi:10.1063/1.3253096](https://doi.org/10.1063/1.3253096)). The model does not
 extrapolate the hot-source Arrhenius onto cold walls: the evaporation and condensation coefficients are
 deliberately different off-equilibrium at high supersaturation.
-<!-- impl: §4.2 -> data/vapor_pressures.yaml oxide_vapors.SiO.evaporation_alpha:561 — SiO alpha split -->
+<!-- impl: §4.2 -> data/vapor_pressures.yaml oxide_vapors.SiO.evaporation_alpha:591 — SiO alpha split -->
 
 ### §4.3 The one-hour reservoir model
 
@@ -379,7 +379,7 @@ fresh equilibrium solve at each instant: it smooths the time integration but ass
 is constant over the tick, which accumulates error when the melt composition swings hard within a
 single hour. It is stated as a current approximation in
 [`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1388 — hourly depletion reservoir -->
+<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1423 — hourly depletion reservoir -->
 
 ### §4.4 The Knudsen and Langmuir limits, the sweep, and self-poisoning
 
@@ -403,7 +403,7 @@ the primary anchor for the vapor-pressure and activity coefficients, and why sti
 furnace model only as enhancements layered on top of that baseline. Equilibrium-mode KEMS pins the
 activity (it is transport-independent); free-evaporation (Langmuir) measurements pin α at that same
 un-enhanced surface.
-<!-- impl: §4.4 -> engines/builtin/evaporation_flux.py _fuchs_sutugin_gas_resistance_weight:225 — ballistic gas limit -->
+<!-- impl: §4.4 -> engines/builtin/evaporation_flux.py _fuchs_sutugin_gas_resistance_weight:252 — ballistic gas limit -->
 
 **The metal-vapor back-pressure.** Between the two limits the net flux is driven by `P_eff − P_bulk`: the
 partial pressure of the species already in the bulk gas subtracts from the equilibrium pressure, so as a
@@ -434,7 +434,7 @@ so the advective removal of vapor and oxygen that a faster flowing sweep would p
 separately from the static-pressure diffusion resistance; and the co-evolved-oxygen self-poisoning acts
 with a one-step lag (through the headspace ledger) rather than as an instantaneous local-surface balance in
 which the oxygen from the current solve poisons that same solve.
-<!-- impl: §4.4 -> simulator/campaigns.py CampaignManager._c2a_staged_stage_gas_control:681 — pN2 band cover -->
+<!-- impl: §4.4 -> simulator/campaigns.py CampaignManager._c2a_staged_stage_gas_control:846 — pN2 band cover -->
 
 ---
 
@@ -447,7 +447,7 @@ species' condensation time constant. Iron is designated to the hottest condenser
 magnesium, sodium, and potassium condensing in progressively cooler stages. SiO that reaches a cold
 surface disproportionates on condensation (`SiO → ½ SiO₂ + ½ Si`), which is why its captured product
 is silica rather than a recoverable monoxide.
-<!-- impl: §5 -> simulator/condensation.py CondensationModel.route:2228 — stage routing efficiency -->
+<!-- impl: §5 -> simulator/condensation.py CondensationModel.route:2362 — stage routing efficiency -->
 <!-- impl: §5 -> engines/builtin/condensation_route.py BuiltinCondensationRouteProvider.dispatch:203 — SiO product credits -->
 
 The condensation reference temperatures used for this routing (for example, iron at 1250 °C, SiO at
@@ -458,7 +458,7 @@ threshold approximately tracks a pure-component saturation crossing it does so b
 condenser stage-band alignment, not the pure-substance vapor-pressure crossing. They are documented as
 such in the recipe data and are an engineering approximation pending physical validation of the real
 condenser geometry.
-<!-- impl: §5 -> data/vapor_pressures.yaml condensation_reference_at_1mbar:733 — routing thresholds -->
+<!-- impl: §5 -> data/vapor_pressures.yaml condensation_reference_at_1mbar:766 — routing thresholds -->
 
 The simulator reports the outcome of routing as a per-stage purity account (designated mass versus
 impurity mass per stage) and pins the routing against per-pipe-segment wall temperatures with a
@@ -481,7 +481,7 @@ through the condensation route inside the mass-balance closure. At each wall the
 sink competes against the onward condensed sink, and the split is set by a per-species, per-segment,
 temperature-dependent wall sticking coefficient. The remainder — the capture budget minus the wall
 deposit — is what reaches the designated condenser.
-<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:3704 — wall HKL MT split -->
+<!-- impl: §6 -> simulator/condensation.py _series_resistance_deposition_flux_mol_m2_s:4184 — wall HKL MT split -->
 
 Wall re-evaporation is handled by a per-species reactivity class:
 
@@ -496,7 +496,7 @@ Wall re-evaporation is handled by a per-species reactivity class:
 - **Sodium and potassium** credit their elemental deposit but carry a diagnostic activity-depression
   state anchored to a disilicate saturation (0.5 mol alkali oxide per mol SiO₂, from the Kracek-family
   phase data).
-<!-- impl: §6 -> engines/builtin/condensation_route.py BuiltinCondensationRouteProvider._wall_reaction_plan:351 — wall reaction plan -->
+<!-- impl: §6 -> engines/builtin/condensation_route.py BuiltinCondensationRouteProvider._wall_reaction_plan:695 — wall reaction plan -->
 
 The accumulated wall load maps to furnace lifespan by a thickness proxy: per segment, the deposited
 mass of each species divided by its density and the segment area gives a cumulative wall thickness, and
@@ -511,7 +511,7 @@ transient wall state) are enumerated in [`docs/model-limitations.md`](model-limi
 The Knudsen number is reported per segment as a transport diagnostic and drives cold-spot warnings, but
 it does not gate deposition routing — the transport regimes are treated as continuous, consistent with
 modelling coating as a rate rather than a threshold.
-<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:3940 — wall Kn weighting -->
+<!-- impl: §6 -> simulator/condensation.py _knudsen_regime_factor:4487 — wall Kn weighting -->
 
 ---
 
@@ -526,7 +526,7 @@ number — total iron expressed as ferrous oxide — and do **not** resolve the 
 fluorescence measure total iron by X-ray intensity and cannot separate the oxidation states at
 collection time, so all iron is booked as FeO and the redox state must be inferred afterward. Every
 feedstock in the catalog follows this convention, and its annotations say so.
-<!-- impl: §7.1 -> simulator/fe_redox.py feot_equivalent_wt_pct:319 — total iron conversion -->
+<!-- impl: §7.1 -> simulator/fe_redox.py feot_equivalent_wt_pct:368 — total iron conversion -->
 
 That convention is also a validation caveat for mass-spectrometry comparisons. A KEMS sample sees vapor
 over the ferric/ferrous state actually present in the experimental melt, while the simulator starts from
@@ -544,8 +544,8 @@ vapor pressure. The activity authority switches by regime: below the iron–wüs
 metal-saturated and uses a CALPHAD/Holzheid stoichiometric-wüstite activity coefficient (γ_FeO ≈ 1.70,
 Holzheid 1997); above iron–wüstite plus one log unit it uses the Kress & Carmichael ferric limb; between
 them it blends smoothly, with the activity clamped at the pure-FeO ceiling.
-<!-- impl: §7.1 -> simulator/fe_redox.py _kress91_fe2o3_over_feo_molar:547 — Kress redox split -->
-<!-- impl: §7.1 -> simulator/fe_redox.py _calphad_feo_activity_components:670 — FeO activity blend -->
+<!-- impl: §7.1 -> simulator/fe_redox.py _kress91_fe2o3_over_feo_molar:608 — Kress redox split -->
+<!-- impl: §7.1 -> simulator/fe_redox.py _calphad_feo_activity_components:736 — FeO activity blend -->
 
 **Temperature band and the liquidus gate.** The Kress & Carmichael calibration spans **1200–1630 °C**
 (228 quench analyses, iron–wüstite to air; the prior 1400 °C floor was a *conservative* gate, superseded by
@@ -607,8 +607,8 @@ heating energy and exposure to thermochemistry-refit movement. CI carbonaceous c
 promoted by this rule; the MAGEMin sample curve leaves its staged residual below the workability
 threshold through the Mg/Al₂O₃ window, so static C6 is a typed refusal with Al left in the rump.
 <!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider.dispatch:231 — metallothermic refusal behavior -->
-<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._reduction_margin_kj_per_mol_o2:1198 — Ellingham margin gate -->
-<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._crossover_temperature_C:1412 — crossover temperatures -->
+<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._reduction_margin_kj_per_mol_o2:1476 — Ellingham margin gate -->
+<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._crossover_temperature_C:1715 — crossover temperatures -->
 
 ### §7.3 Molten regolith electrolysis
 
@@ -625,7 +625,7 @@ temperature, and are labelled UNCERTIFIED. The ferric full-reduction rung is ref
 path can reduce ferric to ferrous through an explicitly uncertified diagnostic route rather than a
 validated ferric-current-partition model. Metal-phase settling and drain-tap are not modelled —
 reduced metal accumulates in a single account and is reported directly as product.
-<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider._nernst_voltage:790 — Nernst correction -->
+<!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider._nernst_voltage:965 — Nernst correction -->
 <!-- impl: §7.3 -> engines/builtin/electrolysis_step.py BuiltinElectrolysisStepProvider.dispatch:262 — Faraday ledger step -->
 
 ### §7.4 Redox capacity: the liquidus scalar and the negligible-mol floor
@@ -656,8 +656,8 @@ regime, so it leaves the system without re-equilibrating with the melt — apply
 tiny term does not change the physics (the oxygen escapes ballistically either way), so the floor is
 moot precisely where it fires. Graded range/saturation refusals still apply *above* the floor, where a
 real capacity meets an out-of-range or non-finite demand.
-<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._melt_redox_source_capacity_mol_per_ln_fO2:3793 — C_m liquid_fraction -->
-<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._apply_oxygen_reservoir_redox_source_terms:4000 — negligible-mol redox floor -->
+<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._melt_redox_source_capacity_mol_per_ln_fO2:4056 — C_m liquid_fraction -->
+<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._apply_oxygen_reservoir_redox_source_terms:4271 — negligible-mol redox floor -->
 
 ---
 
@@ -778,7 +778,7 @@ carbon into labile, refractory, carbonate, and process-reductant buckets, and ca
 refractory carbon after Stage 0. That diagnostic is not ledger-active in the extraction path described
 above; it documents the split that would need to become authoritative before the simplification is
 removed.
-<!-- impl: §10.1 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_partition_carbon_diagnostic:1213 — carbon split diagnostic -->
+<!-- impl: §10.1 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_partition_carbon_diagnostic:1265 — carbon split diagnostic -->
 <!-- impl: §10.1 -> engines/builtin/foulant_disposition.py partition_carbon:413 — carbon bucket partition -->
 
 ### §10.2 CNOPS handling
@@ -803,7 +803,7 @@ The cleanup stage's treatment of carbon, nitrogen, oxygen, phosphorus, and sulfu
   sulfate-capacity (SCAS) limits and the sulfide/sulfate partition; otherwise it falls back to the
   builtin bucketing with a recorded warning. The gate never mutates the atom ledger.
 <!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_carbonate_decomposition:565 — carbonate oxide credit -->
-<!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_volatilization_diagnostic:920 — volatile salt diagnostic -->
+<!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_volatilization_diagnostic:964 — volatile salt diagnostic -->
 
 The mechanism behind this cleanup is, for most species, **name-routing rather than reductant-driven
 thermodynamics**: raw feedstock components are matched by name and dropped into terminal buckets
@@ -867,4 +867,4 @@ engine version. The diagnostic-only `magemin-shadow` identity uses provider/mode
 has no AlphaMELTS version field. A mode or declared-version change therefore invalidates the applicable
 identity rather than silently reusing it. This is what lets a validation number
 be re-derived and audited rather than taken on trust that "the cache had it."
-<!-- impl: §11 -> simulator/reduced_real_determinism.py _provider_identity_components — provider-specific cache identity -->
+<!-- impl: §11 -> simulator/reduced_real_determinism.py _provider_identity:2624 — provider-specific cache identity -->
