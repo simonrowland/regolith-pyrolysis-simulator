@@ -2486,6 +2486,27 @@ Melt fraction = 1.0
     assert result.diagnostics.get('diagnostic_oxide_activities') in (None, {})
 
 
+def test_subprocess_inline_activity_requires_explicit_species_value_syntax():
+    backend = AlphaMELTSBackend()
+    output = """
+Liquid activities: SiO2 0.42 Na=0.08
+<> Stable phase assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1500.000000 (C)
+liquid: SiO2 Al2O3 FeO Na2O
+100.0 g 50.0 15.0 10.0 5.0
+Melt fraction = 1.0
+"""
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1500.0,
+        total_input_kg=100.0,
+    )
+
+    assert result.activity_coefficients == {'Na': pytest.approx(0.08)}
+
+
 @pytest.mark.parametrize('activity_header', ['Activities:', 'Liquid activities:'])
 def test_subprocess_activity_header_does_not_parse_following_phase_block(
     activity_header,
@@ -2508,6 +2529,16 @@ Melt fraction = 1.0
 
     assert result.activity_coefficients == {}
     assert result.diagnostics.get('diagnostic_oxide_activities') in (None, {})
+
+
+def test_subprocess_activity_table_rejects_loose_prose_label():
+    backend = AlphaMELTSBackend()
+    activities = backend._activity_table_after(
+        ['Liquid activities:', 'Mass SiO2', '100.0 0.42'],
+        0,
+    )
+
+    assert 'Mass' not in activities
 
 
 def test_equilibrium_emission_keeps_endmember_activities_diagnostic_only():

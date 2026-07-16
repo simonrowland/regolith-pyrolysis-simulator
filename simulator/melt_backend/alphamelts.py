@@ -2541,8 +2541,18 @@ class _MELTSBackendSupport(MeltBackend):
     def _activity_pairs_from_line(self, line: str) -> dict:
         if ':' not in line:
             return {}
-        tokens = line.split(':', 1)[1].split()
-        return self._activity_pairs_from_tokens(tokens)
+        activities: Dict[str, float] = {}
+        for match in re.finditer(
+            r'([^\s,=]+)\s*=\s*([^\s,]+)',
+            line.split(':', 1)[1],
+        ):
+            name, raw_value = match.groups()
+            if (
+                self._looks_like_activity_label(name)
+                and self._is_number(raw_value)
+            ):
+                activities[name] = float(raw_value)
+        return activities
 
     def _activity_table_after(self, lines: list[str], idx: int) -> dict:
         if not lines[idx].strip().endswith(':'):
@@ -2567,22 +2577,6 @@ class _MELTSBackendSupport(MeltBackend):
                 for name, value in zip(names, value_tokens)
             }
         return {}
-
-    def _activity_pairs_from_tokens(self, tokens: list[str]) -> dict:
-        activities: Dict[str, float] = {}
-        idx = 0
-        while idx + 1 < len(tokens):
-            name = tokens[idx].strip(',')
-            raw_value = tokens[idx + 1].strip(',')
-            if (
-                self._looks_like_activity_label(name)
-                and self._is_number(raw_value)
-            ):
-                activities[name] = float(raw_value)
-                idx += 2
-                continue
-            idx += 1
-        return activities
 
     def _looks_like_activity_label(self, name: object) -> bool:
         label = str(name).strip().strip(',')
