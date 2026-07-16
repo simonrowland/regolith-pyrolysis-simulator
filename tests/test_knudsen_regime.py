@@ -227,7 +227,7 @@ def test_unknown_carrier_knudsen_diagnostic_fails_loud():
             overhead_pressure_mbar=10.0,
             gas_temperature_C=1500.0,
             pipe_diameter_m=0.12,
-            carrier_gas="pHe",
+            carrier_gas="badHe",
         )
 
 
@@ -255,6 +255,7 @@ def test_blank_explicit_carrier_gas_fails_loud():
         ("N2", "N2"),
         ("pN2", "N2"),
         ("N2 sweep", "N2"),
+        ("pHe", "He"),
         ("pAr", "Ar"),
         ("pO2", "O2"),
         ("pCO2", "CO2"),
@@ -275,9 +276,12 @@ def test_supported_carrier_gas_aliases_resolve_without_fallback(carrier_gas, exp
     assert diagnostic["carrier_collision_diameter_m"] == pytest.approx(
         condensation_module._carrier_collision_diameter_m(expected)
     )
+    assert PyrolysisSimulator._normalize_condensation_carrier_gas(
+        carrier_gas, allow_unset=False
+    ) == expected
 
 
-@pytest.mark.parametrize("carrier_gas", ["pHe", "badCO2"])
+@pytest.mark.parametrize("carrier_gas", ["badHe", "badCO2"])
 def test_invalid_campaign_carrier_gas_fails_before_defaulting_to_n2(carrier_gas):
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim.melt = MeltState(campaign=CampaignPhase.C2A)

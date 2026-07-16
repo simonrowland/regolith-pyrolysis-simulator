@@ -2760,6 +2760,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         upper = text.upper().replace(' ', '').replace('_', '').replace('-', '')
         if upper in {'N2', 'PN2', 'N2SWEEP', 'PN2SWEEP'}:
             return 'N2'
+        if upper in {'HE', 'PHE'}:
+            return 'He'
         if upper in {'AR', 'PAR'}:
             return 'Ar'
         if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
@@ -2775,7 +2777,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return 'CO2'
         raise ValueError(
             f'Unsupported condensation carrier_gas {value!r}; supported '
-            'carrier gases: N2/pN2, Ar/pAr, O2/pO2, CO2/pCO2'
+            'carrier gases: He/pHe, N2/pN2, Ar/pAr, O2/pO2, CO2/pCO2'
         )
 
     def _resolve_condensation_carrier_gas(self) -> str:

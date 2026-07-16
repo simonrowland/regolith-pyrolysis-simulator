@@ -18,6 +18,7 @@ literals (golden-neutral by construction).
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Mapping
 
@@ -34,6 +35,7 @@ FREE_MOLECULAR_KNUDSEN_MIN = 10.0
 COLLISION_DIAMETER_SOURCE = "Poling et al., Lennard-Jones sigma"
 COLLISION_DIAMETERS_M: Mapping[str, float] = MappingProxyType(
     {
+        "He": 2.551e-10,
         "N2": 3.798e-10,
         "Ar": 3.542e-10,
         "O2": 3.467e-10,
@@ -41,6 +43,36 @@ COLLISION_DIAMETERS_M: Mapping[str, float] = MappingProxyType(
         "CO2": 3.941e-10,
         "H2": 2.827e-10,
         "H2O": 2.641e-10,
+    }
+)
+
+
+@dataclass(frozen=True)
+class CarrierGasProperties:
+    collision_diameter_m: float
+    lennard_jones_epsilon_over_k_K: float
+    molar_mass_kg_mol: float
+    lennard_jones_molar_mass_g_mol: float
+
+
+# Reinstate reference-state Cp and thermal conductivity with first runtime consumer.
+CARRIER_GAS_PROPERTIES: Mapping[str, CarrierGasProperties] = MappingProxyType(
+    {
+        "He": CarrierGasProperties(
+            COLLISION_DIAMETERS_M["He"], 10.22, 0.004002602, 4.002602,
+        ),
+        "N2": CarrierGasProperties(
+            COLLISION_DIAMETERS_M["N2"], 71.4, 0.0280134, 28.014,
+        ),
+        "Ar": CarrierGasProperties(
+            COLLISION_DIAMETERS_M["Ar"], 93.3, 0.039948, 39.948,
+        ),
+        "CO2": CarrierGasProperties(
+            COLLISION_DIAMETERS_M["CO2"], 195.2, 0.0440095, 44.010,
+        ),
+        "O2": CarrierGasProperties(
+            COLLISION_DIAMETERS_M["O2"], 106.7, 0.031998, 31.998,
+        ),
     }
 )
 

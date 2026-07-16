@@ -77,6 +77,22 @@ def test_continuum_limit_is_transport_limited_by_gas_resistance():
     assert result.flux_kg_s_m2 == pytest.approx(delta_p / result.r_gas, rel=0.02)
 
 
+def test_helium_carrier_changes_chapman_enskog_gas_resistance():
+    nitrogen = _evap(
+        carrier_gas="N2",
+        knudsen_number=1.0e-7,
+        melt_resistance_enabled=False,
+    )
+    helium = _evap(
+        carrier_gas="He",
+        knudsen_number=1.0e-7,
+        melt_resistance_enabled=False,
+    )
+
+    assert helium.d_ab_m2_s > nitrogen.d_ab_m2_s
+    assert helium.r_gas < nitrogen.r_gas
+
+
 def test_alpha_effective_never_exceeds_intrinsic_alpha_across_kn_and_stir():
     kn_values = [0.0, 1.0e-7, 0.01, 0.1, 1.0, 10.0, math.inf]
     stir_values = [0.0, 1.0, MAX_STIR_FACTOR, 1000.0]

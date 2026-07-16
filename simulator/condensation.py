@@ -74,6 +74,8 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.transport_constants import (
+    CARRIER_GAS_PROPERTIES,
+    CarrierGasProperties,
     COLLISION_DIAMETERS_M,
     FREE_MOLECULAR_KNUDSEN_MIN,
     N2_COLLISION_DIAMETER_M,
@@ -185,6 +187,20 @@ def _carrier_collision_diameter_angstrom(species: str) -> float:
     return round(COLLISION_DIAMETERS_M[species] * 1e10, 3)
 
 
+def _carrier_lennard_jones_params(species: str) -> tuple[float, float, float]:
+    properties = CARRIER_GAS_PROPERTIES[species]
+    sigma_angstrom = (
+        properties.collision_diameter_m * 1e10
+        if species == 'N2'
+        else _carrier_collision_diameter_angstrom(species)
+    )
+    return (
+        sigma_angstrom,
+        properties.lennard_jones_epsilon_over_k_K,
+        properties.lennard_jones_molar_mass_g_mol,
+    )
+
+
 # Chapman-Enskog Lennard-Jones parameters (vapor species + carrier gas).
 # Species: collision diameter (Angstrom), ε/k_B (K), molecular mass (g/mol).
 # Primary source: Bird/Stewart/Lightfoot "Transport Phenomena" 2nd ed.
@@ -203,10 +219,11 @@ def _carrier_collision_diameter_angstrom(species: str) -> float:
 _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     # (sigma Angstrom, eps/k_B K, M g/mol)
     # N2 sigma derives from N2_COLLISION_DIAMETER_M (one grounded source, BUG-013)
-    'N2':  (N2_COLLISION_DIAMETER_M * 1e10, 71.4, 28.014),  # BSL Table E.1
-    'Ar':  (_carrier_collision_diameter_angstrom('Ar'), 93.3,   39.948),  # BSL Table E.1
-    'CO2': (_carrier_collision_diameter_angstrom('CO2'), 195.2,  44.010),  # BSL Table E.1
-    'O2':  (_carrier_collision_diameter_angstrom('O2'), 106.7,  31.998),  # BSL Table E.1
+    'N2':  _carrier_lennard_jones_params('N2'),  # BSL Table E.1
+    'Ar':  _carrier_lennard_jones_params('Ar'),  # BSL Table E.1
+    'CO2': _carrier_lennard_jones_params('CO2'),  # BSL Table E.1
+    'O2':  _carrier_lennard_jones_params('O2'),  # BSL Table E.1
+    'He':  _carrier_lennard_jones_params('He'),  # BSL Table E.1
     'Na':  (3.567, 1375.0, 22.990),  # Svehla 1962 vapor
     'K':   (3.987, 1305.0, 39.098),  # Svehla 1962 vapor
     'Ca':  (3.880, 1224.0, 40.078),  # BSL extension
@@ -233,6 +250,10 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
         'source': 'Bird/Stewart/Lightfoot Table E.1',
     },
     'O2': {
+        'status': 'sourced',
+        'source': 'Bird/Stewart/Lightfoot Table E.1',
+    },
+    'He': {
         'status': 'sourced',
         'source': 'Bird/Stewart/Lightfoot Table E.1',
     },
@@ -286,7 +307,7 @@ STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     4: 'alkali_stage4',
     7: 'terminal',
 }
-SUPPORTED_CARRIER_GAS_LABELS = 'N2/pN2, Ar/pAr, CO2/pCO2'
+SUPPORTED_CARRIER_GAS_LABELS = 'He/pHe, N2/pN2, Ar/pAr, CO2/pCO2'
 STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
 WALL_REACTIVITY_MATRIX_PATH = (
     DATA_DIR / 'literature' / 'wall_reactivity_matrix.yaml'
@@ -1495,6 +1516,8 @@ def _canonical_carrier_gas_key(carrier_gas: str | None) -> str:
     upper = text.upper().replace(' ', '').replace('_', '').replace('-', '')
     if upper in {'N2', 'PN2', 'N2SWEEP', 'PN2SWEEP'}:
         return 'N2'
+    if upper in {'HE', 'PHE'}:
+        return 'He'
     if upper in {'AR', 'PAR'}:
         return 'Ar'
     if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
@@ -1518,25 +1541,30 @@ def _carrier_collision_diameter_diagnostic(carrier_gas: str) -> dict[str, Any]:
         if carrier_gas is None
         else str(carrier_gas).strip()
     )
-    params = _LENNARD_JONES_PARAMS.get(requested_key)
-    if params is not None:
+    properties = CARRIER_GAS_PROPERTIES.get(requested_key)
+    if properties is not None:
         provenance = _LENNARD_JONES_PROVENANCE.get(requested_key, {})
         return {
             'requested_carrier_gas': requested,
             'applied_carrier_gas': requested_key,
             'carrier_gas_status': provenance.get('status', 'sourced'),
             'carrier_gas_reason': '',
-            'carrier_collision_diameter_m': float(params[0]) * 1.0e-10,
+            'carrier_collision_diameter_m': properties.collision_diameter_m,
             'carrier_collision_diameter_source': provenance.get('source', ''),
         }
     raise _unsupported_carrier_gas_error(carrier_gas)
 
 
+def carrier_gas_properties(carrier_gas: str | None) -> CarrierGasProperties:
+    key = _canonical_carrier_gas_key(carrier_gas)
+    try:
+        return CARRIER_GAS_PROPERTIES[key]
+    except KeyError:
+        raise _unsupported_carrier_gas_error(carrier_gas) from None
+
+
 def _carrier_collision_diameter_m(carrier_gas: str) -> float:
-    params = _LENNARD_JONES_PARAMS.get(_canonical_carrier_gas_key(carrier_gas))
-    if params is None:
-        return N2_COLLISION_DIAMETER_M
-    return float(params[0]) * 1.0e-10
+    return carrier_gas_properties(carrier_gas).collision_diameter_m
 
 
 def _transport_parameter_notice(
