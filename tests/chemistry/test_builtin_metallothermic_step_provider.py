@@ -68,6 +68,7 @@ from simulator.chemistry.kernel import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.dto import ProviderAccountView
+from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.state import (
     MOLAR_MASS,
     CampaignPhase,
@@ -2257,11 +2258,36 @@ def test_provider_short_circuits_on_empty_reagent(
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.live_engine
 def test_c6_static_hold_exercises_c6_proceed_decision_path(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
+    readiness_timeout_s = 10.0
+    magemin = MAGEMinBackend()
+    if not magemin.initialize({}):
+        pytest.skip("MAGEMin live backend unavailable: binary not located")
+    readiness = magemin.equilibrate(
+        1400.0,
+        composition_kg={
+            "SiO2": 49.0,
+            "Al2O3": 14.0,
+            "FeO": 10.0,
+            "MgO": 9.0,
+            "CaO": 11.0,
+        },
+        pressure_bar=1000.0,
+        call_timeout_s=readiness_timeout_s,
+    )
+    readiness_detail = "; ".join(readiness.warnings)
+    if "timed out after" in readiness_detail:
+        pytest.skip(
+            "MAGEMin live backend unavailable after "
+            f"{readiness_timeout_s:g}s readiness timeout: {readiness_detail}"
+        )
+    assert readiness.status == "ok", readiness_detail
+
     patched_setpoints = copy.deepcopy(setpoints_data)
     c6_cfg = patched_setpoints["campaigns"]["C6"]
     # Pin the selected recipe mechanism: within-noise yield ties choose the
