@@ -763,6 +763,31 @@ class EvaporationMixin:
                 )
             return curve
 
+        # Opt-in caller-owned memo for workflows that build fresh simulator
+        # instances for equivalent rows. The full composition/P/fO2 key is
+        # load-bearing: pressure and redox state are liquidus inputs, so only
+        # an exact physical-key match may reuse a curve.
+        shared_curve_cache = getattr(
+            self,
+            '_freeze_gate_shared_curve_cache',
+            None,
+        )
+        if isinstance(shared_curve_cache, dict):
+            process_cached = shared_curve_cache.get(key)
+            if isinstance(process_cached, Mapping):
+                curve = dict(process_cached)
+                self._freeze_gate_liquid_fraction_cache = {
+                    'key': key,
+                    'curve': dict(curve),
+                }
+                if store is not None and getattr(store, 'capture_enabled', False):
+                    store.capture_gate_curve(
+                        self,
+                        fO2_log=redox_key_fO2_log,
+                        curve=curve,
+                    )
+                return curve
+
         previous_in_progress = bool(
             getattr(self, '_freeze_gate_curve_in_progress', False)
         )
@@ -804,6 +829,10 @@ class EvaporationMixin:
                 'key': key,
                 'curve': dict(curve),
             }
+            if isinstance(shared_curve_cache, dict):
+                # Store a copy so later sim mutations of their local cache
+                # cannot corrupt the caller-owned memo used by sibling rows.
+                shared_curve_cache[key] = dict(curve)
             cache_committed = True
             self._freeze_gate_cache_rebuild_count = (
                 int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1

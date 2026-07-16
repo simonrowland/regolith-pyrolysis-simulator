@@ -1578,6 +1578,45 @@ def test_freeze_gate_cache_key_includes_pressure_and_fo2(
     assert different_fO2 != baseline
 
 
+def test_shared_freeze_gate_curve_cache_reuses_only_full_physical_key(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    shared_cache = {}
+    sims = [
+        _build_freeze_gate_sim(
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+            enabled=True,
+        )
+        for _ in range(2)
+    ]
+    calls = []
+    curves = [
+        {'source': 'first', 'solidus_T_C': 900.0, 'liquidus_T_C': 1300.0},
+        {'source': 'second', 'solidus_T_C': 910.0, 'liquidus_T_C': 1310.0},
+    ]
+    for index, sim in enumerate(sims):
+        sim._freeze_gate_shared_curve_cache = shared_cache
+        sim._freeze_gate_curve_from_gate_dispatch = (
+            lambda reasons, *, fO2_log, index=index: (
+                calls.append(index) or curves[index]
+            )
+        )
+
+    first = sims[0]._freeze_gate_curve()
+    same_key = sims[1]._freeze_gate_curve()
+    sims[1].melt.p_total_mbar += 20.0
+    different_pressure = sims[1]._freeze_gate_curve()
+
+    assert calls == [0, 1]
+    assert same_key == first
+    assert different_pressure == curves[1]
+    assert len(shared_cache) == 2
+
+
 def test_freeze_gate_redox_key_ignores_degenerate_reference_temperature(
     vapor_pressure_data,
     feedstocks_data,
