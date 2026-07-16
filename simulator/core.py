@@ -11530,13 +11530,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             )
         )
+        # Stratification remains an hour-boundary diagnostic: all legacy
+        # physics has read the canonical staging account before this point.
         # A backend-authored metal-phase transition is authoritative for that
-        # account.  Do not immediately overwrite its disposition with the
-        # diagnostic-only builtin stratification provider.
-        if not backend_controls_metal_phase:
-            # Stratification remains an hour-boundary diagnostic: all legacy
-            # physics has read the canonical staging account before this move.
-            self._step_metal_phase_stratification(equilibrium)
+        # account, so the builtin provider may instrument but not commit its
+        # derived disposition on this tick.
+        self._step_metal_phase_stratification(
+            equilibrium,
+            commit_disposition=not backend_controls_metal_phase,
+            account_state_source=(
+                'backend-authored'
+                if backend_controls_metal_phase
+                else 'builtin-authored'
+            ),
+        )
 
         # --- 10. Record snapshot ---
         completed_hour = int(self.melt.hour)

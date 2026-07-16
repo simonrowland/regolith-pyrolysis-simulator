@@ -627,8 +627,14 @@ class ExtractionMixin:
                 transition_meta={'behavior_gate': 'diagnostic_only'},
             )
 
-    def _step_metal_phase_stratification(self, equilibrium) -> None:
-        """Commit diagnostic alloy disposition, then report density/film state."""
+    def _step_metal_phase_stratification(
+        self,
+        equilibrium,
+        *,
+        commit_disposition: bool = True,
+        account_state_source: str = 'builtin-authored',
+    ) -> None:
+        """Derive alloy density/film diagnostics and optionally commit disposition."""
 
         from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
@@ -681,7 +687,7 @@ class ExtractionMixin:
             ChemistryIntent.METAL_PHASE_STRATIFICATION,
             control_inputs=controls,
         )
-        if result.transition is not None:
+        if commit_disposition and result.transition is not None:
             self._commit_proposal(
                 ChemistryIntent.METAL_PHASE_STRATIFICATION,
                 result.transition,
@@ -691,18 +697,27 @@ class ExtractionMixin:
                 transition_meta={'behavior_gate': 'diagnostic_only'},
             )
 
-        pools_mol = {
-            'bottom_pool': dict(
-                self.atom_ledger.mol_by_account(METAL_BOTTOM_POOL_ACCOUNT)
-            ),
-            'float_layer': dict(
-                self.atom_ledger.mol_by_account(METAL_FLOAT_LAYER_ACCOUNT)
-            ),
-        }
-        self._metal_phase_stratification_prior_pools_mol = {
-            pool_name: dict(species_mol)
-            for pool_name, species_mol in pools_mol.items()
-        }
+        if commit_disposition:
+            pools_mol = {
+                'bottom_pool': dict(
+                    self.atom_ledger.mol_by_account(METAL_BOTTOM_POOL_ACCOUNT)
+                ),
+                'float_layer': dict(
+                    self.atom_ledger.mol_by_account(METAL_FLOAT_LAYER_ACCOUNT)
+                ),
+            }
+            self._metal_phase_stratification_prior_pools_mol = {
+                pool_name: dict(species_mol)
+                for pool_name, species_mol in pools_mol.items()
+            }
+        else:
+            derived_pools = dict(result.diagnostic or {}).get(
+                'pool_mol_after', {}
+            )
+            pools_mol = {
+                'bottom_pool': dict(derived_pools.get('bottom_pool', {})),
+                'float_layer': dict(derived_pools.get('float_layer', {})),
+            }
         pool_reports: dict[str, dict[str, Any]] = {}
         for pool_name, species_mol in pools_mol.items():
             positive = {
@@ -774,6 +789,14 @@ class ExtractionMixin:
 
         self._last_metal_phase_stratification_diagnostic = {
             **dict(result.diagnostic or {}),
+            'provenance': {
+                'account_state_source': account_state_source,
+                'diagnostic_derivation': (
+                    'builtin-committed'
+                    if commit_disposition
+                    else 'builtin-read-only'
+                ),
+            },
             'temperature_K': temperature_K,
             'melt_density_kg_m3': melt_density,
             'melt_density_tier': melt_density_tier,

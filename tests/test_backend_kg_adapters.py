@@ -2,7 +2,12 @@ import importlib
 
 import pytest
 
-from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.account_ids import (
+    METAL_BOTTOM_POOL_ACCOUNT,
+    METAL_FLOAT_LAYER_ACCOUNT,
+    METAL_PHASE_ACCOUNT,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+)
 from simulator.accounting import AccountingError
 from simulator.equilibrium import EquilibriumMixin
 from simulator.core import PyrolysisSimulator
@@ -214,6 +219,56 @@ def test_backend_result_applies_as_atom_delta():
         expected_feo_remaining_kg
     )
     assert sim._make_snapshot().mass_balance_error_pct == pytest.approx(0.0)
+
+
+def test_backend_metal_transition_keeps_read_only_stratification_diagnostic(
+    monkeypatch,
+):
+    MaterialLot = _required_attr("simulator.accounting", "MaterialLot")
+    LedgerTransition = _required_attr("simulator.accounting", "LedgerTransition")
+    backend = AtomDeltaBackend(MaterialLot, LedgerTransition)
+    sim = _sim(backend)
+    sim.load_batch("oxide", mass_kg=1000.0)
+    metal_accounts = (
+        METAL_PHASE_ACCOUNT,
+        METAL_BOTTOM_POOL_ACCOUNT,
+        METAL_FLOAT_LAYER_ACCOUNT,
+    )
+    observed = {}
+    original = sim._step_metal_phase_stratification
+
+    def record_stratification_accounts(equilibrium, **kwargs):
+        observed["before"] = {
+            account: dict(sim.atom_ledger.mol_by_account(account))
+            for account in metal_accounts
+        }
+        original(equilibrium, **kwargs)
+        observed["after"] = {
+            account: dict(sim.atom_ledger.mol_by_account(account))
+            for account in metal_accounts
+        }
+
+    monkeypatch.setattr(
+        sim,
+        "_step_metal_phase_stratification",
+        record_stratification_accounts,
+    )
+
+    snapshot = sim.step()
+
+    assert observed["before"] == observed["after"]
+    assert observed["before"][METAL_PHASE_ACCOUNT]["Fe"] == pytest.approx(1000.0)
+    assert observed["before"][METAL_BOTTOM_POOL_ACCOUNT] == {}
+    assert observed["before"][METAL_FLOAT_LAYER_ACCOUNT] == {}
+    diagnostic = snapshot.metal_phase_stratification
+    assert diagnostic
+    assert diagnostic["pools"]["bottom_pool"]["species_mol"]["Fe"] == pytest.approx(
+        observed["before"][METAL_PHASE_ACCOUNT]["Fe"]
+    )
+    assert diagnostic["provenance"] == {
+        "account_state_source": "backend-authored",
+        "diagnostic_derivation": "builtin-read-only",
+    }
 
 
 def test_backend_validated_transition_observes_reagent_provenance():
