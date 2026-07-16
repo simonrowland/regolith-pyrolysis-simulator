@@ -3522,20 +3522,7 @@ def _thermoengine_dependency_is_missing(cause):
     ))
 
 
-@pytest.mark.parametrize(
-    ('cause', 'expected'),
-    [
-        (ModuleNotFoundError("No module named 'thermoengine'"), True),
-        (FileNotFoundError('missing ThermoEngine binary'), True),
-        (RuntimeError('absolute fO2 root solve failed'), False),
-        (TimeoutError('smoke equilibrium timed out after 8.0s'), False),
-    ],
-)
-def test_thermoengine_parity_skip_requires_missing_dependency(cause, expected):
-    assert _thermoengine_dependency_is_missing(cause) is expected
-
-
-def test_thermoengine_absolute_fo2_shadow_parity_against_subprocess_when_available():
+def _initialize_thermoengine_for_parity():
     thermo = ThermoEngineBackend()
     try:
         thermo_ok = thermo.initialize({})
@@ -3545,6 +3532,40 @@ def test_thermoengine_absolute_fo2_shadow_parity_against_subprocess_when_availab
         raise
     if not thermo_ok:
         pytest.skip('ThermoEngine transport unavailable')
+    return thermo
+
+
+@pytest.mark.parametrize(
+    ('cause', 'expected'),
+    [
+        (ModuleNotFoundError("No module named 'thermoengine'"), True),
+        (FileNotFoundError('missing ThermoEngine binary'), True),
+        (RuntimeError('absolute fO2 root solve failed'), False),
+        (TimeoutError('smoke equilibrium timed out after 8.0s'), False),
+    ],
+)
+def test_thermoengine_parity_skip_requires_missing_dependency(
+    monkeypatch, cause, expected,
+):
+    class ExpectedParitySkip(Exception):
+        pass
+
+    def fail_initialize(_backend, _config):
+        raise ImportError('ThermoEngine initialization failed') from cause
+
+    def raise_expected_skip(reason):
+        raise ExpectedParitySkip(reason)
+
+    monkeypatch.setattr(ThermoEngineBackend, 'initialize', fail_initialize)
+    monkeypatch.setattr(pytest, 'skip', raise_expected_skip)
+
+    expected_exception = ExpectedParitySkip if expected else ImportError
+    with pytest.raises(expected_exception):
+        _initialize_thermoengine_for_parity()
+
+
+def test_thermoengine_absolute_fo2_shadow_parity_against_subprocess_when_available():
+    thermo = _initialize_thermoengine_for_parity()
 
     subprocess_backend = AlphaMELTSBackend()
     try:
