@@ -2,6 +2,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -9,7 +10,11 @@ from engines.builtin.vapor_pressure import VaporPressureRangeError
 from simulator import condensation as condensation_module
 from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
 from simulator.overhead import OverheadGasModel
-from simulator.runner import _sio_wall_terminal_mol, build_sio_yield_report
+from simulator.runner import (
+    _apply_sio_wall_sweep_controls,
+    _sio_wall_terminal_mol,
+    build_sio_yield_report,
+)
 from simulator.state import (
     CampaignPhase,
     CondensationStage,
@@ -28,6 +33,36 @@ GOLDENS = (
     ("lunar_mare_low_ti", "lunar_mare_low_ti_c2a.json"),
     ("mars_basalt", "mars_basalt_c2a.json"),
 )
+
+
+def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
+    configured = {}
+
+    class CondensationRecorder:
+        pipe_segments = (SimpleNamespace(name="hot_duct"),)
+
+        def configure_operating_conditions(self, **kwargs):
+            configured.update(kwargs)
+
+    condensation_model = CondensationRecorder()
+    sim = SimpleNamespace(
+        campaign_mgr=SimpleNamespace(overrides={}),
+        melt=SimpleNamespace(temperature_C=1450.0),
+        overhead_model=SimpleNamespace(
+            pipe_diameter_m=0.12,
+            stage_area_m2_by_stage=lambda: {1: 2.0},
+            stage_area_geometry_provenance_notice=lambda: {"status": "test"},
+        ),
+        condensation_model=condensation_model,
+        _condensation_model=condensation_model,
+        _configure_overhead_headspace=lambda _campaign: None,
+    )
+
+    _apply_sio_wall_sweep_controls(sim, liner_temperature_c=900.0)
+
+    assert configured["gas_temperature_C"] == pytest.approx(1450.0)
+    assert configured["wall_temperature_C"] == pytest.approx(900.0)
+    assert configured["pipe_segment_temperatures_C"] == {"hot_duct": 900.0}
 
 # Post 2026-05-20 Antoine P_sat refit: builtin SiO fallback fitted to VapoRock,
 # so evolved SiO dropped ~4700x to the activity-corrected magnitude.

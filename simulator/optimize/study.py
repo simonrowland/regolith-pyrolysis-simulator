@@ -161,6 +161,7 @@ _SSO2_OBJECTIVE_TRACE_KEY = "sso2_objective_evidence"
 _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
     {
         "campaigns_to_resinter",
+        "aggregate_campaigns_to_resinter",
         "wall_deposit_kg_by_segment_species",
         "wall_deposit_kg_by_zone_species",
         "wall_deposit_kg",
@@ -174,6 +175,8 @@ _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
         "furnace_lifespan_consumed_fraction",
         "wall_deposit_total_kg",
         "wall_deposit_kg_by_species",
+        "wall_deposit_cumulative_total_kg",
+        "wall_deposit_cumulative_kg_by_species",
         "wall_deposit_sticking_authority",
     }
 )

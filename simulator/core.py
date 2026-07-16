@@ -2858,7 +2858,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             wall_temperature_C=transport['pipe_temperature_C'],
             overhead_pressure_mbar=transport['pressure_mbar'],
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
-            gas_temperature_C=transport['pipe_temperature_C'],
+            # The upstream vapor is evaluated at the melt-side temperature used
+            # by the conductance model; the independently scheduled pipe and
+            # segment temperatures are liner-wall states, not gas states.
+            gas_temperature_C=transport['conductance_temperature_C'],
             stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
             stage_area_geometry_provenance_notice=transport.get(
                 'stage_area_geometry_provenance_notice', {}),
@@ -2930,9 +2933,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         adjustment = self.condensation_model.adjust_c2a_pressure_setpoint(
             requested_p_total_mbar=float(self.melt.p_total_mbar),
             pO2_mbar=float(self.melt.pO2_mbar),
-            gas_temperature_C=(
-                self.overhead_model.resolve_pipe_temperature_C(self.melt)
-            ),
+            # Knudsen conductance evaluates the vapor at the melt-side gas
+            # temperature; the scheduled pipe temperature is a wall state.
+            gas_temperature_C=float(self.melt.temperature_C),
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             pN2_min_mbar=C2A_STAGED_PN2_SWEEP_MIN_MBAR,
             pN2_max_mbar=C2A_STAGED_PN2_SWEEP_MAX_MBAR,

@@ -4,6 +4,7 @@ from types import MappingProxyType, SimpleNamespace
 
 import pytest
 
+from simulator.run_executor import RunExecution
 from simulator.condensation import CONDENSATION_TEMPS_C
 from simulator.diagnostics import wall_deposit_remobilization_by_segment_species
 from simulator.optimize.objective import _coating_product_summary
@@ -281,6 +282,32 @@ def test_coating_product_summary_surfaces_threshold_field_not_mass_transfer() ->
     assert row["later_max_T_C"] == pytest.approx(later_T_C)
     assert row["thermal_remobilization_threshold_exceeded"] is True
     _assert_threshold_row_semantics(row)
+
+
+def test_coating_product_summary_normalizes_cumulative_load_by_campaigns_elapsed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "simulator.optimize.objective._wall_resinter_threshold_kg",
+        lambda: 10.0,
+    )
+    segment = "hot_wall"
+    species = "SiO"
+    run = RunExecution(
+        session=SimpleNamespace(),
+        simulator=_sim(snapshots=(), operating_history=[]),
+        snapshots=(),
+        trace=SimpleNamespace(
+            wall_deposit_by_segment_species_kg={(segment, species): 4.0},
+            wall_zone_by_segment={segment: "Hot"},
+        ),
+        campaigns_elapsed=4.0,
+    )
+
+    coating = _coating_product_summary(run)
+
+    # 4 kg accumulated / 4 campaigns = 1 kg/campaign; 10 kg / rate = 10 campaigns.
+    assert coating["campaigns_to_resinter"] == pytest.approx(10.0)
 
 
 def test_campaign_hour_resolution_matches_production_path() -> None:

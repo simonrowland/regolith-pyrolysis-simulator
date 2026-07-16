@@ -577,7 +577,7 @@ class PhysicsConstraintSet:
             return _fail_closed("coating", self.coating_min_campaigns_to_resinter, str(exc))
 
     def coating_from_fouling_report(self, report: Any) -> GateMargin:
-        """Classify the runner's total-load lifespan verdict.
+        """Classify the runner's worst-segment lifespan verdict.
 
         A non-authoritative wall-sticking or threshold verdict is deliberately
         unconstrained by coating: heuristics remain visible, but never become a
@@ -614,15 +614,20 @@ class PhysicsConstraintSet:
             raise CoatingFeasibilityReportError(
                 "wall-fouling status_reason must be str"
             )
-        raw_observed = report["campaigns_to_resinter_total"]
+        observed_field = (
+            "campaigns_to_resinter_worst_segment"
+            if "campaigns_to_resinter_worst_segment" in report
+            else "campaigns_to_resinter_total"
+        )
+        raw_observed = report[observed_field]
         if isinstance(raw_observed, bool) or not isinstance(raw_observed, int | float):
             raise CoatingFeasibilityReportError(
-                "wall-fouling campaigns_to_resinter_total must be numeric"
+                f"wall-fouling {observed_field} must be numeric"
             )
         observed = float(raw_observed)
         if math.isnan(observed) or observed < 0.0:
             raise CoatingFeasibilityReportError(
-                "wall-fouling campaigns_to_resinter_total must be non-negative"
+                f"wall-fouling {observed_field} must be non-negative"
             )
         margin = observed - self.coating_min_campaigns_to_resinter.value
         feasible = (
@@ -631,7 +636,7 @@ class PhysicsConstraintSet:
         )
         if authoritative:
             detail = (
-                f"runner wall-fouling campaigns_to_resinter_total={observed:.6g}; "
+                f"runner wall-fouling {observed_field}={observed:.6g}; "
                 f"minimum={self.coating_min_campaigns_to_resinter.value:.6g}"
             )
         else:

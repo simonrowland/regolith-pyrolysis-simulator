@@ -422,6 +422,56 @@ def test_lifespan_cost_metric_is_not_costed_when_threshold_is_unavailable(monkey
     }
 
 
+def test_multisegment_lifespan_and_economics_normalize_cumulative_campaign_load(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 10.0)
+    deposits = {
+        ("hot_duct", "SiO"): 8.0,
+        ("cold_duct", "Na"): 0.8,
+    }
+    sim = SimpleNamespace()
+    run_execution = SimpleNamespace(
+        simulator=sim,
+        campaigns_elapsed=4.0,
+        trace=SimpleNamespace(wall_deposit_by_segment_species_kg=deposits),
+    )
+    cost_parameters = CostParameters(
+        electricity_cost_per_kWh=0.0,
+        furnace_resinter_cost_usd=100.0,
+        depreciation_expense_per_run=999.0,
+        generic_reagent_cost_per_kg=0.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 0.0,
+            "K": 0.0,
+            "Mg": 0.0,
+            "Ca": 0.0,
+        },
+    )
+
+    assert objective_module._campaigns_to_resinter(
+        deposits,
+        campaigns_elapsed=4.0,
+    ) == pytest.approx(5.0)
+    assert objective_module._aggregate_campaigns_to_resinter(
+        deposits,
+        campaigns_elapsed=4.0,
+    ) == pytest.approx(10.0 / 2.2)
+
+    lifespan = objective_module._furnace_lifespan_cost_summary(run_execution, sim)
+    assert lifespan["wall_deposit_total_kg"] == pytest.approx(2.2)
+    assert lifespan["wall_deposit_cumulative_total_kg"] == pytest.approx(8.8)
+    assert lifespan["furnace_lifespan_consumed_fraction"] == pytest.approx(0.22)
+
+    depreciation = objective_module._depreciation_expense_per_run_summary(
+        run_execution,
+        sim,
+        cost_parameters=cost_parameters,
+    )
+    assert depreciation["campaigns_to_resinter"] == pytest.approx(10.0 / 2.2)
+    assert depreciation["depreciation_expense_per_run_usd"] == pytest.approx(22.0)
+
+
 def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() -> None:
     cost_parameters = CostParameters(
         electricity_cost_per_kWh=7.0,
@@ -1975,6 +2025,57 @@ def test_best_tap_coating_summary_uses_tap_hour_not_terminal_deposit() -> None:
     assert "100" not in coating["campaigns_to_resinter"]
 
 
+def test_best_tap_coating_summary_normalizes_through_partial_campaign(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 10.0)
+    snapshots = (
+        _tap_snapshot(
+            1,
+            {"SiO2": 50.0, "CaO": 50.0},
+            wall_delta={("stage_1_to_stage_2", "SiO"): 0.25},
+        ),
+        _tap_snapshot(2, {"SiO2": 70.0, "CaO": 30.0}),
+        _tap_snapshot(3, {"SiO2": 80.0, "CaO": 20.0}),
+        _tap_snapshot(
+            4,
+            {"SiO2": 20.0, "CaO": 80.0},
+            wall_delta={("stage_1_to_stage_2", "SiO"): 100.0},
+        ),
+    )
+    run = _tap_run(snapshots, configured_hours=4)
+    run.campaigns_elapsed = 1.5
+    run.simulator.campaign_mgr = SimpleNamespace(_max_hold_hr=lambda campaign: 4)
+    run.session = SimpleNamespace(
+        _step_results=(
+            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(campaign_summary={"campaign": "C0", "duration_h": 2}),
+            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(campaign_summary=None),
+        )
+    )
+    profile = _composition_score_profile(
+        "residual_rump_at_stop",
+        oxides={
+            "SiO2": {"min": 45.0, "max": 55.0, "weight": 1.0},
+            "CaO": {"min": 45.0, "max": 55.0, "weight": 1.0},
+        },
+        maturity={"best_tap": {"enabled": True, "tap_grid": [1]}},
+    )
+    _set_profile_hours(profile, 4)
+
+    evidence = compute_objectives(profile, run).evidence["composition_target:pool-test"][
+        "composition_target"
+    ]
+    coating = evidence["tap_coating_product_summary"]
+
+    assert evidence["tap_hour"] == 1
+    assert coating["wall_deposit_cumulative_total_kg"] == pytest.approx(0.25)
+    assert coating["wall_deposit_total_kg"] == pytest.approx(1.0)
+    assert coating["campaigns_to_resinter"] == pytest.approx(10.0)
+    assert coating["aggregate_campaigns_to_resinter"] == pytest.approx(10.0)
+
+
 def test_best_tap_clean_coating_summary_emits_complete_empty_fields() -> None:
     snapshots = (
         _tap_snapshot(1, {"SiO2": 50.0, "CaO": 50.0}),
@@ -2034,7 +2135,7 @@ def test_best_tap_coating_summary_carries_violation_present_at_tap_hour() -> Non
 
     assert evidence["tap_hour"] == 2
     assert coating["wall_deposit_kg_by_segment_species"]["stage_1_to_stage_2"]["SiO"] == pytest.approx(100.0)
-    assert "100" in coating["campaigns_to_resinter"]
+    assert "150" in coating["campaigns_to_resinter"]
 
 
 def test_best_tap_missing_requested_grid_hour_fails_loud() -> None:

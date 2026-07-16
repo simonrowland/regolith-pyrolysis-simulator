@@ -226,6 +226,7 @@ RUN_METADATA_KEYS = frozenset({
     "campaign",
     "hours_requested",
     "hours_completed",
+    "campaigns_elapsed",
     "mass_kg",
     "additives_kg",
     "track",
@@ -722,6 +723,7 @@ def _assert_schema_shape(payload: dict) -> None:
       this without picking a specific scenario.
     """
 
+    assert RUNNER_SCHEMA_VERSION == "1.5.0"
     assert set(payload) == TOP_LEVEL_KEYS, (
         f"top-level keys drift: {set(payload) - TOP_LEVEL_KEYS} extra, "
         f"{TOP_LEVEL_KEYS - set(payload)} missing"

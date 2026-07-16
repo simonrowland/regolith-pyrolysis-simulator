@@ -75,6 +75,7 @@ from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
 )
+from simulator.trace import wall_deposit_by_segment_species_kg
 from simulator.pumping_cost import pumping_context_from_sim
 from simulator.run_executor import (
     RunExecution,
@@ -104,7 +105,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.4.0"
+RUNNER_SCHEMA_VERSION = "1.5.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -974,6 +975,9 @@ class PyrolysisRun:
             c5_enabled=self.c5_enabled,
             mre_target_species=self.mre_target_species,
             mre_max_voltage_V=self.mre_max_voltage_V,
+            campaigns_elapsed=self.run_metadata_overrides.get(
+                "campaigns_elapsed", 1.0
+            ),
             unavailable_error_cls=RunnerError,
             force_builtin_vapor_pressure=(
                 _force_builtin_vapor_pressure
@@ -1129,6 +1133,7 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
+        run_metadata["campaigns_elapsed"] = float(execution.campaigns_elapsed)
         run_metadata.update(
             {
                 "backend_status": str(execution.backend_status),
@@ -2530,6 +2535,7 @@ def _wall_liner_resinter_config() -> dict[str, Any]:
 def _wall_fouling_report(
     wall_deposit_kg: Mapping[str, float],
     *,
+    wall_deposit_by_segment_species: Mapping[tuple[str, str], float] | None = None,
     alpha_notice: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     cfg = _wall_liner_resinter_config()
@@ -2541,21 +2547,51 @@ def _wall_fouling_report(
     dominant_species = max(positive, key=positive.get) if positive else "none"
     dominant_kg = positive.get(dominant_species, 0.0) if dominant_species else 0.0
     total_wall_load_kg = sum(positive.values())
+    segment_load_kg: dict[str, float] = {}
+    if wall_deposit_by_segment_species is not None:
+        for key, kg in wall_deposit_by_segment_species.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                continue
+            amount = float(kg)
+            if amount > 0.0:
+                segment = str(key[0])
+                segment_load_kg[segment] = segment_load_kg.get(segment, 0.0) + amount
     threshold = cfg.get("resinter_threshold_kg")
     fast_n = int(cfg["fast_fouling_campaign_threshold"])
+    campaigns_by_segment: dict[str, float | str] = {}
+    aggregate_campaigns_to_resinter: float | str = "infinite"
     if total_wall_load_kg <= 0.0:
         campaigns_to_resinter: float | str = "infinite"
         verdict = "slow-fouling"
     elif threshold is None:
+        controlling_segment_load_kg = max(
+            segment_load_kg.values(),
+            default=total_wall_load_kg,
+        )
         campaigns_to_resinter = (
+            f"resinter_threshold_kg / {controlling_segment_load_kg:.12g}"
+        )
+        aggregate_campaigns_to_resinter = (
             f"resinter_threshold_kg / {total_wall_load_kg:.12g}"
         )
+        campaigns_by_segment = {
+            segment: f"resinter_threshold_kg / {load_kg:.12g}"
+            for segment, load_kg in sorted(segment_load_kg.items())
+        }
         verdict = (
             "threshold-parametric: fast-fouling if campaigns_to_resinter "
             f"< {fast_n}, else slow-fouling"
         )
     else:
-        campaigns_to_resinter = float(threshold) / total_wall_load_kg
+        aggregate_campaigns_to_resinter = float(threshold) / total_wall_load_kg
+        campaigns_by_segment = {
+            segment: float(threshold) / load_kg
+            for segment, load_kg in sorted(segment_load_kg.items())
+        }
+        campaigns_to_resinter = min(
+            campaigns_by_segment.values(),
+            default=aggregate_campaigns_to_resinter,
+        )
         verdict = (
             "fast-fouling"
             if campaigns_to_resinter < fast_n
@@ -2578,6 +2614,8 @@ def _wall_fouling_report(
         "resinter_threshold_kg": threshold,
         "resinter_threshold_basis": cfg.get("resinter_threshold_basis"),
         "campaigns_to_resinter": campaigns_to_resinter,
+        "campaigns_to_resinter_by_segment": campaigns_by_segment,
+        "aggregate_campaigns_to_resinter": aggregate_campaigns_to_resinter,
         "fast_fouling_campaign_threshold": fast_n,
         "output_status": str(authority.get("output_status", "authoritative")),
         "authoritative": authoritative,
@@ -2688,7 +2726,7 @@ def _apply_sio_wall_sweep_controls(
         sim.condensation_model.configure_operating_conditions(
             wall_temperature_C=float(liner_temperature_c),
             pipe_diameter_m=sim.overhead_model.pipe_diameter_m,
-            gas_temperature_C=float(liner_temperature_c),
+            gas_temperature_C=float(sim.melt.temperature_C),
             stage_area_m2_by_stage=sim.overhead_model.stage_area_m2_by_stage(),
             stage_area_geometry_provenance_notice=(
                 sim.overhead_model.stage_area_geometry_provenance_notice()),
@@ -2865,6 +2903,9 @@ def build_sio_yield_report(
     wall_deposit_kg = _wall_deposit_report_kg(final_state)
     wall_fouling = _wall_fouling_report(
         wall_deposit_kg,
+        wall_deposit_by_segment_species=(
+            wall_deposit_by_segment_species_kg(sim.atom_ledger)
+        ),
         alpha_notice=sticking_notice,
     )
 
@@ -3842,6 +3883,17 @@ def _runner_failure_result(
     }
     for key, value in overrides.items():
         run_metadata[str(key)] = _json_safe(value)
+    run_metadata["campaigns_elapsed"] = _json_safe(
+        float(
+            getattr(
+                execution,
+                "campaigns_elapsed",
+                overrides.get("campaigns_elapsed", 1.0),
+            )
+            if execution is not None
+            else overrides.get("campaigns_elapsed", 1.0)
+        )
+    )
     run_metadata.update(
         canonicalize_fidelity_emission(
             backend_name=backend_name,
