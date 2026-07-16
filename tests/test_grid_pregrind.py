@@ -1072,6 +1072,31 @@ def test_cache_v2_immutable_metadata_written_checked_and_refuses_drift(tmp_path)
         ).encode("utf-8")
         assert dictionary["sha256"] == hashlib.sha256(encoded).hexdigest()
         assert dictionary["unknown_value_policy"] == "refuse"
+    assert manifest["dictionaries"]["regime"]["values"] == [
+        item.value for item in grid_pregrind_writer.MeltRegime
+    ]
+    assert manifest["dictionaries"]["evidence_class"]["values"] == [
+        item.value for item in grid_pregrind_writer.EvidenceClass
+    ]
+    assert manifest["dictionaries"]["backend"]["values"] == [
+        item.value for item in grid_pregrind_writer.CacheV2GridBackend
+    ]
+    assert manifest["dictionaries"]["tier"]["values"] == [
+        item.value for item in grid_pregrind_writer.CacheV2ConfidenceTier
+    ]
+    assert manifest["dictionaries"]["notice"]["values"] == [
+        item.value for item in grid_pregrind_writer.CacheV2Notice
+    ]
+    assert {
+        "H2O",
+        "CO2",
+        "CO",
+        "CH4",
+        "NH3",
+        "HCN",
+        "SO2",
+        "H2S",
+    } <= set(manifest["dictionaries"]["species"]["values"])
 
     with GridCacheWriter(database, existing_only=True):
         pass
@@ -1114,38 +1139,114 @@ def test_cache_v2_key_hash_round_trips_stored_typed_inputs(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "field, value, match",
+    "namespace, field, value, reason",
     [
         (
+            "generic",
             "activity_coefficients",
             {"unknown_species": 1.0},
-            "unknown species",
+            "cache_v2_unknown_species",
         ),
         (
+            "generic",
             "phase_species_mol",
             {"olivine0": {"undeclared_formula_token": 1.0}},
-            "unknown species",
+            "cache_v2_unknown_species",
         ),
         (
+            "generic",
             "phase_species_mol",
             {"olivine0": {"(Mg0.6Fe0.4)2SiO4": 1.0}},
-            "unknown species",
+            "cache_v2_unknown_species",
         ),
         (
+            "generic",
             "phase_species_mol",
             {"unknown0": {"(Mg0.8Fe0.2)2SiO4": 1.0}},
-            "unknown species",
+            "cache_v2_unknown_species",
+        ),
+        (
+            "thermoengine",
+            "liquid_activities",
+            {"future_bogus_endmember": 1.0},
+            "cache_v2_unknown_thermoengine_liquid_endmember",
+        ),
+        (
+            "alphamelts",
+            "phase_masses_kg",
+            {"future bogus phase": 1.0},
+            "cache_v2_unknown_phase",
+        ),
+        (
+            "alphamelts",
+            "activity_coefficients",
+            {"future bogus species": 1.0},
+            "cache_v2_unknown_species",
+        ),
+        (
+            "output",
+            "engine_mode",
+            "future bogus backend",
+            "cache_v2_unknown_backend",
         ),
     ],
 )
-def test_cache_v2_unknown_dictionary_values_are_refused(
-    tmp_path, field, value, match
+def test_cache_v2_unknown_dictionary_values_are_contained(
+    tmp_path, namespace, field, value, reason
 ):
     output = _output()
-    output["generic"][field] = value
+    if namespace == "output":
+        output[field] = value
+    else:
+        output.setdefault(namespace, {})[field] = value
     with GridCacheWriter(tmp_path / f"unknown-{field}.db") as writer:
-        with pytest.raises(ValueError, match=match):
-            writer._output_values(output)
+        values = writer._output_values(output)
+    assert values["status"] == "error"
+    assert values["status_kind"] == "failure"
+    assert values["failure_reason_code"] == reason
+    assert reason in values["refusal_reason"]
+    assert len(values["failure_message"]) <= 512
+    assert json.loads(values["generic_phases_present_json"] or "[]") == []
+    assert json.loads(values["te_liquid_activities_json"] or "{}") == {}
+
+
+def test_cache_v2_h2o_species_and_liquid_endmember_write_successfully(tmp_path):
+    output = _output()
+    output["generic"]["phase_species_mol"]["olivine0"]["H2O"] = 0.125
+    output["generic"]["phase_species_kg"]["olivine0"]["H2O"] = 0.00225
+    output["generic"]["vapor_pressures_Pa"]["H2O"] = 2.0
+    output["generic"]["vapor_pressures_source"]["H2O"] = "thermoengine:test"
+    output["generic"]["activity_coefficients"]["H2O"] = 0.8
+    output["thermoengine"] = {"liquid_activities": {"H2O": 0.7}}
+
+    with GridCacheWriter(
+        tmp_path / "h2o-speciation.db", backend_name="subprocess"
+    ) as writer:
+        writer.seed_id_block(0)
+        batch_id = writer.ensure_batch(
+            label="h2o-speciation",
+            kind="fixed",
+            seed=335,
+            params={"full_grid_points": 1, "shard_count": 3},
+        )
+        assert writer.materialize_key(
+            _inputs(1200.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        assert writer.write_result(grid_key_id, output)
+        row = writer.connection.execute(
+            "SELECT * FROM alphamelts_outputs"
+        ).fetchone()
+
+    assert row["status"] == "ok"
+    assert json.loads(row["generic_phase_species_mol_json"])["olivine0"][
+        "H2O"
+    ] == pytest.approx(0.125)
+    assert json.loads(row["generic_vapor_pressures_Pa_json"])["H2O"] == 2.0
+    assert json.loads(row["te_liquid_activities_json"])["H2O"] == 0.7
 
 
 def test_cache_v2_thermoengine_phase_dictionary_covers_grounded_vocabulary(
@@ -1167,6 +1268,7 @@ def test_cache_v2_thermoengine_phase_dictionary_covers_grounded_vocabulary(
     assert len(native_labels) == len(canonical_labels) == 54
     assert "Solid Alloy" in native_labels
     assert "solid alloy" in canonical_labels
+    assert "alloy-solid" in grid_pregrind_writer.CACHE_V2_PHASE_DICTIONARY
     assert canonical_labels <= set(grid_pregrind_writer.CACHE_V2_PHASE_DICTIONARY)
     assert "ThermoEngine MELTSv1.0.2 MELTSmodel.get_phase_names()" in (
         cache_v2_identity_manifest()["dictionary_sources"]["phase"]
@@ -1228,6 +1330,59 @@ def test_legacy_grid_without_cache_v2_metadata_remains_readable(tmp_path):
 
     with GridCacheWriter(database, existing_only=True) as writer:
         assert writer.counts()["total"] == 0
+
+
+def test_legacy_cache_v2_descriptive_manifest_remains_readable(tmp_path):
+    database = tmp_path / "legacy-descriptive-manifest.db"
+    with GridCacheWriter(database):
+        pass
+
+    legacy_manifest = cache_v2_identity_manifest()
+    legacy_manifest["dictionaries"]["species"]["values"] = legacy_manifest[
+        "dictionaries"
+    ]["species"]["values"][:29]
+    legacy_manifest["dictionaries"]["phase"]["values"].remove("alloy-solid")
+    legacy_manifest["dictionaries"]["evidence_class"]["values"].append("unknown")
+    for dictionary in legacy_manifest["dictionaries"].values():
+        encoded = json.dumps(
+            dictionary["values"],
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        ).encode("utf-8")
+        dictionary["sha256"] = hashlib.sha256(encoded).hexdigest()
+    legacy_manifest["dictionary_sources"]["species"] = "legacy observed union"
+    legacy_manifest["dictionary_policy"]["unknown_species"] = "refuse"
+    manifest_json = grid_pregrind_writer.canonical_json(legacy_manifest)
+
+    connection = sqlite3.connect(database)
+    connection.execute(
+        "UPDATE metadata SET value = ? WHERE key = 'cache_v2_identity_manifest'",
+        (manifest_json,),
+    )
+    connection.execute(
+        "UPDATE metadata SET value = ? "
+        "WHERE key = 'cache_v2_identity_manifest_sha256'",
+        (hashlib.sha256(manifest_json.encode("utf-8")).hexdigest(),),
+    )
+    connection.commit()
+    connection.close()
+
+    with GridCacheWriter(database, existing_only=True) as writer:
+        assert writer.counts()["total"] == 0
+        metadata = dict(
+            writer.connection.execute(
+                "SELECT key, value FROM metadata WHERE key LIKE 'cache_v2_%'"
+            )
+        )
+        current_manifest = grid_pregrind_writer.canonical_json(
+            cache_v2_identity_manifest()
+        )
+        assert metadata["cache_v2_identity_manifest"] == current_manifest
+        assert metadata["cache_v2_identity_manifest_sha256"] == hashlib.sha256(
+            current_manifest.encode("utf-8")
+        ).hexdigest()
 
 
 def _prepared_drain_database(database, temperatures=(1200.0,)):
@@ -1369,6 +1524,130 @@ def test_unknown_phase_is_per_point_failure_and_pool_continues(
     assert "future bogus phase" in rows[0]["failure_message"]
     assert len(rows[0]["failure_message"]) <= 512
     assert json.loads(rows[0]["generic_phases_present_json"] or "[]") == []
+    assert [row["status"] for row in rows[1:]] == ["ok", "ok"]
+
+
+@pytest.mark.parametrize(
+    "kind, failure_reason_code",
+    [
+        ("species", "cache_v2_unknown_species"),
+        ("species_activity", "cache_v2_unknown_species"),
+        ("phase_affinity", "cache_v2_unknown_phase"),
+        ("alphamelts_phase", "cache_v2_unknown_phase"),
+        ("alphamelts_species", "cache_v2_unknown_species"),
+        ("backend", "cache_v2_unknown_backend"),
+        ("backend_and_phase", "cache_v2_unknown_backend"),
+        (
+            "thermoengine_liquid_endmember",
+            "cache_v2_unknown_thermoengine_liquid_endmember",
+        ),
+    ],
+)
+def test_unknown_nonphase_dictionary_is_per_point_failure_and_pool_continues(
+    tmp_path, monkeypatch, kind, failure_reason_code
+):
+    database = tmp_path / f"unknown-{kind}-contained.db"
+    status = tmp_path / f"status-{kind}.json"
+    _prepared_drain_database(database, temperatures=(1200.0, 1250.0, 1300.0))
+    context = _ImmediateContext()
+
+    monkeypatch.setattr(grid_pregrind, "_STOP_REQUESTED", False)
+    monkeypatch.setattr(
+        grid_pregrind.multiprocessing,
+        "get_context",
+        lambda method: context if method == "spawn" else None,
+    )
+
+    def fake_run_point(job):
+        output = _output()
+        if job.shuffle_rank == 0:
+            if kind == "species":
+                output["generic"]["vapor_pressures_Pa"] = {
+                    "future bogus species": 1.0
+                }
+                output["generic"]["vapor_pressures_source"] = {
+                    "future bogus species": "future:test"
+                }
+            elif kind == "species_activity":
+                output["generic"]["activity_coefficients"] = {
+                    "future bogus activity": 1.0
+                }
+            elif kind == "phase_affinity":
+                output["generic"]["phase_affinities"] = {
+                    "future bogus phase": {"affinity_J": 1.0}
+                }
+            elif kind == "alphamelts_phase":
+                output["alphamelts"]["phase_masses_kg"] = {
+                    "future bogus phase": 1.0
+                }
+            elif kind == "alphamelts_species":
+                output["alphamelts"]["activity_coefficients"] = {
+                    "future bogus species": 1.0
+                }
+            elif kind == "backend":
+                output["engine_mode"] = "future bogus backend"
+            elif kind == "backend_and_phase":
+                output["engine_mode"] = "future bogus backend"
+                output["generic"]["phases_present"] = ["future bogus phase"]
+            else:
+                output["thermoengine"] = {
+                    "liquid_activities": {"future bogus endmember": 1.0}
+                }
+        return job.grid_key_id, output
+
+    monkeypatch.setattr(grid_pregrind, "_run_point", fake_run_point)
+    args = SimpleNamespace(
+        backend="subprocess",
+        workers=2,
+        heartbeat_s=60.0,
+        limit=None,
+        status_json=status,
+        seed=178,
+        db=database,
+        commit_every=10,
+        assume_queued_run_mode=None,
+        model="MELTSv1.0.2",
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+        thermoengine_equilibrate_timeout_s=60.0,
+        allow_zero_component_boundary=False,
+    )
+
+    with GridCacheWriter(
+        database, existing_only=True, backend_name="subprocess"
+    ) as writer:
+        batch_id = writer.connection.execute(
+            "SELECT batch_id FROM batches WHERE label = 'fixed-v2'"
+        ).fetchone()[0]
+        result = grid_pregrind.run_cycle(
+            args,
+            writer,
+            batch_id=batch_id,
+            grid_total=3,
+            shard=0,
+        )
+        rows = writer.connection.execute(
+            "SELECT status, engine_mode, failure_reason_code, failure_message, "
+            "generic_phases_present_json, te_liquid_activities_json "
+            "FROM alphamelts_outputs ORDER BY grid_key_id"
+        ).fetchall()
+
+    assert context.pool.submissions == 3
+    assert result == {
+        "existing": 0,
+        "completed": 3,
+        "inserted": 3,
+        "success": 2,
+        "refusal": 0,
+        "failure": 1,
+    }
+    assert rows[0]["status"] == "error"
+    assert rows[0]["failure_reason_code"] == failure_reason_code
+    assert rows[0]["engine_mode"] == "subprocess"
+    assert "future bogus" in rows[0]["failure_message"]
+    assert len(rows[0]["failure_message"]) <= 512
+    assert json.loads(rows[0]["generic_phases_present_json"] or "[]") == []
+    assert json.loads(rows[0]["te_liquid_activities_json"] or "{}") == {}
     assert [row["status"] for row in rows[1:]] == ["ok", "ok"]
 
 
