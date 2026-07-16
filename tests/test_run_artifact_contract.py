@@ -362,7 +362,10 @@ def test_cost_block_times_canonical_usage_equals_terminal_cost_totals() -> None:
         ]
     )
     payload["run_metadata"]["cost_rollup_diagnostic"] = {
-        "pumping_diagnostic": {"pumping_electrical_kWh": 4.0}
+        "pumping_diagnostic": {
+            "status": "ok",
+            "pumping_electrical_kWh": 4.0,
+        }
     }
 
     artifact = build_run_artifact(payload, run_id="run-cost-golden")
@@ -416,6 +419,48 @@ def test_cost_totals_disclose_absent_pumping_basis() -> None:
     assert "pumping_electrical_energy_kWh" not in totals
     assert totals["basis_note"] == (
         "pumping electrical energy not emitted; electrical totals exclude pumping"
+    )
+
+
+@pytest.mark.parametrize(
+    "status,pumping_kWh",
+    [
+        ("refused", 0.0),
+        ("partial", 2.0),
+        ("pumping_feasibility_unresolved", 4.0),
+    ],
+)
+def test_cost_totals_exclude_nonresolved_pumping_and_name_status(
+    status,
+    pumping_kWh,
+) -> None:
+    payload = _runner_payload(
+        per_hour_summary=[
+            {
+                "hour": 1,
+                "campaign": "C0",
+                "mass_balance_pct": 0.0,
+                "energy_electrical_kWh": 2.0,
+                "energy_evaporation_thermal_kWh": 3.0,
+            }
+        ]
+    )
+    payload["run_metadata"]["cost_rollup_diagnostic"] = {
+        "pumping_diagnostic": {
+            "status": status,
+            "pumping_electrical_kWh": pumping_kWh,
+        }
+    }
+
+    artifact = build_run_artifact(payload, run_id=f"run-cost-{status}")
+
+    totals = artifact["terminal"]["cost_totals"]
+    assert "pumping_electrical_energy_kWh" not in totals
+    assert "pumping_electrical_cost_usd" not in totals
+    assert totals["electrical_energy_kWh"] == pytest.approx(2.0)
+    assert totals["electrical_cost_usd"] == pytest.approx(20.0)
+    assert totals["basis_note"] == (
+        f"pumping electrical energy excluded; diagnostic status={status}"
     )
 
 

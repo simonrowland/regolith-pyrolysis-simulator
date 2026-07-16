@@ -99,16 +99,22 @@ def _canonical_energy_cost_totals(
         pumping_diagnostic = cost_rollup.get("pumping_diagnostic")
 
     pumping_electrical_kWh = None
+    pumping_status = None
     if isinstance(pumping_diagnostic, Mapping):
-        candidate = pumping_diagnostic.get("pumping_electrical_kWh")
-        if (
-            isinstance(candidate, bool)
-            or not isinstance(candidate, Real)
-            or not math.isfinite(float(candidate))
-            or float(candidate) < 0.0
-        ):
-            return None
-        pumping_electrical_kWh = float(candidate)
+        raw_status = pumping_diagnostic.get("status")
+        pumping_status = (
+            str(raw_status).strip() if raw_status is not None else "missing"
+        ) or "missing"
+        if pumping_status in {"ok", "resolved"}:
+            candidate = pumping_diagnostic.get("pumping_electrical_kWh")
+            if (
+                isinstance(candidate, bool)
+                or not isinstance(candidate, Real)
+                or not math.isfinite(float(candidate))
+                or float(candidate) < 0.0
+            ):
+                return None
+            pumping_electrical_kWh = float(candidate)
 
     total_electrical_kWh = process_electrical_kWh
     result: dict[str, Any] = {
@@ -119,9 +125,15 @@ def _canonical_energy_cost_totals(
         ],
     }
     if pumping_electrical_kWh is None:
-        result["basis_note"] = (
-            "pumping electrical energy not emitted; electrical totals exclude pumping"
-        )
+        if pumping_status is None:
+            result["basis_note"] = (
+                "pumping electrical energy not emitted; electrical totals exclude pumping"
+            )
+        else:
+            result["basis_note"] = (
+                "pumping electrical energy excluded; "
+                f"diagnostic status={pumping_status}"
+            )
     else:
         total_electrical_kWh += pumping_electrical_kWh
         result.update(

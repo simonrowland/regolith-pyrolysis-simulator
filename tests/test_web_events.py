@@ -480,6 +480,62 @@ def test_recipe_load_omits_cost_parameters_when_recipe_carries_none(tmp_path):
     assert "cost_parameters" not in loaded.get_json()
 
 
+def test_active_run_recipe_load_stages_costs_without_mutating_cost_identity(
+    monkeypatch,
+):
+    sid = "active-recipe-load-sid"
+    original_costs = default_cost_parameters_block()
+    loaded_costs = default_cost_parameters_block()
+    loaded_costs["parameters"]["electricity_cost_per_kWh"]["value"] = 12.0
+    emitted = []
+    socketio = SimpleNamespace(
+        emit=lambda event, payload, **kwargs: emitted.append((event, payload, kwargs))
+    )
+    monkeypatch.setattr(web_events, "_registered_socketio", socketio)
+    _simulations[sid] = {
+        "running": True,
+        "run_id": "active-run-cost-identity",
+        "cost_parameters": copy.deepcopy(original_costs),
+    }
+    _sim_locks[sid] = threading.Lock()
+
+    try:
+        applied = web_events.apply_loaded_recipe_patch_to_state(
+            sid,
+            {"campaigns": {"C4": {"temp_range_C": [1585.0, 1595.0]}}},
+            cost_parameters=loaded_costs,
+        )
+
+        assert applied is True
+        assert _simulations[sid]["cost_parameters"] == original_costs
+        assert web_events._loaded_recipe_cost_parameters[sid]["cost_parameters"] == loaded_costs
+        assert emitted == [
+            (
+                "simulation_status",
+                {
+                    "status": "recipe_cost_parameters_staged",
+                    "notice_type": "cost_parameters_next_submission",
+                    "message": (
+                        "Loaded recipe cost parameters are staged for the next submission; "
+                        "the active run cost identity is unchanged."
+                    ),
+                    "run_id": "active-run-cost-identity",
+                },
+                {"room": sid},
+            )
+        ]
+
+        web_events.apply_loaded_recipe_patch_to_state(
+            sid,
+            {"campaigns": {"C4": {"temp_range_C": [1585.0, 1595.0]}}},
+        )
+        assert _simulations[sid]["cost_parameters"] == original_costs
+        assert len(emitted) == 1
+    finally:
+        _clear_simulation_state(sid)
+        web_events._loaded_recipe_cost_parameters.pop(sid, None)
+
+
 def test_recipe_save_serializes_resolved_staged_ladder(tmp_path):
     staged_patch = load_recipe_patch(
         _RECIPE_DIR / "c2a_staged_temperature_ladder.yaml"

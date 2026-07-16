@@ -93,6 +93,7 @@ _MAX_RUN_IDEMPOTENCY_ENTRIES = 1024
 _MAX_ACTIVE_RUNS = 4
 _draft_validation_slots = threading.BoundedSemaphore(1)
 _registered_start_handler = None
+_registered_socketio = None
 _O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 _MAX_WEB_MASS_KG = 1_000_000_000.0
 _MAX_SIM_SPEED_SECONDS = 3600.0
@@ -332,21 +333,50 @@ def apply_loaded_recipe_patch_to_state(
             _loaded_recipe_cost_parameters[sid] = pending
     if state is None:
         return False
+    active_run = False
+    cost_staged_for_next_run = False
+    active_run_id = None
     if lock is None:
         state["loaded_setpoints_patch"] = normalized
         state["setpoints_patch"] = normalized
-        if isinstance(cost_parameters, Mapping):
-            state["cost_parameters"] = copy.deepcopy(dict(cost_parameters))
-        else:
-            state.pop("cost_parameters", None)
-        return True
-    with lock:
-        state["loaded_setpoints_patch"] = normalized
-        state["setpoints_patch"] = normalized
-        if isinstance(cost_parameters, Mapping):
-            state["cost_parameters"] = copy.deepcopy(dict(cost_parameters))
-        else:
-            state.pop("cost_parameters", None)
+        active_run = bool(state.get("running"))
+        cost_staged_for_next_run = active_run and isinstance(
+            cost_parameters, Mapping
+        )
+        active_run_id = state.get("run_id")
+        if not active_run:
+            if isinstance(cost_parameters, Mapping):
+                state["cost_parameters"] = copy.deepcopy(dict(cost_parameters))
+            else:
+                state.pop("cost_parameters", None)
+    else:
+        with lock:
+            state["loaded_setpoints_patch"] = normalized
+            state["setpoints_patch"] = normalized
+            active_run = bool(state.get("running"))
+            cost_staged_for_next_run = active_run and isinstance(
+                cost_parameters, Mapping
+            )
+            active_run_id = state.get("run_id")
+            if not active_run:
+                if isinstance(cost_parameters, Mapping):
+                    state["cost_parameters"] = copy.deepcopy(dict(cost_parameters))
+                else:
+                    state.pop("cost_parameters", None)
+    if cost_staged_for_next_run and _registered_socketio is not None:
+        _registered_socketio.emit(
+            "simulation_status",
+            {
+                "status": "recipe_cost_parameters_staged",
+                "notice_type": "cost_parameters_next_submission",
+                "message": (
+                    "Loaded recipe cost parameters are staged for the next submission; "
+                    "the active run cost identity is unchanged."
+                ),
+                "run_id": active_run_id,
+            },
+            room=sid,
+        )
     return True
 
 
@@ -1995,7 +2025,8 @@ def _start_background_loop(
 
 def register_events(socketio):
     """Register all SocketIO events for the simulator UI."""
-    global _registered_start_handler
+    global _registered_socketio, _registered_start_handler
+    _registered_socketio = socketio
 
     @socketio.on('connect')
     def handle_connect():
