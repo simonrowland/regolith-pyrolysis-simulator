@@ -5510,6 +5510,141 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._sync_oxygen_kg_counters()
         return result
 
+    def _compute_capacity_coupling_shadow(self, equilibrium):
+        degraded_before = copy.deepcopy(self._degraded_path_engagement)
+        try:
+            return self._compute_capacity_coupling_shadow_impl(equilibrium)
+        finally:
+            self._degraded_path_engagement = degraded_before
+
+    def _compute_capacity_coupling_shadow_impl(self, equilibrium):
+        from engines.builtin.evaporation_flux import (
+            BuiltinEvaporationFluxProvider,
+        )
+        from simulator.accounting.formulas import resolve_species_formula
+        from simulator.capacity_coupling import solve_capacity_shadow
+        from simulator.chemistry.kernel.account_filters import (
+            build_provider_account_view,
+        )
+        from simulator.chemistry.kernel.dto import IntentRequest
+        from simulator.thermal_train import (
+            FiniteCapacity,
+            capacity_from_hardware,
+            thermal_train_parameters_from_mapping,
+        )
+
+        params = thermal_train_parameters_from_mapping()
+        capacity = capacity_from_hardware(params.cold_train)
+        if not isinstance(capacity, FiniteCapacity):
+            return None
+
+        ledger_before = self.atom_ledger.mol_by_account()
+        transition_count_before = len(self.atom_ledger.transitions)
+        pre_holdup = self._overhead_holdup_mol()
+        initial_partials = {
+            species: 0.0
+            for species in dict(equilibrium.vapor_pressures_Pa or {})
+        }
+        controls, molar_masses = self._evaporation_flux_control_inputs(
+            equilibrium,
+            overhead_partials_Pa=initial_partials,
+        )
+        for species in pre_holdup:
+            molar_masses.setdefault(
+                species,
+                resolve_species_formula(
+                    species,
+                    self.species_formula_registry,
+                ).molar_mass_kg_per_mol(),
+            )
+
+        provider = BuiltinEvaporationFluxProvider()
+        profile = provider.capability_profile()
+        account_view = build_provider_account_view(
+            self.atom_ledger,
+            profile.declared_accounts,
+            self.species_formula_registry,
+        )
+        raw_liquid_fraction = getattr(equilibrium, 'liquid_fraction', 1.0)
+        liquid_fraction_factor = min(
+            1.0,
+            max(0.0, float(
+                1.0 if raw_liquid_fraction is None else raw_liquid_fraction
+            )),
+        ) if self._freeze_gate_enabled() else 1.0
+
+        def flux_at_partials(partials_Pa):
+            iteration_controls = dict(controls)
+            iteration_controls['overhead_partials_Pa'] = dict(partials_Pa)
+            iteration_controls['overhead_pressure_pa'] = sum(
+                partials_Pa.values()
+            )
+            request = IntentRequest(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                account_view=account_view,
+                temperature_C=float(self.melt.temperature_C),
+                pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+                control_inputs=iteration_controls,
+            )
+            result = provider.dispatch(request)
+            if str(result.status) != 'ok':
+                raise RuntimeError(
+                    str((result.diagnostic or {}).get('reason') or result.status)
+                )
+            rates = {
+                species: float(rate) * liquid_fraction_factor
+                for species, rate in dict(
+                    (result.diagnostic or {}).get(
+                        'evaporation_flux_kg_hr', {}
+                    ) or {}
+                ).items()
+            }
+            residual_fe_mol = getattr(
+                self,
+                '_native_fe_vapor_residual_capacity_mol_this_hr',
+                None,
+            )
+            if residual_fe_mol is not None and 'Fe' in rates:
+                rates['Fe'] = min(
+                    rates['Fe'],
+                    max(0.0, float(residual_fe_mol))
+                    * molar_masses.get('Fe', 0.0),
+                )
+            return rates
+
+        cold_train = params.cold_train
+        assert cold_train is not None
+        result = solve_capacity_shadow(
+            pre_holdup_mol=pre_holdup,
+            molar_mass_kg_mol=molar_masses,
+            flux_kg_hr_at_partials=flux_at_partials,
+            capacity=capacity,
+            head_bled_species_mol={},
+            external_o2_holdup_mol=float(
+                getattr(
+                    self,
+                    '_o2_bubbler_external_o2_in_overhead_mol',
+                    0.0,
+                ) or 0.0
+            ),
+            temperature_K=self._headspace_temperature_K(),
+            volume_m3=self._headspace_volume_m3(),
+            dt_hr=1.0,
+            bleed_conductance_kg_s=self._headspace_bleed_conductance_kg_s(
+                species_kg_for_M_avg=self._overhead_holdup_species_kg(
+                    pre_holdup
+                ),
+            ),
+            downstream_pressure_Pa=(
+                self._headspace_downstream_pressure_bar() * 100000.0
+            ),
+            k_relief_kg_hr_Pa=cold_train.relief['k_relief_kg_hr_Pa'],
+            p_open_Pa=cold_train.relief['p_open_Pa'],
+        )
+        assert self.atom_ledger.mol_by_account() == ledger_before
+        assert len(self.atom_ledger.transitions) == transition_count_before
+        return result
+
     def _compute_intrinsic_melt_fO2(
         self, temperature_K: Optional[float] = None
     ) -> float:
@@ -10632,6 +10767,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
         evap_flux = EvaporationFlux()
         if evaporation_campaign:
+            if (
+                self._overhead_headspace_enabled()
+                and hasattr(equilibrium, 'vapor_pressures_Pa')
+            ):
+                self._compute_capacity_coupling_shadow(equilibrium)
             evap_flux = self._calculate_evaporation(equilibrium)
             evap_flux = self._apply_analytic_evaporation_depletion(evap_flux)
 

@@ -296,6 +296,17 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
 
     @staticmethod
     def _invalid_destructive_control(controls: dict) -> str | None:
+        if "cold_train_capacity" in controls:
+            from simulator.thermal_train import FiniteCapacity, NoColdTrain
+
+            capacity = controls["cold_train_capacity"]
+            if not isinstance(capacity, (NoColdTrain, FiniteCapacity)):
+                return "cold_train_capacity must be NoColdTrain or FiniteCapacity"
+            if isinstance(capacity, FiniteCapacity) and (
+                not math.isfinite(capacity.value_kg_hr)
+                or capacity.value_kg_hr <= 0.0
+            ):
+                return "cold_train_capacity must be finite and positive"
         force_drain_all = controls.get("force_drain_all", False)
         if not isinstance(force_drain_all, bool):
             return "force_drain_all must be a boolean"

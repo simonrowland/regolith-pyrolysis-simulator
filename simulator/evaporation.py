@@ -234,11 +234,6 @@ class EvaporationMixin:
             )
         )
 
-        # Precompute the auxiliary maps the provider consumes via
-        # control_inputs. This keeps the provider stateless: every
-        # piece of caller-owned state (yaml lookups, stoich validation,
-        # available-mass cap, overhead backpressure) arrives in the
-        # request, so the provider holds no simulator references.
         (
             molar_masses_kg_mol,
             stoich_by_species,
@@ -1419,6 +1414,80 @@ class EvaporationMixin:
             available_oxide_kg[species] = ledger_oxide_kg
 
         return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
+
+    def _evaporation_flux_control_inputs(
+        self,
+        equilibrium: Any,
+        *,
+        overhead_partials_Pa: Mapping[str, float],
+        overhead_pressure_pa: float | None = None,
+    ) -> tuple[dict[str, Any], dict[str, float]]:
+        vapor_pressures = dict(equilibrium.vapor_pressures_Pa or {})
+        (
+            molar_masses_kg_mol,
+            stoich_by_species,
+            available_oxide_kg,
+        ) = self._build_evaporation_aux_maps(vapor_pressures)
+        vapor_pressure_diagnostic = dict(
+            getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
+        )
+        kernel_config = dict(
+            getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
+        )
+        carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
+        carrier_gas = carrier_resolver() if callable(carrier_resolver) else 'N2'
+        controls: dict[str, Any] = {
+            'vapor_pressures_Pa': vapor_pressures,
+            'vapor_pressures_source': dict(
+                getattr(equilibrium, 'vapor_pressures_source', {}) or {}
+            ),
+            'vapor_pressure_numerator_provenance': dict(
+                vapor_pressure_diagnostic.get(
+                    'vapor_pressure_numerator_provenance'
+                ) or {}
+            ),
+            'vapor_pressure_activities': dict(
+                getattr(equilibrium, 'activity_coefficients', {}) or {}
+            ),
+            'pO2_bar': vapor_pressure_diagnostic.get('pO2_bar'),
+            'overhead_partials_Pa': dict(overhead_partials_Pa),
+            'molar_mass_kg_mol': molar_masses_kg_mol,
+            'stoich_by_species': stoich_by_species,
+            'available_oxide_kg': available_oxide_kg,
+            'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
+            'stir_factor': {
+                'axial': clamp_stir_factor(self.melt.stir_state.axial),
+                'radial': clamp_stir_factor(self.melt.stir_state.radial),
+            },
+            'pipe_diameter_m': float(
+                getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+            ),
+            'overhead_pressure_pa': (
+                sum(overhead_partials_Pa.values())
+                if overhead_pressure_pa is None
+                else float(overhead_pressure_pa)
+            ),
+            'gas_temperature_K': float(
+                getattr(self.overhead, 'headspace_temperature_K', 0.0)
+                or self.melt.temperature_C + 273.15
+            ),
+            'carrier_gas': carrier_gas,
+            'evaporation_series_resistance': dict(
+                kernel_config.get('evaporation_series_resistance', {}) or {}
+            ),
+            'alpha': _load_evaporation_alpha_by_species(self.vapor_pressures),
+            'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
+                self.vapor_pressures
+            ),
+            'allow_unmeasured_alpha_fallback': bool(
+                kernel_config.get('allow_unmeasured_alpha_fallback', False)
+            ),
+        }
+        if 'unmeasured_alpha_fallback_species' in kernel_config:
+            controls['unmeasured_alpha_fallback_species'] = tuple(
+                kernel_config['unmeasured_alpha_fallback_species'] or ()
+            )
+        return controls, molar_masses_kg_mol
 
     def _apply_analytic_evaporation_depletion(
         self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
