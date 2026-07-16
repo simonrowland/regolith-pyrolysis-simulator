@@ -725,6 +725,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.inventory = ProcessInventory()
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
+        self._melt_headspace_composition_mbar: Dict[str, float] = {}
 
         # --- Batch record ---
         self.record = BatchRecord()
@@ -1026,6 +1027,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Reset condensation train
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
+        self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
         self._last_native_fe_partition_diagnostic = {}
@@ -11355,6 +11357,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 evap_flux = self._apply_analytic_evaporation_depletion(
                     evap_flux
                 )
+        overhead_flux = evap_flux
 
         # --- 5. Condensation routing ---
         # Send evaporated species through the 8-stage train.
@@ -11362,7 +11365,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if evap_flux.total_kg_hr > 0:
             self._configure_condensation_operating_conditions(evap_flux)
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
-            self._route_to_condensation(evap_flux)
+            overhead_flux = self._route_to_condensation(evap_flux)
         self._pending_knudsen_zero_overhead_flow_marker = None
 
         # --- 6. Update melt composition ---
@@ -11410,7 +11413,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_offgas_O2_kg_hr = self._ledger_o2_kg(
                 'process.overhead_gas')
         self.overhead = self.overhead_model.update(
-            evap_flux,
+            overhead_flux,
             self.melt,
             self.train,
             actual_O2_kg_hr=melt_offgas_O2_kg_hr,
@@ -11426,6 +11429,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             cold_train_capacity=(
                 configured_capacity
             ),
+            # F-317 derivation: the melt-to-train duct is upstream of capture,
+            # so m_dot_pipe = sum(m_dot_evolved); downstream reporting instead
+            # uses y_i = m_dot_residual_i / sum(m_dot_residual). Both fluxes are
+            # kg/hr, and near-total capture must not erase the upstream load.
+            transport_inlet_kg_hr=evap_flux.total_kg_hr,
+            transport_inlet_flux=evap_flux,
+        )
+        upstream_transport = self.overhead_model.estimate_transport_state(
+            evap_flux,
+            self.melt,
+            p_downstream_bar=self._headspace_downstream_pressure_bar(),
+        )
+        self._melt_headspace_composition_mbar = (
+            self.overhead_model.species_partial_pressures(
+                evap_flux,
+                upstream_transport['vapor_pressure_mbar'],
+            )
         )
         if capacity_result is not None:
             self.overhead.transport_saturation_pct = (

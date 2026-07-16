@@ -5,6 +5,7 @@ import pytest
 
 import simulator.evaporation as evaporation_module
 from simulator.accounting import AccountingError, MaterialLot
+from simulator.condensation import CondensationRouteResult
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import (
@@ -1245,6 +1246,306 @@ def test_overhead_product_partials_use_mole_fractions_not_mass_fractions():
         expected_na_fraction
     )
     assert gas.composition["Na"] > gas.composition["Fe"]
+
+
+def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
+    sim = _gas_train_sim()
+    sim.vapor_pressures["oxide_vapors"]["FeO"] = {
+        "parent_oxide": "FeO",
+        "stoich_oxide_per_vapor": 1.0,
+        "stoich_O2_per_vapor": 0.0,
+    }
+    flux = EvaporationFlux(
+        total_kg_hr=2.0,
+        species_kg_hr={"Fe": 1.0, "FeO": 1.0},
+    )
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Fe": 0.25, "FeO": 0.75},
+            condensed_by_stage_species={1: {"Fe": 0.75, "FeO": 0.25}},
+            wall_deposit_by_species={"Fe": 0.15},
+            wall_deposit_fraction_by_species={"Fe": 0.2},
+            wall_deposit_account_fractions_by_species={
+                "Fe": {PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[0]: 1.0},
+            },
+        ),
+    )
+
+    residual_flux = sim._route_to_condensation(flux)
+    captured_baffle_kg = sim.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).get("Fe", 0.0)
+    captured_wall_kg = sim.atom_ledger.kg_by_account(
+        PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[0]
+    ).get("Fe", 0.0)
+    monkeypatch.setattr(
+        sim.overhead_model,
+        "_vapor_pressure_mbar_from_flux",
+        lambda *_args, **_kwargs: 10.0,
+    )
+    gas = sim.overhead_model.update(residual_flux, sim.melt, sim.train)
+
+    fe_mol_hr = 0.25 / (MOLAR_MASS["Fe"] / 1000.0)
+    feo_mol_hr = 0.75 / (MOLAR_MASS["FeO"] / 1000.0)
+    expected_fe_mbar = 10.0 * fe_mol_hr / (fe_mol_hr + feo_mol_hr)
+    expected_feo_mbar = 10.0 - expected_fe_mbar
+
+    assert residual_flux.species_kg_hr == pytest.approx(
+        {"Fe": 0.25, "FeO": 0.75}
+    )
+    assert captured_wall_kg > 0.0
+    assert captured_baffle_kg + captured_wall_kg + residual_flux.species_kg_hr[
+        "Fe"
+    ] == pytest.approx(1.0, rel=1e-12)
+    assert gas.composition["Fe"] == pytest.approx(expected_fe_mbar)
+    assert gas.composition["FeO"] == pytest.approx(expected_feo_mbar)
+
+
+def test_transport_saturation_uses_full_inlet_when_residual_is_nearly_captured():
+    sim = _gas_train_sim()
+    residual_flux = EvaporationFlux(
+        total_kg_hr=1.0e-12,
+        species_kg_hr={"Fe": 1.0e-12},
+    )
+    residual_transport = sim.overhead_model.estimate_transport_state(
+        residual_flux, sim.melt
+    )
+    pipe_capacity_kg_hr = residual_transport["pipe_conductance_kg_hr"]
+    inlet_flux = EvaporationFlux(
+        total_kg_hr=1.5 * pipe_capacity_kg_hr,
+        species_kg_hr={"Fe": 1.5 * pipe_capacity_kg_hr},
+    )
+
+    gas = sim.overhead_model.update(
+        residual_flux,
+        sim.melt,
+        sim.train,
+        transport_inlet_kg_hr=inlet_flux.total_kg_hr,
+    )
+
+    assert gas.transport_saturation_pct == pytest.approx(150.0)
+    assert gas.evap_exceeds_transport is True
+    assert gas.composition == pytest.approx({
+        "Fe": residual_transport["vapor_pressure_mbar"],
+    })
+
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.campaign_hour = 0.0
+    sim.overhead = gas
+    sim.campaign_mgr.get_temp_target = lambda *_args: (1600.0, 100.0)
+    sim._update_temperature()
+
+    assert sim._last_actual_ramp == pytest.approx(50.0)
+    assert "pipe saturated" in sim._last_throttle_reason
+
+
+def test_heavy_species_transport_uses_upstream_mixture_after_total_capture():
+    from simulator.overhead import (
+        DEFAULT_PIPE_M_AVG_KG_MOL,
+        OverheadGasModel,
+        _mean_molar_mass_kg_mol,
+    )
+    from simulator.state import CondensationTrain, MeltState
+
+    model = OverheadGasModel({"enabled": False})
+    melt = MeltState(temperature_C=1500.0, p_total_mbar=1.0)
+    upstream_flux = EvaporationFlux(
+        total_kg_hr=0.1,
+        species_kg_hr={"CrO2": 0.1},
+    )
+    residual_flux = EvaporationFlux()
+
+    upstream_transport = model.estimate_transport_state(upstream_flux, melt)
+    fallback_transport = model.estimate_transport_state(residual_flux, melt)
+    gas = model.update(
+        residual_flux,
+        melt,
+        CondensationTrain.create_default(),
+        transport_inlet_kg_hr=upstream_flux.total_kg_hr,
+        transport_inlet_flux=upstream_flux,
+    )
+
+    assert _mean_molar_mass_kg_mol(upstream_flux.species_kg_hr) == pytest.approx(
+        MOLAR_MASS["CrO2"] / 1000.0
+    )
+    assert MOLAR_MASS["CrO2"] / 1000.0 != pytest.approx(
+        DEFAULT_PIPE_M_AVG_KG_MOL
+    )
+    assert gas.pipe_conductance_kg_hr == pytest.approx(
+        upstream_transport["pipe_conductance_kg_hr"]
+    )
+    assert gas.pipe_conductance_kg_hr != pytest.approx(
+        fallback_transport["pipe_conductance_kg_hr"]
+    )
+    assert gas.composition == {}
+
+
+def test_condensation_residual_ignores_prior_holdup_drain_credit(monkeypatch):
+    sim = _gas_train_sim()
+    prior_holdup_kg = 2.0e-8
+    evolved_kg = 3.0e-8
+    condensed_kg = 1.0e-8
+    residual_kg = evolved_kg - condensed_kg
+    retained_wall_kg = 5.0e-13
+    sim.atom_ledger.load_external(
+        "process.condensation_retained_holdup",
+        {"Fe": prior_holdup_kg},
+        source="residual-regression prior retained holdup",
+    )
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Fe": residual_kg},
+            wall_deposit_by_species={"Fe": retained_wall_kg},
+            wall_deposit_fraction_by_species={
+                "Fe": retained_wall_kg / condensed_kg,
+            },
+            wall_deposit_account_fractions_by_species={
+                "Fe": {PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[0]: 1.0},
+            },
+        ),
+    )
+
+    residual_flux = sim._route_to_condensation(EvaporationFlux(
+        total_kg_hr=evolved_kg,
+        species_kg_hr={"Fe": evolved_kg},
+    ))
+
+    assert residual_flux.species_kg_hr["Fe"] == pytest.approx(
+        residual_kg, rel=0.0, abs=1e-24
+    )
+    assert sim.atom_ledger.kg_by_account(
+        "process.condensation_retained_holdup"
+    ).get("Fe", 0.0) == pytest.approx(
+        condensed_kg, rel=0.0, abs=1e-24
+    )
+    assert sim.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).get("Fe", 0.0) == pytest.approx(
+        prior_holdup_kg, rel=0.0, abs=1e-24
+    )
+
+
+def test_step_overhead_composition_uses_real_condensation_residual():
+    sim = _gas_train_sim()
+    evolved_kg = 1.0
+    flux = EvaporationFlux(
+        total_kg_hr=evolved_kg,
+        species_kg_hr={"Fe": evolved_kg},
+    )
+    sim.melt.campaign = CampaignPhase.C2A
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    sim._calculate_evaporation = lambda _equilibrium: flux
+    _bypass_analytic_depletion(sim)
+    seen = {}
+    real_update = sim.overhead_model.update
+
+    def _spy_update(overhead_flux, *args, **kwargs):
+        seen["flux"] = overhead_flux
+        seen["transport_inlet_kg_hr"] = kwargs["transport_inlet_kg_hr"]
+        return real_update(overhead_flux, *args, **kwargs)
+
+    sim.overhead_model.update = _spy_update
+    sim.step()
+
+    residual_kg = seen["flux"].species_kg_hr["Fe"]
+    assert 0.0 < residual_kg < evolved_kg
+    expected_transport = sim.overhead_model.estimate_transport_state(
+        flux, sim.melt
+    )
+    expected_saturation_pct = (
+        evolved_kg / expected_transport["pipe_conductance_kg_hr"] * 100.0
+    )
+    assert seen["transport_inlet_kg_hr"] == pytest.approx(evolved_kg)
+    assert sim.overhead.transport_saturation_pct == pytest.approx(
+        expected_saturation_pct
+    )
+    residual_transport = sim.overhead_model.estimate_transport_state(
+        seen["flux"], sim.melt
+    )
+    assert sim.overhead.composition["Fe"] == pytest.approx(
+        residual_transport["vapor_pressure_mbar"]
+    )
+
+
+def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
+    monkeypatch,
+):
+    sim = _gas_train_sim()
+    evolved_kg = 1.0
+    residual_kg = 1.0e-8
+    flux = EvaporationFlux(
+        total_kg_hr=evolved_kg,
+        species_kg_hr={"Fe": evolved_kg},
+    )
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Fe": residual_kg},
+            condensed_by_stage_species={1: {"Fe": evolved_kg - residual_kg}},
+        ),
+    )
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.temperature_C = 1500.0
+    sim._apply_native_fe_saturation_split = lambda **_kwargs: None
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    sim._calculate_evaporation = lambda _equilibrium: flux
+    _bypass_analytic_depletion(sim)
+
+    sim.step()
+
+    upstream_transport = sim.overhead_model.estimate_transport_state(
+        flux, sim.melt
+    )
+    residual_flux = EvaporationFlux(
+        total_kg_hr=residual_kg,
+        species_kg_hr={"Fe": residual_kg},
+    )
+    residual_transport = sim.overhead_model.estimate_transport_state(
+        residual_flux, sim.melt
+    )
+    assert sim._melt_headspace_composition_mbar["Fe"] == pytest.approx(
+        upstream_transport["vapor_pressure_mbar"]
+    )
+    assert sim.overhead.composition["Fe"] == pytest.approx(
+        residual_transport["vapor_pressure_mbar"]
+    )
+    assert sim._melt_headspace_composition_mbar["Fe"] > (
+        sim.overhead.composition["Fe"] * 1.0e3
+    )
+    assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
+        upstream_transport["vapor_pressure_mbar"] * 100.0
+    )
+
+    seen = {}
+
+    def _capture_dispatch(_intent, *, control_inputs):
+        seen.update(control_inputs)
+        return types.SimpleNamespace(
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": {}},
+        )
+
+    sim._dispatch_only = _capture_dispatch
+    equilibrium = types.SimpleNamespace(
+        vapor_pressures_Pa={"Fe": 100.0},
+        vapor_pressures_source={},
+        activity_coefficients={},
+        diagnostics={},
+        liquid_fraction=1.0,
+    )
+    evaporation_module.EvaporationMixin._calculate_evaporation(sim, equilibrium)
+
+    assert seen["overhead_partials_Pa"]["Fe"] == pytest.approx(
+        upstream_transport["vapor_pressure_mbar"] * 100.0
+    )
+    assert seen["overhead_partials_Pa"]["Fe"] > 0.0
 
 
 def test_commanded_po2_numerical_floor_when_all_inputs_zero():

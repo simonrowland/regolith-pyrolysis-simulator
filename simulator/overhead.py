@@ -799,6 +799,8 @@ class OverheadGasModel:
                bleed_conductance_kg_s: Optional[float] = None,  # kg/s — explicit bleed mass-flow capacity
                bleed_conductance_kg_s_per_bar: Optional[float] = None,  # deprecated compatibility alias; kg/s, not per-bar
                cold_train_capacity=None,
+               transport_inlet_kg_hr: Optional[float] = None,
+               transport_inlet_flux: Optional[EvaporationFlux] = None,
                ) -> OverheadGas:
         """
         Calculate overhead gas state for this hour.
@@ -813,6 +815,12 @@ class OverheadGasModel:
             mre_anode_O2_mol_hr: MRE anode O₂ flow in mol/hr. Recorded as a
                                  separate source bin and not counted as
                                  turbine throughput.
+            transport_inlet_kg_hr: Full evolved mass flux entering the upstream
+                                   transport duct. ``evap_flux`` remains the
+                                   post-condensation composition basis.
+            transport_inlet_flux: Full evolved species flux entering the
+                                  upstream transport duct. Supplies the mixture
+                                  basis for conductance and backpressure.
 
         Returns:
             Updated OverheadGas with pressure, flow, and feedback data
@@ -832,11 +840,27 @@ class OverheadGasModel:
         total_evap_kg_hr = evap_flux.total_kg_hr  # kg/hr — total evaporation mass flow
 
         # ── Pipe conductance limit ──────────────────────── [PIPE-1]
+        upstream_flux = (
+            transport_inlet_flux
+            if transport_inlet_flux is not None
+            else evap_flux
+        )
         transport_state = self.estimate_transport_state(
-            evap_flux,
+            upstream_flux,
             melt,
             p_downstream_bar=p_downstream_bar,
         )  # mixed units — pipe transport state
+        if transport_inlet_kg_hr is not None:
+            inlet_load_kg_hr = max(0.0, float(transport_inlet_kg_hr))
+            pipe_capacity_kg_hr = transport_state['pipe_conductance_kg_hr']
+            if inlet_load_kg_hr <= 0.0:
+                transport_state['pipe_capacity_used_pct'] = 0.0
+            elif pipe_capacity_kg_hr > 0.0:
+                transport_state['pipe_capacity_used_pct'] = (
+                    inlet_load_kg_hr / pipe_capacity_kg_hr * 100.0
+                )
+            else:
+                transport_state['pipe_capacity_used_pct'] = 999.0
         conductance = transport_state['conductance_kg_s']  # kg/s — pipe mass-flow capacity
         gas.pipe_conductance_kg_hr = transport_state['pipe_conductance_kg_hr']  # kg/hr — pipe mass-flow capacity
         gas.initial_throat_area_m2 = transport_state['initial_throat_area_m2']  # m² — user-configured throat cross-section
@@ -882,40 +906,26 @@ class OverheadGasModel:
         # Total pressure may include a non-condensable background gas
         # such as Mars CO2; product partial pressures should not inherit
         # that background pressure.
-        vapor_pressure_mbar = transport_state['vapor_pressure_mbar']  # mbar (nominal) — proxy pressure, not rigorous partial pressure
-        gas.pressure_mbar = transport_state['pressure_mbar']  # mbar — reported total overhead pressure
+        # The transport duct is upstream of the condensation train, while the
+        # reported product gas is downstream. Conductance/backpressure therefore
+        # use ``upstream_flux`` above; serialized partials keep the residual flux
+        # and its residual pressure scale so capture is not reported as product.
+        report_transport_state = (
+            transport_state
+            if upstream_flux is evap_flux
+            else self.estimate_transport_state(
+                evap_flux,
+                melt,
+                p_downstream_bar=p_downstream_bar,
+            )
+        )
+        vapor_pressure_mbar = report_transport_state['vapor_pressure_mbar']  # mbar (nominal) — downstream proxy pressure
+        gas.pressure_mbar = report_transport_state['pressure_mbar']  # mbar — reported downstream total pressure
 
         # ── Product partial pressures (proportional to evaporation rates) ──
         if total_evap_kg_hr > 0:
-            molar_flow_by_species: dict[str, float] = {}
-            for sp, rate in evap_flux.species_kg_hr.items():  # kg/hr — species evaporation mass flow
-                molar_mass_g_mol = MOLAR_MASS.get(sp)
-                if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
-                    continue
-                molar_flow_by_species[sp] = max(0.0, float(rate)) / (  # mol/hr — kg/hr / kg/mol
-                    molar_mass_g_mol / 1000.0
-                )
-            total_molar_flow = sum(molar_flow_by_species.values())  # mol/hr — total gas molar flow
-            # F-316 derivation:
-            # premise: ideal-gas partial pressure fractions are mole fractions,
-            # while evap_flux arrives as species mass rates.
-            # algebra: y_i = n_dot_i / Σ n_dot_i, p_i = y_i * P_vapor.
-            # unit check: (kg/hr)/(kg/mol)=mol/hr; the ratio is dimensionless;
-            # multiplying by mbar yields mbar partial pressure.
-            # sanity: equal masses of light Na and heavy Fe no longer produce
-            # equal partial pressures; if every molar mass is unknown, retain
-            # the legacy mass-fraction fallback rather than dropping pressure.
-            if total_molar_flow > 0.0:
-                for sp, molar_flow in molar_flow_by_species.items():
-                    gas.composition[sp] = (
-                        molar_flow / total_molar_flow * vapor_pressure_mbar
-                    )  # mbar — species proxy partial pressure from mole fraction
-            else:
-                for sp, rate in evap_flux.species_kg_hr.items():
-                    gas.composition[sp] = (
-                        max(0.0, float(rate)) / total_evap_kg_hr
-                        * vapor_pressure_mbar
-                    )  # mbar — legacy fallback for unknown species
+            gas.composition.update(self.species_partial_pressures(
+                evap_flux, vapor_pressure_mbar))
 
         # Controlled/background atmosphere partial pressures.
         if melt.pO2_mbar > 0.0:
@@ -963,6 +973,38 @@ class OverheadGasModel:
         gas.pressure_mbar = max(gas.pressure_mbar, partial_pressure_sum_mbar)
 
         return gas
+
+    @staticmethod
+    def species_partial_pressures(
+        evap_flux: EvaporationFlux,
+        vapor_pressure_mbar: float,
+    ) -> dict[str, float]:
+        """Project a species mass-flow mixture onto mole-fraction partials."""
+        total_evap_kg_hr = max(0.0, float(evap_flux.total_kg_hr))
+        if total_evap_kg_hr <= 0.0:
+            return {}
+        molar_flow_by_species: dict[str, float] = {}
+        for species, rate in evap_flux.species_kg_hr.items():
+            molar_mass_g_mol = MOLAR_MASS.get(species)
+            if molar_mass_g_mol is None or molar_mass_g_mol <= 0.0:
+                continue
+            molar_flow_by_species[species] = max(0.0, float(rate)) / (
+                molar_mass_g_mol / 1000.0
+            )
+        total_molar_flow = sum(molar_flow_by_species.values())
+        # F-316: y_i = n_dot_i / sum(n_dot), p_i = y_i P_vapor. Mass rates
+        # become mol/hr through kg/(kg/mol); unknown-only mixtures retain the
+        # legacy mass-fraction fallback instead of losing pressure entirely.
+        if total_molar_flow > 0.0:
+            return {
+                species: molar_flow / total_molar_flow * vapor_pressure_mbar
+                for species, molar_flow in molar_flow_by_species.items()
+            }
+        return {
+            species: max(0.0, float(rate)) / total_evap_kg_hr
+            * vapor_pressure_mbar
+            for species, rate in evap_flux.species_kg_hr.items()
+        }
 
     def _update_finite_headspace(self, gas: OverheadGas, melt: MeltState,
                                  overhead_holdup_mol: Mapping[str, float],

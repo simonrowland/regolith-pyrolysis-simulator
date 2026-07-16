@@ -120,6 +120,16 @@ def _load_evaporation_alpha_envelope_by_species(
 
 
 class EvaporationMixin:
+    def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
+        """Return upstream melt-headspace backpressure for evaporation."""
+
+        melt_headspace_partials_mbar = getattr(
+            self, '_melt_headspace_composition_mbar', {}) or {}
+        return float(melt_headspace_partials_mbar.get(
+            species,
+            self.overhead.composition.get(species, 0.0),
+        )) * 100.0
+
     def _calculate_evaporation(
         self,
         equilibrium,
@@ -236,9 +246,12 @@ class EvaporationMixin:
         )
 
         # Overhead backpressure (Pa)                       [LOOP-1]
-        # Uses the previous hour's overhead partial pressures as
-        # backpressure. Gas pO2 has already been applied once upstream in
-        # the equilibrium vapor pressures consumed here.
+        # Uses the previous hour's upstream melt-headspace/duct partials as
+        # backpressure. ``overhead.composition`` is the physically distinct
+        # post-condensation report, so near-total capture must not erase P_bulk
+        # above the melt. The fallback preserves callers/tests that seed only
+        # the legacy report surface. Gas pO2 has already been applied once
+        # upstream in the equilibrium vapor pressures consumed here.
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))
@@ -246,7 +259,7 @@ class EvaporationMixin:
             }
             if overhead_partials_override_Pa is not None
             else {
-                species: self.overhead.composition.get(species, 0.0) * 100.0
+                species: self._evaporation_bulk_partial_pressure_pa(species)
                 for species in vapor_pressures
             }
         )
@@ -1635,7 +1648,9 @@ class EvaporationMixin:
                 effective_rates[species] = min(current_rate, allowed_rate)
         return effective_rates
 
-    def _route_to_condensation(self, evap_flux: EvaporationFlux):
+    def _route_to_condensation(
+        self, evap_flux: EvaporationFlux
+    ) -> EvaporationFlux:
         """
         Route evaporated species through the condensation train.
 
@@ -1674,6 +1689,11 @@ class EvaporationMixin:
            disproportionation when sp_data declares the product map).
         3. ``_project_condensed_stage_collection`` projects the actual
            credited_condensed_kg onto stage UI bookkeeping.
+
+        Returns an :class:`EvaporationFlux` containing only this tick's vapor
+        that remains free in ``process.overhead_gas`` after all committed
+        baffle, wall, and retained-holdup routing. Melt depletion still uses
+        the original full evolved flux at the caller.
 
         End-of-tick ledger state is identical to the pre-flip behaviour:
         between the two kernel commits the vapor passes through
@@ -1738,17 +1758,49 @@ class EvaporationMixin:
                 evap_flux.species_kg_hr.keys()
             )
         )
+        residual_species_kg_hr = {
+            species: max(0.0, float(rate_kg_hr) * phase_scalar)
+            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
+        }
         for species in species_order:
             if species not in evap_flux.species_kg_hr:
                 continue
             rate_kg_hr = evap_flux.species_kg_hr[species] * phase_scalar
+            overhead_before_kg = float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    species, 0.0,
+                )
+                or 0.0
+            )
             self._route_evaporated_species_to_condensation(
                 route_result,
                 species,
                 rate_kg_hr,
             )
+            overhead_after_kg = float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    species, 0.0,
+                )
+                or 0.0
+            )
+
+            # Premise: the ledger delta spans this tick's full vapor credit and
+            # every committed removal (baffle, wall, or retained holdup).
+            # Algebra: free-vapor delta = (before + evolved - removals) - before
+            # = evolved - removals. Unit check: kg - kg = kg per one-hour tick,
+            # numerically kg/hr. Sanity: zero removal leaves the evolved rate;
+            # complete committed removal leaves zero, independent of diagnostics.
+            residual_species_kg_hr[species] = max(
+                0.0, overhead_after_kg - overhead_before_kg,
+            )
 
         self._sync_oxygen_kg_counters()
+
+        residual_flux = EvaporationFlux(
+            species_kg_hr=residual_species_kg_hr,
+        )
+        residual_flux.update_totals()
+        return residual_flux
 
     def _route_evaporated_species_to_condensation(
         self,
