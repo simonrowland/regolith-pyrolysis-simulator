@@ -217,9 +217,6 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     'Al':  (2.940, 3093.0, 26.982),  # Estimated
     'Ti':  (2.890, 6000.0, 47.867),  # Estimated
     'SiO': (3.374, 71.4,   44.085),  # Estimated; sparse direct data
-    # CLASS-PROXY: nearest represented oxide vapor. SiO collision parameters
-    # preserve Chapman-Enskog T^1.5/P scaling; CrO2 keeps its own molar mass.
-    'CrO2': (3.374, 71.4, 83.9941),
 }
 
 _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
@@ -1439,6 +1436,8 @@ def _chapman_enskog_d_ab_m2_s(
     T_K: float,
     pressure_pa: float,
     carrier: str = DEFAULT_CARRIER_GAS,
+    *,
+    species_params: tuple[float, float, float] | None = None,
 ) -> float:
     """Binary diffusion coefficient ``D_AB`` for ``species`` in
     ``carrier`` gas at ``T_K``, ``pressure_pa``. Returns m²/s.
@@ -1454,11 +1453,13 @@ def _chapman_enskog_d_ab_m2_s(
         σ_AB = (σ_A + σ_B) / 2       (collision diameter, Angstrom)
         Ω_D  = Neufeld collision integral at T* = T * k_B / ε_AB
 
-    Returns 0 on unknown species (caller falls back to the legacy
-    constant via the explicit ``diffusion_coefficient_m2_s`` parameter
-    on the flux callers).
+    ``species_params`` lets a caller supply a path-local proxy without adding
+    it to the shared condensation table. Returns 0 on unknown species (caller
+    falls back to the legacy constant via the explicit
+    ``diffusion_coefficient_m2_s`` parameter on the flux callers).
     """
-    species_params = _LENNARD_JONES_PARAMS.get(species)
+    if species_params is None:
+        species_params = _LENNARD_JONES_PARAMS.get(species)
     carrier_key = _canonical_carrier_gas_key(carrier)
     carrier_params = _LENNARD_JONES_PARAMS.get(carrier_key)
     if species_params is None or carrier_params is None:

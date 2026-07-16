@@ -186,12 +186,16 @@ def test_chi_decomp_o2_suppression_does_not_cap_high_temperature_extent(
 def test_chi_decomp_po2_edge_semantics(foulant_registry_yaml: Path) -> None:
     registry = load_foulant_registry(foulant_registry_yaml)
 
-    reference = chi_decomp("CaSO4", 1300.0, 0.2, 0.0, registry)
-    no_overhead = chi_decomp("CaSO4", 1300.0, 0.0, 0.0, registry)
-    floor = chi_decomp("CaSO4", 1300.0, 1.0e-9, 0.0, registry)
+    vacuum = chi_decomp("CaSO4", 1300.0, 0.0, 0.0, registry)
+    floor = chi_decomp("CaSO4", 1300.0, 1.0e-15, 0.0, registry)
     below_floor = chi_decomp("CaSO4", 1300.0, 1.0e-30, 0.0, registry)
 
-    assert no_overhead == reference
+    # Fixture: T0=1423.15 K, width=R*T0/1000=11.832727 C, nu_O2=1/2.
+    # Vacuum shift = 0.5*width*ln(1e-15/0.2) = -194.821944 C,
+    # giving effective onset 1228.328056 K and near-complete extent at 1300 C.
+    assert vacuum.onset_K == pytest.approx(1228.3280559055947, rel=1e-12)
+    assert vacuum.extent == pytest.approx(0.9999999999997791, rel=1e-12)
+    assert vacuum == floor
     assert below_floor == floor
     for invalid in (-1.0, float("nan"), float("inf")):
         with pytest.raises(ValueError, match="pX_bar must be finite and non-negative"):

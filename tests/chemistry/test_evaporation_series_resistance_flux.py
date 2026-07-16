@@ -13,7 +13,12 @@ from engines.builtin.evaporation_flux import (
 )
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.condensation import GAS_CONSTANT_J_MOL_K
+from simulator.condensation import (
+    DEFAULT_BINARY_DIFFUSION_M2_S,
+    GAS_CONSTANT_J_MOL_K,
+    _chapman_enskog_d_ab_m2_s,
+    _series_resistance_deposition_flux_mol_m2_s,
+)
 from simulator.state import MAX_STIR_FACTOR
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
@@ -196,6 +201,46 @@ def test_cro2_class_proxy_preserves_chapman_enskog_scaling():
         base.d_ab_m2_s / 2.0, rel=1e-12
     )
     assert hotter.d_ab_m2_s > base.d_ab_m2_s
+
+
+def test_cro2_evaporation_proxy_absolute_diffusivity_pin():
+    result = _evap(
+        species="CrO2",
+        molar_mass_kg_mol=0.0839941,
+        knudsen_number=1.0e-7,
+        T_surface_K=1973.0,
+        T_gas_K=1973.0,
+        melt_resistance_enabled=False,
+    )
+
+    # sigma_AB=(3.374+3.798)/2=3.586 A; M_AB=42.0150 g/mol;
+    # T*=1973/71.4=27.6331; Omega_D=0.631606; the CE expression gives
+    # 448.662 cm2/s = 0.0448662 m2/s at 1973 K and 1000 Pa.
+    assert result.d_ab_m2_s == pytest.approx(0.044866224694514775, rel=1e-12)
+
+
+def test_cro2_condensation_transport_uses_documented_default_fallback():
+    helper_result = _chapman_enskog_d_ab_m2_s("CrO2", 1973.0, 1000.0)
+    deposition_inputs = {
+        "species": "CrO2",
+        "P_local_pa": 1.0e5,
+        "T_surface_K": 1973.0,
+        "alpha_s": 1.0,
+        "regime_factor": 0.0,
+        "T_gas_K": 1973.0,
+        "reactive_product_backstop": False,
+    }
+    implicit_fallback = _series_resistance_deposition_flux_mol_m2_s(
+        **deposition_inputs
+    )
+    failed_ce_fallback = _series_resistance_deposition_flux_mol_m2_s(
+        **deposition_inputs,
+        overhead_pressure_pa=1000.0,
+    )
+
+    assert helper_result == 0.0
+    assert DEFAULT_BINARY_DIFFUSION_M2_S == pytest.approx(1.0e-2)
+    assert failed_ce_fallback == pytest.approx(implicit_fallback, rel=1e-12)
 
 
 def test_anti_exploit_stir_bounds_and_defensive_clamps():

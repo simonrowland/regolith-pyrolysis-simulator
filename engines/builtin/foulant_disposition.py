@@ -15,12 +15,11 @@ from typing import Any
 
 import yaml
 
-from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
-
 GAS_CONSTANT_J_PER_MOL_K = 8.314462618
 PA_PER_BAR = 100_000.0
 UNGROUNDABLE_PROCESS_EXTENT = "UNGROUNDABLE_PROCESS_EXTENT"
 NOT_SPECIFIED = "not_speciated"
+_NUMERICAL_PO2_GUARD_BAR = 1.0e-15
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_VAPOR_PRESSURES_PATH = _REPO_ROOT / "data" / "vapor_pressures.yaml"
@@ -377,15 +376,10 @@ def chi_decomp(
         # dG = dG_ref + nu_O2*R*T*ln(pO2/p_ref). Linearizing dG_ref at
         # its zero crossing gives DeltaT = nu_O2*(R*T/|dG/dT|)*ln(...),
         # hence nu_O2*width below; no extra gas-mole divisor belongs here.
-        # Exactly zero denotes no O2 overhead measurement, where the shift is
-        # undefined, so retain the reference-pressure extent. Positive values
-        # clamp at the simulator's 1e-9 bar numerical vacuum guard to prevent
-        # the logarithm diverging beyond the modeled pressure domain.
-        effective_p_o2_bar = (
-            p_ref_bar
-            if p_o2_bar == 0.0
-            else max(p_o2_bar, DEFAULT_VACUUM_FLOOR_BAR)
-        )
+        # Zero is a commanded vacuum setpoint. Use a purely numerical guard
+        # below every physical body floor (asteroid 1e-14 bar is the smallest),
+        # so all physical pressures pass through unclamped while log(0) cannot.
+        effective_p_o2_bar = max(p_o2_bar, _NUMERICAL_PO2_GUARD_BAR)
         onset_c += nu_o2 * width_c * math.log(effective_p_o2_bar / p_ref_bar)
         reported_onset_k = onset_c + 273.15
 
