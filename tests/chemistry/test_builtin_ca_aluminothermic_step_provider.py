@@ -53,6 +53,9 @@ def _controls(**overrides):
         "p_total_mbar": 0.05,
         "pO2_mbar": 0.0,
         "active_ca_condensation_route": True,
+        # Legacy schema names: these select the ~780 C Ca shell of shared
+        # ballistic CF-7, not a standalone condenser (Jacob & Srikanth 1990;
+        # C3A/CA slag limits: Jerebtsov 2001).
         "dedicated_ca_condenser": True,
         "ca_condensation_species": "Ca",
         "ca_condenser_temperature_C": 780.0,
@@ -431,6 +434,7 @@ def test_c7_refuses_generic_reagent_inventory_al(formula_registry):
         ({"p_total_mbar": 1.0}, "c7_total_pressure_outside_vacuum_envelope"),
         (
             {"active_ca_condensation_route": False},
+            # Legacy serialized reason; semantics are shared CF-7 Ca-shell routing.
             "c7_no_active_dedicated_ca_condensation_route",
         ),
     ),
@@ -502,7 +506,7 @@ def test_c7_refuses_insufficient_al_when_partial_extent_forbidden(formula_regist
     assert result.diagnostic["limiting_cap"] == "stoich"
 
 
-def test_c7_capture_routes_overhead_ca_to_dedicated_train(formula_registry):
+def test_c7_capture_routes_overhead_ca_to_shared_cf7_ca_shell(formula_registry):
     result = _provider().dispatch(
         _request(
             formula_registry,
@@ -529,6 +533,7 @@ def test_c7_capture_routes_overhead_ca_to_dedicated_train(formula_registry):
         "process.condensation_train": {"Ca": 4.0},
         "process.wall_deposit": {"Ca": 1.0},
     }
+    assert result.diagnostic["ca_condenser_temperature_C"] == pytest.approx(780.0)
     _atom_check(result.transition, formula_registry, tol=1e-12)
 
 

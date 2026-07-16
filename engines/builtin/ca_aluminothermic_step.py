@@ -32,6 +32,8 @@ C7_CAMPAIGN_NAME = "C7_CA_ALUMINOTHERMIC"
 C7_DECISION_YES = "yes"
 C7_MIN_TOTAL_PRESSURE_MBAR = 0.01
 C7_MAX_TOTAL_PRESSURE_MBAR = 0.1
+# CF-7 is the shared ballistic multi-metal condenser; 780 C is its Ca shell,
+# grounded by Jacob & Srikanth (1990) and the C3A/CA slag limits in Jerebtsov (2001).
 C7_DEFAULT_CONDENSER_TEMPERATURE_C = 780.0
 C7_MIN_HOLD_TEMP_C = 1100.0
 C7_MAX_HOLD_TEMP_C = 1300.0
@@ -364,6 +366,7 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
                 p_total_mbar=p_total_mbar,
             )
         if not self._has_dedicated_ca_route(controls):
+            # Keep the serialized refusal token stable for existing artifacts.
             return self._refused(
                 "c7_no_active_dedicated_ca_condensation_route",
                 control_audit=control_audit,
@@ -662,13 +665,15 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
             return False
         if str(controls.get("ca_condensation_species") or "Ca") != "Ca":
             return False
+        # Legacy schema key: true enables the Ca shell of shared CF-7, not a
+        # standalone Ca condenser.
         if not bool(controls.get("dedicated_ca_condenser") or False):
             return False
-        condenser_temp = _finite_float(
+        ca_shell_temp = _finite_float(
             controls.get("ca_condenser_temperature_C"),
             C7_DEFAULT_CONDENSER_TEMPERATURE_C,
         )
-        return abs(condenser_temp - C7_DEFAULT_CONDENSER_TEMPERATURE_C) <= 50.0
+        return abs(ca_shell_temp - C7_DEFAULT_CONDENSER_TEMPERATURE_C) <= 50.0
 
     @staticmethod
     def _source_label(account: str) -> str:
