@@ -184,6 +184,8 @@ class ThermoEnginePayload:
     system_entropy: Optional[float] = None
     system_volume: Optional[float] = None
     system_heat_capacity_Cp: Optional[float] = None
+    system_dVdP_m3_bar: Optional[float] = None
+    system_dVdT_m3_K: Optional[float] = None
     liquid_fraction: float = 0.0
     liquid_composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
     activity_coefficients: Mapping[str, float] = field(default_factory=dict)
@@ -191,6 +193,9 @@ class ThermoEnginePayload:
     solved_fO2_log: Optional[float] = None
     phase_universe_size: int = 0
     fO2_solve_count: int = 0
+    solver_status: Optional[str] = None
+    solver_converged: Optional[bool] = None
+    solver_iterations: Optional[int] = None
     warnings: tuple[str, ...] = ()
 
 
@@ -618,6 +623,8 @@ print('ok')
             'volume_m3': 'Volume',
             'heat_capacity_J_K': 'HeatCapacity',
             'density_kg_m3': 'Density',
+            'dVdP_m3_bar': 'DvDp',
+            'dVdT_m3_K': 'DvDt',
         }
         phase_thermo: dict[str, dict[str, Any]] = {}
         for phase in phases:
@@ -633,6 +640,11 @@ print('ok')
             # take their separate cm3 -> m3 path before both engines emit the
             # same ``volume_m3`` key.
             values['volume_m3'] *= 1.0e-5
+            # ThermoEngine exposes Volume in J/bar, DvDp in J/bar^2,
+            # and DvDt in J/(bar K). Since 1 J/bar = 1e-5 m3, the same
+            # conversion produces m3/bar and m3/K derivatives.
+            values['dVdP_m3_bar'] *= 1.0e-5
+            values['dVdT_m3_K'] *= 1.0e-5
             values['density_kg_m3'] *= 1000.0
             values['reference_mass_kg'] = phase_masses_kg[phase]
             values['reference_basis'] = 'thermoengine_solver_phase_amount'
@@ -725,6 +737,12 @@ print('ok')
             float(values['heat_capacity_J_K'])
             for values in phase_thermo.values()
         )
+        system_dVdP = sum(
+            float(values['dVdP_m3_bar']) for values in phase_thermo.values()
+        )
+        system_dVdT = sum(
+            float(values['dVdT_m3_K']) for values in phase_thermo.values()
+        )
         thermodynamic_basis = {
             'reference_basis': 'thermoengine_solver_system_amount',
             'reference_mass_kg': total_mass_kg,
@@ -732,6 +750,8 @@ print('ok')
             'system_entropy': {'units': 'J/K'},
             'system_volume': {'units': 'm3', 'source_units': 'J/bar'},
             'system_heat_capacity_Cp': {'units': 'J/K'},
+            'system_dVdP_m3_bar': {'units': 'm3/bar'},
+            'system_dVdT_m3_K': {'units': 'm3/K'},
         }
         # Autoreview r4 P2 (2026-05-27): only emit a liquid composition
         # / activities / Fe-redox split when ThermoEngine actually
@@ -796,6 +816,8 @@ print('ok')
             system_entropy=system_entropy,
             system_volume=system_volume,
             system_heat_capacity_Cp=system_heat_capacity,
+            system_dVdP_m3_bar=system_dVdP,
+            system_dVdT_m3_K=system_dVdT,
             liquid_fraction=liquid_fraction,
             liquid_composition_wt_pct=liquid_comp,
             activity_coefficients=activities,
@@ -803,6 +825,11 @@ print('ok')
             solved_fO2_log=solved_fO2_log,
             phase_universe_size=len(melts.get_phase_names()),
             fO2_solve_count=fO2_solve_count,
+            solver_status=status_text,
+            solver_converged=True,
+            # MELTSmodel returns convergence status but exposes no iteration
+            # count in its public result or XML tree.
+            solver_iterations=None,
             warnings=tuple(warnings) + extra_warnings + (
                 f'ThermoEngine status: {status_text}',
             ),

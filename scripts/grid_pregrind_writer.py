@@ -73,6 +73,27 @@ CACHE_V2_VAPOR_SPECIES = (
     "Ti",
 )
 
+# ThermoEngine MELTSv1.0.2 liquid solution endmembers. These are activity
+# labels, not bulk oxide components; keeping a separate dictionary prevents a
+# distiller from silently interpreting Fe2SiO4 activity as FeO activity.
+CACHE_V2_THERMOENGINE_LIQUID_ENDMEMBERS = (
+    "SiO2",
+    "TiO2",
+    "Al2O3",
+    "Fe2O3",
+    "MgCr2O4",
+    "Fe2SiO4",
+    "MnSi0.5O2",
+    "Mg2SiO4",
+    "NiSi0.5O2",
+    "CoSi0.5O2",
+    "CaSiO3",
+    "Na2SiO3",
+    "KAlSiO4",
+    "Ca3(PO4)2",
+    "H2O",
+)
+
 CACHE_V2_FLAG_DICTIONARIES = {
     "regime": ("frozen", "partial", "molten"),
     "evidence_class": (
@@ -302,6 +323,18 @@ GENERIC_OUTPUT_FIELDS = (
     "diagnostics",
 )
 
+THERMOENGINE_OUTPUT_FIELDS = (
+    "liquid_activities",
+    "system_dVdP_m3_bar",
+    "system_dVdT_m3_K",
+    "solver_status",
+    "solver_converged",
+    "solver_iterations",
+    "solver_iterations_available",
+    "fO2_solve_count",
+    "phase_universe_size",
+)
+
 ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS = (
     "activity_coefficients",
     "applied_fe3fet",
@@ -347,9 +380,10 @@ FINDER_OUTPUT_FIELDS = (
 assert len(INPUT_FIELDS) == 25
 assert (
     len(GENERIC_OUTPUT_FIELDS)
+    + len(THERMOENGINE_OUTPUT_FIELDS)
     + len(ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS)
     + len(FINDER_OUTPUT_FIELDS)
-) == 75
+) == 84
 
 
 def utc_now() -> str:
@@ -505,6 +539,28 @@ def _cache_v2_output_spec(
     elif field == "phase_affinities":
         units = "J"
         basis = "ThermoEngine affinity_J phase basis"
+    elif field == "liquid_activities":
+        units = "dimensionless"
+        basis = "ThermoEngine solved liquid endmember activity"
+    elif field == "system_dVdP_m3_bar":
+        units = "m3/bar"
+        encoding = "ieee754-binary64"
+        basis = "ThermoEngine solver system amount"
+    elif field == "system_dVdT_m3_K":
+        units = "m3/K"
+        encoding = "ieee754-binary64"
+        basis = "ThermoEngine solver system amount"
+    elif field in {"solver_converged", "solver_iterations_available"}:
+        units = "boolean"
+        encoding = "sqlite-integer-0-or-1"
+        basis = "ThermoEngine public solver result"
+    elif field in {"solver_iterations", "fO2_solve_count", "phase_universe_size"}:
+        units = "count"
+        encoding = "nullable-integer"
+        basis = "ThermoEngine public solver result"
+    elif field == "solver_status":
+        units = "status_text"
+        basis = "ThermoEngine public solver result"
     elif field in {
         "samples",
         "diagnostics",
@@ -573,6 +629,11 @@ def _cache_v2_output_spec(
             "state": "enum",
             "phase_scope": "enum",
         }
+    elif field == "liquid_activities":
+        spec["nested_key_encoding"] = {
+            "dictionary": "thermoengine_liquid_endmember",
+            "unknown": "refuse",
+        }
     return spec
 
 
@@ -580,12 +641,16 @@ def _cache_v2_output_contract() -> list[dict[str, Any]]:
     contract = [
         *(_cache_v2_output_spec("generic", field) for field in GENERIC_OUTPUT_FIELDS),
         *(
+            _cache_v2_output_spec("thermoengine", field)
+            for field in THERMOENGINE_OUTPUT_FIELDS
+        ),
+        *(
             _cache_v2_output_spec("alphamelts", field)
             for field in ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS
         ),
         *(_cache_v2_output_spec("finder", field) for field in FINDER_OUTPUT_FIELDS),
     ]
-    assert len(contract) == 75
+    assert len(contract) == 84
     return contract
 
 
@@ -594,6 +659,9 @@ def cache_v2_identity_manifest() -> dict[str, Any]:
     dictionaries = {
         "phase": _cache_v2_dictionary(CACHE_V2_PHASE_DICTIONARY),
         "species": _cache_v2_dictionary(species),
+        "thermoengine_liquid_endmember": _cache_v2_dictionary(
+            CACHE_V2_THERMOENGINE_LIQUID_ENDMEMBERS
+        ),
         **{
             name: _cache_v2_dictionary(values)
             for name, values in CACHE_V2_FLAG_DICTIONARIES.items()
@@ -637,6 +705,9 @@ def cache_v2_identity_manifest() -> dict[str, Any]:
             "phase": "writer-declared AlphaMELTS phase vocabulary v1",
             "species": (
                 "COMPONENT_FIELDS union data/vapor_pressures.yaml projected species"
+            ),
+            "thermoengine_liquid_endmember": (
+                "ThermoEngine MELTSv1.0.2 Liq endmember_names"
             ),
             "regime": "simulator.melt_regime.MeltRegime",
             "evidence_class": "simulator.fidelity_vocabulary.EvidenceClass",
@@ -1006,6 +1077,20 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     generic_liquidus_T_C_repr TEXT,
     generic_diagnostics_json TEXT,
 
+    -- ThermoEngine-only fields. NULL is required for subprocess rows and
+    -- presence-optional for databases created before the TE field freeze.
+    te_liquid_activities_json TEXT,
+    te_system_dVdP_m3_bar REAL,
+    te_system_dVdP_m3_bar_repr TEXT,
+    te_system_dVdT_m3_K REAL,
+    te_system_dVdT_m3_K_repr TEXT,
+    te_solver_status TEXT,
+    te_solver_converged INTEGER,
+    te_solver_iterations INTEGER,
+    te_solver_iterations_available INTEGER,
+    te_fO2_solve_count INTEGER,
+    te_phase_universe_size INTEGER,
+
     alpha_activity_coefficients_json TEXT,
     alpha_applied_fe3fet REAL,
     alpha_applied_fe3fet_repr TEXT,
@@ -1133,7 +1218,7 @@ class GridCacheWriter:
                 "variant-local bookkeeping only; recompute reviewed canonical_state_bytes "
                 "from typed full-precision inputs; never transplant this hash",
             )
-            self._set_metadata("schema_output_field_count", "75")
+            self._set_metadata("schema_output_field_count", "84")
             self._set_metadata("schema_input_field_count", "25")
             self._set_metadata("grid_realization_revision", GRID_REALIZATION_REVISION)
             self._set_metadata("database_id", str(uuid.uuid4()), overwrite=False)
@@ -1355,6 +1440,17 @@ class GridCacheWriter:
                 "generic_phase_instances_json": "TEXT",
                 "generic_solid_composition_wt_pct_json": "TEXT",
                 "generic_bulk_composition_wt_pct_json": "TEXT",
+                "te_liquid_activities_json": "TEXT",
+                "te_system_dVdP_m3_bar": "REAL",
+                "te_system_dVdP_m3_bar_repr": "TEXT",
+                "te_system_dVdT_m3_K": "REAL",
+                "te_system_dVdT_m3_K_repr": "TEXT",
+                "te_solver_status": "TEXT",
+                "te_solver_converged": "INTEGER",
+                "te_solver_iterations": "INTEGER",
+                "te_solver_iterations_available": "INTEGER",
+                "te_fO2_solve_count": "INTEGER",
+                "te_phase_universe_size": "INTEGER",
                 "run_mode": "TEXT",
                 "applied_timeout_s": "REAL",
                 "applied_timeout_s_repr": "TEXT",
@@ -2159,6 +2255,7 @@ class GridCacheWriter:
 
     def _output_values(self, output: Mapping[str, Any]) -> dict[str, Any]:
         generic = dict(output.get("generic") or {})
+        thermoengine = dict(output.get("thermoengine") or {})
         alpha = dict(output.get("alphamelts") or {})
         finder = dict(output.get("finder") or {})
         if str(output["status"]) == "ok":
@@ -2283,6 +2380,35 @@ class GridCacheWriter:
             "generic_liquidus_T_C": _float(generic.get("liquidus_T_C")),
             "generic_liquidus_T_C_repr": _repr(generic.get("liquidus_T_C")),
             "generic_diagnostics_json": _json(generic.get("diagnostics")),
+            "te_liquid_activities_json": _json(
+                thermoengine.get("liquid_activities")
+            ),
+            "te_system_dVdP_m3_bar": _float(
+                thermoengine.get("system_dVdP_m3_bar")
+            ),
+            "te_system_dVdP_m3_bar_repr": _repr(
+                thermoengine.get("system_dVdP_m3_bar")
+            ),
+            "te_system_dVdT_m3_K": _float(
+                thermoengine.get("system_dVdT_m3_K")
+            ),
+            "te_system_dVdT_m3_K_repr": _repr(
+                thermoengine.get("system_dVdT_m3_K")
+            ),
+            "te_solver_status": thermoengine.get("solver_status"),
+            "te_solver_converged": (
+                None
+                if thermoengine.get("solver_converged") is None
+                else int(bool(thermoengine["solver_converged"]))
+            ),
+            "te_solver_iterations": thermoengine.get("solver_iterations"),
+            "te_solver_iterations_available": (
+                None
+                if thermoengine.get("solver_iterations_available") is None
+                else int(bool(thermoengine["solver_iterations_available"]))
+            ),
+            "te_fO2_solve_count": thermoengine.get("fO2_solve_count"),
+            "te_phase_universe_size": thermoengine.get("phase_universe_size"),
             "alpha_activity_coefficients_json": _json(alpha.get("activity_coefficients")),
             "alpha_applied_fe3fet": _float(alpha.get("applied_fe3fet")),
             "alpha_applied_fe3fet_repr": _repr(alpha.get("applied_fe3fet")),
@@ -2377,7 +2503,6 @@ class GridCacheWriter:
             "liquid_composition_wt_pct",
             "solid_composition_wt_pct",
             "bulk_composition_wt_pct",
-            "activity_coefficients",
             "vapor_pressures_Pa",
             "vapor_pressures_source",
         ):
@@ -2400,6 +2525,21 @@ class GridCacheWriter:
             raise ValueError(
                 "cache_v2 unknown species values refused: "
                 + ", ".join(unknown_species)
+            )
+
+        allowed_activity_labels = (
+            allowed_species | set(CACHE_V2_THERMOENGINE_LIQUID_ENDMEMBERS)
+        )
+        unknown_activity_labels = sorted(
+            set(str(value) for value in dict(
+                generic.get("activity_coefficients") or {}
+            ))
+            - allowed_activity_labels
+        )
+        if unknown_activity_labels:
+            raise ValueError(
+                "cache_v2 unknown species activity labels refused: "
+                + ", ".join(unknown_activity_labels)
             )
 
         liquid_fraction = float(generic.get("liquid_fraction") or 0.0)

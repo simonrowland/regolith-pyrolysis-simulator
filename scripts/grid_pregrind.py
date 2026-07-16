@@ -30,6 +30,7 @@ from scripts.grid_pregrind_writer import (  # noqa: E402
     ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS,
     FINDER_INPUT_FIELDS,
     GENERIC_OUTPUT_FIELDS,
+    THERMOENGINE_OUTPUT_FIELDS,
     GridCacheWriter,
     canonical_input_vector,
     canonical_json,
@@ -724,11 +725,10 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
             if str(getattr(args, "backend", "subprocess")) == "subprocess"
             else "thermoengine"
         ),
-        "subprocess_run_mode": (
-            "isothermal"
-            if str(getattr(args, "backend", "subprocess")) == "subprocess"
-            else None
-        ),
+        # cache_v2 keeps the historical field name, but the value describes
+        # the physical solve contract for both engine paths. ThermoEngine is
+        # also an isothermal point solve; NULL is invalid for this key field.
+        "subprocess_run_mode": "isothermal",
         "redox_buffer": None,
         "fO2_offset": None,
         "Fe3Fet_Liq": None,
@@ -833,6 +833,80 @@ def _raw_stream(value: Any) -> Any:
 
 def _generic_result(result: Any) -> dict[str, Any]:
     return {name: getattr(result, name) for name in GENERIC_OUTPUT_FIELDS}
+
+
+def _thermoengine_generic_result(result: Any) -> dict[str, Any]:
+    values = _generic_result(result)
+    aliases = {
+        "rhombohedraloxide": "rhm-oxide",
+        "alloyliquid": "alloy-liquid",
+        "sulfideliquid": "sulfide-liquid",
+    }
+
+    def canonical_phase(name: Any) -> str:
+        native = str(name)
+        compact = "".join(character for character in native.lower() if character.isalnum())
+        return aliases.get(compact, native.strip().lower().replace("_", "-"))
+
+    native_labels: dict[str, str] = {}
+
+    def canonical_mapping(mapping: Any) -> dict[str, Any] | None:
+        if mapping is None:
+            return None
+        normalized: dict[str, Any] = {}
+        for native, payload in dict(mapping).items():
+            canonical = canonical_phase(native)
+            if canonical in normalized:
+                raise ValueError(
+                    f"ThermoEngine phase label collision after normalization: {native!r}"
+                )
+            native_labels[canonical] = str(native)
+            normalized[canonical] = payload
+        return normalized
+
+    values["phases_present"] = [
+        canonical_phase(phase) for phase in values["phases_present"]
+    ]
+    for field in (
+        "phase_masses_kg",
+        "phase_compositions",
+        "phase_thermo",
+        "chem_potentials",
+        "phase_affinities",
+    ):
+        values[field] = canonical_mapping(values[field])
+    diagnostics = dict(values.get("diagnostics") or {})
+    diagnostics["thermoengine_native_phase_labels"] = native_labels
+    values["diagnostics"] = diagnostics
+    return values
+
+
+def _thermoengine_result(result: Any) -> dict[str, Any]:
+    diagnostics = dict(getattr(result, "diagnostics", {}) or {})
+    values = {
+        "liquid_activities": dict(
+            getattr(result, "activity_coefficients", {}) or {}
+        ),
+        "system_dVdP_m3_bar": diagnostics.get(
+            "thermoengine_system_dVdP_m3_bar"
+        ),
+        "system_dVdT_m3_K": diagnostics.get(
+            "thermoengine_system_dVdT_m3_K"
+        ),
+        "solver_status": diagnostics.get("thermoengine_solver_status"),
+        "solver_converged": diagnostics.get("thermoengine_solver_converged"),
+        "solver_iterations": diagnostics.get("thermoengine_solver_iterations"),
+        "solver_iterations_available": diagnostics.get(
+            "thermoengine_solver_iterations_available"
+        ),
+        "fO2_solve_count": diagnostics.get("thermoengine_fO2_solve_count"),
+        "phase_universe_size": diagnostics.get(
+            "thermoengine_default_phase_universe_size"
+        ),
+    }
+    if set(values) != set(THERMOENGINE_OUTPUT_FIELDS):
+        raise RuntimeError("ThermoEngine output field inventory drift")
+    return values
 
 
 def _alpha_result(result: Any, backend: Any, engine_version: str) -> dict[str, Any]:
@@ -1223,7 +1297,8 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 "run_mode": None,
                 "applied_timeout_s": None,
                 "native_input": None,
-                "generic": _generic_result(result),
+                "generic": _thermoengine_generic_result(result),
+                "thermoengine": _thermoengine_result(result),
                 "alphamelts": {},
                 "finder": {},
                 "created_at": utc_now(),
