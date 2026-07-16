@@ -419,6 +419,7 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     """
 
     from simulator.condensation import (
+        DEFAULT_BINARY_DIFFUSION_M2_S,
         DEFAULT_CARRIER_GAS,
         GAS_CONSTANT_J_MOL_K,
         _chapman_enskog_d_ab_m2_s,
@@ -567,6 +568,16 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             overhead_pa,
             carrier=str(carrier_gas or DEFAULT_CARRIER_GAS),
         )
+        if species == "CrO2" and (
+            not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0
+        ):
+            # CrO2 is a declared oxide-vapor product but has no defensible
+            # Lennard-Jones row yet. Preserve the existing documented transport
+            # fallback (1e-2 m2/s, the documented 10 mbar/1700 C SiO-in-N2
+            # order-of-magnitude anchor) instead of inventing CrO2 sigma/epsilon.
+            # This coefficient is transport-only and pO2-invariant, so the
+            # upstream Cr2O3 + 1/4 O2 -> CrO2 pressure lever remains applied once.
+            d_ab_m2_s = DEFAULT_BINARY_DIFFUSION_M2_S
         if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
             raise EvaporationFluxConfigurationError(
                 "missing Chapman-Enskog transport parameters for "

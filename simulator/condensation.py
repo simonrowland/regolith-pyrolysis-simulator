@@ -4252,7 +4252,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     # math and out the other side as NaN/inf fluxes that poison the
     # downstream ledger. Codex pre-0.5.2 Phase B P1 (NaN propagation +
     # regime_factor escape route). Fail closed at the gate.
-    if pipe_diameter_m <= 0.0 or alpha_s <= 0.0:
+    if pipe_diameter_m <= 0.0 or alpha_s <= 0.0 or T_surface_K <= 0.0:
         return 0.0
     if not (math.isfinite(pipe_diameter_m) and math.isfinite(alpha_s)
             and math.isfinite(P_local_pa) and math.isfinite(T_surface_K)):

@@ -104,7 +104,10 @@ def _source_dg_sigmoid_extent(
 ) -> float:
     onset_k = _source_onset_k(points)
     width_c = _source_sigmoid_width_c(points, onset_k)
-    x = (T_C - (onset_k - 273.15)) / width_c
+    onset_c = onset_k - 273.15
+    if o2_reference_bar is not None and pX_bar > 0.0:
+        onset_c += 0.5 * width_c * math.log(pX_bar / o2_reference_bar)
+    x = (T_C - onset_c) / width_c
     extent = 1.0 / (1.0 + math.exp(-x))
     return extent
 

@@ -327,9 +327,21 @@ def chi_decomp(
     else:
         path = "thermal"
 
+    o2_dependence = gating.get("o2_dependence")
+    if o2_dependence == "suppresses" and path == "thermal" and float(pX_bar) > 0.0:
+        p_ref_bar = float(gating.get("o2_reference_bar", 0.2))
+        if not math.isfinite(p_ref_bar) or p_ref_bar <= 0.0:
+            raise ValueError("o2_reference_bar must be finite and positive")
+        # CaSO4 -> CaO + SO2 + 1/2 O2 gives
+        # dG = dG_ref + (1/2)RT ln(pO2/p_ref).  Linearizing the sourced
+        # dG row at dG=0 and using width = RT/|dG/dT| therefore moves the
+        # onset by +(width/2)ln(pO2/p_ref). Units: K * dimensionless = K;
+        # at 0.01 bar versus the declared 0.2-bar reference the corrected
+        # 1500 C onset is about 1421 C, so lower pO2 increases decomposition.
+        onset_c += 0.5 * width_c * math.log(float(pX_bar) / p_ref_bar)
+
     extent = _sigmoid_extent(float(T_C), onset_c, width_c)
 
-    o2_dependence = gating.get("o2_dependence")
     if o2_dependence == "requires" and float(pX_bar) <= 0.0:
         extent = 0.0
 

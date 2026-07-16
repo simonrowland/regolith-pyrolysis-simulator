@@ -162,7 +162,7 @@ def test_chi_decomp_returns_disposition_extent_with_derived_width(
     assert isinstance(low_pO2, DispositionExtent)
     assert isinstance(high_pO2, DispositionExtent)
     assert low_pO2.path == "thermal"
-    assert low_pO2.extent == pytest.approx(high_pO2.extent)
+    assert low_pO2.extent > high_pO2.extent
     assert 1100.0 < low_pO2.onset_K - 273.15 < 1300.0
 
     carb = chi_decomp("CaSO4", 1100.0, 0.01, 10.0, registry)
