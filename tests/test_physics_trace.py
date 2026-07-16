@@ -29,7 +29,10 @@ def _load_data_yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text()) or {}
 
 
-def _representative_sim(hours: int = 33) -> PyrolysisSimulator:
+def _representative_sim(
+    hours: int = 12,
+    hold_temperature_C: float = 1500.0,
+) -> PyrolysisSimulator:
     feedstocks = _load_data_yaml("feedstocks.yaml")
     setpoints = _load_data_yaml("setpoints.yaml")
     vapor_pressures = _load_data_yaml("vapor_pressures.yaml")
@@ -44,7 +47,11 @@ def _representative_sim(hours: int = 33) -> PyrolysisSimulator:
     sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
     sim.load_batch("mars_basalt", mass_kg=1000.0, additives_kg={"C": 30.0})
     sim.start_campaign(CampaignPhase.C2A)
+    # Post-6bb2c7f transport no longer over-evaporates on the cold early ramp
+    # (pre-fix low-T Fe/Ca stage mass was non-physical). Hold inside the
+    # C2A extraction window so condensation stages genuinely collect.
     for _ in range(hours):
+        sim.melt.temperature_C = hold_temperature_C
         sim.step()
     return sim
 
@@ -71,8 +78,13 @@ def test_accounting_query_facade_matches_legacy_wrappers():
         assert sim._rump_element_kg(element) == queries.rump_element_kg(element)
 
     assert stage_purity(sim.train) == MassBalance().stage_purity(sim.train)
-    stage = next(stage for stage in sim.train.stages if stage.collected_kg)
-    species = next(iter(stage.collected_kg))
+    stage = next(
+        stage
+        for stage in sim.train.stages
+        if any(kg > 0.0 for kg in (stage.collected_kg or {}).values())
+    )
+    species = next(sp for sp, kg in stage.collected_kg.items() if kg > 0.0)
+    assert stage.collected_kg[species] > 0.0
     assert stage.purity_pct(species) == condensation_stage_purity_pct(
         stage, species)
 
