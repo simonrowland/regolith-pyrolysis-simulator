@@ -348,6 +348,23 @@ it does not introduce a new schema version.
 }
 ```
 
+An early C7 **transport** refusal (route/pressure gate, before provider
+dispatch) emits the transport-shaped record instead:
+
+```jsonc
+"c7_refusal_diagnostic": {
+  "reason_refused": "no_active_route_or_pressure_outside_vacuum_envelope",
+  "c7_transport_refusal": "no_active_route_or_pressure_outside_vacuum_envelope",
+  "r_transport": 0.0,
+  "transport_ca_mol": 0.0,
+  "c7_overhead_pressure_pa": 0.0
+}
+```
+
+`reason_refused` is common to both shapes. A transport refusal also
+suppresses the Ca-capture commit for that step (fail-closed; no ledger
+mutation on the refusal path).
+
 Both fields are always present and object-shaped. `c7_product_report` is
 `{}` until C7 produces its report. `c7_refusal_diagnostic` is `{}` unless
 the C7 authority refuses a step. Early failure envelopes emit `{}` for
