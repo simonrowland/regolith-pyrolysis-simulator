@@ -373,6 +373,7 @@ def build_run_artifact(
         ("final", "final"),
         ("stage_purity_report", "stage_purity"),
         ("vapor_pressure_source_report", "vapor_pressure_source_report"),
+        ("yield_disposition", "yield_disposition"),
     ):
         if payload_key in runner_payload:
             terminal[artifact_key] = runner_payload[payload_key]

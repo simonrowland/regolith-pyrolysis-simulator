@@ -41,7 +41,7 @@ from simulator.optimize.recipe import (
     RecipeSchema,
 )
 from simulator.run_executor import RunExecutor, _json_safe
-from simulator.state import CampaignPhase
+from simulator.state import CampaignPhase, HourSnapshot
 from simulator.runner import (
     EngineBugAbort,
     NOT_APPLICABLE_UNTIL_P0,
@@ -123,6 +123,64 @@ def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
     assert summary["mass_balance_pct"] is None
     assert summary["O2_yield_kg_cumulative"] is None
     json.dumps(summary, allow_nan=False)
+
+
+@pytest.mark.parametrize(
+    ("carrier", "atmosphere"),
+    (("N2", "PN2_SWEEP"), ("Ar", "CONTROLLED_O2"), ("CO2", "CO2_BACKPRESSURE")),
+)
+def test_per_hour_summary_emits_actual_carrier_partial_pressure(
+    carrier: str,
+    atmosphere: str,
+) -> None:
+    snapshot = HourSnapshot(hour=1, campaign=CampaignPhase.C0)
+    snapshot.overhead.pressure_mbar = 10.0
+    snapshot.overhead.composition = {"O2": 1.0, carrier: 7.5, "SiO": 1.5}
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+        record=SimpleNamespace(snapshots=(snapshot,)),
+        melt=SimpleNamespace(
+            background_gas_species=carrier,
+            atmosphere=SimpleNamespace(name=atmosphere),
+        ),
+    )
+
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+
+    assert summary["carrier_identity"] == carrier
+    assert summary["p_non_O2_bar"] == pytest.approx(0.0075)
+    assert summary["p_non_O2_bar"] != pytest.approx(
+        summary["P_total_bar"] - summary["pO2_bar"]
+    )
+
+
+def test_per_hour_summary_omits_carrier_pair_without_physical_carrier() -> None:
+    snapshot = HourSnapshot(hour=1, campaign=CampaignPhase.C0)
+    snapshot.overhead.pressure_mbar = 2.0
+    snapshot.overhead.composition = {"CO2": 2.0}
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+        record=SimpleNamespace(snapshots=(snapshot,)),
+        melt=SimpleNamespace(
+            background_gas_species="",
+            atmosphere=SimpleNamespace(name="HARD_VACUUM"),
+        ),
+    )
+
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+
+    assert "carrier_identity" not in summary
+    assert "p_non_O2_bar" not in summary
 
 
 VPR_P6A_TRACE_CONTROLS = {
@@ -215,6 +273,8 @@ PER_HOUR_KEYS = frozenset({
     "transport_formula_id",
 })
 PER_HOUR_OPTIONAL_KEYS = frozenset({
+    "p_non_O2_bar",
+    "carrier_identity",
     "pO2_enforcement",
     # Conditionally-emitted per-hour keys: present on a row only when the
     # backing source is populated (staged / diagnostic / real-backend runs),
