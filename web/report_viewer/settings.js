@@ -91,12 +91,25 @@ function downloadHeader(header) {
 function render(artifact) {
   if (!artifact || !artifact.header || typeof artifact.header !== "object") throw new Error("Artifact header is absent or malformed.");
   const header = artifact.header;
+  const hasRecipeSnapshot = header.recipe_snapshot
+    && typeof header.recipe_snapshot === "object"
+    && !Array.isArray(header.recipe_snapshot);
+  const manifestAction = RUN_ID
+    ? hasRecipeSnapshot
+      ? `<a href="/api/runs/${encodeURIComponent(RUN_ID)}/run.yaml" download>Download run.yaml</a>`
+      : `<button type="button" disabled title="Artifact carries no recipe snapshot">Download run.yaml unavailable</button>`
+    : "";
+  const downloadNote = RUN_ID
+    ? hasRecipeSnapshot
+      ? "The run.yaml export contains the captured recipe snapshot and identifying run inputs."
+      : "This artifact carries no recipe snapshot; run.yaml export is unavailable."
+    : "Static samples offer captured-header download only; run.yaml export is available for live runs.";
   $("#settings").innerHTML = `<header>
     <div class="masthead"><div class="brand"><strong>DIRECT LEAP</strong> TECHNOLOGIES</div><div class="doc-label">Read-only<br>owner T-8</div></div>
     <div class="eyebrow">PHASE 2 · SETTINGS INSPECTOR</div><h1>Captured run settings</h1>
     <p class="lede"><span class="mono">${esc(header.run_id)}</span> · settings copied from the frozen artifact header.</p>
-    <div class="settings-actions"><a href="./index.html${RUN_QUERY}">← Back to report</a><button id="download-run" type="button">Download captured header (YAML)</button></div>
-    <div class="note"><b>Read-only.</b> Config editing remains owner T-8. The download contains the captured header only; an importable run.yaml export is pending W-A4.</div>
+    <div class="settings-actions"><a href="./index.html${RUN_QUERY}">← Back to report</a><button id="download-run" type="button">Download captured header (YAML)</button>${manifestAction}</div>
+    <div class="note"><b>Read-only.</b> Config editing remains owner T-8. ${downloadNote}</div>
   </header>
   ${settingsField(1, "Recipe snapshot", "Captured recipe material only; absent values are not reconstructed.", dataBlock(header.recipe_snapshot))}
   ${settingsField(2, "Engine identity", "Backend identity recorded by the run header.", dataBlock(header.engine_identity))}

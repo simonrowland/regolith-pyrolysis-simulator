@@ -15,7 +15,7 @@ import tempfile
 from typing import Any
 from urllib.parse import quote, urlsplit
 
-from flask import Blueprint, Response, current_app, render_template, jsonify, request, send_file, session
+from flask import Blueprint, Response, current_app, render_template, jsonify, request, send_file, send_from_directory, session
 import yaml
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
@@ -106,6 +106,7 @@ bp = Blueprint('web', __name__,
                static_folder='static')
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
+REPORT_VIEWER_DIR = Path(__file__).parent / 'report_viewer'
 THERMAL_TRAIN_DEFAULT_ARTIFACT_ID = 'thermal-train-default-v1'
 THERMAL_TRAIN_DEFAULT_ARTIFACT_SCHEMA = 'thermal-train-default-artifact-v1'
 THERMAL_TRAIN_DEFAULT_ARTIFACT_PATH = (
@@ -157,16 +158,16 @@ def _configure_request_size_limit(state) -> None:
 
 @bp.before_request
 def _reject_unsafe_cross_origin_request():
-    if request.method in {'GET', 'HEAD', 'OPTIONS'}:
-        return None
-    if request.content_length is not None and request.content_length > BUNDLE_CAP_BYTES:
-        return _json_error('request body exceeds 512MB cap', 413)
     if not _request_host_is_configured():
         return _typed_json_error(
             'request Host does not match the configured server bind',
             'untrusted_request_host',
             403,
         )
+    if request.method in {'GET', 'HEAD', 'OPTIONS'}:
+        return None
+    if request.content_length is not None and request.content_length > BUNDLE_CAP_BYTES:
+        return _json_error('request body exceeds 512MB cap', 413)
     if _request_is_same_origin():
         return None
     return _json_error('cross-origin mutation refused', 403)
@@ -3285,6 +3286,12 @@ def simulator():
     )
 
 
+@bp.route('/report/', defaults={'asset': 'index.html'}, methods=['GET'])
+@bp.route('/report/<path:asset>', methods=['GET'])
+def report_viewer(asset: str):
+    return send_from_directory(REPORT_VIEWER_DIR, asset)
+
+
 def _ledger_get(resource: str, **params):
     client_id = str(session.get('ledger_client_id') or '')
     if not client_id:
@@ -3448,6 +3455,63 @@ def run_artifact_api(run_id: str):
     if artifact is None:
         return _json_error('run artifact not found', 404)
     return jsonify(artifact)
+
+
+@bp.route('/api/runs/<run_id>/run.yaml', methods=['GET'])
+def run_manifest_api(run_id: str):
+    try:
+        artifact = load_run_artifact(run_id)
+    except RunStoreCorruptionError as exc:
+        return _typed_json_error(str(exc), 'run_store_corruption', 500)
+    except ValueError as exc:
+        return _typed_json_error(str(exc), 'invalid_run_id', 400)
+    if artifact is None:
+        return _typed_json_error('run artifact not found', 'run_not_found', 404)
+
+    header = artifact['header']
+    snapshot = header.get('recipe_snapshot')
+    if not isinstance(snapshot, Mapping):
+        return _typed_json_error(
+            'artifact carries no recipe snapshot; export unavailable',
+            'run_manifest_unavailable',
+            409,
+        )
+    setpoints_patch = snapshot.get('setpoints_patch')
+    pins = snapshot.get('pins')
+    schema_version = snapshot.get('recipe_schema_version')
+    if (
+        not isinstance(setpoints_patch, Mapping)
+        or not isinstance(pins, list)
+        or not all(isinstance(pin, str) for pin in pins)
+        or not isinstance(schema_version, str)
+        or not schema_version
+    ):
+        return _typed_json_error(
+            'artifact recipe snapshot is malformed; export unavailable',
+            'run_manifest_unavailable',
+            409,
+        )
+
+    manifest: dict[str, Any] = {}
+    if header.get('feedstock_id') is not None:
+        manifest['feedstock'] = copy.deepcopy(header['feedstock_id'])
+    if header.get('charge_mass_kg') is not None:
+        manifest['mass_kg'] = copy.deepcopy(header['charge_mass_kg'])
+    if header.get('seed') is not None:
+        manifest['seed'] = copy.deepcopy(header['seed'])
+    manifest.update({
+        'setpoints_patch': copy.deepcopy(dict(setpoints_patch)),
+        'pins': copy.deepcopy(pins),
+        'recipe_schema_version': schema_version,
+    })
+    body = yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True)
+    return Response(
+        body,
+        content_type='application/yaml; charset=utf-8',
+        headers={
+            'Content-Disposition': f'attachment; filename="run-{run_id}.yaml"',
+        },
+    )
 
 
 @bp.route('/api/runs/<run_id>/meta', methods=['PATCH'])
