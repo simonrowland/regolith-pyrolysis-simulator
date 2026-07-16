@@ -238,6 +238,12 @@ class ThermoEngineBackend(_MELTSBackendSupport):
                     payload.phase_universe_size
                 ),
                 'thermoengine_fO2_solve_count': payload.fO2_solve_count,
+                'thermoengine_solver_status': payload.solver_status,
+                'thermoengine_solver_converged': payload.solver_converged,
+                'thermoengine_solver_iterations': payload.solver_iterations,
+                'thermoengine_solver_iterations_available': False,
+                'thermoengine_system_dVdP_m3_bar': payload.system_dVdP_m3_bar,
+                'thermoengine_system_dVdT_m3_K': payload.system_dVdT_m3_K,
                 'authoritative_for_requested_conditions': not bool(
                     clamp_diagnostics.get('operating_point_clamped')
                 ),

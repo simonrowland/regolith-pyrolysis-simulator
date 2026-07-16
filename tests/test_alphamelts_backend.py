@@ -2611,6 +2611,8 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
                 'Volume': 20.0,
                 'HeatCapacity': 30.0,
                 'Density': 3.5,
+                'DvDp': -0.02,
+                'DvDt': 0.03,
             }[property_name]
 
         def get_thermo_properties_of_phase_components(self, root, phase, mode):
@@ -2677,6 +2679,8 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
         'volume_m3': pytest.approx(2.0e-4),
         'heat_capacity_J_K': 30.0,
         'density_kg_m3': 3500.0,
+        'dVdP_m3_bar': pytest.approx(-2.0e-7),
+        'dVdT_m3_K': pytest.approx(3.0e-7),
         'reference_mass_kg': pytest.approx(0.9),
         'reference_basis': 'thermoengine_solver_phase_amount',
     }
@@ -2708,6 +2712,11 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
             'composition_formula': 'SiO2',
         },
     }
+    assert result.system_dVdP_m3_bar == pytest.approx(-4.0e-7)
+    assert result.system_dVdT_m3_K == pytest.approx(6.0e-7)
+    assert result.solver_status == 'success'
+    assert result.solver_converged is True
+    assert result.solver_iterations is None
     assert result.system_volume == pytest.approx(4.0e-4)
     assert result.thermodynamic_basis['reference_mass_kg'] == pytest.approx(1.0)
 

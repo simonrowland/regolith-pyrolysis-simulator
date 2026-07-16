@@ -128,6 +128,7 @@ def test_backend_selector_defaults_to_subprocess_and_accepts_thermoengine():
         "thermoengine_health_timeout_s": 31.0,
     }
     thermoengine_inputs = grid_pregrind.point_inputs(point, thermoengine_args)
+    assert thermoengine_inputs["subprocess_run_mode"] == "isothermal"
     assert thermoengine_inputs["fO2_log"] == point.intended_fO2_log
     assert 0.0 < thermoengine_inputs["kress91_fixed_ferric_fraction"] < 1.0
     assert thermoengine_inputs["composition_mol"]["FeO"] > 0.0
@@ -924,8 +925,19 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(
         ("alphamelts_outputs", "generic_phase_affinities_json"),
         ("alphamelts_outputs", "generic_phase_instances_json"),
         ("alphamelts_outputs", "generic_solid_composition_wt_pct_json"),
-        ("alphamelts_outputs", "generic_bulk_composition_wt_pct_json"),
-        ("alphamelts_outputs", "run_mode"),
+            ("alphamelts_outputs", "generic_bulk_composition_wt_pct_json"),
+            ("alphamelts_outputs", "te_liquid_activities_json"),
+            ("alphamelts_outputs", "te_system_dVdP_m3_bar"),
+            ("alphamelts_outputs", "te_system_dVdP_m3_bar_repr"),
+            ("alphamelts_outputs", "te_system_dVdT_m3_K"),
+            ("alphamelts_outputs", "te_system_dVdT_m3_K_repr"),
+            ("alphamelts_outputs", "te_solver_status"),
+            ("alphamelts_outputs", "te_solver_converged"),
+            ("alphamelts_outputs", "te_solver_iterations"),
+            ("alphamelts_outputs", "te_solver_iterations_available"),
+            ("alphamelts_outputs", "te_fO2_solve_count"),
+            ("alphamelts_outputs", "te_phase_universe_size"),
+            ("alphamelts_outputs", "run_mode"),
         ("alphamelts_outputs", "applied_timeout_s"),
         ("alphamelts_outputs", "applied_timeout_s_repr"),
     ):
@@ -971,12 +983,23 @@ def test_existing_grid_database_adds_nullable_runmode_output_columns(
         "generic_phase_affinities_json",
         "generic_phase_instances_json",
         "generic_solid_composition_wt_pct_json",
-        "generic_bulk_composition_wt_pct_json",
-        "run_mode",
+            "generic_bulk_composition_wt_pct_json",
+            "te_liquid_activities_json",
+            "te_system_dVdP_m3_bar",
+            "te_system_dVdP_m3_bar_repr",
+            "te_system_dVdT_m3_K",
+            "te_system_dVdT_m3_K_repr",
+            "te_solver_status",
+            "te_solver_converged",
+            "te_solver_iterations",
+            "te_solver_iterations_available",
+            "te_fO2_solve_count",
+            "te_phase_universe_size",
+            "run_mode",
         "applied_timeout_s",
         "applied_timeout_s_repr",
     } <= output_columns
-    assert output_field_count == "75"
+    assert output_field_count == "84"
 
 
 def test_cache_v2_immutable_metadata_written_checked_and_refuses_drift(tmp_path):
@@ -1003,11 +1026,21 @@ def test_cache_v2_immutable_metadata_written_checked_and_refuses_drift(tmp_path)
         for component in COMPONENT_FIELDS
     ]
     assert "timeout_s" not in quantized_fields
-    assert len(manifest["outputs"]) == 75
+    assert len(manifest["outputs"]) == 84
+    output_specs = {item["field"]: item for item in manifest["outputs"]}
+    assert output_specs["thermoengine.system_dVdP_m3_bar"]["units"] == "m3/bar"
+    assert output_specs["thermoengine.system_dVdT_m3_K"]["units"] == "m3/K"
+    assert output_specs["thermoengine.liquid_activities"]["reference_basis"] == (
+        "ThermoEngine solved liquid endmember activity"
+    )
     assert {
         item["field"] for item in manifest["outputs"]
     } == {
         *(f"generic.{field}" for field in grid_pregrind_writer.GENERIC_OUTPUT_FIELDS),
+        *(
+            f"thermoengine.{field}"
+            for field in grid_pregrind_writer.THERMOENGINE_OUTPUT_FIELDS
+        ),
         *(
             f"alphamelts.{field}"
             for field in grid_pregrind_writer.ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS
@@ -1401,6 +1434,7 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
             "o.generic_phase_affinities_json, "
             "o.generic_phase_instances_json, "
             "o.generic_bulk_composition_wt_pct_json, "
+            "o.te_liquid_activities_json, o.te_solver_status, "
             "o.alpha_intrinsic_fO2_log "
             "FROM grid_keys h JOIN alphamelts_outputs o ON o.grid_key_id = h.id"
         ).fetchone()
@@ -1430,6 +1464,8 @@ def test_writer_round_trip_and_resume_skip(tmp_path):
         assert json.loads(row["generic_bulk_composition_wt_pct_json"])[
             "SiO2"
         ] == 49.3753
+        assert row["te_liquid_activities_json"] is None
+        assert row["te_solver_status"] is None
         assert row["alpha_intrinsic_fO2_log"] == -9.0
         assert writer.counts() == {
             "success": 1,
@@ -1459,6 +1495,20 @@ def test_writer_populates_thermoengine_only_json_without_scalar_padding(tmp_path
             "composition_formula": "SiO2",
         }
     }
+    output["generic"]["phase_thermo"]["liquid"].update(
+        {"dVdP_m3_bar": -1.25e-10, "dVdT_m3_K": 2.5e-9}
+    )
+    output["thermoengine"] = {
+        "liquid_activities": {"SiO2": 0.73},
+        "system_dVdP_m3_bar": -1.25e-10,
+        "system_dVdT_m3_K": 2.5e-9,
+        "solver_status": "success, Optimal residual norm.",
+        "solver_converged": True,
+        "solver_iterations": None,
+        "solver_iterations_available": False,
+        "fO2_solve_count": 1,
+        "phase_universe_size": 42,
+    }
 
     with GridCacheWriter(database) as writer:
         batch_id = writer.ensure_batch(
@@ -1476,7 +1526,12 @@ def test_writer_populates_thermoengine_only_json_without_scalar_padding(tmp_path
         assert writer.write_result(grid_key_id, output)
         row = writer.connection.execute(
             "SELECT generic_chem_potentials_json, "
-            "generic_phase_affinities_json, failure_reason_code, "
+            "generic_phase_affinities_json, generic_phase_thermo_json, "
+            "te_liquid_activities_json, te_system_dVdP_m3_bar, "
+            "te_system_dVdT_m3_K, te_solver_status, "
+            "te_solver_converged, te_solver_iterations, "
+            "te_solver_iterations_available, te_fO2_solve_count, "
+            "te_phase_universe_size, failure_reason_code, "
             "failure_message FROM alphamelts_outputs"
         ).fetchone()
         sample = writer.sample_row()
@@ -1503,6 +1558,18 @@ def test_writer_populates_thermoengine_only_json_without_scalar_padding(tmp_path
             "composition_formula": "SiO2",
         }
     }
+    assert json.loads(row["generic_phase_thermo_json"])["liquid"] == (
+        output["generic"]["phase_thermo"]["liquid"]
+    )
+    assert json.loads(row["te_liquid_activities_json"]) == {"SiO2": 0.73}
+    assert row["te_system_dVdP_m3_bar"] == -1.25e-10
+    assert row["te_system_dVdT_m3_K"] == 2.5e-9
+    assert row["te_solver_status"] == "success, Optimal residual norm."
+    assert row["te_solver_converged"] == 1
+    assert row["te_solver_iterations"] is None
+    assert row["te_solver_iterations_available"] == 0
+    assert row["te_fO2_solve_count"] == 1
+    assert row["te_phase_universe_size"] == 42
     assert row["failure_reason_code"] is None
     assert row["failure_message"] is None
     assert sample["intended_fO2_log"] == -9.0
