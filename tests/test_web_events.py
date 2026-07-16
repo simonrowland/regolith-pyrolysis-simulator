@@ -2093,6 +2093,90 @@ def test_replacing_simulation_state_stops_prior_run():
         _clear_simulation_state(sid)
 
 
+def test_socket_run_is_fully_initialized_when_published(tmp_path, monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    store = RunArtifactStore(tmp_path / "runs")
+    monkeypatch.setattr(web_events, "get_run_store", lambda: store)
+    original_replace = web_events._replace_simulation_state
+    published = []
+
+    def inspect_publication(*args, **kwargs):
+        state, lock = original_replace(*args, **kwargs)
+        required = {
+            "backend_message",
+            "backend_status",
+            "backend_authoritative",
+            "recipe_inputs",
+            "setpoints_patch",
+            "resolved_setpoints_patch",
+        }
+        assert required <= state.keys()
+        published.append(state)
+        return state, lock
+
+    monkeypatch.setattr(
+        web_events,
+        "_replace_simulation_state",
+        inspect_publication,
+    )
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    try:
+        result = client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+            },
+            callback=True,
+        )
+        assert result["status"] == "started"
+        assert len(published) == 1
+    finally:
+        client.disconnect()
+
+
+def test_fresh_socket_binds_client_identity_before_arbitration(
+    tmp_path,
+    monkeypatch,
+):
+    _force_socketio_internal_analytical(monkeypatch)
+    store = RunArtifactStore(tmp_path / "runs")
+    monkeypatch.setattr(web_events, "get_run_store", lambda: store)
+    app = app_module.create_app()
+    client = app_module.socketio.test_client(app)
+    payload = {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+    }
+    try:
+        first = client.emit("start_simulation", payload, callback=True)
+        first_state = next(
+            state
+            for state in _simulations.values()
+            if state.get("run_id") == first["run_id"]
+        )
+        client_id = first_state.get("ledger_client_id")
+        assert isinstance(client_id, str) and client_id
+        assert client_id in web_events._socket_client_ids.values()
+
+        second = client.emit("start_simulation", payload, callback=True)
+        owned = [
+            state
+            for state in _simulations.values()
+            if state.get("ledger_client_id") == client_id
+        ]
+        assert len(owned) == 1
+        assert owned[0]["run_id"] == second["run_id"]
+        assert store.load(first["run_id"])["lifecycle"] == "cancelled"
+    finally:
+        client.disconnect()
+
+
 def test_stale_run_id_cannot_emit_after_restart():
     sid = "test-stale-run"
 
@@ -2250,7 +2334,10 @@ def _terminal_runner_document(status: str) -> dict[str, object]:
         "final_state": {"process.cleaned_melt": {"SiO2": 2.0}},
         "final": {"wall_deposit_by_species_kg": {"SiO": 0.25}},
         "stage_purity_report": {"stage_1": {"verdict": "PURE"}},
-        "vapor_pressure_source_report": {"status": "ok"},
+        "vapor_pressure_source_report": {
+            "vapor_pressure_backend_status": "available",
+            "authoritative_for_requested_vapor_pressure": True,
+        },
     }
 
 

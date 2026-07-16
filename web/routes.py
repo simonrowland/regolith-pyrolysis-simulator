@@ -135,6 +135,7 @@ OPTIMIZER_JOB_FIDELITIES = (
 DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP = 4
 DEFAULT_OPTIMIZER_JOB_BUDGET_CAP = 256
 DEFAULT_OPTIMIZER_JOB_QUEUE_CAP = 64
+RUN_COMMAND_BODY_CAP_BYTES = 1024 * 1024
 MAX_ADDITIVE_CALC_MASS_KG = 1_000_000_000.0
 _SAFE_FILENAME_RE = re.compile(r'[^A-Za-z0-9._-]+')
 _RECIPE_TITLE_MAX_CHARS = 120
@@ -2478,6 +2479,19 @@ def _typed_json_error(message: str, error_type: str, code: int):
     return jsonify({'error': message, 'error_type': error_type}), code
 
 
+def _reject_oversized_run_command():
+    if (
+        request.content_length is not None
+        and request.content_length > RUN_COMMAND_BODY_CAP_BYTES
+    ):
+        return _typed_json_error(
+            'run command body exceeds 1 MiB cap',
+            'run_command_too_large',
+            413,
+        )
+    return None
+
+
 def _finite_or_none(value: Any) -> float | None:
     if isinstance(value, bool):
         return None
@@ -3273,6 +3287,9 @@ def runs_api():
 
 @bp.route('/api/runs', methods=['POST'])
 def submit_run_api():
+    oversized = _reject_oversized_run_command()
+    if oversized is not None:
+        return oversized
     payload = request.get_json(silent=True)
     if not isinstance(payload, Mapping):
         return _typed_json_error(
@@ -3296,6 +3313,9 @@ def submit_run_api():
 
 @bp.route('/api/runs/draft', methods=['POST'])
 def validate_run_draft_api():
+    oversized = _reject_oversized_run_command()
+    if oversized is not None:
+        return oversized
     payload = request.get_json(silent=True)
     if not isinstance(payload, Mapping):
         return _typed_json_error(
@@ -3318,6 +3338,9 @@ def validate_run_draft_api():
 
 @bp.route('/api/runs/<run_id>/cancel', methods=['POST'])
 def cancel_run_api(run_id: str):
+    oversized = _reject_oversized_run_command()
+    if oversized is not None:
+        return oversized
     from app import socketio
     from web.events import cancel_run_command
 
@@ -3371,6 +3394,9 @@ def run_artifact_api(run_id: str):
 
 @bp.route('/api/runs/<run_id>/meta', methods=['PATCH'])
 def run_meta_api(run_id: str):
+    oversized = _reject_oversized_run_command()
+    if oversized is not None:
+        return oversized
     payload = request.get_json(silent=True)
     if not isinstance(payload, Mapping):
         return jsonify({

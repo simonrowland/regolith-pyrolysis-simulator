@@ -7,6 +7,7 @@ import app as app_module
 from simulator.backends import BackendUnavailableError
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from web import events as web_events
+from web import routes as web_routes
 from web.run_store import RunArtifactStore
 
 
@@ -26,7 +27,10 @@ def _runner_document(status: str = "ok") -> dict[str, object]:
         "final_state": {"process.cleaned_melt": {"SiO2": 2.0}},
         "final": {},
         "stage_purity_report": {},
-        "vapor_pressure_source_report": {"status": "ok"},
+        "vapor_pressure_source_report": {
+            "vapor_pressure_backend_status": "available",
+            "authoritative_for_requested_vapor_pressure": True,
+        },
     }
 
 
@@ -54,10 +58,12 @@ class _Socket:
 def _clean_command_state():
     before = set(web_events._simulations)
     web_events._run_idempotency.clear()
+    web_events._socket_client_ids.clear()
     yield
     for sid in set(web_events._simulations) - before:
         web_events._clear_simulation_state(sid)
     web_events._run_idempotency.clear()
+    web_events._socket_client_ids.clear()
 
 
 def test_cancel_route_persists_cancelled_partial_and_terminal_is_409(tmp_path):
@@ -93,6 +99,48 @@ def test_cancel_route_persists_cancelled_partial_and_terminal_is_409(tmp_path):
         "error": "run is already terminal",
         "error_type": "run_not_active",
     }
+
+
+def test_cancel_by_run_id_cannot_cancel_sid_replacement(tmp_path, monkeypatch):
+    store = RunArtifactStore(tmp_path / "runs")
+    sid = "aba-cancel"
+    first, _ = web_events._replace_simulation_state(
+        sid,
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+    )
+    original_cancel = web_events._cancel_simulation_state
+    successor = None
+
+    def replace_before_cancel(socketio, target_sid, **kwargs):
+        nonlocal successor
+        successor, _ = web_events._replace_simulation_state(
+            target_sid,
+            _PartialSession(),
+            speed=0.0,
+            ledger_client_id="owner",
+            run_store=store,
+        )
+        return original_cancel(socketio, target_sid, **kwargs)
+
+    monkeypatch.setattr(
+        web_events,
+        "_cancel_simulation_state",
+        replace_before_cancel,
+    )
+
+    result = web_events.cancel_run_command(
+        _Socket(),
+        first["run_id"],
+        client_id="owner",
+    )
+
+    assert result is None
+    assert successor is web_events._simulations[sid]
+    assert successor["running"] is True
+    assert store.load(successor["run_id"]) is None
 
 
 def test_cancel_complete_boundary_keeps_honest_ok_execution_status(tmp_path):
@@ -408,6 +456,7 @@ def test_cross_transport_submit_replaces_prior_run_and_keeps_ledger_unique(
     monkeypatch,
     first_transport,
 ):
+    monkeypatch.setattr(web_events, "_MAX_ACTIVE_RUNS", 1)
     store = RunArtifactStore(tmp_path / "runs")
     backend = InternalAnalyticalBackend()
     backend.initialize({})
@@ -477,6 +526,67 @@ def test_cross_transport_submit_replaces_prior_run_and_keeps_ledger_unique(
         assert ledger_response.status_code == 200
     finally:
         socket_client.disconnect()
+
+
+@pytest.mark.parametrize("replacement_transport", ["http", "socket"])
+def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
+    tmp_path,
+    monkeypatch,
+    replacement_transport,
+):
+    store = RunArtifactStore(tmp_path / "runs")
+    prior, _ = web_events._replace_simulation_state(
+        "prior-owner-sid",
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=store,
+    )
+    monkeypatch.setattr(store, "save", lambda *_args, **_kwargs: False)
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    monkeypatch.setattr(web_events, "_get_backend", lambda _name: backend)
+    monkeypatch.setattr(web_events, "get_run_store", lambda: store)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        lambda *_args, **_kwargs: None,
+    )
+    emitted = []
+    monkeypatch.setattr(
+        app_module.socketio,
+        "emit",
+        lambda event, payload, **kwargs: emitted.append((event, payload, kwargs)),
+    )
+    app = app_module.create_app()
+    payload = {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+    }
+
+    if replacement_transport == "http":
+        client = app.test_client()
+        with client.session_transaction() as browser_session:
+            browser_session["ledger_client_id"] = "owner"
+        response = client.post("/api/runs", json=payload)
+        assert response.status_code == 500
+        assert response.get_json()["error_type"] == "run_replacement_failed"
+    else:
+        result = web_events._registered_start_handler(
+            payload,
+            sid="socket-replacement",
+            ledger_client_id="owner",
+        )
+        assert result is None
+        assert emitted[-1][1]["error_type"] == "run_replacement_failed"
+
+    assert web_events._simulations["prior-owner-sid"] is prior
+    assert prior["running"] is False
+    assert prior.get("artifact_persisted") is not True
+    assert store.load(prior["run_id"]) is None
+    assert "socket-replacement" not in web_events._simulations
 
 
 def test_invalid_http_submit_does_not_destroy_active_run(tmp_path, monkeypatch):
@@ -898,6 +1008,87 @@ def test_command_routes_return_typed_json_errors(path, body, error_type):
     assert response.status_code == 400
     assert response.get_json()["error_type"] == error_type
     assert response.get_json()["error"]
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/api/runs",
+        "/api/runs/draft",
+        "/api/runs/unknown-run/cancel",
+        "/api/runs/unknown-run/meta",
+    ],
+)
+def test_run_command_routes_reject_bodies_over_one_mib(path):
+    body = b'{"padding":"' + (
+        b"x" * web_routes.RUN_COMMAND_BODY_CAP_BYTES
+    ) + b'"}'
+
+    response = app_module.create_app().test_client().open(
+        path,
+        method="PATCH" if path.endswith("/meta") else "POST",
+        data=body,
+        content_type="application/json",
+    )
+
+    assert response.status_code == 413
+    assert response.get_json() == {
+        "error": "run command body exceeds 1 MiB cap",
+        "error_type": "run_command_too_large",
+    }
+
+
+@pytest.mark.parametrize("transport", ["http", "socket"])
+def test_global_active_run_cap_is_shared_by_http_and_socket(
+    tmp_path,
+    monkeypatch,
+    transport,
+):
+    monkeypatch.setattr(web_events, "_MAX_ACTIVE_RUNS", 1)
+    store = RunArtifactStore(tmp_path / "runs")
+    active, _ = web_events._replace_simulation_state(
+        "active-owner-sid",
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="active-owner",
+        run_store=store,
+    )
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    monkeypatch.setattr(web_events, "_get_backend", lambda _name: backend)
+    monkeypatch.setattr(web_events, "get_run_store", lambda: store)
+    emitted = []
+    monkeypatch.setattr(
+        app_module.socketio,
+        "emit",
+        lambda event, payload, **kwargs: emitted.append((event, payload, kwargs)),
+    )
+    app = app_module.create_app()
+    payload = {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+    }
+
+    if transport == "http":
+        response = app.test_client().post(
+            "/api/runs",
+            json=payload,
+        )
+        assert response.status_code == 503
+        assert response.get_json()["error_type"] == "global_run_capacity_exhausted"
+    else:
+        result = web_events._registered_start_handler(
+            payload,
+            sid="saturated-socket",
+            ledger_client_id="socket-owner",
+        )
+        assert result is None
+        assert emitted[-1][1]["error_type"] == "global_run_capacity_exhausted"
+
+    assert web_events._simulations["active-owner-sid"] is active
+    assert active["running"] is True
 
 
 @pytest.mark.parametrize("path", ["/api/runs", "/api/runs/draft"])
