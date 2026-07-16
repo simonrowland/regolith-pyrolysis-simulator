@@ -2547,26 +2547,25 @@ class _MELTSBackendSupport(MeltBackend):
     def _activity_table_after(self, lines: list[str], idx: int) -> dict:
         if not lines[idx].strip().endswith(':'):
             return {}
-        for header_idx in range(idx + 1, min(idx + 6, len(lines))):
-            header = lines[header_idx].strip()
-            if not header:
-                continue
-            names = header.split()
-            if not any(self._looks_like_activity_label(name) for name in names):
-                continue
-            for values_idx in range(header_idx + 1, min(header_idx + 5, len(lines))):
-                value_tokens = lines[values_idx].strip().split()
-                if not value_tokens:
-                    continue
-                values = []
-                for token in value_tokens:
-                    if self._is_number(token):
-                        values.append(float(token))
-                if len(values) >= len(names):
-                    return {
-                        name: value
-                        for name, value in zip(names, values)
-                    }
+        table_lines = [
+            line.strip()
+            for line in lines[idx + 1:min(idx + 6, len(lines))]
+            if line.strip()
+        ]
+        if len(table_lines) < 2:
+            return {}
+        names = table_lines[0].split()
+        value_tokens = table_lines[1].split()
+        if (
+            names
+            and all(self._looks_like_activity_label(name) for name in names)
+            and len(value_tokens) == len(names)
+            and all(self._is_number(token) for token in value_tokens)
+        ):
+            return {
+                name: float(value)
+                for name, value in zip(names, value_tokens)
+            }
         return {}
 
     def _activity_pairs_from_tokens(self, tokens: list[str]) -> dict:
@@ -2587,9 +2586,10 @@ class _MELTSBackendSupport(MeltBackend):
 
     def _looks_like_activity_label(self, name: object) -> bool:
         label = str(name).strip().strip(',')
-        if not label or self._is_number(label):
-            return False
-        return bool(re.search(r'[A-Za-z]', label))
+        return bool(re.fullmatch(
+            r'(?:[A-Z][a-z]?\d*|\((?:[A-Z][a-z]?\d*)+\)\d*)+(?:_Liq)?',
+            label,
+        ))
 
     def _parse_single_point_stdout(self, output: str, *,
                                    requested_temperature_C: float,

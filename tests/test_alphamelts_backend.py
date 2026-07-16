@@ -2486,6 +2486,30 @@ Melt fraction = 1.0
     assert result.diagnostics.get('diagnostic_oxide_activities') in (None, {})
 
 
+@pytest.mark.parametrize('activity_header', ['Activities:', 'Liquid activities:'])
+def test_subprocess_activity_header_does_not_parse_following_phase_block(
+    activity_header,
+):
+    backend = AlphaMELTSBackend()
+    output = f"""
+{activity_header}
+liquid: SiO2 Al2O3 FeO MgO CaO
+100.0 g 50.0 15.0 10.0 10.0 15.0
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1500.000000 (C)
+Melt fraction = 1.0
+"""
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1500.0,
+        total_input_kg=100.0,
+    )
+
+    assert result.activity_coefficients == {}
+    assert result.diagnostics.get('diagnostic_oxide_activities') in (None, {})
+
+
 def test_equilibrium_emission_keeps_endmember_activities_diagnostic_only():
     backend = AlphaMELTSBackend()
 
