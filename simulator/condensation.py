@@ -276,10 +276,12 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
         'status': 'proxy',
         'source': 'estimated sparse-data SiO vapor Lennard-Jones row',
     },
-    'CrO2': {
-        'status': 'proxy',
-        'source': 'CLASS-PROXY: SiO oxide-vapor Lennard-Jones row; CrO2 molar mass',
-    },
+    # CrO2 deliberately has NO provenance row: condensation/deposition transport
+    # for CrO2 uses the documented DEFAULT_BINARY_DIFFUSION_M2_S fallback (pinned
+    # by test_cro2_condensation_transport_uses_documented_default_fallback). The
+    # SiO-based CLASS-PROXY exists only on the evaporation path
+    # (engines/builtin/evaporation_flux.py::_EVAPORATION_LJ_PROXY_PARAMS); a row
+    # here would falsely report proxy authority for deposition transport.
 }
 
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
