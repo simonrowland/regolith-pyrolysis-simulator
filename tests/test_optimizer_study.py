@@ -3799,10 +3799,13 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
             status="ok",
             product_summary={
                 "campaigns_to_resinter": "resinter_threshold_kg / 100",
+                "aggregate_campaigns_to_resinter": "resinter_threshold_kg / 200",
                 "wall_deposit_kg_by_segment_species": {
                     "stage_1_to_stage_2": {"SiO": 100.0}
                 },
                 "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 100.0}},
+                "wall_deposit_cumulative_total_kg": 100.0,
+                "wall_deposit_cumulative_kg_by_species": {"SiO": 100.0},
             },
             trace={
                 "backend_status": "diagnostic_stub",
@@ -3818,10 +3821,15 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
                     },
                     "tap_coating_product_summary": {
                         "campaigns_to_resinter": "resinter_threshold_kg / 0.001",
+                        "aggregate_campaigns_to_resinter": (
+                            "resinter_threshold_kg / 0.002"
+                        ),
                         "wall_deposit_kg_by_segment_species": {
                             "stage_1_to_stage_2": {"SiO": 0.001}
                         },
                         "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 0.001}},
+                        "wall_deposit_cumulative_total_kg": 0.001,
+                        "wall_deposit_cumulative_kg_by_species": {"SiO": 0.001},
                     },
                 },
             },
@@ -3834,11 +3842,20 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
         cache_hit=False,
     )
     assert record.product_summary["campaigns_to_resinter"] == "resinter_threshold_kg / 0.001"
+    assert record.product_summary["aggregate_campaigns_to_resinter"] == (
+        "resinter_threshold_kg / 0.002"
+    )
     assert record.product_summary["wall_deposit_kg_by_segment_species"] == {
         "stage_1_to_stage_2": {"SiO": 0.001}
     }
     assert record.product_summary["wall_deposit_kg_by_zone_species"] == {
         "Hot": {"SiO": 0.001}
+    }
+    assert record.product_summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
+        0.001
+    )
+    assert record.product_summary["wall_deposit_cumulative_kg_by_species"] == {
+        "SiO": 0.001
     }
 
     study._write_leaderboard(
@@ -3900,10 +3917,13 @@ def test_tap_truncated_partial_coating_projection_fails_loud() -> None:
             status="ok",
             product_summary={
                 "campaigns_to_resinter": "resinter_threshold_kg / 100",
+                "aggregate_campaigns_to_resinter": "resinter_threshold_kg / 200",
                 "wall_deposit_kg_by_segment_species": {
                     "stage_1_to_stage_2": {"SiO": 100.0}
                 },
                 "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 100.0}},
+                "wall_deposit_cumulative_total_kg": 100.0,
+                "wall_deposit_cumulative_kg_by_species": {"SiO": 100.0},
             },
             trace={
                 "backend_status": "diagnostic_stub",
@@ -3920,12 +3940,19 @@ def test_tap_truncated_partial_coating_projection_fails_loud() -> None:
         ),
     )
 
-    with pytest.raises(study.StudyAbort, match="wall_deposit_kg_by_segment_species"):
+    with pytest.raises(study.StudyAbort) as exc_info:
         study._to_record(
             study.Candidate(id="tap-partial", patch=RecipePatch({})),
             scored,
             cache_hit=False,
         )
+    message = str(exc_info.value)
+    for field in (
+        "aggregate_campaigns_to_resinter",
+        "wall_deposit_cumulative_total_kg",
+        "wall_deposit_cumulative_kg_by_species",
+    ):
+        assert field in message
 
 
 def test_backend_status_field_survives_strip_and_store_for_real_backend(tmp_path) -> None:
