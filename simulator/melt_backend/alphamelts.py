@@ -100,6 +100,7 @@ ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID = 'fo2_constraint_invalid'
 ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED = 'fo2_constraint_unapplied'
 ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING = 'system_output_missing'
 ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE = 'phase_mass_incomplete'
+ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY = 'vapor_projection_empty'
 ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 0.01
 ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10 = 1.0e-6
 # alphaMELTS input serialization emits an oxide only above this wt% value.
@@ -124,6 +125,7 @@ ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED: 'contract_error',
     ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: 'parse_error',
     ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE: 'parse_error',
+    ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY: 'contract_error',
 }
 
 ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
@@ -169,6 +171,9 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
     ),
     ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE: (
         'AlphaMELTS phase rows do not close to the engine system mass'
+    ),
+    ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY: (
+        'Positive-liquid AlphaMELTS state lacks a sourced vapor-pressure map'
     ),
 }
 
@@ -3607,9 +3612,9 @@ class _MELTSBackendSupport(MeltBackend):
         if float(eq.liquid_fraction or 0.0) <= 0.0:
             return {}, {}, {'vapor_pressure_zero_reason': 'no_liquid_phase'}
         if not eq.liquid_composition_wt_pct:
-            raise RuntimeError(
-                'AlphaMELTS subprocess vapor projection missing solved liquid '
-                'composition for positive liquid fraction'
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
+                'missing solved liquid composition for positive liquid fraction',
             )
 
         import yaml
@@ -3653,16 +3658,26 @@ class _MELTSBackendSupport(MeltBackend):
         )
         result = provider.dispatch(request)
         if result.status != 'ok':
-            raise RuntimeError(
-                'builtin subprocess vapor projection failed: '
-                f'status={result.status!r}; warnings={list(result.warnings)!r}'
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
+                'provider refused vapor projection: '
+                f'status={result.status!r}; warnings={list(result.warnings)!r}',
             )
         diagnostic = dict(result.diagnostic or {})
-        return (
-            dict(diagnostic.get('vapor_pressures_Pa') or {}),
-            dict(diagnostic.get('vapor_pressures_source') or {}),
-            diagnostic,
-        )
+        pressures = dict(diagnostic.get('vapor_pressures_Pa') or {})
+        sources = dict(diagnostic.get('vapor_pressures_source') or {})
+        if not pressures:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
+                'provider returned status=ok with no vapor_pressures_Pa entries',
+            )
+        if set(pressures) != set(sources):
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
+                'vapor pressure/source keys differ: '
+                f'pressures={sorted(pressures)!r}; sources={sorted(sources)!r}',
+            )
+        return pressures, sources, diagnostic
 
     def _vapor_pressures_via_vaporock_or_antoine(
         self,

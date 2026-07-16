@@ -31,6 +31,7 @@ from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED,
     ALPHAMELTS_REASON_SUBPROCESS_DIED,
     ALPHAMELTS_REASON_TIMEOUT,
+    ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
     AlphaMELTSBackend,
     AlphaMELTSSubprocessContractError,
     AlphaMELTSSubprocessRunMode,
@@ -546,6 +547,93 @@ def test_builtin_subprocess_vapor_projection_populates_representative_melt():
     assert diagnostics['vapor_pressures_Pa'] == pressures
 
 
+@pytest.mark.parametrize(
+    'diagnostic, reason_fragment',
+    [
+        ({'vapor_pressures_Pa': {}, 'vapor_pressures_source': {}}, 'no vapor'),
+        (
+            {
+                'vapor_pressures_Pa': {'Na': 1.0},
+                'vapor_pressures_source': {'K': 'test'},
+            },
+            'keys differ',
+        ),
+    ],
+)
+def test_builtin_subprocess_vapor_projection_refuses_silent_empty_or_unsourced(
+    diagnostic,
+    reason_fragment,
+):
+    backend = AlphaMELTSBackend()
+    backend._subprocess_vapor_pressure_provider = types.SimpleNamespace(
+        dispatch=lambda _request: types.SimpleNamespace(
+            status='ok', warnings=(), diagnostic=diagnostic
+        )
+    )
+    result = EquilibriumResult(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={'Na2O': 100.0},
+        status='ok',
+    )
+
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match=reason_fragment,
+    ) as excinfo:
+        backend._builtin_vapor_projection_for_subprocess(result)
+
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY
+    )
+
+
+@pytest.mark.parametrize(
+    'composition, provider_status, reason_fragment',
+    [
+        ({}, 'ok', 'missing solved liquid composition'),
+        ({'Na2O': 100.0}, 'unavailable', 'provider refused vapor projection'),
+    ],
+)
+def test_builtin_subprocess_vapor_projection_unavailable_paths_are_typed(
+    composition,
+    provider_status,
+    reason_fragment,
+):
+    backend = AlphaMELTSBackend()
+    backend._subprocess_vapor_pressure_provider = types.SimpleNamespace(
+        dispatch=lambda _request: types.SimpleNamespace(
+            status=provider_status,
+            warnings=('test-unavailable',),
+            diagnostic={},
+        )
+    )
+    result = EquilibriumResult(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-9.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct=composition,
+        status='ok',
+    )
+
+    with pytest.raises(
+        AlphaMELTSSubprocessContractError,
+        match=reason_fragment,
+    ) as excinfo:
+        backend._builtin_vapor_projection_for_subprocess(result)
+
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY
+    )
+
+
 def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     monkeypatch,
 ):
@@ -988,7 +1076,11 @@ def test_alphamelts_subprocess_signal_exit_is_typed_crash_without_mode_flip(
     monkeypatch.setattr(
         backend,
         '_builtin_vapor_projection_for_subprocess',
-        lambda _eq: ({}, {}, {'test_stub': True}),
+        lambda _eq: (
+            {'Na': 1.0},
+            {'Na': 'builtin_authoritative:test'},
+            {'test_stub': True},
+        ),
     )
 
     with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:

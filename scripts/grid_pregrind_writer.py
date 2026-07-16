@@ -74,7 +74,7 @@ CACHE_V2_VAPOR_SPECIES = (
 )
 
 CACHE_V2_FLAG_DICTIONARIES = {
-    "regime": ("solid", "mixed", "liquid", "unknown"),
+    "regime": ("frozen", "partial", "molten"),
     "evidence_class": (
         "melts",
         "magemin",
@@ -83,14 +83,8 @@ CACHE_V2_FLAG_DICTIONARIES = {
         "unknown",
     ),
     "backend": ("subprocess", "thermoengine"),
-    "tier": ("grounded", "modeled", "indicative", "unknown"),
-    "notice": (
-        "none",
-        "validity_band_advisory",
-        "validity_band_degradation",
-        "interpolation_extrapolated",
-        "engine_silent",
-    ),
+    "tier": ("grounded", "modeled", "indicative"),
+    "notice": ("none",),
 }
 
 CACHE_V2_CLAMP_EXTRAPOLATION_BITS = {
@@ -424,7 +418,7 @@ def _cache_v2_dictionary(
 
 def _cache_v2_output_spec(
     namespace: str, field: str
-) -> dict[str, str]:
+) -> dict[str, Any]:
     name = f"{namespace}.{field}"
     units = "dimensionless"
     basis = "AlphaMELTS solved state"
@@ -440,14 +434,20 @@ def _cache_v2_output_spec(
         encoding = "ieee754-binary64"
     elif field.endswith("_kg") or field == "phase_masses_kg":
         units = "kg"
+        basis = "physical batch mass"
     elif field == "phase_species_mol":
         units = "mol"
         basis = "physical phase-instance mass and parsed formula/endmember"
     elif field == "phase_species_kg":
         units = "kg"
         basis = "physical phase-instance mass"
-    elif "composition_wt_pct" in field or "phase_modes_wt_pct" in field:
+    elif (
+        "composition_wt_pct" in field
+        or "phase_modes_wt_pct" in field
+        or field == "phase_compositions"
+    ):
         units = "wt_pct"
+        basis = "named phase or solved bulk composition"
     elif "fraction" in field or field in {"system_phi", "sample_frac_M"}:
         units = "fraction"
         encoding = "ieee754-binary64 or canonical-json array"
@@ -458,21 +458,21 @@ def _cache_v2_output_spec(
         units = "kg/m3"
         encoding = "ieee754-binary64"
     elif field == "system_enthalpy":
-        units = "AlphaMELTS System_main H table-native"
+        units = "J"
         encoding = "ieee754-binary64"
-        basis = "as printed for AlphaMELTS solver system amount"
+        basis = "AlphaMELTS solver system amount"
     elif field == "system_entropy":
-        units = "AlphaMELTS System_main S table-native"
+        units = "J/K"
         encoding = "ieee754-binary64"
-        basis = "as printed for AlphaMELTS solver system amount"
+        basis = "AlphaMELTS solver system amount"
     elif field == "system_volume":
-        units = "AlphaMELTS System_main V table-native"
+        units = "m3"
         encoding = "ieee754-binary64"
-        basis = "as printed for AlphaMELTS solver system amount"
+        basis = "AlphaMELTS solver system amount; converted from table cm3"
     elif field == "system_heat_capacity_Cp":
-        units = "AlphaMELTS System_main Cp table-native"
+        units = "J/K"
         encoding = "ieee754-binary64"
-        basis = "as printed for AlphaMELTS solver system amount"
+        basis = "AlphaMELTS solver system amount"
     elif field == "system_dVdP":
         units = "AlphaMELTS System_main dVdP*10^6 as printed"
         encoding = "ieee754-binary64"
@@ -487,6 +487,33 @@ def _cache_v2_output_spec(
     elif field == "vapor_pressures_Pa":
         units = "Pa"
         basis = "post-equilibrium project-authoritative vapor projection"
+    elif field == "vapor_pressures_source":
+        units = "source_label"
+        basis = "one source label per vapor_pressures_Pa species key"
+    elif field == "activity_coefficients":
+        units = "dimensionless"
+        basis = "AlphaMELTS solved liquid activity basis"
+    elif field == "phase_instances":
+        units = "mixed_nested"
+        basis = "one row per AlphaMELTS Phase_main phase instance"
+    elif field == "phase_thermo":
+        units = "mixed_nested"
+        basis = "AlphaMELTS solver phase amount before physical-mass rescale"
+    elif field == "chem_potentials":
+        units = "J/mol"
+        basis = "ThermoEngine chemical_potential_J_mol component basis"
+    elif field == "phase_affinities":
+        units = "J"
+        basis = "ThermoEngine affinity_J phase basis"
+    elif field in {
+        "samples",
+        "diagnostics",
+        "backend_diagnostics",
+        "liquid_fraction_path",
+        "sulfur_saturation",
+        "ledger_transition",
+    }:
+        units = "mixed_nested_or_not_applicable"
     elif field in {"liquidus_T_C", "solidus_T_C"}:
         units = "degC"
         encoding = "ieee754-binary64"
@@ -495,15 +522,61 @@ def _cache_v2_output_spec(
         encoding = "ieee754-binary64"
     elif field in {"iterations", "status", "warnings", "diagnostics"}:
         units = "not_applicable"
-    return {
+    spec: dict[str, Any] = {
         "field": name,
         "units": units,
         "reference_basis": basis,
         "encoding": encoding,
     }
+    if field == "phase_instances":
+        spec["nested_units"] = {
+            "solver_basis_mass_kg": "kg",
+            "physical_mass_kg": "kg",
+            "reference_mass_kg": "kg",
+            "enthalpy_J": "J",
+            "entropy_J_K": "J/K",
+            "volume_m3": "m3",
+            "heat_capacity_J_K": "J/K",
+            "density_kg_m3": "kg/m3",
+            "composition_wt_pct": "wt_pct",
+            "reference_basis": "alphamelts_solver_phase_amount",
+        }
+    elif field in {"phase_species_mol", "phase_species_kg"}:
+        spec["nested_key_encoding"] = {
+            "outer": "exact phase instance_id",
+            "inner_dictionary_values": "species dictionary index",
+            "inner_formula_tokens": (
+                "exact UTF-8 only when identical to the corresponding "
+                "phase_instances.formula_or_endmember_token"
+            ),
+            "unknown": "refuse",
+        }
+    elif field == "phase_thermo":
+        spec["nested_units"] = {
+            "enthalpy_J": "J",
+            "entropy_J_K": "J/K",
+            "volume_m3": "m3",
+            "heat_capacity_J_K": "J/K",
+            "density_kg_m3": "kg/m3",
+            "reference_mass_kg": "kg",
+            "reference_basis": "alphamelts_solver_phase_amount",
+        }
+    elif field == "chem_potentials":
+        spec["nested_units"] = {
+            "components": "J/mol",
+            "units": "J/mol",
+            "source_basis": "chemical_potential_J_mol",
+        }
+    elif field == "phase_affinities":
+        spec["nested_units"] = {
+            "affinity_J": "J",
+            "state": "enum",
+            "phase_scope": "enum",
+        }
+    return spec
 
 
-def _cache_v2_output_contract() -> list[dict[str, str]]:
+def _cache_v2_output_contract() -> list[dict[str, Any]]:
     contract = [
         *(_cache_v2_output_spec("generic", field) for field in GENERIC_OUTPUT_FIELDS),
         *(
@@ -555,15 +628,31 @@ def cache_v2_identity_manifest() -> dict[str, Any]:
             "nullable_encoding": "one-byte presence tag then encoded value",
             "string_encoding": "one-byte presence tag, uint32-be byte length, UTF-8 bytes",
             "identity_note": (
-                "join hash for quantized_inputs only; engine_name and engine_version "
-                "remain separate cache identity fields"
+                "hash component for quantized_inputs only; never a sole cache identity"
             ),
+            "join_identity": ["engine_name", "engine_version", "key_hash"],
         },
         "dictionaries": dictionaries,
+        "dictionary_sources": {
+            "phase": "writer-declared AlphaMELTS phase vocabulary v1",
+            "species": (
+                "COMPONENT_FIELDS union data/vapor_pressures.yaml projected species"
+            ),
+            "regime": "simulator.melt_regime.MeltRegime",
+            "evidence_class": "simulator.fidelity_vocabulary.EvidenceClass",
+            "backend": "GridCacheWriter supported grid backends",
+            "tier": "t-131 confidence rollup vocabulary",
+            "notice": "no-notice sentinel; future codes require schema-version break",
+        },
         "dictionary_policy": {
             "unknown_phase": "refuse",
             "unknown_species": "refuse",
             "overflow": "no silent overflow; schema-version break required",
+            "phase_formula_tokens": (
+                "exact UTF-8 tokens are carried by phase_instances and may key "
+                "phase_species only when the same token is declared on that instance; "
+                "they are not species-dictionary indices"
+            ),
         },
         "flags": {
             "dictionaries": ["regime", "evidence_class", "backend", "tier", "notice"],
@@ -643,7 +732,9 @@ def cache_v2_key_hash(inputs: Mapping[str, Any]) -> str:
 
 def cache_v2_key_hash_from_grid_row(row: Mapping[str, Any]) -> str:
     values = {
-        item["field"]: row[item["field"]]
+        item["field"]: row[
+            "fe3fet_ratio" if item["field"] == "Fe3Fet_Liq" else item["field"]
+        ]
         for item in CACHE_V2_QUANTIZED_INPUTS
     }
     return hashlib.sha256(_canonical_f64_key_bytes(values)).hexdigest()
@@ -1283,19 +1374,19 @@ class GridCacheWriter:
         )
 
     def _ensure_claim_table(self) -> None:
-        self.connection.executescript(
-            """
-            CREATE TABLE IF NOT EXISTS grid_key_claims (
+        self.connection.execute(
+            """CREATE TABLE IF NOT EXISTS grid_key_claims (
                 grid_key_id INTEGER NOT NULL REFERENCES grid_keys(id),
                 engine_epoch INTEGER NOT NULL,
                 claim_owner TEXT NOT NULL,
                 claimed_at_epoch REAL NOT NULL,
                 expires_at_epoch REAL NOT NULL,
                 PRIMARY KEY(grid_key_id, engine_epoch)
-            );
-            CREATE INDEX IF NOT EXISTS idx_grid_key_claims_expiry
-                ON grid_key_claims(expires_at_epoch);
-            """
+            )"""
+        )
+        self.connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_grid_key_claims_expiry "
+            "ON grid_key_claims(expires_at_epoch)"
         )
 
     def _begin_write_section(self, savepoint_name: str) -> str | None:
@@ -2070,6 +2161,8 @@ class GridCacheWriter:
         generic = dict(output.get("generic") or {})
         alpha = dict(output.get("alphamelts") or {})
         finder = dict(output.get("finder") or {})
+        if str(output["status"]) == "ok":
+            self._validate_cache_v2_output_dictionaries(generic)
         values = {
             "status": str(output["status"]),
             "status_kind": str(output["status_kind"]),
@@ -2243,6 +2336,81 @@ class GridCacheWriter:
             ),
         }
         return values
+
+    @staticmethod
+    def _validate_cache_v2_output_dictionaries(
+        generic: Mapping[str, Any],
+    ) -> None:
+        allowed_phases = set(CACHE_V2_PHASE_DICTIONARY)
+        observed_phases: set[str] = set()
+        observed_phases.update(str(value) for value in generic.get("phases_present") or ())
+        for field in (
+            "phase_masses_kg",
+            "phase_compositions",
+            "phase_thermo",
+        ):
+            observed_phases.update(
+                str(value) for value in dict(generic.get(field) or {})
+            )
+        for instance in generic.get("phase_instances") or ():
+            phase = dict(instance).get("phase")
+            if phase is not None:
+                observed_phases.add(str(phase))
+        unknown_phases = sorted(observed_phases - allowed_phases)
+        if unknown_phases:
+            raise ValueError(
+                "cache_v2 unknown phase values refused: "
+                + ", ".join(unknown_phases)
+            )
+
+        allowed_species = set(COMPONENT_FIELDS) | set(CACHE_V2_VAPOR_SPECIES)
+        instance_formula_tokens = {
+            str(dict(instance).get("instance_id")): str(
+                dict(instance).get("formula_or_endmember_token")
+            )
+            for instance in generic.get("phase_instances") or ()
+            if dict(instance).get("instance_id")
+            and dict(instance).get("formula_or_endmember_token")
+        }
+        observed_species: set[str] = set()
+        for field in (
+            "liquid_composition_wt_pct",
+            "solid_composition_wt_pct",
+            "bulk_composition_wt_pct",
+            "activity_coefficients",
+            "vapor_pressures_Pa",
+            "vapor_pressures_source",
+        ):
+            observed_species.update(
+                str(value) for value in dict(generic.get(field) or {})
+            )
+        for field in ("phase_species_mol", "phase_species_kg"):
+            for instance_id, species_values in dict(
+                generic.get(field) or {}
+            ).items():
+                for value in dict(species_values or {}):
+                    species = str(value)
+                    if species in allowed_species:
+                        continue
+                    if instance_formula_tokens.get(str(instance_id)) == species:
+                        continue
+                    observed_species.add(species)
+        unknown_species = sorted(observed_species - allowed_species)
+        if unknown_species:
+            raise ValueError(
+                "cache_v2 unknown species values refused: "
+                + ", ".join(unknown_species)
+            )
+
+        liquid_fraction = float(generic.get("liquid_fraction") or 0.0)
+        pressures = dict(generic.get("vapor_pressures_Pa") or {})
+        sources = dict(generic.get("vapor_pressures_source") or {})
+        if liquid_fraction > 0.0 and (
+            not pressures or set(pressures) != set(sources)
+        ):
+            raise ValueError(
+                "cache_v2 positive-liquid vapor map must be non-empty and sourced"
+            )
 
     def _insert_or_ignore(
         self, table: str, values: Mapping[str, Any]

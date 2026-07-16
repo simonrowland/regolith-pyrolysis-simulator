@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import sqlite3
 import sys
+import threading
+import time
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -11,6 +14,7 @@ import pytest
 import yaml
 
 import scripts.grid_pregrind as grid_pregrind
+import scripts.grid_pregrind_writer as grid_pregrind_writer
 from scripts.grid_pregrind import (
     DEFAULT_FEEDSTOCKS,
     build_grid_points,
@@ -28,6 +32,8 @@ from scripts.grid_pregrind_writer import (
     FINDER_INPUT_FIELDS,
     GridCacheWriter,
     cache_v2_identity_manifest,
+    cache_v2_key_hash,
+    cache_v2_key_hash_from_grid_row,
     canonical_input_vector,
     expedited_key,
 )
@@ -476,8 +482,14 @@ def _output(status: str = "ok") -> dict:
             "pressure_bar": 1.0,
             "phases_present": ["liquid"],
             "phase_masses_kg": {"liquid": 0.1},
-            "phase_species_mol": {},
-            "phase_species_kg": {},
+            "phase_species_mol": {
+                "olivine0": {"(Mg0.8Fe0.2)2SiO4": 0.25},
+                "olivine1": {"(Mg0.6Fe0.4)2SiO4": 0.35},
+            },
+            "phase_species_kg": {
+                "olivine0": {"(Mg0.8Fe0.2)2SiO4": 0.04},
+                "olivine1": {"(Mg0.6Fe0.4)2SiO4": 0.06},
+            },
             "phase_instances": [
                 {
                     "instance_id": "olivine0",
@@ -527,8 +539,10 @@ def _output(status: str = "ok") -> dict:
             "phase_affinities": None,
             "solid_composition_wt_pct": {},
             "bulk_composition_wt_pct": {"SiO2": 49.3753},
-            "vapor_pressures_Pa": {},
-            "vapor_pressures_source": {},
+            "vapor_pressures_Pa": {"SiO": 12.5},
+            "vapor_pressures_source": {
+                "SiO": "builtin_authoritative:test"
+            },
             "activity_coefficients": {},
             "fO2_log": -9.0,
             "warnings": [],
@@ -989,6 +1003,37 @@ def test_cache_v2_immutable_metadata_written_checked_and_refuses_drift(tmp_path)
         for component in COMPONENT_FIELDS
     ]
     assert "timeout_s" not in quantized_fields
+    assert len(manifest["outputs"]) == 75
+    assert {
+        item["field"] for item in manifest["outputs"]
+    } == {
+        *(f"generic.{field}" for field in grid_pregrind_writer.GENERIC_OUTPUT_FIELDS),
+        *(
+            f"alphamelts.{field}"
+            for field in grid_pregrind_writer.ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS
+        ),
+        *(f"finder.{field}" for field in grid_pregrind_writer.FINDER_OUTPUT_FIELDS),
+    }
+    output_specs = {item["field"]: item for item in manifest["outputs"]}
+    assert output_specs["generic.system_dVdP"]["units"] == (
+        "AlphaMELTS System_main dVdP*10^6 as printed"
+    )
+    assert output_specs["generic.system_dVdT"]["units"] == (
+        "AlphaMELTS System_main dVdT*10^6 as printed"
+    )
+    assert manifest["flags"]["clamp_extrapolation_bits"]
+    for dictionary in manifest["dictionaries"].values():
+        assert dictionary["values"]
+        assert len(dictionary["sha256"]) == 64
+        encoded = json.dumps(
+            dictionary["values"],
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        ).encode("utf-8")
+        assert dictionary["sha256"] == hashlib.sha256(encoded).hexdigest()
+        assert dictionary["unknown_value_policy"] == "refuse"
 
     with GridCacheWriter(database, existing_only=True):
         pass
@@ -1005,6 +1050,99 @@ def test_cache_v2_immutable_metadata_written_checked_and_refuses_drift(tmp_path)
             match="cache_v2 immutable metadata mismatch",
         ):
             GridCacheWriter(database, existing_only=existing_only)
+
+
+def test_cache_v2_key_hash_round_trips_stored_typed_inputs(tmp_path):
+    database = tmp_path / "cache-v2-key-hash.db"
+    inputs = _inputs(1200.0)
+    with GridCacheWriter(database) as writer:
+        writer.seed_id_block(0)
+        batch_id = writer.ensure_batch(
+            label="cache-v2-key-hash",
+            kind="fixed",
+            seed=178,
+            params={"full_grid_points": 1, "shard_count": 3},
+        )
+        assert writer.materialize_key(
+            inputs,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+        )
+        row = writer.connection.execute("SELECT * FROM grid_keys").fetchone()
+        assert row is not None
+        assert row["key_hash"] == cache_v2_key_hash(inputs)
+        assert row["key_hash"] == cache_v2_key_hash_from_grid_row(row)
+
+
+@pytest.mark.parametrize(
+    "field, value, match",
+    [
+        ("phases_present", ["unknown_phase"], "unknown phase"),
+        (
+            "activity_coefficients",
+            {"unknown_species": 1.0},
+            "unknown species",
+        ),
+        (
+            "phase_species_mol",
+            {"olivine0": {"undeclared_formula_token": 1.0}},
+            "unknown species",
+        ),
+        (
+            "phase_species_mol",
+            {"olivine0": {"(Mg0.6Fe0.4)2SiO4": 1.0}},
+            "unknown species",
+        ),
+        (
+            "phase_species_mol",
+            {"unknown0": {"(Mg0.8Fe0.2)2SiO4": 1.0}},
+            "unknown species",
+        ),
+    ],
+)
+def test_cache_v2_unknown_dictionary_values_are_refused(
+    tmp_path, field, value, match
+):
+    output = _output()
+    output["generic"][field] = value
+    with GridCacheWriter(tmp_path / f"unknown-{field}.db") as writer:
+        with pytest.raises(ValueError, match=match):
+            writer._output_values(output)
+
+
+def test_concurrent_partial_creator_is_refused_before_schema_mutation(tmp_path):
+    database = tmp_path / "cache-v2-concurrent-create.db"
+    creator = sqlite3.connect(database)
+    creator.execute("BEGIN IMMEDIATE")
+    creator.execute("CREATE TABLE replacement_marker(value TEXT)")
+    errors = []
+
+    def open_writer():
+        try:
+            GridCacheWriter(database)
+        except Exception as exc:  # captured for assertion in the main thread
+            errors.append(exc)
+
+    thread = threading.Thread(target=open_writer)
+    thread.start()
+    time.sleep(0.05)
+    creator.commit()
+    creator.close()
+    thread.join(timeout=5.0)
+
+    assert not thread.is_alive()
+    assert len(errors) == 1
+    assert "missing tables" in str(errors[0])
+    connection = sqlite3.connect(database)
+    tables = {
+        row[0]
+        for row in connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"
+        )
+    }
+    connection.close()
+    assert tables == {"replacement_marker"}
 
 
 def test_legacy_grid_without_cache_v2_metadata_remains_readable(tmp_path):
