@@ -154,8 +154,8 @@ function makeHeader(artifact, rows, energy) {
   const campaignChain = Array.isArray(header.campaign_chain) ? header.campaign_chain.join("→") || "—" : "—";
   const status = artifact.execution_status;
   const failureText = [artifact.failure?.reason, artifact.failure?.error_message].filter(Boolean).join(" · ") || "No failure reason or error message was emitted in this artifact.";
-  const costProvenance = typeof header.cost_block?._provenance === "string" && header.cost_block._provenance.trim()
-    ? header.cost_block._provenance.trim()
+  const costProvenance = typeof header.cost_block?.provenance === "string" && header.cost_block.provenance.trim()
+    ? header.cost_block.provenance.trim()
     : null;
   return `<header>
     <div class="masthead">
@@ -195,6 +195,9 @@ function yieldsSection(rows, terminal) {
 function processSection(artifact, rows, spans) {
   const temperature = rows.map((row) => n(row.T_C));
   const pressure = rows.map((row) => n(row.pO2_bar));
+  const carrierPressure = rows.map((row) => n(row.p_carrier_bar));
+  const hasCarrierPressure = carrierPressure.some((value) => value !== null);
+  const carrierIdentities = [...new Set(rows.map((row) => row.carrier_identity).filter((value) => typeof value === "string" && value.trim()).map((value) => value.trim()))];
   const electrical = totalSeries(artifact.timesteps, "energy_electrical_kWh");
   const thermal = totalSeries(artifact.timesteps, "energy_evaporation_thermal_kWh");
   const vaporKeys = [...new Set(rows.flatMap((row) => Object.keys(row.vapor_species_kg_hr || {})))];
@@ -204,12 +207,20 @@ function processSection(artifact, rows, spans) {
     lineChart("pressure-chart", "O₂ partial pressure · bar (log scale)", [{ label: "pO₂ bar", values: pressure, color: COLORS[1] }], { log: true, spans, maxLabel: hasNumber(maxPresent(pressure)) ? `${maxPresent(pressure).toExponential(1)} bar` : "not emitted" }),
     lineChart("energy-chart", "Cumulative energy · kWh", [{ label: "electrical", values: electrical, color: COLORS[1] }, { label: "thermal: evaporation total (latent + dissociation breakdown)", values: thermal, color: COLORS[2] }], { zero: true, spans }),
     lineChart("vapor-chart", "Vapor species surges · kg/h", topVapors.map((item, index) => ({ label: item.key, values: rows.map((row) => n(row.vapor_species_kg_hr?.[item.key])), color: COLORS[index] })), { zero: true, spans })
-  ].join("");
+  ];
+  if (hasCarrierPressure) {
+    charts.splice(2, 0, lineChart("carrier-pressure-chart", "Carrier pressure · bar", [{ label: "carrier bar", values: carrierPressure, color: COLORS[3] }], { spans, maxLabel: `${maxPresent(carrierPressure)?.toExponential(1) ?? "not emitted"} bar` }));
+  }
+  const carrierIdentity = carrierIdentities.length
+    ? `<div class="note"><b>Carrier identity:</b> ${carrierIdentities.map((identity) => `<span class="mono">${esc(identity)}</span>`).join(" · ")}</div>`
+    : pending("carrier_identity", "summary.carrier_identity is absent. No carrier identity is inferred.");
+  const carrierPressureNote = hasCarrierPressure
+    ? ""
+    : pending("p_carrier_bar", "summary.p_carrier_bar is absent. P_total − pO₂ is not used as a substitute.");
   return section(2, "Process record — per-hour telemetry", "Frozen timestep summaries; shaded bands follow campaign boundaries.",
     `<div class="stepper"><div class="stepper-head"><div><div class="ct">Timestep inspector</div><output id="step-output">Hour ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)} · ${esc(rows[0].campaign)}</output></div><span class="status-pill">1 / ${rows.length}</span></div>` +
     `<input id="stepper" type="range" min="0" max="${rows.length - 1}" value="0" step="1" aria-label="Report hour"><div class="range-labels"><span>h ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)}</span><span>h ${artifact.timesteps.at(-1).hour === undefined || artifact.timesteps.at(-1).hour === null ? "not emitted" : esc(artifact.timesteps.at(-1).hour)}</span></div><div id="current-grid" class="current-grid"></div><div class="timestep-ledger"><div class="ct">Selected timestep ledger · mol-native</div><div id="timestep-ledger"></div></div></div>` +
-    `<div class="chart-grid">${charts}</div>` +
-    pending("W-A0", "summary.p_non_O2_bar and carrier_identity are absent. P_total − pO₂ is not used as a substitute, so neutral-sweep pressure is not charted."));
+    `<div class="chart-grid">${charts.join("")}</div>` + carrierIdentity + carrierPressureNote);
 }
 
 function renderTimestepLedger(timestep) {
@@ -266,17 +277,24 @@ function campaignSection(artifact, spans) {
 }
 
 function tapsAndPuritySection(terminal) {
-  const stageRows = Object.entries(terminal.stage_purity || {}).map(([key, stage]) => {
+  const stages = Object.entries(terminal.stage_purity || {});
+  const hasActivity = stages.some(([, stage]) => stage.activity && typeof stage.activity === "object" && !Array.isArray(stage.activity) && Object.values(stage.activity).some((value) => typeof value === "boolean"));
+  const stageRows = stages.map(([key, stage]) => {
     const backendVerdict = typeof stage.verdict === "string" && stage.verdict.trim() ? stage.verdict.trim().toUpperCase() : null;
     const verdict = backendVerdict ?? "UNAVAILABLE";
     const verdictClass = ["pure", "mixed", "contaminated"].includes(verdict.toLowerCase()) ? verdict.toLowerCase() : "unavailable";
     const trace = hasNumber(stage.total_kg) && Number(stage.total_kg) < .01 ? ` <span class="trace">· trace (&lt;0.01 kg total)</span>` : "";
-    return `<tr><td>${esc(stage.label || key)}<br><span class="trace mono">${esc(key)}</span></td><td class="species-list">${esc((stage.accepted_species || []).join(" · ") || "none designated")}</td>` +
+    const activity = stage.activity && typeof stage.activity === "object" && !Array.isArray(stage.activity) ? stage.activity : null;
+    const acceptedSpecies = stage.accepted_species || [];
+    const speciesList = activity
+      ? acceptedSpecies.map((species) => typeof activity[species] === "boolean" ? `${esc(species)} · ${activity[species] ? "ACTIVE" : "IDLE"}` : esc(species)).join("<br>") || "none designated"
+      : esc(acceptedSpecies.join(" · ") || "none designated");
+    return `<tr><td>${esc(stage.label || key)}<br><span class="trace mono">${esc(key)}</span></td><td class="species-list">${speciesList}</td>` +
       `<td class="num">${exactKg(stage.total_kg)}${trace}</td><td class="num">${exactKg(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}</td><td class="num">${hasNumber(stage.purity_fraction) ? `${(Number(stage.purity_fraction) * 100).toFixed(4)}%` : "not emitted"}</td><td><span class="verdict ${verdictClass}">${esc(verdict)}</span></td></tr>`;
   }).join("");
   return section(5, "Metal taps & stage purity", "Live backend masses, purity fraction, and verdict. An absent backend verdict is unavailable; trace is an annotation from total_kg.",
     `<div class="table-wrap"><table><thead><tr><th>Stage</th><th>Accepted species</th><th class="num">Total</th><th class="num">Designated</th><th class="num">Impurity</th><th class="num">Purity</th><th>Backend verdict</th></tr></thead><tbody>${stageRows}</tbody></table></div>` +
-    pending("W-A10", "Per-species stage activity is not emitted, so intended-versus-contaminant activity is not inferred."));
+    (hasActivity ? "" : pending("W-A10", "Per-species stage activity is not emitted, so intended-versus-contaminant activity is not inferred.")));
 }
 
 function wallAndOxygenSection(artifact, rows) {
@@ -315,14 +333,23 @@ function costSection(artifact, energy) {
   }
   const hasCostShare = hasNumber(energy.totalCost) && energy.totalCost !== 0;
   const electricalShare = hasCostShare ? energy.electricalCost / energy.totalCost * 100 : null;
-  const provenance = typeof prices._provenance === "string" && prices._provenance.trim()
-    ? `<div class="note"><b>Cost provenance:</b> ${esc(prices._provenance.trim())}</div>`
+  const provenance = typeof prices.provenance === "string" && prices.provenance.trim()
+    ? `<div class="note"><b>Cost provenance:</b> ${esc(prices.provenance.trim())}</div>`
     : "";
+  const pumpingRows = energy.canonicalCostTotals
+    ? `<div class="kv"><span>Process electrical</span><b>${hasNumber(energy.processElectrical) ? `${energy.processElectrical.toFixed(6)} kWh · ${money(energy.processElectricalCost)}` : "not emitted"}</b></div><div class="kv"><span>Pumping</span><b>${hasNumber(energy.pumpingElectrical) ? `${energy.pumpingElectrical.toFixed(6)} kWh · ${money(energy.pumpingElectricalCost)}` : "excluded / not emitted"}</b></div>`
+    : "";
+  const basisNote = typeof energy.basisNote === "string" && energy.basisNote.trim()
+    ? `<div class="note"><b>Cost basis:</b> ${esc(energy.basisNote.trim())}</div>`
+    : "";
+  const totalFormula = energy.canonicalCostTotals
+    ? `<div class="note"><b>Total ${money(energy.totalCost)}</b> binds terminal.cost_totals: ${hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : "not emitted"} kWh total electrical plus ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`
+    : `<div class="note"><b>Total ${money(energy.totalCost)}</b> = ${hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : "not emitted"} kWh × ${money(prices.electrical_cost_per_kWh)} + ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal × ${money(prices.solar_heat_cost_per_kWh)}. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`;
   return section(8, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
-    provenance + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${hasNumber(energy.electrical) ? `${energy.electrical.toFixed(6)} <small>kWh</small>` : "not emitted"}</div><div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.electricalCost)}</b></div></div>` +
+    provenance + basisNote + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${hasNumber(energy.electrical) ? `${energy.electrical.toFixed(6)} <small>kWh</small>` : "not emitted"}</div>${pumpingRows}<div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.electricalCost)}</b></div></div>` +
     `<div class="card"><div class="ct">Solar heat · evaporation thermal total</div><div class="cbig">${hasNumber(energy.thermal) ? `${energy.thermal.toFixed(6)} <small>kWh</small>` : "not emitted"}</div><div class="kv"><span>Latent breakdown</span><b>${hasNumber(energy.latent) ? `${energy.latent.toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Dissociation breakdown</span><b>${hasNumber(energy.dissociation) ? `${energy.dissociation.toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Price</span><b>${money(prices.solar_heat_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.thermalCost)}</b></div></div></div>` +
     `${hasCostShare ? `<div class="cost-stack" aria-label="Cost share"><span style="width:${electricalShare}%"></span><span style="width:${100 - electricalShare}%"></span></div><div class="legend"><span><i class="swatch" style="background:var(--blue)"></i>electrical cost</span><span><i class="swatch" style="background:var(--green)"></i>solar-heat cost</span></div>` : pending("energy values", "Cost share is unavailable because one or more energy or price values were not emitted.")}` +
-    `<div class="note"><b>Total ${money(energy.totalCost)}</b> = ${hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : "not emitted"} kWh × ${money(prices.electrical_cost_per_kWh)} + ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal × ${money(prices.solar_heat_cost_per_kWh)}. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`);
+    totalFormula);
 }
 
 function provenanceSection(artifact) {
@@ -362,7 +389,8 @@ function renderCurrent(artifact, index) {
   $(".status-pill").textContent = `${index + 1} / ${artifact.timesteps.length}`;
   $("#current-grid").innerHTML = [
     ["Temperature", hasNumber(row.T_C) ? `${Number(row.T_C).toLocaleString()} °C` : "not emitted"], ["Total pressure", hasNumber(row.P_total_bar) ? `${Number(row.P_total_bar).toExponential(3)} bar` : "not emitted"],
-    ["pO₂", hasNumber(row.pO2_bar) ? `${Number(row.pO2_bar).toExponential(3)} bar` : "not emitted"], ["Electrical", hasNumber(row.energy_electrical_kWh) ? `${Number(row.energy_electrical_kWh).toFixed(4)} kWh` : "not emitted"],
+    ["pO₂", hasNumber(row.pO2_bar) ? `${Number(row.pO2_bar).toExponential(3)} bar` : "not emitted"], ["Carrier pressure", hasNumber(row.p_carrier_bar) ? `${Number(row.p_carrier_bar).toExponential(3)} bar` : "not emitted"],
+    ["Carrier identity", typeof row.carrier_identity === "string" && row.carrier_identity.trim() ? row.carrier_identity.trim() : "not emitted"], ["Electrical", hasNumber(row.energy_electrical_kWh) ? `${Number(row.energy_electrical_kWh).toFixed(4)} kWh` : "not emitted"],
     ["Evaporation thermal", hasNumber(row.energy_evaporation_thermal_kWh) ? `${Number(row.energy_evaporation_thermal_kWh).toFixed(4)} kWh` : "not emitted"], [row.O2_metric_label || "O₂ metric label not emitted", kg(row.O2_source_side_potential_kg_cumulative, 4)],
     ["Regime", row.regime], ["Kn", row.Kn == null ? "not emitted" : row.Kn && typeof row.Kn === "object" ? sci(row.Kn.knudsen_number) : sci(row.Kn)]
   ].map(([key, value]) => `<div class="current"><div class="k">${esc(key)}</div><div class="v">${esc(value)}</div></div>`).join("");
@@ -387,9 +415,27 @@ function render(artifact) {
     dissociation: sumPresent(rows.map((row) => row.energy_dissociation_kWh))
   };
   energy.thermal = energy.evaporation;
-  energy.electricalCost = hasNumber(energy.electrical) && hasNumber(artifact.header.cost_block?.electrical_cost_per_kWh) ? energy.electrical * Number(artifact.header.cost_block.electrical_cost_per_kWh) : null;
-  energy.thermalCost = hasNumber(energy.thermal) && hasNumber(artifact.header.cost_block?.solar_heat_cost_per_kWh) ? energy.thermal * Number(artifact.header.cost_block.solar_heat_cost_per_kWh) : null;
-  energy.totalCost = hasNumber(energy.electricalCost) && hasNumber(energy.thermalCost) ? energy.electricalCost + energy.thermalCost : null;
+  const canonicalCostTotals = artifact.terminal.cost_totals && typeof artifact.terminal.cost_totals === "object" && !Array.isArray(artifact.terminal.cost_totals)
+    ? artifact.terminal.cost_totals
+    : null;
+  if (canonicalCostTotals) {
+    energy.canonicalCostTotals = true;
+    energy.processElectrical = n(canonicalCostTotals.process_electrical_energy_kWh);
+    energy.pumpingElectrical = n(canonicalCostTotals.pumping_electrical_energy_kWh);
+    energy.electrical = n(canonicalCostTotals.electrical_energy_kWh);
+    energy.thermal = n(canonicalCostTotals.evaporation_thermal_energy_kWh);
+    energy.processElectricalCost = n(canonicalCostTotals.process_electrical_cost_usd);
+    energy.pumpingElectricalCost = n(canonicalCostTotals.pumping_electrical_cost_usd);
+    energy.electricalCost = n(canonicalCostTotals.electrical_cost_usd);
+    energy.thermalCost = n(canonicalCostTotals.solar_heat_cost_usd);
+    energy.totalCost = n(canonicalCostTotals.total_cost_usd);
+    energy.basisNote = canonicalCostTotals.basis_note;
+  } else {
+    energy.canonicalCostTotals = false;
+    energy.electricalCost = hasNumber(energy.electrical) && hasNumber(artifact.header.cost_block?.electrical_cost_per_kWh) ? energy.electrical * Number(artifact.header.cost_block.electrical_cost_per_kWh) : null;
+    energy.thermalCost = hasNumber(energy.thermal) && hasNumber(artifact.header.cost_block?.solar_heat_cost_per_kWh) ? energy.thermal * Number(artifact.header.cost_block.solar_heat_cost_per_kWh) : null;
+    energy.totalCost = hasNumber(energy.electricalCost) && hasNumber(energy.thermalCost) ? energy.electricalCost + energy.thermalCost : null;
+  }
   const timestepSections = rows.length
     ? yieldsSection(rows, artifact.terminal) + processSection(artifact, rows, spans) + campaignSection(artifact, spans)
     : section(1, "Per-hour telemetry", "No timestep rows were emitted for this run.", `<div class="pending"><strong>Not emitted</strong><p>This execution has zero timesteps; header, failure, and terminal data remain available below.</p></div>`);

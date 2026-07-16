@@ -534,6 +534,9 @@ def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture():
         .read_text(encoding="utf-8")
     )
     assert "cost_rollup_diagnostic" in actual["run_metadata"]
+    assert actual["run_metadata"]["cost_rollup_diagnostic"]["price_basis"] == (
+        "legacy_placeholder_awaiting_owner_ratification"
+    )
     stripped_actual = copy.deepcopy(actual)
     stripped_expected = copy.deepcopy(expected)
     stripped_actual["run_metadata"].pop("cost_rollup_diagnostic", None)

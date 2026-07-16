@@ -233,9 +233,9 @@
       "owner_ratify_placeholders": [
         {
           "name": "electrical_usd_per_kWh",
-          "value": 100.0,
+          "value": 10.0,
           "units": "USD/kWh",
-          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "source_tag": "owner-t7-two-price-energy-v1",
           "ticket": "COST-PARAM-ELECTRICAL-KWH",
           "status": "owner-ratify-placeholder"
         },
@@ -342,7 +342,8 @@
         },
         "allocation_status": "allocated_by_product_mass",
         "owner_ratify_money_projection": 4717.8
-      }
+      },
+      "price_basis": "legacy_placeholder_awaiting_owner_ratification"
     }
   },
   "final_state": {

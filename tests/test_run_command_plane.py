@@ -441,6 +441,8 @@ def test_submit_idempotency_is_client_scoped_and_payload_bound(monkeypatch):
         "client_token": "retry-token",
         "feedstock": "lunar_mare_low_ti",
         "mass_kg": 1000,
+        "cost_parameters": {"schema_version": "optimize-costs-v1"},
+        "cost_parameters_recipe_name": "http-tab-recipe",
     }
 
     first = client.post("/api/runs", json=payload)
@@ -452,6 +454,8 @@ def test_submit_idempotency_is_client_scoped_and_payload_bound(monkeypatch):
     assert replay.status_code == 200
     assert replay.get_json()["idempotent_replay"] is True
     assert len(calls) == 1
+    assert calls[0][0]["cost_parameters"] == payload["cost_parameters"]
+    assert calls[0][0]["cost_parameters_recipe_name"] == "http-tab-recipe"
     assert conflict.status_code == 409
     assert conflict.get_json()["error_type"] == "idempotency_conflict"
 

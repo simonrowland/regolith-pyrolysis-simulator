@@ -54,6 +54,17 @@ def test_stage_purity_report_flags_non_designated_stage_landings():
     assert stage["verdict"] == "MIXED"
 
 
+def test_stage_purity_activity_uses_explicit_accepted_species_capture_state():
+    train = CondensationTrain.create_default()
+    train.stages[2].collected_kg.update({"Cr": 1.0, "Mn": 0.0})
+
+    stage = stage_purity_report(train)[STAGE_KEY_BY_NUMBER[2]]
+
+    assert stage["activity"] == {"Cr": True, "Mn": False}
+    assert "Cr2O3" not in stage["activity"]
+    assert "activity" not in stage_purity_report(train)[STAGE_KEY_BY_NUMBER[3]]
+
+
 def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     train = CondensationTrain.create_default()
     model = CondensationModel(train)

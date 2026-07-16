@@ -5088,6 +5088,11 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
         designated_species_kg: dict[str, float] = {}
         coproduct_species_kg: dict[str, float] = {}
         impurity_species_kg: dict[str, float] = {}
+        activity = {
+            species: float(stage.collected_kg[species]) > 1e-12
+            for species in sorted(accepted_species)
+            if species in stage.collected_kg
+        }
         for species, kg in sorted(stage.collected_kg.items()):
             kg = float(kg)
             if abs(kg) <= 1e-12:
@@ -5113,7 +5118,7 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
         else:
             verdict = 'CONTAMINATED'
 
-        report[stage_key] = {
+        stage_report = {
             'stage_number': stage_number,
             'label': stage.label,
             'accepted_species': sorted(accepted_species),
@@ -5130,4 +5135,7 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
                 if impurity_kg > 1e-12 else ''
             ),
         }
+        if activity:
+            stage_report['activity'] = activity
+        report[stage_key] = stage_report
     return report

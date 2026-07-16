@@ -20,9 +20,16 @@ from simulator.config import DEFAULT_DATA_DIR
 OPTIMIZE_COSTS_SCHEMA_VERSION = "optimize-costs-v1"
 RECIPE_COST_PARAMETERS_KEY = "cost_parameters"
 DEFAULT_COST_PARAMETERS_PATH = DEFAULT_DATA_DIR / "optimize_costs.yaml"
+DEFAULT_ELECTRICAL_COST_PER_KWH = 10.0
+DEFAULT_SOLAR_HEAT_COST_PER_KWH = 0.05
+ENERGY_COST_DEFAULT_SOURCE = "owner-t7-two-price-energy-v1"
+PAYLOAD_ABSENT_COST_PROVENANCE = (
+    "canonical defaults; payload carried no cost parameters"
+)
 SHUTTLE_REAGENT_SPECIES = frozenset({"Na", "K", "Mg", "Ca"})
 _REQUIRED_SCALAR_PARAMETERS = (
     "electricity_cost_per_kWh",
+    "solar_heat_cost_per_kWh",
     "furnace_resinter_cost_usd",
     "depreciation_expense_per_run",
     "generic_reagent_cost_per_kg",
@@ -37,6 +44,7 @@ class CostParameters:
     depreciation_expense_per_run: float
     generic_reagent_cost_per_kg: float
     shuttle_reagent_replacement_cost_per_kg: Mapping[str, float] = field(default_factory=dict)
+    solar_heat_cost_per_kWh: float = DEFAULT_SOLAR_HEAT_COST_PER_KWH
 
     def __post_init__(self) -> None:
         for field_name in _REQUIRED_SCALAR_PARAMETERS:
@@ -76,9 +84,17 @@ def load_cost_parameters(path: str | Path | None = None) -> dict[str, Any]:
         raise FileNotFoundError(f"cost parameter config unreadable: {cost_path}") from exc
     if not isinstance(payload, Mapping):
         raise TypeError(f"cost parameter config must be a mapping: {cost_path}")
+    is_default_path = cost_path.resolve() == DEFAULT_COST_PARAMETERS_PATH.resolve()
+    if is_default_path:
+        payload = _with_default_energy_costs(payload)
+    source = (
+        f"default:{ENERGY_COST_DEFAULT_SOURCE}; base_config:{cost_path}"
+        if is_default_path
+        else str(cost_path)
+    )
     return normalize_cost_parameters(
         payload,
-        source=str(cost_path),
+        source=source,
         defaults_applied=False,
     )
 
@@ -96,7 +112,6 @@ def recipe_cost_parameters_from_payload(
         defaults = load_cost_parameters()
         defaults["provenance"] = {
             **dict(defaults.get("provenance", {})),
-            "source": f"default:{DEFAULT_COST_PARAMETERS_PATH}",
             "recipe_source": source,
             "defaults_applied": True,
         }
@@ -126,6 +141,7 @@ def normalize_cost_parameters(
     raw_parameters = payload.get("parameters")
     if not isinstance(raw_parameters, Mapping):
         raise ValueError("cost parameter payload missing parameters mapping")
+    raw_parameters = _with_missing_solar_heat_default(raw_parameters)
 
     parameters: dict[str, Any] = {}
     for name in _REQUIRED_SCALAR_PARAMETERS:
@@ -214,11 +230,71 @@ def cost_parameters_from_mapping(payload: Mapping[str, Any] | None = None) -> Co
     values = cost_parameter_values(payload)["parameters"]
     return CostParameters(
         electricity_cost_per_kWh=values["electricity_cost_per_kWh"],
+        solar_heat_cost_per_kWh=values["solar_heat_cost_per_kWh"],
         furnace_resinter_cost_usd=values["furnace_resinter_cost_usd"],
         depreciation_expense_per_run=values["depreciation_expense_per_run"],
         generic_reagent_cost_per_kg=values["generic_reagent_cost_per_kg"],
         shuttle_reagent_replacement_cost_per_kg=values[_SHUTTLE_PARAMETER],
     )
+
+
+def canonical_energy_cost_block(
+    payload: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    block = default_cost_parameters_block() if payload is None else normalize_cost_parameters(
+        payload,
+        source=str(payload.get("provenance", {}).get("source", "cost parameter payload"))
+        if isinstance(payload.get("provenance"), Mapping)
+        else "cost parameter payload",
+        defaults_applied=bool(payload.get("provenance", {}).get("defaults_applied", False))
+        if isinstance(payload.get("provenance"), Mapping)
+        else False,
+    )
+    values = cost_parameter_values(block)["parameters"]
+    provenance = block.get("provenance")
+    source = provenance.get("source") if isinstance(provenance, Mapping) else None
+    if payload is None:
+        source = PAYLOAD_ABSENT_COST_PROVENANCE
+    return {
+        "electrical_cost_per_kWh": values["electricity_cost_per_kWh"],
+        "solar_heat_cost_per_kWh": values["solar_heat_cost_per_kWh"],
+        "provenance": str(source or ENERGY_COST_DEFAULT_SOURCE),
+    }
+
+
+def _with_default_energy_costs(payload: Mapping[str, Any]) -> dict[str, Any]:
+    result = copy.deepcopy(dict(payload))
+    parameters = result.get("parameters")
+    if not isinstance(parameters, Mapping):
+        return result
+    parameters = copy.deepcopy(dict(parameters))
+    parameters["electricity_cost_per_kWh"] = {
+        "value": DEFAULT_ELECTRICAL_COST_PER_KWH,
+        "units": "USD/kWh",
+        "source_tag": ENERGY_COST_DEFAULT_SOURCE,
+    }
+    parameters["solar_heat_cost_per_kWh"] = {
+        "value": DEFAULT_SOLAR_HEAT_COST_PER_KWH,
+        "units": "USD/kWh",
+        "source_tag": ENERGY_COST_DEFAULT_SOURCE,
+    }
+    result["parameters"] = parameters
+    return result
+
+
+def _with_missing_solar_heat_default(
+    parameters: Mapping[str, Any],
+) -> dict[str, Any]:
+    result = dict(parameters)
+    result.setdefault(
+        "solar_heat_cost_per_kWh",
+        {
+            "value": DEFAULT_SOLAR_HEAT_COST_PER_KWH,
+            "units": "USD/kWh",
+            "source_tag": ENERGY_COST_DEFAULT_SOURCE,
+        },
+    )
+    return result
 
 
 def _parameter_entry(parameters: Mapping[str, Any], name: str) -> Mapping[str, Any]:

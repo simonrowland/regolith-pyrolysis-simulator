@@ -68,6 +68,16 @@ def _runner_payload(status: str = "partial") -> dict:
             "vapor_pressure_backend_status": "ok",
             "authoritative_for_requested_vapor_pressure": True,
         },
+        "yield_disposition": {
+            "basis": "target_atom_equivalent",
+            "targets": {
+                "Fe": {
+                    "denominator_target_equiv_mol": 2.0,
+                    "yield_fraction": 0.5,
+                    "unextracted_fraction": 0.5,
+                }
+            },
+        },
     }
 
 
@@ -177,8 +187,19 @@ def test_build_run_artifact_repackages_runner_payload(monkeypatch) -> None:
         "residual_pct": 1e-13,
         "basis": "final-hour percent",
     }
-    assert "yield_disposition" not in artifact["terminal"]
+    assert artifact["terminal"]["yield_disposition"] is payload[
+        "yield_disposition"
+    ]
     assert "wall_lifetime" not in artifact["terminal"]
+
+
+def test_build_run_artifact_omits_yield_disposition_when_runner_omits_it() -> None:
+    payload = _runner_payload()
+    payload.pop("yield_disposition")
+
+    artifact = build_run_artifact(payload, run_id="run-without-yield")
+
+    assert "yield_disposition" not in artifact["terminal"]
 
 
 @pytest.mark.parametrize(

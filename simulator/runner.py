@@ -194,6 +194,11 @@ _METAL_PRODUCT_SPECIES: tuple[str, ...] = (
     "K",
     "Si",
 )
+_CARRIER_TOKENS: dict[str, str] = {
+    "N2": "N2",
+    "AR": "Ar",
+    "CO2": "CO2",
+}
 
 
 class RunnerError(RuntimeError):
@@ -1162,15 +1167,17 @@ class PyrolysisRun:
             run_metadata["c3_na_hold_adjustment"] = _json_safe(
                 c3_na_hold_adjustment
             )
-        run_metadata["cost_rollup_diagnostic"] = _json_safe(
-            build_cost_rollup_diagnostic(
-                cost_ledger=sim.cost_ledger,
-                per_hour=execution.per_hour,
-                products_kg=sim.product_ledger(),
-                pumping_context=pumping_context_from_sim(sim, execution.snapshots),
-                snapshots=execution.snapshots,
-            )
+        cost_rollup_diagnostic = build_cost_rollup_diagnostic(
+            cost_ledger=sim.cost_ledger,
+            per_hour=execution.per_hour,
+            products_kg=sim.product_ledger(),
+            pumping_context=pumping_context_from_sim(sim, execution.snapshots),
+            snapshots=execution.snapshots,
         )
+        cost_rollup_diagnostic["price_basis"] = (
+            "legacy_placeholder_awaiting_owner_ratification"
+        )
+        run_metadata["cost_rollup_diagnostic"] = _json_safe(cost_rollup_diagnostic)
         sim.record.cost_rollup = dict(run_metadata["cost_rollup_diagnostic"])
 
         # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
@@ -1782,6 +1789,8 @@ def build_per_hour_summary(
     * ``T_C``: melt temperature in Celsius
     * ``P_total_bar``: total pressure above the melt in bar
     * ``pO2_bar``: pO2 partial pressure in bar
+    * ``p_carrier_bar``: actual declared carrier partial pressure in bar, when present
+    * ``carrier_identity``: canonical N2/Ar/CO2 carrier token, when present
     * ``mass_balance_pct``: ledger-based mass balance error, percent
     * ``O2_yield_kg_cumulative``: legacy serialized key for source-side
       O2 potential from all bins (kg), not recovered/captured O2
@@ -1815,6 +1824,7 @@ def build_per_hour_summary(
     pO2_bar = (
         float(snapshot.overhead.composition.get('O2', 0.0)) * _MBAR_TO_BAR
     )
+    carrier_observables = _carrier_pressure_observables(sim, snapshot)
 
     products = sim.product_ledger()
     metal_yields = {
@@ -1861,6 +1871,7 @@ def build_per_hour_summary(
         "T_C": float(snapshot.temperature_C),
         "P_total_bar": p_total_bar,
         "pO2_bar": pO2_bar,
+        **carrier_observables,
         "mass_balance_pct": mass_balance_pct,
         "O2_yield_kg_cumulative": o2_source_side_potential_kg,
         "O2_source_side_potential_kg_cumulative": o2_source_side_potential_kg,
@@ -1937,6 +1948,43 @@ def build_per_hour_summary(
     if isinstance(enforcement, Mapping) and int(enforcement.get("hour", -1)) == int(snapshot.hour):
         summary["pO2_enforcement"] = _json_safe(dict(enforcement))
     return _json_safe(summary)
+
+
+def _carrier_pressure_observables(
+    sim: PyrolysisSimulator,
+    snapshot: HourSnapshot,
+) -> dict[str, float | str]:
+    """Return the actual declared carrier partial pressure when present."""
+    melt = getattr(sim, "melt", None)
+    raw_carrier = str(
+        getattr(melt, "background_gas_species", "") or ""
+    ).strip()
+    carrier = _CARRIER_TOKENS.get(raw_carrier.upper())
+    atmosphere_name = str(
+        getattr(getattr(melt, "atmosphere", None), "name", "") or ""
+    )
+    if carrier is None and atmosphere_name == "PN2_SWEEP":
+        carrier = "N2"
+    elif carrier is None and atmosphere_name == "CO2_BACKPRESSURE":
+        carrier = "CO2"
+    if carrier is None:
+        return {}
+
+    try:
+        partial_mbar = float(
+            snapshot.overhead.composition.get(carrier, 0.0) or 0.0
+        )
+    except (TypeError, ValueError):
+        return {}
+    if not math.isfinite(partial_mbar) or partial_mbar <= 0.0:
+        return {}
+    # Derivation: overhead.composition stores physical species partials in mbar;
+    # p_carrier[bar] = p_carrier[mbar] * 1e-3. P_total - pO2 is forbidden
+    # because total pressure may also include vapor species or a control floor.
+    return {
+        "p_carrier_bar": partial_mbar * _MBAR_TO_BAR,
+        "carrier_identity": carrier,
+    }
 
 
 # ----------------------------------------------------------------------

@@ -3896,11 +3896,23 @@ def _marginal_extraction_cost_summary(
     run_execution: Any | None,
     cost_parameters: CostParameters,
 ) -> Mapping[str, Any]:
-    energy_kWh = _variable_energy_kWh(sim, run_execution=run_execution)
-    # Unit check: kWh * USD/kWh = USD. The simulator energy total already
-    # includes condenser, turbine, MRE electrical, and evaporation-equivalent
-    # kWh; _pumping_energy_penalty_kWh adds the T-005 pumping sidecar.
-    energy_cost_usd = energy_kWh * cost_parameters.electricity_cost_per_kWh
+    electrical_kWh = _energy_component_value(
+        sim,
+        "electrical",
+        run_execution=run_execution,
+    )
+    solar_heat_kWh = _energy_component_value(
+        sim,
+        "evaporation_thermal",
+        run_execution=run_execution,
+    )
+    electrical_cost_usd = (
+        electrical_kWh * cost_parameters.electricity_cost_per_kWh
+    )
+    solar_heat_cost_usd = (
+        solar_heat_kWh * cost_parameters.solar_heat_cost_per_kWh
+    )
+    energy_cost_usd = electrical_cost_usd + solar_heat_cost_usd
     reagent = _reagent_consumption_cost_summary(
         sim,
         product_ledger,
@@ -3926,27 +3938,16 @@ def _marginal_extraction_cost_summary(
             "+ per-run depreciation"
         ),
         "marginal_cost_usd": total,
-        "energy_kWh": energy_kWh,
+        "energy_electrical_kWh": electrical_kWh,
+        "energy_evaporation_thermal_kWh": solar_heat_kWh,
         "electricity_cost_per_kWh": cost_parameters.electricity_cost_per_kWh,
+        "solar_heat_cost_per_kWh": cost_parameters.solar_heat_cost_per_kWh,
+        "electrical_cost_usd": electrical_cost_usd,
+        "solar_heat_cost_usd": solar_heat_cost_usd,
         "energy_cost_usd": energy_cost_usd,
         "reagent": reagent,
         "depreciation": depreciation,
     })
-
-
-def _variable_energy_kWh(
-    sim: Any,
-    *,
-    run_execution: Any | None,
-) -> float:
-    return (
-        _sim_float(
-            sim,
-            "energy_electrical_plus_evaporation_cumulative_kWh",
-            "energy_electrical_plus_evaporation_kWh",
-        )
-        + _pumping_energy_penalty_kWh(sim, run_execution=run_execution)
-    )
 
 
 def _reagent_consumption_cost_summary(
