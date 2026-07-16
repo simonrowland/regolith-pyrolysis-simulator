@@ -3,7 +3,8 @@
 
 Delegates to the canonical, contract-fixed `simulator.accounting.run_artifact.build_run_artifact` (single
 source of truth — do NOT re-implement the reshape here). Then injects a DEMO two-price cost_block so the
-settings inspector / cost panel can be demonstrated; the real backend emits cost_block via W-A5a.
+settings inspector / cost panel can be demonstrated; no backend emits cost_block yet — production
+emission arrives with W-A5a (held for golden coordination).
 
 Usage: python3 freeze_sample.py <payload.json> <out.json>
 """

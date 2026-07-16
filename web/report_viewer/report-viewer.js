@@ -161,7 +161,7 @@ function makeHeader(artifact, rows, energy) {
       <span class="chip">charge ${kg(header.charge_mass_kg, 0)}</span>
       <span class="chip">engine ${esc(header.engine_identity?.name)}</span>
       <span class="chip">schema ${esc(artifact.artifact_schema_version)}</span>
-      <span class="chip accent">C3 dose ${Object.entries(header.c3_dose || {}).map(([key, value]) => `${esc(key)} ${esc(value)} kg`).join(" · ")}</span>
+      ${header.c3_dose && Object.keys(header.c3_dose).length ? `<span class="chip accent">C3 dose ${Object.entries(header.c3_dose).map(([key, value]) => `${esc(key.replace(/_kg$/, ""))} ${esc(value)} kg`).join(" · ")}</span>` : ""}
     </div>
     <div class="status-banner ${["failed", "refused"].includes(status) ? "failed" : ""}">
       <div class="status-icon">${status === "ok" ? "✓" : "!"}</div><div><strong>Execution status: ${esc(status)}</strong>

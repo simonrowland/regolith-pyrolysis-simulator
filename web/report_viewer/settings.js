@@ -43,7 +43,7 @@ function configEntries(config) {
 
 function effectiveConfig(config) {
   if (!config || typeof config !== "object") {
-    return `<div class="pending"><strong>Effective config not captured</strong><p>captured at run merge points (W-A5) — not in this sample</p></div>`;
+    return `<div class="pending"><strong>Effective config not captured</strong><p>This run's artifact does not carry header.effective_config (live runs record it at the submit merge point).</p></div>`;
   }
   const entries = configEntries(config);
   if (!entries.length) return `<div class="pending"><strong>Effective config empty</strong><p>No per-key values were captured.</p></div>`;
