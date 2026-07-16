@@ -670,7 +670,7 @@ def test_mixed_organic_stage0_formula_routes_to_oxidized_offgas():
 
     sim.load_batch("comet", mass_kg=1000.0)
     inv = sim.inventory
-    expected_products, expected_o2 = sim._oxidized_stage0_products(
+    expected_products, expected_o2, _solid_char = sim._oxidized_stage0_products(
         "organics", inv.raw_components_kg["organics"])
 
     assert "organics" not in inv.gas_volatiles_kg
@@ -722,7 +722,7 @@ def test_stage0_complete_oxidation_routes_surplus_o2_to_stage0_terminal():
     )
 
     sim.load_batch("peroxide", mass_kg=1000.0)
-    products, oxidant_kg = sim._oxidized_stage0_products(
+    products, oxidant_kg, _solid_char = sim._oxidized_stage0_products(
         "h2o2", sim.inventory.raw_components_kg["h2o2"])
     stage0_o2_kg = products["O2"]
     snapshot = sim._make_snapshot()

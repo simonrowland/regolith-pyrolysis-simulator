@@ -62,6 +62,7 @@ from simulator.account_ids import (
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
+    SOLID_CHAR_CARBON_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.accounting import (
@@ -343,6 +344,7 @@ FLOW_MASS_ACCOUNTS = (
     'process.cleaned_melt',
     C7_AL_CREDIT_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    SOLID_CHAR_CARBON_ACCOUNT,
     'process.raw_feedstock',
     'process.condensation_train',
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
@@ -387,6 +389,17 @@ BACKEND_ACCOUNT_SCOPED_ONLY = (
     'process.overhead_gas',
 )
 OXYGEN_MOLAR_MASS_KG_PER_MOL = MOLAR_MASS[OXYGEN_SPECIES] / 1000.0
+# Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO
+# Ellingham line lies below Fe/FeO above ~700 C, so FeO + C -> Fe + CO is
+# thermodynamically favorable at melt temperatures. Algebra: 1:1 molar
+# (FeO + C = Fe + CO). Unit check: mol FeO * 0.055845 kg/mol = kg Fe.
+# Sanity: 1 t feed at 3.5 wt% C with Sephton floor f_refractory=0.39 yields
+# ~1.136 kmol char and at most ~63.5 kg Fe (owner brief ~80 kg Fe/t is the
+# CI-scale order-of-magnitude check, not a free threshold).
+FEO_CHAR_REDUCTION_MIN_T_C = 700.0
+CHAR_SPECIES = 'C'
+CHAR_LANCE_BASIS_CO2 = 'C_plus_O2_to_CO2'
+CHAR_LANCE_BASIS_CO = 'C_plus_half_O2_to_CO'
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
 OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
 OXYGEN_RESERVOIR_REDOX_SOURCE_MIN_FO2_LOG10_BAR = -1.0e11
@@ -937,6 +950,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         previous_carbonate_specs = self._stage0_carbonate_decomposition_specs
         previous_foulant_diagnostics = self._stage0_foulant_diagnostics
         self.species_formula_registry = self._registry_for_feedstock(fs)
+        # Must be set before _build_process_inventory so Stage-0 oxidation
+        # can look up the Sephton refractory-C partition for this feed.
+        self._batch_feedstock_key = str(feedstock_key)
         try:
             inventory = self._build_process_inventory(
                 fs, mass_value, feedstock_key=feedstock_key,
@@ -953,6 +969,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._stage0_carbon_cleanup_specs = []
         self._stage0_carbonate_decomposition_specs = []
         self._stage0_perchlorate_cleanup_specs = []
+        self._last_char_lance_diagnostic: Dict[str, Any] = {}
+        self._last_char_feo_reduction_diagnostic: Dict[str, Any] = {}
+        self._last_char_contamination_diagnostic: Dict[str, Any] = {}
         required_carbon_kg = self.inventory.carbon_reductant_required_kg
         if (
             required_carbon_kg > 1e-12
@@ -4685,6 +4704,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_authority=gate_authority,
         )
         target_delta_log10 = target_fO2_log - current_fO2_log
+        _char_basis, char_o2_per_c, _char_product = self._char_lance_basis()
+        char_o2_need_mol = self._solid_char_carbon_mol() * char_o2_per_c
         target_need_mol = 0.0
         reason = 'applied'
         actual_injected_mol = 0.0
@@ -4696,7 +4717,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         elif commanded_mol <= 0.0:
             reason = 'commanded_zero'
         elif target_delta_log10 <= 0.0:
-            reason = 'at_or_above_target'
+            actual_injected_mol = min(commanded_mol, char_o2_need_mol)
+            reason = (
+                'char_lance_only'
+                if actual_injected_mol > OXYGEN_RESERVOIR_NOOP_MOL
+                else 'at_or_above_target'
+            )
         elif C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
             requested_absorbed_mol = max(0.0, commanded_mol * eta_absorb)
             reason = 'no_melt_redox_capacity'
@@ -4718,6 +4744,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'applied_o2_mol': 0.0,
                 'internal_o2_capacity_mol': requested_absorbed_mol,
             }
+            actual_injected_mol = min(commanded_mol, char_o2_need_mol)
+            if actual_injected_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+                reason = 'char_lance_only_no_melt_redox_capacity'
         else:
             target_need_mol = max(
                 0.0,
@@ -4729,9 +4758,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 eta_for_cap = max(eta_absorb, 1.0e-12)
                 actual_injected_mol = min(
                     commanded_mol,
-                    target_need_mol / eta_for_cap,
+                    char_o2_need_mol + target_need_mol / eta_for_cap,
                 )
-                absorbed_mol = min(actual_injected_mol * eta_absorb, target_need_mol)
+                redox_injection_mol = max(
+                    0.0, actual_injected_mol - char_o2_need_mol
+                )
+                absorbed_mol = min(
+                    redox_injection_mol * eta_absorb, target_need_mol
+                )
                 passthrough_mol = max(0.0, actual_injected_mol - absorbed_mol)
                 if actual_injected_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
                     reason = 'below_threshold'
@@ -4744,12 +4778,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 passthrough_mol = actual_injected_mol
                 absorbed_mol = 0.0
                 reason = 'deferred_not_liquid'
+        char_o2_mol = 0.0
+        char_lance: Dict[str, Any] = {}
         if actual_injected_mol > OXYGEN_RESERVOIR_NOOP_MOL:
             self.atom_ledger.load_external_mol(
                 FO2_BUFFER_ACCOUNT,
                 {OXYGEN_SPECIES: actual_injected_mol},
                 source='external O2 bubbler injection',
             )
+            # t-325: O2-lance solid char FIRST (before Fe-redox absorption).
+            # Dose O2 available this hour is the injected buffer load; char
+            # claims it ahead of melt FeO/Fe2O3 respeciation.
+            char_lance = self._apply_char_lance_oxidation(
+                o2_available_mol=actual_injected_mol,
+            )
+            char_o2_mol = max(
+                0.0, float(char_lance.get('o2_consumed_mol', 0.0) or 0.0)
+            )
+            if char_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL and reason == 'applied':
+                reason = 'char_lance_then_fe_redox'
         if absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
             requested_absorbed_mol = absorbed_mol
             target_absorption_fO2_log = (
@@ -4841,7 +4888,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     absorption_respeciation.get('reason')
                     or 'fe_redox_respeciation_refused'
                 )
-        passthrough_mol = max(0.0, actual_injected_mol - absorbed_mol)
+        # Char-lanced O2 left via CO2/CO offgas, not as melt Fe-redox
+        # absorption or overhead passthrough.
+        total_sink_mol = absorbed_mol + char_o2_mol
+        passthrough_mol = max(0.0, actual_injected_mol - total_sink_mol)
         if passthrough_mol > OXYGEN_RESERVOIR_NOOP_MOL:
             transition_source, transition_meta = (
                 self._melt_redox_transition_provenance(gate_authority)
@@ -4850,7 +4900,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ChemistryIntent.OXYGEN_BUBBLER,
                 control_inputs={
                     'injected_mol': actual_injected_mol,
-                    'absorbed_mol': absorbed_mol,
+                    'absorbed_mol': total_sink_mol,
                     'passthrough_mol': passthrough_mol,
                     'source': 'redox_source:o2_bubbler',
                 },
@@ -4864,7 +4914,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
 
         injected_kg = actual_injected_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
-        absorbed_kg = absorbed_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        # Absorbed telemetry = Fe-redox + char-lance sinks (not passthrough).
+        absorbed_kg = total_sink_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
         passthrough_kg = passthrough_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
         self._o2_bubbler_injected_kg = injected_kg
         self._o2_bubbler_absorbed_kg = absorbed_kg
@@ -4900,13 +4951,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'melt_redox_capacity_mol_per_ln_fO2': C_m,
             'commanded_mol': commanded_mol,
             'target_need_mol': target_need_mol,
+            'char_o2_need_mol': char_o2_need_mol,
             'injected_mol': actual_injected_mol,
-            'absorbed_mol': absorbed_mol,
+            'absorbed_mol': total_sink_mol,
+            'fe_redox_absorbed_mol': absorbed_mol,
+            'char_lance_o2_mol': char_o2_mol,
             'passthrough_mol': passthrough_mol,
             'injected_kg': injected_kg,
             'absorbed_kg': absorbed_kg,
             'passthrough_kg': passthrough_kg,
             'absorption_respeciation': dict(absorption_respeciation),
+            'char_lance': dict(char_lance),
         }
         self._last_o2_bubbler_diagnostic = diagnostic
         return diagnostic
@@ -6757,9 +6812,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             terminal_melt_external,
             source=f'{label} cleaned melt',
         )
+        # Elemental C from refractory organic partition is credited by the
+        # complete_oxidation transition into process.solid_char_carbon;
+        # strip it from residual so raw_feedstock does not double-count.
+        residual_for_raw = dict(self.inventory.residual_components_kg)
+        residual_for_raw.pop(CHAR_SPECIES, None)
         self._load_ledger_account(
             'process.raw_feedstock',
-            self.inventory.residual_components_kg,
+            residual_for_raw,
             source=f'{label} Stage 0 residual',
         )
         self._load_ledger_account(
@@ -6890,6 +6950,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feedstock: Mapping[str, Any],
     ) -> Tuple[list[dict], Dict[str, float]]:
         entries = self._feedstock_formula_entries(feedstock)
+        feedstock_key = str(getattr(self, '_batch_feedstock_key', '') or '')
+        refractory_fraction = self._refractory_organic_c_fraction(
+            feedstock_key
+        )
         specs: list[dict] = []
         product_totals: Dict[str, float] = {}
         for species, entry in entries.items():
@@ -6899,15 +6963,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             kg = float(self.inventory.raw_components_kg.get(species, 0.0))
             if kg <= 1e-12:
                 continue
-            products_kg, oxidant_kg = self._oxidized_stage0_products(
-                species, kg)
-            if not products_kg:
+            f_refractory = (
+                refractory_fraction
+                if self._species_is_carbonaceous_organic_carrier(species)
+                else 0.0
+            )
+            products_kg, oxidant_kg, solid_char_c_kg = (
+                self._oxidized_stage0_products(
+                    species, kg, refractory_c_fraction=f_refractory
+                )
+            )
+            if not products_kg and solid_char_c_kg <= 1e-12:
                 continue
             specs.append({
                 'species': species,
                 'feed_kg': kg,
                 'products_kg': products_kg,
                 'oxidant_kg': oxidant_kg,
+                'solid_char_c_kg': solid_char_c_kg,
             })
             self._merge_masses(product_totals, products_kg)
         return specs, product_totals
@@ -6975,6 +7048,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'feed_kg': feed_kg,
                     'products_kg': products_kg,
                     'oxidant_kg': oxidant_kg,
+                    'solid_char_c_kg': float(
+                        spec.get('solid_char_c_kg') or 0.0
+                    ),
                 },
             )
 
@@ -8480,6 +8556,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             residual,
             self._unsupported_cleaned_melt_components(
                 feedstock, cleaned_melt_source, mass_kg))
+        # Solid char parked by _apply_stage0_offgas_chemistry so inventory
+        # mass closes; ledger credits process.solid_char_carbon via the
+        # complete_oxidation transition (seed strips C from raw_feedstock).
+        solid_char_park = dict(buckets.pop('_solid_char_carbon', {}) or {})
+        if solid_char_park:
+            self._merge_masses(residual, solid_char_park)
         stage0_mass_balance_delta_kg = self._add_stage0_balance_residue(
             residual,
             mass_kg,
@@ -8785,8 +8867,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         buckets: Dict[str, Dict[str, float]],
     ) -> Dict[str, float]:
         entries = self._feedstock_formula_entries(feedstock)
+        feedstock_key = str(getattr(self, '_batch_feedstock_key', '') or '')
+        refractory_fraction = self._refractory_organic_c_fraction(
+            feedstock_key
+        )
         external_inputs: Dict[str, float] = {}
         gas_bucket = buckets.get('gas_volatiles', {})
+        # residual_components is assembled later; park solid char in a
+        # dedicated side map that _build_process_inventory merges into
+        # residual_components_kg after classification.
+        solid_char_park = buckets.setdefault('_solid_char_carbon', {})
         for species, kg in list(gas_bucket.items()):
             entry = entries.get(species)
             if not entry:
@@ -8794,18 +8884,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mode = str(entry.get('offgas_mode', '')).lower()
             if mode not in {'complete_oxidation', 'oxidized'}:
                 continue
-            products_kg, oxidant_kg = self._oxidized_stage0_products(
-                species, kg)
+            f_refractory = (
+                refractory_fraction
+                if self._species_is_carbonaceous_organic_carrier(species)
+                else 0.0
+            )
+            products_kg, oxidant_kg, solid_char_c_kg = (
+                self._oxidized_stage0_products(
+                    species, kg, refractory_c_fraction=f_refractory
+                )
+            )
             gas_bucket.pop(species, None)
             self._merge_masses(gas_bucket, products_kg)
+            if solid_char_c_kg > 1e-12:
+                solid_char_park[CHAR_SPECIES] = (
+                    solid_char_park.get(CHAR_SPECIES, 0.0) + solid_char_c_kg
+                )
             if oxidant_kg > 0.0:
                 external_inputs['O2'] = (
                     external_inputs.get('O2', 0.0) + oxidant_kg)
         return external_inputs
 
     def _oxidized_stage0_products(
-        self, species: str, kg: float
-    ) -> Tuple[Dict[str, float], float]:
+        self,
+        species: str,
+        kg: float,
+        *,
+        refractory_c_fraction: float = 0.0,
+    ) -> Tuple[Dict[str, float], float, float]:
+        """Complete-oxidation products with optional refractory-C withhold.
+
+        Premise: Sephton 2004 (REF-024) partitions organic C into labile
+        and refractory shares. Labile C oxidizes to CO2; refractory C is
+        retained as elemental solid char (process.solid_char_carbon).
+        Algebra: labile_C = total_C * (1 - f); CO2_mol = labile_C;
+        solid_C_mol = total_C * f; O2 demand uses labile C only.
+        Unit check: mol * kg/mol -> kg. Sanity: f=0 recovers the pre-t-325
+        full-oxidation products; f=0.39 on CI organics withholds ~11.5 kg C/t.
+        """
         formula = resolve_species_formula(species, self.species_formula_registry)
         species_mol = float(kg) / formula.molar_mass_kg_per_mol()
         atom_mol = formula.atom_moles(species_mol)
@@ -8822,14 +8938,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         nitrogen_mol = atom_mol.get('N', 0.0)
         feed_oxygen_mol = atom_mol.get('O', 0.0)
 
-        if carbon_mol > 0.0:
-            products_mol['CO2'] = carbon_mol
+        f_ref = max(0.0, min(1.0, float(refractory_c_fraction)))
+        if not math.isfinite(f_ref):
+            f_ref = 0.0
+        refractory_c_mol = carbon_mol * f_ref
+        labile_c_mol = max(0.0, carbon_mol - refractory_c_mol)
+
+        if labile_c_mol > 0.0:
+            products_mol['CO2'] = labile_c_mol
         if hydrogen_mol > 0.0:
             products_mol['H2O'] = hydrogen_mol / 2.0
         if nitrogen_mol > 0.0:
             products_mol['N2'] = nitrogen_mol / 2.0
 
-        product_oxygen_mol = 2.0 * carbon_mol + hydrogen_mol / 2.0
+        # O demand for labile CO2 + H2O only; solid char carries no O.
+        product_oxygen_mol = 2.0 * labile_c_mol + hydrogen_mol / 2.0
         oxygen_deficit_mol = product_oxygen_mol - feed_oxygen_mol
         oxidant_o2_mol = max(0.0, oxygen_deficit_mol / 2.0)
         if oxygen_deficit_mol < -1e-12:
@@ -8845,7 +8968,232 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         oxidant_kg = oxidant_o2_mol * resolve_species_formula(
             'O2', self.species_formula_registry).molar_mass_kg_per_mol()
-        return products_kg, oxidant_kg
+        solid_char_c_kg = refractory_c_mol * resolve_species_formula(
+            CHAR_SPECIES, self.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        return products_kg, oxidant_kg, solid_char_c_kg
+
+    def _refractory_organic_c_fraction(self, feedstock_key: str) -> float:
+        """Return Sephton-floor (or iom_anchor) f_refractory for feedstock."""
+        if not feedstock_key:
+            return 0.0
+        partition_row = (
+            self._load_carbon_partition_config()
+            .get('phase_partitions', {})
+            .get(feedstock_key, {})
+            or {}
+        )
+        refractory = dict(partition_row.get('f_refractory_organic_C') or {})
+        value = refractory.get('floor')
+        if value is None:
+            value = refractory.get('iom_anchor')
+        if value is None:
+            return 0.0
+        fraction = float(value)
+        if not math.isfinite(fraction) or fraction < 0.0 or fraction > 1.0:
+            return 0.0
+        return fraction
+
+    @staticmethod
+    def _species_is_carbonaceous_organic_carrier(species: str) -> bool:
+        key = str(species or '').strip().lower()
+        return key in {
+            'c',
+            'carbon_content',
+            'carbonaceous_organic',
+            'organics',
+            'hydrocarbons',
+            'organics_hydrocarbons',
+            'generic_carbonaceous_organic',
+        }
+
+    def _char_lance_basis(self) -> tuple[str, float, str]:
+        """Configured O2-lance oxidation basis: (name, O2_per_C_mol, product).
+
+        Default C + O2 -> CO2 under an O2 lance (1 mol O2 / mol C). CO
+        basis is available when data/stage0_carbon_partition.yaml sets
+        lance_oxidation.basis = C_plus_half_O2_to_CO.
+        """
+        lance = (
+            self._load_carbon_partition_config().get('lance_oxidation') or {}
+        )
+        basis = str(lance.get('basis') or CHAR_LANCE_BASIS_CO2)
+        if basis == CHAR_LANCE_BASIS_CO:
+            return basis, 0.5, 'CO'
+        if basis == CHAR_LANCE_BASIS_CO2:
+            return basis, 1.0, 'CO2'
+        raise ValueError(f'unsupported char lance oxidation basis: {basis!r}')
+
+    def _solid_char_carbon_mol(self) -> float:
+        return max(
+            0.0,
+            float(
+                self.atom_ledger.mol_by_account(
+                    SOLID_CHAR_CARBON_ACCOUNT
+                ).get(CHAR_SPECIES, 0.0)
+                or 0.0
+            ),
+        )
+
+    def _apply_char_lance_oxidation(
+        self, *, o2_available_mol: float
+    ) -> Dict[str, Any]:
+        """Oxidize solid char with bubbler O2 (lance-first claim)."""
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_CHAR_LANCE_OXIDATION,
+        )
+
+        char_mol = self._solid_char_carbon_mol()
+        o2_mol = max(0.0, float(o2_available_mol))
+        basis_name, o2_per_c, product = self._char_lance_basis()
+        diagnostic: Dict[str, Any] = {
+            'status': 'ok',
+            'basis': basis_name,
+            'o2_per_c_mol': o2_per_c,
+            'product_species': product,
+            'char_c_mol_before': char_mol,
+            'o2_available_mol': o2_mol,
+            'o2_consumed_mol': 0.0,
+            'extent_mol': 0.0,
+        }
+        if char_mol <= 1e-12 or o2_mol <= 1e-12:
+            diagnostic['status'] = 'skipped'
+            diagnostic['reason'] = 'no_char_or_o2'
+            self._last_char_lance_diagnostic = diagnostic
+            return diagnostic
+        result = self._dispatch_and_commit(
+            ChemistryIntent.STAGE0_PRETREATMENT,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_CHAR_LANCE_OXIDATION,
+                'char_c_mol': char_mol,
+                'o2_mol': o2_mol,
+                'o2_per_c_mol': o2_per_c,
+                'product_species': product,
+            },
+        )
+        diag = dict(result.diagnostic or {})
+        diagnostic.update({
+            'o2_consumed_mol': float(diag.get('o2_consumed_mol', 0.0) or 0.0),
+            'extent_mol': float(diag.get('extent_mol', 0.0) or 0.0),
+            'char_c_mol_after': self._solid_char_carbon_mol(),
+            'provider_status': result.status,
+        })
+        self._last_char_lance_diagnostic = diagnostic
+        return diagnostic
+
+    def _apply_char_feo_reduction(self) -> Dict[str, Any]:
+        """Equilibrium-limited FeO + C -> Fe + CO when T exceeds Ellingham gate."""
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_CHAR_FEO_REDUCTION,
+        )
+
+        T_C = float(self.melt.temperature_C)
+        char_mol = self._solid_char_carbon_mol()
+        feo_mol = max(
+            0.0,
+            float(
+                self.atom_ledger.mol_by_account('process.cleaned_melt').get(
+                    'FeO', 0.0
+                )
+                or 0.0
+            ),
+        )
+        diagnostic: Dict[str, Any] = {
+            'status': 'ok',
+            'temperature_C': T_C,
+            'min_T_C': FEO_CHAR_REDUCTION_MIN_T_C,
+            'char_c_mol_before': char_mol,
+            'feo_mol_before': feo_mol,
+            'extent_mol': 0.0,
+            'fe_product_mol': 0.0,
+            'co_product_mol': 0.0,
+        }
+        diagnostic['contamination_risk'] = (
+            self._update_char_contamination_diagnostic()
+        )
+        if T_C + 1e-9 < FEO_CHAR_REDUCTION_MIN_T_C:
+            diagnostic['status'] = 'skipped'
+            diagnostic['reason'] = 'below_ellingham_crossover_T'
+            self._last_char_feo_reduction_diagnostic = diagnostic
+            return diagnostic
+        if char_mol <= 1e-12 or feo_mol <= 1e-12:
+            diagnostic['status'] = 'skipped'
+            diagnostic['reason'] = 'no_char_or_feo'
+            self._last_char_feo_reduction_diagnostic = diagnostic
+            return diagnostic
+        result = self._dispatch_and_commit(
+            ChemistryIntent.STAGE0_PRETREATMENT,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_CHAR_FEO_REDUCTION,
+                'char_c_mol': char_mol,
+                'feo_mol': feo_mol,
+            },
+        )
+        diag = dict(result.diagnostic or {})
+        extent = float(diag.get('extent_mol', 0.0) or 0.0)
+        diagnostic.update({
+            'extent_mol': extent,
+            'fe_product_mol': extent,
+            'co_product_mol': extent,
+            'char_c_mol_after': self._solid_char_carbon_mol(),
+            'provider_status': result.status,
+            'kinetics': diag.get('kinetics'),
+            'kinetics_justification': diag.get('kinetics_justification'),
+        })
+        if extent > 1e-12:
+            self._project_cleaned_melt_from_atom_ledger()
+        self._last_char_feo_reduction_diagnostic = diagnostic
+        return diagnostic
+
+    def _update_char_contamination_diagnostic(self) -> Dict[str, Any]:
+        """WARN-only: un-lanced char can reduce P/Cr/Ti and form carbides.
+
+        Thresholds are thermodynamic-onset (positive surviving char with
+        susceptible melt inventory), not selectivity model. Full P/Cr/Ti
+        competition and carbide speciation remain future work.
+        """
+        char_mol = self._solid_char_carbon_mol()
+        melt = self.atom_ledger.mol_by_account('process.cleaned_melt')
+        susceptible = {
+            species: max(0.0, float(melt.get(species, 0.0) or 0.0))
+            for species in ('P2O5', 'Cr2O3', 'TiO2')
+        }
+        present = {
+            species: mol for species, mol in susceptible.items() if mol > 1e-12
+        }
+        warning = None
+        status = 'OK'
+        if char_mol > 1e-12:
+            status = 'WARN'
+            warning = (
+                'WARNING: un-lanced solid char can reduce melt P/Cr/Ti oxides '
+                'where present and form metal carbides (positive-char onset; '
+                'no selectivity model applied).'
+            )
+        diagnostic = {
+            'status': status,
+            'diagnostic_only': True,
+            'warning': warning,
+            'p_cr_ti_reduction_status': (
+                'WARN' if char_mol > 1e-12 and present else 'OK'
+            ),
+            'carbide_risk_status': 'WARN' if char_mol > 1e-12 else 'OK',
+            'surviving_char_C_mol': char_mol,
+            'susceptible_melt_mol': present,
+            'threshold_basis': (
+                'thermodynamic-onset: positive surviving char; susceptible '
+                'P2O5/Cr2O3/TiO2 inventory reported separately'
+            ),
+            'threshold_source': (
+                'Ellingham oxide stability vs C/CO; no sourced safe residual '
+                'char allowance for P/Cr/Ti selectivity'
+            ),
+            'out_of_scope': (
+                'vacuum SiO2+C->SiO(g); full selectivity/carbide speciation'
+            ),
+        }
+        self._last_char_contamination_diagnostic = diagnostic
+        return diagnostic
 
     def _decompose_stage0_carbonates(
         self,
@@ -10802,6 +11150,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._establish_melt_redox_gate_authority_for_current_hour()
         self._apply_oxygen_reservoir_exchange()
         self._apply_o2_bubbler()
+        # t-325: un-lanced solid char reduces melt FeO at T >= 700 C
+        # (Ellingham C/CO vs Fe/FeO). Equilibrium-limited one-step.
+        self._apply_char_feo_reduction()
 
         c3_shuttle_campaign = self.melt.campaign in (
             CampaignPhase.C3_K, CampaignPhase.C3_NA,

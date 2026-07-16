@@ -77,6 +77,15 @@ def test_ci_c0_sufficient_lance_clears_warning_on_both_oxidation_bases() -> None
     execution = RunExecutor().execute(run._session_config())
     execution.snapshots[0].o2_bubbler_injected_kg = 40.0
     execution.snapshots[0].o2_bubbler_absorbed_kg = 40.0
+    char_mol = execution.simulator._solid_char_carbon_mol()
+    execution.simulator.atom_ledger.load_external_mol(
+        "reservoir.fo2_buffer",
+        {"O2": char_mol},
+        source="test sufficient lance",
+    )
+    execution.simulator._apply_char_lance_oxidation(
+        o2_available_mol=char_mol
+    )
     ledger_before = execution.simulator.atom_ledger.mol_by_account()
     diagnostic = _c0_char_diagnostic(
         execution.simulator,
