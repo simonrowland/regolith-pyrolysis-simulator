@@ -26,11 +26,13 @@ from __future__ import annotations
 import importlib
 import importlib.metadata
 import math
+import multiprocessing
 import os
 import re
 import signal
 import subprocess
 import tempfile
+import traceback
 import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
@@ -64,6 +66,9 @@ from simulator.physical_constants import GAS_CONSTANT
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
 ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR = 1.0e-6
 ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
+# 20s is the established per-solve subprocess budget; bracket searches apply
+# it independently to each native call rather than treating it as a run budget.
+ALPHAMELTS_DEFAULT_TIMEOUT_S = 20.0
 MELTS_OXIDE_BASIS = (
     'SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MgO', 'CaO',
     'Na2O', 'K2O', 'Cr2O3', 'MnO', 'P2O5', 'NiO', 'CoO',
@@ -184,6 +189,24 @@ class AlphaMELTSSubprocessContractError(MeltBackendError):
     """Typed failure for subprocess request/output contract violations."""
 
 
+class AlphaMELTSConfigurationError(ValueError):
+    """Typed failure for invalid AlphaMELTS backend configuration."""
+
+
+def _validated_timeout_s(value: object) -> float:
+    try:
+        timeout_s = float(value)
+    except (TypeError, ValueError) as exc:
+        raise AlphaMELTSConfigurationError(
+            'AlphaMELTS timeout_s must be finite and positive'
+        ) from exc
+    if not math.isfinite(timeout_s) or timeout_s <= 0.0:
+        raise AlphaMELTSConfigurationError(
+            'AlphaMELTS timeout_s must be finite and positive'
+        )
+    return timeout_s
+
+
 def _alphamelts_backend_failure_category(reason_code: str,
                                          backend_status: str | None = None
                                          ) -> str | None:
@@ -264,6 +287,40 @@ def _normalize_subprocess_run_mode(
             ALPHAMELTS_REASON_RUN_MODE_INVALID,
             repr(value),
         ) from exc
+
+
+def _run_petthermotools_worker(
+    connection,
+    operation: str,
+    model_code: int,
+    args: tuple,
+    kwargs: dict,
+) -> None:
+    """Run one PetThermoTools native call in a killable child process."""
+    try:
+        try:
+            module = importlib.import_module('petthermotools')
+        except ImportError:
+            module = importlib.import_module('PetThermoTools')
+        call_kwargs = dict(kwargs)
+        if operation in {'equilibrate_MELTS', 'findLiq_MELTS'}:
+            loader = getattr(module, 'MELTSdynamic', None)
+            if loader is None:
+                meltsdynamic = importlib.import_module('meltsdynamic')
+                loader = getattr(meltsdynamic, 'MELTSdynamic', None)
+            if loader is None:
+                raise ImportError('MELTSdynamic loader not found')
+            call_kwargs['melts'] = loader(model_code)
+        function = getattr(module, operation)
+        connection.send(('ok', function(*args, **call_kwargs)))
+    except BaseException as exc:  # pragma: no cover - child/native boundary
+        connection.send((
+            'error', type(exc).__name__, str(exc), traceback.format_exc(),
+        ))
+    finally:
+        connection.close()
+
+
 PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'All', 'Mass', 'Volume', 'rho', 'Conditions', 'Input', 'Affinity',
     'Activities', 'activities', 'activity_coefficients',
@@ -333,7 +390,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._fo2_offset: Optional[float] = None
         self._fe3fet_ratio: Optional[float] = None
         self._model = 'MELTSv1.0.2'
-        self._timeout_s = 20.0
+        self._timeout_s = ALPHAMELTS_DEFAULT_TIMEOUT_S
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None
         self._subprocess_vapor_pressure_provider = None
@@ -366,7 +423,9 @@ class _MELTSBackendSupport(MeltBackend):
         self._fe3fet_ratio = self._normalize_fe3fet_ratio(
             config.get('Fe3Fet_Liq', config.get('fe3fet_ratio')))
         self._model = str(config.get('model', self._model))
-        self._timeout_s = float(config.get('timeout_s', self._timeout_s))
+        self._timeout_s = _validated_timeout_s(
+            config.get('timeout_s', ALPHAMELTS_DEFAULT_TIMEOUT_S)
+        )
         self._vapor_transport_pO2_bar = float(
             config.get(
                 'vapor_transport_pO2_bar',
@@ -560,7 +619,10 @@ class _MELTSBackendSupport(MeltBackend):
                 'PetThermoTools compiled MELTS payload missing: '
                 'MELTSdynamic loader not found'
             )
-        self._pet_melts = loader(self._melts_model_code())
+        # Keep only the loader capability marker in the simulator process.
+        # Constructing MELTSdynamic invokes native code, so the actual payload
+        # is created by _run_petthermotools_worker behind its hard deadline.
+        self._pet_melts = loader
         self._pet_payload_preloaded = True
 
     def _melts_model_code(self) -> int:
@@ -1616,14 +1678,16 @@ class _MELTSBackendSupport(MeltBackend):
                     warnings=warnings,
                 )
             )
-            results = ptt.equilibrate_MELTS(
-                Model=self._model,
-                P_bar=solved_pressure_bar,
-                T_C=temperature_C,
-                comp=ptt_comp,
-                fO2_buffer=self._redox_buffer,
-                fO2_offset=self._fo2_offset,
-                melts=self._pet_melts,
+            results = self._run_petthermotools_isolated(
+                'equilibrate_MELTS',
+                kwargs={
+                    'Model': self._model,
+                    'P_bar': solved_pressure_bar,
+                    'T_C': temperature_C,
+                    'comp': ptt_comp,
+                    'fO2_buffer': self._redox_buffer,
+                    'fO2_offset': self._fo2_offset,
+                },
             )
             eq = self._parse_petthermotools_result(
                 results,
@@ -1685,7 +1749,7 @@ class _MELTSBackendSupport(MeltBackend):
 
             return self._fail_closed_on_clamped_operating_point(eq)
 
-        except ImportError:
+        except (ImportError, AlphaMELTSSubprocessContractError):
             self._mode = None
             raise
         except Exception as e:
@@ -1701,6 +1765,73 @@ class _MELTSBackendSupport(MeltBackend):
         if self._pet_module is None:
             raise ImportError('PetThermoTools module not initialized')
         return self._pet_module
+
+    def _run_petthermotools_isolated(
+        self,
+        operation: str,
+        *,
+        args: tuple = (),
+        kwargs: Optional[Mapping[str, object]] = None,
+    ):
+        """Execute a native PetThermoTools operation behind a hard deadline."""
+        timeout_s = _validated_timeout_s(self._timeout_s)
+        context = multiprocessing.get_context('spawn')
+        parent, child = context.Pipe(duplex=True)
+        process = context.Process(
+            target=_run_petthermotools_worker,
+            args=(
+                child,
+                operation,
+                self._melts_model_code(),
+                tuple(args),
+                dict(kwargs or {}),
+            ),
+            daemon=True,
+        )
+        try:
+            process.start()
+        except Exception as exc:
+            child.close()
+            parent.close()
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_SUBPROCESS_DIED,
+                f'PetThermoTools {operation} worker failed to start: {exc}',
+            ) from exc
+        child.close()
+        try:
+            if not parent.poll(timeout_s):
+                raise _alphamelts_backend_failure_error(
+                    ALPHAMELTS_REASON_TIMEOUT,
+                    f'PetThermoTools {operation} exceeded hard timeout of '
+                    f'{timeout_s:g}s',
+                )
+            try:
+                message = parent.recv()
+            except (EOFError, OSError) as exc:
+                raise _alphamelts_backend_failure_error(
+                    ALPHAMELTS_REASON_SUBPROCESS_DIED,
+                    f'PetThermoTools {operation} worker exited without a result',
+                ) from exc
+        finally:
+            parent.close()
+            process.join(timeout=0.25)
+            if process.is_alive():
+                process.terminate()
+                process.join(timeout=0.25)
+            if process.is_alive():
+                process.kill()
+                process.join(timeout=1.0)
+        if message[0] == 'ok':
+            return message[1]
+        _tag, exc_name, detail, child_traceback = message
+        if exc_name == 'ImportError':
+            raise ImportError(
+                f'PetThermoTools {operation} failed: {detail}\n'
+                f'{child_traceback}'
+            )
+        raise RuntimeError(
+            f'PetThermoTools {operation} failed: {detail}\n{child_traceback}'
+        )
 
     def _to_petthermotools_liq_comp(self, comp_wt: Mapping[str, float]) -> dict:
         feot = float(comp_wt.get('FeO', 0.0)) + (
@@ -1834,29 +1965,36 @@ class _MELTSBackendSupport(MeltBackend):
         find_liq = getattr(ptt, 'findLiq', None)
         try:
             if callable(find_liq_melts):
-                raw = find_liq_melts(
-                    P_bar=max(pressure_bar, 1e-6),
-                    Model=self._model,
-                    T_C_init=float(seed_T_C),
-                    comp=ptt_comp,
-                    melts=self._pet_melts,
-                    fO2_buffer=self._redox_buffer,
-                    fO2_offset=self._fo2_offset,
-                    Step=50.0,
+                raw = self._run_petthermotools_isolated(
+                    'findLiq_MELTS',
+                    kwargs={
+                        'P_bar': max(pressure_bar, 1e-6),
+                        'Model': self._model,
+                        'T_C_init': float(seed_T_C),
+                        'comp': ptt_comp,
+                        'fO2_buffer': self._redox_buffer,
+                        'fO2_offset': self._fo2_offset,
+                        'Step': 50.0,
+                    },
                 )
             elif callable(find_liq):
-                raw = find_liq(
-                    None,
-                    0,
-                    Model=self._model,
-                    P_bar=max(pressure_bar, 1e-6),
-                    T_initial_C=float(seed_T_C),
-                    comp=ptt_comp,
-                    fO2_buffer=self._redox_buffer,
-                    fO2_offset=self._fo2_offset,
+                raw = self._run_petthermotools_isolated(
+                    'findLiq',
+                    args=(None, 0),
+                    kwargs={
+                        'Model': self._model,
+                        'P_bar': max(pressure_bar, 1e-6),
+                        'T_initial_C': float(seed_T_C),
+                        'comp': ptt_comp,
+                        'fO2_buffer': self._redox_buffer,
+                        'fO2_offset': self._fo2_offset,
+                    },
                 )
             else:
                 return None, ('PetThermoTools findLiq API not found',)
+        except (ImportError, AlphaMELTSSubprocessContractError):
+            self._mode = None
+            raise
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
             return None, (f'PetThermoTools findLiq failed: {exc}',)
         return self._extract_temperature_C(raw), ()
@@ -1982,9 +2120,11 @@ class _MELTSBackendSupport(MeltBackend):
             # Run alphaMELTS directly. The alphaMELTS 2 app runner only
             # emits *_tbl.txt for path-style runs; single-point equilibria
             # report the stable phase assemblage on stdout.
-            timeout_s = getattr(self, '_timeout_s', 20.0)
-            if timeout_s is None:
-                timeout_s = 20.0
+            timeout_s = _validated_timeout_s(getattr(
+                self,
+                '_timeout_s',
+                ALPHAMELTS_DEFAULT_TIMEOUT_S,
+            ))
             try:
                 result = subprocess.run(
                     [str(binary), '1'],
@@ -3598,17 +3738,24 @@ class _MELTSBackendSupport(MeltBackend):
             raise AttributeError(
                 'PetThermoTools isothermal_decompression API not found'
             )
-        results = ptt.isothermal_decompression(
-            Model=self._model,
-            bulk=ptt_comp,
-            T_C=T_C,
-            P_start_bar=P_start_bar,
-            P_end_bar=P_end_bar,
-            dp_bar=dp_bar,
-            fO2_buffer=self._redox_buffer,
-            fO2_offset=self._fo2_offset,
-            multi_processing=False,
-        )
+        try:
+            results = self._run_petthermotools_isolated(
+                'isothermal_decompression',
+                kwargs={
+                    'Model': self._model,
+                    'bulk': ptt_comp,
+                    'T_C': T_C,
+                    'P_start_bar': P_start_bar,
+                    'P_end_bar': P_end_bar,
+                    'dp_bar': dp_bar,
+                    'fO2_buffer': self._redox_buffer,
+                    'fO2_offset': self._fo2_offset,
+                    'multi_processing': False,
+                },
+            )
+        except Exception:
+            self._mode = None
+            raise
         if isinstance(results, Mapping) and all(
             isinstance(value, Mapping) for value in results.values()
         ):

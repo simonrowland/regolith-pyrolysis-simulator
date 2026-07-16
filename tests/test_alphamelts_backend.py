@@ -35,6 +35,7 @@ from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_REASON_TIMEOUT,
     ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
     AlphaMELTSBackend,
+    AlphaMELTSConfigurationError,
     AlphaMELTSSubprocessContractError,
     AlphaMELTSSubprocessRunMode,
     activity_from_chem_potential,
@@ -46,6 +47,7 @@ from simulator.melt_backend.base import (
 )
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
 from engines.alphamelts.thermoengine import (
+    ThermoEngineIsolationError,
     ThermoEnginePayload,
     ThermoEngineTransport,
 )
@@ -129,6 +131,30 @@ def test_alphamelts_python_liquidus_finder_uses_findliq_gate():
     assert result.status == 'ok'
     assert result.solidus_T_C == pytest.approx(1000.0, abs=1.0)
     assert result.liquidus_T_C == pytest.approx(1300.0, abs=1.0)
+
+
+def test_alphamelts_python_liquidus_timeout_marks_backend_unavailable():
+    backend = AlphaMELTSBackend()
+    backend._mode = 'python_api'
+    backend._pet_module = types.SimpleNamespace(
+        findLiq_MELTS=lambda **_kwargs: None
+    )
+    backend._pet_payload_preloaded = True
+    backend._pet_melts = object()
+
+    def raise_timeout(*_args, **_kwargs):
+        raise AlphaMELTSSubprocessContractError('timed out')
+
+    backend._run_petthermotools_isolated = raise_timeout
+
+    with pytest.raises(AlphaMELTSSubprocessContractError):
+        backend._find_petthermotools_liquidus_C(
+            _melts_domain_composition(),
+            pressure_bar=1.0,
+            seed_T_C=1200.0,
+        )
+
+    assert backend.is_available() is False
 
 
 @pytest.mark.parametrize(
@@ -1023,11 +1049,6 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     backend._mode = 'python_api'
     seen = {}
 
-    class FakePetThermoTools:
-        def equilibrate_MELTS(self, **kwargs):
-            seen.update(kwargs)
-            return {'ok': True}
-
     def fake_parse(
         results,
         *,
@@ -1055,7 +1076,14 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     monkeypatch.setattr(
         backend,
         '_require_petthermotools_runtime',
-        lambda: FakePetThermoTools(),
+        lambda: object(),
+    )
+    monkeypatch.setattr(
+        backend,
+        '_run_petthermotools_isolated',
+        lambda operation, *, kwargs: (
+            seen.update(operation=operation, **kwargs) or {'ok': True}
+        ),
     )
     monkeypatch.setattr(backend, '_parse_petthermotools_result', fake_parse)
     monkeypatch.setattr(
@@ -1072,6 +1100,7 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     )
 
     assert seen['P_bar'] == pytest.approx(1e-6)
+    assert seen['operation'] == 'equilibrate_MELTS'
     assert result.temperature_C == pytest.approx(1600.0)
     assert result.pressure_bar == pytest.approx(1e-6)
     assert result.diagnostics['operating_point_clamped'] is True
@@ -1197,6 +1226,132 @@ def test_alphamelts_subprocess_timeout_stays_loud_without_mode_flip(monkeypatch)
     assert backend._mode == 'subprocess'
 
 
+def test_alphamelts_python_native_hang_is_killed_and_marks_unavailable(
+    monkeypatch,
+):
+    events = []
+
+    class FakeConnection:
+        def poll(self, timeout):
+            events.append(('poll', timeout))
+            return False
+
+        def recv(self):
+            raise AssertionError('timed-out worker must not be read')
+
+        def close(self):
+            events.append(('close',))
+
+    class FakeProcess:
+        alive = True
+
+        def start(self):
+            events.append(('start',))
+
+        def join(self, timeout):
+            events.append(('join', timeout))
+
+        def is_alive(self):
+            return self.alive
+
+        def terminate(self):
+            events.append(('terminate',))
+
+        def kill(self):
+            events.append(('kill',))
+            self.alive = False
+
+    class FakeContext:
+        def Pipe(self, duplex):
+            assert duplex is True
+            return FakeConnection(), FakeConnection()
+
+        def Process(self, **kwargs):
+            assert kwargs['daemon'] is True
+            return FakeProcess()
+
+    backend = AlphaMELTSBackend()
+    backend._mode = 'python_api'
+    backend._pet_payload_preloaded = True
+    backend._pet_melts = object()
+    backend._pet_module = types.SimpleNamespace()
+    backend._timeout_s = 3.5
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.multiprocessing.get_context',
+        lambda method: FakeContext() if method == 'spawn' else None,
+    )
+
+    with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
+        backend._equilibrate_python(
+            450.0,
+            _melts_domain_composition(),
+            -9.0,
+            0.01,
+        )
+
+    assert excinfo.value.backend_failure_reason_code == ALPHAMELTS_REASON_TIMEOUT
+    assert excinfo.value.backend_failure_category == 'not_converged'
+    assert backend.is_available() is False
+    assert ('poll', 3.5) in events
+    assert [event[0] for event in events][-5:] == [
+        'join', 'terminate', 'join', 'kill', 'join',
+    ]
+
+
+def test_alphamelts_python_worker_start_failure_closes_pipes(monkeypatch):
+    events = []
+
+    class FakeConnection:
+        def close(self):
+            events.append('close')
+
+    class FakeProcess:
+        def start(self):
+            raise OSError('spawn unavailable')
+
+    class FakeContext:
+        def Pipe(self, duplex):
+            assert duplex is True
+            return FakeConnection(), FakeConnection()
+
+        def Process(self, **kwargs):
+            assert kwargs['daemon'] is True
+            return FakeProcess()
+
+    backend = AlphaMELTSBackend()
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.multiprocessing.get_context',
+        lambda method: FakeContext() if method == 'spawn' else None,
+    )
+
+    with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
+        backend._run_petthermotools_isolated('equilibrate_MELTS')
+
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_SUBPROCESS_DIED
+    )
+    assert events == ['close', 'close']
+
+
+def test_alphamelts_python_worker_revalidates_timeout_before_spawn(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._timeout_s = math.inf
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.multiprocessing.get_context',
+        lambda _method: (_ for _ in ()).throw(
+            AssertionError('invalid timeout must refuse before worker spawn')
+        ),
+    )
+
+    with pytest.raises(
+        AlphaMELTSConfigurationError,
+        match='timeout_s.*finite and positive',
+    ):
+        backend._run_petthermotools_isolated('equilibrate_MELTS')
+
+
 def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
     backend = AlphaMELTSBackend()
     monkeypatch.setattr(
@@ -1228,6 +1383,28 @@ def test_alphamelts_subprocess_uses_configured_timeout(monkeypatch):
     )
     assert seen['timeout'] == 37.5
     assert backend._mode == 'subprocess'
+
+
+@pytest.mark.parametrize(
+    'timeout_s',
+    [math.inf, -math.inf, math.nan, 0.0, -1.0],
+)
+def test_alphamelts_timeout_config_must_be_finite_and_positive(
+    monkeypatch,
+    timeout_s,
+):
+    backend = AlphaMELTSBackend()
+    monkeypatch.setattr(
+        backend,
+        '_find_project_binary',
+        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+    )
+
+    with pytest.raises(
+        AlphaMELTSConfigurationError,
+        match='timeout_s.*finite and positive',
+    ):
+        backend.initialize({'mode': 'subprocess', 'timeout_s': timeout_s})
 
 
 def test_alphamelts_subprocess_missing_binary_is_loud_and_disables_mode(monkeypatch):
@@ -1460,6 +1637,23 @@ def test_alphamelts_initialize_requires_petthermotools_payload(monkeypatch):
 
     with pytest.raises(ImportError, match='PetThermoTools Python path unavailable'):
         backend.initialize({'mode': 'python_api'})
+
+
+def test_alphamelts_petthermotools_loader_is_not_constructed_in_process():
+    backend = AlphaMELTSBackend()
+    calls = []
+
+    def fake_loader(model_code):
+        calls.append(model_code)
+        return object()
+
+    backend._preload_petthermotools_payload(
+        types.SimpleNamespace(MELTSdynamic=fake_loader)
+    )
+
+    assert calls == []
+    assert backend._pet_melts is fake_loader
+    assert backend._pet_payload_preloaded is True
 
 
 def test_alphamelts_require_petthermotools_does_not_use_subprocess(monkeypatch):
@@ -2760,7 +2954,27 @@ def test_thermoengine_activity_extractor_uses_mu_minus_mu0():
     })
 
 
-def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
+def test_thermoengine_equilibrate_refuses_in_process_fallback(monkeypatch):
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    monkeypatch.setattr(
+        transport,
+        '_equilibrate_in_process',
+        lambda **_kwargs: (_ for _ in ()).throw(
+            AssertionError('in-process fallback called')
+        ),
+    )
+
+    with pytest.raises(ThermoEngineIsolationError, match='isolated worker'):
+        transport.equilibrate(
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            comp_wt={'SiO2': 50.0},
+        )
+
+
+def test_thermoengine_private_in_process_equilibrate_parses_payload(monkeypatch):
     class FakeMelts:
         bulk_wt: dict[str, float] | None = None
 
@@ -2849,7 +3063,7 @@ def test_thermoengine_public_equilibrate_runs_in_process(monkeypatch):
 
     monkeypatch.setattr('engines.alphamelts.thermoengine.subprocess.run', fail_run)
 
-    result = transport.equilibrate(
+    result = transport._equilibrate_in_process(
         temperature_C=1200.0,
         pressure_bar=1.0,
         comp_wt={'SiO2': 50.0, 'Al2O3': 0.0},
@@ -3125,7 +3339,9 @@ def test_thermoengine_standalone_shadow_parity_with_frozen_legacy_oracle(
     assert result.ledger_transition is None
 
 
-def test_thermoengine_imposes_absolute_fo2_with_default_phase_solver(monkeypatch):
+def test_thermoengine_private_solver_imposes_absolute_fo2_with_python_fake(
+    monkeypatch,
+):
     class FakeMelts:
         def __init__(self):
             self.bulk_wt = {}
@@ -3211,7 +3427,7 @@ def test_thermoengine_imposes_absolute_fo2_with_default_phase_solver(monkeypatch
     )
     monkeypatch.setattr(transport, '_fe_redox_split', lambda _comp: {})
 
-    result = transport.equilibrate(
+    result = transport._equilibrate_in_process(
         temperature_C=1200.0,
         pressure_bar=1.0,
         comp_wt={'SiO2': 80.0, 'FeO': 18.0, 'Fe2O3': 2.0},
@@ -3894,7 +4110,8 @@ def test_decompression_path_calls_verified_petthermotools_api():
     backend = AlphaMELTSBackend()
     calls = []
 
-    def fake_decompression(**kwargs):
+    def fake_decompression(operation, *, kwargs):
+        assert operation == 'isothermal_decompression'
         calls.append(kwargs)
         return {
             0: {
@@ -3921,7 +4138,8 @@ def test_decompression_path_calls_verified_petthermotools_api():
 
     backend._mode = 'python_api'
     backend._pet_module = types.SimpleNamespace(
-        isothermal_decompression=fake_decompression)
+        isothermal_decompression=object())
+    backend._run_petthermotools_isolated = fake_decompression
     backend._pet_payload_preloaded = True
     backend._pet_melts = object()
     backend._redox_buffer = 'QFM'
@@ -3952,6 +4170,32 @@ def test_decompression_path_calls_verified_petthermotools_api():
     assert calls[0]['bulk']['FeOt_Liq'] == pytest.approx(10.0)
     assert [result.pressure_bar for result in results] == [1000.0, 1.0]
     assert [result.fO2_log for result in results] == [-10.5, -10.5]
+
+
+def test_decompression_timeout_marks_python_backend_unavailable():
+    backend = AlphaMELTSBackend()
+    backend._mode = 'python_api'
+    backend._pet_module = types.SimpleNamespace(
+        isothermal_decompression=object()
+    )
+    backend._pet_payload_preloaded = True
+    backend._pet_melts = object()
+
+    def raise_timeout(*_args, **_kwargs):
+        raise AlphaMELTSSubprocessContractError('timed out')
+
+    backend._run_petthermotools_isolated = raise_timeout
+
+    with pytest.raises(AlphaMELTSSubprocessContractError):
+        backend.decompression_path(
+            1200.0,
+            1000.0,
+            1.0,
+            100.0,
+            composition_kg=_melts_domain_composition(),
+        )
+
+    assert backend.is_available() is False
 
 
 def test_alphamelts_stdout_parser_solid_only_reports_zero_liquid_fraction():
@@ -4282,13 +4526,12 @@ def test_alphamelts_python_requires_solved_fo2_echo():
     backend._mode = 'python_api'
     backend._pet_melts = object()
     backend._pet_payload_preloaded = True
-    backend._pet_module = types.SimpleNamespace(
-        equilibrate_MELTS=lambda **_kwargs: ({
+    backend._pet_module = types.SimpleNamespace()
+    backend._run_petthermotools_isolated = lambda *_args, **_kwargs: ({
             'Conditions': {'mass': 100.0},
             'liquid1': {'SiO2': 50.0},
             'liquid1_prop': {'mass': 100.0},
         }, {})
-    )
 
     result = backend.equilibrate(
         temperature_C=1500.0,
@@ -4307,15 +4550,14 @@ def test_alphamelts_python_preserves_solved_fo2_and_scales_physical_batches():
     backend._mode = 'python_api'
     backend._pet_melts = object()
     backend._pet_payload_preloaded = True
-    backend._pet_module = types.SimpleNamespace(
-        equilibrate_MELTS=lambda **_kwargs: ({
+    backend._pet_module = types.SimpleNamespace()
+    backend._run_petthermotools_isolated = lambda *_args, **_kwargs: ({
             'Conditions': {'mass': 100.0, 'P_bar': 1.0, 'fO2_log': -8.0},
             'liquid1': {'SiO2': 50.0, 'Al2O3': 15.0, 'FeO': 10.0},
             'liquid1_prop': {'mass': 80.0},
             'olivine1': {'SiO2': 40.0, 'MgO': 50.0},
             'olivine1_prop': {'mass': 20.0},
         }, {})
-    )
     base = _melts_domain_composition()
 
     ten_kg = backend.equilibrate(
