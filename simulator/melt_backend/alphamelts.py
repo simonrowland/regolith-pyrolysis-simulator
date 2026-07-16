@@ -3630,7 +3630,10 @@ class _MELTSBackendSupport(MeltBackend):
         self,
         eq: EquilibriumResult,
     ) -> tuple[Dict[str, float], Dict[str, str], Dict[str, object]]:
-        if float(eq.liquid_fraction or 0.0) <= 0.0:
+        from simulator.melt_regime import MeltRegime, melt_regime
+        if melt_regime(
+            liquid_fraction=float(eq.liquid_fraction or 0.0), epsilon=0.0
+        ) is MeltRegime.FROZEN:
             return {}, {}, {'vapor_pressure_zero_reason': 'no_liquid_phase'}
         if not eq.liquid_composition_wt_pct:
             raise _alphamelts_backend_failure_error(
