@@ -10,6 +10,8 @@ import logging
 import math
 import os
 import re
+import secrets
+import stat
 import tempfile
 import threading
 from pathlib import Path
@@ -24,6 +26,33 @@ DEFAULT_RETENTION = 100
 _RUN_ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 _SAVE_LOCK = threading.Lock()
 _LOG = logging.getLogger(__name__)
+_DIRECTORY_OPEN_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC | os.O_NOFOLLOW
+_FILE_OPEN_FLAGS = os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW
+
+
+@contextmanager
+def _open_directory(path: Path):
+    descriptor = os.open(path, _DIRECTORY_OPEN_FLAGS)
+    try:
+        yield descriptor
+    finally:
+        os.close(descriptor)
+
+
+def _load_json_regular(path: Path, *, directory_fd: int | None = None) -> Any:
+    if directory_fd is None:
+        with _open_directory(path.parent) as parent_fd:
+            return _load_json_regular(path, directory_fd=parent_fd)
+    descriptor = os.open(path.name, _FILE_OPEN_FLAGS, dir_fd=directory_fd)
+    try:
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            raise OSError(f"refusing non-regular file: {path}")
+        with os.fdopen(descriptor, encoding="utf-8") as handle:
+            descriptor = -1
+            return json.load(handle)
+    finally:
+        if descriptor >= 0:
+            os.close(descriptor)
 
 
 class RunStoreCorruptionError(RuntimeError):
@@ -115,8 +144,7 @@ class RunArtifactStore:
     def load(self, run_id: str) -> dict[str, Any] | None:
         path = self._path(run_id)
         try:
-            with path.open(encoding="utf-8") as handle:
-                payload = json.load(handle)
+            payload = _load_json_regular(path)
         except FileNotFoundError:
             return None
         except (OSError, json.JSONDecodeError) as exc:
@@ -242,8 +270,7 @@ class RunArtifactStore:
     def _load_meta(self, run_id: str) -> dict[str, Any]:
         path = self._meta_path(run_id)
         try:
-            with path.open(encoding="utf-8") as handle:
-                payload = json.load(handle)
+            payload = _load_json_regular(path)
         except FileNotFoundError:
             return {}
         except (OSError, json.JSONDecodeError) as exc:
@@ -276,8 +303,12 @@ class RunArtifactStore:
         ):
             raise ValueError("folder must be a string or null")
         with self._store_lock():
-            if not artifact_path.is_file():
+            try:
+                _load_json_regular(artifact_path)
+            except FileNotFoundError:
                 raise FileNotFoundError(run_id)
+            except (OSError, json.JSONDecodeError) as exc:
+                raise RunStoreCorruptionError(run_id, artifact_path, str(exc)) from exc
             return self._write_meta_updates(run_id, updates)
 
     def _save_parent_run_id(self, run_id: str, parent_run_id: str) -> None:
@@ -288,50 +319,94 @@ class RunArtifactStore:
         self, run_id: str, updates: Mapping[str, Any]
     ) -> dict[str, Any]:
         destination = self._meta_path(run_id)
-        claim_path = destination.with_suffix(".write-lock")
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        with claim_path.open("a", encoding="utf-8") as claim_handle:
-            fcntl.flock(claim_handle.fileno(), fcntl.LOCK_EX)
-            metadata = self._load_meta(run_id)
-            for key, value in updates.items():
-                if key == "folder" and value is None:
-                    metadata.pop(key, None)
-                else:
-                    metadata[key] = value
-            temp_path: Path | None = None
+        with _open_directory(self.runs_dir) as runs_fd:
             try:
-                fd, raw_temp_path = tempfile.mkstemp(
-                    prefix=f".{run_id}.", suffix=".tmp", dir=destination.parent
-                )
-                temp_path = Path(raw_temp_path)
-                with os.fdopen(fd, "w", encoding="utf-8") as handle:
-                    json.dump(
-                        metadata,
-                        handle,
-                        indent=2,
-                        sort_keys=True,
-                        allow_nan=False,
+                os.mkdir("meta", dir_fd=runs_fd)
+            except FileExistsError:
+                pass
+            meta_fd = os.open("meta", _DIRECTORY_OPEN_FLAGS, dir_fd=runs_fd)
+        try:
+            claim_name = f"{run_id}.write-lock"
+            claim_fd = os.open(
+                claim_name,
+                os.O_RDWR | os.O_CREAT | os.O_CLOEXEC | os.O_NOFOLLOW,
+                0o600,
+                dir_fd=meta_fd,
+            )
+            with os.fdopen(claim_fd, "a", encoding="utf-8") as claim_handle:
+                if not stat.S_ISREG(os.fstat(claim_handle.fileno()).st_mode):
+                    raise OSError(f"refusing non-regular file: {destination.parent / claim_name}")
+                fcntl.flock(claim_handle.fileno(), fcntl.LOCK_EX)
+                try:
+                    metadata = _load_json_regular(destination, directory_fd=meta_fd)
+                except FileNotFoundError:
+                    metadata = {}
+                if not isinstance(metadata, dict):
+                    raise RunMetaCorruptionError(
+                        run_id,
+                        destination,
+                        f"expected metadata to be an object, got {type(metadata).__name__}",
                     )
-                    handle.write("\n")
-                    handle.flush()
-                    os.fsync(handle.fileno())
-                # Atomic whole-sidecar replacement: serialized writers preserve
-                # existing keys and the latest completed write wins.
-                os.replace(temp_path, destination)
-            finally:
-                if temp_path is not None:
-                    temp_path.unlink(missing_ok=True)
+                for key, value in updates.items():
+                    if key == "folder" and value is None:
+                        metadata.pop(key, None)
+                    else:
+                        metadata[key] = value
+                temp_name = f".{run_id}.{secrets.token_hex(8)}.tmp"
+                try:
+                    temp_fd = os.open(
+                        temp_name,
+                        os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_CLOEXEC,
+                        0o600,
+                        dir_fd=meta_fd,
+                    )
+                    with os.fdopen(temp_fd, "w", encoding="utf-8") as handle:
+                        json.dump(
+                            metadata,
+                            handle,
+                            indent=2,
+                            sort_keys=True,
+                            allow_nan=False,
+                        )
+                        handle.write("\n")
+                        handle.flush()
+                        os.fsync(handle.fileno())
+                    # Keep the destination anchored to the verified meta directory
+                    # even if its pathname is swapped while this write is active.
+                    os.replace(
+                        temp_name,
+                        destination.name,
+                        src_dir_fd=meta_fd,
+                        dst_dir_fd=meta_fd,
+                    )
+                finally:
+                    try:
+                        os.unlink(temp_name, dir_fd=meta_fd)
+                    except FileNotFoundError:
+                        pass
+        finally:
+            os.close(meta_fd)
         return metadata
 
     @staticmethod
     def _quarantine(path: Path) -> Path:
-        candidate = path.with_suffix(f"{path.suffix}.corrupt")
-        index = 1
-        while candidate.exists():
-            candidate = path.with_suffix(f"{path.suffix}.corrupt.{index}")
-            index += 1
-        os.replace(path, candidate)
-        return candidate
+        with _open_directory(path.parent) as parent_fd:
+            candidate_name = f"{path.name}.corrupt"
+            index = 1
+            while True:
+                try:
+                    os.stat(candidate_name, dir_fd=parent_fd, follow_symlinks=False)
+                except FileNotFoundError:
+                    break
+                candidate_name = f"{path.name}.corrupt.{index}"
+                index += 1
+            os.replace(
+                path.name,
+                candidate_name,
+                src_dir_fd=parent_fd,
+                dst_dir_fd=parent_fd,
+            )
+        return path.parent / candidate_name
 
     def _quarantine_or_log(
         self, path: Path, corruption_error: RunStoreCorruptionError
@@ -428,8 +503,9 @@ class RunArtifactStore:
         starred_count = 0
         for path in self._artifact_paths():
             try:
-                with path.open(encoding="utf-8") as handle:
-                    artifact = json.load(handle)
+                artifact = self.load(path.stem)
+                if artifact is None:
+                    continue
                 header = artifact.get("header", {}) or {}
                 if self._has_quarantined_meta(path.stem):
                     continue
@@ -445,7 +521,7 @@ class RunArtifactStore:
                 # this run until metadata is repaired rather than deleting a
                 # possibly protected artifact.
                 continue
-            except (OSError, json.JSONDecodeError, AttributeError):
+            except (OSError, json.JSONDecodeError, AttributeError, RunStoreCorruptionError):
                 continue
         if starred_count > self.keep:
             _LOG.warning(

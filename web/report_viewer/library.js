@@ -99,7 +99,9 @@ function renderList() {
     ? visible.map(runCard).join("")
     : runs.length
       ? `<div class="pending"><strong>No matching runs</strong><p>No indexed run matches this folder and filter.</p></div>`
-      : `<div class="pending"><strong>No indexed runs</strong><p>The run index is valid but contains no entries.</p></div>`);
+      : liveIndexError
+        ? `<div class="pending"><strong>No static sample runs</strong><p>The live index could not be read, and the static sample index contains no entries.</p></div>`
+        : `<div class="pending"><strong>No indexed runs</strong><p>The run index is valid but contains no entries.</p></div>`);
 }
 
 function bindControls() {

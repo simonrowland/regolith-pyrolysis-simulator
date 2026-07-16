@@ -461,6 +461,34 @@ def test_submit_idempotency_is_client_scoped_and_payload_bound(monkeypatch):
     assert len(calls) == 2
 
 
+def test_failed_tokenized_launch_is_not_cached_and_retry_can_start(monkeypatch):
+    calls = []
+
+    def fail_then_start(payload, **kwargs):
+        calls.append((payload, kwargs))
+        if len(calls) == 1:
+            raise RuntimeError("launch failed")
+        return {"run_id": "run-retry", "status": "started"}
+
+    monkeypatch.setattr(web_events, "_registered_start_handler", fail_then_start)
+    payload = {"client_token": "retry-after-failure", "mass_kg": 1000}
+
+    with pytest.raises(RuntimeError, match="launch failed"):
+        web_events.submit_run_command(_Socket(), payload, client_id="same-client")
+    assert web_events._run_idempotency == {}
+
+    retry = web_events.submit_run_command(
+        _Socket(), payload, client_id="same-client"
+    )
+    replay = web_events.submit_run_command(
+        _Socket(), payload, client_id="same-client"
+    )
+
+    assert retry["idempotent_replay"] is False
+    assert replay["idempotent_replay"] is True
+    assert len(calls) == 2
+
+
 def test_concurrent_idempotent_submits_launch_once(monkeypatch):
     barrier = threading.Barrier(3)
     calls = []
@@ -767,7 +795,8 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
     ]
 
 
-def test_invalid_http_submit_does_not_destroy_active_run(tmp_path, monkeypatch):
+def test_invalid_http_submit_does_not_destroy_active_run(tmp_path):
+    app_module.create_app()
     store = RunArtifactStore(tmp_path / "runs")
     state, _ = web_events._replace_simulation_state(
         "http:owner:active",
@@ -777,14 +806,6 @@ def test_invalid_http_submit_does_not_destroy_active_run(tmp_path, monkeypatch):
         run_store=store,
     )
     state["http_owned"] = True
-
-    def reject_invalid(_payload, **_kwargs):
-        raise web_events.RunCommandError(
-            "mass_kg must be numeric",
-            error_type="invalid_run_input",
-        )
-
-    monkeypatch.setattr(web_events, "_registered_start_handler", reject_invalid)
 
     with pytest.raises(web_events.RunCommandError, match="mass_kg must be numeric"):
         web_events.submit_run_command(
@@ -797,6 +818,32 @@ def test_invalid_http_submit_does_not_destroy_active_run(tmp_path, monkeypatch):
     assert state["running"] is True
     assert state.get("artifact_persisted") is not True
     assert store.load(state["run_id"]) is None
+
+
+def test_cancel_already_persisted_http_run_releases_state_and_lock():
+    sid = "http:owner:already-persisted"
+    state, _ = web_events._replace_simulation_state(
+        sid,
+        _CompleteSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+    )
+    state["http_owned"] = True
+    state["artifact_persisted"] = True
+
+    result = web_events._cancel_simulation_state(
+        _Socket(),
+        sid,
+        reason="cancelled_by_client",
+    )
+
+    assert result == {
+        "run_id": state["run_id"],
+        "status": "terminal",
+        "cancelled": False,
+    }
+    assert sid not in web_events._simulations
+    assert sid not in web_events._sim_locks
 
 
 def test_http_terminal_run_releases_session_state(tmp_path, monkeypatch):
@@ -824,7 +871,7 @@ def test_http_terminal_run_releases_session_state(tmp_path, monkeypatch):
         state["run_id"],
         lock,
         "backend",
-        "available",
+        "ok",
         True,
     )
 
@@ -927,7 +974,7 @@ def test_c6_terminal_persist_excludes_concurrent_cancel(tmp_path, monkeypatch):
         state["run_id"],
         run_lock,
         "backend",
-        "available",
+        "ok",
         True,
     )
     loop_thread = threading.Thread(target=socket.target, name="c6-loop")
@@ -1022,7 +1069,7 @@ def test_failure_terminal_persist_excludes_concurrent_cancel(monkeypatch):
         state["run_id"],
         run_lock,
         "backend",
-        "available",
+        "ok",
         True,
     )
 

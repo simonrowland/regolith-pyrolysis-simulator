@@ -12,6 +12,7 @@ from flask import Flask
 
 from simulator.accounting.run_artifact import (
     ARTIFACT_SCHEMA_VERSION,
+    CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT,
     RunArtifactContractError,
     build_run_artifact,
 )
@@ -128,7 +129,7 @@ def test_non_terminal_hour_performs_zero_artifact_writes(tmp_path, monkeypatch) 
             state["run_id"],
             lock,
             "backend",
-            "available",
+            "ok",
             True,
         )
         socket.target()
@@ -178,6 +179,31 @@ def test_build_run_artifact_repackages_runner_payload(monkeypatch) -> None:
     }
     assert "yield_disposition" not in artifact["terminal"]
     assert "wall_lifetime" not in artifact["terminal"]
+
+
+@pytest.mark.parametrize(
+    ("residual_pct", "expected_relation", "expected_grade"),
+    [
+        (-1e-11, "exceeds", "low"),
+        (CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT, "within", None),
+    ],
+)
+def test_build_run_artifact_confidence_uses_signed_magnitude_and_inclusive_gate(
+    residual_pct, expected_relation, expected_grade
+) -> None:
+    payload = _runner_payload("ok")
+    payload["per_hour_summary"][-1]["mass_balance_pct"] = residual_pct
+
+    confidence = build_run_artifact(
+        payload,
+        run_id="confidence-boundary",
+    )["terminal"]["confidence"]
+
+    if expected_grade is None:
+        assert confidence["grade"] != "low"
+    else:
+        assert confidence["grade"] == expected_grade
+    assert expected_relation in confidence["reasons"][0]
 
 
 @pytest.mark.parametrize("status", ["ok", "partial", "refused", "failed"])
@@ -327,7 +353,7 @@ def test_store_meta_atomic_failure_cleans_temp_and_preserves_previous_sidecar(
     meta_path = store.runs_dir / "meta" / "atomic.json"
     original_bytes = meta_path.read_bytes()
 
-    def fail_replace(_source, _destination):
+    def fail_replace(_source, _destination, **_kwargs):
         raise OSError("replace failed")
 
     monkeypatch.setattr(run_store_module.os, "replace", fail_replace)
@@ -475,10 +501,10 @@ def test_store_publish_failure_retry_overwrites_orphan_lineage(tmp_path, monkeyp
     artifact_path = store.runs_dir / "child.json"
     real_replace = run_store_module.os.replace
 
-    def fail_artifact_publish(source, destination):
+    def fail_artifact_publish(source, destination, **kwargs):
         if Path(destination) == artifact_path:
             raise OSError("artifact publish failed")
-        return real_replace(source, destination)
+        return real_replace(source, destination, **kwargs)
 
     monkeypatch.setattr(run_store_module.os, "replace", fail_artifact_publish)
     with pytest.raises(OSError, match="artifact publish failed"):
@@ -709,6 +735,61 @@ def test_store_meta_path_uses_run_id_validation(tmp_path) -> None:
     assert not (tmp_path / "runs" / "meta" / "escape.json").exists()
 
 
+def test_store_rejects_artifact_symlink_without_reading_target(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    store.runs_dir.mkdir(parents=True)
+    target = tmp_path / "outside.json"
+    target.write_text(
+        json.dumps(build_run_artifact(_runner_payload("ok"), run_id="outside")),
+        encoding="utf-8",
+    )
+    link = store.runs_dir / "leak.json"
+    link.symlink_to(target)
+
+    with pytest.raises(RunStoreCorruptionError, match="corrupt run artifact"):
+        store.load("leak")
+
+    assert target.exists()
+    assert store.list_runs() == []
+    assert target.exists()
+    assert not link.exists()
+    assert (store.runs_dir / "leak.json.corrupt").is_symlink()
+
+
+def test_store_rejects_metadata_symlink_without_reading_target(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="meta-link")
+    assert store.save("meta-link", artifact) is True
+    meta_dir = store.runs_dir / "meta"
+    meta_dir.mkdir()
+    target = tmp_path / "outside-meta.json"
+    target.write_text('{"starred": true}', encoding="utf-8")
+    link = meta_dir / "meta-link.json"
+    link.symlink_to(target)
+
+    summaries = store.list_runs()
+
+    assert summaries[0]["run_id"] == "meta-link"
+    assert summaries[0]["starred"] is False
+    assert target.read_text(encoding="utf-8") == '{"starred": true}'
+    assert not link.exists()
+    assert (meta_dir / "meta-link.json.corrupt").is_symlink()
+
+
+def test_store_rejects_symlinked_meta_directory_on_write(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="meta-dir-link")
+    assert store.save("meta-dir-link", artifact) is True
+    outside_meta = tmp_path / "outside-meta"
+    outside_meta.mkdir()
+    (store.runs_dir / "meta").symlink_to(outside_meta, target_is_directory=True)
+
+    with pytest.raises(OSError):
+        store.update_meta("meta-dir-link", {"starred": True})
+
+    assert list(outside_meta.iterdir()) == []
+
+
 def test_store_corrupt_load_is_typed_and_list_quarantines(tmp_path) -> None:
     store = RunArtifactStore(tmp_path / "runs")
     store.runs_dir.mkdir(parents=True)
@@ -787,6 +868,21 @@ def test_store_timestep_without_summary_is_typed_and_quarantined(tmp_path) -> No
 
     assert store.list_runs() == []
     assert (store.runs_dir / "no-summary.json.corrupt").exists()
+
+
+def test_store_timestep_rejects_non_object_metal_yields(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    store.runs_dir.mkdir(parents=True)
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="bad-metals")
+    artifact["timesteps"][-1]["summary"]["metal_yields_kg"] = []
+    bad_path = store.runs_dir / "bad-metals.json"
+    bad_path.write_text(json.dumps(artifact), encoding="utf-8")
+
+    with pytest.raises(RunStoreCorruptionError, match="metal_yields_kg"):
+        store.load("bad-metals")
+
+    assert store.list_runs() == []
+    assert (store.runs_dir / "bad-metals.json.corrupt").exists()
 
 
 def test_store_summary_omits_absent_species_and_labels_source_side_o2(tmp_path) -> None:

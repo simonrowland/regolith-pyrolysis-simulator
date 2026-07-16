@@ -2316,7 +2316,7 @@ def test_loop_rechecks_pause_after_acquiring_run_lock(monkeypatch):
             state["run_id"],
             PauseOnEnter(),
             "backend",
-            "available",
+            "ok",
             True,
         )
         with pytest.raises(StopPausedLoop):
@@ -2419,7 +2419,7 @@ def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
             state["run_id"],
             lock,
             "backend",
-            "available",
+            "ok",
             True,
         )
         socket.target()
@@ -2507,7 +2507,7 @@ def test_terminal_state_finishes_before_terminal_emit(
             state["run_id"],
             lock,
             "backend",
-            "available",
+            "ok",
             True,
         )
         socket.target()
@@ -2603,7 +2603,7 @@ def test_tick_snapshot_is_built_before_concurrent_mutation(monkeypatch):
             state["run_id"],
             run_lock,
             "backend",
-            "available",
+            "ok",
             True,
         )
         socket.target()
@@ -3203,7 +3203,7 @@ def test_loop_projection_and_emit_failures_stop_current_run(
             state["run_id"],
             lock,
             "backend",
-            "available",
+            "ok",
             True,
         )
         socket.target()

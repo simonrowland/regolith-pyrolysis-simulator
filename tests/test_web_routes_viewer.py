@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
+import subprocess
 
+import pytest
 import yaml
 from flask import Flask
 
@@ -50,6 +53,72 @@ def test_report_viewer_serves_index_and_assets(tmp_path: Path) -> None:
     assert b"Regolith Refinery Run Report" in index.data
     assert script.status_code == 200
     assert b"Download run.yaml" in script.data
+
+
+@pytest.mark.parametrize("has_recipe_snapshot", [True, False])
+def test_settings_script_executes_live_run_resolution_and_manifest_gate(
+    has_recipe_snapshot: bool,
+) -> None:
+    script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/settings.js"
+    artifact = _artifact(
+        recipe_snapshot=(
+            {
+                "setpoints_patch": {},
+                "pins": [],
+                "recipe_schema_version": "recipe-schema-v1",
+            }
+            if has_recipe_snapshot
+            else None
+        )
+    )
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const source = fs.readFileSync(process.argv[2], "utf8");
+const settings = { innerHTML: "" };
+const download = { addEventListener() {} };
+let fetched = null;
+const context = {
+  window: { location: { search: process.argv[3] } },
+  document: {
+    querySelector(selector) {
+      if (selector === "#settings") return settings;
+      if (selector === "#download-run") return download;
+      throw new Error(`unexpected selector ${selector}`);
+    },
+    createElement() { throw new Error("download should not execute during render"); }
+  },
+  URLSearchParams,
+  Blob,
+  URL,
+  encodeURIComponent,
+  setTimeout,
+  fetch: async (url) => {
+    fetched = url;
+    return { ok: true, json: async () => JSON.parse(process.argv[4]) };
+  }
+};
+vm.runInNewContext(source, context);
+setImmediate(() => process.stdout.write(JSON.stringify({ fetched, html: settings.innerHTML })));
+"""
+
+    completed = subprocess.run(
+        ["node", "-", str(script_path), "?run=run/live", json.dumps(artifact)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    result = json.loads(completed.stdout)
+
+    assert result["fetched"] == "/api/runs/run%2Flive"
+    assert './index.html?run=run%2Flive' in result["html"]
+    if has_recipe_snapshot:
+        assert '/api/runs/run%2Flive/run.yaml' in result["html"]
+        assert "Download run.yaml unavailable" not in result["html"]
+    else:
+        assert '/api/runs/run%2Flive/run.yaml' not in result["html"]
+        assert "Download run.yaml unavailable" in result["html"]
 
 
 def test_report_viewer_serves_only_viewer_asset_types(tmp_path: Path) -> None:
