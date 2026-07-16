@@ -104,6 +104,7 @@ ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE = 'phase_mass_incomplete'
 ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY = 'vapor_projection_empty'
 ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 0.01
 ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10 = 1.0e-6
+ALPHAMELTS_PHASE_MASS_DISPLAY_RESOLUTION_G = 0.001
 # alphaMELTS input serialization emits an oxide only above this wt% value.
 # Values at/below it are native zero-component cells, regardless of Python sign.
 ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT = 0.001
@@ -2540,53 +2541,49 @@ class _MELTSBackendSupport(MeltBackend):
     def _activity_pairs_from_line(self, line: str) -> dict:
         if ':' not in line:
             return {}
-        tokens = line.split(':', 1)[1].split()
-        return self._activity_pairs_from_tokens(tokens)
-
-    def _activity_table_after(self, lines: list[str], idx: int) -> dict:
-        for header_idx in range(idx + 1, min(idx + 6, len(lines))):
-            header = lines[header_idx].strip()
-            if not header:
-                continue
-            names = header.split()
-            if not any(self._looks_like_activity_label(name) for name in names):
-                continue
-            for values_idx in range(header_idx + 1, min(header_idx + 5, len(lines))):
-                value_tokens = lines[values_idx].strip().split()
-                if not value_tokens:
-                    continue
-                values = []
-                for token in value_tokens:
-                    if self._is_number(token):
-                        values.append(float(token))
-                if len(values) >= len(names):
-                    return {
-                        name: value
-                        for name, value in zip(names, values)
-                    }
-        return {}
-
-    def _activity_pairs_from_tokens(self, tokens: list[str]) -> dict:
         activities: Dict[str, float] = {}
-        idx = 0
-        while idx + 1 < len(tokens):
-            name = tokens[idx].strip(',')
-            raw_value = tokens[idx + 1].strip(',')
+        for match in re.finditer(
+            r'([^\s,=]+)\s*=\s*([^\s,]+)',
+            line.split(':', 1)[1],
+        ):
+            name, raw_value = match.groups()
             if (
                 self._looks_like_activity_label(name)
                 and self._is_number(raw_value)
             ):
                 activities[name] = float(raw_value)
-                idx += 2
-                continue
-            idx += 1
         return activities
+
+    def _activity_table_after(self, lines: list[str], idx: int) -> dict:
+        if not lines[idx].strip().endswith(':'):
+            return {}
+        table_lines = [
+            line.strip()
+            for line in lines[idx + 1:min(idx + 6, len(lines))]
+            if line.strip()
+        ]
+        if len(table_lines) < 2:
+            return {}
+        names = table_lines[0].split()
+        value_tokens = table_lines[1].split()
+        if (
+            names
+            and all(self._looks_like_activity_label(name) for name in names)
+            and len(value_tokens) == len(names)
+            and all(self._is_number(token) for token in value_tokens)
+        ):
+            return {
+                name: float(value)
+                for name, value in zip(names, value_tokens)
+            }
+        return {}
 
     def _looks_like_activity_label(self, name: object) -> bool:
         label = str(name).strip().strip(',')
-        if not label or self._is_number(label):
-            return False
-        return bool(re.search(r'[A-Za-z]', label))
+        return bool(re.fullmatch(
+            r'(?:[A-Z][a-z]?\d*|\((?:[A-Z][a-z]?\d*)+\)\d*)+(?:_Liq)?',
+            label,
+        ))
 
     def _parse_single_point_stdout(self, output: str, *,
                                    requested_temperature_C: float,
@@ -2896,14 +2893,24 @@ class _MELTSBackendSupport(MeltBackend):
                 'System_main_tbl.txt lacks engine system mass',
             )
         system_mass_kg = float(system_mass_g) / 1000.0
+        displayed_phase_count = len(phase_instance_masses_kg) + int(
+            'liquid' in phase_masses_kg
+        )
+        phase_mass_rounding_tolerance_kg = (
+            max(1, displayed_phase_count)
+            * ALPHAMELTS_PHASE_MASS_DISPLAY_RESOLUTION_G
+            / 2.0
+            / 1000.0
+        )
         if not math.isclose(
             solver_basis_kg,
             system_mass_kg,
             rel_tol=1.0e-6,
-            # Phase_main_tbl prints mass to 0.001 g while System_main_tbl
-            # retains more digits.  Half one printed unit is the tightest
-            # closure tolerance justified by the engine-owned text.
-            abs_tol=5.0e-7,
+            # Phase_main_tbl prints each phase mass to 0.001 g while
+            # System_main_tbl retains more digits. Allow half one printed unit
+            # per displayed phase, the tightest aggregate closure tolerance
+            # justified by the engine-owned text.
+            abs_tol=max(1.0e-9, phase_mass_rounding_tolerance_kg),
         ):
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE,
