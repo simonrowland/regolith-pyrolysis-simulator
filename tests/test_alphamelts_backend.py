@@ -547,6 +547,54 @@ def test_builtin_subprocess_vapor_projection_populates_representative_melt():
     assert diagnostics['vapor_pressures_Pa'] == pressures
 
 
+def test_builtin_subprocess_vapor_projection_separates_melt_fo2_from_transport_po2(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    monkeypatch.setattr(
+        backend,
+        '_find_project_binary',
+        lambda _engine_root: Path('/tmp/fake-alphamelts'),
+    )
+    assert backend.initialize({
+        'mode': 'subprocess',
+        'vapor_transport_pO2_bar': 2.0e-9,
+    }) is True
+    seen = {}
+
+    def dispatch(request):
+        seen['request'] = request
+        return types.SimpleNamespace(
+            status='ok',
+            warnings=(),
+            diagnostic={
+                'vapor_pressures_Pa': {'Na': 1.0},
+                'vapor_pressures_source': {'Na': 'test'},
+            },
+        )
+
+    backend._subprocess_vapor_pressure_provider = types.SimpleNamespace(
+        dispatch=dispatch
+    )
+    result = EquilibriumResult(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        fO2_log=-11.0,
+        phases_present=['liquid'],
+        phase_masses_kg={'liquid': 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={'Na2O': 100.0},
+        status='ok',
+    )
+
+    backend._builtin_vapor_projection_for_subprocess(result)
+
+    request = seen['request']
+    assert request.fO2_log == pytest.approx(-11.0)
+    assert request.control_inputs['intrinsic_fO2_log'] == pytest.approx(-11.0)
+    assert request.control_inputs['pO2_bar'] == pytest.approx(2.0e-9)
+
+
 @pytest.mark.parametrize(
     'diagnostic, reason_fragment',
     [

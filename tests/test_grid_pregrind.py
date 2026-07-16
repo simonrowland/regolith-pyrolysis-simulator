@@ -106,6 +106,9 @@ def test_backend_selector_defaults_to_subprocess_and_accepts_thermoengine():
 
     assert default_args.backend == "subprocess"
     assert grid_pregrind.backend_config(default_args)["mode"] == "subprocess"
+    assert grid_pregrind.backend_config(default_args)[
+        "vapor_transport_pO2_bar"
+    ] == pytest.approx(1.0e-9)
     explicit_subprocess_args = grid_pregrind.parser().parse_args(
         ["--backend", "subprocess"]
     )
@@ -120,8 +123,10 @@ def test_backend_selector_defaults_to_subprocess_and_accepts_thermoengine():
         point, default_args
     ) == grid_pregrind.point_inputs(point, explicit_subprocess_args)
     assert thermoengine_args.backend == "thermoengine"
+    subprocess_config = grid_pregrind.backend_config(default_args)
+    subprocess_config.pop("vapor_transport_pO2_bar")
     assert grid_pregrind.backend_config(thermoengine_args) == {
-        **grid_pregrind.backend_config(default_args),
+        **subprocess_config,
         "grid_backend_name": "thermoengine",
         "mode": "thermoengine",
         "thermoengine_equilibrate_timeout_s": 91.0,
