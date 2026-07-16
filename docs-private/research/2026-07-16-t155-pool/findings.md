@@ -28,3 +28,33 @@ The pool break was a test-fixture vocabulary failure, not process-pool serializa
 BLOCKED: staged for controller commit
 
 READY: docs-private/research/2026-07-16-t155-pool/findings.md
+
+## Round 2: deterministic normal-child assertion
+
+### TL;DR
+
+The deterministic `normal-child-survived.txt` failure is a stale test-timing contract, not a pool-reaping defect. The fixture child writes after 1.0 s, but round 1 raised this node's worker timeout from 0.75 s to 2.0 s. The child therefore completes its side effect a full second before timeout teardown begins; no reaper can undo that write. The fixture child now sleeps 3.0 s, keeping it alive when the 2.0 s timeout reaper snapshots and kills descendants. No production pool code changed.
+
+### Root cause derivation
+
+- Original contract (`26ab7c01`): child writes at 1.0 s; worker timeout was 0.2 s. Later `24b9ad0` widened the timeout to 0.75 s. In both versions the child was alive when timeout teardown began, so file absence tested reaping.
+- Round-1 fixture commit `e7975e6` widened only `per_eval_timeout_seconds` to 2.0 s for cold-spawn headroom. It left the child delay at 1.0 s. Timeline: child writes at about T+1.0 s; pool declares timeout and begins reaping at T+2.0 s; assertion observes the already-written file.
+- Current teardown still reads the worker's tracked child-PID log, stops the worker/process group, snapshots descendants, and SIGKILLs tracked descendants. The unchanged direct termination regression `test_pool_process_termination_kills_child_process_group` passes 3/3 here.
+- Correct test semantics require `child_delay > worker_timeout`, plus enough post-result observation time for an unreaped child to write. The new 3.0 s child delay exceeds the 2.0 s timeout; the existing 1.3 s post-result wait (after the replacement worker completes the next evaluation) exposes a missed reap.
+
+### Round-2 verification
+
+- Focused t-155 recipe/EvalSpec/staged identity selection: `35 passed, 278 deselected in 3.91s`.
+- Full `tests/test_optimizer_pool.py -n0`: `34 passed, 4 skipped in 21.70s`; all executable nodes green. The same four process-pool nodes remain sandbox-skipped because this worker's actual runtime still raises `PermissionError: [Errno 1] Operation not permitted` while creating a `ProcessPoolExecutor`.
+- Requested normal-child node, three solo attempts: all three reached the module fixture and sandbox-skipped for that same `PermissionError`; this runtime could not execute the provisioned path described by the controller.
+- Direct child-reaper regression, three solo attempts: `1 passed` each (`2.09 s`, `2.06 s`, `2.02 s`).
+- `git diff --check`: clean before findings append.
+
+## Round-2 staged paths
+
+- `tests/test_optimizer_pool.py`
+- `docs-private/research/2026-07-16-t155-pool/findings.md`
+
+BLOCKED: staged for controller commit
+
+READY: docs-private/research/2026-07-16-t155-pool/findings.md

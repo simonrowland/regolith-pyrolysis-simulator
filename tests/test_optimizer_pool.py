@@ -490,7 +490,9 @@ def _normal_child_then_hang_evaluate(
             "-c",
             (
                 "import pathlib, sys, time; "
-                "time.sleep(1.0); "
+                # Stay alive beyond the 2.0s worker timeout below. If the
+                # reaper misses this child, it writes before the assertion.
+                "time.sleep(3.0); "
                 "pathlib.Path(sys.argv[1]).write_text('alive', encoding='utf-8')"
             ),
             str(survivor),
