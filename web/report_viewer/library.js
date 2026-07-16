@@ -73,9 +73,10 @@ function runCard(run) {
     ? `./index.html?run=${encodeURIComponent(run.run_id)}`
     : run.artifact;
   const unavailable = canLoad ? "" : `<p class="demo-note">${esc(run.unavailable_note || "demo metadata — no artifact")}</p>`;
+  const cancelledBadge = run.lifecycle === "cancelled" ? ` <span class="verdict contaminated">CANCELLED</span>` : "";
   return `<article class="card run-card">
     <div class="run-card-head">
-      <div><div class="ct">${esc(run.folder ?? "unfiled")} · ${esc(run.status)}</div><h2>${esc(run.name)}</h2></div>
+      <div><div class="ct">${esc(run.folder ?? "unfiled")} · ${esc(run.status)}${cancelledBadge}</div><h2>${esc(run.name)}</h2></div>
       <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(runId)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${run.name} ${isStarred ? "from" : "to"} favorites`)}"${isStarPending ? " disabled" : ""}>${isStarred ? "★" : "☆"}</button>
     </div>
     ${starError ? `<p class="demo-note" role="alert">${esc(`Could not save star for ${run.name}. ${starError}`)}</p>` : ""}

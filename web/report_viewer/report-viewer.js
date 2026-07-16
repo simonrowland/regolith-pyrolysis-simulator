@@ -198,8 +198,8 @@ function processSection(artifact, rows, spans) {
     lineChart("vapor-chart", "Vapor species surges · kg/h", topVapors.map((item, index) => ({ label: item.key, values: rows.map((row) => n(row.vapor_species_kg_hr?.[item.key])), color: COLORS[index] })), { zero: true, spans })
   ].join("");
   return section(2, "Process record — per-hour telemetry", "Frozen timestep summaries; shaded bands follow campaign boundaries.",
-    `<div class="stepper"><div class="stepper-head"><div><div class="ct">Timestep inspector</div><output id="step-output">Hour 1 · ${esc(rows[0].campaign)}</output></div><span class="status-pill">1 / ${rows.length}</span></div>` +
-    `<input id="stepper" type="range" min="0" max="${rows.length - 1}" value="0" step="1" aria-label="Report hour"><div class="range-labels"><span>h ${esc(artifact.timesteps[0].hour)}</span><span>h ${esc(artifact.timesteps.at(-1).hour)}</span></div><div id="current-grid" class="current-grid"></div></div>` +
+    `<div class="stepper"><div class="stepper-head"><div><div class="ct">Timestep inspector</div><output id="step-output">Hour ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)} · ${esc(rows[0].campaign)}</output></div><span class="status-pill">1 / ${rows.length}</span></div>` +
+    `<input id="stepper" type="range" min="0" max="${rows.length - 1}" value="0" step="1" aria-label="Report hour"><div class="range-labels"><span>h ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)}</span><span>h ${artifact.timesteps.at(-1).hour === undefined || artifact.timesteps.at(-1).hour === null ? "not emitted" : esc(artifact.timesteps.at(-1).hour)}</span></div><div id="current-grid" class="current-grid"></div></div>` +
     `<div class="chart-grid">${charts}</div>` +
     pending("W-A0", "summary.p_non_O2_bar and carrier_identity are absent. P_total − pO₂ is not used as a substitute, so neutral-sweep pressure is not charted."));
 }
@@ -295,20 +295,37 @@ function costSection(artifact, energy) {
 function provenanceSection(artifact) {
   const meta = artifact.terminal.run_metadata || {};
   const closure = artifact.terminal.mass_balance_closure || {};
+  const confidence = artifact.terminal.confidence;
+  const confidenceGrade = typeof confidence?.grade === "string" && confidence.grade.trim()
+    ? confidence.grade.trim()
+    : null;
+  const confidenceClass = ({ high: "pure", medium: "mixed", low: "contaminated" })[confidenceGrade?.toLowerCase()] || "unavailable";
+  const confidenceReasons = Array.isArray(confidence?.reasons) ? confidence.reasons : [];
+  const confidenceContent = confidence && typeof confidence === "object"
+    ? `<div class="note"><b>Confidence:</b> <span class="verdict ${confidenceClass}">${esc(confidenceGrade || "grade not emitted")}</span>` +
+      (confidenceReasons.length
+        ? `<ul>${confidenceReasons.map((reason) => `<li>${esc(reason)}</li>`).join("")}</ul>`
+        : `<p>Confidence reasons not emitted.</p>`) +
+      `</div>`
+    : pending("confidence", "Confidence not emitted (requires mass-balance evidence).");
+  const hoursRequested = meta.hours_requested === undefined || meta.hours_requested === null ? "not emitted" : meta.hours_requested;
+  const hoursCompleted = meta.hours_completed === undefined || meta.hours_completed === null ? "not emitted" : meta.hours_completed;
   const facts = [
     ["Artifact schema", artifact.artifact_schema_version], ["Runner schema", meta.schema_version],
     ["Backend evidence", meta.evidence_class], ["Backend authoritative", meta.backend_authoritative],
-    ["Certification allowed", meta.certification_allowed], ["Hours requested / completed", `${meta.hours_requested} / ${meta.hours_completed}`],
+    ["Certification allowed", meta.certification_allowed], ["Hours requested / completed", `${hoursRequested} / ${hoursCompleted}`],
     ["Mass-balance residual", `${sci(closure.residual_pct ?? closure.residual)} % · ${closure.basis || "basis not emitted"}`],
-    ["Kernel identity", artifact.header.engine_identity?.cache_version]
+    ["Kernel commit", artifact.header.engine_identity?.kernel_commit_sha ?? "not emitted"],
+    ["Engine cache version", artifact.header.engine_identity?.cache_version ?? "not emitted"]
   ];
-  return section(9, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}</tbody></table></div>`);
+  return section(9, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
 }
 
 function renderCurrent(artifact, index) {
   const timestep = artifact.timesteps[index];
   const row = timestep.summary;
-  $("#step-output").textContent = `Hour ${timestep.hour} · ${row.campaign}`;
+  const hour = timestep.hour === undefined || timestep.hour === null ? "not emitted" : String(timestep.hour);
+  $("#step-output").textContent = `Hour ${hour} · ${row.campaign ?? "campaign not emitted"}`;
   $(".status-pill").textContent = `${index + 1} / ${artifact.timesteps.length}`;
   $("#current-grid").innerHTML = [
     ["Temperature", hasNumber(row.T_C) ? `${Number(row.T_C).toLocaleString()} °C` : "not emitted"], ["Total pressure", hasNumber(row.P_total_bar) ? `${Number(row.P_total_bar).toExponential(3)} bar` : "not emitted"],
