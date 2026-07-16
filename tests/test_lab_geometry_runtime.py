@@ -320,6 +320,48 @@ def test_declared_surface_temperature_schedule_moves_runtime_deposits() -> None:
     )
 
 
+def test_mre_gas_condensation_applies_declared_surface_schedule() -> None:
+    schedule = dynamic_lab_schedule()
+    for point in schedule["surface_temperature_C"]["condenser_profile"][:2]:
+        point["value"] = 1800.0
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C5",
+        hours=1,
+        mass_kg=1000.0,
+        backend_name="stub",
+        setpoints_patch={"lab_geometry": dynamic_surface_geometry_fixture()},
+        lab_schedule=schedule,
+        c5_enabled=True,
+        mre_target_species="CaO",
+        mre_max_voltage_V=2.3,
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
+    sim = run._start_session().simulator
+    sim.melt.temperature_C = 1575.0
+    sim._melt_redox_liquidus_gate_curve = lambda: (
+        sim._melt_redox_liquidus_floor_fallback(
+            source="test:mre_lab_surface_schedule",
+            reason="MRE condensation schedule regression uses the test floor",
+            liquidus_status="unavailable",
+        )
+    )
+
+    sim._step_mre(sample_time_h=1.0)
+
+    segments = {
+        segment.name: segment
+        for segment in sim.condensation_model.pipe_segments
+    }
+    assert segments["holder"].wall_temperature_C == pytest.approx(25.0)
+    assert segments["condenser"].wall_temperature_C == pytest.approx(1800.0)
+    deposits_kg = wall_deposit_by_segment_species_kg(sim.atom_ledger)
+    assert deposits_kg.get(("holder", "Ca"), 0.0) > (
+        deposits_kg.get(("condenser", "Ca"), 0.0)
+    )
+
+
 def test_surface_temperature_schedule_is_behavioral_cache_determinant() -> None:
     base_schedule = dynamic_lab_schedule(holder_then_condenser=True)
     mutant_schedule = dynamic_lab_schedule(holder_then_condenser=False)

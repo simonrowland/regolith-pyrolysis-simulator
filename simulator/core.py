@@ -10581,7 +10581,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         if self.melt.campaign in (CampaignPhase.C5,
                                    CampaignPhase.MRE_BASELINE):
-            mre_O2_kg = self._step_mre()
+            mre_O2_kg = self._step_mre(sample_time_h=sample_time_h)
             self._mre_anode_O2_kg_this_hr = mre_O2_kg
             mre_energy_kWh = self._mre_energy_this_hr
         else:
