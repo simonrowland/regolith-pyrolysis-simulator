@@ -82,6 +82,7 @@ _simulations: dict = {}
 _sim_locks: dict = {}
 _simulations_guard = threading.Lock()
 _run_command_lock = threading.RLock()
+_run_idempotency_guard = threading.Lock()
 _socket_client_ids: dict[str, str] = {}
 _run_idempotency: dict[tuple[str, str], tuple[str, dict[str, object]]] = {}
 _MAX_RUN_IDEMPOTENCY_ENTRIES = 1024
@@ -422,17 +423,32 @@ def _clear_simulation_state(sid: str, run_id: str | None = None) -> bool:
         return True
 
 
-def _finish_terminal_state(sid: str, run_id: str) -> None:
+def _finish_terminal_state(
+    sid: str,
+    run_id: str,
+    *,
+    idempotency_result: Mapping[str, object] | None = None,
+) -> None:
     """Stop a terminal run and release synthetic HTTP session state."""
-    with _simulations_guard:
-        state = _simulations.get(sid)
-        if state is None or state.get('run_id') != run_id:
-            return
-        state['running'] = False
-        state['paused'] = False
-        if state.get('http_owned') and state.get('artifact_persisted'):
-            _simulations.pop(sid, None)
-            _sim_locks.pop(sid, None)
+    terminal_result = None
+    if idempotency_result is not None:
+        terminal_result = {'run_id': run_id, **dict(idempotency_result)}
+    with _run_idempotency_guard:
+        with _simulations_guard:
+            state = _simulations.get(sid)
+            if state is None or state.get('run_id') != run_id:
+                return
+            state['running'] = False
+            state['paused'] = False
+            if terminal_result is not None:
+                state['idempotency_terminal_result'] = terminal_result
+            if state.get('http_owned') and state.get('artifact_persisted'):
+                _simulations.pop(sid, None)
+                _sim_locks.pop(sid, None)
+        if terminal_result is not None:
+            for key, (payload, result) in list(_run_idempotency.items()):
+                if result.get('run_id') == run_id:
+                    _run_idempotency[key] = (payload, dict(terminal_result))
 
 
 def _persist_terminal(
@@ -555,8 +571,15 @@ def _cancel_simulation_state(
             error_message='',
         )
         if artifact is None:
-            state['running'] = False
-            state['paused'] = False
+            _finish_terminal_state(
+                sid,
+                target_run_id,
+                idempotency_result={
+                    'status': 'error',
+                    'reason': 'persistence_failed',
+                    'message': 'Run was cancelled but its report was not saved',
+                },
+            )
             raise RuntimeError('cancelled run artifact could not be persisted')
         _finish_terminal_state(sid, target_run_id)
         return {
@@ -634,7 +657,10 @@ def _ensure_global_run_capacity(replacement_sid: str | None) -> None:
         )
 
 
-def _idempotency_entry_is_terminal(run_id: object) -> bool:
+def _idempotency_entry_is_terminal(result: Mapping[str, object]) -> bool:
+    if result.get('reason') == 'persistence_failed':
+        return True
+    run_id = result.get('run_id')
     with _simulations_guard:
         state = next(
             (
@@ -648,24 +674,25 @@ def _idempotency_entry_is_terminal(run_id: object) -> bool:
 
 
 def _make_idempotency_capacity() -> None:
-    while len(_run_idempotency) >= _MAX_RUN_IDEMPOTENCY_ENTRIES:
-        terminal_key = next(
-            (
-                key
-                for key, (_, result) in _run_idempotency.items()
-                if _idempotency_entry_is_terminal(result.get('run_id'))
-            ),
-            None,
-        )
-        if terminal_key is None:
-            # Launch-once records for nonterminal runs are never evicted. Reject
-            # new tokenized work until a terminal record becomes evictable.
-            raise RunCommandError(
-                'idempotency capacity is occupied by active runs',
-                error_type='idempotency_capacity_exhausted',
-                status_code=503,
+    with _run_idempotency_guard:
+        while len(_run_idempotency) >= _MAX_RUN_IDEMPOTENCY_ENTRIES:
+            terminal_key = next(
+                (
+                    key
+                    for key, (_, result) in _run_idempotency.items()
+                    if _idempotency_entry_is_terminal(result)
+                ),
+                None,
             )
-        _run_idempotency.pop(terminal_key)
+            if terminal_key is None:
+                # Launch-once records for nonterminal runs are never evicted. Reject
+                # new tokenized work until a terminal record becomes evictable.
+                raise RunCommandError(
+                    'idempotency capacity is occupied by active runs',
+                    error_type='idempotency_capacity_exhausted',
+                    status_code=503,
+                )
+            _run_idempotency.pop(terminal_key)
 
 
 def submit_run_command(
@@ -702,7 +729,10 @@ def submit_run_command(
     token_key = (client_id, token)
     with _run_command_lock:
         if token:
-            existing = _run_idempotency.get(token_key)
+            with _run_idempotency_guard:
+                existing = _run_idempotency.get(token_key)
+                if existing is not None:
+                    existing = (existing[0], dict(existing[1]))
             if existing is not None:
                 existing_payload, existing_result = existing
                 if existing_payload != canonical_payload:
@@ -735,9 +765,31 @@ def submit_run_command(
             command_mode=True,
             replace_sid=previous_sid,
         )
+        response_result = dict(result)
         if token:
-            _run_idempotency[token_key] = (canonical_payload, dict(result))
-        return {**result, 'idempotent_replay': False}
+            cached_result = dict(response_result)
+            run_id = cached_result.get('run_id')
+            with _run_idempotency_guard:
+                with _simulations_guard:
+                    state = next(
+                        (
+                            candidate
+                            for candidate in _simulations.values()
+                            if candidate.get('run_id') == run_id
+                        ),
+                        None,
+                    )
+                    if state is not None:
+                        cached_result = dict(
+                            state.get('idempotency_terminal_result')
+                            or cached_result
+                        )
+                _run_idempotency[token_key] = (
+                    canonical_payload,
+                    cached_result,
+                )
+            response_result = cached_result
+        return {**response_result, 'idempotent_replay': False}
 
 
 def validate_run_draft(
@@ -1546,7 +1598,15 @@ def _start_background_loop(
         except Exception as exc:  # noqa: BLE001 -- cleanup must still run
             _safe_log(f'Simulation status emission failed: {exc}')
         finally:
-            _finish_terminal_state(sid, run_id)
+            _finish_terminal_state(
+                sid,
+                run_id,
+                idempotency_result=(
+                    payload
+                    if payload.get('reason') == 'persistence_failed'
+                    else None
+                ),
+            )
 
     def stop_for_failure(exc: Exception, session, sim) -> None:
         _safe_log(f'Simulation loop failed: {exc}')

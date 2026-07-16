@@ -680,22 +680,15 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
     replacement_transport,
 ):
     store = RunArtifactStore(tmp_path / "runs")
-    prior, _ = web_events._replace_simulation_state(
-        "prior-owner-sid",
-        _PartialSession(),
-        speed=0.0,
-        ledger_client_id="owner",
-        run_store=store,
-    )
-    monkeypatch.setattr(store, "save", lambda *_args, **_kwargs: False)
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     monkeypatch.setattr(web_events, "_get_backend", lambda _name: backend)
     monkeypatch.setattr(web_events, "get_run_store", lambda: store)
+    launched = []
     monkeypatch.setattr(
         app_module.socketio,
         "start_background_task",
-        lambda *_args, **_kwargs: None,
+        lambda *args, **kwargs: launched.append((args, kwargs)),
     )
     emitted = []
     monkeypatch.setattr(
@@ -710,11 +703,21 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
         "mass_kg": 1000,
         "speed": 0,
     }
+    tokenized_payload = {**payload, "client_token": "original-run"}
+    client = app.test_client()
+    with client.session_transaction() as browser_session:
+        browser_session["ledger_client_id"] = "owner"
+    initial = client.post("/api/runs", json=tokenized_payload)
+    assert initial.status_code == 201
+    prior_run_id = initial.get_json()["run_id"]
+    prior_sid, prior = next(
+        (sid, state)
+        for sid, state in web_events._simulations.items()
+        if state.get("run_id") == prior_run_id
+    )
+    monkeypatch.setattr(store, "save", lambda *_args, **_kwargs: False)
 
     if replacement_transport == "http":
-        client = app.test_client()
-        with client.session_transaction() as browser_session:
-            browser_session["ledger_client_id"] = "owner"
         response = client.post("/api/runs", json=payload)
         assert response.status_code == 500
         assert response.get_json()["error_type"] == "run_replacement_failed"
@@ -727,11 +730,41 @@ def test_replacement_persist_failure_is_typed_and_keeps_honest_state(
         assert result is None
         assert emitted[-1][1]["error_type"] == "run_replacement_failed"
 
-    assert web_events._simulations["prior-owner-sid"] is prior
+    assert web_events._simulations[prior_sid] is prior
     assert prior["running"] is False
     assert prior.get("artifact_persisted") is not True
     assert store.load(prior["run_id"]) is None
     assert "socket-replacement" not in web_events._simulations
+
+    replay = client.post("/api/runs", json=tokenized_payload)
+    assert replay.status_code == 200
+    assert replay.get_json() == {
+        "idempotent_replay": True,
+        "message": "Run was cancelled but its report was not saved",
+        "reason": "persistence_failed",
+        "run_id": prior_run_id,
+        "status": "error",
+    }
+    assert len(launched) == 1
+
+    monkeypatch.setattr(web_events, "_MAX_RUN_IDEMPOTENCY_ENTRIES", 1)
+    fresh_launches = []
+
+    def fake_start(_payload, **_kwargs):
+        fresh_launches.append(True)
+        return {"run_id": "fresh-run", "status": "started"}
+
+    monkeypatch.setattr(web_events, "_registered_start_handler", fake_start)
+    fresh = web_events.submit_run_command(
+        _Socket(),
+        {"client_token": "fresh-token", "mass_kg": 1000},
+        client_id="fresh-owner",
+    )
+    assert fresh["run_id"] == "fresh-run"
+    assert fresh_launches == [True]
+    assert list(web_events._run_idempotency) == [
+        ("fresh-owner", "fresh-token")
+    ]
 
 
 def test_invalid_http_submit_does_not_destroy_active_run(tmp_path, monkeypatch):
