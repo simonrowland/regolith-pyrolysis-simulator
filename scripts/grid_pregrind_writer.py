@@ -24,8 +24,9 @@ import yaml
 SCHEMA_VARIANT = "alphamelts-expedited-v1"
 GRID_REALIZATION_REVISION = "v2-kress-composition-space"
 CACHE_V2_SCHEMA_VERSION = "cache-v2-grind-source-v1"
+CACHE_V2_FAILURE_MESSAGE_MAX_LENGTH = 512
 
-CACHE_V2_PHASE_DICTIONARY = (
+CACHE_V2_SUBPROCESS_PHASE_DICTIONARY = (
     "liquid",
     "olivine",
     "orthopyroxene",
@@ -53,6 +54,81 @@ CACHE_V2_PHASE_DICTIONARY = (
     "alloy-liquid",
     "sulfide-liquid",
     "fluid",
+)
+
+# Grounded ThermoEngine MELTSv1.0.2 phase vocabulary.  The native labels come
+# from ``MELTSmodel.get_phase_names()`` (the same source counted by
+# ``ThermoEngineTransport._equilibrate_in_process`` in
+# engines/alphamelts/thermoengine.py).  The canonical labels are the exact
+# output of the t-331 ``_thermoengine_generic_result.canonical_phase`` contract
+# in scripts/grid_pregrind.py; simulator/melt_backend/thermoengine.py passes the
+# native assemblage labels through to that boundary.  Keeping both values here
+# makes the provenance of every dictionary entry reviewable instead of
+# presenting an unexplained hand-written union.
+CACHE_V2_THERMOENGINE_PHASE_LABELS = (
+    ("actinolite", "Actinolite"),
+    ("aegirine", "Aegirine"),
+    ("aenigmatite", "Aenigmatite"),
+    ("akermanite", "Akermanite"),
+    ("andalusite", "Andalusite"),
+    ("anthophyllite", "Anthophyllite"),
+    ("apatite", "Apatite"),
+    ("augite", "Augite"),
+    ("biotite", "Biotite"),
+    ("chromite", "Chromite"),
+    ("coesite", "Coesite"),
+    ("corundum", "Corundum"),
+    ("cristobalite", "Cristobalite"),
+    ("cummingtonite", "Cummingtonite"),
+    ("fayalite", "Fayalite"),
+    ("forsterite", "Forsterite"),
+    ("garnet", "Garnet"),
+    ("gehlenite", "Gehlenite"),
+    ("hematite", "Hematite"),
+    ("hornblende", "Hornblende"),
+    ("ilmenite", "Ilmenite"),
+    ("ilmenite ss", "Ilmenite ss"),
+    ("kalsilite", "Kalsilite"),
+    ("kalsilite ss", "Kalsilite ss"),
+    ("kyanite", "Kyanite"),
+    ("leucite", "Leucite"),
+    ("lime", "Lime"),
+    ("liquid", "Liquid"),
+    ("liquid alloy", "Liquid Alloy"),
+    ("magnetite", "Magnetite"),
+    ("melilite", "Melilite"),
+    ("muscovite", "Muscovite"),
+    ("nepheline", "Nepheline"),
+    ("nepheline ss", "Nepheline ss"),
+    ("olivine", "Olivine"),
+    ("orthooxide", "OrthoOxide"),
+    ("orthopyroxene", "Orthopyroxene"),
+    ("panunzite", "Panunzite"),
+    ("periclase", "Periclase"),
+    ("perovskite", "Perovskite"),
+    ("phlogopite", "Phlogopite"),
+    ("pigeonite", "Pigeonite"),
+    ("plagioclase", "Plagioclase"),
+    ("quartz", "Quartz"),
+    ("rutile", "Rutile"),
+    ("sanidine", "Sanidine"),
+    ("sillimanite", "Sillimanite"),
+    ("solid alloy", "Solid Alloy"),
+    ("sphene", "Sphene"),
+    ("spinel", "Spinel"),
+    ("titanaugite", "Titanaugite"),
+    ("tridymite", "Tridymite"),
+    ("water", "Water"),
+    ("whitlockite", "Whitlockite"),
+)
+
+CACHE_V2_PHASE_DICTIONARY = tuple(
+    dict.fromkeys(
+        (
+            *CACHE_V2_SUBPROCESS_PHASE_DICTIONARY,
+            *(canonical for canonical, _native in CACHE_V2_THERMOENGINE_PHASE_LABELS),
+        )
+    )
 )
 
 CACHE_V2_VAPOR_SPECIES = (
@@ -702,7 +778,11 @@ def cache_v2_identity_manifest() -> dict[str, Any]:
         },
         "dictionaries": dictionaries,
         "dictionary_sources": {
-            "phase": "writer-declared AlphaMELTS phase vocabulary v1",
+            "phase": (
+                "writer-declared subprocess vocabulary union ThermoEngine "
+                "MELTSv1.0.2 MELTSmodel.get_phase_names(), canonicalized by "
+                "scripts.grid_pregrind._thermoengine_generic_result"
+            ),
             "species": (
                 "COMPONENT_FIELDS union data/vapor_pressures.yaml projected species"
             ),
@@ -716,7 +796,7 @@ def cache_v2_identity_manifest() -> dict[str, Any]:
             "notice": "no-notice sentinel; future codes require schema-version break",
         },
         "dictionary_policy": {
-            "unknown_phase": "refuse",
+            "unknown_phase": "typed per-point cache_v2_unknown_phase failure",
             "unknown_species": "refuse",
             "overflow": "no silent overflow; schema-version break required",
             "phase_formula_tokens": (
@@ -2182,6 +2262,7 @@ class GridCacheWriter:
         grid_key_id: int,
         output: Mapping[str, Any],
     ) -> bool:
+        output = self.contain_cache_v2_unknown_phase(output)
         output_mode = str(output["engine_mode"])
         if self.backend_name is not None:
             expected_mode = self._engine_mode_for_backend(self.backend_name)
@@ -2253,7 +2334,63 @@ class GridCacheWriter:
             self._rollback_write_section(write_section)
             raise
 
+    @staticmethod
+    def _cache_v2_unknown_phases(generic: Mapping[str, Any]) -> tuple[str, ...]:
+        allowed_phases = set(CACHE_V2_PHASE_DICTIONARY)
+        observed_phases: set[str] = set()
+        observed_phases.update(
+            str(value) for value in generic.get("phases_present") or ()
+        )
+        for field in (
+            "phase_masses_kg",
+            "phase_compositions",
+            "phase_thermo",
+        ):
+            observed_phases.update(
+                str(value) for value in dict(generic.get(field) or {})
+            )
+        for instance in generic.get("phase_instances") or ():
+            phase = dict(instance).get("phase")
+            if phase is not None:
+                observed_phases.add(str(phase))
+        return tuple(sorted(observed_phases - allowed_phases))
+
+    @classmethod
+    def contain_cache_v2_unknown_phase(
+        cls,
+        output: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        """Convert a dictionary gap into one fail-closed point result."""
+        contained = dict(output)
+        if str(contained["status"]) != "ok":
+            return contained
+        unknown_phases = cls._cache_v2_unknown_phases(
+            dict(contained.get("generic") or {})
+        )
+        if not unknown_phases:
+            return contained
+
+        labels = ", ".join(repr(label) for label in unknown_phases)
+        message = f"cache_v2 unknown phase values refused: {labels}"
+        contained.update(
+            {
+                "status": "error",
+                "status_kind": "failure",
+                "refusal_reason": "cache_v2_unknown_phase",
+                "failure_reason_code": "cache_v2_unknown_phase",
+                "failure_message": message[:CACHE_V2_FAILURE_MESSAGE_MAX_LENGTH],
+                # Do not persist scientific values from an output whose phase
+                # vocabulary failed the closed dictionary contract.
+                "generic": {},
+                "thermoengine": {},
+                "alphamelts": {},
+                "finder": {},
+            }
+        )
+        return contained
+
     def _output_values(self, output: Mapping[str, Any]) -> dict[str, Any]:
+        output = self.contain_cache_v2_unknown_phase(output)
         generic = dict(output.get("generic") or {})
         thermoengine = dict(output.get("thermoengine") or {})
         alpha = dict(output.get("alphamelts") or {})
@@ -2467,22 +2604,7 @@ class GridCacheWriter:
     def _validate_cache_v2_output_dictionaries(
         generic: Mapping[str, Any],
     ) -> None:
-        allowed_phases = set(CACHE_V2_PHASE_DICTIONARY)
-        observed_phases: set[str] = set()
-        observed_phases.update(str(value) for value in generic.get("phases_present") or ())
-        for field in (
-            "phase_masses_kg",
-            "phase_compositions",
-            "phase_thermo",
-        ):
-            observed_phases.update(
-                str(value) for value in dict(generic.get(field) or {})
-            )
-        for instance in generic.get("phase_instances") or ():
-            phase = dict(instance).get("phase")
-            if phase is not None:
-                observed_phases.add(str(phase))
-        unknown_phases = sorted(observed_phases - allowed_phases)
+        unknown_phases = GridCacheWriter._cache_v2_unknown_phases(generic)
         if unknown_phases:
             raise ValueError(
                 "cache_v2 unknown phase values refused: "

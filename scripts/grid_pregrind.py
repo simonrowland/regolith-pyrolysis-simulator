@@ -1635,6 +1635,7 @@ def run_cycle(
                         f"expected {job.grid_key_id}, got {grid_key_id}"
                     )
                 _record_job_runtime(job, output)
+                output = writer.contain_cache_v2_unknown_phase(output)
                 if writer.write_result(job.grid_key_id, output):
                     inserted += 1
                 completed += 1

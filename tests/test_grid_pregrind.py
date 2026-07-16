@@ -1111,7 +1111,6 @@ def test_cache_v2_key_hash_round_trips_stored_typed_inputs(tmp_path):
 @pytest.mark.parametrize(
     "field, value, match",
     [
-        ("phases_present", ["unknown_phase"], "unknown phase"),
         (
             "activity_coefficients",
             {"unknown_species": 1.0},
@@ -1142,6 +1141,38 @@ def test_cache_v2_unknown_dictionary_values_are_refused(
     with GridCacheWriter(tmp_path / f"unknown-{field}.db") as writer:
         with pytest.raises(ValueError, match=match):
             writer._output_values(output)
+
+
+def test_cache_v2_thermoengine_phase_dictionary_covers_grounded_vocabulary(
+    tmp_path,
+):
+    native_labels = {
+        native
+        for _canonical, native in (
+            grid_pregrind_writer.CACHE_V2_THERMOENGINE_PHASE_LABELS
+        )
+    }
+    canonical_labels = {
+        canonical
+        for canonical, _native in (
+            grid_pregrind_writer.CACHE_V2_THERMOENGINE_PHASE_LABELS
+        )
+    }
+
+    assert len(native_labels) == len(canonical_labels) == 54
+    assert "Solid Alloy" in native_labels
+    assert "solid alloy" in canonical_labels
+    assert canonical_labels <= set(grid_pregrind_writer.CACHE_V2_PHASE_DICTIONARY)
+    assert "ThermoEngine MELTSv1.0.2 MELTSmodel.get_phase_names()" in (
+        cache_v2_identity_manifest()["dictionary_sources"]["phase"]
+    )
+
+    output = _output()
+    output["generic"]["phases_present"] = ["solid alloy"]
+    output["generic"]["phase_masses_kg"] = {"solid alloy": 0.1}
+    with GridCacheWriter(tmp_path / "solid-alloy.db") as writer:
+        values = writer._output_values(output)
+    assert json.loads(values["generic_phases_present_json"]) == ["solid alloy"]
 
 
 def test_concurrent_partial_creator_is_refused_before_schema_mutation(tmp_path):
@@ -1194,7 +1225,7 @@ def test_legacy_grid_without_cache_v2_metadata_remains_readable(tmp_path):
         assert writer.counts()["total"] == 0
 
 
-def _prepared_drain_database(database):
+def _prepared_drain_database(database, temperatures=(1200.0,)):
     with GridCacheWriter(database) as writer:
         writer.seed_id_block(0)
         batch_id = writer.ensure_batch(
@@ -1202,7 +1233,7 @@ def _prepared_drain_database(database):
             kind="fixed",
             seed=178,
             params={
-                "full_grid_points": 1,
+                "full_grid_points": len(temperatures),
                 "shard_count": 3,
                 "kress91_partition": {
                     "implementation": "fixture:kress91_split",
@@ -1210,13 +1241,14 @@ def _prepared_drain_database(database):
                 },
             },
         )
-        assert writer.materialize_key(
-            _inputs(1200.0),
-            batch_id=batch_id,
-            shuffle_rank=0,
-            shard=0,
-            intended_fO2_log=-9.0,
-        )
+        for shuffle_rank, temperature_C in enumerate(temperatures):
+            assert writer.materialize_key(
+                _inputs(temperature_C),
+                batch_id=batch_id,
+                shuffle_rank=shuffle_rank,
+                shard=0,
+                intended_fO2_log=-9.0,
+            )
 
 
 class _ImmediateResult:
@@ -1258,6 +1290,81 @@ class _ImmediateContext:
     def Pool(self, *, processes, initializer, initargs):
         self.pool = _ImmediatePool(processes, initializer, initargs)
         return self.pool
+
+
+def test_unknown_phase_is_per_point_failure_and_pool_continues(
+    tmp_path, monkeypatch
+):
+    database = tmp_path / "unknown-phase-contained.db"
+    status = tmp_path / "status.json"
+    _prepared_drain_database(database, temperatures=(1200.0, 1250.0, 1300.0))
+    context = _ImmediateContext()
+
+    monkeypatch.setattr(grid_pregrind, "_STOP_REQUESTED", False)
+    monkeypatch.setattr(
+        grid_pregrind.multiprocessing,
+        "get_context",
+        lambda method: context if method == "spawn" else None,
+    )
+
+    def fake_run_point(job):
+        output = _output()
+        if job.shuffle_rank == 0:
+            output["generic"]["phases_present"] = ["future bogus phase"]
+            output["generic"]["phase_masses_kg"] = {"future bogus phase": 0.1}
+        return job.grid_key_id, output
+
+    monkeypatch.setattr(grid_pregrind, "_run_point", fake_run_point)
+    args = SimpleNamespace(
+        backend="subprocess",
+        workers=2,
+        heartbeat_s=60.0,
+        limit=None,
+        status_json=status,
+        seed=178,
+        db=database,
+        commit_every=10,
+        assume_queued_run_mode=None,
+        model="MELTSv1.0.2",
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+        thermoengine_equilibrate_timeout_s=60.0,
+        allow_zero_component_boundary=False,
+    )
+
+    with GridCacheWriter(database, existing_only=True) as writer:
+        batch_id = writer.connection.execute(
+            "SELECT batch_id FROM batches WHERE label = 'fixed-v2'"
+        ).fetchone()[0]
+        result = grid_pregrind.run_cycle(
+            args,
+            writer,
+            batch_id=batch_id,
+            grid_total=3,
+            shard=0,
+        )
+        rows = writer.connection.execute(
+            "SELECT status, status_kind, failure_reason_code, failure_message, "
+            "generic_phases_present_json FROM alphamelts_outputs "
+            "ORDER BY grid_key_id"
+        ).fetchall()
+
+    assert context.pool.submissions == 3
+    assert result == {
+        "existing": 0,
+        "completed": 3,
+        "inserted": 3,
+        "success": 2,
+        "refusal": 0,
+        "failure": 1,
+    }
+    assert rows[0]["status"] == "error"
+    assert rows[0]["status_kind"] == "failure"
+    assert rows[0]["failure_reason_code"] == "cache_v2_unknown_phase"
+    assert "future bogus phase" in rows[0]["failure_message"]
+    assert len(rows[0]["failure_message"]) <= 512
+    assert json.loads(rows[0]["generic_phases_present_json"] or "[]") == []
+    assert [row["status"] for row in rows[1:]] == ["ok", "ok"]
 
 
 def test_drain_only_uses_prepared_queue_without_importing_fe_redox(
