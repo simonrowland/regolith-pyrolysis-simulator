@@ -2062,6 +2062,9 @@ def test_thermoengine_health_smoke_requires_positive_phase_mass(monkeypatch):
         code = args[-1]
         assert 'positive_phase_mass_kg' in code
         assert 'payload.phase_masses_kg' in code
+        assert 'fO2_log=-9.0' in code
+        assert 'payload.solved_fO2_log is None' in code
+        assert 'abs(float(payload.solved_fO2_log) - -9.0)' in code
         return subprocess.CompletedProcess(args, 0, stdout='ok\n', stderr='')
 
     monkeypatch.setattr(
@@ -3467,7 +3470,7 @@ def test_thermoengine_live_fo2_near_spinel_boundary_is_unique_or_fails_loud():
     assert imposed.phase_masses_kg
 
 
-def test_thermoengine_intrinsic_shadow_parity_against_subprocess_when_available():
+def test_thermoengine_absolute_fo2_shadow_parity_against_subprocess_when_available():
     thermo = ThermoEngineBackend()
     try:
         thermo_ok = thermo.initialize({})
@@ -3498,18 +3501,17 @@ def test_thermoengine_intrinsic_shadow_parity_against_subprocess_when_available(
         'MnO': 2.0,
         'P2O5': 3.0,
     }
+    target_fO2_log = -9.0
     thermo_result = thermo.equilibrate(
         temperature_C=1200.0,
         composition_kg=composition_kg,
+        fO2_log=target_fO2_log,
         pressure_bar=1.0,
     )
     subprocess_result = subprocess_backend.equilibrate(
         temperature_C=1200.0,
         composition_kg=composition_kg,
-        # Preserve the pre-redox-root cross-transport anchor: ThermoEngine's
-        # old path was intrinsic closed even though this subprocess reference
-        # was explicitly run at the adapter's historical -9 default.
-        fO2_log=-9.0,
+        fO2_log=target_fO2_log,
         pressure_bar=1.0,
         # Explicit mode: the live parity comparison is an isothermal
         # equilibrate; without this the no-mode contract error fires
@@ -3518,6 +3520,20 @@ def test_thermoengine_intrinsic_shadow_parity_against_subprocess_when_available(
     )
     if not subprocess_result.phase_masses_kg:
         pytest.skip('AlphaMELTS subprocess did not report modal phase masses')
+
+    thermo_solved_fO2_log = thermo_result.diagnostics['solved_fO2_log']
+    subprocess_solved_fO2_log = (
+        subprocess_result.diagnostics['engine_reported_fO2_log']
+    )
+    assert thermo_solved_fO2_log == pytest.approx(
+        target_fO2_log, abs=1.0e-3,
+    )
+    assert subprocess_solved_fO2_log == pytest.approx(
+        target_fO2_log, abs=1.0e-3,
+    )
+    assert thermo_solved_fO2_log == pytest.approx(
+        subprocess_solved_fO2_log, abs=1.0e-3,
+    )
 
     def canonical_modes(result):
         return {

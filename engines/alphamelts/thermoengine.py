@@ -403,6 +403,7 @@ class ThermoEngineTransport:
             if ok or (now - cached_at) < ttl:
                 return ok, message
 
+        target_fO2_log = -9.0
         code = f"""
 from engines.alphamelts.thermoengine import ThermoEngineTransport
 
@@ -417,6 +418,7 @@ transport._initialize_in_process()
 payload = transport._equilibrate_in_process(
     temperature_C=1200.0,
     pressure_bar=1.0,
+    fO2_log={target_fO2_log!r},
     comp_wt={{
         'SiO2': 49.0,
         'TiO2': 1.5,
@@ -432,6 +434,15 @@ payload = transport._equilibrate_in_process(
         'P2O5': 0.3,
     }},
 )
+if (
+    payload.solved_fO2_log is None
+    or abs(float(payload.solved_fO2_log) - {target_fO2_log!r}) >= 1.0e-3
+):
+    raise RuntimeError(
+        'ThermoEngine smoke equilibrium did not solve at requested absolute fO2: '
+        f'requested={{{target_fO2_log!r}:g}}, '
+        f'solved={{payload.solved_fO2_log!r}}'
+    )
 positive_phase_mass_kg = sum(
     float(value)
     for value in payload.phase_masses_kg.values()
