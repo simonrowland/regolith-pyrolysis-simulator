@@ -27,12 +27,20 @@ socketio = SocketIO()
 def _request_authority_config() -> dict[str, object]:
     """Build request authority metadata from the server bind environment."""
     run_config = _run_config_from_env()
+    # Loopback by default; REGOLITH_ALLOWED_HOSTNAMES (comma-separated) is the
+    # operator knob for serving beyond localhost — without it a LAN client's
+    # Host header fails the pinned-authority check with no recourse.
+    extra_hostnames = frozenset(
+        host.strip().lower()
+        for host in os.environ.get('REGOLITH_ALLOWED_HOSTNAMES', '').split(',')
+        if host.strip()
+    )
     return {
         'REGOLITH_BIND_PORT': run_config['port'],
         'REGOLITH_ALLOWED_HOSTNAMES': frozenset({
             'localhost',
             '127.0.0.1',
-        }),
+        }) | extra_hostnames,
     }
 
 
