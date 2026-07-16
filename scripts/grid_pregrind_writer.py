@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 import datetime as dt
+import functools
 import hashlib
 import json
 import math
@@ -19,6 +20,10 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 import yaml
+
+from simulator.accounting.formulas import load_species_formulas
+from simulator.fidelity_vocabulary import EvidenceClass
+from simulator.melt_regime import MeltRegime
 
 
 SCHEMA_VARIANT = "alphamelts-expedited-v1"
@@ -51,6 +56,7 @@ CACHE_V2_SUBPROCESS_PHASE_DICTIONARY = (
     "apatite",
     "corundum",
     "metal",
+    "alloy-solid",
     "alloy-liquid",
     "sulfide-liquid",
     "fluid",
@@ -131,24 +137,6 @@ CACHE_V2_PHASE_DICTIONARY = tuple(
     )
 )
 
-CACHE_V2_VAPOR_SPECIES = (
-    "Al",
-    "Ca",
-    "Cr",
-    "CrO2",
-    "Fe",
-    "K",
-    "KCl",
-    "Mg",
-    "Mn",
-    "Na",
-    "NaCl",
-    "NaF",
-    "Si",
-    "SiO",
-    "Ti",
-)
-
 # ThermoEngine MELTSv1.0.2 liquid solution endmembers. These are activity
 # labels, not bulk oxide components; keeping a separate dictionary prevents a
 # distiller from silently interpreting Fe2SiO4 activity as FeO activity.
@@ -170,18 +158,31 @@ CACHE_V2_THERMOENGINE_LIQUID_ENDMEMBERS = (
     "H2O",
 )
 
+class CacheV2GridBackend(str, Enum):
+    SUBPROCESS = "subprocess"
+    THERMOENGINE = "thermoengine"
+
+
+class CacheV2ConfidenceTier(str, Enum):
+    GROUNDED = "grounded"
+    MODELED = "modeled"
+    INDICATIVE = "indicative"
+
+
+class CacheV2Notice(str, Enum):
+    NONE = "none"
+
+
+# Distillation dictionaries are enumerated from their defining enums. Regime,
+# evidence class, tier, and notice have no grind-source row carriers, so their
+# definition validation remains a manifest/config check. Backend is also used
+# by the point-level engine_mode containment and writer no-blend gate.
 CACHE_V2_FLAG_DICTIONARIES = {
-    "regime": ("frozen", "partial", "molten"),
-    "evidence_class": (
-        "melts",
-        "magemin",
-        "internal-datatables",
-        "internal-analytical",
-        "unknown",
-    ),
-    "backend": ("subprocess", "thermoengine"),
-    "tier": ("grounded", "modeled", "indicative"),
-    "notice": ("none",),
+    "regime": tuple(item.value for item in MeltRegime),
+    "evidence_class": tuple(item.value for item in EvidenceClass),
+    "backend": tuple(item.value for item in CacheV2GridBackend),
+    "tier": tuple(item.value for item in CacheV2ConfidenceTier),
+    "notice": tuple(item.value for item in CacheV2Notice),
 }
 
 CACHE_V2_CLAMP_EXTRAPOLATION_BITS = {
@@ -210,6 +211,20 @@ COMPONENT_FIELDS = (
     "Na2O",
     "K2O",
     "P2O5",
+)
+
+# Formula-bearing volatile products that can be emitted independently of a
+# feedstock/catalog key. Keep this registry explicit: H2S is a legitimate
+# future volatile even though it is not yet a species_catalog feedstock id.
+CACHE_V2_VOLATILE_SPECIES = (
+    "H2O",
+    "CO2",
+    "CO",
+    "CH4",
+    "NH3",
+    "HCN",
+    "SO2",
+    "H2S",
 )
 
 CACHE_V2_QUANTIZED_INPUTS = (
@@ -514,6 +529,40 @@ def _load_corpus_version() -> str:
     return value.strip()
 
 
+@functools.cache
+def _cache_v2_species_dictionary() -> tuple[str, ...]:
+    """Enumerate every project-authoritative formula/vapor species label."""
+    root = Path(__file__).resolve().parents[1]
+    catalog_path = root / "data" / "species_catalog.yaml"
+    vapor_path = root / "data" / "vapor_pressures.yaml"
+    try:
+        formula_species = tuple(load_species_formulas(catalog_path))
+        vapor_payload = yaml.safe_load(vapor_path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError, ValueError) as exc:
+        raise ValueError(f"cannot enumerate cache_v2 species registries: {exc}") from exc
+    if not isinstance(vapor_payload, Mapping):
+        raise ValueError(f"cache_v2 vapor species registry must be a mapping: {vapor_path}")
+    vapor_species: list[str] = []
+    for section in ("metals", "oxide_vapors", "foulant_vapor"):
+        entries = vapor_payload.get(section)
+        if not isinstance(entries, Mapping):
+            raise ValueError(
+                f"cache_v2 vapor species registry section {section!r} "
+                f"must be a mapping: {vapor_path}"
+            )
+        vapor_species.extend(str(value) for value in entries)
+    return tuple(
+        dict.fromkeys(
+            (
+                *COMPONENT_FIELDS,
+                *formula_species,
+                *vapor_species,
+                *CACHE_V2_VOLATILE_SPECIES,
+            )
+        )
+    )
+
+
 def _cache_v2_dictionary(
     values: Sequence[str], *, unknown_policy: str = "refuse"
 ) -> dict[str, Any]:
@@ -731,7 +780,7 @@ def _cache_v2_output_contract() -> list[dict[str, Any]]:
 
 
 def cache_v2_identity_manifest() -> dict[str, Any]:
-    species = tuple(dict.fromkeys((*COMPONENT_FIELDS, *CACHE_V2_VAPOR_SPECIES)))
+    species = _cache_v2_species_dictionary()
     dictionaries = {
         "phase": _cache_v2_dictionary(CACHE_V2_PHASE_DICTIONARY),
         "species": _cache_v2_dictionary(species),
@@ -784,20 +833,26 @@ def cache_v2_identity_manifest() -> dict[str, Any]:
                 "scripts.grid_pregrind._thermoengine_generic_result"
             ),
             "species": (
-                "COMPONENT_FIELDS union data/vapor_pressures.yaml projected species"
+                "simulator.accounting.formulas.load_species_formulas over "
+                "data/species_catalog.yaml union data/vapor_pressures.yaml "
+                "metals/oxide_vapors/foulant_vapor keys union the in-code "
+                "CACHE_V2_VOLATILE_SPECIES product registry"
             ),
             "thermoengine_liquid_endmember": (
                 "ThermoEngine MELTSv1.0.2 Liq endmember_names"
             ),
             "regime": "simulator.melt_regime.MeltRegime",
             "evidence_class": "simulator.fidelity_vocabulary.EvidenceClass",
-            "backend": "GridCacheWriter supported grid backends",
-            "tier": "t-131 confidence rollup vocabulary",
-            "notice": "no-notice sentinel; future codes require schema-version break",
+            "backend": "scripts.grid_pregrind_writer.CacheV2GridBackend",
+            "tier": "scripts.grid_pregrind_writer.CacheV2ConfidenceTier",
+            "notice": "scripts.grid_pregrind_writer.CacheV2Notice",
         },
         "dictionary_policy": {
             "unknown_phase": "typed per-point cache_v2_unknown_phase failure",
-            "unknown_species": "refuse",
+            "unknown_species": "typed per-point cache_v2_unknown_species failure",
+            "unknown_thermoengine_liquid_endmember": (
+                "typed per-point cache_v2_unknown_thermoengine_liquid_endmember failure"
+            ),
             "overflow": "no silent overflow; schema-version break required",
             "phase_formula_tokens": (
                 "exact UTF-8 tokens are carried by phase_instances and may key "
@@ -900,6 +955,34 @@ def _immutable_cache_v2_metadata() -> dict[str, str]:
         "cache_v2_identity_manifest_sha256": hashlib.sha256(
             manifest.encode("utf-8")
         ).hexdigest(),
+    }
+
+
+def _cache_v2_descriptive_manifest_compatible(
+    database_manifest: str | None,
+    writer_manifest: str,
+) -> bool:
+    """Allow legacy descriptive dictionaries without relaxing cache identity."""
+    try:
+        database_payload = json.loads(database_manifest or "")
+        writer_payload = json.loads(writer_manifest)
+    except (TypeError, json.JSONDecodeError):
+        return False
+    if not isinstance(database_payload, dict) or not isinstance(writer_payload, dict):
+        return False
+    descriptive_fields = {
+        "dictionaries",
+        "dictionary_sources",
+        "dictionary_policy",
+    }
+    return {
+        key: value
+        for key, value in database_payload.items()
+        if key not in descriptive_fields
+    } == {
+        key: value
+        for key, value in writer_payload.items()
+        if key not in descriptive_fields
     }
 
 
@@ -1287,6 +1370,7 @@ class GridCacheWriter:
                 # This explicit grid-cache signature is what distinguishes a
                 # presence-optional legacy DB from a partial/crashed creation.
                 self._validate_existing_database()
+                self._upgrade_compatible_cache_v2_descriptive_manifest()
 
             # Additive migrations happen only after the same-connection guard.
             self._ensure_v2_provenance_columns()
@@ -1326,11 +1410,10 @@ class GridCacheWriter:
 
     @staticmethod
     def _engine_mode_for_backend(backend_name: str) -> str:
-        if backend_name == "subprocess":
-            return "subprocess"
-        if backend_name == "thermoengine":
-            return "thermoengine"
-        raise ValueError(f"unsupported grid backend: {backend_name!r}")
+        try:
+            return CacheV2GridBackend(backend_name).value
+        except ValueError as exc:
+            raise ValueError(f"unsupported grid backend: {backend_name!r}") from exc
 
     def _assert_backend_not_blended(self, backend_name: str | None) -> None:
         if backend_name is None:
@@ -1352,6 +1435,41 @@ class GridCacheWriter:
 
     def _validate_existing_database(self) -> None:
         self._validate_connection(self.connection)
+
+    def _upgrade_compatible_cache_v2_descriptive_manifest(self) -> None:
+        """Refresh descriptive dictionaries before this writer can append rows."""
+        immutable = _immutable_cache_v2_metadata()
+        rows = {
+            str(row[0]): str(row[1])
+            for row in self.connection.execute(
+                "SELECT key, value FROM metadata WHERE key IN (?, ?)",
+                (
+                    "cache_v2_identity_manifest",
+                    "cache_v2_identity_manifest_sha256",
+                ),
+            )
+        }
+        stored_manifest = rows.get("cache_v2_identity_manifest")
+        stored_sha256 = rows.get("cache_v2_identity_manifest_sha256")
+        if stored_manifest is None or stored_sha256 is None:
+            return
+        if stored_sha256 != hashlib.sha256(
+            stored_manifest.encode("utf-8")
+        ).hexdigest():
+            return
+        current_manifest = immutable["cache_v2_identity_manifest"]
+        if stored_manifest == current_manifest:
+            return
+        if not _cache_v2_descriptive_manifest_compatible(
+            stored_manifest,
+            current_manifest,
+        ):
+            return
+        self._set_metadata("cache_v2_identity_manifest", current_manifest)
+        self._set_metadata(
+            "cache_v2_identity_manifest_sha256",
+            immutable["cache_v2_identity_manifest_sha256"],
+        )
 
     @staticmethod
     def _validate_connection(connection: sqlite3.Connection) -> None:
@@ -1417,10 +1535,32 @@ class GridCacheWriter:
         }
         if rows:
             missing_metadata = sorted(set(immutable) - set(rows))
+            stored_manifest = rows.get("cache_v2_identity_manifest")
+            stored_manifest_sha256 = rows.get("cache_v2_identity_manifest_sha256")
+            stored_manifest_hash_valid = (
+                stored_manifest is not None
+                and stored_manifest_sha256
+                == hashlib.sha256(stored_manifest.encode("utf-8")).hexdigest()
+            )
+            descriptive_manifest_compatible = (
+                stored_manifest_hash_valid
+                and _cache_v2_descriptive_manifest_compatible(
+                    stored_manifest,
+                    immutable["cache_v2_identity_manifest"],
+                )
+            )
             mismatches = {
                 key: {"database": rows.get(key), "writer": value}
                 for key, value in immutable.items()
                 if rows.get(key) != value
+                and not (
+                    descriptive_manifest_compatible
+                    and key
+                    in {
+                        "cache_v2_identity_manifest",
+                        "cache_v2_identity_manifest_sha256",
+                    }
+                )
             }
             if missing_metadata or mismatches:
                 raise ValueError(
@@ -2262,7 +2402,17 @@ class GridCacheWriter:
         grid_key_id: int,
         output: Mapping[str, Any],
     ) -> bool:
-        output = self.contain_cache_v2_unknown_phase(output)
+        output = self.contain_cache_v2_unknown_dictionary(output)
+        if output.get("failure_reason_code") == "cache_v2_unknown_backend":
+            contained_backend = self.backend_name
+            if contained_backend is None:
+                raw_format = str(output.get("raw_payload_format") or "")
+                contained_backend = (
+                    CacheV2GridBackend.THERMOENGINE.value
+                    if raw_format.startswith("thermoengine-")
+                    else CacheV2GridBackend.SUBPROCESS.value
+                )
+            output = {**output, "engine_mode": contained_backend}
         output_mode = str(output["engine_mode"])
         if self.backend_name is not None:
             expected_mode = self._engine_mode_for_backend(self.backend_name)
@@ -2335,7 +2485,10 @@ class GridCacheWriter:
             raise
 
     @staticmethod
-    def _cache_v2_unknown_phases(generic: Mapping[str, Any]) -> tuple[str, ...]:
+    def _cache_v2_unknown_phases(
+        generic: Mapping[str, Any],
+        alphamelts: Mapping[str, Any] | None = None,
+    ) -> tuple[str, ...]:
         allowed_phases = set(CACHE_V2_PHASE_DICTIONARY)
         observed_phases: set[str] = set()
         observed_phases.update(
@@ -2345,6 +2498,8 @@ class GridCacheWriter:
             "phase_masses_kg",
             "phase_compositions",
             "phase_thermo",
+            "chem_potentials",
+            "phase_affinities",
         ):
             observed_phases.update(
                 str(value) for value in dict(generic.get(field) or {})
@@ -2353,10 +2508,116 @@ class GridCacheWriter:
             phase = dict(instance).get("phase")
             if phase is not None:
                 observed_phases.add(str(phase))
+        alpha = dict(alphamelts or {})
+        observed_phases.update(
+            str(value) for value in alpha.get("phases_present") or ()
+        )
+        for field in ("phase_masses_kg", "phase_modes_wt_pct"):
+            observed_phases.update(
+                str(value) for value in dict(alpha.get(field) or {})
+            )
         return tuple(sorted(observed_phases - allowed_phases))
 
+    @staticmethod
+    def _cache_v2_unknown_species(
+        generic: Mapping[str, Any],
+        alphamelts: Mapping[str, Any] | None = None,
+    ) -> tuple[str, ...]:
+        allowed_species = set(_cache_v2_species_dictionary())
+        instance_formula_tokens = {
+            str(dict(instance).get("instance_id")): str(
+                dict(instance).get("formula_or_endmember_token")
+            )
+            for instance in generic.get("phase_instances") or ()
+            if dict(instance).get("instance_id")
+            and dict(instance).get("formula_or_endmember_token")
+        }
+        observed_species: set[str] = set()
+        for field in (
+            "liquid_composition_wt_pct",
+            "solid_composition_wt_pct",
+            "bulk_composition_wt_pct",
+            "vapor_pressures_Pa",
+            "vapor_pressures_source",
+        ):
+            observed_species.update(
+                str(value) for value in dict(generic.get(field) or {})
+            )
+        for field in ("phase_species_mol", "phase_species_kg"):
+            for instance_id, species_values in dict(
+                generic.get(field) or {}
+            ).items():
+                for value in dict(species_values or {}):
+                    species = str(value)
+                    if species in allowed_species:
+                        continue
+                    if instance_formula_tokens.get(str(instance_id)) == species:
+                        continue
+                    observed_species.add(species)
+        allowed_activity_labels = (
+            allowed_species | set(CACHE_V2_THERMOENGINE_LIQUID_ENDMEMBERS)
+        )
+        observed_species.update(
+            set(
+                str(value)
+                for value in dict(generic.get("activity_coefficients") or {})
+            )
+            - allowed_activity_labels
+        )
+        alpha = dict(alphamelts or {})
+        observed_species.update(
+            str(value)
+            for value in dict(alpha.get("liquid_composition_wt_pct") or {})
+            if str(value) not in allowed_species
+        )
+        observed_species.update(
+            set(
+                str(value)
+                for value in dict(alpha.get("activity_coefficients") or {})
+            )
+            - allowed_activity_labels
+        )
+        return tuple(sorted(observed_species - allowed_species))
+
+    @staticmethod
+    def _cache_v2_unknown_thermoengine_liquid_endmembers(
+        thermoengine: Mapping[str, Any],
+    ) -> tuple[str, ...]:
+        observed = {
+            str(value)
+            for value in dict(thermoengine.get("liquid_activities") or {})
+        }
+        return tuple(
+            sorted(observed - set(CACHE_V2_THERMOENGINE_LIQUID_ENDMEMBERS))
+        )
+
     @classmethod
-    def contain_cache_v2_unknown_phase(
+    def _cache_v2_dictionary_gap(
+        cls,
+        output: Mapping[str, Any],
+    ) -> tuple[str, tuple[str, ...]] | None:
+        generic = dict(output.get("generic") or {})
+        thermoengine = dict(output.get("thermoengine") or {})
+        alphamelts = dict(output.get("alphamelts") or {})
+        backend = str(output.get("engine_mode"))
+        unknown_backend = (
+            ()
+            if backend in {item.value for item in CacheV2GridBackend}
+            else (backend,)
+        )
+        checks = (
+            ("backend", unknown_backend),
+            ("phase", cls._cache_v2_unknown_phases(generic, alphamelts)),
+            ("species", cls._cache_v2_unknown_species(generic, alphamelts)),
+            (
+                "thermoengine_liquid_endmember",
+                cls._cache_v2_unknown_thermoengine_liquid_endmembers(thermoengine),
+            ),
+        )
+        return next(((kind, labels) for kind, labels in checks if labels), None)
+
+    @classmethod
+    def contain_cache_v2_unknown_dictionary(
         cls,
         output: Mapping[str, Any],
     ) -> dict[str, Any]:
@@ -2364,22 +2625,22 @@ class GridCacheWriter:
         contained = dict(output)
         if str(contained["status"]) != "ok":
             return contained
-        unknown_phases = cls._cache_v2_unknown_phases(
-            dict(contained.get("generic") or {})
-        )
-        if not unknown_phases:
+        gap = cls._cache_v2_dictionary_gap(contained)
+        if gap is None:
             return contained
 
-        labels = ", ".join(repr(label) for label in unknown_phases)
-        message = f"cache_v2 unknown phase values refused: {labels}"
+        kind, unknown_values = gap
+        labels = ", ".join(repr(label) for label in unknown_values)
+        reason = f"cache_v2_unknown_{kind}"
+        message = f"cache_v2 unknown {kind} values refused: {labels}"
         contained.update(
             {
                 "status": "error",
                 "status_kind": "failure",
-                "refusal_reason": "cache_v2_unknown_phase",
-                "failure_reason_code": "cache_v2_unknown_phase",
+                "refusal_reason": reason,
+                "failure_reason_code": reason,
                 "failure_message": message[:CACHE_V2_FAILURE_MESSAGE_MAX_LENGTH],
-                # Do not persist scientific values from an output whose phase
+                # Do not persist scientific values from an output whose
                 # vocabulary failed the closed dictionary contract.
                 "generic": {},
                 "thermoengine": {},
@@ -2389,14 +2650,22 @@ class GridCacheWriter:
         )
         return contained
 
+    @classmethod
+    def contain_cache_v2_unknown_phase(
+        cls,
+        output: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        """Backward-compatible name for the all-dictionary containment gate."""
+        return cls.contain_cache_v2_unknown_dictionary(output)
+
     def _output_values(self, output: Mapping[str, Any]) -> dict[str, Any]:
-        output = self.contain_cache_v2_unknown_phase(output)
+        output = self.contain_cache_v2_unknown_dictionary(output)
         generic = dict(output.get("generic") or {})
         thermoengine = dict(output.get("thermoengine") or {})
         alpha = dict(output.get("alphamelts") or {})
         finder = dict(output.get("finder") or {})
         if str(output["status"]) == "ok":
-            self._validate_cache_v2_output_dictionaries(generic)
+            self._validate_cache_v2_vapor_maps(generic)
         values = {
             "status": str(output["status"]),
             "status_kind": str(output["status_kind"]),
@@ -2601,69 +2870,9 @@ class GridCacheWriter:
         return values
 
     @staticmethod
-    def _validate_cache_v2_output_dictionaries(
+    def _validate_cache_v2_vapor_maps(
         generic: Mapping[str, Any],
     ) -> None:
-        unknown_phases = GridCacheWriter._cache_v2_unknown_phases(generic)
-        if unknown_phases:
-            raise ValueError(
-                "cache_v2 unknown phase values refused: "
-                + ", ".join(unknown_phases)
-            )
-
-        allowed_species = set(COMPONENT_FIELDS) | set(CACHE_V2_VAPOR_SPECIES)
-        instance_formula_tokens = {
-            str(dict(instance).get("instance_id")): str(
-                dict(instance).get("formula_or_endmember_token")
-            )
-            for instance in generic.get("phase_instances") or ()
-            if dict(instance).get("instance_id")
-            and dict(instance).get("formula_or_endmember_token")
-        }
-        observed_species: set[str] = set()
-        for field in (
-            "liquid_composition_wt_pct",
-            "solid_composition_wt_pct",
-            "bulk_composition_wt_pct",
-            "vapor_pressures_Pa",
-            "vapor_pressures_source",
-        ):
-            observed_species.update(
-                str(value) for value in dict(generic.get(field) or {})
-            )
-        for field in ("phase_species_mol", "phase_species_kg"):
-            for instance_id, species_values in dict(
-                generic.get(field) or {}
-            ).items():
-                for value in dict(species_values or {}):
-                    species = str(value)
-                    if species in allowed_species:
-                        continue
-                    if instance_formula_tokens.get(str(instance_id)) == species:
-                        continue
-                    observed_species.add(species)
-        unknown_species = sorted(observed_species - allowed_species)
-        if unknown_species:
-            raise ValueError(
-                "cache_v2 unknown species values refused: "
-                + ", ".join(unknown_species)
-            )
-
-        allowed_activity_labels = (
-            allowed_species | set(CACHE_V2_THERMOENGINE_LIQUID_ENDMEMBERS)
-        )
-        unknown_activity_labels = sorted(
-            set(str(value) for value in dict(
-                generic.get("activity_coefficients") or {}
-            ))
-            - allowed_activity_labels
-        )
-        if unknown_activity_labels:
-            raise ValueError(
-                "cache_v2 unknown species activity labels refused: "
-                + ", ".join(unknown_activity_labels)
-            )
-
         liquid_fraction = float(generic.get("liquid_fraction") or 0.0)
         pressures = dict(generic.get("vapor_pressures_Pa") or {})
         sources = dict(generic.get("vapor_pressures_source") or {})

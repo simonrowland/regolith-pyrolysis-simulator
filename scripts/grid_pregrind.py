@@ -28,6 +28,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from scripts.grid_pregrind_writer import (  # noqa: E402
     ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS,
+    CacheV2GridBackend,
     FINDER_INPUT_FIELDS,
     GENERIC_OUTPUT_FIELDS,
     THERMOENGINE_OUTPUT_FIELDS,
@@ -1704,7 +1705,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--db", type=Path, default=DEFAULT_DB)
     result.add_argument(
         "--backend",
-        choices=("subprocess", "thermoengine"),
+        choices=tuple(item.value for item in CacheV2GridBackend),
         default="subprocess",
         help=(
             "chemistry engine (default: subprocess). ThermoEngine is diagnostic-only "
