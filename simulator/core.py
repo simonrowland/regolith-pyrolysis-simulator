@@ -5480,9 +5480,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _dispatch_overhead_bleed(
         self,
         *,
-        turbine_spec=None,
         force_drain_all: bool = False,
-        o2_vented_kg: Optional[float] = None,
         capacity_result=None,
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
@@ -5506,20 +5504,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             'dt_hr': 1.0,
             'force_drain_all': bool(force_drain_all),
-            'max_o2_flow_kg_hr': getattr(
-                turbine_spec, 'max_O2_flow_kg_hr', None
-            ),
             'external_o2_in_overhead_mol': getattr(
                 self,
                 '_o2_bubbler_external_o2_in_overhead_mol',
                 0.0,
             ),
         }
-        if o2_vented_kg is not None:
-            controls['o2_vented_kg'] = o2_vented_kg
         from simulator.thermal_train import FiniteCapacity
 
         capacity, cold_train = self._cold_train_capacity_policy()
+        # Snapshot for _project_overhead_bleed_partition: the policy re-reads
+        # config on every call, so the projection must reuse the exact
+        # capacity this dispatch partitioned with, never a fresh read.
+        self._last_bleed_cold_train_capacity = capacity
         if isinstance(capacity, FiniteCapacity):
             assert cold_train is not None
             accumulator_enabled = bool(
@@ -5566,6 +5563,72 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 stage.collected_kg.pop(OXYGEN_SPECIES, None)
         self._sync_oxygen_kg_counters()
         return result
+
+    def _project_overhead_bleed_partition(self, result: IntentResult) -> None:
+        diagnostic = dict(result.diagnostic or {})
+        admitted_mol = max(0.0, float(diagnostic.get('o2_stored_mol', 0.0) or 0.0))
+        vented_mol = max(
+            0.0,
+            float(diagnostic.get('melt_o2_vented_mol', 0.0) or 0.0),
+        )
+        self.overhead.turbine_flow_mol_hr = admitted_mol
+        self.overhead.turbine_flow_kg_hr = (
+            admitted_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        )
+        self.overhead.O2_vented_mol_hr = vented_mol
+        self.overhead.O2_vented_kg_hr = (
+            vented_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        )
+        self.overhead.melt_offgas_O2_mol_hr = max(
+            0.0,
+            float(diagnostic.get('melt_o2_bled_mol', 0.0) or 0.0),
+        )
+        self.overhead.turbine_limited = any(
+            float(diagnostic.get(name, 0.0) or 0.0) > 0.0
+            for name in ('o2_relieved_mol', 'o2_held_mol')
+        )
+        # Utilization keeps the legacy consumer contract (state.OverheadGas
+        # .turbine_utilization_pct: "load as % of max O2 throughput (0-100+)",
+        # read by the Loop-3b >120% overload ramp throttle): it exceeds 100%
+        # exactly when melt-side O2 demand exceeds the cold train's per-tick
+        # capacity. DERIVATION: demand_mol = admitted + accumulated +
+        # relieved + held (the four melt-side partition legs; external O2
+        # never transits the cold train), capacity_mol = C[kg/hr] x dt[hr]
+        # / M_O2[kg/mol]. Units: kg/hr x hr / (kg/mol) = mol.
+        # turbine_limited deliberately keys on relieved/held ONLY:
+        # accumulation is DESIGNED absorption (the cistern cold-battery
+        # sizes the compressor on campaign mean, and its purpose is letting
+        # the bake-off run at peak while the cavern buffers), so utilization
+        # may read >100% with limited=False while the accumulator absorbs;
+        # at cavern fill the overflow lands in relieved/held and Loop-3b
+        # engages. Conversely the relief law is pressure-driven
+        # (k_relief x max(0, p-p_open)), so limited=True with utilization
+        # <= 100% is also possible. NoColdTrain mirrors the legacy
+        # no-turbine-spec branch: 0.0. Capacity is the snapshot the bleed
+        # dispatch partitioned with (the policy re-reads config per call, so
+        # a fresh read here could report utilization against a different
+        # capacity than the one that produced this partition).
+        capacity = getattr(self, '_last_bleed_cold_train_capacity', None)
+        from simulator.thermal_train import FiniteCapacity
+        if isinstance(capacity, FiniteCapacity) and capacity.value_kg_hr > 0.0:
+            demand_mol = admitted_mol + sum(
+                max(0.0, float(diagnostic.get(name, 0.0) or 0.0))
+                for name in (
+                    'o2_accumulated_mol', 'o2_relieved_mol', 'o2_held_mol'
+                )
+            )
+            # dt_hr is pinned to 1.0 in _dispatch_overhead_bleed's controls.
+            capacity_mol = (
+                capacity.value_kg_hr * 1.0 / OXYGEN_MOLAR_MASS_KG_PER_MOL
+            )
+            self.overhead.turbine_utilization_pct = (
+                demand_mol / capacity_mol * 100.0
+            )
+        else:
+            self.overhead.turbine_utilization_pct = 0.0
+        self.overhead.turbine_shaft_power_kW = (
+            self.overhead.turbine_flow_kg_hr * 0.02
+        )
 
     def _compute_capacity_coupling_shadow(self, equilibrium):
         degraded_before = copy.deepcopy(self._degraded_path_engagement)
@@ -10961,10 +11024,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             self._apply_fe_redox_respeciation()
 
-        # --- 7. Overhead gas (with turbine capacity feedback) ---   [LOOP-2]
-        # Pass the turbine spec so overhead model can enforce capacity limits,
-        # compute O₂ venting, and calculate transport saturation.
-        turbine_spec = self._get_turbine_spec()
+        # --- 7. Overhead gas (with cold-train capacity feedback) ---   [LOOP-2]
+        # Equipment sizing also supplies the runtime pipe/throat geometry used
+        # by transport saturation. The returned turbine record no longer owns
+        # O2 partition authority, but the geometry side effect remains required.
+        self._get_turbine_spec()
         # The AtomLedger is the canonical quantity authority (see AGENTS.md),
         # so the turbine/vent decision is fed strictly the actual finite O2
         # holdup in process.overhead_gas. This is NOT max()'d with a per-tick
@@ -10980,7 +11044,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         bleed_result = None
         if finite_headspace_enabled:
             bleed_result = self._dispatch_overhead_bleed(
-                turbine_spec=turbine_spec,
                 capacity_result=capacity_result,
             )
             self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
@@ -10999,7 +11062,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             evap_flux,
             self.melt,
             self.train,
-            turbine_spec=turbine_spec,
             actual_O2_kg_hr=melt_offgas_O2_kg_hr,
             actual_O2_mol_hr=melt_offgas_O2_kg_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL,
             mre_anode_O2_mol_hr=(
@@ -11028,12 +11090,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Track cumulative O₂ vented and stored
         if not finite_headspace_enabled:
             bleed_result = self._dispatch_overhead_bleed(
-                turbine_spec=turbine_spec,
                 force_drain_all=True,
-                o2_vented_kg=self.overhead.O2_vented_kg_hr,
             )
             self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
             self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        assert bleed_result is not None
+        self._project_overhead_bleed_partition(bleed_result)
         self._sync_oxygen_kg_counters()
         self._refresh_knudsen_zero_overhead_flow_marker(evap_flux)
 
@@ -11269,10 +11331,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _get_turbine_spec(self):
         """
-        Get the turbine spec from the auto-designed plant equipment.
+        Size the plant equipment (side effect) and return its turbine record.
 
-        Returns None if equipment hasn't been sized yet (the overhead
-        model handles None gracefully by not enforcing limits).
+        The load-bearing part is the sizing side effect: it populates
+        self._equipment, whose pipe/throat geometry the overhead transport
+        model consumes. The returned turbine record is display metadata
+        only — O2 capacity authority moved to the cold-train partition
+        (_cold_train_capacity_policy / OVERHEAD_BLEED), so no caller
+        enforces limits from it anymore.
         """
         if self._equipment is None:
             # Auto-size equipment for this batch

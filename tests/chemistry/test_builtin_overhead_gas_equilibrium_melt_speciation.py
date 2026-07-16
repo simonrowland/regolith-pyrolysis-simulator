@@ -283,7 +283,6 @@ def test_materialized_al_o_surface_moves_only_through_commit_batch(
             "p_total_bar": 0.0,
             "p_downstream_bar": 0.0,
             "bleed_conductance_kg_s": 0.0,
-            "max_o2_flow_kg_hr": 0.0,
         },
     )
 

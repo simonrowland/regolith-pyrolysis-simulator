@@ -137,7 +137,11 @@ def test_c3_step_refreshes_equilibrium_after_shuttle_before_evaporation(
         "update",
         lambda *args, **kwargs: sim.overhead,
     )
-    monkeypatch.setattr(sim, "_dispatch_overhead_bleed", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        sim,
+        "_dispatch_overhead_bleed",
+        lambda *args, **kwargs: SimpleNamespace(diagnostic={}),
+    )
     monkeypatch.setattr(sim, "_sync_oxygen_kg_counters", lambda: None)
     monkeypatch.setattr(
         sim.energy_tracker,

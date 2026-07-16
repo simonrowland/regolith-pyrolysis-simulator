@@ -241,24 +241,8 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
                 o2_stored_mol = 0.0
                 melt_o2_vented_mol = 0.0
         else:
-            melt_o2_bled_kg = (
-                melt_o2_bled_mol * molar_mass.get(OXYGEN_SPECIES, 0.0)
-            )
-            melt_o2_vented_kg = self._o2_vented_kg(
-                melt_o2_bled_kg, controls
-            )
-            melt_o2_vented_mol = (
-                melt_o2_vented_kg / molar_mass[OXYGEN_SPECIES]
-                if melt_o2_bled_mol > 0.0
-                and molar_mass.get(OXYGEN_SPECIES, 0.0) > 0.0
-                else 0.0
-            )
-            melt_o2_vented_mol = min(
-                melt_o2_bled_mol, max(0.0, melt_o2_vented_mol)
-            )
-            o2_stored_mol = max(
-                0.0, melt_o2_bled_mol - melt_o2_vented_mol
-            )
+            melt_o2_vented_mol = 0.0
+            o2_stored_mol = melt_o2_bled_mol
         o2_vented_mol = melt_o2_vented_mol + external_o2_bled_mol
         debited_mol = dict(candidate_bled_mol)
         actual_o2_debit_mol = (
@@ -423,6 +407,9 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
 
     @staticmethod
     def _invalid_destructive_control(controls: dict) -> str | None:
+        for legacy_name in ("o2_vented_kg", "max_o2_flow_kg_hr"):
+            if legacy_name in controls:
+                return f"{legacy_name} is retired; OVERHEAD_BLEED owns partitioning"
         finite_capacity = False
         if "cold_train_capacity" in controls:
             from simulator.thermal_train import FiniteCapacity, NoColdTrain
@@ -463,8 +450,6 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             ("dt_hr", 1.0),
             ("p_total_bar", 0.0),
             ("p_downstream_bar", 0.0),
-            ("o2_vented_kg", 0.0),
-            ("max_o2_flow_kg_hr", 0.0),
             ("external_o2_in_overhead_mol", 0.0),
             ("k_relief_kg_hr_Pa", 0.0),
             ("p_open_Pa", 0.0),
@@ -511,23 +496,3 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             if cavern_capacity_kg <= 0.0:
                 return "cavern_capacity_kg must be a finite positive number"
         return None
-
-    @staticmethod
-    def _o2_vented_kg(bled_o2_kg: float, controls: dict) -> float:
-        if bled_o2_kg <= 0.0:
-            return 0.0
-        if "cold_train_capacity" in controls:
-            from simulator.thermal_train import FiniteCapacity
-
-            if isinstance(controls["cold_train_capacity"], FiniteCapacity):
-                return 0.0
-        if "o2_vented_kg" in controls:
-            return min(bled_o2_kg, max(0.0, float(controls["o2_vented_kg"])))
-        max_o2_flow_kg_hr = max(
-            0.0, float(controls.get("max_o2_flow_kg_hr") or 0.0)
-        )
-        if max_o2_flow_kg_hr <= 0.0:
-            return 0.0
-        dt_hr = max(0.0, float(controls.get("dt_hr", 1.0)))
-        max_stored_kg = max_o2_flow_kg_hr * dt_hr
-        return max(0.0, bled_o2_kg - max_stored_kg)

@@ -1722,9 +1722,7 @@ def test_oxygen_is_not_duplicated_in_product_ledger():
     sim.train.stages[1].collected_kg["O2"] = 1.5
     sim.train.stages[4].collected_kg["O2"] = 3.5
     sim._dispatch_overhead_bleed(
-        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
-        o2_vented_kg=3.0,
     )
     snapshot = sim._make_snapshot()
     sim.melt.campaign = CampaignPhase.COMPLETE
@@ -1732,23 +1730,24 @@ def test_oxygen_is_not_duplicated_in_product_ledger():
 
     assert "O2" not in sim.record.products_kg
     assert snapshot.oxygen_produced_kg == pytest.approx(5.0)
-    assert snapshot.O2_stored_kg == pytest.approx(2.0)
-    assert snapshot.O2_vented_cumulative_kg == pytest.approx(3.0)
+    assert snapshot.O2_stored_kg == pytest.approx(5.0)
+    assert snapshot.O2_vented_cumulative_kg == pytest.approx(0.0)
     assert snapshot.stage0_O2_stored_kg == pytest.approx(0.0)
-    assert snapshot.melt_offgas_O2_stored_kg == pytest.approx(2.0)
-    assert snapshot.melt_offgas_O2_vented_kg == pytest.approx(3.0)
+    assert snapshot.melt_offgas_O2_stored_kg == pytest.approx(5.0)
+    assert snapshot.melt_offgas_O2_vented_kg == pytest.approx(0.0)
     assert snapshot.mre_anode_O2_stored_kg == pytest.approx(0.0)
-    assert snapshot.condensation_totals["O2"] == pytest.approx(2.0)
+    assert snapshot.condensation_totals["O2"] == pytest.approx(5.0)
     assert sim.record.oxygen_total_kg == pytest.approx(5.0)
-    assert sim.record.oxygen_stored_kg == pytest.approx(2.0)
-    assert sim.record.oxygen_vented_kg == pytest.approx(3.0)
+    assert sim.record.oxygen_stored_kg == pytest.approx(5.0)
+    assert sim.record.oxygen_vented_kg == pytest.approx(0.0)
     assert (
         sim.record.oxygen_stored_kg + sim.record.oxygen_vented_kg
         == pytest.approx(sim.record.oxygen_total_kg))
     assert sim.atom_ledger.kg_by_account(
-        "terminal.oxygen_melt_offgas_stored")["O2"] == pytest.approx(2.0)
+        "terminal.oxygen_melt_offgas_stored")["O2"] == pytest.approx(5.0)
     assert sim.atom_ledger.kg_by_account(
-        "terminal.oxygen_melt_offgas_vented_to_vacuum")["O2"] == pytest.approx(3.0)
+        "terminal.oxygen_melt_offgas_vented_to_vacuum"
+    ).get("O2", 0.0) == pytest.approx(0.0)
     assert sum(
         stage.collected_kg.get("O2", 0.0)
         for stage in sim.train.stages

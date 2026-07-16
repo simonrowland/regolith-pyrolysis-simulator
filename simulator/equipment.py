@@ -98,10 +98,8 @@ class TurbineSpec:
     Turbine-compressor sizing.
 
     The turbine compresses O₂ from overhead mbar pressure to ~3 bar
-    for storage.  Max throughput is set by the available shaft power
-    and the pressure ratio.  When O₂ production exceeds max_O2_flow_kg_hr,
-    the excess is vented to lunar vacuum (physically reasonable —
-    more O₂ than can be stored).
+    for storage. Runtime admission and relief partitioning belongs to the
+    authoritative OVERHEAD_BLEED provider, not this sizing record.
     """
     power_kW: float = 0.0              # Design-point shaft power
     O2_throughput_kg_hr: float = 0.0   # Design-point O₂ flow
@@ -110,7 +108,6 @@ class TurbineSpec:
     isentropic_efficiency: float = 0.75
 
     # Capacity limits (set by size_turbine)
-    max_O2_flow_kg_hr: float = 0.0     # Maximum O₂ the turbine can compress
     max_shaft_power_kW: float = 0.0    # Maximum shaft power available
     max_total_flow_kg_hr: float = 0.0  # Maximum total gas throughput
 
@@ -512,9 +509,8 @@ class EquipmentDesigner:
 
         Reference: 15-30 kWh per tonne O₂ for compression to ~3 bar.
 
-        Max capacity is 1.5× the design-point O₂ rate.  Beyond this,
-        the turbine shaft power is exceeded and excess O₂ must be vented.
-        The max is set by the pressure differential and available power.
+        The sizing envelope is 1.5× the design-point O₂ rate. Runtime O₂
+        admission and relief remain provider-owned.
         """
         # Expected O₂ production rate (scale with batch)
         # ~400 kg O₂ per tonne regolith over ~100 hours
@@ -526,14 +522,13 @@ class EquipmentDesigner:
 
         # Max capacity = 1.5× design point
         # Beyond this, the turbine shaft power is exceeded
-        max_O2 = O2_rate * 1.5
-        max_shaft = max_O2 * 0.02  # kW at max throughput
-        max_total = max_O2 / 0.3   # Total gas flow (O₂ is ~30%)
+        rated_O2_flow = O2_rate * 1.5
+        max_shaft = rated_O2_flow * 0.02  # kW at rated throughput
+        max_total = rated_O2_flow / 0.3   # Total gas flow (O₂ is ~30%)
 
         return TurbineSpec(
             power_kW=power_kW,
             O2_throughput_kg_hr=O2_rate,
-            max_O2_flow_kg_hr=max_O2,
             max_shaft_power_kW=max_shaft,
             max_total_flow_kg_hr=max_total,
         )

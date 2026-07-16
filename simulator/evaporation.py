@@ -258,12 +258,16 @@ class EvaporationMixin:
         # so this call site stays in lock-step with the rest of the
         # simulator's kernel callers.
         control_inputs, molar_masses_kg_mol = (
-            self._evaporation_flux_control_inputs(
-            equilibrium,
-            overhead_partials_Pa=overhead_partials_Pa,
-            overhead_pressure_pa=self._evaporation_overhead_total_pressure_Pa(
-                overhead_partials_Pa
-            ),
+            EvaporationMixin._evaporation_flux_control_inputs(
+                self,
+                equilibrium,
+                overhead_partials_Pa=overhead_partials_Pa,
+                overhead_pressure_pa=(
+                    EvaporationMixin._evaporation_overhead_total_pressure_Pa(
+                        self,
+                        overhead_partials_Pa,
+                    )
+                ),
             )
         )
         kernel_result = self._dispatch_only(

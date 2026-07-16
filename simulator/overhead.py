@@ -789,7 +789,6 @@ class OverheadGasModel:
     def update(self, evap_flux: EvaporationFlux,
                melt: MeltState,
                train: CondensationTrain,
-               turbine_spec=None,
                actual_O2_kg_hr: float = 0.0,  # kg/hr — melt/offgas O2 mass flow
                actual_O2_mol_hr: Optional[float] = None,  # mol/hr — melt/offgas O2 molar flow
                mre_anode_O2_mol_hr: float = 0.0,  # mol/hr — MRE anode O2 flow
@@ -808,10 +807,6 @@ class OverheadGasModel:
             evap_flux:     Current evaporation rates from the melt
             melt:          Current melt state (T, atmosphere, pO₂)
             train:         Condensation train (for gas routing)
-            turbine_spec:  TurbineSpec from equipment auto-design (optional).
-                           If provided, enforces turbine max O₂ flow and
-                           computes venting, shaft power, and transport
-                           saturation metrics.
             actual_O2_kg_hr: Melt/offgas O₂ produced this hour, kg.
             actual_O2_mol_hr: Same melt/offgas O₂ flow in mol/hr. If omitted,
                               it is projected from kg.
@@ -824,13 +819,14 @@ class OverheadGasModel:
         """
         gas = existing_gas if existing_gas is not None else OverheadGas()
         self._reset_gas(gas)
-        from simulator.thermal_train import FiniteCapacity
-
-        legacy_turbine_spec = (
-            None
-            if isinstance(cold_train_capacity, FiniteCapacity)
-            else turbine_spec
+        O2_flow_kg_hr = max(0.0, actual_O2_kg_hr)
+        O2_flow_mol_hr = (
+            max(0.0, float(actual_O2_mol_hr))
+            if actual_O2_mol_hr is not None
+            else O2_flow_kg_hr / O2_KG_PER_MOL
         )
+        gas.melt_offgas_O2_mol_hr = O2_flow_mol_hr
+        gas.mre_anode_O2_mol_hr = max(0.0, float(mre_anode_O2_mol_hr))
 
         # Total evaporation rate → pressure buildup
         total_evap_kg_hr = evap_flux.total_kg_hr  # kg/hr — total evaporation mass flow
@@ -878,7 +874,6 @@ class OverheadGasModel:
                 actual_O2_kg_hr=actual_O2_kg_hr,  # kg/hr — melt/offgas O2 mass flow
                 actual_O2_mol_hr=actual_O2_mol_hr,  # mol/hr — melt/offgas O2 molar flow
                 mre_anode_O2_mol_hr=mre_anode_O2_mol_hr,  # mol/hr — MRE anode O2 flow
-                turbine_spec=legacy_turbine_spec,
             )
             return gas
 
@@ -967,60 +962,14 @@ class OverheadGasModel:
         # advertising an impossible sum(partials) > total state.
         gas.pressure_mbar = max(gas.pressure_mbar, partial_pressure_sum_mbar)
 
-        # ── Turbine flow + capacity enforcement ─────────── [LOOP-2]
-        O2_flow_kg_hr = max(0.0, actual_O2_kg_hr)  # kg/hr — melt/offgas O2 mass flow
-        O2_flow_mol_hr = (  # mol/hr — melt/offgas O2 molar flow
-            max(0.0, float(actual_O2_mol_hr))
-            if actual_O2_mol_hr is not None
-            else O2_flow_kg_hr / O2_KG_PER_MOL  # kg/hr / kg/mol -> mol/hr
-        )
-        gas.melt_offgas_O2_mol_hr = O2_flow_mol_hr  # mol/hr — melt/offgas O2 source flow
-        gas.mre_anode_O2_mol_hr = max(0.0, float(mre_anode_O2_mol_hr))  # mol/hr — MRE anode O2 source flow
-        gas.turbine_flow_kg_hr = O2_flow_kg_hr  # kg/hr — O2 turbine mass flow before capacity cap
-        gas.turbine_flow_mol_hr = O2_flow_mol_hr  # mol/hr — O2 turbine molar flow before capacity cap
-
-        if legacy_turbine_spec is not None and legacy_turbine_spec.max_O2_flow_kg_hr > 0:
-            max_O2 = legacy_turbine_spec.max_O2_flow_kg_hr  # kg/hr — turbine O2 mass-flow capacity
-
-            # Turbine utilization
-            gas.turbine_utilization_pct = (
-                O2_flow_kg_hr / max_O2 * 100.0) if max_O2 > 0 else 0.0  # percent — dimensionless utilization -> percent
-
-            if O2_flow_kg_hr > max_O2:
-                # Turbine is overloaded: cap compressed flow and vent excess.
-                gas.turbine_limited = True  # dimensionless bool — turbine capacity exceeded
-                gas.O2_vented_kg_hr = O2_flow_kg_hr - max_O2  # kg/hr — O2 flow above turbine capacity
-                gas.O2_vented_mol_hr = gas.O2_vented_kg_hr / O2_KG_PER_MOL  # mol/hr — kg/hr / kg/mol
-                gas.turbine_flow_kg_hr = max_O2  # kg/hr — capped compressed O2 mass flow
-                gas.turbine_flow_mol_hr = max_O2 / O2_KG_PER_MOL  # mol/hr — kg/hr / kg/mol
-            else:
-                gas.turbine_limited = False  # dimensionless bool — turbine capacity not exceeded
-                gas.O2_vented_kg_hr = 0.0  # kg/hr — no vented O2 mass flow
-                gas.O2_vented_mol_hr = 0.0  # mol/hr — no vented O2 molar flow
-
-            # ── Shaft power calculation ─────────────────────── [EQ-5]
-            # W = (γ/(γ-1)) × ṁ × R_specific × T × [(p₂/p₁)^((γ-1)/γ) - 1] / η
-            # Simplified: ~0.02 kWh/kg O₂ from 1 mbar to 3 bar
-            # Actual shaft power scales with the capped flow
-            gas.turbine_shaft_power_kW = gas.turbine_flow_kg_hr * 0.02  # kW — kg/hr × 0.02 kWh/kg
-
-        else:
-            # No turbine spec — no capacity enforcement
-            gas.turbine_utilization_pct = 0.0  # percent — no turbine capacity basis
-            gas.turbine_limited = False  # dimensionless bool — no turbine capacity basis
-            gas.O2_vented_kg_hr = 0.0  # kg/hr — no vented O2 mass flow
-            gas.O2_vented_mol_hr = 0.0  # mol/hr — no vented O2 molar flow
-            gas.turbine_shaft_power_kW = O2_flow_kg_hr * 0.02  # kW — kg/hr × 0.02 kWh/kg
-
         return gas
 
     def _update_finite_headspace(self, gas: OverheadGas, melt: MeltState,
                                  overhead_holdup_mol: Mapping[str, float],
                                  *,
-                                 actual_O2_kg_hr: float,  # kg/hr — melt/offgas O2 mass flow
-                                 actual_O2_mol_hr: Optional[float],  # mol/hr — melt/offgas O2 molar flow
-                                 mre_anode_O2_mol_hr: float,  # mol/hr — MRE anode O2 flow
-                                 turbine_spec) -> None:
+                                  actual_O2_kg_hr: float,  # kg/hr — melt/offgas O2 mass flow
+                                  actual_O2_mol_hr: Optional[float],  # mol/hr — melt/offgas O2 molar flow
+                                  mre_anode_O2_mol_hr: float) -> None:  # mol/hr — MRE anode O2 flow
         partials_bar = self._compute_partial_pressures(  # bar — species partial pressures
             overhead_holdup_mol,
             gas.headspace_volume_m3,
@@ -1082,51 +1031,6 @@ class OverheadGasModel:
                     max(0.0, melt.p_total_mbar - melt.pO2_mbar)
                     * background_fraction,  # mbar — background gas partial pressure share
                 )
-
-        self._update_turbine_fields(
-            gas,
-            turbine_spec=turbine_spec,
-            actual_O2_kg_hr=actual_O2_kg_hr,  # kg/hr — melt/offgas O2 mass flow
-            actual_O2_mol_hr=actual_O2_mol_hr,  # mol/hr — melt/offgas O2 molar flow
-            mre_anode_O2_mol_hr=mre_anode_O2_mol_hr,  # mol/hr — MRE anode O2 flow
-        )
-
-    def _update_turbine_fields(self, gas: OverheadGas, *, turbine_spec,
-                               actual_O2_kg_hr: float,  # kg/hr — melt/offgas O2 mass flow
-                               actual_O2_mol_hr: Optional[float],  # mol/hr — melt/offgas O2 molar flow
-                               mre_anode_O2_mol_hr: float) -> None:  # mol/hr — MRE anode O2 flow
-        O2_flow_kg_hr = max(0.0, actual_O2_kg_hr)  # kg/hr — melt/offgas O2 mass flow
-        O2_flow_mol_hr = (  # mol/hr — melt/offgas O2 molar flow
-            max(0.0, float(actual_O2_mol_hr))
-            if actual_O2_mol_hr is not None
-            else O2_flow_kg_hr / O2_KG_PER_MOL  # kg/hr / kg/mol -> mol/hr
-        )
-        gas.melt_offgas_O2_mol_hr = O2_flow_mol_hr  # mol/hr — melt/offgas O2 source flow
-        gas.mre_anode_O2_mol_hr = max(0.0, float(mre_anode_O2_mol_hr))  # mol/hr — MRE anode O2 source flow
-        gas.turbine_flow_kg_hr = O2_flow_kg_hr  # kg/hr — O2 turbine mass flow before capacity cap
-        gas.turbine_flow_mol_hr = O2_flow_mol_hr  # mol/hr — O2 turbine molar flow before capacity cap
-
-        if turbine_spec is not None and turbine_spec.max_O2_flow_kg_hr > 0:
-            max_O2 = turbine_spec.max_O2_flow_kg_hr  # kg/hr — turbine O2 mass-flow capacity
-            gas.turbine_utilization_pct = (
-                O2_flow_kg_hr / max_O2 * 100.0) if max_O2 > 0 else 0.0  # percent — dimensionless utilization -> percent
-            if O2_flow_kg_hr > max_O2:
-                gas.turbine_limited = True  # dimensionless bool — turbine capacity exceeded
-                gas.O2_vented_kg_hr = O2_flow_kg_hr - max_O2  # kg/hr — O2 flow above turbine capacity
-                gas.O2_vented_mol_hr = gas.O2_vented_kg_hr / O2_KG_PER_MOL  # mol/hr — kg/hr / kg/mol
-                gas.turbine_flow_kg_hr = max_O2  # kg/hr — capped compressed O2 mass flow
-                gas.turbine_flow_mol_hr = max_O2 / O2_KG_PER_MOL  # mol/hr — kg/hr / kg/mol
-            else:
-                gas.turbine_limited = False  # dimensionless bool — turbine capacity not exceeded
-                gas.O2_vented_kg_hr = 0.0  # kg/hr — no vented O2 mass flow
-                gas.O2_vented_mol_hr = 0.0  # mol/hr — no vented O2 molar flow
-            gas.turbine_shaft_power_kW = gas.turbine_flow_kg_hr * 0.02  # kW — kg/hr × 0.02 kWh/kg
-        else:
-            gas.turbine_utilization_pct = 0.0  # percent — no turbine capacity basis
-            gas.turbine_limited = False  # dimensionless bool — no turbine capacity basis
-            gas.O2_vented_kg_hr = 0.0  # kg/hr — no vented O2 mass flow
-            gas.O2_vented_mol_hr = 0.0  # mol/hr — no vented O2 molar flow
-            gas.turbine_shaft_power_kW = O2_flow_kg_hr * 0.02  # kW — kg/hr × 0.02 kWh/kg
 
     @staticmethod
     def _reset_gas(gas: OverheadGas) -> None:

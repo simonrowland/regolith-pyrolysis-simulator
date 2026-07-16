@@ -868,9 +868,7 @@ def test_o2_bubbler_external_passthrough_not_terminal_product_o2() -> None:
     )
 
     bleed_result = sim._dispatch_overhead_bleed(
-        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
-        o2_vented_kg=0.0,
     )
 
     assert bleed_result.diagnostic["external_o2_bled_mol"] == pytest.approx(
@@ -2243,9 +2241,7 @@ def test_pn2_sweep_transport_prediction_matches_authoritative_bleed_residual() -
     head_o2_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
 
     predicted_pO2 = sim._pn2_sweep_transport_pO2_bar(head_o2_mol)
-    bleed = sim._dispatch_overhead_bleed(
-        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0)
-    )
+    bleed = sim._dispatch_overhead_bleed()
     residual_o2_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
     authoritative_residual_pO2 = sim._headspace_ledger_pO2_bar_from_o2_mol(
         residual_o2_mol

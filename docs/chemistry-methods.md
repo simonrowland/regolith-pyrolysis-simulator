@@ -379,7 +379,7 @@ fresh equilibrium solve at each instant: it smooths the time integration but ass
 is constant over the tick, which accumulates error when the melt composition swings hard within a
 single hour. It is stated as a current approximation in
 [`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1560 — hourly depletion reservoir -->
+<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1502 — hourly depletion reservoir -->
 
 ### §4.4 The Knudsen and Langmuir limits, the sweep, and self-poisoning
 
@@ -421,7 +421,7 @@ accumulated oxygen self-limits the extraction. Under an inert sweep cover, that 
 off through the pressure-and-conductance path, lowering the transport oxygen pressure and relieving the
 suppression.
 <!-- impl: §4.4 -> engines/builtin/evaporation_transition.py BuiltinEvaporationTransitionProvider.dispatch:262 — O2 overhead credit -->
-<!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:332 — conductance bleed -->
+<!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:373 — conductance bleed -->
 
 **How the sweep is represented, and its current limits.** The inert sweep (the 5–15 mbar pN₂ cover) enters
 the model as an *overhead pressure*, not as a commanded *flow rate*. Raising it lowers the Knudsen number

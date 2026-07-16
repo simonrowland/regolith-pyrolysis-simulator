@@ -449,6 +449,11 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
 
     snapshot = sim.step()
 
+    assert sim._equipment is not None
+    assert snapshot.overhead.initial_throat_area_m2 == pytest.approx(
+        sim._equipment.pipe.initial_throat_area_m2
+    )
+
     assert (
         snapshot.hour,
         snapshot.temperature_C,
@@ -548,7 +553,6 @@ def test_live_overhead_bleed_routes_binding_capacity_surge_to_accumulator(
     )
 
     result = sim._dispatch_overhead_bleed(
-        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
     )
     diagnostic = dict(result.diagnostic or {})
@@ -1001,7 +1005,7 @@ def test_binding_cold_train_does_not_turn_redox_no_capacity_into_fo2_move(
 
 
 @pytest.mark.parametrize("finite_headspace_enabled", [False, True])
-def test_legacy_turbine_cap_is_unbounded_under_finite_capacity(
+def test_overhead_model_leaves_provider_partition_mirrors_unset(
     finite_headspace_enabled,
 ):
     sim = _real_capacity_sim()
@@ -1011,7 +1015,6 @@ def test_legacy_turbine_cap_is_unbounded_under_finite_capacity(
         EvaporationFlux(),
         sim.melt,
         sim.train,
-        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=1.0e-6),
         actual_O2_kg_hr=1.0,
         actual_O2_mol_hr=1.0 / M_O2,
         overhead_holdup_mol={},
@@ -1020,4 +1023,5 @@ def test_legacy_turbine_cap_is_unbounded_under_finite_capacity(
 
     assert gas.turbine_limited is False
     assert gas.O2_vented_kg_hr == 0.0
-    assert gas.turbine_flow_kg_hr == pytest.approx(1.0)
+    assert gas.turbine_flow_kg_hr == 0.0
+    assert gas.melt_offgas_O2_mol_hr == pytest.approx(1.0 / M_O2)

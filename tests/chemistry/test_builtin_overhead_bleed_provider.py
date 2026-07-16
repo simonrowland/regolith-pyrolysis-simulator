@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import copy
 import math
-from types import SimpleNamespace
 
 import pytest
 
@@ -58,9 +57,7 @@ def test_force_drain_bleed_commits_pure_move_o2_partition(
     )
 
     result = sim._dispatch_overhead_bleed(
-        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
-        o2_vented_kg=3.0,
     )
     proof = dict(result.transition.atom_balance_proof)
 
@@ -74,13 +71,13 @@ def test_force_drain_bleed_commits_pure_move_o2_partition(
     ) == pytest.approx(0.0)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_stored"
-    )["O2"] == pytest.approx(2.0)
+    )["O2"] == pytest.approx(5.0)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_vented_to_vacuum"
-    )["O2"] == pytest.approx(3.0)
+    ).get("O2", 0.0) == pytest.approx(0.0)
 
 
-def test_explicit_no_cold_train_keeps_legacy_o2_partition(
+def test_explicit_no_cold_train_uses_provider_storage_partition(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     sim = _build_sim(
@@ -100,7 +97,6 @@ def test_explicit_no_cold_train_keeps_legacy_o2_partition(
         control_inputs={
             "cold_train_capacity": NoColdTrain(),
             "force_drain_all": True,
-            "o2_vented_kg": 3.0,
         },
     )
 
@@ -108,10 +104,10 @@ def test_explicit_no_cold_train_keeps_legacy_o2_partition(
     assert result.transition is not None
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_stored"
-    )["O2"] == pytest.approx(2.0)
+    )["O2"] == pytest.approx(5.0)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_vented_to_vacuum"
-    )["O2"] == pytest.approx(3.0)
+    ).get("O2", 0.0) == pytest.approx(0.0)
 
 
 def test_bleed_conductance_caps_partial_drain(
@@ -137,7 +133,6 @@ def test_bleed_conductance_caps_partial_drain(
             "bleed_conductance_kg_s": 0.01,
             "dt_hr": 1.0 / 3600.0,
             "force_drain_all": False,
-            "max_o2_flow_kg_hr": 100.0,
         },
     )
 
@@ -193,7 +188,6 @@ def test_bleed_conductance_requires_positive_pressure_delta(
             "bleed_conductance_kg_s": 0.01,
             "dt_hr": 1.0 / 3600.0,
             "force_drain_all": False,
-            "max_o2_flow_kg_hr": 100.0,
         },
     )
 
@@ -302,11 +296,8 @@ def test_destructive_bleed_controls_fail_closed_without_ledger_mutation(
 @pytest.mark.parametrize(
     ("probe", "expected_reason"),
     [
-        ("negative_o2_vented", "o2_vented_kg"),
-        ("nan_o2_vented", "o2_vented_kg"),
         ("negative_downstream_pressure", "p_downstream_bar"),
         ("absent_total_pressure", "p_total_bar"),
-        ("absent_turbine_limit", "max_o2_flow_kg_hr"),
         ("negative_external_o2", "external_o2_in_overhead_mol"),
     ],
 )
@@ -336,18 +327,11 @@ def test_core_passes_raw_destructive_bleed_controls_to_provider_guard(
         "_overhead_gas_equilibrium_diagnostic",
         lambda: {"p_total_bar": 2.0},
     )
-    turbine_spec = SimpleNamespace(max_O2_flow_kg_hr=1.0)
     dispatch_kwargs = {"force_drain_all": True}
-    if probe == "negative_o2_vented":
-        dispatch_kwargs["o2_vented_kg"] = -1.0
-    elif probe == "nan_o2_vented":
-        dispatch_kwargs["o2_vented_kg"] = float("nan")
-    elif probe == "negative_downstream_pressure":
+    if probe == "negative_downstream_pressure":
         sim._overhead_headspace_config["downstream_pressure_bar"] = -1.0
     elif probe == "absent_total_pressure":
         monkeypatch.setattr(sim, "_overhead_gas_equilibrium_diagnostic", lambda: {})
-    elif probe == "absent_turbine_limit":
-        turbine_spec = SimpleNamespace()
     elif probe == "negative_external_o2":
         sim._o2_bubbler_external_o2_in_overhead_mol = -1.0
 
@@ -359,10 +343,7 @@ def test_core_passes_raw_destructive_bleed_controls_to_provider_guard(
     before_transitions = copy.deepcopy(tuple(sim.atom_ledger.transitions))
     before_recorded_snapshots = copy.deepcopy(tuple(sim.record.snapshots))
 
-    result = sim._dispatch_overhead_bleed(
-        turbine_spec=turbine_spec,
-        **dispatch_kwargs,
-    )
+    result = sim._dispatch_overhead_bleed(**dispatch_kwargs)
 
     assert result.status == "unsupported"
     assert result.transition is None
@@ -596,7 +577,6 @@ def test_bleed_conductance_is_kg_s_not_per_bar(
             "bleed_conductance_kg_s": 0.01,
             "dt_hr": 1.0 / 3600.0,
             "force_drain_all": False,
-            "max_o2_flow_kg_hr": 100.0,
         },
     )
 
@@ -628,7 +608,6 @@ def test_legacy_bleed_conductance_alias_remains_kg_s(
             "bleed_conductance_kg_s_per_bar": 0.01,
             "dt_hr": 1.0 / 3600.0,
             "force_drain_all": False,
-            "max_o2_flow_kg_hr": 100.0,
         },
     )
 
@@ -660,7 +639,6 @@ def test_external_o2_bleed_is_not_stored_as_melt_offgas_product(
         control_inputs={
             "force_drain_all": True,
             "external_o2_in_overhead_mol": 4.0,
-            "max_o2_flow_kg_hr": 100.0,
         },
     )
 
@@ -713,7 +691,6 @@ def test_finite_capacity_commits_admission_and_continuous_relief_once(
             "p_open_Pa": 900.0,
             "vessel_rating_Pa": 2000.0,
             "k_relief_kg_hr_Pa": o2_molar_mass / 100.0,
-            "max_o2_flow_kg_hr": 1.0e-12,
         },
     )
 
