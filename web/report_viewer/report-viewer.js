@@ -266,17 +266,24 @@ function campaignSection(artifact, spans) {
 }
 
 function tapsAndPuritySection(terminal) {
-  const stageRows = Object.entries(terminal.stage_purity || {}).map(([key, stage]) => {
+  const stages = Object.entries(terminal.stage_purity || {});
+  const hasActivity = stages.some(([, stage]) => stage.activity && typeof stage.activity === "object" && !Array.isArray(stage.activity) && Object.values(stage.activity).some((value) => typeof value === "boolean"));
+  const stageRows = stages.map(([key, stage]) => {
     const backendVerdict = typeof stage.verdict === "string" && stage.verdict.trim() ? stage.verdict.trim().toUpperCase() : null;
     const verdict = backendVerdict ?? "UNAVAILABLE";
     const verdictClass = ["pure", "mixed", "contaminated"].includes(verdict.toLowerCase()) ? verdict.toLowerCase() : "unavailable";
     const trace = hasNumber(stage.total_kg) && Number(stage.total_kg) < .01 ? ` <span class="trace">· trace (&lt;0.01 kg total)</span>` : "";
-    return `<tr><td>${esc(stage.label || key)}<br><span class="trace mono">${esc(key)}</span></td><td class="species-list">${esc((stage.accepted_species || []).join(" · ") || "none designated")}</td>` +
+    const activity = stage.activity && typeof stage.activity === "object" && !Array.isArray(stage.activity) ? stage.activity : null;
+    const acceptedSpecies = stage.accepted_species || [];
+    const speciesList = activity
+      ? acceptedSpecies.map((species) => typeof activity[species] === "boolean" ? `${esc(species)} · ${activity[species] ? "ACTIVE" : "IDLE"}` : esc(species)).join("<br>") || "none designated"
+      : esc(acceptedSpecies.join(" · ") || "none designated");
+    return `<tr><td>${esc(stage.label || key)}<br><span class="trace mono">${esc(key)}</span></td><td class="species-list">${speciesList}</td>` +
       `<td class="num">${exactKg(stage.total_kg)}${trace}</td><td class="num">${exactKg(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}</td><td class="num">${hasNumber(stage.purity_fraction) ? `${(Number(stage.purity_fraction) * 100).toFixed(4)}%` : "not emitted"}</td><td><span class="verdict ${verdictClass}">${esc(verdict)}</span></td></tr>`;
   }).join("");
   return section(5, "Metal taps & stage purity", "Live backend masses, purity fraction, and verdict. An absent backend verdict is unavailable; trace is an annotation from total_kg.",
     `<div class="table-wrap"><table><thead><tr><th>Stage</th><th>Accepted species</th><th class="num">Total</th><th class="num">Designated</th><th class="num">Impurity</th><th class="num">Purity</th><th>Backend verdict</th></tr></thead><tbody>${stageRows}</tbody></table></div>` +
-    pending("W-A10", "Per-species stage activity is not emitted, so intended-versus-contaminant activity is not inferred."));
+    (hasActivity ? "" : pending("W-A10", "Per-species stage activity is not emitted, so intended-versus-contaminant activity is not inferred.")));
 }
 
 function wallAndOxygenSection(artifact, rows) {
