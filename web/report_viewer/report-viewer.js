@@ -199,9 +199,34 @@ function processSection(artifact, rows, spans) {
   ].join("");
   return section(2, "Process record — per-hour telemetry", "Frozen timestep summaries; shaded bands follow campaign boundaries.",
     `<div class="stepper"><div class="stepper-head"><div><div class="ct">Timestep inspector</div><output id="step-output">Hour ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)} · ${esc(rows[0].campaign)}</output></div><span class="status-pill">1 / ${rows.length}</span></div>` +
-    `<input id="stepper" type="range" min="0" max="${rows.length - 1}" value="0" step="1" aria-label="Report hour"><div class="range-labels"><span>h ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)}</span><span>h ${artifact.timesteps.at(-1).hour === undefined || artifact.timesteps.at(-1).hour === null ? "not emitted" : esc(artifact.timesteps.at(-1).hour)}</span></div><div id="current-grid" class="current-grid"></div></div>` +
+    `<input id="stepper" type="range" min="0" max="${rows.length - 1}" value="0" step="1" aria-label="Report hour"><div class="range-labels"><span>h ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)}</span><span>h ${artifact.timesteps.at(-1).hour === undefined || artifact.timesteps.at(-1).hour === null ? "not emitted" : esc(artifact.timesteps.at(-1).hour)}</span></div><div id="current-grid" class="current-grid"></div><div class="timestep-ledger"><div class="ct">Selected timestep ledger · mol-native</div><div id="timestep-ledger"></div></div></div>` +
     `<div class="chart-grid">${charts}</div>` +
     pending("W-A0", "summary.p_non_O2_bar and carrier_identity are absent. P_total − pO₂ is not used as a substitute, so neutral-sweep pressure is not charted."));
+}
+
+function renderTimestepLedger(timestep) {
+  if (!Object.prototype.hasOwnProperty.call(timestep, "ledger")) {
+    return `<div class="pending timestep-ledger-pending">per-hour ledger not captured in this artifact (schema &lt; 0.2.0 or capture disabled)</div>`;
+  }
+  const ledger = timestep.ledger;
+  if (!ledger || typeof ledger !== "object" || Array.isArray(ledger)) {
+    return `<div class="pending timestep-ledger-pending">per-hour ledger captured, but the account map is malformed</div>`;
+  }
+  const accounts = Object.entries(ledger);
+  if (!accounts.length) {
+    return `<div class="note">Per-hour ledger captured, empty.</div>`;
+  }
+  const rows = accounts.map(([account, species]) => {
+    if (!species || typeof species !== "object" || Array.isArray(species)) {
+      return `<tr><td class="mono">${esc(account)}</td><td colspan="2">captured, malformed species map</td></tr>`;
+    }
+    const entries = Object.entries(species);
+    if (!entries.length) {
+      return `<tr><td class="mono">${esc(account)}</td><td colspan="2">captured, empty account</td></tr>`;
+    }
+    return entries.map(([name, value], index) => `<tr>${index === 0 ? `<td class="mono" rowspan="${entries.length}">${esc(account)}</td>` : ""}<td class="mono">${esc(name)}</td><td class="num">${exactMol(value)}</td></tr>`).join("");
+  }).join("");
+  return `<div class="table-wrap timestep-ledger-wrap"><table><thead><tr><th>Account</th><th>Species</th><th class="num">Amount · mol</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function ledgerSection(finalState) {
@@ -333,6 +358,7 @@ function renderCurrent(artifact, index) {
     ["Evaporation thermal", hasNumber(row.energy_evaporation_thermal_kWh) ? `${Number(row.energy_evaporation_thermal_kWh).toFixed(4)} kWh` : "not emitted"], [row.O2_metric_label || "O₂ metric label not emitted", kg(row.O2_source_side_potential_kg_cumulative, 4)],
     ["Regime", row.regime], ["Kn", row.Kn == null ? "not emitted" : row.Kn && typeof row.Kn === "object" ? sci(row.Kn.knudsen_number) : sci(row.Kn)]
   ].map(([key, value]) => `<div class="current"><div class="k">${esc(key)}</div><div class="v">${esc(value)}</div></div>`).join("");
+  $("#timestep-ledger").innerHTML = renderTimestepLedger(timestep);
   updateMarkers(index, artifact.timesteps.length);
 }
 

@@ -71,6 +71,9 @@ input[type="range"] { width: 100%; margin: 18px 0 8px; accent-color: var(--orang
 .current { flex: 1 1 135px; padding: 10px; border-left: 2px solid var(--blue); background: var(--blue-soft); }
 .current .k { color: var(--ink-3); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
 .current .v { margin-top: 5px; font: 700 14px/1.2 "SFMono-Regular", Consolas, monospace; }
+.timestep-ledger { margin-top: 16px; }
+.timestep-ledger-wrap { max-height: 22rem; margin-top: 8px; overflow: auto; }
+.timestep-ledger-pending { margin-top: 8px; font-size: 12px; line-height: 1.5; }
 
 .chart-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .chartbox { padding: 14px; min-width: 0; }
