@@ -230,6 +230,19 @@ def test_kress91_referenced_log_fo2_refuses_below_calibration_temperature(
         )
 
 
+def test_kress91_referenced_log_fo2_refuses_below_calibration_target_without_reference(
+) -> None:
+    with pytest.raises(
+        Kress91InvalidControls,
+        match=r"target_T_K.*below liquid calibration floor",
+    ):
+        kress91_referenced_log_fO2(
+            -7.75,
+            reference_T_K=None,
+            target_T_K=1000.0,
+        )
+
+
 def test_kress91_equal_temperature_still_references_pressure_change() -> None:
     temperature_K = 1400.0 + 273.15
     reference_fO2_log = -7.75

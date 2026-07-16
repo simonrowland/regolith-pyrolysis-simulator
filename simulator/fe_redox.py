@@ -198,23 +198,27 @@ def kress91_referenced_log_fO2(
     target_pressure_bar: float | None = None,
 ) -> float:
     redox_fO2_log = float(fO2_log)
-    if reference_T_K is None:
-        return redox_fO2_log
-    redox_reference_T_K = float(reference_T_K)
     redox_target_T_K = float(target_T_K)
     # 273.15 K is the exact Celsius-to-kelvin offset, so this is the
     # documented 1200 C liquid-calibration floor expressed in kelvin.
     calibration_min_T_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15
-    for name, temperature_K in (
-        ('reference_T_K', redox_reference_T_K),
-        ('target_T_K', redox_target_T_K),
-    ):
-        if temperature_K < calibration_min_T_K:
-            raise Kress91InvalidControls(
-                f'Kress91 invalid control {name}: {temperature_K!r} K is '
-                'below liquid calibration floor '
-                f'{calibration_min_T_K!r} K'
-            )
+    if redox_target_T_K < calibration_min_T_K:
+        raise Kress91InvalidControls(
+            f'Kress91 invalid control target_T_K: {redox_target_T_K!r} K is '
+            'below liquid calibration floor '
+            f'{calibration_min_T_K!r} K'
+        )
+    if reference_T_K is None:
+        return redox_fO2_log
+    redox_reference_T_K = float(reference_T_K)
+    if redox_reference_T_K < calibration_min_T_K:
+        # A reference in the REF-001 mid-band is corrupt persisted state and
+        # must fail loud rather than silently bypassing the calibration band.
+        raise Kress91InvalidControls(
+            'Kress91 invalid control reference_T_K: '
+            f'{redox_reference_T_K!r} K is below liquid calibration floor '
+            f'{calibration_min_T_K!r} K'
+        )
     delta_ln_fO2 = kress91_ln_fO2_temperature_delta(
         redox_reference_T_K,
         redox_target_T_K,
