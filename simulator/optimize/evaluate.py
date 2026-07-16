@@ -1299,6 +1299,17 @@ def _trace_with_optimizer_coating_report(
         raise CoatingFeasibilityReportError(
             "wall_deposit_by_segment_species_kg trace is missing or malformed"
         )
+    try:
+        campaigns_elapsed = float(getattr(run_execution, "campaigns_elapsed", 1.0))
+    except (TypeError, ValueError) as exc:
+        raise CoatingFeasibilityReportError(
+            "campaigns_elapsed must be numeric"
+        ) from exc
+    if not math.isfinite(campaigns_elapsed) or campaigns_elapsed <= 0.0:
+        raise CoatingFeasibilityReportError(
+            "campaigns_elapsed must be finite and positive"
+        )
+    normalized_deposit: dict[tuple[str, str], float] = {}
     by_species: dict[str, float] = {}
     for key, raw_kg in raw_deposit.items():
         if not isinstance(key, tuple) or len(key) != 2:
@@ -1315,16 +1326,22 @@ def _trace_with_optimizer_coating_report(
             raise CoatingFeasibilityReportError(
                 f"wall deposit {key!r} must be finite and non-negative"
             )
-        by_species[str(key[1])] = by_species.get(str(key[1]), 0.0) + kg
+        normalized_kg = kg / campaigns_elapsed
+        normalized_deposit[(str(key[0]), str(key[1]))] = normalized_kg
+        by_species[str(key[1])] = by_species.get(str(key[1]), 0.0) + normalized_kg
     from simulator.runner import _wall_fouling_report
 
     runner_report = _wall_fouling_report(
         by_species,
-        wall_deposit_by_segment_species=raw_deposit,
+        wall_deposit_by_segment_species=normalized_deposit,
         alpha_notice=getattr(trace, "wall_deposit_sticking_authority", {}) or {},
     )
     try:
         campaigns = runner_report["campaigns_to_resinter"]
+        aggregate_campaigns = runner_report.get(
+            "aggregate_campaigns_to_resinter",
+            campaigns,
+        )
         authoritative = runner_report["authoritative_for_resinter"]
         output_status = runner_report["output_status"]
         status_reason = runner_report["status_reason"]
@@ -1332,18 +1349,29 @@ def _trace_with_optimizer_coating_report(
         raise CoatingFeasibilityReportError(
             f"runner wall-fouling report missing required field: {exc.args[0]}"
         ) from exc
+    threshold_parametric = False
     if campaigns == "infinite":
         campaigns = math.inf
     elif isinstance(campaigns, str) and campaigns.startswith(
         "resinter_threshold_kg / "
     ):
+        threshold_parametric = True
+        campaigns = math.inf
+    if aggregate_campaigns == "infinite":
+        aggregate_campaigns = math.inf
+    elif isinstance(aggregate_campaigns, str) and aggregate_campaigns.startswith(
+        "resinter_threshold_kg / "
+    ):
+        threshold_parametric = True
+        aggregate_campaigns = math.inf
+    if threshold_parametric:
         authoritative = False
         output_status = "non-authoritative-threshold"
         status_reason = "resinter threshold is not grounded"
-        campaigns = math.inf
     report = dict(runner_report)
     report.update(
-        campaigns_to_resinter_total=campaigns,
+        campaigns_to_resinter_worst_segment=campaigns,
+        campaigns_to_resinter_total=aggregate_campaigns,
         authoritative_for_resinter=authoritative,
         output_status=output_status,
         status_reason=status_reason,

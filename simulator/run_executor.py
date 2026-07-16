@@ -92,6 +92,21 @@ class RunExecution:
     campaigns_elapsed: float = 1.0
 
 
+def _campaigns_elapsed_from_session_history(
+    session: SimSession,
+    *,
+    fallback: float,
+) -> float:
+    completed_campaigns = sum(
+        1
+        for result in getattr(session, "_step_results", ())
+        if getattr(result, "campaign_summary", None) is not None
+    )
+    if completed_campaigns:
+        return float(completed_campaigns)
+    return float(fallback)
+
+
 class RunExecutor:
     """Drive a configured session and return structured execution data."""
 
@@ -323,8 +338,15 @@ class RunExecutor:
                 reduced_real_cache=reduced_real_cache,
                 backend_status=backend_status,
                 backend_authoritative=backend_authoritative,
-                campaigns_elapsed=float(
-                    getattr(getattr(session, "_config", None), "campaigns_elapsed", 1.0)
+                campaigns_elapsed=_campaigns_elapsed_from_session_history(
+                    session,
+                    fallback=float(
+                        getattr(
+                            getattr(session, "_config", None),
+                            "campaigns_elapsed",
+                            1.0,
+                        )
+                    ),
                 ),
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
@@ -375,8 +397,15 @@ class RunExecutor:
                     "envelope detail unavailable: "
                     f"{_safe_exception_text(envelope_exc)}"
                 ),
-                campaigns_elapsed=float(
-                    getattr(getattr(session, "_config", None), "campaigns_elapsed", 1.0)
+                campaigns_elapsed=_campaigns_elapsed_from_session_history(
+                    session,
+                    fallback=float(
+                        getattr(
+                            getattr(session, "_config", None),
+                            "campaigns_elapsed",
+                            1.0,
+                        )
+                    ),
                 ),
             )
 

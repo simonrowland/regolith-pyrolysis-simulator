@@ -226,6 +226,7 @@ RUN_METADATA_KEYS = frozenset({
     "campaign",
     "hours_requested",
     "hours_completed",
+    "campaigns_elapsed",
     "mass_kg",
     "additives_kg",
     "track",

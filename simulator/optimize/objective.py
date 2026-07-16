@@ -1780,7 +1780,11 @@ def _tap_coating_product_summary(
                 "wall_deposit_kg_by_zone_species": MappingProxyType({}),
                 "wall_deposit_remobilization_by_segment_species": MappingProxyType({}),
                 "campaigns_to_resinter": "infinite",
-                **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
+                "aggregate_campaigns_to_resinter": "infinite",
+                **_furnace_lifespan_cost_summary_from_raw(
+                    raw_by_segment,
+                    campaigns_elapsed=_campaigns_elapsed(run_execution),
+                ),
                 **_coating_authority_summary(authority),
             }
         )
@@ -1822,7 +1826,14 @@ def _tap_coating_product_summary(
                 raw_by_segment,
                 campaigns_elapsed=_campaigns_elapsed(run_execution),
             ),
-            **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
+            "aggregate_campaigns_to_resinter": _aggregate_campaigns_to_resinter(
+                raw_by_segment,
+                campaigns_elapsed=_campaigns_elapsed(run_execution),
+            ),
+            **_furnace_lifespan_cost_summary_from_raw(
+                raw_by_segment,
+                campaigns_elapsed=_campaigns_elapsed(run_execution),
+            ),
             **_coating_authority_summary(authority),
         }
     )
@@ -3390,7 +3401,14 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
             raw_by_segment,
             campaigns_elapsed=_campaigns_elapsed(run_execution),
         ),
-        **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
+        "aggregate_campaigns_to_resinter": _aggregate_campaigns_to_resinter(
+            raw_by_segment,
+            campaigns_elapsed=_campaigns_elapsed(run_execution),
+        ),
+        **_furnace_lifespan_cost_summary_from_raw(
+            raw_by_segment,
+            campaigns_elapsed=_campaigns_elapsed(run_execution),
+        ),
         **_coating_authority_summary(authority),
     })
 
@@ -3709,21 +3727,42 @@ def _campaigns_to_resinter(
     *,
     campaigns_elapsed: float = 1.0,
 ) -> float | str:
-    by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
-    if not by_species:
-        return "infinite"
-    total_wall_load_kg = sum(by_species.values())
     elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
     if elapsed <= 0.0:
         raise ObjectiveComputationError("campaigns_elapsed must be positive")
-    # Cumulative load L over N campaigns implies rate L/N kg/campaign.
-    # threshold kg / (L/N kg/campaign) = threshold*N/L campaigns; for N=1,
-    # L and threshold=10L, the result is 10 campaigns.
-    wall_load_kg_per_campaign = total_wall_load_kg / elapsed
+    by_segment = _wall_deposit_by_segment_species_summary(
+        wall_deposit_by_segment_species
+    )
+    segment_loads_kg_per_campaign = [
+        sum(species_kg.values()) / elapsed
+        for species_kg in by_segment.values()
+        if sum(species_kg.values()) > 0.0
+    ]
+    if not segment_loads_kg_per_campaign:
+        return "infinite"
+    controlling_load_kg_per_campaign = max(segment_loads_kg_per_campaign)
     threshold = _wall_resinter_threshold_kg()
     if threshold is None:
-        return f"resinter_threshold_kg / {wall_load_kg_per_campaign:.12g}"
-    return threshold / wall_load_kg_per_campaign
+        return f"resinter_threshold_kg / {controlling_load_kg_per_campaign:.12g}"
+    return threshold / controlling_load_kg_per_campaign
+
+
+def _aggregate_campaigns_to_resinter(
+    wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+    *,
+    campaigns_elapsed: float = 1.0,
+) -> float | str:
+    by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
+    if not by_species:
+        return "infinite"
+    elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
+    if elapsed <= 0.0:
+        raise ObjectiveComputationError("campaigns_elapsed must be positive")
+    aggregate_load_kg_per_campaign = sum(by_species.values()) / elapsed
+    threshold = _wall_resinter_threshold_kg()
+    if threshold is None:
+        return f"resinter_threshold_kg / {aggregate_load_kg_per_campaign:.12g}"
+    return threshold / aggregate_load_kg_per_campaign
 
 
 def _campaigns_elapsed(run_execution: Any) -> float:
@@ -3791,14 +3830,31 @@ def _furnace_lifespan_cost_summary(
     sim: Any,
 ) -> Mapping[str, Any]:
     raw = _wall_deposit_metric_raw(run_execution, sim)
-    return _furnace_lifespan_cost_summary_from_raw(raw)
+    return _furnace_lifespan_cost_summary_from_raw(
+        raw,
+        campaigns_elapsed=(
+            _campaigns_elapsed(run_execution) if run_execution is not None else 1.0
+        ),
+    )
 
 
 def _furnace_lifespan_cost_summary_from_raw(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+    *,
+    campaigns_elapsed: float = 1.0,
 ) -> Mapping[str, Any]:
-    by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
-    total_wall_load_kg = sum(by_species.values())
+    elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
+    if elapsed <= 0.0:
+        raise ObjectiveComputationError("campaigns_elapsed must be positive")
+    cumulative_by_species = _wall_deposit_by_species_summary(
+        wall_deposit_by_segment_species
+    )
+    cumulative_total_wall_load_kg = sum(cumulative_by_species.values())
+    by_species = MappingProxyType({
+        species: kg / elapsed
+        for species, kg in cumulative_by_species.items()
+    })
+    total_wall_load_kg = cumulative_total_wall_load_kg / elapsed
     threshold = _wall_resinter_threshold_kg()
     summary: dict[str, Any] = {
         "furnace_lifespan_consumed_fraction": None,
@@ -3809,6 +3865,8 @@ def _furnace_lifespan_cost_summary_from_raw(
         "resinter_threshold_kg": threshold,
         "wall_deposit_total_kg": total_wall_load_kg,
         "wall_deposit_kg_by_species": by_species,
+        "wall_deposit_cumulative_total_kg": cumulative_total_wall_load_kg,
+        "wall_deposit_cumulative_kg_by_species": cumulative_by_species,
     }
     if threshold is None:
         return MappingProxyType(summary)

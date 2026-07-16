@@ -169,8 +169,10 @@ it does not introduce a new schema version.
   runs: `backend_status`, `backend_authoritative`, `backend_real_active`,
   `evidence_class`, `runtime_status`, `label_source`,
   `certification_allowed`, and `engines_used.active/requested/registry`.
-* Any extra keys passed via `run_metadata_overrides` are forwarded
-  verbatim; the runner does not interpret them.
+* Any extra keys passed via `run_metadata_overrides` are forwarded verbatim
+  except `campaigns_elapsed`: completed campaign-transition summaries in the
+  session are authoritative, while the override is an explicit fallback when
+  the run records no completed transition.
 * `refusal_diagnostic` preserves the typed reason and structured evidence for
   any handled simulation refusal. Campaign-pressure refusals populate only
   this generic field. Knudsen refusals also populate

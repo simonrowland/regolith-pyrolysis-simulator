@@ -1133,6 +1133,7 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
+        run_metadata["campaigns_elapsed"] = float(execution.campaigns_elapsed)
         run_metadata.update(
             {
                 "backend_status": str(execution.backend_status),
@@ -3882,6 +3883,17 @@ def _runner_failure_result(
     }
     for key, value in overrides.items():
         run_metadata[str(key)] = _json_safe(value)
+    run_metadata["campaigns_elapsed"] = _json_safe(
+        float(
+            getattr(
+                execution,
+                "campaigns_elapsed",
+                overrides.get("campaigns_elapsed", 1.0),
+            )
+            if execution is not None
+            else overrides.get("campaigns_elapsed", 1.0)
+        )
+    )
     run_metadata.update(
         canonicalize_fidelity_emission(
             backend_name=backend_name,

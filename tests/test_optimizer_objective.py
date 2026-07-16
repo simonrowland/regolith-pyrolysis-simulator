@@ -422,6 +422,56 @@ def test_lifespan_cost_metric_is_not_costed_when_threshold_is_unavailable(monkey
     }
 
 
+def test_multisegment_lifespan_and_economics_normalize_cumulative_campaign_load(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(objective_module, "_wall_resinter_threshold_kg", lambda: 10.0)
+    deposits = {
+        ("hot_duct", "SiO"): 8.0,
+        ("cold_duct", "Na"): 0.8,
+    }
+    sim = SimpleNamespace()
+    run_execution = SimpleNamespace(
+        simulator=sim,
+        campaigns_elapsed=4.0,
+        trace=SimpleNamespace(wall_deposit_by_segment_species_kg=deposits),
+    )
+    cost_parameters = CostParameters(
+        electricity_cost_per_kWh=0.0,
+        furnace_resinter_cost_usd=100.0,
+        depreciation_expense_per_run=999.0,
+        generic_reagent_cost_per_kg=0.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 0.0,
+            "K": 0.0,
+            "Mg": 0.0,
+            "Ca": 0.0,
+        },
+    )
+
+    assert objective_module._campaigns_to_resinter(
+        deposits,
+        campaigns_elapsed=4.0,
+    ) == pytest.approx(5.0)
+    assert objective_module._aggregate_campaigns_to_resinter(
+        deposits,
+        campaigns_elapsed=4.0,
+    ) == pytest.approx(10.0 / 2.2)
+
+    lifespan = objective_module._furnace_lifespan_cost_summary(run_execution, sim)
+    assert lifespan["wall_deposit_total_kg"] == pytest.approx(2.2)
+    assert lifespan["wall_deposit_cumulative_total_kg"] == pytest.approx(8.8)
+    assert lifespan["furnace_lifespan_consumed_fraction"] == pytest.approx(0.22)
+
+    depreciation = objective_module._depreciation_expense_per_run_summary(
+        run_execution,
+        sim,
+        cost_parameters=cost_parameters,
+    )
+    assert depreciation["campaigns_to_resinter"] == pytest.approx(10.0 / 2.2)
+    assert depreciation["depreciation_expense_per_run_usd"] == pytest.approx(22.0)
+
+
 def test_marginal_cost_uses_depreciation_default_and_shuttle_replacement_rate() -> None:
     cost_parameters = CostParameters(
         electricity_cost_per_kWh=7.0,

@@ -2815,6 +2815,7 @@ def test_runner_wall_fouling_report_binds_optimizer_candidate(
         "_wall_fouling_report",
         lambda *_args, **_kwargs: {
             "campaigns_to_resinter": 9.0,
+            "aggregate_campaigns_to_resinter": 12.0,
             "resinter_threshold_kg": 4.5,
             "wall_deposit_kg_per_campaign": 0.5,
             "authoritative_for_resinter": True,
@@ -2844,6 +2845,8 @@ def test_runner_wall_fouling_report_binds_optimizer_candidate(
     assert result.failing_gates == ("coating",)
     coating = result.feasibility_margins["coating"]
     assert coating.observed == pytest.approx(9.0)
+    assert coating.status_payload["campaigns_to_resinter_worst_segment"] == pytest.approx(9.0)
+    assert coating.status_payload["campaigns_to_resinter_total"] == pytest.approx(12.0)
     assert coating.status_payload["resinter_threshold_kg"] == pytest.approx(4.5)
     assert coating.status_payload["wall_deposit_kg_per_campaign"] == pytest.approx(0.5)
     assert coating.status_payload["sticking_alpha_authority"] == {

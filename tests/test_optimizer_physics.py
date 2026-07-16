@@ -392,7 +392,8 @@ def test_authoritative_bad_coating_fails_grounded_campaign_gate() -> None:
 def test_runner_fouling_report_binds_authoritative_coating_gate() -> None:
     trace = _valid_trace_object(
         wall_fouling_report={
-            "campaigns_to_resinter_total": 9.5,
+            "campaigns_to_resinter_total": 20.0,
+            "campaigns_to_resinter_worst_segment": 9.5,
             "authoritative_for_resinter": True,
             "output_status": "authoritative",
             "status_reason": "",

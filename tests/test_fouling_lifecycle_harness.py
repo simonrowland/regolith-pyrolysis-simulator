@@ -132,12 +132,30 @@ def test_harness_rejects_constituent_mass_balance_regression() -> None:
         harness.run((0,))
 
 
-def test_harness_namespaces_live_runner_total_parity_from_lifecycle_projection() -> None:
-    runner_verdict = _wall_fouling_report({"SiO": 0.3})
+def test_harness_namespaces_live_runner_aggregate_parity_from_lifecycle_projection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "simulator.runner._wall_liner_resinter_config",
+        lambda: {
+            "liner_material": "test-liner",
+            "resinter_threshold_kg": 10.0,
+            "resinter_threshold_basis": "test basis",
+            "fast_fouling_campaign_threshold": 10,
+        },
+    )
+    deposits = {
+        ("hot_duct", "SiO"): 2.0,
+        ("cold_duct", "Na"): 0.2,
+    }
+    runner_verdict = _wall_fouling_report(
+        {"SiO": 2.0, "Na": 0.2},
+        wall_deposit_by_segment_species=deposits,
+    )
 
     def run_campaign(_index: int) -> FoulingRunArtifact:
         return _artifact(
-            {("duct_a", "SiO"): 0.3},
+            deposits,
             ledger=object(),
             result_document={"fouling_rate": runner_verdict},
         )
@@ -150,12 +168,12 @@ def test_harness_namespaces_live_runner_total_parity_from_lifecycle_projection()
         resinter_threshold_kg=None,
     ).run((0,))
 
+    assert runner_verdict["campaigns_to_resinter"] == pytest.approx(5.0)
     assert result.campaigns_to_resinter_total.to_dict() == {
-        "value": runner_verdict["campaigns_to_resinter"],
+        "value": runner_verdict["aggregate_campaigns_to_resinter"],
         "authoritative_for_resinter": runner_verdict["authoritative_for_resinter"],
     }
-    assert result.lifecycle_projection.to_dict()["service_life_campaigns"] is None
-    assert result.lifecycle_projection.to_dict()["service_life_authoritative"] is False
+    assert result.campaigns_to_resinter_total.value == pytest.approx(10.0 / 2.2)
 
 
 def test_runner_resinter_verdict_uses_worst_segment_liner_load(

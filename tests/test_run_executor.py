@@ -9,7 +9,12 @@ import pytest
 from simulator.accounting.ledger import AtomLedger
 from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.condensation import KnudsenRegimeRefusal
-from simulator.run_executor import RunExecution, RunExecutor, _aggregate_backend_status
+from simulator.run_executor import (
+    RunExecution,
+    RunExecutor,
+    _aggregate_backend_status,
+    _campaigns_elapsed_from_session_history,
+)
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession, SimSessionConfig, StepResult
 from simulator.state import CampaignPhase, DecisionType
@@ -61,6 +66,37 @@ def test_run_executor_propagates_campaigns_elapsed_from_run_metadata():
 
     assert config.campaigns_elapsed == pytest.approx(4.0)
     assert execution.campaigns_elapsed == pytest.approx(4.0)
+
+
+def test_campaign_transition_history_overrides_campaign_count_fallback():
+    session = SimpleNamespace(
+        _step_results=[
+            SimpleNamespace(campaign_summary={"campaign": "C0"}),
+            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(campaign_summary={"campaign": "C1"}),
+        ]
+    )
+
+    assert _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    ) == pytest.approx(2.0)
+
+
+def test_run_metadata_projects_execution_campaign_count_over_override():
+    run = _run(
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-30T00:00:00Z",
+            "kernel_commit_sha": "run-executor-fixture",
+            "campaigns_elapsed": 99,
+        }
+    )
+    execution = RunExecutor().execute(run._session_config())
+    execution = replace(execution, campaigns_elapsed=2.0)
+
+    payload = run._build_output(execution)
+
+    assert payload["run_metadata"]["campaigns_elapsed"] == pytest.approx(2.0)
 
 
 def test_pyrolysis_run_is_executor_json_adapter():
