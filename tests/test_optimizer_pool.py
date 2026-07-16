@@ -25,6 +25,13 @@ from simulator.optimize.pool import PoolEvaluationRequest, evaluate_batch
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
 
+# Pool tests encode a synthetic integer signal on a real allowlist-v12 knob so
+# RecipePatch.recipe_id / resolve_conditional_patch validate (post-t-155).
+# Signal range used by this file is roughly [-1, 99]; base 1300 keeps every
+# encoded value inside furnace_max_T_C bounds [1200, 2000].
+_POOL_TEST_KNOB = "furnace_max_T_C"
+_POOL_TEST_SIGNAL_BASE = 1300.0
+
 
 _DATA_DIGESTS = {
     "setpoints": "setpoints-digest",
@@ -118,7 +125,15 @@ def spawnable_process_pool() -> None:
 
 
 def _patch(value: int) -> RecipePatch:
-    return RecipePatch.from_nested({"test": {"value": value}})
+    """Build a schema-valid patch carrying a pool-test integer signal."""
+    return RecipePatch.from_nested(
+        {_POOL_TEST_KNOB: _POOL_TEST_SIGNAL_BASE + float(value)}
+    )
+
+
+def _patch_signal(patch: RecipePatch) -> int:
+    """Decode the integer signal stored on the allowlist-v12 test knob."""
+    return int(round(float(patch.to_nested()[_POOL_TEST_KNOB]) - _POOL_TEST_SIGNAL_BASE))
 
 
 def _profile() -> dict[str, object]:
@@ -244,7 +259,7 @@ def _fake_evaluate(
     output_dir: str,
     **_: object,
 ) -> ScoredResult:
-    value = int(patch.to_nested()["test"]["value"])
+    value = _patch_signal(patch)
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     (out / "artifact.txt").write_text(f"{candidate_id}:{value}\n")
@@ -305,7 +320,7 @@ def _store_rejected_evaluate(
         output_dir=output_dir,
         **kwargs,
     )
-    value = int(patch.to_nested()["test"]["value"])
+    value = _patch_signal(patch)
     if value != 13:
         return result
     assert result.run_reference is not None
@@ -351,7 +366,7 @@ def _sleepy_evaluate(
     output_dir: str,
     **kwargs: object,
 ) -> ScoredResult:
-    value = int(patch.to_nested()["test"]["value"])
+    value = _patch_signal(patch)
     if value == 1:
         time.sleep(0.25)
     return _fake_evaluate(
@@ -375,7 +390,7 @@ def _slow_or_abort_evaluate(
     output_dir: str,
     **kwargs: object,
 ) -> ScoredResult:
-    value = int(patch.to_nested()["test"]["value"])
+    value = _patch_signal(patch)
     if value == 50:
         time.sleep(20.0)
     if value == 99:
@@ -455,7 +470,7 @@ def _normal_child_then_hang_evaluate(
     output_dir: str,
     **kwargs: object,
 ) -> ScoredResult:
-    value = int(patch.to_nested()["test"]["value"])
+    value = _patch_signal(patch)
     if value != 1:
         return _fake_evaluate(
             patch,
@@ -475,7 +490,9 @@ def _normal_child_then_hang_evaluate(
             "-c",
             (
                 "import pathlib, sys, time; "
-                "time.sleep(1.0); "
+                # Stay alive beyond the 2.0s worker timeout below. If the
+                # reaper misses this child, it writes before the assertion.
+                "time.sleep(3.0); "
                 "pathlib.Path(sys.argv[1]).write_text('alive', encoding='utf-8')"
             ),
             str(survivor),
@@ -515,7 +532,7 @@ def _float_reduction_evaluate(
     output_dir: str,
     **_: object,
 ) -> ScoredResult:
-    value = int(patch.to_nested()["test"]["value"])
+    value = _patch_signal(patch)
     try:
         import numpy as np
 
@@ -596,6 +613,8 @@ def _spec(
     profile: dict[str, object],
 ) -> EvalSpec:
     return EvalSpec(
+        # Real allowlist-v12 patches: production recipe_id resolves conditionals
+        # and must remain the identity path (no synthetic carve-out).
         recipe_id=patch.recipe_id(recipe_schema_version="pool-test-schema"),
         feedstock_recipe_digest="feedstock-recipe-digest",
         feedstock_id=feedstock_id,
@@ -960,6 +979,10 @@ def test_process_pool_timeout_reaps_normal_subprocess_child(
     tmp_path: Path,
     spawnable_process_pool: None,
 ) -> None:
+    # Hang path sleeps 5s; timeout must stay below that. After the timed-out
+    # worker is reaped, the next eval on max_workers=1 may pay a cold-spawn
+    # import cost (~0.8s under load), so leave headroom above 0.75s while
+    # remaining well under the hang duration.
     results = evaluate_batch(
         [
             PoolEvaluationRequest(
@@ -979,7 +1002,7 @@ def test_process_pool_timeout_reaps_normal_subprocess_child(
         max_workers=1,
         output_root=tmp_path,
         evaluate_fn=_normal_child_then_hang_evaluate,
-        per_eval_timeout_seconds=0.75,
+        per_eval_timeout_seconds=2.0,
     )
 
     time.sleep(1.3)
