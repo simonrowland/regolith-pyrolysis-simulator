@@ -188,16 +188,15 @@ class RunArtifactStore:
                 try:
                     artifact = self.load(path.stem)
                 except RunStoreCorruptionError as exc:
-                    quarantine_path = self._quarantine(path)
-                    _LOG.error("%s; quarantined at %s", exc, quarantine_path)
+                    self._quarantine_or_log(path, exc)
                     continue
                 if artifact is None:
                     continue
                 try:
                     metadata = self._load_meta(path.stem)
                 except RunMetaCorruptionError as exc:
-                    quarantine_path = self._quarantine(exc.path)
-                    _LOG.error("%s; quarantined at %s", exc, quarantine_path)
+                    if self._quarantine_or_log(exc.path, exc) is None:
+                        continue
                     metadata = {}
                 summaries.append(self._summary(artifact, path.stem, metadata))
         return sorted(
@@ -334,6 +333,22 @@ class RunArtifactStore:
         os.replace(path, candidate)
         return candidate
 
+    def _quarantine_or_log(
+        self, path: Path, corruption_error: RunStoreCorruptionError
+    ) -> Path | None:
+        try:
+            quarantine_path = self._quarantine(path)
+        except OSError as quarantine_error:
+            _LOG.error(
+                "%s; quarantine failed for %s: %s",
+                corruption_error,
+                path,
+                quarantine_error,
+            )
+            return None
+        _LOG.error("%s; quarantined at %s", corruption_error, quarantine_path)
+        return quarantine_path
+
     @staticmethod
     def _summary(
         artifact: dict[str, Any],
@@ -425,8 +440,7 @@ class RunArtifactStore:
                     created_at = str(header.get("created_at") or "")
                     unstarred.append((created_at, path))
             except RunMetaCorruptionError as exc:
-                quarantine_path = self._quarantine(exc.path)
-                _LOG.error("%s; quarantined at %s", exc, quarantine_path)
+                self._quarantine_or_log(exc.path, exc)
                 # A corrupt sidecar may be hiding a star. Skip eviction for
                 # this run until metadata is repaired rather than deleting a
                 # possibly protected artifact.

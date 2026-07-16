@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 from flask import Flask
@@ -14,6 +15,7 @@ from simulator.accounting.run_artifact import (
     RunArtifactContractError,
     build_run_artifact,
 )
+from web import events as web_events
 from web import routes as web_routes
 from web import run_store as run_store_module
 from web.run_store import (
@@ -66,6 +68,76 @@ def _runner_payload(status: str = "partial") -> dict:
             "authoritative_for_requested_vapor_pressure": True,
         },
     }
+
+
+def test_non_terminal_hour_performs_zero_artifact_writes(tmp_path, monkeypatch) -> None:
+    sid = "test-non-terminal-no-write"
+    persist_calls = []
+    save_calls = []
+    emitted_events = []
+    sim = SimpleNamespace(_poisoned_hour=None)
+
+    class Session:
+        simulator = sim
+
+        @staticmethod
+        def is_complete():
+            return False
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+        def emit(self, event, _payload, room=None):
+            emitted_events.append(event)
+            if event == "per_hour_summary":
+                state["running"] = False
+
+        @staticmethod
+        def sleep(_seconds):
+            pass
+
+    socket = Socket()
+    store = RunArtifactStore(tmp_path / "runs")
+    state, lock = web_events._replace_simulation_state(sid, Session(), speed=0.0)
+    state["run_store"] = store
+    step_result = SimpleNamespace(
+        snapshot=object(),
+        backend_error="",
+        per_hour_summary={"hour": 1},
+        campaign_summary=None,
+        decision_event=None,
+    )
+
+    def record_persist(*args, **kwargs):
+        persist_calls.append((args, kwargs))
+
+    def record_save(*args, **kwargs):
+        save_calls.append((args, kwargs))
+
+    monkeypatch.setattr(web_events, "drive_session", lambda *_args, **_kwargs: iter([step_result]))
+    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+    monkeypatch.setattr(web_events, "persist_run_artifact", record_persist)
+    monkeypatch.setattr(store, "save", record_save)
+
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            lock,
+            "backend",
+            "available",
+            True,
+        )
+        socket.target()
+
+        assert "per_hour_summary" in emitted_events
+        assert persist_calls == []
+        assert save_calls == []
+    finally:
+        web_events._clear_simulation_state(sid)
 
 
 def test_build_run_artifact_repackages_runner_payload(monkeypatch) -> None:
@@ -480,6 +552,77 @@ def test_store_corrupt_meta_is_quarantined_and_skipped_by_retention(tmp_path) ->
     assert store.load("protected") == protected
     assert not meta_path.exists()
     assert (store.runs_dir / "meta" / "protected.json.corrupt").exists()
+
+
+def test_store_list_skips_corrupt_artifact_when_quarantine_fails(
+    tmp_path, monkeypatch, caplog
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    healthy = build_run_artifact(_runner_payload("ok"), run_id="healthy")
+    assert store.save("healthy", healthy) is True
+    corrupt_path = store.runs_dir / "broken.json"
+    corrupt_path.write_text("{not-json", encoding="utf-8")
+
+    def fail_quarantine(_path):
+        raise PermissionError("read-only quarantine")
+
+    monkeypatch.setattr(store, "_quarantine", fail_quarantine)
+    with caplog.at_level("ERROR", logger=run_store_module.__name__):
+        rows = store.list_runs()
+
+    assert [row["run_id"] for row in rows] == ["healthy"]
+    assert corrupt_path.exists()
+    assert "quarantine failed" in caplog.text
+    assert "read-only quarantine" in caplog.text
+
+
+def test_store_list_skips_run_with_corrupt_meta_when_quarantine_fails(
+    tmp_path, monkeypatch, caplog
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    for run_id in ("healthy", "poisoned-meta"):
+        artifact = build_run_artifact(_runner_payload("ok"), run_id=run_id)
+        assert store.save(run_id, artifact) is True
+    meta_path = store.runs_dir / "meta" / "poisoned-meta.json"
+    meta_path.parent.mkdir(parents=True, exist_ok=True)
+    meta_path.write_text("{not-json", encoding="utf-8")
+
+    def fail_quarantine(_path):
+        raise FileNotFoundError("concurrent quarantine removal")
+
+    monkeypatch.setattr(store, "_quarantine", fail_quarantine)
+    with caplog.at_level("ERROR", logger=run_store_module.__name__):
+        rows = store.list_runs()
+
+    assert [row["run_id"] for row in rows] == ["healthy"]
+    assert meta_path.exists()
+    assert "quarantine failed" in caplog.text
+    assert "concurrent quarantine removal" in caplog.text
+
+
+def test_store_retention_survives_meta_quarantine_failure(
+    tmp_path, monkeypatch, caplog
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs", keep=1)
+    protected = build_run_artifact(_runner_payload("ok"), run_id="protected")
+    assert store.save("protected", protected) is True
+    meta_path = store.runs_dir / "meta" / "protected.json"
+    meta_path.parent.mkdir(parents=True, exist_ok=True)
+    meta_path.write_text("{not-json", encoding="utf-8")
+    store.keep = 0
+
+    def fail_quarantine(_path):
+        raise PermissionError("retention quarantine denied")
+
+    monkeypatch.setattr(store, "_quarantine", fail_quarantine)
+    trigger = build_run_artifact(_runner_payload("ok"), run_id="trigger")
+    with caplog.at_level("ERROR", logger=run_store_module.__name__):
+        assert store.save("trigger", trigger) is True
+
+    assert store.load("protected") == protected
+    assert meta_path.exists()
+    assert "quarantine failed" in caplog.text
+    assert "retention quarantine denied" in caplog.text
 
 
 def test_store_quarantine_serializes_with_concurrent_metadata_replace(
