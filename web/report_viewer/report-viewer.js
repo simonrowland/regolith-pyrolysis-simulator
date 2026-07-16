@@ -43,6 +43,14 @@ const exactValue = (value, unit) => hasNumber(value)
   : "not emitted";
 const exactKg = (value) => exactValue(value, "kg");
 const exactMol = (value) => exactValue(value, "mol");
+// Ledger cells must never fabricate: JS coercion turns true into "1 mol" and
+// []/false/whitespace into "0 mol". Only real finite numbers render as mol.
+const strictMol = (value) => typeof value === "number" && Number.isFinite(value)
+  ? exactValue(value, "mol")
+  : `<span class="trace">non-numeric (${esc(typeof value === "string" ? "string" : Array.isArray(value) ? "array" : typeof value)})</span>`;
+const strictMolSum = (values) => values.every((value) => typeof value === "number" && Number.isFinite(value))
+  ? exactValue(values.reduce((total, value) => total + value, 0), "mol")
+  : "not numeric";
 const money = (value) => hasNumber(value)
   ? Number(value).toLocaleString(undefined, { style: "currency", currency: "USD", minimumFractionDigits: 2 })
   : "not emitted";
@@ -224,7 +232,7 @@ function renderTimestepLedger(timestep) {
     if (!entries.length) {
       return `<tr><td class="mono">${esc(account)}</td><td colspan="2">captured, empty account</td></tr>`;
     }
-    return entries.map(([name, value], index) => `<tr>${index === 0 ? `<td class="mono" rowspan="${entries.length}">${esc(account)}</td>` : ""}<td class="mono">${esc(name)}</td><td class="num">${exactMol(value)}</td></tr>`).join("");
+    return entries.map(([name, value], index) => `<tr>${index === 0 ? `<td class="mono" rowspan="${entries.length}">${esc(account)}</td>` : ""}<td class="mono">${esc(name)}</td><td class="num">${strictMol(value)}</td></tr>`).join("");
   }).join("");
   return `<div class="table-wrap timestep-ledger-wrap"><table><thead><tr><th>Account</th><th>Species</th><th class="num">Amount · mol</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -232,7 +240,7 @@ function renderTimestepLedger(timestep) {
 function ledgerSection(finalState) {
   const rows = Object.entries(finalState || {}).map(([account, species]) => {
     const entries = Object.entries(species || {});
-    return `<tr><td class="mono">${esc(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${esc(name)} ${exactMol(value)}`).join(" · ") : "empty"}</td><td class="num">${exactMol(sum(entries.map(([, value]) => value)))}</td></tr>`;
+    return `<tr><td class="mono">${esc(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${esc(name)} ${strictMol(value)}`).join(" · ") : "empty"}</td><td class="num">${strictMolSum(entries.map(([, value]) => value))}</td></tr>`;
   }).join("");
   return section(3, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.", `<div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>`);
 }

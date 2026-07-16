@@ -26,6 +26,12 @@ DEFAULT_RETENTION = 100
 _RUN_ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 _SAVE_LOCK = threading.Lock()
 _LOG = logging.getLogger(__name__)
+# SYMLINK-CONFINEMENT SCOPE (honest boundary): artifact/meta READS and meta
+# writes refuse symlinks (O_NOFOLLOW / dir-fd below). The store ROOT, the
+# .write-lock files, and tempfile creation still follow pathnames — an actor
+# who can replace runs_dir itself with a symlink can redirect them. That actor
+# already has filesystem write access to the store's parent (outside the
+# local-workbench threat model); full root confinement is queued backlog.
 _DIRECTORY_OPEN_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC | os.O_NOFOLLOW
 _FILE_OPEN_FLAGS = os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW
 
