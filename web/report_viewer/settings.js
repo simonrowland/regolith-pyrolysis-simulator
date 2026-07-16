@@ -91,9 +91,13 @@ function downloadHeader(header) {
 function render(artifact) {
   if (!artifact || !artifact.header || typeof artifact.header !== "object") throw new Error("Artifact header is absent or malformed.");
   const header = artifact.header;
-  const hasRecipeSnapshot = header.recipe_snapshot
-    && typeof header.recipe_snapshot === "object"
-    && !Array.isArray(header.recipe_snapshot);
+  // Mirror the export endpoint's validity rule exactly — offering a download
+  // the endpoint would 409 is a false affordance.
+  const snapshot = header.recipe_snapshot;
+  const hasRecipeSnapshot = snapshot && typeof snapshot === "object" && !Array.isArray(snapshot)
+    && snapshot.setpoints_patch && typeof snapshot.setpoints_patch === "object" && !Array.isArray(snapshot.setpoints_patch)
+    && Array.isArray(snapshot.pins) && snapshot.pins.every((pin) => typeof pin === "string")
+    && typeof snapshot.recipe_schema_version === "string" && snapshot.recipe_schema_version.length > 0;
   const manifestAction = RUN_ID
     ? hasRecipeSnapshot
       ? `<a href="/api/runs/${encodeURIComponent(RUN_ID)}/run.yaml" download>Download run.yaml</a>`

@@ -52,6 +52,17 @@ def test_report_viewer_serves_index_and_assets(tmp_path: Path) -> None:
     assert b"Download run.yaml" in script.data
 
 
+def test_report_viewer_serves_only_viewer_asset_types(tmp_path: Path) -> None:
+    # send_from_directory alone would publish EVERY regular file in the
+    # source dir — non-asset files (freeze_sample.py) and dotfiles must 404.
+    client = _app(tmp_path).test_client()
+
+    assert client.get("/report/freeze_sample.py").status_code == 404
+    assert client.get("/report/.hidden.json").status_code == 404
+    assert client.get("/report/sample-run-artifact.json").status_code == 200
+    assert client.get("/report/library.html").status_code == 200
+
+
 def test_report_viewer_rejects_path_traversal(tmp_path: Path) -> None:
     client = _app(tmp_path).test_client()
 

@@ -15,7 +15,7 @@ import tempfile
 from typing import Any
 from urllib.parse import quote, urlsplit
 
-from flask import Blueprint, Response, current_app, render_template, jsonify, request, send_file, send_from_directory, session
+from flask import Blueprint, Response, abort, current_app, render_template, jsonify, request, send_file, send_from_directory, session
 import yaml
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
@@ -3286,9 +3286,19 @@ def simulator():
     )
 
 
+# Only true viewer assets are servable: send_from_directory alone would
+# publish EVERY regular file under the source dir (freeze_sample.py, dotfiles).
+_REPORT_VIEWER_ASSET_SUFFIXES = ('.html', '.js', '.css', '.json')
+
+
 @bp.route('/report/', defaults={'asset': 'index.html'}, methods=['GET'])
 @bp.route('/report/<path:asset>', methods=['GET'])
 def report_viewer(asset: str):
+    basename = asset.rsplit('/', 1)[-1]
+    if basename.startswith('.') or not asset.lower().endswith(
+        _REPORT_VIEWER_ASSET_SUFFIXES
+    ):
+        abort(404)
     return send_from_directory(REPORT_VIEWER_DIR, asset)
 
 
