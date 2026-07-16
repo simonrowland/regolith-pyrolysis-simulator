@@ -2489,6 +2489,21 @@ def _reject_oversized_run_command():
             'run_command_too_large',
             413,
         )
+    request.max_content_length = RUN_COMMAND_BODY_CAP_BYTES + 1
+    try:
+        body = request.get_data(cache=True)
+    except RequestEntityTooLarge:
+        return _typed_json_error(
+            'run command body exceeds 1 MiB cap',
+            'run_command_too_large',
+            413,
+        )
+    if len(body) > RUN_COMMAND_BODY_CAP_BYTES:
+        return _typed_json_error(
+            'run command body exceeds 1 MiB cap',
+            'run_command_too_large',
+            413,
+        )
     return None
 
 

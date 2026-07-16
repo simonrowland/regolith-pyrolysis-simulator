@@ -1,7 +1,10 @@
 import threading
+from io import BytesIO
 from types import SimpleNamespace
 
 import pytest
+from werkzeug.test import EnvironBuilder
+from werkzeug.wrappers import Response
 
 import app as app_module
 from simulator.backends import BackendUnavailableError
@@ -222,6 +225,97 @@ def test_disconnect_persists_orphaned_run_as_cancelled_partial(tmp_path, monkeyp
     artifact = RunArtifactStore(tmp_path / "runs").load(run_id)
     assert artifact["lifecycle"] == "cancelled"
     assert artifact["execution_status"] == "partial"
+
+
+def test_start_racing_disconnect_cannot_publish_orphan(tmp_path, monkeypatch):
+    sid = "disconnect-start-race"
+    client_id = "owner"
+    ready_to_publish = threading.Event()
+    release_start = threading.Event()
+    result = []
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    handler = web_events._registered_start_handler
+    web_events._socket_client_ids[sid] = client_id
+
+    def blocking_backend(_name):
+        ready_to_publish.set()
+        assert release_start.wait(timeout=2.0)
+        return backend
+
+    monkeypatch.setitem(handler.__globals__, "_get_backend", blocking_backend)
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        lambda *_args, **_kwargs: None,
+    )
+    payload = {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+    }
+
+    def start():
+        with app.app_context():
+            result.append(handler(payload, sid=sid))
+
+    starter = threading.Thread(target=start)
+    starter.start()
+    assert ready_to_publish.wait(timeout=2.0)
+    web_events._disconnect_simulation_client(_Socket(), sid)
+    release_start.set()
+    starter.join(timeout=10.0)
+
+    assert not starter.is_alive()
+    assert result == [None]
+    assert sid not in web_events._simulations
+    assert sid not in web_events._socket_client_ids
+
+
+def test_disconnect_racing_replacement_cannot_delete_successor(
+    tmp_path,
+    monkeypatch,
+):
+    sid = "disconnect-replacement-race"
+    first, _ = web_events._replace_simulation_state(
+        sid,
+        _PartialSession(),
+        speed=0.0,
+        ledger_client_id="owner",
+        run_store=RunArtifactStore(tmp_path / "runs"),
+    )
+    web_events._socket_client_ids[sid] = "owner"
+    successor = None
+
+    def replace_before_cancel(_socketio, target_sid, **kwargs):
+        nonlocal successor
+        assert kwargs["run_id"] == first["run_id"]
+        successor, _ = web_events._replace_simulation_state(
+            target_sid,
+            _PartialSession(),
+            speed=0.0,
+            ledger_client_id="owner",
+            run_store=RunArtifactStore(tmp_path / "successor-runs"),
+        )
+        return {
+            "run_id": first["run_id"],
+            "status": "cancelled",
+            "cancelled": True,
+        }
+
+    monkeypatch.setattr(
+        web_events,
+        "_cancel_simulation_state",
+        replace_before_cancel,
+    )
+
+    web_events._disconnect_simulation_client(_Socket(), sid)
+
+    assert web_events._simulations[sid] is successor
+    assert successor["running"] is True
 
 
 def test_socket_restart_persists_displaced_run(tmp_path, monkeypatch):
@@ -1038,6 +1132,30 @@ def test_run_command_routes_reject_bodies_over_one_mib(path):
     }
 
 
+def test_run_command_route_rejects_chunked_body_over_one_mib():
+    body = b'{"padding":"' + (
+        b"x" * web_routes.RUN_COMMAND_BODY_CAP_BYTES
+    ) + b'"}'
+    builder = EnvironBuilder(
+        path="/api/runs",
+        method="POST",
+        input_stream=BytesIO(body),
+        content_type="application/json",
+    )
+    environ = builder.get_environ()
+    environ.pop("CONTENT_LENGTH", None)
+    environ["HTTP_TRANSFER_ENCODING"] = "chunked"
+    environ["wsgi.input_terminated"] = True
+
+    response = Response.from_app(app_module.create_app(), environ)
+
+    assert response.status_code == 413
+    assert response.get_json() == {
+        "error": "run command body exceeds 1 MiB cap",
+        "error_type": "run_command_too_large",
+    }
+
+
 @pytest.mark.parametrize("transport", ["http", "socket"])
 def test_global_active_run_cap_is_shared_by_http_and_socket(
     tmp_path,
@@ -1100,6 +1218,21 @@ def test_command_routes_share_socket_input_validation(path):
 
     assert response.status_code == 400
     assert response.get_json()["error_type"] == "invalid_run_input"
+
+
+def test_submit_rejects_compound_c5_enabled_with_typed_400():
+    response = app_module.create_app().test_client().post(
+        "/api/runs",
+        json={"c5_enabled": {"unexpected": True}},
+    )
+
+    assert response.status_code == 400
+    assert response.get_json() == {
+        "error": "c5_enabled must be a boolean",
+        "error_type": "invalid_run_input",
+        "message": "c5_enabled must be a boolean",
+        "status": "error",
+    }
 
 
 def test_http_command_error_preserves_structured_socket_diagnostics(monkeypatch):

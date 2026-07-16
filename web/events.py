@@ -406,13 +406,19 @@ def _resolved_recipe_patch_for_session(
         return {}
 
 
-def _clear_simulation_state(sid: str) -> None:
-    """Stop and remove any active simulation for a client."""
+def _clear_simulation_state(sid: str, run_id: str | None = None) -> bool:
+    """Stop and remove the current simulation, optionally by exact identity."""
     with _simulations_guard:
-        state = _simulations.pop(sid, None)
+        state = _simulations.get(sid)
+        if state is None or (
+            run_id is not None and state.get('run_id') != run_id
+        ):
+            return False
+        _simulations.pop(sid, None)
         if state is not None:
             state['running'] = False
         _sim_locks.pop(sid, None)
+        return True
 
 
 def _finish_terminal_state(sid: str, run_id: str) -> None:
@@ -585,6 +591,30 @@ def cancel_run_command(
         reason='cancelled_by_client',
         run_id=run_id,
     )
+
+
+def _disconnect_simulation_client(socketio, sid: str) -> None:
+    """Cancel only the run observed by this disconnect under client arbitration."""
+    with _run_command_lock:
+        client_id = _socket_client_ids.get(sid)
+        state, _ = _current_simulation_state(sid)
+        run_id = str(state['run_id']) if state is not None else None
+        try:
+            if run_id is not None:
+                _cancel_simulation_state(
+                    socketio,
+                    sid,
+                    reason='client_disconnected',
+                    run_id=run_id,
+                )
+        except RuntimeError as exc:
+            _safe_log(f'Disconnected run retained after persistence failure: {exc}')
+        else:
+            if run_id is not None:
+                _clear_simulation_state(sid, run_id=run_id)
+        finally:
+            if _socket_client_ids.get(sid) == client_id:
+                _socket_client_ids.pop(sid, None)
 
 
 def _ensure_global_run_capacity(replacement_sid: str | None) -> None:
@@ -785,9 +815,7 @@ def _backend_name_for_session(backend) -> str:
 def _coerce_bool(value) -> bool:
     if isinstance(value, bool):
         return value
-    if isinstance(value, str):
-        return value.strip().lower() in {'1', 'true', 'yes', 'on'}
-    return bool(value)
+    raise InputValidationError('c5_enabled must be a boolean')
 
 
 def _coerce_bounded_float(
@@ -1854,19 +1882,7 @@ def register_events(socketio):
     def handle_disconnect():
         sid = request.sid
         _safe_log(f"Client disconnected: {sid}")
-        try:
-            _cancel_simulation_state(
-                socketio,
-                sid,
-                reason='client_disconnected',
-            )
-        except RuntimeError as exc:
-            _safe_log(f'Disconnected run retained after persistence failure: {exc}')
-        else:
-            _clear_simulation_state(sid)
-        finally:
-            with _run_command_lock:
-                _socket_client_ids.pop(sid, None)
+        _disconnect_simulation_client(socketio, sid)
 
     @socketio.on('start_simulation')
     def handle_start(
@@ -1890,6 +1906,7 @@ def register_events(socketio):
         }
         """
         sid = sid or request.sid
+        socket_bound = ledger_client_id is None
 
         def reject(
             payload: dict[str, object],
@@ -1907,6 +1924,16 @@ def register_events(socketio):
             socket_payload['error_type'] = error_type
             socketio.emit('simulation_status', socket_payload, room=sid)
             return None
+
+        with _run_command_lock:
+            resolved_ledger_client_id = ledger_client_id
+            if socket_bound:
+                resolved_ledger_client_id = _socket_client_ids.get(sid)
+                if resolved_ledger_client_id is None:
+                    return reject({
+                        'status': 'error',
+                        'message': 'client disconnected before run launch',
+                    }, 'client_disconnected', 409)
 
         if data is None:
             data = {}
@@ -2033,6 +2060,13 @@ def register_events(socketio):
                 'backend_status': 'unavailable',
                 'backend_authoritative': False,
             }, 'backend_unavailable')
+        if socket_bound:
+            with _run_command_lock:
+                if _socket_client_ids.get(sid) != resolved_ledger_client_id:
+                    return reject({
+                        'status': 'error',
+                        'message': 'client disconnected before run launch',
+                    }, 'client_disconnected', 409)
         resolution_status = backend_resolution_status(backend)
         backend_type = resolution_status.active_backend
         backend_message = ''
@@ -2134,19 +2168,6 @@ def register_events(socketio):
             },
         )
 
-        with _run_command_lock:
-            resolved_ledger_client_id = ledger_client_id
-            if resolved_ledger_client_id is None:
-                resolved_ledger_client_id = _socket_client_ids.get(sid)
-            if resolved_ledger_client_id is None:
-                resolved_ledger_client_id = str(
-                    flask_session.setdefault(
-                        'ledger_client_id',
-                        uuid.uuid4().hex,
-                    )
-                )
-                _socket_client_ids[sid] = resolved_ledger_client_id
-
         initial_state = {
             'http_owned': command_mode,
             'backend_message': backend_message,
@@ -2175,8 +2196,18 @@ def register_events(socketio):
         if effective_config:
             initial_state['effective_config'] = effective_config
         cancelled_prior_run_id = None
+        published_run_id = None
         try:
             with _run_command_lock:
+                if (
+                    socket_bound
+                    and _socket_client_ids.get(sid) != resolved_ledger_client_id
+                ):
+                    raise RunCommandError(
+                        'client disconnected before run launch',
+                        error_type='client_disconnected',
+                        status_code=409,
+                    )
                 with _simulations_guard:
                     client_replacement_sid = next(
                         (
@@ -2219,7 +2250,10 @@ def register_events(socketio):
                         # Terminal cancellation is an immutable first write, so rollback
                         # is impossible; any later launch failure reports this run ID.
                     if replacement_sid != sid and cancellation is not None:
-                        _clear_simulation_state(replacement_sid)
+                        _clear_simulation_state(
+                            replacement_sid,
+                            run_id=replacement_run_id,
+                        )
 
                 state, run_lock = _replace_simulation_state(
                     sid,
@@ -2231,6 +2265,7 @@ def register_events(socketio):
                     initial_state=initial_state,
                 )
             run_id = state['run_id']
+            published_run_id = run_id
 
             _emit_if_current(
                 socketio,
@@ -2273,7 +2308,8 @@ def register_events(socketio):
                 'message': str(exc),
             }, 'run_replacement_failed', 500)
         except Exception as exc:  # noqa: BLE001 -- typed launch boundary
-            _clear_simulation_state(sid)
+            if published_run_id is not None:
+                _clear_simulation_state(sid, run_id=published_run_id)
             if cancelled_prior_run_id is not None:
                 return reject({
                     'status': 'error',

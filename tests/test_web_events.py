@@ -1658,6 +1658,7 @@ def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch
             "unknown runtime_campaign_overrides",
         ),
         ({"c4_max_temp_C": "nan"}, "c4_max_temp_C"),
+        ({"c5_enabled": {"unexpected": True}}, "c5_enabled"),
         ({"c5_enabled": True, "mre_max_voltage_V": "abc"}, "mre_max_voltage_V"),
         ({"additives": {"Na": "abc"}}, "additives.Na"),
         ({"additives": {"Na": -1}}, "additives.Na"),
