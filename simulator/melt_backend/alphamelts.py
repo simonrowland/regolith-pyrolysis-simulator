@@ -37,7 +37,10 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from engines.alphamelts.domain import canonical_melt_oxide_activity_name
 from engines.domain_reason import OutOfDomainReason, reason_value
-from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    resolve_species_formula,
+)
 from simulator.melt_backend.base import (
     EquilibriumResult,
     LiquidFractionInvalidError,
@@ -326,6 +329,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._timeout_s = 20.0
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None
+        self._subprocess_vapor_pressure_provider = None
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
 
     def initialize(self, config: dict) -> bool:
@@ -1043,6 +1047,9 @@ class _MELTSBackendSupport(MeltBackend):
         requested_temperature_C: Optional[float] = None,
         phases_present: Optional[List[str]] = None,
         phase_masses_kg: Optional[Mapping[str, float]] = None,
+        phase_species_mol: Optional[Mapping[str, Mapping[str, float]]] = None,
+        phase_species_kg: Optional[Mapping[str, Mapping[str, float]]] = None,
+        phase_instances: Optional[List[Mapping[str, object]]] = None,
         liquid_fraction: Optional[float] = None,
         liquid_composition_wt_pct: Optional[Mapping[str, float]] = None,
         liquid_viscosity_Pa_s: Optional[float] = None,
@@ -1098,6 +1105,14 @@ class _MELTSBackendSupport(MeltBackend):
             fO2_log=(None if fO2_log is None else float(fO2_log)),
             phases_present=list(phases_present or []),
             phase_masses_kg=phase_masses,
+            phase_species_mol={
+                str(phase): dict(species)
+                for phase, species in dict(phase_species_mol or {}).items()
+            },
+            phase_species_kg={
+                str(phase): dict(species)
+                for phase, species in dict(phase_species_kg or {}).items()
+            },
             phase_compositions={
                 str(phase): dict(composition)
                 for phase, composition in dict(phase_compositions or {}).items()
@@ -1157,6 +1172,7 @@ class _MELTSBackendSupport(MeltBackend):
             ),
             solid_composition_wt_pct=dict(solid_composition_wt_pct or {}),
             bulk_composition_wt_pct=dict(bulk_composition_wt_pct or {}),
+            phase_instances=[dict(instance) for instance in phase_instances or []],
         )
         result.backend_name = self.backend_name
         result.engine_version = self.get_engine_version()
@@ -2012,6 +2028,17 @@ class _MELTSBackendSupport(MeltBackend):
                 },
                 table_outputs=table_outputs,
             )
+            if eq.status != 'ok':
+                return eq
+            (
+                eq.vapor_pressures_Pa,
+                eq.vapor_pressures_source,
+                vapor_diagnostics,
+            ) = self._builtin_vapor_projection_for_subprocess(eq)
+            eq.diagnostics = self._merge_diagnostics(
+                eq.diagnostics,
+                {'subprocess_vapor_projection': vapor_diagnostics},
+            )
             return eq
 
     def _subprocess_fo2_constraint(self, fO2_log: float) -> tuple[str, float]:
@@ -2205,13 +2232,15 @@ class _MELTSBackendSupport(MeltBackend):
             raise ValueError('Phase_main_tbl.txt lacks oxide columns')
 
         accumulated: dict[str, dict[str, object]] = {}
+        phase_instances: list[dict[str, object]] = []
         for line in lines[header_index + 1:]:
             tokens = line.split()
             if len(tokens) < 7 + len(oxides):
                 raise ValueError(
                     f'Phase_main_tbl.txt malformed row: {line!r}'
                 )
-            phase = re.sub(r'\d+$', '', tokens[0])
+            instance_id = tokens[0]
+            phase = re.sub(r'\d+$', '', instance_id)
             try:
                 mass_g, enthalpy, entropy, volume, heat_capacity = (
                     float(value) for value in tokens[1:6]
@@ -2235,6 +2264,20 @@ class _MELTSBackendSupport(MeltBackend):
                 mass_g / volume * 1000.0
                 if mass_g > 0.0 and volume > 0.0 else None
             )
+            phase_instances.append({
+                'instance_id': instance_id,
+                'phase': phase,
+                'solver_basis_mass_kg': mass_g / 1000.0,
+                'formula_or_endmember_token': ' '.join(property_tokens),
+                'enthalpy_J': enthalpy,
+                'entropy_J_K': entropy,
+                'volume_m3': volume * 1.0e-6,
+                'heat_capacity_J_K': heat_capacity,
+                'density_kg_m3': density_kg_m3,
+                'reference_mass_kg': mass_g / 1000.0,
+                'reference_basis': 'alphamelts_solver_phase_amount',
+                'composition_wt_pct': dict(zip(oxides, composition_values)),
+            })
 
             entry = accumulated.setdefault(
                 phase,
@@ -2294,7 +2337,106 @@ class _MELTSBackendSupport(MeltBackend):
         return {
             'phase_thermo': phase_thermo,
             'phase_compositions': phase_compositions,
+            'phase_instances': phase_instances,
         }
+
+    @staticmethod
+    def _phase_species_from_instances(
+        phase_instances: List[Mapping[str, object]],
+    ) -> tuple[Dict[str, Dict[str, float]], Dict[str, Dict[str, float]]]:
+        species_mol: Dict[str, Dict[str, float]] = {}
+        species_kg: Dict[str, Dict[str, float]] = {}
+        for instance in phase_instances:
+            instance_id = str(instance['instance_id'])
+            mass_kg = float(instance.get('physical_mass_kg') or 0.0)
+            if not math.isfinite(mass_kg) or mass_kg <= 0.0:
+                continue
+            formula_token = str(
+                instance.get('formula_or_endmember_token') or ''
+            ).strip()
+            if not str(instance.get('phase') or '').startswith('liquid'):
+                try:
+                    molar_mass = (
+                        _MELTSBackendSupport._alphamelts_formula_molar_mass_kg_mol(
+                            formula_token
+                        )
+                    )
+                except ValueError:  # solver tokens are not always formulas
+                    molar_mass = 0.0
+                if molar_mass > 0.0 and math.isfinite(molar_mass):
+                    species_kg[instance_id] = {formula_token: mass_kg}
+                    species_mol[instance_id] = {
+                        formula_token: mass_kg / molar_mass
+                    }
+                    continue
+
+            composition = dict(instance.get('composition_wt_pct') or {})
+            instance_kg: Dict[str, float] = {}
+            instance_mol: Dict[str, float] = {}
+            for species, raw_wt_pct in composition.items():
+                wt_pct = float(raw_wt_pct)
+                if not math.isfinite(wt_pct) or wt_pct <= 0.0:
+                    continue
+                component_kg = mass_kg * wt_pct / 100.0
+                molar_mass = resolve_species_formula(
+                    str(species)
+                ).molar_mass_kg_per_mol()
+                instance_kg[str(species)] = component_kg
+                instance_mol[str(species)] = component_kg / molar_mass
+            if instance_kg:
+                species_kg[instance_id] = instance_kg
+                species_mol[instance_id] = instance_mol
+        return species_mol, species_kg
+
+    @staticmethod
+    def _alphamelts_formula_molar_mass_kg_mol(formula: str) -> float:
+        # AlphaMELTS annotates oxidation state with prime marks (for example
+        # Fe'' in olivine).  Charge does not alter elemental molar mass.
+        formula = formula.replace("'", '').replace('"', '')
+        tokens = re.findall(r'[A-Z][a-z]?|[()]|\d+(?:\.\d+)?', formula)
+        if not tokens or ''.join(tokens) != formula:
+            raise ValueError(f'invalid AlphaMELTS formula token {formula!r}')
+
+        def parse_group(index: int, *, nested: bool) -> tuple[Dict[str, float], int]:
+            atoms: Dict[str, float] = {}
+            while index < len(tokens):
+                token = tokens[index]
+                if token == ')':
+                    if not nested:
+                        raise ValueError(f'unmatched formula close in {formula!r}')
+                    return atoms, index + 1
+                if token == '(':
+                    group, index = parse_group(index + 1, nested=True)
+                    multiplier = 1.0
+                    if index < len(tokens) and re.fullmatch(
+                        r'\d+(?:\.\d+)?', tokens[index]
+                    ):
+                        multiplier = float(tokens[index])
+                        index += 1
+                    for element, count in group.items():
+                        atoms[element] = atoms.get(element, 0.0) + count * multiplier
+                    continue
+                if token not in ATOMIC_WEIGHTS_G_PER_MOL:
+                    raise ValueError(f'invalid element in {formula!r}')
+                index += 1
+                count = 1.0
+                if index < len(tokens) and re.fullmatch(
+                    r'\d+(?:\.\d+)?', tokens[index]
+                ):
+                    count = float(tokens[index])
+                    index += 1
+                atoms[token] = atoms.get(token, 0.0) + count
+            if nested:
+                raise ValueError(f'unclosed formula group in {formula!r}')
+            return atoms, index
+
+        atoms, final_index = parse_group(0, nested=False)
+        if final_index != len(tokens) or not atoms:
+            raise ValueError(f'invalid AlphaMELTS formula token {formula!r}')
+        return sum(
+            ATOMIC_WEIGHTS_G_PER_MOL[element] * count
+            for element, count in atoms.items()
+        ) / 1000.0
 
     def _parse_composition_table(
         self,
@@ -2484,6 +2626,10 @@ class _MELTSBackendSupport(MeltBackend):
         phase_compositions = dict(
             phase_values.get('phase_compositions') or {}
         )
+        phase_instances = [
+            dict(instance)
+            for instance in phase_values.get('phase_instances') or []
+        ]
         if liquid_table_composition:
             phase_compositions['liquid'] = liquid_table_composition
         stable_verdict = re.search(r'<> Stable .+ assemblage achieved\.', output)
@@ -2728,7 +2874,10 @@ class _MELTSBackendSupport(MeltBackend):
             solver_basis_kg,
             system_mass_kg,
             rel_tol=1.0e-6,
-            abs_tol=1.0e-9,
+            # Phase_main_tbl prints mass to 0.001 g while System_main_tbl
+            # retains more digits.  Half one printed unit is the tightest
+            # closure tolerance justified by the engine-owned text.
+            abs_tol=5.0e-7,
         ):
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE,
@@ -2779,6 +2928,13 @@ class _MELTSBackendSupport(MeltBackend):
             phase: mass_kg * mass_scale
             for phase, mass_kg in phase_masses_kg.items()
         }
+        for instance in phase_instances:
+            instance['physical_mass_kg'] = (
+                float(instance['solver_basis_mass_kg']) * mass_scale
+            )
+        phase_species_mol, phase_species_kg = (
+            self._phase_species_from_instances(phase_instances)
+        )
         eq = self._emit_equilibrium_result(
             temperature_C=executed_temperature_C,
             requested_temperature_C=requested_temperature_C,
@@ -2786,6 +2942,9 @@ class _MELTSBackendSupport(MeltBackend):
             fO2_log=executed_fO2_log,
             phases_present=phases_present,
             phase_masses_kg=phase_masses_kg,
+            phase_species_mol=phase_species_mol,
+            phase_species_kg=phase_species_kg,
+            phase_instances=phase_instances,
             liquid_fraction=liquid_fraction,
             liquid_composition_wt_pct=liquid_composition_wt_pct,
             liquid_viscosity_Pa_s=float(
@@ -3440,6 +3599,70 @@ class _MELTSBackendSupport(MeltBackend):
     # ------------------------------------------------------------------
     # Vapor pressure helpers
     # ------------------------------------------------------------------
+
+    def _builtin_vapor_projection_for_subprocess(
+        self,
+        eq: EquilibriumResult,
+    ) -> tuple[Dict[str, float], Dict[str, str], Dict[str, object]]:
+        if float(eq.liquid_fraction or 0.0) <= 0.0:
+            return {}, {}, {'vapor_pressure_zero_reason': 'no_liquid_phase'}
+        if not eq.liquid_composition_wt_pct:
+            raise RuntimeError(
+                'AlphaMELTS subprocess vapor projection missing solved liquid '
+                'composition for positive liquid fraction'
+            )
+
+        import yaml
+        from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+        provider = self._subprocess_vapor_pressure_provider
+        if provider is None:
+            data_path = (
+                Path(__file__).resolve().parents[2]
+                / 'data'
+                / 'vapor_pressures.yaml'
+            )
+            with data_path.open(encoding='utf-8') as handle:
+                vapor_data = yaml.safe_load(handle) or {}
+            provider = BuiltinVaporPressureProvider(vapor_data)
+            self._subprocess_vapor_pressure_provider = provider
+        melt_mol = {}
+        for species, wt_pct in eq.liquid_composition_wt_pct.items():
+            mass_kg = float(wt_pct)
+            if mass_kg <= 0.0:
+                continue
+            melt_mol[str(species)] = (
+                mass_kg
+                / resolve_species_formula(str(species)).molar_mass_kg_per_mol()
+            )
+        request = IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={'process.cleaned_melt': melt_mol},
+                species_formula_registry={},
+            ),
+            temperature_C=eq.temperature_C,
+            pressure_bar=eq.pressure_bar,
+            fO2_log=eq.fO2_log,
+            control_inputs={
+                'pO2_bar': max(10.0 ** float(eq.fO2_log), 1e-30),
+                'intrinsic_fO2_log': eq.fO2_log,
+            },
+        )
+        result = provider.dispatch(request)
+        if result.status != 'ok':
+            raise RuntimeError(
+                'builtin subprocess vapor projection failed: '
+                f'status={result.status!r}; warnings={list(result.warnings)!r}'
+            )
+        diagnostic = dict(result.diagnostic or {})
+        return (
+            dict(diagnostic.get('vapor_pressures_Pa') or {}),
+            dict(diagnostic.get('vapor_pressures_source') or {}),
+            diagnostic,
+        )
 
     def _vapor_pressures_via_vaporock_or_antoine(
         self,

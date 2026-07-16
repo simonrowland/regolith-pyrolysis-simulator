@@ -10,6 +10,7 @@ import math
 import os
 import socket
 import sqlite3
+import struct
 import time
 import urllib.parse
 import uuid
@@ -17,9 +18,91 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
+import yaml
+
 
 SCHEMA_VARIANT = "alphamelts-expedited-v1"
 GRID_REALIZATION_REVISION = "v2-kress-composition-space"
+CACHE_V2_SCHEMA_VERSION = "cache-v2-grind-source-v1"
+
+CACHE_V2_PHASE_DICTIONARY = (
+    "liquid",
+    "olivine",
+    "orthopyroxene",
+    "clinopyroxene",
+    "spinel",
+    "plagioclase",
+    "feldspar",
+    "quartz",
+    "tridymite",
+    "cristobalite",
+    "rhm-oxide",
+    "ilmenite",
+    "magnetite",
+    "hematite",
+    "garnet",
+    "melilite",
+    "nepheline",
+    "leucite",
+    "kalsilite",
+    "perovskite",
+    "whitlockite",
+    "apatite",
+    "corundum",
+    "metal",
+    "alloy-liquid",
+    "sulfide-liquid",
+    "fluid",
+)
+
+CACHE_V2_VAPOR_SPECIES = (
+    "Al",
+    "Ca",
+    "Cr",
+    "CrO2",
+    "Fe",
+    "K",
+    "KCl",
+    "Mg",
+    "Mn",
+    "Na",
+    "NaCl",
+    "NaF",
+    "Si",
+    "SiO",
+    "Ti",
+)
+
+CACHE_V2_FLAG_DICTIONARIES = {
+    "regime": ("solid", "mixed", "liquid", "unknown"),
+    "evidence_class": (
+        "melts",
+        "magemin",
+        "internal-datatables",
+        "internal-analytical",
+        "unknown",
+    ),
+    "backend": ("subprocess", "thermoengine"),
+    "tier": ("grounded", "modeled", "indicative", "unknown"),
+    "notice": (
+        "none",
+        "validity_band_advisory",
+        "validity_band_degradation",
+        "interpolation_extrapolated",
+        "engine_silent",
+    ),
+}
+
+CACHE_V2_CLAMP_EXTRAPOLATION_BITS = {
+    "0": "temperature_clamped",
+    "1": "pressure_clamped",
+    "2": "fo2_clamped",
+    "3": "composition_clamped",
+    "4": "temperature_extrapolated",
+    "5": "pressure_extrapolated",
+    "6": "fo2_extrapolated",
+    "7": "composition_extrapolated",
+}
 
 COMPONENT_FIELDS = (
     "SiO2",
@@ -36,6 +119,105 @@ COMPONENT_FIELDS = (
     "Na2O",
     "K2O",
     "P2O5",
+)
+
+CACHE_V2_QUANTIZED_INPUTS = (
+    *(
+        {
+            "field": f"component_{component}_mol",
+            "units": "mol",
+            "representation": "ieee754-binary64",
+            "rounding": "none; raw native value",
+        }
+        for component in COMPONENT_FIELDS
+    ),
+    {
+        "field": "temperature_C",
+        "units": "degC",
+        "representation": "ieee754-binary64",
+        "rounding": "none; raw native value",
+    },
+    {
+        "field": "pressure_bar",
+        "units": "bar",
+        "representation": "ieee754-binary64",
+        "rounding": "none; raw native value",
+    },
+    {
+        "field": "fO2_log",
+        "units": "log10(fO2/bar)",
+        "representation": "ieee754-binary64",
+        "rounding": "none; raw native value",
+    },
+    {
+        "field": "fO2_offset",
+        "units": "log10 buffer offset",
+        "representation": "nullable ieee754-binary64",
+        "rounding": "none; raw native value",
+    },
+    {
+        "field": "Fe3Fet_Liq",
+        "units": "mol fraction",
+        "representation": "nullable ieee754-binary64",
+        "rounding": "none; raw native value",
+    },
+    {
+        "field": "model",
+        "units": "enum",
+        "representation": "UTF-8 exact string",
+        "rounding": "not applicable",
+    },
+    {
+        "field": "subprocess_run_mode",
+        "units": "enum",
+        "representation": "UTF-8 exact string",
+        "rounding": "not applicable",
+    },
+    {
+        "field": "redox_buffer",
+        "units": "enum",
+        "representation": "nullable UTF-8 exact string",
+        "rounding": "not applicable",
+    },
+    *(
+        {
+            "field": field,
+            "units": units,
+            "representation": representation,
+            "rounding": "none; raw native value",
+        }
+        for field, units, representation in (
+            ("finder_min_T_C", "degC", "nullable ieee754-binary64"),
+            ("finder_max_T_C", "degC", "nullable ieee754-binary64"),
+            ("finder_scan_step_C", "degC", "nullable ieee754-binary64"),
+            ("finder_tolerance_C", "degC", "nullable ieee754-binary64"),
+            (
+                "finder_solid_epsilon",
+                "mass fraction",
+                "nullable ieee754-binary64",
+            ),
+            (
+                "finder_liquid_epsilon",
+                "mass fraction",
+                "nullable ieee754-binary64",
+            ),
+            (
+                "finder_monotonicity_tolerance",
+                "mass fraction",
+                "nullable ieee754-binary64",
+            ),
+            (
+                "finder_monotone_smoothing_max",
+                "mass fraction",
+                "nullable ieee754-binary64",
+            ),
+            (
+                "finder_max_bisection_iterations",
+                "count",
+                "nullable unsigned integer",
+            ),
+        )
+    ),
 )
 
 COMMON_INPUT_FIELDS = (
@@ -92,6 +274,7 @@ GENERIC_OUTPUT_FIELDS = (
     "phase_masses_kg",
     "phase_species_mol",
     "phase_species_kg",
+    "phase_instances",
     "phase_compositions",
     "liquid_fraction",
     "phase_assemblage_available",
@@ -172,7 +355,7 @@ assert (
     len(GENERIC_OUTPUT_FIELDS)
     + len(ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS)
     + len(FINDER_OUTPUT_FIELDS)
-) == 74
+) == 75
 
 
 def utc_now() -> str:
@@ -215,6 +398,269 @@ def canonical_json(value: Any) -> str:
     )
 
 
+def _load_corpus_version() -> str:
+    path = Path(__file__).resolve().parents[1] / "data" / "corpus_version.yaml"
+    try:
+        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise ValueError(f"cannot load corpus version from {path}: {exc}") from exc
+    value = payload.get("corpus_version") if isinstance(payload, Mapping) else None
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"corpus version missing from {path}")
+    return value.strip()
+
+
+def _cache_v2_dictionary(
+    values: Sequence[str], *, unknown_policy: str = "refuse"
+) -> dict[str, Any]:
+    ordered = [str(value) for value in values]
+    payload = canonical_json(ordered)
+    return {
+        "values": ordered,
+        "sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
+        "unknown_value_policy": unknown_policy,
+    }
+
+
+def _cache_v2_output_spec(
+    namespace: str, field: str
+) -> dict[str, str]:
+    name = f"{namespace}.{field}"
+    units = "dimensionless"
+    basis = "AlphaMELTS solved state"
+    encoding = "canonical-json"
+    if field.endswith("_T_C") or field.endswith("temperature_C"):
+        units = "degC"
+        encoding = "ieee754-binary64"
+    elif field.endswith("_T_K"):
+        units = "K"
+        encoding = "ieee754-binary64"
+    elif "pressure_bar" in field:
+        units = "bar"
+        encoding = "ieee754-binary64"
+    elif field.endswith("_kg") or field == "phase_masses_kg":
+        units = "kg"
+    elif field == "phase_species_mol":
+        units = "mol"
+        basis = "physical phase-instance mass and parsed formula/endmember"
+    elif field == "phase_species_kg":
+        units = "kg"
+        basis = "physical phase-instance mass"
+    elif "composition_wt_pct" in field or "phase_modes_wt_pct" in field:
+        units = "wt_pct"
+    elif "fraction" in field or field in {"system_phi", "sample_frac_M"}:
+        units = "fraction"
+        encoding = "ieee754-binary64 or canonical-json array"
+    elif "viscosity_Pa_s" in field:
+        units = "Pa*s"
+        encoding = "ieee754-binary64"
+    elif "density" in field or field == "system_solid_density_rhos":
+        units = "kg/m3"
+        encoding = "ieee754-binary64"
+    elif field == "system_enthalpy":
+        units = "AlphaMELTS System_main H table-native"
+        encoding = "ieee754-binary64"
+        basis = "as printed for AlphaMELTS solver system amount"
+    elif field == "system_entropy":
+        units = "AlphaMELTS System_main S table-native"
+        encoding = "ieee754-binary64"
+        basis = "as printed for AlphaMELTS solver system amount"
+    elif field == "system_volume":
+        units = "AlphaMELTS System_main V table-native"
+        encoding = "ieee754-binary64"
+        basis = "as printed for AlphaMELTS solver system amount"
+    elif field == "system_heat_capacity_Cp":
+        units = "AlphaMELTS System_main Cp table-native"
+        encoding = "ieee754-binary64"
+        basis = "as printed for AlphaMELTS solver system amount"
+    elif field == "system_dVdP":
+        units = "AlphaMELTS System_main dVdP*10^6 as printed"
+        encoding = "ieee754-binary64"
+        basis = "unscaled table value for AlphaMELTS solver system amount"
+    elif field == "system_dVdT":
+        units = "AlphaMELTS System_main dVdT*10^6 as printed"
+        encoding = "ieee754-binary64"
+        basis = "unscaled table value for AlphaMELTS solver system amount"
+    elif field == "system_fO2_delta_QFM" or field == "fO2_log":
+        units = "log10"
+        encoding = "ieee754-binary64"
+    elif field == "vapor_pressures_Pa":
+        units = "Pa"
+        basis = "post-equilibrium project-authoritative vapor projection"
+    elif field in {"liquidus_T_C", "solidus_T_C"}:
+        units = "degC"
+        encoding = "ieee754-binary64"
+    elif field in {"liquidus_T_K", "solidus_T_K"}:
+        units = "K"
+        encoding = "ieee754-binary64"
+    elif field in {"iterations", "status", "warnings", "diagnostics"}:
+        units = "not_applicable"
+    return {
+        "field": name,
+        "units": units,
+        "reference_basis": basis,
+        "encoding": encoding,
+    }
+
+
+def _cache_v2_output_contract() -> list[dict[str, str]]:
+    contract = [
+        *(_cache_v2_output_spec("generic", field) for field in GENERIC_OUTPUT_FIELDS),
+        *(
+            _cache_v2_output_spec("alphamelts", field)
+            for field in ALPHAMELTS_DIAGNOSTIC_OUTPUT_FIELDS
+        ),
+        *(_cache_v2_output_spec("finder", field) for field in FINDER_OUTPUT_FIELDS),
+    ]
+    assert len(contract) == 75
+    return contract
+
+
+def cache_v2_identity_manifest() -> dict[str, Any]:
+    species = tuple(dict.fromkeys((*COMPONENT_FIELDS, *CACHE_V2_VAPOR_SPECIES)))
+    dictionaries = {
+        "phase": _cache_v2_dictionary(CACHE_V2_PHASE_DICTIONARY),
+        "species": _cache_v2_dictionary(species),
+        **{
+            name: _cache_v2_dictionary(values)
+            for name, values in CACHE_V2_FLAG_DICTIONARIES.items()
+        },
+    }
+    return {
+        "schema_version": CACHE_V2_SCHEMA_VERSION,
+        "corpus_version": _load_corpus_version(),
+        "identity": {
+            "fields": [
+                "engine_name",
+                "engine_version",
+                "quantized_inputs",
+            ],
+            "cache_lever": "corpus_version",
+            "optimizer_identity_included": False,
+        },
+        "quantized_inputs": list(CACHE_V2_QUANTIZED_INPUTS),
+        "numeric_policy": {
+            "authoritative_storage": "raw native values",
+            "canonical_negative_zero": "+0.0",
+            "non_finite": "refuse",
+            "rounding_rule": "no decimal quantization or rounding",
+        },
+        "key_hash": {
+            "algorithm": "sha256",
+            "canonical_bytes": "cache-v2-canonical-f64-key-v1",
+            "field_order": [
+                item["field"] for item in CACHE_V2_QUANTIZED_INPUTS
+            ],
+            "float_encoding": "IEEE-754 binary64 big-endian; -0 normalized to +0",
+            "nullable_encoding": "one-byte presence tag then encoded value",
+            "string_encoding": "one-byte presence tag, uint32-be byte length, UTF-8 bytes",
+            "identity_note": (
+                "join hash for quantized_inputs only; engine_name and engine_version "
+                "remain separate cache identity fields"
+            ),
+        },
+        "dictionaries": dictionaries,
+        "dictionary_policy": {
+            "unknown_phase": "refuse",
+            "unknown_species": "refuse",
+            "overflow": "no silent overflow; schema-version break required",
+        },
+        "flags": {
+            "dictionaries": ["regime", "evidence_class", "backend", "tier", "notice"],
+            "clamp_extrapolation_bits": CACHE_V2_CLAMP_EXTRAPOLATION_BITS,
+            "unknown_bit_policy": "refuse",
+        },
+        "outputs": _cache_v2_output_contract(),
+    }
+
+
+def _cache_v2_quantized_values(inputs: Mapping[str, Any]) -> dict[str, Any]:
+    composition_mol = inputs.get("composition_mol") or {}
+    values = {
+        f"component_{component}_mol": composition_mol.get(component)
+        for component in COMPONENT_FIELDS
+    }
+    values.update(
+        {
+            "temperature_C": inputs.get("temperature_C"),
+            "pressure_bar": inputs.get("pressure_bar"),
+            "fO2_log": inputs.get("fO2_log"),
+            "fO2_offset": inputs.get("fO2_offset"),
+            "Fe3Fet_Liq": inputs.get("Fe3Fet_Liq"),
+            "model": inputs.get("model"),
+            "subprocess_run_mode": inputs.get("subprocess_run_mode"),
+            "redox_buffer": inputs.get("redox_buffer"),
+            **{
+                field: inputs.get(field)
+                for field in FINDER_INPUT_FIELDS
+            },
+        }
+    )
+    return values
+
+
+def _canonical_f64_key_bytes(values: Mapping[str, Any]) -> bytes:
+    payload = bytearray(b"cache-v2-canonical-f64-key-v1\0")
+    missing = [
+        item["field"]
+        for item in CACHE_V2_QUANTIZED_INPUTS
+        if item["field"] not in values
+    ]
+    if missing:
+        raise ValueError(f"cache_v2 key fields missing: {missing}")
+    for item in CACHE_V2_QUANTIZED_INPUTS:
+        field = item["field"]
+        representation = item["representation"]
+        value = values[field]
+        nullable = representation.startswith("nullable ")
+        if value is None:
+            if not nullable:
+                raise ValueError(f"cache_v2 key field {field!r} may not be null")
+            payload.extend(b"\x00")
+            continue
+        payload.extend(b"\x01")
+        if "UTF-8" in representation:
+            encoded = str(value).encode("utf-8")
+            payload.extend(struct.pack(">I", len(encoded)))
+            payload.extend(encoded)
+            continue
+        number = float(value)
+        if not math.isfinite(number):
+            raise ValueError(
+                f"cache_v2 key field {field!r} must be finite: {value!r}"
+            )
+        if number == 0.0:
+            number = 0.0
+        payload.extend(struct.pack(">d", number))
+    return bytes(payload)
+
+
+def cache_v2_key_hash(inputs: Mapping[str, Any]) -> str:
+    return hashlib.sha256(
+        _canonical_f64_key_bytes(_cache_v2_quantized_values(inputs))
+    ).hexdigest()
+
+
+def cache_v2_key_hash_from_grid_row(row: Mapping[str, Any]) -> str:
+    values = {
+        item["field"]: row[item["field"]]
+        for item in CACHE_V2_QUANTIZED_INPUTS
+    }
+    return hashlib.sha256(_canonical_f64_key_bytes(values)).hexdigest()
+
+
+def _immutable_cache_v2_metadata() -> dict[str, str]:
+    manifest = canonical_json(cache_v2_identity_manifest())
+    return {
+        "cache_v2_schema_version": CACHE_V2_SCHEMA_VERSION,
+        "corpus_version": _load_corpus_version(),
+        "cache_v2_identity_manifest": manifest,
+        "cache_v2_identity_manifest_sha256": hashlib.sha256(
+            manifest.encode("utf-8")
+        ).hexdigest(),
+    }
+
+
 def canonical_input_vector(inputs: Mapping[str, Any]) -> str:
     allowed_fields = INPUT_FIELDS + POINT_PROVENANCE_FIELDS
     missing = [
@@ -251,6 +697,19 @@ def _json(value: Any) -> str | None:
     return None if value is None else canonical_json(value)
 
 
+def _execute_sql_script_in_transaction(
+    connection: sqlite3.Connection, script: str
+) -> None:
+    statement = ""
+    for line in script.splitlines(keepends=True):
+        statement += line
+        if sqlite3.complete_statement(statement):
+            connection.execute(statement)
+            statement = ""
+    if statement.strip():
+        raise ValueError("incomplete SQLite schema statement")
+
+
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS metadata (
     key TEXT PRIMARY KEY,
@@ -283,6 +742,7 @@ CREATE TABLE IF NOT EXISTS batches (
 CREATE TABLE IF NOT EXISTS grid_keys (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     expedited_key TEXT NOT NULL UNIQUE,
+    key_hash TEXT UNIQUE,
     canonical_vector TEXT NOT NULL UNIQUE,
     batch_id INTEGER NOT NULL REFERENCES batches(batch_id),
     shuffle_rank INTEGER NOT NULL,
@@ -406,6 +866,8 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     generic_phase_masses_kg_json TEXT,
     generic_phase_species_mol_json TEXT,
     generic_phase_species_kg_json TEXT,
+    -- Presence-optional for legacy rows written before per-instance capture.
+    generic_phase_instances_json TEXT,
     generic_phase_compositions_json TEXT,
     generic_liquid_fraction REAL,
     generic_liquid_fraction_repr TEXT,
@@ -527,36 +989,16 @@ class GridCacheWriter:
         self.claim_owner = f"{socket.gethostname()}:{os.getpid()}:{uuid.uuid4()}"
         if self.engine_epoch < 1:
             raise ValueError("engine_epoch must be >= 1")
+        if existing_only and not self.path.is_file():
+            raise FileNotFoundError(f"database does not exist: {self.path}")
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        database = str(self.path)
         if existing_only:
-            if not self.path.is_file():
-                raise FileNotFoundError(f"database does not exist: {self.path}")
-            validation_database = (
-                "file:"
-                + urllib.parse.quote(str(self.path.resolve()), safe="/")
-                + "?mode=ro"
-            )
-            validation_connection: sqlite3.Connection | None = None
-            try:
-                validation_connection = sqlite3.connect(
-                    validation_database, timeout=30.0, uri=True
-                )
-                validation_connection.row_factory = sqlite3.Row
-                self._validate_connection(validation_connection)
-            except sqlite3.DatabaseError as exc:
-                raise ValueError(
-                    f"cannot validate existing grid cache {self.path}: {exc}"
-                ) from exc
-            finally:
-                if validation_connection is not None:
-                    validation_connection.close()
             database = (
                 "file:"
                 + urllib.parse.quote(str(self.path.resolve()), safe="/")
                 + "?mode=rw"
             )
-        else:
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            database = str(self.path)
         try:
             self.connection = sqlite3.connect(
                 database, timeout=30.0, uri=existing_only
@@ -564,31 +1006,33 @@ class GridCacheWriter:
         except sqlite3.DatabaseError as exc:
             raise ValueError(f"cannot open grid cache {self.path}: {exc}") from exc
         self.connection.row_factory = sqlite3.Row
-        if existing_only:
-            try:
-                self._validate_existing_database()
-            except sqlite3.DatabaseError as exc:
-                self.connection.close()
-                raise ValueError(
-                    f"cannot validate existing grid cache {self.path}: {exc}"
-                ) from exc
-            except Exception:
-                self.connection.close()
-                raise
-        self.connection.execute("PRAGMA journal_mode=WAL")
-        self.connection.execute("PRAGMA synchronous=NORMAL")
         self.connection.execute("PRAGMA foreign_keys=ON")
         self.connection.execute("PRAGMA busy_timeout=30000")
-        if existing_only:
-            # Retry/drain opens an existing database read-write. Add nullable
-            # forward columns only; historical rows remain untouched.
-            self._ensure_v2_provenance_columns()
-            self._ensure_runmode_output_columns()
-            self._ensure_claim_table()
-            self._set_metadata("schema_output_field_count", "74")
-            self.connection.commit()
-        else:
-            self.connection.executescript(SCHEMA_SQL)
+        try:
+            # One handle owns classification, immutable validation, migration,
+            # and fresh creation. BEGIN IMMEDIATE serializes concurrent creators
+            # and path replacement cannot change the already-open file handle.
+            self.connection.execute("BEGIN IMMEDIATE")
+            tables = {
+                str(row[0])
+                for row in self.connection.execute(
+                    "SELECT name FROM sqlite_master "
+                    "WHERE type = 'table' AND name != 'sqlite_sequence'"
+                )
+            }
+            fresh_database = not tables
+            if existing_only and fresh_database:
+                raise ValueError(
+                    f"existing database is not a grid cache: {self.path}"
+                )
+            if fresh_database:
+                _execute_sql_script_in_transaction(self.connection, SCHEMA_SQL)
+            else:
+                # This explicit grid-cache signature is what distinguishes a
+                # presence-optional legacy DB from a partial/crashed creation.
+                self._validate_existing_database()
+
+            # Additive migrations happen only after the same-connection guard.
             self._ensure_v2_provenance_columns()
             self._ensure_runmode_output_columns()
             self._ensure_claim_table()
@@ -598,12 +1042,26 @@ class GridCacheWriter:
                 "variant-local bookkeeping only; recompute reviewed canonical_state_bytes "
                 "from typed full-precision inputs; never transplant this hash",
             )
-            self._set_metadata("schema_output_field_count", "74")
+            self._set_metadata("schema_output_field_count", "75")
             self._set_metadata("schema_input_field_count", "25")
             self._set_metadata("grid_realization_revision", GRID_REALIZATION_REVISION)
             self._set_metadata("database_id", str(uuid.uuid4()), overwrite=False)
             self._set_metadata("created_at", utc_now(), overwrite=False)
+            if fresh_database:
+                for key, value in _immutable_cache_v2_metadata().items():
+                    self._set_metadata(key, value, overwrite=False)
             self.connection.commit()
+        except Exception as exc:
+            if self.connection.in_transaction:
+                self.connection.rollback()
+            self.connection.close()
+            if isinstance(exc, sqlite3.DatabaseError):
+                raise ValueError(
+                    f"cannot validate existing grid cache {self.path}: {exc}"
+                ) from exc
+            raise
+        self.connection.execute("PRAGMA journal_mode=WAL")
+        self.connection.execute("PRAGMA synchronous=NORMAL")
         try:
             self._assert_backend_not_blended(self.backend_name)
         except Exception:
@@ -669,6 +1127,7 @@ class GridCacheWriter:
                 f"schema variant mismatch: database={value!r}, "
                 f"writer={SCHEMA_VARIANT!r}"
             )
+        GridCacheWriter._validate_immutable_cache_v2_metadata(connection)
         provenance_columns = set(table_columns(connection, "grid_keys"))
         missing_columns = {
             "intended_fO2_log",
@@ -679,6 +1138,39 @@ class GridCacheWriter:
                 "existing database lacks v2 provenance columns: "
                 + ", ".join(sorted(missing_columns))
             )
+
+    @staticmethod
+    def _validate_immutable_cache_v2_metadata(
+        connection: sqlite3.Connection,
+    ) -> None:
+        tables = {
+            str(row[0])
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            )
+        }
+        if "metadata" not in tables:
+            return
+        immutable = _immutable_cache_v2_metadata()
+        rows = {
+            str(row[0]): str(row[1])
+            for row in connection.execute(
+                "SELECT key, value FROM metadata WHERE key IN (?, ?, ?, ?)",
+                tuple(immutable),
+            )
+        }
+        if rows:
+            missing_metadata = sorted(set(immutable) - set(rows))
+            mismatches = {
+                key: {"database": rows.get(key), "writer": value}
+                for key, value in immutable.items()
+                if rows.get(key) != value
+            }
+            if missing_metadata or mismatches:
+                raise ValueError(
+                    "cache_v2 immutable metadata mismatch: "
+                    f"missing={missing_metadata!r}, mismatches={mismatches!r}"
+                )
 
     @classmethod
     def has_batch_definitions(cls, path: str | os.PathLike[str]) -> bool:
@@ -717,6 +1209,7 @@ class GridCacheWriter:
     def _ensure_v2_provenance_columns(self) -> None:
         columns = set(table_columns(self.connection, "grid_keys"))
         additions = {
+            "key_hash": "TEXT",
             "intended_fO2_log": "REAL",
             "intended_fO2_log_repr": "TEXT",
             "kress91_fixed_ferric_fraction": "REAL",
@@ -728,6 +1221,10 @@ class GridCacheWriter:
                 self.connection.execute(
                     f'ALTER TABLE grid_keys ADD COLUMN "{name}" {column_type}'
                 )
+        self.connection.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_grid_keys_cache_v2_key_hash "
+            "ON grid_keys(key_hash) WHERE key_hash IS NOT NULL"
+        )
 
     def _ensure_runmode_output_columns(self) -> None:
         additions = {
@@ -764,6 +1261,7 @@ class GridCacheWriter:
                 "generic_phase_thermo_json": "TEXT",
                 "generic_chem_potentials_json": "TEXT",
                 "generic_phase_affinities_json": "TEXT",
+                "generic_phase_instances_json": "TEXT",
                 "generic_solid_composition_wt_pct_json": "TEXT",
                 "generic_bulk_composition_wt_pct_json": "TEXT",
                 "run_mode": "TEXT",
@@ -919,7 +1417,7 @@ class GridCacheWriter:
         if cursor.rowcount == 0:
             vector = values["canonical_vector"]
             row = self.connection.execute(
-                "SELECT canonical_vector, batch_id, shuffle_rank, shard, "
+                "SELECT canonical_vector, key_hash, batch_id, shuffle_rank, shard, "
                 "kress91_partition_provenance_json, "
                 "kress91_fixed_ferric_fraction "
                 "FROM grid_keys WHERE expedited_key = ?",
@@ -928,6 +1426,15 @@ class GridCacheWriter:
             if row is None or row["canonical_vector"] != vector:
                 raise RuntimeError(
                     f"expedited-key collision for {values['expedited_key']}"
+                )
+            if row["key_hash"] not in {None, values["key_hash"]}:
+                raise RuntimeError(
+                    f"cache-v2 key-hash drift for {values['expedited_key']}"
+                )
+            if row["key_hash"] is None:
+                self.connection.execute(
+                    "UPDATE grid_keys SET key_hash = ? WHERE expedited_key = ?",
+                    (values["key_hash"], values["expedited_key"]),
                 )
             existing_provenance = row["kress91_partition_provenance_json"]
             point_provenance = values["kress91_partition_provenance_json"]
@@ -1412,6 +1919,7 @@ class GridCacheWriter:
             )
         values = {
             "expedited_key": key,
+            "key_hash": cache_v2_key_hash(inputs),
             "canonical_vector": vector,
             "batch_id": int(batch_id),
             "shuffle_rank": int(shuffle_rank),
@@ -1597,6 +2105,7 @@ class GridCacheWriter:
             "generic_phase_masses_kg_json": _json(generic.get("phase_masses_kg")),
             "generic_phase_species_mol_json": _json(generic.get("phase_species_mol")),
             "generic_phase_species_kg_json": _json(generic.get("phase_species_kg")),
+            "generic_phase_instances_json": _json(generic.get("phase_instances")),
             "generic_phase_compositions_json": _json(generic.get("phase_compositions")),
             "generic_liquid_fraction": _float(generic.get("liquid_fraction")),
             "generic_liquid_fraction_repr": _repr(generic.get("liquid_fraction")),
