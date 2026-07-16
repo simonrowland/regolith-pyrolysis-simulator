@@ -2464,6 +2464,28 @@ def test_subprocess_activity_parser_accepts_unqualified_table_heading():
     ) == pytest.approx({'Na': 0.08, 'K': 0.03})
 
 
+def test_subprocess_inline_activity_does_not_parse_following_phase_prose_as_table():
+    backend = AlphaMELTSBackend()
+    output = """
+Activity of H2O = 0.0
+<> Stable solid assemblage achieved.
+liquid: SiO2 Al2O3 FeO MgO CaO
+100.0 g 50.0 15.0 10.0 10.0 15.0
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1500.000000 (C)
+Melt fraction = 1.0
+"""
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1500.0,
+        total_input_kg=100.0,
+    )
+
+    assert result.activity_coefficients == {'H2O': pytest.approx(0.0)}
+    assert result.diagnostics.get('diagnostic_oxide_activities') in (None, {})
+
+
 def test_equilibrium_emission_keeps_endmember_activities_diagnostic_only():
     backend = AlphaMELTSBackend()
 
@@ -3960,6 +3982,29 @@ olivine: 20.0 g, composition (Mg,Fe)2SiO4
         2.0 * ten_kg.phase_masses_kg['liquid']
     )
     assert ten_kg.liquid_fraction == twenty_kg.liquid_fraction == pytest.approx(0.8)
+
+
+def test_alphamelts_subprocess_accepts_display_rounded_phase_mass():
+    backend = AlphaMELTSBackend()
+    output = """
+<> Stable liquid assemblage achieved.
+Initial alphaMELTS calculation at: P 1.000000 (bars), T 1500.000000 (C)
+liquid: SiO2
+100.041 g 100.0
+Melt fraction = 1.0
+"""
+
+    result = _parse_subprocess_fixture(
+        backend,
+        output,
+        temperature_C=1500.0,
+        system_output=_system_main_fixture(
+            temperature_C=1500.0,
+            system_mass_g=100.040579,
+        ),
+    )
+
+    assert result.phase_masses_kg == {'liquid': pytest.approx(0.1)}
 
 
 def test_alphamelts_subprocess_rejects_partial_phase_mass_parse():

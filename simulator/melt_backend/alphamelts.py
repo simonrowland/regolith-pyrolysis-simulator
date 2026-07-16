@@ -104,6 +104,7 @@ ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE = 'phase_mass_incomplete'
 ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY = 'vapor_projection_empty'
 ALPHAMELTS_EXECUTED_T_TOLERANCE_C = 0.01
 ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10 = 1.0e-6
+ALPHAMELTS_PHASE_MASS_DISPLAY_RESOLUTION_G = 0.001
 # alphaMELTS input serialization emits an oxide only above this wt% value.
 # Values at/below it are native zero-component cells, regardless of Python sign.
 ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT = 0.001
@@ -2544,6 +2545,8 @@ class _MELTSBackendSupport(MeltBackend):
         return self._activity_pairs_from_tokens(tokens)
 
     def _activity_table_after(self, lines: list[str], idx: int) -> dict:
+        if not lines[idx].strip().endswith(':'):
+            return {}
         for header_idx in range(idx + 1, min(idx + 6, len(lines))):
             header = lines[header_idx].strip()
             if not header:
@@ -2896,14 +2899,24 @@ class _MELTSBackendSupport(MeltBackend):
                 'System_main_tbl.txt lacks engine system mass',
             )
         system_mass_kg = float(system_mass_g) / 1000.0
+        displayed_phase_count = len(phase_instance_masses_kg) + int(
+            'liquid' in phase_masses_kg
+        )
+        phase_mass_rounding_tolerance_kg = (
+            max(1, displayed_phase_count)
+            * ALPHAMELTS_PHASE_MASS_DISPLAY_RESOLUTION_G
+            / 2.0
+            / 1000.0
+        )
         if not math.isclose(
             solver_basis_kg,
             system_mass_kg,
             rel_tol=1.0e-6,
-            # Phase_main_tbl prints mass to 0.001 g while System_main_tbl
-            # retains more digits.  Half one printed unit is the tightest
-            # closure tolerance justified by the engine-owned text.
-            abs_tol=5.0e-7,
+            # Phase_main_tbl prints each phase mass to 0.001 g while
+            # System_main_tbl retains more digits. Allow half one printed unit
+            # per displayed phase, the tightest aggregate closure tolerance
+            # justified by the engine-owned text.
+            abs_tol=max(1.0e-9, phase_mass_rounding_tolerance_kg),
         ):
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_PHASE_MASS_INCOMPLETE,
