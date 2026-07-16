@@ -53,8 +53,10 @@ def _controls(**overrides):
         "p_total_mbar": 0.05,
         "pO2_mbar": 0.0,
         "active_ca_condensation_route": True,
+        # Legacy serialized key = CF-7 Ca-shell enable.
         "dedicated_ca_condenser": True,
         "ca_condensation_species": "Ca",
+        # Legacy serialized key = CF-7 Ca-shell temperature.
         "ca_condenser_temperature_C": 780.0,
         "thermo_margin_kj_per_mol_o2": 2.0,
         "aluminate_mode": "C3A",
@@ -431,6 +433,7 @@ def test_c7_refuses_generic_reagent_inventory_al(formula_registry):
         ({"p_total_mbar": 1.0}, "c7_total_pressure_outside_vacuum_envelope"),
         (
             {"active_ca_condensation_route": False},
+            # Legacy serialized reason; semantics are shared CF-7 Ca-shell routing.
             "c7_no_active_dedicated_ca_condensation_route",
         ),
     ),
@@ -450,6 +453,37 @@ def test_c7_refuses_bad_vacuum_route_or_thermo(formula_registry, override, reaso
     assert result.status == "refused"
     assert result.transition is None
     assert result.diagnostic["reason_refused"] == reason
+
+
+def test_c7_shared_cf7_ca_shell_route_method_gates_dispatch(
+    formula_registry, monkeypatch
+):
+    method_name = "_has_active_cf7_ca_shell_route"
+    assert callable(getattr(BuiltinCaAluminothermicStepProvider, method_name))
+    monkeypatch.setattr(
+        BuiltinCaAluminothermicStepProvider,
+        method_name,
+        staticmethod(lambda controls: False),
+    )
+
+    result = _provider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"CaO": 60.0},
+                C7_AL_CREDIT_ACCOUNT: {"Al": 20.0},
+            },
+            _controls(),
+        )
+    )
+
+    assert result.status == "refused"
+    assert result.transition is None
+    # Legacy serialized reason; semantics are shared CF-7 Ca-shell routing.
+    assert (
+        result.diagnostic["reason_refused"]
+        == "c7_no_active_dedicated_ca_condensation_route"
+    )
 
 
 def test_c7_ignores_configured_thermo_scalar_and_uses_computed_margin(
@@ -502,24 +536,25 @@ def test_c7_refuses_insufficient_al_when_partial_extent_forbidden(formula_regist
     assert result.diagnostic["limiting_cap"] == "stoich"
 
 
-def test_c7_capture_routes_overhead_ca_to_dedicated_train(formula_registry):
-    result = _provider().dispatch(
-        _request(
-            formula_registry,
-            {
-                "process.overhead_gas": {"Ca": 5.0},
-                "process.condensation_train": {},
-                "process.wall_deposit": {},
-            },
-            _controls(
-                operation="ca_capture",
-                capture_mol=5.0,
-                capture_fraction=0.8,
-                route_uncaptured_to_wall=True,
-            ),
-        )
+def test_c7_capture_routes_overhead_ca_to_shared_cf7_ca_shell(formula_registry):
+    request = _request(
+        formula_registry,
+        {
+            "process.overhead_gas": {"Ca": 5.0},
+            "process.condensation_train": {},
+            "process.wall_deposit": {},
+        },
+        _controls(
+            operation="ca_capture",
+            capture_mol=5.0,
+            capture_fraction=0.8,
+            route_uncaptured_to_wall=True,
+        ),
     )
+    result = _provider().dispatch(request)
+    repeat_result = _provider().dispatch(request)
 
+    assert repeat_result == result
     assert result.status == "ok"
     assert result.transition is not None
     assert dict(result.transition.debits) == {
@@ -529,6 +564,7 @@ def test_c7_capture_routes_overhead_ca_to_dedicated_train(formula_registry):
         "process.condensation_train": {"Ca": 4.0},
         "process.wall_deposit": {"Ca": 1.0},
     }
+    assert result.diagnostic["ca_condenser_temperature_C"] == pytest.approx(780.0)
     _atom_check(result.transition, formula_registry, tol=1e-12)
 
 

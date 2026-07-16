@@ -32,6 +32,8 @@ C7_CAMPAIGN_NAME = "C7_CA_ALUMINOTHERMIC"
 C7_DECISION_YES = "yes"
 C7_MIN_TOTAL_PRESSURE_MBAR = 0.01
 C7_MAX_TOTAL_PRESSURE_MBAR = 0.1
+# CF-7 is the shared ballistic multi-metal condenser; 780 C is its Ca shell,
+# grounded by Jacob & Srikanth (1990) and the C3A/CA slag limits in Jerebtsov (2001).
 C7_DEFAULT_CONDENSER_TEMPERATURE_C = 780.0
 C7_MIN_HOLD_TEMP_C = 1100.0
 C7_MAX_HOLD_TEMP_C = 1300.0
@@ -363,7 +365,8 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
                 pO2_mbar=pO2_mbar,
                 p_total_mbar=p_total_mbar,
             )
-        if not self._has_dedicated_ca_route(controls):
+        if not self._has_active_cf7_ca_shell_route(controls):
+            # Keep the serialized refusal token stable for existing artifacts.
             return self._refused(
                 "c7_no_active_dedicated_ca_condensation_route",
                 control_audit=control_audit,
@@ -477,6 +480,7 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
                 "ca_uncaptured_wall_deposit_kg": (
                     wall_deposit_mol * ca_formula.molar_mass_kg_per_mol()
                 ),
+                # Legacy serialized key = CF-7 Ca-shell temperature.
                 "ca_condenser_temperature_C": _finite_float(
                     controls.get("ca_condenser_temperature_C"),
                     C7_DEFAULT_CONDENSER_TEMPERATURE_C,
@@ -657,18 +661,20 @@ class BuiltinCaAluminothermicStepProvider(ChemistryProvider):
         return debits
 
     @staticmethod
-    def _has_dedicated_ca_route(controls: Mapping[str, Any]) -> bool:
+    def _has_active_cf7_ca_shell_route(controls: Mapping[str, Any]) -> bool:
         if not bool(controls.get("active_ca_condensation_route") or False):
             return False
         if str(controls.get("ca_condensation_species") or "Ca") != "Ca":
             return False
+        # Legacy serialized key = CF-7 Ca-shell enable.
         if not bool(controls.get("dedicated_ca_condenser") or False):
             return False
-        condenser_temp = _finite_float(
+        # Legacy serialized key = CF-7 Ca-shell temperature.
+        ca_shell_temp = _finite_float(
             controls.get("ca_condenser_temperature_C"),
             C7_DEFAULT_CONDENSER_TEMPERATURE_C,
         )
-        return abs(condenser_temp - C7_DEFAULT_CONDENSER_TEMPERATURE_C) <= 50.0
+        return abs(ca_shell_temp - C7_DEFAULT_CONDENSER_TEMPERATURE_C) <= 50.0
 
     @staticmethod
     def _source_label(account: str) -> str:

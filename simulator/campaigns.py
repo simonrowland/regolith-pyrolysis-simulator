@@ -2162,7 +2162,8 @@ class CampaignManager:
                 recommendation='yes',
                 context=(
                     'Proceed with default-off C7 aluminothermic Ca recovery? '
-                    'Requires Al budget, hard vacuum, and a dedicated Ca condenser.'
+                    'Requires Al budget, hard vacuum, and the shared CF-7 '
+                    'multi-metal condenser Ca shell.'
                 ),
             )
 

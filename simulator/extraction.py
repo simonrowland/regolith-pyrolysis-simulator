@@ -2933,19 +2933,21 @@ class ExtractionMixin:
         if p_total_raw is None:
             p_total_raw = cfg.get('p_total_mbar_default')
         p_total_mbar = self._c7_float(p_total_raw, self.melt.p_total_mbar)
-        route_controls = {
+        cf7_ca_shell_controls = {
             'active_ca_condensation_route': self._c7_bool(
                 cfg.get('active_ca_condensation_route'), True),
+            # Legacy serialized key = CF-7 Ca-shell enable.
             'dedicated_ca_condenser': self._c7_bool(
                 cfg.get('dedicated_ca_condenser'), True),
             'ca_condensation_species': str(
                 cfg.get('ca_condensation_species') or 'Ca'),
+            # Legacy serialized key = CF-7 Ca-shell temperature.
             'ca_condenser_temperature_C': self._c7_float(
                 cfg.get('ca_condenser_temperature_C'), 780.0),
         }
-        active_route = (
+        cf7_ca_shell_route_active = (
             BuiltinCaAluminothermicStepProvider
-            ._has_dedicated_ca_route(route_controls)
+            ._has_active_cf7_ca_shell_route(cf7_ca_shell_controls)
         )
         area_m2 = max(
             0.0,
@@ -2994,7 +2996,7 @@ class ExtractionMixin:
         gas_temperature_K = float(
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or hold_temp_K
         )
-        if active_route and (
+        if cf7_ca_shell_route_active and (
             C7_MIN_TOTAL_PRESSURE_MBAR <= p_total_mbar <= C7_MAX_TOTAL_PRESSURE_MBAR
         ):
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(
@@ -3111,7 +3113,7 @@ class ExtractionMixin:
             'c7_transport_source': 'series_resistance_hkl_ca_evaporation',
             'c7_transport_refusal': (
                 ''
-                if active_route
+                if cf7_ca_shell_route_active
                 and C7_MIN_TOTAL_PRESSURE_MBAR
                 <= p_total_mbar
                 <= C7_MAX_TOTAL_PRESSURE_MBAR
@@ -3200,10 +3202,12 @@ class ExtractionMixin:
             'pO2_mbar': self._c7_float(pO2_raw, self.melt.pO2_mbar),
             'active_ca_condensation_route': self._c7_bool(
                 cfg.get('active_ca_condensation_route'), True),
+            # Legacy serialized key = CF-7 Ca-shell enable.
             'dedicated_ca_condenser': self._c7_bool(
                 cfg.get('dedicated_ca_condenser'), True),
             'ca_condensation_species': str(
                 cfg.get('ca_condensation_species') or 'Ca'),
+            # Legacy serialized key = CF-7 Ca-shell temperature.
             'ca_condenser_temperature_C': self._c7_float(
                 cfg.get('ca_condenser_temperature_C'), 780.0),
             'thermo_margin_kj_per_mol_o2': self._c7_float(
