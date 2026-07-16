@@ -24,45 +24,50 @@ from scripts.grid_pregrind import DEFAULT_FEEDSTOCK_ANCHORS
 FAITHFUL_RUMP = "faithful-rump"
 CALCULATION_BUG = "calculation-bug"
 MELTS_VS_FREEZE = "melts-vs-freeze"
+ENGINE_REFUSAL = "engine-refusal"
+PRE_ENGINE_INPUT = "pre-engine-input"
 UNCLASSIFIED = "unclassified"
 TRIAGE_CLASSES = (
     FAITHFUL_RUMP,
     CALCULATION_BUG,
     MELTS_VS_FREEZE,
+    ENGINE_REFUSAL,
+    PRE_ENGINE_INPUT,
     UNCLASSIFIED,
 )
 
-_FAITHFUL_RUMP_REASONS = frozenset(
-    {
-        "below_liquidus",
-        "faithful_rump",
-        "fully_solid",
-        "no_liquid_phase",
-        "physical_refusal",
-        "rump_only",
-        "silicate_window",
-        "zero_component_boundary",
-    }
-)
-_CALCULATION_BUG_REASONS = frozenset(
-    {
-        "executed_temperature_mismatch",
-        "executed_temperature_missing",
-        "missing_binary",
-        "parse_empty_output",
-        "subprocess_died",
-        "thermoengine_equilibrium_status",
-        "timeout",
-    }
-)
-_MELTS_VS_FREEZE_REASONS = frozenset(
-    {
-        "alphamelts_freeze_disagreement",
-        "freeze_gate_disagreement",
-        "kernel_liquidus_disagree",
-        "melts_vs_freeze",
-        "no_convergence",
-    }
+# Exact stable tokens emitted by the grid producer.
+PRODUCER_REASON_CLASSES = {
+    # scripts/grid_pregrind.py:1126,1144 (typed pre-engine refusals)
+    "stale_explicit_fo2_key": PRE_ENGINE_INPUT,
+    "zero_component_boundary": PRE_ENGINE_INPUT,
+    # simulator/melt_backend/alphamelts.py:85-99 (backend reason constants)
+    "no_convergence": ENGINE_REFUSAL,
+    "subprocess_pressure_below_minimum": ENGINE_REFUSAL,
+    "timeout": CALCULATION_BUG,
+    "subprocess_died": CALCULATION_BUG,
+    "nonzero_exit": CALCULATION_BUG,
+    "parse_empty_output": CALCULATION_BUG,
+    "missing_binary": CALCULATION_BUG,
+    "subprocess_run_mode_required": CALCULATION_BUG,
+    "subprocess_run_mode_invalid": CALCULATION_BUG,
+    "executed_temperature_missing": CALCULATION_BUG,
+    "executed_temperature_mismatch": CALCULATION_BUG,
+    "fo2_constraint_invalid": CALCULATION_BUG,
+    "fo2_constraint_unapplied": CALCULATION_BUG,
+    "system_output_missing": CALCULATION_BUG,
+    "phase_mass_incomplete": CALCULATION_BUG,
+    # scripts/grid_pregrind.py:966-986 (stable ThermoEngine failure codes)
+    "thermoengine_zero_ferric_limit": CALCULATION_BUG,
+    "thermoengine_nonfinite_fo2_echo": CALCULATION_BUG,
+    "thermoengine_equilibrium_status": CALCULATION_BUG,
+}
+# scripts/grid_pregrind.py:980-986 also emits dynamic exception_<type> codes;
+# classify that producer-defined family below rather than inventing members.
+
+TAXONOMY_GAPS = (
+    "MELTS-vs-freeze cannot be assessed from current grid_pregrind rows: "
+    "every producer persists finder={}, so finder_liquid_fraction is absent.",
 )
 _REASON_KEYS = frozenset(
     {
@@ -139,22 +144,21 @@ def classify_non_eval(row: Mapping[str, Any]) -> str:
     """Classify one persisted non-eval row using explicit recorded signals."""
     payload = _decoded_payload(row.get("raw_payload"))
     tokens = _reason_tokens(row) | _reason_tokens(payload)
-    if tokens & _MELTS_VS_FREEZE_REASONS:
-        return MELTS_VS_FREEZE
     melts_fraction = _recorded_number(row, "generic_liquid_fraction")
     freeze_fraction = _recorded_number(row, "finder_liquid_fraction")
-    if melts_fraction is not None and freeze_fraction is not None and (
-        (melts_fraction > 0.0) != (freeze_fraction > 0.0)
-    ):
-        return MELTS_VS_FREEZE
-    if tokens & _FAITHFUL_RUMP_REASONS:
-        return FAITHFUL_RUMP
     requested_temperature = _recorded_number(
         row, "generic_requested_temperature_C", "grid_temperature_C"
     )
     liquidus_temperature = _reported_liquidus(row)
+    status_kind = _normalise_token(row.get("status_kind", ""))
+    # Evidence precedence: dual recorded fractions, then physical rump evidence,
+    # then producer reason tokens. Tokens never mask evidence-bearing rows.
+    if melts_fraction is not None and freeze_fraction is not None and (
+        (melts_fraction > 0.0) != (freeze_fraction > 0.0)
+    ):
+        return MELTS_VS_FREEZE
     if (
-        _normalise_token(row.get("status_kind", "")) == "refusal"
+        status_kind == "refusal"
         and (
             melts_fraction == 0.0
             or (
@@ -165,12 +169,18 @@ def classify_non_eval(row: Mapping[str, Any]) -> str:
         )
     ):
         return FAITHFUL_RUMP
-    status_kind = _normalise_token(row.get("status_kind", ""))
+    mapped_classes = {
+        PRODUCER_REASON_CLASSES[token]
+        for token in tokens
+        if token in PRODUCER_REASON_CLASSES
+    }
+    for triage_class in (PRE_ENGINE_INPUT, ENGINE_REFUSAL, CALCULATION_BUG):
+        if triage_class in mapped_classes:
+            return triage_class
     failure_reason = _normalise_token(row.get("failure_reason_code", ""))
     if (
         status_kind == "failure"
         or failure_reason.startswith("exception_")
-        or tokens & _CALCULATION_BUG_REASONS
     ):
         return CALCULATION_BUG
     return UNCLASSIFIED
@@ -225,6 +235,7 @@ def build_triage_report(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "per_feedstock": {
             feedstock: by_feedstock[feedstock] for feedstock in sorted(by_feedstock)
         },
+        "taxonomy_gaps": list(TAXONOMY_GAPS),
         "total_non_eval": len(non_eval_rows),
         "unclassified": unclassified,
     }

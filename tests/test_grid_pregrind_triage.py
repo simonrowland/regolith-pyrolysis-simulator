@@ -5,8 +5,11 @@ import sqlite3
 
 from scripts.grid_pregrind_triage import (
     CALCULATION_BUG,
+    ENGINE_REFUSAL,
     FAITHFUL_RUMP,
     MELTS_VS_FREEZE,
+    PRE_ENGINE_INPUT,
+    TAXONOMY_GAPS,
     UNCLASSIFIED,
     build_triage_report,
     classify_non_eval,
@@ -14,68 +17,137 @@ from scripts.grid_pregrind_triage import (
 )
 
 
-def test_classify_non_eval_covers_closed_taxonomy_and_preserves_unknown():
+def test_classify_non_eval_uses_real_producer_payloads_and_preserves_unknown():
     faithful = {
         "feedstock_id": "lunar_mare",
         "status": "out_of_domain",
         "status_kind": "refusal",
+        "refusal_reason": "no_convergence",
+        "failure_reason_code": None,
         "generic_requested_temperature_C": 1100.0,
         "generic_liquidus_T_C": 1250.0,
         "generic_liquid_fraction": 0.0,
-        "raw_payload": {},
+        "finder_liquid_fraction": None,
+        "raw_payload": json.dumps({"engine_invoked": True}),
     }
     calculation_bug = {
         "feedstock_id": "lunar_mare",
         "status": "error",
         "status_kind": "failure",
+        "refusal_reason": "RuntimeError",
         "failure_reason_code": "exception_runtimeerror",
-        "raw_payload": {"exception": {"message": "adapter exploded"}},
+        "generic_liquid_fraction": None,
+        "finder_liquid_fraction": None,
+        "raw_payload": json.dumps(
+            {
+                "engine_invoked": False,
+                "exception": {
+                    "type": "RuntimeError",
+                    "message": "adapter exploded",
+                },
+            }
+        ),
     }
-    disagreement = {
+    engine_refusal = {
         "feedstock_id": "lunar_highland",
         "status": "out_of_domain",
         "status_kind": "refusal",
         "refusal_reason": "no_convergence",
-        "raw_payload": {},
+        "failure_reason_code": None,
+        "generic_liquid_fraction": None,
+        "finder_liquid_fraction": None,
+        "raw_payload": json.dumps({"engine_invoked": True, "captures": []}),
+    }
+    pre_engine = {
+        "feedstock_id": "lunar_highland",
+        "status": "out_of_domain",
+        "status_kind": "refusal",
+        "refusal_reason": "zero_component_boundary",
+        "failure_reason_code": "zero_component_boundary",
+        "generic_liquid_fraction": None,
+        "finder_liquid_fraction": None,
+        "raw_payload": json.dumps(
+            {
+                "engine_invoked": False,
+                "preflight_refusal": {
+                    "reason": "zero_component_boundary",
+                    "diagnostic_override_available": True,
+                },
+            }
+        ),
     }
     unknown = {
         "feedstock_id": "lunar_highland",
         "status": "out_of_domain",
         "status_kind": "refusal",
-        "refusal_reason": "stale_explicit_fo2_key",
-        "raw_payload": {"opaque": ["payload", 7]},
+        "refusal_reason": "future_engine_refusal",
+        "failure_reason_code": None,
+        "generic_liquid_fraction": None,
+        "finder_liquid_fraction": None,
+        "raw_payload": json.dumps(
+            {"engine_invoked": True, "opaque": ["payload", 7]}
+        ),
     }
 
     assert classify_non_eval(faithful) == FAITHFUL_RUMP
     assert classify_non_eval(calculation_bug) == CALCULATION_BUG
-    assert classify_non_eval(disagreement) == MELTS_VS_FREEZE
+    assert classify_non_eval(engine_refusal) == ENGINE_REFUSAL
+    assert classify_non_eval(pre_engine) == PRE_ENGINE_INPUT
     assert classify_non_eval(unknown) == UNCLASSIFIED
 
-    report = build_triage_report([unknown, disagreement, calculation_bug, faithful])
+    report = build_triage_report(
+        [unknown, engine_refusal, calculation_bug, pre_engine, faithful]
+    )
     assert report == {
         "counts": {
             FAITHFUL_RUMP: 1,
             CALCULATION_BUG: 1,
-            MELTS_VS_FREEZE: 1,
+            MELTS_VS_FREEZE: 0,
+            ENGINE_REFUSAL: 1,
+            PRE_ENGINE_INPUT: 1,
             UNCLASSIFIED: 1,
         },
         "per_feedstock": {
             "lunar_highland": {
                 FAITHFUL_RUMP: 0,
                 CALCULATION_BUG: 0,
-                MELTS_VS_FREEZE: 1,
+                MELTS_VS_FREEZE: 0,
+                ENGINE_REFUSAL: 1,
+                PRE_ENGINE_INPUT: 1,
                 UNCLASSIFIED: 1,
             },
             "lunar_mare": {
                 FAITHFUL_RUMP: 1,
                 CALCULATION_BUG: 1,
                 MELTS_VS_FREEZE: 0,
+                ENGINE_REFUSAL: 0,
+                PRE_ENGINE_INPUT: 0,
                 UNCLASSIFIED: 0,
             },
         },
-        "total_non_eval": 4,
+        "taxonomy_gaps": list(TAXONOMY_GAPS),
+        "total_non_eval": 5,
         "unclassified": [{"feedstock": "lunar_highland", "raw": unknown}],
     }
+
+
+def test_melts_vs_freeze_requires_both_recorded_fraction_signals():
+    recorded_disagreement = {
+        "status": "out_of_domain",
+        "status_kind": "refusal",
+        "refusal_reason": "no_convergence",
+        "failure_reason_code": None,
+        "generic_liquid_fraction": 0.25,
+        "finder_liquid_fraction": 0.0,
+        "raw_payload": json.dumps({"engine_invoked": True}),
+    }
+    producer_shaped_row = {
+        **recorded_disagreement,
+        "finder_liquid_fraction": None,
+    }
+
+    assert classify_non_eval(recorded_disagreement) == MELTS_VS_FREEZE
+    assert classify_non_eval(producer_shaped_row) == ENGINE_REFUSAL
 
 
 def test_report_ignores_success_and_uses_unassigned_feedstock_bucket():
@@ -85,8 +157,11 @@ def test_report_ignores_success_and_uses_unassigned_feedstock_bucket():
             {
                 "status": "out_of_domain",
                 "status_kind": "refusal",
-                "refusal_reason": "fully_solid",
-                "raw_payload": {},
+                "refusal_reason": "no_convergence",
+                "failure_reason_code": None,
+                "generic_liquid_fraction": 0.0,
+                "finder_liquid_fraction": None,
+                "raw_payload": json.dumps({"engine_invoked": True}),
             },
         ]
     )
