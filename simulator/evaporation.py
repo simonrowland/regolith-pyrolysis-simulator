@@ -120,6 +120,16 @@ def _load_evaporation_alpha_envelope_by_species(
 
 
 class EvaporationMixin:
+    def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
+        """Return upstream melt-headspace backpressure for evaporation."""
+
+        melt_headspace_partials_mbar = getattr(
+            self, '_melt_headspace_composition_mbar', {}) or {}
+        return float(melt_headspace_partials_mbar.get(
+            species,
+            self.overhead.composition.get(species, 0.0),
+        )) * 100.0
+
     def _calculate_evaporation(
         self,
         equilibrium,
@@ -242,8 +252,6 @@ class EvaporationMixin:
         # above the melt. The fallback preserves callers/tests that seed only
         # the legacy report surface. Gas pO2 has already been applied once
         # upstream in the equilibrium vapor pressures consumed here.
-        melt_headspace_partials_mbar = getattr(
-            self, '_melt_headspace_composition_mbar', {}) or {}
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))
@@ -251,10 +259,7 @@ class EvaporationMixin:
             }
             if overhead_partials_override_Pa is not None
             else {
-                species: melt_headspace_partials_mbar.get(
-                    species,
-                    self.overhead.composition.get(species, 0.0),
-                ) * 100.0
+                species: self._evaporation_bulk_partial_pressure_pa(species)
                 for species in vapor_pressures
             }
         )

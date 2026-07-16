@@ -1519,6 +1519,9 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     assert sim._melt_headspace_composition_mbar["Fe"] > (
         sim.overhead.composition["Fe"] * 1.0e3
     )
+    assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
+        upstream_transport["vapor_pressure_mbar"] * 100.0
+    )
 
     seen = {}
 

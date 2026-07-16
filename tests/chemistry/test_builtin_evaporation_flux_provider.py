@@ -99,7 +99,7 @@ def _series_resistance_reference_flux(
         assert M_g_mol is not None, species
         M_kg_mol = M_g_mol / 1000.0
         stoich = sim._evaporation_stoich(species, sp_data)
-        P_ambient_Pa = sim.overhead.composition.get(species, 0.0) * 100.0
+        P_ambient_Pa = sim._evaporation_bulk_partial_pressure_pa(species)
         alpha = alpha_s(
             species,
             T_K,
