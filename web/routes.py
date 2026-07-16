@@ -15,7 +15,7 @@ import tempfile
 from typing import Any
 from urllib.parse import quote, urlsplit
 
-from flask import Blueprint, Response, current_app, render_template, jsonify, request, send_file, session
+from flask import Blueprint, Response, abort, current_app, render_template, jsonify, request, send_file, send_from_directory, session
 import yaml
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
@@ -94,13 +94,19 @@ from web.advisory import (
     vapor_pressure_authority_payload,
     wall_advisory_payload,
 )
-from web.run_store import list_runs, load as load_run_artifact
+from web.run_store import (
+    RunStoreCorruptionError,
+    get_run_store,
+    list_runs,
+    load as load_run_artifact,
+)
 
 bp = Blueprint('web', __name__,
                template_folder='templates',
                static_folder='static')
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
+REPORT_VIEWER_DIR = Path(__file__).parent / 'report_viewer'
 THERMAL_TRAIN_DEFAULT_ARTIFACT_ID = 'thermal-train-default-v2'
 THERMAL_TRAIN_DEFAULT_ARTIFACT_SCHEMA = 'thermal-train-default-artifact-v2'
 THERMAL_TRAIN_DEFAULT_ARTIFACT_PATH = (
@@ -130,6 +136,7 @@ OPTIMIZER_JOB_FIDELITIES = (
 DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP = 4
 DEFAULT_OPTIMIZER_JOB_BUDGET_CAP = 256
 DEFAULT_OPTIMIZER_JOB_QUEUE_CAP = 64
+RUN_COMMAND_BODY_CAP_BYTES = 1024 * 1024
 MAX_ADDITIVE_CALC_MASS_KG = 1_000_000_000.0
 _SAFE_FILENAME_RE = re.compile(r'[^A-Za-z0-9._-]+')
 _RECIPE_TITLE_MAX_CHARS = 120
@@ -142,10 +149,21 @@ def _configure_request_size_limit(state) -> None:
     configured = state.app.config.get('MAX_CONTENT_LENGTH')
     if configured is None or configured > BUNDLE_CAP_BYTES:
         state.app.config['MAX_CONTENT_LENGTH'] = BUNDLE_CAP_BYTES
+    # Blueprints are also mounted by focused tests and embedders that do not
+    # call create_app(); authority still comes from app.py's bind contract.
+    from app import _request_authority_config
+    for key, value in _request_authority_config().items():
+        state.app.config.setdefault(key, value)
 
 
 @bp.before_request
 def _reject_unsafe_cross_origin_request():
+    if not _request_host_is_configured():
+        return _typed_json_error(
+            'request Host does not match the configured server bind',
+            'untrusted_request_host',
+            403,
+        )
     if request.method in {'GET', 'HEAD', 'OPTIONS'}:
         return None
     if request.content_length is not None and request.content_length > BUNDLE_CAP_BYTES:
@@ -170,21 +188,53 @@ def _sqlite_error_response(_exc: sqlite3.Error):
     return _json_error('optimizer result store unreadable', 500)
 
 
-def _request_is_same_origin() -> bool:
-    source = request.headers.get('Origin') or request.headers.get('Referer')
-    if source is None:
-        return request.headers.get('Sec-Fetch-Site') != 'cross-site'
+def _configured_request_authority() -> tuple[frozenset[str], int]:
+    """Return the loopback names and port owned by the actual server bind."""
+    hostnames = frozenset(
+        str(host).lower()
+        for host in current_app.config['REGOLITH_ALLOWED_HOSTNAMES']
+    )
+    return hostnames, int(current_app.config['REGOLITH_BIND_PORT'])
+
+
+def _request_host_is_configured() -> bool:
+    hostnames, bind_port = _configured_request_authority()
     try:
-        candidate = urlsplit(source)
-        expected = urlsplit(request.host_url)
+        candidate = urlsplit(f'//{request.host}')
+        candidate_port = candidate.port
     except ValueError:
         return False
     return (
-        candidate.scheme.lower(),
-        candidate.netloc.lower(),
-    ) == (
-        expected.scheme.lower(),
-        expected.netloc.lower(),
+        candidate.hostname is not None
+        and candidate.hostname.lower() in hostnames
+        and (candidate_port if candidate_port is not None else bind_port)
+        == bind_port
+        and candidate.username is None
+        and candidate.password is None
+    )
+
+
+def _request_is_same_origin() -> bool:
+    # request.host_url reflects the untrusted Host header. Pin Host and source
+    # independently to the loopback names plus REGOLITH_PORT from app.py.
+    if not _request_host_is_configured():
+        return False
+    source = request.headers.get('Origin') or request.headers.get('Referer')
+    if source is None:
+        return request.headers.get('Sec-Fetch-Site') != 'cross-site'
+    hostnames, bind_port = _configured_request_authority()
+    try:
+        candidate = urlsplit(source)
+        candidate_port = candidate.port
+    except ValueError:
+        return False
+    return (
+        candidate.scheme.lower() == 'http'
+        and candidate.hostname is not None
+        and candidate.hostname.lower() in hostnames
+        and candidate_port == bind_port
+        and candidate.username is None
+        and candidate.password is None
     )
 
 
@@ -2469,6 +2519,38 @@ def _json_error(message: str, code: int):
     return jsonify({'error': message}), code
 
 
+def _typed_json_error(message: str, error_type: str, code: int):
+    return jsonify({'error': message, 'error_type': error_type}), code
+
+
+def _reject_oversized_run_command():
+    if (
+        request.content_length is not None
+        and request.content_length > RUN_COMMAND_BODY_CAP_BYTES
+    ):
+        return _typed_json_error(
+            'run command body exceeds 1 MiB cap',
+            'run_command_too_large',
+            413,
+        )
+    request.max_content_length = RUN_COMMAND_BODY_CAP_BYTES + 1
+    try:
+        body = request.get_data(cache=True)
+    except RequestEntityTooLarge:
+        return _typed_json_error(
+            'run command body exceeds 1 MiB cap',
+            'run_command_too_large',
+            413,
+        )
+    if len(body) > RUN_COMMAND_BODY_CAP_BYTES:
+        return _typed_json_error(
+            'run command body exceeds 1 MiB cap',
+            'run_command_too_large',
+            413,
+        )
+    return None
+
+
 def _finite_or_none(value: Any) -> float | None:
     if isinstance(value, bool):
         return None
@@ -3204,6 +3286,22 @@ def simulator():
     )
 
 
+# Only true viewer assets are servable: send_from_directory alone would
+# publish EVERY regular file under the source dir (freeze_sample.py, dotfiles).
+_REPORT_VIEWER_ASSET_SUFFIXES = ('.html', '.js', '.css', '.json')
+
+
+@bp.route('/report/', defaults={'asset': 'index.html'}, methods=['GET'])
+@bp.route('/report/<path:asset>', methods=['GET'])
+def report_viewer(asset: str):
+    basename = asset.rsplit('/', 1)[-1]
+    if basename.startswith('.') or not asset.lower().endswith(
+        _REPORT_VIEWER_ASSET_SUFFIXES
+    ):
+        abort(404)
+    return send_from_directory(REPORT_VIEWER_DIR, asset)
+
+
 def _ledger_get(resource: str, **params):
     client_id = str(session.get('ledger_client_id') or '')
     if not client_id:
@@ -3262,15 +3360,199 @@ def runs_api():
     return jsonify(list_runs())
 
 
+@bp.route('/api/runs', methods=['POST'])
+def submit_run_api():
+    oversized = _reject_oversized_run_command()
+    if oversized is not None:
+        return oversized
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, Mapping):
+        return _typed_json_error(
+            'run request body must be a JSON object',
+            'invalid_run_request',
+            400,
+        )
+    session.setdefault('ledger_client_id', os.urandom(16).hex())
+    client_id = str(session['ledger_client_id'])
+    from app import socketio
+    from web.events import RunCommandError, submit_run_command
+
+    try:
+        result = submit_run_command(socketio, payload, client_id=client_id)
+    except RunCommandError as exc:
+        return jsonify(exc.response_payload()), exc.status_code
+    except RuntimeError as exc:
+        return _typed_json_error(str(exc), 'run_command_failed', 500)
+    return jsonify(result), (200 if result['idempotent_replay'] else 201)
+
+
+@bp.route('/api/runs/draft', methods=['POST'])
+def validate_run_draft_api():
+    oversized = _reject_oversized_run_command()
+    if oversized is not None:
+        return oversized
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, Mapping):
+        return _typed_json_error(
+            'run draft body must be a JSON object',
+            'invalid_run_request',
+            400,
+        )
+    session.setdefault('ledger_client_id', os.urandom(16).hex())
+    client_id = str(session['ledger_client_id'])
+    from web.events import RunCommandError, validate_run_draft
+
+    try:
+        result = validate_run_draft(payload, client_id=client_id)
+    except RunCommandError as exc:
+        return jsonify(exc.response_payload()), exc.status_code
+    except RuntimeError as exc:
+        return _typed_json_error(str(exc), 'run_command_failed', 500)
+    return jsonify(result)
+
+
+@bp.route('/api/runs/<run_id>/cancel', methods=['POST'])
+def cancel_run_api(run_id: str):
+    oversized = _reject_oversized_run_command()
+    if oversized is not None:
+        return oversized
+    from app import socketio
+    from web.events import cancel_run_command
+
+    client_id = str(session.get('ledger_client_id') or '')
+    try:
+        result = cancel_run_command(
+            socketio,
+            run_id,
+            client_id=client_id,
+        )
+    except RuntimeError as exc:
+        return _typed_json_error(str(exc), 'run_cancel_failed', 500)
+    if result is None:
+        try:
+            artifact = load_run_artifact(run_id)
+        except ValueError as exc:
+            return _typed_json_error(str(exc), 'invalid_run_id', 400)
+        except RunStoreCorruptionError as exc:
+            return _typed_json_error(str(exc), 'run_store_corruption', 500)
+        if artifact is not None:
+            return _typed_json_error(
+                'run is already terminal',
+                'run_not_active',
+                409,
+            )
+        return _typed_json_error('run not found', 'run_not_found', 404)
+    if result['status'] == 'terminal':
+        return _typed_json_error(
+            'run is already terminal',
+            'run_not_active',
+            409,
+        )
+    return jsonify(result)
+
+
 @bp.route('/api/runs/<run_id>', methods=['GET'])
 def run_artifact_api(run_id: str):
     try:
         artifact = load_run_artifact(run_id)
+    except RunStoreCorruptionError as exc:
+        return jsonify({
+            'error': str(exc),
+            'error_type': 'run_store_corruption',
+        }), 500
     except ValueError as exc:
         return _json_error(str(exc), 400)
     if artifact is None:
         return _json_error('run artifact not found', 404)
     return jsonify(artifact)
+
+
+@bp.route('/api/runs/<run_id>/run.yaml', methods=['GET'])
+def run_manifest_api(run_id: str):
+    try:
+        artifact = load_run_artifact(run_id)
+    except RunStoreCorruptionError as exc:
+        return _typed_json_error(str(exc), 'run_store_corruption', 500)
+    except ValueError as exc:
+        return _typed_json_error(str(exc), 'invalid_run_id', 400)
+    if artifact is None:
+        return _typed_json_error('run artifact not found', 'run_not_found', 404)
+
+    header = artifact['header']
+    snapshot = header.get('recipe_snapshot')
+    if not isinstance(snapshot, Mapping):
+        return _typed_json_error(
+            'artifact carries no recipe snapshot; export unavailable',
+            'run_manifest_unavailable',
+            409,
+        )
+    setpoints_patch = snapshot.get('setpoints_patch')
+    pins = snapshot.get('pins')
+    schema_version = snapshot.get('recipe_schema_version')
+    if (
+        not isinstance(setpoints_patch, Mapping)
+        or not isinstance(pins, list)
+        or not all(isinstance(pin, str) for pin in pins)
+        or not isinstance(schema_version, str)
+        or not schema_version
+    ):
+        return _typed_json_error(
+            'artifact recipe snapshot is malformed; export unavailable',
+            'run_manifest_unavailable',
+            409,
+        )
+
+    manifest: dict[str, Any] = {}
+    if header.get('feedstock_id') is not None:
+        manifest['feedstock'] = copy.deepcopy(header['feedstock_id'])
+    if header.get('charge_mass_kg') is not None:
+        manifest['mass_kg'] = copy.deepcopy(header['charge_mass_kg'])
+    if header.get('seed') is not None:
+        manifest['seed'] = copy.deepcopy(header['seed'])
+    manifest.update({
+        'setpoints_patch': copy.deepcopy(dict(setpoints_patch)),
+        'pins': copy.deepcopy(pins),
+        'recipe_schema_version': schema_version,
+    })
+    body = yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True)
+    return Response(
+        body,
+        content_type='application/yaml; charset=utf-8',
+        headers={
+            'Content-Disposition': f'attachment; filename="run-{run_id}.yaml"',
+        },
+    )
+
+
+@bp.route('/api/runs/<run_id>/meta', methods=['PATCH'])
+def run_meta_api(run_id: str):
+    oversized = _reject_oversized_run_command()
+    if oversized is not None:
+        return oversized
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, Mapping):
+        return jsonify({
+            'error': 'run metadata request body must be a JSON object',
+            'error_type': 'invalid_run_metadata',
+        }), 400
+    try:
+        metadata = get_run_store().update_meta(run_id, payload)
+    except FileNotFoundError:
+        return jsonify({
+            'error': 'run artifact not found',
+            'error_type': 'run_not_found',
+        }), 404
+    except ValueError as exc:
+        return jsonify({
+            'error': str(exc),
+            'error_type': 'invalid_run_metadata',
+        }), 400
+    except RunStoreCorruptionError as exc:
+        return jsonify({
+            'error': str(exc),
+            'error_type': 'run_store_corruption',
+        }), 500
+    return jsonify({'run_id': run_id, **metadata})
 
 
 @bp.route('/api/wall-risk')

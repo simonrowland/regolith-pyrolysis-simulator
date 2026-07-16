@@ -10,13 +10,8 @@
   "run_id": "sample-fullseq-lunar-197h",
   "name": "Full-sequence lunar (C0->C6, demo)",
   "created_at": "2026-07-12T00:00:00Z",
-  "seed": null,
   "feedstock_id": "lunar_mare_low_ti",
   "charge_mass_kg": 1000.0,
-  "c3_dose": {
-   "K": 56.0,
-   "Na": 140.0
-  },
   "campaign_chain": [
    "C0",
    "C0B",
@@ -28,13 +23,15 @@
   ],
   "engine_identity": {
    "name": "internal-analytical",
-   "cache_version": "PINNED-FULLSEQ-MOCK",
-   "backend_wire_token": "internal-analytical"
-  },
-  "recipe_snapshot": {
-   "note": "not captured in this payload; W-A4 emits the importable recipe"
+   "cache_version": null,
+   "backend_wire_token": "internal-analytical",
+   "kernel_commit_sha": "PINNED-FULLSEQ-MOCK"
   },
   "target_snapshot": null,
+  "c3_dose": {
+   "Na_kg": 140.0,
+   "K_kg": 56.0
+  },
   "cost_block": {
    "electrical_cost_per_kWh": 10.0,
    "solar_heat_cost_per_kWh": 0.05,
@@ -92858,7 +92855,7 @@
   },
   "mass_balance_closure": {
    "residual_pct": 2.0463630789890883e-13,
-   "basis": "final per-hour mass_balance_pct"
+   "basis": "final-hour percent"
   }
  }
 }

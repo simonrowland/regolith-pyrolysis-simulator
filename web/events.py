@@ -2,6 +2,9 @@
 
 import copy
 from collections.abc import Mapping
+from dataclasses import replace
+from datetime import datetime, timezone
+import json
 import math
 import threading
 import uuid
@@ -27,6 +30,7 @@ from simulator.backends import (
     resolve_backend,
 )
 from simulator.accounting.ledger_api import LedgerAPI
+from simulator.accounting.run_artifact import build_run_artifact
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.campaigns import CampaignManager
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
@@ -34,8 +38,10 @@ from simulator.core import PoisonedHourError
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+from simulator.optimize.recipe import recipe_schema_version
 from simulator.recipe_io import RecipeIOError, normalize_recipe_patch
-from simulator.runner import RunnerError, _deep_merge_setpoints
+from simulator.run_executor import RunExecutor
+from simulator.runner import PyrolysisRun, RunnerError, _deep_merge_setpoints
 from simulator.session import (
     DecisionPolicy,
     SimSession,
@@ -44,6 +50,7 @@ from simulator.session import (
     normalize_mre_policy,
 )
 from simulator.state import MOLAR_MASS
+from simulator.trace import PhysicsTrace
 # Goal #18 ``JSON-RUNNER-HARNESS``: the SocketIO stream and the CLI
 # runner share ONE per-hour summary builder.  ``SimSession.advance()``
 # owns that runner-format summary and returns it in ``StepResult``; this
@@ -56,6 +63,7 @@ from web.advisory import (
     vapor_pressure_authority_payload,
     wall_advisory_payload,
 )
+from web.run_store import get_run_store, persist_run_artifact
 
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
@@ -73,6 +81,14 @@ def _load_yaml(filename):
 _simulations: dict = {}
 _sim_locks: dict = {}
 _simulations_guard = threading.Lock()
+_run_command_lock = threading.RLock()
+_run_idempotency_guard = threading.Lock()
+_socket_client_ids: dict[str, str] = {}
+_run_idempotency: dict[tuple[str, str], tuple[str, dict[str, object]]] = {}
+_MAX_RUN_IDEMPOTENCY_ENTRIES = 1024
+_MAX_ACTIVE_RUNS = 4
+_draft_validation_slots = threading.BoundedSemaphore(1)
+_registered_start_handler = None
 _O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 _MAX_WEB_MASS_KG = 1_000_000_000.0
 _MAX_SIM_SPEED_SECONDS = 3600.0
@@ -90,6 +106,31 @@ class RecipeStateError(ValueError):
     pass
 
 
+class RunCommandError(ValueError):
+    def __init__(
+        self,
+        message: str,
+        *,
+        error_type: str,
+        status_code: int = 400,
+        payload: Mapping[str, object] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.error_type = error_type
+        self.status_code = status_code
+        self.payload = dict(payload or {})
+
+    def response_payload(self) -> dict[str, object]:
+        payload = copy.deepcopy(self.payload)
+        payload['error'] = str(self)
+        payload['error_type'] = self.error_type
+        return payload
+
+
+class _RunReplacementError(RuntimeError):
+    pass
+
+
 def _safe_log(message: str) -> None:
     try:
         print(message)
@@ -103,6 +144,9 @@ def _replace_simulation_state(
     speed: float,
     *,
     ledger_client_id: str | None = None,
+    run_store=None,
+    runner_projector=None,
+    initial_state: Mapping[str, object] | None = None,
 ) -> tuple[dict, threading.Lock]:
     """Install one active simulation for a client and stop any prior run."""
     while True:
@@ -124,8 +168,13 @@ def _replace_simulation_state(
                     'paused': False,
                     'speed': speed,
                     'run_id': uuid.uuid4().hex,
+                    'per_hour_ledger': {},
                     'ledger_client_id': ledger_client_id,
+                    'run_store': run_store,
+                    'runner_projector': runner_projector,
                 }
+                if initial_state:
+                    state.update(initial_state)
                 _simulations[sid] = state
                 _sim_locks[sid] = run_lock
                 return state, run_lock
@@ -195,14 +244,15 @@ def read_ledger_api(
 
 def read_ledger_api_for_client(client_id: str, resource: str, **params):
     """Resolve an active run owned by one signed Flask browser session."""
-    with _simulations_guard:
-        matches = [
-            sid for sid, state in _simulations.items()
-            if state.get('ledger_client_id') == client_id
-        ]
-    if len(matches) != 1:
-        raise LookupError("no unique active simulation for this browser session")
-    return read_ledger_api(matches[0], resource, **params)
+    with _run_command_lock:
+        with _simulations_guard:
+            matches = [
+                sid for sid, state in _simulations.items()
+                if state.get('ledger_client_id') == client_id
+            ]
+        if len(matches) != 1:
+            raise LookupError("no unique active simulation for this browser session")
+        return read_ledger_api(matches[0], resource, **params)
 
 
 def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bool:
@@ -217,7 +267,10 @@ def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bo
             if (
                 state is None
                 or state.get('run_id') != run_id
-                or not state['running']
+                or (
+                    not state['running']
+                    and not state.get('terminal_emission_pending')
+                )
             ):
                 return False
         emitted_payload = payload
@@ -358,13 +411,431 @@ def _resolved_recipe_patch_for_session(
         return {}
 
 
-def _clear_simulation_state(sid: str) -> None:
-    """Stop and remove any active simulation for a client."""
+def _clear_simulation_state(sid: str, run_id: str | None = None) -> bool:
+    """Stop and remove the current simulation, optionally by exact identity."""
     with _simulations_guard:
-        state = _simulations.pop(sid, None)
+        state = _simulations.get(sid)
+        if state is None or (
+            run_id is not None and state.get('run_id') != run_id
+        ):
+            return False
+        _simulations.pop(sid, None)
         if state is not None:
             state['running'] = False
         _sim_locks.pop(sid, None)
+        return True
+
+
+def _finish_terminal_state(
+    sid: str,
+    run_id: str,
+    *,
+    idempotency_result: Mapping[str, object] | None = None,
+    defer_cleanup: bool = False,
+) -> None:
+    """Stop a terminal run and release synthetic HTTP session state."""
+    terminal_result = None
+    if idempotency_result is not None:
+        terminal_result = {'run_id': run_id, **dict(idempotency_result)}
+    with _run_idempotency_guard:
+        with _simulations_guard:
+            state = _simulations.get(sid)
+            if state is None or state.get('run_id') != run_id:
+                return
+            state['running'] = False
+            state['paused'] = False
+            if defer_cleanup:
+                state['terminal_emission_pending'] = True
+            else:
+                state.pop('terminal_emission_pending', None)
+            if terminal_result is not None:
+                state['idempotency_terminal_result'] = terminal_result
+            if (
+                not defer_cleanup
+                and state.get('http_owned')
+                and state.get('artifact_persisted')
+            ):
+                _simulations.pop(sid, None)
+                _sim_locks.pop(sid, None)
+        if terminal_result is not None:
+            for key, (payload, result) in list(_run_idempotency.items()):
+                if result.get('run_id') == run_id:
+                    _run_idempotency[key] = (payload, dict(terminal_result))
+
+
+def _persist_terminal(
+    socketio,
+    sid: str,
+    run_id: str,
+    session,
+    *,
+    status: str,
+    lifecycle: str = 'complete',
+    reason: str = '',
+    error_message: str = '',
+    refusal_diagnostic: Mapping[str, object] | None = None,
+) -> dict[str, object] | None:
+    state, _ = _current_simulation_state(sid, run_id)
+    projector = state.get('runner_projector') if state is not None else None
+    try:
+        try:
+            runner_payload = _full_runner_payload(
+                session,
+                projector=projector,
+                status=status,
+                reason=reason,
+                error_message=error_message,
+                refusal_diagnostic=refusal_diagnostic,
+            )
+        except Exception as projection_exc:  # noqa: BLE001
+            _safe_log(f'Full runner projection unavailable: {projection_exc}')
+            fallback_status = 'failed' if status == 'ok' else status
+            runner_payload = _available_runner_payload(
+                session,
+                projector=projector,
+                status=fallback_status,
+                reason=(reason or 'runner_projection_failed'),
+                error_message=(
+                    error_message
+                    or f'Runner projection failed: {projection_exc}'
+                ),
+                refusal_diagnostic=refusal_diagnostic,
+            )
+        effective_config = state.get('effective_config') if state is not None else None
+        if effective_config:
+            runner_payload['effective_config'] = copy.deepcopy(effective_config)
+        per_hour_ledger = state.get('per_hour_ledger') if state is not None else None
+        if per_hour_ledger:
+            runner_payload['per_hour_ledger'] = copy.deepcopy(per_hour_ledger)
+        run_store = state.get('run_store') if state is not None else None
+        if run_store is None:
+            raise RuntimeError('run artifact store is unavailable')
+        if lifecycle == 'complete':
+            artifact = persist_run_artifact(
+                runner_payload,
+                run_id,
+                store=run_store,
+            )
+        else:
+            artifact = build_run_artifact(
+                runner_payload,
+                run_id=run_id,
+                lifecycle=lifecycle,
+            )
+            if not run_store.save(run_id, artifact):
+                raise RuntimeError(f'run artifact {run_id!r} already exists')
+    except Exception as exc:  # noqa: BLE001 -- durability is client-visible
+        _safe_log(f'Run artifact persistence failed: {exc}')
+        _finish_terminal_state(sid, run_id, defer_cleanup=True)
+        try:
+            _emit_if_current(
+                socketio,
+                sid,
+                run_id,
+                'simulation_persistence_failed',
+                {
+                    'status': 'persistence_failed',
+                    'message': str(exc),
+                },
+            )
+        except Exception as emit_exc:  # noqa: BLE001 -- log lost visibility
+            _safe_log(f'Persistence failure emission failed: {emit_exc}')
+        return None
+    with _simulations_guard:
+        current = _simulations.get(sid)
+        if current is not None and current.get('run_id') == run_id:
+            current['artifact_persisted'] = True
+    return artifact
+
+
+def _cancel_simulation_state(
+    socketio,
+    sid: str,
+    *,
+    reason: str,
+    run_id: str | None = None,
+) -> dict[str, object] | None:
+    state, run_lock = _current_simulation_state(sid, run_id)
+    if state is None or run_lock is None:
+        return None
+    target_run_id = str(state['run_id'])
+    with run_lock:
+        current, _ = _current_simulation_state(sid, target_run_id)
+        if current is not state:
+            return None
+        if state.get('artifact_persisted'):
+            _finish_terminal_state(sid, target_run_id)
+            return {
+                'run_id': target_run_id,
+                'status': 'terminal',
+                'cancelled': False,
+            }
+        execution_status = (
+            'ok' if state['session'].is_complete() else 'partial'
+        )
+        artifact = _persist_terminal(
+            socketio,
+            sid,
+            target_run_id,
+            state['session'],
+            status=execution_status,
+            lifecycle='cancelled',
+            reason=reason,
+            error_message='',
+        )
+        if artifact is None:
+            _finish_terminal_state(
+                sid,
+                target_run_id,
+                idempotency_result={
+                    'status': 'error',
+                    'reason': 'persistence_failed',
+                    'message': 'Run was cancelled but its report was not saved',
+                },
+            )
+            raise RuntimeError('cancelled run artifact could not be persisted')
+        _finish_terminal_state(sid, target_run_id)
+        return {
+            'run_id': target_run_id,
+            'status': 'cancelled',
+            'cancelled': True,
+        }
+
+
+def cancel_run_command(
+    socketio,
+    run_id: str,
+    *,
+    client_id: str,
+) -> dict[str, object] | None:
+    with _simulations_guard:
+        sid = next(
+            (
+                candidate_sid
+                for candidate_sid, state in _simulations.items()
+                if (
+                    state.get('run_id') == run_id
+                    and state.get('ledger_client_id') == client_id
+                )
+            ),
+            None,
+        )
+    if sid is None:
+        return None
+    return _cancel_simulation_state(
+        socketio,
+        sid,
+        reason='cancelled_by_client',
+        run_id=run_id,
+    )
+
+
+def _disconnect_simulation_client(socketio, sid: str) -> None:
+    """Cancel only the run observed by this disconnect under client arbitration."""
+    with _run_command_lock:
+        client_id = _socket_client_ids.get(sid)
+        state, _ = _current_simulation_state(sid)
+        run_id = str(state['run_id']) if state is not None else None
+        try:
+            if run_id is not None:
+                _cancel_simulation_state(
+                    socketio,
+                    sid,
+                    reason='client_disconnected',
+                    run_id=run_id,
+                )
+        except RuntimeError as exc:
+            _safe_log(f'Disconnected run retained after persistence failure: {exc}')
+        else:
+            if run_id is not None:
+                _clear_simulation_state(sid, run_id=run_id)
+        finally:
+            if _socket_client_ids.get(sid) == client_id:
+                _socket_client_ids.pop(sid, None)
+
+
+def _ensure_global_run_capacity(replacement_sid: str | None) -> None:
+    with _simulations_guard:
+        active_sids = {
+            candidate_sid
+            for candidate_sid, state in _simulations.items()
+            if state.get('running') and not state.get('artifact_persisted')
+        }
+    active_sids.discard(replacement_sid)
+    if len(active_sids) >= _MAX_ACTIVE_RUNS:
+        raise RunCommandError(
+            'global active-run capacity is exhausted',
+            error_type='global_run_capacity_exhausted',
+            status_code=503,
+        )
+
+
+def _idempotency_entry_is_terminal(result: Mapping[str, object]) -> bool:
+    if result.get('reason') == 'persistence_failed':
+        return True
+    run_id = result.get('run_id')
+    with _simulations_guard:
+        state = next(
+            (
+                candidate
+                for candidate in _simulations.values()
+                if candidate.get('run_id') == run_id
+            ),
+            None,
+        )
+        return state is None or bool(state.get('artifact_persisted'))
+
+
+def _make_idempotency_capacity() -> None:
+    with _run_idempotency_guard:
+        while len(_run_idempotency) >= _MAX_RUN_IDEMPOTENCY_ENTRIES:
+            terminal_key = next(
+                (
+                    key
+                    for key, (_, result) in _run_idempotency.items()
+                    if _idempotency_entry_is_terminal(result)
+                ),
+                None,
+            )
+            if terminal_key is None:
+                # Launch-once records for nonterminal runs are never evicted. Reject
+                # new tokenized work until a terminal record becomes evictable.
+                raise RunCommandError(
+                    'idempotency capacity is occupied by active runs',
+                    error_type='idempotency_capacity_exhausted',
+                    status_code=503,
+                )
+            _run_idempotency.pop(terminal_key)
+
+
+def submit_run_command(
+    socketio,
+    payload: Mapping[str, object],
+    *,
+    client_id: str,
+) -> dict[str, object]:
+    if not isinstance(payload, Mapping):
+        raise RunCommandError(
+            'run request body must be a JSON object',
+            error_type='invalid_run_request',
+        )
+    request_payload = dict(payload)
+    raw_token = request_payload.pop('client_token', None)
+    token = ''
+    if raw_token is not None:
+        if not isinstance(raw_token, str) or not raw_token.strip():
+            raise RunCommandError(
+                'client_token must be a non-empty string',
+                error_type='invalid_client_token',
+            )
+        token = raw_token.strip()
+        if len(token) > 256:
+            raise RunCommandError(
+                'client_token must be at most 256 characters',
+                error_type='invalid_client_token',
+            )
+    canonical_payload = json.dumps(
+        request_payload,
+        sort_keys=True,
+        separators=(',', ':'),
+    )
+    token_key = (client_id, token)
+    with _run_command_lock:
+        if token:
+            with _run_idempotency_guard:
+                existing = _run_idempotency.get(token_key)
+                if existing is not None:
+                    existing = (existing[0], dict(existing[1]))
+            if existing is not None:
+                existing_payload, existing_result = existing
+                if existing_payload != canonical_payload:
+                    raise RunCommandError(
+                        'client_token was already used with a different request',
+                        error_type='idempotency_conflict',
+                        status_code=409,
+                    )
+                return {**existing_result, 'idempotent_replay': True}
+            _make_idempotency_capacity()
+        handler = _registered_start_handler
+        if handler is None:
+            raise RuntimeError('run command handler is unavailable')
+        with _simulations_guard:
+            previous_sid = next(
+                (
+                    candidate_sid
+                    for candidate_sid, state in _simulations.items()
+                    if (
+                        state.get('ledger_client_id') == client_id
+                    )
+                ),
+                None,
+            )
+        sid = f'http:{client_id}:{uuid.uuid4().hex}'
+        result = handler(
+            request_payload,
+            sid=sid,
+            ledger_client_id=client_id,
+            command_mode=True,
+            replace_sid=previous_sid,
+        )
+        response_result = dict(result)
+        if token:
+            cached_result = dict(response_result)
+            run_id = cached_result.get('run_id')
+            with _run_idempotency_guard:
+                with _simulations_guard:
+                    state = next(
+                        (
+                            candidate
+                            for candidate in _simulations.values()
+                            if candidate.get('run_id') == run_id
+                        ),
+                        None,
+                    )
+                    if state is not None:
+                        cached_result = dict(
+                            state.get('idempotency_terminal_result')
+                            or cached_result
+                        )
+                _run_idempotency[token_key] = (
+                    canonical_payload,
+                    cached_result,
+                )
+            response_result = cached_result
+        return {**response_result, 'idempotent_replay': False}
+
+
+def validate_run_draft(
+    payload: Mapping[str, object],
+    *,
+    client_id: str,
+) -> dict[str, object]:
+    if not isinstance(payload, Mapping):
+        raise RunCommandError(
+            'run draft body must be a JSON object',
+            error_type='invalid_run_request',
+        )
+    request_payload = dict(payload)
+    request_payload.pop('client_token', None)
+    handler = _registered_start_handler
+    if handler is None:
+        raise RuntimeError('run command handler is unavailable')
+    if not _draft_validation_slots.acquire(blocking=False):
+        raise RunCommandError(
+            'run draft validation capacity is exhausted',
+            error_type='draft_validation_capacity_exhausted',
+            status_code=503,
+        )
+    try:
+        return handler(
+            request_payload,
+            sid=f'draft:{client_id}:{uuid.uuid4().hex}',
+            ledger_client_id=client_id,
+            command_mode=True,
+            draft_mode=True,
+        )
+    finally:
+        _draft_validation_slots.release()
 
 
 def _get_backend(backend_name: str):
@@ -419,9 +890,7 @@ def _backend_name_for_session(backend) -> str:
 def _coerce_bool(value) -> bool:
     if isinstance(value, bool):
         return value
-    if isinstance(value, str):
-        return value.strip().lower() in {'1', 'true', 'yes', 'on'}
-    return bool(value)
+    raise InputValidationError('c5_enabled must be a boolean')
 
 
 def _coerce_bounded_float(
@@ -926,6 +1395,182 @@ def _knudsen_regime_diagnostic_from_sim(sim):
     return dict(diagnostic) if isinstance(diagnostic, dict) else {}
 
 
+def _mapping_leaf_paths(
+    value: Mapping[str, object],
+    prefix: tuple[str, ...] = (),
+) -> list[str]:
+    paths: list[str] = []
+    for key, child in value.items():
+        child_path = (*prefix, str(key))
+        if isinstance(child, Mapping):
+            paths.extend(_mapping_leaf_paths(child, child_path))
+        else:
+            paths.append('.'.join(child_path))
+    return paths
+
+
+def _effective_config_from_setpoints(
+    setpoints: Mapping[str, object],
+    *,
+    override_paths: set[str],
+) -> dict[str, dict[str, object]]:
+    effective_config: dict[str, dict[str, object]] = {}
+
+    def contains_absent(value: object) -> bool:
+        if value is None:
+            return True
+        if isinstance(value, Mapping):
+            return any(contains_absent(child) for child in value.values())
+        if isinstance(value, (list, tuple)):
+            return any(contains_absent(child) for child in value)
+        return False
+
+    def capture(value: object, prefix: tuple[str, ...]) -> None:
+        if isinstance(value, Mapping):
+            for key, child in value.items():
+                capture(child, (*prefix, str(key)))
+            return
+        if not prefix or contains_absent(value):
+            return
+        path = '.'.join(prefix)
+        effective_config[path] = {
+            'value': copy.deepcopy(value),
+            'source': 'override' if path in override_paths else 'default',
+        }
+
+    capture(setpoints, ())
+    return effective_config
+
+
+def _recipe_snapshot_from_projector(projector) -> dict[str, object] | None:
+    if projector is None:
+        return None
+    setpoints_patch = getattr(projector, 'setpoints_patch', None)
+    if not isinstance(setpoints_patch, Mapping):
+        return None
+    return {
+        'setpoints_patch': copy.deepcopy(dict(setpoints_patch)),
+        'pins': sorted(_mapping_leaf_paths(setpoints_patch)),
+        'recipe_schema_version': recipe_schema_version,
+    }
+
+
+def _full_runner_payload(
+    session,
+    *,
+    projector=None,
+    status: str,
+    reason: str = '',
+    error_message: str = '',
+    refusal_diagnostic: Mapping[str, object] | None = None,
+) -> dict[str, object]:
+    """Project a web-driven session through the canonical runner envelope."""
+    result_document = getattr(session, 'result_document', None)
+    try:
+        recorded = result_document() if callable(result_document) else None
+    except RuntimeError:
+        recorded = None
+    if isinstance(recorded, Mapping):
+        payload = copy.deepcopy(dict(recorded))
+        recorded_status = payload.get('status')
+        if recorded_status != status:
+            _safe_log(
+                'Recorded terminal outcome conflicts with observed outcome: '
+                f'recorded={recorded_status!r}, observed={status!r}; '
+                'using observed outcome'
+            )
+        payload['status'] = status
+        payload['reason'] = reason
+        payload['error_message'] = error_message
+        if refusal_diagnostic is not None:
+            payload['refusal_diagnostic'] = copy.deepcopy(
+                dict(refusal_diagnostic)
+            )
+        else:
+            payload.pop('refusal_diagnostic', None)
+        recipe_snapshot = _recipe_snapshot_from_projector(projector)
+        if recipe_snapshot is not None:
+            payload['recipe_snapshot'] = recipe_snapshot
+        return payload
+
+    sim = session.simulator
+    config = session._config
+    if config is None:
+        raise RuntimeError('web session has no runner configuration')
+    execution = RunExecutor().execute_session(session, hours=0)
+    execution = replace(
+        execution,
+        snapshots=tuple(getattr(sim.record, 'snapshots', ()) or ()),
+        trace=PhysicsTrace.from_simulator(sim),
+        per_hour=tuple(session.per_hour_summaries()),
+        operator_decisions=tuple(session.operator_decisions()),
+        status=status,
+        reason=reason,
+        error_message=error_message,
+        refusal_diagnostic=dict(refusal_diagnostic or {}),
+    )
+    if projector is None:
+        raise RuntimeError('web session has no canonical runner projector')
+    active_projector = copy.copy(projector)
+    active_projector.hours = max(
+        int(config.hours),
+        int(getattr(sim.melt, 'hour', 0)),
+    )
+    payload = active_projector._build_output(execution)
+    recipe_snapshot = _recipe_snapshot_from_projector(active_projector)
+    if recipe_snapshot is not None:
+        payload['recipe_snapshot'] = recipe_snapshot
+    return payload
+
+
+def _available_runner_payload(
+    session,
+    *,
+    projector=None,
+    status: str,
+    reason: str,
+    error_message: str,
+    refusal_diagnostic: Mapping[str, object] | None,
+) -> dict[str, object]:
+    """Return an honest reduced envelope when canonical projection is unavailable."""
+    config = getattr(session, '_config', None)
+    sim = getattr(session, 'simulator', None)
+    metadata: dict[str, object] = {}
+    if config is not None:
+        metadata = {
+            'feedstock_id': config.feedstock_id,
+            'mass_kg': config.mass_kg,
+            'backend': config.backend_name,
+            'track': config.track,
+        }
+    metadata_overrides = getattr(projector, 'run_metadata_overrides', None)
+    if isinstance(metadata_overrides, Mapping):
+        started_at_utc = metadata_overrides.get('started_at_utc')
+        if started_at_utc:
+            metadata['started_at_utc'] = copy.deepcopy(started_at_utc)
+    melt = getattr(sim, 'melt', None) if sim is not None else None
+    if melt is not None:
+        metadata['hours_completed'] = int(getattr(melt, 'hour', 0))
+    if refusal_diagnostic:
+        metadata['refusal_diagnostic'] = copy.deepcopy(
+            dict(refusal_diagnostic)
+        )
+    summaries_builder = getattr(session, 'per_hour_summaries', None)
+    summaries = summaries_builder() if callable(summaries_builder) else []
+    payload = {
+        'schema_version': 'web-reduced-terminal-v1',
+        'run_metadata': metadata,
+        'per_hour_summary': copy.deepcopy(list(summaries)),
+        'status': status,
+        'reason': reason,
+        'error_message': error_message,
+    }
+    recipe_snapshot = _recipe_snapshot_from_projector(projector)
+    if recipe_snapshot is not None:
+        payload['recipe_snapshot'] = recipe_snapshot
+    return payload
+
+
 def _start_background_loop(
     socketio,
     sid: str,
@@ -935,7 +1580,36 @@ def _start_background_loop(
     backend_status: str,
     backend_authoritative: bool,
 ):
+    def persist_terminal(
+        session,
+        *,
+        status: str,
+        reason: str = '',
+        error_message: str = '',
+        refusal_diagnostic: Mapping[str, object] | None = None,
+    ) -> dict[str, object] | None:
+        return _persist_terminal(
+            socketio,
+            sid,
+            run_id,
+            session,
+            status=status,
+            reason=reason,
+            error_message=error_message,
+            refusal_diagnostic=refusal_diagnostic,
+        )
+
     def stop_with_status(payload: Mapping[str, object]) -> None:
+        _finish_terminal_state(
+            sid,
+            run_id,
+            idempotency_result=(
+                payload
+                if payload.get('reason') == 'persistence_failed'
+                else None
+            ),
+            defer_cleanup=True,
+        )
         try:
             _emit_if_current(
                 socketio,
@@ -947,13 +1621,17 @@ def _start_background_loop(
         except Exception as exc:  # noqa: BLE001 -- cleanup must still run
             _safe_log(f'Simulation status emission failed: {exc}')
         finally:
-            with _simulations_guard:
-                current = _simulations.get(sid)
-                if current is not None and current.get('run_id') == run_id:
-                    current['running'] = False
-                    current['paused'] = False
+            _finish_terminal_state(
+                sid,
+                run_id,
+                idempotency_result=(
+                    payload
+                    if payload.get('reason') == 'persistence_failed'
+                    else None
+                ),
+            )
 
-    def stop_for_failure(exc: Exception, sim) -> None:
+    def stop_for_failure(exc: Exception, session, sim) -> None:
         _safe_log(f'Simulation loop failed: {exc}')
         message = str(exc)
         unenriched_message = message
@@ -979,7 +1657,28 @@ def _start_background_loop(
         }
         if poisoned is not None:
             error_payload['reason'] = 'poisoned_hour'
-        stop_with_status(error_payload)
+        with run_lock:
+            current, _ = _current_simulation_state(sid, run_id)
+            if (
+                current is None
+                or not current['running']
+                or current.get('artifact_persisted')
+            ):
+                return
+            artifact = persist_terminal(
+                session,
+                status='failed',
+                reason=str(error_payload.get('reason') or ''),
+                error_message=message,
+            )
+            if artifact is None:
+                stop_with_status({
+                    'status': 'error',
+                    'reason': 'persistence_failed',
+                    'message': 'Run failed but its report was not saved',
+                })
+                return
+            stop_with_status(error_payload)
 
     def run_loop():
         while True:
@@ -995,6 +1694,7 @@ def _start_background_loop(
 
             step_result = None
             decision_payload = None
+            tick_data = None
             with run_lock:
                 state, _ = _current_simulation_state(sid, run_id)
                 if (
@@ -1014,6 +1714,30 @@ def _start_background_loop(
                             run_id,
                             completion_payload=completion_payload,
                         )
+                        artifact = persist_terminal(session, status='ok')
+                        if artifact is None:
+                            stop_with_status({
+                                'status': 'error',
+                                'reason': 'persistence_failed',
+                                'message': 'Run completed but its report was not saved',
+                            })
+                            break
+                        if artifact.get('execution_status') != 'ok':
+                            stop_with_status({
+                                'status': 'error',
+                                'reason': 'terminal_run_failed',
+                                'message': 'Run finished with a failed terminal result',
+                            })
+                            break
+                    except Exception as exc:  # noqa: BLE001 -- loop boundary
+                        stop_for_failure(exc, session, sim)
+                        break
+                    try:
+                        _finish_terminal_state(
+                            sid,
+                            run_id,
+                            defer_cleanup=True,
+                        )
                         emitted = _emit_if_current(
                             socketio,
                             sid,
@@ -1021,18 +1745,18 @@ def _start_background_loop(
                             'simulation_complete',
                             completion_payload,
                         )
-                    except Exception as exc:  # noqa: BLE001 -- loop boundary
-                        stop_for_failure(exc, sim)
+                    except Exception as exc:  # noqa: BLE001 -- transport boundary
+                        _safe_log(f'Simulation completion emission failed: {exc}')
+                        stop_with_status({
+                            'status': 'error',
+                            'reason': 'completion_emit_failed',
+                            'message': str(exc),
+                        })
                         break
                     if not emitted:
+                        _finish_terminal_state(sid, run_id)
                         break
-                    with _simulations_guard:
-                        current = _simulations.get(sid)
-                        if (
-                            current is not None
-                            and current.get('run_id') == run_id
-                        ):
-                            current['running'] = False
+                    _finish_terminal_state(sid, run_id)
                     break
 
                 try:
@@ -1046,6 +1770,29 @@ def _start_background_loop(
                         decision = session.pending_decision()
                         if decision is not None:
                             decision_payload = _decision_payload(decision)
+                    elif isinstance(step_result.per_hour_summary, Mapping):
+                        hour = step_result.per_hour_summary.get('hour')
+                        ledger = getattr(sim, 'atom_ledger', None)
+                        mol_by_account = getattr(ledger, 'mol_by_account', None)
+                        if hour is not None and callable(mol_by_account):
+                            state['per_hour_ledger'][str(hour)] = copy.deepcopy(
+                                mol_by_account()
+                            )
+                    if step_result is not None:
+                        tick_data = _tick_payload(
+                            sim=sim,
+                            snapshot=step_result.snapshot,
+                            backend_message=backend_message,
+                            backend_status=backend_status,
+                            backend_authoritative=backend_authoritative,
+                            backend_error=step_result.backend_error,
+                        )
+                        _record_last_recipe_capture(
+                            sid,
+                            run_id,
+                            tick_data=tick_data,
+                            per_hour_summary=step_result.per_hour_summary,
+                        )
                 except KnudsenRegimeRefusal as exc:
                     _safe_log(f'Simulation refused: {exc.reason}')
                     error_payload = {
@@ -1057,10 +1804,24 @@ def _start_background_loop(
                         'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,
                     }
+                    artifact = persist_terminal(
+                        session,
+                        status='refused',
+                        reason=exc.reason,
+                        error_message=exc.reason,
+                        refusal_diagnostic=exc.diagnostic,
+                    )
+                    if artifact is None:
+                        stop_with_status({
+                            'status': 'error',
+                            'reason': 'persistence_failed',
+                            'message': 'Run was refused but its report was not saved',
+                        })
+                        break
                     stop_with_status(error_payload)
                     break
                 except Exception as exc:
-                    stop_for_failure(exc, sim)
+                    stop_for_failure(exc, session, sim)
                     break
 
             if step_result is None:
@@ -1082,20 +1843,6 @@ def _start_background_loop(
 
             sim = session.simulator
             try:
-                tick_data = _tick_payload(
-                    sim=sim,
-                    snapshot=step_result.snapshot,
-                    backend_message=backend_message,
-                    backend_status=backend_status,
-                    backend_authoritative=backend_authoritative,
-                    backend_error=step_result.backend_error,
-                )
-                _record_last_recipe_capture(
-                    sid,
-                    run_id,
-                    tick_data=tick_data,
-                    per_hour_summary=step_result.per_hour_summary,
-                )
                 if not _emit_if_current(
                     socketio, sid, run_id, 'simulation_tick', tick_data
                 ):
@@ -1120,7 +1867,7 @@ def _start_background_loop(
                     ):
                         break
             except Exception as exc:  # noqa: BLE001 -- loop boundary
-                stop_for_failure(exc, sim)
+                stop_for_failure(exc, session, sim)
                 break
 
             campaign_summary = step_result.campaign_summary
@@ -1149,22 +1896,29 @@ def _start_background_loop(
                     'backend_authoritative': backend_authoritative,
                     'backend_message': backend_message,
                 }
-                if not _emit_if_current(
-                    socketio,
-                    sid,
-                    run_id,
-                    'simulation_status',
-                    refusal_payload,
-                ):
-                    break
-                with _simulations_guard:
-                    current = _simulations.get(sid)
+                with run_lock:
+                    current, _ = _current_simulation_state(sid, run_id)
                     if (
-                        current is not None
-                        and current.get('run_id') == run_id
+                        current is None
+                        or not current['running']
+                        or current.get('artifact_persisted')
                     ):
-                        current['running'] = False
-                        current['paused'] = False
+                        break
+                    artifact = persist_terminal(
+                        session,
+                        status='refused',
+                        reason=reason,
+                        error_message=reason,
+                        refusal_diagnostic=c6_refusal,
+                    )
+                    if artifact is None:
+                        stop_with_status({
+                            'status': 'error',
+                            'reason': 'persistence_failed',
+                            'message': 'Run was refused but its report was not saved',
+                        })
+                        break
+                    stop_with_status(refusal_payload)
                 break
 
             if step_result.decision_event is not None:
@@ -1199,9 +1953,20 @@ def _start_background_loop(
 
 def register_events(socketio):
     """Register all SocketIO events for the simulator UI."""
+    global _registered_start_handler
 
     @socketio.on('connect')
     def handle_connect():
+        with _run_command_lock:
+            client_id = flask_session.get('ledger_client_id')
+            if not isinstance(client_id, str) or not client_id:
+                socketio.emit('simulation_status', {
+                    'status': 'error',
+                    'message': 'browser identity must be established over HTTP first',
+                    'error_type': 'client_identity_required',
+                }, room=request.sid)
+                return
+            _socket_client_ids[request.sid] = client_id
         _safe_log(f"Client connected: {request.sid}")
 
     @socketio.on('ledger_api')
@@ -1223,10 +1988,18 @@ def register_events(socketio):
     def handle_disconnect():
         sid = request.sid
         _safe_log(f"Client disconnected: {sid}")
-        _clear_simulation_state(sid)
+        _disconnect_simulation_client(socketio, sid)
 
     @socketio.on('start_simulation')
-    def handle_start(data):
+    def handle_start(
+        data,
+        *,
+        sid: str | None = None,
+        ledger_client_id: str | None = None,
+        command_mode: bool = False,
+        draft_mode: bool = False,
+        replace_sid: str | None = None,
+    ):
         """
         Start a new simulation run.
 
@@ -1238,15 +2011,43 @@ def register_events(socketio):
             'speed': 1.0,           # seconds per simulation hour
         }
         """
-        sid = request.sid
+        sid = sid or request.sid
+        socket_bound = ledger_client_id is None
+
+        def reject(
+            payload: dict[str, object],
+            error_type: str,
+            status_code: int = 400,
+        ):
+            if command_mode:
+                raise RunCommandError(
+                    str(payload['message']),
+                    error_type=error_type,
+                    status_code=status_code,
+                    payload=payload,
+                )
+            socket_payload = dict(payload)
+            socket_payload['error_type'] = error_type
+            socketio.emit('simulation_status', socket_payload, room=sid)
+            return None
+
+        with _run_command_lock:
+            resolved_ledger_client_id = ledger_client_id
+            if socket_bound:
+                resolved_ledger_client_id = _socket_client_ids.get(sid)
+                if resolved_ledger_client_id is None:
+                    return reject({
+                        'status': 'error',
+                        'message': 'browser identity must be established over HTTP first',
+                    }, 'client_identity_required', 409)
+
         if data is None:
             data = {}
         elif not isinstance(data, Mapping):
-            socketio.emit('simulation_status', {
+            return reject({
                 'status': 'error',
                 'message': 'start_simulation payload must be an object',
-            }, room=sid)
-            return
+            }, 'invalid_run_request')
 
         feedstock_key = data.get('feedstock', 'lunar_mare_low_ti')
         try:
@@ -1307,11 +2108,10 @@ def register_events(socketio):
                 data.get('runtime_campaign_overrides')
             )
         except InputValidationError as exc:
-            socketio.emit('simulation_status', {
+            return reject({
                 'status': 'error',
                 'message': str(exc),
-            }, room=sid)
-            return
+            }, 'invalid_run_input')
         # Default is 'auto' (AlphaMELTS-preferred autodetect per
         # \goal BACKEND-DEFAULT-SWITCH). Explicit UI choices are still honoured.
         backend_name = data.get('backend', 'auto')
@@ -1328,17 +2128,15 @@ def register_events(socketio):
                 setpoints = _deep_merge_setpoints(setpoints, setpoints_patch)
                 c4_max_temp = _c4_setpoint_ceiling_T_C(setpoints)
             except RunnerError as exc:
-                socketio.emit('simulation_status', {
+                return reject({
                     'status': 'error',
                     'message': str(exc),
-                }, room=sid)
-                return
+                }, 'invalid_run_input')
             except InputValidationError as exc:
-                socketio.emit('simulation_status', {
+                return reject({
                     'status': 'error',
                     'message': str(exc),
-                }, room=sid)
-                return
+                }, 'invalid_run_input')
         if furnace_material_id:
             try:
                 setpoints['furnace_max_T_C'] = resolve_furnace_max_T_C(
@@ -1346,22 +2144,35 @@ def register_events(socketio):
                     requested_cap=setpoints.get('furnace_max_T_C'),
                 )
             except ValueError as exc:
-                socketio.emit('simulation_status', {
+                return reject({
                     'status': 'error',
                     'message': str(exc),
-                }, room=sid)
-                return
+                }, 'invalid_run_input')
+
+        override_paths = set(_mapping_leaf_paths(setpoints_patch))
+        if furnace_material_id:
+            override_paths.add('furnace_max_T_C')
+        effective_config = _effective_config_from_setpoints(
+            setpoints,
+            override_paths=override_paths,
+        )
 
         try:
             backend = _get_backend(backend_name)
         except BackendUnavailableError as exc:
-            socketio.emit('simulation_status', {
+            return reject({
                 'status': 'error',
                 'message': str(exc),
                 'backend_status': 'unavailable',
                 'backend_authoritative': False,
-            }, room=sid)
-            return
+            }, 'backend_unavailable')
+        if socket_bound:
+            with _run_command_lock:
+                if _socket_client_ids.get(sid) != resolved_ledger_client_id:
+                    return reject({
+                        'status': 'error',
+                        'message': 'client disconnected before run launch',
+                    }, 'client_disconnected', 409)
         resolution_status = backend_resolution_status(backend)
         backend_type = resolution_status.active_backend
         backend_message = ''
@@ -1399,80 +2210,229 @@ def register_events(socketio):
                 )
             )
         except BackendUnavailableError as e:
-            socketio.emit('simulation_status', {
+            return reject({
                 'status': 'error',
                 'message': str(e),
                 'backend_status': resolution_status.backend_status,
                 'backend_authoritative': resolution_status.authoritative,
-            }, room=sid)
-            return
+            }, 'backend_unavailable')
         except (TypeError, ValueError) as exc:
-            socketio.emit('simulation_status', {
+            return reject({
                 'status': 'error',
                 'message': str(exc),
-            }, room=sid)
-            return
+            }, 'invalid_run_input')
         sim = session.simulator
 
-        state, run_lock = _replace_simulation_state(
-            sid,
-            session,
-            speed,
-            ledger_client_id=flask_session.get('ledger_client_id'),
-        )
-        run_id = state['run_id']
-        state['backend_message'] = backend_message
-        state['backend_status'] = resolution_status.backend_status
-        state['backend_authoritative'] = resolution_status.authoritative
-        state['recipe_inputs'] = _recipe_inputs_payload(
-            feedstock_key=str(feedstock_key),
-            mass_kg=mass_kg,
-            track=str(track),
-            runtime_campaign_overrides=runtime_campaign_overrides,
-            c4_max_temp=c4_max_temp,
-            furnace_max_T_C=setpoints.get('furnace_max_T_C'),
-            c5_enabled=c5_enabled,
-            mre_target_species=mre_target_species,
-            mre_max_voltage_V=mre_max_voltage_V,
-            additives_kg=additives_kg,
-            furnace_material_id=furnace_material_id,
-        )
-        state['setpoints_patch'] = copy.deepcopy(setpoints_patch)
-        state['resolved_setpoints_patch'] = _resolved_recipe_patch_for_session(
-            setpoints_patch=setpoints_patch,
-            setpoints=setpoints,
-            runtime_campaign_overrides=runtime_campaign_overrides,
+        if draft_mode:
+            normalized_values = {
+                'feedstock': str(feedstock_key),
+                'mass_kg': mass_kg,
+                'backend': str(backend_name),
+                'track': str(track),
+                'speed': speed,
+                'c4_max_temp_C': c4_max_temp,
+                'c5_enabled': c5_enabled,
+                'mre_target_species': mre_target_species,
+                'mre_max_voltage_V': mre_max_voltage_V,
+                'additives': additives_kg,
+                'setpoints_patch': copy.deepcopy(setpoints_patch),
+                'runtime_campaign_overrides': copy.deepcopy(
+                    runtime_campaign_overrides
+                ),
+                'furnace_material_id': furnace_material_id,
+            }
+            validated_inputs = {
+                key: value
+                for key, value in normalized_values.items()
+                if key in data
+            }
+            return {
+                'status': 'valid',
+                'validated_inputs': validated_inputs,
+            }
+
+        run_store = get_run_store()
+        runner_projector = PyrolysisRun(
+            feedstock_id=session._config.feedstock_id,
+            campaign=session._config.campaign,
+            hours=session._config.hours,
+            additives_kg=dict(session._config.additives_kg),
+            mass_kg=float(session._config.mass_kg),
+            backend_name=session._config.backend_name,
+            setpoints_patch=copy.deepcopy(setpoints_patch),
+            runtime_campaign_overrides=(
+                session._config.runtime_campaign_overrides
+            ),
+            track=session._config.track,
+            c5_enabled=session._config.c5_enabled,
+            mre_target_species=session._config.mre_target_species,
+            mre_max_voltage_V=session._config.mre_max_voltage_V,
+            run_metadata_overrides={
+                'started_at_utc': datetime.now(timezone.utc).strftime(
+                    '%Y-%m-%dT%H:%M:%SZ'
+                ),
+            },
         )
 
-        _emit_if_current(
-            socketio,
-            sid,
-            run_id,
-            'simulation_status',
-            _start_payload(
-                sim=sim,
-                feedstock_key=feedstock_key,
+        initial_state = {
+            'http_owned': command_mode,
+            'backend_message': backend_message,
+            'backend_status': resolution_status.backend_status,
+            'backend_authoritative': resolution_status.authoritative,
+            'recipe_inputs': _recipe_inputs_payload(
+                feedstock_key=str(feedstock_key),
                 mass_kg=mass_kg,
-                backend_requested=backend_name,
-                backend_active=backend_type,
-                backend_status=resolution_status.backend_status,
-                backend_authoritative=resolution_status.authoritative,
-                backend_message=backend_message,
-                backend_payload=resolution_status.as_payload(),
+                track=str(track),
+                runtime_campaign_overrides=runtime_campaign_overrides,
+                c4_max_temp=c4_max_temp,
+                furnace_max_T_C=setpoints.get('furnace_max_T_C'),
                 c5_enabled=c5_enabled,
                 mre_target_species=mre_target_species,
                 mre_max_voltage_V=mre_max_voltage_V,
+                additives_kg=additives_kg,
+                furnace_material_id=furnace_material_id,
             ),
-        )
-        _start_background_loop(
-            socketio,
-            sid,
-            run_id,
-            run_lock,
-            backend_message,
-            resolution_status.backend_status,
-            resolution_status.authoritative,
-        )
+            'setpoints_patch': copy.deepcopy(setpoints_patch),
+            'resolved_setpoints_patch': _resolved_recipe_patch_for_session(
+                setpoints_patch=setpoints_patch,
+                setpoints=setpoints,
+                runtime_campaign_overrides=runtime_campaign_overrides,
+            ),
+        }
+        if effective_config:
+            initial_state['effective_config'] = effective_config
+        cancelled_prior_run_id = None
+        published_run_id = None
+        try:
+            with _run_command_lock:
+                if (
+                    socket_bound
+                    and _socket_client_ids.get(sid) != resolved_ledger_client_id
+                ):
+                    raise RunCommandError(
+                        'client disconnected before run launch',
+                        error_type='client_disconnected',
+                        status_code=409,
+                    )
+                with _simulations_guard:
+                    client_replacement_sid = next(
+                        (
+                            candidate_sid
+                            for candidate_sid, candidate_state in _simulations.items()
+                            if (
+                                resolved_ledger_client_id is not None
+                                and candidate_state.get('ledger_client_id')
+                                == resolved_ledger_client_id
+                            )
+                        ),
+                        None,
+                    )
+                replacement_sid = (
+                    client_replacement_sid
+                    or replace_sid
+                    or (sid if not command_mode else None)
+                )
+                _ensure_global_run_capacity(replacement_sid)
+                if replacement_sid is not None:
+                    replacement_state, _ = _current_simulation_state(
+                        replacement_sid
+                    )
+                    replacement_run_id = (
+                        str(replacement_state['run_id'])
+                        if replacement_state is not None
+                        else None
+                    )
+                    try:
+                        cancellation = _cancel_simulation_state(
+                            socketio,
+                            replacement_sid,
+                            reason='replaced_by_new_run',
+                            run_id=replacement_run_id,
+                        )
+                    except RuntimeError as exc:
+                        raise _RunReplacementError(str(exc)) from exc
+                    if cancellation is not None and cancellation.get('cancelled'):
+                        cancelled_prior_run_id = str(cancellation['run_id'])
+                        # Terminal cancellation is an immutable first write, so rollback
+                        # is impossible; any later launch failure reports this run ID.
+                    if replacement_sid != sid and cancellation is not None:
+                        _clear_simulation_state(
+                            replacement_sid,
+                            run_id=replacement_run_id,
+                        )
+
+                state, run_lock = _replace_simulation_state(
+                    sid,
+                    session,
+                    speed,
+                    ledger_client_id=resolved_ledger_client_id,
+                    run_store=run_store,
+                    runner_projector=runner_projector,
+                    initial_state=initial_state,
+                )
+            run_id = state['run_id']
+            published_run_id = run_id
+
+            _emit_if_current(
+                socketio,
+                sid,
+                run_id,
+                'simulation_status',
+                _start_payload(
+                    sim=sim,
+                    feedstock_key=feedstock_key,
+                    mass_kg=mass_kg,
+                    backend_requested=backend_name,
+                    backend_active=backend_type,
+                    backend_status=resolution_status.backend_status,
+                    backend_authoritative=resolution_status.authoritative,
+                    backend_message=backend_message,
+                    backend_payload=resolution_status.as_payload(),
+                    c5_enabled=c5_enabled,
+                    mre_target_species=mre_target_species,
+                    mre_max_voltage_V=mre_max_voltage_V,
+                ),
+            )
+            _start_background_loop(
+                socketio,
+                sid,
+                run_id,
+                run_lock,
+                backend_message,
+                resolution_status.backend_status,
+                resolution_status.authoritative,
+            )
+        except RunCommandError as exc:
+            return reject(
+                {'status': 'error', 'message': str(exc)},
+                exc.error_type,
+                exc.status_code,
+            )
+        except _RunReplacementError as exc:
+            return reject({
+                'status': 'error',
+                'message': str(exc),
+            }, 'run_replacement_failed', 500)
+        except Exception as exc:  # noqa: BLE001 -- typed launch boundary
+            if published_run_id is not None:
+                _clear_simulation_state(sid, run_id=published_run_id)
+            if cancelled_prior_run_id is not None:
+                return reject({
+                    'status': 'error',
+                    'message': (
+                        f'New run launch failed after prior run '
+                        f'{cancelled_prior_run_id} was cancelled and persisted: {exc}'
+                    ),
+                    'prior_run_id': cancelled_prior_run_id,
+                    'prior_run_cancelled': True,
+                }, 'run_launch_failed_after_replacement', 500)
+            return reject({
+                'status': 'error',
+                'message': f'Run launch failed: {exc}',
+            }, 'run_launch_failed', 500)
+        return {'run_id': run_id, 'status': 'started'}
+
+    _registered_start_handler = handle_start
 
     @socketio.on('pause_simulation')
     def handle_pause():

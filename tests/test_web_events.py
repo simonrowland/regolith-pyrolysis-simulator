@@ -14,6 +14,7 @@ import app as app_module
 from web import events as web_events
 from web import routes as web_routes
 from simulator.backends import BackendSelectionPolicy, backend_resolution_status
+from simulator.condensation import KnudsenRegimeRefusal
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
@@ -26,6 +27,7 @@ from web.events import (
     _completion_payload,
     _current_simulation_state,
     _emit_if_current,
+    _effective_config_from_setpoints,
     _get_backend,
     _MASS_BALANCE_ERROR_BREACH_PCT,
     _replace_simulation_state,
@@ -34,11 +36,21 @@ from web.events import (
     _simulations,
     _tick_payload,
 )
+from web.run_store import RunArtifactStore
 
 
 _DELETE = object()
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _RECIPE_DIR = _REPO_ROOT / "data" / "recipes"
+
+
+def _identified_socket_client(app):
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    return app_module.socketio.test_client(
+        app,
+        flask_test_client=http_client,
+    )
 
 
 def _tag_with_id(source: str, element_id: str) -> str:
@@ -214,7 +226,7 @@ def _force_socketio_internal_analytical(monkeypatch) -> list[tuple[object, tuple
 def test_socketio_ledger_api_is_byte_identical_read_only(monkeypatch):
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     before_sids = set(_simulations)
 
@@ -368,7 +380,7 @@ def test_loaded_recipe_start_applies_restored_runtime_levers(
     loaded = app.test_client().post("/recipes/load", json={"name": "loaded-c4"})
     assert loaded.status_code == 200, loaded.get_json()
 
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -502,7 +514,7 @@ def test_staged_recipe_save_load_start_is_identity(
         assert loaded.status_code == 200, loaded.get_json()
         assert loaded.get_json()["setpoints_patch"] == saved_patch
 
-        socket_client = app_module.socketio.test_client(app)
+        socket_client = _identified_socket_client(app)
         assert socket_client.is_connected()
         socket_client.get_received()
         before = set(_simulations)
@@ -1064,7 +1076,7 @@ def test_web_start_event_carries_mre_fields_into_session(monkeypatch):
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1352,7 +1364,7 @@ def test_web_start_event_resolves_furnace_material_cap(
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1418,7 +1430,7 @@ def test_web_start_event_defaults_c4_temp_from_setpoints(monkeypatch):
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1473,7 +1485,7 @@ def test_loaded_recipe_start_applies_patch_and_runtime_overrides(monkeypatch):
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1546,7 +1558,7 @@ def test_web_start_event_rejects_unselectable_furnace_material_before_session(
 
     monkeypatch.setattr("web.events._get_backend", fail_if_backend_resolves)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1584,7 +1596,7 @@ def test_web_start_event_rejects_unselectable_furnace_material_before_session(
 def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch):
     monkeypatch.setattr("web.events._get_backend", lambda _backend_name: InternalAnalyticalBackend())
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1655,6 +1667,7 @@ def test_web_start_event_applies_furnace_material_after_recipe_patch(monkeypatch
             "unknown runtime_campaign_overrides",
         ),
         ({"c4_max_temp_C": "nan"}, "c4_max_temp_C"),
+        ({"c5_enabled": {"unexpected": True}}, "c5_enabled"),
         ({"c5_enabled": True, "mre_max_voltage_V": "abc"}, "mre_max_voltage_V"),
         ({"additives": {"Na": "abc"}}, "additives.Na"),
         ({"additives": {"Na": -1}}, "additives.Na"),
@@ -1675,7 +1688,7 @@ def test_web_start_event_rejects_invalid_numeric_payload_before_session(
 
     monkeypatch.setattr("web.events._get_backend", fail_if_backend_resolves)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1737,7 +1750,7 @@ def test_make_decision_rejects_bad_payload(monkeypatch, bad_payload, message):
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1793,7 +1806,7 @@ def test_make_decision_rejects_choice_not_in_pending_options(monkeypatch):
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1873,7 +1886,7 @@ def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -1919,7 +1932,7 @@ def test_adjust_speed_rejects_out_of_bounds_without_mutating_state(
 def test_adjust_po2_rolls_back_when_post_mutation_validation_fails(monkeypatch):
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     client.get_received()
     before = set(_simulations)
 
@@ -1964,7 +1977,7 @@ def test_adjust_po2_rolls_back_when_post_mutation_validation_fails(monkeypatch):
 def test_adjust_campaign_override_rolls_back_after_validation_failure(monkeypatch):
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     client.get_received()
     before = set(_simulations)
 
@@ -2040,7 +2053,7 @@ def test_adjust_parameter_rejects_unknown_or_incomplete_noops(
 ):
     _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     client.get_received()
     before = set(_simulations)
 
@@ -2088,6 +2101,90 @@ def test_replacing_simulation_state_stops_prior_run():
         assert first_lock is not second_lock
     finally:
         _clear_simulation_state(sid)
+
+
+def test_socket_run_is_fully_initialized_when_published(tmp_path, monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    store = RunArtifactStore(tmp_path / "runs")
+    monkeypatch.setattr(web_events, "get_run_store", lambda: store)
+    original_replace = web_events._replace_simulation_state
+    published = []
+
+    def inspect_publication(*args, **kwargs):
+        state, lock = original_replace(*args, **kwargs)
+        required = {
+            "backend_message",
+            "backend_status",
+            "backend_authoritative",
+            "recipe_inputs",
+            "setpoints_patch",
+            "resolved_setpoints_patch",
+        }
+        assert required <= state.keys()
+        published.append(state)
+        return state, lock
+
+    monkeypatch.setattr(
+        web_events,
+        "_replace_simulation_state",
+        inspect_publication,
+    )
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    try:
+        result = client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+            },
+            callback=True,
+        )
+        assert result["status"] == "started"
+        assert len(published) == 1
+    finally:
+        client.disconnect()
+
+
+def test_http_identified_socket_binds_client_identity_before_arbitration(
+    tmp_path,
+    monkeypatch,
+):
+    _force_socketio_internal_analytical(monkeypatch)
+    store = RunArtifactStore(tmp_path / "runs")
+    monkeypatch.setattr(web_events, "get_run_store", lambda: store)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    payload = {
+        "backend": "internal-analytical",
+        "feedstock": "lunar_mare_low_ti",
+        "mass_kg": 1000,
+        "speed": 0,
+    }
+    try:
+        first = client.emit("start_simulation", payload, callback=True)
+        first_state = next(
+            state
+            for state in _simulations.values()
+            if state.get("run_id") == first["run_id"]
+        )
+        client_id = first_state.get("ledger_client_id")
+        assert isinstance(client_id, str) and client_id
+        assert client_id in web_events._socket_client_ids.values()
+
+        second = client.emit("start_simulation", payload, callback=True)
+        owned = [
+            state
+            for state in _simulations.values()
+            if state.get("ledger_client_id") == client_id
+        ]
+        assert len(owned) == 1
+        assert owned[0]["run_id"] == second["run_id"]
+        assert store.load(first["run_id"])["lifecycle"] == "cancelled"
+    finally:
+        client.disconnect()
 
 
 def test_stale_run_id_cannot_emit_after_restart():
@@ -2219,7 +2316,7 @@ def test_loop_rechecks_pause_after_acquiring_run_lock(monkeypatch):
             state["run_id"],
             PauseOnEnter(),
             "backend",
-            "available",
+            "ok",
             True,
         )
         with pytest.raises(StopPausedLoop):
@@ -2227,6 +2324,823 @@ def test_loop_rechecks_pause_after_acquiring_run_lock(monkeypatch):
         assert drive_calls == []
     finally:
         _clear_simulation_state(sid)
+
+
+def _terminal_runner_document(status: str) -> dict[str, object]:
+    return {
+        "schema_version": "1.4.0",
+        "status": status,
+        "reason": "terminal reason" if status != "ok" else "",
+        "error_message": "terminal failure" if status != "ok" else "",
+        "run_metadata": {
+            "started_at_utc": "2026-07-15T12:00:00Z",
+            "feedstock_id": "lunar_mare_low_ti",
+            "mass_kg": 1000.0,
+            "backend": "stub",
+        },
+        "per_hour_summary": [
+            {"hour": 1, "campaign": "C0", "T_C": 900.0, "mass_balance_pct": 0.0}
+        ],
+        "final_state": {"process.cleaned_melt": {"SiO2": 2.0}},
+        "final": {"wall_deposit_by_species_kg": {"SiO": 0.25}},
+        "stage_purity_report": {"stage_1": {"verdict": "PURE"}},
+        "vapor_pressure_source_report": {
+            "vapor_pressure_backend_status": "fallback",
+            "authoritative_for_requested_vapor_pressure": False,
+        },
+    }
+
+
+def test_run_loop_captures_detached_mol_ledger_at_hour_boundary(monkeypatch):
+    sid = "test-hourly-ledger-capture"
+    captured_payloads = []
+
+    class Ledger:
+        balances = {"process.cleaned_melt": {"SiO2": 1.25}}
+
+        def mol_by_account(self):
+            return self.balances
+
+    ledger = Ledger()
+    sim = SimpleNamespace(atom_ledger=ledger, _poisoned_hour=None)
+
+    class Session:
+        completed = False
+        simulator = sim
+
+        def is_complete(self):
+            return self.completed
+
+        def result_document(self):
+            return _terminal_runner_document("ok")
+
+    session = Session()
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+        def emit(self, event, _payload, room=None):
+            if event == "simulation_tick":
+                ledger.balances["process.cleaned_melt"]["SiO2"] = 99.0
+
+        def sleep(self, _seconds):
+            pass
+
+    socket = Socket()
+    state, lock = _replace_simulation_state(sid, session, speed=0.0)
+    state["run_store"] = object()
+    step_result = SimpleNamespace(
+        snapshot=object(),
+        backend_error="",
+        per_hour_summary={"hour": 1},
+        campaign_summary=None,
+        decision_event=None,
+    )
+
+    def drive_one(*_args, **_kwargs):
+        session.completed = True
+        return iter([step_result])
+
+    def capture_artifact(payload, _run_id, *, store):
+        captured_payloads.append(copy.deepcopy(payload))
+        return {"execution_status": "ok"}
+
+    monkeypatch.setattr(web_events, "drive_session", drive_one)
+    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "persist_run_artifact", capture_artifact)
+
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            lock,
+            "backend",
+            "ok",
+            True,
+        )
+        socket.target()
+
+        assert captured_payloads[0]["per_hour_ledger"] == {
+            "1": {"process.cleaned_melt": {"SiO2": 1.25}}
+        }
+    finally:
+        _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize(
+    ("terminal_path", "terminal_event"),
+    [
+        ("complete", "simulation_complete"),
+        ("refused", "simulation_status"),
+        ("failed", "simulation_status"),
+        ("c6_refused", "simulation_status"),
+    ],
+)
+def test_terminal_state_finishes_before_terminal_emit(
+    monkeypatch,
+    terminal_path,
+    terminal_event,
+):
+    sid = f"test-terminal-order-{terminal_path}"
+    session = SimpleNamespace(
+        simulator=SimpleNamespace(_poisoned_hour=None),
+        is_complete=lambda: terminal_path == "complete",
+    )
+    state, lock = _replace_simulation_state(sid, session, speed=0.0)
+    observed = []
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+        def emit(self, event, payload, room=None):
+            if event == terminal_event:
+                observed.append((state["running"], state["paused"], payload))
+
+    socket = Socket()
+
+    def persist_terminal(*_args, status, **_kwargs):
+        state["artifact_persisted"] = True
+        return {"execution_status": status}
+
+    if terminal_path == "refused":
+        def drive(*_args, **_kwargs):
+            raise KnudsenRegimeRefusal({"reason": "binding refusal"})
+    elif terminal_path == "failed":
+        def drive(*_args, **_kwargs):
+            raise RuntimeError("terminal failure")
+    else:
+        campaign_summary = None
+        if terminal_path == "c6_refused":
+            campaign_summary = {
+                "c6_refusal_diagnostic": {
+                    "status": "refused",
+                    "diagnostic": {"reason_refused": "c6 refused"},
+                }
+            }
+
+        def drive(*_args, **_kwargs):
+            return iter([
+                SimpleNamespace(
+                    snapshot=object(),
+                    backend_error="",
+                    per_hour_summary={"hour": 1},
+                    campaign_summary=campaign_summary,
+                    decision_event=None,
+                )
+            ])
+
+    monkeypatch.setattr(web_events, "_persist_terminal", persist_terminal)
+    monkeypatch.setattr(web_events, "drive_session", drive)
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            lock,
+            "backend",
+            "ok",
+            True,
+        )
+        socket.target()
+
+        assert len(observed) == 1
+        assert observed[0][:2] == (False, False)
+    finally:
+        _clear_simulation_state(sid)
+
+
+def test_tick_snapshot_is_built_before_concurrent_mutation(monkeypatch):
+    sid = "test-tick-snapshot-lock-order"
+    sim = SimpleNamespace(live_pressure=1.0, atom_ledger=None)
+    session = SimpleNamespace(simulator=sim, is_complete=lambda: False)
+    state, _ = _replace_simulation_state(sid, session, speed=0.0)
+    payload_started = threading.Event()
+    mutation_attempted = threading.Event()
+    mutation_done = threading.Event()
+    captured_ticks = []
+
+    class TrackingLock:
+        def __init__(self):
+            self._lock = threading.RLock()
+            self.owner = None
+            self.depth = 0
+
+        def __enter__(self):
+            if threading.current_thread().name == "tick-mutator":
+                mutation_attempted.set()
+            self._lock.acquire()
+            self.owner = threading.get_ident()
+            self.depth += 1
+            return self
+
+        def __exit__(self, *_args):
+            self.depth -= 1
+            if self.depth == 0:
+                self.owner = None
+            self._lock.release()
+
+    run_lock = TrackingLock()
+    with web_events._simulations_guard:
+        web_events._sim_locks[sid] = run_lock
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+    socket = Socket()
+    step = SimpleNamespace(
+        snapshot=object(),
+        backend_error="",
+        per_hour_summary={"hour": 1},
+        campaign_summary=None,
+        decision_event=None,
+    )
+    monkeypatch.setattr(
+        web_events,
+        "drive_session",
+        lambda *_args, **_kwargs: iter([step]),
+    )
+
+    def build_tick(**_kwargs):
+        payload_started.set()
+        assert mutation_attempted.wait(2)
+        assert run_lock.owner == threading.get_ident()
+        return {"live_pressure": sim.live_pressure}
+
+    def emit_after_mutation(_socketio, _sid, _run_id, event, payload):
+        if event == "simulation_tick":
+            assert mutation_done.wait(2)
+            captured_ticks.append(copy.deepcopy(payload))
+            state["running"] = False
+            return False
+        return True
+
+    monkeypatch.setattr(web_events, "_tick_payload", build_tick)
+    monkeypatch.setattr(web_events, "_emit_if_current", emit_after_mutation)
+
+    def mutate():
+        assert payload_started.wait(2)
+        with run_lock:
+            sim.live_pressure = 2.0
+            mutation_done.set()
+
+    mutator = threading.Thread(target=mutate, name="tick-mutator")
+    mutator.start()
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            run_lock,
+            "backend",
+            "ok",
+            True,
+        )
+        socket.target()
+        mutator.join(2)
+
+        assert mutation_done.is_set()
+        assert sim.live_pressure == 2.0
+        assert captured_ticks == [{"live_pressure": 1.0}]
+        assert state["last_recipe_capture"]["tick"] == {"live_pressure": 1.0}
+    finally:
+        mutator.join(2)
+        _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize("outcome", ["ok", "refused", "failed"])
+def test_terminal_outcomes_persist_full_runner_document(tmp_path, monkeypatch, outcome):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    logged = []
+    monkeypatch.setattr(web_events, "_safe_log", logged.append)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+
+    class Session:
+        simulator = SimpleNamespace(_poisoned_hour=None)
+
+        def is_complete(self):
+            return outcome == "ok"
+
+        def result_document(self):
+            recorded_outcome = "failed" if outcome == "ok" else "ok"
+            return _terminal_runner_document(recorded_outcome)
+
+    if outcome == "ok":
+        monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+    elif outcome == "refused":
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                KnudsenRegimeRefusal({"reason": "binding refusal"})
+            ),
+        )
+    else:
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("boom")),
+        )
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        state["session"] = Session()
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        store = RunArtifactStore(tmp_path / "runs")
+        artifact = store.load(state["run_id"])
+        assert artifact is not None
+        assert artifact["execution_status"] == outcome
+        assert artifact["terminal"]["final_state"] == {
+            "process.cleaned_melt": {"SiO2": 2.0}
+        }
+        assert artifact["terminal"]["final"] == {
+            "wall_deposit_by_species_kg": {"SiO": 0.25}
+        }
+        if outcome != "ok":
+            assert artifact["failure"]["error_message"]
+        assert any(
+            f"observed={outcome!r}; using observed outcome" in message
+            for message in logged
+        )
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+@pytest.mark.parametrize(
+    ("submitted_patch", "expected_patch", "expected_pins"),
+    [
+        (None, {}, []),
+        (
+            {"campaigns": {"C4": {"temp_range_C": [1600.0, 1660.0]}}},
+            {"campaigns": {"C4": {"temp_range_C": [1600.0, 1660.0]}}},
+            ["campaigns.C4.temp_range_C"],
+        ),
+    ],
+)
+def test_real_web_session_uses_canonical_runner_projector(
+    tmp_path,
+    monkeypatch,
+    submitted_patch,
+    expected_patch,
+    expected_pins,
+):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+
+    try:
+        submission = {
+            "backend": "internal-analytical",
+            "feedstock": "lunar_mare_low_ti",
+            "mass_kg": 1000,
+            "speed": 0,
+            "track": "pyrolysis",
+        }
+        if submitted_patch is not None:
+            submission["setpoints_patch"] = submitted_patch
+        client.emit(
+            "start_simulation",
+            submission,
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        session = state["session"]
+        session.advance()
+        session.is_complete = lambda: True
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        artifact = RunArtifactStore(tmp_path / "runs").load(state["run_id"])
+        assert artifact is not None
+        assert artifact["execution_status"] == "ok"
+        assert len(artifact["timesteps"]) == 1
+        assert artifact["terminal"]["final_state"]
+        assert artifact["terminal"]["final"]
+        run_metadata = artifact["terminal"]["run_metadata"]
+        assert run_metadata["backend"] == "internal-analytical"
+        assert run_metadata["cost_rollup_diagnostic"]
+        assert artifact["header"]["recipe_snapshot"] == {
+            "setpoints_patch": expected_patch,
+            "pins": expected_pins,
+            "recipe_schema_version": "recipe-schema-v1",
+        }
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_real_web_session_failure_persists_non_sparse_terminal(tmp_path, monkeypatch):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                RuntimeError("terminal boom")
+            ),
+        )
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        artifact = RunArtifactStore(tmp_path / "runs").load(state["run_id"])
+        assert artifact is not None
+        assert artifact["execution_status"] == "failed"
+        assert artifact["failure"]["error_message"] == "terminal boom"
+        assert artifact["terminal"]["final_state"]
+        assert artifact["terminal"]["final"]
+        assert artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"]
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_web_run_payload_captures_effective_config_sources(monkeypatch):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    captured_payloads = []
+
+    def capture_persist(runner_payload, _run_id, *, store):
+        assert store is not None
+        captured_payloads.append(copy.deepcopy(runner_payload))
+        return {"execution_status": "ok"}
+
+    monkeypatch.setattr(web_events, "persist_run_artifact", capture_persist)
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {})
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+                "setpoints_patch": {
+                    "campaigns": {"C4": {"temp_range_C": [1600.0, 1660.0]}}
+                },
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        state["session"] = SimpleNamespace(
+            simulator=SimpleNamespace(_poisoned_hour=None),
+            is_complete=lambda: True,
+            result_document=lambda: _terminal_runner_document("ok"),
+        )
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        assert len(captured_payloads) == 1
+        effective_config = captured_payloads[0]["effective_config"]
+        assert effective_config["campaigns.C4.temp_range_C"] == {
+            "value": [1600.0, 1660.0],
+            "source": "override",
+        }
+        assert effective_config["campaigns.C4.pO2_mbar_default"]["source"] == (
+            "default"
+        )
+        assert "campaigns.C0.pO2_mbar" not in effective_config
+        assert (
+            "completion_contracts.gated_steps.C0.contracts"
+            not in effective_config
+        )
+        assert "mass_kg" not in effective_config
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_empty_setpoint_resolution_omits_effective_config():
+    payload = {}
+    effective_config = _effective_config_from_setpoints({}, override_paths=set())
+    if effective_config:
+        payload["effective_config"] = effective_config
+
+    assert "effective_config" not in payload
+
+
+@pytest.mark.parametrize("terminal_path", ["ok", "refused", "failed", "c6_refused"])
+def test_persist_failure_visible_on_all_terminal_paths(
+    tmp_path,
+    monkeypatch,
+    terminal_path,
+):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+
+    session = SimpleNamespace(
+        simulator=SimpleNamespace(_poisoned_hour=None),
+        is_complete=lambda: terminal_path == "ok",
+        result_document=lambda: _terminal_runner_document(
+            "ok" if terminal_path == "ok" else "refused"
+        ),
+    )
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+    if terminal_path == "refused":
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                KnudsenRegimeRefusal({"reason": "binding refusal"})
+            ),
+        )
+    elif terminal_path == "failed":
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                RuntimeError("terminal boom")
+            ),
+        )
+    elif terminal_path == "c6_refused":
+        monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+        monkeypatch.setattr(
+            web_events,
+            "drive_session",
+            lambda *_args, **_kwargs: iter([
+                SimpleNamespace(
+                    snapshot=object(),
+                    backend_error="",
+                    per_hour_summary={},
+                    campaign_summary={
+                        "c6_refusal_diagnostic": {
+                            "status": "refused",
+                            "diagnostic": {"reason_refused": "c6 refused"},
+                        }
+                    },
+                    decision_event=None,
+                )
+            ]),
+        )
+    monkeypatch.setattr(
+        web_events,
+        "persist_run_artifact",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(OSError("disk full")),
+    )
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        state["session"] = session
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        events = client.get_received()
+        names = [event["name"] for event in events]
+        assert "simulation_complete" not in names
+        assert "simulation_persistence_failed" in names
+        assert "persistence_retry" not in state
+        statuses = [
+            event["args"][0]
+            for event in events
+            if event["name"] == "simulation_status"
+        ]
+        assert statuses[-1]["status"] == "error"
+        assert statuses[-1]["reason"] == "persistence_failed"
+        assert state["running"] is False
+        assert state["paused"] is False
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_save_ok_completion_emit_failure_is_not_persistence_failure(
+    tmp_path,
+    monkeypatch,
+):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+    original_emit_if_current = web_events._emit_if_current
+
+    def fail_completion_emit(socketio, sid, run_id, event, payload):
+        if event == "simulation_complete":
+            raise RuntimeError("completion transport failed")
+        return original_emit_if_current(socketio, sid, run_id, event, payload)
+
+    monkeypatch.setattr(web_events, "_emit_if_current", fail_completion_emit)
+    monkeypatch.setattr(web_events, "_completion_payload", lambda _sim: {"done": True})
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        state["session"] = SimpleNamespace(
+            simulator=SimpleNamespace(_poisoned_hour=None),
+            is_complete=lambda: True,
+            result_document=lambda: _terminal_runner_document("ok"),
+        )
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        events = client.get_received()
+        names = [event["name"] for event in events]
+        statuses = [
+            event["args"][0]
+            for event in events
+            if event["name"] == "simulation_status"
+        ]
+        assert "simulation_complete" not in names
+        assert "simulation_persistence_failed" not in names
+        assert statuses[-1]["reason"] == "completion_emit_failed"
+        assert state["artifact_persisted"] is True
+        assert RunArtifactStore(tmp_path / "runs").load(state["run_id"]) is not None
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_c6_refusal_emit_failure_still_cleans_run_state(tmp_path, monkeypatch):
+    captured_tasks = _force_socketio_internal_analytical(monkeypatch)
+    logged = []
+    monkeypatch.setattr(web_events, "_safe_log", logged.append)
+    app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+    original_emit_if_current = web_events._emit_if_current
+
+    def fail_refusal_emit(socketio, sid, run_id, event, payload):
+        if event == "simulation_status" and payload.get("status") == "refused":
+            raise RuntimeError("refusal transport failed")
+        return original_emit_if_current(socketio, sid, run_id, event, payload)
+
+    monkeypatch.setattr(web_events, "_emit_if_current", fail_refusal_emit)
+    monkeypatch.setattr(web_events, "_tick_payload", lambda **_kwargs: {})
+    monkeypatch.setattr(
+        web_events,
+        "drive_session",
+        lambda *_args, **_kwargs: iter([
+            SimpleNamespace(
+                snapshot=object(),
+                backend_error="",
+                per_hour_summary={},
+                campaign_summary={
+                    "c6_refusal_diagnostic": {
+                        "status": "refused",
+                        "diagnostic": {"reason_refused": "c6 refused"},
+                    }
+                },
+                decision_event=None,
+            )
+        ]),
+    )
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        state["session"] = SimpleNamespace(
+            simulator=SimpleNamespace(_poisoned_hour=None),
+            is_complete=lambda: False,
+            result_document=lambda: _terminal_runner_document("refused"),
+        )
+        target, args, kwargs = captured_tasks.pop()
+        target(*args, **kwargs)
+
+        assert any(
+            "Simulation status emission failed: refusal transport failed" in message
+            for message in logged
+        )
+        assert state["artifact_persisted"] is True
+        assert state["running"] is False
+        assert state["paused"] is False
+        assert RunArtifactStore(tmp_path / "runs").load(state["run_id"]) is not None
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_observed_terminal_without_refusal_diagnostic_clears_recorded_value():
+    recorded = _terminal_runner_document("refused")
+    recorded["refusal_diagnostic"] = {"reason": "stale refusal"}
+    session = SimpleNamespace(result_document=lambda: recorded)
+
+    payload = web_events._full_runner_payload(session, status="ok")
+
+    assert "refusal_diagnostic" not in payload
+
+
+def test_reduced_terminal_payload_preserves_available_submission_provenance():
+    projector = SimpleNamespace(
+        setpoints_patch={},
+        run_metadata_overrides={"started_at_utc": "2026-07-15T12:00:00Z"},
+    )
+    session = SimpleNamespace(
+        _config=SimpleNamespace(
+            feedstock_id="lunar_mare_low_ti",
+            mass_kg=1000.0,
+            backend_name="stub",
+            track="pyrolysis",
+        ),
+        simulator=SimpleNamespace(melt=SimpleNamespace(hour=3)),
+        per_hour_summaries=lambda: [],
+    )
+
+    payload = web_events._available_runner_payload(
+        session,
+        projector=projector,
+        status="failed",
+        reason="runner_projection_failed",
+        error_message="projection failed",
+        refusal_diagnostic=None,
+    )
+
+    assert payload["run_metadata"]["started_at_utc"] == "2026-07-15T12:00:00Z"
+    assert payload["recipe_snapshot"] == {
+        "setpoints_patch": {},
+        "pins": [],
+        "recipe_schema_version": "recipe-schema-v1",
+    }
 
 
 @pytest.mark.parametrize("failure_site", ["completion", "tick", "emit"])
@@ -2289,7 +3203,7 @@ def test_loop_projection_and_emit_failures_stop_current_run(
             state["run_id"],
             lock,
             "backend",
-            "available",
+            "ok",
             True,
         )
         socket.target()
@@ -2540,7 +3454,7 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
         run_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
 
@@ -2582,10 +3496,12 @@ def test_simulation_tick_exposes_live_pot_and_flue_composition(monkeypatch):
 
 def test_web_failure_status_and_cleanup_survive_poison_enrichment_failure(
     monkeypatch,
+    tmp_path,
 ):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -2685,7 +3601,7 @@ def test_per_hour_summary_redox_fields_reach_socket_and_recipe_capture_live_path
         run_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -2814,7 +3730,7 @@ def test_optional_native_fe_nested_redox_payloads_reach_socket_and_recipe_captur
         run_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -2916,7 +3832,7 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
         run_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
 
@@ -2950,6 +3866,7 @@ def test_simulation_tick_exposes_mass_balance_category_when_pct_none(
 
 def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
     monkeypatch,
+    tmp_path,
 ):
     captured_tasks = []
 
@@ -2969,7 +3886,8 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
         capture_background_task,
     )
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
+    client = _identified_socket_client(app)
     assert client.is_connected()
     client.get_received()
     before = set(_simulations)
@@ -3055,6 +3973,16 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
             refusal["c6_refusal_diagnostic"]["diagnostic"]["reason_refused"]
             == refusal["reason"]
         )
+        artifact = RunArtifactStore(tmp_path / "runs").load(refusal["run_id"])
+        assert artifact is not None
+        assert artifact["execution_status"] == "refused"
+        assert len(artifact["timesteps"]) == 42
+        assert artifact["failure"] == {
+            "reason": refusal["reason"],
+            "error_message": refusal["reason"],
+        }
+        assert artifact["terminal"]["final_state"]
+        assert artifact["terminal"]["final"]
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
@@ -3105,7 +4033,7 @@ def test_tick_omits_pot_composition_when_cleaned_melt_ledger_unavailable(
     assert payload["pot_composition_wt_pct"] == {}
 
 
-def test_web_pause_resume_is_result_neutral(monkeypatch):
+def test_web_pause_resume_is_result_neutral(monkeypatch, tmp_path):
     captured_tasks = []
 
     def force_internal_analytical_backend(_backend_name):
@@ -3124,10 +4052,11 @@ def test_web_pause_resume_is_result_neutral(monkeypatch):
         capture_background_task,
     )
     app = app_module.create_app()
+    app.config["RUN_ARTIFACT_DIR"] = str(tmp_path / "runs")
 
     def start_web_session():
         before = set(_simulations)
-        client = app_module.socketio.test_client(app)
+        client = _identified_socket_client(app)
         assert client.is_connected()
         client.get_received()
         client.emit(

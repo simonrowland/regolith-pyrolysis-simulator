@@ -1,6 +1,10 @@
 "use strict";
 
-const ARTIFACT_URL = "./sample-run-artifact.json";
+const RUN_ID = new URLSearchParams(window.location.search).get("run");
+const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
+const ARTIFACT_URL = RUN_ID
+  ? `/api/runs/${encodeURIComponent(RUN_ID)}`
+  : "./sample-run-artifact.json";
 const $ = (selector, root = document) => root.querySelector(selector);
 const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
@@ -11,7 +15,7 @@ const displayNumber = (value, unit = "") => hasNumber(value)
   : "not emitted";
 
 function dataBlock(value) {
-  if (value === undefined || value === null) return `<div class="pending"><strong>Not captured</strong><p>This field is absent from the sample header.</p></div>`;
+  if (value === undefined || value === null) return `<div class="pending"><strong>Not captured</strong><p>This field is absent from the artifact header.</p></div>`;
   return `<pre class="data-block">${esc(JSON.stringify(value, null, 2))}</pre>`;
 }
 
@@ -39,7 +43,7 @@ function configEntries(config) {
 
 function effectiveConfig(config) {
   if (!config || typeof config !== "object") {
-    return `<div class="pending"><strong>Effective config not captured</strong><p>captured at run merge points (W-A5) — not in this sample</p></div>`;
+    return `<div class="pending"><strong>Effective config not captured</strong><p>This run's artifact does not carry header.effective_config (live runs record it at the submit merge point).</p></div>`;
   }
   const entries = configEntries(config);
   if (!entries.length) return `<div class="pending"><strong>Effective config empty</strong><p>No per-key values were captured.</p></div>`;
@@ -79,7 +83,7 @@ function downloadHeader(header) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "run.yaml";
+  link.download = "run-header.yaml";
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
@@ -87,12 +91,29 @@ function downloadHeader(header) {
 function render(artifact) {
   if (!artifact || !artifact.header || typeof artifact.header !== "object") throw new Error("Artifact header is absent or malformed.");
   const header = artifact.header;
+  // Mirror the export endpoint's validity rule exactly — offering a download
+  // the endpoint would 409 is a false affordance.
+  const snapshot = header.recipe_snapshot;
+  const hasRecipeSnapshot = snapshot && typeof snapshot === "object" && !Array.isArray(snapshot)
+    && snapshot.setpoints_patch && typeof snapshot.setpoints_patch === "object" && !Array.isArray(snapshot.setpoints_patch)
+    && Array.isArray(snapshot.pins) && snapshot.pins.every((pin) => typeof pin === "string")
+    && typeof snapshot.recipe_schema_version === "string" && snapshot.recipe_schema_version.length > 0;
+  const manifestAction = RUN_ID
+    ? hasRecipeSnapshot
+      ? `<a href="/api/runs/${encodeURIComponent(RUN_ID)}/run.yaml" download>Download run.yaml</a>`
+      : `<button type="button" disabled title="Artifact carries no recipe snapshot">Download run.yaml unavailable</button>`
+    : "";
+  const downloadNote = RUN_ID
+    ? hasRecipeSnapshot
+      ? "The run.yaml export contains the captured recipe snapshot and identifying run inputs."
+      : "This artifact carries no recipe snapshot; run.yaml export is unavailable."
+    : "Static samples offer captured-header download only; run.yaml export is available for live runs.";
   $("#settings").innerHTML = `<header>
     <div class="masthead"><div class="brand"><strong>DIRECT LEAP</strong> TECHNOLOGIES</div><div class="doc-label">Read-only<br>owner T-8</div></div>
     <div class="eyebrow">PHASE 2 · SETTINGS INSPECTOR</div><h1>Captured run settings</h1>
     <p class="lede"><span class="mono">${esc(header.run_id)}</span> · settings copied from the frozen artifact header.</p>
-    <div class="settings-actions"><a href="./index.html">← Back to report</a><button id="download-run" type="button">Download run.yaml</button></div>
-    <div class="note"><b>Read-only.</b> Config editing remains owner T-8. The download contains the captured header only.</div>
+    <div class="settings-actions"><a href="./index.html${RUN_QUERY}">← Back to report</a><button id="download-run" type="button">Download captured header (YAML)</button>${manifestAction}</div>
+    <div class="note"><b>Read-only.</b> Config editing remains owner T-8. ${downloadNote}</div>
   </header>
   ${settingsField(1, "Recipe snapshot", "Captured recipe material only; absent values are not reconstructed.", dataBlock(header.recipe_snapshot))}
   ${settingsField(2, "Engine identity", "Backend identity recorded by the run header.", dataBlock(header.engine_identity))}
