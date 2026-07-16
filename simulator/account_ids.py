@@ -32,6 +32,11 @@ OXYGEN_MRE_ANODE_ACCOUNT = "terminal.oxygen_mre_anode_stored"
 OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT = (
     "reservoir.oxygen_cistern_liquid_inventory"
 )
+# Debitable solid-C inventory from Stage-0 refractory organic partition
+# (t-325). Distinct from terminal.stage0_residual_refractory_carbon
+# (non-debitable diagnostic sink) and process.reagent_inventory C
+# (operator-supplied reductant).
+SOLID_CHAR_CARBON_ACCOUNT = "process.solid_char_carbon"
 CHROMIUM_CONDENSED_OXIDE_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
 SPENT_REDUCTANT_RESIDUE_ACCOUNT = "process.spent_reductant_residue"
 C7_AL_CREDIT_ACCOUNT = "process.c7_al_credit"

@@ -153,6 +153,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.account_ids import SOLID_CHAR_CARBON_ACCOUNT
 
 
 # Reaction-family discriminators (string-literal contract with the
@@ -164,6 +165,7 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 #   - sulfate_carbon: maps to feedstock 'sulfate_so3_to_so2_co'.
 #   - boudouard: maps to feedstock 'co2_boudouard_to_co'.
 #   - perchlorate: maps to feedstock 'perchlorate_to_chloride_o2'.
+#   - char_lance_oxidation / char_feo_reduction: t-325 committed char.
 REACTION_FAMILY_COMPLETE_OXIDATION = "complete_oxidation"
 REACTION_FAMILY_SULFATE_CARBON = "sulfate_carbon"
 REACTION_FAMILY_CATION_SULFATE_CARBON = "cation_sulfate_carbon"
@@ -175,6 +177,8 @@ REACTION_FAMILY_SULFATE_DECOMP = "sulfate_decomp"
 REACTION_FAMILY_SILICATE_DISPLACEMENT = "silicate_displacement"
 REACTION_FAMILY_PARTITION_CARBON = "partition_carbon"
 REACTION_FAMILY_INERT_TO_RUMP = "inert_to_rump"
+REACTION_FAMILY_CHAR_LANCE_OXIDATION = "char_lance_oxidation"
+REACTION_FAMILY_CHAR_FEO_REDUCTION = "char_feo_reduction"
 VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_COMPLETE_OXIDATION,
     REACTION_FAMILY_SULFATE_CARBON,
@@ -187,10 +191,17 @@ VALID_REACTION_FAMILIES = frozenset({
     REACTION_FAMILY_SILICATE_DISPLACEMENT,
     REACTION_FAMILY_PARTITION_CARBON,
     REACTION_FAMILY_INERT_TO_RUMP,
+    REACTION_FAMILY_CHAR_LANCE_OXIDATION,
+    REACTION_FAMILY_CHAR_FEO_REDUCTION,
 })
 
 OXYGEN_SPECIES = "O2"
+CHAR_SPECIES = "C"
 OXYGEN_STAGE0_ACCOUNT = "terminal.oxygen_stage0_stored"
+FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
+CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
+METAL_PHASE_ACCOUNT = "process.metal_phase"
+OFFGAS_ACCOUNT = "terminal.offgas"
 
 
 class BuiltinStage0PretreatmentProvider(ChemistryProvider):
@@ -236,8 +247,11 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         "process.reagent_inventory",
         "process.stage0_perchlorate_feed",
         "process.cleaned_melt",
+        SOLID_CHAR_CARBON_ACCOUNT,
+        "process.metal_phase",
         "reservoir.stage0_oxidant",
         "reservoir.stage0_process_gas",
+        FO2_BUFFER_ACCOUNT,
         "terminal.offgas",
         "terminal.stage0_salt_phase",
         "terminal.stage0_chloride_salt_phase",
@@ -329,6 +343,14 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
             return self._dispatch_inert_to_rump_diagnostic(
                 controls, control_audit,
             )
+        if reaction_family == REACTION_FAMILY_CHAR_LANCE_OXIDATION:
+            return self._dispatch_char_lance_oxidation(
+                controls, registry, resolve_species_formula, control_audit,
+            )
+        if reaction_family == REACTION_FAMILY_CHAR_FEO_REDUCTION:
+            return self._dispatch_char_feo_reduction(
+                controls, registry, resolve_species_formula, control_audit,
+            )
         if reaction_family == REACTION_FAMILY_BOUDOUARD:
             return self._dispatch_boudouard(
                 controls, registry, resolve_species_formula, control_audit,
@@ -359,13 +381,14 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
         feed_kg = float(controls.get("feed_kg") or 0.0)
         products_kg = dict(controls.get("products_kg") or {})
         oxidant_kg = float(controls.get("oxidant_kg") or 0.0)
+        solid_char_c_kg = float(controls.get("solid_char_c_kg") or 0.0)
 
         if not species:
             return self._out_of_domain(
                 "complete_oxidation requires a species name",
                 control_audit=control_audit,
             )
-        if feed_kg <= 1e-12 and not products_kg:
+        if feed_kg <= 1e-12 and not products_kg and solid_char_c_kg <= 1e-12:
             # Legacy ``_stage0_oxidation_transition_specs`` filters out
             # entries with feed_kg <= 1e-12, so an empty payload here
             # means the caller is asking the provider to handle a
@@ -420,13 +443,21 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 kg_val / product_formula.molar_mass_kg_per_mol()
             )
         if offgas_mol:
-            credits["terminal.offgas"] = offgas_mol
+            credits[OFFGAS_ACCOUNT] = offgas_mol
 
         if o2_credit_kg > 1e-12:
             o2_formula = resolve_species_formula(OXYGEN_SPECIES, registry)
             mol_o2 = o2_credit_kg / o2_formula.molar_mass_kg_per_mol()
             if mol_o2 > 0.0:
                 credits[OXYGEN_STAGE0_ACCOUNT] = {OXYGEN_SPECIES: mol_o2}
+
+        # Refractory organic C withheld from CO2 (t-325): elemental solid
+        # char in the debitable melt inventory account.
+        if solid_char_c_kg > 1e-12:
+            c_formula = resolve_species_formula(CHAR_SPECIES, registry)
+            mol_char = solid_char_c_kg / c_formula.molar_mass_kg_per_mol()
+            if mol_char > 0.0:
+                credits[SOLID_CHAR_CARBON_ACCOUNT] = {CHAR_SPECIES: mol_char}
 
         if not credits:
             return self._empty_result(
@@ -456,6 +487,7 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 "oxidant_kg": oxidant_kg,
                 "offgas_kg": dict(products_kg),  # post-O2-pop
                 "oxygen_stage0_kg": o2_credit_kg,
+                "solid_char_c_kg": solid_char_c_kg,
             },
         )
 
@@ -1368,6 +1400,145 @@ class BuiltinStage0PretreatmentProvider(ChemistryProvider):
                 "rump_frac": 1.0,
                 "fate": "terminal_slag",
                 "behavior_change_gate": "instrument_first",
+            },
+        )
+
+    def _dispatch_char_lance_oxidation(
+        self,
+        controls: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        control_audit,
+    ) -> IntentResult:
+        """O2-lance solid char: C + O2 -> CO2 or C + 1/2 O2 -> CO.
+
+        Premise: absorbed bubbler O2 oxidizes residual solid char before
+        Fe-redox absorption (t-325). Algebra: extent = min(C_mol,
+        O2_mol / nu) with nu = 1 (CO2) or 0.5 (CO). Unit check: mol
+        species cancel. Sanity: 1 kmol char needs 32 kg O2 (CO2 basis).
+        """
+        char_mol = max(0.0, float(controls.get("char_c_mol") or 0.0))
+        o2_mol = max(0.0, float(controls.get("o2_mol") or 0.0))
+        o2_per_c = float(controls.get("o2_per_c_mol") or 1.0)
+        product = str(controls.get("product_species") or "CO2")
+        if char_mol <= 1e-12 or o2_mol <= 1e-12 or o2_per_c <= 0.0:
+            return self._empty_result(
+                "char_lance_oxidation skipped: no char or O2",
+                control_audit=control_audit,
+            )
+        if product not in {"CO2", "CO"}:
+            return self._out_of_domain(
+                f"char_lance_oxidation unsupported product {product!r}",
+                control_audit=control_audit,
+            )
+        extent = min(char_mol, o2_mol / o2_per_c)
+        if extent <= 1e-12:
+            return self._empty_result(
+                "char_lance_oxidation skipped: zero extent",
+                control_audit=control_audit,
+            )
+        o2_consumed = extent * o2_per_c
+        # CO2: C + O2 -> CO2 (1 product mol / C). CO: C + 1/2 O2 -> CO.
+        product_mol = extent
+        debits = {
+            SOLID_CHAR_CARBON_ACCOUNT: {CHAR_SPECIES: extent},
+            FO2_BUFFER_ACCOUNT: {OXYGEN_SPECIES: o2_consumed},
+        }
+        credits = {OFFGAS_ACCOUNT: {product: product_mol}}
+        atom_proof = build_atom_balance_proof(
+            debits, credits, registry, resolve_species_formula,
+        )
+        proposal = LedgerTransitionProposal(
+            debits=debits,
+            credits=credits,
+            reason="char_lance_oxidation",
+            atom_balance_proof=atom_proof,
+        )
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=proposal,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_CHAR_LANCE_OXIDATION,
+                "char_c_mol": char_mol,
+                "o2_mol": o2_mol,
+                "o2_per_c_mol": o2_per_c,
+                "extent_mol": extent,
+                "o2_consumed_mol": o2_consumed,
+                "product_species": product,
+                "product_mol": product_mol,
+            },
+        )
+
+    def _dispatch_char_feo_reduction(
+        self,
+        controls: Mapping[str, Any],
+        registry: Mapping[str, Any],
+        resolve_species_formula,
+        control_audit,
+    ) -> IntentResult:
+        """Equilibrium-limited FeO + C -> Fe + CO at melt T.
+
+        Premise: above ~700 C the C/CO Ellingham line is below Fe/FeO
+        (REF-020 NIST-JANAF/Chase 1998), so the reaction is spontaneous
+        when both reactants are present. Choice: process-equilibrium-limited
+        one-step extent = min(FeO_mol, C_mol). This is an instantaneous-
+        equilibration modeling assumption at the one-hour process timestep,
+        avoiding an unsupported free rate constant; it is not a resolved
+        kinetic law. Algebra: 1:1 molar.
+        Unit check: mol Fe * 0.055845 kg/mol = kg Fe. Sanity: 958 mol
+        char (CI Sephton floor) yields at most 53.5 kg Fe when FeO is
+        in excess.
+        """
+        char_mol = max(0.0, float(controls.get("char_c_mol") or 0.0))
+        feo_mol = max(0.0, float(controls.get("feo_mol") or 0.0))
+        if char_mol <= 1e-12 or feo_mol <= 1e-12:
+            return self._empty_result(
+                "char_feo_reduction skipped: no char or FeO",
+                control_audit=control_audit,
+            )
+        extent = min(char_mol, feo_mol)
+        if extent <= 1e-12:
+            return self._empty_result(
+                "char_feo_reduction skipped: zero extent",
+                control_audit=control_audit,
+            )
+        debits = {
+            SOLID_CHAR_CARBON_ACCOUNT: {CHAR_SPECIES: extent},
+            CLEANED_MELT_ACCOUNT: {"FeO": extent},
+        }
+        credits = {
+            METAL_PHASE_ACCOUNT: {"Fe": extent},
+            OFFGAS_ACCOUNT: {"CO": extent},
+        }
+        atom_proof = build_atom_balance_proof(
+            debits, credits, registry, resolve_species_formula,
+        )
+        proposal = LedgerTransitionProposal(
+            debits=debits,
+            credits=credits,
+            reason="char_feo_reduction",
+            atom_balance_proof=atom_proof,
+        )
+        return IntentResult(
+            intent=ChemistryIntent.STAGE0_PRETREATMENT,
+            status="ok",
+            transition=proposal,
+            control_audit=control_audit,
+            diagnostic={
+                "reaction_family": REACTION_FAMILY_CHAR_FEO_REDUCTION,
+                "char_c_mol": char_mol,
+                "feo_mol": feo_mol,
+                "extent_mol": extent,
+                "fe_product_mol": extent,
+                "co_product_mol": extent,
+                "kinetics": "equilibrium_limited_min_reactants",
+                "kinetics_justification": (
+                    "instantaneous process-equilibrium assumption at the "
+                    "one-hour timestep; no sourced kinetic law or free "
+                    "rate constant"
+                ),
             },
         )
 

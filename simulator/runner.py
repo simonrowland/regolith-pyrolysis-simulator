@@ -2031,14 +2031,33 @@ def _c0_char_diagnostic(
         for row in (getattr(sim, "_stage0_foulant_diagnostics", ()) or ())
         if row.get("reaction_family") == "partition_carbon"
     )
-    refractory_char_mol = sum(
+    # t-325: committed solid-char account is authoritative residual
+    # inventory; partition diagnostic is the Stage-0 formation total
+    # used when the ledger has not yet been queried / is empty after
+    # full consumption still warrants a diagnostic block only if the
+    # partition reported char this batch.
+    from simulator.account_ids import SOLID_CHAR_CARBON_ACCOUNT
+
+    partition_char_mol = sum(
         float(row["refractory_mol"])
         for row in carbon_diagnostics
         if isinstance(row.get("refractory_mol"), (int, float))
         and float(row["refractory_mol"]) > 0.0
     )
-    if refractory_char_mol <= 0.0:
+    ledger_char_mol = max(
+        0.0,
+        float(
+            sim.atom_ledger.mol_by_account(SOLID_CHAR_CARBON_ACCOUNT).get(
+                "C", 0.0
+            )
+            or 0.0
+        ),
+    )
+    if partition_char_mol <= 0.0 and ledger_char_mol <= 0.0:
         return {}
+    # Residual hazard inventory: live ledger balance. Formation total
+    # stays available under partition diagnostics for attribution.
+    refractory_char_mol = ledger_char_mol
 
     partition_row = (
         sim._load_carbon_partition_config()
@@ -2074,20 +2093,19 @@ def _c0_char_diagnostic(
     # Sanity: 1 tonne at 3.5 wt% C and the Sephton floor 0.39 gives
     # 1.136 kmol (13.65 kg) char, 36.3/18.2 kg O2 (CO2/CO), and at most
     # 63.5 kg Fe. This report is a projection only; no account is mutated.
-    o2_required_co2_mol = refractory_char_mol
-    o2_required_co_mol = 0.5 * refractory_char_mol
+    o2_required_co2_mol = partition_char_mol
+    o2_required_co_mol = 0.5 * partition_char_mol
     injected_residual_co2_mol = max(
-        refractory_char_mol - o2_injected_mol, 0.0
+        partition_char_mol - o2_injected_mol, 0.0
     )
     injected_residual_co_mol = max(
-        refractory_char_mol - 2.0 * o2_injected_mol, 0.0
+        partition_char_mol - 2.0 * o2_injected_mol, 0.0
     )
-    absorbed_residual_co2_mol = max(
-        refractory_char_mol - o2_absorbed_mol, 0.0
-    )
-    absorbed_residual_co_mol = max(
-        refractory_char_mol - 2.0 * o2_absorbed_mol, 0.0
-    )
+    # The ledger balance is already post-lance. Do not subtract cumulative
+    # bubbler absorption a second time; that telemetry also includes Fe-redox
+    # absorption and is retained only for dose-coverage attribution.
+    absorbed_residual_co2_mol = refractory_char_mol
+    absorbed_residual_co_mol = refractory_char_mol
 
     c0_end = c0_snapshots[-1]
     melt_feo_kg = max(
@@ -2118,6 +2136,20 @@ def _c0_char_diagnostic(
             "a positive fraction of C0-end melt FeO; diagnostic only, "
             "no process gate applied."
         )
+    susceptible_melt_mol = {}
+    for species in ("P2O5", "Cr2O3", "TiO2"):
+        species_kg = max(
+            0.0,
+            float(c0_end.inventory.melt_oxide_kg.get(species, 0.0) or 0.0),
+        )
+        if species_kg > 0.0:
+            formula = resolve_species_formula(
+                species, sim.species_formula_registry
+            )
+            susceptible_melt_mol[species] = (
+                species_kg / formula.molar_mass_kg_per_mol()
+            )
+    contamination_warn = refractory_char_mol > 0.0
 
     return {
         "status": "WARN" if warning_fired else "OK",
@@ -2135,6 +2167,7 @@ def _c0_char_diagnostic(
             "regime_caveat": refractory_partition.get("regime_caveat"),
         },
         "inventory": {
+            "formed_refractory_char_C_mol": partition_char_mol,
             "refractory_char_C_mol": refractory_char_mol,
             "refractory_char_C_kg": (
                 refractory_char_mol * carbon_molar_mass_kg_per_mol
@@ -2188,12 +2221,13 @@ def _c0_char_diagnostic(
                 ),
             },
             "residual_basis": (
-                "absorbed_O2_for_un_lanced_hazard; injected_O2_is_dose_ceiling"
+                "live_post_lance_solid_char_ledger; injected_and_absorbed_O2_"
+                "are_dose_coverage_attribution_only"
             ),
         },
         "FeO_reduction_potential": {
             "basis": (
-                "C_plus_O2_to_CO2_absorbed_O2_residual_conservative_case"
+                "live_post_lance_solid_char_ledger_residual"
             ),
             "melt_FeO_available_mol": melt_feo_mol,
             "melt_FeO_available_kg": melt_feo_kg,
@@ -2211,6 +2245,35 @@ def _c0_char_diagnostic(
             "warning_threshold_source": (
                 "owner-flagged 2026-07-15 Ellingham premise; REF-020 "
                 "NIST-JANAF/Chase 1998 thermochemistry"
+            ),
+        },
+        "contamination_risk": {
+            "status": "WARN" if contamination_warn else "OK",
+            "diagnostic_only": True,
+            "warning": (
+                "WARNING: un-lanced solid char can reduce melt P/Cr/Ti "
+                "oxides where present and form metal carbides; selectivity "
+                "is not modeled."
+                if contamination_warn
+                else None
+            ),
+            "susceptible_melt_mol": susceptible_melt_mol,
+            "warning_threshold": (
+                "generic carbide caution at positive surviving char; "
+                "P/Cr/Ti reduction caution additionally requires positive "
+                "susceptible oxide inventory"
+            ),
+            "p_cr_ti_reduction_status": (
+                "WARN" if contamination_warn and susceptible_melt_mol else "OK"
+            ),
+            "carbide_risk_status": "WARN" if contamination_warn else "OK",
+            "warning_threshold_source": (
+                "thermodynamic-onset screen from REF-020 JANAF oxide "
+                "stability; no sourced safe residual-char allowance"
+            ),
+            "out_of_scope": (
+                "vacuum SiO2+C->SiO(g); P/Cr/Ti selectivity and carbide "
+                "speciation"
             ),
         },
     }

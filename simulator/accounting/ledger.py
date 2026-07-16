@@ -19,6 +19,7 @@ from simulator.accounting.lots import MaterialLot
 from simulator.account_ids import (
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+    SOLID_CHAR_CARBON_ACCOUNT,
 )
 
 # Per-transition mass-closure slack. The element gate below is the binding
@@ -67,6 +68,7 @@ KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
     "process.raw_feedstock",
     "process.reagent_inventory",
     "process.spent_reductant_residue",
+    SOLID_CHAR_CARBON_ACCOUNT,
     "process.stage0_carbonate_feed",
     "process.stage0_perchlorate_feed",
     "process.stage0_salt_feed",
