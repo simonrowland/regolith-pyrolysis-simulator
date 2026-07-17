@@ -147,6 +147,27 @@ def _campaigns_elapsed_from_session_history(
                         )
                         if staged_duration is not None:
                             campaign_duration_h = float(staged_duration)
+            elif campaign_name == "C5":
+                # C5 max_hold_hr is per-branch (setpoints.yaml):
+                #   {branch_two: H2, branch_one: H1}
+                # Match campaigns.py C5 endpoint selection exactly:
+                #   record.branch == 'two' -> branch_two; else -> branch_one.
+                # Unset/empty branch therefore uses branch_one so the progress
+                # denominator equals the hold ceiling that would actually fire.
+                # Do not float() the mapping; _max_hold_hr(campaign) alone aborts.
+                record_branch = str(
+                    getattr(getattr(sim, "record", None), "branch", "") or ""
+                )
+                hold_key = (
+                    "branch_two" if record_branch == "two" else "branch_one"
+                )
+                configured_duration = getattr(
+                    campaign_mgr, "_configured_max_hold_hr", None
+                )
+                if callable(configured_duration):
+                    campaign_duration_h = float(
+                        configured_duration(campaign, hold_key)
+                    )
             else:
                 duration = getattr(campaign_mgr, "_max_hold_hr", None)
                 if callable(duration):
