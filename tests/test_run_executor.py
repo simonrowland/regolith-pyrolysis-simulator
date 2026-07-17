@@ -128,6 +128,82 @@ def test_campaign_count_resolves_structured_c3_duration():
     ) == pytest.approx(1.0 / 3.0)
 
 
+def test_campaign_count_resolves_structured_c5_branch_max_hold():
+    """C5 max_hold_hr is a per-branch mapping; progress must not float() it.
+
+    Authoritative schema (data/setpoints.yaml campaigns.C5.max_hold_hr):
+      {branch_two: ..., branch_one: ...}
+    Selection rule mirrors campaigns.py C5 endpoint: branch=='two' uses
+    branch_two, otherwise branch_one (including unset branch).
+    """
+    calls: list[tuple] = []
+
+    def _configured_max_hold_hr(_campaign, *path):
+        calls.append(path)
+        table = {
+            ("branch_two",): 800.0,
+            ("branch_one",): 400.0,
+        }
+        return table[path]
+
+    campaign_mgr = SimpleNamespace(
+        _configured_max_hold_hr=_configured_max_hold_hr,
+        # If the consumer wrongly calls scalar _max_hold_hr(campaign), surface it.
+        _max_hold_hr=lambda _campaign: (_ for _ in ()).throw(
+            AssertionError("C5 must not resolve scalar max_hold_hr")
+        ),
+    )
+
+    # Active hour mid-C5 on branch two: 1 completed campaign + 2/800.
+    session_two = SimpleNamespace(
+        _step_results=[
+            SimpleNamespace(campaign_summary={"campaign": "C4"}),
+            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(campaign_summary=None),
+        ],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C5),
+            record=SimpleNamespace(branch="two"),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+    assert _campaigns_elapsed_from_session_history(
+        session_two,
+        fallback=99.0,
+    ) == pytest.approx(1.0 + 2.0 / 800.0)
+    assert calls[-1] == ("branch_two",)
+
+    # Unset branch defaults to branch_one (matches campaigns.py endpoint).
+    session_default = SimpleNamespace(
+        _step_results=[SimpleNamespace(campaign_summary=None)],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C5),
+            record=SimpleNamespace(branch=""),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+    assert _campaigns_elapsed_from_session_history(
+        session_default,
+        fallback=99.0,
+    ) == pytest.approx(1.0 / 400.0)
+    assert calls[-1] == ("branch_one",)
+
+    # Explicit branch one.
+    session_one = SimpleNamespace(
+        _step_results=[SimpleNamespace(campaign_summary=None)],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C5),
+            record=SimpleNamespace(branch="one"),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+    assert _campaigns_elapsed_from_session_history(
+        session_one,
+        fallback=99.0,
+    ) == pytest.approx(1.0 / 400.0)
+    assert calls[-1] == ("branch_one",)
+
+
 def test_run_metadata_projects_execution_campaign_count_over_override():
     run = _run(
         run_metadata_overrides={
