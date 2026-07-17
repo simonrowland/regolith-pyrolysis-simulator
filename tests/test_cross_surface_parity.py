@@ -236,7 +236,12 @@ def _run_cli_session() -> SurfaceResult:
 def _run_web_session(monkeypatch) -> SurfaceResult:
     captured_tasks = _install_stepwise_web(monkeypatch)
     app = app_module.create_app()
-    client = app_module.socketio.test_client(app)
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    client = app_module.socketio.test_client(
+        app,
+        flask_test_client=http_client,
+    )
     assert client.is_connected()
     client.get_received()
 
