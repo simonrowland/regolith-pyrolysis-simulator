@@ -86,7 +86,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # temperatures execute to the same value.
 # 2026-07-14 t-194 Cr grounding: executable C2A_continuous recompute with
 # grounded Cr alpha=0.9 and fallback retained only for Mn/CrO2.
-PHASE3BIS_SIO_EVOLVED_KG = 1.77221126749e-05
+# 2026-07-17 t-159/t-160: executable recompute after the corrected transport
+# and wall-capture composition; invariance remains bit-identical.
+PHASE3BIS_SIO_EVOLVED_KG = 7.50757523608e-06
 
 
 @lru_cache(maxsize=None)

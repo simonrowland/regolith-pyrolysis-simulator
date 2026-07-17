@@ -341,7 +341,7 @@ def test_ci_c0_to_c6_refusal_preserves_prior_rows_and_ledger_accounts():
     )
     # The binding C6 refusal now fires on the first C6 tick, after all prior
     # campaign rows have been preserved in the envelope.
-    assert len(rows) == 42
+    assert len(rows) == 43
     assert list(dict.fromkeys(row["campaign"] for row in rows)) == [
         "C0",
         "C0B",

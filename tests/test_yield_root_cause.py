@@ -157,7 +157,7 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives():
     # requirement is 2.15044 V, so the 1.6 V cap cannot consume the remaining
     # Na2O. The scheduler now skips that unreachable rung instead of spending
     # the full C5 hold there; this residual is therefore mechanism-backed.
-    assert na2o_left == pytest.approx(4.10129509, abs=1e-6)
+    assert na2o_left == pytest.approx(4.094548078976671, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT

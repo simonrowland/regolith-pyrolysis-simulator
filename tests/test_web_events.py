@@ -4501,11 +4501,10 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
             )
         )
 
-        # C6 cold-hold (1450 -> 1400 C, wave-09) reaches the binding CI
-        # refusal one ramp-hour earlier: 42 hours (was 43 at the 1450 recipe;
-        # controller-verified pre-existing vs the token flip).
-        assert names.count("simulation_tick") == 42
-        assert names.count("per_hour_summary") == 42
+        # The t-160 timing correction preserves the first binding C6 tick
+        # before refusal, so all prior rows plus that refusal tick survive.
+        assert names.count("simulation_tick") == 43
+        assert names.count("per_hour_summary") == 43
         assert "campaign_complete_summary" in names
         assert "simulation_complete" not in names
         assert max(
@@ -4536,7 +4535,7 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
         artifact = RunArtifactStore(tmp_path / "runs").load(refusal["run_id"])
         assert artifact is not None
         assert artifact["execution_status"] == "refused"
-        assert len(artifact["timesteps"]) == 42
+        assert len(artifact["timesteps"]) == 43
         assert artifact["failure"] == {
             "reason": refusal["reason"],
             "error_message": refusal["reason"],

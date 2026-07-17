@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.4.0",
+  "schema_version": "1.5.0",
   "run_metadata": {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "feedstock_id": "ci_carbonaceous_chondrite",
     "campaign": "C2B",
     "hours_requested": 12,
@@ -104,6 +104,7 @@
       }
     },
     "kernel_commit_sha": "goal-18-fixture",
+    "campaigns_elapsed": 1.12,
     "backend_status": "unavailable",
     "backend_authoritative": false,
     "evidence_class": "internal-analytical",
@@ -162,70 +163,70 @@
       "transition_balance_max_abs": 0.0,
       "product_costs": {
         "terminal.product:CO2": {
-          "quantity_kg": 119.52048180475606,
+          "quantity_kg": 77.32807787577242,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 1601.484718486691,
-            "furnace_h": 4.1797852498673915,
+            "thermal_flux_h": 1181.4038735606853,
+            "furnace_h": 3.0833978169403244,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 1643.2825709853648
+          "owner_ratify_money_projection": 1212.2378517300886
         },
         "terminal.product:CaCO3": {
           "quantity_kg": 0.007531238486095049,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 0.1009129411514815,
-            "furnace_h": 0.0002633771137974201,
+            "thermal_flux_h": 0.11506084936542368,
+            "furnace_h": 0.00030030236034300843,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 0.1035467122894557
+          "owner_ratify_money_projection": 0.11806387296885376
         },
         "terminal.product:H2O": {
           "quantity_kg": 181.71535447096545,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 2434.8493154088264,
-            "furnace_h": 6.354820084585219,
+            "thermal_flux_h": 2776.2131111332396,
+            "furnace_h": 7.245760436208377,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 2498.3975162546785
+          "owner_ratify_money_projection": 2848.6707154953233
         },
         "terminal.product:N2": {
           "quantity_kg": 1.9950124688279303,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 26.73166919823443,
-            "furnace_h": 0.06976815659202514,
+            "thermal_flux_h": 30.479426402678314,
+            "furnace_h": 0.07954959259474961,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 27.429350764154684
+          "owner_ratify_money_projection": 31.27492232862581
         },
         "terminal.product:Na2CO3": {
           "quantity_kg": 3.042543994524749e-11,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 4.076780514083358e-10,
-            "furnace_h": 1.0640168378137433e-12,
+            "thermal_flux_h": 4.648341662371153e-10,
+            "furnace_h": 1.21319109027043e-12,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 4.1831821978647324e-10
+          "owner_ratify_money_projection": 4.769660771398196e-10
         },
         "terminal.product:S": {
           "quantity_kg": 39.900249376558605,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 534.6333839646886,
-            "furnace_h": 1.3953631318405026,
+            "thermal_flux_h": 609.5885280535663,
+            "furnace_h": 1.5909918518949921,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 548.5870152830936
+          "owner_ratify_money_projection": 625.4984465725162
         }
       },
       "active_inventory_costs": {},
@@ -356,10 +357,13 @@
       "NiO": 206.36185511326167,
       "SiO2": 4617.710834737149
     },
+    "process.solid_char_carbon": {
+      "C": 958.7221688514541
+    },
     "process.stage0_volatile_feed": {},
     "reservoir.stage0_oxidant": {},
     "terminal.offgas": {
-      "CO2": 2715.819078023951,
+      "CO2": 1757.096909172497,
       "H2O": 10086.89172750294,
       "N2": 71.21483789633506
     },
@@ -547,79 +551,79 @@
     },
     "pipe_m_avg_fallback": {
       "engaged": true,
-      "total_count": 36,
+      "total_count": 48,
       "by_hour": [
         {
           "campaign": "C2B",
           "hour": 0,
           "campaign_hour": 0,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C2B",
           "hour": 1,
           "campaign_hour": 1,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C2B",
           "hour": 2,
           "campaign_hour": 2,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C2B",
           "hour": 3,
           "campaign_hour": 3,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C2B",
           "hour": 4,
           "campaign_hour": 4,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C2B",
           "hour": 5,
           "campaign_hour": 5,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C2B",
           "hour": 6,
           "campaign_hour": 6,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C2B",
           "hour": 7,
           "campaign_hour": 7,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C2B",
           "hour": 8,
           "campaign_hour": 8,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C3_K",
           "hour": 9,
           "campaign_hour": 0,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C3_K",
           "hour": 10,
           "campaign_hour": 1,
-          "count": 3
+          "count": 4
         },
         {
           "campaign": "C3_K",
           "hour": 11,
           "campaign_hour": 2,
-          "count": 3
+          "count": 4
         }
       ]
     }
