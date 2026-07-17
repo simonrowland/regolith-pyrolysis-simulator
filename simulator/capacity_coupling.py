@@ -341,6 +341,7 @@ def solve_capacity_shadow(
         )
         bleed_controls = dict(controls)
         bleed_controls["p_total_bar"] = total_pressure_Pa / 100000.0
+        bleed_controls["bleed_conductance_kg_s"] = bleed_conductance_kg_s
         if controlled_flow:
             positive_source_kg_hr = sum(
                 max(0.0, source_mol_hr.get(species, 0.0))

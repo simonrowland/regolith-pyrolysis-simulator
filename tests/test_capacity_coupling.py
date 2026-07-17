@@ -11,6 +11,7 @@ import yaml
 
 import simulator.capacity_coupling as capacity_coupling
 from engines.builtin.overhead_bleed import (
+    BuiltinOverheadBleedProvider,
     compressible_pressure_capacity_fraction,
 )
 from simulator.accounting import resolve_species_formula
@@ -601,7 +602,7 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
     )
 
     assert captured == [expected]
-    assert captured[0]["overhead_pressure_pa"] == pytest.approx(1200.0)
+    assert captured[0]["overhead_pressure_pa"] == pytest.approx(500.0)
 
 
 def test_no_cold_train_reuses_head_bleed_without_evaluating_shadow_flux():
@@ -921,6 +922,18 @@ def test_pipe_saturation_uses_executable_pressure_ratio_capacity(
         M_N2 / executable_capacity if executable_capacity > 0.0 else math.inf
     )
     assert result.saturation.pipe == pytest.approx(expected)
+    provider_bled = BuiltinOverheadBleedProvider._bled_species_mol(
+        {"N2": 1.0},
+        total_mol=1.0,
+        total_kg=M_N2,
+        controls={
+            "bleed_conductance_kg_s": conductance,
+            "p_total_bar": total_pressure_Pa / 100000.0,
+            "p_downstream_bar": downstream_pressure_Pa / 100000.0,
+            "dt_hr": 1.0,
+        },
+    )
+    assert result.bled_species_mol == pytest.approx(provider_bled)
 
 
 def test_picard_source_includes_stoichiometric_oxide_vapor_oxygen():
@@ -1010,6 +1023,8 @@ def test_overhead_model_leaves_provider_partition_mirrors_unset(
 ):
     sim = _real_capacity_sim()
     sim.overhead_model._finite_headspace_enabled = finite_headspace_enabled
+    if finite_headspace_enabled:
+        sim.overhead_model._headspace_volume_m3 = 1.0
 
     gas = sim.overhead_model.update(
         EvaporationFlux(),

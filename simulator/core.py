@@ -54,6 +54,7 @@ from simulator.account_ids import (
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+    OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
     METAL_PHASE_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
@@ -369,6 +370,9 @@ FLOW_MASS_ACCOUNTS = (
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
     OXYGEN_MRE_ANODE_ACCOUNT,
     OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+    OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
+    'terminal.stage0_residual_carbonate_carbon',
+    'terminal.stage0_residual_refractory_carbon',
 )
 FLOW_MASS_EXCLUDED_ACCOUNTS = (
     'process.stage0_carbonate_feed',
@@ -2746,13 +2750,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return bool(self._freeze_gate_config.get('enabled', False))
 
     def _headspace_volume_m3(self) -> float:
+        from simulator.overhead import (
+            OverheadConfigurationError,
+            _required_positive_finite_float,
+        )
+
+        if not self._overhead_headspace_enabled():
+            return 0.0
         configured = self._overhead_headspace_config.get('volume_m3')
         if configured is not None:
-            return max(0.0, float(configured))
+            return _required_positive_finite_float(
+                configured,
+                'headspace.volume_m3',
+            )
+        if self._equipment is None:
+            self._get_turbine_spec()
         equipment = self._equipment
         if equipment is not None:
-            return max(0.0, float(getattr(equipment, 'headspace_volume_m3', 0.0)))
-        return 0.085
+            equipment_volume = getattr(equipment, 'headspace_volume_m3', None)
+            if equipment_volume is not None:
+                return _required_positive_finite_float(
+                    equipment_volume,
+                    'equipment.headspace_volume_m3',
+                )
+        raise OverheadConfigurationError(
+            'finite headspace requires a positive configured volume_m3'
+        )
 
     def _headspace_temperature_K(self) -> float:
         melt_T_K = float(self.melt.temperature_C) + 273.15
@@ -2765,6 +2788,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if model == 'lumped':
             return max(1.0, melt_T_K - 100.0)
         return max(1.0, melt_T_K)
+
+    def _melt_headspace_total_pressure_bar(self) -> float:
+        partial_sum_mbar = sum(
+            max(0.0, float(value))
+            for value in self._melt_headspace_composition_mbar.values()
+        )
+        commanded_mbar = max(
+            0.0,
+            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0),
+        )
+        return max(partial_sum_mbar, commanded_mbar) / 1000.0
 
     @staticmethod
     def _normalize_condensation_carrier_gas(
@@ -3251,11 +3285,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return 0.0
 
     def _headspace_ledger_pO2_bar_from_o2_mol(self, o2_mol: float) -> float:
+        o2 = max(0.0, float(o2_mol))
+        if o2 <= 0.0:
+            # pO2 = n R T / (V 1e5) is identically 0 at n = 0 for any V, so do
+            # not query the headspace volume: the typed-refusal resolver may
+            # lazily auto-design equipment, and triggering that mid-load
+            # (before melt geometry exists) caches a degenerate crucible.
+            return 0.0
         volume_m3 = self._headspace_volume_m3()
         T_head_K = self._headspace_temperature_K()
         if volume_m3 <= 0.0 or T_head_K <= 0.0:
             return 0.0
-        return max(0.0, float(o2_mol)) * GAS_CONSTANT * T_head_K / (
+        return o2 * GAS_CONSTANT * T_head_K / (
             volume_m3 * 1.0e5
         )
 
@@ -3322,17 +3363,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         total_mol * GAS_CONSTANT * T_head_K
                         / (volume_m3 * 1.0e5)
                     )
-                p_downstream_bar = self._headspace_downstream_pressure_bar()
                 from engines.builtin.overhead_bleed import (
                     compressible_pressure_capacity_fraction,
                 )
-                # DERIVATION: conductance is the kg/s capacity at P1 against
-                # vacuum. The shared compressible-Poiseuille helper supplies
-                # the finite-P2 capacity fraction; fraction * C * seconds is kg.
                 pressure_capacity_fraction = (
                     compressible_pressure_capacity_fraction(
                         p_total_bar,
-                        p_downstream_bar,
+                        self._headspace_downstream_pressure_bar(),
                     )
                 )
                 bleed_kg = (
@@ -5993,7 +6030,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         )
         pressure_bar = floor_vacuum_pressure_bar(
-            float(self.overhead.pressure_mbar) * 1.0e-3,
+            self._melt_headspace_total_pressure_bar(),
             floor_bar=self._vacuum_floor_bar(),
         )
         log_iw = (
@@ -6278,7 +6315,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             float(pressure_bar)
             if pressure_bar is not None
             else floor_vacuum_pressure_bar(
-                float(self.overhead.pressure_mbar) * 1.0e-3,
+                self._melt_headspace_total_pressure_bar(),
                 floor_bar=self._vacuum_floor_bar(),
             )
         )
@@ -6465,16 +6502,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         pressure_source = 'melt.p_total_mbar'
         if overhead_pressure_mbar <= 0.0:
-            overhead_pressure_mbar = float(
-                getattr(self.overhead, 'pressure_mbar', 0.0) or 0.0
+            overhead_pressure_mbar = sum(
+                max(0.0, float(value))
+                for value in self._melt_headspace_composition_mbar.values()
             )
-            pressure_source = 'overhead.pressure_mbar'
+            pressure_source = '_melt_headspace_composition_mbar'
         overhead_pressure_pa = max(0.0, overhead_pressure_mbar) * 100.0
-        P_bulk_Pa = max(
-            0.0,
-            float(getattr(self.overhead, 'composition', {}).get('Fe', 0.0) or 0.0)
-            * 100.0,
-        )
+        P_bulk_Pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Fe'))
         gas_temperature_K = float(
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
         )
@@ -11167,6 +11201,75 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     # THE CORE LOOP
     # ------------------------------------------------------------------
 
+    def _snapshot_terminal_refusal_hour_state(
+        self,
+    ) -> tuple[Dict[str, Any], Any, Optional[Dict[str, Any]]]:
+        preserved_names = {
+            'backend',
+            '_sulfsat_gate',
+            '_base_species_formula_registry',
+            'species_formula_registry',
+            '_chem_registry',
+            'atom_ledger',
+            '_chem_kernel',
+            'cost_ledger',
+        }
+        memo = {id(self): self}
+        state = {
+            name: copy.deepcopy(value, memo)
+            for name, value in self.__dict__.items()
+            if name not in preserved_names
+        }
+        ledger = copy.copy(self.atom_ledger)
+        ledger._balances = copy.deepcopy(self.atom_ledger._balances)
+        ledger._policies = dict(self.atom_ledger._policies)
+        ledger._transitions = list(self.atom_ledger._transitions)
+        ledger._terminal_debit_authorized_transition_ids = set(
+            self.atom_ledger._terminal_debit_authorized_transition_ids
+        )
+        ledger._external_loads = list(self.atom_ledger._external_loads)
+        cost_state = None
+        if hasattr(self, 'cost_ledger'):
+            cost_state = {
+                name: (
+                    value
+                    if name == 'import_context'
+                    else list(value)
+                    if isinstance(value, list)
+                    else copy.deepcopy(value)
+                )
+                for name, value in self.cost_ledger.__dict__.items()
+            }
+        return state, ledger, cost_state
+
+    def _restore_terminal_refusal_hour_state(
+        self,
+        state: Mapping[str, Any],
+        ledger: Any,
+        cost_state: Optional[Mapping[str, Any]],
+    ) -> None:
+        preserved_names = {
+            'backend',
+            '_sulfsat_gate',
+            '_base_species_formula_registry',
+            'species_formula_registry',
+            '_chem_registry',
+            'cost_ledger',
+        }
+        preserved = {
+            name: self.__dict__[name]
+            for name in preserved_names
+            if name in self.__dict__
+        }
+        self.__dict__.clear()
+        self.__dict__.update(preserved)
+        self.__dict__.update(state)
+        self.atom_ledger = ledger
+        if cost_state is not None:
+            self.cost_ledger.__dict__.clear()
+            self.cost_ledger.__dict__.update(cost_state)
+        self._chem_kernel = self._build_chemistry_kernel()
+
     def step(self) -> HourSnapshot:
         """Advance one hour, refusing replay after a partial commit."""
         poisoned = self._poisoned_hour
@@ -11179,6 +11282,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # transitions can poison unchanged balances.
         attempt_hour = int(self.melt.hour)
         transition_count_before = len(self.atom_ledger.transitions)
+        (
+            terminal_refusal_state,
+            terminal_refusal_ledger,
+            terminal_refusal_cost_state,
+        ) = (
+            self._snapshot_terminal_refusal_hour_state()
+        )
         try:
             return self._step_one_hour()
         except BaseException as exc:
@@ -11187,7 +11297,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 0,
                 len(self.atom_ledger.transitions) - transition_count_before,
             )
-            if committed_transition_count:
+            terminal_refusal = bool(
+                getattr(type(exc), 'terminal_refusal', False)
+            )
+            if terminal_refusal:
+                self._restore_terminal_refusal_hour_state(
+                    terminal_refusal_state,
+                    terminal_refusal_ledger,
+                    terminal_refusal_cost_state,
+                )
+            elif committed_transition_count:
                 # AtomLedger is append-only. Whole-hour rollback would require
                 # compensating transitions and is a separate design change.
                 self._poisoned_hour = PoisonedHourState(
@@ -11623,6 +11742,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._stamp_redox_source_context_for_current_state(force=True)
         snapshot = self._make_snapshot()
         snapshot.evap_flux = evap_flux
+        snapshot.melt_headspace_composition_mbar = dict(
+            self._melt_headspace_composition_mbar
+        )
         snapshot.evap_plane_selectivity = evap_plane_selectivity
         snapshot.partial_melt_offgassing_diagnostic = dict(
             self._last_partial_melt_offgassing_diagnostic
@@ -11759,12 +11881,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # Estimate current volatiles offgas rate from evaporation
                 # Na, K, H₂O, S, Cl species are volatiles
                 volatile_species = {'Na', 'K'}  # Main C0 volatiles
-                vol_rate = sum(
-                    self.overhead.composition.get(sp, 0.0) * 100.0  # rough mass proxy
-                    for sp in volatile_species
-                )
-                # Better estimate: use the actual evap flux if available
-                # (from the previous hour's snapshot)
+                vol_rate = 0.0
                 if self.record.snapshots:
                     last = self.record.snapshots[-1]
                     vol_rate = sum(

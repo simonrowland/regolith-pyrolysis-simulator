@@ -1376,6 +1376,13 @@ def _trace_with_optimizer_coating_report(
         output_status=output_status,
         status_reason=status_reason,
     )
+    if threshold_parametric:
+        report.update(
+            coating_constraint_mode="no_unqualified_deposition",
+            unqualified_deposition_rate_kg_per_campaign=float(
+                runner_report.get("wall_deposit_kg_per_campaign", 0.0) or 0.0
+            ),
+        )
     if not authoritative:
         report.update(
             authoritative=False,

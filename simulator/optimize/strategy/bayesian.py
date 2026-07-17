@@ -446,7 +446,19 @@ def _constraint_values(scored: "ScoredResult") -> tuple[tuple[str, ...], tuple[f
             if math.isnan(numeric_margin):
                 raise ValueError(f"constraint margin {name!r} is not finite")
             names.append(str(name))
-            if has_feasible_flag:
+            status_payload = getattr(raw_margin, "status_payload", {}) or {}
+            continuous = (
+                isinstance(status_payload, Mapping)
+                and status_payload.get("constraint_mode") == "continuous"
+            )
+            if continuous:
+                values.append(
+                    _constraint_violation_from_margin(
+                        numeric_margin,
+                        infeasible_flag=False,
+                    )
+                )
+            elif has_feasible_flag:
                 if bool(getattr(raw_margin, "feasible")):
                     values.append(0.0)
                 else:

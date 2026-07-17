@@ -2756,7 +2756,7 @@ class CondensationModel:
             pipe_segments=self.pipe_segments,
             carrier_gas=carrier_gas,
         )
-        if current.get('status') != 'refused':
+        if current.get('regime') != KnudsenRegime.FREE_MOLECULAR.value:
             prior = self.last_knudsen_pressure_adjustment
             if (
                     prior.get('status') == 'applied'
@@ -2804,15 +2804,14 @@ class CondensationModel:
         }
         if applied_pN2_mbar > band_max:
             diagnostic.update({
-                'status': 'refused',
-                'reason': 'c2a_knudsen_pressure_window_empty',
-                'reason_refused': KNUDSEN_REFUSAL_REASON,
+                'status': 'warning',
+                'reason': 'c2a_knudsen_pressure_window_continuous_transport',
                 'required_pN2_mbar': applied_pN2_mbar,
+                'band_max_pN2_mbar': band_max,
+                'band_max_p_total_mbar': pO2 + band_max,
             })
             self.last_knudsen_pressure_adjustment = dict(diagnostic)
-            refusal = dict(current)
-            refusal['pressure_adjustment'] = dict(diagnostic)
-            raise KnudsenRegimeRefusal(refusal)
+            return diagnostic
 
         diagnostic.update({
             'applied_pN2_mbar': applied_pN2_mbar,
@@ -4742,11 +4741,11 @@ def knudsen_regime_diagnostic(
     status = 'ok'
     reason = ''
     if worst_regime is KnudsenRegime.FREE_MOLECULAR:
-        status = 'refused'
+        status = 'warning'
         reason = KNUDSEN_REFUSAL_REASON
         warnings.append(
-            'Knudsen number is outside viscous-flow validity; '
-            'condensation routing refused.'
+            'Knudsen number is outside viscous-flow validity; continuous '
+            'free-molecular surface transport applied.'
         )
     elif worst_regime is KnudsenRegime.TRANSITIONAL:
         status = 'warning'

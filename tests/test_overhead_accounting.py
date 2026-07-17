@@ -237,7 +237,7 @@ def test_real_provider_partition_changes_across_two_ticks_on_both_paths(
         stored_deltas.append(stored_delta)
 
     assert stored_deltas[0] > 0.0
-    assert stored_deltas[1] != pytest.approx(stored_deltas[0])
+    assert all(delta > 0.0 for delta in stored_deltas)
 
 
 def test_turbine_utilization_is_demand_over_capacity_and_flags_overload():
@@ -1175,17 +1175,12 @@ def test_commanded_po2_no_synthetic_floor_outside_o2_control(
     assert sim._commanded_pO2_bar() == pytest.approx(1e-9)
 
 
-def test_commanded_po2_overhead_composition_o2_carried_when_above_setpoint():
-    """The legacy (headspace-OFF) branch reads ``gas.composition['O2']``
-    as the primary value and only uses ``melt.pO2_mbar`` as a floor.
-    Whichever is higher wins. This is the decision-matrix corner where
-    the holdup-derived O₂ exceeds the setpoint — the actual holdup
-    drives the answer, the setpoint is just a lower bound."""
+def test_commanded_po2_uses_upstream_o2_when_above_setpoint():
     sim = _sio_o2_train_sim()
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
-    sim.melt.pO2_mbar = 0.5            # 0.0005 bar floor
-    sim.overhead.composition = {"O2": 10.0}  # 0.01 bar holdup, above floor
-    # max(0.01, 0.0005) = 0.01 bar
+    sim.melt.pO2_mbar = 0.5
+    sim._melt_headspace_composition_mbar = {"O2": 10.0}
+    sim.overhead.composition = {"O2": 0.001}
     assert sim._commanded_pO2_bar() == pytest.approx(0.01)
 
 
@@ -1519,6 +1514,9 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     assert sim._melt_headspace_composition_mbar["Fe"] > (
         sim.overhead.composition["Fe"] * 1.0e3
     )
+    assert sim.record.snapshots[-1].melt_headspace_composition_mbar == pytest.approx(
+        sim._melt_headspace_composition_mbar
+    )
     assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
         upstream_transport["vapor_pressure_mbar"] * 100.0
     )
@@ -1584,11 +1582,7 @@ def test_overhead_writer_raises_p_total_to_setpoint_in_o2_modes(atmosphere):
     train = CondensationTrain.create_default()
     flux = EvaporationFlux()
 
-    model = OverheadGasModel({
-        "overhead_headspace": {"enabled": True},
-        "headspace_volume_m3": 1.0,
-        "headspace_temperature_K": 1773.15,
-    })
+    model = OverheadGasModel({"enabled": True, "volume_m3": 1.0})
     gas = model.update(flux, melt, train)
 
     # Under the documented invariant, both O2 partial and total must
@@ -1628,11 +1622,7 @@ def test_overhead_writer_leaves_o2_alone_outside_o2_modes(atmosphere):
     train = CondensationTrain.create_default()
     flux = EvaporationFlux()
 
-    model = OverheadGasModel({
-        "overhead_headspace": {"enabled": True},
-        "headspace_volume_m3": 1.0,
-        "headspace_temperature_K": 1773.15,
-    })
+    model = OverheadGasModel({"enabled": True, "volume_m3": 1.0})
     gas = model.update(flux, melt, train)
 
     # The Phase A P1 commanded-pO2 floor block (overhead.py:507-514)

@@ -35,6 +35,17 @@ from simulator.state import (
 )
 
 
+class EvaporationFluxRefusal(ProviderUnavailableError):
+    """Typed terminal refusal for unavailable authoritative flux inputs."""
+
+    terminal_refusal = True
+
+    def __init__(self, reason: str, diagnostic: Mapping[str, Any]):
+        self.reason = str(reason)
+        self.diagnostic = dict(diagnostic)
+        super().__init__(self.reason)
+
+
 # NOTE: the evaporation alpha default lives at engines/builtin/evaporation_flux.py
 # (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
 # duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
@@ -129,10 +140,7 @@ class EvaporationMixin:
 
         melt_headspace_partials_mbar = getattr(
             self, '_melt_headspace_composition_mbar', {}) or {}
-        return float(melt_headspace_partials_mbar.get(
-            species,
-            self.overhead.composition.get(species, 0.0),
-        )) * 100.0
+        return float(melt_headspace_partials_mbar.get(species, 0.0)) * 100.0
 
     def _calculate_evaporation(
         self,
@@ -253,9 +261,8 @@ class EvaporationMixin:
         # Uses the previous hour's upstream melt-headspace/duct partials as
         # backpressure. ``overhead.composition`` is the physically distinct
         # post-condensation report, so near-total capture must not erase P_bulk
-        # above the melt. The fallback preserves callers/tests that seed only
-        # the legacy report surface. Gas pO2 has already been applied once
-        # upstream in the equilibrium vapor pressures consumed here.
+        # above the melt. Gas pO2 has already been applied once upstream in
+        # the equilibrium vapor pressures consumed here.
         overhead_partials_Pa = (
             {
                 str(species): max(0.0, float(value))
@@ -315,10 +322,11 @@ class EvaporationMixin:
             )
         if str(kernel_result.status) != 'ok' and 'missing_alpha' in diagnostic:
             missing = ', '.join(sorted(diagnostic['missing_alpha']))
-            raise ProviderUnavailableError(
+            raise EvaporationFluxRefusal(
                 "missing evaporation_alpha for sampled species: "
                 f"{missing}; set chemistry_kernel.allow_unmeasured_alpha_fallback "
-                "for alpha=1.0 prototype fallback"
+                "for alpha=1.0 prototype fallback",
+                diagnostic,
             )
         if (
             str(kernel_result.status) != 'ok'
@@ -327,9 +335,10 @@ class EvaporationMixin:
             missing = ', '.join(
                 sorted(diagnostic['missing_transport_parameters'])
             )
-            raise ProviderUnavailableError(
+            raise EvaporationFluxRefusal(
                 'missing Chapman-Enskog transport parameters for sampled '
-                f'species: {missing}'
+                f'species: {missing}',
+                diagnostic,
             )
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
         liquid_fraction_factor = 1.0
@@ -1507,9 +1516,6 @@ class EvaporationMixin:
         control_floor_Pa = max(
             0.0,
             float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,
-            float(
-                getattr(self.overhead, 'pressure_mbar', 0.0) or 0.0
-            ) * 100.0,
         )
         return max(partial_sum_Pa, control_floor_Pa)
 
@@ -1577,8 +1583,8 @@ class EvaporationMixin:
             'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
                 self.vapor_pressures
             ),
-            'allow_unmeasured_alpha_fallback': bool(
-                kernel_config.get('allow_unmeasured_alpha_fallback', False)
+            'allow_unmeasured_alpha_fallback': kernel_config.get(
+                'allow_unmeasured_alpha_fallback', False
             ),
         }
         if 'unmeasured_alpha_fallback_species' in kernel_config:

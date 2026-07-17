@@ -376,15 +376,15 @@ def test_authoritative_bad_coating_fails_grounded_campaign_gate() -> None:
     result = constraints.evaluate(trace)
     coating = result.margins["coating"]
 
-    assert not result.feasible
-    assert result.failing_gates == ("coating",)
-    assert not coating.feasible
+    assert result.feasible
+    assert result.failing_gates == ()
+    assert coating.feasible
     assert coating.authoritative is True
     assert coating.status == "available"
     assert coating.observed == pytest.approx(0.2)
     assert coating.threshold.value == pytest.approx(10.0)
     assert (
-        "fail-closed: grounded coating criterion "
+        "continuous constraint exceeded: grounded coating criterion "
         "campaigns_to_resinter=0.2 < 10"
     ) in coating.detail
 
@@ -402,8 +402,8 @@ def test_runner_fouling_report_binds_authoritative_coating_gate() -> None:
 
     result = PhysicsConstraintSet().evaluate(trace)
 
-    assert not result.feasible
-    assert result.failing_gates == ("coating",)
+    assert result.feasible
+    assert result.failing_gates == ()
     assert result.margins["coating"].observed == pytest.approx(9.5)
 
 
@@ -770,7 +770,7 @@ def test_knudsen_viscous_global_only_summary_fails_closed() -> None:
     assert "fail-closed" in margin.detail
 
 
-def test_knudsen_viscous_bad_segment_is_infeasible() -> None:
+def test_knudsen_nonviscous_segment_is_finite_continuous_constraint() -> None:
     trace = _valid_trace_object(
         snapshots=(
             _kn_snapshot(
@@ -792,8 +792,9 @@ def test_knudsen_viscous_bad_segment_is_infeasible() -> None:
 
     margin = PhysicsConstraintSet().knudsen_viscous(trace)
 
-    assert not margin.feasible
+    assert margin.feasible
     assert margin.margin < 0.0
+    assert math.isfinite(margin.margin)
 
 
 def test_extraction_completeness_counts_cr2o3_as_two_cr_equivalent_mol() -> None:

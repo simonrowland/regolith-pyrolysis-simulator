@@ -20,6 +20,11 @@ OXYGEN_SINK_CHANNEL_MODE_VALUES: tuple[str, ...] = tuple(
     mode.value for mode in OxygenSinkChannelMode
 )
 
+_AUTHORITY_OPT_IN_BOOL_KEYS = (
+    "allow_fallback_vapor",
+    "allow_unmeasured_alpha_fallback",
+)
+
 
 def normalize_oxygen_sink_channel_mode(value: Any = None) -> OxygenSinkChannelMode:
     if value is None:
@@ -47,6 +52,9 @@ def normalize_chemistry_kernel_config(
     if not all(isinstance(key, str) for key in config):
         raise ValueError("chemistry_kernel keys must be strings")
     normalized = dict(config)
+    for key in _AUTHORITY_OPT_IN_BOOL_KEYS:
+        if key in normalized and not isinstance(normalized[key], bool):
+            raise TypeError(f"chemistry_kernel.{key} must be bool")
     if OXYGEN_SINK_CHANNEL_MODE_KEY in normalized:
         normalized[OXYGEN_SINK_CHANNEL_MODE_KEY] = normalize_oxygen_sink_channel_mode(
             normalized[OXYGEN_SINK_CHANNEL_MODE_KEY]

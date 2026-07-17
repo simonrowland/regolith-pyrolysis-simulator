@@ -645,7 +645,7 @@ def test_knudsen_regime_factor_rises_toward_ballistic():
     assert condensation_module._knudsen_regime_factor(ballistic_kn) > 0.99
 
 
-def test_low_pressure_free_molecular_regime_refuses_condensation():
+def test_low_pressure_free_molecular_regime_routes_continuously():
     train = CondensationTrain.create_default()
     melt = MeltState()
     melt.temperature_C = 1700.0
@@ -668,10 +668,11 @@ def test_low_pressure_free_molecular_regime_refuses_condensation():
 
     assert ballistic.regime_factor > viscous.regime_factor
     assert viscous_route.knudsen_regime_diagnostic["status"] == "ok"
-    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
-        ballistic.route(flux, melt)
-    assert exc_info.value.reason == "knudsen_outside_viscous_flow"
-    assert exc_info.value.diagnostic["status"] == "refused"
+    ballistic_route = ballistic.route(flux, melt)
+    assert ballistic_route.knudsen_regime_diagnostic["status"] == "warning"
+    assert ballistic_route.knudsen_regime_diagnostic["reason"] == (
+        "knudsen_outside_viscous_flow"
+    )
 
 
 def test_liner_temperature_schedule_is_recipe_controllable():

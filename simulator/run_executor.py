@@ -19,6 +19,7 @@ from simulator.core import (
     PoisonedHourError,
     PyrolysisSimulator,
 )
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.pumping_cost import pumping_context_from_sim
 from simulator.session import (
     DecisionPolicy,
@@ -40,6 +41,7 @@ _TYPED_PHYSICS_REFUSALS = (
 _ALL_TYPED_PHYSICS_REFUSALS = (
     KnudsenRegimeRefusal,
     CampaignPressureSetpointRefusal,
+    EvaporationFluxRefusal,
     *_TYPED_PHYSICS_REFUSALS,
 )
 
@@ -328,7 +330,11 @@ class RunExecutor:
                     reason = "pending_decision"
                 elif sim.melt.hour < hours:
                     status = "partial"
-        except (KnudsenRegimeRefusal, CampaignPressureSetpointRefusal) as exc:
+        except (
+            KnudsenRegimeRefusal,
+            CampaignPressureSetpointRefusal,
+            EvaporationFluxRefusal,
+        ) as exc:
             failure_exc = exc
             status = "refused"
             reason = exc.reason

@@ -10,6 +10,7 @@ import yaml
 import scripts.make_recipe_db_profile as generator
 from simulator.optimize.evaluate import (
     BackendUnavailableAbort,
+    FailureCategory,
     _build_eval_inputs,
     _composition_target_constraints,
     evaluate,
@@ -66,15 +67,6 @@ SC67_CRO2_TARGET_IDS = frozenset({
     "pc-extract-na",
     "pc-extract-o2",
 })
-SC67_CRO2_MESSAGE = (
-    "ProviderUnavailableError: missing evaporation_alpha for sampled species: "
-    "CrO2; set chemistry_kernel.allow_unmeasured_alpha_fallback for alpha=1.0 "
-    "prototype fallback; PoisonedHourError: simulator hour 9 is poisoned after 1 "
-    "ledger transition(s) committed before abort (ProviderUnavailableError: missing "
-    "evaporation_alpha for sampled species: CrO2; set chemistry_kernel."
-    "allow_unmeasured_alpha_fallback for alpha=1.0 prototype fallback); retry "
-    "refused; create a fresh simulator or reload the batch"
-)
 def _setpoint_campaign_config(campaign: str) -> dict[str, object]:
     path = Path("data/setpoints.yaml")
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -610,18 +602,19 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
         )
         return
 
-    with pytest.raises(BackendUnavailableAbort) as exc_info:
-        evaluate(
-            RecipePatch({}),
-            "lunar_mare_low_ti",
-            "stub",
-            profile=profile,
-            candidate_id=f"smoke-{target_id}",
-        )
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile=profile,
+        candidate_id=f"smoke-{target_id}",
+    )
 
-    message = str(exc_info.value)
-    assert type(exc_info.value) is BackendUnavailableAbort
-    assert message == SC67_CRO2_MESSAGE
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.run_reference.status == "refused"
+    message = result.run_reference.error_message
+    assert "missing evaporation_alpha for sampled species: CrO2" in message
+    assert "PoisonedHourError" not in message
     assert "sampled species: Mn" not in message
     assert "sampled species: Cr," not in message
     assert "unknown campaign" not in message

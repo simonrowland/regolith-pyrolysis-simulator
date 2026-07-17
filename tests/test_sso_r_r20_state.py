@@ -2510,3 +2510,78 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
         100.0 * stage_3_capture["Fe_kg"] / stage_3_capture["total_kg"]
     )
     assert abs(snapshot.mass_balance_error_pct) <= 5e-12
+
+
+def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1700.0
+    sim.melt.p_total_mbar = 10.0
+    sim._melt_headspace_composition_mbar = {"Fe": 4.0}
+    sim.overhead.composition = {"Fe": 0.001}
+
+    diagnostic = sim._native_fe_partition_diagnostic(1.0)
+
+    assert diagnostic["P_bulk_Pa"] == pytest.approx(400.0)
+
+    sim._melt_headspace_composition_mbar = {"O2": 10.0}
+    diagnostic = sim._native_fe_partition_diagnostic(1.0)
+    assert diagnostic["P_bulk_Pa"] == pytest.approx(0.0)
+
+
+def test_native_fe_saturation_uses_upstream_total_pressure(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1700.0
+    sim.melt.p_total_mbar = 0.0
+    sim._melt_headspace_composition_mbar = {"N2": 5.0}
+    seen_pressure_bar = []
+
+    def capture_state(
+        _comp,
+        *,
+        fe3_over_sigma_fe,
+        T_K,
+        pressure_bar,
+        fO2_log,
+    ):
+        seen_pressure_bar.append(pressure_bar)
+        return {
+            "native_fe_saturation": False,
+            "native_fe_frac": 0.0,
+        }
+
+    monkeypatch.setattr(sim, "_native_fe_saturation_state", capture_state)
+    sim.overhead.pressure_mbar = 900.0
+    sim._compute_native_fe_saturation_extent(
+        {"FeO": 1.0},
+        fe3_over_sigma_fe=0.1,
+    )
+    sim.overhead.pressure_mbar = 0.001
+    sim._compute_native_fe_saturation_extent(
+        {"FeO": 1.0},
+        fe3_over_sigma_fe=0.1,
+    )
+
+    assert seen_pressure_bar == pytest.approx([0.005, 0.005])
+
+
+def test_c7_transport_uses_upstream_headspace_not_downstream_residual() -> None:
+    sim = _make_sim()
+    cfg = dict(sim._c7_campaign_config())
+    cfg.update(
+        active_ca_condensation_route=True,
+        dedicated_ca_condenser=True,
+        p_total_mbar=0.01,
+        ca_route_surface_area_m2=0.2,
+        hold_time_h=1.0,
+    )
+    sim._melt_headspace_composition_mbar = {"Ca": 3.0}
+    sim.overhead.composition = {"Ca": 0.001}
+
+    _extent, diagnostic = sim._c7_transport_extent_mol(
+        cfg,
+        ca_per_extent=3.0,
+    )
+
+    assert diagnostic["c7_ca_p_bulk_pa"] == pytest.approx(300.0)
