@@ -696,6 +696,8 @@ def test_vapor_pressure_scales_with_square_root_of_flux():
 
 def test_loop3_vacuum_overcapacity_exceeds_100_and_throttles_ramp():
     model = _make_model()
+    # Explicit test choice: 0.085 m³ was the former fail-open product default.
+    model.configure_headspace({"enabled": True, "volume_m3": 0.085})
     melt = MeltState()
     melt.temperature_C = 1500.0
     melt.p_total_mbar = 0.0
