@@ -192,12 +192,18 @@ class AccountingQueries:
             overhead = getattr(snapshot, "overhead", None)
             saturation_series.append(float(getattr(overhead, "transport_saturation_pct", 0.0)))
             vented_series.append(float(getattr(snapshot, "O2_vented_kg_hr", 0.0)))
+            upstream_partials_mbar = dict(
+                getattr(snapshot, "melt_headspace_composition_mbar", {}) or {}
+            )
             overhead_state_series.append({
-                "pressure_Pa": float(getattr(overhead, "pressure_mbar", 0.0)) * 100.0,
-                "temperature_K": float(getattr(overhead, "headspace_temperature_K", 0.0)),
+                "pressure_Pa": sum(
+                    max(0.0, float(value))
+                    for value in upstream_partials_mbar.values()
+                ) * 100.0,
+                "temperature_K": float(getattr(snapshot, "temperature_C", 0.0)) + 273.15,
                 "composition_mbar": {
                     str(species): float(pressure)
-                    for species, pressure in dict(getattr(overhead, "composition", {}) or {}).items()
+                    for species, pressure in upstream_partials_mbar.items()
                 },
                 "throat_diameter_m": float(getattr(overhead, "throat_diameter_m", 0.0)),
             })

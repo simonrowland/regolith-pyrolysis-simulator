@@ -79,6 +79,8 @@ _SHOMATE_O2 = (
     (100.0, 700.0, (31.32234, -20.23531, 57.86644, -36.50624, -0.007374)),
     # NIST WebBook SRD 69 Shomate coefficients, 700-2000 K.
     (700.0, 2000.0, (30.03235, 8.772972, -3.988133, 0.788313, -0.741599)),
+    # NIST WebBook SRD 69 Shomate coefficients, 2000-6000 K.
+    (2000.0, 6000.0, (20.91111, 10.72071, -2.020498, 0.146449, 9.245722)),
 )
 _MONATOMIC_SPECIES = frozenset({"Na", "K", "Mg", "Fe", "Ca", "Al", "Cr", "Mn", "Ti"})
 _PARAMETER_NAMES = frozenset({
@@ -778,7 +780,7 @@ def oxygen_cp_shomate_j_per_mol_k(temperature_K: float) -> float:
             t = temperature / 1000.0
             a, b, c, d, e = coefficients
             return a + b * t + c * t ** 2 + d * t ** 3 + e / t ** 2
-    raise ValueError("O2 Shomate Cp valid only from 100 K through 2000 K")
+    raise ValueError("O2 Shomate Cp valid only from 100 K through 6000 K")
 
 
 def oxygen_cp_j_per_mol_k(temperature_K: float, *, allow_low_temperature: bool = False) -> float:
@@ -876,7 +878,7 @@ def integrate_molar_sensible_enthalpy_j_per_mol(
     while cursor < high:
         upper = min(high, cursor + step)
         if species == "O2":
-            for boundary in (100.0, 700.0, 2000.0):
+            for boundary in (100.0, 700.0, 2000.0, 6000.0):
                 if cursor < boundary < upper:
                     upper = boundary
                     break

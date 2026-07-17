@@ -2805,7 +2805,7 @@ def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic(
     assert "runner wall-fouling" in coating.detail
 
 
-def test_runner_wall_fouling_report_binds_optimizer_candidate(
+def test_runner_wall_fouling_report_emits_continuous_optimizer_margin(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import simulator.runner as runner_module
@@ -2841,9 +2841,10 @@ def test_runner_wall_fouling_report_binds_optimizer_candidate(
         executor=FakeExecutor(_execution()),
     )
 
-    assert not result.feasible
-    assert result.failing_gates == ("coating",)
+    assert result.feasible
+    assert result.failing_gates == ()
     coating = result.feasibility_margins["coating"]
+    assert coating.margin < 0.0
     assert coating.observed == pytest.approx(9.0)
     assert coating.status_payload["campaigns_to_resinter_worst_segment"] == pytest.approx(9.0)
     assert coating.status_payload["campaigns_to_resinter_total"] == pytest.approx(12.0)

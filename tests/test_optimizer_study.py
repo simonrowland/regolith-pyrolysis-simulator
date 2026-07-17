@@ -4206,7 +4206,7 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
 
     # v4 2026-07-12: bumped when t-005 wired the body-aware sub-ambient pumping
     # hard gate; pre-wiring cached feasibility verdicts must not be served.
-    assert current_version == "physics-feasibility-v4-subambient-pumping"
+    assert current_version == "physics-feasibility-v5-continuous-transport"
     assert old_digest != new_digest
     assert old_cache_key != new_cache_key
     assert old_recipe_id == new_recipe_id

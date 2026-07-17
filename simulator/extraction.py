@@ -3004,14 +3004,7 @@ class ExtractionMixin:
                 )
             except (OverflowError, TypeError, ValueError, ZeroDivisionError):
                 p_sat_pa = 0.0
-        p_bulk_pa = max(
-            0.0,
-            self._c7_float(
-                getattr(self.overhead, 'composition', {}).get('Ca', 0.0),
-                0.0,
-            )
-            * 100.0,
-        )
+        p_bulk_pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Ca'))
         overhead_pressure_pa = max(0.0, p_total_mbar * 100.0)
         series_config = dict(
             (getattr(self, 'setpoints', {}) or {})

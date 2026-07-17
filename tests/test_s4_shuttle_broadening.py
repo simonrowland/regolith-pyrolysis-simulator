@@ -5,7 +5,9 @@ import pytest
 
 from engines.builtin.metallothermic_step import (
     BuiltinMetallothermicStepProvider,
+    REACTION_FAMILY_C3_K,
     REACTION_FAMILY_C3_NA,
+    REACTION_FAMILY_C6_MG,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.account_ids import METAL_PHASE_ACCOUNTS
@@ -250,6 +252,61 @@ def test_na_shuttle_reduces_feo_to_fe_atom_balanced(liquid_fraction):
         mol_feo_reduced
     )
     _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("family", "reagent", "oxide", "temperature_C", "extra_controls"),
+    (
+        (REACTION_FAMILY_C3_K, "K", "FeO", 800.0, {}),
+        (
+            REACTION_FAMILY_C3_NA,
+            "Na",
+            "FeO",
+            1100.0,
+            {"na_target_stage": "feo_cleanup"},
+        ),
+        (REACTION_FAMILY_C6_MG, "Mg", "Al2O3", 1400.0, {}),
+    ),
+)
+def test_metallothermic_provider_call_sites_integrate_dt_hr(
+    family: str,
+    reagent: str,
+    oxide: str,
+    temperature_C: float,
+    extra_controls: dict,
+) -> None:
+    sim = _build_provider_sim()
+    provider = BuiltinMetallothermicStepProvider()
+
+    def reagent_used_kg(dt_hr: float) -> float:
+        result = provider.dispatch(IntentRequest(
+            intent=ChemistryIntent.METALLOTHERMIC_STEP,
+            account_view=ProviderAccountView(
+                accounts={
+                    "process.cleaned_melt": {oxide: _kg_to_mol(oxide, 1000.0)},
+                    "process.metal_phase": {},
+                    "process.reagent_inventory": {},
+                    SPENT_REDUCTANT_RESIDUE_ACCOUNT: {},
+                },
+                species_formula_registry=sim.species_formula_registry,
+            ),
+            temperature_C=temperature_C,
+            pressure_bar=1.0e-6,
+            control_inputs={
+                "reaction_family": family,
+                "reagent_available_kg": 3.0,
+                "liquid_fraction": 1.0,
+                "dt_hr": dt_hr,
+                **extra_controls,
+            },
+        ))
+        assert result.transition is not None
+        mol = result.transition.debits["process.reagent_inventory"][reagent]
+        return mol * MOLAR_MASS[reagent] / 1000.0
+
+    half = reagent_used_kg(0.5)
+    full = reagent_used_kg(1.0)
+    assert 3.0 * (1.0 - (1.0 - half / 3.0) ** 2) == pytest.approx(full)
 
 
 def test_na_shuttle_spent_residue_fills_solubility_cap_across_ticks():

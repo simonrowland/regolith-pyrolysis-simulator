@@ -38,6 +38,7 @@ from simulator.cost_parameters import (
     normalize_cost_parameters,
 )
 from simulator.core import PoisonedHourError
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
@@ -1818,17 +1819,21 @@ def _start_background_loop(
                             tick_data=tick_data,
                             per_hour_summary=step_result.per_hour_summary,
                         )
-                except KnudsenRegimeRefusal as exc:
+                except (KnudsenRegimeRefusal, EvaporationFluxRefusal) as exc:
                     _safe_log(f'Simulation refused: {exc.reason}')
                     error_payload = {
                         'status': 'refused',
                         'reason': exc.reason,
                         'message': exc.reason,
-                        'knudsen_regime_diagnostic': dict(exc.diagnostic),
+                        'refusal_diagnostic': dict(exc.diagnostic),
                         'backend_status': backend_status,
                         'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,
                     }
+                    if isinstance(exc, KnudsenRegimeRefusal):
+                        error_payload['knudsen_regime_diagnostic'] = dict(
+                            exc.diagnostic
+                        )
                     artifact = persist_terminal(
                         session,
                         status='refused',

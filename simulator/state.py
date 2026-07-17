@@ -985,6 +985,7 @@ class HourSnapshot:
 
     # Evaporation
     evap_flux: EvaporationFlux = field(default_factory=EvaporationFlux)
+    melt_headspace_composition_mbar: Dict[str, float] = field(default_factory=dict)
 
     # Overhead
     overhead: OverheadGas = field(default_factory=OverheadGas)

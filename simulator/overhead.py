@@ -540,8 +540,16 @@ class OverheadGasModel:
     def configure_headspace(self, config: Mapping) -> None:
         merged = dict(self.DEFAULT_HEADSPACE_CONFIG)
         merged.update(dict(config or {}))
-        self._finite_headspace_enabled = bool(merged.get('enabled', False))  # dimensionless bool — finite-headspace switch
+        enabled = merged.get('enabled', False)
+        if not isinstance(enabled, bool):
+            raise OverheadConfigurationError('headspace.enabled must be bool')
+        self._finite_headspace_enabled = enabled  # dimensionless bool — finite-headspace switch
         self._headspace_volume_m3 = merged.get('volume_m3')  # m³ or None — finite headspace volume
+        if self._headspace_volume_m3 is not None:
+            self._headspace_volume_m3 = _required_positive_finite_float(
+                self._headspace_volume_m3,
+                'headspace.volume_m3',
+            )
         self._temperature_model = str(merged.get('temperature_model') or 'melt')  # unitless — headspace temperature basis
         self._temperature_offset_K = merged.get('temperature_offset_K')  # K or None — headspace temperature offset
         self._bleed_model = str(merged.get('bleed_model') or 'poiseuille')  # unitless — bleed conductance model
@@ -1197,11 +1205,21 @@ class OverheadGasModel:
         }
 
     def _resolve_headspace_volume(self, explicit: Optional[float]) -> float:  # m³ or None — explicit volume override
+        if not self._finite_headspace_enabled:
+            return 0.0
         if explicit is not None:
-            return max(0.0, float(explicit))  # m³ — explicit finite headspace volume
+            return _required_positive_finite_float(
+                explicit,
+                'headspace.volume_m3',
+            )  # m³ — explicit finite headspace volume
         if self._headspace_volume_m3 is not None:
-            return max(0.0, float(self._headspace_volume_m3))  # m³ — configured finite headspace volume
-        return 0.085  # m³ — default finite headspace volume
+            return _required_positive_finite_float(
+                self._headspace_volume_m3,
+                'headspace.volume_m3',
+            )  # m³ — configured finite headspace volume
+        raise OverheadConfigurationError(
+            'finite headspace requires a positive configured volume_m3'
+        )
 
     def _headspace_temperature_K(self, melt: MeltState) -> float:
         melt_T_K = float(melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET  # K — melt temperature; °C -> K
