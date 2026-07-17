@@ -421,7 +421,7 @@ accumulated oxygen self-limits the extraction. Under an inert sweep cover, that 
 off through the pressure-and-conductance path, lowering the transport oxygen pressure and relieving the
 suppression.
 <!-- impl: §4.4 -> engines/builtin/evaporation_transition.py BuiltinEvaporationTransitionProvider.dispatch:262 — O2 overhead credit -->
-<!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:373 — conductance bleed -->
+<!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:475 — conductance bleed -->
 
 **How the sweep is represented, and its current limits.** The inert sweep (the 5–15 mbar pN₂ cover) enters
 the model as an *overhead pressure*, not as a commanded *flow rate*. Raising it lowers the Knudsen number

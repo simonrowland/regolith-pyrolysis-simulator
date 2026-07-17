@@ -2851,9 +2851,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         evap_flux: EvaporationFlux,
     ) -> None:
+        effective_transport_capacity = getattr(
+            self,
+            '_effective_transport_capacity_this_tick',
+            None,
+        )
+        transport_kwargs = {}
+        if effective_transport_capacity is not None:
+            transport_kwargs['effective_transport_capacity'] = (
+                effective_transport_capacity
+            )
         transport = self.overhead_model.estimate_transport_state(
             evap_flux,
             self.melt,
+            **transport_kwargs,
         )
         self.condensation_model.configure_operating_conditions(
             wall_temperature_C=transport['pipe_temperature_C'],
@@ -3054,7 +3065,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 temperatures_C
             )
 
-    def _headspace_downstream_pressure_bar(self) -> float:
+    def _headspace_downstream_pressure_bar(
+        self,
+        effective_transport_capacity=None,
+    ) -> float:
+        if effective_transport_capacity is not None:
+            return effective_transport_capacity.downstream_pressure_bar
         configured = self._overhead_headspace_config.get(
             'downstream_pressure_bar')
         if configured is not None:
@@ -3068,7 +3084,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'CONTROLLED_O2_FLOW',
             'O2_BACKPRESSURE',
         }:
-            return max(0.0, float(self.melt.pO2_mbar) / 1000.0)
+            return self.overhead_model._resolve_downstream_pressure(
+                self.melt,
+                None,
+            )
         return 0.0
 
     def _sync_c2a_staged_overhead_gas_control(self) -> None:
@@ -3117,13 +3136,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if species_kg_for_M_avg is None:
             species_kg_for_M_avg = self._overhead_holdup_species_kg()
         p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
-        p_downstream_Pa = max(0.0, self._headspace_downstream_pressure_bar()) * 1.0e5
+        # This is the upstream-to-vacuum carrying limit C0. Controlled-pO2
+        # runtime passes it through the provider-owned flow-capacity result;
+        # pressure-bound modes retain the provider's finite-P2 derate.
         return max(
             0.0,
             float(self.overhead_model._pipe_conductance(
                 p_mean_Pa,
                 self.melt.temperature_C,
-                p_downstream_Pa=p_downstream_Pa,
+                p_downstream_Pa=0.0,
                 species_kg_for_M_avg=species_kg_for_M_avg,
             )),
         )
@@ -5538,11 +5559,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return NoColdTrain("runtime_enforcement_disabled"), params.cold_train
         return capacity_from_hardware(params.cold_train), params.cold_train
 
+    def _controlled_o2_transport_capacity(self, evap_flux, *, dt_hr=1.0):
+        """Build the live controlled-flow boundary through canonical policy."""
+
+        capacity, _cold_train = self._cold_train_capacity_policy()
+        retained_holdup_kg = sum(
+            max(0.0, float(mass_kg))
+            for mass_kg in self._overhead_holdup_species_kg().values()
+        )
+        return self.overhead_model.controlled_o2_transport_capacity(
+            evap_flux,
+            self.melt,
+            cold_train_capacity=capacity,
+            retained_holdup_kg=retained_holdup_kg,
+            dt_hr=dt_hr,
+        )
+
     def _dispatch_overhead_bleed(
         self,
         *,
         force_drain_all: bool = False,
         capacity_result=None,
+        effective_transport_capacity=None,
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
@@ -5553,7 +5591,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'headspace_volume_m3': self._headspace_volume_m3(),
             'headspace_temperature_K': self._headspace_temperature_K(),
             'bleed_conductance_kg_s': (
-                self._headspace_bleed_conductance_kg_s(
+                effective_transport_capacity.pipe_capacity_kg_hr / 3600.0
+                if effective_transport_capacity is not None
+                else self._headspace_bleed_conductance_kg_s(
                     species_kg_for_M_avg=species_kg_for_M_avg,
                 )
             ),
@@ -5561,7 +5601,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'p_downstream_bar': (
                 configured_downstream_pressure_bar
                 if configured_downstream_pressure_bar is not None
-                else self._headspace_downstream_pressure_bar()
+                else self._headspace_downstream_pressure_bar(
+                    effective_transport_capacity
+                )
             ),
             'dt_hr': 1.0,
             'force_drain_all': bool(force_drain_all),
@@ -5571,6 +5613,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 0.0,
             ),
         }
+        if effective_transport_capacity is not None:
+            controls['effective_transport_capacity'] = (
+                effective_transport_capacity
+            )
         from simulator.thermal_train import FiniteCapacity
 
         capacity, cold_train = self._cold_train_capacity_policy()
@@ -5872,6 +5918,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 thermal_train_parameters_from_mapping().cavern_capacity_kg
                 if accumulator_enabled
                 else 0.0
+            ),
+            controlled_flow=(
+                self._overhead_headspace_config.get(
+                    'downstream_pressure_bar'
+                ) is None
+                and getattr(self.melt.atmosphere, 'name', '') in {
+                    'CONTROLLED_O2',
+                    'CONTROLLED_O2_FLOW',
+                    'O2_BACKPRESSURE',
+                }
             ),
         )
         assert self.atom_ledger.mol_by_account() == ledger_before
@@ -11362,6 +11418,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     evap_flux
                 )
         overhead_flux = evap_flux
+        effective_transport_capacity = (
+            self._controlled_o2_transport_capacity(evap_flux)
+        )
+        self._effective_transport_capacity_this_tick = (
+            effective_transport_capacity
+        )
 
         # --- 5. Condensation routing ---
         # Send evaporated species through the 8-stage train.
@@ -11403,6 +11465,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if finite_headspace_enabled:
             bleed_result = self._dispatch_overhead_bleed(
                 capacity_result=capacity_result,
+                effective_transport_capacity=effective_transport_capacity,
             )
             self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
             self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
@@ -11427,9 +11490,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             overhead_holdup_mol=self._overhead_holdup_mol(),
             existing_gas=self.overhead,
             headspace_volume_m3=self._headspace_volume_m3(),
-            p_downstream_bar=self._headspace_downstream_pressure_bar(),
+            p_downstream_bar=self._headspace_downstream_pressure_bar(
+                effective_transport_capacity
+            ),
             bleed_conductance_kg_s=(
-                self._headspace_bleed_conductance_kg_s()),
+                effective_transport_capacity.pipe_capacity_kg_hr / 3600.0
+                if effective_transport_capacity is not None
+                else self._headspace_bleed_conductance_kg_s()),
             cold_train_capacity=(
                 configured_capacity
             ),
@@ -11439,11 +11506,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # kg/hr, and near-total capture must not erase the upstream load.
             transport_inlet_kg_hr=evap_flux.total_kg_hr,
             transport_inlet_flux=evap_flux,
+            effective_transport_capacity=effective_transport_capacity,
         )
         upstream_transport = self.overhead_model.estimate_transport_state(
             evap_flux,
             self.melt,
-            p_downstream_bar=self._headspace_downstream_pressure_bar(),
+            p_downstream_bar=self._headspace_downstream_pressure_bar(
+                effective_transport_capacity
+            ),
+            effective_transport_capacity=effective_transport_capacity,
         )
         self._melt_headspace_composition_mbar = (
             self.overhead_model.species_partial_pressures(
@@ -11451,9 +11522,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 upstream_transport['vapor_pressure_mbar'],
             )
         )
-        if capacity_result is not None:
+        if capacity_result is not None and effective_transport_capacity is None:
             self.overhead.transport_saturation_pct = (
-                min(2.0, capacity_result.saturation.combined) * 100.0
+                capacity_result.saturation.combined * 100.0
             )
             self.overhead.transport_binding_cause = (
                 capacity_result.saturation.binding_cause
@@ -11653,11 +11724,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             binding_cause = getattr(
                 self.overhead, 'transport_binding_cause', 'pipe'
             )
-            saturation_label = (
-                'O2 capacity'
-                if binding_cause == 'oxygen'
-                else 'pipe'
-            )
+            if binding_cause == 'oxygen':
+                saturation_label = 'O2 capacity'
+            elif str(binding_cause).startswith('controlled_o2_'):
+                saturation_label = f'equipment incompatibility [{binding_cause}]'
+            else:
+                saturation_label = 'pipe'
             throttle_reason = (
                 f'{saturation_label} saturated (infinite)'
                 if math.isinf(sat_pct)

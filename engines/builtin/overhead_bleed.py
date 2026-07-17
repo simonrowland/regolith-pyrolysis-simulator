@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 
 from engines.builtin._common import (
     build_atom_balance_proof,
@@ -34,6 +35,107 @@ OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT = (
     "terminal.oxygen_bubbler_external_vented_to_vacuum"
 )
 OXYGEN_SPECIES = "O2"
+
+
+@dataclass(frozen=True)
+class EffectiveTransportCapacity:
+    """One-tick controlled-flow boundary shared by bleed and diagnostics."""
+
+    pipe_capacity_kg_hr: float
+    equipment_capacity_kg_hr: float | None
+    effective_capacity_kg_hr: float
+    evolved_flux_kg_hr: float
+    retained_holdup_kg: float
+    demand_flux_kg_hr: float
+    swallowed_flux_kg_hr: float
+    saturation: float
+    upstream_pressure_bar: float
+    downstream_pressure_bar: float
+    binding_cause: str
+
+
+def controlled_flow_capacity(
+    *,
+    pipe_capacity_kg_hr: float,
+    equipment_capacity_kg_hr: float | None,
+    evolved_flux_kg_hr: float,
+    retained_holdup_kg: float = 0.0,
+    dt_hr: float = 1.0,
+    equipment_capacity_required: bool = True,
+    upstream_pressure_bar: float,
+) -> EffectiveTransportCapacity:
+    """Resolve a controlled-pO2 flow boundary without prescribing suction."""
+
+    pipe_capacity = max(0.0, float(pipe_capacity_kg_hr))
+    equipment_capacity = (
+        max(0.0, float(equipment_capacity_kg_hr))
+        if equipment_capacity_kg_hr is not None
+        else 0.0
+    )
+    evolved_flux = max(0.0, float(evolved_flux_kg_hr))
+    retained_holdup = max(0.0, float(retained_holdup_kg))
+    tick_duration_hr = max(0.0, float(dt_hr))
+    upstream_pressure = max(0.0, float(upstream_pressure_bar))
+    effective_capacity = (
+        min(pipe_capacity, equipment_capacity)
+        if equipment_capacity_kg_hr is not None
+        else (0.0 if equipment_capacity_required else pipe_capacity)
+    )
+    # retained_holdup [kg] / tick_duration [hr] = the average kg/hr needed
+    # to evacuate pre-tick inventory during this tick.  Adding the live
+    # evolved source gives the full boundary demand without counting the
+    # current source twice in retained inventory.
+    holdup_drain_flux = (
+        retained_holdup / tick_duration_hr
+        if tick_duration_hr > 0.0
+        else 0.0
+    )
+    demand_flux = evolved_flux + holdup_drain_flux
+    swallowed_flux = min(demand_flux, effective_capacity)
+    saturation = (
+        demand_flux / effective_capacity
+        if effective_capacity > 0.0
+        else (math.inf if demand_flux > 0.0 else 0.0)
+    )
+
+    if equipment_capacity_kg_hr is None or equipment_capacity <= 0.0:
+        binding_cause = "controlled_o2_no_equipment"
+    elif equipment_capacity <= pipe_capacity:
+        binding_cause = "controlled_o2_equipment"
+    else:
+        binding_cause = "pipe"
+
+    if upstream_pressure <= 0.0 or pipe_capacity <= 0.0:
+        downstream_pressure = upstream_pressure
+    else:
+        # Premise: integrated compressible Poiseuille flow is
+        # C(P1,P2)=k(P1^2-P2^2), while C0=k*P1^2 is the vacuum carrying
+        # limit. Algebra gives P2=sqrt(max(P1^2-C/k,0)) =
+        # P1*sqrt(max(1-C/C0,0)). Here C is the flow the equipment can
+        # actually swallow this tick. Units: C/k is bar^2, so P2 is bar.
+        # Limits: C->0 gives P2->P1; C->C0 gives P2->0; requested C>C0
+        # has no real forward-flow solution and is reported by saturation.
+        downstream_pressure = upstream_pressure * math.sqrt(
+            max(1.0 - swallowed_flux / pipe_capacity, 0.0)
+        )
+
+    return EffectiveTransportCapacity(
+        pipe_capacity_kg_hr=pipe_capacity,
+        equipment_capacity_kg_hr=(
+            equipment_capacity
+            if equipment_capacity_kg_hr is not None
+            else None
+        ),
+        effective_capacity_kg_hr=effective_capacity,
+        evolved_flux_kg_hr=evolved_flux,
+        retained_holdup_kg=retained_holdup,
+        demand_flux_kg_hr=demand_flux,
+        swallowed_flux_kg_hr=swallowed_flux,
+        saturation=saturation,
+        upstream_pressure_bar=upstream_pressure,
+        downstream_pressure_bar=downstream_pressure,
+        binding_cause=binding_cause,
+    )
 
 
 def compressible_pressure_capacity_fraction(
@@ -385,13 +487,20 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             conductance_raw = controls.get("bleed_conductance_kg_s_per_bar")
         conductance = max(0.0, float(conductance_raw or 0.0))
         dt_hr = max(0.0, float(controls.get("dt_hr", 1.0)))
-        pressure_square_fraction = compressible_pressure_capacity_fraction(
-            controls.get("p_total_bar") or 0.0,
-            controls.get("p_downstream_bar") or 0.0,
-        )
-        bleed_kg = (
-            conductance * pressure_square_fraction * dt_hr * 3600.0
-        )
+        flow_capacity = controls.get("effective_transport_capacity")
+        if isinstance(flow_capacity, EffectiveTransportCapacity):
+            # The shared boundary already resolved the one allowed mass flow.
+            # Downstream pressure is its diagnostic inversion only; it must
+            # never be fed back into committed disposition.
+            bleed_kg = flow_capacity.swallowed_flux_kg_hr * dt_hr
+        else:
+            pressure_square_fraction = compressible_pressure_capacity_fraction(
+                controls.get("p_total_bar") or 0.0,
+                controls.get("p_downstream_bar") or 0.0,
+            )
+            bleed_kg = (
+                conductance * pressure_square_fraction * dt_hr * 3600.0
+            )
         if bleed_kg <= 0.0:
             return {}
         bleed_kg = min(total_kg, bleed_kg)

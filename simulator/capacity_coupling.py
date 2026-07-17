@@ -10,6 +10,7 @@ from types import MappingProxyType
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
     compressible_pressure_capacity_fraction,
+    controlled_flow_capacity,
 )
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
@@ -193,6 +194,7 @@ def solve_capacity_shadow(
     accumulator_enabled: bool = False,
     cistern_fill_kg: float = 0.0,
     cavern_capacity_kg: float = 0.0,
+    controlled_flow: bool = False,
     rel_tol: float = DEFAULT_REL_TOL,
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
 ) -> CapacityShadowResult | CapacityShadowRefusal:
@@ -273,6 +275,12 @@ def solve_capacity_shadow(
     final_source_mol_hr: dict[str, float] = {}
     final_evolved: dict[str, float] = {}
     final_residual: dict[str, float] = {}
+    final_flow_capacity = None
+    retained_holdup_kg = sum(
+        max(0.0, float(pre_holdup_mol.get(species, 0.0)))
+        * molar_mass_kg_mol[species]
+        for species in species_order
+    )
 
     # Premise: HK source rates depend on the pressure produced by their own
     # post-source, post-bleed residual holdup. Algebra defines the Picard map
@@ -333,6 +341,26 @@ def solve_capacity_shadow(
         )
         bleed_controls = dict(controls)
         bleed_controls["p_total_bar"] = total_pressure_Pa / 100000.0
+        if controlled_flow:
+            positive_source_kg_hr = sum(
+                max(0.0, source_mol_hr.get(species, 0.0))
+                * molar_mass_kg_mol[species]
+                for species in species_order
+            )
+            final_flow_capacity = controlled_flow_capacity(
+                pipe_capacity_kg_hr=bleed_conductance_kg_s * 3600.0,
+                equipment_capacity_kg_hr=capacity.value_kg_hr,
+                evolved_flux_kg_hr=positive_source_kg_hr,
+                retained_holdup_kg=retained_holdup_kg,
+                dt_hr=dt_hr,
+                upstream_pressure_bar=total_pressure_Pa / 100000.0,
+            )
+            bleed_controls["effective_transport_capacity"] = (
+                final_flow_capacity
+            )
+            bleed_controls["p_downstream_bar"] = (
+                final_flow_capacity.downstream_pressure_bar
+            )
         ordinary_bled = BuiltinOverheadBleedProvider._bled_species_mol(
             final_evolved,
             total_mol=total_mol,
@@ -433,27 +461,35 @@ def solve_capacity_shadow(
         if initial_plus_source_kg > 0.0
         else 0.0
     )
-    pipe_capacity_kg_hr = (
-        bleed_conductance_kg_s
-        * compressible_pressure_capacity_fraction(
-            total_pressure_Pa / 100000.0,
-            downstream_pressure_Pa / 100000.0,
-        )
-        * 3600.0
-    )
     positive_source_kg_hr = {
         species: max(0.0, source_mol_hr)
         * molar_mass_kg_mol[species]
         for species, source_mol_hr in final_source_mol_hr.items()
     }
-    saturation = combined_saturation(
-        total_evaporation_kg_hr=sum(positive_source_kg_hr.values()),
-        oxygen_evaporation_kg_hr=positive_source_kg_hr.get(
-            OXYGEN_SPECIES, 0.0
-        ),
-        pipe_capacity_kg_hr=pipe_capacity_kg_hr,
-        capacity=capacity,
-    )
+    if controlled_flow and final_flow_capacity is not None:
+        saturation = SaturationShadow(
+            final_flow_capacity.saturation,
+            None,
+            final_flow_capacity.saturation,
+            final_flow_capacity.binding_cause,
+        )
+    else:
+        pipe_capacity_kg_hr = (
+            bleed_conductance_kg_s
+            * compressible_pressure_capacity_fraction(
+                total_pressure_Pa / 100000.0,
+                downstream_pressure_Pa / 100000.0,
+            )
+            * 3600.0
+        )
+        saturation = combined_saturation(
+            total_evaporation_kg_hr=sum(positive_source_kg_hr.values()),
+            oxygen_evaporation_kg_hr=positive_source_kg_hr.get(
+                OXYGEN_SPECIES, 0.0
+            ),
+            pipe_capacity_kg_hr=pipe_capacity_kg_hr,
+            capacity=capacity,
+        )
     return CapacityShadowResult(
         capacity=capacity,
         partial_pressures_Pa=partials,

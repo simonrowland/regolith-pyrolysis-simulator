@@ -48,6 +48,10 @@ from simulator.core import (
 # Single-source the pipe-temperature default from condensation (canonical
 # pipe-defaults home; cycle-safe — condensation doesn't import overhead) [BUG-052].
 from simulator.condensation import DEFAULT_PIPE_TEMPERATURE_C  # °C — default pipe/liner temperature
+from engines.builtin.overhead_bleed import (
+    EffectiveTransportCapacity,
+    controlled_flow_capacity,
+)
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET  # K — Celsius-to-Kelvin offset
 from simulator.state import GAS_CONSTANT, MOLAR_MASS  # R: J/(mol·K); molar masses: g/mol
 
@@ -608,15 +612,19 @@ class OverheadGasModel:
         evap_flux: EvaporationFlux,
         melt: MeltState,
         p_downstream_bar: Optional[float] = None,
+        effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
     ) -> dict[str, float]:
         """Estimate pipe pressure/capacity with the existing Poiseuille model."""
 
         pipe_temperature_C = self.resolve_pipe_temperature_C(melt)  # °C — active pipe/liner wall temperature
         total_evap_kg_hr = max(0.0, float(evap_flux.total_kg_hr))  # kg/hr — total evaporation mass flow
         allowed_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)  # Pa — allowed upstream pressure; mbar -> Pa with 1 Pa floor
+        controlled_flow = effective_transport_capacity is not None
         downstream_pressure_Pa = (
-            self._resolve_downstream_pressure(melt, p_downstream_bar) * 1.0e5
-        )  # Pa — downstream/reference pressure; bar -> Pa
+            effective_transport_capacity.downstream_pressure_bar * 1.0e5
+            if controlled_flow
+            else self._resolve_downstream_pressure(melt, p_downstream_bar) * 1.0e5
+        )  # Pa — derived or explicit downstream/reference pressure; bar -> Pa
         # Preserve the existing gas-transport path: Poiseuille conductance has
         # historically used melt/gas temperature. The liner trajectory controls
         # wall deposition and Kn diagnostics without changing evaporation totals.
@@ -628,31 +636,50 @@ class OverheadGasModel:
         # ``evap_flux.species_kg_hr`` is the steady-state pipe
         # composition; the time unit cancels in the mole-fraction
         # weighting.
-        conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
-            allowed_pressure_Pa,
-            conductance_temperature_C,
-            p_downstream_Pa=downstream_pressure_Pa,
-            species_kg_for_M_avg=evap_flux.species_kg_hr,  # kg/hr by species — composition basis for M_avg
-        )
-        pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
-        if conductance > 0.0:
+        if controlled_flow:
+            pipe_conductance_kg_hr = (
+                effective_transport_capacity.effective_capacity_kg_hr
+            )
+            conductance = pipe_conductance_kg_hr / 3600.0
+            vapor_pressure_mbar = allowed_pressure_Pa / 100.0
+        else:
+            conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
+                allowed_pressure_Pa,
+                conductance_temperature_C,
+                p_downstream_Pa=downstream_pressure_Pa,
+                species_kg_for_M_avg=evap_flux.species_kg_hr,  # kg/hr by species — composition basis for M_avg
+            )
+            pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
+        if not controlled_flow and conductance > 0.0:
             vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, sqrt(Poiseuille balance)
                 total_evap_kg_hr / 3600.0,  # kg/s — evaporation mass flow
                 conductance_temperature_C,
                 p_downstream_bar=downstream_pressure_Pa / 1.0e5,
                 species_kg_for_M_avg=evap_flux.species_kg_hr,
             )
-        else:
-            vapor_pressure_mbar = 0.0  # mbar — zero pressure when pipe capacity is zero
+        elif not controlled_flow:
+            # Premise: zero forward conductance is a closed-line condition,
+            # not zero vapor pressure; evolved gas fills the upstream volume
+            # until the allowed headspace pressure is reached and backpressure
+            # suppresses the next tick's net HKL source.  Algebra is the closed
+            # boundary P_vapor=P_up.  Unit check: Pa/100=mbar.  Limits: any
+            # positive conductance uses the Poiseuille inversion above; at
+            # P_down->P_up this full-upstream state makes the following live
+            # flux (and therefore saturation) recover instead of relatching.
+            vapor_pressure_mbar = allowed_pressure_Pa / 100.0
         pressure_mbar = max(vapor_pressure_mbar, float(melt.p_total_mbar))  # mbar — reported total overhead pressure
-        if total_evap_kg_hr <= 0.0:
+        if controlled_flow:
+            pipe_capacity_used_pct = (
+                effective_transport_capacity.saturation * 100.0
+            )
+        elif total_evap_kg_hr <= 0.0:
             pipe_capacity_used_pct = 0.0
         elif pipe_conductance_kg_hr > 0.0:
             pipe_capacity_used_pct = (
                 total_evap_kg_hr / pipe_conductance_kg_hr * 100.0
             )  # percent — load / capacity at allowed upstream pressure
         else:
-            pipe_capacity_used_pct = 999.0
+            pipe_capacity_used_pct = math.inf
         return {
             'pipe_temperature_C': pipe_temperature_C,  # °C — active pipe/liner wall temperature
             'conductance_temperature_C': conductance_temperature_C,  # °C — gas temperature used for conductance
@@ -669,7 +696,64 @@ class OverheadGasModel:
             'pipe_capacity_used_pct': pipe_capacity_used_pct,  # percent — capacity used
             'vapor_pressure_mbar': vapor_pressure_mbar,  # mbar — steady-state vapor partial pressure
             'pressure_mbar': pressure_mbar,  # mbar — reported total overhead pressure
+            'p_downstream_bar': downstream_pressure_Pa / 1.0e5,
+            'transport_binding_cause': (
+                effective_transport_capacity.binding_cause
+                if controlled_flow
+                else 'pipe'
+            ),
         }
+
+    def controlled_o2_transport_capacity(
+        self,
+        evap_flux: EvaporationFlux,
+        melt: MeltState,
+        *,
+        cold_train_capacity,
+        retained_holdup_kg: float = 0.0,
+        dt_hr: float = 1.0,
+    ) -> Optional[EffectiveTransportCapacity]:
+        """Return the one-tick flow boundary for controlled-pO2 operation."""
+
+        if self._downstream_pressure_override is not None:
+            return None
+        if getattr(melt.atmosphere, 'name', '') not in {
+            'CONTROLLED_O2',
+            'CONTROLLED_O2_FLOW',
+            'O2_BACKPRESSURE',
+        }:
+            return None
+        allowed_pressure_Pa = max(float(melt.p_total_mbar) * 100.0, 1.0)
+        pipe_capacity_kg_hr = (
+            max(0.0, float(self._conductance_override)) * 3600.0
+            if self._conductance_override is not None
+            else self._pipe_conductance(
+                allowed_pressure_Pa,
+                float(melt.temperature_C),
+                p_downstream_Pa=0.0,
+                species_kg_for_M_avg=evap_flux.species_kg_hr,
+            ) * 3600.0
+        )
+        from simulator.thermal_train import FiniteCapacity, NoColdTrain
+
+        equipment_capacity = (
+            cold_train_capacity.value_kg_hr
+            if isinstance(cold_train_capacity, FiniteCapacity)
+            else None
+        )
+        equipment_capacity_required = not (
+            isinstance(cold_train_capacity, NoColdTrain)
+            and cold_train_capacity.reason == "runtime_enforcement_disabled"
+        )
+        return controlled_flow_capacity(
+            pipe_capacity_kg_hr=pipe_capacity_kg_hr,
+            equipment_capacity_kg_hr=equipment_capacity,
+            evolved_flux_kg_hr=evap_flux.total_kg_hr,
+            retained_holdup_kg=retained_holdup_kg,
+            dt_hr=dt_hr,
+            equipment_capacity_required=equipment_capacity_required,
+            upstream_pressure_bar=allowed_pressure_Pa / 1.0e5,
+        )
 
     def _resolve_liner_temperature_value(
         self,
@@ -801,6 +885,7 @@ class OverheadGasModel:
                cold_train_capacity=None,
                transport_inlet_kg_hr: Optional[float] = None,
                transport_inlet_flux: Optional[EvaporationFlux] = None,
+               effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
                ) -> OverheadGas:
         """
         Calculate overhead gas state for this hour.
@@ -849,18 +934,8 @@ class OverheadGasModel:
             upstream_flux,
             melt,
             p_downstream_bar=p_downstream_bar,
+            effective_transport_capacity=effective_transport_capacity,
         )  # mixed units — pipe transport state
-        if transport_inlet_kg_hr is not None:
-            inlet_load_kg_hr = max(0.0, float(transport_inlet_kg_hr))
-            pipe_capacity_kg_hr = transport_state['pipe_conductance_kg_hr']
-            if inlet_load_kg_hr <= 0.0:
-                transport_state['pipe_capacity_used_pct'] = 0.0
-            elif pipe_capacity_kg_hr > 0.0:
-                transport_state['pipe_capacity_used_pct'] = (
-                    inlet_load_kg_hr / pipe_capacity_kg_hr * 100.0
-                )
-            else:
-                transport_state['pipe_capacity_used_pct'] = 999.0
         conductance = transport_state['conductance_kg_s']  # kg/s — pipe mass-flow capacity
         gas.pipe_conductance_kg_hr = transport_state['pipe_conductance_kg_hr']  # kg/hr — pipe mass-flow capacity
         gas.initial_throat_area_m2 = transport_state['initial_throat_area_m2']  # m² — user-configured throat cross-section
@@ -876,8 +951,22 @@ class OverheadGasModel:
         )
         gas.bleed_conductance_kg_s = finite_conductance  # kg/s — finite-headspace bleed mass-flow capacity
         gas.bleed_conductance_kg_s_per_bar = finite_conductance  # kg/s — deprecated compatibility alias
-        gas.p_downstream_bar = self._resolve_downstream_pressure(  # bar — downstream/reference pressure
-            melt, p_downstream_bar)
+        if effective_transport_capacity is None:
+            inlet_load_kg_hr = (
+                max(0.0, float(transport_inlet_kg_hr))
+                if transport_inlet_kg_hr is not None
+                else max(0.0, float(upstream_flux.total_kg_hr))
+            )
+            pipe_capacity_kg_hr = transport_state['pipe_conductance_kg_hr']
+            if inlet_load_kg_hr <= 0.0:
+                transport_state['pipe_capacity_used_pct'] = 0.0
+            elif pipe_capacity_kg_hr > 0.0:
+                transport_state['pipe_capacity_used_pct'] = (
+                    inlet_load_kg_hr / pipe_capacity_kg_hr * 100.0
+                )
+            else:
+                transport_state['pipe_capacity_used_pct'] = math.inf
+        gas.p_downstream_bar = transport_state['p_downstream_bar']
         gas.headspace_volume_m3 = self._resolve_headspace_volume(  # m³ — finite headspace volume
             headspace_volume_m3)
         gas.headspace_temperature_K = self._headspace_temperature_K(melt)  # K — finite headspace gas temperature
@@ -886,7 +975,7 @@ class OverheadGasModel:
         # How much of the pipe capacity is being used.
         # >100% means evaporation exceeds transport → triggers ΔT/dt throttle.
         gas.transport_saturation_pct = transport_state['pipe_capacity_used_pct']  # percent — pipe capacity used
-        gas.transport_binding_cause = 'pipe'
+        gas.transport_binding_cause = transport_state['transport_binding_cause']
 
         gas.evap_exceeds_transport = gas.transport_saturation_pct > 100.0  # dimensionless bool — transport over-capacity flag
 
@@ -917,6 +1006,7 @@ class OverheadGasModel:
                 evap_flux,
                 melt,
                 p_downstream_bar=p_downstream_bar,
+                effective_transport_capacity=effective_transport_capacity,
             )
         )
         vapor_pressure_mbar = report_transport_state['vapor_pressure_mbar']  # mbar (nominal) — downstream proxy pressure
@@ -1148,7 +1238,10 @@ class OverheadGasModel:
             'CONTROLLED_O2_FLOW',
             'O2_BACKPRESSURE',
         }:
-            return max(0.0, float(melt.pO2_mbar) / 1000.0)  # bar — O2 setpoint; mbar -> bar
+            # Without a live flux there is no controlled-flow pressure drop to
+            # invert. The zero-flow diagnostic limit is P2=P1; runtime callers
+            # receive the derived value from controlled_o2_transport_capacity.
+            return max(0.0, float(melt.p_total_mbar) / 1000.0)
         return 0.0  # bar — vacuum downstream/reference pressure
 
     @staticmethod
