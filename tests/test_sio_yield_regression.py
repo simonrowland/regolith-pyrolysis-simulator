@@ -194,9 +194,11 @@ def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
 # prototype unity. Mn and CrO2 remain ungrounded, so these CLI goldens retain
 # the explicit alpha=1.0 fallback for those species. Executable regeneration
 # moves the coupled evolved-SiO and routing pins through the grounded Cr path.
+# 2026-07-17 t-159/t-160/t-260 composition: executable CLI regeneration after
+# the transport and capture corrections moved both coupled SiO baselines.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.77221126749e-05,
-    "mars_basalt": 1.78539123372e-05,
+    "lunar_mare_low_ti": 7.50757523608e-06,
+    "mars_basalt": 7.55703307186e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +

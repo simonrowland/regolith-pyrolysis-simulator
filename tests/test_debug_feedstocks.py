@@ -325,12 +325,12 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     ] == pytest.approx(0.8575205152142129)
     assert sim.atom_ledger.kg_by_account("process.condensation_train")[
         "Na"
-    ] == pytest.approx(0.002038061119616019)
+    ] == pytest.approx(9.389045452223855e-07)
     wall_na_kg = sum(
         sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
     )
-    assert wall_na_kg == pytest.approx(1.4762851331783949)
+    assert wall_na_kg == pytest.approx(1.4783222553934658)
     assert wall_na_kg > sim.atom_ledger.kg_by_account(
         "process.condensation_train"
     )["Na"]

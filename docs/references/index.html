@@ -32,7 +32,6 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>docs/chemistry-provenance.notes.md:29</code> - Highest-priority gaps to encode first (authority / golden / certification paths): - **Kress91 composition coeffs** (`simulator/fe_redox.py`) — cited (REF-001) elsewhere but not at the definition site.</li>
 <li><code>simulator/fe_redox.py:24</code> - class Kress91InvalidControls(ValueError): # provenance: Kress91 coefficients — REF-001 CMP 108:82-92; ln(fO2) and inverse-T terms.</li>
 <li><code>simulator/fe_redox.py:56</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # source REF-001 defines the Kress91 liquid relation and 1200 C floor.</li>
 <li><code>simulator/fe_redox.py:62</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: &#x27;REF-001 Kress91 liquid relation; below 1200 C calibration floor&#x27;</li>
@@ -176,7 +175,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/species_catalog.yaml:122</code> - species.id.source: source: Stoichiometric iron sulfate formula for cation-bearing sulfate Stage 0 routing; NIST WebBook REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
 <li><code>data/species_catalog.yaml:164</code> - species.id.source: source: Sodium carbonate formula for the carbonate_salts surrogate component and Na2CO3 silicate-displacement gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
 <li><code>data/vapor_pressures.yaml:237</code> - metals.Fe.pure_component_antoine.source: source: &quot;REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron anchored at 1 atm&quot;</li>
-<li><code>simulator/core.py:8902</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
+<li><code>simulator/core.py:9368</code> - def _stage0_carbonate_decomposition_extent(: # data/foulant_thermo.yaml REF-012 NIST WebBook dG rows give</li>
 </ul>
 </section>
 <section class="entry" id="REF-013">
@@ -300,8 +299,11 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:472</code> - metals.Mn.pure_component_antoine.segments.name.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(s) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_sub, standard pressure 1 bar, constrained to the stored liquid fit at 1519 K for C0 runtime continuity&quot;</li>
 <li><code>data/vapor_pressures.yaml:509</code> - metals.Mn.pure_component_antoine.segments.name.source: source: &quot;REF-020 NIST-JANAF/Chase 1998 Mn(l) and Mn(g) Shomate thermodynamic evaluation; derived Antoine fit to DeltaG_vap, standard pressure 1 bar, with exact 101325 Pa anchor at 2334.526 K&quot;</li>
 <li><code>data/vapor_pressures.yaml:678</code> - oxide_vapors.CrO2.source: source: &quot;REF-020 JANAF coefficients shipped by VapoRock.&quot;</li>
-<li><code>simulator/runner.py:2055</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
-<li><code>simulator/runner.py:2164</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
+<li><code>engines/builtin/stage0_pretreatment.py:1484</code> - def _dispatch_char_feo_reduction(: (REF-020 NIST-JANAF/Chase 1998), so the reaction is spontaneous</li>
+<li><code>simulator/core.py:393</code> - class _MeltRedoxLiquidusFloorFallback: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
+<li><code>simulator/runner.py:2126</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
+<li><code>simulator/runner.py:2251</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
+<li><code>simulator/runner.py:2276</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-021">
@@ -351,7 +353,9 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/stage0_carbon_partition.yaml:15</code> - phase_partitions.ci_carbonaceous_chondrite.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:33</code> - phase_partitions.cm_carbonaceous_chondrite.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
 <li><code>data/stage0_carbon_partition.yaml:51</code> - phase_partitions.ceres_regolith.f_refractory_organic_C.source: source: &quot;REF-024 sephton_2004_murchison_hydropyrolysis&quot;</li>
-<li><code>data/stage0_carbon_partition.yaml:83</code> - burnout_kinetics.labile_chon_unlimited_o2.source: source: &quot;REF-024 sephton_2004_stepped_combustion_temperature_classes&quot;</li>
+<li><code>data/stage0_carbon_partition.yaml:86</code> - lance_oxidation.source: source: &quot;balanced reaction C + O2 -&gt; CO2; REF-024 supplies the residual-char inventory, not the combustion stoichiometry&quot;</li>
+<li><code>data/stage0_carbon_partition.yaml:92</code> - burnout_kinetics.labile_chon_unlimited_o2.source: source: &quot;REF-024 sephton_2004_stepped_combustion_temperature_classes&quot;</li>
+<li><code>simulator/core.py:8986</code> - def _oxidized_stage0_products(: Premise: Sephton 2004 (REF-024) partitions organic C into labile</li>
 </ul>
 </section>
 <section class="entry" id="REF-025">
@@ -555,7 +559,6 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/vapor_pressures.yaml:64</code> - metals.Na.pure_component_antoine.source: source: &quot;REF-041 NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium (C7440235); log10(P/bar)=2.46077-1873.728/(T-416.372), converted to Pa by A+5&quot;</li>
-<li><code>docs/chemistry-provenance.notes.md:41</code> - Bibliography additions still needed (`docs/references/references.yaml`, next ids REF-041+): ## Bibliography additions still needed (`docs/references/references.yaml`, next ids REF-041+)</li>
 </ul>
 </section>
 <section class="entry" id="REF-042">
@@ -611,7 +614,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>simulator/equipment.py:165</code> - class EquipmentDesigner: # provenance: melt emissivity — REF-047 coefficient_note; engineering default for hot silicates.</li>
+<li><code>simulator/equipment.py:162</code> - class EquipmentDesigner: # provenance: melt emissivity — REF-047 coefficient_note; engineering default for hot silicates.</li>
 </ul>
 </section>
 <section class="entry" id="REF-048">

@@ -100,6 +100,8 @@ STAGE_SIO_GAS_MODE = (
 # from 67f7eae1... to 32e9d2e9...; payload recomputed from _base_spec().
 # 2026-07-12 wave-12-cost-params: default cost parameters are now part of the
 # EvalSpec identity so cost-sensitive optimizer cache entries are reproducible.
+# 2026-07-17 W-A5a/t-227: re-pinned from the executable serializer after the
+# reviewed electricity and solar-heat defaults landed.
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor"'
     b':false,"allowlist_version":"allowlist-v12","backend_name":"i'
@@ -109,11 +111,12 @@ PINNED_EVALSPEC_JSON = (
     b'k":false,"engine":"builtin","pressure_Pa":"0.001000000"},"co'
     b'de_version":"0.6.0","cost_parameters":{"parameters":{"deprec'
     b'iation_expense_per_run":"50.000000000","electricity_cost_per'
-    b'_kWh":"0.150000000","furnace_resinter_cost_usd":"5000.000000'
+    b'_kWh":"10.000000000","furnace_resinter_cost_usd":"5000.000000'
     b'000","generic_reagent_cost_per_kg":"10.000000000","shuttle_r'
     b'eagent_replacement_cost_per_kg":{"Ca":"0.500000000","K":"1.0'
-    b'00000000","Mg":"0.750000000","Na":"0.500000000"}},"schema_ve'
-    b'rsion":"optimize-costs-v1"},"data_digests":{"corpus_version"'
+    b'00000000","Mg":"0.750000000","Na":"0.500000000"},"solar_he'
+    b'at_cost_per_kWh":"0.050000000"},"schema_version":"optimize-c'
+    b'osts-v1"},"data_digests":{"corpus_version"'
     b':"corpus-version-digest","feedstocks":"feedstock-digest","fo'
     b'ulant_thermo":"foulant-thermo-digest","materials":"materials'
     b'-digest","profile":"profile-digest","setpoints":"setpoints-d'

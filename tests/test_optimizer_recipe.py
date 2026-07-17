@@ -600,7 +600,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-14 t-194 Cr/Mn grounding: the functional vapor-pressure digest
     # moved with data/vapor_pressures.yaml; merge-time (2026-07-15) empirical
     # recompute in the integrated tree (t-259 purity fix + t-194 digest move).
-    assert cache_key(spec) == "872f467f22434f07b6ffa6e34f8d8d29d89620d4f38ae49afeb03a15d719af1d"
+    # 2026-07-17: t-097 (110f03c/a217ce8) owns the Ellingham source-fingerprint
+    # move; W-A5a/t-227 adds the composed reviewed electricity/solar defaults.
+    # Recomputed from this tree.
+    assert cache_key(spec) == "fcad6c47739bd266d7d343b17bb38f936315f25114a4927931d513d38cf88431"
     assert cache_key(spec) != "be16be9b30f3b68f4889933efad83da6eb65b40cd80f7c5d16349a5f891e464b"
 
 

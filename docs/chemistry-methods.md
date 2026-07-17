@@ -379,7 +379,7 @@ fresh equilibrium solve at each instant: it smooths the time integration but ass
 is constant over the tick, which accumulates error when the melt composition swings hard within a
 single hour. It is stated as a current approximation in
 [`docs/model-limitations.md`](model-limitations.md).
-<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1502 — hourly depletion reservoir -->
+<!-- impl: §4.3 -> simulator/evaporation.py EvaporationMixin._apply_analytic_evaporation_depletion:1635 — hourly depletion reservoir -->
 
 ### §4.4 The Knudsen and Langmuir limits, the sweep, and self-poisoning
 
@@ -656,8 +656,8 @@ regime, so it leaves the system without re-equilibrating with the melt — apply
 tiny term does not change the physics (the oxygen escapes ballistically either way), so the floor is
 moot precisely where it fires. Graded range/saturation refusals still apply *above* the floor, where a
 real capacity meets an out-of-range or non-finite demand.
-<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._melt_redox_source_capacity_mol_per_ln_fO2:4056 — C_m liquid_fraction -->
-<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._apply_oxygen_reservoir_redox_source_terms:4271 — negligible-mol redox floor -->
+<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._melt_redox_source_capacity_mol_per_ln_fO2:4085 — C_m liquid_fraction -->
+<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._apply_oxygen_reservoir_redox_source_terms:4300 — negligible-mol redox floor -->
 
 ---
 
@@ -778,7 +778,7 @@ carbon into labile, refractory, carbonate, and process-reductant buckets, and ca
 refractory carbon after Stage 0. That diagnostic is not ledger-active in the extraction path described
 above; it documents the split that would need to become authoritative before the simplification is
 removed.
-<!-- impl: §10.1 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_partition_carbon_diagnostic:1265 — carbon split diagnostic -->
+<!-- impl: §10.1 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_partition_carbon_diagnostic:1297 — carbon split diagnostic -->
 <!-- impl: §10.1 -> engines/builtin/foulant_disposition.py partition_carbon:468 — carbon bucket partition -->
 
 ### §10.2 CNOPS handling
@@ -802,8 +802,8 @@ The cleanup stage's treatment of carbon, nitrogen, oxygen, phosphorus, and sulfu
   falls inside its calibration windows, the gate reports the sulfide-capacity (SCSS) and
   sulfate-capacity (SCAS) limits and the sulfide/sulfate partition; otherwise it falls back to the
   builtin bucketing with a recorded warning. The gate never mutates the atom ledger.
-<!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_carbonate_decomposition:565 — carbonate oxide credit -->
-<!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_volatilization_diagnostic:964 — volatile salt diagnostic -->
+<!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_carbonate_decomposition:598 — carbonate oxide credit -->
+<!-- impl: §10.2 -> engines/builtin/stage0_pretreatment.py BuiltinStage0PretreatmentProvider._dispatch_volatilization_diagnostic:996 — volatile salt diagnostic -->
 
 The mechanism behind this cleanup is, for most species, **name-routing rather than reductant-driven
 thermodynamics**: raw feedstock components are matched by name and dropped into terminal buckets

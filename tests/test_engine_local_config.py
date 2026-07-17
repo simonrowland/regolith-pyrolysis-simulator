@@ -189,7 +189,7 @@ def test_rekey_migration_round_trip_and_idempotency(
     _sample_config(tmp_path, monkeypatch)
     db_path = tmp_path / "cache.sqlite"
     legacy_version = "alphaMELTS subprocess (/Users/me/alphamelts2)"
-    target = "analytical-test-v1"
+    target = "analytical-corpus-2026-06-30-redox-v3-regrind-v1"
     key = {
         "schema_version": "test",
         "artifact": "equilibrium_post_record",
