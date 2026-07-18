@@ -65,6 +65,11 @@ ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
     # Legacy representative high-T coefficients kept for keying/stoichiometry
     # compatibility. Authoritative dG(T) now comes from ELLINGHAM_FIT_SEGMENTS.
     # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti/Si.
+    # Here dH_f is the intercept of the fitted dG(T)=dH_f-T*dS_f line, not a
+    # second 298 K formation-enthalpy table.  Its high-T JANAF reaction basis
+    # includes the applicable metal/oxide phases (for example gaseous Na/K and
+    # the Mg liquid/gas transition), so its magnitude must not be unified with
+    # the 298 K dissociation values in thermal_budget.py.
     # Per-species trailing IDs are the JANAF grounding-corpus anchors;
     # dG(1600C) values are the cross-check used during refit.
     #
