@@ -106,6 +106,16 @@ def latent_vaporization_kj_per_mol(species: str) -> float:
 
 
 # Parent-oxide dissociation enthalpies.  Values are kJ/mol parent oxide.
+#
+# BASIS BOUNDARY: these are reversals of 298 K standard formation enthalpies
+# for the named condensed oxide and elements in their 298 K standard states
+# (Na(s)/K(s)/Mg(s) for the cross-checked rows) + O2(g).
+# They are not interchangeable with ``ELLINGHAM_THERMO`` dH coefficients:
+# those are
+# effective intercepts from high-temperature linear dG(T) fits, per mol O2,
+# whose JANAF phase basis includes high-T metal/oxide phase changes.  The
+# expected Na/K/Mg separation is pinned in
+# ``tests/test_thermochemical_basis_split.py``.
 _OXIDE_DISSOCIATION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
     # NIST-JANAF Chase 1998 ΔfH° Na2O(s)=-414.22 kJ/mol; Na2O -> 2Na + 1/2O2 = +414.22.
     "Na2O": EnthalpyCoefficient(414.22, "NIST-JANAF Chase 1998 Na2O(s) ΔfH=-414.22 kJ/mol"),
