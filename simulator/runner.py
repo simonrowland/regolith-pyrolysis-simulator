@@ -776,9 +776,8 @@ class PyrolysisRun:
     strict_result_contract: bool = field(init=False, default=True)
 
     def __post_init__(self) -> None:
-        # Fold the `internal-analytical` display alias onto the stable `stub`
-        # token so the serialized run metadata (`"backend"`) and the fidelity-
-        # vocabulary backend-token translator both see the legacy token.
+        # Fold legacy analytical aliases onto the canonical
+        # `internal-analytical` token before serialization and translation.
         self.backend_name = canonical_backend_name(self.backend_name)
         self._enforce_preset_comparison_contract()
         if int(self.hours) < 0:
@@ -4311,8 +4310,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             mass_kg=mass_kg,
             additives_kg=additives,
             track=args.track,
-            # Failure envelope: fold the alias so even the error path serializes
-            # the stable `stub` token (the success path folds in PyrolysisRun).
+            # Failure envelope: canonicalize even the error path (the success
+            # path also canonicalizes in PyrolysisRun).
             backend_name=canonical_backend_name(args.backend),
             engines=merged,
             metadata_overrides=metadata_overrides,

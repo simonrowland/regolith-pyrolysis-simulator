@@ -167,9 +167,8 @@ class SimSessionConfig:
     campaigns_elapsed: float = 1.0
 
     def __post_init__(self) -> None:
-        # Fold the `internal-analytical` display alias onto the stable `stub`
-        # token so session config, serialized metadata, and the fidelity-
-        # vocabulary backend-token translator all see the legacy token.
+        # Fold legacy analytical aliases onto the canonical
+        # `internal-analytical` token before serialization and translation.
         object.__setattr__(
             self, "backend_name", canonical_backend_name(self.backend_name)
         )

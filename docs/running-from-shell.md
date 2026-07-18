@@ -138,7 +138,7 @@ accepts the alias `C2A` → `C2A_continuous`.
   fractions, or non-ideal melt activities (`liquid_fraction` is left unsolved). So the
   extraction sequence and product ledger are meaningful under `internal-analytical`; the
   melt-phase numbers are idealized. (Both names resolve to the same backend; runs serialize
-  the stable `stub` token in `backend_name`.)
+  the canonical `internal-analytical` token in `backend_name`.)
 - **`--backend alphamelts`**: adds the real MELTS-family **melt solution model** on top of
   that vapor physics (liquidus, phase fractions, non-ideal activities; the diagnostic
   authority). Accurate but slow (~6+ min per equilibrium, and the liquidus search is a

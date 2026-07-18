@@ -137,7 +137,7 @@ it does not introduce a new schema version.
   "mass_kg":         1000.0,
   "additives_kg":    {"C": 30.0},            // additive species -> kg
   "track":           "pyrolysis",            // or "mre_baseline"
-  "backend":         "stub",                 // melt backend name (the internal-analytical model; serialized as the stable `stub` token even when invoked as --backend=internal-analytical)
+  "backend":         "internal-analytical",  // canonical melt backend name (`stub` remains an accepted input alias)
   "started_at_utc":  "2026-05-15T00:00:00Z", // ISO8601 UTC
   "engines_used": {
     "active": {                               // flat intent -> authoritative provider_id
