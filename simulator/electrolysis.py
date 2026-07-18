@@ -851,7 +851,7 @@ class ElectrolysisModel:
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)  # g/mol
             moles = kg * 1000.0 / M_oxide_gmol  # kg→g then ÷ g/mol
 
-            # Faraday energy: E = V × n × F × moles / (η × 1000)
+            # Faraday energy in kWh: E = V × n × F × moles / (η × 1000 × 3600)
             eta = 0.5  # average efficiency
             V = (E0 + max_voltage_V) / 2.0  # average operating voltage
             energy_kWh = V * n * FARADAY * moles / (eta * 1000.0 * 3600.0)

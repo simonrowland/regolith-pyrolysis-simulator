@@ -138,7 +138,8 @@ _OXIDE_DISSOCIATION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
 # Si + O2 (910.94 kJ/mol) and then also added an SiO(condensed)->SiO(g) latent
 # (337.60), ~54% high and physically wrong.  The real path is a single reaction
 #   parent_oxide(melt) -> oxide_vapor(g) + partial O2,
-# ΔH = ΔfH[oxide_vapor(g)] - ΔfH[parent_oxide] (1 mol oxide vapor : 1 mol parent).
+# ΔH follows the balanced per-mol-vapor reaction below; the parent-oxide
+# coefficient is species-specific (1 SiO2 per SiO, but 1/2 Cr2O3 per CrO2).
 _OXIDE_VAPOR_REACTION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
     # NIST-JANAF Chase 1998: ΔfH°[SiO2, α-quartz]=-910.94, ΔfH°[SiO(g)]=-100.42;
     # SiO2 -> SiO(g) + 1/2 O2 = -100.42 - (-910.94) = +810.52 kJ/mol SiO.
