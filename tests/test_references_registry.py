@@ -109,6 +109,25 @@ def test_live_cited_blank_doi_url_requires_unavailable_reason():
     assert not any("blank doi and url without provenance_unavailable_reason" in error for error in errors)
 
 
+def test_scan_excludes_private_chemistry_provenance_notes(tmp_path):
+    builder = load_builder()
+    notes = tmp_path / "docs" / "chemistry-provenance.notes.md"
+    notes.parent.mkdir(parents=True)
+    notes.write_text("Private audit note citing REF-999.\n", encoding="utf-8")
+    public = tmp_path / "docs" / "public.md"
+    public.write_text("Public model note citing REF-998.\n", encoding="utf-8")
+
+    assert builder.scan_files(tmp_path) == {
+        "REF-998": [
+            builder.CitationUse(
+                file="docs/public.md",
+                line=1,
+                context="Public model note citing REF-998.",
+            )
+        ]
+    }
+
+
 def test_doi_manifest_rejects_mislabelled_title_and_fake_doi():
     builder = load_builder()
     references = {ref_id: dict(entry) for ref_id, entry in builder.load_registry(REGISTRY).items()}
