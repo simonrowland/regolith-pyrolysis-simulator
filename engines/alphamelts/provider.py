@@ -128,13 +128,11 @@ class AlphaMELTSProvider(ChemistryProvider):
         return CapabilityProfile(
             provider_id='alphamelts-diagnostic',
             intents=_INTENTS,
-            # Registered as authoritative so :class:`ProviderRegistry` will
-            # accept ``register(shadow=False)``. The provider never builds
-            # a :class:`LedgerTransitionProposal`; :attr:`IntentResult.
-            # transition` is always None. Goal #8 checklist item 5 binds
-            # this, and the writer-purity invariant test catches any
-            # accidental write attempt.
+            # Registry dispatch ownership is separate from ledger-transition
+            # authority. AlphaMELTS owns dispatch for these diagnostic intents
+            # but must never be allowed to write an authoritative transition.
             is_authoritative_for=_INTENTS,
+            ledger_transition_authority_for=frozenset(),
             declared_accounts=frozenset({self.DECLARED_ACCOUNT}),
         )
 

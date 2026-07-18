@@ -34,6 +34,7 @@ _LOG = logging.getLogger(__name__)
 # local-workbench threat model); full root confinement is queued backlog.
 _DIRECTORY_OPEN_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC | os.O_NOFOLLOW
 _FILE_OPEN_FLAGS = os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW
+_SUPPORTED_ARTIFACT_SCHEMA_VERSIONS = frozenset({"0.2.0"})
 
 
 @contextmanager
@@ -160,6 +161,18 @@ class RunArtifactStore:
                 run_id,
                 path,
                 f"expected a JSON object, got {type(payload).__name__}",
+            )
+        schema_version = payload.get("artifact_schema_version")
+        if (
+            not isinstance(schema_version, str)
+            or schema_version not in _SUPPORTED_ARTIFACT_SCHEMA_VERSIONS
+        ):
+            raise RunStoreCorruptionError(
+                run_id,
+                path,
+                "artifact schema version must be one of "
+                f"{sorted(_SUPPORTED_ARTIFACT_SCHEMA_VERSIONS)}, got "
+                f"{schema_version!r}",
             )
         self._validate_nested_shape(run_id, path, payload)
         return payload
