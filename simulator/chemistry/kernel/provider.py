@@ -50,12 +50,13 @@ class ChemistryProvider(ABC):
     def emits_ledger_transition(self, intent: ChemistryIntent) -> bool:
         """Whether ``intent`` is one this provider may commit transitions for.
 
-        Default: ``intent in self.capability_profile().is_authoritative_for``.
+        Default: membership in the capability profile's
+        ``ledger_transition_authority_for`` set.
         Subclasses may override for narrower per-call gating (e.g. an
         adapter that is authoritative on lunar feedstocks but only
         diagnostic on Mars feedstocks) but must NEVER return ``True``
-        for an intent outside its declared authority.
+        for an intent outside its declared ledger-transition authority.
         """
 
         profile = self.capability_profile()
-        return profile.is_authoritative(intent)
+        return profile.may_emit_ledger_transition(intent)

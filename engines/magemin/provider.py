@@ -131,6 +131,7 @@ class MAGEMinShadowProvider(ChemistryProvider):
             # intent. SILICATE_LIQUIDUS / SILICATE_EQUILIBRIUM remain
             # shadow-only parity surfaces.
             is_authoritative_for=_FALLBACK_INTENTS,
+            ledger_transition_authority_for=frozenset(),
             declared_accounts=frozenset({self.DECLARED_ACCOUNT}),
         )
 

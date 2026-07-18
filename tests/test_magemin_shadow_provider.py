@@ -392,8 +392,8 @@ def test_provider_capability_profile_declares_silicate_intent_set():
     })
 
 
-def test_provider_capability_profile_authority_limited_to_gate_intent():
-    """MAGEMin stays shadow-only for full silicate-state intents."""
+def test_provider_gate_fallback_owns_dispatch_but_not_ledger_authority():
+    """MAGEMin gate fallback remains diagnostic-only at the ledger boundary."""
     profile = MAGEMinShadowProvider().capability_profile()
     assert profile.is_authoritative_for == frozenset({
         ChemistryIntent.GATE_LIQUID_FRACTION,
@@ -404,6 +404,8 @@ def test_provider_capability_profile_authority_limited_to_gate_intent():
     ):
         assert not profile.is_authoritative(intent)
     assert profile.is_authoritative(ChemistryIntent.GATE_LIQUID_FRACTION)
+    for intent in profile.intents:
+        assert not profile.may_emit_ledger_transition(intent)
 
 
 def test_provider_declares_only_cleaned_melt_account():

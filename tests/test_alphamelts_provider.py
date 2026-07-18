@@ -261,15 +261,8 @@ def test_provider_declares_silicate_intent_set():
     })
 
 
-def test_provider_authoritative_for_silicate_intents():
-    """Authoritative registration is required so the kernel routes here.
-
-    The provider is *diagnostic* in the sense that
-    :attr:`IntentResult.transition` is always None; that is enforced
-    by separate tests (no_ledger_transition / writer-purity). The
-    registry-level authority is the only mechanism the kernel exposes
-    for "this provider answers this intent".
-    """
+def test_provider_owns_dispatch_but_not_ledger_authority_for_silicate_intents():
+    """Registry ownership routes diagnostics without granting ledger writes."""
     provider = AlphaMELTSProvider(backend=None)
     profile = provider.capability_profile()
     for intent in (
@@ -279,6 +272,7 @@ def test_provider_authoritative_for_silicate_intents():
         ChemistryIntent.GATE_LIQUID_FRACTION,
     ):
         assert profile.is_authoritative(intent)
+        assert not profile.may_emit_ledger_transition(intent)
 
 
 def test_provider_declares_only_cleaned_melt_account():

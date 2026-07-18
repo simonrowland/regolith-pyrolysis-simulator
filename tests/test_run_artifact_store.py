@@ -826,6 +826,44 @@ def test_store_corrupt_load_is_typed_and_list_quarantines(tmp_path) -> None:
 
 
 @pytest.mark.parametrize(
+    ("schema_version", "omit_version"),
+    [
+        pytest.param(None, True, id="missing"),
+        pytest.param("99.0.0", False, id="unsupported"),
+        pytest.param([], False, id="list"),
+        pytest.param({}, False, id="object"),
+        pytest.param(123, False, id="integer"),
+        pytest.param(None, False, id="null"),
+    ],
+)
+def test_store_rejects_missing_or_unsupported_artifact_schema_version(
+    tmp_path, schema_version, omit_version
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="bad-schema")
+    if omit_version:
+        del artifact["artifact_schema_version"]
+    else:
+        artifact["artifact_schema_version"] = schema_version
+    store.runs_dir.mkdir(parents=True)
+    (store.runs_dir / "bad-schema.json").write_text(
+        json.dumps(artifact), encoding="utf-8"
+    )
+
+    with pytest.raises(RunStoreCorruptionError, match="artifact schema version"):
+        store.load("bad-schema")
+
+
+def test_store_loads_supported_artifact_schema_version(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="supported-schema")
+    artifact["artifact_schema_version"] = "0.2.0"
+    assert store.save("supported-schema", artifact) is True
+
+    assert store.load("supported-schema") == artifact
+
+
+@pytest.mark.parametrize(
     "malformed_field, malformed_value",
     [("header", "not-an-object"), ("terminal", [])],
 )

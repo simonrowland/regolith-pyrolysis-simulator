@@ -8,6 +8,7 @@ import pytest
 import yaml
 from flask import Flask
 
+from simulator.accounting.run_artifact import ARTIFACT_SCHEMA_VERSION
 from simulator.recipe_io import normalize_recipe_patch
 from web.routes import bp
 from web.run_store import RunArtifactStore
@@ -34,7 +35,7 @@ def _artifact(*, recipe_snapshot: dict | None) -> dict:
     if recipe_snapshot is not None:
         header["recipe_snapshot"] = recipe_snapshot
     return {
-        "artifact_schema_version": "0.1.0",
+        "artifact_schema_version": ARTIFACT_SCHEMA_VERSION,
         "execution_status": "ok",
         "lifecycle": "complete",
         "header": header,
