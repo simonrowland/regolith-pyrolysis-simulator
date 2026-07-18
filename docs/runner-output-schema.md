@@ -6,10 +6,14 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.5.0`
+**Schema version:** `1.6.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
 
-Schema 1.5.0 adds the unconditional `run_metadata.campaigns_elapsed` field and
+Schema 1.6.0 adds the unconditional top-level `product_classification` field.
+It preserves the raw five-bucket classifier output and its operator-facing
+markdown projection from the same completed simulation state.
+
+Schema 1.5.0 added the unconditional `run_metadata.campaigns_elapsed` field and
 the `campaigns_to_resinter_by_segment` and
 `aggregate_campaigns_to_resinter` fields in the SiO wall-fouling report.
 Golden runner and SiO-yield fixtures therefore require controller regeneration
@@ -66,10 +70,14 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.5.0",
+  "schema_version": "1.6.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
+  "product_classification": {   // see "Product classification"
+    "classification": {...},
+    "markdown": "# Three-Product-Class Report\n..."
+  },
   "stage_purity_report": {...}, // see "Stage purity report"
   "vapor_pressure_source_report": {...}, // see "Vapor pressure source report"
   "shuttle_refusal_history": [...], // see "Shuttle refusal history"
@@ -90,6 +98,24 @@ All top-level keys are required.  Tests assert the **exact** set --
 adding a new key requires bumping `RUNNER_SCHEMA_VERSION` and the
 schema-shape assertion.
 
+## Product classification
+
+`product_classification.classification` is the five-bucket result from
+`simulator.three_product_report.classify_products()` with
+`early_tap_mode=False`. The primary runner has no early-tap option, so
+mid-run residual melt is not reported as an industrial mixed-glass product.
+
+`product_classification.markdown` is the existing
+`format_three_product_markdown()` projection. It names the four Mandate
+classes for operators: metals plus source-side O₂ potential, pure silica
+glass, industrial mixed glass, and refractory ceramic rump. Both projections
+come from the same classification object.
+
+Early failure envelopes that have no simulator expose the stable empty shape
+`{"classification": {}, "markdown": ""}`. If a simulator exists, failure
+reporting attempts the same projection but falls back to that empty shape so
+classification cannot mask the primary runner error.
+
 For a runner-strict result, a nonempty per-snapshot
 `metal_projection_drift_kg` audit remaps an otherwise successful result to
 `status: "failed"` with top-level `reason: "metal_projection_drift"`.
@@ -102,7 +128,7 @@ it does not introduce a new schema version.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.5.0",
+  "schema_version": "1.6.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,

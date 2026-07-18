@@ -734,7 +734,7 @@ class ChemistryKernel:
            proposal not returned by this kernel's live dispatch path is
            refused before account, atom, or ledger mutation checks.  The
            selected provider must still declare the intent in its
-           ``is_authoritative_for`` set.
+           ``ledger_transition_authority_for`` set.
         2. :func:`validate_proposal_accounts` -- every account touched
            must be in the selected provider's
            :attr:`CapabilityProfile.declared_accounts`.

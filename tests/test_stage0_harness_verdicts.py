@@ -35,6 +35,9 @@ from simulator.stage0_harness import run_stage0_harness_from_config
 from tests.test_stage0_harness import _session_config
 
 
+_NACL_CL_MASS_FRACTION = 35.45 / (22.98976928 + 35.45)
+
+
 @dataclass
 class _FakeTimelineEntry:
     hour: int
@@ -61,12 +64,12 @@ def test_verdict_a_never_fails_harness():
 
 
 def test_liquidus_warning_at_two_percent_of_T():
-    residual = {"NaCl": 0.3}
+    residual = {"NaCl": 0.3 / _NACL_CL_MASS_FRACTION}
     adj = melt_effect_adjustment(
         residual,
         {"liquidus_T_C": 1400.0},
         "alphamelts",
-        T_in_C=1400.0,
+        T_in_C=1300.0,
     )
     assert adj.raw_liquidus_C == pytest.approx(1400.0)
     assert adj.adjusted_liquidus_C == pytest.approx(1370.0)
@@ -199,20 +202,20 @@ def test_ungrounded_large_interval_escalates_to_warning_via_max_before_after():
 def test_liquidus_uses_max_relative_and_absolute_floor():
     assert PROPERTY_THRESHOLD_TABLE["liquidus"].absolute_warning_floor == pytest.approx(25.0)
     below_floor = melt_effect_adjustment(
-        {"NaCl": 0.24},
-        {"liquidus_T_C": 1000.0},
+        {"NaCl": 0.249 / _NACL_CL_MASS_FRACTION},
+        {"liquidus_T_C": 1200.0},
         "alphamelts",
-        T_in_C=1000.0,
+        T_in_C=1200.0,
     )
     below_flags = evaluate_verdict_a(below_floor.perturbations, hour=1)
     assert below_flags[0].perturbation_before > 2.0
     assert below_flags[0].level == "INFO"
 
     at_floor = melt_effect_adjustment(
-        {"NaCl": 0.25},
-        {"liquidus_T_C": 1000.0},
+        {"NaCl": 0.25 / _NACL_CL_MASS_FRACTION},
+        {"liquidus_T_C": 1200.0},
         "alphamelts",
-        T_in_C=1000.0,
+        T_in_C=1200.0,
     )
     at_floor_flags = evaluate_verdict_a(at_floor.perturbations, hour=1)
     assert at_floor_flags[0].level == "WARNING"
@@ -332,10 +335,12 @@ def test_raw_and_adjusted_are_separate_with_provenance():
         residual,
         {"liquidus_T_C": 1400.0},
         "alphamelts",
-        T_in_C=1400.0,
+        T_in_C=1300.0,
     )
     assert adj.raw_liquidus_C == pytest.approx(1400.0)
-    assert adj.adjusted_liquidus_C == pytest.approx(1370.0)
+    assert adj.adjusted_liquidus_C == pytest.approx(
+        1400.0 - 30.0 * _NACL_CL_MASS_FRACTION
+    )
     assert adj.adjusted_liquidus_C != adj.raw_liquidus_C
     assert adj.effect_table_version == EFFECT_TABLE_VERSION
     assert adj.adjusted_liquidus_provenance

@@ -76,6 +76,10 @@ from simulator.diagnostics import (
     wall_deposit_sticking_authority_status,
 )
 from simulator.trace import wall_deposit_by_segment_species_kg
+from simulator.three_product_report import classify_products
+from simulator.three_product_report_markdown import (
+    format_three_product_markdown,
+)
 from simulator.pumping_cost import pumping_context_from_sim
 from simulator.run_executor import (
     RunExecution,
@@ -105,7 +109,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.5.0"
+RUNNER_SCHEMA_VERSION = "1.6.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -1232,6 +1236,16 @@ class PyrolysisRun:
             "run_metadata": run_metadata,
             "final_state": final_state,
             "final": _final_summary_report(final_state, execution),
+            "product_classification": _json_safe(
+                _safe_failure_value(
+                    lambda: _product_classification_report(
+                        sim,
+                        feedstock_id=self.feedstock_id,
+                        campaign=self.campaign,
+                    ),
+                    {"classification": {}, "markdown": ""},
+                ),
+            ),
             "stage_purity_report": stage_purity_report(sim.train),
             "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
             "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
@@ -2523,6 +2537,24 @@ def _final_summary_report(
             execution.trace.wall_deposit_by_segment_species_kg,
         ),
         "pump_outlet_by_species_kg": NOT_APPLICABLE_UNTIL_P0,
+    }
+
+
+def _product_classification_report(
+    sim: PyrolysisSimulator,
+    *,
+    feedstock_id: str,
+    campaign: str,
+) -> dict[str, Any]:
+    """Return the machine-readable classes and their operator markdown."""
+    classification = classify_products(sim, early_tap_mode=False)
+    return {
+        "classification": _json_safe(classification),
+        "markdown": format_three_product_markdown(
+            classification,
+            feedstock_id=feedstock_id,
+            campaign=campaign,
+        ),
     }
 
 
@@ -3989,6 +4021,18 @@ def _runner_failure_result(
         "run_metadata": run_metadata,
         "final_state": _json_safe(final_state),
         "final": _json_safe(final),
+        "product_classification": _json_safe(
+            _safe_failure_value(
+                lambda: _product_classification_report(
+                    sim,
+                    feedstock_id=feedstock_id,
+                    campaign=campaign,
+                ),
+                {"classification": {}, "markdown": ""},
+            )
+            if sim is not None
+            else {"classification": {}, "markdown": ""}
+        ),
         "stage_purity_report": _json_safe(stage_report),
         "vapor_pressure_source_report": _json_safe(vapor_report),
         "shuttle_refusal_history": _json_safe(

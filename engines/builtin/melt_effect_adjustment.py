@@ -18,6 +18,10 @@ from engines.alphamelts.domain import (
     _is_non_oxide_species_name,
 )
 from engines.magemin.domain import MAGEMinDomainGate
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    resolve_species_formula,
+)
 from simulator.state import OXIDE_SPECIES
 
 _OXIDE_SET = frozenset(OXIDE_SPECIES)
@@ -83,6 +87,17 @@ EFFECT_ROWS: dict[str, dict[str, Any]] = {
                 "coefficient_C_per_wt_pct": -100.0,
                 "grounded": True,
                 "source": "Filiberto & Treiman 2009; LPSC 2011 #2064",
+                # Filiberto & Treiman (2009), DOI 10.1016/j.chemgeo.2008.08.025,
+                # Chem. Geol. Table 2 rows report Cl-bearing runs at 1200,
+                # 1250, 1280, 1290, 1300, 1307, 1310, 1315, 1325, and 1340 C;
+                # those rows, not the 1150-1450 C plot axis in open LPSC 2011
+                # #2064 Fig. 1, bound the demonstrated 1200-1340 C envelope.
+                # The coefficient is -100 C per wt% Cl.  Sanity: the endpoint
+                # 0.7 wt% Cl at 1340 C stays grounded and epsilon beyond it
+                # downgrades; 1.0 wt% NaCl -> 0.606 wt% Cl -> about -60.6 C.
+                "valid_range_C": (1200.0, 1340.0),
+                "valid_range_wt_pct": (0.0, 0.7),
+                "valid_range_composition_basis": "Cl",
             },
         },
     },
@@ -833,6 +848,59 @@ def _inside_range(value: float, bounds: Any) -> bool | None:
     return low <= value <= high
 
 
+def _source_composition_wt_pct(
+    species: str,
+    carrier_wt_pct: float,
+    composition_basis: str | None,
+) -> float:
+    if not composition_basis or species == composition_basis:
+        return float(carrier_wt_pct)
+    formula = resolve_species_formula(species)
+    basis_atom_count = float(formula.elements.get(composition_basis, 0.0))
+    if basis_atom_count <= 0.0:
+        raise ValueError(
+            f"species {species!r} contains no {composition_basis!r} for source gate"
+        )
+    basis_mass_fraction = (
+        basis_atom_count * ATOMIC_WEIGHTS_G_PER_MOL[composition_basis]
+    ) / formula.molar_mass_g_per_mol()
+    return float(carrier_wt_pct) * basis_mass_fraction
+
+
+def _source_domain_assessment(
+    *,
+    prop_cfg: Mapping[str, Any],
+    species: str,
+    carrier_wt_pct: float,
+    T_in_C: float | None,
+) -> tuple[bool, bool, dict[str, Any]]:
+    temperature_range = prop_cfg.get("valid_range_C")
+    composition_range = prop_cfg.get("valid_range_wt_pct")
+    composition_basis = prop_cfg.get("valid_range_composition_basis")
+    composition_wt_pct = _source_composition_wt_pct(
+        species,
+        carrier_wt_pct,
+        str(composition_basis) if composition_basis else None,
+    )
+    temperature_in_domain = (
+        _inside_range(T_in_C, temperature_range) if T_in_C is not None else None
+    )
+    composition_in_domain = _inside_range(composition_wt_pct, composition_range)
+    checked = temperature_in_domain is not None or composition_in_domain is not None
+    in_domain = temperature_in_domain is not False and composition_in_domain is not False
+    metadata = {
+        "T_C": float(T_in_C) if T_in_C is not None else None,
+        "valid_range_C": tuple(temperature_range) if temperature_range else None,
+        "carrier_wt_pct": float(carrier_wt_pct),
+        "composition_wt_pct": float(composition_wt_pct),
+        "composition_basis": str(composition_basis or "carrier"),
+        "valid_range_wt_pct": (
+            tuple(composition_range) if composition_range else None
+        ),
+    }
+    return checked, in_domain, metadata
+
+
 def _analytical_model_metadata(
     row_key: str,
     species: str,
@@ -1139,10 +1207,29 @@ def _compute_property_perturbation(
         )
 
     if mode == "delta_T_per_wt_pct":
+        source_domain_checked, source_domain_ok, source_domain_values = (
+            _source_domain_assessment(
+                prop_cfg=prop_cfg,
+                species=species,
+                carrier_wt_pct=wt_pct,
+                T_in_C=T_in_C,
+            )
+        )
+        if source_domain_checked and not source_domain_ok:
+            grounded = False
         coeff = float(prop_cfg["coefficient_C_per_wt_pct"])
-        delta_T = coeff * wt_pct
+        composition_wt_pct = float(source_domain_values["composition_wt_pct"])
+        delta_T = coeff * composition_wt_pct
         before = _liquidus_perturbation_pct(delta_T, T_in_C)
         after = 0.0
+        source_domain_metadata: dict[str, Any] = {}
+        if source_domain_checked and not source_domain_ok:
+            source_domain_metadata = {
+                "source_domain": {
+                    "status": "out_of_domain",
+                    **source_domain_values,
+                }
+            }
         return _with_analytical_model_metadata(
             PropertyPerturbation(
                 property=property_name,
@@ -1158,6 +1245,7 @@ def _compute_property_perturbation(
                 raw_value=delta_T,
                 adjusted_value=0.0,
                 metric_basis=float(T_in_C),
+                metadata=source_domain_metadata,
             ),
             analytical_metadata,
         )
@@ -1263,6 +1351,8 @@ def request_certified_point(
     property_name: str,
     *,
     wt_pct: float = 1.0,
+    species: str | None = None,
+    T_in_C: float | None = None,
 ) -> float:
     """Fail loud when an ungrounded effect row has no certified point."""
     row = EFFECT_ROWS[row_key]
@@ -1272,9 +1362,27 @@ def request_certified_point(
             f"certified-point refused for ungrounded effect "
             f"{row_key}.{property_name} (interval only; wt%={wt_pct})"
         )
+    source_species = species or str(row.get("species_aliases", (row_key,))[0])
+    source_domain_checked, source_domain_ok, source_domain_values = (
+        _source_domain_assessment(
+            prop_cfg=prop_cfg,
+            species=source_species,
+            carrier_wt_pct=wt_pct,
+            T_in_C=T_in_C,
+        )
+    )
+    temperature_required = prop_cfg.get("valid_range_C") is not None
+    if (temperature_required and T_in_C is None) or (
+        source_domain_checked and not source_domain_ok
+    ):
+        raise CertifiedPointRefusedError(
+            f"certified-point refused outside source coverage for "
+            f"{row_key}.{property_name}: {source_domain_values}"
+        )
     mode = prop_cfg["mode"]
     if mode == "delta_T_per_wt_pct":
-        return float(prop_cfg["coefficient_C_per_wt_pct"]) * wt_pct
+        composition_wt_pct = float(source_domain_values["composition_wt_pct"])
+        return float(prop_cfg["coefficient_C_per_wt_pct"]) * composition_wt_pct
     raise CertifiedPointRefusedError(
         f"no certified-point path for {row_key}.{property_name} mode={mode!r}"
     )
@@ -1368,10 +1476,23 @@ def melt_effect_adjustment(
                     "grounded": False,
                 })
             if not pert.grounded:
-                warnings.append(
-                    f"noise_floor_ungrounded: {species} {prop_name} effect "
-                    f"interval half-width drives flag (row={row_key})"
-                )
+                source_domain = pert.metadata.get("source_domain")
+                if source_domain:
+                    warnings.append(
+                        f"out_of_domain_source_coverage: {species} {prop_name} "
+                        f"effect at T={T_in_C:g} C, "
+                        f"{source_domain['composition_wt_pct']:g} wt% "
+                        f"{source_domain['composition_basis']} "
+                        f"({wt_pct:g} wt% {species}) is outside "
+                        f"T={source_domain['valid_range_C']} C and/or "
+                        f"wt%={source_domain['valid_range_wt_pct']}; "
+                        f"row={row_key} not applied as grounded"
+                    )
+                else:
+                    warnings.append(
+                        f"noise_floor_ungrounded: {species} {prop_name} effect "
+                        f"interval half-width drives flag (row={row_key})"
+                    )
 
     adjusted_liquidus = None
     if raw_liquidus is not None:

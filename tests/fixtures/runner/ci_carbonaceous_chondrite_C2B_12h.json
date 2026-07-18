@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.5.0",
+  "schema_version": "1.6.0",
   "run_metadata": {
-    "schema_version": "1.5.0",
+    "schema_version": "1.6.0",
     "feedstock_id": "ci_carbonaceous_chondrite",
     "campaign": "C2B",
     "hours_requested": 12,
@@ -2885,4 +2885,81 @@
   "status": "ok",
   "reason": "",
   "error_message": ""
+,  "product_classification": {
+    "classification": {
+      "metals_plus_O2": {
+        "metals_kg": {},
+        "metals_total_kg": 0.0,
+        "O2_kg": 0.0,
+        "O2_partition_kg": {},
+        "class_total_kg": 0.0
+      },
+      "ingots_metals": {
+        "species_kg": {},
+        "class_total_kg": 0.0
+      },
+      "oxygen": {
+        "O2_kg": 0.0,
+        "partition_kg": {},
+        "class_total_kg": 0.0
+      },
+      "pure_silica_glass": {
+        "stage_3_capture_kg": 0.0,
+        "stage_3_kg_by_species": {},
+        "class_total_kg": 0.0
+      },
+      "glass": {
+        "species_kg": {},
+        "class_total_kg": 0.0,
+        "pure_silica_glass_kg": 0.0,
+        "industrial_mixed_glass_kg": 0.0
+      },
+      "industrial_mixed_glass": {
+        "mixed_melt_residual_kg": 0.0,
+        "early_tap_mode": false,
+        "note": "present only when operator declared early-tap via early_tap_mode=True; zero by default — mid-run cleaned_melt is NOT a product class",
+        "class_total_kg": 0.0
+      },
+      "captured_volatiles": {
+        "kg_by_species": {
+          "CO2": 77.32807787577242,
+          "H2O": 181.71535447096545,
+          "N2": 1.9950124688279303
+        },
+        "class_total_kg": 261.0384448155658
+      },
+      "process_inventory_spent_reductant": {
+        "kg_by_species": {},
+        "class_total_kg": 0.0,
+        "account": "process.spent_reductant_residue",
+        "disposition": "process_inventory_spent_reductant"
+      },
+      "refractory_ceramic_rump": {
+        "rump_kg_by_species": {
+          "Al2O3": 19.267077783577232,
+          "CaO": 22.151900185217183,
+          "FeO": 231.20493340292677,
+          "MgO": 188.42515152467027,
+          "Na2O": 5.322558934708119,
+          "NiO": 15.413662226861785,
+          "SiO2": 277.4459200835121
+        },
+        "rump_total_kg": 759.2312041414734,
+        "rump_refractory_oxides_kg": 229.8441294934647,
+        "rump_silicate_residual_kg": 277.4459200835121,
+        "rump_unextracted_metals_kg": 0.0,
+        "rump_other_kg": 251.94115456449668,
+        "class_total_kg": 759.2312041414734
+      },
+      "unclassified": {
+        "kg_by_species": {
+          "CaCO3": 0.007531238486095049,
+          "Na2CO3": 3.042543994524749E-11,
+          "S": 39.900249376558605
+        },
+        "total_kg": 39.907780615075126
+      }
+    },
+    "markdown": "# Three-Product-Class Report\n**Feedstock**: `ci_carbonaceous_chondrite` • **Campaign**: `C2B`\n\n**Class totals**: Metals + O₂ potential: — kg | Silica glass: — kg | Mixed glass: — kg | Rump: 759.231 kg\n\n## 1. Metals + source-side O₂ potential (alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co + emitted O₂ potential)\n**Class total**: — kg\n\n- Metals subtotal: — kg\n- Source-side O₂ potential subtotal (emitted; not recovered/captured): — kg\n\nPer-species:\n  (no species in this class)\n\n## 2. Pure silica glass (Stage 3 fused-silica baffle capture)\n**Class total**: — kg\n\n- Stage 3 capture: — kg\n\nPer-species on Stage 3 baffles:\n  (no species in this class)\n\n## 3. Industrial mixed glass (early-tap residual melt option)\n**Class total**: — kg\n\n- Mixed melt residual: — kg\n  - *present only when operator declared early-tap via early_tap_mode=True; zero by default — mid-run cleaned_melt is NOT a product class*\n\n## 4. Refractory ceramic rump (Ca / REE / refractory oxides — by physics)\n**Class total**: 759.231 kg\n\n- Rump total: 759.231 kg\n- Refractory oxides floor (by physics): 229.844 kg\n- Silicate residual: 277.446 kg\n- Unextracted metals residue (failure-mode 1): — kg\n- Other / unclassified rump: 251.941 kg\n\nPer-species:\n  - **Al2O3**: 19.267 kg\n  - **CaO**: 22.152 kg\n  - **FeO**: 231.205 kg\n  - **MgO**: 188.425 kg\n  - **Na2O**: 5.323 kg\n  - **NiO**: 15.414 kg\n  - **SiO2**: 277.446 kg\n\n## ⚠️ Unclassified species (mapping gap)\n**Total**: 39.908 kg — these species were in `product_ledger()` but did not map to any of the four north-star product classes. The mapping in `simulator/three_product_report.py` may need to be extended.\n\n  - **CaCO3**: 7.531e-03 kg\n  - **Na2CO3**: — kg\n  - **S**: 39.900 kg\n"
+  }
 }

@@ -4,7 +4,7 @@ The kernel never commits a proposal without running these four checks in
 order:
 
 1. :func:`validate_intent_authority` -- the proposing provider must have
-   the intent in its ``is_authoritative_for`` set.
+   the intent in its ``ledger_transition_authority_for`` set.
 2. :func:`validate_proposal_accounts` -- every account touched on either
    side of the proposal must be in the provider's
    ``declared_accounts``.
@@ -61,17 +61,17 @@ def validate_intent_authority(
     """Reject if the provider is not authoritative for ``intent``.
 
     Only providers that have declared an intent in
-    :attr:`CapabilityProfile.is_authoritative_for` may emit a
+    :attr:`CapabilityProfile.ledger_transition_authority_for` may emit a
     :class:`LedgerTransitionProposal` for it.  Shadow / diagnostic
     providers may return :class:`IntentResult` with ``transition=None``
     only.
     """
 
-    if not profile.is_authoritative(intent):
+    if not profile.may_emit_ledger_transition(intent):
         raise UnauthorizedIntentError(
-            f"provider {profile.provider_id!r} is not authoritative for intent "
-            f"{intent.value!r}; declared authority: "
-            f"{sorted(i.value for i in profile.is_authoritative_for)}"
+            f"provider {profile.provider_id!r} lacks ledger-transition authority "
+            f"for intent {intent.value!r}; declared ledger authority: "
+            f"{sorted(i.value for i in profile.ledger_transition_authority_for)}"
         )
 
 

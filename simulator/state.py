@@ -826,10 +826,11 @@ class EvaporationFlux:
     """
     Evaporation rates from the melt surface for one timestep.
 
-    Calculated using the Hertz-Knudsen-Langmuir equation:
-        J = α × (P_sat - P_ambient) / √(2π M R T)
-    where α is the evaporation coefficient (sticking probability),
-    multiplied by the induction stirring factor (4-8×).
+    The source provider combines the intrinsic Hertz-Knudsen interface
+    resistance with gas- and melt-transfer resistances, then integrates the
+    resulting mass flux over source area and time to populate the kg/hr fields
+    below. Stirring changes the melt-transfer resistance; it is not a direct
+    multiplier on the stored rate.
     """
     species_kg_hr: Dict[str, float] = field(default_factory=dict)
     # Mass evaporation rate per species (kg/hr)

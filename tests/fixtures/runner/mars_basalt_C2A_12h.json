@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.5.0",
+  "schema_version": "1.6.0",
   "run_metadata": {
-    "schema_version": "1.5.0",
+    "schema_version": "1.6.0",
     "feedstock_id": "mars_basalt",
     "campaign": "C2A",
     "hours_requested": 12,
@@ -2843,4 +2843,94 @@
   "status": "ok",
   "reason": "",
   "error_message": ""
+,  "product_classification": {
+    "classification": {
+      "metals_plus_O2": {
+        "metals_kg": {},
+        "metals_total_kg": 0.0,
+        "O2_kg": 3.0629468311083095,
+        "O2_partition_kg": {
+          "stored": 3.0629468311083095,
+          "total": 3.0629468311083095,
+          "stage0_stored": 3.0629468311083095,
+          "stage0_o2_recovered_stored": 3.0629468311083095
+        },
+        "class_total_kg": 3.0629468311083095
+      },
+      "ingots_metals": {
+        "species_kg": {},
+        "class_total_kg": 0.0
+      },
+      "oxygen": {
+        "O2_kg": 3.0629468311083095,
+        "partition_kg": {
+          "stored": 3.0629468311083095,
+          "total": 3.0629468311083095,
+          "stage0_stored": 3.0629468311083095,
+          "stage0_o2_recovered_stored": 3.0629468311083095
+        },
+        "class_total_kg": 3.0629468311083095
+      },
+      "pure_silica_glass": {
+        "stage_3_capture_kg": 0.0,
+        "stage_3_kg_by_species": {},
+        "class_total_kg": 0.0
+      },
+      "glass": {
+        "species_kg": {},
+        "class_total_kg": 0.0,
+        "pure_silica_glass_kg": 0.0,
+        "industrial_mixed_glass_kg": 0.0
+      },
+      "industrial_mixed_glass": {
+        "mixed_melt_residual_kg": 0.0,
+        "early_tap_mode": false,
+        "note": "present only when operator declared early-tap via early_tap_mode=True; zero by default — mid-run cleaned_melt is NOT a product class",
+        "class_total_kg": 0.0
+      },
+      "captured_volatiles": {
+        "kg_by_species": {
+          "CO": 119.93835638528458,
+          "CO2": 12.980296371129933,
+          "SO2": 45.701373991878
+        },
+        "class_total_kg": 178.6200267482925
+      },
+      "process_inventory_spent_reductant": {
+        "kg_by_species": {},
+        "class_total_kg": 0.0,
+        "account": "process.spent_reductant_residue",
+        "disposition": "process_inventory_spent_reductant"
+      },
+      "refractory_ceramic_rump": {
+        "rump_kg_by_species": {
+          "Al2O3": 99.95240361732507,
+          "CaO": 72.14495079156326,
+          "FeO": 171.34697762970012,
+          "K2O": 4.75963826749167,
+          "MgO": 84.87751487596529,
+          "Na2O": 34.653058922849944,
+          "P2O5": 8.09138505473584,
+          "SiO2": 433.127082341742,
+          "TiO2": 9.51927653498334
+        },
+        "rump_total_kg": 918.4722880363565,
+        "rump_refractory_oxides_kg": 266.494145819837,
+        "rump_silicate_residual_kg": 433.127082341742,
+        "rump_unextracted_metals_kg": 0.0,
+        "rump_other_kg": 218.85105987477758,
+        "class_total_kg": 918.4722880363565
+      },
+      "unclassified": {
+        "kg_by_species": {
+          "CaCO3": 0.008624540598544783,
+          "Na2CO3": 3.483968669115711E-11,
+          "Cl": 8.3601850108717,
+          "consumed_C_reagent": 30.0
+        },
+        "total_kg": 38.36880955150508
+      }
+    },
+    "markdown": "# Three-Product-Class Report\n**Feedstock**: `mars_basalt` • **Campaign**: `C2A`\n\n**Class totals**: Metals + O₂ potential: 3.063 kg | Silica glass: — kg | Mixed glass: — kg | Rump: 918.472 kg\n\n## 1. Metals + source-side O₂ potential (alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co + emitted O₂ potential)\n**Class total**: 3.063 kg\n\n- Metals subtotal: — kg\n- Source-side O₂ potential subtotal (emitted; not recovered/captured): 3.063 kg\n\nPer-species:\n  (no species in this class)\n\n## 2. Pure silica glass (Stage 3 fused-silica baffle capture)\n**Class total**: — kg\n\n- Stage 3 capture: — kg\n\nPer-species on Stage 3 baffles:\n  (no species in this class)\n\n## 3. Industrial mixed glass (early-tap residual melt option)\n**Class total**: — kg\n\n- Mixed melt residual: — kg\n  - *present only when operator declared early-tap via early_tap_mode=True; zero by default — mid-run cleaned_melt is NOT a product class*\n\n## 4. Refractory ceramic rump (Ca / REE / refractory oxides — by physics)\n**Class total**: 918.472 kg\n\n- Rump total: 918.472 kg\n- Refractory oxides floor (by physics): 266.494 kg\n- Silicate residual: 433.127 kg\n- Unextracted metals residue (failure-mode 1): — kg\n- Other / unclassified rump: 218.851 kg\n\nPer-species:\n  - **Al2O3**: 99.952 kg\n  - **CaO**: 72.145 kg\n  - **FeO**: 171.347 kg\n  - **K2O**: 4.760 kg\n  - **MgO**: 84.878 kg\n  - **Na2O**: 34.653 kg\n  - **P2O5**: 8.091 kg\n  - **SiO2**: 433.127 kg\n  - **TiO2**: 9.519 kg\n\n## ⚠️ Unclassified species (mapping gap)\n**Total**: 38.369 kg — these species were in `product_ledger()` but did not map to any of the four north-star product classes. The mapping in `simulator/three_product_report.py` may need to be extended.\n\n  - **CaCO3**: 8.625e-03 kg\n  - **Cl**: 8.360 kg\n  - **Na2CO3**: — kg\n  - **consumed_C_reagent**: 30.000 kg\n"
+  }
 }

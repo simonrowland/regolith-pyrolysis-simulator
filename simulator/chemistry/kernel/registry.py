@@ -1,11 +1,11 @@
 """Registration table mapping intents to providers.
 
-Each intent has at most ONE authoritative provider (whose result
-becomes a :class:`LedgerTransitionProposal`), at most ONE fallback
-provider (used only when the authoritative provider is absent/unavailable
+Each intent has at most ONE authoritative dispatch owner, at most ONE fallback
+provider (used only when the authoritative dispatch owner is absent/unavailable
 AND the caller opted into fallback for that intent), and any number of
 shadow providers (whose results are recorded for trace and parity testing
-but never committed).  Conflicting
+but never committed). Ledger-transition authority is declared separately in
+the provider capability profile. Conflicting
 authoritative or fallback registrations raise :class:`KernelError`.
 
 The fallback slot was added under \\goal VAPOROCK-AUTHORITY-PROMOTION
@@ -58,9 +58,9 @@ class ProviderRegistry:
                 :class:`CapabilityProfile` must declare every intent
                 being registered against it.  For authoritative and
                 fallback registrations the intent must also appear in
-                ``is_authoritative_for`` -- a fallback must itself be
-                capable of authority, otherwise nothing can take over
-                when the authoritative provider is unavailable.
+                ``is_authoritative_for`` so the provider can own that
+                dispatch slot. Ledger-transition authority is validated
+                separately if the provider returns a proposal.
             intents: Iterable of :class:`ChemistryIntent` values.
             shadow: If True, register as a shadow provider; mutually
                 exclusive with ``fallback``.
@@ -106,19 +106,15 @@ class ProviderRegistry:
                     f"{sorted(i.value for i in profile.intents)}"
                 )
             if fallback:
-                # Fallback must itself be authority-capable: when the
-                # authoritative provider is missing, the fallback
-                # produces the LedgerTransitionProposal in its place.
-                # An is_authoritative_for=frozenset() provider promoted
-                # to fallback would still produce diagnostic-only
-                # results -- legal but contractually equivalent to
-                # "no fallback wired", so we reject it loudly.
+                # Fallback must own the fallback dispatch slot. Whether it
+                # may produce a LedgerTransitionProposal is an orthogonal
+                # capability enforced by validate_intent_authority.
                 if not profile.is_authoritative(intent):
                     raise KernelError(
                         f"provider {profile.provider_id!r} cannot be fallback for "
                         f"{intent.value!r}: missing from CapabilityProfile."
-                        f"is_authoritative_for (fallback must be "
-                        f"authority-capable)"
+                        f"is_authoritative_for (fallback must own the "
+                        f"dispatch slot)"
                     )
                 if self._authoritative.get(intent) is provider:
                     raise KernelError(
