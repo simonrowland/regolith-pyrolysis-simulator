@@ -436,7 +436,11 @@ class PT0DeterminismStore:
         composition_by_account: Mapping[str, Mapping[str, float]] | None = None,
     ) -> dict[str, dict[str, float]]:
         if composition_by_account is None:
-            composition_by_account = sim.atom_ledger.mol_by_account()
+            accounts = sim.atom_ledger.mol_by_account()
+            composition_by_account = {
+                str(account): sim.atom_ledger.project_account_mol(str(account))
+                for account in accounts
+            }
         return canonicalized_composition_mol_by_account(
             composition_by_account,
             sig_figs=self._control_quantization.composition_sig_figs,
@@ -2554,7 +2558,7 @@ def _composition_mol_fraction(
     *,
     sig_figs: int | None = None,
 ) -> list[tuple[str, float]]:
-    cleaned = sim.atom_ledger.mol_by_account(_CLEANED_MELT_ACCOUNT)
+    cleaned = sim.atom_ledger.project_account_mol(_CLEANED_MELT_ACCOUNT)
     return _composition_mol_fraction_from_mol(cleaned, sig_figs=sig_figs)
 
 

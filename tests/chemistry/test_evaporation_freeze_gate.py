@@ -1668,7 +1668,7 @@ def test_shared_freeze_gate_curve_cache_splits_validation_map_dose_states(
         }
         monkeypatch.setattr(
             sim.atom_ledger,
-            'mol_by_account',
+            'project_account_mol',
             lambda account, composition=composition: dict(composition),
         )
         sim._freeze_gate_shared_curve_cache = shared_cache

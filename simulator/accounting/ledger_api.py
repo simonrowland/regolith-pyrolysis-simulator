@@ -99,7 +99,7 @@ class LedgerAPI:
         if units == "kg":
             values = self.ledger.project_account_kg(account)
         elif units == "mol":
-            values = self.ledger.mol_by_account(account)
+            values = self.ledger.project_account_mol(account)
         elif units == "wt_pct":
             values = None if self._account_can_be_signed(account) else wt_pct_from_kg(
                 self.ledger.project_account_kg(account)

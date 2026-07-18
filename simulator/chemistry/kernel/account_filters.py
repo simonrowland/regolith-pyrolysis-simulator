@@ -67,6 +67,7 @@ def build_provider_account_view(
         raise AccountFilterViolation(
             "ledger.mol_by_account() did not return a mapping; cannot filter"
         )
+    project_account_mol = getattr(ledger, "project_account_mol", None)
 
     overrides: dict[str, dict[str, float]] = {}
     if account_mol_overrides is not None:
@@ -83,6 +84,12 @@ def build_provider_account_view(
         species_mol = (
             overrides[account]
             if account in overrides
+            # Provider inputs are an outward physics boundary. Canonical mol
+            # retains signed roundoff dust for unbiased closure, while the
+            # ledger projection clamps only admissible dust and still refuses
+            # materially negative normal accounts.
+            else project_account_mol(account)
+            if callable(project_account_mol)
             else snapshot.get(account, {})
         )
         if species_mol:

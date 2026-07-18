@@ -312,8 +312,17 @@ class EquilibriumMixin:
         # --- Melt composition for oxide activities ---
         comp_wt = self.melt.composition_wt_pct()
         atom_ledger = getattr(self, "atom_ledger", None)
+        project_account_mol = getattr(atom_ledger, "project_account_mol", None)
         mol_by_account = getattr(atom_ledger, "mol_by_account", None)
-        if callable(mol_by_account):
+        if callable(project_account_mol):
+            # Canonical balances retain signed sub-tolerance dust so ledger
+            # closure stays unbiased. Physics consumers use the ledger-owned
+            # projection, which clamps only policy-admissible negative dust and
+            # still refuses a materially negative normal account.
+            melt_account_mol = dict(
+                project_account_mol("process.cleaned_melt") or {}
+            )
+        elif callable(mol_by_account):
             melt_account_mol = dict(mol_by_account("process.cleaned_melt") or {})
         else:
             melt_account_mol = {

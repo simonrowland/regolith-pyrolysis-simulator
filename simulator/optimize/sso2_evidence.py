@@ -154,7 +154,9 @@ def _certified_full_feo_equiv_na_dose_kg(
         additives_kg={SSO2_CERTIFIED_DOSE_SPECIES: float(mass_kg)},
     )
     base_feo_mol = float(
-        sim.atom_ledger.mol_by_account("process.cleaned_melt").get("FeO", 0.0)
+        sim.atom_ledger.project_account_mol("process.cleaned_melt").get(
+            "FeO", 0.0
+        )
         or 0.0
     )
     before = len(sim.atom_ledger.transitions)

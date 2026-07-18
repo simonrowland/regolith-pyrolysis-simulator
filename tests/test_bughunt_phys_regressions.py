@@ -5,11 +5,13 @@ import math
 from types import MappingProxyType, SimpleNamespace
 
 import pytest
+import simulator.reduced_real_determinism as reduced_real_determinism
 
 from engines.builtin.metallothermic_step import _time_integrated_inventory_fraction
 from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
 from simulator.accounting.queries import AccountingQueries
 from simulator.accounting.exceptions import AccountingError
+from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.ledger import (
     KNOWN_LEDGER_ACCOUNT_PREFIXES,
     KNOWN_LEDGER_ACCOUNTS,
@@ -33,9 +35,12 @@ from simulator.evaporation import EvaporationFluxRefusal, EvaporationMixin
 from simulator.extraction import ExtractionMixin
 from simulator.interpolation_uncertainty import _nonlinearity_component
 from simulator.optimize.evaluate import _trace_with_optimizer_coating_report
+from simulator.optimize.objective import _ledger_mol_by_accounts
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.strategy.bayesian import _constraint_values
 from simulator.overhead import OverheadConfigurationError, OverheadGasModel
+from simulator.reduced_real_determinism import PT0DeterminismStore
+from simulator.runner import _final_state_from_ledger
 from simulator.state import (
     Atmosphere,
     BatchRecord,
@@ -270,6 +275,7 @@ def test_negative_ledger_dust_never_projects_as_product_mass() -> None:
     canonical = ledger.kg_by_account("process.overhead_gas")
     assert canonical["Cr"] < 0.0
     assert abs(canonical["Cr"]) <= ledger.balance_tolerance_kg
+    assert ledger.project_account_mol("process.overhead_gas") == {}
     assert ledger.account_species_kg()["process.overhead_gas"] == {}
     assert ledger.account_kg("process.overhead_gas") == 0.0
     assert AccountingQueries(sim).product_ledger().get("Cr", 0.0) == 0.0
@@ -280,6 +286,168 @@ def test_negative_ledger_dust_never_projects_as_product_mass() -> None:
         for species_kg in ledger.kg_by_account().values()
         for kg in species_kg.values()
     ) == pytest.approx(1.0, abs=1.0e-15)
+
+
+def _signed_dust_ledger(account: str = "process.cleaned_melt") -> AtomLedger:
+    ledger = AtomLedger(
+        allowed_accounts=KNOWN_LEDGER_ACCOUNTS,
+        allowed_account_prefixes=KNOWN_LEDGER_ACCOUNT_PREFIXES,
+    )
+    ledger.load_external(account, {"FeO": 1.0})
+    ledger.move(
+        "outward_mol_projection_dust_probe",
+        account,
+        "process.wall_deposit_segment_mol_projection_probe",
+        {"FeO": 1.0 + 4.0e-13},
+    )
+    assert ledger.mol_by_account(account)["FeO"] < 0.0
+    return ledger
+
+
+def test_public_mol_serialization_projects_signed_dust() -> None:
+    ledger = _signed_dust_ledger()
+    sim = SimpleNamespace(
+        atom_ledger=ledger,
+        train=SimpleNamespace(stages=[]),
+        _unspent_additive_reagents_kg=lambda: {},
+        _terminal_rump_by_species=lambda: {},
+        _terminal_rump_by_class=lambda: {},
+    )
+
+    assert LedgerAPI(sim).account("process.cleaned_melt", units="mol")[
+        "species"
+    ] == {}
+    assert ledger.close_report()["mol_by_account"]["process.cleaned_melt"] == {}
+    assert ledger.mol_by_account("process.cleaned_melt")["FeO"] < 0.0
+
+
+def test_direct_liquidus_backend_receives_projected_mol_and_refuses_real_negative() -> None:
+    ledger = _signed_dust_ledger()
+    calls: list[dict[str, object]] = []
+
+    def finder(**kwargs):
+        calls.append(kwargs)
+        raise RuntimeError("probe complete")
+
+    sim = SimpleNamespace(
+        atom_ledger=ledger,
+        backend=SimpleNamespace(find_liquidus_solidus=finder),
+        species_formula_registry={},
+    )
+    reasons: list[str] = []
+    assert EvaporationMixin._freeze_gate_curve_from_backend_liquidus(
+        sim, reasons, pressure_bar=1.0e-6, fO2_log=-9.0
+    ) is None
+    assert calls[0]["composition_mol_by_account"] == {
+        "process.cleaned_melt": {}
+    }
+
+    ledger._balances["process.cleaned_melt"]["FeO"] *= 10.0
+    with pytest.raises(AccountingError, match="negative outward mass"):
+        EvaporationMixin._freeze_gate_curve_from_backend_liquidus(
+            sim, [], pressure_bar=1.0e-6, fO2_log=-9.0
+        )
+    assert len(calls) == 1
+
+
+def test_legacy_backend_composition_projects_dust_and_refuses_real_negative() -> None:
+    ledger = _signed_dust_ledger()
+    sim = SimpleNamespace(atom_ledger=ledger)
+
+    assert PyrolysisSimulator._backend_composition_mol_by_account(sim).get(
+        "process.cleaned_melt"
+    ) is None
+    ledger._balances["process.cleaned_melt"]["FeO"] *= 10.0
+    with pytest.raises(AccountingError, match="negative outward mass"):
+        PyrolysisSimulator._backend_composition_mol_by_account(sim)
+
+
+def test_pt0_ledger_overrides_project_dust_and_refuse_real_negative() -> None:
+    ledger = _signed_dust_ledger()
+    sim = SimpleNamespace(atom_ledger=ledger)
+    store = PT0DeterminismStore("capture")
+
+    projected = store.canonical_composition_mol_by_account(sim)
+    assert projected["process.cleaned_melt"] == {}
+    assert reduced_real_determinism._composition_mol_fraction(sim) == []
+
+    ledger._balances["process.cleaned_melt"]["FeO"] *= 10.0
+    with pytest.raises(AccountingError, match="negative outward mass"):
+        store.canonical_composition_mol_by_account(sim)
+    with pytest.raises(AccountingError, match="negative outward mass"):
+        reduced_real_determinism._composition_mol_fraction(sim)
+
+
+def test_remaining_outward_mol_consumer_classes_fail_closed() -> None:
+    consumers = (
+        (
+            "runner_final_state",
+            "process.cleaned_melt",
+            lambda sim: _final_state_from_ledger(sim),
+            lambda result: result["process.cleaned_melt"] == {},
+        ),
+        (
+            "optimizer_account_aggregation",
+            "process.cleaned_melt",
+            lambda sim: _ledger_mol_by_accounts(
+                sim, ("process.cleaned_melt",)
+            ),
+            lambda result: result == {},
+        ),
+        (
+            "extraction_availability",
+            "process.cleaned_melt",
+            lambda sim: ExtractionMixin._cleaned_melt_available_mol_by_species(
+                sim, ("FeO",)
+            ),
+            lambda result: result == {"FeO": 0.0},
+        ),
+        (
+            "parametric_liquidus",
+            "process.cleaned_melt",
+            lambda sim: EvaporationMixin._freeze_gate_curve_from_parametric_liquidus(
+                sim, []
+            ),
+            lambda result: result is None,
+        ),
+        (
+            "headspace_holdup",
+            "process.overhead_gas",
+            lambda sim: PyrolysisSimulator._overhead_holdup_mol(sim),
+            lambda result: result == {},
+        ),
+        (
+            "cleaned_melt_fe_inventory",
+            "process.cleaned_melt",
+            lambda sim: PyrolysisSimulator._cleaned_melt_fe_atom_mol(sim),
+            lambda result: result == 0.0,
+        ),
+        (
+            "public_plume_report",
+            "process.overhead_gas",
+            lambda sim: AccountingQueries(sim).lab_plume_product_partition(),
+            lambda result: (
+                result["near_melt"]["sio"]["species_mol"] == 0.0
+                and result["near_melt"]["free_analyzer_oxygen"][
+                    "species_mol"
+                ] == {}
+            ),
+        ),
+    )
+
+    for seam, account, consume, accepts_dust in consumers:
+        ledger = _signed_dust_ledger(account)
+        sim = SimpleNamespace(
+            atom_ledger=ledger,
+            species_formula_registry=ledger.registry,
+        )
+        result = consume(sim)
+        assert accepts_dust(result), seam
+        assert ledger.mol_by_account(account)["FeO"] < 0.0, seam
+
+        ledger._balances[account]["FeO"] *= 10.0
+        with pytest.raises(AccountingError, match="negative outward mass"):
+            consume(sim)
 
 
 def test_runtime_melt_and_c7_report_use_ledger_projection_policy() -> None:

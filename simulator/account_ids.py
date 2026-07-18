@@ -12,12 +12,17 @@ METAL_PHASE_ACCOUNTS = (
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
 )
+CHROMIUM_CONDENSED_OXIDE_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
 # Writer sweep (2026-07-12): evaporation._project_condensed_stage_collection
 # projects condensation-train credits; extraction._project_condensed_species
-# projects condensation-train or metal-phase balances. Other mutations clear.
+# projects condensation-train, dedicated terminal chromium-product, or
+# metal-phase balances. Other mutations clear.  The dedicated chromium account
+# still backs the same stage-collection UI projection, so excluding it makes a
+# correctly routed Cr2O3 product appear as projection-only mass.
 STAGE_COLLECTION_BACKING_ACCOUNTS = (
     *METAL_PHASE_ACCOUNTS,
     "process.condensation_train",
+    CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
 )
 OXYGEN_STAGE0_ACCOUNT = "terminal.oxygen_stage0_stored"
 OXYGEN_MELT_OFFGAS_ACCOUNT = "terminal.oxygen_melt_offgas_stored"
@@ -37,7 +42,6 @@ OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT = (
 # (non-debitable diagnostic sink) and process.reagent_inventory C
 # (operator-supplied reductant).
 SOLID_CHAR_CARBON_ACCOUNT = "process.solid_char_carbon"
-CHROMIUM_CONDENSED_OXIDE_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
 SPENT_REDUCTANT_RESIDUE_ACCOUNT = "process.spent_reductant_residue"
 C7_AL_CREDIT_ACCOUNT = "process.c7_al_credit"
 OXYGEN_STORED_ACCOUNTS = (

@@ -608,6 +608,14 @@ class AtomLedger:
                 projected[species] = value
         return projected
 
+    def project_account_mol(self, account: str) -> dict[str, float]:
+        """Project one account to outward-policy mol without changing closure."""
+        return _species_kg_to_mol(
+            self.project_account_kg(account),
+            self.registry,
+            tolerance_kg=0.0,
+        )
+
     def _projection_tolerance_kg(
         self,
         account: str,
@@ -783,7 +791,10 @@ class AtomLedger:
             account: self.project_account_kg(account)
             for account in sorted(self._balances)
         }
-        mol_by_account = self.mol_by_account()
+        mol_by_account = {
+            account: self.project_account_mol(account)
+            for account in sorted(self._balances)
+        }
         total_kg_by_account = {
             account: sum(species_kg.values())
             for account, species_kg in kg_by_account.items()

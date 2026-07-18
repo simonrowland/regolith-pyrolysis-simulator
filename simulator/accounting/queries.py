@@ -786,7 +786,11 @@ class AccountingQueries:
         not near-melt. Outlet ``plume_product_proxy`` is condensation-train
         SiO2 — a route-product proxy, not direct O2-consuming ledger proof.
         """
-        balances = self.ledger.mol_by_account()
+        accounts = self.ledger.mol_by_account()
+        balances = {
+            account: self.ledger.project_account_mol(account)
+            for account in accounts
+        }
         registry = self.ledger.registry
 
         near_melt_species_mol = dict(

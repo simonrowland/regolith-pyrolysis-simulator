@@ -2984,10 +2984,11 @@ def _captured_products_mol(
     result: dict[str, float] = {}
     ledger = getattr(sim, "atom_ledger", None)
     mol_by_account = getattr(ledger, "mol_by_account", None)
+    project_account_mol = getattr(ledger, "project_account_mol", None)
     if callable(mol_by_account):
         raw = mol_by_account()
         if isinstance(raw, Mapping):
-            for account, species_mol in raw.items():
+            for account, raw_species_mol in raw.items():
                 account_name = str(account)
                 if account_name in _VENTED_PRODUCT_ACCOUNTS:
                     continue
@@ -3002,6 +3003,11 @@ def _captured_products_mol(
                     }
                 ):
                     continue
+                species_mol = (
+                    project_account_mol(account_name)
+                    if callable(project_account_mol)
+                    else raw_species_mol
+                )
                 if not isinstance(species_mol, Mapping):
                     continue
                 for species, mol in species_mol.items():
@@ -3143,9 +3149,14 @@ def _ledger_mol_by_accounts(sim: Any, accounts: Sequence[str]) -> dict[str, floa
     mol_by_account = getattr(ledger, "mol_by_account", None)
     if not callable(mol_by_account):
         return {}
+    project_account_mol = getattr(ledger, "project_account_mol", None)
     result: dict[str, float] = {}
     for account in accounts:
-        raw = mol_by_account(account)
+        raw = (
+            project_account_mol(account)
+            if callable(project_account_mol)
+            else mol_by_account(account)
+        )
         if not isinstance(raw, Mapping):
             continue
         for species, mol in raw.items():

@@ -194,7 +194,10 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # schema and quantization are unchanged; value captured by full-suite run.
     # 2026-07-14 t-194 Mn grounding: the parsed Mn alpha block advances only the
     # functional data digest; replay schema and control quantization are unchanged.
-    assert key_hash == "6bb4755414034b8ff0bd99b49fd199eac1de3612fd9e36665de521afae16f683"
+    # 2026-07-18 outward mol projection completeness: PT0 now projects every
+    # live ledger account before canonicalizing provider overrides, so the
+    # source-module identity advances without changing quantization tolerances.
+    assert key_hash == "c859430e19fa4eacef3f74dd2e4f62a5764fd5ad4c7570e1ef8389e4c59ee064"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 

@@ -687,7 +687,12 @@ class EvaporationMixin:
         vapor_pressure_diagnostic: Mapping[str, Any],
     ) -> dict[str, float]:
         try:
-            account_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+            projection = getattr(self.atom_ledger, 'project_account_mol', None)
+            account_mol = (
+                projection(_FREEZE_GATE_ACCOUNT)
+                if callable(projection)
+                else self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+            )
         except AttributeError:
             account_mol = {}
         fractions = dict(single_cation_mole_fractions(account_mol))
@@ -934,7 +939,9 @@ class EvaporationMixin:
         pressure_bar: float,
         fO2_log: float,
     ) -> tuple:
-        cleaned_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+        cleaned_mol = self.atom_ledger.project_account_mol(
+            _FREEZE_GATE_ACCOUNT
+        )
         relevant_mol: dict[str, float] = {}
         for species, mol in cleaned_mol.items():
             species_key = str(species)
@@ -1140,14 +1147,15 @@ class EvaporationMixin:
         if not callable(finder):
             reasons.append('backend liquidus finder unavailable')
             return None
+        composition_mol = self.atom_ledger.project_account_mol(
+            _FREEZE_GATE_ACCOUNT
+        )
         try:
             result = finder(
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 composition_mol_by_account={
-                    _FREEZE_GATE_ACCOUNT: self.atom_ledger.mol_by_account(
-                        _FREEZE_GATE_ACCOUNT
-                    )
+                    _FREEZE_GATE_ACCOUNT: composition_mol
                 },
                 species_formula_registry=dict(
                     getattr(self, 'species_formula_registry', {}) or {}
@@ -1237,7 +1245,9 @@ class EvaporationMixin:
         self,
         reasons: list[str],
     ) -> dict[str, Any] | None:
-        cleaned_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+        cleaned_mol = self.atom_ledger.project_account_mol(
+            _FREEZE_GATE_ACCOUNT
+        )
         if not any(
             species in _FREEZE_GATE_COMPOSITION_SPECIES and float(mol) > 0.0
             for species, mol in cleaned_mol.items()

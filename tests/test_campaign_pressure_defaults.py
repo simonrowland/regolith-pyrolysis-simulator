@@ -552,9 +552,10 @@ def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
     assert melt.background_gas_species == "Ar"
 
     gas = OverheadGasModel({
-        "overhead_headspace": {"enabled": True},
-        "headspace_volume_m3": 1.0,
-        "headspace_temperature_K": 1773.15,
+        "enabled": True,
+        # Explicit test geometry, not a product default: finite headspace must
+        # refuse when neither equipment nor the caller supplies a volume.
+        "volume_m3": 1.0,
     }).update(EvaporationFlux(), melt, CondensationTrain.create_default())
 
     assert gas.composition.get("Ar", 0.0) == pytest.approx(8.0)

@@ -82,10 +82,25 @@ def test_o2_shomate_anchor_and_validity_refusal() -> None:
     assert oxygen_cp_shomate_j_per_mol_k(298.15) == pytest.approx(independently_computed, rel=1e-12)
     assert OXYGEN_GAMMA == pytest.approx(1.395)
     assert OXYGEN_SPECIFIC_GAS_CONSTANT_J_PER_KG_K == pytest.approx(259.8)
+    # NIST Chemistry WebBook SRD 69 (Chase, 1998) publishes a third O2
+    # Shomate band from 2000 through 6000 K; 2000 K is not an upper limit.
+    high = (20.91111, 10.72071, -2.020498, 0.146449, 9.245722)
+    t_high = 2500.0 / 1000.0
+    independently_computed_high = (
+        high[0]
+        + high[1] * t_high
+        + high[2] * t_high**2
+        + high[3] * t_high**3
+        + high[4] / t_high**2
+    )
+    assert oxygen_cp_shomate_j_per_mol_k(2500.0) == pytest.approx(
+        independently_computed_high,
+        rel=1e-12,
+    )
     with pytest.raises(ValueError, match="100 K"):
         oxygen_cp_shomate_j_per_mol_k(99.999)
-    with pytest.raises(ValueError, match="2000 K"):
-        oxygen_cp_shomate_j_per_mol_k(2000.001)
+    with pytest.raises(ValueError, match="6000 K"):
+        oxygen_cp_shomate_j_per_mol_k(6000.001)
 
 
 def test_independent_o2_phase_enthalpies_and_public_alkali_latent_accessor() -> None:

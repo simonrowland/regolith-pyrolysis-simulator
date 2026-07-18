@@ -2031,19 +2031,21 @@ def _carrier_pressure_observables(
 def _final_state_from_ledger(sim: PyrolysisSimulator) -> dict[str, dict[str, float]]:
     """Return ``{account_name: {species_id: mol}}`` for the full ledger.
 
-    ``AtomLedger.mol_by_account()`` returns mol-keyed balances for every
-    registered account.  Zero entries are dropped to keep the output
-    compact -- downstream callers should treat absent keys as 0.0.
+    Outward-policy mol projections are used for every registered account.
+    Zero entries are dropped to keep the output compact -- downstream callers
+    should treat absent keys as 0.0.
     """
 
-    balances = sim.atom_ledger.mol_by_account()
+    accounts = sim.atom_ledger.mol_by_account()
     return {
         account: {
             species: float(mol)
-            for species, mol in sorted(species_mol.items())
+            for species, mol in sorted(
+                sim.atom_ledger.project_account_mol(account).items()
+            )
             if abs(float(mol)) > 0.0
         }
-        for account, species_mol in sorted(balances.items())
+        for account in sorted(accounts)
     }
 
 
@@ -2083,7 +2085,7 @@ def _c0_char_diagnostic(
     ledger_char_mol = max(
         0.0,
         float(
-            sim.atom_ledger.mol_by_account(SOLID_CHAR_CARBON_ACCOUNT).get(
+            sim.atom_ledger.project_account_mol(SOLID_CHAR_CARBON_ACCOUNT).get(
                 "C", 0.0
             )
             or 0.0
@@ -2890,9 +2892,10 @@ def build_sio_yield_report(
         max(float(sim.melt.temperature_C) + 273.15, 1.0),
         {"coefficient_spec": sio_alpha_spec},
     )
-    initial_balances = sim.atom_ledger.mol_by_account()
     initial_sio2_mol = float(
-        initial_balances.get("process.cleaned_melt", {}).get("SiO2", 0.0)
+        sim.atom_ledger.project_account_mol("process.cleaned_melt").get(
+            "SiO2", 0.0
+        )
     )
 
     result = base_run._run_session(session)

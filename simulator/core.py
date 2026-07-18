@@ -2758,7 +2758,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         live_overhead_o2_mol = max(
             0.0,
             float(
-                self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                self.atom_ledger.project_account_mol('process.overhead_gas').get(
                     OXYGEN_SPECIES,
                     0.0,
                 )
@@ -3320,7 +3320,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _overhead_holdup_mol(self) -> Dict[str, float]:
         return {
             species: float(mol)
-            for species, mol in self.atom_ledger.mol_by_account(
+            for species, mol in self.atom_ledger.project_account_mol(
                 'process.overhead_gas').items()
             if float(mol) > 0.0
         }
@@ -3469,7 +3469,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self._overhead_headspace_enabled() and residual_o2_mol > 0.0:
             holdup_mol = {
                 species: max(0.0, float(mol))
-                for species, mol in self.atom_ledger.mol_by_account(
+                for species, mol in self.atom_ledger.project_account_mol(
                     'process.overhead_gas'
                 ).items()
                 if max(0.0, float(mol)) > 0.0
@@ -3549,7 +3549,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
     ) -> OxygenReservoirState:
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -3584,7 +3584,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _cleaned_melt_fe_atom_mol(self) -> float:
         total_fe_mol = 0.0
-        for species, mol in self.atom_ledger.mol_by_account(
+        for species, mol in self.atom_ledger.project_account_mol(
             'process.cleaned_melt'
         ).items():
             if float(mol) <= 0.0:
@@ -3716,7 +3716,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         head_o2_mol = float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -4463,7 +4463,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f'got {reference_T_K!r}'
                 )
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -4530,7 +4530,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -5211,7 +5211,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._fe_redox_internal_o2_consumed_mol_this_hr = 0.0
 
     def _ledger_ferric_fraction_diagnostic(self) -> Dict[str, Any]:
-        melt_mol = self.atom_ledger.mol_by_account('process.cleaned_melt')
+        melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
         feo_mol = max(0.0, float(melt_mol.get('FeO', 0.0) or 0.0))
         fe2o3_mol = max(0.0, float(melt_mol.get('Fe2O3', 0.0) or 0.0))
         oxidized_fe_mol = feo_mol + 2.0 * fe2o3_mol
@@ -5575,7 +5575,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -5691,7 +5691,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             candidate_fO2_log=candidate_fO2_log,
         )
         post_head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -6486,7 +6486,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         native_frac = min(1.0, max(0.0, float(
             native_state.get('native_fe_frac', 0.0) or 0.0,
         )))
-        cleaned_melt_mol = self.atom_ledger.mol_by_account(
+        cleaned_melt_mol = self.atom_ledger.project_account_mol(
             'process.cleaned_melt')
         feo_mol = max(0.0, float(cleaned_melt_mol.get('FeO', 0.0) or 0.0))
         total_fe_mol = self._cleaned_melt_fe_atom_mol()
@@ -6786,7 +6786,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and self.melt.campaign == CampaignPhase.C2A_STAGED
         ):
             native_fe_mol = max(0.0, float(
-                self.atom_ledger.mol_by_account('process.metal_phase').get(
+                self.atom_ledger.project_account_mol('process.metal_phase').get(
                     'Fe', 0.0,
                 )
                 or 0.0
@@ -7736,7 +7736,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         for account in BACKEND_REACTIVE_ACCOUNTS:
             species_mol = {
                 species: mol
-                for species, raw_mol in self.atom_ledger.mol_by_account(
+                for species, raw_mol in self.atom_ledger.project_account_mol(
                     account).items()
                 if (mol := float(raw_mol)) > 0.0
             }
@@ -9326,7 +9326,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return max(
             0.0,
             float(
-                self.atom_ledger.mol_by_account(
+                self.atom_ledger.project_account_mol(
                     SOLID_CHAR_CARBON_ACCOUNT
                 ).get(CHAR_SPECIES, 0.0)
                 or 0.0
@@ -9390,7 +9390,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feo_mol = max(
             0.0,
             float(
-                self.atom_ledger.mol_by_account('process.cleaned_melt').get(
+                self.atom_ledger.project_account_mol('process.cleaned_melt').get(
                     'FeO', 0.0
                 )
                 or 0.0
@@ -9451,7 +9451,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         competition and carbide speciation remain future work.
         """
         char_mol = self._solid_char_carbon_mol()
-        melt = self.atom_ledger.mol_by_account('process.cleaned_melt')
+        melt = self.atom_ledger.project_account_mol('process.cleaned_melt')
         susceptible = {
             species: max(0.0, float(melt.get(species, 0.0) or 0.0))
             for species in ('P2O5', 'Cr2O3', 'TiO2')

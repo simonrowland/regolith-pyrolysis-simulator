@@ -55,7 +55,7 @@ def test_account_units_match_ledger_ground_truth_and_are_basis_aware():
     api = _api()
     ledger = api.ledger
     assert api.account("process.cleaned_melt", units="kg")["species"] == ledger.kg_by_account("process.cleaned_melt")
-    assert api.account("process.cleaned_melt", units="mol")["species"] == ledger.mol_by_account("process.cleaned_melt")
+    assert api.account("process.cleaned_melt", units="mol")["species"] == ledger.project_account_mol("process.cleaned_melt")
     wt = api.account("process.cleaned_melt", units="wt_pct")
     assert wt["basis"] == "oxide"
     assert sum(wt["species"].values()) == pytest.approx(100.0)
