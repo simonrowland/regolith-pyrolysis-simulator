@@ -292,11 +292,20 @@ class MAGEMinShadowProvider(ChemistryProvider):
     @staticmethod
     def _extract_diagnostic(result: Any) -> Mapping[str, Any]:
         if isinstance(result, Mapping):
-            return dict(result.get('diagnostic') or result)
-        diagnostic = getattr(result, 'diagnostic', None)
-        if diagnostic is None:
-            return {}
-        return dict(diagnostic)
+            diagnostic = dict(result.get('diagnostic') or result)
+            control_audit = result.get('control_audit')
+        else:
+            diagnostic = dict(getattr(result, 'diagnostic', None) or {})
+            control_audit = getattr(result, 'control_audit', None)
+        if isinstance(control_audit, Mapping):
+            applied = control_audit.get('applied')
+        else:
+            applied = getattr(control_audit, 'applied', None)
+        if isinstance(applied, Mapping):
+            for key in ('temperature_C', 'pressure_bar', 'fO2_log'):
+                if key in applied:
+                    diagnostic.setdefault(key, applied[key])
+        return diagnostic
 
     @staticmethod
     def _extract_status(result: Any) -> str:

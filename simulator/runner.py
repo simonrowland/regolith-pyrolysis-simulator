@@ -776,6 +776,7 @@ class PyrolysisRun:
         # token so the serialized run metadata (`"backend"`) and the fidelity-
         # vocabulary backend-token translator both see the legacy token.
         self.backend_name = canonical_backend_name(self.backend_name)
+        self._enforce_preset_comparison_contract()
         if int(self.hours) < 0:
             raise RunnerError(
                 f"invalid hours: hours must be >= 0; got {int(self.hours)}"
@@ -786,6 +787,23 @@ class PyrolysisRun:
         )
         self.runtime_campaign_overrides = overrides
         self.setpoints_overrides = overrides
+
+    def _enforce_preset_comparison_contract(self) -> None:
+        preset = self.run_metadata_overrides.get(PRESET_PROVENANCE_METADATA_KEY)
+        if not isinstance(preset, Mapping):
+            return
+        contract = preset.get("comparison_contract")
+        if not isinstance(contract, Mapping):
+            return
+        policy = str(contract.get("fast_tier_policy") or "").strip()
+        if (
+            policy == "cached_real_only_no_internal_analytical"
+            and self.backend_name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        ):
+            raise RunnerError(
+                "preset comparison contract forbids internal-analytical execution: "
+                "fast_tier_policy=cached_real_only_no_internal_analytical"
+            )
     # ------------------------------------------------------------------
     # Run entry points
     # ------------------------------------------------------------------

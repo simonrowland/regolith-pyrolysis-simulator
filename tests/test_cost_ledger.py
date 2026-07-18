@@ -201,6 +201,23 @@ def test_run_input_allocation_uses_existing_species_product_row():
     assert co.thermal_flux_h == pytest.approx(1273.15)
 
 
+def test_run_input_allocation_reports_terminal_mass_basis_not_cost_lot_mass():
+    ledger = CostLedger()
+    ledger.apply_mass_allocated_event(
+        process_step="stage0",
+        outputs_kg={("terminal.offgas", "CO"): 2.0},
+        processing_cost=CostVector(external_reagent_kg=1.0),
+    )
+
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=ledger,
+        per_hour=({"T_C": 1000.0},),
+        products_kg={"CO": 10.0},
+    )
+
+    assert diagnostic["product_costs"]["terminal.offgas:CO"]["quantity_kg"] == pytest.approx(10.0)
+
+
 def test_run_input_allocation_excludes_reagent_bookkeeping_products():
     diagnostic = build_cost_rollup_diagnostic(
         cost_ledger=CostLedger(),

@@ -218,7 +218,19 @@ def run_fidelity_correlation(
         )
         drops.extend(drop for drop in (fast_drop, high_drop) if drop is not None)
         if fast is not None and high is not None:
-            pairs.append((index, fast, high))
+            mismatch = _pair_evalspec_mismatch(fast, high)
+            if mismatch is None:
+                pairs.append((index, fast, high))
+            else:
+                drops.append(
+                    _drop(
+                        index,
+                        "pair",
+                        f"fidelity-doe-{index:06d}",
+                        "incompatible_evalspec",
+                        mismatch,
+                    )
+                )
 
     objectives = _objective_names(objective_names, pairs)
     protocol = FidelityCorrelationProtocol(
@@ -671,17 +683,46 @@ def _arm_inherited_evidence_class(
     tasks: Sequence[_FidelityTask],
     results: Sequence[ScoredResult],
 ) -> str | None:
+    evidence_classes: set[str] = set()
     for result in results:
         token = _result_inherited_evidence_token(result)
         if token is not None:
-            return _inherited_evidence_class_from_token(token)
+            evidence_classes.add(_inherited_evidence_class_from_token(token))
     for task in tasks:
         cache_config = _task_run_options(task).get("reduced_real_cache")
         if isinstance(cache_config, Mapping):
             token = cache_config.get("authorized_backend_name")
             if token is not None:
-                return _inherited_evidence_class_from_token(token)
-    return None
+                evidence_classes.add(_inherited_evidence_class_from_token(token))
+    return next(iter(evidence_classes)) if len(evidence_classes) == 1 else None
+
+
+def _pair_evalspec_mismatch(
+    fast: ScoredResult,
+    high: ScoredResult,
+) -> str | None:
+    fast_spec = getattr(fast, "eval_spec", None)
+    high_spec = getattr(high, "eval_spec", None)
+    if fast_spec is None or high_spec is None:
+        missing = [
+            arm
+            for arm, spec in (("fast", fast_spec), ("high", high_spec))
+            if spec is None
+        ]
+        return "fidelity pair EvalSpec missing: " + ", ".join(missing)
+    mismatches: list[str] = []
+    if int(fast_spec.hours) != int(high_spec.hours):
+        mismatches.append(
+            f"hours fast={fast_spec.hours} high={high_spec.hours}"
+        )
+    if str(fast_spec.bounds_digest) != str(high_spec.bounds_digest):
+        mismatches.append(
+            "bounds_digest "
+            f"fast={fast_spec.bounds_digest!r} high={high_spec.bounds_digest!r}"
+        )
+    if not mismatches:
+        return None
+    return "fidelity pair EvalSpec mismatch: " + "; ".join(mismatches)
 
 
 def _result_inherited_evidence_token(result: ScoredResult) -> object | None:

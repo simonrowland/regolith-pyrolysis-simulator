@@ -956,6 +956,10 @@ def _validate_two_phase_certify(
         source=source,
         where="two_phase_certify",
     )
+    if "enabled" in raw and not isinstance(raw["enabled"], bool):
+        raise ProfileValidationError(
+            f"{source}: two_phase_certify.enabled must be a bool"
+        )
     if "top_k" in raw:
         top_k = raw["top_k"]
         if not isinstance(top_k, int) or isinstance(top_k, bool) or top_k <= 0:

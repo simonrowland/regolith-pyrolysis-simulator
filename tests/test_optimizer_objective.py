@@ -177,6 +177,24 @@ def test_legacy_energy_objective_alias_scores_under_canonical_definition() -> No
     ) == (-4.0,)
 
 
+@pytest.mark.parametrize(
+    ("metric", "expected_units"),
+    (("Fe_kg", "kg"), ("electrical_energy_kWh", "kWh")),
+)
+def test_objective_definitions_reject_wrong_units_for_dynamic_metrics(
+    metric: str,
+    expected_units: str,
+) -> None:
+    profile = {
+        "objectives": [
+            {"metric": metric, "sense": "maximize", "units": "USD"}
+        ]
+    }
+
+    with pytest.raises(ObjectiveProfileError, match=expected_units):
+        objective_definitions(profile)
+
+
 def test_energy_alias_set_is_derived_from_canonical_alias_mapping() -> None:
     expected = frozenset(
         {

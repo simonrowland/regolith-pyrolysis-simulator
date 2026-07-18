@@ -13,6 +13,7 @@ from functools import lru_cache, partial
 import inspect
 import multiprocessing as mp
 import logging
+import math
 import os
 from pathlib import Path
 import pickle
@@ -925,8 +926,8 @@ def resolve_eval_timeout_seconds(value: float | int | str | None = None) -> floa
     if raw is None:
         return float(DEFAULT_EVAL_TIMEOUT_SECONDS)
     seconds = float(raw)
-    if seconds <= 0.0:
-        raise ValueError("per-eval timeout seconds must be positive")
+    if not math.isfinite(seconds) or seconds <= 0.0:
+        raise ValueError("per-eval timeout seconds must be finite and positive")
     return seconds
 
 

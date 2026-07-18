@@ -443,6 +443,7 @@ def test_writer_gate_rejects_independent_projection_mutations():
 
 @pytest.mark.skipif(not LEGACY_DB.exists(), reason="private reduced-real corpus absent")
 @pytest.mark.serial
+@pytest.mark.xdist_group("serial")
 def test_full_corpus_golden_byte_parity_and_idempotence(tmp_path):
     destination = tmp_path / "cache-v2.db"
     report_path = tmp_path / "cache-v2.report.json"

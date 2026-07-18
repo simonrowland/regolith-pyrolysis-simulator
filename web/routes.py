@@ -265,28 +265,34 @@ def _optimizer_runs_root() -> Path:
 
 def _optimizer_job_parallel_cap() -> int:
     configured = current_app.config.get('OPTIMIZER_JOB_PARALLEL_CAP')
+    if configured is None:
+        return DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP
     try:
         cap = int(configured)
     except (TypeError, ValueError):
-        cap = DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP
+        cap = 1
     return max(1, cap)
 
 
 def _optimizer_job_budget_cap() -> int:
     configured = current_app.config.get('OPTIMIZER_JOB_BUDGET_CAP')
+    if configured is None:
+        return DEFAULT_OPTIMIZER_JOB_BUDGET_CAP
     try:
         cap = int(configured)
     except (TypeError, ValueError):
-        cap = DEFAULT_OPTIMIZER_JOB_BUDGET_CAP
+        cap = 1
     return max(1, cap)
 
 
 def _optimizer_job_queue_cap() -> int:
     configured = current_app.config.get('OPTIMIZER_JOB_QUEUE_CAP')
+    if configured is None:
+        return DEFAULT_OPTIMIZER_JOB_QUEUE_CAP
     try:
         cap = int(configured)
     except (TypeError, ValueError):
-        cap = DEFAULT_OPTIMIZER_JOB_QUEUE_CAP
+        cap = 1
     return max(1, cap)
 
 

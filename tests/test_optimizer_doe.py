@@ -8,6 +8,7 @@ import math
 import pytest
 
 import simulator.optimize.doe as doe_module
+from simulator.campaigns import C2A_STAGED_PN2_SWEEP_MIN_MBAR
 from simulator.optimize.doe import (
     ConditionalSubspaceExhausted,
     DEPENDENCY_FREE_LHC_SAMPLER,
@@ -49,7 +50,7 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         )
         for index in range(8)
     )
-    assert [len(item.patch.values) for item in batch] == [64, 70] * 4
+    assert [len(item.patch.values) for item in batch] == [61, 67] * 4
     assert [item.patch.canonical_json() for item in batch] == [
         item.patch.canonical_json() for item in indexed
     ]
@@ -73,7 +74,7 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
     ]
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "6f8e525bef21ad89bfe4d69dc5504aa6e247dc10d6033cba87513cdf24c36160"
+    ).hexdigest() == "9d98f401d27b41b2a464d7447f3a63719e7c6fd4cc35a75b36fb1aeb8fcbf613"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -97,7 +98,7 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
     ]
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "da078800efa7a5e4d4a677b05fb522aaac3e5fa86e71ba24f8a7036a730ec5e8"
+    ).hexdigest() == "8d93c9a7266efa667b43a9cd912601173aad43462a8042a1e51161b7f1bbde79"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():
@@ -260,6 +261,10 @@ def _assert_pressure_defaults_are_jointly_feasible(
                         total,
                         ".".join(mode_path),
                         mode,
+                    )
+                    assert (
+                        total - po2
+                        >= C2A_STAGED_PN2_SWEEP_MIN_MBAR - 1.0e-12
                     )
                     continue
             assert po2 <= total, (
@@ -558,7 +563,7 @@ def test_sampler_varies_every_allowlisted_knob_across_samples() -> None:
     for schema in (RecipeSchema(), _small_schema()):
         patches = sample_recipe_patches(
             schema,
-            n_samples=46,
+                n_samples=128,
             seed=42,
             sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
         )

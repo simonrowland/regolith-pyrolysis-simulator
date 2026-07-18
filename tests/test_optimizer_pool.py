@@ -21,7 +21,11 @@ from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_
 from simulator.optimize.evaluate import EngineBugAbort, FailureCategory, RunReference, ScoredResult
 from simulator.optimize.objective import ObjectiveValue, ObjectiveVector
 from simulator.optimize.physics import GateMargin, ThresholdSpec
-from simulator.optimize.pool import PoolEvaluationRequest, evaluate_batch
+from simulator.optimize.pool import (
+    PoolEvaluationRequest,
+    evaluate_batch,
+    resolve_eval_timeout_seconds,
+)
 from simulator.optimize.recipe import RecipePatch
 from simulator.optimize.results_store import ResultStore
 
@@ -42,6 +46,12 @@ _DATA_DIGESTS = {
     "species_catalog": "species-catalog-digest",
     "profile": "profile-digest",
 }
+
+
+@pytest.mark.parametrize("value", ["nan", "inf", "-inf"])
+def test_eval_timeout_rejects_nonfinite_values(value: str) -> None:
+    with pytest.raises(ValueError, match="finite and positive"):
+        resolve_eval_timeout_seconds(value)
 
 
 @pytest.fixture(autouse=True)
