@@ -434,7 +434,7 @@ so the advective removal of vapor and oxygen that a faster flowing sweep would p
 separately from the static-pressure diffusion resistance; and the co-evolved-oxygen self-poisoning acts
 with a one-step lag (through the headspace ledger) rather than as an instantaneous local-surface balance in
 which the oxygen from the current solve poisons that same solve.
-<!-- impl: §4.4 -> simulator/campaigns.py CampaignManager._c2a_staged_stage_gas_control:846 — pN2 band cover -->
+<!-- impl: §4.4 -> simulator/campaigns.py CampaignManager._c2a_staged_stage_gas_control:910 — pN2 band cover -->
 
 ---
 
@@ -606,9 +606,9 @@ noise, so within-noise yield ties break toward margin headroom; the colder hold 
 heating energy and exposure to thermochemistry-refit movement. CI carbonaceous chondrite is not
 promoted by this rule; the MAGEMin sample curve leaves its staged residual below the workability
 threshold through the Mg/Al₂O₃ window, so static C6 is a typed refusal with Al left in the rump.
-<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider.dispatch:231 — metallothermic refusal behavior -->
-<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._reduction_margin_kj_per_mol_o2:1476 — Ellingham margin gate -->
-<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._crossover_temperature_C:1715 — crossover temperatures -->
+<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider.dispatch:257 — metallothermic refusal behavior -->
+<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._reduction_margin_kj_per_mol_o2:1503 — Ellingham margin gate -->
+<!-- impl: §7.2 -> engines/builtin/metallothermic_step.py BuiltinMetallothermicStepProvider._crossover_temperature_C:1742 — crossover temperatures -->
 
 ### §7.3 Molten regolith electrolysis
 
@@ -656,8 +656,8 @@ regime, so it leaves the system without re-equilibrating with the melt — apply
 tiny term does not change the physics (the oxygen escapes ballistically either way), so the floor is
 moot precisely where it fires. Graded range/saturation refusals still apply *above* the floor, where a
 real capacity meets an out-of-range or non-finite demand.
-<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._melt_redox_source_capacity_mol_per_ln_fO2:4143 — C_m liquid_fraction -->
-<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._apply_oxygen_reservoir_redox_source_terms:4358 — negligible-mol redox floor -->
+<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._melt_redox_source_capacity_mol_per_ln_fO2:4274 — C_m liquid_fraction -->
+<!-- impl: §7.4 -> simulator/core.py PyrolysisSimulator._apply_oxygen_reservoir_redox_source_terms:4489 — negligible-mol redox floor -->
 
 ---
 
