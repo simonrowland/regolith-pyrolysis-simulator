@@ -120,7 +120,12 @@ EXPECTED_ROUTING = [
 
 def _make_client():
     app = app_module.create_app()
-    c = app_module.socketio.test_client(app)
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    c = app_module.socketio.test_client(
+        app,
+        flask_test_client=http_client,
+    )
     assert c.is_connected()
     c.get_received()  # drain connect noise
     return c
