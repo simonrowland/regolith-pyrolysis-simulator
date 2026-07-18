@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.5.0",
+  "schema_version": "1.6.0",
   "run_metadata": {
-    "schema_version": "1.5.0",
+    "schema_version": "1.6.0",
     "feedstock_id": "lunar_mare_low_ti",
     "campaign": "C0",
     "hours_requested": 24,
@@ -5842,4 +5842,107 @@
   "status": "ok",
   "reason": "",
   "error_message": ""
+,  "product_classification": {
+    "classification": {
+      "metals_plus_O2": {
+        "metals_kg": {
+          "Na": 0.0006587613398649386,
+          "K": 0.00011059510625681077,
+          "Fe": 0.0000016204809237437715,
+          "Mg": 4.5157801141634694E-9,
+          "Cr": 3.018595605034899E-10,
+          "Mn": 3.4617820992530584E-8
+        },
+        "metals_total_kg": 0.0007710163625061603,
+        "O2_kg": 1.9610983630797468E-7,
+        "O2_partition_kg": {
+          "stored": 1.9610983630797468E-7,
+          "total": 1.9610983630797468E-7,
+          "melt_offgas_stored": 1.9610983630797468E-7
+        },
+        "class_total_kg": 0.0007712124723424683
+      },
+      "ingots_metals": {
+        "species_kg": {
+          "Na": 0.0006587613398649386,
+          "K": 0.00011059510625681077,
+          "Fe": 0.0000016204809237437715,
+          "Mg": 4.5157801141634694E-9,
+          "Cr": 3.018595605034899E-10,
+          "Mn": 3.4617820992530584E-8
+        },
+        "class_total_kg": 0.0007710163625061603
+      },
+      "oxygen": {
+        "O2_kg": 1.9610983630797468E-7,
+        "partition_kg": {
+          "stored": 1.9610983630797468E-7,
+          "total": 1.9610983630797468E-7,
+          "melt_offgas_stored": 1.9610983630797468E-7
+        },
+        "class_total_kg": 1.9610983630797468E-7
+      },
+      "pure_silica_glass": {
+        "stage_3_capture_kg": 0.0,
+        "stage_3_kg_by_species": {},
+        "class_total_kg": 0.0
+      },
+      "glass": {
+        "species_kg": {},
+        "class_total_kg": 0.0,
+        "pure_silica_glass_kg": 0.0,
+        "industrial_mixed_glass_kg": 0.0
+      },
+      "industrial_mixed_glass": {
+        "mixed_melt_residual_kg": 0.0,
+        "early_tap_mode": false,
+        "note": "present only when operator declared early-tap via early_tap_mode=True; zero by default — mid-run cleaned_melt is NOT a product class",
+        "class_total_kg": 0.0
+      },
+      "captured_volatiles": {
+        "kg_by_species": {
+          "Cr": 3.018595605034899E-10,
+          "Fe": 0.0000016204809237437715,
+          "K": 0.00011059510625681077,
+          "Mg": 4.5157801141634694E-9,
+          "Mn": 3.4617820992530584E-8,
+          "Na": 0.0006587613398649386,
+          "SiO": 2.3100739355778983E-8
+        },
+        "class_total_kg": 0.0007710394632455161
+      },
+      "process_inventory_spent_reductant": {
+        "kg_by_species": {},
+        "class_total_kg": 0.0,
+        "account": "process.spent_reductant_residue",
+        "disposition": "process_inventory_spent_reductant"
+      },
+      "refractory_ceramic_rump": {
+        "rump_kg_by_species": {
+          "Al2O3": 138.96037056098817,
+          "CaO": 113.22696860524962,
+          "Cr2O3": 3.6026762733622157,
+          "FeO": 169.8404508231429,
+          "K2O": 1.029202855398998,
+          "MgO": 92.64024703317045,
+          "MnO": 2.058672111759897,
+          "Na2O": 4.116456329558975,
+          "P2O5": 1.029336078229542,
+          "SiO2": 458.0545540756709,
+          "TiO2": 15.440041173443129
+        },
+        "rump_total_kg": 999.9989759199748,
+        "rump_refractory_oxides_kg": 363.8703036462136,
+        "rump_silicate_residual_kg": 458.0545540756709,
+        "rump_unextracted_metals_kg": 0.0,
+        "rump_other_kg": 178.07411819809033,
+        "class_total_kg": 999.9989759199748
+      },
+      "unclassified": {
+        "kg_by_species": {},
+        "total_kg": 0.0
+      }
+    },
+    "markdown": "# Three-Product-Class Report\n**Feedstock**: `lunar_mare_low_ti` • **Campaign**: `C0`\n\n**Class totals**: Metals + O₂ potential: 7.712e-04 kg | Silica glass: — kg | Mixed glass: — kg | Rump: 999.999 kg\n\n## 1. Metals + source-side O₂ potential (alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co + emitted O₂ potential)\n**Class total**: 7.712e-04 kg\n\n- Metals subtotal: 7.710e-04 kg\n- Source-side O₂ potential subtotal (emitted; not recovered/captured): 1.961e-07 kg\n\nPer-species:\n  - **Cr**: — kg\n  - **Fe**: 1.620e-06 kg\n  - **K**: 1.106e-04 kg\n  - **Mg**: 4.516e-09 kg\n  - **Mn**: 3.462e-08 kg\n  - **Na**: 6.588e-04 kg\n\n## 2. Pure silica glass (Stage 3 fused-silica baffle capture)\n**Class total**: — kg\n\n- Stage 3 capture: — kg\n\nPer-species on Stage 3 baffles:\n  (no species in this class)\n\n## 3. Industrial mixed glass (early-tap residual melt option)\n**Class total**: — kg\n\n- Mixed melt residual: — kg\n  - *present only when operator declared early-tap via early_tap_mode=True; zero by default — mid-run cleaned_melt is NOT a product class*\n\n## 4. Refractory ceramic rump (Ca / REE / refractory oxides — by physics)\n**Class total**: 999.999 kg\n\n- Rump total: 999.999 kg\n- Refractory oxides floor (by physics): 363.870 kg\n- Silicate residual: 458.055 kg\n- Unextracted metals residue (failure-mode 1): — kg\n- Other / unclassified rump: 178.074 kg\n\nPer-species:\n  - **Al2O3**: 138.960 kg\n  - **CaO**: 113.227 kg\n  - **Cr2O3**: 3.603 kg\n  - **FeO**: 169.840 kg\n  - **K2O**: 1.029 kg\n  - **MgO**: 92.640 kg\n  - **MnO**: 2.059 kg\n  - **Na2O**: 4.116 kg\n  - **P2O5**: 1.029 kg\n  - **SiO2**: 458.055 kg\n  - **TiO2**: 15.440 kg\n"
+  }
 }
