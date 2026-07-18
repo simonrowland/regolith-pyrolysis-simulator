@@ -57,6 +57,10 @@ from simulator.runner import (
     _status_with_mass_balance_invariant,
     _vapor_pressure_source_report,
 )
+from simulator.three_product_report import classify_products
+from simulator.three_product_report_markdown import (
+    format_three_product_markdown,
+)
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures" / "runner"
@@ -73,6 +77,61 @@ def test_json_safe_nonfinite_numbers_export_null():
     assert _json_safe(
         {"nan": float("nan"), "inf": [float("inf"), -float("inf")]}
     ) == {"nan": None, "inf": [None, None]}
+
+
+def test_completed_run_emits_legible_product_classification() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    payload = run._run_session(session)
+    expected = classify_products(session.simulator)
+    report = payload["product_classification"]
+
+    assert report["classification"] == expected
+    assert report["markdown"] == format_three_product_markdown(
+        expected,
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+    )
+    assert "Metals + O₂ potential" in report["markdown"]
+    assert "Silica glass" in report["markdown"]
+    assert "Industrial mixed glass" in report["markdown"]
+    assert "Refractory ceramic rump" in report["markdown"]
+
+
+def test_completed_run_preserves_success_when_product_classification_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    def raise_classification_error(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("injected product-classification failure")
+
+    monkeypatch.setattr(
+        "simulator.runner._product_classification_report",
+        raise_classification_error,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["product_classification"] == {
+        "classification": {},
+        "markdown": "",
+    }
 
 
 def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
@@ -196,6 +255,7 @@ TOP_LEVEL_KEYS = frozenset({
     "run_metadata",
     "final_state",
     "final",
+    "product_classification",
     "stage_purity_report",
     "vapor_pressure_source_report",
     "shuttle_refusal_history",
@@ -723,7 +783,7 @@ def _assert_schema_shape(payload: dict) -> None:
       this without picking a specific scenario.
     """
 
-    assert RUNNER_SCHEMA_VERSION == "1.5.0"
+    assert RUNNER_SCHEMA_VERSION == "1.6.0"
     assert set(payload) == TOP_LEVEL_KEYS, (
         f"top-level keys drift: {set(payload) - TOP_LEVEL_KEYS} extra, "
         f"{TOP_LEVEL_KEYS - set(payload)} missing"
