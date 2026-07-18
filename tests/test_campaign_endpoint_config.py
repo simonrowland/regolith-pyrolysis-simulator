@@ -6,12 +6,17 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.campaigns import CampaignManager
+from simulator.campaigns import (
+    CampaignHoldAcquisitionRefusal,
+    CampaignHoldTargetRefusal,
+    CampaignManager,
+)
 from simulator.state import (
     BatchRecord,
     CampaignPhase,
     CondensationTrain,
     EvaporationFlux,
+    HourSnapshot,
     MeltState,
 )
 
@@ -158,6 +163,10 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
         (CampaignPhase.C5, 800, 25.0, _flux(), BatchRecord(branch="two"), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C5, 799, 25.0, _flux(), BatchRecord(branch="one"), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C5, 800, 25.0, _flux(), BatchRecord(branch="one"), None, 0.0, 100.0, 0, True),
+        # Inventory evidence in docs-private/research/2026-07-18-c6primary/
+        # report.md:20-22 records zero provider transitions while every C6
+        # snapshot remained in transport-limited preheat. Depletion and the
+        # reaction-hold cap therefore cannot complete C6 at 25 C.
         (
             CampaignPhase.C6,
             0,
@@ -180,9 +189,9 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
             0.0,
             100.0,
             0,
-            True,
+            False,
         ),
-        (CampaignPhase.C6, 20, 25.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
+        (CampaignPhase.C6, 20, 25.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.MRE_BASELINE, 0, 25.0, _flux(), BatchRecord(), None, 2.44, 9.0, 2, False),
         (CampaignPhase.MRE_BASELINE, 0, 25.0, _flux(), BatchRecord(), None, 2.45, 9.0, 2, True),
         (CampaignPhase.MRE_BASELINE, 120, 25.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
@@ -212,6 +221,255 @@ def test_configured_campaign_endpoints_match_legacy_trip_points(
     )
 
     assert manager.check_endpoint(melt, flux, CondensationTrain(), record) is expected
+
+
+def test_c6_current_at_target_tick_can_satisfy_composition_endpoint() -> None:
+    manager = CampaignManager(_setpoints())
+    melt = _melt(
+        CampaignPhase.C6,
+        0,
+        temperature_C=1400.0,
+        composition_kg={"SiO2": 10.0, "Al2O3": 7.4, "CaO": 82.6},
+    )
+
+    assert manager.check_endpoint(
+        melt,
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is True
+
+
+def test_c6_max_hold_counts_only_provider_dispatch_ticks() -> None:
+    manager = CampaignManager(_setpoints())
+    melt = _melt(CampaignPhase.C6, 80, temperature_C=1400.0)
+    preheat = [
+        HourSnapshot(campaign=CampaignPhase.C6, temperature_C=1150.0)
+        for _ in range(40)
+    ]
+    at_hold = [
+        HourSnapshot(
+            campaign=CampaignPhase.C6,
+            temperature_C=1400.0,
+            c6_at_hold_target=True,
+        )
+        for _ in range(19)
+    ]
+
+    assert manager.check_endpoint(
+        melt,
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(snapshots=[*preheat, *at_hold[:-1]]),
+    ) is False
+    assert manager.check_endpoint(
+        melt,
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(snapshots=[*preheat, *at_hold]),
+    ) is True
+
+
+def test_c6_ramping_schedule_counts_only_tick_dispatch_evidence() -> None:
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C6"] = {
+        "lab_schedule": {
+            "id": "c6-ramping-hold-clock",
+            "duration_h": 2.0,
+            "interpolation": "piecewise_linear",
+            "interpolation_source_class": "assumption_with_sensitivity_marker",
+            "interpolation_citation_id": "test",
+            "interpolation_extraction_note": "ramping C6 regression",
+            "furnace_ceiling_C": 1600.0,
+            "melt_temperature_C": [
+                {"t_h": 0.0, "value": 1200.0, "unit": "C"},
+                {"t_h": 2.0, "value": 1400.0, "unit": "C"},
+            ],
+            "chamber_pressure_mbar": [
+                {"t_h": 0.0, "value": 1.0, "unit": "mbar"},
+                {"t_h": 2.0, "value": 1.0, "unit": "mbar"},
+            ],
+            "gas_boundary": {
+                "background_gas": {
+                    "species": "Ar",
+                    "mole_fraction": 1.0,
+                    "source_class": "assumption_with_sensitivity_marker",
+                    "citation_id": "test",
+                    "digest": "c6-ramp-argon",
+                },
+                "imposed_flow": {
+                    "value": 0.3,
+                    "unit": "NL_min",
+                    "source_class": "assumption_with_sensitivity_marker",
+                    "citation_id": "test",
+                    "digest": "c6-ramp-flow",
+                },
+                "pressure_control": {
+                    "mode": "flow_through_with_pump",
+                    "source_class": "assumption_with_sensitivity_marker",
+                    "citation_id": "test",
+                    "digest": "c6-ramp-pressure",
+                },
+            },
+        }
+    }
+    manager.setpoints["campaigns"]["C6"]["max_hold_hr"] = 2.0
+    prior_melt = _melt(CampaignPhase.C6, 0, temperature_C=1400.0)
+    current_melt = _melt(CampaignPhase.C6, 1, temperature_C=1400.0)
+    prior_target, _ = manager.get_temp_target(
+        CampaignPhase.C6, 0, prior_melt
+    )
+    current_target, _ = manager.get_temp_target(
+        CampaignPhase.C6, 1, current_melt
+    )
+    assert prior_target == pytest.approx(1300.0)
+    assert current_target == pytest.approx(1400.0)
+    assert manager.c6_at_hold_target(prior_target, 1400.0) is False
+    assert manager.c6_at_hold_target(current_target, 1400.0) is True
+
+    late_acquisition = HourSnapshot(
+        campaign=CampaignPhase.C6,
+        temperature_C=1400.0,
+        c6_at_hold_target=False,
+    )
+    assert manager.check_endpoint(
+        current_melt,
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(snapshots=[late_acquisition]),
+    ) is False
+
+
+@pytest.mark.parametrize(
+    "temperature_C",
+    [float("nan"), float("inf"), float("-inf")],
+)
+def test_c6_nonfinite_temperature_refuses_before_endpoint(
+    temperature_C: float,
+) -> None:
+    manager = CampaignManager(_setpoints())
+    melt = _melt(CampaignPhase.C6, 0, temperature_C=temperature_C)
+
+    with pytest.raises(CampaignHoldTargetRefusal, match="c6_hold_target_nonfinite"):
+        manager.check_endpoint(
+            melt,
+            _flux(),
+            CondensationTrain(),
+            BatchRecord(),
+        )
+
+
+@pytest.mark.parametrize(
+    "hold_target_C",
+    [float("nan"), float("inf"), float("-inf")],
+)
+def test_c6_nonfinite_hold_target_refuses_shared_dispatch_predicate(
+    hold_target_C: float,
+) -> None:
+    with pytest.raises(CampaignHoldTargetRefusal, match="c6_hold_target_nonfinite"):
+        CampaignManager.c6_at_hold_target(hold_target_C, 1400.0)
+
+
+def test_c6_operator_max_hours_is_typed_acquisition_refusal() -> None:
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C6"] = {"max_hours": 2.0}
+    transport = {
+        "binding_cause": "controlled_o2_no_equipment",
+        "saturation_pct": 202.0,
+        "evap_exceeds_transport": True,
+    }
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C6, 0, temperature_C=1150.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+        transport_state=transport,
+    ) is False
+    with pytest.raises(CampaignHoldAcquisitionRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C6, 1, temperature_C=1150.0),
+            _flux(),
+            CondensationTrain(),
+            BatchRecord(),
+            transport_state=transport,
+        )
+    assert refusal.value.diagnostic["unacquired_hold_target_C"] == 1400.0
+    assert refusal.value.diagnostic["acquisition_limit_source"] == (
+        "operator_override:C6.max_hours"
+    )
+    assert refusal.value.diagnostic["binding_transport_state"] == transport
+
+    # At target, the current tick has dispatched thermite before endpoint
+    # evaluation, so the same operator wall clock is a successful escape.
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C6, 1, temperature_C=1400.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+        transport_state=transport,
+    ) is True
+
+
+def test_c6_configured_target_acquisition_ceiling_is_default_backstop() -> None:
+    manager = CampaignManager(_setpoints())
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C6, 118, temperature_C=1150.0),
+        _flux(),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is False
+    with pytest.raises(CampaignHoldAcquisitionRefusal) as refusal:
+        manager.check_endpoint(
+            _melt(CampaignPhase.C6, 119, temperature_C=1150.0),
+            _flux(),
+            CondensationTrain(),
+            BatchRecord(),
+        )
+    assert refusal.value.diagnostic["acquisition_limit_hr"] == 120.0
+    assert refusal.value.diagnostic["acquisition_limit_source"] == (
+        "setpoint:C6.max_target_acquisition_hr"
+    )
+
+
+@pytest.mark.parametrize(
+    "invalid_limit",
+    [float("nan"), float("inf"), 0.0, -1.0],
+)
+def test_c6_configured_acquisition_ceiling_refuses_nonfinite_or_nonpositive(
+    invalid_limit: float,
+) -> None:
+    setpoints = _setpoints()
+    setpoints["campaigns"]["C6"]["max_target_acquisition_hr"] = invalid_limit
+    manager = CampaignManager(setpoints)
+
+    with pytest.raises(
+        ValueError,
+        match="max_target_acquisition_hr must be finite and positive",
+    ):
+        manager.check_endpoint(
+            _melt(CampaignPhase.C6, 0, temperature_C=1150.0),
+            _flux(),
+            CondensationTrain(),
+            BatchRecord(),
+        )
+
+
+@pytest.mark.parametrize("invalid_limit", [float("nan"), float("inf")])
+def test_c6_operator_acquisition_ceiling_refuses_nonfinite(
+    invalid_limit: float,
+) -> None:
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C6"] = {"max_hours": invalid_limit}
+
+    with pytest.raises(ValueError, match="C6.max_hours must be finite"):
+        manager.check_endpoint(
+            _melt(CampaignPhase.C6, 0, temperature_C=1150.0),
+            _flux(),
+            CondensationTrain(),
+            BatchRecord(),
+        )
 
 
 def test_zero_runtime_max_hours_uses_configured_campaign_default():
@@ -290,6 +548,7 @@ def test_campaign_endpoint_caps_and_classes_are_materialized():
         "branch_one": 800,
     }
     assert campaigns["mre_baseline"]["max_hold_hr"] == 120
+    assert campaigns["C6"]["max_target_acquisition_hr"] == 120
     assert campaigns["C6"]["max_hold_hr"] == 20
 
     assert {

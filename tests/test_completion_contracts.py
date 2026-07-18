@@ -49,6 +49,9 @@ class _FakeLedger:
             }
         return dict(self._accounts.get(account, {}))
 
+    def project_account_kg(self, account: str):
+        return dict(self._accounts.get(account, {}))
+
 
 class _FakeQueries:
     def __init__(

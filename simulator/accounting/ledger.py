@@ -33,6 +33,8 @@ DEFAULT_MASS_TOLERANCE_KG = 2e-2
 DEFAULT_ATOM_TOLERANCE_MOL = 1e-6
 DEFAULT_RELATIVE_TOLERANCE = 1e-9
 DEFAULT_BALANCE_TOLERANCE_KG = 1e-12
+DEFAULT_BALANCE_RELATIVE_TOLERANCE = 1e-12
+DEFAULT_BALANCE_ABSOLUTE_FLOOR_KG = 1e-15
 DEFAULT_SCOPE = "batch"
 POLICY_SCOPES = {"batch", "campaign", "external"}
 TERMINAL_DEBIT_EXCEPTIONS = {
@@ -294,9 +296,12 @@ class AtomLedger:
             "relative_tolerance", relative_tolerance
         )
         self.balance_tolerance_kg = DEFAULT_BALANCE_TOLERANCE_KG
+        self.balance_relative_tolerance = DEFAULT_BALANCE_RELATIVE_TOLERANCE
+        self.balance_absolute_floor_kg = DEFAULT_BALANCE_ABSOLUTE_FLOOR_KG
         # Canonical balances are species mol. Public kg accessors are
         # projections at the simulator boundary.
         self._balances: dict[str, dict[str, float]] = {}
+        self._movement_scale_kg: dict[str, dict[str, float]] = {}
         self._policies: dict[str, AccountPolicy] = {}
         self._transitions: list[LedgerTransition] = []
         self._terminal_debit_authorized_transition_ids: set[int] = set()
@@ -315,6 +320,11 @@ class AtomLedger:
                 cleaned_kg,
                 self.registry,
                 tolerance_kg=self.balance_tolerance_kg,
+            )
+            self._record_movement_scale(
+                self._movement_scale_kg,
+                str(account),
+                cleaned_kg,
             )
         self._initial_balances = _copy_balances(self._balances)
         self.assert_balanced()
@@ -400,6 +410,7 @@ class AtomLedger:
         lot = MaterialLot(account, species_kg, source=source)
         lot.total_mass_kg(self.registry)
         projected = _copy_balances(self._balances)
+        movement_scale = _copy_balances(self._movement_scale_kg)
         _apply_lot(
             projected,
             lot,
@@ -407,8 +418,10 @@ class AtomLedger:
             tolerance_kg=self.balance_tolerance_kg,
             registry=self.registry,
         )
-        self._validate_account_policies(projected)
+        self._record_lot_movement_scale(movement_scale, lot)
+        self._validate_account_policies(projected, movement_scale)
         self._balances = projected
+        self._movement_scale_kg = movement_scale
         self._external_loads.append(lot)
         return lot
 
@@ -421,6 +434,7 @@ class AtomLedger:
         lot = self.credit_mol(account, species_mol, source=source)
         lot.total_mass_kg(self.registry)
         projected = _copy_balances(self._balances)
+        movement_scale = _copy_balances(self._movement_scale_kg)
         _apply_lot(
             projected,
             lot,
@@ -428,8 +442,10 @@ class AtomLedger:
             tolerance_kg=self.balance_tolerance_kg,
             registry=self.registry,
         )
-        self._validate_account_policies(projected)
+        self._record_lot_movement_scale(movement_scale, lot)
+        self._validate_account_policies(projected, movement_scale)
         self._balances = projected
+        self._movement_scale_kg = movement_scale
         self._external_loads.append(lot)
         return lot
 
@@ -460,8 +476,12 @@ class AtomLedger:
             relative_tolerance=self.relative_tolerance,
         )
         projected = self.project(transition)
-        self._validate_account_policies(projected)
+        movement_scale = _copy_balances(self._movement_scale_kg)
+        for lot in (*transition.debits, *transition.credits):
+            self._record_lot_movement_scale(movement_scale, lot)
+        self._validate_account_policies(projected, movement_scale)
         self._balances = projected
+        self._movement_scale_kg = movement_scale
         self._transitions.append(transition)
         if _terminal_debit_capability is _C7_TERMINAL_SLAG_REWORK_CAPABILITY:
             self._terminal_debit_authorized_transition_ids.add(id(transition))
@@ -546,21 +566,96 @@ class AtomLedger:
         return self._policies.get(name, AccountPolicy.normal(name))
 
     def kg_by_account(self, account: str | None = None) -> dict[str, dict[str, float]] | dict[str, float]:
+        """Return the exact signed kg projection of canonical mol balances."""
         self._assert_balances_finite()
         if account is not None:
             return _species_mol_to_kg(
                 self._balances.get(str(account), {}),
                 self.registry,
-                tolerance_kg=self.balance_tolerance_kg,
+                tolerance_kg=0.0,
             )
         return {
             name: _species_mol_to_kg(
                 species,
                 self.registry,
-                tolerance_kg=self.balance_tolerance_kg,
+                tolerance_kg=0.0,
             )
             for name, species in sorted(self._balances.items())
         }
+
+    def project_account_kg(self, account: str) -> dict[str, float]:
+        """Project one account for reports, products, and terminal summaries."""
+        name = str(account)
+        species_kg = self.kg_by_account(name)
+        if self.account_policy(name).allow_negative:
+            return species_kg
+        projected: dict[str, float] = {}
+        for species, kg in species_kg.items():
+            value = float(kg)
+            tolerance_kg = self._projection_tolerance_kg(name, species)
+            if value < -tolerance_kg:
+                # This is not display dust: a normal account below policy
+                # tolerance is corrupt state and must refuse, not be clamped.
+                raise AccountingError(
+                    "negative outward mass from normal account: "
+                    f"account={name!r} species={species!r} kg={value:.12g}"
+                )
+            if value < 0.0:
+                # Display-only clamp. Canonical signed mol/kg remains untouched,
+                # preserving exact ledger closure for audit and validation.
+                continue
+            if value != 0.0:
+                projected[species] = value
+        return projected
+
+    def _projection_tolerance_kg(
+        self,
+        account: str,
+        species: str,
+        movement_scale_kg: Mapping[str, Mapping[str, float]] | None = None,
+    ) -> float:
+        scales = (
+            self._movement_scale_kg
+            if movement_scale_kg is None
+            else movement_scale_kg
+        )
+        scale_kg = abs(float(scales.get(account, {}).get(species, 0.0)))
+        # Subtraction/conversion roundoff scales with the largest movement for
+        # this account/species, so the relative term preserves ~1e-12 kg dust
+        # at a 1 kg scale without granting that absolute band to tiny accounts.
+        # The 1e-15 kg floor covers near-zero representation noise only.
+        return max(
+            self.balance_absolute_floor_kg,
+            self.balance_relative_tolerance * scale_kg,
+        )
+
+    @staticmethod
+    def _record_movement_scale(
+        movement_scale_kg: dict[str, dict[str, float]],
+        account: str,
+        species_kg: Mapping[str, float],
+    ) -> None:
+        account_scale = movement_scale_kg.setdefault(str(account), {})
+        for species, kg in species_kg.items():
+            value = abs(float(kg))
+            account_scale[str(species)] = max(
+                value,
+                account_scale.get(str(species), 0.0),
+            )
+
+    def _record_lot_movement_scale(
+        self,
+        movement_scale_kg: dict[str, dict[str, float]],
+        lot: MaterialLot,
+    ) -> None:
+        self._record_movement_scale(
+            movement_scale_kg,
+            lot.account,
+            lot.species_kg,
+        )
+
+    def projected_total_kg_by_account(self, account: str) -> float:
+        return sum(self.project_account_kg(account).values())
 
     def mol_by_account(self, account: str | None = None) -> dict[str, dict[str, float]] | dict[str, float]:
         self._assert_balances_finite()
@@ -584,12 +679,13 @@ class AtomLedger:
 
     def kg_by_species(self, account: str | None = None) -> dict[str, float]:
         if account is not None:
-            return self.kg_by_account(str(account))
+            return self.project_account_kg(str(account))
         totals: defaultdict[str, float] = defaultdict(float)
-        for species_kg in self.kg_by_account().values():
+        for name in sorted(self._balances):
+            species_kg = self.project_account_kg(name)
             for species, kg in species_kg.items():
                 totals[species] += kg
-        return dict(sorted((species, kg) for species, kg in totals.items() if abs(kg) > self.balance_tolerance_kg))
+        return dict(sorted((species, kg) for species, kg in totals.items() if kg != 0.0))
 
     def mol_by_species(self, account: str | None = None) -> dict[str, float]:
         self._assert_balances_finite()
@@ -663,11 +759,7 @@ class AtomLedger:
         for account in sorted(name for name in reservoir_accounts if name.startswith("reservoir.")):
             policy = self.account_policy(account)
             species_mol = dict(self._balances.get(account, {}))
-            species_kg = _species_mol_to_kg(
-                species_mol,
-                self.registry,
-                tolerance_kg=self.balance_tolerance_kg,
-            )
+            species_kg = self.project_account_kg(account)
             remaining = {
                 species: limit + species_kg.get(species, 0.0)
                 for species, limit in policy.credit_limit_kg_by_species.items()
@@ -687,9 +779,15 @@ class AtomLedger:
 
     def close_report(self) -> dict[str, Any]:
         self.assert_balanced()
-        kg_by_account = self.kg_by_account()
+        kg_by_account = {
+            account: self.project_account_kg(account)
+            for account in sorted(self._balances)
+        }
         mol_by_account = self.mol_by_account()
-        total_kg_by_account = self.total_kg_by_account()
+        total_kg_by_account = {
+            account: sum(species_kg.values())
+            for account, species_kg in kg_by_account.items()
+        }
         kg_by_species = self.kg_by_species()
         account_species = {account: self.kg_by_species(account) for account in sorted(self._balances)}
         terminal_accounts = {
@@ -752,7 +850,10 @@ class AtomLedger:
     def account_species_kg(self, account: str | None = None) -> dict[str, dict[str, float]] | dict[str, float]:
         if account is not None:
             return self.kg_by_species(account)
-        return self.kg_by_account()
+        return {
+            name: self.project_account_kg(name)
+            for name in sorted(self._balances)
+        }
 
     def account_species_mol(self, account: str | None = None) -> dict[str, dict[str, float]] | dict[str, float]:
         if account is not None:
@@ -760,7 +861,12 @@ class AtomLedger:
         return self.mol_by_account()
 
     def account_kg(self, account: str | None = None) -> dict[str, float] | float:
-        return self.total_kg_by_account(account)
+        if account is not None:
+            return self.projected_total_kg_by_account(str(account))
+        return {
+            name: self.projected_total_kg_by_account(name)
+            for name in sorted(self._balances)
+        }
 
     def account_atom_moles(self, account: str) -> dict[str, float]:
         return self.atom_moles_by_account(account)
@@ -804,7 +910,9 @@ class AtomLedger:
                     )
 
     def _validate_account_policies(
-        self, balances: Mapping[str, Mapping[str, float]] | None = None
+        self,
+        balances: Mapping[str, Mapping[str, float]] | None = None,
+        movement_scale_kg: Mapping[str, Mapping[str, float]] | None = None,
     ) -> None:
         checked = balances if balances is not None else self._balances
         self._assert_balances_finite(checked)
@@ -814,7 +922,9 @@ class AtomLedger:
             species_kg = _species_mol_to_kg(
                 species_mol,
                 self.registry,
-                tolerance_kg=self.balance_tolerance_kg,
+                # Policy applies the movement-scaled tolerance below; do not
+                # erase a small signed balance before that comparison.
+                tolerance_kg=0.0,
             )
             allowed_species = TERMINAL_ACCOUNT_ALLOWED_SPECIES.get(account)
             for species, kg in species_kg.items():
@@ -825,7 +935,12 @@ class AtomLedger:
                         f"account {account!r} only accepts species: {allowed}; "
                         f"got {species!r}"
                     )
-                if kg >= -self.balance_tolerance_kg:
+                tolerance_kg = self._projection_tolerance_kg(
+                    account,
+                    species,
+                    movement_scale_kg,
+                )
+                if kg >= -tolerance_kg:
                     continue
                 if not policy.allow_negative:
                     raise OverdraftError(
@@ -837,7 +952,7 @@ class AtomLedger:
                     raise OverdraftError(
                         f"reservoir account {account!r} has no credit limit for {species!r}"
                     )
-                if kg < -limit - self.balance_tolerance_kg:
+                if kg < -limit - tolerance_kg:
                     raise OverdraftError(
                         f"reservoir account {account!r} exceeded {species!r} credit: "
                         f"balance={kg:.12g} kg limit={limit:.12g} kg"
@@ -1001,13 +1116,18 @@ def _apply_lot(
     account_balances = balances.setdefault(lot.account, {})
     for species, mol in lot.species_moles_for(registry).items():
         value = account_balances.get(species, 0.0) + sign * mol
-        if _species_mol_abs_kg(species, value, registry) <= tolerance_kg:
-            value = 0.0
         account_balances[species] = value
+    # Keep sub-tolerance signed dust rather than pruning it. A prune of r kg
+    # changes whole-ledger closure by exactly -r without a counterpart lot;
+    # repeated same-sign near-depletions can therefore bias closure by as much
+    # as N*tolerance_kg. Retention makes that policy contribution exactly zero:
+    # signed IEEE-754 remainders stay in their account, so only ordinary
+    # floating summation error remains (bounded by O(N*eps*sum(|movement|))),
+    # with no systematic N*tolerance_kg deletion term.
     balances[lot.account] = {
         species: mol
         for species, mol in sorted(account_balances.items())
-        if _species_mol_abs_kg(species, mol, registry) > tolerance_kg
+        if mol != 0.0
     }
 
 

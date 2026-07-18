@@ -40,12 +40,129 @@ from __future__ import annotations
 
 import inspect
 import copy
+import gc
 from collections import deque
 from dataclasses import dataclass
 import logging
 import math
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
+
+
+class RefusalStateSnapshotError(TypeError):
+    """Typed refusal when rollback state contains an unsupported proxy graph."""
+
+
+def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
+    """Deep-copy rollback state while retaining immutable mapping views."""
+    visited: set[int] = set()
+    prepared_backings: set[int] = set()
+
+    def mapping_referent(proxy: MappingProxyType) -> Any:
+        referents = [
+            item for item in gc.get_referents(proxy)
+            if isinstance(item, (dict, MappingProxyType))
+        ]
+        if len(referents) != 1:
+            raise RefusalStateSnapshotError(
+                'mappingproxy rollback snapshot requires exactly one '
+                f'mapping referent; found {len(referents)}'
+            )
+        return referents[0]
+
+    def seed_mapping_proxies(candidate: Any) -> None:
+        candidate_id = id(candidate)
+        if candidate_id in visited:
+            return
+        visited.add(candidate_id)
+
+        if isinstance(candidate, MappingProxyType):
+            # Normalized schedules are immutable by contract. Copy the actual
+            # backing dict and rewrap every proxy layer before copying dict
+            # contents. Bottom-up construction is load-bearing when the base
+            # dict points back to the outer proxy: deepcopy must see the outer
+            # memo entry before it encounters that cycle.
+            proxy_chain: list[MappingProxyType] = []
+            chain_ids: set[int] = set()
+            backing: Any = candidate
+            while isinstance(backing, MappingProxyType):
+                backing_id = id(backing)
+                if backing_id in memo:
+                    break
+                if backing_id in chain_ids:
+                    raise RefusalStateSnapshotError(
+                        'mappingproxy rollback snapshot has a referent cycle'
+                    )
+                chain_ids.add(backing_id)
+                proxy_chain.append(backing)
+                visited.add(backing_id)
+                backing = mapping_referent(backing)
+            if isinstance(backing, MappingProxyType):
+                copied_referent = memo[id(backing)]
+                base_backing = None
+            elif isinstance(backing, dict):
+                backing_id = id(backing)
+                copied_referent = memo.setdefault(backing_id, {})
+                base_backing = backing
+            else:
+                raise RefusalStateSnapshotError(
+                    'mappingproxy rollback snapshot requires a dict backing'
+                )
+            for proxy in reversed(proxy_chain):
+                copied_referent = MappingProxyType(copied_referent)
+                memo[id(proxy)] = copied_referent
+            if base_backing is not None and backing_id not in prepared_backings:
+                prepared_backings.add(backing_id)
+                for key, item in base_backing.items():
+                    seed_mapping_proxies(key)
+                    seed_mapping_proxies(item)
+                for key, item in base_backing.items():
+                    memo[backing_id][copy.deepcopy(key, memo)] = copy.deepcopy(
+                        item, memo
+                    )
+            return
+
+        if isinstance(candidate, dict):
+            children = (*candidate.keys(), *candidate.values())
+        elif isinstance(candidate, (list, tuple, set, frozenset, deque)):
+            children = candidate
+        else:
+            attributes = getattr(candidate, '__dict__', None)
+            children = (
+                list(attributes.values())
+                if isinstance(attributes, dict)
+                else []
+            )
+            for cls in type(candidate).__mro__:
+                slots = getattr(cls, '__slots__', ())
+                if isinstance(slots, str):
+                    slots = (slots,)
+                for slot in slots:
+                    if slot in ('__dict__', '__weakref__'):
+                        continue
+                    try:
+                        children.append(getattr(candidate, slot))
+                    except AttributeError:
+                        pass
+        for child in children:
+            seed_mapping_proxies(child)
+
+    try:
+        seed_mapping_proxies(value)
+        return copy.deepcopy(value, memo)
+    except RefusalStateSnapshotError:
+        raise
+    except (KeyboardInterrupt, SystemExit, GeneratorExit):
+        # Multiple inheritance can make a process-control signal an Exception
+        # too.  Preserve control flow by testing these classes first.
+        raise
+    except Exception as exc:
+        # Do not format the caught exception: its __str__/__repr__ is part of
+        # the adversarial snapshot graph and may itself raise.
+        raise RefusalStateSnapshotError(
+            'unsupported rollback snapshot graph'
+        ) from exc
 
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
@@ -503,6 +620,10 @@ class PoisonedHourError(RuntimeError):
             f'before abort ({state.aborting_exception_summary}); retry refused; '
             'create a fresh simulator or reload the batch'
         )
+
+
+class MeltHeadspaceProjectionError(RuntimeError):
+    """Authoritative chemistry requested a missing headspace projection."""
 
 
 class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
@@ -2790,9 +2911,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return max(1.0, melt_T_K)
 
     def _melt_headspace_total_pressure_bar(self) -> float:
+        upstream_partials_mbar = getattr(
+            self,
+            '_melt_headspace_composition_mbar',
+            None,
+        )
+        if upstream_partials_mbar is None:
+            raise MeltHeadspaceProjectionError(
+                'authoritative melt-headspace pressure requires '
+                '_melt_headspace_composition_mbar projection'
+            )
         partial_sum_mbar = sum(
             max(0.0, float(value))
-            for value in self._melt_headspace_composition_mbar.values()
+            for value in upstream_partials_mbar.values()
         )
         commanded_mbar = max(
             0.0,
@@ -6029,8 +6160,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self.melt, 'melt_fO2_log', -9.0),
             )
         )
+        # Diagnostic-only construction via ``__new__`` predates the runtime
+        # projection. Preserve the exact pre-PHYS pressure source here only;
+        # authoritative callers of the shared accessor fail loud if absent.
+        diagnostic_pressure_bar = (
+            float(self.overhead.pressure_mbar) / 1000.0
+            if getattr(self, '_melt_headspace_composition_mbar', None) is None
+            else self._melt_headspace_total_pressure_bar()
+        )
         pressure_bar = floor_vacuum_pressure_bar(
-            self._melt_headspace_total_pressure_bar(),
+            diagnostic_pressure_bar,
             floor_bar=self._vacuum_floor_bar(),
         )
         log_iw = (
@@ -7547,8 +7686,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )
 
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
-        ledger_melt = self.atom_ledger.kg_by_account('process.cleaned_melt')
-        spent_reductant_residue = self.atom_ledger.kg_by_account(
+        ledger_melt = self.atom_ledger.project_account_kg('process.cleaned_melt')
+        spent_reductant_residue = self.atom_ledger.project_account_kg(
             SPENT_REDUCTANT_RESIDUE_ACCOUNT)
         projected_melt = {
             species: float(kg)
@@ -7575,7 +7714,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _project_drain_tap_from_atom_ledger(self) -> None:
         self.inventory.metal_alloy_kg = {
             species: float(kg)
-            for species, kg in self.atom_ledger.kg_by_account(
+            for species, kg in self.atom_ledger.project_account_kg(
                 'terminal.drain_tap_material').items()
         }
 
@@ -10988,8 +11127,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _terminal_slag_kg(self) -> float:
         return (
-            self.atom_ledger.total_kg_by_account('process.cleaned_melt')
-            + self.atom_ledger.total_kg_by_account('terminal.slag')
+            self.atom_ledger.projected_total_kg_by_account('process.cleaned_melt')
+            + self.atom_ledger.projected_total_kg_by_account('terminal.slag')
         )
 
     def _terminal_rump_by_species(self) -> Dict[str, float]:
@@ -11055,8 +11194,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.record.completed = True
 
     def _ledger_o2_kg(self, account: str) -> float:
-        species_kg = self.atom_ledger.kg_by_account(account)
-        return max(0.0, float(species_kg.get(OXYGEN_SPECIES, 0.0)))
+        species_kg = self.atom_ledger.project_account_kg(account)
+        return float(species_kg.get(OXYGEN_SPECIES, 0.0))
 
     def _train_o2_kg(self) -> float:
         return sum(
@@ -11090,7 +11229,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _overhead_gas_totals(self) -> Dict[str, float]:
         return {
             species: float(kg)
-            for species, kg in self.atom_ledger.kg_by_account(
+            for species, kg in self.atom_ledger.project_account_kg(
                 'process.overhead_gas').items()
             if kg > 1e-12 and species != OXYGEN_SPECIES
         }
@@ -11134,9 +11273,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         unspent: Dict[str, float] = {}
         for reagent in sorted(reagents):
             kg = (
-                self.atom_ledger.kg_by_account(
+                self.atom_ledger.project_account_kg(
                     f'reservoir.reagent.{reagent}').get(reagent, 0.0)
-                + self.atom_ledger.kg_by_account(
+                + self.atom_ledger.project_account_kg(
                     'process.reagent_inventory').get(reagent, 0.0)
             )
             if kg > 1e-9:
@@ -11197,6 +11336,43 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self, '_last_c6_refusal_diagnostic', {}) or {})
         return summary
 
+    def _check_campaign_endpoint(self, evap_flux: EvaporationFlux) -> bool:
+        """Evaluate the endpoint and convert a C6 acquisition timeout to refusal."""
+        from simulator.campaigns import CampaignHoldAcquisitionRefusal
+
+        try:
+            return self.campaign_mgr.check_endpoint(
+                self.melt,
+                evap_flux,
+                self.train,
+                self.record,
+                transport_state={
+                    'binding_cause': str(getattr(
+                        self.overhead,
+                        'transport_binding_cause',
+                        'unknown',
+                    )),
+                    'saturation_pct': float(getattr(
+                        self.overhead,
+                        'transport_saturation_pct',
+                        0.0,
+                    )),
+                    'evap_exceeds_transport': bool(getattr(
+                        self.overhead,
+                        'evap_exceeds_transport',
+                        False,
+                    )),
+                    'turbine_limited': bool(getattr(
+                        self.overhead,
+                        'turbine_limited',
+                        False,
+                    )),
+                },
+            )
+        except CampaignHoldAcquisitionRefusal as exc:
+            self._record_c6_refusal(exc.diagnostic)
+            return True
+
     # ------------------------------------------------------------------
     # THE CORE LOOP
     # ------------------------------------------------------------------
@@ -11215,13 +11391,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'cost_ledger',
         }
         memo = {id(self): self}
-        state = {
-            name: copy.deepcopy(value, memo)
+        state_source = {
+            name: value
             for name, value in self.__dict__.items()
             if name not in preserved_names
         }
+        state = _deepcopy_refusal_state(state_source, memo)
         ledger = copy.copy(self.atom_ledger)
         ledger._balances = copy.deepcopy(self.atom_ledger._balances)
+        ledger._movement_scale_kg = copy.deepcopy(
+            getattr(self.atom_ledger, '_movement_scale_kg', {})
+        )
         ledger._policies = dict(self.atom_ledger._policies)
         ledger._transitions = list(self.atom_ledger._transitions)
         ledger._terminal_debit_authorized_transition_ids = set(
@@ -11436,10 +11616,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.melt.campaign == CampaignPhase.C6:
             c6_target_T, _ = self.campaign_mgr.get_temp_target(
                 self.melt.campaign, self.melt.campaign_hour, self.melt)
-            c6_hold_reached = (
-                c6_target_T is not None
-                and abs(float(c6_target_T) - self.melt.temperature_C) < 0.1
+            c6_hold_reached = self.campaign_mgr.c6_at_hold_target(
+                c6_target_T,
+                self.melt.temperature_C,
             )
+        self._c6_at_hold_target_this_hr = c6_hold_reached
         if c6_hold_reached:
             self._step_thermite()
         else:
@@ -11691,8 +11872,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt.campaign == CampaignPhase.C6
             and self._c6_campaign_refused
         )
-        campaign_done = c6_refused or self.campaign_mgr.check_endpoint(
-            self.melt, evap_flux, self.train, self.record)
+        campaign_done = c6_refused or self._check_campaign_endpoint(evap_flux)
         if campaign_done:
             # Capture campaign summary before transitioning
             finishing_campaign = self.melt.campaign.name
@@ -12295,6 +12475,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_mass_kg=self.melt.total_mass_kg,
             composition_wt_pct=self.melt.composition_wt_pct(),
             inventory=self.inventory.copy(),
+            c6_at_hold_target=(
+                self.melt.campaign == CampaignPhase.C6
+                and bool(getattr(
+                    self,
+                    '_c6_at_hold_target_this_hr',
+                    False,
+                ))
+            ),
             overhead=copy.deepcopy(self.overhead),
             condensation_totals=condensation_totals,
             condensed_by_stage_species_delta=dict(

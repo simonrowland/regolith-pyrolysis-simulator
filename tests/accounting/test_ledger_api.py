@@ -108,6 +108,9 @@ def test_snapshot_is_versioned_attested_and_read_only():
     assert before == after
     assert snapshot["ledger_schema_version"] == LEDGER_SCHEMA_VERSION
     assert snapshot["provenance"]["mass_balance_attested"] is True
+    assert snapshot["provenance"]["balance_tolerance_kg"] == 1.0e-12
+    assert snapshot["provenance"]["balance_projection_relative_tolerance"] == 1.0e-12
+    assert snapshot["provenance"]["balance_projection_absolute_floor_kg"] == 1.0e-15
     assert api.accounts()["ledger_schema_version"] == LEDGER_SCHEMA_VERSION
 
 

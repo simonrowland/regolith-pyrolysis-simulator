@@ -4549,7 +4549,7 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
 
 
 class RaisingCleanedMeltLedger:
-    def kg_by_account(self, account):
+    def project_account_kg(self, account):
         assert account == "process.cleaned_melt"
         raise RuntimeError("cleaned melt unavailable")
 

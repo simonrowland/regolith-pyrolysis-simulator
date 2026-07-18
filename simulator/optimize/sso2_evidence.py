@@ -705,14 +705,11 @@ def _stage_species_kg_from_trace(trace: Any) -> tuple[dict[tuple[int, str], floa
 def _ledger_account_kg(ledger: Any, account: str) -> tuple[dict[str, float], str, str]:
     if ledger is None:
         return {}, "missing_fe_tap_evidence", "atom ledger is missing"
-    kg_by_account = getattr(ledger, "kg_by_account", None)
+    kg_by_account = getattr(ledger, "project_account_kg", None)
     if not callable(kg_by_account):
-        return {}, "missing_fe_tap_evidence", "atom ledger has no kg_by_account reader"
+        return {}, "missing_fe_tap_evidence", "atom ledger has no projected kg reader"
     try:
         raw = kg_by_account(account)
-    except TypeError:
-        all_accounts = kg_by_account()
-        raw = all_accounts.get(account, {}) if isinstance(all_accounts, Mapping) else {}
     except Exception as exc:  # noqa: BLE001 - report surface must fail closed
         return {}, "missing_fe_tap_evidence", str(exc)
     if raw is None:

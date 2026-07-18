@@ -97,12 +97,12 @@ class LedgerAPI:
         if account not in self._discovered_accounts():
             raise KeyError(account)
         if units == "kg":
-            values = self.ledger.kg_by_account(account)
+            values = self.ledger.project_account_kg(account)
         elif units == "mol":
             values = self.ledger.mol_by_account(account)
         elif units == "wt_pct":
             values = None if self._account_can_be_signed(account) else wt_pct_from_kg(
-                self.ledger.kg_by_account(account)
+                self.ledger.project_account_kg(account)
             )
         else:
             raise ValueError("units must be one of: kg, mol, wt_pct")
@@ -141,7 +141,15 @@ class LedgerAPI:
             "ledger_schema_version": LEDGER_SCHEMA_VERSION,
             "provenance": {
                 "mass_balance_attested": bool(report.get("balanced")),
+                # Schema-2 compatibility: input cleaning still uses this
+                # absolute threshold. Outward projection policy is separate.
                 "balance_tolerance_kg": float(self.ledger.balance_tolerance_kg),
+                "balance_projection_relative_tolerance": float(
+                    self.ledger.balance_relative_tolerance
+                ),
+                "balance_projection_absolute_floor_kg": float(
+                    self.ledger.balance_absolute_floor_kg
+                ),
                 "writer": "commit_batch",
             },
             **report,

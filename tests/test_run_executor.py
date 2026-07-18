@@ -7,7 +7,10 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.accounting.ledger import AtomLedger
-from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignHoldTargetRefusal,
+    CampaignPressureSetpointRefusal,
+)
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.run_executor import (
     RunExecution,
@@ -580,6 +583,36 @@ def test_run_executor_preserves_campaign_pressure_refusal_during_execution(
     assert execution.reason == diagnostic["reason"]
     assert execution.error_message == diagnostic["reason"]
     assert execution.refusal_diagnostic == diagnostic
+
+
+def test_run_executor_preserves_nonfinite_c6_hold_refusal(monkeypatch):
+    class BareSession:
+        simulator = SimpleNamespace()
+
+    diagnostic = {
+        "hold_target_C": 1400.0,
+        "temperature_C": float("nan"),
+        "detail": "C6 hold target and melt temperature must be finite",
+    }
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise CampaignHoldTargetRefusal(diagnostic)
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+
+    execution = RunExecutor().execute_session(BareSession(), hours=1)
+
+    assert execution.status == "refused"
+    assert execution.reason == "c6_hold_target_nonfinite"
+    assert execution.error_message == "c6_hold_target_nonfinite"
+    assert execution.refusal_diagnostic == {
+        **diagnostic,
+        "status": "refused",
+        "reason": "c6_hold_target_nonfinite",
+    }
 
 
 def test_run_executor_failure_envelope_uses_safe_exception_text(monkeypatch):

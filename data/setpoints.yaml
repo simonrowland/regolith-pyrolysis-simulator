@@ -607,6 +607,7 @@ campaigns:
     endpoint:
       type: "self_terminating"
       criterion: "liquidus exceeds 1700 C (residual SiO2+Al2O3 < 15-20%)"
+    max_target_acquisition_hr: 120      # wall-clock refusal; distinct from reaction hold
     max_hold_hr: 20
     composition_endpoint:
       type: "refractory_oxide_sum_below"

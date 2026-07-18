@@ -982,6 +982,10 @@ class HourSnapshot:
     melt_mass_kg: float = 0.0
     composition_wt_pct: Dict[str, float] = field(default_factory=dict)
     inventory: ProcessInventory = field(default_factory=ProcessInventory)
+    # Historical C6 hold accounting must use the dispatch decision made on
+    # that tick. Re-evaluating an old temperature against a later ramp target
+    # can otherwise turn pre-dispatch history into reaction hold time.
+    c6_at_hold_target: bool = False
 
     # Evaporation
     evap_flux: EvaporationFlux = field(default_factory=EvaporationFlux)

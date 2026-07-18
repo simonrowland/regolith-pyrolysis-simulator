@@ -520,7 +520,7 @@ class ExtractionMixin:
         """
         ledger_metals: Dict[str, float] = {}
         for account in STAGE_COLLECTION_BACKING_ACCOUNTS:
-            for species, kg in self.atom_ledger.kg_by_account(account).items():
+            for species, kg in self.atom_ledger.project_account_kg(account).items():
                 try:
                     ledger_kg = float(kg)
                 except (TypeError, ValueError):
@@ -2902,8 +2902,8 @@ class ExtractionMixin:
         residual_kg = 0.0
         ree_kg = 0.0
         for account in ('process.cleaned_melt', 'terminal.slag'):
-            for species, kg in self.atom_ledger.kg_by_account(account).items():
-                amount = max(0.0, float(kg))
+            for species, kg in self.atom_ledger.project_account_kg(account).items():
+                amount = float(kg)
                 if account == 'terminal.slag' and species in aluminate_species:
                     continue
                 residual_kg += amount

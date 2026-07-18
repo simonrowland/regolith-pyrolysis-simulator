@@ -166,7 +166,7 @@ def test_captured_volatiles_include_condensation_train_account():
         product_ledger=lambda: {},
         train=SimpleNamespace(stages=[]),
         atom_ledger=SimpleNamespace(
-            kg_by_account=lambda acct: {
+            project_account_kg=lambda acct: {
                 'terminal.offgas': {'H2O': 1.0, 'O2': 2.0},
                 'process.condensation_train': {'Na': 3.0, 'K': 4.0},
             }.get(acct, {})
@@ -188,7 +188,7 @@ def test_spent_reductant_residue_surfaces_as_process_inventory_bucket():
         product_ledger=lambda: {},
         train=SimpleNamespace(stages=[]),
         atom_ledger=SimpleNamespace(
-            kg_by_account=lambda acct: {
+            project_account_kg=lambda acct: {
                 'process.cleaned_melt': {'CaO': 1.0},
                 'process.spent_reductant_residue': {'Na2O': 2.5},
             }.get(acct, {})
@@ -306,7 +306,7 @@ def test_mixed_glass_zero_by_default_even_with_cleaned_melt():
         product_ledger=lambda: {},
         train=SimpleNamespace(stages=[]),
         atom_ledger=SimpleNamespace(
-            kg_by_account=lambda acct: (
+            project_account_kg=lambda acct: (
                 {'SiO2': 100.0, 'Al2O3': 20.0}
                 if acct == 'process.cleaned_melt' else {}
             ),
@@ -333,7 +333,7 @@ def test_mixed_glass_counts_cleaned_melt_only_in_early_tap_mode():
         product_ledger=lambda: {},
         train=SimpleNamespace(stages=[]),
         atom_ledger=SimpleNamespace(
-            kg_by_account=lambda acct: (
+            project_account_kg=lambda acct: (
                 {'SiO2': 100.0, 'Al2O3': 20.0}
                 if acct == 'process.cleaned_melt' else {}
             ),

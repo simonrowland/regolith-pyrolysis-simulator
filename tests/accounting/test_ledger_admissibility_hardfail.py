@@ -12,7 +12,6 @@ from simulator.accounting.exceptions import (
 )
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.ledger import (
-    DEFAULT_BALANCE_TOLERANCE_KG,
     DEFAULT_MASS_TOLERANCE_KG,
     KNOWN_LEDGER_ACCOUNT_PREFIXES,
     KNOWN_LEDGER_ACCOUNTS,
@@ -757,9 +756,11 @@ def test_strict_allowlist_accepts_known_accounts_and_dynamic_prefixes() -> None:
 
 
 def test_overdraft_tolerance_boundary_apply_and_kernel_commit_batch() -> None:
-    molar_mass = resolve_species_formula("SiO2").molar_mass_kg_per_mol()
-    within_extra_mol = (DEFAULT_BALANCE_TOLERANCE_KG * 0.5) / molar_mass
-    beyond_extra_mol = (DEFAULT_BALANCE_TOLERANCE_KG * 2.0) / molar_mass
+    relative_tolerance = AtomLedger().balance_relative_tolerance
+    within_extra_kg = 1.0 * relative_tolerance * 0.5
+    beyond_extra_kg = 1.0 * relative_tolerance * 2.0
+    within_extra_mol = relative_tolerance * 0.5
+    beyond_extra_mol = relative_tolerance * 2.0
 
     ledger = AtomLedger()
     ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
@@ -768,13 +769,13 @@ def test_overdraft_tolerance_boundary_apply_and_kernel_commit_batch() -> None:
         debits=(
             MaterialLot(
                 "process.cleaned_melt",
-                {"SiO2": 1.0 + DEFAULT_BALANCE_TOLERANCE_KG * 0.5},
+                {"SiO2": 1.0 + within_extra_kg},
             ),
         ),
         credits=(
             MaterialLot(
                 "process.overhead_gas",
-                {"SiO2": 1.0 + DEFAULT_BALANCE_TOLERANCE_KG * 0.5},
+                {"SiO2": 1.0 + within_extra_kg},
             ),
         ),
     )
@@ -787,13 +788,13 @@ def test_overdraft_tolerance_boundary_apply_and_kernel_commit_batch() -> None:
             debits=(
                 MaterialLot(
                     "process.cleaned_melt",
-                    {"SiO2": 1.0 + DEFAULT_BALANCE_TOLERANCE_KG * 2.0},
+                    {"SiO2": 1.0 + beyond_extra_kg},
                 ),
             ),
             credits=(
                 MaterialLot(
                     "process.overhead_gas",
-                    {"SiO2": 1.0 + DEFAULT_BALANCE_TOLERANCE_KG * 2.0},
+                    {"SiO2": 1.0 + beyond_extra_kg},
                 ),
             ),
         )
@@ -897,6 +898,75 @@ def test_element_atom_drift_boundary_catches_pretransition_discard() -> None:
     assert drift["whole_run_boundary_residual_mol_atoms"]["Si"] == pytest.approx(
         -residual_mol_atoms
     )
+
+
+def test_balanced_transition_retains_sub_tolerance_remainder_without_mass_loss() -> None:
+    ledger = AtomLedger()
+    initial_kg = 1.0e-8
+    remainder_kg = 8.854e-15
+    moved_kg = initial_kg - remainder_kg
+    ledger.load_external("process.overhead_gas", {"Cr": initial_kg})
+
+    ledger.move(
+        "synthetic_condense_Cr",
+        "process.overhead_gas",
+        "process.condensation_train",
+        {"Cr": moved_kg},
+    )
+
+    assert ledger.kg_by_account("process.overhead_gas")["Cr"] == pytest.approx(
+        remainder_kg,
+        rel=1.0e-9,
+        abs=0.0,
+    )
+    assert math.fsum(ledger.total_kg_by_account().values()) == initial_kg
+    assert ledger.close_report()["element_atom_drift"][
+        "whole_run_boundary_residual_mol_atoms"
+    ]["Cr"] == 0.0
+
+
+def test_small_account_relative_overdraft_is_not_hidden_by_display_floor() -> None:
+    ledger = AtomLedger()
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.1e-12})
+
+    with pytest.raises(OverdraftError):
+        ledger.move(
+            "small_account_overdraft",
+            "process.cleaned_melt",
+            "terminal.slag",
+            {"SiO2": 2.0e-12},
+        )
+
+    assert ledger.kg_by_account("process.cleaned_melt")["SiO2"] == pytest.approx(
+        1.1e-12,
+        rel=1.0e-12,
+        abs=0.0,
+    )
+
+
+def test_projection_clamp_boundary_uses_relative_scale_with_absolute_floor() -> None:
+    ledger = AtomLedger()
+    ledger.load_external("process.cleaned_melt", {"SiO2": 1.0})
+    tolerance_kg = ledger._projection_tolerance_kg(
+        "process.cleaned_melt",
+        "SiO2",
+    )
+    assert tolerance_kg == 1.0e-12
+
+    mol_per_kg = (
+        ledger.mol_by_account("process.cleaned_melt")["SiO2"]
+        / ledger.kg_by_account("process.cleaned_melt")["SiO2"]
+    )
+    ledger._balances["process.cleaned_melt"]["SiO2"] = (
+        -math.nextafter(tolerance_kg, 0.0) * mol_per_kg
+    )
+    assert ledger.project_account_kg("process.cleaned_melt") == {}
+
+    ledger._balances["process.cleaned_melt"]["SiO2"] = (
+        -math.nextafter(tolerance_kg, math.inf) * mol_per_kg
+    )
+    with pytest.raises(AccountingError, match="negative outward mass"):
+        ledger.project_account_kg("process.cleaned_melt")
 
 
 def test_policy_mapping_rejects_embedded_account_mismatch_before_mutation() -> None:

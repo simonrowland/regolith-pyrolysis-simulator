@@ -11,7 +11,10 @@ from typing import Any, Mapping
 from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
 from engines.builtin.vapor_pressure import VaporPressureRangeError
 from simulator.backends import requires_stage0_subprocess
-from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignHoldTargetRefusal,
+    CampaignPressureSetpointRefusal,
+)
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.core import (
@@ -40,6 +43,7 @@ _TYPED_PHYSICS_REFUSALS = (
 )
 _ALL_TYPED_PHYSICS_REFUSALS = (
     KnudsenRegimeRefusal,
+    CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
     EvaporationFluxRefusal,
     *_TYPED_PHYSICS_REFUSALS,
@@ -332,6 +336,7 @@ class RunExecutor:
                     status = "partial"
         except (
             KnudsenRegimeRefusal,
+            CampaignHoldTargetRefusal,
             CampaignPressureSetpointRefusal,
             EvaporationFluxRefusal,
         ) as exc:

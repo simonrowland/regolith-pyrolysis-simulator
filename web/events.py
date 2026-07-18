@@ -1087,7 +1087,7 @@ def _pot_composition_kg(sim, snapshot) -> dict[str, float]:
         return {}
     try:
         return _rounded_positive_species(
-            ledger.kg_by_account('process.cleaned_melt'), 4)
+            ledger.project_account_kg('process.cleaned_melt'), 4)
     except Exception as exc:
         _safe_log(f'Unable to read cleaned-melt ledger for web tick: {exc}')
         return {}

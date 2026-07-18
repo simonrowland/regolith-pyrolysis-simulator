@@ -226,7 +226,7 @@ class AccountingQueries:
                 products,
                 {
                     species: kg
-                    for species, kg in self.ledger.kg_by_account(account).items()
+                    for species, kg in self.ledger.project_account_kg(account).items()
                     if species != OXYGEN_SPECIES
                 },
             )
@@ -249,7 +249,7 @@ class AccountingQueries:
     ) -> dict[str, float]:
         species_kg: dict[str, float] = {}
         for account in accounts:
-            _merge_masses(species_kg, self.ledger.kg_by_account(str(account)))
+            _merge_masses(species_kg, self.ledger.project_account_kg(str(account)))
         return {
             species: kg
             for species, kg in sorted(species_kg.items())
@@ -260,11 +260,13 @@ class AccountingQueries:
         pattern = str(account_pattern)
         if pattern.endswith("*"):
             prefix = pattern[:-1]
-            all_accounts = self.ledger.kg_by_account()
             species_kg: dict[str, float] = {}
-            for account, values in all_accounts.items():
+            for account in self.ledger.kg_by_account():
                 if str(account).startswith(prefix):
-                    _merge_masses(species_kg, values)
+                    _merge_masses(
+                        species_kg,
+                        self.ledger.project_account_kg(str(account)),
+                    )
             return {
                 species: kg
                 for species, kg in sorted(species_kg.items())
@@ -367,7 +369,7 @@ class AccountingQueries:
     def terminal_rump_by_species(self) -> dict[str, float]:
         species_kg: dict[str, float] = {}
         for account in TERMINAL_RUMP_ACCOUNTS:
-            _merge_masses(species_kg, self.ledger.kg_by_account(account))
+            _merge_masses(species_kg, self.ledger.project_account_kg(account))
         return {
             species: kg
             for species, kg in sorted(species_kg.items())
@@ -407,7 +409,7 @@ class AccountingQueries:
             by_class[category] += kg
 
         total_kg = sum(
-            self.ledger.total_kg_by_account(account)
+            self.ledger.projected_total_kg_by_account(account)
             for account in TERMINAL_RUMP_ACCOUNTS
         )
         class_total_kg = sum(by_class.values())
@@ -608,7 +610,7 @@ class AccountingQueries:
     def condensation_totals_with_terminal_oxygen(self) -> dict[str, float]:
         totals = {
             species: float(kg)
-            for species, kg in self.ledger.kg_by_account(
+            for species, kg in self.ledger.project_account_kg(
                 "process.condensation_train").items()
             if kg > 1e-12
         }
@@ -889,7 +891,7 @@ class AccountingQueries:
         species_names = self.sim._RUMP_ELEMENT_SPECIES.get(element, ())
         total = 0.0
         for account in TERMINAL_RUMP_ACCOUNTS:
-            species_kg = self.ledger.kg_by_account(account)
+            species_kg = self.ledger.project_account_kg(account)
             for species in species_names:
                 total += max(0.0, float(species_kg.get(species, 0.0)))
             if account == C7_AL_CREDIT_ACCOUNT:
@@ -908,8 +910,8 @@ class AccountingQueries:
 
 
 def _ledger_o2_kg(ledger: Any, account: str) -> float:
-    species_kg = ledger.kg_by_account(account)
-    return max(0.0, float(species_kg.get(OXYGEN_SPECIES, 0.0)))
+    species_kg = ledger.project_account_kg(account)
+    return float(species_kg.get(OXYGEN_SPECIES, 0.0))
 
 
 def _ratio_or_none(numerator: float, denominator: float) -> float | None:

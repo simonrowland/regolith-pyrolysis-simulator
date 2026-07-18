@@ -716,6 +716,8 @@ class _FakeLedger:
             return {"Fe": 50.0}
         return {}
 
+    project_account_kg = kg_by_account
+
 
 class _FakeProductSim:
     atom_ledger = _FakeLedger()
@@ -795,6 +797,8 @@ class _FakeSso2Ledger:
 
     def kg_by_account(self, account: str) -> dict[str, float]:
         return dict(self._accounts.get(account, {}))
+
+    project_account_kg = kg_by_account
 
 
 def _fake_sso2_stage_gas() -> dict[str, float | str]:

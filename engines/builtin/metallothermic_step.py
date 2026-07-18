@@ -200,6 +200,10 @@ def _time_integrated_inventory_fraction(
 
     fraction = max(0.0, min(1.0, float(one_hour_fraction)))
     duration = max(0.0, float(dt_hr))
+    if duration == 1.0:
+        # At the one-hour reference cadence, 1 - (1 - f)**1 = f exactly.
+        # Preserve the legacy per-hour rate without a log/expm1 round trip.
+        return fraction
     if fraction >= 1.0:
         return 1.0 if duration > 0.0 else 0.0
     # If S(1)=1-f for first-order depletion, S(dt)=(1-f)**dt and the

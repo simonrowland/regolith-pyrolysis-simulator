@@ -42,7 +42,7 @@ def _make_audit_target(
 ) -> SimpleNamespace:
     """Minimal duck-typed surface for ``_audit_metal_projection_drift``.
 
-    The method only touches ``self.atom_ledger.kg_by_account`` and
+    The method only touches ``self.atom_ledger.project_account_kg`` and
     ``self.train.stages[*].collected_kg``; everything else on
     ``ExtractionMixin`` is irrelevant. Build a SimpleNamespace that
     exposes just those two surfaces with the requested test
@@ -67,7 +67,7 @@ def _make_audit_target(
         return {}
 
     ns = SimpleNamespace(
-        atom_ledger=SimpleNamespace(kg_by_account=_fake_kg_by_account),
+        atom_ledger=SimpleNamespace(project_account_kg=_fake_kg_by_account),
         train=train,
     )
     # Bind the audit + projection-sum helpers + tolerance so ``self``

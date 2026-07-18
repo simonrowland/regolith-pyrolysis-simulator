@@ -1,30 +1,50 @@
 from __future__ import annotations
 
+import gc
 import math
-from types import SimpleNamespace
+from types import MappingProxyType, SimpleNamespace
 
 import pytest
 
 from engines.builtin.metallothermic_step import _time_integrated_inventory_fraction
 from engines.builtin.overhead_bleed import BuiltinOverheadBleedProvider
 from simulator.accounting.queries import AccountingQueries
-from simulator.accounting.ledger import KNOWN_LEDGER_ACCOUNTS
+from simulator.accounting.exceptions import AccountingError
+from simulator.accounting.ledger import (
+    KNOWN_LEDGER_ACCOUNT_PREFIXES,
+    KNOWN_LEDGER_ACCOUNTS,
+    AtomLedger,
+    LedgerTransition,
+)
+from simulator.accounting.lots import MaterialLot
 from simulator.chemistry.kernel.config import normalize_chemistry_kernel_config
 from simulator.condensation import knudsen_regime_diagnostic
+from simulator.campaigns import CampaignManager
 from simulator.core import (
-    CampaignPhase,
     FLOW_MASS_ACCOUNTS,
+    MeltHeadspaceProjectionError,
     PyrolysisSimulator,
+    RefusalStateSnapshotError,
+    _deepcopy_refusal_state,
 )
 from simulator.chemistry.kernel import ProviderUnavailableError
 from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import EvaporationFluxRefusal, EvaporationMixin
+from simulator.extraction import ExtractionMixin
 from simulator.interpolation_uncertainty import _nonlinearity_component
 from simulator.optimize.evaluate import _trace_with_optimizer_coating_report
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.strategy.bayesian import _constraint_values
 from simulator.overhead import OverheadConfigurationError, OverheadGasModel
-from simulator.state import Atmosphere, EvaporationFlux, HourSnapshot
+from simulator.state import (
+    Atmosphere,
+    BatchRecord,
+    CampaignPhase,
+    CondensationTrain,
+    EvaporationFlux,
+    HourSnapshot,
+    MeltState,
+)
 from simulator.thermal_train import (
     integrate_molar_sensible_enthalpy_j_per_mol,
     oxygen_cp_shomate_j_per_mol_k,
@@ -38,6 +58,12 @@ def test_authority_opt_ins_reject_truthy_strings() -> None:
 
 
 def test_evaporation_typed_refusal_rolls_back_entire_hour() -> None:
+    class SlottedScheduleHolder:
+        __slots__ = ("schedule",)
+
+        def __init__(self, schedule):
+            self.schedule = schedule
+
     class FakeLedger:
         def __init__(self) -> None:
             self._balances = {}
@@ -56,6 +82,25 @@ def test_evaporation_typed_refusal_rolls_back_entire_hour() -> None:
     sim.melt = SimpleNamespace(hour=4)
     sim.overhead = SimpleNamespace(pressure_mbar=2.0)
     sim.record = SimpleNamespace(snapshots=[])
+    schedule_backing = {"points": [{"temperature_C": 25.0}]}
+    schedule = MappingProxyType(schedule_backing)
+    schedule_backing["self"] = schedule
+    nested_backing = {"points": [{"temperature_C": 50.0}]}
+    nested_inner = MappingProxyType(nested_backing)
+    nested_outer = MappingProxyType(nested_inner)
+    nested_backing["outer_cycle"] = nested_outer
+    slotted_backing = {"points": [{"temperature_C": 75.0}]}
+    slotted_proxy = MappingProxyType(slotted_backing)
+    slotted_holder = SlottedScheduleHolder(slotted_proxy)
+    sim.runtime_state = {
+        "schedule": schedule,
+        "schedule_backing": schedule_backing,
+        "nested_backing": nested_backing,
+        "nested_inner": nested_inner,
+        "nested_outer": nested_outer,
+        "nested_outer_alias": nested_outer,
+        "slotted_holder": slotted_holder,
+    }
     sim.atom_ledger = FakeLedger()
     sim._chem_registry = object()
     sim._chem_kernel = object()
@@ -66,6 +111,11 @@ def test_evaporation_typed_refusal_rolls_back_entire_hour() -> None:
         sim.melt.hour = 5
         sim.overhead.pressure_mbar = 99.0
         sim.record.snapshots.append(object())
+        sim.runtime_state["schedule"]["points"][0]["temperature_C"] = 625.0
+        sim.runtime_state["nested_outer"]["points"][0]["temperature_C"] = 650.0
+        sim.runtime_state["slotted_holder"].schedule["points"][0][
+            "temperature_C"
+        ] = 675.0
         raise EvaporationFluxRefusal("missing_alpha", {"missing_alpha": ["CrO2"]})
 
     sim._step_one_hour = refuse_after_commit
@@ -77,6 +127,183 @@ def test_evaporation_typed_refusal_rolls_back_entire_hour() -> None:
     assert sim.melt.hour == 4
     assert sim.overhead.pressure_mbar == pytest.approx(2.0)
     assert sim.record.snapshots == []
+    schedule = sim.runtime_state["schedule"]
+    schedule_backing = sim.runtime_state["schedule_backing"]
+    assert isinstance(schedule, MappingProxyType)
+    assert schedule["points"] == [{"temperature_C": 25.0}]
+    assert schedule["self"] is schedule
+    schedule_backing["rollback_proof"] = True
+    assert schedule["rollback_proof"] is True
+    with pytest.raises(TypeError):
+        schedule["points"] = []
+    nested_backing = sim.runtime_state["nested_backing"]
+    nested_inner = sim.runtime_state["nested_inner"]
+    nested_outer = sim.runtime_state["nested_outer"]
+    assert isinstance(nested_inner, MappingProxyType)
+    assert isinstance(nested_outer, MappingProxyType)
+    assert nested_outer is sim.runtime_state["nested_outer_alias"]
+    assert any(
+        referent is nested_inner for referent in gc.get_referents(nested_outer)
+    )
+    assert any(
+        referent is nested_backing for referent in gc.get_referents(nested_inner)
+    )
+    assert nested_outer["points"] == [{"temperature_C": 50.0}]
+    assert nested_outer["outer_cycle"] is nested_outer
+    nested_backing["rollback_proof"] = True
+    assert nested_inner["rollback_proof"] is True
+    assert nested_outer["rollback_proof"] is True
+    with pytest.raises(TypeError):
+        nested_outer["points"] = []
+    slotted_schedule = sim.runtime_state["slotted_holder"].schedule
+    assert isinstance(slotted_schedule, MappingProxyType)
+    assert slotted_schedule["points"] == [{"temperature_C": 75.0}]
+
+
+def test_unsupported_refusal_snapshot_graph_raises_typed_error() -> None:
+    sim = object.__new__(PyrolysisSimulator)
+    sim.runtime_state = {"unsupported": memoryview(b"not-deepcopyable")}
+    sim.atom_ledger = SimpleNamespace(
+        _balances={},
+        _policies={},
+        _transitions=[],
+        _terminal_debit_authorized_transition_ids=set(),
+        _external_loads=[],
+    )
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+
+    with pytest.raises(RefusalStateSnapshotError, match="unsupported rollback"):
+        sim._snapshot_terminal_refusal_hour_state()
+
+
+@pytest.mark.parametrize(
+    ("hook", "error_type"),
+    (("deepcopy", ValueError), ("reduce", RuntimeError)),
+)
+def test_adversarial_refusal_snapshot_failures_are_typed(
+    hook: str,
+    error_type: type[Exception],
+) -> None:
+    if hook == "deepcopy":
+        class Adversarial:
+            def __deepcopy__(self, memo):
+                raise error_type("custom snapshot refusal")
+    else:
+        class Adversarial:
+            def __reduce__(self):
+                raise error_type("custom snapshot refusal")
+
+    sim = object.__new__(PyrolysisSimulator)
+    backing = {"adversarial": Adversarial()}
+    sim.runtime_state = {"proxy": MappingProxyType(backing)}
+    sim.atom_ledger = SimpleNamespace(
+        _balances={},
+        _policies={},
+        _transitions=[],
+        _terminal_debit_authorized_transition_ids=set(),
+        _external_loads=[],
+    )
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+
+    with pytest.raises(RefusalStateSnapshotError) as refusal:
+        sim._snapshot_terminal_refusal_hour_state()
+    assert isinstance(refusal.value.__cause__, error_type)
+
+
+def test_hybrid_keyboard_interrupt_escapes_snapshot_boundary_unchanged() -> None:
+    class HybridInterrupt(KeyboardInterrupt, Exception):
+        pass
+
+    signal = HybridInterrupt("stop snapshot construction")
+
+    class Adversarial:
+        def __getstate__(self):
+            raise signal
+
+    with pytest.raises(HybridInterrupt, match="stop snapshot construction") as caught:
+        _deepcopy_refusal_state(Adversarial(), {})
+    assert caught.value is signal
+
+
+def test_snapshot_error_translation_does_not_format_hostile_repr() -> None:
+    class Hostile:
+        def __repr__(self):
+            raise RuntimeError("repr escaped")
+
+    class Adversarial:
+        def __deepcopy__(self, memo):
+            raise ValueError(Hostile())
+
+    with pytest.raises(RefusalStateSnapshotError) as refusal:
+        _deepcopy_refusal_state(Adversarial(), {})
+    assert isinstance(refusal.value.__cause__, ValueError)
+    assert str(refusal.value) == "unsupported rollback snapshot graph"
+
+
+def test_negative_ledger_dust_never_projects_as_product_mass() -> None:
+    ledger = AtomLedger(
+        allowed_accounts=KNOWN_LEDGER_ACCOUNTS,
+        allowed_account_prefixes=KNOWN_LEDGER_ACCOUNT_PREFIXES,
+    )
+    ledger.load_external("process.overhead_gas", {"Cr": 1.0})
+    moved_kg = 1.0 + 4.0e-13
+    ledger.apply(
+        LedgerTransition(
+            name="adversarial_dust_move",
+            debits=(MaterialLot("process.overhead_gas", {"Cr": moved_kg}),),
+            credits=(
+                MaterialLot(
+                    "process.wall_deposit_segment_dust_probe",
+                    {"Cr": moved_kg},
+                ),
+            ),
+        )
+    )
+    sim = SimpleNamespace(
+        atom_ledger=ledger,
+        _unspent_additive_reagents_kg=lambda: {},
+        _consumed_additive_reagents_kg=lambda: {},
+    )
+
+    canonical = ledger.kg_by_account("process.overhead_gas")
+    assert canonical["Cr"] < 0.0
+    assert abs(canonical["Cr"]) <= ledger.balance_tolerance_kg
+    assert ledger.account_species_kg()["process.overhead_gas"] == {}
+    assert ledger.account_kg("process.overhead_gas") == 0.0
+    assert AccountingQueries(sim).product_ledger().get("Cr", 0.0) == 0.0
+    report = ledger.close_report()
+    assert report["kg_by_account"]["process.overhead_gas"].get("Cr", 0.0) == 0.0
+    assert math.fsum(
+        kg
+        for species_kg in ledger.kg_by_account().values()
+        for kg in species_kg.values()
+    ) == pytest.approx(1.0, abs=1.0e-15)
+
+
+def test_runtime_melt_and_c7_report_use_ledger_projection_policy() -> None:
+    ledger = AtomLedger()
+    ledger.load_external("process.cleaned_melt", {"Cr": 1.0})
+    ledger.move(
+        "cleaned_melt_dust_probe",
+        "process.cleaned_melt",
+        "process.wall_deposit_segment_dust_probe",
+        {"Cr": 1.0 + 4.0e-13},
+    )
+    melt = SimpleNamespace(composition_kg=None, update_total_mass=lambda: None)
+    sim = SimpleNamespace(
+        atom_ledger=ledger,
+        melt=melt,
+        inventory=SimpleNamespace(melt_oxide_kg=None),
+    )
+
+    PyrolysisSimulator._project_cleaned_melt_from_atom_ledger(sim)
+    assert melt.composition_kg == {}
+
+    ledger._balances["process.cleaned_melt"]["Cr"] *= 10.0
+    with pytest.raises(AccountingError, match="negative outward mass"):
+        ExtractionMixin._c7_residual_ceramic_report(sim)
 
 
 def test_oxygen_sensible_integral_uses_nist_high_temperature_shomate_band() -> None:
@@ -227,6 +454,76 @@ def test_evaporation_total_pressure_ignores_downstream_residual() -> None:
         {"Fe": 300.0},
     )
     assert first == second == pytest.approx(500.0)
+
+
+@pytest.mark.parametrize("projection", [None, "missing"])
+def test_authoritative_headspace_pressure_refuses_missing_projection(
+    projection: object,
+) -> None:
+    sim = object.__new__(PyrolysisSimulator)
+    sim.melt = SimpleNamespace(p_total_mbar=5.0)
+    sim.overhead = SimpleNamespace(pressure_mbar=900.0)
+    if projection is None:
+        sim._melt_headspace_composition_mbar = None
+
+    with pytest.raises(
+        MeltHeadspaceProjectionError,
+        match="authoritative melt-headspace pressure",
+    ):
+        sim._compute_native_fe_saturation_extent(
+            {"FeO": 1.0},
+            fe3_over_sigma_fe=0.1,
+            T_K=1873.15,
+            fO2_log=-7.5,
+        )
+
+
+def test_c6_acquisition_timeout_ends_as_transport_bound_refusal() -> None:
+    sim = object.__new__(PyrolysisSimulator)
+    sim.campaign_mgr = CampaignManager({
+        "campaigns": {
+            "C6": {
+                "default_hold_T_C": 1400.0,
+                "max_target_acquisition_hr": 120.0,
+                "max_hold_hr": 20.0,
+                "composition_endpoint": {
+                    "species": ["SiO2", "Al2O3"],
+                    "threshold_wt_pct": 17.5,
+                },
+            }
+        }
+    })
+    sim.campaign_mgr.overrides["C6"] = {"max_hours": 1.0}
+    sim.melt = MeltState(
+        campaign=CampaignPhase.C6,
+        campaign_hour=0,
+        temperature_C=1150.0,
+    )
+    sim.train = CondensationTrain()
+    sim.record = BatchRecord()
+    sim.overhead = SimpleNamespace(
+        transport_binding_cause="controlled_o2_no_equipment",
+        transport_saturation_pct=202.0,
+        evap_exceeds_transport=True,
+        turbine_limited=False,
+    )
+    sim._last_c6_refusal_diagnostic = {}
+    sim._c6_campaign_refused = False
+
+    assert sim._check_campaign_endpoint(EvaporationFlux()) is True
+    assert sim._c6_campaign_refused is True
+    refusal = sim._last_c6_refusal_diagnostic
+    assert refusal["status"] == "refused"
+    assert refusal["diagnostic"]["reason_refused"] == (
+        "c6_hold_target_not_acquired"
+    )
+    assert refusal["diagnostic"]["unacquired_hold_target_C"] == 1400.0
+    assert refusal["diagnostic"]["binding_transport_state"] == {
+        "binding_cause": "controlled_o2_no_equipment",
+        "saturation_pct": 202.0,
+        "evap_exceeds_transport": True,
+        "turbine_limited": False,
+    }
 
 
 def test_uncontrolled_equilibrium_po2_ignores_downstream_residual() -> None:
