@@ -124,7 +124,7 @@ Operator meaning:
 
 | Flag | Honest interpretation |
 | --- | --- |
-| `stub` | Fast smoke-path evaluation on the `internal-analytical` model (this fidelity-tier value keeps its serialized name `stub`). Useful for checking profiles, job wiring, artifacts, and UI. Not a real chemistry result. |
+| `stub` | Legacy input alias for fast smoke-path evaluation on the `internal-analytical` model; serialized backend identity is `internal-analytical`. Useful for checking profiles, job wiring, artifacts, and UI. Not a real chemistry result. |
 | `fast` | Fast tier label. The study still checks the EvalSpec cache before running a fresh evaluation. In the checked-in profiles, this tier is also `internal-analytical`-backed (legacy `stub`). |
 | `high` | High tier label. Intended for real-backend work when a profile/backend config points there. In the checked-in profiles, this tier is also `internal-analytical`-backed (legacy `stub`). |
 | `auto` | Valid fidelity label. In the checked-in profiles, this tier is also `internal-analytical`-backed (legacy `stub`). |

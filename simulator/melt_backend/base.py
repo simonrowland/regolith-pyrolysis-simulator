@@ -639,8 +639,8 @@ class InternalAnalyticalBackend(MeltBackend):
     """
     The builtin analytical melt backend (``internal-analytical``).
 
-    Named ``internal-analytical`` in trust-architecture vocabulary; ``stub`` is
-    the legacy input alias and stable serialization token. Returns empty
+    Named and serialized as ``internal-analytical``; ``stub`` is a legacy input
+    alias. Returns empty
     equilibrium results; the simulator's
     ``_internal_analytical_equilibrium()`` method handles Ellingham/Antoine
     vapor pressures independently of this class. Denylisted from certification
