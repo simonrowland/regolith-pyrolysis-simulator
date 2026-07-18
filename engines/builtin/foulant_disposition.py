@@ -202,6 +202,24 @@ def _validate_dg_points(dg_points: Sequence[tuple[float, float]]) -> None:
         seen_t.add(t_k)
 
 
+def _dg_source_confidence(
+    confidence: str,
+    temperature_K: float,
+    dg_points: Sequence[tuple[float, float]],
+) -> str:
+    # Source-domain gate: the stored rows are bounded reconstructions from
+    # Linstrom & Mallard, NIST WebBook SRD 69, and Chase (1998) NIST-JANAF,
+    # DOI 10.18434/T42S31 (with Sutter 2014 NTRS 20140006489 and Bruck 2014
+    # LPSC 2057 for perchlorates).  Each row's stated coverage is exactly its
+    # min/max T_K points.  Sanity: either endpoint stays at the configured
+    # confidence; one kelvin below/above the row downgrades to out_of_domain.
+    low_K = min(point[0] for point in dg_points)
+    high_K = max(point[0] for point in dg_points)
+    if low_K <= temperature_K <= high_K:
+        return confidence
+    return "out_of_domain"
+
+
 def _interpolate_onset_K(dg_points: Sequence[tuple[float, float]]) -> float:
     _validate_dg_points(dg_points)
     ordered = sorted(dg_points, key=lambda row: row[0])
@@ -338,6 +356,12 @@ def chi_decomp(
         raise KeyError(f"dG row {dg_key!r} missing from registry")
 
     dg_points = _parse_dg_points(dg_row)
+    query_temperature_K = float(T_C) + 273.15
+    confidence = _dg_source_confidence(
+        str(entry.warning_flags.get("confidence", "partly_grounded")),
+        query_temperature_K,
+        dg_points,
+    )
     thermal_onset_k = _interpolate_onset_K(dg_points)
     thermal_onset_c = thermal_onset_k - 273.15
     width_c = _derive_sigmoid_width_C(dg_points, thermal_onset_k)
@@ -356,7 +380,7 @@ def chi_decomp(
         if reagent_mol <= 0.0:
             return DispositionExtent(
                 extent=0.0,
-                confidence=str(entry.warning_flags.get("confidence", "partly_grounded")),
+                confidence=confidence,
                 onset_K=reported_onset_k,
                 path=path,
             )
@@ -388,7 +412,6 @@ def chi_decomp(
     if o2_dependence == "requires" and p_o2_bar <= 0.0:
         extent = 0.0
 
-    confidence = str(entry.warning_flags.get("confidence", "partly_grounded"))
     return DispositionExtent(
         extent=min(max(extent, 0.0), 1.0),
         confidence=confidence,
