@@ -2860,6 +2860,12 @@ def test_endmember_activity_labels_do_not_reach_evaporation_flux_as_oxide_keys()
         _build_partial_melt_offgassing_diagnostic=lambda *a, **k: {},
         _dispatch_only=_dispatch_only,
     )
+    # Bind the production helper (simulator/evaporation.py:138) so this
+    # stand-in follows the real backpressure path without copying its logic.
+    sim._evaporation_bulk_partial_pressure_pa = types.MethodType(
+        PyrolysisSimulator._evaporation_bulk_partial_pressure_pa,
+        sim,
+    )
 
     PyrolysisSimulator._calculate_evaporation(sim, result)
 
