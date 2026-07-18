@@ -326,7 +326,13 @@ def test_internal_analytical_backend_name_accepts_old_and_emits_new_cache_key(
 ) -> None:
     aliased = _base_spec(backend_name=alias)
     assert aliased.backend_name == "internal-analytical"
-    assert cache_key(aliased) == cache_key(_base_spec(backend_name="internal-analytical"))
+    payload = json.loads(canonical_evalspec_json(aliased).decode("utf-8"))
+    assert payload["backend_name"] == "internal-analytical"
+    restored = pickle.loads(pickle.dumps(aliased))
+    assert restored.backend_name == "internal-analytical"
+    assert cache_key(aliased) == cache_key(
+        _base_spec(backend_name="internal-analytical")
+    )
 
 
 def test_build_eval_inputs_keys_schema_allowlist_version_in_production_path() -> None:

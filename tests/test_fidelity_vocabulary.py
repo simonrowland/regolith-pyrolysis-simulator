@@ -441,10 +441,19 @@ def test_canonical_emission_preserves_not_run_honesty() -> None:
     assert payload["degraded_from"] == ["not_run"]
 
 
-def test_canonical_emission_refuses_denylisted_certification_shape() -> None:
-    with pytest.raises(FidelityVocabularyTranslationError):
+@pytest.mark.parametrize("backend_name", ["internal-analytical", "stub"])
+def test_canonical_emission_refuses_analytical_certification_shape(
+    backend_name: str,
+) -> None:
+    with pytest.raises(
+        FidelityVocabularyTranslationError,
+        match=(
+            "certification emission refused for denylisted "
+            "evidence_class='internal-analytical'"
+        ),
+    ):
         canonicalize_fidelity_emission(
-            backend_name="stub",
+            backend_name=backend_name,
             backend_status="ok",
             backend_authoritative=True,
             certification_shape=True,

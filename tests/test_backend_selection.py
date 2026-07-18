@@ -41,6 +41,11 @@ from simulator.grind_preflight import (
     assert_grind_feedstock_stage0_route_coverage,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.fidelity_vocabulary import (
+    FidelityVocabularyTranslationError,
+    canonicalize_fidelity_emission,
+)
+from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
 from web.events import BackendUnavailableError, _get_backend
 
 SPINEL_COMPOSITION_HANG_FEEDSTOCK_IDS = (
@@ -736,7 +741,8 @@ def test_internal_analytical_alias_pins_internal_analytical_backend(monkeypatch,
     """``backend='internal-analytical'`` resolves exactly like ``'internal-analytical'``.
 
     Even when AlphaMELTS is available the alias deterministically pins
-    InternalAnalyticalBackend (it folds onto ``stub`` before the autodetect branch).
+    InternalAnalyticalBackend (legacy aliases fold onto ``internal-analytical``
+    before the autodetect branch).
     """
     _install_fakes(monkeypatch, alphamelts_available=True)
 
@@ -755,22 +761,66 @@ def test_internal_analytical_alias_runner_strict_resolves_like_stub():
 
 
 def test_internal_analytical_alias_serializes_new_token_and_denylists():
-    backend = resolve_backend(
-        'internal-analytical',
-        BackendSelectionPolicy.WEB_AUTODETECT,
-        internal_analytical_backend_cls=InternalAnalyticalBackend,
-        log_selection=lambda selected: None,
-    )
-    resolution = backend_resolution_status(backend)
+    cache_identities = []
 
-    assert resolution.requested_backend == 'internal-analytical'
-    assert resolution.active_backend == 'InternalAnalyticalBackend'
-    assert resolution.message == (
-        'internal-analytical backend selected; '
-        'no authoritative melt result available'
-    )
-    assert resolution.backend_status == 'unavailable'
-    assert resolution.authoritative is False
+    for name in ('internal-analytical', 'stub'):
+        backend = resolve_backend(
+            name,
+            BackendSelectionPolicy.WEB_AUTODETECT,
+            internal_analytical_backend_cls=InternalAnalyticalBackend,
+            log_selection=lambda selected: None,
+        )
+        resolution = backend_resolution_status(backend)
+
+        assert resolution.requested_backend == 'internal-analytical'
+        assert resolution.active_backend == 'InternalAnalyticalBackend'
+        assert resolution.message == (
+            'internal-analytical backend selected; '
+            'no authoritative melt result available'
+        )
+        assert resolution.backend_status == 'unavailable'
+        assert resolution.authoritative is False
+
+        with pytest.raises(
+            FidelityVocabularyTranslationError,
+            match=(
+                "certification emission refused for denylisted "
+                "evidence_class='internal-analytical'"
+            ),
+        ):
+            canonicalize_fidelity_emission(
+                backend_name=name,
+                backend_status='ok',
+                backend_authoritative=True,
+                certification_shape=True,
+            )
+
+        spec = EvalSpec(
+            recipe_id='recipe-id',
+            feedstock_recipe_digest='feedstock-recipe-digest',
+            feedstock_id='lunar_mare_low_ti',
+            profile_id='profile-id',
+            fidelity='fast',
+            code_version='test-code-version',
+            data_digests={
+                'feedstocks': 'feedstocks-digest',
+                'foulant_thermo': 'foulant-thermo-digest',
+                'materials': 'materials-digest',
+                'profile': 'profile-digest',
+                'setpoints': 'setpoints-digest',
+                'species_catalog': 'species-catalog-digest',
+                'vapor_pressures': 'vapor-pressures-digest',
+            },
+            backend_name=name,
+        )
+        assert spec.backend_name == 'internal-analytical'
+        assert (
+            json.loads(canonical_evalspec_json(spec))['backend_name']
+            == 'internal-analytical'
+        )
+        cache_identities.append(cache_key(spec))
+
+    assert cache_identities[0] == cache_identities[1]
 
 
 @pytest.mark.parametrize('name', ['something-else', 'factsage', 'FactSAGE'])

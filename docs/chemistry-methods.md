@@ -700,9 +700,9 @@ recorded warning.
   equilibrium engine models, and it fails loudly out of range rather than extrapolating. It supplies the
   oxide activities its own vapor-pressure path consumes — the ideal-for-non-iron, Kress-for-iron
   treatment of §3 — but it does not run a Gibbs-energy minimization or compute phase boundaries. In
-  trust-architecture vocabulary this is the `internal-analytical` model (serialized under the legacy
-  name `stub`), and it is denylisted from certification claims: it can supply exploratory diagnostic
-  evidence but cannot certify a yield or phase claim.
+  trust-architecture vocabulary this is the `internal-analytical` model (the legacy input alias
+  `stub` also serializes as `internal-analytical`), and it is denylisted from certification claims:
+  it can supply exploratory diagnostic evidence but cannot certify a yield or phase claim.
 <!-- impl: §9 -> engines/builtin/__init__.py __all__:69 — builtin providers exported -->
 
 - **AlphaMELTS / MELTS** (via ThermoEngine / PetThermoTools) is the live path for silicate equilibrium:

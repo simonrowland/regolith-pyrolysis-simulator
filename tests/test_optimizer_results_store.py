@@ -1233,13 +1233,21 @@ def test_store_accepts_closure_clean_authoritative_in_domain_cache_write(
         assert conn.execute("SELECT count(*) FROM results").fetchone()[0] == 1
 
 
-def test_store_rejects_internal_analytical_backend_name_with_spoofed_authority_markers(
+@pytest.mark.parametrize(
+    "backend_name",
+    [
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+    ],
+)
+def test_store_rejects_analytical_backend_aliases_with_spoofed_authority_markers(
     tmp_path,
+    backend_name: str,
 ) -> None:
-    spec = _base_spec()
+    spec = _base_spec(backend_name=backend_name)
     trace = _admissible_trace(
         {
-            "backend_name": LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            "backend_name": backend_name,
             "backend_status": "ok",
             "backend_authoritative": True,
         }
@@ -1254,7 +1262,7 @@ def test_store_rejects_internal_analytical_backend_name_with_spoofed_authority_m
         run_reference=RunReference(
             status="ok",
             trace=trace,
-            backend_name=LEGACY_ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            backend_name=backend_name,
             backend_status="ok",
             backend_authoritative=True,
             product_summary={"oxygen_kg": 10.0},

@@ -55,8 +55,8 @@ Campaign aliases include `C2A_continuous` -> `C2A` and
 `C2A_staged` -> `C2A_STAGED`; `C2A_staged.hold_temp_C` is the staged hot-hold
 operator knob.
 
-The default backend is `internal-analytical` (legacy alias `stub`; both names
-resolve identically and frames serialize the stable `stub` token in `backend`).
+The default backend is `internal-analytical` (legacy input alias `stub`; both
+names resolve identically and frames serialize `internal-analytical` in `backend`).
 Backend resolution uses `BackendSelectionPolicy.RUNNER_STRICT`, matching the
 deterministic runner path. `factsage` is archived/removed and is rejected as an
 unknown backend.
@@ -87,7 +87,7 @@ protocol version bump.
   "ok": true,
   "frame_type": "start",
   "protocol_version": "1.0.0",
-  "backend": "stub",
+  "backend": "internal-analytical",
   "feedstock_id": "lunar_mare_low_ti",
   "campaign": "C0",
   "mass_kg": 1000.0,
