@@ -427,6 +427,30 @@ def test_runner_fouling_report_non_authoritative_is_unconstrained_and_surfaced()
     assert "resinter threshold is not grounded" in coating.detail
 
 
+def test_direct_null_threshold_report_binds_no_unqualified_deposition() -> None:
+    trace = _valid_trace_object(
+        wall_fouling_report={
+            "campaigns_to_resinter_total": math.inf,
+            "resinter_threshold_kg": None,
+            "wall_deposit_kg_per_campaign": 0.5,
+            "authoritative_for_resinter": False,
+            "output_status": "non-authoritative-threshold",
+            "status_reason": "resinter threshold is not grounded",
+        }
+    )
+
+    result = PhysicsConstraintSet().evaluate(trace)
+    coating = result.margins["coating"]
+
+    assert not result.feasible
+    assert not coating.feasible
+    assert coating.authoritative is True
+    assert coating.margin == pytest.approx(-0.5)
+    assert coating.status_payload["coating_constraint_mode"] == (
+        "no_unqualified_deposition"
+    )
+
+
 @pytest.mark.parametrize(
     "report",
     (

@@ -1379,6 +1379,11 @@ def _trace_with_optimizer_coating_report(
     if threshold_parametric:
         report.update(
             coating_constraint_mode="no_unqualified_deposition",
+            coating_constraint_authoritative=True,
+            coating_constraint_reason=(
+                "without a finite material damage capacity, no positive "
+                "continuous deposition rate has a qualified liner lifespan"
+            ),
             unqualified_deposition_rate_kg_per_campaign=float(
                 runner_report.get("wall_deposit_kg_per_campaign", 0.0) or 0.0
             ),

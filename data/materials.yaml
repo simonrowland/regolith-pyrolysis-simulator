@@ -131,6 +131,10 @@ liner_materials:
   hot_wall_refractory_liner:
     max_service_T_C: 1600
     alpha_s_by_species: *default_liner_alpha_s_by_species
+    # No sourced damage-capacity threshold exists yet. Null therefore means
+    # "no qualified positive deposition rate": the optimizer must reject any
+    # modeled wall loading until a finite material threshold can convert the
+    # continuous kg/campaign rate into a defensible liner lifespan.
     resinter_threshold_kg: null
-    resinter_threshold_basis: configurable_parameter_no_sourced_default
+    resinter_threshold_basis: fail_closed_no_qualified_positive_deposition
     fast_fouling_campaign_threshold: 10

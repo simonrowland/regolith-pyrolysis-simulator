@@ -35,6 +35,7 @@ from simulator.optimize.objective import (
     canonical_objective_metric,
     objective_metric_aliases,
 )
+from simulator.optimize.pool import resolve_eval_timeout_seconds
 from simulator.fidelity_vocabulary import (
     CANONICAL_EVIDENCE_CLASSES,
     FidelityVocabularyTranslationError,
@@ -117,8 +118,7 @@ def run_fidelity_correlation(
 ) -> FidelityCorrelationResult:
     """Evaluate DOE patches at both fidelities and score rank-preservation trust."""
 
-    if per_eval_timeout_s <= 0:
-        raise ValueError("per_eval_timeout_s must be positive")
+    per_eval_timeout_s = resolve_eval_timeout_seconds(per_eval_timeout_s)
     top_k_values = _top_k(top_k)
     threshold_profile = _thresholds(thresholds or DEFAULT_THRESHOLD_PROFILE)
     if max_samples is None:

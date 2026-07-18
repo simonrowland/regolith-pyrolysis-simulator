@@ -619,8 +619,35 @@ class PhysicsConstraintSet:
             raise CoatingFeasibilityReportError(
                 "wall-fouling status_reason must be str"
             )
-        if report.get("coating_constraint_mode") == "no_unqualified_deposition":
-            raw_rate = report.get("unqualified_deposition_rate_kg_per_campaign")
+        constraint_mode = report.get("coating_constraint_mode")
+        threshold_is_unqualified = False
+        if "resinter_threshold_kg" in report:
+            raw_threshold = report["resinter_threshold_kg"]
+            if raw_threshold is None:
+                threshold_is_unqualified = True
+            elif isinstance(raw_threshold, bool) or not isinstance(
+                raw_threshold, int | float
+            ):
+                raise CoatingFeasibilityReportError(
+                    "wall-fouling resinter_threshold_kg must be numeric or null"
+                )
+            else:
+                threshold = float(raw_threshold)
+                threshold_is_unqualified = (
+                    not math.isfinite(threshold) or threshold <= 0.0
+                )
+        if constraint_mode == "no_unqualified_deposition" or threshold_is_unqualified:
+            if (
+                constraint_mode == "no_unqualified_deposition"
+                and report.get("coating_constraint_authoritative") is not True
+            ):
+                raise CoatingFeasibilityReportError(
+                    "no-unqualified-deposition constraint must be authoritative"
+                )
+            raw_rate = report.get(
+                "unqualified_deposition_rate_kg_per_campaign",
+                report.get("wall_deposit_kg_per_campaign"),
+            )
             if isinstance(raw_rate, bool) or not isinstance(raw_rate, int | float):
                 raise CoatingFeasibilityReportError(
                     "unqualified deposition rate must be numeric"
@@ -641,20 +668,24 @@ class PhysicsConstraintSet:
             )
             return GateMargin(
                 gate="coating",
-                feasible=True,
+                feasible=rate == 0.0,
                 margin=-rate,
                 threshold=threshold,
                 observed=rate,
                 detail=(
-                    "continuous no-unqualified-deposition constraint; "
+                    "fail-closed continuous no-unqualified-deposition constraint: "
+                    "no finite material damage capacity qualifies a positive "
+                    "deposition rate; "
                     f"deposit_rate={rate:.6g} kg/campaign"
                 ),
-                status="warning",
-                authoritative=False,
+                status="available",
+                authoritative=True,
                 output_status=output_status,
                 status_reason=status_reason,
                 status_payload={
                     **report,
+                    "coating_constraint_mode": "no_unqualified_deposition",
+                    "coating_constraint_authoritative": True,
                     "constraint_mode": "continuous",
                 },
             )

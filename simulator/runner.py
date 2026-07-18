@@ -2557,13 +2557,19 @@ def _wall_fouling_report(
                 segment = str(key[0])
                 segment_load_kg[segment] = segment_load_kg.get(segment, 0.0) + amount
     threshold = cfg.get("resinter_threshold_kg")
+    threshold_kg = None if threshold is None else float(threshold)
+    threshold_is_qualified = (
+        threshold_kg is not None
+        and math.isfinite(threshold_kg)
+        and threshold_kg > 0.0
+    )
     fast_n = int(cfg["fast_fouling_campaign_threshold"])
     campaigns_by_segment: dict[str, float | str] = {}
     aggregate_campaigns_to_resinter: float | str = "infinite"
     if total_wall_load_kg <= 0.0:
         campaigns_to_resinter: float | str = "infinite"
         verdict = "slow-fouling"
-    elif threshold is None:
+    elif not threshold_is_qualified:
         controlling_segment_load_kg = max(
             segment_load_kg.values(),
             default=total_wall_load_kg,
@@ -2583,9 +2589,10 @@ def _wall_fouling_report(
             f"< {fast_n}, else slow-fouling"
         )
     else:
-        aggregate_campaigns_to_resinter = float(threshold) / total_wall_load_kg
+        assert threshold_kg is not None
+        aggregate_campaigns_to_resinter = threshold_kg / total_wall_load_kg
         campaigns_by_segment = {
-            segment: float(threshold) / load_kg
+            segment: threshold_kg / load_kg
             for segment, load_kg in sorted(segment_load_kg.items())
         }
         campaigns_to_resinter = min(

@@ -3176,9 +3176,10 @@ class CondensationModel:
                 overhead_pressure_pa=overhead_pressure_pa,
                 carrier_gas=self.carrier_gas,
                 vapor_pressure_data=self.vapor_pressure_data,
-                # Owner scope for 2026-06-29 re-evap fix is wall deposits
-                # only; keep historical condenser-stage capture unchanged.
+                # Wall CrO2 remains reversible; designated Stage 2 instead
+                # materializes the declared stable Cr2O3 + O2 product route.
                 reactive_product_backstop=False,
+                stable_condensation_product_backstop=(species == 'CrO2'),
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
@@ -4158,6 +4159,7 @@ def _wall_deposition_driving_pressure_pa(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     reactive_product_backstop: bool = True,
+    stable_condensation_product_backstop: bool = False,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
@@ -4182,6 +4184,13 @@ def _wall_deposition_driving_pressure_pa(
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
+    if stable_condensation_product_backstop:
+        if species != 'CrO2':
+            raise ValueError(
+                'stable condensation-product backstop is authorized only '
+                f'for CrO2, got {species!r}'
+            )
+        return max(0.0, local_pressure_pa)
     if P_sat_pa is None or not math.isfinite(P_sat_pa):
         return 0.0
     if reactive_product_backstop:
@@ -4266,6 +4275,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     radial_stir_factor: float | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     reactive_product_backstop: bool = True,
+    stable_condensation_product_backstop: bool = False,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
@@ -4333,6 +4343,9 @@ def _series_resistance_deposition_flux_mol_m2_s(
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
         reactive_product_backstop=reactive_product_backstop,
+        stable_condensation_product_backstop=(
+            stable_condensation_product_backstop
+        ),
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )

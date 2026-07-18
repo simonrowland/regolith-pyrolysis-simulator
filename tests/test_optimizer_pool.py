@@ -846,6 +846,17 @@ def test_process_pool_timeout_records_failure_with_fake_executor(
     assert [result.feasible for result in results[1:]] == [True, True]
 
 
+@pytest.mark.parametrize("raw", ["nan", "inf", "-inf", "0", "-1"])
+def test_eval_timeout_env_refuses_non_finite_or_non_positive_values(
+    monkeypatch: pytest.MonkeyPatch,
+    raw: str,
+) -> None:
+    monkeypatch.setenv(pool_module.EVAL_TIMEOUT_ENV, raw)
+
+    with pytest.raises(ValueError, match="finite and positive"):
+        pool_module.resolve_eval_timeout_seconds()
+
+
 def test_process_pool_timeout_abort_includes_requeued_child_pid_logs(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

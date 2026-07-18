@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from types import SimpleNamespace
 import ast
+import math
 
 import pytest
 
@@ -258,6 +259,27 @@ def test_runner_parametric_resinter_uses_worst_segment_and_keeps_aggregate(
         "cold_duct": "resinter_threshold_kg / 0.2",
         "hot_duct": "resinter_threshold_kg / 2",
     }
+
+
+def test_runner_non_finite_resinter_threshold_fails_closed_as_unqualified(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "simulator.runner._wall_liner_resinter_config",
+        lambda: {
+            "liner_material": "test-liner",
+            "resinter_threshold_kg": math.inf,
+            "resinter_threshold_basis": "invalid non-finite capacity",
+            "fast_fouling_campaign_threshold": 10,
+        },
+    )
+
+    report = _wall_fouling_report({"SiO": 0.5})
+
+    assert report["campaigns_to_resinter"] == "resinter_threshold_kg / 0.5"
+    assert report["aggregate_campaigns_to_resinter"] == (
+        "resinter_threshold_kg / 0.5"
+    )
 
 
 def test_harness_derived_total_fails_closed_when_runner_authority_absent() -> None:

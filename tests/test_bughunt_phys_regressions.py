@@ -332,13 +332,14 @@ def test_null_resinter_threshold_emits_finite_deposition_constraint() -> None:
         PhysicsConstraintSet(active_gates=("coating",)),
     )
     margin = PhysicsConstraintSet().coating(overlay)
-    assert margin.feasible
+    assert not margin.feasible
+    assert margin.authoritative
     assert margin.margin == pytest.approx(-0.5)
     assert margin.status_payload["coating_constraint_mode"] == (
         "no_unqualified_deposition"
     )
     names, values = _constraint_values(
-        SimpleNamespace(feasibility_margins={"coating": margin}, feasible=True)
+        SimpleNamespace(feasibility_margins={"coating": margin}, feasible=False)
     )
     assert names == ("coating",)
     assert values == pytest.approx((0.5,))

@@ -11,6 +11,7 @@ import copy
 import errno
 from functools import lru_cache, partial
 import inspect
+import math
 import multiprocessing as mp
 import logging
 import os
@@ -920,13 +921,13 @@ def _attach_teardown_error(abort: BaseException, teardown_error: BaseException) 
         abort.__context__ = teardown_error
 
 
-def resolve_eval_timeout_seconds(value: float | int | str | None = None) -> float | None:
+def resolve_eval_timeout_seconds(value: float | int | str | None = None) -> float:
     raw = value if value is not None else os.environ.get(EVAL_TIMEOUT_ENV)
     if raw is None:
         return float(DEFAULT_EVAL_TIMEOUT_SECONDS)
     seconds = float(raw)
-    if seconds <= 0.0:
-        raise ValueError("per-eval timeout seconds must be positive")
+    if not math.isfinite(seconds) or seconds <= 0.0:
+        raise ValueError("per-eval timeout seconds must be finite and positive")
     return seconds
 
 

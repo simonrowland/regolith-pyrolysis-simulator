@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import json
+import math
 import os
 import time
 from pathlib import Path
@@ -50,6 +51,20 @@ def _doe(n_samples: int = 8) -> DoeSpec:
         seed=42,
         sampler_name=DEPENDENCY_FREE_LHC_SAMPLER,
     )
+
+
+@pytest.mark.parametrize("timeout_s", [math.nan, math.inf, -math.inf, 0.0, -1.0])
+def test_fidelity_timeout_refuses_non_finite_or_non_positive_values(
+    timeout_s: float,
+) -> None:
+    with pytest.raises(ValueError, match="finite and positive"):
+        run_fidelity_correlation(
+            _doe(1),
+            _perfect_fast,
+            _perfect_high,
+            feedstock_id=FEEDSTOCK_ID,
+            per_eval_timeout_s=timeout_s,
+        )
 
 
 def test_t155_fidelity_tasks_propagate_conditional_context_to_both_arms(
