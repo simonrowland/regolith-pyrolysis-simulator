@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import inspect
 import json
 import math
@@ -156,8 +157,8 @@ def _result(
     backend_name: str | None = None,
     backend_status: str | None = None,
 ) -> ScoredResult:
-    eval_spec = _eval_spec(candidate_id, backend_name) if backend_name is not None else None
-    cache_key = f"cache-{candidate_id}" if eval_spec is not None else None
+    eval_spec = _eval_spec(candidate_id, backend_name or "stub")
+    cache_key = f"cache-{candidate_id}"
     run_reference = _run_reference(backend_status)
     if not feasible:
         return ScoredResult(
@@ -762,6 +763,125 @@ def test_cached_real_all_ok_arm_without_inherited_evidence_degrades_without_cras
     assert fast["requires_inherited_evidence_class"] is True
     assert "evidence_class" not in fast
     assert "certification_allowed" not in fast
+
+
+def test_cached_real_mixed_evidence_classes_cannot_certify() -> None:
+    task = fidelity_module._FidelityTask(
+        index=0,
+        tier="fast",
+        fn=_authoritative_cached_real_fast,
+        patch=RecipePatch({}),
+        feedstock_id=FEEDSTOCK_ID,
+        fidelity="fast",
+        profile={"fidelities": {"fast": {"backend_name": "cached-real"}}},
+        candidate_id="fidelity-doe-000000-fast",
+        kwargs={},
+    )
+    results = []
+    for index, evidence_class in enumerate(("melts", "magemin")):
+        result = _result(
+            f"fidelity-doe-{index:06d}-fast",
+            oxygen_kg=1.0,
+            energy_kwh=2.0,
+            backend_name="cached-real",
+            backend_status="ok",
+        )
+        results.append(
+            replace(
+                result,
+                run_reference=replace(
+                    result.run_reference,
+                    evidence_class=evidence_class,
+                ),
+            )
+        )
+
+    arm = fidelity_module._arm_backend_authority(
+        "fast",
+        "fast",
+        (task,),
+        results,
+    )
+
+    assert arm["authoritative"] is False
+    assert arm["requires_inherited_evidence_class"] is True
+    assert "evidence_class" not in arm
+
+
+def test_fidelity_pair_drops_unequal_evalspec_hours_and_bounds(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_run_eval_batch(tasks, timeout_s, *, max_workers):
+        del timeout_s, max_workers
+        outcomes = {}
+        for task in tasks:
+            result = _result(
+                task.candidate_id,
+                oxygen_kg=float(task.index + 1),
+                energy_kwh=10.0,
+                backend_name="alphamelts",
+                backend_status="ok",
+            )
+            spec = replace(
+                result.eval_spec,
+                hours=1 if task.tier == "fast" else 2,
+                bounds_digest=(
+                    "fast-bounds" if task.tier == "fast" else "high-bounds"
+                ),
+            )
+            outcomes[(task.tier, task.index)] = (
+                replace(result, eval_spec=spec),
+                None,
+            )
+        return outcomes
+
+    monkeypatch.setattr(fidelity_module, "_run_eval_batch", fake_run_eval_batch)
+    result = run_fidelity_correlation(
+        _doe(2),
+        _perfect_fast,
+        _perfect_high,
+        per_eval_timeout_s=1.0,
+        feedstock_id=FEEDSTOCK_ID,
+        objective_names=("oxygen_kg",),
+    )
+
+    assert result.n_samples_compared == 0
+    assert result.n_samples_dropped == 2
+    assert all(
+        drop["reason"] == "incompatible_evalspec"
+        for drop in result.dropped_evaluations
+    )
+    assert all(
+        "hours" in drop["message"] and "bounds_digest" in drop["message"]
+        for drop in result.dropped_evaluations
+    )
+
+
+@pytest.mark.parametrize("missing_arm", ("both", "fast", "high"))
+def test_fidelity_pair_rejects_missing_evalspec(missing_arm: str) -> None:
+    fast = _result(
+        "fidelity-doe-000000-fast",
+        oxygen_kg=1.0,
+        energy_kwh=10.0,
+        backend_name="alphamelts",
+        backend_status="ok",
+    )
+    high = _result(
+        "fidelity-doe-000000-high",
+        oxygen_kg=1.0,
+        energy_kwh=10.0,
+        backend_name="alphamelts",
+        backend_status="ok",
+    )
+    if missing_arm in {"both", "fast"}:
+        fast = replace(fast, eval_spec=None)
+    if missing_arm in {"both", "high"}:
+        high = replace(high, eval_spec=None)
+
+    mismatch = fidelity_module._pair_evalspec_mismatch(fast, high)
+
+    assert mismatch is not None
+    assert "missing" in mismatch
 
 
 def test_missing_declared_objective_in_arm_withholds_inconclusive_and_names_metric(

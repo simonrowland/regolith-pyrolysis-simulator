@@ -164,6 +164,7 @@ _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
         "aggregate_campaigns_to_resinter",
         "wall_deposit_kg_by_segment_species",
         "wall_deposit_kg_by_zone_species",
+        "wall_deposit_remobilization_by_segment_species",
         "wall_deposit_kg",
         "fouling_rate",
         "coating_status",
@@ -1252,8 +1253,11 @@ def _resolve_two_phase_config(
         if isinstance(override, bool):
             return TwoPhaseConfig(enabled=override)
         if isinstance(override, Mapping):
+            enabled = override.get("enabled", True)
+            if not isinstance(enabled, bool):
+                raise StudyError("two_phase_certify.enabled must be a bool")
             return TwoPhaseConfig(
-                enabled=bool(override.get("enabled", True)),
+                enabled=enabled,
                 top_k=int(override.get("top_k", DEFAULT_TWO_PHASE_TOP_K)),
                 disagreement_threshold=(
                     float(override["disagreement_threshold"])
@@ -1267,8 +1271,11 @@ def _resolve_two_phase_config(
         return TwoPhaseConfig(enabled=False)
     if not isinstance(block, Mapping):
         raise StudyError("two_phase_certify must be a mapping when present in profile")
+    enabled = block.get("enabled", False)
+    if not isinstance(enabled, bool):
+        raise StudyError("two_phase_certify.enabled must be a bool")
     return TwoPhaseConfig(
-        enabled=bool(block.get("enabled", False)),
+        enabled=enabled,
         top_k=int(block.get("top_k", DEFAULT_TWO_PHASE_TOP_K)),
         disagreement_threshold=(
             float(block["disagreement_threshold"])

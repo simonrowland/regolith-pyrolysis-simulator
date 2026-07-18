@@ -35,6 +35,7 @@ from simulator.chemistry.kernel import (
     ChemistryIntent,
     ChemistryKernel,
     ChemistryProvider,
+    ControlAudit,
     IntentRequest,
     IntentResult,
     ProviderAccountView,
@@ -98,7 +99,18 @@ class _StubAuthoritativeProvider(ChemistryProvider):
             intent=request.intent,
             status=self._status,
             transition=None,  # diagnostic; goal #8 already binds this
-            control_audit=None,
+            control_audit=ControlAudit(
+                requested={
+                    'temperature_C': request.temperature_C,
+                    'pressure_bar': request.pressure_bar,
+                    'fO2_log': request.fO2_log,
+                },
+                applied={
+                    'temperature_C': request.temperature_C,
+                    'pressure_bar': request.pressure_bar,
+                    'fO2_log': request.fO2_log,
+                },
+            ),
             diagnostic=diagnostic,
             warnings=(),
         )

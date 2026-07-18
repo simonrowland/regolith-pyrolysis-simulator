@@ -479,6 +479,7 @@ def _c2a_stage_depletion_log_slope_knob(stage_name: str) -> KnobSpec:
             "engineering_envelope: per-stage cumulative-yield log-slope epsilon; "
             "0.0 keeps fixed-duration mode, positive values floor to 0.01 1/hr"
         ),
+        search_enabled=False,
     )
 
 

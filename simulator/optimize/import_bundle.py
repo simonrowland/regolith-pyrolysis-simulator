@@ -82,7 +82,9 @@ SUPPORTED_MEMBER_SCHEMA_VERSIONS = frozenset({MEMBER_SCHEMA_VERSION})
 # Affirmative success tokens for job_status.json (uppercased). A bundle is accepted only
 # when success is True AND status is one of these; any other status (RUNNING/ERROR/ABORTED/
 # FAILED/…) is rejected fail-closed even if `success` was set true.
-_SUCCESSFUL_JOB_STATUSES = frozenset({"SUCCEEDED", "SUCCESS", "COMPLETED", "COMPLETE"})
+_SUCCESSFUL_JOB_STATUSES = frozenset(
+    {"SUCCEEDED", "COMPLETED-NO-FEASIBLE-WINNER"}
+)
 _IDENTITY_FIELDS = (
     "corpus_version",
     "code_version",

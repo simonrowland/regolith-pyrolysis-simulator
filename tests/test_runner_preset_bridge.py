@@ -277,6 +277,26 @@ def test_preset_bridge_cli_maps_leg_and_records_provenance(tmp_path: Path):
         enforcement[0]["achieved_mbar"] * 1.0e-3)
 
 
+def test_preset_fast_tier_policy_rejects_internal_analytical_backend() -> None:
+    with pytest.raises(
+        runner_module.RunnerError,
+        match="forbids internal-analytical execution",
+    ):
+        PyrolysisRun(
+            feedstock_id="lunar_mare_low_ti",
+            backend_name="internal-analytical",
+            run_metadata_overrides={
+                runner_module.PRESET_PROVENANCE_METADATA_KEY: {
+                    "comparison_contract": {
+                        "fast_tier_policy": (
+                            "cached_real_only_no_internal_analytical"
+                        )
+                    }
+                }
+            },
+        )
+
+
 def test_preset_bridge_mass_balance_breach_marks_status_failed(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

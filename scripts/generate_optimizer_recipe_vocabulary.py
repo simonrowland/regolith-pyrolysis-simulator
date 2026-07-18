@@ -14,6 +14,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.optimize.canonical import canonical_json_dumps
+from simulator.optimize.doe import _conditional_specs
 from simulator.optimize.recipe import (
     CANONICAL_TO_RUNTIME_PATH,
     PATH_ALIASES,
@@ -65,7 +66,7 @@ def build_manifest() -> dict[str, Any]:
         conditional.append(
             {
                 "id": "c5-on" if active else "c5-off",
-                "dimension": 70 if active else 64,
+                "dimension": len(_conditional_specs(schema, active=active)),
                 "digest": context.conditional_subspace_digest,
             }
         )

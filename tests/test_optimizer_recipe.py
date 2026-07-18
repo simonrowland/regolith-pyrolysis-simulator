@@ -93,7 +93,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
     assert identity_digest == (
-        "824a6522b1e802b3fa1fb2f0dd93e1b449930e4990756b0159b9436959187ef2"
+        "072e1d3adba682b092a78ce141e0b0cab9ea2a180f510d3d44794a97336e506a"
     )
     assert identity_digest != (
         "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
@@ -443,6 +443,21 @@ def test_pinned_c2a_temperature_targets_leave_other_knobs_searchable() -> None:
     ) not in {spec.path for spec in schema.allowlist}
 
 
+def test_numerical_depletion_tolerance_is_runtime_only_not_searchable() -> None:
+    schema = RecipeSchema()
+    tolerance_paths = {
+        spec.path
+        for spec in schema.allowlist
+        if spec.path[-1] == "depletion_log_slope_epsilon_per_hr"
+    }
+
+    assert tolerance_paths
+    assert tolerance_paths.isdisjoint(
+        {spec.path for spec in schema.search_allowlist}
+    )
+    assert all(schema.spec_for(path).runtime_enabled for path in tolerance_paths)
+
+
 def test_pin_unknown_or_forbidden_path_fails_loudly() -> None:
     with pytest.raises(RecipeValidationError, match="pin path matches no optimizer knob"):
         RecipeSchema(pinned_paths=["C2A_staged.stages.sio_window.not_a_knob"])
@@ -496,10 +511,10 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
 
     assert unpinned is schema
-    assert len(paths) == 70
+    assert len(paths) == 67
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "20fbfe6d34c8499b006fc44f10288f08ed9c723a2520a5eeffe500de39ed2fdc"
+        == "1bc920bf1a0c96b9d4dd0f9679cf9d5495478f79fa6d56294d53a9cd6e7d5c78"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -524,7 +539,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-01: moved when C4b added FeSi to species_catalog and the
     # grounded wall_reactivity_matrix source surface.
     # 2026-07-03: moved when S2b routed the C3 Na/K dose through the credit
-    # line (core/extraction/runner/state source edits). recipe_id + the 70-path
+    # line (core/extraction/runner/state source edits). recipe_id + the search
     # search allowlist above are UNCHANGED, so this is source-fingerprint
     # invalidation only, not a recipe/schema/allowlist or authoritative
     # vapor/yield/ledger move.
@@ -1234,7 +1249,8 @@ def test_c2a_staged_depletion_log_slope_knobs_canonicalize_per_stage() -> None:
     assert spec.low == pytest.approx(0.0)
     assert spec.high == pytest.approx(0.50)
     assert spec.units == "1/hr"
-    assert spec.path in {item.path for item in schema.search_allowlist}
+    assert spec.search_enabled is False
+    assert spec.path not in {item.path for item in schema.search_allowlist}
 
     zero = RecipePatch({alkali_path: 0.0}).validated(schema)
     sub_floor = RecipePatch({alkali_path: 0.005}).validated(schema)

@@ -451,14 +451,17 @@ class OptimizerJobRunner:
         success = payload.get("success")
         detail = self._terminal_marker_detail(payload)
         study_status = str(payload.get("study_status") or "").strip()
-        if marker_status == STATUS_COMPLETED_NO_FEASIBLE_WINNER.upper() or (
+        if marker_status == STATUS_COMPLETED_NO_FEASIBLE_WINNER.upper() and success is True:
+            return STATUS_COMPLETED_NO_FEASIBLE_WINNER, detail
+        if (
             study_status == STATUS_COMPLETED_NO_FEASIBLE_WINNER
-            and (marker_status in {STATUS_SUCCEEDED, "SUCCESS"} or success is True)
+            and marker_status == STATUS_SUCCEEDED
+            and success is True
         ):
             return STATUS_COMPLETED_NO_FEASIBLE_WINNER, detail
-        if marker_status in {STATUS_SUCCEEDED, "SUCCESS"} or success is True:
+        if marker_status == STATUS_SUCCEEDED and success is True:
             return STATUS_SUCCEEDED, detail
-        if marker_status in {STATUS_FAILED, "FAILURE", "ERROR"} or success is False:
+        if marker_status == STATUS_FAILED and success is False:
             return STATUS_FAILED, detail
         return (
             STATUS_FAILED,

@@ -577,6 +577,30 @@ def test_import_rejects_running_job_status_with_success_true(tmp_path: Path) -> 
         )
 
 
+@pytest.mark.parametrize("status", ["SUCCESS", "COMPLETED", "COMPLETE"])
+def test_import_rejects_producer_impossible_success_aliases(
+    tmp_path: Path,
+    status: str,
+) -> None:
+    members = _members(tmp_path)
+    members["job_status.json"] = _json_bytes(
+        {
+            "member_schema_version": MEMBER_SCHEMA_VERSION,
+            "status": status,
+            "success": True,
+        }
+    )
+    bundle = _write_zip(tmp_path / f"alias-{status}.rpstudy.zip", members)
+
+    with pytest.raises(ImportBundleError, match="job_status.json reports unsuccessful"):
+        import_study_bundle(
+            bundle,
+            tmp_path / "runs",
+            verification_tier=0,
+            evaluator=_evaluator(oxygen=10.0),
+        )
+
+
 def test_import_rejects_manifest_summary_study_status_mismatch(tmp_path: Path) -> None:
     bundle = _write_zip(
         tmp_path / "study-status-mismatch.rpstudy.zip",

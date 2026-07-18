@@ -1815,6 +1815,25 @@ def test_optimizer_job_submit_spawns_cli_under_runs_jobs(client) -> None:
     assert meta["pid"] == popen.processes[0].pid
 
 
+@pytest.mark.parametrize(
+    ("config_key", "resolver"),
+    (
+        ("OPTIMIZER_JOB_PARALLEL_CAP", web_routes._optimizer_job_parallel_cap),
+        ("OPTIMIZER_JOB_BUDGET_CAP", web_routes._optimizer_job_budget_cap),
+        ("OPTIMIZER_JOB_QUEUE_CAP", web_routes._optimizer_job_queue_cap),
+    ),
+)
+def test_malformed_optimizer_resource_caps_fail_closed_to_one(
+    client,
+    config_key,
+    resolver,
+) -> None:
+    client.application.config[config_key] = "not-an-integer"
+
+    with client.application.app_context():
+        assert resolver() == 1
+
+
 def test_optimizer_job_submit_rejects_cross_origin_before_mutation(client) -> None:
     response = client.post(
         "/api/optimizer/jobs",
@@ -2510,6 +2529,27 @@ def test_optimizer_job_register_marks_orphan_with_success_marker_succeeded_on_re
     meta = json.loads((job_dir / ".job_meta.json").read_text(encoding="utf-8"))
     assert meta["status"] == "SUCCEEDED"
     assert meta["completed_at"] is not None
+
+
+@pytest.mark.parametrize("status", ["SUCCESS", "COMPLETED", "COMPLETE", "ERROR", "FAILURE"])
+def test_optimizer_job_marker_rejects_producer_impossible_status_aliases(
+    tmp_path,
+    status,
+) -> None:
+    runs_dir = tmp_path / "runs"
+    job_dir = runs_dir / "jobs" / "alias-status"
+    job_dir.mkdir(parents=True)
+    (job_dir / "job_status.json").write_text(
+        json.dumps({"status": status, "success": status not in {"ERROR", "FAILURE"}}),
+        encoding="utf-8",
+    )
+    runner = optimizer_job_runner.OptimizerJobRunner(runs_dir)
+
+    terminal = runner._terminal_status_from_marker("alias-status")
+
+    assert terminal is not None
+    assert terminal[0] == "FAILED"
+    assert "invalid status" in terminal[1]
 
 
 def test_optimizer_job_reload_and_web_render_no_feasible_status(tmp_path) -> None:

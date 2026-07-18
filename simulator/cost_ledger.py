@@ -883,18 +883,27 @@ def _build_cost_rollup_diagnostic(
         ]
         if not matches:
             matches = [f"{account}:{species}"]
-            quantities = {matches[0]: float(product_inputs[key])}
+            allocation_weights = {matches[0]: 1.0}
         else:
-            quantities = {
+            allocation_weights = {
                 product_key: max(
                     0.0,
                     float(product_costs[product_key].get("quantity_kg", 0.0)),
                 )
                 for product_key in matches
             }
-            if sum(quantities.values()) <= VECTOR_TOLERANCE:
-                quantities = {product_key: 1.0 for product_key in matches}
-        split = _allocate_by_mass(quantities, product_alloc[key])
+            if sum(allocation_weights.values()) <= VECTOR_TOLERANCE:
+                allocation_weights = {product_key: 1.0 for product_key in matches}
+        weight_total = sum(allocation_weights.values())
+        terminal_quantity = float(product_inputs[key])
+        # The run-input numerator is allocated from terminal product mass, so
+        # each reported denominator must use that same terminal scope. Existing
+        # lot quantities only split a species across matching account rows.
+        quantities = {
+            product_key: terminal_quantity * weight / weight_total
+            for product_key, weight in allocation_weights.items()
+        }
+        split = _allocate_by_mass(allocation_weights, product_alloc[key])
         for product_key, added_cost in split.items():
             existing = CostVector(**product_costs.get(product_key, {}).get("accumulated_cost", {}))
             total = existing + added_cost

@@ -3804,6 +3804,9 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
                     "stage_1_to_stage_2": {"SiO": 100.0}
                 },
                 "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 100.0}},
+                "wall_deposit_remobilization_by_segment_species": {
+                    "stage_1_to_stage_2": {"SiO": {"remobilized_kg": 100.0}}
+                },
                 "wall_deposit_cumulative_total_kg": 100.0,
                 "wall_deposit_cumulative_kg_by_species": {"SiO": 100.0},
             },
@@ -3828,6 +3831,11 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
                             "stage_1_to_stage_2": {"SiO": 0.001}
                         },
                         "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 0.001}},
+                        "wall_deposit_remobilization_by_segment_species": {
+                            "stage_1_to_stage_2": {
+                                "SiO": {"remobilized_kg": 0.001}
+                            }
+                        },
                         "wall_deposit_cumulative_total_kg": 0.001,
                         "wall_deposit_cumulative_kg_by_species": {"SiO": 0.001},
                     },
@@ -3851,6 +3859,9 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
     assert record.product_summary["wall_deposit_kg_by_zone_species"] == {
         "Hot": {"SiO": 0.001}
     }
+    assert record.product_summary[
+        "wall_deposit_remobilization_by_segment_species"
+    ] == {"stage_1_to_stage_2": {"SiO": {"remobilized_kg": 0.001}}}
     assert record.product_summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
         0.001
     )
@@ -5867,6 +5878,11 @@ def test_two_phase_disabled_matches_single_pass_output(tmp_path) -> None:
         disabled / "winner.recipe.yaml"
     ).read_text()
     assert not (disabled / "two_phase_certification.json").exists()
+
+
+def test_two_phase_override_rejects_string_false() -> None:
+    with pytest.raises(study.StudyError, match="enabled must be a bool"):
+        study._resolve_two_phase_config({}, {"enabled": "false"})
 
 
 def test_two_phase_certification_records_parallel_for_adaptive_strategy(tmp_path) -> None:

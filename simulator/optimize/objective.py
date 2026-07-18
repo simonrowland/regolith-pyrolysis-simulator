@@ -64,6 +64,18 @@ FURNACE_LIFESPAN_COST_METRICS = frozenset({
     "furnace_lifespan_consumed_fraction",
     "furnace_lifespan_cost_fraction",
 })
+_MASS_OBJECTIVE_METRICS = frozenset(
+    {
+        "pure_silica_glass_kg",
+        "metals_plus_o2_kg",
+        "metals_total_kg",
+        "O2_kg",
+        "o2_kg",
+        "oxygen_kg",
+        "oxygen_stored_kg",
+        "oxygen_vented_kg",
+    }
+)
 SUPPORTED_COMPOSITION_POOLS = COMPOSITION_PRODUCT_POOLS
 COMPOSITION_VECTOR_SPECIES = frozenset({"Na", "K", "Fe", "Mg", "Si", "Al", "Ca", "O2"})
 COMPOSITION_VECTOR_ROLES = frozenset({"extract", "retain", "free", "to_window"})
@@ -1281,15 +1293,49 @@ def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefiniti
     for ordinal, raw in enumerate(raw_objectives):
         if not isinstance(raw, Mapping):
             raise ObjectiveProfileError("each objective must be a mapping")
+        metric = canonical_objective_metric(str(raw.get("metric", "")))
+        units = str(raw.get("units", ""))
+        expected_units = _expected_objective_units(metric)
+        if expected_units is not None and units != expected_units:
+            raise ObjectiveProfileError(
+                f"objectives[{ordinal}].units for {metric!r} must be "
+                f"{expected_units!r}, got {units!r}"
+            )
         definitions.append(
             ObjectiveDefinition(
-                metric=canonical_objective_metric(str(raw.get("metric", ""))),
+                metric=metric,
                 sense=str(raw.get("sense", "")),
-                units=str(raw.get("units", "")),
+                units=units,
                 ordinal=ordinal,
             )
         )
     return tuple(definitions)
+
+
+def _expected_objective_units(metric: str) -> str | None:
+    if metric.startswith(COMPOSITION_TARGET_METRIC_PREFIX):
+        return "score_0_1"
+    if _energy_component_metric(metric) is not None:
+        return "kWh"
+    if _energy_per_product_metric(metric) is not None:
+        return "kWh/kg"
+    if metric in _MASS_OBJECTIVE_METRICS:
+        return "kg"
+    if metric == ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC:
+        return "kWh"
+    if metric in {"duration_h", "total_hours", *FURNACE_TIME_METRICS}:
+        return "h"
+    if metric in SOLAR_THERMAL_FLUX_METRICS:
+        return "K*h"
+    if metric in THROUGHPUT_OWNER_COST_METRICS:
+        return "USD"
+    if metric in FURNACE_LIFESPAN_COST_METRICS:
+        return "fraction/run"
+    if metric == SSO2_OWNER_RECIPE_ID:
+        return "score_0_1"
+    if metric.endswith("_kg"):
+        return "kg"
+    return None
 
 
 def objective_importance_evidence(
