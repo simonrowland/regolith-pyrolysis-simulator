@@ -14,6 +14,13 @@ class _Ledger:
             return {key: dict(value) for key, value in self._accounts.items()}
         return dict(self._accounts.get(account, {}))
 
+    def project_account_kg(self, account: str) -> dict[str, float]:
+        return {
+            species: float(kg)
+            for species, kg in self.kg_by_account(account).items()
+            if float(kg) > 0.0
+        }
+
 
 def test_spent_reductant_residue_query_is_separate_from_native_rump():
     sim = SimpleNamespace(

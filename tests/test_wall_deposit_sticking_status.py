@@ -102,6 +102,16 @@ def _fake_sim(
                 return {key: dict(value) for key, value in self._accounts.items()}
             return dict(self._accounts.get(str(account), {}))
 
+        def project_account_kg(self, account: str) -> dict[str, float]:
+            return {
+                species: float(kg)
+                for species, kg in self.kg_by_account(account).items()
+                if float(kg) > 0.0
+            }
+
+        def projected_total_kg_by_account(self, account: str) -> float:
+            return sum(self.project_account_kg(account).values())
+
         def total_kg_by_account(self, account: str) -> float:
             return sum(self.kg_by_account(account).values())
 

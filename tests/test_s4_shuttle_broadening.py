@@ -154,7 +154,11 @@ def test_c3_step_refreshes_equilibrium_after_shuttle_before_evaporation(
     monkeypatch.setattr(sim, "_update_extraction_completeness_diagnostic", lambda: None)
     monkeypatch.setattr(sim, "_evap_plane_selectivity_diagnostic", lambda flux: {})
     monkeypatch.setattr(sim, "_compute_fe_redox_split_diagnostic", lambda: {})
-    monkeypatch.setattr(sim.campaign_mgr, "check_endpoint", lambda *args: False)
+    monkeypatch.setattr(
+        sim.campaign_mgr,
+        "check_endpoint",
+        lambda *args, **kwargs: False,
+    )
     monkeypatch.setattr(sim, "_make_snapshot", lambda: SimpleNamespace())
     monkeypatch.setattr(sim, "_oxygen_total_kg", lambda: 0.0)
     monkeypatch.setattr(sim, "is_complete", lambda: False)

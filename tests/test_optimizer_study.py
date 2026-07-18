@@ -1602,6 +1602,13 @@ class _Sso2AbsenceLedger:
             return {key: dict(value) for key, value in balances.items()}
         return dict(balances.get(account, {}))
 
+    def project_account_kg(self, account: str) -> dict[str, float]:
+        return {
+            species: float(kg)
+            for species, kg in self.kg_by_account(account).items()
+            if float(kg) > 0.0
+        }
+
 
 class _Sso2AbsenceSim:
     def __init__(self, snapshots: tuple[Any, ...]) -> None:
