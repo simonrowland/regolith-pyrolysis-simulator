@@ -122,8 +122,8 @@ MRE_DECOMP_VOLTAGE_PROVENANCE = {
         "delta_gf_kJ_per_mol_formula": -75.258559038,
         "delta_gf_relation": "DeltaGf = -E*n*F",
         "delta_gf_source": (
-            "Hemingway 1990 Am. Mineral. 75:781; Robie & Hemingway; "
-            "NEA Chemical Thermodynamics of Nickel"
+            "REF-058 Mah & Pankratz 1976 USBM Bulletin 668 NiO(s) "
+            "rows 1100-2000 K; phase split at Ni melt 1728 K"
         ),
         "status": "cited_raw_thermo",
     },

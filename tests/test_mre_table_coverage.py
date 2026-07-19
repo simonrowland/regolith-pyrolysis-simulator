@@ -124,6 +124,7 @@ def test_mre_decomp_voltage_provenance_sidecar_covers_each_rung() -> None:
     assert set(MRE_DECOMP_VOLTAGE_PROVENANCE) == set(DECOMP_VOLTAGES)
 
     graph_promoted = {
+        "NiO",
         "Na2O",
         "K2O",
         "FeO",
@@ -173,12 +174,11 @@ def test_mre_decomp_voltage_provenance_sidecar_covers_each_rung() -> None:
 
 def test_fallback_ladder_voltages_pin_canonical_literals() -> None:
     # Missing-YAML fallback uses the same graph-first canonical resolver as the
-    # published ladder. NiO remains a flagged static fallback because it is not
-    # covered by the Ellingham graph.
+    # published ladder, including the phase-correct NiO graph row.
     from simulator.mre_ladder import MRE_VOLTAGE_LADDER_FALLBACK
 
     expected_voltage_by_species = {
-        "NiO": 0.39,
+        "NiO": 0.386419,
         "FeO": 0.804340,
         "MnO": 1.254731,
         "Cr2O3": 1.118868,
@@ -199,9 +199,7 @@ def test_fallback_ladder_voltages_pin_canonical_literals() -> None:
         ), (
             f"fallback voltage for {oxide} drifted from the canonical literal"
         )
-        if oxide == "NiO":
-            assert rung["voltage_authority"] == "ellingham_fallback"
-        elif oxide == "MnO":
+        if oxide == "MnO":
             assert rung["voltage_authority"] == "ellingham_graph"
             assert rung["voltage_authoritative"] is False
             assert rung["voltage_status"] == (

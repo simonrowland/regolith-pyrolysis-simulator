@@ -103,7 +103,7 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
     ]
     assert [entry["voltage"] for entry in sequence] == pytest.approx([
         0.023465,
-        0.39,
+        0.386419,
         0.408926,
         0.804340,
         1.118868,
@@ -127,14 +127,14 @@ def test_build_mre_voltage_sequence_matches_published_yaml_ladder():
         8,
         10,
     ]
-    assert sequence[1]["voltage_authority"] == "ellingham_fallback"
+    assert sequence[1]["voltage_authority"] == "ellingham_graph"
+    assert sequence[1]["voltage_authoritative"] is True
     assert sequence[5]["voltage_authority"] == "ellingham_graph"
     assert sequence[5]["voltage_authoritative"] is False
     assert sequence[5]["voltage_status"] == mre_ladder.MRE_MN_DIAGNOSTIC_STATUS
     assert all(
         entry["voltage_authority"] == "ellingham_graph"
         for idx, entry in enumerate(sequence)
-        if idx != 1
     )
 
 
@@ -250,14 +250,15 @@ def test_mn_graph_voltage_is_diagnostic_for_mre_consumption():
     assert ref.status == mre_ladder.MRE_MN_DIAGNOSTIC_STATUS
 
 
-def test_uncovered_mre_voltage_falls_back_to_static_with_flag():
+def test_nio_mre_voltage_uses_phase_correct_graph_row():
     ref = mre_ladder.mre_decomposition_voltage_reference("NiO", temperature_K=1873.15)
 
     assert ref is not None
-    assert ref.voltage == pytest.approx(mre_ladder.DECOMP_VOLTAGES["NiO"])
-    assert ref.authority == "ellingham_fallback"
-    assert ref.authoritative is False
-    assert ref.status == "ellingham_query_failed:species_not_graph_covered"
+    assert ref.voltage == pytest.approx(0.386419, abs=1e-6)
+    assert ref.authority == "ellingham_graph"
+    assert ref.authoritative is True
+    assert ref.status == "ok"
+    assert "Ni(l)" in str(ref.ellingham_phase_basis)
 
 
 @pytest.mark.parametrize(

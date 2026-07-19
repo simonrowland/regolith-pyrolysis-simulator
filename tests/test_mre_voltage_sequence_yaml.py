@@ -184,7 +184,7 @@ def test_build_falls_back_to_canonical_ladder_when_yaml_missing():
     seq = sim._build_mre_voltage_sequence()
     voltages = [entry["voltage"] for entry in seq]
     assert voltages == pytest.approx(
-        [0.39, 0.8043402178, 1.1188684032, 1.2547313977, 1.4910580719,
+        [0.3864186271, 0.8043402178, 1.1188684032, 1.2547313977, 1.4910580719,
          1.5755209919, 1.7926036985, 1.8573244700, 2.2083160725],
         abs=1e-6,
     )
@@ -234,7 +234,7 @@ def test_build_returns_fresh_lists_not_aliasing_fallback():
     seq1 = sim._build_mre_voltage_sequence()
     seq1[0]["voltage"] = 99.9
     seq2 = sim._build_mre_voltage_sequence()
-    assert seq2[0]["voltage"] == 0.39  # original, not 99.9
+    assert seq2[0]["voltage"] == pytest.approx(0.3864186271)  # original, not 99.9
 
 
 def test_build_yaml_path_sorted_by_voltage_ascending():
@@ -415,7 +415,8 @@ def test_nio_voltage_is_grounded_and_ordered_before_feo():
     feo_ref = mre_ladder.mre_decomposition_voltage_reference("FeO")
     assert nio_ref is not None
     assert feo_ref is not None
-    assert nio_ref.authority == "ellingham_fallback"
+    assert nio_ref.authority == "ellingham_graph"
+    assert nio_ref.authoritative is True
     assert feo_ref.authority == "ellingham_graph"
     assert nio_ref.voltage < feo_ref.voltage
 
@@ -425,7 +426,7 @@ def test_nio_voltage_is_grounded_and_ordered_before_feo():
     yaml_nio = next(entry for entry in yaml_seq if entry["species"] == ["NiO"])
     assert yaml_seq[0]["species"] == ["K2O"]
     assert yaml_nio["voltage"] == pytest.approx(0.39, abs=0.01)
-    assert yaml_nio["voltage_authority"] == "ellingham_fallback"
+    assert yaml_nio["voltage_authority"] == "ellingham_graph"
 
     fallback_min = min(MRE_VOLTAGE_LADDER_FALLBACK, key=lambda entry: entry["voltage"])
     assert fallback_min["species"] == ("NiO",)

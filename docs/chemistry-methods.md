@@ -623,8 +623,8 @@ reducible oxide carries a standard-state decomposition voltage `E° = −ΔG_f°
 1873 K, with the electrons per formula unit and Faraday's constant (96485.33 C/mol) setting the current
 relationship, and the runtime applies the Nernst melt-activity and oxygen-pressure correction on top of
 the standard-state rung. The voltage ladder is raw-thermodynamically anchored from NIST-JANAF (Chase
-1998) and companion evaluations (Barin; O'Neill 1988 for the FeO rung; Hemingway 1990 and
-Robie–Hemingway for NiO) — for example NiO at 0.39 V, FeO at 0.75 V, SiO₂ at 1.45 V, TiO₂ at 1.70 V,
+1998) and companion evaluations (Barin; O'Neill 1988 for the FeO rung; Mah & Pankratz 1976
+USBM Bulletin 668 for phase-correct NiO) — for example NiO at 0.3864 V at 1873.15 K, FeO at 0.75 V, SiO₂ at 1.45 V, TiO₂ at 1.70 V,
 Al₂O₃ at 1.95 V. The alkali-oxide rungs (Na₂O, K₂O at 0.5 V) and the alkaline-earth rungs are held at
 legacy values pending activity- and vapor-aware grounding, because those species are volatile at cell
 temperature, and are labelled UNCERTIFIED. The ferric full-reduction rung is reference-only; the live

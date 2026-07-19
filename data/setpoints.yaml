@@ -1440,11 +1440,10 @@ mre_voltage_sequence:
       campaign: "C5 carbonaceous trace recovery"
       min_hold_hours: 2
       note: >-
-        NiO source: DeltaGf(NiO, ~1873 K) ~= -76 kJ/mol from Hemingway
-        1990 Am. Mineral. 75:781 + Robie & Hemingway auxiliaries,
-        cross-confirmed by NEA Chemical Thermodynamics of Nickel;
-        E = -DeltaGf/(2F) ~= 0.39 V standard-state, with runtime Nernst
-        applying melt activity + pO2. MRE-COVERAGE #32B reanchors FeO,
+        NiO graph source: REF-058 Mah & Pankratz 1976 USBM Bulletin 668
+        NiO(s) rows 1100-2000 K, split at the 1728 K Ni melt;
+        E = -DeltaGf(T)/(2F) is 0.3864 V at 1873.15 K standard-state,
+        with runtime Nernst applying melt activity + pO2. MRE-COVERAGE #32B reanchors FeO,
         Cr2O3, MnO, SiO2, TiO2, and Al2O3 to the same raw-thermo basis
         (NIST-JANAF/Chase 1998, Barin, O'Neill 1988, Robie-Hemingway,
         NEA), rounded to 0.05 V. Fe2O3 is not a live MRE full-reduction

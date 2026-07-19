@@ -64,7 +64,8 @@ class EllinghamFitSegment:
 ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
     # Legacy representative high-T coefficients kept for keying/stoichiometry
     # compatibility. Authoritative dG(T) now comes from ELLINGHAM_FIT_SEGMENTS.
-    # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti/Si.
+    # Source-specific high-T refits: JANAF for Na/K/Fe/Cr/Mg/Ca/Al/Ti/Si,
+    # and REF-058 USBM Bulletin 668 for Ni/NiO.
     # Here dH_f is the intercept of the fitted dG(T)=dH_f-T*dS_f line, not a
     # second 298 K formation-enthalpy table.  Its high-T JANAF reaction basis
     # includes the applicable metal/oxide phases (for example gaseous Na/K and
@@ -82,6 +83,8 @@ ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
     'Na': (-1135.130, -0.537417, 4, 2),      # Na-012,  dG(1600C) ~ -128
     'K':  (-975.838, -0.520580, 4, 2),       # K-012,   dG(1600C) ~ -1
     'Fe': (-538.946, -0.125272, 2, 2),       # Fe-018,  dG(1600C) ~ -304
+    'Ni': (-465.852, -0.167751, 2, 2),       # NiO(s), solid-Ni rail to 1728 K;
+                                             # phase-correct segments below.
     'Mn': (-794.540, -0.165650, 2, 2),       # Legacy Mn(l) compatibility row;
                                              # dG authority is segmented below.
     'Cr': (-748.076, -0.168676, 4/3, 2/3),   # Cr-014,  dG(1600C) ~ -432
@@ -284,6 +287,38 @@ ELLINGHAM_FIT_SEGMENTS: dict[str, tuple[EllinghamFitSegment, ...]] = {
             (1809.0, 2600.0),
             "2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600 K",
             "Chase 1998 NIST-JANAF Fe-020; confidence: primary-refit",
+        ),
+    ),
+    # Ni premise: REF-058, Mah & Pankratz, U.S. Bureau of Mines Bulletin 668
+    # (1976),
+    # table "Thermodynamic Properties of NiO(s)", rows 1100-2000 K.  The
+    # source reports DeltaGf in kcal/mol NiO for Ni(s,l) + 1/2 O2 -> NiO(s)
+    # and splits the metal standard state at the sourced 1728 K Ni melt.
+    # Conversion to this table's one-mol-O2 basis is
+    #   DeltaG[kJ/mol O2] = 2 * 4.184 * DeltaGf[kcal/mol NiO].
+    # Least-squares DeltaG = DeltaH - T*DeltaS fits are constrained through
+    # the shared 1728 K source value, so the solid/liquid rails join exactly.
+    # Max source-grid residuals are 0.174 kJ/mol O2 (solid-Ni rail) and
+    # 0.074 kJ/mol O2 (liquid-Ni rail). No legacy-output fitting enters either
+    # coefficient.
+    "Ni": (
+        EllinghamFitSegment(
+            -465.852324599,
+            -0.167750743402,
+            2,
+            2,
+            (1100.0, 1728.0),
+            "2 Ni(s) + O2 -> 2 NiO(s); source rows 1100-1728 K",
+            "REF-058 Mah & Pankratz 1976 USBM Bulletin 668, NiO(s) table; confidence: primary-refit",
+        ),
+        EllinghamFitSegment(
+            -495.556320989,
+            -0.184940556128,
+            2,
+            2,
+            (1728.0, 2000.0),
+            "2 Ni(l) + O2 -> 2 NiO(s); source rows 1728-2000 K",
+            "REF-058 Mah & Pankratz 1976 USBM Bulletin 668, NiO(s) table; confidence: primary-refit",
         ),
     ),
     # Mn premise: Pankratz USBM B672 MnO(c) rows 1100-1500 K, then the

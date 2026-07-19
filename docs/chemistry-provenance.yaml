@@ -520,7 +520,7 @@ values:
 
   - id: mre_decomp_voltages_cited_raw_thermo
     quantity: "Standard oxide decomposition voltages with cited high-temperature raw-thermo grounding."
-    value: {NiO: 0.39, FeO: 0.75, Cr2O3: 0.95, MnO: 1.05, SiO2: 1.45, TiO2: 1.70, Al2O3: 1.95}
+    value: {NiO_at_1873_15_K: 0.3864, FeO: 0.75, Cr2O3: 0.95, MnO: 1.05, SiO2: 1.45, TiO2: 1.70, Al2O3: 1.95}
     units: V
     tier: CITED
     basis: >-
@@ -534,15 +534,15 @@ values:
     uncertainty: "Rounded to 0.05 V; high-temperature DeltaGf scatter is typically a few tens of kJ/mol for the major oxides."
     chosen:
       ref: REF-020
-      locus: "JANAF Monograph 9 oxide species tables near 1800-1900 K for Cr2O3/MnO/SiO2/TiO2/Al2O3, plus NiO Hemingway 1990 American Mineralogist 75:p.781 and FeO O'Neill emf anchors where code comments identify them."
+      locus: "JANAF Monograph 9 oxide species tables near 1800-1900 K for Cr2O3/MnO/SiO2/TiO2/Al2O3; REF-058 Mah & Pankratz USBM Bulletin 668 NiO(s) rows 1100-2000 K; FeO O'Neill emf anchors where code comments identify them."
       url: "https://janaf.nist.gov/"
       why: "Provides the common raw-thermo basis for the cited MRE voltage rungs."
     alternatives:
       - ref: "NASA molten oxide electrolysis table at 1300 K"
         lacks: "lower-temperature potentials and different normalization/activities; not the 1873 K runtime anchor"
       - ref: REF-045
-        value: "NiO 0.39 V support"
-        lacks: "single-species NiO support only, not a full oxide ladder"
+        value: "Independent lower-temperature NiO support"
+        lacks: "does not supply the phase-resolved 1728-2000 K source grid used by the live NiO graph row"
       - ref: REF-046
         value: "FeO 0.75 V support"
         lacks: "single Fe-O emf support only, not a full oxide ladder"

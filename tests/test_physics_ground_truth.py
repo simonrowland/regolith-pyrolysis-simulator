@@ -22,16 +22,69 @@ from simulator.chemistry.ellingham_thermo import (
     MG_NORMAL_BOILING_POINT_K,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_metal_phase_kind,
+    ellingham_segment_for_temperature,
 )
 from simulator.environment import (
     ASTEROID_VACUUM_FLOOR_BAR,
     MOON_VACUUM_FLOOR_BAR,
 )
+from simulator.mre_ladder import mre_decomposition_voltage_reference
 from simulator.state import GAS_CONSTANT, MOLAR_MASS
 
 
 PA_PER_ATM = 101_325.0
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
+
+
+@pytest.mark.parametrize(
+    ("temperature_K", "source_delta_gf_kcal_per_mol_nio", "phase_token"),
+    [
+        (1100.0, -33.64, "Ni(s)"),
+        (1200.0, -31.62, "Ni(s)"),
+        (1300.0, -29.60, "Ni(s)"),
+        (1400.0, -27.59, "Ni(s)"),
+        (1500.0, -25.58, "Ni(s)"),
+        (1600.0, -23.58, "Ni(s)"),
+        (1700.0, -21.60, "Ni(s)"),
+        (1728.0, -21.03, "Ni(l)"),
+        (1800.0, -19.43, "Ni(l)"),
+        (1900.0, -17.23, "Ni(l)"),
+        (2000.0, -15.02, "Ni(l)"),
+    ],
+)
+def test_nio_ellingham_row_matches_usbm_source_grid(
+    temperature_K: float,
+    source_delta_gf_kcal_per_mol_nio: float,
+    phase_token: str,
+) -> None:
+    # Mah & Pankratz 1976 USBM Bulletin 668, NiO(s) table. Source values are
+    # per mol NiO; the graph is per mol O2: 2 mol NiO/O2 and 4.184 kJ/kcal.
+    expected_kj_per_mol_o2 = source_delta_gf_kcal_per_mol_nio * 2.0 * 4.184
+    segment = ellingham_segment_for_temperature("Ni", temperature_K)
+
+    assert phase_token in segment.phase_basis
+    assert ellingham_delta_g_kj_per_mol_o2(
+        "Ni", temperature_K
+    ) == pytest.approx(expected_kj_per_mol_o2, abs=0.18)
+
+
+def test_nio_mre_rung_is_phase_correct_graph_authority() -> None:
+    solid_reference = mre_decomposition_voltage_reference(
+        "NiO", temperature_K=1700.0
+    )
+    liquid_reference = mre_decomposition_voltage_reference(
+        "NiO", temperature_K=1873.15
+    )
+
+    assert solid_reference is not None
+    assert liquid_reference is not None
+    assert solid_reference.authority == "ellingham_graph"
+    assert liquid_reference.authority == "ellingham_graph"
+    assert solid_reference.authoritative is True
+    assert liquid_reference.authoritative is True
+    assert "Ni(s)" in (solid_reference.ellingham_phase_basis or "")
+    assert "Ni(l)" in (liquid_reference.ellingham_phase_basis or "")
+    assert liquid_reference.voltage == pytest.approx(0.386419, abs=1e-6)
 ALCOCK_SOURCE_LOG10_PA = {
     "Ti": {
         "solid": {

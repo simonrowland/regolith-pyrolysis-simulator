@@ -40,6 +40,7 @@ def _delta_g_jump_at_breakpoint(species: str, temperature_K: float) -> float:
     ("species", "fit_breakpoint_K"),
     [
         ("Na", 1156.1),
+        ("Ni", 1728.0),
         ("Mg", 1366.0),
         ("Ca", 1757.0),
     ],

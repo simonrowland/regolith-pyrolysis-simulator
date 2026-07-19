@@ -21,7 +21,7 @@ ul { padding-left: 1.4rem; }</style>
 <body>
 <h1>Reference Registry</h1>
 <nav><strong>Topics:</strong> 
-<a href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a> (7) | <a href="topics/ceres-mineralogy.html">ceres-mineralogy</a> (4) | <a href="topics/ceres-organics.html">ceres-organics</a> (1) | <a href="topics/comet-organics.html">comet-organics</a> (2) | <a href="topics/evaporation.html">evaporation</a> (6) | <a href="topics/foulant-thermo.html">foulant-thermo</a> (1) | <a href="topics/mars-carbonates.html">mars-carbonates</a> (1) | <a href="topics/perchlorate.html">perchlorate</a> (2) | <a href="topics/redox-fo2.html">redox-fo2</a> (9) | <a href="topics/ree-partitioning.html">ree-partitioning</a> (1) | <a href="topics/ree-volatility.html">ree-volatility</a> (1) | <a href="topics/simulants.html">simulants</a> (1) | <a href="topics/thermal-properties.html">thermal-properties</a> (2) | <a href="topics/thermochemistry.html">thermochemistry</a> (4) | <a href="topics/vapor-pressure.html">vapor-pressure</a> (11) | <a href="topics/volatility.html">volatility</a> (4)
+<a href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a> (7) | <a href="topics/ceres-mineralogy.html">ceres-mineralogy</a> (4) | <a href="topics/ceres-organics.html">ceres-organics</a> (1) | <a href="topics/comet-organics.html">comet-organics</a> (2) | <a href="topics/evaporation.html">evaporation</a> (6) | <a href="topics/foulant-thermo.html">foulant-thermo</a> (1) | <a href="topics/mars-carbonates.html">mars-carbonates</a> (1) | <a href="topics/perchlorate.html">perchlorate</a> (2) | <a href="topics/redox-fo2.html">redox-fo2</a> (9) | <a href="topics/ree-partitioning.html">ree-partitioning</a> (1) | <a href="topics/ree-volatility.html">ree-volatility</a> (1) | <a href="topics/simulants.html">simulants</a> (1) | <a href="topics/thermal-properties.html">thermal-properties</a> (2) | <a href="topics/thermochemistry.html">thermochemistry</a> (5) | <a href="topics/vapor-pressure.html">vapor-pressure</a> (11) | <a href="topics/volatility.html">volatility</a> (4)
 </nav>
 <h2>Master List</h2>
 <section class="entry" id="REF-001">
@@ -727,6 +727,20 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>simulator/accounting/queries.py:98</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
 <li><code>simulator/accounting/queries.py:384</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REF-057), so extraction removes carrier mass while the ledger keeps the</li>
+</ul>
+</section>
+<section class="entry" id="REF-058">
+<h2>REF-058</h2>
+<p class="citation">Mah, A.D. &amp; Pankratz, L.B. (1976). Contributions to the Data on Theoretical Metallurgy: XVI. Thermodynamic Properties of Nickel and Its Inorganic Compounds. <em>U.S. Bureau of Mines Bulletin 668</em>: 28.</p>
+<p class="meta"><span class="badge">DATA</span><span class="badge status-current">current</span><a class="badge" href="topics/thermochemistry.html">thermochemistry</a></p>
+<p><a href="https://stacks.cdc.gov/view/cdc/220136/cdc_220136_DS1.pdf">source URL</a></p>
+<blockquote><p>Formation: Ni(s,l) + 1/2 O2(g) = NiO(s)</p><footer>p. 28; Defines the phase-aware NiO formation reaction and the per-formula-unit source basis converted to the graph&#x27;s per-O2 convention.</footer></blockquote>
+<blockquote><p>1728 K, melting point of Ni; DeltaH = 4.10 kcal/mole.</p><footer>p. 28; Pins the solid-Ni/liquid-Ni segment boundary used by the NiO Ellingham row.</footer></blockquote>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>data/setpoints.yaml</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
+<li><code>engines/builtin/electrolysis_step.py</code> - REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668 NiO(s)</li>
+<li><code>simulator/chemistry/ellingham_thermo.py</code> - Ni/NiO source rows and segment metadata.</li>
 </ul>
 </section>
 </body>

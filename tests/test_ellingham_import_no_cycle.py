@@ -49,5 +49,5 @@ def test_leaf_first_import_order():
     _import_in_fresh_interpreter(
         "from simulator.chemistry.ellingham_thermo import ELLINGHAM_THERMO, "
         "ELLINGHAM_FIT_RANGE_K; "
-        "assert len(ELLINGHAM_THERMO) == 10 and ELLINGHAM_FIT_RANGE_K == (1100.0, 1700.0)"
+        "assert len(ELLINGHAM_THERMO) == 11 and ELLINGHAM_FIT_RANGE_K == (1100.0, 1700.0)"
     )

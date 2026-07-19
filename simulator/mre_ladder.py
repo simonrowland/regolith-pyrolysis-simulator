@@ -62,6 +62,7 @@ MRE_MN_DIAGNOSTIC_STATUS = (
 )
 
 MRE_ELLINGHAM_METAL_BY_OXIDE = {
+    "NiO": "Ni",
     "Na2O": "Na",
     "K2O": "K",
     "FeO": "Fe",
