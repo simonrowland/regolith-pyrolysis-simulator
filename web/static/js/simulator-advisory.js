@@ -296,6 +296,22 @@ function renderProductLedgerPanel(payload) {
     advisoryClear(content);
     content.className = 'advisory-result';
     let sections = 0;
+    const story = advisoryObject(data.product_story);
+    if (story) {
+        if (appendAdvisorySection(content, 'Pot of regolith in', story.input)) sections += 1;
+        if (appendAdvisorySection(content, 'Metal ingots out', story.metal_ingots, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Glass out', story.glass, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Oxygen out', story.oxygen, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Captured volatiles out', story.captured_volatiles, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Refractory ceramic out', story.refractory_ceramic, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Terminal residue — incompletely extracted', story.terminal_residue, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Escaped to vacuum', story.escaped_to_vacuum, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Unrecovered process inventory', story.unrecovered_process_inventory, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Furnace wall deposits', story.wall_deposits, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Process residue', story.process_residue, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Off-spec condenser capture', story.off_spec_condensate, 'kg')) sections += 1;
+        if (appendAdvisorySection(content, 'Unclassified output', story.unclassified, 'kg')) sections += 1;
+    }
     if (appendAdvisorySection(content, 'Products', data.products, 'kg')) sections += 1;
 
     const oxygen = {};
