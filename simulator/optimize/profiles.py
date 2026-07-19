@@ -407,7 +407,8 @@ def constrained_max_profile(
 
     constraints = dict(overlaid.get("constraints", {}) or {})
     gates = [str(gate) for gate in constraints.get("gates", [])]
-    gates = [gate for gate in gates if gate != "coating"]
+    if "coating" not in gates:
+        gates.append("coating")
     if furnace_T_max_C is not None:
         constraints["furnace_T_max_C"] = float(furnace_T_max_C)
         if "furnace_temperature" not in gates:

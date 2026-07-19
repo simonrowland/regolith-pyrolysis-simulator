@@ -22,6 +22,8 @@ RECIPE_COST_PARAMETERS_KEY = "cost_parameters"
 DEFAULT_COST_PARAMETERS_PATH = DEFAULT_DATA_DIR / "optimize_costs.yaml"
 DEFAULT_ELECTRICAL_COST_PER_KWH = 10.0
 DEFAULT_SOLAR_HEAT_COST_PER_KWH = 0.05
+DEFAULT_FURNACE_LIFETIME_COST_MULTIPLIER = 500.0
+DEFAULT_MIN_FOULING_PENALTY = 1.0
 ENERGY_COST_DEFAULT_SOURCE = "owner-t7-two-price-energy-v1"
 PAYLOAD_ABSENT_COST_PROVENANCE = (
     "canonical defaults; payload carried no cost parameters"
@@ -33,6 +35,8 @@ _REQUIRED_SCALAR_PARAMETERS = (
     "furnace_resinter_cost_usd",
     "depreciation_expense_per_run",
     "generic_reagent_cost_per_kg",
+    "furnace_lifetime_cost_multiplier",
+    "min_fouling_penalty",
 )
 _SHUTTLE_PARAMETER = "shuttle_reagent_replacement_cost_per_kg"
 
@@ -45,13 +49,15 @@ class CostParameters:
     generic_reagent_cost_per_kg: float
     shuttle_reagent_replacement_cost_per_kg: Mapping[str, float] = field(default_factory=dict)
     solar_heat_cost_per_kWh: float = DEFAULT_SOLAR_HEAT_COST_PER_KWH
+    furnace_lifetime_cost_multiplier: float = DEFAULT_FURNACE_LIFETIME_COST_MULTIPLIER
+    min_fouling_penalty: float = DEFAULT_MIN_FOULING_PENALTY
 
     def __post_init__(self) -> None:
         for field_name in _REQUIRED_SCALAR_PARAMETERS:
             object.__setattr__(
                 self,
                 field_name,
-                _finite_nonnegative(getattr(self, field_name), field_name),
+                _validated_scalar_parameter(getattr(self, field_name), field_name),
             )
         shuttle = {
             str(species): _finite_nonnegative(value, f"{_SHUTTLE_PARAMETER}.{species}")
@@ -148,7 +154,7 @@ def normalize_cost_parameters(
         entry = _parameter_entry(raw_parameters, name)
         parameters[name] = {
             **{str(key): copy.deepcopy(value) for key, value in entry.items() if key != "value"},
-            "value": _finite_nonnegative(entry.get("value"), name),
+            "value": _validated_scalar_parameter(entry.get("value"), name),
         }
 
     shuttle_entry = _parameter_entry(raw_parameters, _SHUTTLE_PARAMETER)
@@ -234,6 +240,8 @@ def cost_parameters_from_mapping(payload: Mapping[str, Any] | None = None) -> Co
         furnace_resinter_cost_usd=values["furnace_resinter_cost_usd"],
         depreciation_expense_per_run=values["depreciation_expense_per_run"],
         generic_reagent_cost_per_kg=values["generic_reagent_cost_per_kg"],
+        furnace_lifetime_cost_multiplier=values["furnace_lifetime_cost_multiplier"],
+        min_fouling_penalty=values["min_fouling_penalty"],
         shuttle_reagent_replacement_cost_per_kg=values[_SHUTTLE_PARAMETER],
     )
 
@@ -308,7 +316,21 @@ def _parameter_entry(parameters: Mapping[str, Any], name: str) -> Mapping[str, A
 
 def _parameter_value(parameters: Mapping[str, Any], name: str) -> float:
     entry = _parameter_entry(parameters, name)
-    return _finite_nonnegative(entry.get("value"), name)
+    return _validated_scalar_parameter(entry.get("value"), name)
+
+
+def _validated_scalar_parameter(value: Any, name: str) -> float:
+    if name != "min_fouling_penalty":
+        return _finite_nonnegative(value, name)
+    if isinstance(value, bool):
+        raise TypeError(f"{name} must be numeric")
+    try:
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise TypeError(f"{name} must be numeric") from exc
+    if not math.isfinite(number) or number <= 0.0:
+        raise ValueError("min_fouling_penalty must be positive")
+    return number
 
 
 def _finite_nonnegative(value: Any, name: str) -> float:

@@ -77,6 +77,21 @@ winner: <candidate_id>
 strategy: <input_strategy>-><strategy_class>
 ```
 
+### Advanced Furnace-Lifetime Cost
+
+The recipe `cost_parameters` block exposes `furnace_lifetime_cost_multiplier`
+and `min_fouling_penalty`. Their defaults are `500.0` and `1.0`: the multiplier
+may be relaxed to zero for edge-case exploration, but the penalty floor must
+remain strictly positive. The optimizer values the furnace at roughly 500
+typical batch process costs and amortizes that value over the qualified coating
+model's worst-segment `campaigns_to_resinter` lifetime. A clean/infinite-lifetime recipe
+with exactly zero deposition pays zero, while any positive qualified fouling
+pays at least one typical batch cost. The multiplier is an edge-case exploration
+lever: lower it only to surface qualified fouling recipes when an extraction goal
+is otherwise intractable. The one-batch floor remains, so zero fouling keeps its
+bright-line priority even under a relaxed multiplier. Advanced overrides participate
+in the evaluation cache identity. This is an economic trade-off, not a hard gate.
+
 ## Choose Inputs
 
 ### Feedstock And Profile

@@ -712,7 +712,7 @@ def test_uncontrolled_equilibrium_po2_ignores_downstream_residual() -> None:
 
 
 @pytest.mark.parametrize("gate", ["coating", "knudsen_viscous"])
-def test_continuous_negative_margin_reaches_optimizer_constraint(gate: str) -> None:
+def test_qualified_continuous_negative_margin_is_priced_not_constrained(gate: str) -> None:
     margin = GateMargin(
         gate=gate,
         feasible=True,
@@ -732,7 +732,7 @@ def test_continuous_negative_margin_reaches_optimizer_constraint(gate: str) -> N
         SimpleNamespace(feasibility_margins={gate: margin}, feasible=True)
     )
     assert names == (gate,)
-    assert values == pytest.approx((9.8,))
+    assert values == pytest.approx((0.0,))
 
 
 def test_first_snapshot_volatile_throttle_ignores_downstream_partials() -> None:

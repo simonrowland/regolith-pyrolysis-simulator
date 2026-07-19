@@ -20,9 +20,10 @@ from simulator.optimize.doe import (
 from simulator.optimize.evalspec import EvalSpec, PrefixEvalSpec
 from simulator.optimize.evaluate import RunReference, ScoredResult
 from simulator.optimize.objective import (
+    ObjectiveComputationError,
     ObjectiveDefinition,
+    cost_adjusted_objective_scores,
     objective_definitions,
-    objective_scores,
     pareto_front,
 )
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
@@ -981,6 +982,10 @@ def _pareto_archive(
         feasible,
         definitions,
         objective_getter=lambda member: member.scored.objectives,
+        score_getter=lambda member: _scored_objective_scores(
+            member.scored,
+            definitions,
+        ),
     )
     seen_keys: dict[str, str] = {}
     for member in front:
@@ -1043,7 +1048,7 @@ def _score_key(
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[Any, ...]:
     if scored.feasible and scored.objectives is not None:
-        scores = objective_scores(scored.objectives, definitions)
+        scores = _scored_objective_scores(scored, definitions)
         return (
             0,
             *_score_key_components(scores),
@@ -1051,6 +1056,21 @@ def _score_key(
             candidate.id,
         )
     return (1, scored.cache_key or "", candidate.id)
+
+
+def _scored_objective_scores(
+    scored: ScoredResult,
+    definitions: Sequence[ObjectiveDefinition],
+) -> tuple[float | None, ...]:
+    reference = scored.run_reference
+    try:
+        return cost_adjusted_objective_scores(
+            scored.objectives,
+            definitions,
+            product_summary=(reference.product_summary if reference is not None else {}),
+        )
+    except ObjectiveComputationError:
+        return (None,) * len(definitions)
 
 
 def _score_key_components(

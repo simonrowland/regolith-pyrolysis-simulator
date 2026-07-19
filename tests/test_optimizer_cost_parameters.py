@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 import yaml
 
 from simulator.cost_parameters import (
+    CostParameters,
     RECIPE_COST_PARAMETERS_KEY,
     SHUTTLE_REAGENT_SPECIES,
     cost_parameter_values,
@@ -14,7 +16,12 @@ from simulator.cost_parameters import (
     default_cost_parameters_block,
     recipe_cost_parameters_from_payload,
 )
-from simulator.optimize.evalspec import EvalSpec, cache_key, current_code_version
+from simulator.optimize.evalspec import (
+    EvalSpec,
+    cache_key,
+    canonical_evalspec_json,
+    current_code_version,
+)
 from simulator.recipe_io import (
     load_recipe_patch,
     read_recipe_cost_parameters,
@@ -61,12 +68,30 @@ def test_yaml_defaults_load_with_recipe_default_provenance() -> None:
     assert values["solar_heat_cost_per_kWh"] == pytest.approx(0.05)
     assert values["furnace_resinter_cost_usd"] > 0.0
     assert values["depreciation_expense_per_run"] > 0.0
+    assert values["furnace_lifetime_cost_multiplier"] == pytest.approx(500.0)
+    assert values["min_fouling_penalty"] == pytest.approx(1.0)
     assert set(values["shuttle_reagent_replacement_cost_per_kg"]) == SHUTTLE_REAGENT_SPECIES
 
     defaulted = recipe_cost_parameters_from_payload({}, source="legacy.recipe.yaml")
     assert defaulted["provenance"]["defaults_applied"] is True
     assert "legacy.recipe.yaml" in defaulted["provenance"]["recipe_source"]
     assert cost_parameter_values(defaulted) == cost_parameter_values(block)
+
+
+@pytest.mark.parametrize("floor", (0.0, -1.0))
+def test_min_fouling_penalty_fails_closed_at_load_and_construction(floor: float) -> None:
+    invalid = _with_value(default_cost_parameters_block(), "min_fouling_penalty", floor)
+
+    with pytest.raises(ValueError, match="min_fouling_penalty must be positive"):
+        recipe_cost_parameters_from_payload(
+            {RECIPE_COST_PARAMETERS_KEY: invalid},
+            source="invalid-floor.recipe.yaml",
+        )
+
+    valid = cost_parameters_from_mapping(default_cost_parameters_block())
+    assert isinstance(valid, CostParameters)
+    with pytest.raises(ValueError, match="min_fouling_penalty must be positive"):
+        replace(valid, min_fouling_penalty=floor)
 
 
 def test_recipe_round_trip_carries_cost_block(tmp_path: Path) -> None:
@@ -150,6 +175,31 @@ def test_evalspec_hash_tracks_cost_values_but_not_cost_provenance() -> None:
     )
     assert cache_key(_spec(solar_moved)) != cache_key(_spec(base))
 
+    lifetime_moved = _with_value(base, "furnace_lifetime_cost_multiplier", 25.0)
+    assert cache_key(_spec(lifetime_moved)) != cache_key(_spec(base))
+    assert cost_parameters_from_mapping(lifetime_moved).furnace_lifetime_cost_multiplier == 25.0
+
+    floor_moved = _with_value(base, "min_fouling_penalty", 3.0)
+    assert cache_key(_spec(floor_moved)) != cache_key(_spec(base))
+    assert cost_parameters_from_mapping(floor_moved).min_fouling_penalty == 3.0
+
+
+def test_default_furnace_cost_controls_are_identity_transparent_but_nondefaults_split_key() -> None:
+    base = default_cost_parameters_block()
+    lifetime_moved = _with_value(base, "furnace_lifetime_cost_multiplier", 25.0)
+    floor_moved = _with_value(base, "min_fouling_penalty", 3.0)
+
+    base_json = canonical_evalspec_json(_spec(base))
+    lifetime_json = canonical_evalspec_json(_spec(lifetime_moved))
+    floor_json = canonical_evalspec_json(_spec(floor_moved))
+
+    assert b'"furnace_lifetime_cost_multiplier"' not in base_json
+    assert b'"min_fouling_penalty"' not in base_json
+    assert b'"furnace_lifetime_cost_multiplier"' in lifetime_json
+    assert b'"min_fouling_penalty"' in floor_json
+    assert cache_key(_spec(lifetime_moved)) != cache_key(_spec(base))
+    assert cache_key(_spec(floor_moved)) != cache_key(_spec(base))
+
 
 def test_shuttle_static_replacement_exception_is_exact_species_set() -> None:
     params = cost_parameters_from_mapping(default_cost_parameters_block())
@@ -170,6 +220,12 @@ def test_cost_parameter_sources_are_reproducible() -> None:
     assert parameters["solar_heat_cost_per_kWh"]["source_tag"] == electricity_source
     for name in ("furnace_resinter_cost_usd", "depreciation_expense_per_run"):
         assert "owner ratified 2026-07-12" in parameters[name]["source_tag"]
+    assert "owner final ratification 2026-07-19" in parameters[
+        "furnace_lifetime_cost_multiplier"
+    ]["source_tag"]
+    assert "owner ratified 2026-07-19" in parameters[
+        "min_fouling_penalty"
+    ]["source_tag"]
     assert "owner ratified 2026-07-12" in parameters[
         "shuttle_reagent_replacement_cost_per_kg"
     ]["source_tag"]

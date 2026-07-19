@@ -1044,6 +1044,8 @@ def evaluate(
             run_execution,
             objective_profile,
             trace_payload=trace_payload,
+            cost_parameters=spec.cost_parameters,
+            coating_margin=feasibility.margins.get("coating"),
         ),
     )
 
@@ -4232,6 +4234,8 @@ def _out_of_domain_result(
                 scoring_execution,
                 profile,
                 trace_payload=trace_payload,
+                cost_parameters=spec.cost_parameters,
+                coating_margin=feasibility.margins.get("coating"),
             ),
             notes=assessment.notes,
         )
@@ -5084,12 +5088,21 @@ def _run_reference(
     profile: Mapping[str, Any],
     *,
     trace_payload: Mapping[str, Any] | None = None,
+    cost_parameters: Mapping[str, Any] | None = None,
+    coating_margin: GateMargin | None = None,
 ) -> RunReference:
     summary: Mapping[str, Any] = {}
     if str(getattr(run_execution, "status", "ok")) != "refused":
         try:
-            summary = product_summary(run_execution, profile)
+            summary = product_summary(
+                run_execution,
+                profile,
+                cost_parameters=cost_parameters,
+                coating_margin=coating_margin,
+            )
         except ObjectiveComputationError:
+            if cost_parameters is not None:
+                raise
             summary = {}
     return RunReference(
         status=str(getattr(run_execution, "status", "ok")),

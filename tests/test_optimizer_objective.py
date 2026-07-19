@@ -18,8 +18,10 @@ from simulator.optimize.objective import (
     ObjectiveProfileError,
     composition_targets_require_coating,
     composition_target_eval_metadata,
+    cost_adjusted_objective_scores,
     compute_objectives,
     dominates,
+    furnace_amortization_cost_per_run,
     objective_definitions,
     objective_scores,
     objective_importance_evidence,
@@ -47,6 +49,13 @@ DEFINITIONS = (
     ObjectiveDefinition("oxygen_kg", "maximize", "kg", ordinal=0),
     ObjectiveDefinition(ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC, "minimize", "kWh", ordinal=1),
 )
+
+
+def _available_furnace_summary(penalty: float) -> dict[str, float | str]:
+    return {
+        "furnace_amortization_status": "available",
+        "furnace_amortization_batch_cost_equivalents": penalty,
+    }
 
 
 def test_dominates_requires_strict_improvement() -> None:
@@ -680,6 +689,512 @@ def test_pareto_front_preserves_stable_non_dominated_order() -> None:
     )
 
     assert [item["id"] for item in front] == ["d", "c"]
+
+
+def test_furnace_amortization_cost_trades_continuously_against_yield() -> None:
+    assert furnace_amortization_cost_per_run(
+        20.0, 1.0, 500.0, 1.0, has_positive_fouling=True
+    ) == pytest.approx(10_000.0)
+    assert furnace_amortization_cost_per_run(
+        20.0, 500.0, 500.0, 1.0, has_positive_fouling=True
+    ) == pytest.approx(20.0)
+    assert furnace_amortization_cost_per_run(
+        20.0, math.inf, 500.0, 1.0, has_positive_fouling=True
+    ) == pytest.approx(20.0)
+    assert furnace_amortization_cost_per_run(
+        20.0, math.inf, 500.0, 1.0, has_positive_fouling=False
+    ) == 0.0
+    assert objective_module._has_positive_wall_deposit({("wall", "SiO"): 1e-30})
+    assert not objective_module._has_positive_wall_deposit({("wall", "SiO"): 0.0})
+    lifetime, positive = objective_module._selection_coating_lifetime(
+        SimpleNamespace(
+            status_payload={
+                "campaigns_to_resinter_worst_segment": 1e30,
+                "wall_deposit_kg_per_campaign": 1e-30,
+            }
+        ),
+        fallback_campaigns="infinite",
+        fallback_positive=False,
+    )
+    assert lifetime == pytest.approx(1e30)
+    assert positive is True
+
+    params = CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=1.0,
+        depreciation_expense_per_run=1.0,
+        generic_reagent_cost_per_kg=1.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+        furnace_lifetime_cost_multiplier=10.0,
+        min_fouling_penalty=3.0,
+    )
+    sim = SimpleNamespace(
+        record=SimpleNamespace(
+            cost_rollup={
+                "run_input_cost": {"owner_ratify_money_projection": 20.0}
+            }
+        )
+    )
+    barely_fouling = objective_module._furnace_amortization_summary(
+        sim,
+        math.inf,
+        has_positive_fouling=True,
+        cost_parameters=params,
+    )
+    zero_fouling = objective_module._furnace_amortization_summary(
+        sim,
+        math.inf,
+        has_positive_fouling=False,
+        cost_parameters=params,
+    )
+    assert barely_fouling["furnace_amortization_cost_per_run_usd"] == 60.0
+    assert barely_fouling["furnace_amortization_batch_cost_equivalents"] == 3.0
+    assert zero_fouling["furnace_amortization_cost_per_run_usd"] == 0.0
+    unavailable = objective_module._furnace_amortization_summary(
+        SimpleNamespace(
+            record=SimpleNamespace(
+                cost_rollup={
+                    "run_input_cost": {
+                        "allocation_status": "unavailable_after_cost_observation_error",
+                        "owner_ratify_money_projection": 0.0,
+                    }
+                }
+            )
+        ),
+        1.0,
+        has_positive_fouling=True,
+        cost_parameters=params,
+    )
+    with pytest.raises(ObjectiveComputationError, match="batch_cost_unavailable"):
+        cost_adjusted_objective_scores(
+            {"oxygen_kg": 1.0, "energy_kWh": 1.0},
+            DEFINITIONS,
+            product_summary=unavailable,
+        )
+    items = (
+        {
+            "id": "violates",
+            "objectives": {"oxygen_kg": 100.0, "energy_kWh": 2.0},
+            "summary": _available_furnace_summary(2_500.0),
+        },
+        {
+            "id": "satisfies",
+            "objectives": {"oxygen_kg": 10.0, "energy_kWh": 2.0},
+            "summary": _available_furnace_summary(0.0),
+        },
+    )
+
+    front = pareto_front(
+        items,
+        DEFINITIONS,
+        objective_getter=lambda item: item["objectives"],
+        score_getter=lambda item: cost_adjusted_objective_scores(
+            item["objectives"],
+            DEFINITIONS,
+            product_summary=item["summary"],
+        ),
+    )
+
+    assert [item["id"] for item in front] == ["satisfies"]
+
+    low_multiplier_items = tuple(
+        {**item, "summary": _available_furnace_summary(penalty)}
+        for item, penalty in zip(items, (1.0, 0.0))
+    )
+    low_multiplier_front = pareto_front(
+        low_multiplier_items,
+        DEFINITIONS,
+        objective_getter=lambda item: item["objectives"],
+        score_getter=lambda item: cost_adjusted_objective_scores(
+            item["objectives"], DEFINITIONS, product_summary=item["summary"]
+        ),
+    )
+    assert [item["id"] for item in low_multiplier_front] == ["violates", "satisfies"]
+    assert cost_adjusted_objective_scores(
+        low_multiplier_items[0]["objectives"],
+        DEFINITIONS,
+        product_summary=low_multiplier_items[0]["summary"],
+    )[0] > cost_adjusted_objective_scores(
+        low_multiplier_items[1]["objectives"],
+        DEFINITIONS,
+        product_summary=low_multiplier_items[1]["summary"],
+    )[0]
+
+    bounded = (ObjectiveDefinition("quality", "maximize", "score_0_1", ordinal=0),)
+    assert cost_adjusted_objective_scores(
+        {"quality": 1.0},
+        bounded,
+        product_summary=_available_furnace_summary(1.0),
+    )[0] > cost_adjusted_objective_scores(
+        {"quality": 0.4},
+        bounded,
+        product_summary=_available_furnace_summary(0.0),
+    )[0]
+
+
+def test_furnace_amortization_clean_recipe_skips_missing_lifetime() -> None:
+    assert furnace_amortization_cost_per_run(
+        20.0, None, 0.0, 1.0, has_positive_fouling=False
+    ) == 0.0
+
+
+@pytest.mark.parametrize("campaigns", (math.nan, -1.0))
+@pytest.mark.parametrize("has_positive_fouling", (False, True))
+def test_furnace_amortization_degenerate_lifetime_respects_fouling_bright_line(
+    campaigns: float,
+    has_positive_fouling: bool,
+) -> None:
+    cost = furnace_amortization_cost_per_run(
+        20.0,
+        campaigns,
+        500.0,
+        1.0,
+        has_positive_fouling=has_positive_fouling,
+    )
+
+    if has_positive_fouling:
+        assert cost == furnace_amortization_cost_per_run(
+            20.0, 0.0, 500.0, 1.0, has_positive_fouling=True
+        )
+    else:
+        assert cost == 0.0
+
+
+@pytest.mark.parametrize(
+    "campaigns",
+    (
+        pytest.param(None, id="none"),
+        pytest.param(math.nan, id="nan"),
+        pytest.param(math.inf, id="positive-infinity"),
+        pytest.param(-1.0, id="negative"),
+        pytest.param(0.0, id="instant-death"),
+        pytest.param(1.0, id="one-campaign"),
+        pytest.param(1e9, id="long-lived"),
+    ),
+)
+@pytest.mark.parametrize("has_positive_fouling", (False, True))
+@pytest.mark.parametrize("multiplier", (0.0, 500.0))
+def test_furnace_amortization_degenerate_input_matrix(
+    campaigns: float | None,
+    has_positive_fouling: bool,
+    multiplier: float,
+) -> None:
+    cost = furnace_amortization_cost_per_run(
+        20.0,
+        campaigns,
+        multiplier,
+        1.0,
+        has_positive_fouling=has_positive_fouling,
+    )
+
+    assert math.isfinite(cost)
+    if not has_positive_fouling:
+        assert cost == 0.0
+    elif campaigns is None or math.isinf(campaigns):
+        assert cost == 20.0
+    elif campaigns == 0.0 or (
+        isinstance(campaigns, float) and (math.isnan(campaigns) or campaigns < 0.0)
+    ):
+        assert cost == max(
+            20.0,
+            multiplier
+            * 20.0
+            / objective_module.FURNACE_MIN_MEANINGFUL_LIFETIME_CAMPAIGNS,
+        ) * objective_module.FURNACE_INSTANT_DEATH_FACTOR
+    else:
+        assert cost == max(20.0, multiplier * 20.0 / campaigns)
+
+
+def test_furnace_amortization_cost_is_monotonic_across_instant_death() -> None:
+    campaigns = (0.0, 1e-6, 0.01, 1.0, 500.0, math.inf)
+    costs = tuple(
+        furnace_amortization_cost_per_run(
+            20.0,
+            lifetime,
+            500.0,
+            1.0,
+            has_positive_fouling=True,
+        )
+        for lifetime in campaigns
+    )
+
+    assert all(left >= right for left, right in zip(costs, costs[1:]))
+    assert costs[3:] == (10_000.0, 20.0, 20.0)
+
+
+@pytest.mark.parametrize("batch_cost", (0.0, -1.0))
+def test_furnace_amortization_summary_rejects_nonpositive_fouling_batch_cost(
+    batch_cost: float,
+) -> None:
+    params = CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=1.0,
+        depreciation_expense_per_run=1.0,
+        generic_reagent_cost_per_kg=1.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+        furnace_lifetime_cost_multiplier=500.0,
+        min_fouling_penalty=1.0,
+    )
+    sim = SimpleNamespace(
+        record=SimpleNamespace(
+            cost_rollup={
+                "run_input_cost": {
+                    "owner_ratify_money_projection": batch_cost,
+                }
+            }
+        )
+    )
+
+    fouling = objective_module._furnace_amortization_summary(
+        sim,
+        1.0,
+        has_positive_fouling=True,
+        cost_parameters=params,
+    )
+    clean = objective_module._furnace_amortization_summary(
+        sim,
+        1.0,
+        has_positive_fouling=False,
+        cost_parameters=params,
+    )
+
+    assert fouling["furnace_amortization_status"] == "batch_cost_unavailable"
+    if batch_cost == 0.0:
+        assert clean["furnace_amortization_status"] == "available"
+        assert clean["furnace_amortization_cost_per_run_usd"] == 0.0
+    else:
+        assert clean["furnace_amortization_status"] == "batch_cost_unavailable"
+
+
+def test_cost_adjustment_bounds_tiny_lifetime_and_rejects_overflow() -> None:
+    penalty = furnace_amortization_cost_per_run(
+        20.0,
+        1e-304,
+        500.0,
+        1.0,
+        has_positive_fouling=True,
+    ) / 20.0
+    adjusted = cost_adjusted_objective_scores(
+        {"cost": 100.0},
+        (ObjectiveDefinition("cost", "minimize", "usd"),),
+        product_summary=_available_furnace_summary(penalty),
+    )
+
+    assert math.isfinite(adjusted[0])
+    with pytest.raises(ObjectiveComputationError, match="adjusted objective"):
+        cost_adjusted_objective_scores(
+            {"cost": 1e308},
+            (ObjectiveDefinition("cost", "minimize", "usd"),),
+            product_summary=_available_furnace_summary(1.0),
+        )
+
+
+def test_cost_adjustment_rejects_positive_maximize_underflow() -> None:
+    with pytest.raises(ObjectiveComputationError, match="underflow"):
+        cost_adjusted_objective_scores(
+            {"yield": 1e-300},
+            (ObjectiveDefinition("yield", "maximize", "kg"),),
+            product_summary=_available_furnace_summary(1e100),
+        )
+
+
+@pytest.mark.parametrize(
+    "summary",
+    (
+        {},
+        {"furnace_amortization_status": None},
+        {"furnace_amortization_status": "available"},
+    ),
+)
+def test_cost_adjustment_requires_complete_furnace_evidence(
+    summary: dict[str, object],
+) -> None:
+    with pytest.raises(ObjectiveComputationError, match="furnace amortization"):
+        cost_adjusted_objective_scores(
+            {"oxygen_kg": 1.0},
+            (ObjectiveDefinition("oxygen_kg", "maximize", "kg"),),
+            product_summary=summary,
+        )
+
+
+@pytest.mark.parametrize("sense", ("maximize", "minimize"))
+def test_cost_adjustment_rejects_negative_objective_values(sense: str) -> None:
+    definition = (ObjectiveDefinition("metric", sense, "unit"),)
+    with pytest.raises(ObjectiveComputationError, match="must be non-negative"):
+        cost_adjusted_objective_scores(
+            {"metric": -1.0},
+            definition,
+            product_summary=_available_furnace_summary(1.0),
+        )
+
+    assert cost_adjusted_objective_scores(
+        {"metric": 0.0},
+        definition,
+        product_summary=_available_furnace_summary(1.0),
+    ) == (0.0,)
+
+
+def test_furnace_amortization_instant_death_is_worst_with_zero_multiplier() -> None:
+    instant_death = furnace_amortization_cost_per_run(
+        20.0, 0.0, 0.0, 1.0, has_positive_fouling=True
+    )
+    one_campaign = furnace_amortization_cost_per_run(
+        20.0, 1.0, 0.0, 1.0, has_positive_fouling=True
+    )
+    assert math.isfinite(instant_death)
+    assert instant_death > one_campaign
+
+
+def test_furnace_amortization_none_reaches_summary_as_infinite_lifetime() -> None:
+    params = CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=1.0,
+        depreciation_expense_per_run=1.0,
+        generic_reagent_cost_per_kg=1.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+        furnace_lifetime_cost_multiplier=500.0,
+        min_fouling_penalty=1.0,
+    )
+    sim = SimpleNamespace(
+        record=SimpleNamespace(
+            cost_rollup={
+                "run_input_cost": {"owner_ratify_money_projection": 20.0}
+            }
+        )
+    )
+
+    clean = objective_module._furnace_amortization_summary(
+        sim,
+        None,
+        has_positive_fouling=False,
+        cost_parameters=params,
+    )
+    fouling = objective_module._furnace_amortization_summary(
+        sim,
+        None,
+        has_positive_fouling=True,
+        cost_parameters=params,
+    )
+
+    assert clean["furnace_amortization_cost_per_run_usd"] == 0.0
+    assert clean["furnace_amortization_batch_cost_equivalents"] == 0.0
+    assert fouling["furnace_amortization_cost_per_run_usd"] == 20.0
+    assert fouling["furnace_amortization_batch_cost_equivalents"] == 1.0
+    clean_nan = objective_module._furnace_amortization_summary(
+        sim,
+        math.nan,
+        has_positive_fouling=False,
+        cost_parameters=params,
+    )
+    fouling_nan = objective_module._furnace_amortization_summary(
+        sim,
+        math.nan,
+        has_positive_fouling=True,
+        cost_parameters=params,
+    )
+    assert clean_nan["furnace_amortization_cost_per_run_usd"] == 0.0
+    assert fouling_nan["furnace_amortization_cost_per_run_usd"] == (
+        furnace_amortization_cost_per_run(
+            20.0, 0.0, 500.0, 1.0, has_positive_fouling=True
+        )
+    )
+
+
+def test_instant_death_furnace_cost_stays_finite_through_pareto_scoring() -> None:
+    params = CostParameters(
+        electricity_cost_per_kWh=1.0,
+        furnace_resinter_cost_usd=1.0,
+        depreciation_expense_per_run=1.0,
+        generic_reagent_cost_per_kg=1.0,
+        shuttle_reagent_replacement_cost_per_kg={
+            "Na": 1.0,
+            "K": 1.0,
+            "Mg": 1.0,
+            "Ca": 1.0,
+        },
+        furnace_lifetime_cost_multiplier=500.0,
+        min_fouling_penalty=1.0,
+    )
+    sim = SimpleNamespace(
+        record=SimpleNamespace(
+            cost_rollup={
+                "run_input_cost": {"owner_ratify_money_projection": 20.0}
+            }
+        )
+    )
+    instant_summary = objective_module._furnace_amortization_summary(
+        sim,
+        0.0,
+        has_positive_fouling=True,
+        cost_parameters=params,
+    )
+    definitions = (
+        ObjectiveDefinition("quality", "maximize", "score_0_1", ordinal=0),
+        ObjectiveDefinition("waste", "minimize", "kg", ordinal=1),
+    )
+    items = (
+        {
+            "id": "instant-death",
+            "objectives": {"quality": 1.0, "waste": 0.0},
+            "summary": instant_summary,
+        },
+        {
+            "id": "clean",
+            "objectives": {"quality": 1.0, "waste": 0.0},
+            "summary": _available_furnace_summary(0.0),
+        },
+    )
+
+    adjusted = tuple(
+        cost_adjusted_objective_scores(
+            item["objectives"], definitions, product_summary=item["summary"]
+        )
+        for item in items
+    )
+    front = pareto_front(
+        items,
+        definitions,
+        objective_getter=lambda item: item["objectives"],
+        score_getter=lambda item: cost_adjusted_objective_scores(
+            item["objectives"], definitions, product_summary=item["summary"]
+        ),
+    )
+
+    assert all(math.isfinite(score) for scores in adjusted for score in scores)
+    assert [item["id"] for item in front] == ["clean"]
+
+
+def test_furnace_amortization_requires_positive_floor_when_multiplier_relaxed() -> None:
+    with pytest.raises(
+        ObjectiveComputationError, match="min_fouling_penalty must be positive"
+    ):
+        furnace_amortization_cost_per_run(
+            20.0, math.inf, 0.0, 0.0, has_positive_fouling=True
+        )
+
+    clean = furnace_amortization_cost_per_run(
+        20.0, None, 0.0, 1.0, has_positive_fouling=False
+    )
+    fouling = furnace_amortization_cost_per_run(
+        20.0, math.inf, 0.0, 1.0, has_positive_fouling=True
+    )
+    assert clean == 0.0
+    assert fouling > clean
 
 
 def test_pareto_front_keeps_nullable_objective_identity() -> None:

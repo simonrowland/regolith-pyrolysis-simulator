@@ -25,6 +25,8 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.cost_parameters import (
+    DEFAULT_FURNACE_LIFETIME_COST_MULTIPLIER,
+    DEFAULT_MIN_FOULING_PENALTY,
     cost_parameter_values,
     default_cost_parameters_block,
 )
@@ -605,7 +607,7 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         "campaign": spec.campaign,
         "chemistry_kernel": _chemistry_kernel_key_payload(spec.chemistry_kernel),
         "code_version": spec.code_version,
-        "cost_parameters": cost_parameter_values(spec.cost_parameters),
+        "cost_parameters": _cost_parameters_key_payload(spec.cost_parameters),
         "data_digests": spec.data_digests,
         "feedstock_id": spec.feedstock_id,
         "feedstock_recipe_digest": spec.feedstock_recipe_digest,
@@ -668,6 +670,21 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
 
 def cache_key(spec: EvalSpec) -> str:
     return hashlib.sha256(canonical_evalspec_json(spec)).hexdigest()
+
+
+def _cost_parameters_key_payload(
+    cost_parameters: Mapping[str, Any],
+) -> dict[str, Any]:
+    payload = cost_parameter_values(cost_parameters)
+    parameters = dict(payload["parameters"])
+    if (
+        parameters.get("furnace_lifetime_cost_multiplier")
+        == DEFAULT_FURNACE_LIFETIME_COST_MULTIPLIER
+    ):
+        parameters.pop("furnace_lifetime_cost_multiplier")
+    if parameters.get("min_fouling_penalty") == DEFAULT_MIN_FOULING_PENALTY:
+        parameters.pop("min_fouling_penalty")
+    return {**payload, "parameters": parameters}
 
 
 def _chemistry_kernel_key_payload(kernel: Mapping[str, Any]) -> Mapping[str, Any]:

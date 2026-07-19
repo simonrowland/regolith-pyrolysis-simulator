@@ -198,6 +198,7 @@ def _scored(
     oxygen: float | None = None,
     energy: float = 2.0,
     margin: GateMargin | None = None,
+    furnace_penalty: float = 0.0,
 ) -> ScoredResult:
     spec = eval_spec or _spec(patch, feedstock, fidelity, profile)
     key = cache_key_value or cache_key(spec)
@@ -226,6 +227,8 @@ def _scored(
             product_summary={
                 "oxygen_kg": oxygen_value,
                 "mass_closure": _closed_mass_closure(),
+                "furnace_amortization_status": "available",
+                "furnace_amortization_batch_cost_equivalents": furnace_penalty,
             },
             backend_status="ok",
             backend_authoritative=True,
@@ -1736,6 +1739,108 @@ def test_staged_beam_ranker_raises_on_duplicate_cache_key() -> None:
                 for candidate in candidates
             ]
         )
+
+
+def test_staged_beam_furnace_cost_is_tunable_and_not_a_hard_block() -> None:
+    candidates = (
+        Candidate(id="violates", patch=RecipePatch({})),
+        Candidate(id="satisfies", patch=RecipePatch({})),
+    )
+    continuous = {"constraint_mode": "continuous"}
+    results = (
+        (
+            candidates[0],
+            _scored(
+                candidates[0].patch,
+                candidate_id="violates",
+                cache_key_value="cache-violates",
+                oxygen=100.0,
+                furnace_penalty=2_500.0,
+                margin=replace(
+                    _margin(),
+                    gate="coating",
+                    margin=-9.8,
+                    status_payload=continuous,
+                ),
+            ),
+        ),
+        (
+            candidates[1],
+            _scored(
+                candidates[1].patch,
+                candidate_id="satisfies",
+                cache_key_value="cache-satisfies",
+                oxygen=10.0,
+                furnace_penalty=0.0,
+                margin=replace(
+                    _margin(),
+                    gate="coating",
+                    margin=1.0,
+                    status_payload=continuous,
+                ),
+            ),
+        ),
+    )
+
+    ranked = staged_module._rank_stage_results(
+        results,
+        objective_definitions(PROFILE),
+        beam_width=1,
+    )
+
+    assert ranked[0][1].id == "satisfies"
+    assert results[0][1].feasible is True
+    assert results[0][1].feasibility_margins["delivered_stream_purity"].margin == -9.8
+
+    low_multiplier_results = tuple(
+        (
+            candidate,
+            replace(
+                scored,
+                run_reference=replace(
+                    scored.run_reference,
+                    product_summary={
+                        **scored.run_reference.product_summary,
+                        "furnace_amortization_batch_cost_equivalents": penalty,
+                    },
+                ),
+            ),
+        )
+        for (candidate, scored), penalty in zip(results, (1.0, 0.0))
+    )
+    reranked = staged_module._rank_stage_results(
+        low_multiplier_results,
+        objective_definitions(PROFILE),
+        beam_width=1,
+    )
+    assert reranked[0][1].id == "violates"
+
+    missing_evidence = replace(
+        results[0][1],
+        run_reference=replace(results[0][1].run_reference, product_summary={}),
+    )
+    ranked_with_degraded = staged_module._rank_stage_results(
+        (
+            (candidates[0], missing_evidence),
+            (candidates[1], results[1][1]),
+        ),
+        objective_definitions(PROFILE),
+        beam_width=2,
+    )
+    assert [row[1].id for row in ranked_with_degraded] == ["satisfies", "violates"]
+
+    archive = staged_module._pareto_archive(
+        staged_module._archive_members_from_results(
+            (
+                (candidates[0], missing_evidence),
+                (candidates[1], results[1][1]),
+            ),
+            objective_definitions(PROFILE),
+            RecipeSchema(),
+        ),
+        objective_definitions(PROFILE),
+    )
+    assert [member.candidate.id for member in archive] == ["satisfies"]
 
 
 def test_child_cache_key_duplicate_parent_raises() -> None:

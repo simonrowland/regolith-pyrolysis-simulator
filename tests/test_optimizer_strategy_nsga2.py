@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import importlib
 import math
 import re
@@ -17,10 +18,11 @@ from simulator.optimize import (
     Strategy,
     ThresholdSpec,
 )
-from simulator.optimize.evaluate import FailureCategory, ScoredResult
+from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     LEGACY_ENERGY_KWH_METRIC,
+    ObjectiveComputationError,
     ObjectiveValue,
     ObjectiveVector,
 )
@@ -44,6 +46,19 @@ PROFILE = {
 }
 PATH_X = ("campaigns", "C0", "dT_dt_C_per_hr")
 PATH_Y = ("campaigns", "C0", "hold_time_hr")
+
+
+def _run_reference(
+    furnace_status: str | None = "available",
+    furnace_penalty: float = 0.0,
+) -> RunReference:
+    product_summary = {}
+    if furnace_status is not None:
+        product_summary = {
+            "furnace_amortization_status": furnace_status,
+            "furnace_amortization_batch_cost_equivalents": furnace_penalty,
+        }
+    return RunReference(status="ok", product_summary=product_summary)
 
 
 def _simple_schema() -> RecipeSchema:
@@ -132,6 +147,7 @@ def _gate_margin_result(candidate: Candidate, gate_margin: GateMargin) -> Scored
                 )
             ),
             feasibility_margins={"gate": gate_margin},
+            run_reference=_run_reference(),
         )
     return ScoredResult(
         candidate_id=candidate.id,
@@ -156,6 +172,7 @@ def _null_objective_result(candidate: Candidate) -> ScoredResult:
             )
         ),
         feasibility_margins={"gate": 0.25},
+        run_reference=_run_reference(),
     )
 
 
@@ -192,7 +209,13 @@ def _assert_pressure_trial_params_match_patches(
     assert checked > 0
 
 
-def _feasible_result(candidate: Candidate, yield_value: float, energy: float) -> ScoredResult:
+def _feasible_result(
+    candidate: Candidate,
+    yield_value: float,
+    energy: float,
+    *,
+    furnace_status: str | None = "available",
+) -> ScoredResult:
     return ScoredResult(
         candidate_id=candidate.id,
         eval_spec=None,
@@ -205,6 +228,7 @@ def _feasible_result(candidate: Candidate, yield_value: float, energy: float) ->
             )
         ),
         feasibility_margins={"gate": 0.25},
+        run_reference=_run_reference(furnace_status),
     )
 
 
@@ -212,7 +236,9 @@ def _point_result(candidate: Candidate) -> ScoredResult:
     x, y = _point(candidate)
     return _feasible_result(
         candidate,
-        yield_value=1.0 - abs(x - 0.8) - abs(y - 0.2),
+        # Preserve the same ordering while keeping this physical yield objective
+        # inside the non-negative domain required by furnace cost adjustment.
+        yield_value=2.0 - abs(x - 0.8) - abs(y - 0.2),
         energy=abs(x - 0.2) + abs(y - 0.8),
     )
 
@@ -229,6 +255,7 @@ def _single_objective_result(candidate: Candidate, metric: str, value: float) ->
             )
         ),
         feasibility_margins={"gate": 0.25},
+        run_reference=_run_reference(),
     )
 
 
@@ -255,6 +282,7 @@ def _legacy_energy_cache_result(
             )
         ),
         feasibility_margins={"gate": 0.25},
+        run_reference=_run_reference(),
     )
 
 
@@ -487,6 +515,7 @@ def test_nsga2_constraint_feasible_margin_not_violated_and_reuses_tpe_contract()
                         )
                     ),
                     feasibility_margins={"gate": feasible_margin},
+                    run_reference=_run_reference(),
                 ),
             ),
             (
@@ -583,6 +612,58 @@ def test_nsga2_feasible_unscoreable_result_fails_trial_without_bad_objective_val
     assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.0,)
     assert trial.user_attrs[bayesian._UNSCOREABLE_OBJECTIVES_ATTR] is True
     assert strategy.tell_count == 1
+
+
+@pytest.mark.parametrize(
+    "run_reference",
+    [None, _run_reference(None), _run_reference("batch_cost_unavailable")],
+    ids=("no-reference", "missing-status", "degraded-status"),
+)
+def test_nsga2_missing_or_degraded_furnace_evidence_is_unscoreable(
+    run_reference: RunReference | None,
+) -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=451, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+
+    strategy.tell(
+        [
+            (
+                candidate,
+                replace(
+                    _feasible_result(candidate, 1.0, 2.0),
+                    run_reference=run_reference,
+                ),
+            )
+        ]
+    )
+
+    trial = _trials_by_candidate(strategy)[candidate.id]
+    assert trial.state.name == "FAIL"
+    assert trial.values is None
+    assert trial.user_attrs[bayesian._UNSCOREABLE_OBJECTIVES_ATTR] is True
+    assert strategy.tell_count == 1
+
+
+def test_nsga2_corrupted_available_furnace_evidence_propagates() -> None:
+    strategy = OptunaNSGA2Strategy(_simple_schema(), seed=452, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+    scored = _feasible_result(candidate, 1.0, 2.0)
+
+    with pytest.raises(
+        ObjectiveComputationError,
+        match="furnace amortization penalty must be non-negative",
+    ):
+        strategy.tell(
+            [
+                (
+                    candidate,
+                    replace(
+                        scored,
+                        run_reference=_run_reference(furnace_penalty=-1.0),
+                    ),
+                )
+            ]
+        )
 
 
 def test_nsga2_scores_legacy_energy_cache_objective_against_canonical_profile() -> None:

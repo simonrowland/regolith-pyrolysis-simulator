@@ -17,10 +17,11 @@ from simulator.optimize import (
     Strategy,
     ThresholdSpec,
 )
-from simulator.optimize.evaluate import FailureCategory, ScoredResult
+from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     LEGACY_ENERGY_KWH_METRIC,
+    ObjectiveComputationError,
     ObjectiveValue,
     ObjectiveVector,
 )
@@ -33,6 +34,7 @@ from simulator.optimize.strategy.bayesian import (
     _NONFINITE_INFEASIBLE_CONSTRAINT_VIOLATION,
     _UNSCOREABLE_OBJECTIVES_ATTR,
     _constraints_for_trial,
+    _constraint_values,
     OPTUNA_REQUIRED_MESSAGE,
     OptunaUnavailableError,
 )
@@ -46,6 +48,22 @@ PROFILE = {
     ]
 }
 PATH = ("campaigns", "C0", "dT_dt_C_per_hr")
+
+
+def _available_run_reference(
+    furnace_status: str | None = "available",
+    furnace_penalty: float = 0.0,
+) -> RunReference:
+    product_summary = {}
+    if furnace_status is not None:
+        product_summary = {
+            "furnace_amortization_status": furnace_status,
+            "furnace_amortization_batch_cost_equivalents": furnace_penalty,
+        }
+    return RunReference(
+        status="ok",
+        product_summary=product_summary,
+    )
 
 
 def _simple_schema() -> RecipeSchema:
@@ -102,6 +120,7 @@ def _gate_margin_result(candidate: Candidate, gate_margin: GateMargin) -> Scored
                 )
             ),
             feasibility_margins={"gate": gate_margin},
+            run_reference=_available_run_reference(),
         )
     return ScoredResult(
         candidate_id=candidate.id,
@@ -126,6 +145,7 @@ def _null_objective_result(candidate: Candidate) -> ScoredResult:
             )
         ),
         feasibility_margins={"gate": 0.25},
+        run_reference=_available_run_reference(),
     )
 
 
@@ -162,7 +182,14 @@ def _assert_pressure_trial_params_match_patches(
     assert checked > 0
 
 
-def _feasible_result(candidate: Candidate, yield_value: float, energy: float) -> ScoredResult:
+def _feasible_result(
+    candidate: Candidate,
+    yield_value: float,
+    energy: float,
+    *,
+    furnace_status: str | None = "available",
+    furnace_penalty: float = 0.0,
+) -> ScoredResult:
     return ScoredResult(
         candidate_id=candidate.id,
         eval_spec=None,
@@ -175,6 +202,7 @@ def _feasible_result(candidate: Candidate, yield_value: float, energy: float) ->
             )
         ),
         feasibility_margins={"gate": 0.25},
+        run_reference=_available_run_reference(furnace_status, furnace_penalty),
     )
 
 
@@ -190,6 +218,7 @@ def _single_objective_result(candidate: Candidate, metric: str, value: float) ->
             )
         ),
         feasibility_margins={"gate": 0.25},
+        run_reference=_available_run_reference(),
     )
 
 
@@ -216,6 +245,7 @@ def _legacy_energy_cache_result(
             )
         ),
         feasibility_margins={"gate": 0.25},
+        run_reference=_available_run_reference(),
     )
 
 
@@ -454,6 +484,7 @@ def test_tpe_constraint_feasible_margin_not_violated() -> None:
                         )
                     ),
                     feasibility_margins={"gate": feasible_margin},
+                    run_reference=_available_run_reference(),
                 ),
             ),
             (
@@ -473,6 +504,21 @@ def test_tpe_constraint_feasible_margin_not_violated() -> None:
     trials_by_candidate = _trials_by_candidate(strategy)
     assert trials_by_candidate[candidates[0].id].user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.0,)
     assert trials_by_candidate[candidates[1].id].user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.05,)
+
+
+def test_tpe_qualified_continuous_margin_is_priced_not_constrained() -> None:
+    candidate = Candidate(id="qualified-fouling", patch=RecipePatch({}))
+    margin = _gate_margin(margin=-9.8, tolerance=0.0, feasible=True)
+    margin = GateMargin(
+        **{
+            **margin.__dict__,
+            "status_payload": {"constraint_mode": "continuous"},
+        }
+    )
+    names, values = _constraint_values(_gate_margin_result(candidate, margin))
+
+    assert names == ("gate",)
+    assert values == (0.0,)
 
 
 def test_tpe_nonfinite_gate_margins_map_to_finite_constraint_values() -> None:
@@ -576,6 +622,57 @@ def test_tpe_feasible_unscoreable_result_fails_trial_without_bad_objective_value
     assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR] == (0.0,)
     assert trial.user_attrs[_UNSCOREABLE_OBJECTIVES_ATTR] is True
     assert strategy.tell_count == 1
+
+
+@pytest.mark.parametrize("furnace_status", [None, "batch_cost_unavailable"])
+def test_tpe_missing_or_degraded_furnace_evidence_is_unscoreable(
+    furnace_status: str | None,
+) -> None:
+    strategy = OptunaTPEStrategy(_simple_schema(), seed=451, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+
+    strategy.tell(
+        [
+            (
+                candidate,
+                _feasible_result(
+                    candidate,
+                    1.0,
+                    2.0,
+                    furnace_status=furnace_status,
+                ),
+            )
+        ]
+    )
+
+    trial = _trials_by_candidate(strategy)[candidate.id]
+    assert trial.state.name == "FAIL"
+    assert trial.values is None
+    assert trial.user_attrs[_UNSCOREABLE_OBJECTIVES_ATTR] is True
+    assert strategy.tell_count == 1
+
+
+def test_tpe_corrupted_available_furnace_evidence_propagates() -> None:
+    strategy = OptunaTPEStrategy(_simple_schema(), seed=452, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+
+    with pytest.raises(
+        ObjectiveComputationError,
+        match="furnace amortization penalty must be non-negative",
+    ):
+        strategy.tell(
+            [
+                (
+                    candidate,
+                    _feasible_result(
+                        candidate,
+                        1.0,
+                        2.0,
+                        furnace_penalty=-1.0,
+                    ),
+                )
+            ]
+        )
 
 
 def test_tpe_scores_legacy_energy_cache_objective_against_canonical_profile() -> None:

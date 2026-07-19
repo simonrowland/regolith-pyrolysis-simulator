@@ -65,6 +65,7 @@ from simulator.optimize.objective import (
     ObjectiveProfileError,
     ObjectiveVector,
     canonical_objective_mapping,
+    cost_adjusted_objective_scores,
     objective_definitions,
     objective_scores,
     objective_value_for_metric,
@@ -874,6 +875,7 @@ def run(
         feasible,
         definitions,
         objective_getter=lambda row: row.objectives,
+        score_getter=lambda row: _record_objective_scores(row, definitions),
     )
     explore_pareto_ranked = tuple(
         sorted(explore_pareto, key=lambda row: _rank_key(row, definitions))
@@ -1202,22 +1204,43 @@ def run_certify(
             )
             + "\n"
         )
+    eligible = (record,) if record.feasible else ()
+    leaderboard = (
+        tuple(sorted(eligible, key=lambda row: _rank_key(row, definitions)))
+        if eligible
+        else (record,)
+    )
+    pareto_ranked = tuple(
+        sorted(
+            pareto_front(
+                eligible,
+                definitions,
+                objective_getter=lambda row: row.objectives,
+                score_getter=lambda row: _record_objective_scores(row, definitions),
+            ),
+            key=lambda row: _rank_key(row, definitions),
+        )
+    )
+    winner = pareto_ranked[0] if pareto_ranked else None
+    result_status = (
+        COMPLETED_STATUS if winner is not None else COMPLETED_NO_FEASIBLE_WINNER_STATUS
+    )
     artifacts = _write_artifacts(
         out,
         profile=resolved_profile,
         feedstock=feedstock,
         fidelity=fidelity,
         definitions=definitions,
-        pareto=(record,),
-        leaderboard=(record,),
-        winner=record,
+        pareto=pareto_ranked,
+        leaderboard=leaderboard,
+        winner=winner,
         schema=active_schema,
         failure_counts=MappingProxyType({}),
         search_space_identity=search_space_identity,
         config=config,
         strategy_name="certify",
         sampler_name=_resolved_strategy_sampler(config.strategy),
-        study_status=COMPLETED_STATUS,
+        study_status=result_status,
         write_store=store,
     )
     artifacts["provenance"] = provenance_path
@@ -1229,9 +1252,11 @@ def run_certify(
         store_path=store.path,
         artifacts=artifacts,
         records=(record,),
-        leaderboard=(record,),
-        pareto=(record,),
-        winner=record,
+        leaderboard=leaderboard,
+        pareto=pareto_ranked,
+        winner=winner,
+        status=result_status,
+        reason=result_status,
     )
 
 
@@ -1759,6 +1784,7 @@ def _load_study_journal(
                 feasible,
                 definitions,
                 objective_getter=lambda row: row.objectives,
+                score_getter=lambda row: _record_objective_scores(row, definitions),
             ),
             key=lambda row: _rank_key(row, definitions),
         )
@@ -2614,8 +2640,18 @@ def _run_exact_certification(
         certified_feasible,
         definitions,
         objective_getter=lambda row: row.objectives,
+        score_getter=lambda row: _record_objective_scores(row, definitions),
     )
     pareto_ranked = tuple(sorted(pareto, key=lambda row: _rank_key(row, definitions)))
+    if not pareto_ranked:
+        return _CertificationPassResult(
+            leaderboard=leaderboard,
+            pareto=(),
+            winner=None,
+            artifact=artifact,
+            status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
+            reason=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
+        )
     winner = pareto_ranked[0]
     return _CertificationPassResult(
         leaderboard=leaderboard,
@@ -4580,8 +4616,26 @@ def _rank_key(
     record: StudyRecord,
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[Any, ...]:
-    scores = objective_scores(record.objectives, definitions)
-    return (*_rank_score_components(scores), record.cache_key or "", record.candidate_id)
+    scores = _record_objective_scores(record, definitions)
+    return (
+        *_rank_score_components(scores),
+        record.cache_key or "",
+        record.candidate_id,
+    )
+
+
+def _record_objective_scores(
+    record: StudyRecord,
+    definitions: Sequence[ObjectiveDefinition],
+) -> tuple[float | None, ...]:
+    try:
+        return cost_adjusted_objective_scores(
+            record.objectives,
+            definitions,
+            product_summary=record.product_summary,
+        )
+    except ObjectiveComputationError:
+        return (None,) * len(definitions)
 
 
 def _rank_score_components(
@@ -4791,6 +4845,10 @@ def _write_artifacts(
                     encoding="utf-8",
                 )
                 tap_sidecar_written = True
+        if not winner_written:
+            winner_path.unlink(missing_ok=True)
+        if not tap_sidecar_written:
+            tap_sidecar_path.unlink(missing_ok=True)
     artifacts = {
         "manifest": manifest_path,
         "summary": summary_path,
@@ -5601,6 +5659,7 @@ def _write_aborted_artifacts_from_cache(
                 feasible,
                 definitions,
                 objective_getter=lambda row: row.objectives,
+                score_getter=lambda row: _record_objective_scores(row, definitions),
             ),
             key=lambda row: _rank_key(row, definitions),
         )

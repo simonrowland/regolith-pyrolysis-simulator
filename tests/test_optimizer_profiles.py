@@ -141,7 +141,7 @@ def test_constrained_max_profile_costs_coating_and_applies_hardware_caps() -> No
     constraints = physics_constraints_from_profile(validated)
     metrics = [objective["metric"] for objective in validated["objectives"]]
 
-    assert "coating" not in validated["constraints"]["gates"]
+    assert "coating" in validated["constraints"]["gates"]
     assert "furnace_temperature" in validated["constraints"]["gates"]
     assert "cycle_time" in validated["constraints"]["gates"]
     assert validated["constraints"]["furnace_T_max_C"] == pytest.approx(1300.0)

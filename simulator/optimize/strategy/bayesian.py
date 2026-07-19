@@ -12,6 +12,7 @@ from simulator.optimize.doe import _condition_pressure_pair_values
 from simulator.optimize.objective import (
     ObjectiveDefinition,
     canonical_objective_mapping,
+    cost_adjusted_objective_scores,
     objective_definitions,
 )
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
@@ -419,19 +420,32 @@ def _objective_values_for_definitions(
         return None
 
     mapping = _objective_mapping(scored)
-    values: list[float] = []
-    for definition in definitions:
-        if definition.metric not in mapping:
-            return None
-        value = mapping[definition.metric]
-        if value is None:
-            return None
-        values.append(value)
-    return tuple(values)
+    if any(definition.metric not in mapping or mapping[definition.metric] is None for definition in definitions):
+        return None
+    reference = getattr(scored, "run_reference", None)
+    product_summary = getattr(reference, "product_summary", {}) if reference else {}
+    if product_summary.get("furnace_amortization_status") != "available":
+        # Production results carry available furnace evidence. Direct/replayed or
+        # degraded results that do not remain unscoreable, not ranked as if capital
+        # were free. Once evidence claims to be available, malformed values are
+        # corruption and must propagate from the scorer instead of failing a trial.
+        return None
+    scores = cost_adjusted_objective_scores(
+        mapping,
+        definitions,
+        product_summary=product_summary,
+    )
+    if any(score is None for score in scores):
+        return None
+    return tuple(
+        float(score) if definition.sense == "maximize" else -float(score)
+        for score, definition in zip(scores, definitions)
+    )
 
 
 def _constraint_values(scored: "ScoredResult") -> tuple[tuple[str, ...], tuple[float, ...]]:
     margins = getattr(scored, "feasibility_margins", {}) or {}
+    feasible = bool(getattr(scored, "feasible", False))
     names: list[str] = []
     values: list[float] = []
     if isinstance(margins, Mapping):
@@ -451,13 +465,10 @@ def _constraint_values(scored: "ScoredResult") -> tuple[tuple[str, ...], tuple[f
                 isinstance(status_payload, Mapping)
                 and status_payload.get("constraint_mode") == "continuous"
             )
-            if continuous:
-                values.append(
-                    _constraint_violation_from_margin(
-                        numeric_margin,
-                        infeasible_flag=False,
-                    )
-                )
+            if continuous and feasible:
+                # Qualified coating/Knudsen margins are priced continuously in
+                # selection economics; they are not optimizer constraints.
+                values.append(0.0)
             elif has_feasible_flag:
                 if bool(getattr(raw_margin, "feasible")):
                     values.append(0.0)
@@ -476,7 +487,6 @@ def _constraint_values(scored: "ScoredResult") -> tuple[tuple[str, ...], tuple[f
                     )
                 )
 
-    feasible = bool(getattr(scored, "feasible", False))
     if not values:
         return ("feasible",), (0.0,) if feasible else (1.0,)
     if not feasible and not any(value > 0.0 for value in values):

@@ -48,6 +48,7 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
     compute_objectives,
+    furnace_amortization_cost_per_run,
 )
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.physics import physics_constraints_digest
@@ -115,6 +116,16 @@ PROFILE = {
 }
 FEEDSTOCK = "lunar_mare_low_ti"
 C6_WINDOW_REFUSAL = "c6_joint_thermodynamic_liquid_fraction_window_empty"
+
+
+def _run_reference(**kwargs: Any) -> RunReference:
+    product_summary = dict(kwargs.pop("product_summary", {}) or {})
+    product_summary.setdefault("furnace_amortization_status", "available")
+    product_summary.setdefault(
+        "furnace_amortization_batch_cost_equivalents",
+        0.0,
+    )
+    return RunReference(product_summary=product_summary, **kwargs)
 
 
 def _write_cli_physics_smoke_profile(tmp_path: Path) -> Path:
@@ -676,7 +687,7 @@ def _journal_cache_evaluator(
         feasible=True,
         objectives=objectives,
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -713,7 +724,7 @@ def _journal_any_id_evaluator(
         feasible=True,
         objectives=objectives,
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -1213,7 +1224,7 @@ def test_write_empty_artifacts_synthesizes_aborted_ledgers_from_cache(
                     )
                 ),
                 feasibility_margins={"delivered_stream_purity": _margin()},
-                run_reference=RunReference(
+                run_reference=_run_reference(
                     status="ok",
                     trace={
                         "backend_name": "alphamelts",
@@ -1363,7 +1374,7 @@ def _pressure_feasible_scored(candidate: Any) -> ScoredResult:
         feasible=True,
         objectives=objectives,
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(status="ok", trace={"backend_status": "ok"}),
+        run_reference=_run_reference(status="ok", trace={"backend_status": "ok"}),
     )
 
 
@@ -1541,7 +1552,7 @@ def test_sso2_objective_evidence_projects_reader_failure_without_field_collision
         ),
         feasibility_margins={"delivered_stream_purity": _margin()},
         failing_gates=(),
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -1685,7 +1696,7 @@ def _stored_sso2_record(
         objectives=objectives,
         feasibility_margins={"delivered_stream_purity": _margin()},
         failing_gates=(),
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -1811,7 +1822,7 @@ def _evaluator(
                 failure_category=FailureCategory.ENGINE_BUG,
                 feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
                 failing_gates=("delivered_stream_purity",),
-                run_reference=RunReference(
+                run_reference=_run_reference(
                     status="failed",
                     trace={"backend_status": "diagnostic_stub", "snapshots": ["heavy"]},
                 ),
@@ -1839,7 +1850,7 @@ def _evaluator(
                     detail="test alphamelts domain rejection",
                 )},
                 failing_gates=("backend_domain",),
-                run_reference=RunReference(
+                run_reference=_run_reference(
                     status="ok",
                     trace={
                         "backend_status": "out_of_domain",
@@ -1875,7 +1886,7 @@ def _evaluator(
                 feasible=True,
                 objectives=objectives,
                 feasibility_margins={"delivered_stream_purity": _margin()},
-                run_reference=RunReference(
+                run_reference=_run_reference(
                     status="ok",
                     trace={
                         "backend_status": "out_of_domain",
@@ -1916,7 +1927,7 @@ def _evaluator(
                     )
                 },
                 failing_gates=("non_finite_payload",),
-                run_reference=RunReference(
+                run_reference=_run_reference(
                     status="failed",
                     error_message="PT0NonFinitePayload: $.SCSS_ppm inf",
                     trace={"backend_status": "ok", "snapshots": ["heavy"]},
@@ -1942,7 +1953,7 @@ def _evaluator(
                     )
                 },
                 failing_gates=("inventory_overdraw",),
-                run_reference=RunReference(
+                run_reference=_run_reference(
                     status="failed",
                     error_message="ProposalRejected: balance would be -0.125 kg",
                     trace={"backend_status": "ok", "snapshots": ["heavy"]},
@@ -1959,7 +1970,7 @@ def _evaluator(
                 failure_category=FailureCategory.INFEASIBLE_RECIPE,
                 feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
                 failing_gates=("delivered_stream_purity",),
-                run_reference=RunReference(
+                run_reference=_run_reference(
                     status="ok",
                     trace={"backend_status": "diagnostic_stub", "snapshots": ["heavy"]},
                 ),
@@ -1977,7 +1988,7 @@ def _evaluator(
             feasible=True,
             objectives=objectives,
             feasibility_margins={"delivered_stream_purity": _margin()},
-            run_reference=RunReference(
+            run_reference=_run_reference(
                 status="ok",
                 trace={
                     "backend_status": "ok",
@@ -2022,7 +2033,7 @@ def _seed_safe_certified_evaluator(
             )
         ),
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -2265,6 +2276,12 @@ class _ClosedLoopSim:
             additives_kg={},
             snapshots=snapshots,
             total_hours=configured_hours,
+            cost_rollup={
+                "run_input_cost": {
+                    "allocation_status": "allocated_by_product_mass",
+                    "owner_ratify_money_projection": 10.0,
+                }
+            },
         )
         self.melt = SimpleNamespace(hour=configured_hours)
         self.energy_electrical_plus_evaporation_cumulative_kWh = 1.0
@@ -2408,6 +2425,11 @@ def _closed_loop_best_tap_profile() -> dict[str, Any]:
 
 
 def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path) -> None:
+    (tmp_path / "winner.tap-truncated.json").write_text(
+        '{"stale": "tap"}\n',
+        encoding="utf-8",
+    )
+
     result = study.run(
         PROFILE,
         FEEDSTOCK,
@@ -2423,6 +2445,7 @@ def test_budget_three_stub_e2e_writes_artifacts_and_round_trips_winner(tmp_path)
     assert (tmp_path / "pareto.json").exists()
     assert (tmp_path / "leaderboard.csv").exists()
     assert (tmp_path / "winner.recipe.yaml").exists()
+    assert not (tmp_path / "winner.tap-truncated.json").exists()
     assert (tmp_path / "provenance.jsonl").exists()
     assert (tmp_path / "cache.sqlite").exists()
     assert result.winner.candidate_id == "random-7-000002"
@@ -2548,7 +2571,7 @@ def _legacy_energy_cached_scored(
             )
         ),
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -2958,7 +2981,7 @@ def test_study_records_seed_provenance_and_dual_winner_artifacts(tmp_path) -> No
                 )
             ),
             feasibility_margins={"delivered_stream_purity": _margin()},
-            run_reference=RunReference(
+            run_reference=_run_reference(
                 status="ok",
                 trace={"backend_status": "ok"},
                 backend_status="ok",
@@ -3193,6 +3216,253 @@ def test_leaderboard_separates_certified_envelope_from_preference_score(tmp_path
     ]
 
 
+def test_furnace_cost_changes_study_ranking_without_hard_block() -> None:
+    definitions = study.objective_definitions(PROFILE)
+
+    def record(
+        candidate_id: str,
+        oxygen: float,
+        margin: float,
+        penalty: float,
+    ) -> study.StudyRecord:
+        return study.StudyRecord(
+            candidate_id=candidate_id,
+            patch=RecipePatch({}),
+            feasible=True,
+            status="ok",
+            objectives={
+                "oxygen_kg": oxygen,
+                ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: 2.0,
+            },
+            feasibility_margins={
+                "coating": {
+                    "feasible": True,
+                    "margin": margin,
+                    "status_payload": {"constraint_mode": "continuous"},
+                }
+            },
+            cache_key=f"cache-{candidate_id}",
+            product_summary={
+                "furnace_amortization_status": "available",
+                "furnace_amortization_batch_cost_equivalents": penalty,
+            },
+        )
+
+    violates = record("violates", 100.0, -9.8, 2_500.0)
+    satisfies = record("satisfies", 10.0, 1.0, 0.0)
+    records = (violates, satisfies)
+
+    ranked = sorted(records, key=lambda row: study._rank_key(row, definitions))
+    front = study.pareto_front(
+        records,
+        definitions,
+        objective_getter=lambda row: row.objectives,
+        score_getter=lambda row: study._record_objective_scores(row, definitions),
+    )
+
+    assert [row.candidate_id for row in ranked] == ["satisfies", "violates"]
+    assert [row.candidate_id for row in front] == ["satisfies"]
+    assert violates.feasible is True
+    assert violates.feasibility_margins["coating"]["margin"] == -9.8
+
+    low_multiplier_records = (
+        replace(
+            violates,
+            product_summary={
+                "furnace_amortization_status": "available",
+                "furnace_amortization_batch_cost_equivalents": 1.0,
+            },
+        ),
+        replace(
+            satisfies,
+            product_summary={
+                "furnace_amortization_status": "available",
+                "furnace_amortization_batch_cost_equivalents": 0.0,
+            },
+        ),
+    )
+    assert sorted(
+        low_multiplier_records,
+        key=lambda row: study._rank_key(row, definitions),
+    )[0].candidate_id == "violates"
+
+
+def test_degenerate_furnace_lifetimes_complete_study_with_bounded_ordering(
+    tmp_path,
+) -> None:
+    cases = (
+        ("none", None, True),
+        ("nan", math.nan, True),
+        ("infinite", math.inf, True),
+        ("negative", -1.0, True),
+        ("instant-death", 0.0, True),
+        ("tiny", 1e-9, True),
+        ("one-campaign", 1.0, True),
+        ("clean-nan", math.nan, False),
+    )
+
+    def evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        label, lifetime, has_positive_fouling = cases[_sequence(candidate_id)]
+        penalty = furnace_amortization_cost_per_run(
+            20.0,
+            lifetime,
+            500.0,
+            1.0,
+            has_positive_fouling=has_positive_fouling,
+        ) / 20.0
+        spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=True,
+            objectives=ObjectiveVector(
+                (
+                    ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),
+                    ObjectiveValue("energy_kWh", "minimize", 2.0, "kWh", ordinal=1),
+                )
+            ),
+            feasibility_margins={"delivered_stream_purity": _margin()},
+            run_reference=_run_reference(
+                status="ok",
+                trace={
+                    "backend_status": "ok",
+                    "backend_authoritative": True,
+                    "snapshots": [{"mass_balance_error_pct": 0.0}],
+                },
+                product_summary={
+                    "case": label,
+                    "campaigns_to_resinter": lifetime,
+                    "has_positive_qualified_fouling": has_positive_fouling,
+                    "furnace_amortization_status": "available",
+                    "furnace_amortization_batch_cost_equivalents": penalty,
+                },
+                backend_status="ok",
+                backend_authoritative=True,
+            ),
+        )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        len(cases),
+        tmp_path / "degenerate-lifetime",
+        seed=7,
+        evaluator=evaluator,
+    )
+
+    assert result.status == "completed"
+    by_case = {record.product_summary["case"]: record for record in result.records}
+    penalties = {
+        label: record.product_summary["furnace_amortization_batch_cost_equivalents"]
+        for label, record in by_case.items()
+    }
+    assert all(math.isfinite(value) for value in penalties.values())
+    assert penalties["clean-nan"] == 0.0
+    assert penalties["none"] == penalties["infinite"] == 1.0
+    assert penalties["nan"] == penalties["negative"] == penalties["instant-death"]
+    assert penalties["instant-death"] > penalties["tiny"]
+    assert penalties["tiny"] >= penalties["one-campaign"] >= penalties["infinite"]
+    assert result.winner.product_summary["case"] == "clean-nan"
+
+
+def test_degraded_furnace_evidence_is_excluded_from_study_ranking() -> None:
+    definitions = study.objective_definitions(PROFILE)
+
+    def record(
+        candidate_id: str,
+        oxygen: float,
+        penalty: float,
+        *,
+        status: str = "available",
+    ) -> study.StudyRecord:
+        return study.StudyRecord(
+            candidate_id=candidate_id,
+            patch=RecipePatch({}),
+            feasible=True,
+            status="ok",
+            objectives={
+                "oxygen_kg": oxygen,
+                ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC: 2.0,
+            },
+            feasibility_margins={},
+            cache_key=f"cache-{candidate_id}",
+            product_summary={
+                "furnace_amortization_status": status,
+                "furnace_amortization_batch_cost_equivalents": penalty,
+            },
+        )
+
+    correct_winner = record("correct-winner", 10.0, 0.0)
+    normal_loser = record("normal-loser", 9.0, 0.0)
+    degraded = record(
+        "degraded",
+        100.0,
+        0.0,
+        status="batch_cost_unavailable",
+    )
+    records = (degraded, normal_loser, correct_winner)
+
+    ranked = tuple(sorted(records, key=lambda row: study._rank_key(row, definitions)))
+    front = study.pareto_front(
+        records,
+        definitions,
+        objective_getter=lambda row: row.objectives,
+        score_getter=lambda row: study._record_objective_scores(row, definitions),
+    )
+
+    assert [row.candidate_id for row in ranked] == [
+        "correct-winner",
+        "normal-loser",
+        "degraded",
+    ]
+    assert [row.candidate_id for row in front] == ["correct-winner"]
+    with pytest.raises(study.ObjectiveComputationError, match="batch_cost_unavailable"):
+        study.cost_adjusted_objective_scores(
+            degraded.objectives,
+            definitions,
+            product_summary=degraded.product_summary,
+        )
+
+    spec = _scope_spec()
+    fresh = ScoredResult(
+        candidate_id="fresh-degraded",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue("oxygen_kg", "maximize", 100.0, "kg", ordinal=0),
+                ObjectiveValue(
+                    ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+                    "minimize",
+                    2.0,
+                    "kWh",
+                    ordinal=1,
+                ),
+            )
+        ),
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=_run_reference(
+            status="ok",
+            trace={"backend_status": "ok"},
+            product_summary=degraded.product_summary,
+        ),
+    )
+    study._assert_honest_result(fresh, definitions)
+
+
 def _nullable_position_profile() -> dict[str, Any]:
     return {
         **PROFILE,
@@ -3287,6 +3557,10 @@ def _nullable_position_record(candidate_id: str) -> study.StudyRecord:
         },
         feasibility_margins={},
         cache_key=f"cache-{candidate_id}",
+        product_summary={
+            "furnace_amortization_status": "available",
+            "furnace_amortization_batch_cost_equivalents": 0.0,
+        },
     )
 
 
@@ -3309,7 +3583,7 @@ def _nullable_position_evaluator(
         feasible=True,
         objectives=_nullable_position_objectives(candidate_id, definitions),
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -3374,7 +3648,7 @@ def _pareto_certification_evaluator(
             )
         ),
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -3434,7 +3708,7 @@ def _single_objective_tie_evaluator(
             (ObjectiveValue("oxygen_kg", "maximize", oxygen, "kg", ordinal=0),)
         ),
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -3540,7 +3814,7 @@ def test_two_phase_certification_preserves_seed_lineage_for_dual_winner(
                 )
             ),
             feasibility_margins={"delivered_stream_purity": _margin()},
-            run_reference=RunReference(
+            run_reference=_run_reference(
                 status="ok",
                 trace={"backend_status": "ok"},
                 backend_status="ok",
@@ -3802,7 +4076,7 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
             )
         ),
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             product_summary={
                 "campaigns_to_resinter": "resinter_threshold_kg / 100",
@@ -3931,7 +4205,7 @@ def test_tap_truncated_partial_coating_projection_fails_loud() -> None:
             )
         ),
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             product_summary={
                 "campaigns_to_resinter": "resinter_threshold_kg / 100",
@@ -3987,7 +4261,7 @@ def test_backend_status_field_survives_strip_and_store_for_real_backend(tmp_path
             )
         ),
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={"snapshots": [{"mass_balance_error_pct": 0.0}]},
             product_summary={
@@ -4051,7 +4325,7 @@ def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_pa
                     detail="no wall deposit" if index == 1 else "finite deposit",
                 ),
             },
-            run_reference=RunReference(
+            run_reference=_run_reference(
                 status="ok",
                 trace={
                     "backend_status": "ok",
@@ -4130,7 +4404,7 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
             )
         ),
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -4507,7 +4781,7 @@ def test_winner_tie_determinism_uses_cache_key_then_candidate_id(tmp_path) -> No
                 )
             ),
             feasibility_margins={"delivered_stream_purity": _margin()},
-            run_reference=RunReference(
+            run_reference=_run_reference(
                 status="ok",
                 trace={"backend_status": "diagnostic_stub"},
             ),
@@ -4677,7 +4951,7 @@ def test_typed_physics_refusals_are_stored_and_study_continues(tmp_path) -> None
                 )
             ),
             feasibility_margins={"delivered_stream_purity": _margin()},
-            run_reference=RunReference(status="ok", trace={"backend_status": "ok"}),
+            run_reference=_run_reference(status="ok", trace={"backend_status": "ok"}),
         )
 
     result = study.run(
@@ -4837,7 +5111,7 @@ def test_infeasible_missing_metadata_aborts_before_ok_artifacts(tmp_path) -> Non
             feasible=False,
             failure_category=None,
             feasibility_margins={},
-            run_reference=RunReference(status="ok"),
+            run_reference=_run_reference(status="ok"),
         )
         produced_status.write_text(study._status(result), encoding="utf-8")
         return result
@@ -4878,7 +5152,7 @@ def test_nonfinite_objective_aborts_without_pareto(tmp_path) -> None:
             feasible=True,
             objectives={"oxygen_kg": math.nan, "energy_kWh": 1.0},
             feasibility_margins={"delivered_stream_purity": _margin()},
-            run_reference=RunReference(
+            run_reference=_run_reference(
                 status="ok",
                 trace={"backend_status": "diagnostic_stub"},
             ),
@@ -5273,7 +5547,7 @@ def test_cli_constrained_max_overlay_forwards_hardware_caps(tmp_path, monkeypatc
     profile = captured["profile"]
     metrics = {objective["metric"] for objective in profile["objectives"]}
     assert profile["profile_id"].endswith("-constrained-max")
-    assert "coating" not in profile["constraints"]["gates"]
+    assert "coating" in profile["constraints"]["gates"]
     assert "furnace_temperature" in profile["constraints"]["gates"]
     assert "cycle_time" in profile["constraints"]["gates"]
     assert profile["constraints"]["furnace_T_max_C"] == pytest.approx(1300.0)
@@ -5412,7 +5686,7 @@ def test_constrained_max_nullable_lifespan_persists_and_round_trips(
             objectives=ObjectiveVector(tuple(values), evidence=evidence),
             feasibility_margins={"delivered_stream_purity": _margin()},
             failing_gates=(),
-            run_reference=RunReference(
+            run_reference=_run_reference(
                 status="ok",
                 trace={
                     "backend_status": "ok",
@@ -5599,7 +5873,7 @@ def _two_phase_evaluate_patch(
         feasible=True,
         objectives=objectives,
         feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=RunReference(
+        run_reference=_run_reference(
             status="ok",
             trace={
                 "backend_status": "ok",
@@ -5641,7 +5915,7 @@ def _two_phase_exact_flip_evaluate_patch(
             failure_category=FailureCategory.INFEASIBLE_RECIPE,
             feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
             failing_gates=("delivered_stream_purity",),
-            run_reference=RunReference(
+            run_reference=_run_reference(
                 status="ok",
                 trace={
                     "backend_status": "ok",
@@ -5690,7 +5964,7 @@ def _two_phase_exact_all_infeasible_evaluate_patch(
             failure_category=FailureCategory.INFEASIBLE_RECIPE,
             feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
             failing_gates=("delivered_stream_purity",),
-            run_reference=RunReference(
+            run_reference=_run_reference(
                 status="ok",
                 trace={
                     "backend_status": "ok",
@@ -5716,6 +5990,96 @@ def _two_phase_exact_all_infeasible_evaluate_patch(
         candidate_id=candidate_id,
         **kwargs,
     )
+
+
+def _with_furnace_status(
+    scored: ScoredResult,
+    status: str,
+) -> ScoredResult:
+    assert scored.run_reference is not None
+    product_summary = dict(scored.run_reference.product_summary)
+    product_summary["furnace_amortization_status"] = status
+    return replace(
+        scored,
+        run_reference=replace(
+            scored.run_reference,
+            product_summary=product_summary,
+        ),
+    )
+
+
+def _two_phase_exact_all_degraded_evaluate_patch(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    scored = _two_phase_evaluate_patch(
+        patch,
+        feedstock,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        **kwargs,
+    )
+    tier_ceiling = profile.get("fidelities", {}).get(fidelity, {}).get(
+        "cache_tier_ceiling",
+        "cached_interpolated",
+    )
+    if tier_ceiling == "cached_interpolated":
+        return scored
+    return _with_furnace_status(scored, "batch_cost_unavailable")
+
+
+def _all_degraded_evaluate_patch(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    return _with_furnace_status(
+        _two_phase_evaluate_patch(
+            patch,
+            feedstock,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            **kwargs,
+        ),
+        "batch_cost_unavailable",
+    )
+
+
+def _two_phase_exact_best_raw_candidate_degraded_evaluate_patch(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    *,
+    profile: Mapping[str, Any],
+    candidate_id: str | None = None,
+    **kwargs: Any,
+) -> ScoredResult:
+    scored = _two_phase_evaluate_patch(
+        patch,
+        feedstock,
+        fidelity,
+        profile=profile,
+        candidate_id=candidate_id,
+        **kwargs,
+    )
+    tier_ceiling = profile.get("fidelities", {}).get(fidelity, {}).get(
+        "cache_tier_ceiling",
+        "cached_interpolated",
+    )
+    if tier_ceiling != "cached_interpolated" and candidate_id == "random-7-000004":
+        return _with_furnace_status(scored, "batch_cost_unavailable")
+    return scored
 
 
 def test_two_phase_loop_certifies_top_k_and_reports_certified_winner(tmp_path) -> None:
@@ -5861,6 +6225,153 @@ def test_two_phase_certification_all_infeasible_completes_no_winner(tmp_path) ->
     assert [row["is_winner"] for row in leaderboard_rows] == [
         "False" for _ in range(certification["certification_pool_size"])
     ]
+    assert not (out / "winner.recipe.yaml").exists()
+
+
+def test_two_phase_certification_all_degraded_completes_no_winner(tmp_path) -> None:
+    out = tmp_path / "two-phase-exact-all-degraded"
+    out.mkdir()
+    (out / "winner.recipe.yaml").write_text("stale: winner\n", encoding="utf-8")
+    (out / "winner.tap-truncated.json").write_text(
+        '{"stale": "tap"}\n',
+        encoding="utf-8",
+    )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        5,
+        out,
+        seed=7,
+        evaluator=_two_phase_exact_all_degraded_evaluate_patch,
+        two_phase_certify={"enabled": True, "top_k": 3},
+    )
+
+    assert result.status == study.COMPLETED_NO_FEASIBLE_WINNER_STATUS
+    assert result.reason == study.COMPLETED_NO_FEASIBLE_WINNER_STATUS
+    assert result.winner is None
+    assert result.pareto == ()
+    assert result.leaderboard
+    assert {record.feasible for record in result.leaderboard} == {True}
+    assert {
+        record.product_summary["furnace_amortization_status"]
+        for record in result.leaderboard
+    } == {"batch_cost_unavailable"}
+    pareto_payload = json.loads((out / "pareto.json").read_text())
+    leaderboard_rows = list(csv.DictReader((out / "leaderboard.csv").open()))
+    assert pareto_payload["status"] == study.COMPLETED_NO_FEASIBLE_WINNER_STATUS
+    assert pareto_payload["pareto"] == []
+    assert pareto_payload["winner_candidate_id"] is None
+    assert [row["is_winner"] for row in leaderboard_rows] == [
+        "False" for _ in result.leaderboard
+    ]
+    assert not (out / "winner.recipe.yaml").exists()
+    assert not (out / "winner.tap-truncated.json").exists()
+
+
+def test_two_phase_certification_excludes_degraded_raw_leader(tmp_path) -> None:
+    out = tmp_path / "two-phase-exact-mixed-furnace-evidence"
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        5,
+        out,
+        seed=7,
+        evaluator=_two_phase_exact_best_raw_candidate_degraded_evaluate_patch,
+        two_phase_certify={"enabled": True, "top_k": 3},
+    )
+
+    assert result.winner is not None
+    assert result.winner.candidate_id != "random-7-000004"
+    assert result.winner.product_summary["furnace_amortization_status"] == "available"
+    degraded = next(
+        record
+        for record in result.leaderboard
+        if record.candidate_id == "random-7-000004"
+    )
+    assert (
+        degraded.product_summary["furnace_amortization_status"]
+        == "batch_cost_unavailable"
+    )
+    assert all(
+        record.candidate_id != "random-7-000004" for record in result.pareto
+    )
+
+
+def test_run_certify_degraded_result_completes_no_winner(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    source = tmp_path / "certify-source"
+    out = tmp_path / "certify-degraded"
+    out.mkdir()
+    (out / "winner.recipe.yaml").write_text("stale: winner\n", encoding="utf-8")
+    (out / "winner.tap-truncated.json").write_text(
+        '{"stale": "tap"}\n',
+        encoding="utf-8",
+    )
+    stored = _write_prior_warm_start_run(source, RecipePatch({}))
+    assert stored.eval_spec is not None
+    key = cache_key(stored.eval_spec)
+    degraded = _with_furnace_status(stored, "batch_cost_unavailable")
+    monkeypatch.setattr(
+        study,
+        "_evaluate_one_supervised",
+        lambda *args, **kwargs: degraded,
+    )
+    monkeypatch.setattr(
+        study,
+        "_materialized_record_patch",
+        lambda *args, **kwargs: {},
+    )
+
+    result = study.run_certify(
+        PROFILE,
+        FEEDSTOCK,
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        source / "cache.sqlite",
+        key,
+        out,
+    )
+
+    assert result.status == study.COMPLETED_NO_FEASIBLE_WINNER_STATUS
+    assert result.reason == study.COMPLETED_NO_FEASIBLE_WINNER_STATUS
+    assert result.winner is None
+    assert result.pareto == ()
+    assert result.leaderboard[0].product_summary[
+        "furnace_amortization_status"
+    ] == "batch_cost_unavailable"
+    assert not (out / "winner.recipe.yaml").exists()
+    assert not (out / "winner.tap-truncated.json").exists()
+
+
+def test_main_run_all_degraded_completes_no_winner(tmp_path) -> None:
+    out = tmp_path / "main-all-degraded"
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "stub",
+        1,
+        3,
+        out,
+        seed=7,
+        evaluator=_all_degraded_evaluate_patch,
+    )
+
+    assert result.status == study.COMPLETED_NO_FEASIBLE_WINNER_STATUS
+    assert result.reason == study.COMPLETED_NO_FEASIBLE_WINNER_STATUS
+    assert result.winner is None
+    assert result.pareto == ()
+    assert result.leaderboard
     assert not (out / "winner.recipe.yaml").exists()
 
 

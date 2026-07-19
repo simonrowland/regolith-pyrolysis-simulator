@@ -25,6 +25,18 @@ parameters:
     rationale: "Fallback only: furnace_resinter_cost_usd divided by a 100-campaign placeholder when campaigns_to_resinter is unavailable."
     source_tag: "owner ratified 2026-07-12: marginal-cost accounting bootstrap derived as 5000 USD / 100 campaigns pending measured campaigns-to-resinter"
 
+  furnace_lifetime_cost_multiplier:
+    value: 500.0
+    units: batch-cost multiples
+    rationale: "Advanced edge-case exploration control: furnace lifetime value as a multiple of one typical batch process cost; lower only to surface qualified fouling recipes when extraction is otherwise intractable."
+    source_tag: "owner final ratification 2026-07-19: furnace capital value equals 500 typical batch process costs by default; advanced users may relax for edge-case exploration"
+
+  min_fouling_penalty:
+    value: 1.0
+    units: batch-cost multiples
+    rationale: "Advanced optimizer control: any positive qualified deposition pays at least one typical batch process cost; exactly zero deposition remains free."
+    source_tag: "owner ratified 2026-07-19: zero-fouling bright-line; positive qualified fouling floor defaults to one typical batch process cost"
+
   generic_reagent_cost_per_kg:
     value: 10.0
     units: USD/kg

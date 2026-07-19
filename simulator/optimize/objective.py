@@ -38,6 +38,11 @@ from simulator.trace import wall_deposit_kg_by_zone_species
 
 
 _MISSING = object()
+FURNACE_INSTANT_DEATH_FACTOR = 10.0
+# Economics resolution: one millionth of the coating model's smallest
+# operational lifetime observation (one completed campaign). The model's
+# EPSILON_KG is mass-space and cannot dimensionally define a campaign floor.
+FURNACE_MIN_MEANINGFUL_LIFETIME_CAMPAIGNS = 1.0e-6
 VALID_OBJECTIVE_SENSES = {"minimize", "maximize"}
 COMPOSITION_TARGET_TYPE = "composition_target"
 COMPOSITION_TARGET_METRIC_PREFIX = "composition_target:"
@@ -1841,6 +1846,7 @@ def _tap_coating_product_summary(
                 "wall_deposit_remobilization_by_segment_species": MappingProxyType({}),
                 "campaigns_to_resinter": "infinite",
                 "aggregate_campaigns_to_resinter": "infinite",
+                "has_positive_qualified_fouling": False,
                 **_furnace_lifespan_cost_summary_from_raw(
                     raw_by_segment,
                     campaigns_elapsed=campaigns_elapsed,
@@ -1889,6 +1895,9 @@ def _tap_coating_product_summary(
             "aggregate_campaigns_to_resinter": _aggregate_campaigns_to_resinter(
                 raw_by_segment,
                 campaigns_elapsed=campaigns_elapsed,
+            ),
+            "has_positive_qualified_fouling": _has_positive_wall_deposit(
+                raw_by_segment
             ),
             **_furnace_lifespan_cost_summary_from_raw(
                 raw_by_segment,
@@ -2782,7 +2791,7 @@ def _pool_species_mol(
     pool_provenance: dict[str, Any] | None = None,
     pool_projection: Mapping[str, Mapping[str, float]] | None = None,
     tap_provenance: str | None = None,
-) -> Mapping[str, float]:
+) -> Mapping[str, Any]:
     if pool_projection is not None:
         projected = pool_projection.get(pool)
         if projected is None:
@@ -3362,6 +3371,13 @@ def dominates(
 
     left_scores = objective_scores(left, definitions)
     right_scores = objective_scores(right, definitions)
+    return _scores_dominate(left_scores, right_scores)
+
+
+def _scores_dominate(
+    left_scores: Sequence[float | None],
+    right_scores: Sequence[float | None],
+) -> bool:
     comparable = tuple(
         (a, b)
         for a, b in zip(left_scores, right_scores)
@@ -3372,20 +3388,159 @@ def dominates(
     )
 
 
+def _normalize_campaigns_to_resinter(campaigns_to_resinter: Any) -> float:
+    if campaigns_to_resinter is None or (
+        isinstance(campaigns_to_resinter, str)
+        and campaigns_to_resinter == "infinite"
+    ):
+        return math.inf
+    try:
+        campaigns = float(campaigns_to_resinter)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ObjectiveComputationError(
+            "campaigns_to_resinter must be numeric, None, or 'infinite'"
+        ) from exc
+    # Positive fouling with an unusable signed lifetime is physically no better
+    # than an observed zero lifetime; keep that failure finite and rankable.
+    if math.isnan(campaigns) or campaigns < 0.0:
+        return 0.0
+    return campaigns
+
+
+def furnace_amortization_cost_per_run(
+    batch_cost: float,
+    campaigns_to_resinter: Any,
+    multiplier: float,
+    min_fouling_penalty: float,
+    *,
+    has_positive_fouling: bool,
+) -> float:
+    """Price one run's share of the furnace lifetime."""
+
+    if not has_positive_fouling:
+        return 0.0
+    campaigns = _normalize_campaigns_to_resinter(campaigns_to_resinter)
+    batch = _finite_float(batch_cost, "typical_batch_process_cost_usd")
+    value_multiplier = _finite_float(multiplier, "furnace_lifetime_cost_multiplier")
+    minimum = _finite_float(min_fouling_penalty, "min_fouling_penalty")
+    if batch <= 0.0:
+        raise ObjectiveComputationError("furnace amortization batch cost must be positive")
+    if value_multiplier < 0.0:
+        raise ObjectiveComputationError("furnace amortization multiplier must be non-negative")
+    if minimum <= 0.0:
+        raise ObjectiveComputationError("min_fouling_penalty must be positive")
+    if math.isinf(campaigns):
+        return _finite_float(
+            minimum * batch,
+            "furnace amortization cost",
+        )
+    if campaigns == 0.0:
+        effective_campaigns = FURNACE_MIN_MEANINGFUL_LIFETIME_CAMPAIGNS
+        clamped_cost = max(
+            minimum * batch,
+            value_multiplier * batch / effective_campaigns,
+        )
+        return _finite_float(
+            clamped_cost * FURNACE_INSTANT_DEATH_FACTOR,
+            "instant-death furnace amortization cost",
+        )
+    # Premise: the coating model resolves lifetime as a continuous ratio but its
+    # smallest operational observation is one completed campaign; this economics
+    # policy uses 1 ppm of that observation as a conservative lower resolution.
+    # Smaller positive ratios are economically equivalent. Clamp c to
+    # c_eff=max(c, 1e-6), then price
+    # max(floor*batch, M*batch/c_eff). Because c_eff is non-decreasing in c and
+    # reciprocal lifetime is non-increasing, cost is non-increasing for c>0;
+    # c=0 multiplies the clamped limit by FACTOR>=1, so no instant-death notch exists.
+    # Units: (batches * USD/batch) / campaigns = USD/run. Sanity table for M=500,
+    # batch=$20, floor=1: c=(0, 1e-6, 1, 500, inf) ->
+    # ($1e11, $1e10, $1e4, $20, $20). Normal c>=1 economics are unchanged.
+    effective_campaigns = max(
+        campaigns,
+        FURNACE_MIN_MEANINGFUL_LIFETIME_CAMPAIGNS,
+    )
+    return _finite_float(
+        max(minimum * batch, value_multiplier * batch / effective_campaigns),
+        "furnace amortization cost",
+    )
+
+
+def cost_adjusted_objective_scores(
+    objectives: ObjectiveLike,
+    definitions: Sequence[ObjectiveDefinition],
+    *,
+    product_summary: Mapping[str, Any] | None,
+) -> tuple[float | None, ...]:
+    """Apply the continuous furnace cost in batch-equivalent objective units."""
+
+    scores = objective_scores(objectives, definitions)
+    summary = product_summary or {}
+    status = summary.get("furnace_amortization_status")
+    if status != "available":
+        raise ObjectiveComputationError(
+            f"furnace amortization unavailable: {status}"
+        )
+    if "furnace_amortization_batch_cost_equivalents" not in summary:
+        raise ObjectiveComputationError("furnace amortization penalty is missing")
+    raw_penalty = summary["furnace_amortization_batch_cost_equivalents"]
+    penalty = _finite_float(raw_penalty, "furnace amortization penalty")
+    if penalty < 0.0:
+        raise ObjectiveComputationError("furnace amortization penalty must be non-negative")
+    cost_factor = 1.0 + penalty
+    adjusted: list[float | None] = []
+    for score, definition in zip(scores, definitions):
+        if score is None:
+            adjusted.append(None)
+            continue
+        raw_value = score if definition.sense == "maximize" else -score
+        # Shipped selection metrics are physical mass, time, energy, cost, or
+        # fractions and therefore non-negative. The multiplicative transform is
+        # valid only on that domain. TODO: use a sign-safe additive transform if a
+        # legitimately signed selection objective is introduced.
+        if raw_value < 0.0:
+            raise ObjectiveComputationError(
+                f"objective {definition.metric!r} must be non-negative for cost adjustment"
+            )
+        transformed = (
+            score / cost_factor
+            if definition.sense == "maximize"
+            else score * cost_factor
+        )
+        if raw_value > 0.0 and transformed == 0.0:
+            raise ObjectiveComputationError(
+                f"cost-adjusted objective {definition.metric!r} underflowed to zero"
+            )
+        adjusted.append(
+            _finite_float(
+                transformed,
+                f"cost-adjusted objective {definition.metric!r}",
+            )
+        )
+    return tuple(adjusted)
+
+
 def pareto_front(
     items: Sequence[T],
     definitions: Sequence[ObjectiveDefinition],
     *,
     objective_getter: Callable[[T], ObjectiveLike],
+    score_getter: Callable[[T], Sequence[float | None]] | None = None,
 ) -> tuple[T, ...]:
-    """Stable non-dominated subset using profile objective order and directions."""
+    """Stable non-dominated subset using profile objective directions."""
 
+    scores = tuple(
+        tuple(score_getter(item))
+        if score_getter is not None
+        else objective_scores(objective_getter(item), definitions)
+        for item in items
+    )
     front: list[T] = []
     for index, item in enumerate(items):
-        objectives = objective_getter(item)
+        if all(score is None for score in scores[index]):
+            continue
         if any(
             other_index != index
-            and dominates(objective_getter(other), objectives, definitions)
+            and _scores_dominate(scores[other_index], scores[index])
             for other_index, other in enumerate(items)
         ):
             continue
@@ -3393,7 +3548,13 @@ def pareto_front(
     return tuple(front)
 
 
-def product_summary(run_execution: Any, profile: Mapping[str, Any]) -> Mapping[str, Any]:
+def product_summary(
+    run_execution: Any,
+    profile: Mapping[str, Any],
+    *,
+    cost_parameters: Mapping[str, Any] | CostParameters | None = None,
+    coating_margin: Any = None,
+) -> Mapping[str, Any]:
     sim = getattr(run_execution, "simulator", run_execution)
     product_classes = product_classes_summary(sim, profile)
     product_bins = _product_bins(product_classes)
@@ -3414,7 +3575,111 @@ def product_summary(run_execution: Any, profile: Mapping[str, Any]) -> Mapping[s
         "target_species_yield_report": target_species_yield_report(sim),
     }
     summary.update(_coating_product_summary(run_execution))
+    lifetime, has_positive_fouling = _selection_coating_lifetime(
+        coating_margin,
+        fallback_campaigns=summary.get("campaigns_to_resinter", math.inf),
+        fallback_positive=bool(summary.get("has_positive_qualified_fouling", False)),
+    )
+    summary["campaigns_to_resinter_worst_segment"] = lifetime
+    summary["has_positive_qualified_fouling"] = has_positive_fouling
+    if cost_parameters is not None:
+        summary.update(
+            _furnace_amortization_summary(
+                sim,
+                lifetime,
+                has_positive_fouling=has_positive_fouling,
+                cost_parameters=cost_parameters,
+            )
+        )
     return MappingProxyType(summary)
+
+
+def _selection_coating_lifetime(
+    coating_margin: Any,
+    *,
+    fallback_campaigns: Any,
+    fallback_positive: bool,
+) -> tuple[Any, bool]:
+    payload = getattr(coating_margin, "status_payload", {}) or {}
+    if not isinstance(payload, Mapping):
+        return fallback_campaigns, fallback_positive
+    if payload.get("coating_constraint_mode") == "no_unqualified_deposition":
+        return fallback_campaigns, fallback_positive
+    if "campaigns_to_resinter_worst_segment" not in payload:
+        return fallback_campaigns, fallback_positive
+    campaigns = payload["campaigns_to_resinter_worst_segment"]
+    rate = payload.get("wall_deposit_kg_per_campaign")
+    if isinstance(rate, bool) or not isinstance(rate, int | float):
+        raise ObjectiveComputationError(
+            "qualified coating lifetime missing numeric wall_deposit_kg_per_campaign"
+        )
+    numeric_rate = float(rate)
+    if not math.isfinite(numeric_rate) or numeric_rate < 0.0:
+        raise ObjectiveComputationError(
+            "qualified coating deposition rate must be finite and non-negative"
+        )
+    return campaigns, numeric_rate > 0.0
+
+
+def _furnace_amortization_summary(
+    sim: Any,
+    campaigns_to_resinter: Any,
+    *,
+    has_positive_fouling: bool,
+    cost_parameters: Mapping[str, Any] | CostParameters | None,
+) -> Mapping[str, Any]:
+    parameters = (
+        cost_parameters
+        if isinstance(cost_parameters, CostParameters)
+        else cost_parameters_from_mapping(cost_parameters)
+    )
+    try:
+        run_input = _cost_rollup_run_input(sim)
+    except ObjectiveComputationError:
+        return MappingProxyType({
+            "furnace_amortization_status": "batch_cost_unavailable",
+            "furnace_amortization_batch_cost_equivalents": 0.0,
+        })
+    allocation_status = str(run_input.get("allocation_status", ""))
+    if "unavailable" in allocation_status:
+        return MappingProxyType({
+            "furnace_amortization_status": "batch_cost_unavailable",
+            "furnace_amortization_batch_cost_equivalents": 0.0,
+        })
+    try:
+        batch_cost = _finite_float(
+            run_input.get("owner_ratify_money_projection"),
+            "cost_rollup.run_input_cost.owner_ratify_money_projection",
+        )
+    except ObjectiveComputationError:
+        return MappingProxyType({
+            "furnace_amortization_status": "batch_cost_unavailable",
+            "furnace_amortization_batch_cost_equivalents": 0.0,
+        })
+    if batch_cost < 0.0 or (has_positive_fouling and batch_cost == 0.0):
+        return MappingProxyType({
+            "furnace_amortization_status": "batch_cost_unavailable",
+            "furnace_amortization_batch_cost_equivalents": 0.0,
+        })
+    amortization = furnace_amortization_cost_per_run(
+        batch_cost,
+        campaigns_to_resinter,
+        parameters.furnace_lifetime_cost_multiplier,
+        parameters.min_fouling_penalty,
+        has_positive_fouling=has_positive_fouling,
+    )
+    batch_equivalents = _finite_float(
+        0.0 if batch_cost == 0.0 else amortization / batch_cost,
+        "furnace amortization batch cost equivalents",
+    )
+    return MappingProxyType({
+        "furnace_amortization_status": "available",
+        "typical_batch_process_cost_usd": batch_cost,
+        "furnace_lifetime_cost_multiplier": parameters.furnace_lifetime_cost_multiplier,
+        "min_fouling_penalty": parameters.min_fouling_penalty,
+        "furnace_amortization_cost_per_run_usd": amortization,
+        "furnace_amortization_batch_cost_equivalents": batch_equivalents,
+    })
 
 
 def _extraction_constraints_from_profile(profile: Mapping[str, Any]) -> PhysicsConstraintSet:
@@ -3512,6 +3777,7 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
             raw_by_segment,
             campaigns_elapsed=_campaigns_elapsed(run_execution),
         ),
+        "has_positive_qualified_fouling": _has_positive_wall_deposit(raw_by_segment),
         **_furnace_lifespan_cost_summary_from_raw(
             raw_by_segment,
             campaigns_elapsed=_campaigns_elapsed(run_execution),
@@ -3533,6 +3799,17 @@ def _coating_authority_status(
     return wall_deposit_sticking_authority_status(
         wall_deposit_by_segment_species,
         trace_status if isinstance(trace_status, Mapping) else {},
+    )
+
+
+def _has_positive_wall_deposit(
+    wall_deposit_by_segment_species: Mapping[tuple[str, str], Any],
+) -> bool:
+    """Match the coating model's exact positive-rate test; do not add epsilon."""
+
+    return any(
+        _finite_float(value, f"wall_deposit[{key!r}]") > 0.0
+        for key, value in wall_deposit_by_segment_species.items()
     )
 
 
