@@ -14,7 +14,7 @@ import sqlite3
 import stat
 import struct
 from tempfile import mkdtemp
-from typing import Any, Callable, Mapping
+from typing import TYPE_CHECKING, Any, Callable, Mapping
 from urllib.parse import quote
 from uuid import uuid4
 import zipfile
@@ -22,7 +22,6 @@ import zipfile
 import yaml
 
 from simulator.corpus_version import current_corpus_version
-from simulator.optimize.evaluate import ScoredResult, evaluate
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.optimize.save_bundle import (
@@ -33,6 +32,9 @@ from simulator.optimize.save_bundle import (
     SAVE_SCHEMA_VERSION,
     TERMINAL_STUDY_STATUSES,
 )
+
+if TYPE_CHECKING:
+    from simulator.optimize.evaluate import ScoredResult
 
 BUNDLE_CAP_BYTES = 512 * 1024 * 1024
 SQLITE_CAP_BYTES = 400 * 1024 * 1024
@@ -302,7 +304,12 @@ def verify_imported_study(
 
     profile = _load_profile(root / "study.profile.yaml")
     manifest = _load_json_object(root / "study.manifest.json")
-    active_evaluator = evaluator or evaluate
+    if evaluator is None:
+        from simulator.optimize.evaluate import evaluate
+
+        active_evaluator = evaluate
+    else:
+        active_evaluator = evaluator
     rows_by_cache_key = safety["rows_by_cache_key"]
     results = []
     for candidate in candidates:

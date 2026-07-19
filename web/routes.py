@@ -68,10 +68,6 @@ from simulator.optimize.objective import (
     canonical_objective_metric,
     objective_metric_aliases,
 )
-from simulator.optimize.results_store import (
-    _deserialize_grounding_margins,
-    grounded_result_feasible,
-)
 from simulator.optimize.save_bundle import ALLOWED_MEMBERS, export_study_bundle
 from simulator.recipe_io import (
     RECIPE_LIBRARY_DIR,
@@ -1059,6 +1055,11 @@ def _numeric_objective_value(objective: dict[str, Any]) -> float | None:
 
 
 def _result_row_feasible(row: sqlite3.Row) -> bool:
+    from simulator.optimize.results_store import (
+        _deserialize_grounding_margins,
+        grounded_result_feasible,
+    )
+
     try:
         stored_feasible = int(row['feasible']) == 1
     except (IndexError, KeyError, TypeError, ValueError):
@@ -1082,6 +1083,8 @@ def _result_row_previously_ungated(row: sqlite3.Row) -> bool:
 
 
 def _result_row_constraint_margins(row: sqlite3.Row) -> list[dict[str, Any]]:
+    from simulator.optimize.results_store import _deserialize_grounding_margins
+
     try:
         payload = _json_value(row['feasibility_margins'], {})
     except (IndexError, KeyError, TypeError):

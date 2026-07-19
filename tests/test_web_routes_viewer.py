@@ -69,6 +69,52 @@ def test_report_viewer_reads_canonical_cost_provenance_key() -> None:
     assert "_provenance" not in sample["header"]["cost_block"]
 
 
+def _render_library_yield_chips(payload: dict) -> str:
+    script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/library.js"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const source = fs.readFileSync(process.argv[2], "utf8");
+const context = {
+  document: { querySelector() { return null; } },
+  fetch() { return new Promise(() => {}); }
+};
+vm.createContext(context);
+vm.runInContext(source, context);
+process.stdout.write(context.yieldChips(JSON.parse(process.argv[3])));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(script_path), json.dumps(payload)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return completed.stdout
+
+
+def test_library_renders_canonical_headline_o2() -> None:
+    html = _render_library_yield_chips({"headline_yields_kg": {"O2": 4.25}})
+
+    assert "O₂ source-side potential (not recovered)" in html
+    assert 'title="4.25 kg"' in html
+
+
+def test_library_spurious_top_level_o2_alias_does_not_override_canonical() -> None:
+    html = _render_library_yield_chips(
+        {
+            "headline_yields_kg": {"O2": 4.25},
+            "O2_source_side_potential_kg_cumulative": 99,
+            "O2_metric_label": "spoofed label",
+        }
+    )
+
+    assert "O₂ source-side potential (not recovered)" in html
+    assert 'title="4.25 kg"' in html
+    assert "99 kg" not in html
+    assert "spoofed label" not in html
+
+
 @pytest.mark.parametrize("include_activity", [False, True])
 def test_report_viewer_presence_gates_stage_purity_activity(
     include_activity: bool,

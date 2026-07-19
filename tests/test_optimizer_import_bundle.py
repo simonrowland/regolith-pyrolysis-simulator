@@ -1213,6 +1213,44 @@ def test_tier1_verifies_winner_and_all_pareto_candidates(tmp_path: Path) -> None
     ]
 
 
+def test_tier1_default_evaluator_resolves_in_reevaluation_path(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from simulator.optimize.evaluate import evaluate as expected_evaluate
+
+    seen_evaluators = []
+    candidate = {"cache_key": "cache-a", "candidate_id": "candidate-a"}
+    monkeypatch.setattr(
+        import_bundle_module,
+        "verify_import_hashes",
+        lambda root: {"verdict": "confirmed"},
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_enforce_import_safety_caps",
+        lambda root: {"leaderboard": [], "rows_by_cache_key": {}},
+    )
+    monkeypatch.setattr(
+        import_bundle_module,
+        "_selected_verification_candidates",
+        lambda root, *, top_n, leaderboard: [candidate],
+    )
+    monkeypatch.setattr(import_bundle_module, "_load_profile", lambda path: {})
+    monkeypatch.setattr(import_bundle_module, "_load_json_object", lambda path: {})
+
+    def record_evaluator(candidate, **kwargs):
+        seen_evaluators.append(kwargs["evaluator"])
+        return {"candidate_id": candidate["candidate_id"], "verdict": "confirmed"}
+
+    monkeypatch.setattr(import_bundle_module, "_verify_candidate", record_evaluator)
+
+    report = import_bundle_module.verify_imported_study(tmp_path)
+
+    assert seen_evaluators == [expected_evaluate]
+    assert report["coverage"]["state"] == "verified"
+
+
 def test_winner_recipe_yaml_fallback_is_used_for_missing_leaderboard_patch(
     tmp_path: Path,
 ) -> None:

@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import ast
 from pathlib import Path
+import subprocess
+import sys
 
 OPTIMIZE_DIR = Path(__file__).resolve().parents[1] / "simulator" / "optimize"
 FORBIDDEN_MODULES = {"simulator.mass_balance", "simulator.persistence"}
@@ -58,3 +60,28 @@ def test_boundary_guard_detects_from_package_import_form(tmp_path) -> None:
     detected = _imported_modules(snippet)
     assert "simulator.mass_balance" in detected
     assert "simulator.persistence" in detected
+
+
+def _import_loads_worker_runtime(module: str) -> bool:
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                f"import sys, {module}; "
+                "print('simulator.optimize.worker_runtime' in sys.modules)"
+            ),
+        ],
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return completed.stdout.strip() == "True"
+
+
+def test_web_routes_import_does_not_load_worker_runtime() -> None:
+    assert not _import_loads_worker_runtime("web.routes")
+
+
+def test_import_bundle_import_does_not_load_worker_runtime() -> None:
+    assert not _import_loads_worker_runtime("simulator.optimize.import_bundle")

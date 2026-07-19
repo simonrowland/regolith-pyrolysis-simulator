@@ -52,9 +52,9 @@ function folderButtons() {
 function yieldChips(run) {
   const yields = run.headline_yields_kg;
   const entries = yields && typeof yields === "object" ? Object.entries(yields).filter(([species]) => species !== "O2") : [];
-  const o2 = run.O2_source_side_potential_kg_cumulative ?? yields?.O2;
-  if (o2 !== undefined || run.O2_metric_label) {
-    entries.push([run.O2_metric_label || "O₂ source-side potential (not recovered)", o2]);
+  const o2 = yields?.O2;
+  if (o2 !== undefined) {
+    entries.push(["O₂ source-side potential (not recovered)", o2]);
   }
   if (!entries.length) return "";
   return `<div class="yield-track">${entries.map(([species, value]) =>
