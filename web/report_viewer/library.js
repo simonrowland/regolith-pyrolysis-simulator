@@ -4,6 +4,9 @@ const { fmtNum, fmtRunId, prettySpecies } = globalThis.ReportLabels;
 const LIVE_RUNS_URL = "/api/runs";
 const STATIC_RUNS_URL = "./runs-index.json";
 const SYSTEM_FOLDERS = ["All", "Favorites", "My runs", "Default runs", "Bootstrap ladder"];
+// Match report-viewer: nameless live runs often use the raw hash as `name`.
+const isHashLike = (value) => typeof value === "string"
+  && /^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f-]{27,})$/i.test(value.trim());
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) => ({
@@ -15,6 +18,11 @@ const exactNumber = (value, unit) => hasNumber(value)
   : "not emitted";
 const runIdSpan = (value) => `<span title="${esc(value)}">${esc(fmtRunId(value))}</span>`;
 const speciesSpan = (value) => esc(prettySpecies(value));
+// Readable H2: never dump 32 hex chars as the card title (full id stays in the mono span + title).
+const runDisplayTitle = (run) => {
+  const name = typeof run.name === "string" ? run.name.trim() : "";
+  return name && !isHashLike(name) ? name : `Untitled run · ${fmtRunId(run.run_id ?? name)}`;
+};
 
 let runs = [];
 let activeFolder = "All";
@@ -33,40 +41,107 @@ function folderMatches(run) {
   return run.folder === activeFolder;
 }
 
+function folderCount(folder) {
+  if (folder === "All") return runs.length;
+  if (folder === "Favorites") return runs.filter((run) => isRunStarred(run)).length;
+  return runs.filter((run) => run.folder === folder).length;
+}
+
+function runSearchHaystack(run) {
+  const campaign = Array.isArray(run.campaign_chain) ? run.campaign_chain.join(" ") : "";
+  return [run.run_id, run.name, run.feedstock_id, run.status, run.folder, run.summary, campaign]
+    .map((value) => String(value ?? "").toLocaleLowerCase())
+    .join(" ");
+}
+
 function filteredRuns() {
   const query = $("#run-filter").value.trim().toLocaleLowerCase();
   const sort = $("#run-sort").value;
-  const visible = runs.filter((run) => folderMatches(run) && [
-    run.run_id, run.name, run.feedstock_id, run.status, run.folder, run.summary
-  ].some((value) => String(value ?? "").toLocaleLowerCase().includes(query)));
+  const visible = runs.filter((run) => folderMatches(run) && (
+    !query || runSearchHaystack(run).includes(query)
+  ));
   return visible.sort((left, right) => {
-    if (sort === "name") return String(left.name ?? "").localeCompare(String(right.name ?? ""));
+    if (sort === "name") {
+      return runDisplayTitle(left).localeCompare(runDisplayTitle(right));
+    }
     if (sort === "status") return String(left.status ?? "").localeCompare(String(right.status ?? ""));
     return String(right.created_at ?? "").localeCompare(String(left.created_at ?? ""));
   });
 }
 
 function folderButtons() {
-  return SYSTEM_FOLDERS.map((folder) =>
-    `<button class="folder-button${folder === activeFolder ? " active" : ""}" type="button" data-folder="${esc(folder)}" aria-pressed="${folder === activeFolder}">${esc(folder)}</button>`
-  ).join("");
+  return SYSTEM_FOLDERS.map((folder) => {
+    const count = folderCount(folder);
+    return `<button class="folder-button${folder === activeFolder ? " active" : ""}" type="button" data-folder="${esc(folder)}" aria-pressed="${folder === activeFolder}">${esc(folder)} <span class="folder-count">${esc(String(count))}</span></button>`;
+  }).join("");
+}
+
+// Headline chips must not invent recovery/origin claims. Prefer explicit
+// headline_yield_semantics; O₂ without a label is source-side potential only.
+function yieldQualifier(species, semantics) {
+  const key = String(species ?? "");
+  const token = semantics && typeof semantics === "object" ? semantics[key] : null;
+  if (token === "evolved_product") return "evolved";
+  if (token === "source_side_potential") return "source-side potential (not recovered)";
+  if (typeof token === "string" && token.trim()) return token.trim().replace(/_/g, " ");
+  return "";
 }
 
 function yieldChips(run) {
   const yields = run.headline_yields_kg;
-  const entries = yields && typeof yields === "object" ? Object.entries(yields).filter(([species]) => species !== "O2") : [];
+  const semantics = run.headline_yield_semantics && typeof run.headline_yield_semantics === "object"
+    ? run.headline_yield_semantics
+    : {};
+  const entries = yields && typeof yields === "object"
+    ? Object.entries(yields).filter(([species]) => species !== "O2")
+    : [];
+  const chips = entries.map(([species, value]) => {
+    const qualifier = yieldQualifier(species, semantics);
+    return `<div class="yield-chip"><div class="el">${speciesSpan(species)}</div>` +
+      `<div class="kg">${exactNumber(value, "kg")}${qualifier ? ` · ${esc(qualifier)}` : ""}</div></div>`;
+  });
   const o2 = run.O2_source_side_potential_kg_cumulative ?? yields?.O2;
-  if (o2 !== undefined || run.O2_metric_label) {
-    entries.push([run.O2_metric_label || "O₂ source-side potential (not recovered)", o2]);
+  if (o2 !== undefined || run.O2_metric_label || semantics.O2 === "source_side_potential") {
+    // Never present O₂ as recovered product mass: default label is source-side only.
+    const o2Label = run.O2_metric_label
+      || (semantics.O2 === "source_side_potential" || o2 !== undefined
+        ? "O₂ source-side potential (not recovered)"
+        : "O₂ metric label not emitted");
+    chips.push(`<div class="yield-chip"><div class="el">${esc(o2Label)}</div>` +
+      `<div class="kg">${exactNumber(o2, "kg")}</div></div>`);
   }
-  if (!entries.length) return "";
-  return `<div class="yield-track">${entries.map(([species, value]) =>
-    `<div class="yield-chip"><div class="el">${speciesSpan(species)}</div><div class="kg">${exactNumber(value, "kg")}</div></div>`
-  ).join("")}</div>`;
+  if (!chips.length) return "";
+  return `<div class="yield-track" aria-label="Headline mass metrics">${chips.join("")}</div>`;
+}
+
+function runMetaLine(run) {
+  // Prefer structured fields over the API's yield-only summary string (often unformatted
+  // multi-sig-fig noise that duplicates the yield chips).
+  const parts = [];
+  if (run.feedstock_id) parts.push(String(run.feedstock_id));
+  if (Array.isArray(run.campaign_chain) && run.campaign_chain.length) {
+    parts.push(run.campaign_chain.map((step) => String(step)).join("→"));
+  }
+  const hasYields = Boolean(
+    run.headline_yields_kg
+    && typeof run.headline_yields_kg === "object"
+    && Object.keys(run.headline_yields_kg).length
+  );
+  const summary = typeof run.summary === "string" ? run.summary.trim() : "";
+  if (!hasYields && summary) parts.push(summary);
+  if (hasNumber(run.hours)) parts.push(exactNumber(run.hours, "h"));
+  if (hasNumber(run.peak_T_C)) parts.push(`peak ${exactNumber(run.peak_T_C, "°C")}`);
+  if (run.created_at) {
+    const stamp = String(run.created_at);
+    const day = stamp.slice(0, 10);
+    parts.push(/^\d{4}-\d{2}-\d{2}$/.test(day) ? day : stamp);
+  }
+  return parts;
 }
 
 function runCard(run) {
   const runId = String(run.run_id);
+  const title = runDisplayTitle(run);
   const isStarred = isRunStarred(run);
   const starError = starErrors.get(runId);
   const isStarPending = starPending.has(runId);
@@ -78,17 +153,29 @@ function runCard(run) {
     ? `./index.html?run=${encodeURIComponent(run.run_id)}`
     : run.artifact;
   const unavailable = canLoad ? "" : `<p class="demo-note">${esc(run.unavailable_note || "demo metadata — no artifact")}</p>`;
+  const displayName = title;
   const cancelledBadge = run.lifecycle === "cancelled" ? ` <span class="verdict contaminated">CANCELLED</span>` : "";
+  // Omit "unfiled" noise when the index has no folder (typical for live runs).
+  const folderStatus = run.folder
+    ? `${esc(run.folder)} · ${esc(run.status)}${cancelledBadge}`
+    : `${esc(run.status)}${cancelledBadge}`;
+  const meta = runMetaLine(run);
+  const metaHtml = meta.length
+    ? `<p class="run-summary">${meta.map((part) => (part.includes("<span") ? part : esc(part))).join(" · ")}</p>`
+    : "";
+  const loadDisabledAttrs = canLoad
+    ? ` aria-label="${esc(`Load report for ${displayName}`)}"`
+    : ` disabled aria-disabled="true" title="${esc(run.unavailable_note || "No loadable artifact for this entry")}" aria-label="${esc(`Load unavailable for ${displayName}`)}"`;
   return `<article class="card run-card">
     <div class="run-card-head">
-      <div><div class="ct">${esc(run.folder ?? "unfiled")} · ${esc(run.status)}${cancelledBadge}</div><h2>${esc(run.name)}</h2></div>
-      <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(runId)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${run.name} ${isStarred ? "from" : "to"} favorites`)}"${isStarPending ? " disabled" : ""}>${isStarred ? "★" : "☆"}</button>
+      <div class="run-card-title"><div class="ct">${folderStatus}</div><h2 title="${esc(typeof run.name === "string" && run.name.trim() ? run.name : run.run_id)}">${esc(displayName)}</h2></div>
+      <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(runId)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${displayName} ${isStarred ? "from" : "to"} favorites`)}"${isStarPending ? " disabled aria-busy=\"true\"" : ""}>${isStarred ? "★" : "☆"}</button>
     </div>
-    ${starError ? `<p class="demo-note" role="alert">${esc(`Could not save star for ${run.name}. ${starError}`)}</p>` : ""}
-    <p class="run-summary">${esc(run.summary)}${hasNumber(run.hours) ? ` · ${exactNumber(run.hours, "h")}` : ""}${hasNumber(run.peak_T_C) ? ` · peak ${exactNumber(run.peak_T_C, "°C")}` : ""}</p>
+    ${starError ? `<p class="demo-note" role="alert">${esc(`Could not save star for ${displayName}. ${starError}`)}</p>` : ""}
+    ${metaHtml}
     ${yieldChips(run)}
     ${unavailable}
-    <div class="run-actions"><span class="mono">${runIdSpan(run.run_id)}</span><button class="load-button" type="button" data-load="${esc(loadTarget)}"${canLoad ? "" : " disabled"}>Load</button></div>
+    <div class="run-actions"><span class="mono">${runIdSpan(run.run_id)}</span><button class="load-button" type="button" data-load="${esc(loadTarget)}"${loadDisabledAttrs}>Load</button></div>
   </article>`;
 }
 
@@ -98,7 +185,10 @@ function renderList() {
   const fallbackNotice = liveIndexError
     ? `<div class="fatal"><strong>Live run index unavailable</strong><p>Showing the static sample index only. ${esc(liveIndexError.message || String(liveIndexError))}</p></div>`
     : "";
-  $("#run-list").innerHTML = fallbackNotice + (visible.length
+  const countLine = runs.length
+    ? `<p class="sub run-count" id="run-count">Showing ${esc(String(visible.length))} of ${esc(String(runs.length))} indexed run${runs.length === 1 ? "" : "s"}</p>`
+    : "";
+  $("#run-list").innerHTML = fallbackNotice + countLine + (visible.length
     ? visible.map(runCard).join("")
     : runs.length
       ? `<div class="pending"><strong>No matching runs</strong><p>No indexed run matches this folder and filter.</p></div>`
@@ -175,12 +265,12 @@ function render(index) {
     <div class="eyebrow">PHASE 2 · RUN LIBRARY</div><h1>Run library</h1>
     <p class="lede">Browse frozen-run metadata. Live-run stars are saved durably; sample-entry stars are client-side only. This screen does not execute runs.</p>
   </header>
-  <section><h2><span class="sect">01</span>Find a run</h2><p class="sub">Fixed system folders, text filter, and index-only sorting.</p>
-    <div class="library-controls"><nav id="folder-list" class="folder-list" aria-label="System folders"></nav>
-      <div class="filter-controls"><label>Filter<input id="run-filter" type="search" placeholder="Name, ID, feedstock, status…"></label>
-      <label>Sort<select id="run-sort"><option value="created">Newest created</option><option value="name">Name</option><option value="status">Status</option></select></label></div></div>
+  <section><h2 id="find-run-heading"><span class="sect">01</span>Find a run</h2><p class="sub">Fixed system folders, text filter, and index-only sorting.</p>
+    <div class="library-controls"><nav id="folder-list" class="folder-list" role="toolbar" aria-label="System folders"></nav>
+      <div class="filter-controls"><label for="run-filter">Filter<input id="run-filter" type="search" autocomplete="off" placeholder="Name, ID, feedstock, status…"></label>
+      <label for="run-sort">Sort<select id="run-sort"><option value="created">Newest created</option><option value="name">Name</option><option value="status">Status</option></select></label></div></div>
   </section>
-  <section><h2><span class="sect">02</span>Indexed runs</h2><p class="sub">Only entries with a local artifact can be loaded.</p><div id="run-list" class="run-list"></div></section>
+  <section><h2 id="indexed-runs-heading"><span class="sect">02</span>Indexed runs</h2><p class="sub">Only entries with a local artifact or live API id can be loaded. Yield chips use source-side O₂ labels (not recovered product).</p><div id="run-list" class="run-list" role="region" aria-labelledby="indexed-runs-heading"></div></section>
   <footer class="footer"><span>Static index + local run API · engine-free</span><a href="./index.html">Open sample report</a></footer>`;
   bindControls();
   renderList();

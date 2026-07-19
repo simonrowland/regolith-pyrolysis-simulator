@@ -8,11 +8,11 @@
   <link rel="stylesheet" href="./report-viewer.css">
 </head>
 <body>
-  <main id="library" class="report-shell" aria-live="polite">
-    <div class="loading">
+  <main id="library" class="report-shell">
+    <div class="loading" role="status" aria-live="polite">
       <div class="eyebrow">DIRECT LEAP TECHNOLOGIES · RUN LIBRARY</div>
       <h1>Loading run index…</h1>
-      <p>Reading <code>runs-index.json</code>. No engine or backend is used.</p>
+      <p>Reading the local sample index and live <code>/api/runs</code> when available. Engine-free — this screen does not execute runs.</p>
     </div>
   </main>
   <noscript><p class="fatal">The run library requires JavaScript to read its local index.</p></noscript>

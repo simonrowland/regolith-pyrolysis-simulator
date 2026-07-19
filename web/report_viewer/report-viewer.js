@@ -1,6 +1,6 @@
 "use strict";
 
-const { fmtNum, fmtRunId, prettySpecies, accountLabel } = globalThis.ReportLabels;
+const { fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
@@ -10,12 +10,13 @@ const SUPPORTED_ARTIFACT_SCHEMA_MAJOR = 0;
 const ELLINGHAM_ORDER = ["Na", "K", "Fe", "Cr", "Mn", "Mg", "Si", "Al", "Ti", "Ca"];
 const COLORS = ["#e8940f", "#1f7798", "#468466", "#8b63a6", "#a95c43", "#6f8c9e"];
 const DISPOSITION_GROUPS = Object.freeze([
-  { key: "products", label: "Products" },
-  { key: "retained", label: "Retained" },
-  { key: "losses", label: "Losses" },
-  { key: "terminal_inventory", label: "Terminal inventory" },
+  // Account-role buckets only — not feedstock-origin or per-species yield tiers.
+  { key: "products", label: "Product accounts" },
+  { key: "retained", label: "Retained accounts" },
+  { key: "losses", label: "Loss accounts" },
+  { key: "terminal_inventory", label: "Terminal inventory accounts" },
   { key: "reagent_cycle", label: "Reagent cycle · excluded" },
-  { key: "unclassified", label: "Unclassified" }
+  { key: "unclassified", label: "Unclassified accounts" }
 ]);
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -139,7 +140,7 @@ function lineChart(id, title, series, options = {}) {
   const bands = (options.spans || []).map((span, index) => {
     const start = x(span.startIndex);
     const end = x(span.endIndex);
-    return `<rect class="campaign-band" x="${start}" y="${pad.top}" width="${Math.max(1, end - start)}" height="${height - pad.top - pad.bottom}" style="opacity:${index % 2 ? .065 : .025}"/>`;
+    return `<rect class="campaign-band" x="${start.toFixed(2)}" y="${pad.top}" width="${Math.max(1, end - start).toFixed(2)}" height="${height - pad.top - pad.bottom}" style="opacity:${index % 2 ? .065 : .025}"/>`;
   }).join("");
   const legend = series.map((item, index) => `<span><i class="swatch" style="background:${item.color || COLORS[index]}"></i>${esc(item.label)}</span>`).join("");
   return `<div class="chartbox"><div class="chart-title">${esc(title)}</div><div class="legend">${legend}</div>` +
@@ -165,7 +166,7 @@ function makeHeader(artifact, rows, energy) {
   const finalRow = rows.at(-1) || {};
   const finalMetal = finalRow.metal_yields_kg || {};
   const o2 = finalRow.O2_source_side_potential_kg_cumulative ?? null;
-  const o2Label = finalRow.O2_metric_label || "O₂ metric label not emitted";
+  const o2Label = prettyChemText(finalRow.O2_metric_label || "O₂ metric label not emitted");
   const temperatures = rows.map((row) => row.T_C);
   const peakTemperature = temperatures.length && temperatures.every(hasNumber) ? maxPresent(temperatures) : null;
   const reportedEnergy = hasNumber(energy.electrical) && hasNumber(energy.evaporation) ? energy.electrical + energy.evaporation : null;
@@ -175,6 +176,7 @@ function makeHeader(artifact, rows, energy) {
   const costProvenance = typeof header.cost_block?.provenance === "string" && header.cost_block.provenance.trim()
     ? header.cost_block.provenance.trim()
     : null;
+  const feedstockLabel = prettyFeedstock(header.feedstock_id);
   return `<header>
     <div class="masthead">
       <svg class="mark" viewBox="0 0 42 42" aria-hidden="true"><circle cx="16" cy="27" r="11" fill="none" stroke="currentColor" stroke-width="1.4"/><ellipse cx="16" cy="27" rx="4.8" ry="11" fill="none" stroke="currentColor"/><path d="M6 23q10-4 20 0M6 31q10 4 20 0M29 7l-4 8 8 4 5-2M25 15l-6 2-3-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="5" r="2.6" fill="currentColor"/></svg>
@@ -182,9 +184,9 @@ function makeHeader(artifact, rows, energy) {
       <div class="doc-label">Run report<br><span class="mono">${runIdSpan(header.run_id)}</span></div>
     </div>
     <h1>${esc(runTitle(header))}</h1>
-    <p class="lede"><b>${exactValue(peakTemperature, "°C")} peak</b> · ${esc(header.feedstock_id)} · <b>${rows.length} hours</b> · ${esc(campaignChain)}</p>
+    <p class="lede"><b>${exactValue(peakTemperature, "°C")} peak</b> · <span title="${esc(header.feedstock_id)}">${esc(feedstockLabel)}</span> · <b>${rows.length} hours</b> · ${esc(campaignChain)}</p>
     <div class="meta-chips">
-      <span class="chip">charge ${kg(header.charge_mass_kg, 0)}</span>
+      <span class="chip">charge ${kg(header.charge_mass_kg)}</span>
       <span class="chip">engine ${esc(header.engine_identity?.name)}</span>
       <span class="chip">schema ${esc(artifact.artifact_schema_version)}</span>
       ${header.c3_dose && Object.keys(header.c3_dose).length ? `<span class="chip accent">C3 dose ${Object.entries(header.c3_dose).map(([key, value]) => `${speciesSpan(key.replace(/_kg$/, ""))} ${exactKg(value)}`).join(" · ")}</span>` : ""}
@@ -194,7 +196,7 @@ function makeHeader(artifact, rows, energy) {
       <p>Lifecycle: ${esc(artifact.lifecycle)}. ${esc(failureText)}</p></div>
     </div>
     <div class="glance">
-      <div class="metric"><div class="k">Fe evolved</div><div class="v">${kg(finalMetal.Fe, 2)}</div></div>
+      <div class="metric"><div class="k">Fe evolved</div><div class="v">${kg(finalMetal.Fe)}</div></div>
       <div class="metric"><div class="k">${esc(o2Label)}</div><div class="v">${exactKg(o2)}</div></div>
       <div class="metric"><div class="k">Reported energy</div><div class="v">${exactValue(reportedEnergy, "kWh")} <small>electrical + evaporation thermal</small></div></div>
       <div class="metric"><div class="k">Two-price energy cost</div><div class="v">${header.cost_block ? money(energy.totalCost) : "pending W-A5a"}${costProvenance ? `<small>${esc(costProvenance)}</small>` : ""}</div></div>
@@ -205,9 +207,13 @@ function makeHeader(artifact, rows, energy) {
 function yieldsSection(rows, terminal) {
   const evolved = rows.at(-1).metal_yields_kg || {};
   const max = Math.max(maxPresent(Object.values(evolved)) ?? 0, 1);
-  const chips = ELLINGHAM_ORDER.map((element) => `<div class="yield-chip"><div class="el">${speciesSpan(element)}</div><div class="kg">${exactKg(evolved[element])} evolved</div><div class="bar"><i style="width:${Math.sqrt((n(evolved[element]) ?? 0) / max) * 100}%"></i></div></div>`).join("");
+  const chips = ELLINGHAM_ORDER.map((element) => {
+    const widthPct = Math.min(100, Math.sqrt((n(evolved[element]) ?? 0) / max) * 100);
+    return `<div class="yield-chip"><div class="el">${speciesSpan(element)}</div><div class="kg">${exactKg(evolved[element])} evolved</div><div class="bar"><i style="width:${widthPct.toFixed(2)}%"></i></div></div>`;
+  }).join("");
   const gap = terminal.yield_disposition ? "" : `<div class="note">Per-species feedstock-yield fractions are pending <span class="mono">yield_disposition</span>; none are inferred here.</div>`;
-  return section(1, "Extraction yields — Ellingham order", "Exact evolved mass from the final hourly metal_yields_kg row.", `<div class="yield-track">${chips}</div>${gap}`);
+  // "Evolved" only — not recovered product mass or feedstock-origin yield fractions.
+  return section(1, "Evolved metal mass — Ellingham order", "Exact evolved mass from the final hourly metal_yields_kg row. Not recovered product mass; feedstock-origin fractions require yield_disposition.", `<div class="yield-track" aria-label="Evolved metal mass by element">${chips}</div>${gap}`);
 }
 
 function processSection(artifact, rows, spans) {
@@ -235,9 +241,21 @@ function processSection(artifact, rows, spans) {
   const carrierPressureNote = hasCarrierPressure
     ? ""
     : pending("p_carrier_bar", "summary.p_carrier_bar is absent. P_total − pO₂ is not used as a substitute.");
+  const firstHour = artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : String(artifact.timesteps[0].hour);
+  const lastHour = artifact.timesteps.at(-1).hour === undefined || artifact.timesteps.at(-1).hour === null ? "not emitted" : String(artifact.timesteps.at(-1).hour);
+  const firstCampaign = rows[0].campaign ?? "campaign not emitted";
   return section(2, "Process record — per-hour telemetry", "Frozen timestep summaries; shaded bands follow campaign boundaries.",
-    `<div class="stepper"><div class="stepper-head"><div><div class="ct">Timestep inspector</div><output id="step-output">Hour ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)} · ${esc(rows[0].campaign)}</output></div><span class="status-pill">1 / ${rows.length}</span></div>` +
-    `<input id="stepper" type="range" min="0" max="${rows.length - 1}" value="0" step="1" aria-label="Report hour"><div class="range-labels"><span>h ${artifact.timesteps[0].hour === undefined || artifact.timesteps[0].hour === null ? "not emitted" : esc(artifact.timesteps[0].hour)}</span><span>h ${artifact.timesteps.at(-1).hour === undefined || artifact.timesteps.at(-1).hour === null ? "not emitted" : esc(artifact.timesteps.at(-1).hour)}</span></div><div id="current-grid" class="current-grid"></div><div class="timestep-ledger"><div class="ct">Selected timestep ledger · mol-native</div><div id="timestep-ledger"></div></div></div>` +
+    `<div class="stepper" role="group" aria-label="Timestep inspector">` +
+    `<div class="stepper-head"><div><div class="ct" id="stepper-heading">Timestep inspector</div>` +
+    `<output id="step-output" for="stepper" aria-live="polite">Hour ${esc(firstHour)} · ${esc(firstCampaign)}</output></div>` +
+    `<span class="status-pill" id="step-position" aria-hidden="true">1 / ${rows.length}</span></div>` +
+    `<div class="stepper-controls">` +
+    `<button type="button" id="step-prev" class="step-button" aria-label="Previous hour">‹</button>` +
+    `<input id="stepper" type="range" min="0" max="${rows.length - 1}" value="0" step="1" aria-labelledby="stepper-heading" aria-valuemin="0" aria-valuemax="${rows.length - 1}" aria-valuenow="0" aria-valuetext="Hour ${esc(firstHour)} of ${rows.length}">` +
+    `<button type="button" id="step-next" class="step-button" aria-label="Next hour">›</button></div>` +
+    `<div class="range-labels"><span>h ${esc(firstHour)}</span><span>h ${esc(lastHour)}</span></div>` +
+    `<div id="current-grid" class="current-grid" role="region" aria-label="Selected hour summary"></div>` +
+    `<div class="timestep-ledger"><div class="ct" id="timestep-ledger-heading">Selected timestep ledger · mol-native</div><div id="timestep-ledger" role="region" aria-labelledby="timestep-ledger-heading"></div></div></div>` +
     `<div class="chart-grid">${charts.join("")}</div>` + carrierIdentity + carrierPressureNote);
 }
 
@@ -267,11 +285,24 @@ function renderTimestepLedger(timestep) {
 }
 
 function ledgerSection(finalState) {
-  const rows = Object.entries(finalState || {}).map(([account, species]) => {
+  if (finalState === undefined || finalState === null) {
+    return section(4, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.",
+      `<div class="pending"><strong>Not emitted</strong><p>terminal.final_state is absent from this artifact.</p></div>`);
+  }
+  if (typeof finalState !== "object" || Array.isArray(finalState)) {
+    return section(4, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.",
+      `<div class="pending"><strong>Malformed</strong><p>terminal.final_state is present but is not an account map.</p></div>`);
+  }
+  const accounts = Object.entries(finalState);
+  if (!accounts.length) {
+    return section(4, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.",
+      `<div class="pending"><strong>Empty ledger</strong><p>terminal.final_state was emitted with no accounts.</p></div>`);
+  }
+  const rows = accounts.map(([account, species]) => {
     const entries = Object.entries(species || {});
     return `<tr><td>${accountSpan(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${speciesSpan(name)} ${strictMol(value)}`).join(" · ") : "empty"}</td><td class="num">${strictMolSum(entries.map(([, value]) => value))}</td></tr>`;
   }).join("");
-  return section(3, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.", `<div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>`);
+  return section(4, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.", `<div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step. Account totals sum species amounts as stored — not feedstock-yield fractions.</div>`);
 }
 
 function dispositionRole(account) {
@@ -318,7 +349,7 @@ function accountDispositionSection(finalState) {
     return `<div class="card disposition-group"><div class="ct">${esc(group.label)}</div><div class="cbig">${strictMolSum(groupValues)}</div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
   }).join("");
   const body = content || `<div class="pending"><strong>Not emitted</strong><p>No terminal final_state accounts were emitted.</p></div>`;
-  return section(3, "Account disposition", "Account disposition — where the ledger's atoms sit at termination, grouped by role. This is ACCOUNT-level (which accounts hold what), NOT per-species feedstock-yield fractions — those require origin resolution and arrive with yield_disposition (pending).", `<div class="cards disposition-groups">${body}</div>`);
+  return section(3, "Account disposition", "Account disposition — where terminal inventory sits at run end, grouped by role. Group totals sum species amounts (mol) within each account role; they are NOT atom balances and NOT per-species feedstock-yield fractions — those require origin resolution and arrive with yield_disposition (pending).", `<div class="cards disposition-groups">${body}</div><div class="note">Account disposition is account-level inventory, not feedstock origin or recovered yield.</div>`);
 }
 
 function campaignSection(artifact, spans) {
@@ -338,11 +369,24 @@ function campaignSection(artifact, spans) {
       `<div class="kv"><span>End pO₂</span><b>${exactValue(final.pO2_bar, "bar")}</b></div>` +
       `<div class="kv"><span>End regime</span><b>${esc(final.regime)}</b></div></div>`;
   }).join("");
-  return section(4, "Campaign results", "Measured campaign spans and end-state signals from the timestep array.", `<div class="cards">${cards}</div>`);
+  return section(5, "Campaign results", "Measured campaign spans and end-state signals from the timestep array.", `<div class="cards">${cards}</div>`);
 }
 
 function tapsAndPuritySection(terminal) {
-  const stages = Object.entries(terminal.stage_purity || {});
+  if (!Object.prototype.hasOwnProperty.call(terminal || {}, "stage_purity")) {
+    return section(6, "Metal taps & stage purity", "Live backend masses, purity fraction, and verdict. An absent backend verdict is unavailable; trace is an annotation from total_kg.",
+      `<div class="pending"><strong>Not emitted</strong><p>terminal.stage_purity is absent from this artifact.</p></div>`);
+  }
+  const purity = terminal.stage_purity;
+  if (purity === null || typeof purity !== "object" || Array.isArray(purity)) {
+    return section(6, "Metal taps & stage purity", "Live backend masses, purity fraction, and verdict. An absent backend verdict is unavailable; trace is an annotation from total_kg.",
+      `<div class="pending"><strong>Malformed</strong><p>terminal.stage_purity is present but is not a stage map.</p></div>`);
+  }
+  const stages = Object.entries(purity);
+  if (!stages.length) {
+    return section(6, "Metal taps & stage purity", "Live backend masses, purity fraction, and verdict. An absent backend verdict is unavailable; trace is an annotation from total_kg.",
+      `<div class="pending"><strong>Empty</strong><p>terminal.stage_purity was emitted with no stages.</p></div>`);
+  }
   const hasActivity = stages.some(([, stage]) => stage.activity && typeof stage.activity === "object" && !Array.isArray(stage.activity) && Object.values(stage.activity).some((value) => typeof value === "boolean"));
   const stageRows = stages.map(([key, stage]) => {
     const backendVerdict = typeof stage.verdict === "string" && stage.verdict.trim() ? stage.verdict.trim().toUpperCase() : null;
@@ -354,10 +398,11 @@ function tapsAndPuritySection(terminal) {
     const speciesList = activity
       ? acceptedSpecies.map((species) => typeof activity[species] === "boolean" ? `${speciesSpan(species)} · ${activity[species] ? "ACTIVE" : "IDLE"}` : speciesSpan(species)).join("<br>") || "none designated"
       : acceptedSpecies.map(speciesSpan).join(" · ") || "none designated";
-    return `<tr><td>${esc(stage.label || key)}<br><span class="trace mono">${esc(key)}</span></td><td class="species-list">${speciesList}</td>` +
+    const stageTitle = stage.label || key;
+    return `<tr><td><span title="${esc(key)}">${esc(stageTitle)}</span></td><td class="species-list">${speciesList}</td>` +
       `<td class="num">${exactKg(stage.total_kg)}${trace}</td><td class="num">${exactKg(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}</td><td class="num">${exactValue(hasNumber(stage.purity_fraction) ? Number(stage.purity_fraction) * 100 : null, "%")}</td><td><span class="verdict ${verdictClass}">${esc(verdict)}</span></td></tr>`;
   }).join("");
-  return section(5, "Metal taps & stage purity", "Live backend masses, purity fraction, and verdict. An absent backend verdict is unavailable; trace is an annotation from total_kg.",
+  return section(6, "Metal taps & stage purity", "Live backend masses, purity fraction, and verdict. An absent backend verdict is unavailable; trace is an annotation from total_kg. Hover a stage name for its raw stage key.",
     `<div class="table-wrap"><table><thead><tr><th>Stage</th><th>Accepted species</th><th class="num">Total</th><th class="num">Designated</th><th class="num">Impurity</th><th class="num">Purity</th><th>Backend verdict</th></tr></thead><tbody>${stageRows}</tbody></table></div>` +
     (hasActivity ? "" : pending("W-A10", "Per-species stage activity is not emitted, so intended-versus-contaminant activity is not inferred.")));
 }
@@ -377,26 +422,45 @@ function wallAndOxygenSection(artifact, rows) {
   const wallTotal = wallComplete ? sumObject(wallSpecies) : null;
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
   const o2 = last.O2_source_side_potential_kg_cumulative ?? null;
-  const o2Label = last.O2_metric_label || "O₂ metric label not emitted";
+  const o2Label = prettyChemText(last.O2_metric_label || "O₂ metric label not emitted");
   const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${exactKg(wallTotal)}</div><div class="kv"><span>Species</span><b>${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${speciesSpan(key)} ${exactKg(value)}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${exactValue(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn, "")}</b></div></div>`;
-  const oxygen = `<div class="card"><div class="ct">${esc(o2Label)}</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Metric field</span><b>O2_source_side_potential_kg_cumulative</b></div><div class="kv"><span>Pumping energy</span><b>${exactValue(pumping?.pumping_electrical_kWh, "kWh")}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status ?? "not emitted")}</b></div></div>`;
-  return section(6, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
+  // Human basis only — raw ledger field names stay out of the visible report surface.
+  const oxygen = `<div class="card"><div class="ct">${esc(o2Label)}</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Basis</span><b>cumulative source-side potential · not recovered product</b></div><div class="kv"><span>Pumping energy</span><b>${exactValue(pumping?.pumping_electrical_kWh, "kWh")}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status ?? "not emitted")}</b></div></div>`;
+  return section(7, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed. O₂ figures use the artifact's source-side potential metric — not recovered yield.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
 }
 
 function ceramicSection(terminal) {
-  const melt = terminal.final_state?.["process.cleaned_melt"] || {};
+  const finalState = terminal.final_state;
+  const hasCleanedMelt = finalState && typeof finalState === "object" && !Array.isArray(finalState)
+    && Object.prototype.hasOwnProperty.call(finalState, "process.cleaned_melt");
+  if (!hasCleanedMelt) {
+    return section(8, "Terminal ceramic — cleaned melt", "Composition binds directly to process.cleaned_melt; taxonomy is a separate backend-owned result.",
+      `<div class="pending"><strong>Not emitted</strong><p>process.cleaned_melt is absent from terminal.final_state.</p></div>` +
+      (terminal.terminal_product_taxonomy ? "" : pending("W-D7", "terminal.terminal_product_taxonomy is absent. No density, value-grade, use-class, or product label is fabricated.")));
+  }
+  const melt = finalState["process.cleaned_melt"];
+  if (melt === null || typeof melt !== "object" || Array.isArray(melt)) {
+    return section(8, "Terminal ceramic — cleaned melt", "Composition binds directly to process.cleaned_melt; taxonomy is a separate backend-owned result.",
+      `<div class="pending"><strong>Malformed</strong><p>process.cleaned_melt is present but is not a species map.</p></div>`);
+  }
+  const entries = Object.entries(melt);
+  if (!entries.length) {
+    return section(8, "Terminal ceramic — cleaned melt", "Composition binds directly to process.cleaned_melt; taxonomy is a separate backend-owned result.",
+      `<div class="pending"><strong>Empty account</strong><p>process.cleaned_melt was emitted with no species.</p></div>` +
+      (terminal.terminal_product_taxonomy ? "" : pending("W-D7", "terminal.terminal_product_taxonomy is absent. No density, value-grade, use-class, or product label is fabricated.")));
+  }
   const total = sumObject(melt);
-  const rows = Object.entries(melt).sort((a, b) => (n(b[1]) ?? -Infinity) - (n(a[1]) ?? -Infinity)).map(([species, value]) => `<tr><td>${speciesSpan(species)}</td><td class="num">${exactMol(value)}</td><td class="num">${exactValue(hasNumber(value) && hasNumber(total) && total !== 0 ? Number(value) / total * 100 : null, "%")}</td></tr>`).join("");
-  return section(7, "Terminal ceramic — cleaned melt", "Composition binds directly to process.cleaned_melt; taxonomy is a separate backend-owned result.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Amount · mol</th><th class="num">mol%</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>${terminal.terminal_product_taxonomy ? "" : pending("W-D7", "terminal.terminal_product_taxonomy is absent. No density, value-grade, use-class, or product label is fabricated.")}`);
+  const rows = entries.sort((a, b) => (n(b[1]) ?? -Infinity) - (n(a[1]) ?? -Infinity)).map(([species, value]) => `<tr><td>${speciesSpan(species)}</td><td class="num">${exactMol(value)}</td><td class="num">${exactValue(hasNumber(value) && hasNumber(total) && total !== 0 ? Number(value) / total * 100 : null, "%")}</td></tr>`).join("");
+  return section(8, "Terminal ceramic — cleaned melt", "Composition binds directly to process.cleaned_melt; taxonomy is a separate backend-owned result.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Amount · mol</th><th class="num">mol%</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>${terminal.terminal_product_taxonomy ? "" : pending("W-D7", "terminal.terminal_product_taxonomy is absent. No density, value-grade, use-class, or product label is fabricated.")}`);
 }
 
 function costSection(artifact, energy) {
   const prices = artifact.header.cost_block;
   if (!prices) {
-    return section(8, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
+    return section(9, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
       pending("W-A5a", "header.cost_block is absent. Energy cost cannot be calculated without backend-provided prices."));
   }
-  const hasCostShare = hasNumber(energy.totalCost) && energy.totalCost !== 0;
+  const hasCostShare = hasNumber(energy.totalCost) && energy.totalCost !== 0 && hasNumber(energy.electricalCost);
   const electricalShare = hasCostShare ? energy.electricalCost / energy.totalCost * 100 : null;
   const provenance = typeof prices.provenance === "string" && prices.provenance.trim()
     ? `<div class="note"><b>Cost provenance:</b> ${esc(prices.provenance.trim())}</div>`
@@ -410,10 +474,10 @@ function costSection(artifact, energy) {
   const totalFormula = energy.canonicalCostTotals
     ? `<div class="note"><b>Total ${money(energy.totalCost)}</b> binds terminal.cost_totals: ${exactValue(energy.electrical, "kWh")} total electrical plus ${exactValue(energy.thermal, "kWh")} evaporation thermal. Latent (${exactValue(energy.latent, "kWh")}) and dissociation (${exactValue(energy.dissociation, "kWh")}) are the breakdown of evaporation thermal, not additional energy.</div>`
     : `<div class="note"><b>Total ${money(energy.totalCost)}</b> = ${exactValue(energy.electrical, "kWh")} × ${money(prices.electrical_cost_per_kWh)} + ${exactValue(energy.thermal, "kWh")} evaporation thermal × ${money(prices.solar_heat_cost_per_kWh)}. Latent (${exactValue(energy.latent, "kWh")}) and dissociation (${exactValue(energy.dissociation, "kWh")}) are the breakdown of evaporation thermal, not additional energy.</div>`;
-  return section(8, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
+  return section(9, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
     provenance + basisNote + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${exactValue(energy.electrical, "kWh")}</div>${pumpingRows}<div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.electricalCost)}</b></div></div>` +
     `<div class="card"><div class="ct">Solar heat · evaporation thermal total</div><div class="cbig">${exactValue(energy.thermal, "kWh")}</div><div class="kv"><span>Latent breakdown</span><b>${exactValue(energy.latent, "kWh")}</b></div><div class="kv"><span>Dissociation breakdown</span><b>${exactValue(energy.dissociation, "kWh")}</b></div><div class="kv"><span>Price</span><b>${money(prices.solar_heat_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.thermalCost)}</b></div></div></div>` +
-    `${hasCostShare ? `<div class="cost-stack" aria-label="Cost share"><span style="width:${electricalShare}%"></span><span style="width:${100 - electricalShare}%"></span></div><div class="legend"><span><i class="swatch" style="background:var(--blue)"></i>electrical cost</span><span><i class="swatch" style="background:var(--green)"></i>solar-heat cost</span></div>` : pending("energy values", "Cost share is unavailable because one or more energy or price values were not emitted.")}` +
+    `${hasCostShare ? `<div class="cost-stack" role="img" aria-label="${esc(`Cost share: ${fmtNum(electricalShare)}% electrical, ${fmtNum(100 - electricalShare)}% solar heat`)}"><span style="width:${electricalShare.toFixed(2)}%"></span><span style="width:${(100 - electricalShare).toFixed(2)}%"></span></div><div class="legend"><span><i class="swatch" style="background:var(--blue)" aria-hidden="true"></i>electrical cost</span><span><i class="swatch" style="background:var(--green)" aria-hidden="true"></i>solar-heat cost</span></div>` : pending("energy values", "Cost share is unavailable because one or more energy or price values were not emitted.")}` +
     totalFormula);
 }
 
@@ -445,24 +509,41 @@ function provenanceSection(artifact) {
     ["Kernel commit", artifact.header.engine_identity?.kernel_commit_sha],
     ["Engine cache version", artifact.header.engine_identity?.cache_version]
   ];
-  return section(9, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}${identityFacts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${value == null ? "not emitted" : runIdSpan(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
+  return section(10, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}${identityFacts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${value == null ? "not emitted" : runIdSpan(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
 }
 
 function renderCurrent(artifact, index) {
   const timestep = artifact.timesteps[index];
   const row = timestep.summary;
   const hour = timestep.hour === undefined || timestep.hour === null ? "not emitted" : String(timestep.hour);
-  $("#step-output").textContent = `Hour ${hour} · ${row.campaign ?? "campaign not emitted"}`;
-  $(".status-pill").textContent = `${index + 1} / ${artifact.timesteps.length}`;
-  $("#current-grid").innerHTML = [
-    ["Temperature", fmtNum(row.T_C, "°C")], ["Total pressure", fmtNum(row.P_total_bar, "bar")],
-    ["pO₂", fmtNum(row.pO2_bar, "bar")], ["Carrier pressure", fmtNum(row.p_carrier_bar, "bar")],
-    ["Carrier identity", typeof row.carrier_identity === "string" && row.carrier_identity.trim() ? row.carrier_identity.trim() : "not emitted"], ["Electrical", fmtNum(row.energy_electrical_kWh, "kWh")],
-    ["Evaporation thermal", fmtNum(row.energy_evaporation_thermal_kWh, "kWh")], [row.O2_metric_label || "O₂ metric label not emitted", kg(row.O2_source_side_potential_kg_cumulative)],
-    ["Regime", row.regime], ["Kn", row.Kn == null ? "not emitted" : row.Kn && typeof row.Kn === "object" ? sci(row.Kn.knudsen_number) : sci(row.Kn)]
-  ].map(([key, value]) => `<div class="current"><div class="k">${esc(key)}</div><div class="v">${esc(value)}</div></div>`).join("");
-  $("#timestep-ledger").innerHTML = renderTimestepLedger(timestep);
-  updateMarkers(index, artifact.timesteps.length);
+  const count = artifact.timesteps.length;
+  const stepOutput = $("#step-output");
+  if (stepOutput) stepOutput.textContent = `Hour ${hour} · ${row.campaign ?? "campaign not emitted"}`;
+  const pill = $("#step-position") || $("#step-pill") || $(".status-pill");
+  if (pill) pill.textContent = `${index + 1} / ${count}`;
+  const stepper = $("#stepper");
+  if (stepper) {
+    stepper.value = String(index);
+    stepper.setAttribute("aria-valuenow", String(index));
+    stepper.setAttribute("aria-valuetext", `Hour ${hour}, step ${index + 1} of ${count}`);
+  }
+  const prev = $("#step-prev");
+  const next = $("#step-next");
+  if (prev) prev.disabled = index <= 0;
+  if (next) next.disabled = index >= count - 1;
+  const grid = $("#current-grid");
+  if (grid) {
+    grid.innerHTML = [
+      ["Temperature", fmtNum(row.T_C, "°C")], ["Total pressure", fmtNum(row.P_total_bar, "bar")],
+      ["pO₂", fmtNum(row.pO2_bar, "bar")], ["Carrier pressure", fmtNum(row.p_carrier_bar, "bar")],
+      ["Carrier identity", typeof row.carrier_identity === "string" && row.carrier_identity.trim() ? row.carrier_identity.trim() : "not emitted"], ["Electrical", fmtNum(row.energy_electrical_kWh, "kWh")],
+      ["Evaporation thermal", fmtNum(row.energy_evaporation_thermal_kWh, "kWh")], [prettyChemText(row.O2_metric_label || "O₂ metric label not emitted"), kg(row.O2_source_side_potential_kg_cumulative)],
+      ["Regime", row.regime], ["Kn", row.Kn == null ? "not emitted" : row.Kn && typeof row.Kn === "object" ? sci(row.Kn.knudsen_number) : sci(row.Kn)]
+    ].map(([key, value]) => `<div class="current"><div class="k">${esc(key)}</div><div class="v">${esc(value)}</div></div>`).join("");
+  }
+  const ledger = $("#timestep-ledger");
+  if (ledger) ledger.innerHTML = renderTimestepLedger(timestep);
+  updateMarkers(index, count);
 }
 
 function render(artifact) {
@@ -503,28 +584,76 @@ function render(artifact) {
     energy.thermalCost = hasNumber(energy.thermal) && hasNumber(artifact.header.cost_block?.solar_heat_cost_per_kWh) ? energy.thermal * Number(artifact.header.cost_block.solar_heat_cost_per_kWh) : null;
     energy.totalCost = hasNumber(energy.electricalCost) && hasNumber(energy.thermalCost) ? energy.electricalCost + energy.thermalCost : null;
   }
+  // Order: yields → process inspector → account disposition → full ledger →
+  // campaign spans → taps → wall/O₂ → ceramic → cost → provenance. Section
+  // numbers match this visual order (no duplicate / out-of-order sect labels).
   const timestepSections = rows.length
-    ? yieldsSection(rows, artifact.terminal) + processSection(artifact, rows, spans) + campaignSection(artifact, spans)
-    : section(1, "Per-hour telemetry", "No timestep rows were emitted for this run.", `<div class="pending"><strong>Not emitted</strong><p>This execution has zero timesteps; header, failure, and terminal data remain available below.</p></div>`);
+    ? yieldsSection(rows, artifact.terminal) + processSection(artifact, rows, spans)
+    : section(1, "Evolved metal mass — Ellingham order", "No timestep rows were emitted for this run.", `<div class="pending"><strong>Not emitted</strong><p>Evolved metal mass is unavailable because this execution has zero timesteps.</p></div>`) +
+      section(2, "Process record — per-hour telemetry", "No timestep rows were emitted for this run.", `<div class="pending"><strong>Not emitted</strong><p>This execution has zero timesteps; header, failure, and terminal data remain available below.</p></div>`);
+  const campaignBlock = rows.length
+    ? campaignSection(artifact, spans)
+    : section(5, "Campaign results", "No timestep rows were emitted for this run.", `<div class="pending"><strong>Not emitted</strong><p>Campaign spans and end-state signals are unavailable because this execution has zero timesteps.</p></div>`);
+  document.title = `${runTitle(artifact.header)} · Run report`;
   $("#report").innerHTML = makeHeader(artifact, rows, energy) + timestepSections +
     accountDispositionSection(artifact.terminal.final_state) +
     ledgerSection(artifact.terminal.final_state) +
+    campaignBlock +
     tapsAndPuritySection(artifact.terminal) + wallAndOxygenSection(artifact, rows) + ceramicSection(artifact.terminal) +
     costSection(artifact, energy) + provenanceSection(artifact) +
-    `<footer class="footer"><span>Frozen flatfile report · engine-free · artifact-only rendering</span><a href="./settings.html${RUN_QUERY}">Captured settings</a><span class="mono">${runIdSpan(artifact.header.run_id)}</span></footer>`;
+    `<footer class="footer"><span>Frozen flatfile report · engine-free · artifact-only rendering</span><span class="footer-links"><a href="./library.html">Run library</a><a href="./settings.html${RUN_QUERY}">Captured settings</a></span><span class="mono">${runIdSpan(artifact.header.run_id)}</span></footer>`;
   if (rows.length) {
     const stepper = $("#stepper");
-    stepper.addEventListener("input", () => renderCurrent(artifact, Number(stepper.value)));
+    const go = (index) => {
+      const clamped = Math.max(0, Math.min(rows.length - 1, Number(index) || 0));
+      renderCurrent(artifact, clamped);
+    };
+    stepper.addEventListener("input", () => go(stepper.value));
+    stepper.addEventListener("change", () => go(stepper.value));
+    $("#step-prev")?.addEventListener("click", () => go(Number(stepper.value) - 1));
+    $("#step-next")?.addEventListener("click", () => go(Number(stepper.value) + 1));
+    // Arrow keys when the inspector (or its controls) has focus.
+    $(".stepper")?.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        event.preventDefault();
+        go(Number(stepper.value) - 1);
+      } else if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        event.preventDefault();
+        go(Number(stepper.value) + 1);
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        go(0);
+      } else if (event.key === "End") {
+        event.preventDefault();
+        go(rows.length - 1);
+      }
+    });
     renderCurrent(artifact, 0);
   }
 }
 
+function artifactFetchError(response) {
+  if (response.status === 404) {
+    return RUN_ID
+      ? `No run artifact was found for run id “${RUN_ID}”. Check the library for a valid id.`
+      : "The sample run artifact was not found on this server.";
+  }
+  return `Artifact request failed (${response.status})`;
+}
+
 fetch(ARTIFACT_URL)
-  .then((response) => {
-    if (!response.ok) throw new Error(`Artifact request failed (${response.status})`);
-    return response.json();
+  .then(async (response) => {
+    if (!response.ok) throw new Error(artifactFetchError(response));
+    try {
+      return await response.json();
+    } catch (_error) {
+      throw new Error("Artifact response was not valid JSON (corrupt or truncated payload).");
+    }
   })
   .then(render)
   .catch((error) => {
-    $("#report").innerHTML = `<div class="fatal"><div class="eyebrow">Report unavailable</div><h1>Could not read the frozen artifact</h1><p>${esc(error.message)}</p><p>If your browser blocks local <code>file:</code> fetches, serve this directory with any offline local static server and open <code>index.html</code> there.</p></div>`;
+    const hint = RUN_ID
+      ? `<p>Open the <a href="./library.html">run library</a> to pick another run, or check that the API is serving this artifact.</p>`
+      : `<p>If your browser blocks local <code>file:</code> fetches, serve this directory with any offline local static server and open <code>index.html</code> there.</p>`;
+    $("#report").innerHTML = `<div class="fatal"><div class="eyebrow">Report unavailable</div><h1>Could not read the frozen artifact</h1><p>${esc(error.message)}</p>${hint}</div>`;
   });

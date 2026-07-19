@@ -79,5 +79,23 @@
     return words ? words.replace(/\b\w/g, (character) => character.toUpperCase()) : "Unclassified account";
   }
 
-  root.ReportLabels = Object.freeze({ fmtNum, fmtRunId, prettySpecies, accountLabel });
+  // Snake/kebab feedstock ids → readable title case (lunar_mare_low_ti → Lunar Mare Low Ti).
+  function prettyFeedstock(id) {
+    const value = String(id ?? "").trim();
+    if (!value) return "not emitted";
+    return value
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/\b[a-z]/g, (character) => character.toUpperCase());
+  }
+
+  // Subscript digits inside free-text chemical tokens (O2 → O₂) without inventing species.
+  function prettyChemText(text) {
+    return String(text ?? "").replace(/\b(?:[A-Z][a-z]?\d*)+\b/g, (token) => prettySpecies(token));
+  }
+
+  root.ReportLabels = Object.freeze({
+    fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText
+  });
 }(globalThis));

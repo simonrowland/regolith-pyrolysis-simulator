@@ -188,22 +188,377 @@ setImmediate(() => process.stdout.write(report.innerHTML));
     )
     html = completed.stdout
 
-    assert "Products" in html
-    assert "Retained" in html
-    assert "Losses" in html
-    assert "Terminal inventory" in html
+    assert "Product accounts" in html
+    assert "Retained accounts" in html
+    assert "Loss accounts" in html
+    assert "Terminal inventory accounts" in html
     assert "Reagent cycle · excluded" in html
-    assert "Unclassified" in html
+    assert "Unclassified accounts" in html
     assert '>Cleaned melt</span>' in html
     assert '>Wall deposit · stage 0→1</span>' in html
     assert ">process.cleaned_melt<" not in html
     assert "SiO₂" in html
     assert "1.98e-7 mol" in html
     assert "01234567…" in html
-    assert "Account disposition — where the ledger&#39;s atoms sit at termination" in html
+    assert "Account disposition — where terminal inventory sits at run end" in html
     assert "NOT per-species feedstock-yield fractions" in html
     assert "yield_disposition (pending)" in html
+    # Group labels are account-role buckets, not origin/yield claims.
     assert "feedstock-origin" not in html
+    assert "O2_source_side_potential_kg_cumulative" not in html
+    assert "cumulative source-side potential · not recovered product" in html
+    assert "not feedstock origin or recovered yield" in html
+    assert '<span class="sect">03</span>Account disposition' in html
+    assert '<span class="sect">04</span>Full terminal ledger' in html
+    assert html.count('<span class="sect">03</span>') == 1
+
+
+
+def test_report_viewer_empty_and_absent_sections_are_honest() -> None:
+    """Zero-ts / empty maps must not render blank table bodies."""
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    artifact = {
+        "artifact_schema_version": "0.1.0",
+        "execution_status": "partial",
+        "lifecycle": "cancelled",
+        "failure": {"reason": "client_disconnected", "error_message": ""},
+        "header": {
+            "run_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "feedstock_id": "lunar_mare_low_ti",
+        },
+        "timesteps": [],
+        "terminal": {
+            "final_state": {},
+            "stage_purity": {},
+        },
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const report = { innerHTML: "" };
+const context = {
+  window: { location: { search: "" } },
+  document: { querySelector: (selector) => selector === "#report" ? report : null },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(reportSource, context);
+setImmediate(() => process.stdout.write(report.innerHTML));
+"""
+    completed = subprocess.run(
+        [
+            "node", "-", str(root / "labels.js"),
+            str(root / "report-viewer.js"), json.dumps(artifact),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    html = completed.stdout
+
+    assert "<tbody></tbody>" not in html
+    assert "zero timesteps" in html
+    assert "Empty ledger" in html
+    assert "terminal.final_state was emitted with no accounts" in html
+    assert "Empty" in html and "stage_purity was emitted with no stages" in html
+    assert "process.cleaned_melt is absent" in html
+    assert "Untitled run" in html
+    assert "aaaaaaaa…" in html or "aaaaaaaa" in html
+    assert "Execution status: partial" in html
+    sections = [
+        "Evolved metal mass",
+        "Process record",
+        "Account disposition",
+        "Full terminal ledger",
+        "Campaign results",
+        "Metal taps",
+        "Wall risk",
+        "Terminal ceramic",
+        "Energy",
+        "Provenance",
+    ]
+    positions = []
+    for number, title in enumerate(sections, start=1):
+        token = f'<span class="sect">{number:02d}</span>{title}'
+        assert html.count(token) == 1
+        positions.append(html.index(token))
+    assert positions == sorted(positions)
+
+
+def test_report_viewer_404_and_corrupt_payload_render_fatal() -> None:
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const report = { innerHTML: "" };
+const mode = process.argv[4];
+const context = {
+  window: { location: { search: "?run=missing-run" } },
+  document: { querySelector: (selector) => selector === "#report" ? report : null },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async () => {
+    if (mode === "404") return { ok: false, status: 404 };
+    return { ok: true, status: 200, json: async () => { throw new SyntaxError("bad json"); } };
+  }
+};
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(reportSource, context);
+setImmediate(() => process.stdout.write(report.innerHTML));
+"""
+    for mode, needle in (
+        ("404", "No run artifact was found"),
+        ("corrupt", "not valid JSON"),
+    ):
+        completed = subprocess.run(
+            ["node", "-", str(root / "labels.js"), str(root / "report-viewer.js"), mode],
+            input=harness,
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        html = completed.stdout
+        assert "Report unavailable" in html
+        assert needle in html
+        assert 'href="./library.html"' in html
+
+
+def test_report_viewer_css_has_responsive_and_dark_layout_guards() -> None:
+    css = (
+        Path(__file__).resolve().parents[1] / "web/report_viewer/report-viewer.css"
+    ).read_text(encoding="utf-8")
+    assert "overflow-x: clip" in css
+    assert "@media (max-width: 768px)" in css
+    assert "@media (max-width: 420px)" in css
+    assert "@media (prefers-color-scheme: dark)" in css
+    assert ".status-banner.failed" in css
+    assert "word-break: break-word" in css
+    assert ".table-wrap" in css and "overflow-x: auto" in css
+
+
+def test_library_headline_chips_respect_yield_semantics_and_hide_hash_titles() -> None:
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    index = [
+        {
+            "run_id": "0123456789abcdef0123456789abcdef",
+            "name": "0123456789abcdef0123456789abcdef",
+            "status": "ok",
+            "lifecycle": "complete",
+            "folder": "My runs",
+            "summary": "fixture",
+            "headline_yields_kg": {"Fe": 12.5, "O2": 4.25},
+            "headline_yield_semantics": {
+                "Fe": "evolved_product",
+                "O2": "source_side_potential",
+            },
+            "live": True,
+            "starred": False,
+        },
+        {
+            "run_id": "demo-named-run",
+            "name": "Named demo",
+            "status": "ok",
+            "lifecycle": "complete",
+            "folder": "Default runs",
+            "summary": "no yields",
+            "live": False,
+            "artifact": "index.html",
+            "starred": False,
+        },
+    ]
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const source = fs.readFileSync(process.argv[3], "utf8");
+const library = { innerHTML: "", addEventListener() {} };
+const nodes = new Map();
+const context = {
+  window: { location: { href: "" } },
+  document: {
+    querySelector(selector) {
+      if (selector === "#library") return library;
+      if (!nodes.has(selector)) {
+        const el = {
+          value: selector === "#run-sort" ? "created" : "",
+          innerHTML: "",
+          addEventListener() {}
+        };
+        nodes.set(selector, el);
+      }
+      return nodes.get(selector);
+    }
+  },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async (url) => {
+    if (String(url).includes("runs-index")) {
+      return { ok: true, json: async () => JSON.parse(process.argv[4]) };
+    }
+    return { ok: false, status: 503, json: async () => ({}) };
+  }
+};
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(source, context);
+// Static + live fetch chain needs a macrotask after promise settlement.
+setTimeout(() => {
+  const list = nodes.get("#run-list");
+  process.stdout.write(JSON.stringify({
+    library: library.innerHTML,
+    list: list ? list.innerHTML : ""
+  }));
+}, 50);
+"""
+    completed = subprocess.run(
+        [
+            "node", "-",
+            str(root / "labels.js"),
+            str(root / "library.js"),
+            json.dumps(index),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    result = json.loads(completed.stdout)
+    html = result["library"] + result["list"]
+
+    assert "Untitled run · 01234567…" in html
+    # Full hash may remain in title= tooltips / data-* only — never as the H2 label.
+    assert "<h2>0123456789abcdef0123456789abcdef</h2>" not in html
+    assert ">Untitled run · 01234567…</h2>" in html
+    assert "Named demo" in html
+    assert "evolved" in html
+    assert "source-side potential (not recovered)" in html
+    assert "not recovered" in html
+    assert 'aria-label="Load report for Untitled run · 01234567…"' in html
+    assert 'aria-labelledby="indexed-runs-heading"' in result["library"]
+
+
+def test_report_viewer_stepper_exposes_keyboard_controls() -> None:
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    artifact = {
+        "artifact_schema_version": "0.1.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {"run_id": "stepper-a11y", "name": "Stepper fixture"},
+        "timesteps": [
+            {
+                "hour": 1,
+                "summary": {
+                    "campaign": "C0",
+                    "T_C": 1000,
+                    "pO2_bar": 1e-6,
+                    "metal_yields_kg": {"Fe": 0.1},
+                    "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
+                    "O2_source_side_potential_kg_cumulative": 0.01,
+                    "energy_electrical_kWh": 1.0,
+                    "energy_evaporation_thermal_kWh": 0.5,
+                    "regime": "free-molecular",
+                },
+            },
+            {
+                "hour": 2,
+                "summary": {
+                    "campaign": "C0",
+                    "T_C": 1100,
+                    "pO2_bar": 1e-6,
+                    "metal_yields_kg": {"Fe": 0.2},
+                    "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
+                    "O2_source_side_potential_kg_cumulative": 0.02,
+                    "energy_electrical_kWh": 1.0,
+                    "energy_evaporation_thermal_kWh": 0.5,
+                    "regime": "free-molecular",
+                },
+            },
+        ],
+        "terminal": {
+            "final_state": {
+                "process.condensation_train": {"SiO2": 0.1},
+            }
+        },
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const source = fs.readFileSync(process.argv[3], "utf8");
+const report = { innerHTML: "" };
+const listeners = {};
+const elements = {
+  "#report": report,
+  "#stepper": {
+    value: "0",
+    addEventListener(type, fn) { listeners.stepper = listeners.stepper || {}; listeners.stepper[type] = fn; },
+    setAttribute() {},
+  },
+  "#step-prev": {
+    disabled: false,
+    addEventListener(type, fn) { listeners.prev = listeners.prev || {}; listeners.prev[type] = fn; },
+  },
+  "#step-next": {
+    disabled: false,
+    addEventListener(type, fn) { listeners.next = listeners.next || {}; listeners.next[type] = fn; },
+  },
+  "#step-output": { textContent: "" },
+  "#step-position": { textContent: "" },
+  "#current-grid": { innerHTML: "" },
+  "#timestep-ledger": { innerHTML: "" },
+};
+const context = {
+  window: { location: { search: "" } },
+  document: {
+    querySelector(selector) { return elements[selector] || null; },
+    querySelectorAll() { return []; }
+  },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(source, context);
+setImmediate(() => process.stdout.write(JSON.stringify({
+  html: report.innerHTML,
+  hasPrev: Boolean(listeners.prev && listeners.prev.click),
+  hasNext: Boolean(listeners.next && listeners.next.click),
+  hasInput: Boolean(listeners.stepper && listeners.stepper.input)
+})));
+"""
+    completed = subprocess.run(
+        [
+            "node", "-",
+            str(root / "labels.js"),
+            str(root / "report-viewer.js"),
+            json.dumps(artifact),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    result = json.loads(completed.stdout)
+    html = result["html"]
+
+    assert 'id="step-prev"' in html
+    assert 'id="step-next"' in html
+    assert 'aria-label="Previous hour"' in html
+    assert 'aria-label="Next hour"' in html
+    assert 'aria-valuetext="Hour 1 of 2"' in html or "aria-valuetext" in html
+    assert "Evolved metal mass — Ellingham order" in html
+    assert "Extraction yields" not in html
+    assert "Product accounts" in html
+    assert result["hasPrev"] and result["hasNext"] and result["hasInput"]
+    assert "source-side O₂ potential (emitted; not recovered)" in html
+    assert "O2_source_side_potential_kg_cumulative" not in html
 
 
 def test_report_labels_format_scientific_values_and_identifiers() -> None:
@@ -212,7 +567,9 @@ def test_report_labels_format_scientific_values_and_identifiers() -> None:
     )
     harness = r"""
 require(process.argv[2]);
-const { fmtNum, fmtRunId, prettySpecies, accountLabel } = globalThis.ReportLabels;
+const {
+  fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock, prettyChemText
+} = globalThis.ReportLabels;
 process.stdout.write(JSON.stringify({
   zero: fmtNum(0, "mol"),
   trace: fmtNum(1.978e-7, "mol"),
@@ -222,7 +579,9 @@ process.stdout.write(JSON.stringify({
   named: fmtRunId("sample-fullseq-lunar-197h"),
   species: ["SiO2", "Al2O3", "Fe"].map(prettySpecies),
   wall: accountLabel("process.wall_deposit_segment_stage_3_to_stage_4"),
-  unknown: accountLabel("process.future_account")
+  unknown: accountLabel("process.future_account"),
+  feedstock: prettyFeedstock("lunar_mare_low_ti"),
+  chem: prettyChemText("source-side O2 potential (emitted; not recovered)")
 }));
 """
     completed = subprocess.run(
@@ -244,6 +603,212 @@ process.stdout.write(JSON.stringify({
     assert result["species"] == ["SiO₂", "Al₂O₃", "Fe"]
     assert result["wall"] == "Wall deposit · stage 3→4"
     assert result["unknown"] == "Future Account"
+    assert result["feedstock"] == "Lunar Mare Low Ti"
+    assert result["chem"] == "source-side O₂ potential (emitted; not recovered)"
+
+
+def test_report_viewer_section_order_and_stepper_controls() -> None:
+    """Report page: sequential sections, readable feedstock, stepper affordances."""
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    artifact = {
+        "artifact_schema_version": "0.2.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {
+            "run_id": "aabbccddeeff00112233445566778899",
+            "name": "aabbccddeeff00112233445566778899",
+            "feedstock_id": "lunar_mare_low_ti",
+            "charge_mass_kg": 1000.0,
+            "campaign_chain": ["C0", "C2A"],
+            "engine_identity": {"name": "internal-analytical"},
+            "cost_block": {
+                "electrical_cost_per_kWh": 10.0,
+                "solar_heat_cost_per_kWh": 0.05,
+                "provenance": "test prices",
+            },
+        },
+        "timesteps": [
+            {
+                "hour": 1,
+                "summary": {
+                    "campaign": "C0",
+                    "T_C": 75.0,
+                    "pO2_bar": 1e-8,
+                    "P_total_bar": 0.01,
+                    "energy_electrical_kWh": 0.001,
+                    "energy_evaporation_thermal_kWh": 0.0,
+                    "energy_latent_kWh": 0.0,
+                    "energy_dissociation_kWh": 0.0,
+                    "metal_yields_kg": {"Fe": 0.0},
+                    "O2_source_side_potential_kg_cumulative": 0.0,
+                    "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
+                    "regime": "viscous",
+                    "Kn": 0.01,
+                },
+                "ledger": {"process.cleaned_melt": {"SiO2": 10.0}},
+            },
+            {
+                "hour": 2,
+                "summary": {
+                    "campaign": "C2A",
+                    "T_C": 1400.0,
+                    "pO2_bar": 1e-6,
+                    "P_total_bar": 0.01,
+                    "energy_electrical_kWh": 0.002,
+                    "energy_evaporation_thermal_kWh": 0.1,
+                    "energy_latent_kWh": 0.05,
+                    "energy_dissociation_kWh": 0.05,
+                    "metal_yields_kg": {"Fe": 0.35979618445132294},
+                    "O2_source_side_potential_kg_cumulative": 0.043710764798390075,
+                    "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
+                    "regime": "viscous",
+                    "Kn": 0.0003,
+                },
+                "ledger": {
+                    "process.cleaned_melt": {"SiO2": 9.5, "Al2O3": 1.2},
+                    "terminal.offgas": {"O2": 0.5},
+                },
+            },
+        ],
+        "terminal": {
+            "final_state": {
+                "process.cleaned_melt": {"SiO2": 9.5, "Al2O3": 1.2},
+                "terminal.offgas": {"O2": 0.5},
+            },
+            "stage_purity": {
+                "stage_1_fe_condenser": {
+                    "label": "Fe Condenser",
+                    "accepted_species": ["Fe"],
+                    "total_kg": 0.36,
+                    "designated_kg": 0.36,
+                    "impurity_kg": 0.0,
+                    "purity_fraction": 1.0,
+                    "verdict": "PURE",
+                }
+            },
+            "cost_totals": {
+                "electrical_energy_kWh": 0.003,
+                "evaporation_thermal_energy_kWh": 0.1,
+                "electrical_cost_usd": 0.03,
+                "solar_heat_cost_usd": 0.005,
+                "total_cost_usd": 0.035,
+                "process_electrical_energy_kWh": 0.003,
+                "process_electrical_cost_usd": 0.03,
+                "basis_note": "test basis",
+            },
+        },
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const report = { innerHTML: "" };
+const nodes = new Map();
+function el(id) {
+  if (!nodes.has(id)) {
+    nodes.set(id, {
+      textContent: "",
+      innerHTML: "",
+      value: "0",
+      disabled: false,
+      style: {},
+      attributes: {},
+      addEventListener() {},
+      setAttribute(name, value) { this.attributes[name] = String(value); },
+      getAttribute(name) { return this.attributes[name]; }
+    });
+  }
+  return nodes.get(id);
+}
+const context = {
+  window: { location: { search: "?run=aabbccddeeff00112233445566778899" } },
+  document: {
+    title: "",
+    querySelector(selector) {
+      if (selector === "#report") return report;
+      if (selector.startsWith("#")) return el(selector.slice(1));
+      if (selector === ".status-pill") return el("step-pill");
+      if (selector === ".stepper") return el("stepper-root");
+      return null;
+    },
+    querySelectorAll() { return []; }
+  },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+context.globalThis = context;
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(reportSource, context);
+setTimeout(() => {
+  process.stdout.write(JSON.stringify({
+    html: report.innerHTML,
+    title: context.document.title,
+    aria: el("stepper").attributes
+  }));
+}, 30);
+"""
+    completed = subprocess.run(
+        [
+            "node", "-", str(root / "labels.js"),
+            str(root / "report-viewer.js"), json.dumps(artifact),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+        timeout=15,
+    )
+    result = json.loads(completed.stdout)
+    html = result["html"]
+
+    # Readable title + feedstock (no raw 32-hex H1, no snake_case feedstock).
+    assert "Untitled run · aabbccdd…" in html
+    assert "Lunar Mare Low Ti" in html
+    assert "lunar_mare_low_ti" in html  # retained in title tooltip
+    assert "source-side O₂ potential" in html
+    assert "source-side O2 potential" not in html
+
+    # Sequential section numbers in visual order.
+    sects = [
+        ("01", "Evolved metal mass"),
+        ("02", "Process record"),
+        ("03", "Account disposition"),
+        ("04", "Full terminal ledger"),
+        ("05", "Campaign results"),
+        ("06", "Metal taps"),
+        ("07", "Wall risk"),
+        ("08", "Terminal ceramic"),
+        ("09", "Energy"),
+        ("10", "Provenance"),
+    ]
+    positions = []
+    for num, title in sects:
+        token = f'<span class="sect">{num}</span>{title}'
+        assert token in html, f"missing section {num} {title}"
+        positions.append(html.index(token))
+    assert positions == sorted(positions), "sections out of visual order"
+    assert html.count('<span class="sect">03</span>') == 1
+
+    # Stage purity: human label visible, raw key only in title.
+    assert "Fe Condenser" in html
+    assert "title=\"stage_1_fe_condenser\"" in html
+    assert "trace mono" not in html or "stage_1_fe_condenser" not in html.split("Fe Condenser")[1][:80]
+
+    # Stepper affordances.
+    assert 'id="step-prev"' in html
+    assert 'id="step-next"' in html
+    assert 'id="stepper"' in html
+    assert "aria-valuetext" in result["aria"] or "aria-valuenow" in result["aria"]
+
+    # Footer navigation.
+    assert 'href="./library.html"' in html
+    assert "Captured settings" in html
+
+    # Numbers stay scientific (4 sig / sci), not full double dumps in visible kg.
+    assert "0.3598 kg" in html or "0.3598" in html
+    assert "0.35979618445132294 kg" not in html.replace('title="0.35979618445132294 kg"', "")
 
 
 @pytest.mark.parametrize("has_recipe_snapshot", [True, False])
@@ -318,6 +883,357 @@ setImmediate(() => process.stdout.write(JSON.stringify({ fetched, html: settings
         assert "Download run.yaml unavailable" in result["html"]
 
 
+def test_library_renders_readable_cards_and_live_fallback() -> None:
+    """Library page: hash titles truncated, yields via fmtNum, O₂ source-side, fallback."""
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    static_runs = json.loads((root / "runs-index.json").read_text(encoding="utf-8"))
+    live_runs = [
+        {
+            "run_id": "45454a0a69b44ca5a747e950a662ff8b",
+            "name": "45454a0a69b44ca5a747e950a662ff8b",
+            "feedstock_id": "lunar_mare_low_ti",
+            "campaign_chain": ["C0", "C6"],
+            "peak_T_C": 1750.0,
+            "headline_yields_kg": {
+                "Fe": 0.35979618445132294,
+                "O2": 0.043710764798390075,
+            },
+            "status": "ok",
+            "lifecycle": "complete",
+            "created_at": "2026-07-19T16:00:00Z",
+            "starred": False,
+            "summary": "Fe 0.35979618445132294 kg · O₂ (source-side) 0.043710764798390075 kg",
+            "hours": 61,
+        },
+        {
+            "run_id": "fde0cd985c7e436da8b6c026758d28ce",
+            "name": "fde0cd985c7e436da8b6c026758d28ce",
+            "feedstock_id": "lunar_mare_low_ti",
+            "headline_yields_kg": {},
+            "status": "partial",
+            "lifecycle": "cancelled",
+            "created_at": "2026-07-19T16:52:27Z",
+            "starred": False,
+            "summary": "",
+        },
+        {
+            "run_id": "tiny-trace-run",
+            "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "feedstock_id": "lunar_mare_low_ti",
+            "headline_yields_kg": {"Fe": 1.627767869768048e-11, "O2": 0.0},
+            "status": "ok",
+            "lifecycle": "complete",
+            "created_at": "2026-07-18T00:00:00Z",
+            "starred": False,
+            "summary": "Fe 1.62777e-11 kg",
+        },
+    ]
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const librarySource = fs.readFileSync(process.argv[3], "utf8");
+const staticRuns = JSON.parse(process.argv[4]);
+const liveRuns = JSON.parse(process.argv[5]);
+const liveOk = process.argv[6] === "1";
+
+function mockEl(id) {
+  return {
+    id, _html: "", value: "", disabled: false, dataset: {}, listeners: {},
+    addEventListener(type, fn) { (this.listeners[type] ||= []).push(fn); },
+    get innerHTML() { return this._html; },
+    set innerHTML(v) { this._html = v; }
+  };
+}
+const els = { library: mockEl("library") };
+const known = ["folder-list", "run-list", "run-filter", "run-sort"];
+Object.defineProperty(els.library, "innerHTML", {
+  get() { return this._html || ""; },
+  set(v) {
+    this._html = v;
+    for (const id of known) if (!els[id]) els[id] = mockEl(id);
+  }
+});
+const sandbox = {
+  window: { location: { href: "" } },
+  document: {
+    querySelector(sel) {
+      const id = sel.startsWith("#") ? sel.slice(1) : sel;
+      return els[id] || null;
+    }
+  },
+  encodeURIComponent,
+  fetch: async (url) => {
+    if (url === "./runs-index.json") {
+      return { ok: true, json: async () => staticRuns };
+    }
+    if (url === "/api/runs") {
+      if (!liveOk) return { ok: false, status: 503, json: async () => ({ error: "down" }) };
+      return { ok: true, json: async () => liveRuns };
+    }
+    throw new Error(`unexpected fetch ${url}`);
+  },
+  setTimeout,
+  console
+};
+sandbox.globalThis = sandbox;
+vm.createContext(sandbox);
+vm.runInContext(labelsSource, sandbox);
+vm.runInContext(librarySource, sandbox);
+setImmediate(() => {
+  const list = (els["run-list"] && els["run-list"]._html) || "";
+  const folders = (els["folder-list"] && els["folder-list"]._html) || "";
+  process.stdout.write(JSON.stringify({ list, folders, shell: els.library._html || "" }));
+});
+"""
+
+    def _render(live_ok: bool) -> dict:
+        completed = subprocess.run(
+            [
+                "node",
+                "-",
+                str(root / "labels.js"),
+                str(root / "library.js"),
+                json.dumps(static_runs),
+                json.dumps(live_runs),
+                "1" if live_ok else "0",
+            ],
+            input=harness,
+            text=True,
+            capture_output=True,
+            check=True,
+        )
+        return json.loads(completed.stdout)
+
+    live = _render(True)
+    html = live["list"]
+    folders = live["folders"]
+
+    # Hash-like names become short scientific titles, not 32-char line noise.
+    assert "Untitled run · 45454a0a…" in html
+    assert "Untitled run · fde0cd98…" in html
+    assert "<h2>45454a0a69b44ca5a747e950a662ff8b</h2>" not in html
+    assert "45454a0a…" in html  # truncated mono run id
+    assert "CANCELLED" in html
+    # Yield chips use fmtNum (≤4 sig figs / scientific for traces) as visible text.
+    # Full precision may remain only in title= tooltips (exactNumber), never as the chip body.
+    assert "0.3598 kg" in html
+    assert ">0.35979618445132294" not in html
+    assert "1.63e-11 kg" in html
+    # O₂ honesty: source-side, never claimed as recovered product.
+    assert "O₂ source-side potential (not recovered)" in html
+    assert "not recovered" in html
+    assert "O₂ recovered" not in html
+    # No "unfiled" noise when folder absent; structured meta present.
+    assert "unfiled" not in html
+    assert "lunar_mare_low_ti" in html
+    assert "C0→C6" in html
+    # Named static sample keeps human title; demo without artifact stays disabled.
+    assert "Full-sequence lunar" in html
+    assert "demo metadata — no artifact" in html
+    assert 'data-load="index.html"' in html or "data-load=\"index.html\"" in html
+    assert "disabled" in html
+    # Folder counts + scannability line.
+    assert "Showing" in html and "indexed run" in html
+    assert 'data-folder="My runs"' in folders
+    assert "folder-count" in folders
+    # XSS: artifact-ish name must escape if ever present in title path — star label uses esc.
+    assert "<script>" not in html
+
+    fallback = _render(False)
+    assert "Live run index unavailable" in fallback["list"]
+    assert "Full-sequence lunar" in fallback["list"]
+    assert "45454a0a" not in fallback["list"]
+
+
+def test_settings_script_readable_labels_and_honest_absent_fields() -> None:
+    """Settings inspector must read as a scientific report, not line noise."""
+    script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/settings.js"
+    labels_path = script_path.with_name("labels.js")
+    kernel_sha = "12d65b4f9fa9d2ce452eb811655177116fa06da0"
+    noisy = 0.011309733552923255
+    artifact = {
+        "artifact_schema_version": ARTIFACT_SCHEMA_VERSION,
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {
+            "run_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "name": "Full-sequence lunar demo",
+            "recipe_snapshot": {
+                "recipe_schema_version": "recipe-schema-v1",
+                "pins": ["campaigns.C6.pO2_mbar"],
+                "setpoints_patch": {
+                    "campaigns": {"C6": {"pO2_mbar": 0.2}},
+                },
+            },
+            "engine_identity": {
+                "name": "internal-analytical",
+                "backend_wire_token": "internal-analytical",
+                "kernel_commit_sha": kernel_sha,
+                "cache_version": None,
+            },
+            "c3_dose": {"Na_kg": 140.0, "Al2O3_kg": 1.25},
+            "cost_block": {
+                "electrical_cost_per_kWh": 10.0,
+                "solar_heat_cost_per_kWh": 0.05,
+                "provenance": "canonical defaults; payload carried no cost parameters",
+            },
+            "effective_config": {
+                "campaigns.C0.atmosphere": {
+                    "value": "hard_vacuum",
+                    "source": "default",
+                },
+                "campaigns.C6.pO2_mbar": {"value": 0.2, "source": "override"},
+                "denser_geometry.initial_throat_area_m2": {
+                    "value": noisy,
+                    "source": "default",
+                },
+            },
+        },
+        "timesteps": [],
+        "terminal": {},
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const source = fs.readFileSync(process.argv[3], "utf8");
+const settings = { innerHTML: "" };
+const download = { addEventListener() {} };
+const context = {
+  window: { location: { search: process.argv[4] } },
+  document: {
+    querySelector(selector) {
+      if (selector === "#settings") return settings;
+      if (selector === "#download-run") return download;
+      throw new Error(`unexpected selector ${selector}`);
+    },
+    createElement() { throw new Error("download should not execute during render"); }
+  },
+  URLSearchParams,
+  Blob,
+  URL,
+  encodeURIComponent,
+  setTimeout,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[5]) })
+};
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(source, context);
+setImmediate(() => process.stdout.write(settings.innerHTML));
+"""
+    completed = subprocess.run(
+        [
+            "node",
+            "-",
+            str(labels_path),
+            str(script_path),
+            "?run=settings-readable",
+            json.dumps(artifact),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    html = completed.stdout
+
+    # Lede: human name + truncated run id (full hash only in title tooltip).
+    assert "Full-sequence lunar demo" in html
+    assert "aaaaaaaa…" in html
+    assert 'title="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"' in html
+
+    # Recipe snapshot is structured (not a raw JSON dump of the contract fields).
+    assert "recipe-schema-v1" in html
+    assert "campaigns.C6.pO2_mbar" in html
+    assert "Setpoints patch" in html
+    assert '"recipe_schema_version"' not in html
+
+    # Engine identity: human labels, truncated sha, absent stays absent.
+    assert "Kernel commit" in html
+    assert "Engine cache version" in html
+    assert "Backend wire token" in html
+    assert "kernel_commit_sha" not in html
+    assert "12d65b4f…" in html
+    assert kernel_sha not in html.replace(f'title="{kernel_sha}"', "")
+    assert ">null<" not in html
+    assert "not emitted" in html
+
+    # C3 dose: kg units, species subscripts, _kg suffix stripped.
+    # Subtitle may say "not mol" (honest unit disclaimer); dose cells must be kg.
+    assert "Al₂O₃" in html
+    assert "<td>Na</td>" in html
+    assert "140 kg" in html
+    assert "1.25 kg" in html
+    assert "Dose · kg" in html
+    assert "140 mol" not in html
+    assert "1.25 mol" not in html
+
+    # Two-price block + provenance note (no silent defaults).
+    assert "10 USD/kWh" in html
+    assert "0.05 USD/kWh" in html
+    assert "Price provenance:" in html
+    assert "canonical defaults; payload carried no cost parameters" in html
+
+    # Effective config: fmtNum shortens noise; overrides sort first + highlight.
+    assert str(noisy) not in html.replace(f'title="{noisy}"', "")
+    assert "config-override" in html
+    override_pos = html.find("campaigns.C6.pO2_mbar")
+    default_pos = html.find("campaigns.C0.atmosphere")
+    assert 0 <= override_pos < default_pos
+
+    # Manifest download offered only when snapshot is complete.
+    assert "/api/runs/settings-readable/run.yaml" in html
+    assert "Download run.yaml unavailable" not in html
+
+
+def test_settings_script_gates_run_yaml_when_snapshot_malformed() -> None:
+    script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/settings.js"
+    labels_path = script_path.with_name("labels.js")
+    # pins must be string[]; a number pin mirrors the server 409 rule.
+    artifact = _artifact(
+        recipe_snapshot={
+            "setpoints_patch": {},
+            "pins": [1],
+            "recipe_schema_version": "recipe-schema-v1",
+        }
+    )
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const source = fs.readFileSync(process.argv[3], "utf8");
+const settings = { innerHTML: "" };
+const download = { addEventListener() {} };
+const context = {
+  window: { location: { search: "?run=bad-snap" } },
+  document: {
+    querySelector(selector) {
+      if (selector === "#settings") return settings;
+      if (selector === "#download-run") return download;
+      throw new Error(`unexpected selector ${selector}`);
+    },
+    createElement() { throw new Error("download should not execute during render"); }
+  },
+  URLSearchParams, Blob, URL, encodeURIComponent, setTimeout,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(source, context);
+setImmediate(() => process.stdout.write(settings.innerHTML));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(labels_path), str(script_path), json.dumps(artifact)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    html = completed.stdout
+    assert "/api/runs/bad-snap/run.yaml" not in html
+    assert "Download run.yaml unavailable" in html
+    assert "409" in html
+
+
 def test_report_viewer_serves_only_viewer_asset_types(tmp_path: Path) -> None:
     # send_from_directory alone would publish EVERY regular file in the
     # source dir — non-asset files (freeze_sample.py) and dotfiles must 404.
@@ -327,6 +1243,8 @@ def test_report_viewer_serves_only_viewer_asset_types(tmp_path: Path) -> None:
     assert client.get("/report/.hidden.json").status_code == 404
     assert client.get("/report/sample-run-artifact.json").status_code == 200
     assert client.get("/report/library.html").status_code == 200
+    assert b"/api/runs" in client.get("/report/library.html").data
+    assert b"No engine or backend is used" not in client.get("/report/library.html").data
 
 
 def test_report_viewer_rejects_path_traversal(tmp_path: Path) -> None:
