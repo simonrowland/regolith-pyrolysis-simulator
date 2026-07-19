@@ -102,12 +102,13 @@ STAGE_SIO_GAS_MODE = (
 # EvalSpec identity so cost-sensitive optimizer cache entries are reproducible.
 # 2026-07-17 W-A5a/t-227: re-pinned from the executable serializer after the
 # reviewed electricity and solar-heat defaults landed.
+# b-026 residual: removing the inert C3 hold-time bound moved schema identity.
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor"'
     b':false,"allowlist_version":"allowlist-v12","backend_name":"i'
-    b'nternal-analytical","bounds_digest":"2308bef69d19aa7679dda3f'
-    b'5d9838c91f7efd22eaaa16fc64cf5aa8b2cf63eb5","c5_enabled":fals'
-    b'e,"campaign":"C0","chemistry_kernel":{"allow_builtin_fallbac'
+    b'nternal-analytical","bounds_digest":"d2415b67d026eed269340346674e9'
+    b'e9d1774cc3fae698bd174b08cbfe42d7c79","c5_enabled":false,"ca'
+    b'mpaign":"C0","chemistry_kernel":{"allow_builtin_fallbac'
     b'k":false,"engine":"builtin","pressure_Pa":"0.001000000"},"co'
     b'de_version":"0.6.0","cost_parameters":{"parameters":{"deprec'
     b'iation_expense_per_run":"50.000000000","electricity_cost_per'

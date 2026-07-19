@@ -379,7 +379,6 @@ campaigns:
     slag_solubility_limit_wt_pct: [8, 12]    # Na2O/K2O oxide equivalent
     endpoint:
       type: "pO2_return_to_setpoint"
-      hold_time_min: 30
       species_monitored: ["Na", "K"]
     max_hold_hr:
       C3_K:

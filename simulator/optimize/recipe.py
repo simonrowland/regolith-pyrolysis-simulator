@@ -366,7 +366,6 @@ PATH_ALIASES: Mapping[KeyPath, AliasSpec] = MappingProxyType(
             ("campaigns.C2A_staged.stages.fe_hot_hold.duration_h", "campaigns.C2A_staged.stages.fe_hot_hold.duration_hr", "identity"),
             ("campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h", "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_hr", "identity"),
             ("campaigns.C2A_staged.na_shuttle_stage.duration_h", "campaigns.C2A_staged.na_shuttle_stage.duration_hr", "identity"),
-            ("campaigns.C3.endpoint.hold_time_min", "campaigns.C3.endpoint.hold_time_hr", "minutes-to-hours"),
             ("campaigns.C3.duration_after_pathA_h", "campaigns.C3.duration_after_pathA_hr", "identity"),
             ("campaigns.C3.duration_after_pathB_h_per_phase", "campaigns.C3.duration_after_pathB_hr_per_phase", "identity"),
             ("campaigns.C4.hold_temp_C", "campaigns.C4.default_hold_T_C", "identity"),
@@ -1009,18 +1008,6 @@ class RecipeSchema:
             bounds_source="setpoints:campaigns.C3.Na_phase.pO2_bakeout_mbar",
             search_enabled=False,
             scale="log",
-        ),
-        _knob(
-            "campaigns.C3.endpoint.hold_time_hr",
-            low=0.25,
-            high=1.0,
-            units="hr",
-            # Endpoint hold sweep around 30 min nominal tests equilibration margin.
-            bounds_source=(
-                "engineering_envelope transformed from "
-                "setpoints:campaigns.C3.endpoint.hold_time_min=[15,60]"
-            ),
-            search_enabled=False,
         ),
         _knob(
             "campaigns.C3.alkali_dosing.Na_kg",
@@ -1830,7 +1817,6 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C3.p_total_mbar_default",
         "campaigns.C3.K_phase.pO2_bakeout_mbar",
         "campaigns.C3.Na_phase.pO2_bakeout_mbar",
-        "campaigns.C3.endpoint.hold_time_hr",
         "campaigns.C3.alkali_dosing.Na_kg",
         "campaigns.C3.alkali_dosing.K_kg",
         "campaigns.C3.duration_after_pathA_hr",

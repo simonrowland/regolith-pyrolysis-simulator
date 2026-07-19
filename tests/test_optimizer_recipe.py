@@ -71,17 +71,20 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
             .setpoints
         )
     ).encode()
+    # b-026 residual: removing the behaviorally inert C3 hold-time field moves
+    # resolved/schema identity bytes while the trajectory regression below
+    # keeps runtime behavior pinned.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "77a7172b39b57f4191e2e31f073acd23fba37e8944845531fa3053b3773b8a86"
+        "5c1a8ff2ad74c4ddfe2566287801446d187a74a0c471d94df70801684c2969a0"
     )
     assert schema.bounds_digest == (
-        "2308bef69d19aa7679dda3f5d9838c91f7efd22eaaa16fc64cf5aa8b2cf63eb5"
+        "d2415b67d026eed269340346674e9e9d1774cc3fae698bd174b08cbfe42d7c79"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
     )
     assert empty.recipe_id(schema) == (
-        "fcb620b79a966a6412204c76bf87dc220e1c4cb38cda36c44f57d80cd4fa84b4"
+        "e7192a398b365b98388a526acda7ba09e0cb420da3f5d33cc37d4b43ad7ded28"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -93,7 +96,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
     assert identity_digest == (
-        "072e1d3adba682b092a78ce141e0b0cab9ea2a180f510d3d44794a97336e506a"
+        "dc4a98ad6caaaa800640b0d348116b20bba0264a7303343be15ba2a1391ac9b6"
     )
     assert identity_digest != (
         "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
@@ -523,8 +526,8 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
         profile,
         unpinned,
     )
-    # 2026-07-15 t-155: allowlist-v12 vocabulary identity epoch.
-    assert spec.recipe_id == "fcb620b79a966a6412204c76bf87dc220e1c4cb38cda36c44f57d80cd4fa84b4"
+    # b-026 residual removes one inert allowlist entry; search paths stay fixed.
+    assert spec.recipe_id == "e7192a398b365b98388a526acda7ba09e0cb420da3f5d33cc37d4b43ad7ded28"
     # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
     # moves when the live searchable allowlist identity changes.
     # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed,
@@ -618,7 +621,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-17: t-097 (110f03c/a217ce8) owns the Ellingham source-fingerprint
     # move; W-A5a/t-227 adds the composed reviewed electricity/solar defaults.
     # Recomputed from this tree.
-    assert cache_key(spec) == "b8874bc49362c8b8d4038697397921ffacb94536ac6b6578937197f8c950c410"
+    assert cache_key(spec) == "49c50b9612c20988541821d4060f6e181301c5bee2d9fa8c27b6b298e9480dff"
     assert cache_key(spec) != "be16be9b30f3b68f4889933efad83da6eb65b40cd80f7c5d16349a5f891e464b"
 
 
@@ -632,14 +635,51 @@ def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
         RecipePatch({PO2_DEFAULT: "9.0"}).validated()
 
 
-def test_c3_hold_time_alias_converts_minutes_to_float_hours() -> None:
+def test_c3_dead_hold_time_removed_and_legacy_payload_is_trajectory_neutral() -> None:
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text(encoding="utf-8"))
     old = ("campaigns", "C3", "endpoint", "hold_time_min")
     canonical = ("campaigns", "C3", "endpoint", "hold_time_hr")
-    assert RecipePatch({old: 30}).validated().values[canonical] == pytest.approx(0.5)
-    assert RecipePatch({old: 30.5}).validated().values[canonical] == pytest.approx(30.5 / 60)
 
-    with pytest.raises(RecipeValidationError, match="requires float value"):
-        RecipePatch({canonical: True}).validated()
+    assert "hold_time_min" not in setpoints["campaigns"]["C3"]["endpoint"]
+    assert old not in PATH_ALIASES
+    with pytest.raises(RecipeValidationError, match="unknown recipe path"):
+        RecipePatch({old: 30}).validated()
+    with pytest.raises(RecipeValidationError, match="unknown recipe path"):
+        RecipePatch({canonical: 0.5}).validated()
+
+    def trajectory(config: dict) -> list[tuple[object, ...]]:
+        manager = CampaignManager(config)
+        points = []
+        for campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
+            for path in ("A_staged", "A", "B"):
+                for hour in range(36):
+                    melt = MeltState(
+                        campaign=campaign,
+                        campaign_hour=hour,
+                        temperature_C=25.0,
+                        composition_kg={"SiO2": 50.0, "Al2O3": 20.0, "CaO": 30.0},
+                    )
+                    points.append(
+                        (
+                            campaign,
+                            path,
+                            hour,
+                            manager.get_temp_target(campaign, hour, melt),
+                            manager.check_endpoint(
+                                melt,
+                                EvaporationFlux(),
+                                CondensationTrain(),
+                                BatchRecord(path=path),
+                            ),
+                        )
+                    )
+        return points
+
+    expected = trajectory(copy.deepcopy(setpoints))
+    for legacy_value in (1, 30, 999):
+        legacy = copy.deepcopy(setpoints)
+        legacy["campaigns"]["C3"]["endpoint"]["hold_time_min"] = legacy_value
+        assert trajectory(legacy) == expected
 
 
 def test_furnace_max_t_c_knob_bounds_and_top_level_patch() -> None:
@@ -1530,11 +1570,10 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     ).validated()
 
     assert first.recipe_id() == second.recipe_id()
-    # 2026-07-12: recomputed after the C6 1400 C hold-window bounds moved the
-    # active bounds digest from 67f7eae1... to 32e9d2e9....
+    # b-026 residual: recomputed after removing the inert C3 hold-time bound.
     assert (
         first.recipe_id()
-                == "6b828131b4a825d1f3d761c7b851863fc2ec17dccf8e07665d11ccaa8ae47b89"
+                == "d23ed0e32f9e3acfc5e665288bd6fc8151c103c3f80031aaee733a24a4a1d412"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

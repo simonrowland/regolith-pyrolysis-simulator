@@ -183,7 +183,6 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
         _path("campaigns.C2A_staged.stages.sio_window.p_total_mbar"),
         _path("campaigns.C2A_staged.stages.sio_window.gas_cover_mode"),
         _path("campaigns.C2A_staged.stages.fe_hot_hold.duration_hr"),
-        _path("campaigns.C3.endpoint.hold_time_hr"),
         _path("campaigns.C3.alkali_dosing.Na_kg"),
         _path("campaigns.C3.alkali_dosing.K_kg"),
         _path("campaigns.C4.default_hold_T_C"),
