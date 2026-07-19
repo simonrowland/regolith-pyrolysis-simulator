@@ -73,7 +73,7 @@ class StopAfterStep(Exception):
 
 def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     _install_alpha_fallback_fixture(monkeypatch)
-    batch = _run_batch()
+    batch = _run_batch(monkeypatch)
     cli = _run_cli_session()
     web = _run_web_session(monkeypatch)
     surfaces = [batch, cli, web]
@@ -152,7 +152,7 @@ def _install_alpha_fallback_fixture(monkeypatch) -> None:
     monkeypatch.setattr(web_events, "_load_yaml", load_yaml_with_alpha_fallback)
 
 
-def _run_batch() -> SurfaceResult:
+def _run_batch(monkeypatch) -> SurfaceResult:
     run = PyrolysisRun(
         feedstock_id=FEEDSTOCK,
         campaign=CAMPAIGN,
@@ -166,11 +166,25 @@ def _run_batch() -> SurfaceResult:
             "kernel_commit_sha": "parity-fixture",
         },
     )
-    document = run.run()
+    ledgers = []
+    original_final_state_from_ledger = runner_module._final_state_from_ledger
+
+    def capture_raw_ledger_at_final_state(sim):
+        ledgers.append(_ledger_from_simulator(sim))
+        return original_final_state_from_ledger(sim)
+
+    with monkeypatch.context() as batch_patch:
+        batch_patch.setattr(
+            runner_module,
+            "_final_state_from_ledger",
+            capture_raw_ledger_at_final_state,
+        )
+        document = run.run()
     assert document["status"] == "ok"
+    assert len(ledgers) == 1
     return SurfaceResult(
         name="batch",
-        ledger=document["final_state"],
+        ledger=ledgers[0],
         decisions=[
             (event["decision_type"], event["choice"])
             for event in document["shadow_trace"]
