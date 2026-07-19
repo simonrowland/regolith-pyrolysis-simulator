@@ -176,40 +176,60 @@ def test_new_proxy_species_flux_scales_with_yaml_alpha():
     assert flux["Ti"] / flux["Ca"] == pytest.approx(0.80 / 0.90)
 
 
-def test_cro2_missing_alpha_refuses_nontrivial_flux_by_default():
+def test_cro2_missing_alpha_refuses_only_cro2_and_retains_parent_oxide():
     request = IntentRequest(
         intent=ChemistryIntent.EVAPORATION_FLUX,
         account_view=ProviderAccountView(
-            accounts={"process.cleaned_melt": {"Cr2O3": 10.0}},
+            accounts={
+                "process.cleaned_melt": {"Cr2O3": 10.0, "Na2O": 10.0}
+            },
             species_formula_registry={},
         ),
         temperature_C=1700.0,
         pressure_bar=1e-6,
         fO2_log=None,
         control_inputs={
-            "vapor_pressures_Pa": {"CrO2": 100.0},
+            "vapor_pressures_Pa": {"CrO2": 100.0, "Na": 100.0},
             "overhead_partials_Pa": {},
-            "molar_mass_kg_mol": {"CrO2": 0.084},
+            "molar_mass_kg_mol": {"CrO2": 0.084, "Na": 0.023},
             "stoich_by_species": {
                 "CrO2": {
                     "parent_oxide": "Cr2O3",
                     "oxide_per_product_kg": 1.0,
                     "O2_per_product_kg": 0.0,
-                }
+                },
+                "Na": {
+                    "parent_oxide": "Na2O",
+                    "oxide_per_product_kg": 1.347,
+                    "O2_per_product_kg": 0.347,
+                },
             },
-            "available_oxide_kg": {"CrO2": 10.0},
+            "available_oxide_kg": {"CrO2": 10.0, "Na": 10.0},
             "melt_surface_area_m2": 1.0,
             "stir_factor": 1.0,
-            "alpha": {},
+            "alpha": {"Na": 0.5},
         },
     )
 
     result = BuiltinEvaporationFluxProvider().dispatch(request)
 
-    assert result.status == "unavailable"
-    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"]["Na"] > 0.0
+    assert "CrO2" not in result.diagnostic["evaporation_flux_kg_hr"]
     assert set(result.diagnostic["missing_alpha"]) == {"CrO2"}
-    assert "missing evaporation_alpha" in result.warnings[0]
+    refusal = result.diagnostic["species_refusals"]["CrO2"]
+    assert refusal["policy"] == "fail_loud_missing_alpha"
+    assert refusal["fallback_control"] == (
+        "chemistry_kernel.allow_unmeasured_alpha_fallback"
+    )
+    assert refusal["P_eq_Pa"] == 100.0
+    assert refusal["P_bulk_Pa"] == 0.0
+    assert refusal["baseline_alpha_1_rate_kg_hr"] > 1e-12
+    assert refusal["status"] == "refused"
+    assert refusal["reason"] == "missing_evaporation_alpha"
+    assert refusal["disposition"] == "retained_in_condensed_parent_oxide"
+    assert refusal["parent_oxide"] == "Cr2O3"
+    assert "per-species evaporation refusal" in result.warnings[0]
 
 
 def test_grounded_cr_ignores_unmeasured_fallback_opt_in():

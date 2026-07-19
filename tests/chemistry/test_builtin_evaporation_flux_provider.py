@@ -337,8 +337,14 @@ def test_unmeasured_alpha_fallback_allowlist_is_scoped_and_loud():
         unmeasured_alpha_fallback_species=["CrO2", "Mn"],
     )
 
-    assert refused.status == "unavailable"
+    assert refused.status == "ok"
+    assert refused.diagnostic["evaporation_flux_kg_hr"] == {}
     assert set(refused.diagnostic["missing_alpha"]) == {"Na"}
+    assert refused.diagnostic["species_refusals"]["Na"]["status"] == "refused"
+    assert (
+        refused.diagnostic["species_refusals"]["Na"]["disposition"]
+        == "retained_in_condensed_parent_oxide"
+    )
     assert "unmeasured_alpha_fallback_species" not in refused.diagnostic
 
 

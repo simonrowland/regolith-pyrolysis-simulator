@@ -1051,36 +1051,6 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 ),
             )
 
-        if missing_alpha:
-            missing_alpha_warnings = [
-                "missing evaporation_alpha for sampled species: "
-                + ", ".join(sorted(missing_alpha))
-            ]
-            missing_alpha_diagnostic = {
-                "evaporation_flux_kg_hr": {},
-                "alpha_used_by_species": alpha_used_by_species,
-                "alpha_s_evaluation_by_species": alpha_evaluations_by_species,
-                "flux_uncertainty_pct": flux_uncertainty_pct,
-                "missing_alpha": missing_alpha,
-                "temperature_C": T_C,
-                "evaporation_series_resistance": series_flux_diagnostics,
-            }
-            if missing_molar_mass:
-                missing_alpha_diagnostic["missing_molar_mass"] = missing_molar_mass
-                missing_alpha_warnings.append(
-                    "missing molar_mass_g_mol for evaporation species in "
-                    "data/vapor_pressures.yaml: "
-                    + ", ".join(sorted(missing_molar_mass))
-                )
-            return IntentResult(
-                intent=ChemistryIntent.EVAPORATION_FLUX,
-                status="unavailable",
-                transition=None,
-                control_audit=control_audit,
-                diagnostic=missing_alpha_diagnostic,
-                warnings=tuple(missing_alpha_warnings),
-            )
-
         diagnostic = {
             "evaporation_flux_kg_hr": flux_kg_hr,
             "alpha_used_by_species": alpha_used_by_species,
@@ -1089,11 +1059,33 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
             "evaporation_series_resistance": series_flux_diagnostics,
             "temperature_C": T_C,
         }
+        species_refusals: dict[str, dict[str, float | str]] = {}
+        if missing_alpha:
+            for species, refusal in missing_alpha.items():
+                species_refusals[species] = {
+                    **refusal,
+                    "status": "refused",
+                    "reason": "missing_evaporation_alpha",
+                    "disposition": "retained_in_condensed_parent_oxide",
+                    "parent_oxide": str(
+                        (stoich_by_species.get(species) or {}).get(
+                            "parent_oxide", "unknown"
+                        )
+                    ),
+                }
+            diagnostic["missing_alpha"] = missing_alpha
+            diagnostic["species_refusals"] = species_refusals
         if unmeasured_alpha_fallback_species:
             diagnostic["unmeasured_alpha_fallback_species"] = sorted(
                 unmeasured_alpha_fallback_species
             )
         warning_messages: list[str] = []
+        if missing_alpha:
+            warning_messages.append(
+                "per-species evaporation refusal; retained condensed because "
+                "evaporation_alpha is missing: "
+                + ", ".join(sorted(missing_alpha))
+            )
         if unmeasured_alpha_fallback_species:
             warning_messages.append(
                 "WARNING: alpha=1.0 prototype fallback used for unmeasured "

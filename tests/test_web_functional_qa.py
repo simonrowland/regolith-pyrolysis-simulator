@@ -64,9 +64,6 @@ def _deterministic_web_run(monkeypatch):
         payload = original_load_yaml(filename)
         if filename == "setpoints.yaml":
             payload = dict(payload)
-            kernel = dict(payload.get("chemistry_kernel", {}) or {})
-            kernel["allow_unmeasured_alpha_fallback"] = True
-            payload["chemistry_kernel"] = kernel
             campaigns = dict(payload.get("campaigns", {}) or {})
             c6 = dict(campaigns.get("C6", {}) or {})
             c6["max_hold_hr"] = 1
@@ -253,6 +250,10 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     )
     assert artifact["terminal"]["final_state"] == runner["final_state"]
     sim = state["session"].simulator
+    assert (
+        sim.setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
+        is False
+    )
     assert completion["products"] == {
         species: round(value, 2)
         for species, value in sim.product_ledger().items()
@@ -272,6 +273,8 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert story["refractory_ceramic"]["class_total_kg"] > 0
     assert story["escaped_to_vacuum"]["class_total_kg"] >= 0
     assert story["terminal_residue"]["class_total_kg"] > 0
+    assert completion["terminal_rump_by_species"]["Cr2O3"] > 0
+    assert story["refractory_ceramic"]["species_kg"]["Cr2O3"] > 0
 
     stage_collection = sim._stage_collection_kg_by_source
     assert story["glass"]["species_kg"] == {
