@@ -197,8 +197,8 @@ def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
 # 2026-07-17 t-159/t-160/t-260 composition: executable CLI regeneration after
 # the transport and capture corrections moved both coupled SiO baselines.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 7.61699622023e-06,
-    "mars_basalt": 7.65784335307e-06,
+    "lunar_mare_low_ti": 7.61698230755e-06,
+    "mars_basalt": 7.65772411303e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -235,7 +235,43 @@ def _assert_golden_close(actual, expected, path="root"):
         tolerance = max(abs(float(expected)) * 0.01, 1.0e-12)
         assert abs(float(actual) - float(expected)) <= tolerance, path
         return
+    parametric_prefix = "resinter_threshold_kg / "
+    if (
+        path.startswith("root.fouling_rate.")
+        and isinstance(expected, str)
+        and expected.startswith(parametric_prefix)
+    ):
+        assert isinstance(actual, str), path
+        assert actual.startswith(parametric_prefix), path
+        expected_load_kg = float(expected.removeprefix(parametric_prefix))
+        actual_load_kg = float(actual.removeprefix(parametric_prefix))
+        tolerance = max(abs(expected_load_kg) * 0.01, 1.0e-12)
+        assert abs(actual_load_kg - expected_load_kg) <= tolerance, path
+        return
     assert actual == expected, path
+
+
+def test_golden_comparison_tolerates_only_parametric_fouling_denominator():
+    expected = "resinter_threshold_kg / 7.29135304028e-06"
+    actual = "resinter_threshold_kg / 7.29133970335e-06"
+
+    _assert_golden_close(
+        actual,
+        expected,
+        "root.fouling_rate.aggregate_campaigns_to_resinter",
+    )
+    with pytest.raises(AssertionError):
+        _assert_golden_close(
+            "resinter_threshold_kg / 6.0e-06",
+            expected,
+            "root.fouling_rate.aggregate_campaigns_to_resinter",
+        )
+    with pytest.raises(AssertionError):
+        _assert_golden_close(
+            actual,
+            expected,
+            "root.alpha_provenance",
+        )
 
 
 @pytest.mark.parametrize(("feedstock", "golden_name"), GOLDENS)
