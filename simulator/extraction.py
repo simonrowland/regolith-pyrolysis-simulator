@@ -68,7 +68,7 @@ class ExtractionMixin:
         self,
         species_names,
     ) -> dict[str, float]:
-        cleaned_melt = self.atom_ledger.project_account_mol(
+        cleaned_melt = self.atom_ledger.mol_by_account(
             'process.cleaned_melt'
         )
         return {
@@ -598,10 +598,10 @@ class ExtractionMixin:
 
         prior_pools = {
             'bottom_pool': dict(
-                self.atom_ledger.project_account_mol(METAL_BOTTOM_POOL_ACCOUNT)
+                self.atom_ledger.mol_by_account(METAL_BOTTOM_POOL_ACCOUNT)
             ),
             'float_layer': dict(
-                self.atom_ledger.project_account_mol(METAL_FLOAT_LAYER_ACCOUNT)
+                self.atom_ledger.mol_by_account(METAL_FLOAT_LAYER_ACCOUNT)
             ),
         }
         if not any(prior_pools.values()):
@@ -656,7 +656,7 @@ class ExtractionMixin:
         )
 
         balances = {
-            account: self.atom_ledger.project_account_mol(account)
+            account: self.atom_ledger.mol_by_account(account)
             for account in METAL_PHASE_ACCOUNTS
         }
         classified_species = BOTTOM_POOL_SPECIES | FLOAT_LAYER_SPECIES
@@ -705,12 +705,12 @@ class ExtractionMixin:
         if commit_disposition:
             pools_mol = {
                 'bottom_pool': dict(
-                    self.atom_ledger.project_account_mol(
+                    self.atom_ledger.mol_by_account(
                         METAL_BOTTOM_POOL_ACCOUNT
                     )
                 ),
                 'float_layer': dict(
-                    self.atom_ledger.project_account_mol(
+                    self.atom_ledger.mol_by_account(
                         METAL_FLOAT_LAYER_ACCOUNT
                     )
                 ),
@@ -3190,7 +3190,7 @@ class ExtractionMixin:
             C7_AL_CREDIT_ACCOUNT,
         )
         balances = {
-            account: self.atom_ledger.project_account_mol(account)
+            account: self.atom_ledger.mol_by_account(account)
             for account in c7_accounts
         }
         cleaned_cao = max(
@@ -3371,7 +3371,7 @@ class ExtractionMixin:
                 'c7_al_export_remaining_mol': max(
                     0.0,
                     float(
-                        self.atom_ledger.project_account_mol(
+                        self.atom_ledger.mol_by_account(
                             'process.metal_phase'
                         )
                         .get('Al', 0.0)

@@ -1245,7 +1245,7 @@ class EvaporationMixin:
         self,
         reasons: list[str],
     ) -> dict[str, Any] | None:
-        cleaned_mol = self.atom_ledger.project_account_mol(
+        cleaned_mol = self.atom_ledger.mol_by_account(
             _FREEZE_GATE_ACCOUNT
         )
         if not any(

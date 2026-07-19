@@ -379,6 +379,13 @@ def test_pt0_ledger_overrides_project_dust_and_refuse_real_negative() -> None:
 
 
 def test_remaining_outward_mol_consumer_classes_fail_closed() -> None:
+    """Outward seams must project signed dust and refuse material negatives.
+
+    In-loop physics consumers (availability, holdup, Fe inventory, parametric
+    liquidus availability) intentionally read canonical raw mol so a future
+    projection clamp-band change cannot path-depend the trajectory (t-342).
+    Those are covered by test_in_loop_mol_consumers_use_canonical_raw.
+    """
     consumers = (
         (
             "runner_final_state",
@@ -394,6 +401,41 @@ def test_remaining_outward_mol_consumer_classes_fail_closed() -> None:
             ),
             lambda result: result == {},
         ),
+        (
+            "public_plume_report",
+            "process.overhead_gas",
+            lambda sim: AccountingQueries(sim).lab_plume_product_partition(),
+            lambda result: (
+                result["near_melt"]["sio"]["species_mol"] == 0.0
+                and result["near_melt"]["free_analyzer_oxygen"][
+                    "species_mol"
+                ] == {}
+            ),
+        ),
+    )
+
+    for seam, account, consume, accepts_dust in consumers:
+        ledger = _signed_dust_ledger(account)
+        sim = SimpleNamespace(
+            atom_ledger=ledger,
+            species_formula_registry=ledger.registry,
+        )
+        result = consume(sim)
+        assert accepts_dust(result), seam
+        assert ledger.mol_by_account(account)["FeO"] < 0.0, seam
+
+        ledger._balances[account]["FeO"] *= 10.0
+        with pytest.raises(AccountingError, match="negative outward mass"):
+            consume(sim)
+
+
+def test_in_loop_mol_consumers_use_canonical_raw() -> None:
+    """In-loop reads stay on raw mol; local >0/max(0) filters make dust inert.
+
+    Projection remains an outward/provider boundary only. These sites must not
+    raise AccountingError via project_account_mol, because they no longer call it.
+    """
+    consumers = (
         (
             "extraction_availability",
             "process.cleaned_melt",
@@ -422,17 +464,6 @@ def test_remaining_outward_mol_consumer_classes_fail_closed() -> None:
             lambda sim: PyrolysisSimulator._cleaned_melt_fe_atom_mol(sim),
             lambda result: result == 0.0,
         ),
-        (
-            "public_plume_report",
-            "process.overhead_gas",
-            lambda sim: AccountingQueries(sim).lab_plume_product_partition(),
-            lambda result: (
-                result["near_melt"]["sio"]["species_mol"] == 0.0
-                and result["near_melt"]["free_analyzer_oxygen"][
-                    "species_mol"
-                ] == {}
-            ),
-        ),
     )
 
     for seam, account, consume, accepts_dust in consumers:
@@ -445,9 +476,11 @@ def test_remaining_outward_mol_consumer_classes_fail_closed() -> None:
         assert accepts_dust(result), seam
         assert ledger.mol_by_account(account)["FeO"] < 0.0, seam
 
+        # Material negative stays on the raw path: local clamps, no outward raise.
         ledger._balances[account]["FeO"] *= 10.0
-        with pytest.raises(AccountingError, match="negative outward mass"):
-            consume(sim)
+        result_material = consume(sim)
+        assert accepts_dust(result_material), seam
+        assert ledger.mol_by_account(account)["FeO"] < 0.0, seam
 
 
 def test_runtime_melt_and_c7_report_use_ledger_projection_policy() -> None:
