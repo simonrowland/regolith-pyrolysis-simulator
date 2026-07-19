@@ -22,6 +22,7 @@ from simulator.core import (
     PoisonedHourError,
     PyrolysisSimulator,
 )
+from simulator.electrolysis import MRECurrentPartitionRefusal
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.pumping_cost import pumping_context_from_sim
 from simulator.session import (
@@ -46,6 +47,7 @@ _ALL_TYPED_PHYSICS_REFUSALS = (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
     EvaporationFluxRefusal,
+    MRECurrentPartitionRefusal,
     *_TYPED_PHYSICS_REFUSALS,
 )
 
@@ -344,6 +346,7 @@ class RunExecutor:
             CampaignHoldTargetRefusal,
             CampaignPressureSetpointRefusal,
             EvaporationFluxRefusal,
+            MRECurrentPartitionRefusal,
         ) as exc:
             failure_exc = exc
             status = "refused"

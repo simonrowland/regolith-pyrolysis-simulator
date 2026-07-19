@@ -1289,7 +1289,11 @@ class ExtractionMixin:
         Returns O₂ produced this hour (kg).
         """
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
-        from simulator.electrolysis import ELECTRONS_PER_OXIDE
+        from simulator.electrolysis import (
+            ELECTRONS_PER_OXIDE,
+            MRECurrentPartitionRefusal,
+            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+        )
 
         mre_diagnostic_state_before_step = {
             'uncertified_yield': dict(
@@ -1690,6 +1694,8 @@ class ExtractionMixin:
                     'effective_voltage_margin_temperature_C']
             )
             reason = diagnostic.get('reason_refused', 'electrolysis_step_refused')
+            if reason == MRE_MULTI_OXIDE_PARTITION_REFUSAL:
+                raise MRECurrentPartitionRefusal(reason, refusal_record)
             raise RuntimeError(f'MRE electrolysis refused: {reason}')
         if proposal is not None:
             transition = self._commit_proposal(

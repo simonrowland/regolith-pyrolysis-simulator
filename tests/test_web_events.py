@@ -16,6 +16,10 @@ from web import routes as web_routes
 from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.accounting.queries import TERMINAL_RUMP_REFRACTORY_OXIDES
+from simulator.electrolysis import (
+    MRECurrentPartitionRefusal,
+    MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+)
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -1820,6 +1824,79 @@ def test_c4_disclosure_option_lists_are_server_sourced_byte_identical():
         '<option value="4">Low (4&times;)</option>',
         '<option value="1">Off (1&times;)</option>',
     ]
+
+
+def test_mre_partition_refusal_emits_typed_terminal_status(monkeypatch):
+    sid = "test-mre-partition-refusal"
+    sim = SimpleNamespace(_poisoned_hour=None)
+    session = SimpleNamespace(simulator=sim, is_complete=lambda: False)
+    state, lock = _replace_simulation_state(sid, session, speed=0.0)
+    statuses = []
+    diagnostic = {
+        "hour": 43,
+        "campaign": "MRE_BASELINE",
+        "diagnostic": {
+            "reason_refused": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            "current_partition_certified": False,
+            "reducible_oxide_targets": ("Cr2O3", "SiO2"),
+        },
+    }
+
+    class Socket:
+        def start_background_task(self, target):
+            self.target = target
+            return object()
+
+        def emit(self, event, payload, room=None):
+            if event == "simulation_status":
+                statuses.append(payload)
+
+    socket = Socket()
+
+    def drive(*_args, **_kwargs):
+        raise MRECurrentPartitionRefusal(
+            MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            diagnostic,
+        )
+
+    persisted = {}
+
+    def persist_terminal(*_args, **kwargs):
+        persisted.update(kwargs)
+        state["artifact_persisted"] = True
+        return {"execution_status": kwargs["status"]}
+
+    monkeypatch.setattr(web_events, "drive_session", drive)
+    monkeypatch.setattr(web_events, "_persist_terminal", persist_terminal)
+
+    try:
+        web_events._start_background_loop(
+            socket,
+            sid,
+            state["run_id"],
+            lock,
+            "backend",
+            "ok",
+            True,
+        )
+        socket.target()
+
+        assert sim._poisoned_hour is None
+        assert statuses == [{
+            "status": "refused",
+            "reason": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            "message": MRE_MULTI_OXIDE_PARTITION_REFUSAL,
+            "refusal_diagnostic": diagnostic,
+            "backend_status": "ok",
+            "backend_authoritative": True,
+            "backend_message": "backend",
+            "run_id": state["run_id"],
+        }]
+        assert persisted["status"] == "refused"
+        assert persisted["reason"] == MRE_MULTI_OXIDE_PARTITION_REFUSAL
+        assert persisted["refusal_diagnostic"] == diagnostic
+    finally:
+        _clear_simulation_state(sid)
 
 
 @pytest.mark.parametrize(

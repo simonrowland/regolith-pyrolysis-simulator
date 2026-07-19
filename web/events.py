@@ -57,6 +57,7 @@ from simulator.cost_parameters import (
     normalize_cost_parameters,
 )
 from simulator.core import PoisonedHourError
+from simulator.electrolysis import MRECurrentPartitionRefusal
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -2103,7 +2104,11 @@ def _start_background_loop(
                             tick_data=tick_data,
                             per_hour_summary=step_result.per_hour_summary,
                         )
-                except (KnudsenRegimeRefusal, EvaporationFluxRefusal) as exc:
+                except (
+                    KnudsenRegimeRefusal,
+                    EvaporationFluxRefusal,
+                    MRECurrentPartitionRefusal,
+                ) as exc:
                     _safe_log(f'Simulation refused: {exc.reason}')
                     error_payload = {
                         'status': 'refused',

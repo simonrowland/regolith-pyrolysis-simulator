@@ -95,6 +95,23 @@ MRE_FIXED_REDUCIBLE_OXIDES = tuple(
 )
 
 
+class MRECurrentPartitionRefusal(RuntimeError):
+    """Typed terminal refusal for an uncertified MRE current partition.
+
+    The refusal is terminal for the requested run, but not a simulator fault.
+    ``core.step`` uses ``terminal_refusal`` to restore the whole attempted hour
+    instead of poisoning a simulator that already committed an earlier
+    transition during that hour.
+    """
+
+    terminal_refusal = True
+
+    def __init__(self, reason: str, diagnostic: Mapping[str, object]):
+        self.reason = str(reason)
+        self.diagnostic = dict(diagnostic)
+        super().__init__(self.reason)
+
+
 def min_decomposition_voltage(*, temperature_K: float | None = None) -> float:
     voltages = [
         reference.voltage
