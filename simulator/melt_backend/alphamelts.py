@@ -50,6 +50,10 @@ from simulator.melt_backend.base import (
     MeltBackendError,
     liquid_fraction_from_phase_masses,
 )
+from simulator.melt_backend.engine_worker import (
+    EngineWorkerRemoteError,
+    WarmEngineWorker,
+)
 from simulator.melt_backend.alphamelts_contract import (
     AlphaMELTSSubprocessRunMode,
 )
@@ -321,6 +325,36 @@ def _run_petthermotools_worker(
         connection.close()
 
 
+def _bootstrap_petthermotools_worker(model_code: int):
+    """Import PTT and construct one reusable native MELTS payload."""
+    try:
+        module = importlib.import_module('petthermotools')
+    except ImportError:
+        module = importlib.import_module('PetThermoTools')
+    loader = getattr(module, 'MELTSdynamic', None)
+    if loader is None:
+        meltsdynamic = importlib.import_module('meltsdynamic')
+        loader = getattr(meltsdynamic, 'MELTSdynamic', None)
+    if loader is None:
+        raise ImportError('MELTSdynamic loader not found')
+    resource = {
+        'module': module,
+        'melts': loader(model_code),
+    }
+    version = getattr(module, '__version__', None)
+    return resource, str(version or 'available')
+
+
+def _handle_petthermotools_request(resource, request, _errlog):
+    """Run one operation after rebuilding all Python call state."""
+    operation = str(request['operation'])
+    call_kwargs = dict(request.get('kwargs') or {})
+    if operation in {'equilibrate_MELTS', 'findLiq_MELTS'}:
+        call_kwargs['melts'] = resource['melts']
+    function = getattr(resource['module'], operation)
+    return function(*tuple(request.get('args') or ()), **call_kwargs)
+
+
 PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'All', 'Mass', 'Volume', 'rho', 'Conditions', 'Input', 'Affinity',
     'Activities', 'activities', 'activity_coefficients',
@@ -382,6 +416,8 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_melts = None
         self._pet_import_error: Optional[ImportError] = None
         self._pet_payload_preloaded = False
+        self._pet_worker: Optional[WarmEngineWorker] = None
+        self._pet_warm_enabled = False
         self._engine_version: Optional[str] = None
         self._vaporock_available = False
         self._vaporock_helper: Optional[VapoRockBackend] = None
@@ -417,6 +453,12 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_module = None
         self._pet_melts = None
         self._pet_payload_preloaded = False
+        if bool(config.get('warm_worker', False)):
+            raise ValueError(
+                'PetThermoTools warm_worker is blocked until the real native '
+                'runtime passes the 24-point byte-identity reset gate'
+            )
+        self._pet_warm_enabled = False
         self._redox_buffer = self._normalize_redox_buffer(
             config.get('fO2_buffer', config.get('redox_buffer')))
         self._fo2_offset = self._optional_float(config.get('fO2_offset'))
@@ -519,7 +561,9 @@ class _MELTSBackendSupport(MeltBackend):
 
     def close(self) -> None:
         """Idempotently release transport-owned native resources."""
-        return None
+        if self._pet_worker is not None:
+            self._pet_worker.close()
+            self._pet_worker = None
 
     def _initialize_petthermotools(
         self,
@@ -530,6 +574,33 @@ class _MELTSBackendSupport(MeltBackend):
             self._pet_module = self._import_petthermotools()
             self._engine_version = None
             self._preload_petthermotools_payload(self._pet_module)
+            if self._pet_warm_enabled:
+                diagnostic_path = Path(
+                    tempfile.gettempdir(),
+                    'regolith-pyrolysis-simulator',
+                    'petthermotools-diagnostics.log',
+                )
+                self._pet_worker = WarmEngineWorker(
+                    name='PetThermoTools native operation',
+                    bootstrap=_bootstrap_petthermotools_worker,
+                    handler=_handle_petthermotools_request,
+                    bootstrap_args=(self._melts_model_code(),),
+                    startup_timeout_s=self._timeout_s,
+                    call_timeout_s=self._timeout_s,
+                    diagnostic_log_path=diagnostic_path,
+                )
+                try:
+                    self._pet_worker.start()
+                except EngineWorkerRemoteError as exc:
+                    if exc.exc_name == 'ImportError':
+                        raise ImportError(
+                            f'PetThermoTools worker initialization failed: '
+                            f'{exc.detail}\n{exc.remote_traceback}'
+                        ) from exc
+                    raise RuntimeError(
+                        f'PetThermoTools worker initialization failed: '
+                        f'{exc.detail}\n{exc.remote_traceback}'
+                    ) from exc
             self._pet_available = True
             self._mode = 'python_api'
         except ImportError:
@@ -537,6 +608,9 @@ class _MELTSBackendSupport(MeltBackend):
             self._pet_module = None
             self._pet_melts = None
             self._pet_payload_preloaded = False
+            if self._pet_worker is not None:
+                self._pet_worker.close()
+                self._pet_worker = None
             self._pet_import_error = ImportError(
                 'PetThermoTools Python path unavailable: '
                 'petthermotools and meltsdynamic must both import'
@@ -1775,6 +1849,51 @@ class _MELTSBackendSupport(MeltBackend):
     ):
         """Execute a native PetThermoTools operation behind a hard deadline."""
         timeout_s = _validated_timeout_s(self._timeout_s)
+        worker = self._pet_worker
+        if worker is None:
+            return self._run_petthermotools_cold(
+                operation,
+                args=args,
+                kwargs=kwargs,
+                timeout_s=timeout_s,
+            )
+        try:
+            return worker.call({
+                'operation': operation,
+                'args': tuple(args),
+                'kwargs': dict(kwargs or {}),
+            }, timeout_s=timeout_s)
+        except TimeoutError as exc:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_TIMEOUT,
+                f'PetThermoTools {operation} exceeded hard timeout of '
+                f'{timeout_s:g}s',
+            ) from exc
+        except EngineWorkerRemoteError as exc:
+            if exc.exc_name == 'ImportError':
+                raise ImportError(
+                    f'PetThermoTools {operation} failed: {exc.detail}\n'
+                    f'{exc.remote_traceback}'
+                ) from exc
+            raise RuntimeError(
+                f'PetThermoTools {operation} failed: {exc.detail}\n'
+                f'{exc.remote_traceback}'
+            ) from exc
+        except RuntimeError as exc:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_SUBPROCESS_DIED,
+                f'PetThermoTools {operation} worker exited without a result',
+            ) from exc
+
+    def _run_petthermotools_cold(
+        self,
+        operation: str,
+        *,
+        args: tuple,
+        kwargs: Optional[Mapping[str, object]],
+        timeout_s: float,
+    ):
+        """Retain per-call isolation until native reset earns byte parity."""
         context = multiprocessing.get_context('spawn')
         parent, child = context.Pipe(duplex=True)
         process = context.Process(

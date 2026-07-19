@@ -11,9 +11,9 @@ import faulthandler
 import hashlib
 import json
 import math
-import multiprocessing
 import os
 import pickle
+import re
 import signal
 import subprocess
 import sys
@@ -31,6 +31,10 @@ from simulator.engine_local_config import (
     setup_thermoengine_dylib_path,
     warn_legacy_once,
 )
+from simulator.melt_backend.engine_worker import (
+    EngineWorkerRemoteError,
+    WarmEngineWorker,
+)
 
 
 ActivityConverter = Callable[[float, float, float], float]
@@ -45,6 +49,13 @@ _FO2_MONOTONIC_EPSILON = 1.0e-7
 _FO2_FRACTION_WIDTH_TOLERANCE = 1.0e-10
 _DEFAULT_EQUILIBRATE_TIMEOUT_S = 60.0
 _DEFAULT_WATCHDOG_GRACE_S = 0.25
+_THERMOENGINE_ADAPTER_VERSION = 'regolith-thermoengine-v2'
+
+
+def _thermoengine_cache_identity(native_identity: str) -> str:
+    return f'{native_identity} (adapter={_THERMOENGINE_ADAPTER_VERSION})'
+
+
 _THERMOENGINE_LOG_DIR_ENV = 'REGOLITH_THERMOENGINE_LOG_DIR'
 _FE_O_MOLAR_MASS = 71.8444
 _FE2_O3_MOLAR_MASS = 159.6882
@@ -118,58 +129,33 @@ def _append_solve_input_line(
     errlog.flush()
 
 
-def _run_thermoengine_worker(connection: Any, model_name: str,
-                             activity_converter: ActivityConverter,
-                             error_log_path: str,
-                             diagnostic_signal: int) -> None:
-    """Own all native ThermoEngine state inside a killable worker."""
-    faulthandler.enable()
-    errlog = None
-    try:
-        errlog = _register_worker_fault_handler(
-            error_log_path,
-            diagnostic_signal,
+def _bootstrap_thermoengine_worker(
+    model_name: str,
+    activity_converter: ActivityConverter,
+) -> tuple['ThermoEngineTransport', str]:
+    transport = ThermoEngineTransport(
+        model_name=model_name,
+        activity_converter=activity_converter,
+    )
+    transport._initialize_in_process()
+    return transport, transport.engine_version
+
+
+def _handle_thermoengine_request(
+    transport: 'ThermoEngineTransport',
+    kwargs: Mapping[str, Any],
+    errlog: Any,
+) -> 'ThermoEnginePayload':
+    if errlog is not None:
+        _append_solve_input_line(
+            errlog,
+            worker_id=os.getpid(),
+            temperature_C=kwargs['temperature_C'],
+            pressure_bar=kwargs['pressure_bar'],
+            comp_wt=kwargs['comp_wt'],
+            fO2_log=kwargs['fO2_log'],
         )
-        transport = ThermoEngineTransport(
-            model_name=model_name,
-            activity_converter=activity_converter,
-        )
-        transport._initialize_in_process()
-        connection.send(('ready', transport.engine_version))
-        while True:
-            try:
-                kwargs = connection.recv()
-            except EOFError:
-                break
-            if kwargs is None:
-                break
-            _append_solve_input_line(
-                errlog,
-                worker_id=os.getpid(),
-                temperature_C=kwargs['temperature_C'],
-                pressure_bar=kwargs['pressure_bar'],
-                comp_wt=kwargs['comp_wt'],
-                fO2_log=kwargs['fO2_log'],
-            )
-            try:
-                connection.send((
-                    'ok', transport._equilibrate_in_process(**kwargs)))
-            except BaseException as exc:
-                connection.send((
-                    'error', type(exc).__name__, str(exc),
-                    traceback.format_exc(),
-                ))
-    except BaseException as exc:  # pragma: no cover - native/bootstrap faults
-        connection.send((
-            'error', type(exc).__name__, str(exc), traceback.format_exc(),
-        ))
-    finally:
-        if errlog is not None:
-            try:
-                faulthandler.unregister(diagnostic_signal)
-            finally:
-                errlog.close()
-        connection.close()
+    return transport._equilibrate_in_process(**kwargs)
 
 
 @dataclass(frozen=True)
@@ -238,10 +224,22 @@ class ThermoEngineTransport:
         self._liq_phase = None
         self._melts_version = '1.0.2'
         self._liq_model = 'v1.0'
+        self._operation_sequence = 0
+        self._operation_parent: str | None = None
+        self._operation_roots: list[tuple[Any, Any]] = []
         self.engine_version = 'thermoengine unavailable'
         self._health_cache: dict[str, tuple[bool, str, float]] = {}
-        self._worker_process = None
-        self._worker_connection = None
+        self._worker = WarmEngineWorker(
+            name='ThermoEngine equilibrium',
+            bootstrap=_bootstrap_thermoengine_worker,
+            handler=_handle_thermoengine_request,
+            bootstrap_args=(self._model_name, self._activity_converter),
+            startup_timeout_s=30.0,
+            call_timeout_s=self._equilibrate_timeout_s,
+            diagnostic_log_path=self._diagnostic_log_path,
+            diagnostic_signal=self._diagnostic_signal,
+            watchdog_grace_s=self._watchdog_grace_s,
+        )
 
     def initialize(self) -> bool:
         self.close()
@@ -253,48 +251,13 @@ class ThermoEngineTransport:
                 'ThermoEngine activity_converter must be pickleable for the '
                 'spawned native-solver worker'
             ) from exc
-        context = multiprocessing.get_context('spawn')
-        parent, child = context.Pipe(duplex=True)
-        process = context.Process(
-            target=_run_thermoengine_worker,
-            args=(
-                child,
-                self._model_name,
-                self._activity_converter,
-                str(self._diagnostic_log_path),
-                self._diagnostic_signal,
-            ),
-            daemon=True,
-        )
-        process.start()
-        child.close()
         try:
-            if not parent.poll(30.0):
-                raise TimeoutError(
-                    'ThermoEngine initialization exceeded hard timeout of 30s'
-                )
-            message = parent.recv()
-        except (EOFError, OSError, TimeoutError):
-            parent.close()
-            if process.is_alive():
-                process.terminate()
-            process.join(timeout=1.0)
-            if process.is_alive():
-                process.kill()
-                process.join(timeout=1.0)
-            raise
-        if message[0] != 'ready':
-            if process.is_alive():
-                process.terminate()
-            process.join(timeout=1.0)
-            parent.close()
+            self.engine_version = str(self._worker.start())
+        except EngineWorkerRemoteError as exc:
             raise RuntimeError(
-                f'ThermoEngine initialization failed: {message[2]}\n'
-                f'{message[3]}'
-            )
-        self.engine_version = str(message[1])
-        self._worker_process = process
-        self._worker_connection = parent
+                f'ThermoEngine initialization failed: {exc.detail}\n'
+                f'{exc.remote_traceback}'
+            ) from exc
         return True
 
     @property
@@ -304,48 +267,11 @@ class ThermoEngineTransport:
 
     def _dump_then_kill_worker(self) -> None:
         """Request a native traceback, allow it to flush, then hard-kill."""
-        process = self._worker_process
-        connection = self._worker_connection
-        self._worker_process = None
-        self._worker_connection = None
-        try:
-            if process is not None and process.is_alive():
-                try:
-                    os.kill(process.pid, self._diagnostic_signal)
-                except OSError:
-                    pass
-                time.sleep(self._watchdog_grace_s)
-                if process.is_alive():
-                    process.kill()
-                process.join(timeout=1.0)
-        finally:
-            if connection is not None:
-                connection.close()
+        self._worker._discard_current(diagnostic=True)
 
     def close(self) -> None:
         """Idempotently stop the native worker and close both pipe ends."""
-        process = self._worker_process
-        connection = self._worker_connection
-        self._worker_process = None
-        self._worker_connection = None
-        try:
-            if connection is not None:
-                try:
-                    if process is not None and process.is_alive():
-                        connection.send(None)
-                except (BrokenPipeError, EOFError, OSError):
-                    pass
-                finally:
-                    connection.close()
-        finally:
-            if process is not None:
-                process.join(timeout=1.0)
-                if process.is_alive():
-                    process.terminate()
-                    process.join(timeout=1.0)
-                if process.is_alive():
-                    process.kill()
-                    process.join(timeout=1.0)
+        self._worker.close()
 
     def _initialize_in_process(self) -> bool:
         setup_thermoengine_dylib_path()
@@ -373,10 +299,10 @@ class ThermoEngineTransport:
         self._liq_model = liq_model
         config_version = cache_version_for('thermoengine')
         if config_version is not None:
-            self.engine_version = config_version
+            native_identity = config_version
         else:
             module_path = getattr(thermoengine, '__file__', 'unknown')
-            self.engine_version = (
+            native_identity = (
                 f'thermoengine MELTS {melts_version} '
                 f'(liq_mod {liq_model}; {module_path})'
             )
@@ -385,6 +311,7 @@ class ThermoEngineTransport:
                 'engines.local.toml absent; using legacy ThermoEngine '
                 'path-based identity for cache comparison',
             )
+        self.engine_version = _thermoengine_cache_identity(native_identity)
         return True
 
     def clear_health_cache(self) -> None:
@@ -498,15 +425,11 @@ print('ok')
         warnings: tuple[str, ...] = (),
     ) -> ThermoEnginePayload:
         """Equilibrate with a hard deadline around all native solve calls."""
-        if self._worker_process is None:
+        if self._worker.process is None and self._worker.start_count == 0:
             raise ThermoEngineIsolationError(
                 'ThermoEngine equilibrium requires an isolated worker; '
                 'in-process native equilibrium is forbidden'
             )
-        process = self._worker_process
-        connection = self._worker_connection
-        if connection is None or not process.is_alive():
-            raise RuntimeError('ThermoEngine equilibrium worker is not alive')
         kwargs = {
             'temperature_C': temperature_C,
             'pressure_bar': pressure_bar,
@@ -515,24 +438,11 @@ print('ok')
             'warnings': tuple(warnings),
         }
         try:
-            connection.send(kwargs)
-            if not connection.poll(self._equilibrate_timeout_s):
-                self._dump_then_kill_worker()
-                raise TimeoutError(
-                    'ThermoEngine equilibrium exceeded hard timeout of '
-                    f'{self._equilibrate_timeout_s:g}s'
-                )
-            message = connection.recv()
-        except TimeoutError:
-            raise
-        except (BrokenPipeError, EOFError, OSError) as exc:
-            self.close()
-            raise RuntimeError(
-                'ThermoEngine equilibrium worker exited without a result'
-            ) from exc
-        if message[0] == 'ok':
-            return message[1]
-        _tag, exc_name, detail, child_traceback = message
+            return self._worker.call(kwargs)
+        except EngineWorkerRemoteError as exc:
+            exc_name = exc.exc_name
+            detail = exc.detail
+            child_traceback = exc.remote_traceback
         exception_type = {
             'ImportError': ImportError,
             'TimeoutError': TimeoutError,
@@ -542,7 +452,88 @@ print('ok')
             f'ThermoEngine equilibrium failed: {detail}\n{child_traceback}'
         )
 
+    @property
+    def _worker_process(self):
+        return self._worker.process
+
+    @_worker_process.setter
+    def _worker_process(self, value):
+        self._worker.process = value
+
+    @property
+    def _worker_connection(self):
+        return self._worker.connection
+
+    @_worker_connection.setter
+    def _worker_connection(self, value):
+        self._worker.connection = value
+
+    def _new_melts_model(self) -> Any:
+        if self._equilibrate is None or self._operation_parent is None:
+            raise ImportError('ThermoEngine operation is not initialized')
+        melts = self._equilibrate.MELTSmodel(version=self._melts_version)
+        phases = melts.melts.dictionaryOfPhasesInSystem
+        isolated = 0
+        for phase_wrapper in phases.values():
+            phase = phase_wrapper.phaseClassInstance
+            try:
+                phase.operationParent = self._operation_parent
+            except AttributeError:
+                continue
+            isolated += 1
+        if isolated == 0:
+            raise RuntimeError(
+                'ThermoEngine exposes no operationParent phase namespaces; '
+                'warm reuse would carry process-global phase-instance state'
+            )
+        return melts
+
+    def _track_operation_root(self, melts: Any, runs: Any) -> None:
+        if runs:
+            self._operation_roots.append((melts, runs[0][3]))
+
+    def _clear_operation_palette(self) -> None:
+        """Balance native global phase counters accumulated by this call."""
+        for melts, root in self._operation_roots:
+            phases = melts.melts.dictionaryOfPhasesInSystem
+            for phase_name in melts.get_list_of_phases_in_assemblage(root):
+                try:
+                    phase = phases[str(phase_name)].phaseClassInstance
+                    decrement = phase.decrementInstanceCountOfPhase
+                except (AttributeError, KeyError):
+                    continue
+                decrement()
+        self._operation_roots.clear()
+
     def _equilibrate_in_process(
+        self,
+        *,
+        temperature_C: float,
+        pressure_bar: float,
+        comp_wt: Mapping[str, float],
+        fO2_log: Optional[float] = None,
+        warnings: tuple[str, ...] = (),
+    ) -> ThermoEnginePayload:
+        self._operation_sequence += 1
+        self._operation_parent = (
+            f'RegolithPyrolysis-{os.getpid()}-{self._operation_sequence}'
+        )
+        self._operation_roots = []
+        try:
+            return self._equilibrate_isolated(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                comp_wt=comp_wt,
+                fO2_log=fO2_log,
+                warnings=warnings,
+            )
+        finally:
+            try:
+                self._clear_operation_palette()
+            finally:
+                self._operation_parent = None
+
+    def _equilibrate_isolated(
         self,
         *,
         temperature_C: float,
@@ -554,7 +545,7 @@ print('ok')
         if self._equilibrate is None or self._liq_phase is None:
             raise ImportError('ThermoEngine transport not initialized')
 
-        melts = self._equilibrate.MELTSmodel(version=self._melts_version)
+        melts = self._new_melts_model()
         oxide_names = tuple(str(name) for name in melts.get_oxide_names())
         bulk_wt = {
             oxide: float(comp_wt.get(oxide, 0.0) or 0.0)
@@ -575,6 +566,7 @@ print('ok')
                 pressure_mpa,
                 initialize=True,
             )
+            self._track_operation_root(melts, runs)
         else:
             melts, runs, solved_fO2_log, fO2_solve_count = self._solve_imposed_fO2(
                 temperature_C=float(temperature_C),
@@ -661,12 +653,7 @@ print('ok')
             phase_thermo[phase] = values
         chem_potentials: dict[str, dict[str, Any]] = {}
         for phase in phases:
-            raw_mu = self._strict_finite_mapping(
-                melts.get_thermo_properties_of_phase_components(
-                    root, phase, mode='mu'
-                ),
-                context=f'ThermoEngine {phase} chemical potentials',
-            )
+            raw_mu = self._chemical_potentials_for_phase(melts, root, phase)
             components = dict(raw_mu)
             source_basis = 'chemical_potential_J_mol'
             conversion: dict[str, Any] = {}
@@ -732,7 +719,7 @@ print('ok')
                 'affinity_J': 0.0 if sentinel else affinity_value,
                 'state': 'zero_affinity_sentinel' if sentinel else 'undersaturated',
                 'phase_scope': 'not_in_equilibrium_assemblage',
-                'composition_formula': str(composition),
+                'composition_formula': self._canonical_formula(composition),
             }
         system_enthalpy = sum(
             float(values['enthalpy_J']) for values in phase_thermo.values()
@@ -845,6 +832,91 @@ print('ok')
             ),
         )
 
+    def _retained_solution_chemical_potentials(
+        self,
+        melts: Any,
+        phase_name: str,
+        *,
+        expected_components: Mapping[str, float],
+    ) -> dict[str, float]:
+        """Recompute solution mu while retaining every native vector owner.
+
+        ThermoEngine's Objective-C solution-phase implementations commonly
+        take ``pointerToDouble`` from a temporary ``DoubleVector`` returned by
+        ``getChemicalPotentialFromMolesOfComponents``. Under ARC that backing
+        vector can be released before the pointer is copied, so the XML result
+        contains allocator-history-dependent garbage. Keeping the wrappers in
+        Python locals closes that lifetime hole without changing the solve.
+        """
+        state = melts.melts.valueForKey_('equilibrateState')
+        phase_wrapper = state.phasesInSystem.get(phase_name)
+        if phase_wrapper is None:
+            phase_wrapper = next(
+                (
+                    wrapper for wrapper in state.phasesInSystem.values()
+                    if str(wrapper.phaseClassInstance.phaseName) == phase_name
+                ),
+                None,
+            )
+        if phase_wrapper is None:
+            raise RuntimeError(
+                f'ThermoEngine native state lacks solution phase {phase_name!r}'
+            )
+        phase = phase_wrapper.phaseClassInstance
+        elements_wrapper = phase_wrapper.bulkCompositionInElements
+        moles_wrapper = phase.convertElementsToMoles_(
+            elements_wrapper.pointerToDouble())
+        mu_wrapper = phase.getChemicalPotentialFromMolesOfComponents_andT_andP_(
+            moles_wrapper.pointerToDouble(), state.T, state.P)
+        mu = mu_wrapper.pointerToDouble()
+        components = {
+            str(phase.componentAtIndex_(index).phaseName):
+                self._strict_finite_float(
+                    mu[index],
+                    context=(
+                        f'ThermoEngine {phase_name} retained chemical potential'
+                    ),
+                )
+            for index in range(phase.numberOfSolutionComponents())
+        }
+        expected = set(expected_components)
+        if not expected.issubset(components):
+            missing = ', '.join(sorted(expected - set(components)))
+            raise RuntimeError(
+                f'ThermoEngine {phase_name} native chemical potentials lack: '
+                f'{missing}'
+            )
+        return {name: components[name] for name in expected_components}
+
+    def _chemical_potentials_for_phase(
+        self,
+        melts: Any,
+        root: Any,
+        phase: str,
+    ) -> dict[str, float]:
+        raw_mu = melts.get_thermo_properties_of_phase_components(
+            root, phase, mode='mu'
+        )
+        if isinstance(raw_mu, Mapping) and raw_mu and phase not in raw_mu:
+            raw_mu = self._retained_solution_chemical_potentials(
+                melts,
+                phase,
+                expected_components=raw_mu,
+            )
+        return self._strict_finite_mapping(
+            raw_mu,
+            context=f'ThermoEngine {phase} chemical potentials',
+        )
+
+    @staticmethod
+    def _canonical_formula(value: Any) -> str:
+        """Remove native signed-zero noise without changing formula precision."""
+        return re.sub(
+            r'(?<![0-9.])-0(\.0+)(?=[^0-9]|$)',
+            r'0\1',
+            str(value),
+        )
+
     def _solve_imposed_fO2(
         self,
         *,
@@ -893,13 +965,14 @@ print('ok')
             candidate['FeO'] = (
                 total_fe_moles * (1.0 - ferric_fraction) * _FE_O_MOLAR_MASS
             )
-            model = self._equilibrate.MELTSmodel(version=self._melts_version)
+            model = self._new_melts_model()
             model.set_bulk_composition(candidate)
             result = model.equilibrate_tp(
                 temperature_C,
                 pressure_mpa,
                 initialize=True,
             )
+            self._track_operation_root(model, result)
             solve_count += 1
             if not result:
                 raise RuntimeError('ThermoEngine returned no equilibration result')

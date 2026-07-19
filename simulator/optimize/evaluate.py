@@ -27,9 +27,12 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.backends import (
+    BackendSelectionPolicy,
     BackendUnavailableError,
+    CACHED_REAL_BACKEND_NAME,
     real_backend_feedstock_domain_reason,
     requires_stage0_subprocess,
+    resolve_backend,
 )
 from simulator.campaigns import CampaignPressureSetpointRefusal
 from simulator.chemistry.kernel import OXYGEN_SINK_CHANNEL_MODE_KEY, ProposalRejected
@@ -2226,6 +2229,49 @@ def _build_eval_inputs(
     )
 
 
+@lru_cache(maxsize=32)
+def _resolved_engine_identity_for_eval(
+    backend_name: str,
+    feedstock_id: str,
+    stage0_subprocess_required: bool,
+) -> str:
+    backend_name = canonical_backend_name(backend_name)
+    if backend_name in (
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        CACHED_REAL_BACKEND_NAME,
+    ):
+        return ""
+    runtime = get_worker_runtime(
+        feedstock_id=feedstock_id,
+        stage0_subprocess_required=stage0_subprocess_required,
+    )
+    if (
+        runtime is not None
+        and canonical_backend_name(runtime.backend_name) == backend_name
+    ):
+        getter = getattr(runtime.backend, "get_engine_version", None)
+        if not callable(getter):
+            return ""
+        identity = str(getter() or "").strip()
+        return "" if identity.lower() == "unavailable" else identity
+    backend = resolve_backend(
+        backend_name,
+        BackendSelectionPolicy.RUNNER_STRICT,
+        feedstock_id=feedstock_id,
+        stage0_subprocess_required=stage0_subprocess_required,
+    )
+    try:
+        getter = getattr(backend, "get_engine_version", None)
+        if not callable(getter):
+            return ""
+        identity = str(getter() or "").strip()
+        return "" if identity.lower() == "unavailable" else identity
+    finally:
+        close = getattr(backend, "close", None)
+        if callable(close):
+            close()
+
+
 def _build_prefix_eval_inputs(
     patch: RecipePatch,
     feedstock_id: str,
@@ -2403,6 +2449,15 @@ def _build_eval_inputs_impl(
     if stop_at_stage0_exit:
         run_config = replace(run_config, stop_at_stage0_exit=True)
 
+    resolved_engine_identity = _resolved_engine_identity_for_eval(
+        run_config.backend_name,
+        run_config.feedstock_id,
+        requires_stage0_subprocess(
+            run_config.feedstock_id,
+            run_config.feedstocks,
+        ),
+    )
+
     data_digests = {
         "corpus_version": current_corpus_version(),
         "setpoints": bundle.digests["setpoints"],
@@ -2443,6 +2498,7 @@ def _build_eval_inputs_impl(
         additives_kg=run_config.additives_kg,
         track=str(run_options["track"]),
         backend_name=str(run_options["backend_name"]),
+        resolved_engine_identity=resolved_engine_identity,
         c5_enabled=bool(run_options["c5_enabled"]),
         stop_at_stage0_exit=stop_at_stage0_exit,
         mre_max_voltage_V=float(run_options["mre_max_voltage_V"]),

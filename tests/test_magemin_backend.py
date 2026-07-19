@@ -123,6 +123,35 @@ def test_magemin_defaults_to_subprocess_even_if_pymagemin_importable(monkeypatch
     assert backend._magemin_module is None
 
 
+def test_magemin_reinitialize_closes_existing_warm_worker(monkeypatch):
+    class FakeWorker:
+        close_calls = 0
+
+        def close(self):
+            self.close_calls += 1
+
+    existing = FakeWorker()
+    backend = MAGEMinBackend()
+    backend._subprocess_worker = existing
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_locate_binary',
+        staticmethod(lambda _explicit: Path('/fake/MAGEMin')),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_import_magemin_bridge',
+        lambda self, *, requested: ('subprocess', None),
+    )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', UserWarning)
+        assert backend.initialize({'warm_worker': False}) is True
+
+    assert existing.close_calls == 1
+    assert backend._subprocess_worker is None
+
+
 def test_magemin_and_alphamelts_reject_exact_major_oxide_boundary():
     boundary = {'SiO2': 50.0, 'MgO': 45.0}
 
@@ -1570,7 +1599,7 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
     backend = MAGEMinBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        assert backend.initialize({}) is True
+        assert backend.initialize({"warm_worker": False}) is True
 
     result = backend.equilibrate(
         1200.0,
@@ -1667,7 +1696,7 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
     backend = MAGEMinBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        assert backend.initialize({}) is True
+        assert backend.initialize({"warm_worker": False}) is True
     assert backend._bridge == "subprocess"
 
     # Mars-reducing analog: T = 1450 C, fO2_log = -12 (well below QFM).
@@ -1792,7 +1821,7 @@ def test_magemin_configured_named_buffer_marks_requested_fo2_out_of_domain(
     backend = MAGEMinBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        backend.initialize({"fO2_buffer": "mw"})
+        backend.initialize({"fO2_buffer": "mw", "warm_worker": False})
 
     result = backend.equilibrate(
         1450.0,

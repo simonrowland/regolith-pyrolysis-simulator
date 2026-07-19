@@ -1,0 +1,88 @@
+diff --git a/src/ClinoamphiboleBerman.m b/src/ClinoamphiboleBerman.m
+--- a/src/ClinoamphiboleBerman.m
++++ b/src/ClinoamphiboleBerman.m
+@@ -2159,2 +2159,2 @@
+-	double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++	DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];
+diff --git a/src/SpinelBerman.m b/src/SpinelBerman.m
+--- a/src/SpinelBerman.m
++++ b/src/SpinelBerman.m
+@@ -3339,2 +3339,2 @@
+-	double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++	DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];
+diff --git a/src/NephelineSSBerman.m b/src/NephelineSSBerman.m
+--- a/src/NephelineSSBerman.m
++++ b/src/NephelineSSBerman.m
+@@ -2216,2 +2216,2 @@
+-	double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++	DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];
+diff --git a/src/CpxBerman.m b/src/CpxBerman.m
+--- a/src/CpxBerman.m
++++ b/src/CpxBerman.m
+@@ -4909,2 +4909,2 @@
+-	double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++	DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];
+diff --git a/src/OpxBerman.m b/src/OpxBerman.m
+--- a/src/OpxBerman.m
++++ b/src/OpxBerman.m
+@@ -4871,2 +4871,2 @@
+-	double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++	DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];
+diff --git a/src/LiquidMeltsPlusOldH2OandNewCO2.m b/src/LiquidMeltsPlusOldH2OandNewCO2.m
+--- a/src/LiquidMeltsPlusOldH2OandNewCO2.m
++++ b/src/LiquidMeltsPlusOldH2OandNewCO2.m
+@@ -2520,2 +2520,2 @@
+-    double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-    for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++    DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++    for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];
+diff --git a/src/KalsiliteSSBerman.m b/src/KalsiliteSSBerman.m
+--- a/src/KalsiliteSSBerman.m
++++ b/src/KalsiliteSSBerman.m
+@@ -1149,2 +1149,2 @@
+-	double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++	DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];
+diff --git a/src/OrthoamphiboleBerman.m b/src/OrthoamphiboleBerman.m
+--- a/src/OrthoamphiboleBerman.m
++++ b/src/OrthoamphiboleBerman.m
+@@ -2136,2 +2136,2 @@
+-	double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++	DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];
+diff --git a/src/HornblendeBerman.m b/src/HornblendeBerman.m
+--- a/src/HornblendeBerman.m
++++ b/src/HornblendeBerman.m
+@@ -797,2 +797,2 @@
+-	double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++	DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];
+diff --git a/src/LeuciteBerman.m b/src/LeuciteBerman.m
+--- a/src/LeuciteBerman.m
++++ b/src/LeuciteBerman.m
+@@ -809,2 +809,2 @@
+-	double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++	DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];
+diff --git a/src/LiquidMeltsPlusCO2.m b/src/LiquidMeltsPlusCO2.m
+--- a/src/LiquidMeltsPlusCO2.m
++++ b/src/LiquidMeltsPlusCO2.m
+@@ -2523,2 +2523,2 @@
+-	double *muComponents = [[self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p] pointerToDouble];
+-	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = muComponents[i];
++	DoubleVector *muComponentsWrapper = [self getChemicalPotentialFromMolesOfComponents:m andT:t andP:p];
++	for (NSUInteger i=0; i<NA; i++) muSpecies[i] = [muComponentsWrapper valueAtIndex:i];

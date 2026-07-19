@@ -8,7 +8,6 @@ import base64
 import dataclasses
 import json
 import math
-import multiprocessing
 import os
 import random
 import signal
@@ -40,6 +39,11 @@ from scripts.grid_pregrind_writer import (  # noqa: E402
 from engines.alphamelts.domain import AlphaMELTSDomainGate  # noqa: E402
 from engines.domain_reason import OutOfDomainReason  # noqa: E402
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR  # noqa: E402
+from simulator.melt_backend.engine_worker import (  # noqa: E402
+    EngineWorkerPool,
+    INHERIT_PROCESS_GROUP_ENV,
+    WarmEngineWorker,
+)
 # simulator.fe_redox is imported LAZILY (see kress91_partition_parameters and
 # kress91_partitioned_composition_mol): Kress partitioning runs only at
 # --prepare-only key-generation time on the laptop's epoch tree. Studio drain
@@ -164,24 +168,6 @@ _WORKER_INIT_ERROR: str | None = None
 _WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY = False
 
 
-class _ThermoEngineWorkerProcess(multiprocessing.get_context("spawn").Process):
-    """Pool worker allowed to own ThermoEngine's isolated native child."""
-
-    @property
-    def daemon(self) -> bool:
-        return False
-
-    @daemon.setter
-    def daemon(self, _value: object) -> None:
-        pass
-
-
-class _ThermoEngineSpawnContext(
-    type(multiprocessing.get_context("spawn"))
-):
-    Process = _ThermoEngineWorkerProcess
-
-
 @dataclasses.dataclass(frozen=True)
 class GridPoint:
     ordinal: int
@@ -196,7 +182,7 @@ class WorkerJob:
     grid_key_id: int
     shuffle_rank: int
     inputs: dict[str, Any]
-    engine_epoch: int = 2
+    engine_epoch: int = 3
 
 
 def _request_stop(signum: int, frame: Any) -> None:
@@ -825,6 +811,23 @@ def _worker_initialize(
         _WORKER_INIT_ERROR = f"{type(exc).__name__}: {exc}"
 
 
+def _bootstrap_grid_worker(
+    config: Mapping[str, Any],
+    assumed_queued_run_mode: str | None,
+) -> tuple[Any, str]:
+    os.environ[INHERIT_PROCESS_GROUP_ENV] = '1'
+    _worker_initialize(config, assumed_queued_run_mode)
+    return _WORKER_BACKEND, _WORKER_ENGINE_VERSION
+
+
+def _handle_grid_worker_request(
+    _resource: Any,
+    job: WorkerJob,
+    _errlog: Any,
+) -> tuple[int, dict[str, Any]]:
+    return _run_point(job)
+
+
 def _raw_stream(value: Any) -> Any:
     if value is None or isinstance(value, str):
         return value
@@ -1316,6 +1319,9 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 captures=captures,
                 native_input=native_input,
             )
+            close_backend = getattr(backend, "close", None)
+            if callable(close_backend):
+                close_backend()
             _worker_initialize(_WORKER_CONFIG, _ASSUMED_QUEUED_RUN_MODE)
             return job.grid_key_id, output
 
@@ -1567,12 +1573,6 @@ def run_cycle(
         }
 
     next_heartbeat = time.monotonic() + args.heartbeat_s
-    context = (
-        _ThermoEngineSpawnContext()
-        if args.backend == "thermoengine"
-        else multiprocessing.get_context("spawn")
-    )
-
     def pending_jobs() -> Iterable[WorkerJob]:
         after_rank = -1
         while True:
@@ -1597,10 +1597,25 @@ def run_cycle(
 
     iterator = iter(pending_jobs())
     active: list[tuple[Any, WorkerJob, float]] = []
-    pool = context.Pool(
-        processes=args.workers,
-        initializer=_worker_initialize,
-        initargs=(backend_config(args), args.assume_queued_run_mode),
+    config = backend_config(args)
+    outer_timeout_s = max(
+        float(args.timeout_s),
+        float(config.get("thermoengine_equilibrate_timeout_s", 60.0)),
+    ) + 5.0
+    pool = EngineWorkerPool(
+        lambda index: WarmEngineWorker(
+            name=f"grid engine slot {index}",
+            bootstrap=_bootstrap_grid_worker,
+            handler=_handle_grid_worker_request,
+            bootstrap_args=(config, args.assume_queued_run_mode),
+            startup_timeout_s=max(
+                30.0,
+                float(config.get("thermoengine_health_timeout_s", 8.0)) + 30.0,
+            ),
+            call_timeout_s=outer_timeout_s,
+            daemon=False,
+        ),
+        size=args.workers,
     )
     try:
         def fill() -> None:
@@ -1610,20 +1625,20 @@ def run_cycle(
                 except StopIteration:
                     return
                 active.append((
-                    pool.apply_async(_run_point, (job,)),
+                    pool.submit(job, timeout_s=outer_timeout_s),
                     job,
                     time.monotonic(),
                 ))
 
         fill()
         while active:
-            ready = [item for item in active if item[0].ready()]
+            ready = [item for item in active if item[0].done()]
             if not ready:
                 time.sleep(0.1)
             for async_result, fallback_job, submitted_at in ready:
                 active.remove((async_result, fallback_job, submitted_at))
                 try:
-                    grid_key_id, output = async_result.get()
+                    grid_key_id, output = async_result.result()
                 except Exception as exc:
                     grid_key_id = fallback_job.grid_key_id
                     output = _worker_failure_output(
@@ -1665,13 +1680,8 @@ def run_cycle(
                     database=args.db,
                 )
                 next_heartbeat = time.monotonic() + args.heartbeat_s
-    except BaseException:
-        pool.terminate()
-        raise
-    else:
-        pool.close()
     finally:
-        pool.join()
+        pool.close()
     writer.commit()
     final_state = "stopped" if _STOP_REQUESTED else "complete"
     _heartbeat(
@@ -1735,10 +1745,11 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument(
         "--engine-epoch",
         type=int,
-        default=2,
+        default=3,
         help=(
-            "output epoch (default: 2, the explicit isothermal/fO2/property "
-            "contract; epoch 1 retains legacy liquidus-mode rows)"
+            "output epoch (default: 3, invalidating pre-warm-fix ThermoEngine "
+            "payloads; epoch 2 retains the explicit isothermal/fO2/property "
+            "contract before the adapter identity fix)"
         ),
     )
     result.add_argument("--composition-step-pct", type=float, default=10.0)

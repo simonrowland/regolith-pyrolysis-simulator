@@ -105,6 +105,7 @@ def test_backend_selector_defaults_to_subprocess_and_accepts_thermoengine():
     )
 
     assert default_args.backend == "subprocess"
+    assert default_args.engine_epoch == 3
     assert grid_pregrind.backend_config(default_args)["mode"] == "subprocess"
     assert grid_pregrind.backend_config(default_args)[
         "vapor_transport_pO2_bar"
@@ -139,10 +140,10 @@ def test_backend_selector_defaults_to_subprocess_and_accepts_thermoengine():
     assert thermoengine_inputs["composition_mol"]["FeO"] > 0.0
     assert thermoengine_inputs["composition_mol"]["Fe2O3"] > 0.0
 
-    worker = grid_pregrind._ThermoEngineSpawnContext().Process()
-    assert worker.daemon is False
-    worker.daemon = True
-    assert worker.daemon is False
+    assert not hasattr(grid_pregrind, "_ThermoEngineSpawnContext")
+    assert grid_pregrind.EngineWorkerPool.__module__ == (
+        "simulator.melt_backend.engine_worker"
+    )
 
 
 def test_kress_partition_preserves_iron_and_moves_target_into_composition():
@@ -1426,31 +1427,25 @@ class _ImmediateResult:
     def __init__(self, value):
         self.value = value
 
-    def ready(self):
+    def done(self):
         return True
 
-    def get(self):
+    def result(self):
         return self.value
 
 
 class _ImmediatePool:
-    def __init__(self, processes, initializer, initargs):
-        del initializer
-        self.processes = processes
-        self.initargs = initargs
+    def __init__(self, size, worker_factory):
+        self.processes = size
+        self.worker_factory = worker_factory
         self.submissions = 0
 
-    def apply_async(self, function, args):
+    def submit(self, job, *, timeout_s):
+        del timeout_s
         self.submissions += 1
-        return _ImmediateResult(function(*args))
+        return _ImmediateResult(grid_pregrind._run_point(job))
 
-    def close(self):
-        pass
-
-    def terminate(self):
-        pass
-
-    def join(self):
+    def close(self, **_kwargs):
         pass
 
 
@@ -1458,8 +1453,8 @@ class _ImmediateContext:
     def __init__(self):
         self.pool = None
 
-    def Pool(self, *, processes, initializer, initargs):
-        self.pool = _ImmediatePool(processes, initializer, initargs)
+    def EngineWorkerPool(self, _worker_factory, *, size):
+        self.pool = _ImmediatePool(size, _worker_factory)
         return self.pool
 
 
@@ -1473,9 +1468,7 @@ def test_unknown_phase_is_per_point_failure_and_pool_continues(
 
     monkeypatch.setattr(grid_pregrind, "_STOP_REQUESTED", False)
     monkeypatch.setattr(
-        grid_pregrind.multiprocessing,
-        "get_context",
-        lambda method: context if method == "spawn" else None,
+        grid_pregrind, "EngineWorkerPool", context.EngineWorkerPool
     )
 
     def fake_run_point(job):
@@ -1564,9 +1557,7 @@ def test_unknown_nonphase_dictionary_is_per_point_failure_and_pool_continues(
 
     monkeypatch.setattr(grid_pregrind, "_STOP_REQUESTED", False)
     monkeypatch.setattr(
-        grid_pregrind.multiprocessing,
-        "get_context",
-        lambda method: context if method == "spawn" else None,
+        grid_pregrind, "EngineWorkerPool", context.EngineWorkerPool
     )
 
     def fake_run_point(job):
@@ -1682,9 +1673,7 @@ def test_drain_only_uses_prepared_queue_without_importing_fe_redox(
         },
     )
     monkeypatch.setattr(
-        grid_pregrind.multiprocessing,
-        "get_context",
-        lambda method: context if method == "spawn" else None,
+        grid_pregrind, "EngineWorkerPool", context.EngineWorkerPool
     )
 
     def fake_run_point(job):
@@ -1736,7 +1725,8 @@ def test_drain_only_uses_prepared_queue_without_importing_fe_redox(
     )
     assert "simulator.fe_redox" not in sys.modules
     assert context.pool.processes == 2
-    assert context.pool.initargs[0]["timeout_s"] == pytest.approx(5.0)
+    worker = context.pool.worker_factory(0)
+    assert worker._bootstrap_args[0]["timeout_s"] == pytest.approx(5.0)
     assert context.pool.submissions == 1
 
     with sqlite3.connect(database) as connection:

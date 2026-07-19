@@ -110,6 +110,7 @@ class EvalSpec:
     allowlist_version: str = field(default=DEFAULT_ALLOWLIST_VERSION, kw_only=True)
     bounds_digest: str = field(default_factory=default_bounds_digest, kw_only=True)
     conditional_subspace_digest: str = field(default="", kw_only=True)
+    resolved_engine_identity: str = field(default="", kw_only=True)
     stop_at_stage0_exit: bool = field(default=False, kw_only=True)
     cost_parameters: Mapping[str, Any] = field(
         default_factory=default_cost_parameters_block,
@@ -137,6 +138,7 @@ class EvalSpec:
             "allowlist_version",
             "bounds_digest",
             "conditional_subspace_digest",
+            "resolved_engine_identity",
         ):
             if not isinstance(getattr(self, field_name), str):
                 raise TypeError(f"{field_name} must be a string")
@@ -283,6 +285,7 @@ class EvalSpec:
                 self.stop_at_stage0_exit,
                 _thaw_value(self.cost_parameters),
                 self.conditional_subspace_digest,
+                self.resolved_engine_identity,
             ),
         )
 
@@ -355,6 +358,7 @@ class PrefixEvalSpec(EvalSpec):
                 self.stop_at_stage0_exit,
                 _thaw_value(self.cost_parameters),
                 self.conditional_subspace_digest,
+                self.resolved_engine_identity,
             ),
         )
 
@@ -419,6 +423,16 @@ def _with_legacy_data_digest_args(args: tuple[Any, ...]) -> tuple[Any, ...]:
 
 
 def _rebuild_eval_spec(*args: Any) -> EvalSpec:
+    if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 6:
+        return EvalSpec(
+            *_with_legacy_data_digest_args(args[:-6]),
+            allowlist_version=args[-6],
+            bounds_digest=args[-5],
+            stop_at_stage0_exit=args[-4],
+            cost_parameters=args[-3],
+            conditional_subspace_digest=args[-2],
+            resolved_engine_identity=args[-1],
+        )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 5:
         return EvalSpec(
             *_with_legacy_data_digest_args(args[:-5]),
@@ -492,6 +506,16 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
 
 
 def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
+    if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 6:
+        return PrefixEvalSpec(
+            *_with_legacy_data_digest_args(args[:-6]),
+            allowlist_version=args[-6],
+            bounds_digest=args[-5],
+            stop_at_stage0_exit=args[-4],
+            cost_parameters=args[-3],
+            conditional_subspace_digest=args[-2],
+            resolved_engine_identity=args[-1],
+        )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 5:
         return PrefixEvalSpec(
             *_with_legacy_data_digest_args(args[:-5]),
@@ -602,6 +626,8 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
         payload["stop_at_stage0_exit"] = spec.stop_at_stage0_exit
     if spec.conditional_subspace_digest:
         payload["conditional_subspace_digest"] = spec.conditional_subspace_digest
+    if spec.resolved_engine_identity:
+        payload["resolved_engine_identity"] = spec.resolved_engine_identity
     if spec.stage0_redox_oxidant_kg:
         payload["stage0_redox_oxidant_kg"] = spec.stage0_redox_oxidant_kg
     if spec.stage0_carbon_reductant_kg:

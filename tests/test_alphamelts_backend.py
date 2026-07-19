@@ -19,6 +19,7 @@ from engines.alphamelts import AlphaMELTSProvider
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 import engines.alphamelts.provider as alphamelts_provider_module
 import engines.alphamelts.thermoengine as thermoengine_module
+import simulator.melt_backend.engine_worker as engine_worker_module
 from engines.alphamelts.parser import diagnostics_to_equilibrium
 from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.chemistry.kernel import ChemistryIntent
@@ -1333,6 +1334,16 @@ def test_alphamelts_python_worker_start_failure_closes_pipes(monkeypatch):
     assert events == ['close', 'close']
 
 
+def test_petthermotools_warm_worker_is_blocked_pending_acceptance():
+    backend = AlphaMELTSBackend()
+
+    assert backend._pet_warm_enabled is False
+    assert backend._pet_worker is None
+
+    with pytest.raises(ValueError, match='24-point byte-identity reset gate'):
+        backend.initialize({'warm_worker': True})
+
+
 def test_alphamelts_python_worker_revalidates_timeout_before_spawn(
     monkeypatch,
 ):
@@ -1988,12 +1999,12 @@ def test_thermoengine_timeout_dumps_then_kills_worker(monkeypatch):
             events.append('close')
 
     monkeypatch.setattr(
-        thermoengine_module.os,
+        engine_worker_module.os,
         'kill',
         lambda pid, signum: events.append(('diagnostic_signal', pid, signum)),
     )
     monkeypatch.setattr(
-        thermoengine_module.time,
+        engine_worker_module.time,
         'sleep',
         lambda seconds: events.append(('grace', seconds)),
     )
@@ -2207,7 +2218,7 @@ def test_thermoengine_transport_broken_pipe_closes_worker():
             comp_wt={'SiO2': 50.0},
         )
 
-    assert events == [('close',), ('join', 1.0)]
+    assert events == [('kill',), ('join', 1.0), ('close',)]
     assert transport._worker_process is None
     assert transport._worker_connection is None
 
@@ -3063,6 +3074,18 @@ def test_thermoengine_private_in_process_equilibrate_parses_payload(monkeypatch)
     fake_equilibrate = FakeEquilibrate()
     transport._equilibrate = fake_equilibrate
     transport._liq_phase = object()
+    monkeypatch.setattr(
+        transport,
+        '_new_melts_model',
+        lambda: fake_equilibrate.MELTSmodel(version=transport._melts_version),
+    )
+    monkeypatch.setattr(transport, '_clear_operation_palette', lambda: None)
+    monkeypatch.setattr(
+        transport,
+        '_retained_solution_chemical_potentials',
+        lambda _melts, _phase, *, expected_components: dict(
+            expected_components),
+    )
 
     def fail_run(*_args, **_kwargs):
         raise AssertionError('public equilibrate must not spawn subprocess')
@@ -3148,6 +3171,198 @@ def test_thermoengine_extras_fail_loud_on_malformed_present_value():
             {'SiO2': float('nan')},
             context='ThermoEngine liquid chemical potentials',
         )
+
+
+def test_thermoengine_solution_mu_recovers_before_finite_validation(monkeypatch):
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    melts = types.SimpleNamespace(
+        get_thermo_properties_of_phase_components=lambda *_args, **_kwargs: {
+            'chromite': float('nan'),
+            'hercynite': float('inf'),
+        },
+    )
+    monkeypatch.setattr(
+        transport,
+        '_retained_solution_chemical_potentials',
+        lambda _melts, phase, *, expected_components: {
+            'chromite': -1_932_000.0,
+            'hercynite': -2_404_000.0,
+        },
+    )
+
+    assert transport._chemical_potentials_for_phase(
+        melts, 'root', 'Spinel'
+    ) == {
+        'chromite': -1_932_000.0,
+        'hercynite': -2_404_000.0,
+    }
+
+
+def test_thermoengine_adapter_version_is_part_of_cache_identity():
+    assert thermoengine_module._thermoengine_cache_identity(
+        'thermoengine MELTS 1.0.2'
+    ) == (
+        'thermoengine MELTS 1.0.2 '
+        '(adapter=regolith-thermoengine-v2)'
+    )
+
+
+def test_thermoengine_formula_canonicalizes_native_signed_zero():
+    assert ThermoEngineTransport._canonical_formula(
+        'Mg1.00Fe-0.00SiO4'
+    ) == 'Mg1.00Fe0.00SiO4'
+
+
+def test_thermoengine_native_model_gets_call_namespace_and_balanced_cleanup():
+    decremented = []
+    phase = types.SimpleNamespace(
+        operationParent='Python',
+        decrementInstanceCountOfPhase=lambda: decremented.append('Augite'),
+    )
+    phase_wrapper = types.SimpleNamespace(phaseClassInstance=phase)
+    native = types.SimpleNamespace(
+        dictionaryOfPhasesInSystem={'Augite': phase_wrapper},
+    )
+    model = types.SimpleNamespace(
+        melts=native,
+        get_list_of_phases_in_assemblage=lambda root: ('Augite',),
+    )
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._equilibrate = types.SimpleNamespace(
+        MELTSmodel=lambda **_kwargs: model,
+    )
+    transport._operation_parent = 'test-call-7'
+
+    created = transport._new_melts_model()
+    transport._operation_roots = [(created, 'root')]
+    transport._clear_operation_palette()
+
+    assert created is model
+    assert phase.operationParent == 'test-call-7'
+    assert decremented == ['Augite']
+    assert transport._operation_roots == []
+
+
+def test_thermoengine_operation_cleanup_runs_when_payload_build_raises(
+    monkeypatch,
+):
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    cleaned = []
+    monkeypatch.setattr(
+        transport,
+        '_equilibrate_isolated',
+        lambda **_kwargs: (_ for _ in ()).throw(RuntimeError('parse failed')),
+    )
+    monkeypatch.setattr(
+        transport,
+        '_clear_operation_palette',
+        lambda: cleaned.append(transport._operation_parent),
+    )
+
+    with pytest.raises(RuntimeError, match='parse failed'):
+        transport._equilibrate_in_process(
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            comp_wt={'SiO2': 100.0},
+        )
+
+    assert len(cleaned) == 1
+    assert cleaned[0].startswith('RegolithPyrolysis-')
+    assert transport._operation_parent is None
+
+
+def test_thermoengine_operation_cleanup_failure_is_fail_closed(monkeypatch):
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+    monkeypatch.setattr(
+        transport,
+        '_equilibrate_isolated',
+        lambda **_kwargs: ThermoEnginePayload(),
+    )
+    monkeypatch.setattr(
+        transport,
+        '_clear_operation_palette',
+        lambda: (_ for _ in ()).throw(RuntimeError('cleanup failed')),
+    )
+
+    with pytest.raises(RuntimeError, match='cleanup failed'):
+        transport._equilibrate_in_process(
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            comp_wt={'SiO2': 100.0},
+        )
+
+    assert transport._operation_parent is None
+
+
+def test_thermoengine_retained_solution_mu_reads_owned_native_vectors():
+    class Vector:
+        def __init__(self, values):
+            self.values = values
+
+        def pointerToDouble(self):
+            return self.values
+
+    class Component:
+        def __init__(self, name):
+            self.phaseName = name
+
+    class Phase:
+        phaseName = 'Spinel'
+
+        def convertElementsToMoles_(self, elements):
+            assert elements == [1.0, 2.0]
+            return Vector([0.25, 0.75])
+
+        def getChemicalPotentialFromMolesOfComponents_andT_andP_(
+            self, moles, temperature, pressure,
+        ):
+            assert moles == [0.25, 0.75]
+            assert (temperature, pressure) == (1633.15, 500.0)
+            return Vector([-1_932_000.0, -2_404_000.0])
+
+        def numberOfSolutionComponents(self):
+            return 2
+
+        def componentAtIndex_(self, index):
+            return Component(('chromite', 'hercynite')[index])
+
+    phase = Phase()
+    phase_wrapper = types.SimpleNamespace(
+        phaseClassInstance=phase,
+        bulkCompositionInElements=Vector([1.0, 2.0]),
+    )
+    state = types.SimpleNamespace(
+        phasesInSystem={'Spinel': phase_wrapper},
+        T=1633.15,
+        P=500.0,
+    )
+    melts = types.SimpleNamespace(
+        melts=types.SimpleNamespace(
+            valueForKey_=lambda key: state if key == 'equilibrateState' else None,
+        ),
+    )
+    transport = ThermoEngineTransport(
+        activity_converter=activity_from_chem_potential,
+    )
+
+    result = transport._retained_solution_chemical_potentials(
+        melts,
+        'Spinel',
+        expected_components={'chromite': 0.0, 'hercynite': 0.0},
+    )
+
+    assert result == {
+        'chromite': -1_932_000.0,
+        'hercynite': -2_404_000.0,
+    }
 
 
 def test_alphamelts_thermoengine_default_is_intrinsic_closed(monkeypatch):
@@ -3418,6 +3633,18 @@ def test_thermoengine_private_solver_imposes_absolute_fo2_with_python_fake(
     )
     transport._equilibrate = fake_equilibrate
     transport._liq_phase = object()
+    monkeypatch.setattr(
+        transport,
+        '_new_melts_model',
+        lambda: fake_equilibrate.MELTSmodel(version=transport._melts_version),
+    )
+    monkeypatch.setattr(transport, '_clear_operation_palette', lambda: None)
+    monkeypatch.setattr(
+        transport,
+        '_retained_solution_chemical_potentials',
+        lambda _melts, _phase, *, expected_components: dict(
+            expected_components),
+    )
 
     def echo(model, _root, **_kwargs):
         feo = model.bulk_wt['FeO'] / 71.8444
@@ -3476,6 +3703,12 @@ def test_thermoengine_imposed_fo2_seeds_feo_only_bulk_with_positive_kress91(
         activity_converter=activity_from_chem_potential,
     )
     transport._equilibrate = FakeEquilibrate()
+    monkeypatch.setattr(
+        transport,
+        '_new_melts_model',
+        lambda: transport._equilibrate.MELTSmodel(
+            version=transport._melts_version),
+    )
 
     def echo(model, _root, **_kwargs):
         feo = model.bulk_wt['FeO'] / 71.8444
@@ -3572,6 +3805,12 @@ def test_thermoengine_imposed_fo2_fails_loud_on_buffered_region(monkeypatch):
             return FakeModel()
 
     transport._equilibrate = FakeEquilibrate()
+    monkeypatch.setattr(
+        transport,
+        '_new_melts_model',
+        lambda: transport._equilibrate.MELTSmodel(
+            version=transport._melts_version),
+    )
     with pytest.raises(ValueError, match='non-monotonic/buffered fO2 region'):
         transport._solve_imposed_fO2(
             temperature_C=1200.0,
@@ -3610,6 +3849,12 @@ def test_thermoengine_imposed_fo2_rejects_narrow_target_plateau(monkeypatch):
         activity_converter=activity_from_chem_potential,
     )
     transport._equilibrate = FakeEquilibrate()
+    monkeypatch.setattr(
+        transport,
+        '_new_melts_model',
+        lambda: transport._equilibrate.MELTSmodel(
+            version=transport._melts_version),
+    )
 
     def echo(model, _root, **_kwargs):
         feo = model.bulk_wt['FeO'] / 71.8444

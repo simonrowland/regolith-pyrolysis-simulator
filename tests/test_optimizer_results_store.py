@@ -335,6 +335,43 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
 
 
+def test_thermoengine_identity_invalidates_pre_fix_row_and_remains_deterministic(
+    tmp_path,
+) -> None:
+    pre_fix = _base_spec(backend_name="thermoengine")
+    identity = "thermoengine MELTS test (adapter=regolith-thermoengine-v2)"
+    post_fix = replace(pre_fix, resolved_engine_identity=identity)
+    identical_post_fix = replace(pre_fix, resolved_engine_identity=identity)
+
+    def scored(spec: EvalSpec, candidate_id: str) -> ScoredResult:
+        return _scored(spec, candidate_id=candidate_id)
+
+    store = ResultStore(
+        tmp_path / "results.sqlite",
+        current_code_version=pre_fix.code_version,
+        current_data_digests=pre_fix.data_digests,
+    )
+    store.store(
+        pre_fix,
+        scored(pre_fix, "pre-fix"),
+        created_at="2026-07-19T00:00:00Z",
+    )
+
+    assert cache_key(post_fix) != cache_key(pre_fix)
+    assert store.lookup(post_fix) is None
+
+    store.store(
+        post_fix,
+        scored(post_fix, "post-fix"),
+        created_at="2026-07-19T00:01:00Z",
+    )
+    loaded = store.lookup(identical_post_fix)
+    assert loaded is not None
+    assert loaded.eval_spec == post_fix
+    assert loaded.eval_spec.resolved_engine_identity == identity
+    assert cache_key(identical_post_fix) == cache_key(post_fix)
+
+
 def test_interpolation_diagnostics_do_not_change_result_store_row_key(tmp_path) -> None:
     spec = _base_spec()
     expected_key = cache_key(spec)

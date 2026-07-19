@@ -116,6 +116,10 @@ from simulator.melt_backend.base import (
     project_melt_to_oxide_projection,
     split_cleaned_melt_account,
 )
+from simulator.melt_backend.engine_worker import (
+    EngineWorkerRemoteError,
+    WarmEngineWorker,
+)
 from simulator.melt_backend.liquidus import (
     DEFAULT_LIQUIDUS_FINDER_BUDGET_S,
     LiquidusSolidusResult,
@@ -135,6 +139,30 @@ class _MAGEMinBulkProjection:
     merged_components: Tuple[str, ...] = ()
     source_sum_wt_pct: float = 0.0
     projected_sum_wt_pct: float = 0.0
+
+
+def _bootstrap_magemin_subprocess_worker(
+    binary_path: str,
+    database: str,
+    config: Mapping[str, Any],
+):
+    backend = MAGEMinBackend()
+    backend._binary_path = Path(binary_path)
+    backend._database = str(database)
+    backend._config = dict(config)
+    backend._bridge = 'subprocess'
+    backend._available = True
+    return backend, str(binary_path)
+
+
+def _handle_magemin_subprocess_request(backend, request, _errlog):
+    return backend._call_magemin_subprocess(
+        bulk_projection=request['bulk_projection'],
+        temperature_C=request['temperature_C'],
+        pressure_kbar=request['pressure_kbar'],
+        fO2_log=request['fO2_log'],
+        call_timeout_s=request.get('call_timeout_s'),
+    )
 
 
 def _dropped_account_species(
@@ -215,6 +243,7 @@ class MAGEMinBackend(MeltBackend):
         self._binary_path: Optional[Path] = None
         self._warnings: List[str] = []
         self._last_error: Optional[str] = None
+        self._subprocess_worker: Optional[WarmEngineWorker] = None
 
     # ------------------------------------------------------------------
     # MeltBackend interface
@@ -230,6 +259,7 @@ class MAGEMinBackend(MeltBackend):
         ``python_bridge``.  A missing binary leaves ``is_available()``
         False so the simulator can route around it.
         """
+        self.close()
         self._available = False
         self._warnings = []
         self._last_error = None
@@ -267,8 +297,44 @@ class MAGEMinBackend(MeltBackend):
         self._bridge = bridge
         self._magemin_module = module  # None for the subprocess bridge
 
+        if bridge == 'subprocess' and self._config.get('warm_worker', True):
+            diagnostic_path = Path(
+                tempfile.gettempdir(),
+                'regolith-pyrolysis-simulator',
+                'magemin-diagnostics.log',
+            )
+            self._subprocess_worker = WarmEngineWorker(
+                name='MAGEMin subprocess operation',
+                bootstrap=_bootstrap_magemin_subprocess_worker,
+                handler=_handle_magemin_subprocess_request,
+                bootstrap_args=(
+                    str(binary_path.resolve()),
+                    self._database,
+                    self._config,
+                ),
+                startup_timeout_s=float(
+                    self._config.get('worker_startup_timeout_s', 30.0)
+                ),
+                call_timeout_s=float(self._config.get('timeout_s', 60.0)),
+                diagnostic_log_path=diagnostic_path,
+            )
+            try:
+                self._subprocess_worker.start()
+            except EngineWorkerRemoteError as exc:
+                self._warn(
+                    'MAGEMin warm worker failed to initialize: '
+                    f'{exc.detail}'
+                )
+                self._subprocess_worker = None
+                return False
+
         self._available = True
         return True
+
+    def close(self) -> None:
+        if self._subprocess_worker is not None:
+            self._subprocess_worker.close()
+            self._subprocess_worker = None
 
     def is_available(self) -> bool:
         return self._available
@@ -1043,6 +1109,28 @@ class MAGEMinBackend(MeltBackend):
             )
 
         if self._bridge == 'subprocess':
+            if self._subprocess_worker is not None:
+                timeout_s = (
+                    float(self._config.get('timeout_s', 60.0))
+                    if call_timeout_s is None
+                    else min(
+                        float(self._config.get('timeout_s', 60.0)),
+                        float(call_timeout_s),
+                    )
+                )
+                try:
+                    return self._subprocess_worker.call({
+                        'bulk_projection': bulk_projection,
+                        'temperature_C': temperature_C,
+                        'pressure_kbar': pressure_kbar,
+                        'fO2_log': fO2_log,
+                        'call_timeout_s': timeout_s,
+                    }, timeout_s=timeout_s + 0.5)
+                except EngineWorkerRemoteError as exc:
+                    raise RuntimeError(
+                        f'MAGEMin subprocess worker failed: {exc.detail}\n'
+                        f'{exc.remote_traceback}'
+                    ) from exc
             return self._call_magemin_subprocess(
                 bulk_projection=bulk_projection,
                 temperature_C=temperature_C,

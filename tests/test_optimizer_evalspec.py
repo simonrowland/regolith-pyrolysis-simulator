@@ -363,6 +363,49 @@ def test_build_eval_inputs_keys_schema_allowlist_version_in_production_path() ->
     assert cache_key(old_spec) != cache_key(new_spec)
 
 
+def test_build_eval_inputs_keys_resolved_engine_identity(monkeypatch) -> None:
+    identity = "thermoengine MELTS test (adapter=regolith-thermoengine-v2)"
+    profile = _mre_cap_profile(campaign="C0", backend_name="thermoengine")
+    profile["fidelities"] = {
+        "high": {"backend_name": "thermoengine"}
+    }
+
+    class FakeBackend:
+        def get_engine_version(self) -> str:
+            return identity
+
+        def close(self) -> None:
+            return None
+
+    monkeypatch.setattr(
+        evaluate_module,
+        "resolve_backend",
+        lambda *args, **kwargs: FakeBackend(),
+    )
+    evaluate_module._resolved_engine_identity_for_eval.cache_clear()
+    try:
+        first, _ = _build_eval_inputs(
+            RecipePatch(values={}),
+            "lunar_mare_low_ti",
+            "high",
+            profile,
+            RecipeSchema(),
+        )
+        second, _ = _build_eval_inputs(
+            RecipePatch(values={}),
+            "lunar_mare_low_ti",
+            "high",
+            profile,
+            RecipeSchema(),
+        )
+    finally:
+        evaluate_module._resolved_engine_identity_for_eval.cache_clear()
+
+    assert first.resolved_engine_identity == identity
+    assert canonical_evalspec_json(first) == canonical_evalspec_json(second)
+    assert cache_key(first) == cache_key(second)
+
+
 def test_build_eval_inputs_keys_schema_bounds_digest_in_production_path() -> None:
     profile = _mre_cap_profile(campaign="C0")
     old_schema = RecipeSchema()
@@ -611,6 +654,7 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
         ("additives_kg", {"CaO": 2.5}),
         ("track", "mre_baseline"),
         ("backend_name", "magmin"),
+        ("resolved_engine_identity", "thermoengine adapter-v2"),
         ("c5_enabled", True),
         ("stop_at_stage0_exit", True),
         ("mre_max_voltage_V", 1.45),
@@ -676,6 +720,17 @@ def test_stage0_exit_stop_survives_evalspec_reduce_paths() -> None:
         assert restored.stop_at_stage0_exit is True
 
 
+def test_resolved_engine_identity_survives_evalspec_reduce_paths() -> None:
+    identity = "thermoengine MELTS test (adapter=regolith-thermoengine-v2)"
+    for spec in (
+        _base_spec(resolved_engine_identity=identity),
+        _prefix_spec(resolved_engine_identity=identity),
+    ):
+        restored = pickle.loads(pickle.dumps(spec))
+        assert restored.resolved_engine_identity == identity
+        assert cache_key(restored) == cache_key(spec)
+
+
 def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
     _, args = _base_spec(
         stage0_redox_oxidant_kg=1.0,
@@ -683,7 +738,7 @@ def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-5]
+    old_args = args[:16] + args[19:-6]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -703,7 +758,7 @@ def test_pre_bubbler_evalspec_reduce_payloads_get_empty_settings_default() -> No
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-5]
+    old_args = args[:18] + args[19:-6]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -723,7 +778,7 @@ def test_pre_redox_prefix_evalspec_reduce_payloads_get_zero_dose_defaults() -> N
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-5]
+    old_args = args[:16] + args[19:-6]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -746,7 +801,7 @@ def test_pre_bubbler_prefix_evalspec_reduce_payloads_get_empty_settings_default(
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-5]
+    old_args = args[:18] + args[19:-6]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -764,7 +819,7 @@ def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
         _prefix_spec(stop_at_stage0_exit=False),
     ):
         _, new_args = spec.__reduce__()
-        old_args = new_args[:-5]
+        old_args = new_args[:-6]
         restored = type(spec)(*old_args)
 
         assert restored.stop_at_stage0_exit is False

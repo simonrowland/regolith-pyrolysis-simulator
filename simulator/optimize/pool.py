@@ -51,6 +51,11 @@ from simulator.optimize.worker_runtime import (
     warm_worker_runtime,
     warm_workers_enabled,
 )
+from simulator.melt_backend.engine_worker import (
+    EngineWorkerPool,
+    INHERIT_PROCESS_GROUP_ENV,
+    WarmEngineWorker,
+)
 
 _WORKER_OUTPUT_ENV = "REGOLITH_OPTIMIZER_WORKER_OUTPUT_DIR"
 EVAL_TIMEOUT_ENV = "REGOLITH_OPTIMIZER_EVAL_TIMEOUT_SECONDS"
@@ -245,11 +250,19 @@ def _evaluate_tasks_in_pool(
     max_workers: int | None,
     per_eval_timeout_seconds: float | None,
 ) -> tuple[ScoredResult, ...]:
+    warm_runtime_spec = _warm_runtime_spec(tasks)
+    if warm_runtime_spec is not None and evaluate_fn is evaluate:
+        return _evaluate_tasks_in_engine_worker_pool(
+            tasks,
+            evaluate_fn,
+            max_workers=max_workers,
+            per_eval_timeout_seconds=per_eval_timeout_seconds,
+            warm_runtime_spec=warm_runtime_spec,
+        )
     results: list[ScoredResult | None] = [None] * len(tasks)
     worker_count = max_workers or (os.cpu_count() or 1)
     max_inflight = max(1, worker_count * _INFLIGHT_PER_WORKER)
     task_queue = deque(tasks)
-    warm_runtime_spec = _warm_runtime_spec(tasks)
     initializer = partial(_initialize_worker, warm_runtime_spec)
     executor = _create_executor(max_workers, initializer)
     futures: dict[Future[Any], _PoolTask] = {}
@@ -368,6 +381,100 @@ def _evaluate_tasks_in_pool(
     completed = tuple(result for result in results if result is not None)
     if len(completed) != len(tasks):
         raise RuntimeError("process-pool evaluation ended without all results")
+    return completed
+
+
+def _bootstrap_optimizer_engine_worker(
+    warm_runtime_spec: _WarmRuntimeSpec,
+) -> tuple[None, str]:
+    os.environ[INHERIT_PROCESS_GROUP_ENV] = '1'
+    _initialize_worker(warm_runtime_spec)
+    return None, warm_runtime_spec.backend_name
+
+
+def _handle_optimizer_engine_request(
+    _resource: None,
+    request: tuple[_PoolTask, Callable[..., ScoredResult]],
+    _errlog: Any,
+) -> dict[str, Any]:
+    task, evaluate_fn = request
+    return _evaluate_pool_task(task, evaluate_fn)
+
+
+def _evaluate_tasks_in_engine_worker_pool(
+    tasks: Sequence[_PoolTask],
+    evaluate_fn: Callable[..., ScoredResult],
+    *,
+    max_workers: int | None,
+    per_eval_timeout_seconds: float | None,
+    warm_runtime_spec: _WarmRuntimeSpec,
+) -> tuple[ScoredResult, ...]:
+    """Queue engine-backed evals; a timeout evicts only its owning slot."""
+    worker_count = max_workers or (os.cpu_count() or 1)
+    timeout_s = per_eval_timeout_seconds or DEFAULT_EVAL_TIMEOUT_SECONDS
+    results: list[ScoredResult | None] = [None] * len(tasks)
+    pool = EngineWorkerPool(
+        lambda index: WarmEngineWorker(
+            name=f'optimizer engine slot {index}',
+            bootstrap=_bootstrap_optimizer_engine_worker,
+            handler=_handle_optimizer_engine_request,
+            bootstrap_args=(warm_runtime_spec,),
+            startup_timeout_s=min(300.0, max(30.0, timeout_s)),
+            call_timeout_s=timeout_s,
+            daemon=False,
+        ),
+        size=worker_count,
+    )
+    task_queue = deque(tasks)
+    futures: dict[Future[Any], _PoolTask] = {}
+    while task_queue and len(futures) < worker_count:
+        task = task_queue.popleft()
+        futures[pool.submit((task, evaluate_fn), timeout_s=timeout_s)] = task
+    pending = set(futures)
+    completed_normally = False
+    try:
+        while pending:
+            done, pending = wait(pending, return_when=FIRST_COMPLETED)
+            for future in done:
+                task = futures.pop(future)
+                try:
+                    outcome = future.result()
+                except TimeoutError:
+                    _signal_pids(
+                        _tracked_child_pids_for_tasks((task,)),
+                        signal.SIGKILL,
+                    )
+                    results[task.index] = _timeout_result(
+                        task,
+                        timeout_seconds=timeout_s,
+                        elapsed_seconds=timeout_s,
+                    )
+                    continue
+                except BaseException as exc:
+                    raise RuntimeError(
+                        f'engine worker evaluation failed for {_task_label(task)}'
+                    ) from exc
+                if outcome['kind'] == 'abort':
+                    abort_payload = dict(outcome['abort'])
+                    abort_payload.setdefault('candidate_id', task.candidate_id)
+                    raise _rebuild_abort(abort_payload)
+                results[int(outcome['index'])] = outcome['result']
+            while task_queue and len(pending) < worker_count:
+                task = task_queue.popleft()
+                future = pool.submit((task, evaluate_fn), timeout_s=timeout_s)
+                futures[future] = task
+                pending.add(future)
+        completed_normally = True
+    finally:
+        if not completed_normally:
+            _signal_pids(
+                _tracked_child_pids_for_tasks(tasks),
+                signal.SIGKILL,
+            )
+        pool.close(cancel_pending=not completed_normally)
+    completed = tuple(result for result in results if result is not None)
+    if len(completed) != len(tasks):
+        raise RuntimeError('engine worker pool ended without all results')
     return completed
 
 

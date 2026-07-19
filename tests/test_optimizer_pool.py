@@ -432,6 +432,45 @@ def _slow_or_abort_evaluate(
     )
 
 
+def test_engine_worker_pool_timeout_evicts_only_hung_slot(tmp_path: Path) -> None:
+    slow = replace(
+        _pool_task(
+            0,
+            feedstock_id='lunar_mare_low_ti',
+            stage0_subprocess_required=False,
+            backend_name='internal-analytical',
+        ),
+        patch=_patch(50),
+        candidate_id='slow',
+        output_dir=str(tmp_path / 'slow'),
+    )
+    fast = replace(
+        _pool_task(
+            1,
+            feedstock_id='lunar_mare_low_ti',
+            stage0_subprocess_required=False,
+            backend_name='internal-analytical',
+        ),
+        patch=_patch(2),
+        candidate_id='fast',
+        output_dir=str(tmp_path / 'fast'),
+    )
+    results = pool_module._evaluate_tasks_in_engine_worker_pool(
+        (slow, fast),
+        _slow_or_abort_evaluate,
+        max_workers=2,
+        per_eval_timeout_seconds=0.2,
+        warm_runtime_spec=pool_module._WarmRuntimeSpec(
+            backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            feedstock_id='lunar_mare_low_ti',
+            stage0_subprocess_required=False,
+        ),
+    )
+
+    assert results[0].run_reference.backend_status_reason == 'optimizer_eval_timeout'
+    assert results[1].candidate_id == 'fast'
+
+
 def _grandchild_then_hang_evaluate(
     patch: RecipePatch,
     feedstock_id: str,
