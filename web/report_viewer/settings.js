@@ -1,5 +1,6 @@
 "use strict";
 
+const { fmtNum, fmtRunId, prettySpecies } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
@@ -11,8 +12,10 @@ const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) =>
 }[character]));
 const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
 const displayNumber = (value, unit = "") => hasNumber(value)
-  ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(Number(value).toLocaleString(undefined, { maximumSignificantDigits: 4 }))}${unit ? ` ${esc(unit)}` : ""}</span>`
+  ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`
   : "not emitted";
+const runIdSpan = (value) => `<span title="${esc(value)}">${esc(fmtRunId(value))}</span>`;
+const speciesSpan = (value) => esc(prettySpecies(value));
 
 function dataBlock(value) {
   if (value === undefined || value === null) return `<div class="pending"><strong>Not captured</strong><p>This field is absent from the artifact header.</p></div>`;
@@ -29,6 +32,27 @@ function costBlock(cost) {
     <div class="card"><div class="ct">Owner energy price · electrical</div><div class="cbig">${displayNumber(cost.electrical_cost_per_kWh, "USD/kWh")}</div></div>
     <div class="card"><div class="ct">Owner energy price · solar heat</div><div class="cbig">${displayNumber(cost.solar_heat_cost_per_kWh, "USD/kWh")}</div></div>
   </div>${cost.provenance == null ? "" : `<div class="note">Price provenance: ${esc(cost.provenance)}</div>`}`;
+}
+
+function c3DoseBlock(dose) {
+  if (!dose || typeof dose !== "object" || Array.isArray(dose) || !Object.keys(dose).length) {
+    return `<div class="pending"><strong>Not captured</strong><p>This field is absent from the artifact header.</p></div>`;
+  }
+  const rows = Object.entries(dose).map(([species, value]) => `<tr><td>${speciesSpan(species.replace(/_kg$/, ""))}</td><td class="num">${displayNumber(value, "kg")}</td></tr>`).join("");
+  return `<div class="table-wrap"><table><thead><tr><th>Species</th><th class="num">Dose · kg</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function engineIdentityBlock(identity) {
+  if (!identity || typeof identity !== "object" || Array.isArray(identity)) return dataBlock(identity);
+  const rows = Object.entries(identity).map(([key, value]) => {
+    const display = typeof value === "number"
+      ? displayNumber(value)
+      : typeof value === "string"
+        ? (/^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f-]{27})$/i.test(value) ? runIdSpan(value) : esc(value))
+        : esc(JSON.stringify(value));
+    return `<tr><th class="mono">${esc(key)}</th><td class="mono">${display}</td></tr>`;
+  }).join("");
+  return `<div class="table-wrap"><table><tbody>${rows}</tbody></table></div>`;
 }
 
 function configEntries(config) {
@@ -111,13 +135,13 @@ function render(artifact) {
   $("#settings").innerHTML = `<header>
     <div class="masthead"><div class="brand"><strong>DIRECT LEAP</strong> TECHNOLOGIES</div><div class="doc-label">Read-only<br>owner T-8</div></div>
     <div class="eyebrow">PHASE 2 · SETTINGS INSPECTOR</div><h1>Captured run settings</h1>
-    <p class="lede"><span class="mono">${esc(header.run_id)}</span> · settings copied from the frozen artifact header.</p>
+    <p class="lede"><span class="mono">${runIdSpan(header.run_id)}</span> · settings copied from the frozen artifact header.</p>
     <div class="settings-actions"><a href="./index.html${RUN_QUERY}">← Back to report</a><button id="download-run" type="button">Download captured header (YAML)</button>${manifestAction}</div>
     <div class="note"><b>Read-only.</b> Config editing remains owner T-8. ${downloadNote}</div>
   </header>
   ${settingsField(1, "Recipe snapshot", "Captured recipe material only; absent values are not reconstructed.", dataBlock(header.recipe_snapshot))}
-  ${settingsField(2, "Engine identity", "Backend identity recorded by the run header.", dataBlock(header.engine_identity))}
-  ${settingsField(3, "C3 dose · kg by species", "Captured alkali-shuttle dose in kg (not mol); no recipe inference.", dataBlock(header.c3_dose))}
+  ${settingsField(2, "Engine identity", "Backend identity recorded by the run header.", engineIdentityBlock(header.engine_identity))}
+  ${settingsField(3, "C3 dose · kg by species", "Captured alkali-shuttle dose in kg (not mol); no recipe inference.", c3DoseBlock(header.c3_dose))}
   ${settingsField(4, "Owner's two energy prices", "Electrical and solar-heat prices bind directly to header.cost_block.", costBlock(header.cost_block))}
   ${settingsField(5, "Effective config", "Per-key merged value and source; every non-default source is highlighted.", effectiveConfig(header.effective_config))}
   <footer class="footer"><span>Frozen header inspection · engine-free · no edit controls</span><a href="./library.html">Run library</a></footer>`;

@@ -49,11 +49,14 @@ def test_report_viewer_serves_index_and_assets(tmp_path: Path) -> None:
 
     index = client.get("/report/")
     script = client.get("/report/settings.js")
+    labels = client.get("/report/labels.js")
 
     assert index.status_code == 200
     assert b"Regolith Refinery Run Report" in index.data
     assert script.status_code == 200
     assert b"Download run.yaml" in script.data
+    assert labels.status_code == 200
+    assert b"fmtRunId" in labels.data
 
 
 def test_report_viewer_reads_canonical_cost_provenance_key() -> None:
@@ -74,6 +77,7 @@ def test_report_viewer_presence_gates_stage_purity_activity(
     include_activity: bool,
 ) -> None:
     script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/report-viewer.js"
+    labels_path = script_path.with_name("labels.js")
     stage = {
         "label": "Cr <stage>",
         "accepted_species": ["Cr<script>", "Mn"],
@@ -96,21 +100,23 @@ def test_report_viewer_presence_gates_stage_purity_activity(
     harness = r"""
 const fs = require("fs");
 const vm = require("vm");
-const source = fs.readFileSync(process.argv[2], "utf8");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const source = fs.readFileSync(process.argv[3], "utf8");
 const report = { innerHTML: "" };
 const context = {
   window: { location: { search: "" } },
   document: { querySelector: (selector) => selector === "#report" ? report : null },
   URLSearchParams,
   encodeURIComponent,
-  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[3]) })
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
 };
+vm.runInNewContext(labelsSource, context);
 vm.runInNewContext(source, context);
 setImmediate(() => process.stdout.write(report.innerHTML));
 """
 
     completed = subprocess.run(
-        ["node", "-", str(script_path), json.dumps(artifact)],
+        ["node", "-", str(labels_path), str(script_path), json.dumps(artifact)],
         input=harness,
         text=True,
         capture_output=True,
@@ -130,11 +136,122 @@ setImmediate(() => process.stdout.write(report.innerHTML));
         assert "Pending W-A10" in completed.stdout
 
 
+def test_report_viewer_renders_account_disposition_without_yield_claims() -> None:
+    root = Path(__file__).resolve().parents[1] / "web/report_viewer"
+    artifact = {
+        "artifact_schema_version": "0.1.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {
+            "run_id": "0123456789abcdef0123456789abcdef",
+            "name": "Disposition fixture",
+        },
+        "timesteps": [],
+        "terminal": {
+            "final_state": {
+                "process.condensation_train": {"SiO2": 1.978e-7},
+                "process.cleaned_melt": {"Al2O3": 4.0},
+                "process.wall_deposit_segment_stage_0_to_stage_1": {"Na2O": 0.25},
+                "process.overhead_gas": {"CO2": 0.5},
+                "process.reagent_inventory": {"Na": 2.0},
+                "process.future_account": {"Fe": 3.0},
+            }
+        },
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const reportSource = fs.readFileSync(process.argv[3], "utf8");
+const report = { innerHTML: "" };
+const context = {
+  window: { location: { search: "" } },
+  document: { querySelector: (selector) => selector === "#report" ? report : null },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[4]) })
+};
+vm.runInNewContext(labelsSource, context);
+vm.runInNewContext(reportSource, context);
+setImmediate(() => process.stdout.write(report.innerHTML));
+"""
+
+    completed = subprocess.run(
+        [
+            "node", "-", str(root / "labels.js"),
+            str(root / "report-viewer.js"), json.dumps(artifact),
+        ],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    html = completed.stdout
+
+    assert "Products" in html
+    assert "Retained" in html
+    assert "Losses" in html
+    assert "Terminal inventory" in html
+    assert "Reagent cycle · excluded" in html
+    assert "Unclassified" in html
+    assert '>Cleaned melt</span>' in html
+    assert '>Wall deposit · stage 0→1</span>' in html
+    assert ">process.cleaned_melt<" not in html
+    assert "SiO₂" in html
+    assert "1.98e-7 mol" in html
+    assert "01234567…" in html
+    assert "Account disposition — where the ledger&#39;s atoms sit at termination" in html
+    assert "NOT per-species feedstock-yield fractions" in html
+    assert "yield_disposition (pending)" in html
+    assert "feedstock-origin" not in html
+
+
+def test_report_labels_format_scientific_values_and_identifiers() -> None:
+    labels_path = (
+        Path(__file__).resolve().parents[1] / "web/report_viewer/labels.js"
+    )
+    harness = r"""
+require(process.argv[2]);
+const { fmtNum, fmtRunId, prettySpecies, accountLabel } = globalThis.ReportLabels;
+process.stdout.write(JSON.stringify({
+  zero: fmtNum(0, "mol"),
+  trace: fmtNum(1.978e-7, "mol"),
+  normal: fmtNum(12345.678, "kg"),
+  missing: fmtNum(null, "kg"),
+  hash: fmtRunId("0123456789abcdef0123456789abcdef"),
+  named: fmtRunId("sample-fullseq-lunar-197h"),
+  species: ["SiO2", "Al2O3", "Fe"].map(prettySpecies),
+  wall: accountLabel("process.wall_deposit_segment_stage_3_to_stage_4"),
+  unknown: accountLabel("process.future_account")
+}));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(labels_path)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    result = json.loads(completed.stdout)
+
+    assert result["zero"] == "0 mol"
+    assert result["trace"] == "1.98e-7 mol"
+    assert result["normal"].endswith(" kg")
+    assert "12345.678" not in result["normal"]
+    assert result["missing"] == "not emitted"
+    assert result["hash"] == "01234567…"
+    assert result["named"] == "sample-fullseq-lunar-197h"
+    assert result["species"] == ["SiO₂", "Al₂O₃", "Fe"]
+    assert result["wall"] == "Wall deposit · stage 3→4"
+    assert result["unknown"] == "Future Account"
+
+
 @pytest.mark.parametrize("has_recipe_snapshot", [True, False])
 def test_settings_script_executes_live_run_resolution_and_manifest_gate(
     has_recipe_snapshot: bool,
 ) -> None:
     script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/settings.js"
+    labels_path = script_path.with_name("labels.js")
     artifact = _artifact(
         recipe_snapshot=(
             {
@@ -149,12 +266,13 @@ def test_settings_script_executes_live_run_resolution_and_manifest_gate(
     harness = r"""
 const fs = require("fs");
 const vm = require("vm");
-const source = fs.readFileSync(process.argv[2], "utf8");
+const labelsSource = fs.readFileSync(process.argv[2], "utf8");
+const source = fs.readFileSync(process.argv[3], "utf8");
 const settings = { innerHTML: "" };
 const download = { addEventListener() {} };
 let fetched = null;
 const context = {
-  window: { location: { search: process.argv[3] } },
+  window: { location: { search: process.argv[4] } },
   document: {
     querySelector(selector) {
       if (selector === "#settings") return settings;
@@ -170,15 +288,19 @@ const context = {
   setTimeout,
   fetch: async (url) => {
     fetched = url;
-    return { ok: true, json: async () => JSON.parse(process.argv[4]) };
+    return { ok: true, json: async () => JSON.parse(process.argv[5]) };
   }
 };
+vm.runInNewContext(labelsSource, context);
 vm.runInNewContext(source, context);
 setImmediate(() => process.stdout.write(JSON.stringify({ fetched, html: settings.innerHTML })));
 """
 
     completed = subprocess.run(
-        ["node", "-", str(script_path), "?run=run/live", json.dumps(artifact)],
+        [
+            "node", "-", str(labels_path), str(script_path),
+            "?run=run/live", json.dumps(artifact),
+        ],
         input=harness,
         text=True,
         capture_output=True,

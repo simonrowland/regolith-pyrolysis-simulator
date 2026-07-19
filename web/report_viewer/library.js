@@ -1,5 +1,6 @@
 "use strict";
 
+const { fmtNum, fmtRunId, prettySpecies } = globalThis.ReportLabels;
 const LIVE_RUNS_URL = "/api/runs";
 const STATIC_RUNS_URL = "./runs-index.json";
 const SYSTEM_FOLDERS = ["All", "Favorites", "My runs", "Default runs", "Bootstrap ladder"];
@@ -10,8 +11,10 @@ const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) =>
 }[character]));
 const hasNumber = (value) => value !== null && value !== "" && Number.isFinite(Number(value));
 const exactNumber = (value, unit) => hasNumber(value)
-  ? `<span title="${esc(`${String(value)} ${unit}`)}">${esc(Number(value).toLocaleString(undefined, { maximumSignificantDigits: 4 }))} ${esc(unit)}</span>`
+  ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`
   : "not emitted";
+const runIdSpan = (value) => `<span title="${esc(value)}">${esc(fmtRunId(value))}</span>`;
+const speciesSpan = (value) => esc(prettySpecies(value));
 
 let runs = [];
 let activeFolder = "All";
@@ -58,7 +61,7 @@ function yieldChips(run) {
   }
   if (!entries.length) return "";
   return `<div class="yield-track">${entries.map(([species, value]) =>
-    `<div class="yield-chip"><div class="el">${esc(species)}</div><div class="kg">${exactNumber(value, "kg")}</div></div>`
+    `<div class="yield-chip"><div class="el">${speciesSpan(species)}</div><div class="kg">${exactNumber(value, "kg")}</div></div>`
   ).join("")}</div>`;
 }
 
@@ -82,10 +85,10 @@ function runCard(run) {
       <button class="star-button${isStarred ? " active" : ""}" type="button" data-star="${esc(runId)}" aria-pressed="${isStarred}" aria-label="${esc(`${isStarred ? "Remove" : "Add"} ${run.name} ${isStarred ? "from" : "to"} favorites`)}"${isStarPending ? " disabled" : ""}>${isStarred ? "★" : "☆"}</button>
     </div>
     ${starError ? `<p class="demo-note" role="alert">${esc(`Could not save star for ${run.name}. ${starError}`)}</p>` : ""}
-    <p class="run-summary">${esc(run.summary)}${hasNumber(run.hours) ? esc(` · ${run.hours} h`) : ""}${hasNumber(run.peak_T_C) ? esc(` · peak ${run.peak_T_C} °C`) : ""}</p>
+    <p class="run-summary">${esc(run.summary)}${hasNumber(run.hours) ? ` · ${exactNumber(run.hours, "h")}` : ""}${hasNumber(run.peak_T_C) ? ` · peak ${exactNumber(run.peak_T_C, "°C")}` : ""}</p>
     ${yieldChips(run)}
     ${unavailable}
-    <div class="run-actions"><span class="mono">${esc(run.run_id)}</span><button class="load-button" type="button" data-load="${esc(loadTarget)}"${canLoad ? "" : " disabled"}>Load</button></div>
+    <div class="run-actions"><span class="mono">${runIdSpan(run.run_id)}</span><button class="load-button" type="button" data-load="${esc(loadTarget)}"${canLoad ? "" : " disabled"}>Load</button></div>
   </article>`;
 }
 

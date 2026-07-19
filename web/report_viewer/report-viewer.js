@@ -1,5 +1,6 @@
 "use strict";
 
+const { fmtNum, fmtRunId, prettySpecies, accountLabel } = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
@@ -8,6 +9,14 @@ const ARTIFACT_URL = RUN_ID
 const SUPPORTED_ARTIFACT_SCHEMA_MAJOR = 0;
 const ELLINGHAM_ORDER = ["Na", "K", "Fe", "Cr", "Mn", "Mg", "Si", "Al", "Ti", "Ca"];
 const COLORS = ["#e8940f", "#1f7798", "#468466", "#8b63a6", "#a95c43", "#6f8c9e"];
+const DISPOSITION_GROUPS = Object.freeze([
+  { key: "products", label: "Products" },
+  { key: "retained", label: "Retained" },
+  { key: "losses", label: "Losses" },
+  { key: "terminal_inventory", label: "Terminal inventory" },
+  { key: "reagent_cycle", label: "Reagent cycle · excluded" },
+  { key: "unclassified", label: "Unclassified" }
+]);
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (c) => ({
@@ -35,26 +44,35 @@ const minPresent = (values) => {
   const emitted = values.map(n).filter((value) => value !== null);
   return emitted.length ? Math.min(...emitted) : null;
 };
-const kg = (value, digits = 3) => hasNumber(value)
-  ? `${Number(value).toLocaleString(undefined, { maximumFractionDigits: digits })} kg`
-  : "not emitted";
+const kg = (value) => fmtNum(value, "kg");
 const exactValue = (value, unit) => hasNumber(value)
-  ? `<span title="${esc(`${String(value)} ${unit}`)}">${Number(value).toLocaleString(undefined, { maximumSignificantDigits: 3 })} ${unit}</span>`
+  ? `<span title="${esc(`${String(value)}${unit ? ` ${unit}` : ""}`)}">${esc(fmtNum(value, unit))}</span>`
   : "not emitted";
 const exactKg = (value) => exactValue(value, "kg");
 const exactMol = (value) => exactValue(value, "mol");
+const runIdSpan = (value) => `<span title="${esc(value)}">${esc(fmtRunId(value))}</span>`;
+// A nameless live run's `name` is its raw hash id; don't dump 32 hex chars as
+// the H1. Show a readable title with the short id instead (full id stays in
+// the masthead run-id span + tooltip).
+const isHashLike = (value) => typeof value === "string" && /^(?:[0-9a-f]{24,}|[0-9a-f]{8}-[0-9a-f-]{27,})$/i.test(value.trim());
+const runTitle = (header) => {
+  const name = typeof header.name === "string" ? header.name.trim() : "";
+  return name && !isHashLike(name) ? name : `Untitled run · ${fmtRunId(header.run_id ?? name)}`;
+};
+const accountSpan = (value) => `<span title="${esc(value)}">${esc(accountLabel(value))}</span>`;
+const speciesSpan = (value) => esc(prettySpecies(value));
 // Ledger cells must never fabricate: JS coercion turns true into "1 mol" and
 // []/false/whitespace into "0 mol". Only real finite numbers render as mol.
 const strictMol = (value) => typeof value === "number" && Number.isFinite(value)
   ? exactValue(value, "mol")
   : `<span class="trace">non-numeric (${esc(typeof value === "string" ? "string" : Array.isArray(value) ? "array" : typeof value)})</span>`;
-const strictMolSum = (values) => values.every((value) => typeof value === "number" && Number.isFinite(value))
+const strictMolSum = (values) => values.length && values.every((value) => typeof value === "number" && Number.isFinite(value))
   ? exactValue(values.reduce((total, value) => total + value, 0), "mol")
-  : "not numeric";
+  : values.length ? "not numeric" : "not emitted";
 const money = (value) => hasNumber(value)
   ? Number(value).toLocaleString(undefined, { style: "currency", currency: "USD", minimumFractionDigits: 2 })
   : "not emitted";
-const sci = (value) => hasNumber(value) ? (Number(value) === 0 ? "0" : Number(value).toExponential(3)) : "not emitted";
+const sci = (value) => fmtNum(value);
 
 function pending(task, message) {
   return `<div class="pending"><strong>Pending ${esc(task)}</strong><p>${esc(message)}</p></div>`;
@@ -130,8 +148,8 @@ function lineChart(id, title, series, options = {}) {
     `<line class="axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${height - pad.bottom}"/>${paths}` +
     `<line class="marker" data-marker x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${height - pad.bottom}"/>` +
     `<text class="chart-label" x="${pad.left}" y="${height - 7}">h 1</text><text class="chart-label" text-anchor="end" x="${width - pad.right}" y="${height - 7}">h ${pointCount}</text>` +
-    `<text class="chart-label" x="3" y="${pad.top + 4}">${esc(options.maxLabel || max.toPrecision(3))}</text>` +
-    `<text class="chart-label" x="3" y="${height - pad.bottom}">${esc(options.minLabel || (options.log ? `10^${min.toFixed(1)}` : min.toPrecision(3)))}</text></svg></div>`;
+    `<text class="chart-label" x="3" y="${pad.top + 4}">${esc(options.maxLabel || fmtNum(max))}</text>` +
+    `<text class="chart-label" x="3" y="${height - pad.bottom}">${esc(options.minLabel || (options.log ? `10^${fmtNum(min)}` : fmtNum(min)))}</text></svg></div>`;
 }
 
 function updateMarkers(index, count) {
@@ -161,15 +179,15 @@ function makeHeader(artifact, rows, energy) {
     <div class="masthead">
       <svg class="mark" viewBox="0 0 42 42" aria-hidden="true"><circle cx="16" cy="27" r="11" fill="none" stroke="currentColor" stroke-width="1.4"/><ellipse cx="16" cy="27" rx="4.8" ry="11" fill="none" stroke="currentColor"/><path d="M6 23q10-4 20 0M6 31q10 4 20 0M29 7l-4 8 8 4 5-2M25 15l-6 2-3-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="5" r="2.6" fill="currentColor"/></svg>
       <div class="brand"><strong>DIRECT LEAP</strong> TECHNOLOGIES</div>
-      <div class="doc-label">Run report<br><span class="mono">${esc(header.run_id)}</span></div>
+      <div class="doc-label">Run report<br><span class="mono">${runIdSpan(header.run_id)}</span></div>
     </div>
-    <h1>${esc(header.name)}</h1>
-    <p class="lede"><b>${hasNumber(peakTemperature) ? `${peakTemperature.toLocaleString()} °C` : "not emitted"} peak</b> · ${esc(header.feedstock_id)} · <b>${rows.length} hours</b> · ${esc(campaignChain)}</p>
+    <h1>${esc(runTitle(header))}</h1>
+    <p class="lede"><b>${exactValue(peakTemperature, "°C")} peak</b> · ${esc(header.feedstock_id)} · <b>${rows.length} hours</b> · ${esc(campaignChain)}</p>
     <div class="meta-chips">
       <span class="chip">charge ${kg(header.charge_mass_kg, 0)}</span>
       <span class="chip">engine ${esc(header.engine_identity?.name)}</span>
       <span class="chip">schema ${esc(artifact.artifact_schema_version)}</span>
-      ${header.c3_dose && Object.keys(header.c3_dose).length ? `<span class="chip accent">C3 dose ${Object.entries(header.c3_dose).map(([key, value]) => `${esc(key.replace(/_kg$/, ""))} ${esc(value)} kg`).join(" · ")}</span>` : ""}
+      ${header.c3_dose && Object.keys(header.c3_dose).length ? `<span class="chip accent">C3 dose ${Object.entries(header.c3_dose).map(([key, value]) => `${speciesSpan(key.replace(/_kg$/, ""))} ${exactKg(value)}`).join(" · ")}</span>` : ""}
     </div>
     <div class="status-banner ${["failed", "refused"].includes(status) ? "failed" : ""}">
       <div class="status-icon">${status === "ok" ? "✓" : "!"}</div><div><strong>Execution status: ${esc(status)}</strong>
@@ -178,7 +196,7 @@ function makeHeader(artifact, rows, energy) {
     <div class="glance">
       <div class="metric"><div class="k">Fe evolved</div><div class="v">${kg(finalMetal.Fe, 2)}</div></div>
       <div class="metric"><div class="k">${esc(o2Label)}</div><div class="v">${exactKg(o2)}</div></div>
-      <div class="metric"><div class="k">Reported energy</div><div class="v">${hasNumber(reportedEnergy) ? `${Number(reportedEnergy).toFixed(1)} <small>kWh electrical + evaporation thermal</small>` : "not emitted"}</div></div>
+      <div class="metric"><div class="k">Reported energy</div><div class="v">${exactValue(reportedEnergy, "kWh")} <small>electrical + evaporation thermal</small></div></div>
       <div class="metric"><div class="k">Two-price energy cost</div><div class="v">${header.cost_block ? money(energy.totalCost) : "pending W-A5a"}${costProvenance ? `<small>${esc(costProvenance)}</small>` : ""}</div></div>
     </div>
   </header>`;
@@ -187,8 +205,8 @@ function makeHeader(artifact, rows, energy) {
 function yieldsSection(rows, terminal) {
   const evolved = rows.at(-1).metal_yields_kg || {};
   const max = Math.max(maxPresent(Object.values(evolved)) ?? 0, 1);
-  const chips = ELLINGHAM_ORDER.map((element) => `<div class="yield-chip"><div class="el">${element}</div><div class="kg">${exactKg(evolved[element])} evolved</div><div class="bar"><i style="width:${Math.sqrt((n(evolved[element]) ?? 0) / max) * 100}%"></i></div></div>`).join("");
-  const gap = terminal.yield_disposition ? "" : pending("W-A0 / W-A1", "Atom-basis available mass, fraction, and denominator are not emitted. Exact evolved kg is shown; no yield percentage is invented.");
+  const chips = ELLINGHAM_ORDER.map((element) => `<div class="yield-chip"><div class="el">${speciesSpan(element)}</div><div class="kg">${exactKg(evolved[element])} evolved</div><div class="bar"><i style="width:${Math.sqrt((n(evolved[element]) ?? 0) / max) * 100}%"></i></div></div>`).join("");
+  const gap = terminal.yield_disposition ? "" : `<div class="note">Per-species feedstock-yield fractions are pending <span class="mono">yield_disposition</span>; none are inferred here.</div>`;
   return section(1, "Extraction yields — Ellingham order", "Exact evolved mass from the final hourly metal_yields_kg row.", `<div class="yield-track">${chips}</div>${gap}`);
 }
 
@@ -203,13 +221,13 @@ function processSection(artifact, rows, spans) {
   const vaporKeys = [...new Set(rows.flatMap((row) => Object.keys(row.vapor_species_kg_hr || {})))];
   const topVapors = vaporKeys.map((key) => ({ key, peak: maxPresent(rows.map((row) => row.vapor_species_kg_hr?.[key])) ?? 0 })).sort((a, b) => b.peak - a.peak).slice(0, 4);
   const charts = [
-    lineChart("temperature-chart", "Melt temperature · °C", [{ label: "T °C", values: temperature, color: COLORS[0] }], { spans, maxLabel: `${maxPresent(temperature)?.toLocaleString() ?? "not emitted"} °C` }),
-    lineChart("pressure-chart", "O₂ partial pressure · bar (log scale)", [{ label: "pO₂ bar", values: pressure, color: COLORS[1] }], { log: true, spans, maxLabel: hasNumber(maxPresent(pressure)) ? `${maxPresent(pressure).toExponential(1)} bar` : "not emitted" }),
+    lineChart("temperature-chart", "Melt temperature · °C", [{ label: "T °C", values: temperature, color: COLORS[0] }], { spans, maxLabel: fmtNum(maxPresent(temperature), "°C") }),
+    lineChart("pressure-chart", "O₂ partial pressure · bar (log scale)", [{ label: "pO₂ bar", values: pressure, color: COLORS[1] }], { log: true, spans, maxLabel: fmtNum(maxPresent(pressure), "bar") }),
     lineChart("energy-chart", "Cumulative energy · kWh", [{ label: "electrical", values: electrical, color: COLORS[1] }, { label: "thermal: evaporation total (latent + dissociation breakdown)", values: thermal, color: COLORS[2] }], { zero: true, spans }),
-    lineChart("vapor-chart", "Vapor species surges · kg/h", topVapors.map((item, index) => ({ label: item.key, values: rows.map((row) => n(row.vapor_species_kg_hr?.[item.key])), color: COLORS[index] })), { zero: true, spans })
+    lineChart("vapor-chart", "Vapor species surges · kg/h", topVapors.map((item, index) => ({ label: prettySpecies(item.key), values: rows.map((row) => n(row.vapor_species_kg_hr?.[item.key])), color: COLORS[index] })), { zero: true, spans })
   ];
   if (hasCarrierPressure) {
-    charts.splice(2, 0, lineChart("carrier-pressure-chart", "Carrier pressure · bar", [{ label: "carrier bar", values: carrierPressure, color: COLORS[3] }], { spans, maxLabel: `${maxPresent(carrierPressure)?.toExponential(1) ?? "not emitted"} bar` }));
+    charts.splice(2, 0, lineChart("carrier-pressure-chart", "Carrier pressure · bar", [{ label: "carrier bar", values: carrierPressure, color: COLORS[3] }], { spans, maxLabel: fmtNum(maxPresent(carrierPressure), "bar") }));
   }
   const carrierIdentity = carrierIdentities.length
     ? `<div class="note"><b>Carrier identity:</b> ${carrierIdentities.map((identity) => `<span class="mono">${esc(identity)}</span>`).join(" · ")}</div>`
@@ -237,13 +255,13 @@ function renderTimestepLedger(timestep) {
   }
   const rows = accounts.map(([account, species]) => {
     if (!species || typeof species !== "object" || Array.isArray(species)) {
-      return `<tr><td class="mono">${esc(account)}</td><td colspan="2">captured, malformed species map</td></tr>`;
+      return `<tr><td>${accountSpan(account)}</td><td colspan="2">captured, malformed species map</td></tr>`;
     }
     const entries = Object.entries(species);
     if (!entries.length) {
-      return `<tr><td class="mono">${esc(account)}</td><td colspan="2">captured, empty account</td></tr>`;
+      return `<tr><td>${accountSpan(account)}</td><td colspan="2">captured, empty account</td></tr>`;
     }
-    return entries.map(([name, value], index) => `<tr>${index === 0 ? `<td class="mono" rowspan="${entries.length}">${esc(account)}</td>` : ""}<td class="mono">${esc(name)}</td><td class="num">${strictMol(value)}</td></tr>`).join("");
+    return entries.map(([name, value], index) => `<tr>${index === 0 ? `<td rowspan="${entries.length}">${accountSpan(account)}</td>` : ""}<td>${speciesSpan(name)}</td><td class="num">${strictMol(value)}</td></tr>`).join("");
   }).join("");
   return `<div class="table-wrap timestep-ledger-wrap"><table><thead><tr><th>Account</th><th>Species</th><th class="num">Amount · mol</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -251,9 +269,56 @@ function renderTimestepLedger(timestep) {
 function ledgerSection(finalState) {
   const rows = Object.entries(finalState || {}).map(([account, species]) => {
     const entries = Object.entries(species || {});
-    return `<tr><td class="mono">${esc(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${esc(name)} ${strictMol(value)}`).join(" · ") : "empty"}</td><td class="num">${strictMolSum(entries.map(([, value]) => value))}</td></tr>`;
+    return `<tr><td>${accountSpan(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${speciesSpan(name)} ${strictMol(value)}`).join(" · ") : "empty"}</td><td class="num">${strictMolSum(entries.map(([, value]) => value))}</td></tr>`;
   }).join("");
   return section(3, "Full terminal ledger", "Every final_state account and species; no product projection or hidden filtering.", `<div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>`);
+}
+
+function dispositionRole(account) {
+  if ([
+    "process.condensation_train", "terminal.drain_tap_material",
+    "terminal.chromium_condensed_oxide_stored", "terminal.oxygen_stage0_stored",
+    "terminal.oxygen_mre_anode_stored", "terminal.oxygen_melt_offgas_stored",
+    "terminal.oxygen_melt_offgas_captured", "reservoir.oxygen_cistern_liquid_inventory"
+  ].includes(account)) return "products";
+  if ([
+    "process.cleaned_melt", "terminal.slag", "process.solid_char_carbon",
+    "process.metal_phase", "process.metal_phase_bottom_pool", "process.metal_phase_float_layer",
+    "process.raw_feedstock", "process.stage0_carbonate_feed", "process.stage0_perchlorate_feed",
+    "process.stage0_salt_feed", "process.stage0_volatile_feed", "reservoir.fo2_buffer",
+    "terminal.stage0_chloride_salt_phase", "terminal.stage0_salt_phase",
+    "terminal.stage0_sulfide_matte", "terminal.stage0_residual_carbonate_carbon",
+    "terminal.stage0_residual_refractory_carbon", "reservoir.stage0_oxidant",
+    "reservoir.stage0_process_gas"
+  ].includes(account)) return "retained";
+  if (account === "terminal.offgas" || account === "terminal.oxygen_melt_offgas_vented_to_vacuum" ||
+      account === "process.wall_deposit" || /^process\.wall_deposit_segment_/.test(account)) return "losses";
+  if (account === "process.overhead_gas" || account === "process.condensation_retained_holdup") return "terminal_inventory";
+  if ([
+    "process.reagent_inventory", "process.spent_reductant_residue", "process.c7_al_credit",
+    "terminal.oxygen_bubbler_external_vented_to_vacuum"
+  ].includes(account) || /^reservoir\.reagent\./.test(account)) return "reagent_cycle";
+  return "unclassified";
+}
+
+function accountDispositionSection(finalState) {
+  const accounts = finalState && typeof finalState === "object" && !Array.isArray(finalState)
+    ? Object.entries(finalState)
+    : [];
+  const grouped = new Map(DISPOSITION_GROUPS.map((group) => [group.key, []]));
+  accounts.forEach(([account, species]) => grouped.get(dispositionRole(account)).push([account, species]));
+  const content = DISPOSITION_GROUPS.map((group) => {
+    const members = grouped.get(group.key);
+    if (!members.length) return "";
+    const groupValues = members.flatMap(([, species]) => Object.values(species && typeof species === "object" && !Array.isArray(species) ? species : {}));
+    const rows = members.map(([account, species]) => {
+      const entries = species && typeof species === "object" && !Array.isArray(species) ? Object.entries(species) : [];
+      return `<tr><td>${accountSpan(account)}</td><td class="species-list">${entries.length ? entries.map(([name, value]) => `${speciesSpan(name)} ${strictMol(value)}`).join(" · ") : "empty or malformed"}</td><td class="num">${strictMolSum(entries.map(([, value]) => value))}</td></tr>`;
+    }).join("");
+    return `<div class="card disposition-group"><div class="ct">${esc(group.label)}</div><div class="cbig">${strictMolSum(groupValues)}</div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Species · mol</th><th class="num">Account total · mol</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  }).join("");
+  const body = content || `<div class="pending"><strong>Not emitted</strong><p>No terminal final_state accounts were emitted.</p></div>`;
+  return section(3, "Account disposition", "Account disposition — where the ledger's atoms sit at termination, grouped by role. This is ACCOUNT-level (which accounts hold what), NOT per-species feedstock-yield fractions — those require origin resolution and arrive with yield_disposition (pending).", `<div class="cards disposition-groups">${body}</div>`);
 }
 
 function campaignSection(artifact, spans) {
@@ -268,9 +333,9 @@ function campaignSection(artifact, spans) {
     const lowTemperature = temperatures.every(hasNumber) ? minPresent(temperatures) : null;
     const highTemperature = temperatures.every(hasNumber) ? maxPresent(temperatures) : null;
     return `<div class="card"><div class="ct">${esc(span.name)} · h ${esc(steps[0].hour)}–${esc(steps.at(-1).hour)}</div><div class="cbig">${steps.length} <small>hours</small></div>` +
-      `<div class="kv"><span>Temperature range</span><b>${hasNumber(lowTemperature) && hasNumber(highTemperature) ? `${lowTemperature}–${highTemperature} °C` : "not emitted"}</b></div>` +
-      `<div class="kv"><span>Electrical + evaporation thermal</span><b>${hasNumber(energy) ? `${energy.toFixed(3)} kWh` : "not emitted"}</b></div>` +
-      `<div class="kv"><span>End pO₂</span><b>${hasNumber(final.pO2_bar) ? `${Number(final.pO2_bar).toExponential(3)} bar` : "not emitted"}</b></div>` +
+      `<div class="kv"><span>Temperature range</span><b>${hasNumber(lowTemperature) && hasNumber(highTemperature) ? `${fmtNum(lowTemperature)}–${fmtNum(highTemperature)} °C` : "not emitted"}</b></div>` +
+      `<div class="kv"><span>Electrical + evaporation thermal</span><b>${exactValue(energy, "kWh")}</b></div>` +
+      `<div class="kv"><span>End pO₂</span><b>${exactValue(final.pO2_bar, "bar")}</b></div>` +
       `<div class="kv"><span>End regime</span><b>${esc(final.regime)}</b></div></div>`;
   }).join("");
   return section(4, "Campaign results", "Measured campaign spans and end-state signals from the timestep array.", `<div class="cards">${cards}</div>`);
@@ -287,10 +352,10 @@ function tapsAndPuritySection(terminal) {
     const activity = stage.activity && typeof stage.activity === "object" && !Array.isArray(stage.activity) ? stage.activity : null;
     const acceptedSpecies = stage.accepted_species || [];
     const speciesList = activity
-      ? acceptedSpecies.map((species) => typeof activity[species] === "boolean" ? `${esc(species)} · ${activity[species] ? "ACTIVE" : "IDLE"}` : esc(species)).join("<br>") || "none designated"
-      : esc(acceptedSpecies.join(" · ") || "none designated");
+      ? acceptedSpecies.map((species) => typeof activity[species] === "boolean" ? `${speciesSpan(species)} · ${activity[species] ? "ACTIVE" : "IDLE"}` : speciesSpan(species)).join("<br>") || "none designated"
+      : acceptedSpecies.map(speciesSpan).join(" · ") || "none designated";
     return `<tr><td>${esc(stage.label || key)}<br><span class="trace mono">${esc(key)}</span></td><td class="species-list">${speciesList}</td>` +
-      `<td class="num">${exactKg(stage.total_kg)}${trace}</td><td class="num">${exactKg(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}</td><td class="num">${hasNumber(stage.purity_fraction) ? `${(Number(stage.purity_fraction) * 100).toFixed(4)}%` : "not emitted"}</td><td><span class="verdict ${verdictClass}">${esc(verdict)}</span></td></tr>`;
+      `<td class="num">${exactKg(stage.total_kg)}${trace}</td><td class="num">${exactKg(stage.designated_kg)}</td><td class="num">${exactKg(stage.impurity_kg)}</td><td class="num">${exactValue(hasNumber(stage.purity_fraction) ? Number(stage.purity_fraction) * 100 : null, "%")}</td><td><span class="verdict ${verdictClass}">${esc(verdict)}</span></td></tr>`;
   }).join("");
   return section(5, "Metal taps & stage purity", "Live backend masses, purity fraction, and verdict. An absent backend verdict is unavailable; trace is an annotation from total_kg.",
     `<div class="table-wrap"><table><thead><tr><th>Stage</th><th>Accepted species</th><th class="num">Total</th><th class="num">Designated</th><th class="num">Impurity</th><th class="num">Purity</th><th>Backend verdict</th></tr></thead><tbody>${stageRows}</tbody></table></div>` +
@@ -313,15 +378,15 @@ function wallAndOxygenSection(artifact, rows) {
   const pumping = terminal.run_metadata?.cost_rollup_diagnostic?.pumping_diagnostic;
   const o2 = last.O2_source_side_potential_kg_cumulative ?? null;
   const o2Label = last.O2_metric_label || "O₂ metric label not emitted";
-  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${exactKg(wallTotal)}</div><div class="kv"><span>Species</span><b class="mono">${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${esc(key)} ${esc(sci(value))}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${sci(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn)}</b></div></div>`;
-  const oxygen = `<div class="card"><div class="ct">${esc(o2Label)}</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Metric field</span><b>O2_source_side_potential_kg_cumulative</b></div><div class="kv"><span>Pumping energy</span><b>${pumping && hasNumber(pumping.pumping_electrical_kWh) ? `${Number(pumping.pumping_electrical_kWh).toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status ?? "not emitted")}</b></div></div>`;
+  const wall = `<div class="card"><div class="ct">Observed wall deposits · cumulative timestep series</div><div class="cbig">${exactKg(wallTotal)}</div><div class="kv"><span>Species</span><b>${wallComplete ? Object.entries(wallSpecies).map(([key, value]) => `${speciesSpan(key)} ${exactKg(value)}`).join(" · ") || "none emitted" : "not emitted"}</b></div><div class="kv"><span>Current transport</span><b>${esc(last.regime)} · Kn ${exactValue(last.Kn && typeof last.Kn === "object" ? last.Kn.knudsen_number : last.Kn, "")}</b></div></div>`;
+  const oxygen = `<div class="card"><div class="ct">${esc(o2Label)}</div><div class="cbig">${exactKg(o2)}</div><div class="kv"><span>Metric field</span><b>O2_source_side_potential_kg_cumulative</b></div><div class="kv"><span>Pumping energy</span><b>${exactValue(pumping?.pumping_electrical_kWh, "kWh")}</b></div><div class="kv"><span>Pumping status</span><b>${esc(pumping?.status ?? "not emitted")}</b></div></div>`;
   return section(6, "Wall risk, oxygen & pumping", "Observed deposits and terminal diagnostics only; wall lifetime remains unassessed.", `<div class="cards">${wall}${oxygen}</div>${pending("W-D4", "terminal.wall_lifetime is absent. Wall lifetime is not assessed; this viewer does not issue a CLEAR verdict.")}`);
 }
 
 function ceramicSection(terminal) {
   const melt = terminal.final_state?.["process.cleaned_melt"] || {};
   const total = sumObject(melt);
-  const rows = Object.entries(melt).sort((a, b) => (n(b[1]) ?? -Infinity) - (n(a[1]) ?? -Infinity)).map(([species, value]) => `<tr><td class="mono">${esc(species)}</td><td class="num">${exactMol(value)}</td><td class="num">${hasNumber(value) && hasNumber(total) && total !== 0 ? `${(Number(value) / total * 100).toFixed(4)}%` : "not emitted"}</td></tr>`).join("");
+  const rows = Object.entries(melt).sort((a, b) => (n(b[1]) ?? -Infinity) - (n(a[1]) ?? -Infinity)).map(([species, value]) => `<tr><td>${speciesSpan(species)}</td><td class="num">${exactMol(value)}</td><td class="num">${exactValue(hasNumber(value) && hasNumber(total) && total !== 0 ? Number(value) / total * 100 : null, "%")}</td></tr>`).join("");
   return section(7, "Terminal ceramic — cleaned melt", "Composition binds directly to process.cleaned_melt; taxonomy is a separate backend-owned result.", `<div class="table-wrap"><table><thead><tr><th>Oxide / species</th><th class="num">Amount · mol</th><th class="num">mol%</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">mol-native ledger; kg conversion is a backend (W-A0) step.</div>${terminal.terminal_product_taxonomy ? "" : pending("W-D7", "terminal.terminal_product_taxonomy is absent. No density, value-grade, use-class, or product label is fabricated.")}`);
 }
 
@@ -337,17 +402,17 @@ function costSection(artifact, energy) {
     ? `<div class="note"><b>Cost provenance:</b> ${esc(prices.provenance.trim())}</div>`
     : "";
   const pumpingRows = energy.canonicalCostTotals
-    ? `<div class="kv"><span>Process electrical</span><b>${hasNumber(energy.processElectrical) ? `${energy.processElectrical.toFixed(6)} kWh · ${money(energy.processElectricalCost)}` : "not emitted"}</b></div><div class="kv"><span>Pumping</span><b>${hasNumber(energy.pumpingElectrical) ? `${energy.pumpingElectrical.toFixed(6)} kWh · ${money(energy.pumpingElectricalCost)}` : "excluded / not emitted"}</b></div>`
+    ? `<div class="kv"><span>Process electrical</span><b>${hasNumber(energy.processElectrical) ? `${exactValue(energy.processElectrical, "kWh")} · ${money(energy.processElectricalCost)}` : "not emitted"}</b></div><div class="kv"><span>Pumping</span><b>${hasNumber(energy.pumpingElectrical) ? `${exactValue(energy.pumpingElectrical, "kWh")} · ${money(energy.pumpingElectricalCost)}` : "excluded / not emitted"}</b></div>`
     : "";
   const basisNote = typeof energy.basisNote === "string" && energy.basisNote.trim()
     ? `<div class="note"><b>Cost basis:</b> ${esc(energy.basisNote.trim())}</div>`
     : "";
   const totalFormula = energy.canonicalCostTotals
-    ? `<div class="note"><b>Total ${money(energy.totalCost)}</b> binds terminal.cost_totals: ${hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : "not emitted"} kWh total electrical plus ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`
-    : `<div class="note"><b>Total ${money(energy.totalCost)}</b> = ${hasNumber(energy.electrical) ? energy.electrical.toFixed(6) : "not emitted"} kWh × ${money(prices.electrical_cost_per_kWh)} + ${hasNumber(energy.thermal) ? energy.thermal.toFixed(6) : "not emitted"} kWh evaporation thermal × ${money(prices.solar_heat_cost_per_kWh)}. Latent (${hasNumber(energy.latent) ? energy.latent.toFixed(6) : "not emitted"} kWh) and dissociation (${hasNumber(energy.dissociation) ? energy.dissociation.toFixed(6) : "not emitted"} kWh) are the breakdown of evaporation thermal, not additional energy.</div>`;
+    ? `<div class="note"><b>Total ${money(energy.totalCost)}</b> binds terminal.cost_totals: ${exactValue(energy.electrical, "kWh")} total electrical plus ${exactValue(energy.thermal, "kWh")} evaporation thermal. Latent (${exactValue(energy.latent, "kWh")}) and dissociation (${exactValue(energy.dissociation, "kWh")}) are the breakdown of evaporation thermal, not additional energy.</div>`
+    : `<div class="note"><b>Total ${money(energy.totalCost)}</b> = ${exactValue(energy.electrical, "kWh")} × ${money(prices.electrical_cost_per_kWh)} + ${exactValue(energy.thermal, "kWh")} evaporation thermal × ${money(prices.solar_heat_cost_per_kWh)}. Latent (${exactValue(energy.latent, "kWh")}) and dissociation (${exactValue(energy.dissociation, "kWh")}) are the breakdown of evaporation thermal, not additional energy.</div>`;
   return section(8, "Energy & two-price cost", "Canonical prices come only from header.cost_block.",
-    provenance + basisNote + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${hasNumber(energy.electrical) ? `${energy.electrical.toFixed(6)} <small>kWh</small>` : "not emitted"}</div>${pumpingRows}<div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.electricalCost)}</b></div></div>` +
-    `<div class="card"><div class="ct">Solar heat · evaporation thermal total</div><div class="cbig">${hasNumber(energy.thermal) ? `${energy.thermal.toFixed(6)} <small>kWh</small>` : "not emitted"}</div><div class="kv"><span>Latent breakdown</span><b>${hasNumber(energy.latent) ? `${energy.latent.toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Dissociation breakdown</span><b>${hasNumber(energy.dissociation) ? `${energy.dissociation.toFixed(6)} kWh` : "not emitted"}</b></div><div class="kv"><span>Price</span><b>${money(prices.solar_heat_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.thermalCost)}</b></div></div></div>` +
+    provenance + basisNote + `<div class="cards"><div class="card"><div class="ct">Electrical</div><div class="cbig">${exactValue(energy.electrical, "kWh")}</div>${pumpingRows}<div class="kv"><span>Price</span><b>${money(prices.electrical_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.electricalCost)}</b></div></div>` +
+    `<div class="card"><div class="ct">Solar heat · evaporation thermal total</div><div class="cbig">${exactValue(energy.thermal, "kWh")}</div><div class="kv"><span>Latent breakdown</span><b>${exactValue(energy.latent, "kWh")}</b></div><div class="kv"><span>Dissociation breakdown</span><b>${exactValue(energy.dissociation, "kWh")}</b></div><div class="kv"><span>Price</span><b>${money(prices.solar_heat_cost_per_kWh)} / kWh</b></div><div class="kv"><span>Subtotal</span><b>${money(energy.thermalCost)}</b></div></div></div>` +
     `${hasCostShare ? `<div class="cost-stack" aria-label="Cost share"><span style="width:${electricalShare}%"></span><span style="width:${100 - electricalShare}%"></span></div><div class="legend"><span><i class="swatch" style="background:var(--blue)"></i>electrical cost</span><span><i class="swatch" style="background:var(--green)"></i>solar-heat cost</span></div>` : pending("energy values", "Cost share is unavailable because one or more energy or price values were not emitted.")}` +
     totalFormula);
 }
@@ -374,11 +439,13 @@ function provenanceSection(artifact) {
     ["Artifact schema", artifact.artifact_schema_version], ["Runner schema", meta.schema_version],
     ["Backend evidence", meta.evidence_class], ["Backend authoritative", meta.backend_authoritative],
     ["Certification allowed", meta.certification_allowed], ["Hours requested / completed", `${hoursRequested} / ${hoursCompleted}`],
-    ["Mass-balance residual", `${sci(closure.residual_pct ?? closure.residual)} % · ${closure.basis || "basis not emitted"}`],
-    ["Kernel commit", artifact.header.engine_identity?.kernel_commit_sha ?? "not emitted"],
-    ["Engine cache version", artifact.header.engine_identity?.cache_version ?? "not emitted"]
+    ["Mass-balance residual", `${fmtNum(closure.residual_pct ?? closure.residual, "%")} · ${closure.basis || "basis not emitted"}`]
   ];
-  return section(9, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
+  const identityFacts = [
+    ["Kernel commit", artifact.header.engine_identity?.kernel_commit_sha],
+    ["Engine cache version", artifact.header.engine_identity?.cache_version]
+  ];
+  return section(9, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}${identityFacts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${value == null ? "not emitted" : runIdSpan(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
 }
 
 function renderCurrent(artifact, index) {
@@ -388,10 +455,10 @@ function renderCurrent(artifact, index) {
   $("#step-output").textContent = `Hour ${hour} · ${row.campaign ?? "campaign not emitted"}`;
   $(".status-pill").textContent = `${index + 1} / ${artifact.timesteps.length}`;
   $("#current-grid").innerHTML = [
-    ["Temperature", hasNumber(row.T_C) ? `${Number(row.T_C).toLocaleString()} °C` : "not emitted"], ["Total pressure", hasNumber(row.P_total_bar) ? `${Number(row.P_total_bar).toExponential(3)} bar` : "not emitted"],
-    ["pO₂", hasNumber(row.pO2_bar) ? `${Number(row.pO2_bar).toExponential(3)} bar` : "not emitted"], ["Carrier pressure", hasNumber(row.p_carrier_bar) ? `${Number(row.p_carrier_bar).toExponential(3)} bar` : "not emitted"],
-    ["Carrier identity", typeof row.carrier_identity === "string" && row.carrier_identity.trim() ? row.carrier_identity.trim() : "not emitted"], ["Electrical", hasNumber(row.energy_electrical_kWh) ? `${Number(row.energy_electrical_kWh).toFixed(4)} kWh` : "not emitted"],
-    ["Evaporation thermal", hasNumber(row.energy_evaporation_thermal_kWh) ? `${Number(row.energy_evaporation_thermal_kWh).toFixed(4)} kWh` : "not emitted"], [row.O2_metric_label || "O₂ metric label not emitted", kg(row.O2_source_side_potential_kg_cumulative, 4)],
+    ["Temperature", fmtNum(row.T_C, "°C")], ["Total pressure", fmtNum(row.P_total_bar, "bar")],
+    ["pO₂", fmtNum(row.pO2_bar, "bar")], ["Carrier pressure", fmtNum(row.p_carrier_bar, "bar")],
+    ["Carrier identity", typeof row.carrier_identity === "string" && row.carrier_identity.trim() ? row.carrier_identity.trim() : "not emitted"], ["Electrical", fmtNum(row.energy_electrical_kWh, "kWh")],
+    ["Evaporation thermal", fmtNum(row.energy_evaporation_thermal_kWh, "kWh")], [row.O2_metric_label || "O₂ metric label not emitted", kg(row.O2_source_side_potential_kg_cumulative)],
     ["Regime", row.regime], ["Kn", row.Kn == null ? "not emitted" : row.Kn && typeof row.Kn === "object" ? sci(row.Kn.knudsen_number) : sci(row.Kn)]
   ].map(([key, value]) => `<div class="current"><div class="k">${esc(key)}</div><div class="v">${esc(value)}</div></div>`).join("");
   $("#timestep-ledger").innerHTML = renderTimestepLedger(timestep);
@@ -440,10 +507,11 @@ function render(artifact) {
     ? yieldsSection(rows, artifact.terminal) + processSection(artifact, rows, spans) + campaignSection(artifact, spans)
     : section(1, "Per-hour telemetry", "No timestep rows were emitted for this run.", `<div class="pending"><strong>Not emitted</strong><p>This execution has zero timesteps; header, failure, and terminal data remain available below.</p></div>`);
   $("#report").innerHTML = makeHeader(artifact, rows, energy) + timestepSections +
+    accountDispositionSection(artifact.terminal.final_state) +
     ledgerSection(artifact.terminal.final_state) +
     tapsAndPuritySection(artifact.terminal) + wallAndOxygenSection(artifact, rows) + ceramicSection(artifact.terminal) +
     costSection(artifact, energy) + provenanceSection(artifact) +
-    `<footer class="footer"><span>Frozen flatfile report · engine-free · artifact-only rendering</span><a href="./settings.html${RUN_QUERY}">Captured settings</a><span class="mono">${esc(artifact.header.run_id)}</span></footer>`;
+    `<footer class="footer"><span>Frozen flatfile report · engine-free · artifact-only rendering</span><a href="./settings.html${RUN_QUERY}">Captured settings</a><span class="mono">${runIdSpan(artifact.header.run_id)}</span></footer>`;
   if (rows.length) {
     const stepper = $("#stepper");
     stepper.addEventListener("input", () => renderCurrent(artifact, Number(stepper.value)));
