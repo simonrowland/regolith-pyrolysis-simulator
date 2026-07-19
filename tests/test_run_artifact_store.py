@@ -68,6 +68,16 @@ def _runner_payload(status: str = "partial") -> dict:
             "vapor_pressure_backend_status": "ok",
             "authoritative_for_requested_vapor_pressure": True,
         },
+        "yield_disposition": {
+            "basis": "target_atom_equivalent",
+            "targets": {
+                "Fe": {
+                    "denominator_target_equiv_mol": 2.0,
+                    "yield_fraction": 0.5,
+                    "unextracted_fraction": 0.5,
+                }
+            },
+        },
     }
 
 
@@ -177,8 +187,19 @@ def test_build_run_artifact_repackages_runner_payload(monkeypatch) -> None:
         "residual_pct": 1e-13,
         "basis": "final-hour percent",
     }
-    assert "yield_disposition" not in artifact["terminal"]
+    assert artifact["terminal"]["yield_disposition"] is payload[
+        "yield_disposition"
+    ]
     assert "wall_lifetime" not in artifact["terminal"]
+
+
+def test_build_run_artifact_omits_yield_disposition_when_runner_omits_it() -> None:
+    payload = _runner_payload()
+    payload.pop("yield_disposition")
+
+    artifact = build_run_artifact(payload, run_id="run-without-yield")
+
+    assert "yield_disposition" not in artifact["terminal"]
 
 
 @pytest.mark.parametrize(
@@ -802,6 +823,44 @@ def test_store_corrupt_load_is_typed_and_list_quarantines(tmp_path) -> None:
     assert store.list_runs() == []
     assert not corrupt_path.exists()
     assert (store.runs_dir / "broken.json.corrupt").exists()
+
+
+@pytest.mark.parametrize(
+    ("schema_version", "omit_version"),
+    [
+        pytest.param(None, True, id="missing"),
+        pytest.param("99.0.0", False, id="unsupported"),
+        pytest.param([], False, id="list"),
+        pytest.param({}, False, id="object"),
+        pytest.param(123, False, id="integer"),
+        pytest.param(None, False, id="null"),
+    ],
+)
+def test_store_rejects_missing_or_unsupported_artifact_schema_version(
+    tmp_path, schema_version, omit_version
+) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="bad-schema")
+    if omit_version:
+        del artifact["artifact_schema_version"]
+    else:
+        artifact["artifact_schema_version"] = schema_version
+    store.runs_dir.mkdir(parents=True)
+    (store.runs_dir / "bad-schema.json").write_text(
+        json.dumps(artifact), encoding="utf-8"
+    )
+
+    with pytest.raises(RunStoreCorruptionError, match="artifact schema version"):
+        store.load("bad-schema")
+
+
+def test_store_loads_supported_artifact_schema_version(tmp_path) -> None:
+    store = RunArtifactStore(tmp_path / "runs")
+    artifact = build_run_artifact(_runner_payload("ok"), run_id="supported-schema")
+    artifact["artifact_schema_version"] = "0.2.0"
+    assert store.save("supported-schema", artifact) is True
+
+    assert store.load("supported-schema") == artifact
 
 
 @pytest.mark.parametrize(

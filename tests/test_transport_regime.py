@@ -282,6 +282,33 @@ def test_mixture_mean_free_path_fixture_m3():
 
 
 @pytest.mark.parametrize(
+    ("species", "sigma_m", "molar_mass"),
+    [
+        ("He", 2.551e-10, 0.004002602),
+        ("N2", 3.798e-10, 0.0280134),
+        ("Ar", 3.542e-10, 0.039948),
+        ("CO2", 3.941e-10, 0.0440095),
+    ],
+)
+def test_cover_gas_property_registry_matches_transport_anchors(
+    species, sigma_m, molar_mass
+):
+    properties = tr.CARRIER_GAS_PROPERTIES[species]
+    assert properties.collision_diameter_m == pytest.approx(sigma_m)
+    assert properties.molar_mass_kg_mol == pytest.approx(molar_mass)
+
+
+def test_helium_carrier_changes_mixture_transport():
+    nitrogen = tr.carrier_mixture_mean_free_path(
+        "N2", {"N2": 1.0}, 1300.0, HOT_TEMPERATURE_K, DIAMETER_M
+    )
+    helium = tr.carrier_mixture_mean_free_path(
+        "N2", {"He": 1.0}, 1300.0, HOT_TEMPERATURE_K, DIAMETER_M
+    )
+    assert helium.lambda_m != pytest.approx(nitrogen.lambda_m)
+
+
+@pytest.mark.parametrize(
     ("knudsen_number", "expected"),
     [
         (0.0, tr.KnudsenRegime.VISCOUS),

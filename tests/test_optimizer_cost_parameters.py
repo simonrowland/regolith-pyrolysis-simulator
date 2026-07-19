@@ -57,7 +57,8 @@ def test_yaml_defaults_load_with_recipe_default_provenance() -> None:
     block = default_cost_parameters_block()
     values = cost_parameter_values(block)["parameters"]
 
-    assert values["electricity_cost_per_kWh"] > 0.0
+    assert values["electricity_cost_per_kWh"] == pytest.approx(10.0)
+    assert values["solar_heat_cost_per_kWh"] == pytest.approx(0.05)
     assert values["furnace_resinter_cost_usd"] > 0.0
     assert values["depreciation_expense_per_run"] > 0.0
     assert set(values["shuttle_reagent_replacement_cost_per_kg"]) == SHUTTLE_REAGENT_SPECIES
@@ -142,6 +143,13 @@ def test_evalspec_hash_tracks_cost_values_but_not_cost_provenance() -> None:
     assert cache_key(_spec(moved)) != cache_key(_spec(base))
     assert cache_key(_spec(provenance_only)) == cache_key(_spec(base))
 
+    solar_moved = _with_value(
+        base,
+        "solar_heat_cost_per_kWh",
+        base["parameters"]["solar_heat_cost_per_kWh"]["value"] + 0.01,
+    )
+    assert cache_key(_spec(solar_moved)) != cache_key(_spec(base))
+
 
 def test_shuttle_static_replacement_exception_is_exact_species_set() -> None:
     params = cost_parameters_from_mapping(default_cost_parameters_block())
@@ -158,9 +166,8 @@ def test_cost_parameter_sources_are_reproducible() -> None:
     parameters = default_cost_parameters_block()["parameters"]
 
     electricity_source = parameters["electricity_cost_per_kWh"]["source_tag"]
-    assert "Table 5.6.A" in electricity_source
-    assert "accessed 2026-07-12" in electricity_source
-    assert "https://www.eia.gov/" in electricity_source
+    assert electricity_source == "owner-t7-two-price-energy-v1"
+    assert parameters["solar_heat_cost_per_kWh"]["source_tag"] == electricity_source
     for name in ("furnace_resinter_cost_usd", "depreciation_expense_per_run"):
         assert "owner ratified 2026-07-12" in parameters[name]["source_tag"]
     assert "owner ratified 2026-07-12" in parameters[

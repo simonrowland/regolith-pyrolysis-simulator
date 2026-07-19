@@ -81,6 +81,7 @@ def normalize_recipe_patch(
     _validate_top_level_keys(recipe_payload, source=source, schema=active_schema)
     try:
         patch = RecipePatch.from_nested(recipe_payload)
+        patch = active_schema.resolve_conditional_patch(patch).patch
         normalized = active_schema.to_setpoints_patch(patch)
     except RecipeValidationError as exc:
         raise RecipeIOError(f"invalid recipe {source}: {exc}") from exc

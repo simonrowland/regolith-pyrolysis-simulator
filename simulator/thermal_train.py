@@ -36,8 +36,8 @@ from simulator.transport_regime import (
 )
 
 
-THERMAL_TRAIN_SCHEMA_VERSION = "thermal-train-v1"
-THERMAL_TRAIN_REPORT_SCHEMA_VERSION = "thermal-train-report-v1"
+THERMAL_TRAIN_SCHEMA_VERSION = "thermal-train-v2"
+THERMAL_TRAIN_REPORT_SCHEMA_VERSION = "thermal-train-report-v2"
 DEFAULT_THERMAL_TRAIN_PARAMETERS_PATH = DEFAULT_DATA_DIR / "thermal_train_params.yaml"
 
 SECONDS_PER_HOUR = 3600.0
@@ -47,6 +47,8 @@ OXYGEN_MOLAR_MASS_KG_PER_MOL = resolve_species_formula("O2").molar_mass_kg_per_m
 # NBSIR 77-859 gaseous O2 property tables near the 150 K compressor inlet;
 # the design holds this first-order constant across the equal-stage ladder.
 OXYGEN_GAMMA = 1.395
+# NBSIR 77-859, gaseous oxygen specific gas constant.
+OXYGEN_SPECIFIC_GAS_CONSTANT_J_PER_KG_K = 259.8
 
 # NIST Chemistry WebBook SRD 69, oxygen phase-change data.
 OXYGEN_TRIPLE_POINT_K = 54.361
@@ -77,6 +79,8 @@ _SHOMATE_O2 = (
     (100.0, 700.0, (31.32234, -20.23531, 57.86644, -36.50624, -0.007374)),
     # NIST WebBook SRD 69 Shomate coefficients, 700-2000 K.
     (700.0, 2000.0, (30.03235, 8.772972, -3.988133, 0.788313, -0.741599)),
+    # NIST WebBook SRD 69 Shomate coefficients, 2000-6000 K.
+    (2000.0, 6000.0, (20.91111, 10.72071, -2.020498, 0.146449, 9.245722)),
 )
 _MONATOMIC_SPECIES = frozenset({"Na", "K", "Mg", "Fe", "Ca", "Al", "Cr", "Mn", "Ti"})
 _PARAMETER_NAMES = frozenset({
@@ -86,6 +90,21 @@ _PARAMETER_NAMES = frozenset({
     "frost_sticking_fraction", "cavern_capacity_kg",
     "cavern_thermal_mass_J_per_K", "dT_segment_K", "knudsen_locations",
 })
+_COLD_TRAIN_NAMES = frozenset({
+    "runtime_enforcement", "accumulator_enabled", "rating", "orifice", "relief",
+    "cycle", "endpoint",
+})
+_COLD_TRAIN_LIMIT_NAMES = frozenset({
+    "compressor_mass_flow_limit_kg_hr", "refrigeration_freeze_rate_kg_hr",
+})
+_COLD_TRAIN_RATING_REFERENCE_NAMES = frozenset({"p_ref_Pa", "T_ref_K"})
+_COLD_TRAIN_RATING_NAMES = _COLD_TRAIN_LIMIT_NAMES | _COLD_TRAIN_RATING_REFERENCE_NAMES
+_COLD_TRAIN_ORIFICE_NAMES = frozenset({
+    "discharge_coefficient", "upstream_pressure_Pa", "upstream_temperature_K",
+    "back_pressure_Pa",
+})
+_COLD_TRAIN_RELIEF_NAMES = frozenset({"k_relief_kg_hr_Pa", "p_open_Pa", "vessel_rating_Pa"})
+_COLD_TRAIN_CYCLE_NAMES = frozenset({"liquid_yield", "expander_bypass_fraction"})
 _DISPLAY_PRICE_NAMES = frozenset({
     "radiator_cost_per_m2", "compressor_cost_per_kW", "cryo_cost_per_W",
     "o2_value_per_kg", "fixed_cost_per_hour",
@@ -122,6 +141,68 @@ class DisplayPrices:
 
 
 @dataclass(frozen=True)
+class NoColdTrain:
+    reason: str = "not_configured"
+
+
+@dataclass(frozen=True)
+class FiniteCapacity:
+    value_kg_hr: float
+    p_ref_Pa: float | None = None
+    T_ref_K: float | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "value_kg_hr", _finite_positive(self.value_kg_hr, "value_kg_hr")
+        )
+        for name in _COLD_TRAIN_RATING_REFERENCE_NAMES:
+            value = getattr(self, name)
+            if value is not None:
+                object.__setattr__(self, name, _finite_positive(value, name))
+
+
+@dataclass(frozen=True)
+class ColdTrainParameters:
+    runtime_enforcement: bool
+    accumulator_enabled: bool
+    rating: Mapping[str, float | None]
+    orifice: Mapping[str, float]
+    relief: Mapping[str, float]
+    liquid_yield: float
+    expander_bypass_fraction: float
+    endpoint: str
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.runtime_enforcement, bool):
+            raise TypeError("runtime_enforcement must be a boolean")
+        if not isinstance(self.accumulator_enabled, bool):
+            raise TypeError("accumulator_enabled must be a boolean")
+        if self.accumulator_enabled and not self.runtime_enforcement:
+            raise ValueError(
+                "accumulator_enabled requires runtime_enforcement=true"
+            )
+        rating = {
+            name: None if self.rating.get(name) is None else _finite_positive(self.rating[name], name)
+            for name in _COLD_TRAIN_RATING_NAMES
+        }
+        orifice = {name: _finite_positive(self.orifice[name], name) for name in _COLD_TRAIN_ORIFICE_NAMES}
+        relief = {name: _finite_positive(self.relief[name], name) for name in _COLD_TRAIN_RELIEF_NAMES}
+        y = _fraction(self.liquid_yield, "liquid_yield")
+        x = _unit_interval(self.expander_bypass_fraction, "expander_bypass_fraction")
+        if x + y > 1.0:
+            raise ValueError("expander_bypass_fraction + liquid_yield must be <= 1")
+        if self.endpoint != "liquefier_77K":
+            raise ValueError("cold-train endpoint must be 'liquefier_77K'")
+        if relief["p_open_Pa"] >= relief["vessel_rating_Pa"]:
+            raise ValueError("relief p_open_Pa must be below vessel_rating_Pa")
+        object.__setattr__(self, "rating", MappingProxyType(rating))
+        object.__setattr__(self, "orifice", MappingProxyType(orifice))
+        object.__setattr__(self, "relief", MappingProxyType(relief))
+        object.__setattr__(self, "liquid_yield", y)
+        object.__setattr__(self, "expander_bypass_fraction", x)
+
+
+@dataclass(frozen=True)
 class ThermalTrainParameters:
     eta_2ndlaw: float
     eta_isen: float
@@ -140,6 +221,7 @@ class ThermalTrainParameters:
     cavern_thermal_mass_J_per_K: float
     dT_segment_K: float
     knudsen_locations: Mapping[str, Mapping[str, float]] = field(default_factory=dict)
+    cold_train: ColdTrainParameters | None = None
     display_prices: DisplayPrices | None = None
 
     def __post_init__(self) -> None:
@@ -197,11 +279,15 @@ def load_thermal_train_parameters(path: str | Path | None = None) -> dict[str, A
 
 
 def normalize_thermal_train_parameters(payload: Mapping[str, Any], *, source: str) -> dict[str, Any]:
-    _require_exact_keys(payload, {"schema_version", "parameters", "display_prices"}, "thermal-train root")
+    _require_exact_keys(
+        payload, {"schema_version", "parameters", "cold_train", "display_prices"},
+        "thermal-train root",
+    )
     if payload.get("schema_version") != THERMAL_TRAIN_SCHEMA_VERSION:
         raise ValueError(f"thermal-train schema_version must be {THERMAL_TRAIN_SCHEMA_VERSION!r}")
     raw_parameters = _required_mapping(payload, "parameters")
     raw_prices = _required_mapping(payload, "display_prices")
+    raw_cold_train = _required_mapping(payload, "cold_train")
     _require_exact_keys(raw_parameters, _PARAMETER_NAMES, "thermal-train parameters")
     _require_exact_keys(raw_prices, _DISPLAY_PRICE_NAMES, "thermal-train display_prices")
 
@@ -227,6 +313,7 @@ def normalize_thermal_train_parameters(payload: Mapping[str, Any], *, source: st
         "source_tag": "assumption",
         "values": normalized_locations,
     }
+    cold_train = _normalize_cold_train(raw_cold_train)
 
     prices: dict[str, Any] = {}
     for name in sorted(_DISPLAY_PRICE_NAMES - {"o2_storage_keeping_cost_per_kg"}):
@@ -250,6 +337,7 @@ def normalize_thermal_train_parameters(payload: Mapping[str, Any], *, source: st
     return {
         "schema_version": THERMAL_TRAIN_SCHEMA_VERSION,
         "parameters": parameters,
+        "cold_train": cold_train,
         "display_prices": prices,
         "provenance": {"source": source},
     }
@@ -258,11 +346,19 @@ def normalize_thermal_train_parameters(payload: Mapping[str, Any], *, source: st
 def thermal_train_parameters_from_mapping(
     payload: Mapping[str, Any] | None = None,
 ) -> ThermalTrainParameters:
-    clean_payload = (
-        {key: payload[key] for key in ("schema_version", "parameters", "display_prices")}
-        if payload is not None and "provenance" in payload
-        else payload
-    )
+    clean_payload = payload
+    if payload is not None and "provenance" in payload:
+        _require_exact_keys(
+            payload,
+            {"schema_version", "parameters", "cold_train", "display_prices", "provenance"},
+            "normalized thermal-train root",
+        )
+        provenance = _required_mapping(payload, "provenance")
+        _require_exact_keys(provenance, {"source"}, "thermal-train provenance")
+        clean_payload = {
+            key: payload[key]
+            for key in ("schema_version", "parameters", "cold_train", "display_prices")
+        }
     normalized = load_thermal_train_parameters() if clean_payload is None else normalize_thermal_train_parameters(
         clean_payload,
         source=str(payload.get("provenance", {}).get("source", "thermal-train payload"))
@@ -282,8 +378,380 @@ def thermal_train_parameters_from_mapping(
     return ThermalTrainParameters(
         **values,
         knudsen_locations=raw["knudsen_locations"]["values"],
+        cold_train=_cold_train_parameters(normalized["cold_train"]),
         display_prices=prices,
     )
+
+
+def _normalize_cold_train(payload: Mapping[str, Any]) -> dict[str, Any]:
+    _require_exact_keys(payload, _COLD_TRAIN_NAMES, "cold_train")
+    rating = _required_mapping(payload, "rating")
+    orifice = _required_mapping(payload, "orifice")
+    relief = _required_mapping(payload, "relief")
+    cycle = _required_mapping(payload, "cycle")
+    _require_exact_keys(rating, _COLD_TRAIN_RATING_NAMES, "cold_train.rating")
+    _require_exact_keys(orifice, _COLD_TRAIN_ORIFICE_NAMES, "cold_train.orifice")
+    _require_exact_keys(relief, _COLD_TRAIN_RELIEF_NAMES, "cold_train.relief")
+    _require_exact_keys(cycle, _COLD_TRAIN_CYCLE_NAMES, "cold_train.cycle")
+    runtime_enforcement = _validated_assumption_entry(
+        payload["runtime_enforcement"],
+        "runtime_enforcement",
+        boolean=True,
+    )
+    accumulator_enabled = _validated_assumption_entry(
+        payload["accumulator_enabled"],
+        "accumulator_enabled",
+        boolean=True,
+    )
+    if accumulator_enabled["value"] and not runtime_enforcement["value"]:
+        raise ValueError(
+            "accumulator_enabled requires runtime_enforcement=true"
+        )
+
+    normalized_rating = {
+        name: _validated_assumption_entry(rating[name], name, allow_none=True)
+        for name in sorted(_COLD_TRAIN_RATING_NAMES)
+    }
+    normalized_orifice = {
+        name: _validated_assumption_entry(orifice[name], name)
+        for name in sorted(_COLD_TRAIN_ORIFICE_NAMES)
+    }
+    normalized_relief = {
+        name: _validated_assumption_entry(relief[name], name)
+        for name in sorted(_COLD_TRAIN_RELIEF_NAMES)
+    }
+    normalized_cycle = {
+        name: _validated_assumption_entry(cycle[name], name)
+        for name in sorted(_COLD_TRAIN_CYCLE_NAMES)
+    }
+    endpoint = _validated_assumption_entry(payload["endpoint"], "endpoint", enum=True)
+    if endpoint["value"] != "liquefier_77K":
+        raise ValueError("cold_train.endpoint supports only 'liquefier_77K'")
+    x = float(normalized_cycle["expander_bypass_fraction"]["value"])
+    y = float(normalized_cycle["liquid_yield"]["value"])
+    if not 0.0 <= x <= 1.0 or not 0.0 < y <= 1.0 or x + y > 1.0:
+        raise ValueError("cold_train cycle requires 0<=x<=1, 0<y<=1, and x+y<=1")
+    if float(normalized_relief["p_open_Pa"]["value"]) >= float(
+        normalized_relief["vessel_rating_Pa"]["value"]
+    ):
+        raise ValueError("relief p_open_Pa must be below vessel_rating_Pa")
+    return {
+        "runtime_enforcement": runtime_enforcement,
+        "accumulator_enabled": accumulator_enabled,
+        "rating": normalized_rating,
+        "orifice": normalized_orifice,
+        "relief": normalized_relief,
+        "cycle": normalized_cycle,
+        "endpoint": endpoint,
+    }
+
+
+def _cold_train_parameters(payload: Mapping[str, Any]) -> ColdTrainParameters:
+    return ColdTrainParameters(
+        runtime_enforcement=payload["runtime_enforcement"]["value"],
+        accumulator_enabled=payload["accumulator_enabled"]["value"],
+        rating={name: payload["rating"][name]["value"] for name in _COLD_TRAIN_RATING_NAMES},
+        orifice={name: payload["orifice"][name]["value"] for name in _COLD_TRAIN_ORIFICE_NAMES},
+        relief={name: payload["relief"][name]["value"] for name in _COLD_TRAIN_RELIEF_NAMES},
+        liquid_yield=payload["cycle"]["liquid_yield"]["value"],
+        expander_bypass_fraction=payload["cycle"]["expander_bypass_fraction"]["value"],
+        endpoint=str(payload["endpoint"]["value"]),
+    )
+
+
+def capacity_from_hardware(
+    rating_params: Mapping[str, Any] | ColdTrainParameters | None,
+) -> NoColdTrain | FiniteCapacity:
+    """Reduce cold-end rating limits to the sole authoritative capacity C."""
+
+    if rating_params is None:
+        return NoColdTrain()
+    rating = rating_params.rating if isinstance(rating_params, ColdTrainParameters) else rating_params
+    limits: list[float] = []
+    for name in _COLD_TRAIN_LIMIT_NAMES:
+        raw = rating.get(name)
+        if isinstance(raw, Mapping) and "value" in raw:
+            raw = raw["value"]
+        if raw is not None:
+            limits.append(_finite_positive(raw, name))
+    if not limits:
+        return NoColdTrain("rating_limits_unset")
+    references: dict[str, float | None] = {}
+    for name in _COLD_TRAIN_RATING_REFERENCE_NAMES:
+        raw = rating.get(name)
+        if isinstance(raw, Mapping) and "value" in raw:
+            raw = raw["value"]
+        references[name] = None if raw is None else _finite_positive(raw, name)
+    return FiniteCapacity(min(limits), **references)
+
+
+def orifice_diameter_for_C(
+    capacity_kg_hr: float,
+    discharge_coefficient: float,
+    upstream_pressure_Pa: float,
+    upstream_temperature_K: float,
+    *,
+    back_pressure_Pa: float = 0.0,
+) -> float:
+    """Return choked metering-orifice diameter derived from authoritative C."""
+
+    capacity = _finite_positive(capacity_kg_hr, "capacity_kg_hr") / SECONDS_PER_HOUR
+    coefficient = _fraction(discharge_coefficient, "discharge_coefficient")
+    pressure = _finite_positive(upstream_pressure_Pa, "upstream_pressure_Pa")
+    temperature = _finite_positive(upstream_temperature_K, "upstream_temperature_K")
+    back_pressure = _finite_nonnegative(back_pressure_Pa, "back_pressure_Pa")
+    saturation_pressure = oxygen_saturation_pressure_pa(temperature)
+    critical_ratio = (2.0 / (OXYGEN_GAMMA + 1.0)) ** (
+        OXYGEN_GAMMA / (OXYGEN_GAMMA - 1.0)
+    )
+    if pressure >= 0.95 * saturation_pressure:
+        raise ValueError("orifice inlet fails vapor gate: P0 must be < 0.95*P_sat(T0)")
+    if back_pressure / pressure > critical_ratio:
+        raise ValueError("orifice fails choked gate: P_back/P0 exceeds critical ratio")
+    # Premise: m_dot=Cd*A*P0*sqrt(gamma/(Rs*T0))*phi.  Algebra gives
+    # A=m_dot/(Cd*P0*sqrt(...)*phi), d=sqrt(4A/pi).  Units reduce to m2
+    # then m.  Sanity anchor: Cd=.80, P0=45 kPa, T0=120 K and d=5 mm
+    # carries 9.856 kg/hr O2 when P_back=21 kPa.
+    phi = (2.0 / (OXYGEN_GAMMA + 1.0)) ** (
+        (OXYGEN_GAMMA + 1.0) / (2.0 * (OXYGEN_GAMMA - 1.0))
+    )
+    mass_flux_factor = pressure * math.sqrt(
+        OXYGEN_GAMMA / (OXYGEN_SPECIFIC_GAS_CONSTANT_J_PER_KG_K * temperature)
+    ) * phi
+    area_m2 = capacity / (coefficient * mass_flux_factor)
+    return math.sqrt(4.0 * area_m2 / math.pi)
+
+
+def claude_cycle_cold_end(
+    capacity_kg_hr: float,
+    *,
+    liquid_yield: float,
+    expander_bypass_fraction: float,
+    pressure_low_Pa: float,
+    pressure_high_Pa: float,
+    inlet_temperature_K: float,
+    reject_temperature_K: float,
+    eta_isen: float,
+    makeup_pressure_Pa: float | None = None,
+) -> dict[str, Any]:
+    """Seven-node first-order Claude-cycle state, mass, and energy ledger."""
+
+    product_kg_hr = _finite_positive(capacity_kg_hr, "capacity_kg_hr")
+    y = _fraction(liquid_yield, "liquid_yield")
+    x = _unit_interval(expander_bypass_fraction, "expander_bypass_fraction")
+    if x + y > 1.0:
+        raise ValueError("expander_bypass_fraction + liquid_yield must be <= 1")
+    if x == 0.0:
+        raise ValueError("Claude-cycle liquefaction requires positive dry-expander flow")
+    p_low = _finite_positive(pressure_low_Pa, "pressure_low_Pa")
+    p_high = _finite_positive(pressure_high_Pa, "pressure_high_Pa")
+    p_makeup = p_low if makeup_pressure_Pa is None else _finite_positive(
+        makeup_pressure_Pa, "makeup_pressure_Pa"
+    )
+    if p_high <= p_low:
+        raise ValueError("pressure_high_Pa must exceed pressure_low_Pa")
+    t_in = _finite_positive(inlet_temperature_K, "inlet_temperature_K")
+    t_reject = _finite_positive(reject_temperature_K, "reject_temperature_K")
+    efficiency = _fraction(eta_isen, "eta_isen")
+    circulation_kg_hr = product_kg_hr / y
+    return_kg_hr = (1.0 - y) * circulation_kg_hr
+    bypass_kg_hr = x * circulation_kg_hr
+    separator_inlet_kg_hr = (1.0 - x) * circulation_kg_hr
+    separator_vapor_kg_hr = (1.0 - x - y) * circulation_kg_hr
+    cp_mass = oxygen_cp_shomate_j_per_mol_k(max(t_in, 100.0)) / OXYGEN_MOLAR_MASS_KG_PER_MOL
+    sensible_J_mol = integrate_molar_sensible_enthalpy_j_per_mol(
+        "O2", OXYGEN_NORMAL_BOILING_POINT_K, t_in,
+        segment_K=10.0, allow_low_temperature_o2=True,
+    ) if t_in > OXYGEN_NORMAL_BOILING_POINT_K else 0.0
+    h1 = (sensible_J_mol + OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL) / OXYGEN_MOLAR_MASS_KG_PER_MOL
+    h_vapor_nbp = OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL / OXYGEN_MOLAR_MASS_KG_PER_MOL
+    h_liquid_77 = 0.0
+    exponent = (OXYGEN_GAMMA - 1.0) / OXYGEN_GAMMA
+    pressure_ratio = p_high / p_low
+    h_radiator_out = h_vapor_nbp + cp_mass * (t_reject - OXYGEN_NORMAL_BOILING_POINT_K)
+    separator_bath_temperature_K = 77.0
+    h_separator_vapor = h_vapor_nbp + cp_mass * (
+        separator_bath_temperature_K - OXYGEN_NORMAL_BOILING_POINT_K
+    )
+    cold_load_W = product_kg_hr / SECONDS_PER_HOUR * (h1 - h_liquid_77)
+
+    # Separator premise: the declared 77 K product load Q_c removes the feed-to-liquid
+    # enthalpy, while the vapor leaves on the same linear-cp datum. Solving
+    # m_main*h5 = m_product*h_liquid + m_vapor*h_vapor + Q_c gives h5 [J/kg].
+    h5 = (
+        product_kg_hr * h_liquid_77
+        + separator_vapor_kg_hr * h_separator_vapor
+        + cold_load_W * SECONDS_PER_HOUR
+    ) / separator_inlet_kg_hr
+    t5 = OXYGEN_NORMAL_BOILING_POINT_K + (h5 - h_vapor_nbp) / cp_mass
+    if t5 <= 0.0:
+        raise ValueError("Claude-cycle high-pressure expander inlet temperature must be positive")
+    turbine_specific_J_kg = (
+        efficiency * cp_mass * t5 * (1.0 - pressure_ratio ** -exponent)
+    )
+    h6 = h5 - turbine_specific_J_kg
+    if return_kg_hr > 0.0:
+        h_return_in = (
+            bypass_kg_hr * h6 + separator_vapor_kg_hr * h_separator_vapor
+        ) / return_kg_hr
+        # Recuperator premise: no wall heat or shaft work. Therefore
+        # m_circ*(h_rad-h5) = m_return*(h_return_out-h_return_in), in watts
+        # after either side is divided by 3600 s/hr.
+        h_return_out = h_return_in + circulation_kg_hr / return_kg_hr * (
+            h_radiator_out - h5
+        )
+    else:
+        h_return_out = 0.0
+        h_return_in = 0.0
+    h3 = (
+        product_kg_hr * h1 + return_kg_hr * h_return_out
+    ) / circulation_kg_hr
+    t3 = OXYGEN_NORMAL_BOILING_POINT_K + (h3 - h_vapor_nbp) / cp_mass
+    if t3 <= 0.0:
+        raise ValueError("Claude-cycle compressor suction temperature must be positive")
+    compressor_specific_J_kg = (
+        cp_mass * t3 * (pressure_ratio ** exponent - 1.0) / efficiency
+    )
+    h4 = h3 + compressor_specific_J_kg
+    if min(h5, h6, h_return_in, h_return_out) < 0.0:
+        raise ValueError("Claude-cycle state solution produced negative specific enthalpy")
+    circulation_kg_s = circulation_kg_hr / SECONDS_PER_HOUR
+    compressor_W = circulation_kg_s * compressor_specific_J_kg
+    turbine_W = bypass_kg_hr / SECONDS_PER_HOUR * turbine_specific_J_kg
+    net_work_W = compressor_W - turbine_W
+    if net_work_W < 0.0:
+        raise ValueError("Claude-cycle net shaft work must be non-negative")
+    radiator_reject_W = circulation_kg_s * (h4 - h_radiator_out)
+    separator_cooling_W = cold_load_W
+    reject_load_W = radiator_reject_W + separator_cooling_W
+    if min(radiator_reject_W, separator_cooling_W, reject_load_W) < 0.0:
+        raise ValueError("Claude-cycle wall heat must be non-negative")
+    mass_residuals = {
+        "mixer_kg_hr": product_kg_hr + return_kg_hr - circulation_kg_hr,
+        "separator_kg_hr": separator_inlet_kg_hr - product_kg_hr - separator_vapor_kg_hr,
+        "return_kg_hr": separator_vapor_kg_hr + bypass_kg_hr - return_kg_hr,
+    }
+    device_residuals = {
+        "mixer_W": (
+            product_kg_hr * h1 + return_kg_hr * h_return_out
+            - circulation_kg_hr * h3
+        ) / SECONDS_PER_HOUR,
+        "compressor_W": compressor_W - circulation_kg_s * (h4 - h3),
+        "turbine_W": bypass_kg_hr / SECONDS_PER_HOUR * (h5 - h6) - turbine_W,
+        "reject_radiator_W": circulation_kg_s * (h4 - h_radiator_out) - radiator_reject_W,
+        "recuperator_W": (
+            circulation_kg_hr * (h_radiator_out - h5)
+            - return_kg_hr * (h_return_out - h_return_in)
+        ) / SECONDS_PER_HOUR,
+        "separator_W": (
+            separator_inlet_kg_hr * h5
+            - product_kg_hr * h_liquid_77
+            - separator_vapor_kg_hr * h_separator_vapor
+        ) / SECONDS_PER_HOUR - separator_cooling_W,
+        "cold_return_mixer_W": (
+            bypass_kg_hr * h6 + separator_vapor_kg_hr * h_separator_vapor
+            - return_kg_hr * h_return_in
+        ) / SECONDS_PER_HOUR,
+    }
+    device_scales = {
+        "mixer_W": max(
+            abs(product_kg_hr * h1 + return_kg_hr * h_return_out),
+            abs(circulation_kg_hr * h3),
+        ) / SECONDS_PER_HOUR,
+        "compressor_W": max(abs(compressor_W), abs(circulation_kg_s * (h4 - h3))),
+        "turbine_W": max(abs(turbine_W), abs(bypass_kg_hr / SECONDS_PER_HOUR * (h5 - h6))),
+        "reject_radiator_W": max(
+            abs(radiator_reject_W), abs(circulation_kg_s * (h4 - h_radiator_out))
+        ),
+        "recuperator_W": max(
+            abs(circulation_kg_hr * (h_radiator_out - h5)),
+            abs(return_kg_hr * (h_return_out - h_return_in)),
+        ) / SECONDS_PER_HOUR,
+        "separator_W": max(
+            abs(separator_inlet_kg_hr * h5),
+            abs(product_kg_hr * h_liquid_77 + separator_vapor_kg_hr * h_separator_vapor)
+            + abs(separator_cooling_W * SECONDS_PER_HOUR),
+        ) / SECONDS_PER_HOUR,
+        "cold_return_mixer_W": max(
+            abs(bypass_kg_hr * h6 + separator_vapor_kg_hr * h_separator_vapor),
+            abs(return_kg_hr * h_return_in),
+        ) / SECONDS_PER_HOUR,
+    }
+    device_relative_residuals = {
+        name: value / max(device_scales[name], 1.0)
+        for name, value in device_residuals.items()
+    }
+    plant_in_W = cold_load_W + compressor_W
+    plant_out_W = reject_load_W + turbine_W
+    plant_residual_W = plant_in_W - plant_out_W
+    scale = max(abs(plant_in_W), abs(plant_out_W), 1.0)
+    if abs(plant_residual_W) > 1e-6 * scale or any(
+        abs(value) > 1e-6
+        for value in device_relative_residuals.values()
+    ):
+        raise AssertionError("Claude-cycle energy ledger failed closure")
+    nodes = [
+        {"node": 1, "name": "furnace_overhead_makeup", "P_Pa": p_makeup, "T_K": t_in, "h_J_kg": h1, "mass_flow_kg_hr": product_kg_hr},
+        {"node": 2, "name": "mixer", "P_Pa": p_low, "T_K": t3, "h_J_kg": h3, "mass_flow_kg_hr": circulation_kg_hr},
+        {"node": 3, "name": "compressor_suction", "P_Pa": p_low, "T_K": t3, "h_J_kg": h3, "mass_flow_kg_hr": circulation_kg_hr},
+        {"node": 4, "name": "compressor_discharge", "P_Pa": p_high, "T_K": OXYGEN_NORMAL_BOILING_POINT_K + (h4 - h_vapor_nbp) / cp_mass, "h_J_kg": h4, "mass_flow_kg_hr": circulation_kg_hr},
+        {"node": 5, "name": "recuperator_hp_out", "P_Pa": p_high, "T_K": t5, "h_J_kg": h5, "mass_flow_kg_hr": circulation_kg_hr},
+        {"node": 6, "name": "dry_expander_exhaust", "P_Pa": p_low, "T_K": OXYGEN_NORMAL_BOILING_POINT_K + (h6 - h_vapor_nbp) / cp_mass, "h_J_kg": h6, "mass_flow_kg_hr": bypass_kg_hr},
+        {"node": 7, "name": "jt_exit_separator_inlet", "P_Pa": p_low, "T_K": t5, "h_J_kg": h5, "mass_flow_kg_hr": separator_inlet_kg_hr},
+    ]
+    edges = [
+        {"from": 1, "to": 2, "device": "metering_orifice", "mass_flow_kg_hr": product_kg_hr},
+        {"from": 2, "to": 3, "device": "mixer_outlet", "mass_flow_kg_hr": circulation_kg_hr},
+        {"from": 3, "to": 4, "device": "compressor", "mass_flow_kg_hr": circulation_kg_hr},
+        {"from": 4, "to": 5, "device": "reject_radiator_then_recuperator_hp", "mass_flow_kg_hr": circulation_kg_hr},
+        {"from": 5, "to": 6, "device": "dry_work_expander", "mass_flow_kg_hr": bypass_kg_hr},
+        {"from": 5, "to": 7, "device": "jt_valve", "mass_flow_kg_hr": separator_inlet_kg_hr},
+        {"from": 7, "to": "product", "device": "separator_liquid", "mass_flow_kg_hr": product_kg_hr},
+        {"from": 7, "to": 5, "device": "separator_vapor_cold_return", "mass_flow_kg_hr": separator_vapor_kg_hr},
+        {"from": 6, "to": 5, "device": "expander_exhaust_cold_return", "mass_flow_kg_hr": bypass_kg_hr},
+        {"from": 5, "to": 2, "device": "recuperator_cold_return", "mass_flow_kg_hr": return_kg_hr},
+    ]
+    return {
+        "model": "claude_cycle_7_node_open_plant_v1",
+        "endpoint": "liquefier_77K",
+        "mass_basis": {
+            "product_kg_hr": product_kg_hr,
+            "circulation_kg_hr": circulation_kg_hr,
+            "return_kg_hr": return_kg_hr,
+            "expander_bypass_kg_hr": bypass_kg_hr,
+            "separator_inlet_kg_hr": separator_inlet_kg_hr,
+            "separator_vapor_kg_hr": separator_vapor_kg_hr,
+            "liquid_yield": y,
+            "expander_bypass_fraction": x,
+        },
+        "nodes": nodes,
+        "edges": edges,
+        "mass_residuals": mass_residuals,
+        "energy": {
+            "compressor_work_W": compressor_W,
+            "turbine_work_out_W": turbine_W,
+            "net_work_W": net_work_W,
+            "cold_load_W": cold_load_W,
+            "reject_load_W": reject_load_W,
+            "radiator_reject_W": radiator_reject_W,
+            "separator_cold_W": separator_cooling_W,
+            "separator_bath_temperature_K": separator_bath_temperature_K,
+            "W_comp_W": compressor_W,
+            "W_turb_out_W": turbine_W,
+            "W_net_W": net_work_W,
+            "Q_c_W": cold_load_W,
+            "Q_h_W": reject_load_W,
+            "plant_energy_in_W": plant_in_W,
+            "plant_energy_out_W": plant_out_W,
+            "plant_residual_W": plant_residual_W,
+            "plant_relative_residual": plant_residual_W / scale,
+            "device_residuals_W": device_residuals,
+            "device_relative_residuals": device_relative_residuals,
+            "control_volume_identity": "h0 leaves only through wall heat or shaft work",
+            "lox_77K_enthalpy_basis": "NBP latent plus gas sensible; 90.188-to-77 K liquid subcooling omitted because no sourced liquid-Cp anchor is configured",
+        },
+        "refrigeration_work_W": net_work_W,
+    }
 
 
 def mass_rate_kg_hr_to_molar_rate_mol_s(species: str, mass_rate_kg_hr: float) -> float:
@@ -312,7 +780,7 @@ def oxygen_cp_shomate_j_per_mol_k(temperature_K: float) -> float:
             t = temperature / 1000.0
             a, b, c, d, e = coefficients
             return a + b * t + c * t ** 2 + d * t ** 3 + e / t ** 2
-    raise ValueError("O2 Shomate Cp valid only from 100 K through 2000 K")
+    raise ValueError("O2 Shomate Cp valid only from 100 K through 6000 K")
 
 
 def oxygen_cp_j_per_mol_k(temperature_K: float, *, allow_low_temperature: bool = False) -> float:
@@ -410,7 +878,7 @@ def integrate_molar_sensible_enthalpy_j_per_mol(
     while cursor < high:
         upper = min(high, cursor + step)
         if species == "O2":
-            for boundary in (100.0, 700.0, 2000.0):
+            for boundary in (100.0, 700.0, 2000.0, 6000.0):
                 if cursor < boundary < upper:
                     upper = boundary
                     break
@@ -866,7 +1334,6 @@ def report_from_recorded_series(
     observed_o2_vented_kg_hr: Sequence[float] = (),
     overhead_state_series: Sequence[Mapping[str, Any]] = (),
     parameters: ThermalTrainParameters | None = None,
-    rated_cold_train_kg_hr: float | None = None,
     expected_refractory_trace_species: Sequence[str] = (),
 ) -> dict[str, Any]:
     params = parameters or thermal_train_parameters_from_mapping()
@@ -1131,24 +1598,58 @@ def report_from_recorded_series(
     o2_night["inlet_basis"] = "post_separator_S_B"
     o2_day["inlet_temperature_K"] = o2_inlet_K
     o2_day["inlet_basis"] = "post_separator_S_B"
-    compression = intercooled_compression(
-        peak_o2_mol_s,
-        pressure_suction_Pa=params.P_suction_Pa,
-        pressure_discharge_Pa=params.P_discharge_Pa,
-        stages=params.n_compressor_stages,
-        inlet_temperature_K=params.T_floor_K,
-        eta_isen=params.eta_isen,
+    capacity_result = capacity_from_hardware(params.cold_train)
+    if isinstance(capacity_result, FiniteCapacity) and params.cold_train is not None:
+        capacity_kg_hr = capacity_result.value_kg_hr
+        cold_end = claude_cycle_cold_end(
+            capacity_kg_hr,
+            liquid_yield=params.cold_train.liquid_yield,
+            expander_bypass_fraction=params.cold_train.expander_bypass_fraction,
+            pressure_low_Pa=params.P_suction_Pa,
+            pressure_high_Pa=params.P_discharge_Pa,
+            inlet_temperature_K=params.cold_train.orifice["upstream_temperature_K"],
+            reject_temperature_K=params.T_reject_K,
+            eta_isen=params.eta_isen,
+            makeup_pressure_Pa=params.cold_train.orifice["upstream_pressure_Pa"],
+        )
+        orifice_diameter_m = orifice_diameter_for_C(
+            capacity_kg_hr,
+            params.cold_train.orifice["discharge_coefficient"],
+            params.cold_train.orifice["upstream_pressure_Pa"],
+            params.cold_train.orifice["upstream_temperature_K"],
+            back_pressure_Pa=params.cold_train.orifice["back_pressure_Pa"],
+        )
+        cold_end["metering_orifice"] = {
+            "diameter_m": orifice_diameter_m,
+            "capacity_authority": "derived_from_C_never_source_of_C",
+            **dict(params.cold_train.orifice),
+        }
+        cold_end["relief"] = {
+            **dict(params.cold_train.relief),
+            "law": "mass_flow_kg_hr=k_relief_kg_hr_Pa*max(P_Pa-p_open_Pa,0)",
+        }
+        cold_end["sizing_path"] = "night_path_only"
+    else:
+        capacity_kg_hr = 0.0
+        cold_end = {
+            "status": "not_configured",
+            "reason": capacity_result.reason,
+            "refrigeration_work_W": 0.0,
+            "energy": {"reject_load_W": 0.0, "net_work_W": 0.0},
+        }
+    compression = {
+        "model": "claude_cycle_circulation_compressor",
+        "compressor_shaft_W": cold_end.get("energy", {}).get("compressor_work_W", 0.0),
+        "intercooler_reject_W": 0.0,
+    }
+    cryo = {
+        **cold_end,
+        "cold_load_W": cold_end.get("energy", {}).get("cold_load_W", 0.0),
+        "reject_load_W": cold_end.get("energy", {}).get("reject_load_W", 0.0),
+    }
+    reject_radiator = _isothermal_radiator(
+        cryo["reject_load_W"], params.T_reject_K, params.T_sink_night_K, params.emissivity
     )
-    cryo = cryogenic_tail(
-        peak_o2_mol_s,
-        temperature_floor_K=params.T_floor_K,
-        temperature_frost_K=params.T_frost_K,
-        temperature_reject_K=params.T_reject_K,
-        eta_2ndlaw=params.eta_2ndlaw,
-        segment_K=params.dT_segment_K,
-    )
-    cryo["sizing_path"] = "night_path_only"
-    reject_radiator = _isothermal_radiator(cryo["reject_load_W"], params.T_reject_K, params.T_sink_night_K, params.emissivity)
     # One HourSnapshot represents one elapsed hour, so summing mol/hr rows
     # gives batch mol and snapshot_count is the report's run-hours basis.
     batch_o2_mol = sum(oxygen_molar_rates) * SECONDS_PER_HOUR
@@ -1178,11 +1679,6 @@ def report_from_recorded_series(
         }
         capture_status = {"status": "refused", "reason": "deposition_gate_not_met"}
     captured_batch_kg = captured_batch_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
-    capacity_kg_hr = (
-        peak_o2_kg_hr
-        if rated_cold_train_kg_hr is None
-        else _finite_nonnegative(rated_cold_train_kg_hr, "rated_cold_train_kg_hr")
-    )
     overflow = thermal_train_overflow_kg_hr(peak_o2_kg_hr, capacity_kg_hr)
     # Equal-stage intercooling rejects over the T_floor-to-T_reject band;
     # midpoint sizing avoids pretending the whole surface radiates at 300 K.
@@ -1276,16 +1772,22 @@ def report_from_recorded_series(
             "compressor": compression,
             "intercooler_radiator": intercooler_radiator,
             "cryo_tail": cryo,
+            "cold_end_cycle": cold_end,
             "reject_radiator": reject_radiator,
             "cavern_regeneration": cavern,
         },
         "capacity": {
-            "basis": (
-                "observed_peak_design_capacity"
-                if rated_cold_train_kg_hr is None
-                else "declared_rated_capacity"
-            ),
+            "basis": "hardware_rating_minimum",
             "rated_cold_train_kg_hr": capacity_kg_hr,
+            "rating_reference": {
+                "p_ref_Pa": capacity_result.p_ref_Pa
+                if isinstance(capacity_result, FiniteCapacity)
+                else None,
+                "T_ref_K": capacity_result.T_ref_K
+                if isinstance(capacity_result, FiniteCapacity)
+                else None,
+                "authority": "diagnostic_scalar_rating_reference_not_capacity_source",
+            },
             "thermal_train_overflow_kg_hr": overflow,
             "cavern_capacity_kg": params.cavern_capacity_kg,
             "captured_batch_kg": captured_batch_kg,
@@ -1308,11 +1810,11 @@ def report_from_recorded_series(
         "knudsen_anchors": _knudsen_report(overhead_state_series, params),
         "footnotes": [
             "Condensed-film sensible heat below each crossing is neglected relative to latent heat.",
-            "Cryogenic work is an upper-bound generic refrigerator surrogate with no direct-O2 turbine credit.",
+            "Cold-end work uses the seven-node Claude cycle; dry-expander shaft credit is explicit.",
             "Cryogenic sizing is the night-path-only case; day-operation strategy remains deferred.",
             "Melt-offgas O2 sensible duty is charged through S-A to 1000 K, then enters S-B at that post-separator datum.",
             "SiO/CrO2 condenser enthalpy is not sourced in Phase 1a; exclusions are classified without reusing melt-side reaction enthalpy.",
-            "Default capacity equals the observed peak by design, so overflow is zero unless a declared rated capacity is supplied.",
+            "Cold-end capacity C is the minimum of compressor mass-flow and refrigeration freeze-rate ratings; the orifice is derived from C.",
             "All kg and USD values are report-edge projections; internal enthalpy arithmetic is mol/s and W.",
             "Hot and mid radiator sections conservatively sum per-species design maxima; the displayed hot peak is a concurrent snapshot maximum.",
         ],
@@ -1380,7 +1882,7 @@ def _display_cost_report(
     )
     radiator_usd = radiator_area * prices.radiator_cost_per_m2
     compressor_usd = float(compression["compressor_shaft_W"]) / 1000.0 * prices.compressor_cost_per_kW
-    cryo_usd = float(cryo["refrigeration_work_W"]) * prices.cryo_cost_per_W
+    cryo_usd = float(cryo["cold_load_W"]) * prices.cryo_cost_per_W
     installed = radiator_usd + compressor_usd + cryo_usd
     return {
         "status": "display_only_not_optimizer_objective",
@@ -1388,6 +1890,7 @@ def _display_cost_report(
         "radiator_installed_usd": radiator_usd,
         "compressor_installed_usd": compressor_usd,
         "cryo_installed_usd": cryo_usd,
+        "cryo_installed_basis": "cold_load_W_not_net_shaft_work",
         "total_installed_usd": installed,
         "amortized_per_campaign_usd": installed / prices.amortization_campaigns,
         "fixed_run_cost_usd": run_hours * prices.fixed_cost_per_hour,
@@ -1410,6 +1913,61 @@ def _validated_value_entry(raw: Any, name: str, *, source_tag: str) -> dict[str,
         "value": _finite_nonnegative(raw.get("value"), name),
         "units": units,
         "source_tag": source_tag,
+    }
+
+
+def _validated_assumption_entry(
+    raw: Any,
+    name: str,
+    *,
+    allow_none: bool = False,
+    enum: bool = False,
+    boolean: bool = False,
+) -> dict[str, Any]:
+    if not isinstance(raw, Mapping):
+        raise TypeError(f"{name} must be a mapping")
+    required = {"value", "units", "source_tag", "assumption_class", "range", "provenance"}
+    _require_exact_keys(raw, required, name)
+    if raw.get("source_tag") != "assumption":
+        raise ValueError(f"{name} source_tag must be 'assumption'")
+    if not str(raw.get("assumption_class") or ""):
+        raise ValueError(f"{name} assumption_class is required")
+    if not str(raw.get("provenance") or ""):
+        raise ValueError(f"{name} provenance is required")
+    if not str(raw.get("units") or ""):
+        raise ValueError(f"{name} units are required")
+    bounds = raw.get("range")
+    if not isinstance(bounds, Sequence) or isinstance(bounds, (str, bytes)):
+        raise ValueError(f"{name} range must be a sequence")
+    if not enum and not boolean and len(bounds) != 2:
+        raise ValueError(f"{name} range must contain exactly two bounds")
+    if enum and not bounds:
+        raise ValueError(f"{name} enum range may not be empty")
+    value = raw.get("value")
+    if boolean:
+        if not isinstance(value, bool):
+            raise TypeError(f"{name} must be a boolean")
+        if list(bounds) != [False, True]:
+            raise ValueError(f"{name} boolean range must be [false, true]")
+    elif enum:
+        if value not in bounds:
+            raise ValueError(f"{name} value must be listed in its range")
+    elif value is not None:
+        number = _finite_nonnegative(value, name)
+        low = _finite_nonnegative(bounds[0], f"{name}.range[0]")
+        high = _finite_positive(bounds[1], f"{name}.range[1]")
+        if not low <= number <= high:
+            raise ValueError(f"{name} value must lie inside its declared range")
+        value = number
+    elif not allow_none:
+        raise ValueError(f"{name} value may not be null")
+    return {
+        "value": value,
+        "units": str(raw["units"]),
+        "source_tag": "assumption",
+        "assumption_class": str(raw["assumption_class"]),
+        "range": list(bounds),
+        "provenance": str(raw["provenance"]),
     }
 
 

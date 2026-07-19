@@ -2,6 +2,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -9,7 +10,11 @@ from engines.builtin.vapor_pressure import VaporPressureRangeError
 from simulator import condensation as condensation_module
 from simulator.condensation import CondensationModel, KnudsenRegimeRefusal
 from simulator.overhead import OverheadGasModel
-from simulator.runner import _sio_wall_terminal_mol, build_sio_yield_report
+from simulator.runner import (
+    _apply_sio_wall_sweep_controls,
+    _sio_wall_terminal_mol,
+    build_sio_yield_report,
+)
 from simulator.state import (
     CampaignPhase,
     CondensationStage,
@@ -28,6 +33,36 @@ GOLDENS = (
     ("lunar_mare_low_ti", "lunar_mare_low_ti_c2a.json"),
     ("mars_basalt", "mars_basalt_c2a.json"),
 )
+
+
+def test_sio_wall_sweep_keeps_bulk_gas_temperature_distinct_from_liner():
+    configured = {}
+
+    class CondensationRecorder:
+        pipe_segments = (SimpleNamespace(name="hot_duct"),)
+
+        def configure_operating_conditions(self, **kwargs):
+            configured.update(kwargs)
+
+    condensation_model = CondensationRecorder()
+    sim = SimpleNamespace(
+        campaign_mgr=SimpleNamespace(overrides={}),
+        melt=SimpleNamespace(temperature_C=1450.0),
+        overhead_model=SimpleNamespace(
+            pipe_diameter_m=0.12,
+            stage_area_m2_by_stage=lambda: {1: 2.0},
+            stage_area_geometry_provenance_notice=lambda: {"status": "test"},
+        ),
+        condensation_model=condensation_model,
+        _condensation_model=condensation_model,
+        _configure_overhead_headspace=lambda _campaign: None,
+    )
+
+    _apply_sio_wall_sweep_controls(sim, liner_temperature_c=900.0)
+
+    assert configured["gas_temperature_C"] == pytest.approx(1450.0)
+    assert configured["wall_temperature_C"] == pytest.approx(900.0)
+    assert configured["pipe_segment_temperatures_C"] == {"hot_duct": 900.0}
 
 # Post 2026-05-20 Antoine P_sat refit: builtin SiO fallback fitted to VapoRock,
 # so evolved SiO dropped ~4700x to the activity-corrected magnitude.
@@ -155,13 +190,15 @@ GOLDENS = (
 # and fO2-independent diagnostics no longer receive fO2-shaped requests. The
 # lunar continuous fixture now follows the corrected wall-flux/request path;
 # Mars evolved SiO is unchanged, but routing bins are regenerated below.
-# 2026-07-13 SC-67 regression catch-up: Cr/Mn now refuse unmeasured sticking
-# alphas by default. These CLI goldens explicitly opt into the documented
-# prototype alpha=1.0 fallback pending t-194; executable regeneration moves the
-# coupled evolved-SiO pins with the fallback-enabled Cr/Mn wall route.
+# 2026-07-14 t-194 Cr grounding: Cr now uses its cited alpha=0.9 row instead of
+# prototype unity. Mn and CrO2 remain ungrounded, so these CLI goldens retain
+# the explicit alpha=1.0 fallback for those species. Executable regeneration
+# moves the coupled evolved-SiO and routing pins through the grounded Cr path.
+# 2026-07-17 t-159/t-160/t-260 composition: executable CLI regeneration after
+# the transport and capture corrections moved both coupled SiO baselines.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.77220591892e-05,
-    "mars_basalt": 1.78534512944e-05,
+    "lunar_mare_low_ti": 7.61699622023e-06,
+    "mars_basalt": 7.65784335307e-06,
 }
 
 # 0.5.3 Phase A1 (2026-05-28): finite-headspace default-on flip +
@@ -215,7 +252,8 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
             "C2A_continuous",
             "--hours",
             "24",
-            # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
+            # Mn remains ungrounded pending its follow-up literature sweep;
+            # Cr uses its grounded row while fallback covers Mn/CrO2.
             "--allow-unmeasured-alpha-fallback",
             "--output",
             str(output_path),
@@ -386,7 +424,9 @@ def test_wall_mg_psat_refuses_outside_source_certified_range():
 
 def test_wall_deposit_flags_antoine_extrapolation_at_wall_temperature():
     sio_data = condensation_module.VAPOR_PRESSURE_DATA["oxide_vapors"]["SiO"]
-    assert sio_data["valid_range_K"] == [1400, 2200]
+    # Ground truth: data/vapor_pressures.yaml SiO valid_range_K.
+    certified_range_K = sio_data["valid_range_K"]
+    assert certified_range_K == [1400, 1950]
 
     model = CondensationModel(
         CondensationTrain.create_default(),
@@ -401,9 +441,8 @@ def test_wall_deposit_flags_antoine_extrapolation_at_wall_temperature():
     )
 
     assert "SiO" in route.antoine_extrapolations
-    assert tuple(route.antoine_extrapolations["SiO"]["valid_range_K"]) == (
-        1400.0,
-        2200.0,
+    assert tuple(route.antoine_extrapolations["SiO"]["valid_range_K"]) == tuple(
+        certified_range_K
     )
     assert any(
         "SiO metal Antoine fit extrapolated beyond valid_range_K" in warning
@@ -606,7 +645,7 @@ def test_knudsen_regime_factor_rises_toward_ballistic():
     assert condensation_module._knudsen_regime_factor(ballistic_kn) > 0.99
 
 
-def test_low_pressure_free_molecular_regime_refuses_condensation():
+def test_low_pressure_free_molecular_regime_routes_continuously():
     train = CondensationTrain.create_default()
     melt = MeltState()
     melt.temperature_C = 1700.0
@@ -629,10 +668,11 @@ def test_low_pressure_free_molecular_regime_refuses_condensation():
 
     assert ballistic.regime_factor > viscous.regime_factor
     assert viscous_route.knudsen_regime_diagnostic["status"] == "ok"
-    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
-        ballistic.route(flux, melt)
-    assert exc_info.value.reason == "knudsen_outside_viscous_flow"
-    assert exc_info.value.diagnostic["status"] == "refused"
+    ballistic_route = ballistic.route(flux, melt)
+    assert ballistic_route.knudsen_regime_diagnostic["status"] == "warning"
+    assert ballistic_route.knudsen_regime_diagnostic["reason"] == (
+        "knudsen_outside_viscous_flow"
+    )
 
 
 def test_liner_temperature_schedule_is_recipe_controllable():

@@ -192,6 +192,25 @@ NA_TARGET_TO_METAL = {
 }
 
 
+def _time_integrated_inventory_fraction(
+    one_hour_fraction: float,
+    dt_hr: float,
+) -> float:
+    """Integrate a one-hour inventory fraction over an arbitrary timestep."""
+
+    fraction = max(0.0, min(1.0, float(one_hour_fraction)))
+    duration = max(0.0, float(dt_hr))
+    if duration == 1.0:
+        # At the one-hour reference cadence, 1 - (1 - f)**1 = f exactly.
+        # Preserve the legacy per-hour rate without a log/expm1 round trip.
+        return fraction
+    if fraction >= 1.0:
+        return 1.0 if duration > 0.0 else 0.0
+    # If S(1)=1-f for first-order depletion, S(dt)=(1-f)**dt and the
+    # cadence-invariant extracted fraction is 1-S(dt).
+    return -math.expm1(duration * math.log1p(-fraction))
+
+
 class BuiltinMetallothermicStepProvider(ChemistryProvider):
     """Authoritative ``METALLOTHERMIC_STEP`` provider.
 
@@ -434,8 +453,10 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             else 0.0
         )
 
-        # Spread injection over 3 hours per cycle (legacy comment).
-        K_available_this_hr = K_available_kg / 3.0
+        K_available_this_hr = K_available_kg * _time_integrated_inventory_fraction(
+            1.0 / 3.0,
+            controls.get("dt_hr", 1.0),
+        )
         K_inject_kg = max(
             0.0,
             min(K_available_this_hr, K_for_K2O_limit_kg, K_for_FeO_kg),
@@ -642,7 +663,10 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         TiO2_available_kg = mol_TiO2_available * molar_mass["TiO2"] / 1000.0
         Cr2O3_available_kg = mol_Cr2O3_available * molar_mass["Cr2O3"] / 1000.0
 
-        Na_available_this_hr = Na_available_kg / 3.0
+        Na_available_this_hr = Na_available_kg * _time_integrated_inventory_fraction(
+            1.0 / 3.0,
+            controls.get("dt_hr", 1.0),
+        )
         Na_inject_kg = max(0.0, Na_available_this_hr)
         if Na_inject_kg < 0.001:
             return self._empty_result(
@@ -1110,7 +1134,10 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         MgO_pct = composition_wt_pct.get("MgO", 0.0)
         rate_factor = 0.20 * math.exp(-0.05 * MgO_pct)
         rate_factor = max(0.01, min(0.25, rate_factor))
-        Mg_available_this_hr = Mg_available_kg * rate_factor
+        Mg_available_this_hr = Mg_available_kg * _time_integrated_inventory_fraction(
+            rate_factor,
+            controls.get("dt_hr", 1.0),
+        )
 
         # 3 Mg + Al2O3 -> 3 MgO + 2 Al.  Mg is the limiting reagent.
         mol_Mg = Mg_available_this_hr / molar_mass["Mg"] * 1000.0

@@ -55,6 +55,7 @@ from simulator.config import ConfigBundle, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.accounting import AccountingQueries
+from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     normalize_chemistry_kernel_config,
@@ -73,6 +74,11 @@ from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.diagnostics import (
     pressure_coating_pareto_diagnostic,
     wall_deposit_sticking_authority_status,
+)
+from simulator.trace import wall_deposit_by_segment_species_kg
+from simulator.three_product_report import classify_products
+from simulator.three_product_report_markdown import (
+    format_three_product_markdown,
 )
 from simulator.pumping_cost import pumping_context_from_sim
 from simulator.run_executor import (
@@ -103,7 +109,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.4.0"
+RUNNER_SCHEMA_VERSION = "1.6.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -171,6 +177,7 @@ SIO_WALL_SWEEP_PO2_MODE_CONFIG: dict[str, dict[str, Any]] = {
 }
 SIO_SLOW_FOULING_WALL_DEPOSIT_KG = 1.0e-6
 SIO_WALL_SWEEP_EVOLVED_REL_TOL = 1.0e-6
+C0_CHAR_WARNING_FEO_FRACTION = 0.0
 
 # kg -> bar gauge for the snapshot pressure fields exposed to summaries.
 _MBAR_TO_BAR = 1.0e-3
@@ -192,6 +199,11 @@ _METAL_PRODUCT_SPECIES: tuple[str, ...] = (
     "K",
     "Si",
 )
+_CARRIER_TOKENS: dict[str, str] = {
+    "N2": "N2",
+    "AR": "Ar",
+    "CO2": "CO2",
+}
 
 
 class RunnerError(RuntimeError):
@@ -764,10 +776,10 @@ class PyrolysisRun:
     strict_result_contract: bool = field(init=False, default=True)
 
     def __post_init__(self) -> None:
-        # Fold the `internal-analytical` display alias onto the stable `stub`
-        # token so the serialized run metadata (`"backend"`) and the fidelity-
-        # vocabulary backend-token translator both see the legacy token.
+        # Fold legacy analytical aliases onto the canonical
+        # `internal-analytical` token before serialization and translation.
         self.backend_name = canonical_backend_name(self.backend_name)
+        self._enforce_preset_comparison_contract()
         if int(self.hours) < 0:
             raise RunnerError(
                 f"invalid hours: hours must be >= 0; got {int(self.hours)}"
@@ -778,6 +790,23 @@ class PyrolysisRun:
         )
         self.runtime_campaign_overrides = overrides
         self.setpoints_overrides = overrides
+
+    def _enforce_preset_comparison_contract(self) -> None:
+        preset = self.run_metadata_overrides.get(PRESET_PROVENANCE_METADATA_KEY)
+        if not isinstance(preset, Mapping):
+            return
+        contract = preset.get("comparison_contract")
+        if not isinstance(contract, Mapping):
+            return
+        policy = str(contract.get("fast_tier_policy") or "").strip()
+        if (
+            policy == "cached_real_only_no_internal_analytical"
+            and self.backend_name == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        ):
+            raise RunnerError(
+                "preset comparison contract forbids internal-analytical execution: "
+                "fast_tier_policy=cached_real_only_no_internal_analytical"
+            )
     # ------------------------------------------------------------------
     # Run entry points
     # ------------------------------------------------------------------
@@ -967,6 +996,9 @@ class PyrolysisRun:
             c5_enabled=self.c5_enabled,
             mre_target_species=self.mre_target_species,
             mre_max_voltage_V=self.mre_max_voltage_V,
+            campaigns_elapsed=self.run_metadata_overrides.get(
+                "campaigns_elapsed", 1.0
+            ),
             unavailable_error_cls=RunnerError,
             force_builtin_vapor_pressure=(
                 _force_builtin_vapor_pressure
@@ -1122,6 +1154,7 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
+        run_metadata["campaigns_elapsed"] = float(execution.campaigns_elapsed)
         run_metadata.update(
             {
                 "backend_status": str(execution.backend_status),
@@ -1160,15 +1193,17 @@ class PyrolysisRun:
             run_metadata["c3_na_hold_adjustment"] = _json_safe(
                 c3_na_hold_adjustment
             )
-        run_metadata["cost_rollup_diagnostic"] = _json_safe(
-            build_cost_rollup_diagnostic(
-                cost_ledger=sim.cost_ledger,
-                per_hour=execution.per_hour,
-                products_kg=sim.product_ledger(),
-                pumping_context=pumping_context_from_sim(sim, execution.snapshots),
-                snapshots=execution.snapshots,
-            )
+        cost_rollup_diagnostic = build_cost_rollup_diagnostic(
+            cost_ledger=sim.cost_ledger,
+            per_hour=execution.per_hour,
+            products_kg=sim.product_ledger(),
+            pumping_context=pumping_context_from_sim(sim, execution.snapshots),
+            snapshots=execution.snapshots,
         )
+        cost_rollup_diagnostic["price_basis"] = (
+            "legacy_placeholder_awaiting_owner_ratification"
+        )
+        run_metadata["cost_rollup_diagnostic"] = _json_safe(cost_rollup_diagnostic)
         sim.record.cost_rollup = dict(run_metadata["cost_rollup_diagnostic"])
 
         # Shuttle refusal log (autoreview r3 P2, 2026-05-27): every
@@ -1200,6 +1235,16 @@ class PyrolysisRun:
             "run_metadata": run_metadata,
             "final_state": final_state,
             "final": _final_summary_report(final_state, execution),
+            "product_classification": _json_safe(
+                _safe_failure_value(
+                    lambda: _product_classification_report(
+                        sim,
+                        feedstock_id=self.feedstock_id,
+                        campaign=self.campaign,
+                    ),
+                    {"classification": {}, "markdown": ""},
+                ),
+            ),
             "stage_purity_report": stage_purity_report(sim.train),
             "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
             "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
@@ -1216,6 +1261,15 @@ class PyrolysisRun:
             "reason": reason,
             "error_message": error_message,
         }
+        c0_char_diagnostic = _c0_char_diagnostic(
+            sim,
+            execution.snapshots,
+            feedstock_id=self.feedstock_id,
+        )
+        if c0_char_diagnostic:
+            run_metadata["c0_char_diagnostic"] = _json_safe(
+                c0_char_diagnostic
+            )
         return payload
 
     def _engines_used(self, sim: PyrolysisSimulator) -> dict[str, object]:
@@ -1771,6 +1825,8 @@ def build_per_hour_summary(
     * ``T_C``: melt temperature in Celsius
     * ``P_total_bar``: total pressure above the melt in bar
     * ``pO2_bar``: pO2 partial pressure in bar
+    * ``p_carrier_bar``: actual declared carrier partial pressure in bar, when present
+    * ``carrier_identity``: canonical N2/Ar/CO2 carrier token, when present
     * ``mass_balance_pct``: ledger-based mass balance error, percent
     * ``O2_yield_kg_cumulative``: legacy serialized key for source-side
       O2 potential from all bins (kg), not recovered/captured O2
@@ -1804,6 +1860,7 @@ def build_per_hour_summary(
     pO2_bar = (
         float(snapshot.overhead.composition.get('O2', 0.0)) * _MBAR_TO_BAR
     )
+    carrier_observables = _carrier_pressure_observables(sim, snapshot)
 
     products = sim.product_ledger()
     metal_yields = {
@@ -1850,6 +1907,7 @@ def build_per_hour_summary(
         "T_C": float(snapshot.temperature_C),
         "P_total_bar": p_total_bar,
         "pO2_bar": pO2_bar,
+        **carrier_observables,
         "mass_balance_pct": mass_balance_pct,
         "O2_yield_kg_cumulative": o2_source_side_potential_kg,
         "O2_source_side_potential_kg_cumulative": o2_source_side_potential_kg,
@@ -1928,6 +1986,43 @@ def build_per_hour_summary(
     return _json_safe(summary)
 
 
+def _carrier_pressure_observables(
+    sim: PyrolysisSimulator,
+    snapshot: HourSnapshot,
+) -> dict[str, float | str]:
+    """Return the actual declared carrier partial pressure when present."""
+    melt = getattr(sim, "melt", None)
+    raw_carrier = str(
+        getattr(melt, "background_gas_species", "") or ""
+    ).strip()
+    carrier = _CARRIER_TOKENS.get(raw_carrier.upper())
+    atmosphere_name = str(
+        getattr(getattr(melt, "atmosphere", None), "name", "") or ""
+    )
+    if carrier is None and atmosphere_name == "PN2_SWEEP":
+        carrier = "N2"
+    elif carrier is None and atmosphere_name == "CO2_BACKPRESSURE":
+        carrier = "CO2"
+    if carrier is None:
+        return {}
+
+    try:
+        partial_mbar = float(
+            snapshot.overhead.composition.get(carrier, 0.0) or 0.0
+        )
+    except (TypeError, ValueError):
+        return {}
+    if not math.isfinite(partial_mbar) or partial_mbar <= 0.0:
+        return {}
+    # Derivation: overhead.composition stores physical species partials in mbar;
+    # p_carrier[bar] = p_carrier[mbar] * 1e-3. P_total - pO2 is forbidden
+    # because total pressure may also include vapor species or a control floor.
+    return {
+        "p_carrier_bar": partial_mbar * _MBAR_TO_BAR,
+        "carrier_identity": carrier,
+    }
+
+
 # ----------------------------------------------------------------------
 # Final-state ledger projection
 # ----------------------------------------------------------------------
@@ -1936,19 +2031,289 @@ def build_per_hour_summary(
 def _final_state_from_ledger(sim: PyrolysisSimulator) -> dict[str, dict[str, float]]:
     """Return ``{account_name: {species_id: mol}}`` for the full ledger.
 
-    ``AtomLedger.mol_by_account()`` returns mol-keyed balances for every
-    registered account.  Zero entries are dropped to keep the output
-    compact -- downstream callers should treat absent keys as 0.0.
+    Outward-policy mol projections are used for every registered account.
+    Zero entries are dropped to keep the output compact -- downstream callers
+    should treat absent keys as 0.0.
     """
 
-    balances = sim.atom_ledger.mol_by_account()
+    accounts = sim.atom_ledger.mol_by_account()
     return {
         account: {
             species: float(mol)
-            for species, mol in sorted(species_mol.items())
+            for species, mol in sorted(
+                sim.atom_ledger.project_account_mol(account).items()
+            )
             if abs(float(mol)) > 0.0
         }
-        for account, species_mol in sorted(balances.items())
+        for account in sorted(accounts)
+    }
+
+
+def _c0_char_diagnostic(
+    sim: PyrolysisSimulator,
+    snapshots: tuple[HourSnapshot, ...],
+    *,
+    feedstock_id: str,
+) -> dict[str, Any]:
+    """Project refractory organic carbon and O2-lance coverage at C0 end."""
+    c0_snapshots = tuple(
+        snapshot
+        for snapshot in snapshots
+        if snapshot.campaign == CampaignPhase.C0
+    )
+    if not c0_snapshots:
+        return {}
+
+    carbon_diagnostics = tuple(
+        row
+        for row in (getattr(sim, "_stage0_foulant_diagnostics", ()) or ())
+        if row.get("reaction_family") == "partition_carbon"
+    )
+    # t-325: committed solid-char account is authoritative residual
+    # inventory; partition diagnostic is the Stage-0 formation total
+    # used when the ledger has not yet been queried / is empty after
+    # full consumption still warrants a diagnostic block only if the
+    # partition reported char this batch.
+    from simulator.account_ids import SOLID_CHAR_CARBON_ACCOUNT
+
+    partition_char_mol = sum(
+        float(row["refractory_mol"])
+        for row in carbon_diagnostics
+        if isinstance(row.get("refractory_mol"), (int, float))
+        and float(row["refractory_mol"]) > 0.0
+    )
+    ledger_char_mol = max(
+        0.0,
+        float(
+            sim.atom_ledger.project_account_mol(SOLID_CHAR_CARBON_ACCOUNT).get(
+                "C", 0.0
+            )
+            or 0.0
+        ),
+    )
+    if partition_char_mol <= 0.0 and ledger_char_mol <= 0.0:
+        return {}
+    # Residual hazard inventory: live ledger balance. Formation total
+    # stays available under partition diagnostics for attribution.
+    refractory_char_mol = ledger_char_mol
+
+    partition_row = (
+        sim._load_carbon_partition_config()
+        .get("phase_partitions", {})
+        .get(feedstock_id, {})
+    )
+    refractory_partition = dict(
+        partition_row.get("f_refractory_organic_C", {}) or {}
+    )
+    partition_fraction = refractory_partition.get("floor")
+    if partition_fraction is None:
+        partition_fraction = refractory_partition.get("iom_anchor")
+
+    o2_molar_mass_kg_per_mol = MOLAR_MASS["O2"] / 1000.0
+    carbon_molar_mass_kg_per_mol = ATOMIC_WEIGHTS_G_PER_MOL["C"] / 1000.0
+    feo_molar_mass_kg_per_mol = MOLAR_MASS["FeO"] / 1000.0
+    fe_molar_mass_kg_per_mol = MOLAR_MASS["Fe"] / 1000.0
+    o2_injected_kg = sum(
+        max(0.0, float(snapshot.o2_bubbler_injected_kg))
+        for snapshot in c0_snapshots
+    )
+    o2_absorbed_kg = sum(
+        max(0.0, float(snapshot.o2_bubbler_absorbed_kg))
+        for snapshot in c0_snapshots
+    )
+    o2_injected_mol = o2_injected_kg / o2_molar_mass_kg_per_mol
+    o2_absorbed_mol = o2_absorbed_kg / o2_molar_mass_kg_per_mol
+
+    # Premise: residual char can reduce molten FeO once the C/CO Ellingham
+    # line is below Fe/FeO. Algebra: C + O2 -> CO2 needs 1 mol O2/mol C;
+    # C + 1/2 O2 -> CO needs 0.5 mol O2/mol C; FeO + C -> Fe + CO is 1:1.
+    # Unit check: kg O2 / (kg/mol) -> mol; mol C * kg/mol -> kg C/Fe.
+    # Sanity: 1 tonne at 3.5 wt% C and the Sephton floor 0.39 gives
+    # 1.136 kmol (13.65 kg) char, 36.3/18.2 kg O2 (CO2/CO), and at most
+    # 63.5 kg Fe. This report is a projection only; no account is mutated.
+    o2_required_co2_mol = partition_char_mol
+    o2_required_co_mol = 0.5 * partition_char_mol
+    injected_residual_co2_mol = max(
+        partition_char_mol - o2_injected_mol, 0.0
+    )
+    injected_residual_co_mol = max(
+        partition_char_mol - 2.0 * o2_injected_mol, 0.0
+    )
+    # The ledger balance is already post-lance. Do not subtract cumulative
+    # bubbler absorption a second time; that telemetry also includes Fe-redox
+    # absorption and is retained only for dose-coverage attribution.
+    absorbed_residual_co2_mol = refractory_char_mol
+    absorbed_residual_co_mol = refractory_char_mol
+
+    c0_end = c0_snapshots[-1]
+    melt_feo_kg = max(
+        0.0,
+        float(c0_end.inventory.melt_oxide_kg.get("FeO", 0.0) or 0.0),
+    )
+    melt_feo_mol = melt_feo_kg / feo_molar_mass_kg_per_mol
+    feo_reducible_mol = min(absorbed_residual_co2_mol, melt_feo_mol)
+    feo_fraction_at_risk = (
+        feo_reducible_mol / melt_feo_mol if melt_feo_mol > 0.0 else 0.0
+    )
+    # No source establishes a safe non-zero residual-char allowance. The
+    # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020
+    # NIST-JANAF/Chase 1998 C/CO and Fe/FeO thermochemistry, makes onset the
+    # warning boundary: any positive FeO fraction at risk warns, but never
+    # refuses or changes process behavior.
+    warning_fired = feo_fraction_at_risk > C0_CHAR_WARNING_FEO_FRACTION
+
+    def coverage_pct(o2_mol: float, required_mol: float) -> float:
+        if required_mol <= 0.0:
+            return 100.0
+        return 100.0 * min(max(o2_mol, 0.0) / required_mol, 1.0)
+
+    warning = None
+    if warning_fired:
+        warning = (
+            "WARNING: un-lanced refractory char can stoichiometrically reduce "
+            "a positive fraction of C0-end melt FeO; diagnostic only, "
+            "no process gate applied."
+        )
+    susceptible_melt_mol = {}
+    for species in ("P2O5", "Cr2O3", "TiO2"):
+        species_kg = max(
+            0.0,
+            float(c0_end.inventory.melt_oxide_kg.get(species, 0.0) or 0.0),
+        )
+        if species_kg > 0.0:
+            formula = resolve_species_formula(
+                species, sim.species_formula_registry
+            )
+            susceptible_melt_mol[species] = (
+                species_kg / formula.molar_mass_kg_per_mol()
+            )
+    contamination_warn = refractory_char_mol > 0.0
+
+    return {
+        "status": "WARN" if warning_fired else "OK",
+        "diagnostic_only": True,
+        "warning": warning,
+        "partition": {
+            "feedstock_id": feedstock_id,
+            "f_refractory_organic_C": float(partition_fraction),
+            "fraction_basis": (
+                "floor"
+                if refractory_partition.get("floor") is not None
+                else "iom_anchor"
+            ),
+            "source": refractory_partition.get("source"),
+            "regime_caveat": refractory_partition.get("regime_caveat"),
+        },
+        "inventory": {
+            "formed_refractory_char_C_mol": partition_char_mol,
+            "refractory_char_C_mol": refractory_char_mol,
+            "refractory_char_C_kg": (
+                refractory_char_mol * carbon_molar_mass_kg_per_mol
+            ),
+        },
+        "lance_stoichiometry": {
+            "O2_injected_kg": o2_injected_kg,
+            "O2_injected_mol": o2_injected_mol,
+            "O2_absorbed_kg": o2_absorbed_kg,
+            "O2_absorbed_mol": o2_absorbed_mol,
+            "C_plus_O2_to_CO2": {
+                "O2_required_mol": o2_required_co2_mol,
+                "O2_required_kg": (
+                    o2_required_co2_mol * o2_molar_mass_kg_per_mol
+                ),
+                "injected_coverage_pct": coverage_pct(
+                    o2_injected_mol, o2_required_co2_mol
+                ),
+                "absorbed_coverage_pct": coverage_pct(
+                    o2_absorbed_mol, o2_required_co2_mol
+                ),
+                "injected_basis_residual_char_C_mol": (
+                    injected_residual_co2_mol
+                ),
+                "injected_basis_residual_char_C_kg": (
+                    injected_residual_co2_mol * carbon_molar_mass_kg_per_mol
+                ),
+                "un_lanced_char_C_mol": absorbed_residual_co2_mol,
+                "un_lanced_char_C_kg": (
+                    absorbed_residual_co2_mol * carbon_molar_mass_kg_per_mol
+                ),
+            },
+            "C_plus_half_O2_to_CO": {
+                "O2_required_mol": o2_required_co_mol,
+                "O2_required_kg": (
+                    o2_required_co_mol * o2_molar_mass_kg_per_mol
+                ),
+                "injected_coverage_pct": coverage_pct(
+                    o2_injected_mol, o2_required_co_mol
+                ),
+                "absorbed_coverage_pct": coverage_pct(
+                    o2_absorbed_mol, o2_required_co_mol
+                ),
+                "injected_basis_residual_char_C_mol": injected_residual_co_mol,
+                "injected_basis_residual_char_C_kg": (
+                    injected_residual_co_mol * carbon_molar_mass_kg_per_mol
+                ),
+                "un_lanced_char_C_mol": absorbed_residual_co_mol,
+                "un_lanced_char_C_kg": (
+                    absorbed_residual_co_mol * carbon_molar_mass_kg_per_mol
+                ),
+            },
+            "residual_basis": (
+                "live_post_lance_solid_char_ledger; injected_and_absorbed_O2_"
+                "are_dose_coverage_attribution_only"
+            ),
+        },
+        "FeO_reduction_potential": {
+            "basis": (
+                "live_post_lance_solid_char_ledger_residual"
+            ),
+            "melt_FeO_available_mol": melt_feo_mol,
+            "melt_FeO_available_kg": melt_feo_kg,
+            "FeO_reducible_mol": feo_reducible_mol,
+            "Fe_equivalent_kg": feo_reducible_mol * fe_molar_mass_kg_per_mol,
+            "CO_equivalent_mol": feo_reducible_mol,
+            "melt_FeO_fraction_at_risk": feo_fraction_at_risk,
+            "warning_threshold_melt_FeO_fraction": (
+                C0_CHAR_WARNING_FEO_FRACTION
+            ),
+            "warning_threshold_basis": (
+                "thermodynamic-onset threshold: no sourced safe non-zero "
+                "residual-char allowance; warn above zero melt-FeO fraction"
+            ),
+            "warning_threshold_source": (
+                "owner-flagged 2026-07-15 Ellingham premise; REF-020 "
+                "NIST-JANAF/Chase 1998 thermochemistry"
+            ),
+        },
+        "contamination_risk": {
+            "status": "WARN" if contamination_warn else "OK",
+            "diagnostic_only": True,
+            "warning": (
+                "WARNING: un-lanced solid char can reduce melt P/Cr/Ti "
+                "oxides where present and form metal carbides; selectivity "
+                "is not modeled."
+                if contamination_warn
+                else None
+            ),
+            "susceptible_melt_mol": susceptible_melt_mol,
+            "warning_threshold": (
+                "generic carbide caution at positive surviving char; "
+                "P/Cr/Ti reduction caution additionally requires positive "
+                "susceptible oxide inventory"
+            ),
+            "p_cr_ti_reduction_status": (
+                "WARN" if contamination_warn and susceptible_melt_mol else "OK"
+            ),
+            "carbide_risk_status": "WARN" if contamination_warn else "OK",
+            "warning_threshold_source": (
+                "thermodynamic-onset screen from REF-020 JANAF oxide "
+                "stability; no sourced safe residual-char allowance"
+            ),
+            "out_of_scope": (
+                "vacuum SiO2+C->SiO(g); P/Cr/Ti selectivity and carbide "
+                "speciation"
+            ),
+        },
     }
 
 
@@ -2176,6 +2541,24 @@ def _final_summary_report(
     }
 
 
+def _product_classification_report(
+    sim: PyrolysisSimulator,
+    *,
+    feedstock_id: str,
+    campaign: str,
+) -> dict[str, Any]:
+    """Return the machine-readable classes and their operator markdown."""
+    classification = classify_products(sim, early_tap_mode=False)
+    return {
+        "classification": _json_safe(classification),
+        "markdown": format_three_product_markdown(
+            classification,
+            feedstock_id=feedstock_id,
+            campaign=campaign,
+        ),
+    }
+
+
 def _wall_liner_resinter_config() -> dict[str, Any]:
     materials = load_config_bundle(DATA_DIR).materials
     surface = (
@@ -2203,6 +2586,7 @@ def _wall_liner_resinter_config() -> dict[str, Any]:
 def _wall_fouling_report(
     wall_deposit_kg: Mapping[str, float],
     *,
+    wall_deposit_by_segment_species: Mapping[tuple[str, str], float] | None = None,
     alpha_notice: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     cfg = _wall_liner_resinter_config()
@@ -2214,21 +2598,58 @@ def _wall_fouling_report(
     dominant_species = max(positive, key=positive.get) if positive else "none"
     dominant_kg = positive.get(dominant_species, 0.0) if dominant_species else 0.0
     total_wall_load_kg = sum(positive.values())
+    segment_load_kg: dict[str, float] = {}
+    if wall_deposit_by_segment_species is not None:
+        for key, kg in wall_deposit_by_segment_species.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                continue
+            amount = float(kg)
+            if amount > 0.0:
+                segment = str(key[0])
+                segment_load_kg[segment] = segment_load_kg.get(segment, 0.0) + amount
     threshold = cfg.get("resinter_threshold_kg")
+    threshold_kg = None if threshold is None else float(threshold)
+    threshold_is_qualified = (
+        threshold_kg is not None
+        and math.isfinite(threshold_kg)
+        and threshold_kg > 0.0
+    )
     fast_n = int(cfg["fast_fouling_campaign_threshold"])
+    campaigns_by_segment: dict[str, float | str] = {}
+    aggregate_campaigns_to_resinter: float | str = "infinite"
     if total_wall_load_kg <= 0.0:
         campaigns_to_resinter: float | str = "infinite"
         verdict = "slow-fouling"
-    elif threshold is None:
+    elif not threshold_is_qualified:
+        controlling_segment_load_kg = max(
+            segment_load_kg.values(),
+            default=total_wall_load_kg,
+        )
         campaigns_to_resinter = (
+            f"resinter_threshold_kg / {controlling_segment_load_kg:.12g}"
+        )
+        aggregate_campaigns_to_resinter = (
             f"resinter_threshold_kg / {total_wall_load_kg:.12g}"
         )
+        campaigns_by_segment = {
+            segment: f"resinter_threshold_kg / {load_kg:.12g}"
+            for segment, load_kg in sorted(segment_load_kg.items())
+        }
         verdict = (
             "threshold-parametric: fast-fouling if campaigns_to_resinter "
             f"< {fast_n}, else slow-fouling"
         )
     else:
-        campaigns_to_resinter = float(threshold) / total_wall_load_kg
+        assert threshold_kg is not None
+        aggregate_campaigns_to_resinter = threshold_kg / total_wall_load_kg
+        campaigns_by_segment = {
+            segment: threshold_kg / load_kg
+            for segment, load_kg in sorted(segment_load_kg.items())
+        }
+        campaigns_to_resinter = min(
+            campaigns_by_segment.values(),
+            default=aggregate_campaigns_to_resinter,
+        )
         verdict = (
             "fast-fouling"
             if campaigns_to_resinter < fast_n
@@ -2251,6 +2672,8 @@ def _wall_fouling_report(
         "resinter_threshold_kg": threshold,
         "resinter_threshold_basis": cfg.get("resinter_threshold_basis"),
         "campaigns_to_resinter": campaigns_to_resinter,
+        "campaigns_to_resinter_by_segment": campaigns_by_segment,
+        "aggregate_campaigns_to_resinter": aggregate_campaigns_to_resinter,
         "fast_fouling_campaign_threshold": fast_n,
         "output_status": str(authority.get("output_status", "authoritative")),
         "authoritative": authoritative,
@@ -2361,7 +2784,7 @@ def _apply_sio_wall_sweep_controls(
         sim.condensation_model.configure_operating_conditions(
             wall_temperature_C=float(liner_temperature_c),
             pipe_diameter_m=sim.overhead_model.pipe_diameter_m,
-            gas_temperature_C=float(liner_temperature_c),
+            gas_temperature_C=float(sim.melt.temperature_C),
             stage_area_m2_by_stage=sim.overhead_model.stage_area_m2_by_stage(),
             stage_area_geometry_provenance_notice=(
                 sim.overhead_model.stage_area_geometry_provenance_notice()),
@@ -2469,9 +2892,10 @@ def build_sio_yield_report(
         max(float(sim.melt.temperature_C) + 273.15, 1.0),
         {"coefficient_spec": sio_alpha_spec},
     )
-    initial_balances = sim.atom_ledger.mol_by_account()
     initial_sio2_mol = float(
-        initial_balances.get("process.cleaned_melt", {}).get("SiO2", 0.0)
+        sim.atom_ledger.project_account_mol("process.cleaned_melt").get(
+            "SiO2", 0.0
+        )
     )
 
     result = base_run._run_session(session)
@@ -2538,6 +2962,9 @@ def build_sio_yield_report(
     wall_deposit_kg = _wall_deposit_report_kg(final_state)
     wall_fouling = _wall_fouling_report(
         wall_deposit_kg,
+        wall_deposit_by_segment_species=(
+            wall_deposit_by_segment_species_kg(sim.atom_ledger)
+        ),
         alpha_notice=sticking_notice,
     )
 
@@ -3515,6 +3942,17 @@ def _runner_failure_result(
     }
     for key, value in overrides.items():
         run_metadata[str(key)] = _json_safe(value)
+    run_metadata["campaigns_elapsed"] = _json_safe(
+        float(
+            getattr(
+                execution,
+                "campaigns_elapsed",
+                overrides.get("campaigns_elapsed", 1.0),
+            )
+            if execution is not None
+            else overrides.get("campaigns_elapsed", 1.0)
+        )
+    )
     run_metadata.update(
         canonicalize_fidelity_emission(
             backend_name=backend_name,
@@ -3585,6 +4023,18 @@ def _runner_failure_result(
         "run_metadata": run_metadata,
         "final_state": _json_safe(final_state),
         "final": _json_safe(final),
+        "product_classification": _json_safe(
+            _safe_failure_value(
+                lambda: _product_classification_report(
+                    sim,
+                    feedstock_id=feedstock_id,
+                    campaign=campaign,
+                ),
+                {"classification": {}, "markdown": ""},
+            )
+            if sim is not None
+            else {"classification": {}, "markdown": ""}
+        ),
         "stage_purity_report": _json_safe(stage_report),
         "vapor_pressure_source_report": _json_safe(vapor_report),
         "shuttle_refusal_history": _json_safe(
@@ -3683,7 +4133,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         default=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
                         # type folds legacy analytical aliases before choices validation.
                         type=canonical_backend_name,
-                        choices=(ANALYTICAL_BACKEND_SERIALIZATION_TOKEN, "alphamelts"),
+                        choices=(
+                            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+                            "alphamelts",
+                            "thermoengine",
+                        ),
                         help="Melt backend selection (default: internal-analytical)")
     parser.add_argument("--track", default="pyrolysis",
                         choices=("pyrolysis", "mre_baseline"),
@@ -3859,8 +4313,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             mass_kg=mass_kg,
             additives_kg=additives,
             track=args.track,
-            # Failure envelope: fold the alias so even the error path serializes
-            # the stable `stub` token (the success path folds in PyrolysisRun).
+            # Failure envelope: canonicalize even the error path (the success
+            # path also canonicalizes in PyrolysisRun).
             backend_name=canonical_backend_name(args.backend),
             engines=merged,
             metadata_overrides=metadata_overrides,

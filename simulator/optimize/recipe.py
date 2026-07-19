@@ -26,8 +26,8 @@ from simulator.state import CondensationTrain
 KeyPath = tuple[str, ...]
 
 recipe_schema_version = "recipe-schema-v1"
-allowlist_version = "allowlist-v11"
-O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v11"
+allowlist_version = "allowlist-v12"
+O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v12"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
 _RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
 
@@ -136,11 +136,17 @@ STAGE0_REDOX_OXIDANT_KG_PATH: KeyPath = tuple(
 STAGE0_CARBON_REDUCTANT_KG_PATH: KeyPath = tuple(
     "campaigns.C0.stage0_redox_cleanup.carbon_reductant_kg".split(".")
 )
-C4_HOLD_TEMP_C_PATH: KeyPath = tuple("campaigns.C4.hold_temp_C".split("."))
+C4_DEFAULT_HOLD_T_C_PATH: KeyPath = tuple(
+    "campaigns.C4.default_hold_T_C".split(".")
+)
+# Compatibility import for callers which used the constant rather than the path.
+C4_HOLD_TEMP_C_PATH: KeyPath = C4_DEFAULT_HOLD_T_C_PATH
 
 O2_BUBBLER_RATE_KEY = "o2_bubbler_kg_per_hr"
-O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH: KeyPath = ("o2_bubbler_eta_absorb_default",)
-O2_BUBBLER_TARGET_FO2_LOG_PATH: KeyPath = ("o2_bubbler_target_fO2_log",)
+O2_BUBBLER_ETA_ABSORB_DEFAULT_PATH: KeyPath = (
+    "o2_bubbler_eta_absorb_fraction_default",
+)
+O2_BUBBLER_TARGET_FO2_LOG_PATH: KeyPath = ("o2_bubbler_target_log10_fO2",)
 C2A_STAGED_STAGES_PATH: KeyPath = tuple("campaigns.C2A_staged.stages".split("."))
 C2A_STAGED_ORDER_PATH: KeyPath = tuple("campaigns.C2A_staged.order".split("."))
 C2A_STAGED_PO2_MBAR_DEFAULT_PATH: KeyPath = tuple(
@@ -239,24 +245,24 @@ C2A_STAGED_GAS_COVER_MODES: tuple[str, ...] = ("pn2_sweep", "po2_hold")
 C2A_STAGED_STAGE_FIELDS_BY_NAME: Mapping[str, tuple[str, ...]] = MappingProxyType(
     {
         "alkali_early_fe": (
-            "duration_h",
+            "duration_hr",
             "target_C",
             "ramp_rate_C_per_hr",
             C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
         ) + C2A_STAGED_STAGE_GAS_FIELDS,
         "sio_window": (
-            "duration_h",
+            "duration_hr",
             "target_C",
             "ramp_rate_C_per_hr",
             C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
         ) + C2A_STAGED_STAGE_GAS_FIELDS,
         "fe_hot_hold": (
-            "duration_h",
+            "duration_hr",
             "ramp_rate_C_per_hr",
             C2A_STAGED_DEPLETION_LOG_SLOPE_FIELD,
         ) + C2A_STAGED_STAGE_GAS_FIELDS,
         "cool_for_na_shuttle": (
-            "duration_h",
+            "duration_hr",
             "target_C",
             "ramp_rate_C_per_hr",
         ) + C2A_STAGED_STAGE_GAS_FIELDS,
@@ -268,13 +274,119 @@ O2_BUBBLER_CAMPAIGN_RATE_PATHS: tuple[KeyPath, ...] = tuple(
 )
 O2_BUBBLER_RATE_PATHS: tuple[KeyPath, ...] = O2_BUBBLER_CAMPAIGN_RATE_PATHS
 
-
 class RecipeValidationError(ValueError):
     """Raised when a recipe patch attempts an unsafe or unknown mutation."""
 
 
 class RecipePinWarning(UserWarning):
     """Warns when an optimizer pin names a knob that is already not searched."""
+
+
+class InactiveConditionalChildWarning(DeprecationWarning):
+    """Warns when a legacy/manual inactive guarded child is discarded."""
+
+
+@dataclass(frozen=True)
+class GuardSpec:
+    parent_paths: tuple[KeyPath, ...]
+    predicate: Literal["effective-any-gt"] = "effective-any-gt"
+    threshold: float = 0.0
+    canonicalizer_id: str = ""
+
+
+@dataclass(frozen=True)
+class AliasSpec:
+    canonical_path: KeyPath
+    transform_id: Literal["identity", "minutes-to-hours"] = "identity"
+    deprecation_epoch: str = "allowlist-v12"
+
+
+@dataclass(frozen=True)
+class ConditionalExecutionContext:
+    conditional_mask: tuple[tuple[str, Literal["active", "inactive"]], ...]
+    conditional_subspace_digest: str
+    effective_pins: Mapping[KeyPath, Any]
+    scope: Literal["full", "prefix-before-guard-stage"] = "full"
+    prefix_stage_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.scope not in {"full", "prefix-before-guard-stage"}:
+            raise RecipeValidationError(f"unsupported conditional scope {self.scope!r}")
+        if self.scope == "full" and self.prefix_stage_ids:
+            raise RecipeValidationError("full conditional context cannot carry prefix stage IDs")
+        if self.scope == "prefix-before-guard-stage":
+            if not self.prefix_stage_ids:
+                raise RecipeValidationError(
+                    "prefix conditional context requires executed prefix stage IDs"
+                )
+            if "C5" in self.prefix_stage_ids:
+                raise RecipeValidationError(
+                    "prefix conditional context cannot include guard stage C5"
+                )
+        if len(set(self.prefix_stage_ids)) != len(self.prefix_stage_ids):
+            raise RecipeValidationError("conditional prefix stage IDs must be unique")
+        object.__setattr__(self, "effective_pins", MappingProxyType(dict(self.effective_pins)))
+
+    def __reduce__(self):
+        return (
+            type(self),
+            (
+                self.conditional_mask,
+                self.conditional_subspace_digest,
+                dict(self.effective_pins),
+                self.scope,
+                self.prefix_stage_ids,
+            ),
+        )
+
+
+@dataclass(frozen=True)
+class ResolvedConditionalPatch:
+    patch: "RecipePatch"
+    conditional_context: ConditionalExecutionContext | None
+
+
+C5_GUARD = GuardSpec(
+    parent_paths=(C5_ALLOW_MRE_VOLTAGE_CAP_PATH,),
+    canonicalizer_id="mre-cap-v1",
+)
+O2_BUBBLER_GUARD = GuardSpec(
+    parent_paths=O2_BUBBLER_RATE_PATHS,
+    canonicalizer_id="o2-bubbler-rate-v1",
+)
+
+PATH_ALIASES: Mapping[KeyPath, AliasSpec] = MappingProxyType(
+    {
+        tuple(old.split(".")): AliasSpec(tuple(new.split(".")), transform)
+        for old, new, transform in (
+            ("campaigns.C0b_p_cleanup.duration_h", "campaigns.C0b_p_cleanup.duration_hr", "identity"),
+            ("campaigns.C2A_continuous.duration_h", "campaigns.C2A_continuous.duration_hr", "identity"),
+            ("campaigns.C2A_staged.stages.alkali_early_fe.duration_h", "campaigns.C2A_staged.stages.alkali_early_fe.duration_hr", "identity"),
+            ("campaigns.C2A_staged.stages.sio_window.duration_h", "campaigns.C2A_staged.stages.sio_window.duration_hr", "identity"),
+            ("campaigns.C2A_staged.stages.fe_hot_hold.duration_h", "campaigns.C2A_staged.stages.fe_hot_hold.duration_hr", "identity"),
+            ("campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h", "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_hr", "identity"),
+            ("campaigns.C2A_staged.na_shuttle_stage.duration_h", "campaigns.C2A_staged.na_shuttle_stage.duration_hr", "identity"),
+            ("campaigns.C3.endpoint.hold_time_min", "campaigns.C3.endpoint.hold_time_hr", "minutes-to-hours"),
+            ("campaigns.C3.duration_after_pathA_h", "campaigns.C3.duration_after_pathA_hr", "identity"),
+            ("campaigns.C3.duration_after_pathB_h_per_phase", "campaigns.C3.duration_after_pathB_hr_per_phase", "identity"),
+            ("campaigns.C4.hold_temp_C", "campaigns.C4.default_hold_T_C", "identity"),
+            ("o2_bubbler_eta_absorb_default", "o2_bubbler_eta_absorb_fraction_default", "identity"),
+            ("o2_bubbler_target_fO2_log", "o2_bubbler_target_log10_fO2", "identity"),
+        )
+    }
+)
+
+CANONICAL_TO_RUNTIME_PATH: Mapping[KeyPath, tuple[KeyPath, str]] = MappingProxyType(
+    {
+        alias.canonical_path: (
+            old,
+            "hours-to-minutes"
+            if alias.transform_id == "minutes-to-hours"
+            else alias.transform_id,
+        )
+        for old, alias in PATH_ALIASES.items()
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -288,6 +400,8 @@ class KnobSpec:
     bounds_source: str = ""
     search_enabled: bool = True
     runtime_enabled: bool = True
+    scale: Literal["linear", "log", "log10", "ordinal", "zero-inflated"] = "linear"
+    guard: GuardSpec | None = None
 
 
 def _knob(
@@ -301,6 +415,8 @@ def _knob(
     bounds_source: str,
     search_enabled: bool = True,
     runtime_enabled: bool = True,
+    scale: Literal["linear", "log", "log10", "ordinal", "zero-inflated"] = "linear",
+    guard: GuardSpec | None = None,
 ) -> KnobSpec:
     return KnobSpec(
         path=tuple(path.split(".")),
@@ -312,6 +428,8 @@ def _knob(
         bounds_source=bounds_source,
         search_enabled=search_enabled,
         runtime_enabled=runtime_enabled,
+        scale=scale,
+        guard=guard,
     )
 
 
@@ -335,6 +453,7 @@ def _c2a_stage_gas_knobs(stage_name: str) -> tuple[KnobSpec, ...]:
             high=15.0,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
+            scale="log",
         ),
         _knob(
             f"{prefix}.gas_cover_mode",
@@ -360,6 +479,7 @@ def _c2a_stage_depletion_log_slope_knob(stage_name: str) -> KnobSpec:
             "engineering_envelope: per-stage cumulative-yield log-slope epsilon; "
             "0.0 keeps fixed-duration mode, positive values floor to 0.01 1/hr"
         ),
+        search_enabled=False,
     )
 
 
@@ -372,6 +492,7 @@ def _o2_bubbler_rate_knob(path: str, *, bounds_source: str) -> KnobSpec:
         bounds_source=bounds_source,
         search_enabled=False,
         runtime_enabled=False,
+        scale="zero-inflated",
     )
 
 
@@ -388,19 +509,19 @@ class RecipeSchema:
             "campaigns.C0.temp_range_C",
             "campaigns.C0b_p_cleanup.temp_range_C",
             "campaigns.C0b_p_cleanup.pO2_mbar",
-            "campaigns.C0b_p_cleanup.duration_h",
+            "campaigns.C0b_p_cleanup.duration_hr",
             "campaigns.C2A_continuous.temp_range_C",
             "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
             "campaigns.C2A_continuous.p_total_mbar",
-            "campaigns.C2A_continuous.duration_h",
+            "campaigns.C2A_continuous.duration_hr",
             "campaigns.C2A_staged.temp_range_C",
             "campaigns.C2A_staged.p_total_mbar",
             "campaigns.C2B.temp_range_C",
             "campaigns.C2B.pO2_mbar",
             "campaigns.C3.K_phase.pO2_bakeout_mbar",
             "campaigns.C3.Na_phase.pO2_bakeout_mbar",
-            "campaigns.C3.duration_after_pathA_h",
-            "campaigns.C3.duration_after_pathB_h_per_phase",
+            "campaigns.C3.duration_after_pathA_hr",
+            "campaigns.C3.duration_after_pathB_hr_per_phase",
             "campaigns.C4.temp_range_C",
             "campaigns.C4.pO2_mbar",
             "campaigns.C4.optional_Ca_harvest.pO2_mbar",
@@ -490,7 +611,7 @@ class RecipeSchema:
             runtime_enabled=False,
         ),
         _knob(
-            "o2_bubbler_eta_absorb_default",
+            "o2_bubbler_eta_absorb_fraction_default",
             low=0.0,
             high=1.0,
             units="fraction",
@@ -500,9 +621,10 @@ class RecipeSchema:
             ),
             search_enabled=False,
             runtime_enabled=False,
+            guard=O2_BUBBLER_GUARD,
         ),
         _knob(
-            "o2_bubbler_target_fO2_log",
+            "o2_bubbler_target_log10_fO2",
             low=-20.0,
             high=0.0,
             units="log10 fO2",
@@ -512,6 +634,8 @@ class RecipeSchema:
             ),
             search_enabled=False,
             runtime_enabled=False,
+            scale="log10",
+            guard=O2_BUBBLER_GUARD,
         ),
         _knob(
             "campaigns.C0b_p_cleanup.temp_range_C",
@@ -519,6 +643,7 @@ class RecipeSchema:
             high=1320,
             units="C",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.temp_range_C",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C0b_p_cleanup.pO2_mbar",
@@ -526,6 +651,7 @@ class RecipeSchema:
             high=15.0,
             units="mbar",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.pO2_mbar",
+            scale="log",
         ),
         _knob(
             "campaigns.C0b_p_cleanup.pO2_mbar_default",
@@ -533,6 +659,7 @@ class RecipeSchema:
             high=15.0,
             units="mbar",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.pO2_mbar",
+            scale="log",
         ),
         _knob(
             "campaigns.C0b_p_cleanup.p_total_mbar_default",
@@ -540,13 +667,15 @@ class RecipeSchema:
             high=15.0,
             units="mbar",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.pO2_mbar",
+            scale="log",
         ),
         _knob(
-            "campaigns.C0b_p_cleanup.duration_h",
+            "campaigns.C0b_p_cleanup.duration_hr",
             low=0.5,
             high=2.5,
-            units="h",
+            units="hr",
             bounds_source="setpoints:campaigns.C0b_p_cleanup.duration_h",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_continuous.temp_range_C",
@@ -554,6 +683,7 @@ class RecipeSchema:
             high=1600,
             units="C",
             bounds_source="setpoints:campaigns.C2A_continuous.temp_range_C",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
@@ -568,6 +698,7 @@ class RecipeSchema:
             high=15,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_continuous.p_total_mbar",
+            scale="log",
         ),
         _knob(
             "campaigns.C2A_continuous.p_total_mbar_default",
@@ -575,13 +706,24 @@ class RecipeSchema:
             high=15,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_continuous.p_total_mbar",
+            scale="log",
         ),
         _knob(
-            "campaigns.C2A_continuous.duration_h",
+            "campaigns.C2A_continuous.duration_hr",
             low=18,
             high=28,
-            units="h",
+            units="hr",
             bounds_source="setpoints:campaigns.C2A_continuous.duration_h",
+            search_enabled=False,
+        ),
+        _knob(
+            "campaigns.C2A_continuous.max_hold_hr",
+            "int",
+            low=18,
+            high=30,
+            units="hr",
+            scale="log",
+            bounds_source="engineering_envelope ratified-t155 A2 C2A continuous max hold",
         ),
         _knob(
             "campaigns.C2A_staged.temp_range_C",
@@ -589,6 +731,7 @@ class RecipeSchema:
             high=1750,
             units="C",
             bounds_source="setpoints:campaigns.C2A_staged.temp_range_C",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_staged.default_hold_T_C",
@@ -603,6 +746,7 @@ class RecipeSchema:
             high=15,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
+            scale="log",
         ),
         _knob(
             "campaigns.C2A_staged.p_total_mbar_default",
@@ -610,6 +754,7 @@ class RecipeSchema:
             high=15,
             units="mbar",
             bounds_source="setpoints:campaigns.C2A_staged.p_total_mbar",
+            scale="log",
         ),
         _knob(
             "campaigns.C2A_staged.depletion_flux_decay_fraction",
@@ -634,11 +779,11 @@ class RecipeSchema:
             search_enabled=False,
         ),
         _knob(
-            "campaigns.C2A_staged.stages.alkali_early_fe.duration_h",
+            "campaigns.C2A_staged.stages.alkali_early_fe.duration_hr",
             "int",
             low=1,
             high=6,
-            units="h",
+            units="hr",
             bounds_source=(
                 "engineering_envelope around setpoints.yaml nominal "
                 "campaigns.C2A_staged.stages.alkali_early_fe.duration_h=4"
@@ -667,11 +812,11 @@ class RecipeSchema:
         _c2a_stage_depletion_log_slope_knob("alkali_early_fe"),
         *_c2a_stage_gas_knobs("alkali_early_fe"),
         _knob(
-            "campaigns.C2A_staged.stages.sio_window.duration_h",
+            "campaigns.C2A_staged.stages.sio_window.duration_hr",
             "int",
             low=1,
             high=6,
-            units="h",
+            units="hr",
             bounds_source=(
                 "engineering_envelope around setpoints.yaml nominal "
                 "campaigns.C2A_staged.stages.sio_window.duration_h=3"
@@ -700,11 +845,11 @@ class RecipeSchema:
         _c2a_stage_depletion_log_slope_knob("sio_window"),
         *_c2a_stage_gas_knobs("sio_window"),
         _knob(
-            "campaigns.C2A_staged.stages.fe_hot_hold.duration_h",
+            "campaigns.C2A_staged.stages.fe_hot_hold.duration_hr",
             "int",
             low=1,
             high=4,
-            units="h",
+            units="hr",
             bounds_source=(
                 "engineering_envelope around setpoints.yaml nominal "
                 "campaigns.C2A_staged.stages.fe_hot_hold.duration_h=1"
@@ -723,11 +868,11 @@ class RecipeSchema:
         _c2a_stage_depletion_log_slope_knob("fe_hot_hold"),
         *_c2a_stage_gas_knobs("fe_hot_hold"),
         _knob(
-            "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h",
+            "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_hr",
             "int",
             low=1,
             high=3,
-            units="h",
+            units="hr",
             bounds_source=(
                 "engineering_envelope around setpoints.yaml nominal "
                 "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h=1"
@@ -766,10 +911,10 @@ class RecipeSchema:
             ),
         ),
         _knob(
-            "campaigns.C2A_staged.na_shuttle_stage.duration_h",
+            "campaigns.C2A_staged.na_shuttle_stage.duration_hr",
             low=1,
             high=6,
-            units="h",
+            units="hr",
             # Duration sweep around 3 h nominal covers under/over-hold Na shuttle cases.
             bounds_source=(
                 "engineering_envelope around setpoints.yaml nominal "
@@ -782,6 +927,23 @@ class RecipeSchema:
             high=1480,
             units="C",
             bounds_source="setpoints:campaigns.C2B.temp_range_C",
+            search_enabled=False,
+        ),
+        _knob(
+            "campaigns.C2B.target_delta_below_ceiling_C",
+            low=0,
+            high=160,
+            units="C",
+            bounds_source="engineering_envelope ratified-t155 C2B active ceiling minus delta",
+        ),
+        _knob(
+            "campaigns.C2B.max_hold_hr",
+            "int",
+            low=8,
+            high=20,
+            units="hr",
+            scale="log",
+            bounds_source="engineering_envelope ratified-t155 A2 C2B max hold",
         ),
         _knob(
             "campaigns.C2B.pO2_mbar",
@@ -789,6 +951,7 @@ class RecipeSchema:
             high=2.3,
             units="mbar",
             bounds_source="setpoints:campaigns.C2B.pO2_mbar",
+            scale="log",
         ),
         _knob(
             "campaigns.C2B.pO2_mbar_default",
@@ -796,6 +959,7 @@ class RecipeSchema:
             high=2.3,
             units="mbar",
             bounds_source="setpoints:campaigns.C2B.pO2_mbar",
+            scale="log",
         ),
         _knob(
             "campaigns.C2B.p_total_mbar_default",
@@ -803,6 +967,7 @@ class RecipeSchema:
             high=2.3,
             units="mbar",
             bounds_source="setpoints:campaigns.C2B.pO2_mbar",
+            scale="log",
         ),
         _o2_bubbler_rate_knob(
             "campaigns.C2B.o2_bubbler_kg_per_hr",
@@ -817,6 +982,7 @@ class RecipeSchema:
             high=1.5,
             units="mbar",
             bounds_source="setpoints:campaigns.C3.K_phase.pO2_bakeout_mbar",
+            scale="log",
         ),
         _knob(
             "campaigns.C3.p_total_mbar_default",
@@ -824,6 +990,7 @@ class RecipeSchema:
             high=1.5,
             units="mbar",
             bounds_source="setpoints:campaigns.C3.K_phase.pO2_bakeout_mbar",
+            scale="log",
         ),
         _knob(
             "campaigns.C3.K_phase.pO2_bakeout_mbar",
@@ -831,6 +998,8 @@ class RecipeSchema:
             high=1.5,
             units="mbar",
             bounds_source="setpoints:campaigns.C3.K_phase.pO2_bakeout_mbar",
+            search_enabled=False,
+            scale="log",
         ),
         _knob(
             "campaigns.C3.Na_phase.pO2_bakeout_mbar",
@@ -838,18 +1007,20 @@ class RecipeSchema:
             high=1.5,
             units="mbar",
             bounds_source="setpoints:campaigns.C3.Na_phase.pO2_bakeout_mbar",
+            search_enabled=False,
+            scale="log",
         ),
         _knob(
-            "campaigns.C3.endpoint.hold_time_min",
-            "int",
-            low=15,
-            high=60,
-            units="min",
+            "campaigns.C3.endpoint.hold_time_hr",
+            low=0.25,
+            high=1.0,
+            units="hr",
             # Endpoint hold sweep around 30 min nominal tests equilibration margin.
             bounds_source=(
-                "engineering_envelope around setpoints.yaml nominal "
-                "campaigns.C3.endpoint.hold_time_min=30"
+                "engineering_envelope transformed from "
+                "setpoints:campaigns.C3.endpoint.hold_time_min=[15,60]"
             ),
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C3.alkali_dosing.Na_kg",
@@ -873,18 +1044,20 @@ class RecipeSchema:
             ),
         ),
         _knob(
-            "campaigns.C3.duration_after_pathA_h",
+            "campaigns.C3.duration_after_pathA_hr",
             low=10,
             high=18,
-            units="h",
+            units="hr",
             bounds_source="setpoints:campaigns.C3.duration_after_pathA_h",
+            search_enabled=False,
         ),
         _knob(
-            "campaigns.C3.duration_after_pathB_h_per_phase",
+            "campaigns.C3.duration_after_pathB_hr_per_phase",
             low=20,
             high=35,
-            units="h",
+            units="hr",
             bounds_source="setpoints:campaigns.C3.duration_after_pathB_h_per_phase",
+            search_enabled=False,
         ),
         _o2_bubbler_rate_knob(
             "campaigns.C3.o2_bubbler_kg_per_hr",
@@ -899,9 +1072,10 @@ class RecipeSchema:
             high=1670,
             units="C",
             bounds_source="setpoints:campaigns.C4.temp_range_C",
+            search_enabled=False,
         ),
         _knob(
-            "campaigns.C4.hold_temp_C",
+            "campaigns.C4.default_hold_T_C",
             low=1580,
             high=1670,
             units="C",
@@ -909,11 +1083,22 @@ class RecipeSchema:
             runtime_enabled=False,
         ),
         _knob(
+            "campaigns.C4.max_hold_hr",
+            "int",
+            low=6,
+            high=20,
+            units="hr",
+            scale="log",
+            bounds_source="engineering_envelope ratified-t155 A2 C4 max hold",
+        ),
+        _knob(
             "campaigns.C4.pO2_mbar",
             low=0.08,
             high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C4.pO2_mbar",
+            search_enabled=False,
+            scale="log",
         ),
         _knob(
             "campaigns.C4.pO2_mbar_default",
@@ -921,6 +1106,8 @@ class RecipeSchema:
             high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C4.pO2_mbar",
+            search_enabled=False,
+            scale="log",
         ),
         _knob(
             "campaigns.C4.p_total_mbar_default",
@@ -928,6 +1115,8 @@ class RecipeSchema:
             high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C4.pO2_mbar",
+            search_enabled=False,
+            scale="log",
         ),
         _knob(
             "campaigns.C4.optional_Ca_harvest.pO2_mbar",
@@ -936,6 +1125,7 @@ class RecipeSchema:
             units="mbar",
             bounds_source="setpoints:campaigns.C4.optional_Ca_harvest.pO2_mbar",
             search_enabled=False,
+            scale="log",
         ),
         _o2_bubbler_rate_knob(
             "campaigns.C4.o2_bubbler_kg_per_hr",
@@ -950,6 +1140,7 @@ class RecipeSchema:
             high=1650,
             units="C",
             bounds_source="setpoints:campaigns.C5.temp_range_C",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C5.pO2_bar",
@@ -957,6 +1148,7 @@ class RecipeSchema:
             high=0.1,
             units="bar",
             bounds_source="setpoints:campaigns.C5.pO2_bar",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C5.pO2_mbar_default",
@@ -968,6 +1160,8 @@ class RecipeSchema:
                 "engineering_envelope converted from setpoints.yaml range "
                 "campaigns.C5.pO2_bar=[0.01, 0.1] bar to mbar default"
             ),
+            scale="log",
+            guard=C5_GUARD,
         ),
         _knob(
             "campaigns.C5.p_total_mbar_default",
@@ -979,6 +1173,8 @@ class RecipeSchema:
                 "engineering_envelope converted from setpoints.yaml range "
                 "campaigns.C5.pO2_bar=[0.01, 0.1] bar to total mbar default"
             ),
+            scale="log",
+            guard=C5_GUARD,
         ),
         _knob(
             "campaigns.C5.allow_mre_voltage_cap_V",
@@ -992,6 +1188,35 @@ class RecipeSchema:
                 "EvalSpec.mre_max_voltage_V"
             ),
             runtime_enabled=False,
+            scale="zero-inflated",
+        ),
+        _knob(
+            "campaigns.C5.target_delta_below_ceiling_C",
+            low=0,
+            high=150,
+            units="C",
+            guard=C5_GUARD,
+            bounds_source="engineering_envelope ratified-t155 C5 active ceiling minus delta",
+        ),
+        _knob(
+            "campaigns.C5.max_hold_hr.branch_one",
+            "int",
+            low=1,
+            high=800,
+            units="hr",
+            scale="log",
+            guard=C5_GUARD,
+            bounds_source="engineering_envelope ratified-t155 A2 C5 branch one max hold",
+        ),
+        _knob(
+            "campaigns.C5.max_hold_hr.branch_two",
+            "int",
+            low=1,
+            high=800,
+            units="hr",
+            scale="log",
+            guard=C5_GUARD,
+            bounds_source="engineering_envelope ratified-t155 A2 C5 branch two max hold",
         ),
         _knob(
             "campaigns.C5.branch_two.max_voltage_V",
@@ -1023,6 +1248,7 @@ class RecipeSchema:
             high=1450,
             units="C",
             bounds_source="setpoints:campaigns.C6.temp_range_C",
+            search_enabled=False,
         ),
         _knob(
             "campaigns.C6.default_hold_T_C",
@@ -1032,11 +1258,22 @@ class RecipeSchema:
             bounds_source="setpoints:campaigns.C6.temp_range_C",
         ),
         _knob(
+            "campaigns.C6.max_hold_hr",
+            "int",
+            low=1,
+            high=20,
+            units="hr",
+            scale="log",
+            bounds_source="engineering_envelope ratified-t155 A2 C6 max hold",
+        ),
+        _knob(
             "campaigns.C6.pO2_mbar",
             low=0.08,
             high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C6.pO2_mbar",
+            search_enabled=False,
+            scale="log",
         ),
         _knob(
             "campaigns.C6.pO2_mbar_default",
@@ -1044,6 +1281,8 @@ class RecipeSchema:
             high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C6.pO2_mbar",
+            search_enabled=False,
+            scale="log",
         ),
         _knob(
             "campaigns.C6.p_total_mbar_default",
@@ -1051,6 +1290,8 @@ class RecipeSchema:
             high=0.35,
             units="mbar",
             bounds_source="setpoints:campaigns.C6.pO2_mbar",
+            search_enabled=False,
+            scale="log",
         ),
         _o2_bubbler_rate_knob(
             "campaigns.C6.o2_bubbler_kg_per_hr",
@@ -1068,6 +1309,7 @@ class RecipeSchema:
                 "engineering_envelope diagnostic Robinot oxygen-sink "
                 "channel annotation; no behavior authority"
             ),
+            search_enabled=False,
         ),
         _knob(
             "overhead_headspace.temperature_offset_K",
@@ -1288,6 +1530,246 @@ class RecipeSchema:
         validated = patch.validated(self)
         return _o2_bubbler_identity_settings(validated.values)
 
+    def resolve_conditional_patch(
+        self,
+        patch: "RecipePatch",
+        *,
+        defaults: Mapping[str, Any] | None = None,
+        effective_parent_values: Mapping[KeyPath, Any] | None = None,
+    ) -> ResolvedConditionalPatch:
+        validated = patch.validated(self)
+        values = dict(validated.values)
+        touched_c5 = C5_ALLOW_MRE_VOLTAGE_CAP_PATH in values or any(
+            spec.guard == C5_GUARD and spec.path in values for spec in self.allowlist
+        )
+        touched_bubbler = any(path in values for path in O2_BUBBLER_RATE_PATHS) or any(
+            spec.guard == O2_BUBBLER_GUARD and spec.path in values for spec in self.allowlist
+        )
+        if not touched_c5 and not touched_bubbler:
+            return ResolvedConditionalPatch(validated, None)
+
+        states: dict[str, bool] = {}
+        effective_pins: dict[KeyPath, Any] = {}
+        if touched_c5:
+            guarded = {spec.path for spec in self.allowlist if spec.guard == C5_GUARD}
+            present_children = guarded.intersection(values)
+            if (
+                present_children
+                and C5_ALLOW_MRE_VOLTAGE_CAP_PATH not in values
+                and effective_parent_values is None
+                and defaults is None
+            ):
+                raise RecipeValidationError(
+                    "conditional guard parent unresolved for C5 guarded child"
+                )
+            raw_cap = values.get(
+                C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+                (effective_parent_values or {}).get(
+                    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+                    _nested_default(defaults, C5_ALLOW_MRE_VOLTAGE_CAP_PATH, 0.0),
+                ),
+            )
+            cap = _canonical_mre_cap(raw_cap)
+            active = cap > 0.0
+            states[C5_GUARD.canonicalizer_id] = active
+            if active:
+                if C5_ALLOW_MRE_VOLTAGE_CAP_PATH in values:
+                    values[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] = cap
+            else:
+                effective_pins[C5_ALLOW_MRE_VOLTAGE_CAP_PATH] = 0.0
+                values.pop(C5_ALLOW_MRE_VOLTAGE_CAP_PATH, None)
+                if present_children:
+                    warnings.warn(
+                        "inactive C5 guarded children are deprecated and were discarded",
+                        InactiveConditionalChildWarning,
+                        stacklevel=2,
+                    )
+                for path in guarded:
+                    values.pop(path, None)
+
+        if touched_bubbler:
+            guarded = {
+                spec.path for spec in self.allowlist if spec.guard == O2_BUBBLER_GUARD
+            }
+            present_children = guarded.intersection(values)
+            if (
+                present_children
+                and not any(path in values for path in O2_BUBBLER_RATE_PATHS)
+                and effective_parent_values is None
+                and defaults is None
+            ):
+                raise RecipeValidationError(
+                    "conditional guard parent unresolved for bubbler guarded child"
+                )
+            rates = []
+            for path in O2_BUBBLER_RATE_PATHS:
+                raw = values.get(
+                    path,
+                    (effective_parent_values or {}).get(
+                        path, _nested_default(defaults, path, 0.0)
+                    ),
+                )
+                rate = _identity_float(raw) or 0.0
+                rates.append(max(0.0, rate))
+            active = any(rate > 0.0 for rate in rates)
+            states[O2_BUBBLER_GUARD.canonicalizer_id] = active
+            if not active:
+                if present_children:
+                    warnings.warn(
+                        "inactive bubbler guarded children are deprecated and were discarded",
+                        InactiveConditionalChildWarning,
+                        stacklevel=2,
+                    )
+                for path in guarded:
+                    values.pop(path, None)
+
+        context = conditional_execution_context(
+            self, states=states, effective_pins=effective_pins
+        )
+        return ResolvedConditionalPatch(RecipePatch(values).validated(self), context)
+
+
+def _nested_default(
+    defaults: Mapping[str, Any] | None, path: KeyPath, fallback: Any
+) -> Any:
+    node: Any = defaults
+    for segment in path:
+        if not isinstance(node, Mapping) or segment not in node:
+            return fallback
+        node = node[segment]
+    return node
+
+
+def _canonical_mre_cap(value: Any) -> float:
+    from simulator.electrolysis import min_decomposition_voltage
+
+    cap = _identity_float(value) or 0.0
+    if cap < min_decomposition_voltage():
+        return 0.0
+    return cap
+
+
+def conditional_execution_context(
+    schema: RecipeSchema,
+    *,
+    states: Mapping[str, bool],
+    effective_pins: Mapping[KeyPath, Any] | None = None,
+    scope: Literal["full", "prefix-before-guard-stage"] = "full",
+    prefix_stage_ids: Sequence[str] = (),
+) -> ConditionalExecutionContext:
+    guard_by_id = {
+        C5_GUARD.canonicalizer_id: C5_GUARD,
+        O2_BUBBLER_GUARD.canonicalizer_id: O2_BUBBLER_GUARD,
+    }
+    guards = []
+    sampled_specs: list[dict[str, Any]] = []
+    mask: list[tuple[str, Literal["active", "inactive"]]] = []
+    for guard_id, active in sorted(states.items()):
+        guard = guard_by_id[guard_id]
+        state: Literal["active", "inactive"] = "active" if active else "inactive"
+        mask.append((guard_id, state))
+        guards.append(
+            {
+                "parent_paths": [list(path) for path in guard.parent_paths],
+                "predicate": guard.predicate,
+                "threshold": guard.threshold,
+                "canonicalizer_id": guard.canonicalizer_id,
+                "state": state,
+            }
+        )
+        if active:
+            selected = [
+                spec
+                for spec in schema.search_allowlist
+                if spec.guard == guard or spec.path in guard.parent_paths
+            ]
+            for spec in sorted(selected, key=lambda item: item.path):
+                entry: dict[str, Any] = {
+                    "path": list(spec.path),
+                    "kind": spec.kind,
+                    "scale": spec.scale,
+                }
+                if spec.low is not None:
+                    entry["low"] = spec.low
+                if spec.high is not None:
+                    entry["high"] = spec.high
+                if spec.choices is not None:
+                    entry["choices"] = list(spec.choices)
+                sampled_specs.append(entry)
+    payload = {
+        "schema": "optimizer-conditional-subspace-v1",
+        "guards": guards,
+        "sampled_guard_specs": sampled_specs,
+    }
+    digest = hashlib.sha256(canonical_json_dumps(payload).encode("utf-8")).hexdigest()
+    return ConditionalExecutionContext(
+        tuple(mask),
+        digest,
+        effective_pins or {},
+        scope=scope,
+        prefix_stage_ids=tuple(prefix_stage_ids),
+    )
+
+
+def c5_sampler_context(
+    schema: RecipeSchema,
+    *,
+    active: bool,
+    scope: Literal["full", "prefix-before-guard-stage"] = "full",
+    prefix_stage_ids: Sequence[str] = (),
+) -> ConditionalExecutionContext:
+    pins = {} if active else {C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0}
+    return conditional_execution_context(
+        schema,
+        states={C5_GUARD.canonicalizer_id: active},
+        effective_pins=pins,
+        scope=scope,
+        prefix_stage_ids=prefix_stage_ids,
+    )
+
+
+def conditional_context_metadata(
+    context: ConditionalExecutionContext,
+) -> dict[str, Any]:
+    metadata = {
+        "conditional_mask": [list(item) for item in context.conditional_mask],
+        "conditional_subspace_digest": context.conditional_subspace_digest,
+        "effective_pins": [
+            {"path": list(path), "value": _normalize_value(value)}
+            for path, value in sorted(context.effective_pins.items())
+        ],
+        "conditional_scope": context.scope,
+    }
+    if context.prefix_stage_ids:
+        metadata["conditional_prefix_stage_ids"] = list(context.prefix_stage_ids)
+    return metadata
+
+
+def conditional_context_from_metadata(
+    metadata: Mapping[str, Any],
+) -> ConditionalExecutionContext | None:
+    digest = metadata.get("conditional_subspace_digest")
+    if not digest:
+        return None
+    mask = tuple(
+        (str(item[0]), str(item[1]))
+        for item in metadata.get("conditional_mask", ())
+    )
+    pins = {
+        tuple(str(part) for part in item["path"]): item["value"]
+        for item in metadata.get("effective_pins", ())
+    }
+    return ConditionalExecutionContext(
+        mask,  # type: ignore[arg-type]
+        str(digest),
+        pins,
+        scope=str(metadata.get("conditional_scope", "full")),  # type: ignore[arg-type]
+        prefix_stage_ids=tuple(
+            str(stage_id)
+            for stage_id in metadata.get("conditional_prefix_stage_ids", ())
+        ),
+    )
+
 
 MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
     tuple(path.split("."))
@@ -1299,45 +1781,48 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C0b_p_cleanup.pO2_mbar",
         "campaigns.C0b_p_cleanup.pO2_mbar_default",
         "campaigns.C0b_p_cleanup.p_total_mbar_default",
-        "campaigns.C0b_p_cleanup.duration_h",
+        "campaigns.C0b_p_cleanup.duration_hr",
         "campaigns.C2A_continuous.temp_range_C",
         "campaigns.C2A_continuous.dT_dt_C_per_hr.early_ramp_1050_1320C",
         "campaigns.C2A_continuous.p_total_mbar",
         "campaigns.C2A_continuous.p_total_mbar_default",
-        "campaigns.C2A_continuous.duration_h",
+        "campaigns.C2A_continuous.duration_hr",
+        "campaigns.C2A_continuous.max_hold_hr",
         "campaigns.C2A_staged.temp_range_C",
         "campaigns.C2A_staged.default_hold_T_C",
         "campaigns.C2A_staged.p_total_mbar",
         "campaigns.C2A_staged.p_total_mbar_default",
-        "campaigns.C2A_staged.stages.alkali_early_fe.duration_h",
+        "campaigns.C2A_staged.stages.alkali_early_fe.duration_hr",
         "campaigns.C2A_staged.stages.alkali_early_fe.target_C",
         "campaigns.C2A_staged.stages.alkali_early_fe.ramp_rate_C_per_hr",
         "campaigns.C2A_staged.stages.alkali_early_fe.depletion_log_slope_epsilon_per_hr",
         "campaigns.C2A_staged.stages.alkali_early_fe.pO2_mbar",
         "campaigns.C2A_staged.stages.alkali_early_fe.p_total_mbar",
         "campaigns.C2A_staged.stages.alkali_early_fe.gas_cover_mode",
-        "campaigns.C2A_staged.stages.sio_window.duration_h",
+        "campaigns.C2A_staged.stages.sio_window.duration_hr",
         "campaigns.C2A_staged.stages.sio_window.target_C",
         "campaigns.C2A_staged.stages.sio_window.ramp_rate_C_per_hr",
         "campaigns.C2A_staged.stages.sio_window.depletion_log_slope_epsilon_per_hr",
         "campaigns.C2A_staged.stages.sio_window.pO2_mbar",
         "campaigns.C2A_staged.stages.sio_window.p_total_mbar",
         "campaigns.C2A_staged.stages.sio_window.gas_cover_mode",
-        "campaigns.C2A_staged.stages.fe_hot_hold.duration_h",
+        "campaigns.C2A_staged.stages.fe_hot_hold.duration_hr",
         "campaigns.C2A_staged.stages.fe_hot_hold.ramp_rate_C_per_hr",
         "campaigns.C2A_staged.stages.fe_hot_hold.depletion_log_slope_epsilon_per_hr",
         "campaigns.C2A_staged.stages.fe_hot_hold.pO2_mbar",
         "campaigns.C2A_staged.stages.fe_hot_hold.p_total_mbar",
         "campaigns.C2A_staged.stages.fe_hot_hold.gas_cover_mode",
-        "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_h",
+        "campaigns.C2A_staged.stages.cool_for_na_shuttle.duration_hr",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.target_C",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.ramp_rate_C_per_hr",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.pO2_mbar",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.p_total_mbar",
         "campaigns.C2A_staged.stages.cool_for_na_shuttle.gas_cover_mode",
         "campaigns.C2A_staged.na_shuttle_stage.ramp_rate_C_per_hr",
-        "campaigns.C2A_staged.na_shuttle_stage.duration_h",
+        "campaigns.C2A_staged.na_shuttle_stage.duration_hr",
         "campaigns.C2B.temp_range_C",
+        "campaigns.C2B.target_delta_below_ceiling_C",
+        "campaigns.C2B.max_hold_hr",
         "campaigns.C2B.pO2_mbar",
         "campaigns.C2B.pO2_mbar_default",
         "campaigns.C2B.p_total_mbar_default",
@@ -1345,13 +1830,14 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C3.p_total_mbar_default",
         "campaigns.C3.K_phase.pO2_bakeout_mbar",
         "campaigns.C3.Na_phase.pO2_bakeout_mbar",
-        "campaigns.C3.endpoint.hold_time_min",
+        "campaigns.C3.endpoint.hold_time_hr",
         "campaigns.C3.alkali_dosing.Na_kg",
         "campaigns.C3.alkali_dosing.K_kg",
-        "campaigns.C3.duration_after_pathA_h",
-        "campaigns.C3.duration_after_pathB_h_per_phase",
+        "campaigns.C3.duration_after_pathA_hr",
+        "campaigns.C3.duration_after_pathB_hr_per_phase",
         "campaigns.C4.temp_range_C",
-        "campaigns.C4.hold_temp_C",
+        "campaigns.C4.default_hold_T_C",
+        "campaigns.C4.max_hold_hr",
         "campaigns.C4.pO2_mbar",
         "campaigns.C4.pO2_mbar_default",
         "campaigns.C4.p_total_mbar_default",
@@ -1361,8 +1847,12 @@ MANDATE_LEVER_PATHS: frozenset[KeyPath] = frozenset(
         "campaigns.C5.pO2_mbar_default",
         "campaigns.C5.p_total_mbar_default",
         "campaigns.C5.allow_mre_voltage_cap_V",
+        "campaigns.C5.target_delta_below_ceiling_C",
+        "campaigns.C5.max_hold_hr.branch_one",
+        "campaigns.C5.max_hold_hr.branch_two",
         "campaigns.C6.temp_range_C",
         "campaigns.C6.default_hold_T_C",
+        "campaigns.C6.max_hold_hr",
         "campaigns.C6.pO2_mbar",
         "campaigns.C6.pO2_mbar_default",
         "campaigns.C6.p_total_mbar_default",
@@ -1396,17 +1886,17 @@ def _is_c2a_staged_stage_field_path(path: KeyPath) -> bool:
 def _setpoints_patch_from_runtime_values(
     runtime_values: Mapping[KeyPath, Any],
 ) -> dict[str, Any]:
-    direct_values = {
-        path: value
+    direct_values = dict(
+        _runtime_path_and_value(path, value)
         for path, value in runtime_values.items()
         if not _is_c2a_staged_stage_field_path(path)
-    }
+    )
     stage_values = {
         path: value
         for path, value in runtime_values.items()
         if _is_c2a_staged_stage_field_path(path)
     }
-    nested = RecipePatch(direct_values).to_nested()
+    nested = _nested_runtime_values(direct_values)
     order = direct_values.get(C2A_STAGED_ORDER_PATH)
     if not stage_values and order is None:
         return nested
@@ -1419,7 +1909,7 @@ def _setpoints_patch_from_runtime_values(
     }
     for path, value in stage_values.items():
         stage_name = path[-2]
-        field_name = path[-1]
+        field_name = "duration_h" if path[-1] == "duration_hr" else path[-1]
         try:
             stage = stages_by_name[stage_name]
         except KeyError as exc:
@@ -1444,6 +1934,26 @@ def _setpoints_patch_from_runtime_values(
         raise RecipeValidationError("recipe path conflicts with C2A_staged mapping")
     c2a["stages"] = stages
     c2a["max_hold_hr"] = total_hours
+    return nested
+
+
+def _runtime_path_and_value(path: KeyPath, value: Any) -> tuple[KeyPath, Any]:
+    mapped = CANONICAL_TO_RUNTIME_PATH.get(path)
+    if mapped is None:
+        return path, value
+    runtime_path, transform_id = mapped
+    if transform_id == "hours-to-minutes":
+        return runtime_path, float(value) * 60.0
+    return runtime_path, value
+
+
+def _nested_runtime_values(values: Mapping[KeyPath, Any]) -> dict[str, Any]:
+    nested: dict[str, Any] = {}
+    for path, value in sorted(values.items()):
+        cursor = nested
+        for segment in path[:-1]:
+            cursor = cursor.setdefault(segment, {})
+        cursor[path[-1]] = _normalize_value(value)
     return nested
 
 
@@ -1735,10 +2245,26 @@ class RecipePatch:
     values: Mapping[KeyPath, Any]
 
     def __post_init__(self) -> None:
-        normalized = {
+        raw = {
             _normalize_key_path(path): _normalize_value(value)
             for path, value in self.values.items()
         }
+        normalized: dict[KeyPath, Any] = {}
+        source_by_path: dict[KeyPath, KeyPath] = {}
+        for path, value in raw.items():
+            alias = PATH_ALIASES.get(path)
+            canonical_path = alias.canonical_path if alias else path
+            if canonical_path in normalized:
+                first = source_by_path[canonical_path]
+                raise RecipeValidationError(
+                    "recipe_alias_collision: "
+                    f"{_format_path(first)} and {_format_path(path)} both map to "
+                    f"{_format_path(canonical_path)}"
+                )
+            if alias and alias.transform_id == "minutes-to-hours":
+                value = float(value) / 60.0
+            normalized[canonical_path] = _normalize_value(value)
+            source_by_path[canonical_path] = path
         object.__setattr__(self, "values", MappingProxyType(normalized))
 
     def __reduce__(self) -> tuple[Any, tuple[dict[KeyPath, Any]]]:
@@ -1807,6 +2333,7 @@ class RecipePatch:
             _validate_value(spec, value, active_schema)
         _validate_pressure_default_pairs(active_schema, self.values)
         _validate_c2a_staged_depletion_knob_conflict(self.values)
+        _validate_temperature_dual_control(self.values)
         return RecipePatch(dict(self.values))
 
     def recipe_id(
@@ -1817,12 +2344,13 @@ class RecipePatch:
         allowlist_version: str | None = None,
         ) -> str:
         active_schema = schema or RecipeSchema()
+        resolved = active_schema.resolve_conditional_patch(self).patch
         schema_version = recipe_schema_version or active_schema.recipe_schema_version
         active_allowlist_version = _effective_o2_bubbler_allowlist_version(
-            self.values,
+            resolved.values,
             allowlist_version or active_schema.allowlist_version,
         )
-        canonical = self.canonical_json().encode("utf-8")
+        canonical = resolved.canonical_json().encode("utf-8")
         payload = (
             canonical
             + b"\n"
@@ -1893,6 +2421,16 @@ def _validate_c2a_staged_depletion_knob_conflict(
         "campaigns.C2A_staged.depletion_flux_decay_fraction is legacy-only "
         "and conflicts with per-stage depletion_log_slope_epsilon_per_hr"
     )
+
+
+def _validate_temperature_dual_control(values: Mapping[KeyPath, Any]) -> None:
+    absolute = tuple("campaigns.C2B.temp_range_C".split("."))
+    delta = tuple("campaigns.C2B.target_delta_below_ceiling_C".split("."))
+    if absolute in values and delta in values:
+        raise RecipeValidationError(
+            "recipe_temperature_dual_control: campaigns.C2B.temp_range_C and "
+            "campaigns.C2B.target_delta_below_ceiling_C are mutually exclusive"
+        )
 
 
 def _canonical_c2a_staged_depletion_log_slope_recipe_values(
@@ -2031,6 +2569,8 @@ def _flatten_c2a_staged_stage_list(
         seen.add(stage_name)
         stage_names.append(stage_name)
         allowed_fields = set(C2A_STAGED_STAGE_FIELDS_BY_NAME[stage_name])
+        if "duration_hr" in allowed_fields:
+            allowed_fields.add("duration_h")
         allowed_fields.update(C2A_STAGED_STAGE_METADATA_FIELDS)
         unknown_fields = sorted(
             field_name
@@ -2046,9 +2586,19 @@ def _flatten_c2a_staged_stage_list(
                 f"{_format_path(C2A_STAGED_STAGES_PATH + (stage_name, first))}"
             )
         for field_name in C2A_STAGED_STAGE_FIELDS_BY_NAME[stage_name]:
-            if field_name in stage:
+            source_field = (
+                "duration_h"
+                if field_name == "duration_hr" and "duration_h" in stage
+                else field_name
+            )
+            if field_name in stage and source_field != field_name:
+                raise RecipeValidationError(
+                    "recipe_alias_collision: C2A_staged stage contains both "
+                    "duration_h and duration_hr"
+                )
+            if source_field in stage:
                 flat[C2A_STAGED_STAGES_PATH + (stage_name, field_name)] = (
-                    _normalize_value(stage[field_name])
+                    _normalize_value(stage[source_field])
                 )
     has_complete_stage_set = len(stage_names) == len(C2A_STAGED_STAGE_NAMES) and set(
         stage_names

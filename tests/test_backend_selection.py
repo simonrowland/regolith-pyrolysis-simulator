@@ -41,6 +41,11 @@ from simulator.grind_preflight import (
     assert_grind_feedstock_stage0_route_coverage,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.fidelity_vocabulary import (
+    FidelityVocabularyTranslationError,
+    canonicalize_fidelity_emission,
+)
+from simulator.optimize.evalspec import EvalSpec, cache_key, canonical_evalspec_json
 from web.events import BackendUnavailableError, _get_backend
 
 SPINEL_COMPOSITION_HANG_FEEDSTOCK_IDS = (
@@ -101,6 +106,10 @@ class _FakeAlphaMELTS(_FakeBackend):
     name = 'alphamelts'
 
 
+class _FakeThermoEngine(_FakeBackend):
+    name = 'thermoengine'
+
+
 def _install_fakes(
     monkeypatch,
     *,
@@ -135,6 +144,85 @@ def test_runner_strict_rejects_auto():
 def test_runner_strict_keeps_legacy_exact_name_matching():
     with pytest.raises(BackendUnavailableError, match="unknown backend 'Auto'"):
         resolve_backend('Auto', BackendSelectionPolicy.RUNNER_STRICT)
+
+
+def test_runner_strict_resolves_thermoengine_peer():
+    backend = resolve_backend(
+        'thermoengine',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        thermoengine_backend_cls=lambda: _FakeThermoEngine(available=True),
+    )
+
+    assert isinstance(backend, _FakeThermoEngine)
+    assert backend.init_calls == [{}]
+
+
+def test_legacy_alphamelts_thermoengine_mode_resolves_peer_without_key_rename():
+    backend = resolve_backend(
+        'alphamelts',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        thermoengine_backend_cls=lambda: _FakeThermoEngine(available=True),
+        backend_config={'mode': 'thermoengine'},
+    )
+
+    assert isinstance(backend, _FakeThermoEngine)
+    assert backend.init_calls == [{'mode': 'thermoengine'}]
+    assert backend_resolution_status(backend).requested_backend == 'alphamelts'
+    assert backend._legacy_alphamelts_cache_identity is True
+
+
+@pytest.mark.parametrize(
+    'backend_config',
+    [
+        {'mode': 'subprocess', 'alphamelts': {'mode': 'thermoengine'}},
+        {'mode': 'thermoengine', 'alphamelts': {'mode': 'subprocess'}},
+    ],
+)
+def test_legacy_alphamelts_mode_precedence_keeps_subprocess(backend_config):
+    backend = resolve_backend(
+        'alphamelts',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        alphamelts_backend_cls=lambda: _FakeAlphaMELTS(available=True),
+        thermoengine_backend_cls=lambda: pytest.fail(
+            'ThermoEngine peer must not be selected'
+        ),
+        backend_config=backend_config,
+    )
+
+    assert isinstance(backend, _FakeAlphaMELTS)
+
+
+def test_web_auto_preserves_legacy_thermoengine_mode_selection():
+    backend = resolve_backend(
+        'auto',
+        BackendSelectionPolicy.WEB_AUTODETECT,
+        alphamelts_backend_cls=lambda: pytest.fail(
+            'AlphaMELTS subprocess peer must not be selected'
+        ),
+        thermoengine_backend_cls=lambda: _FakeThermoEngine(available=True),
+        backend_config={'mode': 'thermoengine'},
+    )
+
+    assert isinstance(backend, _FakeThermoEngine)
+    assert backend._legacy_alphamelts_cache_identity is True
+
+
+def test_stage0_required_thermoengine_refuses_instead_of_blending_engines():
+    class _RoutedThermoEngine(_FakeThermoEngine):
+        def initialize(self, config):
+            self._mode = 'thermoengine'
+            return super().initialize(config)
+
+    with pytest.raises(
+        BackendUnavailableError,
+        match='requires subprocess.*ThermoEngine',
+    ):
+        resolve_backend(
+            'thermoengine',
+            BackendSelectionPolicy.RUNNER_STRICT,
+            thermoengine_backend_cls=lambda: _RoutedThermoEngine(available=True),
+            stage0_subprocess_required=True,
+        )
 
 
 def test_web_autodetect_policy_preserves_probe_order():
@@ -653,7 +741,8 @@ def test_internal_analytical_alias_pins_internal_analytical_backend(monkeypatch,
     """``backend='internal-analytical'`` resolves exactly like ``'internal-analytical'``.
 
     Even when AlphaMELTS is available the alias deterministically pins
-    InternalAnalyticalBackend (it folds onto ``stub`` before the autodetect branch).
+    InternalAnalyticalBackend (legacy aliases fold onto ``internal-analytical``
+    before the autodetect branch).
     """
     _install_fakes(monkeypatch, alphamelts_available=True)
 
@@ -672,22 +761,66 @@ def test_internal_analytical_alias_runner_strict_resolves_like_stub():
 
 
 def test_internal_analytical_alias_serializes_new_token_and_denylists():
-    backend = resolve_backend(
-        'internal-analytical',
-        BackendSelectionPolicy.WEB_AUTODETECT,
-        internal_analytical_backend_cls=InternalAnalyticalBackend,
-        log_selection=lambda selected: None,
-    )
-    resolution = backend_resolution_status(backend)
+    cache_identities = []
 
-    assert resolution.requested_backend == 'internal-analytical'
-    assert resolution.active_backend == 'InternalAnalyticalBackend'
-    assert resolution.message == (
-        'internal-analytical backend selected; '
-        'no authoritative melt result available'
-    )
-    assert resolution.backend_status == 'unavailable'
-    assert resolution.authoritative is False
+    for name in ('internal-analytical', 'stub'):
+        backend = resolve_backend(
+            name,
+            BackendSelectionPolicy.WEB_AUTODETECT,
+            internal_analytical_backend_cls=InternalAnalyticalBackend,
+            log_selection=lambda selected: None,
+        )
+        resolution = backend_resolution_status(backend)
+
+        assert resolution.requested_backend == 'internal-analytical'
+        assert resolution.active_backend == 'InternalAnalyticalBackend'
+        assert resolution.message == (
+            'internal-analytical backend selected; '
+            'no authoritative melt result available'
+        )
+        assert resolution.backend_status == 'unavailable'
+        assert resolution.authoritative is False
+
+        with pytest.raises(
+            FidelityVocabularyTranslationError,
+            match=(
+                "certification emission refused for denylisted "
+                "evidence_class='internal-analytical'"
+            ),
+        ):
+            canonicalize_fidelity_emission(
+                backend_name=name,
+                backend_status='ok',
+                backend_authoritative=True,
+                certification_shape=True,
+            )
+
+        spec = EvalSpec(
+            recipe_id='recipe-id',
+            feedstock_recipe_digest='feedstock-recipe-digest',
+            feedstock_id='lunar_mare_low_ti',
+            profile_id='profile-id',
+            fidelity='fast',
+            code_version='test-code-version',
+            data_digests={
+                'feedstocks': 'feedstocks-digest',
+                'foulant_thermo': 'foulant-thermo-digest',
+                'materials': 'materials-digest',
+                'profile': 'profile-digest',
+                'setpoints': 'setpoints-digest',
+                'species_catalog': 'species-catalog-digest',
+                'vapor_pressures': 'vapor-pressures-digest',
+            },
+            backend_name=name,
+        )
+        assert spec.backend_name == 'internal-analytical'
+        assert (
+            json.loads(canonical_evalspec_json(spec))['backend_name']
+            == 'internal-analytical'
+        )
+        cache_identities.append(cache_key(spec))
+
+    assert cache_identities[0] == cache_identities[1]
 
 
 @pytest.mark.parametrize('name', ['something-else', 'factsage', 'FactSAGE'])

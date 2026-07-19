@@ -1,7 +1,7 @@
 """Kernel invariant: providers can only emit transitions for owned intents.
 
-A provider's :class:`CapabilityProfile.is_authoritative_for` is the
-authoritative set.  If a result carries a
+A provider's :class:`CapabilityProfile.ledger_transition_authority_for` is
+the ledger-authority set. If a result carries a
 :class:`LedgerTransitionProposal` for an intent outside that set, the
 kernel raises :class:`UnauthorizedIntentError` BEFORE the proposal is
 seen by the rest of the system.
@@ -11,6 +11,9 @@ from __future__ import annotations
 
 import pytest
 
+from engines.alphamelts.provider import AlphaMELTSProvider
+from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
+from engines.magemin.provider import MAGEMinShadowProvider
 from simulator.accounting.ledger import AtomLedger
 from simulator.chemistry.kernel import (
     CapabilityProfile,
@@ -48,6 +51,18 @@ def test_capability_profile_rejects_unauthorised_subset():
         )
 
 
+def test_capability_profile_rejects_ledger_authority_outside_dispatch_authority():
+    with pytest.raises(ValueError, match="ledger_transition_authority_for"):
+        CapabilityProfile(
+            provider_id="bad-ledger-authority",
+            intents=frozenset({ChemistryIntent.SILICATE_LIQUIDUS}),
+            is_authoritative_for=frozenset(),
+            ledger_transition_authority_for=frozenset(
+                {ChemistryIntent.SILICATE_LIQUIDUS}
+            ),
+        )
+
+
 def test_validate_intent_authority_raises_for_outside_set():
     profile = CapabilityProfile(
         provider_id="shadow",
@@ -67,6 +82,35 @@ def test_validate_intent_authority_allows_owned_intent():
         declared_accounts=frozenset({"process.cleaned_melt", "process.overhead_gas"}),
     )
     validate_intent_authority(ChemistryIntent.EVAPORATION_TRANSITION, profile)
+
+
+@pytest.mark.parametrize(
+    ("provider", "intent"),
+    [
+        (AlphaMELTSProvider(backend=None), ChemistryIntent.GATE_LIQUID_FRACTION),
+        (AlphaMELTSProvider(backend=None), ChemistryIntent.SILICATE_LIQUIDUS),
+        (AlphaMELTSProvider(backend=None), ChemistryIntent.SILICATE_EQUILIBRIUM),
+        (
+            AlphaMELTSProvider(backend=None),
+            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+        ),
+        (MAGEMinShadowProvider(backend=None), ChemistryIntent.GATE_LIQUID_FRACTION),
+    ],
+)
+def test_validate_intent_authority_refuses_diagnostic_provider(
+    provider, intent
+):
+    with pytest.raises(UnauthorizedIntentError):
+        validate_intent_authority(intent, provider.capability_profile())
+
+
+def test_validate_intent_authority_accepts_builtin_condensation_route():
+    provider = BuiltinCondensationRouteProvider()
+
+    validate_intent_authority(
+        ChemistryIntent.CONDENSATION_ROUTE,
+        provider.capability_profile(),
+    )
 
 
 # ---------------------------------------------------------------------------

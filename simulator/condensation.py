@@ -74,6 +74,8 @@ from simulator.backend_names import (
     canonical_backend_name,
 )
 from simulator.transport_constants import (
+    CARRIER_GAS_PROPERTIES,
+    CarrierGasProperties,
     COLLISION_DIAMETERS_M,
     FREE_MOLECULAR_KNUDSEN_MIN,
     N2_COLLISION_DIAMETER_M,
@@ -185,6 +187,20 @@ def _carrier_collision_diameter_angstrom(species: str) -> float:
     return round(COLLISION_DIAMETERS_M[species] * 1e10, 3)
 
 
+def _carrier_lennard_jones_params(species: str) -> tuple[float, float, float]:
+    properties = CARRIER_GAS_PROPERTIES[species]
+    sigma_angstrom = (
+        properties.collision_diameter_m * 1e10
+        if species == 'N2'
+        else _carrier_collision_diameter_angstrom(species)
+    )
+    return (
+        sigma_angstrom,
+        properties.lennard_jones_epsilon_over_k_K,
+        properties.lennard_jones_molar_mass_g_mol,
+    )
+
+
 # Chapman-Enskog Lennard-Jones parameters (vapor species + carrier gas).
 # Species: collision diameter (Angstrom), ε/k_B (K), molecular mass (g/mol).
 # Primary source: Bird/Stewart/Lightfoot "Transport Phenomena" 2nd ed.
@@ -203,10 +219,11 @@ def _carrier_collision_diameter_angstrom(species: str) -> float:
 _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     # (sigma Angstrom, eps/k_B K, M g/mol)
     # N2 sigma derives from N2_COLLISION_DIAMETER_M (one grounded source, BUG-013)
-    'N2':  (N2_COLLISION_DIAMETER_M * 1e10, 71.4, 28.014),  # BSL Table E.1
-    'Ar':  (_carrier_collision_diameter_angstrom('Ar'), 93.3,   39.948),  # BSL Table E.1
-    'CO2': (_carrier_collision_diameter_angstrom('CO2'), 195.2,  44.010),  # BSL Table E.1
-    'O2':  (_carrier_collision_diameter_angstrom('O2'), 106.7,  31.998),  # BSL Table E.1
+    'N2':  _carrier_lennard_jones_params('N2'),  # BSL Table E.1
+    'Ar':  _carrier_lennard_jones_params('Ar'),  # BSL Table E.1
+    'CO2': _carrier_lennard_jones_params('CO2'),  # BSL Table E.1
+    'O2':  _carrier_lennard_jones_params('O2'),  # BSL Table E.1
+    'He':  _carrier_lennard_jones_params('He'),  # BSL Table E.1
     'Na':  (3.567, 1375.0, 22.990),  # Svehla 1962 vapor
     'K':   (3.987, 1305.0, 39.098),  # Svehla 1962 vapor
     'Ca':  (3.880, 1224.0, 40.078),  # BSL extension
@@ -233,6 +250,10 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
         'source': 'Bird/Stewart/Lightfoot Table E.1',
     },
     'O2': {
+        'status': 'sourced',
+        'source': 'Bird/Stewart/Lightfoot Table E.1',
+    },
+    'He': {
         'status': 'sourced',
         'source': 'Bird/Stewart/Lightfoot Table E.1',
     },
@@ -276,6 +297,12 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
         'status': 'proxy',
         'source': 'estimated sparse-data SiO vapor Lennard-Jones row',
     },
+    # CrO2 deliberately has NO provenance row: condensation/deposition transport
+    # for CrO2 uses the documented DEFAULT_BINARY_DIFFUSION_M2_S fallback (pinned
+    # by test_cro2_condensation_transport_uses_documented_default_fallback). The
+    # SiO-based CLASS-PROXY exists only on the evaporation path
+    # (engines/builtin/evaporation_flux.py::_EVAPORATION_LJ_PROXY_PARAMS); a row
+    # here would falsely report proxy authority for deposition transport.
 }
 
 DEFAULT_CARRIER_GAS = 'N2'  # C2A pN2 sweep; CO2 for Mars feedstocks
@@ -286,7 +313,7 @@ STAGE_AREA_KEY_BY_STAGE_NUMBER = {
     4: 'alkali_stage4',
     7: 'terminal',
 }
-SUPPORTED_CARRIER_GAS_LABELS = 'N2/pN2, Ar/pAr, CO2/pCO2'
+SUPPORTED_CARRIER_GAS_LABELS = 'He/pHe, N2/pN2, Ar/pAr, CO2/pCO2'
 STICKING_DATA_PATH = DATA_DIR / 'literature' / 'vacuum_pyrolysis_sticking.yaml'
 WALL_REACTIVITY_MATRIX_PATH = (
     DATA_DIR / 'literature' / 'wall_reactivity_matrix.yaml'
@@ -1432,6 +1459,8 @@ def _chapman_enskog_d_ab_m2_s(
     T_K: float,
     pressure_pa: float,
     carrier: str = DEFAULT_CARRIER_GAS,
+    *,
+    species_params: tuple[float, float, float] | None = None,
 ) -> float:
     """Binary diffusion coefficient ``D_AB`` for ``species`` in
     ``carrier`` gas at ``T_K``, ``pressure_pa``. Returns m²/s.
@@ -1447,11 +1476,13 @@ def _chapman_enskog_d_ab_m2_s(
         σ_AB = (σ_A + σ_B) / 2       (collision diameter, Angstrom)
         Ω_D  = Neufeld collision integral at T* = T * k_B / ε_AB
 
-    Returns 0 on unknown species (caller falls back to the legacy
-    constant via the explicit ``diffusion_coefficient_m2_s`` parameter
-    on the flux callers).
+    ``species_params`` lets a caller supply a path-local proxy without adding
+    it to the shared condensation table. Returns 0 on unknown species (caller
+    falls back to the legacy constant via the explicit
+    ``diffusion_coefficient_m2_s`` parameter on the flux callers).
     """
-    species_params = _LENNARD_JONES_PARAMS.get(species)
+    if species_params is None:
+        species_params = _LENNARD_JONES_PARAMS.get(species)
     carrier_key = _canonical_carrier_gas_key(carrier)
     carrier_params = _LENNARD_JONES_PARAMS.get(carrier_key)
     if species_params is None or carrier_params is None:
@@ -1495,6 +1526,8 @@ def _canonical_carrier_gas_key(carrier_gas: str | None) -> str:
     upper = text.upper().replace(' ', '').replace('_', '').replace('-', '')
     if upper in {'N2', 'PN2', 'N2SWEEP', 'PN2SWEEP'}:
         return 'N2'
+    if upper in {'HE', 'PHE'}:
+        return 'He'
     if upper in {'AR', 'PAR'}:
         return 'Ar'
     if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
@@ -1518,25 +1551,30 @@ def _carrier_collision_diameter_diagnostic(carrier_gas: str) -> dict[str, Any]:
         if carrier_gas is None
         else str(carrier_gas).strip()
     )
-    params = _LENNARD_JONES_PARAMS.get(requested_key)
-    if params is not None:
+    properties = CARRIER_GAS_PROPERTIES.get(requested_key)
+    if properties is not None:
         provenance = _LENNARD_JONES_PROVENANCE.get(requested_key, {})
         return {
             'requested_carrier_gas': requested,
             'applied_carrier_gas': requested_key,
             'carrier_gas_status': provenance.get('status', 'sourced'),
             'carrier_gas_reason': '',
-            'carrier_collision_diameter_m': float(params[0]) * 1.0e-10,
+            'carrier_collision_diameter_m': properties.collision_diameter_m,
             'carrier_collision_diameter_source': provenance.get('source', ''),
         }
     raise _unsupported_carrier_gas_error(carrier_gas)
 
 
+def carrier_gas_properties(carrier_gas: str | None) -> CarrierGasProperties:
+    key = _canonical_carrier_gas_key(carrier_gas)
+    try:
+        return CARRIER_GAS_PROPERTIES[key]
+    except KeyError:
+        raise _unsupported_carrier_gas_error(carrier_gas) from None
+
+
 def _carrier_collision_diameter_m(carrier_gas: str) -> float:
-    params = _LENNARD_JONES_PARAMS.get(_canonical_carrier_gas_key(carrier_gas))
-    if params is None:
-        return N2_COLLISION_DIAMETER_M
-    return float(params[0]) * 1.0e-10
+    return carrier_gas_properties(carrier_gas).collision_diameter_m
 
 
 def _transport_parameter_notice(
@@ -1678,6 +1716,8 @@ class CondensationRouteResult:
         default_factory=dict)
     transport_parameter_notice: Dict[str, Any] = field(default_factory=dict)
     capture_budget_regularizer_notice: Dict[str, Any] = field(default_factory=dict)
+    condensation_refusals_by_species: Dict[str, Dict[str, Any]] = field(
+        default_factory=dict)
     stage_area_geometry_provenance_notice: Dict[str, Any] = field(
         default_factory=dict)
 
@@ -1787,6 +1827,7 @@ class CondensationModel:
         self.knudsen_regime = KnudsenRegime.FREE_MOLECULAR
         self._knudsen_policy_configured = False
         self._viscous_flow_required = True
+        self.lab_geometry: LabGeometry | None = None
         self.pipe_segments = self._build_default_pipe_segments(
             float(wall_temperature_C))
         self.cold_spot_margin_C = COLD_SPOT_MARGIN_C
@@ -2385,6 +2426,7 @@ class CondensationModel:
         wall_sticking_alpha_by_species: dict[str, float] = {}
         wall_sticking_alpha_provenance_by_species: dict[str, Any] = {}
         transport_parameter_notice_by_species: dict[str, Any] = {}
+        condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
         used_capture_budget_regularizer = False
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
@@ -2407,6 +2449,17 @@ class CondensationModel:
             remaining_kg = rate_kg_hr  # Mass still in vapor phase
             wall_deposit_fraction_by_species[species] = 0.0
             wall_deposit_account_fractions_by_species[species] = {}
+
+            if not _species_has_antoine_data(
+                species,
+                vapor_pressure_data=self.vapor_pressure_data,
+            ):
+                remaining_by_species[species] = max(0.0, rate_kg_hr)
+                condensation_refusals_by_species[species] = {
+                    'status': 'refused',
+                    'reason': 'antoine_data_unavailable',
+                }
+                continue
 
             T_cond = _species_condensation_temperature_C(
                 species,
@@ -2668,6 +2721,8 @@ class CondensationModel:
             sticking_alpha_provenance_notice=sticking_notice,
             transport_parameter_notice=transport_notice,
             capture_budget_regularizer_notice=capture_notice,
+            condensation_refusals_by_species=(
+                condensation_refusals_by_species),
             stage_area_geometry_provenance_notice=geometry_notice,
         )
 
@@ -2701,7 +2756,7 @@ class CondensationModel:
             pipe_segments=self.pipe_segments,
             carrier_gas=carrier_gas,
         )
-        if current.get('status') != 'refused':
+        if current.get('regime') != KnudsenRegime.FREE_MOLECULAR.value:
             prior = self.last_knudsen_pressure_adjustment
             if (
                     prior.get('status') == 'applied'
@@ -2749,15 +2804,14 @@ class CondensationModel:
         }
         if applied_pN2_mbar > band_max:
             diagnostic.update({
-                'status': 'refused',
-                'reason': 'c2a_knudsen_pressure_window_empty',
-                'reason_refused': KNUDSEN_REFUSAL_REASON,
+                'status': 'warning',
+                'reason': 'c2a_knudsen_pressure_window_continuous_transport',
                 'required_pN2_mbar': applied_pN2_mbar,
+                'band_max_pN2_mbar': band_max,
+                'band_max_p_total_mbar': pO2 + band_max,
             })
             self.last_knudsen_pressure_adjustment = dict(diagnostic)
-            refusal = dict(current)
-            refusal['pressure_adjustment'] = dict(diagnostic)
-            raise KnudsenRegimeRefusal(refusal)
+            return diagnostic
 
         diagnostic.update({
             'applied_pN2_mbar': applied_pN2_mbar,
@@ -2915,6 +2969,8 @@ class CondensationModel:
         self,
         species: str,
     ) -> list[PipeSegment]:
+        if self.lab_geometry is not None:
+            return list(self.pipe_segments)
         target_stage_number = designated_stage_number(species)
         if target_stage_number is None:
             return []
@@ -3063,7 +3119,6 @@ class CondensationModel:
         if hi_C < lo_C:
             lo_C, hi_C = hi_C, lo_C
 
-        band_flux_fraction = 0.0
         band_flux_mol_m2_s = 0.0
         width_C = hi_C - lo_C
         spec = (
@@ -3121,15 +3176,14 @@ class CondensationModel:
                 overhead_pressure_pa=overhead_pressure_pa,
                 carrier_gas=self.carrier_gas,
                 vapor_pressure_data=self.vapor_pressure_data,
-                # Owner scope for 2026-06-29 re-evap fix is wall deposits
-                # only; keep historical condenser-stage capture unchanged.
+                # Wall CrO2 remains reversible; designated Stage 2 instead
+                # materializes the declared stable Cr2O3 + O2 product route.
                 reactive_product_backstop=False,
+                stable_condensation_product_backstop=(species == 'CrO2'),
                 antoine_extrapolations=antoine_extrapolations,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
-            band_flux_fraction += flux / reference_flux
             band_flux_mol_m2_s += flux
-        band_flux_fraction /= HKL_BAND_SAMPLES
         band_flux_mol_m2_s /= HKL_BAND_SAMPLES
         if isinstance(alpha_record, MutableMapping) and isinstance(spec, Mapping):
             alpha_record['alpha_s_sample_temperature_range_K'] = [
@@ -3239,6 +3293,23 @@ def _missing_required_antoine_keys(block: Any) -> tuple[str, ...]:
         if key not in candidate
     }
     return tuple(sorted(missing))
+
+
+def _species_has_antoine_data(
+    species: str,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+) -> bool:
+    data = _species_vapor_data(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    return any(
+        isinstance(block, Mapping)
+        and not _missing_required_antoine_keys(block)
+        for block_name in _ANTOINE_COEFFICIENT_BLOCKS
+        if (block := data.get(block_name)) is not None
+    )
 
 
 def apply_setpoints_condensation_temperature_overrides(
@@ -4088,6 +4159,7 @@ def _wall_deposition_driving_pressure_pa(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     reactive_product_backstop: bool = True,
+    stable_condensation_product_backstop: bool = False,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
@@ -4112,6 +4184,13 @@ def _wall_deposition_driving_pressure_pa(
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
+    if stable_condensation_product_backstop:
+        if species != 'CrO2':
+            raise ValueError(
+                'stable condensation-product backstop is authorized only '
+                f'for CrO2, got {species!r}'
+            )
+        return max(0.0, local_pressure_pa)
     if P_sat_pa is None or not math.isfinite(P_sat_pa):
         return 0.0
     if reactive_product_backstop:
@@ -4196,6 +4275,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     radial_stir_factor: float | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     reactive_product_backstop: bool = True,
+    stable_condensation_product_backstop: bool = False,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> float:
@@ -4252,7 +4332,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     # math and out the other side as NaN/inf fluxes that poison the
     # downstream ledger. Codex pre-0.5.2 Phase B P1 (NaN propagation +
     # regime_factor escape route). Fail closed at the gate.
-    if pipe_diameter_m <= 0.0 or alpha_s <= 0.0:
+    if pipe_diameter_m <= 0.0 or alpha_s <= 0.0 or T_surface_K <= 0.0:
         return 0.0
     if not (math.isfinite(pipe_diameter_m) and math.isfinite(alpha_s)
             and math.isfinite(P_local_pa) and math.isfinite(T_surface_K)):
@@ -4263,6 +4343,9 @@ def _series_resistance_deposition_flux_mol_m2_s(
         T_surface_K,
         vapor_pressure_data=vapor_pressure_data,
         reactive_product_backstop=reactive_product_backstop,
+        stable_condensation_product_backstop=(
+            stable_condensation_product_backstop
+        ),
         antoine_extrapolations=antoine_extrapolations,
         antoine_extrapolation_warnings=antoine_extrapolation_warnings,
     )
@@ -4671,11 +4754,11 @@ def knudsen_regime_diagnostic(
     status = 'ok'
     reason = ''
     if worst_regime is KnudsenRegime.FREE_MOLECULAR:
-        status = 'refused'
+        status = 'warning'
         reason = KNUDSEN_REFUSAL_REASON
         warnings.append(
-            'Knudsen number is outside viscous-flow validity; '
-            'condensation routing refused.'
+            'Knudsen number is outside viscous-flow validity; continuous '
+            'free-molecular surface transport applied.'
         )
     elif worst_regime is KnudsenRegime.TRANSITIONAL:
         status = 'warning'
@@ -5017,6 +5100,11 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
         designated_species_kg: dict[str, float] = {}
         coproduct_species_kg: dict[str, float] = {}
         impurity_species_kg: dict[str, float] = {}
+        activity = {
+            species: float(stage.collected_kg[species]) > 1e-12
+            for species in sorted(accepted_species)
+            if species in stage.collected_kg
+        }
         for species, kg in sorted(stage.collected_kg.items()):
             kg = float(kg)
             if abs(kg) <= 1e-12:
@@ -5042,7 +5130,7 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
         else:
             verdict = 'CONTAMINATED'
 
-        report[stage_key] = {
+        stage_report = {
             'stage_number': stage_number,
             'label': stage.label,
             'accepted_species': sorted(accepted_species),
@@ -5059,4 +5147,7 @@ def stage_purity_report(train: CondensationTrain) -> dict[str, dict[str, Any]]:
                 if impurity_kg > 1e-12 else ''
             ),
         }
+        if activity:
+            stage_report['activity'] = activity
+        report[stage_key] = stage_report
     return report

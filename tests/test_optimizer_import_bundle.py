@@ -204,6 +204,10 @@ def _sqlite_bytes(
                     else cost_parameters
                 ),
             )
+            if record.get("conditional_subspace_digest"):
+                spec_payload["conditional_subspace_digest"] = str(
+                    record["conditional_subspace_digest"]
+                )
             conn.execute(
                 """
                 INSERT INTO results
@@ -468,6 +472,35 @@ def test_import_accepts_current_schema_version_bundle(tmp_path: Path) -> None:
     assert (imported.path / "study.profile.yaml").is_file()
 
 
+def test_t155_import_preserves_conditional_subspace_identity_in_cache(
+    tmp_path: Path,
+) -> None:
+    digest = "conditional-subspace-digest"
+    bundle = _write_zip(
+        tmp_path / "conditional-identity.rpstudy.zip",
+        _members(
+            tmp_path,
+            sqlite_rows=[
+                {
+                    "cache_key": "cache-a",
+                    "candidate_id": "candidate-a",
+                    "conditional_subspace_digest": digest,
+                }
+            ],
+        ),
+    )
+
+    imported = import_study_bundle(
+        bundle,
+        tmp_path / "runs",
+        verification_tier=0,
+        evaluator=_evaluator(oxygen=10.0),
+    )
+    with sqlite3.connect(imported.path / "cache.sqlite") as conn:
+        payload = json.loads(conn.execute("SELECT eval_spec FROM results").fetchone()[0])
+    assert payload["conditional_subspace_digest"] == digest
+
+
 def test_import_rejects_failed_job_status_before_commit(tmp_path: Path) -> None:
     members = _members(tmp_path)
     members["job_status.json"] = _json_bytes(
@@ -541,6 +574,30 @@ def test_import_rejects_running_job_status_with_success_true(tmp_path: Path) -> 
     with pytest.raises(ImportBundleError, match="job_status.json reports unsuccessful"):
         import_study_bundle(
             bundle, tmp_path / "runs", verification_tier=0, evaluator=_evaluator(oxygen=10.0)
+        )
+
+
+@pytest.mark.parametrize("status", ["SUCCESS", "COMPLETED", "COMPLETE"])
+def test_import_rejects_producer_impossible_success_aliases(
+    tmp_path: Path,
+    status: str,
+) -> None:
+    members = _members(tmp_path)
+    members["job_status.json"] = _json_bytes(
+        {
+            "member_schema_version": MEMBER_SCHEMA_VERSION,
+            "status": status,
+            "success": True,
+        }
+    )
+    bundle = _write_zip(tmp_path / f"alias-{status}.rpstudy.zip", members)
+
+    with pytest.raises(ImportBundleError, match="job_status.json reports unsuccessful"):
+        import_study_bundle(
+            bundle,
+            tmp_path / "runs",
+            verification_tier=0,
+            evaluator=_evaluator(oxygen=10.0),
         )
 
 

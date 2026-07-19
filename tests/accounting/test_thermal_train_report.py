@@ -517,7 +517,7 @@ def test_real_deterministic_runs_are_record_and_ledger_byte_neutral() -> None:
 def test_report_without_history_is_typed_no_data() -> None:
     report = AccountingQueries(_sim(BatchRecord())).thermal_train_report()
     assert report == {
-        "schema_version": "thermal-train-report-v1",
+        "schema_version": "thermal-train-report-v2",
         "status": "no_data",
         "reason": "no_run_history",
         "train_closes_for_run": False,
@@ -527,15 +527,24 @@ def test_report_without_history_is_typed_no_data() -> None:
     }
 
 
-def test_declared_cold_capacity_drives_separate_overflow_diagnostic() -> None:
+def test_structured_hardware_minimum_drives_separate_overflow_diagnostic() -> None:
+    payload = yaml.safe_load(Path("data/thermal_train_params.yaml").read_text(encoding="utf-8"))
+    payload["cold_train"]["rating"]["compressor_mass_flow_limit_kg_hr"]["value"] = 10.0
+    payload["cold_train"]["rating"]["refrigeration_freeze_rate_kg_hr"]["value"] = 8.0
     report = report_from_recorded_series(
         [{}],
         [1000.0],
         [1773.15],
         setpoints=_setpoints(),
-        rated_cold_train_kg_hr=10.0,
+        parameters=thermal_train_parameters_from_mapping(payload),
     )
     assert report["peaks"]["cold_o2_kg_hr"] == pytest.approx(31.998)
-    assert report["capacity"]["thermal_train_overflow_kg_hr"] == pytest.approx(21.998)
-    assert report["capacity"]["basis"] == "declared_rated_capacity"
+    assert report["capacity"]["rated_cold_train_kg_hr"] == 8.0
+    assert report["capacity"]["thermal_train_overflow_kg_hr"] == pytest.approx(23.998)
+    assert report["capacity"]["basis"] == "hardware_rating_minimum"
+    assert report["capacity"]["rating_reference"] == {
+        "p_ref_Pa": 45000.0,
+        "T_ref_K": 120.0,
+        "authority": "diagnostic_scalar_rating_reference_not_capacity_source",
+    }
     assert report["capacity"]["deposition_gate"]["criterion"] == "p_O2 > P_sub(T_wall)"

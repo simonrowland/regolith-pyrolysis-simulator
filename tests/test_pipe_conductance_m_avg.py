@@ -44,6 +44,49 @@ from simulator.state import (
 )
 
 
+def test_condensation_operating_conditions_keep_gas_and_wall_temperatures_distinct():
+    configured = {}
+    overhead = SimpleNamespace(
+        pipe_diameter_m=0.4,
+        estimate_transport_state=lambda _flux, _melt: {
+            "pipe_temperature_C": 900.0,
+            "conductance_temperature_C": 1450.0,
+            "pressure_mbar": 2.0,
+            "stage_area_m2_by_stage": {},
+        },
+        resolve_pipe_segment_temperatures_C=lambda names, _melt: {
+            name: 850.0 + index * 25.0
+            for index, name in enumerate(names)
+        },
+    )
+    condensation = SimpleNamespace(
+        pipe_segments=(SimpleNamespace(name="duct_a"), SimpleNamespace(name="duct_b")),
+        configure_operating_conditions=lambda **kwargs: configured.update(kwargs),
+    )
+    sim = SimpleNamespace(
+        overhead_model=overhead,
+        condensation_model=condensation,
+        melt=SimpleNamespace(
+            stir_state=SimpleNamespace(radial=1.0),
+            campaign=None,
+            campaign_hour=0.0,
+        ),
+        _resolve_condensation_carrier_gas=lambda: "N2",
+    )
+
+    PyrolysisSimulator._configure_condensation_operating_conditions(
+        sim,
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}),
+    )
+
+    assert configured["gas_temperature_C"] == pytest.approx(1450.0)
+    assert configured["wall_temperature_C"] == pytest.approx(900.0)
+    assert configured["pipe_segment_temperatures_C"] == {
+        "duct_a": 850.0,
+        "duct_b": 875.0,
+    }
+
+
 # ---------------------------------------------------------------------------
 # 1. _mean_molar_mass_kg_mol — pure-species sanity
 # ---------------------------------------------------------------------------
@@ -653,6 +696,8 @@ def test_vapor_pressure_scales_with_square_root_of_flux():
 
 def test_loop3_vacuum_overcapacity_exceeds_100_and_throttles_ramp():
     model = _make_model()
+    # Explicit test choice: 0.085 m³ was the former fail-open product default.
+    model.configure_headspace({"enabled": True, "volume_m3": 0.085})
     melt = MeltState()
     melt.temperature_C = 1500.0
     melt.p_total_mbar = 0.0

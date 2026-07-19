@@ -55,7 +55,7 @@ def test_account_units_match_ledger_ground_truth_and_are_basis_aware():
     api = _api()
     ledger = api.ledger
     assert api.account("process.cleaned_melt", units="kg")["species"] == ledger.kg_by_account("process.cleaned_melt")
-    assert api.account("process.cleaned_melt", units="mol")["species"] == ledger.mol_by_account("process.cleaned_melt")
+    assert api.account("process.cleaned_melt", units="mol")["species"] == ledger.project_account_mol("process.cleaned_melt")
     wt = api.account("process.cleaned_melt", units="wt_pct")
     assert wt["basis"] == "oxide"
     assert sum(wt["species"].values()) == pytest.approx(100.0)
@@ -108,6 +108,9 @@ def test_snapshot_is_versioned_attested_and_read_only():
     assert before == after
     assert snapshot["ledger_schema_version"] == LEDGER_SCHEMA_VERSION
     assert snapshot["provenance"]["mass_balance_attested"] is True
+    assert snapshot["provenance"]["balance_tolerance_kg"] == 1.0e-12
+    assert snapshot["provenance"]["balance_projection_relative_tolerance"] == 1.0e-12
+    assert snapshot["provenance"]["balance_projection_absolute_floor_kg"] == 1.0e-15
     assert api.accounts()["ledger_schema_version"] == LEDGER_SCHEMA_VERSION
 
 

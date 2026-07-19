@@ -172,6 +172,9 @@ def _synthetic_result(
     phase_modes_wt_pct: dict,
 ) -> dict:
     return {
+        'temperature_C': 1400.0,
+        'pressure_bar': 1.0,
+        'fO2_log': -9.0,
         'liquidus_T_K': liquidus_T_K,
         'phase_modes_wt_pct': dict(phase_modes_wt_pct),
         'phases_present': sorted(phase_modes_wt_pct),
@@ -196,6 +199,21 @@ def test_parity_identical_results_agree():
     assert report.mode_pct_max_delta == 0.0
     assert report.phases_only_in_authoritative == ()
     assert report.phases_only_in_shadow == ()
+
+
+def test_parity_rejects_equal_outputs_without_required_state_points():
+    result = {
+        'liquidus_T_C': 1350.0,
+        'phase_modes_wt_pct': {'liquid': 100.0},
+    }
+
+    report = MAGEMinParityComparator().compare(result, result)
+
+    assert report.agreement is False
+    assert any(
+        'state point' in warning and 'missing' in warning
+        for warning in report.warnings
+    )
 
 
 def test_parity_100K_liquidus_delta_disagrees():
@@ -276,11 +294,88 @@ def test_parity_does_not_treat_equilibration_temperature_as_liquidus():
     assert report.liquidus_T_delta_K is None
     assert any('cannot evaluate parity' in w for w in report.warnings)
 
-    auth_real = {'temperature_C': 1600.0, 'liquidus_T_C': 1350.0}
-    shadow_real = {'temperature_C': 1600.0, 'liquidus_T_C': 1340.0}
+    auth_real = {
+        'temperature_C': 1600.0,
+        'pressure_bar': 1.0,
+        'fO2_log': -9.0,
+        'liquidus_T_C': 1350.0,
+    }
+    shadow_real = {**auth_real, 'liquidus_T_C': 1340.0}
     real_report = comp.compare(auth_real, shadow_real)
     assert real_report.liquidus_T_delta_K == pytest.approx(10.0)
     assert real_report.agreement is True
+
+
+def test_parity_rejects_equal_outputs_computed_at_unequal_state_points():
+    comp = MAGEMinParityComparator()
+    auth = {
+        "temperature_C": 1400.0,
+        "pressure_bar": 1.0,
+        "fO2_log": -9.0,
+        "liquidus_T_C": 1350.0,
+    }
+    shadow = {
+        **auth,
+        "temperature_C": 1450.0,
+        "pressure_bar": 2.0,
+        "fO2_log": -8.0,
+    }
+
+    report = comp.compare(auth, shadow)
+
+    assert report.agreement is False
+    assert sum("unequal state point" in warning for warning in report.warnings) == 3
+
+
+def test_provider_parity_threads_control_audit_state_points() -> None:
+    provider = MAGEMinShadowProvider()
+    diagnostic = {"liquidus_T_C": 1350.0, "phase_modes_wt_pct": {"liq": 100.0}}
+    auth = {
+        "status": "ok",
+        "diagnostic": diagnostic,
+        "control_audit": {
+            "applied": {"temperature_C": 1400.0, "pressure_bar": 1.0, "fO2_log": -9.0}
+        },
+    }
+    shadow = {
+        "status": "ok",
+        "diagnostic": diagnostic,
+        "control_audit": {
+            "applied": {"temperature_C": 1450.0, "pressure_bar": 1.0, "fO2_log": -9.0}
+        },
+    }
+
+    report = provider.parity_compare(auth, shadow)
+
+    assert report is not None
+    assert report.agreement is False
+    assert any(
+        "unequal state point temperature_C" in warning
+        for warning in report.warnings
+    )
+    assert not any("missing" in warning for warning in report.warnings)
+
+
+def test_provider_parity_accepts_equal_optional_fo2_state_points() -> None:
+    provider = MAGEMinShadowProvider()
+    diagnostic = {"liquidus_T_C": 1350.0, "phase_modes_wt_pct": {"liq": 100.0}}
+    result = {
+        "status": "ok",
+        "diagnostic": diagnostic,
+        "control_audit": {
+            "applied": {
+                "temperature_C": 1400.0,
+                "pressure_bar": 1.0,
+                "fO2_log": None,
+            }
+        },
+    }
+
+    report = provider.parity_compare(result, result)
+
+    assert report is not None
+    assert report.agreement is True
+    assert report.warnings == []
 
 
 # ----------------------------------------------------------------------
@@ -297,8 +392,8 @@ def test_provider_capability_profile_declares_silicate_intent_set():
     })
 
 
-def test_provider_capability_profile_authority_limited_to_gate_intent():
-    """MAGEMin stays shadow-only for full silicate-state intents."""
+def test_provider_gate_fallback_owns_dispatch_but_not_ledger_authority():
+    """MAGEMin gate fallback remains diagnostic-only at the ledger boundary."""
     profile = MAGEMinShadowProvider().capability_profile()
     assert profile.is_authoritative_for == frozenset({
         ChemistryIntent.GATE_LIQUID_FRACTION,
@@ -309,6 +404,8 @@ def test_provider_capability_profile_authority_limited_to_gate_intent():
     ):
         assert not profile.is_authoritative(intent)
     assert profile.is_authoritative(ChemistryIntent.GATE_LIQUID_FRACTION)
+    for intent in profile.intents:
+        assert not profile.may_emit_ledger_transition(intent)
 
 
 def test_provider_declares_only_cleaned_melt_account():

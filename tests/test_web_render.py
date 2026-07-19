@@ -95,10 +95,14 @@ def producer_backed_operator_tick(monkeypatch):
     monkeypatch.setattr(app_module.socketio, "sleep", stop_after_first_positive_sleep)
 
     app = app_module.create_app()
-    html_response = app.test_client().get("/")
+    http_client = app.test_client()
+    html_response = http_client.get("/")
     assert html_response.status_code == 200
 
-    client = app_module.socketio.test_client(app)
+    client = app_module.socketio.test_client(
+        app,
+        flask_test_client=http_client,
+    )
     assert client.is_connected()
     client.get_received()
 

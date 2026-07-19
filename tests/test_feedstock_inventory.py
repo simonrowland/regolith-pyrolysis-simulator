@@ -670,7 +670,7 @@ def test_mixed_organic_stage0_formula_routes_to_oxidized_offgas():
 
     sim.load_batch("comet", mass_kg=1000.0)
     inv = sim.inventory
-    expected_products, expected_o2 = sim._oxidized_stage0_products(
+    expected_products, expected_o2, _solid_char = sim._oxidized_stage0_products(
         "organics", inv.raw_components_kg["organics"])
 
     assert "organics" not in inv.gas_volatiles_kg
@@ -722,7 +722,7 @@ def test_stage0_complete_oxidation_routes_surplus_o2_to_stage0_terminal():
     )
 
     sim.load_batch("peroxide", mass_kg=1000.0)
-    products, oxidant_kg = sim._oxidized_stage0_products(
+    products, oxidant_kg, _solid_char = sim._oxidized_stage0_products(
         "h2o2", sim.inventory.raw_components_kg["h2o2"])
     stage0_o2_kg = products["O2"]
     snapshot = sim._make_snapshot()
@@ -1722,9 +1722,7 @@ def test_oxygen_is_not_duplicated_in_product_ledger():
     sim.train.stages[1].collected_kg["O2"] = 1.5
     sim.train.stages[4].collected_kg["O2"] = 3.5
     sim._dispatch_overhead_bleed(
-        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
-        o2_vented_kg=3.0,
     )
     snapshot = sim._make_snapshot()
     sim.melt.campaign = CampaignPhase.COMPLETE
@@ -1732,23 +1730,24 @@ def test_oxygen_is_not_duplicated_in_product_ledger():
 
     assert "O2" not in sim.record.products_kg
     assert snapshot.oxygen_produced_kg == pytest.approx(5.0)
-    assert snapshot.O2_stored_kg == pytest.approx(2.0)
-    assert snapshot.O2_vented_cumulative_kg == pytest.approx(3.0)
+    assert snapshot.O2_stored_kg == pytest.approx(5.0)
+    assert snapshot.O2_vented_cumulative_kg == pytest.approx(0.0)
     assert snapshot.stage0_O2_stored_kg == pytest.approx(0.0)
-    assert snapshot.melt_offgas_O2_stored_kg == pytest.approx(2.0)
-    assert snapshot.melt_offgas_O2_vented_kg == pytest.approx(3.0)
+    assert snapshot.melt_offgas_O2_stored_kg == pytest.approx(5.0)
+    assert snapshot.melt_offgas_O2_vented_kg == pytest.approx(0.0)
     assert snapshot.mre_anode_O2_stored_kg == pytest.approx(0.0)
-    assert snapshot.condensation_totals["O2"] == pytest.approx(2.0)
+    assert snapshot.condensation_totals["O2"] == pytest.approx(5.0)
     assert sim.record.oxygen_total_kg == pytest.approx(5.0)
-    assert sim.record.oxygen_stored_kg == pytest.approx(2.0)
-    assert sim.record.oxygen_vented_kg == pytest.approx(3.0)
+    assert sim.record.oxygen_stored_kg == pytest.approx(5.0)
+    assert sim.record.oxygen_vented_kg == pytest.approx(0.0)
     assert (
         sim.record.oxygen_stored_kg + sim.record.oxygen_vented_kg
         == pytest.approx(sim.record.oxygen_total_kg))
     assert sim.atom_ledger.kg_by_account(
-        "terminal.oxygen_melt_offgas_stored")["O2"] == pytest.approx(2.0)
+        "terminal.oxygen_melt_offgas_stored")["O2"] == pytest.approx(5.0)
     assert sim.atom_ledger.kg_by_account(
-        "terminal.oxygen_melt_offgas_vented_to_vacuum")["O2"] == pytest.approx(3.0)
+        "terminal.oxygen_melt_offgas_vented_to_vacuum"
+    ).get("O2", 0.0) == pytest.approx(0.0)
     assert sum(
         stage.collected_kg.get("O2", 0.0)
         for stage in sim.train.stages

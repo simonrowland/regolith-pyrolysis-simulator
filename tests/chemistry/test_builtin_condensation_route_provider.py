@@ -145,34 +145,39 @@ from tests.chemistry.conftest import _build_sim
 # an active wall Si lot, changing these pins only by the explicitly conserved
 # sub-floor components.
 EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
+    # 2026-07-17 t-160/t-159/t-260: executable full-path rebaseline after
+    # corrected residual capture and transport composition.
+    # 2026-07-14 t-194 Cr grounding: executable C0->C6 reruns use alpha=0.9
+    # for Cr instead of the prototype-unity fallback; coupled trace wall pins
+    # move slightly.
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 8.674071065810759e-07,
-            "SiO2": 1.8556674803172791e-06,
+            "Si": 3.488847972097408e-06,
+            "SiO2": 7.463786815293877e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 9.758055561681058e-07,
-            "SiO2": 2.0875672149278365e-06,
+            "Si": 3.5901506661581253e-06,
+            "SiO2": 7.68050640821715e-06,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 8.737586063321803e-07,
-            "SiO2": 1.8692554154978237e-06,
+            "Si": 2.4917739566143708e-06,
+            "SiO2": 5.330719410192673e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 9.829559624065655e-07,
-            "SiO2": 2.1028642723615334e-06,
+            "Si": 2.5938217138608916e-06,
+            "SiO2": 5.5490329369380074e-06,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 7.265713972604444e-07,
-            "SiO2": 1.5543738387608785e-06,
+            "Si": 2.820757660060282e-06,
+            "SiO2": 6.034523143649702e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 8.173665116123509e-07,
-            "SiO2": 1.7486142822576064e-06,
+            "Si": 2.9512809690021463e-06,
+            "SiO2": 6.313755188198538e-06,
         },
     },
 }

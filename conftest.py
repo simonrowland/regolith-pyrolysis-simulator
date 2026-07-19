@@ -97,7 +97,7 @@ def production_configured_condensation_route(monkeypatch):
                 wall_temperature_C=transport["pipe_temperature_C"],
                 overhead_pressure_mbar=transport["pressure_mbar"],
                 pipe_diameter_m=overhead_model.pipe_diameter_m,
-                gas_temperature_C=transport["pipe_temperature_C"],
+                gas_temperature_C=transport["conductance_temperature_C"],
                 stage_area_m2_by_stage=transport["stage_area_m2_by_stage"],
                 stage_area_geometry_provenance_notice=transport.get(
                     "stage_area_geometry_provenance_notice", {}

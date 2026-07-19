@@ -65,31 +65,25 @@ ELLINGHAM_THERMO: dict[str, tuple[float, float, float, float]] = {
     # Legacy representative high-T coefficients kept for keying/stoichiometry
     # compatibility. Authoritative dG(T) now comes from ELLINGHAM_FIT_SEGMENTS.
     # V1c JANAF high-T refit over 1100-1700 K for Na/K/Fe/Cr/Mg/Ca/Al/Ti/Si.
+    # Here dH_f is the intercept of the fitted dG(T)=dH_f-T*dS_f line, not a
+    # second 298 K formation-enthalpy table.  Its high-T JANAF reaction basis
+    # includes the applicable metal/oxide phases (for example gaseous Na/K and
+    # the Mg liquid/gas transition), so its magnitude must not be unified with
+    # the 298 K dissociation values in thermal_budget.py.
     # Per-species trailing IDs are the JANAF grounding-corpus anchors;
     # dG(1600C) values are the cross-check used during refit.
     #
-    # Mn updated 0.5.2 (2026-05-27) from the 298 K basis to a proper
-    # HIGH-T linear refit anchored on Mn(l) above the solid->liquid
-    # transition at 1517 K (NIST-JANAF Mn-008 + phase transition data).
-    # Reaction is 2 Mn(l) + O2 -> 2 MnO(s) over the 1517-1700 K window
-    # (Mn liquid, MnO solid; MnO melts at 2058 K above any furnace-
-    # survivable T):
-    #   dH(rxn, Mn liquid) = dH(rxn, Mn solid) - 2 * dH_fus(Mn)
-    #                      = -770.44 - 2 * 12.05 = -794.54 kJ/mol O2
-    #   dS(rxn, Mn liquid) = dS(rxn, Mn solid) - 2 * dS_fus(Mn)
-    #                      = -149.75 - 2 * 7.95 = -165.65 J/K
-    # Below 1517 K the table underestimates oxide stability by
-    # ~5-15 kJ/mol O2 (Mn solid is reactant; the table assumes liquid).
-    # Acceptable for the simulator's use case: Mn high-T vapor pressure
-    # governs evaporation; the recipe T window where Mn matters
-    # (1500-1800 K) is in the liquid-Mn regime where the table is
-    # accurate. Mn is a minor byproduct (~0.2 wt% MnO in lunar mare) so
-    # the sub-1517 K residual is well below the V1c approximation band.
+    # The Mn tuple is the legacy representative Mn(l)-basis row retained for
+    # keying and stoichiometry compatibility only. Authoritative Mn dG(T)
+    # queries route through ELLINGHAM_FIT_SEGMENTS: Pankratz primary-refit
+    # beta/gamma/delta solid-Mn rows cover 1100-1519 K, followed by the
+    # explicitly reconstructed-limited Mn(l) sidecar. No runtime Mn dG(T)
+    # consumer reads this flat row as thermodynamic authority.
     'Na': (-1135.130, -0.537417, 4, 2),      # Na-012,  dG(1600C) ~ -128
     'K':  (-975.838, -0.520580, 4, 2),       # K-012,   dG(1600C) ~ -1
     'Fe': (-538.946, -0.125272, 2, 2),       # Fe-018,  dG(1600C) ~ -304
-    'Mn': (-794.540, -0.165650, 2, 2),       # Mn-008 high-T (Mn(l)+O2->MnO(s),
-                                             # 1517-1700 K basis); dG(1600C) ~ -484
+    'Mn': (-794.540, -0.165650, 2, 2),       # Legacy Mn(l) compatibility row;
+                                             # dG authority is segmented below.
     'Cr': (-748.076, -0.168676, 4/3, 2/3),   # Cr-014,  dG(1600C) ~ -432
     'Mg': (-1342.444, -0.336009, 2, 2),      # Mg-008,  dG(1600C) ~ -713
     'Ca': (-1285.155, -0.222295, 2, 2),      # Ca-027,  dG(1600C) ~ -869

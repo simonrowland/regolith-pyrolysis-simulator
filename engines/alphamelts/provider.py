@@ -57,10 +57,6 @@ from engines.alphamelts.subprocess_runner import (
 from simulator.melt_backend.alphamelts_contract import (
     AlphaMELTSSubprocessRunMode,
 )
-from engines.alphamelts.thermoengine import (
-    equilibrate_via_thermoengine,
-    thermoengine_available,
-)
 from engines.domain_reason import OutOfDomainReason, reason_value
 from simulator.chemistry.kernel.capabilities import (
     CapabilityProfile,
@@ -132,13 +128,11 @@ class AlphaMELTSProvider(ChemistryProvider):
         return CapabilityProfile(
             provider_id='alphamelts-diagnostic',
             intents=_INTENTS,
-            # Registered as authoritative so :class:`ProviderRegistry` will
-            # accept ``register(shadow=False)``. The provider never builds
-            # a :class:`LedgerTransitionProposal`; :attr:`IntentResult.
-            # transition` is always None. Goal #8 checklist item 5 binds
-            # this, and the writer-purity invariant test catches any
-            # accidental write attempt.
+            # Registry dispatch ownership is separate from ledger-transition
+            # authority. AlphaMELTS owns dispatch for these diagnostic intents
+            # but must never be allowed to write an authoritative transition.
             is_authoritative_for=_INTENTS,
+            ledger_transition_authority_for=frozenset(),
             declared_accounts=frozenset({self.DECLARED_ACCOUNT}),
         )
 
@@ -467,11 +461,7 @@ class AlphaMELTSProvider(ChemistryProvider):
         return bool(getattr(self._backend, 'stage0_subprocess_required', False))
 
     def _thermoengine_selected(self) -> bool:
-        # ThermoEngine is an initialized backend mode, not a fallback probe.
-        return (
-            getattr(self._backend, '_mode', None) == 'thermoengine'
-            and thermoengine_available(self._backend)
-        )
+        return getattr(self._backend, 'backend_name', None) == 'thermoengine'
 
     def _run_backend(
         self,
@@ -522,11 +512,20 @@ class AlphaMELTSProvider(ChemistryProvider):
             return completed('subprocess', equilibrium, pressure_bar)
         if not subprocess_required and self._thermoengine_selected():
             pressure_bar = evaluation_pressure('thermoengine')
-            equilibrium = equilibrate_via_thermoengine(
-                self._backend,
+            requested_fO2_log = request.fO2_log
+            if (
+                requested_fO2_log is None
+                and getattr(
+                    self._backend,
+                    '_legacy_alphamelts_cache_identity',
+                    False,
+                )
+            ):
+                requested_fO2_log = -9.0
+            equilibrium = self._backend.equilibrate(
                 temperature_C=request.temperature_C,
                 pressure_bar=pressure_bar,
-                fO2_log=request.fO2_log if request.fO2_log is not None else -9.0,
+                fO2_log=requested_fO2_log,
                 composition_mol_by_account=composition_mol_by_account,
                 species_formula_registry=species_registry,
             )

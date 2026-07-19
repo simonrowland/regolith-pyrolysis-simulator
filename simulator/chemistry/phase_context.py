@@ -14,6 +14,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from ..melt_regime import MeltRegime, melt_regime
+
 LIQUIDUS_MATCH_TOLERANCE_C = 0.05
 COMPOSITION_MATCH_EPS = 1.0e-6
 MAX_COMPOSITION_DISTANCE = 0.05
@@ -481,12 +483,12 @@ def _species_record(
     activity_basis: str,
     provenance: Mapping[str, Any],
 ) -> dict[str, Any]:
-    if liquid_fraction <= 0.0:
-        phase = "solid"
-    elif liquid_fraction >= 1.0:
-        phase = "liquid"
-    else:
-        phase = "mixed"
+    regime = melt_regime(liquid_fraction=liquid_fraction, epsilon=0.0)
+    phase = {
+        MeltRegime.FROZEN: "solid",
+        MeltRegime.PARTIAL: "mixed",
+        MeltRegime.MOLTEN: "liquid",
+    }[regime]
     return {
         "phase": phase,
         "activity_basis": activity_basis,

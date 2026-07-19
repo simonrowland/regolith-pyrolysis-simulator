@@ -129,7 +129,12 @@ def _install_deterministic_web(monkeypatch):
 
 
 def _record_trace(app, captured_tasks):
-    client = app_module.socketio.test_client(app)
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    client = app_module.socketio.test_client(
+        app,
+        flask_test_client=http_client,
+    )
     assert client.is_connected()
     client.get_received()
 

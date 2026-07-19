@@ -59,6 +59,8 @@ C2A_STAGED_PN2_SWEEP_MAX_MBAR = 15.0
 C2A_STAGED_PN2_BAND_REFUSAL_REASON = (
     'c2a_staged_pn2_outside_operating_band'
 )
+C6_HOLD_TARGET_INVALID_REFUSAL_REASON = 'c6_hold_target_nonfinite'
+C6_HOLD_ACQUISITION_REFUSAL_REASON = 'c6_hold_target_not_acquired'
 
 
 class CampaignPressureSetpointRefusal(ValueError):
@@ -79,6 +81,29 @@ class CampaignPressureSetpointRefusal(ValueError):
         super().__init__(
             f'{self.reason}: {detail}' if detail else self.reason
         )
+
+
+class CampaignHoldTargetRefusal(ValueError):
+    """Typed refusal when C6 cannot establish a finite hold comparison."""
+
+    reason = C6_HOLD_TARGET_INVALID_REFUSAL_REASON
+    terminal_refusal = True
+
+    def __init__(self, diagnostic: Mapping[str, object]):
+        self.diagnostic = dict(diagnostic)
+        self.diagnostic.setdefault('status', 'refused')
+        self.diagnostic.setdefault('reason', self.reason)
+        super().__init__(f'{self.reason}: {self.diagnostic}')
+
+
+class CampaignHoldAcquisitionRefusal(ValueError):
+    """Typed refusal when C6 exhausts its wall clock before static hold."""
+
+    reason = C6_HOLD_ACQUISITION_REFUSAL_REASON
+
+    def __init__(self, diagnostic: Mapping[str, object]):
+        self.diagnostic = dict(diagnostic)
+        super().__init__(f'{self.reason}: {self.diagnostic}')
 
 
 @lru_cache(maxsize=None)
@@ -211,6 +236,7 @@ class CampaignManager:
         self.last_c2a_staged_termination: dict[str, object] | None = None
         self._pending_c3_na_scoped_overrides: dict | None = None
         self._active_c3_na_scoped_overrides: dict | None = None
+        self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -654,6 +680,44 @@ class CampaignManager:
                 return self._float(ovr.get('duration_h'), 0.0)
         return self._configured_max_hold_hr(campaign, *path)
 
+    def _c6_target_acquisition_limit(self) -> tuple[float, str]:
+        ovr = self._campaign_overrides(CampaignPhase.C6)
+        if 'max_hours' in ovr:
+            max_hours = self._float(ovr.get('max_hours'), 0.0)
+            if not math.isfinite(max_hours):
+                raise ValueError('C6.max_hours must be finite')
+            if max_hours > 0.0:
+                return max_hours, 'operator_override:C6.max_hours'
+        value = self._campaign_config(CampaignPhase.C6).get(
+            'max_target_acquisition_hr'
+        )
+        limit = self._required_float(
+            value,
+            'C6.max_target_acquisition_hr',
+        )
+        if not math.isfinite(limit) or limit <= 0.0:
+            raise ValueError(
+                'C6.max_target_acquisition_hr must be finite and positive'
+            )
+        return limit, 'setpoint:C6.max_target_acquisition_hr'
+
+    @staticmethod
+    def c6_at_hold_target(
+        hold_target_C: object,
+        temperature_C: object,
+    ) -> bool:
+        if hold_target_C is None:
+            return False
+        target = float(hold_target_C)
+        temperature = float(temperature_C)
+        if not math.isfinite(target) or not math.isfinite(temperature):
+            raise CampaignHoldTargetRefusal({
+                'hold_target_C': target,
+                'temperature_C': temperature,
+                'detail': 'C6 hold target and melt temperature must be finite',
+            })
+        return abs(target - temperature) < 0.1
+
     def _configured_endpoint(self,
                              campaign: CampaignPhase,
                              key: str) -> Mapping:
@@ -1070,6 +1134,32 @@ class CampaignManager:
         if hasattr(melt, 'background_gas_mole_fraction'):
             melt.background_gas_mole_fraction = 0.0
 
+    def _materialize_target_from_delta(
+        self, campaign: CampaignPhase
+    ) -> float | None:
+        if campaign not in (CampaignPhase.C2B, CampaignPhase.C5):
+            return None
+        config = self._campaign_config(campaign)
+        if 'target_delta_below_ceiling_C' not in config:
+            return None
+        delta = self._required_float(
+            config.get('target_delta_below_ceiling_C'),
+            f'{self._campaign_config_key(campaign)}.target_delta_below_ceiling_C',
+        )
+        temperature_range = config.get('temp_range_C')
+        if not isinstance(temperature_range, (list, tuple)) or len(temperature_range) != 2:
+            raise ValueError(
+                f'Malformed campaign temperature range: '
+                f'{self._campaign_config_key(campaign)}.temp_range_C'
+            )
+        process_high_C = self._required_float(
+            temperature_range[1],
+            f'{self._campaign_config_key(campaign)}.temp_range_C[1]',
+        )
+        if not math.isfinite(delta) or delta < 0.0:
+            raise ValueError('target_delta_below_ceiling_C must be finite and non-negative')
+        return min(self.furnace_max_T_C, process_high_C) - delta
+
     def configure_campaign(self, melt: MeltState, campaign: CampaignPhase):
         """
         Set gas-side atmosphere and process parameters for a campaign.
@@ -1078,6 +1168,10 @@ class CampaignManager:
         Called when starting a new campaign phase.
         """
         self._reset_stage_background_gas(melt)
+        self._materialized_target_T_C_by_phase.pop(campaign, None)
+        materialized_target = self._materialize_target_from_delta(campaign)
+        if materialized_target is not None:
+            self._materialized_target_T_C_by_phase[campaign] = materialized_target
 
         if campaign == CampaignPhase.C3_NA:
             self._active_c3_na_scoped_overrides = (
@@ -1353,7 +1447,11 @@ class CampaignManager:
             return (target, ramp)
 
         elif campaign == CampaignPhase.C2B:
-            return self._configured_temperature_ramp(campaign)
+            target = self._materialized_target_T_C_by_phase.get(campaign)
+            if target is None:
+                return self._configured_temperature_ramp(campaign)
+            _, ramp = self._configured_temperature_ramp(campaign)
+            return (target, ramp)
 
         elif campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
             # Legacy C3 alternates injection/bakeout. V1c staged Na cleanup
@@ -1383,7 +1481,10 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C5:
             # MRE: hold at process temperature
-            return (1575.0, 5.0)
+            return (
+                self._materialized_target_T_C_by_phase.get(campaign, 1575.0),
+                5.0,
+            )
 
         elif campaign == CampaignPhase.C6:
             cfg = self._campaign_config(campaign)
@@ -1556,7 +1657,10 @@ class CampaignManager:
     def check_endpoint(self, melt: MeltState,
                        evap_flux: EvaporationFlux,
                        train: CondensationTrain,
-                       record: BatchRecord) -> bool:
+                       record: BatchRecord,
+                       *,
+                       transport_state: Mapping[str, object] | None = None,
+                       ) -> bool:
         """
         Check if the current campaign has reached its endpoint.
 
@@ -1578,9 +1682,11 @@ class CampaignManager:
         campaign = melt.campaign
         completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt)
 
-        # Check user-specified max_hours override first
+        # Check user-specified max_hours override first. C6 handles this as a
+        # hold-acquisition refusal below so the wall clock cannot claim a
+        # successful reaction without provider dispatch.
         ovr = self._campaign_overrides(campaign)
-        if 'max_hours' in ovr:
+        if campaign != CampaignPhase.C6 and 'max_hours' in ovr:
             max_h = float(ovr['max_hours'])
             if max_h > 0 and completed_campaign_hour >= max_h:
                 return True
@@ -1883,6 +1989,43 @@ class CampaignManager:
                 return True
 
         elif campaign == CampaignPhase.C6:
+            hold_target_C, _ = self.get_temp_target(
+                campaign, melt.campaign_hour, melt)
+            at_hold_target = self.c6_at_hold_target(
+                hold_target_C,
+                melt.temperature_C,
+            )
+            acquisition_limit_hr, limit_source = (
+                self._c6_target_acquisition_limit()
+            )
+            if completed_campaign_hour >= acquisition_limit_hr:
+                if not at_hold_target:
+                    diagnostic = {
+                        'reason_refused': C6_HOLD_ACQUISITION_REFUSAL_REASON,
+                        'unacquired_hold_target_C': hold_target_C,
+                        'temperature_C': float(melt.temperature_C),
+                        'completed_campaign_hour': completed_campaign_hour,
+                        'acquisition_limit_hr': acquisition_limit_hr,
+                        'acquisition_limit_source': limit_source,
+                    }
+                    if transport_state is not None:
+                        diagnostic['binding_transport_state'] = dict(
+                            transport_state
+                        )
+                    raise CampaignHoldAcquisitionRefusal(diagnostic)
+                if limit_source == 'operator_override:C6.max_hours':
+                    # The current at-target tick dispatched the provider before
+                    # endpoint evaluation, so the operator wall clock can end
+                    # C6 without misclassifying preheat as reaction hold.
+                    return True
+            if not at_hold_target:
+                return False
+            completed_hold_hr = 1 + sum(
+                1
+                for snapshot in record.snapshots
+                if snapshot.campaign == CampaignPhase.C6
+                and snapshot.c6_at_hold_target
+            )
             composition_endpoint = self._configured_endpoint(
                 campaign, 'composition_endpoint')
             min_hold_hr = self._float(ovr.get('min_hold_hr'), 0.0)
@@ -1892,12 +2035,12 @@ class CampaignManager:
                     'C6.composition_endpoint.species must be a list')
             threshold_wt_pct = self._endpoint_float(
                 campaign, composition_endpoint, 'threshold_wt_pct')
-            max_hold_hr = self._max_hold_hr(campaign)
+            max_hold_hr = self._configured_max_hold_hr(campaign)
             comp = melt.composition_wt_pct()
             refractory_pct = sum(comp.get(str(name), 0.0) for name in species)
-            if melt.campaign_hour >= min_hold_hr and refractory_pct < threshold_wt_pct:
+            if completed_hold_hr >= min_hold_hr and refractory_pct < threshold_wt_pct:
                 return True
-            if completed_campaign_hour >= max_hold_hr:
+            if completed_hold_hr >= max_hold_hr:
                 return True
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
@@ -2124,7 +2267,8 @@ class CampaignManager:
                 recommendation='yes',
                 context=(
                     'Proceed with default-off C7 aluminothermic Ca recovery? '
-                    'Requires Al budget, hard vacuum, and a dedicated Ca condenser.'
+                    'Requires Al budget, hard vacuum, and the shared CF-7 '
+                    'multi-metal condenser Ca shell.'
                 ),
             )
 

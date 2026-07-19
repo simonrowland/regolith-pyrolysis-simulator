@@ -114,7 +114,7 @@ def test_provider_declares_only_stage0_pretreatment_intent():
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_exactly_fifteen_stage0_accounts():
+def test_provider_declares_exactly_eighteen_stage0_accounts():
     """Provider declares exactly the fifteen accounts touched by every
     legacy ``_record_stage0_*_transitions`` call including carbonate
     decomposition and cation-sulfate carbothermal cleanup (MO -> melt,
@@ -132,8 +132,11 @@ def test_provider_declares_exactly_fifteen_stage0_accounts():
         "process.reagent_inventory",
         "process.stage0_perchlorate_feed",
         "process.cleaned_melt",
+        "process.solid_char_carbon",
+        "process.metal_phase",
         "reservoir.stage0_oxidant",
         "reservoir.stage0_process_gas",
+        "reservoir.fo2_buffer",
         "terminal.offgas",
         "terminal.stage0_salt_phase",
         "terminal.stage0_chloride_salt_phase",
@@ -142,8 +145,8 @@ def test_provider_declares_exactly_fifteen_stage0_accounts():
         "terminal.stage0_residual_refractory_carbon",
         "terminal.stage0_residual_carbonate_carbon",
     })
-    # Sanity: Stage 0 must not touch downstream metallothermic accounts.
-    assert "process.metal_phase" not in profile.declared_accounts
+    # Sanity: Stage 0 must not touch unrelated downstream accounts.
+    # process.metal_phase is admitted only for t-325 FeO+C -> Fe + CO.
     assert "process.stage0_carbon_reductant" not in profile.declared_accounts
     assert "process.overhead_gas" not in profile.declared_accounts
     assert "process.condensation_train" not in profile.declared_accounts
@@ -234,10 +237,10 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """When other accounts hold material, the provider must see ONLY
-    the twelve declared Stage 0 accounts. The kernel account filter is
-    the enforcer (binding spec §7); downstream accounts like
-    ``process.metal_phase`` must NOT cross the boundary into this
-    provider's view.
+    its declared Stage 0 (+ t-325 char) accounts. The kernel account
+    filter is the enforcer (binding spec §7); undeclared downstream
+    accounts like ``terminal.oxygen_mre_anode_stored`` must NOT cross
+    the boundary into this provider's view.
     """
 
     sim = _build_sim(
@@ -269,8 +272,9 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     )
     assert "process.cleaned_melt" in expected
     assert "process.reagent_inventory" in expected
-    assert "process.metal_phase" not in accounts
+    assert "process.solid_char_carbon" in expected
     assert "terminal.oxygen_mre_anode_stored" not in accounts
+    assert "process.condensation_train" not in accounts
 
 
 # ---------------------------------------------------------------------------

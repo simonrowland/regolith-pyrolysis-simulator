@@ -5,6 +5,7 @@ import pytest
 
 import simulator.evaporation as evaporation_module
 from simulator.accounting import AccountingError, MaterialLot
+from simulator.condensation import CondensationRouteResult
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import (
@@ -113,7 +114,7 @@ def _bypass_analytic_depletion(sim):
     sim.campaign_mgr.check_endpoint = lambda *args, **kwargs: False
 
 
-def test_turbine_venting_uses_actual_o2_not_total_evaporation_mass():
+def test_overhead_model_does_not_recompute_provider_partition():
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -124,18 +125,206 @@ def test_turbine_venting_uses_actual_o2_not_total_evaporation_mass():
     )
     sim.load_batch("oxide")
     flux = EvaporationFlux(species_kg_hr={"SiO": 100.0}, total_kg_hr=100.0)
-    turbine = types.SimpleNamespace(max_O2_flow_kg_hr=1.0)
-
     overhead = sim.overhead_model.update(
         flux,
         sim.melt,
         sim.train,
-        turbine_spec=turbine,
         actual_O2_kg_hr=2.0,
     )
 
-    assert overhead.O2_vented_kg_hr == pytest.approx(1.0)
-    assert overhead.turbine_flow_kg_hr == pytest.approx(1.0)
+    assert overhead.O2_vented_kg_hr == 0.0
+    assert overhead.turbine_flow_kg_hr == 0.0
+    assert overhead.melt_offgas_O2_mol_hr == pytest.approx(
+        2.0 / (MOLAR_MASS["O2"] / 1000.0)
+    )
+
+
+@pytest.mark.parametrize(
+    ("finite_headspace_enabled", "expected_force_drain"),
+    [(True, False), (False, True)],
+)
+def test_provider_partition_projection_tracks_changes_on_both_runtime_paths(
+    finite_headspace_enabled,
+    expected_force_drain,
+):
+    sim = _sio_train_sim()
+    sim.melt.campaign = CampaignPhase.C2A
+    sim._overhead_headspace_config["enabled"] = finite_headspace_enabled
+    sim.overhead_model._finite_headspace_enabled = finite_headspace_enabled
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    sim._calculate_evaporation = lambda equilibrium: EvaporationFlux()
+    _bypass_analytic_depletion(sim)
+    partitions = iter(((1.0, 2.0), (4.0, 5.0)))
+    force_drain_values = []
+
+    def _provider_result(**kwargs):
+        force_drain_values.append(bool(kwargs.get("force_drain_all", False)))
+        admitted_mol, vented_mol = next(partitions)
+        return types.SimpleNamespace(
+            diagnostic={
+                "bled_o2_mol": admitted_mol + vented_mol,
+                "bled_o2_kg": (
+                    admitted_mol + vented_mol
+                ) * MOLAR_MASS["O2"],
+                "melt_o2_bled_mol": admitted_mol + vented_mol,
+                "o2_stored_mol": admitted_mol,
+                "o2_vented_mol": vented_mol,
+                "melt_o2_vented_mol": vented_mol,
+                "external_o2_vented_mol": 0.0,
+                "o2_relieved_mol": vented_mol,
+                "o2_held_mol": 0.0,
+            }
+        )
+
+    sim._dispatch_overhead_bleed = _provider_result
+
+    sim.step()
+    assert sim.overhead.turbine_flow_mol_hr == pytest.approx(1.0)
+    assert sim.overhead.O2_vented_mol_hr == pytest.approx(2.0)
+
+    sim.step()
+    assert sim.overhead.turbine_flow_mol_hr == pytest.approx(4.0)
+    assert sim.overhead.O2_vented_mol_hr == pytest.approx(5.0)
+    assert force_drain_values == [expected_force_drain, expected_force_drain]
+
+
+@pytest.mark.parametrize("finite_headspace_enabled", [True, False])
+def test_real_provider_partition_changes_across_two_ticks_on_both_paths(
+    finite_headspace_enabled,
+):
+    # Unlike the synthetic-provider test above, this drives the REAL
+    # OVERHEAD_BLEED provider through two full steps on each runtime path
+    # and holds the projection mirrors to the per-tick LEDGER deltas — the
+    # actual consumer contract — with evaporation that changes between
+    # ticks so a stale (previous-tick) projection cannot pass.
+    sim = _sio_train_sim()
+    sim.melt.campaign = CampaignPhase.C2A
+    sim._overhead_headspace_config["enabled"] = finite_headspace_enabled
+    sim.overhead_model._finite_headspace_enabled = finite_headspace_enabled
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    fluxes = iter((
+        EvaporationFlux(species_kg_hr={"SiO": 100.0}, total_kg_hr=100.0),
+        EvaporationFlux(species_kg_hr={"SiO": 40.0}, total_kg_hr=40.0),
+    ))
+    sim._calculate_evaporation = lambda equilibrium: next(fluxes)
+    _bypass_analytic_depletion(sim)
+    o2_kg_per_mol = MOLAR_MASS["O2"] / 1000.0
+
+    def _terminal_o2_mol(account):
+        return sim.atom_ledger.kg_by_account(account).get(
+            "O2", 0.0
+        ) / o2_kg_per_mol
+
+    stored_deltas = []
+    for _tick in range(2):
+        stored_before = _terminal_o2_mol("terminal.oxygen_melt_offgas_stored")
+        vented_before = _terminal_o2_mol(
+            "terminal.oxygen_melt_offgas_vented_to_vacuum"
+        )
+
+        sim.step()
+
+        stored_delta = _terminal_o2_mol(
+            "terminal.oxygen_melt_offgas_stored"
+        ) - stored_before
+        vented_delta = _terminal_o2_mol(
+            "terminal.oxygen_melt_offgas_vented_to_vacuum"
+        ) - vented_before
+        assert sim.overhead.turbine_flow_mol_hr == pytest.approx(stored_delta)
+        assert sim.overhead.O2_vented_mol_hr == pytest.approx(vented_delta)
+        stored_deltas.append(stored_delta)
+
+    assert stored_deltas[0] > 0.0
+    assert all(delta > 0.0 for delta in stored_deltas)
+
+
+def test_turbine_utilization_is_demand_over_capacity_and_flags_overload():
+    # Consumer contract (state.OverheadGas.turbine_utilization_pct, read by
+    # the Loop-3b >120% ramp throttle): utilization exceeds 100% exactly
+    # when melt-side O2 demand exceeds the cold train's per-tick capacity.
+    from simulator.thermal_train import FiniteCapacity
+
+    sim = _sio_train_sim()
+    sio_kg = 100.0
+    flux = EvaporationFlux(species_kg_hr={"SiO": sio_kg}, total_kg_hr=sio_kg)
+    sim._route_to_condensation(flux)
+
+    # Default posture (NoColdTrain) mirrors the legacy no-turbine-spec
+    # branch: utilization pinned at 0.0, no overload flag.
+    result = sim._dispatch_overhead_bleed(force_drain_all=True)
+    sim._project_overhead_bleed_partition(result)
+    assert sim.overhead.turbine_utilization_pct == 0.0
+    assert sim.overhead.turbine_limited is False
+
+    sim = _sio_train_sim()
+    sim._route_to_condensation(flux)
+    _capacity, cold_train = sim._cold_train_capacity_policy()
+    capacity_kg_hr = 1.0e-3
+    sim._cold_train_capacity_policy = lambda: (
+        FiniteCapacity(capacity_kg_hr),
+        cold_train,
+    )
+
+    result = sim._dispatch_overhead_bleed(force_drain_all=True)
+    sim._project_overhead_bleed_partition(result)
+
+    diagnostic = result.diagnostic
+    demand_mol = (
+        diagnostic["o2_admitted_mol"]
+        + diagnostic.get("o2_accumulated_mol", 0.0)
+        + diagnostic["o2_relieved_mol"]
+        + diagnostic["o2_held_mol"]
+    )
+    capacity_mol = capacity_kg_hr / (MOLAR_MASS["O2"] / 1000.0)
+    assert demand_mol > capacity_mol
+    assert sim.overhead.turbine_limited is True
+    assert sim.overhead.turbine_utilization_pct == pytest.approx(
+        demand_mol / capacity_mol * 100.0
+    )
+    assert sim.overhead.turbine_utilization_pct > 100.0
+
+
+def test_accumulator_absorption_reports_overload_without_turbine_limited():
+    # Design semantics pin (owner-ratified cistern cold-battery): while the
+    # accumulator absorbs demand beyond per-tick capacity, utilization reads
+    # >100% (honest demand-vs-freeze-capacity) but turbine_limited stays
+    # False, so the Loop-3b ramp throttle must NOT engage — the cistern's
+    # purpose is letting the bake-off run at peak while the cavern buffers.
+    # Overflow only lands in relieved/held (=> limited=True) at cavern fill.
+    from simulator.thermal_train import FiniteCapacity
+
+    sim = _sio_train_sim()
+    sio_kg = 100.0
+    flux = EvaporationFlux(species_kg_hr={"SiO": sio_kg}, total_kg_hr=sio_kg)
+    sim._route_to_condensation(flux)
+
+    capacity_kg_hr = 1.0e-3
+    cold_train = types.SimpleNamespace(
+        accumulator_enabled=True,
+        # k_relief must be finite-positive (fail-closed provider validation);
+        # p_open far above any headspace pO2 keeps relief exactly zero.
+        relief={
+            "k_relief_kg_hr_Pa": 1.0e-9,
+            "p_open_Pa": 1.0e12,
+            "vessel_rating_Pa": 1.0e15,
+        },
+    )
+    sim._cold_train_capacity_policy = lambda: (
+        FiniteCapacity(capacity_kg_hr),
+        cold_train,
+    )
+
+    result = sim._dispatch_overhead_bleed(force_drain_all=True)
+    sim._project_overhead_bleed_partition(result)
+
+    diagnostic = result.diagnostic
+    assert diagnostic["o2_accumulated_mol"] > 0.0
+    assert diagnostic["o2_relieved_mol"] == pytest.approx(0.0)
+    assert diagnostic["o2_held_mol"] == pytest.approx(0.0)
+    assert sim.overhead.turbine_utilization_pct > 100.0
+    assert sim.overhead.turbine_limited is False
 
 
 def test_mre_anode_o2_is_not_turbine_throughput():
@@ -148,13 +337,10 @@ def test_mre_anode_o2_is_not_turbine_throughput():
         {"metals": {}, "oxide_vapors": {}},
     )
     sim.load_batch("oxide")
-    turbine = types.SimpleNamespace(max_O2_flow_kg_hr=0.1)
-
     overhead = sim.overhead_model.update(
         EvaporationFlux(),
         sim.melt,
         sim.train,
-        turbine_spec=turbine,
         actual_O2_kg_hr=0.0,
         actual_O2_mol_hr=0.0,
         mre_anode_O2_mol_hr=10.0,
@@ -185,41 +371,62 @@ def test_gas_train_o2_routes_through_terminal_ledger_not_stage6():
     assert all("O2" not in stage.collected_kg for stage in sim.train.stages)
 
 
-def test_o2_venting_moves_between_terminal_ledger_accounts():
+def test_force_drain_uses_provider_storage_partition():
     # Re-speciation contract: use SiO to exercise overhead O2 vent routing.
     sim = _sio_train_sim()
     sio_kg = 100.0
     o2_from_sio_kg = _sio_o2_kg(sio_kg)
-    stored_o2_kg = 10.0
-    vented_o2_kg = o2_from_sio_kg - stored_o2_kg
     flux = EvaporationFlux(species_kg_hr={"SiO": sio_kg}, total_kg_hr=sio_kg)
-    turbine = types.SimpleNamespace(max_O2_flow_kg_hr=10.0)
 
     sim._route_to_condensation(flux)
     overhead = sim.overhead_model.update(
         flux,
         sim.melt,
         sim.train,
-        turbine_spec=turbine,
         actual_O2_kg_hr=sim.atom_ledger.kg_by_account(
             "process.overhead_gas").get("O2", 0.0),
     )
-    sim._dispatch_overhead_bleed(
-        turbine_spec=turbine,
+    result = sim._dispatch_overhead_bleed(
         force_drain_all=True,
-        o2_vented_kg=overhead.O2_vented_kg_hr,
     )
+    sim.overhead = overhead
+    sim._project_overhead_bleed_partition(result)
 
-    assert overhead.O2_vented_kg_hr == pytest.approx(vented_o2_kg)
+    assert overhead.O2_vented_kg_hr == 0.0
     assert sim.atom_ledger.kg_by_account("terminal.oxygen_melt_offgas_stored")[
         "O2"
-    ] == pytest.approx(stored_o2_kg)
-    assert sim.atom_ledger.kg_by_account("terminal.oxygen_melt_offgas_vented_to_vacuum")[
-        "O2"
-    ] == pytest.approx(vented_o2_kg)
+    ] == pytest.approx(o2_from_sio_kg)
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_melt_offgas_vented_to_vacuum"
+    ).get("O2", 0.0) == 0.0
     assert sim._oxygen_total_kg() == pytest.approx(o2_from_sio_kg)
-    assert sim.O2_stored_cumulative_kg == pytest.approx(stored_o2_kg)
-    assert sim.O2_vented_cumulative_kg == pytest.approx(vented_o2_kg)
+    assert sim.O2_stored_cumulative_kg == pytest.approx(o2_from_sio_kg)
+    assert sim.O2_vented_cumulative_kg == 0.0
+
+
+def test_vent_mirror_excludes_co_present_external_bubbler_oxygen():
+    sim = _sio_train_sim()
+    sio_kg = 1.0
+    flux = EvaporationFlux(species_kg_hr={"SiO": sio_kg}, total_kg_hr=sio_kg)
+    sim._route_to_condensation(flux)
+
+    external_o2_mol = 4.0
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": external_o2_mol * MOLAR_MASS["O2"] / 1000.0},
+        source="test external bubbler passthrough",
+    )
+    sim._o2_bubbler_external_o2_in_overhead_mol = external_o2_mol
+
+    result = sim._dispatch_overhead_bleed(force_drain_all=True)
+    sim._project_overhead_bleed_partition(result)
+
+    assert result.diagnostic["external_o2_vented_mol"] == pytest.approx(
+        external_o2_mol
+    )
+    assert result.diagnostic["melt_o2_vented_mol"] == pytest.approx(0.0)
+    assert sim.overhead.O2_vented_mol_hr == pytest.approx(0.0)
+    assert sim.overhead.O2_vented_kg_hr == pytest.approx(0.0)
 
 
 def test_step_does_not_double_credit_gas_train_ledger_o2():
@@ -239,30 +446,24 @@ def test_step_does_not_double_credit_gas_train_ledger_o2():
     assert sim._oxygen_total_kg() == pytest.approx(o2_from_sio_kg)
 
 
-def test_step_vents_terminal_stored_evaporation_o2_when_turbine_limited():
-    # Re-speciation contract: SiO O2 still enters overhead and can be vented.
+def test_step_force_drain_stores_evaporation_o2_under_provider_authority():
     sim = _sio_train_sim()
     sio_kg = 100.0
     o2_from_sio_kg = _sio_o2_kg(sio_kg)
-    stored_o2_kg = 10.0
-    vented_o2_kg = o2_from_sio_kg - stored_o2_kg
     flux = EvaporationFlux(species_kg_hr={"SiO": sio_kg}, total_kg_hr=sio_kg)
     sim.melt.campaign = CampaignPhase.C2A
     sim._update_temperature = lambda: None
     sim._get_equilibrium = lambda: object()
     sim._calculate_evaporation = lambda equilibrium: flux
     _bypass_analytic_depletion(sim)
-    sim._get_turbine_spec = lambda: types.SimpleNamespace(
-        max_O2_flow_kg_hr=10.0)
-
     sim.step()
 
-    assert sim.overhead.O2_vented_kg_hr == pytest.approx(vented_o2_kg)
+    assert sim.overhead.O2_vented_kg_hr == 0.0
     assert sim.atom_ledger.kg_by_account(
-        "terminal.oxygen_melt_offgas_stored")["O2"] == pytest.approx(stored_o2_kg)
+        "terminal.oxygen_melt_offgas_stored")["O2"] == pytest.approx(o2_from_sio_kg)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_vented_to_vacuum"
-    )["O2"] == pytest.approx(vented_o2_kg)
+    ).get("O2", 0.0) == 0.0
     assert sim._oxygen_total_kg() == pytest.approx(o2_from_sio_kg)
 
 
@@ -284,9 +485,6 @@ def test_overhead_o2_not_double_counted_across_ticks():
     sim._get_equilibrium = lambda: object()
     sim._calculate_evaporation = lambda equilibrium: flux
     _bypass_analytic_depletion(sim)
-    sim._get_turbine_spec = lambda: types.SimpleNamespace(
-        max_O2_flow_kg_hr=10.0)
-
     def _terminal_o2_kg():
         return sum(
             sim.atom_ledger.kg_by_account(acct).get("O2", 0.0)
@@ -300,7 +498,9 @@ def test_overhead_o2_not_double_counted_across_ticks():
 
     # Tick 1: leave the melt/offgas O2 sitting in process.overhead_gas.
     drained = sim._dispatch_overhead_bleed
-    sim._dispatch_overhead_bleed = lambda *args, **kwargs: None
+    sim._dispatch_overhead_bleed = lambda *args, **kwargs: types.SimpleNamespace(
+        diagnostic={}
+    )
     sim.step()
     sim._dispatch_overhead_bleed = drained
 
@@ -384,9 +584,6 @@ def test_step_drains_uncondensed_overhead_vapor_each_tick():
     sim._get_equilibrium = lambda: object()
     sim._calculate_evaporation = lambda equilibrium: flux
     _bypass_analytic_depletion(sim)
-    sim._get_turbine_spec = lambda: types.SimpleNamespace(
-        max_O2_flow_kg_hr=1.0e9)
-
     sim.step()
     first_terminal = sim.atom_ledger.kg_by_account(
         "terminal.offgas").get("SiO", 0.0)
@@ -538,9 +735,7 @@ def test_intact_oxide_vapor_allows_zero_o2_stoich():
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
     sim._dispatch_overhead_bleed(
-        turbine_spec=types.SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
-        o2_vented_kg=0.0,
     )
 
     products = sim.product_ledger()
@@ -623,9 +818,7 @@ def test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked():
     sim._route_to_condensation(flux)
     sim._update_melt_composition(flux)
     sim._dispatch_overhead_bleed(
-        turbine_spec=types.SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
-        o2_vented_kg=0.0,
     )
 
     products = sim.product_ledger()
@@ -982,17 +1175,12 @@ def test_commanded_po2_no_synthetic_floor_outside_o2_control(
     assert sim._commanded_pO2_bar() == pytest.approx(1e-9)
 
 
-def test_commanded_po2_overhead_composition_o2_carried_when_above_setpoint():
-    """The legacy (headspace-OFF) branch reads ``gas.composition['O2']``
-    as the primary value and only uses ``melt.pO2_mbar`` as a floor.
-    Whichever is higher wins. This is the decision-matrix corner where
-    the holdup-derived O₂ exceeds the setpoint — the actual holdup
-    drives the answer, the setpoint is just a lower bound."""
+def test_commanded_po2_uses_upstream_o2_when_above_setpoint():
     sim = _sio_o2_train_sim()
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
-    sim.melt.pO2_mbar = 0.5            # 0.0005 bar floor
-    sim.overhead.composition = {"O2": 10.0}  # 0.01 bar holdup, above floor
-    # max(0.01, 0.0005) = 0.01 bar
+    sim.melt.pO2_mbar = 0.5
+    sim._melt_headspace_composition_mbar = {"O2": 10.0}
+    sim.overhead.composition = {"O2": 0.001}
     assert sim._commanded_pO2_bar() == pytest.approx(0.01)
 
 
@@ -1055,6 +1243,309 @@ def test_overhead_product_partials_use_mole_fractions_not_mass_fractions():
     assert gas.composition["Na"] > gas.composition["Fe"]
 
 
+def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
+    sim = _gas_train_sim()
+    sim.vapor_pressures["oxide_vapors"]["FeO"] = {
+        "parent_oxide": "FeO",
+        "stoich_oxide_per_vapor": 1.0,
+        "stoich_O2_per_vapor": 0.0,
+    }
+    flux = EvaporationFlux(
+        total_kg_hr=2.0,
+        species_kg_hr={"Fe": 1.0, "FeO": 1.0},
+    )
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Fe": 0.25, "FeO": 0.75},
+            condensed_by_stage_species={1: {"Fe": 0.75, "FeO": 0.25}},
+            wall_deposit_by_species={"Fe": 0.15},
+            wall_deposit_fraction_by_species={"Fe": 0.2},
+            wall_deposit_account_fractions_by_species={
+                "Fe": {PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[0]: 1.0},
+            },
+        ),
+    )
+
+    residual_flux = sim._route_to_condensation(flux)
+    captured_baffle_kg = sim.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).get("Fe", 0.0)
+    captured_wall_kg = sim.atom_ledger.kg_by_account(
+        PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[0]
+    ).get("Fe", 0.0)
+    monkeypatch.setattr(
+        sim.overhead_model,
+        "_vapor_pressure_mbar_from_flux",
+        lambda *_args, **_kwargs: 10.0,
+    )
+    gas = sim.overhead_model.update(residual_flux, sim.melt, sim.train)
+
+    fe_mol_hr = 0.25 / (MOLAR_MASS["Fe"] / 1000.0)
+    feo_mol_hr = 0.75 / (MOLAR_MASS["FeO"] / 1000.0)
+    expected_fe_mbar = 10.0 * fe_mol_hr / (fe_mol_hr + feo_mol_hr)
+    expected_feo_mbar = 10.0 - expected_fe_mbar
+
+    assert residual_flux.species_kg_hr == pytest.approx(
+        {"Fe": 0.25, "FeO": 0.75}
+    )
+    assert captured_wall_kg > 0.0
+    assert captured_baffle_kg + captured_wall_kg + residual_flux.species_kg_hr[
+        "Fe"
+    ] == pytest.approx(1.0, rel=1e-12)
+    assert gas.composition["Fe"] == pytest.approx(expected_fe_mbar)
+    assert gas.composition["FeO"] == pytest.approx(expected_feo_mbar)
+
+
+def test_transport_saturation_uses_full_inlet_when_residual_is_nearly_captured():
+    sim = _gas_train_sim()
+    residual_flux = EvaporationFlux(
+        total_kg_hr=1.0e-12,
+        species_kg_hr={"Fe": 1.0e-12},
+    )
+    residual_transport = sim.overhead_model.estimate_transport_state(
+        residual_flux, sim.melt
+    )
+    pipe_capacity_kg_hr = residual_transport["pipe_conductance_kg_hr"]
+    inlet_flux = EvaporationFlux(
+        total_kg_hr=1.5 * pipe_capacity_kg_hr,
+        species_kg_hr={"Fe": 1.5 * pipe_capacity_kg_hr},
+    )
+
+    gas = sim.overhead_model.update(
+        residual_flux,
+        sim.melt,
+        sim.train,
+        transport_inlet_kg_hr=inlet_flux.total_kg_hr,
+    )
+
+    assert gas.transport_saturation_pct == pytest.approx(150.0)
+    assert gas.evap_exceeds_transport is True
+    assert gas.composition == pytest.approx({
+        "Fe": residual_transport["vapor_pressure_mbar"],
+    })
+
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.campaign_hour = 0.0
+    sim.overhead = gas
+    sim.campaign_mgr.get_temp_target = lambda *_args: (1600.0, 100.0)
+    sim._update_temperature()
+
+    assert sim._last_actual_ramp == pytest.approx(50.0)
+    assert "pipe saturated" in sim._last_throttle_reason
+
+
+def test_heavy_species_transport_uses_upstream_mixture_after_total_capture():
+    from simulator.overhead import (
+        DEFAULT_PIPE_M_AVG_KG_MOL,
+        OverheadGasModel,
+        _mean_molar_mass_kg_mol,
+    )
+    from simulator.state import CondensationTrain, MeltState
+
+    model = OverheadGasModel({"enabled": False})
+    melt = MeltState(temperature_C=1500.0, p_total_mbar=1.0)
+    upstream_flux = EvaporationFlux(
+        total_kg_hr=0.1,
+        species_kg_hr={"CrO2": 0.1},
+    )
+    residual_flux = EvaporationFlux()
+
+    upstream_transport = model.estimate_transport_state(upstream_flux, melt)
+    fallback_transport = model.estimate_transport_state(residual_flux, melt)
+    gas = model.update(
+        residual_flux,
+        melt,
+        CondensationTrain.create_default(),
+        transport_inlet_kg_hr=upstream_flux.total_kg_hr,
+        transport_inlet_flux=upstream_flux,
+    )
+
+    assert _mean_molar_mass_kg_mol(upstream_flux.species_kg_hr) == pytest.approx(
+        MOLAR_MASS["CrO2"] / 1000.0
+    )
+    assert MOLAR_MASS["CrO2"] / 1000.0 != pytest.approx(
+        DEFAULT_PIPE_M_AVG_KG_MOL
+    )
+    assert gas.pipe_conductance_kg_hr == pytest.approx(
+        upstream_transport["pipe_conductance_kg_hr"]
+    )
+    assert gas.pipe_conductance_kg_hr != pytest.approx(
+        fallback_transport["pipe_conductance_kg_hr"]
+    )
+    assert gas.composition == {}
+
+
+def test_condensation_residual_ignores_prior_holdup_drain_credit(monkeypatch):
+    sim = _gas_train_sim()
+    prior_holdup_kg = 2.0e-8
+    evolved_kg = 3.0e-8
+    condensed_kg = 1.0e-8
+    residual_kg = evolved_kg - condensed_kg
+    retained_wall_kg = 5.0e-13
+    sim.atom_ledger.load_external(
+        "process.condensation_retained_holdup",
+        {"Fe": prior_holdup_kg},
+        source="residual-regression prior retained holdup",
+    )
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Fe": residual_kg},
+            wall_deposit_by_species={"Fe": retained_wall_kg},
+            wall_deposit_fraction_by_species={
+                "Fe": retained_wall_kg / condensed_kg,
+            },
+            wall_deposit_account_fractions_by_species={
+                "Fe": {PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS[0]: 1.0},
+            },
+        ),
+    )
+
+    residual_flux = sim._route_to_condensation(EvaporationFlux(
+        total_kg_hr=evolved_kg,
+        species_kg_hr={"Fe": evolved_kg},
+    ))
+
+    assert residual_flux.species_kg_hr["Fe"] == pytest.approx(
+        residual_kg, rel=0.0, abs=1e-24
+    )
+    assert sim.atom_ledger.kg_by_account(
+        "process.condensation_retained_holdup"
+    ).get("Fe", 0.0) == pytest.approx(
+        condensed_kg, rel=0.0, abs=1e-24
+    )
+    assert sim.atom_ledger.kg_by_account(
+        "process.condensation_train"
+    ).get("Fe", 0.0) == pytest.approx(
+        prior_holdup_kg, rel=0.0, abs=1e-24
+    )
+
+
+def test_step_overhead_composition_uses_real_condensation_residual():
+    sim = _gas_train_sim()
+    evolved_kg = 1.0
+    flux = EvaporationFlux(
+        total_kg_hr=evolved_kg,
+        species_kg_hr={"Fe": evolved_kg},
+    )
+    sim.melt.campaign = CampaignPhase.C2A
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    sim._calculate_evaporation = lambda _equilibrium: flux
+    _bypass_analytic_depletion(sim)
+    seen = {}
+    real_update = sim.overhead_model.update
+
+    def _spy_update(overhead_flux, *args, **kwargs):
+        seen["flux"] = overhead_flux
+        seen["transport_inlet_kg_hr"] = kwargs["transport_inlet_kg_hr"]
+        return real_update(overhead_flux, *args, **kwargs)
+
+    sim.overhead_model.update = _spy_update
+    sim.step()
+
+    residual_kg = seen["flux"].species_kg_hr["Fe"]
+    assert 0.0 < residual_kg < evolved_kg
+    expected_transport = sim.overhead_model.estimate_transport_state(
+        flux, sim.melt
+    )
+    expected_saturation_pct = (
+        evolved_kg / expected_transport["pipe_conductance_kg_hr"] * 100.0
+    )
+    assert seen["transport_inlet_kg_hr"] == pytest.approx(evolved_kg)
+    assert sim.overhead.transport_saturation_pct == pytest.approx(
+        expected_saturation_pct
+    )
+    residual_transport = sim.overhead_model.estimate_transport_state(
+        seen["flux"], sim.melt
+    )
+    assert sim.overhead.composition["Fe"] == pytest.approx(
+        residual_transport["vapor_pressure_mbar"]
+    )
+
+
+def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
+    monkeypatch,
+):
+    sim = _gas_train_sim()
+    evolved_kg = 1.0
+    residual_kg = 1.0e-8
+    flux = EvaporationFlux(
+        total_kg_hr=evolved_kg,
+        species_kg_hr={"Fe": evolved_kg},
+    )
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "route",
+        lambda _flux, _melt: CondensationRouteResult(
+            remaining_by_species={"Fe": residual_kg},
+            condensed_by_stage_species={1: {"Fe": evolved_kg - residual_kg}},
+        ),
+    )
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.temperature_C = 1500.0
+    sim._apply_native_fe_saturation_split = lambda **_kwargs: None
+    sim._update_temperature = lambda: None
+    sim._get_equilibrium = lambda: object()
+    sim._calculate_evaporation = lambda _equilibrium: flux
+    _bypass_analytic_depletion(sim)
+
+    sim.step()
+
+    upstream_transport = sim.overhead_model.estimate_transport_state(
+        flux, sim.melt
+    )
+    residual_flux = EvaporationFlux(
+        total_kg_hr=residual_kg,
+        species_kg_hr={"Fe": residual_kg},
+    )
+    residual_transport = sim.overhead_model.estimate_transport_state(
+        residual_flux, sim.melt
+    )
+    assert sim._melt_headspace_composition_mbar["Fe"] == pytest.approx(
+        upstream_transport["vapor_pressure_mbar"]
+    )
+    assert sim.overhead.composition["Fe"] == pytest.approx(
+        residual_transport["vapor_pressure_mbar"]
+    )
+    assert sim._melt_headspace_composition_mbar["Fe"] > (
+        sim.overhead.composition["Fe"] * 1.0e3
+    )
+    assert sim.record.snapshots[-1].melt_headspace_composition_mbar == pytest.approx(
+        sim._melt_headspace_composition_mbar
+    )
+    assert sim._evaporation_bulk_partial_pressure_pa("Fe") == pytest.approx(
+        upstream_transport["vapor_pressure_mbar"] * 100.0
+    )
+
+    seen = {}
+
+    def _capture_dispatch(_intent, *, control_inputs):
+        seen.update(control_inputs)
+        return types.SimpleNamespace(
+            status="ok",
+            diagnostic={"evaporation_flux_kg_hr": {}},
+        )
+
+    sim._dispatch_only = _capture_dispatch
+    equilibrium = types.SimpleNamespace(
+        vapor_pressures_Pa={"Fe": 100.0},
+        vapor_pressures_source={},
+        activity_coefficients={},
+        diagnostics={},
+        liquid_fraction=1.0,
+    )
+    evaporation_module.EvaporationMixin._calculate_evaporation(sim, equilibrium)
+
+    assert seen["overhead_partials_Pa"]["Fe"] == pytest.approx(
+        upstream_transport["vapor_pressure_mbar"] * 100.0
+    )
+    assert seen["overhead_partials_Pa"]["Fe"] > 0.0
+
+
 def test_commanded_po2_numerical_floor_when_all_inputs_zero():
     """All three inputs at zero: composition['O2']=0, melt.pO2_mbar=0,
     atmosphere = O₂-controlled. The setpoint floor is 0 (no-op); only
@@ -1091,11 +1582,7 @@ def test_overhead_writer_raises_p_total_to_setpoint_in_o2_modes(atmosphere):
     train = CondensationTrain.create_default()
     flux = EvaporationFlux()
 
-    model = OverheadGasModel({
-        "overhead_headspace": {"enabled": True},
-        "headspace_volume_m3": 1.0,
-        "headspace_temperature_K": 1773.15,
-    })
+    model = OverheadGasModel({"enabled": True, "volume_m3": 1.0})
     gas = model.update(flux, melt, train)
 
     # Under the documented invariant, both O2 partial and total must
@@ -1135,11 +1622,7 @@ def test_overhead_writer_leaves_o2_alone_outside_o2_modes(atmosphere):
     train = CondensationTrain.create_default()
     flux = EvaporationFlux()
 
-    model = OverheadGasModel({
-        "overhead_headspace": {"enabled": True},
-        "headspace_volume_m3": 1.0,
-        "headspace_temperature_K": 1773.15,
-    })
+    model = OverheadGasModel({"enabled": True, "volume_m3": 1.0})
     gas = model.update(flux, melt, train)
 
     # The Phase A P1 commanded-pO2 floor block (overhead.py:507-514)

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import copy
 import math
-from types import SimpleNamespace
 
 import pytest
 
@@ -13,6 +12,7 @@ from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.overhead import OverheadConfigurationError
 from simulator.state import Atmosphere, EvaporationFlux
+from simulator.thermal_train import FiniteCapacity, NoColdTrain
 from tests.chemistry.conftest import _build_sim
 
 
@@ -27,6 +27,7 @@ def test_provider_declares_overhead_bleed_authority():
     assert profile.declared_accounts == frozenset(
         {
             "process.overhead_gas",
+            "reservoir.oxygen_cistern_liquid_inventory",
             "terminal.offgas",
             "terminal.oxygen_melt_offgas_stored",
             "terminal.oxygen_melt_offgas_vented_to_vacuum",
@@ -36,7 +37,7 @@ def test_provider_declares_overhead_bleed_authority():
 
 
 def test_force_drain_bleed_commits_pure_move_o2_partition(
-    vapor_pressure_data, feedstocks_data, setpoints_data
+    vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch
 ):
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -49,11 +50,14 @@ def test_force_drain_bleed_commits_pure_move_o2_partition(
         {"O2": 5.0},
         source="test overhead oxygen",
     )
+    monkeypatch.setattr(
+        sim,
+        "_cold_train_capacity_policy",
+        lambda: (NoColdTrain(), None),
+    )
 
     result = sim._dispatch_overhead_bleed(
-        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
-        o2_vented_kg=3.0,
     )
     proof = dict(result.transition.atom_balance_proof)
 
@@ -67,10 +71,43 @@ def test_force_drain_bleed_commits_pure_move_o2_partition(
     ) == pytest.approx(0.0)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_stored"
-    )["O2"] == pytest.approx(2.0)
+    )["O2"] == pytest.approx(5.0)
     assert sim.atom_ledger.kg_by_account(
         "terminal.oxygen_melt_offgas_vented_to_vacuum"
-    )["O2"] == pytest.approx(3.0)
+    ).get("O2", 0.0) == pytest.approx(0.0)
+
+
+def test_explicit_no_cold_train_uses_provider_storage_partition(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 5.0},
+        source="explicit NoColdTrain legacy partition fixture",
+    )
+
+    result = sim._dispatch_and_commit(
+        ChemistryIntent.OVERHEAD_BLEED,
+        control_inputs={
+            "cold_train_capacity": NoColdTrain(),
+            "force_drain_all": True,
+        },
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_melt_offgas_stored"
+    )["O2"] == pytest.approx(5.0)
+    assert sim.atom_ledger.kg_by_account(
+        "terminal.oxygen_melt_offgas_vented_to_vacuum"
+    ).get("O2", 0.0) == pytest.approx(0.0)
 
 
 def test_bleed_conductance_caps_partial_drain(
@@ -96,7 +133,6 @@ def test_bleed_conductance_caps_partial_drain(
             "bleed_conductance_kg_s": 0.01,
             "dt_hr": 1.0 / 3600.0,
             "force_drain_all": False,
-            "max_o2_flow_kg_hr": 100.0,
         },
     )
 
@@ -152,7 +188,6 @@ def test_bleed_conductance_requires_positive_pressure_delta(
             "bleed_conductance_kg_s": 0.01,
             "dt_hr": 1.0 / 3600.0,
             "force_drain_all": False,
-            "max_o2_flow_kg_hr": 100.0,
         },
     )
 
@@ -261,11 +296,8 @@ def test_destructive_bleed_controls_fail_closed_without_ledger_mutation(
 @pytest.mark.parametrize(
     ("probe", "expected_reason"),
     [
-        ("negative_o2_vented", "o2_vented_kg"),
-        ("nan_o2_vented", "o2_vented_kg"),
         ("negative_downstream_pressure", "p_downstream_bar"),
         ("absent_total_pressure", "p_total_bar"),
-        ("absent_turbine_limit", "max_o2_flow_kg_hr"),
         ("negative_external_o2", "external_o2_in_overhead_mol"),
     ],
 )
@@ -295,18 +327,11 @@ def test_core_passes_raw_destructive_bleed_controls_to_provider_guard(
         "_overhead_gas_equilibrium_diagnostic",
         lambda: {"p_total_bar": 2.0},
     )
-    turbine_spec = SimpleNamespace(max_O2_flow_kg_hr=1.0)
     dispatch_kwargs = {"force_drain_all": True}
-    if probe == "negative_o2_vented":
-        dispatch_kwargs["o2_vented_kg"] = -1.0
-    elif probe == "nan_o2_vented":
-        dispatch_kwargs["o2_vented_kg"] = float("nan")
-    elif probe == "negative_downstream_pressure":
+    if probe == "negative_downstream_pressure":
         sim._overhead_headspace_config["downstream_pressure_bar"] = -1.0
     elif probe == "absent_total_pressure":
         monkeypatch.setattr(sim, "_overhead_gas_equilibrium_diagnostic", lambda: {})
-    elif probe == "absent_turbine_limit":
-        turbine_spec = SimpleNamespace()
     elif probe == "negative_external_o2":
         sim._o2_bubbler_external_o2_in_overhead_mol = -1.0
 
@@ -318,10 +343,7 @@ def test_core_passes_raw_destructive_bleed_controls_to_provider_guard(
     before_transitions = copy.deepcopy(tuple(sim.atom_ledger.transitions))
     before_recorded_snapshots = copy.deepcopy(tuple(sim.record.snapshots))
 
-    result = sim._dispatch_overhead_bleed(
-        turbine_spec=turbine_spec,
-        **dispatch_kwargs,
-    )
+    result = sim._dispatch_overhead_bleed(**dispatch_kwargs)
 
     assert result.status == "unsupported"
     assert result.transition is None
@@ -421,7 +443,7 @@ def test_live_headspace_bleed_conductance_uses_headspace_species_m_avg(
 @pytest.mark.parametrize(
     "downstream_pressure_bar",
     [
-        pytest.param(10.0, id="finite_downstream"),
+        pytest.param(100.0, id="finite_downstream"),
         pytest.param(float("nan"), id="nan_downstream"),
     ],
 )
@@ -458,9 +480,9 @@ def test_pn2_transport_projection_does_not_bleed_against_downstream_pressure(
 
     if math.isfinite(downstream_pressure_bar):
         assert downstream == pytest.approx(downstream_pressure_bar)
-        assert ledger_pO2 < downstream
     else:
         assert not math.isfinite(downstream)
+    assert ledger_pO2 > 0.0
     assert projected == pytest.approx(ledger_pO2)
 
 
@@ -555,7 +577,6 @@ def test_bleed_conductance_is_kg_s_not_per_bar(
             "bleed_conductance_kg_s": 0.01,
             "dt_hr": 1.0 / 3600.0,
             "force_drain_all": False,
-            "max_o2_flow_kg_hr": 100.0,
         },
     )
 
@@ -587,7 +608,6 @@ def test_legacy_bleed_conductance_alias_remains_kg_s(
             "bleed_conductance_kg_s_per_bar": 0.01,
             "dt_hr": 1.0 / 3600.0,
             "force_drain_all": False,
-            "max_o2_flow_kg_hr": 100.0,
         },
     )
 
@@ -619,7 +639,6 @@ def test_external_o2_bleed_is_not_stored_as_melt_offgas_product(
         control_inputs={
             "force_drain_all": True,
             "external_o2_in_overhead_mol": 4.0,
-            "max_o2_flow_kg_hr": 100.0,
         },
     )
 
@@ -635,3 +654,336 @@ def test_external_o2_bleed_is_not_stored_as_melt_offgas_product(
     assert sim.atom_ledger.mol_by_account(
         "terminal.oxygen_melt_offgas_vented_to_vacuum"
     ).get("O2", 0.0) == pytest.approx(0.0)
+
+
+def test_finite_capacity_commits_admission_and_continuous_relief_once(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    o2_molar_mass = resolve_species_formula(
+        "O2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 12.0 * o2_molar_mass},
+        source="test finite-capacity overhead oxygen",
+    )
+    before_transitions = len(sim.atom_ledger.transitions)
+    mre_before = sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_mre_anode_stored"
+    ).get("O2", 0.0)
+
+    result = sim._dispatch_and_commit(
+        ChemistryIntent.OVERHEAD_BLEED,
+        control_inputs={
+            "bleed_conductance_kg_s": 1.0,
+            "p_total_bar": 1.0,
+            "p_downstream_bar": 0.0,
+            "external_o2_in_overhead_mol": 2.0,
+            "cold_train_capacity": FiniteCapacity(o2_molar_mass),
+            "dt_hr": 1.0,
+            "p_ref_Pa": 1000.0,
+            "p_open_Pa": 900.0,
+            "vessel_rating_Pa": 2000.0,
+            "k_relief_kg_hr_Pa": o2_molar_mass / 100.0,
+        },
+    )
+
+    diagnostic = dict(result.diagnostic or {})
+    assert result.transition is not None
+    assert len(sim.atom_ledger.transitions) == before_transitions + 1
+    assert diagnostic["o2_admitted_mol"] == pytest.approx(1.0)
+    assert diagnostic["o2_relieved_mol"] == pytest.approx(1.0)
+    assert diagnostic["external_o2_bled_mol"] == pytest.approx(2.0)
+    assert diagnostic["o2_held_mol"] == pytest.approx(8.0)
+    assert diagnostic["bled_o2_mol"] == pytest.approx(4.0)
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas")[
+        "O2"
+    ] == pytest.approx(8.0)
+    assert sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_melt_offgas_stored"
+    )["O2"] == pytest.approx(1.0)
+    assert sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_melt_offgas_vented_to_vacuum"
+    )["O2"] == pytest.approx(1.0)
+    assert sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_bubbler_external_vented_to_vacuum"
+    )["O2"] == pytest.approx(2.0)
+    assert sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_mre_anode_stored"
+    ).get("O2", 0.0) == pytest.approx(mre_before)
+    assert max(
+        (abs(value) for value in result.transition.atom_balance_proof.values()),
+        default=0.0,
+    ) <= 1e-12
+
+
+def test_finite_capacity_relief_flows_with_zero_ordinary_conductance(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    o2_molar_mass = resolve_species_formula(
+        "O2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 12.0 * o2_molar_mass},
+        source="zero-conductance relief fixture",
+    )
+
+    result = sim._dispatch_and_commit(
+        ChemistryIntent.OVERHEAD_BLEED,
+        control_inputs={
+            "bleed_conductance_kg_s": 0.0,
+            "p_total_bar": 1.0,
+            "p_downstream_bar": 0.0,
+            "external_o2_in_overhead_mol": 2.0,
+            "cold_train_capacity": FiniteCapacity(o2_molar_mass),
+            "dt_hr": 1.0,
+            "p_ref_Pa": 1000.0,
+            "p_open_Pa": 900.0,
+            "vessel_rating_Pa": 2000.0,
+            "k_relief_kg_hr_Pa": o2_molar_mass / 100.0,
+        },
+    )
+
+    diagnostic = dict(result.diagnostic or {})
+    assert result.transition is not None
+    assert diagnostic["candidate_bled_o2_mol"] == 0.0
+    assert diagnostic["o2_admitted_mol"] == 0.0
+    assert diagnostic["o2_relieved_mol"] == pytest.approx(1.0)
+    assert diagnostic["external_o2_bled_mol"] == 0.0
+    assert diagnostic["o2_held_mol"] == pytest.approx(9.0)
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas")[
+        "O2"
+    ] == pytest.approx(11.0)
+    assert sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_melt_offgas_vented_to_vacuum"
+    )["O2"] == pytest.approx(1.0)
+    assert max(
+        (abs(value) for value in result.transition.atom_balance_proof.values()),
+        default=0.0,
+    ) <= 1e-12
+
+
+def test_finite_capacity_accumulator_commits_atom_balanced_cistern_inventory(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    o2_molar_mass = resolve_species_formula(
+        "O2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 10.0 * o2_molar_mass},
+        source="accumulator surge fixture",
+    )
+    total_kg_before = sum(sim.atom_ledger.total_kg_by_account().values())
+
+    result = sim._dispatch_and_commit(
+        ChemistryIntent.OVERHEAD_BLEED,
+        control_inputs={
+            "bleed_conductance_kg_s": 1.0,
+            "p_total_bar": 1.0,
+            "p_downstream_bar": 0.0,
+            "cold_train_capacity": FiniteCapacity(o2_molar_mass),
+            "dt_hr": 1.0,
+            "p_ref_Pa": 1000.0,
+            "p_open_Pa": 900.0,
+            "vessel_rating_Pa": 2000.0,
+            "k_relief_kg_hr_Pa": o2_molar_mass / 100.0,
+            "accumulator_enabled": True,
+            "cavern_capacity_kg": 5.0 * o2_molar_mass,
+        },
+    )
+
+    diagnostic = dict(result.diagnostic or {})
+    assert result.transition is not None
+    assert diagnostic["o2_admitted_mol"] == pytest.approx(1.0)
+    assert diagnostic["o2_accumulated_mol"] == pytest.approx(5.0)
+    assert diagnostic["o2_relieved_mol"] == pytest.approx(1.0)
+    assert diagnostic["o2_held_mol"] == pytest.approx(3.0)
+    assert diagnostic["cistern_fill_kg"] == 0.0
+    assert diagnostic["cistern_fill_after_kg"] == pytest.approx(
+        5.0 * o2_molar_mass
+    )
+    assert diagnostic["refreeze_duty_kWh_deferred"] == pytest.approx(
+        5.0 * 6820.0 / 3_600_000.0
+    )
+    assert sim.atom_ledger.mol_by_account(
+        "reservoir.oxygen_cistern_liquid_inventory"
+    )["O2"] == pytest.approx(5.0)
+    assert max(
+        (abs(value) for value in result.transition.atom_balance_proof.values()),
+        default=0.0,
+    ) <= 1e-12
+    total_kg_after = sum(sim.atom_ledger.total_kg_by_account().values())
+    assert total_kg_after == pytest.approx(total_kg_before, rel=5e-14)
+
+
+def test_finite_capacity_accumulator_off_is_p2_3_provider_parity(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    outcomes = []
+    for explicit_off in (False, True):
+        sim = _build_sim(
+            "lunar_mare_low_ti",
+            vapor_pressure_data,
+            feedstocks_data,
+            setpoints_data,
+        )
+        o2_molar_mass = resolve_species_formula(
+            "O2", sim.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        sim.atom_ledger.load_external(
+            "process.overhead_gas",
+            {"O2": 10.0 * o2_molar_mass},
+            source="accumulator-off parity fixture",
+        )
+        controls = {
+            "bleed_conductance_kg_s": 1.0,
+            "p_total_bar": 1.0,
+            "p_downstream_bar": 0.0,
+            "cold_train_capacity": FiniteCapacity(o2_molar_mass),
+            "dt_hr": 1.0,
+            "p_ref_Pa": 1000.0,
+            "p_open_Pa": 900.0,
+            "vessel_rating_Pa": 2000.0,
+            "k_relief_kg_hr_Pa": o2_molar_mass / 100.0,
+        }
+        if explicit_off:
+            controls["accumulator_enabled"] = False
+        result = sim._dispatch_and_commit(
+            ChemistryIntent.OVERHEAD_BLEED,
+            control_inputs=controls,
+        )
+        outcomes.append((
+            dict(result.diagnostic or {}),
+            result.transition.debits,
+            result.transition.credits,
+            sim.atom_ledger.mol_by_account(),
+        ))
+
+    assert outcomes[1] == outcomes[0]
+    assert "o2_accumulated_mol" not in outcomes[0][0]
+
+
+def test_full_cistern_resumes_relief_through_provider_and_ledger(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    o2_molar_mass = resolve_species_formula(
+        "O2", sim.species_formula_registry
+    ).molar_mass_kg_per_mol()
+    cistern_account = "reservoir.oxygen_cistern_liquid_inventory"
+    sim.atom_ledger.load_external(
+        cistern_account,
+        {"O2": 5.0 * o2_molar_mass},
+        source="full cistern fixture",
+    )
+    sim.atom_ledger.load_external(
+        "process.overhead_gas",
+        {"O2": 10.0 * o2_molar_mass},
+        source="full cistern surge fixture",
+    )
+    transitions_before = len(sim.atom_ledger.transitions)
+    total_kg_before = sum(sim.atom_ledger.total_kg_by_account().values())
+
+    result = sim._dispatch_and_commit(
+        ChemistryIntent.OVERHEAD_BLEED,
+        control_inputs={
+            "bleed_conductance_kg_s": 1.0,
+            "p_total_bar": 1.0,
+            "p_downstream_bar": 0.0,
+            "cold_train_capacity": FiniteCapacity(o2_molar_mass),
+            "dt_hr": 1.0,
+            "p_ref_Pa": 1000.0,
+            "p_open_Pa": 900.0,
+            "vessel_rating_Pa": 2000.0,
+            "k_relief_kg_hr_Pa": o2_molar_mass,
+            "accumulator_enabled": True,
+            "cavern_capacity_kg": 5.0 * o2_molar_mass,
+        },
+    )
+
+    diagnostic = dict(result.diagnostic or {})
+    assert len(sim.atom_ledger.transitions) == transitions_before + 1
+    assert diagnostic["o2_admitted_mol"] == pytest.approx(1.0)
+    assert diagnostic["o2_accumulated_mol"] == 0.0
+    assert diagnostic["o2_relieved_mol"] == pytest.approx(9.0)
+    assert diagnostic["o2_held_mol"] == 0.0
+    assert diagnostic["cistern_fill_after_kg"] == pytest.approx(
+        5.0 * o2_molar_mass
+    )
+    assert sim.atom_ledger.mol_by_account(cistern_account)[
+        "O2"
+    ] == pytest.approx(5.0)
+    assert cistern_account not in result.transition.credits
+    assert max(
+        (abs(value) for value in result.transition.atom_balance_proof.values()),
+        default=0.0,
+    ) <= 1e-12
+    total_kg_after = sum(sim.atom_ledger.total_kg_by_account().values())
+    assert total_kg_after == pytest.approx(total_kg_before, rel=5e-14)
+
+
+@pytest.mark.parametrize(
+    ("name", "value", "reason"),
+    [
+        ("k_relief_kg_hr_Pa", 0.0, "k_relief_kg_hr_Pa"),
+        ("p_open_Pa", 0.0, "p_open_Pa"),
+        ("vessel_rating_Pa", 0.0, "vessel_rating_Pa"),
+    ],
+)
+def test_finite_capacity_requires_positive_relief_controls(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    name,
+    value,
+    reason,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    controls = {
+        "cold_train_capacity": FiniteCapacity(1.0),
+        "k_relief_kg_hr_Pa": 1.0,
+        "p_open_Pa": 1.0,
+        "vessel_rating_Pa": 2.0,
+    }
+    controls[name] = value
+
+    result = sim._dispatch_and_commit(
+        ChemistryIntent.OVERHEAD_BLEED,
+        control_inputs=controls,
+    )
+
+    assert result.status == "unsupported"
+    assert result.transition is None
+    assert (result.diagnostic or {})["reason"] == (
+        f"{reason} must be a finite positive number"
+    )

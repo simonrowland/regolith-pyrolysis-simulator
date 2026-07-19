@@ -58,18 +58,13 @@ class EquilibriumMixin:
         """
         Commanded oxygen partial pressure (bar) for this hour.
 
-        Toggle-off preserves the legacy commanded-pO₂ path. Toggle-on reads
-        the finite-headspace O₂ partial pressure from the
-        OVERHEAD_GAS_EQUILIBRIUM diagnostic provider.
+        Finite-headspace mode reads the provider's gas inventory diagnostic;
+        non-finite mode reads the upstream melt-headspace partial projection.
 
         Resolution:
-          - ``overhead.composition['O2']`` is itself
-            ``max(gas O2, melt.pO2_mbar)`` written by ``overhead.py`` --
-            structurally the commanded setpoint, not a tracked gas
-            inventory.  (The melt-evaporation O₂ coproduct is credited to
-            ``terminal.oxygen_melt_offgas_stored``, never to
-            ``process.overhead_gas``, and ``process.overhead_gas`` is
-            drained to ``terminal.offgas`` every tick.)
+          - ``_melt_headspace_composition_mbar['O2']`` is the upstream
+            melt-side partial. ``overhead.composition`` is downstream of
+            condensation and cannot set authoritative equilibrium pO₂.
           - The commanded setpoint (``melt.pO2_mbar``) is applied again as
             an explicit *floor*, and only when the atmosphere is an
             actively O₂-controlled mode (turbine + bleed holding the
@@ -104,7 +99,15 @@ class EquilibriumMixin:
                 pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
             return max(pO2_bar, self._vacuum_floor_bar())
 
-        pO2_bar = self.overhead.composition.get('O2', 0.0) / 1000.0
+        upstream_partials = getattr(
+            self,
+            '_melt_headspace_composition_mbar',
+            {},
+        ) or {}
+        pO2_bar = max(
+            0.0,
+            float(upstream_partials.get('O2', 0.0) or 0.0) / 1000.0,
+        )
         if self.melt.atmosphere in _O2_CONTROLLED_ATMOSPHERES:
             pO2_bar = max(pO2_bar, self.melt.pO2_mbar / 1000.0)
         return max(pO2_bar, self._vacuum_floor_bar())
@@ -309,8 +312,17 @@ class EquilibriumMixin:
         # --- Melt composition for oxide activities ---
         comp_wt = self.melt.composition_wt_pct()
         atom_ledger = getattr(self, "atom_ledger", None)
+        project_account_mol = getattr(atom_ledger, "project_account_mol", None)
         mol_by_account = getattr(atom_ledger, "mol_by_account", None)
-        if callable(mol_by_account):
+        if callable(project_account_mol):
+            # Canonical balances retain signed sub-tolerance dust so ledger
+            # closure stays unbiased. Physics consumers use the ledger-owned
+            # projection, which clamps only policy-admissible negative dust and
+            # still refuses a materially negative normal account.
+            melt_account_mol = dict(
+                project_account_mol("process.cleaned_melt") or {}
+            )
+        elif callable(mol_by_account):
             melt_account_mol = dict(mol_by_account("process.cleaned_melt") or {})
         else:
             melt_account_mol = {

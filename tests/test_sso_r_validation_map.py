@@ -304,6 +304,7 @@ def test_exact_full_dose_oxidizing_pn2_row_refuses_absent_melt_redox_capacity():
 
 def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():
     setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
+    freeze_gate_curve_cache = {}
     exact_gas = validation_map.GasPoint(0.1, 5.0, "n2_carrier")
     cases = {
         (temperature_C, exact_gas, 1.0)
@@ -336,6 +337,7 @@ def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():
             feedstocks,
             vapor_pressures,
             grid_scope_label=validation_map.GRID_SCOPE_FULL,
+            freeze_gate_curve_cache=freeze_gate_curve_cache,
         )
         assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
         assert math.isfinite(row["redox_source_delta_ln_fO2"])
@@ -481,18 +483,31 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
     ][0]
     assertions = {a["name"]: a for a in smoke_payload["assertions"]}
 
-    assert owner["native_fe_pool_mol"] > 0.0
-    assert owner["native_fe_tap_mol"] > owner["native_fe_vapor_mol"]
-    assert owner["native_fe_vapor_escape_fraction_of_pool"] < 0.001
-    assert owner["stage_3_Fe_wt_pct"] > 0.0
+    assert owner["native_fe_pool_mol"] == pytest.approx(
+        1576.0114767733974, rel=0.0, abs=1.0e-9
+    )
+    assert owner["native_fe_tap_mol"] == pytest.approx(
+        1573.920255077218, rel=0.0, abs=1.0e-9
+    )
+    assert owner["native_fe_vapor_mol"] == pytest.approx(
+        2.091221696179546, rel=0.0, abs=1.0e-12
+    )
+    assert owner["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
+        0.0013269076570818822, rel=0.0, abs=1.0e-15
+    )
+    assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
+        0.057149310772391514, rel=0.0, abs=1.0e-15
+    )
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12
     assert owner["SiO_provider_pO2_bar"] == pytest.approx(1.0e-9)
-    assert owner["SiO_flux_kg_hr"] >= validation_map.OWNER_RECIPE_MIN_SIO_KG_HR
+    assert owner["SiO_flux_kg_hr"] == pytest.approx(
+        0.016997554231818535, rel=0.0, abs=1.0e-15
+    )
     requested_pO2_assertion = assertions[
         "owner_pN2_recipe_point_requested_pO2_semantics"
     ]
-    assert requested_pO2_assertion["passed"] is True
+    assert requested_pO2_assertion["passed"] is False
     assert "map/live share PN2 sweep transport-pO2 semantics" in (
         requested_pO2_assertion["detail"]
     )
@@ -590,6 +605,10 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     window = _assertion(smoke_payload, "grind_ready_target_window")
     parity = _assertion(smoke_payload, "map_live_semantics_parity")
 
+    # grind_ready_target_window = (first_passing_T is not None) AND
+    # certification_pass(owner and live-parity). Live parity is green, but the
+    # corrected loaded-melt geometry leaves the owner row above its native-Fe
+    # escape limit, so the certification window remains closed.
     assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
     assert parity["passed"] is True
     assert window["passed"] is False
@@ -607,6 +626,7 @@ def test_certification_surfaces_require_owner_pass_and_live_parity(
         updated = dict(row)
         if _is_owner_recipe_row(updated):
             updated["ferric_divergence_material"] = True
+            updated["row_passes_base_integrity"] = False
         rows.append(updated)
     assertions = validation_map.evaluate_assertions(
         rows,

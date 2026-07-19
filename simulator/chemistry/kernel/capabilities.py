@@ -5,9 +5,10 @@ state-machine operation a provider may own. Historical binding-spec
 tables can lag the runtime, so binding/doc exports must derive their
 intent list from this enum instead of copying a static table.
 :class:`CapabilityProfile` is the provider's declaration of which intents
-it can dispatch, which subset it holds authority for (i.e. may emit a
-:class:`LedgerTransitionProposal`), which AtomLedger accounts it requests
-to see, and whether request-level fO2 is a consumed control.
+it can dispatch, which subset may occupy an authoritative/fallback dispatch
+slot, which subset may emit a :class:`LedgerTransitionProposal`, which
+AtomLedger accounts it requests to see, and whether request-level fO2 is a
+consumed control.
 """
 
 from __future__ import annotations
@@ -72,10 +73,13 @@ class CapabilityProfile:
         intents: Every intent the provider can dispatch (authoritative or
             shadow / diagnostic).  A provider may NEVER receive a request
             for an intent outside this set.
-        is_authoritative_for: Subset of ``intents`` for which the
-            provider may emit a :class:`LedgerTransitionProposal`.
-            Providers acting only as shadow / diagnostic leave this
-            empty (or a strict subset of ``intents``).
+        is_authoritative_for: Subset of ``intents`` for which the provider
+            may occupy an authoritative or fallback dispatch slot.
+        ledger_transition_authority_for: Subset of ``is_authoritative_for``
+            for which the provider may emit a
+            :class:`LedgerTransitionProposal`. ``None`` preserves the
+            historical default that dispatch authority also grants ledger
+            authority. Diagnostic dispatch owners set this explicitly empty.
         declared_accounts: AtomLedger account names the provider expects
             to read via its :class:`ProviderAccountView`.  Any account
             outside this set is filtered out before the provider sees
@@ -90,6 +94,7 @@ class CapabilityProfile:
     provider_id: str
     intents: frozenset[ChemistryIntent] = field(default_factory=frozenset)
     is_authoritative_for: frozenset[ChemistryIntent] = field(default_factory=frozenset)
+    ledger_transition_authority_for: frozenset[ChemistryIntent] | None = None
     declared_accounts: frozenset[str] = field(default_factory=frozenset)
     consumes_fO2: bool = True
 
@@ -99,6 +104,11 @@ class CapabilityProfile:
             raise ValueError("CapabilityProfile.provider_id is required")
         intents = frozenset(self.intents)
         authoritative = frozenset(self.is_authoritative_for)
+        ledger_authority = (
+            authoritative
+            if self.ledger_transition_authority_for is None
+            else frozenset(self.ledger_transition_authority_for)
+        )
         declared = frozenset(str(a).strip() for a in self.declared_accounts)
         if "" in declared:
             raise ValueError("CapabilityProfile.declared_accounts cannot contain empty names")
@@ -108,9 +118,18 @@ class CapabilityProfile:
                 f"CapabilityProfile.is_authoritative_for must be a subset of intents; "
                 f"unauthorised: {extra}"
             )
+        if not ledger_authority.issubset(authoritative):
+            extra = sorted(i.value for i in (ledger_authority - authoritative))
+            raise ValueError(
+                "CapabilityProfile.ledger_transition_authority_for must be a "
+                f"subset of is_authoritative_for; unauthorised: {extra}"
+            )
         object.__setattr__(self, "provider_id", provider_id)
         object.__setattr__(self, "intents", intents)
         object.__setattr__(self, "is_authoritative_for", authoritative)
+        object.__setattr__(
+            self, "ledger_transition_authority_for", ledger_authority
+        )
         object.__setattr__(self, "declared_accounts", declared)
         object.__setattr__(self, "consumes_fO2", bool(self.consumes_fO2))
 
@@ -120,6 +139,11 @@ class CapabilityProfile:
         return intent in self.intents
 
     def is_authoritative(self, intent: ChemistryIntent) -> bool:
-        """Whether this provider may emit a transition proposal for ``intent``."""
+        """Whether this provider may own an authoritative dispatch slot."""
 
         return intent in self.is_authoritative_for
+
+    def may_emit_ledger_transition(self, intent: ChemistryIntent) -> bool:
+        """Whether this provider may emit a ledger transition proposal."""
+
+        return intent in self.ledger_transition_authority_for

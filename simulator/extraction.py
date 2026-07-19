@@ -68,7 +68,9 @@ class ExtractionMixin:
         self,
         species_names,
     ) -> dict[str, float]:
-        cleaned_melt = self.atom_ledger.mol_by_account('process.cleaned_melt')
+        cleaned_melt = self.atom_ledger.project_account_mol(
+            'process.cleaned_melt'
+        )
         return {
             str(species): max(0.0, float(cleaned_melt.get(species, 0.0)))
             for species in species_names
@@ -456,7 +458,9 @@ class ExtractionMixin:
             if stage_remaining_kg <= self._LEDGER_KG_TOL:
                 stage.collected_kg.pop(species, None)
             else:
-                stage.collected_kg[species] = stage_remaining_kg
+                self._set_condensed_species_projection(
+                    stage_idx, species, stage_remaining_kg
+                )
             if source_remaining_kg <= self._LEDGER_KG_TOL:
                 self._stage_collection_kg_by_source.pop(key, None)
             else:
@@ -473,7 +477,8 @@ class ExtractionMixin:
             self._condensed_species_projected_kg(species)
             - max(0.0, float(target_kg)),
         )
-        for stage in reversed(self.train.stages):
+        for stage_idx in reversed(range(len(self.train.stages))):
+            stage = self.train.stages[stage_idx]
             if excess_kg <= self._LEDGER_KG_TOL:
                 break
             current_kg = max(
@@ -484,7 +489,9 @@ class ExtractionMixin:
             if remaining_kg <= self._LEDGER_KG_TOL:
                 stage.collected_kg.pop(species, None)
             else:
-                stage.collected_kg[species] = remaining_kg
+                self._set_condensed_species_projection(
+                    stage_idx, species, remaining_kg
+                )
             excess_kg -= remove_kg
 
     def _audit_metal_projection_drift(self) -> Dict[str, float]:
@@ -515,7 +522,7 @@ class ExtractionMixin:
         """
         ledger_metals: Dict[str, float] = {}
         for account in STAGE_COLLECTION_BACKING_ACCOUNTS:
-            for species, kg in self.atom_ledger.kg_by_account(account).items():
+            for species, kg in self.atom_ledger.project_account_kg(account).items():
                 try:
                     ledger_kg = float(kg)
                 except (TypeError, ValueError):
@@ -591,10 +598,10 @@ class ExtractionMixin:
 
         prior_pools = {
             'bottom_pool': dict(
-                self.atom_ledger.mol_by_account(METAL_BOTTOM_POOL_ACCOUNT)
+                self.atom_ledger.project_account_mol(METAL_BOTTOM_POOL_ACCOUNT)
             ),
             'float_layer': dict(
-                self.atom_ledger.mol_by_account(METAL_FLOAT_LAYER_ACCOUNT)
+                self.atom_ledger.project_account_mol(METAL_FLOAT_LAYER_ACCOUNT)
             ),
         }
         if not any(prior_pools.values()):
@@ -622,8 +629,14 @@ class ExtractionMixin:
                 transition_meta={'behavior_gate': 'diagnostic_only'},
             )
 
-    def _step_metal_phase_stratification(self, equilibrium) -> None:
-        """Commit diagnostic alloy disposition, then report density/film state."""
+    def _step_metal_phase_stratification(
+        self,
+        equilibrium,
+        *,
+        commit_disposition: bool = True,
+        account_state_source: str = 'builtin-authored',
+    ) -> None:
+        """Derive alloy density/film diagnostics and optionally commit disposition."""
 
         from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
@@ -642,7 +655,10 @@ class ExtractionMixin:
             pool_weight_percent,
         )
 
-        balances = self.atom_ledger.mol_by_account()
+        balances = {
+            account: self.atom_ledger.project_account_mol(account)
+            for account in METAL_PHASE_ACCOUNTS
+        }
         classified_species = BOTTOM_POOL_SPECIES | FLOAT_LAYER_SPECIES
         if not any(
             any(
@@ -676,7 +692,7 @@ class ExtractionMixin:
             ChemistryIntent.METAL_PHASE_STRATIFICATION,
             control_inputs=controls,
         )
-        if result.transition is not None:
+        if commit_disposition and result.transition is not None:
             self._commit_proposal(
                 ChemistryIntent.METAL_PHASE_STRATIFICATION,
                 result.transition,
@@ -686,18 +702,31 @@ class ExtractionMixin:
                 transition_meta={'behavior_gate': 'diagnostic_only'},
             )
 
-        pools_mol = {
-            'bottom_pool': dict(
-                self.atom_ledger.mol_by_account(METAL_BOTTOM_POOL_ACCOUNT)
-            ),
-            'float_layer': dict(
-                self.atom_ledger.mol_by_account(METAL_FLOAT_LAYER_ACCOUNT)
-            ),
-        }
-        self._metal_phase_stratification_prior_pools_mol = {
-            pool_name: dict(species_mol)
-            for pool_name, species_mol in pools_mol.items()
-        }
+        if commit_disposition:
+            pools_mol = {
+                'bottom_pool': dict(
+                    self.atom_ledger.project_account_mol(
+                        METAL_BOTTOM_POOL_ACCOUNT
+                    )
+                ),
+                'float_layer': dict(
+                    self.atom_ledger.project_account_mol(
+                        METAL_FLOAT_LAYER_ACCOUNT
+                    )
+                ),
+            }
+            self._metal_phase_stratification_prior_pools_mol = {
+                pool_name: dict(species_mol)
+                for pool_name, species_mol in pools_mol.items()
+            }
+        else:
+            derived_pools = dict(result.diagnostic or {}).get(
+                'pool_mol_after', {}
+            )
+            pools_mol = {
+                'bottom_pool': dict(derived_pools.get('bottom_pool', {})),
+                'float_layer': dict(derived_pools.get('float_layer', {})),
+            }
         pool_reports: dict[str, dict[str, Any]] = {}
         for pool_name, species_mol in pools_mol.items():
             positive = {
@@ -769,6 +798,14 @@ class ExtractionMixin:
 
         self._last_metal_phase_stratification_diagnostic = {
             **dict(result.diagnostic or {}),
+            'provenance': {
+                'account_state_source': account_state_source,
+                'diagnostic_derivation': (
+                    'builtin-committed'
+                    if commit_disposition
+                    else 'builtin-read-only'
+                ),
+            },
             'temperature_K': temperature_K,
             'melt_density_kg_m3': melt_density,
             'melt_density_tier': melt_density_tier,
@@ -1150,6 +1187,8 @@ class ExtractionMixin:
     def _route_mre_gas_products_to_condensation(
         self,
         gas_products_kg: Mapping[str, float],
+        *,
+        sample_time_h: float | None = None,
     ) -> dict[str, Any]:
         species_kg = {
             str(species): float(kg)
@@ -1162,6 +1201,8 @@ class ExtractionMixin:
         evap_flux = EvaporationFlux(species_kg_hr=species_kg)
         evap_flux.update_totals()
         self._configure_condensation_operating_conditions(evap_flux)
+        if sample_time_h is not None:
+            self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
         route_result = self.condensation_model.route(evap_flux, self.melt)
         route_diagnostic: dict[str, Any] = {}
         species_order = tuple(
@@ -1207,7 +1248,7 @@ class ExtractionMixin:
             }
         return route_diagnostic
 
-    def _step_mre(self) -> float:
+    def _step_mre(self, *, sample_time_h: float | None = None) -> float:
         """
         Perform one hour of molten regolith electrolysis (C5 or MRE baseline).
 
@@ -1696,7 +1737,8 @@ class ExtractionMixin:
             if delta_kg > 1e-10:
                 mre_gas_deltas_kg[metal] = delta_kg
         gas_route_diagnostic = self._route_mre_gas_products_to_condensation(
-            mre_gas_deltas_kg
+            mre_gas_deltas_kg,
+            sample_time_h=sample_time_h,
         )
         if gas_route_diagnostic:
             result['mre_gas_condensation_route'] = gas_route_diagnostic
@@ -2869,8 +2911,8 @@ class ExtractionMixin:
         residual_kg = 0.0
         ree_kg = 0.0
         for account in ('process.cleaned_melt', 'terminal.slag'):
-            for species, kg in self.atom_ledger.kg_by_account(account).items():
-                amount = max(0.0, float(kg))
+            for species, kg in self.atom_ledger.project_account_kg(account).items():
+                amount = float(kg)
                 if account == 'terminal.slag' and species in aluminate_species:
                     continue
                 residual_kg += amount
@@ -2928,19 +2970,21 @@ class ExtractionMixin:
         if p_total_raw is None:
             p_total_raw = cfg.get('p_total_mbar_default')
         p_total_mbar = self._c7_float(p_total_raw, self.melt.p_total_mbar)
-        route_controls = {
+        cf7_ca_shell_controls = {
             'active_ca_condensation_route': self._c7_bool(
                 cfg.get('active_ca_condensation_route'), True),
+            # Legacy serialized key = CF-7 Ca-shell enable.
             'dedicated_ca_condenser': self._c7_bool(
                 cfg.get('dedicated_ca_condenser'), True),
             'ca_condensation_species': str(
                 cfg.get('ca_condensation_species') or 'Ca'),
+            # Legacy serialized key = CF-7 Ca-shell temperature.
             'ca_condenser_temperature_C': self._c7_float(
                 cfg.get('ca_condenser_temperature_C'), 780.0),
         }
-        active_route = (
+        cf7_ca_shell_route_active = (
             BuiltinCaAluminothermicStepProvider
-            ._has_dedicated_ca_route(route_controls)
+            ._has_active_cf7_ca_shell_route(cf7_ca_shell_controls)
         )
         area_m2 = max(
             0.0,
@@ -2969,14 +3013,7 @@ class ExtractionMixin:
                 )
             except (OverflowError, TypeError, ValueError, ZeroDivisionError):
                 p_sat_pa = 0.0
-        p_bulk_pa = max(
-            0.0,
-            self._c7_float(
-                getattr(self.overhead, 'composition', {}).get('Ca', 0.0),
-                0.0,
-            )
-            * 100.0,
-        )
+        p_bulk_pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Ca'))
         overhead_pressure_pa = max(0.0, p_total_mbar * 100.0)
         series_config = dict(
             (getattr(self, 'setpoints', {}) or {})
@@ -2989,7 +3026,7 @@ class ExtractionMixin:
         gas_temperature_K = float(
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or hold_temp_K
         )
-        if active_route and (
+        if cf7_ca_shell_route_active and (
             C7_MIN_TOTAL_PRESSURE_MBAR <= p_total_mbar <= C7_MAX_TOTAL_PRESSURE_MBAR
         ):
             series_flux = _series_resistance_evaporation_flux_kg_m2_s(
@@ -3106,7 +3143,7 @@ class ExtractionMixin:
             'c7_transport_source': 'series_resistance_hkl_ca_evaporation',
             'c7_transport_refusal': (
                 ''
-                if active_route
+                if cf7_ca_shell_route_active
                 and C7_MIN_TOTAL_PRESSURE_MBAR
                 <= p_total_mbar
                 <= C7_MAX_TOTAL_PRESSURE_MBAR
@@ -3139,7 +3176,17 @@ class ExtractionMixin:
         extent_fraction_raw = self._c7_float(cfg.get('extent_fraction'), 1.0)
         extent_fraction = self._c7_clamp(extent_fraction_raw, 0.0, 1.0)
 
-        balances = self.atom_ledger.mol_by_account()
+        c7_accounts = (
+            'process.cleaned_melt',
+            'terminal.slag',
+            METAL_PHASE_ACCOUNT,
+            METAL_FLOAT_LAYER_ACCOUNT,
+            C7_AL_CREDIT_ACCOUNT,
+        )
+        balances = {
+            account: self.atom_ledger.project_account_mol(account)
+            for account in c7_accounts
+        }
         cleaned_cao = max(
             0.0, float(balances.get('process.cleaned_melt', {}).get('CaO', 0.0))
         )
@@ -3171,6 +3218,18 @@ class ExtractionMixin:
         )
         r_transport, transport_diag = self._c7_transport_extent_mol(
             cfg, ca_per_extent=stoich['Ca'])
+        transport_refusal = str(
+            transport_diag.get('c7_transport_refusal') or '')
+        if transport_refusal:
+            self._last_c7_refusal_diagnostic = {
+                'reason_refused': transport_refusal,
+                'c7_transport_refusal': transport_refusal,
+                'r_transport': r_transport,
+                'transport_ca_mol': float(
+                    transport_diag.get('transport_ca_mol', 0.0) or 0.0),
+                'c7_overhead_pressure_pa': float(
+                    transport_diag.get('c7_overhead_pressure_pa', 0.0) or 0.0),
+            }
         objective_extent = min(r_stoich_total, r_transport)
         objective = str(cfg.get('objective') or 'ree_enrichment')
         p_total_raw = cfg.get('p_total_mbar')
@@ -3195,10 +3254,12 @@ class ExtractionMixin:
             'pO2_mbar': self._c7_float(pO2_raw, self.melt.pO2_mbar),
             'active_ca_condensation_route': self._c7_bool(
                 cfg.get('active_ca_condensation_route'), True),
+            # Legacy serialized key = CF-7 Ca-shell enable.
             'dedicated_ca_condenser': self._c7_bool(
                 cfg.get('dedicated_ca_condenser'), True),
             'ca_condensation_species': str(
                 cfg.get('ca_condensation_species') or 'Ca'),
+            # Legacy serialized key = CF-7 Ca-shell temperature.
             'ca_condenser_temperature_C': self._c7_float(
                 cfg.get('ca_condenser_temperature_C'), 780.0),
             'thermo_margin_kj_per_mol_o2': self._c7_float(
@@ -3304,8 +3365,9 @@ class ExtractionMixin:
                 'c7_al_export_remaining_mol': max(
                     0.0,
                     float(
-                        self.atom_ledger.mol_by_account()
-                        .get('process.metal_phase', {})
+                        self.atom_ledger.project_account_mol(
+                            'process.metal_phase'
+                        )
                         .get('Al', 0.0)
                     ),
                 ),

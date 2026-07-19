@@ -140,7 +140,7 @@ def test_knudsen_regime_classification_boundaries(knudsen_number, expected):
     assert condensation_module.classify_knudsen_regime(knudsen_number) is expected
 
 
-def test_true_vacuum_mean_free_path_is_infinite_and_configured_route_refuses():
+def test_true_vacuum_mean_free_path_is_infinite_and_routes_continuously():
     assert math.isinf(condensation_module._mean_free_path_m(0.0, 1773.15))
     assert math.isinf(
         condensation_module._knudsen_number(0.0, 1773.15, 0.12)
@@ -151,7 +151,7 @@ def test_true_vacuum_mean_free_path_is_infinite_and_configured_route_refuses():
         gas_temperature_C=1500.0,
         pipe_diameter_m=0.12,
     )
-    assert diagnostic["status"] == "refused"
+    assert diagnostic["status"] == "warning"
     assert diagnostic["regime"] == KnudsenRegime.FREE_MOLECULAR.value
     assert diagnostic["knudsen_number"] is None
 
@@ -165,10 +165,11 @@ def test_true_vacuum_mean_free_path_is_infinite_and_configured_route_refuses():
     melt.temperature_C = 1500.0
     flux = EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0)
 
-    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
-        model.route(flux, melt)
-    assert exc_info.value.diagnostic["status"] == "refused"
-    assert exc_info.value.diagnostic["regime"] == KnudsenRegime.FREE_MOLECULAR.value
+    result = model.route(flux, melt)
+    assert result.knudsen_regime_diagnostic["status"] == "warning"
+    assert result.knudsen_regime_diagnostic["regime"] == (
+        KnudsenRegime.FREE_MOLECULAR.value
+    )
 
 
 def test_c2a_knudsen_pressure_floor_recovers_stranded_setpoint():
@@ -200,25 +201,27 @@ def test_c2a_knudsen_pressure_floor_recovers_stranded_setpoint():
     assert applied_kn < condensation_module.FREE_MOLECULAR_KNUDSEN_MIN
 
 
-def test_c2a_knudsen_pressure_floor_retains_typed_refusal_for_empty_band():
+def test_c2a_knudsen_pressure_floor_uses_continuous_transport_for_empty_band():
     model = CondensationModel(CondensationTrain.create_default())
 
-    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
-        model.adjust_c2a_pressure_setpoint(
-            requested_p_total_mbar=1.0e-6,
-            pO2_mbar=0.0,
-            gas_temperature_C=1600.0,
-            pipe_diameter_m=1.0e-8,
-            pN2_min_mbar=5.0,
-            pN2_max_mbar=15.0,
-            carrier_gas="N2",
-        )
+    adjustment = model.adjust_c2a_pressure_setpoint(
+        requested_p_total_mbar=1.0e-6,
+        pO2_mbar=0.0,
+        gas_temperature_C=1600.0,
+        pipe_diameter_m=1.0e-8,
+        pN2_min_mbar=5.0,
+        pN2_max_mbar=15.0,
+        carrier_gas="N2",
+    )
 
-    adjustment = exc_info.value.diagnostic["pressure_adjustment"]
-    assert adjustment["status"] == "refused"
-    assert adjustment["reason"] == "c2a_knudsen_pressure_window_empty"
+    assert adjustment["status"] == "warning"
+    assert adjustment["reason"] == (
+        "c2a_knudsen_pressure_window_continuous_transport"
+    )
     assert adjustment["required_pN2_mbar"] > 15.0
-    assert exc_info.value.reason == "knudsen_outside_viscous_flow"
+    assert "applied_pN2_mbar" not in adjustment
+    assert "applied_p_total_mbar" not in adjustment
+    assert adjustment["band_max_pN2_mbar"] == pytest.approx(15.0)
 
 
 def test_unknown_carrier_knudsen_diagnostic_fails_loud():
@@ -227,7 +230,7 @@ def test_unknown_carrier_knudsen_diagnostic_fails_loud():
             overhead_pressure_mbar=10.0,
             gas_temperature_C=1500.0,
             pipe_diameter_m=0.12,
-            carrier_gas="pHe",
+            carrier_gas="badHe",
         )
 
 
@@ -255,6 +258,7 @@ def test_blank_explicit_carrier_gas_fails_loud():
         ("N2", "N2"),
         ("pN2", "N2"),
         ("N2 sweep", "N2"),
+        ("pHe", "He"),
         ("pAr", "Ar"),
         ("pO2", "O2"),
         ("pCO2", "CO2"),
@@ -275,9 +279,12 @@ def test_supported_carrier_gas_aliases_resolve_without_fallback(carrier_gas, exp
     assert diagnostic["carrier_collision_diameter_m"] == pytest.approx(
         condensation_module._carrier_collision_diameter_m(expected)
     )
+    assert PyrolysisSimulator._normalize_condensation_carrier_gas(
+        carrier_gas, allow_unset=False
+    ) == expected
 
 
-@pytest.mark.parametrize("carrier_gas", ["pHe", "badCO2"])
+@pytest.mark.parametrize("carrier_gas", ["badHe", "badCO2"])
 def test_invalid_campaign_carrier_gas_fails_before_defaulting_to_n2(carrier_gas):
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
     sim.melt = MeltState(campaign=CampaignPhase.C2A)
@@ -403,7 +410,7 @@ def test_pressure_coating_pareto_diagnostic_uses_actual_kn_gate_and_length():
     assert set(diagnostic["by_species"]).issuperset({"Na", "K", "SiO", "Fe"})
 
 
-def test_c2a_recipe_free_molecular_transport_is_refused(monkeypatch):
+def test_c2a_recipe_free_molecular_transport_is_continuous(monkeypatch):
     run = PyrolysisRun(
         feedstock_id="mars_basalt",
         campaign="C2A",
@@ -420,8 +427,8 @@ def test_c2a_recipe_free_molecular_transport_is_refused(monkeypatch):
     sim.melt.temperature_C = 1700.0
     original_estimate = sim.overhead_model.estimate_transport_state
 
-    def low_pressure_transport(evap_flux, melt):
-        state = dict(original_estimate(evap_flux, melt))
+    def low_pressure_transport(evap_flux, melt, **kwargs):
+        state = dict(original_estimate(evap_flux, melt, **kwargs))
         state["pressure_mbar"] = 1.0e-6
         return state
 
@@ -432,11 +439,8 @@ def test_c2a_recipe_free_molecular_transport_is_refused(monkeypatch):
     document = run._run_session(session)
     diagnostic = document["run_metadata"]["knudsen_regime_diagnostic"]
 
-    assert document["status"] == "failed"
-    assert document["reason"] == "poisoned_hour"
-    assert "knudsen_outside_viscous_flow" in document["error_message"]
-    assert "PoisonedHourError" in document["error_message"]
-    assert diagnostic["status"] == "refused"
+    assert document["status"] in {"ok", "partial"}
+    assert diagnostic["status"] == "warning"
     assert diagnostic["reason"] == "knudsen_outside_viscous_flow"
     assert any(
         segment["regime"] == KnudsenRegime.FREE_MOLECULAR.value

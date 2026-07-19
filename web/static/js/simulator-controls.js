@@ -214,19 +214,29 @@ function currentRecipeControlsPayload() {
 
 function applyLoadedRecipeStartIdentity(payload) {
     if (loadedRecipePatch) payload.setpoints_patch = loadedRecipePatch;
+    if (loadedRecipeCostParameters) {
+        payload.cost_parameters = loadedRecipeCostParameters;
+        if (loadedRecipeCostRecipeName) {
+            payload.cost_parameters_recipe_name = loadedRecipeCostRecipeName;
+        }
+    }
     payload.runtime_campaign_overrides = buildRuntimeCampaignOverrides();
     return payload;
 }
 
 let loadedRecipePatch = null;
+let loadedRecipeCostParameters = null;
+let loadedRecipeCostRecipeName = null;
 let recipeChoices = [];
 let lastRecipeTick = null;
 let lastRecipeSummary = null;
 
 function clearLoadedRecipeForManualEdit() {
-    if (!loadedRecipePatch) return;
+    if (!loadedRecipePatch && !loadedRecipeCostParameters) return;
     loadedRecipePatch = null;
-    setStatusText('Recipe edited from loaded controls');
+    loadedRecipeCostParameters = null;
+    loadedRecipeCostRecipeName = null;
+    setStatusText('Recipe edited; loaded recipe prices cleared');
 }
 
 function handleRecipeDefiningControlEdit(e) {
@@ -741,9 +751,20 @@ document.getElementById('recipe-load-confirm')?.addEventListener('click', () => 
             data.setpoints_patch
             && Object.keys(data.setpoints_patch).length
         ) ? data.setpoints_patch : null;
+        loadedRecipeCostParameters = (
+            data.cost_parameters
+            && typeof data.cost_parameters === 'object'
+            && !Array.isArray(data.cost_parameters)
+        ) ? data.cost_parameters : null;
+        loadedRecipeCostRecipeName = loadedRecipeCostParameters
+            ? (data.name || null)
+            : null;
         applyLoadedRecipeControls(data.controls || {});
         hideRecipeModal('load-recipe-modal');
-        setStatusText(`Loaded recipe: ${data.title || data.name}`);
+        const displayName = data.title || data.name;
+        setStatusText(loadedRecipeCostParameters
+            ? `Loaded recipe: ${displayName}; prices from recipe ${data.name} will apply`
+            : `Loaded recipe: ${displayName}; no recipe prices supplied`);
     }).catch(error => setRecipeError('recipe-load-error', error.message));
 });
 

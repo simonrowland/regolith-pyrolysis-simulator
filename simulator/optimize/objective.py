@@ -8,7 +8,7 @@ from dataclasses import replace
 import fnmatch
 import hashlib
 import math
-from types import MappingProxyType
+from types import MappingProxyType, SimpleNamespace
 from collections.abc import Callable, Mapping as MappingABC, Sequence
 from typing import Any, Iterable, Mapping, TypeVar
 
@@ -64,6 +64,18 @@ FURNACE_LIFESPAN_COST_METRICS = frozenset({
     "furnace_lifespan_consumed_fraction",
     "furnace_lifespan_cost_fraction",
 })
+_MASS_OBJECTIVE_METRICS = frozenset(
+    {
+        "pure_silica_glass_kg",
+        "metals_plus_o2_kg",
+        "metals_total_kg",
+        "O2_kg",
+        "o2_kg",
+        "oxygen_kg",
+        "oxygen_stored_kg",
+        "oxygen_vented_kg",
+    }
+)
 SUPPORTED_COMPOSITION_POOLS = COMPOSITION_PRODUCT_POOLS
 COMPOSITION_VECTOR_SPECIES = frozenset({"Na", "K", "Fe", "Mg", "Si", "Al", "Ca", "O2"})
 COMPOSITION_VECTOR_ROLES = frozenset({"extract", "retain", "free", "to_window"})
@@ -1281,15 +1293,49 @@ def objective_definitions(profile: Mapping[str, Any]) -> tuple[ObjectiveDefiniti
     for ordinal, raw in enumerate(raw_objectives):
         if not isinstance(raw, Mapping):
             raise ObjectiveProfileError("each objective must be a mapping")
+        metric = canonical_objective_metric(str(raw.get("metric", "")))
+        units = str(raw.get("units", ""))
+        expected_units = _expected_objective_units(metric)
+        if expected_units is not None and units != expected_units:
+            raise ObjectiveProfileError(
+                f"objectives[{ordinal}].units for {metric!r} must be "
+                f"{expected_units!r}, got {units!r}"
+            )
         definitions.append(
             ObjectiveDefinition(
-                metric=canonical_objective_metric(str(raw.get("metric", ""))),
+                metric=metric,
                 sense=str(raw.get("sense", "")),
-                units=str(raw.get("units", "")),
+                units=units,
                 ordinal=ordinal,
             )
         )
     return tuple(definitions)
+
+
+def _expected_objective_units(metric: str) -> str | None:
+    if metric.startswith(COMPOSITION_TARGET_METRIC_PREFIX):
+        return "score_0_1"
+    if _energy_component_metric(metric) is not None:
+        return "kWh"
+    if _energy_per_product_metric(metric) is not None:
+        return "kWh/kg"
+    if metric in _MASS_OBJECTIVE_METRICS:
+        return "kg"
+    if metric == ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC:
+        return "kWh"
+    if metric in {"duration_h", "total_hours", *FURNACE_TIME_METRICS}:
+        return "h"
+    if metric in SOLAR_THERMAL_FLUX_METRICS:
+        return "K*h"
+    if metric in THROUGHPUT_OWNER_COST_METRICS:
+        return "USD"
+    if metric in FURNACE_LIFESPAN_COST_METRICS:
+        return "fraction/run"
+    if metric == SSO2_OWNER_RECIPE_ID:
+        return "score_0_1"
+    if metric.endswith("_kg"):
+        return "kg"
+    return None
 
 
 def objective_importance_evidence(
@@ -1672,7 +1718,11 @@ def _best_tap_score(
         profile=profile,
     )
     tap_coating_summary = (
-        _tap_coating_product_summary(run_execution, snapshots, tap_hour)
+        _tap_coating_product_summary(
+            run_execution,
+            _recorded_tap_snapshots(run_execution),
+            tap_hour,
+        )
         if nonterminal
         else MappingProxyType({})
     )
@@ -1721,12 +1771,7 @@ def _tap_snapshots(
     run_execution: Any,
     best_tap: Mapping[str, Any],
 ) -> tuple[Any, ...]:
-    snapshots = tuple(getattr(run_execution, "snapshots", ()) or ())
-    if not snapshots:
-        trace = getattr(run_execution, "trace", None)
-        snapshots = tuple(getattr(trace, "snapshots", ()) or ())
-    if not snapshots:
-        raise ObjectiveComputationError("best_tap requires recorded hour snapshots")
+    snapshots = _recorded_tap_snapshots(run_execution)
     grid = best_tap["tap_grid"]
     if grid == "recorded_hours":
         return snapshots
@@ -1738,6 +1783,16 @@ def _tap_snapshots(
             f"best_tap tap_grid requested missing hours: {missing}"
         )
     return tuple(by_hour[hour] for hour in sorted(requested))
+
+
+def _recorded_tap_snapshots(run_execution: Any) -> tuple[Any, ...]:
+    snapshots = tuple(getattr(run_execution, "snapshots", ()) or ())
+    if not snapshots:
+        trace = getattr(run_execution, "trace", None)
+        snapshots = tuple(getattr(trace, "snapshots", ()) or ())
+    if not snapshots:
+        raise ObjectiveComputationError("best_tap requires recorded hour snapshots")
+    return snapshots
 
 
 def _tap_pool_projection(
@@ -1772,6 +1827,11 @@ def _tap_coating_product_summary(
     hour: int,
 ) -> Mapping[str, Any]:
     raw_by_segment = _cumulative_wall_deposit_by_segment_species_kg(snapshots, hour)
+    campaigns_elapsed = _campaigns_elapsed_through_hour(
+        run_execution,
+        snapshots,
+        hour,
+    )
     if not raw_by_segment:
         authority = _coating_authority_status(raw_by_segment, run_execution)
         return MappingProxyType(
@@ -1780,7 +1840,11 @@ def _tap_coating_product_summary(
                 "wall_deposit_kg_by_zone_species": MappingProxyType({}),
                 "wall_deposit_remobilization_by_segment_species": MappingProxyType({}),
                 "campaigns_to_resinter": "infinite",
-                **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
+                "aggregate_campaigns_to_resinter": "infinite",
+                **_furnace_lifespan_cost_summary_from_raw(
+                    raw_by_segment,
+                    campaigns_elapsed=campaigns_elapsed,
+                ),
                 **_coating_authority_summary(authority),
             }
         )
@@ -1818,10 +1882,56 @@ def _tap_coating_product_summary(
                 })
                 for segment, species_map in remobilization.items()
             }),
-            "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
-            **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
+            "campaigns_to_resinter": _campaigns_to_resinter(
+                raw_by_segment,
+                campaigns_elapsed=campaigns_elapsed,
+            ),
+            "aggregate_campaigns_to_resinter": _aggregate_campaigns_to_resinter(
+                raw_by_segment,
+                campaigns_elapsed=campaigns_elapsed,
+            ),
+            **_furnace_lifespan_cost_summary_from_raw(
+                raw_by_segment,
+                campaigns_elapsed=campaigns_elapsed,
+            ),
             **_coating_authority_summary(authority),
         }
+    )
+
+
+def _campaigns_elapsed_through_hour(
+    run_execution: Any,
+    snapshots: Sequence[Any],
+    hour: int,
+) -> float:
+    terminal_elapsed = _campaigns_elapsed(run_execution)
+    terminal_hour = max((_snapshot_hour(snapshot) for snapshot in snapshots), default=0)
+    if terminal_hour <= 0 or hour >= terminal_hour:
+        return terminal_elapsed
+
+    session = getattr(run_execution, "session", None)
+    step_results = tuple(getattr(session, "_step_results", ()))
+    if len(step_results) < terminal_hour:
+        return terminal_elapsed * float(hour) / float(terminal_hour)
+    snapshot = _snapshot_by_hour(snapshots, hour)
+    sim = getattr(run_execution, "simulator", run_execution)
+    tap_sim = SimpleNamespace(
+        campaign_mgr=getattr(sim, "campaign_mgr", None),
+        melt=SimpleNamespace(campaign=getattr(snapshot, "campaign", None)),
+        record=getattr(sim, "record", None),
+    )
+    # Re-run the round-3 completed-campaign derivation on history truncated at
+    # tap_hour: completed campaigns count as units and the active campaign uses
+    # its configured max-hold, never a later campaign's actual close duration.
+    tap_session = SimpleNamespace(
+        _step_results=step_results[:hour],
+        simulator=tap_sim,
+    )
+    from simulator.run_executor import _campaigns_elapsed_from_session_history
+
+    return _campaigns_elapsed_from_session_history(
+        tap_session,
+        fallback=terminal_elapsed * float(hour) / float(terminal_hour),
     )
 
 
@@ -2874,10 +2984,11 @@ def _captured_products_mol(
     result: dict[str, float] = {}
     ledger = getattr(sim, "atom_ledger", None)
     mol_by_account = getattr(ledger, "mol_by_account", None)
+    project_account_mol = getattr(ledger, "project_account_mol", None)
     if callable(mol_by_account):
         raw = mol_by_account()
         if isinstance(raw, Mapping):
-            for account, species_mol in raw.items():
+            for account, raw_species_mol in raw.items():
                 account_name = str(account)
                 if account_name in _VENTED_PRODUCT_ACCOUNTS:
                     continue
@@ -2892,6 +3003,11 @@ def _captured_products_mol(
                     }
                 ):
                     continue
+                species_mol = (
+                    project_account_mol(account_name)
+                    if callable(project_account_mol)
+                    else raw_species_mol
+                )
                 if not isinstance(species_mol, Mapping):
                     continue
                 for species, mol in species_mol.items():
@@ -3033,9 +3149,14 @@ def _ledger_mol_by_accounts(sim: Any, accounts: Sequence[str]) -> dict[str, floa
     mol_by_account = getattr(ledger, "mol_by_account", None)
     if not callable(mol_by_account):
         return {}
+    project_account_mol = getattr(ledger, "project_account_mol", None)
     result: dict[str, float] = {}
     for account in accounts:
-        raw = mol_by_account(account)
+        raw = (
+            project_account_mol(account)
+            if callable(project_account_mol)
+            else mol_by_account(account)
+        )
         if not isinstance(raw, Mapping):
             continue
         for species, mol in raw.items():
@@ -3383,8 +3504,18 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
             })
             for segment, species_map in remobilization.items()
         }),
-        "campaigns_to_resinter": _campaigns_to_resinter(raw_by_segment),
-        **_furnace_lifespan_cost_summary_from_raw(raw_by_segment),
+        "campaigns_to_resinter": _campaigns_to_resinter(
+            raw_by_segment,
+            campaigns_elapsed=_campaigns_elapsed(run_execution),
+        ),
+        "aggregate_campaigns_to_resinter": _aggregate_campaigns_to_resinter(
+            raw_by_segment,
+            campaigns_elapsed=_campaigns_elapsed(run_execution),
+        ),
+        **_furnace_lifespan_cost_summary_from_raw(
+            raw_by_segment,
+            campaigns_elapsed=_campaigns_elapsed(run_execution),
+        ),
         **_coating_authority_summary(authority),
     })
 
@@ -3700,15 +3831,68 @@ def _wall_deposit_by_segment_species_summary(
 
 def _campaigns_to_resinter(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+    *,
+    campaigns_elapsed: float = 1.0,
+) -> float | str:
+    elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
+    if elapsed <= 0.0:
+        raise ObjectiveComputationError("campaigns_elapsed must be positive")
+    by_segment = _wall_deposit_by_segment_species_summary(
+        wall_deposit_by_segment_species
+    )
+    segment_loads_kg_per_campaign = [
+        sum(species_kg.values()) / elapsed
+        for species_kg in by_segment.values()
+        if sum(species_kg.values()) > 0.0
+    ]
+    if not segment_loads_kg_per_campaign:
+        return "infinite"
+    controlling_load_kg_per_campaign = max(segment_loads_kg_per_campaign)
+    threshold = _wall_resinter_threshold_kg()
+    if threshold is None:
+        return f"resinter_threshold_kg / {controlling_load_kg_per_campaign:.12g}"
+    return threshold / controlling_load_kg_per_campaign
+
+
+def _aggregate_campaigns_to_resinter(
+    wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+    *,
+    campaigns_elapsed: float = 1.0,
 ) -> float | str:
     by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
     if not by_species:
         return "infinite"
-    total_wall_load_kg = sum(by_species.values())
+    elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
+    if elapsed <= 0.0:
+        raise ObjectiveComputationError("campaigns_elapsed must be positive")
+    aggregate_load_kg_per_campaign = sum(by_species.values()) / elapsed
     threshold = _wall_resinter_threshold_kg()
     if threshold is None:
-        return f"resinter_threshold_kg / {total_wall_load_kg:.12g}"
-    return threshold / total_wall_load_kg
+        return f"resinter_threshold_kg / {aggregate_load_kg_per_campaign:.12g}"
+    return threshold / aggregate_load_kg_per_campaign
+
+
+def _campaigns_elapsed(run_execution: Any) -> float:
+    direct = getattr(run_execution, "campaigns_elapsed", None)
+    if direct is not None:
+        elapsed = _finite_float(direct, "run_execution.campaigns_elapsed")
+        if elapsed <= 0.0:
+            raise ObjectiveComputationError(
+                "run_execution.campaigns_elapsed must be positive"
+            )
+        return elapsed
+    metadata = getattr(run_execution, "run_metadata", None)
+    if metadata is None:
+        document = getattr(run_execution, "result_document", None)
+        if isinstance(document, Mapping):
+            metadata = document.get("run_metadata")
+    if not isinstance(metadata, Mapping):
+        return 1.0
+    raw = metadata.get("campaigns_elapsed", metadata.get("campaign_index", 1.0))
+    elapsed = _finite_float(raw, "run_metadata.campaigns_elapsed")
+    if elapsed <= 0.0:
+        raise ObjectiveComputationError("run_metadata.campaigns_elapsed must be positive")
+    return elapsed
 
 
 def _wall_deposit_by_species_summary(
@@ -3753,14 +3937,31 @@ def _furnace_lifespan_cost_summary(
     sim: Any,
 ) -> Mapping[str, Any]:
     raw = _wall_deposit_metric_raw(run_execution, sim)
-    return _furnace_lifespan_cost_summary_from_raw(raw)
+    return _furnace_lifespan_cost_summary_from_raw(
+        raw,
+        campaigns_elapsed=(
+            _campaigns_elapsed(run_execution) if run_execution is not None else 1.0
+        ),
+    )
 
 
 def _furnace_lifespan_cost_summary_from_raw(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
+    *,
+    campaigns_elapsed: float = 1.0,
 ) -> Mapping[str, Any]:
-    by_species = _wall_deposit_by_species_summary(wall_deposit_by_segment_species)
-    total_wall_load_kg = sum(by_species.values())
+    elapsed = _finite_float(campaigns_elapsed, "campaigns_elapsed")
+    if elapsed <= 0.0:
+        raise ObjectiveComputationError("campaigns_elapsed must be positive")
+    cumulative_by_species = _wall_deposit_by_species_summary(
+        wall_deposit_by_segment_species
+    )
+    cumulative_total_wall_load_kg = sum(cumulative_by_species.values())
+    by_species = MappingProxyType({
+        species: kg / elapsed
+        for species, kg in cumulative_by_species.items()
+    })
+    total_wall_load_kg = cumulative_total_wall_load_kg / elapsed
     threshold = _wall_resinter_threshold_kg()
     summary: dict[str, Any] = {
         "furnace_lifespan_consumed_fraction": None,
@@ -3771,6 +3972,8 @@ def _furnace_lifespan_cost_summary_from_raw(
         "resinter_threshold_kg": threshold,
         "wall_deposit_total_kg": total_wall_load_kg,
         "wall_deposit_kg_by_species": by_species,
+        "wall_deposit_cumulative_total_kg": cumulative_total_wall_load_kg,
+        "wall_deposit_cumulative_kg_by_species": cumulative_by_species,
     }
     if threshold is None:
         return MappingProxyType(summary)
@@ -3896,11 +4099,23 @@ def _marginal_extraction_cost_summary(
     run_execution: Any | None,
     cost_parameters: CostParameters,
 ) -> Mapping[str, Any]:
-    energy_kWh = _variable_energy_kWh(sim, run_execution=run_execution)
-    # Unit check: kWh * USD/kWh = USD. The simulator energy total already
-    # includes condenser, turbine, MRE electrical, and evaporation-equivalent
-    # kWh; _pumping_energy_penalty_kWh adds the T-005 pumping sidecar.
-    energy_cost_usd = energy_kWh * cost_parameters.electricity_cost_per_kWh
+    electrical_kWh = _energy_component_value(
+        sim,
+        "electrical",
+        run_execution=run_execution,
+    )
+    solar_heat_kWh = _energy_component_value(
+        sim,
+        "evaporation_thermal",
+        run_execution=run_execution,
+    )
+    electrical_cost_usd = (
+        electrical_kWh * cost_parameters.electricity_cost_per_kWh
+    )
+    solar_heat_cost_usd = (
+        solar_heat_kWh * cost_parameters.solar_heat_cost_per_kWh
+    )
+    energy_cost_usd = electrical_cost_usd + solar_heat_cost_usd
     reagent = _reagent_consumption_cost_summary(
         sim,
         product_ledger,
@@ -3926,27 +4141,16 @@ def _marginal_extraction_cost_summary(
             "+ per-run depreciation"
         ),
         "marginal_cost_usd": total,
-        "energy_kWh": energy_kWh,
+        "energy_electrical_kWh": electrical_kWh,
+        "energy_evaporation_thermal_kWh": solar_heat_kWh,
         "electricity_cost_per_kWh": cost_parameters.electricity_cost_per_kWh,
+        "solar_heat_cost_per_kWh": cost_parameters.solar_heat_cost_per_kWh,
+        "electrical_cost_usd": electrical_cost_usd,
+        "solar_heat_cost_usd": solar_heat_cost_usd,
         "energy_cost_usd": energy_cost_usd,
         "reagent": reagent,
         "depreciation": depreciation,
     })
-
-
-def _variable_energy_kWh(
-    sim: Any,
-    *,
-    run_execution: Any | None,
-) -> float:
-    return (
-        _sim_float(
-            sim,
-            "energy_electrical_plus_evaporation_cumulative_kWh",
-            "energy_electrical_plus_evaporation_kWh",
-        )
-        + _pumping_energy_penalty_kWh(sim, run_execution=run_execution)
-    )
 
 
 def _reagent_consumption_cost_summary(

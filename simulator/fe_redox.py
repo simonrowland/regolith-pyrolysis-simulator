@@ -198,10 +198,27 @@ def kress91_referenced_log_fO2(
     target_pressure_bar: float | None = None,
 ) -> float:
     redox_fO2_log = float(fO2_log)
+    redox_target_T_K = float(target_T_K)
+    # 273.15 K is the exact Celsius-to-kelvin offset, so this is the
+    # documented 1200 C liquid-calibration floor expressed in kelvin.
+    calibration_min_T_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15
+    if redox_target_T_K < calibration_min_T_K:
+        raise Kress91InvalidControls(
+            f'Kress91 invalid control target_T_K: {redox_target_T_K!r} K is '
+            'below liquid calibration floor '
+            f'{calibration_min_T_K!r} K'
+        )
     if reference_T_K is None:
         return redox_fO2_log
     redox_reference_T_K = float(reference_T_K)
-    redox_target_T_K = float(target_T_K)
+    if redox_reference_T_K < calibration_min_T_K:
+        # A reference in the REF-001 mid-band is corrupt persisted state and
+        # must fail loud rather than silently bypassing the calibration band.
+        raise Kress91InvalidControls(
+            'Kress91 invalid control reference_T_K: '
+            f'{redox_reference_T_K!r} K is below liquid calibration floor '
+            f'{calibration_min_T_K!r} K'
+        )
     delta_ln_fO2 = kress91_ln_fO2_temperature_delta(
         redox_reference_T_K,
         redox_target_T_K,
@@ -812,8 +829,11 @@ def _calphad_feo_activity_components(
     calphad_weight = _calphad_authority_weight(delta_iw_pure_feo)
     kress91_weight = 1.0 - calphad_weight
     authoritative_unclamped = calphad_weight * central + kress91_weight * kress91_activity
-    # Pure-liquid-FeO standard state: metal saturation is a_FeO = 1, so values
-    # above unity are unphysical supersaturation and must not feed vapor pressure.
+    # Premise: the pure-liquid-FeO standard state has a_FeO = 1 at metal
+    # saturation, so greater activities are unphysical supersaturation.  The
+    # min() therefore creates a continuous kink: below 1 the authority follows
+    # the blend, while above 1 its slope is zero.  At the limiting value both
+    # branches return exactly 1 (and, e.g., an unclamped 1.2 remains authority 1).
     authoritative = min(authoritative_unclamped, 1.0)
     if authoritative > 0.0:
         ratio_current = central / authoritative
@@ -850,7 +870,7 @@ def _calphad_feo_activity_components(
         'a_FeO_authoritative_clamped_to_pure_feo_ceiling': (
             authoritative_unclamped > 1.0
         ),
-        'current_within_calphad_band': low <= authoritative <= high,
+        'current_within_calphad_band': low <= authoritative_unclamped <= high,
         'comparison': {
             'status': (
                 'ok' if ratio_current is not None else 'not_comparable_current_zero'

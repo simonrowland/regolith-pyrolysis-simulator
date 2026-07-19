@@ -11,7 +11,10 @@ from typing import Any, Mapping
 from engines.builtin.melt_effect_adjustment import CertifiedPointRefusedError
 from engines.builtin.vapor_pressure import VaporPressureRangeError
 from simulator.backends import requires_stage0_subprocess
-from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignHoldTargetRefusal,
+    CampaignPressureSetpointRefusal,
+)
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.cost_ledger import build_cost_rollup_diagnostic
 from simulator.core import (
@@ -19,6 +22,7 @@ from simulator.core import (
     PoisonedHourError,
     PyrolysisSimulator,
 )
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.pumping_cost import pumping_context_from_sim
 from simulator.session import (
     DecisionPolicy,
@@ -39,7 +43,9 @@ _TYPED_PHYSICS_REFUSALS = (
 )
 _ALL_TYPED_PHYSICS_REFUSALS = (
     KnudsenRegimeRefusal,
+    CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
+    EvaporationFluxRefusal,
     *_TYPED_PHYSICS_REFUSALS,
 )
 
@@ -89,6 +95,99 @@ class RunExecution:
     backend_status: str = "ok"
     backend_authoritative: bool = True
     envelope_detail_unavailable: str = ""
+    campaigns_elapsed: float = 1.0
+
+
+def _campaigns_elapsed_from_session_history(
+    session: SimSession,
+    *,
+    fallback: float,
+) -> float:
+    step_results = tuple(getattr(session, "_step_results", ()))
+    completed_campaigns = sum(
+        1
+        for result in step_results
+        if getattr(result, "campaign_summary", None) is not None
+    )
+    last_completed_index = max(
+        (
+            index
+            for index, result in enumerate(step_results)
+            if getattr(result, "campaign_summary", None) is not None
+        ),
+        default=-1,
+    )
+    active_campaign_hours = len(step_results) - last_completed_index - 1
+    if active_campaign_hours:
+        sim = getattr(session, "simulator", None)
+        campaign_mgr = getattr(sim, "campaign_mgr", None)
+        campaign = getattr(getattr(sim, "melt", None), "campaign", None)
+        campaign_duration_h: float | None = None
+        if campaign_mgr is not None and campaign is not None:
+            campaign_name = str(getattr(campaign, "name", ""))
+            if campaign_name == "C2A_STAGED":
+                duration = getattr(
+                    campaign_mgr, "_configured_staged_max_hold_hr", None
+                )
+                if callable(duration):
+                    campaign_duration_h = float(duration(campaign))
+            elif campaign_name in {"C3_K", "C3_NA"}:
+                record_path = str(getattr(getattr(sim, "record", None), "path", ""))
+                duration_path = (
+                    "A_staged"
+                    if record_path == "A_staged"
+                    else "A" if record_path == "A" else "default"
+                )
+                configured_duration = getattr(
+                    campaign_mgr, "_configured_max_hold_hr", None
+                )
+                if callable(configured_duration):
+                    campaign_duration_h = float(
+                        configured_duration(campaign, campaign_name, duration_path)
+                    )
+                if record_path == "A_staged":
+                    overrides = getattr(campaign_mgr, "_campaign_overrides", None)
+                    if callable(overrides):
+                        staged_duration = overrides(campaign).get(
+                            "staged_duration_h"
+                        )
+                        if staged_duration is not None:
+                            campaign_duration_h = float(staged_duration)
+            elif campaign_name == "C5":
+                # C5 max_hold_hr is per-branch (setpoints.yaml):
+                #   {branch_two: H2, branch_one: H1}
+                # Match campaigns.py C5 endpoint selection exactly:
+                #   record.branch == 'two' -> branch_two; else -> branch_one.
+                # Unset/empty branch therefore uses branch_one so the progress
+                # denominator equals the hold ceiling that would actually fire.
+                # Do not float() the mapping; _max_hold_hr(campaign) alone aborts.
+                record_branch = str(
+                    getattr(getattr(sim, "record", None), "branch", "") or ""
+                )
+                hold_key = (
+                    "branch_two" if record_branch == "two" else "branch_one"
+                )
+                configured_duration = getattr(
+                    campaign_mgr, "_configured_max_hold_hr", None
+                )
+                if callable(configured_duration):
+                    campaign_duration_h = float(
+                        configured_duration(campaign, hold_key)
+                    )
+            else:
+                duration = getattr(campaign_mgr, "_max_hold_hr", None)
+                if callable(duration):
+                    campaign_duration_h = float(duration(campaign))
+        if campaign_duration_h is not None:
+            if math.isfinite(campaign_duration_h) and campaign_duration_h > 0.0:
+                # The cumulative wall load includes every executed hour, so
+                # include the active campaign on the same time-complete basis.
+                return float(completed_campaigns) + (
+                    float(active_campaign_hours) / campaign_duration_h
+                )
+    if completed_campaigns:
+        return float(completed_campaigns)
+    return float(fallback)
 
 
 class RunExecutor:
@@ -235,7 +334,12 @@ class RunExecutor:
                     reason = "pending_decision"
                 elif sim.melt.hour < hours:
                     status = "partial"
-        except (KnudsenRegimeRefusal, CampaignPressureSetpointRefusal) as exc:
+        except (
+            KnudsenRegimeRefusal,
+            CampaignHoldTargetRefusal,
+            CampaignPressureSetpointRefusal,
+            EvaporationFluxRefusal,
+        ) as exc:
             failure_exc = exc
             status = "refused"
             reason = exc.reason
@@ -322,6 +426,16 @@ class RunExecutor:
                 reduced_real_cache=reduced_real_cache,
                 backend_status=backend_status,
                 backend_authoritative=backend_authoritative,
+                campaigns_elapsed=_campaigns_elapsed_from_session_history(
+                    session,
+                    fallback=float(
+                        getattr(
+                            getattr(session, "_config", None),
+                            "campaigns_elapsed",
+                            1.0,
+                        )
+                    ),
+                ),
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
             if failure_exc is None:
@@ -370,6 +484,16 @@ class RunExecutor:
                 envelope_detail_unavailable=(
                     "envelope detail unavailable: "
                     f"{_safe_exception_text(envelope_exc)}"
+                ),
+                campaigns_elapsed=_campaigns_elapsed_from_session_history(
+                    session,
+                    fallback=float(
+                        getattr(
+                            getattr(session, "_config", None),
+                            "campaigns_elapsed",
+                            1.0,
+                        )
+                    ),
                 ),
             )
 

@@ -10,6 +10,7 @@ import yaml
 import scripts.make_recipe_db_profile as generator
 from simulator.optimize.evaluate import (
     BackendUnavailableAbort,
+    FailureCategory,
     _build_eval_inputs,
     _composition_target_constraints,
     evaluate,
@@ -61,23 +62,11 @@ RUNNABLE_TARGET_IDS = tuple(
         if _is_runnable_target(row)
     )
 )
-SC67_MISSING_ALPHA_TARGET_IDS = frozenset({
-    "pc-ceramic-ca-al-ratio-seed",
-    "pc-ceramic-ca-al-ree",
-    "pc-extract-fe",
+SC67_CRO2_TARGET_IDS = frozenset({
     "pc-extract-k",
-    "pc-extract-mg",
     "pc-extract-na",
     "pc-extract-o2",
-    "pc-glass-clear",
 })
-SC67_MISSING_ALPHA_MESSAGE = (
-    "ProviderUnavailableError: missing evaporation_alpha for sampled species: "
-    "Cr, Mn; set chemistry_kernel.allow_unmeasured_alpha_fallback for "
-    "alpha=1.0 prototype fallback"
-)
-
-
 def _setpoint_campaign_config(campaign: str) -> dict[str, object]:
     path = Path("data/setpoints.yaml")
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -603,7 +592,7 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
     _run_generator(monkeypatch, tmp_path, "lunar_mare_low_ti", target_id, out)
 
     profile = yaml.safe_load(out.read_text())
-    if target_id not in SC67_MISSING_ALPHA_TARGET_IDS:
+    if target_id not in SC67_CRO2_TARGET_IDS:
         evaluate(
             RecipePatch({}),
             "lunar_mare_low_ti",
@@ -613,18 +602,21 @@ def test_target_menu_generated_profiles_internal_analytical_eval_no_campaign_voc
         )
         return
 
-    with pytest.raises(BackendUnavailableAbort) as exc_info:
-        evaluate(
-            RecipePatch({}),
-            "lunar_mare_low_ti",
-            "stub",
-            profile=profile,
-            candidate_id=f"smoke-{target_id}",
-        )
+    result = evaluate(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "stub",
+        profile=profile,
+        candidate_id=f"smoke-{target_id}",
+    )
 
-    message = str(exc_info.value)
-    assert type(exc_info.value) is BackendUnavailableAbort
-    assert message == SC67_MISSING_ALPHA_MESSAGE
+    assert result.failure_category is FailureCategory.PHYSICS_REFUSED
+    assert result.run_reference.status == "refused"
+    message = result.run_reference.error_message
+    assert "missing evaporation_alpha for sampled species: CrO2" in message
+    assert "PoisonedHourError" not in message
+    assert "sampled species: Mn" not in message
+    assert "sampled species: Cr," not in message
     assert "unknown campaign" not in message
     assert "valid options:" not in message
 

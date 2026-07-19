@@ -34,7 +34,11 @@ from simulator.accounting.run_artifact import build_run_artifact
 from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
 from simulator.campaigns import CampaignManager
 from simulator.condensation import KnudsenRegimeRefusal, stage_purity_report
+from simulator.cost_parameters import (
+    normalize_cost_parameters,
+)
 from simulator.core import PoisonedHourError
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
@@ -89,6 +93,7 @@ _MAX_RUN_IDEMPOTENCY_ENTRIES = 1024
 _MAX_ACTIVE_RUNS = 4
 _draft_validation_slots = threading.BoundedSemaphore(1)
 _registered_start_handler = None
+_registered_socketio = None
 _O2_KG_PER_MOL = MOLAR_MASS['O2'] / 1000.0
 _MAX_WEB_MASS_KG = 1_000_000_000.0
 _MAX_SIM_SPEED_SECONDS = 3600.0
@@ -312,21 +317,39 @@ def apply_loaded_recipe_patch_to_state(
     sid: str,
     patch: Mapping[str, object],
 ) -> bool:
-    state, lock = _current_simulation_state(sid)
-    if state is None:
-        return False
     normalized = normalize_recipe_patch(
         patch,
         source="recipes/load setpoints_patch",
     )
+    with _simulations_guard:
+        state = _simulations.get(sid)
+        lock = _sim_locks.get(sid)
+    if state is None:
+        return False
     if lock is None:
         state["loaded_setpoints_patch"] = normalized
         state["setpoints_patch"] = normalized
-        return True
-    with lock:
-        state["loaded_setpoints_patch"] = normalized
-        state["setpoints_patch"] = normalized
+    else:
+        with lock:
+            state["loaded_setpoints_patch"] = normalized
+            state["setpoints_patch"] = normalized
     return True
+
+
+def _cost_identity_applied_notice(
+    recipe_name: str | None,
+) -> dict[str, object]:
+    message = "Applying cost parameters from submission."
+    if recipe_name:
+        message = f"Applying cost parameters from submission (recipe {recipe_name})."
+    notice: dict[str, object] = {
+        "status": "recipe_cost_parameters_applied",
+        "notice_type": "cost_parameters_from_submission",
+        "message": message,
+    }
+    if recipe_name:
+        notice["recipe_name"] = recipe_name
+    return notice
 
 
 def _record_last_recipe_capture(
@@ -504,6 +527,9 @@ def _persist_terminal(
         effective_config = state.get('effective_config') if state is not None else None
         if effective_config:
             runner_payload['effective_config'] = copy.deepcopy(effective_config)
+        cost_parameters = state.get('cost_parameters') if state is not None else None
+        if isinstance(cost_parameters, Mapping):
+            runner_payload['cost_parameters'] = copy.deepcopy(cost_parameters)
         per_hour_ledger = state.get('per_hour_ledger') if state is not None else None
         if per_hour_ledger:
             runner_payload['per_hour_ledger'] = copy.deepcopy(per_hour_ledger)
@@ -1061,7 +1087,7 @@ def _pot_composition_kg(sim, snapshot) -> dict[str, float]:
         return {}
     try:
         return _rounded_positive_species(
-            ledger.kg_by_account('process.cleaned_melt'), 4)
+            ledger.project_account_kg('process.cleaned_melt'), 4)
     except Exception as exc:
         _safe_log(f'Unable to read cleaned-melt ledger for web tick: {exc}')
         return {}
@@ -1793,17 +1819,21 @@ def _start_background_loop(
                             tick_data=tick_data,
                             per_hour_summary=step_result.per_hour_summary,
                         )
-                except KnudsenRegimeRefusal as exc:
+                except (KnudsenRegimeRefusal, EvaporationFluxRefusal) as exc:
                     _safe_log(f'Simulation refused: {exc.reason}')
                     error_payload = {
                         'status': 'refused',
                         'reason': exc.reason,
                         'message': exc.reason,
-                        'knudsen_regime_diagnostic': dict(exc.diagnostic),
+                        'refusal_diagnostic': dict(exc.diagnostic),
                         'backend_status': backend_status,
                         'backend_authoritative': backend_authoritative,
                         'backend_message': backend_message,
                     }
+                    if isinstance(exc, KnudsenRegimeRefusal):
+                        error_payload['knudsen_regime_diagnostic'] = dict(
+                            exc.diagnostic
+                        )
                     artifact = persist_terminal(
                         session,
                         status='refused',
@@ -1953,7 +1983,8 @@ def _start_background_loop(
 
 def register_events(socketio):
     """Register all SocketIO events for the simulator UI."""
-    global _registered_start_handler
+    global _registered_socketio, _registered_start_handler
+    _registered_socketio = socketio
 
     @socketio.on('connect')
     def handle_connect():
@@ -2050,6 +2081,8 @@ def register_events(socketio):
             }, 'invalid_run_request')
 
         feedstock_key = data.get('feedstock', 'lunar_mare_low_ti')
+        cost_parameters = None
+        cost_parameters_recipe_name = None
         try:
             mass_kg = _coerce_bounded_float(
                 data.get('mass_kg'),
@@ -2107,6 +2140,27 @@ def register_events(socketio):
             runtime_campaign_overrides = _coerce_runtime_campaign_overrides(
                 data.get('runtime_campaign_overrides')
             )
+            raw_cost_parameters = data.get('cost_parameters')
+            if raw_cost_parameters is not None and not isinstance(
+                raw_cost_parameters, Mapping
+            ):
+                raise InputValidationError('cost_parameters must be an object')
+            if isinstance(raw_cost_parameters, Mapping):
+                try:
+                    cost_parameters = normalize_cost_parameters(
+                        raw_cost_parameters,
+                        source='start_simulation.cost_parameters',
+                        defaults_applied=False,
+                    )
+                except (TypeError, ValueError) as exc:
+                    raise InputValidationError(str(exc)) from exc
+                raw_recipe_name = data.get('cost_parameters_recipe_name')
+                if raw_recipe_name is not None and not isinstance(raw_recipe_name, str):
+                    raise InputValidationError(
+                        'cost_parameters_recipe_name must be a string'
+                    )
+                if isinstance(raw_recipe_name, str) and raw_recipe_name.strip():
+                    cost_parameters_recipe_name = raw_recipe_name.strip()
         except InputValidationError as exc:
             return reject({
                 'status': 'error',
@@ -2240,6 +2294,7 @@ def register_events(socketio):
                     runtime_campaign_overrides
                 ),
                 'furnace_material_id': furnace_material_id,
+                'cost_parameters': copy.deepcopy(cost_parameters),
             }
             validated_inputs = {
                 key: value
@@ -2299,6 +2354,8 @@ def register_events(socketio):
                 runtime_campaign_overrides=runtime_campaign_overrides,
             ),
         }
+        if isinstance(cost_parameters, Mapping):
+            initial_state['cost_parameters'] = copy.deepcopy(cost_parameters)
         if effective_config:
             initial_state['effective_config'] = effective_config
         cancelled_prior_run_id = None
@@ -2393,6 +2450,17 @@ def register_events(socketio):
                     mre_max_voltage_V=mre_max_voltage_V,
                 ),
             )
+            if isinstance(cost_parameters, Mapping):
+                cost_apply_notice = _cost_identity_applied_notice(
+                    cost_parameters_recipe_name
+                )
+                _emit_if_current(
+                    socketio,
+                    sid,
+                    run_id,
+                    'simulation_status',
+                    cost_apply_notice,
+                )
             _start_background_loop(
                 socketio,
                 sid,

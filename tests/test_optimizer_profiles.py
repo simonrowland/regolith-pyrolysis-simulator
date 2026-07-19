@@ -98,6 +98,20 @@ def test_two_phase_certify_rejects_invalid_top_k() -> None:
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 
 
+def test_two_phase_certify_rejects_string_false() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["two_phase_certify"] = {"enabled": "false"}
+    with pytest.raises(ProfileValidationError, match="enabled must be a bool"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_profile_rejects_units_that_disagree_with_objective_metric() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["objectives"][0]["units"] = "USD"
+    with pytest.raises(ProfileValidationError, match="must be 'kg', got 'USD'"):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
 def test_profile_pinned_paths_schema_key_validates() -> None:
     profile = _profile_copy("lunar_mare_low_ti")
     profile["pinned_paths"] = ["C2A_staged.stages.sio_window.target_C"]

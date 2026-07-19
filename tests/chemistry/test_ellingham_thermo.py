@@ -8,6 +8,7 @@ from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_FLAG,
     ELLINGHAM_RECONSTRUCTED_AUTHORITY_STATUS,
+    ELLINGHAM_THERMO,
     MG_NORMAL_BOILING_POINT_K,
     ellingham_authority_limit,
     ellingham_authority_diagnostic,
@@ -107,6 +108,23 @@ def test_mn_primary_fit_is_split_at_solid_allotrope_breakpoints() -> None:
         0.0,
         abs=1e-6,
     )
+
+
+def test_mn_sub_liquidus_query_uses_solid_segment_not_legacy_liquid_row() -> None:
+    temperature_K = 1500.0
+    segment = ellingham_segment_for_temperature("Mn", temperature_K)
+    dH_f, dS_f, _n_M, _n_ox = ELLINGHAM_THERMO["Mn"]
+    legacy_liquid_delta_g = dH_f - temperature_K * dS_f
+
+    assert "Mn(delta,s)" in segment.phase_basis
+    assert ellingham_delta_g_kj_per_mol_o2(
+        "Mn",
+        temperature_K,
+    ) == pytest.approx(segment.delta_g_kJ_per_mol_O2(temperature_K))
+    assert ellingham_delta_g_kj_per_mol_o2(
+        "Mn",
+        temperature_K,
+    ) != pytest.approx(legacy_liquid_delta_g)
 
 
 def test_mn_reconstructed_tail_is_computable_but_not_authoritative() -> None:

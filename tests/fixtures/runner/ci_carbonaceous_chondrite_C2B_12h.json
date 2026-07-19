@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.4.0",
+  "schema_version": "1.6.0",
   "run_metadata": {
-    "schema_version": "1.4.0",
+    "schema_version": "1.6.0",
     "feedstock_id": "ci_carbonaceous_chondrite",
     "campaign": "C2B",
     "hours_requested": 12,
@@ -104,6 +104,7 @@
       }
     },
     "kernel_commit_sha": "goal-18-fixture",
+    "campaigns_elapsed": 1.12,
     "backend_status": "unavailable",
     "backend_authoritative": false,
     "evidence_class": "internal-analytical",
@@ -162,70 +163,70 @@
       "transition_balance_max_abs": 0.0,
       "product_costs": {
         "terminal.product:CO2": {
-          "quantity_kg": 119.52048180475606,
+          "quantity_kg": 77.32807787577242,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 1601.484718486691,
-            "furnace_h": 4.1797852498673915,
+            "thermal_flux_h": 1181.4038735606853,
+            "furnace_h": 3.0833978169403244,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 1643.2825709853648
+          "owner_ratify_money_projection": 1212.2378517300886
         },
         "terminal.product:CaCO3": {
           "quantity_kg": 0.007531238486095049,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 0.1009129411514815,
-            "furnace_h": 0.0002633771137974201,
+            "thermal_flux_h": 0.11506084936542368,
+            "furnace_h": 0.00030030236034300843,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 0.1035467122894557
+          "owner_ratify_money_projection": 0.11806387296885376
         },
         "terminal.product:H2O": {
           "quantity_kg": 181.71535447096545,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 2434.8493154088264,
-            "furnace_h": 6.354820084585219,
+            "thermal_flux_h": 2776.2131111332396,
+            "furnace_h": 7.245760436208377,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 2498.3975162546785
+          "owner_ratify_money_projection": 2848.6707154953233
         },
         "terminal.product:N2": {
           "quantity_kg": 1.9950124688279303,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 26.73166919823443,
-            "furnace_h": 0.06976815659202514,
+            "thermal_flux_h": 30.479426402678314,
+            "furnace_h": 0.07954959259474961,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 27.429350764154684
+          "owner_ratify_money_projection": 31.27492232862581
         },
         "terminal.product:Na2CO3": {
           "quantity_kg": 3.042543994524749e-11,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 4.076780514083358e-10,
-            "furnace_h": 1.0640168378137433e-12,
+            "thermal_flux_h": 4.648341662371153e-10,
+            "furnace_h": 1.21319109027043e-12,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 4.1831821978647324e-10
+          "owner_ratify_money_projection": 4.769660771398196e-10
         },
         "terminal.product:S": {
           "quantity_kg": 39.900249376558605,
           "accumulated_cost": {
             "electrical_kWh": 0.0,
-            "thermal_flux_h": 534.6333839646886,
-            "furnace_h": 1.3953631318405026,
+            "thermal_flux_h": 609.5885280535663,
+            "furnace_h": 1.5909918518949921,
             "launch_penalty_kg": 0.0,
             "external_reagent_kg": 0.0
           },
-          "owner_ratify_money_projection": 548.5870152830936
+          "owner_ratify_money_projection": 625.4984465725162
         }
       },
       "active_inventory_costs": {},
@@ -233,9 +234,9 @@
       "owner_ratify_placeholders": [
         {
           "name": "electrical_usd_per_kWh",
-          "value": 100.0,
+          "value": 10.0,
           "units": "USD/kWh",
-          "source_tag": "owner-ratify-placeholder:cost-ledger-2026-06-28",
+          "source_tag": "owner-t7-two-price-energy-v1",
           "ticket": "COST-PARAM-ELECTRICAL-KWH",
           "status": "owner-ratify-placeholder"
         },
@@ -342,7 +343,8 @@
         },
         "allocation_status": "allocated_by_product_mass",
         "owner_ratify_money_projection": 4717.8
-      }
+      },
+      "price_basis": "legacy_placeholder_awaiting_owner_ratification"
     }
   },
   "final_state": {
@@ -355,10 +357,13 @@
       "NiO": 206.36185511326167,
       "SiO2": 4617.710834737149
     },
+    "process.solid_char_carbon": {
+      "C": 958.7221688514541
+    },
     "process.stage0_volatile_feed": {},
     "reservoir.stage0_oxidant": {},
     "terminal.offgas": {
-      "CO2": 2715.819078023951,
+      "CO2": 1757.0969091724971,
       "H2O": 10086.89172750294,
       "N2": 71.21483789633506
     },
@@ -380,6 +385,83 @@
     },
     "deposit_by_surface_species_kg": {},
     "pump_outlet_by_species_kg": "not_applicable_until_p0"
+  },
+  "product_classification": {
+    "classification": {
+      "metals_plus_O2": {
+        "metals_kg": {},
+        "metals_total_kg": 0.0,
+        "O2_kg": 0.0,
+        "O2_partition_kg": {},
+        "class_total_kg": 0.0
+      },
+      "ingots_metals": {
+        "species_kg": {},
+        "class_total_kg": 0.0
+      },
+      "oxygen": {
+        "O2_kg": 0.0,
+        "partition_kg": {},
+        "class_total_kg": 0.0
+      },
+      "pure_silica_glass": {
+        "stage_3_capture_kg": 0.0,
+        "stage_3_kg_by_species": {},
+        "class_total_kg": 0.0
+      },
+      "glass": {
+        "species_kg": {},
+        "class_total_kg": 0.0,
+        "pure_silica_glass_kg": 0.0,
+        "industrial_mixed_glass_kg": 0.0
+      },
+      "industrial_mixed_glass": {
+        "mixed_melt_residual_kg": 0.0,
+        "early_tap_mode": false,
+        "note": "present only when operator declared early-tap via early_tap_mode=True; zero by default \u2014 mid-run cleaned_melt is NOT a product class",
+        "class_total_kg": 0.0
+      },
+      "captured_volatiles": {
+        "kg_by_species": {
+          "CO2": 77.32807787577242,
+          "H2O": 181.71535447096545,
+          "N2": 1.9950124688279303
+        },
+        "class_total_kg": 261.0384448155658
+      },
+      "process_inventory_spent_reductant": {
+        "kg_by_species": {},
+        "class_total_kg": 0.0,
+        "account": "process.spent_reductant_residue",
+        "disposition": "process_inventory_spent_reductant"
+      },
+      "refractory_ceramic_rump": {
+        "rump_kg_by_species": {
+          "Al2O3": 19.267077783577232,
+          "CaO": 22.151900185217183,
+          "FeO": 231.20493340292677,
+          "MgO": 188.42515152467027,
+          "Na2O": 5.322558934708119,
+          "NiO": 15.413662226861785,
+          "SiO2": 277.4459200835121
+        },
+        "rump_total_kg": 759.2312041414734,
+        "rump_refractory_oxides_kg": 229.8441294934647,
+        "rump_silicate_residual_kg": 277.4459200835121,
+        "rump_unextracted_metals_kg": 0.0,
+        "rump_other_kg": 251.94115456449668,
+        "class_total_kg": 759.2312041414734
+      },
+      "unclassified": {
+        "kg_by_species": {
+          "CaCO3": 0.007531238486095049,
+          "Na2CO3": 3.042543994524749e-11,
+          "S": 39.900249376558605
+        },
+        "total_kg": 39.907780615075126
+      }
+    },
+    "markdown": "# Three-Product-Class Report\n**Feedstock**: `ci_carbonaceous_chondrite` \u2022 **Campaign**: `C2B`\n\n**Class totals**: Metals + O\u2082 potential: \u2014 kg | Silica glass: \u2014 kg | Mixed glass: \u2014 kg | Rump: 759.231 kg\n\n## 1. Metals + source-side O\u2082 potential (alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co + emitted O\u2082 potential)\n**Class total**: \u2014 kg\n\n- Metals subtotal: \u2014 kg\n- Source-side O\u2082 potential subtotal (emitted; not recovered/captured): \u2014 kg\n\nPer-species:\n  (no species in this class)\n\n## 2. Pure silica glass (Stage 3 fused-silica baffle capture)\n**Class total**: \u2014 kg\n\n- Stage 3 capture: \u2014 kg\n\nPer-species on Stage 3 baffles:\n  (no species in this class)\n\n## 3. Industrial mixed glass (early-tap residual melt option)\n**Class total**: \u2014 kg\n\n- Mixed melt residual: \u2014 kg\n  - *present only when operator declared early-tap via early_tap_mode=True; zero by default \u2014 mid-run cleaned_melt is NOT a product class*\n\n## 4. Refractory ceramic rump (Ca / REE / refractory oxides \u2014 by physics)\n**Class total**: 759.231 kg\n\n- Rump total: 759.231 kg\n- Refractory oxides floor (by physics): 229.844 kg\n- Silicate residual: 277.446 kg\n- Unextracted metals residue (failure-mode 1): \u2014 kg\n- Other / unclassified rump: 251.941 kg\n\nPer-species:\n  - **Al2O3**: 19.267 kg\n  - **CaO**: 22.152 kg\n  - **FeO**: 231.205 kg\n  - **MgO**: 188.425 kg\n  - **Na2O**: 5.323 kg\n  - **NiO**: 15.414 kg\n  - **SiO2**: 277.446 kg\n\n## \u26a0\ufe0f Unclassified species (mapping gap)\n**Total**: 39.908 kg \u2014 these species were in `product_ledger()` but did not map to any of the four north-star product classes. The mapping in `simulator/three_product_report.py` may need to be extended.\n\n  - **CaCO3**: 7.531e-03 kg\n  - **Na2CO3**: \u2014 kg\n  - **S**: 39.900 kg\n"
   },
   "stage_purity_report": {
     "stage_0": {
@@ -546,79 +628,79 @@
     },
     "pipe_m_avg_fallback": {
       "engaged": true,
-      "total_count": 36,
+      "total_count": 12,
       "by_hour": [
         {
           "campaign": "C2B",
           "hour": 0,
           "campaign_hour": 0,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C2B",
           "hour": 1,
           "campaign_hour": 1,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C2B",
           "hour": 2,
           "campaign_hour": 2,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C2B",
           "hour": 3,
           "campaign_hour": 3,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C2B",
           "hour": 4,
           "campaign_hour": 4,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C2B",
           "hour": 5,
           "campaign_hour": 5,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C2B",
           "hour": 6,
           "campaign_hour": 6,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C2B",
           "hour": 7,
           "campaign_hour": 7,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C2B",
           "hour": 8,
           "campaign_hour": 8,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C3_K",
           "hour": 9,
           "campaign_hour": 0,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C3_K",
           "hour": 10,
           "campaign_hour": 1,
-          "count": 3
+          "count": 1
         },
         {
           "campaign": "C3_K",
           "hour": 11,
           "campaign_hour": 2,
-          "count": 3
+          "count": 1
         }
       ]
     }
@@ -2404,10 +2486,10 @@
           "residual_attribution": "sub_liquid_respeciation_deferred",
           "ferric_divergence_after": {
             "status": "warning",
-            "implied_ferric_fraction": 0.9999999990814828,
+            "implied_ferric_fraction": 0.999999999081483,
             "ledger_ferric_fraction": 0.0,
-            "delta_abs": 0.9999999990814828,
-            "delta_signed": 0.9999999990814828,
+            "delta_abs": 0.999999999081483,
+            "delta_signed": 0.999999999081483,
             "warning_threshold_abs": 0.05,
             "warning_threshold_ferric_fraction_abs": 0.05,
             "sampling_context": "current_ledger_vs_current_reservoir",
@@ -2427,10 +2509,10 @@
             "residual_attribution": "sub_liquid_respeciation_deferred",
             "ferric_divergence_after": {
               "status": "warning",
-              "implied_ferric_fraction": 0.9999999990814828,
+              "implied_ferric_fraction": 0.999999999081483,
               "ledger_ferric_fraction": 0.0,
-              "delta_abs": 0.9999999990814828,
-              "delta_signed": 0.9999999990814828,
+              "delta_abs": 0.999999999081483,
+              "delta_signed": 0.999999999081483,
               "warning_threshold_abs": 0.05,
               "warning_threshold_ferric_fraction_abs": 0.05,
               "sampling_context": "current_ledger_vs_current_reservoir",
@@ -2449,10 +2531,10 @@
             "residual_attribution": "sub_liquid_respeciation_deferred",
             "ferric_divergence_after": {
               "status": "warning",
-              "implied_ferric_fraction": 0.9999999990814828,
+              "implied_ferric_fraction": 0.999999999081483,
               "ledger_ferric_fraction": 0.0,
-              "delta_abs": 0.9999999990814828,
-              "delta_signed": 0.9999999990814828,
+              "delta_abs": 0.999999999081483,
+              "delta_signed": 0.999999999081483,
               "warning_threshold_abs": 0.05,
               "warning_threshold_ferric_fraction_abs": 0.05,
               "sampling_context": "current_ledger_vs_current_reservoir",

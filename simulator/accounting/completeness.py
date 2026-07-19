@@ -898,7 +898,7 @@ def _species_kg_by_accounts(
         raise CompletionContractBlocked("ledger surface is unavailable")
     values: dict[str, float] = {}
     for account in accounts:
-        for species, kg in ledger.kg_by_account(str(account)).items():
+        for species, kg in ledger.project_account_kg(str(account)).items():
             amount = float(kg)
             if amount:
                 values[str(species)] = values.get(str(species), 0.0) + amount
@@ -920,9 +920,10 @@ def _species_kg_by_account_pattern(
         return _species_kg_by_accounts(queries, (pattern,))
     prefix = pattern[:-1]
     values: dict[str, float] = {}
-    for account, species_kg in ledger.kg_by_account().items():
+    for account in ledger.kg_by_account():
         if not str(account).startswith(prefix):
             continue
+        species_kg = ledger.project_account_kg(str(account))
         for species, kg in species_kg.items():
             amount = float(kg)
             if amount:

@@ -405,27 +405,28 @@ def _group_for_path(path: KeyPath) -> str:
     dotted = ".".join(path)
     leaf = path[-1]
     if (
+        leaf == "temp_range_C"
+        or leaf == "default_hold_T_C"
+        or leaf == "gas_cover_mode"
+        or ("pO2_" in leaf and "pO2_bakeout_mbar" not in leaf)
+        or "p_total_" in leaf
+    ):
+        return "thermo"
+    if (
         "na_shuttle_stage" in path
         or "pO2_bakeout_mbar" in leaf
-        or leaf in {"duration_after_pathA_h", "duration_after_pathB_h_per_phase"}
+        or leaf in {"duration_after_pathA_hr", "duration_after_pathB_hr_per_phase"}
         or "optional_Ca_harvest" in path
     ):
         return "chemistry"
     if (
         "dT_dt" in dotted
         or "ramp_rate" in leaf
-        or leaf == "duration_h"
+        or leaf in {"duration_hr", "hold_time_hr"}
         or "endpoint" in path
         or "hold_time" in leaf
     ):
         return "schedule"
-    if (
-        leaf == "temp_range_C"
-        or leaf == "default_hold_T_C"
-        or "pO2_" in leaf
-        or "p_total_" in leaf
-    ):
-        return "thermo"
     return "residual"
 
 

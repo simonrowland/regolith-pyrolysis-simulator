@@ -14,6 +14,7 @@ from types import MappingProxyType
 from typing import Mapping
 
 from simulator.transport_constants import (
+    CARRIER_GAS_PROPERTIES,
     COLLISION_DIAMETER_SOURCE,
     COLLISION_DIAMETERS_M,
     FREE_MOLECULAR_KNUDSEN_MIN,
@@ -39,11 +40,12 @@ FORMULA_MIXTURE_MFP = "carrier_mixture_hard_sphere_mean_free_path"
 
 MOLAR_MASSES_KG_PER_MOL: Mapping[str, float] = MappingProxyType(
     {
-        "N2": 0.0280134,
-        "Ar": 0.039948,
-        "O2": 0.031998,
+        "He": CARRIER_GAS_PROPERTIES["He"].molar_mass_kg_mol,
+        "N2": CARRIER_GAS_PROPERTIES["N2"].molar_mass_kg_mol,
+        "Ar": CARRIER_GAS_PROPERTIES["Ar"].molar_mass_kg_mol,
+        "O2": CARRIER_GAS_PROPERTIES["O2"].molar_mass_kg_mol,
         "CO": 0.0280101,
-        "CO2": 0.0440095,
+        "CO2": CARRIER_GAS_PROPERTIES["CO2"].molar_mass_kg_mol,
         "H2": 0.00201588,
         "H2O": 0.01801528,
     }

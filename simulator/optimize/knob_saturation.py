@@ -250,7 +250,7 @@ def _opposing_cost_metrics(
 
 def _is_duration_knob(path: KeyPath) -> bool:
     leaf = path[-1]
-    return leaf == "duration_h" or leaf.startswith("duration_") or leaf.endswith("_duration_h")
+    return leaf in {"duration_h", "duration_hr", "hold_time_hr"} or leaf.startswith("duration_") or leaf.endswith(("_duration_h", "_duration_hr"))
 
 
 def _is_numeric_pair(value: Any) -> bool:

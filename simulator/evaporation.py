@@ -14,6 +14,7 @@ from simulator.chemistry.kernel import (
     ChemistryIntent,
     ProviderUnavailableError,
 )
+from simulator.corpus_version import current_corpus_version
 from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
     kress91_referenced_log_fO2,
@@ -34,13 +35,27 @@ from simulator.state import (
 )
 
 
+class EvaporationFluxRefusal(ProviderUnavailableError):
+    """Typed terminal refusal for unavailable authoritative flux inputs."""
+
+    terminal_refusal = True
+
+    def __init__(self, reason: str, diagnostic: Mapping[str, Any]):
+        self.reason = str(reason)
+        self.diagnostic = dict(diagnostic)
+        super().__init__(self.reason)
+
+
 # NOTE: the evaporation alpha default lives at engines/builtin/evaporation_flux.py
 # (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
 # duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
 _EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
 _FREEZE_GATE_ACCOUNT = 'process.cleaned_melt'
 _FREEZE_GATE_EPSILON = 1.0e-12
-_FREEZE_GATE_FRACTION_QUANTUM = 0.01
+# The validation map's smallest adjacent Na-dose step changes the FeO mole
+# fraction by 0.00105. A 0.0001 quantum leaves more than ten bins across that
+# physical delta while remaining well above floating-point composition jitter.
+_FREEZE_GATE_FRACTION_QUANTUM = 0.0001
 _FREEZE_GATE_PRESSURE_BAR_QUANTUM = 0.01
 _FREEZE_GATE_FO2_LOG_QUANTUM = 1.0
 _FREEZE_GATE_FO2_LOG_BOUND = 30.0
@@ -120,11 +135,19 @@ def _load_evaporation_alpha_envelope_by_species(
 
 
 class EvaporationMixin:
+    def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
+        """Return upstream melt-headspace backpressure for evaporation."""
+
+        melt_headspace_partials_mbar = getattr(
+            self, '_melt_headspace_composition_mbar', {}) or {}
+        return float(melt_headspace_partials_mbar.get(species, 0.0)) * 100.0
+
     def _calculate_evaporation(
         self,
         equilibrium,
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
+        overhead_partials_override_Pa: Mapping[str, float] | None = None,
     ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
@@ -234,102 +257,46 @@ class EvaporationMixin:
             )
         )
 
-        # Precompute the auxiliary maps the provider consumes via
-        # control_inputs. This keeps the provider stateless: every
-        # piece of caller-owned state (yaml lookups, stoich validation,
-        # available-mass cap, overhead backpressure) arrives in the
-        # request, so the provider holds no simulator references.
-        (
-            molar_masses_kg_mol,
-            stoich_by_species,
-            available_oxide_kg,
-        ) = self._build_evaporation_aux_maps(vapor_pressures)
-
         # Overhead backpressure (Pa)                       [LOOP-1]
-        # Uses the previous hour's overhead partial pressures as
-        # backpressure. Gas pO2 has already been applied once upstream in
+        # Uses the previous hour's upstream melt-headspace/duct partials as
+        # backpressure. ``overhead.composition`` is the physically distinct
+        # post-condensation report, so near-total capture must not erase P_bulk
+        # above the melt. Gas pO2 has already been applied once upstream in
         # the equilibrium vapor pressures consumed here.
-        overhead_partials_Pa = {
-            species: self.overhead.composition.get(species, 0.0) * 100.0
-            for species in vapor_pressures
-        }
+        overhead_partials_Pa = (
+            {
+                str(species): max(0.0, float(value))
+                for species, value in overhead_partials_override_Pa.items()
+            }
+            if overhead_partials_override_Pa is not None
+            else {
+                species: self._evaporation_bulk_partial_pressure_pa(species)
+                for species in vapor_pressures
+            }
+        )
+        for species in vapor_pressures:
+            overhead_partials_Pa.setdefault(species, 0.0)
 
         # F-B1: EVAPORATION_FLUX is read-only -- no commit_batch follows.
         # The dispatch-only helper centralises melt-derived T/P plumbing
         # so this call site stays in lock-step with the rest of the
         # simulator's kernel callers.
-        kernel_config = dict(
-            getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
-        )
-        series_resistance_config = dict(
-            kernel_config.get('evaporation_series_resistance', {}) or {}
-        )
-        carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
-        carrier_gas = (
-            carrier_resolver()
-            if callable(carrier_resolver)
-            else 'N2'
-        )
-        gas_temperature_K = float(
-            getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
+        control_inputs, molar_masses_kg_mol = (
+            EvaporationMixin._evaporation_flux_control_inputs(
+                self,
+                equilibrium,
+                overhead_partials_Pa=overhead_partials_Pa,
+                overhead_pressure_pa=(
+                    EvaporationMixin._evaporation_overhead_total_pressure_Pa(
+                        self,
+                        overhead_partials_Pa,
+                    )
+                ),
+            )
         )
         kernel_result = self._dispatch_only(
             ChemistryIntent.EVAPORATION_FLUX,
-            control_inputs={
-                'vapor_pressures_Pa': vapor_pressures,
-                'vapor_pressures_source': dict(
-                    getattr(equilibrium, 'vapor_pressures_source', {}) or {}
-                ),
-                'vapor_pressure_numerator_provenance': dict(
-                    vapor_pressure_diagnostic.get(
-                        'vapor_pressure_numerator_provenance'
-                    )
-                    or {}
-                ),
-                'vapor_pressure_activities': dict(
-                    getattr(equilibrium, 'activity_coefficients', {}) or {}
-                ),
-                'pO2_bar': vapor_pressure_diagnostic.get('pO2_bar'),
-                'overhead_partials_Pa': overhead_partials_Pa,
-                'molar_mass_kg_mol': molar_masses_kg_mol,
-                'stoich_by_species': stoich_by_species,
-                'available_oxide_kg': available_oxide_kg,
-                'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
-                'stir_factor': {
-                    'axial': clamp_stir_factor(self.melt.stir_state.axial),
-                    'radial': clamp_stir_factor(self.melt.stir_state.radial),
-                },
-                'pipe_diameter_m': float(
-                    getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
-                ),
-                'overhead_pressure_pa': float(
-                    getattr(self.overhead, 'pressure_mbar', 0.0) or 0.0
-                ) * 100.0,
-                'gas_temperature_K': gas_temperature_K,
-                'carrier_gas': carrier_gas,
-                'evaporation_series_resistance': series_resistance_config,
-                'alpha': _load_evaporation_alpha_by_species(
-                    self.vapor_pressures
-                ),
-                'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
-                    self.vapor_pressures
-                ),
-                'allow_unmeasured_alpha_fallback': bool(
-                    kernel_config.get('allow_unmeasured_alpha_fallback', False)
-                ),
-                **(
-                    {
-                        'unmeasured_alpha_fallback_species': tuple(
-                            kernel_config[
-                                'unmeasured_alpha_fallback_species'
-                            ]
-                            or ()
-                        )
-                    }
-                    if 'unmeasured_alpha_fallback_species' in kernel_config
-                    else {}
-                ),
-            },
+            control_inputs=control_inputs,
         )
         diagnostic = dict(kernel_result.diagnostic or {})
         self._last_evaporation_flux_diagnostic = diagnostic
@@ -355,10 +322,11 @@ class EvaporationMixin:
             )
         if str(kernel_result.status) != 'ok' and 'missing_alpha' in diagnostic:
             missing = ', '.join(sorted(diagnostic['missing_alpha']))
-            raise ProviderUnavailableError(
+            raise EvaporationFluxRefusal(
                 "missing evaporation_alpha for sampled species: "
                 f"{missing}; set chemistry_kernel.allow_unmeasured_alpha_fallback "
-                "for alpha=1.0 prototype fallback"
+                "for alpha=1.0 prototype fallback",
+                diagnostic,
             )
         if (
             str(kernel_result.status) != 'ok'
@@ -367,9 +335,10 @@ class EvaporationMixin:
             missing = ', '.join(
                 sorted(diagnostic['missing_transport_parameters'])
             )
-            raise ProviderUnavailableError(
+            raise EvaporationFluxRefusal(
                 'missing Chapman-Enskog transport parameters for sampled '
-                f'species: {missing}'
+                f'species: {missing}',
+                diagnostic,
             )
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
         liquid_fraction_factor = 1.0
@@ -718,7 +687,12 @@ class EvaporationMixin:
         vapor_pressure_diagnostic: Mapping[str, Any],
     ) -> dict[str, float]:
         try:
-            account_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+            projection = getattr(self.atom_ledger, 'project_account_mol', None)
+            account_mol = (
+                projection(_FREEZE_GATE_ACCOUNT)
+                if callable(projection)
+                else self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+            )
         except AttributeError:
             account_mol = {}
         fractions = dict(single_cation_mole_fractions(account_mol))
@@ -824,6 +798,31 @@ class EvaporationMixin:
                 )
             return curve
 
+        # Opt-in caller-owned memo for workflows that build fresh simulator
+        # instances for equivalent rows. The full composition/P/fO2 key is
+        # load-bearing: pressure and redox state are liquidus inputs, so only
+        # an exact physical-key match may reuse a curve.
+        shared_curve_cache = getattr(
+            self,
+            '_freeze_gate_shared_curve_cache',
+            None,
+        )
+        if isinstance(shared_curve_cache, dict):
+            process_cached = shared_curve_cache.get(key)
+            if isinstance(process_cached, Mapping):
+                curve = dict(process_cached)
+                self._freeze_gate_liquid_fraction_cache = {
+                    'key': key,
+                    'curve': dict(curve),
+                }
+                if store is not None and getattr(store, 'capture_enabled', False):
+                    store.capture_gate_curve(
+                        self,
+                        fO2_log=redox_key_fO2_log,
+                        curve=curve,
+                    )
+                return curve
+
         previous_in_progress = bool(
             getattr(self, '_freeze_gate_curve_in_progress', False)
         )
@@ -865,6 +864,10 @@ class EvaporationMixin:
                 'key': key,
                 'curve': dict(curve),
             }
+            if isinstance(shared_curve_cache, dict):
+                # Store a copy so later sim mutations of their local cache
+                # cannot corrupt the caller-owned memo used by sibling rows.
+                shared_curve_cache[key] = dict(curve)
             cache_committed = True
             self._freeze_gate_cache_rebuild_count = (
                 int(getattr(self, '_freeze_gate_cache_rebuild_count', 0)) + 1
@@ -936,7 +939,9 @@ class EvaporationMixin:
         pressure_bar: float,
         fO2_log: float,
     ) -> tuple:
-        cleaned_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+        cleaned_mol = self.atom_ledger.project_account_mol(
+            _FREEZE_GATE_ACCOUNT
+        )
         relevant_mol: dict[str, float] = {}
         for species, mol in cleaned_mol.items():
             species_key = str(species)
@@ -946,11 +951,9 @@ class EvaporationMixin:
             if mol_value > _FREEZE_GATE_EPSILON:
                 relevant_mol[species_key] = mol_value
 
-        # Liquidus is stable to small per-tick evaporation drift; 1 mol-%
-        # bins (0.01 fraction quantum) sit comfortably above mole-fraction
-        # float-arithmetic jitter while still well inside the L1 finder ±30 K
-        # tolerance, and still rebuild for campaign-scale major-oxide
-        # composition shifts.
+        # Liquidus is stable to floating-point composition jitter, but dose
+        # states below liquidus are not interchangeable: their distinct curves
+        # feed F_liquid, melt capacity, and native-Fe behavior.
         composition_key = []
         total_mol = sum(relevant_mol.values())
         if total_mol > _FREEZE_GATE_EPSILON:
@@ -977,11 +980,100 @@ class EvaporationMixin:
         # enough to absorb per-tick float noise, fine enough to split
         # overhead-pressure and campaign/redox control changes.
         return (
-            'oxide_mol_fraction_p_fO2_v2',
+            'oxide_mol_fraction_p_fO2_v3',
             round(pressure_bucket, 6),
             round(fO2_bucket, 6),
             tuple(sorted(composition_key)),
+            self._freeze_gate_engine_cache_identity(),
         )
+
+    def _freeze_gate_engine_cache_identity(self) -> tuple:
+        cached = getattr(self, '_freeze_gate_engine_identity_cache', None)
+        if isinstance(cached, tuple):
+            return cached
+
+        register_gate_providers = getattr(
+            self,
+            '_register_freeze_gate_liquid_fraction_providers',
+            None,
+        )
+        if callable(register_gate_providers):
+            register_gate_providers()
+
+        def provider_identity(provider: Any) -> tuple | None:
+            if provider is None:
+                return None
+            profile = provider.capability_profile()
+            version_getter = getattr(provider, '_engine_version', None)
+            version = 'unavailable'
+            if callable(version_getter):
+                try:
+                    version = str(version_getter()).strip() or 'unavailable'
+                except Exception:  # noqa: BLE001 - cache provenance boundary
+                    version = 'unavailable'
+            return (str(profile.provider_id), version)
+
+        registry = getattr(self, '_chem_registry', None)
+        authoritative = (
+            registry.authoritative_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+            if registry is not None
+            else None
+        )
+        fallback = (
+            registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+            if registry is not None
+            else None
+        )
+
+        backend = getattr(self, 'backend', None)
+        config = getattr(backend, 'config', None)
+        configured_name = str(
+            getattr(config, 'authorized_backend_name', '')
+        ).strip()
+        configured_version = str(
+            getattr(config, 'authorized_backend_version', '')
+        ).strip()
+        effective_backend = getattr(backend, '_live_backend', None) or backend
+        backend_name = (
+            configured_name
+            or str(
+                getattr(effective_backend, 'backend_name', None)
+                or getattr(effective_backend, 'name', None)
+                or type(effective_backend).__name__
+            ).strip()
+        )
+        backend_class = configured_name or (
+            f'{type(effective_backend).__module__}.'
+            f'{type(effective_backend).__qualname__}'
+        )
+        backend_version = configured_version
+        if not backend_version:
+            version_getter = getattr(
+                effective_backend,
+                'get_engine_version',
+                None,
+            )
+            if callable(version_getter):
+                try:
+                    backend_version = (
+                        str(version_getter()).strip() or 'unavailable'
+                    )
+                except Exception:  # noqa: BLE001 - cache provenance boundary
+                    backend_version = 'unavailable'
+        identity = (
+            'freeze_gate_engine_identity_v1',
+            ('authoritative', provider_identity(authoritative)),
+            ('fallback', provider_identity(fallback)),
+            (
+                'backend',
+                backend_name,
+                backend_class,
+                backend_version or 'unavailable',
+            ),
+            ('corpus_version', current_corpus_version()),
+        )
+        self._freeze_gate_engine_identity_cache = identity
+        return identity
 
     def _freeze_gate_curve_from_gate_dispatch(
         self,
@@ -1055,14 +1147,15 @@ class EvaporationMixin:
         if not callable(finder):
             reasons.append('backend liquidus finder unavailable')
             return None
+        composition_mol = self.atom_ledger.project_account_mol(
+            _FREEZE_GATE_ACCOUNT
+        )
         try:
             result = finder(
                 pressure_bar=pressure_bar,
                 fO2_log=fO2_log,
                 composition_mol_by_account={
-                    _FREEZE_GATE_ACCOUNT: self.atom_ledger.mol_by_account(
-                        _FREEZE_GATE_ACCOUNT
-                    )
+                    _FREEZE_GATE_ACCOUNT: composition_mol
                 },
                 species_formula_registry=dict(
                     getattr(self, 'species_formula_registry', {}) or {}
@@ -1152,7 +1245,9 @@ class EvaporationMixin:
         self,
         reasons: list[str],
     ) -> dict[str, Any] | None:
-        cleaned_mol = self.atom_ledger.mol_by_account(_FREEZE_GATE_ACCOUNT)
+        cleaned_mol = self.atom_ledger.project_account_mol(
+            _FREEZE_GATE_ACCOUNT
+        )
         if not any(
             species in _FREEZE_GATE_COMPOSITION_SPECIES and float(mol) > 0.0
             for species, mol in cleaned_mol.items()
@@ -1420,6 +1515,139 @@ class EvaporationMixin:
 
         return molar_masses_kg_mol, stoich_by_species, available_oxide_kg
 
+    def _evaporation_overhead_total_pressure_Pa(
+        self,
+        overhead_partials_Pa: Mapping[str, float],
+    ) -> float:
+        partial_sum_Pa = sum(
+            max(0.0, float(value))
+            for value in overhead_partials_Pa.values()
+        )
+        control_floor_Pa = max(
+            0.0,
+            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,
+        )
+        return max(partial_sum_Pa, control_floor_Pa)
+
+    def _evaporation_flux_control_inputs(
+        self,
+        equilibrium: Any,
+        *,
+        overhead_partials_Pa: Mapping[str, float],
+        overhead_pressure_pa: float | None = None,
+    ) -> tuple[dict[str, Any], dict[str, float]]:
+        vapor_pressures = dict(equilibrium.vapor_pressures_Pa or {})
+        (
+            molar_masses_kg_mol,
+            stoich_by_species,
+            available_oxide_kg,
+        ) = self._build_evaporation_aux_maps(vapor_pressures)
+        vapor_pressure_diagnostic = dict(
+            getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
+        )
+        kernel_config = dict(
+            getattr(self, 'setpoints', {}).get('chemistry_kernel', {}) or {}
+        )
+        carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
+        carrier_gas = carrier_resolver() if callable(carrier_resolver) else 'N2'
+        controls: dict[str, Any] = {
+            'vapor_pressures_Pa': vapor_pressures,
+            'vapor_pressures_source': dict(
+                getattr(equilibrium, 'vapor_pressures_source', {}) or {}
+            ),
+            'vapor_pressure_numerator_provenance': dict(
+                vapor_pressure_diagnostic.get(
+                    'vapor_pressure_numerator_provenance'
+                ) or {}
+            ),
+            'vapor_pressure_activities': dict(
+                getattr(equilibrium, 'activity_coefficients', {}) or {}
+            ),
+            'pO2_bar': vapor_pressure_diagnostic.get('pO2_bar'),
+            'overhead_partials_Pa': dict(overhead_partials_Pa),
+            'molar_mass_kg_mol': molar_masses_kg_mol,
+            'stoich_by_species': stoich_by_species,
+            'available_oxide_kg': available_oxide_kg,
+            'melt_surface_area_m2': float(self.melt.melt_surface_area_m2),
+            'stir_factor': {
+                'axial': clamp_stir_factor(self.melt.stir_state.axial),
+                'radial': clamp_stir_factor(self.melt.stir_state.radial),
+            },
+            'pipe_diameter_m': float(
+                getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
+            ),
+            'overhead_pressure_pa': (
+                sum(overhead_partials_Pa.values())
+                if overhead_pressure_pa is None
+                else float(overhead_pressure_pa)
+            ),
+            'gas_temperature_K': float(
+                getattr(self.overhead, 'headspace_temperature_K', 0.0)
+                or self.melt.temperature_C + 273.15
+            ),
+            'carrier_gas': carrier_gas,
+            'evaporation_series_resistance': dict(
+                kernel_config.get('evaporation_series_resistance', {}) or {}
+            ),
+            'alpha': _load_evaporation_alpha_by_species(self.vapor_pressures),
+            'alpha_envelope': _load_evaporation_alpha_envelope_by_species(
+                self.vapor_pressures
+            ),
+            'allow_unmeasured_alpha_fallback': kernel_config.get(
+                'allow_unmeasured_alpha_fallback', False
+            ),
+        }
+        if 'unmeasured_alpha_fallback_species' in kernel_config:
+            controls['unmeasured_alpha_fallback_species'] = tuple(
+                kernel_config['unmeasured_alpha_fallback_species'] or ()
+            )
+        return controls, molar_masses_kg_mol
+
+    def _project_evaporation_overhead_source_mol_hr(
+        self,
+        rates_kg_hr: Mapping[str, float],
+        stoich_by_species: Mapping[str, Mapping[str, Any]],
+    ) -> dict[str, float]:
+        source_mol_hr: dict[str, float] = {}
+        o2_molar_mass = resolve_species_formula(
+            'O2', self.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        for species, raw_rate in rates_kg_hr.items():
+            rate_kg_hr = max(0.0, float(raw_rate))
+            if rate_kg_hr <= 0.0:
+                continue
+            formula = resolve_species_formula(
+                species, self.species_formula_registry
+            )
+            source_mol_hr[species] = (
+                source_mol_hr.get(species, 0.0)
+                + rate_kg_hr / formula.molar_mass_kg_per_mol()
+            )
+            stoich = dict(stoich_by_species.get(species) or {})
+            if not stoich:
+                sp_data = dict(
+                    (self.vapor_pressures.get('metals', {}) or {}).get(
+                        species, {}
+                    )
+                    or (self.vapor_pressures.get('oxide_vapors', {}) or {}).get(
+                        species, {}
+                    )
+                )
+                if sp_data:
+                    stoich = dict(self._evaporation_stoich(species, sp_data))
+            o2_kg_hr = rate_kg_hr * float(
+                stoich.get('O2_per_product_kg') or 0.0
+            )
+            vapor_oxygen_atoms = float(
+                formula.elements.get('O', 0.0) or 0.0
+            )
+            if o2_kg_hr < 0.0 or vapor_oxygen_atoms > 0.0:
+                source_mol_hr['O2'] = (
+                    source_mol_hr.get('O2', 0.0)
+                    + o2_kg_hr / o2_molar_mass
+                )
+        return source_mol_hr
+
     def _apply_analytic_evaporation_depletion(
         self, evap_flux: EvaporationFlux, dt_hr: float = 1.0,
     ) -> EvaporationFlux:
@@ -1429,16 +1657,46 @@ class EvaporationMixin:
 
         phase_scalar = self._record_phase_context_diagnostic(
             'evaporation_depletion', scalar_liquid_fraction=1.0)
+        effective_rates = self._analytic_evaporation_depletion_rates(
+            evap_flux.species_kg_hr,
+            dt_hr=dt_hr,
+            phase_scalar=phase_scalar,
+            cleaned_melt_kg=self.atom_ledger.kg_by_account(
+                'process.cleaned_melt'
+            ),
+            available_o2_kg=float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    'O2', 0.0
+                )
+            ),
+        )
+        smoothed = EvaporationFlux(species_kg_hr=effective_rates)
+        smoothed.update_totals()
+        return smoothed
+
+    def _analytic_evaporation_depletion_rates(
+        self,
+        raw_rates_kg_hr: Mapping[str, float],
+        *,
+        dt_hr: float,
+        phase_scalar: float,
+        cleaned_melt_kg: Mapping[str, float],
+        available_o2_kg: float,
+    ) -> dict[str, float]:
+        """Pure frozen-inventory transform from raw HK rates to actual rates."""
+        if dt_hr <= 0.0 or not raw_rates_kg_hr:
+            return {
+                str(species): max(0.0, float(rate))
+                for species, rate in raw_rates_kg_hr.items()
+            }
 
         metals_data = self.vapor_pressures.get('metals', {}) or {}
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
-        cleaned_melt_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt')
         parent_groups: dict[str, list[dict]] = defaultdict(list)
 
-        for species in sorted(evap_flux.species_kg_hr):
+        for species in sorted(raw_rates_kg_hr):
             raw_rate_kg_hr = (
-                float(evap_flux.species_kg_hr.get(species, 0.0))
+                float(raw_rates_kg_hr.get(species, 0.0))
                 * phase_scalar
             )
             if raw_rate_kg_hr <= 1e-12:
@@ -1484,19 +1742,6 @@ class EvaporationMixin:
                 if product_kg > 1e-12:
                     effective_rates[entry['species']] = product_kg / dt_hr
 
-        self._apply_shared_o2_reactant_depletion(
-            effective_rates, parent_groups, dt_hr)
-
-        smoothed = EvaporationFlux(species_kg_hr=effective_rates)
-        smoothed.update_totals()
-        return smoothed
-
-    def _apply_shared_o2_reactant_depletion(
-        self,
-        effective_rates: dict[str, float],
-        parent_groups: dict[str, list[dict]],
-        dt_hr: float,
-    ) -> None:
         o2_draws: list[tuple[str, float]] = []
         for parent_oxide in sorted(parent_groups):
             for entry in parent_groups[parent_oxide]:
@@ -1509,14 +1754,12 @@ class EvaporationMixin:
                         (species, rate_kg_hr * abs(O2_per_product_kg)))
         total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
         if total_o2_draw_kg_hr <= 1e-12:
-            return
+            return effective_rates
 
-        available_o2_kg = self.atom_ledger.kg_by_account(
-            'process.overhead_gas').get('O2', 0.0)
         if available_o2_kg <= 1e-12:
             for species, _draw in o2_draws:
                 effective_rates.pop(species, None)
-            return
+            return effective_rates
 
         max_fraction = math.nextafter(1.0, 0.0)
         k_hr = total_o2_draw_kg_hr / float(available_o2_kg)
@@ -1539,8 +1782,11 @@ class EvaporationMixin:
                 effective_rates.pop(species, None)
             else:
                 effective_rates[species] = min(current_rate, allowed_rate)
+        return effective_rates
 
-    def _route_to_condensation(self, evap_flux: EvaporationFlux):
+    def _route_to_condensation(
+        self, evap_flux: EvaporationFlux
+    ) -> EvaporationFlux:
         """
         Route evaporated species through the condensation train.
 
@@ -1580,6 +1826,11 @@ class EvaporationMixin:
         3. ``_project_condensed_stage_collection`` projects the actual
            credited_condensed_kg onto stage UI bookkeeping.
 
+        Returns an :class:`EvaporationFlux` containing only this tick's vapor
+        that remains free in ``process.overhead_gas`` after all committed
+        baffle, wall, and retained-holdup routing. Melt depletion still uses
+        the original full evolved flux at the caller.
+
         End-of-tick ledger state is identical to the pre-flip behaviour:
         between the two kernel commits the vapor passes through
         overhead_gas, but the final per-account balances match the
@@ -1599,7 +1850,9 @@ class EvaporationMixin:
             self.condensation_model.configure_operating_conditions(
                 overhead_pressure_mbar=transport['pressure_mbar'],
                 pipe_diameter_m=self.overhead_model.pipe_diameter_m,
-                gas_temperature_C=transport['pipe_temperature_C'],
+                # Chapman-Enskog diffusion uses bulk-gas temperature; the
+                # separate pipe temperature is a wall/liner condition.
+                gas_temperature_C=transport['conductance_temperature_C'],
                 stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
                 stage_area_geometry_provenance_notice=transport.get(
                     'stage_area_geometry_provenance_notice', {}),
@@ -1641,17 +1894,49 @@ class EvaporationMixin:
                 evap_flux.species_kg_hr.keys()
             )
         )
+        residual_species_kg_hr = {
+            species: max(0.0, float(rate_kg_hr) * phase_scalar)
+            for species, rate_kg_hr in evap_flux.species_kg_hr.items()
+        }
         for species in species_order:
             if species not in evap_flux.species_kg_hr:
                 continue
             rate_kg_hr = evap_flux.species_kg_hr[species] * phase_scalar
+            overhead_before_kg = float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    species, 0.0,
+                )
+                or 0.0
+            )
             self._route_evaporated_species_to_condensation(
                 route_result,
                 species,
                 rate_kg_hr,
             )
+            overhead_after_kg = float(
+                self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                    species, 0.0,
+                )
+                or 0.0
+            )
+
+            # Premise: the ledger delta spans this tick's full vapor credit and
+            # every committed removal (baffle, wall, or retained holdup).
+            # Algebra: free-vapor delta = (before + evolved - removals) - before
+            # = evolved - removals. Unit check: kg - kg = kg per one-hour tick,
+            # numerically kg/hr. Sanity: zero removal leaves the evolved rate;
+            # complete committed removal leaves zero, independent of diagnostics.
+            residual_species_kg_hr[species] = max(
+                0.0, overhead_after_kg - overhead_before_kg,
+            )
 
         self._sync_oxygen_kg_counters()
+
+        residual_flux = EvaporationFlux(
+            species_kg_hr=residual_species_kg_hr,
+        )
+        residual_flux.update_totals()
+        return residual_flux
 
     def _route_evaporated_species_to_condensation(
         self,

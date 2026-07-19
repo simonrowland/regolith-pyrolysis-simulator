@@ -106,6 +106,16 @@ def latent_vaporization_kj_per_mol(species: str) -> float:
 
 
 # Parent-oxide dissociation enthalpies.  Values are kJ/mol parent oxide.
+#
+# BASIS BOUNDARY: these are reversals of 298 K standard formation enthalpies
+# for the named condensed oxide and elements in their 298 K standard states
+# (Na(s)/K(s)/Mg(s) for the cross-checked rows) + O2(g).
+# They are not interchangeable with ``ELLINGHAM_THERMO`` dH coefficients:
+# those are
+# effective intercepts from high-temperature linear dG(T) fits, per mol O2,
+# whose JANAF phase basis includes high-T metal/oxide phase changes.  The
+# expected Na/K/Mg separation is pinned in
+# ``tests/test_thermochemical_basis_split.py``.
 _OXIDE_DISSOCIATION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
     # NIST-JANAF Chase 1998 ΔfH° Na2O(s)=-414.22 kJ/mol; Na2O -> 2Na + 1/2O2 = +414.22.
     "Na2O": EnthalpyCoefficient(414.22, "NIST-JANAF Chase 1998 Na2O(s) ΔfH=-414.22 kJ/mol"),
@@ -138,7 +148,8 @@ _OXIDE_DISSOCIATION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
 # Si + O2 (910.94 kJ/mol) and then also added an SiO(condensed)->SiO(g) latent
 # (337.60), ~54% high and physically wrong.  The real path is a single reaction
 #   parent_oxide(melt) -> oxide_vapor(g) + partial O2,
-# ΔH = ΔfH[oxide_vapor(g)] - ΔfH[parent_oxide] (1 mol oxide vapor : 1 mol parent).
+# ΔH follows the balanced per-mol-vapor reaction below; the parent-oxide
+# coefficient is species-specific (1 SiO2 per SiO, but 1/2 Cr2O3 per CrO2).
 _OXIDE_VAPOR_REACTION_KJ_PER_MOL: dict[str, EnthalpyCoefficient] = {
     # NIST-JANAF Chase 1998: ΔfH°[SiO2, α-quartz]=-910.94, ΔfH°[SiO(g)]=-100.42;
     # SiO2 -> SiO(g) + 1/2 O2 = -100.42 - (-910.94) = +810.52 kJ/mol SiO.

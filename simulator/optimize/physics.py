@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 import hashlib
 import math
 from types import MappingProxyType
@@ -45,7 +45,9 @@ SourceKind = Literal[
 # v4 (2026-07-12, t-005): optimizer results now include the body-aware
 # sub-ambient pumping hard gate, so pre-wiring feasibility/cache identities
 # cannot be reused.
-PHYSICS_GATE_VERSION = "physics-feasibility-v4-subambient-pumping"
+# v5: coating and Knudsen transport retain signed continuous margins without
+# Boolean exclusion, so cached v4 feasibility verdicts cannot be reused.
+PHYSICS_GATE_VERSION = "physics-feasibility-v5-continuous-transport"
 DEFAULT_ACTIVE_GATES: tuple[str, ...] = (
     "delivered_stream_purity",
     "coating",
@@ -536,7 +538,7 @@ class PhysicsConstraintSet:
             grounded_campaign_ok = (
                 worst_observed >= self.coating_min_campaigns_to_resinter.value
             )
-            feasible = (not authoritative) or grounded_campaign_ok
+            feasible = True
             if not authoritative:
                 detail = (
                     "non-authoritative: grounded coating criterion not enforced; "
@@ -544,7 +546,7 @@ class PhysicsConstraintSet:
                 )
             elif not grounded_campaign_ok:
                 detail = (
-                    "fail-closed: grounded coating criterion "
+                    "continuous constraint exceeded: grounded coating criterion "
                     f"campaigns_to_resinter={worst_observed:.6g} < "
                     f"{self.coating_min_campaigns_to_resinter.value:.6g}; "
                     f"{worst_campaign_detail}; advisory={detail}"
@@ -571,13 +573,16 @@ class PhysicsConstraintSet:
                     if authoritative
                     else str(authority.get("message", "non-authoritative coating"))
                 ),
-                status_payload=authority,
+                status_payload={
+                    **authority,
+                    "constraint_mode": "continuous",
+                },
             )
         except (KeyError, TypeError, ValueError) as exc:
             return _fail_closed("coating", self.coating_min_campaigns_to_resinter, str(exc))
 
     def coating_from_fouling_report(self, report: Any) -> GateMargin:
-        """Classify the runner's total-load lifespan verdict.
+        """Classify the runner's worst-segment lifespan verdict.
 
         A non-authoritative wall-sticking or threshold verdict is deliberately
         unconstrained by coating: heuristics remain visible, but never become a
@@ -614,24 +619,96 @@ class PhysicsConstraintSet:
             raise CoatingFeasibilityReportError(
                 "wall-fouling status_reason must be str"
             )
-        raw_observed = report["campaigns_to_resinter_total"]
+        constraint_mode = report.get("coating_constraint_mode")
+        threshold_is_unqualified = False
+        if "resinter_threshold_kg" in report:
+            raw_threshold = report["resinter_threshold_kg"]
+            if raw_threshold is None:
+                threshold_is_unqualified = True
+            elif isinstance(raw_threshold, bool) or not isinstance(
+                raw_threshold, int | float
+            ):
+                raise CoatingFeasibilityReportError(
+                    "wall-fouling resinter_threshold_kg must be numeric or null"
+                )
+            else:
+                threshold = float(raw_threshold)
+                threshold_is_unqualified = (
+                    not math.isfinite(threshold) or threshold <= 0.0
+                )
+        if constraint_mode == "no_unqualified_deposition" or threshold_is_unqualified:
+            if (
+                constraint_mode == "no_unqualified_deposition"
+                and report.get("coating_constraint_authoritative") is not True
+            ):
+                raise CoatingFeasibilityReportError(
+                    "no-unqualified-deposition constraint must be authoritative"
+                )
+            raw_rate = report.get(
+                "unqualified_deposition_rate_kg_per_campaign",
+                report.get("wall_deposit_kg_per_campaign"),
+            )
+            if isinstance(raw_rate, bool) or not isinstance(raw_rate, int | float):
+                raise CoatingFeasibilityReportError(
+                    "unqualified deposition rate must be numeric"
+                )
+            rate = float(raw_rate)
+            if not math.isfinite(rate) or rate < 0.0:
+                raise CoatingFeasibilityReportError(
+                    "unqualified deposition rate must be finite and non-negative"
+                )
+            threshold = ThresholdSpec(
+                id="coating_max_unqualified_deposit_kg_per_campaign",
+                value=0.0,
+                units="kg/campaign",
+                source="engineering_envelope",
+                source_ref=(
+                    "require_coating_gate with no sourced resinter capacity"
+                ),
+            )
+            return GateMargin(
+                gate="coating",
+                feasible=rate == 0.0,
+                margin=-rate,
+                threshold=threshold,
+                observed=rate,
+                detail=(
+                    "fail-closed continuous no-unqualified-deposition constraint: "
+                    "no finite material damage capacity qualifies a positive "
+                    "deposition rate; "
+                    f"deposit_rate={rate:.6g} kg/campaign"
+                ),
+                status="available",
+                authoritative=True,
+                output_status=output_status,
+                status_reason=status_reason,
+                status_payload={
+                    **report,
+                    "coating_constraint_mode": "no_unqualified_deposition",
+                    "coating_constraint_authoritative": True,
+                    "constraint_mode": "continuous",
+                },
+            )
+        observed_field = (
+            "campaigns_to_resinter_worst_segment"
+            if "campaigns_to_resinter_worst_segment" in report
+            else "campaigns_to_resinter_total"
+        )
+        raw_observed = report[observed_field]
         if isinstance(raw_observed, bool) or not isinstance(raw_observed, int | float):
             raise CoatingFeasibilityReportError(
-                "wall-fouling campaigns_to_resinter_total must be numeric"
+                f"wall-fouling {observed_field} must be numeric"
             )
         observed = float(raw_observed)
         if math.isnan(observed) or observed < 0.0:
             raise CoatingFeasibilityReportError(
-                "wall-fouling campaigns_to_resinter_total must be non-negative"
+                f"wall-fouling {observed_field} must be non-negative"
             )
         margin = observed - self.coating_min_campaigns_to_resinter.value
-        feasible = (
-            not authoritative
-            or margin >= -self.coating_min_campaigns_to_resinter.tolerance
-        )
+        feasible = True
         if authoritative:
             detail = (
-                f"runner wall-fouling campaigns_to_resinter_total={observed:.6g}; "
+                f"continuous runner wall-fouling {observed_field}={observed:.6g}; "
                 f"minimum={self.coating_min_campaigns_to_resinter.value:.6g}"
             )
         else:
@@ -651,7 +728,10 @@ class PhysicsConstraintSet:
             authoritative=authoritative,
             output_status=output_status,
             status_reason="" if authoritative else status_reason,
-            status_payload=report,
+            status_payload={
+                **report,
+                "constraint_mode": "continuous",
+            },
         )
 
     def extraction_completeness(self, trace: Any) -> GateMargin:
@@ -736,20 +816,27 @@ class PhysicsConstraintSet:
                     )
                 for label, kn, regime in values:
                     margin = self.knudsen_max.value - kn
-                    if regime != "viscous":
-                        margin = min(margin, -math.inf)
                     if margin < worst_margin:
                         worst_margin = margin
                         worst_kn = kn
                         worst_detail = (
                             f"snapshot {index} {label} Kn={kn:.6g} regime={regime}"
                         )
-            return _margin(
+            result = _margin(
                 "knudsen_viscous",
                 worst_margin,
                 self.knudsen_max,
                 worst_kn,
                 worst_detail,
+            )
+            return replace(
+                result,
+                feasible=True,
+                detail=f"continuous transport constraint: {result.detail}",
+                status_payload={
+                    **dict(result.status_payload),
+                    "constraint_mode": "continuous",
+                },
             )
         except (KeyError, TypeError, ValueError) as exc:
             return _fail_closed("knudsen_viscous", self.knudsen_max, str(exc))

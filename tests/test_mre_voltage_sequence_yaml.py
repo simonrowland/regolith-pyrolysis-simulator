@@ -184,11 +184,12 @@ def test_build_falls_back_to_canonical_ladder_when_yaml_missing():
     seq = sim._build_mre_voltage_sequence()
     voltages = [entry["voltage"] for entry in seq]
     assert voltages == pytest.approx(
-        [0.39, 0.804340, 1.050000, 1.118868, 1.491058, 1.575521,
-         1.792604, 1.857324, 2.208316],
+        [0.39, 0.8043402178, 1.1188684032, 1.2547313977, 1.4910580719,
+         1.5755209919, 1.7926036985, 1.8573244700, 2.2083160725],
         abs=1e-6,
     )
-    # Hold-hour pattern matches the documented fallback values.
+    # Values are derived from the authoritative Ellingham ladder; hold-hour
+    # pattern remains the documented fallback schedule.
     hold_hours = [entry["min_hold_hours"] for entry in seq]
     assert hold_hours == [2, 3, 2, 2, 5, 3, 5, 8, 10]
 

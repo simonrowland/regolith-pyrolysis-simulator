@@ -12,6 +12,7 @@ from simulator.account_ids import (
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     OXYGEN_CAPTURED_ACCOUNTS,
+    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
@@ -191,12 +192,18 @@ class AccountingQueries:
             overhead = getattr(snapshot, "overhead", None)
             saturation_series.append(float(getattr(overhead, "transport_saturation_pct", 0.0)))
             vented_series.append(float(getattr(snapshot, "O2_vented_kg_hr", 0.0)))
+            upstream_partials_mbar = dict(
+                getattr(snapshot, "melt_headspace_composition_mbar", {}) or {}
+            )
             overhead_state_series.append({
-                "pressure_Pa": float(getattr(overhead, "pressure_mbar", 0.0)) * 100.0,
-                "temperature_K": float(getattr(overhead, "headspace_temperature_K", 0.0)),
+                "pressure_Pa": sum(
+                    max(0.0, float(value))
+                    for value in upstream_partials_mbar.values()
+                ) * 100.0,
+                "temperature_K": float(getattr(snapshot, "temperature_C", 0.0)) + 273.15,
                 "composition_mbar": {
                     str(species): float(pressure)
-                    for species, pressure in dict(getattr(overhead, "composition", {}) or {}).items()
+                    for species, pressure in upstream_partials_mbar.items()
                 },
                 "throat_diameter_m": float(getattr(overhead, "throat_diameter_m", 0.0)),
             })
@@ -219,7 +226,7 @@ class AccountingQueries:
                 products,
                 {
                     species: kg
-                    for species, kg in self.ledger.kg_by_account(account).items()
+                    for species, kg in self.ledger.project_account_kg(account).items()
                     if species != OXYGEN_SPECIES
                 },
             )
@@ -242,7 +249,7 @@ class AccountingQueries:
     ) -> dict[str, float]:
         species_kg: dict[str, float] = {}
         for account in accounts:
-            _merge_masses(species_kg, self.ledger.kg_by_account(str(account)))
+            _merge_masses(species_kg, self.ledger.project_account_kg(str(account)))
         return {
             species: kg
             for species, kg in sorted(species_kg.items())
@@ -253,11 +260,13 @@ class AccountingQueries:
         pattern = str(account_pattern)
         if pattern.endswith("*"):
             prefix = pattern[:-1]
-            all_accounts = self.ledger.kg_by_account()
             species_kg: dict[str, float] = {}
-            for account, values in all_accounts.items():
+            for account in self.ledger.kg_by_account():
                 if str(account).startswith(prefix):
-                    _merge_masses(species_kg, values)
+                    _merge_masses(
+                        species_kg,
+                        self.ledger.project_account_kg(str(account)),
+                    )
             return {
                 species: kg
                 for species, kg in sorted(species_kg.items())
@@ -360,7 +369,7 @@ class AccountingQueries:
     def terminal_rump_by_species(self) -> dict[str, float]:
         species_kg: dict[str, float] = {}
         for account in TERMINAL_RUMP_ACCOUNTS:
-            _merge_masses(species_kg, self.ledger.kg_by_account(account))
+            _merge_masses(species_kg, self.ledger.project_account_kg(account))
         return {
             species: kg
             for species, kg in sorted(species_kg.items())
@@ -400,7 +409,7 @@ class AccountingQueries:
             by_class[category] += kg
 
         total_kg = sum(
-            self.ledger.total_kg_by_account(account)
+            self.ledger.projected_total_kg_by_account(account)
             for account in TERMINAL_RUMP_ACCOUNTS
         )
         class_total_kg = sum(by_class.values())
@@ -542,6 +551,8 @@ class AccountingQueries:
                 OXYGEN_MELT_OFFGAS_ACCOUNT, 0.0),
             "mre_anode_stored": stored_by_source.get(
                 OXYGEN_MRE_ANODE_ACCOUNT, 0.0),
+            "cistern_liquid_stored": stored_by_source.get(
+                OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT, 0.0),
             "melt_offgas_vented": vented_by_source.get(
                 OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT, 0.0),
             "melt_offgas_captured": captured_by_source.get(
@@ -599,7 +610,7 @@ class AccountingQueries:
     def condensation_totals_with_terminal_oxygen(self) -> dict[str, float]:
         totals = {
             species: float(kg)
-            for species, kg in self.ledger.kg_by_account(
+            for species, kg in self.ledger.project_account_kg(
                 "process.condensation_train").items()
             if kg > 1e-12
         }
@@ -775,7 +786,11 @@ class AccountingQueries:
         not near-melt. Outlet ``plume_product_proxy`` is condensation-train
         SiO2 — a route-product proxy, not direct O2-consuming ledger proof.
         """
-        balances = self.ledger.mol_by_account()
+        accounts = self.ledger.mol_by_account()
+        balances = {
+            account: self.ledger.project_account_mol(account)
+            for account in accounts
+        }
         registry = self.ledger.registry
 
         near_melt_species_mol = dict(
@@ -880,7 +895,7 @@ class AccountingQueries:
         species_names = self.sim._RUMP_ELEMENT_SPECIES.get(element, ())
         total = 0.0
         for account in TERMINAL_RUMP_ACCOUNTS:
-            species_kg = self.ledger.kg_by_account(account)
+            species_kg = self.ledger.project_account_kg(account)
             for species in species_names:
                 total += max(0.0, float(species_kg.get(species, 0.0)))
             if account == C7_AL_CREDIT_ACCOUNT:
@@ -899,8 +914,8 @@ class AccountingQueries:
 
 
 def _ledger_o2_kg(ledger: Any, account: str) -> float:
-    species_kg = ledger.kg_by_account(account)
-    return max(0.0, float(species_kg.get(OXYGEN_SPECIES, 0.0)))
+    species_kg = ledger.project_account_kg(account)
+    return float(species_kg.get(OXYGEN_SPECIES, 0.0))
 
 
 def _ratio_or_none(numerator: float, denominator: float) -> float | None:

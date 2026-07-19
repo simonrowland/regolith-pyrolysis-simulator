@@ -22,6 +22,7 @@ spec.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import math
 from typing import Any, List, Mapping, Optional, Tuple
 
 from engines.magemin.domain import _is_finite
@@ -30,6 +31,7 @@ from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 # Tolerances match the binding spec §4 MAGEMin entry.
 LIQUIDUS_TOLERANCE_K = 50.0
 MODAL_TOLERANCE_WT_PCT = 2.0
+_MISSING = object()
 
 
 @dataclass
@@ -93,6 +95,14 @@ class MAGEMinParityComparator:
         and ``agreement=False``.
         """
         report = ParityReport()
+
+        state_warnings = _state_point_warnings(
+            authoritative_result,
+            shadow_result,
+        )
+        if state_warnings:
+            report.agreement = False
+            report.warnings.extend(state_warnings)
 
         auth_liquidus_K = _extract_liquidus_K(authoritative_result)
         shadow_liquidus_K = _extract_liquidus_K(shadow_result)
@@ -185,6 +195,56 @@ class MAGEMinParityComparator:
         return report
 
 
+def _state_point_warnings(
+    authoritative_result: Any,
+    shadow_result: Any,
+) -> list[str]:
+    warnings: list[str] = []
+    for key in ('temperature_C', 'pressure_bar', 'fO2_log'):
+        auth = _lookup_present(authoritative_result, key)
+        shadow = _lookup_present(shadow_result, key)
+        if auth is _MISSING and shadow is _MISSING:
+            warnings.append(
+                f'MAGEMin parity: required state point {key} missing on both sides.'
+            )
+            continue
+        if auth is _MISSING or shadow is _MISSING:
+            warnings.append(
+                f'MAGEMin parity: state point {key} missing on one side.'
+            )
+            continue
+        if auth is None and shadow is None:
+            continue
+        if auth is None or shadow is None:
+            warnings.append(
+                f'MAGEMin parity: unequal state point {key} ({auth!r} vs {shadow!r}).'
+            )
+            continue
+        try:
+            auth_value = float(auth)
+            shadow_value = float(shadow)
+        except (TypeError, ValueError):
+            warnings.append(
+                f'MAGEMin parity: state point {key} is not numeric on both sides.'
+            )
+            continue
+        if (
+            not _is_finite(auth_value)
+            or not _is_finite(shadow_value)
+            or not math.isclose(
+                auth_value,
+                shadow_value,
+                rel_tol=1.0e-12,
+                abs_tol=1.0e-12,
+            )
+        ):
+            warnings.append(
+                'MAGEMin parity: unequal state point '
+                f'{key} ({auth_value:.12g} vs {shadow_value:.12g}).'
+            )
+    return warnings
+
+
 def _extract_liquidus_K(result: Any) -> Optional[float]:
     """Pull a liquidus temperature (Kelvin) from a result-shaped object.
 
@@ -263,3 +323,9 @@ def _lookup(obj: Any, key: str) -> Any:
     if isinstance(obj, Mapping):
         return obj.get(key)
     return getattr(obj, key, None)
+
+
+def _lookup_present(obj: Any, key: str) -> Any:
+    if isinstance(obj, Mapping):
+        return obj[key] if key in obj else _MISSING
+    return getattr(obj, key) if hasattr(obj, key) else _MISSING

@@ -45,6 +45,7 @@ SCAN_PATTERNS = [
     "engines/**/*.py",
     "docs/**/*.md",
 ]
+SCAN_EXCLUDES = {"docs/chemistry-provenance.notes.md"}
 
 
 @dataclass(frozen=True)
@@ -235,8 +236,10 @@ def scan_files(root: Path = ROOT) -> dict[str, list[CitationUse]]:
                 continue
             if _is_generated_reference_doc(path):
                 continue
-            seen_files.add(path)
             rel = path.relative_to(root).as_posix()
+            if rel in SCAN_EXCLUDES:
+                continue
+            seen_files.add(path)
             text = path.read_text(encoding="utf-8", errors="replace")
             lines = text.splitlines()
             for index, line in enumerate(lines, start=1):

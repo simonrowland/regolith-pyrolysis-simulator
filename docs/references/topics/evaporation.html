@@ -32,11 +32,10 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:110</code> - species.Na.source: source: &quot;REF-013 Sossi et al. 2019 GCA 260:204 reports near-ideal Na alpha_e~1 in open-furnace ferrobasalt FCMAS melt; high-capture value adopted for alkali wall fouling.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:120</code> - species.K.source: source: &quot;REF-013 REF-019 only support a Na analogy for K near-unity alpha; no direct K wall/deposition alpha found, so high-capture default remains UNCERTIFIED.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:140</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
-<li><code>data/setpoints.yaml:376</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
+<li><code>data/setpoints.yaml:377</code> - campaigns.C3.Na2O_activity_gamma: Na2O_activity_gamma: [1.0e-3, 1.0e-2]   # provenance: docs/chemistry-provenance.yaml::gamma_alkali_melt_activity; NaO0.5 value/range from REF-013/REF-019/REF-050; DOI 10.1016/j.gca.2019.06.021 / 10.2138/rmg.2018.84.11</li>
 <li><code>data/vapor_pressures.yaml:72</code> - metals.Na.evaporation_alpha.source: source: &quot;OWNER-RATIFY source_class=open_furnace_apparent_not_intrinsic: REF-013 Sossi et al. 2019 GCA 260:204, Na alpha_e~1 near-ideal open-furnace evaporation from ferrobasalt FCMAS melt; retained pending owner ratification against competing Fedkin intrinsic 0.13&quot;</li>
-<li><code>data/vapor_pressures.yaml:525</code> - metals.Mn.evaporation_alpha_policy.source: source: &quot;REF-013 REF-014 Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted&quot;</li>
-<li><code>data/vapor_pressures.yaml:682</code> - foulant_vapor.NaCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement&quot;</li>
-<li><code>data/vapor_pressures.yaml:707</code> - foulant_vapor.KCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement&quot;</li>
+<li><code>data/vapor_pressures.yaml:715</code> - foulant_vapor.NaCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-NaCl HK measurement&quot;</li>
+<li><code>data/vapor_pressures.yaml:740</code> - foulant_vapor.KCl.evaporation_alpha.source: source: &quot;OWNER-RATIFY salt_proxy_not_intrinsic: REF-013 Salt analogy - Sossi et al. 2019 GCA near-ideal alkali evaporation; no isolated regolith-KCl HK measurement&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-014">
@@ -52,9 +51,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:150</code> - species.Cr.source: source: &quot;REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
 <li><code>data/vapor_pressures.yaml:90</code> - metals.Na.evaporation_alpha.competing_sources.source: - source: &quot;REF-014 Fedkin et al. 2006 LPSC 37:#2249, KEMS sealed-chamber&quot;</li>
 <li><code>data/vapor_pressures.yaml:151</code> - metals.K.evaporation_alpha.source: source: &quot;REF-014 Fedkin et al. 2006 LPSC 37:#2249 KEMS sealed-chamber intrinsic K alpha_e~0.13; replaces prior Na open-furnace analogy for series-resistance intrinsic-alpha model&quot;</li>
-<li><code>data/vapor_pressures.yaml:423</code> - metals.Cr.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 GCA 70:206-223; no isolated HK alpha found&quot;</li>
-<li><code>data/vapor_pressures.yaml:525</code> - metals.Mn.evaporation_alpha_policy.source: source: &quot;REF-013 REF-014 Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted&quot;</li>
-<li><code>data/vapor_pressures.yaml:621</code> - oxide_vapors.CrO2.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted&quot;</li>
+<li><code>data/vapor_pressures.yaml:654</code> - oxide_vapors.CrO2.evaporation_alpha_policy.source: source: &quot;REF-014 Fedkin et al. 2006 plus chromia-boiler literature; no isolated CrO2 HK alpha adopted&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-015">
@@ -66,7 +63,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:100</code> - species.Mg.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; Schaefer &amp; Fegley 2004 Table 10 Mg2SiO4(liq)/Hashimoto alpha_s=0.20-0.21.&quot;</li>
-<li><code>data/vapor_pressures.yaml:204</code> - metals.Mg.evaporation_alpha.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21&quot;</li>
+<li><code>data/vapor_pressures.yaml:205</code> - metals.Mg.evaporation_alpha.source: source: &quot;REF-015 REF-018 Richter et al. 2002 Mg/SiO alpha~0.1-0.2 in vacuum at 1800 C; SF2004 Table 10 Mg2SiO4(l), Hashimoto 1990, alpha_s=0.20-0.21&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-016">
@@ -79,8 +76,8 @@ ul { padding-left: 1.4rem; }</style>
 <ul>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:51</code> - species.Fe.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:69</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
-<li><code>data/vapor_pressures.yaml:243</code> - metals.Fe.evaporation_alpha.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy&quot;</li>
-<li><code>data/vapor_pressures.yaml:573</code> - oxide_vapors.SiO.evaporation_alpha.value.prior_scalar.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
+<li><code>data/vapor_pressures.yaml:244</code> - metals.Fe.evaporation_alpha.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy&quot;</li>
+<li><code>data/vapor_pressures.yaml:603</code> - oxide_vapors.SiO.evaporation_alpha.value.prior_scalar.source: source: &quot;REF-018 REF-016 SF2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-017">
@@ -91,7 +88,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/vapor_pressures.yaml:338</code> - metals.Si.evaporation_alpha.source: source: &quot;REF-017 Safarian &amp; Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation; pure elemental Si branch only&quot;</li>
+<li><code>data/vapor_pressures.yaml:339</code> - metals.Si.evaporation_alpha.source: source: &quot;REF-017 Safarian &amp; Engh 2013 Metall. Mater. Trans. A 44:747-753 pure-Si vacuum evaporation; pure elemental Si branch only&quot;</li>
+<li><code>data/vapor_pressures.yaml:536</code> - metals.Mn.evaporation_alpha.source: source: &quot;REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 class basis: owner-ratified monoatomic-class PROXY, no Mn-specific measurement exists; Safarian &amp; Engh 2013 full text read = zero Mn&quot;</li>
+<li><code>docs/lab-validation-whitepaper.md:112</code> - 2.3 Evaporation coefficients: principled treatment: | Mn | 1.0 (tier 2 owner-ratified monoatomic-class proxy); envelope 0.5–1.0; liquid-process band 1519–2334.526 K | REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 establish the near-unity clean monoatomic-metal class basis through Fe/Cr and multi-metal free evaporation | Not a Mn-specific or temperature-calibrated measurement. Two independent sweeps found no direct Mn HKL coefficient; Safarian &amp; Engh 2013 full text contains zero Mn value. Medium-high confidence for clean liquid Mn; solid α-Mn remains unmeasured. Melt activity belongs in `P_sat`. | assumption (owner-ratified proxy) |</li>
 </ul>
 </section>
 <section class="entry" id="REF-040">
@@ -103,6 +102,9 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:74</code> - species.SiO.cold_wall_condensation.source: source: &quot;REF-040 Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096: high-supersaturation condensation coefficient for growth -&gt; unity; evaporation alpha_e != condensation alpha_c off-equilibrium.&quot;</li>
+<li><code>data/vapor_pressures.yaml:423</code> - metals.Cr.evaporation_alpha.source: source: &quot;REF-040 Pound 1972 J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096, selected McCabe, Hudson &amp; Paxton 1958 Trans. Met. Soc. AIME 212:102 Langmuir-vs-Knudsen result for 99.9% polycrystalline solid Cr and monoatomic Cr(g)&quot;</li>
+<li><code>data/vapor_pressures.yaml:536</code> - metals.Mn.evaporation_alpha.source: source: &quot;REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 class basis: owner-ratified monoatomic-class PROXY, no Mn-specific measurement exists; Safarian &amp; Engh 2013 full text read = zero Mn&quot;</li>
+<li><code>docs/lab-validation-whitepaper.md:112</code> - 2.3 Evaporation coefficients: principled treatment: | Mn | 1.0 (tier 2 owner-ratified monoatomic-class proxy); envelope 0.5–1.0; liquid-process band 1519–2334.526 K | REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 establish the near-unity clean monoatomic-metal class basis through Fe/Cr and multi-metal free evaporation | Not a Mn-specific or temperature-calibrated measurement. Two independent sweeps found no direct Mn HKL coefficient; Safarian &amp; Engh 2013 full text contains zero Mn value. Medium-high confidence for clean liquid Mn; solid α-Mn remains unmeasured. Melt activity belongs in `P_sat`. | assumption (owner-ratified proxy) |</li>
 </ul>
 </section>
 </body>

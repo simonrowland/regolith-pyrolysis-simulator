@@ -96,6 +96,17 @@ class AlphaMELTSBackend(_FakeLiveRealBackend):
         return super().initialize(_config)
 
 
+class ThermoEngineBackend(_FakeLiveRealBackend):
+    name = 'thermoengine'
+    engine_version = 'thermoengine-test 1.0.0'
+    mode = 'thermoengine'
+
+    def initialize(self, _config: Mapping[str, Any] | None = None) -> bool:
+        self._model = self.model
+        self._mode = self.mode
+        return super().initialize(_config)
+
+
 class _AlphaMELTSClusterIdentityBackend(_FakeLiveRealBackend):
     name = "alphamelts"
     engine_version = (
@@ -201,6 +212,192 @@ def test_cached_real_config_defaults_model_mode_for_alphamelts_alias(
     assert normalized.authorized_model == "MELTSv1.0.2"
     assert normalized.authorized_mode == "subprocess"
     assert normalized.authorized_backend_name == "AlphaMELTSBackend"
+
+
+def test_cached_real_legacy_thermoengine_live_fill_keeps_alphamelts_identity(
+    tmp_path: Path,
+) -> None:
+    backend = resolve_backend(
+        'cached-real',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        alphamelts_backend_cls=AlphaMELTSBackend,
+        thermoengine_backend_cls=ThermoEngineBackend,
+        cached_real_config=_cache_config(
+            tmp_path / 'cached-real.db',
+            'live-fill',
+            name='alphamelts',
+            version=ThermoEngineBackend.engine_version,
+            model='MELTSv1.0.2',
+            mode='thermoengine',
+        ),
+        backend_config={'mode': 'thermoengine'},
+    )
+
+    assert isinstance(backend, CachedRealBackend)
+    assert isinstance(backend._live_backend, ThermoEngineBackend)
+    assert backend._live_backend._legacy_alphamelts_cache_identity is True
+
+
+def test_cached_real_explicit_thermoengine_live_fill_round_trips_identity(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / 'cached-real.db'
+    direct_backend = ThermoEngineBackend()
+    direct_backend.initialize({})
+    direct_sim = _build_direct_real_sim(direct_backend, db_path=db_path)
+    live_key = canonical_replay_key(
+        direct_sim,
+        artifact='equilibrium_post_record',
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=None,
+        fe_redox_policy='intrinsic',
+    )
+
+    live_fill_config = _cache_config(
+        db_path,
+        'live-fill',
+        name='thermoengine',
+        version=ThermoEngineBackend.engine_version,
+        model=ThermoEngineBackend.model,
+        mode=ThermoEngineBackend.mode,
+    )
+    live_fill_backend = resolve_backend(
+        'cached-real',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        thermoengine_backend_cls=ThermoEngineBackend,
+        cached_real_config=live_fill_config,
+    )
+
+    assert isinstance(live_fill_backend._live_backend, ThermoEngineBackend)
+    assert not getattr(
+        live_fill_backend._live_backend,
+        '_legacy_alphamelts_cache_identity',
+        False,
+    )
+    live_fill_sim = _build_cached_real_sim(
+        backend=live_fill_backend,
+        cache_config=live_fill_config,
+    )
+    live_fill_key = canonical_replay_key(
+        live_fill_sim,
+        artifact='equilibrium_post_record',
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=None,
+        fe_redox_policy='intrinsic',
+    )
+
+    replay_config = {**live_fill_config, 'miss_policy': 'fail-loud'}
+    replay_backend = resolve_backend(
+        'cached-real',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+    replay_key = canonical_replay_key(
+        replay_sim,
+        artifact='equilibrium_post_record',
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=None,
+        fe_redox_policy='intrinsic',
+    )
+
+    assert (
+        live_key['provider']
+        == live_fill_key['provider']
+        == replay_key['provider']
+    )
+    assert (
+        live_key['backend']
+        == live_fill_key['backend']
+        == replay_key['backend']
+    )
+    assert live_key['provider']['resolved_role'] == 'authoritative'
+
+    direct_gate_key = canonical_replay_key(
+        direct_sim,
+        artifact='freeze_gate_curve',
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=-10.0,
+        fe_redox_policy='intrinsic',
+    )
+    live_fill_gate_key = canonical_replay_key(
+        live_fill_sim,
+        artifact='freeze_gate_curve',
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=-10.0,
+        fe_redox_policy='intrinsic',
+    )
+    replay_gate_key = canonical_replay_key(
+        replay_sim,
+        artifact='freeze_gate_curve',
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=-10.0,
+        fe_redox_policy='intrinsic',
+    )
+
+    assert (
+        direct_gate_key['provider']
+        == live_fill_gate_key['provider']
+        == replay_gate_key['provider']
+    )
+    assert (
+        direct_gate_key['backend']
+        == live_fill_gate_key['backend']
+        == replay_gate_key['backend']
+    )
+    assert direct_gate_key['provider']['resolved_role'] == 'authoritative'
+
+
+@pytest.mark.parametrize(
+    'authorized_name',
+    [
+        'ThermoEngineBackend',
+        'simulator.melt_backend.thermoengine.ThermoEngineBackend',
+    ],
+)
+def test_cached_real_thermoengine_class_alias_replays_authoritative_identity(
+    tmp_path: Path,
+    authorized_name: str,
+) -> None:
+    direct_backend = ThermoEngineBackend()
+    direct_backend.initialize({})
+    direct_sim = _build_direct_real_sim(direct_backend)
+    direct_key = canonical_replay_key(
+        direct_sim,
+        artifact='freeze_gate_curve',
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=-10.0,
+        fe_redox_policy='intrinsic',
+    )
+    replay_config = _cache_config(
+        tmp_path / 'cached-real.db',
+        'fail-loud',
+        name=authorized_name,
+        version=ThermoEngineBackend.engine_version,
+    )
+    replay_backend = resolve_backend(
+        'cached-real',
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+    replay_key = canonical_replay_key(
+        replay_sim,
+        artifact='freeze_gate_curve',
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=-10.0,
+        fe_redox_policy='intrinsic',
+    )
+
+    assert direct_key['provider'] == replay_key['provider']
+    assert direct_key['backend'] == replay_key['backend']
+    assert replay_key['provider']['resolved_role'] == 'authoritative'
 
 
 def test_cached_real_config_threads_control_quantization_to_store(

@@ -61,7 +61,9 @@ SIO_ANCHOR_HOUR = 6
 # K-coupled headspace path (matches golden-deltas.json enumeration).
 # 2026-07-11 0.5.10 E-MOVE: K/S Kress re-reference plus BCD oxygen/native-state
 # routing lower the finite-pO2/IW SiO drift.
-EXPECTED_SIO_DECADE_DRIFT = 0.2837255260751965
+# 2026-07-18 a91db36 loaded-melt/flow-boundary trajectory rebaseline on
+# corrected tip 0990232.
+EXPECTED_SIO_DECADE_DRIFT = 0.18436767251999514
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

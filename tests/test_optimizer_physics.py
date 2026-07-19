@@ -376,15 +376,15 @@ def test_authoritative_bad_coating_fails_grounded_campaign_gate() -> None:
     result = constraints.evaluate(trace)
     coating = result.margins["coating"]
 
-    assert not result.feasible
-    assert result.failing_gates == ("coating",)
-    assert not coating.feasible
+    assert result.feasible
+    assert result.failing_gates == ()
+    assert coating.feasible
     assert coating.authoritative is True
     assert coating.status == "available"
     assert coating.observed == pytest.approx(0.2)
     assert coating.threshold.value == pytest.approx(10.0)
     assert (
-        "fail-closed: grounded coating criterion "
+        "continuous constraint exceeded: grounded coating criterion "
         "campaigns_to_resinter=0.2 < 10"
     ) in coating.detail
 
@@ -392,7 +392,8 @@ def test_authoritative_bad_coating_fails_grounded_campaign_gate() -> None:
 def test_runner_fouling_report_binds_authoritative_coating_gate() -> None:
     trace = _valid_trace_object(
         wall_fouling_report={
-            "campaigns_to_resinter_total": 9.5,
+            "campaigns_to_resinter_total": 20.0,
+            "campaigns_to_resinter_worst_segment": 9.5,
             "authoritative_for_resinter": True,
             "output_status": "authoritative",
             "status_reason": "",
@@ -401,8 +402,8 @@ def test_runner_fouling_report_binds_authoritative_coating_gate() -> None:
 
     result = PhysicsConstraintSet().evaluate(trace)
 
-    assert not result.feasible
-    assert result.failing_gates == ("coating",)
+    assert result.feasible
+    assert result.failing_gates == ()
     assert result.margins["coating"].observed == pytest.approx(9.5)
 
 
@@ -424,6 +425,30 @@ def test_runner_fouling_report_non_authoritative_is_unconstrained_and_surfaced()
     assert coating.authoritative is False
     assert coating.output_status == "non-authoritative-threshold"
     assert "resinter threshold is not grounded" in coating.detail
+
+
+def test_direct_null_threshold_report_binds_no_unqualified_deposition() -> None:
+    trace = _valid_trace_object(
+        wall_fouling_report={
+            "campaigns_to_resinter_total": math.inf,
+            "resinter_threshold_kg": None,
+            "wall_deposit_kg_per_campaign": 0.5,
+            "authoritative_for_resinter": False,
+            "output_status": "non-authoritative-threshold",
+            "status_reason": "resinter threshold is not grounded",
+        }
+    )
+
+    result = PhysicsConstraintSet().evaluate(trace)
+    coating = result.margins["coating"]
+
+    assert not result.feasible
+    assert not coating.feasible
+    assert coating.authoritative is True
+    assert coating.margin == pytest.approx(-0.5)
+    assert coating.status_payload["coating_constraint_mode"] == (
+        "no_unqualified_deposition"
+    )
 
 
 @pytest.mark.parametrize(
@@ -769,7 +794,7 @@ def test_knudsen_viscous_global_only_summary_fails_closed() -> None:
     assert "fail-closed" in margin.detail
 
 
-def test_knudsen_viscous_bad_segment_is_infeasible() -> None:
+def test_knudsen_nonviscous_segment_is_finite_continuous_constraint() -> None:
     trace = _valid_trace_object(
         snapshots=(
             _kn_snapshot(
@@ -791,8 +816,9 @@ def test_knudsen_viscous_bad_segment_is_infeasible() -> None:
 
     margin = PhysicsConstraintSet().knudsen_viscous(trace)
 
-    assert not margin.feasible
+    assert margin.feasible
     assert margin.margin < 0.0
+    assert math.isfinite(margin.margin)
 
 
 def test_extraction_completeness_counts_cr2o3_as_two_cr_equivalent_mol() -> None:

@@ -76,6 +76,15 @@ phase_partitions:
       value: 0.0
     confidence: ungroundable
 
+# t-325 committed O2-lance basis for residual solid char.
+# Premise: under an O2 bubbler/lance the local oxidant is O2-rich, so
+# C + O2 -> CO2 (1 mol O2 / mol C) is the configured complete-oxidation
+# basis. CO basis (C + 1/2 O2 -> CO) remains available by setting
+# basis: C_plus_half_O2_to_CO for scenario work.
+lance_oxidation:
+  basis: C_plus_O2_to_CO2
+  source: "balanced reaction C + O2 -> CO2; REF-024 supplies the residual-char inventory, not the combustion stoichiometry"
+
 burnout_kinetics:
   labile_chon_unlimited_o2:
     law: complete_when_o2_sufficient

@@ -397,6 +397,7 @@ def test_diagnostic_helper_has_no_ledger_or_provider_authority_surface():
 
 
 @pytest.mark.serial
+@pytest.mark.xdist_group("serial")
 def test_real_alphamelt_volatility_diagnostic_opt_in():
     if os.environ.get("REGOLITH_RUN_REAL_ALPHAMELTS_VOLATILITY") != "1":
         pytest.skip("real AlphaMELTS diagnostic smoke is env-gated")
@@ -412,6 +413,7 @@ def test_real_alphamelt_volatility_diagnostic_opt_in():
 
 
 @pytest.mark.serial
+@pytest.mark.xdist_group("serial")
 def test_live_alphamelt_benign_feedstock_returns_oxide_activities_when_available():
     backend = AlphaMELTSBackend()
     try:

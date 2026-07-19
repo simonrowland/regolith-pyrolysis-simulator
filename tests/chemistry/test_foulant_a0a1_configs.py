@@ -114,12 +114,29 @@ def test_chi_decomp_extent_rises_above_onset_and_falls_below(carrier: str) -> No
     assert 0.0 <= high_t.extent <= 1.0
 
 
+def test_chi_decomp_downgrades_confidence_outside_dg_row_temperature_coverage() -> None:
+    registry = load_foulant_registry(FOULANT_THERMO)
+
+    at_low_bound = chi_decomp("CaSO4", 1100.0, 0.2, 0.0, registry)
+    at_high_bound = chi_decomp("CaSO4", 1500.0, 0.2, 0.0, registry)
+    below_bound = chi_decomp("CaSO4", 1099.0, 0.2, 0.0, registry)
+    above_bound = chi_decomp("CaSO4", 1501.0, 0.2, 0.0, registry)
+
+    assert at_low_bound.confidence == "well_grounded"
+    assert at_high_bound.confidence == "well_grounded"
+    assert below_bound.confidence == "out_of_domain"
+    assert above_bound.confidence == "out_of_domain"
+
+
 def test_caso4_o2_suppression_uses_corrected_dg_onset() -> None:
     registry = load_foulant_registry(FOULANT_THERMO)
     low_pO2 = chi_decomp("CaSO4", 1450.0, 0.01, 0.0, registry)
     high_pO2 = chi_decomp("CaSO4", 1450.0, 0.2, 0.0, registry)
     assert low_pO2.extent > high_pO2.extent
-    assert 1450.0 < low_pO2.onset_K - 273.15 < 1550.0
+    # nu_O2=1/2 and width=R*1773.15/280=52.652819 K, so
+    # T_onset(0.01 bar)=1500 C + 0.5*width*ln(0.01/0.2)=1421.133125 C.
+    assert low_pO2.onset_K - 273.15 == pytest.approx(1421.1331250336648)
+    assert high_pO2.onset_K - 273.15 == pytest.approx(1500.0)
 
 
 @pytest.mark.parametrize(

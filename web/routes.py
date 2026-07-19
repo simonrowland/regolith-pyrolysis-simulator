@@ -25,6 +25,7 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
+from simulator.cost_parameters import RECIPE_COST_PARAMETERS_KEY
 from simulator.campaigns import CampaignManager
 from simulator.condensation import (
     BOLTZMANN_CONSTANT_J_K,
@@ -77,6 +78,7 @@ from simulator.recipe_io import (
     RecipeIOError,
     load_recipe_patch,
     normalize_recipe_patch,
+    read_recipe_cost_parameters,
     read_recipe_metadata,
     recipe_library_path,
     write_recipe_patch,
@@ -107,10 +109,10 @@ bp = Blueprint('web', __name__,
 
 DATA_DIR = Path(__file__).parent.parent / 'data'
 REPORT_VIEWER_DIR = Path(__file__).parent / 'report_viewer'
-THERMAL_TRAIN_DEFAULT_ARTIFACT_ID = 'thermal-train-default-v1'
-THERMAL_TRAIN_DEFAULT_ARTIFACT_SCHEMA = 'thermal-train-default-artifact-v1'
+THERMAL_TRAIN_DEFAULT_ARTIFACT_ID = 'thermal-train-default-v2'
+THERMAL_TRAIN_DEFAULT_ARTIFACT_SCHEMA = 'thermal-train-default-artifact-v2'
 THERMAL_TRAIN_DEFAULT_ARTIFACT_PATH = (
-    DATA_DIR / 'fixtures' / 'thermal_train' / 'default-v1.json'
+    DATA_DIR / 'fixtures' / 'thermal_train' / 'default-v2.json'
 )
 OPTIMIZER_CACHE_NAME = 'cache.sqlite'
 OPTIMIZER_ARTIFACT_NAMES = (
@@ -263,28 +265,34 @@ def _optimizer_runs_root() -> Path:
 
 def _optimizer_job_parallel_cap() -> int:
     configured = current_app.config.get('OPTIMIZER_JOB_PARALLEL_CAP')
+    if configured is None:
+        return DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP
     try:
         cap = int(configured)
     except (TypeError, ValueError):
-        cap = DEFAULT_OPTIMIZER_JOB_PARALLEL_CAP
+        cap = 1
     return max(1, cap)
 
 
 def _optimizer_job_budget_cap() -> int:
     configured = current_app.config.get('OPTIMIZER_JOB_BUDGET_CAP')
+    if configured is None:
+        return DEFAULT_OPTIMIZER_JOB_BUDGET_CAP
     try:
         cap = int(configured)
     except (TypeError, ValueError):
-        cap = DEFAULT_OPTIMIZER_JOB_BUDGET_CAP
+        cap = 1
     return max(1, cap)
 
 
 def _optimizer_job_queue_cap() -> int:
     configured = current_app.config.get('OPTIMIZER_JOB_QUEUE_CAP')
+    if configured is None:
+        return DEFAULT_OPTIMIZER_JOB_QUEUE_CAP
     try:
         cap = int(configured)
     except (TypeError, ValueError):
-        cap = DEFAULT_OPTIMIZER_JOB_QUEUE_CAP
+        cap = 1
     return max(1, cap)
 
 
@@ -3102,7 +3110,9 @@ def _recipe_controls_from_patch(patch: Mapping[str, Any]) -> dict[str, Any]:
         p_total = _finite_or_none(c4.get('p_total_mbar_default'))
         if p_total is not None:
             controls['p_total_mbar'] = p_total
-        hold_temp = _finite_or_none(c4.get('hold_temp_C'))
+        hold_temp = _finite_or_none(c4.get('default_hold_T_C'))
+        if hold_temp is None:
+            hold_temp = _finite_or_none(c4.get('hold_temp_C'))
         if hold_temp is not None:
             controls['stage_temp_C'] = hold_temp
         temp_range = c4.get('temp_range_C')
@@ -3244,6 +3254,13 @@ def load_recipe():
         source = recipe_library_path(raw_name, library_dir=_recipe_library_dir())
         setpoints_patch = load_recipe_patch(source)
         metadata = read_recipe_metadata(source)
+        raw_document = yaml.safe_load(source.read_text(encoding='utf-8')) or {}
+        cost_parameters = (
+            read_recipe_cost_parameters(source)
+            if isinstance(raw_document, Mapping)
+            and RECIPE_COST_PARAMETERS_KEY in raw_document
+            else None
+        )
         controls = _recipe_controls_for_response(setpoints_patch, metadata)
         sid = str(payload.get('sid') or '').strip()
         applied_to_session = False
@@ -3259,14 +3276,17 @@ def load_recipe():
         return _json_error(str(exc), 400)
     title = metadata.get('title') or source.stem
     summary = _recipe_metadata_summary(metadata) if metadata else ''
-    return jsonify({
+    response = {
         'name': source.stem,
         'title': title,
         'summary': summary,
         'setpoints_patch': setpoints_patch,
         'controls': controls,
         'applied_to_session': applied_to_session,
-    })
+    }
+    if cost_parameters is not None:
+        response['cost_parameters'] = cost_parameters
+    return jsonify(response)
 
 
 @bp.route('/')
@@ -3643,7 +3663,7 @@ def _load_default_thermal_train_artifact() -> dict[str, Any] | None:
         or artifact.get('artifact_id') != THERMAL_TRAIN_DEFAULT_ARTIFACT_ID
         or not isinstance(config, Mapping)
         or not isinstance(report, Mapping)
-        or report.get('schema_version') != 'thermal-train-report-v1'
+        or report.get('schema_version') != 'thermal-train-report-v2'
         or config.get('mass_kg') != 1000.0
         or config.get('track') != 'pyrolysis'
         or config.get('campaign') != 'C3_NA'

@@ -127,6 +127,12 @@ _ALPHAMELTS_BACKEND_CLASS = (
 _ALPHAMELTS_PROVIDER_ID = "alphamelts-diagnostic"
 _ALPHAMELTS_DEFAULT_MODEL = "MELTSv1.0.2"
 _ALPHAMELTS_DEFAULT_MODE = "subprocess"
+_THERMOENGINE_AUTHORIZED_NAME = 'thermoengine'
+_THERMOENGINE_BACKEND_NAME = 'ThermoEngineBackend'
+_THERMOENGINE_BACKEND_CLASS = (
+    'simulator.melt_backend.thermoengine.ThermoEngineBackend'
+)
+_THERMOENGINE_DEFAULT_MODE = 'thermoengine'
 _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID = "builtin-backend-equilibrium"
 _INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME = "InternalAnalyticalBackend"
 _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME = ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME
@@ -430,7 +436,11 @@ class PT0DeterminismStore:
         composition_by_account: Mapping[str, Mapping[str, float]] | None = None,
     ) -> dict[str, dict[str, float]]:
         if composition_by_account is None:
-            composition_by_account = sim.atom_ledger.mol_by_account()
+            accounts = sim.atom_ledger.mol_by_account()
+            composition_by_account = {
+                str(account): sim.atom_ledger.project_account_mol(str(account))
+                for account in accounts
+            }
         return canonicalized_composition_mol_by_account(
             composition_by_account,
             sig_figs=self._control_quantization.composition_sig_figs,
@@ -2526,7 +2536,11 @@ def _gate_provider_role_for_key(sim: Any) -> str:
         is not None
     ):
         return "authoritative"
-    if _cached_real_authorized_backend_name(sim) == "alphamelts":
+    authorized_name = _cached_real_authorized_backend_name(sim)
+    if (
+        _is_alphamelts_authorized_name(authorized_name)
+        or _is_thermoengine_authorized_name(authorized_name)
+    ):
         return "authoritative"
     return "fallback"
 
@@ -2544,7 +2558,7 @@ def _composition_mol_fraction(
     *,
     sig_figs: int | None = None,
 ) -> list[tuple[str, float]]:
-    cleaned = sim.atom_ledger.mol_by_account(_CLEANED_MELT_ACCOUNT)
+    cleaned = sim.atom_ledger.project_account_mol(_CLEANED_MELT_ACCOUNT)
     return _composition_mol_fraction_from_mol(cleaned, sig_figs=sig_figs)
 
 
@@ -2667,7 +2681,10 @@ def _engine_version_provenance(
         authorized_name = str(
             getattr(config, "authorized_backend_name", "")
         ).strip()
-        if _is_alphamelts_authorized_name(authorized_name):
+        if (
+            _is_alphamelts_authorized_name(authorized_name)
+            or _is_thermoengine_authorized_name(authorized_name)
+        ):
             version = str(
                 getattr(config, "authorized_backend_version", "")
             ).strip()
@@ -2700,7 +2717,9 @@ def _cached_real_provider_identity(
     authorized_name = str(
         getattr(config, "authorized_backend_name", "")
     ).strip()
-    if not _is_alphamelts_authorized_name(authorized_name):
+    is_alphamelts = _is_alphamelts_authorized_name(authorized_name)
+    is_thermoengine = _is_thermoengine_authorized_name(authorized_name)
+    if not (is_alphamelts or is_thermoengine):
         return None
     alphamelts_intents = {
         ChemistryIntent.SILICATE_LIQUIDUS,
@@ -2737,7 +2756,11 @@ def _cached_real_provider_identity(
         ),
         "mode": (
             str(getattr(config, "authorized_mode", "")).strip()
-            or _ALPHAMELTS_DEFAULT_MODE
+            or (
+                _THERMOENGINE_DEFAULT_MODE
+                if is_thermoengine
+                else _ALPHAMELTS_DEFAULT_MODE
+            )
         ),
     }
 
@@ -2851,7 +2874,11 @@ def _equilibrium_payload_intent(sim: Any) -> ChemistryIntent:
         is not None
     ):
         return ChemistryIntent.SILICATE_EQUILIBRIUM
-    if _cached_real_authorized_backend_name(sim) == "alphamelts":
+    authorized_name = _cached_real_authorized_backend_name(sim)
+    if (
+        _is_alphamelts_authorized_name(authorized_name)
+        or _is_thermoengine_authorized_name(authorized_name)
+    ):
         return ChemistryIntent.SILICATE_EQUILIBRIUM
     return ChemistryIntent.BACKEND_EQUILIBRIUM
 
@@ -3220,6 +3247,12 @@ def _authorized_backend_identity_for_key(
             "backend_class": _ALPHAMELTS_BACKEND_CLASS,
             "corpus_version": current_corpus_version(),
         }
+    if _is_thermoengine_authorized_name(name):
+        return {
+            'backend_name': _THERMOENGINE_BACKEND_NAME,
+            'backend_class': _THERMOENGINE_BACKEND_CLASS,
+            'corpus_version': current_corpus_version(),
+        }
     return {
         "backend_name": name,
         "backend_class": name,
@@ -3230,6 +3263,8 @@ def _authorized_backend_identity_for_key(
 def _backend_name_for_key(backend: Any) -> str:
     if _is_alphamelts_backend(backend):
         return _ALPHAMELTS_BACKEND_NAME
+    if _is_thermoengine_backend(backend):
+        return _THERMOENGINE_BACKEND_NAME
     if type(backend).__name__ == _INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME:
         return _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME
     return type(backend).__name__
@@ -3238,6 +3273,8 @@ def _backend_name_for_key(backend: Any) -> str:
 def _backend_class_for_key(backend: Any) -> str:
     if _is_alphamelts_backend(backend):
         return _ALPHAMELTS_BACKEND_CLASS
+    if _is_thermoengine_backend(backend):
+        return _THERMOENGINE_BACKEND_CLASS
     if type(backend).__name__ == _INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME:
         return _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_CLASS
     return _qualified_type(backend)
@@ -3258,9 +3295,36 @@ def _backend_version_for_key(backend: Any) -> str:
 def _is_alphamelts_backend(backend: Any) -> bool:
     if backend is None:
         return False
+    if bool(getattr(backend, '_legacy_alphamelts_cache_identity', False)):
+        return True
     return any(
         cls.__name__ == _ALPHAMELTS_BACKEND_NAME
         for cls in type(backend).__mro__
+    )
+
+
+def _is_thermoengine_backend(backend: Any) -> bool:
+    if backend is None or bool(
+        getattr(backend, '_legacy_alphamelts_cache_identity', False)
+    ):
+        return False
+    declared_name = (
+        getattr(backend, 'backend_name', None)
+        or getattr(backend, 'name', None)
+    )
+    if str(declared_name or '').strip().lower() == _THERMOENGINE_AUTHORIZED_NAME:
+        return True
+    return any(
+        cls.__name__ == _THERMOENGINE_BACKEND_NAME
+        for cls in type(backend).__mro__
+    )
+
+
+def _is_thermoengine_authorized_name(value: Any) -> bool:
+    text = str(value or '').strip().lower()
+    leaf = text.rsplit('.', 1)[-1]
+    return text == _THERMOENGINE_AUTHORIZED_NAME or leaf == (
+        _THERMOENGINE_BACKEND_NAME.lower()
     )
 
 

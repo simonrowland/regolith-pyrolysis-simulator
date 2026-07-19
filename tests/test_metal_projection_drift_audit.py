@@ -38,11 +38,12 @@ def _make_audit_target(
     *,
     metal_phase_kg: Dict[str, float],
     condensation_train_kg: Dict[str, float] | None = None,
+    chromium_product_kg: Dict[str, float] | None = None,
     train_kg_by_stage: Iterable[Dict[str, float]],
 ) -> SimpleNamespace:
     """Minimal duck-typed surface for ``_audit_metal_projection_drift``.
 
-    The method only touches ``self.atom_ledger.kg_by_account`` and
+    The method only touches ``self.atom_ledger.project_account_kg`` and
     ``self.train.stages[*].collected_kg``; everything else on
     ``ExtractionMixin`` is irrelevant. Build a SimpleNamespace that
     exposes just those two surfaces with the requested test
@@ -64,10 +65,12 @@ def _make_audit_target(
             return dict(metal_phase_kg)
         if account == 'process.condensation_train':
             return dict(condensation_train_kg or {})
+        if account == 'terminal.chromium_condensed_oxide_stored':
+            return dict(chromium_product_kg or {})
         return {}
 
     ns = SimpleNamespace(
-        atom_ledger=SimpleNamespace(kg_by_account=_fake_kg_by_account),
+        atom_ledger=SimpleNamespace(project_account_kg=_fake_kg_by_account),
         train=train,
     )
     # Bind the audit + projection-sum helpers + tolerance so ``self``
@@ -118,6 +121,16 @@ def test_audit_condensation_credit_and_stage_projection_are_in_sync():
         metal_phase_kg={},
         condensation_train_kg={'K': 0.02, 'Na': 0.03},
         train_kg_by_stage=[{}, {'K': 0.02}, {'Na': 0.03}],
+    )
+    assert target._audit_metal_projection_drift() == {}
+
+
+def test_audit_dedicated_chromium_product_and_stage_projection_are_in_sync():
+    """Cr2O3 is stored terminally but still projected as stage collection."""
+    target = _make_audit_target(
+        metal_phase_kg={},
+        chromium_product_kg={'Cr2O3': 0.02},
+        train_kg_by_stage=[{}, {}, {'Cr2O3': 0.02}],
     )
     assert target._audit_metal_projection_drift() == {}
 

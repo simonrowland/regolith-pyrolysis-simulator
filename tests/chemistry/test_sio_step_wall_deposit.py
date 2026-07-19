@@ -185,14 +185,16 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # contract is now restored end-to-end after the process-condensation fold,
     # and wave-11's request-shape audit fix is in main. Two-pass probe:
     # docs-private/research/2026-07-12-pin-final/reconcile_run{1,2}.json.
+    # 2026-07-17 t-159/t-160/t-260: executable recompute after corrected
+    # transport composition and wall-capture accounting.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        2.281305845076e-07, rel=1e-9
+        6.2152989776736e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
-        2.429765790373e-07, rel=1e-9
+        7.29135304029e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
-        2.428777052747e-07, rel=1e-9
+        7.2913530402799995e-06, rel=1e-9
     )
 
 

@@ -440,7 +440,7 @@ def _stage0_exit_reason(sim: PyrolysisSimulator) -> str | None:
 
 
 def _capture_cleaned_melt_kg(sim: PyrolysisSimulator) -> dict[str, float]:
-    ledger_melt = sim.atom_ledger.kg_by_account("process.cleaned_melt")
+    ledger_melt = sim.atom_ledger.project_account_kg("process.cleaned_melt")
     return {
         species: float(kg)
         for species, kg in ledger_melt.items()

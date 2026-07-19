@@ -418,10 +418,21 @@ metals:
       B: 16064.989
       C: -83.86
       valid_range_K: [1889, 2755]
-    evaporation_alpha_policy:
-      tier: 3
-      policy: "fail_loud_missing_alpha"
-      source: "REF-014 Fedkin et al. 2006 GCA 70:206-223; no isolated HK alpha found"
+    evaporation_alpha:
+      value: 0.9
+      source: "REF-040 Pound 1972 J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096, selected McCabe, Hudson & Paxton 1958 Trans. Met. Soc. AIME 212:102 Langmuir-vs-Knudsen result for 99.9% polycrystalline solid Cr and monoatomic Cr(g)"
+      T_band_K: [1318, 1563]
+      envelope: [0.8, 1.0]
+      tier: 1
+      # DERIVATION (owner-ratified 2026-07-14): premise = clean 99.9%
+      # polycrystalline SOLID Cr evaporating as monoatomic Cr(g); basis = alpha
+      # is the measured Langmuir free-evaporation flux / Knudsen equilibrium-flux
+      # ratio selected by Pound from McCabe et al.; valid only at 1318-1563 K;
+      # sanity check = 0.9 +/- 0.1 stays <= 1 and matches the near-unity
+      # monoatomic-vapor-metal class. REGIME CAVEAT: this is pure-SOLID-Cr free
+      # evaporation, NOT Cr dissolved in silicate melt (liquid pure Cr was not
+      # separately measured; T_m approximately 2180 K). Melt activity belongs
+      # in P_sat, never in alpha; O-contaminated surfaces can sharply reduce alpha.
     antoine:
       A: 11.420
       B: 20730
@@ -520,10 +531,28 @@ metals:
       B: 10402.946653439165
       C: -160.520331526149
       valid_range_K: [1228, 2334.526]
-    evaporation_alpha_policy:
-      tier: 3
-      policy: "fail_loud_missing_alpha"
-      source: "REF-013 REF-014 Sossi et al. 2019 and Fedkin et al. 2006 discuss Mn volatility but no isolated HK alpha was adopted"
+    evaporation_alpha:
+      value: 1.0
+      source: "REF-040 Pound 1972 and REF-017 Safarian & Engh 2013 class basis: owner-ratified monoatomic-class PROXY, no Mn-specific measurement exists; Safarian & Engh 2013 full text read = zero Mn"
+      T_band_K: [1519, 2334.526]
+      envelope: [0.5, 1.0]
+      tier: 2
+      tag: "proxy"
+      # DERIVATION (owner-ratified 2026-07-14): premise = clean LIQUID Mn
+      # evaporating as monoatomic Mn(g); basis = measured clean-surface Fe/Cr
+      # monoatomic-metal alpha values cluster at approximately 0.9-1.0, while
+      # two independent literature sweeps found no Mn-specific measurement.
+      # Safarian & Engh 2013 full text was read and contains zero Mn number;
+      # Mn is absent from Pound's selected monatomic-metal alpha tables, and
+      # steelmaking Mn-loss studies report overall mass-transfer k, not HKL alpha.
+      # Confidence is medium-high for regolith-relevant liquid Mn; clean solid
+      # alpha-Mn may differ for crystallographic reasons and remains unmeasured.
+      # The [0.5, 1.0] envelope is therefore wider than Cr's [0.8, 1.0] and
+      # admits a material sub-unity solid-Mn case without pretending calibration.
+      # T_band_K follows the liquid pure-component Antoine process range, not a
+      # temperature-calibrated alpha measurement. Sanity check: alpha <= 1 and
+      # class-consistent. REGIME CAVEAT: melt activity belongs in P_sat, never
+      # in alpha; this class proxy is not a silicate-melt activity correction.
     antoine:
       A: 11.183
       B: 14740

@@ -48,7 +48,7 @@ SSO2_NATIVE_FE_PARTITION_TRANSITIONS = tuple(
     SSO2_NATIVE_FE_PARTITION_TRANSITION_BY_SOURCE.values()
 )
 SSO2_MASS_BALANCE_TOLERANCE_PCT = 5.0e-12
-SSO2_UNMEASURED_ALPHA_FALLBACK_SPECIES = ("Cr", "CrO2", "Mn")
+SSO2_UNMEASURED_ALPHA_FALLBACK_SPECIES = ("CrO2",)
 SSO2_CHUNK3B_READER_HANDOFF = (
     "PhysicsConstraintSet.delivered_stream_purity plus the SSO-2 profile/objective "
     "reader added in chunk 3b; it must consume Stage 3 Fe contamination and Fe tap "
@@ -154,7 +154,9 @@ def _certified_full_feo_equiv_na_dose_kg(
         additives_kg={SSO2_CERTIFIED_DOSE_SPECIES: float(mass_kg)},
     )
     base_feo_mol = float(
-        sim.atom_ledger.mol_by_account("process.cleaned_melt").get("FeO", 0.0)
+        sim.atom_ledger.project_account_mol("process.cleaned_melt").get(
+            "FeO", 0.0
+        )
         or 0.0
     )
     before = len(sim.atom_ledger.transitions)
@@ -479,7 +481,7 @@ def _unmeasured_alpha_fallback_notice(sim: Any) -> dict[str, Any]:
         "severity": "warning",
         "status": "engaged" if total_count > 0 else "not_engaged",
         "policy": "alpha=1.0 prototype fallback",
-        "scope": "SSO-2 trace Cr/Mn species lacking grounded evaporation alpha",
+        "scope": "SSO-2 trace CrO2 species lacking grounded evaporation alpha",
         "permitted_species": sorted(permitted),
         "engaged_species": sorted(engaged_species),
         "total_engagement_count": total_count,
@@ -705,14 +707,11 @@ def _stage_species_kg_from_trace(trace: Any) -> tuple[dict[tuple[int, str], floa
 def _ledger_account_kg(ledger: Any, account: str) -> tuple[dict[str, float], str, str]:
     if ledger is None:
         return {}, "missing_fe_tap_evidence", "atom ledger is missing"
-    kg_by_account = getattr(ledger, "kg_by_account", None)
+    kg_by_account = getattr(ledger, "project_account_kg", None)
     if not callable(kg_by_account):
-        return {}, "missing_fe_tap_evidence", "atom ledger has no kg_by_account reader"
+        return {}, "missing_fe_tap_evidence", "atom ledger has no projected kg reader"
     try:
         raw = kg_by_account(account)
-    except TypeError:
-        all_accounts = kg_by_account()
-        raw = all_accounts.get(account, {}) if isinstance(all_accounts, Mapping) else {}
     except Exception as exc:  # noqa: BLE001 - report surface must fail closed
         return {}, "missing_fe_tap_evidence", str(exc)
     if raw is None:

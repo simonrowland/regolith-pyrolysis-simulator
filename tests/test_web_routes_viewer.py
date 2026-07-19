@@ -8,6 +8,7 @@ import pytest
 import yaml
 from flask import Flask
 
+from simulator.accounting.run_artifact import ARTIFACT_SCHEMA_VERSION
 from simulator.recipe_io import normalize_recipe_patch
 from web.routes import bp
 from web.run_store import RunArtifactStore
@@ -34,7 +35,7 @@ def _artifact(*, recipe_snapshot: dict | None) -> dict:
     if recipe_snapshot is not None:
         header["recipe_snapshot"] = recipe_snapshot
     return {
-        "artifact_schema_version": "0.1.0",
+        "artifact_schema_version": ARTIFACT_SCHEMA_VERSION,
         "execution_status": "ok",
         "lifecycle": "complete",
         "header": header,
@@ -53,6 +54,80 @@ def test_report_viewer_serves_index_and_assets(tmp_path: Path) -> None:
     assert b"Regolith Refinery Run Report" in index.data
     assert script.status_code == 200
     assert b"Download run.yaml" in script.data
+
+
+def test_report_viewer_reads_canonical_cost_provenance_key() -> None:
+    root = Path(__file__).resolve().parents[1] / "web" / "report_viewer"
+    report_source = (root / "report-viewer.js").read_text(encoding="utf-8")
+    settings_source = (root / "settings.js").read_text(encoding="utf-8")
+    sample = json.loads((root / "sample-run-artifact.json").read_text(encoding="utf-8"))
+
+    assert "cost_block?.provenance" in report_source
+    assert "prices.provenance" in report_source
+    assert "cost.provenance" in settings_source
+    assert sample["header"]["cost_block"]["provenance"]
+    assert "_provenance" not in sample["header"]["cost_block"]
+
+
+@pytest.mark.parametrize("include_activity", [False, True])
+def test_report_viewer_presence_gates_stage_purity_activity(
+    include_activity: bool,
+) -> None:
+    script_path = Path(__file__).resolve().parents[1] / "web/report_viewer/report-viewer.js"
+    stage = {
+        "label": "Cr <stage>",
+        "accepted_species": ["Cr<script>", "Mn"],
+        "total_kg": 1.0,
+        "designated_kg": 1.0,
+        "impurity_kg": 0.0,
+        "purity_fraction": 1.0,
+        "verdict": "PURE",
+    }
+    if include_activity:
+        stage["activity"] = {"Cr<script>": True, "Mn": False}
+    artifact = {
+        "artifact_schema_version": "0.1.0",
+        "execution_status": "ok",
+        "lifecycle": "complete",
+        "header": {"run_id": "purity-activity"},
+        "timesteps": [],
+        "terminal": {"stage_purity": {"stage_2": stage}},
+    }
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const source = fs.readFileSync(process.argv[2], "utf8");
+const report = { innerHTML: "" };
+const context = {
+  window: { location: { search: "" } },
+  document: { querySelector: (selector) => selector === "#report" ? report : null },
+  URLSearchParams,
+  encodeURIComponent,
+  fetch: async () => ({ ok: true, json: async () => JSON.parse(process.argv[3]) })
+};
+vm.runInNewContext(source, context);
+setImmediate(() => process.stdout.write(report.innerHTML));
+"""
+
+    completed = subprocess.run(
+        ["node", "-", str(script_path), json.dumps(artifact)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+
+    assert "<script>" not in completed.stdout
+    assert "Cr&lt;script&gt;" in completed.stdout
+    if include_activity:
+        assert "Cr&lt;script&gt; · ACTIVE" in completed.stdout
+        assert "Mn · IDLE" in completed.stdout
+        assert "Pending W-A10" not in completed.stdout
+    else:
+        assert "Cr&lt;script&gt; · Mn" in completed.stdout
+        assert "ACTIVE" not in completed.stdout
+        assert "IDLE" not in completed.stdout
+        assert "Pending W-A10" in completed.stdout
 
 
 @pytest.mark.parametrize("has_recipe_snapshot", [True, False])

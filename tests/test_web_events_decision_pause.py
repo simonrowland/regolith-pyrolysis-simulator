@@ -84,6 +84,14 @@ def _deterministic_liquidus_gate(monkeypatch):
             # Pending t-194 grounded Cr/Mn alphas; alpha=1.0 prototype fallback.
             kernel_config['allow_unmeasured_alpha_fallback'] = True
             payload['chemistry_kernel'] = kernel_config
+            campaigns = dict(payload.get('campaigns', {}) or {})
+            c6 = dict(campaigns.get('C6', {}) or {})
+            # Explicit state-machine fixture horizon, not a product default:
+            # C6 now counts reaction hold only after acquiring its static
+            # target; these tests exercise decision routing, not hold duration.
+            c6['max_hold_hr'] = 1
+            campaigns['C6'] = c6
+            payload['campaigns'] = campaigns
         return payload
 
     monkeypatch.setattr(events_module, '_load_yaml', load_yaml_with_alpha_fallback)
@@ -104,7 +112,8 @@ START_PARAMS = {
 # Deterministic gate order for the params above (verified by driving the
 # internal-analytical session to completion under AUTO_APPLY): three gates,
 # each answered with its
-# own recommendation; the run completes at hour 132.
+# own recommendation; the fixture-shortened C6 hold then completes after its
+# target is physically acquired.
 EXPECTED_DECISIONS = ['PATH_AB', 'BRANCH_ONE_TWO', 'C6_PROCEED']
 
 # Each recommendation, as routed by apply_decision to that exact gate. Read off
@@ -120,7 +129,12 @@ EXPECTED_ROUTING = [
 
 def _make_client():
     app = app_module.create_app()
-    c = app_module.socketio.test_client(app)
+    http_client = app.test_client()
+    assert http_client.get("/").status_code == 200
+    c = app_module.socketio.test_client(
+        app,
+        flask_test_client=http_client,
+    )
     assert c.is_connected()
     c.get_received()  # drain connect noise
     return c

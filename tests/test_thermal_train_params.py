@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -32,6 +33,8 @@ def test_default_thermal_train_parameters_are_closed_tagged_and_frozen() -> None
         "warm_overburden": 0.5,
         "psr": 0.0,
     }
+    assert params.cold_train.runtime_enforcement is False
+    assert params.cold_train.accumulator_enabled is False
     with pytest.raises(TypeError):
         params.knudsen_locations["duct"]["L_m"] = 1.0
 
@@ -41,6 +44,37 @@ def test_parameter_schema_rejects_unknown_and_missing_keys() -> None:
     payload["parameters"]["orphan"] = {"value": 1, "units": "x", "source_tag": "assumption"}
     with pytest.raises(ValueError, match="exactly"):
         normalize_thermal_train_parameters(payload, source="test")
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda payload: payload.update(extra_root=True),
+        lambda payload: payload["cold_train"].update(extra_cold_train={}),
+        lambda payload: payload["cold_train"]["rating"].update(extra_rating={}),
+        lambda payload: payload["cold_train"]["orifice"].update(extra_orifice={}),
+        lambda payload: payload["cold_train"]["relief"].update(extra_relief={}),
+        lambda payload: payload["cold_train"]["cycle"].update(extra_cycle={}),
+        lambda payload: payload["cold_train"]["rating"]["p_ref_Pa"].update(extra_entry=True),
+    ],
+)
+def test_raw_and_normalized_parameter_paths_refuse_unknown_keys(mutate) -> None:
+    raw = _raw()
+    mutate(raw)
+    with pytest.raises(ValueError, match="exactly"):
+        thermal_train_parameters_from_mapping(raw)
+
+    normalized = load_thermal_train_parameters()
+    mutate(normalized)
+    with pytest.raises(ValueError, match="exactly"):
+        thermal_train_parameters_from_mapping(normalized)
+
+
+def test_normalized_provenance_schema_is_closed() -> None:
+    normalized = deepcopy(load_thermal_train_parameters())
+    normalized["provenance"]["extra"] = True
+    with pytest.raises(ValueError, match="exactly"):
+        thermal_train_parameters_from_mapping(normalized)
     payload = _raw()
     del payload["display_prices"]["cryo_cost_per_W"]
     with pytest.raises(ValueError, match="exactly"):
@@ -53,6 +87,37 @@ def test_parameter_schema_rejects_nonfinite_negative_and_bool_values(bad) -> Non
     payload["parameters"]["eta_isen"]["value"] = bad
     with pytest.raises((TypeError, ValueError)):
         normalize_thermal_train_parameters(payload, source="test")
+
+
+@pytest.mark.parametrize("bad", [0, 1, "false", None])
+def test_runtime_enforcement_requires_boolean(bad) -> None:
+    payload = _raw()
+    payload["cold_train"]["runtime_enforcement"]["value"] = bad
+    with pytest.raises(TypeError, match="boolean"):
+        normalize_thermal_train_parameters(payload, source="test")
+
+
+@pytest.mark.parametrize("bad", [0, 1, "false", None])
+def test_accumulator_enabled_requires_boolean(bad) -> None:
+    payload = _raw()
+    payload["cold_train"]["accumulator_enabled"]["value"] = bad
+    with pytest.raises(TypeError, match="boolean"):
+        normalize_thermal_train_parameters(payload, source="test")
+
+
+def test_accumulator_requires_runtime_enforcement() -> None:
+    payload = _raw()
+    payload["cold_train"]["accumulator_enabled"]["value"] = True
+    with pytest.raises(
+        ValueError,
+        match="accumulator_enabled requires runtime_enforcement=true",
+    ):
+        thermal_train_parameters_from_mapping(payload)
+
+    payload["cold_train"]["runtime_enforcement"]["value"] = True
+    assert thermal_train_parameters_from_mapping(
+        payload
+    ).cold_train.accumulator_enabled is True
 
 
 def test_assumption_and_ratification_source_tags_are_required() -> None:

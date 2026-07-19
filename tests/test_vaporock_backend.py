@@ -1,3 +1,4 @@
+import math
 import types
 import warnings
 from pathlib import Path
@@ -546,7 +547,7 @@ def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch)
 
 
 def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
-    """VapoRock vapor-pressure surface, anchored to SF2004 / Sossi-Fegley 2018.
+    """VapoRock literature anchors plus same-basis builtin shadow parity.
 
     \\goal VAPOROCK-SIO-DIVERGENCE (chunk 24/Phase-2). This test replaces the
     earlier first-agreeing-species short-circuit comparison with explicit
@@ -568,30 +569,20 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
        which calls ``redox_buffer`` for an absolute logfO2 + passes it to
        ``eval_gas_abundances`` directly).
 
-    2. **fO2-regime conflation is the apparent-disagreement driver.**
-       SF2004 Table 9 (``p(SiO) = 0.0131 Pa`` for tholeiite at 1900 K) is
-       reported at the **intrinsic** fO2 of the melt (Kress91, ~IW for
-       basalt). The simulator's default ``HARD_VACUUM`` atmosphere
-       pins ``fO2_log = -9`` (the vacuum floor), which for a basalt
-       at 1873.15 K is roughly **1 decade more reducing than IW**
-       (IW@1873.15K ≈ -7.98, per VapoRock's ``chemistry.redox_buffer``).
-       Because ``p(SiO) ∝ 1/√fO2`` in the SiO₂(melt) → SiO(g) + ½O₂(g)
-       equilibrium, the vacuum-floor regime inflates p(SiO) by ~3.2×
-       (one decade × √10) versus intrinsic. **This is a known
-       simulator-architecture limitation** (the gas-pO2 / melt-fO2
-       conflation; see \\goal FINITE-HEADSPACE-PO2-MODEL #17), not a
-       VapoRock bug.
+    2. **The fO2/pO2 channels are now separate.** The t-333 basis split
+       keeps intrinsic melt fO2 separate from headspace transport pO2.
+       The kernel feeds the VapoRock shadow headspace transport pO2,
+       converted to gas ``fO2_log``; intrinsic melt fO2 is retained only
+       as redox provenance. Builtin SiO suppression also reads transport
+       pO2, while its result's ``fO2_log`` reports intrinsic melt redox.
+       Reusing that result field for the shadow was the retired premise.
 
-    3. **Two assertions, two regimes.** To validate VapoRock against
-       literature, we evaluate at the **intrinsic-fO2 regime (IW)**
-       and assert agreement with SF2004 / Sossi-Fegley 2018. To
-       validate the **operating-point behaviour**, we evaluate at the
-       simulator's default vacuum-floor fO2 and assert the predicted
-       1-decade inflation. Both assertions are explicit; the comparison
-       does NOT short-circuit on the first agreeing species. The
-       builtin Antoine path's three-decade SiO error is documented but
-       not asserted on (the builtin is the fallback provider; the
-       authoritative path is the contract being validated).
+    3. **Parity must compare like with like.** VapoRock is checked against
+       literature at IW, then builtin and VapoRock are compared twice with
+       both channels deliberately aligned: once at IW and once at the
+       1e-9-bar transport floor. Their SiO pressures must agree within
+       0.45 decade on each common basis. This tests actual provider
+       parity instead of the old VapoRock-to-itself ratio.
     """
     backend = VapoRockBackend()
     with warnings.catch_warnings():
@@ -679,36 +670,91 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
         f"(SF2004 anchor ~6 Pa at 1900 K)."
     )
 
-    # ------------------------------------------------------------------
-    # Regime B: simulator default now uses intrinsic melt fO2. Gas pO2 is
-    # consumed by EVAPORATION_FLUX, not by VAPOR_PRESSURE.
-    # ------------------------------------------------------------------
+    # Keep the two redox channels deliberately divergent here: the result's
+    # redox field reports intrinsic melt fO2, not headspace transport pO2.
+    floor_pO2_bar = 1.0e-9
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log_iw
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = floor_pO2_bar
     sim.melt.fO2_log = fO2_log_iw
     sim.melt.melt_fO2_log = fO2_log_iw
-    builtin = sim._internal_analytical_equilibrium()
-    assert builtin.fO2_log == pytest.approx(fO2_log_iw, abs=0.05)
+    sim.melt.pO2_mbar = floor_pO2_bar * 1000.0
+    builtin_divergent = sim._internal_analytical_equilibrium()
+    assert builtin_divergent.fO2_log == pytest.approx(fO2_log_iw)
 
-    vaporock_builtin = backend.equilibrate(
+    vaporock_floor = backend.equilibrate(
         sim.melt.temperature_C,
         composition_mol=sim._backend_composition_mol(),
-        fO2_log=builtin.fO2_log,
+        fO2_log=math.log10(floor_pO2_bar),
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
     )
-
-    vaporock_builtin_pressures = _vaporock_diagnostic_pressures(vaporock_builtin)
-    if not vaporock_builtin_pressures:
-        pytest.skip(
-            "VapoRock returned no diagnostic vapor pressures at simulator "
-            "intrinsic fO2"
-        )
-
-    p_sio_builtin = vaporock_builtin_pressures.get("SiO", 0.0)
-    ratio = p_sio_builtin / p_sio_iw if p_sio_iw > 0.0 else float("nan")
-    assert 0.8 <= ratio <= 1.25, (
-        f"VapoRock p(SiO) simulator-intrinsic / IW ratio = {ratio:.3f}; "
-        f"VAPOR_PRESSURE should no longer use the gas vacuum floor as melt fO2"
+    vaporock_floor_pressures = _vaporock_diagnostic_pressures(vaporock_floor)
+    if not vaporock_floor_pressures:
+        pytest.skip("VapoRock returned no pressures at the transport floor")
+    p_sio_floor = vaporock_floor_pressures.get("SiO", 0.0)
+    assert p_sio_floor > 0.0
+    # SiO2(melt) -> SiO(g) + 1/2 O2(g) gives p_SiO proportional to
+    # pO2^-1/2, hence p_SiO(IW)/p_SiO(floor) =
+    # (pO2_IW/pO2_floor)^-1/2. rel=1e-6 admits floating-point noise while
+    # remaining far tighter than any physically meaningful scaling drift.
+    expected_iw_to_floor_ratio = (
+        (10.0**fO2_log_iw) / floor_pO2_bar
+    ) ** -0.5
+    assert p_sio_iw / p_sio_floor == pytest.approx(
+        expected_iw_to_floor_ratio, rel=1.0e-6
     )
+
+    # t-333 made the channels independent. Align them intentionally for
+    # provider parity: builtin SiO reads headspace transport pO2; the direct
+    # VapoRock adapter call receives that same pressure as gas fO2. The
+    # pseudo-Antoine SiO row has a documented ~0.270-decade maximum residual
+    # (docs/chemistry-methods.md section 2.1), versus ~0.086 observed here.
+    # A 0.45-decade ceiling leaves fit/model headroom while failing loudly on
+    # real drift. Both paths should retain the same residual because they
+    # apply the same inverse-root pO2 scaling.
+    same_basis_errors = {}
+    for basis_name, basis_fO2_log in (
+        ("IW", fO2_log_iw),
+        ("transport floor", math.log10(1.0e-9)),
+    ):
+        basis_pO2_bar = 10.0**basis_fO2_log
+        sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = basis_fO2_log
+        sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = basis_pO2_bar
+        sim.melt.fO2_log = basis_fO2_log
+        sim.melt.melt_fO2_log = basis_fO2_log
+        sim.melt.pO2_mbar = basis_pO2_bar * 1000.0
+
+        builtin = sim._internal_analytical_equilibrium()
+        assert builtin.fO2_log == pytest.approx(basis_fO2_log)
+        vaporock = backend.equilibrate(
+            sim.melt.temperature_C,
+            composition_mol=sim._backend_composition_mol(),
+            fO2_log=basis_fO2_log,
+            pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        )
+        vaporock_pressures = _vaporock_diagnostic_pressures(vaporock)
+        if not vaporock_pressures:
+            pytest.skip(f"VapoRock returned no pressures at {basis_name}")
+
+        # SiO only: Na's pure-component Antoine certification range is
+        # [924, 1118] K, below this 1873 K fixture; the IW literature band
+        # above remains the load-bearing Na check.
+        for species in ("SiO",):
+            builtin_pressure = builtin.vapor_pressures_Pa.get(species, 0.0)
+            vaporock_pressure = vaporock_pressures.get(species, 0.0)
+            assert builtin_pressure > 0.0 and vaporock_pressure > 0.0
+            error_decades = abs(
+                math.log10(builtin_pressure / vaporock_pressure)
+            )
+            same_basis_errors[basis_name] = error_decades
+            assert error_decades <= 0.45, (
+                f"{species} builtin/VapoRock parity at {basis_name} differs "
+                f"by {error_decades:.3f} decades: builtin={builtin_pressure:.4e} "
+                f"Pa, VapoRock={vaporock_pressure:.4e} Pa"
+            )
+
+    assert abs(
+        same_basis_errors["IW"] - same_basis_errors["transport floor"]
+    ) <= 1.0e-6
 
 
 def test_vaporock_iw_literature_grid_residuals_are_explicit():

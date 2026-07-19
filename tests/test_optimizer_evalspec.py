@@ -36,7 +36,11 @@ from simulator.optimize.evalspec import (
 import simulator.optimize.evalspec as evalspec_module
 import simulator.optimize.evaluate as evaluate_module
 import simulator.melt_backend.vaporock as vaporock_module
-from simulator.optimize.evaluate import EvaluationInputError, _build_eval_inputs
+from simulator.optimize.evaluate import (
+    EvaluationInputError,
+    _build_eval_inputs,
+    _build_prefix_eval_inputs,
+)
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.profiles import ProfileValidationError
 from simulator.optimize.recipe import (
@@ -46,14 +50,20 @@ from simulator.optimize.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_PATHS_BY_STAGE,
     C2A_STAGED_ORDER_PATH,
     C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    C5_GUARD,
     C4_HOLD_TEMP_C_PATH,
     FURNACE_MAX_T_C_PATH,
     O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION,
+    O2_BUBBLER_GUARD,
+    ConditionalExecutionContext,
     RecipePatch,
     RecipeSchema,
+    RecipeValidationError,
     STAGE0_CARBON_REDUCTANT_KG_PATH,
     STAGE0_REDOX_OXIDANT_KG_PATH,
     allowlist_version,
+    c5_sampler_context,
+    conditional_execution_context,
 )
 from simulator.campaigns import CampaignManager
 from simulator.core import CampaignPhase
@@ -90,20 +100,23 @@ STAGE_SIO_GAS_MODE = (
 # from 67f7eae1... to 32e9d2e9...; payload recomputed from _base_spec().
 # 2026-07-12 wave-12-cost-params: default cost parameters are now part of the
 # EvalSpec identity so cost-sensitive optimizer cache entries are reproducible.
+# 2026-07-17 W-A5a/t-227: re-pinned from the executable serializer after the
+# reviewed electricity and solar-heat defaults landed.
 PINNED_EVALSPEC_JSON = (
     b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor"'
-    b':false,"allowlist_version":"allowlist-v11","backend_name":"i'
-    b'nternal-analytical","bounds_digest":"32e9d2e945bd870a2af90d5'
-    b'fc46259dd7b724404d9066c4505d98921b8fd4252","c5_enabled":fals'
+    b':false,"allowlist_version":"allowlist-v12","backend_name":"i'
+    b'nternal-analytical","bounds_digest":"2308bef69d19aa7679dda3f'
+    b'5d9838c91f7efd22eaaa16fc64cf5aa8b2cf63eb5","c5_enabled":fals'
     b'e,"campaign":"C0","chemistry_kernel":{"allow_builtin_fallbac'
     b'k":false,"engine":"builtin","pressure_Pa":"0.001000000"},"co'
     b'de_version":"0.6.0","cost_parameters":{"parameters":{"deprec'
     b'iation_expense_per_run":"50.000000000","electricity_cost_per'
-    b'_kWh":"0.150000000","furnace_resinter_cost_usd":"5000.000000'
+    b'_kWh":"10.000000000","furnace_resinter_cost_usd":"5000.000000'
     b'000","generic_reagent_cost_per_kg":"10.000000000","shuttle_r'
     b'eagent_replacement_cost_per_kg":{"Ca":"0.500000000","K":"1.0'
-    b'00000000","Mg":"0.750000000","Na":"0.500000000"}},"schema_ve'
-    b'rsion":"optimize-costs-v1"},"data_digests":{"corpus_version"'
+    b'00000000","Mg":"0.750000000","Na":"0.500000000"},"solar_he'
+    b'at_cost_per_kWh":"0.050000000"},"schema_version":"optimize-c'
+    b'osts-v1"},"data_digests":{"corpus_version"'
     b':"corpus-version-digest","feedstocks":"feedstock-digest","fo'
     b'ulant_thermo":"foulant-thermo-digest","materials":"materials'
     b'-digest","profile":"profile-digest","setpoints":"setpoints-d'
@@ -313,7 +326,13 @@ def test_internal_analytical_backend_name_accepts_old_and_emits_new_cache_key(
 ) -> None:
     aliased = _base_spec(backend_name=alias)
     assert aliased.backend_name == "internal-analytical"
-    assert cache_key(aliased) == cache_key(_base_spec(backend_name="internal-analytical"))
+    payload = json.loads(canonical_evalspec_json(aliased).decode("utf-8"))
+    assert payload["backend_name"] == "internal-analytical"
+    restored = pickle.loads(pickle.dumps(aliased))
+    assert restored.backend_name == "internal-analytical"
+    assert cache_key(aliased) == cache_key(
+        _base_spec(backend_name="internal-analytical")
+    )
 
 
 def test_build_eval_inputs_keys_schema_allowlist_version_in_production_path() -> None:
@@ -415,9 +434,10 @@ def test_o2_bubbler_default_and_zero_settings_preserve_evalspec_identity() -> No
     assert default_spec.recipe_id == baseline.recipe_id
     assert zero_spec.recipe_id == baseline.recipe_id
     assert canonical_evalspec_json(default_spec) == canonical_evalspec_json(baseline)
-    assert canonical_evalspec_json(zero_spec) == canonical_evalspec_json(baseline)
+    assert canonical_evalspec_json(zero_spec) != canonical_evalspec_json(baseline)
     assert cache_key(default_spec) == cache_key(baseline)
-    assert cache_key(zero_spec) == cache_key(baseline)
+    assert cache_key(zero_spec) != cache_key(baseline)
+    assert zero_spec.conditional_subspace_digest
     assert b"o2_bubbler_settings" not in canonical_evalspec_json(default_spec)
 
 
@@ -663,7 +683,7 @@ def test_pre_redox_evalspec_reduce_payloads_get_zero_dose_defaults() -> None:
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-4]
+    old_args = args[:16] + args[19:-5]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -683,7 +703,7 @@ def test_pre_bubbler_evalspec_reduce_payloads_get_empty_settings_default() -> No
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-4]
+    old_args = args[:18] + args[19:-5]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_eval_spec(*old_args)
@@ -703,7 +723,7 @@ def test_pre_redox_prefix_evalspec_reduce_payloads_get_zero_dose_defaults() -> N
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:16] + args[19:-4]
+    old_args = args[:16] + args[19:-5]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -726,7 +746,7 @@ def test_pre_bubbler_prefix_evalspec_reduce_payloads_get_empty_settings_default(
         o2_bubbler_settings={"kg_per_hr": {"C3": 0.25}},
         stop_at_stage0_exit=True,
     ).__reduce__()
-    old_args = args[:18] + args[19:-4]
+    old_args = args[:18] + args[19:-5]
     old_args_with_stop = old_args + (True,)
 
     restored = evalspec_module._rebuild_prefix_eval_spec(*old_args)
@@ -744,7 +764,7 @@ def test_old_evalspec_reduce_payloads_default_stage0_exit_stop_false() -> None:
         _prefix_spec(stop_at_stage0_exit=False),
     ):
         _, new_args = spec.__reduce__()
-        old_args = new_args[:-4]
+        old_args = new_args[:-5]
         restored = type(spec)(*old_args)
 
         assert restored.stop_at_stage0_exit is False
@@ -982,9 +1002,10 @@ def test_build_eval_inputs_mre_cap_zero_is_default_no_mre_cache_neutral() -> Non
     assert cap_zero_spec.mre_target_species == ""
     assert cap_zero_run_config.c5_enabled is False
     assert cap_zero_run_config.mre_max_voltage_V == pytest.approx(0.0)
-    assert canonical_evalspec_json(cap_zero_spec) == canonical_evalspec_json(default_spec)
-    assert cache_key(cap_zero_spec) == cache_key(default_spec)
-    # cap=0 must strip to a cap-absent recipe_id (golden-neutral default).
+    assert canonical_evalspec_json(cap_zero_spec) != canonical_evalspec_json(default_spec)
+    assert cache_key(cap_zero_spec) != cache_key(default_spec)
+    assert cap_zero_spec.conditional_subspace_digest
+    # cap=0 strips to a cap-absent recipe_id while retaining explicit guard identity.
     assert cap_zero_spec.recipe_id == default_spec.recipe_id
 
 
@@ -1045,11 +1066,11 @@ def test_build_eval_inputs_mre_cap_below_min_rung_is_no_mre_cache_neutral() -> N
         just_below_spec.recipe_id,
     } == {default_spec.recipe_id}
     assert {
-        cache_key(default_spec),
         cache_key(cap_zero_spec),
         cache_key(below_min_spec),
         cache_key(just_below_spec),
-    } == {cache_key(default_spec)}
+    } == {cache_key(cap_zero_spec)}
+    assert cache_key(cap_zero_spec) != cache_key(default_spec)
 
     assert min_spec.c5_enabled is True
     assert min_spec.mre_max_voltage_V == pytest.approx(min_rung)
@@ -1057,6 +1078,28 @@ def test_build_eval_inputs_mre_cap_below_min_rung_is_no_mre_cache_neutral() -> N
     assert min_run_config.mre_max_voltage_V == pytest.approx(min_rung)
     assert min_spec.recipe_id != default_spec.recipe_id
     assert cache_key(min_spec) != cache_key(default_spec)
+
+
+def test_t155_explicit_off_cap_overrides_active_profile_default() -> None:
+    profile = _mre_cap_profile(
+        c5_enabled=True,
+        mre_max_voltage_V=1.45,
+        mre_target_species="SiO2",
+    )
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        RecipeSchema(),
+    )
+
+    assert spec.c5_enabled is False
+    assert spec.mre_max_voltage_V == pytest.approx(0.0)
+    assert spec.mre_target_species == ""
+    assert run_config.c5_enabled is False
+    assert run_config.mre_max_voltage_V == pytest.approx(0.0)
+    assert spec.conditional_subspace_digest
 
 
 def test_build_eval_inputs_mre_cap_int_and_float_share_recipe_id() -> None:
@@ -1080,6 +1123,128 @@ def test_build_eval_inputs_mre_cap_int_and_float_share_recipe_id() -> None:
     )
     assert cap_int_spec.recipe_id == cap_float_spec.recipe_id
     assert cache_key(cap_int_spec) == cache_key(cap_float_spec)
+
+
+@pytest.mark.parametrize("campaign", ("C2B", "C3", "C4", "C6"))
+@pytest.mark.parametrize(
+    "rate,metadata_active",
+    ((1.0, False), (0.0, True)),
+)
+def test_t155_bubbler_context_must_match_resolved_patch(
+    campaign: str, rate: float, metadata_active: bool
+) -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch(
+        {("campaigns", campaign, "o2_bubbler_kg_per_hr"): rate}
+    )
+    context = conditional_execution_context(
+        schema,
+        states={O2_BUBBLER_GUARD.canonicalizer_id: metadata_active},
+    )
+
+    with pytest.raises(
+        EvaluationInputError, match="conditional_mask does not match resolved patch"
+    ):
+        _build_eval_inputs(
+            patch,
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            _mre_cap_profile(),
+            schema,
+            conditional_context=context,
+        )
+
+
+@pytest.mark.parametrize(
+    "context_factory,error",
+    (
+        (
+            lambda schema: ConditionalExecutionContext(
+                (), "digest", {}, scope="arbitrary"  # type: ignore[arg-type]
+            ),
+            "unsupported conditional scope",
+        ),
+        (
+            lambda schema: c5_sampler_context(
+                schema, active=True, scope="prefix-before-guard-stage"
+            ),
+            "requires executed prefix stage IDs",
+        ),
+        (
+            lambda schema: c5_sampler_context(
+                schema,
+                active=True,
+                scope="prefix-before-guard-stage",
+                prefix_stage_ids=("C0", "C5"),
+            ),
+            "cannot include guard stage C5",
+        ),
+    ),
+)
+def test_t155_prefix_conditional_context_requires_enumerated_stage_proof(
+    context_factory, error: str
+) -> None:
+    with pytest.raises(RecipeValidationError, match=error):
+        context_factory(RecipeSchema())
+
+
+def test_t155_prefix_conditional_context_refuses_full_evalspec_reuse() -> None:
+    schema = RecipeSchema()
+    context = c5_sampler_context(
+        schema,
+        active=True,
+        scope="prefix-before-guard-stage",
+        prefix_stage_ids=("C0", "C0B"),
+    )
+
+    with pytest.raises(
+        EvaluationInputError,
+        match="cannot enter full evaluation or cache identity",
+    ):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            _mre_cap_profile(),
+            schema,
+            conditional_context=context,
+        )
+
+
+def test_t155_prefix_stage_proof_must_match_executed_stage_set() -> None:
+    schema = RecipeSchema()
+    context = c5_sampler_context(
+        schema,
+        active=True,
+        scope="prefix-before-guard-stage",
+        prefix_stage_ids=("C0",),
+    )
+
+    with pytest.raises(
+        EvaluationInputError,
+        match="prefix stage IDs do not match executed stage set",
+    ):
+        _build_prefix_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            _mre_cap_profile(),
+            schema,
+            prefix_stage_ids=("C0", "C0B"),
+            conditional_context=context,
+        )
+
+    prefix_spec, _ = _build_prefix_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        _mre_cap_profile(),
+        schema,
+        prefix_stage_ids=("C0",),
+        conditional_context=context,
+    )
+    assert isinstance(prefix_spec, PrefixEvalSpec)
+    assert prefix_spec.prefix_stage_ids == ("C0",)
 
 
 def test_build_eval_inputs_mre_cap_positive_enables_c5_and_partitions_cache() -> None:
@@ -1490,7 +1655,7 @@ def test_run_options_with_c4_hold_temp_conflict_raises() -> None:
     # The conflict guard fires when a pre-existing C4 hold_temp_C runtime override
     # disagrees with the patched value (_run_options_with_c4_hold_temp).
     run_options = {"runtime_campaign_overrides": {"C4": {"hold_temp_C": 1600.0}}}
-    with pytest.raises(EvaluationInputError, match="hold_temp_C conflicts"):
+    with pytest.raises(EvaluationInputError, match="default_hold_T_C conflicts"):
         evaluate_module._run_options_with_c4_hold_temp(
             run_options,
             RecipePatch({C4_HOLD_TEMP_C_PATH: 1620.0}),

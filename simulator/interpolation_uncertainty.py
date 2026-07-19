@@ -330,10 +330,25 @@ def _nonlinearity_component(
         ]
         if len(y_rows) < 3:
             continue
-        y_scale = max(max(abs(y) for _x, y, _w in y_rows), 1.0e-30)
+        pressure_log = output_name.startswith("log10_vapor_pressure_Pa:")
+        y_center = (
+            sum(y for _x, y, _w in y_rows) / len(y_rows)
+            if pressure_log
+            else 0.0
+        )
+        # Only log(P) has a unit-dependent additive offset. Center that surface
+        # and normalize by local variation; retain relative-level scaling for
+        # dimensionless outputs such as liquid fraction.
+        y_scale = max(
+            max(
+                abs(y - y_center) if pressure_log else abs(y)
+                for _x, y, _w in y_rows
+            ),
+            1.0 if pressure_log else 1.0e-30,
+        )
         coeffs = _weighted_quadratic_coefficients(
             [x for x, _y, _w in y_rows],
-            [y / y_scale for _x, y, _w in y_rows],
+            [(y - y_center) / y_scale for _x, y, _w in y_rows],
             [w for _x, _y, w in y_rows],
         )
         if coeffs is None:

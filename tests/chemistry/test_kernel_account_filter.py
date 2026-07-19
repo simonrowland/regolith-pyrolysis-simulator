@@ -106,6 +106,25 @@ def test_filter_declared_but_empty_account_appears_as_empty_dict():
     assert view.accounts["process.salt_phase"] == {}
 
 
+def test_filter_projects_signed_closure_dust_before_provider_dispatch():
+    ledger = AtomLedger()
+    ledger.load_external("process.cleaned_melt", {"FeO": 1.0})
+    ledger.move(
+        "provider_view_dust_probe",
+        "process.cleaned_melt",
+        "process.wall_deposit_segment_provider_view_probe",
+        {"FeO": 1.0 + 4.0e-13},
+    )
+
+    assert ledger.mol_by_account("process.cleaned_melt")["FeO"] < 0.0
+    view = build_provider_account_view(
+        ledger,
+        frozenset({"process.cleaned_melt"}),
+        species_formula_registry={},
+    )
+    assert view.accounts["process.cleaned_melt"] == {}
+
+
 def test_provider_view_is_immutable():
     ledger = _ledger_with_accounts()
     view = build_provider_account_view(

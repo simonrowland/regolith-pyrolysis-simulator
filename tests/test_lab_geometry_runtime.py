@@ -9,7 +9,11 @@ from engines.builtin.condensation_route import BuiltinCondensationRouteProvider
 from simulator.accounting import AtomLedger, LedgerTransition
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.condensation import CondensationModel, knudsen_regime_diagnostic
+from simulator.condensation import (
+    CondensationModel,
+    KnudsenRegimeRefusal,
+    knudsen_regime_diagnostic,
+)
 from simulator.core import PyrolysisSimulator
 from simulator.lab_schedule import LabScheduleValidationError, normalize_lab_schedule
 from simulator.equipment import EquipmentDesigner
@@ -313,6 +317,48 @@ def test_declared_surface_temperature_schedule_moves_runtime_deposits() -> None:
     )
     assert _surface_sio_delta(rows[1], "condenser") > (
         _surface_sio_delta(rows[1], "holder")
+    )
+
+
+def test_mre_gas_condensation_applies_declared_surface_schedule() -> None:
+    schedule = dynamic_lab_schedule()
+    for point in schedule["surface_temperature_C"]["condenser_profile"][:2]:
+        point["value"] = 1800.0
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C5",
+        hours=1,
+        mass_kg=1000.0,
+        backend_name="stub",
+        setpoints_patch={"lab_geometry": dynamic_surface_geometry_fixture()},
+        lab_schedule=schedule,
+        c5_enabled=True,
+        mre_target_species="CaO",
+        mre_max_voltage_V=2.3,
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
+    sim = run._start_session().simulator
+    sim.melt.temperature_C = 1575.0
+    sim._melt_redox_liquidus_gate_curve = lambda: (
+        sim._melt_redox_liquidus_floor_fallback(
+            source="test:mre_lab_surface_schedule",
+            reason="MRE condensation schedule regression uses the test floor",
+            liquidus_status="unavailable",
+        )
+    )
+
+    sim._step_mre(sample_time_h=1.0)
+
+    segments = {
+        segment.name: segment
+        for segment in sim.condensation_model.pipe_segments
+    }
+    assert segments["holder"].wall_temperature_C == pytest.approx(25.0)
+    assert segments["condenser"].wall_temperature_C == pytest.approx(1800.0)
+    deposits_kg = wall_deposit_by_segment_species_kg(sim.atom_ledger)
+    assert deposits_kg.get(("holder", "Ca"), 0.0) > (
+        deposits_kg.get(("condenser", "Ca"), 0.0)
     )
 
 
@@ -735,6 +781,10 @@ def test_wall_allocation_uses_view_factor_and_line_of_sight() -> None:
     raw = robinot_geometry_fixture()
     model = CondensationModel(CondensationTrain.create_default())
     model.configure_lab_geometry(parse_lab_geometry(raw))
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        gas_temperature_C=1700.0,
+    )
 
     base = model.route(
         EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
@@ -771,6 +821,19 @@ def test_wall_allocation_uses_view_factor_and_line_of_sight() -> None:
         match="invalid_lab_geometry_view_factor",
     ):
         parse_lab_geometry(invalid_view_factor)
+
+
+def test_geometry_only_direct_route_refuses_unconfigured_knudsen_policy() -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_lab_geometry(parse_lab_geometry(robinot_geometry_fixture()))
+
+    with pytest.raises(KnudsenRegimeRefusal) as exc_info:
+        model.route(
+            EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+            MeltState(temperature_C=1700.0),
+        )
+
+    assert exc_info.value.reason == "knudsen_policy_unconfigured"
 
 
 def test_lab_surface_deposit_accounts_conserve_and_roll_up_by_surface() -> None:

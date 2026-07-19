@@ -40,12 +40,129 @@ from __future__ import annotations
 
 import inspect
 import copy
+import gc
 from collections import deque
 from dataclasses import dataclass
 import logging
 import math
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
+
+
+class RefusalStateSnapshotError(TypeError):
+    """Typed refusal when rollback state contains an unsupported proxy graph."""
+
+
+def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
+    """Deep-copy rollback state while retaining immutable mapping views."""
+    visited: set[int] = set()
+    prepared_backings: set[int] = set()
+
+    def mapping_referent(proxy: MappingProxyType) -> Any:
+        referents = [
+            item for item in gc.get_referents(proxy)
+            if isinstance(item, (dict, MappingProxyType))
+        ]
+        if len(referents) != 1:
+            raise RefusalStateSnapshotError(
+                'mappingproxy rollback snapshot requires exactly one '
+                f'mapping referent; found {len(referents)}'
+            )
+        return referents[0]
+
+    def seed_mapping_proxies(candidate: Any) -> None:
+        candidate_id = id(candidate)
+        if candidate_id in visited:
+            return
+        visited.add(candidate_id)
+
+        if isinstance(candidate, MappingProxyType):
+            # Normalized schedules are immutable by contract. Copy the actual
+            # backing dict and rewrap every proxy layer before copying dict
+            # contents. Bottom-up construction is load-bearing when the base
+            # dict points back to the outer proxy: deepcopy must see the outer
+            # memo entry before it encounters that cycle.
+            proxy_chain: list[MappingProxyType] = []
+            chain_ids: set[int] = set()
+            backing: Any = candidate
+            while isinstance(backing, MappingProxyType):
+                backing_id = id(backing)
+                if backing_id in memo:
+                    break
+                if backing_id in chain_ids:
+                    raise RefusalStateSnapshotError(
+                        'mappingproxy rollback snapshot has a referent cycle'
+                    )
+                chain_ids.add(backing_id)
+                proxy_chain.append(backing)
+                visited.add(backing_id)
+                backing = mapping_referent(backing)
+            if isinstance(backing, MappingProxyType):
+                copied_referent = memo[id(backing)]
+                base_backing = None
+            elif isinstance(backing, dict):
+                backing_id = id(backing)
+                copied_referent = memo.setdefault(backing_id, {})
+                base_backing = backing
+            else:
+                raise RefusalStateSnapshotError(
+                    'mappingproxy rollback snapshot requires a dict backing'
+                )
+            for proxy in reversed(proxy_chain):
+                copied_referent = MappingProxyType(copied_referent)
+                memo[id(proxy)] = copied_referent
+            if base_backing is not None and backing_id not in prepared_backings:
+                prepared_backings.add(backing_id)
+                for key, item in base_backing.items():
+                    seed_mapping_proxies(key)
+                    seed_mapping_proxies(item)
+                for key, item in base_backing.items():
+                    memo[backing_id][copy.deepcopy(key, memo)] = copy.deepcopy(
+                        item, memo
+                    )
+            return
+
+        if isinstance(candidate, dict):
+            children = (*candidate.keys(), *candidate.values())
+        elif isinstance(candidate, (list, tuple, set, frozenset, deque)):
+            children = candidate
+        else:
+            attributes = getattr(candidate, '__dict__', None)
+            children = (
+                list(attributes.values())
+                if isinstance(attributes, dict)
+                else []
+            )
+            for cls in type(candidate).__mro__:
+                slots = getattr(cls, '__slots__', ())
+                if isinstance(slots, str):
+                    slots = (slots,)
+                for slot in slots:
+                    if slot in ('__dict__', '__weakref__'):
+                        continue
+                    try:
+                        children.append(getattr(candidate, slot))
+                    except AttributeError:
+                        pass
+        for child in children:
+            seed_mapping_proxies(child)
+
+    try:
+        seed_mapping_proxies(value)
+        return copy.deepcopy(value, memo)
+    except RefusalStateSnapshotError:
+        raise
+    except (KeyboardInterrupt, SystemExit, GeneratorExit):
+        # Multiple inheritance can make a process-control signal an Exception
+        # too.  Preserve control flow by testing these classes first.
+        raise
+    except Exception as exc:
+        # Do not format the caught exception: its __str__/__repr__ is part of
+        # the adversarial snapshot graph and may itself raise.
+        raise RefusalStateSnapshotError(
+            'unsupported rollback snapshot graph'
+        ) from exc
 
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
@@ -53,6 +170,9 @@ from simulator.account_ids import (
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
+    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+    OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
+    METAL_PHASE_ACCOUNT,
     OXYGEN_MELT_OFFGAS_ACCOUNT,
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
@@ -61,6 +181,7 @@ from simulator.account_ids import (
     OXYGEN_STAGE0_ACCOUNT,
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
+    SOLID_CHAR_CARBON_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 from simulator.accounting import (
@@ -342,6 +463,7 @@ FLOW_MASS_ACCOUNTS = (
     'process.cleaned_melt',
     C7_AL_CREDIT_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    SOLID_CHAR_CARBON_ACCOUNT,
     'process.raw_feedstock',
     'process.condensation_train',
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
@@ -364,6 +486,10 @@ FLOW_MASS_ACCOUNTS = (
     OXYGEN_MELT_OFFGAS_VENTED_ACCOUNT,
     OXYGEN_MELT_OFFGAS_CAPTURED_ACCOUNT,
     OXYGEN_MRE_ANODE_ACCOUNT,
+    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
+    OXYGEN_BUBBLER_EXTERNAL_VENTED_ACCOUNT,
+    'terminal.stage0_residual_carbonate_carbon',
+    'terminal.stage0_residual_refractory_carbon',
 )
 FLOW_MASS_EXCLUDED_ACCOUNTS = (
     'process.stage0_carbonate_feed',
@@ -385,6 +511,17 @@ BACKEND_ACCOUNT_SCOPED_ONLY = (
     'process.overhead_gas',
 )
 OXYGEN_MOLAR_MASS_KG_PER_MOL = MOLAR_MASS[OXYGEN_SPECIES] / 1000.0
+# Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO
+# Ellingham line lies below Fe/FeO above ~700 C, so FeO + C -> Fe + CO is
+# thermodynamically favorable at melt temperatures. Algebra: 1:1 molar
+# (FeO + C = Fe + CO). Unit check: mol FeO * 0.055845 kg/mol = kg Fe.
+# Sanity: 1 t feed at 3.5 wt% C with Sephton floor f_refractory=0.39 yields
+# ~1.136 kmol char and at most ~63.5 kg Fe (owner brief ~80 kg Fe/t is the
+# CI-scale order-of-magnitude check, not a free threshold).
+FEO_CHAR_REDUCTION_MIN_T_C = 700.0
+CHAR_SPECIES = 'C'
+CHAR_LANCE_BASIS_CO2 = 'C_plus_O2_to_CO2'
+CHAR_LANCE_BASIS_CO = 'C_plus_half_O2_to_CO'
 OXYGEN_ACCOUNTING_TOLERANCE_KG = 1e-9
 OXYGEN_RESERVOIR_NOOP_MOL = 1e-15
 OXYGEN_RESERVOIR_REDOX_SOURCE_MIN_FO2_LOG10_BAR = -1.0e11
@@ -483,6 +620,10 @@ class PoisonedHourError(RuntimeError):
             f'before abort ({state.aborting_exception_summary}); retry refused; '
             'create a fresh simulator or reload the batch'
         )
+
+
+class MeltHeadspaceProjectionError(RuntimeError):
+    """Authoritative chemistry requested a missing headspace projection."""
 
 
 class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
@@ -710,6 +851,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.inventory = ProcessInventory()
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
+        self._melt_headspace_composition_mbar: Dict[str, float] = {}
 
         # --- Batch record ---
         self.record = BatchRecord()
@@ -935,6 +1077,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         previous_carbonate_specs = self._stage0_carbonate_decomposition_specs
         previous_foulant_diagnostics = self._stage0_foulant_diagnostics
         self.species_formula_registry = self._registry_for_feedstock(fs)
+        # Must be set before _build_process_inventory so Stage-0 oxidation
+        # can look up the Sephton refractory-C partition for this feed.
+        self._batch_feedstock_key = str(feedstock_key)
         try:
             inventory = self._build_process_inventory(
                 fs, mass_value, feedstock_key=feedstock_key,
@@ -951,6 +1096,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._stage0_carbon_cleanup_specs = []
         self._stage0_carbonate_decomposition_specs = []
         self._stage0_perchlorate_cleanup_specs = []
+        self._last_char_lance_diagnostic: Dict[str, Any] = {}
+        self._last_char_feo_reduction_diagnostic: Dict[str, Any] = {}
+        self._last_char_contamination_diagnostic: Dict[str, Any] = {}
         required_carbon_kg = self.inventory.carbon_reductant_required_kg
         if (
             required_carbon_kg > 1e-12
@@ -1005,6 +1153,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Reset condensation train
         self.train = CondensationTrain.create_default()
         self.overhead = OverheadGas()
+        self._melt_headspace_composition_mbar = {}
         self._last_overhead_gas_equilibrium = {}
         self._last_vapor_pressure_diagnostic = {}
         self._last_native_fe_partition_diagnostic = {}
@@ -1519,9 +1668,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
           backend is not an AlphaMELTSBackend (the provider would have
           nowhere to delegate).
 
-        The duck-typed check (presence of ``_mode``, ``is_available``,
-        ``get_engine_version``) lets the registration accept future
-        AlphaMELTS subclasses without a hard isinstance gate.
+        The stable backend-name check accepts both peer MELTS engines without
+        importing either optional transport at registration time.
         """
         backend = self._provider_registration_backend(self.backend)
         if backend is None:
@@ -1548,21 +1696,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     @staticmethod
     def _is_alphamelts_backend(backend: Any) -> bool:
-        """Duck-type check for the AlphaMELTSBackend class.
+        """Duck-type check for an AlphaMELTS-family diagnostic backend.
 
-        Avoids a hard import on ``simulator.melt_backend.alphamelts`` at
-        registration time (the adapter has optional dependencies). The
-        check matches the class name on the instance's MRO; this is the
-        same idiom used elsewhere in this module for VapoRock /
-        FactSAGE backend detection.
+        Avoids hard imports on optional MELTS transports at registration time.
         """
         backend = PyrolysisSimulator._provider_registration_backend(backend)
         if backend is None:
             return False
-        for cls in type(backend).__mro__:
-            if cls.__name__ == 'AlphaMELTSBackend':
-                return True
-        return False
+        declared_name = (
+            getattr(backend, 'backend_name', None)
+            or getattr(backend, 'name', None)
+        )
+        if str(declared_name or '').strip().lower() in {
+            'alphamelts',
+            'thermoengine',
+        }:
+            return True
+        return any(
+            cls.__name__ in {'AlphaMELTSBackend', 'ThermoEngineBackend'}
+            for cls in type(backend).__mro__
+        )
 
     def _register_freeze_gate_liquid_fraction_providers(self) -> None:
         """Register providers for the freeze gate scalar intent on demand."""
@@ -2605,7 +2758,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         live_overhead_o2_mol = max(
             0.0,
             float(
-                self.atom_ledger.mol_by_account('process.overhead_gas').get(
+                self.atom_ledger.project_account_mol('process.overhead_gas').get(
                     OXYGEN_SPECIES,
                     0.0,
                 )
@@ -2718,13 +2871,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return bool(self._freeze_gate_config.get('enabled', False))
 
     def _headspace_volume_m3(self) -> float:
+        from simulator.overhead import (
+            OverheadConfigurationError,
+            _required_positive_finite_float,
+        )
+
+        if not self._overhead_headspace_enabled():
+            return 0.0
         configured = self._overhead_headspace_config.get('volume_m3')
         if configured is not None:
-            return max(0.0, float(configured))
+            return _required_positive_finite_float(
+                configured,
+                'headspace.volume_m3',
+            )
+        if self._equipment is None:
+            self._get_turbine_spec()
         equipment = self._equipment
         if equipment is not None:
-            return max(0.0, float(getattr(equipment, 'headspace_volume_m3', 0.0)))
-        return 0.085
+            equipment_volume = getattr(equipment, 'headspace_volume_m3', None)
+            if equipment_volume is not None:
+                return _required_positive_finite_float(
+                    equipment_volume,
+                    'equipment.headspace_volume_m3',
+                )
+        raise OverheadConfigurationError(
+            'finite headspace requires a positive configured volume_m3'
+        )
 
     def _headspace_temperature_K(self) -> float:
         melt_T_K = float(self.melt.temperature_C) + 273.15
@@ -2737,6 +2909,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if model == 'lumped':
             return max(1.0, melt_T_K - 100.0)
         return max(1.0, melt_T_K)
+
+    def _melt_headspace_total_pressure_bar(self) -> float:
+        upstream_partials_mbar = getattr(
+            self,
+            '_melt_headspace_composition_mbar',
+            None,
+        )
+        if upstream_partials_mbar is None:
+            raise MeltHeadspaceProjectionError(
+                'authoritative melt-headspace pressure requires '
+                '_melt_headspace_composition_mbar projection'
+            )
+        partial_sum_mbar = sum(
+            max(0.0, float(value))
+            for value in upstream_partials_mbar.values()
+        )
+        commanded_mbar = max(
+            0.0,
+            float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0),
+        )
+        return max(partial_sum_mbar, commanded_mbar) / 1000.0
 
     @staticmethod
     def _normalize_condensation_carrier_gas(
@@ -2756,6 +2949,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         upper = text.upper().replace(' ', '').replace('_', '').replace('-', '')
         if upper in {'N2', 'PN2', 'N2SWEEP', 'PN2SWEEP'}:
             return 'N2'
+        if upper in {'HE', 'PHE'}:
+            return 'He'
         if upper in {'AR', 'PAR'}:
             return 'Ar'
         if upper in {'O2', 'PO2', 'O2BACKPRESSURE', 'CONTROLLEDO2'}:
@@ -2771,7 +2966,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return 'CO2'
         raise ValueError(
             f'Unsupported condensation carrier_gas {value!r}; supported '
-            'carrier gases: N2/pN2, Ar/pAr, O2/pO2, CO2/pCO2'
+            'carrier gases: He/pHe, N2/pN2, Ar/pAr, O2/pO2, CO2/pCO2'
         )
 
     def _resolve_condensation_carrier_gas(self) -> str:
@@ -2821,15 +3016,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         evap_flux: EvaporationFlux,
     ) -> None:
+        effective_transport_capacity = getattr(
+            self,
+            '_effective_transport_capacity_this_tick',
+            None,
+        )
+        transport_kwargs = {}
+        if effective_transport_capacity is not None:
+            transport_kwargs['effective_transport_capacity'] = (
+                effective_transport_capacity
+            )
         transport = self.overhead_model.estimate_transport_state(
             evap_flux,
             self.melt,
+            **transport_kwargs,
         )
         self.condensation_model.configure_operating_conditions(
             wall_temperature_C=transport['pipe_temperature_C'],
             overhead_pressure_mbar=transport['pressure_mbar'],
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
-            gas_temperature_C=transport['pipe_temperature_C'],
+            # The upstream vapor is evaluated at the melt-side temperature used
+            # by the conductance model; the independently scheduled pipe and
+            # segment temperatures are liner-wall states, not gas states.
+            gas_temperature_C=transport['conductance_temperature_C'],
             stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
             stage_area_geometry_provenance_notice=transport.get(
                 'stage_area_geometry_provenance_notice', {}),
@@ -2901,9 +3110,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         adjustment = self.condensation_model.adjust_c2a_pressure_setpoint(
             requested_p_total_mbar=float(self.melt.p_total_mbar),
             pO2_mbar=float(self.melt.pO2_mbar),
-            gas_temperature_C=(
-                self.overhead_model.resolve_pipe_temperature_C(self.melt)
-            ),
+            # Knudsen conductance evaluates the vapor at the melt-side gas
+            # temperature; the scheduled pipe temperature is a wall state.
+            gas_temperature_C=float(self.melt.temperature_C),
             pipe_diameter_m=self.overhead_model.pipe_diameter_m,
             pN2_min_mbar=C2A_STAGED_PN2_SWEEP_MIN_MBAR,
             pN2_max_mbar=C2A_STAGED_PN2_SWEEP_MAX_MBAR,
@@ -3021,7 +3230,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 temperatures_C
             )
 
-    def _headspace_downstream_pressure_bar(self) -> float:
+    def _headspace_downstream_pressure_bar(
+        self,
+        effective_transport_capacity=None,
+    ) -> float:
+        if effective_transport_capacity is not None:
+            return effective_transport_capacity.downstream_pressure_bar
         configured = self._overhead_headspace_config.get(
             'downstream_pressure_bar')
         if configured is not None:
@@ -3035,7 +3249,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'CONTROLLED_O2_FLOW',
             'O2_BACKPRESSURE',
         }:
-            return max(0.0, float(self.melt.pO2_mbar) / 1000.0)
+            return self.overhead_model._resolve_downstream_pressure(
+                self.melt,
+                None,
+            )
         return 0.0
 
     def _sync_c2a_staged_overhead_gas_control(self) -> None:
@@ -3084,13 +3301,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if species_kg_for_M_avg is None:
             species_kg_for_M_avg = self._overhead_holdup_species_kg()
         p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
-        p_downstream_Pa = max(0.0, self._headspace_downstream_pressure_bar()) * 1.0e5
+        # This is the upstream-to-vacuum carrying limit C0. Controlled-pO2
+        # runtime passes it through the provider-owned flow-capacity result;
+        # pressure-bound modes retain the provider's finite-P2 derate.
         return max(
             0.0,
             float(self.overhead_model._pipe_conductance(
                 p_mean_Pa,
                 self.melt.temperature_C,
-                p_downstream_Pa=p_downstream_Pa,
+                p_downstream_Pa=0.0,
                 species_kg_for_M_avg=species_kg_for_M_avg,
             )),
         )
@@ -3101,7 +3320,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _overhead_holdup_mol(self) -> Dict[str, float]:
         return {
             species: float(mol)
-            for species, mol in self.atom_ledger.mol_by_account(
+            for species, mol in self.atom_ledger.project_account_mol(
                 'process.overhead_gas').items()
             if float(mol) > 0.0
         }
@@ -3197,11 +3416,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return 0.0
 
     def _headspace_ledger_pO2_bar_from_o2_mol(self, o2_mol: float) -> float:
+        o2 = max(0.0, float(o2_mol))
+        if o2 <= 0.0:
+            # pO2 = n R T / (V 1e5) is identically 0 at n = 0 for any V, so do
+            # not query the headspace volume: the typed-refusal resolver may
+            # lazily auto-design equipment, and triggering that mid-load
+            # (before melt geometry exists) caches a degenerate crucible.
+            return 0.0
         volume_m3 = self._headspace_volume_m3()
         T_head_K = self._headspace_temperature_K()
         if volume_m3 <= 0.0 or T_head_K <= 0.0:
             return 0.0
-        return max(0.0, float(o2_mol)) * GAS_CONSTANT * T_head_K / (
+        return o2 * GAS_CONSTANT * T_head_K / (
             volume_m3 * 1.0e5
         )
 
@@ -3243,7 +3469,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self._overhead_headspace_enabled() and residual_o2_mol > 0.0:
             holdup_mol = {
                 species: max(0.0, float(mol))
-                for species, mol in self.atom_ledger.mol_by_account(
+                for species, mol in self.atom_ledger.project_account_mol(
                     'process.overhead_gas'
                 ).items()
                 if max(0.0, float(mol)) > 0.0
@@ -3268,17 +3494,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         total_mol * GAS_CONSTANT * T_head_K
                         / (volume_m3 * 1.0e5)
                     )
-                p_downstream_bar = self._headspace_downstream_pressure_bar()
                 from engines.builtin.overhead_bleed import (
                     compressible_pressure_capacity_fraction,
                 )
-                # DERIVATION: conductance is the kg/s capacity at P1 against
-                # vacuum. The shared compressible-Poiseuille helper supplies
-                # the finite-P2 capacity fraction; fraction * C * seconds is kg.
                 pressure_capacity_fraction = (
                     compressible_pressure_capacity_fraction(
                         p_total_bar,
-                        p_downstream_bar,
+                        self._headspace_downstream_pressure_bar(),
                     )
                 )
                 bleed_kg = (
@@ -3327,7 +3549,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
     ) -> OxygenReservoirState:
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -3362,7 +3584,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _cleaned_melt_fe_atom_mol(self) -> float:
         total_fe_mol = 0.0
-        for species, mol in self.atom_ledger.mol_by_account(
+        for species, mol in self.atom_ledger.project_account_mol(
             'process.cleaned_melt'
         ).items():
             if float(mol) <= 0.0:
@@ -3494,7 +3716,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         head_o2_mol = float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -4241,7 +4463,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     f'got {reference_T_K!r}'
                 )
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -4308,7 +4530,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -4677,6 +4899,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_authority=gate_authority,
         )
         target_delta_log10 = target_fO2_log - current_fO2_log
+        _char_basis, char_o2_per_c, _char_product = self._char_lance_basis()
+        char_o2_need_mol = self._solid_char_carbon_mol() * char_o2_per_c
         target_need_mol = 0.0
         reason = 'applied'
         actual_injected_mol = 0.0
@@ -4688,7 +4912,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         elif commanded_mol <= 0.0:
             reason = 'commanded_zero'
         elif target_delta_log10 <= 0.0:
-            reason = 'at_or_above_target'
+            actual_injected_mol = min(commanded_mol, char_o2_need_mol)
+            reason = (
+                'char_lance_only'
+                if actual_injected_mol > OXYGEN_RESERVOIR_NOOP_MOL
+                else 'at_or_above_target'
+            )
         elif C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
             requested_absorbed_mol = max(0.0, commanded_mol * eta_absorb)
             reason = 'no_melt_redox_capacity'
@@ -4710,6 +4939,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'applied_o2_mol': 0.0,
                 'internal_o2_capacity_mol': requested_absorbed_mol,
             }
+            actual_injected_mol = min(commanded_mol, char_o2_need_mol)
+            if actual_injected_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+                reason = 'char_lance_only_no_melt_redox_capacity'
         else:
             target_need_mol = max(
                 0.0,
@@ -4721,9 +4953,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 eta_for_cap = max(eta_absorb, 1.0e-12)
                 actual_injected_mol = min(
                     commanded_mol,
-                    target_need_mol / eta_for_cap,
+                    char_o2_need_mol + target_need_mol / eta_for_cap,
                 )
-                absorbed_mol = min(actual_injected_mol * eta_absorb, target_need_mol)
+                redox_injection_mol = max(
+                    0.0, actual_injected_mol - char_o2_need_mol
+                )
+                absorbed_mol = min(
+                    redox_injection_mol * eta_absorb, target_need_mol
+                )
                 passthrough_mol = max(0.0, actual_injected_mol - absorbed_mol)
                 if actual_injected_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
                     reason = 'below_threshold'
@@ -4736,12 +4973,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 passthrough_mol = actual_injected_mol
                 absorbed_mol = 0.0
                 reason = 'deferred_not_liquid'
+        char_o2_mol = 0.0
+        char_lance: Dict[str, Any] = {}
         if actual_injected_mol > OXYGEN_RESERVOIR_NOOP_MOL:
             self.atom_ledger.load_external_mol(
                 FO2_BUFFER_ACCOUNT,
                 {OXYGEN_SPECIES: actual_injected_mol},
                 source='external O2 bubbler injection',
             )
+            # t-325: O2-lance solid char FIRST (before Fe-redox absorption).
+            # Dose O2 available this hour is the injected buffer load; char
+            # claims it ahead of melt FeO/Fe2O3 respeciation.
+            char_lance = self._apply_char_lance_oxidation(
+                o2_available_mol=actual_injected_mol,
+            )
+            char_o2_mol = max(
+                0.0, float(char_lance.get('o2_consumed_mol', 0.0) or 0.0)
+            )
+            if char_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL and reason == 'applied':
+                reason = 'char_lance_then_fe_redox'
         if absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
             requested_absorbed_mol = absorbed_mol
             target_absorption_fO2_log = (
@@ -4833,7 +5083,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     absorption_respeciation.get('reason')
                     or 'fe_redox_respeciation_refused'
                 )
-        passthrough_mol = max(0.0, actual_injected_mol - absorbed_mol)
+        # Char-lanced O2 left via CO2/CO offgas, not as melt Fe-redox
+        # absorption or overhead passthrough.
+        total_sink_mol = absorbed_mol + char_o2_mol
+        passthrough_mol = max(0.0, actual_injected_mol - total_sink_mol)
         if passthrough_mol > OXYGEN_RESERVOIR_NOOP_MOL:
             transition_source, transition_meta = (
                 self._melt_redox_transition_provenance(gate_authority)
@@ -4842,7 +5095,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ChemistryIntent.OXYGEN_BUBBLER,
                 control_inputs={
                     'injected_mol': actual_injected_mol,
-                    'absorbed_mol': absorbed_mol,
+                    'absorbed_mol': total_sink_mol,
                     'passthrough_mol': passthrough_mol,
                     'source': 'redox_source:o2_bubbler',
                 },
@@ -4856,7 +5109,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
 
         injected_kg = actual_injected_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
-        absorbed_kg = absorbed_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        # Absorbed telemetry = Fe-redox + char-lance sinks (not passthrough).
+        absorbed_kg = total_sink_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
         passthrough_kg = passthrough_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
         self._o2_bubbler_injected_kg = injected_kg
         self._o2_bubbler_absorbed_kg = absorbed_kg
@@ -4892,13 +5146,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'melt_redox_capacity_mol_per_ln_fO2': C_m,
             'commanded_mol': commanded_mol,
             'target_need_mol': target_need_mol,
+            'char_o2_need_mol': char_o2_need_mol,
             'injected_mol': actual_injected_mol,
-            'absorbed_mol': absorbed_mol,
+            'absorbed_mol': total_sink_mol,
+            'fe_redox_absorbed_mol': absorbed_mol,
+            'char_lance_o2_mol': char_o2_mol,
             'passthrough_mol': passthrough_mol,
             'injected_kg': injected_kg,
             'absorbed_kg': absorbed_kg,
             'passthrough_kg': passthrough_kg,
             'absorption_respeciation': dict(absorption_respeciation),
+            'char_lance': dict(char_lance),
         }
         self._last_o2_bubbler_diagnostic = diagnostic
         return diagnostic
@@ -4953,7 +5211,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._fe_redox_internal_o2_consumed_mol_this_hr = 0.0
 
     def _ledger_ferric_fraction_diagnostic(self) -> Dict[str, Any]:
-        melt_mol = self.atom_ledger.mol_by_account('process.cleaned_melt')
+        melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
         feo_mol = max(0.0, float(melt_mol.get('FeO', 0.0) or 0.0))
         fe2o3_mol = max(0.0, float(melt_mol.get('Fe2O3', 0.0) or 0.0))
         oxidized_fe_mol = feo_mol + 2.0 * fe2o3_mol
@@ -5317,7 +5575,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
         head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -5433,7 +5691,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             candidate_fO2_log=candidate_fO2_log,
         )
         post_head_o2_mol = max(0.0, float(
-            self.atom_ledger.mol_by_account('process.overhead_gas').get(
+            self.atom_ledger.project_account_mol('process.overhead_gas').get(
                 OXYGEN_SPECIES,
                 0.0,
             )
@@ -5457,12 +5715,40 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._sync_oxygen_reservoir_mirror()
         return reservoir
 
+    def _cold_train_capacity_policy(self):
+        from simulator.thermal_train import (
+            NoColdTrain,
+            capacity_from_hardware,
+            thermal_train_parameters_from_mapping,
+        )
+
+        params = thermal_train_parameters_from_mapping()
+        if not params.cold_train.runtime_enforcement:
+            return NoColdTrain("runtime_enforcement_disabled"), params.cold_train
+        return capacity_from_hardware(params.cold_train), params.cold_train
+
+    def _controlled_o2_transport_capacity(self, evap_flux, *, dt_hr=1.0):
+        """Build the live controlled-flow boundary through canonical policy."""
+
+        capacity, _cold_train = self._cold_train_capacity_policy()
+        retained_holdup_kg = sum(
+            max(0.0, float(mass_kg))
+            for mass_kg in self._overhead_holdup_species_kg().values()
+        )
+        return self.overhead_model.controlled_o2_transport_capacity(
+            evap_flux,
+            self.melt,
+            cold_train_capacity=capacity,
+            retained_holdup_kg=retained_holdup_kg,
+            dt_hr=dt_hr,
+        )
+
     def _dispatch_overhead_bleed(
         self,
         *,
-        turbine_spec=None,
         force_drain_all: bool = False,
-        o2_vented_kg: Optional[float] = None,
+        capacity_result=None,
+        effective_transport_capacity=None,
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
@@ -5473,7 +5759,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'headspace_volume_m3': self._headspace_volume_m3(),
             'headspace_temperature_K': self._headspace_temperature_K(),
             'bleed_conductance_kg_s': (
-                self._headspace_bleed_conductance_kg_s(
+                effective_transport_capacity.pipe_capacity_kg_hr / 3600.0
+                if effective_transport_capacity is not None
+                else self._headspace_bleed_conductance_kg_s(
                     species_kg_for_M_avg=species_kg_for_M_avg,
                 )
             ),
@@ -5481,21 +5769,66 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'p_downstream_bar': (
                 configured_downstream_pressure_bar
                 if configured_downstream_pressure_bar is not None
-                else self._headspace_downstream_pressure_bar()
+                else self._headspace_downstream_pressure_bar(
+                    effective_transport_capacity
+                )
             ),
             'dt_hr': 1.0,
             'force_drain_all': bool(force_drain_all),
-            'max_o2_flow_kg_hr': getattr(
-                turbine_spec, 'max_O2_flow_kg_hr', None
-            ),
             'external_o2_in_overhead_mol': getattr(
                 self,
                 '_o2_bubbler_external_o2_in_overhead_mol',
                 0.0,
             ),
         }
-        if o2_vented_kg is not None:
-            controls['o2_vented_kg'] = o2_vented_kg
+        if effective_transport_capacity is not None:
+            controls['effective_transport_capacity'] = (
+                effective_transport_capacity
+            )
+        from simulator.thermal_train import FiniteCapacity
+
+        capacity, cold_train = self._cold_train_capacity_policy()
+        # Snapshot for _project_overhead_bleed_partition: the policy re-reads
+        # config on every call, so the projection must reuse the exact
+        # capacity this dispatch partitioned with, never a fresh read.
+        self._last_bleed_cold_train_capacity = capacity
+        if isinstance(capacity, FiniteCapacity):
+            assert cold_train is not None
+            accumulator_enabled = bool(
+                getattr(cold_train, 'accumulator_enabled', False)
+            )
+            p_ref_Pa = (
+                capacity_result.partial_pressures_Pa.get(OXYGEN_SPECIES, 0.0)
+                if capacity_result is not None
+                else self._headspace_ledger_pO2_bar_from_o2_mol(
+                    self._overhead_holdup_mol().get(OXYGEN_SPECIES, 0.0)
+                ) * 100000.0
+            )
+            controls.update({
+                'cold_train_capacity': capacity,
+                'p_ref_Pa': p_ref_Pa,
+                'k_relief_kg_hr_Pa': cold_train.relief[
+                    'k_relief_kg_hr_Pa'
+                ],
+                'p_open_Pa': cold_train.relief['p_open_Pa'],
+                'vessel_rating_Pa': cold_train.relief['vessel_rating_Pa'],
+            })
+            if accumulator_enabled:
+                from simulator.thermal_train import (
+                    thermal_train_parameters_from_mapping,
+                )
+
+                controls.update({
+                    'accumulator_enabled': True,
+                    'cavern_capacity_kg': (
+                        thermal_train_parameters_from_mapping()
+                        .cavern_capacity_kg
+                    ),
+                })
+            if capacity_result is not None:
+                controls['p_total_bar'] = sum(
+                    capacity_result.partial_pressures_Pa.values()
+                ) / 100000.0
         result = self._dispatch_and_commit(
             ChemistryIntent.OVERHEAD_BLEED,
             control_inputs=controls,
@@ -5504,6 +5837,269 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             for stage in self.train.stages:
                 stage.collected_kg.pop(OXYGEN_SPECIES, None)
         self._sync_oxygen_kg_counters()
+        return result
+
+    def _project_overhead_bleed_partition(self, result: IntentResult) -> None:
+        diagnostic = dict(result.diagnostic or {})
+        admitted_mol = max(0.0, float(diagnostic.get('o2_stored_mol', 0.0) or 0.0))
+        vented_mol = max(
+            0.0,
+            float(diagnostic.get('melt_o2_vented_mol', 0.0) or 0.0),
+        )
+        self.overhead.turbine_flow_mol_hr = admitted_mol
+        self.overhead.turbine_flow_kg_hr = (
+            admitted_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        )
+        self.overhead.O2_vented_mol_hr = vented_mol
+        self.overhead.O2_vented_kg_hr = (
+            vented_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
+        )
+        self.overhead.melt_offgas_O2_mol_hr = max(
+            0.0,
+            float(diagnostic.get('melt_o2_bled_mol', 0.0) or 0.0),
+        )
+        self.overhead.turbine_limited = any(
+            float(diagnostic.get(name, 0.0) or 0.0) > 0.0
+            for name in ('o2_relieved_mol', 'o2_held_mol')
+        )
+        # Utilization keeps the legacy consumer contract (state.OverheadGas
+        # .turbine_utilization_pct: "load as % of max O2 throughput (0-100+)",
+        # read by the Loop-3b >120% overload ramp throttle): it exceeds 100%
+        # exactly when melt-side O2 demand exceeds the cold train's per-tick
+        # capacity. DERIVATION: demand_mol = admitted + accumulated +
+        # relieved + held (the four melt-side partition legs; external O2
+        # never transits the cold train), capacity_mol = C[kg/hr] x dt[hr]
+        # / M_O2[kg/mol]. Units: kg/hr x hr / (kg/mol) = mol.
+        # turbine_limited deliberately keys on relieved/held ONLY:
+        # accumulation is DESIGNED absorption (the cistern cold-battery
+        # sizes the compressor on campaign mean, and its purpose is letting
+        # the bake-off run at peak while the cavern buffers), so utilization
+        # may read >100% with limited=False while the accumulator absorbs;
+        # at cavern fill the overflow lands in relieved/held and Loop-3b
+        # engages. Conversely the relief law is pressure-driven
+        # (k_relief x max(0, p-p_open)), so limited=True with utilization
+        # <= 100% is also possible. NoColdTrain mirrors the legacy
+        # no-turbine-spec branch: 0.0. Capacity is the snapshot the bleed
+        # dispatch partitioned with (the policy re-reads config per call, so
+        # a fresh read here could report utilization against a different
+        # capacity than the one that produced this partition).
+        capacity = getattr(self, '_last_bleed_cold_train_capacity', None)
+        from simulator.thermal_train import FiniteCapacity
+        if isinstance(capacity, FiniteCapacity) and capacity.value_kg_hr > 0.0:
+            demand_mol = admitted_mol + sum(
+                max(0.0, float(diagnostic.get(name, 0.0) or 0.0))
+                for name in (
+                    'o2_accumulated_mol', 'o2_relieved_mol', 'o2_held_mol'
+                )
+            )
+            # dt_hr is pinned to 1.0 in _dispatch_overhead_bleed's controls.
+            capacity_mol = (
+                capacity.value_kg_hr * 1.0 / OXYGEN_MOLAR_MASS_KG_PER_MOL
+            )
+            self.overhead.turbine_utilization_pct = (
+                demand_mol / capacity_mol * 100.0
+            )
+        else:
+            self.overhead.turbine_utilization_pct = 0.0
+        self.overhead.turbine_shaft_power_kW = (
+            self.overhead.turbine_flow_kg_hr * 0.02
+        )
+
+    def _compute_capacity_coupling_shadow(self, equilibrium):
+        degraded_before = copy.deepcopy(self._degraded_path_engagement)
+        try:
+            return self._compute_capacity_coupling_shadow_impl(equilibrium)
+        finally:
+            self._degraded_path_engagement = degraded_before
+
+    def _compute_capacity_coupling_shadow_impl(self, equilibrium):
+        from engines.builtin.evaporation_flux import (
+            BuiltinEvaporationFluxProvider,
+        )
+        from simulator.accounting.formulas import resolve_species_formula
+        from simulator.capacity_coupling import solve_capacity_shadow
+        from simulator.chemistry.kernel.account_filters import (
+            build_provider_account_view,
+        )
+        from simulator.chemistry.kernel.dto import IntentRequest
+        from simulator.thermal_train import (
+            FiniteCapacity,
+            thermal_train_parameters_from_mapping,
+        )
+
+        capacity, cold_train = self._cold_train_capacity_policy()
+        if not isinstance(capacity, FiniteCapacity) or cold_train is None:
+            return None
+        accumulator_enabled = bool(
+            getattr(cold_train, 'accumulator_enabled', False)
+        )
+
+        ledger_before = self.atom_ledger.mol_by_account()
+        transition_count_before = len(self.atom_ledger.transitions)
+        pre_holdup = self._overhead_holdup_mol()
+        initial_partials = {
+            species: 0.0
+            for species in dict(equilibrium.vapor_pressures_Pa or {})
+        }
+        controls, molar_masses = self._evaporation_flux_control_inputs(
+            equilibrium,
+            overhead_partials_Pa=initial_partials,
+        )
+        for species in pre_holdup:
+            molar_masses.setdefault(
+                species,
+                resolve_species_formula(
+                    species,
+                    self.species_formula_registry,
+                ).molar_mass_kg_per_mol(),
+            )
+        molar_masses.setdefault(
+            OXYGEN_SPECIES,
+            resolve_species_formula(
+                OXYGEN_SPECIES,
+                self.species_formula_registry,
+            ).molar_mass_kg_per_mol(),
+        )
+
+        provider = BuiltinEvaporationFluxProvider()
+        profile = provider.capability_profile()
+        account_view = build_provider_account_view(
+            self.atom_ledger,
+            profile.declared_accounts,
+            self.species_formula_registry,
+        )
+        liquid_fraction_factor = (
+            self._freeze_gate_liquid_fraction_factor()
+            if self._freeze_gate_enabled()
+            else 1.0
+        )
+        frozen_cleaned_melt_kg = self.atom_ledger.kg_by_account(
+            'process.cleaned_melt'
+        )
+        frozen_overhead_o2_kg = float(
+            self.atom_ledger.kg_by_account('process.overhead_gas').get(
+                OXYGEN_SPECIES, 0.0
+            )
+        )
+
+        rates_cache = {}
+
+        def flux_at_partials(partials_Pa):
+            cache_key = tuple(sorted(
+                (str(species), float(pressure))
+                for species, pressure in partials_Pa.items()
+            ))
+            if cache_key in rates_cache:
+                return dict(rates_cache[cache_key])
+            iteration_controls = dict(controls)
+            iteration_controls['overhead_partials_Pa'] = dict(partials_Pa)
+            iteration_controls['overhead_pressure_pa'] = (
+                self._evaporation_overhead_total_pressure_Pa(partials_Pa)
+            )
+            request = IntentRequest(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                account_view=account_view,
+                temperature_C=float(self.melt.temperature_C),
+                pressure_bar=float(self.melt.p_total_mbar) / 1000.0,
+                control_inputs=iteration_controls,
+            )
+            result = provider.dispatch(request)
+            if str(result.status) != 'ok':
+                raise RuntimeError(
+                    str((result.diagnostic or {}).get('reason') or result.status)
+                )
+            rates = {
+                species: float(rate) * liquid_fraction_factor
+                for species, rate in dict(
+                    (result.diagnostic or {}).get(
+                        'evaporation_flux_kg_hr', {}
+                    ) or {}
+                ).items()
+            }
+            residual_fe_mol = getattr(
+                self,
+                '_native_fe_vapor_residual_capacity_mol_this_hr',
+                None,
+            )
+            if residual_fe_mol is not None and 'Fe' in rates:
+                rates['Fe'] = min(
+                    rates['Fe'],
+                    max(0.0, float(residual_fe_mol))
+                    * molar_masses.get('Fe', 0.0),
+                )
+            rates = self._analytic_evaporation_depletion_rates(
+                rates,
+                dt_hr=1.0,
+                phase_scalar=1.0,
+                cleaned_melt_kg=frozen_cleaned_melt_kg,
+                available_o2_kg=frozen_overhead_o2_kg,
+            )
+            rates_cache[cache_key] = dict(rates)
+            return rates
+
+        def overhead_source_at_partials(partials_Pa):
+            return self._project_evaporation_overhead_source_mol_hr(
+                flux_at_partials(partials_Pa),
+                controls['stoich_by_species'],
+            )
+
+        result = solve_capacity_shadow(
+            pre_holdup_mol=pre_holdup,
+            molar_mass_kg_mol=molar_masses,
+            flux_kg_hr_at_partials=flux_at_partials,
+            capacity=capacity,
+            head_bled_species_mol={},
+            external_o2_holdup_mol=float(
+                getattr(
+                    self,
+                    '_o2_bubbler_external_o2_in_overhead_mol',
+                    0.0,
+                ) or 0.0
+            ),
+            temperature_K=self._headspace_temperature_K(),
+            volume_m3=self._headspace_volume_m3(),
+            dt_hr=1.0,
+            bleed_conductance_kg_s=self._headspace_bleed_conductance_kg_s(
+                species_kg_for_M_avg=self._overhead_holdup_species_kg(
+                    pre_holdup
+                ),
+            ),
+            downstream_pressure_Pa=(
+                self._headspace_downstream_pressure_bar() * 100000.0
+            ),
+            k_relief_kg_hr_Pa=cold_train.relief['k_relief_kg_hr_Pa'],
+            p_open_Pa=cold_train.relief['p_open_Pa'],
+            overhead_source_mol_hr_at_partials=overhead_source_at_partials,
+            total_pressure_Pa_at_partials=(
+                self._evaporation_overhead_total_pressure_Pa
+            ),
+            vessel_rating_Pa=cold_train.relief['vessel_rating_Pa'],
+            accumulator_enabled=accumulator_enabled,
+            cistern_fill_kg=(
+                self.atom_ledger.kg_by_account(
+                    OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
+                ).get(OXYGEN_SPECIES, 0.0)
+                if accumulator_enabled
+                else 0.0
+            ),
+            cavern_capacity_kg=(
+                thermal_train_parameters_from_mapping().cavern_capacity_kg
+                if accumulator_enabled
+                else 0.0
+            ),
+            controlled_flow=(
+                self._overhead_headspace_config.get(
+                    'downstream_pressure_bar'
+                ) is None
+                and getattr(self.melt.atmosphere, 'name', '') in {
+                    'CONTROLLED_O2',
+                    'CONTROLLED_O2_FLOW',
+                    'O2_BACKPRESSURE',
+                }
+            ),
+        )
+        assert self.atom_ledger.mol_by_account() == ledger_before
+        assert len(self.atom_ledger.transitions) == transition_count_before
         return result
 
     def _compute_intrinsic_melt_fO2(
@@ -5564,8 +6160,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self.melt, 'melt_fO2_log', -9.0),
             )
         )
+        # Diagnostic-only construction via ``__new__`` predates the runtime
+        # projection. Preserve the exact pre-PHYS pressure source here only;
+        # authoritative callers of the shared accessor fail loud if absent.
+        diagnostic_pressure_bar = (
+            float(self.overhead.pressure_mbar) / 1000.0
+            if getattr(self, '_melt_headspace_composition_mbar', None) is None
+            else self._melt_headspace_total_pressure_bar()
+        )
         pressure_bar = floor_vacuum_pressure_bar(
-            float(self.overhead.pressure_mbar) * 1.0e-3,
+            diagnostic_pressure_bar,
             floor_bar=self._vacuum_floor_bar(),
         )
         log_iw = (
@@ -5850,7 +6454,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             float(pressure_bar)
             if pressure_bar is not None
             else floor_vacuum_pressure_bar(
-                float(self.overhead.pressure_mbar) * 1.0e-3,
+                self._melt_headspace_total_pressure_bar(),
                 floor_bar=self._vacuum_floor_bar(),
             )
         )
@@ -5882,7 +6486,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         native_frac = min(1.0, max(0.0, float(
             native_state.get('native_fe_frac', 0.0) or 0.0,
         )))
-        cleaned_melt_mol = self.atom_ledger.mol_by_account(
+        cleaned_melt_mol = self.atom_ledger.project_account_mol(
             'process.cleaned_melt')
         feo_mol = max(0.0, float(cleaned_melt_mol.get('FeO', 0.0) or 0.0))
         total_fe_mol = self._cleaned_melt_fe_atom_mol()
@@ -6037,16 +6641,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         pressure_source = 'melt.p_total_mbar'
         if overhead_pressure_mbar <= 0.0:
-            overhead_pressure_mbar = float(
-                getattr(self.overhead, 'pressure_mbar', 0.0) or 0.0
+            overhead_pressure_mbar = sum(
+                max(0.0, float(value))
+                for value in self._melt_headspace_composition_mbar.values()
             )
-            pressure_source = 'overhead.pressure_mbar'
+            pressure_source = '_melt_headspace_composition_mbar'
         overhead_pressure_pa = max(0.0, overhead_pressure_mbar) * 100.0
-        P_bulk_Pa = max(
-            0.0,
-            float(getattr(self.overhead, 'composition', {}).get('Fe', 0.0) or 0.0)
-            * 100.0,
-        )
+        P_bulk_Pa = max(0.0, self._evaporation_bulk_partial_pressure_pa('Fe'))
         gas_temperature_K = float(
             getattr(self.overhead, 'headspace_temperature_K', 0.0) or T_K
         )
@@ -6185,7 +6786,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and self.melt.campaign == CampaignPhase.C2A_STAGED
         ):
             native_fe_mol = max(0.0, float(
-                self.atom_ledger.mol_by_account('process.metal_phase').get(
+                self.atom_ledger.project_account_mol('process.metal_phase').get(
                     'Fe', 0.0,
                 )
                 or 0.0
@@ -6509,9 +7110,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             terminal_melt_external,
             source=f'{label} cleaned melt',
         )
+        # Elemental C from refractory organic partition is credited by the
+        # complete_oxidation transition into process.solid_char_carbon;
+        # strip it from residual so raw_feedstock does not double-count.
+        residual_for_raw = dict(self.inventory.residual_components_kg)
+        residual_for_raw.pop(CHAR_SPECIES, None)
         self._load_ledger_account(
             'process.raw_feedstock',
-            self.inventory.residual_components_kg,
+            residual_for_raw,
             source=f'{label} Stage 0 residual',
         )
         self._load_ledger_account(
@@ -6642,6 +7248,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feedstock: Mapping[str, Any],
     ) -> Tuple[list[dict], Dict[str, float]]:
         entries = self._feedstock_formula_entries(feedstock)
+        feedstock_key = str(getattr(self, '_batch_feedstock_key', '') or '')
+        refractory_fraction = self._refractory_organic_c_fraction(
+            feedstock_key
+        )
         specs: list[dict] = []
         product_totals: Dict[str, float] = {}
         for species, entry in entries.items():
@@ -6651,15 +7261,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             kg = float(self.inventory.raw_components_kg.get(species, 0.0))
             if kg <= 1e-12:
                 continue
-            products_kg, oxidant_kg = self._oxidized_stage0_products(
-                species, kg)
-            if not products_kg:
+            f_refractory = (
+                refractory_fraction
+                if self._species_is_carbonaceous_organic_carrier(species)
+                else 0.0
+            )
+            products_kg, oxidant_kg, solid_char_c_kg = (
+                self._oxidized_stage0_products(
+                    species, kg, refractory_c_fraction=f_refractory
+                )
+            )
+            if not products_kg and solid_char_c_kg <= 1e-12:
                 continue
             specs.append({
                 'species': species,
                 'feed_kg': kg,
                 'products_kg': products_kg,
                 'oxidant_kg': oxidant_kg,
+                'solid_char_c_kg': solid_char_c_kg,
             })
             self._merge_masses(product_totals, products_kg)
         return specs, product_totals
@@ -6727,6 +7346,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'feed_kg': feed_kg,
                     'products_kg': products_kg,
                     'oxidant_kg': oxidant_kg,
+                    'solid_char_c_kg': float(
+                        spec.get('solid_char_c_kg') or 0.0
+                    ),
                 },
             )
 
@@ -7064,8 +7686,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )
 
     def _project_cleaned_melt_from_atom_ledger(self) -> None:
-        ledger_melt = self.atom_ledger.kg_by_account('process.cleaned_melt')
-        spent_reductant_residue = self.atom_ledger.kg_by_account(
+        ledger_melt = self.atom_ledger.project_account_kg('process.cleaned_melt')
+        spent_reductant_residue = self.atom_ledger.project_account_kg(
             SPENT_REDUCTANT_RESIDUE_ACCOUNT)
         projected_melt = {
             species: float(kg)
@@ -7092,7 +7714,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _project_drain_tap_from_atom_ledger(self) -> None:
         self.inventory.metal_alloy_kg = {
             species: float(kg)
-            for species, kg in self.atom_ledger.kg_by_account(
+            for species, kg in self.atom_ledger.project_account_kg(
                 'terminal.drain_tap_material').items()
         }
 
@@ -7114,7 +7736,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         for account in BACKEND_REACTIVE_ACCOUNTS:
             species_mol = {
                 species: mol
-                for species, raw_mol in self.atom_ledger.mol_by_account(
+                for species, raw_mol in self.atom_ledger.project_account_mol(
                     account).items()
                 if (mol := float(raw_mol)) > 0.0
             }
@@ -8232,6 +8854,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             residual,
             self._unsupported_cleaned_melt_components(
                 feedstock, cleaned_melt_source, mass_kg))
+        # Solid char parked by _apply_stage0_offgas_chemistry so inventory
+        # mass closes; ledger credits process.solid_char_carbon via the
+        # complete_oxidation transition (seed strips C from raw_feedstock).
+        solid_char_park = dict(buckets.pop('_solid_char_carbon', {}) or {})
+        if solid_char_park:
+            self._merge_masses(residual, solid_char_park)
         stage0_mass_balance_delta_kg = self._add_stage0_balance_residue(
             residual,
             mass_kg,
@@ -8537,8 +9165,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         buckets: Dict[str, Dict[str, float]],
     ) -> Dict[str, float]:
         entries = self._feedstock_formula_entries(feedstock)
+        feedstock_key = str(getattr(self, '_batch_feedstock_key', '') or '')
+        refractory_fraction = self._refractory_organic_c_fraction(
+            feedstock_key
+        )
         external_inputs: Dict[str, float] = {}
         gas_bucket = buckets.get('gas_volatiles', {})
+        # residual_components is assembled later; park solid char in a
+        # dedicated side map that _build_process_inventory merges into
+        # residual_components_kg after classification.
+        solid_char_park = buckets.setdefault('_solid_char_carbon', {})
         for species, kg in list(gas_bucket.items()):
             entry = entries.get(species)
             if not entry:
@@ -8546,18 +9182,44 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             mode = str(entry.get('offgas_mode', '')).lower()
             if mode not in {'complete_oxidation', 'oxidized'}:
                 continue
-            products_kg, oxidant_kg = self._oxidized_stage0_products(
-                species, kg)
+            f_refractory = (
+                refractory_fraction
+                if self._species_is_carbonaceous_organic_carrier(species)
+                else 0.0
+            )
+            products_kg, oxidant_kg, solid_char_c_kg = (
+                self._oxidized_stage0_products(
+                    species, kg, refractory_c_fraction=f_refractory
+                )
+            )
             gas_bucket.pop(species, None)
             self._merge_masses(gas_bucket, products_kg)
+            if solid_char_c_kg > 1e-12:
+                solid_char_park[CHAR_SPECIES] = (
+                    solid_char_park.get(CHAR_SPECIES, 0.0) + solid_char_c_kg
+                )
             if oxidant_kg > 0.0:
                 external_inputs['O2'] = (
                     external_inputs.get('O2', 0.0) + oxidant_kg)
         return external_inputs
 
     def _oxidized_stage0_products(
-        self, species: str, kg: float
-    ) -> Tuple[Dict[str, float], float]:
+        self,
+        species: str,
+        kg: float,
+        *,
+        refractory_c_fraction: float = 0.0,
+    ) -> Tuple[Dict[str, float], float, float]:
+        """Complete-oxidation products with optional refractory-C withhold.
+
+        Premise: Sephton 2004 (REF-024) partitions organic C into labile
+        and refractory shares. Labile C oxidizes to CO2; refractory C is
+        retained as elemental solid char (process.solid_char_carbon).
+        Algebra: labile_C = total_C * (1 - f); CO2_mol = labile_C;
+        solid_C_mol = total_C * f; O2 demand uses labile C only.
+        Unit check: mol * kg/mol -> kg. Sanity: f=0 recovers the pre-t-325
+        full-oxidation products; f=0.39 on CI organics withholds ~11.5 kg C/t.
+        """
         formula = resolve_species_formula(species, self.species_formula_registry)
         species_mol = float(kg) / formula.molar_mass_kg_per_mol()
         atom_mol = formula.atom_moles(species_mol)
@@ -8574,14 +9236,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         nitrogen_mol = atom_mol.get('N', 0.0)
         feed_oxygen_mol = atom_mol.get('O', 0.0)
 
-        if carbon_mol > 0.0:
-            products_mol['CO2'] = carbon_mol
+        f_ref = max(0.0, min(1.0, float(refractory_c_fraction)))
+        if not math.isfinite(f_ref):
+            f_ref = 0.0
+        refractory_c_mol = carbon_mol * f_ref
+        labile_c_mol = max(0.0, carbon_mol - refractory_c_mol)
+
+        if labile_c_mol > 0.0:
+            products_mol['CO2'] = labile_c_mol
         if hydrogen_mol > 0.0:
             products_mol['H2O'] = hydrogen_mol / 2.0
         if nitrogen_mol > 0.0:
             products_mol['N2'] = nitrogen_mol / 2.0
 
-        product_oxygen_mol = 2.0 * carbon_mol + hydrogen_mol / 2.0
+        # O demand for labile CO2 + H2O only; solid char carries no O.
+        product_oxygen_mol = 2.0 * labile_c_mol + hydrogen_mol / 2.0
         oxygen_deficit_mol = product_oxygen_mol - feed_oxygen_mol
         oxidant_o2_mol = max(0.0, oxygen_deficit_mol / 2.0)
         if oxygen_deficit_mol < -1e-12:
@@ -8597,7 +9266,232 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         }
         oxidant_kg = oxidant_o2_mol * resolve_species_formula(
             'O2', self.species_formula_registry).molar_mass_kg_per_mol()
-        return products_kg, oxidant_kg
+        solid_char_c_kg = refractory_c_mol * resolve_species_formula(
+            CHAR_SPECIES, self.species_formula_registry
+        ).molar_mass_kg_per_mol()
+        return products_kg, oxidant_kg, solid_char_c_kg
+
+    def _refractory_organic_c_fraction(self, feedstock_key: str) -> float:
+        """Return Sephton-floor (or iom_anchor) f_refractory for feedstock."""
+        if not feedstock_key:
+            return 0.0
+        partition_row = (
+            self._load_carbon_partition_config()
+            .get('phase_partitions', {})
+            .get(feedstock_key, {})
+            or {}
+        )
+        refractory = dict(partition_row.get('f_refractory_organic_C') or {})
+        value = refractory.get('floor')
+        if value is None:
+            value = refractory.get('iom_anchor')
+        if value is None:
+            return 0.0
+        fraction = float(value)
+        if not math.isfinite(fraction) or fraction < 0.0 or fraction > 1.0:
+            return 0.0
+        return fraction
+
+    @staticmethod
+    def _species_is_carbonaceous_organic_carrier(species: str) -> bool:
+        key = str(species or '').strip().lower()
+        return key in {
+            'c',
+            'carbon_content',
+            'carbonaceous_organic',
+            'organics',
+            'hydrocarbons',
+            'organics_hydrocarbons',
+            'generic_carbonaceous_organic',
+        }
+
+    def _char_lance_basis(self) -> tuple[str, float, str]:
+        """Configured O2-lance oxidation basis: (name, O2_per_C_mol, product).
+
+        Default C + O2 -> CO2 under an O2 lance (1 mol O2 / mol C). CO
+        basis is available when data/stage0_carbon_partition.yaml sets
+        lance_oxidation.basis = C_plus_half_O2_to_CO.
+        """
+        lance = (
+            self._load_carbon_partition_config().get('lance_oxidation') or {}
+        )
+        basis = str(lance.get('basis') or CHAR_LANCE_BASIS_CO2)
+        if basis == CHAR_LANCE_BASIS_CO:
+            return basis, 0.5, 'CO'
+        if basis == CHAR_LANCE_BASIS_CO2:
+            return basis, 1.0, 'CO2'
+        raise ValueError(f'unsupported char lance oxidation basis: {basis!r}')
+
+    def _solid_char_carbon_mol(self) -> float:
+        return max(
+            0.0,
+            float(
+                self.atom_ledger.project_account_mol(
+                    SOLID_CHAR_CARBON_ACCOUNT
+                ).get(CHAR_SPECIES, 0.0)
+                or 0.0
+            ),
+        )
+
+    def _apply_char_lance_oxidation(
+        self, *, o2_available_mol: float
+    ) -> Dict[str, Any]:
+        """Oxidize solid char with bubbler O2 (lance-first claim)."""
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_CHAR_LANCE_OXIDATION,
+        )
+
+        char_mol = self._solid_char_carbon_mol()
+        o2_mol = max(0.0, float(o2_available_mol))
+        basis_name, o2_per_c, product = self._char_lance_basis()
+        diagnostic: Dict[str, Any] = {
+            'status': 'ok',
+            'basis': basis_name,
+            'o2_per_c_mol': o2_per_c,
+            'product_species': product,
+            'char_c_mol_before': char_mol,
+            'o2_available_mol': o2_mol,
+            'o2_consumed_mol': 0.0,
+            'extent_mol': 0.0,
+        }
+        if char_mol <= 1e-12 or o2_mol <= 1e-12:
+            diagnostic['status'] = 'skipped'
+            diagnostic['reason'] = 'no_char_or_o2'
+            self._last_char_lance_diagnostic = diagnostic
+            return diagnostic
+        result = self._dispatch_and_commit(
+            ChemistryIntent.STAGE0_PRETREATMENT,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_CHAR_LANCE_OXIDATION,
+                'char_c_mol': char_mol,
+                'o2_mol': o2_mol,
+                'o2_per_c_mol': o2_per_c,
+                'product_species': product,
+            },
+        )
+        diag = dict(result.diagnostic or {})
+        diagnostic.update({
+            'o2_consumed_mol': float(diag.get('o2_consumed_mol', 0.0) or 0.0),
+            'extent_mol': float(diag.get('extent_mol', 0.0) or 0.0),
+            'char_c_mol_after': self._solid_char_carbon_mol(),
+            'provider_status': result.status,
+        })
+        self._last_char_lance_diagnostic = diagnostic
+        return diagnostic
+
+    def _apply_char_feo_reduction(self) -> Dict[str, Any]:
+        """Equilibrium-limited FeO + C -> Fe + CO when T exceeds Ellingham gate."""
+        from engines.builtin.stage0_pretreatment import (
+            REACTION_FAMILY_CHAR_FEO_REDUCTION,
+        )
+
+        T_C = float(self.melt.temperature_C)
+        char_mol = self._solid_char_carbon_mol()
+        feo_mol = max(
+            0.0,
+            float(
+                self.atom_ledger.project_account_mol('process.cleaned_melt').get(
+                    'FeO', 0.0
+                )
+                or 0.0
+            ),
+        )
+        diagnostic: Dict[str, Any] = {
+            'status': 'ok',
+            'temperature_C': T_C,
+            'min_T_C': FEO_CHAR_REDUCTION_MIN_T_C,
+            'char_c_mol_before': char_mol,
+            'feo_mol_before': feo_mol,
+            'extent_mol': 0.0,
+            'fe_product_mol': 0.0,
+            'co_product_mol': 0.0,
+        }
+        diagnostic['contamination_risk'] = (
+            self._update_char_contamination_diagnostic()
+        )
+        if T_C + 1e-9 < FEO_CHAR_REDUCTION_MIN_T_C:
+            diagnostic['status'] = 'skipped'
+            diagnostic['reason'] = 'below_ellingham_crossover_T'
+            self._last_char_feo_reduction_diagnostic = diagnostic
+            return diagnostic
+        if char_mol <= 1e-12 or feo_mol <= 1e-12:
+            diagnostic['status'] = 'skipped'
+            diagnostic['reason'] = 'no_char_or_feo'
+            self._last_char_feo_reduction_diagnostic = diagnostic
+            return diagnostic
+        result = self._dispatch_and_commit(
+            ChemistryIntent.STAGE0_PRETREATMENT,
+            control_inputs={
+                'reaction_family': REACTION_FAMILY_CHAR_FEO_REDUCTION,
+                'char_c_mol': char_mol,
+                'feo_mol': feo_mol,
+            },
+        )
+        diag = dict(result.diagnostic or {})
+        extent = float(diag.get('extent_mol', 0.0) or 0.0)
+        diagnostic.update({
+            'extent_mol': extent,
+            'fe_product_mol': extent,
+            'co_product_mol': extent,
+            'char_c_mol_after': self._solid_char_carbon_mol(),
+            'provider_status': result.status,
+            'kinetics': diag.get('kinetics'),
+            'kinetics_justification': diag.get('kinetics_justification'),
+        })
+        if extent > 1e-12:
+            self._project_cleaned_melt_from_atom_ledger()
+        self._last_char_feo_reduction_diagnostic = diagnostic
+        return diagnostic
+
+    def _update_char_contamination_diagnostic(self) -> Dict[str, Any]:
+        """WARN-only: un-lanced char can reduce P/Cr/Ti and form carbides.
+
+        Thresholds are thermodynamic-onset (positive surviving char with
+        susceptible melt inventory), not selectivity model. Full P/Cr/Ti
+        competition and carbide speciation remain future work.
+        """
+        char_mol = self._solid_char_carbon_mol()
+        melt = self.atom_ledger.project_account_mol('process.cleaned_melt')
+        susceptible = {
+            species: max(0.0, float(melt.get(species, 0.0) or 0.0))
+            for species in ('P2O5', 'Cr2O3', 'TiO2')
+        }
+        present = {
+            species: mol for species, mol in susceptible.items() if mol > 1e-12
+        }
+        warning = None
+        status = 'OK'
+        if char_mol > 1e-12:
+            status = 'WARN'
+            warning = (
+                'WARNING: un-lanced solid char can reduce melt P/Cr/Ti oxides '
+                'where present and form metal carbides (positive-char onset; '
+                'no selectivity model applied).'
+            )
+        diagnostic = {
+            'status': status,
+            'diagnostic_only': True,
+            'warning': warning,
+            'p_cr_ti_reduction_status': (
+                'WARN' if char_mol > 1e-12 and present else 'OK'
+            ),
+            'carbide_risk_status': 'WARN' if char_mol > 1e-12 else 'OK',
+            'surviving_char_C_mol': char_mol,
+            'susceptible_melt_mol': present,
+            'threshold_basis': (
+                'thermodynamic-onset: positive surviving char; susceptible '
+                'P2O5/Cr2O3/TiO2 inventory reported separately'
+            ),
+            'threshold_source': (
+                'Ellingham oxide stability vs C/CO; no sourced safe residual '
+                'char allowance for P/Cr/Ti selectivity'
+            ),
+            'out_of_scope': (
+                'vacuum SiO2+C->SiO(g); full selectivity/carbide speciation'
+            ),
+        }
+        self._last_char_contamination_diagnostic = diagnostic
+        return diagnostic
 
     def _decompose_stage0_carbonates(
         self,
@@ -10233,8 +11127,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _terminal_slag_kg(self) -> float:
         return (
-            self.atom_ledger.total_kg_by_account('process.cleaned_melt')
-            + self.atom_ledger.total_kg_by_account('terminal.slag')
+            self.atom_ledger.projected_total_kg_by_account('process.cleaned_melt')
+            + self.atom_ledger.projected_total_kg_by_account('terminal.slag')
         )
 
     def _terminal_rump_by_species(self) -> Dict[str, float]:
@@ -10300,8 +11194,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.record.completed = True
 
     def _ledger_o2_kg(self, account: str) -> float:
-        species_kg = self.atom_ledger.kg_by_account(account)
-        return max(0.0, float(species_kg.get(OXYGEN_SPECIES, 0.0)))
+        species_kg = self.atom_ledger.project_account_kg(account)
+        return float(species_kg.get(OXYGEN_SPECIES, 0.0))
 
     def _train_o2_kg(self) -> float:
         return sum(
@@ -10335,7 +11229,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _overhead_gas_totals(self) -> Dict[str, float]:
         return {
             species: float(kg)
-            for species, kg in self.atom_ledger.kg_by_account(
+            for species, kg in self.atom_ledger.project_account_kg(
                 'process.overhead_gas').items()
             if kg > 1e-12 and species != OXYGEN_SPECIES
         }
@@ -10379,9 +11273,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         unspent: Dict[str, float] = {}
         for reagent in sorted(reagents):
             kg = (
-                self.atom_ledger.kg_by_account(
+                self.atom_ledger.project_account_kg(
                     f'reservoir.reagent.{reagent}').get(reagent, 0.0)
-                + self.atom_ledger.kg_by_account(
+                + self.atom_ledger.project_account_kg(
                     'process.reagent_inventory').get(reagent, 0.0)
             )
             if kg > 1e-9:
@@ -10442,9 +11336,119 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 getattr(self, '_last_c6_refusal_diagnostic', {}) or {})
         return summary
 
+    def _check_campaign_endpoint(self, evap_flux: EvaporationFlux) -> bool:
+        """Evaluate the endpoint and convert a C6 acquisition timeout to refusal."""
+        from simulator.campaigns import CampaignHoldAcquisitionRefusal
+
+        try:
+            return self.campaign_mgr.check_endpoint(
+                self.melt,
+                evap_flux,
+                self.train,
+                self.record,
+                transport_state={
+                    'binding_cause': str(getattr(
+                        self.overhead,
+                        'transport_binding_cause',
+                        'unknown',
+                    )),
+                    'saturation_pct': float(getattr(
+                        self.overhead,
+                        'transport_saturation_pct',
+                        0.0,
+                    )),
+                    'evap_exceeds_transport': bool(getattr(
+                        self.overhead,
+                        'evap_exceeds_transport',
+                        False,
+                    )),
+                    'turbine_limited': bool(getattr(
+                        self.overhead,
+                        'turbine_limited',
+                        False,
+                    )),
+                },
+            )
+        except CampaignHoldAcquisitionRefusal as exc:
+            self._record_c6_refusal(exc.diagnostic)
+            return True
+
     # ------------------------------------------------------------------
     # THE CORE LOOP
     # ------------------------------------------------------------------
+
+    def _snapshot_terminal_refusal_hour_state(
+        self,
+    ) -> tuple[Dict[str, Any], Any, Optional[Dict[str, Any]]]:
+        preserved_names = {
+            'backend',
+            '_sulfsat_gate',
+            '_base_species_formula_registry',
+            'species_formula_registry',
+            '_chem_registry',
+            'atom_ledger',
+            '_chem_kernel',
+            'cost_ledger',
+        }
+        memo = {id(self): self}
+        state_source = {
+            name: value
+            for name, value in self.__dict__.items()
+            if name not in preserved_names
+        }
+        state = _deepcopy_refusal_state(state_source, memo)
+        ledger = copy.copy(self.atom_ledger)
+        ledger._balances = copy.deepcopy(self.atom_ledger._balances)
+        ledger._movement_scale_kg = copy.deepcopy(
+            getattr(self.atom_ledger, '_movement_scale_kg', {})
+        )
+        ledger._policies = dict(self.atom_ledger._policies)
+        ledger._transitions = list(self.atom_ledger._transitions)
+        ledger._terminal_debit_authorized_transition_ids = set(
+            self.atom_ledger._terminal_debit_authorized_transition_ids
+        )
+        ledger._external_loads = list(self.atom_ledger._external_loads)
+        cost_state = None
+        if hasattr(self, 'cost_ledger'):
+            cost_state = {
+                name: (
+                    value
+                    if name == 'import_context'
+                    else list(value)
+                    if isinstance(value, list)
+                    else copy.deepcopy(value)
+                )
+                for name, value in self.cost_ledger.__dict__.items()
+            }
+        return state, ledger, cost_state
+
+    def _restore_terminal_refusal_hour_state(
+        self,
+        state: Mapping[str, Any],
+        ledger: Any,
+        cost_state: Optional[Mapping[str, Any]],
+    ) -> None:
+        preserved_names = {
+            'backend',
+            '_sulfsat_gate',
+            '_base_species_formula_registry',
+            'species_formula_registry',
+            '_chem_registry',
+            'cost_ledger',
+        }
+        preserved = {
+            name: self.__dict__[name]
+            for name in preserved_names
+            if name in self.__dict__
+        }
+        self.__dict__.clear()
+        self.__dict__.update(preserved)
+        self.__dict__.update(state)
+        self.atom_ledger = ledger
+        if cost_state is not None:
+            self.cost_ledger.__dict__.clear()
+            self.cost_ledger.__dict__.update(cost_state)
+        self._chem_kernel = self._build_chemistry_kernel()
 
     def step(self) -> HourSnapshot:
         """Advance one hour, refusing replay after a partial commit."""
@@ -10458,6 +11462,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # transitions can poison unchanged balances.
         attempt_hour = int(self.melt.hour)
         transition_count_before = len(self.atom_ledger.transitions)
+        (
+            terminal_refusal_state,
+            terminal_refusal_ledger,
+            terminal_refusal_cost_state,
+        ) = (
+            self._snapshot_terminal_refusal_hour_state()
+        )
         try:
             return self._step_one_hour()
         except BaseException as exc:
@@ -10466,7 +11477,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 0,
                 len(self.atom_ledger.transitions) - transition_count_before,
             )
-            if committed_transition_count:
+            terminal_refusal = bool(
+                getattr(type(exc), 'terminal_refusal', False)
+            )
+            if terminal_refusal:
+                self._restore_terminal_refusal_hour_state(
+                    terminal_refusal_state,
+                    terminal_refusal_ledger,
+                    terminal_refusal_cost_state,
+                )
+            elif committed_transition_count:
                 # AtomLedger is append-only. Whole-hour rollback would require
                 # compensating transitions and is a separate design change.
                 self._poisoned_hour = PoisonedHourState(
@@ -10554,6 +11574,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._establish_melt_redox_gate_authority_for_current_hour()
         self._apply_oxygen_reservoir_exchange()
         self._apply_o2_bubbler()
+        # t-325: un-lanced solid char reduces melt FeO at T >= 700 C
+        # (Ellingham C/CO vs Fe/FeO). Equilibrium-limited one-step.
+        self._apply_char_feo_reduction()
 
         c3_shuttle_campaign = self.melt.campaign in (
             CampaignPhase.C3_K, CampaignPhase.C3_NA,
@@ -10577,7 +11600,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         if self.melt.campaign in (CampaignPhase.C5,
                                    CampaignPhase.MRE_BASELINE):
-            mre_O2_kg = self._step_mre()
+            mre_O2_kg = self._step_mre(sample_time_h=sample_time_h)
             self._mre_anode_O2_kg_this_hr = mre_O2_kg
             mre_energy_kWh = self._mre_energy_this_hr
         else:
@@ -10593,10 +11616,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self.melt.campaign == CampaignPhase.C6:
             c6_target_T, _ = self.campaign_mgr.get_temp_target(
                 self.melt.campaign, self.melt.campaign_hour, self.melt)
-            c6_hold_reached = (
-                c6_target_T is not None
-                and abs(float(c6_target_T) - self.melt.temperature_C) < 0.1
+            c6_hold_reached = self.campaign_mgr.c6_at_hold_target(
+                c6_target_T,
+                self.melt.temperature_C,
             )
+        self._c6_at_hold_target_this_hr = c6_hold_reached
         if c6_hold_reached:
             self._step_thermite()
         else:
@@ -10627,9 +11651,79 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Only during pyrolysis campaigns (C0, C2A, C2B, C3 bakeout, C4).
         # Not during MRE (C5) — electrolysis produces O₂ at the anode.
         evap_flux = EvaporationFlux()
+        capacity_result = None
         if evaporation_campaign:
-            evap_flux = self._calculate_evaporation(equilibrium)
-            evap_flux = self._apply_analytic_evaporation_depletion(evap_flux)
+            if (
+                self._overhead_headspace_enabled()
+                and hasattr(equilibrium, 'vapor_pressures_Pa')
+            ):
+                from simulator.capacity_coupling import (
+                    CapacityCouplingRefusalError,
+                    CapacityShadowRefusal,
+                )
+
+                from simulator.thermal_train import FiniteCapacity
+
+                capacity, cold_train = self._cold_train_capacity_policy()
+                if isinstance(capacity, FiniteCapacity):
+                    assert cold_train is not None
+                    capacity_result = (
+                        self._compute_capacity_coupling_shadow(equilibrium)
+                    )
+                    if isinstance(capacity_result, CapacityShadowRefusal):
+                        raise CapacityCouplingRefusalError(capacity_result)
+            if capacity_result is not None:
+                live_raw_flux = self._calculate_evaporation(
+                    equilibrium,
+                    overhead_partials_override_Pa=(
+                        capacity_result.partial_pressures_Pa
+                    ),
+                )
+                live_effective_flux = (
+                    self._apply_analytic_evaporation_depletion(live_raw_flux)
+                )
+                solved_rates = {
+                    species: float(rate)
+                    for species, rate in (
+                        capacity_result.evaporation_flux_kg_hr.items()
+                    )
+                    if float(rate) > 1.0e-12
+                }
+                live_rates = {
+                    species: float(rate)
+                    for species, rate in live_effective_flux.species_kg_hr.items()
+                    if float(rate) > 1.0e-12
+                }
+                assert set(live_rates) == set(solved_rates)
+                assert all(
+                    math.isclose(
+                        live_rates[species],
+                        solved_rates[species],
+                        rel_tol=1.0e-12,
+                        abs_tol=1.0e-15,
+                    )
+                    for species in solved_rates
+                )
+                evap_flux.species_kg_hr = {
+                    species: float(rate)
+                    for species, rate in (
+                        solved_rates.items()
+                    )
+                    if float(rate) > 1.0e-12
+                }
+                evap_flux.update_totals()
+            else:
+                evap_flux = self._calculate_evaporation(equilibrium)
+                evap_flux = self._apply_analytic_evaporation_depletion(
+                    evap_flux
+                )
+        overhead_flux = evap_flux
+        effective_transport_capacity = (
+            self._controlled_o2_transport_capacity(evap_flux)
+        )
+        self._effective_transport_capacity_this_tick = (
+            effective_transport_capacity
+        )
 
         # --- 5. Condensation routing ---
         # Send evaporated species through the 8-stage train.
@@ -10637,7 +11731,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if evap_flux.total_kg_hr > 0:
             self._configure_condensation_operating_conditions(evap_flux)
             self._apply_lab_surface_temperatures(sample_time_h=sample_time_h)
-            self._route_to_condensation(evap_flux)
+            overhead_flux = self._route_to_condensation(evap_flux)
         self._pending_knudsen_zero_overhead_flow_marker = None
 
         # --- 6. Update melt composition ---
@@ -10650,10 +11744,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             self._apply_fe_redox_respeciation()
 
-        # --- 7. Overhead gas (with turbine capacity feedback) ---   [LOOP-2]
-        # Pass the turbine spec so overhead model can enforce capacity limits,
-        # compute O₂ venting, and calculate transport saturation.
-        turbine_spec = self._get_turbine_spec()
+        # --- 7. Overhead gas (with cold-train capacity feedback) ---   [LOOP-2]
+        # Equipment sizing also supplies the runtime pipe/throat geometry used
+        # by transport saturation. The returned turbine record no longer owns
+        # O2 partition authority, but the geometry side effect remains required.
+        self._get_turbine_spec()
         # The AtomLedger is the canonical quantity authority (see AGENTS.md),
         # so the turbine/vent decision is fed strictly the actual finite O2
         # holdup in process.overhead_gas. This is NOT max()'d with a per-tick
@@ -10662,24 +11757,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # max()-ing the two
         # overlapping quantities would let the turbine see carried-over O2 as
         # fresh throughput, or mask the case where holdup < this-hour output.
+        from simulator.thermal_train import FiniteCapacity
+
         finite_headspace_enabled = self._overhead_headspace_enabled()
+        configured_capacity, _cold_train = self._cold_train_capacity_policy()
         bleed_result = None
         if finite_headspace_enabled:
             bleed_result = self._dispatch_overhead_bleed(
-                turbine_spec=turbine_spec)
+                capacity_result=capacity_result,
+                effective_transport_capacity=effective_transport_capacity,
+            )
             self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
             self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
             bleed_diag = dict(bleed_result.diagnostic or {})
-            melt_offgas_O2_kg_hr = float(
-                bleed_diag.get('bled_o2_kg', 0.0) or 0.0)
+            melt_offgas_O2_kg_hr = (
+                float(bleed_diag.get('melt_o2_bled_mol', 0.0) or 0.0)
+                * OXYGEN_MOLAR_MASS_KG_PER_MOL
+                if isinstance(configured_capacity, FiniteCapacity)
+                else float(bleed_diag.get('bled_o2_kg', 0.0) or 0.0)
+            )
         else:
             melt_offgas_O2_kg_hr = self._ledger_o2_kg(
                 'process.overhead_gas')
         self.overhead = self.overhead_model.update(
-            evap_flux,
+            overhead_flux,
             self.melt,
             self.train,
-            turbine_spec=turbine_spec,
             actual_O2_kg_hr=melt_offgas_O2_kg_hr,
             actual_O2_mol_hr=melt_offgas_O2_kg_hr / OXYGEN_MOLAR_MASS_KG_PER_MOL,
             mre_anode_O2_mol_hr=(
@@ -10687,19 +11790,58 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             overhead_holdup_mol=self._overhead_holdup_mol(),
             existing_gas=self.overhead,
             headspace_volume_m3=self._headspace_volume_m3(),
-            p_downstream_bar=self._headspace_downstream_pressure_bar(),
+            p_downstream_bar=self._headspace_downstream_pressure_bar(
+                effective_transport_capacity
+            ),
             bleed_conductance_kg_s=(
-                self._headspace_bleed_conductance_kg_s()))
+                effective_transport_capacity.pipe_capacity_kg_hr / 3600.0
+                if effective_transport_capacity is not None
+                else self._headspace_bleed_conductance_kg_s()),
+            cold_train_capacity=(
+                configured_capacity
+            ),
+            # F-317 derivation: the melt-to-train duct is upstream of capture,
+            # so m_dot_pipe = sum(m_dot_evolved); downstream reporting instead
+            # uses y_i = m_dot_residual_i / sum(m_dot_residual). Both fluxes are
+            # kg/hr, and near-total capture must not erase the upstream load.
+            transport_inlet_kg_hr=evap_flux.total_kg_hr,
+            transport_inlet_flux=evap_flux,
+            effective_transport_capacity=effective_transport_capacity,
+        )
+        upstream_transport = self.overhead_model.estimate_transport_state(
+            evap_flux,
+            self.melt,
+            p_downstream_bar=self._headspace_downstream_pressure_bar(
+                effective_transport_capacity
+            ),
+            effective_transport_capacity=effective_transport_capacity,
+        )
+        self._melt_headspace_composition_mbar = (
+            self.overhead_model.species_partial_pressures(
+                evap_flux,
+                upstream_transport['vapor_pressure_mbar'],
+            )
+        )
+        if capacity_result is not None and effective_transport_capacity is None:
+            self.overhead.transport_saturation_pct = (
+                capacity_result.saturation.combined * 100.0
+            )
+            self.overhead.transport_binding_cause = (
+                capacity_result.saturation.binding_cause
+            )
+            self.overhead.evap_exceeds_transport = (
+                capacity_result.saturation.combined > 1.0
+            )
 
         # Track cumulative O₂ vented and stored
         if not finite_headspace_enabled:
             bleed_result = self._dispatch_overhead_bleed(
-                turbine_spec=turbine_spec,
                 force_drain_all=True,
-                o2_vented_kg=self.overhead.O2_vented_kg_hr,
             )
             self._attribute_o2_bubbler_vented_from_bleed(bleed_result)
             self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+        assert bleed_result is not None
+        self._project_overhead_bleed_partition(bleed_result)
         self._sync_oxygen_kg_counters()
         self._refresh_knudsen_zero_overhead_flow_marker(evap_flux)
 
@@ -10730,8 +11872,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt.campaign == CampaignPhase.C6
             and self._c6_campaign_refused
         )
-        campaign_done = c6_refused or self.campaign_mgr.check_endpoint(
-            self.melt, evap_flux, self.train, self.record)
+        campaign_done = c6_refused or self._check_campaign_endpoint(evap_flux)
         if campaign_done:
             # Capture campaign summary before transitioning
             finishing_campaign = self.melt.campaign.name
@@ -10748,9 +11889,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 pending_decision = self.campaign_mgr.get_decision(
                     self.melt.campaign, self.record)
 
+        backend_transition = getattr(equilibrium, 'ledger_transition', None)
+        backend_controls_metal_phase = (
+            backend_transition is not None
+            and any(
+                str(lot.account) == METAL_PHASE_ACCOUNT
+                for lot in (
+                    tuple(backend_transition.debits)
+                    + tuple(backend_transition.credits)
+                )
+            )
+        )
         # Stratification remains an hour-boundary diagnostic: all legacy
-        # physics has read the canonical staging account before this move.
-        self._step_metal_phase_stratification(equilibrium)
+        # physics has read the canonical staging account before this point.
+        # A backend-authored metal-phase transition is authoritative for that
+        # account, so the builtin provider may instrument but not commit its
+        # derived disposition on this tick.
+        self._step_metal_phase_stratification(
+            equilibrium,
+            commit_disposition=not backend_controls_metal_phase,
+            account_state_source=(
+                'backend-authored'
+                if backend_controls_metal_phase
+                else 'builtin-authored'
+            ),
+        )
 
         # --- 10. Record snapshot ---
         completed_hour = int(self.melt.hour)
@@ -10759,6 +11922,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._stamp_redox_source_context_for_current_state(force=True)
         snapshot = self._make_snapshot()
         snapshot.evap_flux = evap_flux
+        snapshot.melt_headspace_composition_mbar = dict(
+            self._melt_headspace_composition_mbar
+        )
         snapshot.evap_plane_selectivity = evap_plane_selectivity
         snapshot.partial_melt_offgassing_diagnostic = dict(
             self._last_partial_melt_offgassing_diagnostic
@@ -10845,15 +12011,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         # --- Loop 3: Metals train transport saturation throttle ---
         sat_pct = float(self.overhead.transport_saturation_pct)
-        if not math.isfinite(sat_pct):
+        if math.isnan(sat_pct) or sat_pct < 0.0:
             raise ValueError(
-                'overhead.transport_saturation_pct must be finite before '
+                'overhead.transport_saturation_pct must be non-negative before '
                 f'temperature mutation; got {sat_pct!r}')
         if sat_pct > 100.0:
             # Linear scale: 100% → full ramp, 200% → zero ramp
-            scale = max(0.0, 2.0 - sat_pct / 100.0)
+            scale = (
+                0.0
+                if math.isinf(sat_pct)
+                else max(0.0, 2.0 - sat_pct / 100.0)
+            )
             actual_ramp *= scale
-            throttle_reason = f'pipe saturated ({sat_pct:.0f}%)'
+            binding_cause = getattr(
+                self.overhead, 'transport_binding_cause', 'pipe'
+            )
+            if binding_cause == 'oxygen':
+                saturation_label = 'O2 capacity'
+            elif str(binding_cause).startswith('controlled_o2_'):
+                saturation_label = f'equipment incompatibility [{binding_cause}]'
+            else:
+                saturation_label = 'pipe'
+            throttle_reason = (
+                f'{saturation_label} saturated (infinite)'
+                if math.isinf(sat_pct)
+                else f'{saturation_label} saturated ({sat_pct:.0f}%)'
+            )
 
         # --- Loop 3b: Turbine overload (milder throttle) ---
         if self.overhead.turbine_limited:
@@ -10878,12 +12061,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # Estimate current volatiles offgas rate from evaporation
                 # Na, K, H₂O, S, Cl species are volatiles
                 volatile_species = {'Na', 'K'}  # Main C0 volatiles
-                vol_rate = sum(
-                    self.overhead.composition.get(sp, 0.0) * 100.0  # rough mass proxy
-                    for sp in volatile_species
-                )
-                # Better estimate: use the actual evap flux if available
-                # (from the previous hour's snapshot)
+                vol_rate = 0.0
                 if self.record.snapshots:
                     last = self.record.snapshots[-1]
                     vol_rate = sum(
@@ -10919,10 +12097,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _get_turbine_spec(self):
         """
-        Get the turbine spec from the auto-designed plant equipment.
+        Size the plant equipment (side effect) and return its turbine record.
 
-        Returns None if equipment hasn't been sized yet (the overhead
-        model handles None gracefully by not enforcing limits).
+        The load-bearing part is the sizing side effect: it populates
+        self._equipment, whose pipe/throat geometry the overhead transport
+        model consumes. The returned turbine record is display metadata
+        only — O2 capacity authority moved to the cold-train partition
+        (_cold_train_capacity_policy / OVERHEAD_BLEED), so no caller
+        enforces limits from it anymore.
         """
         if self._equipment is None:
             # Auto-size equipment for this batch
@@ -11293,6 +12475,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_mass_kg=self.melt.total_mass_kg,
             composition_wt_pct=self.melt.composition_wt_pct(),
             inventory=self.inventory.copy(),
+            c6_at_hold_target=(
+                self.melt.campaign == CampaignPhase.C6
+                and bool(getattr(
+                    self,
+                    '_c6_at_hold_target_this_hr',
+                    False,
+                ))
+            ),
             overhead=copy.deepcopy(self.overhead),
             condensation_totals=condensation_totals,
             condensed_by_stage_species_delta=dict(

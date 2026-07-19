@@ -7,9 +7,17 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.accounting.ledger import AtomLedger
-from simulator.campaigns import CampaignPressureSetpointRefusal
+from simulator.campaigns import (
+    CampaignHoldTargetRefusal,
+    CampaignPressureSetpointRefusal,
+)
 from simulator.condensation import KnudsenRegimeRefusal
-from simulator.run_executor import RunExecution, RunExecutor, _aggregate_backend_status
+from simulator.run_executor import (
+    RunExecution,
+    RunExecutor,
+    _aggregate_backend_status,
+    _campaigns_elapsed_from_session_history,
+)
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession, SimSessionConfig, StepResult
 from simulator.state import CampaignPhase, DecisionType
@@ -45,6 +53,174 @@ def test_run_executor_returns_structured_execution():
     assert isinstance(execution.trace, PhysicsTrace)
     assert execution.trace.snapshots == execution.snapshots
     assert isinstance(execution.operator_decisions, tuple)
+
+
+def test_run_executor_uses_campaigns_elapsed_override_without_history():
+    run = _run(
+        hours=0,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-30T00:00:00Z",
+            "kernel_commit_sha": "run-executor-fixture",
+            "campaigns_elapsed": 4,
+        }
+    )
+    config = run._session_config()
+
+    execution = RunExecutor().execute(config)
+
+    assert config.campaigns_elapsed == pytest.approx(4.0)
+    assert execution.campaigns_elapsed == pytest.approx(4.0)
+
+
+def test_campaign_transition_history_overrides_campaign_count_fallback():
+    session = SimpleNamespace(
+        _step_results=[
+            SimpleNamespace(campaign_summary={"campaign": "C0"}),
+            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(campaign_summary={"campaign": "C1"}),
+        ]
+    )
+
+    assert _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    ) == pytest.approx(2.0)
+
+
+def test_campaign_count_includes_partial_campaign_hours():
+    session = SimpleNamespace(
+        _step_results=[
+            SimpleNamespace(campaign_summary={"campaign": "C0", "duration_h": 8}),
+            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(campaign_summary=None),
+        ],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C0B),
+            campaign_mgr=SimpleNamespace(_max_hold_hr=lambda _campaign: 8.0),
+        ),
+    )
+
+    campaigns_elapsed = _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    )
+
+    assert campaigns_elapsed == pytest.approx(1.25)
+    assert (8.0 + 2.0) / campaigns_elapsed == pytest.approx(8.0)
+
+
+def test_campaign_count_resolves_structured_c3_duration():
+    campaign_mgr = SimpleNamespace(
+        _configured_max_hold_hr=lambda _campaign, phase, path: {
+            ("C3_NA", "A_staged"): 3.0,
+        }[(phase, path)],
+        _campaign_overrides=lambda _campaign: {},
+    )
+    session = SimpleNamespace(
+        _step_results=[SimpleNamespace(campaign_summary=None)],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C3_NA),
+            record=SimpleNamespace(path="A_staged"),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+
+    assert _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    ) == pytest.approx(1.0 / 3.0)
+
+
+def test_campaign_count_resolves_structured_c5_branch_max_hold():
+    """C5 max_hold_hr is a per-branch mapping; progress must not float() it.
+
+    Authoritative schema (data/setpoints.yaml campaigns.C5.max_hold_hr):
+      {branch_two: ..., branch_one: ...}
+    Selection rule mirrors campaigns.py C5 endpoint: branch=='two' uses
+    branch_two, otherwise branch_one (including unset branch).
+    """
+    calls: list[tuple] = []
+
+    def _configured_max_hold_hr(_campaign, *path):
+        calls.append(path)
+        table = {
+            ("branch_two",): 800.0,
+            ("branch_one",): 400.0,
+        }
+        return table[path]
+
+    campaign_mgr = SimpleNamespace(
+        _configured_max_hold_hr=_configured_max_hold_hr,
+        # If the consumer wrongly calls scalar _max_hold_hr(campaign), surface it.
+        _max_hold_hr=lambda _campaign: (_ for _ in ()).throw(
+            AssertionError("C5 must not resolve scalar max_hold_hr")
+        ),
+    )
+
+    # Active hour mid-C5 on branch two: 1 completed campaign + 2/800.
+    session_two = SimpleNamespace(
+        _step_results=[
+            SimpleNamespace(campaign_summary={"campaign": "C4"}),
+            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(campaign_summary=None),
+        ],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C5),
+            record=SimpleNamespace(branch="two"),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+    assert _campaigns_elapsed_from_session_history(
+        session_two,
+        fallback=99.0,
+    ) == pytest.approx(1.0 + 2.0 / 800.0)
+    assert calls[-1] == ("branch_two",)
+
+    # Unset branch defaults to branch_one (matches campaigns.py endpoint).
+    session_default = SimpleNamespace(
+        _step_results=[SimpleNamespace(campaign_summary=None)],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C5),
+            record=SimpleNamespace(branch=""),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+    assert _campaigns_elapsed_from_session_history(
+        session_default,
+        fallback=99.0,
+    ) == pytest.approx(1.0 / 400.0)
+    assert calls[-1] == ("branch_one",)
+
+    # Explicit branch one.
+    session_one = SimpleNamespace(
+        _step_results=[SimpleNamespace(campaign_summary=None)],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C5),
+            record=SimpleNamespace(branch="one"),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+    assert _campaigns_elapsed_from_session_history(
+        session_one,
+        fallback=99.0,
+    ) == pytest.approx(1.0 / 400.0)
+    assert calls[-1] == ("branch_one",)
+
+
+def test_run_metadata_projects_execution_campaign_count_over_override():
+    run = _run(
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-30T00:00:00Z",
+            "kernel_commit_sha": "run-executor-fixture",
+            "campaigns_elapsed": 99,
+        }
+    )
+    execution = RunExecutor().execute(run._session_config())
+    execution = replace(execution, campaigns_elapsed=2.0)
+
+    payload = run._build_output(execution)
+
+    assert payload["run_metadata"]["campaigns_elapsed"] == pytest.approx(2.0)
 
 
 def test_pyrolysis_run_is_executor_json_adapter():
@@ -166,8 +342,8 @@ def test_ci_c0_to_c6_refusal_preserves_prior_rows_and_ledger_accounts():
     assert payload["reason"] == (
         "c6_joint_thermodynamic_liquid_fraction_window_empty"
     )
-    # The binding C6 refusal now fires on the first C6 tick, after all prior
-    # campaign rows have been preserved in the envelope.
+    # The refusal boundary preserves every completed pre-C6 row; the refused
+    # C6 tick itself is not emitted as a completed row.
     assert len(rows) == 42
     assert list(dict.fromkeys(row["campaign"] for row in rows)) == [
         "C0",
@@ -407,6 +583,36 @@ def test_run_executor_preserves_campaign_pressure_refusal_during_execution(
     assert execution.reason == diagnostic["reason"]
     assert execution.error_message == diagnostic["reason"]
     assert execution.refusal_diagnostic == diagnostic
+
+
+def test_run_executor_preserves_nonfinite_c6_hold_refusal(monkeypatch):
+    class BareSession:
+        simulator = SimpleNamespace()
+
+    diagnostic = {
+        "hold_target_C": 1400.0,
+        "temperature_C": float("nan"),
+        "detail": "C6 hold target and melt temperature must be finite",
+    }
+
+    def fail_drive_session(*_args, **_kwargs):
+        raise CampaignHoldTargetRefusal(diagnostic)
+
+    monkeypatch.setattr(
+        "simulator.run_executor.drive_session",
+        fail_drive_session,
+    )
+
+    execution = RunExecutor().execute_session(BareSession(), hours=1)
+
+    assert execution.status == "refused"
+    assert execution.reason == "c6_hold_target_nonfinite"
+    assert execution.error_message == "c6_hold_target_nonfinite"
+    assert execution.refusal_diagnostic == {
+        **diagnostic,
+        "status": "refused",
+        "reason": "c6_hold_target_nonfinite",
+    }
 
 
 def test_run_executor_failure_envelope_uses_safe_exception_text(monkeypatch):

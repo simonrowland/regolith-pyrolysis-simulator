@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from typing import Any
 
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.cost_parameters import (
+    DEFAULT_ELECTRICAL_COST_PER_KWH,
+    ENERGY_COST_DEFAULT_SOURCE,
+)
 
 
 @dataclass(frozen=True)
@@ -30,9 +34,9 @@ class OwnerRatifyCostParameter:
 
 ELECTRICAL_USD_PER_KWH = OwnerRatifyCostParameter(
     name="electrical_usd_per_kWh",
-    value=100.0,
+    value=DEFAULT_ELECTRICAL_COST_PER_KWH,
     units="USD/kWh",
-    source_tag="owner-ratify-placeholder:cost-ledger-2026-06-28",
+    source_tag=ENERGY_COST_DEFAULT_SOURCE,
     ticket="COST-PARAM-ELECTRICAL-KWH",
 )
 THERMAL_USD_PER_FLUX_H = OwnerRatifyCostParameter(

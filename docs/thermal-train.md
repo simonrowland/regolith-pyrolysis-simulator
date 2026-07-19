@@ -1,10 +1,10 @@
 # Downstream Thermal Train — O₂ condenser chain and frost-cistern storage
 
-Status: Phase 1a — diagnostic sizing report. Nothing in this subsystem mutates the
+Status: Phase 2B — diagnostic sizing report. Nothing in this subsystem mutates the
 ledger, the transport path, or the optimizer objective; it reads a run's recorded
 history and reports what downstream hardware that run would require. Objective
-(cost) wiring is Phase 1b; physical capacity enforcement in the transport path is
-Phase 2. See `docs/model-limitations.md` for scope caveats.
+(cost) wiring and physical capacity enforcement in the live bleed path remain
+separate follow-on work. See `docs/model-limitations.md` for scope caveats.
 
 ## What it models
 
@@ -21,14 +21,10 @@ Furnace (mbar overhead, choked throat)
   [S-B] Post-separator O₂ stream, baffled radiator → passive floor (~150 K)
         Free radiative descent (night sink). Radiators fade as gas temperature
         approaches the sink; below the floor there is no passive cooling.
-  [S-C] Staged intercooled compression (LOX-turbopump alloy regime; the metal only
-        ever sees cold O₂, and at mbar-to-sub-bar pressure — orders of magnitude
-        below alloy sustained-burn thresholds).
-  [S-D] Reject radiator + refrigeration lift down to frost conditions.
-        Expansion alone cannot make stable frost: a nozzle conserves stagnation
-        enthalpy, so an expansion-cooled stream re-heats on wall stagnation
-        ("hot snow"). Only heat rejected through a wall or work extracted through
-        a shaft actually leaves the stream — hence the refrigeration tail.
+  [S-C/D] Seven-node Claude cycle: make-up metering orifice → return mixer →
+        compressor → reject radiator → recuperator → HP split. Bypass flow drives
+        a dry work expander; main flow crosses a JT valve and separates at the
+        77 K LOX bath. Expander exhaust and separator vapor rejoin as cold return.
   [S-E] Free expansion to Kn ≫ 1 → frost cavern: ballistic desublimation onto cold
         walls. Collection is decoupled from drainage.
   [S-F] Batch drain: seal the cavern, warm the frost to the O₂ triple point
@@ -56,17 +52,17 @@ its evolution rate pays for spike-sized hardware; overflow beyond the train's
 swallow capacity is O₂ that never reaches storage. The report therefore separates:
 
 - `peaks` — observed per-species and max-concurrent-total flow peaks;
-- `capacity` — the rated cold-train throughput (defaults to the observed peak,
-  labeled `observed_peak_design_capacity`) and the freshly computed
+- `capacity` — authoritative cold-train throughput
+  `C = min(compressor mass-flow rating, refrigeration freeze-rate rating)` and
+  the freshly computed
   `thermal_train_overflow_kg_hr = max(0, cold_inlet − C)`;
 - `observed_upstream_state` — the run's recorded upstream transport diagnostics,
   kept in a separate column because they are *not* consequences of the
   hypothetical train.
 
-In Phase 1a this is diagnostic only. Phase 1b prices it (capex per campaign, vented
-O₂ under a single-valuation policy, cycle-time cost) so the optimizer can trade
-bake-off schedule against downstream hardware. Phase 2 makes capacity physically
-binding through overhead backpressure.
+This remains diagnostic only. Display pricing estimates capex per campaign, O₂
+value under a single-valuation policy, and cycle-time cost. Capacity becomes
+physically binding through overhead backpressure in later P2-2/P2-3 chunks.
 
 ## The report screen
 
@@ -88,19 +84,33 @@ carries `excluded_species` with their peak flows and flags
 
 ## Parameters and provenance
 
-`data/thermal_train_params.yaml` (`schema_version: thermal-train-v1`) carries the
+`data/thermal_train_params.yaml` (`schema_version: thermal-train-v2`) carries the
 engineering assumptions (emissivity, sink temperatures, compressor efficiency and
-pressure ladder, frost/storage temperatures, cavern capacity), each tagged
+pressure ladder, frost/storage temperatures, cavern capacity), plus cold-end
+ratings and their diagnostic `(p_ref, T_ref)` scalar-rating reference, Claude-cycle
+splits, derived-orifice inputs, continuous relief law, and the `liquefier_77K`
+endpoint. The reference state is carried for the P2-2 curve upgrade but does not
+set C. Each authored value carries assumption class, range, and provenance; the
+metering-orifice diameter is derived from C and never sets C.
+Legacy parameters remain tagged
 `assumption`. Display prices on the report are owner-ratified and tagged with
-their ratification date; in Phase 1a they are display-only and enter no objective
-or cache identity.
+their ratification date; they are display-only and enter no objective
+or cache identity. Compressor capex uses gross compressor shaft rating; cold-box
+capex uses `Q_c` lift rating. Net plant shaft work is an energy ledger field and
+is not priced again as a second machine.
 
-## Known Phase-1a limitations
+## Known limitations
 
-- The cryogenic tail is sized to the 54 K frost endpoint. This is a valid upper
-  bound but is about 2x conservative in cold-end work versus the intended 77 K
-  liquefier endpoint (Carnot factor plus ΔH_vap rather than ΔH_sub); Phase 2
-  models the endpoint as a configuration choice.
+- The Claude-cycle report is first-order ideal-gas machinery. The 77 K LOX load
+  includes sourced gas sensible heat and vaporization enthalpy; 90.188-to-77 K
+  liquid subcooling is explicitly omitted until a sourced liquid-O₂ Cp anchor is
+  configured. Compressor and dry-expander shaft terms use the same gas-Cp Δh
+  basis; JT exit temperature is reported on that same first-order enthalpy basis,
+  separately from the 77 K separator bath.
+- `intercooled_compression()` and `cryogenic_tail()` remain public only for Phase-1a
+  import compatibility. The v2 report does not call them; remove them after the
+  compatibility window once downstream imports have migrated to the Claude-cycle
+  report fields.
 - SiO and CrO₂ carry reaction-class condensation enthalpies, not simple latents;
   until a condenser-side enthalpy source lands they route to `excluded_species`
   (fail-closed), so SiO-heavy runs will report the train as not closing. They are

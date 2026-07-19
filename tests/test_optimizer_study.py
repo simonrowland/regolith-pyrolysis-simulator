@@ -38,6 +38,7 @@ from simulator.cost_parameters import default_cost_parameters_block
 from simulator.optimize import cli as optimizer_cli
 from simulator.optimize import physics as physics_module
 from simulator.optimize import study
+from simulator.optimize.doe import SCIPY_SOBOL_SAMPLER, sample_recipe_candidates
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
 from simulator.optimize.evaluate import evaluate
@@ -51,7 +52,13 @@ from simulator.optimize.objective import (
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.physics import physics_constraints_digest
 from simulator.optimize.profiles import constrained_max_profile, physics_constraints_from_profile
-from simulator.optimize.recipe import RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    C5_ALLOW_MRE_VOLTAGE_CAP_PATH,
+    RecipePatch,
+    RecipeSchema,
+    conditional_context_from_metadata,
+    conditional_context_metadata,
+)
 from simulator.optimize.results_store import ResultStore
 from simulator.optimize.save_bundle import ALLOWED_MEMBERS, export_study_bundle
 from simulator.optimize.strategy import (
@@ -1594,6 +1601,13 @@ class _Sso2AbsenceLedger:
         if account is None:
             return {key: dict(value) for key, value in balances.items()}
         return dict(balances.get(account, {}))
+
+    def project_account_kg(self, account: str) -> dict[str, float]:
+        return {
+            species: float(kg)
+            for species, kg in self.kg_by_account(account).items()
+            if float(kg) > 0.0
+        }
 
 
 class _Sso2AbsenceSim:
@@ -3792,10 +3806,16 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
             status="ok",
             product_summary={
                 "campaigns_to_resinter": "resinter_threshold_kg / 100",
+                "aggregate_campaigns_to_resinter": "resinter_threshold_kg / 200",
                 "wall_deposit_kg_by_segment_species": {
                     "stage_1_to_stage_2": {"SiO": 100.0}
                 },
                 "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 100.0}},
+                "wall_deposit_remobilization_by_segment_species": {
+                    "stage_1_to_stage_2": {"SiO": {"remobilized_kg": 100.0}}
+                },
+                "wall_deposit_cumulative_total_kg": 100.0,
+                "wall_deposit_cumulative_kg_by_species": {"SiO": 100.0},
             },
             trace={
                 "backend_status": "diagnostic_stub",
@@ -3811,10 +3831,20 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
                     },
                     "tap_coating_product_summary": {
                         "campaigns_to_resinter": "resinter_threshold_kg / 0.001",
+                        "aggregate_campaigns_to_resinter": (
+                            "resinter_threshold_kg / 0.002"
+                        ),
                         "wall_deposit_kg_by_segment_species": {
                             "stage_1_to_stage_2": {"SiO": 0.001}
                         },
                         "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 0.001}},
+                        "wall_deposit_remobilization_by_segment_species": {
+                            "stage_1_to_stage_2": {
+                                "SiO": {"remobilized_kg": 0.001}
+                            }
+                        },
+                        "wall_deposit_cumulative_total_kg": 0.001,
+                        "wall_deposit_cumulative_kg_by_species": {"SiO": 0.001},
                     },
                 },
             },
@@ -3827,11 +3857,23 @@ def test_tap_truncated_leaderboard_uses_tap_hour_coating_summary(tmp_path) -> No
         cache_hit=False,
     )
     assert record.product_summary["campaigns_to_resinter"] == "resinter_threshold_kg / 0.001"
+    assert record.product_summary["aggregate_campaigns_to_resinter"] == (
+        "resinter_threshold_kg / 0.002"
+    )
     assert record.product_summary["wall_deposit_kg_by_segment_species"] == {
         "stage_1_to_stage_2": {"SiO": 0.001}
     }
     assert record.product_summary["wall_deposit_kg_by_zone_species"] == {
         "Hot": {"SiO": 0.001}
+    }
+    assert record.product_summary[
+        "wall_deposit_remobilization_by_segment_species"
+    ] == {"stage_1_to_stage_2": {"SiO": {"remobilized_kg": 0.001}}}
+    assert record.product_summary["wall_deposit_cumulative_total_kg"] == pytest.approx(
+        0.001
+    )
+    assert record.product_summary["wall_deposit_cumulative_kg_by_species"] == {
+        "SiO": 0.001
     }
 
     study._write_leaderboard(
@@ -3893,10 +3935,13 @@ def test_tap_truncated_partial_coating_projection_fails_loud() -> None:
             status="ok",
             product_summary={
                 "campaigns_to_resinter": "resinter_threshold_kg / 100",
+                "aggregate_campaigns_to_resinter": "resinter_threshold_kg / 200",
                 "wall_deposit_kg_by_segment_species": {
                     "stage_1_to_stage_2": {"SiO": 100.0}
                 },
                 "wall_deposit_kg_by_zone_species": {"Hot": {"SiO": 100.0}},
+                "wall_deposit_cumulative_total_kg": 100.0,
+                "wall_deposit_cumulative_kg_by_species": {"SiO": 100.0},
             },
             trace={
                 "backend_status": "diagnostic_stub",
@@ -3913,12 +3958,19 @@ def test_tap_truncated_partial_coating_projection_fails_loud() -> None:
         ),
     )
 
-    with pytest.raises(study.StudyAbort, match="wall_deposit_kg_by_segment_species"):
+    with pytest.raises(study.StudyAbort) as exc_info:
         study._to_record(
             study.Candidate(id="tap-partial", patch=RecipePatch({})),
             scored,
             cache_hit=False,
         )
+    message = str(exc_info.value)
+    for field in (
+        "aggregate_campaigns_to_resinter",
+        "wall_deposit_cumulative_total_kg",
+        "wall_deposit_cumulative_kg_by_species",
+    ):
+        assert field in message
 
 
 def test_backend_status_field_survives_strip_and_store_for_real_backend(tmp_path) -> None:
@@ -4172,7 +4224,7 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
 
     # v4 2026-07-12: bumped when t-005 wired the body-aware sub-ambient pumping
     # hard gate; pre-wiring cached feasibility verdicts must not be served.
-    assert current_version == "physics-feasibility-v4-subambient-pumping"
+    assert current_version == "physics-feasibility-v5-continuous-transport"
     assert old_digest != new_digest
     assert old_cache_key != new_cache_key
     assert old_recipe_id == new_recipe_id
@@ -5835,6 +5887,11 @@ def test_two_phase_disabled_matches_single_pass_output(tmp_path) -> None:
     assert not (disabled / "two_phase_certification.json").exists()
 
 
+def test_two_phase_override_rejects_string_false() -> None:
+    with pytest.raises(study.StudyError, match="enabled must be a bool"):
+        study._resolve_two_phase_config({}, {"enabled": "false"})
+
+
 def test_two_phase_certification_records_parallel_for_adaptive_strategy(tmp_path) -> None:
     out = tmp_path / "adaptive-two-phase"
     study.run(
@@ -5874,3 +5931,108 @@ def _contains_key(value: Any, key: str) -> bool:
     if is_dataclass(value) and not isinstance(value, type):
         return any(_contains_key(getattr(value, field.name), key) for field in fields(value))
     return False
+def test_t155_tpe_and_nsga2_defer_scale_and_guard_metadata() -> None:
+    """Both Optuna strategies share this intentionally legacy-linear suggester."""
+    from simulator.optimize.recipe import GuardSpec, KnobSpec
+    from simulator.optimize.strategy.bayesian import _suggest_value
+
+    calls: list[tuple[str, float, float, bool]] = []
+
+    class Trial:
+        def suggest_float(self, name, low, high, *, log):
+            calls.append((name, low, high, log))
+            return (low + high) / 2.0
+
+    spec = KnobSpec(
+        path=("deferred",),
+        kind="float",
+        low=1.0,
+        high=100.0,
+        scale="log",
+        guard=GuardSpec(parent_paths=(("parent",),), canonicalizer_id="test"),
+    )
+    assert _suggest_value(Trial(), spec) == pytest.approx(50.5)
+    assert calls == [("deferred", 1.0, 100.0, False)]
+
+
+def test_t155_search_provenance_round_trips_conditional_context() -> None:
+    from simulator.optimize.recipe import (
+        c5_sampler_context,
+        conditional_context_from_metadata,
+        conditional_context_metadata,
+    )
+
+    context = c5_sampler_context(RecipeSchema(), active=False)
+    candidate = Candidate(
+        id="conditional-off",
+        patch=RecipePatch({}),
+        metadata={
+            "strategy": "random",
+            "proposal_source": "sobol",
+            **conditional_context_metadata(context),
+        },
+    )
+    provenance = study._search_provenance_from_candidate(candidate)
+    json.dumps(dict(provenance))
+    assert conditional_context_from_metadata(provenance) == context
+
+
+def test_t155_two_stream_sampler_evaluate_evalspec_study_identity_matrix() -> None:
+    schema = RecipeSchema()
+    sampled_streams = sample_recipe_candidates(
+        schema,
+        n_samples=2,
+        seed=19,
+        sampler_name=SCIPY_SOBOL_SAMPLER,
+    )
+
+    for index, (stream, sampled) in enumerate(
+        zip(("no-mre", "mre-on"), sampled_streams, strict=True)
+    ):
+        context = sampled.conditional_context
+        scored = evaluate(
+            sampled.patch,
+            FEEDSTOCK,
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            profile=PROFILE,
+            candidate_id=f"conditional-{index}",
+            executor=_StudyFakeExecutor(
+                exc=CampaignPressureSetpointRefusal(
+                    {"status": "refused", "detail": "matrix sentinel"}
+                )
+            ),
+            schema=schema,
+            conditional_context=context,
+        )
+        assert scored.eval_spec is not None
+        candidate = Candidate(
+            id=f"conditional-{index}",
+            patch=sampled.patch,
+            metadata={
+                "strategy": "random",
+                "proposal_source": "sobol",
+                **conditional_context_metadata(context),
+            },
+        )
+        record = study._to_record(candidate, scored, cache_hit=False)
+
+        expected_active = stream == "mre-on"
+        assert dict(sampled.conditional_mask) == {
+            "mre-cap-v1": "active" if expected_active else "inactive"
+        }
+        assert (
+            C5_ALLOW_MRE_VOLTAGE_CAP_PATH in sampled.patch.values
+        ) is expected_active
+        assert dict(sampled.effective_pins) == (
+            {} if expected_active else {C5_ALLOW_MRE_VOLTAGE_CAP_PATH: 0.0}
+        )
+        assert scored.eval_spec.conditional_subspace_digest == (
+            sampled.conditional_subspace_digest
+        )
+        assert scored.eval_spec.c5_enabled is expected_active
+        assert (scored.eval_spec.mre_max_voltage_V > 0.0) is expected_active
+        assert record.patch.canonical_json() == sampled.patch.canonical_json()
+        assert record.eval_spec == scored.eval_spec
+        assert record.cache_key == cache_key(scored.eval_spec)
+        assert record.eval_spec.recipe_id == scored.eval_spec.recipe_id
+        assert conditional_context_from_metadata(record.search_provenance) == context

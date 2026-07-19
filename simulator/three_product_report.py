@@ -271,7 +271,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     mixed_melt_residual_kg = 0.0
     if early_tap_mode and hasattr(sim, 'atom_ledger'):
         try:
-            cleaned_melt = sim.atom_ledger.kg_by_account(
+            cleaned_melt = sim.atom_ledger.project_account_kg(
                 'process.cleaned_melt'
             )
             mixed_melt_residual_kg = float(
@@ -429,13 +429,13 @@ def _ledger_species_kg(
     exclude_species: set[str] | None = None,
 ) -> dict[str, float]:
     ledger = getattr(sim, 'atom_ledger', None)
-    kg_by_account = getattr(ledger, 'kg_by_account', None)
-    if not callable(kg_by_account):
+    project_account_kg = getattr(ledger, 'project_account_kg', None)
+    if not callable(project_account_kg):
         return {}
     excluded = exclude_species or set()
     values: dict[str, float] = {}
     for account in accounts:
-        raw = kg_by_account(account)
+        raw = project_account_kg(account)
         if not isinstance(raw, Mapping):
             continue
         for species, kg in raw.items():

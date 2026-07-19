@@ -2801,11 +2801,25 @@ def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic(
     assert result.objectives is not None
     assert result.failing_gates == ()
     coating = result.feasibility_margins["coating"]
-    assert coating.observed == math.inf
-    assert "runner wall-fouling" in coating.detail
+    # Fail-closed contract (wave-0 fix): an unqualified/null resinter threshold
+    # no longer reports an infinite lifespan; the gate binds in
+    # no_unqualified_deposition mode and observed is the (zero) unqualified
+    # deposition, not math.inf. The sourcing claim of this test is unchanged:
+    # the gate must consume the runner wall-fouling report, not the removed
+    # delta heuristic.
+    assert coating.observed == 0.0
+    assert coating.status_payload["coating_constraint_mode"] == (
+        "no_unqualified_deposition"
+    )
+    assert coating.status_payload["coating_constraint_authoritative"] is True
+    # Sourcing proof: the delta heuristic was deleted from the trace above, so
+    # the per-campaign deposition rate in the payload can only have come from
+    # the runner wall-fouling report.
+    assert coating.status_payload["wall_deposit_kg_per_campaign"] == 0.0
+    assert "deposit_rate=0 kg/campaign" in coating.detail
 
 
-def test_runner_wall_fouling_report_binds_optimizer_candidate(
+def test_runner_wall_fouling_report_emits_continuous_optimizer_margin(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import simulator.runner as runner_module
@@ -2815,6 +2829,7 @@ def test_runner_wall_fouling_report_binds_optimizer_candidate(
         "_wall_fouling_report",
         lambda *_args, **_kwargs: {
             "campaigns_to_resinter": 9.0,
+            "aggregate_campaigns_to_resinter": 12.0,
             "resinter_threshold_kg": 4.5,
             "wall_deposit_kg_per_campaign": 0.5,
             "authoritative_for_resinter": True,
@@ -2840,10 +2855,13 @@ def test_runner_wall_fouling_report_binds_optimizer_candidate(
         executor=FakeExecutor(_execution()),
     )
 
-    assert not result.feasible
-    assert result.failing_gates == ("coating",)
+    assert result.feasible
+    assert result.failing_gates == ()
     coating = result.feasibility_margins["coating"]
+    assert coating.margin < 0.0
     assert coating.observed == pytest.approx(9.0)
+    assert coating.status_payload["campaigns_to_resinter_worst_segment"] == pytest.approx(9.0)
+    assert coating.status_payload["campaigns_to_resinter_total"] == pytest.approx(12.0)
     assert coating.status_payload["resinter_threshold_kg"] == pytest.approx(4.5)
     assert coating.status_payload["wall_deposit_kg_per_campaign"] == pytest.approx(0.5)
     assert coating.status_payload["sticking_alpha_authority"] == {
@@ -2872,7 +2890,7 @@ def test_inactive_coating_gate_does_not_construct_runner_overlay(
     assert result.feasible
 
 
-def test_parametric_runner_fouling_report_has_coherent_non_authority(
+def test_parametric_runner_fouling_report_binds_no_unqualified_deposition(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import simulator.runner as runner_module
@@ -2891,6 +2909,7 @@ def test_parametric_runner_fouling_report_has_coherent_non_authority(
             "status_reason": "",
             "nominal_verdict": "slow-fouling",
             "verdict": "slow-fouling",
+            "wall_deposit_kg_per_campaign": 0.5,
         },
     )
     profile = {
@@ -2906,6 +2925,11 @@ def test_parametric_runner_fouling_report_has_coherent_non_authority(
         executor=FakeExecutor(_execution()),
     )
 
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
+    coating = result.feasibility_margins["coating"]
+    assert not coating.feasible
+    assert coating.authoritative
     report = result.feasibility_margins["coating"].status_payload
     assert report["campaigns_to_resinter"] == "resinter_threshold_kg / 0.5"
     assert report["resinter_threshold_basis"] == "parameter required"
@@ -2916,6 +2940,8 @@ def test_parametric_runner_fouling_report_has_coherent_non_authority(
     assert report["status"] == "warning"
     assert report["verdict"] == "non-authoritative"
     assert report["nominal_verdict"] == "slow-fouling"
+    assert report["coating_constraint_mode"] == "no_unqualified_deposition"
+    assert report["coating_constraint_authoritative"] is True
 
 
 def test_knudsen_snapshot_replacement_preserves_coating_overlay() -> None:
@@ -3372,7 +3398,22 @@ def test_real_backend_out_of_domain_subsolidus_rump_terminal_is_scored_success()
     assert trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
 
 
-def test_out_of_domain_earned_rump_terminal_composition_target_scores_success() -> None:
+def test_out_of_domain_earned_rump_terminal_composition_target_scores_success(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.runner as runner_module
+
+    monkeypatch.setattr(
+        runner_module,
+        "_wall_liner_resinter_config",
+        lambda: {
+            "liner_material": "test_liner",
+            "resinter_threshold_kg": 100.0,
+            "resinter_threshold_basis": "test_finite_capacity",
+            "fast_fouling_campaign_threshold": 10,
+        },
+    )
+
     class NoTerminalSlagLedger:
         def mol_by_account(self, account: str | None = None):
             balances = {"process.cleaned_melt": {"CaO": 1.0}}

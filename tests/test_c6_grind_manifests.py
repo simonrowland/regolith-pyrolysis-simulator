@@ -64,19 +64,22 @@ def _feedstock_sets() -> tuple[set[str], set[str], set[str], set[str], set[str]]
 
 @pytest.fixture(scope="module")
 def moon_manifest() -> dict:
-    assert MOON_MANIFEST.is_file(), f"missing {MOON_MANIFEST}"
+    if not MOON_MANIFEST.is_file():
+        pytest.skip(f"requires private C6 grind manifest: {MOON_MANIFEST}")
     return _load_manifest(MOON_MANIFEST)
 
 
 @pytest.fixture(scope="module")
 def mars_manifest() -> dict:
-    assert MARS_MANIFEST.is_file(), f"missing {MARS_MANIFEST}"
+    if not MARS_MANIFEST.is_file():
+        pytest.skip(f"requires private C6 grind manifest: {MARS_MANIFEST}")
     return _load_manifest(MARS_MANIFEST)
 
 
 @pytest.fixture(scope="module")
 def stype_manifest() -> dict:
-    assert STYPE_MANIFEST.is_file(), f"missing {STYPE_MANIFEST}"
+    if not STYPE_MANIFEST.is_file():
+        pytest.skip(f"requires private C6 grind manifest: {STYPE_MANIFEST}")
     return _load_manifest(STYPE_MANIFEST)
 
 
@@ -165,6 +168,10 @@ def test_stype_manifest_schema_and_profiles(stype_manifest: dict) -> None:
         assert profile_path.is_file(), f"missing profile for {job['id']}: {profile_path}"
 
 
+@pytest.mark.skipif(
+    not LAUNCH_SCRIPT.is_file(),
+    reason="requires private C6 grind launcher",
+)
 def test_launch_studio2_defaults_to_stype_manifest() -> None:
     text = LAUNCH_SCRIPT.read_text(encoding="utf-8")
     assert "manifest-c6-stype-studio2.json" in text
@@ -181,13 +188,15 @@ def test_pc_glass_retain_excluded(moon_manifest: dict, mars_manifest: dict) -> N
 def test_c6_manifest_feedstocks_have_stage0_route_coverage() -> None:
     feedstocks = load_config_bundle().feedstocks
     manifest_paths = sorted(GRIND_DIR.glob("manifest-c6-*.json"))
-    assert {path.name for path in manifest_paths} >= {
+    required_manifest_names = {
         "manifest-c6-kreep-studio3.json",
         "manifest-c6-mare-studio1.json",
         "manifest-c6-mars-stype-studio2.json",
         "manifest-c6-moon-studio1.json",
         "manifest-c6-stype-studio2.json",
     }
+    if not required_manifest_names <= {path.name for path in manifest_paths}:
+        pytest.skip("requires complete private C6 grind manifest set")
 
     violations = {
         path.name: grind_feedstock_stage0_route_coverage_violations(
@@ -212,6 +221,8 @@ def test_epoch_grind_dry_run_materializes_safe_manifest_feedstocks(
     manifest_path: Path,
     feedstock: str,
 ) -> None:
+    if not manifest_path.is_file():
+        pytest.skip(f"requires private C6 grind manifest: {manifest_path}")
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         base_cache = tmp_path / "base.sqlite"
@@ -248,6 +259,10 @@ def test_epoch_grind_dry_run_materializes_safe_manifest_feedstocks(
         )
 
 
+@pytest.mark.skipif(
+    not STYPE_MANIFEST.is_file(),
+    reason="requires private C6 stype manifest",
+)
 def test_epoch_grind_dry_run_materializes_commands_for_stype_manifest() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)

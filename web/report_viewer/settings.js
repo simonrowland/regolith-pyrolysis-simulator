@@ -28,7 +28,7 @@ function costBlock(cost) {
   return `<div class="cards">
     <div class="card"><div class="ct">Owner energy price · electrical</div><div class="cbig">${displayNumber(cost.electrical_cost_per_kWh, "USD/kWh")}</div></div>
     <div class="card"><div class="ct">Owner energy price · solar heat</div><div class="cbig">${displayNumber(cost.solar_heat_cost_per_kWh, "USD/kWh")}</div></div>
-  </div>${cost._provenance == null ? "" : `<div class="note">Price provenance: ${esc(cost._provenance)}</div>`}`;
+  </div>${cost.provenance == null ? "" : `<div class="note">Price provenance: ${esc(cost.provenance)}</div>`}`;
 }
 
 function configEntries(config) {

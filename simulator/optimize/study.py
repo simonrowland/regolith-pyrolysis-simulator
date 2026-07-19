@@ -45,6 +45,7 @@ from simulator.optimize.evaluate import (
     RunReference,
     ScoredResult,
     _build_eval_inputs,
+    _build_prefix_eval_inputs,
     _is_stale_profile_refusal,
     _stale_profile_result,
     evaluate,
@@ -88,6 +89,8 @@ from simulator.optimize.recipe import (
     RecipeValidationError,
     allowlist_version,
     recipe_schema_version,
+    conditional_context_from_metadata,
+    c5_sampler_context,
 )
 from simulator.optimize.result_scope import result_scope_json, result_scope_payload
 from simulator.optimize.save_bundle import MEMBER_SCHEMA_VERSION, SAVE_SCHEMA_VERSION
@@ -117,6 +120,7 @@ from simulator.optimize.strategy.staged import (
     StagedReplayViolation,
     StagedStrategy,
     TopologyChoice,
+    authoritative_prefix_stage_ids,
     assert_prefix_replay_equal,
     enumerate_topologies,
     make_prefix_eval_spec,
@@ -157,8 +161,10 @@ _SSO2_OBJECTIVE_TRACE_KEY = "sso2_objective_evidence"
 _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
     {
         "campaigns_to_resinter",
+        "aggregate_campaigns_to_resinter",
         "wall_deposit_kg_by_segment_species",
         "wall_deposit_kg_by_zone_species",
+        "wall_deposit_remobilization_by_segment_species",
         "wall_deposit_kg",
         "fouling_rate",
         "coating_status",
@@ -170,6 +176,8 @@ _TAP_COATING_PRODUCT_SUMMARY_FIELDS = frozenset(
         "furnace_lifespan_consumed_fraction",
         "wall_deposit_total_kg",
         "wall_deposit_kg_by_species",
+        "wall_deposit_cumulative_total_kg",
+        "wall_deposit_cumulative_kg_by_species",
         "wall_deposit_sticking_authority",
     }
 )
@@ -395,6 +403,7 @@ class StudyResult:
     winner: StudyRecord | None = None
     status: str = COMPLETED_STATUS
     reason: str = COMPLETED_STATUS
+    prefix_evals_run: int = 0
     winner_selection_rule: str = WINNER_SELECTION_RULE
 
     def __post_init__(self) -> None:
@@ -637,6 +646,7 @@ def run(
     events_path = out / STUDY_EVENTS_NAME
     strategy_state_path = out / STRATEGY_STATE_NAME
     evaluated = 0
+    prefix_evals_run = 0
     topology_cursor = 0
     batch_seq = 0
     ask_seq_by_id: dict[str, int] = {}
@@ -757,7 +767,7 @@ def run(
                     strategy=active_strategy,
                     staged_strategies=staged_strategies,
                 )
-            results = _evaluate_candidates(
+            results, prefix_evals_in_batch = _evaluate_candidates(
                 candidates,
                 profile=loop_profile,
                 feedstock=config.feedstock,
@@ -772,6 +782,8 @@ def run(
                 prefix_replay_cache=prefix_replay_cache,
                 per_eval_timeout_seconds=config.per_eval_timeout_seconds,
             )
+            # Owner decision deferred: debit config.budget here if prefix evals join it.
+            prefix_evals_run += prefix_evals_in_batch
             tell_batch: list[tuple[Candidate, ScoredResult]] = []
             for candidate, scored, cache_hit in results:
                 _assert_honest_result(scored, definitions)
@@ -851,6 +863,7 @@ def run(
             sampler_name=_resolved_strategy_sampler(active_strategy),
             constraints=active_constraints,
             write_store=store,
+            prefix_evals_run=prefix_evals_run,
         )
         raise
 
@@ -877,6 +890,7 @@ def run(
             config=config,
             constraints=active_constraints,
             write_store=store,
+            prefix_evals_run=prefix_evals_run,
         )
         raise StudyNoFeasibleError("no candidates were evaluated")
     if records and non_finite_count == len(records):
@@ -890,6 +904,7 @@ def run(
             config=config,
             constraints=active_constraints,
             write_store=store,
+            prefix_evals_run=prefix_evals_run,
         )
         raise StudyNoFeasibleError(
             "all candidates failed with non_finite_payload; "
@@ -907,6 +922,7 @@ def run(
                 config=config,
                 constraints=active_constraints,
                 write_store=store,
+                prefix_evals_run=prefix_evals_run,
             )
             raise StudyNoFeasibleError(
                 "no feasible candidates due to config/runtime failure; "
@@ -935,6 +951,7 @@ def run(
             sampler_name=_resolved_strategy_sampler(active_strategy),
             study_status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
             write_store=store,
+            prefix_evals_run=prefix_evals_run,
         )
         artifacts["provenance"] = provenance_path
         artifacts["store"] = store.path
@@ -948,6 +965,7 @@ def run(
             winner=None,
             status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
             reason=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
+            prefix_evals_run=prefix_evals_run,
         )
 
     result_status = COMPLETED_STATUS
@@ -1016,6 +1034,7 @@ def run(
         sampler_name=_resolved_strategy_sampler(active_strategy),
         study_status=result_status,
         write_store=store,
+        prefix_evals_run=prefix_evals_run,
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
@@ -1039,6 +1058,7 @@ def run(
         winner=winner,
         status=result_status,
         reason=result_reason,
+        prefix_evals_run=prefix_evals_run,
     )
 
 
@@ -1233,8 +1253,11 @@ def _resolve_two_phase_config(
         if isinstance(override, bool):
             return TwoPhaseConfig(enabled=override)
         if isinstance(override, Mapping):
+            enabled = override.get("enabled", True)
+            if not isinstance(enabled, bool):
+                raise StudyError("two_phase_certify.enabled must be a bool")
             return TwoPhaseConfig(
-                enabled=bool(override.get("enabled", True)),
+                enabled=enabled,
                 top_k=int(override.get("top_k", DEFAULT_TWO_PHASE_TOP_K)),
                 disagreement_threshold=(
                     float(override["disagreement_threshold"])
@@ -1248,8 +1271,11 @@ def _resolve_two_phase_config(
         return TwoPhaseConfig(enabled=False)
     if not isinstance(block, Mapping):
         raise StudyError("two_phase_certify must be a mapping when present in profile")
+    enabled = block.get("enabled", False)
+    if not isinstance(enabled, bool):
+        raise StudyError("two_phase_certify.enabled must be a bool")
     return TwoPhaseConfig(
-        enabled=bool(block.get("enabled", False)),
+        enabled=enabled,
         top_k=int(block.get("top_k", DEFAULT_TWO_PHASE_TOP_K)),
         disagreement_threshold=(
             float(block["disagreement_threshold"])
@@ -2481,7 +2507,7 @@ def _run_exact_certification(
 
     for explore_record in certification_pool:
         candidate = _certification_candidate_from_record(explore_record)
-        results = _evaluate_candidates(
+        results, _ = _evaluate_candidates(
             [candidate],
             profile=profile,
             feedstock=feedstock,
@@ -2655,6 +2681,10 @@ def _search_space_identity(
     profile_pinned_paths: Sequence[str],
     cli_pinned_paths: Sequence[str],
 ) -> Mapping[str, Any]:
+    conditional_digests = [
+        c5_sampler_context(schema, active=active).conditional_subspace_digest
+        for active in (False, True)
+    ]
     return MappingProxyType(
         {
             "recipe_schema_version": schema.recipe_schema_version,
@@ -2666,6 +2696,8 @@ def _search_space_identity(
                 ".".join(path) for path in getattr(schema, "pinned_paths", ())
             ],
             "search_knob_paths": [".".join(spec.path) for spec in schema.search_allowlist],
+            "conditional_allocation_version": "optimizer-conditional-subspace-v1",
+            "conditional_subspace_digests": conditional_digests,
         }
     )
 
@@ -3086,6 +3118,7 @@ def _store_warm_start_seeds(
                 profile,
                 schema,
                 constraints=constraints,
+                conditional_context=_full_conditional_context_from_metadata(provenance),
             )
         except ProfileValidationError as exc:
             if _is_stale_profile_refusal(exc):
@@ -3242,10 +3275,11 @@ def _evaluate_candidates(
     prefix_replay_cache: dict[str, ScoredResult],
     skip_store_lookup: bool = False,
     per_eval_timeout_seconds: float | None = None,
-) -> tuple[tuple[Candidate, ScoredResult, bool], ...]:
+) -> tuple[tuple[tuple[Candidate, ScoredResult, bool], ...], int]:
     results: list[tuple[Candidate, ScoredResult, bool] | None] = [None] * len(candidates)
     misses: list[tuple[int, Candidate]] = []
     staged_prefixes: dict[str, ScoredResult] = {}
+    prefix_evals_run = 0
     for index, candidate in enumerate(candidates):
         cached = None
         if not skip_store_lookup:
@@ -3259,7 +3293,7 @@ def _evaluate_candidates(
                 constraints,
             )
         if cached is None:
-            prefix = _ensure_staged_prefix_replay(
+            prefix, prefix_eval_ran = _ensure_staged_prefix_replay(
                 candidate,
                 profile=profile,
                 feedstock=feedstock,
@@ -3273,6 +3307,7 @@ def _evaluate_candidates(
                 prefix_replay_cache=prefix_replay_cache,
                 per_eval_timeout_seconds=per_eval_timeout_seconds,
             )
+            prefix_evals_run += int(prefix_eval_ran)
             if prefix is not None:
                 if prefix.eval_spec is None:
                     results[index] = (
@@ -3291,7 +3326,10 @@ def _evaluate_candidates(
         requests: list[PoolEvaluationRequest] = []
         for _, candidate in misses:
             call_patch = candidate.patch
+            conditional_context = _full_evaluation_conditional_context(candidate)
             evaluator_kwargs: dict[str, Any] = {}
+            if conditional_context is not None:
+                evaluator_kwargs["conditional_context"] = conditional_context
             staged_prefix = staged_prefixes.get(candidate.id)
             if staged_prefix is not None:
                 stage_patch = _stage_patch_from_metadata(candidate, schema)
@@ -3346,6 +3384,9 @@ def _evaluate_candidates(
                         profile,
                         schema,
                         constraints=constraints,
+                        conditional_context=_full_evaluation_conditional_context(
+                            candidate
+                        ),
                     )
                 except ProfileValidationError as exc:
                     if _is_stale_profile_refusal(exc):
@@ -3359,7 +3400,7 @@ def _evaluate_candidates(
     completed = tuple(result for result in results if result is not None)
     if len(completed) != len(candidates):
         raise RuntimeError("study evaluation ended without all candidate results")
-    return completed
+    return completed, prefix_evals_run
 
 
 def _ensure_staged_prefix_replay(
@@ -3376,30 +3417,72 @@ def _ensure_staged_prefix_replay(
     definitions: Sequence[ObjectiveDefinition],
     prefix_replay_cache: dict[str, ScoredResult],
     per_eval_timeout_seconds: float | None,
-) -> ScoredResult | None:
+) -> tuple[ScoredResult | None, bool]:
     if not _is_staged_candidate(candidate):
-        return None
+        return None, False
     prefix_depth = candidate.metadata.get("prefix_depth", 0)
     if not isinstance(prefix_depth, int):
         raise StagedBeamStateError("staged prefix_depth metadata must be an int")
     if prefix_depth <= 0:
-        return None
+        return None, False
 
-    prefix_patch = _prefix_patch_from_metadata(candidate, schema)
-    base_spec, _ = _build_eval_inputs(
-        prefix_patch,
-        feedstock,
-        fidelity,
-        profile,
+    prefix_stage_ids = _string_tuple_metadata(candidate, "prefix_stage_ids")
+    stage_index = candidate.metadata.get("stage_index")
+    if (
+        isinstance(stage_index, bool)
+        or not isinstance(stage_index, int)
+        or stage_index != prefix_depth
+    ):
+        raise StagedBeamStateError(
+            "staged prefix_depth does not match candidate stage_index"
+        )
+    authoritative_prefix = authoritative_prefix_stage_ids(
         schema,
-        constraints=constraints,
+        profile,
+        _topology_id_metadata(candidate),
+        prefix_depth,
     )
-    prefix_spec = make_prefix_eval_spec(
-        base_spec,
-        prefix_stage_ids=_string_tuple_metadata(candidate, "prefix_stage_ids"),
-        prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
-        topology_id=_topology_id_metadata(candidate),
-    )
+    if prefix_stage_ids != authoritative_prefix:
+        raise StagedBeamStateError(
+            "staged prefix stage IDs do not match the authoritative topology stage table"
+        )
+    prefix_patch = _prefix_patch_from_metadata(candidate, schema)
+    context = conditional_context_from_metadata(candidate.metadata)
+    if context is not None and context.scope == "prefix-before-guard-stage":
+        context = c5_sampler_context(
+            schema,
+            active=True,
+            scope="prefix-before-guard-stage",
+            prefix_stage_ids=prefix_stage_ids,
+        )
+        prefix_spec, _ = _build_prefix_eval_inputs(
+            prefix_patch,
+            feedstock,
+            fidelity,
+            profile,
+            schema,
+            prefix_stage_ids=prefix_stage_ids,
+            prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
+            topology_id=_topology_id_metadata(candidate),
+            constraints=constraints,
+            conditional_context=context,
+        )
+    else:
+        base_spec, _ = _build_eval_inputs(
+            prefix_patch,
+            feedstock,
+            fidelity,
+            profile,
+            schema,
+            constraints=constraints,
+            conditional_context=context,
+        )
+        prefix_spec = make_prefix_eval_spec(
+            base_spec,
+            prefix_stage_ids=prefix_stage_ids,
+            prefix_recipe_ids=_string_tuple_metadata(candidate, "prefix_recipe_ids"),
+            topology_id=_topology_id_metadata(candidate),
+        )
     if not isinstance(prefix_spec, PrefixEvalSpec):
         raise StagedBeamStateError("staged prefix spec was not a PrefixEvalSpec")
     prefix_key = cache_key(prefix_spec)
@@ -3407,12 +3490,12 @@ def _ensure_staged_prefix_replay(
         cached = store.lookup(prefix_spec)
         if cached is None:
             raise StagedBeamStateError(f"verified staged prefix vanished: {prefix_key}")
-        return cached
+        return cached, False
 
     cached = store.lookup(prefix_spec)
     if cached is not None:
         prefix_replay_cache[prefix_key] = cached
-        return cached
+        return cached, False
 
     fresh = _evaluate_prefix_one(
         candidate,
@@ -3429,7 +3512,7 @@ def _ensure_staged_prefix_replay(
         per_eval_timeout_seconds=per_eval_timeout_seconds,
     )
     if fresh.eval_spec is None:
-        return fresh
+        return fresh, True
     _assert_honest_result(fresh, definitions)
     light_fresh = _strip_heavy_result(fresh)
     # Grind-infra sweep Q2 (completeness): unlike the main/certify sinks, the
@@ -3452,7 +3535,7 @@ def _ensure_staged_prefix_replay(
         raise StagedBeamStateError(f"staged prefix cache write failed: {prefix_key}")
     assert_prefix_replay_equal(cached, light_fresh)
     prefix_replay_cache[prefix_key] = cached
-    return cached
+    return cached, True
 
 
 def _evaluate_prefix_one(
@@ -3560,6 +3643,19 @@ def _is_staged_candidate(candidate: Candidate) -> bool:
     return candidate.metadata.get("strategy") == "staged"
 
 
+def _full_evaluation_conditional_context(
+    candidate: Candidate,
+):
+    return _full_conditional_context_from_metadata(candidate.metadata)
+
+
+def _full_conditional_context_from_metadata(metadata: Mapping[str, Any]):
+    context = conditional_context_from_metadata(metadata)
+    if context is not None and context.scope == "prefix-before-guard-stage":
+        return None
+    return context
+
+
 def _lookup_cached(
     candidate: Candidate,
     profile: Mapping[str, Any],
@@ -3580,6 +3676,7 @@ def _lookup_cached(
             profile,
             schema,
             constraints=constraints,
+            conditional_context=_full_evaluation_conditional_context(candidate),
         )
     except RecipeValidationError:
         return None
@@ -3612,7 +3709,10 @@ def _evaluate_one_supervised(
 ) -> ScoredResult:
     stage_patch = _stage_patch_from_metadata(candidate, schema)
     call_patch = candidate.patch
+    conditional_context = _full_evaluation_conditional_context(candidate)
     evaluator_kwargs: dict[str, Any] = {}
+    if conditional_context is not None:
+        evaluator_kwargs["conditional_context"] = conditional_context
     if staged_prefix is not None:
         if stage_patch is None:
             raise StagedReplayViolation(
@@ -3662,6 +3762,7 @@ def _evaluate_one_supervised(
                 profile,
                 schema,
                 constraints=constraints,
+                conditional_context=conditional_context,
             )
         except ProfileValidationError as exc:
             if _is_stale_profile_refusal(exc):
@@ -3717,6 +3818,7 @@ def _evaluate_one(
             constraints=constraints,
             output_dir=out_dir / "evals" / candidate.id,
             staged_replay=staged_replay,
+            conditional_context=_full_evaluation_conditional_context(candidate),
         )
     except ProfileValidationError as exc:
         if _is_stale_profile_refusal(exc):
@@ -3736,6 +3838,7 @@ def _evaluate_one(
                 profile,
                 schema,
                 constraints=constraints,
+                conditional_context=_full_evaluation_conditional_context(candidate),
             )
         except ProfileValidationError as exc:
             if _is_stale_profile_refusal(exc):
@@ -4020,6 +4123,11 @@ def _search_provenance_from_candidate(candidate: Candidate) -> Mapping[str, Any]
         "parent_cache_key",
         "trial_number",
         "seed_id",
+        "conditional_mask",
+        "conditional_subspace_digest",
+        "effective_pins",
+        "conditional_scope",
+        "conditional_prefix_stage_ids",
     ):
         value = metadata.get(key)
         if value is not None:
@@ -4502,6 +4610,7 @@ def _write_artifacts(
     sampler_name: str | None = None,
     study_status: str | None = None,
     write_store: ResultStore | None = None,
+    prefix_evals_run: int = 0,
 ) -> dict[str, Path]:
     created_at = datetime.now(UTC).isoformat()
     resolved_study_status = study_status or (
@@ -4575,6 +4684,7 @@ def _write_artifacts(
         failure_counts=failure_counts,
         config=config,
         strategy_name=resolved_strategy,
+        prefix_evals_run=prefix_evals_run,
     )
     winner_written = False
     tap_sidecar_written = False
@@ -4637,6 +4747,7 @@ def _write_artifacts(
                     sampler_name=resolved_sampler,
                     search_space_identity=search_space_identity,
                     strategy_config=strategy_config,
+                    prefix_evals_run=prefix_evals_run,
                     # journal replay reconstructs strategy state from the ask/tell
                     # journal alone; a warm_start_from study needs bundled seed
                     # state replay cannot rebuild, so it is not journal-replayable
@@ -4715,6 +4826,7 @@ def _study_summary_payload(
     failure_counts: Mapping[str, int],
     config: StudyConfig | None,
     strategy_name: str,
+    prefix_evals_run: int = 0,
 ) -> Mapping[str, Any]:
     feasible_count = sum(1 for record in leaderboard if record.feasible)
     infeasible_count = sum(int(value) for value in failure_counts.values())
@@ -4739,6 +4851,7 @@ def _study_summary_payload(
         "seed": int(config.seed) if config is not None else 0,
         "budget": budget,
         "evaluated": evaluated,
+        "prefix_evals_run": int(prefix_evals_run),
         "verdict_counts": {
             "feasible": feasible_count,
             "not_attempted": max(budget - evaluated, 0),
@@ -4791,6 +4904,7 @@ def _study_manifest_payload(
     search_space_identity: Mapping[str, Any] | None,
     strategy_config: Mapping[str, Any],
     replayable: bool,
+    prefix_evals_run: int = 0,
 ) -> Mapping[str, Any]:
     return {
         "save_schema_version": SAVE_SCHEMA_VERSION,
@@ -4806,6 +4920,7 @@ def _study_manifest_payload(
         },
         "seed": int(config.seed) if config is not None else 0,
         "budget": int(config.budget) if config is not None else 0,
+        "prefix_evals_run": int(prefix_evals_run),
         "parallel": int(config.parallel) if config is not None else 1,
         "fidelity": fidelity,
         "profile": {
@@ -5306,10 +5421,10 @@ def _round_or_none(value: float | None) -> float | None:
 
 _TAP_TRUNCATION_DURATION_PATHS: Mapping[str, tuple[str, ...]] = MappingProxyType(
     {
-        "C0B": ("campaigns", "C0b_p_cleanup", "duration_h"),
-        "C0b_p_cleanup": ("campaigns", "C0b_p_cleanup", "duration_h"),
-        "C2A": ("campaigns", "C2A_continuous", "duration_h"),
-        "C2A_continuous": ("campaigns", "C2A_continuous", "duration_h"),
+        "C0B": ("campaigns", "C0b_p_cleanup", "duration_hr"),
+        "C0b_p_cleanup": ("campaigns", "C0b_p_cleanup", "duration_hr"),
+        "C2A": ("campaigns", "C2A_continuous", "duration_hr"),
+        "C2A_continuous": ("campaigns", "C2A_continuous", "duration_hr"),
     }
 )
 _UNSUPPORTED_TAP_TRUNCATION_CAMPAIGNS = frozenset(
@@ -5455,6 +5570,7 @@ def _write_aborted_artifacts_from_cache(
     sampler_name: str | None = None,
     constraints: Any = None,
     write_store: ResultStore | None = None,
+    prefix_evals_run: int = 0,
 ) -> bool:
     records = _records_from_cache_sqlite(
         out,
@@ -5508,6 +5624,7 @@ def _write_aborted_artifacts_from_cache(
         sampler_name=sampler_name,
         study_status=ABORTED_STATUS,
         write_store=write_store,
+        prefix_evals_run=prefix_evals_run,
     )
     return True
 
@@ -5596,6 +5713,7 @@ def _write_empty_artifacts(
     config: StudyConfig | None = None,
     constraints: Any = None,
     write_store: ResultStore | None = None,
+    prefix_evals_run: int = 0,
 ) -> None:
     fidelity = str(canonical_backend_name(fidelity))
     schema = RecipeSchema()
@@ -5619,6 +5737,7 @@ def _write_empty_artifacts(
         sampler_name=sampler_name,
         constraints=constraints,
         write_store=write_store,
+        prefix_evals_run=prefix_evals_run,
     ):
         return
 
@@ -5659,6 +5778,7 @@ def _write_empty_artifacts(
                     failure_counts=failure_counts,
                     config=config,
                     strategy_name=strategy_name,
+                    prefix_evals_run=prefix_evals_run,
                 ),
                 indent=2,
                 sort_keys=True,
@@ -5681,6 +5801,7 @@ def _write_empty_artifacts(
                     sampler_name=sampler_name,
                     search_space_identity=None,
                     strategy_config=strategy_config,
+                    prefix_evals_run=prefix_evals_run,
                     replayable=(
                         (out / "study.events.jsonl").is_file()
                         and getattr(config, "warm_start_from", None) is None

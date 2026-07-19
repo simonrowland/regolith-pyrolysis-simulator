@@ -165,10 +165,13 @@ def _build_sim(
     vapor_pressures: Mapping[str, Any],
     *,
     dose_kg: float = 0.0,
+    freeze_gate_curve_cache: dict[tuple, dict[str, Any]] | None = None,
 ) -> PyrolysisSimulator:
     sim = PyrolysisSimulator(None, setpoints, feedstocks, vapor_pressures)
     additives = {DOSE_SPECIES: dose_kg} if dose_kg > 0.0 else {}
     sim.load_batch(FEEDSTOCK, mass_kg=BATCH_KG, additives_kg=additives)
+    if freeze_gate_curve_cache is not None:
+        sim._freeze_gate_shared_curve_cache = freeze_gate_curve_cache
     return sim
 
 
@@ -222,6 +225,8 @@ def calibrate_dose(
     setpoints: Mapping[str, Any] | None = None,
     feedstocks: Mapping[str, Any] | None = None,
     vapor_pressures: Mapping[str, Any] | None = None,
+    *,
+    freeze_gate_curve_cache: dict[tuple, dict[str, Any]] | None = None,
 ) -> DoseCalibration:
     if setpoints is None or feedstocks is None or vapor_pressures is None:
         setpoints, feedstocks, vapor_pressures = _load_data()
@@ -230,6 +235,7 @@ def calibrate_dose(
         feedstocks,
         vapor_pressures,
         dose_kg=1000.0,
+        freeze_gate_curve_cache=freeze_gate_curve_cache,
     )
     base_feo_mol = float(
         sim.atom_ledger.mol_by_account("process.cleaned_melt").get("FeO", 0.0)
@@ -461,6 +467,7 @@ def run_row(
     vapor_pressures: Mapping[str, Any],
     *,
     grid_scope_label: str = "",
+    freeze_gate_curve_cache: dict[tuple, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     dose_kg = float(dose_fraction) * calibration.full_feo_equiv_dose_kg
     sim = _build_sim(
@@ -468,6 +475,7 @@ def run_row(
         feedstocks,
         vapor_pressures,
         dose_kg=dose_kg,
+        freeze_gate_curve_cache=freeze_gate_curve_cache,
     )
     dose_result = _apply_dose(sim, dose_kg=dose_kg)
 
@@ -684,6 +692,8 @@ def run_owner_live_step_probe(
     setpoints: Mapping[str, Any],
     feedstocks: Mapping[str, Any],
     vapor_pressures: Mapping[str, Any],
+    *,
+    freeze_gate_curve_cache: dict[tuple, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     dose_kg = calibration.full_feo_equiv_dose_kg
     owner_patch = _owner_pn2_recipe_patch()
@@ -697,6 +707,7 @@ def run_owner_live_step_probe(
         feedstocks,
         vapor_pressures,
         dose_kg=dose_kg,
+        freeze_gate_curve_cache=freeze_gate_curve_cache,
     )
     _apply_dose(sim, dose_kg=dose_kg)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -817,13 +828,20 @@ def manual_fO2_anchors(
     setpoints: Mapping[str, Any] | None = None,
     feedstocks: Mapping[str, Any] | None = None,
     vapor_pressures: Mapping[str, Any] | None = None,
+    *,
+    freeze_gate_curve_cache: dict[tuple, dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     if setpoints is None or feedstocks is None or vapor_pressures is None:
         setpoints, feedstocks, vapor_pressures = _load_data()
     anchors = []
     for fO2_log in (-9.0, -9.5):
         reference = ANCHOR_REFERENCE_BY_FO2[fO2_log]
-        sim = _build_sim(setpoints, feedstocks, vapor_pressures)
+        sim = _build_sim(
+            setpoints,
+            feedstocks,
+            vapor_pressures,
+            freeze_gate_curve_cache=freeze_gate_curve_cache,
+        )
         sim.melt.temperature_C = 1600.0
         sim.melt.p_total_mbar = 10.0
         sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log
@@ -1191,7 +1209,16 @@ def evaluate_assertions(
 def run_validation_map(*, smoke: bool = False) -> dict[str, Any]:
     warnings.filterwarnings("ignore", category=UserWarning, module="simulator.melt_backend.vaporock")
     setpoints, feedstocks, vapor_pressures = _load_data()
-    calibration = calibrate_dose(setpoints, feedstocks, vapor_pressures)
+    # Each row requires a fresh ledger. Rows with matching engine identity and
+    # quantized composition/P/fO2 reuse curves; dose-distinct partial-melt rows
+    # remain separate, while identical rows retain the MAGEMin performance win.
+    freeze_gate_curve_cache: dict[tuple, dict[str, Any]] = {}
+    calibration = calibrate_dose(
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+        freeze_gate_curve_cache=freeze_gate_curve_cache,
+    )
     scope = grid_scope(smoke)
     grid = smoke_grid() if smoke else full_grid()
     rows = [
@@ -1204,15 +1231,22 @@ def run_validation_map(*, smoke: bool = False) -> dict[str, Any]:
             feedstocks,
             vapor_pressures,
             grid_scope_label=scope,
+            freeze_gate_curve_cache=freeze_gate_curve_cache,
         )
         for T, gas, dose in grid
     ]
-    anchors = manual_fO2_anchors(setpoints, feedstocks, vapor_pressures)
+    anchors = manual_fO2_anchors(
+        setpoints,
+        feedstocks,
+        vapor_pressures,
+        freeze_gate_curve_cache=freeze_gate_curve_cache,
+    )
     live_owner_probe = run_owner_live_step_probe(
         calibration,
         setpoints,
         feedstocks,
         vapor_pressures,
+        freeze_gate_curve_cache=freeze_gate_curve_cache,
     )
     assertions = evaluate_assertions(
         rows,

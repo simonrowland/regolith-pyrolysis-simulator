@@ -224,7 +224,10 @@ def _campaigns_total_from_artifact(
     report = _find_fouling_report(artifact.result_document)
     if report is not None:
         return CampaignsToResinterTotal(
-            value=report.get("campaigns_to_resinter", "infinite"),
+            value=report.get(
+                "aggregate_campaigns_to_resinter",
+                report.get("campaigns_to_resinter", "infinite"),
+            ),
             authoritative_for_resinter=_authoritative_for_resinter(snapshot),
         )
     return campaigns_to_resinter_total(

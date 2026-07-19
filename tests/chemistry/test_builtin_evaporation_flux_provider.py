@@ -99,7 +99,7 @@ def _series_resistance_reference_flux(
         assert M_g_mol is not None, species
         M_kg_mol = M_g_mol / 1000.0
         stoich = sim._evaporation_stoich(species, sp_data)
-        P_ambient_Pa = sim.overhead.composition.get(species, 0.0) * 100.0
+        P_ambient_Pa = sim._evaporation_bulk_partial_pressure_pa(species)
         alpha = alpha_s(
             species,
             T_K,
@@ -280,7 +280,7 @@ def test_provider_emits_no_ledger_transition():
     assert result.transition is None
 
 
-def test_evaporation_caller_counts_unmeasured_alpha_fallback_engagement(
+def test_evaporation_caller_counts_cro2_mn_alpha_fallback_engagement(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -296,7 +296,7 @@ def test_evaporation_caller_counts_unmeasured_alpha_fallback_engagement(
         status="ok",
         diagnostic={
             "evaporation_flux_kg_hr": {},
-            "unmeasured_alpha_fallback_species": ["Cr", "Mn"],
+            "unmeasured_alpha_fallback_species": ["CrO2", "Mn"],
         },
     )
     equilibrium = SimpleNamespace(
@@ -334,7 +334,7 @@ def test_unmeasured_alpha_fallback_allowlist_is_scoped_and_loud():
         1.0,
         alpha={},
         allow_unmeasured_alpha_fallback=True,
-        unmeasured_alpha_fallback_species=["Cr", "CrO2", "Mn"],
+        unmeasured_alpha_fallback_species=["CrO2", "Mn"],
     )
 
     assert refused.status == "unavailable"

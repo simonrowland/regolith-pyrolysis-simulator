@@ -6,8 +6,18 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.4.0`
+**Schema version:** `1.6.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
+
+Schema 1.6.0 adds the unconditional top-level `product_classification` field.
+It preserves the raw five-bucket classifier output and its operator-facing
+markdown projection from the same completed simulation state.
+
+Schema 1.5.0 added the unconditional `run_metadata.campaigns_elapsed` field and
+the `campaigns_to_resinter_by_segment` and
+`aggregate_campaigns_to_resinter` fields in the SiO wall-fouling report.
+Golden runner and SiO-yield fixtures therefore require controller regeneration
+on main; this worktree intentionally does not regenerate them.
 
 Schema 1.4.0 makes the vapor-pressure source report's backend-facet keys
 unconditional, admits the staged-C2A `c2a_staged_gas` per-hour key, and
@@ -60,10 +70,14 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.4.0",
+  "schema_version": "1.6.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
+  "product_classification": {   // see "Product classification"
+    "classification": {...},
+    "markdown": "# Three-Product-Class Report\n..."
+  },
   "stage_purity_report": {...}, // see "Stage purity report"
   "vapor_pressure_source_report": {...}, // see "Vapor pressure source report"
   "shuttle_refusal_history": [...], // see "Shuttle refusal history"
@@ -84,6 +98,24 @@ All top-level keys are required.  Tests assert the **exact** set --
 adding a new key requires bumping `RUNNER_SCHEMA_VERSION` and the
 schema-shape assertion.
 
+## Product classification
+
+`product_classification.classification` is the five-bucket result from
+`simulator.three_product_report.classify_products()` with
+`early_tap_mode=False`. The primary runner has no early-tap option, so
+mid-run residual melt is not reported as an industrial mixed-glass product.
+
+`product_classification.markdown` is the existing
+`format_three_product_markdown()` projection. It names the four Mandate
+classes for operators: metals plus source-side O₂ potential, pure silica
+glass, industrial mixed glass, and refractory ceramic rump. Both projections
+come from the same classification object.
+
+Early failure envelopes that have no simulator expose the stable empty shape
+`{"classification": {}, "markdown": ""}`. If a simulator exists, failure
+reporting attempts the same projection but falls back to that empty shape so
+classification cannot mask the primary runner error.
+
 For a runner-strict result, a nonempty per-snapshot
 `metal_projection_drift_kg` audit remaps an otherwise successful result to
 `status: "failed"` with top-level `reason: "metal_projection_drift"`.
@@ -96,15 +128,16 @@ it does not introduce a new schema version.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.4.0",
+  "schema_version": "1.6.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
   "hours_completed": 24,                     // <= hours_requested
+  "campaigns_elapsed": 1.25,                 // completed campaigns + active campaign fraction by completed/max-hold hours
   "mass_kg":         1000.0,
   "additives_kg":    {"C": 30.0},            // additive species -> kg
   "track":           "pyrolysis",            // or "mre_baseline"
-  "backend":         "stub",                 // melt backend name (the internal-analytical model; serialized as the stable `stub` token even when invoked as --backend=internal-analytical)
+  "backend":         "internal-analytical",  // canonical melt backend name (`stub` remains an accepted input alias)
   "started_at_utc":  "2026-05-15T00:00:00Z", // ISO8601 UTC
   "engines_used": {
     "active": {                               // flat intent -> authoritative provider_id
@@ -169,8 +202,12 @@ it does not introduce a new schema version.
   runs: `backend_status`, `backend_authoritative`, `backend_real_active`,
   `evidence_class`, `runtime_status`, `label_source`,
   `certification_allowed`, and `engines_used.active/requested/registry`.
-* Any extra keys passed via `run_metadata_overrides` are forwarded
-  verbatim; the runner does not interpret them.
+* Any extra keys passed via `run_metadata_overrides` are forwarded verbatim
+  except `campaigns_elapsed`: session history is authoritative. It counts each
+  completed campaign as 1 and the active partial campaign as completed hours
+  divided by that campaign's configured maximum hold. This matches cumulative
+  wall-load scope; the override is only a fallback when history cannot derive a
+  campaign-equivalent duration.
 * `refusal_diagnostic` preserves the typed reason and structured evidence for
   any handled simulation refusal. Campaign-pressure refusals populate only
   this generic field. Knudsen refusals also populate
@@ -228,6 +265,28 @@ it does not introduce a new schema version.
 * `pump_outlet_by_species_kg` is P0-gated. Runner schema `1.4.0`
   reports the explicit sentinel `not_applicable_until_p0`; P6b will
   replace it with pump/outlet totals after molecular transport lands.
+
+### SiO wall-fouling report
+
+`build_sio_yield_report().fouling_rate` reports both the controlling segment
+and the aggregate liner load:
+
+```jsonc
+{
+  "campaigns_to_resinter": 5.0,
+  "campaigns_to_resinter_by_segment": {
+    "cold_duct": 50.0,
+    "hot_duct": 5.0
+  },
+  "aggregate_campaigns_to_resinter": 4.545454545454546
+}
+```
+
+* `campaigns_to_resinter` is the minimum segment value and controls the verdict.
+* `campaigns_to_resinter_by_segment` exposes each positive segment load.
+* `aggregate_campaigns_to_resinter` retains the whole-liner projection for
+  consumers that explicitly need the aggregate rather than the controlling
+  segment.
 
 ## Stage purity report
 
@@ -347,6 +406,23 @@ it does not introduce a new schema version.
   "thermo_margin_source": "builtin_janaf_ellingham_al_ca"
 }
 ```
+
+An early C7 **transport** refusal (route/pressure gate, before provider
+dispatch) emits the transport-shaped record instead:
+
+```jsonc
+"c7_refusal_diagnostic": {
+  "reason_refused": "no_active_route_or_pressure_outside_vacuum_envelope",
+  "c7_transport_refusal": "no_active_route_or_pressure_outside_vacuum_envelope",
+  "r_transport": 0.0,
+  "transport_ca_mol": 0.0,
+  "c7_overhead_pressure_pa": 0.0
+}
+```
+
+`reason_refused` is common to both shapes. A transport refusal also
+suppresses the Ca-capture commit for that step (fail-closed; no ledger
+mutation on the refusal path).
 
 Both fields are always present and object-shaped. `c7_product_report` is
 `{}` until C7 produces its report. `c7_refusal_diagnostic` is `{}` unless

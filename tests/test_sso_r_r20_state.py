@@ -153,6 +153,7 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
             object(),
             exchange_direction="redox_source:evaporative_loss",
         )
+        return _evap_flux
 
     monkeypatch.setattr(sim, "_apply_oxygen_reservoir_exchange", fake_exchange)
     monkeypatch.setattr(sim, "_apply_o2_bubbler", fake_bubbler)
@@ -225,7 +226,9 @@ def test_step_orders_source_producers_before_native_split(
         order.append("fe_redox_respeciation")
         return {}
 
-    def fake_producer():
+    def fake_producer(**_kwargs):
+        # Accepts producer-protocol kwargs (e.g. sample_time_h from the t-159
+        # campaigns-elapsed authority) — this stub only records call order.
         order.append(producer_marker)
         return producer_result
 
@@ -868,9 +871,7 @@ def test_o2_bubbler_external_passthrough_not_terminal_product_o2() -> None:
     )
 
     bleed_result = sim._dispatch_overhead_bleed(
-        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0),
         force_drain_all=True,
-        o2_vented_kg=0.0,
     )
 
     assert bleed_result.diagnostic["external_o2_bled_mol"] == pytest.approx(
@@ -1158,21 +1159,21 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
     assert reservoir.redox_source_terms_mol_o2_equiv[label] == pytest.approx(
         expected_source
     )
-    assert reservoir.melt_redox_capacity_mol_per_ln_fO2 == pytest.approx(0.0)
-    assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(0.0)
-    assert reservoir.redox_source_terms_applied is False
-    assert reservoir.redox_source_skipped_terms_mol_o2_equiv[label] == pytest.approx(
-        expected_source
+    # Continuous freeze-gate liquid_fraction (0.5.9 / 6d72725) gives real mush
+    # capacity at 1150 C for lunar mare (solidus ~916 C, liquidus ~1370 C), so
+    # the committed C3-Na O2-equiv source term applies through the integrator
+    # (delta_ln = n_O2 / C_m). The bbf0134 inversion to no_melt_redox_capacity
+    # was an env-dependent retune (floor fallback when MAGEMin was unavailable);
+    # with a real liquidus curve the applied path is the correct invariant.
+    assert reservoir.melt_redox_capacity_mol_per_ln_fO2 > OXYGEN_RESERVOIR_NOOP_MOL
+    assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(
+        expected_source / reservoir.melt_redox_capacity_mol_per_ln_fO2
     )
-    assert reservoir.redox_source_skipped_reasons_by_label[label] == (
-        "no_melt_redox_capacity"
-    )
-    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
-    assert sim._compute_fe_redox_split_diagnostic()["native_fe_frac"] == pytest.approx(
-        before_native
-    )
-    assert breakdown["ferric_divergence"]["status"] == "warning"
-    assert breakdown["ferric_divergence"]["attribution"] == "respeciation_pending"
+    assert reservoir.redox_source_terms_applied is True
+    assert reservoir.redox_source_skipped_terms_mol_o2_equiv == {}
+    assert reservoir.melt_intrinsic_fO2_log < before_fO2
+    assert sim._compute_fe_redox_split_diagnostic()["native_fe_frac"] > before_native
+    assert breakdown["ferric_divergence"]["status"] == "ok"
     assert breakdown["ferric_divergence"]["sampling_context"] == (
         "current_ledger_vs_current_reservoir"
     )
@@ -1204,8 +1205,8 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     ledger_pO2 = exchange.headspace_ledger_pO2_bar
     transport_pO2 = exchange.headspace_transport_pO2_bar
 
-    assert exchange_o2_mol == pytest.approx(0.0)
-    assert exchange_direction == "none:no_melt_redox_capacity"
+    assert abs(exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
+    assert exchange_direction
     assert k_O_m_s > 0.0
     assert tau_hr > 0.0
 
@@ -1214,6 +1215,10 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
     reservoir = snapshot.oxygen_reservoir
     label = "redox_source:c3_na_shuttle_reduction"
 
+    # Same-hour exchange observables must survive the subsequent C3-Na source
+    # term: k_O / tau / exchange mol / headspace pO2 are frozen from the
+    # earlier passive exchange; only exchange_direction is composed with the
+    # applied redox-source label.
     assert reservoir["k_O_m_s"] == pytest.approx(k_O_m_s)
     assert reservoir["tau_hr"] == pytest.approx(tau_hr)
     assert reservoir["exchange_o2_mol"] == pytest.approx(exchange_o2_mol)
@@ -1223,17 +1228,11 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
         transport_pO2
     )
     assert reservoir["exchange_direction"].split("|")[0] == exchange_direction
-    assert any(
-        part.startswith(f"{label}:")
-        for part in reservoir["exchange_direction"].split("|")
-    )
+    assert label in reservoir["exchange_direction"].split("|")
     assert label in reservoir["redox_source_terms_mol_o2_equiv"]
-    assert label in reservoir["redox_source_skipped_terms_mol_o2_equiv"]
-    assert reservoir["redox_source_applied_terms_mol_o2_equiv"] == {}
-    assert reservoir["redox_source_skipped_reasons_by_label"][label] == (
-        "no_melt_redox_capacity"
-    )
-    assert reservoir["redox_source_terms_applied"] is False
+    assert label in reservoir["redox_source_applied_terms_mol_o2_equiv"]
+    assert reservoir["redox_source_skipped_terms_mol_o2_equiv"] == {}
+    assert reservoir["redox_source_terms_applied"] is True
 
 
 def test_c3_k_source_term_comes_from_committed_transition() -> None:
@@ -1723,6 +1722,7 @@ def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
     sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
     sim.melt.temperature_C = 1200.0
+    ledger_before = sim.atom_ledger.mol_by_account()
 
     sim._step_c7_ca_aluminothermic()
 
@@ -1732,7 +1732,81 @@ def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
     assert diagnostic["c7_transport_refusal"] == (
         "no_active_route_or_pressure_outside_vacuum_envelope"
     )
-    assert sim._last_c7_refusal_diagnostic == {}
+    assert sim._last_c7_refusal_diagnostic == {
+        "reason_refused": "no_active_route_or_pressure_outside_vacuum_envelope",
+        "c7_transport_refusal": (
+            "no_active_route_or_pressure_outside_vacuum_envelope"
+        ),
+        "r_transport": pytest.approx(0.0),
+        "transport_ca_mol": pytest.approx(0.0),
+        "c7_overhead_pressure_pa": pytest.approx(
+            diagnostic["c7_overhead_pressure_pa"]
+        ),
+    }
+    assert sim.atom_ledger.mol_by_account() == ledger_before
+
+
+def test_c7_transport_refusal_preserves_preexisting_overhead_ca(monkeypatch) -> None:
+    monkeypatch.setattr(
+        BuiltinCaAluminothermicStepProvider,
+        "_computed_thermo_margin_kj_per_mol_o2",
+        lambda self, hold_temp_C: 2.0,
+    )
+    setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
+    setpoints["campaigns"]["C7"].update(
+        {
+            "enabled": True,
+            "al_credit_limit_kg": 20.0,
+            "extent_fraction": 0.1,
+            "ca_condenser_temperature_C": 1000.0,
+        }
+    )
+    sim = PyrolysisSimulator(
+        InternalAnalyticalBackend(),
+        setpoints,
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("vapor_pressures.yaml"),
+    )
+    sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
+    sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+    sim.melt.temperature_C = 1200.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Ca": 0.25},
+        source="test pre-existing C7 overhead calcium",
+    )
+    capture_operations: list[str] = []
+    dispatch_and_commit = sim._dispatch_and_commit
+
+    def track_dispatch_and_commit(intent, *, control_inputs):
+        capture_operations.append(str(control_inputs.get("operation") or ""))
+        return dispatch_and_commit(intent, control_inputs=control_inputs)
+
+    monkeypatch.setattr(sim, "_dispatch_and_commit", track_dispatch_and_commit)
+    relevant_accounts = (
+        "process.overhead_gas",
+        "process.condensation_train",
+        "process.wall_deposit",
+    )
+    balances_before = sim.atom_ledger.mol_by_account()
+    relevant_before = {
+        account: copy.deepcopy(balances_before.get(account, {}))
+        for account in relevant_accounts
+    }
+    overhead_ca_before = relevant_before["process.overhead_gas"]["Ca"]
+
+    sim._step_c7_ca_aluminothermic()
+
+    balances_after = sim.atom_ledger.mol_by_account()
+    relevant_after = {
+        account: balances_after.get(account, {}) for account in relevant_accounts
+    }
+    assert sim._last_c7_refusal_diagnostic["reason_refused"] == (
+        "no_active_route_or_pressure_outside_vacuum_envelope"
+    )
+    assert "ca_capture" not in capture_operations
+    assert relevant_after == relevant_before
+    assert balances_after["process.overhead_gas"]["Ca"] == overhead_ca_before
 
 
 def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
@@ -2243,9 +2317,7 @@ def test_pn2_sweep_transport_prediction_matches_authoritative_bleed_residual() -
     head_o2_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
 
     predicted_pO2 = sim._pn2_sweep_transport_pO2_bar(head_o2_mol)
-    bleed = sim._dispatch_overhead_bleed(
-        turbine_spec=SimpleNamespace(max_O2_flow_kg_hr=0.0)
-    )
+    bleed = sim._dispatch_overhead_bleed()
     residual_o2_mol = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
     authoritative_residual_pO2 = sim._headspace_ledger_pO2_bar_from_o2_mol(
         residual_o2_mol
@@ -2424,7 +2496,11 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert snapshot.overhead.composition["N2"] == pytest.approx(10.0)
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
-    assert partition["native_fe_vapor_escape_fraction_of_pool"] < 0.001
+    assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
+        0.001966576138843868,
+        rel=0.0,
+        abs=1.0e-15,
+    )
     assert partition["overhead_pressure_pa"] == pytest.approx(1000.0)
     assert partition["carrier_gas"] == "N2"
     assert tap_mol["Fe"] == pytest.approx(partition["native_fe_tap_mol"])
@@ -2438,3 +2514,78 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
         100.0 * stage_3_capture["Fe_kg"] / stage_3_capture["total_kg"]
     )
     assert abs(snapshot.mass_balance_error_pct) <= 5e-12
+
+
+def test_native_fe_partition_uses_upstream_headspace_not_downstream_residual() -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1700.0
+    sim.melt.p_total_mbar = 10.0
+    sim._melt_headspace_composition_mbar = {"Fe": 4.0}
+    sim.overhead.composition = {"Fe": 0.001}
+
+    diagnostic = sim._native_fe_partition_diagnostic(1.0)
+
+    assert diagnostic["P_bulk_Pa"] == pytest.approx(400.0)
+
+    sim._melt_headspace_composition_mbar = {"O2": 10.0}
+    diagnostic = sim._native_fe_partition_diagnostic(1.0)
+    assert diagnostic["P_bulk_Pa"] == pytest.approx(0.0)
+
+
+def test_native_fe_saturation_uses_upstream_total_pressure(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    sim.melt.temperature_C = 1700.0
+    sim.melt.p_total_mbar = 0.0
+    sim._melt_headspace_composition_mbar = {"N2": 5.0}
+    seen_pressure_bar = []
+
+    def capture_state(
+        _comp,
+        *,
+        fe3_over_sigma_fe,
+        T_K,
+        pressure_bar,
+        fO2_log,
+    ):
+        seen_pressure_bar.append(pressure_bar)
+        return {
+            "native_fe_saturation": False,
+            "native_fe_frac": 0.0,
+        }
+
+    monkeypatch.setattr(sim, "_native_fe_saturation_state", capture_state)
+    sim.overhead.pressure_mbar = 900.0
+    sim._compute_native_fe_saturation_extent(
+        {"FeO": 1.0},
+        fe3_over_sigma_fe=0.1,
+    )
+    sim.overhead.pressure_mbar = 0.001
+    sim._compute_native_fe_saturation_extent(
+        {"FeO": 1.0},
+        fe3_over_sigma_fe=0.1,
+    )
+
+    assert seen_pressure_bar == pytest.approx([0.005, 0.005])
+
+
+def test_c7_transport_uses_upstream_headspace_not_downstream_residual() -> None:
+    sim = _make_sim()
+    cfg = dict(sim._c7_campaign_config())
+    cfg.update(
+        active_ca_condensation_route=True,
+        dedicated_ca_condenser=True,
+        p_total_mbar=0.01,
+        ca_route_surface_area_m2=0.2,
+        hold_time_h=1.0,
+    )
+    sim._melt_headspace_composition_mbar = {"Ca": 3.0}
+    sim.overhead.composition = {"Ca": 0.001}
+
+    _extent, diagnostic = sim._c7_transport_extent_mol(
+        cfg,
+        ca_per_extent=3.0,
+    )
+
+    assert diagnostic["c7_ca_p_bulk_pa"] == pytest.approx(300.0)

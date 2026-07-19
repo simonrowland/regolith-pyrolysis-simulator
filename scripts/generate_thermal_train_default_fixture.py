@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the read-only Phase-1a default thermal-train artifact."""
+"""Generate the read-only Phase-2 default thermal-train artifact."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from simulator.session import SimSession, SimSessionConfig
 
 
 DATA = ROOT / "data"
-OUTPUT = DATA / "fixtures" / "thermal_train" / "default-v1.json"
+OUTPUT = DATA / "fixtures" / "thermal_train" / "default-v2.json"
 
 
 def _load(name: str) -> dict:
@@ -51,8 +51,8 @@ def main() -> int:
         session.advance()
     report = AccountingQueries(session.simulator).thermal_train_report()
     artifact = {
-        "artifact_schema_version": "thermal-train-default-artifact-v1",
-        "artifact_id": "thermal-train-default-v1",
+        "artifact_schema_version": "thermal-train-default-artifact-v2",
+        "artifact_id": "thermal-train-default-v2",
         "config": {
             "feedstock_id": "lunar_mare_low_ti",
             "mass_kg": 1000.0,

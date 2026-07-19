@@ -29,6 +29,17 @@ _ACCOUNT_BASIS = {
     "terminal.drain_tap_material": "elemental",
 }
 
+# ``thermal_train`` has live consumers in the simulator advisory and thermal-
+# train page. Every other named view is a deprecated compatibility projection:
+# no current report/library/settings reader consumes it, and removing it would
+# break the schema-2.0.0 wire surface. Frozen-run replacements are:
+#
+# - taps, ceramic, condensation, offgas, wall, oxygen, and industrial glass:
+#   ``timesteps[].ledger`` (plus the matching ``summary``/``terminal`` fields);
+# - stage purity: ``terminal.stage_purity``.
+#
+# Keep these labels beside the registry so a future major-version removal can
+# audit the complete compatibility surface rather than rediscovering it.
 _VIEW_NAMES = (
     "melt_pot_upper_tap", "melt_pot_bottom_tap", "terminal_ceramic",
     "condensation_train", "offgas", "wall_deposits", "oxygen_partition",
@@ -86,12 +97,12 @@ class LedgerAPI:
         if account not in self._discovered_accounts():
             raise KeyError(account)
         if units == "kg":
-            values = self.ledger.kg_by_account(account)
+            values = self.ledger.project_account_kg(account)
         elif units == "mol":
-            values = self.ledger.mol_by_account(account)
+            values = self.ledger.project_account_mol(account)
         elif units == "wt_pct":
             values = None if self._account_can_be_signed(account) else wt_pct_from_kg(
-                self.ledger.kg_by_account(account)
+                self.ledger.project_account_kg(account)
             )
         else:
             raise ValueError("units must be one of: kg, mol, wt_pct")
@@ -130,13 +141,27 @@ class LedgerAPI:
             "ledger_schema_version": LEDGER_SCHEMA_VERSION,
             "provenance": {
                 "mass_balance_attested": bool(report.get("balanced")),
+                # Schema-2 compatibility: input cleaning still uses this
+                # absolute threshold. Outward projection policy is separate.
                 "balance_tolerance_kg": float(self.ledger.balance_tolerance_kg),
+                "balance_projection_relative_tolerance": float(
+                    self.ledger.balance_relative_tolerance
+                ),
+                "balance_projection_absolute_floor_kg": float(
+                    self.ledger.balance_absolute_floor_kg
+                ),
                 "writer": "commit_batch",
             },
             **report,
         }
 
     def view(self, name: str) -> dict[str, Any]:
+        """Return a named compatibility projection or the live thermal-train view.
+
+        Stored-run consumers must use the frozen artifact seam described above;
+        the non-thermal named views remain behavior-stable only for schema-2.0.0
+        compatibility until a coordinated major-version removal.
+        """
         view_name = str(name)
         if view_name == "melt_pot_upper_tap":
             payload = self.account("process.metal_phase_float_layer")

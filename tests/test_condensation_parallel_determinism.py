@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import math
 
 import pytest
 
@@ -13,22 +14,6 @@ from simulator.state import (
 )
 
 
-# 2026-07-10 BH-063: configured throat/stage areas now drive each pipe
-# segment's declared capture surface. This replaces the legacy circumference-
-# derived area and is the same mechanism used by the recomputed wall goldens.
-EXPECTED_COLD_WALL_SIO_SEGMENT_KG = 0.05606386174412921
-EXPECTED_COLD_WALL_SIO_SEGMENT_SI_KG = (
-    EXPECTED_COLD_WALL_SIO_SEGMENT_KG
-    * 0.5
-    * MOLAR_MASS["Si"]
-    / MOLAR_MASS["SiO"]
-)
-EXPECTED_COLD_WALL_SIO_SEGMENT_SIO2_KG = (
-    EXPECTED_COLD_WALL_SIO_SEGMENT_KG
-    * 0.5
-    * MOLAR_MASS["SiO2"]
-    / MOLAR_MASS["SiO"]
-)
 MULTI_TICK_COUNT = 4
 C0_ENDPOINT_SETPOINTS = {
     "temp_range_C": [20, 950],
@@ -159,15 +144,51 @@ def test_cold_wall_segment_attribution_matches_configured_geometry_values():
 
     attribution = _route_cold_wall_sio_tick(session)
 
-    assert set(attribution) == {
-        "process.wall_deposit_segment_stage_0_to_stage_1",
-        "process.wall_deposit_segment_stage_1_to_stage_2",
+    # Premise: the configured 0.06 m throat radius and downstream area ratios
+    # give A1 = pi*(0.06 m)^2*4.0 and A2 = pi*(0.06 m)^2*4.5; the configured
+    # operating point gives SiO wall flux J = 0.062743751473665094 mol/m^2/s.
+    # Algebra: m_i = J*A_i*M_SiO*3600, so A2/A1 = m2/m1 = 4.5/4.0.
+    # Unit check: (mol/m^2/s)*(m^2)*(kg/mol)*(s/h) = kg/h.
+    # Sanity: the attributed total is conserved and the larger area deposits
+    # more mass.
+    sio_flux_mol_m2_s = 0.062743751473665094
+    segment_areas_m2 = {
+        "process.wall_deposit_segment_stage_0_to_stage_1": (
+            math.pi * 0.06**2 * 4.0
+        ),
+        "process.wall_deposit_segment_stage_1_to_stage_2": (
+            math.pi * 0.06**2 * 4.5
+        ),
     }
-    for species_kg in attribution.values():
+    expected_sio_kg = {
+        account: (
+            sio_flux_mol_m2_s
+            * area_m2
+            * (MOLAR_MASS["SiO"] / 1000.0)
+            * 3600.0
+        )
+        for account, area_m2 in segment_areas_m2.items()
+    }
+
+    assert set(attribution) == set(expected_sio_kg)
+    for account, sio_kg in expected_sio_kg.items():
+        species_kg = attribution[account]
         assert species_kg == {
-            "Si": pytest.approx(EXPECTED_COLD_WALL_SIO_SEGMENT_SI_KG),
-            "SiO2": pytest.approx(EXPECTED_COLD_WALL_SIO_SEGMENT_SIO2_KG),
+            "Si": pytest.approx(
+                sio_kg * 0.5 * MOLAR_MASS["Si"] / MOLAR_MASS["SiO"]
+            ),
+            "SiO2": pytest.approx(
+                sio_kg * 0.5 * MOLAR_MASS["SiO2"] / MOLAR_MASS["SiO"]
+            ),
         }
+    assert sum(
+        sum(species_kg.values()) for species_kg in attribution.values()
+    ) == pytest.approx(sum(expected_sio_kg.values()))
+    assert sum(attribution[
+        "process.wall_deposit_segment_stage_1_to_stage_2"
+    ].values()) > sum(attribution[
+        "process.wall_deposit_segment_stage_0_to_stage_1"
+    ].values())
     assert session.simulator.atom_ledger.kg_by_account(
         "process.wall_deposit"
     ) == {}

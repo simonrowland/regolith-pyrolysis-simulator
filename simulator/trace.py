@@ -182,9 +182,10 @@ class PhysicsTrace:
 
 def wall_deposit_by_segment_species_kg(ledger: Any) -> dict[tuple[str, str], float]:
     result: dict[tuple[str, str], float] = {}
-    for account, species_kg in ledger.kg_by_account().items():
+    for account in ledger.kg_by_account():
         if not str(account).startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):
             continue
+        species_kg = ledger.project_account_kg(str(account))
         segment = str(account)[len(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX):]
         for species, kg in species_kg.items():
             amount = float(kg)

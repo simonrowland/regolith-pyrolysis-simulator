@@ -41,7 +41,7 @@ from simulator.optimize.recipe import (
     RecipeSchema,
 )
 from simulator.run_executor import RunExecutor, _json_safe
-from simulator.state import CampaignPhase
+from simulator.state import CampaignPhase, HourSnapshot
 from simulator.runner import (
     EngineBugAbort,
     NOT_APPLICABLE_UNTIL_P0,
@@ -56,6 +56,10 @@ from simulator.runner import (
     _runner_failure_result,
     _status_with_mass_balance_invariant,
     _vapor_pressure_source_report,
+)
+from simulator.three_product_report import classify_products
+from simulator.three_product_report_markdown import (
+    format_three_product_markdown,
 )
 
 
@@ -73,6 +77,61 @@ def test_json_safe_nonfinite_numbers_export_null():
     assert _json_safe(
         {"nan": float("nan"), "inf": [float("inf"), -float("inf")]}
     ) == {"nan": None, "inf": [None, None]}
+
+
+def test_completed_run_emits_legible_product_classification() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    payload = run._run_session(session)
+    expected = classify_products(session.simulator)
+    report = payload["product_classification"]
+
+    assert report["classification"] == expected
+    assert report["markdown"] == format_three_product_markdown(
+        expected,
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+    )
+    assert "Metals + O₂ potential" in report["markdown"]
+    assert "Silica glass" in report["markdown"]
+    assert "Industrial mixed glass" in report["markdown"]
+    assert "Refractory ceramic rump" in report["markdown"]
+
+
+def test_completed_run_preserves_success_when_product_classification_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    def raise_classification_error(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("injected product-classification failure")
+
+    monkeypatch.setattr(
+        "simulator.runner._product_classification_report",
+        raise_classification_error,
+    )
+
+    payload = run._run_session(session)
+
+    assert payload["status"] == "ok"
+    assert payload["product_classification"] == {
+        "classification": {},
+        "markdown": "",
+    }
 
 
 def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
@@ -125,6 +184,64 @@ def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
     json.dumps(summary, allow_nan=False)
 
 
+@pytest.mark.parametrize(
+    ("carrier", "atmosphere"),
+    (("N2", "PN2_SWEEP"), ("Ar", "CONTROLLED_O2"), ("CO2", "CO2_BACKPRESSURE")),
+)
+def test_per_hour_summary_emits_actual_carrier_partial_pressure(
+    carrier: str,
+    atmosphere: str,
+) -> None:
+    snapshot = HourSnapshot(hour=1, campaign=CampaignPhase.C0)
+    snapshot.overhead.pressure_mbar = 10.0
+    snapshot.overhead.composition = {"O2": 1.0, carrier: 7.5, "SiO": 1.5}
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+        record=SimpleNamespace(snapshots=(snapshot,)),
+        melt=SimpleNamespace(
+            background_gas_species=carrier,
+            atmosphere=SimpleNamespace(name=atmosphere),
+        ),
+    )
+
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+
+    assert summary["carrier_identity"] == carrier
+    assert summary["p_carrier_bar"] == pytest.approx(0.0075)
+    assert summary["p_carrier_bar"] != pytest.approx(
+        summary["P_total_bar"] - summary["pO2_bar"]
+    )
+
+
+def test_per_hour_summary_omits_carrier_pair_without_physical_carrier() -> None:
+    snapshot = HourSnapshot(hour=1, campaign=CampaignPhase.C0)
+    snapshot.overhead.pressure_mbar = 2.0
+    snapshot.overhead.composition = {"CO2": 2.0}
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+        record=SimpleNamespace(snapshots=(snapshot,)),
+        melt=SimpleNamespace(
+            background_gas_species="",
+            atmosphere=SimpleNamespace(name="HARD_VACUUM"),
+        ),
+    )
+
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+
+    assert "carrier_identity" not in summary
+    assert "p_carrier_bar" not in summary
+
+
 VPR_P6A_TRACE_CONTROLS = {
     "sio_start_temperature_c": 1050.0,
     "sio_hold_temperature_c": 1600.0,
@@ -138,6 +255,7 @@ TOP_LEVEL_KEYS = frozenset({
     "run_metadata",
     "final_state",
     "final",
+    "product_classification",
     "stage_purity_report",
     "vapor_pressure_source_report",
     "shuttle_refusal_history",
@@ -168,6 +286,7 @@ RUN_METADATA_KEYS = frozenset({
     "campaign",
     "hours_requested",
     "hours_completed",
+    "campaigns_elapsed",
     "mass_kg",
     "additives_kg",
     "track",
@@ -215,6 +334,8 @@ PER_HOUR_KEYS = frozenset({
     "transport_formula_id",
 })
 PER_HOUR_OPTIONAL_KEYS = frozenset({
+    "p_carrier_bar",
+    "carrier_identity",
     "pO2_enforcement",
     # Conditionally-emitted per-hour keys: present on a row only when the
     # backing source is populated (staged / diagnostic / real-backend runs),
@@ -662,6 +783,7 @@ def _assert_schema_shape(payload: dict) -> None:
       this without picking a specific scenario.
     """
 
+    assert RUNNER_SCHEMA_VERSION == "1.6.0"
     assert set(payload) == TOP_LEVEL_KEYS, (
         f"top-level keys drift: {set(payload) - TOP_LEVEL_KEYS} extra, "
         f"{TOP_LEVEL_KEYS - set(payload)} missing"
@@ -1123,8 +1245,9 @@ def test_runner_golden_fixture_matches(scenario):
     _assert_mass_balance_bound(actual)
     assert actual == expected, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
-        "regenerate via `python -m simulator.runner --output=tests/fixtures/"
-        f"runner/{scenario['fixture']}` if the change is intentional."
+        "regenerate all canonical scenarios via "
+        "`python3 scripts/regenerate_runner_goldens.py` if the change is "
+        "intentional; the bare simulator.runner CLI omits scenario inputs."
     )
 
 
@@ -1200,6 +1323,40 @@ def test_c7_schema_fields_have_success_failure_parity(tmp_path, monkeypatch):
     assert failure["status"] == "failed"
     assert failure["c7_product_report"] == {}
     assert failure["c7_refusal_diagnostic"] == {}
+
+
+def test_c7_transport_refusal_is_exported(tmp_path, monkeypatch):
+    monkeypatch.setenv("MPLCONFIGDIR", str(tmp_path / "mpl"))
+    payload = PyrolysisRun(
+        feedstock_id="targeted_super_kreep_ore",
+        campaign="C7_CA_ALUMINOTHERMIC",
+        hours=2,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        setpoints_patch={
+            "campaigns": {
+                "C7": {
+                    "enabled": True,
+                    "al_credit_limit_kg": 20.0,
+                    "extent_fraction": 0.1,
+                    "hold_time_h": 1.0,
+                    "active_ca_condensation_route": False,
+                }
+            }
+        },
+        run_metadata_overrides={
+            "started_at_utc": "2026-06-28T00:00:00Z",
+            "kernel_commit_sha": "c7-transport-refusal",
+        },
+    ).run()
+
+    refusal = payload["c7_refusal_diagnostic"]
+    assert refusal["reason_refused"] == (
+        "no_active_route_or_pressure_outside_vacuum_envelope"
+    )
+    assert refusal["c7_transport_refusal"] == refusal["reason_refused"]
+    assert refusal["r_transport"] == pytest.approx(0.0)
+    assert refusal["transport_ca_mol"] == pytest.approx(0.0)
 
 
 def test_runner_cli_entry_point_writes_output_file(tmp_path):

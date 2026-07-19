@@ -201,6 +201,23 @@ def test_run_input_allocation_uses_existing_species_product_row():
     assert co.thermal_flux_h == pytest.approx(1273.15)
 
 
+def test_run_input_allocation_reports_terminal_mass_basis_not_cost_lot_mass():
+    ledger = CostLedger()
+    ledger.apply_mass_allocated_event(
+        process_step="stage0",
+        outputs_kg={("terminal.offgas", "CO"): 2.0},
+        processing_cost=CostVector(external_reagent_kg=1.0),
+    )
+
+    diagnostic = build_cost_rollup_diagnostic(
+        cost_ledger=ledger,
+        per_hour=({"T_C": 1000.0},),
+        products_kg={"CO": 10.0},
+    )
+
+    assert diagnostic["product_costs"]["terminal.offgas:CO"]["quantity_kg"] == pytest.approx(10.0)
+
+
 def test_run_input_allocation_excludes_reagent_bookkeeping_products():
     diagnostic = build_cost_rollup_diagnostic(
         cost_ledger=CostLedger(),
@@ -521,6 +538,7 @@ def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture():
         hours=24,
         additives_kg={},
         allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
         run_metadata_overrides={
             "started_at_utc": "2026-05-15T00:00:00Z",
             "kernel_commit_sha": "goal-18-fixture",
@@ -533,6 +551,9 @@ def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture():
         .read_text(encoding="utf-8")
     )
     assert "cost_rollup_diagnostic" in actual["run_metadata"]
+    assert actual["run_metadata"]["cost_rollup_diagnostic"]["price_basis"] == (
+        "legacy_placeholder_awaiting_owner_ratification"
+    )
     stripped_actual = copy.deepcopy(actual)
     stripped_expected = copy.deepcopy(expected)
     stripped_actual["run_metadata"].pop("cost_rollup_diagnostic", None)
