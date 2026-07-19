@@ -1,0 +1,48 @@
+schema_version: langmuir_knudsen_flux_validation.v1
+
+# These are measured normalized fluxes, J_Langmuir / J_Knudsen.  The ratio is
+# the evaporation coefficient and is independent of aperture area and vapor-
+# pressure units.  Values are literature observations, not model-generated
+# absolute fluxes.  Runtime coefficients remain in vapor_pressures.yaml.
+measurements:
+  chromium_solid_langmuir_knudsen:
+    species: Cr
+    material: 99.9_percent_polycrystalline_solid_chromium
+    regime: direct_langmuir_to_knudsen_effusion_comparison
+    temperature_range_k: [1318, 1563]
+    measured_langmuir_to_effusion_flux_ratio:
+      value: 0.90
+      uncertainty_absolute: 0.10
+    source:
+      citation_id: REF-040
+      citation: "Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1, 135-146, Table 1"
+      doi: 10.1063/1.3253096
+      primary_data: "McCabe, Hudson & Paxton (1958), Trans. Met. Soc. AIME 212, 102"
+      extraction_note: "Pound-selected measured alpha_v; direct free-evaporation mass loss divided by equilibrium Knudsen-effusion flux."
+
+  potassium_silicate_vacuum:
+    species: K
+    material: Yu_et_al_2003_C1_silicate_melt
+    regime: vacuum_langmuir_flux_against_equilibrium_reference
+    temperature_range_k: [1723.15, 1723.15]
+    measured_langmuir_to_effusion_flux_ratio:
+      value: 0.13
+      uncertainty_absolute: 0.02
+    source:
+      citation_id: REF-014
+      citation: "Fedkin et al. (2006), Geochim. Cosmochim. Acta 70, 206-223; value tabulated with uncertainty by Richter et al. (2011), Meteorit. Planet. Sci. 46"
+      doi: 10.1016/j.gca.2005.08.014
+      extraction_note: "Vacuum C1 experiment at 1450 degC; measured residue loss fitted as K flux divided by the equilibrium Hertz-Knudsen reference flux."
+
+  iron_olivine_kems:
+    species: Fe
+    material: Fo93Fa7_olivine
+    regime: knudsen_effusion_mass_spectrometry
+    temperature_range_k: [1700, 1800]
+    measured_langmuir_to_effusion_flux_ratio:
+      range: [0.011, 0.020]
+    source:
+      citation_id: REF-016
+      citation: "Costa & Jacobson (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry, NASA NTRS 20150002321"
+      url: https://ntrs.nasa.gov/citations/20150002321
+      extraction_note: "Reported Fe+ vaporization-coefficient range from the KEMS campaign; the adopted runtime coefficient is the measured high-side bound."

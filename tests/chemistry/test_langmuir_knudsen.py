@@ -3,14 +3,18 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
 
 import pytest
+import yaml
 
 from engines.builtin.evaporation_flux import _series_resistance_evaporation_flux_kg_m2_s
 from simulator.chemistry.langmuir_knudsen import (
     grounded_alpha,
     knudsen_effusion_flux,
+    knudsen_effusion_molar_flux,
     langmuir_flux,
+    langmuir_molar_flux,
     pseudo_antoine_p_eq_pa,
     series_flux,
     species_molar_mass_kg_mol,
@@ -28,6 +32,10 @@ _K_BASE = {
     "molar_mass_kg_mol": 0.0390983,
     "alpha": 0.13,
 }
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_VALIDATION_SIDECAR = (
+    _REPO_ROOT / "data/literature/langmuir_knudsen_flux_validation.yaml"
+)
 
 
 def test_langmuir_flux_matches_hk_formula():
@@ -49,6 +57,23 @@ def test_langmuir_flux_matches_hk_formula():
         alpha,
         molar_mass_kg_mol=molar_mass,
     ) == pytest.approx(expected, rel=1e-12)
+
+    expected_molar = alpha * delta_p / math.sqrt(
+        2.0 * math.pi * molar_mass * GAS_CONSTANT_J_MOL_K * T_K
+    )
+    assert langmuir_molar_flux(
+        T_K,
+        p_eq,
+        p_bulk,
+        alpha,
+        molar_mass_kg_mol=molar_mass,
+    ) == pytest.approx(expected_molar, rel=1e-12)
+    assert knudsen_effusion_molar_flux(
+        T_K,
+        p_eq,
+        p_bulk_pa=p_bulk,
+        molar_mass_kg_mol=molar_mass,
+    ) == pytest.approx(expected_molar / alpha, rel=1e-12)
 
 
 def test_knudsen_effusion_is_alpha_one_langmuir():
@@ -169,11 +194,27 @@ def test_validate_against_baseline_reports_ratios_without_tuning():
     rows = validate_against_baseline()
     assert len(rows) == 3
     by_species = {row.species: row for row in rows}
-    for species in ("Na", "K", "SiO"):
+    for species in ("Cr", "K", "Fe"):
         row = by_species[species]
-        assert row.modeled_flux_kg_s_m2 > 0.0
-        assert row.measured_flux_kg_s_m2 > 0.0
-        assert math.isfinite(row.ratio_modeled_over_measured)
-        # Grounding rows are self-consistent at alpha=1 HK back-solve basis;
-        # ratios near unity confirm the analytical limit wiring, not tuning.
-        assert row.ratio_modeled_over_measured == pytest.approx(1.0, rel=0.02)
+        assert row.measured_ratio_low <= row.modeled_langmuir_to_effusion_ratio
+        assert row.modeled_langmuir_to_effusion_ratio <= row.measured_ratio_high
+        assert abs(row.relative_error_percent) <= row.allowed_error_percent + 1e-12
+        assert row.source
+
+    assert by_species["Cr"].relative_error_percent == pytest.approx(0.0)
+    assert by_species["K"].relative_error_percent == pytest.approx(0.0)
+    assert by_species["Fe"].relative_error_percent == pytest.approx(
+        29.0322580645
+    )
+
+
+def test_validation_observations_live_in_literature_sidecar():
+    payload = yaml.safe_load(_VALIDATION_SIDECAR.read_text())
+    assert payload["schema_version"] == "langmuir_knudsen_flux_validation.v1"
+    assert len(payload["measurements"]) == 3
+    for row in payload["measurements"].values():
+        source = row["source"]
+        assert source["citation_id"].startswith("REF-")
+        assert source.get("doi") or source.get("url")
+        assert source["extraction_note"]
+        assert row["measured_langmuir_to_effusion_flux_ratio"]
