@@ -152,32 +152,32 @@ EXPECTED_C4B_WALL_SEGMENT_DEPOSITS_KG = {
     # move slightly.
     "lunar_mare_low_ti": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 1.415040139316315e-07,
-            "SiO2": 3.0272336368361093e-07,
+            "Si": 3.488847972097408e-06,
+            "SiO2": 7.463786815293877e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 1.5901736459101957e-07,
-            "SiO2": 3.4019014836112613e-07,
+            "Si": 3.5901506661581253e-06,
+            "SiO2": 7.68050640821715e-06,
         },
     },
     "mars_basalt": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 3.438547913357479e-07,
-            "SiO2": 7.356178539371814e-07,
+            "Si": 2.4917739566143708e-06,
+            "SiO2": 5.330719410192673e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 3.8678241308690854e-07,
-            "SiO2": 8.274540760370561e-07,
+            "Si": 2.5938217138608916e-06,
+            "SiO2": 5.5490329369380074e-06,
         },
     },
     "s_type_asteroid_silicate": {
         "process.wall_deposit_segment_stage_0_to_stage_1": {
-            "Si": 4.429046652048168e-07,
-            "SiO2": 9.475179277016558e-07,
+            "Si": 2.820757660060282e-06,
+            "SiO2": 6.034523143649702e-06,
         },
         "process.wall_deposit_segment_stage_1_to_stage_2": {
-            "Si": 4.981696298508181e-07,
-            "SiO2": 1.0657477610940608e-06,
+            "Si": 2.9512809690021463e-06,
+            "SiO2": 6.313755188198538e-06,
         },
     },
 }

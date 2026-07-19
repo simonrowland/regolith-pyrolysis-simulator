@@ -342,9 +342,9 @@ def test_ci_c0_to_c6_refusal_preserves_prior_rows_and_ledger_accounts():
     assert payload["reason"] == (
         "c6_joint_thermodynamic_liquid_fraction_window_empty"
     )
-    # The binding C6 refusal now fires on the first C6 tick, after all prior
-    # campaign rows have been preserved in the envelope.
-    assert len(rows) == 43
+    # The refusal boundary preserves every completed pre-C6 row; the refused
+    # C6 tick itself is not emitted as a completed row.
+    assert len(rows) == 42
     assert list(dict.fromkeys(row["campaign"] for row in rows)) == [
         "C0",
         "C0B",

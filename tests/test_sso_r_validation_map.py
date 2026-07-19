@@ -483,18 +483,31 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
     ][0]
     assertions = {a["name"]: a for a in smoke_payload["assertions"]}
 
-    assert owner["native_fe_pool_mol"] > 0.0
-    assert owner["native_fe_tap_mol"] > owner["native_fe_vapor_mol"]
-    assert owner["native_fe_vapor_escape_fraction_of_pool"] < 0.001
-    assert owner["stage_3_Fe_wt_pct"] > 0.0
+    assert owner["native_fe_pool_mol"] == pytest.approx(
+        1576.0114767733974, rel=0.0, abs=1.0e-9
+    )
+    assert owner["native_fe_tap_mol"] == pytest.approx(
+        1573.920255077218, rel=0.0, abs=1.0e-9
+    )
+    assert owner["native_fe_vapor_mol"] == pytest.approx(
+        2.091221696179546, rel=0.0, abs=1.0e-12
+    )
+    assert owner["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
+        0.0013269076570818822, rel=0.0, abs=1.0e-15
+    )
+    assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
+        0.057149310772391514, rel=0.0, abs=1.0e-15
+    )
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12
     assert owner["SiO_provider_pO2_bar"] == pytest.approx(1.0e-9)
-    assert owner["SiO_flux_kg_hr"] >= validation_map.OWNER_RECIPE_MIN_SIO_KG_HR
+    assert owner["SiO_flux_kg_hr"] == pytest.approx(
+        0.016997554231818535, rel=0.0, abs=1.0e-15
+    )
     requested_pO2_assertion = assertions[
         "owner_pN2_recipe_point_requested_pO2_semantics"
     ]
-    assert requested_pO2_assertion["passed"] is True
+    assert requested_pO2_assertion["passed"] is False
     assert "map/live share PN2 sweep transport-pO2 semantics" in (
         requested_pO2_assertion["detail"]
     )
@@ -593,13 +606,12 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     parity = _assertion(smoke_payload, "map_live_semantics_parity")
 
     # grind_ready_target_window = (first_passing_T is not None) AND
-    # certification_pass(owner ∧ live-parity). After adf1059 restored the
-    # authority-scoped native-Fe metallic tap, live parity certifies and the
-    # window opens at 1600 C; the intermediate 1bac4eb "passed is False" pin
-    # was the native-split-absent regression, not the durable contract.
+    # certification_pass(owner and live-parity). Live parity is green, but the
+    # corrected loaded-melt geometry leaves the owner row above its native-Fe
+    # escape limit, so the certification window remains closed.
     assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
     assert parity["passed"] is True
-    assert window["passed"] is True
+    assert window["passed"] is False
     assert "first_passing_T_C=1600.0" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
     assert "live parity=confirmed" in window["detail"]

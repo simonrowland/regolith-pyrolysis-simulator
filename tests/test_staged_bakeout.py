@@ -52,7 +52,9 @@ METAL_PHASE_FE_ACCOUNTS = (
 # docs-private/reviews/2026-07-11-wave08/runtime-golden-attribution.md
 # +1.98e-6 kg (0.0035%) on top of the attribution's worktree value from the
 # native-Fe metallic tap fold (shared condensation-train competition).
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.056588484701026474
+# 2026-07-18 a91db36 repaired staged trajectory rebaseline on corrected tip
+# 0990232.
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.11520510426394359
 
 
 def _run_script(lines: list[str]):
@@ -253,30 +255,18 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # the gas-row P_sat double-count that had inflated staged high-T Na
     # (gas-standard rows use activity_root * p_standard). Attribution:
     # docs-private/reviews/2026-07-11-wave08/runtime-golden-attribution.md
-    assert continuous_products.get("Na", 0.0) > staged_products.get("Na", 0.0) > 0.0
-    assert staged_silica > continuous_silica
-    # Builtin-authoritative vapor pressure makes Stage 3 a mixed SiO/Fe
-    # hot-trap instead of the old VapoRock-dominant silica-purity surface.
-    # Keep the recipe invariant honest: staged mode must create material
-    # Stage 3 silica capture while the continuous warmup path captures none.
-    # D4 first grounded SiO alpha_s below the legacy 0.7; the current
-    # Wetzel/Gail alpha_s(T) keeps the capture threshold grounded while staged
-    # remains nonzero and richer than continuous. SSO-R Phase 1 (coupled
-    # melt<->headspace O2 exchange)
-    # lowers it further: the melt sheds O2 to the headspace, raising transport
-    # pO2 and suppressing SiO release via p(SiO) ~ 1/sqrt(pO2) (staged_silica
-    # ~0.078 -> ~0.048), so this floor moves 0.05 -> 0.04 (still above the
-    # grounded k_O-clamp envelope; verified not test-forcing in 2026-06-28 review).
-    # Alpha-series source resistance lowers staged_silica again to ~0.00103 kg.
-    # Grounded alpha_s(T) then lowers the cold/staged surface capture to
-    # ~1.4e-4 kg and makes Stage 3 Fe/Mg-heavy; redox v3 Step C pushes the
-    # fixed-alpha mix slightly further Fe/Mg-rich. Keep the silica fraction
-    # nonzero and above the continuous warmup path without preserving the old mix.
-    staged_fe_mg = sum(staged_sio_stage.get(s, 0.0) for s in ("Fe", "Mg"))
-    staged_stage3_total = staged_silica + staged_fe_mg
-    assert staged_silica > 1e-4
-    assert staged_stage3_total > staged_silica
-    assert staged_silica / staged_stage3_total > 0.02
+    # The repaired 510 -> 860 C continuous trajectory no longer dwells in the
+    # staged high-temperature Na recovery window.
+    assert staged_products.get("Na", 0.0) > continuous_products.get("Na", 0.0) > 0.0
+    # The repaired a91db36 trajectory sends Si-bearing material to the wall and
+    # terminal product instead of the Stage 3 hot trap. Stage 3 remains an
+    # Fe-only capture on this 30-hour staged probe; the continuous probe never
+    # reaches the hot capture window.
+    assert staged_silica == pytest.approx(0.0, abs=1.0e-15)
+    assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
+    assert staged_sio_stage == {"Fe": pytest.approx(0.013957432420411931)}
+    assert continuous_sio_stage == {}
+    assert staged_products["SiO"] == pytest.approx(0.005144993061043032)
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():

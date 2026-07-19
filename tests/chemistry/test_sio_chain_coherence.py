@@ -88,7 +88,9 @@ MAX_CHAIN_CLOSURE_ERR_PCT = 6.0e-5
 # grounded Cr alpha=0.9 and fallback retained only for Mn/CrO2.
 # 2026-07-17 t-159/t-160: executable recompute after the corrected transport
 # and wall-capture composition; invariance remains bit-identical.
-PHASE3BIS_SIO_EVOLVED_KG = 7.50757523608e-06
+# 2026-07-18 a91db36 flow-boundary transport rebaseline on corrected tip
+# 0990232; wall-temperature invariance remains bit-identical.
+PHASE3BIS_SIO_EVOLVED_KG = 7.61699622023e-06
 
 
 @lru_cache(maxsize=None)

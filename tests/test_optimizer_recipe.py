@@ -72,7 +72,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         )
     ).encode()
     assert hashlib.sha256(resolved).hexdigest() == (
-        "69ed44ac69342dcbe542b66a6509903c242877c43fff9acc96e4f64bcb9f0f01"
+        "77a7172b39b57f4191e2e31f073acd23fba37e8944845531fa3053b3773b8a86"
     )
     assert schema.bounds_digest == (
         "2308bef69d19aa7679dda3f5d9838c91f7efd22eaaa16fc64cf5aa8b2cf63eb5"
@@ -618,7 +618,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-17: t-097 (110f03c/a217ce8) owns the Ellingham source-fingerprint
     # move; W-A5a/t-227 adds the composed reviewed electricity/solar defaults.
     # Recomputed from this tree.
-    assert cache_key(spec) == "fcad6c47739bd266d7d343b17bb38f936315f25114a4927931d513d38cf88431"
+    assert cache_key(spec) == "b8874bc49362c8b8d4038697397921ffacb94536ac6b6578937197f8c950c410"
     assert cache_key(spec) != "be16be9b30f3b68f4889933efad83da6eb65b40cd80f7c5d16349a5f891e464b"
 
 

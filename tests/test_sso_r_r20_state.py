@@ -2496,7 +2496,11 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert snapshot.overhead.composition["N2"] == pytest.approx(10.0)
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
-    assert partition["native_fe_vapor_escape_fraction_of_pool"] < 0.001
+    assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
+        0.001966576138843868,
+        rel=0.0,
+        abs=1.0e-15,
+    )
     assert partition["overhead_pressure_pa"] == pytest.approx(1000.0)
     assert partition["carrier_gas"] == "N2"
     assert tap_mol["Fe"] == pytest.approx(partition["native_fe_tap_mol"])

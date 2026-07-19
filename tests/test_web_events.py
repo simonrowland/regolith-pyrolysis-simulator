@@ -4501,10 +4501,10 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
             )
         )
 
-        # The t-160 timing correction preserves the first binding C6 tick
-        # before refusal, so all prior rows plus that refusal tick survive.
-        assert names.count("simulation_tick") == 43
-        assert names.count("per_hour_summary") == 43
+        # The refusal boundary preserves every completed pre-C6 tick; the
+        # refused C6 tick itself is not emitted as a completed tick.
+        assert names.count("simulation_tick") == 42
+        assert names.count("per_hour_summary") == 42
         assert "campaign_complete_summary" in names
         assert "simulation_complete" not in names
         assert max(
@@ -4535,7 +4535,7 @@ def test_socketio_reports_binding_c6_refusal_after_retaining_run_data(
         artifact = RunArtifactStore(tmp_path / "runs").load(refusal["run_id"])
         assert artifact is not None
         assert artifact["execution_status"] == "refused"
-        assert len(artifact["timesteps"]) == 43
+        assert len(artifact["timesteps"]) == 42
         assert artifact["failure"] == {
             "reason": refusal["reason"],
             "error_message": refusal["reason"],
