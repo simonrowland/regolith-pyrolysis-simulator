@@ -266,6 +266,16 @@ it does not introduce a new schema version.
   reports the explicit sentinel `not_applicable_until_p0`; P6b will
   replace it with pump/outlet totals after molecular transport lands.
 
+With `--include-wall-deposit-rate-diagnostics`, `final` also carries
+`wall_deposition_rate_committed` (mol/s and kg/h by segment/species, divided
+by its explicit `dt_h`) and `wall_fouling_lifespan`. The lifespan block is
+INFO-only, normalizes execution-local committed deltas by observed campaign
+equivalents, keeps pre-existing wall inventory separate, exposes
+`campaigns_to_resinter` and the fast/slow/non-authoritative verdict, and always has
+`authoritative_for_selection: false` during shadow rollout. These opt-in
+fields do not change schema version, objectives, cache identity, feasibility,
+or default JSON bytes.
+
 ### SiO wall-fouling report
 
 `build_sio_yield_report().fouling_rate` reports both the controlling segment
@@ -554,6 +564,16 @@ mole, energy, pressure, or partition arithmetic.
   ...
 ]
 ```
+
+When `--include-wall-deposit-rate-diagnostics` is set, each row additionally
+contains separate `wall_deposition_rate_committed` and
+`wall_deposition_rate_shadow_candidate` blocks. The committed block is the
+mol-native ledger delta divided by `HourSnapshot.duration_h`; the shadow block
+repeats that explicit `dt_h`, decomposes
+incident, stuck, re-evaporated, and net continuous flux and has
+`inventory_effect: false`. Compact compatibility projections
+`wall_deposit_rate_by_segment_species_kg_h` and
+`wall_deposit_rate_by_species_kg_h` are emitted from the committed block.
 
 * One entry per simulated hour up to `hours_requested`, or until the
   simulator marks the batch `is_complete()` (whichever comes first).

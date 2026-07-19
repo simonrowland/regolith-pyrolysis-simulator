@@ -55,7 +55,10 @@ from simulator.config import ConfigBundle, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.accounting import AccountingQueries
-from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    resolve_species_formula,
+)
 from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
     normalize_chemistry_kernel_config,
@@ -764,6 +767,7 @@ class PyrolysisRun:
     sio_ramp_c_per_hr: float | None = None
     sio_liner_temperature_c: float | None = None
     sio_pO2_mbar: float | None = None
+    include_wall_deposit_rate_diagnostics: bool = False
     feedstocks_path: Optional[Path] = None
     setpoints_path: Optional[Path] = None
     vapor_pressures_path: Optional[Path] = None
@@ -1230,11 +1234,68 @@ class PyrolysisRun:
             strict_result_contract=self.strict_result_contract,
         )
 
+        final_summary = _final_summary_report(final_state, execution)
+        per_hour_summary = list(execution.per_hour)
+        if self.include_wall_deposit_rate_diagnostics:
+            snapshots = tuple(execution.snapshots)
+            per_hour_summary = [
+                _with_wall_deposit_rate_diagnostics(
+                    row,
+                    snapshots[index],
+                    dt_h=float(snapshots[index].duration_h),
+                )
+                if index < len(snapshots)
+                else dict(row)
+                for index, row in enumerate(execution.per_hour)
+            ]
+            duration_h = sum(float(item.duration_h) for item in snapshots)
+            execution_delta = _sum_wall_deposit_deltas(snapshots)
+            execution_nested = _nested_species_kg_from_segment_species(
+                execution_delta
+            )
+            committed_rate = {}
+            if duration_h > 0.0:
+                committed_rate, _ = _wall_deposit_rate_from_delta(
+                    execution_nested,
+                    dt_h=duration_h,
+                )
+            final_summary["wall_deposition_rate_committed"] = {
+                "source": "committed_ledger_delta_divided_by_explicit_dt",
+                "dt_h": duration_h,
+                "by_segment_species": committed_rate,
+            }
+            campaign_equivalents = max(
+                0.0,
+                float(execution.campaigns_elapsed)
+                - float(execution.campaigns_elapsed_start),
+            )
+            per_campaign_delta = {
+                key: amount / campaign_equivalents
+                for key, amount in execution_delta.items()
+            } if campaign_equivalents > 0.0 else {}
+            cumulative = execution.trace.wall_deposit_by_segment_species_kg
+            existing_before = {
+                key: max(0.0, float(amount) - execution_delta.get(key, 0.0))
+                for key, amount in cumulative.items()
+            }
+            lifespan = _wall_fouling_lifespan_report(
+                per_campaign_by_segment_species_kg=(
+                    _nested_species_kg_from_segment_species(per_campaign_delta)
+                ),
+                existing_by_segment_species_kg=(
+                    _nested_species_kg_from_segment_species(existing_before)
+                ),
+            )
+            final_summary["wall_fouling_lifespan"] = {
+                **lifespan,
+                "campaign_equivalents_observed": campaign_equivalents,
+            }
+
         payload = {
             "schema_version": RUNNER_SCHEMA_VERSION,
             "run_metadata": run_metadata,
             "final_state": final_state,
-            "final": _final_summary_report(final_state, execution),
+            "final": final_summary,
             "product_classification": _json_safe(
                 _safe_failure_value(
                     lambda: _product_classification_report(
@@ -1255,7 +1316,7 @@ class PyrolysisRun:
                 melt_redox_gate_floor_fallback_engagement
             ),
             "pO2_enforcement_by_hour": _json_safe(pO2_enforcement_by_hour),
-            "per_hour_summary": list(execution.per_hour),
+            "per_hour_summary": per_hour_summary,
             "shadow_trace": list(execution.shadow_trace),
             "status": status,
             "reason": reason,
@@ -1594,6 +1655,129 @@ def _nested_species_kg_from_segment_species(
         segment: dict(sorted(species_kg.items()))
         for segment, species_kg in sorted(nested.items())
     }
+
+
+def _sum_wall_deposit_deltas(
+    snapshots: tuple[HourSnapshot, ...],
+) -> dict[tuple[str, str], float]:
+    totals: dict[tuple[str, str], float] = {}
+    for snapshot in snapshots:
+        for key, raw_kg in snapshot.wall_deposit_by_segment_species_delta.items():
+            totals[key] = totals.get(key, 0.0) + float(raw_kg)
+    return totals
+
+
+def _wall_deposit_rate_from_delta(
+    wall_deposit_delta_kg: Mapping[str, Mapping[str, float]],
+    *,
+    dt_h: float,
+) -> tuple[dict[str, dict[str, dict[str, float]]], dict[str, float]]:
+    """Project a committed mol-native ledger delta into mol/s and kg/h."""
+
+    if not math.isfinite(dt_h) or dt_h <= 0.0:
+        raise RunnerError("wall deposit rate dt_h must be finite and positive")
+    by_segment_species: dict[str, dict[str, dict[str, float]]] = {}
+    by_species_kg_h: dict[str, float] = {}
+    for segment, species_kg in sorted(wall_deposit_delta_kg.items()):
+        for species, raw_kg in sorted(species_kg.items()):
+            kg = _finite_export_float(
+                raw_kg,
+                field=f"wall deposit delta kg {segment}.{species}",
+            )
+            if abs(kg) <= 1.0e-12:
+                continue
+            formula = resolve_species_formula(str(species))
+            kg_h = kg / dt_h
+            mol_s = kg_h / formula.molar_mass_kg_per_mol() / 3600.0
+            by_segment_species.setdefault(str(segment), {})[str(species)] = {
+                "mol_s": _finite_export_float(
+                    mol_s, field=f"wall deposit rate mol/s {segment}.{species}"
+                ),
+                "kg_h": _finite_export_float(
+                    kg_h, field=f"wall deposit rate kg/h {segment}.{species}"
+                ),
+            }
+            by_species_kg_h[str(species)] = (
+                by_species_kg_h.get(str(species), 0.0) + kg_h
+            )
+    return by_segment_species, dict(sorted(by_species_kg_h.items()))
+
+
+def _with_wall_deposit_rate_diagnostics(
+    row: Mapping[str, Any],
+    snapshot: HourSnapshot,
+    *,
+    dt_h: float,
+) -> dict[str, Any]:
+    updated = dict(row)
+    wall_delta = row.get("wall_deposit_delta_kg") or {}
+    if not isinstance(wall_delta, Mapping):
+        wall_delta = {}
+    committed, species_kg_h = _wall_deposit_rate_from_delta(
+        wall_delta,
+        dt_h=dt_h,
+    )
+    updated["wall_deposition_rate_committed"] = {
+        "source": "committed_ledger_delta_divided_by_explicit_dt",
+        "dt_h": dt_h,
+        "by_segment_species": committed,
+    }
+    updated["wall_deposition_rate_shadow_candidate"] = {
+        "source": "continuous_rate_model_v1",
+        "inventory_effect": False,
+        "dt_h": dt_h,
+        "by_segment_species": _json_safe(
+            _project_wall_deposition_shadow_to_output(
+                snapshot.wall_deposition_rate_shadow_candidate
+            )
+        ),
+        "authoritative_for_lifespan": False,
+    }
+    updated["wall_deposit_rate_by_segment_species_kg_h"] = {
+        segment: {
+            species: values["kg_h"]
+            for species, values in species_rates.items()
+        }
+        for segment, species_rates in committed.items()
+    }
+    updated["wall_deposit_rate_by_species_kg_h"] = species_kg_h
+    return updated
+
+
+def _project_wall_deposition_shadow_to_output(
+    shadow: Mapping[str, Mapping[str, Mapping[str, Any]]],
+) -> dict[str, dict[str, dict[str, Any]]]:
+    """Add kg/h leaves only at the outward serialization boundary."""
+
+    projected: dict[str, dict[str, dict[str, Any]]] = {}
+    for segment, species_records in sorted(shadow.items()):
+        for species, source_record in sorted(species_records.items()):
+            record = copy.deepcopy(dict(source_record))
+            molar_mass = resolve_species_formula(
+                str(species)
+            ).molar_mass_kg_per_mol()
+            scale = molar_mass * 3600.0
+            record["kg_h"] = float(record.get("mol_s", 0.0)) * scale
+            record["available_supply_kg_h"] = (
+                float(record.get("available_supply_mol_s", 0.0)) * scale
+            )
+            record["uncapped_transport_capacity_kg_h"] = (
+                float(
+                    record.get("uncapped_transport_capacity_mol_s", 0.0)
+                )
+                * scale
+            )
+            uncertainty = dict(record.get("uncertainty") or {})
+            for percentile in ("p05", "p50", "p95"):
+                mol_key = f"{percentile}_mol_s"
+                kg_key = f"{percentile}_kg_h"
+                mol_value = uncertainty.get(mol_key)
+                uncertainty[kg_key] = (
+                    None if mol_value is None else float(mol_value) * scale
+                )
+            record["uncertainty"] = uncertainty
+            projected.setdefault(str(segment), {})[str(species)] = record
+    return projected
 
 
 def _wall_deposit_cumulative_kg_at_snapshot(
@@ -2684,6 +2868,106 @@ def _wall_fouling_report(
         "sticking_alpha_authority": authority,
         "nominal_verdict": nominal_verdict,
         "verdict": verdict,
+    }
+
+
+def _wall_fouling_lifespan_report(
+    *,
+    per_campaign_by_segment_species_kg: Mapping[str, Mapping[str, float]],
+    existing_by_segment_species_kg: Mapping[str, Mapping[str, float]],
+) -> dict[str, Any]:
+    """Return INFO-only remaining-life projection from execution-local rates."""
+
+    cfg = _wall_liner_resinter_config()
+    per_segment = {
+        str(segment): sum(max(0.0, float(kg)) for kg in species_kg.values())
+        for segment, species_kg in per_campaign_by_segment_species_kg.items()
+    }
+    per_segment = {key: value for key, value in per_segment.items() if value > 0.0}
+    existing_by_segment = {
+        str(segment): sum(max(0.0, float(kg)) for kg in species_kg.values())
+        for segment, species_kg in existing_by_segment_species_kg.items()
+    }
+    total_per_campaign = sum(per_segment.values())
+    controlling_segment: str | None = None
+    threshold = cfg.get("resinter_threshold_kg")
+    threshold_kg = None if threshold is None else float(threshold)
+    threshold_qualified = (
+        threshold_kg is not None
+        and math.isfinite(threshold_kg)
+        and threshold_kg > 0.0
+    )
+    campaigns_by_segment: dict[str, float | str] = {}
+    if total_per_campaign <= 0.0:
+        campaigns_to_resinter: float | str = "infinite"
+        nominal_verdict = "slow-fouling"
+    elif threshold_qualified:
+        assert threshold_kg is not None
+        campaigns_by_segment = {
+            segment: max(
+                0.0,
+                threshold_kg - existing_by_segment.get(segment, 0.0),
+            )
+            / load
+            for segment, load in sorted(per_segment.items())
+        }
+        campaigns_to_resinter = min(campaigns_by_segment.values())
+        controlling_segment = min(
+            campaigns_by_segment,
+            key=campaigns_by_segment.get,
+        )
+        nominal_verdict = (
+            "fast-fouling"
+            if campaigns_to_resinter < cfg["fast_fouling_campaign_threshold"]
+            else "slow-fouling"
+        )
+    else:
+        campaigns_by_segment = {
+            segment: (
+                "(resinter_threshold_kg - "
+                f"{existing_by_segment.get(segment, 0.0):.12g}) / {load:.12g}"
+            )
+            for segment, load in sorted(per_segment.items())
+        }
+        campaigns_to_resinter = (
+            "threshold-parametric; see campaigns_to_resinter_by_segment"
+        )
+        nominal_verdict = (
+            "threshold-parametric: fast-fouling if campaigns_to_resinter "
+            f"< {cfg['fast_fouling_campaign_threshold']}, else slow-fouling"
+        )
+
+    return {
+        "input_basis": "execution_local_committed_rate_per_campaign",
+        "liner_material": cfg["liner_material"],
+        "controlling_segment": controlling_segment,
+        "wall_deposit_kg_per_campaign": _clean_report_float(
+            total_per_campaign
+        ),
+        "existing_wall_load_kg_by_segment": {
+            key: _clean_report_float(value)
+            for key, value in sorted(existing_by_segment.items())
+            if value > 0.0
+        },
+        "damage_per_campaign": None,
+        "campaigns_to_resinter": campaigns_to_resinter,
+        "campaigns_to_resinter_by_segment": campaigns_by_segment,
+        "hours_to_resinter": None,
+        "lifespan_interval_campaigns": [None, None],
+        "fast_fouling_campaign_threshold": cfg[
+            "fast_fouling_campaign_threshold"
+        ],
+        "resinter_threshold_kg": threshold,
+        "threshold_basis": (
+            cfg.get("resinter_threshold_basis")
+            or "unmeasured_material_damage_capacity"
+        ),
+        "nominal_verdict": nominal_verdict,
+        "verdict": "non-authoritative",
+        "authoritative": False,
+        "authoritative_for_resinter": False,
+        "verdict_authoritative": False,
+        "authoritative_for_selection": False,
     }
 
 
@@ -4182,6 +4466,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         help="Override SiO overhead liner temperature")
     parser.add_argument("--sio-po2-mbar", type=float, default=None,
                         help="Override SiO controlled pO2 in mbar")
+    parser.add_argument(
+        "--include-wall-deposit-rate-diagnostics",
+        action="store_true",
+        help=(
+            "Include INFO-only committed and shadow wall-deposition rates "
+            "plus furnace-lifespan diagnostics"
+        ),
+    )
     parser.add_argument("--output", required=True,
                         help="Path to write the JSON result document")
     parser.add_argument("--started-at-utc", default=None,
@@ -4295,6 +4587,9 @@ def main(argv: Optional[list[str]] = None) -> int:
             sio_ramp_c_per_hr=args.sio_ramp_c_per_hr,
             sio_liner_temperature_c=args.sio_liner_temperature_c,
             sio_pO2_mbar=args.sio_po2_mbar,
+            include_wall_deposit_rate_diagnostics=bool(
+                args.include_wall_deposit_rate_diagnostics
+            ),
             run_metadata_overrides=metadata_overrides,
         )
         result = run.run()

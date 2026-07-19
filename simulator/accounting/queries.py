@@ -2397,6 +2397,33 @@ def wall_deposit_candidates_by_segment_kg(
             name: value * scale
             for name, value in candidates.items()
         }
+    by_segment = getattr(
+        model,
+        "last_wall_deposition_rate_shadow_candidate",
+        None,
+    )
+    if isinstance(by_segment, dict):
+        molar_mass_kg_mol = resolve_species_formula(
+            species
+        ).molar_mass_kg_per_mol()
+        for segment_name, candidate_kg_h in candidates.items():
+            record = by_segment.get(segment_name, {}).get(species)
+            if not isinstance(record, dict):
+                continue
+            reported_mol_s = (
+                candidate_kg_h / molar_mass_kg_mol / SECONDS_PER_HOUR
+            )
+            transport_capacity_mol_s = float(
+                record["uncapped_transport_capacity_mol_s"]
+            )
+            record["mol_s"] = reported_mol_s
+            record["supply_limited"] = (
+                transport_capacity_mol_s > reported_mol_s
+            )
+            record["transport_limited"] = (
+                transport_capacity_mol_s <= reported_mol_s
+            )
+            record["uncertainty"]["p50_mol_s"] = reported_mol_s
     return candidates
 
 
@@ -2417,9 +2444,13 @@ def wall_deposit_candidate_for_surface_kg(
         return 0.0
 
     from simulator.condensation import (
+        _knudsen_number,
         _local_wall_species_pressure_pa,
         _series_resistance_deposition_flux_mol_m2_s,
+        _transport_parameter_notice,
+        _wall_alpha_record,
         _wall_alpha_s,
+        classify_knudsen_regime,
     )
 
     alpha_s = _wall_alpha_s(
@@ -2444,24 +2475,28 @@ def wall_deposit_candidate_for_surface_kg(
     T_wall_K = max(float(wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
     T_gas_K = max(float(model.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET, 1.0)
     overhead_pressure_pa = float(model.overhead_pressure_mbar) * 100.0
+    applied_pipe_diameter_m = (
+        float(pipe_diameter_m)
+        if pipe_diameter_m is not None
+        else model.pipe_diameter_m
+    )
+    applied_regime_factor = (
+        float(regime_factor)
+        if regime_factor is not None
+        else model.regime_factor
+    )
+    rate_diagnostic: dict[str, Any] = {}
     flux = _series_resistance_deposition_flux_mol_m2_s(
         species, P_local_pa, T_wall_K, alpha_s,
-        pipe_diameter_m=(
-            float(pipe_diameter_m)
-            if pipe_diameter_m is not None
-            else model.pipe_diameter_m
-        ),
+        pipe_diameter_m=applied_pipe_diameter_m,
         stir_factor=model.stir_factor,
         radial_stir_factor=model.radial_stir_factor,
-        regime_factor=(
-            float(regime_factor)
-            if regime_factor is not None
-            else model.regime_factor
-        ),
+        regime_factor=applied_regime_factor,
         T_gas_K=T_gas_K,
         overhead_pressure_pa=overhead_pressure_pa,
         carrier_gas=str(getattr(model, "carrier_gas", "N2") or "N2"),
         vapor_pressure_data=vapor_pressure_data,
+        diagnostic_out=rate_diagnostic,
     )
     if flux <= 0.0:
         return 0.0
@@ -2471,7 +2506,97 @@ def wall_deposit_candidate_for_surface_kg(
         flux_mol_m2_s=flux,
         surface_area_m2=surface_area_m2,
     )
+    carrier_gas = str(getattr(model, "carrier_gas", "N2") or "N2")
+    knudsen_number = _knudsen_number(
+        overhead_pressure_pa,
+        T_gas_K,
+        applied_pipe_diameter_m,
+        carrier_gas=carrier_gas,
+    )
+    alpha_record = _wall_alpha_record(
+        species,
+        getattr(model, "materials", None),
+        segment=segment,
+        T_K=T_wall_K,
+    )
+    parameter_status = _wall_rate_parameter_status(alpha_record)
+    segment_name = str(getattr(segment, "name", "default_pipe"))
+    by_segment = getattr(
+        model,
+        "last_wall_deposition_rate_shadow_candidate",
+        None,
+    )
+    if isinstance(by_segment, dict):
+        reported_kg_h = min(rate_kg_hr, budget_kg_hr)
+        molar_mass_kg_mol = resolve_species_formula(
+            species
+        ).molar_mass_kg_per_mol()
+        reported_mol_s = (
+            reported_kg_h / molar_mass_kg_mol / SECONDS_PER_HOUR
+        )
+        available_supply_mol_s = (
+            rate_kg_hr / molar_mass_kg_mol / SECONDS_PER_HOUR
+        )
+        transport_capacity_mol_s = (
+            budget_kg_hr / molar_mass_kg_mol / SECONDS_PER_HOUR
+        )
+        by_segment.setdefault(segment_name, {})[species] = {
+            **rate_diagnostic,
+            "mol_s": reported_mol_s,
+            "available_supply_mol_s": available_supply_mol_s,
+            "uncapped_transport_capacity_mol_s": transport_capacity_mol_s,
+            "supply_limited": budget_kg_hr > rate_kg_hr,
+            "transport_limited": budget_kg_hr <= rate_kg_hr,
+            "inventory_effect": False,
+            "transport": {
+                "Kn": knudsen_number,
+                "regime_label": classify_knudsen_regime(knudsen_number).value,
+                "correction_model": "series_resistance_continuity_v1",
+                "correction_parameter_status": "bounded_prior",
+                "notice": _transport_parameter_notice(species, carrier_gas),
+            },
+            "surface": {
+                "wall_temperature_K": T_wall_K,
+                "material": str(getattr(segment, "liner_material", "")),
+                "alpha_c": alpha_s,
+                "alpha_c_status": parameter_status,
+                "alpha_c_source": str(alpha_record.get("source") or ""),
+                "reevap_model": "bulk_hkl_equilibrium_pressure",
+            },
+            "parameter_status": parameter_status,
+            "uncertainty": {
+                "p05_mol_s": None,
+                "p50_mol_s": reported_mol_s,
+                "p95_mol_s": None,
+                "basis": "unqualified_until_same_surface_calibration",
+            },
+            "authoritative_for_lifespan": False,
+        }
     return min(rate_kg_hr, budget_kg_hr)
+
+
+def _wall_rate_parameter_status(alpha_record: Mapping[str, Any]) -> str:
+    """Map generic source provenance onto the coating interface vocabulary."""
+
+    raw = str(
+        alpha_record.get("qualification_status")
+        or alpha_record.get("status")
+        or ""
+    ).strip().lower()
+    allowed = {
+        "measured_same_surface",
+        "measured_proxy_surface",
+        "bounded_prior",
+        "uncalibrated",
+    }
+    if raw in allowed:
+        return raw
+    source_class = str(alpha_record.get("source_class") or "").lower()
+    if "uncert" in raw or not alpha_record.get("source"):
+        return "uncalibrated"
+    if "proxy" in raw or "proxy" in source_class:
+        return "measured_proxy_surface"
+    return "bounded_prior"
 
 
 def _wall_deposition_flux_budget_kg_hr(

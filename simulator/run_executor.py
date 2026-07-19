@@ -96,6 +96,7 @@ class RunExecution:
     backend_authoritative: bool = True
     envelope_detail_unavailable: str = ""
     campaigns_elapsed: float = 1.0
+    campaigns_elapsed_start: float = 0.0
 
 
 def _campaigns_elapsed_from_session_history(
@@ -236,6 +237,10 @@ class RunExecutor:
         hours = _coerce_nonnegative_hours(hours)
         snapshot_start = len(
             tuple(getattr(getattr(sim, "record", None), "snapshots", ()))
+        )
+        campaigns_elapsed_start = _campaigns_elapsed_from_session_history(
+            session,
+            fallback=0.0,
         )
         if stop_at_stage0_exit is None:
             config = getattr(session, "_config", None)
@@ -436,6 +441,7 @@ class RunExecutor:
                         )
                     ),
                 ),
+                campaigns_elapsed_start=campaigns_elapsed_start,
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
             if failure_exc is None:
@@ -495,6 +501,7 @@ class RunExecutor:
                         )
                     ),
                 ),
+                campaigns_elapsed_start=campaigns_elapsed_start,
             )
 
 

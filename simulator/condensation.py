@@ -92,6 +92,7 @@ from simulator.accounting.queries import (
     wall_deposit_candidates_by_segment_kg as query_wall_deposit_candidates_by_segment_kg,
 )
 from simulator.config import load_config_bundle
+from simulator.coating_rate import continuous_wall_deposition_flux
 from simulator.core import (
     CondensationTrain, CondensationStage, EvaporationFlux, MeltState,
 )
@@ -1846,6 +1847,9 @@ class CondensationModel:
         self.last_sticking_alpha_provenance_notice: dict[str, Any] = {}
         self.last_transport_parameter_notice: dict[str, Any] = {}
         self.last_capture_budget_regularizer_notice: dict[str, Any] = {}
+        self.last_wall_deposition_rate_shadow_candidate: dict[
+            str, dict[str, Any]
+        ] = {}
         self.wall_alkali_binding_diagnostic_state_by_account: dict[
             str, dict[str, Any]
         ] = {}
@@ -2420,6 +2424,7 @@ class CondensationModel:
         wall_deposit_fraction_by_species: Dict[str, float] = {}
         wall_deposit_account_fractions_by_species: Dict[
             str, Dict[str, float]] = {}
+        self.last_wall_deposition_rate_shadow_candidate = {}
         impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
         antoine_extrapolations: Dict[str, Dict[str, Any]] = {}
         antoine_extrapolation_warnings: list[str] = []
@@ -2697,6 +2702,13 @@ class CondensationModel:
             self.operating_history[-1][
                 'capture_budget_regularizer_notice'
             ] = dict(capture_notice)
+
+        if self.operating_history:
+            self.operating_history[-1][
+                'wall_deposition_rate_shadow_candidate'
+            ] = copy.deepcopy(
+                self.last_wall_deposition_rate_shadow_candidate
+            )
 
         return CondensationRouteResult(
             remaining_by_species=remaining_by_species,
@@ -4278,6 +4290,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     stable_condensation_product_backstop: bool = False,
     antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
     antoine_extrapolation_warnings: list[str] | None = None,
+    diagnostic_out: MutableMapping[str, Any] | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -4361,12 +4374,13 @@ def _series_resistance_deposition_flux_mol_m2_s(
     # kinetic gas temperature belongs in this coefficient. T_surface remains
     # in P_sat(T_surface) above; conflating the two overstates cold-wall arrival.
     # Extract the per-Pa coefficient by calling the unit-pressure helper.
-    k_hkl_per_pa = alpha_s * _hkl_impingement_flux_mol_m2_s(
+    collision_coefficient_per_pa = _hkl_impingement_flux_mol_m2_s(
         species,
         1.0,
         effective_T_gas_K,
         vapor_pressure_data=vapor_pressure_data,
     )
+    k_hkl_per_pa = alpha_s * collision_coefficient_per_pa
     if not math.isfinite(k_hkl_per_pa) or k_hkl_per_pa <= 0.0:
         return 0.0
 
@@ -4392,7 +4406,22 @@ def _series_resistance_deposition_flux_mol_m2_s(
     # branch entirely (avoids spurious dependence on the legacy fallback
     # D_AB constant in tests that don't configure overhead pressure).
     if mt_weight <= 0.0:
-        return k_hkl_per_pa * driving_pressure_pa
+        flux = k_hkl_per_pa * driving_pressure_pa
+        rate = continuous_wall_deposition_flux(
+            bulk_pressure_pa=P_local_pa,
+            equilibrium_pressure_pa=max(
+                0.0, P_local_pa - driving_pressure_pa
+            ),
+            collision_coefficient_mol_m2_s_pa=(
+                collision_coefficient_per_pa
+            ),
+            sticking_coefficient=alpha_s,
+            gas_resistance_pa_m2_s_mol=0.0,
+            wall_temperature_K=T_surface_K,
+        )
+        if diagnostic_out is not None:
+            diagnostic_out.update(rate.to_dict())
+        return flux
 
     # k_MT per Pa: Sh_eff × D_AB / (L_pipe × R × T_gas). T_gas (bulk) sets
     # the ideal-gas denominator; T_surface (wall) sets the saturation
@@ -4448,11 +4477,21 @@ def _series_resistance_deposition_flux_mol_m2_s(
     if not math.isfinite(inv_k_total) or inv_k_total <= 0.0:
         return 0.0
     flux = driving_pressure_pa / inv_k_total
+    rate = continuous_wall_deposition_flux(
+        bulk_pressure_pa=P_local_pa,
+        equilibrium_pressure_pa=max(0.0, P_local_pa - driving_pressure_pa),
+        collision_coefficient_mol_m2_s_pa=collision_coefficient_per_pa,
+        sticking_coefficient=alpha_s,
+        gas_resistance_pa_m2_s_mol=mt_weight / k_mt_per_pa,
+        wall_temperature_K=T_surface_K,
+    )
     if not math.isfinite(flux):
         # Belt-and-suspenders: a non-finite product (e.g., +inf / +inf
         # → NaN) still escapes the per-branch checks above on some
         # platforms. Fail closed at the exit.
         return 0.0
+    if diagnostic_out is not None:
+        diagnostic_out.update(rate.to_dict())
     return flux
 
 

@@ -12470,6 +12470,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         snapshot = HourSnapshot(
             hour=self.melt.hour,
+            duration_h=1.0,
             campaign=self.melt.campaign,
             temperature_C=self.melt.temperature_C,
             melt_mass_kg=self.melt.total_mass_kg,
@@ -12489,6 +12490,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._last_condensed_by_stage_species_delta),
             wall_deposit_by_segment_species_delta=dict(
                 self._last_wall_deposit_by_segment_species_delta),
+            wall_deposition_rate_shadow_candidate=copy.deepcopy(
+                getattr(
+                    self.condensation_model,
+                    'last_wall_deposition_rate_shadow_candidate',
+                    {},
+                )
+            ),
             impurity_delta=dict(self._last_impurity_delta),
             energy_electrical_plus_evaporation_cumulative_kWh=(
                 self.energy_electrical_plus_evaporation_cumulative_kWh

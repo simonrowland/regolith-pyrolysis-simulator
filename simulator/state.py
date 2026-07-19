@@ -976,6 +976,7 @@ class HourSnapshot:
     The full history of snapshots constitutes the batch record.
     """
     hour: int = 0
+    duration_h: float = 1.0
     campaign: CampaignPhase = CampaignPhase.IDLE
 
     # Melt
@@ -1001,6 +1002,9 @@ class HourSnapshot:
         default_factory=dict)
     wall_deposit_by_segment_species_delta: Dict[Tuple[str, str], float] = field(
         default_factory=dict)
+    wall_deposition_rate_shadow_candidate: Dict[
+        str, Dict[str, Any]
+    ] = field(default_factory=dict)
     impurity_delta: Dict[Tuple[int, str], float] = field(default_factory=dict)
 
     # Energy
