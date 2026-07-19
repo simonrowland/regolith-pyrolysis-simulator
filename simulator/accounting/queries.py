@@ -95,6 +95,7 @@ TERMINAL_RUMP_REFRACTORY_OXIDES = frozenset({
 TERMINAL_RUMP_SILICATE_RESIDUAL = frozenset({"SiO2"})
 TERMINAL_RUMP_UNEXTRACTED_METALS = frozenset({"Fe", "Ni", "Co", "Mn"})
 TERMINAL_RUMP_CLASS_TOLERANCE_PCT = 5e-12
+REE_ENRICHMENT_SOURCE_IDS = ("REF-056", "REF-057")
 STAGE0_MELT_REDOX_ACCOUNT = "process.cleaned_melt"
 STAGE0_O2_SOURCE_ACCOUNT_PREFIXES = (
     "process.stage0_",
@@ -374,6 +375,81 @@ class AccountingQueries:
             species: kg
             for species, kg in sorted(species_kg.items())
             if kg > 0.0
+        }
+
+    def terminal_ree_enrichment_extent(self) -> dict[str, Any]:
+        """Ledger-derived REE retention and concentration in the terminal rump.
+
+        REEs are treated as refractory, incompatible lithophiles (REF-056,
+        REF-057), so extraction removes carrier mass while the ledger keeps the
+        lumped ``REE_oxides`` inventory in the residue.  No empirical enrichment
+        coefficient is fitted here.  If ``M`` is total rump mass and ``R`` is
+        REE-oxide mass, then ``E = (R1/M1)/(R0/M0)`` and the process extent is
+        ``X = 1 - M1/M0``.  ``R1/R0`` is reported separately so any future REE
+        loss or addition cannot hide behind the concentration ratio.
+        """
+        initial = self.initial_cleaned_melt_kg()
+        # This is the residual ceramic, not every terminal-rump account: unused
+        # imported C7 Al credit is process inventory, while Ca3Al2O6/Ca12Al14O33
+        # are separately reported C7 calcium-aluminate products. Including either
+        # would dilute the native residue and can make extraction extent negative.
+        terminal: dict[str, float] = {}
+        _merge_masses(
+            terminal,
+            self.ledger.project_account_kg("process.cleaned_melt"),
+        )
+        c7_aluminate_products = {"Ca3Al2O6", "Ca12Al14O33"}
+        _merge_masses(
+            terminal,
+            {
+                species: kg
+                for species, kg in self.ledger.project_account_kg(
+                    "terminal.slag"
+                ).items()
+                if species not in c7_aluminate_products
+            },
+        )
+        initial_total_kg = sum(initial.values())
+        terminal_total_kg = sum(terminal.values())
+        initial_ree_kg = float(initial.get("REE_oxides", 0.0))
+        terminal_ree_kg = float(terminal.get("REE_oxides", 0.0))
+        initial_wt_pct = (
+            initial_ree_kg / initial_total_kg * 100.0
+            if initial_total_kg > 0.0 else 0.0
+        )
+        terminal_wt_pct = (
+            terminal_ree_kg / terminal_total_kg * 100.0
+            if terminal_total_kg > 0.0 else 0.0
+        )
+        retention_fraction = (
+            terminal_ree_kg / initial_ree_kg
+            if initial_ree_kg > 0.0 else None
+        )
+        enrichment_factor = (
+            terminal_wt_pct / initial_wt_pct
+            if initial_wt_pct > 0.0 else None
+        )
+        mass_remaining_fraction = (
+            terminal_total_kg / initial_total_kg
+            if initial_total_kg > 0.0 else None
+        )
+        return {
+            "basis": "initial_cleaned_melt_to_terminal_residual_ceramic",
+            "partition_basis": "refractory_incompatible_lithophile_retained_in_residue",
+            "source_ids": list(REE_ENRICHMENT_SOURCE_IDS),
+            "initial_ree_oxides_kg": initial_ree_kg,
+            "terminal_ree_oxides_kg": terminal_ree_kg,
+            "initial_ree_oxides_wt_pct": initial_wt_pct,
+            "terminal_ree_oxides_wt_pct": terminal_wt_pct,
+            "ree_retention_fraction": retention_fraction,
+            "residual_mass_remaining_fraction": mass_remaining_fraction,
+            "mass_removal_extent_fraction": (
+                None
+                if mass_remaining_fraction is None
+                else 1.0 - mass_remaining_fraction
+            ),
+            "ree_enrichment_factor": enrichment_factor,
+            "derivation": "E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0",
         }
 
     def spent_reductant_residue_by_species(self) -> dict[str, float]:

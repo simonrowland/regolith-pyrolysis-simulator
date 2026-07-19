@@ -7,6 +7,7 @@ import pytest
 import yaml
 
 from simulator.campaigns import CampaignManager
+from simulator.extraction import ExtractionMixin
 from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun
 from simulator.state import BatchRecord, CampaignPhase, DecisionType
@@ -103,6 +104,12 @@ def test_c7_enabled_run_refuses_on_unfavorable_computed_margin_and_closes_mass(
     assert products["calcium_aluminate_cement_slag"]["kg"] == 0.0
     ree = products["residual_REE_enriched_terminal_ceramic"]
     assert ree["REE_enrichment_factor"] == pytest.approx(1.0, rel=0.0, abs=1e-12)
+    assert ree["REE_retention_fraction"] == pytest.approx(1.0)
+    assert ree["mass_removal_extent_fraction"] == pytest.approx(0.0)
+    assert ree["REE_partition_source_ids"] == ["REF-056", "REF-057"]
+    assert ree["REE_enrichment_derivation"] == (
+        "E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0"
+    )
     assert ree["REE_oxides_wt_pct_after_C7"] == pytest.approx(
         ree["REE_oxides_wt_pct_before_C7"], rel=0.0, abs=1e-12
     )
@@ -159,3 +166,22 @@ def test_c7_set_it_to_11_reports_campaign_knob_saturations(tmp_path, monkeypatch
         "campaigns.C7.al_fraction": True,
         "campaigns.C7.extent_fraction": True,
     }
+
+
+def test_c7_zero_ree_baseline_reports_undefined_enrichment():
+    before = {
+        "REE_oxides_kg": 0.0,
+        "REE_oxides_wt_pct": 0.0,
+        "residual_terminal_ceramic_kg": 100.0,
+    }
+    after = {
+        "REE_oxides_kg": 0.0,
+        "REE_oxides_wt_pct": 0.0,
+        "residual_terminal_ceramic_kg": 50.0,
+    }
+
+    extent = ExtractionMixin._c7_ree_enrichment_extent(before, after)
+
+    assert extent["REE_enrichment_factor"] is None
+    assert extent["REE_retention_fraction"] is None
+    assert extent["mass_removal_extent_fraction"] == pytest.approx(0.5)

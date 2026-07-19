@@ -41,6 +41,7 @@ from simulator.account_ids import (
 )
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.queries import (
+    AccountingQueries,
     CONDENSATION_TRAIN_ACCOUNT,
     PRODUCT_LEDGER_ACCOUNTS,
     TERMINAL_ESCAPE_ACCOUNT,
@@ -1654,6 +1655,15 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
         ),
     )
 
+    refractory_ceramic_bucket = _product_story_bucket(refractory_ceramic)
+    try:
+        refractory_ceramic_bucket['ree_enrichment_extent'] = (
+            AccountingQueries(sim).terminal_ree_enrichment_extent()
+        )
+    except Exception as exc:  # noqa: BLE001 -- raw product masses remain usable
+        _safe_log(f'REE enrichment projection unavailable: {exc}')
+        refractory_ceramic_bucket['ree_enrichment_extent'] = {}
+
     return {
         'input': {
             'feedstock': sim.record.feedstock_key,
@@ -1664,7 +1674,7 @@ def _product_story_payload(sim, *, terminal_rump_by_species):
         'glass': _product_story_bucket(glass),
         'oxygen': oxygen,
         'captured_volatiles': _product_story_bucket(captured_volatiles),
-        'refractory_ceramic': _product_story_bucket(refractory_ceramic),
+        'refractory_ceramic': refractory_ceramic_bucket,
         'terminal_residue': residue_bucket,
         'escaped_to_vacuum': _product_story_bucket(escaped_to_vacuum),
         'unrecovered_process_inventory': _product_story_bucket(

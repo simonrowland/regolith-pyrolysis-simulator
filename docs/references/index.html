@@ -21,7 +21,7 @@ ul { padding-left: 1.4rem; }</style>
 <body>
 <h1>Reference Registry</h1>
 <nav><strong>Topics:</strong> 
-<a href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a> (7) | <a href="topics/ceres-mineralogy.html">ceres-mineralogy</a> (4) | <a href="topics/ceres-organics.html">ceres-organics</a> (1) | <a href="topics/comet-organics.html">comet-organics</a> (2) | <a href="topics/evaporation.html">evaporation</a> (6) | <a href="topics/foulant-thermo.html">foulant-thermo</a> (1) | <a href="topics/mars-carbonates.html">mars-carbonates</a> (1) | <a href="topics/perchlorate.html">perchlorate</a> (2) | <a href="topics/redox-fo2.html">redox-fo2</a> (9) | <a href="topics/simulants.html">simulants</a> (1) | <a href="topics/thermal-properties.html">thermal-properties</a> (2) | <a href="topics/thermochemistry.html">thermochemistry</a> (4) | <a href="topics/vapor-pressure.html">vapor-pressure</a> (11) | <a href="topics/volatility.html">volatility</a> (4)
+<a href="topics/carbonaceous-chondrites.html">carbonaceous-chondrites</a> (7) | <a href="topics/ceres-mineralogy.html">ceres-mineralogy</a> (4) | <a href="topics/ceres-organics.html">ceres-organics</a> (1) | <a href="topics/comet-organics.html">comet-organics</a> (2) | <a href="topics/evaporation.html">evaporation</a> (6) | <a href="topics/foulant-thermo.html">foulant-thermo</a> (1) | <a href="topics/mars-carbonates.html">mars-carbonates</a> (1) | <a href="topics/perchlorate.html">perchlorate</a> (2) | <a href="topics/redox-fo2.html">redox-fo2</a> (9) | <a href="topics/ree-partitioning.html">ree-partitioning</a> (1) | <a href="topics/ree-volatility.html">ree-volatility</a> (1) | <a href="topics/simulants.html">simulants</a> (1) | <a href="topics/thermal-properties.html">thermal-properties</a> (2) | <a href="topics/thermochemistry.html">thermochemistry</a> (4) | <a href="topics/vapor-pressure.html">vapor-pressure</a> (11) | <a href="topics/volatility.html">volatility</a> (4)
 </nav>
 <h2>Master List</h2>
 <section class="entry" id="REF-001">
@@ -203,6 +203,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
+<li><code>data/literature/langmuir_knudsen_flux_validation.yaml:32</code> - measurements.potassium_silicate_vacuum.source.citation_id: citation_id: REF-014</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:90</code> - species.CrO2.source: source: &quot;REF-014 notes no isolated CrO2 Hertz-Knudsen alpha adopted; retain high-capture default as a fouling-conservative placeholder.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:140</code> - species.Mn.source: source: &quot;REF-013 REF-014 discuss Mn volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:150</code> - species.Cr.source: source: &quot;REF-014 discusses Cr volatility but no isolated Hertz-Knudsen/sticking alpha was adopted; retain conservative high-capture default.&quot;</li>
@@ -231,6 +232,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
+<li><code>data/literature/langmuir_knudsen_flux_validation.yaml:45</code> - measurements.iron_olivine_kems.source.citation_id: citation_id: REF-016</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:51</code> - species.Fe.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; high-side 0.02 adopted for conservative Fe capture.&quot;</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:69</code> - species.SiO.value.prior_scalar.source: source: &quot;REF-018 REF-016 Schaefer &amp; Fegley 2004 Table 10 SiO2(liq), Hashimoto 1990, alpha_s=0.038-0.048; Costa &amp; Jacobson 2015 olivine SiO+ 0.003-0.036 cross-check.&quot;</li>
 <li><code>data/vapor_pressures.yaml:244</code> - metals.Fe.evaporation_alpha.source: source: &quot;REF-016 Costa &amp; Jacobson 2015 KEMS Fo93Fa7 olivine, Fe+ alpha=0.011-0.020 at 1700-1800 K; Ebel 2005 calculated Fe/FeO alpha~0.2 noted as non-measured high-side proxy&quot;</li>
@@ -301,9 +303,9 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/vapor_pressures.yaml:678</code> - oxide_vapors.CrO2.source: source: &quot;REF-020 JANAF coefficients shipped by VapoRock.&quot;</li>
 <li><code>engines/builtin/stage0_pretreatment.py:1484</code> - def _dispatch_char_feo_reduction(: (REF-020 NIST-JANAF/Chase 1998), so the reaction is spontaneous</li>
 <li><code>simulator/core.py:514</code> - class _MeltRedoxLiquidusFloorFallback: # Premise (owner-ratified t-325 / REF-020 NIST-JANAF/Chase 1998): the C/CO</li>
-<li><code>simulator/runner.py:2159</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
-<li><code>simulator/runner.py:2284</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
-<li><code>simulator/runner.py:2309</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
+<li><code>simulator/runner.py:2343</code> - def _c0_char_diagnostic(: # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020</li>
+<li><code>simulator/runner.py:2468</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;owner-flagged 2026-07-15 Ellingham premise; REF-020 &quot;</li>
+<li><code>simulator/runner.py:2493</code> - def coverage_pct(o2_mol: float, required_mol: float) -&gt; float: &quot;thermodynamic-onset screen from REF-020 JANAF oxide &quot;</li>
 </ul>
 </section>
 <section class="entry" id="REF-021">
@@ -544,6 +546,7 @@ ul { padding-left: 1.4rem; }</style>
 <p><em>Quote needed: no verified pull quote recorded.</em></p>
 <p><strong>Cited by:</strong></p>
 <ul>
+<li><code>data/literature/langmuir_knudsen_flux_validation.yaml:17</code> - measurements.chromium_solid_langmuir_knudsen.source.citation_id: citation_id: REF-040</li>
 <li><code>data/literature/vacuum_pyrolysis_sticking.yaml:74</code> - species.SiO.cold_wall_condensation.source: source: &quot;REF-040 Pound 1972 JPCRD 1:135 DOI 10.1063/1.3253096: high-supersaturation condensation coefficient for growth -&gt; unity; evaporation alpha_e != condensation alpha_c off-equilibrium.&quot;</li>
 <li><code>data/vapor_pressures.yaml:423</code> - metals.Cr.evaporation_alpha.source: source: &quot;REF-040 Pound 1972 J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096, selected McCabe, Hudson &amp; Paxton 1958 Trans. Met. Soc. AIME 212:102 Langmuir-vs-Knudsen result for 99.9% polycrystalline solid Cr and monoatomic Cr(g)&quot;</li>
 <li><code>data/vapor_pressures.yaml:536</code> - metals.Mn.evaporation_alpha.source: source: &quot;REF-040 Pound 1972 and REF-017 Safarian &amp; Engh 2013 class basis: owner-ratified monoatomic-class PROXY, no Mn-specific measurement exists; Safarian &amp; Engh 2013 full text read = zero Mn&quot;</li>
@@ -699,6 +702,31 @@ ul { padding-left: 1.4rem; }</style>
 <p><strong>Cited by:</strong></p>
 <ul>
 <li><code>simulator/fe_redox.py:70</code> - def kress91_temperature_band_case(temperature_C: float) -&gt; dict[str, object]: # (REF-055) are comparison/validation sources, not wider model authority.</li>
+</ul>
+</section>
+<section class="entry" id="REF-056">
+<h2>REF-056</h2>
+<p class="citation">Warren, P.H. &amp; Wasson, J.T. (1979). The origin of KREEP. <em>Reviews of Geophysics and Space Physics</em> <strong>17</strong>: 73-88.</p>
+<p class="meta"><span class="badge">MODEL</span><span class="badge status-current">current</span><a class="badge" href="topics/ree-partitioning.html">ree-partitioning</a></p>
+<p><a href="https://doi.org/10.1029/RG017i001p00073">doi:10.1029/RG017i001p00073</a> | <a href="https://ntrs.nasa.gov/citations/19790041907">source URL</a></p>
+<blockquote><p>Fractional crystallization of this magma ocean would have produced large enrichments of incompatibles in a residual liquid.</p><footer>NASA NTRS abstract; REEs are incompatible and concentrate in the residual fraction.</footer></blockquote>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>simulator/accounting/queries.py:98</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
+<li><code>simulator/accounting/queries.py:383</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REEs are treated as refractory, incompatible lithophiles (REF-056,</li>
+<li><code>simulator/extraction.py:2939</code> - def _c7_ree_enrichment_extent(before: dict, after: dict) -&gt; dict: With REE oxides retained in the refractory residue (REF-056/057),</li>
+</ul>
+</section>
+<section class="entry" id="REF-057">
+<h2>REF-057</h2>
+<p class="citation">Lodders, K., Bergemann, M. &amp; Palme, H. (2025). Solar System Elemental Abundances from the Solar Photosphere and CI-Chondrites. <em>Space Science Reviews</em> <strong>221</strong>: 23.</p>
+<p class="meta"><span class="badge">DATA</span><span class="badge status-current">current</span><a class="badge" href="topics/ree-volatility.html">ree-volatility</a></p>
+<p><a href="https://doi.org/10.1007/s11214-025-01146-w">doi:10.1007/s11214-025-01146-w</a> | <a href="https://ntrs.nasa.gov/citations/20250008646">source URL</a></p>
+<blockquote><p>lithophile elements (RLE) including Al, Ti, Ca, Zr, Hf, Sc, Y and the REE</p><footer>accepted manuscript p. 21 (PDF page 20); Ca and REEs belong to the refractory lithophile component retained in the residue.</footer></blockquote>
+<p><strong>Cited by:</strong></p>
+<ul>
+<li><code>simulator/accounting/queries.py:98</code> - REE_ENRICHMENT_SOURCE_IDS = (&quot;REF-056&quot;, &quot;REF-057&quot;)</li>
+<li><code>simulator/accounting/queries.py:384</code> - def terminal_ree_enrichment_extent(self) -&gt; dict[str, Any]: REF-057), so extraction removes carrier mass while the ledger keeps the</li>
 </ul>
 </section>
 </body>

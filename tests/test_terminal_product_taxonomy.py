@@ -130,7 +130,7 @@ def test_terminal_product_classifier_ci_crash_composition_fails_closed() -> None
 def test_terminal_product_grade_bucket_math_and_omissions() -> None:
     result = classify_terminal_product(
         {
-            "REE2O3": 10.0,
+            "REE_oxides": 10.0,
             "TiO2": 5.0,
             "Cr2O3": 2.5,
             "ZrO2": 1.5,
@@ -150,7 +150,7 @@ def test_terminal_product_grade_bucket_math_and_omissions() -> None:
     assert buckets["chromia"]["mass_kg"] == pytest.approx(5.0)
     assert buckets["zirconia"]["wt_pct_of_residue"] == pytest.approx(1.5)
     assert buckets["zirconia"]["mass_kg"] == pytest.approx(3.0)
-    assert grade["coverage"]["reported_species"] == ["Cr2O3", "REE2O3", "TiO2", "ZrO2"]
+    assert grade["coverage"]["reported_species"] == ["Cr2O3", "REE_oxides", "TiO2", "ZrO2"]
     assert "metallic_pgm" not in buckets
     omitted = {item["bucket"]: item for item in grade["coverage"]["omitted_value_buckets"]}
     assert omitted["metallic_pgm"]["status"] == "future_out_of_domain_today"
@@ -174,7 +174,7 @@ def test_terminal_product_grade_omits_absent_species_instead_of_zero_filling() -
 
 def test_terminal_product_classifier_kreep_ish_high_ree_leads_with_grade() -> None:
     result = classify_terminal_product(
-        {"REE2O3": 52.0, "P2O5": 18.0, "K2O": 8.0, "TiO2": 22.0},
+        {"REE_oxides": 52.0, "P2O5": 18.0, "K2O": 8.0, "TiO2": 22.0},
         basis=WT_BASIS,
         residue_mass_kg=50.0,
         furnace_ceiling_c=1800,
@@ -195,7 +195,7 @@ def test_terminal_product_classifier_does_not_nearest_neighbor_out_of_tolerance(
             "CaO": 20.2,
             "Al2O3": 36.6,
             "SiO2": 35.0,
-            "REE2O3": 8.2,
+            "REE_oxides": 8.2,
         },
         basis=WT_BASIS,
         furnace_ceiling_c=1300,

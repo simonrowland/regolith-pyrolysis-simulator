@@ -16,6 +16,7 @@ from simulator.account_ids import (
     STAGE_COLLECTION_BACKING_ACCOUNTS,
 )
 from simulator.accounting.queries import AccountingQueries
+from simulator.accounting.queries import REE_ENRICHMENT_SOURCE_IDS
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.condensation_routing import product_stage_number
 from simulator.state import (
@@ -2931,6 +2932,41 @@ class ExtractionMixin:
             'residual_terminal_ceramic_kg': residual_kg,
         }
 
+    @staticmethod
+    def _c7_ree_enrichment_extent(before: dict, after: dict) -> dict:
+        """C7-local REE concentration from conserved mass, never a fit.
+
+        With REE oxides retained in the refractory residue (REF-056/057),
+        C7 enrichment follows directly from removing non-REE carrier mass:
+        ``E=(R1/M1)/(R0/M0)``, ``X=1-M1/M0``, retention ``=R1/R0``.
+        """
+        before_ree = float(before['REE_oxides_kg'])
+        after_ree = float(after['REE_oxides_kg'])
+        before_mass = float(before['residual_terminal_ceramic_kg'])
+        after_mass = float(after['residual_terminal_ceramic_kg'])
+        retention = after_ree / before_ree if before_ree > 0.0 else None
+        remaining = after_mass / before_mass if before_mass > 0.0 else None
+        enrichment = (
+            float(after['REE_oxides_wt_pct'])
+            / float(before['REE_oxides_wt_pct'])
+            if float(before['REE_oxides_wt_pct']) > 0.0 else None
+        )
+        return {
+            'REE_enrichment_factor': enrichment,
+            'REE_retention_fraction': retention,
+            'residual_mass_remaining_fraction': remaining,
+            'mass_removal_extent_fraction': (
+                None if remaining is None else 1.0 - remaining
+            ),
+            'REE_partition_basis': (
+                'refractory_incompatible_lithophile_retained_in_residue'
+            ),
+            'REE_partition_source_ids': list(REE_ENRICHMENT_SOURCE_IDS),
+            'REE_enrichment_derivation': (
+                'E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0'
+            ),
+        }
+
     def _c7_stoich(self, mode: str) -> dict:
         if str(mode).upper() == 'C12A7':
             return {
@@ -3489,10 +3525,7 @@ class ExtractionMixin:
         )
         aggregate['REE_oxides_wt_pct_before_C7'] = before['REE_oxides_wt_pct']
         aggregate['REE_oxides_wt_pct_after_C7'] = after['REE_oxides_wt_pct']
-        aggregate['REE_enrichment_factor'] = (
-            after['REE_oxides_wt_pct'] / before['REE_oxides_wt_pct']
-            if before['REE_oxides_wt_pct'] > 0.0 else 0.0
-        )
+        aggregate.update(self._c7_ree_enrichment_extent(before, after))
         aggregate['REE_oxides_kg_preserved'] = after['REE_oxides_kg']
         aggregate['residual_terminal_ceramic_kg'] = (
             after['residual_terminal_ceramic_kg'])
@@ -3522,6 +3555,7 @@ class ExtractionMixin:
                 'unused_surplus_ca_mol': float(
                     diagnostic.get('unused_surplus_ca_mol', 0.0)),
             })
+        ree_extent = self._c7_ree_enrichment_extent(before, after)
         return {
             'enabled': bool(diagnostic),
             'products': {
@@ -3536,10 +3570,7 @@ class ExtractionMixin:
                     'kg': after['residual_terminal_ceramic_kg'],
                     'REE_oxides_wt_pct_before_C7': before['REE_oxides_wt_pct'],
                     'REE_oxides_wt_pct_after_C7': after['REE_oxides_wt_pct'],
-                    'REE_enrichment_factor': (
-                        after['REE_oxides_wt_pct'] / before['REE_oxides_wt_pct']
-                        if before['REE_oxides_wt_pct'] > 0.0 else 0.0
-                    ),
+                    **ree_extent,
                     'REE_oxides_kg_preserved': after['REE_oxides_kg'],
                 },
             },

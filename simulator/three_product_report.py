@@ -38,7 +38,9 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.queries import (
+    AccountingQueries,
     TERMINAL_RUMP_CLASS_TOLERANCE_PCT,
     TERMINAL_RUMP_REFRACTORY_OXIDES,
     TERMINAL_RUMP_SILICATE_RESIDUAL,
@@ -188,6 +190,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 'rump_silicate_residual_kg': float,
                 'rump_unextracted_metals_kg': float,
                 'rump_other_kg': float,
+                'ree_enrichment_extent': dict,
                 'class_total_kg': float,
             },
             'unclassified': {
@@ -260,6 +263,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         sim,
         rump_kg_by_species=rump_kg_by_species,
     )
+    ree_enrichment_extent = _terminal_ree_enrichment_extent(sim)
 
     # ----- Class 3: industrial mixed glass (early-tap option) -----
     # Detected by presence of bulk Si-bearing melt mass left in the
@@ -359,6 +363,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 rump_by_class_kg['unextracted_metals']
             ),
             'rump_other_kg': rump_by_class_kg['other'],
+            'ree_enrichment_extent': ree_enrichment_extent,
             'class_total_kg': rump_total_kg,
         },
         'unclassified': {
@@ -366,6 +371,14 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'total_kg': unclassified_total,
         },
     }
+
+
+def _terminal_ree_enrichment_extent(sim: Any) -> dict[str, Any]:
+    """Expose the accounting facade's feed-to-terminal REE derivation."""
+    try:
+        return dict(AccountingQueries(sim).terminal_ree_enrichment_extent())
+    except (AccountingError, AttributeError, TypeError, ValueError):
+        return {}
 
 
 def _terminal_rump_by_class_kg(

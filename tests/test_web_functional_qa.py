@@ -275,6 +275,14 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert story["terminal_residue"]["class_total_kg"] > 0
     assert completion["terminal_rump_by_species"]["Cr2O3"] > 0
     assert story["refractory_ceramic"]["species_kg"]["Cr2O3"] > 0
+    ree_extent = story["refractory_ceramic"]["ree_enrichment_extent"]
+    assert ree_extent["basis"] == (
+        "initial_cleaned_melt_to_terminal_residual_ceramic"
+    )
+    assert ree_extent["source_ids"] == ["REF-056", "REF-057"]
+    assert ree_extent["derivation"] == (
+        "E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0"
+    )
 
     stage_collection = sim._stage_collection_kg_by_source
     assert story["glass"]["species_kg"] == {

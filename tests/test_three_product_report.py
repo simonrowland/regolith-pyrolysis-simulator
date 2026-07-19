@@ -231,6 +231,76 @@ def test_rump_reads_terminal_rump_method():
     )
 
 
+def test_rump_ree_enrichment_extent_is_ledger_derived_not_fitted():
+    class Ledger:
+        @staticmethod
+        def project_account_kg(account):
+            return (
+                {'CaO': 48.0, 'REE_oxides': 2.0}
+                if account == 'process.cleaned_melt'
+                else {}
+            )
+
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=Ledger(),
+        record=SimpleNamespace(
+            initial_inventory=SimpleNamespace(
+                melt_oxide_kg={'CaO': 98.0, 'REE_oxides': 2.0}
+            )
+        ),
+        _terminal_rump_by_species=lambda: {'CaO': 48.0, 'REE_oxides': 2.0},
+    )
+
+    extent = classify_products(sim)['refractory_ceramic_rump'][
+        'ree_enrichment_extent'
+    ]
+
+    assert extent['source_ids'] == ['REF-056', 'REF-057']
+    assert extent['ree_retention_fraction'] == pytest.approx(1.0)
+    assert extent['mass_removal_extent_fraction'] == pytest.approx(0.5)
+    assert extent['initial_ree_oxides_wt_pct'] == pytest.approx(2.0)
+    assert extent['terminal_ree_oxides_wt_pct'] == pytest.approx(4.0)
+    assert extent['ree_enrichment_factor'] == pytest.approx(2.0)
+
+
+def test_rump_ree_extent_excludes_c7_credit_and_aluminate_product():
+    class Ledger:
+        @staticmethod
+        def project_account_kg(account):
+            return {
+                'process.cleaned_melt': {'CaO': 48.0, 'REE_oxides': 2.0},
+                'process.c7_al_credit': {'Al': 100.0},
+                'terminal.slag': {'Ca3Al2O6': 25.0},
+            }.get(account, {})
+
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=Ledger(),
+        record=SimpleNamespace(
+            initial_inventory=SimpleNamespace(
+                melt_oxide_kg={'CaO': 98.0, 'REE_oxides': 2.0}
+            )
+        ),
+        _terminal_rump_by_species=lambda: {
+            'CaO': 48.0,
+            'REE_oxides': 2.0,
+            'Al': 100.0,
+            'Ca3Al2O6': 25.0,
+        },
+    )
+
+    extent = classify_products(sim)['refractory_ceramic_rump'][
+        'ree_enrichment_extent'
+    ]
+
+    assert extent['terminal_ree_oxides_wt_pct'] == pytest.approx(4.0)
+    assert extent['mass_removal_extent_fraction'] == pytest.approx(0.5)
+    assert extent['ree_enrichment_factor'] == pytest.approx(2.0)
+
+
 def test_rump_surfaces_nonzero_other_bucket_and_mass_closes():
     """The terminal rump report must not hide the accounting ``other`` bucket."""
     sim = SimpleNamespace(
