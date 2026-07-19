@@ -111,6 +111,8 @@ from simulator.melt_backend.base import (
     EquilibriumResult,
     MeltBackend,
     MeltCompositionError,
+    RealBackendAuthority,
+    RealBackendFamily,
     liquid_fraction_from_phase_masses,
     projection_diagnostics_for_melt_input,
     project_melt_to_oxide_projection,
@@ -220,7 +222,7 @@ def _magemin_bulk_projection_details(
     return details
 
 
-class MAGEMinBackend(MeltBackend):
+class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     """
     MAGEMin silicate phase equilibrium adapter.
 
@@ -236,6 +238,8 @@ class MAGEMinBackend(MeltBackend):
                            ``MAGEMin`` binary over a subprocess. Optional
                            Python/Julia bridges are opt-in only.
     """
+
+    real_backend_family = RealBackendFamily.MAGEMIN
 
     name = 'magemin'
 

@@ -48,6 +48,8 @@ from simulator.melt_backend.base import (
     LiquidFractionInvalidError,
     MeltBackend,
     MeltBackendError,
+    RealBackendAuthority,
+    RealBackendFamily,
     liquid_fraction_from_phase_masses,
 )
 from simulator.engine_pool import (
@@ -4422,7 +4424,8 @@ class _MELTSBackendSupport(MeltBackend):
         }
 
 
-class AlphaMELTSBackend(_MELTSBackendSupport):
+class AlphaMELTSBackend(_MELTSBackendSupport, RealBackendAuthority):
     """alphaMELTS subprocess/PetThermoTools backend."""
 
     backend_name = 'alphamelts'
+    real_backend_family = RealBackendFamily.ALPHAMELTS

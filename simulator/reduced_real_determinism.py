@@ -31,10 +31,6 @@ from simulator.backend_names import (
     canonical_backend_class_name,
 )
 from simulator.chemistry.kernel import ChemistryIntent
-from simulator.corpus_version import (
-    current_corpus_version,
-    interoperable_corpus_versions,
-)
 from simulator.config import functional_data_yaml_digest
 from simulator.grind_preflight import (
     assert_strict_vapor_pt1_row,
@@ -43,7 +39,13 @@ from simulator.fe_redox import (
     KRESS91_FO2_KEY_REFERENCE_T_K,
     kress91_referenced_log_fO2,
 )
-from simulator.melt_backend.base import EquilibriumResult
+from simulator.fidelity_vocabulary import EvidenceClass
+from simulator.melt_backend.base import (
+    EquilibriumResult,
+    RealBackendAuthority,
+    RealBackendFamily,
+    project_melt_to_oxide_projection,
+)
 from simulator.melt_backend.sulfsat import SulfurSaturationResult
 
 
@@ -52,7 +54,7 @@ _LOGGER = logging.getLogger(__name__)
 
 SCHEMA_VERSION = "pt0-reduced-real-determinism-v1"
 PHYSICS_BUCKET_SCHEMA_VERSION = "pt1-reduced-real-physics-bucket-v2"
-PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v1"
+PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v2"
 PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 PT1_METADATA_TABLE = "reduced_real_metadata"
 PT1_READ_ONLY_BASE_ALIAS = "pt1_read_only_base"
@@ -133,6 +135,14 @@ _THERMOENGINE_BACKEND_CLASS = (
     'simulator.melt_backend.thermoengine.ThermoEngineBackend'
 )
 _THERMOENGINE_DEFAULT_MODE = 'thermoengine'
+_MAGEMIN_BACKEND_IDENTITIES = frozenset(
+    {
+        (
+            "MAGEMinBackend",
+            "simulator.melt_backend.magemin.MAGEMinBackend",
+        ),
+    }
+)
 _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID = "builtin-backend-equilibrium"
 _INTERNAL_ANALYTICAL_BACKEND_RUNTIME_NAME = "InternalAnalyticalBackend"
 _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME = ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME
@@ -695,7 +705,7 @@ class PT0DeterminismStore:
         *,
         engine_version_provenance: str | None = None,
     ) -> None:
-        validate_reduced_real_equilibrium_record_key(artifact, key)
+        validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         key_bytes = canonical_json_bytes(key)
         payload_bytes = canonical_json_bytes(payload)
         key_hash = _sha256(key_bytes)
@@ -1061,6 +1071,9 @@ class PT0DeterminismStore:
         key_hash: str,
         entry: Mapping[str, Any],
     ) -> None:
+        validate_reduced_real_equilibrium_record_key(
+            artifact, key, entry.get("payload")
+        )
         if entry.get("artifact") != artifact:
             raise PT0CacheCollision(
                 f"PT-0 stored artifact mismatch for {artifact}: {key_hash}"
@@ -1158,7 +1171,7 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_bytes: bytes | None = None,
         physics_bucket_hash: str | None = None,
     ) -> None:
-        validate_reduced_real_equilibrium_record_key(artifact, key)
+        validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         if self.strict_vapor_gate:
             assert_strict_vapor_pt1_row(
                 artifact=artifact,
@@ -1235,15 +1248,15 @@ class PT1PersistentEquilibriumStore:
                     key_hash,
                     artifact,
                     PT1_STORE_SCHEMA_VERSION,
-                    str(key.get("schema_version")),
+                    SCHEMA_VERSION,
                     key_hash,
                     payload_hash,
                     sqlite3.Binary(key_bytes),
                     sqlite3.Binary(payload_bytes),
                     _code_version(),
-                    str(key.get("corpus_version")),
+                    None,
                     _none_or_str(engine_version_provenance),
-                    canonical_json_bytes(key.get("data_digests", {})).decode("utf-8"),
+                    "{}",
                     str(physics_bucket_key.get("schema_version")),
                     physics_bucket_hash,
                     _replay_scope_hash(physics_bucket_key),
@@ -1549,6 +1562,12 @@ class PT1PersistentEquilibriumStore:
         )
         conn.execute(
             f"""
+            CREATE INDEX IF NOT EXISTS idx_{PT1_EQUILIBRIUM_TABLE}_engine_version
+            ON {PT1_EQUILIBRIUM_TABLE}(engine_version)
+            """
+        )
+        conn.execute(
+            f"""
             CREATE INDEX IF NOT EXISTS idx_{PT1_EQUILIBRIUM_TABLE}_physics
             ON {PT1_EQUILIBRIUM_TABLE}(
                 artifact,
@@ -1720,11 +1739,6 @@ class PT1PersistentEquilibriumStore:
                 "PT-1 row store schema version drift: "
                 f"{row['store_schema_version']} != {PT1_STORE_SCHEMA_VERSION}"
             )
-        if row["request_schema_version"] != str(key.get("schema_version")):
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 row request schema version drift: "
-                f"{row['request_schema_version']} != {key.get('schema_version')}"
-            )
         if row["artifact"] != artifact:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row artifact mismatch for {artifact}: {key_hash}"
@@ -1759,22 +1773,9 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row canonical request mismatch: {key_hash}"
             )
-        row_corpus_version = _none_or_str(row["corpus_version"])
-        if row_corpus_version not in interoperable_corpus_versions():
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row corpus version is not interoperable: {key_hash}"
-            )
-        if row_corpus_version != _none_or_str(key.get("corpus_version")):
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row corpus version drift: {key_hash}"
-            )
-        data_digests_json = canonical_json_bytes(
-            key.get("data_digests", {})
-        ).decode("utf-8")
-        if row["data_digests_json"] != data_digests_json:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row data digest drift: {key_hash}"
-            )
+        validate_reduced_real_equilibrium_record_key(
+            artifact, row_key, row_payload
+        )
         return {
             "artifact": artifact,
             "key": copy.deepcopy(dict(row_key)),
@@ -1884,6 +1885,139 @@ class PT1PersistentEquilibriumStore:
         )
 
 
+def _engine_result_namespace_id(
+    *,
+    artifact: str,
+    intent: ChemistryIntent,
+    backend: Any,
+) -> str:
+    family = _typed_backend_family(backend)
+    result_shape = (
+        "freeze-gate-curve"
+        if intent == ChemistryIntent.GATE_LIQUID_FRACTION
+        or artifact == "freeze_gate_curve"
+        else "equilibrium-composite"
+    )
+    return f"{family}:{result_shape}"
+
+
+def _namespace_output_is_extensive(namespace_id: str) -> bool:
+    return namespace_id == "alphamelts:equilibrium-composite"
+
+
+def _effective_magemin_database(
+    sim: Any,
+    intent: ChemistryIntent,
+    provider_role: str | None,
+) -> str | None:
+    candidates: list[Any] = []
+    registry = getattr(sim, "_chem_registry", None)
+    if registry is not None:
+        provider = (
+            registry.fallback_for(intent)
+            if provider_role == "fallback"
+            else registry.authoritative_for(intent)
+        )
+        candidates.extend((provider, getattr(provider, "_backend", None)))
+    backend = getattr(sim, "backend", None)
+    candidates.extend((backend, getattr(backend, "_live_backend", None)))
+    for candidate in candidates:
+        database = getattr(candidate, "_database", None)
+        if database is not None and str(database).strip():
+            return str(database).strip()
+    return None
+
+
+def _resolved_backend_for_cache_identity(
+    sim: Any,
+    intent: ChemistryIntent,
+    provider_role: str | None,
+) -> Any:
+    registry = getattr(sim, "_chem_registry", None)
+    if registry is not None:
+        provider = (
+            registry.fallback_for(intent)
+            if provider_role == "fallback"
+            else registry.authoritative_for(intent)
+        )
+        provider_backend = getattr(provider, "_backend", None)
+        if provider_backend is not None:
+            return provider_backend
+        if (
+            isinstance(provider, RealBackendAuthority)
+            and getattr(provider, "real_backend_family", None)
+            is RealBackendFamily.MAGEMIN
+        ):
+            return provider
+    backend = getattr(sim, "backend", None)
+    return getattr(backend, "_live_backend", None) or backend
+
+
+def _backend_boundary_composition(
+    sim: Any,
+    intent: ChemistryIntent,
+    provider_role: str | None,
+    *,
+    namespace_id: str,
+    sig_figs: int,
+) -> list[tuple[str, float]]:
+    cleaned = sim.atom_ledger.project_account_mol(_CLEANED_MELT_ACCOUNT)
+    backend = _resolved_backend_for_cache_identity(sim, intent, provider_role)
+    species_registry = getattr(sim, "species_formula_registry", None)
+    family = namespace_id.partition(":")[0]
+    if family == "magemin":
+        if backend is None or not hasattr(backend, "_build_db_bulk_projection"):
+            from simulator.melt_backend.magemin import MAGEMinBackend
+
+            backend = MAGEMinBackend()
+            database = _effective_magemin_database(sim, intent, provider_role)
+            if database:
+                backend._database = database
+        projection = project_melt_to_oxide_projection(
+            composition_kg=None,
+            composition_mol=cleaned,
+            oxide_basis=backend._MAGEMIN_INPUT_BASIS,
+            species_formula_registry=species_registry,
+        )
+        bulk = backend._build_db_bulk_projection(projection.oxide_wt_pct)
+        return [
+            (str(component), float(_sigfig(value, sig_figs) or 0.0))
+            for component, value in zip(bulk.order, bulk.vector)
+        ]
+    if family in {"alphamelts", "thermoengine"}:
+        from simulator.melt_backend.alphamelts import MELTS_OXIDE_BASIS
+
+        projection = project_melt_to_oxide_projection(
+            composition_kg=None,
+            composition_mol=cleaned,
+            oxide_basis=MELTS_OXIDE_BASIS,
+            species_formula_registry=species_registry,
+        )
+        normalizer = getattr(backend, "_normalize_composition_to_melts_basis", None)
+        if callable(normalizer):
+            normalized = normalizer(projection.oxide_wt_pct)
+        else:
+            # Fail-loud cached-real replay has no live backend instance. Rebuild
+            # the ordinary MELTS boundary normalization so its key remains
+            # byte-identical to a direct/live-fill producer.
+            normalized = {
+                oxide: float(projection.oxide_wt_pct.get(oxide, 0.0))
+                for oxide in MELTS_OXIDE_BASIS
+            }
+            total = sum(normalized.values())
+            if total <= 0.0:
+                raise ValueError("MELTS boundary composition has no basis oxides")
+            normalized = {
+                oxide: value / total * 100.0
+                for oxide, value in normalized.items()
+            }
+        return [
+            (str(component), float(_sigfig(value, sig_figs) or 0.0))
+            for component, value in sorted(normalized.items())
+        ]
+    return _composition_mol_fraction_from_mol(cleaned, sig_figs=sig_figs)
+
+
 def canonical_replay_key(
     sim: Any,
     *,
@@ -1981,36 +2115,49 @@ def canonical_replay_key(
         provider_role=provider_role,
     )
     vapor_provider = _provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
+    resolved_backend = _resolved_backend_for_cache_identity(
+        sim, intent, provider_role
+    )
+    namespace_id = _engine_result_namespace_id(
+        artifact=artifact,
+        intent=intent,
+        backend=resolved_backend,
+    )
+    total_amount_kg = sum(
+        float(value)
+        for value in sim.atom_ledger.project_account_kg(
+            _CLEANED_MELT_ACCOUNT
+        ).values()
+        if float(value) > 0.0
+    )
+    include_amount = _namespace_output_is_extensive(namespace_id)
+    transport_getter = getattr(sim, "_vapor_pressure_dispatch_pO2_bar", None)
+    transport_pO2 = (
+        float(transport_getter())
+        if callable(transport_getter)
+        else commanded_pO2_bar
+    )
+    quantized_transport_pO2 = _sigfig(
+        transport_pO2,
+        quantization.composition_sig_figs,
+    )
+    if quantized_transport_pO2 is None:
+        raise PT0InvalidControls(
+            "non-finite vapor transport pO2 passed to PT-0 cache key"
+        )
+    sulfsat_gate = getattr(sim, "_sulfsat_gate", None)
     model_identity = {
         "model": provider.get("model"),
         "mode": provider.get("mode"),
+        "magemin_database": _effective_magemin_database(sim, intent, provider_role),
     }
-    engine_version = _cache_key_engine_version(
-        sim,
-        intent,
-        provider_identity=provider,
-        provider_role=provider_role,
-    )
-    if engine_version is not None:
-        model_identity["engine_version"] = engine_version
-
-    # NOTE (cache identity is VERSION-based, NOT source-content-based — deliberate,
-    # see commit 8d09d4f "corpus_version = sole cache lever"): the cache key uses
-    # SCHEMA_VERSION + corpus_version + provider/backend identity, and intentionally
-    # OMITS _source_module_digest(). A source-CONTENT digest in the key would make
-    # the key differ across clusters/checkouts on byte-only differences (line
-    # endings, paths) and break cross-cluster cache sharing. _source_module_digest()
-    # is therefore provenance/coverage only (exercised by tests, which assert a
-    # source byte-change leaves this key UNCHANGED). Tradeoff (accepted by policy):
-    # a covered-module LOGIC change requires a MANUAL corpus_version/SCHEMA_VERSION
-    # bump — there is no auto-tripwire (adding one would force a bump on every
-    # covered edit). Do NOT "fix" this by adding the digest to the key.
-    return {
-        "schema_version": SCHEMA_VERSION,
-        "artifact": str(artifact),
-        "intent": intent.value,
-        "composition_mol_fraction": _composition_mol_fraction(
+    key = {
+        "namespace_id": namespace_id,
+        "composition_mol_fraction": _backend_boundary_composition(
             sim,
+            intent,
+            provider_role,
+            namespace_id=namespace_id,
             sig_figs=quantization.composition_sig_figs,
         ),
         "controls": {
@@ -2018,44 +2165,32 @@ def canonical_replay_key(
             "log_fO2": quantized_fO2_log,
             "pressure_bar": pressure_bar,
             "pO2_bar": quantized_pO2_bar,
+            "vapor_transport_pO2_bar": quantized_transport_pO2,
         },
         "redox": {
             "fe_redox_policy": str(fe_redox_policy),
-            "fe_split": _fe_split(
-                sim,
-                sig_figs=quantization.composition_sig_figs,
-            ),
         },
-        "backend": _backend_identity_for_key(sim),
-        "provider": provider,
-        "vapor_pressure_provider": vapor_provider,
+        "vapor_pressure_provider_selection": vapor_provider.get(
+            "resolved_provider_id"
+        ),
         "sulfur_side": {
             "S_input_ppm": _sigfig(sim._stage0_sulfur_input_ppm(), 6),
-            "stage0_inventory_digest": _digest(sulfur_inventory),
-            **_sulfsat_identity(getattr(sim, "_sulfsat_gate", None)),
+            "inventory": _json_ready(sulfur_inventory),
+            "sulfsat_available": _sulfsat_available(sulfsat_gate),
+            "sulfsat_provider_selection": type(sulfsat_gate).__name__,
         },
         "model": model_identity,
-        "data_digests": _data_digests(sim),
-        "corpus_version": current_corpus_version(),
     }
+    if include_amount:
+        key["total_submitted_amount_kg"] = _sigfig(
+            total_amount_kg,
+            quantization.composition_sig_figs,
+        )
+    return key
 
 
 def _compatible_replay_keys(key: Mapping[str, Any]) -> tuple[dict[str, Any], ...]:
-    current = str(key.get("corpus_version") or "").strip()
-    versions = (current,) + tuple(
-        version
-        for version in interoperable_corpus_versions()
-        if version and version != current
-    )
-    result: list[dict[str, Any]] = []
-    for version in versions:
-        candidate = copy.deepcopy(dict(key))
-        candidate["corpus_version"] = version
-        backend = candidate.get("backend")
-        if isinstance(backend, Mapping) and "corpus_version" in backend:
-            backend["corpus_version"] = version
-        result.append(candidate)
-    return tuple(result)
+    return (copy.deepcopy(dict(key)),)
 
 
 def _expand_compatible_replay_keys(
@@ -2113,18 +2248,15 @@ def canonical_physics_bucket_key_from_replay_key(
 
     sulfur_input_ppm = _sulfur_input_ppm_from_replay_key(key)
     bucket_sulfur: dict[str, Any] = {"S_input_ppm": sulfur_input_ppm}
-    stage0_inventory_digest = _stage0_inventory_digest_from_replay_key(key)
-    if stage0_inventory_digest is not None:
-        bucket_sulfur["stage0_inventory_digest"] = stage0_inventory_digest
+    stage0_inventory = _stage0_inventory_digest_from_replay_key(key)
+    if stage0_inventory is not None:
+        bucket_sulfur["inventory"] = stage0_inventory
     replay_scope: dict[str, Any] = {
-        "exact_replay_schema_version": key.get("schema_version"),
-        "backend": _json_ready(key.get("backend", {})),
-        "provider": _json_ready(key.get("provider", {})),
-        "vapor_pressure_provider": _json_ready(
-            key.get("vapor_pressure_provider", {})
+        "namespace_id": key.get("namespace_id"),
+        "vapor_pressure_provider_selection": key.get(
+            "vapor_pressure_provider_selection"
         ),
-        "corpus_version": key.get("corpus_version"),
-        "data_digests": _solver_data_digests_from_key(key),
+        "model": _json_ready(key.get("model", {})),
     }
     if sulfur_input_ppm and sulfur_input_ppm > 0.0:
         replay_scope["sulfsat"] = _sulfsat_scope_from_key(key)
@@ -2132,8 +2264,7 @@ def canonical_physics_bucket_key_from_replay_key(
     return {
         "schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
         "physics_bucket": {
-            "artifact": str(key.get("artifact")),
-            "intent": str(key.get("intent")),
+            "namespace_id": str(key.get("namespace_id")),
             "composition_mol_fraction": _json_ready(
                 key.get("composition_mol_fraction", [])
             ),
@@ -2300,39 +2431,69 @@ def physics_control_rung_error_budget(
 def validate_reduced_real_equilibrium_record_key(
     artifact: str,
     key: Mapping[str, Any],
+    payload: Mapping[str, Any] | None = None,
 ) -> None:
     if str(artifact) != "equilibrium_post_record":
         return
-    provider = key.get("provider", {})
-    if not isinstance(provider, Mapping):
-        provider = {}
-    provider_ids = {
-        str(provider.get(field, "")).strip()
-        for field in (
-            "resolved_provider_id",
-            "authoritative_provider_id",
-            "fallback_provider_id",
-        )
-        if provider.get(field) is not None
-    }
-    if _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID in provider_ids:
-        backend = key.get("backend", {})
-        if not isinstance(backend, Mapping):
-            backend = {}
-        if not _is_internal_analytical_backend_key(backend):
-            return
+    namespace_id = str(key.get("namespace_id") or "")
+    namespace_family = namespace_id.partition(":")[0]
+    authority = payload.get("authority") if isinstance(payload, Mapping) else None
+    if not isinstance(authority, Mapping):
         raise RuntimeError(
-            "PT-1 reduced-real equilibrium_post_record rows require an "
-            "authorized real provider; got builtin-backend-equilibrium. "
-            "Populate with --backend alphamelts --require-magemin."
+            "PT-1 reduced-real equilibrium_post_record rows require typed "
+            "row authority metadata"
         )
-    backend = key.get("backend", {})
-    if not isinstance(backend, Mapping):
-        backend = {}
-    if _is_internal_analytical_backend_key(backend):
+    if authority.get("schema") != "reduced-real-authority-v1":
         raise RuntimeError(
             "PT-1 reduced-real equilibrium_post_record rows require "
-            "an authorized real backend_name; got InternalAnalyticalBackend."
+            "reduced-real-authority-v1 metadata"
+        )
+    backend = authority.get("backend", {})
+    if not isinstance(backend, Mapping):
+        backend = {}
+    typed_family = _row_validated_backend_family(backend)
+    if typed_family is None:
+        rejected_identity = (
+            "internal-analytical"
+            if _is_internal_analytical_backend_key(backend)
+            else "unrecognized"
+        )
+        raise RuntimeError(
+            "PT-1 reduced-real equilibrium_post_record rows require a "
+            "row-validated real backend identity; self-asserted evidence_class, "
+            "backend_family, and backend labels do not establish authority; "
+            f"got {rejected_identity}."
+        )
+    expected_evidence = {
+        RealBackendFamily.ALPHAMELTS: EvidenceClass.MELTS.value,
+        RealBackendFamily.THERMOENGINE: EvidenceClass.MELTS.value,
+        RealBackendFamily.MAGEMIN: EvidenceClass.MAGEMIN.value,
+    }[typed_family]
+    evidence_class = str(authority.get("evidence_class") or "")
+    backend_family = str(authority.get("backend_family") or "")
+    if (
+        evidence_class != expected_evidence
+        or backend_family != typed_family.value
+        or namespace_family != typed_family.value
+    ):
+        raise RuntimeError(
+            "PT-1 reduced-real equilibrium_post_record authority/namespace "
+            "mismatch: "
+            f"evidence={evidence_class!r}, backend_family={backend_family!r}, "
+            f"validated_backend_family={typed_family.value!r}, "
+            f"namespace={namespace_id!r}."
+        )
+    provider = authority.get("provider", {})
+    if not isinstance(provider, Mapping):
+        provider = {}
+    if not _row_provider_matches_family(provider, typed_family):
+        resolved_provider_id = str(
+            provider.get("resolved_provider_id") or ""
+        ).strip()
+        raise RuntimeError(
+            "PT-1 reduced-real equilibrium_post_record rows require the "
+            f"validated {typed_family.value} provider; got "
+            f"{resolved_provider_id or '<missing>'}."
         )
 
 
@@ -2344,13 +2505,79 @@ def _is_internal_analytical_backend_key(backend: Mapping[str, Any]) -> bool:
     )
 
 
+def _row_validated_backend_family(
+    backend: Mapping[str, Any],
+) -> RealBackendFamily | None:
+    """Resolve persisted authority only from closed, exact adapter identities."""
+
+    identity = (
+        str(backend.get("backend_name") or "").strip(),
+        str(backend.get("backend_class") or "").strip(),
+    )
+    if identity == (_ALPHAMELTS_BACKEND_NAME, _ALPHAMELTS_BACKEND_CLASS):
+        return RealBackendFamily.ALPHAMELTS
+    if identity == (_THERMOENGINE_BACKEND_NAME, _THERMOENGINE_BACKEND_CLASS):
+        return RealBackendFamily.THERMOENGINE
+    if identity in _MAGEMIN_BACKEND_IDENTITIES:
+        return RealBackendFamily.MAGEMIN
+    return None
+
+
+def _row_provider_matches_family(
+    provider: Mapping[str, Any],
+    family: RealBackendFamily,
+) -> bool:
+    """Require an exact provider/role tuple for the validated backend family."""
+
+    resolved = str(provider.get("resolved_provider_id") or "").strip()
+    role = str(provider.get("resolved_role") or "").strip()
+    authoritative = str(
+        provider.get("authoritative_provider_id") or ""
+    ).strip()
+    fallback = str(provider.get("fallback_provider_id") or "").strip()
+    if family in {
+        RealBackendFamily.ALPHAMELTS,
+        RealBackendFamily.THERMOENGINE,
+    }:
+        allowed_resolved = {
+            _ALPHAMELTS_PROVIDER_ID,
+            _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID,
+        }
+        return (
+            resolved in allowed_resolved
+            and role == "authoritative"
+            and authoritative == resolved
+            and fallback in {"", "magemin-shadow"}
+        )
+    if family is RealBackendFamily.MAGEMIN:
+        if resolved != "magemin-shadow":
+            return False
+        if role == "authoritative":
+            return authoritative == "magemin-shadow" and fallback in {
+                "",
+                "magemin-shadow",
+            }
+        if role == "fallback":
+            return (
+                authoritative
+                in {
+                    _ALPHAMELTS_PROVIDER_ID,
+                    _BUILTIN_BACKEND_EQUILIBRIUM_PROVIDER_ID,
+                }
+                and fallback == "magemin-shadow"
+            )
+    return False
+
+
 def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
     transition = getattr(result, "ledger_transition", None)
     if transition is not None:
         raise PT0CacheCollision(
             "PT-0 equilibrium replay does not support cached ledger transitions"
         )
+    intent = _equilibrium_payload_intent(sim)
     payload = {
+        "authority": _equilibrium_record_authority(sim, intent),
         "equilibrium_result": {
             field.name: _json_ready(getattr(result, field.name))
             for field in dataclasses.fields(EquilibriumResult)
@@ -2370,6 +2597,31 @@ def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
             getattr(result, "alphamelts_diagnostics")
         )
     return payload
+
+
+def _equilibrium_record_authority(
+    sim: Any,
+    intent: ChemistryIntent,
+) -> dict[str, Any]:
+    """Persist typed, non-key authority evidence for admission and replay."""
+
+    backend = _resolved_backend_for_cache_identity(sim, intent, None)
+    backend_family = _typed_backend_family(backend)
+    evidence_class = {
+        "alphamelts": EvidenceClass.MELTS.value,
+        "thermoengine": EvidenceClass.MELTS.value,
+        "magemin": EvidenceClass.MAGEMIN.value,
+    }.get(backend_family, EvidenceClass.INTERNAL_ANALYTICAL.value)
+    return {
+        "schema": "reduced-real-authority-v1",
+        "evidence_class": evidence_class,
+        "backend_family": backend_family,
+        "backend": _typed_backend_identity_for_authority(backend),
+        "provider": _provider_identity(sim, intent),
+        "vapor_pressure": _provider_identity(
+            sim, ChemistryIntent.VAPOR_PRESSURE
+        ),
+    }
 
 
 def _cache_payload_diagnostic(value: Mapping[str, Any]) -> dict[str, Any]:
@@ -2974,7 +3226,7 @@ def _stage0_inventory_digest_from_replay_key(key: Mapping[str, Any]) -> Any | No
     sulfur_side = key.get("sulfur_side", {})
     if not isinstance(sulfur_side, Mapping):
         return None
-    return sulfur_side.get("stage0_inventory_digest")
+    return sulfur_side.get("inventory")
 
 
 def _sulfur_input_ppm_from_replay_key(key: Mapping[str, Any]) -> float:
@@ -2995,28 +3247,19 @@ def _sulfsat_scope_from_key(key: Mapping[str, Any]) -> dict[str, Any]:
     return {
         name: sulfur_side.get(name)
         for name in (
-            "sulfsat_provider",
             "sulfsat_available",
-            "sulfsat_package_version",
-            "sulfsat_calibration_version",
+            "sulfsat_provider_selection",
         )
         if sulfur_side.get(name) is not None
     }
 
 
 def _physics_bucket_consumes_log_fO2(key: Mapping[str, Any]) -> bool:
-    return str(key.get("intent")) in {
-        ChemistryIntent.SILICATE_EQUILIBRIUM.value,
-        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION.value,
-        ChemistryIntent.GATE_LIQUID_FRACTION.value,
-        ChemistryIntent.BACKEND_EQUILIBRIUM.value,
-    }
+    return key.get("controls") is not None
 
 
 def _physics_bucket_consumes_pO2_bar(key: Mapping[str, Any]) -> bool:
-    return str(key.get("artifact")) == "equilibrium_post_record" and bool(
-        key.get("vapor_pressure_provider")
-    )
+    return bool(key.get("vapor_pressure_provider_selection"))
 
 
 def _control_float(key: Mapping[str, Any], control_name: str) -> float | None:
@@ -3233,7 +3476,46 @@ def _backend_identity_for_key(sim: Any) -> dict[str, str]:
     return {
         "backend_name": _backend_name_for_key(backend),
         "backend_class": _backend_class_for_key(backend),
-        "corpus_version": current_corpus_version(),
+    }
+
+
+def _typed_backend_family(backend: Any) -> str:
+    """Return a closed engine family without consulting provider labels."""
+
+    if backend is None:
+        return "internal-analytical"
+    live_backend = getattr(backend, "_live_backend", None)
+    if live_backend is not None and live_backend is not backend:
+        return _typed_backend_family(live_backend)
+    if isinstance(backend, RealBackendAuthority):
+        family = getattr(backend, "real_backend_family", None)
+        if isinstance(family, RealBackendFamily):
+            return family.value
+    return "internal-analytical"
+
+
+def _typed_backend_identity_for_authority(backend: Any) -> dict[str, str]:
+    """Serialize a canonical identity chosen only by typed backend authority."""
+
+    family = _typed_backend_family(backend)
+    if family == RealBackendFamily.ALPHAMELTS.value:
+        return {
+            "backend_name": _ALPHAMELTS_BACKEND_NAME,
+            "backend_class": _ALPHAMELTS_BACKEND_CLASS,
+        }
+    if family == RealBackendFamily.THERMOENGINE.value:
+        return {
+            "backend_name": _THERMOENGINE_BACKEND_NAME,
+            "backend_class": _THERMOENGINE_BACKEND_CLASS,
+        }
+    if family == RealBackendFamily.MAGEMIN.value:
+        return {
+            "backend_name": "MAGEMinBackend",
+            "backend_class": "simulator.melt_backend.magemin.MAGEMinBackend",
+        }
+    return {
+        "backend_name": _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME,
+        "backend_class": _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_CLASS,
     }
 
 
@@ -3245,18 +3527,15 @@ def _authorized_backend_identity_for_key(
         return {
             "backend_name": _ALPHAMELTS_BACKEND_NAME,
             "backend_class": _ALPHAMELTS_BACKEND_CLASS,
-            "corpus_version": current_corpus_version(),
         }
     if _is_thermoengine_authorized_name(name):
         return {
             'backend_name': _THERMOENGINE_BACKEND_NAME,
             'backend_class': _THERMOENGINE_BACKEND_CLASS,
-            'corpus_version': current_corpus_version(),
         }
     return {
         "backend_name": name,
         "backend_class": name,
-        "corpus_version": current_corpus_version(),
     }
 
 

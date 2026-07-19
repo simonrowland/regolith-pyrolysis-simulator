@@ -20,7 +20,11 @@ from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.corpus_version import current_corpus_version
 from simulator.grind_preflight import GrindSourceGateError
-from simulator.melt_backend.base import EquilibriumResult
+from simulator.melt_backend.base import (
+    EquilibriumResult,
+    RealBackendAuthority,
+    RealBackendFamily,
+)
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.optimize.determinism import deterministic_result_view
 from simulator.reduced_real_determinism import (
@@ -197,7 +201,7 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-07-18 outward mol projection completeness: PT0 now projects every
     # live ledger account before canonicalizing provider overrides, so the
     # source-module identity advances without changing quantization tolerances.
-    assert key_hash == "c859430e19fa4eacef3f74dd2e4f62a5764fd5ad4c7570e1ef8389e4c59ee064"
+    assert key_hash == "cbb53f105da263c36047ae30e827c2bf754348bb000bf76c1ddef29657b70fcb"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -252,7 +256,7 @@ class _CountingSilicateEquilibriumProvider(ChemistryProvider):
     ) -> None:
         self.calls = 0
         self.fail_live = fail_live
-        self.provider_id = provider_id or self.name
+        self.provider_id = provider_id or "alphamelts-diagnostic"
         self.engine_version = engine_version
 
     def capability_profile(self) -> CapabilityProfile:
@@ -307,7 +311,9 @@ def _run_authoritative_alphamelts_equilibrium(
     allow_internal_analytical_fallback: bool = True,
 ):
     sim = _build_pt0_sim(store)
-    class AlphaMELTSBackend:
+    class AlphaMELTSBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+
         def is_available(self) -> bool:
             return True
 
@@ -475,7 +481,18 @@ def _silicate_equilibrium_key(
 ) -> dict:
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
-    sim.backend.is_available = lambda: True
+    class AlphaMELTSBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+
+        _model = getattr(provider, "_test_model", "MELTSv1.0.2")
+        _mode = getattr(provider, "_test_mode", "subprocess")
+
+        def is_available(self):
+            return True
+
+    typed_backend = AlphaMELTSBackend()
+    sim.backend = typed_backend
+    provider._backend = typed_backend
     sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -493,7 +510,8 @@ def _alphamelts_silicate_equilibrium_key(
         provider_id="alphamelts-diagnostic",
         engine_version=engine_version,
     )
-    provider._backend = SimpleNamespace(_model=model, _mode=mode)
+    provider._test_model = model
+    provider._test_mode = mode
     return _silicate_equilibrium_key(provider)
 
 
@@ -547,7 +565,7 @@ def test_interpolation_diagnostics_do_not_enter_replay_key() -> None:
     assert b"interpolation_feasibility" not in canonical_json_bytes(after)
 
 
-def test_alphamelts_provider_key_partitions_model_mode_and_engine_version() -> None:
+def test_alphamelts_provider_key_partitions_model_mode_not_engine_version() -> None:
     base = _alphamelts_silicate_equilibrium_key()
     pmelts = _alphamelts_silicate_equilibrium_key(model="pMELTS")
     thermoengine = _alphamelts_silicate_equilibrium_key(mode="thermoengine")
@@ -558,36 +576,25 @@ def test_alphamelts_provider_key_partitions_model_mode_and_engine_version() -> N
     assert base["model"] == {
         "model": "MELTSv1.0.2",
         "mode": "subprocess",
-        "engine_version": "alphamelts-authentic-test",
+        "magemin_database": None,
     }
     assert pmelts["model"]["model"] == "pMELTS"
     assert thermoengine["model"]["mode"] == "thermoengine"
-    assert next_engine["model"]["engine_version"] == "alphamelts-authentic-test-2"
+    assert "engine_version" not in next_engine["model"]
     assert _key_hash(base) != _key_hash(pmelts)
     assert _key_hash(base) != _key_hash(thermoengine)
-    assert _key_hash(base) != _key_hash(next_engine)
+    assert _key_hash(base) == _key_hash(next_engine)
 
 
 def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> None:
     key = _freeze_gate_key()
 
-    assert key["backend"] == {
-        "backend_name": "InternalAnalyticalBackend",
-        "backend_class": "simulator.melt_backend.base.InternalAnalyticalBackend",
-        "corpus_version": current_corpus_version(),
-    }
-    assert key["provider"] == {
-        "resolved_provider_id": "magemin-shadow",
-        "resolved_role": "fallback",
-        "authoritative_provider_id": None,
-        "fallback_provider_id": "magemin-shadow",
-        "fallback_allowed": True,
-        "model": "magemin-shadow",
-        "mode": "subprocess",
-    }
+    assert key["namespace_id"] == "magemin:freeze-gate-curve"
+    assert "provider_selection" not in key
     assert key["model"] == {
         "model": "magemin-shadow",
         "mode": "subprocess",
+        "magemin_database": None,
     }
     # No engine_version key is folded into the non-alphamelts model identity (the exact dicts
     # above assert that — the BH-055/056 folding is alphamelts-only). The FULL-key byte-identity
@@ -596,7 +603,44 @@ def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> No
     # duplicate that hardcoded hash here (it rebaselines on legitimate data/corpus moves, and a
     # stale second copy would spuriously re-break this test).
     assert "engine_version" not in key["model"]
-    assert "engine_version" not in key["provider"]
+    assert "engine_version" not in key
+    assert "total_submitted_amount_kg" not in key
+
+
+def test_amount_is_present_only_for_extensive_alphamelts_composite() -> None:
+    extensive = _alphamelts_silicate_equilibrium_key()
+    intensive_magemin = _freeze_gate_key()
+
+    assert extensive["namespace_id"] == "alphamelts:equilibrium-composite"
+    assert extensive["total_submitted_amount_kg"] > 0.0
+    assert intensive_magemin["namespace_id"] == "magemin:freeze-gate-curve"
+    assert "total_submitted_amount_kg" not in intensive_magemin
+
+
+def test_magemin_database_identity_splits_intensive_gate_keys() -> None:
+    def key_for(database: str) -> dict:
+        store = PT0DeterminismStore("capture")
+        sim = _build_pt0_sim(store)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        sim._register_freeze_gate_liquid_fraction_providers()
+        provider = sim._chem_registry.fallback_for(
+            ChemistryIntent.GATE_LIQUID_FRACTION
+        )
+        provider._backend = SimpleNamespace(_database=database)
+        return canonical_replay_key(
+            sim,
+            artifact="freeze_gate_curve",
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=sim._compute_intrinsic_melt_fO2(),
+            fe_redox_policy="intrinsic",
+        )
+
+    ig = key_for("ig")
+    igad = key_for("igad")
+
+    assert ig["model"]["magemin_database"] == "ig"
+    assert igad["model"]["magemin_database"] == "igad"
+    assert _key_hash(ig) != _key_hash(igad)
 
 
 def test_magemin_shadow_fallback_under_alphamelts_config_excludes_engine_version(
@@ -660,11 +704,15 @@ def _c3a_ladder_key(
 
 
 def _put_c3a_payload(db_path: Path, key: dict, label: str) -> None:
-    payload = {"equilibrium_result": {"status": "ok"}, "label": label}
+    payload = {
+        "authority": _alphamelts_record_authority(),
+        "equilibrium_result": {"status": "ok"},
+        "label": label,
+    }
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     rrd.PT1PersistentEquilibriumStore(db_path).put(
-        artifact=str(key["artifact"]),
+        artifact="equilibrium_post_record",
         key=key,
         key_bytes=key_bytes,
         key_hash=hashlib.sha256(key_bytes).hexdigest(),
@@ -676,32 +724,38 @@ def _put_c3a_payload(db_path: Path, key: dict, label: str) -> None:
 
 def _strict_vapor_key() -> dict:
     return {
-        "schema_version": rrd.SCHEMA_VERSION,
-        "artifact": "equilibrium_post_record",
-        "intent": ChemistryIntent.SILICATE_EQUILIBRIUM.value,
+        "namespace_id": "alphamelts:equilibrium-composite",
         "composition_mol_fraction": [["Na2O", 0.1], ["SiO2", 0.9]],
         "controls": {"T_K": 1473.15, "log_fO2": -8.0, "pressure_bar": 0.001},
         "redox": {"fe_redox_policy": "intrinsic", "fe_split": {}},
+        "vapor_pressure_provider_selection": "builtin-vapor-pressure",
+        "sulfur_side": {"S_input_ppm": 0.0, "stage0_inventory_digest": "test"},
+        "model": {"model": "alphamelts-diagnostic", "mode": "AlphaMELTSProvider"},
+    }
+
+
+def _alphamelts_record_authority() -> dict:
+    return {
+        "schema": "reduced-real-authority-v1",
+        "evidence_class": "melts",
+        "backend_family": "alphamelts",
         "backend": {
             "backend_name": "AlphaMELTSBackend",
             "backend_class": "simulator.melt_backend.alphamelts.AlphaMELTSBackend",
-            "backend_version": "alpha-v1",
         },
         "provider": {
             "resolved_provider_id": "alphamelts-diagnostic",
             "resolved_role": "authoritative",
+            "authoritative_provider_id": "alphamelts-diagnostic",
+            "fallback_provider_id": None,
         },
-        "vapor_pressure_provider": {
+        "vapor_pressure": {
             "resolved_provider_id": "builtin-vapor-pressure",
             "resolved_role": "authoritative",
             "authoritative_provider_id": "builtin-vapor-pressure",
             "fallback_provider_id": None,
             "fallback_allowed": False,
         },
-        "sulfur_side": {"S_input_ppm": 0.0, "stage0_inventory_digest": "test"},
-        "model": {"model": "alphamelts-diagnostic", "mode": "AlphaMELTSProvider"},
-        "data_digests": {"vapor_pressures": "test"},
-        "corpus_version": current_corpus_version(),
     }
 
 
@@ -761,6 +815,7 @@ def test_strict_pt1_put_rejects_builtin_fallback_vapor_source(
 ) -> None:
     key = _strict_vapor_key()
     payload = {
+        "authority": _alphamelts_record_authority(),
         "equilibrium_result": {"status": "ok"},
         "last_vapor_pressures_source": {"Na": "builtin_fallback"},
     }
@@ -786,7 +841,7 @@ def test_strict_pt1_put_rejects_builtin_fallback_vapor_source(
 def _lookup_c3a_payload(db_path: Path, key: dict) -> tuple[dict, PT0DeterminismStore]:
     store = PT0DeterminismStore("capture", db_path=db_path)
     payload = store._lookup_optional(
-        str(key["artifact"]),
+        "equilibrium_post_record",
         key,
         physics_bucket_key=canonical_physics_bucket_key_from_replay_key(key),
     )
@@ -813,25 +868,20 @@ def test_pt0_canonical_key_contains_required_identity_fields() -> None:
         fe_redox_policy="intrinsic",
     )
 
-    assert key["schema_version"] == "pt0-reduced-real-determinism-v1"
     assert key["composition_mol_fraction"]
-    assert set(key["controls"]) == {"T_K", "log_fO2", "pressure_bar", "pO2_bar"}
-    assert key["provider"]["resolved_provider_id"] == "magemin-shadow"
-    assert key["provider"]["resolved_role"] == "fallback"
-    assert "vapor_pressure_provider" in key
-    assert "stage0_inventory_digest" in key["sulfur_side"]
-    assert "sulfsat_package_version" in key["sulfur_side"]
-    assert "sulfsat_calibration_version" in key["sulfur_side"]
+    assert set(key["controls"]) == {
+        "T_K", "log_fO2", "pressure_bar", "pO2_bar", "vapor_transport_pO2_bar"
+    }
+    assert "provider_selection" not in key
+    assert "vapor_pressure_provider_selection" in key
+    assert "inventory" in key["sulfur_side"]
+    assert "sulfsat_package_version" not in key["sulfur_side"]
+    assert "sulfsat_calibration_version" not in key["sulfur_side"]
     assert "code_version" not in key
-    assert key["corpus_version"] == current_corpus_version()
+    assert "corpus_version" not in key
     assert "engine_version" not in key
     assert "source_module_digest" not in key
-    assert set(key["data_digests"]) == {
-        "setpoints",
-        "feedstocks",
-        "vapor_pressures",
-        "species_formula_registry",
-    }
+    assert "data_digests" not in key
 
 
 def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
@@ -902,7 +952,7 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
     assert redox_key["controls"]["log_fO2"] != capture_key["controls"]["log_fO2"]
 
 
-def test_pt2_silicate_provider_identity_changes_equilibrium_key() -> None:
+def test_pt2_equilibrium_provider_id_is_namespace_metadata_only() -> None:
     first = _silicate_equilibrium_key(
         _CountingSilicateEquilibriumProvider(
             provider_id="alphamelts-diagnostic-a",
@@ -922,13 +972,13 @@ def test_pt2_silicate_provider_identity_changes_equilibrium_key() -> None:
         )
     )
 
-    assert first["intent"] == ChemistryIntent.SILICATE_EQUILIBRIUM.value
-    assert first["provider"]["resolved_provider_id"] == "alphamelts-diagnostic-a"
-    assert _key_hash(different_provider) != _key_hash(first)
+    assert first["namespace_id"] == "alphamelts:equilibrium-composite"
+    assert "provider_selection" not in first
+    assert _key_hash(different_provider) == _key_hash(first)
     assert _key_hash(different_version) == _key_hash(first)
 
 
-def test_pt2_physics_bucket_partitions_setpoints_and_feedstock_digests() -> None:
+def test_pt2_physics_bucket_ignores_static_data_fingerprints() -> None:
     provider = _CountingSilicateEquilibriumProvider(
         provider_id="alphamelts-diagnostic-cache-c1",
         engine_version="alpha-v1",
@@ -963,17 +1013,10 @@ def test_pt2_physics_bucket_partitions_setpoints_and_feedstock_digests() -> None
 
     baseline_hash = _physics_bucket_hash(baseline_key)
     assert _physics_bucket_hash(unchanged_key) == baseline_hash
-    assert _key_hash(setpoints_key) != _key_hash(baseline_key)
-    assert (
-        setpoints_key["data_digests"]["setpoints"]
-        != baseline_key["data_digests"]["setpoints"]
-    )
-    assert _physics_bucket_hash(setpoints_key) != baseline_hash
-    assert (
-        feedstocks_key["data_digests"]["feedstocks"]
-        != baseline_key["data_digests"]["feedstocks"]
-    )
-    assert _physics_bucket_hash(feedstocks_key) != baseline_hash
+    assert _key_hash(setpoints_key) == _key_hash(baseline_key)
+    assert _physics_bucket_hash(setpoints_key) == baseline_hash
+    assert _key_hash(feedstocks_key) == _key_hash(baseline_key)
+    assert _physics_bucket_hash(feedstocks_key) == baseline_hash
 
 
 def test_pt2_physics_bucket_partitions_real_determinants() -> None:
@@ -1004,18 +1047,16 @@ def test_pt2_physics_bucket_partitions_real_determinants() -> None:
     po2_changed["controls"]["pO2_bar"] *= 10.0
 
     solver_version_changed = copy.deepcopy(key)
-    solver_version_changed["provider"]["engine_version"] = "alpha-v2"
-    solver_version_changed["engine_version"] = "alpha-v2"
 
     assert _physics_bucket_hash(composition_changed) != baseline
     assert _physics_bucket_hash(temperature_changed) != baseline
     assert _physics_bucket_hash(pressure_changed) != baseline
     assert _physics_bucket_hash(redox_changed) != baseline
     assert _physics_bucket_hash(po2_changed) != baseline
-    assert _physics_bucket_hash(solver_version_changed) != baseline
+    assert _physics_bucket_hash(solver_version_changed) == baseline
 
 
-def test_pt2_physics_bucket_partitions_stage0_inventory_digest() -> None:
+def test_pt2_physics_bucket_partitions_stage0_inventory_values() -> None:
     key = _silicate_equilibrium_key(
         _CountingSilicateEquilibriumProvider(
             provider_id="alphamelts-diagnostic-cache-c1",
@@ -1024,16 +1065,17 @@ def test_pt2_physics_bucket_partitions_stage0_inventory_digest() -> None:
     )
     sulfur_key = copy.deepcopy(key)
     sulfur_key["sulfur_side"]["S_input_ppm"] = 1000.0
-    sulfur_key["sulfur_side"]["stage0_inventory_digest"] = "history-a"
+    sulfur_key["sulfur_side"]["inventory"] = {"salt_phase": {"CaSO4": 1.0}}
     bucket = canonical_physics_bucket_key_from_replay_key(sulfur_key)
 
     assert bucket["physics_bucket"]["sulfur"]["S_input_ppm"] == 1000.0
     assert (
-        bucket["physics_bucket"]["sulfur"]["stage0_inventory_digest"] == "history-a"
+        bucket["physics_bucket"]["sulfur"]["inventory"]
+        == {"salt_phase": {"CaSO4": 1.0}}
     )
 
     history_changed = copy.deepcopy(sulfur_key)
-    history_changed["sulfur_side"]["stage0_inventory_digest"] = "history-b"
+    history_changed["sulfur_side"]["inventory"] = {"salt_phase": {"CaSO4": 2.0}}
     assert _physics_bucket_hash(history_changed) != _physics_bucket_hash(sulfur_key)
 
 
@@ -1241,7 +1283,7 @@ def test_pt2_control_ladder_refuses_po2_knee_crossing(tmp_path: Path) -> None:
     store = PT0DeterminismStore("capture", db_path=db_path)
 
     payload = store._lookup_optional(
-        str(query_key["artifact"]),
+        "equilibrium_post_record",
         query_key,
         physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query_key),
     )
@@ -1307,7 +1349,9 @@ def test_pt2_ladder_columns_are_nullable_additive(tmp_path: Path) -> None:
 
 
 def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -> None:
-    class NonAnalyticalBackend:
+    class AlphaMELTSBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+
         def get_engine_version(self) -> str:
             return "non-stub-test"
 
@@ -1323,12 +1367,12 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
 
     db_path = tmp_path / "pt1.sqlite"
     provider = _CountingSilicateEquilibriumProvider(
-        provider_id="alphamelts-diagnostic-cache-c1",
+        provider_id="alphamelts-diagnostic",
         engine_version="alpha-v1",
     )
     capture_store = PT0DeterminismStore("capture", db_path=db_path)
     capture_sim = _build_pt0_sim(capture_store)
-    capture_sim.backend = NonAnalyticalBackend()
+    capture_sim.backend = AlphaMELTSBackend()
     capture_sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -1350,7 +1394,7 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
 
     replay_store = PT0DeterminismStore("capture", db_path=db_path)
     replay_sim = _build_pt0_sim(replay_store)
-    replay_sim.backend = NonAnalyticalBackend()
+    replay_sim.backend = AlphaMELTSBackend()
     replay_sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -1379,13 +1423,15 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
 def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
     tmp_path: Path,
 ) -> None:
-    class NonAnalyticalBackend:
+    class AlphaMELTSBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+
         def get_engine_version(self) -> str:
             return "non-stub-test"
 
     db_path = tmp_path / "control-quantization.sqlite"
     provider = _CountingSilicateEquilibriumProvider(
-        provider_id="alphamelts-diagnostic-cache-c1",
+        provider_id="alphamelts-diagnostic",
         engine_version="alpha-v1",
     )
     capture_store = PT0DeterminismStore(
@@ -1394,7 +1440,7 @@ def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
         control_quantization=ControlQuantization.from_name("coarse"),
     )
     capture_sim = _build_pt0_sim(capture_store)
-    capture_sim.backend = NonAnalyticalBackend()
+    capture_sim.backend = AlphaMELTSBackend()
     capture_sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -1420,7 +1466,7 @@ def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
         control_quantization=ControlQuantization.from_name("fine"),
     )
     replay_sim = _build_pt0_sim(replay_store)
-    replay_sim.backend = NonAnalyticalBackend()
+    replay_sim.backend = AlphaMELTSBackend()
     replay_sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -1776,7 +1822,7 @@ def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(
     assert sim._last_reduced_real_cache_state is None
     assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
 
-    with pytest.raises(RuntimeError, match="builtin-backend-equilibrium"):
+    with pytest.raises(RuntimeError, match="internal-analytical"):
         capture.capture_equilibrium(sim, ok_result)
 
     assert capture.summary()["entries"] == 0
@@ -1784,6 +1830,208 @@ def test_pt1_capture_equilibrium_rejects_internal_analytical_provider(
     assert capture.last_cache_state is None
     assert sim._last_reduced_real_cache_state is None
     assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
+
+
+@pytest.mark.parametrize(
+    "provider_id",
+    ["alphamelts-diagnostic", "unknown-real-engine-label"],
+)
+def test_internal_backend_cannot_be_relabelled_real_by_provider_text(
+    provider_id: str,
+) -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    provider = _CountingSilicateEquilibriumProvider(
+        provider_id=provider_id
+    )
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    key = store._equilibrium_key(sim)
+    result = EquilibriumResult(
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        phase_assemblage_available=False,
+        status="ok",
+    )
+    payload = rrd.equilibrium_payload(sim, result)
+
+    assert key["namespace_id"] == "internal-analytical:equilibrium-composite"
+    assert payload["authority"]["evidence_class"] == "internal-analytical"
+    relabelled = {**key, "namespace_id": "alphamelts:equilibrium-composite"}
+    with pytest.raises(RuntimeError, match="row-validated real backend"):
+        rrd.validate_reduced_real_equilibrium_record_key(
+            "equilibrium_post_record", relabelled, payload
+        )
+
+
+@pytest.mark.parametrize(
+    "stub_name",
+    [
+        "AlphaMELTSBackend",
+        "ThermoEngineBackend",
+        "MAGEMinBackend",
+        "MAGEMinShadowProvider",
+    ],
+)
+def test_same_name_stub_has_no_real_engine_authority(stub_name: str) -> None:
+    stub_type = type(stub_name, (), {})
+
+    assert rrd._typed_backend_family(stub_type()) == "internal-analytical"
+
+
+def test_same_name_alphamelts_stub_cannot_pass_row_authority() -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    stub_type = type("AlphaMELTSBackend", (), {})
+    stub = stub_type()
+    provider = _CountingSilicateEquilibriumProvider(
+        provider_id="alphamelts-diagnostic"
+    )
+    provider._backend = stub
+    sim.backend = stub
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    key = store._equilibrium_key(sim)
+    result = EquilibriumResult(
+        temperature_C=sim.melt.temperature_C,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        phase_assemblage_available=False,
+        status="ok",
+    )
+    payload = rrd.equilibrium_payload(sim, result)
+
+    assert key["namespace_id"] == "internal-analytical:equilibrium-composite"
+    assert payload["authority"]["evidence_class"] == "internal-analytical"
+    relabelled = {**key, "namespace_id": "alphamelts:equilibrium-composite"}
+    with pytest.raises(RuntimeError, match="row-validated real backend"):
+        rrd.validate_reduced_real_equilibrium_record_key(
+            "equilibrium_post_record", relabelled, payload
+        )
+
+
+def test_row_authority_strings_cannot_promote_stub_to_real_engine() -> None:
+    key = {"namespace_id": "alphamelts:equilibrium-composite"}
+    base = _alphamelts_record_authority()
+    hostile_authorities = []
+
+    fake_same_name = copy.deepcopy(base)
+    fake_same_name["backend"] = {
+        "backend_name": "AlphaMELTSBackend",
+        "backend_class": "hostile.fake.AlphaMELTSBackend",
+    }
+    hostile_authorities.append(fake_same_name)
+
+    arbitrary_real_labels = copy.deepcopy(base)
+    arbitrary_real_labels["backend"] = {
+        "backend_name": "definitely-real-engine",
+        "backend_class": "hostile.fake.RealBackend",
+    }
+    hostile_authorities.append(arbitrary_real_labels)
+
+    builtin_same_name = copy.deepcopy(fake_same_name)
+    builtin_same_name["provider"]["resolved_provider_id"] = (
+        "builtin-backend-equilibrium"
+    )
+    hostile_authorities.append(builtin_same_name)
+
+    internal_spelled_real = copy.deepcopy(base)
+    internal_spelled_real["backend"] = {
+        "backend_name": "InternalAnalyticalBackend",
+        "backend_class": (
+            "simulator.melt_backend.internal_analytical."
+            "InternalAnalyticalBackend"
+        ),
+    }
+    hostile_authorities.append(internal_spelled_real)
+
+    for authority in hostile_authorities:
+        with pytest.raises(RuntimeError, match="row-validated real backend"):
+            rrd.validate_reduced_real_equilibrium_record_key(
+                "equilibrium_post_record", key, {"authority": authority}
+            )
+
+    for field in (
+        "resolved_provider_id",
+        "authoritative_provider_id",
+        "fallback_provider_id",
+    ):
+        unknown_provider = copy.deepcopy(base)
+        unknown_provider["provider"][field] = "unknown-real-engine-label"
+        with pytest.raises(RuntimeError, match="validated alphamelts provider"):
+            rrd.validate_reduced_real_equilibrium_record_key(
+                "equilibrium_post_record",
+                key,
+                {"authority": unknown_provider},
+            )
+
+    wrong_family_provider = copy.deepcopy(base)
+    wrong_family_provider["provider"]["authoritative_provider_id"] = (
+        "magemin-shadow"
+    )
+    with pytest.raises(RuntimeError, match="validated alphamelts provider"):
+        rrd.validate_reduced_real_equilibrium_record_key(
+            "equilibrium_post_record",
+            key,
+            {"authority": wrong_family_provider},
+        )
+
+    wrong_role = copy.deepcopy(base)
+    wrong_role["provider"]["resolved_role"] = "fallback"
+    with pytest.raises(RuntimeError, match="validated alphamelts provider"):
+        rrd.validate_reduced_real_equilibrium_record_key(
+            "equilibrium_post_record", key, {"authority": wrong_role}
+        )
+
+    builtin_wrapped_real = copy.deepcopy(base)
+    builtin_wrapped_real["provider"] = {
+        "resolved_provider_id": "builtin-backend-equilibrium",
+        "resolved_role": "authoritative",
+        "authoritative_provider_id": "builtin-backend-equilibrium",
+        "fallback_provider_id": None,
+    }
+    rrd.validate_reduced_real_equilibrium_record_key(
+        "equilibrium_post_record",
+        key,
+        {"authority": builtin_wrapped_real},
+    )
+
+
+def test_typed_real_backend_produces_row_validated_authority() -> None:
+    class TypedAlphaMELTSBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+
+    sim = _build_pt0_sim(None)
+    sim.backend = TypedAlphaMELTSBackend()
+    sim._chem_registry.register(
+        _CountingSilicateEquilibriumProvider(
+            provider_id="alphamelts-diagnostic"
+        ),
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    key = PT0DeterminismStore("capture")._equilibrium_key(sim)
+    payload = rrd.equilibrium_payload(
+        sim,
+        EquilibriumResult(
+            temperature_C=sim.melt.temperature_C,
+            pressure_bar=sim.melt.p_total_mbar / 1000.0,
+            phase_assemblage_available=False,
+            status="ok",
+        ),
+    )
+
+    assert payload["authority"]["backend"] == {
+        "backend_name": "AlphaMELTSBackend",
+        "backend_class": (
+            "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
+        ),
+    }
+    rrd.validate_reduced_real_equilibrium_record_key(
+        "equilibrium_post_record", key, payload
+    )
 
 
 def test_pt1_capture_gate_curve_skips_non_cacheable_status(
@@ -2029,7 +2277,7 @@ def test_tier_ceiling_cached_exact_refuses_physics_bucket_hit(tmp_path: Path) ->
     store = PT0DeterminismStore("capture", db_path=db_path)
     store.cache_tier_ceiling = "cached_exact"
     payload = store._lookup_optional(
-        str(query_key["artifact"]),
+        "equilibrium_post_record",
         query_key,
         physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query_key),
     )
@@ -2056,7 +2304,7 @@ def test_tier_ceiling_cached_physics_bucket_refuses_interpolation(
     store = PT0DeterminismStore("capture", db_path=db_path)
     store.cache_tier_ceiling = "cached_physics_bucket"
     payload = store._lookup_optional(
-        str(query["artifact"]),
+        "equilibrium_post_record",
         query,
         physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
     )

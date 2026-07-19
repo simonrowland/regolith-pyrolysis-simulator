@@ -596,7 +596,7 @@ class StagedStrategy:
                     "stage_index": self._stage_index,
                     "stage_id": stage_id,
                     "stage_ids": (stage_id,),
-                    "recipe_ids": (frontier_patch.recipe_id(self.schema),),
+                    "recipe_ids": (frontier_patch.optimizer_recipe_id(self.schema),),
                     "prefix_depth": 0,
                     "prefix_stage_ids": (),
                     "prefix_recipe_ids": (),
@@ -766,7 +766,7 @@ class StagedStrategy:
                 stage_patch = sampled.patch
                 replay_patch = _combine_patches(stage_patch, suffix_patch)
                 patch = _combine_patches(prefix_patch, replay_patch).validated(self.schema)
-                recipe_id = patch.recipe_id(self.schema)
+                recipe_id = patch.optimizer_recipe_id(self.schema)
                 candidate_id = (
                     f"{self.name}-{self.seed}-{self.topology.id}-backward-"
                     f"{self.backward_passes_completed:02d}-{target_stage_id}-"
@@ -849,7 +849,7 @@ class StagedStrategy:
                 )
                 replay_patch = _overlay_patch(replay_base, refine_patch)
                 patch = _combine_patches(prefix_patch, replay_patch).validated(self.schema)
-                recipe_id = patch.recipe_id(self.schema)
+                recipe_id = patch.optimizer_recipe_id(self.schema)
                 candidate_id = (
                     f"{self.name}-{self.seed}-{self.topology.id}-joint-"
                     f"{self.joint_refines_completed:02d}-{target_stage_ids[0]}-"
@@ -1038,7 +1038,7 @@ def _recipe_ids_from_metadata(candidate: Candidate, schema: RecipeSchema) -> tup
         return values
     return (
         *_string_tuple_metadata(candidate, "prefix_recipe_ids"),
-        candidate.patch.recipe_id(schema),
+        candidate.patch.optimizer_recipe_id(schema),
     )
 
 

@@ -2451,14 +2451,10 @@ def _build_eval_inputs_impl(
     if stop_at_stage0_exit:
         run_config = replace(run_config, stop_at_stage0_exit=True)
 
-    resolved_engine_identity = _resolved_engine_identity_for_eval(
-        run_config.backend_name,
-        run_config.feedstock_id,
-        requires_stage0_subprocess(
-            run_config.feedstock_id,
-            run_config.feedstocks,
-        ),
-    )
+    # Do not probe a native engine before evaluation merely to build cache
+    # metadata. Engine result writers capture the observed version; callers
+    # importing existing EvalSpecs may still retain that provenance field.
+    resolved_engine_identity = ""
 
     data_digests = {
         "corpus_version": current_corpus_version(),
@@ -2846,7 +2842,7 @@ def _evalspec_recipe_id(
             values.pop(C4_HOLD_TEMP_C_PATH, None)
         else:
             values[C4_HOLD_TEMP_C_PATH] = hold_temp
-    return RecipePatch(values).recipe_id(schema)
+    return RecipePatch(values).optimizer_recipe_id(schema)
 
 
 def _c4_default_hold_temp_C(setpoints: Mapping[str, Any]) -> float:

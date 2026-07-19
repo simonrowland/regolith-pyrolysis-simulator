@@ -14,17 +14,22 @@ from simulator.melt_backend.alphamelts import (
     _MELTSBackendSupport,
     activity_from_chem_potential,
 )
-from simulator.melt_backend.base import EquilibriumResult
+from simulator.melt_backend.base import (
+    EquilibriumResult,
+    RealBackendAuthority,
+    RealBackendFamily,
+)
 from simulator.melt_backend.vaporock import VapoRockBackend
 
 
 THERMOENGINE_MIN_PRESSURE_BAR = 1.0e-6
 
 
-class ThermoEngineBackend(_MELTSBackendSupport):
+class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
     """First-class MeltBackend using ENKI ThermoEngine's spawned worker."""
 
     backend_name = 'thermoengine'
+    real_backend_family = RealBackendFamily.THERMOENGINE
     supports_intrinsic_fO2 = True
 
     def __init__(self) -> None:

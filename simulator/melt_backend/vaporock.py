@@ -200,6 +200,12 @@ def vaporock_runtime_available() -> bool:
     return available
 
 
+def effective_vapor_pressure_provider_selection() -> str:
+    """Stable token for the branch used by MELTS-family vapor projection."""
+
+    return "vaporock" if vaporock_runtime_available() else "activity-antoine"
+
+
 def _clear_vaporock_runtime_available_cache() -> None:
     global _VAPOROCK_RUNTIME_AVAILABLE_CACHE
     _VAPOROCK_RUNTIME_AVAILABLE_CACHE = None

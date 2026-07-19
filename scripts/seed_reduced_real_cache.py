@@ -250,13 +250,6 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
         canonical_payload_bytes = canonical_json_bytes(payload)
         key_digest = hashlib.sha256(canonical_key_bytes).hexdigest()
         payload_digest = hashlib.sha256(canonical_payload_bytes).hexdigest()
-        expected_metadata = {
-            "request_schema_version": str(key.get("schema_version")),
-            "corpus_version": str(key.get("corpus_version")),
-            "data_digests_json": canonical_json_bytes(
-                key.get("data_digests", {})
-            ).decode("utf-8"),
-        }
         mismatches: list[str] = []
         if "artifact" in key and key["artifact"] != artifact:
             mismatches.append("artifact")
@@ -270,9 +263,6 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
             mismatches.append("key_sha256")
         if str(row["payload_sha256"]) != payload_digest:
             mismatches.append("payload_sha256")
-        for field, expected in expected_metadata.items():
-            if str(row[field]) != expected:
-                mismatches.append(field)
         try:
             datetime.fromisoformat(str(row["created_at"]).replace("Z", "+00:00"))
         except ValueError:
@@ -284,7 +274,7 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
                 "PT-1 cache source row canonical/provenance mismatch: "
                 f"{source}:{key_hash} fields={','.join(mismatches)}"
             )
-        validate_reduced_real_equilibrium_record_key(artifact, key)
+        validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         assert_strict_vapor_pt1_row(
             artifact=artifact,
             key=key,

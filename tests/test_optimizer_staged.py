@@ -670,7 +670,7 @@ def test_base_evalspec_and_prefix_evalspec_keys_do_not_collide(tmp_path) -> None
     )
 
 
-def test_prefix_evalspec_copies_schema_identity_and_splits_bounds_digest() -> None:
+def test_prefix_evalspec_copies_schema_metadata_without_keying_bounds_digest() -> None:
     base = _spec(RecipePatch({}))
 
     def prefix_for(spec: EvalSpec) -> PrefixEvalSpec:
@@ -709,7 +709,7 @@ def test_prefix_evalspec_copies_schema_identity_and_splits_bounds_digest() -> No
     assert stage0_exit_prefix.stop_at_stage0_exit is True
     assert old_prefix.recipe_id == new_prefix.recipe_id
     assert old_prefix.prefix_recipe_ids == new_prefix.prefix_recipe_ids
-    assert cache_key(old_prefix) != cache_key(new_prefix)
+    assert cache_key(old_prefix) == cache_key(new_prefix)
     assert cache_key(old_prefix) != cache_key(bubbler_prefix)
     assert cache_key(old_prefix) != cache_key(stage0_exit_prefix)
 

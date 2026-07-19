@@ -60,6 +60,28 @@ def _interpolation_payload(
     status: str = "ok",
 ) -> dict:
     return {
+        "authority": {
+            "schema": "reduced-real-authority-v1",
+            "evidence_class": "melts",
+            "backend_family": "alphamelts",
+            "backend": {
+                "backend_name": "AlphaMELTSBackend",
+                "backend_class": "simulator.melt_backend.alphamelts.AlphaMELTSBackend",
+            },
+            "provider": {
+                "resolved_provider_id": "alphamelts-diagnostic",
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": "alphamelts-diagnostic",
+                "fallback_provider_id": None,
+            },
+            "vapor_pressure": {
+                "resolved_provider_id": "builtin-vapor-pressure",
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": "builtin-vapor-pressure",
+                "fallback_provider_id": None,
+                "fallback_allowed": False,
+            },
+        },
         "equilibrium_result": {
             "status": status,
             "phases_present": phases or ["liquid"],
@@ -95,7 +117,7 @@ def _put_interpolation_row(
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     rrd.PT1PersistentEquilibriumStore(db_path).put(
-        artifact=str(key["artifact"]),
+        artifact="equilibrium_post_record",
         key=key,
         key_bytes=key_bytes,
         key_hash=hashlib.sha256(key_bytes).hexdigest(),
@@ -340,7 +362,7 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
 
     store = PT0DeterminismStore("capture", db_path=db_path)
     payload = store._lookup_optional(
-        str(query["artifact"]),
+        "equilibrium_post_record",
         query,
         physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
     )
@@ -386,7 +408,7 @@ def test_cached_interpolated_eval_trace_emits_feasibility_verdict(tmp_path: Path
 
     store = PT0DeterminismStore("capture", db_path=db_path)
     assert store._lookup_optional(
-        str(query["artifact"]),
+        "equilibrium_post_record",
         query,
         physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
     )
@@ -425,7 +447,7 @@ def test_lookup_optional_accepts_fully_liquid_single_phase_rows(tmp_path: Path) 
 
     store = PT0DeterminismStore("capture", db_path=db_path)
     payload = store._lookup_optional(
-        str(query["artifact"]),
+        "equilibrium_post_record",
         query,
         physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
     )
@@ -489,7 +511,7 @@ def test_near_phase_boundary_query_is_refused_not_interpolated(tmp_path: Path) -
 
     store = PT0DeterminismStore("capture", db_path=db_path)
     payload = store._lookup_optional(
-        str(query["artifact"]),
+        "equilibrium_post_record",
         query,
         physics_bucket_key=canonical_physics_bucket_key_from_replay_key(query),
     )

@@ -451,6 +451,9 @@ def _inputs(temperature_C: float) -> dict:
         ),
         "composition_kg": None,
         "fO2_log": -9.0,
+        "commanded_pO2_bar": 1.0e-9,
+        "vapor_transport_pO2_bar": 1.0e-9,
+        "vapor_pressure_provider_selection": "activity-antoine",
         "pressure_bar": 1.0,
         "composition_mol": composition,
         "composition_mol_by_account": {"process.cleaned_melt": composition},
@@ -1022,15 +1025,18 @@ def test_cache_v2_immutable_metadata_written_checked_and_refuses_drift(tmp_path)
     assert metadata["cache_v2_schema_version"] == CACHE_V2_SCHEMA_VERSION
     assert json.loads(metadata["cache_v2_identity_manifest"]) == manifest
     assert manifest["identity"] == {
-        "fields": ["engine_name", "engine_version", "quantized_inputs"],
-        "cache_lever": "corpus_version",
+        "namespace": "engine_name/result_shape (routed before hashing)",
+        "fields": ["quantized_inputs"],
         "optimizer_identity_included": False,
     }
+    assert "corpus_version" not in metadata
+    assert "corpus_version" not in manifest
     quantized_fields = [item["field"] for item in manifest["quantized_inputs"]]
     assert quantized_fields[:14] == [
         f"component_{component}_mol"
         for component in COMPONENT_FIELDS
     ]
+    assert quantized_fields[14] == "submitted_amount_mol"
     assert "timeout_s" not in quantized_fields
     assert len(manifest["outputs"]) == 84
     output_specs = {item["field"]: item for item in manifest["outputs"]}
@@ -1114,6 +1120,37 @@ def test_cache_v2_immutable_metadata_written_checked_and_refuses_drift(tmp_path)
             match="cache_v2 immutable metadata mismatch",
         ):
             GridCacheWriter(database, existing_only=existing_only)
+
+
+def test_corpus_version_change_cannot_invalidate_engine_database(
+    tmp_path,
+    monkeypatch,
+):
+    database = tmp_path / "corpus-neutral-engine.db"
+    inputs = _inputs(1200.0)
+    key = expedited_key(inputs)
+    with GridCacheWriter(database, backend_name="subprocess") as writer:
+        batch_id = writer.ensure_batch(
+            label="corpus-neutral", kind="fixed", seed=1, params={"points": 1}
+        )
+        writer.materialize_key(
+            inputs, batch_id=batch_id, shuffle_rank=0, shard=0
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        assert writer.write_result(grid_key_id, _output())
+
+    monkeypatch.setattr(
+        grid_pregrind_writer,
+        "_load_corpus_version",
+        lambda: "optimizer-corpus-changed",
+    )
+    for existing_only in (False, True):
+        with GridCacheWriter(
+            database,
+            existing_only=existing_only,
+            backend_name="subprocess",
+        ) as writer:
+            assert writer.existing_keys([key]) == {key}
 
 
 def test_cache_v2_key_hash_round_trips_stored_typed_inputs(tmp_path):
@@ -2034,18 +2071,16 @@ def test_writer_refuses_engine_blending_on_open_and_write(tmp_path):
         )
         grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
         writer.commit()
-        subprocess_writer = GridCacheWriter(
-            database, engine_epoch=2, backend_name="subprocess"
-        )
+        with pytest.raises(ValueError, match="namespace mismatch"):
+            GridCacheWriter(
+                database, engine_epoch=2, backend_name="subprocess"
+            )
         with pytest.raises(ValueError, match="engine blend refused"):
             writer.write_result(grid_key_id, _output())
         assert writer.write_result(grid_key_id, thermoengine_output)
         writer.commit()
-        with subprocess_writer:
-            with pytest.raises(ValueError, match="engine blend refused"):
-                subprocess_writer.write_result(grid_key_id, _output())
 
-    with pytest.raises(ValueError, match="dedicated database"):
+    with pytest.raises(ValueError, match="namespace mismatch"):
         GridCacheWriter(
             database,
             engine_epoch=2,
@@ -2597,6 +2632,73 @@ def test_expedited_key_normalizes_negative_zero_recursively():
     }
     assert canonical_input_vector(negative) == canonical_input_vector(positive)
     assert expedited_key(negative) == expedited_key(positive)
+
+
+def test_grid_amount_is_namespace_sensitive_only_for_extensive_outputs():
+    base = _inputs(1200.0)
+    scaled = dict(base)
+    scaled["composition_mol"] = {
+        component: 2.0 * value
+        for component, value in base["composition_mol"].items()
+    }
+    scaled["composition_mol_by_account"] = {
+        "process.cleaned_melt": scaled["composition_mol"]
+    }
+
+    assert expedited_key(base) != expedited_key(scaled)
+    thermo_base = {**base, "mode": "thermoengine"}
+    thermo_scaled = {**scaled, "mode": "thermoengine"}
+    assert expedited_key(thermo_base) == expedited_key(thermo_scaled)
+    assert cache_v2_key_hash(thermo_base) == cache_v2_key_hash(thermo_scaled)
+
+
+def test_grid_vapor_provider_selection_splits_engine_keys():
+    fallback = {**_inputs(1200.0), "mode": "thermoengine"}
+    vaporock = {
+        **fallback,
+        "vapor_pressure_provider_selection": "vaporock",
+    }
+
+    assert expedited_key(fallback) != expedited_key(vaporock)
+    assert cache_v2_key_hash(fallback) != cache_v2_key_hash(vaporock)
+
+
+def test_prepared_grid_database_is_bound_to_engine_namespace(tmp_path):
+    database = tmp_path / "prepared.db"
+    with GridCacheWriter(database, backend_name="subprocess") as writer:
+        batch_id = writer.ensure_batch(
+            label="prepared", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            _inputs(1200.0), batch_id=batch_id, shuffle_rank=0, shard=0
+        )
+
+    with pytest.raises(ValueError, match="namespace mismatch"):
+        GridCacheWriter(
+            database, backend_name="thermoengine", existing_only=True
+        )
+
+
+def test_grid_operational_timeouts_are_key_neutral():
+    base = _inputs(1200.0)
+    changed = {
+        **base,
+        "timeout_s": 999.0,
+        "thermoengine_health_timeout_s": 321.0,
+    }
+    assert canonical_input_vector(base) == canonical_input_vector(changed)
+    assert cache_v2_key_hash(base) == cache_v2_key_hash(changed)
+
+
+def test_grid_commanded_and_transport_pO2_are_independent_determinants():
+    base = _inputs(1200.0)
+    commanded = {**base, "commanded_pO2_bar": 2.0e-9}
+    transport = {**base, "vapor_transport_pO2_bar": 3.0e-9}
+
+    assert expedited_key(commanded) != expedited_key(base)
+    assert expedited_key(transport) != expedited_key(base)
+    assert cache_v2_key_hash(commanded) != cache_v2_key_hash(base)
+    assert cache_v2_key_hash(transport) != cache_v2_key_hash(base)
 
 
 def test_numeric_expedited_key_prefix_is_a_valid_retry_selector(tmp_path):

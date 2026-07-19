@@ -34,23 +34,10 @@ def _canonical_bytes(value):
 
 def _pt1_key(label: str, *, temperature_K: float = 1500.0) -> dict:
     return {
-        "schema_version": "test",
-        "code_version": "test",
-        "corpus_version": current_corpus_version(),
+        "namespace_id": "magemin:equilibrium-composite",
         "artifact": "equilibrium_result",
         "intent": "EQUILIBRIUM",
-        "data_digests": {},
-        "provider": {
-            "resolved_provider_id": "magemin-shadow",
-            "resolved_role": "silicate_liquidus",
-        },
-        "vapor_pressure_provider": {
-            "resolved_provider_id": "builtin-vapor-pressure",
-            "resolved_role": "authoritative",
-            "authoritative_provider_id": "builtin-vapor-pressure",
-            "fallback_provider_id": None,
-            "fallback_allowed": False,
-        },
+        "vapor_pressure_provider_selection": "builtin-vapor-pressure",
         "controls": {
             "T_K": temperature_K,
             "pressure_bar": 0.01,
@@ -63,6 +50,28 @@ def _pt1_key(label: str, *, temperature_K: float = 1500.0) -> dict:
 
 def _pt1_payload(label: str) -> dict:
     return {
+        "authority": {
+            "schema": "reduced-real-authority-v1",
+            "evidence_class": "magemin",
+            "backend_family": "magemin",
+            "backend": {
+                "backend_name": "MAGEMinBackend",
+                "backend_class": "simulator.melt_backend.magemin.MAGEMinBackend",
+            },
+            "provider": {
+                "resolved_provider_id": "magemin-shadow",
+                "resolved_role": "fallback",
+                "authoritative_provider_id": "alphamelts-diagnostic",
+                "fallback_provider_id": "magemin-shadow",
+            },
+            "vapor_pressure": {
+                "resolved_provider_id": "builtin-vapor-pressure",
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": "builtin-vapor-pressure",
+                "fallback_provider_id": None,
+                "fallback_allowed": False,
+            },
+        },
         "suffix": label,
         "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
     }
@@ -348,7 +357,7 @@ def test_merge_cache_shard_rejects_stored_payload_hash_drift(tmp_path):
     assert driver._cache_row_summary(target_db)["rows"] == 0
 
 
-def test_merge_cache_shard_refuses_corpus_mismatch_without_mutating_target(tmp_path):
+def test_merge_cache_shard_accepts_corpus_key_metadata_drift(tmp_path):
     driver = _load_driver()
     shard_db = tmp_path / "shard.db"
     target_db = tmp_path / "target.db"
@@ -356,18 +365,13 @@ def test_merge_cache_shard_refuses_corpus_mismatch_without_mutating_target(tmp_p
     shard_key = _pt1_key("shard")
     shard_key["corpus_version"] = "incompatible-test-corpus"
     _write_pt1_row(shard_db, shard_key)
-    before = target_db.read_bytes()
+    summary = driver._merge_cache_shard(shard_db, target_db)
 
-    with pytest.raises(
-        driver.CacheShardCorpusVersionMismatch,
-        match="corpus version mismatch",
-    ):
-        driver._merge_cache_shard(shard_db, target_db)
-
-    assert target_db.read_bytes() == before
+    assert summary["inserted_rows"] == 1
+    assert driver._cache_row_summary(target_db)["rows"] == 2
 
 
-def test_merge_cache_shard_refuses_row_key_corpus_drift_without_mutating_target(
+def test_merge_cache_shard_accepts_row_corpus_metadata_drift(
     tmp_path,
 ):
     driver = _load_driver()
@@ -384,15 +388,40 @@ def test_merge_cache_shard_refuses_row_key_corpus_drift_without_mutating_target(
             """,
             ("drifted-row-corpus", shard_hash),
         )
-    before = target_db.read_bytes()
+    summary = driver._merge_cache_shard(shard_db, target_db)
 
-    with pytest.raises(
-        driver.CacheShardCorpusVersionMismatch,
-        match="row corpus version mismatch",
-    ):
-        driver._merge_cache_shard(shard_db, target_db)
+    assert summary["inserted_rows"] == 1
+    assert driver._cache_row_summary(target_db)["rows"] == 2
 
-    assert target_db.read_bytes() == before
+
+def test_magemin_accounting_reads_new_namespace_schema(tmp_path):
+    driver = _load_driver()
+    db_path = tmp_path / "magemin-new-schema.db"
+    key_hash = _write_pt1_row(db_path, _pt1_key("magemin"))
+
+    summary = driver._cache_row_summary(db_path)
+
+    assert summary["magemin_unique_keys"] == 1
+    assert driver._magemin_key_hashes(db_path) == {key_hash}
+
+
+def test_new_schema_pt1_gate_rejects_fallback_authority(tmp_path):
+    driver = _load_driver()
+    db_path = tmp_path / "fallback-authority.db"
+    payload = _pt1_payload("fallback")
+    payload["authority"]["vapor_pressure"].update(
+        {
+            "resolved_provider_id": "builtin-fallback",
+            "authoritative_provider_id": "builtin-vapor-pressure",
+            "fallback_provider_id": "builtin-fallback",
+            "fallback_allowed": True,
+        }
+    )
+    _write_pt1_row(db_path, _pt1_key("fallback"), payload)
+
+    row = driver._cache_payload_rows(db_path)[0]
+    with pytest.raises(driver.GrindSourceGateError, match="builtin-fallback"):
+        driver._validated_cache_payload_row(row)
 
 
 def test_physics_bucket_hit_recomputes_bucket_from_exact_key(tmp_path):

@@ -1270,6 +1270,19 @@ def test_fidelity_pool_reuses_warm_workers_and_cold_env_preserves_zero_drop_pari
     assert cold_result.to_dict() | {"artifact_paths": {}} == warm_result.to_dict() | {
         "artifact_paths": {}
     }
+    warm_bytes = json.dumps(
+        warm_result.to_dict() | {"artifact_paths": {}},
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    cold_bytes = json.dumps(
+        cold_result.to_dict() | {"artifact_paths": {}},
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    assert warm_bytes == cold_bytes
     assert len(cold_records) == 8
     assert not any(record["has_runtime"] for record in cold_records)
 

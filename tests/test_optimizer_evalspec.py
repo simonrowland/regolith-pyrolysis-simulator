@@ -102,34 +102,29 @@ STAGE_SIO_GAS_MODE = (
 # EvalSpec identity so cost-sensitive optimizer cache entries are reproducible.
 # 2026-07-17 W-A5a/t-227: re-pinned from the executable serializer after the
 # reviewed electricity and solar-heat defaults landed.
-# b-026 residual: removing the inert C3 hold-time bound moved schema identity.
+# Regenerated from canonical_evalspec_json(_base_spec()) for b-042.
 PINNED_EVALSPEC_JSON = (
-    b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor"'
-    b':false,"allowlist_version":"allowlist-v12","backend_name":"i'
-    b'nternal-analytical","bounds_digest":"d2415b67d026eed269340346674e9'
-    b'e9d1774cc3fae698bd174b08cbfe42d7c79","c5_enabled":false,"ca'
-    b'mpaign":"C0","chemistry_kernel":{"allow_builtin_fallbac'
-    b'k":false,"engine":"builtin","pressure_Pa":"0.001000000"},"co'
-    b'de_version":"0.6.0","cost_parameters":{"parameters":{"deprec'
-    b'iation_expense_per_run":"50.000000000","electricity_cost_per'
-    b'_kWh":"10.000000000","furnace_resinter_cost_usd":"5000.000000'
-    b'000","generic_reagent_cost_per_kg":"10.000000000","shuttle_r'
-    b'eagent_replacement_cost_per_kg":{"Ca":"0.500000000","K":"1.0'
-    b'00000000","Mg":"0.750000000","Na":"0.500000000"},"solar_he'
-    b'at_cost_per_kWh":"0.050000000"},"schema_version":"optimize-c'
-    b'osts-v1"},"data_digests":{"corpus_version"'
-    b':"corpus-version-digest","feedstocks":"feedstock-digest","fo'
-    b'ulant_thermo":"foulant-thermo-digest","materials":"materials'
-    b'-digest","profile":"profile-digest","setpoints":"setpoints-d'
-    b'igest","species_catalog":"species-catalog-digest","vapor_pre'
-    b'ssures":"vapor-digest"},"feedstock_id":"lunar_mare_low_ti","'
-    b'feedstock_recipe_digest":"feedstock-recipe-digest","fidelity'
-    b'":"fast","force_builtin_vapor_pressure":false,"hours":24,"ma'
-    b'ss_kg":"1000.000000000","mre_max_voltage_V":"0.000000000","m'
-    b're_target_species":"","profile_id":"oxygen-yield-v1","recipe'
-    b'_id":"recipe-id","runtime_campaign_overrides":{"C0":{"hold_t'
-    b'ime_h":"1.000000000"}},"track":"pyrolysis","vapor_pressure_p'
-    b'rovider_id":"builtin-vapor-pressure"}'
+    b'{"additives_kg":{"CaO":"1.500000000"},"allow_fallback_vapor":false,'
+    b'"backend_name":"internal-analytical","c5_enabled":false,"campaign":"C0",'
+    b'"chemistry_kernel":{"allow_builtin_fallback":false,"engine":"builtin",'
+    b'"pressure_Pa":"0.001000000"},"corpus_version":"corpus-version-digest",'
+    b'"cost_parameters":{"parameters":{"depreciation_expense_per_run":'
+    b'"50.000000000","electricity_cost_per_kWh":"10.000000000",'
+    b'"furnace_lifetime_cost_multiplier":"500.000000000",'
+    b'"furnace_resinter_cost_usd":"5000.000000000",'
+    b'"generic_reagent_cost_per_kg":"10.000000000",'
+    b'"min_fouling_penalty":"1.000000000",'
+    b'"shuttle_reagent_replacement_cost_per_kg":{"Ca":"0.500000000",'
+    b'"K":"1.000000000","Mg":"0.750000000","Na":"0.500000000"},'
+    b'"solar_heat_cost_per_kWh":"0.050000000"},"schema_version":'
+    b'"optimize-costs-v1"},"data_digests":{"profile":"profile-digest"},'
+    b'"feedstock_id":"lunar_mare_low_ti","fidelity":"fast",'
+    b'"force_builtin_vapor_pressure":false,"hours":24,"mass_kg":'
+    b'"1000.000000000","mre_max_voltage_V":"0.000000000",'
+    b'"mre_target_species":"","profile_id":"oxygen-yield-v1",'
+    b'"recipe_id":"recipe-id","runtime_campaign_overrides":{"C0":'
+    b'{"hold_time_h":"1.000000000"}},"track":"pyrolysis",'
+    b'"vapor_pressure_provider_id":"builtin-vapor-pressure"}'
 )
 PINNED_FEEDSTOCK_JSON = (
     b'[["Al2O3","13.500000000"],["FeO","16.500000000"],["SiO2","44.500000000"]]'
@@ -313,8 +308,8 @@ def test_alpha_fallback_default_preserves_legacy_evalspec_identity() -> None:
     assert cache_key(enabled_spec) != cache_key(default_spec)
 
 
-def test_evalspec_cache_key_changes_when_allowlist_version_changes() -> None:
-    assert cache_key(_base_spec(allowlist_version="allowlist-old")) != cache_key(
+def test_evalspec_cache_key_ignores_allowlist_version_changes() -> None:
+    assert cache_key(_base_spec(allowlist_version="allowlist-old")) == cache_key(
         _base_spec(allowlist_version="allowlist-new")
     )
 
@@ -360,8 +355,8 @@ def test_build_eval_inputs_keys_schema_allowlist_version_in_production_path() ->
 
     assert old_spec.allowlist_version == "allowlist-old"
     assert new_spec.allowlist_version == "allowlist-new"
-    assert old_spec.recipe_id != new_spec.recipe_id
-    assert cache_key(old_spec) != cache_key(new_spec)
+    assert old_spec.recipe_id == new_spec.recipe_id
+    assert cache_key(old_spec) == cache_key(new_spec)
 
 
 def test_build_eval_inputs_keys_resolved_engine_identity(monkeypatch) -> None:
@@ -402,7 +397,7 @@ def test_build_eval_inputs_keys_resolved_engine_identity(monkeypatch) -> None:
     finally:
         evaluate_module._resolved_engine_identity_for_eval.cache_clear()
 
-    assert first.resolved_engine_identity == identity
+    assert first.resolved_engine_identity == ""
     assert canonical_evalspec_json(first) == canonical_evalspec_json(second)
     assert cache_key(first) == cache_key(second)
 
@@ -441,8 +436,8 @@ def test_build_eval_inputs_keys_schema_bounds_digest_in_production_path() -> Non
 
     assert old_spec.bounds_digest == old_schema.bounds_digest
     assert new_spec.bounds_digest == new_schema.bounds_digest
-    assert old_spec.recipe_id != new_spec.recipe_id
-    assert cache_key(old_spec) != cache_key(new_spec)
+    assert old_spec.recipe_id == new_spec.recipe_id
+    assert cache_key(old_spec) == cache_key(new_spec)
 
 
 def test_o2_bubbler_default_and_zero_settings_preserve_evalspec_identity() -> None:
@@ -478,9 +473,9 @@ def test_o2_bubbler_default_and_zero_settings_preserve_evalspec_identity() -> No
     assert default_spec.recipe_id == baseline.recipe_id
     assert zero_spec.recipe_id == baseline.recipe_id
     assert canonical_evalspec_json(default_spec) == canonical_evalspec_json(baseline)
-    assert canonical_evalspec_json(zero_spec) != canonical_evalspec_json(baseline)
+    assert canonical_evalspec_json(zero_spec) == canonical_evalspec_json(baseline)
     assert cache_key(default_spec) == cache_key(baseline)
-    assert cache_key(zero_spec) != cache_key(baseline)
+    assert cache_key(zero_spec) == cache_key(baseline)
     assert zero_spec.conditional_subspace_digest
     assert b"o2_bubbler_settings" not in canonical_evalspec_json(default_spec)
 
@@ -527,9 +522,7 @@ def test_code_version_is_sourced_from_version_file() -> None:
 
     assert current_code_version() == Path("VERSION").read_text(encoding="utf-8").strip()
     assert spec.code_version == current_code_version()
-    assert b'"code_version":"' + current_code_version().encode("utf-8") + b'"' in (
-        canonical_evalspec_json(spec)
-    )
+    assert b'"code_version"' not in canonical_evalspec_json(spec)
 
 
 def test_feedstock_recipe_digest_is_byte_stable_and_keeps_species_labels() -> None:
@@ -600,9 +593,9 @@ def test_data_corpus_digests_change_evalspec_cache_key() -> None:
     )
 
     assert cache_key(corpus_changed) != cache_key(spec)
-    assert cache_key(materials_changed) != cache_key(spec)
-    assert cache_key(foulant_thermo_changed) != cache_key(spec)
-    assert cache_key(species_catalog_changed) != cache_key(spec)
+    assert cache_key(materials_changed) == cache_key(spec)
+    assert cache_key(foulant_thermo_changed) == cache_key(spec)
+    assert cache_key(species_catalog_changed) == cache_key(spec)
 
 
 def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
@@ -642,20 +635,15 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
     ("field", "value"),
     (
         ("recipe_id", "other-recipe"),
-        ("feedstock_recipe_digest", "other-feedstock-recipe"),
         ("feedstock_id", "lunar_highlands"),
         ("profile_id", "other-profile"),
         ("fidelity", "accurate"),
-        ("code_version", "0.0.0-determinant-mutant"),
-        ("allowlist_version", "allowlist-mutant"),
-        ("bounds_digest", "bounds-mutant"),
         ("campaign", "C2A"),
         ("hours", 48),
         ("mass_kg", 500.0),
         ("additives_kg", {"CaO": 2.5}),
         ("track", "mre_baseline"),
         ("backend_name", "magmin"),
-        ("resolved_engine_identity", "thermoengine adapter-v2"),
         ("c5_enabled", True),
         ("stop_at_stage0_exit", True),
         ("mre_max_voltage_V", 1.45),
@@ -679,13 +667,14 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
         (
             "data_digests",
             {
-                "setpoints": "changed",
+                "corpus_version": "corpus-version-digest",
                 "feedstocks": "feedstock-digest",
                 "foulant_thermo": "foulant-thermo-digest",
                 "materials": "materials-digest",
                 "vapor_pressures": "vapor-digest",
                 "species_catalog": "species-catalog-digest",
-                "profile": "profile-digest",
+                "setpoints": "setpoints-digest",
+                "profile": "changed-profile-digest",
             },
         ),
         (
@@ -696,11 +685,28 @@ def test_evalspec_reduce_rebuild_tolerates_legacy_digest_scope() -> None:
                 "pressure_Pa": 0.001,
             },
         ),
-        ("vapor_pressure_provider_code_fingerprint", "provider-source-sha256:changed"),
     ),
 )
 def test_each_determinant_changes_cache_key(field: str, value: object) -> None:
     assert cache_key(_base_spec(**{field: value})) != cache_key(_base_spec())
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("feedstock_recipe_digest", "other-feedstock-recipe"),
+        ("code_version", "0.0.0-neutral"),
+        ("allowlist_version", "allowlist-neutral"),
+        ("bounds_digest", "bounds-neutral"),
+        ("resolved_engine_identity", "thermoengine adapter-v2"),
+        ("vapor_pressure_provider_code_fingerprint", "source-sha256:changed"),
+    ),
+)
+def test_forbidden_version_and_fingerprint_fields_are_key_neutral(
+    field: str,
+    value: object,
+) -> None:
+    assert cache_key(_base_spec(**{field: value})) == cache_key(_base_spec())
 
 
 def test_stage0_exit_stop_partitions_cache_key_without_default_key_churn() -> None:
@@ -858,12 +864,12 @@ def test_fallback_provider_id_is_not_keyed_when_fallback_disabled() -> None:
     assert cache_key(enabled_first) != cache_key(enabled_second)
 
 
-def test_provider_code_fingerprint_splits_cache_key() -> None:
+def test_provider_code_fingerprint_is_key_neutral() -> None:
     first = _base_spec(vapor_pressure_provider_code_fingerprint="source-sha256:a")
     second = _base_spec(vapor_pressure_provider_code_fingerprint="source-sha256:b")
 
-    assert cache_key(first) != cache_key(second)
-    assert b"source-sha256:a" in canonical_evalspec_json(first)
+    assert cache_key(first) == cache_key(second)
+    assert b"source-sha256:a" not in canonical_evalspec_json(first)
 
 
 def test_nested_vapor_fallback_flag_is_not_dual_keyed() -> None:
@@ -1058,8 +1064,8 @@ def test_build_eval_inputs_mre_cap_zero_is_default_no_mre_cache_neutral() -> Non
     assert cap_zero_spec.mre_target_species == ""
     assert cap_zero_run_config.c5_enabled is False
     assert cap_zero_run_config.mre_max_voltage_V == pytest.approx(0.0)
-    assert canonical_evalspec_json(cap_zero_spec) != canonical_evalspec_json(default_spec)
-    assert cache_key(cap_zero_spec) != cache_key(default_spec)
+    assert canonical_evalspec_json(cap_zero_spec) == canonical_evalspec_json(default_spec)
+    assert cache_key(cap_zero_spec) == cache_key(default_spec)
     assert cap_zero_spec.conditional_subspace_digest
     # cap=0 strips to a cap-absent recipe_id while retaining explicit guard identity.
     assert cap_zero_spec.recipe_id == default_spec.recipe_id
@@ -1126,7 +1132,7 @@ def test_build_eval_inputs_mre_cap_below_min_rung_is_no_mre_cache_neutral() -> N
         cache_key(below_min_spec),
         cache_key(just_below_spec),
     } == {cache_key(cap_zero_spec)}
-    assert cache_key(cap_zero_spec) != cache_key(default_spec)
+    assert cache_key(cap_zero_spec) == cache_key(default_spec)
 
     assert min_spec.c5_enabled is True
     assert min_spec.mre_max_voltage_V == pytest.approx(min_rung)
@@ -2101,7 +2107,7 @@ def test_build_eval_inputs_keys_provider_code_fingerprint(
     )
     assert first_spec.vapor_pressure_provider_code_fingerprint.endswith(":source-a")
     assert second_spec.vapor_pressure_provider_code_fingerprint.endswith(":source-b")
-    assert cache_key(first_spec) != cache_key(second_spec)
+    assert cache_key(first_spec) == cache_key(second_spec)
 
 
 def test_provider_code_fingerprint_includes_upstream_package_versions(

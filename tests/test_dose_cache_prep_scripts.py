@@ -53,10 +53,63 @@ def _put_cache_row(db_path: Path, *, tag: str) -> None:
     )
 
 
+def _put_real_equilibrium_cache_row(db_path: Path) -> None:
+    key = {
+        "schema_version": SCHEMA_VERSION,
+        "namespace_id": "alphamelts:equilibrium-composite",
+        "artifact": "equilibrium_post_record",
+        "intent": "EQUILIBRIUM",
+        "vapor_pressure_provider_selection": "builtin-vapor-pressure",
+        "code_version": "test",
+        "data_digests": {},
+    }
+    payload = {
+        "authority": {
+            "schema": "reduced-real-authority-v1",
+            "evidence_class": "melts",
+            "backend_family": "alphamelts",
+            "backend": {
+                "backend_name": "AlphaMELTSBackend",
+                "backend_class": (
+                    "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
+                ),
+            },
+            "provider": {
+                "resolved_provider_id": "alphamelts-diagnostic",
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": "alphamelts-diagnostic",
+                "fallback_provider_id": None,
+            },
+            "vapor_pressure": {
+                "resolved_provider_id": "builtin-vapor-pressure",
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": "builtin-vapor-pressure",
+                "fallback_provider_id": None,
+                "fallback_allowed": False,
+            },
+        },
+        "equilibrium_result": {"status": "ok"},
+        "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
+    }
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    PT1PersistentEquilibriumStore(db_path).put(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+
+
 def _put_internal_analytical_cache_row(db_path: Path) -> None:
     corpus_version = current_corpus_version()
     key = {
         "schema_version": SCHEMA_VERSION,
+        "namespace_id": "alphamelts:equilibrium-composite",
+        "artifact": "equilibrium_post_record",
         "code_version": "test",
         "corpus_version": corpus_version,
         "data_digests": {},
@@ -71,7 +124,20 @@ def _put_internal_analytical_cache_row(db_path: Path) -> None:
             "fallback_provider_id": None,
         },
     }
-    payload = {"equilibrium_result": {"status": "ok"}}
+    payload = {
+        "authority": {
+            "schema": "reduced-real-authority-v1",
+            "evidence_class": "melts",
+            "backend_family": "alphamelts",
+            "backend": key["backend"],
+            "provider": key["provider"],
+            "vapor_pressure": {
+                "resolved_provider_id": "builtin-vapor-pressure",
+                "resolved_role": "authoritative",
+            },
+        },
+        "equilibrium_result": {"status": "ok"},
+    }
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     key_hash = hashlib.sha256(key_bytes).hexdigest()
@@ -117,6 +183,17 @@ def test_seed_cache_merges_sources_idempotently(tmp_path: Path) -> None:
     assert first["inserted_rows"] == 1
     assert first["rows_after"] == 1
     assert second["inserted_rows"] == 0
+    assert payload_count(target) == 1
+
+
+def test_seed_cache_accepts_new_schema_equilibrium_authority(tmp_path: Path) -> None:
+    source = tmp_path / "source-real.db"
+    target = tmp_path / "target-real.db"
+    _put_real_equilibrium_cache_row(source)
+
+    result = seed_cache(target, [source])
+
+    assert result["inserted_rows"] == 1
     assert payload_count(target) == 1
 
 
@@ -223,7 +300,7 @@ def test_merge_grind_cache_refuses_invalid_later_source_before_target_create(
     captured = capsys.readouterr()
 
     assert rc == 2
-    assert "builtin-backend-equilibrium" in captured.err
+    assert "internal-analytical" in captured.err
     assert not target.exists()
 
 
@@ -238,7 +315,7 @@ def test_seed_cache_refuses_invalid_later_source_without_mutating_target(
     _put_internal_analytical_cache_row(invalid)
     before = target.read_bytes()
 
-    with pytest.raises(RuntimeError, match="builtin-backend-equilibrium"):
+    with pytest.raises(RuntimeError, match="internal-analytical"):
         seed_cache(target, [valid, invalid])
 
     assert target.read_bytes() == before

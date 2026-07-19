@@ -27,10 +27,8 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
     _create_legacy_db(db_path)
     # a/b share ALL physics inputs and differ only on the non-physics axes
     # (code_version / source_module_digest) -> they collapse into one bucket.
-    # c differs by pressure, d differs only by setpoints digest -> since the
-    # b-029 SC-37 fix, setpoints/feedstock digest drift PARTITIONS the physics
-    # bucket (the old expectation that setpoints-a vs setpoints-b collapse was
-    # the collision bug itself).
+    # c differs by pressure. d differs only by a static setpoints digest, now a
+    # forbidden provenance axis, so it collapses with a/b.
     keys = [
         _replay_key("candidate-a", setpoints_digest="setpoints-shared"),
         _replay_key("candidate-b", setpoints_digest="setpoints-shared"),
@@ -44,11 +42,11 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
     dry = backfill.run_backfill(db_path, dry_run=True)
 
     assert dry.total_rows == 4
-    assert dry.distinct_physics_bucket_sha256 == 3
-    assert dry.distinct_physics_bucket_h40_sha256 == 3
-    assert dry.distinct_physics_bucket_h30_sha256 == 3
-    assert dry.distinct_physics_bucket_h40c_sha256 == 3
-    assert dry.distinct_physics_bucket_h30c_sha256 == 3
+    assert dry.distinct_physics_bucket_sha256 == 2
+    assert dry.distinct_physics_bucket_h40_sha256 == 2
+    assert dry.distinct_physics_bucket_h30_sha256 == 2
+    assert dry.distinct_physics_bucket_h40c_sha256 == 2
+    assert dry.distinct_physics_bucket_h30c_sha256 == 2
     assert dry.rows_needing_backfill == 4
     assert dry.rows_updated == 0
     assert _physics_columns(db_path) == set()
@@ -56,11 +54,11 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
     real = backfill.run_backfill(db_path, dry_run=False)
 
     assert real.total_rows == 4
-    assert real.distinct_physics_bucket_sha256 == 3
-    assert real.distinct_physics_bucket_h40_sha256 == 3
-    assert real.distinct_physics_bucket_h30_sha256 == 3
-    assert real.distinct_physics_bucket_h40c_sha256 == 3
-    assert real.distinct_physics_bucket_h30c_sha256 == 3
+    assert real.distinct_physics_bucket_sha256 == 2
+    assert real.distinct_physics_bucket_h40_sha256 == 2
+    assert real.distinct_physics_bucket_h30_sha256 == 2
+    assert real.distinct_physics_bucket_h40c_sha256 == 2
+    assert real.distinct_physics_bucket_h30c_sha256 == 2
     assert real.rows_updated == 4
     assert real.rows_already_backfilled == 0
     assert _exact_columns(db_path) == exact_before
@@ -68,21 +66,21 @@ def test_backfill_physics_bucket_is_idempotent_additive_and_collapses(tmp_path):
     assert _null_physics_column_count(db_path) == 0
 
     # Lock the axis contract directly: a/b (non-physics axes only) share a
-    # bucket; c (pressure) and d (setpoints digest) each get their own.
+    # bucket; c (pressure) gets its own; d (static digest only) collapses.
     bucket_by_label = _bucket_sha_by_code_version(db_path)
     assert bucket_by_label["test-candidate-a"] == bucket_by_label["test-candidate-b"]
     assert bucket_by_label["test-candidate-c"] != bucket_by_label["test-candidate-a"]
-    assert bucket_by_label["test-candidate-d"] != bucket_by_label["test-candidate-a"]
+    assert bucket_by_label["test-candidate-d"] == bucket_by_label["test-candidate-a"]
     assert bucket_by_label["test-candidate-d"] != bucket_by_label["test-candidate-c"]
 
     second = backfill.run_backfill(db_path, dry_run=False)
 
     assert second.total_rows == 4
-    assert second.distinct_physics_bucket_sha256 == 3
-    assert second.distinct_physics_bucket_h40_sha256 == 3
-    assert second.distinct_physics_bucket_h30_sha256 == 3
-    assert second.distinct_physics_bucket_h40c_sha256 == 3
-    assert second.distinct_physics_bucket_h30c_sha256 == 3
+    assert second.distinct_physics_bucket_sha256 == 2
+    assert second.distinct_physics_bucket_h40_sha256 == 2
+    assert second.distinct_physics_bucket_h30_sha256 == 2
+    assert second.distinct_physics_bucket_h40c_sha256 == 2
+    assert second.distinct_physics_bucket_h30c_sha256 == 2
     assert second.rows_updated == 0
     assert second.rows_already_backfilled == 4
     assert _exact_columns(db_path) == exact_before
@@ -113,6 +111,23 @@ def test_backfill_physics_bucket_skips_internal_analytical_rows_before_bucket_de
     assert bucket_by_label["test-trusted"] is not None
     assert bucket_by_label["test-internal-analytical"] is None
     assert _null_physics_column_count(db_path) == 1
+
+
+def test_backfill_accepts_new_schema_equilibrium_authority(tmp_path):
+    db_path = tmp_path / "new-schema.db"
+    _create_legacy_db(db_path)
+    key = _replay_key("new-schema", setpoints_digest="setpoints-new-schema")
+    key.update(
+        artifact="equilibrium_post_record",
+        namespace_id="alphamelts:equilibrium-composite",
+        vapor_pressure_provider_selection="builtin-vapor-pressure",
+    )
+    _insert_legacy_row(db_path, key)
+
+    stats = backfill.run_backfill(db_path, dry_run=False)
+
+    assert stats.invalid_rows == 0
+    assert stats.rows_updated == 1
 
 
 def _bucket_sha_by_code_version(db_path: Path) -> dict:
@@ -184,6 +199,30 @@ def _replay_key(
 
 def _insert_legacy_row(db_path: Path, key: dict) -> None:
     payload = {
+        "authority": {
+            "schema": "reduced-real-authority-v1",
+            "evidence_class": "melts",
+            "backend_family": "alphamelts",
+            "backend": {
+                "backend_name": "AlphaMELTSBackend",
+                "backend_class": (
+                    "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
+                ),
+            },
+            "provider": {
+                "resolved_provider_id": "alphamelts-diagnostic",
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": "alphamelts-diagnostic",
+                "fallback_provider_id": None,
+            },
+            "vapor_pressure": {
+                "resolved_provider_id": "builtin-vapor-pressure",
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": "builtin-vapor-pressure",
+                "fallback_provider_id": None,
+                "fallback_allowed": False,
+            },
+        },
         "equilibrium_result": {"status": "ok"},
         "last_vapor_pressures_source": {
             "Na": "builtin_authoritative",

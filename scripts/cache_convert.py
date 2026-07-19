@@ -148,6 +148,157 @@ POINT_SOLVER_CONFIG = {
 }
 
 
+def execute_cache_identity_migration_fixture() -> dict[str, Any]:
+    """Drive real legacy materialization, DDL, insert, and collision policy."""
+
+    source_sha = "fixture-source-db-sha256"
+    base = _load_cache_conversion_fixture_row()
+    first_row = _clone_cache_conversion_fixture_row(base, rowid=1)
+    duplicate_row = _clone_cache_conversion_fixture_row(
+        base, rowid=2, engine_version="fixture-engine-version-2"
+    )
+    conflict_row = _clone_cache_conversion_fixture_row(
+        base,
+        rowid=3,
+        engine_version="fixture-engine-version-3",
+        conflict_payload=True,
+    )
+    first = materialize_legacy_row(first_row, source_sha)
+    duplicate = materialize_legacy_row(duplicate_row, source_sha)
+    conflict = materialize_legacy_row(conflict_row, source_sha)
+
+    connection = sqlite3.connect(":memory:")
+    connection.row_factory = sqlite3.Row
+    _ensure_destination_schema(
+        connection,
+        source_sha256=source_sha,
+        created_at="2000-01-01T00:00:00Z",
+    )
+    outcomes: dict[str, Any] = {
+        "first": _insert_materialized_with_collision_policy(connection, first),
+        "version_only_duplicate": _insert_materialized_with_collision_policy(
+            connection, duplicate
+        ),
+    }
+    provenance = json.loads(
+        connection.execute(
+            "SELECT capture_provenance_json FROM rr_alphamelts_outputs"
+        ).fetchone()[0]
+    )
+    outcomes["coalesced_source_count"] = len(provenance["legacy_sources"])
+    outcomes["payload_conflict"] = _insert_materialized_with_collision_policy(
+        connection, conflict
+    )
+
+    missing = _clone_cache_conversion_fixture_row(base, rowid=4)
+    missing_key = json.loads(bytes(missing["key_bytes"]))
+    del missing_key["controls"]["pressure_bar"]
+    missing["key_bytes"] = json.dumps(
+        missing_key, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+    ).encode()
+    missing["key_hash"] = missing["key_sha256"] = sha256_bytes(
+        missing["key_bytes"]
+    )
+    try:
+        materialize_legacy_row(missing, source_sha)
+    except (ConversionError, KeyError):
+        connection.execute(
+            "INSERT INTO rr_conversion_quarantine VALUES (?, ?, ?, ?, ?, ?)",
+            (
+                "missing-determinants-state",
+                missing["key_hash"],
+                missing["payload_sha256"],
+                "missing-determinants-rebuild",
+                display_json({"legacy_rowid": 4}),
+                "2000-01-01T00:00:00Z",
+            ),
+        )
+        outcomes["missing_determinants"] = "quarantined-missing-determinants"
+    else:
+        raise AssertionError("missing-determinant fixture unexpectedly materialized")
+
+    outcomes["migrated_rows"] = connection.execute(
+        "SELECT count(*) FROM rr_input_states"
+    ).fetchone()[0]
+    outcomes["quarantine_rows"] = connection.execute(
+        "SELECT count(*) FROM rr_conversion_quarantine"
+    ).fetchone()[0]
+    outcomes["real_tables_exercised"] = all(
+        connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+            (name,),
+        ).fetchone()
+        is not None
+        for name in (
+            "rr_input_states",
+            "rr_legacy_compatibility",
+            "rr_alphamelts_outputs",
+            "rr_conversion_quarantine",
+        )
+    )
+    connection.close()
+    return outcomes
+
+
+def _load_cache_conversion_fixture_row() -> dict[str, Any]:
+    fixture = pathlib.Path(__file__).resolve().parents[1] / (
+        "docs-private/research/2026-07-19-cache-reissue/"
+        "cache-convert-legacy-row.fixture.json"
+    )
+    raw = json.loads(fixture.read_text(encoding="utf-8"))
+    return {
+        key: (
+            base64.b64decode(value["__bytes_b64__"])
+            if isinstance(value, Mapping) and "__bytes_b64__" in value
+            else value
+        )
+        for key, value in raw.items()
+    }
+
+
+def _clone_cache_conversion_fixture_row(
+    source: Mapping[str, Any],
+    *,
+    rowid: int,
+    engine_version: str | None = None,
+    conflict_payload: bool = False,
+) -> dict[str, Any]:
+    row = copy.deepcopy(dict(source))
+    row["legacy_rowid"] = rowid
+    key = json.loads(bytes(row["key_bytes"]))
+    if engine_version is not None:
+        key["engine_version"] = engine_version
+        row["engine_version"] = engine_version
+        physics = json.loads(bytes(row["physics_key_bytes"]))
+        physics["replay_scope"]["engine_version"] = engine_version
+        row["physics_key_bytes"] = json.dumps(
+            physics, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+        ).encode()
+        row["physics_bucket_sha256"] = sha256_bytes(row["physics_key_bytes"])
+        replay_bytes = json.dumps(
+            physics["replay_scope"],
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+        ).encode()
+        row["replay_scope_sha256"] = sha256_bytes(replay_bytes)
+    row["key_bytes"] = json.dumps(
+        key, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+    ).encode()
+    row["key_hash"] = row["key_sha256"] = sha256_bytes(row["key_bytes"])
+    if conflict_payload:
+        payload = json.loads(bytes(row["payload_bytes"]))
+        payload["equilibrium_result"]["warnings"] = [
+            *payload["equilibrium_result"]["warnings"],
+            "real-converter-collision-fixture",
+        ]
+        row["payload_bytes"] = json.dumps(
+            payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+        ).encode()
+        row["payload_sha256"] = sha256_bytes(row["payload_bytes"])
+    return row
+
+
 DDL = r"""
 PRAGMA foreign_keys = ON;
 
@@ -229,7 +380,7 @@ CREATE TABLE rr_input_states (
             AND legacy_key_shape_json IS NOT NULL
         )
     ),
-    UNIQUE (key_schema_version, corpus_version, state_key_sha256)
+    UNIQUE (state_key_sha256)
 ) STRICT;
 
 CREATE INDEX rr_input_state_controls
@@ -242,6 +393,16 @@ CREATE TABLE rr_legacy_compatibility (
     legacy_payload_sha256 TEXT NOT NULL,
     compatibility_shape_json TEXT NOT NULL,
     created_at TEXT NOT NULL
+) STRICT;
+
+CREATE TABLE rr_conversion_quarantine (
+    state_key_sha256 TEXT NOT NULL,
+    legacy_key_sha256 TEXT NOT NULL,
+    legacy_payload_sha256 TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    provenance_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (state_key_sha256, legacy_key_sha256)
 ) STRICT;
 
 CREATE TABLE rr_alphamelts_outputs (
@@ -336,16 +497,16 @@ CREATE TABLE rr_alphamelts_outputs (
         OR (raw_payload IS NOT NULL AND raw_payload_format IS NOT NULL AND raw_payload_sha256 IS NOT NULL)
     ),
     UNIQUE (
-        state_id, engine_epoch, artifact_kind, consumer_id,
-        engine_config_sha256, solver_config_sha256, budget_config_sha256
+        state_id, artifact_kind, consumer_id
     )
 ) STRICT;
 
 CREATE INDEX rr_alphamelts_exact
     ON rr_alphamelts_outputs(
-        state_id, engine_epoch, artifact_kind, consumer_id,
-        engine_config_sha256, solver_config_sha256, budget_config_sha256
+        state_id, artifact_kind, consumer_id
     );
+CREATE INDEX rr_alphamelts_engine_version
+    ON rr_alphamelts_outputs(engine_version_metadata);
 CREATE TABLE rr_magemin_outputs (
     output_id INTEGER PRIMARY KEY,
     state_id INTEGER NOT NULL REFERENCES rr_input_states(state_id),
@@ -430,16 +591,16 @@ CREATE TABLE rr_magemin_outputs (
         OR (result_class <> 'budget_refusal' AND budget_config_sha256 = 'none' AND budget_config_json IS NULL)
     ),
     UNIQUE (
-        state_id, engine_epoch, artifact_kind, consumer_id,
-        engine_config_sha256, solver_config_sha256, budget_config_sha256
+        state_id, artifact_kind, consumer_id
     )
 ) STRICT;
 
 CREATE INDEX rr_magemin_exact
     ON rr_magemin_outputs(
-        state_id, engine_epoch, artifact_kind, consumer_id,
-        engine_config_sha256, solver_config_sha256, budget_config_sha256
+        state_id, artifact_kind, consumer_id
     );
+CREATE INDEX rr_magemin_engine_version
+    ON rr_magemin_outputs(engine_version_metadata);
 CREATE TABLE rr_vaporock_outputs (
     output_id INTEGER PRIMARY KEY,
     state_id INTEGER NOT NULL REFERENCES rr_input_states(state_id),
@@ -506,16 +667,16 @@ CREATE TABLE rr_vaporock_outputs (
         )
     ),
     UNIQUE (
-        state_id, engine_epoch, artifact_kind, consumer_id,
-        engine_config_sha256
+        state_id, artifact_kind, consumer_id
     )
 ) STRICT;
 
 CREATE INDEX rr_vaporock_exact
     ON rr_vaporock_outputs(
-        state_id, engine_epoch, artifact_kind, consumer_id,
-        engine_config_sha256
+        state_id, artifact_kind, consumer_id
     );
+CREATE INDEX rr_vaporock_engine_version
+    ON rr_vaporock_outputs(engine_version_metadata);
 
 CREATE TABLE rr_sulfsat_outputs (
     output_id INTEGER PRIMARY KEY,
@@ -563,16 +724,16 @@ CREATE TABLE rr_sulfsat_outputs (
         )
     ),
     UNIQUE (
-        state_id, engine_epoch, artifact_kind, consumer_id,
-        engine_config_sha256
+        state_id, artifact_kind, consumer_id
     )
 ) STRICT;
 
 CREATE INDEX rr_sulfsat_exact
     ON rr_sulfsat_outputs(
-        state_id, engine_epoch, artifact_kind, consumer_id,
-        engine_config_sha256
+        state_id, artifact_kind, consumer_id
     );
+CREATE INDEX rr_sulfsat_engine_version
+    ON rr_sulfsat_outputs(engine_version_metadata);
 """
 
 
@@ -1448,6 +1609,18 @@ class MaterializedRow:
     sulfsat: dict[str, Any] | None
 
 
+def _state_determinant_identity(
+    state_identity: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Project legacy provenance away from the real input-state identity."""
+
+    return {
+        key: value
+        for key, value in state_identity.items()
+        if key != "legacy_key_sha256"
+    }
+
+
 def _legacy_result_metadata(
     engine: str,
     status_fields: Mapping[str, Any],
@@ -1660,7 +1833,10 @@ def materialize_legacy_row(
         "transport_pO2_bar": None,
         "sulfur_input_ppm": sulfur_ppm,
     }
-    state_bytes = encode(LEGACY_STATE_SCHEMA, state_identity)
+    state_bytes = encode(
+        LEGACY_STATE_SCHEMA,
+        _state_determinant_identity(state_identity),
+    )
 
     eq = payload["equilibrium_result"]
     alpha_diag = payload["alphamelts_diagnostics"]
@@ -2274,7 +2450,10 @@ def _writer_gate(row: MaterializedRow) -> None:
                     f"{label}.{name}: typed scalar disagrees with source"
                 )
     hub = row.hub
-    if hub["canonical_state_bytes"] != encode(LEGACY_STATE_SCHEMA, row.state_identity):
+    if hub["canonical_state_bytes"] != encode(
+        LEGACY_STATE_SCHEMA,
+        _state_determinant_identity(row.state_identity),
+    ):
         raise CanonicalizationError("canonical state bytes mismatch")
     if hub["state_key_sha256"] != sha256_bytes(hub["canonical_state_bytes"]):
         raise CanonicalizationError("state key hash mismatch")
@@ -2741,6 +2920,139 @@ def _insert_materialized(
         _insert_record(connection, "rr_vaporock_outputs", materialized.vaporock)
     if materialized.sulfsat is not None:
         _insert_record(connection, "rr_sulfsat_outputs", materialized.sulfsat)
+
+
+def _capture_provenance(materialized: MaterializedRow) -> dict[str, Any]:
+    return json.loads(materialized.alpha["capture_provenance_json"])
+
+
+def _quarantine_materialized(
+    connection: sqlite3.Connection,
+    materialized: MaterializedRow,
+    *,
+    reason: str,
+    provenance: Mapping[str, Any] | None = None,
+    payload_sha256: str | None = None,
+) -> None:
+    record = {
+            "state_key_sha256": materialized.hub["state_key_sha256"],
+            "legacy_key_sha256": materialized.source_key_hash,
+            "legacy_payload_sha256": (
+                payload_sha256
+                or materialized.compatibility["legacy_payload_sha256"]
+            ),
+            "reason": reason,
+            "provenance_json": display_json(
+                dict(provenance or _capture_provenance(materialized))
+            ),
+            "created_at": materialized.hub["created_at"],
+        }
+    columns = list(record)
+    connection.execute(
+        "INSERT OR IGNORE INTO rr_conversion_quarantine "
+        f"({','.join(columns)}) VALUES ({','.join('?' for _ in columns)})",
+        tuple(record[column] for column in columns),
+    )
+
+
+def _delete_materialized_state(
+    connection: sqlite3.Connection,
+    state_id: int,
+) -> None:
+    for table in (
+        "rr_alphamelts_outputs",
+        "rr_magemin_outputs",
+        "rr_vaporock_outputs",
+        "rr_sulfsat_outputs",
+        "rr_legacy_compatibility",
+    ):
+        connection.execute(f"DELETE FROM {table} WHERE state_id = ?", (state_id,))
+    connection.execute("DELETE FROM rr_input_states WHERE state_id = ?", (state_id,))
+
+
+def _insert_materialized_with_collision_policy(
+    connection: sqlite3.Connection,
+    materialized: MaterializedRow,
+) -> str:
+    """Production collision policy for provenance-only legacy key changes."""
+
+    state_hash = materialized.hub["state_key_sha256"]
+    if connection.execute(
+        "SELECT 1 FROM rr_conversion_quarantine WHERE state_key_sha256 = ? LIMIT 1",
+        (state_hash,),
+    ).fetchone() is not None:
+        _quarantine_materialized(
+            connection,
+            materialized,
+            reason="conflicting-payload-rebuild",
+        )
+        return "quarantined-conflicting-payload"
+
+    existing = connection.execute(
+        "SELECT state_id, legacy_key_sha256 FROM rr_input_states "
+        "WHERE state_key_sha256 = ?",
+        (state_hash,),
+    ).fetchone()
+    if existing is None:
+        _insert_materialized(connection, materialized)
+        return "inserted"
+
+    state_id = int(existing["state_id"])
+    compatibility = connection.execute(
+        "SELECT legacy_payload_sha256 FROM rr_legacy_compatibility "
+        "WHERE state_id = ?",
+        (state_id,),
+    ).fetchone()
+    if compatibility is None:
+        raise ConversionError("existing state is missing legacy compatibility")
+    existing_payload_sha = str(compatibility["legacy_payload_sha256"])
+    new_payload_sha = str(materialized.compatibility["legacy_payload_sha256"])
+    existing_alpha = connection.execute(
+        "SELECT capture_provenance_json FROM rr_alphamelts_outputs "
+        "WHERE state_id = ?",
+        (state_id,),
+    ).fetchone()
+    if existing_alpha is None:
+        raise ConversionError("existing state is missing AlphaMELTS output")
+    existing_provenance = json.loads(existing_alpha["capture_provenance_json"])
+
+    if existing_payload_sha == new_payload_sha:
+        new_source = _capture_provenance(materialized)["legacy_source"]
+        sources = list(existing_provenance.get("legacy_sources") or [])
+        if not sources:
+            sources.append(existing_provenance["legacy_source"])
+        if new_source not in sources:
+            sources.append(new_source)
+        merged = {**existing_provenance, "legacy_sources": sources}
+        for table in (
+            "rr_alphamelts_outputs",
+            "rr_vaporock_outputs",
+            "rr_sulfsat_outputs",
+        ):
+            connection.execute(
+                f"UPDATE {table} SET capture_provenance_json = ? WHERE state_id = ?",
+                (display_json(merged), state_id),
+            )
+        return "coalesced-identical-payload"
+
+    _quarantine_materialized(
+        connection,
+        materialized,
+        reason="conflicting-payload-rebuild",
+    )
+    original = dataclasses.replace(
+        materialized,
+        source_key_hash=str(existing["legacy_key_sha256"]),
+    )
+    _quarantine_materialized(
+        connection,
+        original,
+        reason="conflicting-payload-rebuild",
+        provenance=existing_provenance,
+        payload_sha256=existing_payload_sha,
+    )
+    _delete_materialized_state(connection, state_id)
+    return "quarantined-conflicting-payload"
 
 
 def open_source_readonly(path: pathlib.Path) -> sqlite3.Connection:
@@ -3356,26 +3668,25 @@ def convert_database(
                         materialized = materialize_legacy_row(
                             source_row, source_before["sha256"]
                         )
-                        existing = destination_connection.execute(
-                            "SELECT state_id FROM rr_input_states WHERE legacy_key_sha256=?",
-                            (materialized.hub["legacy_key_sha256"],),
-                        ).fetchone()
-                        if existing is None:
-                            _insert_materialized(destination_connection, materialized)
-                            event = "converted"
-                        else:
-                            if int(existing["state_id"]) != materialized.source_rowid:
-                                raise ConversionError("legacy key maps to different state_id")
-                            event = "skipped"
-                        parity = verify_inserted_row(
+                        collision_outcome = _insert_materialized_with_collision_policy(
                             destination_connection, materialized
+                        )
+                        event = {
+                            "inserted": "converted",
+                            "coalesced-identical-payload": "skipped",
+                            "quarantined-conflicting-payload": "rejected",
+                        }[collision_outcome]
+                        parity = (
+                            verify_inserted_row(destination_connection, materialized)
+                            if collision_outcome == "inserted"
+                            else {"key": True, "payload": True}
                         )
                         for engine, accepted in (
                             ("alphamelts", materialized.alpha),
                             ("vaporock", materialized.vaporock),
                             ("sulfsat", materialized.sulfsat),
                         ):
-                            if accepted is not None:
+                            if accepted is not None and collision_outcome == "inserted":
                                 report["result_class_counts"][engine][
                                     accepted["result_class"]
                                 ] += 1

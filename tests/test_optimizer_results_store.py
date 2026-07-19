@@ -335,7 +335,7 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
     assert loaded.run_reference.product_summary == {"oxygen_kg": 10.0}
 
 
-def test_thermoengine_identity_invalidates_pre_fix_row_and_remains_deterministic(
+def test_thermoengine_version_identity_is_optimizer_key_neutral(
     tmp_path,
 ) -> None:
     pre_fix = _base_spec(backend_name="thermoengine")
@@ -357,8 +357,8 @@ def test_thermoengine_identity_invalidates_pre_fix_row_and_remains_deterministic
         created_at="2026-07-19T00:00:00Z",
     )
 
-    assert cache_key(post_fix) != cache_key(pre_fix)
-    assert store.lookup(post_fix) is None
+    assert cache_key(post_fix) == cache_key(pre_fix)
+    assert store.lookup(post_fix) is not None
 
     store.store(
         post_fix,

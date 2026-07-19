@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import dataclasses
+import copy
 import datetime as dt
 import functools
 import hashlib
@@ -242,6 +243,12 @@ CACHE_V2_QUANTIZED_INPUTS = (
         for component in COMPONENT_FIELDS
     ),
     {
+        "field": "submitted_amount_mol",
+        "units": "mol",
+        "representation": "nullable ieee754-binary64",
+        "rounding": "none; present only for amount-sensitive namespaces",
+    },
+    {
         "field": "temperature_C",
         "units": "degC",
         "representation": "ieee754-binary64",
@@ -258,6 +265,24 @@ CACHE_V2_QUANTIZED_INPUTS = (
         "units": "log10(fO2/bar)",
         "representation": "ieee754-binary64",
         "rounding": "none; raw native value",
+    },
+    {
+        "field": "commanded_pO2_bar",
+        "units": "bar",
+        "representation": "ieee754-binary64",
+        "rounding": "none; effective commanded value",
+    },
+    {
+        "field": "vapor_transport_pO2_bar",
+        "units": "bar",
+        "representation": "ieee754-binary64",
+        "rounding": "none; effective dispatched value",
+    },
+    {
+        "field": "vapor_pressure_provider_selection",
+        "units": "enum",
+        "representation": "UTF-8 exact string",
+        "rounding": "not applicable; effective runtime branch",
     },
     {
         "field": "fO2_offset",
@@ -342,6 +367,9 @@ COMMON_INPUT_FIELDS = (
 
 ALPHAMELTS_CONFIG_FIELDS = (
     "mode",
+    "commanded_pO2_bar",
+    "vapor_transport_pO2_bar",
+    "vapor_pressure_provider_selection",
     "subprocess_run_mode",
     "redox_buffer",
     "fO2_offset",
@@ -472,7 +500,7 @@ FINDER_OUTPUT_FIELDS = (
     "curve_path_liquid_fraction",
 )
 
-assert len(INPUT_FIELDS) == 25
+assert len(INPUT_FIELDS) == 28
 assert (
     len(GENERIC_OUTPUT_FIELDS)
     + len(THERMOENGINE_OUTPUT_FIELDS)
@@ -798,14 +826,9 @@ def cache_v2_identity_manifest() -> dict[str, Any]:
     }
     return {
         "schema_version": CACHE_V2_SCHEMA_VERSION,
-        "corpus_version": _load_corpus_version(),
         "identity": {
-            "fields": [
-                "engine_name",
-                "engine_version",
-                "quantized_inputs",
-            ],
-            "cache_lever": "corpus_version",
+            "namespace": "engine_name/result_shape (routed before hashing)",
+            "fields": ["quantized_inputs"],
             "optimizer_identity_included": False,
         },
         "quantized_inputs": list(CACHE_V2_QUANTIZED_INPUTS),
@@ -827,7 +850,7 @@ def cache_v2_identity_manifest() -> dict[str, Any]:
             "identity_note": (
                 "hash component for quantized_inputs only; never a sole cache identity"
             ),
-            "join_identity": ["engine_name", "engine_version", "key_hash"],
+            "join_identity": ["namespace_id", "key_hash"],
         },
         "dictionaries": dictionaries,
         "dictionary_sources": {
@@ -875,17 +898,48 @@ def cache_v2_identity_manifest() -> dict[str, Any]:
     }
 
 
-def _cache_v2_quantized_values(inputs: Mapping[str, Any]) -> dict[str, Any]:
-    composition_mol = inputs.get("composition_mol") or {}
+def _engine_result_namespace(
+    inputs: Mapping[str, Any],
+    backend_name: str | None = None,
+) -> str:
+    selected = str(backend_name or inputs.get("mode") or "").strip().lower()
+    if selected in {"subprocess", "alphamelts", "petthermotools"}:
+        return "alphamelts-equilibrium-grid"
+    if selected in {"thermoengine", "thermo-engine"}:
+        return "thermoengine-equilibrium-grid"
+    raise ValueError(f"engine result namespace is not resolved: {selected!r}")
+
+
+def _cache_v2_quantized_values(
+    inputs: Mapping[str, Any],
+    backend_name: str | None = None,
+) -> dict[str, Any]:
+    namespace = _engine_result_namespace(inputs, backend_name)
+    raw_composition = inputs.get("composition_mol") or {}
+    total_mol = sum(float(raw_composition.get(component, 0.0)) for component in COMPONENT_FIELDS)
+    if not math.isfinite(total_mol) or total_mol <= 0.0:
+        raise ValueError("cache identity composition must have positive finite total mol")
+    composition_mol = {
+        component: float(raw_composition.get(component, 0.0)) / total_mol
+        for component in COMPONENT_FIELDS
+    }
     values = {
-        f"component_{component}_mol": composition_mol.get(component)
+        f"component_{component}_mol": composition_mol[component]
         for component in COMPONENT_FIELDS
     }
     values.update(
         {
+            "submitted_amount_mol": (
+                total_mol if namespace == "alphamelts-equilibrium-grid" else None
+            ),
             "temperature_C": inputs.get("temperature_C"),
             "pressure_bar": inputs.get("pressure_bar"),
             "fO2_log": inputs.get("fO2_log"),
+            "commanded_pO2_bar": inputs.get("commanded_pO2_bar"),
+            "vapor_transport_pO2_bar": inputs.get("vapor_transport_pO2_bar"),
+            "vapor_pressure_provider_selection": inputs.get(
+                "vapor_pressure_provider_selection"
+            ),
             "fO2_offset": inputs.get("fO2_offset"),
             "Fe3Fet_Liq": inputs.get("Fe3Fet_Liq"),
             "model": inputs.get("model"),
@@ -936,9 +990,12 @@ def _canonical_f64_key_bytes(values: Mapping[str, Any]) -> bytes:
     return bytes(payload)
 
 
-def cache_v2_key_hash(inputs: Mapping[str, Any]) -> str:
+def cache_v2_key_hash(
+    inputs: Mapping[str, Any],
+    backend_name: str | None = None,
+) -> str:
     return hashlib.sha256(
-        _canonical_f64_key_bytes(_cache_v2_quantized_values(inputs))
+        _canonical_f64_key_bytes(_cache_v2_quantized_values(inputs, backend_name))
     ).hexdigest()
 
 
@@ -948,7 +1005,16 @@ def cache_v2_key_hash_from_grid_row(row: Mapping[str, Any]) -> str:
             "fe3fet_ratio" if item["field"] == "Fe3Fet_Liq" else item["field"]
         ]
         for item in CACHE_V2_QUANTIZED_INPUTS
+        if item["field"] != "submitted_amount_mol"
     }
+    namespace = _engine_result_namespace(dict(row))
+    total_mol = float(row["composition_total_mol"])
+    for component in COMPONENT_FIELDS:
+        field = f"component_{component}_mol"
+        values[field] = float(values[field]) / total_mol
+    values["submitted_amount_mol"] = (
+        total_mol if namespace == "alphamelts-equilibrium-grid" else None
+    )
     return hashlib.sha256(_canonical_f64_key_bytes(values)).hexdigest()
 
 
@@ -956,7 +1022,6 @@ def _immutable_cache_v2_metadata() -> dict[str, str]:
     manifest = canonical_json(cache_v2_identity_manifest())
     return {
         "cache_v2_schema_version": CACHE_V2_SCHEMA_VERSION,
-        "corpus_version": _load_corpus_version(),
         "cache_v2_identity_manifest": manifest,
         "cache_v2_identity_manifest_sha256": hashlib.sha256(
             manifest.encode("utf-8")
@@ -981,6 +1046,32 @@ def _cache_v2_descriptive_manifest_compatible(
         "dictionary_sources",
         "dictionary_policy",
     }
+    def identity_projection(payload: dict[str, Any]) -> dict[str, Any]:
+        projected = copy.deepcopy(payload)
+        projected.pop("corpus_version", None)
+        identity = projected.get("identity")
+        if isinstance(identity, dict):
+            identity.pop("cache_lever", None)
+            fields = identity.get("fields")
+            if isinstance(fields, list):
+                identity["fields"] = [
+                    field for field in fields if field != "engine_version"
+                ]
+            if "namespace" not in identity and "engine_name" in (fields or []):
+                identity["namespace"] = (
+                    "engine_name/result_shape (routed before hashing)"
+                )
+                identity["fields"] = [
+                    field for field in identity["fields"] if field != "engine_name"
+                ]
+        key_hash = projected.get("key_hash")
+        if isinstance(key_hash, dict):
+            join = key_hash.get("join_identity")
+            if join == ["engine_name", "engine_version", "key_hash"]:
+                key_hash["join_identity"] = ["namespace_id", "key_hash"]
+        return projected
+    database_payload = identity_projection(database_payload)
+    writer_payload = identity_projection(writer_payload)
     return {
         key: value
         for key, value in database_payload.items()
@@ -992,7 +1083,10 @@ def _cache_v2_descriptive_manifest_compatible(
     }
 
 
-def canonical_input_vector(inputs: Mapping[str, Any]) -> str:
+def canonical_input_vector(
+    inputs: Mapping[str, Any],
+    backend_name: str | None = None,
+) -> str:
     allowed_fields = INPUT_FIELDS + POINT_PROVENANCE_FIELDS
     missing = [
         name
@@ -1002,11 +1096,14 @@ def canonical_input_vector(inputs: Mapping[str, Any]) -> str:
     extra = sorted(set(inputs) - set(allowed_fields))
     if missing or extra:
         raise ValueError(f"input vector mismatch: missing={missing}, extra={extra}")
-    return canonical_json({name: inputs[name] for name in INPUT_FIELDS})
+    return canonical_json(_cache_v2_quantized_values(inputs, backend_name))
 
 
-def expedited_key(inputs: Mapping[str, Any]) -> str:
-    vector = canonical_input_vector(inputs)
+def expedited_key(
+    inputs: Mapping[str, Any],
+    backend_name: str | None = None,
+) -> str:
+    vector = canonical_input_vector(inputs, backend_name)
     return hashlib.sha256(vector.encode("utf-8")).hexdigest()
 
 
@@ -1075,6 +1172,7 @@ CREATE TABLE IF NOT EXISTS grid_keys (
     expedited_key TEXT NOT NULL UNIQUE,
     key_hash TEXT UNIQUE,
     canonical_vector TEXT NOT NULL UNIQUE,
+    input_payload_json TEXT NOT NULL,
     batch_id INTEGER NOT NULL REFERENCES batches(batch_id),
     shuffle_rank INTEGER NOT NULL,
     shard INTEGER NOT NULL CHECK(shard IN (0, 1, 2)),
@@ -1090,6 +1188,11 @@ CREATE TABLE IF NOT EXISTS grid_keys (
     kress91_partition_provenance_json TEXT,
     fO2_log REAL NOT NULL,
     fO2_log_repr TEXT NOT NULL,
+    commanded_pO2_bar REAL NOT NULL,
+    commanded_pO2_bar_repr TEXT NOT NULL,
+    vapor_transport_pO2_bar REAL NOT NULL,
+    vapor_transport_pO2_bar_repr TEXT NOT NULL,
+    vapor_pressure_provider_selection TEXT NOT NULL,
     pressure_bar REAL NOT NULL,
     pressure_bar_repr TEXT NOT NULL,
     composition_mol_json TEXT NOT NULL,
@@ -1305,13 +1408,15 @@ CREATE TABLE IF NOT EXISTS alphamelts_outputs (
     curve_path_temperature_C_json TEXT,
     curve_path_liquid_fraction_json TEXT,
 
-    UNIQUE(expedited_key, engine_epoch)
+    UNIQUE(expedited_key)
 );
 
 CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_input
-    ON alphamelts_outputs(grid_key_id, engine_epoch);
+    ON alphamelts_outputs(grid_key_id);
 CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_status
     ON alphamelts_outputs(status, engine_epoch);
+CREATE INDEX IF NOT EXISTS idx_alphamelts_outputs_engine_version
+    ON alphamelts_outputs(engine_version);
 CREATE INDEX IF NOT EXISTS idx_grid_keys_drain
     ON grid_keys(batch_id, shard, shuffle_rank);
 CREATE INDEX IF NOT EXISTS idx_grid_key_claims_expiry
@@ -1382,6 +1487,10 @@ class GridCacheWriter:
             self._ensure_v2_provenance_columns()
             self._ensure_runmode_output_columns()
             self._ensure_claim_table()
+            if self.backend_name is not None:
+                self._bind_engine_result_namespace(
+                    _engine_result_namespace({}, self.backend_name)
+                )
             self._set_metadata("schema_variant", SCHEMA_VARIANT)
             self._set_metadata(
                 "expedited_key_note",
@@ -1389,7 +1498,7 @@ class GridCacheWriter:
                 "from typed full-precision inputs; never transplant this hash",
             )
             self._set_metadata("schema_output_field_count", "84")
-            self._set_metadata("schema_input_field_count", "25")
+            self._set_metadata("schema_input_field_count", "27")
             self._set_metadata("grid_realization_revision", GRID_REALIZATION_REVISION)
             self._set_metadata("database_id", str(uuid.uuid4()), overwrite=False)
             self._set_metadata("created_at", utc_now(), overwrite=False)
@@ -1437,6 +1546,22 @@ class GridCacheWriter:
                 f"requested backend={backend_name!r} engine_mode={expected_mode!r}; "
                 f"database engine_mode values={sorted(existing_modes)!r}. "
                 "Use a dedicated database for each engine."
+            )
+
+    def _bind_engine_result_namespace(self, namespace_id: str) -> None:
+        row = self.connection.execute(
+            "SELECT value FROM metadata WHERE key = 'engine_result_namespace'"
+        ).fetchone()
+        if row is None:
+            self._set_metadata(
+                "engine_result_namespace", str(namespace_id), overwrite=False
+            )
+            return
+        stored = str(row[0])
+        if stored != str(namespace_id):
+            raise ValueError(
+                "grid cache namespace mismatch: "
+                f"database={stored!r}, requested={namespace_id!r}"
             )
 
     def _validate_existing_database(self) -> None:
@@ -1512,6 +1637,7 @@ class GridCacheWriter:
         missing_columns = {
             "intended_fO2_log",
             "intended_fO2_log_repr",
+            "input_payload_json",
         } - provenance_columns
         if missing_columns:
             raise ValueError(
@@ -1532,10 +1658,11 @@ class GridCacheWriter:
         if "metadata" not in tables:
             return
         immutable = _immutable_cache_v2_metadata()
+        placeholders = ", ".join("?" for _ in immutable)
         rows = {
             str(row[0]): str(row[1])
             for row in connection.execute(
-                "SELECT key, value FROM metadata WHERE key IN (?, ?, ?, ?)",
+                f"SELECT key, value FROM metadata WHERE key IN ({placeholders})",
                 tuple(immutable),
             )
         }
@@ -1617,6 +1744,7 @@ class GridCacheWriter:
             "kress91_fixed_ferric_fraction": "REAL",
             "kress91_fixed_ferric_fraction_repr": "TEXT",
             "kress91_partition_provenance_json": "TEXT",
+            "vapor_pressure_provider_selection": "TEXT",
         }
         for name, column_type in additions.items():
             if name not in columns:
@@ -1819,6 +1947,9 @@ class GridCacheWriter:
         shard: int,
         intended_fO2_log: float | None = None,
     ) -> bool:
+        self._bind_engine_result_namespace(
+            _engine_result_namespace(inputs, self.backend_name)
+        )
         values = self._grid_key_values(
             inputs,
             batch_id=batch_id,
@@ -1915,7 +2046,6 @@ class GridCacheWriter:
             ]
             parameters: list[Any] = [
                 self.engine_epoch,
-                self.engine_epoch,
                 int(batch_id),
                 int(after_shuffle_rank),
             ]
@@ -1930,12 +2060,11 @@ class GridCacheWriter:
                 clauses.append(f"g.id IN ({placeholders})")
                 parameters.extend(int(value) for value in grid_key_ids)
             query = (
-                "SELECT g.id, g.expedited_key, g.canonical_vector, "
+                "SELECT g.id, g.expedited_key, g.input_payload_json, "
                 "g.kress91_partition_provenance_json, "
                 "g.kress91_fixed_ferric_fraction, g.intended_fO2_log, "
                 "g.shuffle_rank, g.shard, g.timeout_s FROM grid_keys g "
                 "LEFT JOIN alphamelts_outputs o ON o.expedited_key = g.expedited_key "
-                "AND o.engine_epoch = ? "
                 "LEFT JOIN grid_key_claims c ON c.grid_key_id = g.id "
                 "AND c.engine_epoch = ? WHERE "
                 + " AND ".join(clauses)
@@ -1973,7 +2102,7 @@ class GridCacheWriter:
                 "grid_key_id": int(row["id"]),
                 "expedited_key": str(row["expedited_key"]),
                 "inputs": {
-                    **json.loads(row["canonical_vector"]),
+                    **json.loads(row["input_payload_json"]),
                     # Provenance is intentionally outside canonical key identity,
                     # but the drain must compare it with the persisted engine input.
                     "intended_fO2_log": row["intended_fO2_log"],
@@ -2001,7 +2130,7 @@ class GridCacheWriter:
         grid_key_ids: Sequence[int] | None = None,
     ) -> dict[str, int]:
         extra = "" if shard is None else " AND g.shard = ?"
-        parameters: list[Any] = [self.engine_epoch, int(batch_id)]
+        parameters: list[Any] = [int(batch_id)]
         if shard is not None:
             parameters.append(int(shard))
         if rank_limit is not None:
@@ -2016,7 +2145,7 @@ class GridCacheWriter:
         row = self.connection.execute(
             "SELECT COUNT(*) AS total, COUNT(o.id) AS done "
             "FROM grid_keys g LEFT JOIN alphamelts_outputs o "
-            "ON o.expedited_key = g.expedited_key AND o.engine_epoch = ? "
+            "ON o.expedited_key = g.expedited_key "
             "WHERE g.batch_id = ?" + extra,
             tuple(parameters),
         ).fetchone()
@@ -2299,8 +2428,8 @@ class GridCacheWriter:
         placeholders = ",".join("?" for _ in keys)
         rows = self.connection.execute(
             f"SELECT expedited_key FROM alphamelts_outputs "
-            f"WHERE engine_epoch = ? AND expedited_key IN ({placeholders})",
-            (self.engine_epoch, *keys),
+            f"WHERE expedited_key IN ({placeholders})",
+            tuple(keys),
         )
         return {str(row[0]) for row in rows}
 
@@ -2313,9 +2442,12 @@ class GridCacheWriter:
         shard: int,
         intended_fO2_log: float | None,
     ) -> dict[str, Any]:
-        vector = canonical_input_vector(inputs)
+        vector = canonical_input_vector(inputs, self.backend_name)
         key = hashlib.sha256(vector.encode("utf-8")).hexdigest()
-        composition_mol = inputs["composition_mol"] or {}
+        composition_mol = {
+            component: float((inputs["composition_mol"] or {}).get(component, 0.0))
+            for component in COMPONENT_FIELDS
+        }
         total_mol = sum(float(value) for value in composition_mol.values())
         registry_json = _json(inputs["species_formula_registry"])
         registry_digest = (
@@ -2323,17 +2455,13 @@ class GridCacheWriter:
             if registry_json is not None
             else None
         )
-        missing_components = [
-            component for component in COMPONENT_FIELDS if component not in composition_mol
-        ]
-        if missing_components:
-            raise ValueError(
-                f"full 14-component input vector required; missing={missing_components}"
-            )
         values = {
             "expedited_key": key,
-            "key_hash": cache_v2_key_hash(inputs),
+            "key_hash": cache_v2_key_hash(inputs, self.backend_name),
             "canonical_vector": vector,
+            "input_payload_json": _json(
+                {name: inputs[name] for name in INPUT_FIELDS}
+            ),
             "batch_id": int(batch_id),
             "shuffle_rank": int(shuffle_rank),
             "shard": int(shard),
@@ -2353,6 +2481,17 @@ class GridCacheWriter:
             ),
             "fO2_log": _float(inputs["fO2_log"]),
             "fO2_log_repr": _repr(inputs["fO2_log"]),
+            "commanded_pO2_bar": _float(inputs["commanded_pO2_bar"]),
+            "commanded_pO2_bar_repr": _repr(inputs["commanded_pO2_bar"]),
+            "vapor_transport_pO2_bar": _float(
+                inputs["vapor_transport_pO2_bar"]
+            ),
+            "vapor_transport_pO2_bar_repr": _repr(
+                inputs["vapor_transport_pO2_bar"]
+            ),
+            "vapor_pressure_provider_selection": inputs[
+                "vapor_pressure_provider_selection"
+            ],
             "pressure_bar": _float(inputs["pressure_bar"]),
             "pressure_bar_repr": _repr(inputs["pressure_bar"]),
             "composition_mol_json": _json(composition_mol),
@@ -2454,8 +2593,8 @@ class GridCacheWriter:
             self._assert_backend_not_blended(output_backend_name)
             existing = self.connection.execute(
                 "SELECT 1 FROM alphamelts_outputs "
-                "WHERE expedited_key = ? AND engine_epoch = ?",
-                (str(row["expedited_key"]), self.engine_epoch),
+                "WHERE expedited_key = ?",
+                (str(row["expedited_key"]),),
             ).fetchone()
             if existing is not None:
                 self.connection.execute(

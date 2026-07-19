@@ -10,15 +10,11 @@ import struct
 import pytest
 
 from scripts import cache_convert
+from scripts import regenerate_cache_identity_goldens
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 LEGACY_DB = ROOT / "docs-private" / "recipe-db" / "reduced-real.db"
-REVIEWED_DESIGN = (
-    ROOT / "docs-private" / "research" / "2026-07-10-t171-schema" / "design.md"
-)
-
-
 def test_encoder_default_materialization_matches_explicit_defaults():
     omitted = cache_convert.materialize_alphamelts_engine_config(
         {"model": "MELTSv1.0.2"}, resolved_mode="subprocess"
@@ -87,12 +83,44 @@ def test_account_vector_uses_exact_builtin_tuple_and_sorted_extensions():
     assert all(row[1] for row in vector[:4])
 
 
-@pytest.mark.skipif(not REVIEWED_DESIGN.exists(), reason="private reviewed design absent")
-def test_embedded_ddl_matches_reviewed_design_byte_for_byte():
-    design = REVIEWED_DESIGN.read_text(encoding="utf-8")
-    reviewed_sql = design.split("```sql", 1)[1].split("```", 1)[0].strip()
+def test_cache_identity_golden_matches_executable_generators():
+    expected = json.loads(
+        regenerate_cache_identity_goldens.GOLDEN.read_text(encoding="utf-8")
+    )
+    actual = regenerate_cache_identity_goldens.build_payload()
 
-    assert cache_convert.DDL.strip() == reviewed_sql
+    assert actual == expected
+    assert all(actual["embedded_sql_parity"].values())
+    assert actual["migration_collision_outcomes"] == {
+        "coalesced_source_count": 2,
+        "first": "inserted",
+        "migrated_rows": 0,
+        "missing_determinants": "quarantined-missing-determinants",
+        "payload_conflict": "quarantined-conflicting-payload",
+        "quarantine_rows": 3,
+        "real_tables_exercised": True,
+        "version_only_duplicate": "coalesced-identical-payload",
+    }
+
+
+def test_cache_identity_migration_fixture_uses_real_converter_path(monkeypatch):
+    calls = 0
+    real_insert = cache_convert._insert_materialized
+
+    def observed_insert(connection, materialized):
+        nonlocal calls
+        calls += 1
+        return real_insert(connection, materialized)
+
+    monkeypatch.setattr(cache_convert, "_insert_materialized", observed_insert)
+
+    outcomes = cache_convert.execute_cache_identity_migration_fixture()
+
+    assert calls == 1
+    assert outcomes["real_tables_exercised"] is True
+    assert outcomes["coalesced_source_count"] == 2
+    assert outcomes["migrated_rows"] == 0
+    assert outcomes["quarantine_rows"] == 3
 
 
 def test_path_gate_rejects_database_and_report_aliases(tmp_path):

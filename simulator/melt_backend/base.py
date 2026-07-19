@@ -12,8 +12,9 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from enum import Enum
 import math
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence
 
 
 BACKEND_CAPABILITY_KEYS = (
@@ -28,6 +29,20 @@ DEFAULT_BACKEND_CAPABILITIES = {
     key: (key == 'silicate_melt')
     for key in BACKEND_CAPABILITY_KEYS
 }
+
+
+class RealBackendFamily(str, Enum):
+    """Closed typed authority carried by explicit real-engine adapters."""
+
+    ALPHAMELTS = "alphamelts"
+    THERMOENGINE = "thermoengine"
+    MAGEMIN = "magemin"
+
+
+class RealBackendAuthority(ABC):
+    """Marker for adapters trusted to assert a real-engine family."""
+
+    real_backend_family: ClassVar[RealBackendFamily]
 
 
 class MeltBackendError(RuntimeError):

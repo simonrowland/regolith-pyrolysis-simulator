@@ -598,19 +598,21 @@ def current_code_version() -> str:
 
 
 def canonical_evalspec_json(spec: EvalSpec) -> bytes:
+    optimizer_data_digests = {
+        key: spec.data_digests[key]
+        for key in ("profile", "physics_constraints")
+        if key in spec.data_digests
+    }
     payload = {
         "additives_kg": spec.additives_kg,
-        "allowlist_version": spec.allowlist_version,
         "backend_name": spec.backend_name,
-        "bounds_digest": spec.bounds_digest,
         "c5_enabled": spec.c5_enabled,
         "campaign": spec.campaign,
         "chemistry_kernel": _chemistry_kernel_key_payload(spec.chemistry_kernel),
-        "code_version": spec.code_version,
-        "cost_parameters": _cost_parameters_key_payload(spec.cost_parameters),
-        "data_digests": spec.data_digests,
+        "corpus_version": spec.data_digests.get("corpus_version", ""),
+        "cost_parameters": cost_parameter_values(spec.cost_parameters),
+        "data_digests": optimizer_data_digests,
         "feedstock_id": spec.feedstock_id,
-        "feedstock_recipe_digest": spec.feedstock_recipe_digest,
         "fidelity": spec.fidelity,
         "hours": spec.hours,
         "mass_kg": spec.mass_kg,
@@ -626,10 +628,6 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
     }
     if spec.stop_at_stage0_exit:
         payload["stop_at_stage0_exit"] = spec.stop_at_stage0_exit
-    if spec.conditional_subspace_digest:
-        payload["conditional_subspace_digest"] = spec.conditional_subspace_digest
-    if spec.resolved_engine_identity:
-        payload["resolved_engine_identity"] = spec.resolved_engine_identity
     if spec.stage0_redox_oxidant_kg:
         payload["stage0_redox_oxidant_kg"] = spec.stage0_redox_oxidant_kg
     if spec.stage0_carbon_reductant_kg:
@@ -639,10 +637,6 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
     if spec.allow_fallback_vapor:
         payload["vapor_pressure_fallback_provider_id"] = (
             spec.vapor_pressure_fallback_provider_id
-        )
-    if spec.vapor_pressure_provider_code_fingerprint:
-        payload["vapor_pressure_provider_code_fingerprint"] = (
-            spec.vapor_pressure_provider_code_fingerprint
         )
     if spec.lab_schedule:
         payload["lab_schedule"] = spec.lab_schedule

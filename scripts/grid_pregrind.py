@@ -682,6 +682,10 @@ def backend_config(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
+    from simulator.melt_backend.vaporock import (
+        effective_vapor_pressure_provider_selection,
+    )
+
     partition_provenance = kress91_partition_authority_record(
         temperature_C=point.temperature_C,
     )
@@ -705,6 +709,11 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
         "kress91_fixed_ferric_fraction": fixed_ferric_fraction,
         "composition_kg": None,
         "fO2_log": point.intended_fO2_log,
+        "commanded_pO2_bar": 10.0 ** point.intended_fO2_log,
+        "vapor_transport_pO2_bar": DEFAULT_VACUUM_FLOOR_BAR,
+        "vapor_pressure_provider_selection": (
+            effective_vapor_pressure_provider_selection()
+        ),
         "pressure_bar": point.pressure_bar,
         "composition_mol": composition_mol,
         "composition_mol_by_account": {
@@ -1247,6 +1256,25 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
         )
 
     backend = _WORKER_BACKEND
+    expected_vapor_provider = str(
+        job.inputs.get("vapor_pressure_provider_selection") or ""
+    )
+    actual_vapor_provider = (
+        "vaporock"
+        if bool(getattr(backend, "_vaporock_available", False))
+        else "activity-antoine"
+    )
+    if expected_vapor_provider != actual_vapor_provider:
+        return job.grid_key_id, _worker_refusal_output(
+            "vapor_provider_selection_mismatch",
+            started=started,
+            run_mode=run_mode,
+            applied_timeout_s=applied_timeout_s,
+            diagnostics={
+                "key_vapor_pressure_provider_selection": expected_vapor_provider,
+                "worker_vapor_pressure_provider_selection": actual_vapor_provider,
+            },
+        )
     if _WORKER_BACKEND_NAME == "thermoengine":
         try:
             total_fe_mol = float(composition_mol.get("FeO", 0.0)) + (

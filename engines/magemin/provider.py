@@ -61,7 +61,11 @@ from simulator.chemistry.kernel.dto import (
     IntentResult,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
-from simulator.melt_backend.base import EquilibriumResult
+from simulator.melt_backend.base import (
+    EquilibriumResult,
+    RealBackendAuthority,
+    RealBackendFamily,
+)
 from simulator.melt_backend.liquidus import LiquidusSolidusResult
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
@@ -89,7 +93,7 @@ _SHADOW_BACKEND_CONFIG = {'python_bridge': 'subprocess'}
 _SHADOW_AUDIT_NOTE = 'shadow, not enforced'
 
 
-class MAGEMinShadowProvider(ChemistryProvider):
+class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
     """MAGEMin provider for silicate shadows and gate fallback.
 
     See module docstring. The provider is constructed with an optional
@@ -108,6 +112,8 @@ class MAGEMinShadowProvider(ChemistryProvider):
     with an empty :class:`MAGEMinShadowDiagnostics`. This matches the
     kernel's ``status='unavailable'`` vocabulary for absent engines.
     """
+
+    real_backend_family = RealBackendFamily.MAGEMIN
 
     name = 'magemin-shadow'
 

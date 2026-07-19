@@ -293,13 +293,29 @@ def assert_strict_vapor_pt1_row(
     row_context = context or f"PT-1 strict corpus {artifact_name}:{key_hash or '<unknown>'}"
     vapor_active = _pt1_row_requires_vapor_source_provenance(artifact_name, payload)
 
-    vapor_provider = key.get("vapor_pressure_provider")
-    if artifact_name == "equilibrium_post_record" or vapor_provider is not None:
+    vapor_selection = key.get("vapor_pressure_provider_selection")
+    authority = payload.get("authority") if isinstance(payload, Mapping) else None
+    vapor_provider = (
+        authority.get("vapor_pressure")
+        if isinstance(authority, Mapping)
+        else None
+    )
+    if artifact_name == "equilibrium_post_record" or vapor_selection is not None:
         assert_strict_vapor_provider_identity(
             vapor_provider if isinstance(vapor_provider, Mapping) else None,
             context=f"{row_context}:key",
             approved_sources=approved_sources,
         )
+        resolved_selection = str(
+            vapor_provider.get("resolved_provider_id", "")
+            if isinstance(vapor_provider, Mapping)
+            else ""
+        ).strip()
+        if str(vapor_selection or "").strip() != resolved_selection:
+            raise GrindSourceGateError(
+                f"{row_context}: vapor provider selection/authority mismatch: "
+                f"key={vapor_selection!r}, authority={resolved_selection!r}"
+            )
 
     gate_payload: dict[str, Any] = {
         "key": key,

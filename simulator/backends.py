@@ -17,17 +17,18 @@ from simulator.backend_names import (  # noqa: F401 - re-exported for callers
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     canonical_backend_name,
 )
-from simulator.corpus_version import (
-    current_corpus_version,
-    interoperable_corpus_versions,
-)
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.alphamelts import (
     AlphaMELTSBackend,
     MELTS_MAJOR_OXIDES,
     MELTS_OXIDE_ALIASES,
 )
-from simulator.melt_backend.base import DEFAULT_BACKEND_CAPABILITIES, InternalAnalyticalBackend
+from simulator.melt_backend.base import (
+    DEFAULT_BACKEND_CAPABILITIES,
+    InternalAnalyticalBackend,
+    RealBackendAuthority,
+    RealBackendFamily,
+)
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
 
 
@@ -139,8 +140,11 @@ class CachedRealConfig:
 
     db_path: Path
     authorized_backend_name: str
-    corpus_version: str
-    interoperable_corpus_versions: tuple[str, ...]
+    authorized_backend_family: RealBackendFamily | None = None
+    # Deprecated compatibility-only inputs. Engine cache identity and opening
+    # never consult the optimizer corpus lever.
+    corpus_version: str = ""
+    interoperable_corpus_versions: tuple[str, ...] = ()
     authorized_backend_version: str = ""
     authorized_model: str = ""
     authorized_mode: str = ""
@@ -187,7 +191,7 @@ def build_simulator(config: SimulatorBuildConfig) -> PyrolysisSimulator:
     return sim
 
 
-class CachedRealBackend:
+class CachedRealBackend(RealBackendAuthority):
     """MeltBackend-shaped cached-real facade.
 
     Cache lookup is owned by ``PT0DeterminismStore`` in ``core.py``. This
@@ -205,6 +209,7 @@ class CachedRealBackend:
     ) -> None:
         self.config = config
         self._live_backend = live_backend
+        self.real_backend_family = config.authorized_backend_family
 
     def initialize(self, _config: Mapping[str, Any] | None = None) -> bool:
         return True
@@ -274,6 +279,7 @@ def normalize_cached_real_config(
         value = {
             "db_path": value.db_path,
             "authorized_backend_name": value.authorized_backend_name,
+            "authorized_backend_family": value.authorized_backend_family,
             "authorized_backend_version": value.authorized_backend_version,
             "authorized_model": value.authorized_model,
             "authorized_mode": value.authorized_mode,
@@ -298,8 +304,20 @@ def normalize_cached_real_config(
         raise unavailable_error_cls(
             "cached-real requires reduced_real_cache.authorized_backend_name"
         )
-    corpus_version = current_corpus_version()
-    interoperable_versions = interoperable_corpus_versions()
+    raw_authorized_family = value.get("authorized_backend_family")
+    if raw_authorized_family is None:
+        if _is_alphamelts_authorized_name(authorized_backend_name):
+            authorized_backend_family = RealBackendFamily.ALPHAMELTS
+        elif _is_thermoengine_authorized_name(authorized_backend_name):
+            authorized_backend_family = RealBackendFamily.THERMOENGINE
+        else:
+            authorized_backend_family = None
+    elif isinstance(raw_authorized_family, RealBackendFamily):
+        authorized_backend_family = raw_authorized_family
+    else:
+        raise unavailable_error_cls(
+            "cached-real authorized_backend_family must be a RealBackendFamily"
+        )
     authorized_backend_version = str(
         value.get("authorized_backend_version", "")
     ).strip()
@@ -344,8 +362,7 @@ def normalize_cached_real_config(
     return CachedRealConfig(
         db_path=db_path,
         authorized_backend_name=authorized_backend_name,
-        corpus_version=corpus_version,
-        interoperable_corpus_versions=interoperable_versions,
+        authorized_backend_family=authorized_backend_family,
         authorized_backend_version=authorized_backend_version,
         authorized_model=authorized_model,
         authorized_mode=authorized_mode,

@@ -65,20 +65,25 @@ def test_legacy_allow_stub_equilibrium_cli_alias_is_preserved() -> None:
 
 def _write_magemin_row(db_path, suffix, payload=None):
     key = {
+        "namespace_id": "magemin:equilibrium-composite",
+        "artifact": "equilibrium_result",
+        "intent": "EQUILIBRIUM",
+        "vapor_pressure_provider_selection": "builtin-vapor-pressure",
         "schema_version": "test",
         "code_version": "test",
         "corpus_version": current_corpus_version(),
         "data_digests": {},
-        "provider": {
-            "resolved_provider_id": driver.MAGEMIN_PROVIDER_ID,
-            "resolved_role": "silicate_liquidus",
-        },
         "suffix": suffix,
     }
-    payload = payload or {
+    base_payload = _strict_vapor_pt1_payload()
+    base_payload.update({
         "suffix": suffix,
-        "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
-    }
+    })
+    if payload is not None:
+        base_payload.pop("equilibrium_result", None)
+        base_payload.pop("last_vapor_pressures_source", None)
+        base_payload.update(payload)
+    payload = base_payload
     key_bytes = _canonical_bytes(key)
     payload_bytes = _canonical_bytes(payload)
     driver.PT1PersistentEquilibriumStore(db_path).put(
@@ -99,27 +104,46 @@ def _strict_vapor_pt1_key(
     fallback_provider_id=None,
 ):
     return {
+        "namespace_id": "magemin:equilibrium-composite",
+        "artifact": "equilibrium_result",
+        "intent": "EQUILIBRIUM",
+        "vapor_pressure_provider_selection": vapor_provider_id,
         "schema_version": "test",
         "code_version": "test",
         "corpus_version": current_corpus_version(),
         "data_digests": {},
-        "provider": {
-            "resolved_provider_id": driver.MAGEMIN_PROVIDER_ID,
-            "resolved_role": "silicate_liquidus",
-        },
-        "vapor_pressure_provider": {
-            "resolved_provider_id": vapor_provider_id,
-            "resolved_role": "authoritative",
-            "authoritative_provider_id": vapor_provider_id,
-            "fallback_provider_id": fallback_provider_id,
-            "fallback_allowed": fallback_provider_id is not None,
-        },
         "suffix": suffix,
     }
 
 
-def _strict_vapor_pt1_payload():
+def _strict_vapor_pt1_payload(
+    *,
+    vapor_provider_id="builtin-vapor-pressure",
+    fallback_provider_id=None,
+):
     return {
+        "authority": {
+            "schema": "reduced-real-authority-v1",
+            "evidence_class": "magemin",
+            "backend_family": "magemin",
+            "backend": {
+                "backend_name": "MAGEMinBackend",
+                "backend_class": "simulator.melt_backend.magemin.MAGEMinBackend",
+            },
+            "provider": {
+                "resolved_provider_id": driver.MAGEMIN_PROVIDER_ID,
+                "resolved_role": "fallback",
+                "authoritative_provider_id": "alphamelts-diagnostic",
+                "fallback_provider_id": driver.MAGEMIN_PROVIDER_ID,
+            },
+            "vapor_pressure": {
+                "resolved_provider_id": vapor_provider_id,
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": vapor_provider_id,
+                "fallback_provider_id": fallback_provider_id,
+                "fallback_allowed": fallback_provider_id is not None,
+            },
+        },
         "equilibrium_result": {"status": "ok"},
         "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
     }
@@ -170,7 +194,26 @@ def _write_equilibrium_post_record_row_raw(
             "fallback_provider_id": None,
         },
     }
-    payload = {"equilibrium_result": {"status": "ok"}}
+    payload = {
+        "authority": {
+            "schema": "reduced-real-authority-v1",
+            "evidence_class": "internal-analytical",
+            "backend_family": "internal-analytical",
+            "backend": {
+                "backend_name": backend_name,
+                "backend_class": backend_name,
+            },
+            "provider": {
+                "resolved_provider_id": provider_id,
+                "resolved_role": "authoritative",
+            },
+            "vapor_pressure": {
+                "resolved_provider_id": "builtin-vapor-pressure",
+                "resolved_role": "authoritative",
+            },
+        },
+        "equilibrium_result": {"status": "ok"},
+    }
     key_bytes = _canonical_bytes(key)
     payload_bytes = _canonical_bytes(payload)
     driver.PT1PersistentEquilibriumStore(db_path)
@@ -771,7 +814,7 @@ def test_merge_cache_shard_rejects_internal_analytical_equilibrium_post_record(t
         provider_id="builtin-backend-equilibrium",
     )
 
-    with pytest.raises(RuntimeError, match="builtin-backend-equilibrium"):
+    with pytest.raises(RuntimeError, match="internal-analytical"):
         driver._merge_cache_shard(shard_db, target_db)
 
     assert driver._cache_row_summary(target_db)["rows"] == 0
@@ -835,7 +878,7 @@ def test_strict_pt1_write_paths_share_vapor_gate(
 ):
     target_db = tmp_path / f"{write_path}-{case_name}-target.db"
     key = _strict_vapor_pt1_key(case_name, **key_kwargs)
-    payload = _strict_vapor_pt1_payload()
+    payload = _strict_vapor_pt1_payload(**key_kwargs)
     payload.update(payload_update)
 
     def write_put():

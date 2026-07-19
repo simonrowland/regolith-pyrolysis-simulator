@@ -743,6 +743,11 @@ def test_process_pool_matches_serial_deterministic_view(tmp_path: Path) -> None:
     serial_views = {result.candidate_id: deterministic_result_view(result) for result in serial}
     pooled_views = {result.candidate_id: deterministic_result_view(result) for result in pooled}
     assert pooled_views == serial_views
+    assert json.dumps(
+        pooled_views, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode("utf-8") == json.dumps(
+        serial_views, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode("utf-8")
 
 
 @pytest.mark.timeout(15)

@@ -2348,6 +2348,15 @@ class RecipePatch:
         )
         return hashlib.sha256(payload).hexdigest()
 
+    def optimizer_recipe_id(
+        self,
+        schema: RecipeSchema | None = None,
+    ) -> str:
+        """Return cache identity for resolved recipe values only."""
+        active_schema = schema or RecipeSchema()
+        resolved = active_schema.resolve_conditional_patch(self).patch
+        return hashlib.sha256(resolved.canonical_json().encode("utf-8")).hexdigest()
+
     def canonical_json(self) -> str:
         values = _canonical_recipe_values(self.values)
         entries = [

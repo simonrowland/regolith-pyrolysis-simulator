@@ -348,7 +348,7 @@ def _physics_values_from_admitted_row(row: sqlite3.Row) -> PhysicsBucketValues:
         raise ValueError("row artifact does not match key artifact")
 
     _reject_internal_analytical_backend_key(key)
-    validate_reduced_real_equilibrium_record_key(artifact, key)
+    validate_reduced_real_equilibrium_record_key(artifact, key, payload)
     assert_strict_vapor_pt1_row(
         artifact=artifact,
         key=key,

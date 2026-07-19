@@ -526,8 +526,8 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
         profile,
         unpinned,
     )
-    # b-026 residual removes one inert allowlist entry; search paths stay fixed.
-    assert spec.recipe_id == "e7192a398b365b98388a526acda7ba09e0cb420da3f5d33cc37d4b43ad7ded28"
+    # b-042: optimizer identity contains resolved values only.
+    assert spec.recipe_id == "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     # cache_key includes physics_constraints; recipe_id is allowlist-versioned and
     # moves when the live searchable allowlist identity changes.
     # 2026-06-29: moved when the Mg pseudo vapor-pressure row was removed,
@@ -621,8 +621,7 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # 2026-07-17: t-097 (110f03c/a217ce8) owns the Ellingham source-fingerprint
     # move; W-A5a/t-227 adds the composed reviewed electricity/solar defaults.
     # Recomputed from this tree.
-    assert cache_key(spec) == "49c50b9612c20988541821d4060f6e181301c5bee2d9fa8c27b6b298e9480dff"
-    assert cache_key(spec) != "be16be9b30f3b68f4889933efad83da6eb65b40cd80f7c5d16349a5f891e464b"
+    assert cache_key(spec) == "332e86c4f7c37ca05f784209c5c10d1e3a07bb500ce0c6e4b4b411f3ae1d0123"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -1670,6 +1669,32 @@ def test_recipe_id_changes_when_allowlist_version_changes() -> None:
     assert patch.validated(old_schema).recipe_id(old_schema) != patch.validated(
         new_schema
     ).recipe_id(new_schema)
+
+
+def test_optimizer_recipe_id_uses_resolved_values_only() -> None:
+    patch = RecipePatch({PO2_DEFAULT: 9.0})
+    old_schema = RecipeSchema(allowlist_version="allowlist-old")
+    new_schema = RecipeSchema(allowlist_version="allowlist-new")
+    bounds_schema = RecipeSchema(
+        allowlist=tuple(
+            replace(spec, high=spec.high + 1.0)
+            if spec.path == PO2_DEFAULT
+            else spec
+            for spec in old_schema.allowlist
+        ),
+        allowlist_version=old_schema.allowlist_version,
+        recipe_schema_version="recipe-schema-other",
+    )
+
+    assert patch.optimizer_recipe_id(old_schema) == patch.optimizer_recipe_id(
+        new_schema
+    )
+    assert patch.optimizer_recipe_id(old_schema) == patch.optimizer_recipe_id(
+        bounds_schema
+    )
+    assert patch.optimizer_recipe_id(old_schema) != RecipePatch(
+        {PO2_DEFAULT: 8.0}
+    ).optimizer_recipe_id(old_schema)
 
 
 def test_redox_cleanup_dose_fields_validate_but_do_not_materialize() -> None:

@@ -756,24 +756,7 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
             "PT-1 cache shard row store schema version drift: "
             f"{row['store_schema_version']}"
         )
-    if str(row["request_schema_version"]) != str(key.get("schema_version")):
-        raise RuntimeError(
-            f"PT-1 cache shard row request schema drift: {row['key_hash']}"
-        )
-    row_corpus_version = str(row.get("corpus_version") or "")
-    key_corpus_version = str(key.get("corpus_version") or "")
-    if row_corpus_version != key_corpus_version:
-        raise CacheShardCorpusVersionMismatch(
-            "PT-1 cache shard row corpus version mismatch: "
-            f"row={row_corpus_version!r} key={key_corpus_version!r} "
-            f"key_hash={row['key_hash']}"
-        )
-    data_digests_json = canonical_json_bytes(key.get("data_digests", {})).decode(
-        "utf-8"
-    )
-    if str(row["data_digests_json"]) != data_digests_json:
-        raise RuntimeError(f"PT-1 cache shard row data digest drift: {row['key_hash']}")
-    validate_reduced_real_equilibrium_record_key(artifact, key)
+    validate_reduced_real_equilibrium_record_key(artifact, key, payload)
     assert_strict_vapor_pt1_row(
         artifact=artifact,
         key=key,
@@ -796,7 +779,7 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
         "physics_bucket_bytes": physics_bucket_bytes,
         "physics_bucket_hash": physics_bucket_hash,
         "ladder_values": _physics_ladder_values_from_replay_key(key),
-        "data_digests_json": data_digests_json,
+        "data_digests_json": str(row["data_digests_json"]),
     }
 
 
@@ -805,13 +788,17 @@ def _cache_row_summary(db_path: Path) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     for row in payload_rows:
         key = json.loads(bytes(row["key_bytes"]).decode("utf-8"))
-        provider = key.get("provider") or {}
+        payload = json.loads(bytes(row["payload_bytes"]).decode("utf-8"))
+        authority = payload.get("authority") or {}
+        provider = authority.get("provider") or {}
+        namespace_id = str(key.get("namespace_id") or "")
         rows.append(
             {
                 "key_hash": row["key_hash"],
                 "artifact": row["artifact"],
                 "provider_id": provider.get("resolved_provider_id", ""),
                 "provider_role": provider.get("resolved_role", ""),
+                "namespace_id": namespace_id,
             }
         )
     by_artifact = Counter(row["artifact"] for row in rows)
@@ -822,7 +809,7 @@ def _cache_row_summary(db_path: Path) -> dict[str, Any]:
     magemin_keys = {
         row["key_hash"]
         for row in rows
-        if row["provider_id"] == MAGEMIN_PROVIDER_ID
+        if row["namespace_id"].startswith("magemin:")
     }
     return {
         "rows": len(rows),
@@ -837,8 +824,7 @@ def _magemin_key_hashes(db_path: Path) -> set[str]:
     key_hashes: set[str] = set()
     for row in _cache_payload_rows(db_path):
         key = json.loads(bytes(row["key_bytes"]).decode("utf-8"))
-        provider = key.get("provider") or {}
-        if provider.get("resolved_provider_id", "") == MAGEMIN_PROVIDER_ID:
+        if str(key.get("namespace_id") or "").startswith("magemin:"):
             key_hashes.add(str(row["key_hash"]))
     return key_hashes
 
@@ -846,18 +832,6 @@ def _magemin_key_hashes(db_path: Path) -> set[str]:
 def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
     rows = _cache_payload_rows(shard_path)
     validated_rows = [_validated_cache_payload_row(row) for row in rows]
-    shard_versions = {str(row["key"].get("corpus_version") or "") for row in validated_rows}
-    target_rows = _cache_payload_rows(target_path)
-    target_versions = {
-        str(row.get("corpus_version") or "") for row in target_rows
-    }
-    if len(shard_versions) > 1 or len(target_versions) > 1 or (
-        shard_versions and target_versions and shard_versions != target_versions
-    ):
-        raise CacheShardCorpusVersionMismatch(
-            "PT-1 cache shard corpus version mismatch: "
-            f"shard={sorted(shard_versions)!r} target={sorted(target_versions)!r}"
-        )
     target_store = PT1PersistentEquilibriumStore(target_path)
     inserted_rows = 0
     with target_store._connect() as conn:
