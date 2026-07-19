@@ -1,362 +1,1793 @@
-schema_version: 1
+schema_version: 2
+policy_id: terminal_ceramic_hierarchy.v1.most_specific_else_parent
 source_documents:
-  deepened_table: "docs-private/research/2026-06-08-wall-chemistry/ceramic-types-deepened.md"
-  audit: "docs-private/research/2026-06-08-wall-chemistry/ceramic-AUDIT.md"
-  references: "docs-private/references/ceramic-types-references.md"
-composition_kinds:
-  - point-anchor
-  - window
-service_temp_kinds:
-  - service
-  - melting-only
-  - uncharacterized
-
+  deepened_table: docs-private/research/2026-06-08-wall-chemistry/ceramic-types-deepened.md
+  audit: docs-private/research/2026-06-08-wall-chemistry/ceramic-AUDIT.md
+  references: docs-private/references/ceramic-types-references.md
+  taxonomy: docs-private/research/2026-07-19-ceramics-glass-taxonomy/taxonomy.md
+  datasheets: docs-private/research/2026-07-19-ceramics-glass-taxonomy/datasheets.md
+ignored_identity_oxides:
+- FeO
+- Fe2O3
+analytical_tolerance_wt_pct: 0.5
 ceramics:
-  anorthite:
-    label: "Anorthite / Ca-rich plagioclase ceramic, CaAl2Si2O8"
+  calcium_aluminate_refractory:
+    parent: null
+    level: parent
+    label: Calcium-aluminate refractory / CAC family
     composition:
-      kind: point-anchor
-      defining_oxides: ["CaO", "Al2O3", "SiO2"]
-      wt_pct: {CaO: 20.0, Al2O3: 37.0, SiO2: 43.0}
-      citations: ["C:S8", "C:S13"]
-      note: >
-        Narrow phase anchor only. SOFC/CMAS seal sources treat anorthite as a
-        crystallized seal/glass-ceramic phase, not a hot-face liner rating.
+      kind: window
+      defining_oxides:
+      - CaO
+      - Al2O3
+      allow_other_oxides: true
+      note: CaO-Al2O3 family; SiO2+MgO must remain below 15 wt%.
+      wt_pct_window:
+        CaO:
+        - 5
+        - 65
+        Al2O3:
+        - 35
+        - 95
+      constraints:
+        sum_max:
+        - oxides:
+          - SiO2
+          - MgO
+          value: 15
+      citations: []
     service_temp:
       value_C: null
       kind: uncharacterized
       citations: []
-      note: "Standalone anorthite refractory service is uncharacterized."
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: limited-scope
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Calcium aluminate cement (CAC) binders and refractory castables; specialty
+        mortars for high-temperature and chemically aggressive service; not a single pure-phase product
+        at parent level.
+      density_g_cm3: "Family span ~2.9\u20133.8 (phase-dependent: CA ~2.94; CA6 theoretical ~3.79). Bulk\
+        \ castables much lower (porous)."
+      colour: "Pure phases white\u2013off-white; Fe/Ti impurities \u2192 grey, beige, or pinkish; fired\
+        \ CAC products often grey\u2013buff."
+      melting_point_C: "Phase-dependent (see subtypes): CA incongruent ~1390 \xB0C; CA2 ~1750\u20131765\
+        \ \xB0C class; CA6 ~1830\u20131875 \xB0C; C3A decomposes ~1540 \xB0C class. Parent has no single\
+        \ T."
+      softening_working_temp_C: "CAC castable systems **formulation-dependent** ~700\u20131900 \xB0C product\
+        \ range (tax: CAC literature). Parent alone: **uncharacterized**."
+      creep_limit_C: "**Uncharacterized at parent** \u2014 gated by binder/aggregate system and porosity;\
+        \ do not use family melting points as RUL."
+      water_stability: '**Hydraulic phases hydrate** (CA, C3A, C12A7): designed to set with water as cements.
+        High-alumina refractories (CA6-rich) are comparatively water-stable once fired. Free lime if present
+        slakes.'
+      materials_compatibility: "Good resistance to many weak acids and sulfates vs Portland in CAC use;\
+        \ basic slag service depends on Al\u2082O\u2083 grade. Attacked by strong alkali in some systems;\
+        \ CA6 subtype preferred for alkali. Reducing atmospheres generally acceptable for aluminates."
+      mechanical_properties: 'Brittle oxide ceramics; strength is product-body dependent (castable vs
+        dense aggregate). Parent: **uncharacterized single-number set**.'
+      appearance_texture: "Fired bodies: matte to slightly vitreous ceramic; castables granular/porous;\
+        \ dense aggregates dull white\u2013grey."
+      everyday_analog: High-temperature refractory cement / furnace castable lining (not ordinary Portland
+        concrete).
+  monocalcium_aluminate_CA:
+    label: Monocalcium aluminate, CA, CaO.Al2O3
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - Al2O3
+      wt_pct:
+        CaO: 35.0
+        Al2O3: 65.0
+      allow_other_oxides: false
+      note: ''
+      citations:
+      - C:S3
+      - C:S8
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations:
+      - C:S3
+      - C:S8
+      scoped_values_C:
+        CAC_castable_systems:
+        - 700
+        - 1900
+      note: 'Standalone CA terminal-ceramic service is uncharacterized. CAC-bonded castable limits are
+        formulation ratings, not pure CA service.
+
+        '
+    liner_suitability:
+      verdict: limited-scope
+      citations:
+      - C:S3
+      - C:S8
+      note: 'Binder/castable-system phase only. Do not classify as a standalone terminal liner ceramic.
+
+        '
+    parent: calcium_aluminate_refractory
+    level: subtype
+    datasheet:
+      terrestrial_applications: Principal hydraulic phase in calcium aluminate cements; rapid-hardening
+        specialty cements; refractory castable binders. **Not** a standalone hot-face liner phase.
+      density_g_cm3: "~2.94\u20132.98 theoretical (2945 kg\xB7m\u207B\xB3). [web:12][web:8]"
+      colour: "Colourless\u2013white pure phase; commercial CAC clinker grey from Fe/impurities."
+      melting_point_C: "**Incongruent** melt ~**1390 \xB0C** (peritectic-style decomposition to liquid\
+        \ + CA2/corundum path \u2014 Wikipedia MCA). [web:12] Alternate literature quotes ~1600 \xB0C\
+        \ for related CA systems \u2014 prefer incongruent **1390 \xB0C** for pure CA. [web:12][web:9]"
+      softening_working_temp_C: "Standalone liner: **uncharacterized**. As CAC binder in formulated castables:\
+        \ service often **~1480\u20131650 \xB0C** class depending on aggregate (tax)."
+      creep_limit_C: '**Uncharacterized as pure CA body.** Castable RUL is aggregate+matrix limited, not
+        pure-CA melting.'
+      water_stability: "**Hydrates and sets** (designed hydraulic behaviour): rapid reaction with water\
+        \ \u2192 CAH\u2081\u2080 metastable hydrate and/or C\u2082AH\u2088 + C\u2083AH\u2086 + Al(OH)\u2083\
+        \ gel. [web:12] Wet storage of unfired powder fails by hydration. Fired dense ceramic is more\
+        \ stable but residual free Ca-aluminates can still hydrate if porous."
+      materials_compatibility: 'Good chemical resistance in many CAC applications (sewage, sulfate soils).
+        High-T: intermediate between lime-rich and alumina-rich aluminates. Attacked if free lime present;
+        basic slag service limited vs magnesia.'
+      mechanical_properties: Hardness **uncharacterized single pure-crystal value** commonly published;
+        CAC pastes gain early compressive strength (hydraulic, not refractory ceramic numbers). Brittle
+        ceramic when densified.
+      appearance_texture: "Clinker: grey granular; pure synthetic: white powder/ceramic, dull\u2013matte."
+      everyday_analog: "Rapid-set specialty cement (Fondu/CAC) \u2014 not Portland grey cement exactly,\
+        \ but the same \u201Chydraulic cement powder\u201D feel."
+  calcium_dialuminate_CA2:
+    label: Calcium dialuminate, CA2, CaO.2Al2O3
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - Al2O3
+      wt_pct:
+        CaO: 22.0
+        Al2O3: 78.0
+      allow_other_oxides: false
+      note: ''
+      citations:
+      - C:S3
+      - C:S8
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations:
+      - C:S3
+      - C:S8
+      scoped_values_C:
+        CAC_castable_systems:
+        - 700
+        - 1900
+      note: 'Standalone CA2 terminal-ceramic service is uncharacterized. CAC/castable values are product-system
+        evidence only.
+
+        '
+    liner_suitability:
+      verdict: limited-scope
+      citations:
+      - C:S3
+      - C:S8
+      note: 'Binder/high-alumina CAC phase. Do not classify a rump as furnace-liner CA2 unless a CA2 body/product
+        window is added.
+
+        '
+    parent: calcium_aluminate_refractory
+    level: subtype
+    datasheet:
+      terrestrial_applications: "High-alumina CAC phase; intermediate in CaO\u2013Al\u2082O\u2083 phase\
+        \ diagram; refractory CAC formulations; rare terrestrial/meteoritic mineral (grossite). Not standalone\
+        \ commercial liner."
+      density_g_cm3: "~**2.88** g/cm\xB3 (grossite calculated/measured class). [web:64][web:69]"
+      colour: "Colourless\u2013white pure; V impurities can give light violet (specialty). [web:66] Fe\
+        \ \u2192 grey/buff."
+      melting_point_C: "~**1750\u20131765 \xB0C** class (literature with CA pair). [web:9] Congruency\
+        \ details phase-diagram dependent; treat as high-T aluminate solid before CA6 field."
+      softening_working_temp_C: 'Standalone: **uncharacterized**. High-alumina CAC product service uses
+        aggregate, not pure CA2.'
+      creep_limit_C: '**Uncharacterized** pure phase.'
+      water_stability: "Hydraulically **much less reactive** than CA at ambient T; elevated-T hydration\
+        \ possible in CAC systems. [web:11] Not free-lime slaking. Generally more water-tolerant than\
+        \ C\u2083S/CaO once fired, but unfired powder can still hydrate slowly."
+      materials_compatibility: High-alumina character (leans acid/high-Al refractory family); better alkali/slag
+        options than lime-rich aluminates but inferior to CA6 for many alkali environments.
+      mechanical_properties: '**Uncharacterized** robust pure-phase mechanical dataset in open product
+        literature; brittle oxide.'
+      appearance_texture: "White\u2013grey crystalline ceramic; matte to weakly vitreous."
+      everyday_analog: "High-alumina refractory grain / white cement clinker phase \u2014 closest everyday:\
+        \ pale high-alumina furnace cement aggregate."
+  calcium_hexaluminate_CA6:
+    label: Calcium hexaluminate / hibonite, CA6, CaO.6Al2O3
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - Al2O3
+      wt_pct:
+        CaO: 8.0
+        Al2O3: 92.0
+      allow_other_oxides: false
+      note: ''
+      citations:
+      - C:S4
+      - C:S5
+      - C:S8
+    service_temp:
+      value_C: 1500
+      kind: service
+      citations:
+      - C:S4
+      - C:S5
+      melting_note_C: 1830
+      note: 'Porous CA6 is described as long-term stable up to 1500 degC for thermal-insulating/refractory
+        applications.
+
+        '
+    liner_suitability:
+      verdict: strong-candidate
+      citations:
+      - C:S4
+      - C:S5
+      note: 'Strong terminal refractory/insulating-liner candidate with sourced alkaline resistance, reducing-atmosphere
+        stability, and low wettability by molten metals/slags.
+
+        '
+    parent: calcium_aluminate_refractory
+    level: subtype
+    datasheet:
+      terrestrial_applications: High-alumina **hot-face / insulating refractory** (porous CA6); cement-kiln
+        linings; alkali- and reducing-atmosphere service; synthetic dense aggregate (e.g. Bonite-class
+        CA6). [web:0][web:3][web:5]
+      density_g_cm3: "Theoretical ~**3.79** g/cm\xB3; mineral hibonite measured ~3.83\u20133.85. [web:2][web:71]\
+        \ Porous insulating products: bulk density much lower (product-specific)."
+      colour: "Pure: white\u2013colourless; hibonite mineral often brown/black from Fe/Ti/REE; V can purple.\
+        \ Fe/Cr/Ti impurities tint grey\u2013brown\u2013pink."
+      melting_point_C: "~**1830\u20131875 \xB0C** (product literature 1830 \xB0C; formation papers 1875\
+        \ \xB0C). [web:3][web:2] Incongruent melting of CaAl\u2081\u2082O\u2081\u2089 reported near ~**1852\
+        \ \xB0C** in experimental work. [web:70]"
+      softening_working_temp_C: "**Long-term service ~1500 \xB0C** (porous CA6 insulating); melting far\
+        \ higher. [tax: CA6 service 1500 \xB0C]"
+      creep_limit_C: "Structural use gated well below melting; porous CA6 insulation ~**1500 \xB0C** continuous\
+        \ class is the practical furnace ceiling cited for product grades. Dense CA6 aggregate can run\
+        \ higher in formulated bricks \u2014 **product-row only**; no single RUL universal."
+      water_stability: "**Water-stable** as fired ceramic (non-hydraulic hexaluminate). Unlike free CaO/C\u2083\
+        S, does not slake. Residual unreacted CaO in imperfect synthesis can hydrate \u2014 purity gate."
+      materials_compatibility: '**Strong alkali resistance** and good behaviour in reducing atmospheres
+        relative to many aluminosilicates; resists CO attack in dense forms. [web:5][web:0] High-alumina
+        / near-neutral-to-acid family; attacked by strongly basic FeO-rich slags less favorably than magnesia;
+        CMAS infiltration still a risk at very high T.'
+      mechanical_properties: "Intrinsically difficult to densify (plate-like grains) \u2192 porous bodies\
+        \ lower strength; dense CA6 aggregate used for hot strength. Hardness **uncharacterized** as a\
+        \ single standard Mohs in product sheets consulted; brittle refractory ceramic."
+      appearance_texture: "Porous grades: chalky\u2013matte white insulating brick feel; dense aggregate:\
+        \ hard dull-white ceramic grain."
+      everyday_analog: "Lightweight insulating firebrick / kiln hot-face block \u2014 pale, matte, refractory."
+  tricalcium_aluminate_C3A:
+    parent: calcium_aluminate_refractory
+    level: subtype
+    label: Tricalcium aluminate, C3A, Ca3Al2O6
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - Al2O3
+      wt_pct:
+        CaO: 62.3
+        Al2O3: 37.7
+      allow_other_oxides: false
+      note: ''
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
     liner_suitability:
       verdict: not-recommended
-      citations: ["C:S8", "C:S13"]
-      note: >
-        Use as a CAS/LTCC/CMAS glass-ceramic phase marker only; blank to
-        no-match outside sourced anorthite or CMAS windows.
-
-  mullite:
-    label: "Mullite, aluminosilicate solid solution"
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Portland cement **clinker interstitial** phase; controls early set with
+        gypsum; **not** a refractory liner product.
+      density_g_cm3: "~**3.04** g/cm\xB3 class (cement mineral data; confirm product row if coding)."
+      colour: "Pure colourless\u2013white; clinker grey from Fe/ferrite association."
+      melting_point_C: "Decomposes / incongruent path ~**1540\u20131542 \xB0C** class (tax note ~1542\
+        \ \xB0C). Not a congruent liner solid."
+      softening_working_temp_C: "**Not applicable as liner** \u2014 cement phase."
+      creep_limit_C: '**not-recommended** as structural hot-face; no RUL product class as pure C3A.'
+      water_stability: '**Hydrates vigorously** (flash set without gypsum); forms calcium aluminate hydrates.
+        **Hydrates-and-fails** as a dry ceramic residue if water contacts free C3A.'
+      materials_compatibility: 'Cement chemistry: sulfate attack pathway (ettringite) is a durability
+        issue in concrete, not a refractory virtue. Unsuitable vs molten slag as a pure phase.'
+      mechanical_properties: '**Uncharacterized** as engineering ceramic; brittle.'
+      appearance_texture: 'Clinker: dark grey nodular; pure: white powder.'
+      everyday_analog: Portland cement clinker nodule (the fast-setting interstitial chemistry).
+  mayenite_C12A7:
+    parent: calcium_aluminate_refractory
+    level: subtype
+    label: Mayenite, C12A7
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - Al2O3
+      wt_pct:
+        CaO: 48.5
+        Al2O3: 51.5
+      allow_other_oxides: false
+      note: ''
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: marker-only
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Cement/clinker cage phase; specialty electride/oxide research material;
+        **not** terminal liner.
+      density_g_cm3: "~**2.68\u20132.85** class (literature scatter; **prefer blank if coding strict**\
+        \ \u2014 mineral mayenite ~2.85). Mark: **approximate / source-dependent**."
+      colour: "Colourless\u2013white pure; may tint with transition metals."
+      melting_point_C: "~**1400\u20131450 \xB0C** class in CaO\u2013Al\u2082O\u2083 diagrams (phase-diagram\
+        \ context); treat as **uncharacterized product T** without a cited pure-phase RUL."
+      softening_working_temp_C: '**Uncharacterized** as liner.'
+      creep_limit_C: '**Uncharacterized / not-recommended** liner.'
+      water_stability: '**Hydrates** (cement-related calcium aluminate); water contact degrades free phase.'
+      materials_compatibility: Cement curiosity; not slag-resistant refractory design phase.
+      mechanical_properties: '**Uncharacterized** engineering ceramic numbers.'
+      appearance_texture: White crystalline / chalky powder when pure.
+      everyday_analog: "Specialty cement phase powder \u2014 closest: white calcium-aluminate cement flour."
+  aluminosilicate_ceramic:
+    parent: null
+    level: parent
+    label: Aluminosilicate ceramic (acid / high-alumina family)
     composition:
       kind: window
-      defining_oxides: ["Al2O3", "SiO2"]
+      defining_oxides:
+      - Al2O3
+      - SiO2
+      allow_other_oxides: true
+      note: Al2O3+SiO2 must comprise at least 70 wt% of nonvolatile oxides.
       wt_pct_window:
-        Al2O3: [71.8, 74.3]
-        SiO2: [25.7, 28.2]
+        Al2O3:
+        - 25
+        - 95
+        SiO2:
+        - 5
+        - 75
+      constraints:
+        sum_min:
+        - oxides:
+          - Al2O3
+          - SiO2
+          value: 70
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: candidate
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Fireclay and high-alumina bricks, kiln furniture, crucibles, furnace linings
+        (acid/high-Al service), porcelain/stoneware bodies at lower Al end.
+      density_g_cm3: "Family ~2.5\u20133.2+ (fireclay lower bulk; mullite ~3.0\u20133.2 theoretical)."
+      colour: "White\u2013buff\u2013grey pure; Fe \u2192 cream, tan, brown; Ti \u2192 cream/blue-grey\
+        \ under redox."
+      melting_point_C: "Wide: fireclay eutectics lower; mullite ~1830\u20131850 \xB0C; pure alumina end\
+        \ higher. **No single parent T.**"
+      softening_working_temp_C: "Fireclay lower (often <1400 \xB0C class products); high-alumina/mullite\
+        \ higher \u2014 **subtype-gated**."
+      creep_limit_C: Product RUL/PCE gated; parent **uncharacterized single number**.
+      water_stability: '**Water-stable** fired aluminosilicates (no free-lime hydration). Green clay bodies
+        soften with water; fired ceramics do not.'
+      materials_compatibility: "**Acid / high-alumina family** (ASTM language): resists acidic slags better\
+        \ than basic; **attacked by basic FeO\u2013CaO-rich slag**. Alkali vapour can form low-melting\
+        \ alkali-aluminosilicates (glazing/corrosion). CMAS attack at turbine/hot-section analogs."
+      mechanical_properties: Brittle ceramics; flexural strengths product-dependent (see mullite).
+      appearance_texture: Matte to semi-vitreous ceramic; porcelain-like when dense and fine-grained.
+      everyday_analog: "Fired brick / bathroom-tile ceramic / kiln shelf \u2014 dense, hard, earthy-to-porcelain."
+  mullite:
+    label: Mullite, aluminosilicate solid solution
+    composition:
+      kind: window
+      defining_oxides:
+      - Al2O3
+      - SiO2
+      allow_other_oxides: false
+      note: ''
+      wt_pct_window:
+        Al2O3:
+        - 71.8
+        - 74.3
+        SiO2:
+        - 25.7
+        - 28.2
       window:
-        diagram_ref: "Mao et al. 2006, J. Am. Ceram. Soc. 89(1):298-308, Fig. 1, DOI:10.1111/j.1551-2916.2005.00698.x; CAS Mul liquidus field"
+        diagram_ref: Mao et al. 2006, J. Am. Ceram. Soc. 89(1):298-308, Fig. 1, DOI:10.1111/j.1551-2916.2005.00698.x;
+          CAS Mul liquidus field
         temperature_C: 1600
-        phase_field: "mullite solid-solution classifier window inside the CaO-Al2O3-SiO2 Mul field"
-        digitized_by: "codex-R2-2026-06-09; text-bounded window, no polygon expansion"
+        phase_field: mullite solid-solution classifier window inside the CaO-Al2O3-SiO2 Mul field
+        digitized_by: codex-R2-2026-06-09; text-bounded window, no polygon expansion
         tolerance_wt_pct: 0.5
-      citations: ["C:S2"]
-      note: >
-        Source-supported mullite solid solution is 60-63 mol% Al2O3 below
-        1600 degC. Broader alumina-rich points remain out of classifier scope
-        without another source.
+      citations:
+      - C:S2
     service_temp:
       value_C: 1600
       kind: service
-      citations: ["C:S2"]
+      citations:
+      - C:S2
       qualified_values_C:
         vacuum_limit: 1600
         typical_air_max: 1725
         air_limit: 1800
-      note: >
-        Use 1600 degC as conservative default where atmosphere/load is unknown.
-        Air-service product rows can be higher.
+      note: 'Use 1600 degC as conservative default where atmosphere/load is unknown. Air-service product
+        rows can be higher.
+
+        '
     liner_suitability:
       verdict: strong-candidate
-      citations: ["C:S2"]
-      note: >
-        Strong liner/kiln-furniture candidate with cited hot-blast, reheat,
-        steel-ladle, glass, and kiln-furniture uses.
+      citations:
+      - C:S2
+      note: 'Strong liner/kiln-furniture candidate with cited hot-blast, reheat, steel-ladle, glass, and
+        kiln-furniture uses.
 
-  doloma:
-    label: "Doloma / dolomite basic refractory, CaO.MgO family"
-    composition:
-      kind: window
-      defining_oxides: ["CaO", "MgO"]
-      wt_pct_window:
-        CaO: [40.0, 45.0]
-        MgO: [30.0, 35.0]
-      point_anchor_wt_pct: {CaO: 58.2, MgO: 41.8}
-      citations: ["C:S6"]
-      note: >
-        Product/service dolomite-brick window is kept separate from pure
-        CaO.MgO stoichiometry.
-    service_temp:
-      value_C: 1650
-      kind: service
-      citations: ["C:S6"]
-      qualified_values_C:
-        basic_refractory_guide_max: 1800
-      note: >
-        Product table gives 1650 degC max temperature; broader basic-refractory
-        guidance reaches 1800 degC.
-    liner_suitability:
-      verdict: candidate
-      citations: ["C:S6"]
-      note: >
-        Genuine basic refractory candidate for steelmaking, cement, and
-        non-ferrous service. Hydration sensitivity remains a gate.
-
-  monocalcium_aluminate_CA:
-    label: "Monocalcium aluminate, CA, CaO.Al2O3"
+        '
+    parent: aluminosilicate_ceramic
+    level: subtype
+    datasheet:
+      terrestrial_applications: Kiln furniture, high-alumina refractories, glass-furnace regenerators,
+        advanced structural ceramics, spark-plug bodies historically, aerospace thermal protection composites.
+      density_g_cm3: "Theoretical ~**3.16\u20133.22**; dense ceramics often ~**3.0\u20133.2** g/cm\xB3\
+        . [web:0][web:5]"
+      colour: "Off-white to cream pure; Fe \u2192 grey/buff; natural mullite rare (Isle of Mull history)."
+      melting_point_C: "~**1830\u20131850+ \xB0C** (incongruent/ss complexity on Al\u2082O\u2083\u2013\
+        SiO\u2082 join; industrial cite ~1850 \xB0C). [web:1]"
+      softening_working_temp_C: "**Continuous service ~1600 \xB0C** default product; air product rows\
+        \ sometimes ~1725\u20131800 \xB0C. [tax]"
+      creep_limit_C: "Excellent **creep resistance** among oxides \u2014 structural use commonly limited\
+        \ ~**1600 \xB0C** under load for mullite refractories; above that pyroplastic risk rises despite\
+        \ higher melting. [web:5][web:0]"
+      water_stability: '**Water-stable** (fired). No hydraulic phases.'
+      materials_compatibility: 'High-alumina acid/neutral character: good vs acidic slags and many metals
+        in oxidizing atmospheres; **basic slag attack**; alkali vapour corrosion risk; good thermal-shock
+        vs dense alumina in many grades.'
+      mechanical_properties: "Flexural/MOR ~**160\u2013190 MPa** dense; compressive ~550\u20131320 MPa;\
+        \ fracture toughness ~**2\u20134 MPa\xB7m\u2070\xB7\u2075**; Knoop ~1450 class; brittle. [web:0][web:5]"
+      appearance_texture: 'Dense: porcelain-like, matte to slightly glassy fracture; porous: chalky refractory.'
+      everyday_analog: "High-quality porcelain / dense kiln shelf \u2014 harder, whiter \u201Csuper-ceramic.\u201D"
+  anorthite:
+    label: Anorthite / Ca-rich plagioclase ceramic, CaAl2Si2O8
     composition:
       kind: point-anchor
-      defining_oxides: ["CaO", "Al2O3"]
-      wt_pct: {CaO: 35.0, Al2O3: 65.0}
-      citations: ["C:S3", "C:S8"]
-      note: "Narrow phase anchor."
-    service_temp:
-      value_C: null
-      kind: uncharacterized
-      citations: ["C:S3", "C:S8"]
-      scoped_values_C:
-        CAC_castable_systems: [700, 1900]
-      note: >
-        Standalone CA terminal-ceramic service is uncharacterized. CAC-bonded
-        castable limits are formulation ratings, not pure CA service.
-    liner_suitability:
-      verdict: limited-scope
-      citations: ["C:S3", "C:S8"]
-      note: >
-        Binder/castable-system phase only. Do not classify as a standalone
-        terminal liner ceramic.
-
-  calcium_dialuminate_CA2:
-    label: "Calcium dialuminate, CA2, CaO.2Al2O3"
-    composition:
-      kind: point-anchor
-      defining_oxides: ["CaO", "Al2O3"]
-      wt_pct: {CaO: 22.0, Al2O3: 78.0}
-      citations: ["C:S3", "C:S8"]
-      note: "Narrow phase anchor."
-    service_temp:
-      value_C: null
-      kind: uncharacterized
-      citations: ["C:S3", "C:S8"]
-      scoped_values_C:
-        CAC_castable_systems: [700, 1900]
-      note: >
-        Standalone CA2 terminal-ceramic service is uncharacterized. CAC/castable
-        values are product-system evidence only.
-    liner_suitability:
-      verdict: limited-scope
-      citations: ["C:S3", "C:S8"]
-      note: >
-        Binder/high-alumina CAC phase. Do not classify a rump as furnace-liner
-        CA2 unless a CA2 body/product window is added.
-
-  calcium_hexaluminate_CA6:
-    label: "Calcium hexaluminate / hibonite, CA6, CaO.6Al2O3"
-    composition:
-      kind: point-anchor
-      defining_oxides: ["CaO", "Al2O3"]
-      wt_pct: {CaO: 8.0, Al2O3: 92.0}
-      citations: ["C:S4", "C:S5", "C:S8"]
-      note: >
-        Narrow phase anchor; in-situ CA6 production is described from Al2O3
-        and CaO sources in 6:1 molar ratio.
-    service_temp:
-      value_C: 1500
-      kind: service
-      citations: ["C:S4", "C:S5"]
-      melting_note_C: 1830
-      note: >
-        Porous CA6 is described as long-term stable up to 1500 degC for
-        thermal-insulating/refractory applications.
-    liner_suitability:
-      verdict: strong-candidate
-      citations: ["C:S4", "C:S5"]
-      note: >
-        Strong terminal refractory/insulating-liner candidate with sourced
-        alkaline resistance, reducing-atmosphere stability, and low wettability
-        by molten metals/slags.
-
-  dicalcium_silicate_C2S:
-    label: "Dicalcium silicate / belite, C2S, 2CaO.SiO2"
-    composition:
-      kind: point-anchor
-      defining_oxides: ["CaO", "SiO2"]
-      wt_pct: {CaO: 65.0, SiO2: 35.0}
-      citations: ["C:S8", "C:S9"]
-      note: "Narrow cement-clinker phase anchor."
+      defining_oxides:
+      - CaO
+      - Al2O3
+      - SiO2
+      wt_pct:
+        CaO: 20.0
+        Al2O3: 37.0
+        SiO2: 43.0
+      allow_other_oxides: false
+      note: ''
+      citations:
+      - C:S8
+      - C:S13
     service_temp:
       value_C: null
       kind: uncharacterized
       citations: []
-      note: "Standalone refractory service is uncharacterized."
+      note: Standalone anorthite refractory service is uncharacterized.
     liner_suitability:
       verdict: not-recommended
-      citations: ["C:S8", "C:S9"]
-      note: >
-        Cement-clinker/hydraulic phase, not a terminal refractory-liner class
-        by itself.
+      citations:
+      - C:S8
+      - C:S13
+      note: 'Use as a CAS/LTCC/CMAS glass-ceramic phase marker only; blank to no-match outside sourced
+        anorthite or CMAS windows.
 
-  tricalcium_silicate_C3S:
-    label: "Tricalcium silicate / alite, C3S, 3CaO.SiO2"
-    composition:
-      kind: point-anchor
-      defining_oxides: ["CaO", "SiO2"]
-      wt_pct: {CaO: 74.0, SiO2: 26.0}
-      citations: ["C:S8", "C:S10"]
-      note: "Narrow cement-clinker phase anchor."
-    service_temp:
-      value_C: null
-      kind: uncharacterized
-      citations: []
-      note: "Standalone refractory service is uncharacterized."
-    liner_suitability:
-      verdict: not-recommended
-      citations: ["C:S8", "C:S10"]
-      note: >
-        High-Ca clinker phase is inappropriate as a hot-face ceramic
-        classification without a source-backed refractory product.
-
-  wollastonite:
-    label: "Wollastonite / calcium metasilicate, CS, CaO.SiO2"
-    composition:
-      kind: point-anchor
-      defining_oxides: ["CaO", "SiO2"]
-      wt_pct: {CaO: 48.0, SiO2: 52.0}
-      citations: ["C:S8", "C:S11", "C:S12"]
-      note: >
-        Substitutions can occur, but no sourced admissible oxide window was
-        found for a pure wollastonite refractory-liner classifier.
-    service_temp:
-      value_C: null
-      kind: uncharacterized
-      citations: ["C:S11"]
-      melting_note_C: 1540
-      note: >
-        Pure wollastonite standalone furnace-liner service is uncharacterized.
-        Do not substitute calcium-silicate insulation-board ratings.
-    liner_suitability:
-      verdict: limited-scope
-      citations: ["C:S11", "C:S12"]
-      note: >
-        Useful ceramic/glaze/frit ingredient and thermal-shock modifier, not a
-        proven terminal hot-face liner anchor.
-
-  magnesium_aluminate_spinel:
-    label: "Magnesium aluminate spinel, MgAl2O4"
-    composition:
-      kind: point-anchor
-      defining_oxides: ["MgO", "Al2O3"]
-      wt_pct: {MgO: 28.3, Al2O3: 71.7}
-      citations: ["C:S1", "C:S14"]
-      note: >
-        Stoichiometric point. Alumina-rich or magnesia-rich spinel stays out of
-        scope until a source gives windows.
-    service_temp:
-      value_C: 1700
-      kind: service
-      citations: ["C:S1"]
-      melting_note_C: 2135
-      note: >
-        Morgan lists magnesium aluminate typical maximum use temperature of
-        1700 degC in inert atmosphere; this is not a universal load-bearing
-        liner rating.
-    liner_suitability:
-      verdict: candidate
-      citations: ["C:S1", "C:S14"]
-      note: >
-        Genuine refractory/technical-ceramic candidate for high-temperature
-        components and magnesia-spinel refractory systems.
-
-  forsterite:
-    label: "Forsterite, Mg2SiO4"
-    composition:
-      kind: point-anchor
-      defining_oxides: ["MgO", "SiO2"]
-      wt_pct: {MgO: 57.3, SiO2: 42.7}
-      product_brick_window:
-        MgO_min: 60.0
-        SiO2_min: 20.0
-      citations: ["C:S15", "C:S16", "C:S17"]
-      note: >
-        Product-grade magnesia-forsterite brick formulation is not the pure
-        forsterite classifier window.
-    service_temp:
-      value_C: 1890
-      kind: melting-only
-      citations: ["C:S15", "C:S16", "C:S17"]
-      product_RUL_C:
-        RSMF_60A: 1650
-        RSMF_60B: 1600
-      note: >
-        Audit correction: S15 supports product refractoriness-under-load and
-        applications, not a genuine max-service rating for pure forsterite.
-    liner_suitability:
-      verdict: candidate
-      citations: ["C:S15", "C:S16", "C:S17"]
-      note: >
-        Product-grade magnesia-forsterite brick is a refractory candidate, but
-        pure-phase service temperature must remain non-service until a direct
-        service source is added.
-
+        '
+    parent: aluminosilicate_ceramic
+    level: subtype
+    datasheet:
+      terrestrial_applications: "Glass-ceramic seals (SOFC/CMAS paths), petrologic plagioclase endmember,\
+        \ filler/marker phase \u2014 **not** hot-face liner alone."
+      density_g_cm3: "~**2.74\u20132.76** g/cm\xB3. [web:18][web:20]"
+      colour: "Colourless, white, grey; Fe/impurities \u2192 reddish/grey tints. [web:18]"
+      melting_point_C: "Congruent melt ~**1550\u20131553 \xB0C** class (standard mineral data ~1550 \xB0\
+        C)."
+      softening_working_temp_C: "Liner service: **uncharacterized / not-recommended**. Glass-ceramic seals\
+        \ operate far lower (e.g. 750\u2013950 \xB0C SOFC scope in tax)."
+      creep_limit_C: '**Uncharacterized as structural hot-face.** Soft relative to mullite/spinel at high
+        T.'
+      water_stability: '**Water-stable** silicate (does not slake). Weathering over geologic time, not
+        hydraulic failure.'
+      materials_compatibility: Intermediate CAS phase; CMAS glass-ceramic corrosion contexts; not basic-slag
+        brick chemistry.
+      mechanical_properties: "Mohs **6\u20136.5**; brittle feldspar. [web:18] Engineering flexural set:\
+        \ **uncharacterized** as bulk product ceramic."
+      appearance_texture: "Vitreous\u2013pearly mineral luster; ceramic bodies matte white\u2013grey."
+      everyday_analog: "White feldspar / porcelain body component \u2014 closest: unglazed porcelain shard."
   cordierite_mullite:
-    label: "Cordierite / cordierite-mullite kiln furniture"
+    label: Cordierite / cordierite-mullite kiln furniture
     composition:
       kind: window
-      defining_oxides: ["MgO", "Al2O3", "SiO2"]
+      defining_oxides:
+      - MgO
+      - Al2O3
+      - SiO2
+      allow_other_oxides: false
+      note: ''
       wt_pct_window:
-        MgO: [4.0, 7.0]
-        Al2O3: [35.0, 48.0]
-        SiO2: [45.0, 58.0]
+        MgO:
+        - 4
+        - 7
+        Al2O3:
+        - 35
+        - 48
+        SiO2:
+        - 45
+        - 58
       window:
-        diagram_ref: "Smart and Glasser 1981, Ceram. Int. 7(3):90-97, DOI:10.1016/0272-8842(81)90003-1; MgO-Al2O3-SiO2 1350 C isothermal section"
+        diagram_ref: Smart and Glasser 1981, Ceram. Int. 7(3):90-97, DOI:10.1016/0272-8842(81)90003-1;
+          MgO-Al2O3-SiO2 1350 C isothermal section
         temperature_C: 1350
-        phase_field: "cordierite-mullite kiln-furniture body; cordierite/mullite MAS assemblage"
-        digitized_by: "codex-R2-2026-06-09; product window retained, no ternary-polygon expansion"
+        phase_field: cordierite-mullite kiln-furniture body; cordierite/mullite MAS assemblage
+        digitized_by: codex-R2-2026-06-09; product window retained, no ternary-polygon expansion
         tolerance_wt_pct: 0.5
-      pure_cordierite_wt_pct: {MgO: 13.8, Al2O3: 34.9, SiO2: 51.4}
-      citations: ["C:S18", "C:S19"]
-      note: >
-        Practical window is a cordierite-mullite kiln-furniture body, not pure
-        cordierite.
+      pure_cordierite_wt_pct:
+        MgO: 13.8
+        Al2O3: 34.9
+        SiO2: 51.4
+      citations:
+      - C:S18
+      - C:S19
     service_temp:
       value_C: 1300
       kind: service
-      citations: ["C:S18", "C:S19"]
+      citations:
+      - C:S18
+      - C:S19
       qualified_values_C:
-        product_grade_range: [1150, 1350]
+        product_grade_range:
+        - 1150
+        - 1350
         high_temperature_grade: 1350
-      note: >
-        ABREF lists max service temperature 1300 degC; IPS product grades span
-        1150-1350 degC.
+      note: 'ABREF lists max service temperature 1300 degC; IPS product grades span 1150-1350 degC.
+
+        '
     liner_suitability:
       verdict: candidate
-      citations: ["C:S18", "C:S19"]
-      note: >
-        Good kiln furniture, burner, and hot support candidate below service
-        ceiling; not for terminal hot-face liner service above 1350 degC.
+      citations:
+      - C:S18
+      - C:S19
+      note: 'Good kiln furniture, burner, and hot support candidate below service ceiling; not for terminal
+        hot-face liner service above 1350 degC.
 
-  cmas_glass_ceramic:
-    label: "CMAS glass-ceramic, melilite/anorthite SOFC-seal family"
+        '
+    parent: aluminosilicate_ceramic
+    level: subtype
+    datasheet:
+      terrestrial_applications: '**Kiln furniture** (batts, props), thermal-shock ware, catalytic-converter
+        substrates (cordierite-rich), heat-exchanger ceramics.'
+      density_g_cm3: "Product bulk often ~**1.8\u20132.5** (porous); theoretical cordierite ~2.51; mullite\
+        \ phase denser \u2014 body-averaged."
+      colour: "Buff, cream, grey; Fe \u2192 tan/brown."
+      melting_point_C: "Cordierite incongruent decomposition ~**1460 \xB0C** class; mullite higher \u2014\
+        \ body melts/softens as multi-phase. [web:19 product context ~1460 cordierite]"
+      softening_working_temp_C: "Product grades **~1150\u20131350 \xB0C**; typical **~1300 \xB0C**. [tax][web:14][web:16]"
+      creep_limit_C: "Load-bearing life diminishes **beyond ~1300 \xB0C**; practical ceiling **~1300\u2013\
+        1350 \xB0C** for kiln furniture under load. [web:16]"
+      water_stability: '**Water-stable** fired body.'
+      materials_compatibility: Excellent thermal-shock chemistry (low CTE); not designed as basic-slag
+        hot-face; alkali/CMAS still corrosive at high T. Oxidizing kiln atmospheres standard.
+      mechanical_properties: Lower strength than dense mullite (porosity + cordierite); thermal-shock-tolerant
+        brittleness. Exact MPa **product-specific**.
+      appearance_texture: Matte, porous, biscuit-ceramic; sandpapery to chalky kiln-shelf feel.
+      everyday_analog: Pizza stone / kiln shelf / catalytic-converter honeycomb ceramic.
+  sillimanite_group:
+    parent: aluminosilicate_ceramic
+    level: subtype
+    label: Sillimanite-group, Al2SiO5
     composition:
       kind: point-anchor
-      defining_oxides: ["CaO", "MgO", "Al2O3", "SiO2"]
-      wt_pct: {CaO: 35.0, MgO: 6.3, Al2O3: 21.2, SiO2: 37.5}
-      mol_pct: {CaO: 38.7, MgO: 9.7, Al2O3: 12.9, SiO2: 38.7}
-      citations: ["C:S13", "C:S20"]
-      note: >
-        Single characterized SOFC-seal composition, not a universal CMAS
-        window.
+      defining_oxides:
+      - Al2O3
+      - SiO2
+      wt_pct:
+        Al2O3: 62.9
+        SiO2: 37.1
+      allow_other_oxides: false
+      note: ''
+      citations: []
     service_temp:
       value_C: null
       kind: uncharacterized
-      citations: ["C:S13", "C:S20"]
-      scoped_values_C:
-        SOFC_seal_operation: [750, 950]
-        seal_stability: 850
-      note: >
-        Audit scope guard: SOFC seal/glass-ceramic use is sourced, but this is
-        not a refractory-liner or hot-duct service rating.
+      citations: []
+      note: No single sourced service temperature.
     liner_suitability:
       verdict: limited-scope
-      citations: ["C:S13", "C:S20"]
-      note: >
-        Sealing glass-ceramic candidate only. Not a terminal furnace liner or
-        hot-duct ceramic anchor.
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Natural refractory **raw materials**; convert toward mullite + silica
+        on firing for high-alumina bricks and shapes.
+      density_g_cm3: Andalusite ~3.15; sillimanite ~3.24; kyanite ~3.6 (polymorph-dependent).
+      colour: "Grey, white, yellow, green, blue (kyanite); Fe \u2192 brown."
+      melting_point_C: Polymorphs **decompose/transform** rather than simple congruent melt at 1 atm;
+        industrial value is **mullitization on firing**, not pure-phase melt T.
+      softening_working_temp_C: 'Pure-phase liner: **uncharacterized**. After conversion: use **mullite
+        product** ratings only with conversion evidence. [tax]'
+      creep_limit_C: '**Uncharacterized** as raw mineral liner.'
+      water_stability: '**Water-stable** silicates.'
+      materials_compatibility: High-alumina raw-material path; post-fire chemistry follows mullite/silica
+        residue.
+      mechanical_properties: "Mohs ~**6.5\u20137.5** (polymorph-dependent); brittle."
+      appearance_texture: Prismatic crystals; industrial concentrates granular; fired shapes become mullite-like
+        ceramic.
+      everyday_analog: 'Before firing: hard mineral sand/grit; after: high-alumina brick.'
+  cordierite_pure:
+    parent: aluminosilicate_ceramic
+    level: subtype
+    label: Cordierite, Mg2Al4Si5O18
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - MgO
+      - Al2O3
+      - SiO2
+      wt_pct:
+        MgO: 13.8
+        Al2O3: 34.9
+        SiO2: 51.4
+      allow_other_oxides: false
+      note: ''
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: limited-scope
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Low-expansion technical ceramics, catalytic substrates, thermal-shock
+        components; prefer product `cordierite_mullite` for kiln furniture windows.
+      density_g_cm3: "~**2.51\u20132.53** theoretical."
+      colour: "Colourless\u2013blue\u2013grey mineral; ceramics cream\u2013grey."
+      melting_point_C: "**Incongruent** decomposition ~**1460 \xB0C** class."
+      softening_working_temp_C: "Continuous use often cited **~1200\u20131300 \xB0C** for technical cordierite;\
+        \ product grades vary. [web:15]"
+      creep_limit_C: "Similar to cordierite-mullite furniture: load limits **\u22721300 \xB0C** class."
+      water_stability: '**Water-stable**.'
+      materials_compatibility: Low CTE thermal-shock champion; not basic-slag brick.
+      mechanical_properties: Mohs ~**7**; brittle, moderate strength porous bodies. [web:15]
+      appearance_texture: 'Matte technical ceramic; natural: vitreous mineral.'
+      everyday_analog: Catalytic-converter ceramic / pizza-stone cordierite.
+  basic_mgo_refractory:
+    parent: null
+    level: parent
+    label: Basic / MgO-CaO refractory family
+    composition:
+      kind: window
+      defining_oxides:
+      - CaO
+      - MgO
+      allow_other_oxides: true
+      note: MgO+CaO dominant at 55 wt% or more.
+      constraints:
+        sum_min:
+        - oxides:
+          - CaO
+          - MgO
+          value: 55
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: candidate
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Steelmaking BOF/EAF linings, cement rotary kilns, non-ferrous basic furnaces,
+        magnesia and doloma bricks.
+      density_g_cm3: "Dense magnesia ~3.5 true; doloma ~3.2\u20133.4 true; bulk brick lower."
+      colour: "White\u2013buff pure MgO/CaO; Fe \u2192 brown; chrome-spinel grades dark."
+      melting_point_C: "MgO ~2800 \xB0C; CaO\u2013MgO eutectic ~2370 \xB0C; spinel ~2135 \xB0C \u2014\
+        \ family high."
+      softening_working_temp_C: "Product bricks commonly **\u22651600\u20131800 \xB0C** service class\
+        \ (subtype)."
+      creep_limit_C: "RUL-limited below melting; doloma/forsterite product RUL often **~1600\u20131700\
+        \ \xB0C** class."
+      water_stability: '**Critical gate:** free **CaO and MgO hydrate/slake** (volume expansion, dusting).
+        Spinel/forsterite much more water-stable.'
+      materials_compatibility: "**Basic family:** resists basic slag; **attacked by acidic SiO\u2082-rich\
+        \ slag**. Carbon-bonded grades for steel. Hydration and CO\u2082 can carbonate free lime."
+      mechanical_properties: Dense basic bricks high compressive strength; brittle.
+      appearance_texture: 'Dense brick: dull, granular, stony; hydrated: chalky powder.'
+      everyday_analog: "Steel-mill furnace brick / agricultural lime (when hydrated) \u2014 contrast is\
+        \ the point."
+  doloma:
+    label: Doloma / dolomite basic refractory, CaO.MgO family
+    composition:
+      kind: window
+      defining_oxides:
+      - CaO
+      - MgO
+      allow_other_oxides: true
+      note: ''
+      wt_pct_window:
+        CaO:
+        - 40
+        - 45
+        MgO:
+        - 30
+        - 35
+      point_anchor_wt_pct:
+        CaO: 58.2
+        MgO: 41.8
+      citations:
+      - C:S6
+    service_temp:
+      value_C: 1650
+      kind: service
+      citations:
+      - C:S6
+      qualified_values_C:
+        basic_refractory_guide_max: 1800
+      note: 'Product table gives 1650 degC max temperature; broader basic-refractory guidance reaches
+        1800 degC.
+
+        '
+    liner_suitability:
+      verdict: candidate
+      citations:
+      - C:S6
+      note: 'Genuine basic refractory candidate for steelmaking, cement, and non-ferrous service. Hydration
+        sensitivity remains a gate.
+
+        '
+    parent: basic_mgo_refractory
+    level: subtype
+    datasheet:
+      terrestrial_applications: Basic steelmaking and cement-kiln refractories; doloma bricks; tar/carbon-bonded
+        grades.
+      density_g_cm3: "True density ~**3.2\u20133.4** class for CaO\u2013MgO; bulk brick lower (product)."
+      colour: "Grey\u2013buff\u2013brown; carbon-bonded black."
+      melting_point_C: "CaO\u2013MgO eutectic ~**2370 \xB0C**; pure endmembers higher. [tax][web:64 taxonomy]"
+      softening_working_temp_C: "Product max common **~1650 \xB0C**; broader guidance sometimes ~1800\
+        \ \xB0C. [tax]"
+      creep_limit_C: "**RUL-class ~1650\u20131700 \xB0C** product grades \u2014 **this is the furnace\
+        \ structural ceiling**, not 2370 \xB0C. [tax]"
+      water_stability: "**Hydrates-and-fails:** free CaO (and MgO) **slake** with moisture \u2192 Ca(OH)\u2082\
+        \ / Mg(OH)\u2082, expansion, strength loss. Must store dry; CO\u2082 carbonation also degrades\
+        \ free lime."
+      materials_compatibility: Excellent vs **basic slag**; poor vs acidic slag; steelmaking workhorse
+        with carbon bond.
+      mechanical_properties: High hot strength when dense/carbon-bonded; ambient strength product-specific.
+        Brittle ceramic/oxide.
+      appearance_texture: 'Dense stony brick; hydrated: chalky/dusty lime.'
+      everyday_analog: "When fresh: grey furnace brick; when wet-damaged: powdered agricultural lime /\
+        \ builder\u2019s lime."
+  magnesium_aluminate_spinel:
+    label: Magnesium aluminate spinel, MgAl2O4
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - MgO
+      - Al2O3
+      wt_pct:
+        MgO: 28.3
+        Al2O3: 71.7
+      allow_other_oxides: false
+      note: ''
+      citations:
+      - C:S1
+      - C:S14
+    service_temp:
+      value_C: 1700
+      kind: service
+      citations:
+      - C:S1
+      melting_note_C: 2135
+      note: 'Morgan lists magnesium aluminate typical maximum use temperature of 1700 degC in inert atmosphere;
+        this is not a universal load-bearing liner rating.
+
+        '
+    liner_suitability:
+      verdict: candidate
+      citations:
+      - C:S1
+      - C:S14
+      note: 'Genuine refractory/technical-ceramic candidate for high-temperature components and magnesia-spinel
+        refractory systems.
+
+        '
+    parent: basic_mgo_refractory
+    level: subtype
+    datasheet:
+      terrestrial_applications: Structural refractories (steel ladles, cement kilns, glass tanks), transparent
+        armor/IR windows (specialty dense), kiln furniture aggregates. [web:10]
+      density_g_cm3: "Theoretical ~**3.58** g/cm\xB3."
+      colour: "Colourless\u2013white pure; natural spinel gem red/blue/etc. from Cr/Fe/Co; refractories\
+        \ white\u2013grey\u2013pink."
+      melting_point_C: "Congruent ~**2135 \xB0C**. [tax]"
+      softening_working_temp_C: "Typical max use **~1700 \xB0C** (inert) for refractory products. [tax]"
+      creep_limit_C: "Structural service commonly limited near **~1700 \xB0C** product class (below melting);\
+        \ excellent high-T stability among oxides."
+      water_stability: '**Water-stable** (no free-lime hydration). One reason spinel is preferred over
+        free MgO in humid handling.'
+      materials_compatibility: '**Neutral/basic-leaning specialty:** good slag resistance in many steel/cement
+        contexts; resists both moderately acid and basic slags better than pure silica or pure lime extremes;
+        CMAS still relevant at extreme T.'
+      mechanical_properties: Mohs ~**8**; Vickers hardness high (specialty transparent spinel literature);
+        fracture toughness moderate; brittle. Dense spinel high strength. Exact GPa/MPa **grade-dependent**.
+      appearance_texture: "Dense: vitreous\u2013porcelain, can be translucent; brick: matte white\u2013\
+        grey grain."
+      everyday_analog: "Hard white technical ceramic \u2014 between porcelain and sapphire window; gem\
+        \ spinel for pure crystals."
+  forsterite:
+    label: Forsterite, Mg2SiO4
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - MgO
+      - SiO2
+      wt_pct:
+        MgO: 57.3
+        SiO2: 42.7
+      product_brick_window:
+        MgO_min: 60.0
+        SiO2_min: 20.0
+      allow_other_oxides: false
+      note: ''
+      citations:
+      - C:S15
+      - C:S16
+      - C:S17
+    service_temp:
+      value_C: 1890
+      kind: melting-only
+      citations:
+      - C:S15
+      - C:S16
+      - C:S17
+      product_RUL_C:
+        RSMF_60A: 1650
+        RSMF_60B: 1600
+      note: 'Audit correction: S15 supports product refractoriness-under-load and applications, not a
+        genuine max-service rating for pure forsterite.
+
+        '
+    liner_suitability:
+      verdict: candidate
+      citations:
+      - C:S15
+      - C:S16
+      - C:S17
+      note: 'Product-grade magnesia-forsterite brick is a refractory candidate, but pure-phase service
+        temperature must remain non-service until a direct service source is added.
+
+        '
+    parent: basic_mgo_refractory
+    level: subtype
+    datasheet:
+      terrestrial_applications: Magnesia-forsterite refractories; electrical ceramics; gem peridot (Fe-bearing
+        olivine); biomedical research ceramics.
+      density_g_cm3: "~**3.21\u20133.33** (pure forsterite ~3.27). [web:34][web:27]"
+      colour: "Pure colourless\u2013white; Fe \u2192 olive green (peridot); ceramics cream\u2013tan."
+      melting_point_C: "Congruent ~**1890 \xB0C**. [web:34][tax melting-only]"
+      softening_working_temp_C: 'Pure-phase service: do **not** use 1890 as service. Product brick service
+        lower.'
+      creep_limit_C: "Product **RUL ~1600\u20131650 \xB0C** class typical for forsterite/magnesia-forsterite\
+        \ bricks. [tax]"
+      water_stability: '**Water-stable** relative to free MgO (bound silicate); does not slake like periclase.
+        Surface weathering possible over long geologic time.'
+      materials_compatibility: Basic-family silicate refractory; good vs basic slag vs acid silica brick;
+        silica activity can form lower-melting silicates with fluxes.
+      mechanical_properties: Mohs **7**; fracture toughness of dense nano-forsterite researched as relatively
+        high among ceramics; brittle. [web:34][web:31]
+      appearance_texture: "Vitreous mineral; ceramic: matte granular olive\u2013cream."
+      everyday_analog: 'Peridot gem (green) or pale olivine sand; industrial: greenish-grey furnace brick
+        grain.'
+  periclase_mgo:
+    parent: basic_mgo_refractory
+    level: subtype
+    label: Periclase / magnesia, MgO
+    composition:
+      kind: window
+      defining_oxides:
+      - MgO
+      allow_other_oxides: true
+      note: ''
+      wt_pct_window:
+        MgO:
+        - 90
+        - 100
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: candidate
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Magnesia bricks, EAF/BOF linings, cement kilns, electrical insulators,
+        dead-burned magnesia aggregate.
+      density_g_cm3: "Theoretical ~**3.58** g/cm\xB3 (periclase)."
+      colour: "White pure; Fe \u2192 brown/yellow."
+      melting_point_C: "~**2800 \xB0C**."
+      softening_working_temp_C: "Magnesia brick product service commonly **\u22651600\u20131800 \xB0C**\
+        \ (purity/load dependent) \u2014 leave null without product row. [tax]"
+      creep_limit_C: High pure MgO creep resistance among oxides, but **product RUL** and impurity silicate
+        films dominate; **product-sourced only**.
+      water_stability: "**Hydrates-and-fails:** MgO + H\u2082O \u2192 Mg(OH)\u2082 (brucite), expansion/dusting.\
+        \ Critical storage/handling gate."
+      materials_compatibility: '**Basic:** excellent vs basic slag; attacked by acid slag; hydration and
+        thermal cycling cracking risks.'
+      mechanical_properties: "Mohs ~**5.5\u20136** (periclase); dense magnesia high compressive strength;\
+        \ brittle."
+      appearance_texture: 'Dense white ceramic/stony; hydrated: soft chalky powder.'
+      everyday_analog: 'Milk-of-magnesia chemistry when hydrated; when dead-burned: white furnace brick.'
+  enstatite:
+    parent: basic_mgo_refractory
+    level: subtype
+    label: Enstatite, MgSiO3
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - MgO
+      - SiO2
+      wt_pct:
+        MgO: 40.2
+        SiO2: 59.8
+      allow_other_oxides: false
+      note: ''
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: limited-scope
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Pyroxene ceramic/glass-ceramic research; natural pyroxene; **limited**
+        as premium refractory vs forsterite.
+      density_g_cm3: "~**3.2** g/cm\xB3 class."
+      colour: Colourless, grey, green, brown with Fe.
+      melting_point_C: "~**1557 \xB0C** class (incongruent/polymorph path in MgO\u2013SiO\u2082; lower\
+        \ than forsterite 1890 \xB0C)."
+      softening_working_temp_C: 'Liner: **uncharacterized** (limited-scope).'
+      creep_limit_C: '**Uncharacterized**; expect lower than forsterite product bricks.'
+      water_stability: '**Water-stable** silicate.'
+      materials_compatibility: Intermediate Mg-silicate; not premium basic brick.
+      mechanical_properties: "Mohs ~**5\u20136**; brittle."
+      appearance_texture: Vitreous to pearly mineral; ceramic matte.
+      everyday_analog: Green-grey pyroxene rock / ceramic insulator body.
+  ca_mg_silicate:
+    parent: null
+    level: parent
+    label: Calcium-magnesium silicate family
+    composition:
+      kind: window
+      defining_oxides:
+      - CaO
+      - MgO
+      - SiO2
+      allow_other_oxides: true
+      note: CaO-MgO-SiO2 dominate; Al2O3 remains low to moderate.
+      constraints:
+        sum_min:
+        - oxides:
+          - CaO
+          - MgO
+          - SiO2
+          value: 70
+        sum_max:
+        - oxides:
+          - Al2O3
+          value: 30
+        any_min:
+        - oxides:
+          - CaO
+          - MgO
+          value: 5
+        all_min:
+        - oxides:
+          - SiO2
+          value: 5
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: limited-scope
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: "Ceramic additives, glass-ceramics, slag phases, fillers \u2014 generally\
+        \ **limited-scope** as hot-face."
+      density_g_cm3: "~2.8\u20133.3 family span."
+      colour: "White\u2013green\u2013grey; Fe tints olive/brown."
+      melting_point_C: "Typically **1300\u20131550 \xB0C** class phases \u2014 lower than premium refractories."
+      softening_working_temp_C: '**Uncharacterized** liner parent.'
+      creep_limit_C: "**Uncharacterized** \u2014 not furnace structural family."
+      water_stability: Most **water-stable** silicates (unlike free CaO).
+      materials_compatibility: Intermediate; glass-ceramic and slag chemistry more than ASTM basic brick.
+      mechanical_properties: "Brittle silicates; Mohs mostly 4.5\u20136.5."
+      appearance_texture: Vitreous minerals to matte ceramic powders.
+      everyday_analog: "Ceramic glaze crystals / rock-forming silicate \u2014 closest: white mineral filler\
+        \ powder."
+  wollastonite:
+    label: Wollastonite / calcium metasilicate, CS, CaO.SiO2
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - SiO2
+      wt_pct:
+        CaO: 48.0
+        SiO2: 52.0
+      allow_other_oxides: false
+      note: ''
+      citations:
+      - C:S8
+      - C:S11
+      - C:S12
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations:
+      - C:S11
+      melting_note_C: 1540
+      note: 'Pure wollastonite standalone furnace-liner service is uncharacterized. Do not substitute
+        calcium-silicate insulation-board ratings.
+
+        '
+    liner_suitability:
+      verdict: limited-scope
+      citations:
+      - C:S11
+      - C:S12
+      note: 'Useful ceramic/glaze/frit ingredient and thermal-shock modifier, not a proven terminal hot-face
+        liner anchor.
+
+        '
+    parent: ca_mg_silicate
+    level: subtype
+    datasheet:
+      terrestrial_applications: "Ceramics (shrinkage control), paints, plastics, friction (brake), metallurgical\
+        \ flux, glazes \u2014 **not** hot-face liner."
+      density_g_cm3: "~**2.86\u20133.09**. [web:22]"
+      colour: White, colourless, grey. [web:22]
+      melting_point_C: "Congruent ~**1540\u20131544 \xB0C**. [web:22][web:23]"
+      softening_working_temp_C: 'Liner: **uncharacterized**.'
+      creep_limit_C: '**Uncharacterized** as structural refractory.'
+      water_stability: '**Water-stable** (very low solubility silicate).'
+      materials_compatibility: Used as ceramic additive; not slag-resistant brick design.
+      mechanical_properties: "Mohs **4.5\u20135**; acicular particles reinforce plastics; brittle ceramic.\
+        \ [web:22]"
+      appearance_texture: "Silky\u2013vitreous acicular crystals; powder chalky-white."
+      everyday_analog: "White mineral filler / \u201Cceramic talc-like\u201D powder; brake-pad mineral."
+  diopside:
+    parent: ca_mg_silicate
+    level: subtype
+    label: Diopside, CaMgSi2O6
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - MgO
+      - SiO2
+      wt_pct:
+        CaO: 25.9
+        MgO: 18.6
+        SiO2: 55.5
+      allow_other_oxides: false
+      note: ''
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: limited-scope
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Pyroxene glass-ceramics, petrologic mineral, ceramic research.
+      density_g_cm3: "~**3.22\u20133.38**."
+      colour: Colourless, green, brown (Fe/Cr).
+      melting_point_C: "~**1391 \xB0C**. [tax]"
+      softening_working_temp_C: 'Liner: **uncharacterized**.'
+      creep_limit_C: '**Uncharacterized**.'
+      water_stability: '**Water-stable**.'
+      materials_compatibility: Glass-ceramic path phase; CMAS-related.
+      mechanical_properties: "Mohs **5.5\u20136.5**; brittle. [web:25]"
+      appearance_texture: "Vitreous pyroxene; ceramic matte\u2013glassy."
+      everyday_analog: Green pyroxene crystal / glass-ceramic cookware crystal phase.
+  akermanite_melilite:
+    parent: ca_mg_silicate
+    level: subtype
+    label: Akermanite-gehlenite melilite solid solution
+    composition:
+      kind: window
+      defining_oxides:
+      - CaO
+      - MgO
+      - Al2O3
+      - SiO2
+      allow_other_oxides: false
+      note: ''
+      wt_pct_window:
+        CaO:
+        - 40.4
+        - 41.6
+        MgO:
+        - 0
+        - 15.3
+        Al2O3:
+        - 0
+        - 37.7
+        SiO2:
+        - 21.4
+        - 44.6
+      constraints:
+        sum_min:
+        - oxides:
+          - MgO
+          - Al2O3
+          value: 14
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: limited-scope
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Blast-furnace slag mineralogy, CMAS primary crystallizing phase, glass-ceramics.
+      density_g_cm3: "\xC5kermanite ~**2.94**; gehlenite ~**3.04**."
+      colour: "Colourless\u2013yellow\u2013grey\u2013brown; Fe tints."
+      melting_point_C: "\xC5kermanite ~**1454 \xB0C**; gehlenite ~**1590 \xB0C** class (ss path between)."
+      softening_working_temp_C: 'Liner: **uncharacterized**.'
+      creep_limit_C: '**Uncharacterized**.'
+      water_stability: '**Water-stable** silicates (slag minerals weather slowly, not hydraulic lime).'
+      materials_compatibility: Central **CMAS** crystallizing phases; relevant to turbine CMAS attack
+        literature as deposit phases.
+      mechanical_properties: "Mohs ~**5\u20136**; brittle."
+      appearance_texture: "Vitreous\u2013resinous slag crystals; ceramic: grey-yellow matte."
+      everyday_analog: "Blast-furnace slag mineral / \u201Cglassy rock\u201D crystals."
+  merwinite:
+    parent: ca_mg_silicate
+    level: subtype
+    label: Merwinite, Ca3MgSi2O8
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - MgO
+      - SiO2
+      wt_pct:
+        CaO: 51.2
+        MgO: 12.3
+        SiO2: 36.6
+      allow_other_oxides: false
+      note: ''
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: limited-scope
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Cement/slag phase marker; Ca-rich CMAS residue; limited specialty ceramic.
+      density_g_cm3: ~**3.15** class.
+      colour: "Colourless\u2013grey."
+      melting_point_C: "~**1575 \xB0C** class (phase-diagram context)."
+      softening_working_temp_C: '**Uncharacterized** liner.'
+      creep_limit_C: '**Uncharacterized**.'
+      water_stability: "Generally **water-stable** silicate; less hydraulic than free C\u2082S/C\u2083\
+        S but Ca-rich \u2014 treat as non-slaking vs CaO."
+      materials_compatibility: Ca-rich basic-leaning silicate marker.
+      mechanical_properties: Mohs ~**6**; brittle. **Sparse** engineering data.
+      appearance_texture: Granular colourless mineral.
+      everyday_analog: Pale slag/clinker mineral grain.
+  monticellite:
+    parent: ca_mg_silicate
+    level: subtype
+    label: Monticellite, CaMgSiO4
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - MgO
+      - SiO2
+      wt_pct:
+        CaO: 35.8
+        MgO: 25.8
+        SiO2: 38.4
+      allow_other_oxides: false
+      note: ''
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: marker-only
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Marker phase in CMAS/slags; limited ceramic use.
+      density_g_cm3: "~**3.05\u20133.2**."
+      colour: "Colourless\u2013grey\u2013yellow."
+      melting_point_C: "~**1503 \xB0C**. [tax]"
+      softening_working_temp_C: '**Uncharacterized**.'
+      creep_limit_C: '**Uncharacterized**.'
+      water_stability: '**Water-stable** olivine-group silicate.'
+      materials_compatibility: Lower-T CMAS phase.
+      mechanical_properties: "Mohs ~**5\u20135.5**; brittle."
+      appearance_texture: Vitreous granular.
+      everyday_analog: Pale olivine-like sand grain.
+  alkaline_earth_silicate_cement:
+    parent: null
+    level: parent
+    label: Alkaline-earth silicate cement/clinker phases
+    composition:
+      kind: window
+      defining_oxides:
+      - CaO
+      - SiO2
+      allow_other_oxides: true
+      note: 'High-Ca silicate: CaO at least 55% on the CaO-SiO2 basis.'
+      constraints:
+        sum_min:
+        - oxides:
+          - CaO
+          - SiO2
+          value: 80
+        ratio_window:
+        - numerator: CaO
+          denominator:
+          - CaO
+          - SiO2
+          range:
+          - 0.55
+          - 0.8
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: not-recommended
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: "Portland cement clinker only \u2014 **explicitly not** hot-face refractories."
+      density_g_cm3: "Clinker ~3.1\u20133.2."
+      colour: Dark grey clinker.
+      melting_point_C: "Clinker forms ~1450 \xB0C kiln; phases melt/decompose near that range."
+      softening_working_temp_C: "**N/A liner** \u2014 cement."
+      creep_limit_C: '**not-recommended** furnace liner.'
+      water_stability: '**Hydrates-and-fails** as free clinker phases (designed hydraulic).'
+      materials_compatibility: Hydraulic binders; not slag-resistant hot-face design.
+      mechanical_properties: Concrete strength via hydration products, not ceramic hot strength.
+      appearance_texture: Grey nodular clinker; powder cement.
+      everyday_analog: Portland cement / concrete.
+  dicalcium_silicate_C2S:
+    label: Dicalcium silicate / belite, C2S, 2CaO.SiO2
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - SiO2
+      wt_pct:
+        CaO: 65.0
+        SiO2: 35.0
+      allow_other_oxides: false
+      note: ''
+      citations:
+      - C:S8
+      - C:S9
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: Standalone refractory service is uncharacterized.
+    liner_suitability:
+      verdict: not-recommended
+      citations:
+      - C:S8
+      - C:S9
+      note: 'Cement-clinker/hydraulic phase, not a terminal refractory-liner class by itself.
+
+        '
+    parent: alkaline_earth_silicate_cement
+    level: subtype
+    datasheet:
+      terrestrial_applications: Portland cement belite; contributes late strength; **not** liner.
+      density_g_cm3: "\u03B2-C\u2082S ~**3.28\u20133.30**."
+      colour: "Colourless\u2013amber pure; clinker grey."
+      melting_point_C: "~**2130 \xB0C** (\u03B1) class for pure C\u2082S \u2014 **irrelevant** to liner\
+        \ use; hydraulic phase."
+      softening_working_temp_C: '**not-recommended** liner.'
+      creep_limit_C: '**not-recommended**.'
+      water_stability: "**Hydrates** (slowly vs C\u2083S) to C\u2013S\u2013H + CH; free phase **fails\
+        \ as dry ceramic in water** by design."
+      materials_compatibility: Cement only.
+      mechanical_properties: Cement mineral; Mohs uncommonly cited for engineering ceramic use.
+      appearance_texture: Clinker crystal; dusty powder when ground.
+      everyday_analog: Portland cement clinker (slow-hydrating fraction).
+  tricalcium_silicate_C3S:
+    label: Tricalcium silicate / alite, C3S, 3CaO.SiO2
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - SiO2
+      wt_pct:
+        CaO: 74.0
+        SiO2: 26.0
+      allow_other_oxides: false
+      note: ''
+      citations:
+      - C:S8
+      - C:S10
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: Standalone refractory service is uncharacterized.
+    liner_suitability:
+      verdict: not-recommended
+      citations:
+      - C:S8
+      - C:S10
+      note: 'High-Ca clinker phase is inappropriate as a hot-face ceramic classification without a source-backed
+        refractory product.
+
+        '
+    parent: alkaline_earth_silicate_cement
+    level: subtype
+    datasheet:
+      terrestrial_applications: Dominant Portland cement strength phase (alite); **not** liner.
+      density_g_cm3: "~**3.13\u20133.15**."
+      colour: "Colourless\u2013brown pure; clinker grey."
+      melting_point_C: "Incongruent ~**1900\u20132070 \xB0C** class in pure system \u2014 **not** a service\
+        \ rating."
+      softening_working_temp_C: '**not-recommended** liner.'
+      creep_limit_C: '**not-recommended**.'
+      water_stability: "**Hydrates rapidly** \u2192 C\u2013S\u2013H + Ca(OH)\u2082. **Hydrates-and-fails**\
+        \ as free ceramic residue."
+      materials_compatibility: Cement only; free lime association worsens water damage.
+      mechanical_properties: Cement mineral.
+      appearance_texture: Dark clinker nodules when bulk.
+      everyday_analog: Portland cement / concrete strength chemistry.
+  ree_ti_cr_rump_phase:
+    parent: null
+    level: parent
+    label: REE / Ti / Cr-bearing rump accessory family
+    composition:
+      kind: window
+      defining_oxides:
+      - TiO2
+      - Cr2O3
+      - La2O3
+      - Ce2O3
+      - Nd2O3
+      - Y2O3
+      allow_other_oxides: true
+      note: Accessory family when Ti, Cr, or a named REE oxide reaches 5 wt%.
+      constraints:
+        any_min:
+        - oxides:
+          - TiO2
+          - Cr2O3
+          - La2O3
+          - Ce2O3
+          - Nd2O3
+          - Y2O3
+          value: 5
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: marker-only
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: "Accessories, concentrates, value-grade markers \u2014 **not** bulk liners."
+      density_g_cm3: "High: chromite ~4.5\u20135.1; perovskite ~4.0; REE phases often >5."
+      colour: 'Dark: black, brown, red (Cr/Fe/Ti chromophores).'
+      melting_point_C: "Often high (perovskite ~1975 \xB0C; chromite ~ partial melt paths)."
+      softening_working_temp_C: '**Uncharacterized** as bulk liner family.'
+      creep_limit_C: '**Uncharacterized**.'
+      water_stability: Generally **water-stable** oxides/spinels (not free lime).
+      materials_compatibility: Specialty; chromia resists many slags; REE phases process-specific.
+      mechanical_properties: Hard accessories (chromite Mohs ~5.5).
+      appearance_texture: "Opaque metallic\u2013submetallic grains."
+      everyday_analog: Black sand / chrome ore grit.
+  perovskite_catito3:
+    parent: ree_ti_cr_rump_phase
+    level: subtype
+    label: Perovskite, CaTiO3
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - TiO2
+      wt_pct:
+        CaO: 41.3
+        TiO2: 58.7
+      allow_other_oxides: false
+      note: ''
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: marker-only
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Dielectric ceramics, Ti sink in CMAS/CAS systems, mineral perovskite;
+        rare bulk structural product.
+      density_g_cm3: "~**4.0\u20134.1**. [web:36]"
+      colour: Pure white powder; mineral black/brown/red/yellow from Fe/Nb/REE. [web:36][web:38]
+      melting_point_C: "~**1975 \xB0C**. [web:36][tax]"
+      softening_working_temp_C: 'Liner: **uncharacterized**.'
+      creep_limit_C: '**Uncharacterized** as structural hot-face product.'
+      water_stability: '**Water-stable**.'
+      materials_compatibility: "Titanate; reducing atmospheres can reduce Ti\u2074\u207A; specialty dielectric\
+        \ not slag brick."
+      mechanical_properties: Mohs ~**5.5**; brittle. [web:38]
+      appearance_texture: "Pure: white powder; mineral: dark, submetallic\u2013adamantine."
+      everyday_analog: White ceramic powder / dark metallic-looking mineral grain.
+  ree_aluminate_silicate_family:
+    parent: ree_ti_cr_rump_phase
+    level: subtype
+    label: REE aluminate-silicate family
+    composition:
+      kind: window
+      defining_oxides:
+      - Al2O3
+      - SiO2
+      - La2O3
+      - Ce2O3
+      - Nd2O3
+      - Y2O3
+      allow_other_oxides: true
+      note: ''
+      constraints:
+        any_min:
+        - oxides:
+          - La2O3
+          - Ce2O3
+          - Nd2O3
+          - Y2O3
+          value: 5
+        sum_min:
+        - oxides:
+          - Al2O3
+          - SiO2
+          value: 20
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: marker-only
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: "REE concentrates, phosphors, specialty ceramics (YAG-like aluminates\
+        \ etc. when named); KREEP-style residue flags \u2014 **family flag, not single leaf**."
+      density_g_cm3: "**Uncharacterized** without named REE phase (often 5\u20137+)."
+      colour: Often coloured by 4f ions (Nd purple, Er pink, etc.) or white if La/Y.
+      melting_point_C: '**Uncharacterized** without named phase.'
+      softening_working_temp_C: '**Uncharacterized**.'
+      creep_limit_C: '**Uncharacterized**.'
+      water_stability: "Generally **water-stable** oxide/silicate families; some REE oxides carbonate/hydrate\
+        \ slowly \u2014 phase-specific."
+      materials_compatibility: Value concentrate; not bulk liner.
+      mechanical_properties: '**Uncharacterized** family.'
+      appearance_texture: Dense ceramic powders / glassy REE residues.
+      everyday_analog: Rare-earth magnet precursor oxides / ceramic phosphor powder.
+  cr_spinel_chromite:
+    parent: ree_ti_cr_rump_phase
+    level: subtype
+    label: Cr-bearing spinel / chromite
+    composition:
+      kind: window
+      defining_oxides:
+      - Cr2O3
+      - FeO
+      - MgO
+      allow_other_oxides: true
+      note: ''
+      wt_pct_window:
+        Cr2O3:
+        - 20
+        - 75
+      constraints:
+        sum_min:
+        - oxides:
+          - FeO
+          - MgO
+          value: 10
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: marker-only
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Chromite ore, refractory chrome/chrome-magnesia bricks (with product window),
+        foundry sand.
+      density_g_cm3: "~**4.5\u20135.1**."
+      colour: "Black\u2013dark brown."
+      melting_point_C: "Chromite ~**~2180 \xB0C** class (varies with solid solution); product chrome refractories\
+        \ high."
+      softening_working_temp_C: 'Without product chromia brick row: **uncharacterized**.'
+      creep_limit_C: Product chrome-magnesia RUL high when sourced; pure leaf **blank**.
+      water_stability: '**Water-stable**.'
+      materials_compatibility: Chromia/spinel resists many slags; hexavalent Cr environmental issue in
+        oxidizing alkali; reducing preferred in some chrome bricks.
+      mechanical_properties: Mohs ~**5.5**; brittle.
+      appearance_texture: "Black metallic\u2013submetallic granular."
+      everyday_analog: Black sand / chrome ore / dark sandpaper grit.
+  ree_titanate_pyrochlore_family:
+    parent: ree_ti_cr_rump_phase
+    level: subtype
+    label: REE titanate / pyrochlore family
+    composition:
+      kind: window
+      defining_oxides:
+      - TiO2
+      - La2O3
+      - Ce2O3
+      - Nd2O3
+      - Y2O3
+      allow_other_oxides: true
+      note: ''
+      constraints:
+        any_min:
+        - oxides:
+          - La2O3
+          - Ce2O3
+          - Nd2O3
+          - Y2O3
+          value: 5
+        sum_min:
+        - oxides:
+          - TiO2
+          value: 10
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: marker-only
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: "Specialty electroceramics, nuclear waste form research (pyrochlore),\
+        \ REE-titanate residues \u2014 **family flag**."
+      density_g_cm3: "**Uncharacterized** without named Ln (often ~5\u20137)."
+      colour: Variable with Ln and defects.
+      melting_point_C: '**Uncharacterized** family (many high-melting).'
+      softening_working_temp_C: '**Uncharacterized**.'
+      creep_limit_C: '**Uncharacterized**.'
+      water_stability: Generally **water-stable** titanates; leach rates phase-specific.
+      materials_compatibility: Specialty; not bulk liner.
+      mechanical_properties: '**Uncharacterized** family.'
+      appearance_texture: Dense ceramic / dark residue.
+      everyday_analog: Advanced ceramic powder (no single household object).
+  cas_cmas_glass_ceramic:
+    parent: null
+    level: parent
+    label: CAS/CMAS glass-ceramic family
+    composition:
+      kind: window
+      defining_oxides:
+      - CaO
+      - MgO
+      - Al2O3
+      - SiO2
+      allow_other_oxides: true
+      note: ''
+      constraints:
+        sum_min:
+        - oxides:
+          - CaO
+          - MgO
+          - Al2O3
+          - SiO2
+          value: 85
+        all_min:
+        - oxides:
+          - CaO
+          - Al2O3
+          - SiO2
+          value: 3
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: limited-scope
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: "SOFC seals, cast glass-ceramics, partially crystallized slag-ceramics\
+        \ \u2014 **not** furnace hot-face."
+      density_g_cm3: "~2.5\u20133.0 typical silicate glass-ceramics."
+      colour: "White\u2013grey\u2013green depending on Fe."
+      melting_point_C: Softening of residual glass + crystal melt-out **composition-dependent**.
+      softening_working_temp_C: "Seal operation often **750\u2013950 \xB0C** class (SOFC analogs). [tax]"
+      creep_limit_C: Viscous flow of residual glass sets ceiling **well below** refractory brick RUL.
+      water_stability: '**Water-stable** solid; high-alkali residual glass may leach alkali.'
+      materials_compatibility: Designed for metal/ceramic seal CTE match; CMAS chemistry is the material.
+      mechanical_properties: 'Glass-ceramic: tougher than glass sometimes, still brittle.'
+      appearance_texture: "Opaque\u2013translucent glassy ceramic."
+      everyday_analog: Glass-ceramic cookware (Pyroceram-like) but CAS/CMAS not lithium cookware chemistry.
+  cmas_glass_ceramic:
+    label: CMAS glass-ceramic, melilite/anorthite SOFC-seal family
+    composition:
+      kind: point-anchor
+      defining_oxides:
+      - CaO
+      - MgO
+      - Al2O3
+      - SiO2
+      wt_pct:
+        CaO: 35.0
+        MgO: 6.3
+        Al2O3: 21.2
+        SiO2: 37.5
+      mol_pct:
+        CaO: 38.7
+        MgO: 9.7
+        Al2O3: 12.9
+        SiO2: 38.7
+      allow_other_oxides: false
+      note: ''
+      citations:
+      - C:S13
+      - C:S20
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations:
+      - C:S13
+      - C:S20
+      scoped_values_C:
+        SOFC_seal_operation:
+        - 750
+        - 950
+        seal_stability: 850
+      note: 'Audit scope guard: SOFC seal/glass-ceramic use is sourced, but this is not a refractory-liner
+        or hot-duct service rating.
+
+        '
+    liner_suitability:
+      verdict: limited-scope
+      citations:
+      - C:S13
+      - C:S20
+      note: 'Sealing glass-ceramic candidate only. Not a terminal furnace liner or hot-duct ceramic anchor.
+
+        '
+    parent: cas_cmas_glass_ceramic
+    level: subtype
+    datasheet:
+      terrestrial_applications: Solid-oxide fuel-cell seals; experimental CMAS castables.
+      density_g_cm3: "~**2.6\u20132.9** typical (composition-specific; **approx**)."
+      colour: Off-white to green-grey with Fe.
+      melting_point_C: "Multi-phase; residual glass softens first \u2014 **no single congruent T**."
+      softening_working_temp_C: "Seal service **~750\u2013950 \xB0C** scoped. [tax]"
+      creep_limit_C: "Viscous seal design intentional above Tg \u2014 **not** structural liner creep rating."
+      water_stability: '**Water-stable** body; leach depends on residual glass alkalis (usually low in
+        CAS).'
+      materials_compatibility: Compatible with selected interconnects/electrolytes in SOFC literature;
+        not basic steel slag brick.
+      mechanical_properties: Brittle glass-ceramic; strength **product-specific**.
+      appearance_texture: Opaque stone-like glass-ceramic.
+      everyday_analog: Stove-top glass-ceramic surface (analog only).
+  gehlenite_anorthite_path:
+    parent: cas_cmas_glass_ceramic
+    level: subtype
+    label: Gehlenite-anorthite crystallization path
+    composition:
+      kind: window
+      defining_oxides:
+      - CaO
+      - MgO
+      - Al2O3
+      - SiO2
+      allow_other_oxides: false
+      note: ''
+      wt_pct_window:
+        CaO:
+        - 20
+        - 41
+        MgO:
+        - 0
+        - 8
+        Al2O3:
+        - 32
+        - 40
+        SiO2:
+        - 21
+        - 43
+      citations: []
+    service_temp:
+      value_C: null
+      kind: uncharacterized
+      citations: []
+      note: No single sourced service temperature.
+    liner_suitability:
+      verdict: marker-only
+      citations: []
+      note: Taxonomy family classification.
+    datasheet:
+      terrestrial_applications: Crystallization-path **marker label**, not a product SKU.
+      density_g_cm3: "Path between gehlenite ~3.04 and anorthite ~2.75 \u2014 **not a single density**."
+      colour: "White\u2013buff\u2013grey."
+      melting_point_C: "Path region on CAS liquidus \u2014 **not a single T**."
+      softening_working_temp_C: '**Uncharacterized** product.'
+      creep_limit_C: '**Uncharacterized**.'
+      water_stability: Phases **water-stable**.
+      materials_compatibility: CAS primary-field path.
+      mechanical_properties: '**Uncharacterized** as product.'
+      appearance_texture: Mixed crystalline ceramic.
+      everyday_analog: Multi-phase ceramic shard / slag crystallization.

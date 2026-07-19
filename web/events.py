@@ -83,6 +83,7 @@ from web.feedstock_data import load_visible_feedstocks
 from web.advisory import (
     active_wall_species_from_flue,
     ceramic_rump_payload,
+    industrial_glass_payload,
     oxide_wt_pct_from_kg,
     vapor_pressure_authority_payload,
     wall_advisory_payload,
@@ -1382,9 +1383,19 @@ def _completion_payload(sim):
     final_snapshot = sim._make_snapshot()
     terminal_rump_by_species = sim._terminal_rump_by_species()
     spent_reductant_by_species = sim._spent_reductant_residue_by_species()
+    try:
+        industrial_glass_view = LedgerAPI(sim).view('industrial_glass')['data']
+    except Exception as exc:  # noqa: BLE001 -- optional presentation boundary
+        _safe_log(f'Industrial glass projection unavailable: {exc}')
+        industrial_glass_view = None
     terminal_rump_composition_wt_pct = oxide_wt_pct_from_kg(
         terminal_rump_by_species
     )
+    refractory_rump_composition_wt_pct = oxide_wt_pct_from_kg({
+        species: mass
+        for species, mass in terminal_rump_by_species.items()
+        if species in TERMINAL_RUMP_REFRACTORY_OXIDES
+    })
     try:
         terminal_rump_by_class = sim._terminal_rump_by_class()
     except Exception as exc:  # noqa: BLE001 -- raw species ledger remains usable
@@ -1441,7 +1452,13 @@ def _completion_payload(sim):
         'terminal_rump_composition_wt_pct': terminal_rump_composition_wt_pct,
         'terminal_rump_by_class': terminal_rump_by_class,
         'ceramic_rump_panel': ceramic_rump_payload(
-            terminal_rump_composition_wt_pct
+            refractory_rump_composition_wt_pct
+        ),
+        'glass_panel': industrial_glass_payload(
+            industrial_glass_view,
+            pO2_mbar=max(float(sim.melt.pO2_mbar), 0.0),
+            temperature_C=float(sim.melt.temperature_C),
+            pressure_mbar=max(float(sim.melt.p_total_mbar), 0.0),
         ),
         'vapor_pressure_authority_panel': vapor_pressure_authority_payload(
             getattr(sim, '_last_backend_diagnostics', {}) or {}

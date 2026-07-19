@@ -90,6 +90,8 @@ def test_named_views_preserve_tap_and_oxygen_account_distinctions():
     assert "early_tap_mode" not in industrial_glass
     assert industrial_glass["projection_basis"] == "hypothetical_early_tap"
     assert "does not assert that the run selected an early tap" in industrial_glass["note"]
+    assert "species_kg" in industrial_glass
+    assert "oxide_wt_pct" in industrial_glass
     assert api.view("stage_purity")["view"] == "stage_purity"
 
 

@@ -10,10 +10,24 @@
     {% elif ceramic_rump.match %}
     <div class="advisory-result">
         <div class="advisory-result-title">{{ ceramic_rump.match.label }}</div>
+        <div>Hierarchy: {{ ceramic_rump.match.hierarchy | join(' > ') }}</div>
+        <div>Match level: {{ ceramic_rump.match.match_level }}</div>
         <div>Composition: {{ ceramic_rump.match.composition_kind }}</div>
         <div>{{ ceramic_rump.match.service_temp.display }}</div>
         <div>Service kind: {{ ceramic_rump.match.service_temp.kind }}</div>
         <div>Liner verdict: {{ ceramic_rump.match.liner_suitability.verdict }}</div>
+        {% set sheet = ceramic_rump.match.datasheet %}
+        <div>Terrestrial applications: {{ sheet.terrestrial_applications }}</div>
+        <div>Density: {{ sheet.density_g_cm3 }}</div>
+        <div>Colour: {{ sheet.colour }}</div>
+        <div>Melting point: {{ sheet.melting_point_C }}</div>
+        <div>Softening / working / service: {{ sheet.softening_working_temp_C }}</div>
+        <div>Creep / furnace ceiling: {{ sheet.creep_limit_C }}</div>
+        <div>Water stability: {{ sheet.water_stability }}</div>
+        <div>Materials compatibility: {{ sheet.materials_compatibility }}</div>
+        <div>Mechanical properties: {{ sheet.mechanical_properties }}</div>
+        <div>Appearance / texture: {{ sheet.appearance_texture }}</div>
+        <div>Everyday analog: {{ sheet.everyday_analog }}</div>
     </div>
     {% else %}
     <div class="advisory-empty">{{ ceramic_rump.status }} - {{ ceramic_rump.reason }}</div>

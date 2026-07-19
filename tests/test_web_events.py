@@ -15,6 +15,7 @@ from web import events as web_events
 from web import routes as web_routes
 from simulator.backends import BackendSelectionPolicy, backend_resolution_status
 from simulator.condensation import KnudsenRegimeRefusal
+from simulator.accounting.queries import TERMINAL_RUMP_REFRACTORY_OXIDES
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -3806,6 +3807,69 @@ def test_completion_payload_exposes_final_mass_reconciliation():
     assert payload["mass_balance_error_pct"] == pytest.approx(0.0)
     assert payload["stage0_mass_balance_delta_kg"] == pytest.approx(0.0)
     assert "residual_inventory_kg" in payload
+
+
+def test_completion_ceramic_panel_classifies_product_story_refractory_slice(
+    monkeypatch,
+):
+    sim, _snapshot = _sim_with_mass_balance_snapshot(0.0)
+    terminal_rump = {
+        "CaO": 25.0,
+        "Al2O3": 35.0,
+        "SiO2": 30.0,
+        "MgO": 8.0,
+        "TiO2": 2.0,
+    }
+    monkeypatch.setattr(
+        sim,
+        "_terminal_rump_by_species",
+        lambda: dict(terminal_rump),
+    )
+    monkeypatch.setattr(
+        web_events,
+        "_product_story_payload",
+        lambda _sim, *, terminal_rump_by_species: {
+            "refractory_ceramic": {
+                "species_kg": {
+                    species: round(mass, 2)
+                    for species, mass in sorted(terminal_rump_by_species.items())
+                    if species in TERMINAL_RUMP_REFRACTORY_OXIDES
+                }
+            },
+            "terminal_residue": {
+                "species_kg": {
+                    species: round(mass, 2)
+                    for species, mass in sorted(terminal_rump_by_species.items())
+                    if species not in TERMINAL_RUMP_REFRACTORY_OXIDES
+                }
+            },
+        },
+    )
+
+    payload = _completion_payload(sim)
+    refractory_species = {
+        species: mass
+        for species, mass in terminal_rump.items()
+        if species in TERMINAL_RUMP_REFRACTORY_OXIDES
+    }
+
+    assert payload["product_story"]["refractory_ceramic"]["species_kg"] == {
+        species: round(mass, 2)
+        for species, mass in sorted(refractory_species.items())
+    }
+    assert payload["product_story"]["terminal_residue"]["species_kg"] == {
+        "SiO2": 30.0
+    }
+    assert payload["ceramic_rump_panel"]["composition_wt_pct"] == {
+        "Al2O3": 50.0,
+        "CaO": 35.714,
+        "MgO": 11.429,
+        "TiO2": 2.857,
+    }
+    assert (
+        payload["ceramic_rump_panel"]["match"]["ceramic_id"]
+        == "calcium_aluminate_refractory"
+    )
 
 
 def test_web_payloads_preserve_full_precision_mass_balance_error(

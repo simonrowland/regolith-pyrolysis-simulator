@@ -308,6 +308,9 @@ def test_ceramic_rump_panel_renders_match_and_service_rating(client) -> None:
     assert "Mullite" in html
     assert "Usable service: 1600 C" in html
     assert "Service kind: service" in html
+    assert "Match level: subtype" in html
+    assert "Terrestrial applications:" in html
+    assert "Everyday analog:" in html
 
 
 def test_ceramic_rump_panel_renders_no_match(client) -> None:
@@ -316,7 +319,7 @@ def test_ceramic_rump_panel_renders_no_match(client) -> None:
     assert response.status_code == 200
     html = response.get_data(as_text=True)
     assert "no-match" in html
-    assert "composition outside source-supported ceramic windows" in html
+    assert "composition outside source-supported ceramic predicates" in html
 
 
 def test_ceramic_rump_panel_honors_melting_only_not_service(client) -> None:
@@ -348,3 +351,18 @@ def test_ceramic_rump_panel_renders_ambiguous(client, monkeypatch) -> None:
     html = response.get_data(as_text=True)
     assert "ambiguous" in html
     assert "alpha, beta" in html
+
+
+def test_industrial_glass_panel_renders_family_clarity_and_datasheet(client) -> None:
+    response = client.get(
+        "/partials/industrial-glass-panel"
+        "?SiO2=49&Al2O3=15&CaO=12&MgO=10&FeO=10&TiO2=4"
+    )
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "Basalt / high-iron glass" in html
+    assert "Optical clarity estimate: opaque_dark" in html
+    assert "Colour estimate: dark_brown_black" in html
+    assert "Redox source: ledger_speciation" in html
+    assert "Everyday analog:" in html

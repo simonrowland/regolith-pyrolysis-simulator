@@ -209,6 +209,68 @@ function renderCeramicRumpPanel(payload) {
         'Liner verdict',
         payload.match.liner_suitability ? payload.match.liner_suitability.verdict : 'n/a'
     );
+    appendCeramicLine(content, 'Hierarchy', (payload.match.hierarchy || []).join(' > ') || 'n/a');
+    appendCeramicLine(content, 'Match level', payload.match.match_level || 'n/a');
+    appendMaterialDatasheet(content, payload.match.datasheet);
+}
+
+function renderIndustrialGlassPanel(payload) {
+    const content = document.getElementById('industrial-glass-content');
+    if (!content) return;
+    const status = payload && payload.status ? payload.status : 'n/a';
+    updateAdvisoryState('industrial-glass-state', status);
+    advisoryClear(content);
+    if (!payload || status === 'n/a') {
+        content.className = 'advisory-empty';
+        content.textContent = 'n/a';
+        return;
+    }
+    if (status === 'no-match' || status === 'ambiguous' || !payload.match) {
+        content.className = 'advisory-empty';
+        content.textContent = status + ' - ' + (payload.reason || '');
+        return;
+    }
+    content.className = 'advisory-result';
+    const title = document.createElement('div');
+    title.className = 'advisory-result-title';
+    title.textContent = payload.match.label || 'n/a';
+    content.appendChild(title);
+    if (payload.projection_basis) {
+        appendCeramicLine(content, 'Projection', payload.projection_basis);
+        appendCeramicLine(content, 'Projection note', payload.projection_note || 'n/a');
+    }
+    appendCeramicLine(content, 'Hierarchy', (payload.match.hierarchy || []).join(' > ') || 'n/a');
+    appendCeramicLine(content, 'Match level', payload.match.match_level || 'n/a');
+    appendCeramicLine(content, 'Use grades', advisoryFormatValue(payload.use_grade_optical));
+    appendCeramicLine(content, 'Optical clarity estimate', payload.clarity_grade || 'n/a');
+    appendCeramicLine(content, 'Colour estimate', payload.colour_estimate || 'n/a');
+    const fe = advisoryObject(payload.fe_model) || {};
+    appendCeramicLine(content, 'Total Fe as Fe2O3', advisoryFormatValue(fe.total_fe2o3_wt_pct, 'wt%'));
+    appendCeramicLine(content, 'Fe2+ fraction', advisoryFormatValue(fe.fe2_fraction));
+    appendCeramicLine(content, 'Redox source', fe.redox_source || 'n/a');
+    appendCeramicLine(content, 'Confidence', payload.confidence || 'n/a');
+    appendMaterialDatasheet(content, payload.match.datasheet);
+}
+
+function appendMaterialDatasheet(parent, datasheet) {
+    const sheet = advisoryObject(datasheet);
+    if (!sheet) return;
+    const labels = {
+        terrestrial_applications: 'Terrestrial applications',
+        density_g_cm3: 'Density',
+        colour: 'Colour',
+        melting_point_C: 'Melting point',
+        softening_working_temp_C: 'Softening / working / service',
+        creep_limit_C: 'Creep / furnace ceiling',
+        water_stability: 'Water stability',
+        materials_compatibility: 'Materials compatibility',
+        mechanical_properties: 'Mechanical properties',
+        appearance_texture: 'Appearance / texture',
+        everyday_analog: 'Everyday analog',
+    };
+    for (const [key, label] of Object.entries(labels)) {
+        appendCeramicLine(parent, label, sheet[key] || 'uncharacterized');
+    }
 }
 
 function appendCeramicLine(parent, label, value) {
@@ -623,6 +685,7 @@ socket.on('simulation_tick', (data) => {
 socket.on('simulation_complete', (data) => {
     renderProductLedgerPanel(data);
     renderCeramicRumpPanel(data.ceramic_rump_panel);
+    renderIndustrialGlassPanel(data.glass_panel);
     renderVaporPressureAuthorityPanel(data.vapor_pressure_authority_panel);
     renderKnudsenRegimePanelFromDiagnostic(
         data.knudsen_regime_diagnostic,
@@ -666,6 +729,7 @@ socket.on('decision_required', () => {
 
 window.renderWallRiskPanel = renderWallRiskPanel;
 window.renderCeramicRumpPanel = renderCeramicRumpPanel;
+window.renderIndustrialGlassPanel = renderIndustrialGlassPanel;
 window.renderVaporPressureAuthorityPanel = renderVaporPressureAuthorityPanel;
 window.renderProductLedgerPanel = renderProductLedgerPanel;
 window.renderOverlapEvaporationPanel = renderOverlapEvaporationPanel;

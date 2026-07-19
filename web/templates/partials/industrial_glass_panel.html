@@ -1,0 +1,42 @@
+<div class="advisory-panel" data-industrial-glass-panel>
+    <div class="advisory-panel-header">
+        <h3>Industrial Glass</h3>
+        <span class="advisory-state advisory-state-{{ glass_panel.status }}">{{ glass_panel.status }}</span>
+    </div>
+    {% if glass_panel.status == 'n/a' %}
+    <div class="advisory-empty">n/a</div>
+    {% elif glass_panel.status in ['no-match', 'ambiguous'] %}
+    <div class="advisory-empty">{{ glass_panel.status }} - {{ glass_panel.reason }}</div>
+    {% elif glass_panel.match %}
+    <div class="advisory-result">
+        <div class="advisory-result-title">{{ glass_panel.match.label }}</div>
+        {% if glass_panel.projection_basis %}
+        <div>Projection: {{ glass_panel.projection_basis }}</div>
+        <div>{{ glass_panel.projection_note }}</div>
+        {% endif %}
+        <div>Hierarchy: {{ glass_panel.match.hierarchy | join(' > ') }}</div>
+        <div>Match level: {{ glass_panel.match.match_level }}</div>
+        <div>Use grades: {{ glass_panel.use_grade_optical | join(', ') }}</div>
+        <div>Optical clarity estimate: {{ glass_panel.clarity_grade }}</div>
+        <div>Colour estimate: {{ glass_panel.colour_estimate }}</div>
+        <div>Total Fe as Fe2O3: {{ glass_panel.fe_model.total_fe2o3_wt_pct }} wt%</div>
+        <div>Fe2+ fraction: {{ glass_panel.fe_model.fe2_fraction }}</div>
+        <div>Redox source: {{ glass_panel.fe_model.redox_source }}</div>
+        <div>Confidence: {{ glass_panel.confidence }}</div>
+        {% set sheet = glass_panel.match.datasheet %}
+        <div>Terrestrial applications: {{ sheet.terrestrial_applications }}</div>
+        <div>Density: {{ sheet.density_g_cm3 }}</div>
+        <div>Colour: {{ sheet.colour }}</div>
+        <div>Melting point: {{ sheet.melting_point_C }}</div>
+        <div>Softening / working: {{ sheet.softening_working_temp_C }}</div>
+        <div>Creep / furnace ceiling: {{ sheet.creep_limit_C }}</div>
+        <div>Water stability: {{ sheet.water_stability }}</div>
+        <div>Materials compatibility: {{ sheet.materials_compatibility }}</div>
+        <div>Mechanical properties: {{ sheet.mechanical_properties }}</div>
+        <div>Appearance / texture: {{ sheet.appearance_texture }}</div>
+        <div>Everyday analog: {{ sheet.everyday_analog }}</div>
+    </div>
+    {% else %}
+    <div class="advisory-empty">{{ glass_panel.status }} - {{ glass_panel.reason }}</div>
+    {% endif %}
+</div>

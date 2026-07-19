@@ -181,6 +181,9 @@ class LedgerAPI:
             payload = dict(
                 classify_products(self.sim, early_tap_mode=True)["industrial_mixed_glass"]
             )
+            species_kg = self.ledger.project_account_kg("process.cleaned_melt")
+            payload["species_kg"] = dict(species_kg)
+            payload["oxide_wt_pct"] = oxide_wt_pct_from_kg(species_kg)
             payload.pop("early_tap_mode", None)
             payload["projection_basis"] = "hypothetical_early_tap"
             payload["note"] = (

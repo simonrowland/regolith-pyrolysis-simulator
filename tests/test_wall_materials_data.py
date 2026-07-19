@@ -382,11 +382,17 @@ def test_wall_equilibrium_phase_windows_are_provenanced():
 
 def test_ceramic_types_schema_is_fail_closed():
     data = _load_yaml("ceramic_types.yaml")
-    assert data["schema_version"] == 1
-    assert set(data["ceramics"]) == CERAMIC_ANCHORS
+    assert data["schema_version"] == 2
+    assert CERAMIC_ANCHORS < set(data["ceramics"])
+    assert len(data["ceramics"]) == 35
 
     for entry in data["ceramics"].values():
-        assert {"label", "composition", "service_temp", "liner_suitability"} <= set(entry)
+        assert {
+            "label", "parent", "level", "composition", "service_temp",
+            "liner_suitability", "datasheet",
+        } <= set(entry)
+        assert entry["level"] in {"parent", "subtype"}
+        assert len(entry["datasheet"]) == 11
 
         composition = entry["composition"]
         assert composition["kind"] in COMPOSITION_KINDS
@@ -394,8 +400,10 @@ def test_ceramic_types_schema_is_fail_closed():
         assert "citations" in composition
         if composition["kind"] == "point-anchor":
             assert "wt_pct" in composition
-        else:
+        elif "wt_pct_window" in composition:
             assert "wt_pct_window" in composition
+        else:
+            assert composition.get("constraints")
         if "window" in composition:
             window = composition["window"]
             assert {

@@ -89,6 +89,7 @@ from web.feedstock_data import (
 )
 from web.advisory import (
     ceramic_rump_payload,
+    industrial_glass_payload,
     vapor_pressure_authority_payload,
     wall_advisory_payload,
 )
@@ -3618,6 +3619,33 @@ def ceramic_rump_panel_partial():
     return render_template(
         'partials/ceramic_rump_panel.html',
         ceramic_rump=payload,
+    )
+
+
+@bp.route('/api/industrial-glass')
+def industrial_glass_api():
+    payload = industrial_glass_payload(
+        _query_composition_wt_pct(),
+        pO2_mbar=_query_optional_float('pO2_mbar', minimum=0.0),
+        temperature_C=_query_optional_float('temperature_C'),
+        pressure_mbar=_query_optional_float('pressure_mbar', minimum=0.0),
+        tolerance_wt_pct=_query_optional_float('tolerance_wt_pct', minimum=0.0),
+    )
+    return jsonify(payload)
+
+
+@bp.route('/partials/industrial-glass-panel')
+def industrial_glass_panel_partial():
+    payload = industrial_glass_payload(
+        _query_composition_wt_pct(),
+        pO2_mbar=_query_optional_float('pO2_mbar', minimum=0.0),
+        temperature_C=_query_optional_float('temperature_C'),
+        pressure_mbar=_query_optional_float('pressure_mbar', minimum=0.0),
+        tolerance_wt_pct=_query_optional_float('tolerance_wt_pct', minimum=0.0),
+    )
+    return render_template(
+        'partials/industrial_glass_panel.html',
+        glass_panel=payload,
     )
 
 

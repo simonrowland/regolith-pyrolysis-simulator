@@ -11,7 +11,10 @@ from simulator.ceramic_classifier import (
     CeramicClassification,
     CeramicMatch,
     CeramicServiceTemperature,
+    GlassClassification,
+    GlassMatch,
     classify_ceramic_rump,
+    classify_industrial_glass,
 )
 from simulator.wall_advisor import (
     WALL_ZONE_TEMPERATURES_C,
@@ -134,6 +137,43 @@ def ceramic_rump_payload(
         kwargs["tolerance_wt_pct"] = float(tolerance_wt_pct)
     classification = classify_ceramic_rump(composition, **kwargs)
     return _ceramic_classification_payload(classification, composition)
+
+
+def industrial_glass_payload(
+    industrial_glass_view: Mapping[str, Any] | None,
+    *,
+    pO2_mbar: float | None = None,
+    temperature_C: float | None = None,
+    pressure_mbar: float | None = None,
+    tolerance_wt_pct: float | None = None,
+) -> dict[str, Any]:
+    view = dict(industrial_glass_view or {})
+    raw_composition = view.get("oxide_wt_pct", view)
+    composition = _positive_float_mapping(
+        raw_composition if isinstance(raw_composition, Mapping) else None
+    )
+    if not composition:
+        return {
+            "status": "n/a",
+            "reason": "n/a",
+            "composition_wt_pct": {},
+            "match": None,
+        }
+    kwargs: dict[str, Any] = {
+        "pO2_mbar": pO2_mbar,
+        "temperature_C": temperature_C,
+        "pressure_mbar": pressure_mbar,
+    }
+    if tolerance_wt_pct is not None:
+        kwargs["tolerance_wt_pct"] = float(tolerance_wt_pct)
+    classification = classify_industrial_glass(composition, **kwargs)
+    return _glass_classification_payload(
+        classification,
+        composition,
+        projection_basis=_string_or_none(view.get("projection_basis")),
+        projection_note=_string_or_none(view.get("note")),
+        pO2_mbar=pO2_mbar,
+    )
 
 
 def vapor_pressure_authority_payload(
@@ -278,6 +318,61 @@ def _ceramic_match_payload(match: CeramicMatch) -> dict[str, Any]:
         "composition_kind": match.composition_kind,
         "service_temp": _ceramic_service_temp_payload(match.service_temp),
         "liner_suitability": dict(match.liner_suitability),
+        "parent_id": match.parent_id,
+        "match_level": match.match_level,
+        "hierarchy": list(match.hierarchy),
+        "datasheet": dict(match.datasheet),
+    }
+
+
+def _glass_classification_payload(
+    classification: GlassClassification,
+    composition: Mapping[str, float],
+    *,
+    projection_basis: str | None,
+    projection_note: str | None,
+    pO2_mbar: float | None,
+) -> dict[str, Any]:
+    return {
+        "status": classification.status,
+        "reason": classification.reason,
+        "confidence": classification.confidence,
+        "projection_basis": projection_basis,
+        "projection_note": projection_note,
+        "composition_wt_pct": {
+            oxide: round(value, 3)
+            for oxide, value in sorted(composition.items())
+        },
+        "match": (
+            _glass_match_payload(classification.match)
+            if classification.match is not None
+            else None
+        ),
+        "clarity_grade": classification.clarity_grade,
+        "colour_estimate": classification.colour_estimate,
+        "use_grade_optical": list(classification.use_grade_optical),
+        "fe_model": {
+            "total_fe2o3_wt_pct": round(
+                classification.total_fe2o3_wt_pct, 5
+            ),
+            "fe2_fraction": _round_or_none(classification.fe2_fraction),
+            "pO2_mbar": _round_or_none(pO2_mbar),
+            "redox_source": classification.redox_source,
+            "citations": list(classification.model_citations),
+        },
+    }
+
+
+def _glass_match_payload(match: GlassMatch) -> dict[str, Any]:
+    return {
+        "family_id": match.family_id,
+        "label": match.label,
+        "parent_id": match.parent_id,
+        "match_level": match.match_level,
+        "hierarchy": list(match.hierarchy),
+        "composition_kind": match.composition_kind,
+        "use_grade": list(match.use_grade),
+        "datasheet": dict(match.datasheet),
     }
 
 

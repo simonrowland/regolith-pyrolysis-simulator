@@ -1,0 +1,442 @@
+schema_version: 1
+policy_id: industrial_glass_hierarchy.v1.family_plus_fe_clarity
+source_documents:
+  taxonomy: docs-private/research/2026-07-19-ceramics-glass-taxonomy/taxonomy.md
+  datasheets: docs-private/research/2026-07-19-ceramics-glass-taxonomy/datasheets.md
+clarity_model:
+  confidence: estimate
+  total_fe_basis: Fe2O3-equivalent wt%
+  feo_to_fe2o3_factor: 1.1113
+  clarity_bands:
+  - max_exclusive: 0.015
+    grade: optical_clear
+  - max_exclusive: 0.05
+    grade: low_iron_clear
+  - max_exclusive: 0.15
+    grade: standard_clear_tinted
+  - max_exclusive: 0.3
+    grade: intentionally_coloured
+  - max_exclusive: 1.0
+    grade: intentionally_coloured
+  - max_exclusive: 3.0
+    grade: strongly_coloured
+  - grade: opaque_dark
+  redox_colour_bands:
+  - max_exclusive: 0.25
+    colour: yellow
+  - max_inclusive: 0.6
+    colour: green
+  - colour: blue_green
+  low_fe_colour_bands:
+  - max_exclusive: 0.015
+    colour: colourless
+  - max_exclusive: 0.05
+    colour: colourless_to_faint_green
+  basalt_minimum_clarity_grade: strongly_coloured
+  citations:
+  - taxonomy.md Part 4.3
+  - Kress & Carmichael 1991, Contributions to Mineralogy and Petrology 108:82-92
+glass_types:
+  soda_lime_analog:
+    parent: null
+    level: parent
+    label: Soda-lime-silica analog
+    composition:
+      kind: window
+      defining_oxides:
+      - SiO2
+      - Na2O
+      - K2O
+      - CaO
+      - MgO
+      - Al2O3
+      allow_other_oxides: true
+      note: ''
+      wt_pct_window:
+        SiO2:
+        - 65
+        - 75
+        Al2O3:
+        - 0
+        - 5
+      constraints:
+        sum_window:
+        - oxides:
+          - Na2O
+          - K2O
+          range:
+          - 8
+          - 18
+        - oxides:
+          - CaO
+          - MgO
+          range:
+          - 6
+          - 15
+        sum_max:
+        - oxides:
+          - B2O3
+          value: 1
+    use_grade:
+    - container
+    - architectural
+    datasheet:
+      terrestrial_applications: '~90% of commercial glass: containers, float windows, mirrors, tableware.
+        [tax][web:60]'
+      density_g_cm3: "~**2.5** (2.44\u20132.53 typical). [web:54][web:60]"
+      colour: "Intrinsically colourless; Fe \u2192 green edge / green bottle; Cr green; Co blue; Se/Mn\
+        \ decolourize."
+      melting_point_C: "No sharp melting point (glass); industrial melt ~**1400\u20131600 \xB0C** tank\
+        \ temperatures."
+      softening_working_temp_C: "Littleton **softening ~715\u2013730 \xB0C**; **working ~900 \xB0C** (\u03B7\
+        \u224810\u2074 P); annealing ~500\u2013550 \xB0C; strain ~510\u2013530 \xB0C. [web:54][web:55][web:60][tax]"
+      creep_limit_C: "Viscous flow / pyroplastic deformation begins near softening \u2014 structural load\
+        \ ceiling **\u226A softening** for any \u201Cliner\u201D misuse; glass is not a hot-face brick.\
+        \ Practical continuous use of annealed SLS articles often **\u2272100\u2013250 \xB0C** (product),\
+        \ far below softening."
+      water_stability: "**Generally water-stable** solid; **alkali leaching** (ion exchange) in water/acid\
+        \ over time \u2014 high-alkali surfaces can haze (weathering)."
+      materials_compatibility: Attacked by HF and hot strong alkali; good vs most aqueous acids (not HF);
+        not basic-slag refractory.
+      mechanical_properties: "Mohs ~**5.5\u20136**; brittle; annealed flexural design strengths low tens\
+        \ of MPa; tempered higher. Fracture toughness ~0.7\u20130.8 MPa\xB7m\u2070\xB7\u2075 class. [web:54][web:60]"
+      appearance_texture: Vitreous, transparent, smooth, conchoidal fracture.
+      everyday_analog: Window glass / bottle glass.
+    out_of_domain: false
+    priority: 0
+  container_sls_analog:
+    parent: soda_lime_analog
+    level: subtype
+    label: Container soda-lime-silica analog
+    composition:
+      kind: window
+      defining_oxides:
+      - SiO2
+      - Na2O
+      - K2O
+      - CaO
+      - MgO
+      - Al2O3
+      allow_other_oxides: true
+      note: ''
+      wt_pct_window:
+        SiO2:
+        - 65
+        - 75
+        Al2O3:
+        - 1
+        - 5
+      constraints:
+        sum_max:
+        - oxides:
+          - MgO
+          value: 1
+        sum_window:
+        - oxides:
+          - Na2O
+          - K2O
+          range:
+          - 8
+          - 16
+        - oxides:
+          - CaO
+          - Al2O3
+          range:
+          - 9
+          - 18
+    use_grade:
+    - container
+    datasheet:
+      terrestrial_applications: "Bottles, jars; durability bias slightly higher CaO+Al\u2082O\u2083."
+      density_g_cm3: ~**2.5**.
+      colour: Flint clear, green, amber (Fe/Cr/S-Fe amber chromophore).
+      melting_point_C: "Glass \u2014 tank melt as parent."
+      softening_working_temp_C: "Softening ~**720\u2013730 \xB0C**; working ~**900 \xB0C** class."
+      creep_limit_C: "Same viscous-glass caveat as parent \u2014 **not** furnace liner."
+      water_stability: Water-stable with alkali leach; container durability tested (e.g. hydrolytic classes).
+      materials_compatibility: Food/chemical packaging chemistry; not refractory.
+      mechanical_properties: Brittle glass; impact-sensitive.
+      appearance_texture: Clear or coloured transparent glass, glossy.
+      everyday_analog: Beer/wine bottle.
+    out_of_domain: false
+    priority: 0
+  float_sls_analog:
+    parent: soda_lime_analog
+    level: subtype
+    label: Float soda-lime-silica analog
+    composition:
+      kind: window
+      defining_oxides:
+      - SiO2
+      - Na2O
+      - K2O
+      - CaO
+      - MgO
+      - Al2O3
+      allow_other_oxides: true
+      note: ''
+      wt_pct_window:
+        SiO2:
+        - 68
+        - 75
+        MgO:
+        - 2
+        - 6
+      constraints:
+        sum_window:
+        - oxides:
+          - Na2O
+          - K2O
+          range:
+          - 12
+          - 18
+    use_grade:
+    - architectural
+    datasheet:
+      terrestrial_applications: Flat architectural glass, automotive (further processed), mirrors.
+      density_g_cm3: ~**2.5**.
+      colour: "Standard float: faint green edge (~0.1% Fe\u2082O\u2083); low-iron ultra-clear grades exist."
+      melting_point_C: "Glass \u2014 float tank melt."
+      softening_working_temp_C: "Softening ~**720\u2013730 \xB0C**; working ~**900 \xB0C**."
+      creep_limit_C: Not structural refractory; architectural glass softens/creeps near softening range.
+      water_stability: Water-stable; surface weathering possible.
+      materials_compatibility: Building glazing; tin-bath underside chemistry in float process.
+      mechanical_properties: Same brittle SLS family; tempered float much stronger in bending.
+      appearance_texture: Perfectly flat, glossy, transparent sheets.
+      everyday_analog: Window pane / picture-frame glass.
+    out_of_domain: false
+    priority: 0
+  calcium_aluminosilicate_glass:
+    parent: null
+    level: parent
+    label: Calcium aluminosilicate glass
+    composition:
+      kind: window
+      defining_oxides:
+      - SiO2
+      - Al2O3
+      - CaO
+      - MgO
+      - Na2O
+      - K2O
+      allow_other_oxides: true
+      note: ''
+      wt_pct_window:
+        SiO2:
+        - 40
+        - 70
+        Al2O3:
+        - 10
+        - 30
+        CaO:
+        - 10
+        - 40
+      constraints:
+        sum_max:
+        - oxides:
+          - Na2O
+          - K2O
+          value: 5
+        sum_min:
+        - oxides:
+          - SiO2
+          - Al2O3
+          - CaO
+          value: 75
+    use_grade:
+    - specialty
+    - insulation
+    datasheet:
+      terrestrial_applications: "High-temperature glasses, fiber precursors, SCM/pozzolan precursors,\
+        \ specialty seals \u2014 alkali-poor CAS melts."
+      density_g_cm3: "Typically ~**2.6\u20132.9** (composition-dependent; **approx**)."
+      colour: "Colourless to yellow-green with Fe; low-alkali often less \u201Cbottle green\u201D than\
+        \ SLS at same Fe if redox differs."
+      melting_point_C: Glass; melt temperatures generally **higher** than SLS for comparable viscosity.
+      softening_working_temp_C: "**Composition-dependent \u2014 leave null** unless a specific composition\
+        \ is modeled; do **not** copy SLS 720/900 \xB0C. [tax]"
+      creep_limit_C: Viscous flow near softening (unknown without composition); **not** hot-face brick.
+      water_stability: '**Water-stable** network; lower alkali leach than SLS if truly alkali-poor; Al
+        improves chemical durability.'
+      materials_compatibility: Better chemical durability than high-alkali glass often; HF attacks; not
+        basic refractory.
+      mechanical_properties: "Brittle glass; hardness Mohs ~6 class typical silicates \u2014 **exact uncharacterized**\
+        \ without grade."
+      appearance_texture: Vitreous transparent to translucent.
+      everyday_analog: Specialty lab/industrial glass (not Pyrex B-silicate unless B present).
+    out_of_domain: false
+    priority: 0
+  alkali_aluminosilicate_glass:
+    parent: null
+    level: parent
+    label: Alkali aluminosilicate glass
+    composition:
+      kind: window
+      defining_oxides:
+      - SiO2
+      - Al2O3
+      - Na2O
+      - K2O
+      - CaO
+      - MgO
+      allow_other_oxides: true
+      note: ''
+      wt_pct_window:
+        SiO2:
+        - 45
+        - 80
+        Al2O3:
+        - 8
+        - 30
+      constraints:
+        sum_min:
+        - oxides:
+          - Na2O
+          - K2O
+          value: 10
+    use_grade:
+    - specialty
+    - architectural
+    datasheet:
+      terrestrial_applications: Chemically strengthen-able cover glass analogs, lamp glasses, display/specialty
+        sheet (SCHOTT AS family class). [tax]
+      density_g_cm3: "~**2.4\u20132.6** typical AS glasses (**grade-dependent**)."
+      colour: Clear commercial grades; Fe tints green.
+      melting_point_C: Glass; high-T melts vs SLS often.
+      softening_working_temp_C: "Commercial AS: **higher Tg/softening than SLS** \u2014 formulation-specific;\
+        \ **blank unless sourced**. [tax]"
+      creep_limit_C: "Viscous glass \u2014 not refractory liner."
+      water_stability: Water-stable; alkali ion-exchange durable grades engineered for mobile cover glass;
+        still leachable under extreme pH.
+      materials_compatibility: "Designed for chemical strengthening (K\u207A/Na\u207A exchange); HF attack."
+      mechanical_properties: High strength after ion exchange (surface compression); still brittle glass
+        fracture.
+      appearance_texture: Clear, glossy sheet glass.
+      everyday_analog: Smartphone cover glass / chemically strengthened glass.
+    out_of_domain: false
+    priority: 0
+  basalt_high_fe_glass:
+    parent: null
+    level: parent
+    label: Basalt / high-iron glass
+    composition:
+      kind: window
+      defining_oxides:
+      - SiO2
+      - Al2O3
+      - CaO
+      - MgO
+      - FeO
+      - Fe2O3
+      allow_other_oxides: true
+      note: ''
+      wt_pct_window:
+        SiO2:
+        - 40
+        - 60
+        Al2O3:
+        - 8
+        - 22
+      constraints:
+        sum_window:
+        - oxides:
+          - CaO
+          - MgO
+          range:
+          - 10
+          - 30
+        fe2o3_equivalent_min: 2
+    use_grade:
+    - insulation
+    - slag_wool
+    datasheet:
+      terrestrial_applications: Rockwool/slag-wool insulation, basalt fiber composites, dark architectural
+        glass, cast basalt tiles.
+      density_g_cm3: "Melt/glass ~**2.7\u20132.9**; fiber products much lower bulk."
+      colour: "Dark green\u2013brown\u2013black (high Fe). **Not optical clear.**"
+      melting_point_C: "Processing melts often ~**1400\u20131500 \xB0C**. [tax]"
+      softening_working_temp_C: "Fiber/wool product softening often ~**900\u20131000 \xB0C** class; continuous\
+        \ insulation service much lower. [tax]"
+      creep_limit_C: Fibrous products collapse/sinter well below melt; **not** structural hot-face.
+      water_stability: Water-stable glass; wool can wick water (physical), not chemical hydration failure.
+      materials_compatibility: High-Fe silicate; oxidizing/reducing shifts Fe colour; not optical; insulation
+        chemistry.
+      mechanical_properties: Fibers high tensile for glass fibers; bulk cast basalt hard, brittle.
+      appearance_texture: Dark glassy rock / fibrous wool.
+      everyday_analog: Black rockwool insulation / dark basalt tile / lava glass.
+    out_of_domain: false
+    priority: 100
+  fused_silica_endpoint:
+    parent: null
+    level: parent
+    label: Fused-silica endpoint
+    composition:
+      kind: window
+      defining_oxides:
+      - SiO2
+      allow_other_oxides: true
+      note: ''
+      wt_pct_window:
+        SiO2:
+        - 99
+        - 100
+    use_grade:
+    - optical
+    - specialty
+    datasheet:
+      terrestrial_applications: Optical components, high-T processware, UV lamps, crucibles, semiconductor
+        process quartzware.
+      density_g_cm3: ~**2.20**. [web:48][web:49]
+      colour: Colourless ultra-pure; metal impurities tint.
+      melting_point_C: "Softens long before \u201Cmelt\u201D; cristobalite melt context ~**1713\u2013\
+        1723 \xB0C** for pure SiO\u2082."
+      softening_working_temp_C: "Softening ~**1585\u20131683 \xB0C** grade-dependent (often ~**1665 \xB0\
+        C** fused quartz); annealing ~1140\u20131215 \xB0C. [web:46][web:48]"
+      creep_limit_C: "Viscous creep of silica glass significant at high T under load \u2014 product max\
+        \ service often **~1000\u20131200 \xB0C** continuous class for many quartzware uses (grade/load\
+        \ dependent; [web:45] max service K range maps ~900\u20131100 \xB0C). **Do not treat softening\
+        \ as structural RUL.**"
+      water_stability: "**Water-stable**; extremely low alkali leach (pure SiO\u2082). HF dissolves."
+      materials_compatibility: Excellent chemical purity resistance; attacked by HF and hot alkali; thermal-shock
+        excellent (low CTE).
+      mechanical_properties: "Mohs ~**5.3\u20136.5**; tensile design low due to flaws (~50 MPa class tensile);\
+        \ compressive high; brittle. [web:48][web:49]"
+      appearance_texture: Water-clear glassy, can be translucent fused; silky fracture.
+      everyday_analog: "High-end quartz halogen envelope / lab fused-quartz ware \u2014 \u201Csuper glass.\u201D"
+    out_of_domain: false
+    priority: 0
+  borosilicate:
+    parent: null
+    level: parent
+    label: Borosilicate (out-of-domain negative control)
+    composition:
+      kind: window
+      defining_oxides:
+      - SiO2
+      - B2O3
+      allow_other_oxides: true
+      note: 'Negative control: requires B2O3 in the ledger.'
+      wt_pct_window:
+        SiO2:
+        - 60
+        - 90
+        B2O3:
+        - 5
+        - 30
+    use_grade:
+    - specialty
+    datasheet:
+      terrestrial_applications: "Labware (Pyrex/Duran), pharma vials, lighting \u2014 **only if B\u2082\
+        O\u2083 feedstock present**."
+      density_g_cm3: ~**2.23**.
+      colour: Clear commercial.
+      melting_point_C: Glass; lower melt viscosity vs silica.
+      softening_working_temp_C: "Softening ~**820 \xB0C** class (commercial borosilicate; grade-dependent)."
+      creep_limit_C: Not refractory brick; labware continuous use far below softening.
+      water_stability: Excellent chemical durability vs SLS.
+      materials_compatibility: Good thermal-shock; HF attacks.
+      mechanical_properties: Brittle glass; better thermal shock than SLS.
+      appearance_texture: Clear laboratory glass.
+      everyday_analog: Pyrex measuring cup / lab beaker.
+    out_of_domain: true
+    priority: 100
