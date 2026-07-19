@@ -116,8 +116,10 @@ from simulator.melt_backend.base import (
     project_melt_to_oxide_projection,
     split_cleaned_melt_account,
 )
-from simulator.melt_backend.engine_worker import (
+from simulator.engine_pool import (
+    EngineWorkerPool,
     EngineWorkerRemoteError,
+    EngineWorkerTimeout,
     WarmEngineWorker,
 )
 from simulator.melt_backend.liquidus import (
@@ -126,6 +128,10 @@ from simulator.melt_backend.liquidus import (
     find_liquidus_solidus_by_fraction,
 )
 from simulator.state import OXIDE_SPECIES
+
+
+MAGEMIN_WARM_CALL_TIMEOUT_S = 2.0
+MAGEMIN_WARM_LIQUIDUS_BUDGET_S = 15.0
 
 
 @dataclass(frozen=True)
@@ -243,7 +249,7 @@ class MAGEMinBackend(MeltBackend):
         self._binary_path: Optional[Path] = None
         self._warnings: List[str] = []
         self._last_error: Optional[str] = None
-        self._subprocess_worker: Optional[WarmEngineWorker] = None
+        self._subprocess_pool: Optional[EngineWorkerPool] = None
 
     # ------------------------------------------------------------------
     # MeltBackend interface
@@ -303,38 +309,56 @@ class MAGEMinBackend(MeltBackend):
                 'regolith-pyrolysis-simulator',
                 'magemin-diagnostics.log',
             )
-            self._subprocess_worker = WarmEngineWorker(
-                name='MAGEMin subprocess operation',
-                bootstrap=_bootstrap_magemin_subprocess_worker,
-                handler=_handle_magemin_subprocess_request,
-                bootstrap_args=(
-                    str(binary_path.resolve()),
-                    self._database,
-                    self._config,
-                ),
-                startup_timeout_s=float(
-                    self._config.get('worker_startup_timeout_s', 30.0)
-                ),
-                call_timeout_s=float(self._config.get('timeout_s', 60.0)),
-                diagnostic_log_path=diagnostic_path,
-            )
+            warm_timeout_s = float(self._config.get(
+                'warm_call_timeout_s',
+                MAGEMIN_WARM_CALL_TIMEOUT_S,
+            ))
+            pool_size = int(self._config.get('warm_pool_size', 1))
+            if not math.isfinite(warm_timeout_s) or warm_timeout_s <= 0.0:
+                raise ValueError(
+                    'MAGEMin warm_call_timeout_s must be finite and positive'
+                )
+            if pool_size <= 0:
+                raise ValueError('MAGEMin warm_pool_size must be positive')
+
+            def worker_factory(index: int) -> WarmEngineWorker:
+                return WarmEngineWorker(
+                    name=f'MAGEMin subprocess pool slot {index}',
+                    bootstrap=_bootstrap_magemin_subprocess_worker,
+                    handler=_handle_magemin_subprocess_request,
+                    bootstrap_args=(
+                        str(binary_path.resolve()),
+                        self._database,
+                        self._config,
+                    ),
+                    startup_timeout_s=float(
+                        self._config.get('worker_startup_timeout_s', 30.0)
+                    ),
+                    call_timeout_s=warm_timeout_s,
+                    diagnostic_log_path=diagnostic_path.with_name(
+                        f'{diagnostic_path.stem}-{index}{diagnostic_path.suffix}'
+                    ),
+                )
             try:
-                self._subprocess_worker.start()
+                self._subprocess_pool = EngineWorkerPool(
+                    worker_factory,
+                    size=pool_size,
+                )
             except EngineWorkerRemoteError as exc:
                 self._warn(
-                    'MAGEMin warm worker failed to initialize: '
+                    'MAGEMin warm pool failed to initialize: '
                     f'{exc.detail}'
                 )
-                self._subprocess_worker = None
+                self._subprocess_pool = None
                 return False
 
         self._available = True
         return True
 
     def close(self) -> None:
-        if self._subprocess_worker is not None:
-            self._subprocess_worker.close()
-            self._subprocess_worker = None
+        if self._subprocess_pool is not None:
+            self._subprocess_pool.close(cancel_pending=True)
+            self._subprocess_pool = None
 
     def is_available(self) -> bool:
         return self._available
@@ -524,6 +548,11 @@ class MAGEMinBackend(MeltBackend):
                 fO2_log=fO2_log,
                 call_timeout_s=call_timeout_s,
             )
+        except EngineWorkerTimeout:
+            # A hang is a control-plane event, not an equilibrium refusal.
+            # The pool has already killed the slot; preserve the typed signal
+            # so the caller can retry while the next call respawns it.
+            raise
         except Exception as exc:  # noqa: BLE001 - library-boundary catch
             # MAGEMin is present but the minimisation did not produce a
             # usable result.
@@ -647,7 +676,11 @@ class MAGEMinBackend(MeltBackend):
         if 'liquidus_finder_budget_s' in self._config:
             raw_budget = self._config.get('liquidus_finder_budget_s')
         else:
-            raw_budget = DEFAULT_LIQUIDUS_FINDER_BUDGET_S
+            raw_budget = (
+                MAGEMIN_WARM_LIQUIDUS_BUDGET_S
+                if self._subprocess_pool is not None
+                else DEFAULT_LIQUIDUS_FINDER_BUDGET_S
+            )
         if raw_budget is None:
             return LiquidusSolidusResult(
                 status='not_converged',
@@ -1109,23 +1142,35 @@ class MAGEMinBackend(MeltBackend):
             )
 
         if self._bridge == 'subprocess':
-            if self._subprocess_worker is not None:
+            if self._subprocess_pool is not None:
                 timeout_s = (
-                    float(self._config.get('timeout_s', 60.0))
+                    float(self._config.get(
+                        'warm_call_timeout_s',
+                        MAGEMIN_WARM_CALL_TIMEOUT_S,
+                    ))
                     if call_timeout_s is None
                     else min(
-                        float(self._config.get('timeout_s', 60.0)),
+                        float(self._config.get(
+                            'warm_call_timeout_s',
+                            MAGEMIN_WARM_CALL_TIMEOUT_S,
+                        )),
                         float(call_timeout_s),
                     )
                 )
                 try:
-                    return self._subprocess_worker.call({
+                    future = self._subprocess_pool.submit({
                         'bulk_projection': bulk_projection,
                         'temperature_C': temperature_C,
                         'pressure_kbar': pressure_kbar,
                         'fO2_log': fO2_log,
-                        'call_timeout_s': timeout_s,
-                    }, timeout_s=timeout_s + 0.5)
+                        # Let the pool's typed hard wall fire first. The inner
+                        # subprocess timeout is only a secondary containment
+                        # wall for platforms without process-group cleanup.
+                        'call_timeout_s': timeout_s + 0.5,
+                    }, timeout_s=timeout_s)
+                    return future.result()
+                except EngineWorkerTimeout:
+                    raise
                 except EngineWorkerRemoteError as exc:
                     raise RuntimeError(
                         f'MAGEMin subprocess worker failed: {exc.detail}\n'

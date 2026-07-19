@@ -50,8 +50,9 @@ from simulator.melt_backend.base import (
     MeltBackendError,
     liquid_fraction_from_phase_masses,
 )
-from simulator.melt_backend.engine_worker import (
+from simulator.engine_pool import (
     EngineWorkerRemoteError,
+    EngineWorkerTimeout,
     WarmEngineWorker,
 )
 from simulator.melt_backend.alphamelts_contract import (
@@ -73,6 +74,7 @@ ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
 # 20s is the established per-solve subprocess budget; bracket searches apply
 # it independently to each native call rather than treating it as a run budget.
 ALPHAMELTS_DEFAULT_TIMEOUT_S = 20.0
+PETTHERMOTOOLS_WARM_CALL_TIMEOUT_S = 3.0
 MELTS_OXIDE_BASIS = (
     'SiO2', 'TiO2', 'Al2O3', 'FeO', 'Fe2O3', 'MgO', 'CaO',
     'Na2O', 'K2O', 'Cr2O3', 'MnO', 'P2O5', 'NiO', 'CoO',
@@ -339,18 +341,22 @@ def _bootstrap_petthermotools_worker(model_code: int):
         raise ImportError('MELTSdynamic loader not found')
     resource = {
         'module': module,
-        'melts': loader(model_code),
+        'loader': loader,
+        'model_code': int(model_code),
     }
     version = getattr(module, '__version__', None)
     return resource, str(version or 'available')
 
 
 def _handle_petthermotools_request(resource, request, _errlog):
-    """Run one operation after rebuilding all Python call state."""
+    """Run one operation after rebuilding all native/Python call state."""
     operation = str(request['operation'])
     call_kwargs = dict(request.get('kwargs') or {})
     if operation in {'equilibrate_MELTS', 'findLiq_MELTS'}:
-        call_kwargs['melts'] = resource['melts']
+        # PetThermoTools mutates the MELTSdynamic payload. Reusing that object
+        # makes warm output request-order dependent, violating grind cache
+        # identity. Keep imports resident but reconstruct the per-call model.
+        call_kwargs['melts'] = resource['loader'](resource['model_code'])
     function = getattr(resource['module'], operation)
     return function(*tuple(request.get('args') or ()), **call_kwargs)
 
@@ -418,6 +424,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_payload_preloaded = False
         self._pet_worker: Optional[WarmEngineWorker] = None
         self._pet_warm_enabled = False
+        self._pet_warm_timeout_s = PETTHERMOTOOLS_WARM_CALL_TIMEOUT_S
         self._engine_version: Optional[str] = None
         self._vaporock_available = False
         self._vaporock_helper: Optional[VapoRockBackend] = None
@@ -453,12 +460,16 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_module = None
         self._pet_melts = None
         self._pet_payload_preloaded = False
-        if bool(config.get('warm_worker', False)):
-            raise ValueError(
-                'PetThermoTools warm_worker is blocked until the real native '
-                'runtime passes the 24-point byte-identity reset gate'
+        # PetThermoTools remains opt-in until its compiled MELTSdynamic
+        # runtime is installed and passes the native byte-identity gate.
+        # When selected, it uses the same kill/respawn isolation primitive.
+        self._pet_warm_enabled = bool(config.get('warm_worker', False))
+        self._pet_warm_timeout_s = _validated_timeout_s(
+            config.get(
+                'petthermotools_warm_call_timeout_s',
+                PETTHERMOTOOLS_WARM_CALL_TIMEOUT_S,
             )
-        self._pet_warm_enabled = False
+        )
         self._redox_buffer = self._normalize_redox_buffer(
             config.get('fO2_buffer', config.get('redox_buffer')))
         self._fo2_offset = self._optional_float(config.get('fO2_offset'))
@@ -586,7 +597,7 @@ class _MELTSBackendSupport(MeltBackend):
                     handler=_handle_petthermotools_request,
                     bootstrap_args=(self._melts_model_code(),),
                     startup_timeout_s=self._timeout_s,
-                    call_timeout_s=self._timeout_s,
+                    call_timeout_s=self._pet_warm_timeout_s,
                     diagnostic_log_path=diagnostic_path,
                 )
                 try:
@@ -1823,6 +1834,9 @@ class _MELTSBackendSupport(MeltBackend):
 
             return self._fail_closed_on_clamped_operating_point(eq)
 
+        except EngineWorkerTimeout:
+            # The worker was already killed and will respawn on the next call.
+            raise
         except (ImportError, AlphaMELTSSubprocessContractError):
             self._mode = None
             raise
@@ -1848,21 +1862,24 @@ class _MELTSBackendSupport(MeltBackend):
         kwargs: Optional[Mapping[str, object]] = None,
     ):
         """Execute a native PetThermoTools operation behind a hard deadline."""
-        timeout_s = _validated_timeout_s(self._timeout_s)
         worker = self._pet_worker
         if worker is None:
+            timeout_s = _validated_timeout_s(self._timeout_s)
             return self._run_petthermotools_cold(
                 operation,
                 args=args,
                 kwargs=kwargs,
                 timeout_s=timeout_s,
             )
+        timeout_s = _validated_timeout_s(self._pet_warm_timeout_s)
         try:
             return worker.call({
                 'operation': operation,
                 'args': tuple(args),
                 'kwargs': dict(kwargs or {}),
             }, timeout_s=timeout_s)
+        except EngineWorkerTimeout:
+            raise
         except TimeoutError as exc:
             raise _alphamelts_backend_failure_error(
                 ALPHAMELTS_REASON_TIMEOUT,

@@ -4,9 +4,10 @@ import time
 
 import pytest
 
-from simulator.melt_backend.engine_worker import (
+from simulator.engine_pool import (
     EngineWorkerRemoteError,
     EngineWorkerPool,
+    EngineWorkerTimeout,
     WarmEngineWorker,
 )
 
@@ -16,6 +17,8 @@ def _bootstrap_test_worker():
 
 
 def _handle_test_request(resource, request, _errlog):
+    if request.get('nested_timeout'):
+        raise EngineWorkerTimeout('nested native engine', 0.125, phase='job')
     if request.get('raise'):
         raise ValueError('tainted native request')
     delay = float(request.get('delay', 0.0))
@@ -85,8 +88,10 @@ def test_warm_worker_matches_24_cold_workers_byte_for_byte():
 def test_timeout_discards_slot_and_next_call_respawns():
     worker = _test_worker(timeout_s=0.05)
     worker.start()
-    with pytest.raises(TimeoutError, match='hard timeout'):
+    with pytest.raises(EngineWorkerTimeout, match='hard timeout') as exc_info:
         worker.call({**_points()[0], 'delay': 0.2})
+    assert exc_info.value.phase == 'job'
+    assert exc_info.value.timeout_s == pytest.approx(0.05)
     assert worker.process is None
 
     assert worker.call(_points()[1], timeout_s=1.0)
@@ -106,12 +111,26 @@ def test_remote_error_discards_tainted_slot_before_next_call():
     worker.close()
 
 
+def test_nested_typed_timeout_crosses_worker_boundary_and_respawns():
+    worker = _test_worker()
+    worker.start()
+    with pytest.raises(EngineWorkerTimeout) as exc_info:
+        worker.call({**_points()[0], 'nested_timeout': True})
+    assert exc_info.value.worker_name == 'nested native engine'
+    assert exc_info.value.timeout_s == pytest.approx(0.125)
+    assert worker.process is None
+
+    assert worker.call(_points()[1], timeout_s=1.0)
+    assert worker.start_count == 2
+    worker.close()
+
+
 def test_queue_pool_keeps_draining_while_one_slot_hangs():
     with EngineWorkerPool(lambda _index: _test_worker(timeout_s=0.08), size=2) as pool:
         hung = pool.submit({**_points()[0], 'delay': 0.3})
         fast = [pool.submit(point) for point in _points()[1:7]]
         assert all(future.result(timeout=1.0) for future in fast)
-        with pytest.raises(TimeoutError):
+        with pytest.raises(EngineWorkerTimeout):
             hung.result(timeout=1.0)
 
 

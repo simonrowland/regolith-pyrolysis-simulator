@@ -21,13 +21,18 @@ from pathlib import Path
 
 import pytest
 
+from simulator.engine_pool import EngineWorkerTimeout
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 from engines.domain_reason import OutOfDomainReason
 from engines.magemin.domain import MAGEMinDomainGate
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
-from simulator.melt_backend.magemin import MAGEMinBackend
+from simulator.melt_backend.magemin import (
+    MAGEMIN_WARM_CALL_TIMEOUT_S,
+    MAGEMIN_WARM_LIQUIDUS_BUDGET_S,
+    MAGEMinBackend,
+)
 
 
 def _disable_configured_magemin_path(monkeypatch):
@@ -123,16 +128,17 @@ def test_magemin_defaults_to_subprocess_even_if_pymagemin_importable(monkeypatch
     assert backend._magemin_module is None
 
 
-def test_magemin_reinitialize_closes_existing_warm_worker(monkeypatch):
-    class FakeWorker:
+def test_magemin_reinitialize_closes_existing_warm_pool(monkeypatch):
+    class FakePool:
         close_calls = 0
 
-        def close(self):
+        def close(self, *, cancel_pending=False):
+            assert cancel_pending is True
             self.close_calls += 1
 
-    existing = FakeWorker()
+    existing = FakePool()
     backend = MAGEMinBackend()
-    backend._subprocess_worker = existing
+    backend._subprocess_pool = existing
     monkeypatch.setattr(
         MAGEMinBackend,
         '_locate_binary',
@@ -149,7 +155,114 @@ def test_magemin_reinitialize_closes_existing_warm_worker(monkeypatch):
         assert backend.initialize({'warm_worker': False}) is True
 
     assert existing.close_calls == 1
-    assert backend._subprocess_worker is None
+    assert backend._subprocess_pool is None
+
+
+def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch):
+    import simulator.melt_backend.magemin as magemin_module
+
+    submitted = {}
+
+    class FakeFuture:
+        def result(self):
+            return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+    class FakePool:
+        def __init__(self, worker_factory, *, size):
+            self.workers = (worker_factory(0),)
+            self.size = size
+
+        def submit(self, request, *, timeout_s=None):
+            submitted.update(request=request, timeout_s=timeout_s)
+            return FakeFuture()
+
+        def close(self, *, cancel_pending=False):
+            pass
+
+    monkeypatch.setattr(magemin_module, 'EngineWorkerPool', FakePool)
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_locate_binary',
+        staticmethod(lambda _explicit: Path('/fake/MAGEMin')),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_import_magemin_bridge',
+        lambda self, *, requested: ('subprocess', None),
+    )
+
+    backend = MAGEMinBackend()
+    assert backend.initialize({}) is True
+    assert backend._subprocess_pool.size == 1
+    assert backend._subprocess_pool.workers[0].call_timeout_s == pytest.approx(
+        MAGEMIN_WARM_CALL_TIMEOUT_S
+    )
+
+    projection = backend._build_db_bulk_projection({
+        'SiO2': 60.0,
+        'MgO': 40.0,
+    })
+    assert backend._call_magemin(projection, 1200.0, 1.0, -8.0)
+    assert submitted['timeout_s'] == pytest.approx(2.0)
+    assert submitted['request']['call_timeout_s'] == pytest.approx(2.5)
+
+
+def test_magemin_equilibrate_surfaces_typed_hang_without_disabling_backend(
+    monkeypatch,
+):
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    monkeypatch.setattr(
+        backend,
+        '_call_magemin',
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            EngineWorkerTimeout('MAGEMin slot 0', 2.0, phase='job')
+        ),
+    )
+
+    with pytest.raises(EngineWorkerTimeout):
+        backend.equilibrate(
+            1200.0,
+            composition_mol={'SiO2': 1.0, 'MgO': 1.0},
+        )
+    assert backend.is_available() is True
+
+
+@pytest.mark.parametrize(
+    ('pooled', 'expected_budget_s'),
+    ((True, MAGEMIN_WARM_LIQUIDUS_BUDGET_S),
+     (False, liquidus_module.DEFAULT_LIQUIDUS_FINDER_BUDGET_S)),
+)
+def test_magemin_liquidus_budget_is_tight_only_for_warm_pool(
+    monkeypatch,
+    pooled,
+    expected_budget_s,
+):
+    import simulator.melt_backend.magemin as magemin_module
+
+    captured = {}
+
+    def fake_finder(_sample_fraction, **kwargs):
+        captured.update(kwargs)
+        return liquidus_module.LiquidusSolidusResult(status='not_converged')
+
+    monkeypatch.setattr(
+        magemin_module,
+        'find_liquidus_solidus_by_fraction',
+        fake_finder,
+    )
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._config = {}
+    backend._subprocess_pool = object() if pooled else None
+
+    backend.find_liquidus_solidus(
+        composition_mol={'SiO2': 1.0, 'MgO': 1.0},
+    )
+    assert captured['budget_s'] == pytest.approx(expected_budget_s)
 
 
 def test_magemin_and_alphamelts_reject_exact_major_oxide_boundary():
@@ -1775,7 +1888,10 @@ def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):
     backend = MAGEMinBackend()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
-        backend.initialize({"fO2_buffer": "qfm-2"})  # invalid: includes offset
+        backend.initialize({
+            "fO2_buffer": "qfm-2",  # invalid: includes offset
+            "warm_worker": False,
+        })
 
     result = backend.equilibrate(
         1450.0,

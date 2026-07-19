@@ -39,7 +39,7 @@ from scripts.grid_pregrind_writer import (  # noqa: E402
 from engines.alphamelts.domain import AlphaMELTSDomainGate  # noqa: E402
 from engines.domain_reason import OutOfDomainReason  # noqa: E402
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR  # noqa: E402
-from simulator.melt_backend.engine_worker import (  # noqa: E402
+from simulator.engine_pool import (  # noqa: E402
     EngineWorkerPool,
     INHERIT_PROCESS_GROUP_ENV,
     WarmEngineWorker,

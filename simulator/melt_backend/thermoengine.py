@@ -5,7 +5,11 @@ from __future__ import annotations
 from typing import List, Mapping, Optional
 import warnings
 
-from engines.alphamelts.thermoengine import ThermoEngineTransport
+from engines.alphamelts.thermoengine import (
+    THERMOENGINE_WARM_CALL_TIMEOUT_S,
+    ThermoEngineTransport,
+)
+from simulator.engine_pool import EngineWorkerTimeout
 from simulator.melt_backend.alphamelts import (
     _MELTSBackendSupport,
     activity_from_chem_potential,
@@ -57,7 +61,10 @@ class ThermoEngineBackend(_MELTSBackendSupport):
                 model_name=self._model,
                 activity_converter=activity_from_chem_potential,
                 equilibrate_timeout_s=float(
-                    config.get('thermoengine_equilibrate_timeout_s', 60.0)
+                    config.get(
+                        'thermoengine_equilibrate_timeout_s',
+                        THERMOENGINE_WARM_CALL_TIMEOUT_S,
+                    )
                 ),
             )
             self._thermoengine_transport = transport
@@ -312,6 +319,10 @@ class ThermoEngineBackend(_MELTSBackendSupport):
             )
             eq.fe_redox_split = dict(payload.fe_redox_split)
             return self._fail_closed_on_clamped_operating_point(eq)
+        except EngineWorkerTimeout:
+            # WarmEngineWorker has evicted the hung process. Keep the
+            # transport live so the next call respawns this slot.
+            raise
         except ImportError as exc:
             self._close_after_failure(exc)
             raise

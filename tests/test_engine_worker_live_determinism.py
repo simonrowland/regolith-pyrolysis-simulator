@@ -17,7 +17,7 @@ import pytest
 import engines.alphamelts.thermoengine as thermoengine_module
 from engines.alphamelts.thermoengine import ThermoEngineTransport
 from simulator.melt_backend.alphamelts import activity_from_chem_potential
-from simulator.melt_backend.engine_worker import (
+from simulator.engine_pool import (
     EngineWorkerPool,
     WarmEngineWorker,
 )
@@ -387,6 +387,89 @@ def _magemin_points(backend: MAGEMinBackend):
         })
     points.extend((dict(points[3]), dict(points[4])))
     return points
+
+
+def _magemin_planetary_points():
+    return [
+        {
+            'label': 'lunar',
+            'temperature_C': 1250.0,
+            'composition_kg': {
+                'SiO2': 49.0, 'TiO2': 1.5, 'Al2O3': 14.0,
+                'FeO': 10.0, 'Fe2O3': 1.0, 'MgO': 9.0,
+                'CaO': 11.0, 'Na2O': 2.5, 'K2O': 0.8,
+                'Cr2O3': 0.2, 'MnO': 0.2, 'P2O5': 0.3,
+            },
+            'pressure_bar': 1.0,
+            'fO2_log': -9.0,
+        },
+        {
+            'label': 'mars',
+            'temperature_C': 1200.0,
+            'composition_kg': {
+                'SiO2': 45.0, 'TiO2': 1.0, 'Al2O3': 10.0,
+                'FeO': 18.0, 'Fe2O3': 3.5, 'MgO': 9.0,
+                'CaO': 7.0, 'Na2O': 3.0, 'K2O': 0.5,
+                'Cr2O3': 0.2, 'MnO': 0.3, 'P2O5': 0.5,
+            },
+            'pressure_bar': 6.0,
+            'fO2_log': -8.0,
+        },
+        {
+            'label': 'asteroid',
+            'temperature_C': 1450.0,
+            'composition_kg': {
+                'SiO2': 43.0, 'TiO2': 0.2, 'Al2O3': 3.0,
+                'FeO': 12.0, 'Fe2O3': 0.3, 'MgO': 35.0,
+                'CaO': 3.0, 'Na2O': 1.0, 'K2O': 0.1,
+                'Cr2O3': 1.0, 'MnO': 0.3, 'P2O5': 0.2,
+            },
+            'pressure_bar': 1.0,
+            'fO2_log': -11.0,
+        },
+    ]
+
+
+@pytest.mark.skipif(not _enabled(), reason='set REGOLITH_RUN_ENGINE_DETERMINISM=1')
+def test_magemin_runtime_pool_planetary_and_liquidus_byte_identity():
+    binary_path = os.environ.get('REGOLITH_MAGEMIN_BINARY')
+    cold = MAGEMinBackend()
+    warm = MAGEMinBackend()
+    common = {'binary_path': binary_path} if binary_path else {}
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', UserWarning)
+        if not cold.initialize({**common, 'warm_worker': False}):
+            pytest.skip('MAGEMin unavailable')
+        if not warm.initialize({
+            **common,
+            'warm_worker': True,
+            'warm_call_timeout_s': 2.0,
+            'liquidus_finder_budget_s': 15.0,
+        }):
+            pytest.skip('MAGEMin warm pool unavailable')
+
+    points = _magemin_planetary_points()
+    try:
+        for point in points:
+            kwargs = {key: value for key, value in point.items() if key != 'label'}
+            assert _bytes(warm.equilibrate(**kwargs)) == _bytes(
+                cold.equilibrate(**kwargs)
+            ), point['label']
+
+        liquidus_kwargs = {
+            key: value
+            for key, value in points[0].items()
+            if key not in {'label', 'temperature_C'}
+        }
+        warm_liquidus = warm.find_liquidus_solidus(**liquidus_kwargs)
+        cold_liquidus = cold.find_liquidus_solidus(**liquidus_kwargs)
+        assert warm_liquidus.status == 'ok'
+        assert _bytes(warm_liquidus) == _bytes(cold_liquidus)
+    finally:
+        cold.close()
+        warm.close()
+
+    print('MAGEMIN_RUNTIME_POOL_BYTE_IDENTITY planetary=3/3 liquidus=1/1')
 
 
 @pytest.mark.skipif(not _enabled(), reason='set REGOLITH_RUN_ENGINE_DETERMINISM=1')

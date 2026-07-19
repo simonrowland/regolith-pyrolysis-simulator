@@ -51,8 +51,9 @@ from simulator.optimize.worker_runtime import (
     warm_worker_runtime,
     warm_workers_enabled,
 )
-from simulator.melt_backend.engine_worker import (
+from simulator.engine_pool import (
     EngineWorkerPool,
+    EngineWorkerTimeout,
     INHERIT_PROCESS_GROUP_ENV,
     WarmEngineWorker,
 )
@@ -439,6 +440,17 @@ def _evaluate_tasks_in_engine_worker_pool(
                 task = futures.pop(future)
                 try:
                     outcome = future.result()
+                except EngineWorkerTimeout as exc:
+                    _signal_pids(
+                        _tracked_child_pids_for_tasks((task,)),
+                        signal.SIGKILL,
+                    )
+                    results[task.index] = _timeout_result(
+                        task,
+                        timeout_seconds=exc.timeout_s,
+                        elapsed_seconds=exc.timeout_s,
+                    )
+                    continue
                 except TimeoutError:
                     _signal_pids(
                         _tracked_child_pids_for_tasks((task,)),

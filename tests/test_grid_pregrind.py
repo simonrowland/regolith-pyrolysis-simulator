@@ -142,7 +142,7 @@ def test_backend_selector_defaults_to_subprocess_and_accepts_thermoengine():
 
     assert not hasattr(grid_pregrind, "_ThermoEngineSpawnContext")
     assert grid_pregrind.EngineWorkerPool.__module__ == (
-        "simulator.melt_backend.engine_worker"
+        "simulator.engine_pool"
     )
 
 

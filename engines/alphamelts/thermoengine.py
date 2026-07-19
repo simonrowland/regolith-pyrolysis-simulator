@@ -31,7 +31,7 @@ from simulator.engine_local_config import (
     setup_thermoengine_dylib_path,
     warn_legacy_once,
 )
-from simulator.melt_backend.engine_worker import (
+from simulator.engine_pool import (
     EngineWorkerRemoteError,
     WarmEngineWorker,
 )
@@ -47,7 +47,8 @@ class ThermoEngineIsolationError(RuntimeError):
 _FO2_ECHO_TOLERANCE = 1.0e-3
 _FO2_MONOTONIC_EPSILON = 1.0e-7
 _FO2_FRACTION_WIDTH_TOLERANCE = 1.0e-10
-_DEFAULT_EQUILIBRATE_TIMEOUT_S = 60.0
+THERMOENGINE_WARM_CALL_TIMEOUT_S = 3.0
+_DEFAULT_EQUILIBRATE_TIMEOUT_S = THERMOENGINE_WARM_CALL_TIMEOUT_S
 _DEFAULT_WATCHDOG_GRACE_S = 0.25
 _THERMOENGINE_ADAPTER_VERSION = 'regolith-thermoengine-v2'
 

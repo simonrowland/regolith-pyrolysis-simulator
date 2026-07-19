@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.engine_pool import EngineWorkerTimeout
 from engines.builtin.vapor_pressure import (
     HighUncertaintyVaporPressureFallbackWarning,
 )
@@ -19,7 +20,7 @@ from engines.alphamelts import AlphaMELTSProvider
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 import engines.alphamelts.provider as alphamelts_provider_module
 import engines.alphamelts.thermoengine as thermoengine_module
-import simulator.melt_backend.engine_worker as engine_worker_module
+import simulator.engine_pool as engine_worker_module
 from engines.alphamelts.parser import diagnostics_to_equilibrium
 from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.chemistry.kernel import ChemistryIntent
@@ -720,6 +721,12 @@ def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     seen = {}
 
     def fake_run(*args, **kwargs):
+        if args[0][-1] == '--version':
+            return types.SimpleNamespace(
+                returncode=0,
+                stdout='alphaMELTS fake\n',
+                stderr='',
+            )
         seen['stdin'] = kwargs['input']
         seen['env'] = dict(kwargs['env'])
         seen['input_melts'] = (
@@ -1334,14 +1341,84 @@ def test_alphamelts_python_worker_start_failure_closes_pipes(monkeypatch):
     assert events == ['close', 'close']
 
 
-def test_petthermotools_warm_worker_is_blocked_pending_acceptance():
-    backend = AlphaMELTSBackend()
+def test_petthermotools_warm_worker_is_opt_in_with_cold_fallback(monkeypatch):
+    observed = []
 
-    assert backend._pet_warm_enabled is False
-    assert backend._pet_worker is None
+    def fake_initialize_petthermotools(self, *, require_petthermotools):
+        observed.append((
+            self._pet_warm_enabled,
+            self._pet_warm_timeout_s,
+            require_petthermotools,
+        ))
+        self._mode = 'python_api'
 
-    with pytest.raises(ValueError, match='24-point byte-identity reset gate'):
-        backend.initialize({'warm_worker': True})
+    monkeypatch.setattr(
+        AlphaMELTSBackend,
+        '_initialize_petthermotools',
+        fake_initialize_petthermotools,
+    )
+    monkeypatch.setattr(
+        'simulator.melt_backend.vaporock.VapoRockBackend.initialize',
+        lambda self, _config: True,
+    )
+    monkeypatch.setattr(
+        'simulator.melt_backend.vaporock.VapoRockBackend.is_available',
+        lambda self: True,
+    )
+
+    warm = AlphaMELTSBackend()
+    assert warm.initialize({
+        'mode': 'python_api',
+        'warm_worker': True,
+    }) is True
+    cold = AlphaMELTSBackend()
+    assert cold.initialize({
+        'mode': 'python_api',
+        'warm_worker': False,
+        'timeout_s': 37.5,
+    }) is True
+
+    assert observed == [
+        (True, 3.0, True),
+        (False, 3.0, True),
+    ]
+
+
+def test_petthermotools_warm_handler_rebuilds_mutable_native_payload():
+    from simulator.melt_backend.alphamelts import (
+        _handle_petthermotools_request,
+    )
+
+    payloads = []
+
+    class FakeModule:
+        @staticmethod
+        def equilibrate_MELTS(*, melts):
+            payloads.append(melts)
+            return {'payload_index': len(payloads)}
+
+    loader_calls = []
+
+    def loader(model_code):
+        payload = {'model_code': model_code, 'sequence': len(loader_calls)}
+        loader_calls.append(payload)
+        return payload
+
+    resource = {
+        'module': FakeModule(),
+        'loader': loader,
+        'model_code': 1,
+    }
+    request = {'operation': 'equilibrate_MELTS'}
+
+    assert _handle_petthermotools_request(resource, request, None) == {
+        'payload_index': 1,
+    }
+    assert _handle_petthermotools_request(resource, request, None) == {
+        'payload_index': 2,
+    }
+    assert payloads[0] is not payloads[1]
+    assert len(loader_calls) == 2
 
 
 def test_alphamelts_python_worker_revalidates_timeout_before_spawn(
@@ -1825,7 +1902,28 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
     assert backend.initialize({}) is True
     assert backend._mode == 'thermoengine'
     assert backend.get_engine_version() == 'thermoengine fake'
-    assert backend._thermoengine_transport.equilibrate_timeout_s == 60.0
+    assert backend._thermoengine_transport.equilibrate_timeout_s == 3.0
+
+
+def test_thermoengine_backend_surfaces_typed_hang_and_keeps_respawn_transport():
+    class TimedOutTransport:
+        def equilibrate(self, **_kwargs):
+            raise EngineWorkerTimeout('ThermoEngine equilibrium', 3.0, phase='job')
+
+    backend = ThermoEngineBackend()
+    transport = TimedOutTransport()
+    backend._thermoengine_transport = transport
+    backend._mode = 'thermoengine'
+
+    with pytest.raises(EngineWorkerTimeout):
+        backend._equilibrate_thermoengine(
+            1400.0,
+            _melts_domain_composition(),
+            -9.0,
+            1.0,
+        )
+    assert backend._thermoengine_transport is transport
+    assert backend._mode == 'thermoengine'
 
 
 def test_alphamelts_backend_rejects_thermoengine_transport_mode():
