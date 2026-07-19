@@ -164,6 +164,8 @@ pytest
 - [Feedstocks](docs/feedstocks.md)
 - [Melt Backends](docs/melt-backends.md)
 - [Model Limitations](docs/model-limitations.md)
+- [Recipe Playbook](docs/recipe-playbook.md)
+- [FAQ](docs/faq.md)
 - [Developer Map](docs/developer-map.md)
 
 ## Source Layout

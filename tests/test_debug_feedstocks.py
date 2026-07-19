@@ -146,6 +146,11 @@ def test_debug_batches_auto_apply_branching_decisions():
     assert record.branch == "two"
     assert (DecisionType.BRANCH_ONE_TWO, "two") in record.decisions
 
+    assert manager.get_next_campaign(CampaignPhase.C4, record) == CampaignPhase.C2A
+    assert record.path == "A_post_mg_boiloff"
+    assert manager.get_next_campaign(CampaignPhase.C2A, record) == CampaignPhase.COMPLETE
+
+    record.path = "A_staged"
     assert manager.get_next_campaign(CampaignPhase.C5, record) == CampaignPhase.C6
     assert (DecisionType.C6_PROCEED, "yes") in record.decisions
 
@@ -185,7 +190,7 @@ def test_c2a_staged_c3_na_cool_cleanup_does_not_poison_reused_manager():
 
     assert manager.get_temp_target(
         CampaignPhase.C3_NA, 0, default_melt
-    ) == (1275.0, 50.0)
+    ) == (1150.0, 50.0)
     assert manager.get_temp_target(
         CampaignPhase.C3_NA, 3, default_melt
     ) == (1600.0, 50.0)
@@ -242,8 +247,8 @@ def test_debug_batches_skip_c5_by_default_after_c4():
     record.branch = "two"
 
     assert manager.c5_enabled is False
-    assert manager.get_next_campaign(CampaignPhase.C4, record) == CampaignPhase.C6
-    assert (DecisionType.C6_PROCEED, "yes") in record.decisions
+    assert manager.get_next_campaign(CampaignPhase.C4, record) == CampaignPhase.C2A
+    assert manager.get_next_campaign(CampaignPhase.C2A, record) == CampaignPhase.COMPLETE
 
 
 def test_c5_enabled_routes_c4_to_c5():
@@ -261,7 +266,7 @@ def test_branch_decision_context_matches_c5_default_off():
 
     context = manager.get_decision(CampaignPhase.C3_NA, record).context
 
-    assert "C4 Mg pyrolysis + C6 Mg thermite" in context
+    assert "C4 Mg pyrolysis + final C2A boiloff" in context
     assert "complete pyrolysis-only" in context
     assert "C5 limited MRE" not in context
     assert "full MRE to 2.5 V" not in context
@@ -290,10 +295,8 @@ def test_normal_batches_still_pause_for_branching_decisions():
     record.path = "A"
     assert manager.get_next_campaign(CampaignPhase.C3_NA, record) is None
     record.branch = "two"
-    assert manager.get_next_campaign(CampaignPhase.C4, record) is None
-    assert manager.get_decision(CampaignPhase.C4, record).decision_type == (
-        DecisionType.C6_PROCEED
-    )
+    assert manager.get_next_campaign(CampaignPhase.C4, record) == CampaignPhase.C2A
+    assert manager.get_next_campaign(CampaignPhase.C2A, record) == CampaignPhase.COMPLETE
 
 
 def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
@@ -313,7 +316,7 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     oxygen_kg = sim._step_mre()
 
     assert oxygen_kg > 0.0
-    assert sim.melt.composition_kg["Na2O"] == pytest.approx(996.8513781574554)
+    assert sim.melt.composition_kg["Na2O"] == pytest.approx(996.8526822455086)
     # 2026-07-11 0.5.10 E-MOVE: phase-basis rails route gas-basis MRE Na
     # through overhead, reactive wall capture, and the condensation train
     # instead of forcing it into metal_phase.
@@ -322,7 +325,7 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     ) == pytest.approx(0.0)
     assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "Na"
-    ] == pytest.approx(0.8575205152142129)
+    ] == pytest.approx(0.8571653495845415)
     assert sim.atom_ledger.kg_by_account("process.condensation_train")[
         "Na"
     ] == pytest.approx(9.389045452223855e-07)
@@ -330,7 +333,7 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
         sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
     )
-    assert wall_na_kg == pytest.approx(1.4783222553934658)
+    assert wall_na_kg == pytest.approx(1.4777099673154022)
     assert wall_na_kg > sim.atom_ledger.kg_by_account(
         "process.condensation_train"
     )["Na"]

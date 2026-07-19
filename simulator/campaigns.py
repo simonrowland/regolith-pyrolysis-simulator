@@ -236,6 +236,8 @@ class CampaignManager:
         self.last_c2a_staged_termination: dict[str, object] | None = None
         self._pending_c3_na_scoped_overrides: dict | None = None
         self._active_c3_na_scoped_overrides: dict | None = None
+        self._pending_post_mg_c2a_overrides: dict | None = None
+        self._active_post_mg_c2a_overrides: dict | None = None
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
 
     _CONFIG_KEY_BY_PHASE = {
@@ -519,6 +521,11 @@ class CampaignManager:
 
     def _campaign_overrides(self, campaign: CampaignPhase) -> dict:
         merged: dict = {}
+        if (
+            campaign == CampaignPhase.C2A
+            and self._active_post_mg_c2a_overrides
+        ):
+            merged.update(self._active_post_mg_c2a_overrides)
         if (
             campaign == CampaignPhase.C3_NA
             and self._active_c3_na_scoped_overrides
@@ -1182,6 +1189,15 @@ class CampaignManager:
             self._pending_c3_na_scoped_overrides = None
             self._active_c3_na_scoped_overrides = None
 
+        if campaign == CampaignPhase.C2A:
+            self._active_post_mg_c2a_overrides = (
+                self._pending_post_mg_c2a_overrides
+            )
+            self._pending_post_mg_c2a_overrides = None
+        else:
+            self._pending_post_mg_c2a_overrides = None
+            self._active_post_mg_c2a_overrides = None
+
         if campaign == CampaignPhase.C2A_STAGED:
             self._c2a_staged_stage_idx = 0
             self._c2a_staged_stage_start_hour = 0
@@ -1458,8 +1474,24 @@ class CampaignManager:
             # overrides both targets to the cool FeO window near 1150 C.
             # Alternate between injection T and bakeout T
             ovr = self._campaign_overrides(campaign)
-            inject_target = self._float(ovr.get('inject_target_C'), 1275.0)
-            bakeout_target = self._float(ovr.get('bakeout_target_C'), 1600.0)
+            phase_key = 'K_phase' if campaign == CampaignPhase.C3_K else 'Na_phase'
+            phase_cfg = self._campaign_config(campaign).get(phase_key, {})
+            if not isinstance(phase_cfg, Mapping):
+                phase_cfg = {}
+            inject_band = phase_cfg.get('T_inject_C', ())
+            bakeout_band = phase_cfg.get('T_bakeout_C', ())
+            default_inject = (
+                max(float(value) for value in inject_band)
+                if isinstance(inject_band, (list, tuple)) and inject_band
+                else (820.0 if campaign == CampaignPhase.C3_K else 1150.0)
+            )
+            default_bakeout = (
+                sum(float(value) for value in bakeout_band) / len(bakeout_band)
+                if isinstance(bakeout_band, (list, tuple)) and bakeout_band
+                else 1600.0
+            )
+            inject_target = self._float(ovr.get('inject_target_C'), default_inject)
+            bakeout_target = self._float(ovr.get('bakeout_target_C'), default_bakeout)
             ramp_rate = self._float(ovr.get('ramp_rate'), 50.0)
             cycle_period = 6  # hours per inject-bakeout cycle
             if campaign_hour % cycle_period < 3:
@@ -2142,6 +2174,8 @@ class CampaignManager:
             return None  # Triggers PATH_AB decision
 
         elif current == CampaignPhase.C2A:
+            if record.path == 'A_post_mg_boiloff':
+                return CampaignPhase.COMPLETE
             # After Path A C2A → C3 (K phase)
             return CampaignPhase.C3_K
 
@@ -2175,7 +2209,20 @@ class CampaignManager:
         elif current == CampaignPhase.C4:
             if self.c5_enabled:
                 return CampaignPhase.C5
-            return self._get_next_after_c5(record)
+            # Canonical no-MRE path: Mg is selectively recovered before the
+            # final high-temperature pyrolysis ramp.  Reuse C2A physics with a
+            # scoped, derived schedule.  The configured band midpoints need
+            # 12 h for the catalogued 1150->1320 C post-shuttle floor at
+            # 15 C/h and 70 h for 1320->1843 C at 7.5 C/h.  The 160 h hard
+            # cap is the conservative slow-band schedule (132 h) plus the
+            # existing 28 h extraction window.  The path marker prevents a C3
+            # loop.
+            self._pending_post_mg_c2a_overrides = {
+                'min_hold_hr': 82.0,
+                'max_hours': 160.0,
+            }
+            record.path = 'A_post_mg_boiloff'
+            return CampaignPhase.C2A
 
         elif current == CampaignPhase.C5:
             return self._get_next_after_c5(record)
@@ -2215,7 +2262,7 @@ class CampaignManager:
 
         elif current == CampaignPhase.C3_NA:
             branch_two_context = (
-                'Branch Two (preferred): C4 Mg pyrolysis + C6 Mg thermite.'
+                'Branch Two (preferred): C4 Mg pyrolysis + final C2A boiloff.'
             )
             if self.c5_enabled:
                 branch_two_context = (
@@ -2241,14 +2288,7 @@ class CampaignManager:
                 ),
             )
 
-        elif (
-            current == CampaignPhase.C5
-            or (
-                current == CampaignPhase.C4
-                and not self.c5_enabled
-                and record.branch == 'two'
-            )
-        ):
+        elif current == CampaignPhase.C5:
             return DecisionPoint(
                 decision_type=DecisionType.C6_PROCEED,
                 options=['yes', 'no'],

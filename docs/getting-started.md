@@ -4,7 +4,9 @@ This tutorial walks through a first run of the simulator using both the web UI a
 
 ## What you will do
 
-Run a default C0 through C2A pyrolysis sequence on a 1-tonne `lunar_mare_low_ti` batch, observe the per-hour product ledger, and locate the JSON output for downstream analysis.
+Run the canonical full-yield pyrolysis recipe on a 1-tonne
+`lunar_mare_low_ti` batch, observe the per-hour product ledger, and locate the
+JSON output for downstream analysis.
 
 ## Prerequisites
 
@@ -62,7 +64,9 @@ Open `http://127.0.0.1:3000/` in a browser.
 
 Things to look for during the run:
 
-- **Campaign transition around hour 19–30** (feedstock-dependent): the simulator automatically advances from C0 bakeoff through C2A pyrolysis once the IR-endpoint criteria are met. Watch the `campaign` field in the per-hour table flip from `C0` to `C2A`.
+- **Campaign sequence**: the simulator advances through C0/C0b, staged Path A,
+  the cool Na shuttle where the Mg driver engages, C4, and a final continuous
+  C2A boiloff to the alumina ceiling. C5/MRE is absent.
 - **SiO flux peak in the 1400–1600 °C window**: under the default Path A pN₂ sweep (C2A_continuous), SiO co-evolves with Fe. The `condensation_train_kg` column shows SiO glass accumulating in Stage 3. Under pO₂ control (C2B), SiO flux is suppressed >300× at 1 mbar pO₂.
 - **Mass balance closure**: the `mass_balance_pct` field should remain below `5e-12 %` at every tick. A nonzero drift indicates a regression; see `tests/test_mass_balance.py`.
 - **Stage purity** (in the runner JSON output's `stage_purity_report`): each stage carries a `verdict` (`PURE` / `MIXED` / `CONTAMINATED`) and a per-species kg breakdown of designated vs impurity material. Stage 3 should be `PURE` SiO under default Path A.
@@ -77,8 +81,9 @@ The `simulator.runner` module provides a non-interactive batch path:
 python3 -m simulator.runner \
     --feedstock=lunar_mare_low_ti \
     --campaign=C0 \
-    --hours=24 \
-    --output=runs/lunar_mare_24h.json
+    --hours=400 \
+    --recipe=data/recipes/canonical_lunar_full_yield.yaml \
+    --output=runs/canonical_lunar_full_yield.json
 ```
 
 The runner writes a JSON document to `--output` (creating the parent directory if needed) and exits `0` on success. A failed run still writes well-formed JSON with `"status": "failed"` so pipelines do not need to parse stderr.

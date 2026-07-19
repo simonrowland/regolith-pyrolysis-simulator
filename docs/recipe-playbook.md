@@ -163,19 +163,27 @@ See [`docs/session-script-protocol.md`](session-script-protocol.md) for the full
 
 ### Metals-extraction mode (the default)
 
-Objective: maximum metals + source-side O₂ potential from a lunar mare feedstock.
+Objective: maximum pressure-and-temperature-driven extraction from a lunar mare
+feedstock before any MRE electrolysis load.  The pinned bundle is
+`data/recipes/canonical_lunar_full_yield.yaml`.
 
-Sequence: **C0 → C0b → C2A_continuous → C3 → C4 → C6**. C5 is optional and
-is inserted between C4 and C6 only when `c5_enabled` is set.
+Sequence: **C0 → C0b → C2A_staged → C3 → C4 → C2A_continuous final boiloff**.
+C5 is disabled in the canonical profile.
 
 - C0b is recommended for all lunar feedstocks even at low P₂O₅; it adds only 0.5–2.5 h and prevents P carryover into C2.
-- C2A_continuous at Path A extracts Na, K, Fe, and SiO in a single ramp; this halves C3 scope and reduces C5.
+- C2A_staged separates alkali/SiO/Fe before the cool C3 cleanup.
 - C3_NA (Na-only post-V1c) cleans residual FeO at the cool ~1150 °C window; the legacy K-shuttle path is refused by the engine under V1c-JANAF and is no longer used here.
-- C4 extracts Mg thermally (18–42 kg/t); accumulate over 3–6 batches before first C6 run.
-- C5 Branch Two at max 1.6 V removes Si by electrolysis, permanently eliminating the SiO source from the melt.
-- C6 thermite yields 65–80 kg Al/t; terminal slag (10–15 kg/t, 0.5–1 wt% REE) is the refractory ceramic rump.
+- The non-FeO dissociation driver engages in the 1150 °C C3_NA window and recovers Mg before C4; C4 remains enabled before the final kinetic-pyrolysis pass.
+- After C4, C2A_continuous is re-enabled. Its configured band midpoints require 82 h from the catalogued 1150 °C post-shuttle floor through 1320 °C to 1843 °C; the 160 h cap is the conservative slow-band 132 h ramp plus the existing 28 h extraction window. The endpoint is `dense_alumina_max.max_service_T_C` from `data/furnace_materials.yaml`, not a yield fit.
+- C5 is disabled (`allow_mre_voltage_cap_V: 0`); this canonical profile is pyrolysis-only.
+- Optional C6 thermite remains a separate downstream recipe; it is not part of this pyrolysis-only default.
 
-Expected final-state outputs for a `lunar_mare_low_ti` 1-tonne batch: Fe 85–130 kg, Na 2.3–4.0 kg, K 0.8–1.35 kg, SiO₂ glass 100–160 kg, Mg 18–42 kg, Si 30–100 kg, Al 65–80 kg, O₂ 380–440 kg total, refractory slag 10–15 kg. Source: `data/setpoints.yaml` §11.
+```shell
+python -m simulator.runner --feedstock lunar_mare_low_ti --campaign C0 --hours 400 \
+  --recipe data/recipes/canonical_lunar_full_yield.yaml --output canonical-lunar.json
+```
+
+Pinned 2026-07-19 demo outputs for a `lunar_mare_low_ti` 1-tonne batch are Fe 85.566 kg, SiO 53.474 kg, Na 1.121 kg, K 0.854 kg, and Mg 19.366 kg. Source: `docs-private/research/2026-07-19-canonical-recipe/report.md`.
 
 ### Industrial-glass mode
 

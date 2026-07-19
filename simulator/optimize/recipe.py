@@ -679,7 +679,7 @@ class RecipeSchema:
         _knob(
             "campaigns.C2A_continuous.temp_range_C",
             low=1050,
-            high=1600,
+            high=1843,
             units="C",
             bounds_source="setpoints:campaigns.C2A_continuous.temp_range_C",
             search_enabled=False,
@@ -710,19 +710,25 @@ class RecipeSchema:
         _knob(
             "campaigns.C2A_continuous.duration_hr",
             low=18,
-            high=28,
+            high=160,
             units="hr",
-            bounds_source="setpoints:campaigns.C2A_continuous.duration_h",
+            bounds_source=(
+                "engineering_envelope catalog-grounded dense-alumina ramp "
+                "plus the setpoints C2A extraction window"
+            ),
             search_enabled=False,
         ),
         _knob(
             "campaigns.C2A_continuous.max_hold_hr",
             "int",
             low=18,
-            high=30,
+            high=160,
             units="hr",
             scale="log",
-            bounds_source="engineering_envelope ratified-t155 A2 C2A continuous max hold",
+            bounds_source=(
+                "engineering_envelope slow ramp to dense-alumina 1843 C plus "
+                "setpoints C2A continuous extraction window"
+            ),
         ),
         _knob(
             "campaigns.C2A_staged.temp_range_C",

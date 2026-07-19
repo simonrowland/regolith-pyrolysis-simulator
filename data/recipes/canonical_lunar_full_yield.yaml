@@ -1,0 +1,19 @@
+# Canonical lunar-regolith happy path: solar-thermal pyrolysis only.
+# Run from C0: staged Path A -> C3 Na cleanup -> C4 Mg recovery -> final C2A
+# continuous boiloff to the alumina ceiling.  C5 remains disabled.
+furnace_max_T_C: 1843
+campaigns:
+  C2A_continuous:
+    temp_range_C: [1050, 1843]
+    dT_dt_C_per_hr:
+      early_ramp_1050_1320C: [10, 20]
+    p_total_mbar: [5, 15]
+    p_total_mbar_default: 10.0
+    duration_h: [132, 160]
+    max_hold_hr: 160
+  C3:
+    alkali_dosing:
+      Na_kg: 140.0
+      K_kg: 56.0
+  C4:
+    temp_range_C: [1580, 1670]

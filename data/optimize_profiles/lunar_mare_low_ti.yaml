@@ -1,9 +1,9 @@
 profile_id: lunar-mare-low-ti-objectives-v1
 profile_schema_version: profile-schema-v1
 feedstock: lunar_mare_low_ti
-description: Standard mare basalt baseline; balance O2, Fe/Mg metal, silica glass, and short runs.
-north_star_rationale: Clean mare basalt is the baseline pot-of-dirt case, so maximize O2 plus metal ingots plus silica glass while holding coating and extraction gates.
-objective_emphasis: Balanced O2/metals/glass baseline.
+description: Canonical lunar happy path; full-yield continuous pyrolysis ramp with alkali shuttle, Mg recovery, and no MRE.
+north_star_rationale: Clean mare basalt is the baseline pot-of-dirt case, so demonstrate pressure plus a catalog-limited thermal ramp extracting multiple products before any MRE electrolysis load.
+objective_emphasis: Pyrolysis-only Fe/SiO/alkali/Mg yield under the alumina furnace ceiling.
 objectives:
   - {metric: oxygen_kg, sense: maximize, units: kg, weight: 0.34, rationale: main stored oxidizer product}
   - {metric: metals_total_kg, sense: maximize, units: kg, weight: 0.28, rationale: Fe/Mg ingot proxy}
@@ -19,15 +19,25 @@ fidelities:
   high: {backend_name: internal-analytical, hours: 1}
   auto: {backend_name: internal-analytical, hours: 1}
 seed_recipes:
-  - id: mare-low-ti-path-a-seed
+  - id: canonical-lunar-full-yield
     source_campaign: C2A_continuous
-    rationale: Use the setpoints Path A co-extraction recipe for Na/K, Fe, SiO2, and O2.
+    rationale: Owner-specified canonical Path A ramp; 1843 C is dense-alumina max service, C3 inventory uses catalog bounds, and a zero C5 cap forbids MRE.
     patch:
+      furnace_max_T_C: 1843
       campaigns:
         C2A_continuous:
-          temp_range_C: [1050, 1600]
+          temp_range_C: [1050, 1843]
           dT_dt_C_per_hr:
             early_ramp_1050_1320C: [10, 20]
           p_total_mbar: [5, 15]
           p_total_mbar_default: 10.0
-          duration_h: [18, 28]
+          duration_h: [132, 160]
+          max_hold_hr: 160
+        C3:
+          alkali_dosing:
+            Na_kg: 140.0
+            K_kg: 56.0
+        C4:
+          temp_range_C: [1580, 1670]
+        C5:
+          allow_mre_voltage_cap_V: 0.0

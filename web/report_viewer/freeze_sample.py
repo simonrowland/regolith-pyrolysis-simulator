@@ -5,21 +5,34 @@ Delegates to the canonical, contract-fixed `simulator.accounting.run_artifact.bu
 source of truth — do NOT re-implement the reshape here). The artifact builder
 emits the same canonical two-price cost block used by live runs.
 
-Usage: python3 freeze_sample.py <payload.json> <out.json>
+Usage: python3 freeze_sample.py <payload.json> <out.json> [recipe.yaml]
 """
 import json
 import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from simulator.accounting.run_artifact import build_run_artifact
+from simulator.optimize.recipe import recipe_schema_version
+from simulator.recipe_io import load_recipe_patch
 
 def main():
     src, out = sys.argv[1], sys.argv[2]
     with open(src) as f:
         payload = json.load(f)
+    if len(sys.argv) > 3:
+        payload["recipe_snapshot"] = {
+            "setpoints_patch": load_recipe_patch(Path(sys.argv[3])),
+            "pins": [],
+            "recipe_schema_version": recipe_schema_version,
+        }
     artifact = build_run_artifact(
         payload,
-        run_id="sample-fullseq-lunar-197h",
-        name="Full-sequence lunar (C0->C6, demo)",
+        run_id="canonical-lunar-full-yield",
+        name="Canonical lunar full-yield pyrolysis demo",
     )
     with open(out, "w") as f:
         json.dump(artifact, f, indent=1)

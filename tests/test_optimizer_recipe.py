@@ -71,20 +71,19 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
             .setpoints
         )
     ).encode()
-    # b-026 residual: removing the behaviorally inert C3 hold-time field moves
-    # resolved/schema identity bytes while the trajectory regression below
-    # keeps runtime behavior pinned.
+    # Canonical lunar full-yield expands the catalog-grounded C2A envelope and
+    # aligns the staged-path default metadata; resolved/schema identity moves.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "5c1a8ff2ad74c4ddfe2566287801446d187a74a0c471d94df70801684c2969a0"
+        "37d3fb4dec0ce84948aa76b9fea3a46695a4f44e4b244e7988ec448c6b5a3af6"
     )
     assert schema.bounds_digest == (
-        "d2415b67d026eed269340346674e9e9d1774cc3fae698bd174b08cbfe42d7c79"
+        "9b0c68b2cb8a85067492ebacd9d448438fcd406007cd733a48103c76b8af6b8a"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
     )
     assert empty.recipe_id(schema) == (
-        "e7192a398b365b98388a526acda7ba09e0cb420da3f5d33cc37d4b43ad7ded28"
+        "b358010cde41d9ffac5b30397d71cf44983d2c220e1265f4eb27a2ad5284c175"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -96,7 +95,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
     assert identity_digest == (
-        "dc4a98ad6caaaa800640b0d348116b20bba0264a7303343be15ba2a1391ac9b6"
+        "a57bdefe05dbc2416e5312c4cf82ad0c20dc8776f89acac5a5e2a2c221baaffb"
     )
     assert identity_digest != (
         "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
@@ -1569,10 +1568,10 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     ).validated()
 
     assert first.recipe_id() == second.recipe_id()
-    # b-026 residual: recomputed after removing the inert C3 hold-time bound.
+    # Recomputed after the catalog-grounded C2A full-yield envelope expansion.
     assert (
         first.recipe_id()
-                == "d23ed0e32f9e3acfc5e665288bd6fc8151c103c3f80031aaee733a24a4a1d412"
+                == "8f04efbf5ea156f18d0067851df71fdbe4a3e5b5b4fe2cd255cf6d77dd35f0b3"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

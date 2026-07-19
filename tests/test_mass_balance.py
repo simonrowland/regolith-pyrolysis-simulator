@@ -334,11 +334,11 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
 
     steps = _run_c2a_staged_to_completion(sim)
 
-    # C5 is default-off: the staged path now stops after the branch
-    # decision instead of appending a default C5 cleanup segment. Endpoint
-    # caps count the hour just processed, because check_endpoint runs before
-    # core increments campaign_hour.
-    assert steps == 39
+    # C5 is default-off: the canonical staged path appends the 160-hour final
+    # continuous boiloff instead of MRE. Endpoint caps count the hour just
+    # processed, because check_endpoint runs before core increments
+    # campaign_hour.
+    assert steps == 179
     transition_names = {
         getattr(transition, "name", "")
         for transition in sim.atom_ledger.transitions
@@ -371,10 +371,14 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
         assert liquid_fractions == []
 
 
+@pytest.mark.timeout(1800)
+@pytest.mark.serial
+@pytest.mark.xdist_group("serial")
 def test_cumulative_transition_mass_closure_bounded():
     # DEFAULT_MASS_TOLERANCE_KG (20 g) bounds a single transition only.
-    # A full C0->C6 batch commits hundreds of transitions; if each closed a
-    # little short/long with a consistent sign, cumulative drift could grow
+    # A full no-MRE batch through final C2A commits hundreds of
+    # transitions; if each closed a little short/long with a consistent sign,
+    # cumulative drift could grow
     # unbounded while every individual transition still passed. Guard that
     # gap directly: sum abs(debit - credit) over every committed transition
     # and bound the total far below even one per-transition tolerance.
@@ -393,10 +397,10 @@ def test_cumulative_transition_mass_closure_bounded():
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
     sim.start_campaign(CampaignPhase.C0)
 
-    # Drive the full pyrolysis path C0 -> ... -> C6 to completion.
+    # Drive the full no-MRE pyrolysis path through the final C2A boiloff.
     decision_choice = {
         DecisionType.ROOT_BRANCH: "pyrolysis",
-        DecisionType.PATH_AB: "A",
+        DecisionType.PATH_AB: "A_staged",
         DecisionType.BRANCH_ONE_TWO: "two",
         DecisionType.C6_PROCEED: "yes",
     }
