@@ -106,9 +106,9 @@ Source: `data/setpoints.yaml` §1 `C3:` block (the YAML key is still `C3` for ba
 **Atmosphere**: controlled O₂ (pO₂ 0.08–0.35 mbar).  
 **Prerequisite**: SiO₂ activity reduced 30–50 % by C3 conditioning; otherwise SiO co-extraction is 10–40× higher than under pure vacuum.
 
-Mg vapor pressure is ~0.5 bar at 1600 °C, far above any pO₂ setpoint, so once the pO₂ window is opened for Mg it evolves strongly. Product yield: 18–42 kg Mg per tonne for a typical low-Ti mare batch (35–65 % of remaining Mg).
+The former `~0.5 bar at 1600 °C` claim confused pure-metal volatility with release from MgO and is withdrawn. With `a_MgO = 0.0926`, `P_Mg = 0.01 bar`, and the melt oxygen potential assumed to have reached the CF-1 ambient floor, the current runtime's Mg-metal-phase-correct targets are 1892 °C (Moon) and 1768 °C (asteroid), with derived roots 1892.647/1768.703 °C. These are diagnostic thresholds, not universal body-only constants: stage composition changes `a_MgO`, and the surface must actually reach the ambient fO₂. The current 1670 °C C4 hold is therefore below the grounded lunar opening threshold and its legacy 18–42 kg/t yield is not certified by this threshold calculation.
 
-Under the pN₂ variant (pO₂ → 0), Mg can be extracted at 1500–1580 °C at ~0.1 bar vapor pressure, at the cost of uncontrolled SiO co-evolution. Use only when residual SiO₂ is not needed for ceramics.
+Under the pN₂ variant, sweep pressure changes gas transport but does not replace the melt fO₂ in the MgO dissociation equilibrium. No `~0.1 bar` Mg claim is certified for the legacy 1500–1580 °C band; use that range only as an explicitly ungrounded experimental sweep until a stage-specific melt-redox trajectory supports it.
 
 Branch One fallback: skip C4, electrolyse Mg in C5 at up to 2.5 V. This costs 5–10× electrode life and 2650–4050 kWh/t versus 1200–2000 kWh/t for Branch Two (C4 + C6).
 

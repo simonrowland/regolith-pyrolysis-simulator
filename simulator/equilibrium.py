@@ -586,10 +586,18 @@ class EquilibriumMixin:
             dissociation_pO2_bar = (
                 pO2_bar if parent_oxide == 'FeO' else melt_dissociation_pO2_bar
             )
-            # Melt-dissolved non-FeO oxide dissociation sees the melt's
-            # oxygen chemical potential; headspace pO2 remains reserved for
-            # gas transport/backpressure. FeO already carries melt redox
-            # through its Kress91 activity and is intentionally unchanged.
+            # Premise: this fallback solves the melt-supported source pressure;
+            # the later surface-flux layer owns overhead species backpressure.
+            # For MgO(l) -> Mg(g) + 1/2 O2,
+            # K1=(f_Mg/p0)*(fO2/p0)^1/2/a_MgO. The per-mol-O2 JANAF row uses
+            # K2=K1**2=(f_Mg/p0)**2*(fO2/p0)/a_MgO**2, therefore
+            # root=(K2*a_oxide**n_ox/fO2_bar)**(1/n_M), n_ox=n_M=2.
+            # Unit check: K, activity, and reduced fugacities are dimensionless;
+            # the gas/condensed pressure rail supplies Pa below. Sanity/limit:
+            # fO2 down by 100 raises Mg by 10; fO2 -> infinity suppresses Mg.
+            # Thus non-FeO uses intrinsic melt fO2, while overhead pO2 remains
+            # available to transport/backpressure. FeO already carries melt
+            # redox through Kress91 activity and is intentionally unchanged.
             numerator = K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar
 
             if numerator <= 0:

@@ -423,13 +423,34 @@ campaigns:
       gas_temperature_C: 1670
       pipe_diameter_m: 0.12
     target_species: ["Mg"]
-    Mg_vapour_pressure_bar_1600C: 0.5  # Legacy inert note; MgO congruent vaporization follows overhead pO2, not this fossil scalar.
+    # Mg threshold derivation (diagnostic grounding, not a replacement C4 hold):
+    # Premise: late-stage melt fO2 has reached the named CF-1 body floor and
+    # a_MgO=0.0926 is held fixed for the old-vs-current comparison.
+    # Algebra: the per-mol-O2 row has K2=K1^2, so on the post-boiling
+    # JANAF gas rail P_Mg/p0=(K2*a_MgO^2/fO2_bar)^0.5; solve 0.01 bar.
+    # Unit check: K, a, fO2/p0, and P_Mg/p0 are dimensionless; p0=1 bar.
+    # Sanity/limit: lower fO2 lowers the root; a_MgO=1 lowers it too. These
+    # roots assume the melt oxygen potential actually reaches ambient and do
+    # not assert that the current 1670 C C4 hold opens a 0.01-bar window.
+    Mg_threshold_grounding:
+      target_metal_pressure_bar: 0.01
+      MgO_activity: 0.0926
+      phase_basis: "Mg(g) JANAF fugacity rail; no condensed Antoine above 1363.15 K"
+      lunar:
+        melt_fO2_floor_bar: 1.3e-12
+        target_C: 1892
+        derived_root_C: 1892.647
+      asteroid:
+        melt_fO2_floor_bar: 1.0e-14
+        target_C: 1768
+        derived_root_C: 1768.703
     prerequisite: "SiO2 activity reduced 30-50% by C3 conditioning"
     SiO_gunk_vs_vacuum: "10-40x lower"
     products:
       Mg:
         mass_kg: [18, 42]
-        note: "35-65% of remaining Mg"
+        status: "ungrounded_legacy_projection"
+        note: "Historical 35-65% projection; not certified by the phase-correct 0.01-bar threshold or current 1670 C hold."
     optional_Ca_harvest:
       T_C: [1780, 1920]
       pO2_mbar: [0.03, 0.12]
@@ -437,8 +458,8 @@ campaigns:
       note: "poor selectivity, marginal"
       requires: "Furnace B at 1950-2050 C for serious Ca depletion"
     pN2_variant:
-      note: "Under pN2 with pO2->0, MgO decomposition faster (no Le Chatelier)"
-      T_lower_C: [1500, 1580]           # Mg p_vap ~0.1 bar
+      note: "An inert sweep changes transport, but MgO release follows melt fO2; no 0.01-bar Mg threshold is certified for this legacy temperature band."
+      T_lower_C: [1500, 1580]
       pN2_mbar: [5, 12]
       contraindication: "if residual SiO2 wanted for ceramics"
     branch_one_fallback: "Skip C4; Mg electrolysed in C5 MRE"

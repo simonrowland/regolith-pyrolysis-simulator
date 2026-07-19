@@ -10,12 +10,11 @@ The provider:
   account it declares),
 - looks up Antoine coefficients from the ``vapor_pressures.yaml``
   payload passed at construction time,
-- combines Ellingham oxide-decomposition equilibrium with Antoine
+- combines Ellingham oxide-decomposition equilibrium with phase-correct
   reference terms to compute per-species effective equilibrium pressures at the
-  request's ``temperature_C`` and the caller-supplied transport/overhead
-  ``pO2_bar`` (via ``control_inputs``). The intrinsic-melt fO2/redox
-  channel resolves separately from the transport pO2 channel so future
-  redox controls cannot alias the SiO transport lever. Only
+  request's ``temperature_C``. Non-FeO metal release reads the independently
+  supplied intrinsic-melt fO2; overhead ``pO2_bar`` remains the gas-side
+  transport/backpressure channel (and the explicit SiO lever). Only
   ``pure_component_antoine`` sidecars are used for pure-component reference
   pressures when present; legacy ``antoine`` rows are used only when no
   sidecar exists. ``pseudo_psat_backsolved_from_vaporock`` rows are backsolved
@@ -1082,10 +1081,22 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if parent_oxide == 'FeO'
                 else melt_dissociation_pO2_bar
             )
-            # Melt-dissolved non-FeO oxide dissociation sees the melt's
-            # oxygen chemical potential; headspace pO2 remains reserved for
-            # gas transport/backpressure. FeO already carries melt redox
-            # through its Kress91 activity and is intentionally unchanged.
+            # Premise: this value is the melt-supported metal source pressure,
+            # not the later surface-flux boundary condition. For MgO(l) ->
+            # Mg(g) + 1/2 O2, K1=(f_Mg/p0)*(fO2/p0)^1/2/a_MgO. The JANAF row
+            # is normalized per mol O2, so K2=K1**2 and
+            # K2=(f_Mg/p0)**2*(fO2/p0)/a_MgO**2. Therefore the generic solve is
+            # root=(K2*a_oxide**n_ox/fO2_bar)**(1/n_M), n_ox=n_M=2.
+            # Unit check: K, activities, and fugacity/standard-pressure ratios
+            # are dimensionless; the selected rail supplies Pa only afterward.
+            # Sanity/limit: lowering melt fO2 raises Mg as fO2**-1/2, while
+            # fO2 -> infinity suppresses release. The separately dispatched
+            # evaporation flux still subtracts overhead metal backpressure,
+            # preserving the surface metal-transport path. Pure-MgO congruent
+            # co-evolution is a separate reaction-basis validation, not a
+            # runtime boundary condition solved by that subtraction.
+            # FeO already carries melt redox through its Kress91 activity and
+            # intentionally retains the legacy transport denominator here.
             numerator = _require_finite_vapor_value(
                 K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar,
                 species=species,

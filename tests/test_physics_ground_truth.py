@@ -13,9 +13,20 @@ from engines.builtin.vapor_pressure import (
     vapor_pressure_source_label,
 )
 from engines.builtin.metallothermic_step import BuiltinMetallothermicStepProvider
+from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.chemistry import ellingham_graph
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_METAL_PHASE_GAS,
+    MG_NORMAL_BOILING_POINT_K,
+    ellingham_delta_g_kj_per_mol_o2,
+    ellingham_metal_phase_kind,
+)
+from simulator.environment import (
+    ASTEROID_VACUUM_FLOOR_BAR,
+    MOON_VACUUM_FLOOR_BAR,
+)
 from simulator.state import GAS_CONSTANT, MOLAR_MASS
 
 
@@ -128,6 +139,11 @@ NIST_JANAF_MN_SHOMATE = {
 
 def _vapor_pressure_data() -> dict:
     with (DATA_DIR / "vapor_pressures.yaml").open() as handle:
+        return yaml.safe_load(handle)
+
+
+def _setpoints_data() -> dict:
+    with (DATA_DIR / "setpoints.yaml").open() as handle:
         return yaml.safe_load(handle)
 
 
@@ -395,6 +411,74 @@ def test_mg_sidecar_is_monotonic_but_gas_runtime_uses_fugacity() -> None:
         high > low
         for low, high in zip(effective_pressures_pa, effective_pressures_pa[1:])
     )
+
+
+@pytest.mark.parametrize(
+    ("body", "melt_fO2_bar", "owner_target_C", "derived_root_C"),
+    [
+        ("moon", MOON_VACUUM_FLOOR_BAR, 1892, 1892.647),
+        ("asteroid", ASTEROID_VACUUM_FLOOR_BAR, 1768, 1768.703),
+    ],
+)
+def test_mg_phase_correct_0p01_bar_threshold(
+    body: str,
+    melt_fO2_bar: float,
+    owner_target_C: int,
+    derived_root_C: float,
+) -> None:
+    # Premise: compare both bodies at the historical fixed lunar-melt activity
+    # a_MgO=0.0926 and ask where supported Mg reaches 0.01 bar = 1000 Pa.
+    # Algebra: MgO -> Mg + 1/2 O2 gives K1, while the per-mol-O2 JANAF
+    # reaction has K2=K1**2; thus on the Mg(g) rail
+    # P_Mg/p0=(K2*a_MgO**2/fO2_bar)**0.5.
+    # Unit check: K, activity, fO2/p0, and P_Mg/p0 are dimensionless; the
+    # graph multiplies the final ratio by p0=100000 Pa.
+    # Sanity/limit: the lower asteroid fO2 must open the same pressure window
+    # at a lower T. Both roots are above Mg's 1363.15 K boiling boundary, so a
+    # condensed Antoine multiplier would double-count vaporization.
+    target_pressure_pa = 0.01 * 100_000.0
+    a_MgO = 0.0926
+    low_K, high_K = 2000.0, 2300.0
+    for _ in range(80):
+        mid_K = (low_K + high_K) / 2.0
+        pressure_pa = ellingham_graph.effective_equilibrium_pressure_Pa(
+            "Mg",
+            mid_K,
+            melt_fO2_bar,
+            a_oxide=a_MgO,
+        )
+        if pressure_pa < target_pressure_pa:
+            low_K = mid_K
+        else:
+            high_K = mid_K
+    root_K = (low_K + high_K) / 2.0
+
+    target_data = _setpoints_data()["campaigns"]["C4"]["Mg_threshold_grounding"]
+    body_data = target_data["lunar" if body == "moon" else body]
+
+    assert root_K - 273.15 == pytest.approx(derived_root_C, abs=0.002), body
+    assert target_data["target_metal_pressure_bar"] == pytest.approx(0.01)
+    assert target_data["MgO_activity"] == pytest.approx(a_MgO)
+    assert body_data["melt_fO2_floor_bar"] == pytest.approx(melt_fO2_bar)
+    assert body_data["target_C"] == owner_target_C
+    assert body_data["derived_root_C"] == pytest.approx(derived_root_C, abs=0.001)
+    assert abs(body_data["target_C"] - (root_K - 273.15)) < 1.0
+    assert root_K > MG_NORMAL_BOILING_POINT_K
+    assert ellingham_metal_phase_kind("Mg", root_K) == ELLINGHAM_METAL_PHASE_GAS
+
+
+def test_mg_gas_rail_matches_janaf_source_grid_anchor() -> None:
+    # Premise: the threshold roots use the 2000-2600 K Mg(g)/MgO(s) JANAF
+    # segment, so an external source-grid point must constrain that rail.
+    # Algebra: dG=H-T*S on the per-mol-O2 formation row. Unit check: H is
+    # kJ/mol-O2 and T*S is K*kJ/(mol-O2*K), hence dG is kJ/mol-O2.
+    # Sanity/limit: the fitted 2600 K endpoint must remain within its reported
+    # 0.457 kJ/mol-O2 residual of the Chase 1998 grid value -398.744.
+    assert ellingham_delta_g_kj_per_mol_o2("Mg", 2600.0) == pytest.approx(
+        -398.744,
+        abs=0.457,
+    )
+    assert ellingham_metal_phase_kind("Mg", 2600.0) == ELLINGHAM_METAL_PHASE_GAS
 
 
 @pytest.mark.parametrize(

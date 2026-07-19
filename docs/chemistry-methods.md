@@ -129,14 +129,20 @@ SiO2(melt) → SiO(g) + ½ O2(g)
 p(SiO) ∝ a(SiO2) / √pO2
 ```
 
-The effective SiO pressure carries an explicit inverse-root oxygen-pressure term above the vacuum floor,
+The effective SiO pressure carries an explicit inverse-root overhead oxygen-pressure term above the vacuum floor,
 `a(SiO₂) × √(pO₂_ref / pO₂)` with `pO₂_ref = 1×10⁻⁹ bar`, so that lowering the overhead oxygen pressure
 raises the SiO pressure and raising it suppresses SiO. This is the physical basis of the "hold pO₂ to
 lock silicon in the melt, drop toward vacuum to release it" control described in `docs/concepts.md`.
 When `pO₂` is at or below that floor, the suppression term is not applied again; the model reads the
 hard-vacuum reference rather than extrapolating the divergence.
 The species-specific oxygen-pressure slopes for the other oxides (the `−1/n_M` family in
-`docs/concepts.md`) follow from the same formation-reaction stoichiometry.
+`docs/concepts.md`) follow from the same formation-reaction stoichiometry, but their oxygen-activity
+basis is not the SiO overhead lever. For a non-FeO metal such as Mg, the source pressure is the amount
+supported by the melt and therefore reads the SSO-R intrinsic melt fO₂. The later surface-flux solve
+separately subtracts the species' overhead partial pressure and applies gas-side transport resistance.
+Pure-MgO congruent vaporization is a third boundary condition: co-evolved Mg and O₂ are solved
+self-consistently. Its agreement validates the JANAF reaction basis, but does not justify substituting
+far-field overhead O₂ for a buffered melt's oxygen chemical potential.
 <!-- impl: §2.3 -> engines/builtin/vapor_pressure.py BuiltinVaporPressureProvider.dispatch:948 — SiO pO2 suppression -->
 <!-- impl: §2.3 -> data/vapor_pressures.yaml oxide_vapors.SiO.suppression_equation:626 — SiO equation metadata -->
 
@@ -413,13 +419,13 @@ driving force.
 <!-- impl: §4.4 -> engines/builtin/evaporation_flux.py _series_resistance_evaporation_flux_kg_m2_s:446 — Pbulk driving force -->
 
 **Co-evolved oxygen and self-poisoning.** Every dissociation-driven species releases oxygen as it evolves
-(`SiO₂ → SiO + ½O₂`, `MOₓ → M + (x/2)O₂`). That oxygen raises the effective oxygen pressure, which —
-through the same `pO₂^(−x/2)` dissociation lever (§2) — suppresses further evolution. The model captures
-this as a **headspace oxygen balance**: oxygen released by evaporation is credited to the overhead gas,
-converted to a transport oxygen pressure, and applied to the *next* step's vapor-pressure solve, so
-accumulated oxygen self-limits the extraction. Under an inert sweep cover, that headspace oxygen is bled
-off through the pressure-and-conductance path, lowering the transport oxygen pressure and relieving the
-suppression.
+(`SiO₂ → SiO + ½O₂`, `MOₓ → M + (x/2)O₂`). The model credits that oxygen to the overhead gas. It directly
+feeds the next-step overhead pO₂ lever for congruent oxide-vapor species such as SiO and participates in
+gas-side pressure/transport for all species. Non-FeO metal source equilibrium is different: Mg release
+reads the SSO-R intrinsic melt fO₂, so headspace oxygen can suppress it only after redox/transport coupling
+changes that melt reservoir; it is not substituted directly as the MgO equilibrium denominator. Under an
+inert sweep cover, overhead oxygen is bled through the pressure-and-conductance path, but the present model
+does not resolve an instantaneous local-surface O₂ spike inside the same Mg solve.
 <!-- impl: §4.4 -> engines/builtin/evaporation_transition.py BuiltinEvaporationTransitionProvider.dispatch:262 — O2 overhead credit -->
 <!-- impl: §4.4 -> engines/builtin/overhead_bleed.py BuiltinOverheadBleedProvider._bled_species_mol:475 — conductance bleed -->
 

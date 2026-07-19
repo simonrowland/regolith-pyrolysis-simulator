@@ -102,11 +102,11 @@ Temperature determines which species are above their vapor-pressure threshold at
 - **Na, K**: volatile by 1250–1350 °C (vapor pressures >> any pO₂ setpoint above hard vacuum)
 - **Fe**: 0.01–0.1 mbar at 1400–1600 °C — adequate for selective harvest
 - **SiO**: 0.5–2 mbar at 1600 °C under vacuum; the problem species for fouling
-- **Mg**: ~0.5 bar at 1600 °C — highly volatile once conditions allow
+- **Mg**: the current runtime's Mg-metal-phase-correct `P_Mg = 0.01 bar` targets are 1892 °C at the lunar floor and 1768 °C at the asteroid floor (derived roots 1892.647/1768.703 °C) for the explicitly frozen comparison activity `a_MgO = 0.0926` and the assumption that melt fO₂ has reached the ambient floor; the root is activity- and melt-fO₂-dependent
 - **Al**: boiling point 2519 °C; negligible vapor pressure at any furnace-survivable temperature; MRE only
 - **Ca**: significant above ~1500 °C but poor selectivity vs other species present at that temperature; extraction marginal
 
-The practical implication is that temperature alone sequences Na/K → Fe → SiO (overlapping) → Mg cleanly in time, but Ca, Al, and Ti are below their practical vapor threshold at any temperature the crucible survives. The rump is the physical residue of that floor only for routes that did not later consume those oxides by C5/MRE or C6 thermite.
+The practical implication is that Na/K → Fe → SiO can be sequenced thermally, while Mg opens only in a deep-reduction/deep-vacuum window whose phase-correct threshold is at or above the present furnace ceiling for the frozen lunar-mare comparison. Ca, Al, and Ti remain below their practical vapor threshold at any temperature the current crucible survives. The rump is the physical residue of that floor only for routes that did not later consume those oxides by C5/MRE or C6 thermite.
 
 ## The alkali shuttle
 
