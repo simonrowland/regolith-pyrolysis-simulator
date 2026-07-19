@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.6.0",
+  "schema_version": "1.7.0",
   "run_metadata": {
-    "schema_version": "1.6.0",
+    "schema_version": "1.7.0",
     "feedstock_id": "ci_carbonaceous_chondrite",
     "campaign": "C2B",
     "hours_requested": 12,
@@ -463,6 +463,607 @@
     },
     "markdown": "# Three-Product-Class Report\n**Feedstock**: `ci_carbonaceous_chondrite` \u2022 **Campaign**: `C2B`\n\n**Class totals**: Metals + O\u2082 potential: \u2014 kg | Silica glass: \u2014 kg | Mixed glass: \u2014 kg | Rump: 759.231 kg\n\n## 1. Metals + source-side O\u2082 potential (alkali / Fe / Mg / Si / Ti / Al / Ca / Cr / Mn / Ni / Co + emitted O\u2082 potential)\n**Class total**: \u2014 kg\n\n- Metals subtotal: \u2014 kg\n- Source-side O\u2082 potential subtotal (emitted; not recovered/captured): \u2014 kg\n\nPer-species:\n  (no species in this class)\n\n## 2. Pure silica glass (Stage 3 fused-silica baffle capture)\n**Class total**: \u2014 kg\n\n- Stage 3 capture: \u2014 kg\n\nPer-species on Stage 3 baffles:\n  (no species in this class)\n\n## 3. Industrial mixed glass (early-tap residual melt option)\n**Class total**: \u2014 kg\n\n- Mixed melt residual: \u2014 kg\n  - *present only when operator declared early-tap via early_tap_mode=True; zero by default \u2014 mid-run cleaned_melt is NOT a product class*\n\n## 4. Refractory ceramic rump (Ca / REE / refractory oxides \u2014 by physics)\n**Class total**: 759.231 kg\n\n- Rump total: 759.231 kg\n- Refractory oxides floor (by physics): 229.844 kg\n- Silicate residual: 277.446 kg\n- Unextracted metals residue (failure-mode 1): \u2014 kg\n- Other / unclassified rump: 251.941 kg\n\nPer-species:\n  - **Al2O3**: 19.267 kg\n  - **CaO**: 22.152 kg\n  - **FeO**: 231.205 kg\n  - **MgO**: 188.425 kg\n  - **Na2O**: 5.323 kg\n  - **NiO**: 15.414 kg\n  - **SiO2**: 277.446 kg\n\n## \u26a0\ufe0f Unclassified species (mapping gap)\n**Total**: 39.908 kg \u2014 these species were in `product_ledger()` but did not map to any of the four north-star product classes. The mapping in `simulator/three_product_report.py` may need to be extended.\n\n  - **CaCO3**: 7.531e-03 kg\n  - **Na2CO3**: \u2014 kg\n  - **S**: 39.900 kg\n"
   },
+  "thermal_train_report": {
+    "capacity": {
+      "basis": "hardware_rating_minimum",
+      "capture_shortfall_kg": 0.0,
+      "capture_status": {
+        "reason": null,
+        "status": "captured"
+      },
+      "captured_batch_kg": 0.0,
+      "cavern_capacity_kg": 2850000.0,
+      "deposition_gate": {
+        "criterion": "p_O2 > P_sub(T_wall)",
+        "frost_forms": true,
+        "partial_pressure_Pa": 600000.0,
+        "sublimation_pressure_Pa": 146.33
+      },
+      "frost_sticking_fraction": 0.9,
+      "rated_cold_train_kg_hr": 9.856,
+      "rating_reference": {
+        "T_ref_K": 120.0,
+        "authority": "diagnostic_scalar_rating_reference_not_capacity_source",
+        "p_ref_Pa": 45000.0
+      },
+      "thermal_train_overflow_kg_hr": 0.0
+    },
+    "closure_status": "closed",
+    "condensation_crossings": {},
+    "display_costs": {
+      "amortized_per_campaign_usd": 4337.463426809224,
+      "captured_o2_display_value_usd": 0.0,
+      "compressor_installed_usd": 12290.836658882421,
+      "cryo_installed_basis": "cold_load_W_not_net_shaft_work",
+      "cryo_installed_usd": 65781.35167769429,
+      "fixed_run_cost_usd": 600.0,
+      "radiator_installed_usd": 8677.080199607766,
+      "source_tag": "owner-ratified-2026-07-13",
+      "status": "display_only_not_optimizer_objective",
+      "storage_keeping_psr_usd": 0.0,
+      "storage_keeping_warm_overburden_usd": 0.0,
+      "total_installed_usd": 86749.26853618448
+    },
+    "excluded_major_heat_carrier_species": [],
+    "excluded_refractory_trace_species": [],
+    "excluded_species": {},
+    "excluded_species_nonzero": false,
+    "footnotes": [
+      "Condensed-film sensible heat below each crossing is neglected relative to latent heat.",
+      "Cold-end work uses the seven-node Claude cycle; dry-expander shaft credit is explicit.",
+      "Cryogenic sizing is the night-path-only case; day-operation strategy remains deferred.",
+      "Melt-offgas O2 sensible duty is charged through S-A to 1000 K, then enters S-B at that post-separator datum.",
+      "SiO/CrO2 condenser enthalpy is not sourced in Phase 1a; exclusions are classified without reusing melt-side reaction enthalpy.",
+      "Cold-end capacity C is the minimum of compressor mass-flow and refrigeration freeze-rate ratings; the orifice is derived from C.",
+      "All kg and USD values are report-edge projections; internal enthalpy arithmetic is mol/s and W.",
+      "Hot and mid radiator sections conservatively sum per-species design maxima; the displayed hot peak is a concurrent snapshot maximum."
+    ],
+    "knudsen_anchors": {
+      "anchors": {
+        "cavern": {
+          "reason": "cavern pressure and characteristic state are not recorded",
+          "status": "inputs_required"
+        },
+        "duct": {
+          "status": "inputs_required"
+        },
+        "throat": {
+          "status": "inputs_required"
+        }
+      },
+      "refusals": [
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 0
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 1
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 2
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 3
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 4
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 5
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 6
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 7
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 8
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 9
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 10
+        },
+        {
+          "reason": "overhead pressure must be positive",
+          "snapshot_index": 11
+        }
+      ],
+      "status": "inputs_required"
+    },
+    "observed_upstream_state": {
+      "O2_vented_peak_kg_hr": 0.0,
+      "note": "observed legacy upstream diagnostics; not thermal-train overflow",
+      "transport_saturation_peak_pct": 0.0
+    },
+    "peaks": {
+      "cold_o2_kg_hr": 0.0,
+      "cold_o2_mol_hr": 0.0,
+      "hot_species_basis": "per_species_design_maxima_not_concurrent_sum",
+      "hot_species_kg_hr": {},
+      "hot_total_vapor_basis": "maximum_concurrent_snapshot_total",
+      "hot_total_vapor_kg_hr": 0,
+      "hot_total_vapor_projection_status": "complete"
+    },
+    "run_hours": 12,
+    "run_hours_basis": "one_hour_per_snapshot",
+    "schema_version": "thermal-train-report-v2",
+    "sections": {
+      "cavern_regeneration": {
+        "cavern_walls_J": 468049999.9999999,
+        "integration_segment_K": 50.0,
+        "oxygen_fusion_J": 0.0,
+        "oxygen_sensible_J": 0.0,
+        "total_J": 468049999.9999999
+      },
+      "cold_end_cycle": {
+        "edges": [
+          {
+            "device": "metering_orifice",
+            "from": 1,
+            "mass_flow_kg_hr": 9.856,
+            "to": 2
+          },
+          {
+            "device": "mixer_outlet",
+            "from": 2,
+            "mass_flow_kg_hr": 39.424,
+            "to": 3
+          },
+          {
+            "device": "compressor",
+            "from": 3,
+            "mass_flow_kg_hr": 39.424,
+            "to": 4
+          },
+          {
+            "device": "reject_radiator_then_recuperator_hp",
+            "from": 4,
+            "mass_flow_kg_hr": 39.424,
+            "to": 5
+          },
+          {
+            "device": "dry_work_expander",
+            "from": 5,
+            "mass_flow_kg_hr": 7.8848,
+            "to": 6
+          },
+          {
+            "device": "jt_valve",
+            "from": 5,
+            "mass_flow_kg_hr": 31.5392,
+            "to": 7
+          },
+          {
+            "device": "separator_liquid",
+            "from": 7,
+            "mass_flow_kg_hr": 9.856,
+            "to": "product"
+          },
+          {
+            "device": "separator_vapor_cold_return",
+            "from": 7,
+            "mass_flow_kg_hr": 21.683200000000003,
+            "to": 5
+          },
+          {
+            "device": "expander_exhaust_cold_return",
+            "from": 6,
+            "mass_flow_kg_hr": 7.8848,
+            "to": 5
+          },
+          {
+            "device": "recuperator_cold_return",
+            "from": 5,
+            "mass_flow_kg_hr": 29.567999999999998,
+            "to": 2
+          }
+        ],
+        "endpoint": "liquefier_77K",
+        "energy": {
+          "Q_c_W": 657.8135167769428,
+          "Q_h_W": 6720.277065888269,
+          "W_comp_W": 6145.4183294412105,
+          "W_net_W": 6062.463549111325,
+          "W_turb_out_W": 82.95478032988525,
+          "cold_load_W": 657.8135167769428,
+          "compressor_work_W": 6145.4183294412105,
+          "control_volume_identity": "h0 leaves only through wall heat or shaft work",
+          "device_relative_residuals": {
+            "cold_return_mixer_W": 0.0,
+            "compressor_W": 0.0,
+            "mixer_W": 0.0,
+            "recuperator_W": -1.2372531856753898e-16,
+            "reject_radiator_W": 0.0,
+            "separator_W": 0.0,
+            "turbine_W": -3.4261689702967985e-16
+          },
+          "device_residuals_W": {
+            "cold_return_mixer_W": 0.0,
+            "compressor_W": 0.0,
+            "mixer_W": 0.0,
+            "recuperator_W": -2.5870071517096625e-13,
+            "reject_radiator_W": 0.0,
+            "separator_W": 0.0,
+            "turbine_W": -2.842170943040401e-14
+          },
+          "lox_77K_enthalpy_basis": "NBP latent plus gas sensible; 90.188-to-77 K liquid subcooling omitted because no sourced liquid-Cp anchor is configured",
+          "net_work_W": 6062.463549111325,
+          "plant_energy_in_W": 6803.231846218154,
+          "plant_energy_out_W": 6803.231846218155,
+          "plant_relative_residual": -1.3368568385310974e-16,
+          "plant_residual_W": -9.094947017729282e-13,
+          "radiator_reject_W": 6062.463549111326,
+          "reject_load_W": 6720.277065888269,
+          "separator_bath_temperature_K": 77.0,
+          "separator_cold_W": 657.8135167769428,
+          "turbine_work_out_W": 82.95478032988525
+        },
+        "mass_basis": {
+          "circulation_kg_hr": 39.424,
+          "expander_bypass_fraction": 0.2,
+          "expander_bypass_kg_hr": 7.8848,
+          "liquid_yield": 0.25,
+          "product_kg_hr": 9.856,
+          "return_kg_hr": 29.567999999999998,
+          "separator_inlet_kg_hr": 31.5392,
+          "separator_vapor_kg_hr": 21.683200000000003
+        },
+        "mass_residuals": {
+          "mixer_kg_hr": 0.0,
+          "return_kg_hr": 7.105427357601002e-15,
+          "separator_kg_hr": -3.552713678800501e-15
+        },
+        "metering_orifice": {
+          "back_pressure_Pa": 21000.0,
+          "capacity_authority": "derived_from_C_never_source_of_C",
+          "diameter_m": 0.0049999570315212,
+          "discharge_coefficient": 0.8,
+          "upstream_pressure_Pa": 45000.0,
+          "upstream_temperature_K": 120.0
+        },
+        "model": "claude_cycle_7_node_open_plant_v1",
+        "nodes": [
+          {
+            "P_Pa": 45000.0,
+            "T_K": 120.0,
+            "h_J_kg": 240272.79427729244,
+            "mass_flow_kg_hr": 9.856,
+            "name": "furnace_overhead_makeup",
+            "node": 1
+          },
+          {
+            "P_Pa": 21000.0,
+            "T_K": 291.68553074785814,
+            "h_J_kg": 396715.38908537495,
+            "mass_flow_kg_hr": 39.424,
+            "name": "mixer",
+            "node": 2
+          },
+          {
+            "P_Pa": 21000.0,
+            "T_K": 291.68553074785814,
+            "h_J_kg": 396715.38908537495,
+            "mass_flow_kg_hr": 39.424,
+            "name": "compressor_suction",
+            "node": 3
+          },
+          {
+            "P_Pa": 600000.0,
+            "T_K": 907.6342625568681,
+            "h_J_kg": 957883.8647851609,
+            "mass_flow_kg_hr": 39.424,
+            "name": "compressor_discharge",
+            "node": 4
+          },
+          {
+            "P_Pa": 600000.0,
+            "T_K": 90.42852860584512,
+            "h_J_kg": 213357.45800522531,
+            "mass_flow_kg_hr": 39.424,
+            "name": "recuperator_hp_out",
+            "node": 5
+          },
+          {
+            "P_Pa": 21000.0,
+            "T_K": 48.85618234513593,
+            "h_J_kg": 175482.4061094782,
+            "mass_flow_kg_hr": 7.8848,
+            "name": "dry_expander_exhaust",
+            "node": 6
+          },
+          {
+            "P_Pa": 21000.0,
+            "T_K": 90.42852860584512,
+            "h_J_kg": 213357.45800522531,
+            "mass_flow_kg_hr": 31.5392,
+            "name": "jt_exit_separator_inlet",
+            "node": 7
+          }
+        ],
+        "refrigeration_work_W": 6062.463549111325,
+        "relief": {
+          "k_relief_kg_hr_Pa": 0.001,
+          "law": "mass_flow_kg_hr=k_relief_kg_hr_Pa*max(P_Pa-p_open_Pa,0)",
+          "p_open_Pa": 800000.0,
+          "vessel_rating_Pa": 1000000.0
+        },
+        "sizing_path": "night_path_only"
+      },
+      "compressor": {
+        "compressor_shaft_W": 6145.4183294412105,
+        "intercooler_reject_W": 0.0,
+        "model": "claude_cycle_circulation_compressor"
+      },
+      "cryo_tail": {
+        "cold_load_W": 657.8135167769428,
+        "edges": [
+          {
+            "device": "metering_orifice",
+            "from": 1,
+            "mass_flow_kg_hr": 9.856,
+            "to": 2
+          },
+          {
+            "device": "mixer_outlet",
+            "from": 2,
+            "mass_flow_kg_hr": 39.424,
+            "to": 3
+          },
+          {
+            "device": "compressor",
+            "from": 3,
+            "mass_flow_kg_hr": 39.424,
+            "to": 4
+          },
+          {
+            "device": "reject_radiator_then_recuperator_hp",
+            "from": 4,
+            "mass_flow_kg_hr": 39.424,
+            "to": 5
+          },
+          {
+            "device": "dry_work_expander",
+            "from": 5,
+            "mass_flow_kg_hr": 7.8848,
+            "to": 6
+          },
+          {
+            "device": "jt_valve",
+            "from": 5,
+            "mass_flow_kg_hr": 31.5392,
+            "to": 7
+          },
+          {
+            "device": "separator_liquid",
+            "from": 7,
+            "mass_flow_kg_hr": 9.856,
+            "to": "product"
+          },
+          {
+            "device": "separator_vapor_cold_return",
+            "from": 7,
+            "mass_flow_kg_hr": 21.683200000000003,
+            "to": 5
+          },
+          {
+            "device": "expander_exhaust_cold_return",
+            "from": 6,
+            "mass_flow_kg_hr": 7.8848,
+            "to": 5
+          },
+          {
+            "device": "recuperator_cold_return",
+            "from": 5,
+            "mass_flow_kg_hr": 29.567999999999998,
+            "to": 2
+          }
+        ],
+        "endpoint": "liquefier_77K",
+        "energy": {
+          "Q_c_W": 657.8135167769428,
+          "Q_h_W": 6720.277065888269,
+          "W_comp_W": 6145.4183294412105,
+          "W_net_W": 6062.463549111325,
+          "W_turb_out_W": 82.95478032988525,
+          "cold_load_W": 657.8135167769428,
+          "compressor_work_W": 6145.4183294412105,
+          "control_volume_identity": "h0 leaves only through wall heat or shaft work",
+          "device_relative_residuals": {
+            "cold_return_mixer_W": 0.0,
+            "compressor_W": 0.0,
+            "mixer_W": 0.0,
+            "recuperator_W": -1.2372531856753898e-16,
+            "reject_radiator_W": 0.0,
+            "separator_W": 0.0,
+            "turbine_W": -3.4261689702967985e-16
+          },
+          "device_residuals_W": {
+            "cold_return_mixer_W": 0.0,
+            "compressor_W": 0.0,
+            "mixer_W": 0.0,
+            "recuperator_W": -2.5870071517096625e-13,
+            "reject_radiator_W": 0.0,
+            "separator_W": 0.0,
+            "turbine_W": -2.842170943040401e-14
+          },
+          "lox_77K_enthalpy_basis": "NBP latent plus gas sensible; 90.188-to-77 K liquid subcooling omitted because no sourced liquid-Cp anchor is configured",
+          "net_work_W": 6062.463549111325,
+          "plant_energy_in_W": 6803.231846218154,
+          "plant_energy_out_W": 6803.231846218155,
+          "plant_relative_residual": -1.3368568385310974e-16,
+          "plant_residual_W": -9.094947017729282e-13,
+          "radiator_reject_W": 6062.463549111326,
+          "reject_load_W": 6720.277065888269,
+          "separator_bath_temperature_K": 77.0,
+          "separator_cold_W": 657.8135167769428,
+          "turbine_work_out_W": 82.95478032988525
+        },
+        "mass_basis": {
+          "circulation_kg_hr": 39.424,
+          "expander_bypass_fraction": 0.2,
+          "expander_bypass_kg_hr": 7.8848,
+          "liquid_yield": 0.25,
+          "product_kg_hr": 9.856,
+          "return_kg_hr": 29.567999999999998,
+          "separator_inlet_kg_hr": 31.5392,
+          "separator_vapor_kg_hr": 21.683200000000003
+        },
+        "mass_residuals": {
+          "mixer_kg_hr": 0.0,
+          "return_kg_hr": 7.105427357601002e-15,
+          "separator_kg_hr": -3.552713678800501e-15
+        },
+        "metering_orifice": {
+          "back_pressure_Pa": 21000.0,
+          "capacity_authority": "derived_from_C_never_source_of_C",
+          "diameter_m": 0.0049999570315212,
+          "discharge_coefficient": 0.8,
+          "upstream_pressure_Pa": 45000.0,
+          "upstream_temperature_K": 120.0
+        },
+        "model": "claude_cycle_7_node_open_plant_v1",
+        "nodes": [
+          {
+            "P_Pa": 45000.0,
+            "T_K": 120.0,
+            "h_J_kg": 240272.79427729244,
+            "mass_flow_kg_hr": 9.856,
+            "name": "furnace_overhead_makeup",
+            "node": 1
+          },
+          {
+            "P_Pa": 21000.0,
+            "T_K": 291.68553074785814,
+            "h_J_kg": 396715.38908537495,
+            "mass_flow_kg_hr": 39.424,
+            "name": "mixer",
+            "node": 2
+          },
+          {
+            "P_Pa": 21000.0,
+            "T_K": 291.68553074785814,
+            "h_J_kg": 396715.38908537495,
+            "mass_flow_kg_hr": 39.424,
+            "name": "compressor_suction",
+            "node": 3
+          },
+          {
+            "P_Pa": 600000.0,
+            "T_K": 907.6342625568681,
+            "h_J_kg": 957883.8647851609,
+            "mass_flow_kg_hr": 39.424,
+            "name": "compressor_discharge",
+            "node": 4
+          },
+          {
+            "P_Pa": 600000.0,
+            "T_K": 90.42852860584512,
+            "h_J_kg": 213357.45800522531,
+            "mass_flow_kg_hr": 39.424,
+            "name": "recuperator_hp_out",
+            "node": 5
+          },
+          {
+            "P_Pa": 21000.0,
+            "T_K": 48.85618234513593,
+            "h_J_kg": 175482.4061094782,
+            "mass_flow_kg_hr": 7.8848,
+            "name": "dry_expander_exhaust",
+            "node": 6
+          },
+          {
+            "P_Pa": 21000.0,
+            "T_K": 90.42852860584512,
+            "h_J_kg": 213357.45800522531,
+            "mass_flow_kg_hr": 31.5392,
+            "name": "jt_exit_separator_inlet",
+            "node": 7
+          }
+        ],
+        "refrigeration_work_W": 6062.463549111325,
+        "reject_load_W": 6720.277065888269,
+        "relief": {
+          "k_relief_kg_hr_Pa": 0.001,
+          "law": "mass_flow_kg_hr=k_relief_kg_hr_Pa*max(P_Pa-p_open_Pa,0)",
+          "p_open_Pa": 800000.0,
+          "vessel_rating_Pa": 1000000.0
+        },
+        "sizing_path": "night_path_only"
+      },
+      "hot_radiator": {
+        "active_lift_W": 0.0,
+        "area_m2": 0.0,
+        "latent_area_m2": 0.0,
+        "latent_crossings": {},
+        "latent_load_W": 0.0,
+        "sensible_area_m2": 0.0,
+        "sensible_load_W": 0.0,
+        "sizing_basis": "per_species_maxima_conservative",
+        "status": "sized"
+      },
+      "intercooler_radiator": {
+        "area_m2": 0.0,
+        "load_W": 0.0,
+        "sizing_temperature_K": 225.0
+      },
+      "mid_radiator": {
+        "active_lift_W": 0.0,
+        "area_m2": 0.0,
+        "latent_area_m2": 0.0,
+        "latent_crossings": {},
+        "latent_load_W": 0.0,
+        "sensible_area_m2": 0.0,
+        "sensible_load_W": 0.0,
+        "sizing_basis": "per_species_maxima_conservative",
+        "status": "sized"
+      },
+      "o2_passive_radiator_day": {
+        "active_lift_W": 0.0,
+        "area_m2": 0.0,
+        "inlet_basis": "post_separator_S_B",
+        "inlet_temperature_K": 1000.0,
+        "latent_area_m2": 0.0,
+        "latent_crossings": {},
+        "latent_load_W": 0.0,
+        "reason": "target_not_above_effective_sink_margin",
+        "sensible_area_m2": 0.0,
+        "sensible_load_W": 0.0,
+        "status": "passive_refused"
+      },
+      "o2_passive_radiator_night": {
+        "active_lift_W": 0.0,
+        "area_m2": 0.0,
+        "inlet_basis": "post_separator_S_B",
+        "inlet_temperature_K": 1000.0,
+        "latent_area_m2": 0.0,
+        "latent_crossings": {},
+        "latent_load_W": 0.0,
+        "sensible_area_m2": 0.0,
+        "sensible_load_W": 0.0,
+        "status": "sized"
+      },
+      "reject_radiator": {
+        "area_m2": 17.354160399215534,
+        "load_W": 6720.277065888269
+      }
+    },
+    "snapshot_count": 12,
+    "status": "closed",
+    "train_closes_for_run": true
+  },
   "stage_purity_report": {
     "stage_0": {
       "stage_number": 0,
@@ -816,6 +1417,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -997,6 +1607,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -1178,6 +1797,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -1359,6 +1987,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -1540,6 +2177,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -1721,6 +2367,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -1902,6 +2557,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -2083,6 +2747,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -2264,6 +2937,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -2445,6 +3127,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "inject",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -2626,6 +3317,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "inject",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},
@@ -2807,6 +3507,15 @@
         "product_vapor_enthalpy_sink": 0,
         "net_unallocated": 0.0
       },
+      "shuttle_phase": "inject",
+      "shuttle_injected_kg_hr": 0.0,
+      "shuttle_reduced_kg_hr": 0.0,
+      "shuttle_metal_produced_kg_hr": 0.0,
+      "shuttle_K_inventory_kg": 0.0,
+      "shuttle_Na_inventory_kg": 0.0,
+      "shuttle_cycle": 0,
+      "mre_voltage_V": 0.0,
+      "mre_current_A": 0.0,
       "metal_yields_kg": {},
       "condensation_train_kg": {},
       "vapor_species_kg_hr": {},

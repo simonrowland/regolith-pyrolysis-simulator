@@ -46,6 +46,15 @@ PER_HOUR_KEYS = {
     "energy_electrical_plus_evaporation_cumulative_kWh",
     "energy_cumulative_breakdown_kWh",
     "energy_evaporation_breakdown_kWh",
+    "shuttle_phase",
+    "shuttle_injected_kg_hr",
+    "shuttle_reduced_kg_hr",
+    "shuttle_metal_produced_kg_hr",
+    "shuttle_K_inventory_kg",
+    "shuttle_Na_inventory_kg",
+    "shuttle_cycle",
+    "mre_voltage_V",
+    "mre_current_A",
 }
 PER_HOUR_DIAGNOSTIC_KEYS = {
     "fe_redox_split",

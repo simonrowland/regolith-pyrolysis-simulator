@@ -6,10 +6,12 @@ It is the single source of truth for both the CLI and the SocketIO
 stream's `per_hour_summary` frames; the schema is asserted in
 `tests/test_runner_smoke.py::test_runner_schema_shape_contract`.
 
-**Schema version:** `1.6.0`
+**Schema version:** `1.7.0`
 **Owning goal:** `#18 JSON-RUNNER-HARNESS`
 
-Schema 1.6.0 adds the unconditional top-level `product_classification` field.
+Schema 1.7.0 adds the unconditional top-level `thermal_train_report` field and
+the shuttle plus direct MRE voltage/current fields to each per-hour row. Schema
+1.6.0 added the unconditional top-level `product_classification` field.
 It preserves the raw five-bucket classifier output and its operator-facing
 markdown projection from the same completed simulation state.
 
@@ -70,7 +72,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
 
 ```jsonc
 {
-  "schema_version": "1.6.0",
+  "schema_version": "1.7.0",
   "run_metadata": {...},        // see "Run metadata"
   "final_state": {...},         // see "Final state"
   "final": {...},               // see "Final summary"
@@ -78,6 +80,7 @@ the in-process P6a trace harness used by the CLI-boundary parity test.
     "classification": {...},
     "markdown": "# Three-Product-Class Report\n..."
   },
+  "thermal_train_report": {...}, // canonical named thermal-train view data
   "stage_purity_report": {...}, // see "Stage purity report"
   "vapor_pressure_source_report": {...}, // see "Vapor pressure source report"
   "shuttle_refusal_history": [...], // see "Shuttle refusal history"
@@ -116,6 +119,12 @@ Early failure envelopes that have no simulator expose the stable empty shape
 reporting attempts the same projection but falls back to that empty shape so
 classification cannot mask the primary runner error.
 
+## Thermal-train report
+
+`thermal_train_report` is the canonical `AccountingQueries.thermal_train_report()`
+named-view data projected once from the run's recorded snapshots. The durable
+artifact copies this block unchanged; it does not rebuild the view.
+
 For a runner-strict result, a nonempty per-snapshot
 `metal_projection_drift_kg` audit remaps an otherwise successful result to
 `status: "failed"` with top-level `reason: "metal_projection_drift"`.
@@ -128,7 +137,7 @@ it does not introduce a new schema version.
 
 ```jsonc
 "run_metadata": {
-  "schema_version": "1.6.0",
+  "schema_version": "1.7.0",
   "feedstock_id":   "lunar_mare_low_ti",
   "campaign":       "C0",                    // starting campaign phase
   "hours_requested": 24,
@@ -515,6 +524,15 @@ mole, energy, pressure, or partition arithmetic.
     "energy_electrical_plus_evaporation_cumulative_kWh": 4.8,
     "energy_cumulative_breakdown_kWh": {},   // cumulative components by named mechanism
     "energy_evaporation_breakdown_kWh": {},  // this-hour evaporation components
+    "shuttle_phase": "inject",
+    "shuttle_injected_kg_hr": 0.5,
+    "shuttle_reduced_kg_hr": 0.8,
+    "shuttle_metal_produced_kg_hr": 0.6,
+    "shuttle_K_inventory_kg": 12.0,
+    "shuttle_Na_inventory_kg": 24.0,
+    "shuttle_cycle": 1,
+    "mre_voltage_V": 0.75,
+    "mre_current_A": 1000.0,
     "O2_yield_kg_cumulative": 0.0,           // legacy key; source-side O2 potential, kg
     "O2_source_side_potential_kg_cumulative": 0.0, // honest alias for the same value
     "O2_metric_label": "source-side O2 potential (emitted; not recovered)",
@@ -582,6 +600,9 @@ incident, stuck, re-evaporated, and net continuous flux and has
   batch totals. `energy_scope` and `furnace_heat_status` state that the
   reported total covers electrical plus known evaporation enthalpy, not a
   complete furnace heat-loss model.
+* Shuttle and direct MRE voltage/current fields are required verbatim
+  projections of the same `HourSnapshot` fields used by the live tick surface;
+  the runner does not round or reconstruct them.
 * `mass_balance_pct` is the simulator's own
   `HourSnapshot.mass_balance_error_pct` -- expected to stay below
   `5e-12 %` per the invariant tracked in `tests/test_mass_balance.py`.

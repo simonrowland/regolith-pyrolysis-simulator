@@ -112,7 +112,7 @@ from simulator.state import (
 )
 
 # Public schema version pinned by docs/runner-output-schema.md.
-RUNNER_SCHEMA_VERSION = "1.6.0"
+RUNNER_SCHEMA_VERSION = "1.7.0"
 ZERO_INPUT_BASIS_BREACH = "zero_input_basis_breach"
 RUNNER_MASS_BALANCE_LIMIT_PCT = 5.0e-12
 O2_SOURCE_SIDE_POTENTIAL_LABEL = (
@@ -1306,6 +1306,12 @@ class PyrolysisRun:
                     {"classification": {}, "markdown": ""},
                 ),
             ),
+            "thermal_train_report": _json_safe(
+                _safe_failure_value(
+                    lambda: _thermal_train_report(sim),
+                    {},
+                ),
+            ),
             "stage_purity_report": stage_purity_report(sim.train),
             "vapor_pressure_source_report": _vapor_pressure_source_report(sim),
             "shuttle_refusal_history": _json_safe(shuttle_refusal_history),
@@ -2116,6 +2122,17 @@ def build_per_hour_summary(
         "energy_evaporation_breakdown_kWh": _json_safe(
             dict(snapshot.energy.evaporation_breakdown_kWh)
         ),
+        "shuttle_phase": str(snapshot.shuttle_phase),
+        "shuttle_injected_kg_hr": float(snapshot.shuttle_injected_kg_hr),
+        "shuttle_reduced_kg_hr": float(snapshot.shuttle_reduced_kg_hr),
+        "shuttle_metal_produced_kg_hr": float(
+            snapshot.shuttle_metal_produced_kg_hr
+        ),
+        "shuttle_K_inventory_kg": float(snapshot.shuttle_K_inventory_kg),
+        "shuttle_Na_inventory_kg": float(snapshot.shuttle_Na_inventory_kg),
+        "shuttle_cycle": int(snapshot.shuttle_cycle),
+        "mre_voltage_V": float(snapshot.mre_voltage_V),
+        "mre_current_A": float(snapshot.mre_current_A),
         "metal_yields_kg": metal_yields,
         "condensation_train_kg": {
             species: float(kg)
@@ -2741,6 +2758,25 @@ def _product_classification_report(
             campaign=campaign,
         ),
     }
+
+
+def _thermal_train_report(sim: PyrolysisSimulator) -> dict[str, Any]:
+    """Project the canonical named view with deterministic mapping order."""
+    report = _json_safe(AccountingQueries(sim).thermal_train_report())
+
+    def ordered(value: Any) -> Any:
+        if isinstance(value, Mapping):
+            return {
+                str(key): ordered(child)
+                for key, child in sorted(
+                    value.items(), key=lambda item: str(item[0])
+                )
+            }
+        if isinstance(value, list):
+            return [ordered(child) for child in value]
+        return value
+
+    return ordered(report)
 
 
 def _wall_liner_resinter_config() -> dict[str, Any]:
@@ -4318,6 +4354,14 @@ def _runner_failure_result(
             )
             if sim is not None
             else {"classification": {}, "markdown": ""}
+        ),
+        "thermal_train_report": _json_safe(
+            _safe_failure_value(
+                lambda: _thermal_train_report(sim),
+                {},
+            )
+            if sim is not None
+            else {}
         ),
         "stage_purity_report": _json_safe(stage_report),
         "vapor_pressure_source_report": _json_safe(vapor_report),

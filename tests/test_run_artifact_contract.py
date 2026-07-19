@@ -156,6 +156,30 @@ def test_timestep_summary_is_the_verbatim_input_mapping() -> None:
     assert artifact["timesteps"][0]["summary"] is summary
 
 
+def test_terminal_preserves_precomputed_producer_blocks_without_reprojection(
+) -> None:
+    payload = _runner_payload()
+    thermal_train_report = {"schema_version": "thermal-train-report-v2"}
+    product_classification = {
+        "classification": {"metals_and_oxygen": {"Fe": 1.0}},
+        "markdown": "producer markdown",
+    }
+    payload["thermal_train_report"] = thermal_train_report
+    payload["product_classification"] = product_classification
+
+    artifact = build_run_artifact(payload, run_id="run-producer-blocks")
+
+    assert artifact["terminal"]["thermal_train_report"] is thermal_train_report
+    assert artifact["terminal"]["product_classification"] is product_classification
+
+
+def test_legacy_payload_omits_new_terminal_blocks() -> None:
+    artifact = build_run_artifact(_runner_payload(), run_id="run-legacy")
+
+    assert "thermal_train_report" not in artifact["terminal"]
+    assert "product_classification" not in artifact["terminal"]
+
+
 def test_header_and_terminal_key_contract_omits_unavailable_optional_fields(
     monkeypatch,
 ) -> None:

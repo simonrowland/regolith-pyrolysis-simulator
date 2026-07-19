@@ -30,6 +30,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.accounting import AccountingQueries
+from simulator.accounting.run_artifact import build_run_artifact
 from simulator.chemistry.kernel import ProviderUnavailableError
 from simulator.campaigns import CampaignManager
 from simulator.core import PoisonedHourError
@@ -105,6 +107,40 @@ def test_completed_run_emits_legible_product_classification() -> None:
     assert "Refractory ceramic rump" in report["markdown"]
 
 
+def test_completed_run_artifact_preserves_computed_views_and_hourly_controls() -> None:
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    payload = run._run_session(session)
+    artifact = build_run_artifact(payload, run_id="producer-attachment")
+    snapshot = session.simulator.record.snapshots[-1]
+    summary = artifact["timesteps"][-1]["summary"]
+
+    assert artifact["terminal"]["thermal_train_report"] == payload[
+        "thermal_train_report"
+    ] == AccountingQueries(session.simulator).thermal_train_report()
+    assert artifact["terminal"]["product_classification"] is payload[
+        "product_classification"
+    ]
+    assert summary["shuttle_phase"] == snapshot.shuttle_phase
+    assert summary["shuttle_injected_kg_hr"] == snapshot.shuttle_injected_kg_hr
+    assert summary["shuttle_reduced_kg_hr"] == snapshot.shuttle_reduced_kg_hr
+    assert summary["shuttle_metal_produced_kg_hr"] == (
+        snapshot.shuttle_metal_produced_kg_hr
+    )
+    assert summary["shuttle_K_inventory_kg"] == snapshot.shuttle_K_inventory_kg
+    assert summary["shuttle_Na_inventory_kg"] == snapshot.shuttle_Na_inventory_kg
+    assert summary["shuttle_cycle"] == snapshot.shuttle_cycle
+    assert summary["mre_voltage_V"] == snapshot.mre_voltage_V
+    assert summary["mre_current_A"] == snapshot.mre_current_A
+
+
 def test_completed_run_preserves_success_when_product_classification_raises(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -164,6 +200,15 @@ def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
         energy=energy,
         energy_electrical_plus_evaporation_cumulative_kWh=0.0,
         energy_cumulative_breakdown_kWh={},
+        shuttle_phase="",
+        shuttle_injected_kg_hr=0.0,
+        shuttle_reduced_kg_hr=0.0,
+        shuttle_metal_produced_kg_hr=0.0,
+        shuttle_K_inventory_kg=0.0,
+        shuttle_Na_inventory_kg=0.0,
+        shuttle_cycle=0,
+        mre_voltage_V=0.0,
+        mre_current_A=0.0,
         condensation_totals={},
         evap_flux=SimpleNamespace(species_kg_hr={}),
         wall_deposit_by_segment_species_delta={},
@@ -182,6 +227,36 @@ def test_per_hour_summary_sanitizes_nonfinite_numeric_telemetry():
     assert summary["mass_balance_pct"] is None
     assert summary["O2_yield_kg_cumulative"] is None
     json.dumps(summary, allow_nan=False)
+
+
+def test_per_hour_summary_preserves_nonzero_shuttle_and_mre_snapshot_values():
+    snapshot = HourSnapshot(hour=7, campaign=CampaignPhase.C3_K)
+    snapshot.shuttle_phase = "inject"
+    snapshot.shuttle_injected_kg_hr = 1.25
+    snapshot.shuttle_reduced_kg_hr = 2.5
+    snapshot.shuttle_metal_produced_kg_hr = 3.75
+    snapshot.shuttle_K_inventory_kg = 4.125
+    snapshot.shuttle_Na_inventory_kg = 5.25
+    snapshot.shuttle_cycle = 6
+    snapshot.mre_voltage_V = 1.45
+    snapshot.mre_current_A = 987.6
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+        record=SimpleNamespace(snapshots=(snapshot,)),
+    )
+
+    summary = build_per_hour_summary(sim, snapshot, include_fe_redox_split=False)
+
+    assert summary["shuttle_phase"] == "inject"
+    assert summary["shuttle_injected_kg_hr"] == 1.25
+    assert summary["shuttle_reduced_kg_hr"] == 2.5
+    assert summary["shuttle_metal_produced_kg_hr"] == 3.75
+    assert summary["shuttle_K_inventory_kg"] == 4.125
+    assert summary["shuttle_Na_inventory_kg"] == 5.25
+    assert summary["shuttle_cycle"] == 6
+    assert summary["mre_voltage_V"] == 1.45
+    assert summary["mre_current_A"] == 987.6
 
 
 @pytest.mark.parametrize(
@@ -256,6 +331,7 @@ TOP_LEVEL_KEYS = frozenset({
     "final_state",
     "final",
     "product_classification",
+    "thermal_train_report",
     "stage_purity_report",
     "vapor_pressure_source_report",
     "shuttle_refusal_history",
@@ -324,6 +400,15 @@ PER_HOUR_KEYS = frozenset({
     "energy_electrical_plus_evaporation_cumulative_kWh",
     "energy_cumulative_breakdown_kWh",
     "energy_evaporation_breakdown_kWh",
+    "shuttle_phase",
+    "shuttle_injected_kg_hr",
+    "shuttle_reduced_kg_hr",
+    "shuttle_metal_produced_kg_hr",
+    "shuttle_K_inventory_kg",
+    "shuttle_Na_inventory_kg",
+    "shuttle_cycle",
+    "mre_voltage_V",
+    "mre_current_A",
     "metal_yields_kg",
     "condensation_train_kg",
     "vapor_species_kg_hr",
@@ -783,7 +868,7 @@ def _assert_schema_shape(payload: dict) -> None:
       this without picking a specific scenario.
     """
 
-    assert RUNNER_SCHEMA_VERSION == "1.6.0"
+    assert RUNNER_SCHEMA_VERSION == "1.7.0"
     assert set(payload) == TOP_LEVEL_KEYS, (
         f"top-level keys drift: {set(payload) - TOP_LEVEL_KEYS} extra, "
         f"{TOP_LEVEL_KEYS - set(payload)} missing"
