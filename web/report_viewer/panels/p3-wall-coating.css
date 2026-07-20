@@ -1,0 +1,137 @@
+.sec-p3-wall-coating .sec-p3-context {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.sec-p3-wall-coating .sec-p3-context > div {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+}
+
+.sec-p3-wall-coating .sec-p3-context > div > span,
+.sec-p3-wall-coating .sec-p3-hour-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink-3);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.sec-p3-wall-coating .sec-p3-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.sec-p3-wall-coating .sec-p3-badge,
+.sec-p3-wall-coating .sec-p3-watch {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  max-width: 100%;
+  padding: 4px 7px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink-2);
+  background: var(--panel);
+  font: 9px/1.25 "SFMono-Regular", Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.sec-p3-wall-coating .sec-p3-watch {
+  margin-left: 7px;
+  border-color: color-mix(in srgb, var(--orange) 55%, var(--rule));
+  color: var(--accent-ink);
+}
+
+.sec-p3-wall-coating .sec-p3-species {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.sec-p3-wall-coating .sec-p3-species i {
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 2px;
+}
+
+.sec-p3-wall-coating .sec-p3-missing {
+  color: var(--ink-3);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+}
+
+.sec-p3-wall-coating h3 {
+  margin: 18px 0 8px;
+  font-size: 13px;
+  letter-spacing: .03em;
+}
+
+.sec-p3-wall-coating .sec-p3-geometry {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-3);
+  font-size: 10px;
+}
+
+.sec-p3-wall-coating .sec-p3-geometry > span {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.sec-p3-wall-coating .sec-p3-details {
+  margin-top: 12px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+}
+
+.sec-p3-wall-coating .sec-p3-details > summary {
+  padding: 11px 13px;
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.sec-p3-wall-coating .sec-p3-details[open] > summary {
+  border-bottom: 1px solid var(--rule);
+}
+
+.sec-p3-wall-coating .sec-p3-details > :not(summary) {
+  margin: 10px;
+}
+
+.sec-p3-wall-coating .sec-p3-state {
+  margin: 0;
+}
+
+.sec-p3-wall-coating .sec-p3-lifetime {
+  display: grid;
+  gap: 5px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--orange);
+  background: color-mix(in srgb, var(--orange) 7%, var(--panel));
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.sec-p3-wall-coating .sec-p3-lifetime b {
+  color: var(--ink);
+}
+
+@media (max-width: 768px) {
+  .sec-p3-wall-coating .sec-p3-context {
+    grid-template-columns: 1fr;
+  }
+}
