@@ -193,38 +193,40 @@ def test_p13_registers_renders_emitted_facts_and_pins_on_update() -> None:
     result = _run_panel(artifact, [0])
     html = result["rendered"]
     update = result["updates"][0]
+    redox = _tile(html, "redox", "flow")
+    flow = _tile(html, "flow", "mre")
+    mre = _tile(html, "mre")
 
     assert result["id"] == "sec-p13-status-strip"
     assert result["hasRender"] and result["hasOnTimestep"]
-    assert "log fO₂ -9" in html
-    assert "IW buffer log fO₂ -71.6" in html
-    assert "ΔIW not emitted" in html
-    assert "ΔIW -71.6" not in html
-    assert "Fe³⁺/ΣFe" in html
-    assert "Native Fe 0 · event status: deferred" in html
-    assert "event reason: deferred_not_liquid_for_redox" in html
-    assert "backend redox ledger" in html
-    assert "Reference</dt><dd>IW buffer</dd>" in html
-    assert "Redox diagnostic status" in html
-    redox = _tile(html, "redox", "flow")
+    assert "log fO₂ -9" in redox
+    assert "IW buffer log fO₂ -71.6" in redox
+    assert "ΔIW not emitted" in redox
+    assert "ΔIW -71.6" not in redox
+    assert "Fe³⁺/ΣFe" in redox
+    assert "Native Fe 0 · event status: deferred" in redox
+    assert "event reason: deferred_not_liquid_for_redox" in redox
+    assert "backend redox ledger" in redox
+    assert "Reference</dt><dd>IW buffer</dd>" in redox
+    assert "Redox diagnostic status" in redox
     assert ">authoritative: false</span>" in redox
     assert ">diagnostic_only: true</span>" in redox
     assert ">extrapolation: true</span>" in redox
     assert ">high_uncertainty: true</span>" in redox
-    assert "viscous / swept" in html
-    assert "Kn 0.00382" in html
-    assert "bernoulli_swept_v2" in html
-    assert "Campaign: C5" in html
-    assert "Ladder 4.75 V" in html
-    assert "diagnostic_uncertified" in html
-    assert "authoritative_ellingham_graph_with_static_fallback" in html
-    assert "NiO: 4.752 V" in html
-    assert "voltage authority: ellingham_graph" in html
-    assert "voltage authoritative: true" in html
-    assert "voltage status: ok" in html
-    assert "MRE activity: not emitted" in html
-    flow = _tile(update, "flow", "mre")
-    assert _class_inner(flow, "sec-p13-headline") == "viscous / swept"
+    assert "viscous / swept" in flow
+    assert "Kn 0.00382" in flow
+    assert "bernoulli_swept_v2" in flow
+    assert "Campaign: C5" in mre
+    assert "Ladder 4.75 V" in mre
+    assert "diagnostic_uncertified" in mre
+    assert "authoritative_ellingham_graph_with_static_fallback" in mre
+    assert "NiO: 4.752 V" in mre
+    assert "voltage authority: ellingham_graph" in mre
+    assert "voltage authoritative: true" in mre
+    assert "voltage status: ok" in mre
+    assert "MRE activity: not emitted" in mre
+    update_flow = _tile(update, "flow", "mre")
+    assert _class_inner(update_flow, "sec-p13-headline") == "viscous / swept"
 
 
 def test_p13_pins_inside_stepper_immediately_before_current_grid() -> None:
@@ -401,18 +403,33 @@ def test_p13_partial_subtrees_withhold_absent_numbers_and_unqualified_voltage() 
     assert "ΔIW 70" not in html
 
 
-def test_p13_emitted_fraction_parts_do_not_synthesize_missing_ratio() -> None:
+@pytest.mark.parametrize(
+    ("missing_key", "pending_label", "forbidden_render"),
+    [
+        ("fe3_over_sigma_fe", "Fe³⁺/ΣFe", "Fe³⁺/ΣFe 0.9984"),
+        ("ferric_frac", "Ferric fraction", "Ferric fraction</dt><dd>0.9984"),
+        ("ferrous_frac", "Ferrous fraction", "Ferrous fraction</dt><dd>0.0016"),
+        ("native_fe_frac", "Native Fe fraction", "Native Fe fraction</dt><dd>0"),
+    ],
+)
+def test_p13_emitted_fraction_parts_do_not_synthesize_missing_values(
+    missing_key: str,
+    pending_label: str,
+    forbidden_render: str,
+) -> None:
     summary = _present_summary()
     redox_summary = summary["fe_redox_split"]
-    redox_summary.pop("fe3_over_sigma_fe")
-    redox_summary["ferric_frac"] = 0.25
-    redox_summary["ferrous_frac"] = 0.75
+    redox_summary.pop(missing_key)
     html = _run_panel({"timesteps": [{"summary": summary}]})["rendered"]
     redox = _tile(html, "redox", "flow")
 
-    assert _class_inner(redox, "sec-p13-fact") == "Ferric 0.25 · ferrous 0.75"
-    assert "Fe³⁺/ΣFe</dt><dd>not emitted</dd>" in redox
-    assert "Fe³⁺/ΣFe 0.25" not in redox
+    assert f"{pending_label}</dt><dd>not emitted</dd>" in redox
+    assert forbidden_render not in redox
+    if missing_key == "fe3_over_sigma_fe":
+        assert _class_inner(redox, "sec-p13-fact") == "Ferric 0.9984 · ferrous 0.0016"
+    elif missing_key == "native_fe_frac":
+        assert "Native Fe not emitted · event status: deferred" in redox
+        assert "Native Fe 0 · event status" not in redox
 
 
 def test_p13_object_kn_does_not_infer_missing_regime() -> None:
@@ -468,7 +485,14 @@ def test_p13_all_artifact_text_routes_escape_exactly_once() -> None:
         "authority": "<redox-authority>",
     }
     redox.update(redox_values)
+    native_event_values = {
+        "native_fe_event": "<native-event-route>",
+        "native_fe_event_status": "<native-event-status-route>",
+        "native_fe_event_reason": "<native-event-reason-route>",
+    }
+    redox["native_fe_saturation_event"].update(native_event_values)
     summary["regime"] = "<flow-regime>"
+    summary["transport_formula_id"] = "<transport-formula-route>"
     summary["campaign"] = "<campaign-route>"
     diagnostic = summary["mre_ellingham_ladder_diagnostic"]
     diagnostic_values = {
@@ -480,6 +504,7 @@ def test_p13_all_artifact_text_routes_escape_exactly_once() -> None:
         "refusal_context": "<diagnostic-refusal-context>",
     }
     diagnostic.update(diagnostic_values)
+    diagnostic["certification"] = "<diagnostic-certification-route>"
     diagnostic["derived_Ed_V"] = {"<species-route>": 1.2}
     diagnostic["species"] = {
         "<species-route>": {
@@ -501,11 +526,23 @@ def test_p13_all_artifact_text_routes_escape_exactly_once() -> None:
         ("Refusal context", "redox-refusal-context"),
     ):
         assert f"{label}</dt><dd>&lt;{value}&gt;</dd>" in redox_html
+    for label, value in (
+        ("Native Fe event", "native-event-route"),
+        ("Native Fe event status", "native-event-status-route"),
+        ("Native Fe event reason", "native-event-reason-route"),
+    ):
+        assert f"{label}</dt><dd>&lt;{value}&gt;</dd>" in redox_html
+    assert (
+        "event status: &lt;native-event-status-route&gt; · "
+        "event reason: &lt;native-event-reason-route&gt;"
+    ) in redox_html
     assert "authority: &lt;redox-authority&gt;" in redox_html
     assert _class_inner(flow_html, "sec-p13-headline") == (
         "regime token: &lt;flow-regime&gt;"
     )
+    assert "Transport formula</dt><dd>&lt;transport-formula-route&gt;</dd>" in flow_html
     assert "Campaign: &lt;campaign-route&gt;" in mre_html
+    assert ">&lt;diagnostic-certification-route&gt;</span>" in mre_html
     for label, value in (
         ("Authority", "diagnostic-authority"),
         ("Status", "diagnostic-status"),
@@ -522,9 +559,12 @@ def test_p13_all_artifact_text_routes_escape_exactly_once() -> None:
         raw in html
         for raw in (
             *redox_values.values(),
+            *native_event_values.values(),
             *diagnostic_values.values(),
             "<flow-regime>",
+            "<transport-formula-route>",
             "<campaign-route>",
+            "<diagnostic-certification-route>",
             "<species-route>",
             "<voltage-authority-route>",
             "<voltage-status-route>",
@@ -575,6 +615,9 @@ def test_p13_numeric_routes_distinguish_absent_empty_malformed_and_zero(
     assert f"Redox diagnostic status</dt><dd>{expected_scalar}</dd>" in redox
     assert f"Kn {expected_kn}" in flow
     assert f"CoO: {expected_voltage}" in mre
+    assert "voltage authority: not emitted" in mre
+    assert "voltage authoritative: false" in mre
+    assert "voltage status: decomposition_voltage_unavailable" in mre
 
 
 def test_p13_empty_emitted_maps_are_not_rendered_as_absent() -> None:
