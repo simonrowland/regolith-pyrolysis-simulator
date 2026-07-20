@@ -244,7 +244,7 @@ def test_p3_absent_fields_stay_pending_without_coating_verdict() -> None:
         "run_metadata": {"knudsen_regime_diagnostic": {}},
     }
     sparse_html = _render_panel(sparse_knudsen)["html"]
-    assert "Transport context pending" in sparse_html
+    assert "Transport context empty" in sparse_html
 
     empty_knudsen = _artifact()
     empty_knudsen["terminal"] = {
@@ -283,6 +283,20 @@ def test_p3_absent_fields_stay_pending_without_coating_verdict() -> None:
     assert "Regime</b> malformed (object)" in malformed_transport
     assert "Carrier</b> malformed (array)" in malformed_transport
     assert "Kn</b> malformed (string)" in malformed_transport
+
+    for kn_value, expected in (("", "Kn</b> empty"), (None, "Kn</b> malformed (null)")):
+        scalar_knudsen = _artifact()
+        scalar_knudsen["terminal"] = {
+            "run_metadata": {
+                "knudsen_regime_diagnostic": {"knudsen_number": kn_value},
+            },
+        }
+        scalar_transport = _region(
+            _render_panel(scalar_knudsen)["html"],
+            "<span>Transport context</span>",
+            '<div class="sec-p3-coating-status">',
+        )
+        assert expected in scalar_transport
 
     for final_value, expected in (
         ({"wall_deposit_by_species_kg": {}}, "Terminal aggregate empty"),
@@ -508,18 +522,18 @@ def test_p3_mixed_partial_sources_rank_each_species_by_best_emitted_value() -> N
 
 
 def test_p3_raw_render_and_timestep_guards_cover_malformed_inputs() -> None:
-    malformed_artifacts: tuple[object, ...] = (
-        None,
-        {},
-        [],
-        {"terminal": None},
-        {"terminal": {}, "timesteps": None},
-        {"terminal": {}, "timesteps": "malformed"},
+    malformed_artifacts: tuple[tuple[object, str], ...] = (
+        (None, "Hourly coating telemetry pending"),
+        ({}, "Hourly coating telemetry pending"),
+        ([], "Timestep list malformed"),
+        ({"terminal": None}, "Hourly coating telemetry pending"),
+        ({"terminal": {}, "timesteps": None}, "Timestep list malformed"),
+        ({"terminal": {}, "timesteps": "malformed"}, "Timestep list malformed"),
     )
-    for artifact in malformed_artifacts:
+    for artifact, expected_hourly_state in malformed_artifacts:
         rendered = _render_panel(artifact, timestep_index=0)
         assert "Per-species wall deposits pending" in rendered["html"]
-        assert "Hourly coating telemetry pending" in rendered["hourly"]
+        assert expected_hourly_state in rendered["hourly"]
         assert "Selected hour · not emitted" in rendered["hourly"]
 
     valid = _artifact()
@@ -529,8 +543,12 @@ def test_p3_raw_render_and_timestep_guards_cover_malformed_inputs() -> None:
         assert "Hourly coating telemetry pending" in hourly
         assert "Selected hour · not emitted" in hourly
 
+    empty_timesteps = _render_panel(_artifact(), timestep_index=0)["hourly"]
+    assert "Timestep list empty" in empty_timesteps
+    assert "Selected hour · not emitted" in empty_timesteps
+
     missing_target = _render_panel(valid, timestep_index=0, target_present=False)
-    assert "Hourly coating telemetry pending" in missing_target["html"]
+    assert "Selected-hour summary empty" in missing_target["html"]
     assert missing_target["hourly"] == ""
 
 
@@ -562,3 +580,318 @@ def test_p3_wall_lifetime_present_path_surfaces_payload_without_viewer_verdict()
     # Emitting payload numbers is required; inventing a gate chip is still forbidden.
     assert "CLEAR" not in lifetime
     assert "ruined" not in lifetime
+
+
+def test_p3_container_states_stay_distinct_in_routing_and_context_regions() -> None:
+    def source_region(artifact: object) -> str:
+        return _region(
+            _render_panel(artifact)["html"],
+            '<p class="sub">',
+            '<div class="sec-p3-context">',
+        )
+
+    assert "Report artifact</b> not emitted" in source_region(None)
+    assert "Report artifact</b> empty" in source_region({})
+    assert "Report artifact</b> malformed (array)" in source_region([])
+
+    missing = source_region({"terminal": {"other": True}})
+    assert "Final summary</b> not emitted" in missing
+    assert "Run metadata</b> not emitted" in missing
+    assert "Timesteps</b> not emitted" in missing
+
+    empty = source_region({"terminal": {"final": {}, "run_metadata": {}}, "timesteps": []})
+    assert "Final summary</b> empty" in empty
+    assert "Run metadata</b> empty" in empty
+    assert "Timesteps</b> empty" in empty
+
+    malformed = source_region({"terminal": {"final": [], "run_metadata": []}, "timesteps": {}})
+    assert "Final summary</b> malformed (array)" in malformed
+    assert "Run metadata</b> malformed (array)" in malformed
+    assert "Timesteps</b> malformed (object)" in malformed
+
+    for coating_value, expected in (
+        (None, "Coating diagnostic</b> not emitted"),
+        ({}, "Coating diagnostic</b> empty"),
+        ([], "Coating diagnostic</b> malformed (array)"),
+    ):
+        metadata = {} if coating_value is None else {
+            "pressure_coating_pareto_diagnostic": coating_value,
+        }
+        artifact = {"terminal": {"run_metadata": metadata}, "timesteps": []}
+        coating_region = _region(
+            _render_panel(artifact)["html"],
+            '<div class="sec-p3-coating-status">',
+            "<h3>Wall deposit by species</h3>",
+        )
+        assert expected in coating_region
+
+    malformed_status = {
+        "terminal": {
+            "run_metadata": {
+                "pressure_coating_pareto_diagnostic": {"status": {}},
+            },
+        },
+        "timesteps": [],
+    }
+    malformed_status_region = _region(
+        _render_panel(malformed_status)["html"],
+        '<div class="sec-p3-coating-status">',
+        "<h3>Wall deposit by species</h3>",
+    )
+    assert "Status</b> malformed (object)" in malformed_status_region
+
+    emitted_without_status = {
+        "terminal": {
+            "run_metadata": {
+                "pressure_coating_pareto_diagnostic": {
+                    "by_species": {"SiO": {"status": "ok"}},
+                },
+            },
+        },
+        "timesteps": [],
+    }
+    emitted_without_status_region = _region(
+        _render_panel(emitted_without_status)["html"],
+        '<div class="sec-p3-coating-status">',
+        "<h3>Wall deposit by species</h3>",
+    )
+    assert "Diagnostic status</b> not emitted" in emitted_without_status_region
+    assert "<b>Diagnostic</b> not emitted" not in emitted_without_status_region
+
+    for knudsen_value, expected in (
+        (None, "Transport context pending"),
+        ({}, "Transport context empty"),
+        ([], "Transport context malformed"),
+    ):
+        metadata = {} if knudsen_value is None else {
+            "knudsen_regime_diagnostic": knudsen_value,
+        }
+        artifact = {"terminal": {"run_metadata": metadata}, "timesteps": []}
+        transport = _region(
+            _render_panel(artifact)["html"],
+            "<span>Transport context</span>",
+            '<div class="sec-p3-coating-status">',
+        )
+        assert expected in transport
+
+    for geometry_value, expected in (
+        (None, None),
+        ({}, "Geometry notice</b> empty"),
+        ([], "Geometry notice</b> malformed (array)"),
+        ({"unrecognized": "value"}, "Geometry notice</b> emitted (no supported fields)"),
+    ):
+        knudsen = {"status": "ok"}
+        if geometry_value is not None:
+            knudsen["stage_area_geometry_provenance_notice"] = geometry_value
+        artifact = {
+            "terminal": {"run_metadata": {"knudsen_regime_diagnostic": knudsen}},
+            "timesteps": [],
+        }
+        transport = _region(
+            _render_panel(artifact)["html"],
+            "<span>Transport context</span>",
+            '<div class="sec-p3-coating-status">',
+        )
+        if expected is None:
+            assert "Coating geometry provenance" not in transport
+        else:
+            assert expected in transport
+
+    unsupported_knudsen = {
+        "terminal": {
+            "run_metadata": {
+                "knudsen_regime_diagnostic": {"schema_version": "future-v1"},
+            },
+        },
+        "timesteps": [],
+    }
+    unsupported_transport = _region(
+        _render_panel(unsupported_knudsen)["html"],
+        "<span>Transport context</span>",
+        '<div class="sec-p3-coating-status">',
+    )
+    assert "Transport context emitted" in unsupported_transport
+    assert "no P3-supported context fields" in unsupported_transport
+    assert "Transport context pending" not in unsupported_transport
+
+
+def test_p3_nested_map_states_are_visible_without_dropping_valid_siblings() -> None:
+    def species_region(coating: object) -> str:
+        artifact = {
+            "terminal": {
+                "final": {"wall_deposit_by_species_kg": {"SiO": 1.0}},
+                "run_metadata": {"pressure_coating_pareto_diagnostic": coating},
+            },
+            "timesteps": [],
+        }
+        return _region(
+            _render_panel(artifact)["html"],
+            "<h3>Wall deposit by species</h3>",
+            '<details class="sec-p3-details"><summary>Per-wall-segment terminal breakdown',
+        )
+
+    omitted_entry = species_region({"by_species": {}})
+    assert "Per-species diagnostic map empty" in omitted_entry
+    assert _cell_texts(_row_with(omitted_entry, 'title="SiO"'))[4] == (
+        "Per-species status not emitted"
+    )
+
+    malformed_parent = species_region({"by_species": []})
+    assert "Per-species diagnostic map malformed" in malformed_parent
+    assert "malformed (array)" in malformed_parent
+
+    empty_entry = species_region({"by_species": {"SiO": {}}})
+    assert _cell_texts(_row_with(empty_entry, 'title="SiO"'))[4] == (
+        "Per-species entry empty"
+    )
+
+    malformed_entry = species_region({"by_species": {"SiO": []}})
+    assert _cell_texts(_row_with(malformed_entry, 'title="SiO"'))[4] == (
+        "Per-species entry malformed (array)"
+    )
+
+    current_empty = species_region({"by_species": {"SiO": {"status": "ok"}}, "current": {}})
+    assert "Coating current map empty" in current_empty
+    current_malformed = species_region({"by_species": {"SiO": {"status": "ok"}}, "current": []})
+    assert "Coating current map malformed" in current_malformed
+    assert "malformed (array)" in current_malformed
+
+    nested_maps = species_region({
+        "by_species": {"SiO": {"status": "ok"}},
+        "current": {
+            "wall_deposit_flux_kg_hr_by_species": {},
+            "wall_deposit_cumulative_kg_by_species": [],
+        },
+    })
+    assert "Current coating flux map empty" in nested_maps
+    assert "Current coating cumulative map malformed" in nested_maps
+    assert "malformed (array)" in nested_maps
+
+    segment_artifact = {
+        "terminal": {
+            "final": {
+                "deposit_by_surface_species_kg": {
+                    "empty_segment": {},
+                    "malformed_segment": [],
+                    "stage_0_to_stage_1": {"SiO": 0.0},
+                },
+            },
+        },
+        "timesteps": [],
+    }
+    segment_region = _region(
+        _render_panel(segment_artifact)["html"],
+        "<summary>Per-wall-segment terminal breakdown</summary>",
+        "</details>",
+    )
+    assert "Segment empty_segment empty" in segment_region
+    assert "Segment malformed_segment malformed" in segment_region
+    assert "malformed (array)" in segment_region
+    assert _cell_texts(_row_with(segment_region, 'title="SiO"')) == [
+        "Wall deposit · stage 0→1", "SiO", "0 kg",
+    ]
+
+
+def test_p3_hourly_container_states_and_partial_histories_never_derive_values() -> None:
+    def hourly(timestep: object) -> str:
+        artifact = {"terminal": {}, "timesteps": [timestep]}
+        return _render_panel(artifact, timestep_index=0)["hourly"]
+
+    assert "Hourly coating telemetry pending" in hourly({"hour": 1})
+    assert "Selected-hour summary empty" in hourly({"hour": 1, "summary": {}})
+    assert "Selected-hour summary malformed" in hourly({"hour": 1, "summary": []})
+
+    empty_map = hourly({"hour": 1, "summary": {"wall_deposit_delta_kg": {}}})
+    assert "Hourly deposit map empty" in empty_map
+    malformed_map = hourly({"hour": 1, "summary": {"wall_deposit_delta_kg": []}})
+    assert "Hourly deposit map malformed" in malformed_map
+    assert "malformed (array)" in malformed_map
+
+    malformed_child = hourly({
+        "hour": 1,
+        "summary": {
+            "wall_deposit_delta_kg": {"stage_0_to_stage_1": []},
+            "wall_deposit_cumulative_kg": {"stage_0_to_stage_1": {"SiO": 0.5}},
+        },
+    })
+    malformed_row = _row_with(malformed_child, 'title="SiO"')
+    assert _cell_texts(malformed_row) == [
+        "Wall deposit · stage 0→1", "SiO", "malformed (array)", "0.5 kg",
+    ]
+    assert "Hourly segment stage_0_to_stage_1 malformed" in malformed_child
+
+    empty_child = hourly({
+        "hour": 1,
+        "summary": {
+            "wall_deposit_delta_kg": {"stage_0_to_stage_1": {}},
+            "wall_deposit_cumulative_kg": {"stage_0_to_stage_1": {"SiO": 0.5}},
+        },
+    })
+    assert _cell_texts(_row_with(empty_child, 'title="SiO"'))[2:] == [
+        "not emitted", "0.5 kg",
+    ]
+    assert "Hourly segment stage_0_to_stage_1 empty" in empty_child
+
+    for hour_value, expected in (
+        (None, "Selected hour · malformed (null)"),
+        ("", "Selected hour · empty"),
+        (0, "Selected hour · 0"),
+        ({}, "Selected hour · malformed (object)"),
+    ):
+        assert expected in hourly({"hour": hour_value, "summary": {}})
+    assert "Selected hour · not emitted" in hourly({"summary": {}})
+
+    delta_history = {
+        "terminal": {
+            "run_metadata": {
+                "pressure_coating_pareto_diagnostic": {
+                    "by_species": {"SiO": {"status": "ok"}},
+                },
+            },
+        },
+        "timesteps": [
+            {"hour": 1, "summary": {"wall_deposit_delta_kg": {"seg": {"SiO": 0.111}}}},
+            {"hour": 2, "summary": {"wall_deposit_delta_kg": {"seg": {"SiO": 0.222}}}},
+        ],
+    }
+    delta_render = _render_panel(delta_history, timestep_index=1)
+    delta_species = _region(
+        delta_render["html"],
+        "<h3>Wall deposit by species</h3>",
+        '<details class="sec-p3-details"><summary>Per-wall-segment terminal breakdown',
+    )
+    assert _cell_texts(_row_with(delta_species, 'title="SiO"'))[1:] == [
+        "not emitted", "not emitted", "not emitted", "Status ok",
+    ]
+    assert _cell_texts(_row_with(delta_render["hourly"], 'title="SiO"'))[2:] == [
+        "0.222 kg/hour", "not emitted",
+    ]
+    assert "0.333 kg" not in delta_species and "0.333 kg" not in delta_render["hourly"]
+
+    cumulative_history = {
+        "terminal": {
+            "run_metadata": {
+                "pressure_coating_pareto_diagnostic": {
+                    "by_species": {"SiO": {"status": "ok"}},
+                },
+            },
+        },
+        "timesteps": [
+            {"hour": 1, "summary": {"wall_deposit_cumulative_kg": {"seg": {"SiO": 0.5}}}},
+            {"hour": 2, "summary": {"wall_deposit_cumulative_kg": {"seg": {"SiO": 0.8}}}},
+        ],
+    }
+    cumulative_render = _render_panel(cumulative_history, timestep_index=1)
+    cumulative_species = _region(
+        cumulative_render["html"],
+        "<h3>Wall deposit by species</h3>",
+        '<details class="sec-p3-details"><summary>Per-wall-segment terminal breakdown',
+    )
+    assert _cell_texts(_row_with(cumulative_species, 'title="SiO"'))[1:] == [
+        "not emitted", "not emitted", "not emitted", "Status ok",
+    ]
+    assert _cell_texts(_row_with(cumulative_render["hourly"], 'title="SiO"'))[2:] == [
+        "not emitted", "0.8 kg",
+    ]
+    assert "0.3 kg/hour" not in cumulative_species
+    assert "0.3 kg/hour" not in cumulative_render["hourly"]
