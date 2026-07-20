@@ -1,0 +1,147 @@
+.sec-p1-fe-redox {
+  --sec-p1-fe: var(--orange);
+  display: block;
+}
+
+.sec-p1-fe-redox .sec-p1-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.sec-p1-fe-redox .sec-p1-flag {
+  cursor: help;
+}
+
+.sec-p1-fe-redox .sec-p1-flag-clear {
+  border-color: color-mix(in srgb, var(--green) 58%, var(--rule));
+  background: color-mix(in srgb, var(--green) 10%, var(--panel));
+}
+
+.sec-p1-fe-redox .sec-p1-flag-caution {
+  border-color: color-mix(in srgb, var(--orange) 58%, var(--rule));
+  background: color-mix(in srgb, var(--orange) 10%, var(--panel));
+}
+
+.sec-p1-fe-redox .sec-p1-headline,
+.sec-p1-fe-redox .sec-p1-partition-head,
+.sec-p1-fe-redox .sec-p1-stage3 {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+  margin: 12px 0;
+}
+
+.sec-p1-fe-redox .sec-p1-partition-head {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sec-p1-fe-redox .sec-p1-stage3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sec-p1-fe-redox .sec-p1-metric {
+  min-height: 82px;
+  border-left: 3px solid var(--sec-p1-fe);
+}
+
+.sec-p1-fe-redox .sec-p1-metric .v {
+  font-size: clamp(18px, 2.5vw, 26px);
+}
+
+.sec-p1-fe-redox .sec-p1-pending-value {
+  color: var(--ink-3);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.sec-p1-fe-redox .sec-p1-disclosure,
+.sec-p1-fe-redox .sec-p1-nested-disclosure {
+  margin-top: 12px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+}
+
+.sec-p1-fe-redox .sec-p1-disclosure > summary,
+.sec-p1-fe-redox .sec-p1-nested-disclosure > summary {
+  padding: 11px 13px;
+  color: var(--ink-2);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.sec-p1-fe-redox .sec-p1-disclosure > summary:hover,
+.sec-p1-fe-redox .sec-p1-disclosure > summary:focus-visible,
+.sec-p1-fe-redox .sec-p1-nested-disclosure > summary:hover,
+.sec-p1-fe-redox .sec-p1-nested-disclosure > summary:focus-visible {
+  background: color-mix(in srgb, var(--blue) 8%, var(--panel));
+  color: var(--ink);
+}
+
+.sec-p1-fe-redox .sec-p1-disclosure[open] > summary,
+.sec-p1-fe-redox .sec-p1-nested-disclosure[open] > summary {
+  border-bottom: 1px solid var(--rule);
+}
+
+.sec-p1-fe-redox .sec-p1-disclosure > h3 {
+  margin: 14px 13px 7px;
+  color: var(--ink-2);
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.sec-p1-fe-redox .sec-p1-table-wrap {
+  overflow-x: auto;
+}
+
+.sec-p1-fe-redox .sec-p1-table-wrap table {
+  margin: 0;
+}
+
+.sec-p1-fe-redox .sec-p1-table-wrap td {
+  min-width: 150px;
+  overflow-wrap: anywhere;
+}
+
+.sec-p1-fe-redox .sec-p1-empty-note {
+  padding: 12px 13px;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.sec-p1-fe-redox .sec-p1-pending {
+  margin: 12px;
+  box-shadow: none;
+}
+
+.sec-p1-fe-redox > .sec-p1-pending {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.sec-p1-fe-redox .sec-p1-link-note {
+  margin: 12px;
+}
+
+@media (max-width: 900px) {
+  .sec-p1-fe-redox .sec-p1-headline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sec-p1-fe-redox .sec-p1-partition-head,
+  .sec-p1-fe-redox .sec-p1-stage3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .sec-p1-fe-redox .sec-p1-headline,
+  .sec-p1-fe-redox .sec-p1-partition-head,
+  .sec-p1-fe-redox .sec-p1-stage3 {
+    grid-template-columns: 1fr;
+  }
+}
