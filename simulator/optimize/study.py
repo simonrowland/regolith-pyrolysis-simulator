@@ -789,7 +789,12 @@ def run(
             for candidate, scored, cache_hit in results:
                 _assert_honest_result(scored, definitions)
                 light_scored = _strip_heavy_result(scored)
-                record = _to_record(candidate, scored, cache_hit=cache_hit)
+                record = _to_record(
+                    candidate,
+                    light_scored,
+                    cache_hit=cache_hit,
+                    already_light=True,
+                )
                 with store.write_lock():
                     if scored.eval_spec is not None:
                         try:
@@ -4105,8 +4110,14 @@ def _latest_backend_status(value: Any) -> str | None:
     return _backend_status_from_trace(value[-1])
 
 
-def _to_record(candidate: Candidate, scored: ScoredResult, *, cache_hit: bool) -> StudyRecord:
-    light_scored = _strip_heavy_result(scored)
+def _to_record(
+    candidate: Candidate,
+    scored: ScoredResult,
+    *,
+    cache_hit: bool,
+    already_light: bool = False,
+) -> StudyRecord:
+    light_scored = scored if already_light else _strip_heavy_result(scored)
     failure = light_scored.failure_category
     objectives = _objective_mapping(light_scored.objectives)
     search_provenance = _search_provenance_from_candidate(candidate)

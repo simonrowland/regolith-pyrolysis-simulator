@@ -3534,6 +3534,19 @@ def pareto_front(
         else objective_scores(objective_getter(item), definitions)
         for item in items
     )
+    if scores and all(row and all(score is not None for score in row) for row in scores):
+        front_indices: list[int] = []
+        for index, row in enumerate(scores):
+            if any(_scores_dominate(scores[other], row) for other in front_indices):
+                continue
+            front_indices = [
+                other
+                for other in front_indices
+                if not _scores_dominate(row, scores[other])
+            ]
+            front_indices.append(index)
+        return tuple(items[index] for index in front_indices)
+
     front: list[T] = []
     for index, item in enumerate(items):
         if all(score is None for score in scores[index]):

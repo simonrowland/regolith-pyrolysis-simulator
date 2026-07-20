@@ -155,8 +155,6 @@ class MorrisScreenStrategy:
     def tell(self, results: Sequence[tuple[Candidate, "ScoredResult"]]) -> None:
         batch: list[tuple[Candidate, "ScoredResult"]] = []
         seen: set[str] = set()
-        recorded = set(self._result_by_id)
-
         for pair in results:
             if not isinstance(pair, tuple) or len(pair) != 2:
                 raise ValueError(
@@ -180,7 +178,7 @@ class MorrisScreenStrategy:
                 raise ValueError(f"candidate metadata does not match plan: {candidate.id!r}")
             if candidate.id in seen:
                 raise ValueError(f"duplicate candidate_id in tell batch: {candidate.id!r}")
-            if candidate.id in recorded:
+            if candidate.id in self._result_by_id:
                 raise ValueError(f"candidate_id already recorded: {candidate.id!r}")
             seen.add(candidate.id)
             batch.append((candidate, scored))

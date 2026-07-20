@@ -691,6 +691,19 @@ def test_pareto_front_preserves_stable_non_dominated_order() -> None:
     assert [item["id"] for item in front] == ["d", "c"]
 
 
+def test_pareto_front_with_empty_score_rows_preserves_prior_empty_front() -> None:
+    items = ("a", "b")
+
+    front = pareto_front(
+        items,
+        (),
+        objective_getter=lambda item: (),
+        score_getter=lambda item: (),
+    )
+
+    assert front == ()
+
+
 def test_furnace_amortization_cost_trades_continuously_against_yield() -> None:
     assert furnace_amortization_cost_per_run(
         20.0, 1.0, 500.0, 1.0, has_positive_fouling=True

@@ -211,7 +211,6 @@ class OptunaNSGA2Strategy:
     def tell(self, results: Sequence[tuple[Candidate, "ScoredResult"]]) -> None:
         batch: list[TellBatchRow] = []
         seen: set[str] = set()
-        recorded = set(self._result_by_id)
         scored_result_type: Any | None = None
 
         for pair in results:
@@ -249,7 +248,7 @@ class OptunaNSGA2Strategy:
                 raise ValueError(
                     f"duplicate candidate_id in tell batch: {candidate.id!r}"
                 )
-            if candidate.id in recorded:
+            if candidate.id in self._result_by_id:
                 raise ValueError(f"candidate_id already recorded: {candidate.id!r}")
             trial = self._trial_by_candidate_id.get(candidate.id)
             if trial is None:

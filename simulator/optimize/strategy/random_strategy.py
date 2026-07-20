@@ -43,6 +43,7 @@ class RandomStrategy:
         self._asked = 0
         self._tell_count = 0
         self._results: list[tuple[Candidate, ScoredResult]] = []
+        self._recorded_ids: set[str] = set()
 
     @property
     def seed(self) -> int:
@@ -90,8 +91,6 @@ class RandomStrategy:
     def tell(self, results: Sequence[tuple[Candidate, "ScoredResult"]]) -> None:
         batch: list[tuple[Candidate, "ScoredResult"]] = []
         seen: set[str] = set()
-        recorded = {candidate.id for candidate, _ in self._results}
-
         for pair in results:
             if not isinstance(pair, tuple) or len(pair) != 2:
                 raise ValueError(
@@ -108,12 +107,13 @@ class RandomStrategy:
                 )
             if candidate.id in seen:
                 raise ValueError(f"duplicate candidate_id in tell batch: {candidate.id!r}")
-            if candidate.id in recorded:
+            if candidate.id in self._recorded_ids:
                 raise ValueError(f"candidate_id already recorded: {candidate.id!r}")
             seen.add(candidate.id)
             batch.append((candidate, scored))
 
         self._results.extend(batch)
+        self._recorded_ids.update(candidate.id for candidate, _ in batch)
         self._tell_count += len(batch)
 
     def _candidate_id(self, sequence: int) -> str:

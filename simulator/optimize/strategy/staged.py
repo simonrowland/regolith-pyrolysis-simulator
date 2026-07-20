@@ -347,6 +347,7 @@ class StagedStrategy:
         self._stage_joint_refine_trace_signals: dict[str, tuple[str, ...]] = {}
         self._asked_by_id: dict[str, Candidate] = {}
         self._results: list[tuple[Candidate, ScoredResult]] = []
+        self._recorded_ids: set[str] = set()
         self._archive: tuple[_ArchiveMember, ...] = ()
         self._mode = "forward"
         self._tell_count = 0
@@ -403,7 +404,6 @@ class StagedStrategy:
     def tell(self, results: Sequence[tuple[Candidate, ScoredResult]]) -> None:
         batch: list[tuple[Candidate, ScoredResult, tuple[str, ...]]] = []
         seen: set[str] = set()
-        recorded = {candidate.id for candidate, _ in self._results}
         for pair in results:
             if not isinstance(pair, tuple) or len(pair) != 2:
                 raise ValueError("tell results must contain (Candidate, ScoredResult) 2-tuples")
@@ -420,7 +420,7 @@ class StagedStrategy:
                 )
             if candidate.id in seen:
                 raise ValueError(f"duplicate candidate_id in tell batch: {candidate.id!r}")
-            if candidate.id in recorded:
+            if candidate.id in self._recorded_ids:
                 raise ValueError(f"candidate_id already recorded: {candidate.id!r}")
             seen.add(candidate.id)
             joint_refine_trace_signals = _joint_refine_trace_labels(_scored_trace(scored))
@@ -432,6 +432,7 @@ class StagedStrategy:
             self._stage_results[candidate.id] = (candidate, scored)
             self._stage_joint_refine_trace_signals[candidate.id] = joint_refine_trace_signals
             self._results.append((candidate, scored))
+            self._recorded_ids.add(candidate.id)
         self._tell_count += len(batch)
         self._advance_completed_stage()
 

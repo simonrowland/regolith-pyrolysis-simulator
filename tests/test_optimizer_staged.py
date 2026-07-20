@@ -1706,6 +1706,29 @@ def test_staged_single_stage_terminates_and_empty_stage_fails_loud() -> None:
         StagedStrategy(RecipeSchema(allowlist=()), seed=3, objective_profile=PROFILE)
 
 
+def test_staged_tell_rejects_candidate_from_completed_prior_stage() -> None:
+    strategy = StagedStrategy(
+        SCHEMA,
+        seed=3,
+        objective_profile=_staged_profile(beam_width=1, children_per_parent=1),
+    )
+    first_stage = strategy.ask(10)
+    assert first_stage
+    strategy.tell(
+        [
+            (candidate, _scored(candidate.patch, candidate_id=candidate.id))
+            for candidate in first_stage
+        ]
+    )
+    assert strategy.ask(10)
+
+    candidate = first_stage[0]
+    with pytest.raises(ValueError, match="candidate_id already recorded"):
+        strategy.tell(
+            [(candidate, _scored(candidate.patch, candidate_id=candidate.id))]
+        )
+
+
 def test_staged_allowlist_unknown_stage_raises_named_error() -> None:
     profile = {
         **PROFILE,
